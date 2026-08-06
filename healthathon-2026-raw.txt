@@ -1,0 +1,651 @@
+Koita Foundation
+IIT Bombay · KCDH
+FOGSI
+National Cancer Grid
+RSSDI
+Home
+About
+Themes
+Eligibility
+Journey
+Prizes
+FAQ
+Dashboard →
+Sign out
+
+Health-a-thon
+2026
+- India's first Doctor and Technology health hackathon for assistive AI
+India's First Health Hackathon
+Doctors & Technologists
+Co - creating AI Solutions
+
+in Cancer, Diabetes and Maternal & Child Health.
+
+Go to Dashboard →
+Doctor's Role ↗
+|
+Technologist's Role ↗
+
+A JOINT INITIATIVE
+
+India's leading health ecosystem comes together
+Federation of Obstetric and Gynaecological Societies of India logo
+Federation of Obstetric and Gynaecological Societies of India
+India's largest professional associations of obstetricians and gynaecologists, representing over 45,000 OB-GYN specialists through 280+ member societies across India.
+
+About Federation of Obstetric and Gynaecological Societies of India →
+National Cancer Grid logo
+National Cancer Grid
+India's largest cancer care networks, bringing together 370+ member institutions that collectively serve nearly 60% of all cancer patients in India.
+
+About National Cancer Grid →
+Research Society for the Study of Diabetes in India logo
+Research Society for the Study of Diabetes in India
+India's largest professional body for diabetes care, representing over 13,000 members through 23 state chapters across the country.
+
+About Research Society for the Study of Diabetes in India →
+IIT Bombay · KCDH logo
+IIT Bombay · KCDH
+India's first academic centre dedicated to Digital Health, driving research, entrepreneurship and innovation in Digital Health and AI.
+
+About IIT Bombay · KCDH →
+Koita Foundation logo
+Koita Foundation
+Driving Digital Health and AI adoption in India through strategic partnerships with leading academic, healthcare, technology organizations and NGOs.
+
+About Koita Foundation →
+Powered by
+Reskilll
+Health-a-thon 2026 focuses on non-clinical, operational and workflow problems.
+Not diagnosis. Not clinical decision-making.
+
+But the day-to-day barriers that slow healthcare down.
+
+Doctors don't need AI expertise
+Doctors don't need coding expertise
+Bring your clinical expertise and work with the team.
+WHAT WILL YOU WORK ON
+
+Use Cases And Problem Statements
+
+Doctor / Care Team Facing
+Simplify workflows, reduce admin load and support better care coordination.
+
+Explore 7 use cases
+
+Patient / Caregiver Facing
+Guide, engage and empower patients and caregivers through their journey.
+
+Explore 6 use cases
+These use cases can be adapted and applied across Cancer, Diabetes and Maternal & Child Health. During registration, teams choose the care domain they want to work and build in.
+
+DESIGN BAR
+
+Design principles & hackathon scope
+Leverage existing AI capabilities - agents, orchestration frameworks, APIs and open-source tools (e.g. LangChain, OpenClaw, Hermes Agents and similar). Work with existing workflows; keep solutions assistive, human-centred and measurable within 60–90 days.
+
+Out of Scope: Clinical AI solutions involving diagnosis, treatment recommendations, clinical decision support, clinical risk scoring, interpretation of medical data or autonomous clinical advice.
+
+Principles & scope
+WHO CAN APPLY
+Open to All Doctors, Medical students, Technology Innovators and multidisciplinary teams passionate about solving real-world healthcare challenges with AI. Participate individually or as a team.
+
+Doctors
+All Practising Doctors, Residents and Fellows
+
+Medical Students
+Medical students (3rd year onwards), Interns and PG Residents
+
+Healthcare Professional
+Nurses, physiotherapists, pharmacists, lab technicians, dietitians, allied health & healthcare management
+
+Startups / Health-Tech
+Startups and Health-Tech companies
+
+Technology Teams
+Developers, AI builders, researchers and innovators
+
+Engineering Students
+Engineering students, M.E, PhD
+
+TEAM STRUCTURE
+2–5 members per team. Every team needs a Doctor and a Technologist.
+Remaining seats are open to any clinical, technical or multidisciplinary background.
+
+REWARDS & RECOGNITION
+PRIZE POOL WORTH
+
+₹54+ LAKHS
+
+Cash Prizes
+Technology Credits
+Partner Benefits
+BEYOND THE PRIZES
+
+Access
+
+Connect with Doctors and Hospitals from NCG, RSSDI and FOGSI.
+
+Recognition
+
+National recognition, plus a feature for top teams on the website.
+
+Certificate
+
+Official certificate for every eligible participant.
+
+Networking
+
+Meet startups and investors, and keep collaborating.
+
+GRAND FINALE
+
+IIT Bombay
+
+28 Nov 2026
+Powai, Mumbai · Maharashtra
+Indian Institute of Technology Bombay
+One Hackathon. Real Problems. Real Impact.
+
+Doctors and technologists co-creating India-ready AI solutions
+
+Let's build the future of healthcare, together.
+
+Go to Dashboard →
+Koita Foundation
+IIT Bombay · KCDH
+FOGSI
+National Cancer Grid
+RSSDI
+Register
+Who can join
+Themes
+FAQ
+·
+healthathon@reskilll.com
+·
+Join WhatsApp
+Powered by
+Reskilll
+© 2026 · Health-a-thon 2026 · Assistive, not diagnostic.https://healthathon.reskilll.com/ Koita Foundation
+IIT Bombay · KCDH
+FOGSI
+National Cancer Grid
+RSSDI
+Home
+About
+Themes
+Eligibility
+Journey
+Prizes
+FAQ
+Dashboard →
+Sign out
+Back to home
+FAQ AND GUIDE
+
+Everything you need before you register
+A short guide, the full programme timeline, and answers to the questions people ask most.
+
+Guide
+Journey
+Timeline
+FAQs
+Guide
+Assistive, not diagnostic. Keep this in mind at every stage.
+
+What is Health-a-thon 2026?
+India’s first Doctor × Technology health hackathon. Doctors name real operational problems; technologists help design and build assistive AI solutions - not diagnostic tools - for Cancer Care, Diabetes Care, and Maternal & Child Health.
+
+Who can join
+Practising doctors, medical students (PG / final year / interns), NCG · RSSDI · FOGSI network members, startups, developers, AI builders, researchers, and final-year engineering students. Register solo or as a team of 2–5 with one clinical lead (practising doctor) and one technical lead.
+
+The hard rule
+Assistive, not diagnostic. Solutions may simplify workflows (follow-ups, documentation, navigation, coordination). They must not diagnose, prescribe, replace clinical judgement, or act as clinical decision support. Use only fake or fully anonymised data.
+
+How it works
+Doctors and healthcare professionals register and select a challenge → technology teams join from 15 August → you pick your team → Round 1 idea submission → shortlist → build sprint with mentors → Top 30 announced by 14 November → grand finale at IIT Bombay on 28 November 2026.
+
+Key registration windows
+Doctor & healthcare professional registration: now – 21 August 2026. Technology team registration: 15 August – 11 September 2026. Matchmaking & team formation: 22 August – 18 September. Round 1 idea submission: 12 – 25 September. Round 1 evaluation & shortlisting: 26 September – 3 October. Build sprint: 5 October – 8 November. Top teams announced by 14 November. Grand finale: 28 November 2026 at IIT Bombay, Powai.
+
+Prizes
+₹54+ Lakhs prize pool, split evenly across the three clinical tracks. Top 30 teams reach the finale; every finalist is awarded. Cash prizes, technology credits and partner benefits apply.
+
+Guardrail: Out of Scope: Clinical AI solutions involving diagnosis, treatment recommendations, clinical decision support, clinical risk scoring, interpretation of medical data or autonomous clinical advice.
+
+Your journey
+Five stages from registration to the grand finale
+
+1
+Doctor & healthcare professional registration
+
+Now – 21 Aug 2026
+Register and select the healthcare challenge or use case you would like to work on.
+
+2
+Matchmaking & team formation
+
+22 Aug – 18 Sep 2026
+Review recommended technology teams and select the team you would like to work with - or bring a tech partner you already know.
+
+3
+Round 1 – idea submission
+
+12 – 25 Sep 2026
+With your technology team, develop and submit your solution concept and proposed approach.
+
+4
+Build sprint & final submission
+
+5 Oct – 8 Nov 2026
+Guide clinical fit while technologists build. Mentors support the team through a 5-week online sprint.
+
+5
+Grand finale
+
+28 Nov 2026
+Top teams present to the jury at IIT Bombay for the ₹54+ lakh prize pool.
+
+Full programme timeline
+1 Aug – 28 Nov 2026
+
+01
+
+Doctor & healthcare professional registration
+Now – 21 Aug 2026
+
+Register for the hackathon and select the healthcare challenge or use case you would like to work on.
+
+02
+
+Technology team registration
+15 Aug – 11 Sep 2026
+
+Technology innovators and developers from across India register, showcase their expertise and select the healthcare challenges they would like to work on.
+
+03
+
+Matchmaking & team formation
+22 Aug – 18 Sep 2026
+
+Review recommended technology teams and select the team you would like to work with. Together, you will refine your problem statement and prepare for Round 1.
+
+04
+
+Round 1 – idea submission
+12 – 25 Sep 2026
+
+Work with your technology team to develop and submit your solution concept and proposed approach. This is the first stage of the evaluation process.
+
+05
+
+Round 1 evaluation & shortlisting
+26 Sep – 3 Oct 2026
+
+Entries will be evaluated, and shortlisted teams will be selected to participate in the Build Sprint.
+
+06
+
+Build sprint & final submission
+5 Oct – 8 Nov 2026
+
+Shortlisted teams will participate in a 5-week online Build Sprint, where doctors and technology teams work together to refine the solution, build the prototype and final submission, supported by mentors and expert check-ins.
+
+07
+
+Top teams announcement
+By 14 Nov 2026
+
+The Top 30 teams will be shortlisted and announced for the Grand Finale.
+
+08
+
+Grand finale – IIT Bombay
+28 Nov 2026
+
+Present your solution before an eminent jury of clinicians, industry leaders and technology experts at IIT Bombay and compete for the ₹54+ lakh prize pool.
+
+Offline @ IIT Bombay, Powai
+
+FAQ
+
+Frequently asked questions
+Still stuck? Email support or join the community WhatsApp.
+
+Contact support
+Join WhatsApp
+
+Who can apply?
+Practising doctors, residents and fellows; members of the NCG, RSSDI and FOGSI networks; medical students (PG and final year) and interns; healthcare professionals (nurses, allied health such as physiotherapists, pharmacists, lab technicians and dietitians, and healthcare management); startups and health-tech companies; developers, AI builders, researchers and innovators; and final-year engineering students from all disciplines. Medical students need more than 3.5 years of education completed. You can register individually or as a team.
+
+How are doctors paired with technologists?
+
+Is coding required?
+
+Can doctors join alone?
+
+How big is a team?
+
+Is it online or in person?
+
+What may teams build?
+
+What makes a strong entry?
+
+Do we need a measurable KPI?
+
+How much system integration is expected?
+
+Must solutions be multilingual?
+
+What does pilot results in 60–90 days mean?
+
+Who is eligible for a prize?
+Ready to co-create?
+
+Doctors and healthcare professionals register first. Technology teams join from 15 August.
+
+Register as Doctor →
+Tech teams open 15 Aug ·
+8d 00h 36m
+Koita Foundation
+IIT Bombay · KCDH
+FOGSI
+National Cancer Grid
+RSSDI
+Register
+Who can join
+Themes
+FAQ
+·
+healthathon@reskilll.com
+·
+Join WhatsApp
+Powered by
+Reskilll
+© 2026 · Health-a-thon 2026 · Assistive, not diagnostic. Practising doctors, residents and fellows; members of the NCG, RSSDI and FOGSI networks; medical students (PG and final year) and interns; healthcare professionals (nurses, allied health such as physiotherapists, pharmacists, lab technicians and dietitians, and healthcare management); startups and health-tech companies; developers, AI builders, researchers and innovators; and final-year engineering students from all disciplines. Medical students need more than 3.5 years of education completed. You can register individually or as a team.
+
+ You name a clinical workflow problem and select your track and use cases. Technologists join next and list their skills and ideas. During matchmaking, you review recommended tech teams and choose which one to join - you always pick; the platform never assigns a team for you. Existing teams that already include a doctor skip matchmaking. Once paired, the technologists help design and build the assistive solution while you stay clinical lead.
+
+ Not for doctors. You define the problem and guide clinical fit; technologists on your team handle the build. Every team has a clinical lead and a technical lead. Doctors and healthcare professionals register first (now through 21 August); technology team registration opens 15 August.
+
+Yes. Register on your own and describe the problem you want solved - you will be paired with technologists during matchmaking (22 August – 18 September), or you can bring a tech team you already know. You always choose the team.
+
+Two to five people, with one clinical lead (a practising doctor) and one technical lead on every team. Doctors and technologists work as one team from concept through the build sprint.
+
+Registration, matchmaking, submissions and the build sprint all run through this platform. The Top 30 teams are announced by 14 November. The grand finale is in person at IIT Bombay, Powai on 28 November 2026, where those finalists present a live demonstration of their working prototype to the jury.
+
+Assistive, not diagnostic. Solutions simplify operational workflows - follow-up and recall, notes and documentation, patient navigation, workflow automation. Nothing may diagnose, prescribe, replace clinical judgement, or act as clinical decision support. Strong entries also keep a human override and an audit trail for operational actions. Teams build on fake or fully anonymised data only - no patient data on the platform, with mentors, or in demos.
+
+Beyond the assistive guardrail, strong solutions target a high-frequency workflow pain, stay easy for doctors and patients, deliver near-term impact on low-cost channels, keep first-phase integration light, name a measurable operational KPI, support multilingual and caregiver-friendly use where needed, allow human override with an audit trail, plan for pilot evidence in 60–90 days, and work with information the clinic already has - paper registers, Excel, PDFs, scans, WhatsApp or hospital systems.
+
+Yes for a strong entry. Pick one operational metric you intend to move - for example recall completion, time-to-note, no-show rate or handoff lag - and say how you would measure baseline and change. Programme funnel numbers (entries, finalists) are not a substitute for your solution KPI.
+
+Minimal in phase one. Prefer light touch on existing systems over a full HIS or EHR rewrite. Solutions should still meet the clinic where it is - paper, spreadsheets, PDFs, images, WhatsApp or hospital systems - rather than assuming a clean greenfield database.
+
+Where your users need it, yes. Design for the languages of the doctors, patients and caregivers you serve, and treat caregivers as first-class users when the workflow involves family support - not English-only by default if the care setting is not.
+
+A stage demo at the finale is not the whole story. Strong entries show a credible path to early evidence in a real care setting within two to three months - even a small pilot that moves an operational KPI - not only a slide deck or one-off prototype walkthrough.
+
+The prize pool is ₹54+ Lakhs, split evenly across the three clinical tracks - cancer care, diabetes care and maternal and child health. The Top 30 teams are announced by 14 November and reach the finale; every finalist is awarded.
+Doctor / Care Team Facing
+7 use cases · Simplify workflows, reduce admin load and support better care coordination.
+
+
+01
+Patient Follow-up & Continuity of Care
+Keep patients connected across months of care - surface who needs follow-up before they are lost to care.
+
+02
+Consultation Readiness & Patient Journey Review
+Start every consult with a complete, longitudinal view of the patient - not a scramble across systems.
+
+03
+Patient Registry & Population Health
+A live view of the whole panel - care gaps, priorities and longitudinal journeys at population scale.
+
+04
+Clinic Operations & Patient Flow
+Run busy OPDs with real-time flow, smarter slots and fewer bottlenecks - without disrupting care.
+
+05
+Doctor Productivity & Knowledge Assistant
+An assistive knowledge and content co-pilot for teaching, research and admin - clinician stays in control.
+
+06
+Patient Education & Digital Engagement
+Create accurate, multilingual education and campaigns without turning clinicians into full-time content teams.
+
+07
+Clinic Performance & Practice Growth
+Grow referrals, retention and reputation with practice insights - without extra admin load. Use case 01 of 07
+
+Patient Follow-up & Continuity of Care
+Keep patients connected across months of care - surface who needs follow-up before they are lost to care.
+The current reality
+Long-term conditions such as cancer, diabetes and maternal health require patients to remain engaged with care over months or years.
+Many patients miss follow-up appointments, investigations, treatment milestones or scheduled reviews during their care journey.
+Hospitals invest significant effort in identifying and re-engaging these patients to ensure continuity of care.
+Relevant information is often fragmented across appointment systems, EMRs, laboratory records, treatment registers, spreadsheets and manual tracking processes.
+Doctors and care teams spend considerable time identifying patients who require follow-up, prioritising interventions and coordinating activities across multiple departments.
+As patient volumes increase, these manual processes become increasingly difficult to sustain, resulting in delayed interventions and gaps in continuity of care.
+What we're looking for
+Design solutions that help healthcare teams ensure patients remain connected throughout their care journey - enabling early identification of patients requiring follow-up and timely interventions before they are lost to care.
+Improve visibility across fragmented patient information to support informed decision-making, facilitate coordinated follow-up across doctors and care teams, and simplify follow-up workflows within existing healthcare settings.
+Reduce avoidable gaps in care by strengthening continuity of care and patient engagement, enabling healthcare providers to deliver timely, coordinated and patient-centred follow-up at scale.
+
+Use case 02 of 07
+
+Consultation Readiness & Patient Journey Review
+Start every consult with a complete, longitudinal view of the patient - not a scramble across systems.
+The current reality
+Preparing for a follow-up consultation involves much more than reviewing a patient's medical record. Doctors and care teams often need to reconstruct the patient's clinical journey from consultation notes, laboratory investigations, imaging reports, treatment records, medication history and pending clinical actions.
+In long-term care settings such as cancer, diabetes and maternal health, every consultation builds upon previous decisions. Clinicians need to quickly understand what has changed since the last visit, what remains pending and which issues require immediate attention.
+Much of this information is fragmented across multiple systems or exists only as scanned reports, PDFs, images and patient-provided documents, making it difficult to obtain a complete picture before the consultation.
+As outpatient clinics become busier, clinicians have limited time to assemble this information, resulting in increased administrative effort and less time for meaningful patient interaction.
+What we're looking for
+Design solutions that help doctors and care teams begin every consultation with a complete, contextual and longitudinal understanding of the patient's care journey by bringing together clinically relevant information from diverse healthcare data sources.
+Enable clinicians to quickly identify meaningful clinical changes, pending investigations, care milestones, medication history and other information required to support informed decision-making during the consultation.
+Support the interpretation of structured and unstructured information - including EMRs, laboratory systems, imaging reports, prescriptions, discharge summaries, referral letters, scanned documents, PDFs, photographs and patient-provided records - while identifying missing or inconsistent information and enabling clinicians to gather additional context where required.
+
+Use case 03 of 07
+
+Patient Registry & Population Health
+A live view of the whole panel - care gaps, priorities and longitudinal journeys at population scale.
+The current reality
+Doctors and care teams managing patients with chronic and long-term conditions such as cancer, diabetes and maternal health need to continuously monitor patient populations across different stages of their care journey - not just during clinic visits, but throughout the entire continuum of care.
+They need to identify patients requiring attention, recognise emerging care gaps, prioritise outreach and ensure that investigations, treatments, screenings and follow-up milestones are completed on time.
+Information required to manage these patient populations is often fragmented across EMRs, disease registries, laboratory systems, spreadsheets and programme databases, making it difficult to maintain a comprehensive and up-to-date view of patients under their care.
+As patient volumes increase, manually tracking longitudinal care journeys and coordinating timely interventions becomes increasingly challenging, limiting the ability to deliver proactive, continuous and population-based care.
+What we're looking for
+Design solutions that enable doctors and care teams to maintain a comprehensive, longitudinal and real-time view of the patient populations under their care, supporting proactive population health management.
+Consolidate information from multiple healthcare systems to generate meaningful patient- and population-level insights, identify emerging care gaps, highlight patients requiring attention and support informed clinical and operational decision-making.
+Enable coordinated, proactive and continuous care by making it easier to monitor longitudinal care journeys, manage disease registries and support timely interventions across the continuum of care.
+
+Use case 04 of 07
+
+Clinic Operations & Patient Flow
+Run busy OPDs with real-time flow, smarter slots and fewer bottlenecks - without disrupting care.
+The current reality
+Delivering timely and coordinated care in busy outpatient clinics requires continuous coordination between doctors, nurses, front-desk teams and care coordinators while managing appointments, patient arrivals, no-shows, walk-ins, delayed investigations, last-minute cancellations and changing clinical priorities.
+As patient volumes increase, balancing clinic capacity with patient demand becomes increasingly challenging, requiring continuous adjustments to schedules, patient flow and resource allocation throughout the day.
+Care teams often rely on multiple systems, manual coordination and real-time decision-making to accommodate urgent cases, minimise delays, and ensure patients receive the right care at the right time.
+Inefficient patient flow can result in longer waiting times, underutilised clinic capacity, operational bottlenecks and missed opportunities to deliver timely care.
+What we're looking for
+Design solutions that help clinics proactively manage appointments, patient flow and day-to-day operations while supporting doctors, care teams and administrative staff in responding to real-time operational changes.
+Optimise clinic operations by supporting intelligent appointment management, dynamic scheduling, patient queue management, utilisation of cancelled or vacant appointment slots, prioritisation based on clinical urgency and coordinated communication with patients and care teams.
+Provide real-time visibility into clinic operations, proactively identify operational bottlenecks and enable timely recommendations that improve clinic efficiency, patient experience and care delivery without disrupting existing workflows.
+
+Use case 05 of 07
+
+Doctor Productivity & Knowledge Assistant
+An assistive knowledge and content co-pilot for teaching, research and admin - clinician stays in control.
+The current reality
+Doctors spend a significant amount of time on professional activities beyond direct patient care, including creating educational material, presentations, research manuscripts, referral communications, patient information, departmental reports, clinical protocols and other professional content.
+They also invest considerable effort in reviewing medical literature, clinical guidelines, research publications and other sources of information to support clinical practice, teaching, research and academic work.
+These activities are often repetitive, context-dependent and require information to be gathered, synthesised, adapted and presented for different purposes and audiences.
+As clinical, academic and administrative responsibilities continue to grow, managing this workload becomes increasingly challenging, reducing the time available for patient care, research, education and innovation.
+What we're looking for
+Design solutions that act as an intelligent productivity and knowledge assistant for doctors, supporting professional, academic and administrative activities while ensuring clinicians remain in complete control of the final output.
+Assist clinicians in creating, reviewing, refining, summarising, adapting and organising professional content by leveraging available clinical context, institutional knowledge, medical literature and user preferences.
+Support knowledge discovery, evidence synthesis, content creation, educational material development, research activities and other routine tasks that improve productivity while reducing repetitive cognitive and administrative effort.
+
+Use case 06 of 07
+
+Patient Education & Digital Engagement
+Create accurate, multilingual education and campaigns without turning clinicians into full-time content teams.
+The current reality
+Patient education and engagement are essential for the long-term management of conditions such as cancer, diabetes and maternal and child health. Beyond consultations, doctors and care teams need to continuously educate patients on disease awareness, lifestyle modifications, medication adherence, preventive care, treatment milestones and self-management, while addressing misinformation and improving health literacy.
+Sustaining meaningful patient engagement requires significant time and effort. Clinicians are increasingly expected to create educational material, patient handouts, awareness campaigns, social media content, videos, presentations, newsletters, blogs, patient stories and multilingual communication tailored to different audiences and stages of the care journey.
+Planning communication calendars, adapting content across multiple digital channels, maintaining clinical accuracy and delivering consistent outreach can become a significant operational burden, often competing with direct patient care and other professional responsibilities.
+What we're looking for
+Design solutions that enable doctors and care teams to efficiently create, manage and deliver accurate, engaging and context-aware patient education and communication across multiple digital and offline channels.
+Support the creation and adaptation of educational content, presentation material, newsletters, blogs, video scripts, awareness campaigns, multilingual communication and personalised educational journeys tailored to different patient populations and stages of care.
+Simplify content planning, communication calendars, campaign management and ongoing patient engagement while ensuring clinicians remain in complete control of the accuracy, quality and final messaging.
+
+Use case 07 of 07
+
+Clinic Performance & Practice Growth
+Grow referrals, retention and reputation with practice insights - without extra admin load.
+The current reality
+Building and managing a successful clinical practice requires much more than delivering high-quality patient care. Doctors need to strengthen their professional presence, build patient trust, grow referral networks, engage with their communities and manage their digital presence while ensuring their practice operates efficiently.
+At the same time, clinicians need to understand where patients are coming from, what influences patient retention, how services are being utilised and where opportunities exist to improve and grow their practice.
+These responsibilities require significant time, effort and expertise beyond clinical practice. Information is often spread across appointment systems, patient feedback, referral sources, online platforms and operational records, making it difficult to gain meaningful insights or take timely action while balancing busy clinical schedules.
+What we're looking for
+Design solutions that help doctors build, manage and grow their practice while reducing the operational effort involved in running a modern healthcare practice.
+Support clinicians in strengthening their professional visibility, patient engagement, referral relationships, online presence and reputation while enabling data-driven practice growth.
+Provide meaningful practice and operational insights that help improve patient acquisition, patient retention, service utilisation, communication strategies and overall practice performance.
+
+Patient / Caregiver Facing
+6 use cases · Guide, engage and empower patients and caregivers through their journey.
+
+
+01
+Care Journey Companion
+Stage-aware guidance for patients and caregivers - what next, what to prepare, when to seek help.
+
+02
+Long-term Care Engagement
+Sustained adherence over months and years - milestones, lifestyle and motivation that last.
+
+03
+Family & Caregiver Support
+Tools for families who coordinate care - with consent, clarity and less stress.
+
+04
+Healthcare Navigation & Access
+Clear next steps across registration, tests, billing and referrals - especially for complex journeys.
+
+05
+Financial & Administrative Support
+Insurance, schemes and paperwork made navigable - so cost does not block care.
+
+06
+Patient Health Journey Progress
+A simple longitudinal view of milestones done, pending and next - so progress is visible.
+
+Use case 01 of 06
+
+Care Journey Companion
+Stage-aware guidance for patients and caregivers - what next, what to prepare, when to seek help.
+The current reality
+Managing long-term conditions such as cancer, diabetes and maternal health can be overwhelming for patients and their caregivers. Beyond consultations, patients often struggle to understand what comes next in their care journey, how to prepare for upcoming appointments, investigations or treatments, what lifestyle changes to follow and when to seek medical attention.
+Every stage of the care journey presents different information needs. Patients undergoing chemotherapy, individuals living with diabetes and expectant mothers all require timely, stage-specific guidance tailored to their condition, treatment plan and evolving healthcare needs.
+Without timely, personalised and reliable guidance, patients frequently rely on fragmented information from multiple sources, leading to anxiety, confusion, poor preparedness and inconsistent adherence to care plans.
+What we're looking for
+Design solutions that act as an intelligent care companion, providing patients and caregivers with timely, personalised and context-aware guidance throughout their healthcare journey.
+Adapt guidance based on an individual's condition, stage of care and evolving needs, helping patients understand what to expect, how to prepare, what actions are required and when to seek appropriate medical advice.
+Support intuitive and accessible care journey navigation, personalised education, milestone tracking, caregiver engagement and ongoing communication, while complementing - not replacing - the relationship between patients and their healthcare providers.
+
+Use case 02 of 06
+
+Long-term Care Engagement
+Sustained adherence over months and years - milestones, lifestyle and motivation that last.
+The current reality
+Successfully managing long-term conditions such as cancer, diabetes and maternal health requires patients to remain actively engaged in their care over weeks, months and, in many cases, years. Beyond taking medicines, patients need to complete investigations, attend follow-up appointments, adopt lifestyle changes, monitor their condition, recognise warning signs and actively participate in their care journey.
+Maintaining long-term engagement is often challenging. Motivation may decline over time, life circumstances change, and patients can gradually lose track of investigations, treatment milestones, medications and recommended lifestyle modifications.
+Family members and caregivers play an important role in supporting patients, but may not always have the information, tools or support needed to help patients stay on track. As a result, patients may gradually disengage from their care, leading to poor adherence, delayed interventions and suboptimal health outcomes.
+What we're looking for
+Design solutions that help patients and caregivers remain actively engaged throughout the entire care journey, supporting long-term participation rather than isolated interactions.
+Encourage sustained adherence to treatment plans, investigations, lifestyle modifications, self-monitoring and other care activities by adapting to the patient's condition, stage of care, progress and individual circumstances.
+Strengthen long-term connections between patients, caregivers and healthcare teams through personalised engagement, timely support and meaningful participation in the care journey.
+
+Use case 03 of 06
+
+Family & Caregiver Support
+Tools for families who coordinate care - with consent, clarity and less stress.
+The current reality
+Family members and caregivers play a vital role in supporting patients with long-term conditions such as cancer, diabetes and maternal health. They often help manage appointments, medications, lifestyle modifications, home care, transportation, finances and emotional well-being, while serving as an important link between patients and healthcare providers.
+Despite their central role, caregivers often have limited visibility into the patient's care journey. They may not fully understand treatment plans, upcoming milestones, warning signs, care instructions or changes in the patient's condition, making it difficult to provide timely and informed support.
+Communication is frequently fragmented across patients, caregivers and healthcare providers. As care becomes more complex, particularly during prolonged treatment or recovery, the lack of coordinated information and communication can increase stress for both patients and caregivers and impact continuity of care.
+What we're looking for
+Design solutions that empower family members and caregivers to actively participate in the patient's healthcare journey while respecting patient consent, privacy and existing clinical workflows.
+Enable caregivers to stay informed about the patient's care plan, appointments, medications, treatment milestones, care requirements and other relevant updates to provide timely and coordinated support.
+Strengthen communication, care coordination and shared care planning between patients, caregivers and healthcare providers through personalised education, task management, timely alerts and other collaborative care capabilities.
+
+Use case 04 of 06
+
+Healthcare Navigation & Access
+Clear next steps across registration, tests, billing and referrals - especially for complex journeys.
+The current reality
+Accessing healthcare often involves navigating multiple touchpoints across the care journey, including registration, appointments, investigations, consultations, pharmacies, billing, referrals and follow-up care. Understanding where to go, what to do next and how to complete each step of care can be confusing and overwhelming, particularly for elderly patients, individuals with chronic conditions, people from rural areas and those with limited health literacy.
+For patients with long-term conditions such as cancer, diabetes and maternal health, care is often delivered across multiple departments, facilities and healthcare professionals over an extended period, making the care journey even more complex.
+Patients and caregivers frequently rely on verbal instructions, paper documents and multiple sources of information to navigate the healthcare system, increasing the risk of missed steps, unnecessary delays, fragmented care experiences and poor access to services.
+What we're looking for
+Design solutions that help patients and caregivers navigate the healthcare system with greater confidence by providing clear, personalised and context-aware guidance throughout their care journey.
+Support patients across registrations, appointments, investigations, consultations, hospital processes, referrals and follow-up care, making healthcare services easier to access, understand and navigate.
+Improve the overall patient experience through multilingual communication, accessibility, document and process guidance, care coordination and proactive assistance, while reducing barriers to accessing timely healthcare services.
+
+Use case 06 of 06
+
+Patient Health Journey Progress
+A simple longitudinal view of milestones done, pending and next - so progress is visible.
+The current reality
+For patients living with long-term conditions such as cancer, diabetes and maternal health, healthcare is a continuous journey involving consultations, investigations, treatments, medications, follow-up visits and preventive care over an extended period.
+While every interaction generates valuable information, patients rarely have a simple, consolidated and longitudinal view of their overall health journey, making it difficult to understand how they are progressing over time.
+As care spans multiple providers, facilities and digital systems, patients often struggle to understand what has been completed, which milestones have been achieved, what remains pending and what comes next. This lack of visibility can make it difficult for patients and caregivers to stay informed, prepare for upcoming stages of care and remain actively engaged throughout their healthcare journey.
+What we're looking for
+Design solutions that provide patients and caregivers with a clear, longitudinal and easy-to-understand view of their healthcare journey and progress over time.
+Consolidate information from across the care journey to present completed milestones, ongoing treatments, investigations, preventive care, upcoming activities and future care milestones in an intuitive and meaningful manner.
+Help patients visualise their progress, understand treatment pathways, track health goals and prepare for the next stage of care, empowering them to become informed, confident and active participants in managing their health.
+
+Use case 05 of 06
+
+Financial & Administrative Support
+Insurance, schemes and paperwork made navigable - so cost does not block care.
+The current reality
+Patients and caregivers managing long-term conditions such as cancer, diabetes and maternal health often face significant financial and administrative challenges alongside their medical care, including navigating insurance policies, reimbursement processes, government health schemes, financial assistance programmes and hospital documentation.
+Eligibility criteria, required documentation, approval processes and application timelines often vary across providers and schemes, making these processes complex, time-consuming and difficult to understand during an already stressful period.
+Many patients are unaware of the financial benefits and support they may be entitled to or struggle to complete administrative processes without repeated visits, multiple interactions and extensive paperwork, leading to delays in care, higher out-of-pocket expenses and underutilisation of available support.
+What we're looking for
+Design solutions that simplify how patients and caregivers access financial assistance, navigate healthcare-related administrative processes and receive the support they are entitled to with greater confidence and ease.
+Help patients understand available insurance benefits, reimbursement pathways, government health schemes and financial assistance programmes relevant to their individual circumstances while simplifying process navigation and decision-making.
+Support eligibility guidance, document management, application assistance, status tracking, multilingual communication and personalised administrative guidance, making financial and administrative support more accessible, transparent and patient-friendly.
+
+Use case 04 of 06
+
+Healthcare Navigation & Access
+Clear next steps across registration, tests, billing and referrals - especially for complex journeys.
+The current reality
+Accessing healthcare often involves navigating multiple touchpoints across the care journey, including registration, appointments, investigations, consultations, pharmacies, billing, referrals and follow-up care. Understanding where to go, what to do next and how to complete each step of care can be confusing and overwhelming, particularly for elderly patients, individuals with chronic conditions, people from rural areas and those with limited health literacy.
+For patients with long-term conditions such as cancer, diabetes and maternal health, care is often delivered across multiple departments, facilities and healthcare professionals over an extended period, making the care journey even more complex.
+Patients and caregivers frequently rely on verbal instructions, paper documents and multiple sources of information to navigate the healthcare system, increasing the risk of missed steps, unnecessary delays, fragmented care experiences and poor access to services.
+What we're looking for
+Design solutions that help patients and caregivers navigate the healthcare system with greater confidence by providing clear, personalised and context-aware guidance throughout their care journey.
+Support patients across registrations, appointments, investigations, consultations, hospital processes, referrals and follow-up care, making healthcare services easier to access, understand and navigate.
+Improve the overall patient experience through multilingual communication, accessibility, document and process guidance, care coordination and proactive assistance, while reducing barriers to accessing timely healthcare services.
+
+Use case 03 of 06
+
+Family & Caregiver Support
+Tools for families who coordinate care - with consent, clarity and less stress.
+The current reality
+Family members and caregivers play a vital role in supporting patients with long-term conditions such as cancer, diabetes and maternal health. They often help manage appointments, medications, lifestyle modifications, home care, transportation, finances and emotional well-being, while serving as an important link between patients and healthcare providers.
+Despite their central role, caregivers often have limited visibility into the patient's care journey. They may not fully understand treatment plans, upcoming milestones, warning signs, care instructions or changes in the patient's condition, making it difficult to provide timely and informed support.
+Communication is frequently fragmented across patients, caregivers and healthcare providers. As care becomes more complex, particularly during prolonged treatment or recovery, the lack of coordinated information and communication can increase stress for both patients and caregivers and impact continuity of care.
+What we're looking for
+Design solutions that empower family members and caregivers to actively participate in the patient's healthcare journey while respecting patient consent, privacy and existing clinical workflows.
+Enable caregivers to stay informed about the patient's care plan, appointments, medications, treatment milestones, care requirements and other relevant updates to provide timely and coordinated support.
+Strengthen communication, care coordination and shared care planning between patients, caregivers and healthcare providers through personalised education, task management, timely alerts and other collaborative care capabilities.
