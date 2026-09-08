@@ -1,0 +1,20 @@
+Communication job: By the end, hackathon judges and clinical collaborators should understand why Continuity Loop is a focused continuity-of-care workflow, see the verified retrieval moment, and choose the next clinician-owned validation step because the product closes a documented handoff loop without making autonomous clinical or legal claims.
+
+Audience: Health-a-thon judges, oncology/palliative-care clinicians, and potential pilot owners.
+Narrative: care-transition failure -> receiving-physician wedge -> closed-loop workflow -> provenance and human gate -> honest MVP boundary -> simulation proof plan -> clinician decision/ask.
+
+Primary source files:
+- C:\\Users\\basit\\Downloads\\CODE\\healthathon\\MEETING_SUMMARY_FOR_TEAM.md
+- C:\\Users\\basit\\Downloads\\CODE\\healthathon\\PRODUCT_REQUIREMENTS.md
+- C:\\Users\\basit\\Downloads\\CODE\\healthathon\\VENTURE_DECISION_MATRIX.md
+- C:\\Users\\basit\\Downloads\\CODE\\healthathon\\TOMORROW_CALL_CARD.md
+- C:\\Users\\basit\\Downloads\\CODE\\healthathon\\PROTOTYPE_HANDOFF.md
+- C:\\Users\\basit\\Downloads\\CODE\\healthathon\\SOURCE_INDEX.md
+
+Visual asset:
+- Authentic product screenshot captured from https://continuity-loop-healthathon.vercel.app on 27 August 2026 at 1440 x 1000 CSS pixels; synthetic data only.
+
+Claim handling:
+- Current product behaviour is described as demonstrated, not production-ready.
+- Proposed pilot measures and targets are labelled as targets/plan, not observed outcomes.
+- The deck does not claim live AI, patient outcomes, clinical efficacy, legal validity, real authentication, EHR/ABDM integration, or market uniqueness.

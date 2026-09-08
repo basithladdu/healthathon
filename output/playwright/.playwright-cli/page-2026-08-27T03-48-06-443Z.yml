@@ -1,0 +1,87 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - complementary "Primary navigation" [ref=e3]:
+      - button "Continuity Loop Goals-of-Care Workflow" [ref=e4] [cursor=pointer]:
+        - generic [ref=e5]: GC
+        - generic [ref=e6]:
+          - strong [ref=e7]: Continuity Loop
+          - generic [ref=e8]: Goals-of-Care Workflow
+      - navigation [ref=e9]:
+        - button "Clinical handoff" [ref=e10] [cursor=pointer]
+        - button "Guided conversation" [ref=e14] [cursor=pointer]
+        - button "Follow-up worklist 4" [ref=e18] [cursor=pointer]:
+          - generic [ref=e21]: Follow-up worklist
+          - generic [ref=e22]: "4"
+        - button "Patients" [ref=e23] [cursor=pointer]
+        - button "Verified records" [ref=e27] [cursor=pointer]
+        - button "Audit log" [ref=e31] [cursor=pointer]
+      - generic [ref=e35]:
+        - generic [ref=e36]: Safety Boundary
+        - paragraph [ref=e40]: Documents a clinician-led conversation. It is not a treatment order, legal directive, or autonomous triage system.
+    - generic [ref=e41]:
+      - generic [ref=e42]:
+        - generic [ref=e43]: Synthetic Demonstration Sandbox
+        - generic [ref=e47]:
+          - generic "Switch simulated clinical role" [ref=e48]:
+            - generic [ref=e49]: "Simulate Role:"
+            - combobox "Simulated clinical role" [ref=e50] [cursor=pointer]:
+              - option "Dr Sujay (Physician)"
+              - option "Dr Isha Menon (Emergency)" [selected]
+              - option "Anitha Rao (Coordinator)"
+          - generic "Signed in user" [ref=e51]:
+            - generic [ref=e52]: IM
+            - generic [ref=e53]:
+              - strong [ref=e54]: Dr Isha Menon
+              - generic [ref=e55]: Emergency physician
+      - generic [ref=e56]:
+        - button "← Back to patient record" [ref=e176] [cursor=pointer]
+        - generic [ref=e178]:
+          - paragraph [ref=e179]: Controlled Clinical Hand-Off Gate
+          - heading "Retrieve verified record" [level=1] [ref=e180]
+        - generic [ref=e181]:
+          - generic [ref=e182]:
+            - generic [ref=e184]:
+              - heading "Record requested" [level=2] [ref=e185]
+              - text: Identity verification
+            - generic [ref=e186]:
+              - generic [ref=e187]: MR
+              - generic [ref=e188]:
+                - strong [ref=e189]: Meera Raghavan
+                - generic [ref=e190]: CANCER-20418 · Age 62
+            - generic [ref=e191]:
+              - generic [ref=e192]:
+                - term [ref=e193]: Latest Verified Version
+                - definition [ref=e194]: Version 1 · 21 Aug 2026
+              - generic [ref=e195]:
+                - term [ref=e196]: Record Category
+                - definition [ref=e197]: Verified Goals-of-Care Summary
+              - generic [ref=e198]:
+                - term [ref=e199]: Access Boundary
+                - definition [ref=e200]: Simulated authorised clinical access
+              - generic [ref=e201]:
+                - term [ref=e202]: Audit Mode
+                - definition [ref=e203]: Simulated access-purpose trail
+          - generic [ref=e204]:
+            - generic [ref=e206]:
+              - heading "Access authorization" [level=2] [ref=e207]
+              - text: Access purpose is recorded in this browser-local demonstration trail
+            - generic [ref=e208]:
+              - generic [ref=e209]: Signed-in Clinician
+              - textbox "Signed-in Clinician" [ref=e210]: Dr Isha Menon · Emergency physician
+            - generic [ref=e211]:
+              - generic [ref=e212]: Clinical Reason for Retrieval
+              - combobox "Clinical Reason for Retrieval" [ref=e213]:
+                - option "Planned consultation / Outpatient review"
+                - option "Active inpatient treatment team review"
+                - option "Transfer of care / Clinical hand-off"
+                - option "Patient or surrogate requested copy"
+                - option "Emergency clinical decision review (Break-glass)" [selected]
+            - generic [ref=e214]:
+              - generic [ref=e215]: Care Relationship Basis
+              - combobox "Care Relationship Basis" [ref=e216]:
+                - option "Current primary oncology treating team"
+                - option "Consulting palliative specialist"
+                - option "Emergency receiving physician" [selected]
+                - option "Inpatient nursing / care coordinator"
+            - button "Log access and view verified record" [ref=e217] [cursor=pointer]
+  - alert [ref=e175]

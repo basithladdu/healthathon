@@ -1,0 +1,1647 @@
+{
+  "schema": "openai.presentation.layout/v4",
+  "unit": "px",
+  "slide": {
+    "aid": "sl/m03avs",
+    "id": "m03avs",
+    "slide": 6,
+    "layoutId": "62d9e4d2-a92b-469b-b6da-e992ba6e52bc",
+    "layoutName": "Title Slide",
+    "layoutType": "title",
+    "masterLayoutId": "a59c3b43-cf55-4c7d-863a-ebb5adff7400",
+    "masterLayoutName": "Master",
+    "backgroundColor": "#FFFFFF",
+    "frame": {
+      "left": 0,
+      "top": 0,
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "theme": {
+    "colorSchemeName": "ChatGPT",
+    "colors": {
+      "accent1": "#156082",
+      "accent2": "#E97132",
+      "accent3": "#196B24",
+      "accent4": "#0F9ED5",
+      "accent5": "#A02B93",
+      "accent6": "#4EA72E",
+      "bg1": "#FFFFFF",
+      "bg2": "#000000",
+      "tx1": "#1F1F1F",
+      "tx2": "#FFFFFF",
+      "dk1": "#000000",
+      "lt1": "#FFFFFF",
+      "dk2": "#0E2841",
+      "lt2": "#E8E8E8",
+      "hlink": "#467886",
+      "folHlink": "#96607D"
+    },
+    "typefaces": [
+      "Helvetica Neue"
+    ]
+  },
+  "inheritedLayers": [
+    {
+      "scope": "layout",
+      "id": "62d9e4d2-a92b-469b-b6da-e992ba6e52bc",
+      "name": "Title Slide",
+      "type": "title",
+      "parentLayoutId": "a59c3b43-cf55-4c7d-863a-ebb5adff7400",
+      "elements": []
+    },
+    {
+      "scope": "master",
+      "id": "a59c3b43-cf55-4c7d-863a-ebb5adff7400",
+      "name": "Master",
+      "type": "master",
+      "elements": []
+    }
+  ],
+  "elements": [
+    {
+      "order": 1,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/8nutkj6d",
+      "id": "1",
+      "name": "boundary-title",
+      "bbox": [
+        42,
+        36,
+        1196,
+        78
+      ],
+      "geometry": "rect",
+      "text": "The MVP is useful because its boundaries are explicit.",
+      "textPreview": "The MVP is useful because its boundaries are explicit.",
+      "resolvedFontSize": 40,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 40,
+        "typeface": "Helvetica Neue",
+        "color": "#101714",
+        "bold": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "wrap": "square",
+        "autoFit": "shrinkText",
+        "autoFitScale": 1,
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "The MVP is useful because its boundaries are explicit."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "The MVP is useful because its boundaries are explicit.",
+          "resolvedTextStyle": {
+            "fontSize": 40,
+            "typeface": "Helvetica Neue",
+            "color": "#101714",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "The MVP is useful because its boundaries are explicit.",
+              "fontSize": 40,
+              "typeface": "Helvetica Neue",
+              "color": "#101714",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 2,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/7mlsreps",
+      "id": "2",
+      "name": "boundary-now-label",
+      "bbox": [
+        42,
+        155,
+        500,
+        24
+      ],
+      "geometry": "rect",
+      "text": "DEMONSTRATED NOW",
+      "textPreview": "DEMONSTRATED NOW",
+      "resolvedFontSize": 16,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 16,
+        "typeface": "Helvetica Neue",
+        "color": "#0A6B57",
+        "bold": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "wrap": "square",
+        "autoFit": "shrinkText",
+        "autoFitScale": 1,
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "DEMONSTRATED NOW"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "DEMONSTRATED NOW",
+          "resolvedTextStyle": {
+            "fontSize": 16,
+            "typeface": "Helvetica Neue",
+            "color": "#0A6B57",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "DEMONSTRATED NOW",
+              "fontSize": 16,
+              "typeface": "Helvetica Neue",
+              "color": "#0A6B57",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 3,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/mlsbi9o7",
+      "id": "3",
+      "name": "boundary-not-label",
+      "bbox": [
+        694,
+        155,
+        500,
+        24
+      ],
+      "geometry": "rect",
+      "text": "NOT CLAIMED",
+      "textPreview": "NOT CLAIMED",
+      "resolvedFontSize": 16,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 16,
+        "typeface": "Helvetica Neue",
+        "color": "#0A6B57",
+        "bold": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "wrap": "square",
+        "autoFit": "shrinkText",
+        "autoFitScale": 1,
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "NOT CLAIMED"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "NOT CLAIMED",
+          "resolvedTextStyle": {
+            "fontSize": 16,
+            "typeface": "Helvetica Neue",
+            "color": "#0A6B57",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "NOT CLAIMED",
+              "fontSize": 16,
+              "typeface": "Helvetica Neue",
+              "color": "#0A6B57",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 4,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/lkjap47m",
+      "id": "4",
+      "name": "boundary-divider",
+      "bbox": [
+        639,
+        150,
+        1,
+        410
+      ],
+      "geometry": "rect",
+      "fillColor": "#B8C4C0",
+      "lineWidth": 0
+    },
+    {
+      "order": 5,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/kzatgj61",
+      "id": "5",
+      "name": "boundary-now-0-mark",
+      "bbox": [
+        42,
+        208,
+        10,
+        10
+      ],
+      "geometry": "rect",
+      "fillColor": "#3D8DFF",
+      "lineWidth": 0
+    },
+    {
+      "order": 6,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/zy1snepg",
+      "id": "6",
+      "name": "boundary-now-0-text",
+      "bbox": [
+        70,
+        201,
+        530,
+        48
+      ],
+      "geometry": "rect",
+      "text": "Synthetic patient binding",
+      "textPreview": "Synthetic patient binding",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 18,
+        "typeface": "Helvetica Neue",
+        "color": "#101714",
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "wrap": "square",
+        "autoFit": "shrinkText",
+        "autoFitScale": 1,
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Synthetic patient binding"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Synthetic patient binding",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "typeface": "Helvetica Neue",
+            "color": "#101714",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Synthetic patient binding",
+              "fontSize": 18,
+              "typeface": "Helvetica Neue",
+              "color": "#101714",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 7,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/yxsbe9ov",
+      "id": "7",
+      "name": "boundary-now-1-mark",
+      "bbox": [
+        42,
+        252,
+        10,
+        10
+      ],
+      "geometry": "rect",
+      "fillColor": "#3D8DFF",
+      "lineWidth": 0
+    },
+    {
+      "order": 8,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/5gnu187q",
+      "id": "8",
+      "name": "boundary-now-1-text",
+      "bbox": [
+        70,
+        245,
+        530,
+        48
+      ],
+      "geometry": "rect",
+      "text": "Guided eight-domain checklist",
+      "textPreview": "Guided eight-domain checklist",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 18,
+        "typeface": "Helvetica Neue",
+        "color": "#101714",
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "wrap": "square",
+        "autoFit": "shrinkText",
+        "autoFitScale": 1,
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Guided eight-domain checklist"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Guided eight-domain checklist",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "typeface": "Helvetica Neue",
+            "color": "#101714",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Guided eight-domain checklist",
+              "fontSize": 18,
+              "typeface": "Helvetica Neue",
+              "color": "#101714",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 9,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/4vets365",
+      "id": "9",
+      "name": "boundary-now-2-mark",
+      "bbox": [
+        42,
+        296,
+        10,
+        10
+      ],
+      "geometry": "rect",
+      "fillColor": "#3D8DFF",
+      "lineWidth": 0
+    },
+    {
+      "order": 10,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/29kbydsn",
+      "id": "10",
+      "name": "boundary-now-2-text",
+      "bbox": [
+        70,
+        289,
+        530,
+        48
+      ],
+      "geometry": "rect",
+      "text": "Deterministic source-linked draft",
+      "textPreview": "Deterministic source-linked draft",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 18,
+        "typeface": "Helvetica Neue",
+        "color": "#101714",
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "wrap": "square",
+        "autoFit": "shrinkText",
+        "autoFitScale": 1,
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Deterministic source-linked draft"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Deterministic source-linked draft",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "typeface": "Helvetica Neue",
+            "color": "#101714",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Deterministic source-linked draft",
+              "fontSize": 18,
+              "typeface": "Helvetica Neue",
+              "color": "#101714",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 11,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/3atc7i98",
+      "id": "11",
+      "name": "boundary-now-3-mark",
+      "bbox": [
+        42,
+        340,
+        10,
+        10
+      ],
+      "geometry": "rect",
+      "fillColor": "#3D8DFF",
+      "lineWidth": 0
+    },
+    {
+      "order": 12,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/obmt0nat",
+      "id": "12",
+      "name": "boundary-now-3-text",
+      "bbox": [
+        70,
+        333,
+        530,
+        48
+      ],
+      "geometry": "rect",
+      "text": "Physician review + acknowledgement gate",
+      "textPreview": "Physician review + acknowledgement gate",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 18,
+        "typeface": "Helvetica Neue",
+        "color": "#101714",
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "wrap": "square",
+        "autoFit": "shrinkText",
+        "autoFitScale": 1,
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Physician review + acknowledgement gate"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Physician review + acknowledgement gate",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "typeface": "Helvetica Neue",
+            "color": "#101714",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Physician review + acknowledgement gate",
+              "fontSize": 18,
+              "typeface": "Helvetica Neue",
+              "color": "#101714",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 13,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/pwvu9sre",
+      "id": "13",
+      "name": "boundary-now-4-mark",
+      "bbox": [
+        42,
+        384,
+        10,
+        10
+      ],
+      "geometry": "rect",
+      "fillColor": "#3D8DFF",
+      "lineWidth": 0
+    },
+    {
+      "order": 14,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/u5kbudsr",
+      "id": "14",
+      "name": "boundary-now-4-text",
+      "bbox": [
+        70,
+        377,
+        530,
+        48
+      ],
+      "geometry": "rect",
+      "text": "Append-only version 2",
+      "textPreview": "Append-only version 2",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 18,
+        "typeface": "Helvetica Neue",
+        "color": "#101714",
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "wrap": "square",
+        "autoFit": "shrinkText",
+        "autoFitScale": 1,
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Append-only version 2"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Append-only version 2",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "typeface": "Helvetica Neue",
+            "color": "#101714",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Append-only version 2",
+              "fontSize": 18,
+              "typeface": "Helvetica Neue",
+              "color": "#101714",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 15,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/f6ts3i9w",
+      "id": "15",
+      "name": "boundary-now-5-mark",
+      "bbox": [
+        42,
+        428,
+        10,
+        10
+      ],
+      "geometry": "rect",
+      "fillColor": "#3D8DFF",
+      "lineWidth": 0
+    },
+    {
+      "order": 16,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/g72tw3ah",
+      "id": "16",
+      "name": "boundary-now-5-text",
+      "bbox": [
+        70,
+        421,
+        530,
+        48
+      ],
+      "geometry": "rect",
+      "text": "Purpose-bound retrieval + audit",
+      "textPreview": "Purpose-bound retrieval + audit",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 18,
+        "typeface": "Helvetica Neue",
+        "color": "#101714",
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "wrap": "square",
+        "autoFit": "shrinkText",
+        "autoFitScale": 1,
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Purpose-bound retrieval + audit"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Purpose-bound retrieval + audit",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "typeface": "Helvetica Neue",
+            "color": "#101714",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Purpose-bound retrieval + audit",
+              "fontSize": 18,
+              "typeface": "Helvetica Neue",
+              "color": "#101714",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 17,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/18bu58r2",
+      "id": "17",
+      "name": "boundary-now-6-mark",
+      "bbox": [
+        42,
+        472,
+        10,
+        10
+      ],
+      "geometry": "rect",
+      "fillColor": "#3D8DFF",
+      "lineWidth": 0
+    },
+    {
+      "order": 18,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/y14b6xsv",
+      "id": "18",
+      "name": "boundary-now-6-text",
+      "bbox": [
+        70,
+        465,
+        530,
+        48
+      ],
+      "geometry": "rect",
+      "text": "Coordinator outreach worklist",
+      "textPreview": "Coordinator outreach worklist",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 18,
+        "typeface": "Helvetica Neue",
+        "color": "#101714",
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "wrap": "square",
+        "autoFit": "shrinkText",
+        "autoFitScale": 1,
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Coordinator outreach worklist"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Coordinator outreach worklist",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "typeface": "Helvetica Neue",
+            "color": "#101714",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Coordinator outreach worklist",
+              "fontSize": 18,
+              "typeface": "Helvetica Neue",
+              "color": "#101714",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 19,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/z2dcf29g",
+      "id": "19",
+      "name": "boundary-not-0-mark",
+      "bbox": [
+        694,
+        208,
+        10,
+        10
+      ],
+      "geometry": "rect",
+      "fillColor": "#B8C4C0",
+      "lineWidth": 0
+    },
+    {
+      "order": 20,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/v6p8rups",
+      "id": "20",
+      "name": "boundary-not-0-text",
+      "bbox": [
+        722,
+        201,
+        485,
+        40
+      ],
+      "geometry": "rect",
+      "text": "Live AI transcription or model accuracy",
+      "textPreview": "Live AI transcription or model accuracy",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 18,
+        "typeface": "Helvetica Neue",
+        "color": "#101714",
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "wrap": "square",
+        "autoFit": "shrinkText",
+        "autoFitScale": 1,
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Live AI transcription or model accuracy"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Live AI transcription or model accuracy",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "typeface": "Helvetica Neue",
+            "color": "#101714",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Live AI transcription or model accuracy",
+              "fontSize": 18,
+              "typeface": "Helvetica Neue",
+              "color": "#101714",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 21,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/algryp87",
+      "id": "21",
+      "name": "boundary-not-1-mark",
+      "bbox": [
+        694,
+        258,
+        10,
+        10
+      ],
+      "geometry": "rect",
+      "fillColor": "#B8C4C0",
+      "lineWidth": 0
+    },
+    {
+      "order": 22,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/x87qt47y",
+      "id": "22",
+      "name": "boundary-not-1-text",
+      "bbox": [
+        722,
+        251,
+        485,
+        40
+      ],
+      "geometry": "rect",
+      "text": "Real authentication, encryption or cryptographic audit",
+      "textPreview": "Real authentication, encryption or cryptographic audit",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 18,
+        "typeface": "Helvetica Neue",
+        "color": "#101714",
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "wrap": "square",
+        "autoFit": "shrinkText",
+        "autoFitScale": 1,
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Real authentication, encryption or cryptographic audit"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Real authentication, encryption or cryptographic audit",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "typeface": "Helvetica Neue",
+            "color": "#101714",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Real authentication, encryption or cryptographic audit",
+              "fontSize": 18,
+              "typeface": "Helvetica Neue",
+              "color": "#101714",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 23,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/w7y90zqd",
+      "id": "23",
+      "name": "boundary-not-2-mark",
+      "bbox": [
+        694,
+        308,
+        10,
+        10
+      ],
+      "geometry": "rect",
+      "fillColor": "#B8C4C0",
+      "lineWidth": 0
+    },
+    {
+      "order": 24,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/jap8vepo",
+      "id": "24",
+      "name": "boundary-not-2-text",
+      "bbox": [
+        722,
+        301,
+        485,
+        40
+      ],
+      "geometry": "rect",
+      "text": "EHR, ABDM or messaging integration",
+      "textPreview": "EHR, ABDM or messaging integration",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 18,
+        "typeface": "Helvetica Neue",
+        "color": "#101714",
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "wrap": "square",
+        "autoFit": "shrinkText",
+        "autoFitScale": 1,
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "EHR, ABDM or messaging integration"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "EHR, ABDM or messaging integration",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "typeface": "Helvetica Neue",
+            "color": "#101714",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "EHR, ABDM or messaging integration",
+              "fontSize": 18,
+              "typeface": "Helvetica Neue",
+              "color": "#101714",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 25,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/i9gr298j",
+      "id": "25",
+      "name": "boundary-not-3-mark",
+      "bbox": [
+        694,
+        358,
+        10,
+        10
+      ],
+      "geometry": "rect",
+      "fillColor": "#B8C4C0",
+      "lineWidth": 0
+    },
+    {
+      "order": 26,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/5crqx47u",
+      "id": "26",
+      "name": "boundary-not-3-text",
+      "bbox": [
+        722,
+        351,
+        485,
+        40
+      ],
+      "geometry": "rect",
+      "text": "Patient outcomes or treatment effects",
+      "textPreview": "Patient outcomes or treatment effects",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 18,
+        "typeface": "Helvetica Neue",
+        "color": "#101714",
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "wrap": "square",
+        "autoFit": "shrinkText",
+        "autoFitScale": 1,
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Patient outcomes or treatment effects"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Patient outcomes or treatment effects",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "typeface": "Helvetica Neue",
+            "color": "#101714",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Patient outcomes or treatment effects",
+              "fontSize": 18,
+              "typeface": "Helvetica Neue",
+              "color": "#101714",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 27,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/kby94jq9",
+      "id": "27",
+      "name": "boundary-not-4-mark",
+      "bbox": [
+        694,
+        408,
+        10,
+        10
+      ],
+      "geometry": "rect",
+      "fillColor": "#B8C4C0",
+      "lineWidth": 0
+    },
+    {
+      "order": 28,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/7e98zep0",
+      "id": "28",
+      "name": "boundary-not-4-text",
+      "bbox": [
+        722,
+        401,
+        485,
+        40
+      ],
+      "geometry": "rect",
+      "text": "Legal signature, living will or treatment order",
+      "textPreview": "Legal signature, living will or treatment order",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 18,
+        "typeface": "Helvetica Neue",
+        "color": "#101714",
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "wrap": "square",
+        "autoFit": "shrinkText",
+        "autoFitScale": 1,
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Legal signature, living will or treatment order"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Legal signature, living will or treatment order",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "typeface": "Helvetica Neue",
+            "color": "#101714",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Legal signature, living will or treatment order",
+              "fontSize": 18,
+              "typeface": "Helvetica Neue",
+              "color": "#101714",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 29,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/6d0r698f",
+      "id": "29",
+      "name": "boundary-not-5-mark",
+      "bbox": [
+        694,
+        458,
+        10,
+        10
+      ],
+      "geometry": "rect",
+      "fillColor": "#B8C4C0",
+      "lineWidth": 0
+    },
+    {
+      "order": 30,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/4j2pwjmd",
+      "id": "30",
+      "name": "boundary-not-5-text",
+      "bbox": [
+        722,
+        451,
+        485,
+        40
+      ],
+      "geometry": "rect",
+      "text": "Autonomous triage, prognosis or recommendation",
+      "textPreview": "Autonomous triage, prognosis or recommendation",
+      "resolvedFontSize": 18,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 18,
+        "typeface": "Helvetica Neue",
+        "color": "#101714",
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "wrap": "square",
+        "autoFit": "shrinkText",
+        "autoFitScale": 1,
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Autonomous triage, prognosis or recommendation"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Autonomous triage, prognosis or recommendation",
+          "resolvedTextStyle": {
+            "fontSize": 18,
+            "typeface": "Helvetica Neue",
+            "color": "#101714",
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Autonomous triage, prognosis or recommendation",
+              "fontSize": 18,
+              "typeface": "Helvetica Neue",
+              "color": "#101714",
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 31,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/p4bqpony",
+      "id": "31",
+      "name": "boundary-bottom",
+      "bbox": [
+        42,
+        586,
+        1196,
+        38
+      ],
+      "geometry": "roundRect",
+      "fillColor": "#EAF3FF",
+      "lineWidth": 0
+    },
+    {
+      "order": 32,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/2h07u94n",
+      "id": "32",
+      "name": "boundary-bottom-text",
+      "bbox": [
+        64,
+        595,
+        1144,
+        20
+      ],
+      "geometry": "rect",
+      "text": "Clinical summary only · Reconfirm current status before acute orders.",
+      "textPreview": "Clinical summary only · Reconfirm current status before acute orders.",
+      "resolvedFontSize": 16.67,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 17,
+        "typeface": "Helvetica Neue",
+        "color": "#101714",
+        "bold": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "wrap": "square",
+        "autoFit": "shrinkText",
+        "autoFitScale": 0.98,
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "Clinical summary only · Reconfirm current status before acute orders."
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "Clinical summary only · Reconfirm current status before acute orders.",
+          "resolvedTextStyle": {
+            "fontSize": 17,
+            "typeface": "Helvetica Neue",
+            "color": "#101714",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "Clinical summary only · Reconfirm current status before acute orders.",
+              "fontSize": 17,
+              "typeface": "Helvetica Neue",
+              "color": "#101714",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 33,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/3i98ne58",
+      "id": "33",
+      "name": "footer-rule-6",
+      "bbox": [
+        42,
+        666,
+        1196,
+        1
+      ],
+      "geometry": "rect",
+      "fillColor": "#B8C4C0",
+      "lineWidth": 0
+    },
+    {
+      "order": 34,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/gfipsjmh",
+      "id": "34",
+      "name": "footer-label-6",
+      "bbox": [
+        42,
+        678,
+        430,
+        20
+      ],
+      "geometry": "rect",
+      "text": "CONTINUITY LOOP  ·  HEALTH-A-THON 2026",
+      "textPreview": "CONTINUITY LOOP  ·  HEALTH-A-THON 2026",
+      "resolvedFontSize": 14,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 14,
+        "typeface": "Helvetica Neue",
+        "color": "#53615D",
+        "bold": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "wrap": "square",
+        "autoFit": "shrinkText",
+        "autoFitScale": 1,
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "CONTINUITY LOOP  ·  HEALTH-A-THON 2026"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "CONTINUITY LOOP  ·  HEALTH-A-THON 2026",
+          "resolvedTextStyle": {
+            "fontSize": 14,
+            "typeface": "Helvetica Neue",
+            "color": "#53615D",
+            "bold": true,
+            "alignment": "left"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "CONTINUITY LOOP  ·  HEALTH-A-THON 2026",
+              "fontSize": 14,
+              "typeface": "Helvetica Neue",
+              "color": "#53615D",
+              "bold": true,
+              "alignment": "left"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    },
+    {
+      "order": 35,
+      "kind": "shape",
+      "scope": "slide",
+      "aid": "sh/hgrqlon2",
+      "id": "35",
+      "name": "footer-number-6",
+      "bbox": [
+        1170,
+        676,
+        68,
+        22
+      ],
+      "geometry": "rect",
+      "text": "06",
+      "textPreview": "06",
+      "resolvedFontSize": 16,
+      "resolvedTextStyle": {
+        "anchor": 1,
+        "fontSize": 16,
+        "typeface": "Helvetica Neue",
+        "color": "#101714",
+        "bold": true,
+        "alignment": "right",
+        "verticalAlignment": "top",
+        "wrap": "square",
+        "autoFit": "shrinkText",
+        "autoFitScale": 1,
+        "insets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      },
+      "textLayout": {
+        "lineCount": 1,
+        "lines": [
+          {
+            "index": 1,
+            "text": "06"
+          }
+        ]
+      },
+      "paragraphs": [
+        {
+          "index": 1,
+          "text": "06",
+          "resolvedTextStyle": {
+            "fontSize": 16,
+            "typeface": "Helvetica Neue",
+            "color": "#101714",
+            "bold": true,
+            "alignment": "right"
+          },
+          "runs": [
+            {
+              "index": 1,
+              "text": "06",
+              "fontSize": 16,
+              "typeface": "Helvetica Neue",
+              "color": "#101714",
+              "bold": true,
+              "alignment": "right"
+            }
+          ],
+          "marginLeft": 0
+        }
+      ],
+      "lineWidth": 0
+    }
+  ],
+  "composeRuns": []
+}

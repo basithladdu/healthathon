@@ -1,0 +1,140 @@
+- main [ref=e2]:
+  - complementary "Primary navigation" [ref=e3]:
+    - button "Continuity Loop Goals-of-Care Workflow" [ref=e4] [cursor=pointer]:
+      - generic [ref=e5]: GC
+      - generic [ref=e6]:
+        - strong [ref=e7]: Continuity Loop
+        - generic [ref=e8]: Goals-of-Care Workflow
+    - navigation [ref=e9]:
+      - button "Clinical handoff" [ref=e10] [cursor=pointer]
+      - button "Guided conversation" [ref=e14] [cursor=pointer]
+      - button "Follow-up worklist 4" [ref=e18] [cursor=pointer]:
+        - generic [ref=e21]: Follow-up worklist
+        - generic [ref=e22]: "4"
+      - button "Patients" [ref=e23] [cursor=pointer]
+      - button "Verified records" [ref=e27] [cursor=pointer]
+      - button "Audit log" [ref=e31] [cursor=pointer]
+    - generic [ref=e35]:
+      - generic [ref=e36]: Safety Boundary
+      - paragraph [ref=e40]: Documents a clinician-led conversation. It is not a treatment order, legal directive, or autonomous triage system.
+  - generic [ref=e41]:
+    - generic [ref=e42]:
+      - generic [ref=e43]: Synthetic Demonstration Sandbox
+      - generic [ref=e47]:
+        - generic "Switch simulated clinical role" [ref=e48]:
+          - generic [ref=e49]: "Simulate Role:"
+          - combobox "Simulated clinical role" [ref=e50] [cursor=pointer]:
+            - option "Dr Sujay (Physician)" [selected]
+            - option "Dr Isha Menon (Emergency)"
+            - option "Anitha Rao (Coordinator)"
+        - generic "Signed in user" [ref=e51]:
+          - generic [ref=e52]: SS
+          - generic [ref=e53]:
+            - strong [ref=e54]: Dr Sujay
+            - generic [ref=e55]: Clinical lead
+    - generic [ref=e56]:
+      - generic [ref=e57]:
+        - generic [ref=e58]:
+          - paragraph [ref=e59]: Synthetic demonstration · no real patient data
+          - heading "When care changes, the right note should be easy to find." [level=1] [ref=e61]
+          - paragraph [ref=e62]: Talk it through with the patient and family, confirm what was recorded, and help the next doctor see the latest clinician-verified summary.
+          - generic [ref=e63]:
+            - button "Retrieve verified record" [ref=e64] [cursor=pointer]
+            - button "Start guided conversation" [ref=e67] [cursor=pointer]
+        - complementary "Current synthetic record" [ref=e70]:
+          - generic [ref=e71]:
+            - generic [ref=e72]:
+              - text: Current verified record
+              - strong [ref=e73]: Meera Raghavan
+              - generic [ref=e74]: CANCER-20418 · Version 1
+            - status "Physician verified" [ref=e75]
+          - generic [ref=e78]:
+            - generic [ref=e79]:
+              - term [ref=e80]: Patient priority
+              - definition [ref=e81]: Patient initiated discussion regarding family understanding of illness.
+            - generic [ref=e82]:
+              - term [ref=e83]: Intervention preferences
+              - definition [ref=e84]: Specific intervention scope and surrogate preferences pending family consult.
+            - generic [ref=e85]:
+              - term [ref=e86]: Next review
+              - definition [ref=e87]: Follow-up planned for late August. · Dr Sujay
+            - generic [ref=e88]:
+              - term [ref=e89]: ABHA Number
+              - definition [ref=e90]: Not linked in this demo
+          - generic [ref=e91]: Clinical summary only. Reconfirm current status before acute orders.
+      - region [ref=e95]:
+        - generic [ref=e96]:
+          - text: How this works
+          - heading "Three small steps keep the conversation together." [level=2] [ref=e97]
+          - paragraph [ref=e98]: No legal order is created here. A clinician leads the conversation and signs off on the summary.
+        - list [ref=e99]:
+          - listitem [ref=e100]:
+            - generic [ref=e101]: "01"
+            - generic [ref=e105]:
+              - heading "Talk it through" [level=3] [ref=e106]
+              - paragraph [ref=e107]: The treating clinician covers what matters, who is involved, and what still needs a conversation.
+              - generic [ref=e108]: Treating clinician
+            - text: →
+          - listitem [ref=e109]:
+            - generic [ref=e110]: "02"
+            - generic [ref=e114]:
+              - heading "Confirm the note" [level=3] [ref=e115]
+              - paragraph [ref=e116]: The source-linked draft is checked by the physician and acknowledged by the patient or family.
+              - generic [ref=e117]: Clinician + patient/family
+            - text: →
+          - listitem [ref=e118]:
+            - generic [ref=e119]: "03"
+            - generic [ref=e123]:
+              - heading "Retrieve when needed" [level=3] [ref=e124]
+              - paragraph [ref=e125]: The receiving doctor records why they opened it, then sees the latest verified version.
+              - generic [ref=e126]: Receiving physician
+      - region "Primary workflows" [ref=e127]:
+        - article [ref=e128]:
+          - generic [ref=e129]: "01"
+          - generic [ref=e130]:
+            - heading "I’m receiving this patient" [level=2] [ref=e131]
+            - paragraph [ref=e132]: Identify the patient, record why you need the note, and open the latest verified version.
+          - button "Start retrieval →" [ref=e133] [cursor=pointer]
+        - article [ref=e134]:
+          - generic [ref=e135]: "02"
+          - generic [ref=e136]:
+            - heading "I’m the treating clinician" [level=2] [ref=e137]
+            - paragraph [ref=e138]: Use the conversation guide, mark what was covered, and prepare a source-linked draft.
+          - button "Open conversation guide →" [ref=e139] [cursor=pointer]
+        - article [ref=e140]:
+          - generic [ref=e141]: "03"
+          - generic [ref=e142]:
+            - heading "I manage follow-up" [level=2] [ref=e143]
+            - paragraph [ref=e144]: Keep dates and outreach outcomes moving. Send clinical questions back to the named physician.
+          - button "Open follow-up worklist →" [ref=e145] [cursor=pointer]
+      - generic [ref=e146]:
+        - generic [ref=e147]:
+          - text: Round 1 MVP scorecard
+          - heading "What we can prove before deployment" [level=2] [ref=e148]
+        - generic [ref=e149]:
+          - generic [ref=e150]:
+            - strong [ref=e151]: "20"
+            - generic [ref=e152]: synthetic conversations to test
+          - generic [ref=e153]:
+            - strong [ref=e154]: "8"
+            - generic [ref=e155]: conversation domains covered
+          - generic [ref=e156]:
+            - strong [ref=e157]: <30 sec
+            - generic [ref=e158]: median retrieval target
+          - generic [ref=e159]:
+            - strong [ref=e160]: "0"
+            - generic [ref=e161]: unstated preferences filled in
+      - region [ref=e162]:
+        - generic [ref=e163]:
+          - text: Measures for a real pilot
+          - heading "The outcomes we will track after the MVP." [level=2] [ref=e164]
+        - generic [ref=e165]:
+          - generic [ref=e166]:
+            - strong [ref=e167]: More conversations completed
+            - generic [ref=e168]: Compare documented goals-of-care discussions before and after rollout.
+          - generic [ref=e169]:
+            - strong [ref=e170]: Less distress to measure
+            - generic [ref=e171]: Use a short patient and family confidence check after the conversation.
+          - generic [ref=e172]:
+            - strong [ref=e173]: Fewer avoidable escalations
+            - generic [ref=e174]: Track ICU visits and aggressive emergency measures as a later pilot outcome.

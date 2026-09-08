@@ -1,0 +1,203 @@
+{"kind":"deck","id":"pr/waz9gl","name":"Deck"}
+{"kind":"layout","layoutId":"a59c3b43-cf55-4c7d-863a-ebb5adff7400","name":"Master","type":"master"}
+{"kind":"layout","layoutId":"62d9e4d2-a92b-469b-b6da-e992ba6e52bc","name":"Title Slide","type":"title"}
+{"kind":"slide","id":"sl/7duvls","slide":1,"title":"CONTINUITY LOOP","textShapes":8}
+{"kind":"textbox","id":"sh/x8n2xo7m","slide":1,"name":"cover-kicker","text":"CONTINUITY LOOP","textPreview":"CONTINUITY LOOP","textChars":15,"textLines":1,"bbox":[42,42,340,28]}
+{"kind":"shape","id":"sh/a5wj29ob","slide":1,"name":"cover-kicker-rule","bbox":[42,82,120,4]}
+{"kind":"textbox","id":"sh/b65kvepg","slide":1,"name":"cover-title","text":"Keep a clinician-owned\nconversation current.","textPreview":"Keep a clinician-owned | conversation current.","textChars":44,"textLines":2,"bbox":[42,185,930,190]}
+{"kind":"textbox","id":"sh/o3u10z65","slide":1,"name":"cover-subtitle","text":"Goals-of-care follow-up and verified clinical handoff for cancer care.","textPreview":"Goals-of-care follow-up and verified clinical handoff for cancer care.","textChars":70,"textLines":1,"bbox":[42,414,780,70]}
+{"kind":"textbox","id":"sh/94n2t47q","slide":1,"name":"cover-context","text":"CANCER CARE  /  PATIENT FOLLOW-UP & CONTINUITY OF CARE  /  HACKATHON MVP","textPreview":"CANCER CARE  /  PATIENT FOLLOW-UP & CONTINUITY OF CARE  /  HACKATHON MVP","textChars":72,"textLines":1,"bbox":[42,566,960,28]}
+{"kind":"shape","id":"sh/mhcjy9oz","slide":1,"name":"cover-accent-field","bbox":[1092,42,146,568]}
+{"kind":"textbox","id":"sh/n2lkrepk","slide":1,"name":"cover-accent-copy","text":"CLINICIAN\nOWNED\nVERIFIED\nRETRIEVABLE","textPreview":"CLINICIAN | OWNED | VERIFIED | RETRIEVABLE","textChars":36,"textLines":4,"bbox":[1112,105,118,220]}
+{"kind":"textbox","id":"sh/8zylc369","slide":1,"name":"cover-synthetic","text":"SYNTHETIC PROTOTYPE","textPreview":"SYNTHETIC PROTOTYPE","textChars":19,"textLines":1,"bbox":[1120,548,100,35]}
+{"kind":"shape","id":"sh/t07258nu","slide":1,"name":"footer-rule-1","bbox":[42,666,1196,1]}
+{"kind":"textbox","id":"sh/hgnapc7q","slide":1,"name":"footer-label-1","text":"CONTINUITY LOOP  ·  HEALTH-A-THON 2026","textPreview":"CONTINUITY LOOP  ·  HEALTH-A-THON 2026","textChars":38,"textLines":1,"bbox":[42,678,430,20]}
+{"kind":"textbox","id":"sh/wfe9wrq5","slide":1,"name":"footer-number-1","text":"01","textPreview":"01","textChars":2,"textLines":1,"bbox":[1170,676,68,22]}
+{"kind":"notes","id":"nt/7duvls","slide":1,"text":"Open with the continuity failure and the product's narrow promise: keep a clinician-owned conversation current and retrievable when care changes.\n\n[Sources]\n- C:\\Users\\basit\\Downloads\\CODE\\healthathon\\VENTURE_DECISION_MATRIX.md (selected use case and product position)\n- C:\\Users\\basit\\Downloads\\CODE\\healthathon\\MEETING_SUMMARY_FOR_TEAM.md (one-sentence concept)"}
+{"kind":"slide","id":"sl/ifdb1o","slide":2,"title":"The failure is continuity, not the absence of another note.","textShapes":15}
+{"kind":"textbox","id":"sh/l4fytcry","slide":2,"name":"problem-title","text":"The failure is continuity, not the absence of another note.","textPreview":"The failure is continuity, not the absence of another note.","textChars":59,"textLines":1,"bbox":[42,36,1196,78]}
+{"kind":"textbox","id":"sh/y14zyxs7","slide":2,"name":"problem-intro","text":"A difficult conversation can be unfinished, informal, or hard to find when care changes.","textPreview":"A difficult conversation can be unfinished, informal, or hard to find when care changes.","textChars":88,"textLines":1,"bbox":[42,139,540,80]}
+{"kind":"textbox","id":"sh/z2dgr29s","slide":2,"name":"problem-statement","text":"At night, the receiving physician and family may repeat the conversation under pressure.","textPreview":"At night, the receiving physician and family may repeat the conversation under pressure.","textChars":88,"textLines":1,"bbox":[42,315,510,130]}
+{"kind":"textbox","id":"sh/8r6h47a9","slide":2,"name":"problem-implication","text":"The operational wedge is not a document repository. It is a closed loop from follow-up ownership to verified retrieval.","textPreview":"The operational wedge is not a document repository. It is a closed loop from follow-up ownership to verified retrieval.","textChars":119,"textLines":1,"bbox":[42,500,520,88]}
+{"kind":"shape","id":"sh/tsfixcru","slide":2,"name":"problem-flow-rule","bbox":[704,292,442,3]}
+{"kind":"shape","id":"sh/m5oz2xsj","slide":2,"name":"problem-node-0","bbox":[690,275,38,38]}
+{"kind":"textbox","id":"sh/7qx0v294","slide":2,"name":"problem-node-number-0","text":"01","textPreview":"01","textChars":2,"textLines":1,"bbox":[690,286,38,20]}
+{"kind":"textbox","id":"sh/gvqh8ral","slide":2,"name":"problem-node-title-0","text":"Treating clinician","textPreview":"Treating clinician","textChars":18,"textLines":1,"bbox":[685,350,150,52]}
+{"kind":"textbox","id":"sh/hwzi1wr6","slide":2,"name":"problem-node-body-0","text":"Conversation may remain incomplete.","textPreview":"Conversation may remain incomplete.","textChars":35,"textLines":1,"bbox":[685,419,150,95]}
+{"kind":"shape","id":"sh/547uhwfu","slide":2,"name":"problem-node-1","bbox":[868,275,38,38]}
+{"kind":"textbox","id":"sh/43yt8re9","slide":2,"name":"problem-node-number-1","text":"02","textPreview":"02","textChars":2,"textLines":1,"bbox":[868,286,38,20]}
+{"kind":"textbox","id":"sh/325cfmxo","slide":2,"name":"problem-node-title-1","text":"Patient + family","textPreview":"Patient + family","textChars":16,"textLines":1,"bbox":[863,350,150,52]}
+{"kind":"textbox","id":"sh/i1wb6hw3","slide":2,"name":"problem-node-body-1","text":"Preferences can change or need revisiting.","textPreview":"Preferences can change or need revisiting.","textChars":42,"textLines":1,"bbox":[863,419,150,95]}
+{"kind":"shape","id":"sh/d87ulwfq","slide":2,"name":"problem-node-2","bbox":[1046,275,38,38]}
+{"kind":"textbox","id":"sh/s7ytcbe5","slide":2,"name":"problem-node-number-2","text":"03","textPreview":"03","textChars":2,"textLines":1,"bbox":[1046,286,38,20]}
+{"kind":"textbox","id":"sh/r6pcj6x0","slide":2,"name":"problem-node-title-2","text":"Receiving physician","textPreview":"Receiving physician","textChars":19,"textLines":1,"bbox":[1041,350,150,52]}
+{"kind":"textbox","id":"sh/q5gba1wf","slide":2,"name":"problem-node-body-2","text":"The latest verified context must be findable.","textPreview":"The latest verified context must be findable.","textChars":45,"textLines":1,"bbox":[1041,419,150,95]}
+{"kind":"shape","id":"sh/9cna9cfm","slide":2,"name":"footer-rule-2","bbox":[42,666,1196,1]}
+{"kind":"textbox","id":"sh/8bet07e1","slide":2,"name":"footer-label-2","text":"CONTINUITY LOOP  ·  HEALTH-A-THON 2026","textPreview":"CONTINUITY LOOP  ·  HEALTH-A-THON 2026","textChars":38,"textLines":1,"bbox":[42,678,430,20]}
+{"kind":"textbox","id":"sh/krilcbq9","slide":2,"name":"footer-number-2","text":"02","textPreview":"02","textChars":2,"textLines":1,"bbox":[1170,676,68,22]}
+{"kind":"notes","id":"nt/ifdb1o","slide":2,"text":"Name the failure as a continuity problem: the conversation may exist somewhere, but it does not reliably travel with the patient's changing care context.\n\n[Sources]\n- C:\\Users\\basit\\Downloads\\CODE\\healthathon\\MEETING_SUMMARY_FOR_TEAM.md (problem described by clinicians)\n- C:\\Users\\basit\\Downloads\\CODE\\healthathon\\VENTURE_DECISION_MATRIX.md (visible handoff wedge and operational product)"}
+{"kind":"slide","id":"sl/x823i6","slide":3,"title":"The first high-trust moment is a verified handoff.","textShapes":10}
+{"kind":"textbox","id":"sh/25gza987","slide":3,"name":"wedge-title","text":"The first high-trust moment is a verified handoff.","textPreview":"The first high-trust moment is a verified handoff.","textChars":50,"textLines":1,"bbox":[42,36,1196,78]}
+{"kind":"textbox","id":"sh/98ri54ry","slide":3,"name":"wedge-kicker","text":"RECEIVING PHYSICIAN","textPreview":"RECEIVING PHYSICIAN","textChars":19,"textLines":1,"bbox":[42,164,420,24]}
+{"kind":"textbox","id":"sh/o7ihczqd","slide":3,"name":"wedge-claim","text":"Find the latest\nrecord—after\nrecording why.","textPreview":"Find the latest | record—after | recording why.","textChars":43,"textLines":3,"bbox":[42,205,455,160]}
+{"kind":"textbox","id":"sh/fip0zu9g","slide":3,"name":"wedge-body","text":"The receiving clinician sees a controlled access gate before the verified summary is opened.","textPreview":"The receiving clinician sees a controlled access gate before the verified summary is opened.","textChars":92,"textLines":1,"bbox":[42,410,430,72]}
+{"kind":"shape","id":"sh/ehgz6p8b","slide":3,"name":"wedge-bullet-1-mark","bbox":[42,522,10,10]}
+{"kind":"textbox","id":"sh/147i14rm","slide":3,"name":"wedge-bullet-1-text","text":"Patient-bound record","textPreview":"Patient-bound record","textChars":20,"textLines":1,"bbox":[70,515,460,48]}
+{"kind":"shape","id":"sh/0jyh8zq1","slide":3,"name":"wedge-bullet-2-mark","bbox":[42,561,10,10]}
+{"kind":"textbox","id":"sh/jet0be90","slide":3,"name":"wedge-bullet-2-text","text":"Purpose + care relationship","textPreview":"Purpose + care relationship","textChars":27,"textLines":1,"bbox":[70,554,460,48]}
+{"kind":"shape","id":"sh/yd0jit8f","slide":3,"name":"wedge-bullet-3-mark","bbox":[42,600,10,10]}
+{"kind":"textbox","id":"sh/c7a5wfql","slide":3,"name":"wedge-bullet-3-text","text":"Latest version + audit event","textPreview":"Latest version + audit event","textChars":28,"textLines":1,"bbox":[70,593,460,48]}
+{"kind":"shape","id":"sh/xsjm5kr6","slide":3,"name":"wedge-image-frame","bbox":[548,145,690,480]}
+{"kind":"textbox","id":"sh/b6143a90","slide":3,"name":"wedge-caption","text":"Production UI capture · synthetic data · emergency access gate","textPreview":"Production UI capture · synthetic data · emergency access gate","textChars":62,"textLines":1,"bbox":[565,612,656,22]}
+{"kind":"shape","id":"sh/o3a5svqp","slide":3,"name":"footer-rule-3","bbox":[42,666,1196,1]}
+{"kind":"textbox","id":"sh/p4jm10ra","slide":3,"name":"footer-label-3","text":"CONTINUITY LOOP  ·  HEALTH-A-THON 2026","textPreview":"CONTINUITY LOOP  ·  HEALTH-A-THON 2026","textChars":38,"textLines":1,"bbox":[42,678,430,20]}
+{"kind":"textbox","id":"sh/21snq58j","slide":3,"name":"footer-number-3","text":"03","textPreview":"03","textChars":2,"textLines":1,"bbox":[1170,676,68,22]}
+{"kind":"image","id":"im/p87alcny","slide":3,"name":"","geometry":"rect","alt":"Synthetic Continuity Loop emergency retrieval access gate","bbox":[565,164,656,443]}
+{"kind":"notes","id":"nt/x823i6","slide":3,"text":"Use the screenshot as the product proof point. The value is the controlled handoff gate: the clinician records the access purpose and relationship before retrieving the current verified record.\n\n[Sources]\n- C:\\Users\\basit\\Downloads\\CODE\\healthathon\\PRODUCT_REQUIREMENTS.md (emergency retrieval requirements)\n- C:\\Users\\basit\\Downloads\\CODE\\healthathon\\PROTOTYPE_HANDOFF.md (demonstrated retrieval workflow and boundaries)\n- Visual asset: https://continuity-loop-healthathon.vercel.app/ (captured 27 August 2026 at 1440 x 1000 CSS pixels; synthetic data)"}
+{"kind":"slide","id":"sl/bqvsr8","slide":4,"title":"A closed loop connects follow-up, documentation, verification and retrieval.","textShapes":20}
+{"kind":"textbox","id":"sh/ahw3ux8j","slide":4,"name":"workflow-title","text":"A closed loop connects follow-up, documentation, verification and retrieval.","textPreview":"A closed loop connects follow-up, documentation, verification and retrieval.","textChars":76,"textLines":1,"bbox":[42,36,1196,78]}
+{"kind":"textbox","id":"sh/x4n2ps7a","slide":4,"name":"workflow-intro","text":"Five clinician-owned states make the continuity handoff explicit.","textPreview":"Five clinician-owned states make the continuity handoff explicit.","textChars":65,"textLines":1,"bbox":[42,137,760,36]}
+{"kind":"shape","id":"sh/w3elw7qp","slide":4,"name":"workflow-spine","bbox":[146,219,990,2]}
+{"kind":"shape","id":"sh/nelkji9s","slide":4,"name":"workflow-spine-node-0","bbox":[146,207,26,26]}
+{"kind":"shape","id":"sh/mdc3qd87","slide":4,"name":"workflow-spine-node-1","bbox":[374,207,26,26]}
+{"kind":"shape","id":"sh/9gn2lsry","slide":4,"name":"workflow-spine-node-2","bbox":[602,207,26,26]}
+{"kind":"shape","id":"sh/ofelsnqd","slide":4,"name":"workflow-spine-node-3","bbox":[830,207,26,26]}
+{"kind":"shape","id":"sh/zalkfi9w","slide":4,"name":"workflow-spine-node-4","bbox":[1058,207,26,26]}
+{"kind":"shape","id":"sh/e9c3md8b","slide":4,"name":"step-1-rule","bbox":[42,235,206,5]}
+{"kind":"textbox","id":"sh/wf6pcvq1","slide":4,"name":"step-1-number","text":"01","textPreview":"01","textChars":2,"textLines":1,"bbox":[42,254,48,26]}
+{"kind":"textbox","id":"sh/xgfq50rm","slide":4,"name":"step-1-title","text":"Enrol + assign","textPreview":"Enrol + assign","textChars":14,"textLines":1,"bbox":[42,297,206,70]}
+{"kind":"textbox","id":"sh/ado7a58b","slide":4,"name":"step-1-body","text":"The clinician selects the patient, owner and next review date.","textPreview":"The clinician selects the patient, owner and next review date.","textChars":62,"textLines":1,"bbox":[42,384,206,112]}
+{"kind":"shape","id":"sh/vex83a9w","slide":4,"name":"step-2-rule","bbox":[270,235,206,5]}
+{"kind":"textbox","id":"sh/8b6p8va5","slide":4,"name":"step-2-number","text":"02","textPreview":"02","textChars":2,"textLines":1,"bbox":[270,254,48,26]}
+{"kind":"textbox","id":"sh/9cfq10rq","slide":4,"name":"step-2-title","text":"Talk + mark","textPreview":"Talk + mark","textChars":11,"textLines":1,"bbox":[270,297,206,70]}
+{"kind":"textbox","id":"sh/m9476lsz","slide":4,"name":"step-2-body","text":"The clinician records discussed, not discussed or defer/clarify.","textPreview":"The clinician records discussed, not discussed or defer/clarify.","textChars":64,"textLines":1,"bbox":[270,384,206,112]}
+{"kind":"shape","id":"sh/nax8zq9k","slide":4,"name":"step-3-rule","bbox":[498,235,206,5]}
+{"kind":"textbox","id":"sh/s7q9kzq9","slide":4,"name":"step-3-number","text":"03","textPreview":"03","textChars":2,"textLines":1,"bbox":[498,254,48,26]}
+{"kind":"textbox","id":"sh/t8zqdkru","slide":4,"name":"step-3-title","text":"Draft + trace","textPreview":"Draft + trace","textChars":13,"textLines":1,"bbox":[498,297,206,70]}
+{"kind":"textbox","id":"sh/1ofqxkjy","slide":4,"name":"step-3-body","text":"Each substantive field stays linked to the source conversation.","textPreview":"Each substantive field stays linked to the source conversation.","textChars":63,"textLines":1,"bbox":[498,384,206,112]}
+{"kind":"shape","id":"sh/03mp4fid","slide":4,"name":"step-4-rule","bbox":[726,235,206,5]}
+{"kind":"textbox","id":"sh/f2d8va18","slide":4,"name":"step-4-number","text":"04","textPreview":"04","textChars":2,"textLines":1,"bbox":[726,254,48,26]}
+{"kind":"textbox","id":"sh/e1472p0n","slide":4,"name":"step-4-title","text":"Review + acknowledge","textPreview":"Review + acknowledge","textChars":20,"textLines":1,"bbox":[726,297,206,70]}
+{"kind":"textbox","id":"sh/d0vqtkj2","slide":4,"name":"step-4-body","text":"The physician edits, resolves and releases the verified version.","textPreview":"The physician edits, resolves and releases the verified version.","textChars":64,"textLines":1,"bbox":[726,384,206,112]}
+{"kind":"shape","id":"sh/szmp0fih","slide":4,"name":"step-5-rule","bbox":[954,235,206,5]}
+{"kind":"textbox","id":"sh/ryd8ra1w","slide":4,"name":"step-5-number","text":"05","textPreview":"05","textChars":2,"textLines":1,"bbox":[954,254,48,26]}
+{"kind":"textbox","id":"sh/6x47y50b","slide":4,"name":"step-5-title","text":"Retrieve + reconfirm","textPreview":"Retrieve + reconfirm","textChars":20,"textLines":1,"bbox":[954,297,206,70]}
+{"kind":"textbox","id":"sh/5wvqp0jq","slide":4,"name":"step-5-body","text":"The receiving physician records purpose and checks what may have changed.","textPreview":"The receiving physician records purpose and checks what may have changed.","textChars":73,"textLines":1,"bbox":[954,384,206,112]}
+{"kind":"shape","id":"sh/4v2pwvil","slide":4,"name":"workflow-version-box","bbox":[42,560,1196,54]}
+{"kind":"textbox","id":"sh/u10nq1g3","slide":4,"name":"workflow-version-text","text":"A changed preference creates a new version; nothing released is overwritten.","textPreview":"A changed preference creates a new version; nothing released is overwritten.","textChars":76,"textLines":1,"bbox":[64,575,1135,24]}
+{"kind":"shape","id":"sh/v294z6ho","slide":4,"name":"footer-rule-4","bbox":[42,666,1196,1]}
+{"kind":"textbox","id":"sh/w3i5sby9","slide":4,"name":"footer-label-4","text":"CONTINUITY LOOP  ·  HEALTH-A-THON 2026","textPreview":"CONTINUITY LOOP  ·  HEALTH-A-THON 2026","textChars":38,"textLines":1,"bbox":[42,678,430,20]}
+{"kind":"textbox","id":"sh/h4r61gzu","slide":4,"name":"footer-number-4","text":"04","textPreview":"04","textChars":2,"textLines":1,"bbox":[1170,676,68,22]}
+{"kind":"notes","id":"nt/bqvsr8","slide":4,"text":"Walk left to right. The worklist is the operational layer, but the record is only released after the physician review and acknowledgement gate; retrieval ends with reconfirmation, not an automatic order.\n\n[Sources]\n- C:\\Users\\basit\\Downloads\\CODE\\healthathon\\PRODUCT_REQUIREMENTS.md (P0 workflow, verification, versioning and retrieval requirements)\n- C:\\Users\\basit\\Downloads\\CODE\\healthathon\\PROTOTYPE_HANDOFF.md (demonstrated workflow)"}
+{"kind":"slide","id":"sl/a9fytb","slide":5,"title":"Every field has a source. Every release has a human gate.","textShapes":15}
+{"kind":"textbox","id":"sh/pw7uxsr2","slide":5,"name":"trust-title","text":"Every field has a source. Every release has a human gate.","textPreview":"Every field has a source. Every release has a human gate.","textChars":57,"textLines":1,"bbox":[42,36,1196,78]}
+{"kind":"textbox","id":"sh/2tgv2dsr","slide":5,"name":"trust-source-label","text":"SYNTHETIC EXCERPT","textPreview":"SYNTHETIC EXCERPT","textChars":17,"textLines":1,"bbox":[42,148,500,24]}
+{"kind":"shape","id":"sh/nupcvi9w","slide":5,"name":"trust-source-box","bbox":[42,185,510,220]}
+{"kind":"textbox","id":"sh/cjid8nat","slide":5,"name":"trust-source-copy","text":"“Patient initiated discussion\nregarding family understanding\nof illness.”","textPreview":"“Patient initiated discussion | regarding family understanding | of illness.”","textChars":73,"textLines":3,"bbox":[75,235,440,130]}
+{"kind":"textbox","id":"sh/xkru1sre","slide":5,"name":"trust-source-meta","text":"Source-linked draft · synthetic patient","textPreview":"Source-linked draft · synthetic patient","textChars":39,"textLines":1,"bbox":[75,370,430,24]}
+{"kind":"shape","id":"sh/ahgv6xsn","slide":5,"name":"trust-connector","bbox":[552,292,118,3]}
+{"kind":"textbox","id":"sh/bipcz298","slide":5,"name":"trust-connector-label","text":"maps to","textPreview":"maps to","textChars":7,"textLines":1,"bbox":[570,260,90,22]}
+{"kind":"textbox","id":"sh/knidc7qp","slide":5,"name":"trust-field-label","text":"STRUCTURED FIELD","textPreview":"STRUCTURED FIELD","textChars":16,"textLines":1,"bbox":[710,148,500,24]}
+{"kind":"shape","id":"sh/lore5cra","slide":5,"name":"trust-field-box","bbox":[710,185,528,145]}
+{"kind":"textbox","id":"sh/1kjq5gru","slide":5,"name":"trust-field-copy","text":"Patient priority","textPreview":"Patient priority","textChars":16,"textLines":1,"bbox":[740,215,460,28]}
+{"kind":"textbox","id":"sh/0japwbq9","slide":5,"name":"trust-field-value","text":"Patient initiated discussion regarding family understanding of illness.","textPreview":"Patient initiated discussion regarding family understanding of illness.","textChars":71,"textLines":1,"bbox":[740,260,450,52]}
+{"kind":"textbox","id":"sh/zi18369o","slide":5,"name":"trust-gate-label","text":"RELEASE GATE","textPreview":"RELEASE GATE","textChars":12,"textLines":1,"bbox":[710,366,500,24]}
+{"kind":"shape","id":"sh/ehs7u183","slide":5,"name":"trust-bullet-1-mark","bbox":[710,412,10,10]}
+{"kind":"textbox","id":"sh/9o3q90rq","slide":5,"name":"trust-bullet-1-text","text":"Unstated stays unstated.","textPreview":"Unstated stays unstated.","textChars":24,"textLines":1,"bbox":[738,405,500,48]}
+{"kind":"shape","id":"sh/onap0vql","slide":5,"name":"trust-bullet-2-mark","bbox":[710,459,10,10]}
+{"kind":"textbox","id":"sh/nm187q90","slide":5,"name":"trust-bullet-2-text","text":"Clarification blocks publication.","textPreview":"Clarification blocks publication.","textChars":33,"textLines":1,"bbox":[738,452,500,48]}
+{"kind":"shape","id":"sh/mls7yl8f","slide":5,"name":"trust-bullet-3-mark","bbox":[710,506,10,10]}
+{"kind":"textbox","id":"sh/psz6xwrm","slide":5,"name":"trust-bullet-3-text","text":"Physician review and acknowledgement are explicit.","textPreview":"Physician review and acknowledgement are explicit.","textChars":50,"textLines":1,"bbox":[738,499,500,48]}
+{"kind":"shape","id":"sh/4rqporq1","slide":5,"name":"trust-bottom","bbox":[42,571,1196,45]}
+{"kind":"textbox","id":"sh/g7uh0v29","slide":5,"name":"trust-bottom-text","text":"Deterministic prototype behaviour · no external AI model is active","textPreview":"Deterministic prototype behaviour · no external AI model is active","textChars":66,"textLines":1,"bbox":[64,584,1140,22]}
+{"kind":"shape","id":"sh/h8nyt03u","slide":5,"name":"footer-rule-5","bbox":[42,666,1196,1]}
+{"kind":"textbox","id":"sh/u5czyl43","slide":5,"name":"footer-label-5","text":"CONTINUITY LOOP  ·  HEALTH-A-THON 2026","textPreview":"CONTINUITY LOOP  ·  HEALTH-A-THON 2026","textChars":38,"textLines":1,"bbox":[42,678,430,20]}
+{"kind":"textbox","id":"sh/f6lgrqlo","slide":5,"name":"footer-number-5","text":"05","textPreview":"05","textChars":2,"textLines":1,"bbox":[1170,676,68,22]}
+{"kind":"notes","id":"nt/a9fytb","slide":5,"text":"Show the trust mechanism, not an AI magic trick. The source excerpt anchors the field; unsupported silence remains visible, and the physician gate is what makes release possible.\n\n[Sources]\n- C:\\Users\\basit\\Downloads\\CODE\\healthathon\\PRODUCT_REQUIREMENTS.md (source mapping, unresolved fields and verification gate)\n- C:\\Users\\basit\\Downloads\\CODE\\healthathon\\PROTOTYPE_HANDOFF.md (deterministic extraction and no external AI claim)"}
+{"kind":"slide","id":"sl/m03avs","slide":6,"title":"The MVP is useful because its boundaries are explicit.","textShapes":19}
+{"kind":"textbox","id":"sh/8nutkj6d","slide":6,"name":"boundary-title","text":"The MVP is useful because its boundaries are explicit.","textPreview":"The MVP is useful because its boundaries are explicit.","textChars":54,"textLines":1,"bbox":[42,36,1196,78]}
+{"kind":"textbox","id":"sh/7mlsreps","slide":6,"name":"boundary-now-label","text":"DEMONSTRATED NOW","textPreview":"DEMONSTRATED NOW","textChars":16,"textLines":1,"bbox":[42,155,500,24]}
+{"kind":"textbox","id":"sh/mlsbi9o7","slide":6,"name":"boundary-not-label","text":"NOT CLAIMED","textPreview":"NOT CLAIMED","textChars":11,"textLines":1,"bbox":[694,155,500,24]}
+{"kind":"shape","id":"sh/lkjap47m","slide":6,"name":"boundary-divider","bbox":[639,150,1,410]}
+{"kind":"shape","id":"sh/kzatgj61","slide":6,"name":"boundary-now-0-mark","bbox":[42,208,10,10]}
+{"kind":"textbox","id":"sh/zy1snepg","slide":6,"name":"boundary-now-0-text","text":"Synthetic patient binding","textPreview":"Synthetic patient binding","textChars":25,"textLines":1,"bbox":[70,201,530,48]}
+{"kind":"shape","id":"sh/yxsbe9ov","slide":6,"name":"boundary-now-1-mark","bbox":[42,252,10,10]}
+{"kind":"textbox","id":"sh/5gnu187q","slide":6,"name":"boundary-now-1-text","text":"Guided eight-domain checklist","textPreview":"Guided eight-domain checklist","textChars":29,"textLines":1,"bbox":[70,245,530,48]}
+{"kind":"shape","id":"sh/4vets365","slide":6,"name":"boundary-now-2-mark","bbox":[42,296,10,10]}
+{"kind":"textbox","id":"sh/29kbydsn","slide":6,"name":"boundary-now-2-text","text":"Deterministic source-linked draft","textPreview":"Deterministic source-linked draft","textChars":33,"textLines":1,"bbox":[70,289,530,48]}
+{"kind":"shape","id":"sh/3atc7i98","slide":6,"name":"boundary-now-3-mark","bbox":[42,340,10,10]}
+{"kind":"textbox","id":"sh/obmt0nat","slide":6,"name":"boundary-now-3-text","text":"Physician review + acknowledgement gate","textPreview":"Physician review + acknowledgement gate","textChars":39,"textLines":1,"bbox":[70,333,530,48]}
+{"kind":"shape","id":"sh/pwvu9sre","slide":6,"name":"boundary-now-4-mark","bbox":[42,384,10,10]}
+{"kind":"textbox","id":"sh/u5kbudsr","slide":6,"name":"boundary-now-4-text","text":"Append-only version 2","textPreview":"Append-only version 2","textChars":21,"textLines":1,"bbox":[70,377,530,48]}
+{"kind":"shape","id":"sh/f6ts3i9w","slide":6,"name":"boundary-now-5-mark","bbox":[42,428,10,10]}
+{"kind":"textbox","id":"sh/g72tw3ah","slide":6,"name":"boundary-now-5-text","text":"Purpose-bound retrieval + audit","textPreview":"Purpose-bound retrieval + audit","textChars":31,"textLines":1,"bbox":[70,421,530,48]}
+{"kind":"shape","id":"sh/18bu58r2","slide":6,"name":"boundary-now-6-mark","bbox":[42,472,10,10]}
+{"kind":"textbox","id":"sh/y14b6xsv","slide":6,"name":"boundary-now-6-text","text":"Coordinator outreach worklist","textPreview":"Coordinator outreach worklist","textChars":29,"textLines":1,"bbox":[70,465,530,48]}
+{"kind":"shape","id":"sh/z2dcf29g","slide":6,"name":"boundary-not-0-mark","bbox":[694,208,10,10]}
+{"kind":"textbox","id":"sh/v6p8rups","slide":6,"name":"boundary-not-0-text","text":"Live AI transcription or model accuracy","textPreview":"Live AI transcription or model accuracy","textChars":39,"textLines":1,"bbox":[722,201,485,40]}
+{"kind":"shape","id":"sh/algryp87","slide":6,"name":"boundary-not-1-mark","bbox":[694,258,10,10]}
+{"kind":"textbox","id":"sh/x87qt47y","slide":6,"name":"boundary-not-1-text","text":"Real authentication, encryption or cryptographic audit","textPreview":"Real authentication, encryption or cryptographic audit","textChars":54,"textLines":1,"bbox":[722,251,485,40]}
+{"kind":"shape","id":"sh/w7y90zqd","slide":6,"name":"boundary-not-2-mark","bbox":[694,308,10,10]}
+{"kind":"textbox","id":"sh/jap8vepo","slide":6,"name":"boundary-not-2-text","text":"EHR, ABDM or messaging integration","textPreview":"EHR, ABDM or messaging integration","textChars":34,"textLines":1,"bbox":[722,301,485,40]}
+{"kind":"shape","id":"sh/i9gr298j","slide":6,"name":"boundary-not-3-mark","bbox":[694,358,10,10]}
+{"kind":"textbox","id":"sh/5crqx47u","slide":6,"name":"boundary-not-3-text","text":"Patient outcomes or treatment effects","textPreview":"Patient outcomes or treatment effects","textChars":37,"textLines":1,"bbox":[722,351,485,40]}
+{"kind":"shape","id":"sh/kby94jq9","slide":6,"name":"boundary-not-4-mark","bbox":[694,408,10,10]}
+{"kind":"textbox","id":"sh/7e98zep0","slide":6,"name":"boundary-not-4-text","text":"Legal signature, living will or treatment order","textPreview":"Legal signature, living will or treatment order","textChars":47,"textLines":1,"bbox":[722,401,485,40]}
+{"kind":"shape","id":"sh/6d0r698f","slide":6,"name":"boundary-not-5-mark","bbox":[694,458,10,10]}
+{"kind":"textbox","id":"sh/4j2pwjmd","slide":6,"name":"boundary-not-5-text","text":"Autonomous triage, prognosis or recommendation","textPreview":"Autonomous triage, prognosis or recommendation","textChars":46,"textLines":1,"bbox":[722,451,485,40]}
+{"kind":"shape","id":"sh/p4bqpony","slide":6,"name":"boundary-bottom","bbox":[42,586,1196,38]}
+{"kind":"textbox","id":"sh/2h07u94n","slide":6,"name":"boundary-bottom-text","text":"Clinical summary only · Reconfirm current status before acute orders.","textPreview":"Clinical summary only · Reconfirm current status before acute orders.","textChars":69,"textLines":1,"bbox":[64,595,1144,20]}
+{"kind":"shape","id":"sh/3i98ne58","slide":6,"name":"footer-rule-6","bbox":[42,666,1196,1]}
+{"kind":"textbox","id":"sh/gfipsjmh","slide":6,"name":"footer-label-6","text":"CONTINUITY LOOP  ·  HEALTH-A-THON 2026","textPreview":"CONTINUITY LOOP  ·  HEALTH-A-THON 2026","textChars":38,"textLines":1,"bbox":[42,678,430,20]}
+{"kind":"textbox","id":"sh/hgrqlon2","slide":6,"name":"footer-number-6","text":"06","textPreview":"06","textChars":2,"textLines":1,"bbox":[1170,676,68,22]}
+{"kind":"notes","id":"nt/m03avs","slide":6,"text":"Say the exclusions plainly. These are not missing features to hide; they are the safety boundary of the hackathon prototype and the reason the current proof can be evaluated honestly.\n\n[Sources]\n- C:\\Users\\basit\\Downloads\\CODE\\healthathon\\PRODUCT_REQUIREMENTS.md (demonstration integrity and non-goals)\n- C:\\Users\\basit\\Downloads\\CODE\\healthathon\\PROTOTYPE_HANDOFF.md (current implementation boundary)\n- C:\\Users\\basit\\Downloads\\CODE\\healthathon\\MEETING_SUMMARY_FOR_TEAM.md (clinical summary, not legal/treatment authority)"}
+{"kind":"slide","id":"sl/qg7o2b","slide":7,"title":"The next credible proof is a clinician-reviewed simulation.","textShapes":19}
+{"kind":"textbox","id":"sh/k7qdwnuh","slide":7,"name":"validation-title","text":"The next credible proof is a clinician-reviewed simulation.","textPreview":"The next credible proof is a clinician-reviewed simulation.","textChars":59,"textLines":1,"bbox":[42,36,1196,78]}
+{"kind":"textbox","id":"sh/z6hc3itw","slide":7,"name":"validation-intro","text":"Compare product output with clinician-authored references across varied synthetic or fully anonymised scenarios.","textPreview":"Compare product output with clinician-authored references across varied synthetic or fully anonymised scenarios.","textChars":112,"textLines":1,"bbox":[42,137,1010,45]}
+{"kind":"textbox","id":"sh/y58vudcb","slide":7,"name":"metric-0-number","text":"20","textPreview":"20","textChars":2,"textLines":1,"bbox":[42,236,250,80]}
+{"kind":"shape","id":"sh/9cju9sby","slide":7,"name":"metric-0-rule","bbox":[42,322,238,4]}
+{"kind":"textbox","id":"sh/8bad0nut","slide":7,"name":"metric-0-title","text":"scenarios to run","textPreview":"scenarios to run","textChars":16,"textLines":1,"bbox":[42,343,250,46]}
+{"kind":"textbox","id":"sh/7a1c7it8","slide":7,"name":"metric-0-body","text":"A clinician-owned reference set.","textPreview":"A clinician-owned reference set.","textChars":32,"textLines":1,"bbox":[42,399,250,62]}
+{"kind":"textbox","id":"sh/m9svydcn","slide":7,"name":"metric-1-number","text":"8","textPreview":"8","textChars":1,"textLines":1,"bbox":[342,236,250,80]}
+{"kind":"shape","id":"sh/pgfuxobu","slide":7,"name":"metric-1-rule","bbox":[342,322,238,4]}
+{"kind":"textbox","id":"sh/of6to3u9","slide":7,"name":"metric-1-title","text":"conversation domains","textPreview":"conversation domains","textChars":20,"textLines":1,"bbox":[342,343,250,46]}
+{"kind":"textbox","id":"sh/2p83614n","slide":7,"name":"metric-1-body","text":"The current prototype checklist.","textPreview":"The current prototype checklist.","textChars":32,"textLines":1,"bbox":[342,399,250,62]}
+{"kind":"textbox","id":"sh/3qh4z658","slide":7,"name":"metric-2-number","text":"<30 sec","textPreview":"<30 sec","textChars":7,"textLines":1,"bbox":[642,236,250,80]}
+{"kind":"shape","id":"sh/4rql8bmt","slide":7,"name":"metric-2-rule","bbox":[642,322,238,4]}
+{"kind":"textbox","id":"sh/pczm1gne","slide":7,"name":"metric-2-title","text":"retrieval target","textPreview":"retrieval target","textChars":16,"textLines":1,"bbox":[642,343,250,46]}
+{"kind":"textbox","id":"sh/qd83al4z","slide":7,"name":"metric-2-body","text":"A target, not an observed result.","textPreview":"A target, not an observed result.","textChars":33,"textLines":1,"bbox":[642,399,250,62]}
+{"kind":"textbox","id":"sh/re143q5k","slide":7,"name":"metric-3-number","text":"0","textPreview":"0","textChars":1,"textLines":1,"bbox":[942,236,250,80]}
+{"kind":"shape","id":"sh/cfa5cvmp","slide":7,"name":"metric-3-rule","bbox":[942,322,238,4]}
+{"kind":"textbox","id":"sh/dgjm5g3a","slide":7,"name":"metric-3-title","text":"unstated preferences filled","textPreview":"unstated preferences filled","textChars":27,"textLines":1,"bbox":[942,343,250,46]}
+{"kind":"textbox","id":"sh/ehsnel4v","slide":7,"name":"metric-3-body","text":"An integrity invariant.","textPreview":"An integrity invariant.","textChars":23,"textLines":1,"bbox":[942,399,250,62]}
+{"kind":"textbox","id":"sh/zi147qlg","slide":7,"name":"validation-measures-label","text":"MEASURE","textPreview":"MEASURE","textChars":7,"textLines":1,"bbox":[42,508,160,24]}
+{"kind":"textbox","id":"sh/bmlkvq1o","slide":7,"name":"validation-measures","text":"Required-domain coverage · unsupported statement rate · unresolved-item capture · clinician correction rate · time to prepare/retrieve · receiving-clinician clarity","textPreview":"Required-domain coverage · unsupported statement rate · unresolved-item capture · clinician correction rate · time to prepare/retrieve · ...","textChars":164,"textLines":1,"bbox":[190,507,1015,55]}
+{"kind":"textbox","id":"sh/alc3mlk3","slide":7,"name":"validation-footnote","text":"Targets / plan — not observed outcomes.","textPreview":"Targets / plan — not observed outcomes.","textChars":39,"textLines":1,"bbox":[42,585,500,24]}
+{"kind":"shape","id":"sh/xo3mx0je","slide":7,"name":"footer-rule-7","bbox":[42,666,1196,1]}
+{"kind":"textbox","id":"sh/wnulov29","slide":7,"name":"footer-label-7","text":"CONTINUITY LOOP  ·  HEALTH-A-THON 2026","textPreview":"CONTINUITY LOOP  ·  HEALTH-A-THON 2026","textChars":38,"textLines":1,"bbox":[42,678,430,20]}
+{"kind":"textbox","id":"sh/ni1krq1c","slide":7,"name":"footer-number-7","text":"07","textPreview":"07","textChars":2,"textLines":1,"bbox":[1170,676,68,22]}
+{"kind":"notes","id":"nt/qg7o2b","slide":7,"text":"Make the next step concrete. The 20-case exercise is a proposed validation plan; it is not a result. Compare the product record to a clinician-authored reference and measure fidelity, uncertainty capture and retrieval clarity.\n\n[Sources]\n- C:\\Users\\basit\\Downloads\\CODE\\healthathon\\VENTURE_DECISION_MATRIX.md (20-case pilot hypothesis and measures)\n- C:\\Users\\basit\\Downloads\\CODE\\healthathon\\PRODUCT_REQUIREMENTS.md (eight-domain checklist and no-inference requirement)\n- C:\\Users\\basit\\Downloads\\CODE\\healthathon\\PROTOTYPE_HANDOFF.md (current MVP scorecard boundaries)"}
+{"kind":"slide","id":"sl/067de1","slide":8,"title":"THE NEXT DECISION","textShapes":15}
+{"kind":"textbox","id":"sh/b25snqps","slide":8,"name":"ask-kicker","text":"THE NEXT DECISION","textPreview":"THE NEXT DECISION","textChars":17,"textLines":1,"bbox":[42,42,300,28]}
+{"kind":"shape","id":"sh/c3etwv6d","slide":8,"name":"ask-kicker-rule","bbox":[42,82,120,4]}
+{"kind":"textbox","id":"sh/d4nap07y","slide":8,"name":"ask-title","text":"The decision needed now\nis clinical ownership.","textPreview":"The decision needed now | is clinical ownership.","textChars":46,"textLines":2,"bbox":[42,150,580,150]}
+{"kind":"textbox","id":"sh/y5wby5o3","slide":8,"name":"ask-intro","text":"To make this a real pilot, we need four inputs from clinicians.","textPreview":"To make this a real pilot, we need four inputs from clinicians.","textChars":63,"textLines":1,"bbox":[42,330,530,58]}
+{"kind":"textbox","id":"sh/z65srqpo","slide":8,"name":"ask-number-0","text":"01","textPreview":"01","textChars":2,"textLines":1,"bbox":[710,157,50,24]}
+{"kind":"textbox","id":"sh/07et0v69","slide":8,"name":"ask-copy-0","text":"Approve the exact conversation domains and wording.","textPreview":"Approve the exact conversation domains and wording.","textChars":51,"textLines":1,"bbox":[770,155,430,65]}
+{"kind":"shape","id":"sh/l8nut07u","slide":8,"name":"ask-rule-0","bbox":[710,231,490,1]}
+{"kind":"textbox","id":"sh/e9srm18z","slide":8,"name":"ask-number-1","text":"02","textPreview":"02","textChars":2,"textLines":1,"bbox":[710,261,50,24]}
+{"kind":"textbox","id":"sh/falsf6pk","slide":8,"name":"ask-copy-1","text":"Provide 20 synthetic scenarios and clinician reference records.","textPreview":"Provide 20 synthetic scenarios and clinician reference records.","textChars":63,"textLines":1,"bbox":[770,259,430,65]}
+{"kind":"shape","id":"sh/jax07mdw","slide":8,"name":"ask-rule-1","bbox":[710,335,490,1]}
+{"kind":"textbox","id":"sh/y9oje1cb","slide":8,"name":"ask-number-2","text":"03","textPreview":"03","textChars":2,"textLines":1,"bbox":[710,365,50,24]}
+{"kind":"textbox","id":"sh/5cfi9wv2","slide":8,"name":"ask-copy-2","text":"Name one workflow owner, pilot setting and due-date rule.","textPreview":"Name one workflow owner, pilot setting and due-date rule.","textChars":57,"textLines":1,"bbox":[770,363,430,65]}
+{"kind":"shape","id":"sh/kb61gruh","slide":8,"name":"ask-rule-2","bbox":[710,439,490,1]}
+{"kind":"textbox","id":"sh/b6x03md0","slide":8,"name":"ask-number-3","text":"04","textPreview":"04","textChars":2,"textLines":1,"bbox":[710,469,50,24]}
+{"kind":"textbox","id":"sh/a54jahcf","slide":8,"name":"ask-copy-3","text":"Define acknowledgement, surrogate authority and retrieval roles.","textPreview":"Define acknowledgement, surrogate authority and retrieval roles.","textChars":64,"textLines":1,"bbox":[770,467,430,65]}
+{"kind":"shape","id":"sh/x8fi5wvq","slide":8,"name":"ask-rule-3","bbox":[710,543,490,1]}
+{"kind":"shape","id":"sh/w761cru5","slide":8,"name":"ask-boundary","bbox":[42,525,1196,66]}
+{"kind":"textbox","id":"sh/nid0z2do","slide":8,"name":"ask-boundary-copy","text":"Documents, verifies and retrieves clinician decisions.\nIt does not select patients, recommend treatment or create a legal directive.","textPreview":"Documents, verifies and retrieves clinician decisions. | It does not select patients, recommend treatment or create a legal directive.","textChars":132,"textLines":2,"bbox":[64,539,1135,44]}
+{"kind":"textbox","id":"sh/mh4j6hc3","slide":8,"name":"ask-url","text":"continuity-loop-healthathon.vercel.app  ·  synthetic prototype  ·  clinical review pending","textPreview":"continuity-loop-healthathon.vercel.app  ·  synthetic prototype  ·  clinical review pending","textChars":90,"textLines":1,"bbox":[42,625,930,22]}
+{"kind":"shape","id":"sh/qdkjixgb","slide":8,"name":"footer-rule-8","bbox":[42,666,1196,1]}
+{"kind":"textbox","id":"sh/retkr2xg","slide":8,"name":"footer-label-8","text":"CONTINUITY LOOP  ·  HEALTH-A-THON 2026","textPreview":"CONTINUITY LOOP  ·  HEALTH-A-THON 2026","textChars":38,"textLines":1,"bbox":[42,678,430,20]}
+{"kind":"textbox","id":"sh/cfm1k7y1","slide":8,"name":"footer-number-8","text":"08","textPreview":"08","textChars":2,"textLines":1,"bbox":[1170,676,68,22]}
+{"kind":"notes","id":"nt/067de1","slide":8,"text":"Close with a decision, not a generic thank-you. The product is ready for clinician-owned validation, but the clinical protocol, reference cases, pilot owner and access semantics still need explicit agreement.\n\n[Sources]\n- C:\\Users\\basit\\Downloads\\CODE\\healthathon\\TOMORROW_CALL_CARD.md (clinician decision gate and required inputs)\n- C:\\Users\\basit\\Downloads\\CODE\\healthathon\\VENTURE_DECISION_MATRIX.md (remaining clinical decisions and pilot hypothesis)\n- C:\\Users\\basit\\Downloads\\CODE\\healthathon\\PRODUCT_REQUIREMENTS.md (P1 clinician protocol requirements)"}

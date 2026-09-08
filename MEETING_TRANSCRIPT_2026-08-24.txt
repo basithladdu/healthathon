@@ -1,0 +1,250 @@
+I think this is better camera.
+Hello. Hello Suja. Hello Shah. Hi.
+Hi.
+Hi. Hi. How are you?
+I'm good. How are you?
+Yeah, I'm good. Where do you guys Where are you from? Are you from Yeah, you go first to death. Uh I'm from Bangalore.
+Okay.
+Uh right now working in the Indian Institute of Science.
+Got it. Great.
+And uh
+yeah I'm I'm basically from Kerala but u I've been in Delhi for quite some time and I work together.
+Got it.
+Now I'm working uh as Mangalia Pradesh.
+Oh you in Andhra Pradesh. Okay. So I'm also from Andhra Pradesh from Karun. I actually frequent a lot to Vijayara.
+So we can Vijad and are like
+yes they're very very
+Delhi and Maral are also great Kerala is also great places okay so like I read the document but see it's a little like u the jargon is little confusing so
+that's okay
+yeah
+yeah
+if you guys can break it down or like you can just say we don't have to go by the document but you can just say what you guys want to say so
+yeah
+I think take it
+no no I think you should you started I mean it's it's your brain child so I think you should start and if there's something I'll chime in I suppose.
+Yes.
+Yeah. So um so this this idea comes in because uh so uh
+a lot of you know uh cancer patients uh they they are kind of terminal right we know that they're going to
+uh have some sort of event that can kind of lead to their end so to speak. I mean to say it bluntly
+over the next couple of months or year or so.
+Yeah.
+Okay. Now, at that point of time, usually what happens is families uh need to make a decision about how they want their care to happen, right?
+If some emergency happens.
+Yeah.
+Uh one is, you know, if they want to stay at home, that's great. Uh but if they don't want to stay at home, they want to come to the hospital.
+Uh then, you know, uh sometimes not everything that is medically necessary needs to be done. So, they come to the emergency, but they can still say things like I don't want to go to the ICU. I'm just here because I want to get admitted in the ward and I want to keep them comfortable and so on you know keep them.
+Yeah. Yeah.
+So uh that is where uh that is what the goals of care discussion actually is.
+So it is a discussion that happens between uh the treating physician and the patient.
+Got it.
+Uh at a time when the physician believes that okay this person may not survive a year. or 6 months or something like that.
+Mhm.
+And then they try and bring up this discussion about what the family or or the patient would want in times, you know, uh in in such a situation where they're wor.
+Yeah.
+Um so this can include decisions of one is bringing to hospital versus staying at home.
+Uh second is whether you know the patient if they wor and do they need to be in ICU or do they need to be in the ward or if they are in the ICU should they give like a trial for a couple of days and if nothing is working out then shift. Do they need a ventilator or not? Do they need uh things like diialysis or not? Got it.
+Those kind of questions, right? So this initially this kind of discussion usually starts with oncology patients but uh really it can be translated to patients who are chronically ill uh with any other disease also. So the problem that happens is uh one is these kind of discussions are not really held in India.
+Second is if they are held uh they're not documented properly and you know so what usually happens is you know uh often times it is the physician telling the patient that see when you get admitted they will ask you do you need ventilator or not just say no.
+So that is the kind of you know discussion that usually happens. So none of it is actually ever documented and even if it is documented the patient family cannot get out this document and give it to the emergency physician saying see this discussion has already happened uh this is what we want and you can just confirm with us and something like that. So uh what we want to build is something where we can uh one is help the physician identify which patients need this kind of discussion through a screening tool. Uh second is have like uh you know um AI to guide the physician will lead the discussion but the AI can guide the structure of the discussion making sure that these points are actually covered or not uh through either a voice or or some sort of a conversation ambient listening kind of thing. Once the conversation happens, we want the tool to document the note in a structured format. And if you say click on the part on the note which says you know ventilator or no, it can probably track back to the conversation that happened and see exactly what was said to obey him. Then you know the physician and the patient signs off on this and uh a a non-changeable protected document of this is given to the patient that they can pull out and show it to any other doctor if they don't show up to that that hospital or end up going to a different hospital later. Um we also want you know something uh of you know people can update this. So you know sometimes they may say okay I don't want an ICU but then you know they change in mind. So we want this document to be updatable. So uh you know they can discuss with the physician and every version can show up on the update and things like that. So that is what I was thinking and I told this to sh ma'am do you have any additions you want to no no actually I I mean I I agree with um whatever just said we already had this discussion so I get probably evolve as we start doing it and um you know um issues with the structure as we do it. Um but yeah overall this is what SUJ had envisioned and you know I am with him on this.
+What do you guys think?
+Oh this is uh this is like I think a great initiative actually. So basically let me just again like you know see from my understanding what I what I like let me try to tell you. So these people terminally ill patients they actually go to a hospital They get their care and whatever and now they are like basically diagnosed with any cancer etc etc and after like you know they decide whether they want ventilator or they want like uh you know tube or etc. They document that with one doctor like with the main hospital that they got the care at and they let's say something happens and they go to another doctor or another hospital. We should have no like history of whatever happened with this patient. So so this person has to actually like our application basically has to tell them tell the doctors or the medical personnel basically that okay this is the decision this is the like you know uh the will of the patient like you know and he doesn't want ventilator etc etc and there needs to be a proper documented thing like there the other doctor has to be has to sign off of this and you can also change it like you know uh as like if the patients and the families can change it is is what I'm trying to understand here and uh It should be more official so that and it should of course the structured format that you mentioned which I wrote down here u so it should be in a structured format so that uh the AI they can also ask questions to the AI so that the new doctor can get the context of whatever happened with this patient is that is that what I'm trying to get here like you know or did I miss something
+you I think you've gotten most of it
+uh but we don't want to say uh the word will okay because a living will or An advanced medical directives are legal documents that have to be notorized.
+Got it?
+Uh the problem is for an advanced medical directive or a living will to happen.
+Patients need to know exactly the condition that they have and they have to say that okay I know I have cancer and based on this I do this this this okay and then it is notorized in front of a uh I mean whatever with two witnesses and so on. The problem that happens in India is patients don't know what they have the family will be like oh please don't tell them that they have cancer right
+so in such a case having a legal document becomes a little difficult so we don't say living will we say goals of care document right so that is just a clinical note that a doctor has to write no legal no legalities involved
+okay
+um
+uh so that is the that is the change I wanted to make and second is the patient and the family cannot update it without uh an another doctor being present, right? So the application or whatever it is uh we need to get some uh you know doctors on board and either verify them through their um you know medical uh registration or something like that. So we know that someone with uh you know actual medical repres uh doctors are involved in changing the whole thing.
+Mhm.
+And at the end of it you know both the patient and the doctor needs to digitally or whatever sign it.
+Yeah.
+So It's understood that both parties have read the note and understood what has happened.
+Got it. That's good. And this goals of care, is this like a term in your field? Like is this what you guys use? Uh goals of care for clinical.
+Yeah, we use goals of care discussions. I mean, is there anything else you call it? I don't know.
+No, no. I I'm not in that field. So, I'm just like, you know, I'm curious. That's it.
+No, I thought I think this is what we call it.
+Okay. Okay. Sure.
+We discussed goals of care. when we meet any person and the thing is that like Dr. Sujay already mentioned we don't really have much of it happening in cancer care at this point of time and not in a structured manner.
+So even though every time you kind of have this conversation with the physician and we have it regularly with our patients okay you know uh this is what we're expecting and u this is what you're going to have as an outcome from here.
+We do say that to the patients but it's never really structured in a in a fashion anywhere and kept you know so when the patient suddenly comes to the emergency room the person who's there that time at 3:00 a.m. or 4 a.m. doesn't know exactly how to deal with this and then you have to have that difficult conversation all over again with the family. So
+that's what we're trying to kind of you know uh take away and kind of reduce the anxiety of the family and you know reduce the time taken for whatever is the necessary care that is to be given in the emergency to the patient. I I mean I did I did I uh get that right suj I mean I think
+yeah yeah perfect
+I'm just keeping my video off because there's something wrong with my neck
+it's okay it's fine it's fine my video. Uh, okay. So, I made a little, you know, local prototype. I'll show it to you. You know, I made this just to get a better understanding because I'm a more of a visual person, I guess, if you like to call it that way. Um,
+yeah.
+Yeah. So, can you guys see my screen?
+Yeah.
+Yeah. So, this is like the basic. Please, please do not judge us by our prototype. Okay. Uh, we make really good software. That's a plug. And Okay. So, basically like what try to understand is we have patients and we have different different type we have unique IDs to all patients so I do not know what the actual ID ID is because I'm not really research into that and
+I'm sorry for uh I'm really sorry to interrupt you this is something which is a pre-existing uh format or this is just something now that you've made after
+I made it like this evening uh this evening we just got
+just to get like a visual understanding like you know what's happening
+yeah So like we have patients u and then we have verified records as we said like authorized by I put Dr. Suggest no I'm sorry and we have like like basically the versions as you said like a patient can change like you know of course they can like uh so we have all the versions of whether they want to change their goals of care etc and uh yeah and then we have like kind of like a timeline so when like when did the conversation was initiated one second this is loading I think um Yeah. So basically like uh the we have the verified records and we have like you know the conversation timeline and when did the conversation got initiated. So then like the person who the next person who's going to you know look at this record this patient's record let's say in this name you know Raavan. So they're going to see like clinical team and age and etc etc and they get the like timeline of whatever happened with this particular person and uh yeah so this is again this is just to get um like even better understanding and then the we have uh here same thing like the conversation timeline and then we have the summary. So summary uh like do we want the artificial intelligence models or something like that to generate a summary or we just want the AI to put whatever we give in a structured format. What do we want to do or do we want to do?
+Okay.
+So what I was thinking is see uh
+uh what Dr. Shada and I can do for you is we go through exist uh guidelines that cover what all need to be spoken in a goals of care conversation. Right?
+So one is there are there are two things that are going to happen in such a discussion. One is there's going to be a lot of emotion that will be there from the patient side.
+Uh and then the second is the content itself. So at some point we'll have to make sure that the emotion gets out and then the content stays in. Okay, that is one thing that I was thinking of.
+Second is uh we'll give you a structure that the AI should follow. So the AI can prompt the doctor. So usually I'll tell you why we want this to happen because doctors are not trained to have goals of care discussions in India. Okay?
+So no one knows exactly what to talk about and uh you know how not basically what to talk about right so if the AI can provide something like a checklist or something saying you've spoken about the ICU then you can go ahead and talk about the ventilator then move ahead and talk about diialysis something like that
+and the doctor can you know once Once the conversation happens, the AI can check it off on the box and then move it to the next thing
+and if the doctor chooses not to have that uh you know say a diialysis in this particular conversation then you know it gets uh noted in the conversation that it has not been done and the doctor can you know verify that you know he has indeed not done that and does not want to do it.
+Got it.
+Um so once this conversation happens so how we record the conversation is another thing. Do you want to have like an ambient listening uh that can make it into a conversation or what that we'll have to decide
+and then we'll move ahead and uh with the exact conversation that has happened we'll also give the AI a structure and it will summarize the note that the doctor can read and the patient and the doctor can both read and both sign off on it.
+Got it. Got it. That's great. So is this always going to be voice like the input is going to be voice always?
+I haven't thought about that. I was thinking voice because I I don't know what other input is there. So
+yes, I think I think voice is the best to do. Yeah. Okay.
+So I'll tell you the problems with voice. One is the conversations can run very long. So we'll have to look at how much data can be stored from each conversation.
+Yeah.
+Second is uh uh multiple people are usually there in this conversation. So if the patient isn't there, so it's one one or two doctors
+uh or maybe three doctors going ahead with maybe two to three family members at least.
+So how good is ambient? and AI and actually understanding what is being spoken.
+Yeah.
+So that's a different thing.
+Got it.
+So we don't have to make uh you know like a separate if the AI can just figure out which is the doctor and which is the patient party that should be enough. It does not have to identify each person individually maybe for this.
+Got it. Got it. Okay.
+So that's what I was thinking. Ma'am, do you have anything to add?
+Yeah. But um I think I mean uh to be honest I think we will have to work on this with a couple of you know doctors and see what works best. Um with voice I'm not sure it I mean I I really don't know how much of uh ambient AI uh gathering of information is going to work because it's also the thing of different languages different accents different dialects um I don't know maybe I just don't know the the you know the practicality behind that but I those were concerns which came to mind um so so I don't know I really don't know it could also be that we prompt the uh you know the doctor to ask a particular set of questions and you know kind of input it or have a person on the side like a coordinator which has been mentioned over here where they write down the or note down the answers or discussion and and then it you know it gets transcribed or something I I don't know how much like you said it's difficult to uh decide on that maybe you guys would be able to tell us what works better I don't know I really don't
+okay so there's this thing called speaker diorization I don't know how to pronounce it but like it basically tells you let's say there's three speakers speaker one speaker two speaker three so the speaker one when he's speaking like the what the this is not AI though this is different this is just machine learning models so these kind of detect when or who spoke when basically so like we three are having a conversation right now so like if I'm speaking and if I put this in a model so basically it will detect it won't say that I'm based but it will say that speaker one is currently speaking and it will basically like separate the like whatever I say throughout the meeting and then after like what SUJ says and then after like what you say so I think uh we can do it but again like this comes to a like a very advanced what do you say like I don't think this is good to go in the prototype stage but this is definitely doable like I think technology has abled us it's called speaker dation there's models for this uh and after we collect the data like whatever uh voices sorry not voice but like uh whatever the session has gone and then after that we analyze it. So like do you have any idea on how much how long can these sessions go for?
+Yeah, they can go I think even up to an hour sometimes you know sometimes Yeah.
+maybe an hour also.
+Got it. Yeah, it can be done. There's there's uh like we can do it. There's no problem with this. 1 hour is all right. That's perfectly fine. Anything else that uh you know which basically improves the quality of life for both for basically the end users and yeah I want to add who's the end user here of course it's doctors and then there's patients and patients family is is that right like
+so uh what I've thought of are the you know the the actually Dr. Shahara came up with this so the end user is actually the emergency medicine physician or the physician who does not know the patient but then gets this and it makes his work easier so that person is actually the end user the initiator or whatever it is is the primary doctor or the oncologist. The patients just come in as a secondary thing where they get relief because they've had this conversation.
+Yeah. Yes. Yeah. Okay.
+So, it's more of a doctorto kind of thing and the patient is just kind of secondary in this even though
+that is the primary focus.
+Got it. So, just a question like is this not actually in the like current like you know the medical space for India at least? like I'm curious. I do not know. I have no idea.
+It doesn't exist. So, I'll tell you what. Um uh I think a study a a study was published where a very major cancer center maybe 2 three years back was still documenting 0% goals of care discussions um for advanced stage pancreatic and you know stomach cancers and stuff. So it is something that you know uh paliative care itself doesn't take exist too much in India
+and half of it is concentrated just in Kerala the rest of it really doesn't exist so I think this is something that will add see even if it doesn't uh uh you know work for the competition I think it will really help some people at least
+yeah that that's great that's great uh so
+I just want to add to what Dr. Suja said that uh I mean I think this would also kind of help to bring this discussion into our day-to-day practice is because we don't have the necessary tools probably and you know having this would really help us I mean notwithstanding the convers I mean the competition
+yeah yeah
+yeah and also I believe that in the next couple of years this will really uh
+because there there are talks to include paliative care into the MBBS curriculum
+got it
+uh so it will come up in the next 2 three years in a big way so that way this tool can really help MBBS students also learn how to have these discussions later on because the AI is kind of guiding it.
+Got it. Got it. Okay. So, is there any any other requirements as well? Like because I think I have a very good idea of what you're trying what we're trying to build here. I think it's very meaningful and it also like kind of decreases the distress for the patients as well. You know, they don't have to Yeah.
+Okay. So, any questions you guys have regarding us or anything else? I mean I saw your website you guys have done some I mean overview I have seen and you know I like the kind of projects you've done.
+Uh and the fact that you were able to come up with uh this in
+Yeah. No um one thing I was thinking of
+Yeah.
+I'm sorry. I'm sorry. I'm sorry. Please go ahead.
+So um you know we'll really have to uh some questions I have is how do we uh make sure that the patient is the actual person who is you know was involved in the discussion should we link it to a government ID Aadhaar or something or not
+yeah
+uh how do we verify
+yeah I just I just feel that you know bringing Aadhaar into it makes it a little
+complicated right
+yeah it's unnecessarily bringing the government into it which I'm sorry that might be um unnecessary but u but I I'm sure if we have the Uh I mean I guess that's something to ponder over.
+We can have this we can have probably um uh uh how do you say an opening where it can be linked to an AA ID or something like that later not now.
+Yeah. Aha ID is I think it's better if you do what like I think it's it looks more official because it's a unique ID.
+Correct. And uh second is how do we make sure that uh you know the physicians who have access to this and are changing this are you know registered so I don't know how to do that
+I think it's mainly depends on outreach to the hospitals I guess like if you have
+I guess we uh we can make it as you know in case wherever we are trying to roll this out it could be that you need to have a specific login and password and only few of the people actually have it you give a you know dedicated number of limited access codes or whatever
+yeah
+I think that's good yeah uh and that can be done by the hospital itself the hospital does the work of verifying the doctor rather than anyone else.
+Yeah. And then third question is um at what level should this application be deployed? Is it at a hospital level? So every hospital has their own register of patients or is it at like a state level, national level, much larger level where all the patients get added on to the same registry kind of thing. I don't know.
+I think I think that maybe when you're doing a pilot uh piloting of it, we can probably do it at a smaller level maybe at centers where we know people and see how it works out maybe have some numbers and then we we would be able to show that data to roll it out later don't you think that might be better
+yeah I agree so the so the actual database of the patients with which the conversation happens is only with the doctor who has had it uh not with anyone else so it's at a hospital level kind of thing uh
+I think the data the data base of the patients might be with them but I guess the data which is being heard by the app. Who has that? Who holds that information?
+Where is uh that I guess you will have to tell us.
+Yeah, you asking the data like I mean I think it depends like I mean for this uh I think for prototype we can hold it. I mean it's like you know it's just a prototype but if you want to go like official and actually go and deploy it and give it to the hospitals and stuff then we can decide uh you know we can set up an entity if you want or you can just put it on in our entity. which is the Vbit private limited. So it depends like it depends on uh
+okay so we can work on it later.
+We can work on it later. The data is Yeah.
+Okay. And then the patient has to be given the document which will be like a password protected or something PDF, right?
+Yeah, we can do that. Yeah, I guess. Yes.
+Yeah.
+Okay. Um yeah, I mean I'm cool. I think we should have a little more discussions. Um I think you guys can try and figure out what you have understood and then come up with that and then uh
+Dr. Sharda and I will separately discuss and see uh exactly what steps we are looking for.
+Got it.
+And we'll also come up with the uh framework for the goals of care conversation.
+Okay, understood.
+Does that sound good?
+Yeah. Yeah. Yeah. I have a question. How how are we going to outreach to the hospital? That's I think the only main question.
+Sorry, your voice is getting cut. How are we
+How are we going to outreach? Uh how are we going to like you know hit the hospitals with this app like are we going to like market it like how is it going to be like what do you have in mind
+see honest honestly right now uh I'm I'm thinking about the hackathon only
+but uh there is a good palative medicine community in India and uh I have done some palative medicine certification so I can help you know those kind of people uh really pick this up and uh scale it for us Hopefully
+yeah
+that is something we can do and if this if that is not there then we can go ahead then we can go to platforms that help scale such things like you know social alpha or blockchain for impact.
+So blockchain for impact exists in the IA ecosystem. So they take products from development to deployment. Right.
+So uh there are things places where we can reach out to to you know get this done.
+Got it. Okay. Yeah. That's great. I think for healthathon like for hackathon if we get like a few real users like actual users it will be nice. I'm just thinking.
+Yeah. So uh what Dr. Sha and I were thinking of is once we uh kind of do a protocol or whatever I mean prototype or whatever we can have about you know 20 simulated conversations.
+Got it.
+Uh in different scenarios and not just me and her but you know with different people
+and see how this performs.
+Got it. We'll have to demo a use case and one thing uh uh brought up earlier was we need to give an outcome measure right like a KPI for this.
+Yeah. Yeah. Key point. Yeah. Yeah.
+So what what would that be for this app is the question.
+Okay. We'll we'll I'll I'll look into it more and I'll like you know come with the proper KPI list.
+Yeah. I think we have a good two weeks before the round one ends.
+Yes. Yes. So like Is the team logged in like or are you guys like talking to other
+okay I mean I'm okay with this
+yeah yeah absolutely
+okay okay then are you there
+he's the Silicon Valley boy so I really don't know anything much
+yeah okay
+I'm sorry I did not get your name um I mean whoever speaking to us
+it's Bas write write it down for
+it's Bas yeah
+it's Bas and them A
+yeah.
+Nice to meet you guys.
+Nice to meet you as well, guys.
+Okay. I think it's hitting almost.
+I mean, if you guys are okay with this, we can just lock in the team.
+Yeah, we we okay with this. We okay with this. Yeah.
+I mean, I think you're the only people that reached out and I think it's like a good initiative that you know you guys step forward. So,
+I think we can do it. And we also like the problem statement. So, yeah, let's I I would say we do it. A what do you do? You have any objection? Do you want to continue with this or Yeah. Everything is here to me now.
+Okay. So I think Yeah. Okay. Thanks. Uh okay. That's it. I guess if you have more conversations then I think it will like you know this flourish this more and yeah you guys come up with a structure thing that you wanted to give to us the soft and like apart from the software side right building the software we all we know is building software. So apart from that you want us to do anything research or some s*** please let me know.
+Um I'm sorry. I am very informal in meetings. I'm very sorry.
+No, I'm happy you're informal. I'm tired of formal meetings.
+Yes, me too.
+No, I just um I mean as of now we can only work with what we have right now, I think. So, you know, we I mean I guess we'll have to provide the structure and do a few uh cases and see whether we need something more
+as in Yeah, I mean it's a little too early to say anything else.
+Correct. Uh so I think for round one what they I don't know. Yeah, on the group they were Like if you have an MVP it is good. I have no idea what MVP is.
+Okay. Uh so I'll just uh like I'm I'm like a really good person to sell. MVP is basically like minimum viable product. So it's basically a product where it's okay to get into marketing, right?
+Yeah. Yeah. Yeah. That's it. Yeah. So
+we can make an MVP. Uh I think it's like from what I've seen from hackathons is the best way to win any hackathon is to actually involve just like a small set of real people, real users. That's it.
+Okay.
+Not just to win it or not
+deploy this and have a few simulated conversations so that we can show
+Yeah. Yeah. That's it. That's it. Like if you like students, it could be students. It doesn't have to be patients, you know, cuz patients is real world. That's too, you know, that's too dark. And it could be like patients or students or any one of your uh like it could be you and me as well. Like, you know, I could be the patient like like that, etc. That's it.
+Right. Got it.
+Yeah.
+So, um what What we can do is uh by today evening I mean by tonight or tomorrow we can just all you know get on to the same team so we're fixed.
+Got it.
+Um then probably by the weekend uh maybe by Saturday uh Dr. Sharda and I can share with you uh the structure uh uh of the conversation and even before that maybe by Wednesday we'll we'll tell you the steps that we're looking at at each point. Right?
+So that can help you develop this. So how does that sound to you? Yeah, that sounds great actually.
+Okay. I mean, yeah. Well,
+yeah, I think I think I'm good here. Like, if you guys have anything to talk about, you can talk about it otherwise.
+No, I'm I'm I'm done. I think once we start working is when we really know what the challenges are. So,
+Okay.
+I think that's that's cool. Yeah, that's cool with me. Yeah. Okay.
+Okay, guys. Uh we'll make a WhatsApp group. Do you want me to make one now or like
+Yeah.
+Yeah. Yeah. Make one now. and uh just share your code so we can all get I mean the code on your team.
+Yeah, the team code, right? Yes, of course. Yeah.
+One sec. Uh it's three I'll just write it to you. It's 37 my up.
+No, no, just send it to
+Yeah, you know, I'll just send it. Yeah.
+Okay. A I think you have to join.
+Sorry. No, no, I'm talking to my teammate.
+Yeah, I think you should also join the team. Yeah. Yeah. Okay, I'll send you. Okay. Okay guys, it was very nice talking to you. Um, nice meeting.
+How's the weather in Bangalore? So,
+it's rainy and it's very cold. It's nice. I like it.
+I might come this month thing. So, if if we get time then we can meet.
+Oh, yeah. If you're coming by, you should you should drop by ISC also. I mean, it
+Oh, that that that will be fire. I have never seen IC. I actually wanted to do you know uh like get into the ISC for the longest, but then life kind of threw me into a different corner. So,
+no worries. Yeah. Yeah. Yeah. Good.
+Yes.
+So, just drop by and then we can
+Sure. Sure. That is lovely. Okay. I'm making WhatsApp.
+Yeah. You're saying something?
+Okay. No, I just said I guess we we can sign off then in that case.
+That's it. Yeah. Yeah. Yeah. That's it. Yeah. Yeah, we can sign off. Yeah.
+Byebye.
+Bye. Bye. Good night, guys. Yeah. Okay.

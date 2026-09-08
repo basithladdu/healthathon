@@ -1,0 +1,33 @@
+Goals of care discussions are conversations that happen between patients/caregivers
+of chronic illness with poor long term outcome and their treating physician. It is a
+clinical note documenting the values of the patient/caregivers including their wishes for
+further care - Including decisions on admission to the ICU, requirement of ventilator, or
+feeding tube, and so on.
+
+Patients with advanced malignancy frequently present to the emergency department
+unable to communicate their treatment preferences. Although goals-of-care
+discussions may previously have been done, the documentation is often incomplete,
+unstructured, outdated or difficult for emergency clinicians to retrieve quickly. Thus,
+families may be asked to repeat distressing conversations, while clinicians make critical
+decisions without reliable knowledge of the patient’s values, designated surrogate or
+previously discussed limits of treatment.
+
+We propose a physician-led digital goals-of-care record that converts a clinical
+conversation into a concise, structured and patient-authorized summary. The record
+would be verified by the treating physician, remain updateable and version-controlled,
+and be easily accessible in times of emergency. The emergency physician would then
+be able to spend less time on these conversations and can resort to simply verifying the
+contents of this document. It would inform emergency decision-making while clearly
+distinguishing a goals-of-care summary from more ethical or legal heavy documents
+such as advance medical directives, do-not-resuscitate orders, or decisions to
+withdraw life-sustaining treatment.
+
+The creator of the document would be the primary oncologist/palliative medicine
+physician, the user would be the emergency medicine physician, and any long term care
+provider would be able to update this document.
+
+The primary outcomes will be the time taken to retrieve the record and document an
+appropriate treatment plan. Secondary outcomes will include caregiver anxiety,
+repetition of goals-of-care discussions, record utilisation and alignment of emergency
+care with the patient’s documented preferences.
+
