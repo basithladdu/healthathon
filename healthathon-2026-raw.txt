@@ -649,3 +649,216 @@ What we're looking for
 Design solutions that empower family members and caregivers to actively participate in the patient's healthcare journey while respecting patient consent, privacy and existing clinical workflows.
 Enable caregivers to stay informed about the patient's care plan, appointments, medications, treatment milestones, care requirements and other relevant updates to provide timely and coordinated support.
 Strengthen communication, care coordination and shared care planning between patients, caregivers and healthcare providers through personalised education, task management, timely alerts and other collaborative care capabilities.
+
+
+================================================================================
+HEALTH-A-THON 2026 CONNECT - WEBINAR TRANSCRIPT
+Recorded 6 September 2026. Speakers: Ojasi (Reskill, host), Suri Goyel (Koita
+Foundation), Rizwan Koita (Koita Foundation / NABH), Vikas (Reskill), Sameer
+(platform walkthrough). Captured as raw source material; lightly punctuated
+from the auto-transcript, wording otherwise unedited.
+================================================================================
+
+Welcome everyone. I'm Ojasi from Reskill and I warmly welcome you to the Health-a-thon 2026 Connect, an initiative by Koita Foundation and Koita Centre for Digital Health IIT Bombay, in collaboration with FOGSI, NCG, RSSDI and powered by Reskill.
+
+We have seen a really strong response to the Health-a-thon 2026 so far. With 2,000-plus registrations across 500-plus doctors and technology participants, there is already a growing community of people coming together around real healthcare challenges.
+
+Today's session is all about getting the clarity you need before you start building. So whether you have a big question, a small question, or something you're simply unsure about, please ask away. No question is too big or too small. We'll cover some of the key aspects of the Health-a-thon and then open the floor for your questions.
+
+To begin, I'd like to welcome Suri Goyel from Koita Foundation to share a few words with us. Suri, over to you.
+
+--------------------------------------------------------------------------------
+SURI GOYEL - KOITA FOUNDATION BACKGROUND
+--------------------------------------------------------------------------------
+
+Good afternoon everybody. First of all thank you so much for joining in today and for your interest in this hackathon. It's a very exciting initiative for us at the foundation and we're looking forward to maximum participation from all of y'all.
+
+We thought it would be befitting if we can just give you a quick background about the foundation. I know that the Reskill team has already put in some information in the chat box, but let me just tell you a little bit about it.
+
+We're about 8 years old and what makes us really different is the fact that we are probably one of the only not-for-profits focused entirely on the adoption of digital health and AI in the country. The context for this really is that our founder Mr Rizwan Koita, who will be shortly speaking to us, set up a company called Citius Tech which became India's 25th unicorn, was focused also on digital health, and it was important to bring all those learnings into how India can do things better.
+
+Over the last 8 years we have set up many centres and the rationale behind all of those centres is actually very simple. If you see, in the last 8-10 years India has made rapid strides, whether it is in banking, travel, retail etc. However this has not necessarily converted or happened in the space of healthcare. The reason for this is unfortunately that the engineers and the doctors end up working in silos. On this call today we have more than 500 doctors who have registered along with medical students, and nearly 1,500 engineers, healthcare professionals etc. However they somehow are not able to really communicate and work together. All of you would have either had to select biology or math after your grade 10, which is why a lot of innovation in India has not been able to happen.
+
+Given that construct we set up two centres, one at IIT Bombay and the other one is at Ashoka. IIT Bombay centre currently has more than eight tenure faculty, nearly 60-plus PhD students and master's students, and every semester we have nearly 300 to 400 undergraduate students also studying about digital health. We also have a similar centre at Ashoka University to drive adoption, since the disease burden in India is now moving from communicable to non-communicable diseases and also the impact of longitudinal health records is more pronounced in non-communicable diseases.
+
+We work with three very large national organisations. The National Cancer Grid, which is a consortium of about 350-plus cancer hospitals managing nearly 65% of India's cancer load. We also work with RSSDI, which is India's and possibly Asia's largest body of diabetologists, nearly 13,000 doctors working across the country. And finally we also have a centre of excellence with FOGSI, which is in the space of OB-GYN, again 45,000-plus practising clinicians, nursing homes etc.
+
+Very happy to share that all of these centres of excellence and our partners have come together and are now supporting this hackathon, where each team would necessarily need to have a doctor as well as a tech professional to jointly apply. What also makes this hackathon unique is our focus on non-clinical use cases.
+
+That was really the quick background. I would now request Mr Rizwan Koita to please come in and share his thoughts about the hackathon and why it is important for India at this stage.
+
+--------------------------------------------------------------------------------
+RIZWAN KOITA - WHY NON-CLINICAL USE CASES
+--------------------------------------------------------------------------------
+
+Thank you very much Suri for the background and introduction. At the risk of repeating some of the things that Suri highlighted earlier, in addition to playing the role that I play at Koita Foundation, there is a lot of work that we do across the National Cancer Grid, which is the largest network of cancer hospitals; an entity called RSSDI which is the largest body for diabetes; and we now have a partnership with FOGSI which has got 45,000 OB-GYN doctors. And we are doing this hackathon along with IIT Bombay which is, as most of you would know, India's leading engineering college.
+
+In addition to playing the role that I play in the foundation, I also chair a national body called NABH. It stands for the National Accreditation Board of Hospitals and Healthcare Providers. Even at NABH, in addition to the work that NABH has been doing over the last 20 years - we certify about 30,000 hospitals across the country - we are actively pursuing digital innovation. If any one of you is interested you can go to the NABH website and you'll see that NABH is doing some really interesting things in defining digital health standards for hospitals, for healthcare products and so forth.
+
+When it comes to AI, there is a lot of hype in the world around what are the different things that can be done in AI. I often joke with people, I say, you're reading all these things about AI but have you ever been to a doctor or a hospital which has used any AI tool to actually improve the business of healthcare in India? And often people say no, they haven't encountered it, although they keep on reading about many things in the newspapers and on social media.
+
+The reality is that while there is a lot of innovation happening in the world of AI, to make something work on the ground in healthcare is actually very difficult. The reasons are many. We don't have healthcare data, we don't have access to a lot of hospitals, it's very hard to figure out what use cases will work and what will not work. Even if you come up with a use case, what kind of approval process do you need, especially if it's a clinical application, and so on and so forth. There is so much uncertainty and misinformation in the market when it comes to healthcare AI that you find very little is actually working on the ground.
+
+What is unique about what we are trying to do here in the hackathon this time is that we recognise that it's very hard to build solutions without doctors and technology people working together. One of the things we have done here is ensured that every team that is participating will be a combination of a doctor and a technology professional - at least one doctor and at least one technology professional in every team. What that ensures is that all solutions we will be coming up with as part of the hackathon have a practical grounding in some real world problems faced by healthcare professionals.
+
+The other thing that we are trying to do here is that there is so much focus on clinical use cases - teams working on X-ray images, on MRIs, CT, somebody's trying to do risk prediction based on clinical data. The reality is that even those who have made some progress, because of regulatory uncertainties many of those solutions will struggle to get scaled in the country.
+
+On the flip side, there are so many opportunities to focus on non-clinical use cases - use cases or solutions where they are not providing any guidance to the doctor or the patient in terms of what care pathway or what choice of medicines or procedures they need to do. But there are so many opportunities in healthcare which can benefit by use of AI in non-clinical cases.
+
+For example, you could have AI which is supporting a patient in managing their medication. It is just a medication reminder - an interesting medication reminder app. It could be an app which is providing patient education: I'm a pre-diabetic, I want to learn more about the business of diabetes, and what the app will do is provide me training and counselling.
+
+If you look at the business of a hospital there are so many opportunities. How do you use AI to simplify the patient registration process? It doesn't need access, you're not providing any clinical guidance. These are solutions that can be very easily scaled. One of the big problems in healthcare is the patient discharge process takes very long - how can you use AI to accelerate the patient discharge process, which simplifies a lot of effort on the part of the hospital?
+
+Another pain point we often get to read in the newspapers is there are so many challenges in the whole billing and coordination between hospitals and insurance companies when it comes to claim settlement. There are probably opportunities to use AI to operationalise those kinds of areas where the billing process can happen.
+
+A hospital is actually, in some form and fashion, many of the activities of a hospital are similar to a hotel operation, where there is a booking requirement for the rooms, there is staff scheduling, and then there is the operational management of the different inventories that have to be managed. So there is a huge amount of innovation that can be done at the back end to simplify and enhance efficiencies using AI for regular hospital operations.
+
+In the world, if we all see the progress especially in 2026, we now have agentic solutions. You have solutions like Open Claw, Grok came up with a Grok bot more recently, and these are autonomous agents that can be spun up and trained to perform reasonably sophisticated tasks related with managing a clinic. If you are a diabetologist you may be managing hundreds of patients with diabetes, and for each of the patients there is a certain follow-up activity required for making sure that they schedule their follow-up visit, or if they have to visit some other speciality, or they have to track their lab results and report back. These are literally impossible for an individual doctor to do. But it is quite possible that we could be working and collaborating with an AI agent which has been trained to do patient follow-up and care coordination.
+
+I could go on and on related with the amazing opportunities to use both LLM tools and now agentic solutions, which are getting more and more smart, in improving care. If you look at the three partnerships that we have brought on the table: cancer is a long-term condition and it's an amazing area where patient management and follow-up can have huge value. Diabetes is a very similar type of health condition - it's chronic, it has to be managed over many years if not decades. And then even if you look at mother and child, there are huge opportunities to look at not just the 9-month period but even post delivery, the management of the neonatal cases and early stages of childbirth. There are very interesting use cases that can be defined to support both the nursing homes as well as the mothers. In fact somebody very recently pointed out that there may be even tools for caregivers that can be built, not just for the patient. That can be very interesting.
+
+The good thing about the non-clinical use cases is that if you identify an interesting use case, because it's not impacting patient care directly you could actually take that and roll it out. You don't need any approvals. You can build and pilot a solution very easily, there are no regulatory barriers to do that, and the opportunity to scale this is quite interesting.
+
+With that I'm going to pause and pass it back to Vikas. In summary, we're super excited about doing this, especially because we have two salient features: the unique combination of a doctor-tech pair, and the focus on non-clinical use cases.
+
+--------------------------------------------------------------------------------
+VIKAS - ELIGIBILITY, TEAM STRUCTURE, TIMELINE
+--------------------------------------------------------------------------------
+
+WHO CAN PARTICIPATE
+The hackathon is open to every individual. It is open to doctors, health tech companies, startups, technology professionals, medical students, healthcare professionals and engineering students.
+
+WHAT TEAMS WILL BUILD
+There are two broader categories: a doctor or care-team facing solution, or a patient or caregiver facing solution, across any of the domains - cancer, diabetes, or maternal health. Teams can pick any one use case, combine multiple use cases, or build a connected end-to-end solution which solves multiple use cases.
+
+Whatever use cases we have given under both categories are illustrative. A team can bring any of their real world problems or statements from their own clinical practice. The idea we are looking at is that it has to be very practical, a high-impact solution which can solve everyday problems, addresses a meaningful problem within the everyday challenges of healthcare, and fits naturally in the existing process. It should be able to work with any information and systems which are available. Teams are free to leverage any open-source AI tools, technologies or models.
+
+TEAM STRUCTURE
+A team can be a minimum of two people and a maximum of five members. The key point is every team must have at least one qualified doctor and one technology member. The other three positions are open - doctor, healthcare professional, engineer, anyone.
+
+WHO CAN BE A CLINICAL LEAD
+The doctor can be an MBBS-qualified doctor and above, including PG doctors. It can be BAMS, BHMS, BUMS and BDS qualified doctors. An MBBS student in fourth year and above and in rotating internship can also be a clinical lead, as well as a PG medical student.
+
+Please complete your team formation on your dashboard and the platform. Add all of your members, start connecting with your doctor and start working together on your use case and idea. We already have a very active WhatsApp community where you can connect with members, identify potential members for your teams and build your team right away.
+
+TIMELINE
+- Currently: registration and team formation phase.
+- Idea submission: 12 September to 25 September.
+- Shortlisting, then the build sprint window: around four to five weeks for shortlisted teams to work jointly with the doctor on the solution and make the final submission.
+- Grand finale: 28 November at IIT Bombay. Top 30 teams (10 per track) invited to an offline session to present to a national jury.
+- Phase one registration closes 25 September.
+
+WHAT THE IDEA SUBMISSION NEEDS
+The idea submission form goes live next week. What we're expecting: what exactly is your solution, what problem or use case you're targeting, who does it impact and why it is important, what is your proposed solution and your approach, how you are going to build it, what is your build plan, and what technology or AI approach you are going to use. You will also be given options to attach supporting material including PPT, demo videos or any other relevant material.
+
+Ideas are evaluated across two lenses:
+1. Healthcare relevance and impact - how relevant is the problem, how useful/impactful is the workflow fit, the practicality of your solution, and the potential impact.
+2. Solution and technical feasibility - how feasible is your technical approach, build approach, AI or engineering.
+
+BUILD SPRINT
+Shortlisted teams get mentors assigned. There are two structured mentor check-ins: check-in one on progress and guidance, check-in two to review your prototype, get feedback and guidance, and get experience in how to demo and pitch the solution. Then final submission, final evaluation, and shortlisting of the top 30 teams invited to IIT Bombay.
+
+--------------------------------------------------------------------------------
+Q&A
+--------------------------------------------------------------------------------
+
+Q: Can doctors and engineers register individually and how can they find teammates?
+A: Yes. Doctors can register individually and review a list of all the different tech teams available from the dashboard and platform - you can see a recommended list of teams, connect with those members, discuss your use case, find alignment and join the team. Engineers can also join individually; we will show you the different teams available and where there are vacancies. If you're able to find a doctor that is even best - you can join that doctor and start working together.
+
+Q: Should teams work on the listed problem statements or can they bring their own healthcare challenges?
+A: The use cases given are only illustrative and just to give some key directions. Teams are open to bring their own use cases. The only catch is that it should be a non-clinical administrative workflow challenge and should not fall in the category of a clinical AI solution or anything which gives clinical recommendations.
+[Rizwan adds] Anything where there is no clinical advice or intervention being given out is okay. If there's an app which is computing the dosage of a drug, that is giving clinical advice, so it is out. If something is looking at a medical image and is predicting something about a patient, then it is not included. Otherwise we really urge you all to be as creative as you can in looking at opportunities to use AI tools to improve patient care, improve the life of a doctor, a nurse, a front desk person working in a clinic or hospital. Think about the entire billing team in a given hospital. Think outside the box. Don't only think about the doctor - there are literally tens of different roles across any healthcare organisation. Think of the caregiver. Think of it more as the business of healthcare than what can be done just in the patient-doctor interaction.
+
+Q: The clinical practitioner has completed his MBBS outside India but has not yet received his NMC registration. What should we do?
+A: Please apply.
+
+Q: Can we change the problem statement once we have already registered?
+A: Yes. The problem statement you have chosen is visible on the dashboard along with your team. Go to your problem statement there and change it directly. [Sameer] On the dashboard there is a button called "Edit use case and problem". Click it to go back to the step where you chose the problem statement, choose a different one or describe your own, edit or add a new one, and save the changes.
+
+Q: Can a doctor bring their own problem statement and build their team around it?
+A: Yes, definitely - in fact that's the most ideal situation.
+
+Q: The guidelines emphasise that solutions must be strictly assistive and operational. Where is the line drawn between operational alerts and clinical decision support?
+A: It's actually very simple. Imagine I'm supposed to take one pill three times a day for the next 20 days. If the solution is reminding me to take the pill three times a day for the next 20 days, there is no clinical guidance it's giving me. But if I were to have an application which says "Rizwan, you should have a pill three times a day because of this characteristic of your health condition" and then reminds me for the next 20 days, then it is giving clinical guidance. As long as the doctor is prescribing the pill three times a day and the app is just going to remind me, the app is not providing clinical guidance. Ask yourself: am I doing anything which is providing clinical guidance? If the answer is yes, then it's probably outside the scope of the hackathon.
+
+Q: Can you tell more on application of AI in non-clinical areas, specifically discharge and TPA delays and issues?
+A: Go meet your clinical partner - you anyway have to have one. Sit down with your doctor, maybe even visit one or two hospitals, and ask about the challenges during discharge and all the coordination work needed across various entities before you let a person be discharged. Similarly if you look at insurance issues, you'll realise you can spend your life solving it - forget the hackathon. There are so many problems you may get excited about.
+
+Q: If we get in the top 30 and one team member is not able to travel to IIT Bombay due to a health issue, will that member also get a certificate?
+A: The answer should be yes.
+
+Q: During team formation we proposed our own problem statement. Now we want to change it. Is it possible?
+A: Yes, definitely - as a next step you are anyway going to submit your ideas.
+
+Q: A lot of software already exists in the market related to workflow. Can we also collaborate on their ideas along with our solution?
+A: The only catch is whatever solution you present in the hackathon should not be an existing solution. It can be a part of a solution, but the use case you're showing has to be built. Example: voice scribe. If you're doing a voice scribe for a doctor, there are already solutions, this is not innovative. But within that voice scribe, if you are able to add certain more use cases and you're actually building and showing it, that is acceptable - rather than just taking an existing solution and showing it. So yes, you can collaborate with existing tech partners and work along with them.
+
+Q: If patient data is to be analysed to make a decision support, would that constitute a crossover?
+A: It's a function of what the patient data is. If you go back to the discharge process, you are taking patient data of the bill and figuring out what you need to do to massage it to submit a claim - that is absolutely within the purview. But if you take patient data and come up with a dosage guideline for a drug, or say "now you need to go and do this test", then that's clinical guidance and out of scope. If you're creating a claim and the claim policy is such that for certain kinds of procedures or diseases there are exceptions or more reimbursement, then you will analyse the patient data to streamline the billing process - that is completely within scope. Just ask a simple question: are you giving clinical guidance? If the answer is no, then it is within scope. It's not complicated. Don't make it more complicated.
+
+Q: In these workflows the frontline clinical expertise may often come from chemo coordinators, nurses or clinical pharmacists. Can any of these people become the lead other than a doctor?
+A: We should still have a doctor, just because of the way we've defined it - otherwise it'll become very loose. If a patient is going through chemotherapy there are a whole bunch of steps required, and there are probably opportunities to create non-clinical tools to support such patients. Often the people who will have the best knowledge of this could be the technician working in the chemotherapy department. But for the purposes of this hackathon, please go and get a doctor along with the technician. We're not stopping you from getting the technician - we're still saying just have a doctor as well to complete your team.
+
+Q: Will the data set be given or do we need to find or make one?
+A: There is no data set. You don't need any data set. You can use whatever open-source data sets are available - for example on the Government of India's AI Kosh platform. We will not be giving you any data sets. Also, if you're collaborating with the doctor it is possible that the doctor may have some data related to their own practice, and to that extent if you have access to data please use it.
+
+Q: Do we need to have a working prototype at the initial submission stage?
+A: No. At the idea submission stage what we are looking for is your overall idea and solution. You can have a simple video where you explain everything and add it as a supporting attachment. We are not expecting a working prototype at the idea submission stage. It's an overall idea: this is my idea, this is the use case, why I have selected this use case, this is the technology approach, this is what my output will look like, and these are the supporting materials. It can be a video, a presentation, anything that will give more idea about the solution you are planning to make.
+
+Q: Can a submission combine a doctor-facing operational use case with a patient-facing engagement use case into a single connected workflow?
+A: Yes, we would love to see that.
+
+Q: If my team is reshuffled how can I delete and add new members? Do I have to delete the entire team and add all the new members again?
+A: [Sameer] If different people of your team are in different teams, your other teammates can leave the team and come and join your team. It is not necessary to delete all the teams your folks are distributed into. But in case you want to move on to a different team while you have created a team, yes, you will have to delete it and then go on to a different team.
+
+Q: What do the tracks exactly mean - cancer care, diabetes and maternal health? Do we need to make sure our solution aligns to only one, or all combined?
+A: You need to ensure that your solution at least aligns with any one of them. But when you're presenting you can show the use case's applicability across other domains and specialities also.
+[Rizwan adds] The prizes are for three tracks separately, and the shortlisting of the top 10 teams would be done for all three disease conditions. It is quite likely that you come up with an idea which is more general purpose - absolutely - but they'll have to apply under a certain track because of the way the prizes are structured. Obviously even at the end of the hackathon, if your idea has merit in other domains, that is not going anywhere; you still have the ability to take advantage of a more general-purpose idea.
+
+Q: Will the selection be separate for each domain or will all projects be evaluated together? What does "technologist" mean in this context? Is there a specific PPT format to follow?
+A: There will be separate evaluation for the three tracks - the top 30 teams invited to IIT Bombay will be the top 10 from each track. A technologist is any professional or person working along with the doctor who will be working on the solution, coming up with the solution, designing the solution. It can be a working professional, a health tech company, anyone. On the PPT format, you'll get more details once we open up the idea submission form next week.
+
+Q: Can the solution be hardware related or should we restrict to only app creation?
+A: For now let's just go with apps. Even in a hackathon situation creating hardware is actually tough, because you'll still need some AI on top of it. So I don't think we'll say no to it, but from a practical perspective, given the time and effort - if you already have some hardware on which a use case can be demonstrated then please go for it, and the jury can see what they can do.
+
+Q: There was talk about matchmaking in the group. How does it work?
+A: [Sameer] Matchmaking for clinicians is already open. Matchmaking means: you have a particular use case, profile and problem track that you've chosen, and there are teams or clinicians that might complement you.
+Case 1 - you are an individual technologist with no team yet: you will be given options or suggestions where you can request to join a particular technology team, or a team that already has a technologist and a clinician.
+Case 2 - you have created a team but it is incomplete, i.e. you do not have a clinician yet: matchmaking shows a list of clinicians who are looking for a team. You send out invites, they review and join your team. This goes live very soon.
+On the clinician side, already live: doctors or clinicians can view a list of technology teams where they find common interest and common ground, and join that team.
+It will be visible on the dashboard as soon as it is live.
+
+Q: We have one doctor in our team while the rest of us are students from IIIT Vadodara. Does our team composition meet all the eligibility and team formation guidelines?
+A: Yes. You already have a doctor. If you are working together, you meet the eligibility criteria.
+
+Q: Will all 30 shortlisted teams get financial aid?
+A: There is going to be some financial prize money for the top 10 teams. They will share the entire bouquet of prizes shortly, but certainly for the top 10 there'll be some financial incentives to come to IIT Bombay.
+
+Q: Is a public health use case also allowed or should we strictly stick to private sector use cases?
+A: No, we can certainly do public health use cases.
+
+Q: What is the ideal team composition for the Health-a-thon?
+A: Minimum two people - one doctor, one technologist. Maximum five people. So between two and five people.
+
+--------------------------------------------------------------------------------
+CLOSING REMARKS
+--------------------------------------------------------------------------------
+
+SURI GOYEL:
+I'll just request two things. Number one, make sure that you really work alongside the doctor, especially the technology students, because it's kind of easy to make a solution but the aha would be when you are able to actually use it in the real world. Keep that lens. My second point, which slightly contradicts the first, is don't overthink - because if you try to come up with something very complicated then you'll get intimidated with the whole thing. There are very interesting use cases which I'm sure you can come up with if you have a good conversation with the doctors.
+
+RIZWAN KOITA:
+I was at a conference yesterday and I mentioned the hackathon to a bunch of doctors, and it was quite amazing to see their enthusiasm, because they are sitting on a lot of very interesting ideas but they've never had the opportunity to engage with technical people to brainstorm what the opportunities are. It's a truly interesting time for technology professionals to go in with their minds open and engage with the doctors.
+
+Don't use the presence of the doctor as a checkbox - "I needed somebody to join my team so that it could be a valid submission, I'm going to go and build my own thing." A lot of people have done this and not been successful. Here is a unique opportunity for you to actually work with a doctor and see the world from a vantage point that technology professionals almost never get to see. Even when we meet a doctor - I'm a technology professional myself - I'm usually meeting a doctor when there is a specific health condition, either I'm sick or somebody in the family is sick. You're seeing the front side of the health system: the doctor's clinic as a patient, a hospital as a patient. You almost never get a chance to see the back side of what really happens in the business of healthcare. So take advantage of this opportunity to say, I may have some interesting ideas but I'm going to keep my ideas open, I'm going to engage with the doctor, really see the world from their perspective and find opportunities. You may come up with something truly different than what you may have thought about.
+
+The last comment I'll make is that of course there is prize money, but honestly the prize money for a hackathon like this is actually quite modest - the hackathon is quite well funded, but I think the bigger opportunity for the people who are going to do this well is this. If you look at the people who are going to be there at IIT Bombay screening the last 10-15 participants in each of the three verticals, we have some of India's leading doctors who are going to be there. These are folks at the level of the President of FOGSI, the President and Secretary General of RSSDI, the National Convenor of the National Cancer Grid. We have the top clinicians of the respective areas who have a pan-India understanding and reach. We are also going to be having folks from the venture capital community. We haven't made some of these announcements yet, and it's quite possible that you may have a great solution and a great idea and it may pique the interest of somebody in the community there, and who knows what happens then.
+
+What we will also be doing as a foundation is propagating the winners quite actively on different forums, so the opportunity to get visibility is very good. I'll give you one example: if you go to our foundation website, we did a slightly different event in AI last year, which was the AI awards for actual solutions used in the social sector, and the winner of that eventually got funded by Y Combinator. It's a firm called Adalat AI - if you go to our website you'll see the presence of that. So there is some cool upside which is possible if you do really well. Don't view this as just another hackathon, but view it with a little bit more focus and diligence, because you never know. You may hit upon a really interesting idea and you may end up meeting people that you would otherwise never have got a chance to meet so easily.
+
+OJASI (CLOSE):
+Phase one registration closes on 25 September. Please find your teams and give your all for this, and please don't forget to join the Health-a-thon community on WhatsApp - the link is pinned on YouTube. We are looking forward to seeing the ideas and solutions that come out of this community. Thank you everyone for joining Health-a-thon 2026 Connect, and let's build what healthcare needs next.
+
+================================================================================
+END OF TRANSCRIPT
+================================================================================
