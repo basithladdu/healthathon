@@ -6,6 +6,8 @@
 | --- | --- | --- |
 | `GOCD (1).pdf` | Dr. Sujay's one-page concept proposal | SHA-256 `52BDC39EC91317F7E2444D99404C1E02BFAD0C21165994C5D7D7334E69E9C848` |
 | `healthathon-2026-raw.txt` | Saved public-site capture containing programme rules, FAQ and all 13 official use cases | SHA-256 `1C6F031512306DA78048BAB526EED9D966F18AED5B3535A33A14E27B81023077` |
+| `Healthathon form.docx` | Dr. Sujay's four-section outline of the record the product should capture: general information, medical information and values, decisive actions, signatures | SHA-256 `453257CC911E10433352910810DFE69E40A7A33F90F6B0C9A7C3505464C28D95` |
+| `Saanthvana v 1.0.docx` | Full Emergency Care & Treatment Preference Record (ECTPR): ED quick view, 19 sections, conversation guide, Indian legal position, beta plan, wallet card and sources. Contains a filled-in personal name, so it is listed in `.gitignore` and kept local | SHA-256 `C2BE86ECBD8FFF63ABDF6BD3EA763699CABFC23764E9F271075385EADB493F0E` |
 | Authenticated dashboard observation | Account-specific selected use case and current schedule, inspected read-only on 24 August 2026 | Recorded in `LIVE_DASHBOARD_AUDIT.md`; no account secret or team code reproduced |
 | Raw Codex thread snapshot | Conversation, intermediate reasoning inputs and tool provenance | Copied into the dated local archive at the end of the work session |
 
@@ -17,6 +19,7 @@
 | `MEETING_BRIEF.md` | Full product, workflow, safety, pilot, architecture, evidence and meeting pack |
 | `PS_DECISION_MATRIX.md` | Weighted comparison of all 13 official use cases and sensitivity analysis |
 | `GOCD_PDF_AUDIT.md` | Source-faithful PDF summary, category mapping and scope defects |
+| `ECTPR_SOURCE_AUDIT.md` | What the two ECTPR documents are, section-by-section mapping to the prototype, scope boundary, build decisions, privacy note and open questions |
 | `RAW_TEXT_AUDIT.md` | Structure, official use cases, quality defects and timeline conflict in the `.txt` capture |
 | `LIVE_DASHBOARD_AUDIT.md` | Exact registered choice, editability boundary and account-visible schedule |
 | `MEETING_TRANSCRIPT_2026-08-24.txt` | Verbatim saved clinician-team meeting transcript |
@@ -59,6 +62,7 @@ Accessed 24-25 August 2026 unless the source itself is part of the saved raw cap
 - Account-specific dashboard state overrides guesses from the public `.txt` about the selected use case.
 - The dashboard and saved public capture conflict on registration and matchmaking deadlines. Both are retained; the conflict is not silently resolved.
 - Dr. Sujay's PDF is authoritative for his proposed problem, but not for legal interpretation, clinical authority or the official category.
+- The ECTPR documents are authoritative for the clinical record structure the product should capture. They are not legal advice (the document says so itself) and do not widen the hackathon's non-clinical scope.
 - Published evidence supports the need for structured, revisitable documentation. It does not prove that this particular team has sufficient case volume, workflow ownership or pilot access; those remain meeting hypotheses.
 - Competitor observations are used only to reject generic reminder/scribe positioning. No claim of market uniqueness or being India's first is made.
 - No official entrant allocation by problem statement or cash-versus-credit payout table was found. Crowding and equal-payout arithmetic remain explicitly labelled estimates.

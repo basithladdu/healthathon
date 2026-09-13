@@ -1,0 +1,260 @@
+.ph-card {
+  background: #fff;
+  border: 1px solid var(--bp-border, rgb(10 33 24 / .10));
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgb(10 33 24 / .06);
+  padding: 20px 22px;
+  container-type: inline-size;
+}
+
+.ph-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.ph-eyebrow {
+  margin: 0;
+  font-family: var(--font-body, 'Inter', system-ui, sans-serif);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--bp-primary, #0c5c3f);
+}
+
+.ph-heading {
+  margin: 0;
+  font-family: var(--font-display, 'Sora', system-ui, sans-serif);
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--bp-ink, #0a2118);
+}
+
+.ph-sub {
+  margin: 0;
+  font-family: var(--font-body, 'Inter', system-ui, sans-serif);
+  font-size: 14px;
+  color: var(--bp-muted, #4d6259);
+  min-width: 0;
+}
+
+.ph-stats {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  margin: 4px 0;
+}
+
+@container (min-width: 640px) {
+  .ph-stats {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.ph-stat {
+  background: var(--bp-mist, #f3f7f5);
+  border: 1px solid var(--bp-border, rgb(10 33 24 / .10));
+  border-radius: 10px;
+  padding: 10px 12px;
+  min-width: 0;
+}
+
+.ph-stat-value {
+  font-family: var(--font-body, 'Inter', system-ui, sans-serif);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--bp-ink, #0a2118);
+  overflow-wrap: break-word;
+}
+
+.ph-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ph-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ph-chip {
+  font-family: var(--font-body, 'Inter', system-ui, sans-serif);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--bp-ink, #0a2118);
+  background: var(--bp-mist, #f3f7f5);
+  border: 1px solid var(--bp-border, rgb(10 33 24 / .10));
+  border-radius: 999px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.ph-chip[aria-pressed="true"] {
+  background: var(--bp-ice, #e6f2ec);
+  border-color: var(--bp-primary, #0c5c3f);
+  color: var(--bp-primary, #0c5c3f);
+}
+
+.ph-chip:focus-visible,
+.ph-select:focus-visible,
+.ph-clear:focus-visible {
+  outline: 2px solid var(--bp-primary, #0c5c3f);
+  outline-offset: 2px;
+}
+
+.ph-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.ph-select-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-body, 'Inter', system-ui, sans-serif);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--bp-muted, #4d6259);
+}
+
+.ph-select {
+  font-family: var(--font-body, 'Inter', system-ui, sans-serif);
+  font-size: 12px;
+  color: var(--bp-ink, #0a2118);
+  background: #fff;
+  border: 1px solid var(--bp-border, rgb(10 33 24 / .10));
+  border-radius: 8px;
+  padding: 5px 8px;
+}
+
+.ph-clear {
+  font-family: var(--font-body, 'Inter', system-ui, sans-serif);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--bp-primary, #0c5c3f);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 2px;
+  text-decoration: underline;
+}
+
+.ph-empty {
+  font-family: var(--font-body, 'Inter', system-ui, sans-serif);
+  font-size: 13px;
+  color: var(--bp-muted, #4d6259);
+  padding: 14px 0;
+}
+
+.ph-list,
+.ph-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ph-group {
+  margin-top: 6px;
+}
+
+.ph-month {
+  font-family: var(--font-display, 'Sora', system-ui, sans-serif);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--bp-muted, #4d6259);
+  margin: 10px 0 4px;
+}
+
+.ph-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 0;
+  border-top: 1px solid var(--bp-border, rgb(10 33 24 / .10));
+  min-width: 0;
+}
+
+.ph-row:first-child {
+  border-top: none;
+}
+
+.ph-row-date {
+  font-family: var(--font-body, 'Inter', system-ui, sans-serif);
+  font-size: 12px;
+  color: var(--bp-muted, #4d6259);
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.ph-kind-chip {
+  font-family: var(--font-body, 'Inter', system-ui, sans-serif);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--bp-primary, #0c5c3f);
+  background: var(--bp-ice, #e6f2ec);
+  border-radius: 999px;
+  padding: 3px 9px;
+  white-space: nowrap;
+}
+
+.ph-row-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1 1 200px;
+}
+
+.ph-row-title {
+  font-family: var(--font-body, 'Inter', system-ui, sans-serif);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--bp-ink, #0a2118);
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+
+.ph-row-detail {
+  font-family: var(--font-body, 'Inter', system-ui, sans-serif);
+  font-size: 12px;
+  color: var(--bp-muted, #4d6259);
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+
+.ph-row-actor {
+  font-family: var(--font-body, 'Inter', system-ui, sans-serif);
+  font-size: 11px;
+  color: var(--bp-muted, #4d6259);
+}
+
+.ph-status-pill {
+  font-family: var(--font-body, 'Inter', system-ui, sans-serif);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--bp-ink, #0a2118);
+  background: var(--bp-mist, #f3f7f5);
+  border: 1px solid var(--bp-border, rgb(10 33 24 / .10));
+  border-radius: 999px;
+  padding: 3px 9px;
+  white-space: nowrap;
+}
+
+
+/* Width fix: an element with `container-type: inline-size` ignores its
+   children when sizing itself. Centred with auto margins inside the
+   flex column `.content-frame`, it shrank to its own padding (40px at a
+   768px viewport) and every page collapsed into a one-word column.
+   An explicit width restores full width up to any max-width. */
+.ph-card {
+  width: 100%;
+  min-width: 0;
+}
+

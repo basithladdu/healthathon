@@ -1,0 +1,324 @@
+.ectpr-container {
+  container-type: inline-size;
+  container-name: ectpr;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.ectpr-container * {
+  box-sizing: border-box;
+}
+
+.ectpr-card {
+  background: #fff;
+  border-radius: 16px;
+  border: 1px solid var(--bp-border, rgb(10 33 24 / .10));
+  box-shadow: 0 2px 10px rgb(10 33 24 / .06);
+  padding: 20px 22px;
+  color: var(--bp-ink, #0a2118);
+  font-family: var(--font-body, 'Inter', system-ui, sans-serif);
+  max-width: 100%;
+}
+
+.ectpr-eyebrow {
+  font-family: var(--font-body, 'Inter', system-ui, sans-serif);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--bp-muted, #4d6259);
+  margin-bottom: 4px;
+}
+
+.ectpr-heading {
+  font-family: var(--font-display, 'Sora', system-ui, sans-serif);
+  font-size: 20px;
+  font-weight: 800;
+  margin: 0 0 4px 0;
+}
+
+.ectpr-subline {
+  font-size: 13px;
+  color: var(--bp-muted, #4d6259);
+  margin-bottom: 16px;
+}
+
+.ectpr-empty {
+  font-size: 14px;
+  color: var(--bp-ink, #0a2118);
+  line-height: 1.5;
+}
+
+.ectpr-rule-banner {
+  background: var(--medium-bg, #fff6e0);
+  color: var(--medium-ink, #6b4e00);
+  border: 1px solid var(--medium-line, rgb(107 78 0 / .25));
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 13px;
+  line-height: 1.5;
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.ectpr-rule-banner::before {
+  content: "\26A0";
+  margin-right: 6px;
+}
+
+.ectpr-rule-banner p {
+  margin: 0;
+  display: inline;
+}
+
+.ectpr-goal-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.ectpr-goal-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--bp-muted, #4d6259);
+}
+
+.ectpr-goal-value {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.ectpr-answers-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+@container ectpr (min-width: 560px) {
+  .ectpr-answers-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.ectpr-answer {
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: var(--bp-mist, #f3f7f5);
+}
+
+.ectpr-answer-overline {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--bp-muted, #4d6259);
+  margin-bottom: 4px;
+}
+
+.ectpr-answer--recorded .ectpr-answer-value {
+  font-weight: 700;
+  color: var(--bp-ink, #0a2118);
+}
+
+.ectpr-answer--unrecorded {
+  border: 1px dashed var(--bp-border, rgb(10 33 24 / .10));
+  background: transparent;
+}
+
+.ectpr-answer--unrecorded .ectpr-answer-value {
+  font-style: italic;
+  color: var(--bp-muted, #4d6259);
+}
+
+.ectpr-plain-language {
+  margin-top: 6px;
+  font-size: 12px;
+  font-weight: 400;
+  font-style: normal;
+  color: var(--bp-muted, #4d6259);
+  line-height: 1.4;
+}
+
+.ectpr-contacts {
+  font-size: 13px;
+  line-height: 1.7;
+  margin-bottom: 12px;
+  border-top: 1px solid var(--bp-border, rgb(10 33 24 / .10));
+  padding-top: 12px;
+}
+
+.ectpr-contacts-title {
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.ectpr-muted {
+  color: var(--bp-muted, #4d6259);
+  font-size: 12px;
+}
+
+.ectpr-review-due {
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.ectpr-note {
+  font-size: 12px;
+  color: var(--bp-muted, #4d6259);
+  background: var(--bp-ice, #e6f2ec);
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin-bottom: 12px;
+}
+
+.ectpr-footer {
+  font-size: 11px;
+  color: var(--bp-muted, #4d6259);
+  border-top: 1px solid var(--bp-border, rgb(10 33 24 / .10));
+  padding-top: 10px;
+}
+
+/* Emergency card */
+
+.ectpr-emergency-card {
+  max-width: 420px;
+  position: relative;
+  padding: 0;
+  overflow: hidden;
+}
+
+.ectpr-card-band {
+  background: var(--critical-bg, #fdeceb);
+  color: var(--critical-ink, #7a1f16);
+  border-bottom: 1px solid var(--critical-line, rgb(122 31 22 / .25));
+  font-family: var(--font-display, 'Sora', system-ui, sans-serif);
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 10px 16px;
+}
+
+.ectpr-card-body {
+  padding: 14px 16px;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.ectpr-card-qr {
+  display: flex;
+  justify-content: center;
+  padding: 4px 16px 8px;
+}
+
+.ectpr-card-qr img {
+  max-width: 120px;
+  height: auto;
+}
+
+.ectpr-card-issued {
+  text-align: center;
+  font-size: 12px;
+  color: var(--bp-muted, #4d6259);
+  padding-bottom: 8px;
+}
+
+.ectpr-card-footer {
+  border-top: 1px solid var(--bp-border, rgb(10 33 24 / .10));
+  padding: 10px 16px 14px;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.ectpr-watermark {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-18deg);
+  font-family: var(--font-display, 'Sora', system-ui, sans-serif);
+  font-size: 28px;
+  font-weight: 800;
+  color: rgb(10 33 24 / .18);
+  letter-spacing: 0.05em;
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 1;
+}
+
+.ectpr-empty-card {
+  font-size: 14px;
+  color: var(--bp-muted, #4d6259);
+}
+
+.ectpr-button {
+  margin-top: 12px;
+  border-radius: 10px;
+  border: none;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: var(--font-body, 'Inter', system-ui, sans-serif);
+  cursor: pointer;
+}
+
+.ectpr-button--primary {
+  background: var(--bp-primary, #0c5c3f);
+  color: #fff;
+}
+
+.ectpr-button:focus-visible {
+  outline: 2px solid var(--bp-primary, #0c5c3f);
+  outline-offset: 2px;
+}
+
+.ectpr-issue-help {
+  font-size: 12px;
+  color: var(--bp-muted, #4d6259);
+  line-height: 1.5;
+  margin-top: 10px;
+  max-width: 420px;
+}
+
+.ectpr-checksum-block {
+  margin-top: 10px;
+  max-width: 420px;
+}
+
+.ectpr-checksum {
+  font-size: 13px;
+  font-weight: 700;
+  font-family: monospace;
+}
+
+@media print {
+  body.ectpr-printing * {
+    visibility: hidden !important;
+  }
+  body.ectpr-printing .ectpr-card,
+  body.ectpr-printing .ectpr-card * {
+    visibility: visible !important;
+  }
+  body.ectpr-printing .ectpr-card {
+    position: fixed;
+    top: 16mm;
+    left: 16mm;
+  }
+}
+
+
+/* Width fix: an element with `container-type: inline-size` ignores its
+   children when sizing itself. Centred with auto margins inside the
+   flex column `.content-frame`, it shrank to its own padding (40px at a
+   768px viewport) and every page collapsed into a one-word column.
+   An explicit width restores full width up to any max-width. */
+.ectpr-container {
+  width: 100%;
+  min-width: 0;
+}
+

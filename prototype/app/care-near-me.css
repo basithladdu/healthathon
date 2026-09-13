@@ -1,0 +1,300 @@
+.cnm-root {
+  container-type: inline-size;
+  container-name: cnm;
+  font-family: var(--font-body, 'Inter', system-ui, sans-serif);
+  color: var(--bp-ink, #0a2118);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 100%;
+}
+
+.cnm-card {
+  background: #fff;
+  border: 1px solid var(--bp-border, rgb(10 33 24 / 0.1));
+  border-radius: 16px;
+  box-shadow: 0 1px 2px rgb(10 33 24 / 0.06), 0 16px 40px -20px rgb(10 33 24 / 0.24);
+  padding: 20px 22px;
+  min-width: 0;
+}
+
+.cnm-heading {
+  font-family: var(--font-display, 'Sora', system-ui, sans-serif);
+  font-size: 22px;
+  font-weight: 800;
+  margin: 0 0 8px;
+}
+
+.cnm-text {
+  color: var(--bp-muted, #4d6259);
+  margin: 0 0 16px;
+  min-width: 0;
+}
+
+.cnm-btn {
+  min-height: 40px;
+  border-radius: 10px;
+  font-family: var(--font-body, 'Inter', system-ui, sans-serif);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+.cnm-btn-primary {
+  background: var(--bp-primary, #0c5c3f);
+  color: #fff;
+  border: 1px solid var(--bp-primary, #0c5c3f);
+}
+
+.cnm-btn-secondary {
+  background: var(--bp-mist, #f3f7f5);
+  color: var(--bp-ink, #0a2118);
+  border: 1px solid var(--bp-border, rgb(10 33 24 / 0.1));
+}
+
+.cnm-btn:focus-visible {
+  outline: 2px solid var(--bp-primary, #0c5c3f);
+  outline-offset: 2px;
+}
+
+.cnm-city-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+  min-width: 0;
+}
+
+.cnm-label {
+  font-size: 14px;
+  color: var(--bp-muted, #4d6259);
+}
+
+.cnm-select {
+  min-height: 40px;
+  border-radius: 10px;
+  border: 1px solid var(--bp-border, rgb(10 33 24 / 0.1));
+  padding: 0 10px;
+  font-size: 15px;
+  background: #fff;
+  color: var(--bp-ink, #0a2118);
+  min-width: 0;
+  max-width: 100%;
+}
+
+.cnm-select:focus-visible {
+  outline: 2px solid var(--bp-primary, #0c5c3f);
+  outline-offset: 2px;
+}
+
+.cnm-privacy {
+  margin-top: 16px;
+  font-size: 13px;
+  color: var(--bp-muted, #4d6259);
+  min-width: 0;
+}
+
+.cnm-alert {
+  margin-top: 12px;
+  color: #8a2c1c;
+  font-size: 14px;
+}
+
+.cnm-status {
+  color: var(--bp-muted, #4d6259);
+  margin: 0;
+}
+
+.cnm-results-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cnm-results-summary {
+  margin: 0;
+  font-weight: 700;
+  min-width: 0;
+}
+
+.cnm-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cnm-chip {
+  min-height: 40px;
+  border-radius: 999px;
+  border: 1px solid var(--bp-border, rgb(10 33 24 / 0.1));
+  background: var(--bp-mist, #f3f7f5);
+  color: var(--bp-ink, #0a2118);
+  padding: 0 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cnm-chip[aria-pressed='true'] {
+  background: var(--bp-ice, #e6f2ec);
+  border-color: var(--bp-primary, #0c5c3f);
+  color: var(--bp-primary, #0c5c3f);
+}
+
+.cnm-chip:focus-visible {
+  outline: 2px solid var(--bp-primary, #0c5c3f);
+  outline-offset: 2px;
+}
+
+.cnm-results {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.cnm-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.cnm-list-item {
+  background: #fff;
+  border: 1px solid var(--bp-border, rgb(10 33 24 / 0.1));
+  border-radius: 16px;
+  padding: 16px 18px;
+  min-width: 0;
+}
+
+.cnm-list-item-selected {
+  border-color: var(--bp-primary, #0c5c3f);
+}
+
+.cnm-list-item-category {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--bp-primary, #0c5c3f);
+}
+
+.cnm-list-item-name {
+  font-family: var(--font-display, 'Sora', system-ui, sans-serif);
+  font-size: 17px;
+  font-weight: 800;
+  margin-top: 4px;
+  min-width: 0;
+  word-break: break-word;
+}
+
+.cnm-list-item-distance {
+  font-size: 13px;
+  color: var(--bp-muted, #4d6259);
+  margin-top: 2px;
+}
+
+.cnm-list-item-address {
+  font-size: 14px;
+  color: var(--bp-muted, #4d6259);
+  margin-top: 6px;
+  min-width: 0;
+  word-break: break-word;
+}
+
+.cnm-list-item-phone,
+.cnm-list-item-website {
+  display: inline-block;
+  margin-top: 6px;
+  margin-right: 12px;
+  font-size: 14px;
+  color: var(--bp-primary, #0c5c3f);
+}
+
+.cnm-list-item-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.cnm-empty {
+  color: var(--bp-muted, #4d6259);
+  padding: 16px 0;
+}
+
+.cnm-map {
+  height: 320px;
+  position: relative;
+  z-index: 0;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--bp-border, rgb(10 33 24 / 0.1));
+  min-width: 0;
+}
+
+.cnm-marker {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 3px rgb(10 33 24 / 0.4);
+}
+
+.cnm-marker-origin {
+  background: #c0392b;
+  width: 18px;
+  height: 18px;
+}
+
+.cnm-support-heading {
+  font-family: var(--font-display, 'Sora', system-ui, sans-serif);
+  font-size: 18px;
+  font-weight: 800;
+  margin: 0 0 8px;
+}
+
+.cnm-footnote {
+  font-size: 13px;
+  color: var(--bp-muted, #4d6259);
+  min-width: 0;
+}
+
+@container cnm (min-width: 900px) {
+  .cnm-results {
+    display: grid;
+    grid-template-columns: minmax(300px, 380px) minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  .cnm-map {
+    height: 560px;
+  }
+
+  .cnm-list {
+    max-height: 560px;
+    overflow-y: auto;
+  }
+}
+
+
+/* Width fix: an element with `container-type: inline-size` ignores its
+   children when sizing itself. Centred with auto margins inside the
+   flex column `.content-frame`, it shrank to its own padding (40px at a
+   768px viewport) and every page collapsed into a one-word column.
+   An explicit width restores full width up to any max-width. */
+.cnm-root {
+  width: 100%;
+  min-width: 0;
+}
+

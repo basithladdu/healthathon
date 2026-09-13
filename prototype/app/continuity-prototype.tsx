@@ -2,6 +2,25 @@
 
 import type { FormEvent } from 'react';
 import React, { useMemo, useState, useEffect, useRef } from 'react';
+import { LoginScreen, SignupScreen, FamilyLoginScreen, PatientLoginScreen, type FamilyMember, type PatientAccount } from './auth-screens';
+import { LandingPage } from './landing-page';
+import { AppointmentsPage, initialAppointments, DEMO_TODAY, type Appointment, type AppointmentPatient } from './appointments-page';
+import { CareNearMe } from './care-near-me';
+import { ectprQuickViews, EdQuickView, EmergencyCard } from './ectpr';
+import {
+  MyCarePlan,
+  MyTimeline,
+  MyDoctors,
+  MyDetails,
+  ConsentSignature,
+  type PatientDetails,
+  type DecisionMaker,
+  type ConsentRecord,
+  type CareTeamMember,
+  type TimelineEntry,
+  type PastVisit,
+} from './patient-portal';
+import { PatientHistory, type HistoryEvent } from './patient-history';
 
 type View =
   | 'caregiver'
@@ -17,7 +36,15 @@ type View =
   | 'outreach'
   | 'draft'
   | 'verify'
-  | 'retrieve';
+  | 'retrieve'
+  | 'appointments'
+  | 'my-plan'
+  | 'my-timeline'
+  | 'care-near-me'
+  | 'my-doctors'
+  | 'emergency-card'
+  | 'my-details'
+  | 'consent';
 
 type FollowUpStatus =
   | 'Due today'
@@ -49,7 +76,7 @@ type AuditEvent = {
   actor: string;
   event: string;
   record: string;
-  badge?: 'PUBLISH' | 'OUTREACH' | 'ACCESS' | 'ENROL' | 'VIEW';
+  badge?: 'PUBLISH' | 'OUTREACH' | 'ACCESS' | 'ENROL' | 'VIEW' | 'SCHEDULE' | 'PATIENT';
 };
 
 type OutreachRecord = {
@@ -148,7 +175,17 @@ const careJourneyTouchpoint = {
 
 const patientProfiles: Record<
   string,
-  { age: number; team: string; participant: string; verified: string; phone: string; stage: string }
+  {
+    age: number;
+    team: string;
+    participant: string;
+    verified: string;
+    phone: string;
+    stage: string;
+    dob: string;
+    sex: string;
+    programs: string[];
+  }
 > = {
   'CANCER-20418': {
     age: 62,
@@ -157,6 +194,9 @@ const patientProfiles: Record<
     phone: 'Synthetic contact held by originating team',
     stage: 'Stage IV NSCLC · Continuity Cohort A',
     verified: '21 Aug 2026',
+    dob: '14/03/1964',
+    sex: 'Female',
+    programs: ['Goals-of-care continuity', 'Palliative care'],
   },
   'CANCER-20431': {
     age: 55,
@@ -165,6 +205,9 @@ const patientProfiles: Record<
     phone: 'Synthetic contact held by originating team',
     stage: 'Stage III Cholangiocarcinoma',
     verified: 'Not yet verified',
+    dob: '09/11/1970',
+    sex: 'Female',
+    programs: ['Goals-of-care continuity', 'Thoracic surgery'],
   },
   'CANCER-20392': {
     age: 68,
@@ -173,6 +216,9 @@ const patientProfiles: Record<
     phone: 'Synthetic contact held by originating team',
     stage: 'Stage IV SCLC · Palliative Follow-up',
     verified: 'Awaiting review',
+    dob: '22/01/1958',
+    sex: 'Male',
+    programs: ['Goals-of-care continuity', 'Pulmonary medicine'],
   },
   'CANCER-20377': {
     age: 59,
@@ -181,6 +227,9 @@ const patientProfiles: Record<
     phone: 'Synthetic contact held by originating team',
     stage: 'Stage IV Ovarian Carcinoma',
     verified: '21 Aug 2026',
+    dob: '30/06/1967',
+    sex: 'Female',
+    programs: ['Goals-of-care continuity', 'Palliative care'],
   },
   'CANCER-20452': {
     age: 47,
@@ -189,6 +238,9 @@ const patientProfiles: Record<
     phone: 'Synthetic contact held by originating team',
     stage: 'Stage III Cervical Carcinoma · Synthetic scenario',
     verified: 'Not yet verified',
+    dob: '05/02/1979',
+    sex: 'Not recorded',
+    programs: ['Goals-of-care continuity', 'Gynaecologic oncology'],
   },
   'CANCER-20489': {
     age: 64,
@@ -197,6 +249,9 @@ const patientProfiles: Record<
     phone: 'Synthetic contact held by originating team',
     stage: 'Stage IV Pancreatic Adenocarcinoma · Synthetic scenario',
     verified: 'Not yet verified',
+    dob: '17/12/1961',
+    sex: 'Not recorded',
+    programs: ['Goals-of-care continuity', 'Gastrointestinal oncology'],
   },
 };
 
@@ -414,14 +469,18 @@ const fieldConfig: Array<{
   },
 ];
 
+// Built by hand rather than with Intl: en-GB spells September "Sept", which
+// broke the "DD Mon YYYY" format every other date in the app uses and made
+// those dates unsortable in the Today's handoffs list.
+const DISPLAY_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
 function formatDateForDisplay(dateValue: string) {
   if (!dateValue) return '';
-  return new Intl.DateTimeFormat('en-GB', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-    timeZone: 'UTC',
-  }).format(new Date(`${dateValue}T00:00:00Z`));
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateValue);
+  if (!match) return dateValue;
+  const month = DISPLAY_MONTHS[Number(match[2]) - 1];
+  if (!month) return dateValue;
+  return `${Number(match[3])} ${month} ${match[1]}`;
 }
 
 const filters = [
@@ -550,6 +609,69 @@ function IconColumns({ className = 'w-4 h-4' }: { className?: string }) {
   );
 }
 
+function IconChevronLeft({ className = 'w-4 h-4' }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15 18l-6-6 6-6" />
+    </svg>
+  );
+}
+
+
+function IconExpand({ className = 'w-4 h-4' }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 4H5a1 1 0 00-1 1v4m0 6v4a1 1 0 001 1h4m6 0h4a1 1 0 001-1v-4m0-6V5a1 1 0 00-1-1h-4" />
+    </svg>
+  );
+}
+
+function IconKebab({ className = 'w-4 h-4' }: { className?: string }) {
+  return (
+    <svg className={className} fill="currentColor" viewBox="0 0 24 24">
+      <circle cx="12" cy="5" r="1.6" />
+      <circle cx="12" cy="12" r="1.6" />
+      <circle cx="12" cy="19" r="1.6" />
+    </svg>
+  );
+}
+
+function IconCalendar({ className = 'w-4 h-4' }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <rect x="3" y="5" width="18" height="16" rx="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M8 3v4M16 3v4M3 10h18" />
+    </svg>
+  );
+}
+
+function IconFilter({ className = 'w-4 h-4' }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M4 5h16l-6 7v6l-4 2v-8L4 5z" />
+    </svg>
+  );
+}
+
+function IconMapPin({ className = 'w-4 h-4' }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+    </svg>
+  );
+}
+
+function IconIdCard({ className = 'w-4 h-4' }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <rect x="3" y="5" width="18" height="14" rx="2" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="8" cy="11" r="1.6" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M6 15.5c.5-1.3 1.6-2 2-2s1.5.7 2 2M13 10h5M13 13h5" />
+    </svg>
+  );
+}
+
 function ContinuityMark({ className = '' }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 40 40" fill="none" aria-hidden="true">
@@ -565,9 +687,29 @@ const navItems: Array<{ view: View; label: string; icon: React.FC<{ className?: 
   { view: 'home', label: 'Clinical handoff', icon: IconShieldCheck },
   { view: 'guide', label: 'Guided conversation', icon: IconFileEdit },
   { view: 'worklist', label: 'Follow-up worklist', icon: IconClipboardList },
+  { view: 'appointments', label: 'Appointments', icon: IconCalendar },
   { view: 'patients', label: 'Patients', icon: IconUsers },
   { view: 'records', label: 'Verified records', icon: IconShieldCheck },
   { view: 'audit', label: 'Audit log', icon: IconHistory },
+  { view: 'help', label: 'Plain-language help', icon: IconInfo },
+];
+
+const patientNavItems: Array<{ view: View; label: string; icon: React.FC<{ className?: string }> }> = [
+  { view: 'my-plan', label: 'My care plan', icon: IconShieldCheck },
+  { view: 'my-timeline', label: 'My care journey', icon: IconHistory },
+  { view: 'care-near-me', label: 'Care near me', icon: IconMapPin },
+  { view: 'my-doctors', label: 'My doctors', icon: IconUsers },
+  { view: 'emergency-card', label: 'Emergency card', icon: IconIdCard },
+  { view: 'my-details', label: 'My details', icon: IconFileEdit },
+  { view: 'consent', label: 'Consent', icon: IconCheck },
+  { view: 'help', label: 'Plain-language help', icon: IconInfo },
+];
+
+const familyNavItems: Array<{ view: View; label: string; icon: React.FC<{ className?: string }> }> = [
+  { view: 'caregiver', label: 'Care journey', icon: IconUsers },
+  { view: 'care-near-me', label: 'Care near me', icon: IconMapPin },
+  { view: 'my-doctors', label: 'Care team', icon: IconUsers },
+  { view: 'emergency-card', label: 'Emergency card', icon: IconIdCard },
   { view: 'help', label: 'Plain-language help', icon: IconInfo },
 ];
 
@@ -657,9 +799,16 @@ function StatusPill({ status }: { status: string }) {
 }
 
 export function ContinuityPrototype() {
-  const [view, setView] = useState<View>('caregiver');
+  const [view, setView] = useState<View>('home');
   const [currentRole, setCurrentRole] = useState<UserRole>('Dr Sujay · Clinical lead');
+  const [authScreen, setAuthScreen] = useState<'landing' | 'login' | 'signup' | 'family' | 'patient' | null>('landing');
+  const [sessionType, setSessionType] = useState<'care-team' | 'family' | 'patient'>('care-team');
+  const [familyMember, setFamilyMember] = useState<FamilyMember | null>(null);
+  const [patientAccount, setPatientAccount] = useState<PatientAccount | null>(null);
+  const isFamilySession = sessionType === 'family';
+  const isPatientSession = sessionType === 'patient';
   const [workItems, setWorkItems] = useState(initialWorkItems);
+  const [appointments, setAppointments] = useState<Appointment[]>(initialAppointments);
   const [selectedId, setSelectedId] = useState('CANCER-20418');
   const [recordStates, setRecordStates] =
     useState<Record<string, RecordState>>(initialRecordStates);
@@ -685,6 +834,21 @@ export function ContinuityPrototype() {
   const [auditEvents, setAuditEvents] = useState(initialAuditEvents);
   const [toast, setToast] = useState('');
   const [coverageZoneId, setCoverageZoneId] = useState('south');
+  const [profileTab, setProfileTab] =
+    useState<'overview' | 'care' | 'documents' | 'scheduling' | 'encounters'>('overview');
+  const [patientsPanelOpen, setPatientsPanelOpen] = useState(true);
+  const [profileSearch, setProfileSearch] = useState('');
+  const [profileSort, setProfileSort] = useState<'recent' | 'az'>('recent');
+  const [profileStatusFilter, setProfileStatusFilter] = useState<'All' | FollowUpStatus>('All');
+  const [profileFilterOpen, setProfileFilterOpen] = useState(false);
+  const [openMeasureMenu, setOpenMeasureMenu] = useState<string | null>(null);
+  const [homeShowCompleted, setHomeShowCompleted] = useState(false);
+  const [patientsScope, setPatientsScope] = useState<'all' | 'mine'>('all');
+  const [patientDetailsById, setPatientDetailsById] = useState<Record<string, PatientDetails>>({});
+  const [consentById, setConsentById] = useState<Record<string, ConsentRecord>>({});
+  const [cardIssuedById, setCardIssuedById] = useState<Record<string, string>>({});
+  const [reviewRequestedById, setReviewRequestedById] = useState<Record<string, string>>({});
+  const profileTimelineRef = useRef<HTMLOListElement>(null);
   const enrolDialogRef = useRef<HTMLElement>(null);
   const diffDialogRef = useRef<HTMLElement>(null);
   const retrievedRecordHeadingRef = useRef<HTMLHeadingElement>(null);
@@ -725,6 +889,40 @@ export function ContinuityPrototype() {
   const isTreatingPhysician = currentRole.startsWith('Dr Sujay');
   const isCareCoordinator = currentRole.startsWith('Anitha Rao');
 
+  function enterCareTeam(role: UserRole) {
+    setSessionType('care-team');
+    setFamilyMember(null);
+    setPatientAccount(null);
+    setCurrentRole(role);
+    setView('home');
+    setAuthScreen(null);
+  }
+
+  function enterFamily(member: FamilyMember) {
+    setSessionType('family');
+    setFamilyMember(member);
+    setPatientAccount(null);
+    setView('caregiver');
+    setAuthScreen(null);
+  }
+
+  function enterPatient(account: PatientAccount) {
+    setSessionType('patient');
+    setFamilyMember(null);
+    setPatientAccount(account);
+    selectPatient(account.hospitalId);
+    setView('my-plan');
+    setAuthScreen(null);
+  }
+
+  function signOut() {
+    setSessionType('care-team');
+    setFamilyMember(null);
+    setPatientAccount(null);
+    setView('home');
+    setAuthScreen('landing');
+  }
+
   function switchRole(role: UserRole) {
     setCurrentRole(role);
     updateSelectedRecord((current) => ({
@@ -742,6 +940,7 @@ export function ContinuityPrototype() {
   }
 
   function openDemoRoleWorkflow(role: UserRole) {
+    if (isFamilySession || isPatientSession) return;
     switchRole(role);
 
     if (role === 'Dr Sujay · Clinical lead') {
@@ -903,6 +1102,15 @@ export function ContinuityPrototype() {
     }
   }, [retrievalUnlocked]);
 
+  useEffect(() => {
+    if (!openMeasureMenu) return;
+    function handleEscape(event: KeyboardEvent) {
+      if (event.key === 'Escape') setOpenMeasureMenu(null);
+    }
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [openMeasureMenu]);
+
   const selectedItem =
     workItems.find((item) => item.hospitalId === selectedId) ?? workItems[0];
   const selectedProfile = patientProfiles[selectedId] ?? {
@@ -912,7 +1120,242 @@ export function ContinuityPrototype() {
     phone: 'Synthetic contact held by originating team',
     stage: 'Oncology Cohort',
     verified: 'Not yet verified',
+    dob: 'Not recorded',
+    sex: 'Not recorded',
+    programs: ['Goals-of-care continuity'],
   };
+
+  const portalPatientId = isPatientSession
+    ? (patientAccount?.hospitalId ?? 'CANCER-20418')
+    : (familyMember?.patientId ?? 'CANCER-20418');
+  const portalPatientName =
+    workItems.find((item) => item.hospitalId === portalPatientId)?.patient ??
+    (isPatientSession ? patientAccount?.name : familyMember?.name) ??
+    'Patient';
+
+  function detailsFor(id: string): PatientDetails {
+    const stored = patientDetailsById[id];
+    if (stored) return stored;
+    const item = workItems.find((w) => w.hospitalId === id);
+    const profile = patientProfiles[id];
+    const [dmName, dmRelationship] = (profile?.participant ?? '').split(' · ');
+    const emptyDm: DecisionMaker = { name: '', relationship: '', phone: '', basis: '' };
+    return {
+      fullName: item?.patient ?? 'Unknown patient',
+      dob: profile?.dob ?? '',
+      sex: profile?.sex ?? '',
+      address: '',
+      phone: '',
+      language: '',
+      primaryDecisionMaker: dmName
+        ? { name: dmName, relationship: dmRelationship ?? '', phone: '', basis: '' }
+        : emptyDm,
+      alternateDecisionMaker: emptyDm,
+      localPhysician: { name: '', clinic: '', phone: '' },
+    };
+  }
+
+  function saveDetails(id: string, next: PatientDetails) {
+    setPatientDetailsById((state) => ({ ...state, [id]: next }));
+    const patientName = workItems.find((w) => w.hospitalId === id)?.patient ?? next.fullName;
+    addAudit('Updated their personal details', patientName, 'PATIENT', patientName);
+    notify('Your details were saved.');
+  }
+
+  function requestReview(id: string) {
+    setReviewRequestedById((state) => ({ ...state, [id]: '28 Aug 2026' }));
+    setWorkItems((items) =>
+      items.map((item) =>
+        item.hospitalId === id
+          ? { ...item, status: 'Awaiting review', lastActivity: 'Patient requested a review of the care plan' }
+          : item,
+      ),
+    );
+    const patientName = workItems.find((w) => w.hospitalId === id)?.patient ?? '';
+    addAudit('Requested a review of the care plan', patientName, 'PATIENT', patientName);
+    notify('Your review request was sent to your care team.');
+  }
+
+  function signConsent(id: string, input: { typedName: string; declaration: 'self' | 'delegated' }) {
+    const versionLabel = planVersionLabel(id);
+    setConsentById((state) => ({
+      ...state,
+      [id]: {
+        versionLabel,
+        typedName: input.typedName,
+        declaration: input.declaration,
+        signedAt: '28 Aug 2026 · 10:04',
+      },
+    }));
+    const patientName = workItems.find((w) => w.hospitalId === id)?.patient ?? '';
+    addAudit(`Gave consent to ${versionLabel} (simulated typed signature)`, patientName, 'PATIENT', patientName);
+    notify('Your consent was recorded.');
+  }
+
+  function issueCard(id: string) {
+    setCardIssuedById((state) => ({ ...state, [id]: '28 Aug 2026' }));
+    const patientName = workItems.find((w) => w.hospitalId === id)?.patient ?? '';
+    addAudit('Issued their emergency card', patientName, 'PATIENT', patientName);
+    notify('Your emergency card was issued.');
+  }
+
+  function planVersionLabel(id: string): string {
+    const state = recordStates[id];
+    if (state?.versionPublished) return 'Version 2';
+    if ((patientProfiles[id]?.verified ?? '').includes('2026')) return 'Version 1';
+    return 'No released version';
+  }
+
+  function planFieldsFor(id: string): Array<{ label: string; value: string }> {
+    const state = recordStates[id];
+    if (id === 'CANCER-20418') {
+      const released = state?.versionPublished ? state.draftFields : v1Fields;
+      return fieldConfig.map((f) => ({ label: f.label, value: released[f.key] }));
+    }
+    if (patientHasApprovedSummary(id)) {
+      return [
+        {
+          label: 'Summary',
+          value: 'Your verified summary is held by your care team and is not loaded in this demonstration.',
+        },
+      ];
+    }
+    return [];
+  }
+
+  function clinicalItemsFor(id: string): Array<{ label: string; value: string }> {
+    const record = ectprQuickViews[id];
+    if (!record) return [{ label: 'Emergency care plan', value: 'No emergency care plan signed yet' }];
+    const notDecided = 'Not decided yet';
+    const goalLabels: Record<string, string> = {
+      'prioritise-life': 'Prioritise length of life',
+      balanced: 'Balance comfort and length of life',
+      'prioritise-comfort': 'Prioritise comfort',
+    };
+    const transferLabels: Record<string, string> = {
+      'any-deterioration': 'Transfer to hospital for any deterioration',
+      'listed-reasons-only': 'Transfer only for listed reasons',
+      no: 'Stay in current care setting',
+    };
+    const cprLabels: Record<string, string> = {
+      attempt: 'Attempt CPR',
+      dnacpr: 'Do not attempt CPR',
+    };
+    const breathingLabels: Record<string, string> = {
+      'comfort-only': 'Comfort measures only',
+      mask: 'Simple oxygen mask',
+      'non-rebreather': 'Non-rebreather mask',
+      hfnc: 'High-flow nasal oxygen',
+      niv: 'Non-invasive ventilation',
+      'intubation-trial': 'Intubation, time-limited trial',
+      'intubation-no-limit': 'Intubation, no limit',
+    };
+    const icuLabels: Record<string, string> = {
+      yes: 'ICU care appropriate',
+      'time-limited-trial': 'Time-limited ICU trial',
+      no: 'ICU care not appropriate',
+    };
+    return [
+      { label: 'Overall goal', value: record.goal ? goalLabels[record.goal] : notDecided },
+      { label: 'Hospital transfer', value: record.hospitalTransfer ? transferLabels[record.hospitalTransfer] : notDecided },
+      { label: 'CPR', value: record.cpr ? cprLabels[record.cpr] : notDecided },
+      { label: 'Highest breathing support', value: record.breathingCeiling ? breathingLabels[record.breathingCeiling] : notDecided },
+      { label: 'ICU', value: record.icu ? icuLabels[record.icu] : notDecided },
+    ];
+  }
+
+  function buildHistoryEvents(hospitalId: string): HistoryEvent[] {
+    const events: HistoryEvent[] = [];
+    const patientName = workItems.find((w) => w.hospitalId === hospitalId)?.patient ?? '';
+
+    if (hospitalId === 'CANCER-20418') {
+      events.push({
+        id: 'seed-conversation',
+        sortKey: Date.UTC(2026, 7, 14),
+        dateLabel: '14 Aug 2026',
+        kind: 'conversation',
+        title: 'Conversation initiated',
+        detail: 'Meera requested time to talk through preferences at home with family before writing a clinician-reviewed summary.',
+        actor: 'Dr Sujay',
+      });
+      events.push({
+        id: 'seed-enrolment',
+        sortKey: Date.UTC(2026, 7, 18),
+        dateLabel: '18 Aug 2026',
+        kind: 'enrolment',
+        title: 'Follow-up coordinator assigned',
+        detail: 'Anitha Rao assigned as dedicated continuity owner to maintain accountability for scheduled follow-up.',
+        actor: 'Dr Sujay',
+      });
+    }
+
+    appointments
+      .filter((a) => a.hospitalId === hospitalId)
+      .forEach((a) => {
+        const [y, m, d] = a.date.split('-').map(Number);
+        events.push({
+          id: `appt-${a.id}`,
+          sortKey: Date.UTC(y, (m ?? 1) - 1, d ?? 1, ...(a.time ? a.time.split(':').map(Number) as [number, number] : [0, 0])),
+          dateLabel: `${formatDateForDisplay(a.date)} · ${a.time}`,
+          kind: 'appointment',
+          title: a.type,
+          detail: `${a.status}${a.outcome ? ' — ' + a.outcome : ''} · ${a.mode}`,
+          actor: a.clinician,
+          status: a.status,
+        });
+      });
+
+    auditEvents
+      .filter((e) => e.record.includes(patientName))
+      .forEach((e, index) => {
+        const match = /^(\d{1,2}) (\w{3}) · (\d{2}):(\d{2})$/.exec(e.time);
+        const monthMap: Record<string, number> = {
+          Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5, Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11,
+        };
+        const sortKey = match
+          ? Date.UTC(2026, monthMap[match[2]] ?? 7, Number(match[1]), Number(match[3]), Number(match[4]))
+          : Date.UTC(2026, 7, 28);
+        const dateLabel = match ? `${Number(match[1])} ${match[2]} 2026 · ${match[3]}:${match[4]}` : e.time;
+
+        let kind: HistoryEvent['kind'] | null = null;
+        if (e.badge === 'PUBLISH') kind = 'version';
+        else if (e.badge === 'OUTREACH') kind = 'call';
+        else if (e.badge === 'ENROL') kind = 'enrolment';
+        else if (e.badge === 'SCHEDULE') kind = null;
+        else if (e.badge === 'ACCESS') {
+          kind = e.event.startsWith('Viewed') ? 'retrieval' : e.event.includes('Authorisation') ? 'consent' : 'other';
+        } else if (e.badge === 'VIEW') {
+          kind = e.event.includes('draft') ? 'draft' : e.event.startsWith('Viewed') ? 'retrieval' : 'other';
+        } else if (e.badge === 'PATIENT') {
+          if (e.event.toLowerCase().includes('consent')) kind = 'consent';
+          else if (e.event.toLowerCase().includes('emergency card')) kind = 'card';
+          else if (e.event.toLowerCase().includes('review')) kind = 'review';
+          else if (e.event.toLowerCase().includes('details')) kind = 'details';
+          else kind = 'other';
+        } else {
+          kind = 'other';
+        }
+
+        if (kind === null) return;
+
+        events.push({
+          id: `audit-${index}-${e.time}`,
+          sortKey,
+          dateLabel,
+          kind,
+          title: e.event,
+          detail: e.record,
+          actor: e.actor,
+        });
+      });
+
+    const seen = new Set<string>();
+    return events.filter((e) => {
+      if (seen.has(e.id)) return false;
+      seen.add(e.id);
+      return true;
+    });
+  }
 
   const visibleItems = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -960,6 +1403,20 @@ export function ContinuityPrototype() {
     !versionPublished;
 
   function navigate(nextView: View) {
+    if (isPatientSession) {
+      const allowed: View[] = ['my-plan', 'my-timeline', 'care-near-me', 'my-doctors', 'emergency-card', 'my-details', 'consent', 'help'];
+      if (!allowed.includes(nextView)) {
+        notify('This page is for the care team.');
+        return;
+      }
+    }
+    if (isFamilySession) {
+      const allowed: View[] = ['caregiver', 'care-near-me', 'my-doctors', 'emergency-card', 'help'];
+      if (!allowed.includes(nextView)) {
+        notify('Family access is read-only. The care-team workspace needs a clinician sign-in.');
+        return;
+      }
+    }
     if ((nextView === 'draft' || nextView === 'verify') && !isTreatingPhysician) {
       notify('Only the treating physician can prepare or verify a structured summary.');
       return;
@@ -980,9 +1437,17 @@ export function ContinuityPrototype() {
     }
   }
 
+  // One timer at a time: otherwise an older toast's timeout clears a newer
+  // toast early whenever two actions land within a few seconds.
+  const toastTimerRef = useRef<number | null>(null);
+
   function notify(message: string) {
     setToast(message);
-    window.setTimeout(() => setToast(''), 3500);
+    if (toastTimerRef.current !== null) window.clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = window.setTimeout(() => {
+      setToast('');
+      toastTimerRef.current = null;
+    }, 3500);
   }
 
   function selectPatient(hospitalId: string) {
@@ -999,13 +1464,13 @@ export function ContinuityPrototype() {
     setDiffOpen(true);
   }
 
-  function beginEmergencyRetrieval() {
+  function beginRetrievalFor(hospitalId: string) {
     if (!currentRole.startsWith('Dr')) {
       notify('A simulated physician role is required to retrieve a verified clinical record.');
       return;
     }
-    selectPatient('CANCER-20418');
-    updateRecordState('CANCER-20418', (current) => ({
+    selectPatient(hospitalId);
+    updateRecordState(hospitalId, (current) => ({
       ...current,
       retrievalReason: currentRole.startsWith('Dr Isha')
         ? 'Emergency hand-off retrieval (Break-glass)'
@@ -1019,6 +1484,10 @@ export function ContinuityPrototype() {
     navigate('retrieve');
   }
 
+  function beginEmergencyRetrieval() {
+    beginRetrievalFor('CANCER-20418');
+  }
+
   function beginGuidedConversation() {
     if (!isTreatingPhysician) {
       notify('Only the treating physician can record conversation coverage or prepare a structured draft.');
@@ -1030,14 +1499,31 @@ export function ContinuityPrototype() {
 
   function openPatient(item: WorkItem) {
     selectPatient(item.hospitalId);
+    setProfileTab('overview');
     navigate('patient');
   }
 
-  function addAudit(event: string, record = `${selectedItem.patient}`, badge?: AuditEvent['badge']) {
+  function patientHasApprovedSummary(id: string): boolean {
+    return Boolean(recordStates[id]?.versionPublished) || (patientProfiles[id]?.verified ?? '').includes('2026');
+  }
+
+  function patientSummaryLabel(id: string): string {
+    if (recordStates[id]?.versionPublished) return 'Version 2 · 28 Aug 2026';
+    if ((patientProfiles[id]?.verified ?? '').includes('2026')) return `Version 1 · ${patientProfiles[id].verified}`;
+    return 'No approved summary';
+  }
+
+
+  function addAudit(
+    event: string,
+    record = `${selectedItem.patient}`,
+    badge?: AuditEvent['badge'],
+    actor?: string,
+  ) {
     setAuditEvents((events) => [
       {
         time: '28 Aug · 10:04',
-        actor: currentRole.split(' · ')[0],
+        actor: actor ?? currentRole.split(' · ')[0],
         event,
         record,
         badge,
@@ -1293,20 +1779,26 @@ export function ContinuityPrototype() {
             <p className="care-journey-lede">
               A calm, shared view of the conversation her care team has reviewed, what is next, and who can help prepare for it.
             </p>
-            <div className="care-journey-actions">
-              <button className="primary-button" type="button" onClick={() => navigate('home')}>
-                <IconUsers className="w-4 h-4" />
-                Open care-team workspace
-              </button>
-              <button
-                className="secondary-button"
-                type="button"
-                onClick={() => openDemoRoleWorkflow('Dr Isha Menon · Emergency physician')}
-              >
-                Emergency clinician demo
-                <IconChevronRight className="w-4 h-4" />
-              </button>
-            </div>
+            {isFamilySession ? (
+              <p className="care-journey-signed-in">
+                Signed in as <strong>{familyMember?.name}</strong> · {familyMember?.relationship}
+              </p>
+            ) : (
+              <div className="care-journey-actions">
+                <button className="primary-button" type="button" onClick={() => navigate('home')}>
+                  <IconUsers className="w-4 h-4" />
+                  Open care-team workspace
+                </button>
+                <button
+                  className="secondary-button"
+                  type="button"
+                  onClick={() => openDemoRoleWorkflow('Dr Isha Menon · Emergency physician')}
+                >
+                  Emergency clinician demo
+                  <IconChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            )}
             <div className="care-journey-readonly" role="note">
               <IconLock className="w-4 h-4" />
               <span>Read-only by design. Care-team updates are released only after physician review.</span>
@@ -1317,10 +1809,10 @@ export function ContinuityPrototype() {
             {/* The Vinext local runtime cannot hydrate next/image for this bundled public asset. */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/palliative-care-journey.png"
-              alt="Illustration of a patient and clinician in a palliative care conversation"
-              width={400}
-              height={400}
+              src="/care-conversation.jpg"
+              alt="Illustration of a patient seated across a desk from a clinician, beside a large checklist of reviewed items"
+              width={736}
+              height={751}
               loading="eager"
             />
             <figcaption>Continuity starts with a shared conversation.</figcaption>
@@ -1470,11 +1962,123 @@ export function ContinuityPrototype() {
   }
 
   function renderHome() {
-    const currentReleasedFields = primaryRecordState.versionPublished
-      ? primaryRecordState.draftFields
-      : v1Fields;
-    const currentReleasedVersion = primaryRecordState.versionPublished ? 'Version 2' : 'Version 1';
     const activeFollowUps = Math.max(0, counts.all - counts.completed);
+
+    const statusRank: Record<string, number> = {
+      Overdue: 0,
+      Escalated: 1,
+      'Due today': 2,
+      'Awaiting review': 3,
+      'Awaiting outreach': 4,
+    };
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    function parseDueDate(due: string): number {
+      const isoMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(due);
+      if (isoMatch) {
+        return Date.UTC(Number(isoMatch[1]), Number(isoMatch[2]) - 1, Number(isoMatch[3]));
+      }
+      const parts = due.split(' ');
+      if (parts.length === 3) {
+        const day = Number(parts[0]);
+        // Match on the first three letters so "Sep", "Sept" and "September" all parse.
+        const monthIndex = monthNames.findIndex(
+          (name) => name.slice(0, 3).toLowerCase() === parts[1].slice(0, 3).toLowerCase(),
+        );
+        const year = Number(parts[2]);
+        if (!Number.isNaN(day) && monthIndex !== -1 && !Number.isNaN(year)) {
+          return Date.UTC(year, monthIndex, day);
+        }
+      }
+      return Number.POSITIVE_INFINITY;
+    }
+    function nextAppointmentLabel(id: string): string | null {
+      const upcoming = appointments
+        .filter((a) => a.hospitalId === id && a.status === 'Scheduled' && a.date >= DEMO_TODAY)
+        .sort((a, b) => (a.date === b.date ? a.time.localeCompare(b.time) : a.date.localeCompare(b.date)));
+      const next = upcoming[0];
+      if (!next) return null;
+      const [, monthStr, dayStr] = next.date.split('-');
+      const monthName = monthNames[Number(monthStr) - 1] ?? monthStr;
+      const day = Number(dayStr);
+      return `Next: ${day} ${monthName} · ${next.time}`;
+    }
+    const openItems = workItems
+      .filter((item) => item.status !== 'Completed')
+      .slice()
+      .sort((a, b) => {
+        const rankDiff = (statusRank[a.status] ?? 99) - (statusRank[b.status] ?? 99);
+        if (rankDiff !== 0) return rankDiff;
+        return parseDueDate(a.due) - parseDueDate(b.due);
+      });
+    const completedItems = workItems.filter((item) => item.status === 'Completed');
+
+    function renderHandoffRow(item: WorkItem) {
+      const initials = item.patient
+        .split(' ')
+        .map((p) => p[0])
+        .join('')
+        .slice(0, 2);
+      const nextAppt = nextAppointmentLabel(item.hospitalId);
+      const approved = patientHasApprovedSummary(item.hospitalId);
+      return (
+        <li className="th-row" key={item.hospitalId}>
+          <div className="th-patient">
+            <span className="th-avatar" aria-hidden="true">{initials}</span>
+            <div style={{ minWidth: 0 }}>
+              <div className="th-name">{item.patient}</div>
+              <div className="th-id">{item.hospitalId}</div>
+            </div>
+          </div>
+          <div className="th-task">
+            <div>{item.purpose}</div>
+            <div className="th-last-update">Last update: {item.lastActivity}</div>
+          </div>
+          <div className="th-when">
+            <div className="th-due">{item.due}</div>
+            <StatusPill status={item.status} />
+            {nextAppt && <div className="th-next-appt">{nextAppt}</div>}
+          </div>
+          <div className="th-owner">
+            <span className="th-owner-label">Owner</span>
+            <span className="owner-badge">{item.owner}</span>
+          </div>
+          <div className="th-summary">
+            {approved ? (
+              <span className="th-chip th-chip-ok">
+                <IconCheck className="w-3 h-3" />
+                {patientSummaryLabel(item.hospitalId)}
+              </span>
+            ) : (
+              <span className="th-chip th-chip-none">No approved summary</span>
+            )}
+          </div>
+          <div className="th-actions">
+            <button
+              className="secondary-button"
+              type="button"
+              onClick={() => openPatient(item)}
+              aria-label={`Open ${item.patient}`}
+            >
+              Open
+            </button>
+            {approved && (
+              <button
+                className="primary-button"
+                type="button"
+                disabled={!currentRole.startsWith('Dr')}
+                title={!currentRole.startsWith('Dr') ? 'Physician role required' : undefined}
+                onClick={() => beginRetrievalFor(item.hospitalId)}
+                aria-label={`Retrieve verified record for ${item.patient}`}
+              >
+                <IconLock className="w-3.5 h-3.5" />
+                Retrieve
+              </button>
+            )}
+          </div>
+        </li>
+      );
+    }
+
     return (
       <>
         <section className="command-intro">
@@ -1497,59 +2101,50 @@ export function ContinuityPrototype() {
           </div>
         </section>
 
-        <section className="today-grid" aria-label="Today’s continuity work">
-          <article className="next-action-card">
-            <div className="next-action-heading">
-              <div className="next-action-title-group">
-                <span className="action-icon action-icon-clinician" aria-hidden="true"><IconFileEdit className="w-5 h-5" /></span>
-                <div>
-                  <span className="document-kicker">Next action</span>
-                  <h2>{selectedItem.patient}</h2>
-                  <p>{selectedItem.purpose}</p>
-                </div>
-              </div>
-              <StatusPill status={selectedItem.status} />
+        <section className="detail-card th-card" aria-labelledby="th-title">
+          <div className="th-header">
+            <div>
+              <p className="eyebrow">Today's handoffs</p>
+              <h2 id="th-title">Patients who need attention</h2>
+              <p className="th-note">Ordered by follow-up status, then due date. This list does not rank clinical urgency.</p>
             </div>
-            <div className="next-action-meta">
-              <span><strong>Due</strong>{selectedItem.due}</span>
-              <span><strong>Owner</strong>{selectedItem.owner}</span>
-              <span><strong>Last update</strong>{selectedItem.lastActivity}</span>
-            </div>
-            <div className="next-action-buttons">
-              <button className="primary-button" type="button" onClick={() => openPatient(selectedItem)}>
-                Open follow-up
-              </button>
-              <button
-                className="secondary-button"
-                type="button"
-                onClick={beginGuidedConversation}
-              >
-                <IconFileEdit className="w-4 h-4" />
-                Start guided conversation
+            <div className="th-header-right">
+              <span className="th-count"><strong>{openItems.length}</strong> open</span>
+              <button className="text-button" type="button" onClick={() => navigate('worklist')}>
+                Open all work →
               </button>
             </div>
-          </article>
+          </div>
 
-          <aside className="verified-record-card" aria-label="Verified record ready for retrieval">
-            <div className="verified-record-heading">
-              <div className="verified-record-title-group">
-                <span className="action-icon action-icon-retrieval" aria-hidden="true"><IconLock className="w-4 h-4" /></span>
-                <div>
-                  <span className="document-kicker">Verified handoff</span>
-                  <strong>Meera Raghavan</strong>
-                  <small>CANCER-20418 · {currentReleasedVersion}</small>
-                </div>
-              </div>
-              <StatusPill status="Physician verified" />
-            </div>
-            <p>{currentReleasedFields.priorities}</p>
-            <div className="verified-record-footer">
-              <span>For clinical review only</span>
-              <button className="text-button" type="button" onClick={beginEmergencyRetrieval}>
-                Retrieve record →
+          {openItems.length > 0 ? (
+            <ul className="th-list" role="list">
+              {openItems.map(renderHandoffRow)}
+            </ul>
+          ) : (
+            <p className="th-empty">No open follow-ups right now.</p>
+          )}
+
+          {completedItems.length > 0 && (
+            <>
+              <button
+                className="th-toggle"
+                type="button"
+                aria-expanded={homeShowCompleted}
+                onClick={() => setHomeShowCompleted((v) => !v)}
+              >
+                {homeShowCompleted ? 'Hide completed' : `Show completed (${completedItems.length})`}
               </button>
-            </div>
-          </aside>
+              {homeShowCompleted && (
+                <ul className="th-list th-list-completed" role="list">
+                  {completedItems.map(renderHandoffRow)}
+                </ul>
+              )}
+            </>
+          )}
+
+          <p className="th-footnote">
+            Approved summaries are for clinical review only. Retrieving one asks for a reason and is recorded in the audit log.
+          </p>
         </section>
 
         <section className="today-overview" aria-labelledby="today-overview-title">
@@ -1626,7 +2221,7 @@ export function ContinuityPrototype() {
           </div>
           <div className="role-route-boundary" role="note">
             <IconUsers className="w-4 h-4" />
-            <span><strong>Patient and family access:</strong> preferences are captured through the clinician-led conversation; an independently authenticated patient portal is not part of this demonstration.</span>
+            <span><strong>Patient and family access:</strong> families use the separate family door on the sign-in page, which is simulated. Preferences are still captured through the clinician-led conversation, and no independently authenticated patient portal is part of this demonstration.</span>
           </div>
         </section>
       </>
@@ -2006,28 +2601,268 @@ export function ContinuityPrototype() {
           ]
         : []),
     ];
-    return (
-      <>
-        <button className="back-button" type="button" onClick={() => navigate('worklist')}>
-          ← Back to worklist
-        </button>
+    const initials = selectedItem.patient
+      .split(' ')
+      .map((part) => part[0])
+      .join('')
+      .slice(0, 2)
+      .toUpperCase();
+    const statusDotColor: Record<FollowUpStatus, string> = {
+      'Due today': 'var(--medium-ink)',
+      Overdue: 'var(--critical-ink)',
+      'Awaiting review': 'var(--low-ink)',
+      'Awaiting outreach': 'var(--low-ink)',
+      Escalated: 'var(--critical-ink)',
+      Completed: 'var(--safe-ink)',
+    };
+    const teamChip = selectedProfile.team.split(' · ').pop() ?? selectedProfile.team;
+    const age = selectedProfile.age;
+    const discussedCount = Object.values(conversationCoverage).filter(
+      (value) => value === 'discussed',
+    ).length;
+    const draftReadyCount = draftPrepared
+      ? fieldConfig.filter(({ key }) => draftStatuses[key] === 'ready').length
+      : 0;
 
-        <section className="record-header">
-          <div className="record-identity">
-            <p className="eyebrow">
-              <IconShieldCheck className="w-3.5 h-3.5" /> Patient Continuity Profile
-            </p>
-            <h1>{selectedItem.patient}</h1>
-            <div className="record-inline-meta">
-              <span className="meta-chip"><strong>ID:</strong> {selectedItem.hospitalId}</span>
-              <span className="meta-chip"><strong>Age:</strong> {selectedProfile.age}</span>
-              <span className="meta-chip"><strong>Clinical Team:</strong> {selectedProfile.team}</span>
-              <span className="meta-chip"><strong>Status:</strong> {selectedProfile.stage}</span>
-              <span className="meta-chip"><strong>ABHA:</strong> Not linked in demo</span>
+    const patientIndex = workItems.findIndex((item) => item.hospitalId === selectedItem.hospitalId);
+    function cyclePatient(direction: 1 | -1) {
+      if (workItems.length === 0) return;
+      const baseIndex = patientIndex === -1 ? 0 : patientIndex;
+      const nextIndex = (baseIndex + direction + workItems.length) % workItems.length;
+      selectPatient(workItems[nextIndex].hospitalId);
+    }
+
+    function switchTab(tab: typeof profileTab) {
+      setProfileTab(tab);
+      setOpenMeasureMenu(null);
+    }
+
+    const goalsRows: Array<{
+      key: string;
+      label: string;
+      percent: number;
+      caption: string;
+      onClick: () => void;
+    }> = isMeera
+      ? [
+          {
+            key: 'coverage',
+            label: 'Record conversation coverage',
+            percent: Math.round((discussedCount / 8) * 100),
+            caption: `${discussedCount} of 8`,
+            onClick: () => navigate('guide'),
+          },
+          {
+            key: 'draft',
+            label: 'Link draft fields to the source note',
+            percent: Math.round((draftReadyCount / 5) * 100),
+            caption: `${draftReadyCount} of 5`,
+            onClick: () => navigate('draft'),
+          },
+          {
+            key: 'verify',
+            label: 'Complete verification checks',
+            percent: Math.round((verificationPassedCount / 4) * 100),
+            caption: `${verificationPassedCount} of 4`,
+            onClick: () => navigate('verify'),
+          },
+        ]
+      : [];
+
+    const actionRows: Array<{ key: string; label: string; done: boolean; onClick: () => void }> = [
+      {
+        key: 'guide',
+        label: 'Guided conversation recorded',
+        done: isMeera ? discussedCount > 0 : hasVerifiedRecord,
+        onClick: () => navigate('guide'),
+      },
+      {
+        key: 'draft-prepared',
+        label: 'Structured draft prepared from the source note',
+        done: isMeera
+          ? draftPrepared
+          : selectedItem.status === 'Awaiting review' || hasVerifiedRecord,
+        onClick: () => navigate('draft'),
+      },
+      {
+        key: 'outreach',
+        label: 'Coordinator outreach recorded',
+        done: latestOutreach !== null || isMeera,
+        onClick: () => navigate('outreach'),
+      },
+      {
+        key: 'released',
+        label: isMeera ? 'Version 2 verified and released' : 'Summary verified and released',
+        done: isMeera ? versionPublished : hasVerifiedRecord,
+        onClick: () => navigate(isMeera ? 'verify' : 'records'),
+      },
+    ];
+
+    const measureRows: Array<{
+      key: string;
+      label: string;
+      done: boolean;
+      menu: Array<{ key: string; label: string; onClick: () => void; disabled?: boolean }>;
+    }> = [
+      {
+        key: 'conversation-documented',
+        label: 'Goals-of-care conversation documented',
+        done: hasVerifiedRecord || (isMeera && discussedCount > 0),
+        menu: [
+          { key: 'open-guide', label: 'Open guided conversation', onClick: () => navigate('guide') },
+          { key: 'audit', label: 'View in audit log', onClick: () => navigate('audit') },
+        ],
+      },
+      {
+        key: 'acknowledgement',
+        label: 'Patient or surrogate acknowledgement recorded',
+        done: versionPublished ? acknowledgementComplete : hasVerifiedRecord,
+        menu: [
+          { key: 'open-verify', label: 'Open verification', onClick: () => navigate('verify') },
+          { key: 'audit', label: 'View in audit log', onClick: () => navigate('audit') },
+        ],
+      },
+      {
+        key: 'physician-verified',
+        label: 'Current summary verified by the treating physician',
+        done: hasVerifiedRecord,
+        menu: [
+          { key: 'open-docs', label: 'Open documents', onClick: () => switchTab('documents') },
+          { key: 'audit', label: 'View in audit log', onClick: () => navigate('audit') },
+        ],
+      },
+      {
+        key: 'owner-set',
+        label: 'Follow-up owner and next review date set',
+        done: Boolean(selectedItem.owner && selectedItem.due),
+        menu: [
+          { key: 'open-scheduling', label: 'Open scheduling', onClick: () => switchTab('scheduling') },
+          { key: 'audit', label: 'View in audit log', onClick: () => navigate('audit') },
+        ],
+      },
+      {
+        key: 'handoff',
+        label: 'Handoff retrievable by a receiving clinician',
+        done: hasVerifiedRecord,
+        menu: [
+          {
+            key: 'retrieve',
+            label: 'Retrieve verified record',
+            onClick: () => navigate('retrieve'),
+            disabled: !hasVerifiedRecord,
+          },
+          { key: 'audit', label: 'View in audit log', onClick: () => navigate('audit') },
+        ],
+      },
+    ];
+
+    const filteredPatients = workItems.filter((item) => {
+      const q = profileSearch.trim().toLowerCase();
+      const matchesQuery =
+        !q ||
+        item.patient.toLowerCase().includes(q) ||
+        item.hospitalId.toLowerCase().includes(q);
+      const matchesStatus = profileStatusFilter === 'All' || item.status === profileStatusFilter;
+      return matchesQuery && matchesStatus;
+    });
+    const sortedPatients =
+      profileSort === 'az'
+        ? [...filteredPatients].sort((a, b) => a.patient.localeCompare(b.patient))
+        : [...filteredPatients].reverse();
+
+    const tabs: Array<{ key: typeof profileTab; label: string }> = [
+      { key: 'overview', label: 'Overview' },
+      { key: 'care', label: 'Care Management' },
+      { key: 'documents', label: 'Documents' },
+      { key: 'scheduling', label: 'Scheduling' },
+      { key: 'encounters', label: 'Encounters' },
+    ];
+
+    return (
+      <div className={`pp-root ${patientsPanelOpen ? '' : 'is-panel-collapsed'}`}>
+        <div className="pp-main">
+          {/* Header */}
+          <section className="pp-header">
+            <button
+              className="pp-back-btn"
+              type="button"
+              aria-label="Back to worklist"
+              onClick={() => navigate('worklist')}
+            >
+              <IconChevronLeft className="w-4 h-4" />
+            </button>
+            <div className="pp-header-row">
+              <div className="pp-avatar">{initials}</div>
+              <div className="pp-identity">
+                <h1>{selectedItem.patient}</h1>
+                <p className="pp-subline">
+                  {selectedProfile.dob} ({age} y) · {selectedProfile.sex}
+                </p>
+              </div>
+              <div className="pp-stats">
+                <div className="pp-stat">
+                  <span>MRN</span>
+                  <strong>{selectedItem.hospitalId}</strong>
+                </div>
+                <div className="pp-stat">
+                  <span>Follow-up</span>
+                  <strong className="pp-stat-dot-row">
+                    <span
+                      className="pp-dot"
+                      style={{ background: statusDotColor[selectedItem.status] }}
+                    />
+                    {selectedItem.status}
+                  </strong>
+                </div>
+                <div className="pp-stat">
+                  <span>Programs</span>
+                  <strong title={selectedProfile.programs.join(', ')}>
+                    {selectedProfile.programs.length}
+                  </strong>
+                </div>
+              </div>
+              <div className="pp-header-nav">
+                <button
+                  className="pp-icon-btn"
+                  type="button"
+                  aria-label="Previous patient"
+                  onClick={() => cyclePatient(-1)}
+                >
+                  <IconChevronLeft className="w-4 h-4" />
+                </button>
+                <button
+                  className="pp-icon-btn"
+                  type="button"
+                  aria-label="Next patient"
+                  onClick={() => cyclePatient(1)}
+                >
+                  <IconChevronRight className="w-4 h-4" />
+                </button>
+              </div>
             </div>
-          </div>
-          <div className="record-header-actions">
-            <StatusPill status={hasVerifiedRecord ? 'Physician verified' : selectedItem.status} />
+            <div className="pp-chips">
+              <span className="pp-chip">Goals-of-care cohort</span>
+              <span className="pp-chip">{teamChip}</span>
+              <span className="pp-chip">ABHA: not linked</span>
+            </div>
+          </section>
+
+          {/* Tab bar */}
+          <div className="pp-tabbar">
+            <div className="pp-tablist" role="tablist">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.key}
+                  role="tab"
+                  type="button"
+                  aria-selected={profileTab === tab.key}
+                  className={`pp-tab ${profileTab === tab.key ? 'is-active' : ''}`}
+                  onClick={() => switchTab(tab.key)}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
             <button
               className="secondary-button"
               type="button"
@@ -2038,42 +2873,513 @@ export function ContinuityPrototype() {
               Retrieve verified record
             </button>
           </div>
-        </section>
 
-        <div className="record-meta-grid">
-          <div>
-            <span>Follow-up owner</span>
-            <strong>{selectedItem.owner}</strong>
-          </div>
-          <div>
-            <span>Next planned touchpoint</span>
-            <strong>{selectedItem.due}</strong>
-          </div>
-          <div>
-            <span>Verified Version</span>
-            <strong>
-              {versionPublished
-                ? 'Version 2 (28 Aug 2026)'
-                : hasVerifiedRecord
-                  ? `Version 1 (${selectedProfile.verified})`
-                  : 'No released version'}
-            </strong>
-          </div>
-          <div>
-            <span>Access Tier</span>
-            <strong>Authorised care team only</strong>
-          </div>
-        </div>
+          {/* Overview tab */}
+          {profileTab === 'overview' && (
+            <div className="pp-overview">
+              <section className="detail-card pp-timeline-card">
+                <div className="card-header">
+                  <div className="card-header-titles">
+                    <h2>Patient Timeline</h2>
+                  </div>
+                  <span className="pp-year-chip">2026</span>
+                  <button
+                    className="pp-icon-btn"
+                    type="button"
+                    aria-label="Open all encounters"
+                    onClick={() => switchTab('encounters')}
+                  >
+                    <IconExpand className="w-4 h-4" />
+                  </button>
+                </div>
+                <ol className="timeline-list pp-timeline-list" ref={profileTimelineRef}>
+                  {timelineItems.map((item) => (
+                    <li key={`${item.date}-${item.title}`}>
+                      <span className="timeline-date">{item.date}</span>
+                      <div className="timeline-content">
+                        <strong>{item.title}</strong>
+                        <p className="pp-clamp-2">{item.body}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+                <button className="text-button pp-fullhistory-link" type="button" onClick={() => switchTab('encounters')}>
+                  Full history →
+                </button>
+              </section>
 
-        <div className="record-layout">
-          <div className="record-main-column">
-            {/* Continuity Status */}
+              <div className="pp-overview-grid">
+                <section className="detail-card pp-description-card">
+                  <div className="card-header">
+                    <div className="card-header-titles">
+                      <h2>Patient Description</h2>
+                    </div>
+                  </div>
+                  <p>
+                    {selectedItem.patient}, {age}, is in the goals-of-care continuity cohort under{' '}
+                    {selectedProfile.team}. Recorded diagnosis: {selectedProfile.stage}. Primary
+                    contact: {selectedProfile.participant}. Current follow-up: {selectedItem.purpose},
+                    owned by {selectedItem.owner}, due {selectedItem.due}.
+                  </p>
+                  <p className="pp-muted-note">
+                    Synthetic record. This profile coordinates follow-up and documents a
+                    clinician-led conversation. It does not score risk, estimate prognosis or
+                    recommend treatment.
+                  </p>
+                </section>
+
+                <section className="detail-card pp-goals-card">
+                  <div className="card-header">
+                    <div className="card-header-titles">
+                      <h2>Goals & Activities</h2>
+                    </div>
+                  </div>
+                  {isMeera ? (
+                    <div className="pp-goals-list">
+                      {goalsRows.map((row) => (
+                        <div className="pp-goal-row" key={row.key}>
+                          <span className="pp-goal-percent">{row.percent}%</span>
+                          <div className="pp-goal-body">
+                            <span className="pp-goal-label">{row.label}</span>
+                            <div
+                              className="pp-progress"
+                              role="progressbar"
+                              aria-valuenow={row.percent}
+                              aria-valuemin={0}
+                              aria-valuemax={100}
+                            >
+                              <div className="pp-progress-fill" style={{ width: `${row.percent}%` }} />
+                            </div>
+                            <span className="pp-goal-caption">{row.caption}</span>
+                          </div>
+                          <button
+                            className="pp-icon-btn"
+                            type="button"
+                            aria-label={row.label}
+                            onClick={row.onClick}
+                          >
+                            <IconChevronRight className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="compact-empty-state">
+                      No guided conversation is loaded for this synthetic patient.
+                    </div>
+                  )}
+                </section>
+
+                <section className="detail-card pp-actions-card">
+                  <div className="card-header">
+                    <div className="card-header-titles">
+                      <h2>Actions</h2>
+                    </div>
+                    <button
+                      className="pp-icon-btn"
+                      type="button"
+                      aria-label="Open care management"
+                      onClick={() => switchTab('care')}
+                    >
+                      <IconExpand className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <div className="pp-actions-list">
+                    {actionRows.map((row) => (
+                      <button
+                        key={row.key}
+                        type="button"
+                        className="pp-action-row"
+                        onClick={row.onClick}
+                      >
+                        <span className={`pp-checkbox ${row.done ? 'is-done' : ''}`}>
+                          {row.done && <IconCheck className="w-3 h-3" />}
+                        </span>
+                        <span>{row.label}</span>
+                        <span className="visually-hidden">{row.done ? '(done)' : '(to do)'}</span>
+                      </button>
+                    ))}
+                  </div>
+                </section>
+
+                <section className="detail-card pp-measures-card">
+                  <div className="card-header">
+                    <div className="card-header-titles">
+                      <h2>Continuity Measures & Documentation</h2>
+                    </div>
+                    <button
+                      className="pp-icon-btn"
+                      type="button"
+                      aria-label="Open documents"
+                      onClick={() => switchTab('documents')}
+                    >
+                      <IconExpand className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <div className="pp-measures-list">
+                    {measureRows.map((row) => (
+                      <div className="pp-measure-row" key={row.key}>
+                        <span className="pp-bullet" />
+                        <span className="pp-measure-label">{row.label}</span>
+                        <StatusPill status={row.done ? 'Completed' : 'Pending'} />
+                        <div className="pp-kebab-wrap">
+                          <button
+                            className="pp-icon-btn"
+                            type="button"
+                            aria-haspopup="menu"
+                            aria-expanded={openMeasureMenu === row.key}
+                            aria-label={`Actions for ${row.label}`}
+                            onClick={() =>
+                              setOpenMeasureMenu(openMeasureMenu === row.key ? null : row.key)
+                            }
+                          >
+                            <IconKebab className="w-4 h-4" />
+                          </button>
+                          {openMeasureMenu === row.key && (
+                            <div className="pp-menu" role="menu">
+                              {row.menu.map((item) => (
+                                <button
+                                  key={item.key}
+                                  role="menuitem"
+                                  type="button"
+                                  disabled={item.disabled}
+                                  onClick={() => {
+                                    setOpenMeasureMenu(null);
+                                    item.onClick();
+                                  }}
+                                >
+                                  {item.label}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              </div>
+            </div>
+          )}
+
+          {/* Care management tab */}
+          {profileTab === 'care' && (
+            <div className="pp-tab-columns">
+              <section className="detail-card">
+                <div className="card-header">
+                  <div className="card-header-titles">
+                    <h2>Continuity status & coordination</h2>
+                    <span>Clinician-planned operational follow-up and proxy engagement</span>
+                  </div>
+                  <button
+                    className="text-button"
+                    type="button"
+                    disabled={!isCareCoordinator}
+                    onClick={() => navigate('outreach')}
+                  >
+                    {isCareCoordinator ? 'Record outreach →' : 'Coordinator role required'}
+                  </button>
+                </div>
+                <div className="continuity-grid">
+                  <div>
+                    <span>Follow-Up Purpose</span>
+                    <strong>{selectedItem.purpose}</strong>
+                  </div>
+                  <div>
+                    <span>Current Status</span>
+                    <strong>{selectedItem.status}</strong>
+                  </div>
+                  <div>
+                    <span>Designated Surrogate / Contact</span>
+                    <strong>{selectedProfile.participant}</strong>
+                    <span className="text-xs text-gray-500 mt-1 block">{selectedProfile.phone}</span>
+                  </div>
+                  <div>
+                    <span>Latest Care Team Activity</span>
+                    <strong>{selectedItem.lastActivity}</strong>
+                  </div>
+                </div>
+                {latestOutreach && (
+                  <div className="record-boundary outreach-record" role="status">
+                    <IconCheck className="w-4 h-4 flex-shrink-0" />
+                    <span>
+                      <strong>Latest outreach · {latestOutreach.outcome}</strong>
+                      {latestOutreach.note} Next planned review: {latestOutreach.nextReviewDate} · {latestOutreach.actor}.
+                    </span>
+                  </div>
+                )}
+                {selectedItem.coordinationNote && (
+                  <div className="record-boundary enrolment-record">
+                    <IconInfo className="w-4 h-4 flex-shrink-0" />
+                    <span>
+                      <strong>Enrolment note · {selectedItem.contactChannel}</strong>
+                      {selectedItem.coordinationNote}
+                    </span>
+                  </div>
+                )}
+              </section>
+
+              <section className="detail-card">
+                <div className="card-header">
+                  <div className="card-header-titles">
+                    <h2>Workflow actions</h2>
+                    <span>Role-aware tasks</span>
+                  </div>
+                </div>
+                <div className="stacked-actions">
+                  <button
+                    className="primary-button"
+                    type="button"
+                    disabled={!isMeera || !isTreatingPhysician}
+                    onClick={() => {
+                      if (isMeera) navigate('draft');
+                    }}
+                  >
+                    <IconFileEdit className="w-4 h-4" />
+                    {!isMeera
+                      ? 'Source note unavailable'
+                      : isTreatingPhysician
+                        ? 'Prepare summary draft'
+                        : 'Physician update required'}
+                  </button>
+                  <button
+                    className="secondary-button"
+                    type="button"
+                    disabled={!isCareCoordinator}
+                    onClick={() => navigate('outreach')}
+                  >
+                    <IconClipboardList className="w-4 h-4" />
+                    {isCareCoordinator ? 'Record coordinator outreach' : 'Coordinator role required'}
+                  </button>
+                  <button className="secondary-button" type="button" onClick={() => navigate('audit')}>
+                    <IconHistory className="w-4 h-4" />
+                    View full audit trail
+                  </button>
+                </div>
+              </section>
+            </div>
+          )}
+
+          {/* Documents tab */}
+          {profileTab === 'documents' && (
+            <div className="pp-tab-stack">
+              <section className="detail-card verified-summary-card">
+                <div className="card-header">
+                  <div className="card-header-titles">
+                    <h2>{hasVerifiedRecord ? 'Latest verified conversation summary' : 'No verified summary released'}</h2>
+                    <span>
+                      {versionPublished
+                        ? 'Version 2 · Verified 28 Aug 2026 by Dr Sujay'
+                        : hasVerifiedRecord
+                          ? `Version 1 · Verified ${selectedProfile.verified} by Dr Sujay`
+                          : 'A clinician-reviewed draft is required before retrieval'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    {versionPublished && (
+                      <button className="text-button" type="button" onClick={() => setDiffOpen(true)}>
+                        <IconColumns className="w-3.5 h-3.5" /> Compare versions
+                      </button>
+                    )}
+                    {hasVerifiedRecord && summaryFieldsAvailable && (
+                      <button className="text-button" type="button" onClick={copySummaryToClipboard}>
+                        <IconCopy className="w-3.5 h-3.5" /> Copy
+                      </button>
+                    )}
+                    <button
+                      className="primary-button"
+                      style={{ minHeight: '32px', fontSize: '11px', padding: '0 12px' }}
+                      type="button"
+                      disabled={!isMeera || !isTreatingPhysician}
+                      onClick={() => {
+                        if (isMeera) navigate('draft');
+                      }}
+                    >
+                      {!isMeera
+                        ? 'Source note unavailable'
+                        : isTreatingPhysician
+                          ? 'Update version'
+                          : 'Physician update required'}
+                    </button>
+                  </div>
+                </div>
+                {hasVerifiedRecord ? (
+                  summaryFieldsAvailable ? (
+                    <div className="summary-grid">
+                      <div>
+                        <span>1. Patient&apos;s Stated Priorities</span>
+                        <p>{releasedFields.priorities}</p>
+                      </div>
+                      <div>
+                        <span>2. People Present & Roles</span>
+                        <p>{releasedFields.participants}</p>
+                      </div>
+                      <div>
+                        <span>3. Scope & Topics Discussed</span>
+                        <p>{releasedFields.topics}</p>
+                      </div>
+                      <div>
+                        <span>4. Unresolved / Items Not Stated</span>
+                        <p>{releasedFields.openQuestions}</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="empty-state compact-empty-state">
+                      <p>Version metadata exists for this synthetic patient, but its source-linked field content is not loaded in this demonstration.</p>
+                      <button
+                        className="primary-button"
+                        type="button"
+                        disabled
+                      >
+                        Source note unavailable
+                      </button>
+                    </div>
+                  )
+                ) : (
+                  <div className="empty-state compact-empty-state">
+                    <p>This synthetic patient has no released goals-of-care summary.</p>
+                    <button
+                      className="primary-button"
+                      type="button"
+                      disabled
+                    >
+                      Source note unavailable
+                    </button>
+                  </div>
+                )}
+                <div className="record-boundary">
+                  <IconInfo className="w-4 h-4 flex-shrink-0" />
+                  <span>
+                    {hasVerifiedRecord
+                      ? 'This verifies what was documented in a structured conversation. It is not a treatment order or legal directive.'
+                      : 'No treatment preference should be inferred until a clinician-reviewed conversation summary is released.'}
+                  </span>
+                </div>
+              </section>
+
+              <section className="detail-card">
+                <div className="card-header">
+                  <div className="card-header-titles">
+                    <h2>Version history</h2>
+                    <span>Append-only version history in this demonstration</span>
+                  </div>
+                </div>
+                {hasVerifiedRecord ? (
+                  <div className="version-list">
+                    {versionPublished && (
+                    <div className="version-row current">
+                      <div>
+                        <strong>Version 2 (Current)</strong>
+                        <span>28 Aug 2026 · Dr Sujay</span>
+                        <span>Acknowledgement: {authorisation}</span>
+                      </div>
+                      <StatusPill status="Current" />
+                    </div>
+                  )}
+                    <div className={`version-row ${versionPublished ? '' : 'current'}`}>
+                      <div>
+                        <strong>Version 1 {versionPublished ? '(Superseded)' : '(Current)'}</strong>
+                        <span>{selectedProfile.verified} · Dr Sujay</span>
+                        <span>Acknowledgement: Verbal acknowledgement recorded by care team</span>
+                      </div>
+                      <StatusPill status={versionPublished ? 'Superseded' : 'Current'} />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="compact-empty-state">No released versions.</div>
+                )}
+                <div className="stacked-actions">
+                  {versionPublished && (
+                    <button className="secondary-button" type="button" onClick={() => setDiffOpen(true)}>
+                      <IconColumns className="w-4 h-4" />
+                      Compare v1 vs v2
+                    </button>
+                  )}
+                  <button className="wide-quiet-button" type="button" onClick={() => navigate('records')}>
+                    View all version archives
+                  </button>
+                </div>
+              </section>
+
+              <section className="detail-card identity-sharing-card">
+                <div className="card-header">
+                  <div className="card-header-titles">
+                    <h2>Identity & sharing</h2>
+                    <span>Kept honest for this demonstration</span>
+                  </div>
+                  <StatusPill status="Not connected" />
+                </div>
+                <dl className="identity-sharing-list">
+                  <div>
+                    <dt>ABHA Number</dt>
+                    <dd>Not linked in this demo</dd>
+                  </div>
+                  <div>
+                    <dt>Sharing basis</dt>
+                    <dd>Consent + retrieval purpose</dd>
+                  </div>
+                  <div>
+                    <dt>Data location</dt>
+                    <dd>Browser-local synthetic record</dd>
+                  </div>
+                </dl>
+                <div className="record-boundary">
+                  <IconInfo className="w-4 h-4 flex-shrink-0" />
+                  <span>ABHA is optional. This prototype does not connect to ABDM or create an ABHA number.</span>
+                </div>
+              </section>
+            </div>
+          )}
+
+          {/* Scheduling tab */}
+          {profileTab === 'scheduling' && (
             <section className="detail-card">
               <div className="card-header">
                 <div className="card-header-titles">
-                  <h2>Continuity status & coordination</h2>
-                  <span>Clinician-planned operational follow-up and proxy engagement</span>
+                  <h2>Follow-up schedule</h2>
                 </div>
+              </div>
+              <dl className="identity-sharing-list">
+                <div>
+                  <dt>Follow-up owner</dt>
+                  <dd>{selectedItem.owner}</dd>
+                </div>
+                <div>
+                  <dt>Next planned touchpoint</dt>
+                  <dd>{selectedItem.due}</dd>
+                </div>
+                <div>
+                  <dt>Follow-up purpose</dt>
+                  <dd>{selectedItem.purpose}</dd>
+                </div>
+                <div>
+                  <dt>Current status</dt>
+                  <dd>{selectedItem.status}</dd>
+                </div>
+                <div>
+                  <dt>Latest activity</dt>
+                  <dd>{selectedItem.lastActivity}</dd>
+                </div>
+                <div>
+                  <dt>Next review after outreach</dt>
+                  <dd>{latestOutreach?.nextReviewDate ?? 'No outreach recorded yet'}</dd>
+                </div>
+                <div>
+                  <dt>Verified version</dt>
+                  <dd>
+                    {versionPublished
+                      ? 'Version 2 (28 Aug 2026)'
+                      : hasVerifiedRecord
+                        ? `Version 1 (${selectedProfile.verified})`
+                        : 'No released version'}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Access tier</dt>
+                  <dd>Authorised care team only</dd>
+                </div>
+              </dl>
+              <div className="stacked-actions">
                 <button
                   className="text-button"
                   type="button"
@@ -2083,279 +3389,138 @@ export function ContinuityPrototype() {
                   {isCareCoordinator ? 'Record outreach →' : 'Coordinator role required'}
                 </button>
               </div>
-              <div className="continuity-grid">
-                <div>
-                  <span>Follow-Up Purpose</span>
-                  <strong>{selectedItem.purpose}</strong>
-                </div>
-                <div>
-                  <span>Current Status</span>
-                  <strong>{selectedItem.status}</strong>
-                </div>
-                <div>
-                  <span>Designated Surrogate / Contact</span>
-                  <strong>{selectedProfile.participant}</strong>
-                  <span className="text-xs text-gray-500 mt-1 block">{selectedProfile.phone}</span>
-                </div>
-                <div>
-                  <span>Latest Care Team Activity</span>
-                  <strong>{selectedItem.lastActivity}</strong>
-                </div>
-              </div>
-              {latestOutreach && (
-                <div className="record-boundary outreach-record" role="status">
-                  <IconCheck className="w-4 h-4 flex-shrink-0" />
-                  <span>
-                    <strong>Latest outreach · {latestOutreach.outcome}</strong>
-                    {latestOutreach.note} Next planned review: {latestOutreach.nextReviewDate} · {latestOutreach.actor}.
-                  </span>
-                </div>
-              )}
-              {selectedItem.coordinationNote && (
-                <div className="record-boundary enrolment-record">
-                  <IconInfo className="w-4 h-4 flex-shrink-0" />
-                  <span>
-                    <strong>Enrolment note · {selectedItem.contactChannel}</strong>
-                    {selectedItem.coordinationNote}
-                  </span>
-                </div>
-              )}
             </section>
+          )}
 
-            {/* Timeline */}
-            <section className="detail-card">
-              <div className="card-header">
-                <div className="card-header-titles">
-                  <h2>Conversation timeline</h2>
-                  <span>Chronological record of clinical touches and family discussions</span>
-                </div>
-              </div>
-              <ol className="timeline-list">
-                {timelineItems.map((item) => (
-                  <li key={`${item.date}-${item.title}`}>
-                    <span className="timeline-date">{item.date}</span>
-                    <div className="timeline-content">
-                      <strong>{item.title}</strong>
-                      <p>{item.body}</p>
-                    </div>
-                  </li>
-                ))}
-              </ol>
-            </section>
-
-            {/* Verified Summary */}
-            <section className="detail-card verified-summary-card">
-              <div className="card-header">
-                <div className="card-header-titles">
-                  <h2>{hasVerifiedRecord ? 'Latest verified conversation summary' : 'No verified summary released'}</h2>
-                  <span>
-                    {versionPublished
-                      ? 'Version 2 · Verified 28 Aug 2026 by Dr Sujay'
-                      : hasVerifiedRecord
-                        ? `Version 1 · Verified ${selectedProfile.verified} by Dr Sujay`
-                        : 'A clinician-reviewed draft is required before retrieval'}
-                  </span>
-                </div>
-                <div className="flex items-center gap-3">
-                  {versionPublished && (
-                    <button className="text-button" type="button" onClick={() => setDiffOpen(true)}>
-                      <IconColumns className="w-3.5 h-3.5" /> Compare versions
-                    </button>
-                  )}
-                  {hasVerifiedRecord && summaryFieldsAvailable && (
-                    <button className="text-button" type="button" onClick={copySummaryToClipboard}>
-                      <IconCopy className="w-3.5 h-3.5" /> Copy
-                    </button>
-                  )}
-                  <button
-                    className="primary-button"
-                    style={{ minHeight: '32px', fontSize: '11px', padding: '0 12px' }}
-                    type="button"
-                    disabled={!isMeera || !isTreatingPhysician}
-                    onClick={() => {
-                      if (isMeera) navigate('draft');
-                    }}
-                  >
-                    {!isMeera
-                      ? 'Source note unavailable'
-                      : isTreatingPhysician
-                        ? 'Update version'
-                        : 'Physician update required'}
-                  </button>
-                </div>
-              </div>
-              {hasVerifiedRecord ? (
-                summaryFieldsAvailable ? (
-                  <div className="summary-grid">
-                    <div>
-                      <span>1. Patient&apos;s Stated Priorities</span>
-                      <p>{releasedFields.priorities}</p>
-                    </div>
-                    <div>
-                      <span>2. People Present & Roles</span>
-                      <p>{releasedFields.participants}</p>
-                    </div>
-                    <div>
-                      <span>3. Scope & Topics Discussed</span>
-                      <p>{releasedFields.topics}</p>
-                    </div>
-                    <div>
-                      <span>4. Unresolved / Items Not Stated</span>
-                      <p>{releasedFields.openQuestions}</p>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="empty-state compact-empty-state">
-                    <p>Version metadata exists for this synthetic patient, but its source-linked field content is not loaded in this demonstration.</p>
-                    <button
-                      className="primary-button"
-                      type="button"
-                      disabled
-                    >
-                      Source note unavailable
-                    </button>
-                  </div>
-                )
-              ) : (
-                <div className="empty-state compact-empty-state">
-                  <p>This synthetic patient has no released goals-of-care summary.</p>
-                  <button
-                    className="primary-button"
-                    type="button"
-                    disabled
-                  >
-                    Source note unavailable
-                  </button>
-                </div>
-              )}
-              <div className="record-boundary">
-                <IconInfo className="w-4 h-4 flex-shrink-0" />
-                <span>
-                  {hasVerifiedRecord
-                    ? 'This verifies what was documented in a structured conversation. It is not a treatment order or legal directive.'
-                    : 'No treatment preference should be inferred until a clinician-reviewed conversation summary is released.'}
-                </span>
-              </div>
-            </section>
-          </div>
-
-          <aside className="record-side-column">
-            {/* Version History */}
-            <section className="detail-card">
-              <div className="card-header">
-                <div className="card-header-titles">
-                  <h2>Version history</h2>
-                  <span>Append-only version history in this demonstration</span>
-                </div>
-              </div>
-              {hasVerifiedRecord ? (
-                <div className="version-list">
-                  {versionPublished && (
-                  <div className="version-row current">
-                    <div>
-                      <strong>Version 2 (Current)</strong>
-                      <span>28 Aug 2026 · Dr Sujay</span>
-                      <span>Acknowledgement: {authorisation}</span>
-                    </div>
-                    <StatusPill status="Current" />
-                  </div>
-                )}
-                  <div className={`version-row ${versionPublished ? '' : 'current'}`}>
-                    <div>
-                      <strong>Version 1 {versionPublished ? '(Superseded)' : '(Current)'}</strong>
-                      <span>{selectedProfile.verified} · Dr Sujay</span>
-                      <span>Acknowledgement: Verbal acknowledgement recorded by care team</span>
-                    </div>
-                    <StatusPill status={versionPublished ? 'Superseded' : 'Current'} />
-                  </div>
-                </div>
-              ) : (
-                <div className="compact-empty-state">No released versions.</div>
-              )}
-              <div className="stacked-actions">
-                {versionPublished && (
-                  <button className="secondary-button" type="button" onClick={() => setDiffOpen(true)}>
-                    <IconColumns className="w-4 h-4" />
-                    Compare v1 vs v2
-                  </button>
-                )}
-                <button className="wide-quiet-button" type="button" onClick={() => navigate('records')}>
-                  View all version archives
-                </button>
-              </div>
-            </section>
-
-            {/* Identity and sharing boundary */}
-            <section className="detail-card identity-sharing-card">
-              <div className="card-header">
-                <div className="card-header-titles">
-                  <h2>Identity & sharing</h2>
-                  <span>Kept honest for this demonstration</span>
-                </div>
-                <StatusPill status="Not connected" />
-              </div>
-              <dl className="identity-sharing-list">
-                <div>
-                  <dt>ABHA Number</dt>
-                  <dd>Not linked in this demo</dd>
-                </div>
-                <div>
-                  <dt>Sharing basis</dt>
-                  <dd>Consent + retrieval purpose</dd>
-                </div>
-                <div>
-                  <dt>Data location</dt>
-                  <dd>Browser-local synthetic record</dd>
-                </div>
-              </dl>
-              <div className="record-boundary">
-                <IconInfo className="w-4 h-4 flex-shrink-0" />
-                <span>ABHA is optional. This prototype does not connect to ABDM or create an ABHA number.</span>
-              </div>
-            </section>
-
-            {/* Quick Actions */}
-            <section className="detail-card">
-              <div className="card-header">
-                <div className="card-header-titles">
-                  <h2>Workflow actions</h2>
-                  <span>Role-aware tasks</span>
-                </div>
-              </div>
-              <div className="stacked-actions">
-                <button
-                  className="primary-button"
-                  type="button"
-                  disabled={!isMeera || !isTreatingPhysician}
-                  onClick={() => {
-                    if (isMeera) navigate('draft');
-                  }}
-                >
-                  <IconFileEdit className="w-4 h-4" />
-                  {!isMeera
-                    ? 'Source note unavailable'
-                    : isTreatingPhysician
-                      ? 'Prepare summary draft'
-                      : 'Physician update required'}
-                </button>
-                <button
-                  className="secondary-button"
-                  type="button"
-                  disabled={!isCareCoordinator}
-                  onClick={() => navigate('outreach')}
-                >
-                  <IconClipboardList className="w-4 h-4" />
-                  {isCareCoordinator ? 'Record coordinator outreach' : 'Coordinator role required'}
-                </button>
-                <button className="secondary-button" type="button" onClick={() => navigate('audit')}>
-                  <IconHistory className="w-4 h-4" />
-                  View full audit trail
-                </button>
-              </div>
-            </section>
-          </aside>
+          {/* Encounters tab */}
+          {profileTab === 'encounters' && (
+            <div className="pp-tab-stack">
+              <PatientHistory
+                patientName={selectedItem.patient}
+                events={buildHistoryEvents(selectedItem.hospitalId)}
+                currentPerson={currentRole.split(' · ')[0]}
+              />
+            </div>
+          )}
         </div>
-      </>
+
+        {/* Patients panel */}
+        <aside className="pp-patients">
+          <div className="pp-patients-body">
+            <div className="pp-patients-heading-row">
+              <h2>Patients</h2>
+              <button
+                className="pp-icon-btn pp-panel-handle"
+                type="button"
+                aria-expanded={patientsPanelOpen}
+                aria-label={patientsPanelOpen ? 'Hide patient list' : 'Show patient list'}
+                onClick={() => setPatientsPanelOpen((open) => !open)}
+              >
+                {patientsPanelOpen ? (
+                  <IconChevronRight className="w-4 h-4" />
+                ) : (
+                  <IconChevronLeft className="w-4 h-4" />
+                )}
+              </button>
+            </div>
+            <div className="pp-patients-content">
+              <div className="pp-search-row">
+                <div className="pp-search-input">
+                  <IconSearch className="w-4 h-4" />
+                  <input
+                    type="text"
+                    placeholder="Search patients"
+                    value={profileSearch}
+                    onChange={(event) => setProfileSearch(event.target.value)}
+                  />
+                </div>
+                <button
+                  className="pp-icon-btn"
+                  type="button"
+                  aria-label="Filter patients"
+                  aria-expanded={profileFilterOpen}
+                  onClick={() => setProfileFilterOpen((open) => !open)}
+                >
+                  <IconFilter className="w-4 h-4" />
+                </button>
+              </div>
+              {profileFilterOpen && (
+                <div className="pp-filter-chips">
+                  {(['All', 'Due today', 'Overdue', 'Awaiting review', 'Completed'] as const).map(
+                    (statusOption) => (
+                      <button
+                        key={statusOption}
+                        type="button"
+                        className={`pp-filter-chip ${profileStatusFilter === statusOption ? 'is-active' : ''}`}
+                        onClick={() => setProfileStatusFilter(statusOption)}
+                      >
+                        {statusOption}
+                      </button>
+                    ),
+                  )}
+                </div>
+              )}
+              <div className="pp-sort-row">
+                <button
+                  className="text-button"
+                  type="button"
+                  onClick={() => setProfileSort((sort) => (sort === 'recent' ? 'az' : 'recent'))}
+                >
+                  {profileSort === 'recent' ? 'Recent ▾' : 'A–Z ▾'}
+                </button>
+                <button
+                  className="pp-icon-btn"
+                  type="button"
+                  disabled={!isTreatingPhysician}
+                  title={isTreatingPhysician ? 'Enrol patient' : 'Treating physician role required'}
+                  onClick={() => setEnrolOpen(true)}
+                >
+                  <IconPlus className="w-4 h-4" />
+                </button>
+              </div>
+              <div className="pp-patient-list">
+                {sortedPatients.length === 0 ? (
+                  <div className="compact-empty-state">No patients match.</div>
+                ) : (
+                  sortedPatients.map((item) => {
+                    const profile = patientProfiles[item.hospitalId];
+                    const itemInitials = item.patient
+                      .split(' ')
+                      .map((part) => part[0])
+                      .join('')
+                      .slice(0, 2)
+                      .toUpperCase();
+                    const isSelected = item.hospitalId === selectedId;
+                    return (
+                      <button
+                        key={item.hospitalId}
+                        type="button"
+                        className={`pp-patient-card ${isSelected ? 'is-selected' : ''}`}
+                        aria-current={isSelected ? 'true' : undefined}
+                        onClick={() => selectPatient(item.hospitalId)}
+                      >
+                        <span className="pp-patient-avatar">
+                          {itemInitials}
+                          <span
+                            className="pp-dot pp-patient-dot"
+                            style={{ background: statusDotColor[item.status] }}
+                          />
+                        </span>
+                        <span className="pp-patient-info">
+                          <span className="pp-patient-name">{item.patient}</span>
+                          <span className="pp-patient-meta">
+                            {profile?.dob ?? 'DOB not recorded'}, {item.hospitalId}
+                          </span>
+                        </span>
+                      </button>
+                    );
+                  })
+                )}
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
     );
   }
 
@@ -2741,6 +3906,21 @@ export function ContinuityPrototype() {
               </select>
             </label>
 
+            <div className="record-boundary" role="status">
+              {consentById[selectedId] ? (
+                <span>
+                  Patient consent recorded in the patient portal: {consentById[selectedId].typedName} ·{' '}
+                  {consentById[selectedId].declaration === 'self'
+                    ? 'made these choices themselves'
+                    : 'delegated to their decision-maker'}{' '}
+                  · {consentById[selectedId].signedAt} · {consentById[selectedId].versionLabel}. Simulated
+                  typed signature.
+                </span>
+              ) : (
+                <span>No patient-portal consent recorded for this patient yet.</span>
+              )}
+            </div>
+
             <label className="attestation-row">
               <input
                 type="checkbox"
@@ -2948,6 +4128,7 @@ export function ContinuityPrototype() {
                 <strong>Confidential Clinical Record:</strong> This document summarizes a documented goals-of-care conversation. Re-confirm clinical status with the patient and surrogate before making acute clinical orders.
               </span>
             </div>
+            <EdQuickView record={ectprQuickViews[selectedId] ?? null} audience="clinician" />
             <p className="print-only print-notice">
               Printed from the Continuity Loop demonstration. The patient, record and dates are
               synthetic. This page is not a treatment order, resuscitation order, or legal
@@ -3042,7 +4223,97 @@ export function ContinuityPrototype() {
     );
   }
 
+  function renderAppointments() {
+    const patients: AppointmentPatient[] = workItems.map((item) => {
+      const profile = patientProfiles[item.hospitalId] ?? {
+        age: 61,
+        team: 'Oncology',
+        participant: 'Family participant to be confirmed',
+        dob: 'Not recorded',
+        sex: 'Not recorded',
+      };
+      return {
+        hospitalId: item.hospitalId,
+        name: item.patient,
+        purpose: item.purpose,
+        owner: item.owner,
+        followUpStatus: item.status,
+        lastActivity: item.lastActivity,
+        dob: profile.dob,
+        sex: profile.sex,
+        age: profile.age,
+        team: profile.team,
+        participant: profile.participant,
+        contactChannel: item.contactChannel ?? '',
+      };
+    });
+
+    function hasVerifiedRecord(id: string) {
+      return Boolean(recordStates[id]?.versionPublished) || (patientProfiles[id]?.verified ?? '').includes('2026');
+    }
+
+    function versionLabel(id: string) {
+      return recordStates[id]?.versionPublished
+        ? 'Version 2 · 28 Aug 2026'
+        : (patientProfiles[id]?.verified ?? '').includes('2026')
+          ? `Version 1 · ${patientProfiles[id].verified}`
+          : 'No released version';
+    }
+
+    return (
+      <AppointmentsPage
+        patients={patients}
+        selectedId={selectedId}
+        onSelectPatient={selectPatient}
+        appointments={appointments}
+        onAppointmentsChange={setAppointments}
+        canSchedule={isTreatingPhysician || isCareCoordinator}
+        canStartConversation={isTreatingPhysician}
+        readOnlyReason="Scheduling is limited to the treating physician and the care coordinator in this demonstration."
+        hasVerifiedRecord={hasVerifiedRecord}
+        versionLabel={versionLabel}
+        onAudit={(event, record) => addAudit(event, record, 'SCHEDULE')}
+        onNotify={notify}
+        onOpenProfile={(id) => {
+          const item = workItems.find((w) => w.hospitalId === id);
+          if (item) openPatient(item);
+        }}
+        onStartConversation={(id) => {
+          selectPatient(id);
+          navigate('guide');
+        }}
+        onRetrieve={(id) => {
+          selectPatient(id);
+          navigate('retrieve');
+        }}
+        onRecordOutreach={(id) => {
+          selectPatient(id);
+          navigate('outreach');
+        }}
+        onOpenAudit={() => navigate('audit')}
+        onOpenRecords={() => navigate('records')}
+        onPatientActivity={(id, activity, nextDue) =>
+          setWorkItems((items) =>
+            items.map((w) =>
+              w.hospitalId === id
+                ? { ...w, lastActivity: activity, ...(nextDue ? { due: nextDue } : {}) }
+                : w,
+            ),
+          )
+        }
+      />
+    );
+  }
+
   function renderPatients() {
+    const me = currentRole.split(' · ')[0];
+    const minePatients = workItems.filter((item) => {
+      if (item.owner === me) return true;
+      if (appointments.some((a) => a.hospitalId === item.hospitalId && a.clinician === me)) return true;
+      if (auditEvents.some((e) => e.actor === me && e.record.includes(item.patient))) return true;
+      return false;
+    });
+    const displayedPatients = patientsScope === 'mine' ? minePatients : workItems;
     return (
       <>
         {renderPageHeading(
@@ -3058,8 +4329,32 @@ export function ContinuityPrototype() {
             {isTreatingPhysician ? 'Enrol patient' : 'Treating physician role required'}
           </button>,
         )}
+        <div className="segmented-control" role="group" aria-label="Patient scope">
+          <button
+            type="button"
+            className="segmented-button"
+            aria-pressed={patientsScope === 'all'}
+            onClick={() => setPatientsScope('all')}
+          >
+            All patients ({workItems.length})
+          </button>
+          <button
+            type="button"
+            className="segmented-button"
+            aria-pressed={patientsScope === 'mine'}
+            onClick={() => setPatientsScope('mine')}
+          >
+            My patients ({minePatients.length})
+          </button>
+        </div>
+        {displayedPatients.length === 0 ? (
+          <div className="empty-state">
+            <IconInfo className="w-6 h-6 text-gray-400" />
+            <p>No patients are linked to you yet.</p>
+          </div>
+        ) : (
         <section className="directory-list">
-          {workItems.map((item) => {
+          {displayedPatients.map((item) => {
             const initials = item.patient
               .split(' ')
               .map((p) => p[0])
@@ -3089,6 +4384,7 @@ export function ContinuityPrototype() {
             );
           })}
         </section>
+        )}
       </>
     );
   }
@@ -3415,10 +4711,161 @@ export function ContinuityPrototype() {
       case 'verify': return renderVerify();
       case 'retrieve': return renderRetrieve();
       case 'patients': return renderPatients();
+      case 'appointments': return renderAppointments();
       case 'drafts': return renderDrafts();
       case 'records': return renderRecords();
       case 'audit': return renderAudit();
       case 'help': return renderHelp();
+      case 'my-plan':
+        return (
+          <MyCarePlan
+            patientName={portalPatientName}
+            versionLabel={planVersionLabel(portalPatientId)}
+            verifiedBy="Dr Sujay"
+            verifiedOn={
+              recordStates[portalPatientId]?.versionPublished
+                ? '28 Aug 2026'
+                : (patientProfiles[portalPatientId]?.verified ?? 'Not yet verified')
+            }
+            fields={planFieldsFor(portalPatientId)}
+            quickView={<EdQuickView record={ectprQuickViews[portalPatientId] ?? null} audience="patient" />}
+            consent={consentById[portalPatientId] ?? null}
+            onGoToConsent={() => navigate('consent')}
+          />
+        );
+      case 'my-timeline': {
+        const kindMap: Partial<Record<HistoryEvent['kind'], TimelineEntry['kind']>> = {
+          appointment: 'appointment',
+          call: 'outreach',
+          conversation: 'conversation',
+          version: 'version',
+          consent: 'consent',
+          card: 'card',
+          review: 'review',
+          details: 'details',
+        };
+        const entries: TimelineEntry[] = buildHistoryEvents(portalPatientId)
+          .slice()
+          .sort((a, b) => a.sortKey - b.sortKey)
+          .map((e) => kindMap[e.kind] && {
+            date: e.dateLabel,
+            title: e.title,
+            body: e.detail,
+            kind: kindMap[e.kind] as TimelineEntry['kind'],
+          })
+          .filter((e): e is TimelineEntry => Boolean(e));
+        return (
+          <MyTimeline
+            audience={isPatientSession ? 'patient' : 'family'}
+            patientName={portalPatientName}
+            entries={entries}
+          />
+        );
+      }
+      case 'care-near-me':
+        return <CareNearMe audience={isPatientSession ? 'patient' : 'family'} patientName={portalPatientName} />;
+      case 'my-doctors': {
+        const patientAppointments = appointments.filter(
+          (a) => a.hospitalId === portalPatientId && a.status !== 'Scheduled',
+        );
+        const roleFor = (clinician: string) =>
+          clinician === 'Dr Sujay'
+            ? 'Treating consultant'
+            : clinician === 'Anitha Rao'
+              ? 'Care coordinator'
+              : clinician === 'Dr Isha Menon'
+                ? 'Emergency physician'
+                : 'Care team member';
+        const grouped = new Map<string, CareTeamMember>();
+        for (const a of patientAppointments) {
+          const existing = grouped.get(a.clinician);
+          const visit: PastVisit = {
+            date: formatDateForDisplay(a.date),
+            time: a.time,
+            type: a.type,
+            mode: a.mode,
+            status: a.status,
+            outcome: a.outcome,
+          };
+          if (existing) {
+            existing.visits.push(visit);
+          } else {
+            grouped.set(a.clinician, {
+              name: a.clinician,
+              role: roleFor(a.clinician),
+              organisation: 'Oncology · Palliative care (synthetic)',
+              contactNote: 'Contact details are held by the originating team.',
+              lastVisited: null,
+              visits: [visit],
+            });
+          }
+        }
+        if (!grouped.has('Dr Sujay')) {
+          grouped.set('Dr Sujay', {
+            name: 'Dr Sujay',
+            role: 'Treating consultant',
+            organisation: 'Oncology · Palliative care (synthetic)',
+            contactNote: 'Contact details are held by the originating team.',
+            lastVisited: null,
+            visits: [],
+          });
+        }
+        const members = Array.from(grouped.values()).map((m) => {
+          const attended = m.visits.filter((v) => v.status === 'Attended');
+          const last = attended[attended.length - 1];
+          return { ...m, lastVisited: last ? `${last.date}` : null };
+        });
+        const details = patientDetailsById[portalPatientId];
+        if (details?.localPhysician?.name) {
+          members.push({
+            name: details.localPhysician.name,
+            role: 'Local doctor',
+            organisation: details.localPhysician.clinic || 'Not recorded',
+            contactNote: 'Added by the patient',
+            lastVisited: null,
+            visits: [],
+          });
+        }
+        return (
+          <MyDoctors
+            audience={isPatientSession ? 'patient' : 'family'}
+            patientName={portalPatientName}
+            members={members}
+          />
+        );
+      }
+      case 'emergency-card':
+        return (
+          <>
+            {renderPageHeading('Emergency card', 'Keep this with the patient')}
+            <EmergencyCard
+              record={ectprQuickViews[portalPatientId] ?? null}
+              audience={isPatientSession ? 'patient' : 'family'}
+              issuedOn={cardIssuedById[portalPatientId] ?? null}
+              {...(isPatientSession ? { onIssue: () => issueCard(portalPatientId) } : {})}
+            />
+          </>
+        );
+      case 'my-details':
+        return (
+          <MyDetails
+            details={detailsFor(portalPatientId)}
+            onSave={(next) => saveDetails(portalPatientId, next)}
+            clinicalItems={clinicalItemsFor(portalPatientId)}
+            reviewRequestedOn={reviewRequestedById[portalPatientId] ?? null}
+            onRequestReview={() => requestReview(portalPatientId)}
+          />
+        );
+      case 'consent':
+        return (
+          <ConsentSignature
+            patientName={portalPatientName}
+            versionLabel={planVersionLabel(portalPatientId)}
+            summaryFields={planFieldsFor(portalPatientId)}
+            consent={consentById[portalPatientId] ?? null}
+            onSign={(input) => signConsent(portalPatientId, input)}
+          />
+        );
       default: return renderWorklist();
     }
   }
@@ -3430,15 +4877,102 @@ export function ContinuityPrototype() {
       : ['patient', 'outreach'].includes(view)
         ? 'patients'
         : view;
-  const visibleNavItems = view === 'caregiver'
-    ? navItems.filter((item) => item.view === 'caregiver')
-    : navItems;
+  const mobileNavLabels: Partial<Record<View, string>> = {
+    'my-plan': 'Plan',
+    'my-timeline': 'Journey',
+    'care-near-me': 'Near me',
+    'my-doctors': 'Doctors',
+    'emergency-card': 'Card',
+    'my-details': 'Details',
+    consent: 'Consent',
+    caregiver: 'Journey',
+    home: 'Handoff',
+    guide: 'Guide',
+    worklist: 'Worklist',
+    appointments: 'Appointments',
+    patients: 'Patients',
+    records: 'Records',
+    audit: 'Audit',
+    help: 'Help',
+  };
+  const visibleNavItems = isPatientSession
+    ? patientNavItems
+    : isFamilySession
+      ? familyNavItems
+      : navItems.filter((item) => item.view !== 'caregiver');
+
+  if (authScreen === 'landing') {
+    return (
+      <LandingPage
+        onSignIn={() => setAuthScreen('login')}
+        onSignUp={() => setAuthScreen('signup')}
+        onExploreDemo={() => enterCareTeam('Dr Sujay · Clinical lead')}
+        onFamilyAccess={() => setAuthScreen('family')}
+        onPatientAccess={() => setAuthScreen('patient')}
+      />
+    );
+  }
+  if (authScreen === 'login') {
+    return (
+      <LoginScreen
+        onSignIn={(role) => enterCareTeam(role)}
+        onGoToSignup={() => setAuthScreen('signup')}
+        onGoHome={() => setAuthScreen('landing')}
+        onGoToFamily={() => setAuthScreen('family')}
+        onGoToPatient={() => setAuthScreen('patient')}
+      />
+    );
+  }
+  if (authScreen === 'signup') {
+    return (
+      <SignupScreen
+        onSignUp={(role) => enterCareTeam(role)}
+        onGoToLogin={() => setAuthScreen('login')}
+        onGoHome={() => setAuthScreen('landing')}
+        onGoToFamily={() => setAuthScreen('family')}
+        onGoToPatient={() => setAuthScreen('patient')}
+      />
+    );
+  }
+  if (authScreen === 'patient') {
+    return (
+      <PatientLoginScreen
+        onPatientSignIn={enterPatient}
+        onGoToFamily={() => setAuthScreen('family')}
+        onGoToClinician={() => setAuthScreen('login')}
+        onGoHome={() => setAuthScreen('landing')}
+        patients={workItems.map((w) => ({ hospitalId: w.hospitalId, name: w.patient }))}
+      />
+    );
+  }
+  if (authScreen === 'family') {
+    return (
+      <FamilyLoginScreen
+        onFamilySignIn={enterFamily}
+        onGoToClinician={() => setAuthScreen('login')}
+        onGoHome={() => setAuthScreen('landing')}
+        onGoToPatient={() => setAuthScreen('patient')}
+      />
+    );
+  }
+
+  const familyInitials = (familyMember?.name ?? '')
+    .split(' ')
+    .filter(Boolean)
+    .map((p) => p[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
 
   return (
-    <main className={view === 'caregiver' ? 'app-shell is-caregiver' : 'app-shell'}>
+    <main className={isPatientSession || isFamilySession ? 'app-shell is-portal' : 'app-shell'}>
       {/* Sidebar Navigation */}
       <aside className="sidebar" aria-label="Primary navigation">
-        <button className="brand-button" type="button" onClick={() => navigate('caregiver')}>
+        <button
+          className="brand-button"
+          type="button"
+          onClick={() => navigate(isPatientSession ? 'my-plan' : isFamilySession ? 'caregiver' : 'home')}
+        >
           <span className="brand-mark" aria-hidden="true"><ContinuityMark /></span>
           <div className="brand-titles">
             <strong>Continuity Loop</strong>
@@ -3475,7 +5009,9 @@ export function ContinuityPrototype() {
             <span>Safety Boundary</span>
           </div>
           <p>
-            Documents a clinician-led conversation. It is not a treatment order, legal directive, or autonomous triage system.
+            {isPatientSession || isFamilySession
+              ? 'This app documents what you and your care team agreed. It is not a treatment order or a legal directive.'
+              : 'Documents a clinician-led conversation. It is not a treatment order, legal directive, or autonomous triage system.'}
           </p>
         </div>
       </aside>
@@ -3484,7 +5020,11 @@ export function ContinuityPrototype() {
       <section className="workspace">
         <header className="topbar">
           <div className="topbar-left">
-            <button className="mobile-brand brand-button" type="button" onClick={() => navigate('caregiver')}>
+            <button
+              className="mobile-brand brand-button"
+              type="button"
+              onClick={() => navigate(isPatientSession ? 'my-plan' : isFamilySession ? 'caregiver' : 'home')}
+            >
               <span className="brand-mark" aria-hidden="true"><ContinuityMark /></span>
               <strong>Continuity</strong>
             </button>
@@ -3495,11 +5035,43 @@ export function ContinuityPrototype() {
           </div>
 
           <div className="topbar-right">
-            {view === 'caregiver' ? (
+            {isPatientSession ? (
+              <div className="family-session-bar" aria-label="Patient session">
+                <span className="family-session-label is-patient"><IconLock className="w-3.5 h-3.5" />Patient view</span>
+                <div className="profile-block" aria-label="Signed-in patient">
+                  <span className="profile-initials patient" aria-hidden="true">
+                    {(patientAccount?.name ?? '')
+                      .split(' ')
+                      .filter(Boolean)
+                      .map((p) => p[0])
+                      .join('')
+                      .slice(0, 2)
+                      .toUpperCase() || 'PT'}
+                  </span>
+                  <div className="profile-info">
+                    <strong>{patientAccount?.name}</strong>
+                    <small>Patient</small>
+                  </div>
+                </div>
+                <button className="secondary-button" type="button" onClick={signOut}>Sign out</button>
+              </div>
+            ) : isFamilySession ? (
+              <div className="family-session-bar" aria-label="Family session">
+                <span className="family-session-label"><IconLock className="w-3.5 h-3.5" />Family view · read-only</span>
+                <div className="profile-block" aria-label="Signed-in family member">
+                  <span className="profile-initials family" aria-hidden="true">{familyInitials || 'FM'}</span>
+                  <div className="profile-info">
+                    <strong>{familyMember?.name}</strong>
+                    <small>{familyMember?.relationship}</small>
+                  </div>
+                </div>
+                <button className="secondary-button" type="button" onClick={signOut}>Sign out</button>
+              </div>
+            ) : view === 'caregiver' ? (
               <div className="caregiver-preview-switcher" aria-label="Caregiver demonstration controls">
-                <span><IconLock className="w-3.5 h-3.5" />Read-only caregiver view</span>
+                <span><IconLock className="w-3.5 h-3.5" />Previewing the family view</span>
                 <button className="secondary-button" type="button" onClick={() => navigate('home')}>
-                  Care team
+                  Back to care team
                 </button>
               </div>
             ) : (
@@ -3534,6 +5106,14 @@ export function ContinuityPrototype() {
                     <small>{currentRole.split(' · ')[1]}</small>
                   </div>
                 </div>
+
+                <button
+                  className="secondary-button"
+                  type="button"
+                  onClick={signOut}
+                >
+                  Sign out
+                </button>
               </>
             )}
           </div>
@@ -3549,21 +5129,7 @@ export function ContinuityPrototype() {
               onClick={() => navigate(item.view)}
               aria-current={navView === item.view ? 'page' : undefined}
             >
-              {item.view === 'home'
-                ? 'Handoff'
-                : item.view === 'caregiver'
-                  ? 'Journey'
-                : item.view === 'guide'
-                  ? 'Guide'
-                  : item.view === 'worklist'
-                    ? 'Worklist'
-                    : item.view === 'records'
-                      ? 'Records'
-                      : item.view === 'audit'
-                        ? 'Audit'
-                        : item.view === 'help'
-                          ? 'Help'
-                          : 'Patients'}
+              {mobileNavLabels[item.view] ?? item.label}
             </button>
           ))}
         </nav>

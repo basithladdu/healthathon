@@ -1,39 +1,72 @@
 @import 'tailwindcss';
 
 :root {
-  --canvas: #f6f6f2;
-  --surface: #ffffff;
-  --surface-subtle: #fafaf7;
-  --surface-muted: #f0f1ec;
-  --surface-highlight: #e8f0ec;
-  --ink: #111a18;
+  /* ── Neutrals ─────────────────────────────────────── */
+  --bg:          #f2f5f3;
+  --surface:     #ffffff;
+  --surface-2:   #f8faf9;
+  --surface-3:   #eef3f0;
+  --border:      #e2e9e5;
+  --border-strong: #cbd8d1;
+  --text:        #12201b;
+  --text-2:      #5c6f68;
+  --text-3:      #8fa39b;
+
+  /* ── Accent: clinical green ───────────────────────── */
+  --accent:      #0f6b4f;
+  --accent-2:    #14855f;
+  --accent-deep: #0a4a36;
+  --accent-soft: #e6f4ee;
+  --accent-line: #bfe0d0;
+
+  /* ── Semantic triples: pastel fill / dark ink / mid line ── */
+  --safe-bg:     #e6f5ec;  --safe-ink:     #146b3e;  --safe-line:     #b4e0c6;
+  --low-bg:      #e9f2f8;  --low-ink:      #1c5680;  --low-line:      #bcd8ea;
+  --medium-bg:   #fdf4e5;  --medium-ink:   #8a5a09;  --medium-line:   #f2ddb4;
+  --high-bg:     #fdeee4;  --high-ink:     #9a4310;  --high-line:     #f6cfb4;
+  --critical-bg: #fdeaea;  --critical-ink: #99231f;  --critical-line: #f5c3c1;
+
+  /* ── Elevation ────────────────────────────────────── */
+  --shadow-sm: 0 1px 2px rgba(16,40,32,.05);
+  --shadow:    0 2px 8px rgba(16,40,32,.06), 0 1px 2px rgba(16,40,32,.04);
+  --shadow-lg: 0 12px 32px rgba(16,40,32,.14);
+
+  /* ── Radii ────────────────────────────────────────── */
+  --r-sm: 8px; --r: 12px; --r-lg: 16px; --r-xl: 22px;
+
+  /* ── Type ─────────────────────────────────────────── */
+  --font-ui: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: 'SF Mono', ui-monospace, 'Cascadia Code', Menlo, Consolas, monospace;
+
+  --focus-ring: #0f6b4f;
+  --focus-halo: #ffffff;
+
+  /* ── Back-compat aliases (existing rules depend on these) ── */
+  --canvas: var(--bg);
+  --surface-subtle: var(--surface-2);
+  --surface-muted: var(--surface-3);
+  --surface-highlight: var(--accent-soft);
+  --ink: var(--text);
   --ink-secondary: #33413e;
-  --muted: #62726e;
-  --muted-light: #8e9e9a;
-  --line: #dcdfd8;
-  --line-strong: #c4cac2;
-  --line-subtle: #e9ece7;
-
-  --accent: #115344;
-  --accent-dark: #0a3a2f;
-  --accent-light: #1b6d5b;
-  --accent-soft: #e3efe9;
-  --accent-border: #b3d4c8;
-
-  --danger: #9e2a2b;
-  --danger-soft: #fbf0f0;
-  --danger-border: #f0c3c3;
-
-  --warning: #925400;
-  --warning-soft: #fef7ec;
-  --warning-border: #fedcb0;
-
-  --info: #155e75;
-  --info-soft: #ecfeff;
-  --info-border: #b5e8f0;
-
-  --neutral-soft: #ebeeed;
-  --neutral-border: #cbd5d1;
+  --muted: var(--text-2);
+  --muted-light: var(--text-3);
+  --line: var(--border);
+  --line-strong: var(--border-strong);
+  --line-subtle: #edf2ef;
+  --accent-dark: var(--accent-deep);
+  --accent-light: var(--accent-2);
+  --accent-border: var(--accent-line);
+  --danger: var(--critical-ink);
+  --danger-soft: var(--critical-bg);
+  --danger-border: var(--critical-line);
+  --warning: var(--medium-ink);
+  --warning-soft: var(--medium-bg);
+  --warning-border: var(--medium-line);
+  --info: var(--low-ink);
+  --info-soft: var(--low-bg);
+  --info-border: var(--low-line);
+  --neutral-soft: var(--surface-3);
+  --neutral-border: var(--border-strong);
 }
 
 * {
@@ -50,7 +83,7 @@ body {
   margin: 0;
   background: var(--canvas);
   color: var(--ink);
-  font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-family: var(--font-ui);
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
 }
@@ -2854,7 +2887,7 @@ td > span:not(.status-pill):not(.owner-badge):not(.audit-badge) {
 
 .entry-number {
   color: var(--accent);
-  font-family: var(--font-geist-mono), monospace;
+  font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 700;
 }
@@ -3005,7 +3038,7 @@ td > span:not(.status-pill):not(.owner-badge):not(.audit-badge) {
 
 .domain-index {
   color: var(--muted-light);
-  font-family: var(--font-geist-mono), monospace;
+  font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 700;
 }
@@ -3455,7 +3488,7 @@ td > span:not(.status-pill):not(.owner-badge):not(.audit-badge) {
 
 .route-step-number {
   color: var(--muted-light);
-  font-family: var(--font-geist-mono), monospace;
+  font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 750;
   line-height: 24px;
@@ -6418,3 +6451,876 @@ thead th:last-child {
     gap: 18px;
   }
 }
+
+/* ==========================================================================
+   SafeShell-derived design pass: shapes, type scale, elevation.
+   ========================================================================== */
+
+/* ── Typography foundation ────────────────────────────────────────────── */
+body {
+  font-size: 14px !important;
+  line-height: 1.5 !important;
+  font-family: var(--font-ui) !important;
+  -webkit-font-smoothing: antialiased;
+}
+
+.page-heading h1 {
+  font-size: 21px !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.02em !important;
+}
+
+.section-heading h2,
+.card-header h2 {
+  font-size: 14.5px !important;
+  font-weight: 650 !important;
+  letter-spacing: -0.01em !important;
+}
+
+h3 {
+  font-size: 13.5px !important;
+  font-weight: 650 !important;
+}
+
+.eyebrow,
+.document-kicker,
+.metric-label,
+th,
+.fact .k {
+  font-size: 10.5px !important;
+  font-weight: 650 !important;
+  text-transform: uppercase !important;
+  letter-spacing: .06em !important;
+  color: var(--text-3) !important;
+}
+
+.heading-support,
+.card-header-titles span {
+  font-size: 12px !important;
+  color: var(--text-3) !important;
+}
+
+code, .mono, .print-notice {
+  font-family: var(--font-mono);
+}
+
+/* ── Sidebar ──────────────────────────────────────────────────────────── */
+.app-shell {
+  grid-template-columns: 232px minmax(0, 1fr) !important;
+}
+
+.sidebar {
+  background: var(--surface) !important;
+  border-right: 1px solid var(--border) !important;
+  padding: 18px 12px !important;
+  gap: 4px !important;
+}
+
+.brand-mark {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px !important;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2)) !important;
+  color: #fff;
+  display: grid !important;
+  place-items: center !important;
+}
+
+.brand-titles strong {
+  font-size: 15px !important;
+  font-weight: 650 !important;
+  letter-spacing: -0.01em !important;
+}
+
+.brand-titles span {
+  font-size: 10.5px !important;
+  text-transform: uppercase !important;
+  letter-spacing: .04em !important;
+  color: var(--text-3) !important;
+}
+
+.nav-item {
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+  padding: 8px 10px !important;
+  border-radius: var(--r-sm) !important;
+  color: var(--text-2) !important;
+  transition: background .12s, color .12s;
+}
+
+.nav-item:hover {
+  background: var(--surface-2) !important;
+  color: var(--text) !important;
+}
+
+.nav-item.active,
+.nav-item[aria-current="page"] {
+  background: var(--accent-soft) !important;
+  color: var(--accent) !important;
+  font-weight: 600 !important;
+}
+
+.nav-count-badge {
+  margin-left: auto;
+  font-size: 11px !important;
+  font-weight: 650 !important;
+  border-radius: 99px !important;
+  padding: 1px 7px !important;
+  background: var(--accent-soft) !important;
+  color: var(--accent) !important;
+  border: 1px solid var(--accent-line) !important;
+}
+
+.scope-note {
+  margin-top: auto;
+  background: var(--surface-2) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--r) !important;
+  padding: 10px 12px !important;
+  font-size: 11.5px !important;
+  color: var(--text-2) !important;
+}
+
+/* ── Topbar ───────────────────────────────────────────────────────────── */
+.topbar {
+  padding: 16px 26px !important;
+  border-bottom: 1px solid var(--border) !important;
+  background: var(--surface) !important;
+}
+
+.environment-label {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11.5px !important;
+  font-weight: 600 !important;
+  padding: 4px 10px !important;
+  border-radius: 99px !important;
+  background: var(--safe-bg) !important;
+  color: var(--safe-ink) !important;
+  border: 1px solid var(--safe-line) !important;
+}
+
+.environment-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor !important;
+}
+
+/* ── Stat tiles ───────────────────────────────────────────────────────── */
+.today-stat-grid {
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)) !important;
+  gap: 14px !important;
+}
+
+.today-stat {
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--r-lg) !important;
+  padding: 16px 18px !important;
+  box-shadow: var(--shadow-sm) !important;
+  transition: transform .12s, box-shadow .12s;
+}
+
+.today-stat:hover,
+.today-stat:active,
+.today-stat.active,
+.today-stat[aria-pressed="true"] {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow) !important;
+}
+
+.today-stat.active,
+.today-stat[aria-pressed="true"] {
+  background: var(--accent-soft) !important;
+  border-color: var(--accent-line) !important;
+}
+
+.today-stat.active .metric-number,
+.today-stat.active .metric-label,
+.today-stat[aria-pressed="true"] .metric-number,
+.today-stat[aria-pressed="true"] .metric-label {
+  color: var(--accent) !important;
+}
+
+.metric-number {
+  font-size: 27px !important;
+  font-weight: 680 !important;
+  letter-spacing: -.03em !important;
+}
+
+/* ── Cards & panels ───────────────────────────────────────────────────── */
+.detail-card,
+.worklist-panel,
+.next-action-card,
+.verified-record-card,
+.care-journey-card,
+.glossary-card {
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--r-lg) !important;
+  box-shadow: var(--shadow-sm) !important;
+  overflow: hidden;
+}
+
+.card-header {
+  padding: 14px 18px !important;
+  border-bottom: 1px solid var(--border) !important;
+}
+
+/* ── Tables ───────────────────────────────────────────────────────────── */
+.table-wrap {
+  border: 1px solid var(--border) !important;
+  border-radius: var(--r-lg) !important;
+  background: var(--surface) !important;
+  overflow-x: auto;
+}
+
+table {
+  font-size: 12.5px !important;
+}
+
+th {
+  padding: 11px 14px !important;
+}
+
+td {
+  padding: 11px 14px !important;
+  border-bottom: 1px solid var(--border) !important;
+}
+
+tr:last-child td {
+  border-bottom: none !important;
+}
+
+tbody tr:hover {
+  background: var(--surface-2) !important;
+}
+
+/* ── Buttons ──────────────────────────────────────────────────────────── */
+.primary-button,
+.secondary-button,
+.text-button,
+.back-button,
+.row-action button {
+  font-size: 13px !important;
+  font-weight: 620 !important;
+  padding: 9px 16px !important;
+  border-radius: var(--r-sm) !important;
+  border: 1px solid var(--border) !important;
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  cursor: pointer;
+  transition: filter .12s, background .12s;
+}
+
+.primary-button {
+  background: var(--accent) !important;
+  border-color: var(--accent) !important;
+  color: #fff !important;
+}
+
+.primary-button:hover,
+.secondary-button:hover,
+.text-button:hover,
+.back-button:hover,
+.row-action button:hover {
+  filter: brightness(.97);
+}
+
+.primary-button:disabled,
+.secondary-button:disabled,
+.text-button:disabled,
+.back-button:disabled,
+.row-action button:disabled {
+  opacity: .55 !important;
+  cursor: not-allowed;
+  filter: none;
+}
+
+.row-action button {
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  padding: 4px 9px !important;
+}
+
+/* ── Status pills / tags ─────────────────────────────────────────────── */
+.status-pill,
+.owner-badge,
+.meta-chip,
+.audit-badge,
+.field-status-tag,
+.care-journey-version {
+  font-size: 10.5px !important;
+  font-weight: 650 !important;
+  padding: 2px 8px !important;
+  border-radius: 99px !important;
+  border: 1px solid transparent !important;
+  letter-spacing: .01em;
+  white-space: nowrap;
+}
+
+/* safe: verified / completed / current / ready / discussed */
+.status-completed,
+.status-physician-verified,
+.status-current,
+.status-access-logged {
+  background: var(--safe-bg) !important;
+  color: var(--safe-ink) !important;
+  border-color: var(--safe-line) !important;
+}
+
+/* low: awaiting review / draft / pending */
+.status-awaiting-review,
+.status-draft,
+.status-not-connected {
+  background: var(--low-bg) !important;
+  color: var(--low-ink) !important;
+  border-color: var(--low-line) !important;
+}
+
+/* medium: due today / defer / clarify / not-stated */
+.status-due-today,
+.status-clarify,
+.status-not-stated {
+  background: var(--medium-bg) !important;
+  color: var(--medium-ink) !important;
+  border-color: var(--medium-line) !important;
+}
+
+/* high: overdue / awaiting outreach */
+.status-overdue,
+.status-awaiting-outreach {
+  background: var(--high-bg) !important;
+  color: var(--high-ink) !important;
+  border-color: var(--high-line) !important;
+}
+
+/* critical: escalated / declined / break-glass / superseded */
+.status-escalated,
+.status-superseded {
+  background: var(--critical-bg) !important;
+  color: var(--critical-ink) !important;
+  border-color: var(--critical-line) !important;
+}
+
+/* ── Banners ──────────────────────────────────────────────────────────── */
+.record-boundary,
+.protocol-notice,
+.retrieval-warning,
+.release-blockers,
+.audit-footnote,
+.outreach-error,
+.care-journey-readonly {
+  display: flex !important;
+  gap: 11px !important;
+  padding: 13px 16px !important;
+  border-radius: var(--r) !important;
+  font-size: 12.5px !important;
+}
+
+.record-boundary,
+.protocol-notice,
+.audit-footnote {
+  background: var(--low-bg) !important;
+  color: var(--low-ink) !important;
+  border: 1px solid var(--low-line) !important;
+}
+
+.retrieval-warning,
+.release-blockers {
+  background: var(--medium-bg) !important;
+  color: var(--medium-ink) !important;
+  border: 1px solid var(--medium-line) !important;
+}
+
+.outreach-error {
+  background: var(--critical-bg) !important;
+  color: var(--critical-ink) !important;
+  border: 1px solid var(--critical-line) !important;
+}
+
+.care-journey-readonly {
+  background: var(--safe-bg) !important;
+  color: var(--safe-ink) !important;
+  border: 1px solid var(--safe-line) !important;
+}
+
+/* ── Forms ────────────────────────────────────────────────────────────── */
+.form-field input,
+.form-field select,
+.form-field textarea,
+.search-field input {
+  font: inherit;
+  font-size: 12.5px !important;
+  padding: 8px 11px !important;
+  border-radius: var(--r-sm) !important;
+  border: 1px solid var(--border) !important;
+  background: var(--surface) !important;
+}
+
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus,
+.search-field input:focus {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px var(--accent-soft) !important;
+  outline: none;
+}
+
+.form-field > span {
+  font-size: 11px !important;
+  font-weight: 650 !important;
+  text-transform: uppercase !important;
+  letter-spacing: .05em !important;
+  color: var(--text-3) !important;
+}
+
+.check-row,
+.attestation-row {
+  background: var(--surface-2) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--r) !important;
+  padding: 11px 13px !important;
+}
+
+.check-row input[type="checkbox"],
+.attestation-row input[type="checkbox"] {
+  accent-color: var(--accent);
+}
+
+/* ── Motion ───────────────────────────────────────────────────────────── */
+@keyframes ssFade {
+  from { opacity: 0; transform: translateY(3px); }
+  to { opacity: 1; transform: none; }
+}
+
+.content-frame > * {
+  animation: ssFade .18s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .content-frame > * {
+    animation: none;
+  }
+}
+
+/* ==========================================================================
+   Token authority.
+
+   Two later passes re-declare `:root` with their own hardcoded palette
+   (lines ~3755 and ~6162), which split the old alias names away from the
+   new token system. This block is last, so it re-asserts the aliases and
+   keeps one palette across the whole stylesheet.
+   ========================================================================== */
+
+:root {
+  --accent: #0f6b4f;
+  --accent-dark: var(--accent-deep);
+  --accent-light: var(--accent-2);
+  --accent-soft: #e6f4ee;
+  --accent-border: var(--accent-line);
+
+  --canvas: var(--bg);
+  --surface-subtle: var(--surface-2);
+  --surface-muted: var(--surface-3);
+  --surface-highlight: var(--accent-soft);
+  --ink: var(--text);
+  --muted: var(--text-2);
+  --muted-light: var(--text-3);
+  --line: var(--border);
+  --line-strong: var(--border-strong);
+}
+
+/* ==========================================================================
+   Care-journey illustration.
+
+   The replacement artwork is near-square (736x751) on a white ground, so
+   `cover` at a fixed 342px height would crop the clipboard out of frame.
+   `contain` keeps the whole scene. `multiply` drops the white ground onto
+   the card gradient; the small hue nudge pulls the artwork's teal toward
+   the app's clinical green. Remove the `filter` line to show it untinted.
+   ========================================================================== */
+
+.care-journey-illustration img {
+  /* Size off the artwork's own aspect ratio rather than a fixed 342px box.
+     With `contain` inside that box the near-square image was letterboxing
+     down to roughly 335px wide and leaving the panel half empty. */
+  width: min(100%, 540px) !important;
+  height: auto !important;
+  max-height: 520px !important;
+  object-fit: contain !important;
+  object-position: center bottom !important;
+  filter: hue-rotate(-20deg) saturate(0.9);
+}
+
+@media (max-width: 1100px) {
+  .care-journey-illustration img {
+    max-height: 430px !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .care-journey-illustration img {
+    max-height: 360px !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .care-journey-illustration img {
+    max-height: 290px !important;
+  }
+}
+
+/* ==========================================================================
+   Sidebar inversion.
+
+   Reference reads as a white rail on a black canvas with a filled pill
+   marking the active item. Inverted here: a deep green rail on the light
+   clinical canvas, with the active item as a solid white pill in accent
+   ink. Keeps the sidebar in the same green family as the sign-in panel, so
+   the transition from auth into the workspace is continuous.
+   ========================================================================== */
+
+.sidebar {
+  background: linear-gradient(170deg, #125f48 0%, #0c4838 52%, #093629 100%) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.09) !important;
+}
+
+.brand-mark {
+  background: rgba(255, 255, 255, 0.14) !important;
+  border: 1px solid rgba(255, 255, 255, 0.24) !important;
+  color: #fff !important;
+}
+
+.brand-titles strong {
+  color: #fff !important;
+}
+
+.brand-titles span {
+  color: rgba(255, 255, 255, 0.58) !important;
+}
+
+.nav-item {
+  color: rgba(255, 255, 255, 0.74) !important;
+}
+
+.nav-item svg {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.nav-item:hover {
+  background: rgba(255, 255, 255, 0.09) !important;
+  color: #fff !important;
+}
+
+.nav-item:hover svg {
+  color: #fff;
+}
+
+/* The filled pill from the reference, inverted to white on green. */
+.nav-item.active,
+.nav-item[aria-current='page'] {
+  background: #ffffff !important;
+  color: var(--accent) !important;
+  font-weight: 650 !important;
+  box-shadow: 0 1px 2px rgba(4, 24, 18, 0.28);
+}
+
+.nav-item.active svg,
+.nav-item[aria-current='page'] svg {
+  color: var(--accent);
+}
+
+.nav-count-badge {
+  background: rgba(255, 255, 255, 0.15) !important;
+  border-color: rgba(255, 255, 255, 0.22) !important;
+  color: #fff !important;
+}
+
+.nav-item.active .nav-count-badge,
+.nav-item[aria-current='page'] .nav-count-badge {
+  background: var(--accent-soft) !important;
+  border-color: var(--accent-line) !important;
+  color: var(--accent) !important;
+}
+
+.scope-note {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: rgba(255, 255, 255, 0.66) !important;
+}
+
+.scope-note p {
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.scope-header,
+.scope-header span,
+.scope-note svg {
+  color: rgba(255, 255, 255, 0.86);
+}
+
+
+
+/* Give the illustration column a slightly larger share of the hero. At
+   1.08fr / 0.92fr the figure was capped at ~439px wide, which held the
+   artwork below the size it can carry. Evens the split instead. */
+@media (min-width: 1101px) {
+  .care-journey-hero {
+    grid-template-columns: minmax(0, 0.98fr) minmax(360px, 1.02fr);
+  }
+}
+
+/* ==========================================================================
+   Family session chrome
+   ========================================================================== */
+
+.family-session-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.family-session-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 99px;
+  background: #f5f1e8;
+  color: #6b5a3a;
+  border: 1px solid #e4d9c4;
+}
+
+.profile-initials.family {
+  background: #e9dfcb;
+  color: #6b5a3a;
+}
+
+.care-journey-signed-in {
+  margin: 22px 0 0;
+  font-size: 13.5px;
+  color: var(--text-2);
+}
+
+.care-journey-signed-in strong {
+  color: var(--text);
+  font-weight: 650;
+}
+
+/* On phones the 720px pass already hides the profile block, and the care
+   journey hero keeps its own "Read-only by design" note, so the chip is the
+   piece to drop. Even icon-only it pushed the bar 16px past a 375px screen. */
+@media (max-width: 640px) {
+  .family-session-bar {
+    gap: 8px;
+  }
+
+  .family-session-label {
+    display: none;
+  }
+
+  .family-session-bar .secondary-button {
+    padding: 7px 12px !important;
+  }
+}
+
+
+
+
+/* ==========================================================================
+   Phone topbar repair.
+
+   The shape/type pass re-declared `.environment-label { display: inline-flex }`
+   unscoped, which silently undid the original phone rule that hides it, and
+   gave the topbar 26px side padding. With the added Sign out button the
+   care-team topbar ran 115px past a 360px screen. This restores the original
+   phone behaviour and lets the role picker shrink instead of overflowing.
+   ========================================================================== */
+
+@media (max-width: 720px) {
+  .topbar {
+    padding: 10px 14px !important;
+    gap: 8px;
+  }
+
+  .environment-label {
+    display: none !important;
+  }
+
+  .topbar-left {
+    flex: 0 0 auto;
+  }
+
+  .topbar-right {
+    flex: 1 1 auto;
+    justify-content: flex-end;
+    min-width: 0;
+    gap: 8px;
+  }
+
+  .role-switcher-wrap {
+    flex: 0 1 auto;
+    min-width: 0;
+  }
+
+  .role-select {
+    flex: 1 1 auto;
+    width: auto !important;
+    min-width: 0;
+  }
+
+  .topbar-right > .secondary-button {
+    flex: 0 0 auto;
+    padding: 7px 10px !important;
+    font-size: 12px !important;
+  }
+}
+
+
+/* ==========================================================================
+   Green design blueprint: typography and colour roles.
+
+   Sora for display, Inter for body and controls. Colour roles follow the
+   green edition of the Health-a-thon blueprint (DESIGN_BLUEPRINT_GREEN.md):
+   forest ink, clinical green, mist and ice surfaces, green-tinted shadows.
+   Existing tokens are remapped so every page picks the roles up without
+   per-component edits. Semantic triples (safe/low/medium/high/critical) are
+   deliberately untouched.
+   ========================================================================== */
+
+:root {
+  --font-body: var(--font-inter, 'Inter'), 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-display: var(--font-sora, 'Sora'), 'Sora', var(--font-inter, 'Inter'), 'Inter', system-ui, sans-serif;
+  --font-ui: var(--font-body);
+
+  --bp-ink: #0a2118;
+  --bp-primary: #0c5c3f;
+  --bp-secondary-text: #2a3d35;
+  --bp-muted: #4d6259;
+  --bp-white: #ffffff;
+  --bp-mist: #f3f7f5;
+  --bp-ice: #e6f2ec;
+  --bp-border: rgb(10 33 24 / 0.10);
+  --bp-border-strong: rgb(10 33 24 / 0.22);
+  --bp-pale-green: #a3d2ba;
+  --bp-prize: #f5a623;
+
+  --bp-shadow-card: 0 1px 2px rgb(10 33 24 / 0.06), 0 16px 40px -20px rgb(10 33 24 / 0.24);
+  --bp-shadow-cta: 0 8px 22px rgb(12 92 63 / 0.28);
+  --bp-shadow-feature: 0 2px 4px rgb(10 33 24 / 0.07), 0 32px 64px -24px rgb(10 33 24 / 0.30);
+
+  --bp-radius-small: 10px;
+  --bp-radius-card: 16px;
+  --bp-radius-large: 20px;
+  --bp-radius-feature: 22px;
+  --bp-radius-hero: 24px;
+
+  /* Remap the app's existing roles onto the blueprint */
+  --text: var(--bp-ink);
+  --text-2: var(--bp-muted);
+  --text-3: #6f8279;
+  --bg: var(--bp-mist);
+  --surface: var(--bp-white);
+  --surface-2: #f7faf8;
+  --surface-3: var(--bp-ice);
+  --border: #dfe8e3;
+  --border-strong: #c5d6cd;
+  --accent: var(--bp-primary);
+  --accent-2: #12925a;
+  --accent-deep: #0a4f33;
+  --accent-soft: var(--bp-ice);
+  --accent-line: #bfdccb;
+  --focus-ring: var(--bp-primary);
+
+  /* Keep the legacy aliases pointing at the remapped roles */
+  --canvas: var(--bg);
+  --ink: var(--text);
+  --muted: var(--text-2);
+  --muted-light: var(--text-3);
+  --line: var(--border);
+  --line-strong: var(--border-strong);
+  --surface-subtle: var(--surface-2);
+  --surface-muted: var(--surface-3);
+  --surface-highlight: var(--accent-soft);
+  --accent-dark: var(--accent-deep);
+  --accent-light: var(--accent-2);
+  --accent-border: var(--accent-line);
+}
+
+body {
+  font-family: var(--font-body);
+}
+
+h1,
+h2,
+h3,
+.brand-titles strong {
+  font-family: var(--font-display);
+}
+
+/* ==========================================================================
+   Patient and family portal chrome.
+   ========================================================================== */
+
+.app-shell.is-portal *,
+.app-shell.is-portal *::before,
+.app-shell.is-portal *::after {
+  transition: none !important;
+  animation: none !important;
+  scroll-behavior: auto !important;
+}
+
+.app-shell.is-portal .nav-item:hover,
+.app-shell.is-portal .nav-item:focus-visible {
+  transform: none !important;
+}
+
+.audit-badge-PATIENT {
+  background: #e3f1f0;
+  color: #0f6f6a;
+  border: 1px solid #bfdcda;
+}
+
+.profile-initials.patient {
+  background: #e3f1f0;
+  color: #0f6f6a;
+}
+
+.family-session-label.is-patient {
+  background: #e3f1f0;
+  color: #0f6f6a;
+  border-color: #bfdcda;
+}
+
+.segmented-control {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--surface-3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin: 12px 0;
+}
+
+.segmented-button {
+  border: none;
+  background: transparent;
+  padding: 6px 12px;
+  border-radius: 7px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ink-muted, #556);
+  cursor: pointer;
+}
+
+.segmented-button[aria-pressed="true"] {
+  background: var(--surface);
+  color: var(--ink, #111);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+
