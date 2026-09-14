@@ -33,7 +33,7 @@ const KIND_LABELS: Record<HistoryKind, string> = {
   conversation: 'Conversations',
   draft: 'Drafts',
   version: 'Care plan versions',
-  retrieval: 'Record access',
+  retrieval: 'Note viewed',
   consent: 'Consent',
   card: 'Emergency card',
   review: 'Review requests',
@@ -178,7 +178,7 @@ export function PatientHistory(props: {
         <p className="ph-eyebrow">Encounters</p>
         <h2 className="ph-heading">Patient history</h2>
         <p className="ph-sub">
-          Every appointment, call, conversation, version, record access, consent and emergency
+          Every appointment, call, conversation, version, note viewed, consent and emergency
           card for {patientName}, newest first.
         </p>
 

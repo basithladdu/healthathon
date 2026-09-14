@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { isValidBirthDate } from './patient-date';
 
 export type DecisionMaker = {
   name: string;
@@ -107,7 +108,6 @@ function sameDetails(a: PatientDetails, b: PatientDetails): boolean {
   );
 }
 
-const DOB_PATTERN = /^\d{2}\/\d{2}\/\d{4}$/;
 
 export function MyCarePlan(props: {
   patientName: string;
@@ -115,52 +115,55 @@ export function MyCarePlan(props: {
   verifiedBy: string;
   verifiedOn: string;
   fields: Array<{ label: string; value: string }>;
+  summaryAvailable: boolean;
+  hasReleasedVersion: boolean;
   quickView: React.ReactNode;
   consent: ConsentRecord | null;
   onGoToConsent: () => void;
 }) {
-  const { versionLabel, verifiedBy, verifiedOn, fields, quickView, consent, onGoToConsent } = props;
+  const { versionLabel, verifiedBy, verifiedOn, fields, summaryAvailable, hasReleasedVersion, quickView, consent, onGoToConsent } = props;
   const consentForVersion = consent && consent.versionLabel === versionLabel ? consent : null;
 
   return (
     <section className="ptl-page">
-      <p className="ptl-eyebrow">My care plan</p>
-      <h1 className="ptl-heading">What you and your care team agreed</h1>
-      <p className="ptl-lede">A plain-language summary of the plan your doctor has released.</p>
+      <h1 className="ptl-heading">Care plan</h1>
 
       <div className="ptl-status-row">
         <p className="ptl-status-line">
-          {versionLabel} · verified by {verifiedBy} on {verifiedOn}
+          {versionLabel}{hasReleasedVersion && <> · verified by {verifiedBy} on {verifiedOn}</>}
         </p>
-        {consentForVersion ? (
-          <span className="ptl-chip ptl-chip--safe">You gave consent on {consentForVersion.signedAt}</span>
+        {summaryAvailable && (consentForVersion ? (
+          <span className="ptl-chip ptl-chip--safe">Confirmed on {consentForVersion.signedAt}</span>
         ) : (
           <span className="ptl-chip ptl-chip--medium">
-            Your consent is not recorded yet
+            Not confirmed yet
             <button type="button" className="ptl-link-btn" onClick={onGoToConsent}>
-              Review and give consent →
+              Review summary →
             </button>
           </span>
-        )}
+        ))}
       </div>
 
       {fields.length === 0 ? (
         <p className="ptl-empty">Your care team has not released a written summary yet.</p>
       ) : (
-        <div className="ptl-card-grid">
+        <dl className="ptl-summary-list">
           {fields.map((f) => (
-            <div className="ptl-card ptl-def-card" key={f.label}>
-              <p className="ptl-overline">{f.label}</p>
-              <p className="ptl-def-value">{f.value}</p>
+            <div className="ptl-summary-row" key={f.label}>
+              <dt className="ptl-summary-label">{f.label}</dt>
+              <dd className="ptl-summary-value">{f.value}</dd>
             </div>
           ))}
-        </div>
+        </dl>
       )}
 
       <div className="ptl-quickview">{quickView}</div>
 
-      <section className="ptl-section">
-        <h2 className="ptl-h2">What will always be provided</h2>
+      <details className="ptl-about-summary">
+        <summary>About this summary</summary>
+        <div className="ptl-about-summary-body">
+          <section className="ptl-section">
+            <h2 className="ptl-h2">What will always be provided</h2>
         <p className="ptl-body-text">
           Nothing in this plan reduces care. These will always continue, wherever you are.
         </p>
@@ -180,12 +183,11 @@ export function MyCarePlan(props: {
           Your wishes can change at any time. Tell your care team — what you say now always comes first. Your
           doctor updates the plan and releases a new version; the old one is kept.
         </p>
-      </section>
+          </section>
+        </div>
+      </details>
 
-      <p className="ptl-footer-note">
-        This summary documents a conversation. It is not a treatment order or a legal directive. Synthetic
-        demonstration record.
-      </p>
+      <p className="ptl-footer-note">Sample patient data. Changes last for this session.</p>
     </section>
   );
 }
@@ -302,8 +304,8 @@ export function MyDetails(props: {
     if (!form.fullName.trim()) nextErrors.fullName = 'Full name is required.';
     if (!form.dob.trim()) {
       nextErrors.dob = 'Date of birth is required.';
-    } else if (!DOB_PATTERN.test(form.dob.trim())) {
-      nextErrors.dob = 'Date of birth must be in DD/MM/YYYY format.';
+    } else if (!isValidBirthDate(form.dob.trim())) {
+      nextErrors.dob = 'Enter a valid date of birth in DD/MM/YYYY format, no later than today.';
     }
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
@@ -323,7 +325,7 @@ export function MyDetails(props: {
     <section className="ptl-page">
       <p className="ptl-eyebrow">My details</p>
       <h1 className="ptl-heading">Keep your details up to date</h1>
-      <p className="ptl-lede">Your demographics, decision-makers, and local doctor.</p>
+      <p className="ptl-lede">Your details and people to contact.</p>
 
       {errorList.length > 0 && (
         <div className="ptl-alert" role="alert">
@@ -474,10 +476,7 @@ export function MyDetails(props: {
 
         {saved && <p className="ptl-status-msg" role="status">Saved. Your care plan has not changed.</p>}
 
-        <p className="ptl-form-note">
-          Changing your details does not change your care plan. Phone numbers you add here stay in this browser
-          for the demonstration.
-        </p>
+        <p className="ptl-form-note">Changing your details does not change your care plan. Phone numbers stay local to this session.</p>
       </form>
 
       <div className="ptl-card ptl-readonly-card">
@@ -509,10 +508,11 @@ export function ConsentSignature(props: {
   patientName: string;
   versionLabel: string;
   summaryFields: Array<{ label: string; value: string }>;
+  summaryAvailable: boolean;
   consent: ConsentRecord | null;
   onSign: (input: { typedName: string; declaration: 'self' | 'delegated' }) => void;
 }) {
-  const { patientName, versionLabel, summaryFields, consent, onSign } = props;
+  const { patientName, versionLabel, summaryFields, summaryAvailable, consent, onSign } = props;
   const [declaration, setDeclaration] = useState<'self' | 'delegated' | ''>('');
   const [readConfirmed, setReadConfirmed] = useState(false);
   const [typedName, setTypedName] = useState('');
@@ -522,6 +522,7 @@ export function ConsentSignature(props: {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!summaryAvailable) return;
     if (typedName.trim().toLowerCase() !== patientName.trim().toLowerCase()) {
       setError(`Type your name exactly as it appears on your record: ${patientName}.`);
       return;
@@ -537,29 +538,31 @@ export function ConsentSignature(props: {
   return (
     <section className="ptl-page">
       <p className="ptl-eyebrow">Consent</p>
-      <h1 className="ptl-heading">Review and sign your care plan</h1>
+      <h1 className="ptl-heading">Review your care plan</h1>
       <p className="ptl-lede">{versionLabel}</p>
 
-      <div className="ptl-card-grid">
+      <dl className="ptl-summary-list">
         {summaryFields.map((f) => (
-          <div className="ptl-card ptl-def-card" key={f.label}>
-            <p className="ptl-overline">{f.label}</p>
-            <p className="ptl-def-value">{f.value}</p>
+          <div className="ptl-summary-row" key={f.label}>
+            <dt className="ptl-summary-label">{f.label}</dt>
+            <dd className="ptl-summary-value">{f.value}</dd>
           </div>
         ))}
-      </div>
+      </dl>
 
-      {recorded ? (
+      {!summaryAvailable ? (
+        <p className="ptl-empty">A released summary must be available here before you can review and acknowledge it. Contact your care team.</p>
+      ) : recorded ? (
         <div className="ptl-card ptl-consent-confirm">
-          <h2 className="ptl-h2">Consent recorded</h2>
+          <h2 className="ptl-h2">Acknowledgement recorded</h2>
           <p className="ptl-body-text">{recorded.typedName}</p>
           <p className="ptl-body-text">
             {recorded.declaration === 'self'
               ? 'I have made these choices myself.'
               : 'I have chosen not to be involved in detail and have asked my decision-maker to decide with the team.'}
           </p>
-          <p className="ptl-body-text">Signed on {recorded.signedAt}</p>
-          <p className="ptl-body-text">Your plan is locked when your doctor releases it.</p>
+          <p className="ptl-body-text">Acknowledged {versionLabel} on {recorded.signedAt}</p>
+          <p className="ptl-body-text">Your care team controls when this version is released.</p>
         </div>
       ) : (
         <form className="ptl-form" onSubmit={handleSubmit}>
@@ -611,15 +614,12 @@ export function ConsentSignature(props: {
           </div>
 
           <div className="ptl-form-actions">
-            <button type="submit" className="ptl-btn ptl-btn--primary">Give consent</button>
+            <button type="submit" className="ptl-btn ptl-btn--primary">Confirm I have read {versionLabel}</button>
           </div>
         </form>
       )}
 
-      <p className="ptl-footer-note">
-        This is a simulated typed signature for the demonstration. It is not a legally valid electronic signature.
-        The plan becomes official only when your doctor releases it.
-      </p>
+      <p className="ptl-footer-note">Sample patient data. Changes last for this session.</p>
     </section>
   );
 }

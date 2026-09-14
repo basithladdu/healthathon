@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import type { Map as LeafletMap, Marker } from 'leaflet';
 
 export type CareNearMeProps = {
   audience: 'patient' | 'family';
@@ -106,6 +107,7 @@ type PhotonFeature = {
 
 function classify(key: string | undefined, value: string | undefined, name: string): Category | null {
   if (!key || !FACILITY_KEYS.has(key)) return null;
+  if (value === 'veterinary' || /\b(vet(?:erinary|ernary)?|animal|pet)\b/i.test(name)) return null;
   if (value === 'hospice' || value === 'palliative' || /palliat|hospice/i.test(name)) return 'palliative';
   if (value === 'hospital') return 'hospital';
   if (value === 'clinic' || value === 'doctors' || value === 'doctor') return 'clinic';
@@ -211,21 +213,20 @@ export function CareNearMe(props: CareNearMeProps): React.JSX.Element {
   const [places, setPlaces] = useState<Place[]>([]);
   const [radiusUsed, setRadiusUsed] = useState<number>(RADII[0]);
   const [filter, setFilter] = useState<FilterKey>('all');
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
 
   const abortRef = useRef<AbortController | null>(null);
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
-  const mapRef = useRef<any>(null);
-  const leafletRef = useRef<any>(null);
-  const markersRef = useRef<any[]>([]);
+  const mapRef = useRef<LeafletMap | null>(null);
+  const leafletRef = useRef<typeof import('leaflet') | null>(null);
+  const markersRef = useRef<Array<Marker & { placeId?: string }>>([]);
 
   const geoSupported = typeof navigator !== 'undefined' && !!navigator.geolocation;
 
   const runSearch = async (o: Origin) => {
+    abortRef.current?.abort();
     setOrigin(o);
     setStage('loading');
-    setErrorMessage(null);
     setSelectedPlaceId(null);
 
     const controller = new AbortController();
@@ -234,12 +235,13 @@ export function CareNearMe(props: CareNearMeProps): React.JSX.Element {
 
     try {
       const { places: found, radius } = await searchNear(o, controller.signal);
+      if (abortRef.current !== controller) return;
       setPlaces(found);
       setRadiusUsed(radius);
       setFilter('all');
       setStage('results');
     } catch {
-      setStage('error');
+      if (abortRef.current === controller) setStage('error');
     } finally {
       clearTimeout(timeoutId);
     }
@@ -277,6 +279,7 @@ export function CareNearMe(props: CareNearMeProps): React.JSX.Element {
 
   const handleChangeLocation = () => {
     if (abortRef.current) abortRef.current.abort();
+    abortRef.current = null;
     setStage('consent');
     setPlaces([]);
     setOrigin(null);
@@ -290,6 +293,7 @@ export function CareNearMe(props: CareNearMeProps): React.JSX.Element {
   useEffect(() => {
     return () => {
       if (abortRef.current) abortRef.current.abort();
+      abortRef.current = null;
     };
   }, []);
 
@@ -303,6 +307,61 @@ export function CareNearMe(props: CareNearMeProps): React.JSX.Element {
     if (filter === 'all') return places;
     return places.filter((p) => p.category === filter);
   }, [places, filter]);
+
+  function renderMarkers() {
+    const L = leafletRef.current;
+    const map = mapRef.current;
+    if (!L || !map || !origin) return;
+
+    for (const m of markersRef.current) {
+      map.removeLayer(m);
+    }
+    markersRef.current = [];
+
+    const originIcon = L.divIcon({
+      className: '',
+      html: `<div class="cnm-marker cnm-marker-origin"></div>`,
+      iconSize: [18, 18],
+      iconAnchor: [9, 9],
+    });
+    const originMarker = L.marker([origin.lat, origin.lon], { icon: originIcon, title: 'Search centre', alt: 'Search centre' }).addTo(map);
+    originMarker.bindPopup('You are here / search centre');
+    markersRef.current.push(originMarker);
+
+    const bounds: [number, number][] = [[origin.lat, origin.lon]];
+
+    for (const place of filteredPlaces) {
+      const color = CATEGORY_COLORS[place.category];
+      const icon = L.divIcon({
+        className: '',
+        html: `<div class="cnm-marker" style="background:${color}"></div>`,
+        iconSize: [16, 16],
+        iconAnchor: [8, 8],
+      });
+      const marker: Marker & { placeId?: string } = L.marker([place.lat, place.lon], { icon, title: place.name, alt: place.name }).addTo(map);
+      const dirUrl = `https://www.google.com/maps/dir/?api=1&destination=${place.lat},${place.lon}`;
+      marker.bindPopup(
+        `<strong>${escapeHtml(place.name)}</strong><br/>${CATEGORY_LABELS[place.category]}<br/>${place.distanceKm.toFixed(1)} km<br/><a href="${dirUrl}" target="_blank" rel="noopener noreferrer">Directions</a>`
+      );
+      marker.placeId = place.id;
+      markersRef.current.push(marker);
+      bounds.push([place.lat, place.lon]);
+    }
+
+    if (bounds.length > 1) {
+      map.fitBounds(bounds, { animate: false, padding: [24, 24] });
+    } else {
+      map.setView([origin.lat, origin.lon], 13, { animate: false });
+    }
+  }
+
+  function escapeHtml(s: string): string {
+    return s
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
 
   // Set up map once results are shown.
   useEffect(() => {
@@ -334,6 +393,9 @@ export function CareNearMe(props: CareNearMeProps): React.JSX.Element {
 
     return () => {
       cancelled = true;
+      mapRef.current?.remove();
+      mapRef.current = null;
+      markersRef.current = [];
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stage]);
@@ -345,77 +407,14 @@ export function CareNearMe(props: CareNearMeProps): React.JSX.Element {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filteredPlaces]);
 
-  useEffect(() => {
-    return () => {
-      if (mapRef.current) {
-        mapRef.current.remove();
-        mapRef.current = null;
-      }
-    };
-  }, []);
-
-  function renderMarkers() {
-    const L = leafletRef.current;
-    const map = mapRef.current;
-    if (!L || !map || !origin) return;
-
-    for (const m of markersRef.current) {
-      map.removeLayer(m);
-    }
-    markersRef.current = [];
-
-    const originIcon = L.divIcon({
-      className: '',
-      html: `<div class="cnm-marker cnm-marker-origin"></div>`,
-      iconSize: [18, 18],
-      iconAnchor: [9, 9],
-    });
-    const originMarker = L.marker([origin.lat, origin.lon], { icon: originIcon }).addTo(map);
-    originMarker.bindPopup('You are here / search centre');
-    markersRef.current.push(originMarker);
-
-    const bounds: [number, number][] = [[origin.lat, origin.lon]];
-
-    for (const place of filteredPlaces) {
-      const color = CATEGORY_COLORS[place.category];
-      const icon = L.divIcon({
-        className: '',
-        html: `<div class="cnm-marker" style="background:${color}"></div>`,
-        iconSize: [16, 16],
-        iconAnchor: [8, 8],
-      });
-      const marker = L.marker([place.lat, place.lon], { icon }).addTo(map);
-      const dirUrl = `https://www.google.com/maps/dir/?api=1&destination=${place.lat},${place.lon}`;
-      marker.bindPopup(
-        `<strong>${escapeHtml(place.name)}</strong><br/>${CATEGORY_LABELS[place.category]}<br/>${place.distanceKm.toFixed(1)} km<br/><a href="${dirUrl}" target="_blank" rel="noopener noreferrer">Directions</a>`
-      );
-      (marker as any)._cnmId = place.id;
-      markersRef.current.push(marker);
-      bounds.push([place.lat, place.lon]);
-    }
-
-    if (bounds.length > 1) {
-      map.fitBounds(bounds, { animate: false, padding: [24, 24] });
-    } else {
-      map.setView([origin.lat, origin.lon], 13, { animate: false });
-    }
-  }
-
-  function escapeHtml(s: string): string {
-    return s
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-  }
-
   function handleShowOnMap(place: Place) {
     const map = mapRef.current;
     if (!map) return;
     map.setView([place.lat, place.lon], 16, { animate: false });
     setSelectedPlaceId(place.id);
-    const marker = markersRef.current.find((m) => (m as any)._cnmId === place.id);
+    const marker = markersRef.current.find((m) => m.placeId === place.id);
     if (marker) marker.openPopup();
+    mapContainerRef.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
   }
 
   const originLabel = origin?.label ?? '';
@@ -457,7 +456,7 @@ export function CareNearMe(props: CareNearMeProps): React.JSX.Element {
             </p>
           )}
           <p className="cnm-privacy">
-            Your location stays in this browser. To find places, the map sends an approximate search area (to about 1 km) to Photon, a public OpenStreetMap search service. This demonstration does not store it.
+            Your location stays in this browser. To find places, the map sends an approximate search area (to about 1 km) to Photon, a public OpenStreetMap search service. Your location is not saved.
           </p>
         </div>
       )}
@@ -514,10 +513,13 @@ export function CareNearMe(props: CareNearMeProps): React.JSX.Element {
           </div>
 
           <div className="cnm-results">
-            <div className="cnm-list">
+            <div className="cnm-map" ref={mapContainerRef} role="region" aria-label="Nearby care map" />
+            <div className="cnm-list" role="region" aria-label="Nearby care results" tabIndex={0}>
               {filteredPlaces.length === 0 && (
                 <p className="cnm-empty">
-                  No named places were found within 30 km on OpenStreetMap. Try another city.
+                  {places.length === 0
+                    ? 'No named places were found within 30 km on OpenStreetMap. Try another city.'
+                    : 'No places in this category were returned. Choose another category or city.'}
                 </p>
               )}
               {filteredPlaces.map((place) => (
@@ -564,7 +566,6 @@ export function CareNearMe(props: CareNearMeProps): React.JSX.Element {
                 </div>
               ))}
             </div>
-            <div className="cnm-map" ref={mapContainerRef} />
           </div>
 
           <div className="cnm-card cnm-support">

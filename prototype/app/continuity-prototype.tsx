@@ -1,6 +1,7 @@
 'use client';
 
 import type { FormEvent } from 'react';
+import Image from 'next/image';
 import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { LoginScreen, SignupScreen, FamilyLoginScreen, PatientLoginScreen, type FamilyMember, type PatientAccount } from './auth-screens';
 import { LandingPage } from './landing-page';
@@ -21,6 +22,7 @@ import {
   type PastVisit,
 } from './patient-portal';
 import { PatientHistory, type HistoryEvent } from './patient-history';
+import { reviseSummary, releaseSummary, isSummaryReadyToRelease, invalidateSummaryReview, beginSummaryRevision, latestSummaryRelease, summaryReleaseByNumber, nextSummaryVersion, setSummaryFieldStatus, type DraftFieldKey, type DraftFieldStatus, type SummaryState, type SummaryRelease } from './summary-state';
 
 type View =
   | 'caregiver'
@@ -31,7 +33,6 @@ type View =
   | 'drafts'
   | 'records'
   | 'audit'
-  | 'help'
   | 'patient'
   | 'outreach'
   | 'draft'
@@ -72,6 +73,10 @@ type WorkItem = {
 };
 
 type AuditEvent = {
+  id?: string;
+  patientId?: string;
+  releaseNumber?: number;
+  timestamp?: string;
   time: string;
   actor: string;
   event: string;
@@ -86,15 +91,6 @@ type OutreachRecord = {
   actor: string;
 };
 
-type DraftFieldKey =
-  | 'priorities'
-  | 'participants'
-  | 'topics'
-  | 'openQuestions'
-  | 'followUp';
-
-type DraftFieldStatus = 'ready' | 'not-stated' | 'clarify';
-
 type ConversationDomainKey =
   | 'priorities'
   | 'careSetting'
@@ -107,23 +103,13 @@ type ConversationDomainKey =
 
 type ConversationDisposition = 'discussed' | 'not-discussed' | 'defer';
 
-type RecordState = {
-  draftPrepared: boolean;
-  draftFields: Record<DraftFieldKey, string>;
-  draftStatuses: Record<DraftFieldKey, DraftFieldStatus>;
-  verificationChecks: {
-    source: boolean;
-    ambiguity: boolean;
-    inference: boolean;
-    reviewDate: boolean;
-  };
-  authorisation: string;
-  attested: boolean;
-  versionPublished: boolean;
+type RecordState = SummaryState & {
   retrievalReason: string;
   careRelationship: string;
   retrievalAcknowledged: boolean;
   retrievalUnlocked: boolean;
+  retrievalVersion: number | null;
+  unlockedVersion: number | null;
   conversationCoverage: Record<ConversationDomainKey, ConversationDisposition>;
   latestOutreach: OutreachRecord | null;
 };
@@ -167,12 +153,6 @@ const initialWorkItems: WorkItem[] = [
   },
 ];
 
-const careJourneyTouchpoint = {
-  date: '28 Aug 2026',
-  purpose: 'Family conversation',
-  owner: 'Anitha Rao',
-};
-
 const patientProfiles: Record<
   string,
   {
@@ -191,7 +171,7 @@ const patientProfiles: Record<
     age: 62,
     team: 'Oncology · Palliative care',
     participant: 'Kavya Raghavan · Daughter (Primary Proxy)',
-    phone: 'Synthetic contact held by originating team',
+    phone: 'Ask the care team',
     stage: 'Stage IV NSCLC · Continuity Cohort A',
     verified: '21 Aug 2026',
     dob: '14/03/1964',
@@ -202,7 +182,7 @@ const patientProfiles: Record<
     age: 55,
     team: 'Oncology · Thoracic Surgery',
     participant: 'Sameer Nair · Spouse',
-    phone: 'Synthetic contact held by originating team',
+    phone: 'Ask the care team',
     stage: 'Stage III Cholangiocarcinoma',
     verified: 'Not yet verified',
     dob: '09/11/1970',
@@ -213,7 +193,7 @@ const patientProfiles: Record<
     age: 68,
     team: 'Pulmonary medicine · Oncology',
     participant: 'Nisha Kumar · Daughter',
-    phone: 'Synthetic contact held by originating team',
+    phone: 'Ask the care team',
     stage: 'Stage IV SCLC · Palliative Follow-up',
     verified: 'Awaiting review',
     dob: '22/01/1958',
@@ -224,7 +204,7 @@ const patientProfiles: Record<
     age: 59,
     team: 'Oncology · Palliative care',
     participant: 'Joel Thomas · Son',
-    phone: 'Synthetic contact held by originating team',
+    phone: 'Ask the care team',
     stage: 'Stage IV Ovarian Carcinoma',
     verified: '21 Aug 2026',
     dob: '30/06/1967',
@@ -235,8 +215,8 @@ const patientProfiles: Record<
     age: 47,
     team: 'Gynaecologic oncology',
     participant: 'Aarav Iyer · Brother',
-    phone: 'Synthetic contact held by originating team',
-    stage: 'Stage III Cervical Carcinoma · Synthetic scenario',
+    phone: 'Ask the care team',
+    stage: 'Stage III Cervical Carcinoma',
     verified: 'Not yet verified',
     dob: '05/02/1979',
     sex: 'Not recorded',
@@ -246,8 +226,8 @@ const patientProfiles: Record<
     age: 64,
     team: 'Gastrointestinal oncology',
     participant: 'Neha Mehta · Spouse',
-    phone: 'Synthetic contact held by originating team',
-    stage: 'Stage IV Pancreatic Adenocarcinoma · Synthetic scenario',
+    phone: 'Ask the care team',
+    stage: 'Stage IV Pancreatic Adenocarcinoma',
     verified: 'Not yet verified',
     dob: '17/12/1961',
     sex: 'Not recorded',
@@ -257,6 +237,9 @@ const patientProfiles: Record<
 
 const initialAuditEvents: AuditEvent[] = [
   {
+    id: 'seed-audit-1',
+    patientId: 'CANCER-20418',
+    timestamp: '2026-08-28T09:42:00+05:30',
     time: '28 Aug · 09:42',
     actor: 'Dr Sujay',
     event: 'Viewed current verified version',
@@ -264,6 +247,9 @@ const initialAuditEvents: AuditEvent[] = [
     badge: 'VIEW',
   },
   {
+    id: 'seed-audit-2',
+    patientId: 'CANCER-20418',
+    timestamp: '2026-08-26T16:15:00+05:30',
     time: '26 Aug · 16:15',
     actor: 'Anitha Rao',
     event: 'Recorded outreach and rescheduled follow-up',
@@ -271,6 +257,9 @@ const initialAuditEvents: AuditEvent[] = [
     badge: 'OUTREACH',
   },
   {
+    id: 'seed-audit-3',
+    patientId: 'CANCER-20418',
+    timestamp: '2026-08-21T12:08:00+05:30',
     time: '21 Aug · 12:08',
     actor: 'Dr Sujay',
     event: 'Verified and published version 1',
@@ -278,6 +267,9 @@ const initialAuditEvents: AuditEvent[] = [
     badge: 'PUBLISH',
   },
   {
+    id: 'seed-audit-4',
+    patientId: 'CANCER-20418',
+    timestamp: '2026-08-21T12:06:00+05:30',
     time: '21 Aug · 12:06',
     actor: 'Kavya Raghavan',
     event: 'Authorisation recorded by care team',
@@ -300,7 +292,7 @@ const initialDraftFields: Record<DraftFieldKey, string> = {
   participants: 'Meera Raghavan; Kavya Raghavan (daughter); Dr Sujay.',
   topics:
     'People to involve, questions for the next conversation, and time for family discussion.',
-  openQuestions: 'Specific treatment interventions were not stated.',
+  openQuestions: 'Not stated in this conversation.',
   followUp: 'Continue the conversation on 28 Aug 2026.',
 };
 
@@ -364,40 +356,29 @@ const conversationDomains: Array<{
 
 function createInitialRecordState(hospitalId = 'CANCER-20418'): RecordState {
   const isPrimaryScenario = hospitalId === 'CANCER-20418';
-  const patientName =
-    initialWorkItems.find((item) => item.hospitalId === hospitalId)?.patient ??
-    (hospitalId === 'CANCER-20452'
-      ? 'Sana Iyer'
-      : hospitalId === 'CANCER-20489'
-        ? 'Vikram Mehta'
-        : 'Synthetic patient');
 
   return {
+    patientId: hospitalId,
+    releases: (patientProfiles[hospitalId]?.verified ?? '').includes('2026') ? [{
+      number: 1,
+      patientId: hospitalId,
+      fields: isPrimaryScenario ? Object.freeze({ ...v1Fields }) : null,
+      statuses: null,
+      source: null,
+      excerpts: null,
+      coverage: null,
+      authorisation: 'Verbal acknowledgement recorded by care team',
+      physician: 'Dr Sujay',
+      releasedAt: '2026-08-21T12:00:00+05:30',
+    }] : [],
+    draftSource: isPrimaryScenario ? sourceSnippets.map(({ text }) => text).join(' ') : '',
+    draftExcerpts: Object.fromEntries(sourceSnippets.map(({ key, text }) => [key, isPrimaryScenario ? text : ''])) as Record<DraftFieldKey, string>,
+    draftIsNewConversation: !isPrimaryScenario,
     draftPrepared: false,
-    draftFields: isPrimaryScenario
-      ? { ...initialDraftFields }
-      : {
-          priorities: `No source-linked priorities have been prepared for ${patientName}.`,
-          participants: 'Not stated.',
-          topics: 'Not stated.',
-          openQuestions: 'Goals-of-care domains require clinician review.',
-          followUp: 'Follow-up plan not yet verified.',
-        },
+    draftFields: isPrimaryScenario ? { ...initialDraftFields } : { priorities: '', participants: '', topics: '', openQuestions: '', followUp: '' },
     draftStatuses: isPrimaryScenario
-      ? {
-          priorities: 'ready',
-          participants: 'ready',
-          topics: 'ready',
-          openQuestions: 'not-stated',
-          followUp: 'ready',
-        }
-      : {
-          priorities: 'not-stated',
-          participants: 'not-stated',
-          topics: 'not-stated',
-          openQuestions: 'clarify',
-          followUp: 'clarify',
-        },
+      ? { priorities: 'ready', participants: 'ready', topics: 'ready', openQuestions: 'not-stated', followUp: 'ready' }
+      : { priorities: 'clarify', participants: 'clarify', topics: 'clarify', openQuestions: 'clarify', followUp: 'clarify' },
     verificationChecks: {
       source: false,
       ambiguity: false,
@@ -407,10 +388,13 @@ function createInitialRecordState(hospitalId = 'CANCER-20418'): RecordState {
     authorisation: 'Pending patient review',
     attested: false,
     versionPublished: false,
+    publishedFields: null,
     retrievalReason: 'Planned consultation / Outpatient review',
     careRelationship: 'Current primary oncology treating team',
     retrievalAcknowledged: false,
     retrievalUnlocked: false,
+    retrievalVersion: null,
+    unlockedVersion: null,
     conversationCoverage: isPrimaryScenario
       ? { ...initialConversationCoverage }
       : Object.fromEntries(
@@ -419,10 +403,6 @@ function createInitialRecordState(hospitalId = 'CANCER-20418'): RecordState {
     latestOutreach: null,
   };
 }
-
-const initialRecordStates: Record<string, RecordState> = Object.fromEntries(
-  Object.keys(patientProfiles).map((hospitalId) => [hospitalId, createInitialRecordState(hospitalId)]),
-);
 
 const enrolmentCandidates = {
   'CANCER-20452': { patient: 'Sana Iyer', due: '2 Sep 2026' },
@@ -436,6 +416,15 @@ const v1Fields: Record<DraftFieldKey, string> = {
   openQuestions: 'Specific intervention scope and surrogate preferences pending family consult.',
   followUp: 'Follow-up planned for late August.',
 };
+
+const initialRecordStates: Record<string, RecordState> = Object.fromEntries(
+  Object.keys(patientProfiles).map((hospitalId) => [hospitalId, createInitialRecordState(hospitalId)]),
+);
+
+function releaseDate(release: SummaryRelease | null | undefined): string {
+  if (!release) return 'Not released';
+  return new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(release.releasedAt));
+}
 
 const fieldConfig: Array<{
   key: DraftFieldKey;
@@ -684,14 +673,13 @@ function ContinuityMark({ className = '' }: { className?: string }) {
 
 const navItems: Array<{ view: View; label: string; icon: React.FC<{ className?: string }> }> = [
   { view: 'caregiver', label: 'Care journey', icon: IconUsers },
-  { view: 'home', label: 'Clinical handoff', icon: IconShieldCheck },
-  { view: 'guide', label: 'Guided conversation', icon: IconFileEdit },
-  { view: 'worklist', label: 'Follow-up worklist', icon: IconClipboardList },
+  { view: 'home', label: 'Home', icon: IconShieldCheck },
+  { view: 'guide', label: 'Conversations', icon: IconFileEdit },
+  { view: 'worklist', label: 'Follow-ups', icon: IconClipboardList },
   { view: 'appointments', label: 'Appointments', icon: IconCalendar },
   { view: 'patients', label: 'Patients', icon: IconUsers },
-  { view: 'records', label: 'Verified records', icon: IconShieldCheck },
-  { view: 'audit', label: 'Audit log', icon: IconHistory },
-  { view: 'help', label: 'Plain-language help', icon: IconInfo },
+  { view: 'records', label: 'Notes', icon: IconShieldCheck },
+  { view: 'audit', label: 'History', icon: IconHistory },
 ];
 
 const patientNavItems: Array<{ view: View; label: string; icon: React.FC<{ className?: string }> }> = [
@@ -702,7 +690,6 @@ const patientNavItems: Array<{ view: View; label: string; icon: React.FC<{ class
   { view: 'emergency-card', label: 'Emergency card', icon: IconIdCard },
   { view: 'my-details', label: 'My details', icon: IconFileEdit },
   { view: 'consent', label: 'Consent', icon: IconCheck },
-  { view: 'help', label: 'Plain-language help', icon: IconInfo },
 ];
 
 const familyNavItems: Array<{ view: View; label: string; icon: React.FC<{ className?: string }> }> = [
@@ -710,7 +697,6 @@ const familyNavItems: Array<{ view: View; label: string; icon: React.FC<{ classN
   { view: 'care-near-me', label: 'Care near me', icon: IconMapPin },
   { view: 'my-doctors', label: 'Care team', icon: IconUsers },
   { view: 'emergency-card', label: 'Emergency card', icon: IconIdCard },
-  { view: 'help', label: 'Plain-language help', icon: IconInfo },
 ];
 
 type CoverageZone = {
@@ -817,6 +803,7 @@ export function ContinuityPrototype() {
   const [query, setQuery] = useState('');
   const [enrolOpen, setEnrolOpen] = useState(false);
   const [diffOpen, setDiffOpen] = useState(false);
+  const [comparisonVersion, setComparisonVersion] = useState<number | null>(null);
   const [highlightedField, setHighlightedField] = useState<string | null>(null);
   const [auditFilterActor, setAuditFilterActor] = useState<string>('All');
   const [enrolConfirmed, setEnrolConfirmed] = useState(false);
@@ -832,7 +819,7 @@ export function ContinuityPrototype() {
   const [outreachDate, setOutreachDate] = useState('');
   const [outreachError, setOutreachError] = useState('');
   const [auditEvents, setAuditEvents] = useState(initialAuditEvents);
-  const [toast, setToast] = useState('');
+  const [toast, setToast] = useState<{ message: string } | null>(null);
   const [coverageZoneId, setCoverageZoneId] = useState('south');
   const [profileTab, setProfileTab] =
     useState<'overview' | 'care' | 'documents' | 'scheduling' | 'encounters'>('overview');
@@ -854,8 +841,12 @@ export function ContinuityPrototype() {
   const retrievedRecordHeadingRef = useRef<HTMLHeadingElement>(null);
 
   const recordState = recordStates[selectedId] ?? createInitialRecordState(selectedId);
-  const primaryRecordState =
-    recordStates['CANCER-20418'] ?? createInitialRecordState('CANCER-20418');
+  const currentRelease = latestSummaryRelease(recordState);
+  const requestedRelease = recordState.retrievalVersion === null
+    ? currentRelease : summaryReleaseByNumber(recordState, recordState.retrievalVersion);
+  const draftVersion = recordState.versionPublished ? currentRelease?.number ?? 1 : nextSummaryVersion(recordState);
+  const comparisonNewer = summaryReleaseByNumber(recordState, comparisonVersion ?? currentRelease?.number ?? 0);
+  const comparisonOlder = summaryReleaseByNumber(recordState, (comparisonNewer?.number ?? 1) - 1);
   const {
     draftPrepared,
     draftFields,
@@ -889,7 +880,16 @@ export function ContinuityPrototype() {
   const isTreatingPhysician = currentRole.startsWith('Dr Sujay');
   const isCareCoordinator = currentRole.startsWith('Anitha Rao');
 
+  function closeClinicalAccess() {
+    setRecordStates((states) => Object.fromEntries(Object.entries(states).map(([id, state]) => [id, {
+      ...state, retrievalAcknowledged: false, retrievalUnlocked: false, retrievalVersion: null, unlockedVersion: null,
+    }])));
+    setDiffOpen(false);
+    setComparisonVersion(null);
+  }
+
   function enterCareTeam(role: UserRole) {
+    closeClinicalAccess();
     setSessionType('care-team');
     setFamilyMember(null);
     setPatientAccount(null);
@@ -899,14 +899,18 @@ export function ContinuityPrototype() {
   }
 
   function enterFamily(member: FamilyMember) {
+    if (!workItems.some((item) => item.hospitalId === member.patientId)) return;
+    closeClinicalAccess();
     setSessionType('family');
     setFamilyMember(member);
     setPatientAccount(null);
+    selectPatient(member.patientId);
     setView('caregiver');
     setAuthScreen(null);
   }
 
   function enterPatient(account: PatientAccount) {
+    closeClinicalAccess();
     setSessionType('patient');
     setFamilyMember(null);
     setPatientAccount(account);
@@ -916,6 +920,7 @@ export function ContinuityPrototype() {
   }
 
   function signOut() {
+    closeClinicalAccess();
     setSessionType('care-team');
     setFamilyMember(null);
     setPatientAccount(null);
@@ -967,28 +972,16 @@ export function ContinuityPrototype() {
 
   function setDraftFields(value: React.SetStateAction<Record<DraftFieldKey, string>>) {
     if (!isTreatingPhysician) return;
-    updateSelectedRecord((current) => ({
-      ...current,
+    updateSelectedRecord((current) => reviseSummary(current, {
       draftFields:
         typeof value === 'function' ? value(current.draftFields) : value,
-    }));
-  }
-
-  function setDraftStatuses(
-    value: React.SetStateAction<Record<DraftFieldKey, DraftFieldStatus>>,
-  ) {
-    if (!isTreatingPhysician) return;
-    updateSelectedRecord((current) => ({
-      ...current,
-      draftStatuses:
-        typeof value === 'function' ? value(current.draftStatuses) : value,
     }));
   }
 
   function setVerificationChecks(
     value: React.SetStateAction<RecordState['verificationChecks']>,
   ) {
-    if (!isTreatingPhysician) return;
+    if (!isTreatingPhysician || versionPublished) return;
     updateSelectedRecord((current) => ({
       ...current,
       verificationChecks:
@@ -997,17 +990,13 @@ export function ContinuityPrototype() {
   }
 
   function setAuthorisation(value: string) {
-    if (!isTreatingPhysician) return;
-    updateSelectedRecord((current) => ({ ...current, authorisation: value }));
+    if (!isTreatingPhysician || versionPublished) return;
+    updateSelectedRecord((current) => current.authorisation === value ? current : ({ ...current, authorisation: value, attested: false }));
   }
 
   function setAttested(value: boolean) {
-    if (!isTreatingPhysician) return;
+    if (!isTreatingPhysician || versionPublished) return;
     updateSelectedRecord((current) => ({ ...current, attested: value }));
-  }
-
-  function setVersionPublished(value: boolean) {
-    updateSelectedRecord((current) => ({ ...current, versionPublished: value }));
   }
 
   function setRetrievalReason(value: string) {
@@ -1032,20 +1021,20 @@ export function ContinuityPrototype() {
     updateSelectedRecord((current) => ({ ...current, retrievalAcknowledged: value }));
   }
 
-  function setRetrievalUnlocked(value: boolean) {
-    updateSelectedRecord((current) => ({ ...current, retrievalUnlocked: value }));
-  }
-
   function setConversationDisposition(
     key: ConversationDomainKey,
     value: ConversationDisposition,
   ) {
-    if (!isTreatingPhysician) return;
-    updateSelectedRecord((current) => ({
-      ...current,
+    if (!isTreatingPhysician || versionPublished) return;
+    updateSelectedRecord((current) => current.versionPublished || current.conversationCoverage[key] === value ? current : ({
+      ...invalidateSummaryReview(current),
       conversationCoverage: { ...current.conversationCoverage, [key]: value },
     }));
   }
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [authScreen]);
 
   useEffect(() => {
     const activeDialog = enrolOpen
@@ -1117,7 +1106,7 @@ export function ContinuityPrototype() {
     age: 61,
     team: 'Oncology',
     participant: 'Family participant to be confirmed',
-    phone: 'Synthetic contact held by originating team',
+    phone: 'Ask the care team',
     stage: 'Oncology Cohort',
     verified: 'Not yet verified',
     dob: 'Not recorded',
@@ -1167,7 +1156,7 @@ export function ContinuityPrototype() {
     setWorkItems((items) =>
       items.map((item) =>
         item.hospitalId === id
-          ? { ...item, status: 'Awaiting review', lastActivity: 'Patient requested a review of the care plan' }
+          ? { ...item, status: item.status === 'Escalated' ? 'Escalated' : 'Awaiting review', lastActivity: 'Patient requested a review of the care plan' }
           : item,
       ),
     );
@@ -1177,18 +1166,19 @@ export function ContinuityPrototype() {
   }
 
   function signConsent(id: string, input: { typedName: string; declaration: 'self' | 'delegated' }) {
+    if (!hasLoadedReleasedSummary(id)) return;
     const versionLabel = planVersionLabel(id);
     setConsentById((state) => ({
       ...state,
-      [id]: {
+      [`${id}:${latestReleaseFor(id)?.number}`]: {
         versionLabel,
         typedName: input.typedName,
         declaration: input.declaration,
-        signedAt: '28 Aug 2026 · 10:04',
+        signedAt: new Date().toLocaleString('en-GB'),
       },
     }));
     const patientName = workItems.find((w) => w.hospitalId === id)?.patient ?? '';
-    addAudit(`Gave consent to ${versionLabel} (simulated typed signature)`, patientName, 'PATIENT', patientName);
+    addAudit(`Gave consent to ${versionLabel} (typed name)`, patientName, 'PATIENT', patientName);
     notify('Your consent was recorded.');
   }
 
@@ -1200,27 +1190,38 @@ export function ContinuityPrototype() {
   }
 
   function planVersionLabel(id: string): string {
+    const release = latestReleaseFor(id);
+    return release ? `Version ${release.number}` : 'No released version';
+  }
+
+  function latestReleaseFor(id: string): SummaryRelease | null | undefined {
     const state = recordStates[id];
-    if (state?.versionPublished) return 'Version 2';
-    if ((patientProfiles[id]?.verified ?? '').includes('2026')) return 'Version 1';
-    return 'No released version';
+    return state ? latestSummaryRelease(state) : undefined;
+  }
+
+  function consentFor(id: string): ConsentRecord | null {
+    return consentById[`${id}:${latestReleaseFor(id)?.number}`] ?? null;
   }
 
   function planFieldsFor(id: string): Array<{ label: string; value: string }> {
-    const state = recordStates[id];
-    if (id === 'CANCER-20418') {
-      const released = state?.versionPublished ? state.draftFields : v1Fields;
-      return fieldConfig.map((f) => ({ label: f.label, value: released[f.key] }));
+    const released = latestReleaseFor(id);
+    if (released?.fields) {
+      const labels: Record<DraftFieldKey, string> = { priorities: 'What matters to you', participants: 'Who was there', topics: 'What you discussed', openQuestions: 'Still to discuss', followUp: 'Next steps' };
+      return fieldConfig.map((f) => ({ label: labels[f.key], value: released.fields![f.key] }));
     }
     if (patientHasApprovedSummary(id)) {
       return [
         {
           label: 'Summary',
-          value: 'Your verified summary is held by your care team and is not loaded in this demonstration.',
+          value: 'Ask your care team for a copy of this summary.',
         },
       ];
     }
     return [];
+  }
+
+  function hasLoadedReleasedSummary(id: string): boolean {
+    return Boolean(latestReleaseFor(id)?.fields);
   }
 
   function clinicalItemsFor(id: string): Array<{ label: string; value: string }> {
@@ -1306,13 +1307,13 @@ export function ContinuityPrototype() {
       });
 
     auditEvents
-      .filter((e) => e.record.includes(patientName))
+      .filter((e) => e.patientId ? e.patientId === hospitalId : e.record.split(/ [|\u00b7] /)[0] === patientName)
       .forEach((e, index) => {
         const match = /^(\d{1,2}) (\w{3}) · (\d{2}):(\d{2})$/.exec(e.time);
         const monthMap: Record<string, number> = {
           Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5, Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11,
         };
-        const sortKey = match
+        const sortKey = e.timestamp ? Date.parse(e.timestamp) : match
           ? Date.UTC(2026, monthMap[match[2]] ?? 7, Number(match[1]), Number(match[3]), Number(match[4]))
           : Date.UTC(2026, 7, 28);
         const dateLabel = match ? `${Number(match[1])} ${match[2]} 2026 · ${match[3]}:${match[4]}` : e.time;
@@ -1339,7 +1340,7 @@ export function ContinuityPrototype() {
         if (kind === null) return;
 
         events.push({
-          id: `audit-${index}-${e.time}`,
+          id: e.id ?? `audit-${index}-${e.time}`,
           sortKey,
           dateLabel,
           kind,
@@ -1388,32 +1389,26 @@ export function ContinuityPrototype() {
   }, [workItems]);
 
   const draftFieldBlockers = fieldConfig.filter(
-    ({ key }) => draftStatuses[key] === 'clarify' || !draftFields[key].trim(),
+    ({ key }) => draftStatuses[key] === 'clarify' || !draftFields[key].trim() || (draftStatuses[key] === 'ready' && (!recordState.draftExcerpts[key].trim() || !recordState.draftSource.includes(recordState.draftExcerpts[key]))),
   );
-  const draftReleaseReady = draftPrepared && draftFieldBlockers.length === 0;
+  const draftReleaseReady = draftPrepared && Boolean(recordState.draftSource.trim()) && draftFieldBlockers.length === 0;
   const verificationPassedCount = Object.values(verificationChecks).filter(Boolean).length;
   const acknowledgementComplete =
     authorisation !== 'Pending patient review' && authorisation !== 'Declined';
-  const verificationReady =
-    draftReleaseReady &&
-    verificationPassedCount === 4 &&
-    attested &&
-    acknowledgementComplete &&
-    currentRole.startsWith('Dr Sujay') &&
-    !versionPublished;
+  const verificationReady = isTreatingPhysician && isSummaryReadyToRelease(recordState);
 
   function navigate(nextView: View) {
     if (isPatientSession) {
-      const allowed: View[] = ['my-plan', 'my-timeline', 'care-near-me', 'my-doctors', 'emergency-card', 'my-details', 'consent', 'help'];
+      const allowed: View[] = ['my-plan', 'my-timeline', 'care-near-me', 'my-doctors', 'emergency-card', 'my-details', 'consent'];
       if (!allowed.includes(nextView)) {
         notify('This page is for the care team.');
         return;
       }
     }
     if (isFamilySession) {
-      const allowed: View[] = ['caregiver', 'care-near-me', 'my-doctors', 'emergency-card', 'help'];
+      const allowed: View[] = ['caregiver', 'care-near-me', 'my-doctors', 'emergency-card'];
       if (!allowed.includes(nextView)) {
-        notify('Family access is read-only. The care-team workspace needs a clinician sign-in.');
+        notify('Only the care team can make changes.');
         return;
       }
     }
@@ -1422,7 +1417,7 @@ export function ContinuityPrototype() {
       return;
     }
     if (nextView === 'outreach' && !isCareCoordinator) {
-      notify('Only the simulated care coordinator can record outreach.');
+      notify('Only the care coordinator can save this call.');
       return;
     }
     if (nextView === 'outreach') {
@@ -1433,21 +1428,18 @@ export function ContinuityPrototype() {
     }
     setView(nextView);
     if (typeof window !== 'undefined') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: 'instant' });
     }
   }
 
-  // One timer at a time: otherwise an older toast's timeout clears a newer
-  // toast early whenever two actions land within a few seconds.
-  const toastTimerRef = useRef<number | null>(null);
+  useEffect(() => {
+    if (!toast) return;
+    const timer = window.setTimeout(() => setToast(null), 3500);
+    return () => window.clearTimeout(timer);
+  }, [toast]);
 
   function notify(message: string) {
-    setToast(message);
-    if (toastTimerRef.current !== null) window.clearTimeout(toastTimerRef.current);
-    toastTimerRef.current = window.setTimeout(() => {
-      setToast('');
-      toastTimerRef.current = null;
-    }, 3500);
+    setToast({ message });
   }
 
   function selectPatient(hospitalId: string) {
@@ -1455,18 +1447,16 @@ export function ContinuityPrototype() {
       ...current,
       retrievalAcknowledged: false,
       retrievalUnlocked: false,
+      retrievalVersion: null,
+      unlockedVersion: null,
     }));
+    setComparisonVersion(null);
     setSelectedId(hospitalId);
   }
 
-  function openPrimaryVersionComparison() {
-    selectPatient('CANCER-20418');
-    setDiffOpen(true);
-  }
-
-  function beginRetrievalFor(hospitalId: string) {
+  function beginRetrievalFor(hospitalId: string, releaseNumber?: number) {
     if (!currentRole.startsWith('Dr')) {
-      notify('A simulated physician role is required to retrieve a verified clinical record.');
+      notify('Choose a doctor to view this note.');
       return;
     }
     selectPatient(hospitalId);
@@ -1480,6 +1470,8 @@ export function ContinuityPrototype() {
         : 'Current primary oncology treating team',
       retrievalAcknowledged: false,
       retrievalUnlocked: false,
+      retrievalVersion: releaseNumber ?? null,
+      unlockedVersion: null,
     }));
     navigate('retrieve');
   }
@@ -1504,13 +1496,12 @@ export function ContinuityPrototype() {
   }
 
   function patientHasApprovedSummary(id: string): boolean {
-    return Boolean(recordStates[id]?.versionPublished) || (patientProfiles[id]?.verified ?? '').includes('2026');
+    return Boolean(latestReleaseFor(id));
   }
 
   function patientSummaryLabel(id: string): string {
-    if (recordStates[id]?.versionPublished) return 'Version 2 · 28 Aug 2026';
-    if ((patientProfiles[id]?.verified ?? '').includes('2026')) return `Version 1 · ${patientProfiles[id].verified}`;
-    return 'No approved summary';
+    const release = latestReleaseFor(id);
+    return release ? `Version ${release.number} · ${releaseDate(release)}` : 'No approved summary';
   }
 
 
@@ -1519,10 +1510,16 @@ export function ContinuityPrototype() {
     record = `${selectedItem.patient}`,
     badge?: AuditEvent['badge'],
     actor?: string,
+    patientId = selectedId,
+    releaseNumber?: number,
   ) {
     setAuditEvents((events) => [
       {
-        time: '28 Aug · 10:04',
+        id: crypto.randomUUID(),
+        patientId,
+        releaseNumber,
+        timestamp: new Date().toISOString(),
+        time: new Date().toLocaleString('en-GB'),
         actor: actor ?? currentRole.split(' · ')[0],
         event,
         record,
@@ -1532,15 +1529,15 @@ export function ContinuityPrototype() {
     ]);
   }
 
-  function copySummaryToClipboard() {
-    const releasedFields = versionPublished ? draftFields : v1Fields;
-    const summaryText = `[GOALS OF CARE CONTINUITY SUMMARY]\nPatient: ${selectedItem.patient} (${selectedItem.hospitalId})\nStatus: ${versionPublished ? 'Version 2 (Verified 28 Aug 2026)' : 'Version 1 (Verified 21 Aug 2026)'}\nStated Priorities: ${releasedFields.priorities}\nPeople Present: ${releasedFields.participants}\nTopics Discussed: ${releasedFields.topics}\nUnresolved Questions: ${releasedFields.openQuestions}\nFollow-Up: ${releasedFields.followUp}`;
-
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(summaryText);
-      notify('Verified summary copied to clipboard.');
-    } else {
-      notify('Summary text ready.');
+  async function copySummaryToClipboard() {
+    const release = view === 'retrieve' ? requestedRelease : currentRelease;
+    if (!release?.fields || (view === 'retrieve' && recordState.unlockedVersion !== release.number)) return;
+    const summaryText = [`GOALS-OF-CARE SUMMARY`, `Patient: ${selectedItem.patient} (${selectedId})`, `Version ${release.number} | ${releaseDate(release)} | ${release.physician}`, ...fieldConfig.map(({ key, label }) => `${label}: ${release.fields![key]}`)].join('\n');
+    try {
+      await navigator.clipboard.writeText(summaryText);
+      notify(`Version ${release.number} copied.`);
+    } catch {
+      notify('Copy failed. Use Print handoff to save a copy.');
     }
   }
 
@@ -1604,13 +1601,13 @@ export function ContinuityPrototype() {
       },
       ...events,
     ]);
-    notify(`Follow-up task created for synthetic patient ${candidate.patient}.`);
+    notify(`Follow-up task created for ${candidate.patient}.`);
   }
 
   function saveOutreach(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!isCareCoordinator) {
-      notify('Only the simulated care coordinator can record outreach.');
+      notify('Only the care coordinator can save this call.');
       return;
     }
     const note = outreachNote.trim();
@@ -1667,6 +1664,7 @@ export function ContinuityPrototype() {
   }
 
   function prepareDraft() {
+    if (versionPublished || draftPrepared) return;
     if (!currentRole.startsWith('Dr Sujay')) {
       notify('Only the treating physician can create or update a structured note.');
       return;
@@ -1684,41 +1682,62 @@ export function ContinuityPrototype() {
       attested: false,
     }));
     addAudit('Prepared source-linked structured draft', selectedItem.patient, 'VIEW');
-    notify('Deterministic draft prepared from the synthetic source note.');
+    notify(recordState.draftIsNewConversation ? 'Add your conversation notes.' : 'Preloaded draft opened for review.');
   }
 
   function setDraftFieldStatus(key: DraftFieldKey, status: DraftFieldStatus) {
     if (!isTreatingPhysician) return;
-    setDraftStatuses((statuses) => ({ ...statuses, [key]: status }));
+    updateSelectedRecord((current) => setSummaryFieldStatus(current, key, status));
+  }
+
+  function startConversation() {
+    if (!isTreatingPhysician) return;
+    const next = beginSummaryRevision(recordState);
+    if (next !== recordState) {
+      updateSelectedRecord(() => ({
+        ...next,
+        conversationCoverage: Object.fromEntries(conversationDomains.map(({ key }) => [key, 'defer'])) as Record<ConversationDomainKey, ConversationDisposition>,
+        retrievalAcknowledged: false,
+        retrievalUnlocked: false,
+        unlockedVersion: null,
+      }));
+      addAudit(`Started draft for Version ${nextSummaryVersion(next)}`, selectedItem.patient, 'VIEW');
+    }
+    navigate('draft');
   }
 
   function publishVersion() {
     if (!isTreatingPhysician || !verificationReady) return;
-    setVersionPublished(true);
-    setWorkItems((items) =>
-      items.map((item) =>
-        item.hospitalId === selectedId
-          ? {
-              ...item,
-              status: 'Completed',
-              lastActivity: 'Version 2 verified',
-            }
-          : item,
-      ),
-    );
-    addAudit('Verified and published version 2', `${selectedItem.patient} · v2`, 'PUBLISH');
-    notify('Version 2 published. Version 1 remains in the append-only demo history.');
+    const next = releaseSummary(recordState, {
+      physician: currentRole.split(' \u00b7 ')[0],
+      releasedAt: new Date().toISOString(),
+      coverage: recordState.conversationCoverage,
+    });
+    if (next === recordState) {
+      notify('Complete the source links and review before releasing.');
+      return;
+    }
+    const release = latestSummaryRelease(next)!;
+    updateSelectedRecord(() => ({ ...next, retrievalAcknowledged: false, retrievalUnlocked: false, unlockedVersion: null }));
+    setWorkItems((items) => items.map((item) => item.hospitalId === selectedId
+      ? { ...item, status: 'Completed', lastActivity: `Version ${release.number} verified` } : item));
+    addAudit(`Verified and published version ${release.number}`, `${selectedItem.patient} | v${release.number}`, 'PUBLISH', undefined, selectedId, release.number);
+    notify(`Version ${release.number} released. Earlier versions are preserved.`);
     navigate('patient');
   }
 
   function openRetrievedRecord(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!requestedRelease || requestedRelease.patientId !== selectedId) {
+      notify('No released summary is available for this patient.');
+      return;
+    }
     if (!currentRole.startsWith('Dr')) {
-      notify('Switch to a simulated physician role to retrieve this clinical record.');
+      notify('Choose a doctor to view this note.');
       return;
     }
     if (!retrievalReason || !careRelationship) {
-      notify('Select an access purpose and care relationship before continuing.');
+      notify('Choose why you need this note and your role in the patient’s care.');
       return;
     }
     const isBreakGlassAccess = retrievalReason === 'Emergency hand-off retrieval (Break-glass)';
@@ -1726,32 +1745,34 @@ export function ContinuityPrototype() {
       isBreakGlassAccess &&
       (!currentRole.startsWith('Dr Isha') || careRelationship !== 'Emergency receiving physician')
     ) {
-      notify('Break-glass access requires the simulated emergency physician role and emergency receiving relationship.');
+      notify('Emergency notes can only be opened by the receiving doctor.');
       return;
     }
     if (!retrievalAcknowledged) {
       notify('Confirm the retrieval boundary before viewing the verified record.');
       return;
     }
-    setRetrievalUnlocked(true);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    updateSelectedRecord((current) => ({ ...current, retrievalUnlocked: true, unlockedVersion: requestedRelease.number }));
+    window.scrollTo({ top: 0, behavior: 'instant' });
     addAudit(
-      `Viewed latest verified summary · ${isBreakGlassAccess ? 'Break-glass' : 'Routine'} access · ${retrievalReason}`,
-      `${selectedItem.patient} · ${versionPublished ? 'v2' : 'v1'}`,
+      `Viewed Version ${requestedRelease.number} · ${isBreakGlassAccess ? 'Emergency' : 'Patient care'} · ${retrievalReason}`,
+      `${selectedItem.patient} · v${requestedRelease.number}`,
       'ACCESS',
+      undefined,
+      selectedId,
+      requestedRelease.number,
     );
-    notify('Access justification recorded in the simulated audit trail.');
+    notify('Note opened. Reason saved in History.');
   }
 
   function renderPageHeading(
-    eyebrow: string,
+    _eyebrow: string,
     title: string,
     action?: React.ReactNode,
   ) {
     return (
       <div className="page-heading compact-heading">
         <div>
-          <p className="eyebrow">{eyebrow}</p>
           <h1>{title}</h1>
         </div>
         {action}
@@ -1760,10 +1781,25 @@ export function ContinuityPrototype() {
   }
 
   function renderCareJourney() {
-    const releasedFields = primaryRecordState.versionPublished
-      ? primaryRecordState.draftFields
-      : v1Fields;
-    const releasedVersion = primaryRecordState.versionPublished ? 'Version 2' : 'Version 1';
+    const patientId = isFamilySession ? portalPatientId : selectedId;
+    const patient = workItems.find((item) => item.hospitalId === patientId);
+    if (!patient) return <p className="ptl-empty">Choose a patient.</p>;
+    const firstName = patient.patient.split(' ')[0];
+    const released = latestReleaseFor(patientId);
+    const releasedFields = released?.fields ?? null;
+    const releasedVersion = planVersionLabel(patientId);
+    const nextAppointment = appointments
+      .filter((item) => item.hospitalId === patientId && item.status === 'Scheduled' && item.date >= DEMO_TODAY)
+      .sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`))[0];
+    const touchpoint = nextAppointment
+      ? {
+          date: `${new Date(`${nextAppointment.date}T00:00:00`).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })} at ${nextAppointment.time}`,
+          purpose: nextAppointment.type,
+          owner: nextAppointment.clinician,
+        }
+      : patient.status !== 'Completed'
+        ? { date: patient.due, purpose: patient.purpose, owner: patient.owner }
+        : null;
     const activeCoverageZone =
       coverageZones.find((zone) => zone.id === coverageZoneId) ?? coverageZones[0];
 
@@ -1771,14 +1807,7 @@ export function ContinuityPrototype() {
       <section className="care-journey" aria-labelledby="care-journey-title">
         <article className="care-journey-hero">
           <div className="care-journey-copy">
-            <div className="care-journey-meta">
-              <span className="care-journey-kicker">Care journey companion</span>
-              <span className="care-journey-demo">Simulated caregiver view</span>
-            </div>
-            <h1 id="care-journey-title">Meera’s next steps, all in one place.</h1>
-            <p className="care-journey-lede">
-              A calm, shared view of the conversation her care team has reviewed, what is next, and who can help prepare for it.
-            </p>
+            <h1 id="care-journey-title">{firstName}&rsquo;s next steps</h1>
             {isFamilySession ? (
               <p className="care-journey-signed-in">
                 Signed in as <strong>{familyMember?.name}</strong> · {familyMember?.relationship}
@@ -1787,36 +1816,24 @@ export function ContinuityPrototype() {
               <div className="care-journey-actions">
                 <button className="primary-button" type="button" onClick={() => navigate('home')}>
                   <IconUsers className="w-4 h-4" />
-                  Open care-team workspace
+                  Care team
                 </button>
                 <button
                   className="secondary-button"
                   type="button"
                   onClick={() => openDemoRoleWorkflow('Dr Isha Menon · Emergency physician')}
                 >
-                  Emergency clinician demo
+                  Emergency doctor
                   <IconChevronRight className="w-4 h-4" />
                 </button>
               </div>
             )}
-            <div className="care-journey-readonly" role="note">
-              <IconLock className="w-4 h-4" />
-              <span>Read-only by design. Care-team updates are released only after physician review.</span>
-            </div>
+
           </div>
 
-          <figure className="care-journey-illustration">
-            {/* The Vinext local runtime cannot hydrate next/image for this bundled public asset. */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/care-conversation.jpg"
-              alt="Illustration of a patient seated across a desk from a clinician, beside a large checklist of reviewed items"
-              width={736}
-              height={751}
-              loading="eager"
-            />
-            <figcaption>Continuity starts with a shared conversation.</figcaption>
-          </figure>
+          <div className="family-care-photo">
+            <Image src="/care-consultation.jpg" alt="A clinician and patient in conversation" fill sizes="(max-width: 600px) 120px, 300px" />
+          </div>
         </article>
 
         <div className="care-journey-primary-grid">
@@ -1824,18 +1841,19 @@ export function ContinuityPrototype() {
             <div className="care-journey-card-heading">
               <span className="care-journey-icon care-journey-icon-warm" aria-hidden="true"><IconHistory className="w-5 h-5" /></span>
               <div>
-                <p className="care-journey-label">Next touchpoint</p>
-                <h2>Next-visit checklist</h2>
+                <h2>Next visit</h2>
               </div>
             </div>
-            <div className="care-journey-date-row">
-              <strong>{careJourneyTouchpoint.date}</strong>
-              <span>{careJourneyTouchpoint.purpose}<br />Continuity owner · {careJourneyTouchpoint.owner}</span>
-            </div>
+            {touchpoint ? (
+              <div className="care-journey-date-row">
+                <strong>{touchpoint.date}</strong>
+                <span>{touchpoint.purpose}<br />Contact: {touchpoint.owner}</span>
+              </div>
+            ) : <p>No upcoming touchpoint is recorded. Ask your care team about the next review.</p>}
             <ul className="care-journey-prep-list" aria-label="Plain-language next-visit checklist">
               <li><IconCheck className="w-3.5 h-3.5" />Write down the questions you want the care team to answer.</li>
-              <li><IconCheck className="w-3.5 h-3.5" />Confirm who Meera wants included in the conversation.</li>
-              <li><IconCheck className="w-3.5 h-3.5" />Tell Anitha Rao if the time or people joining need to change.</li>
+              <li><IconCheck className="w-3.5 h-3.5" />Confirm who {firstName} wants included in the conversation.</li>
+              <li><IconCheck className="w-3.5 h-3.5" />Tell {touchpoint?.owner ?? patient.owner} if the time or people joining need to change.</li>
             </ul>
           </article>
 
@@ -1843,11 +1861,11 @@ export function ContinuityPrototype() {
             <div className="care-journey-card-heading">
               <span className="care-journey-icon care-journey-icon-green" aria-hidden="true"><IconShieldCheck className="w-5 h-5" /></span>
               <div>
-                <p className="care-journey-label">Clinician-reviewed release</p>
-                <h2>What the care team has confirmed</h2>
+                <h2>Reviewed summary</h2>
               </div>
               <span className="care-journey-version">{releasedVersion}</span>
             </div>
+            {releasedFields ? <>
             <dl className="care-journey-summary-list">
               <div>
                 <dt>What matters now</dt>
@@ -1865,10 +1883,12 @@ export function ContinuityPrototype() {
             <div className="care-journey-provenance">
               <IconShieldCheck className="w-3.5 h-3.5" />
               <span>
-                Released after physician review by <strong>Dr Sujay</strong> on {releasedVersion === 'Version 2' ? '28 Aug 2026' : '21 Aug 2026'}.
-                A new conversation creates the next version; this one is never edited in place.
+                Reviewed by <strong>{released?.physician}</strong> on {releaseDate(released)}.
               </span>
             </div>
+            </> : <p className="care-journey-card-copy">{patientHasApprovedSummary(patientId)
+              ? 'Ask the care team for a copy of this summary.'
+              : 'The care team has not released a written summary yet.'}</p>}
           </article>
         </div>
 
@@ -1877,8 +1897,7 @@ export function ContinuityPrototype() {
             <div className="care-journey-card-heading">
               <span className="care-journey-icon care-journey-icon-indigo" aria-hidden="true"><IconUsers className="w-5 h-5" /></span>
               <div>
-                <p className="care-journey-label">Your care team</p>
-                <h2>People coordinating the next step</h2>
+                <h2>Care team</h2>
               </div>
             </div>
             <div className="care-journey-people">
@@ -1893,30 +1912,13 @@ export function ContinuityPrototype() {
             </div>
           </article>
 
-          <article className="care-journey-card care-journey-family-card">
-            <div className="care-journey-card-heading">
-              <span className="care-journey-icon care-journey-icon-cream" aria-hidden="true"><IconCheck className="w-5 h-5" /></span>
-              <div>
-                <p className="care-journey-label">Family preparation</p>
-                <h2>Keep the next conversation focused</h2>
-              </div>
-            </div>
-            <p className="care-journey-card-copy">Family members can keep questions together and confirm who Meera wants involved. This companion cannot edit a clinical record.</p>
-            <button className="care-journey-text-button" type="button" onClick={() => navigate('help')}>
-              How clinician review protects context <IconChevronRight className="w-4 h-4" />
-            </button>
-          </article>
+          <button className="family-nearby-button" type="button" onClick={() => navigate('care-near-me')}>
+            <IconMapPin className="w-5 h-5" /> Nearby care <span aria-hidden="true">↗</span>
+          </button>
         </div>
 
-        <article className="care-journey-card care-journey-support-card" aria-labelledby="care-journey-support-title">
-          <div className="care-journey-card-heading">
-            <span className="care-journey-icon care-journey-icon-indigo" aria-hidden="true"><IconInfo className="w-5 h-5" /></span>
-            <div>
-              <p className="care-journey-label">Support resources</p>
-              <h2 id="care-journey-support-title">Ask the care team what is available</h2>
-            </div>
-            <span className="care-journey-resource-status">Seeded · unverified</span>
-          </div>
+        <details className="care-journey-card care-journey-support-card">
+          <summary>Illustrative coverage map</summary>
           <p className="care-journey-card-copy">
             An illustrative sketch of where continuity follow-up happens across Mumbai. The outline is stylised, the counts are seeded,
             and no address, availability, or contact detail here has been verified. Ask the care team what is actually available.
@@ -1951,19 +1953,14 @@ export function ContinuityPrototype() {
               </div>
             </div>
           </div>
-        </article>
+        </details>
 
-        <div className="care-journey-boundary" role="note">
-          <IconInfo className="w-4 h-4" />
-          <p><strong>Demonstration boundary:</strong> Meera, Kavya, the care team, dates, and summary are fictional. This screen has no live login, messaging, medical advice, or record integration.</p>
-        </div>
+
       </section>
     );
   }
 
   function renderHome() {
-    const activeFollowUps = Math.max(0, counts.all - counts.completed);
-
     const statusRank: Record<string, number> = {
       Overdue: 0,
       Escalated: 1,
@@ -2081,32 +2078,31 @@ export function ContinuityPrototype() {
 
     return (
       <>
-        <section className="command-intro">
-          <div className="command-intro-copy">
-            <p className="eyebrow">Continuity handoff</p>
-            <h1>Make every handoff easier to act on.</h1>
-            <p className="command-support">
-              Start with the next follow-up, preserve what was said, and retrieve a verified summary only when the care context calls for it.
-            </p>
-            <div className="demo-session-summary" aria-label={`Active simulated role: ${currentRole}`}>
-              <span className="demo-session-role"><span className="demo-session-dot" aria-hidden="true" />Demo role: <strong>{currentRole.split(' · ')[0]}</strong></span>
-              <span>Browser-local demonstration</span>
+        <section className="care-day-hero">
+          <div className="care-day-copy">
+            <span className="care-day-date">{new Date(`${DEMO_TODAY}T12:00:00`).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' })}</span>
+            <h1>Your care day.</h1>
+            <div className="care-day-actions">
+              <button className="primary-button" type="button" onClick={() => navigate('appointments')}><IconCalendar className="w-4 h-4" />Appointments</button>
+              <button className="care-day-link" type="button" onClick={() => navigate('guide')}>Open conversation <span aria-hidden="true">↗</span></button>
             </div>
           </div>
-          <div className="command-intro-actions">
-            <button className="secondary-button command-help" type="button" onClick={() => navigate('help')}>
-              <IconInfo className="w-4 h-4" />
-              Workflow help
-            </button>
+          <div className="care-day-photo">
+            <Image src="/care-consultation.jpg" alt="A clinician listening to a patient during a consultation" fill sizes="(max-width: 600px) 40vw, 440px" priority />
           </div>
+        </section>
+
+        <section className="care-day-stats" aria-label="Follow-up overview">
+          <button type="button" onClick={() => { setActiveFilter('Due today'); navigate('worklist'); }}><strong>{counts.dueToday}</strong><span>Due today</span><span className="stat-arrow" aria-hidden="true">↗</span></button>
+          <button type="button" onClick={() => { setActiveFilter('Overdue'); navigate('worklist'); }}><strong>{counts.overdue}</strong><span>Overdue</span><span className="stat-arrow" aria-hidden="true">↗</span></button>
+          <button type="button" onClick={() => { setActiveFilter('Awaiting review'); navigate('worklist'); }}><strong>{counts.awaiting}</strong><span>To review</span><span className="stat-arrow" aria-hidden="true">↗</span></button>
+          <button type="button" onClick={() => { setActiveFilter('Awaiting outreach'); navigate('worklist'); }}><strong>{counts.awaitingOutreach}</strong><span>To contact</span><span className="stat-arrow" aria-hidden="true">↗</span></button>
         </section>
 
         <section className="detail-card th-card" aria-labelledby="th-title">
           <div className="th-header">
             <div>
-              <p className="eyebrow">Today's handoffs</p>
-              <h2 id="th-title">Patients who need attention</h2>
-              <p className="th-note">Ordered by follow-up status, then due date. This list does not rank clinical urgency.</p>
+              <h2 id="th-title">Your follow-ups</h2>
             </div>
             <div className="th-header-right">
               <span className="th-count"><strong>{openItems.length}</strong> open</span>
@@ -2142,59 +2138,11 @@ export function ContinuityPrototype() {
             </>
           )}
 
-          <p className="th-footnote">
-            Approved summaries are for clinical review only. Retrieving one asks for a reason and is recorded in the audit log.
-          </p>
+          <p className="th-footnote">Ordered by follow-up status and date, not clinical urgency.</p>
         </section>
 
-        <section className="today-overview" aria-labelledby="today-overview-title">
-          <div className="section-heading">
-            <div>
-              <span className="document-kicker">Worklist overview</span>
-              <h2 id="today-overview-title">What needs attention today</h2>
-            </div>
-            <div className="today-overview-total">
-              <strong>{activeFollowUps}</strong>
-              <span>active follow-ups</span>
-              <button className="text-button" type="button" onClick={() => navigate('worklist')}>
-                Open all work →
-              </button>
-            </div>
-          </div>
-          <div className="today-stat-grid">
-            <button className="today-stat urgent" type="button" onClick={() => { setActiveFilter('Due today'); navigate('worklist'); }}>
-              <strong>{counts.dueToday}</strong>
-              <span>Due today</span>
-            </button>
-            <button className="today-stat overdue" type="button" onClick={() => { setActiveFilter('Overdue'); navigate('worklist'); }}>
-              <strong>{counts.overdue}</strong>
-              <span>Overdue</span>
-            </button>
-            <button className="today-stat" type="button" onClick={() => { setActiveFilter('Awaiting review'); navigate('worklist'); }}>
-              <strong>{counts.awaiting}</strong>
-              <span>Awaiting review</span>
-            </button>
-            <button className="today-stat" type="button" onClick={() => { setActiveFilter('Awaiting outreach'); navigate('worklist'); }}>
-              <strong>{counts.awaitingOutreach}</strong>
-              <span>Awaiting outreach</span>
-            </button>
-          </div>
-          <p className="today-overview-boundary">
-            <IconInfo className="w-3.5 h-3.5" />
-            <span>
-              Seeded workflow counts, not clinical outcomes. They reset on reload; no live EHR,
-              messaging, or analytics connection is active.
-            </span>
-          </p>
-        </section>
-
-        <section className="role-route" aria-labelledby="role-route-title">
-          <div className="section-heading">
-            <div>
-              <span className="document-kicker">Simulated role access</span>
-              <h2 id="role-route-title">Choose the role you want to demonstrate</h2>
-            </div>
-          </div>
+        <details className="role-route care-day-roles">
+          <summary>Try another care team role</summary>
           <div className="role-route-grid">
             <button
               className="role-route-card clinician"
@@ -2219,11 +2167,7 @@ export function ContinuityPrototype() {
               <small>Record the clinical reason before opening the most recent verified version.</small>
             </button>
           </div>
-          <div className="role-route-boundary" role="note">
-            <IconUsers className="w-4 h-4" />
-            <span><strong>Patient and family access:</strong> families use the separate family door on the sign-in page, which is simulated. Preferences are still captured through the clinician-led conversation, and no independently authenticated patient portal is part of this demonstration.</span>
-          </div>
-        </section>
+        </details>
       </>
     );
   }
@@ -2243,11 +2187,11 @@ export function ContinuityPrototype() {
     return (
       <>
         <button className="back-button" type="button" onClick={() => navigate('home')}>
-          ← Back to clinical handoff
+          ← Home
         </button>
         {renderPageHeading(
           'Clinician-owned discussion framework',
-          `Guided conversation · ${selectedItem.patient}`,
+          `Conversation with ${selectedItem.patient}`,
           <StatusPill status={`${discussedCount}/${conversationDomains.length} discussed`} />,
         )}
 
@@ -2257,7 +2201,7 @@ export function ContinuityPrototype() {
               <IconInfo className="w-4 h-4 flex-shrink-0" />
               <span>
                 {isTreatingPhysician
-                  ? 'Demonstration framework based on the clinician meeting. Final wording and mandatory domains require approval from the clinical leads.'
+                  ? 'Use these topics to guide the conversation.'
                   : `Read-only view for ${currentRole}. Only the treating physician can record coverage or prepare the source-linked draft.`}
               </span>
             </div>
@@ -2315,7 +2259,7 @@ export function ContinuityPrototype() {
                     <span className="sr-only">Disposition for {domain.label}</span>
                     <select
                       value={conversationCoverage[domain.key]}
-                      disabled={!isTreatingPhysician}
+                      disabled={!isTreatingPhysician || versionPublished}
                       onChange={(event) =>
                         setConversationDisposition(
                           domain.key,
@@ -2336,13 +2280,13 @@ export function ContinuityPrototype() {
           <aside className="conversation-side">
             <section className="detail-card capture-card">
               <span className="document-kicker">MVP capture mode</span>
-              <h2>Preloaded synthetic source</h2>
+              <h2>{recordState.draftIsNewConversation ? 'Conversation notes' : 'Conversation notes'}</h2>
               <dl className="definition-list">
-                <div><dt>Participants</dt><dd>Patient, daughter, treating physician</dd></div>
+                <div><dt>Participants</dt><dd>{recordState.draftFields.participants || 'Not recorded yet'}</dd></div>
                 <div><dt>Input</dt><dd>Clinician-entered source note</dd></div>
                 <div><dt>Stored with</dt><dd>Every released version</dd></div>
                 <div><dt>Audio</dt><dd>Not recorded or retained</dd></div>
-                <div><dt>Extraction</dt><dd>Deterministic demonstration</dd></div>
+                <div><dt>Preparation</dt><dd>{recordState.draftIsNewConversation ? 'Manual, source-linked fields' : 'Prepared fields'}</dd></div>
               </dl>
             </section>
 
@@ -2363,8 +2307,9 @@ export function ContinuityPrototype() {
                 }}
               >
                 <IconFileEdit className="w-4 h-4" />
-                {isTreatingPhysician ? 'Continue to source-linked draft' : 'Treating physician update required'}
+                {versionPublished ? 'View released source and summary' : isTreatingPhysician ? 'Continue to source-linked draft' : 'Treating physician update required'}
               </button>
+              {versionPublished && isTreatingPhysician && <button className="secondary-button full-width" type="button" onClick={startConversation}>New conversation</button>}
             </section>
           </aside>
         </div>
@@ -2393,7 +2338,7 @@ export function ContinuityPrototype() {
         <div className="page-heading">
           <div>
             <p className="eyebrow">
-              <span className="environment-dot" /> Oncology Continuity Loop · Safe Demonstration
+              <span className="environment-dot" /> Patient details
             </p>
             <h1>Goals-of-care follow-up</h1>
             <p className="heading-support">
@@ -2547,10 +2492,9 @@ export function ContinuityPrototype() {
 
   function renderPatientRecord() {
     const isMeera = selectedItem.hospitalId === 'CANCER-20418';
-    const hasVerifiedRecord =
-      versionPublished || selectedProfile.verified.includes('2026');
-    const summaryFieldsAvailable = isMeera;
-    const releasedFields = versionPublished ? draftFields : v1Fields;
+    const hasVerifiedRecord = Boolean(currentRelease);
+    const summaryFieldsAvailable = Boolean(currentRelease?.fields);
+    const releasedFields = currentRelease?.fields ?? { priorities: '', participants: '', topics: '', openQuestions: '', followUp: '' };
     const timelineItems = [
       ...(isMeera
         ? [
@@ -2574,7 +2518,7 @@ export function ContinuityPrototype() {
             {
               date: 'Task',
               title: 'Continuity task created',
-              body: `${selectedItem.purpose} was recorded for this synthetic patient.`,
+              body: `${selectedItem.purpose} was recorded for this patient.`,
             },
             {
               date: 'Owner',
@@ -2591,15 +2535,11 @@ export function ContinuityPrototype() {
             },
           ]
         : []),
-      ...(versionPublished
-        ? [
-            {
-              date: '28 Aug',
-              title: 'Version 2 verified & published',
-              body: 'Clinician review completed; Version 2 added to the append-only demonstration history.',
-            },
-          ]
-        : []),
+      ...recordState.releases.map((release) => ({
+        date: releaseDate(release),
+        title: `Version ${release.number} released`,
+        body: `Reviewed by ${release.physician}. Earlier releases remain in the archive.`,
+      })),
     ];
     const initials = selectedItem.patient
       .split(' ')
@@ -2692,8 +2632,8 @@ export function ContinuityPrototype() {
       },
       {
         key: 'released',
-        label: isMeera ? 'Version 2 verified and released' : 'Summary verified and released',
-        done: isMeera ? versionPublished : hasVerifiedRecord,
+        label: currentRelease ? `Version ${currentRelease.number} verified and released` : 'Summary verified and released',
+        done: hasVerifiedRecord,
         onClick: () => navigate(isMeera ? 'verify' : 'records'),
       },
     ];
@@ -2716,7 +2656,7 @@ export function ContinuityPrototype() {
       {
         key: 'acknowledgement',
         label: 'Patient or surrogate acknowledgement recorded',
-        done: versionPublished ? acknowledgementComplete : hasVerifiedRecord,
+        done: Boolean(currentRelease?.authorisation),
         menu: [
           { key: 'open-verify', label: 'Open verification', onClick: () => navigate('verify') },
           { key: 'audit', label: 'View in audit log', onClick: () => navigate('audit') },
@@ -2748,7 +2688,7 @@ export function ContinuityPrototype() {
           {
             key: 'retrieve',
             label: 'Retrieve verified record',
-            onClick: () => navigate('retrieve'),
+            onClick: () => beginRetrievalFor(selectedId),
             disabled: !hasVerifiedRecord,
           },
           { key: 'audit', label: 'View in audit log', onClick: () => navigate('audit') },
@@ -2867,7 +2807,7 @@ export function ContinuityPrototype() {
               className="secondary-button"
               type="button"
               disabled={!hasVerifiedRecord}
-              onClick={() => navigate('retrieve')}
+              onClick={() => beginRetrievalFor(selectedId)}
             >
               <IconLock className="w-3.5 h-3.5" />
               Retrieve verified record
@@ -2922,7 +2862,7 @@ export function ContinuityPrototype() {
                     owned by {selectedItem.owner}, due {selectedItem.due}.
                   </p>
                   <p className="pp-muted-note">
-                    Synthetic record. This profile coordinates follow-up and documents a
+                    This profile coordinates follow-up and documents a
                     clinician-led conversation. It does not score risk, estimate prognosis or
                     recommend treatment.
                   </p>
@@ -2965,7 +2905,7 @@ export function ContinuityPrototype() {
                     </div>
                   ) : (
                     <div className="compact-empty-state">
-                      No guided conversation is loaded for this synthetic patient.
+                      No guided conversation is loaded for this patient.
                     </div>
                   )}
                 </section>
@@ -3130,17 +3070,13 @@ export function ContinuityPrototype() {
                   <button
                     className="primary-button"
                     type="button"
-                    disabled={!isMeera || !isTreatingPhysician}
+                    disabled={!isTreatingPhysician}
                     onClick={() => {
-                      if (isMeera) navigate('draft');
+                      if (versionPublished || !draftPrepared) startConversation(); else navigate('draft');
                     }}
                   >
                     <IconFileEdit className="w-4 h-4" />
-                    {!isMeera
-                      ? 'Source note unavailable'
-                      : isTreatingPhysician
-                        ? 'Prepare summary draft'
-                        : 'Physician update required'}
+                    {versionPublished || !draftPrepared ? 'New conversation' : 'Continue draft'}
                   </button>
                   <button
                     className="secondary-button"
@@ -3167,17 +3103,11 @@ export function ContinuityPrototype() {
                 <div className="card-header">
                   <div className="card-header-titles">
                     <h2>{hasVerifiedRecord ? 'Latest verified conversation summary' : 'No verified summary released'}</h2>
-                    <span>
-                      {versionPublished
-                        ? 'Version 2 · Verified 28 Aug 2026 by Dr Sujay'
-                        : hasVerifiedRecord
-                          ? `Version 1 · Verified ${selectedProfile.verified} by Dr Sujay`
-                          : 'A clinician-reviewed draft is required before retrieval'}
-                    </span>
+                    <span>{currentRelease ? `${patientSummaryLabel(selectedId)} | ${currentRelease.physician}` : 'No released summary'}</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    {versionPublished && (
-                      <button className="text-button" type="button" onClick={() => setDiffOpen(true)}>
+                    {recordState.releases.length > 1 && (
+                      <button className="text-button" type="button" onClick={() => { setComparisonVersion(null); setDiffOpen(true); }}>
                         <IconColumns className="w-3.5 h-3.5" /> Compare versions
                       </button>
                     )}
@@ -3190,16 +3120,12 @@ export function ContinuityPrototype() {
                       className="primary-button"
                       style={{ minHeight: '32px', fontSize: '11px', padding: '0 12px' }}
                       type="button"
-                      disabled={!isMeera || !isTreatingPhysician}
+                      disabled={!isTreatingPhysician}
                       onClick={() => {
-                        if (isMeera) navigate('draft');
+                        if (versionPublished || !draftPrepared) startConversation(); else navigate('draft');
                       }}
                     >
-                      {!isMeera
-                        ? 'Source note unavailable'
-                        : isTreatingPhysician
-                          ? 'Update version'
-                          : 'Physician update required'}
+                      {versionPublished || !draftPrepared ? 'New conversation' : 'Continue draft'}
                     </button>
                   </div>
                 </div>
@@ -3225,7 +3151,7 @@ export function ContinuityPrototype() {
                     </div>
                   ) : (
                     <div className="empty-state compact-empty-state">
-                      <p>Version metadata exists for this synthetic patient, but its source-linked field content is not loaded in this demonstration.</p>
+                      <p>The summary text is not available for this version.</p>
                       <button
                         className="primary-button"
                         type="button"
@@ -3237,7 +3163,7 @@ export function ContinuityPrototype() {
                   )
                 ) : (
                   <div className="empty-state compact-empty-state">
-                    <p>This synthetic patient has no released goals-of-care summary.</p>
+                    <p>This patient has no released goals-of-care summary.</p>
                     <button
                       className="primary-button"
                       type="button"
@@ -3261,38 +3187,27 @@ export function ContinuityPrototype() {
                 <div className="card-header">
                   <div className="card-header-titles">
                     <h2>Version history</h2>
-                    <span>Append-only version history in this demonstration</span>
+                    <span>Previous versions stay available</span>
                   </div>
                 </div>
                 {hasVerifiedRecord ? (
                   <div className="version-list">
-                    {versionPublished && (
-                    <div className="version-row current">
-                      <div>
-                        <strong>Version 2 (Current)</strong>
-                        <span>28 Aug 2026 · Dr Sujay</span>
-                        <span>Acknowledgement: {authorisation}</span>
+                    {[...recordState.releases].reverse().map((release) => (
+                      <div className={`version-row ${release.number === currentRelease?.number ? 'current' : ''}`} key={release.number}>
+                        <div><strong>Version {release.number}</strong><span>{releaseDate(release)} | {release.physician}</span><span>Acknowledgement: {release.authorisation ?? 'Not loaded'}</span></div>
+                        <button className="text-button" type="button" disabled={!currentRole.startsWith('Dr')} onClick={() => beginRetrievalFor(selectedId, release.number)}>View version {release.number}</button>
+                        <StatusPill status={release.number === currentRelease?.number ? 'Current' : 'Superseded'} />
                       </div>
-                      <StatusPill status="Current" />
-                    </div>
-                  )}
-                    <div className={`version-row ${versionPublished ? '' : 'current'}`}>
-                      <div>
-                        <strong>Version 1 {versionPublished ? '(Superseded)' : '(Current)'}</strong>
-                        <span>{selectedProfile.verified} · Dr Sujay</span>
-                        <span>Acknowledgement: Verbal acknowledgement recorded by care team</span>
-                      </div>
-                      <StatusPill status={versionPublished ? 'Superseded' : 'Current'} />
-                    </div>
+                    ))}
                   </div>
                 ) : (
                   <div className="compact-empty-state">No released versions.</div>
                 )}
                 <div className="stacked-actions">
-                  {versionPublished && (
-                    <button className="secondary-button" type="button" onClick={() => setDiffOpen(true)}>
+                  {recordState.releases.length > 1 && (
+                    <button className="secondary-button" type="button" onClick={() => { setComparisonVersion(null); setDiffOpen(true); }}>
                       <IconColumns className="w-4 h-4" />
-                      Compare v1 vs v2
+                      Compare latest versions
                     </button>
                   )}
                   <button className="wide-quiet-button" type="button" onClick={() => navigate('records')}>
@@ -3305,14 +3220,14 @@ export function ContinuityPrototype() {
                 <div className="card-header">
                   <div className="card-header-titles">
                     <h2>Identity & sharing</h2>
-                    <span>Kept honest for this demonstration</span>
+                    <span>Record details</span>
                   </div>
                   <StatusPill status="Not connected" />
                 </div>
                 <dl className="identity-sharing-list">
                   <div>
                     <dt>ABHA Number</dt>
-                    <dd>Not linked in this demo</dd>
+                    <dd>Not connected</dd>
                   </div>
                   <div>
                     <dt>Sharing basis</dt>
@@ -3320,7 +3235,7 @@ export function ContinuityPrototype() {
                   </div>
                   <div>
                     <dt>Data location</dt>
-                    <dd>Browser-local synthetic record</dd>
+                    <dd>Saved for this session</dd>
                   </div>
                 </dl>
                 <div className="record-boundary">
@@ -3367,15 +3282,11 @@ export function ContinuityPrototype() {
                 <div>
                   <dt>Verified version</dt>
                   <dd>
-                    {versionPublished
-                      ? 'Version 2 (28 Aug 2026)'
-                      : hasVerifiedRecord
-                        ? `Version 1 (${selectedProfile.verified})`
-                        : 'No released version'}
+                    {patientSummaryLabel(selectedId)}
                   </dd>
                 </div>
                 <div>
-                  <dt>Access tier</dt>
+                  <dt>Who can view</dt>
                   <dd>Authorised care team only</dd>
                 </div>
               </dl>
@@ -3535,7 +3446,7 @@ export function ContinuityPrototype() {
     return (
       <>
         <button className="back-button" type="button" onClick={() => navigate('patient')}>
-          ← Back to patient record
+          ← Back
         </button>
         {renderPageHeading('Care Coordinator Workflow', `Follow-up outreach · ${selectedItem.patient}`)}
 
@@ -3633,180 +3544,58 @@ export function ContinuityPrototype() {
   }
 
   function renderDraft() {
-    const sourceContextAvailable = selectedId === 'CANCER-20418';
     return (
       <>
-        <button className="back-button" type="button" onClick={() => navigate('patient')}>
-          ← Back to patient record
-        </button>
+        <button className="back-button" type="button" onClick={() => navigate('patient')}>Back</button>
         {renderPageHeading(
-          'Clinician Documentation Studio',
-          'Create structured conversation summary',
-          draftPrepared ? (
-            <button className="primary-button" type="button" onClick={() => navigate('verify')}>
-              Continue to verification checklist →
-            </button>
-          ) : undefined,
+          `${selectedItem.patient} | Version ${draftVersion}`,
+          versionPublished ? 'Released summary' : 'Conversation draft',
+          <div className="form-actions">
+            {versionPublished && <button className="secondary-button" type="button" onClick={startConversation}>New conversation</button>}
+            <button className="primary-button" type="button" onClick={() => navigate('verify')}>{versionPublished ? 'Review checklist' : 'Review summary'}</button>
+          </div>,
         )}
         <div className="draft-layout">
           <section className="detail-card source-note-panel">
-            <div className="card-header">
-              <div className="card-header-titles">
-                <h2>Source clinician note</h2>
-                <span>Entered with patient consent · 28 Aug 2026, 09:54</span>
-              </div>
-            </div>
-
-            {sourceContextAvailable ? (
-              <>
-                <div className="form-field">
-                  <span>Interactive source text (hover to inspect provenance)</span>
-                  <div className="source-text-interactive">
-                    {sourceSnippets.map((snippet) => (
-                      <span
-                        key={snippet.key}
-                        className={`source-snippet ${highlightedField === snippet.key ? 'active-highlight' : ''}`}
-                        role="button"
-                        tabIndex={0}
-                        aria-label={`Highlight source excerpt: ${snippet.text}`}
-                        onMouseEnter={() => setHighlightedField(snippet.key)}
-                        onMouseLeave={() => setHighlightedField(null)}
-                        onFocus={() => setHighlightedField(snippet.key)}
-                        onBlur={() => setHighlightedField(null)}
-                        onKeyDown={(event) => {
-                          if (event.key === 'Enter' || event.key === ' ') {
-                            event.preventDefault();
-                            setHighlightedField(snippet.key);
-                          }
-                        }}
-                      >
-                        {snippet.text}{' '}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {!draftPrepared ? (
-                  <button
-                    className="primary-button full-width"
-                    type="button"
-                    disabled={!isTreatingPhysician}
-                    onClick={prepareDraft}
-                  >
-                    <IconFileEdit className="w-4 h-4" />
-                    Extract structured draft from source
-                  </button>
-                ) : (
-                  <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-900 text-xs mt-3 flex items-center gap-2">
-                    <IconCheck className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-                    <span>Structured fields extracted and linked to source sentences.</span>
-                  </div>
-                )}
-                <div className="record-boundary">
-                  <IconInfo className="w-4 h-4 flex-shrink-0" />
-                  <span>
-                    Deterministic extraction uses only explicitly stated facts in the source note. No clinical inferences or prognostic estimates are made.
-                  </span>
-                </div>
-              </>
-            ) : (
-              <div className="record-boundary">
-                <IconInfo className="w-4 h-4 flex-shrink-0" />
-                <span>
-                  The source-linked clinician note is not loaded for {selectedItem.patient} in this demonstration. No source text or structured field value is inferred.
-                </span>
-              </div>
+            <label className="form-field" htmlFor="conversation-source">
+              <span>Conversation notes</span>
+              <textarea id="conversation-source" rows={14} value={recordState.draftSource}
+                readOnly={!isTreatingPhysician || versionPublished}
+                onChange={(event) => updateSelectedRecord((current) => reviseSummary({ ...current, draftPrepared: true }, { draftSource: event.target.value }))} />
+            </label>
+            {!draftPrepared && <button className="primary-button" type="button" onClick={prepareDraft}>Open structured draft</button>}
+            <p className="record-boundary">Use a fictional conversation. Link each stated field to an exact excerpt; nothing is inferred.</p>
+            {highlightedField && recordState.draftExcerpts[highlightedField as DraftFieldKey] && (
+              <blockquote className="source-text-interactive"><mark>{recordState.draftExcerpts[highlightedField as DraftFieldKey]}</mark></blockquote>
             )}
           </section>
-
           <section className="detail-card structured-draft-panel">
-            <div className="card-header">
-              <div className="card-header-titles">
-                <h2>Structured draft fields</h2>
-                <span>{draftPrepared ? 'Review and edit each domain before verification' : 'Awaiting source extraction'}</span>
-              </div>
-              {draftPrepared && <StatusPill status="Draft" />}
+            <div className="card-header"><h2>Summary</h2><StatusPill status={versionPublished ? 'Released' : 'Draft'} /></div>
+            <div className="draft-fields">
+              {fieldConfig.map((field) => (
+                <article className={`draft-field status-${draftStatuses[field.key]}`} key={field.key}>
+                  <div className="draft-field-heading">
+                    <label htmlFor={`field-${field.key}`}>{field.label}</label>
+                    <span className={`field-status-tag ${draftStatuses[field.key]}`}>{draftStatuses[field.key] === 'ready' ? 'Source linked' : draftStatuses[field.key] === 'not-stated' ? 'Not stated' : 'Needs review'}</span>
+                  </div>
+                  <textarea id={`field-${field.key}`} rows={3} value={draftFields[field.key]}
+                    readOnly={!isTreatingPhysician || versionPublished}
+                    onChange={(event) => setDraftFields((fields) => ({ ...fields, [field.key]: event.target.value }))} />
+                  <label className="form-field" htmlFor={`excerpt-${field.key}`}>
+                    <span>Exact source excerpt</span>
+                    <textarea id={`excerpt-${field.key}`} rows={2} value={recordState.draftExcerpts[field.key]}
+                      readOnly={!isTreatingPhysician || versionPublished}
+                      onFocus={() => setHighlightedField(field.key)} onBlur={() => setHighlightedField(null)}
+                      onChange={(event) => updateSelectedRecord((current) => reviseSummary({ ...current, draftPrepared: true }, { draftExcerpts: { ...current.draftExcerpts, [field.key]: event.target.value } }))} />
+                  </label>
+                  <div className="field-actions">
+                    <button type="button" disabled={!isTreatingPhysician || versionPublished} onClick={() => setDraftFieldStatus(field.key, 'ready')}>Confirm source link</button>
+                    <button type="button" disabled={!isTreatingPhysician || versionPublished} onClick={() => setDraftFieldStatus(field.key, 'not-stated')}>Mark not stated</button>
+                    <button type="button" disabled={!isTreatingPhysician || versionPublished} onClick={() => setDraftFieldStatus(field.key, 'clarify')}>Needs clarification</button>
+                  </div>
+                </article>
+              ))}
             </div>
-            {!sourceContextAvailable ? (
-              <div className="draft-placeholder">
-                <IconInfo className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                <strong>Source-linked draft unavailable</strong>
-                <p>No patient-scoped guided conversation is loaded for this record in this demonstration.</p>
-              </div>
-            ) : !draftPrepared ? (
-              <div className="draft-placeholder">
-                <IconFileEdit className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                <strong>No structured fields extracted yet</strong>
-                <p>Click &ldquo;Extract structured draft from source&rdquo; to generate verifiable fields.</p>
-              </div>
-            ) : (
-              <div className="draft-fields">
-                {fieldConfig.map((field) => (
-                  <article
-                    className={`draft-field status-${draftStatuses[field.key]} ${highlightedField === field.key ? 'active-field' : ''}`}
-                    key={field.key}
-                    onMouseEnter={() => setHighlightedField(field.key)}
-                    onMouseLeave={() => setHighlightedField(null)}
-                  >
-                    <div className="draft-field-heading">
-                      <label htmlFor={`field-${field.key}`}>{field.label}</label>
-                      <span className={`field-status-tag ${draftStatuses[field.key]}`}>
-                        {draftStatuses[field.key] === 'ready' && <><IconCheck className="w-3 h-3" /> Source linked</>}
-                        {draftStatuses[field.key] === 'not-stated' && <>Marked not stated</>}
-                        {draftStatuses[field.key] === 'clarify' && <>Needs clarification</>}
-                      </span>
-                    </div>
-                    <textarea
-                      id={`field-${field.key}`}
-                      rows={3}
-                      value={draftFields[field.key]}
-                      readOnly={!isTreatingPhysician}
-                      onChange={(event) =>
-                        setDraftFields((fields) => ({ ...fields, [field.key]: event.target.value }))
-                      }
-                    />
-                    <blockquote
-                      role="button"
-                      tabIndex={0}
-                      onClick={() => setHighlightedField(field.key)}
-                      onKeyDown={(event) => {
-                        if (event.key === 'Enter' || event.key === ' ') {
-                          event.preventDefault();
-                          setHighlightedField(field.key);
-                        }
-                      }}
-                    >
-                      <strong>Provenance:</strong> {field.provenance} (Click to highlight source)
-                    </blockquote>
-                    <div className="field-actions">
-                      <button
-                        type="button"
-                        disabled={!isTreatingPhysician}
-                        onClick={() => setDraftFieldStatus(field.key, 'not-stated')}
-                      >
-                        Mark not stated
-                      </button>
-                      <button
-                        type="button"
-                        disabled={!isTreatingPhysician}
-                        onClick={() => setDraftFieldStatus(field.key, 'clarify')}
-                      >
-                        Mark for clarification
-                      </button>
-                      {draftStatuses[field.key] !== 'ready' && (
-                        <button
-                          type="button"
-                          disabled={!isTreatingPhysician}
-                          onClick={() => setDraftFieldStatus(field.key, 'ready')}
-                        >
-                          Restore source-linked
-                        </button>
-                      )}
-                    </div>
-                  </article>
-                ))}
-              </div>
-            )}
           </section>
         </div>
       </>
@@ -3827,7 +3616,7 @@ export function ContinuityPrototype() {
     const releaseBlockers = [
       !currentRole.startsWith('Dr Sujay') &&
         'Only the treating physician can publish a version.',
-      versionPublished && 'Version 2 has already been released for this record.',
+      versionPublished && `Version ${draftVersion} is already released.`,
       !draftReleaseReady &&
         (draftFieldBlockers.length > 0
           ? `Resolve ${draftFieldBlockers.map(({ label }) => label).join(', ')} in the structured draft.`
@@ -3844,7 +3633,7 @@ export function ContinuityPrototype() {
         <button className="back-button" type="button" onClick={() => navigate('draft')}>
           ← Back to structured draft
         </button>
-        {renderPageHeading('Physician-Controlled Release Gate', 'Verify and publish conversation summary')}
+        {renderPageHeading('Review', 'Review summary')}
 
         <div className="verification-layout">
           <section className="detail-card verification-card">
@@ -3861,7 +3650,7 @@ export function ContinuityPrototype() {
                   <input
                     type="checkbox"
                     checked={verificationChecks[item.key]}
-                    disabled={!isTreatingPhysician}
+                    disabled={!isTreatingPhysician || versionPublished}
                     onChange={(event) =>
                       setVerificationChecks((checks) => ({ ...checks, [item.key]: event.target.checked }))
                     }
@@ -3895,7 +3684,7 @@ export function ContinuityPrototype() {
               <span>Patient or Surrogate Authorisation</span>
               <select
                 value={authorisation}
-                disabled={!isTreatingPhysician}
+                disabled={!isTreatingPhysician || versionPublished}
                 onChange={(event) => setAuthorisation(event.target.value)}
               >
                 <option>Authorised by Patient & Surrogate</option>
@@ -3907,14 +3696,13 @@ export function ContinuityPrototype() {
             </label>
 
             <div className="record-boundary" role="status">
-              {consentById[selectedId] ? (
+              {consentFor(selectedId) ? (
                 <span>
-                  Patient consent recorded in the patient portal: {consentById[selectedId].typedName} ·{' '}
-                  {consentById[selectedId].declaration === 'self'
+                  Patient consent recorded in the patient portal: {consentFor(selectedId)?.typedName} ·{' '}
+                  {consentFor(selectedId)?.declaration === 'self'
                     ? 'made these choices themselves'
                     : 'delegated to their decision-maker'}{' '}
-                  · {consentById[selectedId].signedAt} · {consentById[selectedId].versionLabel}. Simulated
-                  typed signature.
+                  · {consentFor(selectedId)?.signedAt} · {consentFor(selectedId)?.versionLabel}. Typed name.
                 </span>
               ) : (
                 <span>No patient-portal consent recorded for this patient yet.</span>
@@ -3925,7 +3713,7 @@ export function ContinuityPrototype() {
               <input
                 type="checkbox"
                 checked={attested}
-                disabled={!isTreatingPhysician}
+                disabled={!isTreatingPhysician || versionPublished}
                 onChange={(event) => setAttested(event.target.checked)}
               />
               <span>
@@ -3954,7 +3742,7 @@ export function ContinuityPrototype() {
               <button
                 className="secondary-button"
                 type="button"
-                disabled={!isTreatingPhysician}
+                disabled={!isTreatingPhysician || versionPublished}
                 onClick={() => notify('Draft saved without publishing.')}
               >
                 Save as draft
@@ -3966,7 +3754,7 @@ export function ContinuityPrototype() {
                 onClick={publishVersion}
               >
                 <IconShieldCheck className="w-4 h-4" />
-                {versionPublished ? 'Version 2 published' : 'Verify and publish Version 2'}
+                {versionPublished ? `Version ${draftVersion} published` : `Save Version ${draftVersion}`}
               </button>
             </div>
           </section>
@@ -3975,7 +3763,7 @@ export function ContinuityPrototype() {
             <div className="card-header">
               <div className="card-header-titles">
                 <h2>Append-only release preview</h2>
-                <span>{selectedItem.patient} · Version 2</span>
+                <span>{selectedItem.patient} · Version {draftVersion}</span>
               </div>
             </div>
             {fieldConfig.map((field) => (
@@ -3987,7 +3775,7 @@ export function ContinuityPrototype() {
             <div className="record-boundary">
               <IconInfo className="w-4 h-4 flex-shrink-0" />
               <span>
-                Publishing adds a new version to this demonstration history. Future discussions create another version instead of editing the released record.
+                Publication preserves every earlier release. Patient and family views show the latest released summary.
               </span>
             </div>
           </aside>
@@ -3997,27 +3785,31 @@ export function ContinuityPrototype() {
   }
 
   function renderRetrieve() {
-    const sourceContextAvailable = selectedId === 'CANCER-20418';
-    const releasedFields = versionPublished ? draftFields : v1Fields;
+    const release = requestedRelease;
+    const sourceContextAvailable = Boolean(release?.source);
+    const releasedFields = release?.fields;
     const isBreakGlassAccess = retrievalReason === 'Emergency hand-off retrieval (Break-glass)';
     const breakGlassRequirementsMet =
       !isBreakGlassAccess ||
       (currentRole.startsWith('Dr Isha') && careRelationship === 'Emergency receiving physician');
     const retrievalGateReady =
+      Boolean(release) &&
       currentRole.startsWith('Dr') &&
       Boolean(retrievalReason) &&
       Boolean(careRelationship) &&
       breakGlassRequirementsMet &&
       retrievalAcknowledged;
-    const retrievalGateBlocker = !currentRole.startsWith('Dr')
-      ? 'A simulated physician role is required to retrieve a verified clinical record.'
+    const retrievalGateBlocker = !release
+      ? 'No released summary is available for this patient.'
+      : !currentRole.startsWith('Dr')
+      ? 'Choose a doctor to view this note.'
       : !retrievalReason || !careRelationship
-        ? 'Select an access purpose and care relationship before continuing.'
+        ? 'Choose why you need this note and your role in the patient’s care.'
         : !breakGlassRequirementsMet
-          ? 'Break-glass access is limited to the simulated emergency physician role and emergency receiving relationship.'
+          ? 'Only the receiving doctor can open emergency notes.'
           : !retrievalAcknowledged
             ? 'Confirm the retrieval boundary before viewing the record.'
-            : 'Access gate complete. Viewing this record will be logged in the simulated audit trail.';
+            : 'Ready to open. Your reason will be saved in History.';
     const selectedInitials = selectedItem.patient
       .split(' ')
       .map((part) => part[0])
@@ -4027,11 +3819,11 @@ export function ContinuityPrototype() {
     return (
       <>
         <button className="back-button" type="button" onClick={() => navigate('patient')}>
-          ← Back to patient record
+          ← Back
         </button>
-        {renderPageHeading('Controlled Clinical Hand-Off Gate', 'Retrieve verified record')}
+        {renderPageHeading('Notes', 'Open summary')}
 
-        {!retrievalUnlocked ? (
+        {!retrievalUnlocked || !release || recordState.unlockedVersion !== release.number || sessionType !== 'care-team' || !currentRole.startsWith('Dr') ? (
           <div className="retrieval-gate">
             <section className="detail-card retrieval-context">
               <div className="card-header">
@@ -4048,18 +3840,24 @@ export function ContinuityPrototype() {
                 </div>
               </div>
               <dl className="definition-list">
-                <div><dt>Latest Verified Version</dt><dd>{versionPublished ? 'Version 2 · 28 Aug 2026' : 'Version 1 · 21 Aug 2026'}</dd></div>
+                <div><dt>Requested version</dt><dd>{release ? `Version ${release.number} · ${releaseDate(release)}` : 'No released version'}</dd></div>
                 <div><dt>Record Category</dt><dd>Verified Goals-of-Care Summary</dd></div>
-                <div><dt>Access Boundary</dt><dd>Simulated authorised clinical access</dd></div>
-                <div><dt>Audit Mode</dt><dd>Simulated access-purpose trail</dd></div>
+                <div><dt>Who can view</dt><dd>Doctors on the care team</dd></div>
+                <div><dt>History</dt><dd>Reasons for opening notes</dd></div>
               </dl>
+              {recordState.releases.length > 1 && <label className="form-field">
+                <span>Summary version</span>
+                <select value={release?.number ?? ''} onChange={(event) => updateSelectedRecord((current) => ({ ...current, retrievalVersion: Number(event.target.value), retrievalAcknowledged: false, retrievalUnlocked: false, unlockedVersion: null }))}>
+                  {[...recordState.releases].reverse().map((version) => <option key={version.number} value={version.number}>Version {version.number}{version.number === currentRelease?.number ? ' (latest)' : ' (historical)'}</option>)}
+                </select>
+              </label>}
             </section>
 
             <form className="detail-card workflow-form" onSubmit={openRetrievedRecord}>
               <div className="card-header">
                 <div className="card-header-titles">
-                  <h2>Access authorization</h2>
-                  <span>Access purpose is recorded in this browser-local demonstration trail</span>
+                  <h2>Before you open this note</h2>
+                  <span>Your reason is saved in History</span>
                 </div>
               </div>
               <label className="form-field">
@@ -4094,7 +3892,7 @@ export function ContinuityPrototype() {
               >
                 <IconInfo className="w-4 h-4 flex-shrink-0" />
                 <span>
-                  <strong>{isBreakGlassAccess ? 'Emergency / break-glass access.' : 'Routine access.'}</strong>{' '}
+                  <strong>{isBreakGlassAccess ? 'Emergency care.' : 'Patient care.'}</strong>{' '}
                   {retrievalGateBlocker}
                 </span>
               </div>
@@ -4106,7 +3904,7 @@ export function ContinuityPrototype() {
                   disabled={!currentRole.startsWith('Dr')}
                 />
                 <span>
-                  <strong>Retrieval boundary:</strong> I am opening this synthetic summary for the selected care relationship. I will re-confirm current clinical status with the patient or surrogate and care team as appropriate; this summary is not a treatment order or legal directive.
+                  <strong>Confirm:</strong> I am opening this summary for the selected care relationship. I will re-confirm current clinical status with the patient or surrogate and care team as appropriate; this summary is not a treatment order or legal directive.
                 </span>
               </label>
               <button
@@ -4116,7 +3914,7 @@ export function ContinuityPrototype() {
                 aria-describedby="retrieval-gate-status"
               >
                 <IconLock className="w-4 h-4" />
-                Log access and view verified record
+                Open summary
               </button>
             </form>
           </div>
@@ -4130,8 +3928,7 @@ export function ContinuityPrototype() {
             </div>
             <EdQuickView record={ectprQuickViews[selectedId] ?? null} audience="clinician" />
             <p className="print-only print-notice">
-              Printed from the Continuity Loop demonstration. The patient, record and dates are
-              synthetic. This page is not a treatment order, resuscitation order, or legal
+              Sample patient record. This page is not a treatment order, resuscitation order, or legal
               directive, and it does not replace confirming the patient&rsquo;s current clinical
               status and wishes with the patient, surrogate and treating team.
             </p>
@@ -4142,12 +3939,12 @@ export function ContinuityPrototype() {
                 </p>
                 <h2 ref={retrievedRecordHeadingRef} tabIndex={-1}>{selectedItem.patient}</h2>
                 <span>
-                  {selectedItem.hospitalId} · {versionPublished ? 'Version 2' : 'Version 1'} · Attested by Dr Sujay
+                  {selectedItem.hospitalId} · Version {release.number} · Attested by {release.physician}
                 </span>
               </div>
               <div className="flex items-center gap-3">
-                <StatusPill status="Access logged" />
-                {sourceContextAvailable && (
+                <StatusPill status="Viewed" />
+                {releasedFields && (
                   <button className="secondary-button" type="button" onClick={copySummaryToClipboard}>
                     <IconCopy className="w-3.5 h-3.5" /> Copy Summary
                   </button>
@@ -4157,7 +3954,8 @@ export function ContinuityPrototype() {
                 </button>
               </div>
             </div>
-            {sourceContextAvailable ? (
+            {release.number !== currentRelease?.number && <p className="record-boundary">Historical Version {release.number}. The latest released summary is Version {currentRelease?.number}.</p>}
+            {releasedFields ? (
               <div className="summary-grid retrieval-summary-grid">
                 {fieldConfig.map((field) => (
                   <div key={field.key}>
@@ -4169,48 +3967,48 @@ export function ContinuityPrototype() {
             ) : (
               <div className="record-boundary retrieval-summary-unavailable">
                 <IconInfo className="w-4 h-4 flex-shrink-0" />
-                <span>Version metadata is available, but source-linked field content is not loaded for this synthetic scenario. No field value is inferred.</span>
+                <span>Version metadata is available, but source-linked field content is not loaded for this patient. No field value is inferred.</span>
               </div>
             )}
             <section className="retrieval-source-context" aria-labelledby="retrieval-source-title">
               <div className="card-header">
                 <div className="card-header-titles">
                   <h3 id="retrieval-source-title">Source and context</h3>
-                  <span>What this synthetic summary is grounded in</span>
+                  <span>Conversation notes</span>
                 </div>
               </div>
               <dl className="definition-list retrieval-context-list">
                 <div><dt>Originating team</dt><dd>{selectedProfile.team}</dd></div>
-                <div><dt>Source record</dt><dd>Clinician-entered synthetic conversation note</dd></div>
-                <div><dt>Captured</dt><dd>{sourceContextAvailable ? '28 Aug 2026 · 09:54' : 'Timestamp not loaded for this synthetic scenario'}</dd></div>
-                <div><dt>Unresolved / not discussed</dt><dd>{sourceContextAvailable ? releasedFields.openQuestions : 'Not loaded in this synthetic scenario'}</dd></div>
+                <div><dt>Source record</dt><dd>Doctor’s conversation notes</dd></div>
+                <div><dt>Released</dt><dd>{releaseDate(release)}</dd></div>
+                <div><dt>Unresolved / not discussed</dt><dd>{releasedFields?.openQuestions ?? 'Not available'}</dd></div>
               </dl>
               {sourceContextAvailable ? (
                 <div className="retrieval-excerpt-list">
                   <span className="document-kicker">Source excerpts</span>
-                  {sourceSnippets.map((snippet) => (
-                    <blockquote key={snippet.key}>{snippet.text}</blockquote>
-                  ))}
+                  <blockquote>{release.source}</blockquote>
                 </div>
               ) : (
                 <div className="record-boundary">
                   <IconInfo className="w-4 h-4 flex-shrink-0" />
-                  <span>Source excerpts are not loaded for this synthetic scenario. No preference is inferred from missing source text.</span>
+                  <span>Source excerpts are not loaded for this patient. No preference is inferred from missing source text.</span>
                 </div>
               )}
             </section>
             <div className="retrieved-footer">
               <div>
                 <span>Verified By</span>
-                <strong>Dr Sujay · {versionPublished ? '28 Aug 2026' : '21 Aug 2026'}</strong>
+                <strong>{release.physician} · {releaseDate(release)}</strong>
               </div>
               <div>
                 <span>Authorisation Basis</span>
                 <strong>
-                  {versionPublished
-                    ? authorisation
-                    : 'Verbal acknowledgement recorded by care team'}
+                  {release.authorisation ?? 'Not loaded'}
                 </strong>
+              </div>
+              <div>
+                <span>Patient portal acknowledgement</span>
+                <strong>{consentById[`${selectedId}:${release.number}`]?.typedName ?? 'Not recorded for this version'}</strong>
               </div>
               <div>
                 <span>Retrieval Justification</span>
@@ -4248,17 +4046,8 @@ export function ContinuityPrototype() {
       };
     });
 
-    function hasVerifiedRecord(id: string) {
-      return Boolean(recordStates[id]?.versionPublished) || (patientProfiles[id]?.verified ?? '').includes('2026');
-    }
-
-    function versionLabel(id: string) {
-      return recordStates[id]?.versionPublished
-        ? 'Version 2 · 28 Aug 2026'
-        : (patientProfiles[id]?.verified ?? '').includes('2026')
-          ? `Version 1 · ${patientProfiles[id].verified}`
-          : 'No released version';
-    }
+    function hasVerifiedRecord(id: string) { return patientHasApprovedSummary(id); }
+    function versionLabel(id: string) { return patientSummaryLabel(id); }
 
     return (
       <AppointmentsPage
@@ -4269,7 +4058,7 @@ export function ContinuityPrototype() {
         onAppointmentsChange={setAppointments}
         canSchedule={isTreatingPhysician || isCareCoordinator}
         canStartConversation={isTreatingPhysician}
-        readOnlyReason="Scheduling is limited to the treating physician and the care coordinator in this demonstration."
+        readOnlyReason="Only the treating doctor and care coordinator can change appointments."
         hasVerifiedRecord={hasVerifiedRecord}
         versionLabel={versionLabel}
         onAudit={(event, record) => addAudit(event, record, 'SCHEDULE')}
@@ -4282,10 +4071,7 @@ export function ContinuityPrototype() {
           selectPatient(id);
           navigate('guide');
         }}
-        onRetrieve={(id) => {
-          selectPatient(id);
-          navigate('retrieve');
-        }}
+        onRetrieve={(id) => beginRetrievalFor(id)}
         onRecordOutreach={(id) => {
           selectPatient(id);
           navigate('outreach');
@@ -4317,7 +4103,7 @@ export function ContinuityPrototype() {
     return (
       <>
         {renderPageHeading(
-          'Synthetic Patient Registry',
+          'Patients',
           'Patients in continuity cohort',
           <button
             className="primary-button"
@@ -4390,171 +4176,52 @@ export function ContinuityPrototype() {
   }
 
   function renderDrafts() {
+    const drafts = workItems.filter((item) => {
+      const state = recordStates[item.hospitalId];
+      return (state?.draftPrepared && !state.versionPublished) || (!state?.draftPrepared && item.status === 'Awaiting review');
+    });
     return (
       <>
-        {renderPageHeading('Clinician Review Queue', 'Pending structured drafts')}
-        <section className="worklist-panel">
-          <div className="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Patient</th>
-                  <th>Draft Type</th>
-                  <th>Author / Initiated</th>
-                  <th>Status</th>
-                  <th><span className="sr-only">Action</span></th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td data-label="Patient">
-                    <strong>Ramesh Kumar</strong>
-                    <span>CANCER-20392</span>
-                  </td>
-                  <td data-label="Draft Type">Conversation summary</td>
-                  <td data-label="Author / Initiated">28 Aug 2026 · Dr Sujay</td>
-                  <td data-label="Status"><StatusPill status="Awaiting review" /></td>
-                  <td className="row-action">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        selectPatient('CANCER-20392');
-                        navigate('draft');
-                      }}
-                    >
-                      Review
-                    </button>
-                  </td>
-                </tr>
-                {primaryRecordState.draftPrepared && !primaryRecordState.versionPublished && (
-                  <tr>
-                    <td data-label="Patient">
-                      <strong>Meera Raghavan</strong>
-                      <span>CANCER-20418</span>
-                    </td>
-                    <td data-label="Draft Type">Updated conversation summary (v2)</td>
-                    <td data-label="Author / Initiated">28 Aug 2026 · Dr Sujay</td>
-                    <td data-label="Status"><StatusPill status="Draft" /></td>
-                    <td className="row-action">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          selectPatient('CANCER-20418');
-                          navigate('verify');
-                        }}
-                      >
-                        Verify
-                      </button>
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </section>
+        {renderPageHeading('Conversations', 'Drafts')}
+        <section className="worklist-panel"><div className="table-wrap"><table>
+          <thead><tr><th>Patient</th><th>Version</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody>{drafts.map((patient) => {
+            const state = recordStates[patient.hospitalId];
+            return <tr key={patient.hospitalId}>
+              <td data-label="Patient"><strong>{patient.patient}</strong><span>{patient.hospitalId}</span></td>
+              <td data-label="Version">Version {nextSummaryVersion(state)}</td>
+              <td data-label="Status">{state.draftSource ? 'Draft in review' : 'Source note needed'}</td>
+              <td className="row-action"><button type="button" disabled={!isTreatingPhysician} onClick={() => { selectPatient(patient.hospitalId); navigate('draft'); }}>Open draft</button></td>
+            </tr>;
+          })}</tbody>
+        </table>{drafts.length === 0 && <p className="compact-empty-state">No active drafts.</p>}</div></section>
       </>
     );
   }
 
   function renderRecords() {
+    const releases = workItems.flatMap((patient) => (recordStates[patient.hospitalId]?.releases ?? []).map((release) => ({ patient, release }))).sort((a, b) => b.release.releasedAt.localeCompare(a.release.releasedAt));
     return (
       <>
-        <div className="page-heading compact-heading">
-          <div>
-            <p className="eyebrow">Released version archive</p>
-            <h1>Verified goals-of-care records</h1>
-          </div>
-          {primaryRecordState.versionPublished && (
-            <button className="secondary-button" type="button" onClick={openPrimaryVersionComparison}>
-              <IconColumns className="w-4 h-4" />
-              Compare v1 vs v2 revisions
-            </button>
-          )}
-        </div>
-
-        <section className="worklist-panel">
-          <div className="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Patient</th>
-                  <th>Version</th>
-                  <th>Verified By</th>
-                  <th>Authorisation</th>
-                  <th>Status</th>
-                  <th><span className="sr-only">Action</span></th>
-                </tr>
-              </thead>
-              <tbody>
-                {primaryRecordState.versionPublished && (
-                  <tr>
-                    <td data-label="Patient">
-                      <strong>Meera Raghavan</strong>
-                      <span>CANCER-20418</span>
-                    </td>
-                    <td data-label="Version">Version 2 · 28 Aug 2026</td>
-                    <td data-label="Verified By">Dr Sujay</td>
-                    <td data-label="Authorisation">Authorised</td>
-                    <td data-label="Status"><StatusPill status="Current" /></td>
-                    <td className="row-action">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          selectPatient('CANCER-20418');
-                          navigate('retrieve');
-                        }}
-                      >
-                        View
-                      </button>
-                    </td>
-                  </tr>
-                )}
-                <tr>
-                  <td data-label="Patient">
-                    <strong>Meera Raghavan</strong>
-                    <span>CANCER-20418</span>
-                  </td>
-                  <td data-label="Version">Version 1 · 21 Aug 2026</td>
-                  <td data-label="Verified By">Dr Sujay</td>
-                  <td data-label="Authorisation">Authorised</td>
-                  <td data-label="Status"><StatusPill status={primaryRecordState.versionPublished ? 'Superseded' : 'Current'} /></td>
-                  <td className="row-action">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        selectPatient('CANCER-20418');
-                        navigate('patient');
-                      }}
-                    >
-                      View
-                    </button>
-                  </td>
-                </tr>
-                <tr>
-                  <td data-label="Patient">
-                    <strong>Leela Thomas</strong>
-                    <span>CANCER-20377</span>
-                  </td>
-                  <td data-label="Version">Version 1 · 21 Aug 2026</td>
-                  <td data-label="Verified By">Dr Sujay</td>
-                  <td data-label="Authorisation">Authorised</td>
-                  <td data-label="Status"><StatusPill status="Current" /></td>
-                  <td className="row-action">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        selectPatient('CANCER-20377');
-                        navigate('patient');
-                      }}
-                    >
-                      View
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
+        {renderPageHeading('Released summaries', 'Previous notes')}
+        <section className="worklist-panel"><div className="table-wrap"><table>
+          <thead><tr><th>Patient</th><th>Version</th><th>Verified by</th><th>Acknowledgement</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>{releases.map(({ patient, release }) => (
+            <tr key={`${patient.hospitalId}:${release.number}`}>
+              <td data-label="Patient"><strong>{patient.patient}</strong><span>{patient.hospitalId}</span></td>
+              <td data-label="Version">Version {release.number}<span>{releaseDate(release)}</span></td>
+              <td data-label="Verified by">{release.physician}</td>
+              <td data-label="Acknowledgement">{release.authorisation ?? 'Not loaded'}</td>
+              <td data-label="Status"><StatusPill status={release.number === latestReleaseFor(patient.hospitalId)?.number ? 'Current' : 'Superseded'} /></td>
+              <td className="row-action">
+                <button type="button" aria-label={`View ${patient.patient} Version ${release.number}`} disabled={!currentRole.startsWith('Dr')} onClick={() => beginRetrievalFor(patient.hospitalId, release.number)}>View</button>
+                {release.number > 1 && <button type="button" aria-label={`Compare ${patient.patient} Version ${release.number} with previous`} disabled={!currentRole.startsWith('Dr')} onClick={() => {
+                  selectPatient(patient.hospitalId); setComparisonVersion(release.number); setDiffOpen(true);
+                }}>Compare</button>}
+              </td>
+            </tr>
+          ))}</tbody>
+        </table>{releases.length === 0 && <p className="compact-empty-state">No released summaries.</p>}</div></section>
       </>
     );
   }
@@ -4562,7 +4229,7 @@ export function ContinuityPrototype() {
   function renderAudit() {
     return (
       <>
-        {renderPageHeading('Simulated audit trail', 'Continuity event and access history')}
+        {renderPageHeading('History', 'Recent activity')}
 
         <div className="filter-row mb-4 rounded-lg border border-line bg-surface p-2 flex items-center gap-3">
           <span className="text-xs font-semibold text-muted pl-2">Filter by Actor:</span>
@@ -4619,7 +4286,7 @@ export function ContinuityPrototype() {
           </div>
           {filteredAuditEvents.length === 0 && (
             <p className="audit-empty">
-              No recorded events for {auditFilterActor}. Only actions taken in this demonstration
+              No recorded events for {auditFilterActor}. Only actions taken in this session
               appear here.
             </p>
           )}
@@ -4629,73 +4296,10 @@ export function ContinuityPrototype() {
           <IconInfo className="w-4 h-4" />
           <p>
             Showing {filteredAuditEvents.length} of {auditEvents.length} recorded events
-            {auditFilterActor === 'All' ? '' : ` for ${auditFilterActor}`}. This trail is
-            browser-local, is written only when you act in the demonstration, and resets on reload.
-            It is not a tamper-evident audit log.
+            {auditFilterActor === 'All' ? '' : ` for ${auditFilterActor}`}. This history is
+            saved for this session.
           </p>
         </div>
-      </>
-    );
-  }
-
-  function renderHelp() {
-    const glossary = [
-      {
-        term: 'Goals of care',
-        definition:
-          'A clinician-led conversation about what matters to the patient and family, what was discussed, and what needs clarification. This prototype does not choose a treatment.',
-      },
-      {
-        term: 'Source-linked draft',
-        definition:
-          'A draft whose fields point back to the synthetic conversation note. “Not stated” means the note did not say it; the workflow leaves it open instead of guessing.',
-      },
-      {
-        term: 'Physician verified',
-        definition:
-          'The treating physician checked the summary fields and recorded the review. This label is not a legal order or a treatment instruction.',
-      },
-      {
-        term: 'Patient or surrogate acknowledgement',
-        definition:
-          'A record that the patient or authorised surrogate reviewed the conversation summary. It is not a treatment consent record.',
-      },
-      {
-        term: 'Break-glass access',
-        definition:
-          'A simulated emergency access reason recorded before a receiving physician views the latest verified handoff.',
-      },
-      {
-        term: 'Continuity worklist',
-        definition:
-          'Follow-up tasks for ownership, outreach, and review dates. It supports coordination and does not replace clinical judgement.',
-      },
-      {
-        term: 'Synthetic',
-        definition:
-          'Fictional demonstration data used to show the workflow. It is not a real patient record.',
-      },
-    ];
-
-    return (
-      <>
-        {renderPageHeading('Workflow help', 'Terms used in this demonstration')}
-        <section className="glossary-card detail-card" aria-labelledby="glossary-title">
-          <div className="protocol-notice" role="note">
-            <IconInfo className="w-4 h-4 flex-shrink-0" />
-            <span id="glossary-title">
-              Plain-language definitions for labels in this prototype. This is not medical advice, a diagnosis, a treatment recommendation, or a legal directive.
-            </span>
-          </div>
-          <dl className="glossary-list">
-            {glossary.map(({ term, definition }) => (
-              <div className="glossary-entry" key={term}>
-                <dt>{term}</dt>
-                <dd>{definition}</dd>
-              </div>
-            ))}
-          </dl>
-        </section>
       </>
     );
   }
@@ -4715,21 +4319,18 @@ export function ContinuityPrototype() {
       case 'drafts': return renderDrafts();
       case 'records': return renderRecords();
       case 'audit': return renderAudit();
-      case 'help': return renderHelp();
       case 'my-plan':
         return (
           <MyCarePlan
             patientName={portalPatientName}
             versionLabel={planVersionLabel(portalPatientId)}
-            verifiedBy="Dr Sujay"
-            verifiedOn={
-              recordStates[portalPatientId]?.versionPublished
-                ? '28 Aug 2026'
-                : (patientProfiles[portalPatientId]?.verified ?? 'Not yet verified')
-            }
+            verifiedBy={latestReleaseFor(portalPatientId)?.physician ?? ''}
+            verifiedOn={releaseDate(latestReleaseFor(portalPatientId))}
             fields={planFieldsFor(portalPatientId)}
+            summaryAvailable={hasLoadedReleasedSummary(portalPatientId)}
+            hasReleasedVersion={patientHasApprovedSummary(portalPatientId)}
             quickView={<EdQuickView record={ectprQuickViews[portalPatientId] ?? null} audience="patient" />}
-            consent={consentById[portalPatientId] ?? null}
+            consent={consentFor(portalPatientId)}
             onGoToConsent={() => navigate('consent')}
           />
         );
@@ -4793,7 +4394,7 @@ export function ContinuityPrototype() {
             grouped.set(a.clinician, {
               name: a.clinician,
               role: roleFor(a.clinician),
-              organisation: 'Oncology · Palliative care (synthetic)',
+              organisation: 'Oncology · Palliative care ',
               contactNote: 'Contact details are held by the originating team.',
               lastVisited: null,
               visits: [visit],
@@ -4804,7 +4405,7 @@ export function ContinuityPrototype() {
           grouped.set('Dr Sujay', {
             name: 'Dr Sujay',
             role: 'Treating consultant',
-            organisation: 'Oncology · Palliative care (synthetic)',
+            organisation: 'Oncology · Palliative care ',
             contactNote: 'Contact details are held by the originating team.',
             lastVisited: null,
             visits: [],
@@ -4862,7 +4463,8 @@ export function ContinuityPrototype() {
             patientName={portalPatientName}
             versionLabel={planVersionLabel(portalPatientId)}
             summaryFields={planFieldsFor(portalPatientId)}
-            consent={consentById[portalPatientId] ?? null}
+            summaryAvailable={hasLoadedReleasedSummary(portalPatientId)}
+            consent={consentFor(portalPatientId)}
             onSign={(input) => signConsent(portalPatientId, input)}
           />
         );
@@ -4879,21 +4481,20 @@ export function ContinuityPrototype() {
         : view;
   const mobileNavLabels: Partial<Record<View, string>> = {
     'my-plan': 'Plan',
-    'my-timeline': 'Journey',
-    'care-near-me': 'Near me',
+    'my-timeline': 'History',
+    'care-near-me': 'Nearby',
     'my-doctors': 'Doctors',
     'emergency-card': 'Card',
     'my-details': 'Details',
     consent: 'Consent',
-    caregiver: 'Journey',
-    home: 'Handoff',
-    guide: 'Guide',
-    worklist: 'Worklist',
+    caregiver: 'Home',
+    home: 'Home',
+    guide: 'Conversations',
+    worklist: 'Follow-ups',
     appointments: 'Appointments',
     patients: 'Patients',
     records: 'Records',
-    audit: 'Audit',
-    help: 'Help',
+    audit: 'History',
   };
   const visibleNavItems = isPatientSession
     ? patientNavItems
@@ -4948,6 +4549,7 @@ export function ContinuityPrototype() {
   if (authScreen === 'family') {
     return (
       <FamilyLoginScreen
+        patients={workItems.map((item) => ({ hospitalId: item.hospitalId, name: item.patient }))}
         onFamilySignIn={enterFamily}
         onGoToClinician={() => setAuthScreen('login')}
         onGoHome={() => setAuthScreen('landing')}
@@ -5003,17 +4605,6 @@ export function ContinuityPrototype() {
           })}
         </nav>
 
-        <div className="scope-note">
-          <div className="scope-header">
-            <IconShieldCheck className="w-3.5 h-3.5" />
-            <span>Safety Boundary</span>
-          </div>
-          <p>
-            {isPatientSession || isFamilySession
-              ? 'This app documents what you and your care team agreed. It is not a treatment order or a legal directive.'
-              : 'Documents a clinician-led conversation. It is not a treatment order, legal directive, or autonomous triage system.'}
-          </p>
-        </div>
       </aside>
 
       {/* Main Workspace Area */}
@@ -5029,8 +4620,7 @@ export function ContinuityPrototype() {
               <strong>Continuity</strong>
             </button>
             <div className="environment-label">
-              <span className="environment-dot" />
-              <span>Local demonstration · no live records</span>
+
             </div>
           </div>
 
@@ -5068,7 +4658,7 @@ export function ContinuityPrototype() {
                 <button className="secondary-button" type="button" onClick={signOut}>Sign out</button>
               </div>
             ) : view === 'caregiver' ? (
-              <div className="caregiver-preview-switcher" aria-label="Caregiver demonstration controls">
+              <div className="caregiver-preview-switcher" aria-label="Family view">
                 <span><IconLock className="w-3.5 h-3.5" />Previewing the family view</span>
                 <button className="secondary-button" type="button" onClick={() => navigate('home')}>
                   Back to care team
@@ -5076,11 +4666,11 @@ export function ContinuityPrototype() {
               </div>
             ) : (
               <>
-                <div className="role-switcher-wrap" title="Switch simulated demonstration role">
-                  <span className="role-label">Demo role</span>
+                <div className="role-switcher-wrap" title="Choose a care team member">
+                  <span className="role-label">Care team</span>
                   <select
                     className="role-select"
-                    aria-label="Simulated demonstration role"
+                    aria-label="Care team member"
                     value={currentRole}
                     onChange={(e) => {
                       const role = e.target.value as UserRole;
@@ -5093,7 +4683,7 @@ export function ContinuityPrototype() {
                   </select>
                 </div>
 
-                <div className="profile-block" aria-label="Active simulated persona">
+                <div className="profile-block" aria-label="Current profile">
                   <span className={`profile-initials ${currentRole.startsWith('Anitha') ? 'coordinator' : ''}`} aria-hidden="true">
                     {currentRole.startsWith('Anitha')
                       ? 'AR'
@@ -5134,7 +4724,7 @@ export function ContinuityPrototype() {
           ))}
         </nav>
 
-        <div className="content-frame">{renderCurrentView()}</div>
+        <div className={`content-frame${view === 'home' ? ' care-day' : ''}`}>{renderCurrentView()}</div>
       </section>
 
       {/* Enrolment Modal */}
@@ -5245,74 +4835,26 @@ export function ContinuityPrototype() {
         </div>
       )}
 
-      {/* Version Diff Modal */}
-      {diffOpen && primaryRecordState.versionPublished && selectedId === 'CANCER-20418' && (
-        <div
-          className="modal-backdrop"
-          role="presentation"
-          onMouseDown={(event) => {
-            if (event.currentTarget === event.target) setDiffOpen(false);
-          }}
-        >
-          <section
-            ref={diffDialogRef}
-            className="modal-panel large-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="diff-title"
-          >
+      {diffOpen && comparisonOlder && comparisonNewer && currentRole.startsWith('Dr') && (
+        <div className="modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.currentTarget === event.target) setDiffOpen(false); }}>
+          <section ref={diffDialogRef} className="modal-panel large-modal" role="dialog" aria-modal="true" aria-labelledby="diff-title">
             <div className="modal-header">
-              <div>
-                <p className="eyebrow">
-                  <IconColumns className="w-3.5 h-3.5" /> Append-only version comparison
-                </p>
-                <h2 id="diff-title">Version Comparison: v1 (21 Aug) vs v2 (28 Aug)</h2>
-              </div>
-              <button type="button" aria-label="Close comparison" onClick={() => setDiffOpen(false)}>
-                <IconX className="w-4 h-4" />
-              </button>
+              <h2 id="diff-title">{selectedItem.patient}: Version {comparisonOlder.number} and Version {comparisonNewer.number}</h2>
+              <button type="button" aria-label="Close comparison" onClick={() => setDiffOpen(false)}><IconX className="w-4 h-4" /></button>
             </div>
-
-            <div className="p-6">
-              <div className="diff-panel">
-                <div className="diff-version-col">
-                  <div className="diff-header">
-                    <strong>Version 1 (Superseded)</strong>
-                    <span className="text-xs text-muted">21 Aug 2026</span>
-                  </div>
-                  {fieldConfig.map((field) => (
-                    <div key={field.key} className="diff-item">
-                      <span>{field.label}</span>
-                      <p>{v1Fields[field.key]}</p>
+            <div className="p-6"><div className="diff-panel">
+              {[comparisonOlder, comparisonNewer].map((release, index) => (
+                <div className="diff-version-col" key={release.number}>
+                  <div className="diff-header"><strong>Version {release.number}</strong><span>{releaseDate(release)} | {release.physician}</span></div>
+                  {release.fields ? fieldConfig.map((field) => (
+                    <div className="diff-item" key={field.key}>
+                      <span>{field.label}{index === 1 && comparisonOlder.fields && comparisonOlder.fields[field.key] !== release.fields![field.key] && <b className="diff-change-label">Changed</b>}</span>
+                      <p>{release.fields![field.key]}</p>
                     </div>
-                  ))}
+                  )) : <p className="record-boundary">The content of this released version is not loaded.</p>}
                 </div>
-
-                <div className="diff-version-col">
-                  <div className="diff-header">
-                    <strong className="text-emerald-800">Version 2 (Current Active)</strong>
-                    <span className="text-xs text-emerald-700 font-semibold">28 Aug 2026 (Verified)</span>
-                  </div>
-                  {fieldConfig.map((field) => (
-                    <div key={field.key} className="diff-item highlighted">
-                      <span>
-                        {field.label}
-                        {v1Fields[field.key] !== draftFields[field.key] && (
-                          <b className="diff-change-label">Changed</b>
-                        )}
-                      </span>
-                      <p>{draftFields[field.key]}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="mt-4 flex justify-end gap-3">
-                <button className="primary-button" type="button" onClick={() => setDiffOpen(false)}>
-                  Close comparison
-                </button>
-              </div>
-            </div>
+              ))}
+            </div></div>
           </section>
         </div>
       )}
@@ -5321,7 +4863,7 @@ export function ContinuityPrototype() {
       {toast && (
         <div className="toast" role="status" aria-live="polite">
           <IconCheck className="w-4 h-4" />
-          <span>{toast}</span>
+          <span>{toast.message}</span>
         </div>
       )}
     </main>

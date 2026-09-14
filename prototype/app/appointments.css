@@ -59,6 +59,7 @@
   cursor: pointer;
 }
 .ap-tab.active { background: var(--surface); color: var(--text); box-shadow: var(--shadow-sm); font-weight: 600; }
+.ap-tab:disabled { opacity: .5; cursor: not-allowed; }
 .ap-queue-list { display: flex; flex-direction: column; gap: 8px; overflow-y: auto; max-height: 620px; }
 .ap-queue-card {
   display: flex;
@@ -223,6 +224,7 @@
   border-radius: 6px; cursor: pointer; color: var(--text);
 }
 .ap-menu-item:hover { background: var(--surface-2); }
+.ap-menu-item:disabled { opacity: .5; cursor: not-allowed; }
 
 /* Dialog */
 .ap-dialog-backdrop {

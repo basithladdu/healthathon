@@ -257,7 +257,7 @@ export function EdQuickView(props: {
           </div>
           <div>Treating consultant: {record.treatingConsultant ?? 'Not recorded'}</div>
           <div>Palliative care: {record.palliativeContact ?? 'Not recorded'}</div>
-          <div className="ectpr-muted">Phone numbers are held by the originating team in this demonstration.</div>
+          <div className="ectpr-muted">Ask your care team for their phone number.</div>
         </div>
 
         <div className="ectpr-review-due">Review due by {record.reviewDueBy ?? 'Not recorded'}</div>
@@ -270,8 +270,7 @@ export function EdQuickView(props: {
         )}
 
         <div className="ectpr-footer">
-          A recorded preference from a clinician-signed ECTPR. Not a treatment order or a legal directive. Synthetic
-          demonstration record.
+          A recorded preference from a clinician-signed ECTPR. Not a treatment order or a legal directive. Sample patient record.
         </div>
       </div>
     </div>
@@ -287,7 +286,7 @@ async function sha256HexUpper(text: string): Promise<string> {
 
 function buildQrPayload(record: EctprQuickView): string {
   const lines = [
-    'EMERGENCY CARE PLAN IN PLACE (SYNTHETIC DEMO)',
+    'EMERGENCY CARE PLAN (SAMPLE RECORD)',
     `Patient: ${record.patientName}`,
     `UHID: ${record.hospitalId}`,
     `Goal: ${record.goal ? GOAL_LABELS[record.goal] : 'Not recorded'}`,
@@ -329,7 +328,7 @@ function CardFace(props: { record: EctprQuickView; watermark?: boolean; qrDataUr
           Decision-maker:{' '}
           {record.decisionMaker ? `${record.decisionMaker.name} (${record.decisionMaker.relationship})` : 'Not recorded'}
         </div>
-        <div>Full record: hospital record (demonstration)</div>
+        <div>Full record: ask the care team</div>
         <div>
           Signed by {record.signedBy ?? 'Not recorded'} · {record.signedOn ?? 'Not recorded'}
         </div>
@@ -343,7 +342,7 @@ function CardFace(props: { record: EctprQuickView; watermark?: boolean; qrDataUr
       {issuedOn && <div className="ectpr-card-issued">Issued {issuedOn}</div>}
       <div className="ectpr-card-footer">
         <div>If this card is unclear, or the problem is new and reversible — treat fully and call the number above.</div>
-        <div className="ectpr-muted">Synthetic demonstration card</div>
+        <div className="ectpr-muted">Sample patient card</div>
       </div>
     </div>
   );
@@ -356,38 +355,38 @@ export function EmergencyCard(props: {
   onIssue?: () => void;
 }): React.JSX.Element {
   const { record, audience, issuedOn, onIssue } = props;
-  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
-  const [checksum, setChecksum] = useState<string | null>(null);
+  const [qrResult, setQrResult] = useState<{
+    payload: string;
+    dataUrl: string | null;
+    checksum: string | null;
+  } | null>(null);
+  const payload = record && issuedOn ? buildQrPayload(record) : null;
+  const currentQr = qrResult?.payload === payload ? qrResult : null;
+  const qrDataUrl = currentQr?.dataUrl ?? null;
+  const checksum = currentQr?.checksum ?? null;
 
   useEffect(() => {
     let cancelled = false;
-    if (!record || !issuedOn) {
-      setQrDataUrl(null);
-      setChecksum(null);
-      return;
-    }
+    if (!payload) return;
     (async () => {
-      const payload = buildQrPayload(record);
-      const hash = await sha256HexUpper(payload);
-      const checksumShort = hash.slice(0, 16);
-      const fullPayload = `${payload}\nChecksum: ${checksumShort}`;
       try {
+        const hash = await sha256HexUpper(payload);
+        const checksumShort = hash.slice(0, 16);
+        const fullPayload = `${payload}\nChecksum: ${checksumShort}`;
         const dataUrl = await QRCode.toDataURL(fullPayload, { errorCorrectionLevel: 'M', margin: 1, width: 240 });
         if (!cancelled) {
-          setQrDataUrl(dataUrl);
-          setChecksum(checksumShort);
+          setQrResult({ payload, dataUrl, checksum: checksumShort });
         }
       } catch {
         if (!cancelled) {
-          setQrDataUrl(null);
-          setChecksum(null);
+          setQrResult({ payload, dataUrl: null, checksum: null });
         }
       }
     })();
     return () => {
       cancelled = true;
     };
-  }, [record, issuedOn]);
+  }, [payload]);
 
   if (!record) {
     return (
@@ -444,7 +443,8 @@ export function EmergencyCard(props: {
           </p>
         </div>
       )}
-      <button type="button" className="ectpr-button ectpr-button--primary" onClick={handlePrint}>
+      {!qrDataUrl && <p role="status">{currentQr ? 'The QR code could not be created. Reopen the card to try again.' : 'Preparing the QR code…'}</p>}
+      <button type="button" className="ectpr-button ectpr-button--primary" onClick={handlePrint} disabled={!qrDataUrl}>
         Print card
       </button>
     </div>

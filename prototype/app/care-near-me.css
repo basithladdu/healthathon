@@ -167,6 +167,8 @@
   flex-direction: column;
   gap: 12px;
   min-width: 0;
+  max-height: min(60svh, 560px);
+  overflow-y: auto;
 }
 
 .cnm-list-item {
@@ -279,9 +281,13 @@
 
   .cnm-map {
     height: 560px;
+    grid-column: 2;
+    grid-row: 1;
   }
 
   .cnm-list {
+    grid-column: 1;
+    grid-row: 1;
     max-height: 560px;
     overflow-y: auto;
   }

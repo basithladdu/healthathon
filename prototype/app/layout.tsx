@@ -11,6 +11,7 @@ import './care-near-me.css';
 import './ectpr.css';
 import './patient-portal.css';
 import './patient-history.css';
+import './care-workspace.css';
 
 const inter = Inter({
   variable: '--font-inter',

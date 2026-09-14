@@ -13,36 +13,48 @@ const ROLES: { role: AuthRole; name: string; label: string; initials: string }[]
   { role: 'Anitha Rao · Care Coordinator', name: 'Anitha Rao', label: 'Care Coordinator', initials: 'AR' },
 ];
 
+const DEMO_PATIENT = {
+  hospitalId: 'CANCER-20418',
+  name: 'Meera Raghavan',
+  dob: '14/03/1964',
+  accessCode: '482913',
+} as const;
+
+const DEMO_FAMILY_MEMBER = {
+  name: 'Kavya Raghavan',
+  relationship: 'Daughter',
+} as const;
+
 const CARE_TEAM_BRAND = {
-  kicker: 'The handoff layer',
-  headline: 'The conversation survives the handoff.',
-  lede: 'A verified goals-of-care summary the next clinician can open, trust and act on — without asking the family to start again.',
+  kicker: 'Care team',
+  headline: 'Care, together.',
+  lede: 'A source-linked, physician-reviewed plan for the next handoff.',
   features: [
-    { num: '01', title: 'Source-linked', body: 'Every field traces back to what was actually said.' },
-    { num: '02', title: 'Physician-verified', body: 'Released as a new version. Nothing is overwritten.' },
-    { num: '03', title: 'Purpose-logged', body: 'The reason for access is recorded before the record opens.' },
+    { num: '01', title: 'Source-linked', body: 'Each field starts with what was said.' },
+    { num: '02', title: 'Physician-verified', body: 'Every release keeps the previous version.' },
+    { num: '03', title: 'Purpose-logged', body: 'Access opens with a stated reason.' },
   ],
 };
 
 const FAMILY_BRAND = {
-  kicker: 'For patients and families',
-  headline: 'Stay in the loop on your care.',
-  lede: 'See what your care team has confirmed, what happens next, and who to contact, in plain language.',
+  kicker: 'Patients and families',
+  headline: 'By your side.',
+  lede: 'See what your team agreed and what comes next.',
   features: [
-    { num: '01', title: 'What the team confirmed', body: 'The summary your doctor reviewed and approved. Never a rough draft.' },
-    { num: '02', title: 'What happens next', body: 'Your next visit, and a simple checklist to prepare for it.' },
-    { num: '03', title: 'Read-only', body: 'You can view everything. Nothing can be changed by mistake.' },
+    { num: '01', title: 'Team-confirmed', body: 'The summary your doctor reviewed and approved.' },
+    { num: '02', title: 'Next steps', body: 'Your next visit and a simple preparation list.' },
+    { num: '03', title: 'Read-only', body: 'View everything. Nothing changes by mistake.' },
   ],
 };
 
 const PATIENT_BRAND = {
-  kicker: 'For patients',
-  headline: 'Your care plan, in your hands.',
-  lede: 'See what you and your care team agreed, keep an emergency card with you, and find care close to home.',
+  kicker: 'Patient view',
+  headline: 'Your care plan, close at hand.',
+  lede: 'Open the summary, emergency card, and nearby care.',
   features: [
-    { num: '01', title: 'My care plan', body: 'The summary your doctor verified, in plain words.' },
-    { num: '02', title: 'Emergency card', body: 'A wallet card with a QR code for the ambulance crew and the emergency department.' },
-    { num: '03', title: 'Care near me', body: 'Palliative care, hospitals and clinics near you, on a real map.' },
+    { num: '01', title: 'My care plan', body: 'The summary your doctor verified.' },
+    { num: '02', title: 'Emergency card', body: 'A wallet card for the ambulance crew.' },
+    { num: '03', title: 'Care near me', body: 'Palliative care, hospitals and clinics on a map.' },
   ],
 };
 
@@ -50,6 +62,15 @@ function BrandPanel({ variant = 'care-team' }: { variant?: 'care-team' | 'family
   const content = variant === 'family' ? FAMILY_BRAND : variant === 'patient' ? PATIENT_BRAND : CARE_TEAM_BRAND;
   return (
     <div className="auth-brand-panel">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        className="auth-brand-image"
+        src="/care-consultation.jpg"
+        alt=""
+        aria-hidden="true"
+        loading="eager"
+        decoding="async"
+      />
       <div className="auth-brand-noise" aria-hidden="true" />
       <div className="auth-brand-inner">
         <div className="auth-brand-top">
@@ -65,26 +86,14 @@ function BrandPanel({ variant = 'care-team' }: { variant?: 'care-team' | 'family
           <h2 className="auth-brand-value">
             {content.headline}
           </h2>
-          <p className="auth-brand-lede">
-            {content.lede}
-          </p>
+
         </div>
 
-        <ol className="auth-brand-features">
-          {content.features.map((f) => (
-            <li key={f.num}>
-              <span className="auth-brand-num">{f.num}</span>
-              <span className="auth-brand-feature-body">
-                <strong>{f.title}</strong>
-                <span>{f.body}</span>
-              </span>
-            </li>
-          ))}
-        </ol>
+
 
         <div className="auth-brand-foot">
           <span className="auth-brand-dot" aria-hidden="true" />
-          Synthetic demonstration environment · No real patient data
+
         </div>
       </div>
     </div>
@@ -127,6 +136,7 @@ function RoleSelector({
                 <strong>{r.name}</strong>
                 <small>{r.label}</small>
               </span>
+              <span className="auth-role-action" aria-hidden="true">Select</span>
             </div>
           );
         })}
@@ -157,9 +167,14 @@ export function LoginScreen(props: {
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!email.trim() || !password.trim()) {
-      setError('Enter an email and password to continue — any value works in this demo.');
+      setError('Enter an email and password.');
       return;
     }
+    setError('');
+    onSignIn(selectedRole);
+  }
+
+  function openDemo() {
     setError('');
     onSignIn(selectedRole);
   }
@@ -171,60 +186,67 @@ export function LoginScreen(props: {
         <form className="auth-card" onSubmit={handleSubmit} noValidate>
           {onGoHome && (
             <button type="button" className="auth-textbutton lp-back-link" onClick={onGoHome}>
-              ← Back to overview
+              Back
             </button>
           )}
-          <span className="auth-door-chip is-care-team">Care team sign-in</span>
-          <span className="auth-eyebrow">Welcome back</span>
-          <h1 className="auth-title">Sign in to Continuity Loop</h1>
-          <p className="auth-sub">Use any credentials — this is a simulated sign-in.</p>
+          <span className="auth-door-chip is-care-team">Care team</span>
+          <h1 className="auth-title">Care team</h1>
 
           {error && <div className="auth-alert" role="alert">{error}</div>}
 
-          <div className="auth-field">
-            <label className="auth-label" htmlFor="login-email">Work email</label>
-            <input
-              id="login-email"
-              type="email"
-              autoComplete="email"
-              placeholder="sujay@synthetic-hospital.demo"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-
-          <div className="auth-field">
-            <div className="auth-label-row">
-              <label className="auth-label" htmlFor="login-password">Password</label>
-              <button
-                type="button"
-                className="auth-toggle-visibility"
-                onClick={() => setShowPassword((v) => !v)}
-              >
-                {showPassword ? 'Hide' : 'Show'}
-              </button>
-            </div>
-            <input
-              id="login-password"
-              type={showPassword ? 'text' : 'password'}
-              autoComplete="current-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
-
           <RoleSelector selectedRole={selectedRole} onSelect={setSelectedRole} idPrefix="login-role" />
 
-          <label className="auth-checkbox-row">
-            <input
-              type="checkbox"
-              checked={remember}
-              onChange={(e) => setRemember(e.target.checked)}
-            />
-            <span>Remember this device</span>
-          </label>
+          <button type="button" className="auth-demo-submit" onClick={openDemo}>
+            Continue
+          </button>
 
-          <button type="submit" className="auth-submit">Sign in</button>
+          <details className="auth-manual">
+            <summary>Use credentials instead</summary>
+            <div className="auth-manual-body">
+              <div className="auth-field">
+                <label className="auth-label" htmlFor="login-email">Work email</label>
+                <input
+                  id="login-email"
+                  type="email"
+                  autoComplete="email"
+                  placeholder="name@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+
+              <div className="auth-field">
+                <div className="auth-label-row">
+                  <label className="auth-label" htmlFor="login-password">Password</label>
+                  <button
+                    type="button"
+                    className="auth-toggle-visibility"
+                    onClick={() => setShowPassword((v) => !v)}
+                  >
+                    {showPassword ? 'Hide' : 'Show'}
+                  </button>
+                </div>
+                <input
+                  id="login-password"
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+
+              <label className="auth-checkbox-row">
+                <input
+                  type="checkbox"
+                  checked={remember}
+                  onChange={(e) => setRemember(e.target.checked)}
+                />
+                <span>Remember this device</span>
+              </label>
+
+              <button type="submit" className="auth-submit">Continue</button>
+            </div>
+          </details>
 
           <div className="auth-footer">
             New to Continuity Loop?{' '}
@@ -237,7 +259,7 @@ export function LoginScreen(props: {
             <div className="auth-door-switch">
               Patient or family member?{' '}
               <button type="button" className="auth-textbutton" onClick={onGoToFamily}>
-                Use family access →
+                Family
               </button>
             </div>
           )}
@@ -246,13 +268,13 @@ export function LoginScreen(props: {
             <div className="auth-door-switch">
               Patient?{' '}
               <button type="button" className="auth-textbutton" onClick={onGoToPatient}>
-                Use patient access
+                Patient
               </button>
             </div>
           )}
 
           <SimAuthNotice>
-            Simulated authentication. No credentials are checked, stored or transmitted. Any email and password will sign you in.
+            Accounts aren’t connected. Use sample details.
           </SimAuthNotice>
         </form>
       </div>
@@ -281,7 +303,7 @@ export function SignupScreen(props: {
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!fullName.trim() || !email.trim() || !hospital.trim() || !department.trim() || !password.trim() || !confirmPassword.trim()) {
-      setError('Fill in every field to continue — any values work in this demo.');
+      setError('Fill in the missing details.');
       return;
     }
     if (password !== confirmPassword) {
@@ -289,7 +311,7 @@ export function SignupScreen(props: {
       return;
     }
     if (!ack) {
-      setError('Please confirm you understand this is a synthetic demonstration.');
+      setError('Confirm that you are using sample details.');
       return;
     }
     setError('');
@@ -303,13 +325,11 @@ export function SignupScreen(props: {
         <form className="auth-card" onSubmit={handleSubmit} noValidate>
           {onGoHome && (
             <button type="button" className="auth-textbutton lp-back-link" onClick={onGoHome}>
-              ← Back to overview
+              Back
             </button>
           )}
           <span className="auth-door-chip is-care-team">Care team account</span>
-          <span className="auth-eyebrow">Get started</span>
           <h1 className="auth-title">Create your account</h1>
-          <p className="auth-sub">Simulated registration for the demonstration.</p>
 
           {error && <div className="auth-alert" role="alert">{error}</div>}
 
@@ -399,10 +419,10 @@ export function SignupScreen(props: {
               checked={ack}
               onChange={(e) => setAck(e.target.checked)}
             />
-            <span>I understand this is a synthetic demonstration and will not enter real patient information.</span>
+            <span>I am using sample details.</span>
           </label>
 
-          <button type="submit" className="auth-submit">Create account</button>
+          <button type="submit" className="auth-submit">Create profile</button>
 
           <div className="auth-footer">
             Already have an account?{' '}
@@ -415,7 +435,7 @@ export function SignupScreen(props: {
             <div className="auth-door-switch">
               Patient or family member?{' '}
               <button type="button" className="auth-textbutton" onClick={onGoToFamily}>
-                Use family access →
+                Family
               </button>
             </div>
           )}
@@ -424,13 +444,13 @@ export function SignupScreen(props: {
             <div className="auth-door-switch">
               Patient?{' '}
               <button type="button" className="auth-textbutton" onClick={onGoToPatient}>
-                Use patient access
+                Patient
               </button>
             </div>
           )}
 
           <SimAuthNotice>
-            Simulated authentication. No credentials are checked, stored or transmitted. Any email and password will sign you in.
+            Accounts aren’t connected. Use sample details.
           </SimAuthNotice>
         </form>
       </div>
@@ -452,12 +472,13 @@ const FAMILY_RELATIONSHIPS = [
 ];
 
 export function FamilyLoginScreen(props: {
+  patients: Array<{ hospitalId: string; name: string }>;
   onFamilySignIn: (member: FamilyMember) => void;
   onGoToClinician: () => void;
   onGoHome?: () => void;
   onGoToPatient?: () => void;
 }) {
-  const { onFamilySignIn, onGoToClinician, onGoHome, onGoToPatient } = props;
+  const { patients, onFamilySignIn, onGoToClinician, onGoHome, onGoToPatient } = props;
   const [patientId, setPatientId] = useState('');
   const [name, setName] = useState('');
   const [relationship, setRelationship] = useState('Daughter');
@@ -465,21 +486,42 @@ export function FamilyLoginScreen(props: {
   const [error, setError] = useState('');
 
   function fillDemo() {
-    setPatientId('CANCER-20418');
-    setName('Kavya Raghavan');
-    setRelationship('Daughter');
-    setAccessCode('482913');
+    setPatientId(DEMO_PATIENT.hospitalId);
+    setName(DEMO_FAMILY_MEMBER.name);
+    setRelationship(DEMO_FAMILY_MEMBER.relationship);
+    setAccessCode(DEMO_PATIENT.accessCode);
     setError('');
+  }
+
+  function openDemo() {
+    const matchedPatient = patients.find(
+      (patient) => patient.hospitalId.toUpperCase() === DEMO_PATIENT.hospitalId,
+    );
+    if (!matchedPatient) {
+      setError('This patient is not on the list.');
+      return;
+    }
+    fillDemo();
+    onFamilySignIn({
+      name: DEMO_FAMILY_MEMBER.name,
+      relationship: DEMO_FAMILY_MEMBER.relationship,
+      patientId: matchedPatient.hospitalId,
+    });
   }
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!patientId.trim() || !name.trim() || !relationship.trim() || !accessCode.trim()) {
-      setError('Fill in every field to continue. Any values work in this demo.');
+      setError('Fill in every field to continue.');
+      return;
+    }
+    const matchedPatient = patients.find((patient) => patient.hospitalId === patientId.trim().toUpperCase());
+    if (!matchedPatient) {
+      setError('Patient not found. Check the ID.');
       return;
     }
     setError('');
-    onFamilySignIn({ name, relationship, patientId });
+    onFamilySignIn({ name: name.trim(), relationship, patientId: matchedPatient.hospitalId });
   }
 
   return (
@@ -489,78 +531,81 @@ export function FamilyLoginScreen(props: {
         <form className="auth-card" onSubmit={handleSubmit} noValidate>
           {onGoHome && (
             <button type="button" className="auth-textbutton lp-back-link" onClick={onGoHome}>
-              ← Back to overview
+              Back
             </button>
           )}
           <span className="auth-door-chip is-family">Patient & family</span>
-          <span className="auth-eyebrow">Family access</span>
-          <h1 className="auth-title">View your care journey</h1>
-          <p className="auth-sub">For patients and family members. This is simulated access, so no identity is checked.</p>
+          <h1 className="auth-title">Your care journey</h1>
 
           {error && <div className="auth-alert" role="alert">{error}</div>}
 
-          <button type="button" className="auth-demo-member" onClick={fillDemo}>
+          <button type="button" className="auth-demo-member" onClick={openDemo}>
             <span className="auth-demo-avatar" aria-hidden="true">KR</span>
             <span className="auth-demo-text">
-              <strong>Kavya Raghavan</strong>
-              <span>Daughter of Meera Raghavan · CANCER-20418</span>
+              <strong>{DEMO_FAMILY_MEMBER.name}</strong>
+              <span>{DEMO_FAMILY_MEMBER.relationship} of {DEMO_PATIENT.name} · {DEMO_PATIENT.hospitalId}</span>
             </span>
-            <span className="auth-demo-label">Use demo</span>
+            <span className="auth-demo-label">Continue</span>
           </button>
 
-          <div className="auth-field">
-            <label className="auth-label" htmlFor="family-patient-id">Patient ID</label>
-            <input
-              id="family-patient-id"
-              type="text"
-              placeholder="CANCER-20418"
-              value={patientId}
-              onChange={(e) => { setPatientId(e.target.value); setError(''); }}
-            />
-          </div>
+          <details className="auth-manual">
+            <summary>Find a patient</summary>
+            <div className="auth-manual-body">
+              <div className="auth-field">
+                <label className="auth-label" htmlFor="family-patient-id">Patient ID</label>
+                <input
+                  id="family-patient-id"
+                  type="text"
+                  placeholder="CANCER-20418"
+                  value={patientId}
+                  onChange={(e) => { setPatientId(e.target.value); setError(''); }}
+                />
+              </div>
 
-          <div className="auth-field">
-            <label className="auth-label" htmlFor="family-name">Your name</label>
-            <input
-              id="family-name"
-              type="text"
-              autoComplete="name"
-              value={name}
-              onChange={(e) => { setName(e.target.value); setError(''); }}
-            />
-          </div>
+              <div className="auth-field">
+                <label className="auth-label" htmlFor="family-name">Your name</label>
+                <input
+                  id="family-name"
+                  type="text"
+                  autoComplete="name"
+                  value={name}
+                  onChange={(e) => { setName(e.target.value); setError(''); }}
+                />
+              </div>
 
-          <div className="auth-field">
-            <label className="auth-label" htmlFor="family-relationship">Relationship to patient</label>
-            <select
-              id="family-relationship"
-              value={relationship}
-              onChange={(e) => { setRelationship(e.target.value); setError(''); }}
-            >
-              {FAMILY_RELATIONSHIPS.map((r) => (
-                <option key={r} value={r}>{r}</option>
-              ))}
-            </select>
-          </div>
+              <div className="auth-field">
+                <label className="auth-label" htmlFor="family-relationship">Relationship to patient</label>
+                <select
+                  id="family-relationship"
+                  value={relationship}
+                  onChange={(e) => { setRelationship(e.target.value); setError(''); }}
+                >
+                  {FAMILY_RELATIONSHIPS.map((r) => (
+                    <option key={r} value={r}>{r}</option>
+                  ))}
+                </select>
+              </div>
 
-          <div className="auth-field">
-            <label className="auth-label" htmlFor="family-access-code">Access code</label>
-            <input
-              id="family-access-code"
-              type="text"
-              inputMode="numeric"
-              placeholder="6-digit code from your care team"
-              value={accessCode}
-              onChange={(e) => { setAccessCode(e.target.value); setError(''); }}
-            />
-          </div>
+              <div className="auth-field">
+                <label className="auth-label" htmlFor="family-access-code">Code</label>
+                <input
+                  id="family-access-code"
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="6-digit code from your care team"
+                  value={accessCode}
+                  onChange={(e) => { setAccessCode(e.target.value); setError(''); }}
+                />
+              </div>
 
-          <button type="submit" className="auth-submit">View care journey</button>
+              <button type="submit" className="auth-submit">View care journey</button>
+            </div>
+          </details>
 
           <div className="auth-footer">
             Part of the care team?{' '}
             <button type="button" className="auth-textbutton" onClick={onGoToClinician}>
-              Clinician sign in
+              Care team
             </button>
           </div>
 
@@ -568,13 +613,13 @@ export function FamilyLoginScreen(props: {
             <div className="auth-door-switch">
               Are you the patient?{' '}
               <button type="button" className="auth-textbutton" onClick={onGoToPatient}>
-                Use patient access
+                Patient
               </button>
             </div>
           )}
 
           <SimAuthNotice>
-            Simulated family access. No identity is verified and nothing is stored. A real portal would need hospital-issued invitations and identity checks.
+            Accounts aren’t connected. Use sample details.
           </SimAuthNotice>
         </form>
       </div>
@@ -597,23 +642,38 @@ export function PatientLoginScreen(props: {
   const [error, setError] = useState('');
 
   function fillDemo() {
-    setPatientId('CANCER-20418');
-    setName('Meera Raghavan');
-    setDob('14/03/1964');
-    setAccessCode('482913');
+    setPatientId(DEMO_PATIENT.hospitalId);
+    setName(DEMO_PATIENT.name);
+    setDob(DEMO_PATIENT.dob);
+    setAccessCode(DEMO_PATIENT.accessCode);
     setError('');
+  }
+
+  function openDemo() {
+    const matchedPatient = patients?.find(
+      (patient) => patient.hospitalId.toUpperCase() === DEMO_PATIENT.hospitalId,
+    );
+    if (patients && !matchedPatient) {
+      setError('This patient is not on the list.');
+      return;
+    }
+    fillDemo();
+    onPatientSignIn({
+      hospitalId: matchedPatient?.hospitalId ?? DEMO_PATIENT.hospitalId,
+      name: matchedPatient?.name ?? DEMO_PATIENT.name,
+    });
   }
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!patientId.trim() || !name.trim() || !dob.trim() || !accessCode.trim()) {
-      setError('Fill in every field to continue. Any values work in this demo.');
+      setError('Fill in every field to continue.');
       return;
     }
     const trimmedId = patientId.trim().toUpperCase();
     const matchedPatient = patients?.find((p) => p.hospitalId.toUpperCase() === trimmedId);
     if (patients && !matchedPatient) {
-      setError('No demo patient has that ID. Use the demo card above.');
+      setError('Patient not found. Check the ID.');
       return;
     }
     setError('');
@@ -627,78 +687,81 @@ export function PatientLoginScreen(props: {
         <form className="auth-card" onSubmit={handleSubmit} noValidate>
           {onGoHome && (
             <button type="button" className="auth-textbutton lp-back-link" onClick={onGoHome}>
-              ← Back to overview
+              Back
             </button>
           )}
           <span className="auth-door-chip is-patient">Patient</span>
-          <span className="auth-eyebrow">Welcome</span>
-          <h1 className="auth-title">Patient sign-in</h1>
-          <p className="auth-sub">Use the demo patient below, or type any details — this is a simulated sign-in.</p>
+          <h1 className="auth-title">Patient</h1>
 
           {error && <div className="auth-alert" role="alert">{error}</div>}
 
-          <button type="button" className="auth-demo-member" onClick={fillDemo}>
+          <button type="button" className="auth-demo-member" onClick={openDemo}>
             <span className="auth-demo-avatar" aria-hidden="true">MR</span>
             <span className="auth-demo-text">
-              <strong>Meera Raghavan</strong>
-              <span>Patient · CANCER-20418 · 14/03/1964</span>
+              <strong>{DEMO_PATIENT.name}</strong>
+              <span>Patient · {DEMO_PATIENT.hospitalId} · {DEMO_PATIENT.dob}</span>
             </span>
-            <span className="auth-demo-label">Use demo</span>
+            <span className="auth-demo-label">Continue</span>
           </button>
 
-          <div className="auth-field">
-            <label className="auth-label" htmlFor="patient-id">Patient ID (MRN)</label>
-            <input
-              id="patient-id"
-              type="text"
-              placeholder="CANCER-20418"
-              value={patientId}
-              onChange={(e) => { setPatientId(e.target.value); setError(''); }}
-            />
-          </div>
+          <details className="auth-manual">
+            <summary>Find a patient</summary>
+            <div className="auth-manual-body">
+              <div className="auth-field">
+                <label className="auth-label" htmlFor="patient-id">Patient ID (MRN)</label>
+                <input
+                  id="patient-id"
+                  type="text"
+                  placeholder="CANCER-20418"
+                  value={patientId}
+                  onChange={(e) => { setPatientId(e.target.value); setError(''); }}
+                />
+              </div>
 
-          <div className="auth-field">
-            <label className="auth-label" htmlFor="patient-name">Full name</label>
-            <input
-              id="patient-name"
-              type="text"
-              autoComplete="name"
-              value={name}
-              onChange={(e) => { setName(e.target.value); setError(''); }}
-            />
-          </div>
+              <div className="auth-field">
+                <label className="auth-label" htmlFor="patient-name">Full name</label>
+                <input
+                  id="patient-name"
+                  type="text"
+                  autoComplete="name"
+                  value={name}
+                  onChange={(e) => { setName(e.target.value); setError(''); }}
+                />
+              </div>
 
-          <div className="auth-field">
-            <label className="auth-label" htmlFor="patient-dob">Date of birth</label>
-            <input
-              id="patient-dob"
-              type="text"
-              placeholder="DD/MM/YYYY"
-              autoComplete="bday"
-              value={dob}
-              onChange={(e) => { setDob(e.target.value); setError(''); }}
-            />
-          </div>
+              <div className="auth-field">
+                <label className="auth-label" htmlFor="patient-dob">Date of birth</label>
+                <input
+                  id="patient-dob"
+                  type="text"
+                  placeholder="DD/MM/YYYY"
+                  autoComplete="bday"
+                  value={dob}
+                  onChange={(e) => { setDob(e.target.value); setError(''); }}
+                />
+              </div>
 
-          <div className="auth-field">
-            <label className="auth-label" htmlFor="patient-access-code">Access code</label>
-            <input
-              id="patient-access-code"
-              type="text"
-              inputMode="numeric"
-              placeholder="6-digit code from your care team"
-              value={accessCode}
-              onChange={(e) => { setAccessCode(e.target.value); setError(''); }}
-            />
-          </div>
+              <div className="auth-field">
+                <label className="auth-label" htmlFor="patient-access-code">Code</label>
+                <input
+                  id="patient-access-code"
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="6-digit code from your care team"
+                  value={accessCode}
+                  onChange={(e) => { setAccessCode(e.target.value); setError(''); }}
+                />
+              </div>
 
-          <button type="submit" className="auth-submit">Sign in</button>
+              <button type="submit" className="auth-submit">Sign in</button>
+            </div>
+          </details>
 
           {onGoToFamily && (
             <div className="auth-door-switch">
               Signing in for a relative?{' '}
               <button type="button" className="auth-textbutton" onClick={onGoToFamily}>
-                Use family access
+                Family
               </button>
             </div>
           )}
@@ -707,13 +770,13 @@ export function PatientLoginScreen(props: {
             <div className="auth-door-switch">
               Care team member?{' '}
               <button type="button" className="auth-textbutton" onClick={onGoToClinician}>
-                Sign in here
+                Sign in
               </button>
             </div>
           )}
 
           <SimAuthNotice>
-            Simulated sign-in. Nothing you type is checked, stored or sent.
+            Accounts aren’t connected. Use sample details.
           </SimAuthNotice>
         </form>
       </div>

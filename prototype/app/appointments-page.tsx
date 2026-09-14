@@ -1,5 +1,13 @@
 'use client';
 import React, { useMemo, useRef, useState, useEffect } from 'react';
+import {
+  appendScheduledAppointmentForPatient,
+  canMarkAppointmentAttended,
+  nextAppointmentId,
+  updateAppointmentForPatient,
+  validateAppointmentDateTime,
+  type AppointmentDateTimeError,
+} from './appointment-state';
 
 export type AppointmentStatus = 'Scheduled' | 'Attended' | 'Rescheduled' | 'Cancelled' | 'Missed';
 export type AppointmentMode = 'In person' | 'Telephone' | 'Video';
@@ -128,12 +136,12 @@ function lastAttended(list: Appointment[]): Appointment | undefined {
     .sort((a, b) => (a.date === b.date ? b.time.localeCompare(a.time) : b.date.localeCompare(a.date)))[0];
 }
 
-function nextNumericId(list: Appointment[]): string {
-  const max = list.reduce((m, a) => {
-    const n = parseInt(a.id.replace('APT-', ''), 10);
-    return Number.isFinite(n) && n > m ? n : m;
-  }, 1000);
-  return `APT-${max + 1}`;
+function appointmentDateTimeMessage(error: AppointmentDateTimeError, date: string, time: string): string {
+  if (error === 'date-required') return !date && !time ? 'Choose a date and time.' : 'Choose a date.';
+  if (error === 'time-required') return 'Choose a time.';
+  if (error === 'date-invalid') return 'Choose a valid date.';
+  if (error === 'time-invalid') return 'Choose a valid time.';
+  return `Choose a date on or after ${formatDate(DEMO_TODAY)}.`;
 }
 
 /* ---------- Icons ---------- */
@@ -222,7 +230,7 @@ function Menu({
 }: {
   open: boolean;
   onClose: () => void;
-  items: { label: string; onSelect: () => void }[];
+  items: { label: string; onSelect: () => void; disabled?: boolean }[];
 }) {
   const ref = useOutsideClose(onClose);
   useEffect(() => {
@@ -241,7 +249,9 @@ function Menu({
           key={it.label}
           role="menuitem"
           className="ap-menu-item"
+          disabled={it.disabled}
           onClick={() => {
+            if (it.disabled) return;
             it.onSelect();
             onClose();
           }}
@@ -260,12 +270,13 @@ type DialogMode = 'attend' | 'reschedule' | 'cancel' | null;
 function useFocusTrapOpen(open: boolean, firstRef: React.RefObject<HTMLElement | null>) {
   const opener = useRef<HTMLElement | null>(null);
   useEffect(() => {
-    if (open) {
-      opener.current = document.activeElement as HTMLElement;
-      setTimeout(() => firstRef.current?.focus(), 0);
-    } else {
+    if (!open) return;
+    opener.current = document.activeElement as HTMLElement;
+    const timer = setTimeout(() => firstRef.current?.focus(), 0);
+    return () => {
+      clearTimeout(timer);
       opener.current?.focus();
-    }
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 }
@@ -322,7 +333,7 @@ function AppointmentDialog({
   canSchedule: boolean;
   canStartConversation: boolean;
   readOnlyReason: string;
-  onSave: (next: Appointment, extra?: Appointment) => void;
+  onSave: (next: Appointment, extra?: Appointment) => boolean;
   onAudit: (event: string, record: string) => void;
   onNotify: (message: string) => void;
   onStartConversation: (hospitalId: string) => void;
@@ -340,27 +351,14 @@ function AppointmentDialog({
   const firstRef = useRef<HTMLButtonElement | null>(null);
   useFocusTrapOpen(open, firstRef);
 
-  useEffect(() => {
-    if (open) {
-      setMode(defaultMode ?? null);
-      setOutcome('Attended as planned');
-      setNote('');
-      setNewDate('');
-      setNewTime('');
-      setReason('');
-      setError('');
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, appt?.id]);
-
   if (!open || !appt || !patient) return null;
   const titleId = `ap-dialog-title-${appt.id}`;
   const isGuided = /Goals-of-care|Family meeting/i.test(appt.type);
 
   function saveAttend() {
-    if (!canSchedule || !appt) return;
-    const next: Appointment = { ...appt, status: 'Attended', outcome };
-    onSave(next);
+    if (!canSchedule || !appt || !canMarkAppointmentAttended(appt, DEMO_TODAY)) return;
+    const next: Appointment = { ...appt, status: 'Attended', outcome, note: note.trim() || appt.note };
+    if (!onSave(next)) return;
     onAudit(`Marked appointment ${appt.id} attended · ${outcome}`, patient!.name);
     onNotify('Appointment marked attended.');
     onPatientActivity(patient!.hospitalId, `Appointment attended · ${outcome}`);
@@ -369,19 +367,17 @@ function AppointmentDialog({
 
   function saveReschedule() {
     if (!canSchedule || !appt) return;
-    if (!newDate || !newTime) {
-      setError('Choose a date and time.');
+    const dateTimeError = validateAppointmentDateTime(newDate, newTime, DEMO_TODAY);
+    if (dateTimeError) {
+      setError(appointmentDateTimeMessage(dateTimeError, newDate, newTime));
       return;
     }
-    if (newDate < DEMO_TODAY) {
-      setError(`Choose a date on or after ${formatDate(DEMO_TODAY)}.`);
-      return;
-    }
-    const newId = nextNumericId(appointments);
+    const rescheduleReason = reason.trim();
+    const newId = nextAppointmentId(appointments);
     const updated: Appointment = {
       ...appt,
       status: 'Rescheduled',
-      outcome: `Rescheduled to ${formatDate(newDate)} ${newTime}${reason ? ' — ' + reason : ''}`,
+      outcome: `Rescheduled to ${formatDate(newDate)} ${newTime}${rescheduleReason ? ' — ' + rescheduleReason : ''}`,
     };
     const created: Appointment = {
       id: newId,
@@ -394,7 +390,7 @@ function AppointmentDialog({
       status: 'Scheduled',
       documentation: appt.documentation,
     };
-    onSave(updated, created);
+    if (!onSave(updated, created)) return;
     onAudit(`Rescheduled appointment ${appt.id} to ${formatDate(newDate)} ${newTime} as ${newId}`, patient!.name);
     onNotify('Appointment rescheduled.');
     onPatientActivity(patient!.hospitalId, `Appointment rescheduled to ${formatDate(newDate)}`, formatDate(newDate));
@@ -403,13 +399,14 @@ function AppointmentDialog({
 
   function saveCancel() {
     if (!canSchedule || !appt) return;
-    if (!reason.trim()) {
+    const cancellationReason = reason.trim();
+    if (!cancellationReason) {
       setError('Add a reason before cancelling.');
       return;
     }
-    const next: Appointment = { ...appt, status: 'Cancelled', outcome: `Cancelled — ${reason}` };
-    onSave(next);
-    onAudit(`Cancelled appointment ${appt.id} · ${reason}`, patient!.name);
+    const next: Appointment = { ...appt, status: 'Cancelled', outcome: `Cancelled — ${cancellationReason}` };
+    if (!onSave(next)) return;
+    onAudit(`Cancelled appointment ${appt.id} · ${cancellationReason}`, patient!.name);
     onNotify('Appointment cancelled.');
     onPatientActivity(patient!.hospitalId, 'Appointment cancelled');
     onClose();
@@ -432,9 +429,9 @@ function AppointmentDialog({
         <div className="ap-dialog-actions">
           {!canSchedule && <div className="ap-notice">{readOnlyReason}</div>}
           <div className="ap-tabbar" role="tablist">
-            <button ref={firstRef} role="tab" aria-selected={mode === 'attend'} className={`ap-tab ${mode === 'attend' ? 'active' : ''}`} onClick={() => setMode('attend')}>Mark attended</button>
-            <button role="tab" aria-selected={mode === 'reschedule'} className={`ap-tab ${mode === 'reschedule' ? 'active' : ''}`} onClick={() => setMode('reschedule')}>Reschedule</button>
-            <button role="tab" aria-selected={mode === 'cancel'} className={`ap-tab ${mode === 'cancel' ? 'active' : ''}`} onClick={() => setMode('cancel')}>Cancel appointment</button>
+            <button ref={firstRef} role="tab" aria-selected={mode === 'attend'} className={`ap-tab ${mode === 'attend' ? 'active' : ''}`} disabled={!canSchedule || !canMarkAppointmentAttended(appt, DEMO_TODAY)} onClick={() => setMode('attend')}>Mark attended</button>
+            <button role="tab" aria-selected={mode === 'reschedule'} className={`ap-tab ${mode === 'reschedule' ? 'active' : ''}`} disabled={!canSchedule} onClick={() => setMode('reschedule')}>Reschedule</button>
+            <button role="tab" aria-selected={mode === 'cancel'} className={`ap-tab ${mode === 'cancel' ? 'active' : ''}`} disabled={!canSchedule} onClick={() => setMode('cancel')}>Cancel appointment</button>
           </div>
 
           {mode === 'attend' && (
@@ -452,7 +449,7 @@ function AppointmentDialog({
                 <span>Note</span>
                 <textarea value={note} onChange={(e) => setNote(e.target.value)} rows={2} />
               </label>
-              <button className="ap-btn-primary" disabled={!canSchedule} onClick={saveAttend}>Save</button>
+              <button className="ap-btn-primary" disabled={!canSchedule || !canMarkAppointmentAttended(appt, DEMO_TODAY)} onClick={saveAttend}>Save</button>
             </div>
           )}
 
@@ -526,7 +523,7 @@ function ScheduleDialog({
   patient: AppointmentPatient | undefined;
   canSchedule: boolean;
   readOnlyReason: string;
-  onCreate: (a: Appointment) => void;
+  onCreate: (a: Appointment) => boolean;
   onAudit: (event: string, record: string) => void;
   onNotify: (message: string) => void;
   onPatientActivity: (hospitalId: string, activity: string, nextDue?: string) => void;
@@ -541,32 +538,17 @@ function ScheduleDialog({
   const firstRef = useRef<HTMLInputElement | null>(null);
   useFocusTrapOpen(open, firstRef);
 
-  useEffect(() => {
-    if (open) {
-      setType('Goals-of-care conversation');
-      setDate('');
-      setTime('');
-      setClinician('Dr Sujay');
-      setMode('In person');
-      setNote('');
-      setError('');
-    }
-  }, [open]);
-
   if (!open || !patient) return null;
   const titleId = 'ap-schedule-title';
 
   function save() {
     if (!canSchedule) return;
-    if (!date || !time) {
-      setError('Choose a date and time.');
+    const dateTimeError = validateAppointmentDateTime(date, time, DEMO_TODAY);
+    if (dateTimeError) {
+      setError(appointmentDateTimeMessage(dateTimeError, date, time));
       return;
     }
-    if (date < DEMO_TODAY) {
-      setError(`Choose a date on or after ${formatDate(DEMO_TODAY)}.`);
-      return;
-    }
-    const newId = nextNumericId(appointments);
+    const newId = nextAppointmentId(appointments);
     const documentation: DocumentationStatus = /Goals-of-care|Summary review|Family meeting/i.test(type) ? 'Pending' : 'Not required';
     const appt: Appointment = {
       id: newId,
@@ -580,7 +562,7 @@ function ScheduleDialog({
       documentation,
       note: note || undefined,
     };
-    onCreate(appt);
+    if (!onCreate(appt)) return;
     onAudit(`Scheduled ${type} ${formatDate(date)} ${time} as ${newId}`, patient!.name);
     onNotify('Appointment scheduled.');
     onPatientActivity(patient!.hospitalId, `Appointment scheduled for ${formatDate(date)}`, formatDate(date));
@@ -715,12 +697,19 @@ export function AppointmentsPage(props: AppointmentsPageProps): React.JSX.Elemen
   const lastAtt = useMemo(() => lastAttended(patientAppts), [patientAppts]);
   const daysSinceAttended = lastAtt ? daysBetween(lastAtt.date, DEMO_TODAY) : null;
 
-  function updateAppointment(next: Appointment, extra?: Appointment) {
-    const updated = appointments.map((a) => (a.id === next.id ? next : a));
-    onAppointmentsChange(extra ? [...updated, extra] : updated);
+  function updateAppointment(next: Appointment, extra?: Appointment): boolean {
+    if (!canSchedule) return false;
+    const result = updateAppointmentForPatient(appointments, selectedId, next, extra);
+    if (!result.changed) return false;
+    onAppointmentsChange(result.appointments);
+    return true;
   }
-  function createAppointment(a: Appointment) {
-    onAppointmentsChange([...appointments, a]);
+  function createAppointment(a: Appointment): boolean {
+    if (!canSchedule) return false;
+    const result = appendScheduledAppointmentForPatient(appointments, selectedId, a);
+    if (!result.changed) return false;
+    onAppointmentsChange(result.appointments);
+    return true;
   }
 
   const ringRadius = 40;
@@ -851,7 +840,7 @@ export function AppointmentsPage(props: AppointmentsPageProps): React.JSX.Elemen
               </div>
             </div>
             <div className="ap-disclaimer">
-              Telephone and video are appointment labels only. No calling, messaging, video or reminder service is connected in this demonstration.
+              Calls, video visits and reminders are not connected.
             </div>
             {!canSchedule && <div className="ap-notice">{readOnlyReason}</div>}
 
@@ -917,8 +906,8 @@ export function AppointmentsPage(props: AppointmentsPageProps): React.JSX.Elemen
                           open={headerMenuOpen}
                           onClose={() => setHeaderMenuOpen(false)}
                           items={[
-                            { label: 'Reschedule', onSelect: () => canSchedule && setApptDialog({ appt: nextAppt, mode: 'reschedule' }) },
-                            { label: 'Cancel appointment', onSelect: () => canSchedule && setApptDialog({ appt: nextAppt, mode: 'cancel' }) },
+                            { label: 'Reschedule', disabled: !canSchedule, onSelect: () => canSchedule && setApptDialog({ appt: nextAppt, mode: 'reschedule' }) },
+                            { label: 'Cancel appointment', disabled: !canSchedule, onSelect: () => canSchedule && setApptDialog({ appt: nextAppt, mode: 'cancel' }) },
                           ]}
                         />
                       </div>
@@ -963,6 +952,7 @@ export function AppointmentsPage(props: AppointmentsPageProps): React.JSX.Elemen
                         <div>{lastAtt ? formatDate(lastAtt.date) : ''}</div>
                         <button
                           className="ap-btn-secondary"
+                          disabled={!canSchedule}
                           onClick={() => {
                             if (nextAppt) setApptDialog({ appt: nextAppt, mode: 'reschedule' });
                             else setScheduleOpen(true);
@@ -1067,7 +1057,7 @@ export function AppointmentsPage(props: AppointmentsPageProps): React.JSX.Elemen
                     <IconFile />
                     <div className="ap-doc-body">
                       <div className="ap-doc-title">Handoff print sheet</div>
-                      <div className="ap-doc-sub">Printable after an access-logged retrieval</div>
+                      <div className="ap-doc-sub">Open the summary to print it.</div>
                     </div>
                     <button className="ap-icon-btn" aria-label="Open" title="Open" disabled={!hasVerifiedRecord(selectedPatient.hospitalId)} onClick={() => onRetrieve(selectedPatient.hospitalId)}><IconOpenArrow /></button>
                   </div>
@@ -1088,14 +1078,15 @@ export function AppointmentsPage(props: AppointmentsPageProps): React.JSX.Elemen
                     <button className="ap-icon-btn" aria-label="Open" title="Open" onClick={() => onOpenAudit()}><IconOpenArrow /></button>
                   </div>
                 </div>
-                <div className="ap-doc-footer-note">No files are stored in this demonstration. Each item opens the matching record view.</div>
+                <div className="ap-doc-footer-note">Choose a note to open it.</div>
               </section>
             </div>
           </>
         )}
       </main>
 
-      <AppointmentDialog
+      {apptDialog && <AppointmentDialog
+        key={`${apptDialog.appt.id}-${apptDialog.mode ?? "view"}`}
         open={!!apptDialog}
         onClose={() => setApptDialog(null)}
         appt={apptDialog?.appt ?? null}
@@ -1110,8 +1101,8 @@ export function AppointmentsPage(props: AppointmentsPageProps): React.JSX.Elemen
         onPatientActivity={onPatientActivity}
         appointments={appointments}
         defaultMode={apptDialog?.mode ?? null}
-      />
-      <ScheduleDialog
+      />}
+      {scheduleOpen && <ScheduleDialog
         open={scheduleOpen}
         onClose={() => setScheduleOpen(false)}
         patient={selectedPatient}
@@ -1122,7 +1113,7 @@ export function AppointmentsPage(props: AppointmentsPageProps): React.JSX.Elemen
         onAudit={onAudit}
         onNotify={onNotify}
         onPatientActivity={onPatientActivity}
-      />
+      />}
     </div>
   );
 }
