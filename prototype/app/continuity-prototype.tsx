@@ -1537,7 +1537,7 @@ export function ContinuityPrototype() {
       await navigator.clipboard.writeText(summaryText);
       notify(`Version ${release.number} copied.`);
     } catch {
-      notify('Copy failed. Use Print handoff to save a copy.');
+      notify('Copy failed. Use Print to save a copy.');
     }
   }
 
@@ -2065,10 +2065,10 @@ export function ContinuityPrototype() {
                 disabled={!currentRole.startsWith('Dr')}
                 title={!currentRole.startsWith('Dr') ? 'Physician role required' : undefined}
                 onClick={() => beginRetrievalFor(item.hospitalId)}
-                aria-label={`Retrieve verified record for ${item.patient}`}
+                aria-label={`View summary for ${item.patient}`}
               >
                 <IconLock className="w-3.5 h-3.5" />
-                Retrieve
+                View summary
               </button>
             )}
           </div>
@@ -2107,7 +2107,7 @@ export function ContinuityPrototype() {
             <div className="th-header-right">
               <span className="th-count"><strong>{openItems.length}</strong> open</span>
               <button className="text-button" type="button" onClick={() => navigate('worklist')}>
-                Open all work →
+                View follow-ups →
               </button>
             </div>
           </div>
@@ -2163,7 +2163,7 @@ export function ContinuityPrototype() {
             <button className="role-route-card receiving" type="button" onClick={() => openDemoRoleWorkflow('Dr Isha Menon · Emergency physician')}>
               <span className="role-route-icon" aria-hidden="true"><IconLock className="w-5 h-5" /></span>
               <span>Emergency physician</span>
-              <strong>Retrieve a verified handoff</strong>
+              <strong>View summary</strong>
               <small>Record the clinical reason before opening the most recent verified version.</small>
             </button>
           </div>
@@ -2687,7 +2687,7 @@ export function ContinuityPrototype() {
         menu: [
           {
             key: 'retrieve',
-            label: 'Retrieve verified record',
+            label: 'View summary',
             onClick: () => beginRetrievalFor(selectedId),
             disabled: !hasVerifiedRecord,
           },
@@ -2810,7 +2810,7 @@ export function ContinuityPrototype() {
               onClick={() => beginRetrievalFor(selectedId)}
             >
               <IconLock className="w-3.5 h-3.5" />
-              Retrieve verified record
+              View summary
             </button>
           </div>
 
@@ -3808,7 +3808,7 @@ export function ContinuityPrototype() {
         : !breakGlassRequirementsMet
           ? 'Only the receiving doctor can open emergency notes.'
           : !retrievalAcknowledged
-            ? 'Confirm the retrieval boundary before viewing the record.'
+            ? 'Confirm below to continue.'
             : 'Ready to open. Your reason will be saved in History.';
     const selectedInitials = selectedItem.patient
       .split(' ')
@@ -3829,7 +3829,7 @@ export function ContinuityPrototype() {
               <div className="card-header">
                 <div className="card-header-titles">
                   <h2>Record requested</h2>
-                  <span>Identity verification</span>
+                  <span>Patient</span>
                 </div>
               </div>
               <div className="patient-lookup-result">
@@ -3946,11 +3946,11 @@ export function ContinuityPrototype() {
                 <StatusPill status="Viewed" />
                 {releasedFields && (
                   <button className="secondary-button" type="button" onClick={copySummaryToClipboard}>
-                    <IconCopy className="w-3.5 h-3.5" /> Copy Summary
+                    <IconCopy className="w-3.5 h-3.5" /> Copy
                   </button>
                 )}
                 <button className="secondary-button" type="button" onClick={() => window.print()}>
-                  Print handoff
+                  Print
                 </button>
               </div>
             </div>
@@ -4578,7 +4578,7 @@ export function ContinuityPrototype() {
           <span className="brand-mark" aria-hidden="true"><ContinuityMark /></span>
           <div className="brand-titles">
             <strong>Continuity Loop</strong>
-            <span>Goals-of-Care Workflow</span>
+            <span>Care planning</span>
           </div>
         </button>
 

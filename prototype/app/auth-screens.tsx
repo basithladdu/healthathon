@@ -77,7 +77,7 @@ function BrandPanel({ variant = 'care-team' }: { variant?: 'care-team' | 'family
           <div className="auth-brand-mark" aria-hidden="true">CL</div>
           <div className="auth-brand-titles">
             <strong>Continuity Loop</strong>
-            <span>Goals-of-Care Workflow</span>
+            <span>Care planning</span>
           </div>
         </div>
 
@@ -201,7 +201,7 @@ export function LoginScreen(props: {
           </button>
 
           <details className="auth-manual">
-            <summary>Use credentials instead</summary>
+            <summary>Enter details</summary>
             <div className="auth-manual-body">
               <div className="auth-field">
                 <label className="auth-label" htmlFor="login-email">Work email</label>
@@ -251,7 +251,7 @@ export function LoginScreen(props: {
           <div className="auth-footer">
             New to Continuity Loop?{' '}
             <button type="button" className="auth-textbutton" onClick={onGoToSignup}>
-              Create an account
+              Create profile
             </button>
           </div>
 
