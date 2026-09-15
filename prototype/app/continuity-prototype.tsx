@@ -41,6 +41,7 @@ import { AnticipatoryDrugBoxModal } from './anticipatory-drug-box';
 import { MalignantWoundCareModal } from './malignant-wound-care';
 import { BoneMetastasesSinsModal } from './bone-metastases-sins';
 import { CachexiaAscitesModal } from './cachexia-ascites-protocol';
+import { NeuropathicPainBlocksModal } from './neuropathic-pain-blocks';
 import { IconZap, IconFileText, IconHeartPulse, IconHospital, IconSparkles } from './icons';
 
 type View =
@@ -869,6 +870,7 @@ export function ContinuityPrototype() {
   const [woundCareOpen, setWoundCareOpen] = useState(false);
   const [boneSinsOpen, setBoneSinsOpen] = useState(false);
   const [cachexiaAscitesOpen, setCachexiaAscitesOpen] = useState(false);
+  const [neuropathicBlocksOpen, setNeuropathicBlocksOpen] = useState(false);
   const profileTimelineRef = useRef<HTMLOListElement>(null);
   const enrolDialogRef = useRef<HTMLElement>(null);
   const diffDialogRef = useRef<HTMLElement>(null);
@@ -3809,6 +3811,22 @@ export function ContinuityPrototype() {
             >
               <span>💧 Cachexia & Ascites</span>
             </button>
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={() => setNeuropathicBlocksOpen(true)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: '#f5f3ff',
+                borderColor: '#ddd6fe',
+                color: '#6d28d9',
+                fontWeight: 700,
+              }}
+            >
+              <span>⚡ Neuropathic Blocks</span>
+            </button>
             {versionPublished && <button className="secondary-button" type="button" onClick={startConversation}>New conversation</button>}
             <button className="primary-button" type="button" onClick={() => navigate('verify')}>{versionPublished ? 'Review checklist' : 'Review summary'}</button>
           </div>,
@@ -5576,6 +5594,18 @@ export function ContinuityPrototype() {
           onClose={() => setCachexiaAscitesOpen(false)}
           onDispatchOrder={(summary) => {
             setToast({ message: `Ascites / Nutrition Plan Dispatched: ${summary}` });
+          }}
+        />
+      )}
+
+      {neuropathicBlocksOpen && (
+        <NeuropathicPainBlocksModal
+          patientId={selectedItem.hospitalId}
+          patientName={selectedItem.patient}
+          primaryCancer={selectedProfile?.diagnosis || 'Metastatic Oncology Disease'}
+          onClose={() => setNeuropathicBlocksOpen(false)}
+          onDispatchReferral={(summary) => {
+            setToast({ message: `Interventional Referral Dispatched: ${summary}` });
           }}
         />
       )}

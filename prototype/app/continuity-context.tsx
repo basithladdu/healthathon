@@ -187,7 +187,8 @@ export type ModalType =
   | 'anticipatory_box'
   | 'malignant_wound'
   | 'bone_sins'
-  | 'cachexia_ascites';
+  | 'cachexia_ascites'
+  | 'neuropathic_blocks';
 
 export interface ContinuityContextType {
   currentRole: string;
