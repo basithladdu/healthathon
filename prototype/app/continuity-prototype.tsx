@@ -48,6 +48,7 @@ import { PediatricPalliativeModal } from './pediatric-palliative-engine';
 import { MalignantBowelObstructionModal } from './malignant-bowel-obstruction';
 import { RenalHepaticPalliativeModal } from './renal-hepatic-palliative';
 import { PalliativeRadiotherapyModal } from './palliative-radiotherapy-suite';
+import { SpinalCordCompressionModal } from './spinal-cord-compression-suite';
 import { IconZap, IconFileText, IconHeartPulse, IconHospital, IconSparkles } from './icons';
 
 type View =
@@ -883,6 +884,7 @@ export function ContinuityPrototype() {
   const [bowelObstructionOpen, setBowelObstructionOpen] = useState(false);
   const [renalHepaticOpen, setRenalHepaticOpen] = useState(false);
   const [radiotherapyOpen, setRadiotherapyOpen] = useState(false);
+  const [cordCompressionOpen, setCordCompressionOpen] = useState(false);
   const profileTimelineRef = useRef<HTMLOListElement>(null);
   const enrolDialogRef = useRef<HTMLElement>(null);
   const diffDialogRef = useRef<HTMLElement>(null);
@@ -3935,6 +3937,22 @@ export function ContinuityPrototype() {
             >
               <span>⚛️ Radiotherapy</span>
             </button>
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={() => setCordCompressionOpen(true)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: '#fef2f2',
+                borderColor: '#fecaca',
+                color: '#b91c1c',
+                fontWeight: 700,
+              }}
+            >
+              <span>⚡ Cord Compression</span>
+            </button>
             {versionPublished && <button className="secondary-button" type="button" onClick={startConversation}>New conversation</button>}
             <button className="primary-button" type="button" onClick={() => navigate('verify')}>{versionPublished ? 'Review checklist' : 'Review summary'}</button>
           </div>,
@@ -5786,6 +5804,18 @@ export function ContinuityPrototype() {
           onClose={() => setRadiotherapyOpen(false)}
           onDispatchPlan={(summary) => {
             setToast({ message: `Radiotherapy Protocol Dispatched: ${summary}` });
+          }}
+        />
+      )}
+
+      {cordCompressionOpen && (
+        <SpinalCordCompressionModal
+          patientId={selectedItem.hospitalId}
+          patientName={selectedItem.patient}
+          primaryCancer={selectedProfile?.diagnosis || 'Metastatic Oncology Disease'}
+          onClose={() => setCordCompressionOpen(false)}
+          onDispatchPlan={(summary) => {
+            setToast({ message: `MSCC Protocol Dispatched: ${summary}` });
           }}
         />
       )}

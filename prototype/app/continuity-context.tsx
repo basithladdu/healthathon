@@ -194,7 +194,8 @@ export type ModalType =
   | 'pediatric_palliative'
   | 'bowel_obstruction'
   | 'renal_hepatic_palliative'
-  | 'palliative_radiotherapy';
+  | 'palliative_radiotherapy'
+  | 'spinal_cord_compression';
 
 export interface ContinuityContextType {
   currentRole: string;
