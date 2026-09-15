@@ -25,7 +25,9 @@ import { PatientHistory, type HistoryEvent } from './patient-history';
 import { reviseSummary, releaseSummary, isSummaryReadyToRelease, invalidateSummaryReview, beginSummaryRevision, latestSummaryRelease, summaryReleaseByNumber, nextSummaryVersion, setSummaryFieldStatus, type DraftFieldKey, type DraftFieldStatus, type SummaryState, type SummaryRelease } from './summary-state';
 import { QuickDemoBar, type DemoRoleOption } from './quick-demo-bar';
 import { FhirExportModal } from './fhir-export-modal';
-import { IconZap, IconFileText } from './icons';
+import { TreatmentEscalationMatrix } from './tep-matrix';
+import { VoiceDictationBar } from './voice-dictation';
+import { IconZap, IconFileText, IconHeartPulse } from './icons';
 
 type View =
   | 'caregiver'
@@ -839,6 +841,7 @@ export function ContinuityPrototype() {
   const [cardIssuedById, setCardIssuedById] = useState<Record<string, string>>({});
   const [reviewRequestedById, setReviewRequestedById] = useState<Record<string, string>>({});
   const [fhirExportOpen, setFhirExportOpen] = useState(false);
+  const [tepModalOpen, setTepModalOpen] = useState(false);
   const profileTimelineRef = useRef<HTMLOListElement>(null);
   const enrolDialogRef = useRef<HTMLElement>(null);
   const diffDialogRef = useRef<HTMLElement>(null);
@@ -3594,12 +3597,40 @@ export function ContinuityPrototype() {
           `${selectedItem.patient} | Version ${draftVersion}`,
           versionPublished ? 'Released summary' : 'Conversation draft',
           <div className="form-actions">
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={() => setTepModalOpen(true)}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+            >
+              <IconHeartPulse className="w-4 h-4 text-rose-600" />
+              <span>Treatment Escalation (TEP)</span>
+            </button>
             {versionPublished && <button className="secondary-button" type="button" onClick={startConversation}>New conversation</button>}
             <button className="primary-button" type="button" onClick={() => navigate('verify')}>{versionPublished ? 'Review checklist' : 'Review summary'}</button>
           </div>,
         )}
         <div className="draft-layout">
           <section className="detail-card source-note-panel">
+            {isTreatingPhysician && !versionPublished && (
+              <VoiceDictationBar
+                fieldLabel="Conversation notes"
+                onTranscript={(text, append) => {
+                  updateSelectedRecord((current) =>
+                    reviseSummary(
+                      { ...current, draftPrepared: true },
+                      {
+                        draftSource: append
+                          ? current.draftSource
+                            ? `${current.draftSource.trim()}\n\n${text}`
+                            : text
+                          : text,
+                      }
+                    )
+                  );
+                }}
+              />
+            )}
             <label className="form-field" htmlFor="conversation-source">
               <span>Conversation notes</span>
               <textarea id="conversation-source" rows={14} value={recordState.draftSource}
@@ -4097,6 +4128,24 @@ export function ContinuityPrototype() {
                 >
                   <IconFileText className="w-3.5 h-3.5" />
                   <span>ABDM FHIR Export</span>
+                </button>
+                <button
+                  className="secondary-button"
+                  style={{
+                    background: '#fff1f2',
+                    borderColor: '#fecdd3',
+                    color: '#be123c',
+                    fontWeight: 650,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                  }}
+                  type="button"
+                  onClick={() => setTepModalOpen(true)}
+                  title="View Treatment Escalation Plan (TEP) Organ Ceilings"
+                >
+                  <IconHeartPulse className="w-3.5 h-3.5" />
+                  <span>TEP Matrix</span>
                 </button>
               </div>
             </div>
@@ -5037,6 +5086,22 @@ export function ContinuityPrototype() {
           }}
           onClose={() => setFhirExportOpen(false)}
         />
+      )}
+
+      {tepModalOpen && (
+        <div className="modal-backdrop" role="presentation" onMouseDown={(e) => { if (e.target === e.currentTarget) setTepModalOpen(false); }}>
+          <section className="modal-panel large-modal" role="dialog" aria-modal="true" aria-labelledby="tep-title" style={{ maxWidth: '980px', width: '96%', padding: 0, overflow: 'hidden' }}>
+            <TreatmentEscalationMatrix
+              patientId={selectedItem.hospitalId}
+              patientName={selectedItem.patient}
+              onClose={() => setTepModalOpen(false)}
+              onSave={(_selections, overallCeiling) => {
+                setToast({ message: `TEP Matrix Registered: ${overallCeiling}` });
+                setTepModalOpen(false);
+              }}
+            />
+          </section>
+        </div>
       )}
 
       {/* Toast Feedback */}
