@@ -36,6 +36,7 @@ import { ClinicalDiffModal } from './clinical-diff-modal';
 import { OncologyEmergencyTriageModal } from './oncology-emergency-triage';
 import { CaregiverBurdenMatrix } from './caregiver-burden-matrix';
 import { PalliativeSedationCrisisModal } from './palliative-sedation-crisis';
+import { LongitudinalTrajectoryTimeline } from './longitudinal-trajectory-timeline';
 import { IconZap, IconFileText, IconHeartPulse, IconHospital, IconSparkles } from './icons';
 
 type View =
@@ -859,6 +860,7 @@ export function ContinuityPrototype() {
   const [emergencyTriageOpen, setEmergencyTriageOpen] = useState(false);
   const [caregiverBurdenOpen, setCaregiverBurdenOpen] = useState(false);
   const [sedationCrisisOpen, setSedationCrisisOpen] = useState(false);
+  const [trajectoryTimelineOpen, setTrajectoryTimelineOpen] = useState(false);
   const profileTimelineRef = useRef<HTMLOListElement>(null);
   const enrolDialogRef = useRef<HTMLElement>(null);
   const diffDialogRef = useRef<HTMLElement>(null);
@@ -3718,6 +3720,23 @@ export function ContinuityPrototype() {
               <IconZap className="w-4 h-4 text-purple-700" />
               <span>Sedation Protocol</span>
             </button>
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={() => setTrajectoryTimelineOpen(true)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: '#eef2ff',
+                borderColor: '#c7d2fe',
+                color: '#3730a3',
+                fontWeight: 700,
+              }}
+            >
+              <IconHistory className="w-4 h-4 text-indigo-700" />
+              <span>Care Trajectory</span>
+            </button>
             {versionPublished && <button className="secondary-button" type="button" onClick={startConversation}>New conversation</button>}
             <button className="primary-button" type="button" onClick={() => navigate('verify')}>{versionPublished ? 'Review checklist' : 'Review summary'}</button>
           </div>,
@@ -5424,6 +5443,19 @@ export function ContinuityPrototype() {
           onApplyPlan={(protocolSummary) => {
             setToast({ message: `Palliative Sedation Plan Recorded: ${protocolSummary.slice(0, 35)}...` });
             setSedationCrisisOpen(false);
+          }}
+        />
+      )}
+
+      {trajectoryTimelineOpen && (
+        <LongitudinalTrajectoryTimeline
+          patientId={selectedItem.hospitalId}
+          patientName={selectedItem.patient}
+          diagnosis={selectedProfile?.diagnosis || 'Metastatic Oncology Disease'}
+          onClose={() => setTrajectoryTimelineOpen(false)}
+          onExportHandoffPacket={() => {
+            setToast({ message: 'Continuity Transition Packet exported successfully' });
+            setTrajectoryTimelineOpen(false);
           }}
         />
       )}
