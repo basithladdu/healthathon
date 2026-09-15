@@ -189,7 +189,8 @@ export type ModalType =
   | 'bone_sins'
   | 'cachexia_ascites'
   | 'neuropathic_blocks'
-  | 'breathlessness_crisis';
+  | 'breathlessness_crisis'
+  | 'delirium_engine';
 
 export interface ContinuityContextType {
   currentRole: string;

@@ -43,6 +43,7 @@ import { BoneMetastasesSinsModal } from './bone-metastases-sins';
 import { CachexiaAscitesModal } from './cachexia-ascites-protocol';
 import { NeuropathicPainBlocksModal } from './neuropathic-pain-blocks';
 import { BreathlessnessCrisisModal } from './breathlessness-crisis-engine';
+import { PalliativeDeliriumModal } from './palliative-delirium-engine';
 import { IconZap, IconFileText, IconHeartPulse, IconHospital, IconSparkles } from './icons';
 
 type View =
@@ -873,6 +874,7 @@ export function ContinuityPrototype() {
   const [cachexiaAscitesOpen, setCachexiaAscitesOpen] = useState(false);
   const [neuropathicBlocksOpen, setNeuropathicBlocksOpen] = useState(false);
   const [breathlessnessCrisisOpen, setBreathlessnessCrisisOpen] = useState(false);
+  const [deliriumOpen, setDeliriumOpen] = useState(false);
   const profileTimelineRef = useRef<HTMLOListElement>(null);
   const enrolDialogRef = useRef<HTMLElement>(null);
   const diffDialogRef = useRef<HTMLElement>(null);
@@ -3845,6 +3847,22 @@ export function ContinuityPrototype() {
             >
               <span>🫁 Dyspnea Crisis</span>
             </button>
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={() => setDeliriumOpen(true)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: '#fffbeb',
+                borderColor: '#fde68a',
+                color: '#b45309',
+                fontWeight: 700,
+              }}
+            >
+              <span>🧠 Delirium Care</span>
+            </button>
             {versionPublished && <button className="secondary-button" type="button" onClick={startConversation}>New conversation</button>}
             <button className="primary-button" type="button" onClick={() => navigate('verify')}>{versionPublished ? 'Review checklist' : 'Review summary'}</button>
           </div>,
@@ -5636,6 +5654,18 @@ export function ContinuityPrototype() {
           onClose={() => setBreathlessnessCrisisOpen(false)}
           onDispatchOrder={(summary) => {
             setToast({ message: `Dyspnea Protocol Dispatched: ${summary}` });
+          }}
+        />
+      )}
+
+      {deliriumOpen && (
+        <PalliativeDeliriumModal
+          patientId={selectedItem.hospitalId}
+          patientName={selectedItem.patient}
+          primaryCancer={selectedProfile?.diagnosis || 'Metastatic Oncology Disease'}
+          onClose={() => setDeliriumOpen(false)}
+          onDispatchPlan={(summary) => {
+            setToast({ message: `Delirium Protocol Dispatched: ${summary}` });
           }}
         />
       )}
