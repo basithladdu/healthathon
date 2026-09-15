@@ -196,7 +196,8 @@ export type ModalType =
   | 'renal_hepatic_palliative'
   | 'palliative_radiotherapy'
   | 'spinal_cord_compression'
-  | 'malignant_hypercalcemia';
+  | 'malignant_hypercalcemia'
+  | 'svco_decompression';
 
 export interface ContinuityContextType {
   currentRole: string;
