@@ -23,6 +23,8 @@ import {
 } from './patient-portal';
 import { PatientHistory, type HistoryEvent } from './patient-history';
 import { reviseSummary, releaseSummary, isSummaryReadyToRelease, invalidateSummaryReview, beginSummaryRevision, latestSummaryRelease, summaryReleaseByNumber, nextSummaryVersion, setSummaryFieldStatus, type DraftFieldKey, type DraftFieldStatus, type SummaryState, type SummaryRelease } from './summary-state';
+import { QuickDemoBar, type DemoRoleOption } from './quick-demo-bar';
+import { IconZap } from './icons';
 
 type View =
   | 'caregiver'
@@ -1478,6 +1480,45 @@ export function ContinuityPrototype() {
 
   function beginEmergencyRetrieval() {
     beginRetrievalFor('CANCER-20418');
+  }
+
+  function handleFastRoleSelect(roleOption: DemoRoleOption) {
+    if (roleOption === 'dr-sujay') {
+      enterCareTeam('Dr Sujay · Clinical lead');
+      selectPatient('CANCER-20418');
+      navigate('guide');
+    } else if (roleOption === 'dr-isha') {
+      enterCareTeam('Dr Isha Menon · Emergency physician');
+      selectPatient('CANCER-20418');
+      updateRecordState('CANCER-20418', (current) => ({
+        ...current,
+        retrievalReason: 'Emergency hand-off retrieval (Break-glass)',
+        careRelationship: 'Emergency receiving physician',
+        retrievalAcknowledged: true,
+        retrievalUnlocked: true,
+        unlockedVersion: 1,
+      }));
+      navigate('retrieve');
+    } else if (roleOption === 'anitha') {
+      enterCareTeam('Anitha Rao · Care Coordinator');
+      selectPatient('CANCER-20418');
+      navigate('worklist');
+    } else if (roleOption === 'patient') {
+      enterPatient({
+        hospitalId: 'CANCER-20418',
+        name: 'Meera Raghavan',
+        dob: '14/06/1958',
+      });
+      navigate('my-plan');
+    } else if (roleOption === 'family') {
+      enterFamily({
+        name: 'Kavya Raghavan',
+        relationship: 'Daughter (primary proxy)',
+        patientId: 'CANCER-20418',
+        verifiedSummaryOnly: true,
+      });
+      navigate('caregiver');
+    }
   }
 
   function beginGuidedConversation() {
@@ -3644,6 +3685,42 @@ export function ContinuityPrototype() {
               </div>
             </div>
 
+            {!versionPublished && isTreatingPhysician && (
+              <div style={{ padding: '12px 18px 0' }}>
+                <button
+                  type="button"
+                  className="secondary-button"
+                  style={{
+                    width: '100%',
+                    background: '#e6f5ec',
+                    borderColor: '#b4e0c6',
+                    color: '#146b3e',
+                    fontWeight: 700,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    padding: '10px 14px',
+                    borderRadius: '10px',
+                  }}
+                  onClick={() => {
+                    setVerificationChecks({
+                      source: true,
+                      ambiguity: true,
+                      inference: true,
+                      reviewDate: true,
+                    });
+                    setAuthorisation('Authorised by Patient & Surrogate');
+                    setAttested(true);
+                    notify('All 4 safety checks verified and physician attestation signed');
+                  }}
+                >
+                  <IconZap className="w-4 h-4 text-amber-600" />
+                  <span>⚡ 1-Click Fast Complete All 4 Checks &amp; Attestation</span>
+                </button>
+              </div>
+            )}
+
             <div className="check-list">
               {checkItems.map((item) => (
                 <label className="check-row" key={item.key}>
@@ -3860,6 +3937,55 @@ export function ContinuityPrototype() {
                   <span>Your reason is saved in History</span>
                 </div>
               </div>
+
+              <div style={{ marginBottom: '14px' }}>
+                <button
+                  type="button"
+                  className="secondary-button"
+                  style={{
+                    width: '100%',
+                    background: '#fdeaea',
+                    borderColor: '#f5c3c1',
+                    color: '#99231f',
+                    fontWeight: 700,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    padding: '10px 14px',
+                    borderRadius: '10px',
+                  }}
+                  onClick={() => {
+                    setCurrentRole('Dr Isha Menon · Emergency physician');
+                    const targetVersion = release?.number ?? currentRelease?.number ?? 1;
+                    updateSelectedRecord((current) => ({
+                      ...current,
+                      retrievalReason: 'Emergency hand-off retrieval (Break-glass)',
+                      careRelationship: 'Emergency receiving physician',
+                      retrievalAcknowledged: true,
+                      retrievalUnlocked: true,
+                      unlockedVersion: targetVersion,
+                    }));
+                    setAuditEvents((events) => [
+                      {
+                        id: `AUDIT-${Date.now().toString().slice(-4)}`,
+                        actor: 'Dr Isha Menon · Emergency physician',
+                        action: 'Retrieved verified summary (Break-glass)',
+                        target: `${selectedItem.patient} · Version ${targetVersion}`,
+                        timestamp: 'Just now',
+                        detail: 'Emergency hand-off retrieval (Break-glass) · 1-Click Protocol',
+                        securityImpact: 'Critical emergency retrieval logged',
+                      },
+                      ...events,
+                    ]);
+                    notify('Break-glass emergency protocol activated — verified summary unlocked');
+                  }}
+                >
+                  <IconZap className="w-4 h-4 text-amber-500" />
+                  <span>⚡ 1-Click Break-Glass Emergency Retrieval</span>
+                </button>
+              </div>
+
               <label className="form-field">
                 <span>Signed-in Clinician</span>
                 <input value={currentRole} readOnly />
@@ -4504,13 +4630,22 @@ export function ContinuityPrototype() {
 
   if (authScreen === 'landing') {
     return (
-      <LandingPage
-        onSignIn={() => setAuthScreen('login')}
-        onSignUp={() => setAuthScreen('signup')}
-        onExploreDemo={() => enterCareTeam('Dr Sujay · Clinical lead')}
-        onFamilyAccess={() => setAuthScreen('family')}
-        onPatientAccess={() => setAuthScreen('patient')}
-      />
+      <>
+        <QuickDemoBar
+          currentSession={sessionType}
+          currentRole={currentRole}
+          onSelectRole={handleFastRoleSelect}
+          onGoHome={() => setAuthScreen('landing')}
+        />
+        <LandingPage
+          onSignIn={() => setAuthScreen('login')}
+          onSignUp={() => setAuthScreen('signup')}
+          onExploreDemo={() => enterCareTeam('Dr Sujay · Clinical lead')}
+          onFamilyAccess={() => setAuthScreen('family')}
+          onPatientAccess={() => setAuthScreen('patient')}
+          onQuickEnterRole={handleFastRoleSelect}
+        />
+      </>
     );
   }
   if (authScreen === 'login') {
@@ -4567,7 +4702,14 @@ export function ContinuityPrototype() {
     .toUpperCase();
 
   return (
-    <main className={isPatientSession || isFamilySession ? 'app-shell is-portal' : 'app-shell'}>
+    <>
+      <QuickDemoBar
+        currentSession={sessionType}
+        currentRole={currentRole}
+        onSelectRole={handleFastRoleSelect}
+        onGoHome={() => setAuthScreen('landing')}
+      />
+      <main className={isPatientSession || isFamilySession ? 'app-shell is-portal' : 'app-shell'}>
       {/* Sidebar Navigation */}
       <aside className="sidebar" aria-label="Primary navigation">
         <button
@@ -4867,5 +5009,6 @@ export function ContinuityPrototype() {
         </div>
       )}
     </main>
+    </>
   );
 }

@@ -1,7 +1,15 @@
-'use client';
-
 import { useMemo, useState } from 'react';
 import { isValidBirthDate } from './patient-date';
+import { AudioTtsPlayer } from './tts-speech';
+import {
+  IconHeartPulse,
+  IconLungs,
+  IconHospital,
+  IconUsers,
+  IconStethoscope,
+  IconShieldCheck,
+  IconZap,
+} from './icons';
 
 export type DecisionMaker = {
   name: string;
@@ -109,6 +117,16 @@ function sameDetails(a: PatientDetails, b: PatientDetails): boolean {
 }
 
 
+function fieldIcon(label: string) {
+  const l = label.toLowerCase();
+  if (l.includes('cpr') || l.includes('resuscitation') || l.includes('cardiac')) return <IconHeartPulse className="w-4 h-4 text-rose-600" />;
+  if (l.includes('breath') || l.includes('ventilation') || l.includes('oxygen')) return <IconLungs className="w-4 h-4 text-sky-600" />;
+  if (l.includes('hospital') || l.includes('transfer') || l.includes('admission')) return <IconHospital className="w-4 h-4 text-amber-600" />;
+  if (l.includes('decision') || l.includes('proxy') || l.includes('family')) return <IconUsers className="w-4 h-4 text-indigo-600" />;
+  if (l.includes('authoris') || l.includes('consent') || l.includes('directive')) return <IconShieldCheck className="w-4 h-4 text-emerald-600" />;
+  return <IconStethoscope className="w-4 h-4 text-teal-600" />;
+}
+
 export function MyCarePlan(props: {
   patientName: string;
   versionLabel: string;
@@ -121,22 +139,37 @@ export function MyCarePlan(props: {
   consent: ConsentRecord | null;
   onGoToConsent: () => void;
 }) {
-  const { versionLabel, verifiedBy, verifiedOn, fields, summaryAvailable, hasReleasedVersion, quickView, consent, onGoToConsent } = props;
+  const { patientName, versionLabel, verifiedBy, verifiedOn, fields, summaryAvailable, hasReleasedVersion, quickView, consent, onGoToConsent } = props;
   const consentForVersion = consent && consent.versionLabel === versionLabel ? consent : null;
+
+  const spokenPlanText = useMemo(() => {
+    const intro = `Care plan for ${patientName}. ${versionLabel}. Verified by ${verifiedBy || 'treating clinical team'}${verifiedOn ? ` on ${verifiedOn}` : ''}. `;
+    const fieldParts = fields.map((f) => `${f.label}: ${f.value}`).join('. ');
+    const comfortNotice = `Comfort care is always guaranteed. Relief of pain, medication for breathlessness, mouth care, gentle handling, and presence of loved ones will always continue wherever you are. `;
+    return `${intro} Key choices: ${fieldParts}. ${comfortNotice}`;
+  }, [patientName, versionLabel, verifiedBy, verifiedOn, fields]);
 
   return (
     <section className="ptl-page">
-      <h1 className="ptl-heading">Care plan</h1>
+      <div className="ptl-header-row">
+        <div>
+          <span className="ptl-eyebrow">Patient Care Portal</span>
+          <h1 className="ptl-heading">Care plan &amp; Preferences</h1>
+        </div>
+      </div>
 
       <div className="ptl-status-row">
         <p className="ptl-status-line">
           {versionLabel}{hasReleasedVersion && <> · verified by {verifiedBy} on {verifiedOn}</>}
         </p>
         {summaryAvailable && (consentForVersion ? (
-          <span className="ptl-chip ptl-chip--safe">Confirmed on {consentForVersion.signedAt}</span>
+          <span className="ptl-chip ptl-chip--safe">
+            <IconShieldCheck className="w-3.5 h-3.5" />
+            <span>Confirmed on {consentForVersion.signedAt}</span>
+          </span>
         ) : (
           <span className="ptl-chip ptl-chip--medium">
-            Not confirmed yet
+            <span>Not confirmed yet</span>
             <button type="button" className="ptl-link-btn" onClick={onGoToConsent}>
               Review summary →
             </button>
@@ -144,13 +177,26 @@ export function MyCarePlan(props: {
         ))}
       </div>
 
+      {summaryAvailable && fields.length > 0 && (
+        <AudioTtsPlayer
+          title="Listen to your Care Plan (Voice Audio)"
+          subtitle="Open-source browser voice synthesis — speaks your verified treatment goals and comfort priorities aloud"
+          text={spokenPlanText}
+          variant="patient"
+          className="mb-4"
+        />
+      )}
+
       {fields.length === 0 ? (
         <p className="ptl-empty">Your care team has not released a written summary yet.</p>
       ) : (
         <dl className="ptl-summary-list">
           {fields.map((f) => (
             <div className="ptl-summary-row" key={f.label}>
-              <dt className="ptl-summary-label">{f.label}</dt>
+              <dt className="ptl-summary-label">
+                <span className="ptl-field-icon" aria-hidden="true">{fieldIcon(f.label)}</span>
+                <span>{f.label}</span>
+              </dt>
               <dd className="ptl-summary-value">{f.value}</dd>
             </div>
           ))}
@@ -566,6 +612,22 @@ export function ConsentSignature(props: {
         </div>
       ) : (
         <form className="ptl-form" onSubmit={handleSubmit}>
+          <div className="ptl-fast-action-bar">
+            <button
+              type="button"
+              className="ptl-fast-btn"
+              onClick={() => {
+                setDeclaration('self');
+                setReadConfirmed(true);
+                setTypedName(patientName);
+                setError(null);
+              }}
+            >
+              <IconZap className="w-4 h-4 text-amber-500" />
+              <span>1-Click Auto-Fill Consent ({patientName})</span>
+            </button>
+          </div>
+
           {error && <p className="ptl-field-error" role="alert">{error}</p>}
           <fieldset className="ptl-fieldset">
             <legend className="ptl-legend">Declaration</legend>

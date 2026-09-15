@@ -1,0 +1,195 @@
+USER-SUPPLIED CONTEXT CAPTURE
+Captured: 13 September 2026
+Source: Basith's current conversation, including the dashboard text transcribed from the supplied screenshot and pasted messages.
+This is a raw working capture. It is not an official programme export and does not prove that a field has been saved in the live dashboard.
+
+================================================================================
+TEAM CHAT - 25 AUGUST 2026
+================================================================================
+
+[5:02 pm, 25/08/2026] Sujay H S IISC: I do not have Awaiz's number
+[5:02 pm, 25/08/2026] Sujay H S IISC: Please add him to the group
+[5:02 pm, 25/08/2026] Sujay H S IISC: I am sharing some thoughts I had on the technical aspects of it. We can discuss further
+[5:03 pm, 25/08/2026] Sujay H S IISC: We need to create some rough deadlines from both ends and what we will deliver
+[5:05 pm, 25/08/2026] Sujay H S IISC: Round 1 ends in 17 days
+[5:06 pm, 25/08/2026] Sujay H S IISC: We need to have a pitch deck and MVP by then
+[7:29 pm, 25/08/2026] Basith: Hello,
+I have added @Awaiz. There may or may not be just one more person so that the lifting on the technical side is easy. Will let you know
+[7:30 pm, 25/08/2026] Basith: Technical thoughts and questions.docx
+This is lovely. I am going over the meeting transcription once again today and will send the website MVP link so that we all have something to play with.
+[7:31 pm, 25/08/2026] Sujay H S IISC: Hello,
+I have added @Awaiz. There may or may not be just one more person so that the lifting on the technical side is easy. Will let you know
+Whatever you want, guys
+[7:31 pm, 25/08/2026] Sujay H S IISC: This is lovely. I am going over the meeting transcription once again today and will send the website MVP link so that we all have something to play with.
+
+Interpretation: this chat records team formation, the requested technical-notes document, a need for rough deadlines, and the expectation of a pitch deck plus MVP. The exact file `Technical thoughts and questions.docx` was not found in the repository, Downloads tree, or searched user profile.
+
+================================================================================
+HEALTH-A-THON 2026 DASHBOARD - SUPPLIED TEXT
+================================================================================
+
+Header:
+Koita Foundation
+IIT Bombay - KCDH
+FOGSI
+National Cancer Grid
+RSSDI
+Home | About | Themes | Eligibility | Journey | Prizes | FAQ | WhatsApp | Dashboard | Sign out
+
+Dashboard
+Round 1 - Zeros and Ones
+Your Solution Idea
+Seven things to do, in any order, by anyone on your team. Everything saves as you type, and you can keep editing until the deadline.
+Your entry includes a 6-8 slide deck, so start that early - and every long answer has a Dictate button if you would rather talk than type.
+
+Before you start - what cannot be entered
+Out of Scope: Clinical AI solutions involving diagnosis, treatment recommendations, clinical decision support, clinical risk scoring, interpretation of medical data or autonomous clinical advice.
+
+Diagnosis
+Treatment recommendations
+Clinical decision support
+Clinical risk scoring
+Interpretation of medical data
+Autonomous clinical advice
+
+Dashboard counter shown in the supplied text: 0 of 6 done; finish the 6 remaining items above to submit. There are seven numbered items including the optional links/supporting-files item; this counter wording should be treated as a possible UI quirk, not a submission rule.
+
+ITEM 1 OF 7 - TRACK, USER AND USE CASE
+
+Three choices that place your idea. About a minute.
+
+Which track are you submitting under? (required)
+- Cancer
+- Diabetes
+- Maternal & Women's Health
+
+Who is the primary user of your solution? (required)
+- Doctor / Care Team
+- Patient / Caregiver
+- Others
+
+What use case is your team addressing? (required)
+Pick the closest heading. The detail belongs in the answers below.
+- Patient Follow-up & Continuity of Care
+- Consultation Readiness & Patient Journey Review
+- Patient Registry & Population Health
+- Clinic Operations & Patient Flow
+- Doctor Productivity & Knowledge Assistant
+- Patient Education & Digital Engagement
+- Clinic Performance & Practice Growth
+- Care Journey Companion
+- Long-term Care Engagement
+- Family & Caregiver Support
+- Healthcare Navigation & Access
+- Financial & Administrative Support
+- Patient Health Journey Progress
+- Other
+
+ITEM 2 OF 7 - THE PROBLEM YOU ARE SOLVING
+
+Who it affects and why it matters. Up to 150 words.
+Prompt: Briefly describe the problem, who it affects, and why it matters. Maximum 150 words (1,200 characters max).
+Minimum: 100 characters.
+The supplied draft visible in the dashboard was:
+Many patients with diabetes struggle to take their medicines regularly over the long term. Missed doses and inconsistent medication use can affect treatment outcomes, while doctors often have limited visibility into adherence between visits. Regular nudges and medication reminders could help patients stay on track and improve adherence between doctor visits.
+
+ITEM 3 OF 7 - YOUR SOLUTION, AND ITS NAME
+
+What you will build, how it works, and what to call it.
+Prompt: Briefly describe what you are proposing to build, how it will work, and what makes your approach different. Maximum 150 words (1,200 characters max).
+Minimum: 100 characters.
+Solution name minimum: 5 characters.
+The supplied draft visible in the dashboard was:
+A solution that analyses patient records to proactively identify cancer patients who are due or overdue for long-term follow-up, prioritises patients who need attention, and automatically triggers personalised outreach messages to support timely follow-up.
+
+Scope guardrail shown:
+Out of Scope: Clinical AI solutions involving diagnosis, treatment recommendations, clinical decision support, clinical risk scoring, interpretation of medical data or autonomous clinical advice.
+
+Required confirmation:
+I confirm our solution stays outside the out-of-scope list above - it does not diagnose, recommend treatment, provide clinical decision support, or give autonomous clinical advice.
+
+ITEM 4 OF 7 - HOW YOU WILL BUILD IT
+
+The technologies you plan to use. One for the technologists.
+Prompt: Briefly describe the key technologies, frameworks or tools you plan to use. 'AI/ML' on its own tells us nothing. Maximum 80 words (600 characters max).
+Minimum: 30 characters.
+The supplied draft visible in the dashboard was:
+React Native app, Node/Express API, Postgres, and a fine-tuned Whisper model for the voice notes - hosted on AWS.
+
+ITEM 5 OF 7 - EXISTING WORK
+
+Whether any part of this is already built.
+- Yes - we are building on an existing product
+- No - we are building a new solution
+
+ITEM 6 OF 7 - YOUR PITCH DECK
+
+6 to 8 slides, PDF or PowerPoint. Maximum 25 MB.
+Upload a PDF or PowerPoint presentation - maximum 25 MB, 6-8 slides - that helps the jury understand your solution idea or approach.
+
+ITEM 7 OF 7 - LINKS AND SUPPORTING FILES
+
+A prototype, a video, papers, GitHub. Nothing here is required.
+LinkedIn, GitHub, papers - one per line.
+Drop a file here, or click to browse.
+Anything we can open without requesting access.
+The user explicitly wants the optional prototype link, demo video, QR code and screenshots prepared anyway.
+
+Footer:
+healthathon@reskilll.com
++91 98587 77788
+Join WhatsApp
+Powered by Reskilll
+2026 - Health-a-thon 2026 - Assistive, not diagnostic.
+
+================================================================================
+TANUH - C-CAMP LINKEDIN CONTEXT SUPPLIED BY USER
+================================================================================
+
+The AI Centre of Excellence in Healthcare hosted at Indian Institute of Science (IISc) and C-CAMP are launching the 'TANUH - C-CAMP Innovations Program,' focused on identifying and nurturing promising Indian-developed AI-based innovations addressing priority non-communicable disease (NCD) areas.
+
+Indian healthcare is seeing a rapidly escalating NCD burden, with onset of disease being noted as early as the mid-forties, a decade earlier than in most developed nations.
+
+AI innovations have the potential to revolutionize and democratize this sector in Indian healthcare, with opportunities in diagnostics, screening, prevention, monitoring, therapeutics, and scale-up technologies.
+
+India already has a nascent ecosystem for this that is quietly taking shape.
+
+The 'TANUH - C-CAMP Innovations Program' is attempting to provide a customised, stage-appropriate support mechanism to selected innovations across three technical readiness level stages:
+- Idea to Proof of Concept
+- Proof of Concept to Minimum Viable Product
+- Deployment ready
+
+NCD focus areas, stated as not limited to:
+- Cardiovascular and Cerebrovascular Diseases
+- Cancer (Oral, Breast, Cervical and Lung)
+- Chronic Respiratory Disorders
+- Musculoskeletal Disorders
+- Metabolic Liver Diseases
+
+The stated total grant pool is Rs 2.25 Cr+ to support at least eight startups, with support based on stage.
+Applications are stated to be open.
+Application short link supplied: https://lnkd.in/gYzN9qjX
+Stated deadline: 28th Sept, 2026.
+
+Tagged organisations and people in the supplied post included Taslimarif Saiyed; TANUH; Ministry of Education, Government of India; Pralhad Joshi; Ashwini Vaishnaw; Dr Jitendra Singh; Jagat Prakash Nadda; Office of the Principal Scientific Adviser to the Government of India; MeitY Startup Hub; Department of Health Research; Ministry of Health & Family Welfare; NITI Aayog; Department of Biotechnology; Department of Science & Technology; Anusandhan National Research Foundation; Technology Development Board; BIRAC; Atal Innovation Mission; Startup India; Priyank M Kharge; IT BT Department, Karnataka; Startup Karnataka; K-tech; Biotechnology Facilitation Cell; Karnataka Innovation and Technology Society; Rajesh Gokhale; Abhay Karandikar; K VijayRaghavan; Dr Renu Swarup; Kiran Mazumdar-Shaw; Kris Gopalakrishnan; and Prashanth Prakash.
+
+Comments supplied included:
+- Bhabesh Panigrahi, Professor of Practice at Christ University, Bangalore: adoption and commercial readiness must evolve alongside technical readiness; the milestone is an adoption-ready business.
+- Prof Dr Prafulla Swain, Co-Founder Healing Health Total: interest in responsible validation and implementation in public-health and rural-care settings with clinical oversight, data governance and measurable care-completion outcomes.
+- IFERP: India needs AI innovations that are technically strong and validated in real healthcare.
+- Venkata Suresh Telu: public-sector, growth-policy, startup and incubation context.
+- Dr Ramji M.D.: physician, biochemist, entrepreneur and mentor context.
+
+These names are public-post tags/comments, not confirmed team contacts or direct outreach routes. The TANUH source was supplied as LinkedIn text/screenshot; the official application form and guide are not in this repository yet.
+
+================================================================================
+USER REQUEST / WORKING DIRECTION
+================================================================================
+
+The user wants every meeting transcript, source, contact and artifact mapped; a document explaining what happened from the beginning with quotations/evidence; an exact submission.md answer sheet; a submission folder; a pitch deck; a public prototype link; screenshots; a QR code; and a demo video even though the dashboard labels some support items optional. The user wants the work kept on the main branch, no push for now, and wants any teammate commits checked and pulled if available.
+
+The user also asked to identify anything still missing. Current highest-value missing inputs are the exact `Technical thoughts and questions.docx`, complete team contacts and bios, clinician confirmation of the authoritative protocol, the current pilot/evaluation details, the official TANUH guide/form, and final public links.
+
+================================================================================
+END USER-SUPPLIED CONTEXT
+================================================================================

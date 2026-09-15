@@ -1,5 +1,7 @@
 # Continuity Loop prototype handoff
 
+> Current status, 13 September 2026: this document's deployment identifiers describe the August build. The public URL was reopened in Chrome and still showed the older clinician-only interface. The new patient portal, appointments, compact entry screen and local fixes are not deployed. See [current gap review](GAP_REVIEW_2026-09-13.md) and [pull review](PULL_REVIEW_2026-09-13.md).
+
 ## Production
 
 - Canonical public URL: https://continuity-loop-healthathon.vercel.app

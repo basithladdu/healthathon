@@ -11,3 +11,5 @@ node_modules/
 
 # Clinical source with a filled-in personal name; keep local only
 Saanthvana v 1.0.docx
+
+tmp/

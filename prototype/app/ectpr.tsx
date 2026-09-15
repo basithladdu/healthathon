@@ -1,7 +1,15 @@
-'use client';
-
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import QRCode from 'qrcode';
+import { AudioTtsPlayer } from './tts-speech';
+import {
+  IconHeartPulse,
+  IconLungs,
+  IconHospital,
+  IconShieldAlert,
+  IconShieldCheck,
+  IconUsers,
+  IconStethoscope,
+} from './icons';
 
 export type BreathingCeiling =
   | 'comfort-only'
@@ -198,15 +206,30 @@ export function EdQuickView(props: {
   const plainLanguageLine =
     audience !== 'clinician' && record.breathingCeiling ? BREATHING_PLAIN_LANGUAGE[record.breathingCeiling] : null;
 
+  const emergencySpokenText = useMemo(() => {
+    return `Emergency clinical directives for ${record.patientName}, hospital ID ${record.hospitalId}. Primary diagnosis: ${record.diagnosis}. Overall care goal: ${goalLabel}. Cardiopulmonary resuscitation: ${cprLabel}. Highest breathing support ceiling: ${breathingLabel}. Hospital transfer: ${transferLabel}. Intensive care unit admission: ${icuText}. Named proxy decision maker: ${record.decisionMaker ? `${record.decisionMaker.name}, ${record.decisionMaker.relationship}` : 'Not recorded'}. Crucial directive: If in doubt, resuscitate. Signed by ${record.signedBy || 'clinical consultant'} on ${record.signedOn || 'recent record'}.`;
+  }, [record, goalLabel, cprLabel, breathingLabel, transferLabel, icuText]);
+
   return (
     <div className="ectpr-container">
       <div className="ectpr-card ectpr-quickview">
-        <div className="ectpr-eyebrow">Emergency care &amp; treatment preferences</div>
+        <div className="ectpr-eyebrow">
+          <IconShieldAlert className="w-3.5 h-3.5 text-emerald-700" />
+          <span>Emergency care &amp; treatment preferences</span>
+        </div>
         <h2 className="ectpr-heading">ED Quick View</h2>
         <div className="ectpr-subline">
           {record.recordVersion} · signed by {record.signedBy ?? 'Not recorded'} on {record.signedOn ?? 'Not recorded'}{' '}
           · {record.formVersion}
         </div>
+
+        <AudioTtsPlayer
+          title="Emergency Voice Broadcast (Hands-Free Readout)"
+          subtitle="Open-source voice readout of resuscitation and ceiling directives for emergency trauma teams"
+          text={emergencySpokenText}
+          variant="emergency"
+          className="mb-3"
+        />
 
         <div className="ectpr-rule-banner">
           {audience === 'clinician' ? (
@@ -227,23 +250,38 @@ export function EdQuickView(props: {
         </div>
 
         <div className="ectpr-goal-row">
-          <div className="ectpr-goal-label">Overall goal</div>
+          <div className="ectpr-goal-label">
+            <IconStethoscope className="w-4 h-4 text-emerald-700 inline mr-1" />
+            <span>Overall goal</span>
+          </div>
           <div className="ectpr-goal-value">{goalLabel}</div>
         </div>
 
         <div className="ectpr-answers-grid">
           <AnswerCell overline="Bring to hospital?" recorded={!!record.hospitalTransfer}>
-            {transferLabel}
+            <span className="flex items-center gap-1.5">
+              <IconHospital className="w-4 h-4 text-amber-600 inline" />
+              <span>{transferLabel}</span>
+            </span>
           </AnswerCell>
           <AnswerCell overline="CPR if the heart stops?" recorded={!!record.cpr}>
-            {cprLabel}
+            <span className="flex items-center gap-1.5">
+              <IconHeartPulse className="w-4 h-4 text-rose-600 inline" />
+              <span>{cprLabel}</span>
+            </span>
           </AnswerCell>
           <AnswerCell overline="Highest breathing support" recorded={!!record.breathingCeiling}>
-            {breathingLabel}
+            <span className="flex items-center gap-1.5">
+              <IconLungs className="w-4 h-4 text-sky-600 inline" />
+              <span>{breathingLabel}</span>
+            </span>
             {plainLanguageLine && <div className="ectpr-plain-language">{plainLanguageLine}</div>}
           </AnswerCell>
           <AnswerCell overline="ICU admission?" recorded={!!record.icu}>
-            {icuText}
+            <span className="flex items-center gap-1.5">
+              <IconShieldCheck className="w-4 h-4 text-teal-600 inline" />
+              <span>{icuText}</span>
+            </span>
           </AnswerCell>
         </div>
 

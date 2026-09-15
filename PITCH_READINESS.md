@@ -1,5 +1,7 @@
 # Continuity Loop pitch readiness
 
+> Current status, 13 September 2026: the current eight-slide candidate is `submission/Healthathon_Continuity_Loop_Product_Visuals.pptx`, with care illustrations and actual product screenshots. The public QR target still opens the older app. The local prototype supports Version 1 to Version 2 only; later revisions and the 20-scenario clinical review are not implemented/completed. See [current gap review](GAP_REVIEW_2026-09-13.md). The August details below are historical.
+
 Prepared: 27 August 2026
 
 ## Communication job

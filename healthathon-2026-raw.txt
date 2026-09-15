@@ -862,3 +862,16 @@ Phase one registration closes on 25 September. Please find your teams and give y
 ================================================================================
 END OF TRANSCRIPT
 ================================================================================
+
+================================================================================
+ADDITIONAL USER-SUPPLIED CONTEXT - 13 SEPTEMBER 2026
+================================================================================
+
+The current conversation supplied the exact Round 1 dashboard fields, team WhatsApp messages, TANUH announcement context, and the user's request to prepare the full submission package. The complete raw capture is preserved in `USER_SUPPLIED_CONTEXT_2026-09-13.txt` in this repository. It is intentionally kept as a separate labelled source so the Health-a-thon programme capture and the separate TANUH opportunity are not silently conflated.
+
+Key dashboard selections now mapped in `submission.md`:
+- Cancer
+- Doctor / Care Team
+- Patient Follow-up & Continuity of Care
+
+The user also explicitly wants the optional prototype link, demo video, QR code and screenshots prepared, while retaining the non-diagnostic, clinician-controlled boundary.
