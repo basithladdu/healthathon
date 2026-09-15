@@ -38,6 +38,7 @@ import { CaregiverBurdenMatrix } from './caregiver-burden-matrix';
 import { PalliativeSedationCrisisModal } from './palliative-sedation-crisis';
 import { LongitudinalTrajectoryTimeline } from './longitudinal-trajectory-timeline';
 import { AnticipatoryDrugBoxModal } from './anticipatory-drug-box';
+import { MalignantWoundCareModal } from './malignant-wound-care';
 import { IconZap, IconFileText, IconHeartPulse, IconHospital, IconSparkles } from './icons';
 
 type View =
@@ -863,6 +864,7 @@ export function ContinuityPrototype() {
   const [sedationCrisisOpen, setSedationCrisisOpen] = useState(false);
   const [trajectoryTimelineOpen, setTrajectoryTimelineOpen] = useState(false);
   const [drugBoxOpen, setDrugBoxOpen] = useState(false);
+  const [woundCareOpen, setWoundCareOpen] = useState(false);
   const profileTimelineRef = useRef<HTMLOListElement>(null);
   const enrolDialogRef = useRef<HTMLElement>(null);
   const diffDialogRef = useRef<HTMLElement>(null);
@@ -3755,6 +3757,22 @@ export function ContinuityPrototype() {
             >
               <span>📦 Home JIC Box</span>
             </button>
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={() => setWoundCareOpen(true)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: '#fff7ed',
+                borderColor: '#fed7aa',
+                color: '#c2410c',
+                fontWeight: 700,
+              }}
+            >
+              <span>🩹 Malignant Wound</span>
+            </button>
             {versionPublished && <button className="secondary-button" type="button" onClick={startConversation}>New conversation</button>}
             <button className="primary-button" type="button" onClick={() => navigate('verify')}>{versionPublished ? 'Review checklist' : 'Review summary'}</button>
           </div>,
@@ -5486,6 +5504,18 @@ export function ContinuityPrototype() {
           onClose={() => setDrugBoxOpen(false)}
           onLogAdministration={(medName, dose) => {
             setToast({ message: `Dose Administered & Logged: ${medName} (${dose})` });
+          }}
+        />
+      )}
+
+      {woundCareOpen && (
+        <MalignantWoundCareModal
+          patientId={selectedItem.hospitalId}
+          patientName={selectedItem.patient}
+          primaryCancer={selectedProfile?.diagnosis || 'Metastatic Oncology Disease'}
+          onClose={() => setWoundCareOpen(false)}
+          onDispatchKit={(summary) => {
+            setToast({ message: `ASHA Home Wound Dressing Kit Dispatched: ${summary}` });
           }}
         />
       )}

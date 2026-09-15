@@ -184,7 +184,8 @@ export type ModalType =
   | 'caregiver_burden'
   | 'sedation_crisis'
   | 'trajectory_timeline'
-  | 'anticipatory_box';
+  | 'anticipatory_box'
+  | 'malignant_wound';
 
 export interface ContinuityContextType {
   currentRole: string;
