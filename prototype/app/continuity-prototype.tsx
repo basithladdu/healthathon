@@ -37,6 +37,7 @@ import { OncologyEmergencyTriageModal } from './oncology-emergency-triage';
 import { CaregiverBurdenMatrix } from './caregiver-burden-matrix';
 import { PalliativeSedationCrisisModal } from './palliative-sedation-crisis';
 import { LongitudinalTrajectoryTimeline } from './longitudinal-trajectory-timeline';
+import { AnticipatoryDrugBoxModal } from './anticipatory-drug-box';
 import { IconZap, IconFileText, IconHeartPulse, IconHospital, IconSparkles } from './icons';
 
 type View =
@@ -861,6 +862,7 @@ export function ContinuityPrototype() {
   const [caregiverBurdenOpen, setCaregiverBurdenOpen] = useState(false);
   const [sedationCrisisOpen, setSedationCrisisOpen] = useState(false);
   const [trajectoryTimelineOpen, setTrajectoryTimelineOpen] = useState(false);
+  const [drugBoxOpen, setDrugBoxOpen] = useState(false);
   const profileTimelineRef = useRef<HTMLOListElement>(null);
   const enrolDialogRef = useRef<HTMLElement>(null);
   const diffDialogRef = useRef<HTMLElement>(null);
@@ -3737,6 +3739,22 @@ export function ContinuityPrototype() {
               <IconHistory className="w-4 h-4 text-indigo-700" />
               <span>Care Trajectory</span>
             </button>
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={() => setDrugBoxOpen(true)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: '#fff1f2',
+                borderColor: '#fecdd3',
+                color: '#be123c',
+                fontWeight: 700,
+              }}
+            >
+              <span>📦 Home JIC Box</span>
+            </button>
             {versionPublished && <button className="secondary-button" type="button" onClick={startConversation}>New conversation</button>}
             <button className="primary-button" type="button" onClick={() => navigate('verify')}>{versionPublished ? 'Review checklist' : 'Review summary'}</button>
           </div>,
@@ -5456,6 +5474,18 @@ export function ContinuityPrototype() {
           onExportHandoffPacket={() => {
             setToast({ message: 'Continuity Transition Packet exported successfully' });
             setTrajectoryTimelineOpen(false);
+          }}
+        />
+      )}
+
+      {drugBoxOpen && (
+        <AnticipatoryDrugBoxModal
+          patientId={selectedItem.hospitalId}
+          patientName={selectedItem.patient}
+          diagnosis={selectedProfile?.diagnosis || 'Metastatic Oncology Disease'}
+          onClose={() => setDrugBoxOpen(false)}
+          onLogAdministration={(medName, dose) => {
+            setToast({ message: `Dose Administered & Logged: ${medName} (${dose})` });
           }}
         />
       )}
