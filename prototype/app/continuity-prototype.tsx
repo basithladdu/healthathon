@@ -47,6 +47,7 @@ import { PalliativeDeliriumModal } from './palliative-delirium-engine';
 import { PediatricPalliativeModal } from './pediatric-palliative-engine';
 import { MalignantBowelObstructionModal } from './malignant-bowel-obstruction';
 import { RenalHepaticPalliativeModal } from './renal-hepatic-palliative';
+import { PalliativeRadiotherapyModal } from './palliative-radiotherapy-suite';
 import { IconZap, IconFileText, IconHeartPulse, IconHospital, IconSparkles } from './icons';
 
 type View =
@@ -881,6 +882,7 @@ export function ContinuityPrototype() {
   const [pediatricPalliativeOpen, setPediatricPalliativeOpen] = useState(false);
   const [bowelObstructionOpen, setBowelObstructionOpen] = useState(false);
   const [renalHepaticOpen, setRenalHepaticOpen] = useState(false);
+  const [radiotherapyOpen, setRadiotherapyOpen] = useState(false);
   const profileTimelineRef = useRef<HTMLOListElement>(null);
   const enrolDialogRef = useRef<HTMLElement>(null);
   const diffDialogRef = useRef<HTMLElement>(null);
@@ -3917,6 +3919,22 @@ export function ContinuityPrototype() {
             >
               <span>🫘 Renal & Hepatic</span>
             </button>
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={() => setRadiotherapyOpen(true)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: '#fffbeb',
+                borderColor: '#fef3c7',
+                color: '#92400e',
+                fontWeight: 700,
+              }}
+            >
+              <span>⚛️ Radiotherapy</span>
+            </button>
             {versionPublished && <button className="secondary-button" type="button" onClick={startConversation}>New conversation</button>}
             <button className="primary-button" type="button" onClick={() => navigate('verify')}>{versionPublished ? 'Review checklist' : 'Review summary'}</button>
           </div>,
@@ -5756,6 +5774,18 @@ export function ContinuityPrototype() {
           onClose={() => setRenalHepaticOpen(false)}
           onDispatchPlan={(summary) => {
             setToast({ message: `Renal/Hepatic Protocol Dispatched: ${summary}` });
+          }}
+        />
+      )}
+
+      {radiotherapyOpen && (
+        <PalliativeRadiotherapyModal
+          patientId={selectedItem.hospitalId}
+          patientName={selectedItem.patient}
+          primaryCancer={selectedProfile?.diagnosis || 'Metastatic Oncology Disease'}
+          onClose={() => setRadiotherapyOpen(false)}
+          onDispatchPlan={(summary) => {
+            setToast({ message: `Radiotherapy Protocol Dispatched: ${summary}` });
           }}
         />
       )}

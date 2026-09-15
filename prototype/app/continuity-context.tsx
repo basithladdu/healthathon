@@ -193,7 +193,8 @@ export type ModalType =
   | 'delirium_engine'
   | 'pediatric_palliative'
   | 'bowel_obstruction'
-  | 'renal_hepatic_palliative';
+  | 'renal_hepatic_palliative'
+  | 'palliative_radiotherapy';
 
 export interface ContinuityContextType {
   currentRole: string;
