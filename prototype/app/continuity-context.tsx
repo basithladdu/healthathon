@@ -179,7 +179,8 @@ export type ModalType =
   | 'map_dispatch'
   | 'esas'
   | 'deprescribing'
-  | 'prognosis';
+  | 'prognosis'
+  | 'emergency_triage';
 
 export interface ContinuityContextType {
   currentRole: string;

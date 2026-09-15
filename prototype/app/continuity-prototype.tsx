@@ -33,6 +33,7 @@ import { EsasSymptomTracker } from './esas-symptom-tracker';
 import { PalliativeDeprescribingMatrix } from './palliative-deprescribing';
 import { PalliativePrognosisCalculator } from './palliative-prognosis-calculator';
 import { ClinicalDiffModal } from './clinical-diff-modal';
+import { OncologyEmergencyTriageModal } from './oncology-emergency-triage';
 import { IconZap, IconFileText, IconHeartPulse, IconHospital, IconSparkles } from './icons';
 
 type View =
@@ -853,6 +854,7 @@ export function ContinuityPrototype() {
   const [esasOpen, setEsasOpen] = useState(false);
   const [deprescribingOpen, setDeprescribingOpen] = useState(false);
   const [prognosisOpen, setPrognosisOpen] = useState(false);
+  const [emergencyTriageOpen, setEmergencyTriageOpen] = useState(false);
   const profileTimelineRef = useRef<HTMLOListElement>(null);
   const enrolDialogRef = useRef<HTMLElement>(null);
   const diffDialogRef = useRef<HTMLElement>(null);
@@ -3662,6 +3664,22 @@ export function ContinuityPrototype() {
               <IconHeartPulse className="w-4 h-4 text-purple-600" />
               <span>PPI Prognosis</span>
             </button>
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={() => setEmergencyTriageOpen(true)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: '#fee2e2',
+                borderColor: '#fca5a5',
+                color: '#991b1b',
+                fontWeight: 700,
+              }}
+            >
+              <span>🚨 STAT Triage</span>
+            </button>
             {versionPublished && <button className="secondary-button" type="button" onClick={startConversation}>New conversation</button>}
             <button className="primary-button" type="button" onClick={() => navigate('verify')}>{versionPublished ? 'Review checklist' : 'Review summary'}</button>
           </div>,
@@ -4072,6 +4090,27 @@ export function ContinuityPrototype() {
                 >
                   <IconZap className="w-4 h-4 text-amber-500" />
                   <span>⚡ 1-Click Break-Glass Emergency Retrieval</span>
+                </button>
+                <button
+                  type="button"
+                  className="secondary-button"
+                  style={{
+                    width: '100%',
+                    marginTop: '8px',
+                    background: '#fef2f2',
+                    borderColor: '#fca5a5',
+                    color: '#991b1b',
+                    fontWeight: 700,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    padding: '8px 12px',
+                    borderRadius: '8px',
+                  }}
+                  onClick={() => setEmergencyTriageOpen(true)}
+                >
+                  <span>🚨 Oncologic Emergency Triage & STAT Orders</span>
                 </button>
               </div>
 
@@ -5300,6 +5339,22 @@ export function ContinuityPrototype() {
           onApplyPlan={(pps, ppi, _tier, recommendation) => {
             setToast({ message: `Prognostic trajectory applied: PPS ${pps}%, PPI ${ppi} (${recommendation.slice(0, 32)}...)` });
             setPrognosisOpen(false);
+          }}
+        />
+      )}
+
+      {emergencyTriageOpen && (
+        <OncologyEmergencyTriageModal
+          patientId={selectedItem.hospitalId}
+          patientName={selectedItem.patient}
+          diagnosis={selectedProfile?.diagnosis || 'Metastatic Oncology Disease'}
+          onClose={() => setEmergencyTriageOpen(false)}
+          onDispatchAmbulance={(reason) => {
+            setToast({ message: `108 Ambulance dispatched: ${reason}` });
+          }}
+          onApplyOrdersToRecord={(orders) => {
+            setToast({ message: `STAT Emergency Orders Recorded: ${orders.slice(0, 35)}...` });
+            setEmergencyTriageOpen(false);
           }}
         />
       )}
