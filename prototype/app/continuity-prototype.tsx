@@ -31,6 +31,8 @@ import { MapLibreDispatchModal } from './maplibre-dispatch';
 import { SyringeDriverCalculator } from './syringe-driver-calculator';
 import { EsasSymptomTracker } from './esas-symptom-tracker';
 import { PalliativeDeprescribingMatrix } from './palliative-deprescribing';
+import { PalliativePrognosisCalculator } from './palliative-prognosis-calculator';
+import { ClinicalDiffModal } from './clinical-diff-modal';
 import { IconZap, IconFileText, IconHeartPulse, IconHospital, IconSparkles } from './icons';
 
 type View =
@@ -850,6 +852,7 @@ export function ContinuityPrototype() {
   const [syringeDriverOpen, setSyringeDriverOpen] = useState(false);
   const [esasOpen, setEsasOpen] = useState(false);
   const [deprescribingOpen, setDeprescribingOpen] = useState(false);
+  const [prognosisOpen, setPrognosisOpen] = useState(false);
   const profileTimelineRef = useRef<HTMLOListElement>(null);
   const enrolDialogRef = useRef<HTMLElement>(null);
   const diffDialogRef = useRef<HTMLElement>(null);
@@ -3650,6 +3653,15 @@ export function ContinuityPrototype() {
               <IconHospital className="w-4 h-4 text-rose-600" />
               <span>Deprescribing</span>
             </button>
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={() => setPrognosisOpen(true)}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+            >
+              <IconHeartPulse className="w-4 h-4 text-purple-600" />
+              <span>PPI Prognosis</span>
+            </button>
             {versionPublished && <button className="secondary-button" type="button" onClick={startConversation}>New conversation</button>}
             <button className="primary-button" type="button" onClick={() => navigate('verify')}>{versionPublished ? 'Review checklist' : 'Review summary'}</button>
           </div>,
@@ -5165,28 +5177,31 @@ export function ContinuityPrototype() {
         </div>
       )}
 
-      {diffOpen && comparisonOlder && comparisonNewer && currentRole.startsWith('Dr') && (
-        <div className="modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.currentTarget === event.target) setDiffOpen(false); }}>
-          <section ref={diffDialogRef} className="modal-panel large-modal" role="dialog" aria-modal="true" aria-labelledby="diff-title">
-            <div className="modal-header">
-              <h2 id="diff-title">{selectedItem.patient}: Version {comparisonOlder.number} and Version {comparisonNewer.number}</h2>
-              <button type="button" aria-label="Close comparison" onClick={() => setDiffOpen(false)}><IconX className="w-4 h-4" /></button>
-            </div>
-            <div className="p-6"><div className="diff-panel">
-              {[comparisonOlder, comparisonNewer].map((release, index) => (
-                <div className="diff-version-col" key={release.number}>
-                  <div className="diff-header"><strong>Version {release.number}</strong><span>{releaseDate(release)} | {release.physician}</span></div>
-                  {release.fields ? fieldConfig.map((field) => (
-                    <div className="diff-item" key={field.key}>
-                      <span>{field.label}{index === 1 && comparisonOlder.fields && comparisonOlder.fields[field.key] !== release.fields![field.key] && <b className="diff-change-label">Changed</b>}</span>
-                      <p>{release.fields![field.key]}</p>
-                    </div>
-                  )) : <p className="record-boundary">The content of this released version is not loaded.</p>}
-                </div>
-              ))}
-            </div></div>
-          </section>
-        </div>
+      {diffOpen && recordState.releases.length > 0 && (
+        <ClinicalDiffModal
+          patientId={selectedItem.hospitalId}
+          patientName={selectedItem.patient}
+          releases={recordState.releases}
+          initialOlderVersion={comparisonOlder?.number ?? 1}
+          initialNewerVersion={comparisonNewer?.number ?? (recordState.releases[recordState.releases.length - 1]?.number ?? 1)}
+          currentRole={currentRole}
+          onClose={() => setDiffOpen(false)}
+          onEndorse={(vFrom, vTo) => {
+            setAuditEvents((events) => [
+              {
+                id: `AUDIT-${Date.now().toString().slice(-4)}`,
+                actor: currentRole,
+                action: 'Endorsed version handoff',
+                target: `${selectedItem.patient} · V${vFrom} → V${vTo}`,
+                timestamp: 'Just now',
+                detail: `Clinical transition handoff endorsement from Version ${vFrom} to Version ${vTo}`,
+                securityImpact: 'Routine clinical transition audit logged',
+              },
+              ...events,
+            ]);
+            setToast({ message: `Handoff transition V${vFrom} → V${vTo} endorsed by ${currentRole}` });
+          }}
+        />
       )}
 
       {fhirExportOpen && (
@@ -5273,6 +5288,20 @@ export function ContinuityPrototype() {
             />
           </section>
         </div>
+      )}
+
+      {prognosisOpen && (
+        <PalliativePrognosisCalculator
+          patientId={selectedItem.hospitalId}
+          patientName={selectedItem.patient}
+          diagnosis={selectedProfile?.diagnosis || 'Metastatic Oncology Disease'}
+          currentCeilingTier={1}
+          onClose={() => setPrognosisOpen(false)}
+          onApplyPlan={(pps, ppi, _tier, recommendation) => {
+            setToast({ message: `Prognostic trajectory applied: PPS ${pps}%, PPI ${ppi} (${recommendation.slice(0, 32)}...)` });
+            setPrognosisOpen(false);
+          }}
+        />
       )}
 
       {/* Toast Feedback */}

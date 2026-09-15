@@ -9717,6 +9717,31 @@ h3,
   border-top: 1px solid #e2e8f0;
 }
 
+/* Palliative Prognosis & PPS Staging */
+.prog-modal-wide {
+  max-width: 980px !important;
+  width: 95vw !important;
+}
+
+.prog-badge-terminal {
+  background: #ffe4e6;
+  color: #9f1239;
+  border: 1px solid #fecdd3;
+}
+
+.prog-badge-intermediate {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.prog-badge-stable {
+  background: #d1fae5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+
 
 
 
