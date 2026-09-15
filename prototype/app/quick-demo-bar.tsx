@@ -16,8 +16,9 @@ export function QuickDemoBar(props: {
   onSelectRole: (option: DemoRoleOption) => void;
   onGoHome: () => void;
   onFastAction?: (action: 'break-glass' | 'verify-release' | 'patient-consent') => void;
+  onOpenMap?: () => void;
 }) {
-  const { currentSession, currentRole, onSelectRole, onGoHome, onFastAction } = props;
+  const { currentSession, currentRole, onSelectRole, onGoHome, onFastAction, onOpenMap } = props;
   const [collapsed, setCollapsed] = useState(false);
 
   const activeId: DemoRoleOption =
@@ -111,6 +112,30 @@ export function QuickDemoBar(props: {
         </div>
 
         <div className="quick-demo-actions">
+          {onOpenMap && (
+            <button
+              type="button"
+              className="quick-demo-map-btn"
+              onClick={onOpenMap}
+              title="Open MapLibre GL Community GIS & Transit Dispatch Map"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+                padding: '6px 11px',
+                borderRadius: '8px',
+                fontSize: '12px',
+                fontWeight: 750,
+                background: '#047857',
+                color: '#ffffff',
+                border: 'none',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              <span>🗺️ GIS Map</span>
+            </button>
+          )}
           <button
             type="button"
             className="quick-demo-home-btn"

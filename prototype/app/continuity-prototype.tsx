@@ -27,7 +27,9 @@ import { QuickDemoBar, type DemoRoleOption } from './quick-demo-bar';
 import { FhirExportModal } from './fhir-export-modal';
 import { TreatmentEscalationMatrix } from './tep-matrix';
 import { VoiceDictationBar } from './voice-dictation';
-import { IconZap, IconFileText, IconHeartPulse } from './icons';
+import { MapLibreDispatchModal } from './maplibre-dispatch';
+import { SyringeDriverCalculator } from './syringe-driver-calculator';
+import { IconZap, IconFileText, IconHeartPulse, IconHospital } from './icons';
 
 type View =
   | 'caregiver'
@@ -842,6 +844,8 @@ export function ContinuityPrototype() {
   const [reviewRequestedById, setReviewRequestedById] = useState<Record<string, string>>({});
   const [fhirExportOpen, setFhirExportOpen] = useState(false);
   const [tepModalOpen, setTepModalOpen] = useState(false);
+  const [mapOpen, setMapOpen] = useState(false);
+  const [syringeDriverOpen, setSyringeDriverOpen] = useState(false);
   const profileTimelineRef = useRef<HTMLOListElement>(null);
   const enrolDialogRef = useRef<HTMLElement>(null);
   const diffDialogRef = useRef<HTMLElement>(null);
@@ -3604,7 +3608,25 @@ export function ContinuityPrototype() {
               style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
             >
               <IconHeartPulse className="w-4 h-4 text-rose-600" />
-              <span>Treatment Escalation (TEP)</span>
+              <span>TEP Matrix</span>
+            </button>
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={() => setSyringeDriverOpen(true)}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+            >
+              <IconZap className="w-4 h-4 text-purple-600" />
+              <span>Syringe Driver</span>
+            </button>
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={() => setMapOpen(true)}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+            >
+              <IconMapPin className="w-4 h-4 text-emerald-600" />
+              <span>GIS Map</span>
             </button>
             {versionPublished && <button className="secondary-button" type="button" onClick={startConversation}>New conversation</button>}
             <button className="primary-button" type="button" onClick={() => navigate('verify')}>{versionPublished ? 'Review checklist' : 'Review summary'}</button>
@@ -4146,6 +4168,42 @@ export function ContinuityPrototype() {
                 >
                   <IconHeartPulse className="w-3.5 h-3.5" />
                   <span>TEP Matrix</span>
+                </button>
+                <button
+                  className="secondary-button"
+                  style={{
+                    background: '#f0fdf4',
+                    borderColor: '#bbf7d0',
+                    color: '#15803d',
+                    fontWeight: 650,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                  }}
+                  type="button"
+                  onClick={() => setMapOpen(true)}
+                  title="Open MapLibre GL Community GIS & Transit Dispatch Map"
+                >
+                  <IconMapPin className="w-3.5 h-3.5" />
+                  <span>GIS Map</span>
+                </button>
+                <button
+                  className="secondary-button"
+                  style={{
+                    background: '#faf5ff',
+                    borderColor: '#e9d5ff',
+                    color: '#7e22ce',
+                    fontWeight: 650,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                  }}
+                  type="button"
+                  onClick={() => setSyringeDriverOpen(true)}
+                  title="Continuous Subcutaneous Syringe Driver & Opioid Converter"
+                >
+                  <IconZap className="w-3.5 h-3.5" />
+                  <span>Syringe Driver</span>
                 </button>
               </div>
             </div>
@@ -4705,6 +4763,7 @@ export function ContinuityPrototype() {
           currentRole={currentRole}
           onSelectRole={handleFastRoleSelect}
           onGoHome={() => setAuthScreen('landing')}
+          onOpenMap={() => setMapOpen(true)}
         />
         <LandingPage
           onSignIn={() => setAuthScreen('login')}
@@ -4777,6 +4836,7 @@ export function ContinuityPrototype() {
         currentRole={currentRole}
         onSelectRole={handleFastRoleSelect}
         onGoHome={() => setAuthScreen('landing')}
+        onOpenMap={() => setMapOpen(true)}
       />
       <main className={isPatientSession || isFamilySession ? 'app-shell is-portal' : 'app-shell'}>
       {/* Sidebar Navigation */}
@@ -5098,6 +5158,26 @@ export function ContinuityPrototype() {
               onSave={(_selections, overallCeiling) => {
                 setToast({ message: `TEP Matrix Registered: ${overallCeiling}` });
                 setTepModalOpen(false);
+              }}
+            />
+          </section>
+        </div>
+      )}
+
+      {mapOpen && (
+        <MapLibreDispatchModal onClose={() => setMapOpen(false)} />
+      )}
+
+      {syringeDriverOpen && (
+        <div className="modal-backdrop" role="presentation" onMouseDown={(e) => { if (e.target === e.currentTarget) setSyringeDriverOpen(false); }}>
+          <section className="modal-panel large-modal" role="dialog" aria-modal="true" aria-labelledby="sd-title" style={{ maxWidth: '980px', width: '96%', padding: 0, overflow: 'hidden' }}>
+            <SyringeDriverCalculator
+              patientId={selectedItem.hospitalId}
+              patientName={selectedItem.patient}
+              onClose={() => setSyringeDriverOpen(false)}
+              onApplyToCarePlan={(_regimen) => {
+                setToast({ message: 'Syringe driver protocol applied to plan' });
+                setSyringeDriverOpen(false);
               }}
             />
           </section>

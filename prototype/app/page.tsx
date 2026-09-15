@@ -1,5 +1,10 @@
 import { ContinuityPrototype } from './continuity-prototype';
+import { ContinuityProvider } from './continuity-context';
 
 export default function Home() {
-  return <ContinuityPrototype />;
+  return (
+    <ContinuityProvider>
+      <ContinuityPrototype />
+    </ContinuityProvider>
+  );
 }
