@@ -44,6 +44,7 @@ import { CachexiaAscitesModal } from './cachexia-ascites-protocol';
 import { NeuropathicPainBlocksModal } from './neuropathic-pain-blocks';
 import { BreathlessnessCrisisModal } from './breathlessness-crisis-engine';
 import { PalliativeDeliriumModal } from './palliative-delirium-engine';
+import { PediatricPalliativeModal } from './pediatric-palliative-engine';
 import { IconZap, IconFileText, IconHeartPulse, IconHospital, IconSparkles } from './icons';
 
 type View =
@@ -875,6 +876,7 @@ export function ContinuityPrototype() {
   const [neuropathicBlocksOpen, setNeuropathicBlocksOpen] = useState(false);
   const [breathlessnessCrisisOpen, setBreathlessnessCrisisOpen] = useState(false);
   const [deliriumOpen, setDeliriumOpen] = useState(false);
+  const [pediatricPalliativeOpen, setPediatricPalliativeOpen] = useState(false);
   const profileTimelineRef = useRef<HTMLOListElement>(null);
   const enrolDialogRef = useRef<HTMLElement>(null);
   const diffDialogRef = useRef<HTMLElement>(null);
@@ -3863,6 +3865,22 @@ export function ContinuityPrototype() {
             >
               <span>🧠 Delirium Care</span>
             </button>
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={() => setPediatricPalliativeOpen(true)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: '#fff1f2',
+                borderColor: '#fecdd3',
+                color: '#be123c',
+                fontWeight: 700,
+              }}
+            >
+              <span>🧸 Pediatric Palliative</span>
+            </button>
             {versionPublished && <button className="secondary-button" type="button" onClick={startConversation}>New conversation</button>}
             <button className="primary-button" type="button" onClick={() => navigate('verify')}>{versionPublished ? 'Review checklist' : 'Review summary'}</button>
           </div>,
@@ -5666,6 +5684,18 @@ export function ContinuityPrototype() {
           onClose={() => setDeliriumOpen(false)}
           onDispatchPlan={(summary) => {
             setToast({ message: `Delirium Protocol Dispatched: ${summary}` });
+          }}
+        />
+      )}
+
+      {pediatricPalliativeOpen && (
+        <PediatricPalliativeModal
+          patientId={selectedItem.hospitalId}
+          patientName={selectedItem.patient}
+          primaryCancer={selectedProfile?.diagnosis || 'Metastatic Oncology Disease'}
+          onClose={() => setPediatricPalliativeOpen(false)}
+          onDispatchPlan={(summary) => {
+            setToast({ message: `Pediatric Care Plan Dispatched: ${summary}` });
           }}
         />
       )}

@@ -190,7 +190,8 @@ export type ModalType =
   | 'cachexia_ascites'
   | 'neuropathic_blocks'
   | 'breathlessness_crisis'
-  | 'delirium_engine';
+  | 'delirium_engine'
+  | 'pediatric_palliative';
 
 export interface ContinuityContextType {
   currentRole: string;
