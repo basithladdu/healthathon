@@ -45,6 +45,7 @@ import { NeuropathicPainBlocksModal } from './neuropathic-pain-blocks';
 import { BreathlessnessCrisisModal } from './breathlessness-crisis-engine';
 import { PalliativeDeliriumModal } from './palliative-delirium-engine';
 import { PediatricPalliativeModal } from './pediatric-palliative-engine';
+import { MalignantBowelObstructionModal } from './malignant-bowel-obstruction';
 import { IconZap, IconFileText, IconHeartPulse, IconHospital, IconSparkles } from './icons';
 
 type View =
@@ -877,6 +878,7 @@ export function ContinuityPrototype() {
   const [breathlessnessCrisisOpen, setBreathlessnessCrisisOpen] = useState(false);
   const [deliriumOpen, setDeliriumOpen] = useState(false);
   const [pediatricPalliativeOpen, setPediatricPalliativeOpen] = useState(false);
+  const [bowelObstructionOpen, setBowelObstructionOpen] = useState(false);
   const profileTimelineRef = useRef<HTMLOListElement>(null);
   const enrolDialogRef = useRef<HTMLElement>(null);
   const diffDialogRef = useRef<HTMLElement>(null);
@@ -3881,6 +3883,22 @@ export function ContinuityPrototype() {
             >
               <span>🧸 Pediatric Palliative</span>
             </button>
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={() => setBowelObstructionOpen(true)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: '#f0fdf4',
+                borderColor: '#bbf7d0',
+                color: '#15803d',
+                fontWeight: 700,
+              }}
+            >
+              <span>🧪 Bowel Obstruction</span>
+            </button>
             {versionPublished && <button className="secondary-button" type="button" onClick={startConversation}>New conversation</button>}
             <button className="primary-button" type="button" onClick={() => navigate('verify')}>{versionPublished ? 'Review checklist' : 'Review summary'}</button>
           </div>,
@@ -5696,6 +5714,18 @@ export function ContinuityPrototype() {
           onClose={() => setPediatricPalliativeOpen(false)}
           onDispatchPlan={(summary) => {
             setToast({ message: `Pediatric Care Plan Dispatched: ${summary}` });
+          }}
+        />
+      )}
+
+      {bowelObstructionOpen && (
+        <MalignantBowelObstructionModal
+          patientId={selectedItem.hospitalId}
+          patientName={selectedItem.patient}
+          primaryCancer={selectedProfile?.diagnosis || 'Metastatic Oncology Disease'}
+          onClose={() => setBowelObstructionOpen(false)}
+          onDispatchPlan={(summary) => {
+            setToast({ message: `MBO Protocol Dispatched: ${summary}` });
           }}
         />
       )}

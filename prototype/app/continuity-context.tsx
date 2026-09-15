@@ -191,7 +191,8 @@ export type ModalType =
   | 'neuropathic_blocks'
   | 'breathlessness_crisis'
   | 'delirium_engine'
-  | 'pediatric_palliative';
+  | 'pediatric_palliative'
+  | 'bowel_obstruction';
 
 export interface ContinuityContextType {
   currentRole: string;
