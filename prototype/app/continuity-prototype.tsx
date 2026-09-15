@@ -46,6 +46,7 @@ import { BreathlessnessCrisisModal } from './breathlessness-crisis-engine';
 import { PalliativeDeliriumModal } from './palliative-delirium-engine';
 import { PediatricPalliativeModal } from './pediatric-palliative-engine';
 import { MalignantBowelObstructionModal } from './malignant-bowel-obstruction';
+import { RenalHepaticPalliativeModal } from './renal-hepatic-palliative';
 import { IconZap, IconFileText, IconHeartPulse, IconHospital, IconSparkles } from './icons';
 
 type View =
@@ -879,6 +880,7 @@ export function ContinuityPrototype() {
   const [deliriumOpen, setDeliriumOpen] = useState(false);
   const [pediatricPalliativeOpen, setPediatricPalliativeOpen] = useState(false);
   const [bowelObstructionOpen, setBowelObstructionOpen] = useState(false);
+  const [renalHepaticOpen, setRenalHepaticOpen] = useState(false);
   const profileTimelineRef = useRef<HTMLOListElement>(null);
   const enrolDialogRef = useRef<HTMLElement>(null);
   const diffDialogRef = useRef<HTMLElement>(null);
@@ -3899,6 +3901,22 @@ export function ContinuityPrototype() {
             >
               <span>🧪 Bowel Obstruction</span>
             </button>
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={() => setRenalHepaticOpen(true)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: '#eef2ff',
+                borderColor: '#c7d2fe',
+                color: '#4338ca',
+                fontWeight: 700,
+              }}
+            >
+              <span>🫘 Renal & Hepatic</span>
+            </button>
             {versionPublished && <button className="secondary-button" type="button" onClick={startConversation}>New conversation</button>}
             <button className="primary-button" type="button" onClick={() => navigate('verify')}>{versionPublished ? 'Review checklist' : 'Review summary'}</button>
           </div>,
@@ -5726,6 +5744,18 @@ export function ContinuityPrototype() {
           onClose={() => setBowelObstructionOpen(false)}
           onDispatchPlan={(summary) => {
             setToast({ message: `MBO Protocol Dispatched: ${summary}` });
+          }}
+        />
+      )}
+
+      {renalHepaticOpen && (
+        <RenalHepaticPalliativeModal
+          patientId={selectedItem.hospitalId}
+          patientName={selectedItem.patient}
+          primaryCancer={selectedProfile?.diagnosis || 'Metastatic Oncology Disease'}
+          onClose={() => setRenalHepaticOpen(false)}
+          onDispatchPlan={(summary) => {
+            setToast({ message: `Renal/Hepatic Protocol Dispatched: ${summary}` });
           }}
         />
       )}
