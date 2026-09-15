@@ -40,6 +40,7 @@ import { LongitudinalTrajectoryTimeline } from './longitudinal-trajectory-timeli
 import { AnticipatoryDrugBoxModal } from './anticipatory-drug-box';
 import { MalignantWoundCareModal } from './malignant-wound-care';
 import { BoneMetastasesSinsModal } from './bone-metastases-sins';
+import { CachexiaAscitesModal } from './cachexia-ascites-protocol';
 import { IconZap, IconFileText, IconHeartPulse, IconHospital, IconSparkles } from './icons';
 
 type View =
@@ -867,6 +868,7 @@ export function ContinuityPrototype() {
   const [drugBoxOpen, setDrugBoxOpen] = useState(false);
   const [woundCareOpen, setWoundCareOpen] = useState(false);
   const [boneSinsOpen, setBoneSinsOpen] = useState(false);
+  const [cachexiaAscitesOpen, setCachexiaAscitesOpen] = useState(false);
   const profileTimelineRef = useRef<HTMLOListElement>(null);
   const enrolDialogRef = useRef<HTMLElement>(null);
   const diffDialogRef = useRef<HTMLElement>(null);
@@ -3791,6 +3793,22 @@ export function ContinuityPrototype() {
             >
               <span>🦴 Bone Met SINS</span>
             </button>
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={() => setCachexiaAscitesOpen(true)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: '#f0fdfa',
+                borderColor: '#99f6e4',
+                color: '#0f766e',
+                fontWeight: 700,
+              }}
+            >
+              <span>💧 Cachexia & Ascites</span>
+            </button>
             {versionPublished && <button className="secondary-button" type="button" onClick={startConversation}>New conversation</button>}
             <button className="primary-button" type="button" onClick={() => navigate('verify')}>{versionPublished ? 'Review checklist' : 'Review summary'}</button>
           </div>,
@@ -5546,6 +5564,18 @@ export function ContinuityPrototype() {
           onClose={() => setBoneSinsOpen(false)}
           onDispatchReferral={(summary) => {
             setToast({ message: `Spine / RT Referral Dispatched: ${summary}` });
+          }}
+        />
+      )}
+
+      {cachexiaAscitesOpen && (
+        <CachexiaAscitesModal
+          patientId={selectedItem.hospitalId}
+          patientName={selectedItem.patient}
+          primaryCancer={selectedProfile?.diagnosis || 'Metastatic Oncology Disease'}
+          onClose={() => setCachexiaAscitesOpen(false)}
+          onDispatchOrder={(summary) => {
+            setToast({ message: `Ascites / Nutrition Plan Dispatched: ${summary}` });
           }}
         />
       )}
