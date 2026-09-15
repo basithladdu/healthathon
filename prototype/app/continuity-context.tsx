@@ -177,7 +177,8 @@ export type ModalType =
   | 'fhir'
   | 'qr_scanner'
   | 'map_dispatch'
-  | 'esas';
+  | 'esas'
+  | 'deprescribing';
 
 export interface ContinuityContextType {
   currentRole: string;

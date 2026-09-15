@@ -30,6 +30,7 @@ import { VoiceDictationBar } from './voice-dictation';
 import { MapLibreDispatchModal } from './maplibre-dispatch';
 import { SyringeDriverCalculator } from './syringe-driver-calculator';
 import { EsasSymptomTracker } from './esas-symptom-tracker';
+import { PalliativeDeprescribingMatrix } from './palliative-deprescribing';
 import { IconZap, IconFileText, IconHeartPulse, IconHospital, IconSparkles } from './icons';
 
 type View =
@@ -848,6 +849,7 @@ export function ContinuityPrototype() {
   const [mapOpen, setMapOpen] = useState(false);
   const [syringeDriverOpen, setSyringeDriverOpen] = useState(false);
   const [esasOpen, setEsasOpen] = useState(false);
+  const [deprescribingOpen, setDeprescribingOpen] = useState(false);
   const profileTimelineRef = useRef<HTMLOListElement>(null);
   const enrolDialogRef = useRef<HTMLElement>(null);
   const diffDialogRef = useRef<HTMLElement>(null);
@@ -3639,6 +3641,15 @@ export function ContinuityPrototype() {
               <IconSparkles className="w-4 h-4 text-amber-600" />
               <span>ESAS Symptoms</span>
             </button>
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={() => setDeprescribingOpen(true)}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+            >
+              <IconHospital className="w-4 h-4 text-rose-600" />
+              <span>Deprescribing</span>
+            </button>
             {versionPublished && <button className="secondary-button" type="button" onClick={startConversation}>New conversation</button>}
             <button className="primary-button" type="button" onClick={() => navigate('verify')}>{versionPublished ? 'Review checklist' : 'Review summary'}</button>
           </div>,
@@ -4233,6 +4244,24 @@ export function ContinuityPrototype() {
                 >
                   <IconSparkles className="w-3.5 h-3.5" />
                   <span>ESAS Symptoms</span>
+                </button>
+                <button
+                  className="secondary-button"
+                  style={{
+                    background: '#fff1f2',
+                    borderColor: '#fecdd3',
+                    color: '#be123c',
+                    fontWeight: 650,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                  }}
+                  type="button"
+                  onClick={() => setDeprescribingOpen(true)}
+                  title="Palliative Polypharmacy Deprescribing & Drug Interaction Matrix"
+                >
+                  <IconHospital className="w-3.5 h-3.5" />
+                  <span>Deprescribing</span>
                 </button>
               </div>
             </div>
@@ -5224,6 +5253,22 @@ export function ContinuityPrototype() {
               onSave={(_scores, total) => {
                 setToast({ message: `ESAS Symptom Assessment saved (Distress Score: ${total}/90)` });
                 setEsasOpen(false);
+              }}
+            />
+          </section>
+        </div>
+      )}
+
+      {deprescribingOpen && (
+        <div className="modal-backdrop" role="presentation" onMouseDown={(e) => { if (e.target === e.currentTarget) setDeprescribingOpen(false); }}>
+          <section className="modal-panel large-modal" role="dialog" aria-modal="true" aria-labelledby="deprescribe-title" style={{ maxWidth: '980px', width: '96%', padding: 0, overflow: 'hidden' }}>
+            <PalliativeDeprescribingMatrix
+              patientId={selectedItem.hospitalId}
+              patientName={selectedItem.patient}
+              onClose={() => setDeprescribingOpen(false)}
+              onApplyDeprescribingPlan={(_summary) => {
+                setToast({ message: 'Deprescribing recommendations applied to summary' });
+                setDeprescribingOpen(false);
               }}
             />
           </section>
