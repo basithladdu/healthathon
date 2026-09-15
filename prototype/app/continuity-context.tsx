@@ -181,7 +181,8 @@ export type ModalType =
   | 'deprescribing'
   | 'prognosis'
   | 'emergency_triage'
-  | 'caregiver_burden';
+  | 'caregiver_burden'
+  | 'sedation_crisis';
 
 export interface ContinuityContextType {
   currentRole: string;

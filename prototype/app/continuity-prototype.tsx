@@ -35,6 +35,7 @@ import { PalliativePrognosisCalculator } from './palliative-prognosis-calculator
 import { ClinicalDiffModal } from './clinical-diff-modal';
 import { OncologyEmergencyTriageModal } from './oncology-emergency-triage';
 import { CaregiverBurdenMatrix } from './caregiver-burden-matrix';
+import { PalliativeSedationCrisisModal } from './palliative-sedation-crisis';
 import { IconZap, IconFileText, IconHeartPulse, IconHospital, IconSparkles } from './icons';
 
 type View =
@@ -857,6 +858,7 @@ export function ContinuityPrototype() {
   const [prognosisOpen, setPrognosisOpen] = useState(false);
   const [emergencyTriageOpen, setEmergencyTriageOpen] = useState(false);
   const [caregiverBurdenOpen, setCaregiverBurdenOpen] = useState(false);
+  const [sedationCrisisOpen, setSedationCrisisOpen] = useState(false);
   const profileTimelineRef = useRef<HTMLOListElement>(null);
   const enrolDialogRef = useRef<HTMLElement>(null);
   const diffDialogRef = useRef<HTMLElement>(null);
@@ -3699,6 +3701,23 @@ export function ContinuityPrototype() {
               <IconUsers className="w-4 h-4 text-teal-600" />
               <span>Caregiver ZBI</span>
             </button>
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={() => setSedationCrisisOpen(true)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: '#faf5ff',
+                borderColor: '#e9d5ff',
+                color: '#6b21a8',
+                fontWeight: 700,
+              }}
+            >
+              <IconZap className="w-4 h-4 text-purple-700" />
+              <span>Sedation Protocol</span>
+            </button>
             {versionPublished && <button className="secondary-button" type="button" onClick={startConversation}>New conversation</button>}
             <button className="primary-button" type="button" onClick={() => navigate('verify')}>{versionPublished ? 'Review checklist' : 'Review summary'}</button>
           </div>,
@@ -5392,6 +5411,19 @@ export function ContinuityPrototype() {
           onSavePlan={(total, tier) => {
             setToast({ message: `Caregiver Support Plan Saved: ZBI-12 ${total}/48 (${tier})` });
             setCaregiverBurdenOpen(false);
+          }}
+        />
+      )}
+
+      {sedationCrisisOpen && (
+        <PalliativeSedationCrisisModal
+          patientId={selectedItem.hospitalId}
+          patientName={selectedItem.patient}
+          diagnosis={selectedProfile?.diagnosis || 'Metastatic Oncology Disease'}
+          onClose={() => setSedationCrisisOpen(false)}
+          onApplyPlan={(protocolSummary) => {
+            setToast({ message: `Palliative Sedation Plan Recorded: ${protocolSummary.slice(0, 35)}...` });
+            setSedationCrisisOpen(false);
           }}
         />
       )}
