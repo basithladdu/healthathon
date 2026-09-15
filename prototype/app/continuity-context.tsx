@@ -180,7 +180,8 @@ export type ModalType =
   | 'esas'
   | 'deprescribing'
   | 'prognosis'
-  | 'emergency_triage';
+  | 'emergency_triage'
+  | 'caregiver_burden';
 
 export interface ContinuityContextType {
   currentRole: string;

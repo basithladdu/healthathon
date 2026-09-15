@@ -34,6 +34,7 @@ import { PalliativeDeprescribingMatrix } from './palliative-deprescribing';
 import { PalliativePrognosisCalculator } from './palliative-prognosis-calculator';
 import { ClinicalDiffModal } from './clinical-diff-modal';
 import { OncologyEmergencyTriageModal } from './oncology-emergency-triage';
+import { CaregiverBurdenMatrix } from './caregiver-burden-matrix';
 import { IconZap, IconFileText, IconHeartPulse, IconHospital, IconSparkles } from './icons';
 
 type View =
@@ -855,6 +856,7 @@ export function ContinuityPrototype() {
   const [deprescribingOpen, setDeprescribingOpen] = useState(false);
   const [prognosisOpen, setPrognosisOpen] = useState(false);
   const [emergencyTriageOpen, setEmergencyTriageOpen] = useState(false);
+  const [caregiverBurdenOpen, setCaregiverBurdenOpen] = useState(false);
   const profileTimelineRef = useRef<HTMLOListElement>(null);
   const enrolDialogRef = useRef<HTMLElement>(null);
   const diffDialogRef = useRef<HTMLElement>(null);
@@ -3680,6 +3682,23 @@ export function ContinuityPrototype() {
             >
               <span>🚨 STAT Triage</span>
             </button>
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={() => setCaregiverBurdenOpen(true)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: '#f0fdfa',
+                borderColor: '#99f6e4',
+                color: '#0f766e',
+                fontWeight: 700,
+              }}
+            >
+              <IconUsers className="w-4 h-4 text-teal-600" />
+              <span>Caregiver ZBI</span>
+            </button>
             {versionPublished && <button className="secondary-button" type="button" onClick={startConversation}>New conversation</button>}
             <button className="primary-button" type="button" onClick={() => navigate('verify')}>{versionPublished ? 'Review checklist' : 'Review summary'}</button>
           </div>,
@@ -5355,6 +5374,24 @@ export function ContinuityPrototype() {
           onApplyOrdersToRecord={(orders) => {
             setToast({ message: `STAT Emergency Orders Recorded: ${orders.slice(0, 35)}...` });
             setEmergencyTriageOpen(false);
+          }}
+        />
+      )}
+
+      {caregiverBurdenOpen && (
+        <CaregiverBurdenMatrix
+          patientId={selectedItem.hospitalId}
+          patientName={selectedItem.patient}
+          caregiverName="Rohan Sharma"
+          caregiverRelation="Son & Primary Healthcare Proxy"
+          caregiverPhone="+91 98450 11234"
+          onClose={() => setCaregiverBurdenOpen(false)}
+          onDispatchRespite={(caregiver, urgency) => {
+            setToast({ message: `Respite Nurse dispatched for ${caregiver} (${urgency})` });
+          }}
+          onSavePlan={(total, tier) => {
+            setToast({ message: `Caregiver Support Plan Saved: ZBI-12 ${total}/48 (${tier})` });
+            setCaregiverBurdenOpen(false);
           }}
         />
       )}
