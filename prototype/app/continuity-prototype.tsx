@@ -24,7 +24,8 @@ import {
 import { PatientHistory, type HistoryEvent } from './patient-history';
 import { reviseSummary, releaseSummary, isSummaryReadyToRelease, invalidateSummaryReview, beginSummaryRevision, latestSummaryRelease, summaryReleaseByNumber, nextSummaryVersion, setSummaryFieldStatus, type DraftFieldKey, type DraftFieldStatus, type SummaryState, type SummaryRelease } from './summary-state';
 import { QuickDemoBar, type DemoRoleOption } from './quick-demo-bar';
-import { IconZap } from './icons';
+import { FhirExportModal } from './fhir-export-modal';
+import { IconZap, IconFileText } from './icons';
 
 type View =
   | 'caregiver'
@@ -837,6 +838,7 @@ export function ContinuityPrototype() {
   const [consentById, setConsentById] = useState<Record<string, ConsentRecord>>({});
   const [cardIssuedById, setCardIssuedById] = useState<Record<string, string>>({});
   const [reviewRequestedById, setReviewRequestedById] = useState<Record<string, string>>({});
+  const [fhirExportOpen, setFhirExportOpen] = useState(false);
   const profileTimelineRef = useRef<HTMLOListElement>(null);
   const enrolDialogRef = useRef<HTMLElement>(null);
   const diffDialogRef = useRef<HTMLElement>(null);
@@ -4078,6 +4080,24 @@ export function ContinuityPrototype() {
                 <button className="secondary-button" type="button" onClick={() => window.print()}>
                   Print
                 </button>
+                <button
+                  className="secondary-button"
+                  style={{
+                    background: '#e6f5ec',
+                    borderColor: '#b4e0c6',
+                    color: '#146b3e',
+                    fontWeight: 650,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                  }}
+                  type="button"
+                  onClick={() => setFhirExportOpen(true)}
+                  title="Export to Ayushman Bharat Digital Mission (ABDM) FHIR R4 Bundle"
+                >
+                  <IconFileText className="w-3.5 h-3.5" />
+                  <span>ABDM FHIR Export</span>
+                </button>
               </div>
             </div>
             {release.number !== currentRelease?.number && <p className="record-boundary">Historical Version {release.number}. The latest released summary is Version {currentRelease?.number}.</p>}
@@ -4999,6 +5019,24 @@ export function ContinuityPrototype() {
             </div></div>
           </section>
         </div>
+      )}
+
+      {fhirExportOpen && (
+        <FhirExportModal
+          patient={{
+            hospitalId: selectedItem.hospitalId,
+            name: selectedItem.patient,
+            dob: selectedProfile.dob,
+            diagnosis: selectedProfile.diagnosis,
+            versionLabel: `Version ${recordStates[selectedItem.hospitalId]?.releases[0]?.number ?? 1}`,
+            verifiedBy: recordStates[selectedItem.hospitalId]?.releases[0]?.physician,
+            verifiedOn: recordStates[selectedItem.hospitalId]?.releases[0]
+              ? releaseDate(recordStates[selectedItem.hospitalId]!.releases[0])
+              : undefined,
+            fields: planFieldsFor(selectedItem.hospitalId),
+          }}
+          onClose={() => setFhirExportOpen(false)}
+        />
       )}
 
       {/* Toast Feedback */}

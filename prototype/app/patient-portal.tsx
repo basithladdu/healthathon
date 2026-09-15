@@ -96,6 +96,59 @@ const ALWAYS_PROVIDED = [
   'Honest, unhurried communication with the patient and the family, every day',
 ];
 
+const ALWAYS_PROVIDED_HI = [
+  'दर्द से पर्याप्त राहत — दवाओं का समय पर उपयोग',
+  'सांस फूलने पर तुरंत आराम — दवाएं, पंखा, और सही स्थिति',
+  'गंभीर बेचैनी और तनाव के लिए शांतिदायक देखभाल',
+  'मतली, उल्टी और अन्य असहज लक्षणों का प्रभावी नियंत्रण',
+  'मुंह और आंखों की नियमित और कोमल देखभाल',
+  'बिस्तर पर घावों से बचाव के लिए आरामदायक स्थिति और एयर गद्दा',
+  'घावों और त्वचा की नियमित देखभाल',
+  'पेट और मूत्राशय की समस्याओं का दैनिक ध्यान',
+  'हर व्यक्तिगत देखभाल में गोपनीयता और पूर्ण मानवीय गरिमा',
+  'परिवार की निरंतर उपस्थिति और आध्यात्मिक सहयोग',
+  'मरीज और परिजनों के साथ प्रतिदिन स्पष्ट और संवेदनशील बातचीत',
+];
+
+const HINDI_TRANSLATIONS: Record<string, { label: string; valueMap?: Record<string, string> }> = {
+  'Goals of care': {
+    label: 'देखभाल के मुख्य लक्ष्य',
+    valueMap: {
+      'Prioritise comfort and quality of life': 'आराम और जीवन की गुणवत्ता को प्राथमिकता देना',
+      'Comfort-focused care': 'आराम-केंद्रित देखभाल',
+      'Balanced care with limits': 'संतुलित देखभाल सीमाओं के साथ',
+    },
+  },
+  'Cardiopulmonary resuscitation': {
+    label: 'कार्डियोपल्मोनरी पुनर्जीवन (CPR)',
+    valueMap: {
+      'Do not attempt CPR (DNACPR)': 'CPR का प्रयास न करें (DNACPR)',
+      'Attempt CPR': 'CPR का प्रयास करें',
+    },
+  },
+  'Ceiling of breathing support': {
+    label: 'सांस सहायता की अधिकतम सीमा',
+    valueMap: {
+      'Non-invasive ventilation (BiPAP/CPAP) or oxygen mask': 'गैर-आक्रामक वेंटिलेशन (BiPAP/CPAP) या मास्क',
+      'Comfort oxygen only': 'केवल आराम के लिए ऑक्सीजन',
+    },
+  },
+  'Hospital transfer': {
+    label: 'अस्पताल में स्थानांतरण',
+    valueMap: {
+      'Only for listed distress or reversible complications': 'केवल गंभीर संकट या ठीक हो सकने वाली समस्याओं के लिए',
+      'Manage at home or hospice; call team first': 'घर या धर्मशाला में प्रबंधन; पहले टीम से संपर्क करें',
+    },
+  },
+  'Preferred place of care': {
+    label: 'देखभाल का पसंदीदा स्थान',
+    valueMap: {
+      'Home with family support': 'परिवार के साथ घर पर',
+      'Hospice or specialized palliative unit': 'हॉस्पिस या प्रशामक देखभाल इकाई',
+    },
+  },
+};
+
 function sameDecisionMaker(a: DecisionMaker, b: DecisionMaker): boolean {
   return a.name === b.name && a.relationship === b.relationship && a.phone === b.phone && a.basis === b.basis;
 }
@@ -115,7 +168,6 @@ function sameDetails(a: PatientDetails, b: PatientDetails): boolean {
     a.localPhysician.phone === b.localPhysician.phone
   );
 }
-
 
 function fieldIcon(label: string) {
   const l = label.toLowerCase();
@@ -141,20 +193,71 @@ export function MyCarePlan(props: {
 }) {
   const { patientName, versionLabel, verifiedBy, verifiedOn, fields, summaryAvailable, hasReleasedVersion, quickView, consent, onGoToConsent } = props;
   const consentForVersion = consent && consent.versionLabel === versionLabel ? consent : null;
+  const [lang, setLang] = useState<'en' | 'hi'>('en');
 
   const spokenPlanText = useMemo(() => {
+    if (lang === 'hi') {
+      const intro = `${patientName} के लिए देखभाल योजना। ${versionLabel}। ${verifiedBy ? `डॉक्टर ${verifiedBy} द्वारा सत्यापित। ` : ''}`;
+      const fieldParts = fields
+        .map((f) => {
+          const trans = HINDI_TRANSLATIONS[f.label];
+          const lbl = trans ? trans.label : f.label;
+          const val = trans?.valueMap?.[f.value] || f.value;
+          return `${lbl}: ${val}`;
+        })
+        .join('. ');
+      const comfortNotice = `दर्द से राहत, सांस में आसानी और सम्मानजनक देखभाल हमेशा प्रदान की जाएगी। `;
+      return `${intro} आपकी मुख्य प्राथमिकताएं: ${fieldParts}. ${comfortNotice}`;
+    }
     const intro = `Care plan for ${patientName}. ${versionLabel}. Verified by ${verifiedBy || 'treating clinical team'}${verifiedOn ? ` on ${verifiedOn}` : ''}. `;
     const fieldParts = fields.map((f) => `${f.label}: ${f.value}`).join('. ');
     const comfortNotice = `Comfort care is always guaranteed. Relief of pain, medication for breathlessness, mouth care, gentle handling, and presence of loved ones will always continue wherever you are. `;
     return `${intro} Key choices: ${fieldParts}. ${comfortNotice}`;
-  }, [patientName, versionLabel, verifiedBy, verifiedOn, fields]);
+  }, [lang, patientName, versionLabel, verifiedBy, verifiedOn, fields]);
 
   return (
     <section className="ptl-page">
-      <div className="ptl-header-row">
+      <div className="ptl-header-row flex items-center justify-between flex-wrap gap-3">
         <div>
-          <span className="ptl-eyebrow">Patient Care Portal</span>
-          <h1 className="ptl-heading">Care plan &amp; Preferences</h1>
+          <span className="ptl-eyebrow">{lang === 'hi' ? 'मरीज देखभाल पोर्टल' : 'Patient Care Portal'}</span>
+          <h1 className="ptl-heading">{lang === 'hi' ? 'देखभाल योजना और प्राथमिकताएं' : 'Care plan & Preferences'}</h1>
+        </div>
+
+        <div className="ptl-lang-toggle" style={{ display: 'inline-flex', padding: '3px', background: '#eef3f0', borderRadius: '8px', border: '1px solid #cbd8d1' }}>
+          <button
+            type="button"
+            style={{
+              padding: '5px 12px',
+              fontSize: '12px',
+              fontWeight: lang === 'en' ? 700 : 500,
+              background: lang === 'en' ? '#ffffff' : 'transparent',
+              color: '#12201b',
+              borderRadius: '6px',
+              border: 'none',
+              cursor: 'pointer',
+              boxShadow: lang === 'en' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+            }}
+            onClick={() => setLang('en')}
+          >
+            English
+          </button>
+          <button
+            type="button"
+            style={{
+              padding: '5px 12px',
+              fontSize: '12px',
+              fontWeight: lang === 'hi' ? 700 : 500,
+              background: lang === 'hi' ? '#ffffff' : 'transparent',
+              color: '#12201b',
+              borderRadius: '6px',
+              border: 'none',
+              cursor: 'pointer',
+              boxShadow: lang === 'hi' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+            }}
+            onClick={() => setLang('hi')}
+          >
+            🇮🇳 हिंदी (Hindi)
+          </button>
         </div>
       </div>
 
@@ -188,40 +291,49 @@ export function MyCarePlan(props: {
       )}
 
       {fields.length === 0 ? (
-        <p className="ptl-empty">Your care team has not released a written summary yet.</p>
+        <p className="ptl-empty">
+          {lang === 'hi' ? 'आपकी देखभाल टीम ने अभी तक लिखित सारांश जारी नहीं किया है।' : 'Your care team has not released a written summary yet.'}
+        </p>
       ) : (
         <dl className="ptl-summary-list">
-          {fields.map((f) => (
-            <div className="ptl-summary-row" key={f.label}>
-              <dt className="ptl-summary-label">
-                <span className="ptl-field-icon" aria-hidden="true">{fieldIcon(f.label)}</span>
-                <span>{f.label}</span>
-              </dt>
-              <dd className="ptl-summary-value">{f.value}</dd>
-            </div>
-          ))}
+          {fields.map((f) => {
+            const trans = lang === 'hi' ? HINDI_TRANSLATIONS[f.label] : null;
+            const displayLabel = trans ? trans.label : f.label;
+            const displayValue = trans?.valueMap?.[f.value] || f.value;
+            return (
+              <div className="ptl-summary-row" key={f.label}>
+                <dt className="ptl-summary-label">
+                  <span className="ptl-field-icon" aria-hidden="true">{fieldIcon(f.label)}</span>
+                  <span>{displayLabel}</span>
+                </dt>
+                <dd className="ptl-summary-value">{displayValue}</dd>
+              </div>
+            );
+          })}
         </dl>
       )}
 
       <div className="ptl-quickview">{quickView}</div>
 
       <details className="ptl-about-summary">
-        <summary>About this summary</summary>
+        <summary>{lang === 'hi' ? 'इस सारांश के बारे में (गारंटीकृत देखभाल)' : 'About this summary'}</summary>
         <div className="ptl-about-summary-body">
           <section className="ptl-section">
-            <h2 className="ptl-h2">What will always be provided</h2>
-        <p className="ptl-body-text">
-          Nothing in this plan reduces care. These will always continue, wherever you are.
-        </p>
-        <div className="ptl-checklist ptl-two-col">
-          {ALWAYS_PROVIDED.map((item) => (
-            <div className="ptl-check-item" key={item}>
-              <span className="ptl-check-mark" aria-hidden="true">✓</span>
-              <span>{item}</span>
+            <h2 className="ptl-h2">{lang === 'hi' ? 'जो देखभाल हमेशा प्रदान की जाएगी' : 'What will always be provided'}</h2>
+            <p className="ptl-body-text">
+              {lang === 'hi'
+                ? 'इस योजना में कुछ भी देखभाल को कम नहीं करता है। आप कहीं भी हों, ये हमेशा जारी रहेंगे।'
+                : 'Nothing in this plan reduces care. These will always continue, wherever you are.'}
+            </p>
+            <div className="ptl-checklist ptl-two-col">
+              {(lang === 'hi' ? ALWAYS_PROVIDED_HI : ALWAYS_PROVIDED).map((item) => (
+                <div className="ptl-check-item" key={item}>
+                  <span className="ptl-check-mark" aria-hidden="true">✓</span>
+                  <span>{item}</span>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      </section>
+          </section>
 
       <section className="ptl-section">
         <h2 className="ptl-h2">Want to change something?</h2>

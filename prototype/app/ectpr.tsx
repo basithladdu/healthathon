@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import QRCode from 'qrcode';
 import { AudioTtsPlayer } from './tts-speech';
+import { OfflineQrScannerModal } from './offline-qr-scanner-modal';
 import {
   IconHeartPulse,
   IconLungs,
@@ -398,6 +399,7 @@ export function EmergencyCard(props: {
     dataUrl: string | null;
     checksum: string | null;
   } | null>(null);
+  const [scannerOpen, setScannerOpen] = useState(false);
   const payload = record && issuedOn ? buildQrPayload(record) : null;
   const currentQr = qrResult?.payload === payload ? qrResult : null;
   const qrDataUrl = currentQr?.dataUrl ?? null;
@@ -482,9 +484,36 @@ export function EmergencyCard(props: {
         </div>
       )}
       {!qrDataUrl && <p role="status">{currentQr ? 'The QR code could not be created. Reopen the card to try again.' : 'Preparing the QR code…'}</p>}
-      <button type="button" className="ectpr-button ectpr-button--primary" onClick={handlePrint} disabled={!qrDataUrl}>
-        Print card
-      </button>
+      <div className="ectpr-actions-row" style={{ display: 'flex', gap: '10px', marginTop: '16px', flexWrap: 'wrap' }}>
+        <button type="button" className="ectpr-button ectpr-button--primary" onClick={handlePrint} disabled={!qrDataUrl}>
+          🖨️ Print card
+        </button>
+        <button
+          type="button"
+          className="ectpr-button secondary-button"
+          style={{
+            background: '#e6f5ec',
+            borderColor: '#b4e0c6',
+            color: '#146b3e',
+            fontWeight: 700,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+          }}
+          onClick={() => setScannerOpen(true)}
+          disabled={!qrDataUrl}
+        >
+          <span>🚑 Paramedic Offline QR Scanner</span>
+        </button>
+      </div>
+
+      {scannerOpen && (
+        <OfflineQrScannerModal
+          record={record}
+          checksum={checksum}
+          onClose={() => setScannerOpen(false)}
+        />
+      )}
     </div>
   );
 }
