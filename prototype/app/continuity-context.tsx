@@ -176,7 +176,8 @@ export type ModalType =
   | 'syringe_driver'
   | 'fhir'
   | 'qr_scanner'
-  | 'map_dispatch';
+  | 'map_dispatch'
+  | 'esas';
 
 export interface ContinuityContextType {
   currentRole: string;

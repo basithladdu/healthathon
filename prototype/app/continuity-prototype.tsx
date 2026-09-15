@@ -29,7 +29,8 @@ import { TreatmentEscalationMatrix } from './tep-matrix';
 import { VoiceDictationBar } from './voice-dictation';
 import { MapLibreDispatchModal } from './maplibre-dispatch';
 import { SyringeDriverCalculator } from './syringe-driver-calculator';
-import { IconZap, IconFileText, IconHeartPulse, IconHospital } from './icons';
+import { EsasSymptomTracker } from './esas-symptom-tracker';
+import { IconZap, IconFileText, IconHeartPulse, IconHospital, IconSparkles } from './icons';
 
 type View =
   | 'caregiver'
@@ -846,6 +847,7 @@ export function ContinuityPrototype() {
   const [tepModalOpen, setTepModalOpen] = useState(false);
   const [mapOpen, setMapOpen] = useState(false);
   const [syringeDriverOpen, setSyringeDriverOpen] = useState(false);
+  const [esasOpen, setEsasOpen] = useState(false);
   const profileTimelineRef = useRef<HTMLOListElement>(null);
   const enrolDialogRef = useRef<HTMLElement>(null);
   const diffDialogRef = useRef<HTMLElement>(null);
@@ -3628,6 +3630,15 @@ export function ContinuityPrototype() {
               <IconMapPin className="w-4 h-4 text-emerald-600" />
               <span>GIS Map</span>
             </button>
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={() => setEsasOpen(true)}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+            >
+              <IconSparkles className="w-4 h-4 text-amber-600" />
+              <span>ESAS Symptoms</span>
+            </button>
             {versionPublished && <button className="secondary-button" type="button" onClick={startConversation}>New conversation</button>}
             <button className="primary-button" type="button" onClick={() => navigate('verify')}>{versionPublished ? 'Review checklist' : 'Review summary'}</button>
           </div>,
@@ -4205,6 +4216,24 @@ export function ContinuityPrototype() {
                   <IconZap className="w-3.5 h-3.5" />
                   <span>Syringe Driver</span>
                 </button>
+                <button
+                  className="secondary-button"
+                  style={{
+                    background: '#fffbeb',
+                    borderColor: '#fde68a',
+                    color: '#b45309',
+                    fontWeight: 650,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                  }}
+                  type="button"
+                  onClick={() => setEsasOpen(true)}
+                  title="Edmonton Symptom Assessment System (ESAS-r) Radar & Tracker"
+                >
+                  <IconSparkles className="w-3.5 h-3.5" />
+                  <span>ESAS Symptoms</span>
+                </button>
               </div>
             </div>
             {release.number !== currentRelease?.number && <p className="record-boundary">Historical Version {release.number}. The latest released summary is Version {currentRelease?.number}.</p>}
@@ -4585,6 +4614,7 @@ export function ContinuityPrototype() {
             quickView={<EdQuickView record={ectprQuickViews[portalPatientId] ?? null} audience="patient" />}
             consent={consentFor(portalPatientId)}
             onGoToConsent={() => navigate('consent')}
+            onOpenSymptomTracker={() => setEsasOpen(true)}
           />
         );
       case 'my-timeline': {
@@ -5178,6 +5208,22 @@ export function ContinuityPrototype() {
               onApplyToCarePlan={(_regimen) => {
                 setToast({ message: 'Syringe driver protocol applied to plan' });
                 setSyringeDriverOpen(false);
+              }}
+            />
+          </section>
+        </div>
+      )}
+
+      {esasOpen && (
+        <div className="modal-backdrop" role="presentation" onMouseDown={(e) => { if (e.target === e.currentTarget) setEsasOpen(false); }}>
+          <section className="modal-panel large-modal" role="dialog" aria-modal="true" aria-labelledby="esas-title" style={{ maxWidth: '960px', width: '96%', padding: 0, overflow: 'hidden' }}>
+            <EsasSymptomTracker
+              patientId={selectedItem.hospitalId}
+              patientName={selectedItem.patient}
+              onClose={() => setEsasOpen(false)}
+              onSave={(_scores, total) => {
+                setToast({ message: `ESAS Symptom Assessment saved (Distress Score: ${total}/90)` });
+                setEsasOpen(false);
               }}
             />
           </section>

@@ -190,8 +190,9 @@ export function MyCarePlan(props: {
   quickView: React.ReactNode;
   consent: ConsentRecord | null;
   onGoToConsent: () => void;
+  onOpenSymptomTracker?: () => void;
 }) {
-  const { patientName, versionLabel, verifiedBy, verifiedOn, fields, summaryAvailable, hasReleasedVersion, quickView, consent, onGoToConsent } = props;
+  const { patientName, versionLabel, verifiedBy, verifiedOn, fields, summaryAvailable, hasReleasedVersion, quickView, consent, onGoToConsent, onOpenSymptomTracker } = props;
   const consentForVersion = consent && consent.versionLabel === versionLabel ? consent : null;
   const [lang, setLang] = useState<'en' | 'hi'>('en');
 
@@ -223,7 +224,30 @@ export function MyCarePlan(props: {
           <h1 className="ptl-heading">{lang === 'hi' ? 'देखभाल योजना और प्राथमिकताएं' : 'Care plan & Preferences'}</h1>
         </div>
 
-        <div className="ptl-lang-toggle" style={{ display: 'inline-flex', padding: '3px', background: '#eef3f0', borderRadius: '8px', border: '1px solid #cbd8d1' }}>
+        <div className="flex items-center gap-2">
+          {onOpenSymptomTracker && (
+            <button
+              type="button"
+              style={{
+                padding: '6px 14px',
+                fontSize: '12.5px',
+                fontWeight: 700,
+                background: '#fef3c7',
+                color: '#92400e',
+                borderRadius: '8px',
+                border: '1px solid #fde68a',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}
+              onClick={onOpenSymptomTracker}
+            >
+              <span>📊 {lang === 'hi' ? 'लक्षण ट्रैकर (ESAS)' : 'Track Symptoms (ESAS)'}</span>
+            </button>
+          )}
+
+          <div className="ptl-lang-toggle" style={{ display: 'inline-flex', padding: '3px', background: '#eef3f0', borderRadius: '8px', border: '1px solid #cbd8d1' }}>
           <button
             type="button"
             style={{
@@ -260,6 +284,7 @@ export function MyCarePlan(props: {
           </button>
         </div>
       </div>
+    </div>
 
       <div className="ptl-status-row">
         <p className="ptl-status-line">
