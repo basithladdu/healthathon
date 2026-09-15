@@ -49,6 +49,7 @@ import { MalignantBowelObstructionModal } from './malignant-bowel-obstruction';
 import { RenalHepaticPalliativeModal } from './renal-hepatic-palliative';
 import { PalliativeRadiotherapyModal } from './palliative-radiotherapy-suite';
 import { SpinalCordCompressionModal } from './spinal-cord-compression-suite';
+import { MalignantHypercalcemiaModal } from './malignant-hypercalcemia-suite';
 import { IconZap, IconFileText, IconHeartPulse, IconHospital, IconSparkles } from './icons';
 
 type View =
@@ -885,6 +886,7 @@ export function ContinuityPrototype() {
   const [renalHepaticOpen, setRenalHepaticOpen] = useState(false);
   const [radiotherapyOpen, setRadiotherapyOpen] = useState(false);
   const [cordCompressionOpen, setCordCompressionOpen] = useState(false);
+  const [hypercalcemiaOpen, setHypercalcemiaOpen] = useState(false);
   const profileTimelineRef = useRef<HTMLOListElement>(null);
   const enrolDialogRef = useRef<HTMLElement>(null);
   const diffDialogRef = useRef<HTMLElement>(null);
@@ -3953,6 +3955,22 @@ export function ContinuityPrototype() {
             >
               <span>⚡ Cord Compression</span>
             </button>
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={() => setHypercalcemiaOpen(true)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: '#fff7ed',
+                borderColor: '#fed7aa',
+                color: '#c2410c',
+                fontWeight: 700,
+              }}
+            >
+              <span>🧪 Hypercalcemia</span>
+            </button>
             {versionPublished && <button className="secondary-button" type="button" onClick={startConversation}>New conversation</button>}
             <button className="primary-button" type="button" onClick={() => navigate('verify')}>{versionPublished ? 'Review checklist' : 'Review summary'}</button>
           </div>,
@@ -5816,6 +5834,18 @@ export function ContinuityPrototype() {
           onClose={() => setCordCompressionOpen(false)}
           onDispatchPlan={(summary) => {
             setToast({ message: `MSCC Protocol Dispatched: ${summary}` });
+          }}
+        />
+      )}
+
+      {hypercalcemiaOpen && (
+        <MalignantHypercalcemiaModal
+          patientId={selectedItem.hospitalId}
+          patientName={selectedItem.patient}
+          primaryCancer={selectedProfile?.diagnosis || 'Metastatic Oncology Disease'}
+          onClose={() => setHypercalcemiaOpen(false)}
+          onDispatchPlan={(summary) => {
+            setToast({ message: `Hypercalcemia Protocol Dispatched: ${summary}` });
           }}
         />
       )}
