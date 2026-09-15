@@ -39,6 +39,7 @@ import { PalliativeSedationCrisisModal } from './palliative-sedation-crisis';
 import { LongitudinalTrajectoryTimeline } from './longitudinal-trajectory-timeline';
 import { AnticipatoryDrugBoxModal } from './anticipatory-drug-box';
 import { MalignantWoundCareModal } from './malignant-wound-care';
+import { BoneMetastasesSinsModal } from './bone-metastases-sins';
 import { IconZap, IconFileText, IconHeartPulse, IconHospital, IconSparkles } from './icons';
 
 type View =
@@ -865,6 +866,7 @@ export function ContinuityPrototype() {
   const [trajectoryTimelineOpen, setTrajectoryTimelineOpen] = useState(false);
   const [drugBoxOpen, setDrugBoxOpen] = useState(false);
   const [woundCareOpen, setWoundCareOpen] = useState(false);
+  const [boneSinsOpen, setBoneSinsOpen] = useState(false);
   const profileTimelineRef = useRef<HTMLOListElement>(null);
   const enrolDialogRef = useRef<HTMLElement>(null);
   const diffDialogRef = useRef<HTMLElement>(null);
@@ -3773,6 +3775,22 @@ export function ContinuityPrototype() {
             >
               <span>🩹 Malignant Wound</span>
             </button>
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={() => setBoneSinsOpen(true)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: '#eef2ff',
+                borderColor: '#c7d2fe',
+                color: '#4338ca',
+                fontWeight: 700,
+              }}
+            >
+              <span>🦴 Bone Met SINS</span>
+            </button>
             {versionPublished && <button className="secondary-button" type="button" onClick={startConversation}>New conversation</button>}
             <button className="primary-button" type="button" onClick={() => navigate('verify')}>{versionPublished ? 'Review checklist' : 'Review summary'}</button>
           </div>,
@@ -5516,6 +5534,18 @@ export function ContinuityPrototype() {
           onClose={() => setWoundCareOpen(false)}
           onDispatchKit={(summary) => {
             setToast({ message: `ASHA Home Wound Dressing Kit Dispatched: ${summary}` });
+          }}
+        />
+      )}
+
+      {boneSinsOpen && (
+        <BoneMetastasesSinsModal
+          patientId={selectedItem.hospitalId}
+          patientName={selectedItem.patient}
+          primaryCancer={selectedProfile?.diagnosis || 'Metastatic Oncology Disease'}
+          onClose={() => setBoneSinsOpen(false)}
+          onDispatchReferral={(summary) => {
+            setToast({ message: `Spine / RT Referral Dispatched: ${summary}` });
           }}
         />
       )}
