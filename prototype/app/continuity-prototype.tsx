@@ -42,6 +42,7 @@ import { MalignantWoundCareModal } from './malignant-wound-care';
 import { BoneMetastasesSinsModal } from './bone-metastases-sins';
 import { CachexiaAscitesModal } from './cachexia-ascites-protocol';
 import { NeuropathicPainBlocksModal } from './neuropathic-pain-blocks';
+import { BreathlessnessCrisisModal } from './breathlessness-crisis-engine';
 import { IconZap, IconFileText, IconHeartPulse, IconHospital, IconSparkles } from './icons';
 
 type View =
@@ -871,6 +872,7 @@ export function ContinuityPrototype() {
   const [boneSinsOpen, setBoneSinsOpen] = useState(false);
   const [cachexiaAscitesOpen, setCachexiaAscitesOpen] = useState(false);
   const [neuropathicBlocksOpen, setNeuropathicBlocksOpen] = useState(false);
+  const [breathlessnessCrisisOpen, setBreathlessnessCrisisOpen] = useState(false);
   const profileTimelineRef = useRef<HTMLOListElement>(null);
   const enrolDialogRef = useRef<HTMLElement>(null);
   const diffDialogRef = useRef<HTMLElement>(null);
@@ -3827,6 +3829,22 @@ export function ContinuityPrototype() {
             >
               <span>⚡ Neuropathic Blocks</span>
             </button>
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={() => setBreathlessnessCrisisOpen(true)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: '#f0f9ff',
+                borderColor: '#bae6fd',
+                color: '#0369a1',
+                fontWeight: 700,
+              }}
+            >
+              <span>🫁 Dyspnea Crisis</span>
+            </button>
             {versionPublished && <button className="secondary-button" type="button" onClick={startConversation}>New conversation</button>}
             <button className="primary-button" type="button" onClick={() => navigate('verify')}>{versionPublished ? 'Review checklist' : 'Review summary'}</button>
           </div>,
@@ -5606,6 +5624,18 @@ export function ContinuityPrototype() {
           onClose={() => setNeuropathicBlocksOpen(false)}
           onDispatchReferral={(summary) => {
             setToast({ message: `Interventional Referral Dispatched: ${summary}` });
+          }}
+        />
+      )}
+
+      {breathlessnessCrisisOpen && (
+        <BreathlessnessCrisisModal
+          patientId={selectedItem.hospitalId}
+          patientName={selectedItem.patient}
+          primaryCancer={selectedProfile?.diagnosis || 'Metastatic Oncology Disease'}
+          onClose={() => setBreathlessnessCrisisOpen(false)}
+          onDispatchOrder={(summary) => {
+            setToast({ message: `Dyspnea Protocol Dispatched: ${summary}` });
           }}
         />
       )}
