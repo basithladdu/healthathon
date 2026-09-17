@@ -99,8 +99,9 @@ export function LandingPage(props: {
   onFamilyAccess: () => void;
   onPatientAccess?: () => void;
   onQuickEnterRole?: (role: 'dr-sujay' | 'dr-isha' | 'anitha' | 'patient' | 'family') => void;
+  onOpenOpsHub?: (tab: 'map' | 'qr' | 'context' | 'mro') => void;
 }): React.JSX.Element {
-  const { onSignIn, onSignUp, onExploreDemo, onFamilyAccess, onPatientAccess, onQuickEnterRole } = props;
+  const { onSignIn, onSignUp, onExploreDemo, onFamilyAccess, onPatientAccess, onQuickEnterRole, onOpenOpsHub } = props;
   const goToPatient = onPatientAccess ?? onFamilyAccess;
 
   const handleQuickRole = (role: 'dr-sujay' | 'dr-isha' | 'anitha' | 'patient' | 'family') => {
@@ -124,6 +125,10 @@ export function LandingPage(props: {
           </div>
         </div>
         <div className="lp-nav-actions">
+          <button type="button" className="lp-nav-btn lp-nav-btn-highlight" onClick={() => onOpenOpsHub?.('map')}>
+            <IconZap className="w-3.5 h-3.5 text-emerald-700" />
+            <span>Ops Hub</span>
+          </button>
           <button type="button" className="lp-nav-btn lp-nav-btn-highlight" onClick={() => handleQuickRole('dr-sujay')}>
             <IconZap className="w-3.5 h-3.5 text-emerald-700" />
             <span>1-Click Demo</span>
@@ -190,6 +195,42 @@ export function LandingPage(props: {
               <span>Goal-of-Care Dialogue: Anchored to authentic patient preferences</span>
             </div>
           </figure>
+        </section>
+
+        {/* P0 Continuity OS — MapLibre / QR / Context / MRO */}
+        <section className="lp-os-section" aria-labelledby="lp-os-title">
+          <p className="lp-kicker">P0 Continuity OS</p>
+          <h2 id="lp-os-title">MapLibre · QR · Context · MRO</h2>
+          <p>
+            Clickable operating surfaces judges can open from the website: live GIS dispatch, opaque handoff QR with
+            clinic check-in, continuity context audit, and a sealed Medical Record Object vault.
+          </p>
+          <div className="lp-os-grid">
+            <button type="button" className="lp-os-card" onClick={() => onOpenOpsHub?.('map')}>
+              <span className="lp-os-card-tag">MapLibre GL</span>
+              <strong>Community GIS dispatch</strong>
+              <span>Fly Bangalore palliative cohorts, dispatch ASHA / 108, and watch live en-route telemetry.</span>
+              <em>Open map →</em>
+            </button>
+            <button type="button" className="lp-os-card" onClick={() => onOpenOpsHub?.('qr')}>
+              <span className="lp-os-card-tag">QR Bridge</span>
+              <strong>Check-in &amp; handoff unlock</strong>
+              <span>Generate an opaque locator QR, then simulate clinic desk check-in or ED unlock.</span>
+              <em>Open QR →</em>
+            </button>
+            <button type="button" className="lp-os-card" onClick={() => onOpenOpsHub?.('context')}>
+              <span className="lp-os-card-tag">Context Check</span>
+              <strong>Live continuity audit</strong>
+              <span>Inspect session, role, patient, geo, dispatch, and seal readiness with pass/fail gates.</span>
+              <em>Run audit →</em>
+            </button>
+            <button type="button" className="lp-os-card" onClick={() => onOpenOpsHub?.('mro')}>
+              <span className="lp-os-card-tag">MRO Vault</span>
+              <strong>Medical Record Object</strong>
+              <span>Seal, inspect, and integrity-check the portable verified continuity object.</span>
+              <em>Open MRO →</em>
+            </button>
+          </div>
         </section>
 
         {/* 1-Click Fast Switcher Hub */}

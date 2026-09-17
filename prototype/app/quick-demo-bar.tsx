@@ -17,8 +17,9 @@ export function QuickDemoBar(props: {
   onGoHome: () => void;
   onFastAction?: (action: 'break-glass' | 'verify-release' | 'patient-consent') => void;
   onOpenMap?: () => void;
+  onOpenOpsHub?: (tab?: 'map' | 'qr' | 'context' | 'mro') => void;
 }) {
-  const { currentSession, currentRole, onSelectRole, onGoHome, onFastAction, onOpenMap } = props;
+  const { currentSession, currentRole, onSelectRole, onGoHome, onFastAction, onOpenMap, onOpenOpsHub } = props;
   const [collapsed, setCollapsed] = useState(false);
 
   const activeId: DemoRoleOption =
@@ -112,12 +113,12 @@ export function QuickDemoBar(props: {
         </div>
 
         <div className="quick-demo-actions">
-          {onOpenMap && (
+          {(onOpenOpsHub || onOpenMap) && (
             <button
               type="button"
               className="quick-demo-map-btn"
-              onClick={onOpenMap}
-              title="Open MapLibre GL Community GIS & Transit Dispatch Map"
+              onClick={() => (onOpenOpsHub ? onOpenOpsHub('map') : onOpenMap?.())}
+              title="Open Continuity Ops Hub (MapLibre · QR · Context · MRO)"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -133,7 +134,30 @@ export function QuickDemoBar(props: {
                 transition: 'all 0.15s ease',
               }}
             >
-              <span>🗺️ GIS Map</span>
+              <span>🗺️ Ops Hub</span>
+            </button>
+          )}
+          {onOpenOpsHub && (
+            <button
+              type="button"
+              className="quick-demo-map-btn"
+              onClick={() => onOpenOpsHub('mro')}
+              title="Open Medical Record Object vault"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+                padding: '6px 11px',
+                borderRadius: '8px',
+                fontSize: '12px',
+                fontWeight: 750,
+                background: '#0a2118',
+                color: '#d9ef75',
+                border: 'none',
+                cursor: 'pointer',
+              }}
+            >
+              <span>MRO</span>
             </button>
           )}
           <button

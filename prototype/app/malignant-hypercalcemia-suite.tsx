@@ -1358,7 +1358,7 @@ export function MalignantHypercalcemiaModal({
                     1. ST-Segment Obliteration (Short Phase 2 Plateau)
                   </h4>
                   <p style={{ margin: 0, fontSize: '12px', color: '#475569', lineHeight: 1.5 }}>
-                    Extracellular hypercalcemia enhances L-type calcium channel current ($I_{Ca-L}$), accelerating Phase 2 repolarization of ventricular myocytes. The ST segment contracts or virtually disappears, causing the T-wave to emerge directly from the S-wave.
+                    Extracellular hypercalcemia enhances L-type calcium channel current (I_Ca-L), accelerating Phase 2 repolarization of ventricular myocytes. The ST segment contracts or virtually disappears, causing the T-wave to emerge directly from the S-wave.
                   </p>
                 </div>
 

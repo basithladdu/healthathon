@@ -458,8 +458,8 @@ export function SignupScreen(props: {
   );
 }
 
-export type FamilyMember = { name: string; relationship: string; patientId: string };
-export type PatientAccount = { hospitalId: string; name: string };
+export type FamilyMember = { name: string; relationship: string; patientId: string; verifiedSummaryOnly?: boolean };
+export type PatientAccount = { hospitalId: string; name: string; dob?: string };
 
 const FAMILY_RELATIONSHIPS = [
   'I am the patient',

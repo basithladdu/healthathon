@@ -28,6 +28,7 @@ import { FhirExportModal } from './fhir-export-modal';
 import { TreatmentEscalationMatrix } from './tep-matrix';
 import { VoiceDictationBar } from './voice-dictation';
 import { MapLibreDispatchModal } from './maplibre-dispatch';
+import { ContinuityOpsHub, type OpsHubTab } from './continuity-ops-hub';
 import { SyringeDriverCalculator } from './syringe-driver-calculator';
 import { EsasSymptomTracker } from './esas-symptom-tracker';
 import { PalliativeDeprescribingMatrix } from './palliative-deprescribing';
@@ -111,6 +112,8 @@ type AuditEvent = {
   event: string;
   record: string;
   badge?: 'PUBLISH' | 'OUTREACH' | 'ACCESS' | 'ENROL' | 'VIEW' | 'SCHEDULE' | 'PATIENT';
+  detail?: string;
+  securityImpact?: string;
 };
 
 type OutreachRecord = {
@@ -194,6 +197,7 @@ const patientProfiles: Record<
     dob: string;
     sex: string;
     programs: string[];
+    diagnosis?: string;
   }
 > = {
   'CANCER-20418': {
@@ -867,6 +871,9 @@ export function ContinuityPrototype() {
   const [fhirExportOpen, setFhirExportOpen] = useState(false);
   const [tepModalOpen, setTepModalOpen] = useState(false);
   const [mapOpen, setMapOpen] = useState(false);
+  const [opsHubOpen, setOpsHubOpen] = useState(false);
+  const [opsHubTab, setOpsHubTab] = useState<OpsHubTab>('map');
+  const [clinicCheckInNote, setClinicCheckInNote] = useState<string | null>(null);
   const [syringeDriverOpen, setSyringeDriverOpen] = useState(false);
   const [esasOpen, setEsasOpen] = useState(false);
   const [deprescribingOpen, setDeprescribingOpen] = useState(false);
@@ -1167,6 +1174,10 @@ export function ContinuityPrototype() {
     sex: 'Not recorded',
     programs: ['Goals-of-care continuity'],
   };
+  // Profiles carry `stage` (e.g. "Stage IV NSCLC · Continuity Cohort A"); the
+  // leading clause is the working diagnosis used on exports and handoff cards.
+  const selectedDiagnosis: string =
+    selectedProfile.diagnosis ?? selectedProfile.stage.split(' · ')[0];
 
   const portalPatientId = isPatientSession
     ? (patientAccount?.hospitalId ?? 'CANCER-20418')
@@ -1532,6 +1543,88 @@ export function ContinuityPrototype() {
 
   function beginEmergencyRetrieval() {
     beginRetrievalFor('CANCER-20418');
+  }
+
+  function openOpsHub(tab: OpsHubTab = 'map') {
+    setOpsHubTab(tab);
+    setOpsHubOpen(true);
+  }
+
+  function renderContinuityOpsHub(session: 'care-team' | 'family' | 'patient' | 'landing') {
+    const release = latestSummaryRelease(recordStates[selectedId] ?? createInitialRecordState(selectedId));
+    const ready = patientHasApprovedSummary(selectedId);
+    const unlocked = Boolean((recordStates[selectedId] ?? createInitialRecordState(selectedId)).retrievalUnlocked);
+    return (
+      <ContinuityOpsHub
+        open={opsHubOpen}
+        initialTab={opsHubTab}
+        sessionType={session}
+        currentRole={currentRole}
+        patientName={selectedItem.patient}
+        hospitalId={selectedItem.hospitalId}
+        diagnosis={selectedProfile.stage}
+        versionLabel={release ? `Version ${release.number}` : 'Version 1'}
+        verifiedBy={release?.physician}
+        verifiedOn={release ? releaseDate(release) : undefined}
+        summaryReady={ready}
+        retrievalUnlocked={unlocked}
+        cprStatus={selectedItem.hospitalId === 'CANCER-20377' ? 'dnacpr' : 'full_cpr'}
+        onClose={() => setOpsHubOpen(false)}
+        onClinicCheckIn={(payload) => {
+          setClinicCheckInNote(
+            `Clinic QR check-in · ${payload.hospitalId} · ${payload.checkedInAt} · locator ${payload.locator}`,
+          );
+          setAuditEvents((events) => [
+            {
+              id: `AUDIT-QR-${Date.now().toString().slice(-4)}`,
+              time: 'Just now',
+              actor: currentRole,
+              event: 'Clinic QR check-in',
+              record: `${selectedItem.patient} · ${payload.locator}`,
+              badge: 'SCHEDULE',
+              patientId: payload.hospitalId,
+            },
+            ...events,
+          ]);
+          setToast({ message: `Clinic check-in recorded for ${selectedItem.patient}` });
+        }}
+        onUnlockHandoff={(hospitalId) => {
+          if (!ready) {
+            setToast({ message: 'No sealed summary yet — handoff unlock blocked.' });
+            return;
+          }
+          updateRecordState(hospitalId, (current) => ({
+            ...current,
+            retrievalReason: 'Emergency hand-off retrieval (QR opaque locator)',
+            careRelationship: 'Emergency receiving physician',
+            retrievalAcknowledged: true,
+            retrievalUnlocked: true,
+            retrievalVersion: latestSummaryRelease(current)?.number ?? null,
+            unlockedVersion: latestSummaryRelease(current)?.number ?? null,
+          }));
+          setToast({ message: `ED QR unlock applied for ${hospitalId}` });
+          if (session !== 'landing') {
+            setOpsHubOpen(false);
+            navigate('retrieve');
+          }
+        }}
+        onSealMro={(mroId) => {
+          setAuditEvents((events) => [
+            {
+              id: `AUDIT-MRO-${Date.now().toString().slice(-4)}`,
+              time: 'Just now',
+              actor: currentRole,
+              event: 'Medical Record Object sealed',
+              record: mroId,
+              badge: 'PUBLISH',
+              patientId: selectedItem.hospitalId,
+            },
+            ...events,
+          ]);
+          setToast({ message: `MRO sealed · ${mroId}` });
+        }}
+      />
+    );
   }
 
   function handleFastRoleSelect(roleOption: DemoRoleOption) {
@@ -2178,12 +2271,42 @@ export function ContinuityPrototype() {
             <div className="care-day-actions">
               <button className="primary-button" type="button" onClick={() => navigate('appointments')}><IconCalendar className="w-4 h-4" />Appointments</button>
               <button className="care-day-link" type="button" onClick={() => navigate('guide')}>Open conversation <span aria-hidden="true">↗</span></button>
+              <button className="care-day-link" type="button" onClick={() => openOpsHub('map')}>Ops Hub <span aria-hidden="true">↗</span></button>
             </div>
           </div>
           <div className="care-day-photo">
             <Image src="/care-consultation.jpg" alt="A clinician listening to a patient during a consultation" fill sizes="(max-width: 600px) 40vw, 440px" priority />
           </div>
         </section>
+
+        <section className="care-day-os" aria-label="Continuity OS features">
+          <button type="button" onClick={() => openOpsHub('map')}>
+            <span className="os-tag">MapLibre</span>
+            <strong>GIS dispatch map</strong>
+            <small>Live ASHA / 108 routing over Bangalore palliative cohort</small>
+          </button>
+          <button type="button" onClick={() => openOpsHub('qr')}>
+            <span className="os-tag">QR Bridge</span>
+            <strong>Check-in / handoff QR</strong>
+            <small>Opaque locator QR that mutates clinic &amp; ED demo state</small>
+          </button>
+          <button type="button" onClick={() => openOpsHub('context')}>
+            <span className="os-tag">Context</span>
+            <strong>Continuity audit</strong>
+            <small>Pass/fail gates on session, patient, geo, seal readiness</small>
+          </button>
+          <button type="button" onClick={() => openOpsHub('mro')}>
+            <span className="os-tag">MRO</span>
+            <strong>Medical Record Object</strong>
+            <small>Seal + integrity-check the portable verified object</small>
+          </button>
+        </section>
+
+        {clinicCheckInNote && (
+          <p className="th-footnote" role="status" style={{ marginTop: 0, marginBottom: 12, color: '#0c5c3f', fontWeight: 650 }}>
+            {clinicCheckInNote}
+          </p>
+        )}
 
         <section className="care-day-stats" aria-label="Follow-up overview">
           <button type="button" onClick={() => { setActiveFilter('Due today'); navigate('worklist'); }}><strong>{counts.dueToday}</strong><span>Due today</span><span className="stat-arrow" aria-hidden="true">↗</span></button>
@@ -4385,10 +4508,12 @@ export function ContinuityPrototype() {
                     setAuditEvents((events) => [
                       {
                         id: `AUDIT-${Date.now().toString().slice(-4)}`,
-                        actor: 'Dr Isha Menon · Emergency physician',
-                        action: 'Retrieved verified summary (Break-glass)',
-                        target: `${selectedItem.patient} · Version ${targetVersion}`,
+                        time: 'Just now',
                         timestamp: 'Just now',
+                        actor: 'Dr Isha Menon · Emergency physician',
+                        event: 'Retrieved verified summary (Break-glass)',
+                        record: `${selectedItem.patient} · Version ${targetVersion}`,
+                        badge: 'ACCESS',
                         detail: 'Emergency hand-off retrieval (Break-glass) · 1-Click Protocol',
                         securityImpact: 'Critical emergency retrieval logged',
                       },
@@ -5182,7 +5307,8 @@ export function ContinuityPrototype() {
           currentRole={currentRole}
           onSelectRole={handleFastRoleSelect}
           onGoHome={() => setAuthScreen('landing')}
-          onOpenMap={() => setMapOpen(true)}
+          onOpenMap={() => openOpsHub('map')}
+          onOpenOpsHub={openOpsHub}
         />
         <LandingPage
           onSignIn={() => setAuthScreen('login')}
@@ -5191,7 +5317,10 @@ export function ContinuityPrototype() {
           onFamilyAccess={() => setAuthScreen('family')}
           onPatientAccess={() => setAuthScreen('patient')}
           onQuickEnterRole={handleFastRoleSelect}
+          onOpenOpsHub={openOpsHub}
         />
+        {renderContinuityOpsHub('landing')}
+        {mapOpen && <MapLibreDispatchModal onClose={() => setMapOpen(false)} />}
       </>
     );
   }
@@ -5255,7 +5384,8 @@ export function ContinuityPrototype() {
         currentRole={currentRole}
         onSelectRole={handleFastRoleSelect}
         onGoHome={() => setAuthScreen('landing')}
-        onOpenMap={() => setMapOpen(true)}
+        onOpenMap={() => openOpsHub('map')}
+        onOpenOpsHub={openOpsHub}
       />
       <main className={isPatientSession || isFamilySession ? 'app-shell is-portal' : 'app-shell'}>
       {/* Sidebar Navigation */}
@@ -5538,10 +5668,12 @@ export function ContinuityPrototype() {
             setAuditEvents((events) => [
               {
                 id: `AUDIT-${Date.now().toString().slice(-4)}`,
-                actor: currentRole,
-                action: 'Endorsed version handoff',
-                target: `${selectedItem.patient} · V${vFrom} → V${vTo}`,
+                time: 'Just now',
                 timestamp: 'Just now',
+                actor: currentRole,
+                event: 'Endorsed version handoff',
+                record: `${selectedItem.patient} · V${vFrom} → V${vTo}`,
+                badge: 'PUBLISH',
                 detail: `Clinical transition handoff endorsement from Version ${vFrom} to Version ${vTo}`,
                 securityImpact: 'Routine clinical transition audit logged',
               },
@@ -5558,7 +5690,7 @@ export function ContinuityPrototype() {
             hospitalId: selectedItem.hospitalId,
             name: selectedItem.patient,
             dob: selectedProfile.dob,
-            diagnosis: selectedProfile.diagnosis,
+            diagnosis: selectedDiagnosis,
             versionLabel: `Version ${recordStates[selectedItem.hospitalId]?.releases[0]?.number ?? 1}`,
             verifiedBy: recordStates[selectedItem.hospitalId]?.releases[0]?.physician,
             verifiedOn: recordStates[selectedItem.hospitalId]?.releases[0]
@@ -5589,6 +5721,8 @@ export function ContinuityPrototype() {
       {mapOpen && (
         <MapLibreDispatchModal onClose={() => setMapOpen(false)} />
       )}
+
+      {renderContinuityOpsHub(sessionType)}
 
       {syringeDriverOpen && (
         <div className="modal-backdrop" role="presentation" onMouseDown={(e) => { if (e.target === e.currentTarget) setSyringeDriverOpen(false); }}>
