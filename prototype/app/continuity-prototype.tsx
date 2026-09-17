@@ -52,6 +52,7 @@ import { PalliativeRadiotherapyModal } from './palliative-radiotherapy-suite';
 import { SpinalCordCompressionModal } from './spinal-cord-compression-suite';
 import { MalignantHypercalcemiaModal } from './malignant-hypercalcemia-suite';
 import { SvcoThoracicDecompressionModal } from './svco-thoracic-decompression-suite';
+import { BleedCrisisModal } from './bleed-crisis';
 import { IconZap, IconFileText, IconHeartPulse, IconHospital, IconSparkles } from './icons';
 
 type View =
@@ -896,6 +897,7 @@ export function ContinuityPrototype() {
   const [cordCompressionOpen, setCordCompressionOpen] = useState(false);
   const [hypercalcemiaOpen, setHypercalcemiaOpen] = useState(false);
   const [svcoOpen, setSvcoOpen] = useState(false);
+  const [bleedCrisisOpen, setBleedCrisisOpen] = useState(false);
   const profileTimelineRef = useRef<HTMLOListElement>(null);
   const enrolDialogRef = useRef<HTMLElement>(null);
   const diffDialogRef = useRef<HTMLElement>(null);
@@ -4112,6 +4114,22 @@ export function ContinuityPrototype() {
             >
               <span>🫀 SVCO Crisis</span>
             </button>
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={() => setBleedCrisisOpen(true)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: '#450a0a',
+                borderColor: '#450a0a',
+                color: '#fecaca',
+                fontWeight: 700,
+              }}
+            >
+              <span>🩸 Bleeding</span>
+            </button>
             {versionPublished && <button className="secondary-button" type="button" onClick={startConversation}>New conversation</button>}
             <button className="primary-button" type="button" onClick={() => navigate('verify')}>{versionPublished ? 'Review checklist' : 'Review summary'}</button>
           </div>,
@@ -6010,6 +6028,31 @@ export function ContinuityPrototype() {
           onClose={() => setSvcoOpen(false)}
           onDispatchPlan={(summary) => {
             setToast({ message: `SVCO Decompression Protocol Dispatched: ${summary}` });
+          }}
+        />
+      )}
+
+      {bleedCrisisOpen && (
+        <BleedCrisisModal
+          patientId={selectedItem.hospitalId}
+          patientName={selectedItem.patient}
+          primaryCancer={selectedDiagnosis}
+          onClose={() => setBleedCrisisOpen(false)}
+          onDispatchPlan={(summary) => {
+            setAuditEvents((events) => [
+              {
+                id: `AUDIT-BLEED-${Date.now().toString().slice(-4)}`,
+                time: 'Just now',
+                actor: currentRole,
+                event: 'Bleeding plan recorded',
+                record: `${selectedItem.patient} · ${summary}`,
+                badge: 'PUBLISH',
+                patientId: selectedItem.hospitalId,
+                detail: summary,
+              },
+              ...events,
+            ]);
+            setToast({ message: `Bleeding plan in the record — ${summary.split('.')[0]}` });
           }}
         />
       )}
