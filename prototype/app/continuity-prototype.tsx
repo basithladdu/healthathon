@@ -53,6 +53,7 @@ import { SpinalCordCompressionModal } from './spinal-cord-compression-suite';
 import { MalignantHypercalcemiaModal } from './malignant-hypercalcemia-suite';
 import { SvcoThoracicDecompressionModal } from './svco-thoracic-decompression-suite';
 import { BleedCrisisModal } from './bleed-crisis';
+import { ScenarioReviewModal } from './scenario-review';
 import { IconZap, IconFileText, IconHeartPulse, IconHospital, IconSparkles } from './icons';
 
 type View =
@@ -898,6 +899,7 @@ export function ContinuityPrototype() {
   const [hypercalcemiaOpen, setHypercalcemiaOpen] = useState(false);
   const [svcoOpen, setSvcoOpen] = useState(false);
   const [bleedCrisisOpen, setBleedCrisisOpen] = useState(false);
+  const [scenarioReviewOpen, setScenarioReviewOpen] = useState(false);
   const profileTimelineRef = useRef<HTMLOListElement>(null);
   const enrolDialogRef = useRef<HTMLElement>(null);
   const diffDialogRef = useRef<HTMLElement>(null);
@@ -5045,6 +5047,47 @@ export function ContinuityPrototype() {
       <>
         {renderPageHeading('History', 'Recent activity')}
 
+        <div
+          style={{
+            display: 'flex',
+            gap: '12px',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            marginBottom: '14px',
+            padding: '13px 16px',
+            borderRadius: '11px',
+            border: '1px solid #cbd5e1',
+            background: '#0f172a',
+          }}
+        >
+          <div>
+            <strong style={{ display: 'block', fontSize: '13px', color: '#ffffff' }}>
+              Twenty simulated conversations
+            </strong>
+            <small style={{ fontSize: '12px', color: '#94a3b8' }}>
+              The workflow review the clinical leads asked for, scored on the seven agreed measures.
+            </small>
+          </div>
+          <button
+            type="button"
+            onClick={() => setScenarioReviewOpen(true)}
+            style={{
+              padding: '9px 16px',
+              borderRadius: '8px',
+              border: 'none',
+              background: '#d9ef75',
+              color: '#0a2118',
+              fontSize: '13px',
+              fontWeight: 800,
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            Run the review
+          </button>
+        </div>
+
         <div className="filter-row mb-4 rounded-lg border border-line bg-surface p-2 flex items-center gap-3">
           <span className="text-xs font-semibold text-muted pl-2">Filter by Actor:</span>
           {['All', 'Dr Sujay', 'Dr Isha Menon', 'Anitha Rao', 'Kavya Raghavan'].map((actor) => (
@@ -6053,6 +6096,26 @@ export function ContinuityPrototype() {
               ...events,
             ]);
             setToast({ message: `Bleeding plan in the record — ${summary.split('.')[0]}` });
+          }}
+        />
+      )}
+
+      {scenarioReviewOpen && (
+        <ScenarioReviewModal
+          onClose={() => setScenarioReviewOpen(false)}
+          onRecordResult={(line) => {
+            setAuditEvents((events) => [
+              {
+                id: `AUDIT-SIM-${Date.now().toString().slice(-4)}`,
+                time: 'Just now',
+                actor: currentRole,
+                event: 'Workflow review run',
+                record: line,
+                badge: 'PUBLISH',
+              },
+              ...events,
+            ]);
+            setToast({ message: line });
           }}
         />
       )}

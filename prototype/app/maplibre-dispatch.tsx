@@ -37,7 +37,7 @@ export function MapLibreDispatchModal({ onClose }: { onClose: () => void }) {
   useEffect(() => {
     if (!mapContainerRef.current) return;
 
-    // Open-source MapLibre raster style using CartoDB Positron / OSM
+    // Keyless OpenStreetMap raster tiles; CARTO's basemaps now require an API key.
     const map = new maplibregl.Map({
       container: mapContainerRef.current,
       style: {
@@ -46,11 +46,10 @@ export function MapLibreDispatchModal({ onClose }: { onClose: () => void }) {
           'osm-tiles': {
             type: 'raster',
             tiles: [
-              'https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png',
-              'https://b.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png',
+              'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
             ],
             tileSize: 256,
-            attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+            attribution: '&copy; OpenStreetMap contributors',
           },
         },
         layers: [
