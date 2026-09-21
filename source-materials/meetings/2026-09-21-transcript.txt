@@ -1,0 +1,1209 @@
+I'm in the meeting. I'm in the meeting. Yeah, I'll call Sharon once. Hello. 
+
+Yeah, I can hear you. 
+
+All right. Yeah. Okay. No problem. I think Shir is 
+
+not online. 
+
+Okay. 
+
+I'll just give her the transcript of the meeting. It's okay. 
+
+Okay. 
+
+Yeah. How 
+
+you know that you have like an AI thing? 
+
+Uh no. Uh I'm recording on my like uh what do you say? My iPhone. Yeah. So I think it has a task thing on the voice me thing. Oh okay, got it. 
+
+Yeah. How are you? 
+
+Where did you go for the conference? Like what happened in the conference? 
+
+Uh it was a permanent medicine conference uh by the European Restorative Society. 
+
+Okay. 
+
+Um yeah, it was in Barcelona. So I was there and then just around and then came back. 
+
+Got it. Got it. Nice. 
+
+Yeah, it was fun. It was okay. 
+
+Yeah. I think there's a problem with the channel. 
+
+Yeah, I don't know. She's not able to join. 
+
+Uh she said she's trying to sign in but I don't know. She got issue. 
+
+How do you know that? 
+
+I didn't think join in without signing as well like 
+
+yeah but 
+
+you have it open by can share your screen 
+
+yeah one second Yeah. Suja, what were you saying? Uh, 
+
+do you I mean do you have your uh PPT instance? 
+
+Yeah. Yeah. Yeah. Yes. Yes. One second. I am opening it. We also improved the product a little added some things. And also uh we I change I noticed that we changed the uh track on on our on the portal. 
+
+Correct. Yeah. So now it is patient and caregiver side. 
+
+Correct. Yeah. No, the product remains the same. 
+
+Okay. 
+
+It's just that the fit of uh the thing is better with 
+
+the patient. Okay. The patient. 
+
+Got it. Makes sense. 
+
+Even though the doctor starts it, I think we had this discussion. 
+
+Even though the doctor starts it, I think uh the patient and caregiver are the beneficiaries or whatever. 
+
+Yeah. Yeah. Yeah. One second. 
+
+How do you guys know Shiran? 
+
+Uh Shiran is my really good friend. Um So like like we know from No, I can't hear you. 
+
+Yeah, I can't hear you back. Hello. Hello. Hi. 
+
+Oh, yeah. Yeah. Now I can hear. 
+
+Yeah. I was turning on the voice suppression and then it just went away. What's up? Yeah. So, she uh Shireen is our fifth teammate. Uh she is a fourth year medical student and uh her mother and her father both are doctors in Hyderabad. I think one of like I think her mother is in palative care. I don't know if it's palative care or pathology. I can't remember it. I think it's pathology. Uh and father also is a very well-known doctor in Hyderabad. So like we kind of knew them from online and then we met and yeah basically so now we really good friends. Yeah. And me and Az I think you know me and Az we are both from the same like college and startup. Correct. 
+
+Yeah. Okay. So I'll share my screen and we've also done some pro like improvements on the project. One second. Uh, also I got a call from the healthon team. They just they were asking us to submit. 
+
+Yeah, I was like I was like uh we're going to use the deadline to its fullest. So the PPD is the same. We haven't changed anything because we were thinking like we have to discuss a little more about the features. to put in because I'm thinking I what I want to do is I just want to put like a like URL right our portal URL and then the QR code in the middle like in the first uh uh slide like at the middle of the slide and then just like uh in the rest of the slides we'll explain them you know even uh we'll incorporate the details that you have researched about uh like the data and the papers that you have put in in your PPT so we're trying that uh they said 6 to8 slides right should we go go with like eight slides at max. 
+
+Yeah, I think eight slides is fine. 
+
+Yeah, first slide I'll just go with the uh like QR code and then we'll put the link. 
+
+So I guess eight slides with without excluding the title and s\*\*\*, right? 
+
+Yeah. Yeah, that's it. That's it. Yeah. 
+
+Yeah, 
+
+we can upload 10\. I don't think I don't think it will like it's a like hard criteria but so yeah, I'll I'll the PD same. 
+
+I'm the best I'm sorry to just to interrupt. When does this have to be presented? This this uh slide deck 
+
+actually it's the best thing. We do not have to present it. That's like the best thing. Yeah. 
+
+Oh, okay. Okay. And by when? When is the next? 
+
+25th 
+
+of Oh, this. Okay. Okay. 
+
+So, it's like 4 days from now. 
+
+Yeah. Yeah. Yeah. Okay. Okay. 
+
+Yeah. We can upload it on 24th. Uh I'll upload on 24th. That's what I was thinking. 
+
+So, this is 
+
+So, they also said that you can use like an audio kind of walk. through of your or a video walk through of your project attached to the PPT or something like that. I don't know. 
+
+Yes. Yes, we can do that. We'll record the video. There's no problem with that. And we'll also put the link and we'll also give them the code repository which is like the GitHub repository. Uh so that they can check our code files if they want to. Uh and I I just like the main for my side like I had a few questions which is like we have dotted down a few features but like the gist of like we just want you guys which is like the who are in the medical field to just see what we need to add like more features should we have more features should we decrease the features and what not so I'll this is like the uh interface 
+
+decrease the features okay 
+
+yeah yeah decrease the features so this is like the start for the family members like you know the family members can also see what the patient is because that's what we're trying to do we're trying to like kind of uh decrease the distress for both uh families and and patients of course and there's the doctor login of Obviously they have the mobile number and for patients they have the like aba ID like the number ID thing. So I'll just log in as a patient. We'll show this. One second. 
+
+Okay. Yeah. So the name is Santana. Is is that how we pronounce it? I I have no idea. 
+
+Yeah. Sana. 
+
+Sana. Okay. Uh so hi. 
+
+Hi. 
+
+Just one sec. Uh what? Sorry. Uh with respect to if if suppose the doctor is logging in, what would be the number that is asked for the doctor's registration? It is email number and mobile number. Right now I have no idea what to put here. So that's why like 
+
+that would be fantastic if you use the doctor's registration number. 
+
+Oh, there's a registration number for that be you know 
+
+yeah more legit because uh you know that you can be sure it's a registered medical provider and not just some 
+
+Yeah. Yeah. That is it also called aba ID for the 
+
+No, it's called medical registration number. It is different by state actually. 
+
+Oh okay. Got it. Okay, no problem. We we will do that. No problem. 
+
+Is there a place do do we have like an online repository where we can see our data? 
+
+If we put in suppose for us like for mine it's Delhi Medical Council. So if I go to Delhi Medical Council and put my number, it does show my details. 
+
+Got it. Make sense. 
+
+Okay. Can we use that uh 
+
+we have to check for it. If they are exposing an API then we have to one second. What is this? Okay. What was that? Um Uh just type just type Delhi Medical Council. 
+
+Yeah, I think they have the registration ID but I'm not sure. 
+
+So this is the MNC verification. Not many people are on MNC. 
+
+Okay. 
+
+Yeah. Yeah. I mean like for example if you look at as no MNC types. 
+
+Got it. 
+
+Correct. So you can just go to Delhi Medical Council. 
+
+Delhi Medical. Okay, there's the search registration number. Okay, this one this is this is the thing, right? 
+
+Uh 91013 I think. I don't remember 
+
+not 9103\. 
+
+Okay, 
+
+sis please fill the required thing 9\. registrate register registration. 
+
+Oh, okay. Searching. So, 
+
+let's just check another uh maybe if you go on to just Google DMC 91013 and see 
+
+Oh, search your doctor. Is this the thing? Oh, no. I don't think this is Indian medical. 
+
+Oh, yeah. Why don't you just Google? No, no, no. Don't go to that. That's too complicated. 
+
+Okay. Delhi Medical. This one? 
+
+Yeah. I don't know. Um the doctor search by name or Search your doctor. Search your doctor. 
+
+Oh, I just went into that. Okay. Search your doctor. This is the first instruction. 
+
+Is I think I think this will be very broad. 
+
+Last name. Oh, there you see. 
+
+Oh, wait. This is yours. Oh, 
+
+wait. There's only one. Okay. Yeah. 
+
+Caught and 91\. 
+
+You have all the 
+
+You have all the details where she studied her. 
+
+Yeah. Yeah. 
+
+Wow. Okay. Got it. 
+
+I think this would be I mean I don't know. Can you pull it out for every state? If you can that would be great. 
+
+Yeah. I think 
+
+we need to pull it whichever would that be needed for the code or is it not just enough that we ask the doctor to provide the registration number? 
+
+I think we can use 
+
+but we have to kind of verify it against something right. 
+
+Yeah. Yeah, we have password. 
+
+We'll see if there is any API key for this and uh like always take it. 
+
+Yeah, we'll we see we'll see if there's anything for that. Okay, that's it. Okay, so after the doctor u we'll see we'll show the patient once. 
+
+You can probably combine the family and patient together. I mean you're anyway giving the patient s idea. 
+
+Yeah, makes sense. Okay, got it. We we'll do it. So this is kind of like the new UI that we have come up with. 
+
+Yeah. And uh we have one I'll just over just small overview. We have the over uh the calendar thing where like appointments are like you know goals of care uh is scheduled like and uh they can see it weekly or daily. So this might I thought we thought might be helpful and this is like the timeline of it like if they already got the goals of care like conversation before whether or not if they've had it etc. So they doctors can put instructions or like notes uh in there as well. So This is what we have. Is there anything should we add here or like is this necessary at all? 
+
+So this will be to view the version is it? 
+
+Yeah. Yeah. Version just on the calendar. That's it. We're just putting it on a calendar. 
+
+Okay. I mean this is okay I think. 
+
+Yeah. 
+
+What do you think ma'am? 
+
+I think let's go forward and then see if there's any repetition and then maybe settle back on this I suppose. 
+
+Yeah. Yeah. Sure. Sure. Sure. And then there is like the like reports like let's just say like we have put any like tab results or anything for the cancer patient. So if they want to put any like test or anything in the future, they can just like add it and it will be on the calendar. So I don't know if that is in what we're trying to do at all. We just like you know we thought it was a nice feature so we just added it and there's the 
+
+Yeah. Yeah. There's a fine care thing that 
+
+the I'm I'm sorry again I'm interrupting when it comes to the reports. Yeah. 
+
+Um when so if suppose we have multiple reports which are you know So suppose you among women today, tomorrow whatever multiple times points 
+
+and if you want to see like a consolidated version do you have that because that helps to see the trend. 
+
+Okay like like a like a graph thing like on 12th we had this and then on 
+
+I mean it's not necessarily graphical but you know whether it's tabular column whatever like if you suppose if you have ever gone to max hospital or something which they generally do their reports that way. Yeah. 
+
+So you just get the consolidated report he's then it was like this the next day it was this way you know that way. Got it. 
+
+So you have it at one place. No. 
+
+No. No. We don't. We don't. We'll put that. Okay. No problem. So, 
+
+they want to enter the reports into this. 
+
+The patients they themselves do it. I think 
+
+if they have a printed report, can they upload a picture as well? It pulls it. 
+
+They they can they can pull a like proper like result thing. So, 
+
+Oh, wait. Should we upload the like results is is what you're saying like as in like a 
+
+they'll get like a a for sheet saying emoting this much that much. 
+
+Yeah. 
+
+Can they just take a picture of that and upload and this thing pulls out all the individual tests from there directly? 
+
+Yeah, we can do that. We can do that. There's no problem. 
+
+Or and or also most of the apps nowadays send PDFs. So, you know, they can upload that. So, we can just decide on the versions that will be allowed or 
+
+Got it. Got it. How many like pages would this PDF be? That is kind of important. 
+
+10 12 Okay. 
+
+Yeah. 
+
+Okay. Got it. 
+
+Okay. So, I mean this is a nice touch but I'm not sure if this like is in line with what 
+
+Yeah. Yeah. Yeah. Yeah. That is also very important. So like if you that's what I was asking. So if you have to remove any features then then just blend it you know. So we can remove it. And 
+
+so what what you can change this to is them uh being able to upload that cancer related documents like pit scan and those kind of things. 
+
+Okay. 
+
+So that's all there in one space. I don't know. Okay. 
+
+Yes. We can we can do that. Pet scans and like like chemotherapy stuff and all that. 
+
+Yeah, we'll think about this. We should go ahead and 
+
+Sure. And we have the fine care thing that me and SJ discussed where we'll have like the palative centers will be there on the map etc. like Bangalore Baptist Hospital etc. So all these we'll have with the number itself. So the number will be there and you can just use your own location wherever you are. Uh and then it will show the nearest like etc. uh centers and it will like of course we don't have all the centers right now but we can scrape all that data and we can put it and there will be like either directions and also call they can call the number as well so that's that is one uh I mean obviously they can get this from Google as well but it's like a centered uh like pallet of only pallet of uh thing that's it 
+
+wait does it actually show up wait as Google palative care center near me palative care 
+
+I think it does like Google does a great job at doing that. It might not show everything in like near like let's this shows also like Vijayada thing and Kakinada and etc. If we Google near ourselves then we we will first see the ones that are near us and if we go to Hyderabad in the Google map and then we Google there it will show the things in Hyderabad but it won't show like a whole overview of India and its palative centers. 
+
+Correct. 
+
+Yeah. 
+
+But are these uh but these may not be vetted, right? They may just be like random. Even I can upload this. No, 
+
+no, no. These are I mean the the ones that I kind of uploaded are like proper ones that I've seen and researched about. So not anyone can do that. 
+
+If I Google palative care near me, it can also show random. 
+
+Yeah, it it will it can show like anyone I can put my house and say palative care and it will show my house as well. So it's like that. 
+
+Yeah. 
+
+Okay. 
+
+These are just businesses at the end. Google uses their businesses. Yeah. That's it. 
+
+So we get So we get this from official repository. 
+
+Official repository. Yeah. You sent me some uh palative centers rep like a links as well. I I remember. So we pulled that from this. 
+
+Okay. 
+
+Yeah. So this is the map thing. Uh and then we have the care note. So this is the timeline thing. Whatever we discuss like next steps and what matters to the family. 
+
+I'm sorry again I'm interrupting. 
+
+No, it's okay. You don't have to say everything but still this is Um so with respect to the maps at the palative care centers um I have not seen the repository which had shared actually s but um does it tell us whether uh hospitalization is available what are the facilities available over there is an extra center available is it you know is there a daycare center sort of available does that do that su because I think when we looking we want to know that as well I mean uh I don't know if it's easy to do um but do you get to admit the patient or not it's just you know um something Yeah. So it's just an OPT basis thing. 
+
+I I we can do that but uh it is kind of extensive. 
+
+I don't know how we do that. How how do we do that? 
+
+I think if it is in the links that uh like I mean not it was not in the list of what Suja provided me but if there's a different link where they have that data then I think it will be easier for us. 
+
+Does that make sense? I mean I think that that would be a lot of information. 
+
+Yeah. But it does kind of like uh show three things right now. It says like if it's like impatient care or like can you visit the clinic and 
+
+I know this 
+
+this was actually pulled from like straight from like Google and uh from I think one website I can't remember the name of the website. It was some kind of pallet of care like it has like a central repo for the palative care centers. 
+
+Yeah. 
+
+Okay. Okay. 
+
+Yeah. So palm India wait I had the source here only. Palm India Is is is this a like um 
+
+Yeah. Yeah. 
+
+official. Yeah. Yeah. Okay. Pal paralia thing. So they also have their thing but like it's like like some 
+
+the sea also. 
+
+Yeah. So it's like random 
+
+in the sea. 
+
+Yeah. 
+
+That's why they go to 
+
+Yeah. So it's like that. 
+
+Yeah. This is the source actually balia. So if there's any other then 
+
+I mean if it's already I mean if you already have the inpatient outpatient thing then that's I think fair enough for now and if they do have I think the only additional thing which would be probably important would be uh do the do they have imaging center available and um they purchase that and ambulance services I I don't know whether that's the part yeah okay got it we'll we'll look into that and we'll add those no problem and you can search by city as well so that is of of this and we also have like the Hindi then we have to change we can change it to Hindi because I think VBOs is we would also put other languages as well like Telugu as well but uh again like this is not going to be a web app I think we are trying to make a Android app right like at least that's where my head is 
+
+Android yes 
+
+yeah that's I mean I'm okay with anything I mean I think that Yeah, I think Android, right? I mean, it's something almost everyone has it handy nowadays to have it. If 
+
+I have iOS, then I I I can't get a ghost discussion. Huh? 
+
+Then you have to do it on web, right? 
+
+On web you have to do it. I mean, you can do it on we can make it for both. But like I think for this stage, we don't need for both. 
+
+Okay. 
+
+Yeah. On the on the day of the if we get in then maybe we'll make for both. So, oh, so this is the care note. Uh this is like the timeline of the note and this is basically next steps for the terminal patient and what matters to the family and what they discussed like what was the goals of care etc and if is there anything still left to discuss because there's always something left to discuss and what is one thing we wanted to put is like how many people cuz there will be family members and there will be like multiple people multiple voices not just one patient and one doctor is what I collected from the earlier meeting so it's like version one which is v1 and then if it is updated then it's like version two that's it and then if they have another meeting then we'll have the version three like etc. So if there's anything which changes they can see like the patient initiated the like the discussion now mirror like the uh example patient here wants to like wants a family to understand what matters etc like like what changed from version one to version two it just like scratches off so now there was an extra person and who is like you know uh the daughter of Mera so etc like in the discussion in the goals of care discussion so like that 
+
+show me the PDF version 
+
+one second yeah can see it now 
+
+okay 
+
+yeah this is like basic PDF 
+
+yeah this is great but I think uh we'll have to um change just the content of it 
+
+yeah 
+
+uh like you know uh the format that Dr. Shaha gave um I think we can make it in that format it more clinical. 
+
+Oh can you like just reply it in the group once like this 
+
+wait 
+
+uh once 
+
+uh so one is you look at uh 
+
+the helaton form right is is that what they've seen 
+
+no wait so I'm putting so This is Vidi Center. Okay, Vidi Center has a format of its own and they are the official legal people. So you can take a look at that format. 
+
+Okay. 
+
+And then there's one more that uh uh Dr. Sha would have shared over 
+
+and at the end uh they will sign this right is 
+
+Yeah, they're supposed to sign this. I don't know how we're going to get that. Yeah. So we can use this this government ID. This is actually good like we can in the profile we can put everything like we'll have a profile here for the patient and we'll have the like the gender and government ID and full address and if they want to update the address at any time they can update it. Uh Yeah. So they'll use that uh address and then you can use that for the Google Maps template. 
+
+Yeah. Yeah. We can do that as well. Yeah. 
+
+Okay. And uh Yeah. So I've I've I've just linked the chat whatever messages and see that. Yeah. Yeah. 
+
+So should we uh incorporate every single thing in the vidi thing with sample? 
+
+Uh I mean that's two death related. 
+
+Yeah. Yeah. Yeah. Yeah. 
+
+So uh Shardan had shared one thing and I've kind of changed that a little bit to uh the second message the hathon form. 
+
+Yeah. Yeah. Yeah. I've seen it. 
+
+So you can probably tailor it to that. 
+
+Okay. Got it. Yeah. This is all the patient details and everything. So should we ask this like during the onboarding like there will be an onboarding whether when they register. So we'll just like ask them at the start like like how we uh use apps these days they will ask us for our mobile number and name username etc like that 
+
+okay uh oh god so the patient details yeah we can get from there uh the primary oncologist also we can get from I mean the other thing the family details and everything honors they'll have to do it per case basis because different people will be available at different yeah So the initial patient details and all can be pulled from there. That's not a problem. 
+
+Got it. Got it. Okay. Makes sense. 
+
+I also like me using terms like police when I have no idea what it means. 
+
+Yeah. Okay. Yeah. 
+
+Okay. Yeah. Okay. Yeah. Go ahead. That's it. 
+
+Yes. Okay. And then there's reports final. Okay. This is the calendar thing we discussed. Uh and yeah, this is the this is just like extra things like how they're feeling etc. If there's any like pain, nausea or tiredness, uh low appetite and when when is the day and it will basically be forwarded to the person I guess like like is that is this in the line is of what we're trying to do or is this not necessary? Uh so they can add like basically today is 28 28 they can just choose the symptoms and write how they're feeling that note will be there here and maybe in the next uh like if they are having a next discussion then the do doctor will can just see u like what they've gone through etc. It's like a diary thing. 
+
+Yeah, I think this is great. Having a symptom diary for palative care is excellent. It also helps the doctor titrate the medicines based on the symptoms. 
+
+Got it. Yeah. So they don't even have to remember it. They can just like log it here. 
+
+Yeah. Please go. 
+
+And um in case feels that this is something which is important for palative care, do you think it makes sense to kind of make it semi-objective by saying on a scale of 0 to 10 Because otherwise you know almost all apps has this. 
+
+Yeah. Yeah. Correct. 
+
+In case you want to tackle medical. 
+
+Correct. So we will we I mean the feature is great. We'll just have to change the content. I think just for the the initial idea part this is fine. 
+
+Yes. Yes. Yes. You don't have to be nice. You can just like bluntly say just put this but that person will put it. 
+
+Yeah. The reason I wrote it up is that many people apps like even I do. 
+
+Yeah. So even that app asks a lot of things like you know what are your symptoms do you feel bloated do you feel headache nausea etc that becomes very big 
+
+yeah like the flow app yeah 
+
+because I may feel many things I'm sorry 
+
+like the flow app flow app the period tracking app etc 
+
+uh yeah similar to that I mean all of those apps for that 
+
+it becomes a little vague when you remove that so that's the reason why so because if um you want to link it to help the doctor with medical medicine digestation then you'll need to make it more objective Got it. 
+
+Yeah, we'll do that. Yeah, I think we should be able to do that. We'll have to work on that now. 
+
+Yes. Okay. 
+
+Do that on how this is actually how each of these are titrated. Let's see. Let's see. 
+
+Okay. Got it. And uh we have the care story as well like basically this is the timeline and like visit and everything for the patient to see like the goals of conversation and when when it was approved and like basically they'll sign this off the every single version they will be signing off signing it off. one second and there will like if there's any calls and stuff as well like if they have any online discussions or just like so it will also be there. So that's what we thought and if they want to look for the like any milestones or any reports or treatment changes etc etc. So they they have that opportunity. 
+
+Okay. 
+
+Yeah. Okay. So well this is the same thing which will go to the find uh pallet of care thing and uh there's the test results that we already discussed. How are feeling? We already discussed there's a journal which uh which basically is like like a normal uh one second there's a like like this is just thoughts this is not any like you know how are you feeling 1 to 10 thing this is just like journal if you want to like just talk about because these are terminal patients so like if they have any thoughts 
+
+you know um this is really nice and um I don't know if agrees with me on this because something you thought about when someone has a you know and maybe this is something but when someone starts journaling this uh does it make sense to kind of link it to you know similar stories or to kind of try and help people develop community through this app 
+
+yeah 
+
+or you know have a like a support system through this uh so uh what do you think 
+
+that is actually a great idea actually because now whatever we're making is just like onetoone it's just family to doctor and doctor to patient. So if we add a community thing where it's like you know people with similar let's just say similar cancer they can like talk about what's happening because they all get the same pain and meds etc. So it will be nice actually a great idea. What do you think Sj? 
+
+Yeah I think this is good. Uh I also think that you know um a voice journal in this format uh I mean since the the competition is also AI we should be able to kind of get out the information from there and the themes from there. I don't know how we can do that. 
+
+Okay. I was thinking for the journal we'll just leave it alone. You know, we won't like you know it's just like a journal to them. That's it. Uh if they want like is what I thought. So if you want to put it like we can put it like this won't go to the 
+
+Okay. 
+
+Doctor is what I thought. 
+
+I understand. Yeah. 
+
+But 
+
+uh so 
+
+yeah 
+
+some people might use it in a way that you know oh they record something that day and Huh? Okay. This is great. Yeah. 
+
+Just like something for supportive like and yeah, you're saying something. You're saying 
+
+No, no, no. This is great. I think uh uh Dr. Shana's idea is also good. But if you are leaving the voice channel alone, how are you going to build a community is a question. 
+
+I think I mean 
+
+I mean I'm go ahead. 
+
+Sorry. Sorry. Please go ahead. 
+
+Like we'll take the details like I mean of course we have to take the detail. What kind of uh terminal is is that this person is going through. So I think like based on what diseases that they are you know going through we'll kind of group them. I mean we won't tell them that you know everyone is here is suffering from like you know lung cancer but like like we are basically we'll show them a community for them to interact is what like you know subtly without telling them that you guys all have cancer. 
+
+Yeah. If that makes sense. 
+
+I think it's even nice. 
+
+Yeah. Yeah, that's one of the central parts. So, we were also going to connect them with uh you know disease specific uh patient support groups, right? So, this will be a part a larger part of that a part of that. Yeah, I guess 
+
+yeah, you were going to say something Sha. 
+
+No, no, no. I was just going to talk about this. I mean, I think I've forgotten what I have to say. 
+
+Yeah. 
+
+Yeah. But I agree with you guys. I'm just wondering whether um I mean there is How do we ensure data safety in such a case for the patient because it's voice and you know 
+
+there's a lot of clinical data also. 
+
+Yeah. 
+
+Yeah. 
+
+Like data safety as in like it will leak type of safety or like um like 
+
+because a lot of these you know uh even though people do consent and stuff a lot of information gets then used by third parties. I don't know whether this will then be uh requiring uh you know in ad purchases, ads, stuff like that, and they'll get targeted ads. So, I'm just I mean, I really don't know exactly how it work, but I'm just thinking out loud. 
+
+I think it like it at this uh stage we don't have anything because you have to have to do that in order to actually send this data so that you get targeted at. It's like we have to do it like like it's in our hands whether or not we're going to put ads in this or whether or not we're going to like kind of sell this data so that for the better of the uh you know for even making better like decisions or just like publishing our data not like selling our data but like publishing the data so 
+
+okay 
+
+yeah 
+
+yeah so I think be compliant we have to be compliant with the DPD 
+
+yeah DPDP23 act we have to be compliant like that will be done no problem that's there that's no problem 
+
+okay 
+
+and I think there will also be some other medical compliant as well so we we'll be compliant with all of that there's no problem Yeah, you're saying something just go ahead. 
+
+Yeah, all of those DPDP23 and all of those will be dotted down like at the last moment and even this URL will be changed like every single thing will be done afterwards. So those are like later the these are like the concrete features that I'm I was like trying to because uh like I just feel like this is nice for the cancer patient. I'm sure there's uh there's already apps and stuff like that but again if we only have like goals of care discussion then it will be very fragmented for them. 
+
+Correct. I have a few questions here. Yeah. 
+
+What do you mean by take to the next doctor? 
+
+So it was the thing that we discussed where like we'll have a medical record and they can just like this is doctor. So that was one case in the first meeting that we discussed. Uh let's say doctor A is the primary doctor and there was an emergency. So they will go to the emergency hospital and there will will be a doctor which is a doctor B. So we'll have the QR code and everything like that was the thing that we discussed. 
+
+So can we maybe write it as take me to the nearest doctor? Is that what you're trying to say? 
+
+Yeah. Yeah. Like I mean this is what we give to the doctor is what I was trying to say like like this doctor note like so 
+
+I didn't understand where was this I just lost it. Where was this take to the next doctor thing? Sorry. 
+
+Oh check. 
+
+Yeah. Here. 
+
+Yeah. 
+
+Ah, okay. Got it. Okay. 
+
+No, this was uh uh I get what you're trying to say. We can put it as well like take me to the doctor. But this was uh basically what I wanted to put. We didn't put the QR code here yet, but it was basically an information where we provide to the emergency doctor, not the primary doctor, but like the emergency doctor. This was discussed in the first meeting. Yeah. Maybe. 
+
+So that basically this is a it's a consolidated note, right? 
+
+Yes. Yes. So maybe one before. 
+
+Yeah. Yeah. This is the same thing. We'll of course change it like it will be it will have other details about the 
+
+change the format. 
+
+Yeah. We have to change the format. 
+
+Yeah. It has to be very clean. 
+
+And I think the name 
+
+and the name will also have to change. Uh 
+
+we just going to this is just for the doctor's um for the doctor to visualize then it'll have to be a different name. 
+
+Yeah. 
+
+I mean if it's just a consolidated book then we can just say tango put consolidated. 
+
+Yeah. That's it. That's it. Yeah, we we'll change the we'll change the name. No problem. Take to the doctor will be changed. No problem. This is 
+
+and uh 
+
+Yeah, please tell me. 
+
+I'm can just open the Yeah. 
+
+Um what is the meaning of help with costs? 
+
+Help with cost. This was something that I just added but it's like uh it's kind of like a fundraiser link you can add I guess like I mean if they want I don't know this is I just added stuff as well. Yeah. 
+
+Um yeah that I think that is kind of puts you up to a lot of people misusing the app. I'm I'm just That's also true. 
+
+You know, uh people kind of then there are unnecessary questions about platform fees and why did they do this and it's a scam and blah blah blah. That's what I think. 
+
+True, true, true, true. I mean, we can remove it. There's no problem with that. I'm just like you're the professionals like we just put the app. That's 
+
+But no, I'm just thinking out loud. I mean, you're you have another there's another five classes on this. 
+
+I like the keep the expenses part like they can add expenses but I don't think fund raise a link is a good idea 
+
+yeah 
+
+but I'm going to say this one thing right I know that I we made this but we also feel that this is a little extensive so you can just tell us what it is yeah 
+
+because we made this we still feel that it is a little extensive 
+
+you know for the pat 
+
+yeah yeah okay no problem okay we'll cut the help with cost thing and then we have the uh like still the discussion. 
+
+Go by go by. 
+
+Sure. Sure. Okay. Okay. We'll take the help at home. 
+
+Help at home. 
+
+Okay. So, this is the thing the take me to the doctor. We can just put help at home or uh like basically if they need any transport or like ambulances for the for the patients to pick up or if they need any home help to a list of Yeah. So, basically it would just open a Google link, right? 
+
+No. No. Like I I haven't taught this to like how to implement this. 
+
+So you'll have a map. 
+
+Yeah. For the clinics. Yeah. 
+
+Okay. 
+
+And I give a break 
+
+like like if they need any company as in like we talked about uh having like different like people to talk to this you know uh this like this this is about like same people uh what do you say sorry same terminal this is going through people like I I don't know what The word is patients I guess. Yeah. One patient to another patient giving company to each other is what I thought. But 
+
+that would not be a caregiver break. That's it. 
+
+No, the the company thing. 
+
+The company. Yeah, that's what I was saying. 
+
+What is caregiver break? 
+
+Like I I have no idea why we put that there. 
+
+I have no idea. 
+
+I think we should um we should not be having that. 
+
+Yeah, we'll remove the care. 
+
+Yeah. 
+
+Should we put like the paperwork thing if they need help with like I think there's a lot of paper as well and 
+
+two types of paper. 
+
+What is paperwork? 
+
+Like just like the paperwork 
+
+I don't know paper because this will also be like kind of linked to the family as well. So if there's any task here the family is going to complete those tasks. This is not just for the patient. 
+
+Um the thing is that if you do paperwork and stuff then it again you know brings unnecessary legal stuff in there. People might upload their 
+
+you know uh bill and stuff and you know we don't want that. because we have no control in what people will upload over there to look for. 
+
+Should we put transport and maybe like home health? 
+
+Yeah, I think yeah 
+
+and company thing we'll just remove this here and we'll just like maybe create a community thing separately and 
+
+the probably one thing which you can add in addition to home health or nursing and transport would be delivery of medications at home. 
+
+Oh medication. 
+
+Yeah, we can change the equipment to like medications. 
+
+Yeah. Or medical and you know whatever. Got it. 
+
+Like an oxygen drip fill or something like that, you know, something people may need. 
+
+Got it. Okay, makes sense. 
+
+So now we have the still to discuss is just like like if they want to ask anything, they can just add it here. It just stays in the app. That's it. If they want to ask in the next uh discussion of 
+
+the questions for the doctor. 
+
+Yeah. Yeah. Any follow-ups etc. That's it. 
+
+Correct. 
+
+And this is the thing like there's also one discussion that we had where like we can give a copy to the doctors like uh not just to the primary doctor but to other doctors as well. We discussed this to kind of uh like maybe an emergency doctor or like a family member. So it will get added who whoever like copy as in like the data of this this profile. That's it. 
+
+Okay. 
+
+If that makes sense. So if if I I don't think this is necessary 
+
+how how so uh I'm a I'm an emergency physician. They come and give me a copy of JS. 
+
+Yeah. 
+
+Uh but my hospital is not uh does not have suana. 
+
+So how will this show up? How will they give me the copy? 
+
+It will only be for the patient. Um I mean if they don't have the suana then I don't think they will uh they can see it 
+
+but they should be able to see it. You can't expect every doctor to have sana. 
+
+Yeah we can't we can't. Yeah. 
+
+Correct. So that's why they that's why we went for the PDF kind of version that they're able to show. Okay. 
+
+And they they should be able to somehow share the PDF with the other doctor if they want to. I don't know how but uh maybe print out or I don't know. 
+
+Yeah. What we can do is I I'm just going to throw ID over here. So what we can do is we can like we were trying to do the QR thing, right? So like let's just say this is the QR code. So they if they scan the QR code, it will basically open the PDF on the web. 
+
+So they don't have to. So the doctors Emergency doctors don't have to install an app. It will just open the chrome. It will just straight up download the PDF. That's it of this patient. 
+
+Uh it is safe because we are showing this QR code like 
+
+I mean if they obviously like if they publicize this QR code everyone will be able to download the uh 
+
+so they should not be stupid. That's all. 
+
+Yeah, we can give an option for them like if it is leaked then they can change the QR code etc. 
+
+No but once the person on the other side has downloaded the document then they have access to that document, right? 
+
+Yeah. Yeah. Obviously, obviously it will be on their phone etc. 
+
+Yeah. So then that is again still a data issue, right? 
+
+Okay. Then what we can do is we can just give a link to them not let them download it. 
+
+Yeah. 
+
+Just like a link that's 
+
+single use link. 
+
+Yeah. Single use link. 
+
+Yeah. Okay. 
+
+And if they like exit be able to print it out if they want from their 
+
+I mean if they print it out then like they'll obviously have it on their uh phone. 
+
+Yeah. Because they need to put something in the chart of the patient, right? I mean that's what I'm thinking. 
+
+Got it. 
+
+So if someone says if some other someone some other doctor comes and he questions like why did you do this? 
+
+Yeah. 
+
+So these people should have something to show. 
+
+Yeah. Yeah. So should we give the option to print 
+
+or I think uh or another way to tackle the same thing would be like the single link PDF that you care and the other doctors have no option but to just document saying that of care discussion has been done and then these were the things I don't know ma'am what do you think 
+
+we think uh that I mean you didn't think it may not make any difference per se because as of now legally we are in a gray area right so I think if you can just write that we had a rules okay discussion and as of now like we do it with asking them to sign and we sign and and I think that should be that should be it. 
+
+Got it. Okay. 
+
+What do you think now? Is that okay? Does that make sense? 
+
+Yeah. 
+
+I absolutely do not understand what you're saying. 
+
+I am saying that um if you I mean if they even they print it out and put it in the in the file as of now we we are not okay with you know not providing care right. It's not officially in the law. 
+
+Yeah. So this is this is just a clinical note. It is nothing legal. Yes. So the same thing can be written also by the person but because if if they do download it then that person has it. If it is just in the I mean it's it's a matter of you know just discussion and about I I don't know where the line will be drawn with respect to ethics because if it is in the file it is uh still medical legal document and it's going to be in the hospital whereas if it's a PDF and it's downloaded on someone's phone that person has that you know forever until whenever on their So that becomes a part of the patient's side but it is still up to the present doctor to mention that you know goals of care discussion was done document has been attached and we are following that or something like that. They'll have to attach it. They can't just like you know go ahead with it. I mean that they have to save their ass that way. I don't know. 
+
+Right. Right. Okay. All right. Okay. Show next. 
+
+Okay. And then They have the calendar reports. This is the same like uh one is the this is like a check-in like if they want to check in and how they're feeling like it's like basically like a mood. I guess this is also linked with the like journal that we put earlier. So this is just like you know if they like it will show them the uh their what do you say like how they're feeling on a daily basis. This is also a second type of journal which is linked to the first journal. 
+
+Okay. 
+
+Yeah. So that's it. 
+
+Fine. 
+
+Yeah. This is the family task. Uh the reason we have this is because we have a family uh login. So you but you told me to like collapse the family and patient in one thing. So 
+
+should we remove this uh like 
+
+okay this and uh anyone has any thoughts or questions just go back also and write this. The last thing right here 
+
+this is the last thing right? 
+
+Yeah this is the last thing. That's it. That's it. That's it. And the calendar we already So yeah, 
+
+correct. So um can you show how we create the node? 
+
+The note. Okay. Yeah, that's what uh that was what I wanted to discuss. One second. Yeah. So we have this uh that we discussed. We'll we'll have this is let's say for the doctors and obviously we giving it for the doctors, right? for them to create. 
+
+Just 5 minutes left in the meeting. I 
+
+Okay, no problem. 
+
+Will it shut up? 
+
+I think it will. Yeah. Yeah. Okay. 
+
+Okay. No, no problem. We can just 
+
+Yeah, we can create another one. Yeah. So, we have the record a conversation thing. This is on the doctor's side. So, if they have the Santana app and that's what I wanted to ask like what if they don't have the app and they wanted 
+
+No, no, no, no, they can't. They just have to. Yeah. 
+
+Yeah. Okay. Got it. Oh, so the voice note thing and whatever like um we I have not uh added any model behind this but whatever is recorded during the like you know discussion and there will be like a tech thing so when everyone agrees to the recording and live captions so they can just like you know like they can just start speaking and after they start speaking like as you can see there's this thing which is automatically taking the 
+
+now now what if I start speaking is it still going to pick that up 
+
+I don't think your voice will be heard in this because this is like my mic this is picking up my 
+
+I just want to know if if two different people are talking is it going to come up as two different 
+
+not on this one no because 
+
+will 
+
+no dation we need a separate like highle model for that 
+
+yeah 
+
+we'll look into it like we'll look if we can do the daration thing 
+
+yeah so that that is it and then after we have it and then we'll just like basically we'll choose the we'll send it to the person like after having the goals of conversation discussion. What happens is that whatever the thing is it will like basically the person has to sign like the family has to sign. So the doctor signs right after the doctor signs uh we'll let the uh like the patient sign from their portal. So they'll also get an option to sign. We have not yet put that but uh once uh the goals of care discussion has happened and we'll just like let's say here uh like the doctor signs up and one second. Yeah. After after the Yeah, this will send the uh signature to the what do you say like to the family and the patient will sign it from their end. So that's what we thought and it will basically create like a PDF where the doctor has signed there's the conversation there's like the you know the uh what they discussed and everything will be this is the this is exactly taken and put it here but what we're going to do with AI is we're kind of going to like structure this in a better format for the family and 
+
+the format you've given. 
+
+Yeah. Yeah. Yeah. The healthon form, right? That is what we're trying to put. Yeah. So, we'll put that form and then we'll send like after the doctor signs it. Uh the family member from their portal, they will sign it is what we thought. 
+
+Ah, correct. That makes sense. They have to log in from their portal and then Yeah, 
+
+they'll get the sign thing because we have to take their credential. So, they have to be logged in from there. 
+
+Okay. 
+
+So, this is this is 
+
+I think I think people will I think uh you know people want to uh will take this up because you you made ID a necessity to log in and the government wants to popularize this other sheet no 
+
+yeah 
+
+yeah go ahead continue 
+
+okay so that that's that is 
+
+that's fine that's it 
+
+please yeah yeah 
+
+and that's it I'm sorry just show me the permissions once please 
+
+this one these ones 
+
+no no Oh, wait right. You're talking about Okay. Yeah. This is 
+
+the patient and family whose authorized representative that is the doctor. 
+
+Yeah. And a verbal agreement. That's a thing. 
+
+So, uh I'm sorry. I think I missed I didn't understand this actually. Um so this so suppose it says patient and family agreed. 
+
+Yeah. Like regarding their goals of uh regarding their goals of No, no, no. This only the doctor is signing. So the doctor chooses one of these and then he signs on his side. Correct. 
+
+Yeah. Yeah. 
+
+Either the patient and family has agreed both agreed or not. 
+
+Authorized representatives have agreed and verbalized. 
+
+I don't know man. Something like a neighbor or something if the guy is just 
+
+No, we have to be clear on that. Mr. 
+
+Correct. Yeah. We change this. 
+
+Yeah, we we can change that. No problem. teachers back in specifics will have to be changed. 
+
+Family one thing is family and patient agreed after the go like they had they just had the discussion it will be like after they have discussion they'll it will structurize it and they'll have whether or not like a single thing whether the patient have agreed and they'll sign it and if the for the portal from the family it will show that uh you know you the patient and the family has agreed uh you had this this kind of discussion this is a discussion please sign it so they'll sign it and it will be a Copy. That's it. 
+
+Okay. Realistic 
+
+authorized. And what is verbal agreement? 
+
+Verbal just like like we no conclusion was drawn. That's it. I guess is is or they are not yet ready to sign is we could put it in that way. They just had like a verbal okay we'll have this kind of goals of care like you know uh that's it. 
+
+So can we do it as uh so if they've not agreed on it then would you can you do it like when we do applications right the review and sign. this is the final copy or wait do it later you know something like that when application forms online for exams and stuff can we do it like that because verbal verbal agreement witness does not mean anything per se 
+
+yes it doesn't pass it I think at the end of the day we are looking at only one permission that is consensus reached amongst all family members and patient if that is not there then this will not stand okay 
+
+okay 
+
+um second thing is um uh the way I mean what you wanted what you are thinking of right whether so one thing is uh the condition was explained to the patient second thing is I think what you are thinking is we know whether a decision was reached regarding ventilator or not or something like that 
+
+yeah 
+
+so that we'll have to do it in the post sort of so when the AI creates the note the AI should be able to classify the note as you know just a general discussion note versus a you know mechanistic decision having been taken sort of note. 
+
+And uh the third thing is once okay so the doctor signs this first and once the patient signs it from his ID uh the PDF should get locked and it should not be you know no changes should be allowed to that version 
+
+from that point onwards. 
+
+Yes. Okay. Yeah sense. Yeah. 
+
+Okay. Yeah. Maybe from the next discussion it can probably autoop populate all the fields from the previous discussion and only changes have to be made. But uh other than that you know nothing can be done. 
+
+Got it. Got it. Makes sense. Done. So 
+
+can you show me how a different patient can be done 
+
+like uh in the same thing or 
+
+No, no. I want to I want to do this for another patient. How do I add? 
+
+Oh, they they they'll have the data here like let's say let's say for them they have like we have DRA here and we have Romesh. So they'll have a search bar here in which they'll enter enter their id. So we have the four people here which is like this is mock this is simulated so that's why we have these four people here Ramsh kumar eta ID 
+
+yeah the search is by ID that's it 
+
+okay 
+
+and only people who have onboarded themselves to sanet have come 
+
+yeah 
+
+in the search 
+
+yeah yeah 
+
+I think this is okay what do you think ma'am the doctor said I mean I I think it's It's fine. And uh I mean if there are any more we should probably have one more meeting on the 24th before we upload things. Um 
+
+um just make sure okay. Um uh so can you go back to the patient thing I had like comments? 
+
+Yeah please. Okay. One sec. Yeah. 
+
+Okay. So, right now, um I mean, uh everything you've done is great. Uh but there seems to be a little disconnect between the top bar and everything below. Okay. 
+
+Yeah. 
+
+Uh so, um we need to make it more coherent and a little less cluttered. 
+
+Okay. 
+
+Um so, maybe we can have four major categories, right? Yeah. 
+
+So, one is Uh so one can be uh my clinical documents where the goals of care discussion and uh you know the uh the report section and uh uh maybe other cancer related treatment documents can come in if they want to. Another thing could be access to care where you know the palative medicine find the nearest palative medicine the home care uh the ambulance thing all of that can come. 
+
+Okay. 
+
+Uh the third thing can be my space where all of uh moody stuff and journal stuff and all of that stuff can come in. 
+
+Yeah. 
+
+And um I don't know. Do we have anything else to put in any other categories? 
+
+That's it. I guess I think that that in I think these will all go into these four categories. The surgical documents and uh the access to care, the ambulance and the pallet of care thing. And then we'll have MySpace, we'll have the journal, we'll have how are you feeling and etc. 
+
+I think we have one category like on top which will like basically quick access to the QR code 
+
+so that they don't have to 
+
+yeah exactly 
+
+do and the QR code should be able you should be able to like save the QR code um in an offline manner also 
+
+yeah yeah they can download as an image 
+
+yeah exactly um the second second point I had to make was so I mean what we have so far is maybe good for the initial you know just to show what we want to do sort of situation 
+
+yeah Um uh the second thing is yeah so the the goal of a hackathon is to use AI to you know do stuff correct are we using enough AI or are we not losing enough AI? 
+
+Uh I think the voice thing is actually a very big feature but like normal like I mean of course only the technologists might know how uh because it is a big feature to add but like for the end user they'll be they'll they won't know how much of an AI is being used here. So I think It's nice if we have like a kind of like a maybe a chat bot. Uh but again like we discussed last time that uh like having a chatbot is not Yeah. 
+
+And even if you have a chatbot we won't have a quality as good as the the latest like state of the art like chat GPT etc like those are the state of the art models. We won't have uh those kind of checkpoints. So but we can have something where we'll fetch our own data. 
+
+Okay. 
+
+Like 
+
+in answer like if there's 11 pages and if they want to know uh something from those 11 pages then it will strictly be from those 11 pages it won't look up on Google it won't uh like basically it won't hallucinate or give anything else apart from what they have already uploaded so we can do that maybe 
+
+yeah we can do that or if you know AI is the focus of this then um we'll have to present this so we have all of the features but have to present it in a way where uh a conversation is the centerpiece and everything sits around it. 
+
+Yeah. 
+
+At least in the PPD, you know, that we're trying to make that that itself would be a good thing because otherwise we're using AI even in the lab research thing, we'll be using AI to kind of take picture of the PDF and then SC scrape that off and things like that, right? 
+
+Yeah. 
+
+Yeah. So, um I think for now we can try and somehow point create that you know both of your discussions I think uh as the central thing where we using AI and then the rest of it can come around it. 
+
+Got it. Got it. 
+
+And uh then 
+
+do we have any other features to add like? 
+
+No. So I mean we can remove the help with costing and 
+
+yeah we we're removing this and we 
+
+Yeah, we can remove Oh, family tasks if you want. I'm not sure. 
+
+Yeah, we'll we'll remove that. And uh 
+
+still to discuss doesn't exist. 
+
+Yeah, care not reports needs to have like only cancer patient uh things. 
+
+Uh reports. Uh okay. Um I found them. Can you put in I'm not uh I'm not sure how you should handle lab results or if you should even handle the term. 
+
+Um I think that you should have uh the basic things like CBC, LFT, KFT and uh the pet like you said at least to start with and we may be able to you know um branch out later as we go forward. Also one thing with respect to does that make sense sur? 
+
+Correct. So what we can have is we can uh div divide the lab results into two main things. 
+
+Uh one is you know um large cancer related diagnosis documents like PECTs and uh biopsy reports and the other thing can have small monitoring uh tests like CDCLFK where the trending things will be more important. So that way they can you know uh the patient should be able to add uh uh you know on one date he can mark the date and say you know chemo given or you know radiotherapy given and then you can kind of see with each cycle how the blood reports are working and things like that. I don't know what do you think that? 
+
+Yeah. Yeah, it makes sense. 
+
+Yeah. So when so when they get the blood test reports the dates of the blood test reports are already there and uh then you know uh the patient can individually just mark one date and said chemo given and something like see if you if you if you give us more ideas we give you more ideas, right? So at some point. 
+
+I think the part where they can take the documents and kind of like extract stuff from is actually a very big uh thing to do now even though it's like very common you find but it's like a very huge feature and uh one more one more thing is the goals of care those those are very like you know like concrete features uh using AI like if you really want to involve and also like I have a one more question should we like obviously we should include medic and as well, right? Like is that something we're looking for? 
+
+No, I I think that what in what sense are you thinking of 
+
+like daily meds etc. That's it. 
+
+What daily meds they're taking? 
+
+Yeah, like in the calendar like like here they have family meeting and stuff and we have the green thing which like the medicine. So if they just have like a medicine to take today, they'll it will just like the One second. The medicine thing will uh the dot will pop up here and they will like it's like a thing on their calendar and that's it to take a medicine and a reminder I guess in a way. So I would 
+
+I'm sorry. Go ahead. 
+
+So I would rather the patient uses the calendar or the exact feature that you said to mark big events, right? Like like I said chemotherapy or radiotherapy or something like that. 
+
+Yeah. 
+
+Rather than daily navigations. Got it. 
+
+Uh because daily medications can become a little clinical and you know if the data is entered wrong and the patient refers to the app instead of the prescription then it can become a problem. 
+
+Yes. Yes. Okay. Got it. So they can like get reminded of one please. 
+
+Yeah I'm sorry you saying they get reminded of 
+
+like if uh like daily medication I thought it would be like just a reminder for them. That's it. Like what kind of medication? Yeah, 
+
+but kind of uh know that if you want to do that and if you want to bring into that it could be that I don't know if you upload the prescription and that the AI tool which we are creating as part of the app reminds the patient uh by linking it to the Google calendar and the patient is not you know uploading the data themselves. 
+
+Yeah. Yeah. 
+
+Does it make sense? 
+
+Makes sense. Makes sense. Yeah. And that is also for not just medicine but also like sessions of chemotherapy etc. 
+
+Yeah maybe Oh my god. Suj you're making me feel like I'm, you know, speaking gibberish. 
+
+Oh, both of them. You have this study. I have not had this study. 
+
+What I what I was saying is that since you know we need to up the AI uh use game in the in this app. 
+
+Yeah. 
+
+Uh instead of a patient physically putting in anything, if we upload the document that is the last prescription by the doctor and AI reads what is the medications that are there and then kind of links it to a calendar alert to the patient. Okay, this is when you need to take him. Does that make sense? 
+
+That's what I Yes. Yes. But we should allow this feature only if the prescription the doctor is printed. 
+
+No hand no hand is typed. 
+
+If it is typed. Yeah. 
+
+Yeah. Makes sense. 
+
+And also another thing I was thinking is uh that uh you know if you want to increase the AI usage and you knowation 
+
+Yeah. the biceps are very me. 
+
+Yeah, now we can hear you. 
+
+Hello. 
+
+Yeah, we can hear you now. 
+
+Yeah. So, I was just wondering that if in case we have like multiple versions and we have an updated version and then the patient has a lot of data over time and there a lot of investigations etc. Does it make like like you know when we put in documents onto cloud or GPT and stuff and we want to get a uh kind of an overall briefing of you know what does this document say? Um, in addition to the goals of care, if if you wanted to give us a a brief of the uh, you know, the important timelines and with respect to the chemo radio, when was the last time the patient got chemotherapy, when was the last age of radiation therapy? Does it make sense to use AI to develop that for this app? 
+
+Yeah. Yeah, it does. Like it will just fetch uh the things that are there in the document and not actually make up stuff or get from the internet. Yeah, because that way we can say that this will add to the ease for the doctor also uh and for the patients as well because they don't have to remember when 
+
+Yeah. And then it will site it basically it will site the document 
+
+that will be you know also 
+
+yeah what do you think because you know you just concerned about the air so I was just thinking maybe this told me that the two features are pretty heavy and then so he should tell us we can air usually No, we no it's actually a good good feature but like like there's features that are heavy to the developers but the end user won't notice it even if we give to the judges they won't notice it that oh this is a very big feature they'll just think that okay the the voice is going input and then we getting a like a like a output which is like a proper consolidated report and even the thing but the thing which is the that s madam explained which is the thing which extracts the information let's say a particular day we had this one test uh uh but we can't remember it. So they'll just search it from the documents that were already uploaded. So that is like kind of it's called rag. It's like retrieval augmentation. Uh so what it does is it basically just takes whatever is already uploaded and it won't search the Google. It doesn't have internet access. It will only look up for the stuff which is already uploaded. So that's that's something you can do but it's only when the when there is enough data like like at least there needs to be one document and it will search in that one document and if there is nothing then we'll just say that okay there's nothing in these documents regarding this particular term so like we can do that 
+
+yeah I suggest that you said that you know it will be something which is on the app itself I mean on this particular app yeah on the app itself 
+
+add that 
+
+yeah 
+
+yeah but it won't give any extra stuff like let's say there is like a uh chemotherapy session and we wanted to find out when we did this So if you search about it, it won't like if you put it in claude, it will maybe give like the next like it will maybe sympathize with you and all that. But this won't this will just like straight up Yeah. This will straight up give it don't want that. 
+
+Yeah. Whatever it is, it will just 
+
+Yeah. Like just said, we'll do the moody mood board and do that. 
+
+Yeah. 
+
+No, I mean really good on your like thinking uh from the creation side. you know coming up with all of these new features is fantastic. See we don't we can't think like that. We we have dissociated from patient long ago and you know we don't feel what the patient feels. 
+
+Yeah. Got it. Makes sense. 
+
+Yeah. You really stuck. That's excellent. Yeah. 
+
+Thank you. Thank you. I'm trying. Uh and what about caregiver? Because the thing like u applying for it also says that caregiver. So is caregiver a family member or a separate person? Like 
+
+caregiver that can be enough of gives career. 
+
+Okay, got it. 
+
+Yeah. So, I mean, yeah, I think I think it's I think this is great. I think it will come out to be something good. Uh, does anyone have the bandwidth to go through the questions that we had to answer? Should we do that on 23rd? 
+
+The bandwidth for uh 
+
+to go through the PPT and the questions on the website 
+
+the P I think after after updating whatever we have discussed I think we'll update the PPP as well and then I think it's better if we go through that. 
+
+But I think apart from 
+
+also have to make a poweroint for tomorrow. Um yeah, I have a yeah ask. 
+
+Got it. 
+
+Chemotherapy in chemotherapy related. 
+
+Ah that's nice. 
+
+Okay. 
+
+All right. So uh can we can we stop uh the meeting for today and then you know benefit again. Done. 
+
+Done. Done. No problem. Yeah. 
+
+We can wait on both 23rd and 24th, you know, one day to discuss the the updates and the other day to finalize everything and just 
+
+Yes. Sure. Sure. Sure. And if there's any other features as well, please like, you know, just drop in and if there's like any screenshot from another source like an app which is which will be nice to include in for the cancer patient then just uh send it to us. 
+
+Okay. Uh if you can just uh up the minutes you know I you're noting it down I thought right 
+
+which one I I I couldn't get 
+
+the minutes 
+
+minutes of meeting okay sure no problem 
+
+yeah okay 
+
+yeah okay okay have a nice day guys yes good night bye-bye

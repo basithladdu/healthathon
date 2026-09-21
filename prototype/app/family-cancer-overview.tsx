@@ -1,7 +1,7 @@
 'use client';
 
 import { useId } from 'react';
-import type { SymptomEntry } from './family-symptom-state';
+import { symptomSeverityText, type SymptomEntry } from './family-symptom-state';
 import type { CareStoryEntry } from './family-care-story-state';
 import type { CareReport } from './care-calendar-state';
 import { IconArrowRight, IconFileText } from './icons';
@@ -27,7 +27,6 @@ const symptomHindi: Record<string, string> = {
   Pain: 'दर्द', Nausea: 'जी मिचलाना', Tiredness: 'थकान', 'Low appetite': 'भूख कम लगना',
   'Sleep trouble': 'नींद की परेशानी', Breathlessness: 'साँस फूलना', 'Low mood': 'मन उदास होना',
 };
-const severityHindi = { Mild: 'हल्का', Moderate: 'मध्यम', Severe: 'बहुत ज़्यादा' };
 
 export function FamilyCancerOverview({ patientId, patientName, diagnosis, team, hindi, symptoms, story, reports, onCareStory, onCareNote, onSymptoms, onReports }: FamilyCancerOverviewProps) {
   const id = useId();
@@ -48,7 +47,7 @@ export function FamilyCancerOverview({ patientId, patientName, diagnosis, team, 
     })),
     ...patientSymptoms.map((entry) => ({
       key: `symptom:${entry.id}`, date: entry.date,
-      title: `${symptomLabel(entry.symptom)} · ${hindi ? severityHindi[entry.severity] : entry.severity}`,
+      title: `${symptomLabel(entry.symptom)} · ${symptomSeverityText(entry.severity, hindi)}`,
       source: t('Feeling note', 'तबीयत का नोट'), author: entry.editedBy || entry.author,
       kind: 'symptom', open: onSymptoms,
     })),

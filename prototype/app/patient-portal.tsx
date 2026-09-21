@@ -19,6 +19,7 @@ export type DecisionMaker = {
 };
 
 export type PatientDetails = {
+  abhaNumber?: string;
   fullName: string;
   dob: string;
   sex: string;

@@ -1,6 +1,6 @@
 import { isValidAppointmentDate, isValidAppointmentTime } from './appointment-state.ts';
 
-export const CARE_EVENT_KINDS = ['Medicine', 'Appointment', 'Test', 'Procedure', 'Follow-up'] as const;
+export const CARE_EVENT_KINDS = ['Chemotherapy', 'Radiotherapy', 'Appointment', 'Test', 'Procedure', 'Follow-up', 'Medicine'] as const;
 export type CareEventKind = (typeof CARE_EVENT_KINDS)[number];
 export type CareEvent = {
   id: string; patientId: string; kind: CareEventKind; title: string;

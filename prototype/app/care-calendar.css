@@ -15,10 +15,12 @@
 .care-calendar-dots { display: flex; min-height: 5px; justify-content: center; gap: 3px; }
 .care-calendar i { display: inline-block; width: 5px; height: 5px; border-radius: 50%; flex: 0 0 5px; }
 .care-calendar i.medicine { background: #1491a1; }
+.care-calendar i.chemo, .simple-care-app .care-calendar i.chemo { background: #247f86; box-shadow: 0 0 0 2px #247f8624; }
+.care-calendar i.radiotherapy, .simple-care-app .care-calendar i.radiotherapy { background: #c17823; box-shadow: 0 0 0 2px #c1782324; }
 .care-calendar i.visit { background: #9362cb; }
 .care-calendar i.task { background: #a48e55; }
 .care-calendar-day[aria-pressed='true'] i { background: #fff; }
-.care-calendar-key { display: flex; justify-content: center; gap: 13px; font-size: 10px; color: #576b5e; padding: 10px 0 0; }
+.care-calendar-key { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 13px; font-size: 10px; color: #576b5e; padding: 10px 0 0; }
 .care-calendar-key > span { display: flex; align-items: center; gap: 5px; }
 .care-calendar-shortcuts { display: flex; justify-content: center; }
 .care-calendar-shortcuts button { font-size: 12px; padding: 5px 10px; }
@@ -42,6 +44,8 @@
 .care-agenda-list > li { display: grid; grid-template-columns: 58px minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 13px 14px; border-radius: 11px; background: #fff; border: 1px solid #dfe4dc; border-left: 3px solid #a48e55; }
 .care-agenda-list > li.care-agenda-visit { border-left-color: #9362cb; }
 .care-agenda-list > li.care-agenda-medicine { border-left-color: #1491a1; }
+.care-calendar .care-agenda-list > li.care-agenda-chemo { --agenda-tint: #e5f1ed; --agenda-time: #c9e2db; --agenda-ink: #286365; background: var(--agenda-tint); border-color: #c9dfd7; border-left: 3px solid #247f86; }
+.care-calendar .care-agenda-list > li.care-agenda-radiotherapy { --agenda-tint: #fff0d7; --agenda-time: #f0dab0; --agenda-ink: #875b20; background: var(--agenda-tint); border-color: #eddbb9; border-left: 3px solid #c17823; }
 .care-agenda-list time { font-size: 15px; font-weight: 650; font-variant-numeric: tabular-nums; }
 .care-agenda-list strong { display: block; font-size: 15px; font-weight: 600; line-height: 1.4; overflow-wrap: anywhere; }
 .care-agenda-list > li > div > span { display: block; margin-top: 4px; font-size: 12px; color: #617667; line-height: 1.5; overflow-wrap: anywhere; }
@@ -75,16 +79,6 @@
 .care-report-upload input { position: absolute; inset: 0; opacity: 0; width: 100%; cursor: pointer; }
 .care-report-upload:focus-within { outline: 2px solid #35765d; outline-offset: 3px; }
 .care-calendar-note { margin: 5px 0; font-size: 12px; color: #627768; line-height: 1.5; }
-.care-report-empty { font-size: 13px; color: #627768; margin: 12px 0 0; }
-.care-report-list { list-style: none; padding: 0; margin: 8px 0 0; }
-.care-report-list li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid #dfe4dc; }
-.care-report-list li > div { min-width: 0; }
-.care-report-list a { display: inline-block; padding: 10px 0; color: #205c44; text-decoration: underline; text-underline-offset: 3px; font-size: 14px; overflow-wrap: anywhere; }
-.care-report-list span { display: block; font-size: 11px; color: #647869; }
-.care-report-list button { flex-shrink: 0; font-size: 12px; }
-.care-report-actions { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
-.care-report-actions a { min-height: 44px; display: inline-flex; align-items: center; }
-.care-report-actions button { min-height: 44px; }
 .care-calendar-status { font-size: 13px; margin: 8px 0; }
 .care-calendar-status:empty { display: none; }
 .family-next-visit-line { display: flex; flex-wrap: wrap; gap: 4px 16px; align-items: center; margin: -10px 0 18px; font-size: 13px; color: #536b5b; }
@@ -98,7 +92,7 @@
   .care-calendar-dates.is-expanded, .care-calendar-week { display: grid; }
   .care-calendar-shortcuts { justify-content: space-between; }
   .care-calendar-shortcuts .care-month-toggle { display: inline-block; }
-  .care-calendar-key { font-size: 10px; gap: 16px; }
+  .care-calendar-key { font-size: 10px; gap: 8px 16px; }
   .care-month-heading h2 { font-size: 16px; }
   .care-agenda-list > li { grid-template-columns: 43px minmax(0, 1fr) auto; gap: 9px; padding: 10px; }
   .care-day-agenda > .family-section-heading { align-items: center; gap: 10px; }
@@ -109,7 +103,6 @@
   .care-check-button { min-width: 48px; padding: 5px 8px; }
   .care-event-form { gap: 10px; padding: 12px; }
   .care-report-section { margin-top: 18px; }
-  .care-report-list li { align-items: flex-start; flex-wrap: wrap; gap: 2px 12px; }
   .care-selected-date { font-size: 13px; }
   .family-next-visit-line { margin-bottom: 10px; }
 }

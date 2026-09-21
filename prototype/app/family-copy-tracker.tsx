@@ -9,18 +9,20 @@ import {
   type CareCopyDraft, type CareCopyEntry, type CareCopyStatus,
 } from './family-copy-state';
 import './family-copy-tracker.css';
+import type { CareNoteAcknowledgement } from './care-note-signing-state';
 
 export type { CareCopyEntry } from './family-copy-state';
 type Props = {
   patientId: string; patientName: string; author: string; today: string; hindi: boolean;
   releases: readonly SummaryRelease[]; entries: CareCopyEntry[]; onChange: (entries: CareCopyEntry[]) => void;
+  acknowledgements?: readonly CareNoteAcknowledgement[];
 };
 
 export function FamilyCopyTracker(props: Props) {
   return <CopyTrackerForPatient key={`${props.patientId}:${props.author}`} {...props} />;
 }
 
-function CopyTrackerForPatient({ patientId, patientName, author, today, hindi, releases, entries, onChange }: Props) {
+function CopyTrackerForPatient({ patientId, patientName, author, today, hindi, releases, entries, onChange, acknowledgements = [] }: Props) {
   const id = useId();
   const t = (en: string, hi: string) => hindi ? hi : en;
   const copies = approvedPatientCopies(releases, patientId);
@@ -79,6 +81,7 @@ function CopyTrackerForPatient({ patientId, patientName, author, today, hindi, r
         fileName: `saanthvana-${patientId.replace(/[^a-zA-Z0-9_-]/g, '-')}-note-v${latest.number}.pdf`,
         title: t('Doctor-reviewed care note', 'डॉक्टर का मंज़ूर किया हुआ नोट'),
         subtitle: `${patientName} · ${patientId}`,
+        careNote: { release: latest, acknowledgements },
         sections: [
           { heading: t('Review details', 'मंज़ूरी की जानकारी'), lines: [`${t('Version', 'संस्करण')}: ${latest.number}`, `${t('Doctor', 'डॉक्टर')}: ${latest.physician}`, `${t('Released', 'जारी किया')}: ${latest.releasedAt}`, ...(latest.authorisation ? [latest.authorisation] : []), ...(latest.signature ? [`${t('Signed name', 'दर्ज हस्ताक्षर नाम')}: ${latest.signature.name}`, `${t('Signed on', 'हस्ताक्षर की तारीख')}: ${latest.signature.signedAt}`] : [])] },
           { heading: t('What matters to the patient', 'मरीज़ के लिए क्या ज़रूरी है'), lines: [fields.priorities] },

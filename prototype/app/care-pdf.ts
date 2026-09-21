@@ -1,9 +1,14 @@
 'use client';
 
 import type { PDFPage, PDFName, RGB } from 'pdf-lib';
+import type { SummaryRelease } from './summary-state';
+import { CARE_NOTE_KIND_LABELS, careNoteReleaseId, matchingCareNoteAcknowledgements, hasChangedSignedCareNote, type CareNoteAcknowledgement } from './care-note-signing-state';
 
 export type CarePdfSection = { heading: string; lines: string[] };
-export type CarePdfOptions = { fileName: string; title: string; subtitle?: string; sections: CarePdfSection[] };
+export type CarePdfOptions = {
+  fileName: string; title: string; subtitle?: string; sections: CarePdfSection[];
+  careNote?: { release: SummaryRelease; acknowledgements: readonly CareNoteAcknowledgement[] };
+};
 
 let fontBytes: Promise<Uint8Array> | null = null;
 
@@ -17,7 +22,22 @@ function loadFont() {
   return fontBytes;
 }
 
-export async function downloadCarePdf({ fileName, title, subtitle, sections }: CarePdfOptions): Promise<void> {
+export async function downloadCarePdf({ fileName, title, subtitle, sections, careNote }: CarePdfOptions): Promise<void> {
+  if (careNote && hasChangedSignedCareNote(careNote.acknowledgements, careNote.release)) throw new Error('This note no longer matches its signed version.');
+  const acknowledgements = careNote ? matchingCareNoteAcknowledgements(careNote.acknowledgements, careNote.release) : [];
+  const outputSections = [...sections];
+  if (careNote) {
+    const release = careNote.release;
+    if (release.signature) outputSections.push({ heading: 'Doctor signature', lines: [release.signature.name, new Date(release.signature.signedAt).toLocaleString('en-GB'), 'Typed name'] });
+    for (const acknowledgement of acknowledgements) outputSections.push({ heading: acknowledgement.signerRole === 'patient' ? 'Patient signature' : 'Family signature', lines: [acknowledgement.signerName, `${new Date(acknowledgement.signedAt).toLocaleString('en-GB')} · Version ${acknowledgement.version}`, acknowledgement.statement, 'Typed name'] });
+    outputSections.push({ heading: 'Version record', lines: [
+      careNoteReleaseId(release),
+      ...(release.priorVersion !== undefined ? [`Started from version ${release.priorVersion}; reviewed for this conversation.`] : []),
+      acknowledgements.length ? 'This version is saved with the signatures above. Changes require a new app version.' : release.signature && release.noteKind ? 'Patient/family review is pending.' : 'No separate patient/family signature is recorded.',
+      'Typed names recorded in the app. This PDF has no verified digital signature or cryptographic seal.',
+      'Care conversation record. Not a prescription or an advance medical directive.',
+    ] });
+  }
   const pdf = await import('pdf-lib');
   const { default: fontkit } = await import('@pdf-lib/fontkit');
   const bytes = await loadFont();
@@ -122,11 +142,12 @@ export async function downloadCarePdf({ fileName, title, subtitle, sections }: C
   y -= 31;
   write(title, 21, ink, 30);
   if (subtitle) { y -= 2; write(subtitle, 10, muted, 16); }
+  if (careNote?.release.noteKind) write(CARE_NOTE_KIND_LABELS[careNote.release.noteKind], 10, accent, 16);
   y -= 12;
   page.drawLine({ start: { x: margin, y }, end: { x: width - margin, y }, thickness: 1, color: pdf.rgb(0.82, 0.85, 0.79) });
   y -= 23;
 
-  for (const section of sections) {
+  for (const section of outputSections) {
     ensureRoom(52);
     write(section.heading, 12, accent, 19);
     y -= 2;

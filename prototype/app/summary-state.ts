@@ -1,7 +1,12 @@
+import { DOCTOR_SIGNED_AWAITING_REVIEW, isCareNoteKind, type CareNoteKind } from './care-note-signing-state.ts';
+
 export type DraftFieldKey = 'priorities' | 'participants' | 'topics' | 'openQuestions' | 'followUp';
 export type DraftFieldStatus = 'ready' | 'not-stated' | 'clarify';
 
 export type SummaryRelease = {
+  id?: string;
+  noteKind?: CareNoteKind;
+  priorVersion?: number;
   signature?: { name: string; signedAt: string; method: 'typed' };
   number: number;
   patientId: string;
@@ -21,6 +26,7 @@ export type SummaryState = {
   draftSource: string;
   draftExcerpts: Record<DraftFieldKey, string>;
   draftIsNewConversation: boolean;
+  draftPriorVersion?: number;
   draftPrepared: boolean;
   draftFields: Record<DraftFieldKey, string>;
   draftStatuses: Record<DraftFieldKey, DraftFieldStatus>;
@@ -32,6 +38,7 @@ export type SummaryState = {
 };
 
 export type SummaryReleaseOptions = {
+  noteKind?: CareNoteKind;
   signature?: SummaryRelease['signature'];
   physician: string;
   releasedAt: string;
@@ -55,6 +62,7 @@ const FIELD_KEYS: readonly DraftFieldKey[] = [
 const NOT_STATED_TEXT = 'Not stated in this conversation.';
 const PENDING_AUTHORISATION = 'Pending patient review';
 const PERMITTED_AUTHORISATIONS = new Set([
+  DOCTOR_SIGNED_AWAITING_REVIEW,
   'Authorised by Patient & Surrogate',
   'Authorised by Designated Healthcare Proxy',
   'Authorised verbally (witnessed by care team)',
@@ -123,6 +131,7 @@ export function beginSummaryRevision<T extends SummaryState>(state: T): T {
     draftSource: '',
     draftExcerpts: blankExcerpts(),
     draftIsNewConversation: true,
+    draftPriorVersion: undefined,
     verificationChecks: { source: false, ambiguity: false, inference: false, reviewDate: false },
     authorisation: PENDING_AUTHORISATION,
     attested: false,
@@ -234,11 +243,21 @@ export function releaseSummary<T extends SummaryState>(
     !Number.isFinite(Date.parse(options.releasedAt))
   ) return state;
 
+  if (state.authorisation === DOCTOR_SIGNED_AWAITING_REVIEW && (
+    !isCareNoteKind(options.noteKind) || options.signature?.method !== 'typed' ||
+    options.signature.name.trim().toLowerCase() !== options.physician.trim().toLowerCase() ||
+    !Number.isFinite(Date.parse(options.signature.signedAt))
+  )) return state;
+
   const fields = freezeRecord(state.draftFields);
   const statuses = freezeRecord(state.draftStatuses);
   const excerpts = freezeRecord(state.draftExcerpts);
   const coverage = options.coverage == null ? null : freezeRecord({ ...options.coverage });
+  const priorVersion = patientReleases(state).find((previous) => previous.number === state.draftPriorVersion)?.number;
   const release = Object.freeze({
+    id: `${state.patientId}:care-note:${nextSummaryVersion(state)}:${options.releasedAt}`,
+    ...(isCareNoteKind(options.noteKind) ? { noteKind: options.noteKind } : {}),
+    ...(priorVersion !== undefined ? { priorVersion } : {}),
     ...(options.signature ? { signature: Object.freeze({ ...options.signature }) } : {}),
     number: nextSummaryVersion(state),
     patientId: state.patientId,

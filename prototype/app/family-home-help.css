@@ -5,6 +5,8 @@
 .home-help-layout { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); align-items: start; gap: 30px; }
 .home-help-form { display: grid; gap: 14px; padding: 20px; border: 1px solid #d2ddcd; border-radius: 12px; background: #eeefe7; scroll-margin-top: 20px; }
 .home-help-categories { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.home-help-categories button:last-child { grid-column: 1 / -1; }
+.home-help-previous-category { margin: 0; font-size: 13px; color: #6b5b4d; line-height: 1.5; }
 .home-help-categories button, .home-help-filters button { border: 1px solid #bacbbf; border-radius: 7px; padding: 10px; background: #fff; color: #183f32; font-size: 14px; }
 .home-help-categories button[aria-pressed='true'], .home-help-filters button[aria-pressed='true'] { background: #174c3b; border-color: #174c3b; color: #fff; }
 .home-help-details summary { display: flex; align-items: center; font-size: 14px; color: #365c49; text-decoration: underline; text-underline-offset: 3px; }

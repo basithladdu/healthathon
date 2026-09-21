@@ -1,7 +1,8 @@
 import { isValidAppointmentDate } from './appointment-state.ts';
 
-export const SYMPTOM_SEVERITIES = ['Mild', 'Moderate', 'Severe'] as const;
-export type SymptomSeverity = (typeof SYMPTOM_SEVERITIES)[number];
+export const SYMPTOM_SEVERITIES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as const;
+const LEGACY_SYMPTOM_SEVERITIES = ['Mild', 'Moderate', 'Severe'] as const;
+export type SymptomSeverity = (typeof SYMPTOM_SEVERITIES)[number] | (typeof LEGACY_SYMPTOM_SEVERITIES)[number];
 export type SymptomInput = {
   symptom: string;
   severity: SymptomSeverity;
@@ -20,7 +21,9 @@ export type SymptomInputError = 'symptom' | 'severity' | 'date' | 'startedOn' | 
 
 export function validateSymptomInput(input: SymptomInput, today: string): SymptomInputError | null {
   if (!input.symptom.trim() || input.symptom.trim().length > 80) return 'symptom';
-  if (!SYMPTOM_SEVERITIES.includes(input.severity)) return 'severity';
+  if (typeof input.severity === 'number'
+    ? !Number.isInteger(input.severity) || input.severity < 0 || input.severity > 10
+    : !LEGACY_SYMPTOM_SEVERITIES.includes(input.severity)) return 'severity';
   if (!isValidAppointmentDate(today) || !isValidAppointmentDate(input.date) || input.date > today) return 'date';
   if (input.startedOn && (!isValidAppointmentDate(input.startedOn) || input.startedOn > input.date)) return 'startedOn';
   if (input.note.trim().length > 500) return 'note';
@@ -65,15 +68,20 @@ export function selectSymptomEntries(entries: SymptomEntry[], patientId: string,
     .sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id));
 }
 
+export function symptomSeverityText(value: SymptomSeverity, hindi = false): string {
+  if (typeof value === 'number') return `${value}/10`;
+  const labels = { Mild: 'हल्का', Moderate: 'मध्यम', Severe: 'बहुत ज़्यादा' };
+  return hindi ? labels[value] : value;
+}
+
 export function symptomDiaryText(entries: SymptomEntry[], patientId: string, today: string, hindi = false): string {
   const t = (en: string, hi: string) => hindi ? hi : en;
-  const severityLabels = { Mild: 'हल्का', Moderate: 'मध्यम', Severe: 'बहुत ज़्यादा' };
   return [
     t('Saanthvana — How I have been feeling', 'सांत्वना — मेरी तबीयत के नोट'),
     `${t('Saved on', 'कॉपी की तारीख')}: ${today}`,
     t('Patient/family observations. Not sent to the care team.', 'मरीज़ या परिवार के लिखे नोट। देखभाल टीम को नहीं भेजे गए हैं।'),
     ...selectSymptomEntries(entries, patientId, today).map((entry) => [
-      `${entry.date} — ${entry.symptom} — ${hindi ? severityLabels[entry.severity] : entry.severity}`,
+      `${entry.date} — ${entry.symptom} — ${symptomSeverityText(entry.severity, hindi)}`,
       entry.startedOn ? `${t('Started', 'शुरू हुआ')}: ${entry.startedOn}` : '',
       entry.note,
       `${t('Written by', 'लिखा')}: ${entry.author}${entry.editedBy ? `; ${t('edited by', 'बदला')}: ${entry.editedBy}` : ''}`,

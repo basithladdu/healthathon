@@ -65,6 +65,7 @@
 .doctor-review-workbench .family-section-heading h2 { margin: 0; }
 .doctor-review-workbench .care-text-button { min-height: 44px; padding: 8px 0; color: #415a9c; font-size: 12px; }
 .doctor-draft-fields { display: grid; gap: 10px; }
+.doctor-family-draft .doctor-prior-context { margin: 0 0 12px; padding: 9px 11px; border-left: 3px solid #b99958; border-radius: 0 8px 8px 0; background: #fff2d4; color: #705735; font-size: 12px; line-height: 1.55; }
 .doctor-draft-fields > section { padding: 13px 14px; border: 1px solid #ddd2ec; border-left: 4px solid #a58acc; border-radius: 11px; background: #ffffffa8; }
 .doctor-draft-fields > section.is-followUp { border-left-color: #c99742; background: #fff8e7; }
 .doctor-draft-fields > section.is-openQuestions { border-left-color: #7a93c9; background: #f3f6ff; }
@@ -78,6 +79,14 @@
 .doctor-sign-panel .doctor-review-check { display: flex; gap: 10px; align-items: flex-start; min-height: 46px; line-height: 1.6; font-size: 12px; font-weight: 400; cursor: pointer; }
 .doctor-sign-panel .doctor-review-check input { width: 20px; height: 20px; flex: 0 0 20px; margin: 1px 0 0; accent-color: #365ba2; }
 .doctor-note-review .doctor-sign-panel .primary-button { min-height: 48px; padding: 11px 18px; border: 1px solid #2b53a2; border-radius: 11px; background: #2b53a2; color: #fff; box-shadow: none; font-size: 14px; }
+.doctor-note-kind { min-width: 0; margin: 0; padding: 0; border: 0; }
+.doctor-note-kind legend { margin: 0 0 8px; color: #69502b; font-size: 12px; font-weight: 650; }
+.doctor-note-kind > div { display: flex; flex-wrap: wrap; gap: 7px; }
+.doctor-note-kind button { flex: 1 1 auto; min-height: 44px; padding: 9px 11px; border: 1px solid #d8bd83; border-radius: 10px; background: #fffdf6; color: #735735; font: 600 12px/1.4 var(--font-inter, sans-serif); cursor: pointer; }
+.doctor-note-kind button[aria-pressed='true'] { border-color: #ad8539; background: #f4d378; color: #5e451f; box-shadow: inset 0 0 0 1px #ad8539; }
+.doctor-sign-panel > .doctor-sign-actions { gap: 8px; }
+.doctor-sign-actions :is(.primary-button, .secondary-button) { width: 100%; min-height: 44px; margin: 0; padding: 10px 14px; font-size: 13px; }
+.doctor-note-review .doctor-sign-actions .secondary-button { background: #fffaf0; border-color: #d9c291; color: #6c532c; box-shadow: none; }
 .doctor-signed-result { display: flex; align-items: center; flex-wrap: wrap; gap: 15px; padding: 22px; border: 1px solid #b0d4c5; border-radius: 20px; background: #e8f5ed; color: #285b49; }
 .doctor-signed-result > svg { width: 44px; height: 44px; flex-shrink: 0; color: #3b8166; }
 .doctor-signed-result > div { flex: 1 1 240px; min-width: 0; }
@@ -140,6 +149,23 @@
 .care-note-signature > span { color: #8a7565; font-size: 11px; }
 .care-note-signature > strong { color: #523b2c; font: 500 24px/1.3 Georgia, serif; }
 .care-note-signature time { color: #8a7565; font-size: 11px; line-height: 1.5; }
+.care-note-family-signing { min-width: 0; margin-top: 13px; }
+.care-note-family-signing .care-note-signature.is-family { margin: 10px 0 0; padding: 14px 16px; border: 1px solid #cad7b8; border-left: 4px solid #88a674; border-radius: 12px; background: #eef4e6; }
+.care-note-signature.is-family > span, .care-note-signature.is-family time { color: #526747; }
+.care-note-signature.is-family > strong { color: #3e5336; }
+.care-note-final-version { display: flex; align-items: flex-start; gap: 7px; margin: 10px 0 0; color: #4f6843; font-size: 12px; line-height: 1.6; }
+.care-note-final-version svg { width: 17px; height: 17px; flex: 0 0 17px; margin-top: 1px; }
+.care-note-review-pending { margin: 10px 0 0; color: #665280; font-size: 13px; line-height: 1.6; }
+.care-note-review-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; margin-top: 12px; }
+.care-note-review-actions :is(.primary-button, .secondary-button) { min-width: 0; min-height: 46px; margin: 0; padding: 10px 15px; font-size: 13px; white-space: normal; }
+.care-note-acknowledge-form { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); align-items: end; gap: 13px 17px; margin-top: 15px; padding: 18px; border: 1px solid #ddc599; border-radius: 15px; background: #fff2d5; }
+.care-note-reader .care-note-acknowledge-form h3 { grid-column: 1 / -1; margin: 0; color: #715034; font: 650 16px/1.4 var(--font-inter, sans-serif); }
+.care-note-signature-name { display: grid; gap: 7px; min-width: 0; color: #674d36; font-size: 12px; font-weight: 600; }
+.care-note-signature-name input { min-width: 0; width: 100%; min-height: 46px; padding: 11px 12px; border: 1px solid #cdb48a; border-radius: 10px; background: #fffdf8; color: #493a2e; font: 14px/1.4 var(--font-inter, sans-serif); }
+.care-note-review-check { display: flex; align-items: flex-start; gap: 9px; min-height: 46px; color: #584735; font-size: 12px; line-height: 1.65; cursor: pointer; }
+.care-note-review-check input { width: 20px; height: 20px; flex: 0 0 20px; margin: 1px 0 0; accent-color: #aa4a31; }
+.care-note-acknowledge-form .care-note-review-actions { grid-column: 1 / -1; margin: 0; }
+.care-note-signing-error { margin: 12px 0 0; padding: 11px 13px; border: 1px solid #d9af9d; border-radius: 10px; background: #fff0e7; color: #85452f; font-size: 13px; line-height: 1.6; }
 .care-note-reader .care-text-button { min-height: 44px; margin-top: 9px; padding: 10px 0; font-size: 13px; line-height: 1.5; text-align: left; white-space: normal; }
 .care-note-changes { display: grid; gap: 12px; margin-top: 9px; }
 .care-note-changes > section { padding: 14px; border: 1px solid #d7dce6; border-radius: 12px; background: #f7f8fc; }
@@ -191,6 +217,8 @@
   .doctor-record-card { padding: 18px; gap: 9px; }
   .doctor-sign-panel { grid-template-columns: 1fr 1fr; }
   .doctor-sign-panel > button { grid-column: 1 / -1; justify-self: start; }
+  .doctor-sign-panel > .doctor-sign-actions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; }
+  .doctor-sign-actions :is(.primary-button, .secondary-button) { width: auto; }
   .care-note-layout { grid-template-columns: 170px minmax(0, 1fr); gap: 15px; }
   .care-note-paper { padding: 18px; }
   .care-note-story-cards { grid-template-columns: minmax(0, 1fr); }
@@ -234,6 +262,8 @@
   .doctor-note-actions > button { flex: 1 1 auto; }
   .doctor-sign-panel { grid-template-columns: minmax(0, 1fr); padding: 15px; gap: 12px; }
   .doctor-sign-panel > button { width: 100%; }
+  .doctor-sign-panel > .doctor-sign-actions { display: grid; grid-template-columns: 1fr; }
+  .doctor-sign-actions :is(.primary-button, .secondary-button) { width: 100%; }
   .doctor-source-card > p { padding: 11px; max-height: 320px; font-size: 13px; }
   .care-note-top-actions { display: grid; grid-template-columns: minmax(0, 1fr); }
   .care-note-top-actions select { width: 100%; max-width: none; }
@@ -251,6 +281,10 @@
   .care-note-reader .care-note-story-card h3 { font-size: 13px; margin-bottom: 6px; }
   .care-note-signature { margin-top: 15px; padding-top: 13px; }
   .care-note-signature > strong { font-size: 22px; }
+  .care-note-acknowledge-form { grid-template-columns: minmax(0, 1fr); gap: 12px; padding: 14px; }
+  .care-note-review-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; gap: 7px; }
+  .care-note-review-actions :is(.primary-button, .secondary-button) { width: 100%; padding: 10px 9px; font-size: 12px; }
+  .care-note-review-actions > button:only-child { grid-column: 1 / -1; }
   .doctor-conversation-history { gap: 11px; padding-left: 25px; }
   .doctor-conversation-history > article { padding: 15px; }
   .doctor-conversation-history .care-timeline-dot { left: -24px; }

@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import type { SummaryRelease } from './summary-state';
 import { CareRouteLink } from './care-route-link';
 import type { CareView } from './care-routes';
+import { careSectionFor } from './care-section-pages';
 
 export function SimpleCareShell({ children, view, role, hindi, saveStatus, onNavigate, onRole, onLanguage, onSignOut }: {
   children: ReactNode; view: string; role: 'family' | 'patient' | 'doctor'; hindi: boolean;
@@ -14,18 +15,18 @@ export function SimpleCareShell({ children, view, role, hindi, saveStatus, onNav
 }) {
   const t = (en: string, hi: string) => hindi ? hi : en;
   const links = role === 'doctor' ? [{ key: 'home', label: t('Overview', 'एक नज़र') }, { key: 'doctor-record', label: t('Record', 'बातचीत') }, { key: 'doctor-review', label: t('Review & sign', 'जाँचें और साइन करें') }, { key: 'doctor-history', label: t('History', 'पुराने नोट') }, { key: 'care-near-me', label: t('Find care', 'देखभाल ढूँढें') }] as const
-    : [{ key: 'daily-care', label: t('Home', 'होम') }, { key: 'calendar', label: t('Calendar', 'कैलेंडर') }, { key: 'reports', label: t('Reports', 'रिपोर्ट') }, { key: 'my-plan', label: t('Care note', 'देखभाल का नोट') }, { key: 'care-near-me', label: t('Find care', 'देखभाल ढूँढें') }] as const;
+    : [{ key: 'daily-care', label: t('Home', 'होम') }, { key: 'clinical-documents', label: t('My documents', 'दस्तावेज़') }, { key: 'access-care', label: t('Find support', 'मदद') }, { key: 'my-space', label: t('My space', 'मेरी जगह') }, { key: 'doctor-pack', label: t('Care summary', 'देखभाल का सार') }] as const;
   return <div className="simple-care-app">
     <header className="simple-care-header">
       <CareRouteLink className="simple-care-brand" view={role === 'doctor' ? 'home' : 'daily-care'} onOpen={() => onNavigate(role === 'doctor' ? 'home' : 'daily-care')}>Saanthvana</CareRouteLink>
       <div className="simple-care-switches"><button type="button" onClick={onLanguage} lang={hindi ? 'en' : 'hi'}>{hindi ? 'English' : 'हिन्दी'}</button>
-        <select aria-label={t('View as', 'किसका पेज')} value={role} onChange={(event) => onRole(event.target.value as typeof role)}>
-          <option value="family">{t('Family', 'परिवार')}</option><option value="patient">{t('Patient', 'मरीज़')}</option><option value="doctor">{t('Doctor', 'डॉक्टर')}</option>
+        <select aria-label={t('View as', 'किसका पेज')} value={role === 'doctor' ? 'doctor' : 'patient'} onChange={(event) => onRole(event.target.value as typeof role)}>
+          <option value="patient">{t('Patient & family', 'मरीज़ और परिवार')}</option><option value="doctor">{t('Doctor', 'डॉक्टर')}</option>
         </select>
         <button type="button" onClick={onSignOut}>{t('Sign out', 'साइन आउट')}</button>
       </div>
     </header>
-    <nav className="simple-care-nav" aria-label={t('Main navigation', 'मुख्य मेन्यू')}>{links.map(({ key, label }) => <CareRouteLink key={key} view={key} aria-current={view === key ? 'page' : undefined} onOpen={() => onNavigate(key)}>{label}</CareRouteLink>)}</nav>
+    <nav className="simple-care-nav" aria-label={t('Main navigation', 'मुख्य मेन्यू')}>{links.map(({ key, label }) => <CareRouteLink key={key} view={key} aria-current={(role === 'doctor' ? view : careSectionFor(view)) === key ? 'page' : undefined} onOpen={() => onNavigate(key)}>{label}</CareRouteLink>)}</nav>
     <main key={view} className="simple-care-content" lang={hindi ? 'hi' : 'en'}>{children}</main>
     {saveStatus === 'unavailable' && <p className="care-save-error" role="alert">{t('Could not save your latest changes. Download a copy before closing.', 'नए बदलाव सेव नहीं हुए। बंद करने से पहले कॉपी डाउनलोड करें।')}</p>}
   </div>;

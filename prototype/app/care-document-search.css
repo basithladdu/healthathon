@@ -1,0 +1,62 @@
+.care-document-search { min-width: 0; margin-top: 22px; padding: 20px; border: 1px solid #dacfdc; border-radius: 20px; color: #45384c; background: #f5eef9; }
+.care-document-search * { box-sizing: border-box; }
+.care-document-heading, .care-document-results-heading, .care-document-match header, .care-document-match footer, .care-document-editor header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 14px; }
+.care-document-search .care-document-heading h2 { margin: 0; font: 500 25px/1.2 Georgia, 'Times New Roman', serif; letter-spacing: -.5px; }
+.care-document-heading > span, .care-document-match time { color: #796781; font-size: 12px; }
+.care-document-search :is(button, a, input, select, summary) { min-height: 44px; }
+.care-document-search :is(button, a, input, select, textarea, summary):focus-visible { outline: 3px solid #7b598c; outline-offset: 3px; }
+.care-document-search button { border: 1px solid #d9cbe0; border-radius: 11px; padding: 9px 13px; background: #fffcf8; color: #654574; font: 600 13px var(--font-inter), sans-serif; cursor: pointer; }
+.care-document-search button:disabled { opacity: .5; cursor: not-allowed; }
+.care-document-search a { display: inline-flex; align-items: center; color: #654574; font-size: 13px; text-underline-offset: 3px; }
+.care-document-search-form { display: flex; gap: 8px; margin-top: 16px; }
+.care-document-search-form input { flex: 1; min-width: 0; width: 100%; padding: 10px 12px; border: 1px solid #cfbfd6; border-radius: 12px; background: #fffefa; color: #45384c; font: 400 16px var(--font-inter), sans-serif; }
+.care-document-search-label { position: absolute; height: 1px; width: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.care-document-search .care-document-search-form button, .care-document-search .care-document-save { background: #765584; color: #fff; border-color: #765584; }
+.care-document-topics { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.care-document-topics button { padding-inline: 10px; font-size: 12px; background: transparent; }
+.care-document-topics button[aria-pressed='true'] { background: #e5d5ee; border-color: #9b7dac; }
+.care-document-results { margin-top: 15px; }
+.care-document-search :is(h3, h4) { margin: 0; font: 600 15px/1.45 var(--font-inter), sans-serif; overflow-wrap: anywhere; }
+.care-document-results-heading { margin-bottom: 10px; }
+.care-document-match { min-width: 0; padding: 16px; margin-top: 10px; border: 1px solid #e1d4e7; border-radius: 15px; background: #fffdfa; }
+.care-document-match h4 { flex: 1; min-width: 150px; }
+.care-document-match blockquote { margin: 14px 0; padding: 0 0 0 12px; border-left: 3px solid #ccb3dc; }
+.care-document-match blockquote p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; color: #4c414d; font-size: 14px; line-height: 1.65; }
+.care-document-match cite { display: block; margin-top: 6px; color: #8a758d; font-size: 11px; font-style: normal; }
+.care-document-match footer { border-top: 1px solid #ece2ed; padding-top: 5px; }
+.care-document-match footer > span { font-size: 11px; color: #8a758d; }
+.care-document-not-found, .care-document-message { margin: 14px 0 0; color: #6f5b75; font-size: 14px; line-height: 1.5; }
+.care-document-limit { margin: 12px 0 0; font-size: 12px; line-height: 1.5; color: #806d86; }
+.care-document-text-list { margin-top: 12px; }
+.care-document-text-list summary { display: flex; align-items: center; gap: 8px; color: #6f537c; font-size: 13px; font-weight: 600; cursor: pointer; list-style: none; }
+.care-document-text-list summary::before { content: '+'; font-size: 20px; font-weight: 400; }
+.care-document-text-list[open] summary::before { content: '−'; }
+.care-document-text-list summary::-webkit-details-marker { display: none; }
+.care-document-text-list ul { padding: 0; margin: 2px 0 0; list-style: none; }
+.care-document-text-list li { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-block: 6px; border-top: 1px solid #e4d7e8; }
+.care-document-text-list li > span { min-width: 0; font-size: 13px; overflow-wrap: anywhere; }
+.care-document-text-list li button { flex: none; }
+.care-document-editor { display: grid; gap: 12px; margin-top: 16px; padding-top: 14px; border-top: 1px solid #dacee0; }
+.care-document-editor header h3 { flex: 1; min-width: 120px; }
+.care-document-editor label { display: grid; gap: 6px; font-size: 13px; font-weight: 600; }
+.care-document-editor :is(textarea, select) { width: 100%; min-width: 0; padding: 11px; border: 1px solid #cfbfd6; border-radius: 11px; color: #45384c; background: #fffefa; font: 400 16px/1.5 var(--font-inter), sans-serif; }
+.care-document-editor textarea { resize: vertical; }
+.care-document-editor > p { margin: -4px 0 0; color: #806d86; font-size: 12px; line-height: 1.5; }
+.care-document-editor .care-document-error { color: #9f4936; }
+.care-document-editor .care-document-save { justify-self: start; min-width: 110px; }
+.care-document-read-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+.care-document-reading { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 8px 12px; border: 1px solid #d6c4df; border-radius: 12px; background: #ede0f4; }
+.care-document-reading progress { width: 100%; height: 7px; accent-color: #805d90; }
+.care-document-reading span { flex: 1; min-width: 130px; font-size: 12px; color: #72517e; }
+.care-document-editor .care-document-read-message { color: #70557d; font-size: 13px; }
+.care-document-editor .care-document-read-scope { color: #8b7053; font-size: 12px; }
+.care-document-editor textarea:disabled { opacity: .6; }
+@media (max-width: 600px) {
+  .care-document-search { padding: 16px 14px; border-radius: 17px; }
+  .care-document-search .care-document-heading h2 { font-size: 23px; }
+  .care-document-match { padding: 13px; }
+  .care-document-search-form { gap: 6px; }
+  .care-document-search-form button { padding-inline: 11px; }
+  .care-document-topics { gap: 5px; }
+  .care-document-topics button { font-size: 11px; padding-inline: 8px; }
+}

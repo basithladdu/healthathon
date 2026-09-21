@@ -1,5 +1,10 @@
 export const CARE_ROUTES = {
   'daily-care': '/home',
+  'clinical-documents': '/my-documents',
+  'access-care': '/find-care',
+  'my-space': '/my-space',
+  community: '/support-groups',
+  'document-search': '/find-in-documents',
   calendar: '/calendar',
   'family-tasks': '/family-tasks',
   'visit-questions': '/next-visit-questions',
@@ -10,7 +15,7 @@ export const CARE_ROUTES = {
   'care-story': '/care-story',
   'lab-history': '/test-results',
   'voice-journal': '/journal',
-  'doctor-pack': '/next-doctor',
+  'doctor-pack': '/care-summary',
   'home-help': '/help-at-home',
   'support-places': '/saved-places',
   'open-questions': '/questions',
@@ -49,13 +54,16 @@ export type CareView = keyof typeof CARE_ROUTES;
 
 export function careViewFromPath(path: string): CareView | undefined {
   const normalized = path.replace(/\/$/, '') || '/';
+  if (normalized === '/next-doctor') return 'doctor-pack';
+  if (normalized === '/costs' || normalized === '/family-tasks' || normalized === '/saved-places') return 'daily-care';
+  if (normalized === '/questions') return 'visit-questions';
   return (Object.keys(CARE_ROUTES) as CareView[]).find((view) => CARE_ROUTES[view] === normalized);
 }
 
 export function canOpenCareView(view: CareView, role: 'family' | 'patient' | 'care-team', clinician: string) {
   if (role !== 'care-team') {
     if (view === 'caregiver') return role === 'family';
-    if (view === 'my-details' || view === 'consent') return role === 'patient';
+    if (view === 'my-details' || view === 'consent') return true;
     return !CARE_ROUTES[view].startsWith('/workspace/') && !CARE_ROUTES[view].startsWith('/doctor');
   }
   if (view === 'draft' || view === 'verify' || view === 'doctor-review' || view === 'doctor-record') return clinician.startsWith('Dr Sujay');

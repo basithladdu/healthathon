@@ -4,8 +4,8 @@ import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
 import type { CareReport } from './care-calendar-state';
 import {
   LAB_REPORT_FLAGS, LAB_TEST_CATALOG, addLabResult, updateLabResult, removeLabResult,
-  restoreLabResult, selectLabResults, labNumericSeries, labHistoryText, validateLabResult,
-  type LabResultDraft, type LabResultEntry, type LabReportFlag, type LabNumericPoint,
+  restoreLabResult, selectLabResults, labNumericSeries, labHistoryText, labTrendTable, validateLabResult,
+  type LabResultDraft, type LabResultEntry, type LabReportFlag, type LabNumericPoint, type LabTreatmentEvent,
 } from './family-lab-state';
 import './family-lab-history.css';
 
@@ -17,6 +17,7 @@ export type FamilyLabHistoryProps = {
   reports: CareReport[];
   entries: LabResultEntry[];
   onChange: (entries: LabResultEntry[]) => void;
+  treatmentEvents?: readonly LabTreatmentEvent[];
 };
 
 const hindiTests: Record<string, string> = {
@@ -75,11 +76,52 @@ function LabPlot({ points, testName, unit, hindi }: { points: LabNumericPoint[];
   </figure>;
 }
 
+function LabTrendOverview({ patientId, entries, reports, treatmentEvents, hindi, onEdit }: {
+  patientId: string; entries: LabResultEntry[]; reports: CareReport[]; treatmentEvents: readonly LabTreatmentEvent[];
+  hindi: boolean; onEdit: (entry: LabResultEntry) => void;
+}) {
+  const id = useId();
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const t = (en: string, hi: string) => hindi ? hi : en;
+  const table = labTrendTable(entries, patientId, treatmentEvents);
+  const selected = entries.find((entry) => entry.patientId === patientId && entry.id === selectedId);
+  const source = reports.find((report) => report.patientId === patientId && report.id === selected?.reportId);
+  const name = (testName: string) => hindi ? hindiTests[testName] ?? testName : LAB_TEST_CATALOG.find((test) => test.name === testName)?.label ?? testName;
+  const dateLabel = (date: string) => new Date(`${date}T12:00:00Z`).toLocaleDateString(hindi ? 'hi-IN' : 'en-GB', { day: 'numeric', month: 'short', year: '2-digit', timeZone: 'UTC' });
+  if (!table.dates.length) return <p className="lab-trend-empty">{t('Add results from a report to see them side by side.', 'रिपोर्ट के नतीजे जोड़ें, फिर सभी तारीखें साथ देखें।')}</p>;
+  return <div className="lab-trend-overview">
+    <div className="lab-trend-scroll" role="region" tabIndex={0} aria-label={t('Results by date. Scroll sideways for more dates.', 'तारीख के हिसाब से नतीजे। और तारीखों के लिए दाएँ-बाएँ स्क्रॉल करें।')}>
+      <table className="lab-trend-table"><caption>{t('Results by date', 'तारीख के हिसाब से नतीजे')}</caption>
+        <thead><tr><th scope="col">{t('Test', 'जाँच')}</th>{table.dates.map((date) => <th scope="col" key={date}><time dateTime={date}>{dateLabel(date)}</time></th>)}</tr></thead>
+        <tbody>{table.rows.map((row) => <tr key={JSON.stringify([row.testName, row.unit])}>
+          <th scope="row">{name(row.testName)}<span>{row.unit}</span></th>
+          {table.dates.map((date) => <td key={date}>{row.entries.filter((entry) => entry.date === date).map((entry) => <button type="button" key={entry.id} className="lab-trend-value" aria-pressed={selectedId === entry.id} aria-controls={`${id}-source`} aria-label={`${name(entry.testName)}: ${entry.value} ${entry.unit}, ${dateLabel(entry.date)}. ${t('Open source', 'रिपोर्ट देखें')}`} onClick={() => setSelectedId(selectedId === entry.id ? null : entry.id)}>
+            <strong>{entry.value}</strong>{entry.reportFlag !== 'Not stated' && <span data-flag={entry.reportFlag}>{hindi ? hindiFlags[entry.reportFlag] : entry.reportFlag}</span>}
+          </button>)}{!row.entries.some((entry) => entry.date === date) && <span className="lab-trend-missing" aria-label={t('No result recorded', 'नतीजा दर्ज नहीं है')}>—</span>}</td>)}
+        </tr>)}
+        {table.events.length > 0 && <tr className="lab-trend-treatment"><th scope="row">{t('Treatment events', 'इलाज की घटनाएँ')}</th>{table.dates.map((date) => <td key={date}>{table.events.filter((event) => event.date === date).map((event) => {
+          const report = reports.find((item) => item.patientId === patientId && item.id === event.reportId);
+          return <div className="lab-trend-event" key={event.id}><strong>{event.title}</strong><span>{event.status === 'planned' ? t('Planned', 'तय किया गया') : t('Recorded', 'दर्ज किया गया')}</span><small>{event.sourceName}</small>{report && <LabReportLinks report={report} hindi={hindi} compact />}</div>;
+        })}{!table.events.some((event) => event.date === date) && <span className="lab-trend-missing">—</span>}</td>)}</tr>}
+        </tbody>
+      </table>
+    </div>
+    <p className="lab-trend-key">{t('Tap a value for its source. Flags are copied from the report.', 'रिपोर्ट देखने के लिए नतीजे पर टैप करें। फ़्लैग रिपोर्ट से लिखे गए हैं।')}</p>
+    <div id={`${id}-source`}>{selected && <section className="lab-trend-source">
+      <header><h3>{name(selected.testName)} · {selected.value} {selected.unit}</h3><button type="button" onClick={() => setSelectedId(null)}>{t('Close', 'बंद करें')}</button></header>
+      <time dateTime={selected.date}>{dateLabel(selected.date)}</time>
+      <dl><div><dt>{t('Range as printed', 'रिपोर्ट की रेंज')}</dt><dd>{selected.printedRange || t('Not entered', 'दर्ज नहीं है')}</dd></div><div><dt>{t('Flag as printed', 'रिपोर्ट का फ़्लैग')}</dt><dd>{hindi ? hindiFlags[selected.reportFlag] : selected.reportFlag}</dd></div></dl>
+      {source ? <LabReportLinks report={source} hindi={hindi} /> : <p>{selected.sourceName}{selected.reportId ? ` · ${t('File no longer here', 'फ़ाइल अब यहाँ नहीं है')}` : ''}</p>}
+      <footer><span>{t('Copied by', 'लिखने वाले')} {selected.recordedBy}</span><button type="button" onClick={() => onEdit(selected)}>{t('Edit result', 'नतीजा बदलें')}</button></footer>
+    </section>}</div>
+  </div>;
+}
+
 export function FamilyLabHistory(props: FamilyLabHistoryProps) {
   return <LabHistoryForPatient key={props.patientId} {...props} />;
 }
 
-function LabHistoryForPatient({ patientId, author, today, hindi, reports, entries, onChange }: FamilyLabHistoryProps) {
+function LabHistoryForPatient({ patientId, author, today, hindi, reports, entries, onChange, treatmentEvents = [] }: FamilyLabHistoryProps) {
   const id = useId();
   const inputRef = useRef<HTMLInputElement>(null);
   const t = (en: string, hi: string) => hindi ? hi : en;
@@ -93,6 +135,7 @@ function LabHistoryForPatient({ patientId, author, today, hindi, reports, entrie
   const cardTests = [...tests, ...bloodTests.map((test) => test.name).filter((name) => !tests.includes(name))];
   const customSavedTests = tests.filter((name) => !LAB_TEST_CATALOG.some((test) => test.name === name));
   const [selectedTest, setSelectedTest] = useState<string | null>(null);
+  const [view, setView] = useState<'table' | 'test'>('table');
   const [unitChoice, setUnitChoice] = useState('');
   const [formOpen, setFormOpen] = useState(false);
   const [draft, setDraft] = useState<LabResultDraft>(() => blankDraft(today));
@@ -169,7 +212,7 @@ function LabHistoryForPatient({ patientId, author, today, hindi, reports, entrie
   }
 
   function download() {
-    const url = URL.createObjectURL(new Blob([labHistoryText(entries, patientId, hindi)], { type: 'text/plain;charset=utf-8' }));
+    const url = URL.createObjectURL(new Blob([labHistoryText(entries, patientId, hindi, treatmentEvents)], { type: 'text/plain;charset=utf-8' }));
     const link = document.createElement('a'); link.href = url; link.download = 'saanthvana-lab-results.txt'; link.click();
     setTimeout(() => URL.revokeObjectURL(url), 0);
     setMessage(t('Download started.', 'डाउनलोड शुरू हो गया।'));
@@ -219,6 +262,9 @@ function LabHistoryForPatient({ patientId, author, today, hindi, reports, entrie
     </form>}
 
     {!formOpen && <>
+    <nav className="lab-history-views" aria-label={t('View results', 'नतीजे देखें')}><button type="button" aria-pressed={view === 'table'} onClick={() => setView('table')}>{t('All dates together', 'सभी तारीखें साथ')}</button><button type="button" aria-pressed={view === 'test'} onClick={() => setView('test')}>{t('One test at a time', 'एक-एक जाँच')}</button></nav>
+    {view === 'table' && <LabTrendOverview patientId={patientId} entries={entries} reports={patientReports} treatmentEvents={treatmentEvents} hindi={hindi} onEdit={edit} />}
+    {view === 'test' && <>
     <nav className="lab-test-catalog" aria-label={t('Choose a test', 'जाँच चुनें')}>
       {cardTests.map((name) => {
         const latest = patientEntries.find((entry) => entry.testName === name);
@@ -240,10 +286,11 @@ function LabHistoryForPatient({ patientId, author, today, hindi, reports, entrie
     <div className="lab-results-section-heading"><h2>{filter ? testLabel(filter) : t('All results', 'सभी नतीजे')}</h2>{visible.length > 0 && <span>{visible.length} {t(visible.length === 1 ? 'result' : 'results', 'नतीजे')}</span>}</div>
     {filter && units.length > 1 && <label className="lab-chart-unit">{t('Chart unit', 'चार्ट की इकाई')}<select value={plotUnit} onChange={(event) => setUnitChoice(event.target.value)}>{units.map((unit) => <option key={unit}>{unit}</option>)}</select></label>}
     {points.length > 1 && <LabPlot points={points} testName={testLabel(filter)} unit={plotUnit} hindi={hindi} />}
+    </>}
 
     {lastRemoved && <div className="lab-result-undo" role="status"><span>{t('Removed', 'हटा दिया')}: {testLabel(lastRemoved.testName)} · {lastRemoved.value} {lastRemoved.unit}</span><button type="button" onClick={undo}>{t('Undo', 'वापस लाएँ')}</button></div>}
     {message && <p className="lab-result-message" role="status">{message}</p>}
-    {visible.length ? <ol className="lab-result-list">{visible.map((entry) => {
+    {view === 'test' && (visible.length ? <ol className="lab-result-list">{visible.map((entry) => {
       const report = patientReports.find((item) => item.id === entry.reportId);
       return <li key={entry.id} className="lab-result-card">
         <div className="lab-result-card-heading"><h2>{testLabel(entry.testName)}</h2><time dateTime={entry.date}>{dateLabel(entry.date)}</time></div>
@@ -252,7 +299,7 @@ function LabHistoryForPatient({ patientId, author, today, hindi, reports, entrie
         <div className="lab-result-source"><span>{t('Source', 'रिपोर्ट')}</span>{report ? <LabReportLinks report={report} hindi={hindi} /> : <p>{entry.sourceName}{entry.reportId && <span>{t('File no longer here', 'फ़ाइल अब यहाँ नहीं है')}</span>}</p>}</div>
         <div className="lab-result-card-footer"><span>{t('Copied by', 'लिखने वाले')} {entry.recordedBy}{entry.updatedBy !== entry.recordedBy ? ` · ${t('edited by', 'बदला')} ${entry.updatedBy}` : ''}</span><div><button type="button" onClick={() => edit(entry)}>{t('Edit', 'बदलें')}</button><button type="button" onClick={() => remove(entry)}>{t('Remove', 'हटाएँ')}</button></div></div>
       </li>;
-    })}</ol> : <div className="lab-history-empty"><p>{filter ? t(`No ${testLabel(filter)} results added yet.`, `अभी ${testLabel(filter)} का कोई नतीजा नहीं जोड़ा है।`) : t('No results added yet.', 'अभी कोई नतीजा नहीं जोड़ा है।')}</p><button type="button" className="primary-button" onClick={() => openNew()}>{t('Add from a report', 'रिपोर्ट से जोड़ें')}</button></div>}
+    })}</ol> : <div className="lab-history-empty"><p>{filter ? t(`No ${testLabel(filter)} results added yet.`, `अभी ${testLabel(filter)} का कोई नतीजा नहीं जोड़ा है।`) : t('No results added yet.', 'अभी कोई नतीजा नहीं जोड़ा है।')}</p><button type="button" className="primary-button" onClick={() => openNew()}>{t('Add from a report', 'रिपोर्ट से जोड़ें')}</button></div>)}
     </>}
   </section>;
 }

@@ -23,13 +23,14 @@ import type { FamilyCostState } from './family-cost-state';
 import { FamilyCancerOverview } from './family-cancer-overview';
 import type { CareReport } from './care-calendar-state';
 import { FamilyLabHistory } from './family-lab-history';
-import type { LabResultEntry } from './family-lab-state';
+import type { LabResultEntry, LabTreatmentEvent } from './family-lab-state';
+import type { CareNoteAcknowledgement } from './care-note-signing-state';
 import { IconArrowRight } from './icons';
 import { CareArt } from './care-art';
 import { CareRouteLink } from './care-route-link';
 
 export type FamilyTool = 'symptom-diary' | 'care-story' | 'doctor-pack' | 'home-help' | 'support-places' | 'open-questions' | 'copy-tracker' | 'voice-journal' | 'cancer-overview' | 'cost-help' | 'lab-history';
-export function FamilyCareTools({ tool, patientId, patientName, author, today, hindi, symptoms, story, recordedStory, contacts, knownContacts, homeHelp, supportPlaces, questions, copies, releases, voiceJournal, onVoiceJournal, voiceSave, costs, onCosts, labResults, onLabResults, diagnosis, team, reports, onOpen, onCareNote, onReports, onSymptoms, onStory, onContacts, onHomeHelp, onSupportPlaces, onQuestions, onCopies, note, calendarText, reportNames }: {
+export function FamilyCareTools({ tool, patientId, patientName, author, today, hindi, symptoms, story, recordedStory, contacts, knownContacts, homeHelp, supportPlaces, questions, copies, releases, voiceJournal, onVoiceJournal, voiceSave, costs, onCosts, labResults, onLabResults, treatmentEvents, acknowledgements = [], signedRelease, diagnosis, team, reports, onOpen, onCareNote, onReports, onSymptoms, onStory, onContacts, onHomeHelp, onSupportPlaces, onQuestions, onCopies, note, calendarText, reportNames }: {
   tool: FamilyTool; patientId: string; patientName: string; author: string; today: string; hindi: boolean;
   symptoms: SymptomEntry[]; story: CareStoryEntry[]; contacts: HandoverContact[];
   recordedStory?: readonly CareStoryEntry[];
@@ -40,6 +41,7 @@ export function FamilyCareTools({ tool, patientId, patientName, author, today, h
   voiceJournal: VoiceJournalEntry[]; onVoiceJournal: (entries: VoiceJournalEntry[]) => void; voiceSave: CareSaveStatus;
   costs: FamilyCostState; onCosts: (state: FamilyCostState) => void;
   labResults: LabResultEntry[]; onLabResults: (entries: LabResultEntry[]) => void;
+  treatmentEvents?: readonly LabTreatmentEvent[]; acknowledgements?: readonly CareNoteAcknowledgement[]; signedRelease?: SummaryRelease;
   diagnosis: string; team: string; reports: CareReport[]; onOpen: (tool: FamilyTool) => void; onCareNote: () => void; onReports: () => void;
   onQuestions: (entries: OpenQuestion[]) => void; onCopies: (entries: CareCopyEntry[]) => void;
   onSymptoms: (entries: SymptomEntry[]) => void; onStory: (entries: CareStoryEntry[]) => void; onContacts: (entries: HandoverContact[]) => void;
@@ -49,14 +51,14 @@ export function FamilyCareTools({ tool, patientId, patientName, author, today, h
   return <div className="family-care-tools">
     {tool === 'symptom-diary' && <FamilySymptomDiary key={patientId} patientId={patientId} author={author} today={today} hindi={hindi} entries={symptoms} onChange={onSymptoms} />}
     {tool === 'care-story' && <FamilyCareStory key={patientId} patientId={patientId} author={author} today={today} hindi={hindi} entries={story} recordedEntries={recordedStory} onChange={onStory} />}
-    {tool === 'doctor-pack' && <FamilyHandoverPack key={patientId} patientId={patientId} patientName={patientName} author={author} hindi={hindi} note={note} calendarText={calendarText} reportNames={reportNames} contacts={contacts} knownContacts={knownContacts} onContactsChange={onContacts} />}
+    {tool === 'doctor-pack' && <FamilyHandoverPack key={patientId} patientId={patientId} patientName={patientName} author={author} hindi={hindi} note={note} signedRelease={signedRelease} acknowledgements={acknowledgements} calendarText={calendarText} reportNames={reportNames} contacts={contacts} knownContacts={knownContacts} onContactsChange={onContacts} />}
     {tool === 'home-help' && <FamilyHomeHelp key={patientId} patientId={patientId} author={author} today={today} hindi={hindi} entries={homeHelp} onChange={onHomeHelp} />}
     {tool === 'support-places' && <FamilySupportPlaces key={patientId} patientId={patientId} author={author} today={today} hindi={hindi} entries={supportPlaces} onChange={onSupportPlaces} />}
     {tool === 'open-questions' && <FamilyOpenQuestions key={patientId} patientId={patientId} author={author} today={today} hindi={hindi} entries={questions} onChange={onQuestions} />}
-    {tool === 'copy-tracker' && <FamilyCopyTracker key={patientId} patientId={patientId} patientName={patientName} author={author} today={today} hindi={hindi} releases={releases} entries={copies} onChange={onCopies} />}
+    {tool === 'copy-tracker' && <FamilyCopyTracker key={patientId} patientId={patientId} patientName={patientName} author={author} today={today} hindi={hindi} releases={releases} acknowledgements={acknowledgements} entries={copies} onChange={onCopies} />}
     {tool === 'voice-journal' && <FamilyVoiceJournal key={patientId} patientId={patientId} author={author} today={today} hindi={hindi} entries={voiceJournal} onChange={onVoiceJournal} saveStatus={voiceSave} />}
     {tool === 'cost-help' && <FamilyCostHelp key={patientId} patientId={patientId} author={author} today={today} hindi={hindi} state={costs} onChange={onCosts} />}
-    {tool === 'lab-history' && <FamilyLabHistory key={patientId} patientId={patientId} author={author} today={today} hindi={hindi} reports={reports} entries={labResults} onChange={onLabResults} />}
+    {tool === 'lab-history' && <FamilyLabHistory key={patientId} patientId={patientId} author={author} today={today} hindi={hindi} reports={reports} entries={labResults} onChange={onLabResults} treatmentEvents={treatmentEvents} />}
     {tool === 'cancer-overview' && <FamilyCancerOverview key={patientId} patientId={patientId} patientName={patientName} diagnosis={diagnosis} team={team} hindi={hindi} symptoms={symptoms} story={story} reports={reports} onCareStory={() => onOpen('care-story')} onSymptoms={() => onOpen('symptom-diary')} onCareNote={onCareNote} onReports={onReports} />}
   </div>;
 }
@@ -68,11 +70,9 @@ export function FamilyToolButtons({ hindi, onOpen }: { hindi: boolean; onOpen: (
     { key: 'care-story', en: 'Your care story', hi: 'अब तक की देखभाल' },
     { key: 'lab-history', en: 'My test results', hi: 'मेरी जाँच के नतीजे' },
     { key: 'voice-journal', en: 'My journal', hi: 'मेरी डायरी' },
-    { key: 'doctor-pack', en: 'Take to the next doctor', hi: 'अगले डॉक्टर के लिए' },
+    { key: 'doctor-pack', en: 'Care summary', hi: 'देखभाल का सार' },
     { key: 'home-help', en: 'Help at home', hi: 'घर पर मदद' },
-    { key: 'open-questions', en: 'Still to discuss', hi: 'अभी बात करना बाकी है' },
     { key: 'copy-tracker', en: 'Who has the latest copy?', hi: 'नई कॉपी किसके पास है?' },
-    { key: 'cost-help', en: 'Help with costs', hi: 'खर्च में मदद' },
   ] as const;
   return <div className="family-tool-buttons">{tools.map(({ key, en, hi }) => <CareRouteLink key={key} view={key} data-tool={key} onOpen={() => onOpen(key)}>
     <span className="family-tool-icon" aria-hidden="true"><CareArt kind={key} /></span><span className="family-tool-label">{hindi ? hi : en}</span><span className="family-tool-arrow" aria-hidden="true"><IconArrowRight /></span>

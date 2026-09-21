@@ -6,7 +6,7 @@ import { CARE_CENTRES, DIRECTORY_CHECKED_ON, filterCareCentres, type CareCentre 
 import { PalliativeMap, type CareMapOrigin, type CareMapPoint, type CareRoadRoute } from './palliative-map';
 import { DIRECTORY_MAP_POINTS } from './care-map-data';
 
-export type CareNearMeProps = { audience: 'patient' | 'family'; patientName: string };
+export type CareNearMeProps = { audience: 'patient' | 'family'; patientName: string; homeAddress?: string };
 type Category = 'all' | 'palliative' | 'hospital';
 type Place = CareMapPoint & { address: string; sourceUrl: string; distanceKm: number };
 type SearchMatch = CareMapOrigin & { id: string; address: string; sourceUrl: string };
@@ -54,7 +54,7 @@ function directionsUrl(point: CareMapPoint, origin: CareMapOrigin | null) {
   return `https://www.google.com/maps/dir/?${params}`;
 }
 
-export function CareNearMe(_props: CareNearMeProps): React.JSX.Element {
+export function CareNearMe({ homeAddress }: CareNearMeProps): React.JSX.Element {
   const [query, setQuery] = useState('');
   const [service, setService] = useState('');
   const [category, setCategory] = useState<Category>('palliative');
@@ -226,6 +226,7 @@ export function CareNearMe(_props: CareNearMeProps): React.JSX.Element {
         <label>Starting point<input ref={startInput} value={startText} onChange={(event) => setStartText(event.target.value)} placeholder="City, area or address" autoComplete="off" /></label>
         <button type="submit" className="cnm-btn cnm-btn-secondary" disabled={findingOrigin}>Find place</button>
         <button type="button" className="cnm-btn cnm-btn-primary" onClick={useLocation} disabled={findingOrigin}>Use my location</button>
+        {homeAddress?.trim() && <button type="button" className="cnm-btn cnm-btn-secondary" onClick={() => { setStartText(homeAddress.trim()); startInput.current?.focus(); }}>Use home address</button>}
       </form>
       {findingOrigin && <p className="cnm-message" role="status">Finding your starting point…</p>}
       {locationMessage && <p className="cnm-message is-error" role="alert">{locationMessage}</p>}

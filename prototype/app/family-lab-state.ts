@@ -35,6 +35,32 @@ export type LabResultEntry = LabResultDraft & {
 };
 export type LabDraftError = 'testName' | 'value' | 'unit' | 'date' | 'printedRange' | 'reportFlag' | 'source';
 export type LabNumericPoint = { id: string; date: string; value: string; numericValue: number; unit: string };
+export type LabTreatmentEvent = {
+  id: string;
+  patientId: string;
+  date: string;
+  title: string;
+  status: 'recorded' | 'planned';
+  sourceName: string;
+  reportId?: string | null;
+};
+export type LabTrendRow = { testName: string; unit: string; entries: LabResultEntry[] };
+
+export function labTrendTable(entries: LabResultEntry[], patientId: string, treatmentEvents: readonly LabTreatmentEvent[] = []): {
+  dates: string[]; rows: LabTrendRow[]; events: LabTreatmentEvent[];
+} {
+  const values = selectLabResults(entries, patientId).filter((entry) => isValidAppointmentDate(entry.date));
+  const events = treatmentEvents.filter((event) => event.patientId === patientId && isValidAppointmentDate(event.date))
+    .slice().sort((a, b) => a.date.localeCompare(b.date));
+  const rows: LabTrendRow[] = [];
+  for (const entry of values) {
+    const row = rows.find((item) => item.testName === entry.testName && item.unit === entry.unit);
+    if (row) row.entries.push(entry);
+    else rows.push({ testName: entry.testName, unit: entry.unit, entries: [entry] });
+  }
+  rows.sort((a, b) => a.testName.localeCompare(b.testName) || a.unit.localeCompare(b.unit));
+  return { dates: [...new Set([...values.map((entry) => entry.date), ...events.map((event) => event.date)])].sort(), rows, events };
+}
 
 export function validateLabResult(draft: LabResultDraft, patientId: string, today: string, reports: CareReport[]): LabDraftError | null {
   if (!draft.testName.trim() || draft.testName.trim().length > 80) return 'testName';
@@ -91,7 +117,7 @@ export function labNumericSeries(entries: LabResultEntry[], patientId: string, t
     .sort((a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id));
 }
 
-export function labHistoryText(entries: LabResultEntry[], patientId: string, hindi = false): string {
+export function labHistoryText(entries: LabResultEntry[], patientId: string, hindi = false, treatmentEvents: readonly LabTreatmentEvent[] = []): string {
   const t = (en: string, hi: string) => hindi ? hi : en;
   return [
     t('SAANTHVANA — LAB RESULTS', 'सांत्वना — जाँच के नतीजे'),
@@ -103,6 +129,11 @@ export function labHistoryText(entries: LabResultEntry[], patientId: string, hin
       `${t('Flag as printed', 'रिपोर्ट में लिखा फ़्लैग')}: ${entry.reportFlag}`,
       `${t('Source', 'रिपोर्ट')}: ${entry.sourceName}`,
       `${t('Copied by', 'लिखने वाले')}: ${entry.recordedBy}${entry.updatedBy !== entry.recordedBy ? `; ${t('edited by', 'बदला')}: ${entry.updatedBy}` : ''}`,
+    ].join('\n')),
+    ...labTrendTable([], patientId, treatmentEvents).events.map((event) => [
+      `${event.date} — ${t('Treatment event', 'इलाज की घटना')}: ${event.title}`,
+      `${t('Status', 'स्थिति')}: ${event.status === 'planned' ? t('Planned', 'तय किया गया') : t('Recorded', 'दर्ज किया गया')}`,
+      `${t('Source', 'स्रोत')}: ${event.sourceName}`,
     ].join('\n')),
   ].join('\n\n');
 }

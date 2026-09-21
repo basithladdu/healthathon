@@ -1,0 +1,13 @@
+.care-section-page { --section-color: #ffd0ad; --section-border: #e3ae86; }
+.care-section-page.tone-lavender { --section-color: #ddc9fa; --section-border: #bea0e0; }
+.care-section-page.tone-mint { --section-color: #bce7d6; --section-border: #8cc5af; }
+.care-section-page > header { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+.care-section-page > header > svg { width: 68px; height: 64px; }
+.simple-care-app .care-section-page h1 { margin: 0; font: 500 clamp(26px, 3vw, 36px)/1.2 Georgia, serif; }
+.care-section-links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.care-section-links > a { display: grid; grid-template-columns: 60px minmax(0, 1fr) 22px; align-items: center; gap: 12px; padding: 15px; min-height: 98px; background: var(--section-color); border: 1px solid var(--section-border); border-radius: 20px; color: #3c3540; text-decoration: none; }
+.care-section-links > a > svg:first-child { width: 60px; height: 60px; }
+.care-section-links > a > svg:last-child { width: 21px; height: 21px; }
+.care-section-links strong { font-size: 16px; line-height: 1.35; }
+.care-section-links > a:focus-visible { outline: 3px solid #764699; outline-offset: 3px; }
+@media (max-width: 600px) { .care-section-links { grid-template-columns: 1fr; gap: 9px; } .care-section-links > a { min-height: 75px; grid-template-columns: 44px minmax(0, 1fr) 20px; padding: 10px 14px; border-radius: 16px; } .care-section-links > a > svg:first-child { width: 44px; height: 44px; } .care-section-page > header > svg { width: 46px; height: 46px; } }

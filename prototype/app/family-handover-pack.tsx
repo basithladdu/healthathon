@@ -2,6 +2,8 @@
 
 import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
 import { downloadCarePdf, type CarePdfSection } from './care-pdf';
+import type { SummaryRelease } from './summary-state';
+import { matchingCareNoteAcknowledgements, hasChangedSignedCareNote, type CareNoteAcknowledgement } from './care-note-signing-state';
 import {
   addHandoverContact, DEFAULT_HANDOVER_SELECTION, handoverFileName, mergeHandoverContacts,
   removeHandoverContact, restoreHandoverContact, updateHandoverContact,
@@ -14,6 +16,8 @@ type FamilyHandoverPackProps = {
   author: string;
   hindi: boolean;
   note: HandoverNote | null;
+  signedRelease?: SummaryRelease;
+  acknowledgements?: readonly CareNoteAcknowledgement[];
   calendarText: string;
   reportNames: string[];
   contacts: HandoverContact[];
@@ -25,7 +29,7 @@ export function FamilyHandoverPack(props: FamilyHandoverPackProps) {
   return <PatientHandoverPack key={props.patientId} {...props} />;
 }
 
-function PatientHandoverPack({ patientId, patientName, author, hindi, note, calendarText, reportNames, contacts, knownContacts = [], onContactsChange }: FamilyHandoverPackProps) {
+function PatientHandoverPack({ patientId, patientName, author, hindi, note, signedRelease, acknowledgements = [], calendarText, reportNames, contacts, knownContacts = [], onContactsChange }: FamilyHandoverPackProps) {
   const id = useId();
   const t = (en: string, hi: string) => hindi ? hi : en;
   const [selection, setSelection] = useState<HandoverSelection>({ ...DEFAULT_HANDOVER_SELECTION });
@@ -95,7 +99,7 @@ function PatientHandoverPack({ patientId, patientName, author, hindi, note, cale
     if (!hasPack || downloading) return;
     setDownloading(true); setMessage('');
     try {
-      await downloadCarePdf({ fileName: handoverFileName(patientId, selection.note && note ? note.version : null), title: t('Care to take with you', 'साथ ले जाने वाली देखभाल की जानकारी'), subtitle: `${patientName} · ${patientId}`, sections: packetSections() });
+      await downloadCarePdf({ fileName: handoverFileName(patientId, selection.note && note ? note.version : null), title: t('Care summary', 'देखभाल का सार'), subtitle: `${patientName} · ${patientId}`, sections: packetSections(), ...(selection.note && signedRelease ? { careNote: { release: signedRelease, acknowledgements } } : {}) });
       setMessage(t('Your PDF is downloading.', 'आपकी PDF डाउनलोड हो रही है।'));
     } catch (failure) {
       setMessage(failure instanceof Error ? failure.message : t('The PDF could not download. Try Print.', 'PDF डाउनलोड नहीं हुई। प्रिंट करें।'));
@@ -104,6 +108,7 @@ function PatientHandoverPack({ patientId, patientName, author, hindi, note, cale
 
   function print() {
     if (!hasPack) return;
+    if (selection.note && signedRelease && hasChangedSignedCareNote(acknowledgements, signedRelease)) { setMessage(t('This note no longer matches its signed version.', 'यह नोट हस्ताक्षर किए हुए संस्करण से मेल नहीं खाता।')); return; }
     printFrame.current?.remove();
     const frame = document.createElement('iframe');
     frame.title = t('Print the care pack', 'देखभाल की कॉपी प्रिंट करें');
@@ -116,9 +121,11 @@ function PatientHandoverPack({ patientId, patientName, author, hindi, note, cale
     style.textContent = '@page{margin:16mm}body{margin:0;color:#203d33;font:11pt/1.55 Arial,sans-serif}h1{font-size:22pt;margin:0 0 6pt}h2{font-size:12pt;color:#99503a;break-after:avoid;margin:18pt 0 5pt}p{white-space:pre-wrap;overflow-wrap:anywhere;margin:0 0 6pt}header{border-bottom:1pt solid #cfd9ce;padding-bottom:12pt;margin-bottom:16pt}';
     page.head.appendChild(title); page.head.appendChild(style);
     const header = page.createElement('header'); const heading = page.createElement('h1'); heading.textContent = patientName;
-    const identity = page.createElement('p'); identity.textContent = `${t('Care to take with you', 'साथ ले जाने वाली देखभाल की जानकारी')} · ${patientId}`;
+    const identity = page.createElement('p'); identity.textContent = `${t('Care summary', 'देखभाल का सार')} · ${patientId}`;
     header.appendChild(heading); header.appendChild(identity); page.body.appendChild(header);
-    for (const section of packetSections()) {
+    const printSections = packetSections();
+    if (selection.note && signedRelease?.signature) printSections.push({ heading: t('Recorded signatures', 'दर्ज हस्ताक्षर'), lines: [signedRelease.signature.name, signedRelease.signature.signedAt, ...matchingCareNoteAcknowledgements(acknowledgements, signedRelease).map((entry) => `${entry.signerName} · ${entry.signerRole} · ${entry.signedAt} · V${entry.version}`), t('Typed names; no verified digital signature.', 'टाइप किए हुए नाम; सत्यापित डिजिटल हस्ताक्षर नहीं।')] });
+    for (const section of printSections) {
       const heading = page.createElement('h2'); heading.textContent = section.heading; page.body.appendChild(heading);
       for (const line of section.lines) { const paragraph = page.createElement('p'); paragraph.textContent = line; page.body.appendChild(paragraph); }
     }
@@ -134,7 +141,7 @@ function PatientHandoverPack({ patientId, patientName, author, hindi, note, cale
   }
 
   return <section className="family-handover-pack" aria-labelledby={`${id}-heading`}>
-    <div className="handover-heading"><h1 id={`${id}-heading`}>{t('Take to the next doctor', 'अगले डॉक्टर के लिए')}</h1><div className="handover-export-actions"><button type="button" className="primary-button" disabled={!hasPack || downloading} onClick={download}>{downloading ? t('Making PDF…', 'PDF बन रही है…') : t('Download PDF', 'PDF डाउनलोड करें')}</button><button type="button" disabled={!hasPack} onClick={print}>{t('Print', 'प्रिंट करें')}</button></div></div>
+    <div className="handover-heading"><h1 id={`${id}-heading`}>{t('Care summary', 'देखभाल का सार')}</h1><div className="handover-export-actions"><button type="button" className="primary-button" disabled={!hasPack || downloading} onClick={download}>{downloading ? t('Making PDF…', 'PDF बन रही है…') : t('Download PDF', 'PDF डाउनलोड करें')}</button><button type="button" disabled={!hasPack} onClick={print}>{t('Print', 'प्रिंट करें')}</button></div></div>
     <fieldset className="handover-choices"><legend>{t('Include', 'शामिल करें')}</legend><div className="handover-choice-grid">
       {choice('note', note ? t(`Doctor’s note · v${note.version}`, `डॉक्टर का नोट · v${note.version}`) : t('Awaiting doctor’s note', 'डॉक्टर के नोट का इंतज़ार'), Boolean(note))}
       {choice('checklist', t('My checklist', 'मेरी सूची'), Boolean(calendarText.trim()))}

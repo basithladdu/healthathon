@@ -15,6 +15,8 @@ export type FamilyHomeHelpProps = {
 
 const labels: Record<HomeHelpCategory, { hi: string; title: string; hindiTitle: string }> = {
   Transport: { hi: 'आने-जाने में मदद', title: 'Arrange a ride', hindiTitle: 'आने-जाने का इंतज़ाम' },
+  'Home nursing': { hi: 'घर पर नर्सिंग', title: 'Arrange home nursing', hindiTitle: 'घर पर नर्सिंग का इंतज़ाम' },
+  'Medicines or equipment delivery': { hi: 'दवा या उपकरण की डिलीवरी', title: 'Arrange medicine or equipment delivery', hindiTitle: 'दवा या उपकरण घर मँगाना' },
   'Home help or nursing': { hi: 'घर पर मदद या नर्सिंग', title: 'Find help at home', hindiTitle: 'घर पर मदद का इंतज़ाम' },
   Equipment: { hi: 'सामान का इंतज़ाम', title: 'Arrange equipment', hindiTitle: 'ज़रूरी सामान का इंतज़ाम' },
   Paperwork: { hi: 'कागज़ी काम', title: 'Sort the paperwork', hindiTitle: 'कागज़ी काम पूरा करना' },
@@ -113,6 +115,7 @@ function HomeHelpForPatient({ patientId, author, today, hindi, entries, onChange
       <form ref={form} className="home-help-form" tabIndex={-1} onSubmit={save} aria-label={t(editingId ? 'Edit a need' : 'Add a need', editingId ? 'मदद की ज़रूरत बदलें' : 'मदद की ज़रूरत जोड़ें')}>
         <h2>{t(editingId ? 'Edit the details' : 'What do you need?', editingId ? 'जानकारी बदलें' : 'क्या मदद चाहिए?')}</h2>
         <div className="home-help-categories">{HOME_HELP_CATEGORIES.map((value) => <button key={value} type="button" aria-pressed={category === value} onClick={() => chooseCategory(value)}>{t(value, labels[value].hi)}</button>)}</div>
+        {editingId && category && !HOME_HELP_CATEGORIES.some((value) => value === category) && <p className="home-help-previous-category">{t('Saved category', 'दर्ज श्रेणी')}: {t(category, labels[category].hi)}</p>}
         <details open={detailsOpen} onToggle={(event) => setDetailsOpen(event.currentTarget.open)} className="home-help-details"><summary>{t('Add a person, date or note', 'नाम, तारीख या नोट जोड़ें')}</summary><div>
           <label>{t('What needs doing?', 'क्या करना है?')}<input value={title} onChange={(event) => setTitle(event.target.value)} maxLength={160} /></label>
           <label>{t('Who is helping?', 'कौन मदद कर रहा है?')}<input value={helper} onChange={(event) => setHelper(event.target.value)} maxLength={80} autoComplete="off" /></label>

@@ -1,14 +1,15 @@
 import { isValidAppointmentDate } from './appointment-state.ts';
 
-export const HOME_HELP_CATEGORIES = ['Transport', 'Home help or nursing', 'Equipment', 'Paperwork', 'Company', 'Caregiver break'] as const;
+export const HOME_HELP_CATEGORIES = ['Transport', 'Home nursing', 'Medicines or equipment delivery'] as const;
+const LEGACY_HOME_HELP_CATEGORIES = ['Home help or nursing', 'Equipment', 'Paperwork', 'Company', 'Caregiver break'] as const;
 export const HOME_HELP_STATUSES = ['To arrange', 'Arranged', 'Done'] as const;
-export type HomeHelpCategory = (typeof HOME_HELP_CATEGORIES)[number];
+export type HomeHelpCategory = (typeof HOME_HELP_CATEGORIES)[number] | (typeof LEGACY_HOME_HELP_CATEGORIES)[number];
 export type HomeHelpStatus = (typeof HOME_HELP_STATUSES)[number];
 export type HomeHelpInput = { category: HomeHelpCategory; title: string; helper: string; phone: string; date: string; note: string };
 export type HomeHelpEntry = HomeHelpInput & { id: string; patientId: string; status: HomeHelpStatus; author: string; editedBy?: string };
 
 export function validateHomeHelpInput(input: HomeHelpInput): 'category' | 'title' | 'helper' | 'phone' | 'date' | 'note' | null {
-  if (!HOME_HELP_CATEGORIES.includes(input.category)) return 'category';
+  if (![...HOME_HELP_CATEGORIES, ...LEGACY_HOME_HELP_CATEGORIES].includes(input.category)) return 'category';
   if (!input.title.trim() || input.title.trim().length > 160) return 'title';
   if (input.helper.trim().length > 80) return 'helper';
   if (input.phone.trim() && (!/^\+?[\d\s().-]{6,30}$/.test(input.phone.trim()) || input.phone.replace(/\D/g, '').length < 6 || input.phone.replace(/\D/g, '').length > 15)) return 'phone';

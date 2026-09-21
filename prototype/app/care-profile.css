@@ -1,0 +1,13 @@
+.care-profile { max-width: 860px; margin-inline: auto; }
+.care-profile > header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; gap: 16px; }
+.care-profile header > a { min-height: 44px; display: inline-flex; align-items: center; color: #735639; }
+.care-profile form { border: 1px solid #dcc9ab; background: #fffaf1; padding: 22px; border-radius: 22px; }
+.care-profile-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.care-profile label { display: grid; gap: 7px; font-size: 13px; font-weight: 600; color: #534839; }
+.care-profile :is(input,select,textarea) { width: 100%; min-width: 0; min-height: 45px; border: 1px solid #cdbd9d; border-radius: 10px; padding: 10px; background: white; color: #39332c; font-family: inherit; font-size: 15px; line-height: 1.4; }
+.care-profile-wide { grid-column: 1 / -1; }
+.care-profile details { margin-top: 15px; }
+.care-profile summary { min-height: 44px; padding-block: 12px; cursor: pointer; font-weight: 600; }
+.care-profile-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
+.care-profile-actions span { font-size: 13px; }
+@media (max-width: 540px) { .care-profile form { padding: 15px; } .care-profile-fields { gap: 12px; } .care-profile label { font-size: 12px; } .care-profile :is(input,select,textarea) { font-size: 16px; } }
