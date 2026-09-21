@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import type { FeatureCollection } from 'geojson';
 import * as maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import './palliative-map.css';
@@ -80,7 +81,7 @@ export function PalliativeMap({ points, origin, selectedId, route, searchCentre,
   useEffect(() => {
     const map = instance.current;
     if (!map || !ready) return;
-    const data: GeoJSON.FeatureCollection = {
+    const data: FeatureCollection = {
       type: 'FeatureCollection',
       features: route ? [{ type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: route.coordinates } }] : [],
     };
