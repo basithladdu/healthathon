@@ -119,7 +119,8 @@ export function PalliativeMap({ points, origin, selectedId, route, searchCentre,
         count.textContent = String(members.length);
         const label = document.createElement('span');
         label.textContent = 'centres';
-        button.append(count, label);
+        button.appendChild(count);
+        button.appendChild(label);
         button.addEventListener('click', () => {
           userMoved.current = true;
           const bounds = members.reduce((current, member) => current.extend(member.point.coordinates), new maplibregl.LngLatBounds(point.coordinates, point.coordinates));
@@ -135,7 +136,8 @@ export function PalliativeMap({ points, origin, selectedId, route, searchCentre,
               number.textContent = String(member.index + 1);
               const name = document.createElement('strong');
               name.textContent = member.point.name;
-              choice.append(number, name);
+              choice.appendChild(number);
+              choice.appendChild(name);
               choice.addEventListener('click', () => { userMoved.current = false; select.current(member.point.id); });
               list.appendChild(choice);
             }
@@ -164,7 +166,8 @@ export function PalliativeMap({ points, origin, selectedId, route, searchCentre,
       icon.appendChild(path);
       const number = document.createElement('strong');
       number.textContent = String(index + 1);
-      head.append(icon, number);
+      head.appendChild(icon);
+      head.appendChild(number);
       button.appendChild(head);
       button.addEventListener('click', () => { userMoved.current = false; if (selectedId === point.id) refit.current(); select.current(point.id); });
       markers.current.push(new maplibregl.Marker({ element: button, anchor: 'bottom' }).setLngLat(point.coordinates).addTo(map!));
@@ -175,7 +178,8 @@ export function PalliativeMap({ points, origin, selectedId, route, searchCentre,
         category.textContent = point.category === 'palliative' ? 'Palliative care' : 'Hospital';
         const name = document.createElement('strong');
         name.textContent = point.name;
-        label.append(category, name);
+        label.appendChild(category);
+        label.appendChild(name);
         popup.current = new maplibregl.Popup({ closeButton: false, closeOnClick: false, focusAfterOpen: false, offset: 49, maxWidth: '230px', className: 'palliative-map-selected' }).setLngLat(point.coordinates).setDOMContent(label).addTo(map!);
       }
     }
