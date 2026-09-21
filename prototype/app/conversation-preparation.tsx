@@ -1,6 +1,7 @@
 'use client';
 
-import { useId } from 'react';
+import { useId, useState } from 'react';
+import { downloadCarePdf } from './care-pdf';
 
 const QUESTIONS = [
   ['understanding', 'What do you understand about the illness?', 'बीमारी के बारे में आप क्या समझते हैं?'],
@@ -11,32 +12,29 @@ const QUESTIONS = [
   ['language', 'Which language do you prefer?', 'आप किस भाषा में बात करना चाहते हैं?'],
 ] as const;
 
-export type PreparationNotes = Partial<Record<(typeof QUESTIONS)[number][0], string>>;
+export type PreparationNotes = Partial<Record<(typeof QUESTIONS)[number][0], string>> & { checkIn?: 'no-change' | 'nothing-to-add' };
 
 export function ConversationPreparation({ patientName, author, notes, onChange, hindi = false }: {
   patientName: string; author: string; notes: PreparationNotes; onChange: (notes: PreparationNotes) => void; hindi?: boolean;
 }) {
   const id = useId();
-  const hasNotes = Object.values(notes).some((value) => value?.trim());
-  function downloadNotes() {
-    const text = [
-      'Saanthvana — notes to bring to your doctor', `Patient: ${patientName}`, `Written by: ${author}`,
-      'Personal notes. Not reviewed by a doctor; not a treatment decision or an advance medical directive.',
-      ...QUESTIONS.filter(([key]) => notes[key]?.trim()).map(([key, question]) => `${question}\n${notes[key]?.trim()}`),
-    ].join('\n\n');
-    const url = URL.createObjectURL(new Blob([text], { type: 'text/plain;charset=utf-8' }));
-    const link = document.createElement('a'); link.href = url; link.download = 'saanthvana-conversation-notes.txt'; link.click(); URL.revokeObjectURL(url);
+  const [editing, setEditing] = useState(false);
+  const [prompts, setPrompts] = useState(false);
+  const [error, setError] = useState('');
+  const hasNotes = QUESTIONS.some(([key]) => notes[key]?.trim());
+  const t = (en: string, hi: string) => hindi ? hi : en;
+  async function downloadNotes() {
+    try { await downloadCarePdf({ fileName: 'saanthvana-next-visit-notes.pdf', title: patientName + ' — Next visit', subtitle: 'Written by ' + author,
+      sections: QUESTIONS.filter(([key]) => notes[key]?.trim()).map(([key, en, hi]) => ({ heading: t(en, hi), lines: [notes[key]!.trim()] })) }); }
+    catch { setError('The PDF could not be downloaded. Please try again.'); }
   }
-  return <section className="conversation-preparation" aria-labelledby={`${id}-title`}>
-    <h1 id={`${id}-title`}>{hindi ? 'आपके लिए क्या ज़रूरी है?' : 'What matters to you?'}</h1>
-    <p className="preparation-person">{patientName} · {author}</p>
-    <p className="preparation-boundary">{hindi ? 'ये आपके निजी नोट हैं। इन्हें डॉक्टर को दिखाने के लिए डाउनलोड कर सकते हैं।' : 'Your own notes. Save a copy to bring to the doctor.'}</p>
-    <div className="preparation-fields"><label htmlFor={`${id}-priorities`}>{hindi ? 'डॉक्टर को क्या बताना चाहते हैं?' : 'What would you like the doctor to know?'}<textarea id={`${id}-priorities`} rows={5} value={notes.priorities ?? ''} onChange={(event) => onChange({ ...notes, priorities: event.target.value })} /></label></div>
-    <details className="care-preparation-prompts"><summary>{hindi ? 'सोचने के लिए कुछ और सवाल' : 'A few prompts, if you need them'}</summary><div className="preparation-fields">
-      {QUESTIONS.filter(([key]) => key !== 'priorities').map(([key, en, hi]) => <label htmlFor={`${id}-${key}`} key={key}>{hindi ? hi : en}
-        {key === 'language' ? <input id={`${id}-${key}`} value={notes[key] ?? ''} onChange={(event) => onChange({ ...notes, [key]: event.target.value })} /> : <textarea id={`${id}-${key}`} rows={2} value={notes[key] ?? ''} onChange={(event) => onChange({ ...notes, [key]: event.target.value })} />}
-      </label>)}
-    </div></details>
-    <button className="primary-button" type="button" disabled={!hasNotes} onClick={downloadNotes}>{hindi ? 'कॉपी डाउनलोड करें' : 'Save a copy'}</button>
+  return <section className="conversation-preparation" aria-labelledby={id + '-title'}>
+    <div className="doctor-page-heading"><div><span className="doctor-eyebrow">{patientName}</span><h1 id={id + '-title'}>{t('Anything for the next visit?', 'अगली मुलाकात के लिए कुछ?')}</h1></div>{hasNotes && <button className="secondary-button" type="button" onClick={downloadNotes}>PDF</button>}</div>
+    <div className="preparation-quick-choices"><button type="button" aria-pressed={notes.checkIn === 'nothing-to-add'} onClick={() => { onChange({ ...notes, checkIn: 'nothing-to-add' }); setEditing(false); setPrompts(false); }}>{t('Nothing to add', 'कुछ जोड़ना नहीं है')}</button>{hasNotes && <button type="button" aria-pressed={notes.checkIn === 'no-change'} onClick={() => { onChange({ ...notes, checkIn: 'no-change' }); setEditing(false); }}>{t('No change', 'कोई बदलाव नहीं')}</button>}<button type="button" className="primary-button" onClick={() => { setEditing(true); onChange({ ...notes, checkIn: undefined }); }}>{hasNotes ? t('Edit my note', 'नोट बदलें') : t('Add a note', 'एक नोट जोड़ें')}</button><button type="button" aria-pressed={prompts} onClick={() => setPrompts(!prompts)}>{t('Help me think', 'सोचने में मदद करें')}</button></div>
+    {notes.checkIn && <p className="preparation-check-in" role="status">{notes.checkIn === 'no-change' ? t('Your notes stay as they are.', 'आपके नोट वैसे ही रहेंगे।') : t('Nothing to add for now.', 'अभी कुछ जोड़ना नहीं है।')}</p>}
+    {hasNotes && !editing && <div className="preparation-saved-notes">{QUESTIONS.filter(([key]) => notes[key]?.trim()).map(([key, en, hi]) => <article key={key}><h2>{t(en, hi)}</h2><p>{notes[key]}</p></article>)}</div>}
+    {editing && <div className="preparation-fields"><label htmlFor={id + '-priorities'}>{t('What would you like the doctor to know?', 'डॉक्टर को क्या बताना चाहते हैं?')}<textarea id={id + '-priorities'} rows={4} value={notes.priorities ?? ''} onChange={(event) => onChange({ ...notes, priorities: event.target.value, checkIn: undefined })} /></label><button type="button" className="primary-button" onClick={() => setEditing(false)}>{t('Done', 'हो गया')}</button></div>}
+    {prompts && <div className="preparation-prompt-grid">{QUESTIONS.filter(([key]) => key !== 'priorities').map(([key, en, hi]) => <details key={key}><summary>{t(en, hi)}</summary><label htmlFor={id + key} className="sr-only">{t(en, hi)}</label><textarea id={id + key} rows={2} value={notes[key] ?? ''} onChange={(event) => onChange({ ...notes, [key]: event.target.value, checkIn: undefined })} /></details>)}</div>}
+    {error && <p role="alert">{error}</p>}
   </section>;
 }

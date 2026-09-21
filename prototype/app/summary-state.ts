@@ -2,6 +2,7 @@ export type DraftFieldKey = 'priorities' | 'participants' | 'topics' | 'openQues
 export type DraftFieldStatus = 'ready' | 'not-stated' | 'clarify';
 
 export type SummaryRelease = {
+  signature?: { name: string; signedAt: string; method: 'typed' };
   number: number;
   patientId: string;
   fields: Readonly<Record<DraftFieldKey, string>> | null;
@@ -31,6 +32,7 @@ export type SummaryState = {
 };
 
 export type SummaryReleaseOptions = {
+  signature?: SummaryRelease['signature'];
   physician: string;
   releasedAt: string;
   coverage?: Readonly<Record<string, string>> | null;
@@ -237,6 +239,7 @@ export function releaseSummary<T extends SummaryState>(
   const excerpts = freezeRecord(state.draftExcerpts);
   const coverage = options.coverage == null ? null : freezeRecord({ ...options.coverage });
   const release = Object.freeze({
+    ...(options.signature ? { signature: Object.freeze({ ...options.signature }) } : {}),
     number: nextSummaryVersion(state),
     patientId: state.patientId,
     fields,

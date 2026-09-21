@@ -6,7 +6,10 @@ import { usePathname, useRouter } from 'next/navigation';
 import { CARE_ROUTES, careViewFromPath, canOpenCareView, type CareView as View } from './care-routes';
 import React, { useMemo, useState, useEffect, useRef } from 'react';
 import type { FamilyMember, PatientAccount } from './auth-screens';
-import { SimpleCareShell, FamilyCareNote } from './simple-care-shell';
+import { SimpleCareShell } from './simple-care-shell';
+import { DoctorConversation } from './doctor-conversation';
+import type { DoctorConversationEntry, AssistedNote } from './doctor-conversation-state';
+import { CareNoteReader } from './care-note-reader';
 import { CareSignIn } from './care-sign-in';
 import { DoctorNoteReview } from './doctor-note-review';
 import { prepareVisitNote, approveVisitNote } from './visit-note-state';
@@ -20,7 +23,6 @@ import { CareCalendar } from './care-calendar';
 import { addCareEvent, updateCareEvent, careChecksAfterEventUpdate, setCareCheck, reportFileError, type CareEvent, type CareCheck, type CareReport } from './care-calendar-state';
 import { useCareLocalState } from './care-local-store';
 import { FamilyCareTools } from './family-care-tools';
-import { FamilyNoteHistory } from './family-note-history';
 import type { HomeHelpEntry } from './family-home-help-state';
 import type { SupportPlace } from './family-support-state';
 import { addOpenQuestion, type OpenQuestion } from './family-open-question-state';
@@ -859,6 +861,8 @@ export function ContinuityPrototype() {
   const [voiceJournal, setVoiceJournal, voiceSave] = useCareLocalState<VoiceJournalEntry[]>('voice-journal', []);
   const [familyCosts, setFamilyCosts, costSave] = useCareLocalState<FamilyCostState>('family-costs', createEmptyFamilyCostState());
   const [labResults, setLabResults, labSave] = useCareLocalState<LabResultEntry[]>('lab-results', []);
+  const [doctorConversations, setDoctorConversations, conversationSave] = useCareLocalState<DoctorConversationEntry[]>('doctor-conversations', []);
+  const [newDoctorConversation, setNewDoctorConversation] = useState(true);
   const isFamilySession = sessionType === 'family';
   const isPatientSession = sessionType === 'patient';
   const [workItems, setWorkItems] = useState(initialWorkItems);
@@ -1265,6 +1269,41 @@ export function ContinuityPrototype() {
   function saveAppointmentInstructions(patientId: string, appointmentId: string, value: Appointment['preparationInstructions']) {
     if (value && (!value.text.trim() || value.text.length > 1200 || !value.givenBy.trim() || value.givenBy.length > 120 || !value.recordedBy.trim())) return;
     setAppointments((current) => current.map((visit) => visit.hospitalId === patientId && visit.id === appointmentId ? { ...visit, preparationInstructions: value } : visit));
+  }
+
+  function recordedStoryFor(id: string): CareStoryEntry[] {
+    const common = { patientId: id, changeReason: '' };
+    return [
+      ...appointments.filter((visit) => visit.hospitalId === id && visit.status === 'Attended').map((visit): CareStoryEntry => ({ ...common, id: `record-visit-${visit.id}`, date: visit.date, kind: 'Visit', title: visit.type, details: visit.outcome ?? visit.note ?? '', source: 'Appointment record', sourceAuthor: visit.clinician, createdBy: visit.clinician, updatedBy: visit.clinician })),
+      ...(recordStates[id]?.releases ?? []).filter((release) => release.patientId === id).map((release): CareStoryEntry => ({ ...common, id: `record-note-${id}-${release.number}`, date: release.releasedAt.slice(0, 10), kind: 'Milestone', title: `Care note approved · Version ${release.number}`, details: release.fields?.topics ?? release.source ?? '', source: `Approved care note V${release.number}`, sourceAuthor: release.physician, createdBy: release.physician, updatedBy: release.physician })),
+      ...careReports.filter((report) => report.patientId === id).map((report): CareStoryEntry => ({ ...common, id: `record-report-${report.id}`, date: report.date, kind: 'Report', title: report.file.name, details: '', source: 'Uploaded report', sourceAuthor: report.addedBy, createdBy: report.addedBy, updatedBy: report.addedBy })),
+    ];
+  }
+
+  function knownContactsFor(id: string): HandoverContact[] {
+    const details = detailsFor(id);
+    return [
+      { id: `contact-primary-${id}`, patientId: id, name: details.primaryDecisionMaker.name, relationship: details.primaryDecisionMaker.relationship || 'Family contact', phone: details.primaryDecisionMaker.phone },
+      { id: `contact-alternate-${id}`, patientId: id, name: details.alternateDecisionMaker.name, relationship: details.alternateDecisionMaker.relationship || 'Family contact', phone: details.alternateDecisionMaker.phone },
+      { id: `contact-doctor-${id}`, patientId: id, name: details.localPhysician.name || latestReleaseFor(id)?.physician || '', relationship: details.localPhysician.clinic || 'Doctor', phone: details.localPhysician.phone },
+    ].filter((contact) => contact.name.trim());
+  }
+
+  function saveDoctorConversation(entry: DoctorConversationEntry, draft?: AssistedNote) {
+    if (!isTreatingPhysician || sessionType !== 'care-team' || entry.patientId !== selectedId) return;
+    setDoctorConversations((entries) => [...entries, entry]);
+    if (entry.note.trim()) {
+      updateSelectedRecord((current) => {
+        let next = !current.versionPublished && entry.note.trim() === current.draftSource.trim() ? current : prepareVisitNote(current, entry.note);
+        if (draft) {
+          const keys = Object.keys(draft.fields) as DraftFieldKey[];
+          next = reviseSummary(next, { draftFields: draft.fields });
+          next = reviseSummary(next, { draftStatuses: Object.fromEntries(keys.map((key) => [key, draft.fields[key]?.trim() ? 'ready' : 'not-stated'])) as Record<DraftFieldKey, DraftFieldStatus>, draftExcerpts: draft.excerpts });
+        }
+        return next;
+      });
+      setView('doctor-review');
+    } else setView('doctor-history');
   }
 
   function detailsFor(id: string): PatientDetails {
@@ -5347,6 +5386,7 @@ export function ContinuityPrototype() {
         const release = latestReleaseFor(portalPatientId);
         const author = portalAuthor;
         return <FamilyCareTools tool={view} patientId={portalPatientId} patientName={portalPatientName} author={author} today={DEMO_TODAY} hindi={hindi}
+          recordedStory={recordedStoryFor(portalPatientId)} knownContacts={knownContactsFor(portalPatientId)}
           symptoms={symptoms} story={careStory} contacts={handoverContacts} onSymptoms={setSymptoms} onStory={setCareStory} onContacts={setHandoverContacts}
           homeHelp={homeHelp} supportPlaces={supportPlaces} onHomeHelp={setHomeHelp} onSupportPlaces={setSupportPlaces}
           questions={openQuestions} copies={careCopies} releases={recordStates[portalPatientId]?.releases ?? []} onQuestions={setOpenQuestions} onCopies={setCareCopies}
@@ -5515,7 +5555,7 @@ export function ContinuityPrototype() {
   }
 
   if (simpleMode && authScreen === null) {
-    const saves = [preparationSave, taskSave, eventSave, checkSave, reportSave, appointmentSave, noteSave, symptomSave, storySave, contactSave, helpSave, placesSave, questionSave, copySave, comfortSave, voiceSave, costSave, labSave];
+    const saves = [preparationSave, taskSave, eventSave, checkSave, reportSave, appointmentSave, noteSave, symptomSave, storySave, contactSave, helpSave, placesSave, questionSave, copySave, comfortSave, voiceSave, costSave, labSave, conversationSave];
     if (saves.includes('loading')) return <main className="care-opening" aria-busy="true">{hindi ? 'देखभाल की जानकारी खोल रहे हैं…' : 'Opening your care…'}</main>;
     const saveStatus = saves.includes('unavailable') ? 'unavailable' : saves.includes('saving') ? 'saving' : 'saved';
     const role = isFamilySession ? 'family' : isPatientSession ? 'patient' : 'doctor';
@@ -5527,28 +5567,43 @@ export function ContinuityPrototype() {
         else if (next === 'patient') enterPatient({ hospitalId: selectedId, name: selectedItem.patient, dob: patientProfiles[selectedId]?.dob ?? '' });
         else enterFamily({ name: selectedId === 'CANCER-20418' ? 'Kavya Raghavan' : 'Family member', relationship: 'Family member', patientId: selectedId, verifiedSummaryOnly: true });
       }}>
-      {role === 'doctor' && (view === 'home' || view === 'doctor-review') ? view !== 'doctor-review' ? <DoctorCareHome
+      {role === 'doctor' && view === 'home' ? <DoctorCareHome
         patients={workItems.map((item) => ({ id: item.hospitalId, name: item.patient, diagnosis: patientProfiles[item.hospitalId]?.diagnosis ?? patientProfiles[item.hospitalId]?.stage.split(' · ')[0] ?? '' }))}
         records={recordStates} appointments={appointments} physician={currentRole.split(' · ')[0]} today={DEMO_TODAY} hindi={hindi}
-        onReview={(id) => { selectPatient(id); setView('doctor-review'); }} onInstructions={saveAppointmentInstructions} /> : <DoctorNoteReview key={selectedId}
-        patientId={selectedId} patientName={selectedItem.patient} patients={workItems.map((item) => ({ id: item.hospitalId, name: item.patient }))}
-        state={recordState} physician={currentRole.split(' · ')[0]} onPatient={selectPatient}
-        onUseNote={(note) => {
-          if (!isTreatingPhysician || sessionType !== 'care-team') return;
-          updateSelectedRecord((current) => ({ ...prepareVisitNote(current, note),
-            conversationCoverage: Object.fromEntries(conversationDomains.map(({ key }) => [key, 'not-discussed'])) as Record<ConversationDomainKey, ConversationDisposition> }));
-        }}
-        onApprove={(permission, reviewed) => {
-          const next = approveVisitNote(recordState, { treatingPhysician: isTreatingPhysician && sessionType === 'care-team', physician: currentRole.split(' · ')[0], permission, reviewed, releasedAt: new Date().toISOString() });
-          if (next === recordState) return;
-          const release = latestSummaryRelease(next)!;
-          updateSelectedRecord(() => ({ ...next, retrievalAcknowledged: false, retrievalUnlocked: false, unlockedVersion: null }));
-          addAudit(`Approved care note version ${release.number}`, selectedItem.patient, 'PUBLISH', undefined, selectedId, release.number);
-        }}
-        onFamily={() => {
-          enterFamily({ name: selectedId === 'CANCER-20418' ? 'Kavya Raghavan' : 'Family member', relationship: 'Family member', patientId: selectedId, verifiedSummaryOnly: true }, 'my-plan');
-        }} />
-        : view === 'my-plan' ? <><FamilyCareNote patientName={portalPatientName} release={latestReleaseFor(portalPatientId)} fields={planFieldsFor(portalPatientId)} onPrepare={() => navigate('prepare-conversation')} hindi={hindi} /><FamilyNoteHistory key={portalPatientId} patientId={portalPatientId} patientName={portalPatientName} hindi={hindi} releases={recordStates[portalPatientId]?.releases ?? []} /></>
+        onReview={(id) => { selectPatient(id); setView('doctor-review'); }}
+        onRecord={(id) => { if (id) selectPatient(id); setNewDoctorConversation(true); setView('doctor-record'); }}
+        onHistory={(id) => { if (id) selectPatient(id); setView('doctor-history'); }} onInstructions={saveAppointmentInstructions} />
+        : role === 'doctor' && view === 'doctor-record' ? <DoctorConversation key={`${selectedId}:${newDoctorConversation}`}
+          patientId={selectedId} patientName={selectedItem.patient} patients={workItems.map((item) => ({ id: item.hospitalId, name: item.patient }))}
+          physician={currentRole.split(' · ')[0]} initialNote={newDoctorConversation || recordState.versionPublished ? '' : recordState.draftSource} hindi={hindi}
+          onPatient={selectPatient} onSave={saveDoctorConversation} onHistory={() => navigate('doctor-history')} />
+        : role === 'doctor' && view === 'doctor-review' ? <DoctorNoteReview key={selectedId}
+          patientId={selectedId} patientName={selectedItem.patient} patients={workItems.map((item) => ({ id: item.hospitalId, name: item.patient }))}
+          state={recordState} physician={currentRole.split(' · ')[0]} onPatient={selectPatient}
+          onRecord={() => { setNewDoctorConversation(true); navigate('doctor-record'); }} onEdit={() => { setNewDoctorConversation(false); navigate('doctor-record'); }} onHistory={() => navigate('doctor-history')}
+          onFields={(fields) => {
+            if (!isTreatingPhysician || sessionType !== 'care-team') return;
+            updateSelectedRecord((current) => {
+              const next = reviseSummary(current, { draftFields: fields });
+              const keys = Object.keys(fields) as DraftFieldKey[];
+              return reviseSummary(next, { draftStatuses: Object.fromEntries(keys.map((key) => [key, fields[key].trim() && fields[key] !== 'Not stated in this conversation.' ? 'ready' : 'not-stated'])) as Record<DraftFieldKey, DraftFieldStatus>,
+                draftExcerpts: Object.fromEntries(keys.map((key) => [key, fields[key].trim() && fields[key] !== 'Not stated in this conversation.' ? current.draftSource : ''])) as Record<DraftFieldKey, string> });
+            });
+          }}
+          onApprove={(permission, reviewed, signature) => {
+            const next = approveVisitNote(recordState, { treatingPhysician: isTreatingPhysician && sessionType === 'care-team', physician: currentRole.split(' · ')[0], permission, reviewed, signatureName: signature, releasedAt: new Date().toISOString() });
+            if (next === recordState) return;
+            const release = latestSummaryRelease(next)!;
+            updateSelectedRecord(() => ({ ...next, retrievalAcknowledged: false, retrievalUnlocked: false, unlockedVersion: null }));
+            addAudit(`Signed care note version ${release.number}`, selectedItem.patient, 'PUBLISH', undefined, selectedId, release.number);
+          }}
+          onFamily={() => navigate('my-plan')} />
+        : view === 'my-plan' || view === 'note-history' || view === 'doctor-history' ? <CareNoteReader key={portalPatientId}
+          patientId={portalPatientId} patientName={portalPatientName} releases={recordStates[portalPatientId]?.releases ?? []} hindi={hindi}
+          doctor={role === 'doctor'} conversations={doctorConversations}
+          patients={role === 'doctor' ? workItems.map((item) => ({ id: item.hospitalId, name: item.patient })) : undefined}
+          onPatient={role === 'doctor' ? selectPatient : undefined} onRecord={role === 'doctor' ? () => { setNewDoctorConversation(true); navigate('doctor-record'); } : undefined}
+          onPrepare={role === 'doctor' ? undefined : () => navigate('prepare-conversation')} />
         : renderCurrentView()}
     </SimpleCareShell>;
   }

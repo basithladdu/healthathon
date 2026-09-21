@@ -33,6 +33,7 @@ import './family-voice-journal.css';
 import './family-cost-help.css';
 import './doctor-care-home.css';
 import './care-colors.css';
+import './doctor-notes.css';
 
 const inter = Inter({
   variable: '--font-inter',

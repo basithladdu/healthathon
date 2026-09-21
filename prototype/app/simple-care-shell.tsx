@@ -13,7 +13,7 @@ export function SimpleCareShell({ children, view, role, hindi, saveStatus, onNav
   onSignOut: () => void;
 }) {
   const t = (en: string, hi: string) => hindi ? hi : en;
-  const links = role === 'doctor' ? [{ key: 'home', label: t('Overview', 'एक नज़र') }, { key: 'doctor-review', label: t('Care notes', 'देखभाल के नोट') }, { key: 'care-near-me', label: t('Find care', 'देखभाल ढूँढें') }] as const
+  const links = role === 'doctor' ? [{ key: 'home', label: t('Overview', 'एक नज़र') }, { key: 'doctor-record', label: t('Record', 'बातचीत') }, { key: 'doctor-review', label: t('Review & sign', 'जाँचें और साइन करें') }, { key: 'doctor-history', label: t('History', 'पुराने नोट') }, { key: 'care-near-me', label: t('Find care', 'देखभाल ढूँढें') }] as const
     : [{ key: 'daily-care', label: t('Home', 'होम') }, { key: 'calendar', label: t('Calendar', 'कैलेंडर') }, { key: 'reports', label: t('Reports', 'रिपोर्ट') }, { key: 'my-plan', label: t('Care note', 'देखभाल का नोट') }, { key: 'care-near-me', label: t('Find care', 'देखभाल ढूँढें') }] as const;
   return <div className="simple-care-app">
     <header className="simple-care-header">

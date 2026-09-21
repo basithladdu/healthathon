@@ -16,12 +16,15 @@ export function prepareVisitNote<T extends SummaryState>(state: T, note: string)
 
 export function approveVisitNote<T extends SummaryState>(state: T, input: {
   treatingPhysician: boolean; physician: string; permission: string; reviewed: boolean; releasedAt: string;
+  signatureName?: string;
 }): T {
   if (!input.treatingPhysician || !input.reviewed) return state;
+  if (input.signatureName !== undefined && input.signatureName.trim().toLowerCase() !== input.physician.trim().toLowerCase()) return state;
   const candidate = {
     ...state, draftPrepared: true, authorisation: input.permission, attested: true,
     verificationChecks: { source: true, ambiguity: true, inference: true, reviewDate: true },
   };
-  const released = releaseSummary(candidate, { physician: input.physician, releasedAt: input.releasedAt });
+  const released = releaseSummary(candidate, { physician: input.physician, releasedAt: input.releasedAt,
+    ...(input.signatureName ? { signature: { name: input.signatureName.trim(), signedAt: input.releasedAt, method: 'typed' as const } } : {}) });
   return released === candidate ? state : released;
 }

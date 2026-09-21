@@ -27,6 +27,9 @@ export const CARE_ROUTES = {
   consent: '/consent',
   home: '/doctor',
   'doctor-review': '/doctor/review',
+  'doctor-record': '/doctor/record',
+  'doctor-history': '/doctor/history',
+  'note-history': '/care-note/history',
   caregiver: '/workspace/family',
   guide: '/workspace/conversations',
   worklist: '/workspace/follow-ups',
@@ -53,9 +56,9 @@ export function canOpenCareView(view: CareView, role: 'family' | 'patient' | 'ca
   if (role !== 'care-team') {
     if (view === 'caregiver') return role === 'family';
     if (view === 'my-details' || view === 'consent') return role === 'patient';
-    return !CARE_ROUTES[view].startsWith('/workspace/') && view !== 'home' && view !== 'doctor-review';
+    return !CARE_ROUTES[view].startsWith('/workspace/') && !CARE_ROUTES[view].startsWith('/doctor');
   }
-  if (view === 'draft' || view === 'verify' || view === 'doctor-review') return clinician.startsWith('Dr Sujay');
+  if (view === 'draft' || view === 'verify' || view === 'doctor-review' || view === 'doctor-record') return clinician.startsWith('Dr Sujay');
   if (view === 'outreach') return clinician.startsWith('Anitha Rao');
   return true;
 }

@@ -3,8 +3,26 @@
 .family-tool-buttons > :is(a, button):hover { background: #dee9d4; }
 .family-tool-buttons > :is(a, button):focus-visible { outline: 2px solid #35765d; outline-offset: 3px; }
 .family-care-tools > .care-text-button { margin-bottom: 10px; }
+.simple-care-app .family-care-home .family-tool-buttons > [data-tool] { color: var(--tool-ink); border-color: color-mix(in srgb, var(--tool-ink) 16%, transparent); background: var(--tool-tint); }
+.simple-care-app .family-care-home .family-tool-buttons > [data-tool='cancer-overview'] { --tool-tint: #72ceb5; --tool-ink: #173e35; }
+.simple-care-app .family-care-home .family-tool-buttons > [data-tool='symptom-diary'] { --tool-tint: #ffa17c; --tool-ink: #5c2c1e; }
+.simple-care-app .family-care-home .family-tool-buttons > [data-tool='care-story'] { --tool-tint: #e8d468; --tool-ink: #4f4314; }
+.simple-care-app .family-care-home .family-tool-buttons > [data-tool='lab-history'] { --tool-tint: #85c6ed; --tool-ink: #203e59; }
+.simple-care-app .family-care-home .family-tool-buttons > [data-tool='voice-journal'] { --tool-tint: #f3a5c1; --tool-ink: #622741; }
+.simple-care-app .family-care-home .family-tool-buttons > [data-tool='doctor-pack'] { --tool-tint: #b6a2e5; --tool-ink: #3f2b60; }
+.simple-care-app .family-care-home .family-tool-buttons > [data-tool='home-help'] { --tool-tint: #f6bc68; --tool-ink: #674018; }
+.simple-care-app .family-care-home .family-tool-buttons > [data-tool='open-questions'] { --tool-tint: #92b1ec; --tool-ink: #293b63; }
+.simple-care-app .family-care-home .family-tool-buttons > [data-tool='copy-tracker'] { --tool-tint: #aad895; --tool-ink: #344e22; }
+.simple-care-app .family-care-home .family-tool-buttons > [data-tool='cost-help'] { --tool-tint: #f5cf54; --tool-ink: #574115; }
+.simple-care-app .family-care-home .family-tool-buttons > [data-tool] .family-tool-icon { filter: drop-shadow(0 3px 1px #46382016); }
+@media (min-width: 1101px) {
+  .simple-care-app .family-care-home .family-tool-buttons > [data-tool='home-help'] { grid-column: span 6; }
+}
+@media (min-width: 701px) and (max-width: 1100px) {
+  .simple-care-app .family-care-home .family-tool-buttons > [data-tool] { grid-column: span 3; }
+}
 @media (max-width: 700px) {
   .family-tool-buttons { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; margin-bottom: 16px; }
-  .family-tool-buttons > :is(a, button):last-child { grid-column: 1 / -1; }
   .family-tool-buttons > :is(a, button) { min-height: 44px; padding: 10px 13px; font-size: 13px; }
+  .simple-care-app .family-care-home .family-tool-buttons > [data-tool='cost-help'] { grid-column: 1 / -1; grid-template-columns: 60px minmax(0, 1fr); min-height: 88px; }
 }

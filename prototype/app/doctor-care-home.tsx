@@ -6,10 +6,11 @@ import { latestSummaryRelease, type SummaryState } from './summary-state';
 import { VisitInstructions } from './visit-instructions';
 import { IconUsers, IconFileText, IconClock, IconCheckCircle, IconArrowRight } from './icons';
 
-export function DoctorCareHome({ patients, records, appointments, physician, today, hindi, onReview, onInstructions }: {
+export function DoctorCareHome({ patients, records, appointments, physician, today, hindi, onReview, onRecord, onHistory, onInstructions }: {
   patients: Array<{ id: string; name: string; diagnosis: string }>; records: Record<string, SummaryState>;
   appointments: Appointment[]; physician: string; today: string; hindi: boolean;
   onReview: (patientId: string) => void;
+  onRecord: (patientId?: string) => void; onHistory: (patientId?: string) => void;
   onInstructions: (patientId: string, appointmentId: string, value: Appointment['preparationInstructions']) => void;
 }) {
   const [query, setQuery] = useState('');
@@ -18,18 +19,19 @@ export function DoctorCareHome({ patients, records, appointments, physician, tod
   const t = (en: string, hi: string) => hindi ? hi : en;
   const patientIds = new Set(patients.map((patient) => patient.id));
   const pending = patients.filter((patient) => !records[patient.id]?.versionPublished);
-  const approved = patients.filter((patient) => records[patient.id]?.versionPublished);
+  const approved = patients.filter((patient) => records[patient.id] && latestSummaryRelease(records[patient.id]));
   const upcoming = appointments.filter((visit) => patientIds.has(visit.hospitalId) && visit.status === 'Scheduled' && visit.date >= today).sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`));
   const visiblePatients = (onlyPending ? pending : patients).filter((patient) => `${patient.name} ${patient.id} ${patient.diagnosis}`.toLowerCase().includes(query.trim().toLowerCase()));
   const visibleVisits = schedule === 'today' ? upcoming.filter((visit) => visit.date === today) : upcoming;
   const dateLabel = (date: string) => new Date(`${date}T12:00:00`).toLocaleDateString(hindi ? 'hi-IN' : 'en-GB', { day: 'numeric', month: 'short' });
   return <section className="doctor-care-home">
     <header className="doctor-care-heading"><div><h1>{t('Care team', 'देखभाल टीम')}</h1><span>{physician}</span></div><label className="doctor-patient-search"><span className="sr-only">{t('Find a patient', 'मरीज़ ढूँढें')}</span><input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t('Find a patient', 'मरीज़ ढूँढें')} /></label></header>
+    <div className="doctor-home-actions"><button type="button" className="primary-button" onClick={() => onRecord()}><IconFileText />{t('Record conversation', 'बातचीत दर्ज करें')}</button><button type="button" className="secondary-button" onClick={() => onHistory()}><IconClock />{t('Note history', 'पुराने नोट')}</button></div>
     <div className="doctor-overview-cards">
       <button type="button" onClick={() => { setOnlyPending(false); document.getElementById('doctor-patient-queue')?.scrollIntoView({ block: 'nearest' }); }}><IconUsers /><strong>{patients.length}</strong><span>{t('People in care', 'देखभाल में लोग')}</span></button>
       <button type="button" onClick={() => { setOnlyPending(true); document.getElementById('doctor-patient-queue')?.scrollIntoView({ block: 'nearest' }); }}><IconFileText /><strong>{pending.length}</strong><span>{t('Notes to review', 'जाँचने के नोट')}</span></button>
       <button type="button" onClick={() => { setSchedule('upcoming'); document.getElementById('doctor-visit-list')?.scrollIntoView({ block: 'nearest' }); }}><IconClock /><strong>{upcoming.length}</strong><span>{t('Upcoming visits', 'आने वाली मुलाकातें')}</span></button>
-      <div><IconCheckCircle /><strong>{approved.length}</strong><span>{t('Notes approved', 'मंज़ूर नोट')}</span></div>
+      <button type="button" onClick={() => onHistory()}><IconCheckCircle /><strong>{approved.length}</strong><span>{t('Approved notes', 'मंज़ूर नोट')}</span></button>
     </div>
     <div className="doctor-home-grid">
       <section id="doctor-patient-queue" className="doctor-home-panel" aria-labelledby="doctor-queue-title"><div className="family-section-heading"><h2 id="doctor-queue-title">{t('Care notes', 'देखभाल के नोट')}</h2><button type="button" className="care-text-button" aria-pressed={onlyPending} onClick={() => setOnlyPending(!onlyPending)}>{onlyPending ? t('Show everyone', 'सभी को देखें') : t('To review', 'जाँचने हैं')}</button></div>

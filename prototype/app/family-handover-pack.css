@@ -1,46 +1,82 @@
-.family-handover-pack { color: #183f32; }
-.handover-heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 20px; margin-bottom: 24px; }
-.handover-heading h1 { margin: 0; font-size: clamp(23px, 2.4vw, 31px); line-height: 1.25; letter-spacing: -.7px; }
-.handover-heading > span { color: #576b5e; font-size: 15px; }
-.handover-grid { display: grid; grid-template-columns: minmax(270px, .75fr) minmax(0, 1.25fr); align-items: start; gap: 28px; }
-.handover-options { min-width: 0; }
-.handover-choices { min-width: 0; margin: 0 0 24px; padding: 0; border: 0; }
-.handover-choices legend, .handover-contacts h2, .handover-preview h2 { margin: 0 0 12px; padding: 0; font-size: 17px; font-weight: 650; }
-.handover-choice { display: flex; gap: 12px; align-items: center; min-height: 48px; padding: 8px 0; cursor: pointer; line-height: 1.4; font-size: 15px; }
-.handover-choice input { width: 22px; height: 22px; flex: 0 0 22px; accent-color: #174c3b; }
-.handover-choice.is-unavailable { color: #6b756d; cursor: default; }
-.handover-contacts { padding-top: 20px; border-top: 1px solid #d3dace; }
-.handover-contact-list { margin: 0 0 16px; padding: 0; list-style: none; }
-.handover-contact-list li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; padding: 10px 0; border-bottom: 1px solid #dce1d8; }
+.family-handover-pack { color: #263e33; max-width: 980px; margin-inline: auto; }
+.handover-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 18px; }
+.handover-heading h1 { margin: 0; font-size: clamp(23px, 2.4vw, 30px); line-height: 1.2; letter-spacing: -.75px; }
+.handover-export-actions, .handover-contact-actions, .handover-form-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.family-handover-pack button { min-height: 44px; padding: 9px 15px; border: 1px solid #d3d5c6; border-radius: 12px; background: #fffdf7; color: #263e33; font: inherit; font-size: 14px; font-weight: 650; cursor: pointer; }
+.family-handover-pack button.primary-button { min-height: 48px; background: #a65238; border-color: #a65238; color: #fffdf7; box-shadow: 0 4px 0 #783d2b; }
+.family-handover-pack button:disabled { opacity: .5; cursor: not-allowed; box-shadow: none; }
+.handover-choices { min-width: 0; margin: 0 0 20px; padding: 0; border: 0; }
+.handover-choices legend { margin: 0 0 8px; padding: 0; font-size: 12px; font-weight: 700; color: #617060; }
+.handover-choice-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.handover-choice { display: flex; gap: 9px; align-items: center; min-height: 50px; padding: 9px 11px; border: 1px solid #dedfd0; border-radius: 13px; background: #fffcf4; cursor: pointer; line-height: 1.4; font-size: 13px; box-sizing: border-box; }
+.handover-choice.is-selected { background: #e3ecd8; border-color: #a2b393; }
+.handover-choice input { width: 19px; height: 19px; flex: 0 0 19px; margin: 0; accent-color: #527047; }
+.handover-choice.is-unavailable { color: #788171; cursor: default; }
+.handover-preview { min-width: 0; border: 1px solid #e0ddcc; border-radius: 20px; background: #fffef9; overflow-wrap: anywhere; box-shadow: 0 6px 0 #e8e3d2; }
+.handover-preview-heading { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 12px; padding: 23px 26px 20px; border-bottom: 1px solid #e5dfce; background: #f8f0df; border-radius: 20px 20px 0 0; }
+.handover-paper-label { display: block; margin-bottom: 8px; color: #a65238; letter-spacing: 2px; font-weight: 750; font-size: 10px; }
+.handover-preview-heading h2 { margin: 0; font-size: 25px; line-height: 1.15; letter-spacing: -.65px; }
+.handover-patient-id { color: #6e7966; font-size: 12px; }
+.handover-reviewed { padding: 22px 26px; }
+.handover-note-heading, .handover-family-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.handover-note-heading h3, .handover-family-heading h3 { margin: 0; font-size: 17px; line-height: 1.3; }
+.handover-note-heading > span { font-size: 13px; font-weight: 700; }
+.handover-note-source { margin: 6px 0 19px; color: #65715f; font-size: 13px; }
+.handover-note-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 26px; margin: 0; }
+.handover-note-fields > div { min-width: 0; padding: 14px 0; border-top: 1px solid #e8e7dc; }
+.handover-note-fields > div:last-child { grid-column: 1 / -1; }
+.handover-note-fields dt { margin-bottom: 7px; color: #8b4b34; font-size: 12px; font-weight: 750; }
+.handover-note-fields dd { margin: 0; white-space: pre-wrap; font-size: 14px; line-height: 1.65; }
+.handover-clinical-boundary { margin: 12px 0 0; font-size: 12px; line-height: 1.5; color: #69715f; }
+.handover-family-extras { padding: 21px 26px; border-top: 1px solid #dddccc; background: #f3f5e9; border-radius: 0 0 20px 20px; }
+.handover-family-heading > span { font-size: 12px; color: #65715f; }
+.handover-extra-section { margin-top: 19px; }
+.handover-extra-section h4 { margin: 0 0 9px; font-size: 13px; color: #4c6741; }
+.handover-calendar-copy { margin: 0; white-space: pre-wrap; font-size: 13px; line-height: 1.6; }
+.handover-report-list { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 13px; }
+.handover-preview-contacts { display: grid; gap: 10px; margin: 0; }
+.handover-preview-contacts > div { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 5px 16px; }
+.handover-preview-contacts dt { font-size: 14px; font-weight: 650; }
+.handover-preview-contacts dt span { font-size: 12px; font-weight: 400; color: #69715f; margin-left: 8px; }
+.handover-preview-contacts dd { margin: 0; font-size: 13px; }
+.handover-preview-contacts dd a { display: inline-flex; align-items: center; min-height: 44px; color: #476638; text-underline-offset: 3px; }
+.handover-empty { padding: 22px 26px; color: #68705f; font-size: 14px; }
+.handover-contacts { margin-top: 25px; border: 1px solid #dddcca; border-radius: 15px; padding: 0 17px; background: #faf7ec; }
+.handover-contacts summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 54px; cursor: pointer; font-size: 14px; font-weight: 700; }
+.handover-contacts summary::after { content: '+'; font-size: 20px; font-weight: 400; }
+.handover-contacts[open] summary::after { content: '−'; }
+.handover-contacts summary > span { margin-left: auto; color: #74806a; font-size: 12px; }
+.handover-contacts[open] { padding-bottom: 17px; }
+.handover-contact-list { margin: 0 0 14px; padding: 0; list-style: none; }
+.handover-contact-list li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; padding: 13px 0; border-top: 1px solid #e1dfcf; }
 .handover-contact-list li > div:first-child { display: grid; gap: 4px; min-width: 0; }
-.handover-contact-list strong { font-size: 15px; overflow-wrap: anywhere; }
-.handover-contact-list span { font-size: 13px; color: #52665a; overflow-wrap: anywhere; }
-.handover-contact-actions, .handover-form-actions, .handover-export-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-.family-handover-pack button { min-height: 44px; padding: 9px 13px; border: 1px solid #c4cfc0; border-radius: 8px; background: #fff; color: #183f32; font: inherit; font-size: 14px; cursor: pointer; }
-.family-handover-pack button.primary-button { background: #174c3b; border-color: #174c3b; color: #fff; }
-.family-handover-pack button:disabled { opacity: .5; cursor: not-allowed; }
-.handover-contact-actions button, .handover-form-actions > button:not(.secondary-button), .handover-undo button { padding-inline: 8px; border-color: transparent; background: transparent; text-decoration: underline; text-underline-offset: 3px; }
-.handover-contact-form { display: grid; gap: 12px; }
-.handover-contact-form label { display: grid; gap: 6px; min-width: 0; font-size: 13px; font-weight: 600; }
-.handover-contact-form input { width: 100%; min-width: 0; min-height: 44px; box-sizing: border-box; border: 1px solid #becbb9; border-radius: 7px; padding: 9px 10px; background: #fff; color: #183f32; font: inherit; font-size: 15px; }
-.handover-contact-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.handover-contact-list strong { font-size: 14px; overflow-wrap: anywhere; }
+.handover-contact-list span { font-size: 12px; color: #65715f; overflow-wrap: anywhere; }
+.handover-contact-actions button, .handover-form-actions > button:not(.secondary-button), .handover-undo button { padding-inline: 8px; border-color: transparent; background: transparent; text-decoration: underline; text-underline-offset: 3px; font-weight: 500; }
+.handover-contact-form { display: grid; gap: 12px; margin-top: 8px; }
+.handover-contact-form label { display: grid; gap: 6px; min-width: 0; font-size: 12px; font-weight: 650; }
+.handover-contact-form input { width: 100%; min-width: 0; min-height: 46px; box-sizing: border-box; border: 1px solid #cacdb8; border-radius: 10px; padding: 9px 11px; background: #fffef9; color: #263e33; font: inherit; font-size: 15px; }
+.handover-contact-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .handover-undo { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin-top: 12px; font-size: 13px; }
 .handover-undo span { overflow-wrap: anywhere; }
-.handover-preview { min-width: 0; border: 1px solid #d1d9cc; border-radius: 12px; background: #fff; }
-.handover-preview-heading { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; padding: 16px 18px; border-bottom: 1px solid #e0e5dc; }
-.handover-preview-heading h2 { margin: 0; }
-.handover-copy { margin: 0; padding: 20px; white-space: pre-wrap; overflow-wrap: anywhere; font: 14px/1.65 var(--font-inter), sans-serif; }
-.handover-empty { padding: 16px 20px; color: #5e6c60; }
-.handover-message { margin: 14px 0 0; font-size: 13px; color: #46654f; }
+.handover-message { margin: 14px 0 0; font-size: 13px; color: #56634d; }
 .handover-message:empty { margin: 0; }
 .handover-print-frame { position: fixed; width: 1px; height: 1px; border: 0; right: 0; bottom: 0; }
-.family-handover-pack :is(input, button):focus-visible { outline: 2px solid #35765d; outline-offset: 3px; }
+.family-handover-pack :is(input, button, summary, a):focus-visible { outline: 2px solid #537348; outline-offset: 3px; }
 @media (max-width: 760px) {
-  .handover-grid { grid-template-columns: 1fr; gap: 24px; }
-  .handover-heading { margin-bottom: 20px; }
+  .handover-choice-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .handover-note-fields { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+  .handover-heading { margin-bottom: 16px; gap: 14px; }
   .handover-heading h1 { font-size: 24px; }
-  .handover-choices { margin-bottom: 18px; }
-  .handover-contacts { padding-top: 16px; }
-  .handover-copy { padding: 16px; font-size: 13px; }
-  .handover-preview-heading { padding: 14px 16px; }
+  .handover-export-actions { width: 100%; }
+  .handover-export-actions .primary-button { flex: 1; }
+  .handover-choice { padding: 8px 9px; font-size: 12px; gap: 7px; }
+  .handover-preview-heading, .handover-reviewed, .handover-family-extras { padding: 18px; }
+  .handover-preview-heading h2 { font-size: 22px; }
+  .handover-note-fields dd { font-size: 13px; }
+  .handover-note-fields > div { padding-block: 12px; }
+  .handover-contacts { padding-inline: 14px; }
+  .handover-contact-fields { grid-template-columns: 1fr; }
 }

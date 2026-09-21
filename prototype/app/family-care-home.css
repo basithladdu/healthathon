@@ -3,9 +3,11 @@
 .family-care-home .family-care-home-heading h1 { margin: 0; font: 500 clamp(30px, 3.1vw, 40px)/1.15 Georgia, 'Times New Roman', serif; color: #382e29; letter-spacing: -1.2px; }
 .family-care-home-shortcuts { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 12px; margin-top: 2px; }
 .care-home-shortcut { --shortcut-ink: #6f527f; display: grid; grid-template-columns: minmax(0, 1fr) 20px; align-content: center; align-items: center; gap: 12px 8px; grid-column: span 2; min-width: 0; min-height: 140px; padding: 18px; border: 1px solid transparent; border-radius: 20px; background: #e4d5f2; color: #382e29; text-align: left; font: inherit; cursor: pointer; box-shadow: 0 3px 0 #78543609; transition: transform .14s ease, box-shadow .14s ease; }
-.care-home-shortcut-calendar { --shortcut-ink: #80591f; grid-column: span 6; grid-template-columns: 60px minmax(0, 1fr) 22px; gap: 16px; padding: 22px; background: #ffdf96; }
-.care-home-shortcut-tasks { --shortcut-ink: #4b623f; background: #d7e6bd; }
-.care-home-shortcut-comfort { --shortcut-ink: #92523a; background: #ffdbc3; }
+.care-home-shortcut-calendar { grid-column: span 6; grid-template-columns: 60px minmax(0, 1fr) 22px; gap: 16px; padding: 22px; }
+.family-care-home .care-home-shortcut-calendar { --shortcut-ink: #5a3915; background: #f7be50; border-color: #d69a33; }
+.family-care-home .care-home-shortcut-reports { --shortcut-ink: #2e4271; background: #a2b9f0; border-color: #849ddd; }
+.family-care-home .care-home-shortcut-tasks { --shortcut-ink: #234e43; background: #8fd1b9; border-color: #72b39c; }
+.family-care-home .care-home-shortcut-comfort { --shortcut-ink: #743820; background: #f4a77f; border-color: #db8b62; }
 .care-home-shortcut-icon { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 14px; color: var(--shortcut-ink); background: #fffaf17a; box-shadow: inset 0 1px 0 #fffaf199; }
 .care-home-shortcut-icon svg { width: 26px; height: 26px; stroke-width: 1.6; }
 .care-home-shortcut-copy { min-width: 0; grid-column: 1; }
@@ -17,7 +19,7 @@
 .care-home-shortcut-calendar .care-home-shortcut-copy { grid-column: 2; }
 .care-home-shortcut-calendar .care-home-shortcut-copy strong { font: 500 27px/1.2 Georgia, 'Times New Roman', serif; letter-spacing: -.5px; }
 .care-home-shortcut-calendar .care-home-shortcut-arrow { grid-column: 3; grid-row: 1; }
-.care-home-shortcut-visit { display: flex; flex-wrap: wrap; gap: 3px 12px; margin-top: 8px; font-size: 13px; line-height: 1.5; color: #705637; }
+.care-home-shortcut-visit { display: flex; flex-wrap: wrap; gap: 3px 12px; margin-top: 8px; font-size: 13px; line-height: 1.5; color: #5d421d; }
 .care-home-shortcut-visit > span { overflow-wrap: anywhere; }
 .family-care-home .care-home-shortcut:focus-visible { outline: 3px solid #a7653d; outline-offset: 3px; }
 .family-care-home .care-home-shortcut:active { transform: translateY(1px); }

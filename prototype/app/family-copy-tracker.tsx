@@ -2,9 +2,10 @@
 
 import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
 import type { SummaryRelease } from './summary-state';
+import { downloadCarePdf } from './care-pdf';
 import {
   addCareCopyEntry, approvedPatientCopies, careCopyLogText, groupCareCopyEntries, removeCareCopyEntry,
-  restoreCareCopyEntry, reviewedCopyText, updateCareCopyEntry, validateCareCopyDraft,
+  restoreCareCopyEntry, updateCareCopyEntry, validateCareCopyDraft,
   type CareCopyDraft, type CareCopyEntry, type CareCopyStatus,
 } from './family-copy-state';
 import './family-copy-tracker.css';
@@ -31,9 +32,9 @@ function CopyTrackerForPatient({ patientId, patientName, author, today, hindi, r
   const [removed, setRemoved] = useState<Array<{ entry: CareCopyEntry; index: number }>>([]);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [downloading, setDownloading] = useState(false);
   const nameInput = useRef<HTMLInputElement>(null);
   const selectedCopy = copies.find((copy) => copy.number === draft.version);
-  const latestText = latest ? reviewedCopyText(releases, patientId, patientName, latest.number) : null;
   const dateLabel = (value: string) => new Date(`${value.slice(0, 10)}T12:00:00`).toLocaleDateString(hindi ? 'hi-IN' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
   const statusLabel = (status: CareCopyStatus) => status === 'latest' ? t('Latest version recorded', 'नया संस्करण दर्ज है') : status === 'older' ? t('Older version recorded', 'पुराना संस्करण दर्ज है') : t('Version not available here', 'यह संस्करण यहाँ नहीं है');
 
@@ -69,10 +70,29 @@ function CopyTrackerForPatient({ patientId, patientName, author, today, hindi, r
     document.body.appendChild(link); link.click(); link.remove(); window.setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
-  function downloadLatest() {
-    if (!latest || !latestText) return;
-    download(latestText, `saanthvana-${patientId.replace(/[^a-zA-Z0-9_-]/g, '-')}-note-v${latest.number}.txt`);
-    setMessage(t(`Version ${latest.number} is downloading.`, `संस्करण ${latest.number} डाउनलोड हो रहा है।`));
+  async function downloadLatest() {
+    if (!latest?.fields || downloading) return;
+    setDownloading(true); setMessage('');
+    try {
+      const fields = latest.fields;
+      await downloadCarePdf({
+        fileName: `saanthvana-${patientId.replace(/[^a-zA-Z0-9_-]/g, '-')}-note-v${latest.number}.pdf`,
+        title: t('Doctor-reviewed care note', 'डॉक्टर का मंज़ूर किया हुआ नोट'),
+        subtitle: `${patientName} · ${patientId}`,
+        sections: [
+          { heading: t('Review details', 'मंज़ूरी की जानकारी'), lines: [`${t('Version', 'संस्करण')}: ${latest.number}`, `${t('Doctor', 'डॉक्टर')}: ${latest.physician}`, `${t('Released', 'जारी किया')}: ${latest.releasedAt}`, ...(latest.authorisation ? [latest.authorisation] : []), ...(latest.signature ? [`${t('Signed name', 'दर्ज हस्ताक्षर नाम')}: ${latest.signature.name}`, `${t('Signed on', 'हस्ताक्षर की तारीख')}: ${latest.signature.signedAt}`] : [])] },
+          { heading: t('What matters to the patient', 'मरीज़ के लिए क्या ज़रूरी है'), lines: [fields.priorities] },
+          { heading: t('Who was there', 'कौन साथ थे'), lines: [fields.participants] },
+          { heading: t('What was discussed', 'क्या बात हुई'), lines: [fields.topics] },
+          { heading: t('Still to discuss', 'अभी बात करना बाकी है'), lines: [fields.openQuestions] },
+          { heading: t('Next steps', 'आगे क्या करना है'), lines: [fields.followUp] },
+          { heading: t('Care conversation', 'देखभाल की बातचीत'), lines: [t('This reviewed conversation note is not a prescription or a legal directive.', 'यह मंज़ूर किया हुआ बातचीत का नोट है; दवा का पर्चा या क़ानूनी निर्देश नहीं।')] },
+        ],
+      });
+      setMessage(t(`Version ${latest.number} PDF is downloading.`, `संस्करण ${latest.number} की PDF डाउनलोड हो रही है।`));
+    } catch (failure) {
+      setMessage(failure instanceof Error ? failure.message : t('The PDF could not download. Try again.', 'PDF डाउनलोड नहीं हुई। फिर कोशिश करें।'));
+    } finally { setDownloading(false); }
   }
 
   function remove(entry: CareCopyEntry) {
@@ -94,7 +114,7 @@ function CopyTrackerForPatient({ patientId, patientName, author, today, hindi, r
     <div className="copy-tracker-heading"><h1 id={`${id}-heading`}>{t('Who has the latest copy?', 'नई कॉपी किसके पास है?')}</h1><button type="button" disabled={!recipients.length} onClick={() => {
       download(careCopyLogText(entries, releases, patientId, patientName), `saanthvana-copy-log-${patientId.replace(/[^a-zA-Z0-9_-]/g, '-')}.txt`); setMessage(t('Your copy log is downloading.', 'कॉपी की सूची डाउनलोड हो रही है।'));
     }}>{t('Save this list', 'यह सूची डाउनलोड करें')}</button></div>
-    <div className="copy-current-note"><div><h2>{latest ? t(`Latest note · version ${latest.number}`, `नया नोट · संस्करण ${latest.number}`) : t('No approved note here yet', 'यहाँ अभी मंज़ूर किया हुआ नोट नहीं है')}</h2>{latest && <p>{latest.physician} · {dateLabel(latest.releasedAt)}</p>}</div><button type="button" className="primary-button" disabled={!latestText} onClick={downloadLatest}>{t('Download latest note', 'नया नोट डाउनलोड करें')}</button></div>
+    <div className="copy-current-note"><div><h2>{latest ? t(`Latest note · version ${latest.number}`, `नया नोट · संस्करण ${latest.number}`) : t('No approved note here yet', 'यहाँ अभी मंज़ूर किया हुआ नोट नहीं है')}</h2>{latest && <p>{latest.physician} · {dateLabel(latest.releasedAt)}</p>}</div><button type="button" className="primary-button" disabled={!latest?.fields || downloading} onClick={downloadLatest}>{downloading ? t('Making PDF…', 'PDF बन रही है…') : t('Download latest PDF', 'नए नोट की PDF लें')}</button></div>
     {!formOpen && <div className="copy-log-start"><button type="button" onClick={() => openForm()} disabled={!copies.length}>{t('I gave someone a copy', 'मैंने किसी को कॉपी दी')}</button></div>}
     {formOpen && <form className="copy-tracker-form" onSubmit={save} aria-labelledby={`${id}-form-title`}>
       <h2 id={`${id}-form-title`}>{editingId ? t('Correct this entry', 'इस जानकारी में सुधार करें') : t('Record the copy you gave', 'दी हुई कॉपी की जानकारी लिखें')}</h2>

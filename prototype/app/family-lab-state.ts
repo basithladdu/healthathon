@@ -1,7 +1,20 @@
 import { isValidAppointmentDate } from './appointment-state.ts';
 import type { CareReport } from './care-calendar-state.ts';
 
-export const LAB_TEST_SUGGESTIONS = ['Haemoglobin', 'RBC count', 'White cell count', 'Platelet count'] as const;
+export const LAB_TEST_CATALOG = [
+  { name: 'Haemoglobin', label: 'Haemoglobin', short: 'Hb', group: 'blood' },
+  { name: 'White cell count', label: 'White cells (WBC)', short: 'WBC', group: 'blood' },
+  { name: 'Absolute neutrophil count', label: 'Neutrophils (ANC)', short: 'ANC', group: 'blood' },
+  { name: 'Platelet count', label: 'Platelets', short: 'PLT', group: 'blood' },
+  { name: 'RBC count', label: 'Red cells (RBC)', short: 'RBC', group: 'blood' },
+  { name: 'Creatinine', label: 'Creatinine', short: 'Cr', group: 'kidney-liver' },
+  { name: 'Bilirubin', label: 'Bilirubin', short: 'Bili', group: 'kidney-liver' },
+  { name: 'ALT', label: 'ALT (SGPT)', short: 'ALT', group: 'kidney-liver' },
+  { name: 'AST', label: 'AST (SGOT)', short: 'AST', group: 'kidney-liver' },
+  { name: 'Sodium', label: 'Sodium', short: 'Na', group: 'electrolytes' },
+  { name: 'Potassium', label: 'Potassium', short: 'K', group: 'electrolytes' },
+] as const;
+export const LAB_TEST_SUGGESTIONS = LAB_TEST_CATALOG.map((test) => test.name);
 export const LAB_REPORT_FLAGS = ['Not stated', 'Low', 'High', 'Within range'] as const;
 export type LabReportFlag = (typeof LAB_REPORT_FLAGS)[number];
 export type LabResultDraft = {

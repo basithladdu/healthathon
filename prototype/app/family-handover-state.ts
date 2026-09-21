@@ -27,6 +27,15 @@ export const DEFAULT_HANDOVER_SELECTION: HandoverSelection = {
   contacts: false,
 };
 
+export function mergeHandoverContacts(contacts: readonly HandoverContact[], knownContacts: readonly HandoverContact[], patientId: string): HandoverContact[] {
+  const merged = contacts.filter((contact) => contact.patientId === patientId);
+  for (const contact of knownContacts) {
+    if (contact.patientId !== patientId || !contact.name.trim()) continue;
+    if (!merged.some((saved) => saved.id === contact.id || (saved.name.trim().toLocaleLowerCase() === contact.name.trim().toLocaleLowerCase() && saved.phone.trim() === contact.phone.trim()))) merged.push(contact);
+  }
+  return merged;
+}
+
 type HandoverInput = {
   patientId: string;
   patientName: string;
@@ -99,5 +108,5 @@ export function buildHandoverPack(input: HandoverInput): string | null {
 
 export function handoverFileName(patientId: string, noteVersion: number | null): string {
   const safeId = patientId.replace(/[^a-zA-Z0-9_-]/g, '-').slice(0, 60) || 'patient';
-  return `saanthvana-${safeId}${noteVersion === null ? '' : `-note-v${noteVersion}`}-care-pack.txt`;
+  return `saanthvana-${safeId}${noteVersion === null ? '' : `-note-v${noteVersion}`}-care-pack.pdf`;
 }

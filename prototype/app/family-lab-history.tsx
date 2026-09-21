@@ -3,7 +3,7 @@
 import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
 import type { CareReport } from './care-calendar-state';
 import {
-  LAB_REPORT_FLAGS, LAB_TEST_SUGGESTIONS, addLabResult, updateLabResult, removeLabResult,
+  LAB_REPORT_FLAGS, LAB_TEST_CATALOG, addLabResult, updateLabResult, removeLabResult,
   restoreLabResult, selectLabResults, labNumericSeries, labHistoryText, validateLabResult,
   type LabResultDraft, type LabResultEntry, type LabReportFlag, type LabNumericPoint,
 } from './family-lab-state';
@@ -20,8 +20,10 @@ export type FamilyLabHistoryProps = {
 };
 
 const hindiTests: Record<string, string> = {
-  Haemoglobin: 'हीमोग्लोबिन', 'RBC count': 'आरबीसी गिनती',
-  'White cell count': 'सफ़ेद रक्त कोशिकाओं की गिनती', 'Platelet count': 'प्लेटलेट गिनती',
+  Haemoglobin: 'हीमोग्लोबिन', 'RBC count': 'लाल रक्त कोशिकाएँ (RBC)',
+  'White cell count': 'सफ़ेद रक्त कोशिकाएँ (WBC)', 'Platelet count': 'प्लेटलेट्स',
+  'Absolute neutrophil count': 'न्यूट्रोफ़िल (ANC)', Creatinine: 'क्रिएटिनिन',
+  Bilirubin: 'बिलीरुबिन', ALT: 'ALT (SGPT)', AST: 'AST (SGOT)', Sodium: 'सोडियम', Potassium: 'पोटैशियम',
 };
 const hindiFlags: Record<LabReportFlag, string> = { 'Not stated': 'नहीं लिखा है', Low: 'कम', High: 'ज़्यादा', 'Within range': 'रेंज के अंदर' };
 
@@ -81,23 +83,27 @@ function LabHistoryForPatient({ patientId, author, today, hindi, reports, entrie
   const id = useId();
   const inputRef = useRef<HTMLInputElement>(null);
   const t = (en: string, hi: string) => hindi ? hi : en;
-  const testLabel = (name: string) => hindi ? hindiTests[name] ?? name : name;
+  const testLabel = (name: string) => hindi ? hindiTests[name] ?? name : LAB_TEST_CATALOG.find((test) => test.name === name)?.label ?? name;
   const flagLabel = (flag: LabReportFlag) => hindi ? hindiFlags[flag] : flag;
   const dateLabel = (date: string) => new Date(`${date}T12:00:00Z`).toLocaleDateString(hindi ? 'hi-IN' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
   const patientEntries = selectLabResults(entries, patientId);
   const patientReports = reports.filter((report) => report.patientId === patientId);
-  const tests = [...new Set(patientEntries.map((entry) => entry.testName))].sort((a, b) => a.localeCompare(b));
-  const [selectedTest, setSelectedTest] = useState(() => patientEntries[0]?.testName ?? '');
+  const tests = [...new Set(patientEntries.map((entry) => entry.testName))];
+  const bloodTests = LAB_TEST_CATALOG.filter((test) => test.group === 'blood');
+  const cardTests = [...tests, ...bloodTests.map((test) => test.name).filter((name) => !tests.includes(name))];
+  const customSavedTests = tests.filter((name) => !LAB_TEST_CATALOG.some((test) => test.name === name));
+  const [selectedTest, setSelectedTest] = useState<string | null>(null);
   const [unitChoice, setUnitChoice] = useState('');
-  const [formOpen, setFormOpen] = useState(patientEntries.length === 0);
+  const [formOpen, setFormOpen] = useState(false);
   const [draft, setDraft] = useState<LabResultDraft>(() => blankDraft(today));
+  const [customTest, setCustomTest] = useState(false);
   const [sourceChoice, setSourceChoice] = useState(patientReports.length ? '' : 'manual');
   const [showPrinted, setShowPrinted] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [removed, setRemoved] = useState<LabResultEntry[]>([]);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
-  const filter = tests.includes(selectedTest) ? selectedTest : '';
+  const filter = selectedTest ?? patientEntries[0]?.testName ?? 'Haemoglobin';
   const visible = selectLabResults(entries, patientId, filter);
   const units = [...new Set(visible.map((entry) => entry.unit))];
   const plotUnit = units.includes(unitChoice) ? unitChoice : units[0] ?? '';
@@ -109,14 +115,15 @@ function LabHistoryForPatient({ patientId, author, today, hindi, reports, entrie
     if (formOpen) inputRef.current?.focus();
   }, [formOpen, editingId]);
 
-  function openNew() {
-    setEditingId(null); setDraft(blankDraft(today, filter));
+  function openNew(testName = filter || patientEntries[0]?.testName || 'Haemoglobin', other = false) {
+    setEditingId(null); setDraft(blankDraft(today, other ? '' : testName)); setCustomTest(other);
     setSourceChoice(patientReports.length ? '' : 'manual'); setShowPrinted(false);
     setError(''); setMessage(''); setFormOpen(true);
   }
 
   function edit(entry: LabResultEntry) {
     setEditingId(entry.id);
+    setCustomTest(false);
     setDraft({ testName: entry.testName, value: entry.value, unit: entry.unit, date: entry.date, printedRange: entry.printedRange, reportFlag: entry.reportFlag, reportId: entry.reportId, sourceName: entry.sourceName });
     setSourceChoice(entry.reportId || 'manual');
     setShowPrinted(Boolean(entry.printedRange) || entry.reportFlag !== 'Not stated');
@@ -135,7 +142,7 @@ function LabHistoryForPatient({ patientId, author, today, hindi, reports, entrie
       reportFlag: t('Choose the flag printed on the report.', 'रिपोर्ट में लिखा फ़्लैग चुनें।'),
       source: t('Choose an available report, or enter a report name.', 'मौजूद रिपोर्ट चुनें या रिपोर्ट का नाम लिखें।'),
     };
-    if (!sourceChoice || invalid) { setError(errors[invalid ?? 'source']); return; }
+    if (invalid) { setError(errors[invalid]); return; }
     const next = editingId
       ? updateLabResult(entries, patientId, editingId, author, draft, today, reports)
       : addLabResult(entries, patientId, author, crypto.randomUUID(), draft, today, reports);
@@ -171,17 +178,27 @@ function LabHistoryForPatient({ patientId, author, today, hindi, reports, entrie
   return <section className="family-lab-history" aria-labelledby={`${id}-heading`}>
     <header className="lab-history-heading"><h1 id={`${id}-heading`}>{t('Lab results', 'जाँच के नतीजे')}</h1><div>
       <button type="button" className="secondary-button" disabled={!patientEntries.length} onClick={download}>{t('Download results', 'नतीजे डाउनलोड करें')}</button>
-      {!formOpen && <button type="button" className="primary-button" onClick={openNew}>{t('+ Add result', '+ नतीजा जोड़ें')}</button>}
+      {!formOpen && <button type="button" className="primary-button" onClick={() => openNew()}>{t('+ Add result', '+ नतीजा जोड़ें')}</button>}
     </div></header>
 
     {formOpen && <form className="lab-result-form" onSubmit={save}>
-      <div className="lab-result-form-heading"><h2>{t(editingId ? 'Edit result' : 'Copy a result from a report', editingId ? 'नतीजा बदलें' : 'रिपोर्ट से नतीजा लिखें')}</h2><button type="button" onClick={() => { setFormOpen(false); setEditingId(null); setError(''); }}>{t('Cancel', 'रद्द करें')}</button></div>
+      <div className="lab-result-form-heading"><h2>{t(editingId ? 'Edit result' : 'Add a result', editingId ? 'नतीजा बदलें' : 'नतीजा जोड़ें')}</h2><button type="button" onClick={() => { setFormOpen(false); setEditingId(null); setError(''); }}>{t('Cancel', 'रद्द करें')}</button></div>
       <div className="lab-result-fields">
-        <label className="lab-field-wide">{t('Test name', 'जाँच का नाम')}<input ref={inputRef} list={`${id}-tests`} value={draft.testName} maxLength={80} required onChange={(event) => setDraft({ ...draft, testName: event.target.value })} /><datalist id={`${id}-tests`}>{[...new Set([...LAB_TEST_SUGGESTIONS, ...tests])].map((name) => <option key={name} value={name}>{testLabel(name)}</option>)}</datalist></label>
-        <label>{t('Result as printed', 'रिपोर्ट में लिखा नतीजा')}<input value={draft.value} maxLength={80} required onChange={(event) => setDraft({ ...draft, value: event.target.value })} /></label>
+        <label className="lab-field-wide">{t('Test', 'जाँच')}<select value={customTest ? '__other__' : draft.testName} required onChange={(event) => {
+          const other = event.target.value === '__other__'; setCustomTest(other);
+          setDraft({ ...draft, testName: other ? '' : event.target.value });
+        }}>
+          <optgroup label={t('Blood count (CBC)', 'रक्त कोशिकाओं की गिनती (CBC)')}>{bloodTests.map((test) => <option key={test.name} value={test.name}>{testLabel(test.name)}</option>)}</optgroup>
+          <optgroup label={t('Kidney & liver', 'किडनी और लिवर')}>{LAB_TEST_CATALOG.filter((test) => test.group === 'kidney-liver').map((test) => <option key={test.name} value={test.name}>{testLabel(test.name)}</option>)}</optgroup>
+          <optgroup label={t('Electrolytes', 'इलेक्ट्रोलाइट्स')}>{LAB_TEST_CATALOG.filter((test) => test.group === 'electrolytes').map((test) => <option key={test.name} value={test.name}>{testLabel(test.name)}</option>)}</optgroup>
+          {customSavedTests.length > 0 && <optgroup label={t('Your other tests', 'आपकी दूसरी जाँचें')}>{customSavedTests.map((name) => <option key={name} value={name}>{testLabel(name)}</option>)}</optgroup>}
+          <option value="__other__">{t('Other test…', 'कोई और जाँच…')}</option>
+        </select></label>
+        {customTest && <label className="lab-field-wide">{t('Test name on report', 'रिपोर्ट में जाँच का नाम')}<input value={draft.testName} maxLength={80} required onChange={(event) => setDraft({ ...draft, testName: event.target.value })} /></label>}
+        <label>{t('Result as printed', 'रिपोर्ट में लिखा नतीजा')}<input ref={inputRef} value={draft.value} maxLength={80} required onChange={(event) => setDraft({ ...draft, value: event.target.value })} /></label>
         <label>{t('Unit as printed', 'रिपोर्ट में लिखी इकाई')}<input value={draft.unit} maxLength={60} required onChange={(event) => setDraft({ ...draft, unit: event.target.value })} /></label>
         <label>{t('Report date', 'रिपोर्ट की तारीख')}<input type="date" value={draft.date} max={today} required onChange={(event) => setDraft({ ...draft, date: event.target.value })} /></label>
-        <label>{t('Source report', 'किस रिपोर्ट से')}<select value={sourceChoice} required onChange={(event) => {
+        {(patientReports.length > 0 || draft.reportId) && <label>{t('Source report', 'किस रिपोर्ट से')}<select value={sourceChoice} required onChange={(event) => {
           const choice = event.target.value; const report = patientReports.find((item) => item.id === choice);
           setSourceChoice(choice); setDraft({ ...draft, reportId: report?.id ?? null, sourceName: report?.file.name ?? (choice === 'manual' ? draft.sourceName : '') });
         }}>
@@ -189,8 +206,8 @@ function LabHistoryForPatient({ patientId, author, today, hindi, reports, entrie
           {draft.reportId && !linkedReport && <option value={draft.reportId} disabled>{draft.sourceName} — {t('file unavailable', 'फ़ाइल मौजूद नहीं है')}</option>}
           {patientReports.map((report) => <option key={report.id} value={report.id}>{report.file.name}</option>)}
           <option value="manual">{t('Use a report name', 'रिपोर्ट का नाम लिखें')}</option>
-        </select></label>
-        {sourceChoice === 'manual' && <label className="lab-field-wide">{t('Lab or report name', 'लैब या रिपोर्ट का नाम')}<input value={draft.sourceName} required maxLength={300} onChange={(event) => setDraft({ ...draft, sourceName: event.target.value })} /></label>}
+        </select></label>}
+        {(sourceChoice === 'manual' || (!patientReports.length && !draft.reportId)) && <label className={patientReports.length > 0 || draft.reportId ? 'lab-field-wide' : undefined}>{t('Lab or report name', 'लैब या रिपोर्ट का नाम')}<input value={draft.sourceName} required maxLength={300} onChange={(event) => setDraft({ ...draft, sourceName: event.target.value })} /></label>}
         {linkedReport && <div className="lab-field-wide"><LabReportLinks report={linkedReport} hindi={hindi} compact /></div>}
       </div>
       <details className="lab-printed-options" open={showPrinted} onToggle={(event) => setShowPrinted(event.currentTarget.open)}><summary>{t('Printed range & flag (optional)', 'रिपोर्ट की रेंज और फ़्लैग (वैकल्पिक)')}</summary><div className="lab-result-fields">
@@ -201,10 +218,26 @@ function LabHistoryForPatient({ patientId, author, today, hindi, reports, entrie
       <button type="submit" className="primary-button">{t(editingId ? 'Save changes' : 'Save result', editingId ? 'बदलाव सेव करें' : 'नतीजा सेव करें')}</button>
     </form>}
 
-    {tests.length > 0 && <nav className="lab-test-filters" aria-label={t('Choose a test', 'जाँच चुनें')}>
-      <button type="button" aria-pressed={!filter} onClick={() => { setSelectedTest(''); setUnitChoice(''); }}>{t('All results', 'सभी नतीजे')}</button>
-      {tests.map((name) => <button key={name} type="button" aria-pressed={filter === name} onClick={() => { setSelectedTest(name); setUnitChoice(''); }}>{testLabel(name)}</button>)}
-    </nav>}
+    {!formOpen && <>
+    <nav className="lab-test-catalog" aria-label={t('Choose a test', 'जाँच चुनें')}>
+      {cardTests.map((name) => {
+        const latest = patientEntries.find((entry) => entry.testName === name);
+        const test = LAB_TEST_CATALOG.find((item) => item.name === name);
+        return <button key={name} type="button" className="lab-test-tile" data-kind={test?.group ?? 'other'} aria-pressed={filter === name} onClick={() => { setSelectedTest(name); setUnitChoice(''); setMessage(''); if (!latest) openNew(name); }}>
+          <span className="lab-test-tile-top"><span className="lab-test-symbol" aria-hidden="true">{test?.short ?? 'Lab'}</span>{filter === name && <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="m4 10 4 4 8-8" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>}</span>
+          <strong className="lab-test-name">{testLabel(name)}</strong>
+          {latest ? <><span className="lab-test-latest"><strong>{latest.value}</strong> <span>{latest.unit}</span></span><time dateTime={latest.date}>{dateLabel(latest.date)}</time></> : <span className="lab-test-unrecorded">{t('+ Add result', '+ नतीजा जोड़ें')}</span>}
+        </button>;
+      })}
+    </nav>
+    <div className="lab-catalog-actions">
+      <details className="lab-more-tests"><summary>{t('More tests', 'और जाँचें')}</summary><div className="lab-more-test-options">
+        {LAB_TEST_CATALOG.filter((test) => test.group !== 'blood').map((test) => <button key={test.name} type="button" onClick={() => { setSelectedTest(test.name); setUnitChoice(''); if (!tests.includes(test.name)) openNew(test.name); }}>{testLabel(test.name)}</button>)}
+        <button type="button" onClick={() => openNew('', true)}>{t('+ Other test', '+ कोई और जाँच')}</button>
+      </div></details>
+      {patientEntries.length > 0 && <button type="button" className="lab-all-results" aria-pressed={!filter} onClick={() => { setSelectedTest(''); setUnitChoice(''); }}>{t('All results', 'सभी नतीजे')} <span>{patientEntries.length}</span></button>}
+    </div>
+    <div className="lab-results-section-heading"><h2>{filter ? testLabel(filter) : t('All results', 'सभी नतीजे')}</h2>{visible.length > 0 && <span>{visible.length} {t(visible.length === 1 ? 'result' : 'results', 'नतीजे')}</span>}</div>
     {filter && units.length > 1 && <label className="lab-chart-unit">{t('Chart unit', 'चार्ट की इकाई')}<select value={plotUnit} onChange={(event) => setUnitChoice(event.target.value)}>{units.map((unit) => <option key={unit}>{unit}</option>)}</select></label>}
     {points.length > 1 && <LabPlot points={points} testName={testLabel(filter)} unit={plotUnit} hindi={hindi} />}
 
@@ -219,6 +252,7 @@ function LabHistoryForPatient({ patientId, author, today, hindi, reports, entrie
         <div className="lab-result-source"><span>{t('Source', 'रिपोर्ट')}</span>{report ? <LabReportLinks report={report} hindi={hindi} /> : <p>{entry.sourceName}{entry.reportId && <span>{t('File no longer here', 'फ़ाइल अब यहाँ नहीं है')}</span>}</p>}</div>
         <div className="lab-result-card-footer"><span>{t('Copied by', 'लिखने वाले')} {entry.recordedBy}{entry.updatedBy !== entry.recordedBy ? ` · ${t('edited by', 'बदला')} ${entry.updatedBy}` : ''}</span><div><button type="button" onClick={() => edit(entry)}>{t('Edit', 'बदलें')}</button><button type="button" onClick={() => remove(entry)}>{t('Remove', 'हटाएँ')}</button></div></div>
       </li>;
-    })}</ol> : !formOpen && <div className="lab-history-empty"><p>{t('No results added yet.', 'अभी कोई नतीजा नहीं जोड़ा है।')}</p><button type="button" className="primary-button" onClick={openNew}>{t('Add a result', 'नतीजा जोड़ें')}</button></div>}
+    })}</ol> : <div className="lab-history-empty"><p>{filter ? t(`No ${testLabel(filter)} results added yet.`, `अभी ${testLabel(filter)} का कोई नतीजा नहीं जोड़ा है।`) : t('No results added yet.', 'अभी कोई नतीजा नहीं जोड़ा है।')}</p><button type="button" className="primary-button" onClick={() => openNew()}>{t('Add from a report', 'रिपोर्ट से जोड़ें')}</button></div>}
+    </>}
   </section>;
 }
