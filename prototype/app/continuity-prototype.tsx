@@ -2,11 +2,39 @@
 
 import type { FormEvent } from 'react';
 import Image from 'next/image';
+import { usePathname, useRouter } from 'next/navigation';
+import { CARE_ROUTES, careViewFromPath, canOpenCareView, type CareView as View } from './care-routes';
 import React, { useMemo, useState, useEffect, useRef } from 'react';
-import { LoginScreen, SignupScreen, FamilyLoginScreen, PatientLoginScreen, type FamilyMember, type PatientAccount } from './auth-screens';
-import { LandingPage } from './landing-page';
+import type { FamilyMember, PatientAccount } from './auth-screens';
+import { SimpleCareShell, FamilyCareNote } from './simple-care-shell';
+import { CareSignIn } from './care-sign-in';
+import { DoctorNoteReview } from './doctor-note-review';
+import { prepareVisitNote, approveVisitNote } from './visit-note-state';
 import { AppointmentsPage, initialAppointments, DEMO_TODAY, type Appointment, type AppointmentPatient } from './appointments-page';
 import { CareNearMe } from './care-near-me';
+import { SupportResources } from './care-directory';
+import { ConversationPreparation, type PreparationNotes } from './conversation-preparation';
+import { FamilyCareWorkspace } from './family-care-workspace';
+import { FamilyCareHome } from './family-care-home';
+import { CareCalendar } from './care-calendar';
+import { addCareEvent, updateCareEvent, careChecksAfterEventUpdate, setCareCheck, reportFileError, type CareEvent, type CareCheck, type CareReport } from './care-calendar-state';
+import { useCareLocalState } from './care-local-store';
+import { FamilyCareTools } from './family-care-tools';
+import { FamilyNoteHistory } from './family-note-history';
+import type { HomeHelpEntry } from './family-home-help-state';
+import type { SupportPlace } from './family-support-state';
+import { addOpenQuestion, type OpenQuestion } from './family-open-question-state';
+import type { CareCopyEntry } from './family-copy-state';
+import { FamilyComfortSpace } from './family-comfort-space';
+import type { ComfortEntry } from './family-comfort-state';
+import type { VoiceJournalEntry } from './family-voice-state';
+import { createEmptyFamilyCostState, type FamilyCostState } from './family-cost-state';
+import { DoctorCareHome } from './doctor-care-home';
+import type { LabResultEntry } from './family-lab-state';
+import type { SymptomEntry } from './family-symptom-state';
+import type { CareStoryEntry } from './family-care-story-state';
+import type { HandoverContact } from './family-handover-state';
+import { INITIAL_FAMILY_TASKS, addFamilyTask, setFamilyTaskCompleted, type FamilyTask } from './family-care-state';
 import { ectprQuickViews, EdQuickView, EmergencyCard } from './ectpr';
 import {
   MyCarePlan,
@@ -23,7 +51,7 @@ import {
 } from './patient-portal';
 import { PatientHistory, type HistoryEvent } from './patient-history';
 import { reviseSummary, releaseSummary, isSummaryReadyToRelease, invalidateSummaryReview, beginSummaryRevision, latestSummaryRelease, summaryReleaseByNumber, nextSummaryVersion, setSummaryFieldStatus, type DraftFieldKey, type DraftFieldStatus, type SummaryState, type SummaryRelease } from './summary-state';
-import { QuickDemoBar, type DemoRoleOption } from './quick-demo-bar';
+
 import { FhirExportModal } from './fhir-export-modal';
 import { TreatmentEscalationMatrix } from './tep-matrix';
 import { VoiceDictationBar } from './voice-dictation';
@@ -55,29 +83,6 @@ import { SvcoThoracicDecompressionModal } from './svco-thoracic-decompression-su
 import { BleedCrisisModal } from './bleed-crisis';
 import { ScenarioReviewModal } from './scenario-review';
 import { IconZap, IconFileText, IconHeartPulse, IconHospital, IconSparkles } from './icons';
-
-type View =
-  | 'caregiver'
-  | 'home'
-  | 'guide'
-  | 'worklist'
-  | 'patients'
-  | 'drafts'
-  | 'records'
-  | 'audit'
-  | 'patient'
-  | 'outreach'
-  | 'draft'
-  | 'verify'
-  | 'retrieve'
-  | 'appointments'
-  | 'my-plan'
-  | 'my-timeline'
-  | 'care-near-me'
-  | 'my-doctors'
-  | 'emergency-card'
-  | 'my-details'
-  | 'consent';
 
 type FollowUpStatus =
   | 'Due today'
@@ -719,6 +724,8 @@ const navItems: Array<{ view: View; label: string; icon: React.FC<{ className?: 
 
 const patientNavItems: Array<{ view: View; label: string; icon: React.FC<{ className?: string }> }> = [
   { view: 'my-plan', label: 'My care plan', icon: IconShieldCheck },
+  { view: 'daily-care', label: 'Daily care', icon: IconCalendar },
+  { view: 'prepare-conversation', label: 'Prepare for a conversation', icon: IconFileEdit },
   { view: 'my-timeline', label: 'My care journey', icon: IconHistory },
   { view: 'care-near-me', label: 'Care near me', icon: IconMapPin },
   { view: 'my-doctors', label: 'My doctors', icon: IconUsers },
@@ -729,6 +736,8 @@ const patientNavItems: Array<{ view: View; label: string; icon: React.FC<{ class
 
 const familyNavItems: Array<{ view: View; label: string; icon: React.FC<{ className?: string }> }> = [
   { view: 'caregiver', label: 'Care journey', icon: IconUsers },
+  { view: 'daily-care', label: 'Daily care', icon: IconCalendar },
+  { view: 'prepare-conversation', label: 'Prepare for a conversation', icon: IconFileEdit },
   { view: 'care-near-me', label: 'Care near me', icon: IconMapPin },
   { view: 'my-doctors', label: 'Care team', icon: IconUsers },
   { view: 'emergency-card', label: 'Emergency card', icon: IconIdCard },
@@ -820,19 +829,43 @@ function StatusPill({ status }: { status: string }) {
 }
 
 export function ContinuityPrototype() {
-  const [view, setView] = useState<View>('home');
+  const pathname = usePathname();
+  const router = useRouter();
+  const simpleMode = !pathname.startsWith('/workspace/');
+  const [accessReady, setAccessReady] = useState(false);
+  const [hindi, setHindi] = useState(false);
   const [currentRole, setCurrentRole] = useState<UserRole>('Dr Sujay · Clinical lead');
-  const [authScreen, setAuthScreen] = useState<'landing' | 'login' | 'signup' | 'family' | 'patient' | null>('landing');
-  const [sessionType, setSessionType] = useState<'care-team' | 'family' | 'patient'>('care-team');
-  const [familyMember, setFamilyMember] = useState<FamilyMember | null>(null);
+  const [authScreen, setAuthScreen] = useState<'login' | null>('login');
+  const [sessionType, setSessionType] = useState<'care-team' | 'family' | 'patient'>('family');
+  const [familyMember, setFamilyMember] = useState<FamilyMember | null>({ name: 'Kavya Raghavan', relationship: 'Daughter', patientId: 'CANCER-20418', verifiedSummaryOnly: true });
   const [patientAccount, setPatientAccount] = useState<PatientAccount | null>(null);
+  const requestedView = careViewFromPath(pathname);
+  const view: View = requestedView && canOpenCareView(requestedView, sessionType, currentRole)
+    ? requestedView : sessionType === 'care-team' ? 'home' : 'daily-care';
+  function setView(nextView: View) { router.push(CARE_ROUTES[nextView]); }
+  const [preparationNotes, setPreparationNotes, preparationSave] = useCareLocalState<Record<string, PreparationNotes>>('preparation', {});
+  const [familyTasks, setFamilyTasks, taskSave] = useCareLocalState<FamilyTask[]>('tasks', INITIAL_FAMILY_TASKS);
+  const [careEvents, setCareEvents, eventSave] = useCareLocalState<CareEvent[]>('calendar', []);
+  const [careChecks, setCareChecks, checkSave] = useCareLocalState<CareCheck[]>('calendar-checks', []);
+  const [careReports, setCareReports, reportSave] = useCareLocalState<CareReport[]>('reports', []);
+  const [symptoms, setSymptoms, symptomSave] = useCareLocalState<SymptomEntry[]>('symptoms', []);
+  const [careStory, setCareStory, storySave] = useCareLocalState<CareStoryEntry[]>('care-story', []);
+  const [handoverContacts, setHandoverContacts, contactSave] = useCareLocalState<HandoverContact[]>('handover-contacts', []);
+  const [homeHelp, setHomeHelp, helpSave] = useCareLocalState<HomeHelpEntry[]>('home-help', []);
+  const [supportPlaces, setSupportPlaces, placesSave] = useCareLocalState<SupportPlace[]>('support-places', []);
+  const [openQuestions, setOpenQuestions, questionSave] = useCareLocalState<OpenQuestion[]>('open-questions', []);
+  const [careCopies, setCareCopies, copySave] = useCareLocalState<CareCopyEntry[]>('care-copies', []);
+  const [comfortEntries, setComfortEntries, comfortSave] = useCareLocalState<ComfortEntry[]>('comfort', []);
+  const [voiceJournal, setVoiceJournal, voiceSave] = useCareLocalState<VoiceJournalEntry[]>('voice-journal', []);
+  const [familyCosts, setFamilyCosts, costSave] = useCareLocalState<FamilyCostState>('family-costs', createEmptyFamilyCostState());
+  const [labResults, setLabResults, labSave] = useCareLocalState<LabResultEntry[]>('lab-results', []);
   const isFamilySession = sessionType === 'family';
   const isPatientSession = sessionType === 'patient';
   const [workItems, setWorkItems] = useState(initialWorkItems);
-  const [appointments, setAppointments] = useState<Appointment[]>(initialAppointments);
+  const [appointments, setAppointments, appointmentSave] = useCareLocalState<Appointment[]>('appointments', initialAppointments);
   const [selectedId, setSelectedId] = useState('CANCER-20418');
-  const [recordStates, setRecordStates] =
-    useState<Record<string, RecordState>>(initialRecordStates);
+  const [recordStates, setRecordStates, noteSave] =
+    useCareLocalState<Record<string, RecordState>>('care-notes', initialRecordStates);
   const [activeFilter, setActiveFilter] =
     useState<(typeof filters)[number]>('All');
   const [query, setQuery] = useState('');
@@ -905,6 +938,39 @@ export function ContinuityPrototype() {
   const diffDialogRef = useRef<HTMLElement>(null);
   const retrievedRecordHeadingRef = useRef<HTMLHeadingElement>(null);
 
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(sessionStorage.getItem('saanthvana-care-viewer') ?? 'null');
+      if (saved && initialWorkItems.some((item) => item.hospitalId === saved.selectedId)
+        && ['family', 'patient', 'care-team'].includes(saved.sessionType)) {
+        setSelectedId(saved.selectedId);
+        setSessionType(saved.sessionType);
+        if (saved.sessionType === 'family') setFamilyMember({ patientId: saved.selectedId, name: saved.name || 'Family member', relationship: 'Family member', verifiedSummaryOnly: true });
+        else if (saved.sessionType === 'patient') setPatientAccount({ hospitalId: saved.selectedId, name: saved.name || 'Patient' });
+        if (['Dr Sujay · Clinical lead', 'Dr Isha Menon · Emergency physician', 'Anitha Rao · Care Coordinator'].includes(saved.currentRole)) setCurrentRole(saved.currentRole);
+        setHindi(saved.hindi === true);
+        setAuthScreen(null);
+      }
+    } catch { /* Opening a care space still works when browser storage is unavailable. */ }
+    setAccessReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (!accessReady) return;
+    try {
+      if (authScreen !== null) sessionStorage.removeItem('saanthvana-care-viewer');
+      else sessionStorage.setItem('saanthvana-care-viewer', JSON.stringify({
+        sessionType, selectedId, currentRole, hindi,
+        name: sessionType === 'family' ? familyMember?.name : patientAccount?.name,
+      }));
+    } catch { /* The current care space remains available without remembering this tab. */ }
+  }, [accessReady, authScreen, sessionType, selectedId, currentRole, hindi, familyMember, patientAccount]);
+
+  useEffect(() => {
+    if (!accessReady || authScreen !== null) return;
+    if (pathname === '/' || pathname === '/sign-in' || (requestedView && requestedView !== view)) router.replace(CARE_ROUTES[view]);
+  }, [accessReady, authScreen, pathname, requestedView, view, router]);
+
   const recordState = recordStates[selectedId] ?? createInitialRecordState(selectedId);
   const currentRelease = latestSummaryRelease(recordState);
   const requestedRelease = recordState.retrievalVersion === null
@@ -953,44 +1019,47 @@ export function ContinuityPrototype() {
     setComparisonVersion(null);
   }
 
-  function enterCareTeam(role: UserRole) {
+  function enterCareTeam(role: UserRole, nextView: View = 'home') {
     closeClinicalAccess();
     setSessionType('care-team');
     setFamilyMember(null);
     setPatientAccount(null);
     setCurrentRole(role);
-    setView('home');
+    setView(nextView);
     setAuthScreen(null);
   }
 
-  function enterFamily(member: FamilyMember) {
+  function enterFamily(member: FamilyMember, nextView: View = simpleMode ? 'daily-care' : 'caregiver') {
     if (!workItems.some((item) => item.hospitalId === member.patientId)) return;
     closeClinicalAccess();
     setSessionType('family');
     setFamilyMember(member);
     setPatientAccount(null);
     selectPatient(member.patientId);
-    setView('caregiver');
+    setView(nextView);
     setAuthScreen(null);
   }
 
-  function enterPatient(account: PatientAccount) {
+  function enterPatient(account: PatientAccount, nextView: View = simpleMode ? 'daily-care' : 'my-plan') {
     closeClinicalAccess();
     setSessionType('patient');
     setFamilyMember(null);
     setPatientAccount(account);
     selectPatient(account.hospitalId);
-    setView('my-plan');
+    setView(nextView);
     setAuthScreen(null);
   }
 
   function signOut() {
     closeClinicalAccess();
-    setSessionType('care-team');
     setFamilyMember(null);
     setPatientAccount(null);
-    setView('home');
-    setAuthScreen('landing');
+    setAuthScreen('login');
+    router.push('/sign-in');
+  }
+
+  function returnToCare() {
+    enterFamily({ name: 'Kavya Raghavan', relationship: 'Daughter', patientId: 'CANCER-20418', verifiedSummaryOnly: true }, 'daily-care');
   }
 
   function switchRole(role: UserRole) {
@@ -1185,11 +1254,18 @@ export function ContinuityPrototype() {
 
   const portalPatientId = isPatientSession
     ? (patientAccount?.hospitalId ?? 'CANCER-20418')
-    : (familyMember?.patientId ?? 'CANCER-20418');
+    : isFamilySession ? (familyMember?.patientId ?? 'CANCER-20418') : selectedId;
+  const portalAuthor = isFamilySession ? familyMember?.name ?? 'Family member'
+    : isPatientSession ? patientAccount?.name ?? 'Patient' : currentRole.split(' · ')[0];
   const portalPatientName =
     workItems.find((item) => item.hospitalId === portalPatientId)?.patient ??
     (isPatientSession ? patientAccount?.name : familyMember?.name) ??
     'Patient';
+
+  function saveAppointmentInstructions(patientId: string, appointmentId: string, value: Appointment['preparationInstructions']) {
+    if (value && (!value.text.trim() || value.text.length > 1200 || !value.givenBy.trim() || value.givenBy.length > 120 || !value.recordedBy.trim())) return;
+    setAppointments((current) => current.map((visit) => visit.hospitalId === patientId && visit.id === appointmentId ? { ...visit, preparationInstructions: value } : visit));
+  }
 
   function detailsFor(id: string): PatientDetails {
     const stored = patientDetailsById[id];
@@ -1467,19 +1543,9 @@ export function ContinuityPrototype() {
   const verificationReady = isTreatingPhysician && isSummaryReadyToRelease(recordState);
 
   function navigate(nextView: View) {
-    if (isPatientSession) {
-      const allowed: View[] = ['my-plan', 'my-timeline', 'care-near-me', 'my-doctors', 'emergency-card', 'my-details', 'consent'];
-      if (!allowed.includes(nextView)) {
-        notify('This page is for the care team.');
-        return;
-      }
-    }
-    if (isFamilySession) {
-      const allowed: View[] = ['caregiver', 'care-near-me', 'my-doctors', 'emergency-card'];
-      if (!allowed.includes(nextView)) {
-        notify('Only the care team can make changes.');
-        return;
-      }
+    if (!canOpenCareView(nextView, sessionType, currentRole)) {
+      notify('This page is for the care team member responsible for it.');
+      return;
     }
     if ((nextView === 'draft' || nextView === 'verify') && !isTreatingPhysician) {
       notify('Only the treating physician can prepare or verify a structured summary.');
@@ -1629,45 +1695,6 @@ export function ContinuityPrototype() {
         }}
       />
     );
-  }
-
-  function handleFastRoleSelect(roleOption: DemoRoleOption) {
-    if (roleOption === 'dr-sujay') {
-      enterCareTeam('Dr Sujay · Clinical lead');
-      selectPatient('CANCER-20418');
-      navigate('guide');
-    } else if (roleOption === 'dr-isha') {
-      enterCareTeam('Dr Isha Menon · Emergency physician');
-      selectPatient('CANCER-20418');
-      updateRecordState('CANCER-20418', (current) => ({
-        ...current,
-        retrievalReason: 'Emergency hand-off retrieval (Break-glass)',
-        careRelationship: 'Emergency receiving physician',
-        retrievalAcknowledged: true,
-        retrievalUnlocked: true,
-        unlockedVersion: 1,
-      }));
-      navigate('retrieve');
-    } else if (roleOption === 'anitha') {
-      enterCareTeam('Anitha Rao · Care Coordinator');
-      selectPatient('CANCER-20418');
-      navigate('worklist');
-    } else if (roleOption === 'patient') {
-      enterPatient({
-        hospitalId: 'CANCER-20418',
-        name: 'Meera Raghavan',
-        dob: '14/06/1958',
-      });
-      navigate('my-plan');
-    } else if (roleOption === 'family') {
-      enterFamily({
-        name: 'Kavya Raghavan',
-        relationship: 'Daughter (primary proxy)',
-        patientId: 'CANCER-20418',
-        verifiedSummaryOnly: true,
-      });
-      navigate('caregiver');
-    }
   }
 
   function beginGuidedConversation() {
@@ -2026,6 +2053,10 @@ export function ContinuityPrototype() {
           </div>
         </article>
 
+        {isFamilySession && <button className="family-daily-entry" type="button" onClick={() => navigate('daily-care')}>
+          <span><strong>Daily care</strong><small>{familyTasks.filter((task) => task.patientId === patientId && !task.completedBy && task.kind !== 'Question').length} open tasks · visits and questions</small></span><span aria-hidden="true">→</span>
+        </button>}
+
         <div className="care-journey-primary-grid">
           <article className="care-journey-card care-journey-next">
             <div className="care-journey-card-heading">
@@ -2045,6 +2076,7 @@ export function ContinuityPrototype() {
               <li><IconCheck className="w-3.5 h-3.5" />Confirm who {firstName} wants included in the conversation.</li>
               <li><IconCheck className="w-3.5 h-3.5" />Tell {touchpoint?.owner ?? patient.owner} if the time or people joining need to change.</li>
             </ul>
+            {isFamilySession && <button className="secondary-button" type="button" onClick={() => navigate('prepare-conversation')}>Prepare for the conversation</button>}
           </article>
 
           <article className="care-journey-card care-journey-summary">
@@ -2292,7 +2324,7 @@ export function ContinuityPrototype() {
           <button type="button" onClick={() => openOpsHub('qr')}>
             <span className="os-tag">QR Bridge</span>
             <strong>Check-in / handoff QR</strong>
-            <small>Opaque locator QR that mutates clinic &amp; ED demo state</small>
+            <small>Open a care record for clinic check-in or emergency handover</small>
           </button>
           <button type="button" onClick={() => openOpsHub('context')}>
             <span className="os-tag">Context</span>
@@ -4636,7 +4668,7 @@ export function ContinuityPrototype() {
             </div>
             <EdQuickView record={ectprQuickViews[selectedId] ?? null} audience="clinician" />
             <p className="print-only print-notice">
-              Sample patient record. This page is not a treatment order, resuscitation order, or legal
+              This page is not a treatment order, resuscitation order, or legal
               directive, and it does not replace confirming the patient&rsquo;s current clinical
               status and wishes with the patient, surrogate and treating team.
             </p>
@@ -5063,7 +5095,7 @@ export function ContinuityPrototype() {
         >
           <div>
             <strong style={{ display: 'block', fontSize: '13px', color: '#ffffff' }}>
-              Twenty simulated conversations
+              Conversation review
             </strong>
             <small style={{ fontSize: '12px', color: '#94a3b8' }}>
               The workflow review the clinical leads asked for, scored on the seven agreed measures.
@@ -5223,6 +5255,114 @@ export function ContinuityPrototype() {
       }
       case 'care-near-me':
         return <CareNearMe audience={isPatientSession ? 'patient' : 'family'} patientName={portalPatientName} />;
+      case 'support-resources':
+        return <SupportResources />;
+      case 'prepare-conversation': {
+        const noteKey = `${sessionType}:${portalPatientId}:${portalAuthor}`;
+        return <ConversationPreparation
+          patientName={portalPatientName}
+          hindi={hindi}
+          author={`${portalAuthor} (${sessionType})`}
+          notes={preparationNotes[noteKey] ?? {}}
+          onChange={(notes) => setPreparationNotes((current) => ({ ...current, [noteKey]: notes }))}
+        />;
+      }
+      case 'daily-care': {
+        const nextVisit = appointments.filter((item) => item.hospitalId === portalPatientId && item.status === 'Scheduled' && item.date >= DEMO_TODAY)
+          .sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`))[0];
+        return <FamilyCareHome patientName={portalPatientName} hindi={hindi} nextVisit={nextVisit}
+          onOpen={navigate} onCalendar={() => navigate('calendar')} onTasks={() => navigate('family-tasks')}
+          onComfort={() => navigate('comfort')} onReports={() => navigate('reports')} />;
+      }
+      case 'comfort': {
+        const author = portalAuthor;
+        return <FamilyComfortSpace patientId={portalPatientId} author={author} today={DEMO_TODAY} hindi={hindi}
+          entries={comfortEntries} onChange={setComfortEntries} onOpenJournal={() => navigate('voice-journal')} onOpenSymptoms={() => navigate('symptom-diary')} />;
+      }
+      case 'visit-questions':
+      case 'family-tasks': {
+        const author = portalAuthor;
+        return <FamilyCareWorkspace key={portalPatientId} patientId={portalPatientId} patientName={portalPatientName} author={author}
+          tasks={familyTasks} appointments={appointments} demoToday={DEMO_TODAY}
+          tasksOnly
+          section={view === 'visit-questions' ? 'questions' : 'tasks'}
+          onTrackQuestion={(task) => {
+            if (task.patientId !== portalPatientId || task.kind !== 'Question') return;
+            setOpenQuestions((current) => addOpenQuestion(current, portalPatientId, author, DEMO_TODAY, task.id, { topic: task.title, owner: task.owner, due: task.due }));
+            navigate('open-questions');
+          }}
+          calendarText={[
+            'PERSONAL CALENDAR — entered from existing plans; not a prescription',
+            ...careEvents.filter((event) => event.patientId === portalPatientId).map((event) => `${event.date} ${event.time}${event.repeatUntil ? `; daily until ${event.repeatUntil}` : ''} — ${event.kind}: ${event.title}\n${event.instructions}\nAdded by ${event.addedBy}`),
+            'CALENDAR CHECKS',
+            ...careChecks.filter((check) => check.patientId === portalPatientId).map((check) => `${check.date} — ${careEvents.find((event) => event.patientId === portalPatientId && event.id === check.eventId)?.title ?? 'Calendar item'}; marked by ${check.actor} at ${check.checkedAt}`),
+            'REPORT FILE LIST — original files are not included in this text copy',
+            ...careReports.filter((report) => report.patientId === portalPatientId).map((report) => `${report.date} — ${report.file.name}; added by ${report.addedBy}`),
+          ].join('\n\n')}
+          onAdd={(task) => setFamilyTasks((current) => task.patientId === portalPatientId ? addFamilyTask(current, task) : current)}
+          onComplete={(taskId, complete) => setFamilyTasks((current) => setFamilyTaskCompleted(current, portalPatientId, taskId, author, complete))}
+          onPrepare={() => navigate('prepare-conversation')} onCareTeam={() => navigate('my-doctors')} onPlan={() => navigate('my-plan')} hindi={hindi} />;
+      }
+      case 'reports':
+      case 'calendar': {
+        const author = portalAuthor;
+        return <>{view === 'calendar' && <div className="family-workspace-heading"><h1>{hindi ? 'कैलेंडर' : 'Calendar'}</h1></div>}
+          <CareCalendar patientId={portalPatientId} author={author} today={DEMO_TODAY} hindi={hindi}
+            focusReports={view === 'reports'} onAppointmentInstructions={saveAppointmentInstructions} onTestResults={() => navigate('lab-history')}
+            appointments={appointments} tasks={familyTasks} events={careEvents} checks={careChecks} reports={careReports} reportSave={reportSave}
+            onAdd={(event) => setCareEvents((current) => event.patientId === portalPatientId ? addCareEvent(current, event) : current)}
+            onUpdate={(event) => {
+              const previous = careEvents.find((item) => item.patientId === portalPatientId && item.id === event.id);
+              const updated = updateCareEvent(careEvents, portalPatientId, event);
+              if (!previous || updated === careEvents) return;
+              setCareEvents(updated);
+              setCareChecks((current) => careChecksAfterEventUpdate(current, previous, event));
+            }}
+            onCheck={(eventId, date, complete) => setCareChecks((current) => setCareCheck(current, careEvents, portalPatientId, eventId, date, author, new Date().toISOString(), DEMO_TODAY, complete))}
+            onTaskCheck={(taskId, complete) => setFamilyTasks((current) => setFamilyTaskCompleted(current, portalPatientId, taskId, author, complete))}
+            onRemove={(eventId) => {
+              setCareEvents((current) => current.filter((event) => event.patientId !== portalPatientId || event.id !== eventId));
+              setCareChecks((current) => current.filter((check) => check.patientId !== portalPatientId || check.eventId !== eventId));
+            }}
+            onRestore={(event, restoredChecks) => {
+              if (event.patientId !== portalPatientId) return;
+              setCareEvents((current) => addCareEvent(current, event));
+              setCareChecks((current) => [...current, ...restoredChecks.filter((check) => check.patientId === portalPatientId && check.eventId === event.id && !current.some((existing) => existing.patientId === check.patientId && existing.eventId === check.eventId && existing.date === check.date))]);
+            }}
+            onReports={(reports) => setCareReports((current) => [...current, ...reports.filter((report) => report.patientId === portalPatientId && !reportFileError(report.file) && !current.some((existing) => existing.id === report.id))])}
+            onRemoveReport={(reportId) => setCareReports((current) => current.filter((report) => report.patientId !== portalPatientId || report.id !== reportId))}
+            onCareTeam={() => navigate('my-doctors')} /></>;
+      }
+      case 'symptom-diary':
+      case 'care-story':
+      case 'doctor-pack':
+      case 'home-help':
+      case 'support-places':
+      case 'open-questions':
+      case 'copy-tracker':
+      case 'voice-journal':
+      case 'cancer-overview':
+      case 'cost-help':
+      case 'lab-history': {
+        const release = latestReleaseFor(portalPatientId);
+        const author = portalAuthor;
+        return <FamilyCareTools tool={view} patientId={portalPatientId} patientName={portalPatientName} author={author} today={DEMO_TODAY} hindi={hindi}
+          symptoms={symptoms} story={careStory} contacts={handoverContacts} onSymptoms={setSymptoms} onStory={setCareStory} onContacts={setHandoverContacts}
+          homeHelp={homeHelp} supportPlaces={supportPlaces} onHomeHelp={setHomeHelp} onSupportPlaces={setSupportPlaces}
+          questions={openQuestions} copies={careCopies} releases={recordStates[portalPatientId]?.releases ?? []} onQuestions={setOpenQuestions} onCopies={setCareCopies}
+          voiceJournal={voiceJournal} onVoiceJournal={setVoiceJournal} voiceSave={voiceSave}
+          costs={familyCosts} onCosts={setFamilyCosts}
+          labResults={labResults} onLabResults={setLabResults}
+          diagnosis={patientProfiles[portalPatientId]?.diagnosis ?? patientProfiles[portalPatientId]?.stage.split(' · ')[0] ?? ''} team={patientProfiles[portalPatientId]?.team ?? ''}
+          reports={careReports} onOpen={navigate} onCareNote={() => navigate('my-plan')} onReports={() => navigate('reports')}
+          note={release ? { version: release.number, physician: release.physician, releasedAt: release.releasedAt, fields: planFieldsFor(portalPatientId) } : null}
+          calendarText={[
+            ...appointments.filter((item) => item.hospitalId === portalPatientId && item.status === 'Scheduled').map((item) => `${item.date} ${item.time} — ${item.type}; ${item.clinician}${item.preparationInstructions ? `\nInstructions from ${item.preparationInstructions.givenBy}: ${item.preparationInstructions.text}\nWritten here by ${item.preparationInstructions.recordedBy}` : ''}`),
+            ...careEvents.filter((item) => item.patientId === portalPatientId).map((item) => `${item.date} ${item.time}${item.repeatUntil ? `; daily until ${item.repeatUntil}` : ''} — ${item.title}\n${item.instructions}; added by ${item.addedBy}`),
+            ...familyTasks.filter((item) => item.patientId === portalPatientId).map((item) => `${item.completedBy ? 'Done' : 'To do'}: ${item.title}; ${item.owner}${item.due ? `; ${item.due}` : ''}`),
+          ].join('\n\n')}
+          reportNames={careReports.filter((report) => report.patientId === portalPatientId).map((report) => `${report.date} — ${report.file.name}`)} />;
+      }
       case 'my-doctors': {
         const patientAppointments = appointments.filter(
           (a) => a.hospitalId === portalPatientId && a.status !== 'Scheduled',
@@ -5340,6 +5480,8 @@ export function ContinuityPrototype() {
   const mobileNavLabels: Partial<Record<View, string>> = {
     'my-plan': 'Plan',
     'my-timeline': 'History',
+    'prepare-conversation': 'Prepare',
+    'daily-care': 'Daily care',
     'care-near-me': 'Nearby',
     'my-doctors': 'Doctors',
     'emergency-card': 'Card',
@@ -5360,74 +5502,55 @@ export function ContinuityPrototype() {
       ? familyNavItems
       : navItems.filter((item) => item.view !== 'caregiver');
 
-  if (authScreen === 'landing') {
-    return (
-      <>
-        <QuickDemoBar
-          currentSession={sessionType}
-          currentRole={currentRole}
-          onSelectRole={handleFastRoleSelect}
-          onGoHome={() => setAuthScreen('landing')}
-          onOpenMap={() => openOpsHub('map')}
-          onOpenOpsHub={openOpsHub}
-        />
-        <LandingPage
-          onSignIn={() => setAuthScreen('login')}
-          onSignUp={() => setAuthScreen('signup')}
-          onExploreDemo={() => enterCareTeam('Dr Sujay · Clinical lead')}
-          onFamilyAccess={() => setAuthScreen('family')}
-          onPatientAccess={() => setAuthScreen('patient')}
-          onQuickEnterRole={handleFastRoleSelect}
-          onOpenOpsHub={openOpsHub}
-        />
-        {renderContinuityOpsHub('landing')}
-        {mapOpen && <MapLibreDispatchModal onClose={() => setMapOpen(false)} />}
-      </>
-    );
+  if (authScreen !== null) {
+    return <CareSignIn patients={workItems.map((item) => ({ id: item.hospitalId, name: item.patient }))} hindi={hindi} onLanguage={() => setHindi((value) => !value)}
+      onSignIn={({ role, patientId, name }) => {
+        if (!workItems.some((item) => item.hospitalId === patientId)) return;
+        const nextView = requestedView && canOpenCareView(requestedView, role === 'doctor' ? 'care-team' : role, 'Dr Sujay · Clinical lead')
+          ? requestedView : role === 'doctor' ? 'home' : 'daily-care';
+        if (role === 'doctor') { selectPatient(patientId); enterCareTeam('Dr Sujay · Clinical lead', nextView); }
+        else if (role === 'patient') enterPatient({ hospitalId: patientId, name }, nextView);
+        else enterFamily({ patientId, name, relationship: 'Family member', verifiedSummaryOnly: true }, nextView);
+      }} />;
   }
-  if (authScreen === 'login') {
-    return (
-      <LoginScreen
-        onSignIn={(role) => enterCareTeam(role)}
-        onGoToSignup={() => setAuthScreen('signup')}
-        onGoHome={() => setAuthScreen('landing')}
-        onGoToFamily={() => setAuthScreen('family')}
-        onGoToPatient={() => setAuthScreen('patient')}
-      />
-    );
-  }
-  if (authScreen === 'signup') {
-    return (
-      <SignupScreen
-        onSignUp={(role) => enterCareTeam(role)}
-        onGoToLogin={() => setAuthScreen('login')}
-        onGoHome={() => setAuthScreen('landing')}
-        onGoToFamily={() => setAuthScreen('family')}
-        onGoToPatient={() => setAuthScreen('patient')}
-      />
-    );
-  }
-  if (authScreen === 'patient') {
-    return (
-      <PatientLoginScreen
-        onPatientSignIn={enterPatient}
-        onGoToFamily={() => setAuthScreen('family')}
-        onGoToClinician={() => setAuthScreen('login')}
-        onGoHome={() => setAuthScreen('landing')}
-        patients={workItems.map((w) => ({ hospitalId: w.hospitalId, name: w.patient }))}
-      />
-    );
-  }
-  if (authScreen === 'family') {
-    return (
-      <FamilyLoginScreen
-        patients={workItems.map((item) => ({ hospitalId: item.hospitalId, name: item.patient }))}
-        onFamilySignIn={enterFamily}
-        onGoToClinician={() => setAuthScreen('login')}
-        onGoHome={() => setAuthScreen('landing')}
-        onGoToPatient={() => setAuthScreen('patient')}
-      />
-    );
+
+  if (simpleMode && authScreen === null) {
+    const saves = [preparationSave, taskSave, eventSave, checkSave, reportSave, appointmentSave, noteSave, symptomSave, storySave, contactSave, helpSave, placesSave, questionSave, copySave, comfortSave, voiceSave, costSave, labSave];
+    if (saves.includes('loading')) return <main className="care-opening" aria-busy="true">{hindi ? 'देखभाल की जानकारी खोल रहे हैं…' : 'Opening your care…'}</main>;
+    const saveStatus = saves.includes('unavailable') ? 'unavailable' : saves.includes('saving') ? 'saving' : 'saved';
+    const role = isFamilySession ? 'family' : isPatientSession ? 'patient' : 'doctor';
+    return <SimpleCareShell view={view} role={role} hindi={hindi} saveStatus={saveStatus}
+      onSignOut={signOut}
+      onLanguage={() => setHindi((value) => !value)} onNavigate={navigate}
+      onRole={(next) => {
+        if (next === 'doctor') enterCareTeam('Dr Sujay · Clinical lead');
+        else if (next === 'patient') enterPatient({ hospitalId: selectedId, name: selectedItem.patient, dob: patientProfiles[selectedId]?.dob ?? '' });
+        else enterFamily({ name: selectedId === 'CANCER-20418' ? 'Kavya Raghavan' : 'Family member', relationship: 'Family member', patientId: selectedId, verifiedSummaryOnly: true });
+      }}>
+      {role === 'doctor' && (view === 'home' || view === 'doctor-review') ? view !== 'doctor-review' ? <DoctorCareHome
+        patients={workItems.map((item) => ({ id: item.hospitalId, name: item.patient, diagnosis: patientProfiles[item.hospitalId]?.diagnosis ?? patientProfiles[item.hospitalId]?.stage.split(' · ')[0] ?? '' }))}
+        records={recordStates} appointments={appointments} physician={currentRole.split(' · ')[0]} today={DEMO_TODAY} hindi={hindi}
+        onReview={(id) => { selectPatient(id); setView('doctor-review'); }} onInstructions={saveAppointmentInstructions} /> : <DoctorNoteReview key={selectedId}
+        patientId={selectedId} patientName={selectedItem.patient} patients={workItems.map((item) => ({ id: item.hospitalId, name: item.patient }))}
+        state={recordState} physician={currentRole.split(' · ')[0]} onPatient={selectPatient}
+        onUseNote={(note) => {
+          if (!isTreatingPhysician || sessionType !== 'care-team') return;
+          updateSelectedRecord((current) => ({ ...prepareVisitNote(current, note),
+            conversationCoverage: Object.fromEntries(conversationDomains.map(({ key }) => [key, 'not-discussed'])) as Record<ConversationDomainKey, ConversationDisposition> }));
+        }}
+        onApprove={(permission, reviewed) => {
+          const next = approveVisitNote(recordState, { treatingPhysician: isTreatingPhysician && sessionType === 'care-team', physician: currentRole.split(' · ')[0], permission, reviewed, releasedAt: new Date().toISOString() });
+          if (next === recordState) return;
+          const release = latestSummaryRelease(next)!;
+          updateSelectedRecord(() => ({ ...next, retrievalAcknowledged: false, retrievalUnlocked: false, unlockedVersion: null }));
+          addAudit(`Approved care note version ${release.number}`, selectedItem.patient, 'PUBLISH', undefined, selectedId, release.number);
+        }}
+        onFamily={() => {
+          enterFamily({ name: selectedId === 'CANCER-20418' ? 'Kavya Raghavan' : 'Family member', relationship: 'Family member', patientId: selectedId, verifiedSummaryOnly: true }, 'my-plan');
+        }} />
+        : view === 'my-plan' ? <><FamilyCareNote patientName={portalPatientName} release={latestReleaseFor(portalPatientId)} fields={planFieldsFor(portalPatientId)} onPrepare={() => navigate('prepare-conversation')} hindi={hindi} /><FamilyNoteHistory key={portalPatientId} patientId={portalPatientId} patientName={portalPatientName} hindi={hindi} releases={recordStates[portalPatientId]?.releases ?? []} /></>
+        : renderCurrentView()}
+    </SimpleCareShell>;
   }
 
   const familyInitials = (familyMember?.name ?? '')
@@ -5440,14 +5563,7 @@ export function ContinuityPrototype() {
 
   return (
     <>
-      <QuickDemoBar
-        currentSession={sessionType}
-        currentRole={currentRole}
-        onSelectRole={handleFastRoleSelect}
-        onGoHome={() => setAuthScreen('landing')}
-        onOpenMap={() => openOpsHub('map')}
-        onOpenOpsHub={openOpsHub}
-      />
+      <div className="simple-workspace-return"><button type="button" onClick={returnToCare}>← Back to family care</button></div>
       <main className={isPatientSession || isFamilySession ? 'app-shell is-portal' : 'app-shell'}>
       {/* Sidebar Navigation */}
       <aside className="sidebar" aria-label="Primary navigation">
@@ -5458,7 +5574,7 @@ export function ContinuityPrototype() {
         >
           <span className="brand-mark" aria-hidden="true"><ContinuityMark /></span>
           <div className="brand-titles">
-            <strong>Continuity Loop</strong>
+            <strong>Saanthvana</strong>
             <span>Care planning</span>
           </div>
         </button>
@@ -5498,7 +5614,7 @@ export function ContinuityPrototype() {
               onClick={() => navigate(isPatientSession ? 'my-plan' : isFamilySession ? 'caregiver' : 'home')}
             >
               <span className="brand-mark" aria-hidden="true"><ContinuityMark /></span>
-              <strong>Continuity</strong>
+              <strong>Saanthvana</strong>
             </button>
             <div className="environment-label">
 
@@ -5528,7 +5644,7 @@ export function ContinuityPrototype() {
               </div>
             ) : isFamilySession ? (
               <div className="family-session-bar" aria-label="Family session">
-                <span className="family-session-label"><IconLock className="w-3.5 h-3.5" />Family view · read-only</span>
+                <span className="family-session-label"><IconLock className="w-3.5 h-3.5" />Family view</span>
                 <div className="profile-block" aria-label="Signed-in family member">
                   <span className="profile-initials family" aria-hidden="true">{familyInitials || 'FM'}</span>
                   <div className="profile-info">

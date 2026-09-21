@@ -1,0 +1,52 @@
+.family-symptom-diary { color: #183f32; }
+.family-symptom-diary :is(button, input, select, textarea) { font: inherit; color: inherit; min-height: 44px; }
+.family-symptom-diary button { cursor: pointer; }
+.family-symptom-diary :is(button, input, select, textarea):focus-visible { outline: 2px solid #35765d; outline-offset: 3px; }
+.symptom-diary-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; align-items: start; }
+.symptom-diary-form { display: grid; gap: 16px; padding: 20px; background: #eeefe7; border: 1px solid #d6dfd0; border-radius: 12px; scroll-margin-top: 20px; }
+.symptom-diary-form fieldset { padding: 0; margin: 0; border: 0; min-width: 0; }
+.symptom-diary-form legend, .symptom-diary-form label { font-size: 14px; font-weight: 600; }
+.symptom-diary-form legend { margin-bottom: 8px; }
+.symptom-diary-form label { display: grid; gap: 7px; min-width: 0; }
+.symptom-choices { display: flex; flex-wrap: wrap; gap: 7px; }
+.symptom-choices button, .symptom-range button { background: #fff; border: 1px solid #b9cabc; border-radius: 7px; padding: 9px 12px; font-size: 14px; }
+.symptom-choices button[aria-pressed='true'], .symptom-range button[aria-pressed='true'] { color: #fff; background: #174c3b; border-color: #174c3b; }
+.symptom-severity { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.symptom-individual-levels { display: grid; gap: 9px; }
+.symptom-diary-form .symptom-individual-levels label { display: grid; grid-template-columns: minmax(0, 1fr) minmax(130px, .8fr); align-items: center; gap: 12px; padding: 7px 10px 7px 13px; border: 1px solid #e0c8b6; border-radius: 13px; background: #fff8f0; }
+.symptom-individual-levels label > span { overflow-wrap: anywhere; font-size: 14px; line-height: 1.4; }
+.symptom-individual-levels select { width: 100%; min-width: 0; padding: 9px 10px; border: 1px solid #d2b9a7; border-radius: 9px; background: #fffdf9; font-size: 14px; }
+.family-symptom-diary .symptom-severity-toggle { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 0; border: 0; border-radius: 6px; background: transparent; color: #945038; font-size: 13px; text-align: left; text-decoration: underline; text-underline-offset: 3px; }
+.symptom-date-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.symptom-diary-form :is(input, textarea), .symptom-history-filters select { width: 100%; min-width: 0; padding: 10px; border: 1px solid #bacbbf; border-radius: 7px; background: #fff; }
+.symptom-diary-form textarea { resize: vertical; line-height: 1.5; }
+.symptom-form-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.symptom-form-actions .primary-button { width: auto; box-shadow: none; }
+.symptom-error { margin: 0; color: #9a332e; font-size: 14px; line-height: 1.5; }
+.symptom-history-filters { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0 4px; }
+.symptom-range { display: flex; gap: 5px; flex-shrink: 0; }
+.symptom-history-filters select { flex: 1 1 140px; width: auto; font-size: 14px; }
+.symptom-note { padding: 16px 0 8px; border-bottom: 1px solid #d4ddd1; }
+.symptom-note-heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 5px 12px; }
+.symptom-note h3 { margin: 0; font-size: 17px; font-weight: 650; overflow-wrap: anywhere; }
+.symptom-note time { color: #566b5e; font-size: 13px; flex-shrink: 0; }
+.symptom-note-level { margin: 6px 0 0; font-size: 14px; font-weight: 600; line-height: 1.5; }
+.symptom-note-level span { font-weight: 400; color: #566b5e; }
+.symptom-note-text { margin: 10px 0 4px; font-size: 15px; line-height: 1.55; white-space: pre-wrap; overflow-wrap: anywhere; }
+.symptom-note-footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 12px; color: #566b5e; font-size: 12px; }
+.symptom-note-footer > span { min-width: 0; overflow-wrap: anywhere; }
+.symptom-note-footer > div { display: flex; flex-shrink: 0; gap: 6px; }
+.symptom-note-footer button { background: transparent; border: 0; border-radius: 5px; padding: 8px; font-size: 13px; text-decoration: underline; text-underline-offset: 3px; }
+.symptom-empty { font-size: 14px; color: #566b5e; padding-block: 20px; }
+.symptom-status { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; margin-top: 8px; min-height: 44px; font-size: 14px; }
+.symptom-status p { margin: 0; }
+@media (max-width: 760px) {
+  .symptom-diary-layout { grid-template-columns: 1fr; gap: 24px; }
+  .symptom-diary-form { padding: 16px; }
+  .symptom-diary-form :is(input, textarea) { font-size: 16px; }
+  .symptom-choices button { padding-inline: 10px; }
+  .symptom-diary-form .symptom-individual-levels label { grid-template-columns: minmax(0, 1fr) 132px; gap: 8px; padding-inline: 10px; }
+  .symptom-individual-levels select { font-size: 16px; }
+  .symptom-date-fields { grid-template-columns: 1fr; }
+  .symptom-note-heading { align-items: flex-start; }
+}

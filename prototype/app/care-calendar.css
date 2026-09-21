@@ -1,0 +1,115 @@
+.care-calendar { margin-bottom: 14px; }
+.care-opening { display: grid; place-items: center; min-height: 100svh; background: #f6f5f0; color: #183f32; font: 16px var(--font-inter), sans-serif; }
+.care-calendar-grid { display: grid; grid-template-columns: 330px minmax(0, 1fr); gap: 28px; align-items: start; }
+.care-calendar-month { background: #fff; border: 1px solid #d5ded3; border-radius: 16px; padding: 10px; }
+.care-month-heading { display: flex; justify-content: space-between; align-items: center; gap: 4px; }
+.care-month-heading h2 { font-size: 16px; }
+.care-month-heading > button { width: 44px; height: 44px; padding: 0; background: none; border: 0; border-radius: 8px; color: #244d3d; font: 26px/1 sans-serif; cursor: pointer; }
+.care-calendar-weekdays, .care-calendar-dates, .care-calendar-week { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
+.care-calendar-weekdays { text-align: center; font-size: 12px; color: #66786d; padding: 9px 0 3px; }
+.care-calendar-day { display: grid; place-content: center; gap: 3px; min-width: 0; height: 44px; padding: 3px 0; background: none; border: 0; border-radius: 10px; font: 500 14px var(--font-inter), sans-serif; color: #254a3d; cursor: pointer; }
+.care-calendar-day[aria-current='date'] { box-shadow: inset 0 0 0 1px #4d8068; }
+.care-calendar-day[aria-pressed='true'] { background: #195b44; color: white; }
+.care-calendar-day.outside-month { color: #a8b0a6; }
+.care-calendar-day:hover:not([aria-pressed='true']) { background: #eef3ea; }
+.care-calendar-dots { display: flex; min-height: 5px; justify-content: center; gap: 3px; }
+.care-calendar i { display: inline-block; width: 5px; height: 5px; border-radius: 50%; flex: 0 0 5px; }
+.care-calendar i.medicine { background: #1491a1; }
+.care-calendar i.visit { background: #9362cb; }
+.care-calendar i.task { background: #a48e55; }
+.care-calendar-day[aria-pressed='true'] i { background: #fff; }
+.care-calendar-key { display: flex; justify-content: center; gap: 13px; font-size: 10px; color: #576b5e; padding: 10px 0 0; }
+.care-calendar-key > span { display: flex; align-items: center; gap: 5px; }
+.care-calendar-shortcuts { display: flex; justify-content: center; }
+.care-calendar-shortcuts button { font-size: 12px; padding: 5px 10px; }
+.care-calendar-week, .care-calendar-shortcuts .care-month-toggle { display: none; }
+.care-day-agenda { min-width: 0; }
+.care-day-agenda > .family-section-heading { margin: 0 0 12px; min-height: 44px; }
+.care-day-agenda h2 { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; min-width: 0; }
+.care-selected-date { color: #677a6c; font: 400 14px var(--font-inter), sans-serif; }
+.care-day-agenda .primary-button { width: auto; padding: 9px 16px; font-size: 14px; box-shadow: none; }
+.care-agenda-view-controls { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
+.care-agenda-view { display: inline-flex; padding: 3px; background: #eae6dc; border: 1px solid #dbd4c6; border-radius: 12px; }
+.care-agenda-view button { min-width: 70px; min-height: 44px; padding: 8px 16px; border: 0; border-radius: 9px; background: transparent; color: #66594d; font: 600 13px var(--font-inter), sans-serif; cursor: pointer; }
+.care-agenda-view button[aria-pressed='true'] { background: #a6472c; color: #fff; box-shadow: 0 2px 4px #4920121a; }
+.care-agenda-week-controls { display: flex; gap: 5px; }
+.care-agenda-week-controls button { width: 44px; height: 44px; padding: 0; border: 1px solid #d7caba; border-radius: 10px; background: #fffaf1; color: #70432d; font: 26px/1 sans-serif; cursor: pointer; }
+.care-week-agenda { display: grid; gap: 14px; }
+.care-week-agenda-day > h3 { display: flex; align-items: baseline; gap: 10px; margin: 0 0 7px; color: #634b3b; font-size: 13px; font-weight: 650; }
+.care-week-agenda-day > h3 > span { color: #a6472c; font-size: 11px; }
+.care-week-empty { margin: 0; padding: 8px 0 10px; border-bottom: 1px solid #e5ddce; color: #756b5c; font-size: 12px; }
+.care-agenda-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 9px; }
+.care-agenda-list > li { display: grid; grid-template-columns: 58px minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 13px 14px; border-radius: 11px; background: #fff; border: 1px solid #dfe4dc; border-left: 3px solid #a48e55; }
+.care-agenda-list > li.care-agenda-visit { border-left-color: #9362cb; }
+.care-agenda-list > li.care-agenda-medicine { border-left-color: #1491a1; }
+.care-agenda-list time { font-size: 15px; font-weight: 650; font-variant-numeric: tabular-nums; }
+.care-agenda-list strong { display: block; font-size: 15px; font-weight: 600; line-height: 1.4; overflow-wrap: anywhere; }
+.care-agenda-list > li > div > span { display: block; margin-top: 4px; font-size: 12px; color: #617667; line-height: 1.5; overflow-wrap: anywhere; }
+.care-agenda-list > li > div > .care-agenda-kind { font-size: 10px; margin: 0 0 3px; letter-spacing: .025em; }
+.care-agenda-list .care-entry-author { font-size: 10px; }
+.care-agenda-list .care-any-time { font-size: 11px; color: #687a6c; }
+.care-agenda-list li.is-done { background: #eef2e8; }
+.care-agenda-list li.is-done strong { text-decoration: line-through; color: #6c7f70; }
+.care-check-button { min-width: 52px; min-height: 44px; border: 1px solid #bcd2c1; background: #f0f6ed; color: #20543e; border-radius: 9px; padding: 7px 10px; font: 600 12px var(--font-inter), sans-serif; cursor: pointer; }
+.care-check-button[aria-pressed='true'] { background: #216548; color: white; font-size: 20px; border-color: #216548; }
+.care-check-button:disabled { opacity: .5; cursor: default; }
+.care-agenda-actions { display: grid; grid-template-columns: repeat(2, minmax(44px, auto)); gap: 2px; }
+.care-agenda-actions .care-check-button { grid-column: 1 / -1; }
+.care-agenda-actions .care-edit-event, .care-agenda-actions .care-remove-event { min-width: 44px; min-height: 44px; border: 0; border-radius: 7px; background: none; color: #687a6c; padding: 5px; font: 11px var(--font-inter), sans-serif; cursor: pointer; }
+.care-agenda-actions .care-edit-event { color: #974929; }
+.care-agenda-actions .care-check-button + .care-remove-event { grid-column: 1 / -1; }
+.care-agenda-actions .care-edit-event:hover, .care-agenda-actions .care-remove-event:hover { background: #eee8dc; }
+.care-calendar-empty { border: 1px dashed #c5d2c1; border-radius: 12px; padding: 28px 20px; font-size: 14px; color: #657567; }
+.care-event-form { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: #eaf0e3; border: 1px solid #c7d6bf; border-radius: 12px; padding: 16px; margin: 12px 0; }
+.care-event-form label { display: grid; gap: 7px; font-size: 12px; font-weight: 600; min-width: 0; }
+.care-event-form input, .care-event-form select { min-width: 0; min-height: 44px; width: 100%; padding: 9px; border: 1px solid #bacbbf; border-radius: 7px; background: #fff; color: #183f32; font: 15px var(--font-inter), sans-serif; }
+.care-event-wide { grid-column: 1 / -1; }
+.care-event-form h3 { margin: 0; font-size: 15px; }
+.care-event-form-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.care-event-form-actions button { min-height: 44px; }
+.care-event-form p { font-size: 12px; color: #536c5b; line-height: 1.5; margin: 0; }
+.care-report-section { margin-top: 22px; padding-top: 16px; border-top: 1px solid #d4ded0; }
+.care-report-section h2 { font-size: 17px; }
+.care-report-section h2 span { color: #687a6c; font-size: 13px; }
+.care-report-upload { position: relative; display: inline-flex; align-items: center; min-height: 44px; padding: 7px 12px; border: 1px solid #c1d0bc; background: #fff; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.care-report-upload input { position: absolute; inset: 0; opacity: 0; width: 100%; cursor: pointer; }
+.care-report-upload:focus-within { outline: 2px solid #35765d; outline-offset: 3px; }
+.care-calendar-note { margin: 5px 0; font-size: 12px; color: #627768; line-height: 1.5; }
+.care-report-empty { font-size: 13px; color: #627768; margin: 12px 0 0; }
+.care-report-list { list-style: none; padding: 0; margin: 8px 0 0; }
+.care-report-list li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid #dfe4dc; }
+.care-report-list li > div { min-width: 0; }
+.care-report-list a { display: inline-block; padding: 10px 0; color: #205c44; text-decoration: underline; text-underline-offset: 3px; font-size: 14px; overflow-wrap: anywhere; }
+.care-report-list span { display: block; font-size: 11px; color: #647869; }
+.care-report-list button { flex-shrink: 0; font-size: 12px; }
+.care-report-actions { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+.care-report-actions a { min-height: 44px; display: inline-flex; align-items: center; }
+.care-report-actions button { min-height: 44px; }
+.care-calendar-status { font-size: 13px; margin: 8px 0; }
+.care-calendar-status:empty { display: none; }
+.family-next-visit-line { display: flex; flex-wrap: wrap; gap: 4px 16px; align-items: center; margin: -10px 0 18px; font-size: 13px; color: #536b5b; }
+.family-next-visit-line button { font-size: 13px; }
+.family-workspace .care-home-grid { border-top: 1px solid #d4ded0; padding-top: 16px; }
+.family-workspace .care-home-grid .care-home-section { margin-top: 0; }
+@media (max-width: 800px) {
+  .care-calendar-grid { grid-template-columns: 1fr; gap: 18px; }
+  .care-calendar-month { padding: 8px; }
+  .care-calendar-dates { display: none; }
+  .care-calendar-dates.is-expanded, .care-calendar-week { display: grid; }
+  .care-calendar-shortcuts { justify-content: space-between; }
+  .care-calendar-shortcuts .care-month-toggle { display: inline-block; }
+  .care-calendar-key { font-size: 10px; gap: 16px; }
+  .care-month-heading h2 { font-size: 16px; }
+  .care-agenda-list > li { grid-template-columns: 43px minmax(0, 1fr) auto; gap: 9px; padding: 10px; }
+  .care-day-agenda > .family-section-heading { align-items: center; gap: 10px; }
+  .care-day-agenda > .family-section-heading > button { flex-shrink: 0; }
+  .care-agenda-list strong { font-size: 14px; }
+  .care-agenda-list time { font-size: 13px; }
+  .care-agenda-list .care-text-button { max-width: 60px; font-size: 12px; }
+  .care-check-button { min-width: 48px; padding: 5px 8px; }
+  .care-event-form { gap: 10px; padding: 12px; }
+  .care-report-section { margin-top: 18px; }
+  .care-report-list li { align-items: flex-start; flex-wrap: wrap; gap: 2px 12px; }
+  .care-selected-date { font-size: 13px; }
+  .family-next-visit-line { margin-bottom: 10px; }
+}

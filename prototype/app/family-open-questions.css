@@ -1,0 +1,54 @@
+.family-open-questions { max-width: 1000px; color: #123f32; }
+.open-questions-heading, .open-question-actions, .open-question-add-row, .open-question-undo { display: flex; align-items: center; gap: 10px; }
+.open-questions-heading { justify-content: space-between; flex-wrap: wrap; margin-bottom: 20px; gap: 16px; }
+.open-questions-heading h1 { margin: 0; }
+.family-open-questions :is(button, input, summary) { min-height: 44px; }
+.family-open-questions :is(button, input, textarea, summary):focus-visible { outline: 2px solid #35765d; outline-offset: 3px; }
+.family-open-questions :is(input, textarea) { width: 100%; min-width: 0; color: #123f32; border: 1px solid #bacbbf; border-radius: 8px; background: #fff; padding: 10px 12px; font: inherit; font-size: 16px; }
+.family-open-questions textarea { resize: vertical; line-height: 1.6; }
+.family-open-questions label { display: grid; min-width: 0; gap: 7px; font-size: 14px; font-weight: 600; }
+.family-open-questions button { cursor: pointer; }
+.family-open-questions button:disabled { cursor: not-allowed; }
+.family-open-questions summary { display: flex; align-items: center; gap: 7px; width: fit-content; cursor: pointer; color: #52665b; font-size: 14px; }
+.family-open-questions summary::before { content: '+'; }
+.family-open-questions details[open] > summary::before { content: '−'; }
+.open-question-add { max-width: 800px; margin-bottom: 18px; }
+.open-question-add-row input { flex: 1; }
+.open-question-add-row button { flex-shrink: 0; }
+.open-question-two-fields { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; padding-block: 8px; }
+.open-question-list { display: grid; gap: 16px; }
+.open-question-card { min-width: 0; padding: 20px; border: 1px solid #d2dccd; border-radius: 12px; background: #fff; }
+.open-question-status { display: block; color: #52665b; font-size: 13px; font-weight: 600; line-height: 1.5; }
+.open-question-card h2 { margin: 7px 0; font-size: 18px; line-height: 1.5; overflow-wrap: anywhere; }
+.open-question-owner { margin: 6px 0 12px; font-size: 13px; line-height: 1.6; color: #52665b; overflow-wrap: anywhere; }
+.open-question-actions { flex-wrap: wrap; margin-top: 12px; }
+.open-question-link, .open-question-undo button { border: 0; background: transparent; border-radius: 5px; padding: 8px; color: #185341; font: inherit; font-weight: 600; font-size: 14px; }
+.open-question-next { margin-top: 15px; padding: 12px 15px; background: #eeefe7; border-radius: 8px; }
+.open-question-card h3 { margin: 0 0 6px; font-size: 14px; line-height: 1.5; }
+.open-question-next p, .open-question-reply p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 15px; line-height: 1.65; }
+.open-question-replies { margin-top: 8px; }
+.open-question-reply { padding: 10px 0 14px; border-bottom: 1px solid #dce1d8; }
+.open-question-reply > span { display: block; margin-top: 6px; font-size: 12px; line-height: 1.6; color: #52665b; overflow-wrap: anywhere; }
+.open-question-form { display: grid; gap: 12px; padding: 16px; background: #eeefe7; border: 1px solid #cdd7c8; border-radius: 8px; margin-top: 16px; }
+.open-question-form h3 { margin-bottom: 0; font-size: 16px; }
+.open-question-form .open-question-actions { margin-top: 0; }
+.open-question-more { margin-top: 5px; }
+.open-question-more .open-question-actions { margin-top: 0; }
+.open-question-by { margin: 0; font-size: 12px; line-height: 1.6; color: #52665b; overflow-wrap: anywhere; }
+.open-question-message { margin: 0; font-size: 14px; line-height: 1.5; }
+.open-question-message:not(:empty) { margin-block: 10px; }
+.open-question-empty { margin: 15px 0; color: #52665b; font-size: 15px; line-height: 1.6; }
+.open-question-closed { margin-top: 16px; }
+.open-question-closed > summary { font-weight: 600; }
+.open-question-closed > .open-question-list { margin-top: 10px; }
+.open-question-undo { justify-content: space-between; margin: 12px 0; padding: 5px 12px; border: 1px solid #c0cfb4; border-radius: 8px; background: #e9eedf; font-size: 14px; }
+.open-question-undo > span { overflow-wrap: anywhere; min-width: 0; }
+.open-question-undo button { flex-shrink: 0; text-decoration: underline; text-underline-offset: 3px; }
+@media (max-width: 700px) {
+  .open-questions-heading { align-items: flex-start; }
+  .open-question-card, .open-question-form { padding: 16px; }
+  .open-question-two-fields { grid-template-columns: minmax(0, 1fr); }
+  .open-question-actions { gap: 8px; }
+  .family-open-questions :is(.primary-button, .secondary-button) { padding-inline: 14px; }
+  .open-question-card h2 { font-size: 17px; }
+}

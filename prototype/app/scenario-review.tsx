@@ -492,7 +492,9 @@ export function ScenarioReviewModal({ onClose, onRecordResult }: ScenarioReviewP
   const report = useMemo(() => {
     if (!finished) return '';
     const lines = [
-      `# Twenty simulated conversations — observed result`,
+      `# Conversation review — workflow results`,
+      '',
+      'Programmed conversation cases. These results do not measure patient outcomes.',
       '',
       `Cases scored: ${SCENARIOS.length}. Domains per case: ${DOMAIN_KEYS.length}. Released fields per case: ${RELEASED_FIELDS.length}.`,
       '',
@@ -581,7 +583,7 @@ export function ScenarioReviewModal({ onClose, onRecordResult }: ScenarioReviewP
               id="scenario-review-title"
               style={{ margin: '8px 0 2px 0', fontSize: '22px', fontWeight: 800, letterSpacing: '-0.02em', color: '#ffffff' }}
             >
-              Twenty Simulated Conversations
+              Conversation review
             </h1>
             <p style={{ margin: 0, fontSize: '13px', color: '#e2e8f0', opacity: 0.9 }}>
               The workflow review the clinical leads asked for, scored on the seven agreed measures. Every number here is computed from the cases — open a failing case to see the cause.
@@ -881,7 +883,7 @@ export function ScenarioReviewModal({ onClose, onRecordResult }: ScenarioReviewP
               ))}
             </div>
             <p style={{ margin: '8px 0 0 0', fontSize: '12px', color: '#78350f', lineHeight: 1.55 }}>
-              These are simulated conversations. They measure whether the workflow holds, and nothing about what it does to a patient.
+              These programmed conversation cases check the workflow. They do not measure patient outcomes.
             </p>
           </div>
         </div>
@@ -934,7 +936,7 @@ export function ScenarioReviewModal({ onClose, onRecordResult }: ScenarioReviewP
                 if (!finished) return;
                 const met = measures.filter((m) => m.verdict === 'met').length;
                 onRecordResult?.(
-                  `20 simulated conversations scored: ${met} targets met, ${missed.length} below target (${missed
+                  `20 programmed conversation cases scored: ${met} targets met, ${missed.length} below target (${missed
                     .map((m) => m.failingCases.join('/'))
                     .join(', ')})`,
                 );

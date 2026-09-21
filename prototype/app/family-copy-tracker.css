@@ -1,0 +1,52 @@
+.family-copy-tracker { color: #183f32; }
+.copy-tracker-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 22px; }
+.copy-tracker-heading h1 { font-size: clamp(24px, 2.5vw, 31px); letter-spacing: -.7px; line-height: 1.25; margin: 0; }
+.family-copy-tracker button { min-height: 44px; padding: 9px 13px; border: 1px solid #c6d1c0; border-radius: 8px; background: #fff; color: #183f32; font: inherit; font-size: 14px; line-height: 1.5; cursor: pointer; }
+.family-copy-tracker button.primary-button { border-color: #174c3b; background: #174c3b; color: #fff; }
+.family-copy-tracker button:disabled { opacity: .5; cursor: not-allowed; }
+.family-copy-tracker .copy-text-button { border-color: transparent; background: transparent; padding-inline: 6px; text-decoration: underline; text-underline-offset: 3px; }
+.copy-current-note { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 20px; background: #e9efe1; border: 1px solid #cdd8c3; border-radius: 11px; }
+.copy-current-note h2 { margin: 0 0 6px; font-size: 18px; }
+.copy-current-note p { margin: 0; color: #58705b; font-size: 13px; line-height: 1.5; }
+.copy-log-start { display: flex; flex-wrap: wrap; gap: 12px 22px; align-items: center; justify-content: space-between; margin: 14px 0 20px; }
+.copy-log-start p { max-width: 520px; margin: 0; font-size: 13px; color: #5e715e; line-height: 1.55; }
+.copy-tracker-form { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 20px; background: #edf1e6; border: 1px solid #cfdbc6; border-radius: 11px; margin-bottom: 22px; }
+.copy-tracker-form h2 { grid-column: 1 / -1; margin: 0; font-size: 18px; }
+.copy-tracker-form label { display: grid; gap: 7px; min-width: 0; font-size: 13px; font-weight: 600; }
+.copy-tracker-form :is(input, select, textarea) { width: 100%; min-width: 0; min-height: 44px; box-sizing: border-box; padding: 9px 11px; border: 1px solid #b8c9b2; border-radius: 7px; color: #183f32; background: #fff; font: inherit; font-size: 15px; }
+.copy-tracker-form textarea { resize: vertical; line-height: 1.5; }
+.copy-form-wide { grid-column: 1 / -1; }
+.copy-form-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.copy-form-error { margin: 0; color: #903b31; font-size: 13px; }
+.copy-recipient-list { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
+.copy-recipient-card { min-width: 0; padding: 18px; border: 1px solid #d1d9ca; border-radius: 11px; background: #fff; }
+.copy-recipient-heading { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 16px; align-items: flex-start; }
+.copy-recipient-heading > div { min-width: 0; }
+.copy-recipient-heading h2 { margin: 0; font-size: 18px; line-height: 1.4; overflow-wrap: anywhere; }
+.copy-version-state { margin: 6px 0; font-size: 13px; color: #496851; }
+.copy-version-state.is-older { color: #8b5c1d; }
+.copy-version-state.is-unavailable { color: #796754; }
+.copy-last-entry { margin: 14px 0 8px; color: #586c5c; font-size: 13px; line-height: 1.6; }
+.copy-location-note { margin: 10px 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 15px; line-height: 1.6; }
+.copy-history { border-top: 1px solid #dce3d6; margin-top: 14px; }
+.copy-history summary { min-height: 44px; padding: 13px 0; box-sizing: border-box; cursor: pointer; font-size: 14px; }
+.copy-history ol { list-style: none; margin: 0; padding: 0; }
+.copy-history li { padding: 12px 0; border-top: 1px solid #e3e7dc; }
+.copy-entry-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 10px; }
+.copy-entry-heading strong { font-size: 13px; }
+.copy-entry-heading > div { display: flex; flex-wrap: wrap; gap: 6px; }
+.copy-entry-author { margin: 7px 0 0; font-size: 12px; color: #64755f; line-height: 1.5; }
+.copy-empty { font-size: 14px; color: #5c715c; }
+.copy-tracker-status { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin-top: 14px; }
+.copy-tracker-status p { margin: 0; font-size: 13px; }
+.copy-tracker-status p:empty { display: none; }
+.family-copy-tracker :is(input, select, textarea, button, summary):focus-visible { outline: 2px solid #35765d; outline-offset: 3px; }
+@media (max-width: 800px) {
+  .copy-recipient-list { grid-template-columns: 1fr; }
+  .copy-tracker-heading h1 { font-size: 25px; }
+}
+@media (max-width: 480px) {
+  .copy-tracker-form { grid-template-columns: 1fr; padding: 16px; }
+  .copy-current-note, .copy-recipient-card { padding: 16px; }
+  .copy-current-note > button { width: 100%; }
+}

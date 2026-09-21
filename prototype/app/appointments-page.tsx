@@ -25,6 +25,7 @@ export type Appointment = {
   outcome?: string;
   note?: string;
   documentation: DocumentationStatus;
+  preparationInstructions?: { text: string; givenBy: string; recordedBy: string; updatedAt: string };
 };
 
 export type AppointmentPatient = {

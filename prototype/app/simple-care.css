@@ -1,0 +1,87 @@
+.simple-care-app { min-height: 100svh; background: #f6f5f0; color: #183f32; }
+.simple-care-header, .simple-care-nav, .simple-care-content, .simple-care-footer { width: min(1180px, 100%); margin-inline: auto; padding-inline: 36px; }
+.simple-care-header { min-height: 84px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.simple-care-brand { font: 700 26px var(--font-sora), sans-serif; letter-spacing: -1px; color: #123f32; background: none; border: 0; padding: 8px 0; min-height: 44px; cursor: pointer; }
+.simple-care-switches { display: flex; align-items: center; gap: 12px; }
+.simple-care-switches > button, .simple-care-switches select, .doctor-note-review > .family-workspace-heading select { min-height: 44px; border: 1px solid #c6d0c3; border-radius: 8px; padding: 8px 12px; color: #183f32; background: transparent; font: inherit; font-size: 14px; cursor: pointer; }
+.simple-care-nav { display: flex; gap: 28px; border-bottom: 1px solid #d3dace; }
+.simple-care-nav :is(a, button) { min-height: 50px; border: 0; border-bottom: 3px solid transparent; background: none; color: #5e7065; padding: 10px 0; font: 600 15px var(--font-inter), sans-serif; cursor: pointer; }
+.simple-care-nav :is(a, button)[aria-current='page'] { border-bottom-color: #1b513f; color: #123f32; }
+.simple-care-content { padding-block: 24px 10px; }
+.simple-care-app :is(button, input, textarea, select, summary):focus-visible { outline: 2px solid #35765d; outline-offset: 3px; }
+.simple-care-app .secondary-button { min-height: 44px; font-size: 14px; box-shadow: none; background: #fff; }
+.simple-care-app .primary-button { min-height: 44px; background: #174c3b; color: #fff; border-color: #174c3b; }
+.simple-care-app button:disabled { opacity: .5; cursor: not-allowed; }
+.simple-care-footer { display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start; padding-block: 10px 14px; color: #657469; border-top: 1px solid #dce1d8; font-size: 12px; }
+.simple-care-footer > span { padding-block: 14px; }
+.simple-care-footer details { max-width: 530px; }
+.simple-care-footer summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.simple-care-footer p { margin: 0; line-height: 1.6; }
+.care-note-meta { color: #5e7065; font-size: 14px; line-height: 1.6; margin: -10px 0 26px; }
+.care-note-fields { margin: 0 0 20px; display: grid; gap: 20px; }
+.care-note-fields dt { color: #52675c; font-size: 13px; margin-bottom: 6px; font-weight: 600; }
+.care-note-fields dd { margin: 0; font-size: 16px; line-height: 1.65; white-space: pre-wrap; overflow-wrap: anywhere; }
+.simple-care-note { max-width: 850px; }
+.simple-care-content .conversation-preparation .preparation-fields { grid-template-columns: 1fr; }
+.care-preparation-prompts { margin: 16px 0; }
+.care-preparation-prompts summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; font-size: 14px; }
+.doctor-review-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
+.doctor-source { padding: 20px; background: #eeefe7; border-radius: 12px; }
+.doctor-source h2, .doctor-family-copy h2 { margin-bottom: 16px; }
+.doctor-source .family-section-heading h2 { margin: 0; }
+.doctor-source-text { margin: 12px 0 0; font-size: 15px; line-height: 1.75; white-space: pre-wrap; }
+.doctor-source label { display: block; margin-top: 14px; font-size: 14px; }
+.doctor-source textarea { width: 100%; margin: 8px 0 12px; background: #fff; padding: 12px; border: 1px solid #bacbbf; border-radius: 8px; font: 15px/1.6 var(--font-inter), sans-serif; resize: vertical; color: #183f32; }
+.doctor-source .care-note-meta { margin: 12px 0 0; font-size: 12px; }
+.doctor-family-copy { padding-top: 20px; }
+.doctor-approval { display: grid; grid-template-columns: 260px 1fr auto; gap: 22px; align-items: center; margin-top: 26px; padding-top: 24px; border-top: 1px solid #cdd7c8; }
+.doctor-approval > label:first-child { font-size: 13px; font-weight: 600; }
+.doctor-approval select { display: block; width: 100%; min-height: 44px; margin-top: 8px; border: 1px solid #bacbbf; border-radius: 7px; background: #fff; padding: 8px; color: #183f32; font: inherit; }
+.doctor-review-check { display: flex; gap: 12px; align-items: flex-start; font-size: 13px; line-height: 1.6; cursor: pointer; min-height: 44px; }
+.doctor-review-check input { width: 21px; height: 21px; flex: 0 0 21px; margin-top: 3px; accent-color: #174c3b; }
+.doctor-release-row { display: flex; justify-content: space-between; gap: 20px; align-items: center; border-top: 1px solid #cdd7c8; margin-top: 20px; padding-top: 20px; }
+.simple-workspace-return { padding: 10px 24px; background: #eff1e7; }
+.simple-workspace-return button { min-height: 44px; background: none; border: 0; font: inherit; color: #123f32; cursor: pointer; }
+.simple-care-brand, .simple-care-nav a, .family-tool-buttons a, .care-home-shortcut { text-decoration: none; }
+.simple-care-nav a { display: flex; align-items: center; justify-content: center; }
+.care-save-error { width: min(1108px, calc(100% - 36px)); margin: 8px auto 20px; color: #813d24; font-size: 13px; }
+.simple-care-app .care-report-page { border: 0; margin: 0; padding: 0; }
+.care-report-date { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; font-size: 14px; }
+.care-report-date input { min-height: 44px; padding: 8px 12px; border: 1px solid #cfc1b3; border-radius: 11px; font: inherit; }
+.simple-care-app .family-workspace .care-home-single { grid-template-columns: minmax(0, 1fr); max-width: 850px; }
+.family-care-home-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.care-home-visit-links { display: flex; gap: 8px; flex-wrap: wrap; }
+.care-home-visit-links a { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 12px; border: 1px solid #e6ddd1; background: #fffdf9; border-radius: 12px; color: #714834; text-decoration: none; font-size: 13px; }
+.care-home-resources { display: flex; width: fit-content; gap: 10px; align-items: center; min-height: 44px; margin-top: 8px; color: #714834; text-decoration: none; font-size: 14px; }
+.care-home-resources svg { width: 18px; height: 18px; }
+.simple-care-content { animation: care-page-enter .24s ease-out both; }
+.simple-care-app .comfort-orb { animation: care-breathe 7s ease-in-out infinite; }
+.simple-care-app .family-tool-buttons [data-tool='cancer-overview'] .family-tool-icon { animation: care-float 8s ease-in-out infinite; }
+.simple-care-app .family-tool-buttons [data-tool='voice-journal'] .family-tool-icon { animation: care-float 9s ease-in-out -3s infinite; }
+.care-calendar-dots i { width: 7px; height: 7px; }
+@keyframes care-page-enter { from { opacity: .4; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes care-breathe { 0%, 100% { transform: scale(.96); } 50% { transform: scale(1.05) rotate(4deg); } }
+@keyframes care-float { 0%, 100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-4px) rotate(2deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .simple-care-content, .simple-care-app .comfort-orb, .simple-care-app .family-tool-buttons [data-tool] .family-tool-icon { animation: none; }
+}
+@media (max-width: 700px) {
+  .simple-care-header, .simple-care-nav, .simple-care-content, .simple-care-footer { padding-inline: 18px; }
+  .simple-care-header { min-height: 74px; gap: 6px 10px; flex-wrap: wrap; padding-block: 8px; }
+  .simple-care-brand { font-size: 20px; letter-spacing: -.7px; }
+  .simple-care-switches { gap: 6px; }
+  .simple-care-switches > button, .simple-care-switches select { padding-inline: 8px; font-size: 13px; }
+  .simple-care-nav { gap: 26px; }
+  .simple-care-nav :is(a, button) { font-size: 14px; }
+  .simple-care-content { padding-block: 24px 10px; }
+  .simple-care-footer { gap: 0 15px; }
+  .simple-care-footer > span { padding-block: 8px; }
+  .simple-care-footer summary { min-height: 44px; }
+  .doctor-review-grid { grid-template-columns: 1fr; gap: 8px; }
+  .doctor-approval { grid-template-columns: 1fr; gap: 20px; }
+  .doctor-approval button { width: 100%; }
+  .doctor-note-review > .family-workspace-heading { flex-direction: column; align-items: stretch; }
+  .doctor-release-row { align-items: stretch; flex-direction: column; }
+  .doctor-source { padding: 16px; }
+  .simple-care-content .conversation-preparation h1 { font-size: 25px; }
+}

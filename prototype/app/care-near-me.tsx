@@ -1,587 +1,265 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
-import type { Map as LeafletMap, Marker } from 'leaflet';
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
+import { CareDirectory } from './care-directory';
+import { CARE_CENTRES, DIRECTORY_CHECKED_ON, filterCareCentres, type CareCentre } from './care-directory-data';
+import { PalliativeMap, type CareMapOrigin, type CareMapPoint, type CareRoadRoute } from './palliative-map';
 
-export type CareNearMeProps = {
-  audience: 'patient' | 'family';
-  patientName: string;
-};
-
-type City = {
-  name: string;
-  lat: number;
-  lon: number;
-};
-
-const CITIES: City[] = [
-  { name: 'Hyderabad', lat: 17.385, lon: 78.4867 },
-  { name: 'Bengaluru', lat: 12.9716, lon: 77.5946 },
-  { name: 'Chennai', lat: 13.0827, lon: 80.2707 },
-  { name: 'Mumbai', lat: 19.076, lon: 72.8777 },
-  { name: 'Delhi', lat: 28.6139, lon: 77.209 },
-  { name: 'Kolkata', lat: 22.5726, lon: 88.3639 },
-  { name: 'Thiruvananthapuram', lat: 8.5241, lon: 76.9366 },
-];
-
-type Category = 'palliative' | 'hospital' | 'clinic';
-
-type Place = {
-  id: string;
-  name: string;
-  category: Category;
-  lat: number;
-  lon: number;
-  distanceKm: number;
-  address: string;
-  phone?: string;
-  website?: string;
-};
-
-type Origin = {
-  lat: number;
-  lon: number;
-  label: string;
-};
-
-const CATEGORY_LABELS: Record<Category, string> = {
-  palliative: 'Palliative & hospice',
-  hospital: 'Hospital',
-  clinic: 'Clinic / doctors',
-};
-
-const CATEGORY_COLORS: Record<Category, string> = {
-  palliative: '#0c5c3f',
-  hospital: '#1a5f9e',
-  clinic: '#6b5a3a',
-};
-
-const RADII = [5000, 15000, 30000];
-const MAX_DISTANCE_KM = 30;
-const PHOTON_URL = 'https://photon.komoot.io/api/';
-
-// OpenStreetMap's Overpass API answers HTTP 406 to requests sent from web
-// browsers, so the search uses Photon, a geocoder over the same OpenStreetMap
-// data that accepts browser requests and responds in a couple of seconds.
-const PHOTON_QUERIES: Array<{ q: string; osmTag?: string }> = [
-  { q: 'palliative care' },
-  { q: 'hospice' },
-  { q: 'hospital', osmTag: 'amenity:hospital' },
-  { q: 'clinic', osmTag: 'amenity:clinic' },
-  { q: 'doctor', osmTag: 'amenity:doctors' },
-];
-
-// Only facility-like features count; this keeps "Hospice Road" and similar
-// street or place names out of the palliative results.
-const FACILITY_KEYS = new Set(['amenity', 'healthcare', 'building', 'office', 'social_facility']);
-
-function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
-  const R = 6371;
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLon = ((lon2 - lon1) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLon / 2) ** 2;
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
-}
-
-type PhotonProperties = {
-  osm_type?: string;
-  osm_id?: number;
-  osm_key?: string;
-  osm_value?: string;
-  name?: string;
-  housenumber?: string;
-  street?: string;
-  locality?: string;
-  district?: string;
-  city?: string;
-  postcode?: string;
-};
-
+export type CareNearMeProps = { audience: 'patient' | 'family'; patientName: string };
+type Category = 'all' | 'palliative' | 'hospital';
+type Place = CareMapPoint & { address: string; sourceUrl: string; distanceKm: number };
+type SearchMatch = CareMapOrigin & { id: string; address: string; sourceUrl: string };
 type PhotonFeature = {
   geometry?: { coordinates?: [number, number] };
-  properties?: PhotonProperties;
+  properties?: { osm_type?: string; osm_id?: number; osm_key?: string; osm_value?: string; name?: string; housenumber?: string; street?: string; locality?: string; district?: string; city?: string; state?: string; country?: string; countrycode?: string; postcode?: string };
 };
+const PHOTON_URL = 'https://photon.komoot.io/api/';
+const FACILITY_KEYS = new Set(['amenity', 'healthcare', 'building', 'office', 'social_facility']);
 
-function classify(key: string | undefined, value: string | undefined, name: string): Category | null {
-  if (!key || !FACILITY_KEYS.has(key)) return null;
-  if (value === 'veterinary' || /\b(vet(?:erinary|ernary)?|animal|pet)\b/i.test(name)) return null;
-  if (value === 'hospice' || value === 'palliative' || /palliat|hospice/i.test(name)) return 'palliative';
-  if (value === 'hospital') return 'hospital';
-  if (value === 'clinic' || value === 'doctors' || value === 'doctor') return 'clinic';
-  return null;
+function validCoordinates(value: unknown): value is [number, number] {
+  return Array.isArray(value) && value.length === 2 && value.every(Number.isFinite) && Math.abs(value[0]) <= 180 && Math.abs(value[1]) <= 90;
+}
+function distanceKm(a: [number, number], b: [number, number]) {
+  const radians = Math.PI / 180;
+  const value = Math.sin((b[1] - a[1]) * radians / 2) ** 2 + Math.cos(a[1] * radians) * Math.cos(b[1] * radians) * Math.sin((b[0] - a[0]) * radians / 2) ** 2;
+  return 6371 * 2 * Math.atan2(Math.sqrt(value), Math.sqrt(1 - value));
+}
+function categoryOf(feature: PhotonFeature): Exclude<Category, 'all'> | null {
+  const props = feature.properties;
+  if (!props?.osm_key || !FACILITY_KEYS.has(props.osm_key) || /\b(veterinary|animal|pet)\b/i.test(props.name ?? '')) return null;
+  if (props.osm_value === 'hospice' || props.osm_value === 'palliative' || /palliat|hospice/i.test(props.name ?? '')) return 'palliative';
+  return props.osm_value === 'hospital' ? 'hospital' : null;
+}
+function matchOf(feature: PhotonFeature): SearchMatch | null {
+  const props = feature.properties;
+  const coordinates = feature.geometry?.coordinates;
+  if (!props?.name || !validCoordinates(coordinates)) return null;
+  const address = [...new Set([[props.housenumber, props.street].filter(Boolean).join(' '), props.locality ?? props.district, props.city, props.state, props.postcode].filter(Boolean))].join(', ');
+  const kind = ({ N: 'node', W: 'way', R: 'relation', node: 'node', way: 'way', relation: 'relation' } as Record<string, string>)[props.osm_type ?? ''];
+  return { id: `${kind ?? 'place'}/${props.osm_id ?? coordinates.join(',')}`, label: props.name, coordinates, address, sourceUrl: kind && props.osm_id ? `https://www.openstreetmap.org/${kind}/${props.osm_id}` : `https://www.openstreetmap.org/?mlat=${coordinates[1]}&mlon=${coordinates[0]}#map=16/${coordinates[1]}/${coordinates[0]}` };
+}
+async function photon(query: string, signal: AbortSignal, origin?: CareMapOrigin, hospitalOnly = false): Promise<PhotonFeature[]> {
+  const params = new URLSearchParams({ q: query, limit: origin ? '35' : '6', lang: 'en' });
+  if (origin) { params.set('lat', origin.coordinates[1].toFixed(2)); params.set('lon', origin.coordinates[0].toFixed(2)); }
+  if (hospitalOnly) params.set('osm_tag', 'amenity:hospital');
+  const response = await fetch(`${PHOTON_URL}?${params}`, { signal });
+  if (!response.ok) throw new Error('Place search unavailable');
+  const body = await response.json() as { features?: PhotonFeature[] };
+  return Array.isArray(body.features) ? body.features : [];
+}
+function directionsUrl(point: CareMapPoint, origin: CareMapOrigin | null) {
+  const params = new URLSearchParams({ api: '1', destination: `${point.coordinates[1]},${point.coordinates[0]}`, travelmode: 'driving' });
+  if (origin) params.set('origin', `${origin.coordinates[1]},${origin.coordinates[0]}`);
+  return `https://www.google.com/maps/dir/?${params}`;
 }
 
-function buildAddress(p: PhotonProperties): string {
-  const line1 = [p.housenumber, p.street].filter(Boolean).join(' ');
-  const parts = [line1, p.locality ?? p.district, p.city, p.postcode].filter(
-    (part): part is string => Boolean(part),
-  );
-  const unique = parts.filter((part, i) => parts.indexOf(part) === i);
-  return unique.length > 0 ? unique.join(', ') : 'Address not listed on OpenStreetMap';
-}
-
-function parseFeatures(features: PhotonFeature[], origin: Origin): Place[] {
-  const seen = new Set<string>();
-  const places: Place[] = [];
-
-  for (const feature of features) {
-    const coords = feature.geometry?.coordinates;
-    const props = feature.properties ?? {};
-    if (!coords || !props.name) continue;
-    const [lon, lat] = coords;
-
-    const category = classify(props.osm_key, props.osm_value, props.name);
-    if (!category) continue;
-
-    const distanceKm = haversineKm(origin.lat, origin.lon, lat, lon);
-    if (distanceKm > MAX_DISTANCE_KM) continue;
-
-    const dedupeKey = `${props.name.toLowerCase()}|${lat.toFixed(3)}|${lon.toFixed(3)}`;
-    if (seen.has(dedupeKey)) continue;
-    seen.add(dedupeKey);
-
-    places.push({
-      id: `${props.osm_type ?? 'osm'}/${props.osm_id ?? dedupeKey}`,
-      name: props.name,
-      category,
-      lat,
-      lon,
-      distanceKm,
-      address: buildAddress(props),
-    });
-  }
-
-  places.sort((a, b) => a.distanceKm - b.distanceKm);
-  return places.slice(0, 40);
-}
-
-async function fetchPhoton(
-  query: { q: string; osmTag?: string },
-  origin: Origin,
-  signal: AbortSignal,
-): Promise<PhotonFeature[]> {
-  // Two decimals is roughly 1 km: close enough to find nearby care, without
-  // sending the exact location to a third-party service.
-  const params = new URLSearchParams({
-    q: query.q,
-    lat: origin.lat.toFixed(2),
-    lon: origin.lon.toFixed(2),
-    limit: '50',
-    lang: 'en',
-  });
-  if (query.osmTag) params.append('osm_tag', query.osmTag);
-
-  const response = await fetch(`${PHOTON_URL}?${params.toString()}`, { signal });
-  if (!response.ok) throw new Error(`Photon request failed: ${response.status}`);
-  const json = (await response.json()) as { features?: PhotonFeature[] };
-  return json.features ?? [];
-}
-
-type SearchResult = {
-  places: Place[];
-  radius: number;
-};
-
-async function searchNear(origin: Origin, signal: AbortSignal): Promise<SearchResult> {
-  const settled = await Promise.allSettled(PHOTON_QUERIES.map((query) => fetchPhoton(query, origin, signal)));
-  if (settled.every((result) => result.status === 'rejected')) {
-    throw new Error('All place searches failed');
-  }
-  const features = settled.flatMap((result) => (result.status === 'fulfilled' ? result.value : []));
-  const places = parseFeatures(features, origin);
-  const furthest = places.reduce((max, place) => Math.max(max, place.distanceKm), 0);
-  const radius = RADII.find((r) => furthest <= r / 1000) ?? RADII[RADII.length - 1];
-  return { places, radius };
-}
-
-type Stage = 'consent' | 'loading' | 'results' | 'error';
-
-type FilterKey = 'all' | Category;
-
-export function CareNearMe(props: CareNearMeProps): React.JSX.Element {
-  const { audience, patientName } = props;
-  const firstName = patientName.split(' ')[0];
-  const heading = audience === 'patient' ? 'Care near you' : `Care near ${firstName}`;
-
-  const [stage, setStage] = useState<Stage>('consent');
-  const [selectedCityIndex, setSelectedCityIndex] = useState(0);
-  const [locationError, setLocationError] = useState<string | null>(null);
-  const [origin, setOrigin] = useState<Origin | null>(null);
+export function CareNearMe(_props: CareNearMeProps): React.JSX.Element {
+  const [query, setQuery] = useState('');
+  const [service, setService] = useState('');
+  const [category, setCategory] = useState<Category>('all');
+  const [mobileView, setMobileView] = useState<'map' | 'centres'>('map');
+  const [startText, setStartText] = useState('');
+  const [origin, setOrigin] = useState<CareMapOrigin | null>(null);
+  const [originMatches, setOriginMatches] = useState<SearchMatch[]>([]);
+  const [findingOrigin, setFindingOrigin] = useState(false);
+  const [locationMessage, setLocationMessage] = useState('');
   const [places, setPlaces] = useState<Place[]>([]);
-  const [radiusUsed, setRadiusUsed] = useState<number>(RADII[0]);
-  const [filter, setFilter] = useState<FilterKey>('all');
-  const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
+  const [nearbyStatus, setNearbyStatus] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
+  const [nearbyRetry, setNearbyRetry] = useState(0);
+  const [resolved, setResolved] = useState<Record<string, CareMapPoint>>({});
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [locatingId, setLocatingId] = useState<string | null>(null);
+  const [centreMatches, setCentreMatches] = useState<{ centre: CareCentre; matches: SearchMatch[] } | null>(null);
+  const [centreMessage, setCentreMessage] = useState('');
+  const [route, setRoute] = useState<CareRoadRoute | null>(null);
+  const [routeStatus, setRouteStatus] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
+  const [routeRetry, setRouteRetry] = useState(0);
+  const startInput = useRef<HTMLInputElement>(null);
+  const originRequest = useRef<AbortController | null>(null);
+  const centreRequest = useRef<AbortController | null>(null);
+  const locationRequest = useRef(0);
 
-  const abortRef = useRef<AbortController | null>(null);
-  const mapContainerRef = useRef<HTMLDivElement | null>(null);
-  const mapRef = useRef<LeafletMap | null>(null);
-  const leafletRef = useRef<typeof import('leaflet') | null>(null);
-  const markersRef = useRef<Array<Marker & { placeId?: string }>>([]);
+  const centres = useMemo(() => filterCareCentres(query, '', service).filter((centre) => category !== 'hospital' || /hospital|institute|aiims/i.test(centre.name)), [query, service, category]);
+  const filteredPlaces = useMemo(() => places.filter((place) => (!query.trim() || `${place.name} ${place.address}`.toLowerCase().includes(query.trim().toLowerCase())) && (category === 'all' || place.category === category) && !service), [places, query, category, service]);
+  const points = useMemo(() => [...centres.flatMap((centre) => resolved[centre.id] ? [resolved[centre.id]] : []), ...filteredPlaces], [centres, resolved, filteredPlaces]);
+  const selectedCentre = CARE_CENTRES.find((centre) => centre.id === selectedId);
+  const selectedPoint = (selectedId ? resolved[selectedId] : undefined) ?? places.find((place) => place.id === selectedId) ?? null;
+  const selectedName = selectedCentre?.name ?? selectedPoint?.name;
+  const visibleSelectedPoint = points.find((point) => point.id === selectedId) ?? null;
 
-  const geoSupported = typeof navigator !== 'undefined' && !!navigator.geolocation;
+  useEffect(() => () => { originRequest.current?.abort(); centreRequest.current?.abort(); locationRequest.current += 1; }, []);
 
-  const runSearch = async (o: Origin) => {
-    abortRef.current?.abort();
-    setOrigin(o);
-    setStage('loading');
-    setSelectedPlaceId(null);
-
+  useEffect(() => {
+    if (!origin) { setPlaces([]); setNearbyStatus('idle'); return; }
     const controller = new AbortController();
-    abortRef.current = controller;
-    const timeoutId = setTimeout(() => controller.abort(), 15000);
-
-    try {
-      const { places: found, radius } = await searchNear(o, controller.signal);
-      if (abortRef.current !== controller) return;
-      setPlaces(found);
-      setRadiusUsed(radius);
-      setFilter('all');
-      setStage('results');
-    } catch {
-      if (abortRef.current === controller) setStage('error');
-    } finally {
-      clearTimeout(timeoutId);
-    }
-  };
-
-  const handleUseLocation = () => {
-    if (!geoSupported) {
-      setLocationError('Geolocation is not supported on this device. Choose a city instead.');
-      return;
-    }
-    setLocationError(null);
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        runSearch({
-          lat: position.coords.latitude,
-          lon: position.coords.longitude,
-          label: 'your location',
-        });
-      },
-      (error) => {
-        if (error.code === error.PERMISSION_DENIED) {
-          setLocationError('Location permission was not given. Choose a city instead.');
-        } else {
-          setLocationError('Your location could not be found. Choose a city instead.');
-        }
-      },
-      { enableHighAccuracy: false, timeout: 10000, maximumAge: 600000 }
-    );
-  };
-
-  const handleChooseCity = () => {
-    const city = CITIES[selectedCityIndex];
-    runSearch({ lat: city.lat, lon: city.lon, label: city.name });
-  };
-
-  const handleChangeLocation = () => {
-    if (abortRef.current) abortRef.current.abort();
-    abortRef.current = null;
-    setStage('consent');
+    const timeout = setTimeout(() => controller.abort(), 14000);
+    setNearbyStatus('loading');
     setPlaces([]);
-    setOrigin(null);
-    setSelectedPlaceId(null);
-  };
-
-  const handleTryAgain = () => {
-    if (origin) runSearch(origin);
-  };
-
-  useEffect(() => {
-    return () => {
-      if (abortRef.current) abortRef.current.abort();
-      abortRef.current = null;
-    };
-  }, []);
-
-  const counts = useMemo(() => {
-    const c: Record<FilterKey, number> = { all: places.length, palliative: 0, hospital: 0, clinic: 0 };
-    for (const p of places) c[p.category]++;
-    return c;
-  }, [places]);
-
-  const filteredPlaces = useMemo(() => {
-    if (filter === 'all') return places;
-    return places.filter((p) => p.category === filter);
-  }, [places, filter]);
-
-  function renderMarkers() {
-    const L = leafletRef.current;
-    const map = mapRef.current;
-    if (!L || !map || !origin) return;
-
-    for (const m of markersRef.current) {
-      map.removeLayer(m);
-    }
-    markersRef.current = [];
-
-    const originIcon = L.divIcon({
-      className: '',
-      html: `<div class="cnm-marker cnm-marker-origin"></div>`,
-      iconSize: [18, 18],
-      iconAnchor: [9, 9],
-    });
-    const originMarker = L.marker([origin.lat, origin.lon], { icon: originIcon, title: 'Search centre', alt: 'Search centre' }).addTo(map);
-    originMarker.bindPopup('You are here / search centre');
-    markersRef.current.push(originMarker);
-
-    const bounds: [number, number][] = [[origin.lat, origin.lon]];
-
-    for (const place of filteredPlaces) {
-      const color = CATEGORY_COLORS[place.category];
-      const icon = L.divIcon({
-        className: '',
-        html: `<div class="cnm-marker" style="background:${color}"></div>`,
-        iconSize: [16, 16],
-        iconAnchor: [8, 8],
-      });
-      const marker: Marker & { placeId?: string } = L.marker([place.lat, place.lon], { icon, title: place.name, alt: place.name }).addTo(map);
-      const dirUrl = `https://www.google.com/maps/dir/?api=1&destination=${place.lat},${place.lon}`;
-      marker.bindPopup(
-        `<strong>${escapeHtml(place.name)}</strong><br/>${CATEGORY_LABELS[place.category]}<br/>${place.distanceKm.toFixed(1)} km<br/><a href="${dirUrl}" target="_blank" rel="noopener noreferrer">Directions</a>`
-      );
-      marker.placeId = place.id;
-      markersRef.current.push(marker);
-      bounds.push([place.lat, place.lon]);
-    }
-
-    if (bounds.length > 1) {
-      map.fitBounds(bounds, { animate: false, padding: [24, 24] });
-    } else {
-      map.setView([origin.lat, origin.lon], 13, { animate: false });
-    }
-  }
-
-  function escapeHtml(s: string): string {
-    return s
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-  }
-
-  // Set up map once results are shown.
-  useEffect(() => {
-    if (stage !== 'results' || !mapContainerRef.current) return;
-    let cancelled = false;
-
-    (async () => {
-      const L = (await import('leaflet')).default;
-      if (cancelled || !mapContainerRef.current) return;
-      leafletRef.current = L;
-
-      if (!mapRef.current) {
-        const map = L.map(mapContainerRef.current, {
-          zoomAnimation: false,
-          fadeAnimation: false,
-          markerZoomAnimation: false,
-          scrollWheelZoom: false,
-        });
-        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          maxZoom: 19,
-          attribution:
-            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        }).addTo(map);
-        mapRef.current = map;
+    Promise.allSettled([photon('palliative care', controller.signal, origin), photon('hospice', controller.signal, origin), photon('hospital', controller.signal, origin, true)]).then((results) => {
+      if (controller.signal.aborted) return;
+      if (results.every((result) => result.status === 'rejected')) { setNearbyStatus('error'); return; }
+      const found = new Map<string, Place>();
+      for (const result of results) {
+        if (result.status !== 'fulfilled') continue;
+        for (const feature of result.value) {
+          const match = matchOf(feature); const kind = categoryOf(feature);
+          if (!match || !kind) continue;
+          const distance = distanceKm(origin.coordinates, match.coordinates);
+          if (distance > 30) continue;
+          found.set(match.id, { id: match.id, name: match.label, coordinates: match.coordinates, category: kind, address: match.address, sourceUrl: match.sourceUrl, distanceKm: distance });
+        }
       }
-
-      renderMarkers();
-    })();
-
-    return () => {
-      cancelled = true;
-      mapRef.current?.remove();
-      mapRef.current = null;
-      markersRef.current = [];
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stage]);
+      setPlaces([...found.values()].sort((a, b) => a.distanceKm - b.distanceKm));
+      setNearbyStatus('ready');
+    }).finally(() => clearTimeout(timeout));
+    const onAbort = () => setNearbyStatus('error');
+    controller.signal.addEventListener('abort', onAbort);
+    return () => { controller.signal.removeEventListener('abort', onAbort); controller.abort(); clearTimeout(timeout); };
+  }, [origin, nearbyRetry]);
 
   useEffect(() => {
-    if (stage === 'results' && mapRef.current) {
-      renderMarkers();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filteredPlaces]);
+    setRoute(null);
+    if (!origin || !visibleSelectedPoint) { setRouteStatus('idle'); return; }
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 14000);
+    setRouteStatus('loading');
+    const pair = `${origin.coordinates.join(',')};${visibleSelectedPoint.coordinates.join(',')}`;
+    fetch(`https://router.project-osrm.org/route/v1/driving/${pair}?overview=full&geometries=geojson&steps=false`, { signal: controller.signal }).then(async (response) => {
+      if (!response.ok) throw new Error('Route unavailable');
+      const data = await response.json() as { code?: string; routes?: { geometry?: { type?: string; coordinates?: [number, number][] }; distance?: number; duration?: number }[] };
+      const found = data.routes?.[0];
+      if (data.code !== 'Ok' || found?.geometry?.type !== 'LineString' || !Array.isArray(found.geometry.coordinates) || found.geometry.coordinates.length < 2 || !found.geometry.coordinates.every(validCoordinates) || typeof found.distance !== 'number' || !Number.isFinite(found.distance) || typeof found.duration !== 'number' || !Number.isFinite(found.duration)) throw new Error('No road route');
+      if (controller.signal.aborted) return;
+      setRoute({ coordinates: found.geometry.coordinates, distance: found.distance, duration: found.duration });
+      setRouteStatus('ready');
+    }).catch(() => { if (!controller.signal.aborted) setRouteStatus('error'); }).finally(() => clearTimeout(timeout));
+    const onAbort = () => setRouteStatus('error');
+    controller.signal.addEventListener('abort', onAbort);
+    return () => { controller.signal.removeEventListener('abort', onAbort); controller.abort(); clearTimeout(timeout); };
+  }, [origin, visibleSelectedPoint, routeRetry]);
 
-  function handleShowOnMap(place: Place) {
-    const map = mapRef.current;
-    if (!map) return;
-    map.setView([place.lat, place.lon], 16, { animate: false });
-    setSelectedPlaceId(place.id);
-    const marker = markersRef.current.find((m) => m.placeId === place.id);
-    if (marker) marker.openPopup();
-    mapContainerRef.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  function chooseOrigin(match: CareMapOrigin) {
+    originRequest.current?.abort(); locationRequest.current += 1;
+    setOrigin(match); setStartText(match.label); setOriginMatches([]); setLocationMessage(''); setFindingOrigin(false);
+  }
+  async function searchOrigin(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!startText.trim()) { startInput.current?.focus(); return; }
+    originRequest.current?.abort(); locationRequest.current += 1;
+    const controller = new AbortController(); originRequest.current = controller;
+    const timeout = setTimeout(() => controller.abort(), 12000);
+    setFindingOrigin(true); setOriginMatches([]); setLocationMessage('');
+    try {
+      const matches = (await photon(startText.trim(), controller.signal)).map(matchOf).filter((match): match is SearchMatch => Boolean(match));
+      if (originRequest.current !== controller) return;
+      if (matches.length === 1) chooseOrigin(matches[0]);
+      else { setOriginMatches(matches); if (!matches.length) setLocationMessage('No matching place. Add a city or a fuller address.'); }
+    } catch { if (originRequest.current === controller) setLocationMessage('Location search could not load. Try again.'); }
+    finally { clearTimeout(timeout); if (originRequest.current === controller) setFindingOrigin(false); }
+  }
+  function useLocation() {
+    originRequest.current?.abort();
+    const request = ++locationRequest.current;
+    if (!navigator.geolocation) { setLocationMessage('Location is unavailable on this device. Enter a starting point.'); return; }
+    setFindingOrigin(true); setOriginMatches([]); setLocationMessage('');
+    navigator.geolocation.getCurrentPosition((position) => {
+      if (request !== locationRequest.current) return;
+      chooseOrigin({ label: 'My location', coordinates: [position.coords.longitude, position.coords.latitude] });
+    }, (error) => {
+      if (request !== locationRequest.current) return;
+      setFindingOrigin(false); setLocationMessage(error.code === error.PERMISSION_DENIED ? 'Location permission was not given. Enter a starting point instead.' : 'Your location could not be found. Enter a starting point instead.');
+    }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 });
+  }
+  async function selectCentre(centre: CareCentre) {
+    setMobileView('map');
+    centreRequest.current?.abort(); setSelectedId(centre.id); setCentreMatches(null); setCentreMessage('');
+    if (resolved[centre.id]) { setLocatingId(null); return; }
+    const controller = new AbortController(); centreRequest.current = controller;
+    const timeout = setTimeout(() => controller.abort(), 12000);
+    setLocatingId(centre.id);
+    try {
+      const features = await photon(`${centre.name.split('—')[0].trim()} ${centre.city}`, controller.signal);
+      if (centreRequest.current !== controller || controller.signal.aborted) return;
+      const matches = features.filter((feature) => categoryOf(feature) || /clinic|doctors/.test(feature.properties?.osm_value ?? '')).map(matchOf).filter((match): match is SearchMatch => Boolean(match));
+      const exact = matches[0];
+      const nameKey = (value: string) => value.toLowerCase().replace(/[^a-z0-9]/g, '');
+      const postcode = centre.address.match(/\b\d{6}\b/)?.[0];
+      if (matches.length === 1 && nameKey(exact.label) === nameKey(centre.name)
+        && (exact.address.toLowerCase().includes(centre.city.toLowerCase()) || Boolean(postcode && exact.address.includes(postcode)))) {
+        chooseCentreMatch(centre, exact);
+      } else {
+        setCentreMatches({ centre, matches });
+        if (!matches.length) setCentreMessage('This centre’s map pin could not be found. Its Directions link uses the listed address.');
+      }
+    } catch { if (centreRequest.current === controller) setCentreMessage('The centre’s map location could not load. Use its Directions link or try the centre again.'); }
+    finally { clearTimeout(timeout); if (centreRequest.current === controller) setLocatingId(null); }
+  }
+  function chooseCentreMatch(centre: CareCentre, match: SearchMatch) {
+    setResolved((current) => ({ ...current, [centre.id]: { id: centre.id, name: centre.name, coordinates: match.coordinates, category: 'palliative' } }));
+    setCentreMatches(null); setCentreMessage('');
+  }
+  function selectPoint(id: string) {
+    setMobileView('map');
+    centreRequest.current?.abort(); setLocatingId(null); setSelectedId(id); setCentreMatches(null); setCentreMessage('');
+  }
+  function clearOrigin() {
+    originRequest.current?.abort(); locationRequest.current += 1;
+    setOrigin(null); setStartText(''); setOriginMatches([]); setFindingOrigin(false); setLocationMessage('');
   }
 
-  const originLabel = origin?.label ?? '';
-
-  return (
-    <div className="cnm-root">
-      {stage === 'consent' && (
-        <div className="cnm-card cnm-consent">
-          <h2 className="cnm-heading">{heading}</h2>
-          <p className="cnm-text">
-            Find palliative care, hospices, hospitals and clinics close by.
-          </p>
-          <button type="button" className="cnm-btn cnm-btn-primary" onClick={handleUseLocation}>
-            Use my location
-          </button>
-          <div className="cnm-city-row">
-            <label htmlFor="cnm-city-select" className="cnm-label">
-              Or choose a city
-            </label>
-            <select
-              id="cnm-city-select"
-              className="cnm-select"
-              value={selectedCityIndex}
-              onChange={(e) => setSelectedCityIndex(Number(e.target.value))}
-            >
-              {CITIES.map((city, idx) => (
-                <option key={city.name} value={idx}>
-                  {city.name}
-                </option>
-              ))}
-            </select>
-            <button type="button" className="cnm-btn cnm-btn-secondary" onClick={handleChooseCity}>
-              Search
-            </button>
-          </div>
-          {locationError && (
-            <p role="alert" className="cnm-alert">
-              {locationError}
-            </p>
-          )}
-          <p className="cnm-privacy">
-            Your location stays in this browser. To find places, the map sends an approximate search area (to about 1 km) to Photon, a public OpenStreetMap search service. Your location is not saved.
-          </p>
-        </div>
-      )}
-
-      {stage === 'loading' && (
-        <div className="cnm-card">
-          <p role="status" className="cnm-status">
-            Searching OpenStreetMap near {originLabel}…
-          </p>
-        </div>
-      )}
-
-      {stage === 'error' && (
-        <div className="cnm-card">
-          <p role="alert" className="cnm-alert">
-            The place search is not responding. Check your connection and try again.
-          </p>
-          <button type="button" className="cnm-btn cnm-btn-primary" onClick={handleTryAgain}>
-            Try again
-          </button>
-        </div>
-      )}
-
-      {stage === 'results' && (
-        <>
-          <div className="cnm-card cnm-results-header">
-            <p className="cnm-results-summary">
-              {places.length} places within {radiusUsed / 1000} km of {originLabel}
-            </p>
-            <button type="button" className="cnm-btn cnm-btn-secondary" onClick={handleChangeLocation}>
-              Change location
-            </button>
-          </div>
-
-          <div className="cnm-card cnm-filters" role="group" aria-label="Filter places">
-            {(
-              [
-                ['all', `All (${counts.all})`],
-                ['palliative', `Palliative & hospice (${counts.palliative})`],
-                ['hospital', `Hospitals (${counts.hospital})`],
-                ['clinic', `Clinics & doctors (${counts.clinic})`],
-              ] as [FilterKey, string][]
-            ).map(([key, label]) => (
-              <button
-                key={key}
-                type="button"
-                className="cnm-chip"
-                aria-pressed={filter === key}
-                onClick={() => setFilter(key)}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-
-          <div className="cnm-results">
-            <div className="cnm-map" ref={mapContainerRef} role="region" aria-label="Nearby care map" />
-            <div className="cnm-list" role="region" aria-label="Nearby care results" tabIndex={0}>
-              {filteredPlaces.length === 0 && (
-                <p className="cnm-empty">
-                  {places.length === 0
-                    ? 'No named places were found within 30 km on OpenStreetMap. Try another city.'
-                    : 'No places in this category were returned. Choose another category or city.'}
-                </p>
-              )}
-              {filteredPlaces.map((place) => (
-                <div
-                  key={place.id}
-                  className={`cnm-list-item${selectedPlaceId === place.id ? ' cnm-list-item-selected' : ''}`}
-                >
-                  <div className="cnm-list-item-category">{CATEGORY_LABELS[place.category]}</div>
-                  <div className="cnm-list-item-name">{place.name}</div>
-                  <div className="cnm-list-item-distance">{place.distanceKm.toFixed(1)} km</div>
-                  <div className="cnm-list-item-address">{place.address}</div>
-                  {place.phone && (
-                    <a className="cnm-list-item-phone" href={`tel:${place.phone}`}>
-                      {place.phone}
-                    </a>
-                  )}
-                  {place.website && (
-                    <a
-                      className="cnm-list-item-website"
-                      href={place.website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Website
-                    </a>
-                  )}
-                  <div className="cnm-list-item-actions">
-                    <button
-                      type="button"
-                      className="cnm-btn cnm-btn-secondary"
-                      onClick={() => handleShowOnMap(place)}
-                    >
-                      Show on map
-                    </button>
-                    <a
-                      className="cnm-btn cnm-btn-secondary"
-                      href={`https://www.google.com/maps/dir/?api=1&destination=${place.lat},${place.lon}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Directions
-                    </a>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="cnm-card cnm-support">
-            <h3 className="cnm-support-heading">Support groups</h3>
-            <p className="cnm-text">
-              OpenStreetMap does not reliably list patient and family support groups, so none are
-              shown here. Ask your palliative care team about groups near you.
-            </p>
-          </div>
-
-          <p className="cnm-footnote">
-            Places come from OpenStreetMap, a public map that anyone can edit, found using the Photon search service. Check details before
-            you travel. Listing a place here is not a recommendation.
-          </p>
-        </>
-      )}
+  return <section className="cnm-root" aria-label="Find care">
+    <div className="cnm-toolbar">
+      <div className="cnm-topline"><h1>Find care</h1><div className="cnm-categories" role="group" aria-label="Type of care">
+        {(['all', 'palliative', 'hospital'] as const).map((value) => <button type="button" key={value} aria-pressed={category === value} onClick={() => setCategory(value)}>{value === 'all' ? 'All' : value === 'palliative' ? 'Palliative care' : 'Hospitals'}</button>)}
+      </div></div>
+      <div className="cnm-search-row">
+        <label>City or centre<input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search care centres" /></label>
+        <label>Services<select value={service} onChange={(event) => setService(event.target.value)}><option value="">All services</option><option>Clinic visits</option><option>Home care</option><option>Inpatient care</option></select></label>
+      </div>
+      <form className="cnm-start-row" onSubmit={searchOrigin}>
+        <label>Starting point<input ref={startInput} value={startText} onChange={(event) => setStartText(event.target.value)} placeholder="City, area or address" autoComplete="off" /></label>
+        <button type="submit" className="cnm-btn cnm-btn-secondary" disabled={findingOrigin}>Find place</button>
+        <button type="button" className="cnm-btn cnm-btn-primary" onClick={useLocation} disabled={findingOrigin}>Use my location</button>
+      </form>
+      {findingOrigin && <p className="cnm-message" role="status">Finding your starting point…</p>}
+      {locationMessage && <p className="cnm-message is-error" role="alert">{locationMessage}</p>}
+      {originMatches.length > 0 && <ul className="cnm-location-matches" aria-label="Choose a starting point">{originMatches.map((match) => <li key={match.id}><button type="button" onClick={() => chooseOrigin(match)}><strong>{match.label}</strong><span>{match.address}</span></button></li>)}</ul>}
+      {origin && <div className="cnm-origin-line"><span>From {origin.label}</span><button type="button" onClick={clearOrigin}>Clear starting point</button></div>}
     </div>
-  );
+
+    <div className="cnm-view-tabs" role="group" aria-label="Find care view">
+      <button type="button" aria-pressed={mobileView === 'map'} onClick={() => setMobileView('map')}>Map</button>
+      <button type="button" aria-pressed={mobileView === 'centres'} onClick={() => setMobileView('centres')}>Centres ({centres.length + filteredPlaces.length})</button>
+    </div>
+    <div className="cnm-results" data-mobile-view={mobileView}>
+      <div className="cnm-map-panel">
+        {selectedName && <div className="cnm-route-panel" aria-live="polite">
+          <div className="cnm-route-heading"><strong>{selectedName}</strong><button type="button" aria-label="Clear destination" onClick={() => { centreRequest.current?.abort(); setSelectedId(null); setCentreMatches(null); setCentreMessage(''); setLocatingId(null); }}>×</button></div>
+          {centreMatches && centreMatches.matches.length > 0 && <div className="cnm-centre-matches"><p>Choose the matching map location</p>{centreMatches.matches.map((match) => <button type="button" key={match.id} onClick={() => chooseCentreMatch(centreMatches.centre, match)}><strong>{match.label}</strong><span>{match.address}</span></button>)}</div>}
+          {centreMessage && <p className="cnm-message is-error">{centreMessage}</p>}
+          {locatingId && <p className="cnm-message">Finding the centre…</p>}
+          {selectedPoint && !origin && <button type="button" className="cnm-route-start" onClick={() => { startInput.current?.focus(); startInput.current?.scrollIntoView({ block: 'center' }); }}>Add a starting point to see the route ↑</button>}
+          {selectedPoint && origin && routeStatus === 'loading' && <p className="cnm-message">Finding a road route…</p>}
+          {route && routeStatus === 'ready' && <p className="cnm-route-summary"><strong>{(route.distance / 1000).toFixed(1)} km</strong><span>About {Math.max(1, Math.round(route.duration / 60))} min driving · no live traffic</span></p>}
+          {routeStatus === 'error' && <p className="cnm-message is-error">A road route could not load. <button type="button" onClick={() => setRouteRetry((value) => value + 1)}>Try again</button></p>}
+          {selectedPoint && <a className="cnm-directions-link" href={directionsUrl(selectedPoint, origin)} target="_blank" rel="noopener noreferrer">Open directions ↗</a>}
+        </div>}
+        <PalliativeMap points={points} origin={origin} selectedId={selectedId} route={route} searchCentre={origin} onSelect={selectPoint} />
+      </div>
+      <div className="cnm-list" role="region" aria-label="Care centres" tabIndex={0}>
+        <div className="cnm-list-heading"><span>{centres.length + filteredPlaces.length} results</span>{(query || service || category !== 'all') && <button type="button" onClick={() => { setQuery(''); setService(''); setCategory('all'); }}>Clear filters</button>}</div>
+        <CareDirectory centres={centres} selectedId={selectedId} locatingId={locatingId} onSelect={selectCentre} />
+        {filteredPlaces.length > 0 && <div className="cnm-nearby-list"><h3>Nearby map listings</h3>{filteredPlaces.map((place) => <article key={place.id} className={`cnm-place${selectedId === place.id ? ' is-selected' : ''}`}>
+          <button type="button" className="cnm-place-select" aria-pressed={selectedId === place.id} onClick={() => selectPoint(place.id)}><span>{place.category === 'palliative' ? 'Palliative care' : 'Hospital'}</span><strong>{place.name}</strong></button>
+          <address>{place.address || 'Address not listed'}</address>
+          <p>{place.distanceKm.toFixed(1)} km away in a straight line</p>
+          <div className="cnm-place-actions"><a href={directionsUrl(place, origin)} target="_blank" rel="noopener noreferrer">Directions ↗</a><a href={place.sourceUrl} target="_blank" rel="noopener noreferrer">Source ↗</a></div>
+        </article>)}</div>}
+        {nearbyStatus === 'loading' && <p className="cnm-message" role="status">Finding nearby care…</p>}
+        {nearbyStatus === 'error' && <p className="cnm-message is-error">Nearby search could not load. <button type="button" onClick={() => setNearbyRetry((value) => value + 1)}>Try again</button></p>}
+        {!centres.length && !filteredPlaces.length && nearbyStatus !== 'loading' && <p className="cnm-empty">No matching centres. Try another name, area or service.</p>}
+      </div>
+    </div>
+    <details className="cnm-sources"><summary>Sources and contact details</summary><p>Pallium India listings checked {DIRECTORY_CHECKED_ON}. Call to confirm services before travelling. Map listings do not confirm palliative services or availability.</p><p>Your starting point is not saved. Place searches use Photon; road routes send the two locations to OSRM.</p><a href="https://palliumindia.org/clinics" target="_blank" rel="noopener noreferrer">Pallium India care listings ↗</a></details>
+  </section>;
 }

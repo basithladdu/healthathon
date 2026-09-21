@@ -1,0 +1,10 @@
+.family-tool-buttons { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; margin: 0 0 18px; }
+.family-tool-buttons > :is(a, button) { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 54px; border: 1px solid #cbd8c5; background: #eaf0e2; color: #214c38; border-radius: 10px; padding: 12px 16px; font: 600 14px var(--font-inter), sans-serif; text-align: left; cursor: pointer; }
+.family-tool-buttons > :is(a, button):hover { background: #dee9d4; }
+.family-tool-buttons > :is(a, button):focus-visible { outline: 2px solid #35765d; outline-offset: 3px; }
+.family-care-tools > .care-text-button { margin-bottom: 10px; }
+@media (max-width: 700px) {
+  .family-tool-buttons { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; margin-bottom: 16px; }
+  .family-tool-buttons > :is(a, button):last-child { grid-column: 1 / -1; }
+  .family-tool-buttons > :is(a, button) { min-height: 44px; padding: 10px 13px; font-size: 13px; }
+}

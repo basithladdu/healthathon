@@ -284,7 +284,7 @@ export function SvcoThoracicDecompressionModal({
               whiteSpace: 'nowrap',
             }}
           >
-            🫀 3. SVC Anatomy &amp; Stent Simulator
+            🫀 3. SVC Anatomy &amp; Stent View
           </button>
           <button
             type="button"

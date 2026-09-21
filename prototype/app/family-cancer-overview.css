@@ -1,0 +1,85 @@
+.family-cancer-overview { width: 100%; color: #382e29; }
+.cancer-overview-heading { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 10px 20px; margin-bottom: 18px; }
+.family-cancer-overview .cancer-overview-heading h1 { margin: 0; font: 500 clamp(30px, 3.1vw, 40px)/1.15 Georgia, 'Times New Roman', serif; letter-spacing: -1.2px; color: #382e29; }
+.cancer-overview-heading > span { font-size: 15px; color: #76675d; overflow-wrap: anywhere; }
+.cancer-overview-record { padding: 20px 24px; margin-bottom: 20px; background: #fffdf9; border: 1px solid #e6ddd1; border-radius: 20px; }
+.family-cancer-overview .cancer-overview-record h2 { margin: 0 0 14px; color: #76675d; font: 600 12px/1.5 var(--font-inter), sans-serif; letter-spacing: .025em; }
+.cancer-overview-record dl { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 18px 30px; margin: 0; }
+.cancer-overview-record dl > div { min-width: 0; }
+.cancer-overview-record dt { margin: 0 0 5px; color: #76675d; font-size: 13px; }
+.cancer-overview-record dd { margin: 0; color: #382e29; font-size: 17px; line-height: 1.45; font-weight: 500; white-space: pre-wrap; overflow-wrap: anywhere; }
+.cancer-overview-bento { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 16px; }
+.cancer-overview-card { --card-ink: #526247; --card-icon: #cfdabf; display: flex; flex-direction: column; align-items: stretch; gap: 7px; grid-column: span 7; min-width: 0; min-height: 228px; padding: 22px 24px 16px; border: 1px solid transparent; border-radius: 22px; background: #e7eddd; color: #382e29; font: inherit; text-align: left; cursor: pointer; box-shadow: 0 3px 0 #7854360b; transition: transform .14s ease, box-shadow .14s ease; }
+.cancer-overview-symptoms { --card-ink: #884a33; --card-icon: #eebfa6; grid-column: span 5; background: #f7e0d0; }
+.cancer-overview-reports { --card-ink: #745724; --card-icon: #f0d383; grid-column: span 5; background: #fff0cc; }
+.cancer-overview-note { --card-ink: #68557a; --card-icon: #d7c9e3; background: #ece5f2; }
+.cancer-overview-card-top { display: flex; align-items: center; gap: 14px; margin-bottom: 6px; }
+.cancer-overview-icon { display: grid; place-items: center; width: 48px; height: 48px; flex: 0 0 48px; border-radius: 17px; color: var(--card-ink); background: var(--card-icon); box-shadow: inset 0 1px 0 #ffffff66; }
+.cancer-overview-icon svg { width: 27px; height: 27px; stroke-width: 1.6; }
+.cancer-overview-card-title { font-size: 18px; font-weight: 600; letter-spacing: -.3px; line-height: 1.35; }
+.cancer-overview-count { color: var(--card-ink); font-size: 13px; line-height: 1.3; }
+.cancer-overview-count strong { margin-right: 3px; font: 500 32px/1.15 Georgia, 'Times New Roman', serif; letter-spacing: -.8px; }
+.cancer-overview-preview { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; overflow-wrap: anywhere; font-size: 15px; line-height: 1.45; }
+.cancer-overview-date { color: #746457; font-size: 12px; line-height: 1.4; }
+.cancer-overview-card-action { min-height: 44px; display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: auto; padding-top: 8px; color: var(--card-ink); font-size: 13px; font-weight: 600; }
+.cancer-overview-card-action svg { width: 20px; height: 20px; flex: 0 0 20px; }
+.cancer-overview-empty { padding-block: 8px; color: #746457; font-size: 14px; line-height: 1.5; }
+.cancer-overview-note-art { display: grid; place-items: center; flex: 1; align-self: flex-end; width: 76px; min-height: 82px; padding: 10px; margin: -10px 12px -10px 0; color: #846f96; background: #f9f5fc; border: 1px solid #d8cce3; border-radius: 12px; transform: rotate(7deg); box-shadow: 3px 4px 0 #d7c9e36b; }
+.cancer-overview-note-art svg { width: 48px; height: 56px; stroke-width: 1.3; }
+.cancer-overview-history { margin-top: 24px; padding: 22px 24px 8px; background: #fffdf9; border: 1px solid #e6ddd1; border-radius: 22px; }
+.family-cancer-overview .cancer-overview-history h2 { margin: 0 0 12px; color: #382e29; font: 500 24px/1.25 Georgia, 'Times New Roman', serif; letter-spacing: -.5px; }
+.cancer-overview-history ol { list-style: none; padding: 0; margin: 0; }
+.cancer-overview-history li + li { border-top: 1px solid #ece3d8; }
+.cancer-overview-entry { display: grid; grid-template-columns: 110px minmax(0, 1fr) 20px; align-items: center; gap: 18px; width: 100%; min-height: 76px; padding: 14px 0; border: 0; border-radius: 8px; color: #382e29; background: transparent; text-align: left; font: inherit; cursor: pointer; }
+.cancer-overview-entry time { font-size: 12px; line-height: 1.5; color: #76675d; }
+.cancer-overview-entry-copy { position: relative; min-width: 0; padding-left: 16px; border-left: 3px solid #b5c5a1; }
+.cancer-overview-entry-symptom .cancer-overview-entry-copy { border-color: #dcab8e; }
+.cancer-overview-entry-copy strong { display: block; overflow-wrap: anywhere; font-size: 15px; font-weight: 500; line-height: 1.45; }
+.cancer-overview-entry-copy > span { display: block; margin-top: 4px; color: #76675d; font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
+.cancer-overview-entry-arrow { display: flex; align-items: center; color: #986345; }
+.cancer-overview-entry-arrow svg { width: 20px; height: 20px; }
+.cancer-overview-history-empty { padding-bottom: 8px; }
+.cancer-overview-history-empty p { margin: 0; font-size: 14px; color: #76675d; }
+.cancer-overview-history-empty button { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 8px 0; border: 0; border-radius: 8px; background: transparent; color: #965035; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+.cancer-overview-history-empty button svg { width: 18px; height: 18px; }
+.family-cancer-overview button:focus-visible { outline: 3px solid #a7653d; outline-offset: 3px; }
+.family-cancer-overview button:active { transform: translateY(1px); }
+@media (hover: hover) {
+  .cancer-overview-card:hover { transform: translateY(-2px); box-shadow: 0 7px 20px #72503917; }
+  .cancer-overview-entry:hover { background: #fbf7ef; }
+  .cancer-overview-card:active { transform: translateY(1px); }
+}
+@media (max-width: 700px) {
+  .cancer-overview-heading { margin-bottom: 14px; gap: 6px 12px; }
+  .family-cancer-overview .cancer-overview-heading h1 { font-size: 31px; }
+  .cancer-overview-heading > span { font-size: 14px; }
+  .cancer-overview-record { padding: 17px 18px; margin-bottom: 14px; border-radius: 18px; }
+  .cancer-overview-record dl { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .cancer-overview-record dd { font-size: 16px; }
+  .cancer-overview-bento { gap: 10px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cancer-overview-card { grid-column: span 1; min-height: 230px; gap: 6px; padding: 16px 14px 10px; border-radius: 19px; }
+  .cancer-overview-card-top { align-items: flex-start; flex-direction: column; gap: 10px; margin-bottom: 2px; }
+  .cancer-overview-icon { width: 42px; height: 42px; flex-basis: 42px; border-radius: 14px; }
+  .cancer-overview-icon svg { width: 25px; height: 25px; }
+  .cancer-overview-card-title { font-size: 15px; line-height: 1.4; }
+  .cancer-overview-count { font-size: 12px; }
+  .cancer-overview-count strong { font-size: 28px; }
+  .cancer-overview-preview { font-size: 13px; }
+  .cancer-overview-date { font-size: 11px; }
+  .cancer-overview-card-action { font-size: 12px; gap: 7px; }
+  .cancer-overview-card-action svg { width: 17px; height: 17px; flex-basis: 17px; }
+  .cancer-overview-empty { font-size: 13px; }
+  .cancer-overview-note-art { width: 59px; min-height: 64px; padding: 8px; margin: 0 5px 0 0; flex: 0 0 64px; }
+  .cancer-overview-note-art svg { width: 37px; height: 44px; }
+  .cancer-overview-history { padding: 18px 16px 6px; margin-top: 16px; border-radius: 19px; }
+  .family-cancer-overview .cancer-overview-history h2 { font-size: 23px; }
+  .cancer-overview-entry { grid-template-columns: minmax(0, 1fr) 18px; gap: 7px 10px; padding-block: 14px; }
+  .cancer-overview-entry time { grid-column: 1; padding-left: 15px; font-size: 11px; }
+  .cancer-overview-entry-copy { grid-column: 1; padding-left: 12px; }
+  .cancer-overview-entry-copy strong { font-size: 14px; }
+  .cancer-overview-entry-arrow { grid-column: 2; grid-row: 1 / span 2; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cancer-overview-card { transition: none; }
+  .family-cancer-overview button:active, .cancer-overview-card:hover { transform: none; }
+}

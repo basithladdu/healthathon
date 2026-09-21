@@ -1,0 +1,44 @@
+.family-home-help { color: #183f32; }
+.family-home-help :is(button, input, select, textarea, summary) { font: inherit; min-height: 44px; }
+.family-home-help button, .family-home-help summary { cursor: pointer; }
+.family-home-help :is(button, input, textarea, summary):focus-visible { outline: 2px solid #35765d; outline-offset: 3px; }
+.home-help-layout { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); align-items: start; gap: 30px; }
+.home-help-form { display: grid; gap: 14px; padding: 20px; border: 1px solid #d2ddcd; border-radius: 12px; background: #eeefe7; scroll-margin-top: 20px; }
+.home-help-categories { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.home-help-categories button, .home-help-filters button { border: 1px solid #bacbbf; border-radius: 7px; padding: 10px; background: #fff; color: #183f32; font-size: 14px; }
+.home-help-categories button[aria-pressed='true'], .home-help-filters button[aria-pressed='true'] { background: #174c3b; border-color: #174c3b; color: #fff; }
+.home-help-details summary { display: flex; align-items: center; font-size: 14px; color: #365c49; text-decoration: underline; text-underline-offset: 3px; }
+.home-help-details > div { display: grid; gap: 12px; padding-top: 8px; }
+.home-help-form label { display: grid; gap: 7px; min-width: 0; font-size: 14px; font-weight: 600; }
+.home-help-form :is(input, textarea) { width: 100%; min-width: 0; border: 1px solid #bacbbf; border-radius: 7px; background: #fff; padding: 10px; color: #183f32; font-weight: 400; }
+.home-help-form textarea { resize: vertical; line-height: 1.5; }
+.home-help-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.home-help-form-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.home-help-form-actions .primary-button { width: auto; color: #fff; background: #174c3b; box-shadow: none; }
+.home-help-boundary { color: #566b5e; font-size: 12px; line-height: 1.5; margin: 0; }
+.home-help-error { color: #9a332e; margin: 0; font-size: 14px; line-height: 1.5; }
+.home-help-filters { display: flex; gap: 6px; flex-wrap: wrap; margin: 14px 0 3px; }
+.home-help-filters button { padding-inline: 12px; }
+.home-help-card { padding: 16px 0; border-bottom: 1px solid #d2ddcd; }
+.home-help-card-heading { display: flex; gap: 10px 16px; align-items: baseline; justify-content: space-between; }
+.home-help-card h3 { margin: 0; font-size: 17px; font-weight: 650; line-height: 1.45; overflow-wrap: anywhere; }
+.home-help-card-heading > span { font-size: 13px; color: #536b5a; flex-shrink: 0; }
+.home-help-category { color: #566b5e; font-size: 13px; line-height: 1.5; margin: 6px 0; }
+.home-help-person { margin: 0; font-size: 14px; line-height: 1.65; overflow-wrap: anywhere; }
+.home-help-person a { display: inline-flex; align-items: center; min-height: 44px; color: #185341; text-underline-offset: 3px; }
+.home-help-note { margin: 10px 0 0; font-size: 15px; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
+.home-help-card.is-done h3 { color: #566b5e; }
+.home-help-card-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.home-help-card-actions button { padding: 8px 10px; border: 0; border-radius: 6px; background: transparent; color: #185341; font-size: 13px; }
+.home-help-card-actions .home-help-next { background: #e5ecdd; border: 1px solid #bfd1bd; font-weight: 600; }
+.home-help-empty { margin: 22px 0; color: #566b5e; font-size: 14px; line-height: 1.5; }
+.home-help-status { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; margin-top: 10px; min-height: 44px; font-size: 14px; }
+.home-help-status p { margin: 0; }
+@media (max-width: 760px) {
+  .home-help-layout { grid-template-columns: 1fr; gap: 24px; }
+  .home-help-form { padding: 16px; }
+  .home-help-form :is(input, textarea) { font-size: 16px; }
+  .home-help-fields { grid-template-columns: 1fr; }
+  .home-help-card-heading { flex-wrap: wrap; gap: 4px 12px; }
+  .home-help-categories button { font-size: 13px; padding: 9px; }
+}

@@ -1,0 +1,46 @@
+.family-handover-pack { color: #183f32; }
+.handover-heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 20px; margin-bottom: 24px; }
+.handover-heading h1 { margin: 0; font-size: clamp(23px, 2.4vw, 31px); line-height: 1.25; letter-spacing: -.7px; }
+.handover-heading > span { color: #576b5e; font-size: 15px; }
+.handover-grid { display: grid; grid-template-columns: minmax(270px, .75fr) minmax(0, 1.25fr); align-items: start; gap: 28px; }
+.handover-options { min-width: 0; }
+.handover-choices { min-width: 0; margin: 0 0 24px; padding: 0; border: 0; }
+.handover-choices legend, .handover-contacts h2, .handover-preview h2 { margin: 0 0 12px; padding: 0; font-size: 17px; font-weight: 650; }
+.handover-choice { display: flex; gap: 12px; align-items: center; min-height: 48px; padding: 8px 0; cursor: pointer; line-height: 1.4; font-size: 15px; }
+.handover-choice input { width: 22px; height: 22px; flex: 0 0 22px; accent-color: #174c3b; }
+.handover-choice.is-unavailable { color: #6b756d; cursor: default; }
+.handover-contacts { padding-top: 20px; border-top: 1px solid #d3dace; }
+.handover-contact-list { margin: 0 0 16px; padding: 0; list-style: none; }
+.handover-contact-list li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; padding: 10px 0; border-bottom: 1px solid #dce1d8; }
+.handover-contact-list li > div:first-child { display: grid; gap: 4px; min-width: 0; }
+.handover-contact-list strong { font-size: 15px; overflow-wrap: anywhere; }
+.handover-contact-list span { font-size: 13px; color: #52665a; overflow-wrap: anywhere; }
+.handover-contact-actions, .handover-form-actions, .handover-export-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.family-handover-pack button { min-height: 44px; padding: 9px 13px; border: 1px solid #c4cfc0; border-radius: 8px; background: #fff; color: #183f32; font: inherit; font-size: 14px; cursor: pointer; }
+.family-handover-pack button.primary-button { background: #174c3b; border-color: #174c3b; color: #fff; }
+.family-handover-pack button:disabled { opacity: .5; cursor: not-allowed; }
+.handover-contact-actions button, .handover-form-actions > button:not(.secondary-button), .handover-undo button { padding-inline: 8px; border-color: transparent; background: transparent; text-decoration: underline; text-underline-offset: 3px; }
+.handover-contact-form { display: grid; gap: 12px; }
+.handover-contact-form label { display: grid; gap: 6px; min-width: 0; font-size: 13px; font-weight: 600; }
+.handover-contact-form input { width: 100%; min-width: 0; min-height: 44px; box-sizing: border-box; border: 1px solid #becbb9; border-radius: 7px; padding: 9px 10px; background: #fff; color: #183f32; font: inherit; font-size: 15px; }
+.handover-contact-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.handover-undo { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin-top: 12px; font-size: 13px; }
+.handover-undo span { overflow-wrap: anywhere; }
+.handover-preview { min-width: 0; border: 1px solid #d1d9cc; border-radius: 12px; background: #fff; }
+.handover-preview-heading { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; padding: 16px 18px; border-bottom: 1px solid #e0e5dc; }
+.handover-preview-heading h2 { margin: 0; }
+.handover-copy { margin: 0; padding: 20px; white-space: pre-wrap; overflow-wrap: anywhere; font: 14px/1.65 var(--font-inter), sans-serif; }
+.handover-empty { padding: 16px 20px; color: #5e6c60; }
+.handover-message { margin: 14px 0 0; font-size: 13px; color: #46654f; }
+.handover-message:empty { margin: 0; }
+.handover-print-frame { position: fixed; width: 1px; height: 1px; border: 0; right: 0; bottom: 0; }
+.family-handover-pack :is(input, button):focus-visible { outline: 2px solid #35765d; outline-offset: 3px; }
+@media (max-width: 760px) {
+  .handover-grid { grid-template-columns: 1fr; gap: 24px; }
+  .handover-heading { margin-bottom: 20px; }
+  .handover-heading h1 { font-size: 24px; }
+  .handover-choices { margin-bottom: 18px; }
+  .handover-contacts { padding-top: 16px; }
+  .handover-copy { padding: 16px; font-size: 13px; }
+  .handover-preview-heading { padding: 14px 16px; }
+}

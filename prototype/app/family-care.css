@@ -1,0 +1,52 @@
+.family-workspace { max-width: 1100px; color: #123f32; }
+.family-workspace h1, .simple-care-content h1 { margin: 0; font-size: clamp(25px, 3vw, 34px); line-height: 1.25; letter-spacing: -1px; }
+.family-workspace h2, .simple-care-content h2 { font-size: 19px; margin: 0; line-height: 1.4; }
+.family-workspace-heading, .family-section-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.family-workspace-heading { margin-bottom: 20px; }
+.family-section-heading > button { width: auto; flex-shrink: 0; }
+.family-section-heading > span { font-size: 13px; color: #52665b; }
+.family-workspace :is(button, input:not([type="checkbox"]), select), .family-daily-entry { min-height: 44px; }
+.family-workspace :is(button, input, select):focus-visible { outline: 2px solid #14583f; outline-offset: 3px; }
+.care-home-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 44px; align-items: start; }
+.care-next-visit { background: #e9eedf; border: 1px solid #d1dcc3; border-radius: 14px; padding: 20px 24px; }
+.care-next-visit p { margin: 8px 0; font-size: 14px; }
+.care-next-visit .care-visit-time { font-size: 28px; font-weight: 650; letter-spacing: -0.5px; margin: 12px 0 5px; }
+.care-visit-purpose { color: #52665b; }
+.care-home-section { margin-top: 20px; }
+.care-question-panel { margin-top: 0; padding-top: 4px; }
+.family-task-list { list-style: none; padding: 0; margin: 12px 0; }
+.family-task-list li { border-bottom: 1px solid #d7dfd7; }
+.family-task-list label { display: flex; gap: 13px; align-items: flex-start; padding: 12px 0; min-height: 44px; cursor: pointer; }
+.family-task-list input { width: 21px; height: 21px; margin: 2px 0 0; flex: 0 0 21px; accent-color: #14583f; }
+.family-task-list strong { font-size: 15px; font-weight: 600; line-height: 1.5; overflow-wrap: anywhere; }
+.family-task-list li.is-complete strong { text-decoration: line-through; color: #52665b; }
+.family-task-meta { display: block; font-size: 13px; line-height: 1.5; margin-top: 4px; color: #52665b; overflow-wrap: anywhere; }
+.care-input-row { display: flex; gap: 8px; }
+.care-input-row input { flex: 1; min-width: 0; width: 100%; border: 1px solid #bacbbf; border-radius: 8px; padding: 10px 12px; background: #fff; font: inherit; font-size: 15px; color: #123f32; }
+.care-input-row .primary-button { flex: 0 0 auto; width: auto; box-shadow: none; }
+.care-task-options > summary, .care-completed > summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; color: #52665b; font-size: 13px; }
+.care-task-options > summary::before, .care-completed > summary::before { content: '+'; margin-right: 7px; }
+.care-task-options[open] > summary::before, .care-completed[open] > summary::before { content: '−'; }
+.family-task-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 14px; background: #fff; border: 1px solid #d7dfd7; border-radius: 8px; }
+.family-task-form label { display: grid; gap: 8px; min-width: 0; font-size: 14px; font-weight: 600; }
+.family-task-title { grid-column: 1 / -1; }
+.family-task-form input, .family-task-form select { width: 100%; min-width: 0; color: #123f32; border: 1px solid #bacbbf; border-radius: 7px; padding: 10px; font: inherit; font-size: 16px; background: #fff; }
+.family-task-form p { margin: 0; font-size: 13px; line-height: 1.6; }
+.care-text-button { min-height: 44px; background: transparent; border: 0; border-radius: 5px; padding: 7px 0; color: #185341; font: inherit; font-size: 14px; font-weight: 600; text-align: left; cursor: pointer; }
+.care-prepare-link { margin-top: 12px; }
+.care-completed { margin-top: 16px; max-width: 600px; }
+.family-workspace-message { min-height: 22px; font-size: 14px; margin: 8px 0; }
+.family-daily-entry { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 18px 20px; border: 1px solid #bbcfc2; border-radius: 12px; background: #eaf0df; color: #123f32; text-align: left; font: inherit; cursor: pointer; }
+.family-daily-entry strong { display: block; font-size: 18px; }
+.family-daily-entry small { display: block; margin-top: 5px; font-size: 13px; }
+@media (max-width: 700px) {
+  .family-workspace-heading { gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+  .care-home-grid { grid-template-columns: 1fr; gap: 24px; }
+  .care-next-visit { padding: 15px 18px; }
+  .care-next-visit .care-visit-time { font-size: 25px; }
+  .care-home-section { margin-top: 24px; }
+  .care-question-panel { margin-top: 0; }
+  .family-task-form { grid-template-columns: 1fr; }
+  .family-workspace h2 { font-size: 18px; }
+  .family-section-heading { gap: 8px; }
+}

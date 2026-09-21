@@ -370,7 +370,7 @@ export function MyCarePlan(props: {
         </div>
       </details>
 
-      <p className="ptl-footer-note">Sample patient data. Changes last for this session.</p>
+      <p className="ptl-footer-note">Changes last for this session.</p>
     </section>
   );
 }
@@ -818,7 +818,7 @@ export function ConsentSignature(props: {
         </form>
       )}
 
-      <p className="ptl-footer-note">Sample patient data. Changes last for this session.</p>
+      <p className="ptl-footer-note">Changes last for this session.</p>
     </section>
   );
 }

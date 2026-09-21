@@ -11,6 +11,7 @@ export type DemoRoleOption =
   | 'family';
 
 export function QuickDemoBar(props: {
+  defaultCollapsed?: boolean;
   currentSession: 'care-team' | 'family' | 'patient';
   currentRole: string;
   onSelectRole: (option: DemoRoleOption) => void;
@@ -20,7 +21,7 @@ export function QuickDemoBar(props: {
   onOpenOpsHub?: (tab?: 'map' | 'qr' | 'context' | 'mro') => void;
 }) {
   const { currentSession, currentRole, onSelectRole, onGoHome, onFastAction, onOpenMap, onOpenOpsHub } = props;
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(props.defaultCollapsed ?? false);
 
   const activeId: DemoRoleOption =
     currentSession === 'patient'
@@ -38,8 +39,8 @@ export function QuickDemoBar(props: {
       <div className="quick-demo-bar-inner">
         <div className="quick-demo-branding">
           <span className="quick-demo-pill">
-            <IconZap className="w-3.5 h-3.5 text-amber-500 animate-pulse" />
-            <span>1-Click Switcher</span>
+            <IconZap className="w-3.5 h-3.5 text-amber-500" />
+            <span>Care roles</span>
           </span>
         </div>
 
@@ -66,7 +67,7 @@ export function QuickDemoBar(props: {
             <span className="demo-avatar emergency">IM</span>
             <span className="demo-label">
               <strong>Dr Isha</strong>
-              <small className="text-rose-600 font-semibold">Emergency ED 🚨</small>
+              <small className="text-rose-600 font-semibold">Emergency doctor</small>
             </span>
           </button>
 
@@ -94,7 +95,7 @@ export function QuickDemoBar(props: {
             <span className="demo-avatar patient">PT</span>
             <span className="demo-label">
               <strong>Patient Portal</strong>
-              <small>Audio + Plan 🔊</small>
+              <small>Listen to plan</small>
             </span>
           </button>
 
@@ -113,7 +114,7 @@ export function QuickDemoBar(props: {
         </div>
 
         <div className="quick-demo-actions">
-          {(onOpenOpsHub || onOpenMap) && (
+          {!collapsed && (onOpenOpsHub || onOpenMap) && (
             <button
               type="button"
               className="quick-demo-map-btn"
@@ -134,10 +135,10 @@ export function QuickDemoBar(props: {
                 transition: 'all 0.15s ease',
               }}
             >
-              <span>🗺️ Ops Hub</span>
+              <span>Coordination</span>
             </button>
           )}
-          {onOpenOpsHub && (
+          {!collapsed && onOpenOpsHub && (
             <button
               type="button"
               className="quick-demo-map-btn"
@@ -157,7 +158,7 @@ export function QuickDemoBar(props: {
                 cursor: 'pointer',
               }}
             >
-              <span>MRO</span>
+              <span>Care copy</span>
             </button>
           )}
           <button
@@ -172,9 +173,9 @@ export function QuickDemoBar(props: {
             type="button"
             className="quick-demo-collapse-btn"
             onClick={() => setCollapsed(!collapsed)}
-            aria-label={collapsed ? 'Expand fast switcher' : 'Minimize fast switcher'}
+            aria-label={collapsed ? 'Show care roles' : 'Hide care roles'}
           >
-            {collapsed ? '⚡ Expand' : '✕'}
+            {collapsed ? 'Show care roles' : 'Hide care roles'}
           </button>
         </div>
       </div>

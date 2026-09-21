@@ -543,7 +543,7 @@ Attestation: Dr Sujay, Palliative Oncology Lead | Date: ${new Date().toLocaleDat
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-xs">
                     <span className="font-semibold text-slate-700">Projected Survival Probability</span>
-                    <span className="text-[11px] text-slate-400">90-Day Trajectory Simulation</span>
+                    <span className="text-[11px] text-slate-400">Illustrative 90-Day Curve</span>
                   </div>
 
                   <div className="relative bg-slate-900 rounded-xl p-2 border border-slate-800 shadow-inner">

@@ -1166,7 +1166,7 @@ export function MalignantHypercalcemiaModal({
               >
                 <div>
                   <div style={{ fontSize: '12px', color: '#38bdf8', fontWeight: 700, textTransform: 'uppercase' }}>
-                    Lead II Real-Time Electrophysiology Simulator
+                    Illustrated Lead II ECG Trace
                   </div>
                   <h3 style={{ margin: '4px 0 0 0', fontSize: '18px', fontWeight: 800 }}>
                     Cardiac ST-Segment &amp; QTc Shortening Under Hypercalcemia

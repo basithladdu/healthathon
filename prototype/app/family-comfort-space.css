@@ -1,0 +1,58 @@
+.family-comfort-space { color: #382e27; margin-block: 0 22px; border: 1px solid #e0d4c3; border-radius: 22px; background: #f4eee3; overflow: visible; }
+.comfort-bento { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(260px, .8fr); }
+.comfort-check-in { min-width: 0; padding: 26px 28px 18px; }
+.family-comfort-space .comfort-check-in h2 { margin: 0 0 18px; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(26px, 2.6vw, 34px); font-weight: 400; letter-spacing: -.7px; line-height: 1.2; color: #382e27; }
+.comfort-check-in fieldset { min-width: 0; padding: 0; margin: 0; border: 0; }
+.comfort-check-in legend { padding: 0; margin-bottom: 10px; font-size: 14px; line-height: 1.5; color: #69584b; }
+.comfort-feelings { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
+.comfort-feeling { min-height: 60px; border: 1px solid transparent; border-radius: 13px; padding: 14px; color: #382e27; font: inherit; font-size: 16px; text-align: left; cursor: pointer; transition: border-color 160ms ease, box-shadow 160ms ease; }
+.comfort-feeling[data-feeling='Peaceful'] { background: #dde3cd; }
+.comfort-feeling[data-feeling='In pain'] { background: #ead7cd; }
+.comfort-feeling[data-feeling='Tired'] { background: #e1dceb; }
+.comfort-feeling[data-feeling='Happy'] { background: #f0dfae; }
+.comfort-feeling[aria-pressed='true'] { border-color: #6b4e34; box-shadow: inset 0 0 0 1px #6b4e34; font-weight: 650; }
+.comfort-thought { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 0; padding: 20px 26px 16px; border-left: 1px solid #e3d8c7; }
+.comfort-orb { width: 108px; height: 108px; flex-shrink: 0; border-radius: 48% 52% 45% 55%; background-image: radial-gradient(circle at 35% 28%, #fffaf0bb, #fffaf000 78%); background-color: #d8cbb7; box-shadow: inset -9px -9px 18px #6d523814, 0 10px 22px #84684312; border: 1px solid #d7c8b1; transition: background-color 400ms ease, border-color 400ms ease, border-radius 400ms ease, box-shadow 400ms ease; }
+.comfort-orb[data-feeling='Peaceful'] { border-radius: 50%; background-color: #aabc91; border-color: #a2b383; box-shadow: inset -8px -8px 18px #506a2418, 0 10px 24px #a4b69033; }
+.comfort-orb[data-feeling='In pain'] { border-radius: 42% 58% 61% 39%; background-color: #c5896e; border-color: #c49273; box-shadow: inset -8px -8px 18px #6f3c2818, 0 10px 24px #c3967733; }
+.comfort-orb[data-feeling='Tired'] { border-radius: 54% 46% 59% 41%; background-color: #b1a5c8; border-color: #b4a7c5; box-shadow: inset -8px -8px 18px #53425d18, 0 10px 24px #b7a4c733; }
+.comfort-orb[data-feeling='Happy'] { border-radius: 58% 42% 46% 54%; background-color: #dfa950; border-color: #d9aa62; box-shadow: inset -8px -8px 18px #835c2418, 0 10px 24px #ddb46e33; }
+.comfort-current { min-height: 21px; margin: 12px 0 14px; font-size: 14px; line-height: 1.5; color: #594a3f; text-align: center; }
+.comfort-current > span { font-size: 12px; color: #776557; }
+.comfort-thought-button { min-height: 46px; min-width: 180px; max-width: 100%; padding: 11px 20px; border: 1px solid #a45035; border-radius: 11px; background: #ac553a; color: #fff7ed; font: inherit; font-size: 15px; font-weight: 600; cursor: pointer; }
+.comfort-symptom-button { min-height: 44px; margin-top: 3px; padding: 8px 0; border: 0; border-radius: 5px; background: transparent; color: #7a432f; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.comfort-history-wrap { padding: 0 28px 10px; }
+.comfort-history > summary { display: flex; align-items: center; gap: 7px; width: fit-content; min-height: 44px; color: #6c594a; font-size: 13px; cursor: pointer; }
+.comfort-history > summary::before { content: '+'; }
+.comfort-history[open] > summary::before { content: '−'; }
+.comfort-history-heading, .comfort-history li, .comfort-undo { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.comfort-history-heading { border-bottom: 1px solid #dfd2bf; font-size: 13px; color: #6c594a; }
+.comfort-history-heading > span { overflow-wrap: anywhere; min-width: 0; }
+.comfort-history :is(button), .comfort-undo button { min-height: 44px; padding: 8px; border: 0; border-radius: 5px; background: transparent; font: inherit; font-size: 13px; color: #7a432f; font-weight: 600; cursor: pointer; flex-shrink: 0; }
+.comfort-history ol { list-style: none; padding: 0; margin: 0; }
+.comfort-history li { padding-block: 10px; border-bottom: 1px solid #dfd2bf; }
+.comfort-history li > div { min-width: 0; }
+.comfort-history strong { display: block; font-size: 14px; line-height: 1.5; font-weight: 600; }
+.comfort-history time { display: block; margin-top: 4px; color: #776557; font-size: 12px; line-height: 1.5; }
+.comfort-history > p, .comfort-message { margin: 0; color: #6c594a; font-size: 13px; line-height: 1.6; }
+.comfort-message:not(:empty) { margin-top: 4px; }
+.comfort-undo { margin: 5px 28px 8px; padding: 4px 10px; border: 1px solid #d8c4a2; border-radius: 8px; background: #efe0c3; font-size: 13px; }
+.comfort-undo > span { min-width: 0; overflow-wrap: anywhere; }
+.comfort-undo button { text-decoration: underline; text-underline-offset: 3px; }
+.family-comfort-space :is(button, summary):focus-visible { outline: 2px solid #8a4d32; outline-offset: 3px; }
+@media (max-width: 700px) {
+  .comfort-bento { grid-template-columns: minmax(0, 1fr); }
+  .comfort-check-in { padding: 20px 18px 16px; }
+  .family-comfort-space .comfort-check-in h2 { font-size: 28px; margin-bottom: 16px; }
+  .comfort-thought { display: grid; grid-template-columns: 62px minmax(0, 1fr); gap: 5px 14px; padding: 15px 18px; border-left: 0; border-top: 1px solid #e3d8c7; justify-items: start; }
+  .comfort-orb { width: 62px; height: 62px; grid-row: 1 / 3; }
+  .comfort-current { margin: 0; text-align: left; font-size: 13px; }
+  .comfort-thought-button { min-width: 0; padding-inline: 14px; font-size: 14px; }
+  .comfort-symptom-button { grid-column: 2; margin: 0; text-align: left; }
+  .comfort-feeling { min-height: 58px; padding: 13px; }
+  .comfort-history-wrap { padding: 0 18px 10px; }
+  .comfort-undo { margin-inline: 18px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .comfort-orb, .comfort-feeling { transition: none; }
+}

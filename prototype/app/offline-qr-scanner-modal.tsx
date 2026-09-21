@@ -23,7 +23,7 @@ export function OfflineQrScannerModal(props: {
     return () => clearTimeout(timer);
   }, []);
 
-  const emergencyVoiceText = `Paramedic emergency scan verified. Patient: ${record.patientName}. UHID: ${record.hospitalId}. Resuscitation directive: ${record.cpr === 'dnacpr' ? 'Do not attempt CPR' : 'Standard CPR'}. Breathing ceiling: ${record.breathingCeiling || 'Standard oxygen'}. Hospital transfer: ${record.hospitalTransfer || 'Standard'}. Offline SHA-256 checksum verified. If in doubt, resuscitate.`;
+  const emergencyVoiceText = `Saved care preferences. Patient: ${record.patientName}. UHID: ${record.hospitalId}. Resuscitation preference: ${record.cpr === 'dnacpr' ? 'Do not attempt CPR' : record.cpr === 'attempt' ? 'Attempt CPR' : 'Not recorded'}. Breathing support preference: ${record.breathingCeiling || 'Not recorded'}. Hospital transfer preference: ${record.hospitalTransfer || 'Not recorded'}. This card is not a signed medical order or legal directive.`;
 
   const handleVoiceBroadcast = () => {
     if (isPlaying) {
@@ -38,8 +38,8 @@ export function OfflineQrScannerModal(props: {
       <section className="modal-panel offline-scanner-modal" role="dialog" aria-modal="true" aria-labelledby="scanner-modal-title">
         <div className="modal-header">
           <div className="flex items-center gap-2">
-            <span className="scanner-badge">🚑 Offline Paramedic / ED Mode</span>
-            <h2 id="scanner-modal-title">Emergency QR Code Simulator</h2>
+            <span className="scanner-badge">Saved care card</span>
+            <h2 id="scanner-modal-title">Emergency QR code</h2>
           </div>
           <button type="button" className="close-btn" onClick={onClose} aria-label="Close modal">✕</button>
         </div>
@@ -54,15 +54,15 @@ export function OfflineQrScannerModal(props: {
                 <span className="corner bottom-left" />
                 <span className="corner bottom-right" />
               </div>
-              <p className="scanner-status-text">Optical scanning QR code offline payload...</p>
+              <p className="scanner-status-text">Opening saved care card…</p>
             </div>
           ) : (
             <div className="scanner-result-view">
               <div className="scanner-verification-banner">
                 <IconShieldCheck className="w-5 h-5 text-emerald-600 flex-shrink-0" />
                 <div>
-                  <strong>Cryptographic Checksum Validated (100% Offline)</strong>
-                  <p>SHA-256 Hash: {checksum ? `${checksum.slice(0, 8)}…${checksum.slice(-8)}` : 'MATCHED'} · Zero Tampering Detected</p>
+                  <strong>Saved card opened</strong>
+                  <p>Record hash: {checksum ? `${checksum.slice(0, 8)}…${checksum.slice(-8)}` : 'Not recorded'} · No identity or signature verification</p>
                 </div>
               </div>
 
@@ -70,36 +70,36 @@ export function OfflineQrScannerModal(props: {
                 <div className={`triage-card ${record.cpr === 'dnacpr' ? 'is-dnacpr' : 'is-cpr'}`}>
                   <div className="triage-card-header">
                     <IconHeartPulse className="w-4 h-4" />
-                    <span>Resuscitation Ceiling</span>
+                    <span>Recorded CPR preference</span>
                   </div>
                   <div className="triage-card-value">
-                    {record.cpr === 'dnacpr' ? 'DO NOT ATTEMPT CPR' : 'ATTEMPT CPR'}
+                    {record.cpr === 'dnacpr' ? 'Do not attempt CPR' : record.cpr === 'attempt' ? 'Attempt CPR' : 'Not recorded'}
                   </div>
                   <small className="triage-card-note">
-                    {record.cpr === 'dnacpr' ? 'DNACPR registered by oncologist' : 'Standard resuscitation authorized'}
+                    Preference recorded on this card
                   </small>
                 </div>
 
                 <div className="triage-card is-breathing">
                   <div className="triage-card-header">
                     <IconLungs className="w-4 h-4" />
-                    <span>Breathing Ceiling</span>
+                    <span>Recorded breathing support</span>
                   </div>
                   <div className="triage-card-value">
-                    {record.breathingCeiling ? record.breathingCeiling.toUpperCase() : 'COMFORT OXYGEN'}
+                    {record.breathingCeiling ? record.breathingCeiling.replaceAll('-', ' ') : 'Not recorded'}
                   </div>
-                  <small className="triage-card-note">Non-invasive only · No invasive intubation</small>
+                  <small className="triage-card-note">Preference recorded on this card</small>
                 </div>
 
                 <div className="triage-card is-transfer">
                   <div className="triage-card-header">
                     <IconHospital className="w-4 h-4" />
-                    <span>Hospital Transfer</span>
+                    <span>Recorded hospital transfer</span>
                   </div>
                   <div className="triage-card-value">
-                    {record.hospitalTransfer === 'no' ? 'NO TRANSFER' : 'COMFORT TRANSFER ONLY'}
+                    {record.hospitalTransfer === 'no' ? 'No transfer' : record.hospitalTransfer === 'any-deterioration' ? 'For any deterioration' : record.hospitalTransfer === 'listed-reasons-only' ? 'Only for listed reasons' : 'Not recorded'}
                   </div>
-                  <small className="triage-card-note">Call primary palliative team before ambulance transit</small>
+                  <small className="triage-card-note">No transport has been requested</small>
                 </div>
               </div>
 
@@ -107,11 +107,11 @@ export function OfflineQrScannerModal(props: {
                 <div><strong>Patient:</strong> {record.patientName} (UHID: {record.hospitalId})</div>
                 <div><strong>Diagnosis:</strong> {record.diagnosis}</div>
                 <div><strong>Named Proxy:</strong> {record.decisionMaker?.name} ({record.decisionMaker?.relationship})</div>
-                <div><strong>Consultant:</strong> {record.treatingConsultant || 'Dr Sujay'}</div>
+                <div><strong>Consultant:</strong> {record.treatingConsultant || 'Not recorded'}</div>
               </div>
 
               <div className="scanner-rule-callout">
-                <strong>🚨 CRITICAL RESUSCITATION RULE:</strong> If the acute problem is new, reversible and unrelated to the terminal illness (e.g. choking, anaphylaxis, trauma), or if this card is ambiguous, <strong>TREAT FULLY AND RESUSCITATE</strong>.
+                <strong>Recorded preferences.</strong> This card is not a signed medical order or legal directive. Confirm the current plan with the care team.
               </div>
 
               <div className="scanner-actions">
@@ -121,7 +121,7 @@ export function OfflineQrScannerModal(props: {
                   onClick={handleVoiceBroadcast}
                 >
                   <IconVolume2 className="w-4 h-4" />
-                  <span>{isPlaying ? 'Stop Voice Broadcast' : '📢 Broadcast Emergency Directive (Hands-Free TTS)'}</span>
+                  <span>{isPlaying ? 'Stop reading' : 'Read care card aloud'}</span>
                 </button>
               </div>
             </div>
@@ -130,10 +130,10 @@ export function OfflineQrScannerModal(props: {
 
         <div className="scanner-footer">
           <button type="button" className="secondary-button" onClick={() => setIsScanning(true)}>
-            Re-scan QR Code
+            Open care card again
           </button>
           <button type="button" className="secondary-button" onClick={onClose}>
-            Close Scanner
+            Close
           </button>
         </div>
       </section>

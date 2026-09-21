@@ -1,0 +1,52 @@
+.doctor-care-heading { display:flex; align-items:center; justify-content:space-between; gap:20px; margin-bottom:20px; }
+.doctor-care-heading h1 { margin-bottom:7px; }
+.doctor-care-heading span { color:#667484; font-size:14px; }
+.doctor-patient-search { width:280px; max-width:100%; }
+.doctor-patient-search input { width:100%; padding:12px 15px; border:1px solid #d4dfec; }
+.doctor-overview-cards { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; margin-bottom:24px; }
+.doctor-overview-cards > :is(button,div) { display:grid; grid-template-columns:1fr 28px; gap:5px; text-align:left; padding:18px; border:0; border-radius:20px; color:#314963; background:#e1ecf7; }
+.doctor-overview-cards > :nth-child(2) { background:#f4ecc9; color:#6c592d; }
+.doctor-overview-cards > :nth-child(3) { background:#e9e2f5; color:#605076; }
+.doctor-overview-cards > :nth-child(4) { background:#e3edda; color:#4a633f; }
+.doctor-overview-cards svg { grid-column:2; grid-row:1; width:25px; height:25px; }
+.doctor-overview-cards strong { grid-column:1; grid-row:1; font:500 36px/1.1 Georgia,serif; }
+.doctor-overview-cards span { grid-column:1/-1; font-size:14px; margin-top:7px; }
+.doctor-home-grid { display:grid; grid-template-columns:minmax(0,1.05fr) minmax(0,1fr); gap:20px; align-items:start; }
+.doctor-home-panel { background:#fffdf9; border:1px solid #e0e5eb; border-radius:20px; padding:18px; min-width:0; }
+.doctor-home-panel .family-section-heading { margin-bottom:8px; flex-wrap:wrap; gap:8px; }
+.doctor-patient-queue,.doctor-visit-list { list-style:none; padding:0; margin:0; }
+.doctor-patient-queue > li { display:grid; grid-template-columns:40px minmax(0,1fr) auto; gap:12px; padding:15px 0; border-bottom:1px solid #e8e5df; align-items:center; }
+.doctor-patient-queue > li:last-child { border-bottom:0; }
+.doctor-patient-initial { display:grid; place-items:center; height:40px; background:#dde8f2; color:#536d86; border-radius:14px; font-size:12px; }
+.doctor-patient-queue strong,.doctor-visit-list strong { display:block; font-size:15px; }
+.doctor-patient-queue span,.doctor-visit-list span { display:block; font-size:12px; color:#67727c; margin-top:4px; line-height:1.5; overflow-wrap:anywhere; }
+.doctor-patient-queue small,.doctor-visit-list small { display:block; font-size:11px; color:#786f62; margin-top:6px; }
+.doctor-patient-queue button { display:flex; gap:6px; align-items:center; }
+.doctor-schedule-toggle { display:flex; gap:4px; }
+.doctor-schedule-toggle button { padding:7px 10px; border:0; border-radius:10px; font-size:12px; color:#5f6f7f; background:#edf1f4; }
+.doctor-schedule-toggle button[aria-pressed=true] { background:#335a81; color:white; }
+.doctor-visit-list > li { display:grid; grid-template-columns:62px minmax(0,1fr); gap:11px; padding:14px 0; border-bottom:1px solid #e8e5df; }
+.doctor-visit-date { padding:8px; border-radius:12px; background:#e8eef6; color:#4b6480; text-align:center; }
+.doctor-visit-date time { font-size:11px; }
+.doctor-visit-date strong { font-size:14px; margin-top:5px; }
+.visit-instructions { min-width:0; grid-column:1/-1; }
+.visit-instructions-copy { padding:12px; background:#fff5db; border:1px solid #ede1bf; border-radius:12px; }
+.visit-instructions-copy strong { font-size:12px!important; }
+.visit-instructions-copy p { margin:5px 0; white-space:pre-wrap; overflow-wrap:anywhere; font-size:14px; line-height:1.55; }
+.visit-instructions-copy small { color:#7c6a56; font-size:11px; }
+.visit-instructions form { display:grid; gap:10px; background:#fffdf8; padding:12px; border:1px solid #e5d8c6; border-radius:12px; }
+.visit-instructions label { display:grid; gap:6px; font-size:12px; }
+.visit-instructions :is(textarea,input) { min-width:0; width:100%; padding:9px; border:1px solid #cfc1b3; font:14px var(--font-inter),sans-serif; }
+.visit-instructions-actions { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.visit-instructions-actions button { font-size:12px; padding:8px; }
+.care-agenda-list > li > .visit-instructions { grid-column:2/-1; }
+.care-agenda-list .visit-instructions .care-text-button { max-width:none; }
+@media(max-width:850px) { .doctor-home-grid { grid-template-columns:minmax(0,1fr); } }
+@media(max-width:600px) {
+  .doctor-care-heading { display:grid; gap:14px; }.doctor-patient-search{width:100%;}
+  .doctor-overview-cards { grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; margin-bottom:16px; }
+  .doctor-overview-cards > :is(button,div) { padding:14px; border-radius:16px; }.doctor-overview-cards strong{font-size:30px;}
+  .doctor-overview-cards span{font-size:12px;}.doctor-home-panel{padding:14px;}.doctor-patient-queue > li{grid-template-columns:30px minmax(0,1fr) auto;gap:8px;}
+  .doctor-patient-initial{height:34px;}.doctor-patient-queue strong{font-size:14px;}.doctor-patient-queue button{font-size:12px;}
+  .care-agenda-list > li > .visit-instructions { grid-column:1/-1; }
+}

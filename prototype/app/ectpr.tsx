@@ -177,12 +177,12 @@ export function EdQuickView(props: {
           <h2 className="ectpr-heading">ED Quick View</h2>
           {audience === 'clinician' ? (
             <p className="ectpr-empty">
-              No emergency care preference record has been signed for this patient. Provide full standard emergency
+              No emergency care preference record has been saved for this patient. Provide full standard emergency
               care and contact the treating team.
             </p>
           ) : (
             <p className="ectpr-empty">
-              No emergency care plan has been signed yet.{' '}
+              No emergency care preference record has been saved yet.{' '}
               {audience === 'family'
                 ? 'Your care team will talk this through with the patient and family.'
                 : 'Your care team will talk this through with you.'}
@@ -208,7 +208,7 @@ export function EdQuickView(props: {
     audience !== 'clinician' && record.breathingCeiling ? BREATHING_PLAIN_LANGUAGE[record.breathingCeiling] : null;
 
   const emergencySpokenText = useMemo(() => {
-    return `Emergency clinical directives for ${record.patientName}, hospital ID ${record.hospitalId}. Primary diagnosis: ${record.diagnosis}. Overall care goal: ${goalLabel}. Cardiopulmonary resuscitation: ${cprLabel}. Highest breathing support ceiling: ${breathingLabel}. Hospital transfer: ${transferLabel}. Intensive care unit admission: ${icuText}. Named proxy decision maker: ${record.decisionMaker ? `${record.decisionMaker.name}, ${record.decisionMaker.relationship}` : 'Not recorded'}. Crucial directive: If in doubt, resuscitate. Signed by ${record.signedBy || 'clinical consultant'} on ${record.signedOn || 'recent record'}.`;
+    return `Recorded care preferences for ${record.patientName}, hospital ID ${record.hospitalId}. This is not a signed medical order. Primary diagnosis: ${record.diagnosis}. Overall care goal: ${goalLabel}. Cardiopulmonary resuscitation preference: ${cprLabel}. Highest breathing support preference: ${breathingLabel}. Hospital transfer: ${transferLabel}. Intensive care unit admission: ${icuText}. Named proxy decision maker: ${record.decisionMaker ? `${record.decisionMaker.name}, ${record.decisionMaker.relationship}` : 'Not recorded'}. Review recorded by ${record.signedBy || 'Not recorded'} on ${record.signedOn || 'Not recorded'}.`;
   }, [record, goalLabel, cprLabel, breathingLabel, transferLabel, icuText]);
 
   return (
@@ -220,13 +220,13 @@ export function EdQuickView(props: {
         </div>
         <h2 className="ectpr-heading">ED Quick View</h2>
         <div className="ectpr-subline">
-          {record.recordVersion} · signed by {record.signedBy ?? 'Not recorded'} on {record.signedOn ?? 'Not recorded'}{' '}
+          {record.recordVersion} · review recorded by {record.signedBy ?? 'Not recorded'} on {record.signedOn ?? 'Not recorded'}{' '}
           · {record.formVersion}
         </div>
 
         <AudioTtsPlayer
-          title="Emergency Voice Broadcast (Hands-Free Readout)"
-          subtitle="Open-source voice readout of resuscitation and ceiling directives for emergency trauma teams"
+          title="Read care preferences aloud"
+          subtitle="Plays on this device"
           text={emergencySpokenText}
           variant="emergency"
           className="mb-3"
@@ -309,7 +309,7 @@ export function EdQuickView(props: {
         )}
 
         <div className="ectpr-footer">
-          A recorded preference from a clinician-signed ECTPR. Not a treatment order or a legal directive. Sample patient record.
+          Recorded care preferences. Not a signed medical order or legal directive.
         </div>
       </div>
     </div>
@@ -325,7 +325,8 @@ async function sha256HexUpper(text: string): Promise<string> {
 
 function buildQrPayload(record: EctprQuickView): string {
   const lines = [
-    'EMERGENCY CARE PLAN (SAMPLE RECORD)',
+    'RECORDED CARE PREFERENCES',
+    'Not a signed medical order or legal directive.',
     `Patient: ${record.patientName}`,
     `UHID: ${record.hospitalId}`,
     `Goal: ${record.goal ? GOAL_LABELS[record.goal] : 'Not recorded'}`,
@@ -336,7 +337,7 @@ function buildQrPayload(record: EctprQuickView): string {
     `Decision-maker: ${
       record.decisionMaker ? `${record.decisionMaker.name} (${record.decisionMaker.relationship})` : 'Not recorded'
     }`,
-    `Signed: ${record.signedBy ?? 'Not recorded'}, ${record.signedOn ?? 'Not recorded'}`,
+    `Review recorded by: ${record.signedBy ?? 'Not recorded'}, ${record.signedOn ?? 'Not recorded'}`,
     `Record: ${record.formVersion} · ${record.recordVersion}`,
     'If unclear, or the problem is new and reversible: treat fully.',
   ];
@@ -348,7 +349,7 @@ function CardFace(props: { record: EctprQuickView; watermark?: boolean; qrDataUr
   return (
     <div className="ectpr-card ectpr-emergency-card">
       {watermark && <div className="ectpr-watermark">PREVIEW — NOT ISSUED</div>}
-      <div className="ectpr-card-band">EMERGENCY CARE PLAN IN PLACE</div>
+      <div className="ectpr-card-band">RECORDED CARE PREFERENCES</div>
       <div className="ectpr-card-body">
         <div>Patient: {record.patientName}</div>
         <div>UHID: {record.hospitalId}</div>
@@ -369,7 +370,7 @@ function CardFace(props: { record: EctprQuickView; watermark?: boolean; qrDataUr
         </div>
         <div>Full record: ask the care team</div>
         <div>
-          Signed by {record.signedBy ?? 'Not recorded'} · {record.signedOn ?? 'Not recorded'}
+          Review recorded by {record.signedBy ?? 'Not recorded'} · {record.signedOn ?? 'Not recorded'}
         </div>
       </div>
       {qrDataUrl && (
@@ -381,7 +382,7 @@ function CardFace(props: { record: EctprQuickView; watermark?: boolean; qrDataUr
       {issuedOn && <div className="ectpr-card-issued">Issued {issuedOn}</div>}
       <div className="ectpr-card-footer">
         <div>If this card is unclear, or the problem is new and reversible — treat fully and call the number above.</div>
-        <div className="ectpr-muted">Sample patient card</div>
+        <div className="ectpr-muted">Not a signed medical order or legal directive.</div>
       </div>
     </div>
   );
@@ -432,7 +433,7 @@ export function EmergencyCard(props: {
     return (
       <div className="ectpr-container">
         <div className="ectpr-card ectpr-empty-card">
-          No emergency care plan has been signed yet, so there is no card to issue.
+          Save a care preference record before creating a card.
         </div>
       </div>
     );

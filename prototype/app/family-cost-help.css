@@ -1,0 +1,70 @@
+.family-cost-help { max-width: 1100px; color: #3c342c; }
+.family-cost-heading, .family-cost-section-heading, .family-cost-actions, .family-expense-title, .family-cost-undo { display: flex; align-items: center; gap: 10px; }
+.family-cost-heading { justify-content: space-between; flex-wrap: wrap; margin-bottom: 20px; gap: 16px; }
+.family-cost-heading h1 { margin: 0; }
+.family-cost-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); align-items: start; gap: 20px; }
+.family-cost-side { display: grid; gap: 20px; min-width: 0; }
+.family-cost-panel { padding: 20px; min-width: 0; border: 1px solid #ddd3c5; border-radius: 16px; background: #f7f2e9; }
+.family-fundraiser-panel { background: #edf0e3; border-color: #d7deca; }
+.family-paperwork-panel { background: #efebf3; border-color: #ddd4e6; }
+.family-cost-section-heading { justify-content: space-between; flex-wrap: wrap; }
+.family-cost-panel h2 { margin: 0; font-size: 19px; line-height: 1.4; color: #3c342c; }
+.family-cost-panel h3 { margin: 0 0 9px; font-size: 16px; line-height: 1.5; overflow-wrap: anywhere; }
+.family-cost-help :is(button, input:not([type='checkbox']), select, summary, a) { min-height: 44px; }
+.family-cost-help :is(button, input, select, textarea, summary, a):focus-visible { outline: 2px solid #885439; outline-offset: 3px; }
+.family-cost-help :is(input:not([type='checkbox']), select, textarea) { min-width: 0; width: 100%; border: 1px solid #c9bca9; border-radius: 8px; padding: 10px 12px; background: #fffdf8; color: #3c342c; font: inherit; font-size: 16px; }
+.family-cost-help textarea { resize: vertical; line-height: 1.6; }
+.family-cost-help button { cursor: pointer; }
+.family-cost-help button:disabled { cursor: not-allowed; opacity: .5; }
+.family-cost-primary { min-height: 44px; padding: 10px 14px; border: 1px solid #a04e34; border-radius: 9px; background: #aa5439; color: #fff8ee; font: inherit; font-size: 14px; font-weight: 600; }
+.family-cost-link, .family-cost-undo button { min-height: 44px; padding: 8px; border: 0; border-radius: 5px; background: transparent; color: #784a33; font: inherit; font-size: 13px; font-weight: 600; }
+.family-cost-totals { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 18px 0; }
+.family-cost-totals dt { color: #756451; font-size: 12px; line-height: 1.5; }
+.family-cost-totals dd { margin: 5px 0 0; font-size: clamp(16px, 1.7vw, 21px); font-weight: 650; line-height: 1.5; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.family-cost-form { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; margin: 16px 0; padding: 16px; border: 1px solid #dfd4c1; border-radius: 10px; background: #fffaf1; }
+.family-cost-form h3 { grid-column: 1 / -1; margin: 0; }
+.family-cost-form label:not(.family-cost-checkbox) { display: grid; gap: 7px; font-size: 13px; font-weight: 600; min-width: 0; }
+.family-cost-wide { grid-column: 1 / -1; min-width: 0; }
+.family-cost-actions { flex-wrap: wrap; }
+.family-cost-help .family-cost-checkbox { display: flex; align-items: center; gap: 10px; min-height: 44px; font-size: 14px; line-height: 1.5; cursor: pointer; min-width: 0; }
+.family-cost-checkbox input { width: 21px; height: 21px; flex: 0 0 21px; margin: 0; accent-color: #775333; }
+.family-cost-form summary { display: flex; align-items: center; gap: 7px; width: fit-content; font-size: 13px; color: #756451; cursor: pointer; }
+.family-cost-form summary::before { content: '+'; }
+.family-cost-form details[open] > summary::before { content: '−'; }
+.family-expense-list, .family-paperwork-list { list-style: none; margin: 0; padding: 0; }
+.family-expense-list li { border-top: 1px solid #e2d7c6; padding: 14px 0 6px; }
+.family-expense-title { align-items: flex-start; justify-content: space-between; }
+.family-expense-title strong { min-width: 0; overflow-wrap: anywhere; font-size: 15px; line-height: 1.5; }
+.family-expense-title > span { flex-shrink: 0; font-size: 14px; line-height: 1.5; font-weight: 600; font-variant-numeric: tabular-nums; }
+.family-expense-list p { color: #756451; font-size: 12px; line-height: 1.6; margin: 4px 0; }
+.family-expense-list .family-cost-actions { gap: 7px; }
+.family-expense-list .family-cost-checkbox { margin-right: auto; }
+.family-cost-empty { margin: 12px 0 0; color: #756451; font-size: 14px; line-height: 1.6; }
+.family-fundraiser-card { border-top: 1px solid #d6dcc8; margin-top: 14px; padding-top: 14px; }
+.family-fundraiser-card > p { margin: 6px 0 8px; font-size: 14px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
+.family-fundraiser-card > a { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 4px; padding: 6px 0; color: #4d633b; font-size: 14px; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; overflow-wrap: anywhere; }
+.family-fundraiser-card > a > span { font-size: 12px; font-weight: 400; max-width: 100%; }
+.family-fundraiser-card .family-cost-actions { gap: 4px; }
+.family-paperwork-list li { padding: 9px 0; border-bottom: 1px solid #dcd3e3; }
+.family-paperwork-list .family-cost-checkbox { align-items: flex-start; padding-top: 9px; }
+.family-paperwork-list .family-cost-checkbox > span { overflow-wrap: anywhere; min-width: 0; }
+.family-paperwork-list .is-done { text-decoration: line-through; color: #796c81; }
+.family-paperwork-list .family-cost-actions { justify-content: flex-end; }
+.family-paperwork-add { margin-top: 14px; }
+.family-paperwork-add .family-cost-actions { flex-wrap: nowrap; }
+.family-paperwork-add input { flex: 1; }
+.family-paperwork-add button { flex-shrink: 0; }
+.family-cost-message { margin: 0; font-size: 14px; line-height: 1.5; }
+.family-cost-message:not(:empty) { margin-bottom: 14px; }
+.family-cost-undo { justify-content: space-between; margin: 0 0 14px; padding: 4px 12px; border: 1px solid #d9c7a4; border-radius: 8px; background: #f0e3c8; font-size: 14px; }
+.family-cost-undo span { min-width: 0; overflow-wrap: anywhere; }
+.family-cost-undo button { flex-shrink: 0; text-decoration: underline; text-underline-offset: 3px; }
+@media (max-width: 700px) {
+  .family-cost-grid { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .family-cost-side { gap: 16px; }
+  .family-cost-panel { padding: 16px; }
+  .family-cost-form { grid-template-columns: minmax(0, 1fr); padding: 13px; }
+  .family-cost-totals { gap: 8px; }
+  .family-cost-totals dd { font-size: 15px; }
+  .family-expense-title { flex-wrap: wrap; gap: 6px; }
+}

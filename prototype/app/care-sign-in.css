@@ -1,0 +1,264 @@
+.care-sign-in,
+.care-sign-in * { box-sizing: border-box; }
+
+.care-sign-in {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  padding: 22px 32px 12px;
+  color: #304e43;
+  background: radial-gradient(ellipse at 4% 96%, #dbe5c8 0, transparent 45%), radial-gradient(ellipse at 97% 2%, #f6dcc4 0, transparent 47%), #fff7e9;
+  font-family: var(--font-inter), sans-serif;
+}
+
+.care-sign-in-header {
+  width: min(960px, 100%);
+  margin-inline: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.care-sign-in-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font: 700 24px/1.1 var(--font-sora), sans-serif;
+  letter-spacing: -1px;
+}
+.care-sign-in-brand svg { width: 36px; height: 36px; flex: none; }
+.care-sign-in-language {
+  min-height: 44px;
+  min-width: 64px;
+  padding: 9px 14px;
+  border: 1px solid #d2d5ba;
+  border-radius: 14px;
+  background: #fffaf0;
+  color: #345c4f;
+  font: 600 14px var(--font-inter), sans-serif;
+  cursor: pointer;
+}
+
+.care-sign-in-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-block: 20px;
+}
+.care-sign-in-card {
+  width: min(860px, 100%);
+  display: grid;
+  grid-template-columns: minmax(260px, .88fr) minmax(340px, 1fr);
+  overflow: hidden;
+  border: 1px solid #e7d9c5;
+  border-radius: 32px;
+  background: #fffdf6;
+  box-shadow: 0 24px 65px -35px #79563770, 0 3px 0 #eadbc84d;
+}
+
+.care-sign-in-art {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: #efc6a8;
+  transition: background-color 180ms ease;
+}
+.care-sign-in-art[data-role='patient'] { background: #d2dfc1; }
+.care-sign-in-art[data-role='doctor'] { background: #d9cce7; }
+.care-sign-in-sun {
+  position: absolute;
+  top: 35px;
+  right: 18px;
+  width: 108px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #efb748;
+  box-shadow: inset -8px -8px 0 #e4a842;
+  animation: care-sign-in-breathe 9s ease-in-out infinite;
+}
+.care-sign-in-arch {
+  position: absolute;
+  top: 90px;
+  left: 65px;
+  width: 270px;
+  height: 365px;
+  border-radius: 145px 145px 28px 28px;
+  background: #fff1d68c;
+  transform: rotate(7deg);
+}
+.care-sign-in-branch {
+  position: absolute;
+  left: -4px;
+  bottom: -5px;
+  width: 120px;
+  height: 250px;
+}
+.care-sign-in-art-tile {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  border: 1px solid #fff4df;
+  border-radius: 27px;
+  background: #fff9ec;
+  box-shadow: 0 10px 0 -4px #b7846157, 0 18px 30px -16px #775a4960;
+}
+.care-sign-in-art-tile svg { display: block; width: 92%; height: auto; }
+.care-sign-in-art-main { top: 145px; left: 36px; width: 252px; height: 220px; transform: rotate(-8deg); }
+.care-sign-in-art-story { top: 348px; right: 18px; width: 140px; height: 122px; transform: rotate(11deg); background: #f5e7ff; border-color: #f9edff; }
+.care-sign-in-art-voice { top: 39px; left: 28px; width: 119px; height: 102px; transform: rotate(-12deg); background: #e5eed6; border-color: #f2f6e9; }
+.care-sign-in-art-main { animation: care-sign-in-float 7s ease-in-out infinite; }
+.care-sign-in-art-story { animation: care-sign-in-float 8.5s ease-in-out -3s infinite; }
+.care-sign-in-art-voice { animation: care-sign-in-float 9.5s ease-in-out -5s infinite; }
+
+@keyframes care-sign-in-float {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -4px; }
+}
+@keyframes care-sign-in-breathe {
+  0%, 100% { scale: 1; }
+  50% { scale: 1.035; }
+}
+
+.care-sign-in-form {
+  min-width: 0;
+  min-height: 490px;
+  display: grid;
+  gap: 14px;
+  align-content: center;
+  padding: 30px 34px;
+}
+.care-sign-in-form h1 {
+  max-width: 11ch;
+  margin: 0 0 7px;
+  color: #345449;
+  font: 650 34px/1.14 var(--font-sora), sans-serif;
+  letter-spacing: -1.35px;
+  text-wrap: balance;
+}
+.care-sign-in-roles { min-width: 0; margin: 0; padding: 0; border: 0; }
+.care-sign-in-roles legend { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+.care-sign-in-roles > div { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; }
+.care-sign-in-role {
+  min-width: 0;
+  min-height: 97px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 7px 4px 10px;
+  border: 2px solid transparent;
+  border-radius: 18px;
+  color: #3c5145;
+  font: 600 13px/1.25 var(--font-inter), sans-serif;
+  cursor: pointer;
+  transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+.care-sign-in-role svg { display: block; width: 65px; height: 54px; flex: none; }
+.care-sign-in-role-family { background: #f8e5d0; }
+.care-sign-in-role-patient { background: #e7edda; }
+.care-sign-in-role-doctor { background: #ede3f4; }
+.care-sign-in-role[aria-pressed='true'] { border-color: #397e69; box-shadow: 0 4px 0 #bad0ba; transform: translateY(-2px); color: #204f40; }
+.care-sign-in-label { display: grid; min-width: 0; gap: 7px; font-size: 13px; font-weight: 600; }
+.care-sign-in-label :is(select, input) {
+  width: 100%;
+  min-width: 0;
+  min-height: 50px;
+  border: 1px solid #d9daca;
+  border-radius: 14px;
+  padding: 11px 13px;
+  color: #304e43;
+  background: #fffdf7;
+  box-shadow: 0 2px 0 #eee9dc80;
+  font: 400 16px var(--font-inter), sans-serif;
+}
+.care-sign-in-name { margin-block: -7px; }
+.care-sign-in-name summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: #637664;
+  font-size: 12px;
+  cursor: pointer;
+  list-style: none;
+}
+.care-sign-in-name summary::-webkit-details-marker { display: none; }
+.care-sign-in-name summary svg { width: 17px; height: 17px; flex: none; }
+.care-sign-in-name[open] { margin-bottom: 0; }
+.care-sign-in-name .care-sign-in-label { padding-bottom: 4px; }
+.care-sign-in-submit {
+  min-height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 13px 18px;
+  border: 1px solid #af5f42;
+  border-radius: 16px;
+  color: #fffaf1;
+  background: #a9543b;
+  box-shadow: 0 4px 0 #8e4b3530;
+  font: 650 16px var(--font-inter), sans-serif;
+  cursor: pointer;
+  transition: background-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+.care-sign-in-submit svg { width: 23px; height: 23px; flex: none; }
+.care-sign-in button:disabled { opacity: .5; cursor: not-allowed; }
+.care-sign-in :is(button, select, input, summary):focus-visible { outline: 3px solid #397e69; outline-offset: 4px; }
+
+@media (hover: hover) {
+  .care-sign-in-role:hover { transform: translateY(-3px); box-shadow: 0 5px 0 #c6c4a647; }
+  .care-sign-in-role[aria-pressed='true']:hover { box-shadow: 0 5px 0 #bad0ba; }
+  .care-sign-in-submit:not(:disabled):hover { background: #974a34; transform: translateY(-1px); box-shadow: 0 5px 0 #8e4b3530; }
+  .care-sign-in-language:hover { background: #f1ebd9; }
+  .care-sign-in-name summary:hover { color: #2f6652; }
+}
+.care-sign-in-role:active,
+.care-sign-in-submit:not(:disabled):active { transform: translateY(1px); box-shadow: none; }
+
+@media (max-width: 760px) {
+  .care-sign-in { padding: 16px 18px 10px; }
+  .care-sign-in-header { width: min(430px, 100%); }
+  .care-sign-in-brand { font-size: 22px; letter-spacing: -.85px; gap: 8px; }
+  .care-sign-in-brand svg { width: 32px; height: 32px; }
+  .care-sign-in-language { min-width: 60px; padding-inline: 11px; border-radius: 12px; }
+  .care-sign-in-main { padding-block: 15px; }
+  .care-sign-in-card { width: min(430px, 100%); grid-template-columns: minmax(0, 1fr); border-radius: 25px; }
+  .care-sign-in-art { height: 117px; }
+  .care-sign-in-sun { top: -18px; right: calc(50% - 157px); width: 92px; }
+  .care-sign-in-arch { top: -66px; left: calc(50% - 100px); width: 220px; height: 230px; }
+  .care-sign-in-branch { left: calc(50% - 171px); bottom: -16px; width: 66px; height: 140px; }
+  .care-sign-in-art-main { top: 9px; left: calc(50% - 66px); width: 130px; height: 111px; border-radius: 20px; transform: rotate(-7deg); }
+  .care-sign-in-art-story { top: 31px; right: calc(50% - 157px); width: 82px; height: 72px; border-radius: 17px; transform: rotate(12deg); }
+  .care-sign-in-art-voice { top: 25px; left: calc(50% - 145px); width: 73px; height: 64px; border-radius: 16px; transform: rotate(-13deg); }
+  .care-sign-in-form { min-height: 0; gap: 12px; padding: 20px; }
+  .care-sign-in-form h1 { max-width: none; margin-bottom: 3px; font-size: 27px; line-height: 1.17; letter-spacing: -1.1px; }
+  .care-sign-in-roles > div { gap: 8px; }
+  .care-sign-in-role { min-height: 87px; padding-block: 5px 8px; border-radius: 16px; }
+  .care-sign-in-role svg { width: 60px; height: 50px; }
+  .care-sign-in-label :is(select, input) { min-height: 48px; }
+  .care-sign-in-submit { min-height: 52px; }
+}
+
+@media (max-width: 380px) {
+  .care-sign-in { padding-inline: 14px; }
+  .care-sign-in-form { padding-inline: 18px; }
+  .care-sign-in-form h1 { font-size: 25px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .care-sign-in-art-tile,
+  .care-sign-in-sun { animation: none; translate: none; scale: none; }
+  .care-sign-in-art,
+  .care-sign-in-role,
+  .care-sign-in-submit { transition: none; }
+  .care-sign-in-role,
+  .care-sign-in-role:hover,
+  .care-sign-in-role:active,
+  .care-sign-in-submit:not(:disabled):hover,
+  .care-sign-in-submit:not(:disabled):active { transform: none; }
+}

@@ -13,3 +13,6 @@ node_modules/
 Saanthvana v 1.0.docx
 
 tmp/
+
+# Imported private conversations are local project context, not product assets.
+source-materials/private-context/

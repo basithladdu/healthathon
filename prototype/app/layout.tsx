@@ -8,11 +8,31 @@ import './appointments.css';
 import './todays-handoffs.css';
 import 'leaflet/dist/leaflet.css';
 import './care-near-me.css';
+import './care-directory.css';
+import './family-care.css';
 import './ectpr.css';
 import './patient-portal.css';
 import './patient-history.css';
 import './care-workspace.css';
 import './continuity-ops-hub.css';
+import './simple-care.css';
+import './care-sign-in.css';
+import './care-calendar.css';
+import './family-report-comparison.css';
+import './family-care-tools.css';
+import './family-symptom-diary.css';
+import './family-care-story.css';
+import './family-handover-pack.css';
+import './family-home-help.css';
+import './family-support-places.css';
+import './family-note-history.css';
+import './family-open-questions.css';
+import './family-copy-tracker.css';
+import './family-comfort-space.css';
+import './family-voice-journal.css';
+import './family-cost-help.css';
+import './doctor-care-home.css';
+import './care-colors.css';
 
 const inter = Inter({
   variable: '--font-inter',
@@ -29,9 +49,9 @@ const sora = Sora({
 });
 
 export const metadata: Metadata = {
-  title: 'Continuity Loop | Verified Clinical Handoff',
+  title: 'Saanthvana | Family support for cancer care',
   description:
-    'A clinician-led workflow for guided goals-of-care documentation, verification and emergency handoff retrieval.',
+    'Coordinate family tasks and visits, prepare for goals-of-care conversations, and find palliative support with Saanthvana.',
 };
 
 export default function RootLayout({

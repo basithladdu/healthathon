@@ -1,0 +1,44 @@
+.family-note-history { max-width: 1000px; margin-top: 20px; padding-top: 8px; border-top: 1px solid #cdd7c8; color: #123f32; }
+.family-note-history > details > summary { display: flex; gap: 8px; align-items: center; min-height: 48px; cursor: pointer; font-size: 17px; font-weight: 600; }
+.family-note-history > details > summary::before { content: '+'; margin-right: 2px; }
+.family-note-history > details[open] > summary::before { content: '−'; }
+.family-note-history > details > summary > span { font-size: 14px; color: #52665b; }
+.family-note-history :is(button, select) { min-height: 44px; }
+.family-note-history :is(button, select, summary):focus-visible { outline: 2px solid #35765d; outline-offset: 3px; }
+.family-note-history button { cursor: pointer; }
+.family-note-history button:disabled { cursor: not-allowed; }
+.family-note-version-controls, .family-note-compare-controls { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; margin: 14px 0; }
+.family-note-history label { display: grid; gap: 7px; font-size: 13px; font-weight: 600; }
+.family-note-history select { width: auto; max-width: 100%; padding: 9px 12px; border: 1px solid #bacbbf; border-radius: 8px; background: #fff; color: #123f32; font: inherit; font-size: 15px; }
+.family-note-selected { padding: 20px; border: 1px solid #d2dccd; border-radius: 12px; background: #fff; }
+.family-note-version-meta { display: grid; gap: 4px; font-size: 13px; line-height: 1.5; color: #52665b; overflow-wrap: anywhere; }
+.family-note-version-meta strong { color: #123f32; font-size: 15px; }
+.family-note-selected dl { display: grid; gap: 16px; margin: 20px 0 0; }
+.family-note-selected dt { color: #52665b; font-size: 13px; font-weight: 600; line-height: 1.5; }
+.family-note-selected dd { margin: 5px 0 0; }
+.family-note-selected p, .family-note-comparison-values p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 15px; line-height: 1.65; }
+.family-note-selected > p { margin-top: 18px; }
+.family-note-history .family-note-no-text { color: #64756a; font-size: 14px; }
+.family-note-single, .family-note-comparison-rule { font-size: 14px; line-height: 1.6; color: #52665b; }
+.family-note-single { margin: 16px 0; }
+.family-note-comparison { margin-top: 20px; padding: 20px; border: 1px solid #cdd7c8; border-radius: 12px; background: #eeefe7; }
+.family-note-comparison-heading, .family-note-comparison-label { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+.family-note-comparison-heading h3 { margin: 0; font-size: 18px; line-height: 1.5; }
+.family-note-comparison-rule { margin: 10px 0 18px; max-width: 650px; }
+.family-note-comparison-meta, .family-note-comparison-values { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; }
+.family-note-comparison-meta { padding-bottom: 18px; }
+.family-note-comparison-row { border-top: 1px solid #cdd7c8; padding-top: 16px; margin-top: 16px; }
+.family-note-comparison-label { margin-bottom: 12px; }
+.family-note-comparison-label h4 { margin: 0; font-size: 15px; line-height: 1.5; }
+.family-note-comparison-label > span { font-size: 13px; font-weight: 600; color: #52665b; }
+.family-note-comparison-values > div { min-width: 0; }
+.family-note-comparison-values > div > span { display: block; color: #52665b; font-size: 12px; font-weight: 600; margin-bottom: 5px; }
+.family-note-history-message { margin: 0; font-size: 14px; line-height: 1.5; }
+.family-note-history-message:not(:empty) { margin-top: 12px; }
+@media (max-width: 700px) {
+  .family-note-selected, .family-note-comparison { padding: 16px; }
+  .family-note-version-controls, .family-note-compare-controls { gap: 12px 8px; }
+  .family-note-comparison-meta, .family-note-comparison-values { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .family-note-comparison-heading { align-items: flex-start; }
+  .family-note-history :is(.primary-button, .secondary-button) { padding-inline: 14px; }
+}

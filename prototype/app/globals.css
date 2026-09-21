@@ -7328,7 +7328,7 @@ h3,
    ========================================================================== */
 
 .quick-demo-bar {
-  position: sticky;
+  position: relative;
   top: 0;
   z-index: 1000;
   background: #0c231d;
@@ -7340,6 +7340,10 @@ h3,
 
 .quick-demo-bar.is-collapsed {
   opacity: 0.95;
+}
+
+.quick-demo-bar button {
+  min-height: 44px;
 }
 
 .quick-demo-bar-inner {

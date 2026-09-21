@@ -304,7 +304,7 @@ function QrBridgePane(props: {
           desk: 'Oncology Day-Care Desk · Kidwai',
         };
         setLastCheckIn(event);
-        setScanResult(`Clinic check-in recorded for ${patientName} at ${event.desk}.`);
+        setScanResult(`Check-in saved on this device for ${patientName} at ${event.desk}. The clinic has not been notified.`);
         onClinicCheckIn?.(event);
       } else {
         setScanResult(
@@ -320,7 +320,7 @@ function QrBridgePane(props: {
   return (
     <div className="ops-qr-pane">
       <div className="ops-qr-generate">
-        <div className="ops-kicker">Continuity Loop · Opaque locator QR</div>
+        <div className="ops-kicker">Saanthvana · Opaque locator QR</div>
         <h3>Handoff &amp; clinic check-in QR</h3>
         <p className="ops-muted">
           Encodes only a locator + checksum — never CPR ceilings or clinical text. Possessing the QR does not open the note.
@@ -329,7 +329,7 @@ function QrBridgePane(props: {
         <div className="ops-qr-frame">
           {qrDataUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={qrDataUrl} alt="Continuity Loop handoff QR code" width={220} height={220} />
+            <img src={qrDataUrl} alt="Saanthvana handoff QR code" width={220} height={220} />
           ) : (
             <div className="ops-qr-placeholder">Building QR…</div>
           )}
@@ -359,23 +359,23 @@ function QrBridgePane(props: {
 
       <div className="ops-qr-actions">
         <button type="button" className="ops-btn ops-btn-primary" disabled={scanning} onClick={() => runScan('scan-checkin')}>
-          <IconHospital className="w-4 h-4" /> Simulate clinic QR check-in
+          <IconHospital className="w-4 h-4" /> Open clinic check-in
         </button>
         <button type="button" className="ops-btn ops-btn-accent" disabled={scanning} onClick={() => runScan('scan-handoff')}>
-          <IconShieldCheck className="w-4 h-4" /> Simulate ED QR handoff unlock
+          <IconShieldCheck className="w-4 h-4" /> Open emergency handoff
         </button>
 
         <div className="ops-qr-scanner-stage" aria-live="polite">
           {scanning ? (
             <div className="ops-scan-viewfinder">
               <div className="ops-scan-laser" />
-              <p>Optical scan · validating opaque locator…</p>
+              <p>Opening saved QR record…</p>
             </div>
           ) : scanResult ? (
             <div className={`ops-scan-result ${mode === 'scan-handoff' && summaryReady ? 'is-ok' : mode === 'scan-checkin' ? 'is-ok' : 'is-warn'}`}>
               <IconCheckCircle className="w-5 h-5" />
               <div>
-                <strong>{mode === 'scan-checkin' ? 'Clinic check-in complete' : 'Handoff scan complete'}</strong>
+                <strong>{mode === 'scan-checkin' ? 'Check-in saved here' : 'Handoff record opened'}</strong>
                 <p>{scanResult}</p>
                 {lastCheckIn && mode === 'scan-checkin' && (
                   <small>
@@ -385,7 +385,7 @@ function QrBridgePane(props: {
               </div>
             </div>
           ) : (
-            <p className="ops-muted">Run a scan to mutate demo state: appointment desk arrival or ED handoff unlock.</p>
+            <p className="ops-muted">Open a saved QR record. Check-ins stay on this device; the clinic is not notified.</p>
           )}
         </div>
       </div>
@@ -608,7 +608,7 @@ function MroVaultPane(props: {
     const again = sha256Lite(`${mroId}|${locator}|${props.verifiedBy ?? 'unverified'}`);
     setVerifyMsg(
       again === integrity
-        ? 'Integrity match — Medical Record Object unchanged since seal. Not a PKI signature; browser-local demo hash only.'
+        ? 'Record unchanged since saving. This local hash is not a medical or digital signature.'
         : 'Integrity mismatch — object may have been altered.',
     );
   }
@@ -634,7 +634,7 @@ function MroVaultPane(props: {
           <IconFileText className="w-5 h-5" />
           <div>
             <strong>{mroId}</strong>
-            <small>Continuity Loop Medical Record Object</small>
+            <small>Saanthvana Medical Record Object</small>
           </div>
           <button type="button" className="ops-btn ops-btn-ghost" onClick={() => setExpanded((v) => !v)}>
             {expanded ? 'Collapse' : 'Expand'}

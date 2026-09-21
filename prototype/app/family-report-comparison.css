@@ -1,0 +1,10 @@
+.family-report-comparison { margin-top: 10px; }
+.family-report-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin-top: 12px; }
+.family-report-pair > div { min-width: 0; }
+.family-report-pair label { display: grid; gap: 6px; font-size: 14px; font-weight: 600; }
+.family-report-pair select { min-width: 0; width: 100%; min-height: 44px; border: 1px solid #c8d6c9; background: #fff; border-radius: 8px; padding: 8px; font: inherit; font-weight: 400; }
+.family-report-links { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; }
+.family-report-links a { display: inline-flex; align-items: center; min-height: 44px; color: #245b40; font-size: 14px; }
+.family-report-original img { display: block; width: 100%; height: auto; }
+.family-report-original object { display: block; width: 100%; height: 560px; border: 1px solid #dce4dc; }
+@media (max-width: 650px) { .family-report-pair { grid-template-columns: minmax(0, 1fr); gap: 16px; } .family-report-pair select { font-size: 16px; } .family-report-original object { height: 430px; } }

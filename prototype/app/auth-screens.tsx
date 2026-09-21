@@ -74,9 +74,9 @@ function BrandPanel({ variant = 'care-team' }: { variant?: 'care-team' | 'family
       <div className="auth-brand-noise" aria-hidden="true" />
       <div className="auth-brand-inner">
         <div className="auth-brand-top">
-          <div className="auth-brand-mark" aria-hidden="true">CL</div>
+          <div className="auth-brand-mark" aria-hidden="true">S</div>
           <div className="auth-brand-titles">
-            <strong>Continuity Loop</strong>
+            <strong>Saanthvana</strong>
             <span>Care planning</span>
           </div>
         </div>
@@ -249,7 +249,7 @@ export function LoginScreen(props: {
           </details>
 
           <div className="auth-footer">
-            New to Continuity Loop?{' '}
+            New to Saanthvana?{' '}
             <button type="button" className="auth-textbutton" onClick={onGoToSignup}>
               Create profile
             </button>
@@ -274,7 +274,7 @@ export function LoginScreen(props: {
           )}
 
           <SimAuthNotice>
-            Accounts aren’t connected. Use sample details.
+            Hospital accounts aren’t connected.
           </SimAuthNotice>
         </form>
       </div>
@@ -311,7 +311,7 @@ export function SignupScreen(props: {
       return;
     }
     if (!ack) {
-      setError('Confirm that you are using sample details.');
+      setError('Confirm that this does not create a hospital account.');
       return;
     }
     setError('');
@@ -419,7 +419,7 @@ export function SignupScreen(props: {
               checked={ack}
               onChange={(e) => setAck(e.target.checked)}
             />
-            <span>I am using sample details.</span>
+            <span>I understand this does not create a hospital account.</span>
           </label>
 
           <button type="submit" className="auth-submit">Create profile</button>
@@ -450,7 +450,7 @@ export function SignupScreen(props: {
           )}
 
           <SimAuthNotice>
-            Accounts aren’t connected. Use sample details.
+            Hospital accounts aren’t connected.
           </SimAuthNotice>
         </form>
       </div>
@@ -619,7 +619,7 @@ export function FamilyLoginScreen(props: {
           )}
 
           <SimAuthNotice>
-            Accounts aren’t connected. Use sample details.
+            Hospital accounts aren’t connected.
           </SimAuthNotice>
         </form>
       </div>
@@ -776,7 +776,7 @@ export function PatientLoginScreen(props: {
           )}
 
           <SimAuthNotice>
-            Accounts aren’t connected. Use sample details.
+            Hospital accounts aren’t connected.
           </SimAuthNotice>
         </form>
       </div>
