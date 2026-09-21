@@ -14,6 +14,7 @@ Prepared 21 September 2026 from the full 1,209-line user-supplied meeting transc
 - Test trends use a date-by-test table, preserve units and printed ranges, link to reports, and show recorded or planned treatment events without interpreting them.
 - Calendar adds chemotherapy and radiotherapy. It stops offering new manual daily medication entries; existing entries remain available.
 - Each selected symptom has its own 0-10 rating. Older descriptive ratings are preserved.
+- Family care entry dates and the treatment calendar use the current local date, rather than the original fixed August date.
 - Home help focuses on transport, home nursing and medicine/equipment delivery. Community resources use the person's chosen condition. Journal content is not used to choose groups.
 - Fundraising, daily family tasks and duplicate discussion links are removed from the main navigation; saved records are not deleted.
 

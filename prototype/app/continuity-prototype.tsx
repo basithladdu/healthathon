@@ -1268,6 +1268,8 @@ export function ContinuityPrototype() {
   const portalPatientId = isPatientSession
     ? (patientAccount?.hospitalId ?? 'CANCER-20418')
     : isFamilySession ? (familyMember?.patientId ?? 'CANCER-20418') : selectedId;
+  const currentDate = new Date();
+  const careToday = new Date(currentDate.getTime() - currentDate.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
   const portalAuthor = isFamilySession ? familyMember?.name ?? 'Family member'
     : isPatientSession ? patientAccount?.name ?? 'Patient' : currentRole.split(' · ')[0];
   const portalPatientName =
@@ -5332,7 +5334,7 @@ export function ContinuityPrototype() {
         />;
       }
       case 'daily-care': {
-        const nextVisit = appointments.filter((item) => item.hospitalId === portalPatientId && item.status === 'Scheduled' && item.date >= DEMO_TODAY)
+        const nextVisit = appointments.filter((item) => item.hospitalId === portalPatientId && item.status === 'Scheduled' && item.date >= careToday)
           .sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`))[0];
         return <FamilyCareHome patientName={portalPatientName} hindi={hindi} nextVisit={nextVisit}
           onOpen={navigate} onCalendar={() => navigate('calendar')} onTasks={() => navigate('family-tasks')}
@@ -5340,19 +5342,19 @@ export function ContinuityPrototype() {
       }
       case 'comfort': {
         const author = portalAuthor;
-        return <FamilyComfortSpace patientId={portalPatientId} author={author} today={DEMO_TODAY} hindi={hindi}
+        return <FamilyComfortSpace patientId={portalPatientId} author={author} today={careToday} hindi={hindi}
           entries={comfortEntries} onChange={setComfortEntries} onOpenJournal={() => navigate('voice-journal')} onOpenSymptoms={() => navigate('symptom-diary')} />;
       }
       case 'visit-questions':
       case 'family-tasks': {
         const author = portalAuthor;
         return <FamilyCareWorkspace key={portalPatientId} patientId={portalPatientId} patientName={portalPatientName} author={author}
-          tasks={familyTasks} appointments={appointments} demoToday={DEMO_TODAY}
+          tasks={familyTasks} appointments={appointments} demoToday={careToday}
           tasksOnly
           section={view === 'visit-questions' ? 'questions' : 'tasks'}
           onTrackQuestion={(task) => {
             if (task.patientId !== portalPatientId || task.kind !== 'Question') return;
-            setOpenQuestions((current) => addOpenQuestion(current, portalPatientId, author, DEMO_TODAY, task.id, { topic: task.title, owner: task.owner, due: task.due }));
+            setOpenQuestions((current) => addOpenQuestion(current, portalPatientId, author, careToday, task.id, { topic: task.title, owner: task.owner, due: task.due }));
             navigate('open-questions');
           }}
           calendarText={[
@@ -5371,7 +5373,7 @@ export function ContinuityPrototype() {
       case 'calendar': {
         const author = portalAuthor;
         return <>{view === 'calendar' && <div className="family-workspace-heading"><h1>{hindi ? 'कैलेंडर' : 'Calendar'}</h1></div>}
-          <CareCalendar patientId={portalPatientId} author={author} today={DEMO_TODAY} hindi={hindi}
+          <CareCalendar patientId={portalPatientId} author={author} today={careToday} hindi={hindi}
             focusReports={view === 'reports'} onAppointmentInstructions={saveAppointmentInstructions} onTestResults={() => navigate('lab-history')}
             appointments={appointments} tasks={[]} events={careEvents} checks={careChecks} reports={careReports} reportSave={reportSave}
             documentText={documentText} onReadReport={(id) => { setEditReportId(id); navigate('document-search'); }}
@@ -5383,7 +5385,7 @@ export function ContinuityPrototype() {
               setCareEvents(updated);
               setCareChecks((current) => careChecksAfterEventUpdate(current, previous, event));
             }}
-            onCheck={(eventId, date, complete) => setCareChecks((current) => setCareCheck(current, careEvents, portalPatientId, eventId, date, author, new Date().toISOString(), DEMO_TODAY, complete))}
+            onCheck={(eventId, date, complete) => setCareChecks((current) => setCareCheck(current, careEvents, portalPatientId, eventId, date, author, new Date().toISOString(), careToday, complete))}
             onTaskCheck={(taskId, complete) => setFamilyTasks((current) => setFamilyTaskCompleted(current, portalPatientId, taskId, author, complete))}
             onRemove={(eventId) => {
               setCareEvents((current) => current.filter((event) => event.patientId !== portalPatientId || event.id !== eventId));
@@ -5414,7 +5416,7 @@ export function ContinuityPrototype() {
       case 'lab-history': {
         const release = latestReleaseFor(portalPatientId);
         const author = portalAuthor;
-        return <FamilyCareTools tool={view} patientId={portalPatientId} patientName={portalPatientName} author={author} today={DEMO_TODAY} hindi={hindi}
+        return <FamilyCareTools tool={view} patientId={portalPatientId} patientName={portalPatientName} author={author} today={careToday} hindi={hindi}
           recordedStory={recordedStoryFor(portalPatientId)} knownContacts={knownContactsFor(portalPatientId)}
           symptoms={symptoms} story={careStory} contacts={handoverContacts} onSymptoms={setSymptoms} onStory={setCareStory} onContacts={setHandoverContacts}
           homeHelp={homeHelp} supportPlaces={supportPlaces} onHomeHelp={setHomeHelp} onSupportPlaces={setSupportPlaces}
@@ -5598,7 +5600,7 @@ export function ContinuityPrototype() {
       }}>
       {role === 'doctor' && view === 'home' ? <DoctorCareHome
         patients={workItems.map((item) => ({ id: item.hospitalId, name: item.patient, diagnosis: patientProfiles[item.hospitalId]?.diagnosis ?? patientProfiles[item.hospitalId]?.stage.split(' · ')[0] ?? '' }))}
-        records={recordStates} appointments={appointments} physician={currentRole.split(' · ')[0]} today={DEMO_TODAY} hindi={hindi}
+        records={recordStates} appointments={appointments} physician={currentRole.split(' · ')[0]} today={careToday} hindi={hindi}
         onReview={(id) => { selectPatient(id); setView('doctor-review'); }}
         onRecord={(id) => { if (id) selectPatient(id); setNewDoctorConversation(true); setView('doctor-record'); }}
         onHistory={(id) => { if (id) selectPatient(id); setView('doctor-history'); }} onInstructions={saveAppointmentInstructions} />
