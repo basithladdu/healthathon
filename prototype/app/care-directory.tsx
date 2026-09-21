@@ -2,25 +2,27 @@
 
 import { CARE_CENTRES, centreDirectionsUrl, type CareCentre } from './care-directory-data';
 
-export function CareDirectory({ centres = CARE_CENTRES, selectedId, locatingId, onSelect }: {
+export function CareDirectory({ centres = CARE_CENTRES, selectedId, locatingId, onSelect, pinNumbers, distances }: {
   centres?: CareCentre[];
   selectedId?: string | null;
   locatingId?: string | null;
   onSelect?: (centre: CareCentre) => void;
+  pinNumbers?: Record<string, number>;
+  distances?: Record<string, number>;
 }): React.JSX.Element {
   return <div className="care-directory care-directory-map-list">
     {centres.map((centre) => <article key={centre.id} className={`care-centre${selectedId === centre.id ? ' is-selected' : ''}`}>
-      <p className="care-centre-city">{centre.city} · {centre.state}</p>
-      <h3>{onSelect ? <button type="button" className="care-centre-select" aria-pressed={selectedId === centre.id} onClick={() => onSelect(centre)}>{centre.name}<span aria-hidden="true">↗</span></button> : centre.name}</h3>
+      <p className="care-centre-city">{pinNumbers?.[centre.id] && <span className="care-centre-pin-number" aria-label={`Map marker ${pinNumbers[centre.id]}`}>{pinNumbers[centre.id]}</span>}{centre.city} · {centre.state}{distances?.[centre.id] !== undefined && <span className="care-centre-distance">{distances[centre.id].toFixed(1)} km straight-line</span>}</p>
+      <h3>{onSelect && (!pinNumbers || pinNumbers[centre.id]) ? <button type="button" className="care-centre-select" aria-pressed={selectedId === centre.id} onClick={() => onSelect(centre)}>{centre.name}<span aria-hidden="true">↗</span></button> : centre.name}</h3>
       <p className="care-centre-services">{centre.services.length ? centre.services.join(' · ') : 'Call for available services'}</p>
       <address>{centre.address}</address>
       {centre.phoneNote && <p className="care-directory-note">{centre.phoneNote}</p>}
       {locatingId === centre.id && <p className="care-directory-note" role="status">Finding this centre on the map…</p>}
       <div className="care-centre-actions">
-        {onSelect && <button type="button" className="care-centre-route" aria-label={`Show route to ${centre.name}`} onClick={() => onSelect(centre)}>Show route</button>}
+        {onSelect && (!pinNumbers || pinNumbers[centre.id]) && <button type="button" className="care-centre-route" aria-label={`Show ${centre.name} on map`} onClick={() => onSelect(centre)}>Show on map</button>}
         <a href={`tel:${centre.phone}`} aria-label={`Call ${centre.name}: ${centre.phone}`}>Call {centre.phone}</a>
         <a href={centreDirectionsUrl(centre)} target="_blank" rel="noopener noreferrer" aria-label={`Directions to ${centre.name}`}>Directions ↗</a>
-        <a href={centre.directoryUrl} target="_blank" rel="noopener noreferrer" aria-label={`Pallium India listing for ${centre.name}`}>Source ↗</a>
+        <a href={centre.directoryUrl} target="_blank" rel="noopener noreferrer" aria-label={`Contact details for ${centre.name}`}>Source ↗</a>
       </div>
     </article>)}
   </div>;

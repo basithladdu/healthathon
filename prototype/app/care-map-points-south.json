@@ -1,0 +1,32 @@
+[
+  {
+    "id": "aster-cmi",
+    "coordinates": [77.5916468, 13.0545589],
+    "sourceUrl": "https://www.openstreetmap.org/way/1040899005",
+    "checkedOn": "2026-09-21"
+  },
+  {
+    "id": "baptist-bengaluru",
+    "coordinates": [77.5895705, 13.0358406],
+    "sourceUrl": "https://bbh.org.in/contact/",
+    "checkedOn": "2026-09-21"
+  },
+  {
+    "id": "karunashraya",
+    "coordinates": [77.7135457, 12.9572096],
+    "sourceUrl": "https://www.openstreetmap.org/way/122157597",
+    "checkedOn": "2026-09-21"
+  },
+  {
+    "id": "sviccar-tirupati",
+    "coordinates": [79.3815, 13.6303333],
+    "sourceUrl": "https://sviccar.org/contact-us",
+    "checkedOn": "2026-09-21"
+  },
+  {
+    "id": "svims-tirupati",
+    "coordinates": [79.4064279, 13.642574],
+    "sourceUrl": "https://www.openstreetmap.org/node/2450419099",
+    "checkedOn": "2026-09-21"
+  }
+]

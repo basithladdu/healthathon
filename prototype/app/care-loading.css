@@ -1,0 +1,42 @@
+.care-loading,
+.care-loading * { box-sizing: border-box; }
+
+.care-loading {
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: 28px;
+  color: #345449;
+  background: radial-gradient(ellipse at 8% 96%, #dbe5c8 0, transparent 45%), radial-gradient(ellipse at 93% 3%, #f6dcc4 0, transparent 47%), #fff7e9;
+  font-family: var(--font-inter), sans-serif;
+}
+.care-loading-content { display: grid; justify-items: center; gap: 18px; }
+.care-loading-art { position: relative; isolation: isolate; width: 174px; height: 155px; }
+.care-loading-halo { position: absolute; inset: 7px 11px 0; border-radius: 50%; background: #f2dfc6; animation: care-loading-breathe 2.8s ease-in-out infinite; }
+.care-loading-mark { position: absolute; width: 108px; height: 108px; top: 28px; left: 33px; transform: rotate(-6deg); animation: care-loading-float 2.8s ease-in-out infinite; }
+.care-loading-sun { position: absolute; width: 42px; height: 42px; top: 1px; right: 10px; border-radius: 50%; background: #edb847; box-shadow: inset -4px -4px 0 #dfaa3e; animation: care-loading-float 3.1s ease-in-out -.7s infinite; }
+.care-loading-leaf { position: absolute; width: 25px; height: 47px; left: 5px; top: 39px; border-radius: 24px 3px 24px 3px; background: #8cae8a; transform: rotate(-35deg); animation: care-loading-float 3.4s ease-in-out -.4s infinite; }
+.care-loading-petal { position: absolute; width: 26px; height: 34px; right: 5px; bottom: 5px; border-radius: 22px 22px 7px 22px; background: #bb9bd3; transform: rotate(26deg); animation: care-loading-float 3s ease-in-out -1s infinite; }
+.care-loading-name { margin: 0; font: 650 34px/1.15 var(--font-sora), sans-serif; letter-spacing: -1.25px; }
+.care-loading-dots { display: flex; gap: 8px; padding-top: 2px; }
+.care-loading-dots span { width: 7px; height: 7px; border-radius: 50%; background: #ad6249; animation: care-loading-dot 1.2s ease-in-out infinite; }
+.care-loading-dots span:nth-child(2) { background: #c99246; animation-delay: .15s; }
+.care-loading-dots span:nth-child(3) { background: #4d8d78; animation-delay: .3s; }
+.care-loading-status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+@keyframes care-loading-breathe { 0%, 100% { scale: 1; opacity: .7; } 50% { scale: 1.06; opacity: 1; } }
+@keyframes care-loading-float { 0%, 100% { translate: 0 0; } 50% { translate: 0 -5px; } }
+@keyframes care-loading-dot { 0%, 70%, 100% { translate: 0 0; opacity: .4; } 35% { translate: 0 -4px; opacity: 1; } }
+
+@media (max-width: 400px) {
+  .care-loading-content { gap: 15px; }
+  .care-loading-name { font-size: 30px; letter-spacing: -1px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .care-loading-halo,
+  .care-loading-mark,
+  .care-loading-sun,
+  .care-loading-leaf,
+  .care-loading-petal,
+  .care-loading-dots span { animation: none; }
+}

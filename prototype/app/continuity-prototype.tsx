@@ -11,6 +11,7 @@ import { DoctorConversation } from './doctor-conversation';
 import type { DoctorConversationEntry, AssistedNote } from './doctor-conversation-state';
 import { CareNoteReader } from './care-note-reader';
 import { CareSignIn } from './care-sign-in';
+import { CareLoading } from './care-loading';
 import { DoctorNoteReview } from './doctor-note-review';
 import { prepareVisitNote, approveVisitNote } from './visit-note-state';
 import { AppointmentsPage, initialAppointments, DEMO_TODAY, type Appointment, type AppointmentPatient } from './appointments-page';
@@ -5556,7 +5557,7 @@ export function ContinuityPrototype() {
 
   if (simpleMode && authScreen === null) {
     const saves = [preparationSave, taskSave, eventSave, checkSave, reportSave, appointmentSave, noteSave, symptomSave, storySave, contactSave, helpSave, placesSave, questionSave, copySave, comfortSave, voiceSave, costSave, labSave, conversationSave];
-    if (saves.includes('loading')) return <main className="care-opening" aria-busy="true">{hindi ? 'देखभाल की जानकारी खोल रहे हैं…' : 'Opening your care…'}</main>;
+    if (saves.includes('loading')) return <CareLoading hindi={hindi} />;
     const saveStatus = saves.includes('unavailable') ? 'unavailable' : saves.includes('saving') ? 'saving' : 'saved';
     const role = isFamilySession ? 'family' : isPatientSession ? 'patient' : 'doctor';
     return <SimpleCareShell view={view} role={role} hindi={hindi} saveStatus={saveStatus}

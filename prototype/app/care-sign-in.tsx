@@ -1,7 +1,8 @@
 'use client';
 
-import { useId, useState, type FormEvent } from 'react';
+import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
 import { CareArt, type CareArtKind } from './care-art';
+import { CareLoading } from './care-loading';
 import './care-sign-in.css';
 
 export type CareSignInInput = { role: 'family' | 'patient' | 'doctor'; patientId: string; name: string };
@@ -15,22 +16,49 @@ export type CareSignInProps = {
 export function CareSignIn({ patients, hindi, onLanguage, onSignIn }: CareSignInProps) {
   const id = useId();
   const [role, setRole] = useState<CareSignInInput['role']>('family');
-  const [selectedId, setSelectedId] = useState(patients[0]?.id ?? '');
-  const [customName, setCustomName] = useState<string | null>(null);
+  const [selectedId] = useState(patients[0]?.id ?? '');
+  const [identifier, setIdentifier] = useState('');
+  const [error, setError] = useState<'abha' | 'doctor' | null>(null);
+  const [signingIn, setSigningIn] = useState(false);
+  const identifierInput = useRef<HTMLInputElement>(null);
+  const submitting = useRef(false);
+  const loadingTimer = useRef<number | null>(null);
   const patient = patients.find((item) => item.id === selectedId) ?? patients[0];
-  const defaultName = role === 'doctor' ? 'Dr Sujay' : role === 'patient' ? patient?.name ?? ''
+  const name = role === 'doctor' ? 'Dr Sujay' : role === 'patient' ? patient?.name ?? ''
     : patient && /\bmeera\b/i.test(patient.name) ? 'Kavya Raghavan' : 'Family member';
-  const name = customName ?? defaultName;
   const t = (en: string, hi: string) => hindi ? hi : en;
   const roleArt: Record<CareSignInInput['role'], CareArtKind> = {
     family: 'home-help', patient: 'cancer-overview', doctor: 'doctor-pack',
   };
 
+  useEffect(() => () => {
+    if (loadingTimer.current !== null) window.clearTimeout(loadingTimer.current);
+  }, []);
+
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!patient || !name.trim()) return;
-    onSignIn({ role, patientId: patient.id, name: name.trim() });
+    if (submitting.current || !patient || !name.trim()) return;
+    const value = identifier.trim();
+    const valid = role === 'doctor'
+      ? /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) || /^(?:\+?91)?[6-9]\d{9}$/.test(value.replace(/[\s()-]/g, ''))
+      : /^\d{14}$/.test(value.replace(/[\s-]/g, ''));
+    if (!valid) {
+      setError(role === 'doctor' ? 'doctor' : 'abha');
+      identifierInput.current?.focus();
+      return;
+    }
+    const input: CareSignInInput = { role, patientId: patient.id, name: name.trim() };
+    submitting.current = true;
+    setError(null);
+    setIdentifier('');
+    setSigningIn(true);
+    loadingTimer.current = window.setTimeout(() => {
+      loadingTimer.current = null;
+      onSignIn(input);
+    }, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 180 : 850);
   }
+
+  if (signingIn) return <CareLoading hindi={hindi} />;
 
   return <div className="care-sign-in" lang={hindi ? 'hi' : 'en'}>
     <header className="care-sign-in-header">
@@ -47,17 +75,17 @@ export function CareSignIn({ patients, hindi, onLanguage, onSignIn }: CareSignIn
           <div className="care-sign-in-art-tile care-sign-in-art-story"><CareArt kind="care-story" /></div>
           <div className="care-sign-in-art-tile care-sign-in-art-voice"><CareArt kind="voice-journal" /></div>
         </div>
-        <form className="care-sign-in-form" onSubmit={submit} aria-labelledby={`${id}-title`}>
+        <form className="care-sign-in-form" onSubmit={submit} aria-labelledby={`${id}-title`} noValidate>
           <h1 id={`${id}-title`}>{t('Your care starts here', 'देखभाल की शुरुआत यहीं से')}</h1>
-          <fieldset className="care-sign-in-roles"><legend>{t('Continue as', 'किसके तौर पर आगे बढ़ें')}</legend><div>{([
+          <fieldset className="care-sign-in-roles"><legend>{t('Sign in as', 'किसके तौर पर साइन इन करें')}</legend><div>{([
             ['family', 'Family', 'परिवार'], ['patient', 'Patient', 'मरीज़'], ['doctor', 'Doctor', 'डॉक्टर'],
-          ] as const).map(([value, en, hi]) => <button key={value} type="button" className={`care-sign-in-role care-sign-in-role-${value}`} aria-pressed={role === value} onClick={() => { setRole(value); setCustomName(null); }}><CareArt kind={roleArt[value]} /><span>{t(en, hi)}</span></button>)}</div></fieldset>
-          <label className="care-sign-in-label" htmlFor={`${id}-patient`}>{t('Care for', 'किसकी देखभाल')}<select id={`${id}-patient`} value={patient?.id ?? ''} disabled={!patients.length} onChange={(event) => { setSelectedId(event.target.value); setCustomName(null); }} required>
-            {!patients.length && <option value="">{t('No people added yet', 'अभी कोई नाम नहीं जोड़ा है')}</option>}
-            {patients.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
-          </select></label>
-          <details className="care-sign-in-name"><summary><span>{t('Use another name', 'दूसरा नाम इस्तेमाल करें')}</span><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m12 4 4 4M4 16l4-1 9-9a2.8 2.8 0 0 0-4-4l-9 9-1 5Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" /></svg></summary><label className="care-sign-in-label" htmlFor={`${id}-name`}>{t('Your name', 'आपका नाम')}<input id={`${id}-name`} value={name} onChange={(event) => setCustomName(event.target.value)} maxLength={80} autoComplete="off" /></label></details>
-          <button type="submit" className="care-sign-in-submit" disabled={!patient || !name.trim()}><span>{t('Continue', 'आगे बढ़ें')}</span><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg></button>
+          ] as const).map(([value, en, hi]) => <button key={value} type="button" className={`care-sign-in-role care-sign-in-role-${value}`} aria-pressed={role === value} onClick={() => { if (role !== value) { setRole(value); setIdentifier(''); setError(null); } }}><CareArt kind={roleArt[value]} /><span>{t(en, hi)}</span></button>)}</div></fieldset>
+          <label className="care-sign-in-label" htmlFor={`${id}-identifier`}>
+            {role === 'doctor' ? t('Email or mobile number', 'ईमेल या मोबाइल नंबर') : role === 'family' ? t('Patient’s ABHA number', 'मरीज़ का ABHA नंबर') : t('ABHA number', 'ABHA नंबर')}
+            <input ref={identifierInput} id={`${id}-identifier`} type="text" inputMode={role === 'doctor' ? 'text' : 'numeric'} enterKeyHint="go" value={identifier} onChange={(event) => { setIdentifier(event.target.value); setError(null); }} placeholder={role === 'doctor' ? t('Email / mobile', 'ईमेल / मोबाइल') : t('14 digits', '14 अंक')} maxLength={role === 'doctor' ? 254 : 24} autoComplete="off" autoCapitalize="none" spellCheck={false} aria-invalid={Boolean(error)} aria-describedby={error ? `${id}-error` : undefined} required />
+          </label>
+          {error && <p id={`${id}-error`} className="care-sign-in-error" role="alert">{error === 'abha' ? t('Enter a 14-digit ABHA number.', '14 अंकों का ABHA नंबर डालें।') : t('Enter an email or a 10-digit Indian mobile number.', 'ईमेल या 10 अंकों का भारतीय मोबाइल नंबर डालें।')}</p>}
+          <button type="submit" className="care-sign-in-submit" disabled={!patient || !name.trim() || !identifier.trim()}><span>{t('Sign in', 'साइन इन करें')}</span><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg></button>
         </form>
       </div>
     </main>

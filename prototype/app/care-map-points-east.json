@@ -1,0 +1,38 @@
+[
+  {
+    "id": "mnj-hyderabad",
+    "coordinates": [78.4624766, 17.3985266],
+    "sourceUrl": "https://www.mnjiorcc.in/html/contact-info.htm",
+    "checkedOn": "2026-09-21"
+  },
+  {
+    "id": "kumudini-devi",
+    "coordinates": [78.4084287, 17.4888167],
+    "sourceUrl": "https://palliativecarepartners.in/contact-us/",
+    "checkedOn": "2026-09-21"
+  },
+  {
+    "id": "sparsh-hospice",
+    "coordinates": [78.3646542, 17.4186261],
+    "sourceUrl": "https://www.sparshhospice.org/contact/",
+    "checkedOn": "2026-09-21"
+  },
+  {
+    "id": "basavatarakam",
+    "coordinates": [78.4305233, 17.4171079],
+    "sourceUrl": "https://basavatarakam.org/contact-us/",
+    "checkedOn": "2026-09-21"
+  },
+  {
+    "id": "aashraya-kovvur",
+    "coordinates": [81.7129417, 17.0146941],
+    "sourceUrl": "https://aashrayafoundation.ngo/",
+    "checkedOn": "2026-09-21"
+  },
+  {
+    "id": "aiims-mangalagiri",
+    "coordinates": [80.5867942, 16.4450965],
+    "sourceUrl": "https://www.aiimsmangalagiri.edu.in/aboutus/organization/",
+    "checkedOn": "2026-09-21"
+  }
+]

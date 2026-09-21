@@ -10,6 +10,7 @@ export type CareCentre = {
   phoneNote?: string;
   services: CareService[];
   directoryUrl: string;
+  coordinates?: [number, number];
 };
 
 // Selected public listings transcribed from the linked Pallium India directories.
@@ -74,8 +75,9 @@ export const CARE_CENTRES: CareCentre[] = [
   },
   {
     id: 'aashraya-kovvur', name: 'Aashraya Hospice', city: 'Kovvur', state: 'Andhra Pradesh',
-    address: '9.1.8/2, near Lakshmi Cafe Hotel, Kovvur 534350',
-    phone: '+919866072574', services: ['Inpatient care'], directoryUrl: andhraPradesh,
+    // Contact details updated from the centre's own website on 21 September 2026.
+    address: 'Doctors Cooperative Hospital, Kovvuru–Chagallu Road, Kovvur, Andhra Pradesh',
+    phone: '+919000544574', services: ['Inpatient care'], directoryUrl: 'https://aashrayafoundation.ngo/',
   },
   {
     id: 'aiims-mangalagiri', name: 'AIIMS Mangalagiri', city: 'Mangalagiri', state: 'Andhra Pradesh',
@@ -95,5 +97,6 @@ export function filterCareCentres(query: string, state: string, service: string)
 }
 
 export function centreDirectionsUrl(centre: CareCentre): string {
-  return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${centre.name}, ${centre.address}, India`)}`;
+  const destination = centre.coordinates ? `${centre.coordinates[1]},${centre.coordinates[0]}` : `${centre.name}, ${centre.address}, India`;
+  return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}`;
 }

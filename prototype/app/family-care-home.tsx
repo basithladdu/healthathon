@@ -5,6 +5,7 @@ import { FamilyToolButtons, type FamilyTool } from './family-care-tools';
 import { IconArrowRight, IconCheckCircle, IconClock, IconFileText, IconSmile } from './icons';
 import './family-care-home.css';
 import { CareRouteLink } from './care-route-link';
+import { CareArt } from './care-art';
 
 export type FamilyCareHomeProps = {
   patientName: string;
@@ -29,6 +30,7 @@ export function FamilyCareHome({ patientName, hindi, onOpen, onCalendar, onTasks
   return <section className="family-care-home" aria-labelledby={`${id}-heading`}>
     <header className="family-care-home-heading"><h1 id={`${id}-heading`}>{firstName ? t(`${firstName}’s care`, `${firstName} की देखभाल`) : t('Your care', 'आपकी देखभाल')}</h1><div className="care-home-visit-links"><CareRouteLink view="visit-questions">{t('Ask at the next visit', 'अगली मुलाकात में पूछें')}</CareRouteLink><CareRouteLink view="prepare-conversation">{t('What matters to me', 'मेरे लिए क्या ज़रूरी है')}</CareRouteLink></div></header>
 
+    <CareRouteLink view="care-near-me" className="care-home-find-care"><CareArt kind="support-places" /><strong>{t('Find palliative care', 'पैलिएटिव देखभाल ढूँढें')}</strong><IconArrowRight /></CareRouteLink>
     <FamilyToolButtons hindi={hindi} onOpen={onOpen} />
 
     <div className="family-care-home-shortcuts">

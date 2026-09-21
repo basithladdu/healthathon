@@ -162,7 +162,7 @@
 .care-sign-in-role-doctor { background: #ede3f4; }
 .care-sign-in-role[aria-pressed='true'] { border-color: #397e69; box-shadow: 0 4px 0 #bad0ba; transform: translateY(-2px); color: #204f40; }
 .care-sign-in-label { display: grid; min-width: 0; gap: 7px; font-size: 13px; font-weight: 600; }
-.care-sign-in-label :is(select, input) {
+.care-sign-in-label input {
   width: 100%;
   min-width: 0;
   min-height: 50px;
@@ -174,22 +174,9 @@
   box-shadow: 0 2px 0 #eee9dc80;
   font: 400 16px var(--font-inter), sans-serif;
 }
-.care-sign-in-name { margin-block: -7px; }
-.care-sign-in-name summary {
-  min-height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  color: #637664;
-  font-size: 12px;
-  cursor: pointer;
-  list-style: none;
-}
-.care-sign-in-name summary::-webkit-details-marker { display: none; }
-.care-sign-in-name summary svg { width: 17px; height: 17px; flex: none; }
-.care-sign-in-name[open] { margin-bottom: 0; }
-.care-sign-in-name .care-sign-in-label { padding-bottom: 4px; }
+.care-sign-in-label input::placeholder { color: #7c8578; opacity: 1; }
+.care-sign-in-label input[aria-invalid='true'] { border-color: #ae4f39; }
+.care-sign-in-error { margin: -5px 0 0; color: #a54832; font-size: 12px; line-height: 1.45; }
 .care-sign-in-submit {
   min-height: 54px;
   display: flex;
@@ -208,14 +195,13 @@
 }
 .care-sign-in-submit svg { width: 23px; height: 23px; flex: none; }
 .care-sign-in button:disabled { opacity: .5; cursor: not-allowed; }
-.care-sign-in :is(button, select, input, summary):focus-visible { outline: 3px solid #397e69; outline-offset: 4px; }
+.care-sign-in :is(button, input):focus-visible { outline: 3px solid #397e69; outline-offset: 4px; }
 
 @media (hover: hover) {
   .care-sign-in-role:hover { transform: translateY(-3px); box-shadow: 0 5px 0 #c6c4a647; }
   .care-sign-in-role[aria-pressed='true']:hover { box-shadow: 0 5px 0 #bad0ba; }
   .care-sign-in-submit:not(:disabled):hover { background: #974a34; transform: translateY(-1px); box-shadow: 0 5px 0 #8e4b3530; }
   .care-sign-in-language:hover { background: #f1ebd9; }
-  .care-sign-in-name summary:hover { color: #2f6652; }
 }
 .care-sign-in-role:active,
 .care-sign-in-submit:not(:disabled):active { transform: translateY(1px); box-shadow: none; }
@@ -240,7 +226,7 @@
   .care-sign-in-roles > div { gap: 8px; }
   .care-sign-in-role { min-height: 87px; padding-block: 5px 8px; border-radius: 16px; }
   .care-sign-in-role svg { width: 60px; height: 50px; }
-  .care-sign-in-label :is(select, input) { min-height: 48px; }
+  .care-sign-in-label input { min-height: 48px; }
   .care-sign-in-submit { min-height: 52px; }
 }
 
