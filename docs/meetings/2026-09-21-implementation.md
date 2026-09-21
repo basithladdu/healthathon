@@ -30,5 +30,10 @@ Prepared 21 September 2026 from the full 1,209-line user-supplied meeting transc
 ## Verification
 
 - Application TypeScript source check passed using a temporary configuration that excludes stale generated Next.js validators.
-- No local production build or test suite was run, as requested. Local development compilation stopped before browser review; Vercel compilation and live browser review are recorded at delivery.
+- No local production build or test suite was run, as requested. Local development compilation stopped before browser review.
+- App commit `34df7e014462ecd08edb19cd3d8c2050a7af0284` was pushed. Vercel production deployment `dpl_9VgRcjwb4x2T1tNEvNJvP5EkRmrK` completed successfully, including the production build and TypeScript check, and was aliased to `https://continuity-loop-healthathon.vercel.app`.
+- Chrome control timed out. Live review used Computer Use in the in-app browser: desktop 1280x900 and mobile 390x844, Home and section navigation, separate Pain/Tiredness ratings, current-date entry, council/registration fields, doctor signing preflight, and Finish later. No care note was signed during verification. No console errors were recorded in these flows; temporary viewport overrides were reset.
+- The deployed PDF worker returns HTTP 200 with JavaScript content. PDF extraction and signature persistence were source-checked, but a complete real-document extraction/signing exercise was not performed.
+- `/api/care-assist` still returns `ready: false`; live AI is not connected.
+- The minutes PDF was visually checked and is exactly one page. The raw transcript is 64,056 bytes / 1,209 lines, SHA-256 `62425b93f6deeb9313741042abc8725471277bc45acd0aac8a85a4df63e1de9e`, matching the supplied attachment. Git attributes preserve its original bytes.
 - Existing unrelated documents and submission changes were left untouched.
