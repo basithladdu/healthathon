@@ -2,11 +2,21 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { IconFileText, IconSparkles, IconClock } from './icons';
-import type { AssistedNote, DoctorConversationEntry } from './doctor-conversation-state';
+import { CARE_NOTE_LABELS, type AssistedNote, type DoctorConversationEntry } from './doctor-conversation-state';
 
 type RecognitionEvent = { resultIndex: number; results: ArrayLike<{ isFinal: boolean; 0: { transcript: string } }> };
 type Recognition = { continuous: boolean; interimResults: boolean; lang: string; start: () => void; stop: () => void; abort: () => void; onresult: ((event: RecognitionEvent) => void) | null; onerror: ((event: { error: string }) => void) | null; onend: (() => void) | null };
 type RecognitionWindow = Window & { SpeechRecognition?: new () => Recognition; webkitSpeechRecognition?: new () => Recognition };
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
+function isAssistedNote(value: unknown): value is AssistedNote {
+  if (!isRecord(value) || !isRecord(value.fields) || !isRecord(value.excerpts)) return false;
+  const { fields, excerpts } = value;
+  return Object.keys(CARE_NOTE_LABELS).every((key) => typeof fields[key] === 'string' && typeof excerpts[key] === 'string');
+}
 
 export function ConversationAudio({ file }: { file: File }) {
   const [url, setUrl] = useState('');
@@ -40,7 +50,7 @@ export function DoctorConversation({ patientId, patientName, patients, physician
   useEffect(() => {
     mounted.current = true;
     const controller = new AbortController();
-    fetch('/api/care-assist', { signal: controller.signal }).then((response) => response.json()).then((status) => setAiReady(status.ready === true)).catch(() => {});
+    fetch('/api/care-assist', { signal: controller.signal }).then((response) => response.json()).then((status) => setAiReady(isRecord(status) && status.ready === true)).catch(() => {});
     return () => { mounted.current = false; controller.abort(); assistRequest.current?.abort(); recognition.current?.abort(); if (recorder.current?.state === 'recording') recorder.current.stop(); stream.current?.getTracks().forEach((track) => track.stop()); };
   }, []);
   useEffect(() => {
@@ -103,9 +113,10 @@ export function DoctorConversation({ patientId, patientName, patients, physician
       const response = await fetch('/api/care-assist', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ source: note }), signal: request.signal });
       const result = await response.json();
       if (!mounted.current) return;
-      if (!response.ok) throw new Error(result.error || 'The draft could not be prepared. Your note is still here.');
-      if (!Object.values(result.fields as Record<string, string>).some((value) => value.trim())) throw new Error('No clear care-note sections were found. You can review the conversation as written.');
-      save(result as AssistedNote);
+      if (!response.ok) throw new Error(isRecord(result) && typeof result.error === 'string' ? result.error : 'The draft could not be prepared. Your note is still here.');
+      if (!isAssistedNote(result)) throw new Error('The draft could not be read. Your note is still here.');
+      if (!Object.values(result.fields).some((value) => value.trim())) throw new Error('No clear care-note sections were found. You can review the conversation as written.');
+      save(result);
     } catch (error) { if (mounted.current) setMessage(error instanceof Error ? error.message : 'The draft could not be prepared.'); }
     finally { if (mounted.current) setBusy(false); }
   }
