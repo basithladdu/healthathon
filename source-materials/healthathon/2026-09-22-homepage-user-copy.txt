@@ -1,0 +1,178 @@
+Koita Foundation
+IIT Bombay · KCDH
+FOGSI
+National Cancer Grid
+RSSDI
+Home
+About
+Themes
+Eligibility
+Journey
+Prizes
+FAQ
+WhatsApp
+Dashboard →
+Sign out
+
+Health-a-thon
+2026
+- India's first Doctor and Technology health hackathon for assistive AI
+India's First Health Hackathon
+Doctors & Technologists
+Co - creating AI Solutions
+
+in Cancer, Diabetes and Maternal & Child Health.
+
+Go to Dashboard →
+Doctor's Role ↗
+|
+Technologist's Role ↗
+A JOINT INITIATIVE
+
+India's leading health ecosystem comes together
+Federation of Obstetric and Gynaecological Societies of India logo
+Federation of Obstetric and Gynaecological Societies of India
+India's largest professional associations of obstetricians and gynaecologists, representing over 45,000 OB-GYN specialists through 280+ member societies across India.
+
+About Federation of Obstetric and Gynaecological Societies of India →
+National Cancer Grid logo
+National Cancer Grid
+India's largest cancer care networks, bringing together 370+ member institutions that collectively serve nearly 60% of all cancer patients in India.
+
+About National Cancer Grid →
+Research Society for the Study of Diabetes in India logo
+Research Society for the Study of Diabetes in India
+India's largest professional body for diabetes care, representing over 13,000 members through 23 state chapters across the country.
+
+About Research Society for the Study of Diabetes in India →
+IIT Bombay · KCDH logo
+IIT Bombay · KCDH
+India's first academic centre dedicated to Digital Health, driving research, entrepreneurship and innovation in Digital Health and AI.
+
+About IIT Bombay · KCDH →
+Koita Foundation logo
+Koita Foundation
+Driving Digital Health and AI adoption in India through strategic partnerships with leading academic, healthcare, technology organizations and NGOs.
+
+About Koita Foundation →
+Technology partners
+Sarvam AI
+India's sovereign AI lab, building foundational large language and voice models across 10+ Indian languages under the IndiaAI Mission.
+
+About Sarvam AI →
+Powered by
+Reskilll
+Health-a-thon 2026 focuses on non-clinical, operational and workflow problems.
+Not diagnosis. Not clinical decision-making.
+
+But the day-to-day barriers that slow healthcare down.
+
+Doctors don't need AI expertise
+Doctors don't need coding expertise
+Bring your clinical expertise and work with the team.
+WHAT WILL YOU WORK ON
+
+Use Cases And Problem Statements
+
+Doctor / Care Team Facing
+Simplify workflows, reduce admin load and support better care coordination.
+
+Explore 7 use cases
+
+Patient / Caregiver Facing
+Guide, engage and empower patients and caregivers through their journey.
+
+Explore 6 use cases
+These use cases can be adapted and applied across Cancer, Diabetes and Maternal & Child Health. During registration, teams choose the care domain they want to work and build in.
+
+DESIGN BAR
+
+Design principles & hackathon scope
+Leverage existing AI capabilities - agents, orchestration frameworks, APIs and open-source tools (e.g. LangChain, OpenClaw, Hermes Agents and similar). Work with existing workflows; keep solutions assistive, human-centred and measurable within 60–90 days.
+
+Out of Scope: Clinical AI solutions involving diagnosis, treatment recommendations, clinical decision support, clinical risk scoring, interpretation of medical data or autonomous clinical advice.
+
+Principles & scope
+WHO CAN APPLY
+Open to All Doctors, Medical students, Technology Innovators and multidisciplinary teams passionate about solving real-world healthcare challenges with AI. Participate individually or as a team.
+
+Doctors
+All Practising Doctors, Residents and Fellows
+
+Medical Students
+Medical students (3rd year onwards), Interns and PG Residents
+
+Healthcare Professional
+Nurses, physiotherapists, pharmacists, lab technicians, dietitians, allied health & healthcare management
+
+Startups / Health-Tech
+Startups and Health-Tech companies
+
+Technology Teams
+Developers, AI builders, researchers and innovators
+
+Engineering Students
+Engineering students, M.E, PhD
+
+TEAM STRUCTURE
+2–5 members per team. Every team needs a Doctor and a Technologist.
+Remaining seats are open to any clinical, technical or multidisciplinary background.
+
+REWARDS & RECOGNITION
+PRIZE POOL WORTH
+
+₹54+ LAKHS
+
+Cash Prizes
+Technology Credits
+Partner Benefits
+BEYOND THE PRIZES
+
+Access
+
+Connect with Doctors and Hospitals from NCG, RSSDI and FOGSI.
+
+Recognition
+
+National recognition, plus a feature for top teams on the website.
+
+Certificate
+
+Official certificate for every eligible participant.
+
+Networking
+
+Meet startups and investors, and keep collaborating.
+
+GRAND FINALE
+
+IIT Bombay
+
+28 Nov 2026
+Powai, Mumbai · Maharashtra
+Indian Institute of Technology Bombay
+One Hackathon. Real Problems. Real Impact.
+
+Doctors and technologists co-creating India-ready AI solutions
+
+Let's build the future of healthcare, together.
+
+Go to Dashboard →
+Koita Foundation
+IIT Bombay · KCDH
+FOGSI
+National Cancer Grid
+RSSDI
+Register
+Who can join
+Themes
+FAQ
+·
+healthathon@reskilll.com
+·
++91 98587 77788
+·
+Join WhatsApp
+Powered by
+Reskilll
+© 2026 · Health-a-thon 2026 · Assistive, not diagnostic.

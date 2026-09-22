@@ -1,2 +1,4 @@
 # Preserve the supplied meeting transcript byte-for-byte.
 source-materials/meetings/2026-09-21-transcript.txt -text
+# Preserve the supplied official homepage copy byte-for-byte.
+source-materials/healthathon/2026-09-22-homepage-user-copy.txt -text whitespace=cr-at-eol

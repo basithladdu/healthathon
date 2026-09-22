@@ -1,32 +1,31 @@
 Saanthvana meeting minutes
 
-Prepared 21 September 2026 | Product review and Round 1 submission
+Zeros and Ones | Product review and Round 1 | Updated 22 September 2026
 
-Meeting date is unconfirmed. The transcript has no reliable speaker labels; action owners remain unassigned.
+Help cancer patients and families understand what was agreed with the care team, know what needs doing next, and work from the same care plan. Goals-of-care conversations stay at the centre.
 
-DECISIONS
+AGREED IN THE MEETING
 
-- Focus and navigation. Keep patients and caregivers as beneficiaries, with the care conversation at the centre. Combine patient/family entry; organise Clinical documents, Access to care and My space, plus quick access to an offline-saveable QR.
-- Clinical note. Use the team's Healthathon form. Reuse patient and oncologist profile details; record the family members present for each discussion.
-- Review and versions. Doctor signs first, then patient/family reviews from their account. Record agreement explicitly; use Review & sign or Finish later. Distinguish discussion notes from recorded decisions. Lock the signed version and prefill the next discussion from the previous note.
-- Useful care features. Keep a symptom diary with a 0-10 scale, personal journal/mood records, and vetted palliative-care listings with service details, calls and directions.
-- Documents and calendar. Separate PET/biopsy/cancer documents from CBC/LFT/KFT monitoring; show dated results together. Prioritise chemotherapy/radiotherapy milestones. Medication reminders should come from typed prescriptions, not manual entry or handwriting.
-- Reduce clutter. Remove cost-help/fundraising and family tasks from the main flow. Keep home help focused on nursing, transport and medicines/supplies; remove caregiver-break and paperwork items.
+- Keep the app simple: Patient & family entry, three home groups, direct feature pages and a quick care-note QR.
+- Use the team's clinical form. Reuse profile details, record who joined each discussion, let the doctor sign first, then let the patient/family review that exact version. Keep Finish later and previous-note context.
+- Keep the symptom diary, journal and palliative-care map. Separate cancer documents from monitoring results; prioritise treatment milestones. Medicine reminders should come from reviewed typed prescriptions.
+- Keep home help to nursing, transport and medicines/equipment. The meeting removed fundraising, cost-help and daily family tasks from the main flow.
 
-ACTIONS
+ALREADY IN THE APP
 
-- Apply the agreed navigation, scope and clinical note changes. Owner: Team / TBD.
-- Investigate state medical-registration verification and multi-speaker transcription. Owner: Team / TBD.
-- Add search/briefing from uploaded documents, with source citations and a clear not-found result. Assess typed-prescription alerts. Owner: Team / TBD.
-- Revise the eight-slide deck around the care conversation; include the product URL/QR and walkthrough/repository links. Owner: Team / TBD.
+[x] Grouped home, separate routes, Patient & family entry and editable profile.
+[x] Care-note review screens, typed signatures, version history and PDF export.
+[x] Grouped reports, dated results, treatment calendar and separate symptom ratings.
+[x] Palliative-care markers/directions, focused home-help categories and journal.
+
+NEXT ACTIONS
+
+[ ] Complete the core flow. Finish the clinical form, account/registration checks, consented family access and controlled sharing. Connect conversation transcription and document answers with sources and human review.
+[ ] Align with Family & Caregiver Support (added 22 September). Keep goals-of-care central; connect appointments, medicines, care instructions, milestones, practical help, costs and emotional support through simple shared tasks, education and timely alerts. Revisit only the useful cost/task features; keep fundraising out.
+[ ] Validate and finish the entry. Check extraction, reminders, centre details and the clinician/family journey. Revise the 6-8 slide deck around one complete care journey, with the product URL/QR and walkthrough. Keep AI assistive and remove any clinical scoring or advice from accessible routes.
 
 REVIEW AND SUBMISSION
 
-Next review proposed for the 23rd; final review/upload target the 24th; deadline discussed as the 25th. Month/year and meeting time were not stated.
+Review: 23rd. Finalise/upload: 24th. Deadline discussed: 25th.
 
-OPEN ITEMS
-
-- External doctors must be able to read a shared note without installing the app. Single-use links, QR access, downloading/printing and the limits of revocation still need resolution.
-- Community/support groups, private-journal data use and privacy requirements remain open. Verify additional centre facilities, including imaging and ambulance services; validate extraction and reminder accuracy.
-
-Source: source-materials/meetings/2026-09-21-transcript.txt (1,209 lines), preserved unchanged.
+Full transcript saved unchanged. Detailed gaps and official use-case mapping: Truly Left.md.
