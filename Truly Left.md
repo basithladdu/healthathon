@@ -4,15 +4,22 @@ Updated 24 September 2026. Entry: **Cancer > Patient / Caregiver > Family & Care
 
 ## Latest meeting: what changed
 
+- [x] **Make uploads easy to find.** Upload from Home, My documents or Medicines. Pick the file, check its folder and date, and save. Extra text is optional. If you upload a prescription, the app takes you back to adding the medicine with that prescription attached.
+- [x] **Let the doctor finish signing.** Their name is already filled in. If something needs checking, the app says what. After signing, it opens that same note. Anything copied from an earlier conversation needs the doctor to confirm it still applies.
+- [x] **Show the day on Home.** The four primary sections are My documents, Find support, My space and Calendar. Today's medicines and appointments, or the next scheduled items, appear above Quick access. Incoming tasks show the sender.
+- [x] **Say who is doing the job.** “Bring reports” now goes to a named person. They accept it, then mark it done. The person who asked can see what happened. This works when switching roles in the app; sharing between different phones still needs connecting.
+- [x] **Shorten visit preparation.** The next recorded appointment and its instructions lead; questions and practical help use one optional composer. Transport help is assigned, not presented as a booked service.
+- [x] **Update the submission wording.** The revised answers include the supporting features and distinguish the working app from planned AI and account integrations. The opening story uses best supportive care and does not include a death outcome. See [the revised answers](submission/Round_1_Answers_2026-09-24.md) and [chat decisions](docs/meetings/2026-09-23-chat-follow-up.md).
+
 - [x] **Ask to talk.** Patients and family can request a care conversation, choose topics, edit or cancel it, and see its status.
 - [x] **Follow it through.** The doctor can pick up the request, record the conversation, finish later, review and sign. The request then opens that exact signed version. A later discussion gets a new request.
 - [x] **Keep the earlier discussion in view.** The recording page shows the previous signed note and the patient's request separately from today's conversation. Earlier priorities, questions and next steps can carry forward for review; today's participants are not assumed.
 - [x] **Capture the missing details.** A compact, optional structured editor covers values, priorities, attendees, decision-makers, understanding, clinical context, agreed decisions, unresolved matters and follow-up. Populated details follow the note into review, signing and PDF.
-- [x] **Fix the home hierarchy.** My documents, Find support and My space come first. Quick access sits below them.
+- [x] **Fix the home hierarchy.** My documents, Find support, My space and Calendar come first. Quick access sits below the daily plan.
 - [x] **Help find prescribed morphine.** A separate support page connects an entered area to the palliative-care map, links the directory, and keeps a contact/enquiry with call, copy, follow-up and undo.
 - [ ] **Obtain the dispensing-centre list.** The map lists care centres. It does not establish which institution dispenses oral morphine or what is available today. The team still needs the promised source list.
 
-These are interactive app flows using the existing browser data. Real account verification, cross-device delivery and connected AI remain open. [Meeting decisions and actions](docs/meetings/2026-09-23-actions.md).
+You can click through these steps in the app. Real sign-in checks, sharing between phones and the AI connection are still left. [Meeting decisions and actions](docs/meetings/2026-09-23-actions.md).
 
 ## What this is for
 
@@ -68,7 +75,7 @@ These ticks mean the feature exists in the app. Shared accounts, service connect
 
 This follows Basith's 22-23 September requests. The meeting had removed cost-help and family tasks from the main flow; the changes below are a later product decision, not a rewrite of that meeting. Keep fundraising and payment collection out of this plan.
 
-- [ ] **Make the weekly plan genuinely shared.** The calendar and editable named tasks now connect. Finish separate-user delivery, acceptance/reassignment and shared updates across devices. Use the existing records; do not make the family fill another long form.
+- [ ] **Make the weekly plan genuinely shared.** The calendar and named tasks now connect, including acceptance/completion in the app. Finish separate-user delivery, reassignment and shared updates across devices. Use the existing records; do not make the family fill another long form.
 - [ ] **Finish prescription import.** The user can choose a saved original, reuse an exact line, check the time/dates and confirm the schedule. Automatic medicine-name/value extraction and refill reminders remain open. Do not invent doses or interpret handwriting.
 - [ ] **Useful updates and alerts.** Send the right person a confirmed appointment reminder, changed-plan update or agreed task reminder. Include acknowledgement, preferences and quiet hours. Calendar dots and saved entries are not delivered notifications.
 - [ ] **Care instructions people can understand.** Bring forward the care team's instructions, warning signs and contact plan in plain language. Allow reviewed translations. Include relevant lifestyle and home-care instructions already given by the clinician; do not generate fresh medical advice.
@@ -83,7 +90,8 @@ This follows Basith's 22-23 September requests. The meeting had removed cost-hel
 - [ ] **Carry review and corrections through every AI step.** The person can edit, reject or retry an output. Record the source, changes, reviewer and approved version. A note history on one browser is not the full shared audit system.
 - [ ] **Check language and effort with actual users.** Choose the pilot languages, complete the important screens and reviewed care-note translations, then observe a doctor and a patient/caregiver completing the core journey. Measure taps and time; do not just count translated labels.
 - [ ] **Run a 60-90 day operational pilot.** Establish a baseline for time spent writing/retrieving a care note, time a family needs to find the next step, and completion/acknowledgement of agreed tasks. Track extra doctor effort and errors too. Record results before claiming impact; no clinical outcome claims from a UI walkthrough.
-- [ ] **Finish the Round 1 package.** Keep the portal classification and answers consistent with this purpose. Revise the 6-8 slide deck, show one complete care journey, include the working URL/QR and walkthrough, and upload/submit. The submission is not complete merely because the app is deployed.
+- [x] **Get the new deck ready.** The [8-slide deck](submission/Saanthvana_Round_1_2026-09-24.pptx) uses the revised story, real app screens, the main AI idea and the team's names. The AI connection is marked as the next step. The wording is plain and the slides have been viewed.
+- [ ] **Finish the Round 1 entry.** Paste the [revised answers](submission/Round_1_Answers_2026-09-24.md) into the portal, upload the deck and submit. Chrome disconnected before the answers could be changed. The live app does not mean the competition entry has been submitted.
 
 ## Every part of the caregiver brief
 
