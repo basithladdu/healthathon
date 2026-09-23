@@ -1,0 +1,41 @@
+.care-conversation-request { box-sizing:border-box; min-width:0; padding:20px; border:1px solid #e9c981; border-radius:22px; color:#483a30; background:linear-gradient(135deg,#fff0cc 0%,#f9e3cf 52%,#f2e6f7 100%); font-family:var(--font-inter),sans-serif; }
+.care-conversation-request * { box-sizing:border-box; }
+.care-conversation-request :is(h2,p,fieldset) { margin:0; }
+.care-request-head { display:flex; align-items:center; gap:12px; }
+.care-request-head h2 { font:650 21px/1.25 var(--font-sora),sans-serif; letter-spacing:-.35px; }
+.care-request-mark { display:grid; place-items:center; width:38px; height:38px; flex:none; border-radius:13px; color:#8a4e32; background:#fffbf0; font-size:21px; }
+.care-request-intro { max-width:600px; margin-top:10px!important; color:#685343; font-size:13px; line-height:1.6; }
+.care-request-compose { display:grid; gap:11px; margin-top:17px; }
+.care-request-compose fieldset { min-width:0; padding:0; border:0; }
+.care-request-compose legend,.care-request-note-label { display:block; margin-bottom:8px; color:#594638; font-size:12px; font-weight:650; }
+.care-request-compose legend span,.care-request-note-label span { margin-left:5px; color:#8b7866; font-size:10px; font-weight:500; }
+.care-request-topics { display:flex; flex-wrap:wrap; gap:7px; }
+.care-conversation-request button { min-height:40px; border:1px solid #d7c6ac; border-radius:999px; padding:8px 12px; color:#654b37; background:#fffaf0; font:600 11px/1.35 var(--font-inter),sans-serif; cursor:pointer; }
+.care-conversation-request button:focus-visible,.care-conversation-request textarea:focus-visible { outline:3px solid #80609a; outline-offset:2px; }
+.care-request-topics button[aria-pressed=true] { border-color:#9a623f; color:#fff; background:#9a623f; }
+.care-conversation-request textarea { width:100%; min-width:0; resize:vertical; padding:10px 12px; border:1px solid #dbcab4; border-radius:12px; color:#483a30; background:#fffdf7; font:400 13px/1.5 var(--font-inter),sans-serif; }
+.care-request-compose-actions,.care-request-actions { display:flex; flex-wrap:wrap; align-items:center; gap:7px; }
+.care-conversation-request .care-request-send { border-color:#914a35; color:#fff; background:#a9573b; }
+.care-conversation-request .care-request-secondary { background:#fffaf0; }
+.care-conversation-request .care-request-cancel { border-color:transparent; color:#86583e; background:transparent; }
+.care-request-current { margin-top:15px; padding-top:14px; border-top:1px solid #d8c5aa; }
+.care-request-status { display:flex; align-items:center; gap:8px; font-size:13px; }
+.care-request-status-dot { width:9px; height:9px; border-radius:50%; background:#c27b36; }
+.care-request-status-dot.is-in-progress { background:#78529a; }
+.care-request-status-dot.is-completed { background:#5a7947; }
+.care-request-topic-list { display:flex; flex-wrap:wrap; gap:6px; padding:0; margin:10px 0 0; list-style:none; }
+.care-request-topic-list li { padding:5px 9px; border-radius:999px; color:#694d38; background:#fff8e8; font-size:10px; }
+.care-request-current .care-request-note { margin-top:9px!important; color:#5f5044; font-size:12px; line-height:1.55; white-space:pre-wrap; overflow-wrap:anywhere; }
+.care-request-current > small { display:block; margin-top:9px; color:#80705f; font-size:10px; }
+.care-conversation-request .care-request-link { margin-top:10px; border-color:transparent; padding:5px 0; color:#527344; background:transparent; }
+.care-conversation-request .care-request-another { display:flex; margin-top:10px; border-color:#d8b98e; color:#775034; background:#fff8e8; }
+.care-request-previous { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:4px 10px; padding-bottom:9px; border-bottom:1px solid #e1d3c0; }
+.care-request-previous .care-request-topic-list,.care-request-previous .care-request-note,.care-request-previous > small { grid-column:1/-1; }
+.care-request-previous .care-request-link { margin:0; }
+.care-request-current .care-request-actions { margin-top:12px; }
+@media(max-width:600px) {
+  .care-conversation-request { padding:16px; border-radius:18px; }
+  .care-request-head h2 { font-size:19px; }
+  .care-request-topics { gap:6px; }
+  .care-conversation-request button { min-height:42px; }
+}

@@ -1,6 +1,18 @@
 # Truly Left
 
-Updated 23 September 2026. Entry: **Cancer > Patient / Caregiver > Family & Caregiver Support**.
+Updated 24 September 2026. Entry: **Cancer > Patient / Caregiver > Family & Caregiver Support**.
+
+## Latest meeting: what changed
+
+- [x] **Ask to talk.** Patients and family can request a care conversation, choose topics, edit or cancel it, and see its status.
+- [x] **Follow it through.** The doctor can pick up the request, record the conversation, finish later, review and sign. The request then opens that exact signed version. A later discussion gets a new request.
+- [x] **Keep the earlier discussion in view.** The recording page shows the previous signed note and the patient's request separately from today's conversation. Earlier priorities, questions and next steps can carry forward for review; today's participants are not assumed.
+- [x] **Capture the missing details.** A compact, optional structured editor covers values, priorities, attendees, decision-makers, understanding, clinical context, agreed decisions, unresolved matters and follow-up. Populated details follow the note into review, signing and PDF.
+- [x] **Fix the home hierarchy.** My documents, Find support and My space come first. Quick access sits below them.
+- [x] **Help find prescribed morphine.** A separate support page connects an entered area to the palliative-care map, links the directory, and keeps a contact/enquiry with call, copy, follow-up and undo.
+- [ ] **Obtain the dispensing-centre list.** The map lists care centres. It does not establish which institution dispenses oral morphine or what is available today. The team still needs the promised source list.
+
+These are interactive app flows using the existing browser data. Real account verification, cross-device delivery and connected AI remain open. [Meeting decisions and actions](docs/meetings/2026-09-23-actions.md).
 
 ## What this is for
 
@@ -47,7 +59,7 @@ These ticks mean the feature exists in the app. Shared accounts, service connect
 ## First: finish the care conversation
 
 - [x] **Keep the older clinical tools out of the submitted flow.** Legacy `/workspace/*` URLs now resolve to the supported care screens; the older views cannot be opened through the route permission check. The submitted flow has no prognosis scoring, triage or treatment/dose tools. The old implementation remains in source and should be retired separately.
-- [ ] **Complete the actual care-note form.** Map every agreed field in the team's form, keep participants and agreement specific to each discussion, and have the clinicians review the completed flow. The current five-section note has prompts, not full structured form coverage.
+- [ ] **Have the clinicians review the care-note form.** The five-section note now includes a compact structured editor based on the team's questionnaire. Separate treatment-choice matrices, capacity/witness declarations and a legal directive workflow are not implemented. Participants and agreement must stay specific to each discussion.
 - [ ] **Finish the voice workflow for a busy doctor.** Recording, browser captions and source-based note preparation are available. Reliable uploaded-audio transcription, speaker identification and connected AI remain unfinished. Keep consent and source audio/text traceable; the doctor corrects the note before signing.
 - [ ] **Let the family genuinely receive and review it.** Separate accounts, patient-controlled access, shared storage, exact-version acknowledgement and an audit trail must work across devices. Entering an ABHA or council number does not verify identity.
 - [ ] **Finish sharing with the next doctor.** A readable phone view, PDF and QR/link with controlled access, expiry and revocation. Do not promise that a downloaded PDF can be recalled. A typed name is not a verified digital signature or a legal advance directive.

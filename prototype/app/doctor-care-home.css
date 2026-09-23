@@ -13,6 +13,23 @@
 .doctor-overview-cards span { grid-column:1/-1; font-size:14px; margin-top:7px; }
 .doctor-home-grid { display:grid; grid-template-columns:minmax(0,1.05fr) minmax(0,1fr); gap:20px; align-items:start; }
 .doctor-home-panel { background:#fffdf9; border:1px solid #e0e5eb; border-radius:20px; padding:18px; min-width:0; }
+.doctor-conversation-queue { margin-bottom:20px; background:linear-gradient(120deg,#fff4dd,#f2e9f7); border-color:#e8d5b7; }
+.doctor-conversation-queue .family-section-heading > span { display:grid; place-items:center; min-width:26px; height:26px; padding:0 7px; border-radius:999px; color:#765632; background:#fffaf0; font-size:11px; }
+.doctor-conversation-queue ul { list-style:none; padding:0; margin:0; }
+.doctor-conversation-queue li { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:12px; align-items:center; padding:12px 0; border-top:1px solid #e7d8c4; }
+.doctor-conversation-person { display:flex; align-items:center; gap:10px; min-width:0; }
+.doctor-conversation-person > div:last-child { min-width:0; }
+.doctor-conversation-person strong { display:block; font-size:14px; }
+.doctor-conversation-person span,.doctor-conversation-person small { display:block; margin-top:4px; color:#766657; font-size:11px; line-height:1.45; overflow-wrap:anywhere; }
+.doctor-conversation-status { display:grid; justify-items:end; gap:5px; }
+.doctor-conversation-status > span { color:#766657; font-size:10px; }
+.doctor-conversation-status button { display:flex; align-items:center; gap:5px; min-height:38px; padding:7px 10px; border:1px solid #cdb99d; border-radius:999px; color:#684d35; background:#fffaf1; font-size:11px; white-space:nowrap; }
+.doctor-conversation-status button svg { width:14px; height:14px; }
+.doctor-conversation-status button:disabled { opacity:.5; cursor:not-allowed; }
+.doctor-conversation-empty { margin:10px 0 2px; color:#766657; font-size:12px; }
+.doctor-conversation-history { margin-top:9px; border-top:1px solid #e7d8c4; }
+.doctor-conversation-history summary { min-height:44px; display:flex; align-items:center; color:#684d35; font-size:12px; font-weight:650; cursor:pointer; }
+.doctor-conversation-history ul { margin-bottom:2px; }
 .doctor-home-panel .family-section-heading { margin-bottom:8px; flex-wrap:wrap; gap:8px; }
 .doctor-patient-queue,.doctor-visit-list { list-style:none; padding:0; margin:0; }
 .doctor-patient-queue > li { display:grid; grid-template-columns:40px minmax(0,1fr) auto; gap:12px; padding:15px 0; border-bottom:1px solid #e8e5df; align-items:center; }
@@ -49,4 +66,7 @@
   .doctor-overview-cards span{font-size:12px;}.doctor-home-panel{padding:14px;}.doctor-patient-queue > li{grid-template-columns:30px minmax(0,1fr) auto;gap:8px;}
   .doctor-patient-initial{height:34px;}.doctor-patient-queue strong{font-size:14px;}.doctor-patient-queue button{font-size:12px;}
   .care-agenda-list > li > .visit-instructions { grid-column:1/-1; }
+  .doctor-conversation-queue { padding:14px; margin-bottom:14px; }
+  .doctor-conversation-queue li { grid-template-columns:minmax(0,1fr); gap:9px; }
+  .doctor-conversation-status { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; }
 }

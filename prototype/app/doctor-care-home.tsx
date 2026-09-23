@@ -5,13 +5,17 @@ import type { Appointment } from './appointments-page';
 import { latestSummaryRelease, type SummaryState } from './summary-state';
 import { VisitInstructions } from './visit-instructions';
 import { IconUsers, IconFileText, IconClock, IconCheckCircle, IconArrowRight } from './icons';
+import type { CareConversationRequest } from './care-conversation-request-state';
 
-export function DoctorCareHome({ patients, records, appointments, physician, today, hindi, onReview, onRecord, onHistory, onInstructions }: {
+export function DoctorCareHome({ patients, records, appointments, physician, today, hindi, conversationRequests = [], onReview, onRecord, onHistory, onInstructions, onStartConversationRequest, onOpenConversationVersion }: {
   patients: Array<{ id: string; name: string; diagnosis: string }>; records: Record<string, SummaryState>;
   appointments: Appointment[]; physician: string; today: string; hindi: boolean;
+  conversationRequests?: CareConversationRequest[];
   onReview: (patientId: string) => void;
   onRecord: (patientId?: string) => void; onHistory: (patientId?: string) => void;
   onInstructions: (patientId: string, appointmentId: string, value: Appointment['preparationInstructions']) => void;
+  onStartConversationRequest?: (id: string) => void;
+  onOpenConversationVersion?: (patientId: string, version: number) => void;
 }) {
   const [query, setQuery] = useState('');
   const [onlyPending, setOnlyPending] = useState(false);
@@ -23,10 +27,23 @@ export function DoctorCareHome({ patients, records, appointments, physician, tod
   const upcoming = appointments.filter((visit) => patientIds.has(visit.hospitalId) && visit.status === 'Scheduled' && visit.date >= today).sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`));
   const visiblePatients = (onlyPending ? pending : patients).filter((patient) => `${patient.name} ${patient.id} ${patient.diagnosis}`.toLowerCase().includes(query.trim().toLowerCase()));
   const visibleVisits = schedule === 'today' ? upcoming.filter((visit) => visit.date === today) : upcoming;
+  const activeConversationRequests = conversationRequests.filter((request) => request.status === 'requested' || request.status === 'in-progress').sort((a, b) => a.status === b.status ? a.createdAt.localeCompare(b.createdAt) : a.status === 'requested' ? -1 : 1);
+  const completedConversationRequests = conversationRequests.filter((request) => request.status === 'completed' && request.signedVersion).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+  const renderConversationRequest = (request: CareConversationRequest) => {
+    const patient = patients.find((item) => item.id === request.patientId);
+    const completed = request.status === 'completed' && Boolean(request.signedVersion);
+    return <li key={request.id}><div className="doctor-conversation-person"><div className="doctor-patient-initial" aria-hidden="true">{patient?.name.split(' ').map((part) => part[0]).slice(0, 2).join('') ?? '·'}</div><div><strong>{patient?.name ?? request.patientId}</strong><span>{request.requestedBy} · {request.role === 'family' ? t('Family', 'परिवार') : t('Patient', 'मरीज़')}</span><small>{request.topics.length ? request.topics.join(' · ') : request.note || t('No topic added', 'विषय नहीं जोड़ा')}</small></div></div>
+      <div className="doctor-conversation-status">{completed ? <><span>{t('Recorded', 'दर्ज')}</span><button type="button" disabled={!onOpenConversationVersion} onClick={() => onOpenConversationVersion?.(request.patientId, request.signedVersion!)}>{t('Open signed note', 'हस्ताक्षरित नोट खोलें')} <IconArrowRight /></button></> : <><span>{request.status === 'in-progress' ? t('In progress', 'जारी है') : t('Requested', 'अनुरोध')}</span><button type="button" disabled={!onStartConversationRequest} className="care-text-button" onClick={() => onStartConversationRequest?.(request.id)}>{request.status === 'in-progress' ? t('Continue', 'जारी रखें') : t('Start conversation', 'बातचीत शुरू करें')} <IconArrowRight /></button></>}</div>
+    </li>;
+  };
   const dateLabel = (date: string) => new Date(`${date}T12:00:00`).toLocaleDateString(hindi ? 'hi-IN' : 'en-GB', { day: 'numeric', month: 'short' });
   return <section className="doctor-care-home">
     <header className="doctor-care-heading"><div><h1>{t('Care team', 'देखभाल टीम')}</h1><span>{physician}</span></div><label className="doctor-patient-search"><span className="sr-only">{t('Find a patient', 'मरीज़ ढूँढें')}</span><input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t('Find a patient', 'मरीज़ ढूँढें')} /></label></header>
     <div className="doctor-home-actions"><button type="button" className="primary-button" onClick={() => onRecord()}><IconFileText />{t('Record conversation', 'बातचीत दर्ज करें')}</button><button type="button" className="secondary-button" onClick={() => onHistory()}><IconClock />{t('Note history', 'पुराने नोट')}</button></div>
+    {(activeConversationRequests.length > 0 || completedConversationRequests.length > 0) && <section className="doctor-home-panel doctor-conversation-queue" aria-labelledby="doctor-conversation-queue-title"><div className="family-section-heading"><h2 id="doctor-conversation-queue-title">{t('Conversation requests', 'बातचीत के अनुरोध')}</h2><span>{activeConversationRequests.length}</span></div>
+      {activeConversationRequests.length > 0 ? <ul>{activeConversationRequests.map(renderConversationRequest)}</ul> : <p className="doctor-conversation-empty">{t('No open conversation requests.', 'बातचीत के खुले अनुरोध नहीं हैं।')}</p>}
+      {completedConversationRequests.length > 0 && <details className="doctor-conversation-history"><summary>{t('Recorded conversations', 'दर्ज बातचीत')} · {completedConversationRequests.length}</summary><ul>{completedConversationRequests.map(renderConversationRequest)}</ul></details>}
+    </section>}
     <div className="doctor-overview-cards">
       <button type="button" onClick={() => { setOnlyPending(false); document.getElementById('doctor-patient-queue')?.scrollIntoView({ block: 'nearest' }); }}><IconUsers /><strong>{patients.length}</strong><span>{t('People in care', 'देखभाल में लोग')}</span></button>
       <button type="button" onClick={() => { setOnlyPending(true); document.getElementById('doctor-patient-queue')?.scrollIntoView({ block: 'nearest' }); }}><IconFileText /><strong>{pending.length}</strong><span>{t('Notes to review', 'जाँचने के नोट')}</span></button>

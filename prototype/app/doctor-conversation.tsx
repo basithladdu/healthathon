@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { IconFileText, IconSparkles, IconClock } from './icons';
 import { CARE_NOTE_LABELS, organiseConversation, type AssistedNote, type DoctorConversationEntry } from './doctor-conversation-state';
+import type { DraftFieldKey } from './summary-state';
 
 type RecognitionEvent = { resultIndex: number; results: ArrayLike<{ isFinal: boolean; 0: { transcript: string } }> };
 type Recognition = { continuous: boolean; interimResults: boolean; lang: string; start: () => void; stop: () => void; abort: () => void; onresult: ((event: RecognitionEvent) => void) | null; onerror: ((event: { error: string }) => void) | null; onend: (() => void) | null };
@@ -25,9 +26,11 @@ export function ConversationAudio({ file }: { file: File }) {
   return <audio controls preload="metadata" src={url} aria-label="Conversation recording" />;
 }
 
-export function DoctorConversation({ patientId, patientName, patients, physician, initialNote, referenceNote, hindi, onPatient, onSave, onHistory }: {
+export function DoctorConversation({ patientId, patientName, patients, physician, initialNote, referenceNote, previousContext, requestContext, hindi, onPatient, onSave, onHistory }: {
   patientId: string; patientName: string; patients: Array<{ id: string; name: string }>; physician: string;
   initialNote: string; referenceNote?: string; hindi: boolean; onPatient: (id: string) => void;
+  previousContext?: { version: number; releasedAt: string; fields: Readonly<Record<DraftFieldKey, string>> | null };
+  requestContext?: { requestedBy: string; topics: string[]; note: string };
   onSave: (entry: DoctorConversationEntry, draft?: AssistedNote) => void; onHistory: () => void;
 }) {
   const [note, setNote] = useState(initialNote);
@@ -136,6 +139,10 @@ export function DoctorConversation({ patientId, patientName, patients, physician
   return <section className="doctor-conversation">
     <header className="doctor-page-heading"><div><span className="doctor-eyebrow">{physician}</span><h1>{t('Record a conversation', 'बातचीत दर्ज करें')}</h1></div><select aria-label="Patient" value={patientId} disabled={recording || starting || busy} onChange={(event) => onPatient(event.target.value)}>{patients.map((person) => <option key={person.id} value={person.id}>{person.name}</option>)}</select></header>
     <div className="doctor-note-steps" aria-label="Care note steps"><strong><span>1</span> {t('Conversation', 'बातचीत')}</strong><span><span>2</span> {t('Review & sign', 'जाँचें और हस्ताक्षर करें')}</span><button type="button" onClick={onHistory}><IconClock /> {t('Note history', 'पुराने नोट')}</button></div>
+    {requestContext && <section className="doctor-request-context"><h2>Requested discussion</h2><p>From {requestContext.requestedBy}</p>{requestContext.topics.length > 0 && <ul>{requestContext.topics.map((topic, index) => <li key={`${topic}-${index}`}>{topic}</li>)}</ul>}{requestContext.note.trim() && <p>{requestContext.note}</p>}</section>}
+    {previousContext && <details className="doctor-previous-discussion"><summary><strong>Previous signed discussion · Version {previousContext.version}</strong><time dateTime={previousContext.releasedAt}>{new Date(previousContext.releasedAt).toLocaleDateString('en-GB')}</time></summary>{previousContext.fields && <dl>{(Object.keys(CARE_NOTE_LABELS) as DraftFieldKey[]).filter((key) => {
+      const value = previousContext.fields?.[key]?.trim(); return Boolean(value && value !== 'Not stated in this conversation.');
+    }).map((key) => <div key={key}><dt>{CARE_NOTE_LABELS[key]}</dt><dd>{previousContext.fields?.[key]}</dd></div>)}</dl>}</details>}
     <div className="doctor-capture-grid">
       <section className={`doctor-record-card ${recording ? 'is-recording' : ''}`}>
         <div className="doctor-record-orb" aria-hidden="true"><svg viewBox="0 0 48 48"><rect x="17" y="6" width="14" height="25" rx="7"/><path d="M11 23v2a13 13 0 0 0 26 0v-2M24 38v6M17 44h14" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/></svg></div>
@@ -147,7 +154,7 @@ export function DoctorConversation({ patientId, patientName, patients, physician
         {audio && <div className="doctor-audio-review"><ConversationAudio file={audio} /><button type="button" className="care-text-button" disabled={busy} onClick={() => setAudio(undefined)}>Remove recording</button></div>}
       </section>
       <section className="doctor-transcript-card"><div className="family-section-heading"><h2><IconFileText /> {t('Conversation note', 'बातचीत का नोट')}</h2><span>{patientName.split(' ')[0]}</span></div>
-        {referenceNote?.trim() && !note.trim() && !audio && !recording && !starting && <button className="care-text-button" type="button" disabled={busy} onClick={() => { setNote(referenceNote); setMessage(''); }}>{t('Use latest conversation', 'पिछली बातचीत लें')}</button>}
+        {!previousContext && referenceNote?.trim() && !note.trim() && !audio && !recording && !starting && <button className="care-text-button" type="button" disabled={busy} onClick={() => { setNote(referenceNote); setMessage(''); }}>{t('Use latest conversation', 'पिछली बातचीत लें')}</button>}
         <textarea aria-label="Conversation note" value={note} disabled={busy} maxLength={12000} rows={12} onChange={(event) => setNote(event.target.value)} placeholder={t('Record, type, or paste the conversation here.', 'बातचीत रिकॉर्ड करें, लिखें या यहाँ पेस्ट करें।')} />
         {interim && <p className="doctor-caption" aria-live="polite">{interim}</p>}
         <div className="doctor-note-actions"><button className="primary-button" type="button" disabled={recording || starting || busy || (!note.trim() && !audio)} onClick={() => { if (note.trim()) void assist(); else save(); }}>{note.trim() && <IconSparkles />}{busy ? t('Preparing care note…', 'देखभाल नोट तैयार हो रहा है…') : !note.trim() && audio ? t('Save recording', 'रिकॉर्डिंग सेव करें') : t('Prepare care note', 'देखभाल नोट तैयार करें')} →</button></div>

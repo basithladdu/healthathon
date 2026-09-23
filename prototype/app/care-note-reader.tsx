@@ -13,14 +13,15 @@ import { CARE_NOTE_KIND_LABELS, careNoteReleaseId, createCareNoteAcknowledgement
 const KEYS: DraftFieldKey[] = ['followUp', 'priorities', 'topics', 'participants', 'openQuestions'];
 const NOT_STATED = 'Not stated in this conversation.';
 
-export function CareNoteReader({ patientId, patientName, releases, hindi, conversations = [], doctor = false, patients, onPatient, onRecord, onPrepare, acknowledgements = [], signerName, signerRole, onAcknowledge, onFinishLater }: {
+export function CareNoteReader({ patientId, patientName, releases, hindi, conversations = [], doctor = false, patients, onPatient, onRecord, onPrepare, acknowledgements = [], signerName, signerRole, onAcknowledge, onFinishLater, initialVersion }: {
   patientId: string; patientName: string; releases: readonly SummaryRelease[]; hindi: boolean;
   conversations?: readonly DoctorConversationEntry[]; doctor?: boolean;
   patients?: Array<{ id: string; name: string }>; onPatient?: (id: string) => void; onRecord?: () => void; onPrepare?: () => void;
   acknowledgements?: readonly CareNoteAcknowledgement[]; signerName?: string; signerRole?: CareNoteSignerRole;
   onAcknowledge?: (acknowledgement: CareNoteAcknowledgement) => void; onFinishLater?: () => void;
+  initialVersion?: number;
 }) {
-  const [selectedNumber, setSelectedNumber] = useState<number>();
+  const [selectedNumber, setSelectedNumber] = useState<number | undefined>(initialVersion);
   const [tab, setTab] = useState<'notes' | 'conversations'>('notes');
   const [comparing, setComparing] = useState(false);
   const [downloading, setDownloading] = useState(false);

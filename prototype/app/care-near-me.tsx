@@ -97,6 +97,13 @@ export function CareNearMe({ homeAddress }: CareNearMeProps): React.JSX.Element 
   useEffect(() => () => { originRequest.current?.abort(); centreRequest.current?.abort(); locationRequest.current += 1; }, []);
 
   useEffect(() => {
+    const location = new URLSearchParams(window.location.search).get('location')?.trim().slice(0, 160);
+    if (!location) return;
+    setStartText(location);
+    void findOrigin(location);
+  }, []);
+
+  useEffect(() => {
     if (!origin) { setPlaces([]); setNearbyStatus('idle'); return; }
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 14000);
@@ -152,12 +159,15 @@ export function CareNearMe({ homeAddress }: CareNearMeProps): React.JSX.Element 
   async function searchOrigin(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!startText.trim()) { startInput.current?.focus(); return; }
+    await findOrigin(startText.trim());
+  }
+  async function findOrigin(location: string) {
     originRequest.current?.abort(); locationRequest.current += 1;
     const controller = new AbortController(); originRequest.current = controller;
     const timeout = setTimeout(() => controller.abort(), 12000);
     setFindingOrigin(true); setOriginMatches([]); setLocationMessage('');
     try {
-      const matches = (await photon(startText.trim(), controller.signal)).map(matchOf).filter((match): match is SearchMatch => Boolean(match));
+      const matches = (await photon(location, controller.signal)).map(matchOf).filter((match): match is SearchMatch => Boolean(match));
       if (originRequest.current !== controller) return;
       if (matches.length === 1) chooseOrigin(matches[0]);
       else { setOriginMatches(matches); if (!matches.length) setLocationMessage('No matching place. Add a city or a fuller address.'); }

@@ -111,7 +111,7 @@ function NextVisitForPatient({ patientId, patientName, author, today, hindi, app
     finally { setSavingPdf(false); }
   }
 
-  return <section className="care-next-visit" aria-labelledby={`${id}-heading`}>
+  return <section className="care-next-visit-page" aria-labelledby={`${id}-heading`}>
     <header className="next-visit-heading"><div><span>{patientName}</span><h1 id={`${id}-heading`}>{t('Next visit', 'अगली मुलाकात')}</h1></div><button type="button" className="next-visit-download" disabled={savingPdf} onClick={savePdf}><VisitIcon kind="download" />{savingPdf ? t('Saving…', 'सेव हो रहा है…') : t('Save PDF', 'PDF सेव करें')}</button></header>
     {message && <p className="next-visit-message" role="status">{message}</p>}
     <div className="next-visit-top">

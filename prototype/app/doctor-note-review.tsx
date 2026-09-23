@@ -6,6 +6,7 @@ import { approveVisitNote } from './visit-note-state';
 import { CARE_NOTE_LABELS } from './doctor-conversation-state';
 import { CARE_NOTE_KIND_LABELS, DOCTOR_SIGNED_AWAITING_REVIEW, type CareNoteKind } from './care-note-signing-state';
 import { IconCheckCircle, IconClock } from './icons';
+import { CareDiscussionForm } from './care-discussion-form';
 
 const CLINICAL_REVIEW_PROMPTS: Record<DraftFieldKey, string> = {
   priorities: 'In the patient’s words: troubling symptoms, what matters, fears, unfinished matters and unacceptable outcomes.',
@@ -39,6 +40,7 @@ export function DoctorNoteReview({ patientId, patientName, patients, state, phys
       <div className="doctor-review-workbench"><section className="doctor-source-card"><div className="family-section-heading"><h2>Conversation</h2><button type="button" className="care-text-button" onClick={onEdit}>Edit note</button></div><p>{state.draftSource}</p></section>
         <section className="doctor-family-draft"><div className="family-section-heading"><h2>Family’s copy</h2><button className="care-text-button" type="button" onClick={() => setEditing(!editing)}>{editing ? 'Done editing' : 'Edit sections'}</button></div>{state.draftPriorVersion !== undefined && <p className="doctor-prior-context">Started from version {state.draftPriorVersion}. Check what still applies.</p>}
         <details className="doctor-prior-context"><summary className="care-text-button">Clinical review prompts</summary><p style={{ margin: '0 0 10px' }}>Use only the conversation and its sources.</p><dl style={{ margin: 0 }}>{(Object.keys(CARE_NOTE_LABELS) as DraftFieldKey[]).map((key) => <div key={key} style={{ marginBottom: 10 }}><dt><strong>{CARE_NOTE_LABELS[key]}</strong></dt><dd id={`${id}-prompt-${key}`} style={{ margin: '3px 0 0' }}>{CLINICAL_REVIEW_PROMPTS[key]}</dd></div>)}</dl></details>
+        <CareDiscussionForm key={patientId} fields={fields} onFields={(next) => { onFields(next); setReviewed(false); }} />
         <div className="doctor-draft-fields">{(Object.keys(CARE_NOTE_LABELS) as DraftFieldKey[]).map((key) => {
           const value = fields[key]; const empty = !value?.trim() || value === 'Not stated in this conversation.';
           return editing ? <label key={key}><span>{CARE_NOTE_LABELS[key]}{empty && <small> · Not discussed</small>}</span><textarea rows={3} value={empty ? '' : value} placeholder={CLINICAL_REVIEW_PROMPTS[key]} aria-describedby={`${id}-prompt-${key}`} onChange={(event) => { onFields({ ...fields, [key]: event.target.value }); setReviewed(false); }} /></label> : empty ? null : <section key={key} className={'is-' + key}><h3>{CARE_NOTE_LABELS[key]}</h3><p>{value}</p></section>;

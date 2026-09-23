@@ -1,0 +1,48 @@
+.care-medicine-access { display: grid; gap: 14px; width: 100%; max-width: 900px; margin: 0 auto; color: #3d322c; }
+.cma-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.cma-heading > div > p { margin: 0 0 3px; color: #795b80; font-size: 12px; font-weight: 650; }
+.cma-heading h1 { margin: 0; font: 500 clamp(27px, 3vw, 36px)/1.15 Georgia, 'Times New Roman', serif; letter-spacing: -.6px; }
+.cma-back { display: inline-flex; align-items: center; gap: 5px; min-height: 44px; padding: 8px 10px; border-radius: 11px; color: #614c6b; text-decoration: none; white-space: nowrap; }
+.cma-back svg { width: 17px; height: 17px; }
+.cma-search, .cma-questions, .cma-followup { min-width: 0; padding: 15px 17px; border: 1px solid #e1d4c4; border-radius: 17px; background: #fffdf9; }
+.cma-search { background: #f2edf8; border-color: #d8cae7; }
+.care-medicine-access h2 { margin: 0 0 10px; color: #4e3f50; font-size: 16px; font-weight: 650; }
+.cma-search-row { display: flex; align-items: stretch; gap: 8px; }
+.cma-search-row input { flex: 1; min-width: 0; }
+.cma-search-row > a, .cma-actions button, .cma-call { display: inline-flex; justify-content: center; align-items: center; min-height: 44px; padding: 9px 14px; border: 1px solid #bca8cf; border-radius: 11px; background: #fff; color: #51376c; font: inherit; font-size: 13px; font-weight: 650; text-decoration: none; cursor: pointer; }
+.cma-directory-links { display: flex; flex-wrap: wrap; gap: 6px 15px; margin-top: 9px; }
+.cma-directory-links a { color: #5a4770; font-size: 13px; line-height: 1.45; }
+.cma-boundary { margin: 9px 0 0; color: #65574f; font-size: 12px; line-height: 1.45; }
+.cma-questions ul { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 0; padding: 0; list-style: none; }
+.cma-questions li { padding: 10px 11px; border-radius: 12px; background: #fff2dc; color: #594735; font-size: 13px; line-height: 1.4; }
+.cma-followup { background: #eff6f0; border-color: #c9ddce; }
+.cma-followup-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.cma-followup-heading h2 { margin-bottom: 10px; }
+.cma-followup-heading select { min-height: 40px; padding: 7px 28px 7px 10px; border: 1px solid #b5cdbb; border-radius: 10px; background: white; color: #365140; font: inherit; font-size: 13px; }
+.cma-contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+.care-medicine-access label { display: grid; gap: 5px; min-width: 0; color: #5b4d43; font-size: 12px; font-weight: 620; }
+.care-medicine-access input, .care-medicine-access textarea { box-sizing: border-box; width: 100%; min-width: 0; min-height: 42px; padding: 9px 11px; border: 1px solid #d8cfc5; border-radius: 10px; background: #fff; color: #382e29; font: inherit; font-size: 14px; font-weight: 400; }
+.care-medicine-access textarea { min-height: 78px; resize: vertical; line-height: 1.45; }
+.cma-enquiry-field { margin-top: 9px; }
+.cma-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; margin-top: 9px; }
+.cma-actions .cma-call { border-color: #679b76; background: #2e7551; color: #fff; }
+.cma-actions .cma-undo { border-color: #d7bb86; background: #fff7e9; color: #684d25; }
+.cma-actions [role="status"] { color: #285b40; font-size: 12px; }
+.cma-saved { margin: 8px 0 0; color: #57725d; font-size: 11px; }
+.cma-visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.care-medicine-access :focus-visible { outline: 3px solid #764699; outline-offset: 2px; }
+@media(max-width: 650px) {
+  .care-medicine-access { gap: 10px; }
+  .cma-heading { align-items: flex-start; }
+  .cma-heading h1 { font-size: 27px; }
+  .cma-back { font-size: 12px; }
+  .cma-back svg { display: none; }
+  .cma-search, .cma-questions, .cma-followup { padding: 13px; border-radius: 15px; }
+  .cma-questions ul { grid-template-columns: 1fr; gap: 6px; }
+  .cma-questions li { padding: 8px 10px; }
+  .cma-search-row { flex-wrap: wrap; }
+  .cma-search-row input { flex-basis: 100%; }
+  .cma-search-row > a { flex: 1; }
+  .cma-contact-grid { grid-template-columns: 1fr; }
+  .cma-followup-heading { align-items: flex-start; }
+}

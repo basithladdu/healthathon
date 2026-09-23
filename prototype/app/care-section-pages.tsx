@@ -18,6 +18,7 @@ export const CARE_SECTIONS: Array<{ view: CareView; en: string; hi: string; art:
   ] },
   { view: 'access-care', en: 'Find support', hi: 'मदद ढूँढें', art: 'support-places', color: 'lavender', items: [
     { view: 'care-near-me', en: 'Palliative care centres', hi: 'पैलिएटिव देखभाल केंद्र', art: 'support-places' },
+    { view: 'medicine-access', en: 'Find prescribed morphine', hi: 'लिखी हुई मॉर्फ़ीन कहाँ मिलेगी', art: 'cancer-overview' },
     { view: 'home-help', en: 'Help at home', hi: 'घर पर मदद', art: 'home-help' },
     { view: 'care-circle', en: 'My care circle', hi: 'मेरे अपने', art: 'home-help' },
     { view: 'family-tasks', en: 'Who can help?', hi: 'कौन मदद करेगा?', art: 'home-help' },
@@ -26,6 +27,7 @@ export const CARE_SECTIONS: Array<{ view: CareView; en: string; hi: string; art:
     { view: 'my-doctors', en: 'My care team', hi: 'मेरी देखभाल टीम', art: 'doctor-pack' },
   ] },
   { view: 'my-space', en: 'My space', hi: 'मेरी जगह', art: 'voice-journal', color: 'mint', items: [
+    { view: 'request-conversation', en: 'Talk about what matters', hi: 'ज़रूरी बातों पर बात करें', art: 'care-story' },
     { view: 'symptom-diary', en: 'How I feel', hi: 'मैं कैसा महसूस कर रहा हूँ', art: 'symptom-diary' },
     { view: 'voice-journal', en: 'My journal', hi: 'मेरी डायरी', art: 'voice-journal' },
     { view: 'comfort', en: 'A moment for me', hi: 'मेरे लिए थोड़ा समय', art: 'voice-journal' },

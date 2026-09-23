@@ -8,6 +8,8 @@ export const CARE_ROUTES = {
   calendar: '/calendar',
   'next-visit': '/next-visit',
   medicines: '/medicines',
+  'medicine-access': '/medicine-access',
+  'request-conversation': '/talk-about-care',
   'care-circle': '/care-circle',
   'family-tasks': '/family-tasks',
   'visit-questions': '/next-visit-questions',
@@ -79,6 +81,7 @@ export function canOpenCareView(view: CareView, role: 'family' | 'patient' | 'ca
     if (view === 'my-details' || view === 'consent') return true;
     return !CARE_ROUTES[view].startsWith('/workspace/') && !CARE_ROUTES[view].startsWith('/doctor');
   }
+  if (view === 'request-conversation') return false;
   if (view === 'draft' || view === 'verify' || view === 'doctor-review' || view === 'doctor-record') return clinician.startsWith('Dr Sujay');
   if (view === 'outreach') return clinician.startsWith('Anitha Rao');
   return true;

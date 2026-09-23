@@ -49,6 +49,8 @@ const VIEW_PERMISSION: Record<string, CareCirclePermission> = {
   'symptom-diary': 'careNote', 'how-i-feel': 'careNote',
   calendar: 'calendar', 'next-visit': 'calendar', medicines: 'calendar', tasks: 'calendar', 'family-tasks': 'calendar', 'visit-questions': 'calendar', 'next-visit-questions': 'calendar',
   'prepare-conversation': 'calendar', 'prepare-for-a-visit': 'calendar', 'open-questions': 'calendar', questions: 'calendar',
+  'request-conversation': 'careNote', 'talk-about-care': 'careNote',
+  'medicine-access': 'calendar',
   'home-help': 'calendar', 'help-at-home': 'calendar',
   costs: 'costs', 'cost-help': 'costs',
 };
