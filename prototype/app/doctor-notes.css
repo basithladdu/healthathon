@@ -23,6 +23,9 @@
 .doctor-page-heading .doctor-eyebrow { display: block; margin-bottom: 6px; color: #66718e; font-size: 12px; font-weight: 650; }
 :is(.doctor-conversation, .doctor-note-review) .doctor-page-heading h1 { margin: 0; color: #233764; font: 600 clamp(27px, 3vw, 36px)/1.15 var(--font-inter, sans-serif); letter-spacing: -1px; }
 .doctor-page-heading select { width: auto; max-width: 300px; min-height: 46px; min-width: 0; border: 1px solid #bfcbe0; border-radius: 11px; padding: 10px 36px 10px 14px; background: #fff; color: #283d63; font: 500 14px var(--font-inter, sans-serif); }
+.doctor-source-import { position: relative; display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 10px 13px; border: 1px solid #c5d0e4; border-radius: 11px; background: #fff; color: #344e81; font-size: 13px; font-weight: 650; cursor: pointer; }
+.doctor-source-import input { position: absolute; inset: 0; width: 100%; height: 100%; min-width: 0; opacity: 0; cursor: pointer; }
+.doctor-source-import:focus-within { outline: 3px solid #c6973b; outline-offset: 3px; }
 .care-note-top-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
 .care-note-top-actions .primary-button { min-height: 46px; padding: 10px 14px; font-size: 13px; }
 .doctor-note-steps { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 22px; padding: 10px 14px; margin-bottom: 18px; border: 1px solid #d6ddec; border-radius: 14px; background: #f4f6fc; color: #758098; font-size: 13px; }
@@ -79,13 +82,16 @@
 .doctor-source-card textarea, .doctor-family-draft textarea { resize: vertical; min-height: 100px; }
 .doctor-source-card form, .doctor-family-draft form { display: grid; gap: 10px; }
 .doctor-source-card label, .doctor-family-draft label { display: grid; gap: 6px; font-size: 12px; font-weight: 650; color: #5d6b85; }
-.doctor-source-card > p { max-height: min(55svh, 520px); overflow-y: auto; margin: 0; padding: 14px; border: 1px solid #dce3ef; border-radius: 11px; background: #fff; white-space: pre-wrap; overflow-wrap: anywhere; color: #40516d; font: 14px/1.75 var(--font-inter, sans-serif); scrollbar-width: thin; scrollbar-color: #b5c5df #edf1f8; }
+.doctor-source-card details > summary { display: flex; align-items: center; min-height: 44px; color: #49628f; font-size: 13px; cursor: pointer; }
+.doctor-source-card details > p { max-height: min(55svh, 520px); overflow-y: auto; margin: 0; padding: 14px; border: 1px solid #dce3ef; border-radius: 11px; background: #fff; white-space: pre-wrap; overflow-wrap: anywhere; color: #40516d; font: 14px/1.75 var(--font-inter, sans-serif); scrollbar-width: thin; scrollbar-color: #b5c5df #edf1f8; }
 .doctor-review-workbench .family-section-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px 12px; margin-bottom: 10px; }
 .doctor-review-workbench .family-section-heading h2 { margin: 0; }
 .doctor-review-workbench .care-text-button { min-height: 44px; padding: 8px 0; color: #415a9c; font-size: 12px; }
 .doctor-draft-fields { display: grid; gap: 10px; }
 .doctor-family-draft .doctor-prior-context { margin: 0 0 12px; padding: 9px 11px; border-left: 3px solid #b99958; border-radius: 0 8px 8px 0; background: #fff2d4; color: #705735; font-size: 12px; line-height: 1.55; }
 .doctor-draft-fields > section { padding: 13px 14px; border: 1px solid #ddd2ec; border-left: 4px solid #a58acc; border-radius: 11px; background: #ffffffa8; }
+.doctor-draft-field-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 5px 10px; }
+.doctor-draft-field-heading .care-text-button { min-height: 40px; margin: 0; padding: 5px 0; color: #415a9c; font-size: 12px; }
 .doctor-draft-fields > section.is-followUp { border-left-color: #c99742; background: #fff8e7; }
 .doctor-draft-fields > section.is-openQuestions { border-left-color: #7a93c9; background: #f3f6ff; }
 .doctor-family-draft .doctor-draft-fields h3 { margin: 0 0 6px; color: #5d477c; font-size: 12px; font-weight: 700; }
@@ -105,6 +111,7 @@
 .doctor-note-kind button[aria-pressed='true'] { border-color: #ad8539; background: #f4d378; color: #5e451f; box-shadow: inset 0 0 0 1px #ad8539; }
 .doctor-sign-panel > .doctor-sign-actions { gap: 8px; }
 .doctor-sign-actions :is(.primary-button, .secondary-button) { width: 100%; min-height: 44px; margin: 0; padding: 10px 14px; font-size: 13px; }
+.doctor-sign-panel .doctor-signing-reason { grid-column: 1 / -1; margin: 0; color: #765d34; font-size: 12px; line-height: 1.5; }
 .doctor-note-review .doctor-sign-actions .secondary-button { background: #fffaf0; border-color: #d9c291; color: #6c532c; box-shadow: none; }
 .doctor-signed-result { display: flex; align-items: center; flex-wrap: wrap; gap: 15px; padding: 22px; border: 1px solid #b0d4c5; border-radius: 20px; background: #e8f5ed; color: #285b49; }
 .doctor-signed-result > svg { width: 44px; height: 44px; flex-shrink: 0; color: #3b8166; }
@@ -262,6 +269,7 @@
 @media (max-width: 500px) {
   .doctor-page-heading { align-items: stretch; gap: 12px; margin-bottom: 12px; }
   .doctor-page-heading > div, .doctor-page-heading > select { width: 100%; max-width: none; }
+  .doctor-page-heading > .doctor-source-import { width: 100%; }
   :is(.doctor-conversation, .doctor-note-review) .doctor-page-heading h1 { font-size: 27px; letter-spacing: -.7px; }
   .simple-care-app .simple-care-content :is(.doctor-conversation, .doctor-note-review) .doctor-page-heading h1 { font-size: 27px; letter-spacing: -.7px; }
   .doctor-page-heading .doctor-eyebrow { margin-bottom: 4px; font-size: 11px; }

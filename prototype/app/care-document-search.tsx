@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
+import { useRouter } from 'next/navigation';
 import type { CareReport } from './care-calendar-state';
 import { CarePdfReadError, extractCareDocumentPdf, type CarePdfText } from './care-document-extract';
 import { careDocumentFileError, careReportCategory, findCareDocumentText, removeCareDocument, restoreCareDocument, type RemovedCareDocument, type CareDocumentCategory, type CareDocumentText } from './care-document-state';
@@ -72,6 +73,9 @@ export function CareDocumentSearch(props: CareDocumentSearchProps) {
 }
 
 function DocumentSearchForPatient({ patientId, author, hindi, reports, documents, onChange, onReportsChange, editReportId, onEditClose }: CareDocumentSearchProps) {
+  const router = useRouter();
+  const uploadRequested = useRef(false);
+  const returnToMedicines = useRef(false);
   const id = useId();
   const t = (en: string, hi: string) => hindi ? hi : en;
   const available = reports.filter((report) => report.patientId === patientId).sort((a, b) => b.date.localeCompare(a.date));
@@ -110,6 +114,15 @@ function DocumentSearchForPatient({ patientId, author, hindi, reports, documents
   const categoryLabel = (value: CareDocumentCategory) => folders.find((item) => item.key === value)!.name;
 
   useEffect(() => () => { reader.current?.abort(); reader.current = null; }, []);
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    returnToMedicines.current = params.get('next') === 'medicines';
+    if (params.get('upload') === '1' && !uploadRequested.current) {
+      uploadRequested.current = true;
+      input.current?.focus();
+      input.current?.click();
+    }
+  }, []);
   useEffect(() => {
     if (!editReportId) return;
     const report = reports.find((item) => item.patientId === patientId && item.id === editReportId);
@@ -181,7 +194,11 @@ function DocumentSearchForPatient({ patientId, author, hindi, reports, documents
     onReportsChange?.(upload ? [...reports, report] : reports.map((item) => item.patientId === patientId && item.id === report.id ? report : item));
     onChange([...documents.filter((document) => document.patientId !== patientId || document.reportId !== editing.id), next]);
     if (queue.length) { const [nextReport, ...remaining] = queue; resetEditor(nextReport); setUpload(nextReport); setQueue(remaining); void readReport(nextReport); }
-    else { closeEditor(); setMessage(t('Document saved. Find it below or ask a question.', 'दस्तावेज़ सेव हो गया। नीचे देखें या सवाल पूछें।')); setSubmitted(''); setFolder(category); window.requestAnimationFrame(() => searchInput.current?.focus()); }
+    else {
+      closeEditor(); setMessage(t('Document saved.', 'दस्तावेज़ सेव हो गया।')); setSubmitted(''); setFolder(category);
+      if (returnToMedicines.current) router.push(`/medicines?prescription=${encodeURIComponent(report.id)}`);
+      else window.requestAnimationFrame(() => searchInput.current?.focus());
+    }
   }
   function search(value: string) { setQuery(value); setSubmitted(value.trim()); setMessage(''); }
   function removeReport(reportId: string) {
@@ -211,14 +228,12 @@ function DocumentSearchForPatient({ patientId, author, hindi, reports, documents
 
   if (editing) return <section className="care-document-search care-document-review" aria-labelledby={`${id}-review-heading`}>
     <header className="care-document-heading"><div><span className="care-document-eyebrow">{t('Check & save', 'जाँचें और सेव करें')}</span><h2 id={`${id}-review-heading`} tabIndex={-1} ref={reviewHeading}>{t('Your document', 'आपका दस्तावेज़')}</h2></div><button type="button" onClick={closeEditor}>{t('Cancel', 'रद्द करें')}</button></header>
-    <div className="care-document-progress"><span className="is-complete"><DocumentIcon kind="check" />{t('File added', 'फ़ाइल जोड़ी')}</span><span className="is-current">2 <b>{t('Review', 'जाँचें')}</b></span><span>3 <b>{t('Ready to find', 'खोजने के लिए तैयार')}</b></span></div>
     <form className="care-document-editor" onSubmit={saveText}><div className="care-document-review-grid">
       <div className="care-document-original"><DocumentPreview report={editing} hindi={hindi} /><div className="care-document-original-caption"><strong>{editing.file.name}</strong><OriginalLink report={editing} hindi={hindi} /></div></div>
       <div className="care-document-review-fields"><div className="care-document-fields-row"><label>{t('Keep under', 'कहाँ रखें')}<select value={category} onChange={(event) => setCategory(event.target.value as CareDocumentCategory)}><option value="cancer">{t('Cancer care', 'कैंसर की देखभाल')}</option><option value="monitoring">{t('Blood & lab tests', 'खून और लैब जाँच')}</option><option value="other">{t('Other', 'अन्य')}</option></select></label><label>{t('Document date', 'दस्तावेज़ की तारीख')}<input type="date" required max={localDate()} value={reportDate} disabled={!onReportsChange} onChange={(event) => setReportDate(event.target.value)} /></label></div>
-        {upload && <p className="care-document-read-scope">{t('Folder suggested from the filename. Change it if needed.', 'फ़ाइल के नाम से फ़ोल्डर सुझाया है। ज़रूरत हो तो बदलें।')}</p>}
         {reading && <div className="care-document-reading" role="status"><progress max={progress.total || 12} value={progress.page} /><span>{progress.total ? t(`Reading ${progress.page} of ${progress.total} pages`, `${progress.total} में से ${progress.page} पृष्ठ पढ़े`) : t('Opening your document…', 'दस्तावेज़ खोल रहे हैं…')}</span><button type="button" onClick={cancelRead}>{t('Stop', 'रोकें')}</button></div>}
         {readMessage && <p className="care-document-read-message" role="status">{readMessage}</p>}
-        <div className="care-document-text-field"><div><label htmlFor={`${id}-text`}>{t('Check the text', 'टेक्स्ट जाँचें')}</label>{isPdf && !reading && <button type="button" onClick={() => readReport(editing)}>{t('Read again', 'दोबारा पढ़ें')}</button>}</div><textarea id={`${id}-text`} value={text} disabled={reading} onChange={(event) => setText(event.target.value)} maxLength={200000} rows={10} placeholder={t('Copy the words you want to find later.', 'जो शब्द बाद में खोजने हों, उन्हें यहाँ लिखें।')} /></div>
+        <details className="care-document-text-details"><summary>{t('Text for search · optional', 'खोज के लिए टेक्स्ट · वैकल्पिक')}</summary><div className="care-document-text-field"><div><label htmlFor={`${id}-text`}>{t('Check the text', 'टेक्स्ट जाँचें')}</label>{isPdf && !reading && <button type="button" onClick={() => readReport(editing)}>{t('Read again', 'दोबारा पढ़ें')}</button>}</div><textarea id={`${id}-text`} value={text} disabled={reading} onChange={(event) => setText(event.target.value)} maxLength={200000} rows={5} placeholder={t('Copy the words you want to find later.', 'जो शब्द बाद में खोजने हों, उन्हें यहाँ लिखें।')} /></div></details>
         {pdfText && (pdfText.pageCount > pdfText.pagesRead || pdfText.pagesWithoutText.length > 0) && <p className="care-document-read-scope">{pdfText.pageCount > pdfText.pagesRead ? t(`Read the first ${pdfText.pagesRead} of ${pdfText.pageCount} pages. `, `${pdfText.pageCount} में से पहले ${pdfText.pagesRead} पृष्ठ पढ़े। `) : ''}{pdfText.pagesWithoutText.length > 0 ? t(`No text on pages ${pdfText.pagesWithoutText.join(', ')}. Add their text here to include them in search.`, `पृष्ठ ${pdfText.pagesWithoutText.join(', ')} का टेक्स्ट नहीं मिला। खोज में शामिल करने के लिए यहाँ जोड़ें।`) : ''}</p>}
         {error && <p className="care-document-error" role="alert">{error}</p>}
         <div className="care-document-review-footer"><button type="submit" className="care-document-save" disabled={reading || !author.trim()}><DocumentIcon kind="check" />{queue.length ? t('Save & next', 'सेव करें और आगे बढ़ें') : t('Save document', 'दस्तावेज़ सेव करें')}</button>{queue.length > 0 && <span>{t(`${queue.length} more to review`, `${queue.length} और जाँचने हैं`)}</span>}{!upload && onReportsChange && <button type="button" className="care-document-remove" onClick={() => removeReport(editing.id)}><DocumentIcon kind="remove" />{t('Remove document', 'दस्तावेज़ हटाएँ')}</button>}</div>
@@ -229,7 +244,7 @@ function DocumentSearchForPatient({ patientId, author, hindi, reports, documents
     onDragOver={(event) => { if (onReportsChange && event.dataTransfer.types.includes('Files')) { event.preventDefault(); setDragging(true); } }}
     onDragLeave={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setDragging(false); }}
     onDrop={(event) => { if (!onReportsChange) return; event.preventDefault(); setDragging(false); addFiles(Array.from(event.dataTransfer.files)); }}>
-    <header className="care-document-heading"><div className="care-document-heading-title"><span className="care-document-heading-icon"><DocumentIcon /></span><div><h2 id={`${id}-heading`}>{t('My documents', 'मेरे दस्तावेज़')}</h2><span className="care-document-count">{available.length} {t(available.length === 1 ? 'document' : 'documents', 'दस्तावेज़')}</span></div></div>{onReportsChange && <><input ref={input} className="care-document-file-input" type="file" multiple accept="application/pdf,image/jpeg,image/png,image/webp,text/plain,.txt" onChange={(event) => { addFiles(Array.from(event.target.files ?? [])); event.target.value = ''; }} aria-label={t('Choose documents', 'दस्तावेज़ चुनें')} /><button type="button" className="care-document-add" onClick={() => input.current?.click()}><DocumentIcon kind="upload" />{t('Add files', 'फ़ाइलें जोड़ें')}</button></>}</header>
+    <header className="care-document-heading"><div className="care-document-heading-title"><span className="care-document-heading-icon"><DocumentIcon /></span><div><h2 id={`${id}-heading`}>{t('My documents', 'मेरे दस्तावेज़')}</h2><span className="care-document-count">{available.length} {t(available.length === 1 ? 'document' : 'documents', 'दस्तावेज़')}</span></div></div>{onReportsChange && <><input ref={input} className="care-document-file-input" type="file" multiple accept="application/pdf,image/jpeg,image/png,image/webp,text/plain,.txt" onChange={(event) => { addFiles(Array.from(event.target.files ?? [])); event.target.value = ''; }} aria-label={t('Choose documents', 'दस्तावेज़ चुनें')} /><button type="button" className="care-document-add" onClick={() => input.current?.click()}><DocumentIcon kind="upload" />{t('Upload report', 'रिपोर्ट अपलोड करें')}</button></>}</header>
     <div className="care-document-question-panel"><form className="care-document-search-form" onSubmit={(event) => { event.preventDefault(); search(query); }}>
       <label className="care-document-search-label" htmlFor={`${id}-query`}>{t('Ask your documents', 'अपने दस्तावेज़ों से पूछें')}</label><DocumentIcon kind="search" /><input ref={searchInput} id={`${id}-query`} type="search" value={query} maxLength={160} onChange={(event) => setQuery(event.target.value)} placeholder={t('Ask a question or find a word', 'सवाल पूछें या शब्द खोजें')} /><button type="submit" disabled={!query.trim()}>{t('Find', 'खोजें')}</button>
     </form><div className="care-document-topics">{[['What should I bring to my next visit?', 'मुलाकात के लिए क्या लाना है?'], ['What matters to me?', 'मेरे लिए क्या महत्वपूर्ण है?'], ['My latest haemoglobin', 'मेरा आखिरी हीमोग्लोबिन']].map(([en, hi]) => <button key={en} type="button" aria-pressed={submitted === t(en, hi)} onClick={() => search(t(en, hi))}>{t(en, hi)} <span aria-hidden="true">↗</span></button>)}</div></div>

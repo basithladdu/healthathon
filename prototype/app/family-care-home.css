@@ -2,7 +2,7 @@
 .family-care-home-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 15px; }
 .family-care-home .family-care-home-heading h1 { margin: 0; color: #382e29; font: 500 clamp(30px, 3.1vw, 40px)/1.15 Georgia, 'Times New Roman', serif; letter-spacing: -1.2px; }
 .care-home-profile { display: inline-flex; min-height: 44px; align-items: center; color: #5c493b; font-size: 14px; }
-.care-home-category-nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 11px; margin-bottom: 20px; }
+.care-home-category-nav { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 11px; margin-bottom: 13px; }
 .care-home-category { display: grid; grid-template-columns: 52px minmax(0, 1fr) 19px; align-items: center; gap: 10px; min-width: 0; min-height: 76px; padding: 10px 15px; border: 1px solid #dc9b78; border-radius: 17px; background: #ffbf97; color: #423346; text-decoration: none; }
 .care-home-category.tone-lavender { border-color: #b394d4; background: #d6b7f2; }
 .care-home-category.tone-mint { border-color: #70bba1; background: #91d8bd; }
@@ -11,7 +11,7 @@
 .care-home-category > svg:last-child { width: 19px; height: 19px; }
 .care-home-quick-section { padding-top: 15px; border-top: 1px solid #d8cec2; }
 .care-home-quick-section h2 { margin: 0 0 11px; color: #594b40; font-size: 15px; font-weight: 650; }
-.care-home-quick-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 9px; }
+.care-home-quick-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 9px; }
 .care-home-quick-card { display: grid; grid-template-columns: 42px minmax(0, 1fr) 17px; align-items: center; gap: 9px; min-width: 0; min-height: 72px; padding: 9px 12px; border: 1px solid #e1d7ca; border-radius: 15px; background: #fffdf9; color: #493c34; text-decoration: none; transition: transform .14s ease, box-shadow .14s ease; }
 .care-home-quick-card:nth-child(4n + 1) { background: #fff2e5; border-color: #ecd1b4; }
 .care-home-quick-card:nth-child(4n + 2) { background: #edf3fd; border-color: #cfdaee; }
@@ -33,12 +33,12 @@
 @media (max-width: 600px) {
   .family-care-home-heading { margin-bottom: 12px; }
   .family-care-home .family-care-home-heading h1 { font-size: 29px; letter-spacing: -.8px; }
-  .care-home-category-nav { gap: 7px; margin-bottom: 14px; }
+  .care-home-category-nav { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; margin-bottom: 9px; }
   .care-home-category { grid-template-columns: 1fr; justify-items: start; gap: 3px; min-height: 89px; padding: 9px; border-radius: 14px; }
   .care-home-category > svg:first-child { width: 38px; height: 38px; }
   .care-home-category > svg:last-child { display: none; }
   .care-home-category > strong { font-size: 12px; line-height: 1.25; }
-  .care-home-quick-section { padding-top: 12px; }
+  .care-home-quick-section { padding-top: 9px; }
   .care-home-quick-section h2 { margin-bottom: 8px; }
   .care-home-quick-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
   .care-home-quick-card { grid-template-columns: 34px minmax(0, 1fr); gap: 7px; min-height: 63px; padding: 8px; border-radius: 13px; }

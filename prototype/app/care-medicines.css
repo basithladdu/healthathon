@@ -11,6 +11,9 @@
 .care-medicines textarea { resize: vertical; }
 .medicine-heading, .medicine-heading-title, .medicine-day-controls, .medicine-tabs, .medicine-form-actions { display: flex; align-items: center; gap: 12px; }
 .medicine-heading { justify-content: space-between; flex-wrap: wrap; margin-bottom: 17px; }
+.medicine-heading-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.care-medicines a.medicine-upload { padding: 10px 14px; border-radius: 12px; background: #6b4aa0; color: white; text-decoration: none; font-size: 13px; font-weight: 600; }
+.medicine-source-choice summary { cursor: pointer; display: flex; align-items: center; font-size: 13px; font-weight: 600; }
 .medicine-heading-title { min-width: 0; }
 .medicine-heading-icon { display: grid; place-items: center; width: 47px; height: 47px; flex: none; border-radius: 16px; color: #855726; background: #ffe0a2; }
 .medicine-heading-icon svg { width: 29px; height: 29px; }

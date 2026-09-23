@@ -47,3 +47,21 @@ test('approval preserves older versions and changing the note requires a new rev
   assert.equal(latestSummaryRelease(second).number, 2);
   assert.equal(second.releases[0], first.releases[0]);
 });
+
+test('a clinician can publish the explicitly reviewed and signed discussion version', () => {
+  const draft = prepareVisitNote(emptyState(), 'The patient asked to include her daughter in the next conversation.');
+  const doctorSigned = approveVisitNote(draft, {
+    ...approval,
+    permission: 'Doctor signed; awaiting patient/family review',
+    signatureName: 'Dr Sample',
+    noteKind: 'discussion',
+  });
+  assert.notEqual(doctorSigned, draft);
+  assert.equal(doctorSigned.versionPublished, true);
+  assert.equal(latestSummaryRelease(doctorSigned).signature.name, 'Dr Sample');
+  assert.equal(latestSummaryRelease(doctorSigned).noteKind, 'discussion');
+  assert.equal(approveVisitNote(draft, {
+    ...approval, permission: 'Doctor signed; awaiting patient/family review',
+    signatureName: 'Different Name', noteKind: 'discussion',
+  }), draft);
+});

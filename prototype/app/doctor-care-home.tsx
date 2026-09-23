@@ -7,11 +7,12 @@ import { VisitInstructions } from './visit-instructions';
 import { IconUsers, IconFileText, IconClock, IconCheckCircle, IconArrowRight } from './icons';
 import type { CareConversationRequest } from './care-conversation-request-state';
 
-export function DoctorCareHome({ patients, records, appointments, physician, today, hindi, conversationRequests = [], onReview, onRecord, onHistory, onInstructions, onStartConversationRequest, onOpenConversationVersion }: {
+export function DoctorCareHome({ patients, records, appointments, physician, today, hindi, conversationRequests = [], onReview, onRecord, onHistory, onInstructions, onStartConversationRequest, onOpenConversationVersion, onTasks }: {
   patients: Array<{ id: string; name: string; diagnosis: string }>; records: Record<string, SummaryState>;
   appointments: Appointment[]; physician: string; today: string; hindi: boolean;
   conversationRequests?: CareConversationRequest[];
   onReview: (patientId: string) => void;
+  onTasks?: (patientId: string) => void;
   onRecord: (patientId?: string) => void; onHistory: (patientId?: string) => void;
   onInstructions: (patientId: string, appointmentId: string, value: Appointment['preparationInstructions']) => void;
   onStartConversationRequest?: (id: string) => void;
@@ -54,7 +55,7 @@ export function DoctorCareHome({ patients, records, appointments, physician, tod
       <section id="doctor-patient-queue" className="doctor-home-panel" aria-labelledby="doctor-queue-title"><div className="family-section-heading"><h2 id="doctor-queue-title">{t('Care notes', 'देखभाल के नोट')}</h2><button type="button" className="care-text-button" aria-pressed={onlyPending} onClick={() => setOnlyPending(!onlyPending)}>{onlyPending ? t('Show everyone', 'सभी को देखें') : t('To review', 'जाँचने हैं')}</button></div>
         <ul className="doctor-patient-queue">{visiblePatients.map((patient) => {
           const state = records[patient.id]; const release = state ? latestSummaryRelease(state) : null;
-          return <li key={patient.id}><div className="doctor-patient-initial" aria-hidden="true">{patient.name.split(' ').map((part) => part[0]).slice(0, 2).join('')}</div><div><strong>{patient.name}</strong><span>{patient.diagnosis}</span><small>{state?.versionPublished ? `${t('Approved copy', 'मंज़ूर कॉपी')} · ${t('Version', 'संस्करण')} ${release?.number ?? ''}` : t('Needs review', 'जाँच बाकी है')}</small></div><button type="button" className="care-text-button" aria-label={`${t('Open care note for', 'देखभाल का नोट खोलें')} ${patient.name}`} onClick={() => onReview(patient.id)}>{t('Open', 'खोलें')} <IconArrowRight /></button></li>;
+          return <li key={patient.id}><div className="doctor-patient-initial" aria-hidden="true">{patient.name.split(' ').map((part) => part[0]).slice(0, 2).join('')}</div><div><strong>{patient.name}</strong><span>{patient.diagnosis}</span><small>{state?.versionPublished ? `${t('Approved copy', 'मंज़ूर कॉपी')} · ${t('Version', 'संस्करण')} ${release?.number ?? ''}` : t('Needs review', 'जाँच बाकी है')}</small>{onTasks && <button type="button" className="care-text-button" onClick={() => onTasks(patient.id)}>{t('Assign follow-up', 'आगे का काम सौंपें')}</button>}</div><button type="button" className="care-text-button" aria-label={`${t('Open care note for', 'देखभाल का नोट खोलें')} ${patient.name}`} onClick={() => onReview(patient.id)}>{t('Open', 'खोलें')} <IconArrowRight /></button></li>;
         })}</ul>
         {!visiblePatients.length && <p>{t('No matching people here.', 'कोई मेल नहीं मिला।')}</p>}
       </section>

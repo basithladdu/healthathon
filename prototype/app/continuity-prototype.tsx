@@ -17,7 +17,9 @@ import { CareCommunity } from './care-community';
 import { CareDocumentSearch, type CareDocumentText } from './care-document-search';
 import { createMiraDocumentLibrary, CARE_DOCUMENT_LIBRARY_PATIENT_ID, CARE_DOCUMENT_LIBRARY_VERSION } from './care-document-library';
 import { CareCircle } from './care-circle';
-import { createInitialCareCircle, canFamilyOpenView, type CareCircleState } from './care-circle-state';
+import { createInitialCareCircle, canFamilyOpenView, activeCareCircleMember, type CareCircleState } from './care-circle-state';
+import { CareTaskInbox } from './care-task-inbox';
+import type { CareTaskAssignee } from './family-care-state';
 import { CareMedicines } from './care-medicines';
 import { CareConversationRequestForm } from './care-conversation-request';
 import type { CareConversationRequest } from './care-conversation-request-state';
@@ -5319,6 +5321,20 @@ export function ContinuityPrototype() {
     navigate(sessionType === 'care-team' ? 'doctor-history' : 'my-plan');
   }
 
+  function taskPeopleFor(patientId: string): CareTaskAssignee[] {
+    return [
+      { id: `patient:${patientId}`, name: workItems.find((item) => item.hospitalId === patientId)?.patient ?? portalPatientName, role: 'patient' },
+      ...careCircle.members.filter((member) => member.patientId === patientId && member.status === 'active' && member.permissions.calendar).map((member) => ({ id: member.id, name: member.name, role: 'family' as const })),
+      { id: `doctor:${patientId}`, name: 'Dr Sujay', role: 'doctor' },
+    ];
+  }
+
+  function taskViewerFor(patientId: string): CareTaskAssignee {
+    if (sessionType === 'care-team') return { id: `doctor:${patientId}`, name: currentRole.split(' · ')[0], role: 'doctor' };
+    if (isFamilySession) return { id: activeCareCircleMember(careCircle, patientId, portalAuthor)?.id ?? `family:${patientId}:${portalAuthor}`, name: portalAuthor, role: 'family' };
+    return { id: `patient:${patientId}`, name: portalAuthor, role: 'patient' };
+  }
+
   function renderCurrentView() {
     if (!canReadPortalView(view)) return renderAccessRequired();
     switch (view) {
@@ -5326,8 +5342,10 @@ export function ContinuityPrototype() {
         return <CareCircle patientId={portalPatientId} patientName={portalPatientName} author={portalAuthor} role={isPatientSession ? 'patient' : isFamilySession ? 'family' : 'doctor'} hindi={hindi} state={careCircle} onChange={setCareCircle} />;
       case 'next-visit':
         return <CareNextVisit patientId={portalPatientId} patientName={portalPatientName} author={portalAuthor} today={careToday} hindi={hindi}
+          viewer={taskViewerFor(portalPatientId)} assignees={taskPeopleFor(portalPatientId)}
           appointments={appointments} events={careEvents} tasks={familyTasks} reports={canReadReports ? careReports : []}
           onAddTask={(task) => setFamilyTasks((current) => task.patientId === portalPatientId ? addFamilyTask(current, task) : current)}
+          onEditTask={(task) => setFamilyTasks((current) => editFamilyTask(current, portalPatientId, task))}
           onCompleteTask={(taskId, complete) => setFamilyTasks((current) => setFamilyTaskCompleted(current, portalPatientId, taskId, portalAuthor, complete))}
           onOpen={navigate} />;
       case 'medicines':
@@ -5445,20 +5463,34 @@ export function ContinuityPrototype() {
       case 'daily-care': {
         const nextVisit = [...appointments.filter((item) => item.hospitalId === portalPatientId && item.status === 'Scheduled' && item.date >= careToday), ...careEvents.filter((item) => item.patientId === portalPatientId && item.kind !== 'Medicine' && item.date >= careToday).map((item) => ({ date: item.date, time: item.time, clinician: item.title }))]
           .sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`))[0];
-        return <FamilyCareHome patientName={portalPatientName} hindi={hindi} nextVisit={canReadCalendar ? nextVisit : undefined} />;
+        return <FamilyCareHome patientName={portalPatientName} hindi={hindi} nextVisit={canReadCalendar ? nextVisit : undefined}
+          patientId={portalPatientId} today={careToday} author={portalAuthor} role={isFamilySession ? 'family' : 'patient'}
+          events={canReadCalendar ? careEvents.filter((event) => event.kind !== 'Medicine' || canReadReports) : []}
+          appointments={canReadCalendar ? appointments : []} checks={canReadCalendar ? careChecks : []}
+          tasks={canReadCalendar ? familyTasks : []} viewerId={taskViewerFor(portalPatientId).id}
+          onMedicineTaken={(eventId, date, complete) => {
+            if (!canReadCalendar || !canReadReports) return;
+            setCareChecks((current) => setCareCheck(current, careEvents, portalPatientId, eventId, date, portalAuthor, new Date().toISOString(), careToday, complete));
+          }} />;
       }
       case 'comfort': {
         const author = portalAuthor;
         return <FamilyComfortSpace patientId={portalPatientId} author={author} today={careToday} hindi={hindi}
           entries={comfortEntries} onChange={setComfortEntries} onOpenJournal={() => navigate('voice-journal')} onOpenSymptoms={() => navigate('symptom-diary')} />;
       }
-      case 'visit-questions':
-      case 'family-tasks': {
+      case 'family-tasks':
+        return <CareTaskInbox key={`${portalPatientId}:${portalAuthor}`} patientId={portalPatientId} patientName={portalPatientName}
+          viewer={taskViewerFor(portalPatientId)} assignees={taskPeopleFor(portalPatientId)} tasks={familyTasks} appointments={appointments} today={careToday} hindi={hindi}
+          onAdd={(task) => setFamilyTasks((current) => task.patientId === portalPatientId ? addFamilyTask(current, task) : current)}
+          onEdit={(task) => setFamilyTasks((current) => editFamilyTask(current, portalPatientId, task))}
+          onComplete={(taskId, complete) => setFamilyTasks((current) => setFamilyTaskCompleted(current, portalPatientId, taskId, portalAuthor, complete))} />;
+      case 'visit-questions': {
         const author = portalAuthor;
         return <FamilyCareWorkspace key={portalPatientId} patientId={portalPatientId} patientName={portalPatientName} author={author}
+          viewer={taskViewerFor(portalPatientId)} assignees={taskPeopleFor(portalPatientId)}
           tasks={familyTasks} appointments={appointments} demoToday={careToday}
           tasksOnly
-          section={view === 'visit-questions' ? 'questions' : 'tasks'}
+          section="questions"
           onTrackQuestion={(task) => {
             if (task.patientId !== portalPatientId || task.kind !== 'Question') return;
             setOpenQuestions((current) => addOpenQuestion(current, portalPatientId, author, careToday, task.id, { topic: task.title, owner: task.owner, due: task.due }));
@@ -5717,7 +5749,8 @@ export function ContinuityPrototype() {
         conversationRequests={conversationRequests} onStartConversationRequest={startConversationRequest} onOpenConversationVersion={openConversationVersion}
         onReview={(id) => { selectPatient(id); setView('doctor-review'); }}
         onRecord={(id) => { if (id) selectPatient(id); setNewDoctorConversation(true); setView('doctor-record'); }}
-        onHistory={(id) => { if (id) selectPatient(id); setView('doctor-history'); }} onInstructions={saveAppointmentInstructions} />
+        onHistory={(id) => { if (id) selectPatient(id); setView('doctor-history'); }} onInstructions={saveAppointmentInstructions}
+        onTasks={(id) => { selectPatient(id); setView('family-tasks'); }} />
         : role === 'doctor' && view === 'doctor-record' ? <DoctorConversation key={`${selectedId}:${newDoctorConversation}`}
           patientId={selectedId} patientName={selectedItem.patient} patients={workItems.map((item) => ({ id: item.hospitalId, name: item.patient }))}
           physician={currentRole.split(' · ')[0]} initialNote={newDoctorConversation || recordState.versionPublished ? '' : recordState.draftSource} hindi={hindi}
@@ -5727,16 +5760,29 @@ export function ContinuityPrototype() {
           onPatient={selectPatient} onSave={saveDoctorConversation} onHistory={() => navigate('doctor-history')} />
         : role === 'doctor' && view === 'doctor-review' ? <DoctorNoteReview key={selectedId}
           patientId={selectedId} patientName={selectedItem.patient} patients={workItems.map((item) => ({ id: item.hospitalId, name: item.patient }))}
-          state={recordState} physician={currentRole.split(' · ')[0]} onPatient={selectPatient}
+          state={recordState} physician={currentRole.split(' · ')[0]} canSign={isTreatingPhysician && sessionType === 'care-team'} onPatient={selectPatient}
           onRecord={() => { setNewDoctorConversation(true); navigate('doctor-record'); }} onEdit={() => { setNewDoctorConversation(false); navigate('doctor-record'); }} onHistory={() => navigate('doctor-history')}
           onFields={(fields) => {
             if (!isTreatingPhysician || sessionType !== 'care-team') return;
             updateSelectedRecord((current) => {
-              const next = reviseSummary(current, { draftFields: fields });
               const keys = Object.keys(fields) as DraftFieldKey[];
-              return reviseSummary(next, { draftStatuses: Object.fromEntries(keys.map((key) => [key, fields[key].trim() && fields[key] !== 'Not stated in this conversation.' ? 'ready' : 'not-stated'])) as Record<DraftFieldKey, DraftFieldStatus>,
-                draftExcerpts: Object.fromEntries(keys.map((key) => [key, fields[key].trim() && fields[key] !== 'Not stated in this conversation.' ? current.draftSource : ''])) as Record<DraftFieldKey, string> });
+              const changed = keys.filter((key) => fields[key] !== current.draftFields[key]);
+              if (!changed.length) return current;
+              const nextFields = { ...current.draftFields }; const statuses = { ...current.draftStatuses }; const excerpts = { ...current.draftExcerpts };
+              for (const key of changed) {
+                const value = fields[key].trim();
+                nextFields[key] = value || 'Not stated in this conversation.';
+                statuses[key] = !value || value === 'Not stated in this conversation.' ? 'not-stated' : 'ready';
+                excerpts[key] = statuses[key] === 'ready' ? current.draftSource : '';
+              }
+              const next = reviseSummary(current, { draftFields: nextFields, draftExcerpts: excerpts });
+              return reviseSummary(next, { draftStatuses: statuses });
             });
+          }}
+          onConfirmField={(key) => {
+            if (!isTreatingPhysician || sessionType !== 'care-team') return;
+            updateSelectedRecord((current) => current.draftExcerpts[key]?.trim() && current.draftSource.includes(current.draftExcerpts[key])
+              ? setSummaryFieldStatus(current, key, 'ready') : current);
           }}
           onApprove={(permission, reviewed, signature, noteKind) => {
             const next = approveVisitNote(recordState, { treatingPhysician: isTreatingPhysician && sessionType === 'care-team', physician: currentRole.split(' · ')[0], permission, reviewed, signatureName: signature, noteKind, releasedAt: new Date().toISOString() });
@@ -5751,7 +5797,7 @@ export function ContinuityPrototype() {
             }
             addAudit(`Signed care note version ${release.number}`, selectedItem.patient, 'PUBLISH', undefined, selectedId, release.number);
           }}
-          onFinishLater={() => navigate('home')} onFamily={() => navigate('my-plan')} />
+          onFinishLater={() => navigate('home')} onFamily={(version) => { if (version) openConversationVersion(selectedId, version); }} />
         : view === 'my-plan' || view === 'note-history' || view === 'doctor-history' ? <CareNoteReader key={`${portalPatientId}:${noteSelection?.patientId === portalPatientId ? noteSelection.version : 'latest'}`}
           patientId={portalPatientId} patientName={portalPatientName} releases={recordStates[portalPatientId]?.releases ?? []} hindi={hindi}
           initialVersion={noteSelection?.patientId === portalPatientId ? noteSelection.version : undefined}

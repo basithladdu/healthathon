@@ -3,14 +3,16 @@
 import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
 import type { Appointment } from './appointments-page';
 import type { CareEvent, CareReport } from './care-calendar-state';
-import { addFamilyTask, type FamilyTask, type FamilyTaskKind } from './family-care-state';
+import { addFamilyTask, type CareTaskAssignee, type FamilyTask, type FamilyTaskKind } from './family-care-state';
 import { downloadCarePdf } from './care-pdf';
 import './care-next-visit.css';
 
 export type CareNextVisitProps = {
   patientId: string; patientName: string; author: string; today: string; hindi: boolean;
+  viewer?: CareTaskAssignee; assignees?: CareTaskAssignee[];
   appointments: Appointment[]; events: CareEvent[]; tasks: FamilyTask[]; reports: CareReport[];
   onAddTask: (task: FamilyTask) => void;
+  onEditTask?: (task: FamilyTask) => void;
   onCompleteTask: (id: string, complete: boolean) => void;
   onOpen: (view: 'calendar' | 'reports' | 'family-tasks' | 'visit-questions') => void;
 };
@@ -40,16 +42,14 @@ export function CareNextVisit(props: CareNextVisitProps) {
   return <NextVisitForPatient key={`${props.patientId}:${props.author}`} {...props} />;
 }
 
-function NextVisitForPatient({ patientId, patientName, author, today, hindi, appointments, events, tasks, reports, onAddTask, onCompleteTask, onOpen }: CareNextVisitProps) {
+function NextVisitForPatient({ patientId, patientName, author, today, hindi, viewer, assignees = [], appointments, events, tasks, reports, onAddTask, onEditTask, onCompleteTask, onOpen }: CareNextVisitProps) {
   const id = useId();
   const t = (en: string, hi: string) => hindi ? hi : en;
-  const [question, setQuestion] = useState('');
-  const [taskTitle, setTaskTitle] = useState('');
-  const [taskKind, setTaskKind] = useState<FamilyTaskKind>('Transport');
-  const [owner, setOwner] = useState('');
+  const [actionText, setActionText] = useState('');
+  const [actionKind, setActionKind] = useState<'Question' | Exclude<FamilyTaskKind, 'Question'>>('Question');
+  const [assigneeId, setAssigneeId] = useState(viewer?.id ?? '');
   const [message, setMessage] = useState('');
   const [savingPdf, setSavingPdf] = useState(false);
-  const helpInput = useRef<HTMLInputElement>(null);
   const candidates: Visit[] = [
     ...appointments.filter((item) => item.hospitalId === patientId && item.status === 'Scheduled' && item.date >= today).map((item): Visit => ({
       id: item.id, source: 'appointment', title: item.type, date: item.date, time: item.time,
@@ -60,35 +60,30 @@ function NextVisitForPatient({ patientId, patientName, author, today, hindi, app
       time: item.time, clinician: '', mode: '', instructions: item.instructions, instructionAuthor: item.addedBy,
     })),
   ];
-  candidates.sort((a, b) => `${a.date} ${a.time || '99:99'}`.localeCompare(`${b.date} ${b.time || '99:99'}`));
-  const next = candidates[0];
+  const appointmentCandidates = candidates.filter((item) => item.source === 'appointment').sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`));
+  const calendarCandidates = candidates.filter((item) => item.source === 'calendar').sort((a, b) => `${a.date} ${a.time || '99:99'}`.localeCompare(`${b.date} ${b.time || '99:99'}`));
+  const next = appointmentCandidates[0] ?? calendarCandidates[0];
   const patientTasks = tasks.filter((task) => task.patientId === patientId);
-  const questions = patientTasks.filter((task) => task.kind === 'Question' && !task.completedBy);
-  const help = patientTasks.filter((task) => task.kind !== 'Question' && (next
-    ? task.appointmentId === (next.source === 'appointment' ? next.id : '__none__') || task.due === next.date || (!task.due && !task.completedBy)
-    : !task.completedBy));
+  const openTasks = patientTasks.filter((task) => !task.completedBy);
+  const questions = openTasks.filter((task) => task.kind === 'Question');
+  const help = openTasks.filter((task) => task.kind !== 'Question');
   const files = reports.filter((report) => report.patientId === patientId).sort((a, b) => b.date.localeCompare(a.date));
+  const recipients = [...(viewer ? [viewer] : []), ...assignees].filter((person, index, people) => people.findIndex((candidate) => candidate.id === person.id) === index);
+  const selectedRecipient = recipients.find((person) => person.id === assigneeId) ?? viewer;
   const dateLabel = (value: string) => new Date(`${value}T12:00:00`).toLocaleDateString(hindi ? 'hi-IN' : 'en-GB', { weekday: 'short', day: 'numeric', month: 'long' });
 
-  function addQuestion(event: FormEvent<HTMLFormElement>) {
+  function addAction(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!question.trim()) return;
-    onAddTask({ id: crypto.randomUUID(), patientId, title: question.trim(), kind: 'Question', owner: author, due: '', createdBy: author, completedBy: null });
-    setQuestion(''); setMessage(t('Question added.', 'सवाल जोड़ दिया।'));
-  }
-
-  function addHelp(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (!taskTitle.trim()) return;
-    const task: FamilyTask = { id: crypto.randomUUID(), patientId, title: taskTitle.trim(), kind: taskKind, owner: owner.trim() || author, due: next?.date ?? '', createdBy: author, completedBy: null,
-      ...(next?.source === 'appointment' ? { appointmentId: next.id } : {}),
+    if (!actionText.trim()) return;
+    const isQuestion = actionKind === 'Question';
+    const recipient = isQuestion ? undefined : selectedRecipient;
+    if (!isQuestion && recipients.length > 0 && !recipient) return;
+    const task: FamilyTask = { id: crypto.randomUUID(), patientId, title: actionText.trim(), kind: actionKind, owner: recipient?.name ?? author, due: isQuestion ? '' : next?.date ?? '', createdBy: author, completedBy: null,
+      ...(!isQuestion && recipient ? { assignedToId: recipient.id, ownerRole: recipient.role } : {}), ...(viewer ? { createdById: viewer.id } : {}),
+      ...(next?.source === 'appointment' && !isQuestion ? { appointmentId: next.id } : {}),
     };
-    if (addFamilyTask(tasks, task) === tasks) { setMessage(t('A matching task is already on the list. You can change its owner in Family tasks.', 'ऐसा काम सूची में पहले से है। परिवार के कामों में नाम बदल सकते हैं।')); return; }
-    onAddTask(task); setTaskTitle(''); setOwner(''); setMessage(t('Added to the help list.', 'मदद की सूची में जोड़ दिया।'));
-  }
-
-  function chooseHelp(title: string, kind: FamilyTaskKind) {
-    setTaskTitle(title); setTaskKind(kind); helpInput.current?.focus();
+    if (addFamilyTask(tasks, task) === tasks) { setMessage(t('A matching task is already on the list. Change its recipient in Family tasks.', 'ऐसा काम सूची में पहले से है। परिवार के कामों में पाने वाले का नाम बदलें।')); return; }
+    onAddTask(task); setActionText(''); setMessage(t(isQuestion ? 'Question added.' : `Assigned to ${recipient?.name ?? author}.`, isQuestion ? 'सवाल जोड़ दिया।' : `${recipient?.name ?? author} को सौंपा।`));
   }
 
   async function savePdf() {
@@ -111,6 +106,14 @@ function NextVisitForPatient({ patientId, patientName, author, today, hindi, app
     finally { setSavingPdf(false); }
   }
 
+  function taskAction(task: FamilyTask) {
+    const isRecipient = viewer ? task.assignedToId ? task.assignedToId === viewer.id : task.owner.trim().toLocaleLowerCase() === viewer.name.trim().toLocaleLowerCase() : !task.assignedToId;
+    if (!isRecipient || task.completedBy) return null;
+    const needsAcceptance = Boolean(task.assignedToId && task.createdById !== task.assignedToId && !task.acceptedBy);
+    if (needsAcceptance) return onEditTask ? <button type="button" className="next-visit-task-accept" onClick={() => onEditTask({ ...task, acceptedBy: author, acceptedAt: new Date().toISOString() })}>{t('Accept', 'स्वीकार करें')}</button> : null;
+    return <button type="button" className="next-visit-task-done" onClick={() => onCompleteTask(task.id, true)}>{t('Done', 'हो गया')}</button>;
+  }
+
   return <section className="care-next-visit-page" aria-labelledby={`${id}-heading`}>
     <header className="next-visit-heading"><div><span>{patientName}</span><h1 id={`${id}-heading`}>{t('Next visit', 'अगली मुलाकात')}</h1></div><button type="button" className="next-visit-download" disabled={savingPdf} onClick={savePdf}><VisitIcon kind="download" />{savingPdf ? t('Saving…', 'सेव हो रहा है…') : t('Save PDF', 'PDF सेव करें')}</button></header>
     {message && <p className="next-visit-message" role="status">{message}</p>}
@@ -118,10 +121,16 @@ function NextVisitForPatient({ patientId, patientName, author, today, hindi, app
       <section className="next-visit-appointment"><div className="next-visit-date-icon"><VisitIcon />{next && <strong>{Number(next.date.slice(-2))}</strong>}</div><div>{next ? <><span className="next-visit-source">{next.source === 'appointment' ? t('Appointment', 'मुलाकात') : t('Calendar entry', 'कैलेंडर एंट्री')}</span><h2>{next.title}</h2><time dateTime={`${next.date}${next.time ? `T${next.time}` : ''}`}>{dateLabel(next.date)}{next.time && ` · ${next.time}`}</time>{next.clinician && <p>{next.clinician}{next.mode && ` · ${next.mode}`}</p>}</> : <h2>{t('Add your next visit', 'अगली मुलाकात जोड़ें')}</h2>}<button type="button" onClick={() => onOpen('calendar')}>{next ? t('Open calendar', 'कैलेंडर खोलें') : t('Add to calendar', 'कैलेंडर में जोड़ें')} <span aria-hidden="true">↗</span></button></div></section>
       <section className="next-visit-prep"><h2>{t('Before you go', 'जाने से पहले')}</h2>{next?.instructions ? <><p>{next.instructions}</p>{next.instructionAuthor && <span>{t(next.source === 'appointment' ? 'From' : 'Added by', next.source === 'appointment' ? 'दिए गए' : 'जोड़ने वाले')}: {next.instructionAuthor}</span>}</> : <p className="next-visit-empty-line">{t('No preparation note added.', 'तैयारी का निर्देश अभी नहीं जोड़ा है।')}</p>}</section>
     </div>
-    <div className="next-visit-grid">
-      <section className="next-visit-panel next-visit-questions"><div className="next-visit-section-heading"><h2><VisitIcon kind="question" />{t('Questions to ask', 'पूछने के सवाल')}</h2><button type="button" onClick={() => onOpen('visit-questions')}>{t('All questions', 'सभी सवाल')} ↗</button></div><form className="next-visit-quick-add" onSubmit={addQuestion}><input aria-label={t('Question for the visit', 'मुलाकात का सवाल')} value={question} placeholder={t('What would you like to ask?', 'क्या पूछना चाहते हैं?')} required maxLength={240} onChange={(event) => setQuestion(event.target.value)} /><button type="submit" disabled={!question.trim()}>{t('Add', 'जोड़ें')}</button></form><ul className="next-visit-checklist">{questions.slice(0, 6).map((task) => <li key={task.id}><label><input type="checkbox" checked={false} onChange={() => onCompleteTask(task.id, true)} /><span>{task.title}<small>{task.owner}</small></span></label></li>)}</ul>{questions.length === 0 && <p className="next-visit-empty-line">{t('Keep your questions here before the visit.', 'मुलाकात से पहले अपने सवाल यहाँ रखें।')}</p>}</section>
-      <section className="next-visit-panel next-visit-help"><div className="next-visit-section-heading"><h2><VisitIcon kind="help" />{t('Who’s helping?', 'कौन मदद करेगा?')}</h2><button type="button" onClick={() => onOpen('family-tasks')}>{t('All tasks', 'सभी काम')} ↗</button></div><div className="next-visit-help-options"><button type="button" onClick={() => chooseHelp(t('Arrange a ride', 'आने-जाने का इंतज़ाम'), 'Transport')}>{t('Arrange a ride', 'आने-जाने का इंतज़ाम')}</button><button type="button" onClick={() => chooseHelp(t('Bring reports', 'रिपोर्ट साथ लाना'), 'Paperwork')}>{t('Bring reports', 'रिपोर्ट साथ लाना')}</button></div><form className="next-visit-help-form" onSubmit={addHelp}><input ref={helpInput} aria-label={t('Help needed', 'किस मदद की ज़रूरत है')} value={taskTitle} placeholder={t('What needs doing?', 'क्या करना है?')} required maxLength={240} onChange={(event) => setTaskTitle(event.target.value)} /><div className="next-visit-quick-add"><input aria-label={t('Who is helping? Optional', 'कौन मदद करेगा? वैकल्पिक')} value={owner} placeholder={author} maxLength={80} onChange={(event) => setOwner(event.target.value)} /><button type="submit" disabled={!taskTitle.trim()}>{t('Add', 'जोड़ें')}</button></div></form><ul className="next-visit-checklist">{help.slice(0, 6).map((task) => <li key={task.id} className={task.completedBy ? 'is-done' : ''}><label><input type="checkbox" checked={Boolean(task.completedBy)} onChange={(event) => onCompleteTask(task.id, event.target.checked)} /><span>{task.title}<small>{task.owner}{task.completedBy ? ` · ${t('Done by', 'पूरा किया')} ${task.completedBy}` : ''}</small></span></label></li>)}</ul></section>
-      <section className="next-visit-panel next-visit-reports"><div className="next-visit-section-heading"><h2><VisitIcon kind="file" />{t('Reports to hand', 'रिपोर्ट तैयार रखें')}</h2><button type="button" onClick={() => onOpen('reports')}>{t('All reports', 'सभी रिपोर्ट')} ↗</button></div>{files.length ? <ul className="next-visit-report-list">{files.slice(0, 6).map((report) => <li key={report.id}><VisitReportLink report={report} hindi={hindi} /></li>)}</ul> : <button type="button" className="next-visit-add-report" onClick={() => onOpen('reports')}>{t('Add a report', 'रिपोर्ट जोड़ें')}</button>}</section>
+    <div className="next-visit-content">
+      <details className="next-visit-action"><summary>{t('Add a question or ask someone for help', 'सवाल पूछें या किसी से मदद माँगें')}</summary><form onSubmit={addAction}>
+        <label>{t('What would you like to add?', 'क्या जोड़ना चाहेंगे?')}<select value={actionKind} onChange={(event) => setActionKind(event.target.value as typeof actionKind)}><option value="Question">{t('Question for the care team', 'देखभाल टीम से सवाल')}</option><option value="Transport">{t('Task for someone', 'किसी के लिए काम')}</option><option value="Paperwork">{t('Bring a report or document', 'रिपोर्ट या दस्तावेज़ लाएँ')}</option><option value="Home care">{t('Help at home', 'घर पर मदद')}</option><option value="Medicines">{t('Medicine pickup', 'दवा लाना')}</option></select></label>
+        <label>{t(actionKind === 'Question' ? 'Your question' : 'What needs doing?', actionKind === 'Question' ? 'आपका सवाल' : 'क्या करना है?')}<input value={actionText} onChange={(event) => setActionText(event.target.value)} maxLength={240} required /></label>
+        {actionKind !== 'Question' && recipients.length > 0 && <label>{t('Assign to', 'काम सौंपें')}<select value={selectedRecipient?.id ?? ''} onChange={(event) => setAssigneeId(event.target.value)}>{recipients.map((person) => <option key={person.id} value={person.id}>{person.id === viewer?.id ? t('Me', 'मैं') : person.name}</option>)}</select></label>}
+        <button type="submit" disabled={!actionText.trim() || (actionKind !== 'Question' && recipients.length > 0 && !selectedRecipient)}>{t('Add', 'जोड़ें')}</button>
+      </form></details>
+      {message && <p className="next-visit-message" role="status">{message}</p>}
+      {openTasks.length > 0 && <details className="next-visit-task-list"><summary>{t('Questions and tasks', 'सवाल और काम')} · {openTasks.length}</summary><button type="button" className="next-visit-all-tasks" onClick={() => onOpen('family-tasks')}>{t('All tasks', 'सभी काम')} ↗</button><ul>{openTasks.slice(0, 4).map((task) => <li key={task.id}><span><strong>{task.title}</strong><small>{task.owner}{task.due ? ` · ${dateLabel(task.due)}` : ''}{task.acceptedBy ? ` · ${t('Accepted by', 'स्वीकार किया')} ${task.acceptedBy}` : ''}</small></span>{taskAction(task)}</li>)}</ul></details>}
+      <section className="next-visit-panel next-visit-reports"><div className="next-visit-section-heading"><h2><VisitIcon kind="file" />{t('Reports to bring', 'साथ लाने की रिपोर्ट')}</h2><button type="button" onClick={() => onOpen('reports')}>{t('All reports', 'सभी रिपोर्ट')} ↗</button></div>{files.length ? <><ul className="next-visit-report-list">{files.slice(0, 3).map((report) => <li key={report.id}><VisitReportLink report={report} hindi={hindi} /></li>)}</ul>{files.length > 3 && <details className="next-visit-more-reports"><summary>{t('More reports', 'और रिपोर्ट')} · {files.length - 3}</summary><ul className="next-visit-report-list">{files.slice(3).map((report) => <li key={report.id}><VisitReportLink report={report} hindi={hindi} /></li>)}</ul></details>}</> : <button type="button" className="next-visit-add-report" onClick={() => onOpen('reports')}>{t('Add a report', 'रिपोर्ट जोड़ें')}</button>}</section>
     </div>
   </section>;
 }

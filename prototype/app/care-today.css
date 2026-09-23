@@ -1,0 +1,45 @@
+.care-today { width: 100%; margin: 0 0 15px; padding: 12px 14px; border: 1px solid #d9cec2; border-radius: 16px; background: #fffdf9; color: #3d342e; box-shadow: 0 2px 10px #4937230a; }
+.care-today-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.care-today-title { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.care-today-title h2 { margin: 0; color: #3f372f; font: 600 16px/1.25 var(--font-inter, sans-serif); }
+.care-today-dot { width: 9px; height: 9px; flex: 0 0 auto; border-radius: 50%; background: #2d815b; box-shadow: 0 0 0 3px #2d815b1c; }
+.care-today-count { display: inline-grid; place-items: center; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 999px; background: #f1e7d9; color: #604a36; font-size: 11px; font-weight: 700; }
+.care-today-actions { display: flex; align-items: center; flex-wrap: wrap; justify-content: flex-end; gap: 7px; }
+.care-today-upload, .care-today-collapse { display: inline-flex; justify-content: center; align-items: center; min-height: 40px; padding: 8px 12px; border: 1px solid #6da080; border-radius: 10px; background: #2e7551; color: #fff; text-decoration: none; font: 650 12px/1.25 var(--font-inter, sans-serif); cursor: pointer; }
+.care-today-collapse { border-color: #ded5ca; background: #fff; color: #594b40; }
+.care-today-items { display: grid; gap: 6px; max-height: 230px; overflow-y: auto; margin-top: 9px; scrollbar-width: thin; }
+.care-today-item { display: grid; grid-template-columns: 55px auto minmax(0, 1fr) auto auto; align-items: center; gap: 8px; min-width: 0; padding: 7px 9px; border: 1px solid #eee5d9; border-radius: 11px; background: #fff; }
+.care-today-item time { color: #6a5b4e; font-size: 11px; font-variant-numeric: tabular-nums; }
+.care-today-kind { width: fit-content; padding: 4px 7px; border-radius: 7px; background: #edf3fd; color: #385987; font-size: 10px; line-height: 1.2; }
+.care-today-kind.kind-medicine { background: #fff0d9; color: #75501f; }
+.care-today-kind.kind-care-event { background: #eaf3ed; color: #315a43; }
+.care-today-kind.kind-task { background: #f1eafa; color: #604876; }
+.care-today-item > strong { min-width: 0; font-size: 12px; font-weight: 620; line-height: 1.35; overflow-wrap: anywhere; }
+.care-today-check, .care-today-open { display: inline-flex; justify-content: center; align-items: center; gap: 4px; min-height: 36px; padding: 6px 9px; border: 1px solid #d8cbb9; border-radius: 9px; background: #fffaf2; color: #64491e; font: 600 11px/1.2 var(--font-inter, sans-serif); text-decoration: none; cursor: pointer; white-space: nowrap; }
+.care-today-check.is-checked { border-color: #a9cbb3; background: #edf6ef; color: #2e6544; }
+.care-today-open { border-color: #dcd8eb; background: #f7f5fd; color: #51466c; }
+.care-today-open svg { width: 14px; height: 14px; }
+.care-today-empty, .care-today-upcoming { margin: 0; padding: 7px 9px; color: #6a5b4e; font-size: 12px; }
+.care-today-upcoming { border-top: 1px solid #eee5d9; font-size: 11px; }
+.care-today-all-tasks { display: inline-flex; align-items: center; gap: 4px; justify-self: start; min-height: 36px; padding: 4px 8px; color: #574368; font-size: 11px; font-weight: 650; text-decoration: none; }
+.care-today-all-tasks svg { width: 14px; height: 14px; }
+.care-today :focus-visible { outline: 3px solid #764699; outline-offset: 2px; }
+@media(max-width: 650px) {
+  .care-today { margin-bottom: 11px; padding: 10px; border-radius: 14px; }
+  .care-today-heading { align-items: flex-start; }
+  .care-today-title { padding-top: 8px; }
+  .care-today-title h2 { font-size: 15px; }
+  .care-today-actions { gap: 5px; }
+  .care-today-upload, .care-today-collapse { min-height: 40px; padding: 7px 9px; font-size: 11px; }
+  .care-today-item { grid-template-columns: 46px minmax(0, 1fr) auto; gap: 5px 7px; padding: 7px; }
+  .care-today-item time { grid-column: 1; grid-row: 1; }
+  .care-today-kind { grid-column: 2; grid-row: 1; }
+  .care-today-item > strong { grid-column: 2; grid-row: 2; }
+  .care-today-check, .care-today-open { grid-column: 3; grid-row: 1 / span 2; }
+  .care-today-item.is-appointment .care-today-open, .care-today-item.is-care-event .care-today-open { grid-row: 1 / span 2; }
+}
+@media(max-width: 390px) {
+  .care-today-actions { max-width: 66%; }
+  .care-today-upload { white-space: normal; text-align: center; }
+  .care-today-check, .care-today-open { padding-inline: 7px; font-size: 10px; }
+}

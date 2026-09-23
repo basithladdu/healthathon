@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
+import Link from 'next/link';
 import { eventFallsOn, type CareCheck, type CareEvent, type CareReport } from './care-calendar-state';
 import type { CareDocumentText } from './care-document-state';
 import { literalPrescriptionTime, makeMedicineEvent, medicinePrescription, prescriptionLines, type MedicineDraft } from './care-medicines-state';
@@ -47,6 +48,7 @@ function MedicinesForPatient({ patientId, author, today, hindi, events, checks, 
   const [error, setError] = useState('');
   const [showSource, setShowSource] = useState(false);
   const heading = useRef<HTMLHeadingElement>(null);
+  const openedPrescription = useRef(false);
   const medicines = events.filter((event) => event.patientId === patientId && event.kind === 'Medicine').sort((a, b) => a.time.localeCompare(b.time) || a.title.localeCompare(b.title));
   const available = reports.filter((report) => report.patientId === patientId).sort((a, b) => b.date.localeCompare(a.date));
   const scheduled = medicines.filter((item) => eventFallsOn(item, date));
@@ -59,6 +61,15 @@ function MedicinesForPatient({ patientId, author, today, hindi, events, checks, 
   const dateLabel = (value: string) => new Date(`${value}T12:00:00`).toLocaleDateString(hindi ? 'hi-IN' : 'en-GB', { day: 'numeric', month: 'short' });
 
   useEffect(() => { heading.current?.focus(); }, [editingId, isEditing]);
+  useEffect(() => {
+    if (openedPrescription.current) return;
+    const reportId = new URLSearchParams(window.location.search).get('prescription');
+    const report = reports.find((item) => item.patientId === patientId && item.id === reportId);
+    if (!report) return;
+    openedPrescription.current = true;
+    setDraft({ title: '', instructions: '', time: '', date: today, lastDay: today, reportId: report.id, sourceName: report.file.name, sourceText: documents.find((item) => item.patientId === patientId && item.reportId === report.id)?.text ?? '', checked: false });
+    setShowSource(false);
+  }, [reports, documents, patientId, today]);
 
   function openEditor(item?: CareEvent) {
     const prescription = item ? medicinePrescription(item) : null;
@@ -82,7 +93,7 @@ function MedicinesForPatient({ patientId, author, today, hindi, events, checks, 
     const report = available.find((item) => item.id === reportId);
     const source = documents.find((item) => item.patientId === patientId && item.reportId === reportId);
     updateDraft({ reportId: report?.id ?? '', sourceName: report?.file.name ?? '', sourceText: source?.text ?? '' });
-    setShowSource(true);
+    setShowSource(false);
   }
 
   function copyLine(line: string) {
@@ -109,15 +120,16 @@ function MedicinesForPatient({ patientId, author, today, hindi, events, checks, 
     <header className="medicine-heading"><div className="medicine-heading-title"><span className="medicine-heading-icon"><MedicineIcon /></span><h1 id={`${id}-edit-heading`} ref={heading} tabIndex={-1}>{editingId ? t('Edit medicine', 'दवा बदलें') : t('Add from prescription', 'पर्चे से दवा जोड़ें')}</h1></div><button type="button" onClick={closeEditor}>{t('Back', 'वापस')}</button></header>
     <form className="medicine-editor" onSubmit={save}>
       <section className="medicine-source-panel">
-        <label htmlFor={`${id}-source`}>{t('Prescription', 'पर्चा')}<select id={`${id}-source`} value={draft.reportId} onChange={(event) => chooseSource(event.target.value)}><option value="">{t('Paste prescription text', 'पर्चे का टेक्स्ट जोड़ें')}</option>{available.map((report) => <option key={report.id} value={report.id}>{report.file.name} · {dateLabel(report.date)}</option>)}</select></label>
+        <Link href="/reports?upload=1&next=medicines" className="medicine-upload"><MedicineIcon kind="file" />{t('Upload prescription', 'पर्चा अपलोड करें')}</Link>
+        <details className="medicine-source-choice" open={!selectedReport}><summary>{t('Choose prescription', 'पर्चा चुनें')}</summary><label htmlFor={`${id}-source`}>{t('Prescription', 'पर्चा')}<select id={`${id}-source`} value={draft.reportId} onChange={(event) => chooseSource(event.target.value)}><option value="">{t('Paste prescription text', 'पर्चे का टेक्स्ट जोड़ें')}</option>{available.map((report) => <option key={report.id} value={report.id}>{report.file.name} · {dateLabel(report.date)}</option>)}</select></label></details>
         {selectedReport ? <div className="medicine-source-heading"><strong>{selectedReport.file.name}</strong><PrescriptionLink report={selectedReport} hindi={hindi} /></div> : <label htmlFor={`${id}-source-name`}>{t('Prescription name or date', 'पर्चे का नाम या तारीख')}<input id={`${id}-source-name`} value={draft.sourceName} maxLength={240} required onChange={(event) => updateDraft({ sourceName: event.target.value })} /></label>}
         {selectedReport && <button type="button" className="medicine-source-toggle" aria-expanded={showSource} onClick={() => setShowSource(!showSource)}>{showSource ? t('Hide text', 'टेक्स्ट छिपाएँ') : t('Read prescription text', 'पर्चे का टेक्स्ट पढ़ें')}</button>}
-        {(!selectedReport || showSource) && <label htmlFor={`${id}-source-text`}>{selectedReport ? t('Text from this prescription', 'इस पर्चे का टेक्स्ट') : t('Prescription text', 'पर्चे का टेक्स्ट')}<textarea id={`${id}-source-text`} rows={6} value={draft.sourceText} maxLength={200000} required={!selectedReport} onChange={(event) => updateDraft({ sourceText: event.target.value })} /></label>}
+        {(!selectedReport || showSource) && <label htmlFor={`${id}-source-text`}>{selectedReport ? t('Text from this prescription', 'इस पर्चे का टेक्स्ट') : t('Prescription text', 'पर्चे का टेक्स्ट')}<textarea id={`${id}-source-text`} rows={3} value={draft.sourceText} maxLength={200000} required={!selectedReport} onChange={(event) => updateDraft({ sourceText: event.target.value })} /></label>}
         {sourceLines.length > 0 && <details className="medicine-source-lines"><summary>{t('Use a line for the instructions', 'निर्देश के लिए एक पंक्ति चुनें')}</summary><ul>{sourceLines.map((line, index) => <li key={`${index}-${line.slice(0, 40)}`}><button type="button" onClick={() => copyLine(line)}>{line}</button></li>)}</ul></details>}
       </section>
       <section className="medicine-fields">
         <label htmlFor={`${id}-name`}>{t('Medicine name', 'दवा का नाम')}<input id={`${id}-name`} value={draft.title} required maxLength={160} onChange={(event) => updateDraft({ title: event.target.value })} /></label>
-        <label htmlFor={`${id}-instructions`}>{t('Dose & instructions on the prescription', 'पर्चे पर लिखी खुराक और निर्देश')}<textarea id={`${id}-instructions`} rows={3} value={draft.instructions} required maxLength={400} onChange={(event) => updateDraft({ instructions: event.target.value })} /></label>
+        <label htmlFor={`${id}-instructions`}>{t('Dose & instructions on the prescription', 'पर्चे पर लिखी खुराक और निर्देश')}<textarea id={`${id}-instructions`} rows={2} value={draft.instructions} required maxLength={400} onChange={(event) => updateDraft({ instructions: event.target.value })} /></label>
         <div className="medicine-schedule-fields"><label htmlFor={`${id}-time`}>{t('Time', 'समय')}<input id={`${id}-time`} type="time" value={draft.time} required onChange={(event) => updateDraft({ time: event.target.value })} /></label><label htmlFor={`${id}-first`}>{t('First day', 'पहला दिन')}<input id={`${id}-first`} type="date" value={draft.date} required onChange={(event) => updateDraft({ date: event.target.value, lastDay: draft.lastDay < event.target.value ? event.target.value : draft.lastDay })} /></label><label htmlFor={`${id}-last`}>{t('Last day', 'आखिरी दिन')}<input id={`${id}-last`} type="date" value={draft.lastDay} min={draft.date} required onChange={(event) => updateDraft({ lastDay: event.target.value })} /></label></div>
         <p className="medicine-repeat-caption">{draft.lastDay > draft.date ? t('At this time each day between these dates.', 'इन तारीखों के बीच रोज़ इस समय।') : t('One date, one time. Add another entry for another time.', 'एक तारीख, एक समय। दूसरे समय के लिए अलग एंट्री जोड़ें।')}</p>
         <label className="medicine-prescription-check"><input type="checkbox" checked={draft.checked} onChange={(event) => setDraft({ ...draft, checked: event.target.checked })} /><span>{t('Checked against prescription', 'पर्चे से मिलाकर जाँच लिया')}</span></label>
@@ -128,7 +140,7 @@ function MedicinesForPatient({ patientId, author, today, hindi, events, checks, 
   </section>;
 
   return <section className="care-medicines" aria-labelledby={`${id}-heading`}>
-    <header className="medicine-heading"><div className="medicine-heading-title"><span className="medicine-heading-icon"><MedicineIcon /></span><h1 id={`${id}-heading`} ref={heading} tabIndex={-1}>{t('Medicines', 'दवाएँ')}</h1></div><button type="button" className="medicine-primary" onClick={() => openEditor()}><MedicineIcon kind="plus" />{t('Add from prescription', 'पर्चे से जोड़ें')}</button></header>
+    <header className="medicine-heading"><div className="medicine-heading-title"><span className="medicine-heading-icon"><MedicineIcon /></span><h1 id={`${id}-heading`} ref={heading} tabIndex={-1}>{t('Medicines', 'दवाएँ')}</h1></div><div className="medicine-heading-actions"><Link href="/reports?upload=1&next=medicines" className="medicine-upload"><MedicineIcon kind="file" />{t('Upload prescription', 'पर्चा अपलोड करें')}</Link><button type="button" className="medicine-primary" onClick={() => openEditor()}><MedicineIcon kind="plus" />{t('Add medicine', 'दवा जोड़ें')}</button></div></header>
     {message && <p className="medicine-message" role="status">{message}</p>}
     <div className="medicine-day-controls"><div className="medicine-tabs"><button type="button" aria-pressed={view === 'day'} onClick={() => { setView('day'); setDate(today); }}>{t('Today', 'आज')}</button><button type="button" aria-pressed={view === 'all'} onClick={() => setView('all')}>{t('All medicines', 'सभी दवाएँ')}</button></div>{view === 'day' && <input type="date" aria-label={t('Medicine schedule date', 'दवा की तारीख')} value={date} onChange={(event) => { if (event.target.value) setDate(event.target.value); }} />}</div>
     {view === 'day' && <dl className="medicine-overview"><div><dt>{date === today ? t('On today’s list', 'आज की सूची में') : dateLabel(date)}</dt><dd>{scheduled.length}</dd></div><div><dt>{t('Taken', 'ले ली')}</dt><dd>{takenCount}</dd></div><div><dt>{t('Not marked taken', 'लेना दर्ज नहीं किया')}</dt><dd>{scheduled.length - takenCount}</dd></div></dl>}

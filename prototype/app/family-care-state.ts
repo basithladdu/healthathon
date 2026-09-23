@@ -2,6 +2,8 @@ import { isValidAppointmentDate } from './appointment-state.ts';
 
 export const FAMILY_TASK_KINDS = ['Appointment', 'Transport', 'Medicines', 'Home care', 'Paperwork', 'Family support', 'Question'] as const;
 export type FamilyTaskKind = (typeof FAMILY_TASK_KINDS)[number];
+export type CareTaskRole = 'patient' | 'family' | 'doctor';
+export type CareTaskAssignee = { id: string; name: string; role: CareTaskRole };
 export type FamilyTask = {
   id: string;
   patientId: string;
@@ -12,6 +14,11 @@ export type FamilyTask = {
   createdBy: string;
   completedBy: string | null;
   appointmentId?: string;
+  createdById?: string;
+  assignedToId?: string;
+  ownerRole?: CareTaskRole;
+  acceptedBy?: string;
+  acceptedAt?: string;
 };
 
 export const INITIAL_FAMILY_TASKS: FamilyTask[] = [
@@ -37,15 +44,18 @@ export function editFamilyTask(tasks: FamilyTask[], patientId: string, updated: 
   const previous = tasks.find((task) => task.patientId === patientId && task.id === updated.id);
   if (!previous || updated.patientId !== patientId) return tasks;
   const next: FamilyTask = {
-    ...previous,
+    ...previous, assignedToId: updated.assignedToId, ownerRole: updated.ownerRole,
+    acceptedBy: updated.acceptedBy, acceptedAt: updated.acceptedAt,
     title: updated.title.trim(), owner: updated.owner.trim(), kind: updated.kind, due: updated.due,
   };
-  const changed = next.title !== previous.title || next.owner !== previous.owner || next.kind !== previous.kind || next.due !== previous.due;
+  const assignmentChanged = next.assignedToId !== previous.assignedToId || next.owner !== previous.owner || next.ownerRole !== previous.ownerRole;
+  const contentChanged = next.title !== previous.title || next.kind !== previous.kind || next.due !== previous.due;
+  const changed = assignmentChanged || contentChanged || next.acceptedBy !== previous.acceptedBy || next.acceptedAt !== previous.acceptedAt;
   if (!changed) return tasks;
   const remaining = tasks.filter((task) => task !== previous);
   if (addFamilyTask(remaining, next) === remaining) return tasks;
   // A previous completion belongs to the previous wording, owner and schedule.
-  return tasks.map((task) => task === previous ? { ...next, completedBy: null } : task);
+  return tasks.map((task) => task === previous ? { ...next, ...(contentChanged || assignmentChanged ? { completedBy: null } : {}), ...(assignmentChanged ? { acceptedBy: undefined, acceptedAt: undefined } : {}) } : task);
 }
 
 export function removeFamilyTask(tasks: FamilyTask[], patientId: string, taskId: string): FamilyTask[] {
