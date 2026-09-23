@@ -17,6 +17,8 @@
 .care-today-item > strong { min-width: 0; font-size: 12px; font-weight: 620; line-height: 1.35; overflow-wrap: anywhere; }
 .care-today-check, .care-today-open { display: inline-flex; justify-content: center; align-items: center; gap: 4px; min-height: 36px; padding: 6px 9px; border: 1px solid #d8cbb9; border-radius: 9px; background: #fffaf2; color: #64491e; font: 600 11px/1.2 var(--font-inter, sans-serif); text-decoration: none; cursor: pointer; white-space: nowrap; }
 .care-today-check.is-checked { border-color: #a9cbb3; background: #edf6ef; color: #2e6544; }
+.care-today-check:disabled { opacity: .5; cursor: default; }
+.care-today-assigned-task { grid-template-columns: auto minmax(0, 1fr) auto; }
 .care-today-open { border-color: #dcd8eb; background: #f7f5fd; color: #51466c; }
 .care-today-open svg { width: 14px; height: 14px; }
 .care-today-empty, .care-today-upcoming { margin: 0; padding: 7px 9px; color: #6a5b4e; font-size: 12px; }
@@ -36,6 +38,11 @@
   .care-today-kind { grid-column: 2; grid-row: 1; }
   .care-today-item > strong { grid-column: 2; grid-row: 2; }
   .care-today-check, .care-today-open { grid-column: 3; grid-row: 1 / span 2; }
+  .care-today-item.is-medicine .care-today-open { grid-row: 3; }
+  .care-today-assigned-task { grid-template-columns: minmax(0, 1fr) auto; }
+  .care-today-assigned-task .care-today-kind { grid-column: 1; }
+  .care-today-assigned-task > strong { grid-column: 1; }
+  .care-today-assigned-task .care-today-open { grid-column: 2; }
   .care-today-item.is-appointment .care-today-open, .care-today-item.is-care-event .care-today-open { grid-row: 1 / span 2; }
 }
 @media(max-width: 390px) {

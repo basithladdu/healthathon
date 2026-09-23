@@ -37,7 +37,12 @@ export function addFamilyTask(tasks: FamilyTask[], task: FamilyTask): FamilyTask
 
 export function setFamilyTaskCompleted(tasks: FamilyTask[], patientId: string, taskId: string, actor: string, complete: boolean): FamilyTask[] {
   if (!actor.trim()) return tasks;
-  return tasks.map((task) => task.patientId === patientId && task.id === taskId ? { ...task, completedBy: complete ? actor : null } : task);
+  return tasks.map((task) => {
+    if (task.patientId !== patientId || task.id !== taskId) return task;
+    if (task.assignedToId && task.owner.trim().toLocaleLowerCase() !== actor.trim().toLocaleLowerCase()) return task;
+    if (complete && task.assignedToId && task.createdById !== task.assignedToId && !task.acceptedBy) return task;
+    return { ...task, completedBy: complete ? actor : null };
+  });
 }
 
 export function editFamilyTask(tasks: FamilyTask[], patientId: string, updated: FamilyTask): FamilyTask[] {
