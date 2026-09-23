@@ -1,0 +1,54 @@
+[
+  {
+    "local_filename": "consultation-family.jpg",
+    "image_url": "https://upload.wikimedia.org/wikipedia/commons/7/7a/Doctor_consults_with_family_%281%29.jpg",
+    "source_page": "https://commons.wikimedia.org/wiki/File:Doctor_consults_with_family_(1).jpg",
+    "author_credit": "Rhoda Baer, National Cancer Institute Visuals Online (image ID 8002). Credit recommended: Rhoda Baer / National Cancer Institute.",
+    "license": "Public domain; page states worldwide release and reuse restrictions none.",
+    "subject": "A doctor speaking with a teenager and her parents in a clinic.",
+    "suggested_slide_role": "General illustration of a clinician speaking with a patient and family; not the 62-year-old woman in the scenario and not an Indian patient.",
+    "terms_or_caveats": "Original NCI source and Commons page confirm public-domain status. Do not imply this is the case patient or a member of the team."
+  },
+  {
+    "local_filename": "home-care-assistance.jpg",
+    "image_url": "https://upload.wikimedia.org/wikipedia/commons/3/3d/Old_man_being_assisted.jpg",
+    "source_page": "https://commons.wikimedia.org/wiki/File:Old_man_being_assisted.jpg",
+    "author_credit": "geralt (Pixabay file ID 63616); attribution is not required by CC0, but credit is appropriate.",
+    "license": "CC0 1.0 / public-domain dedication, per Wikimedia Commons page.",
+    "subject": "An older adult receiving help with dressing at home.",
+    "suggested_slide_role": "Generic family/home-care support image; not an Indian family, cancer patient, or documented Saanthvana user.",
+    "terms_or_caveats": "The image looks stylized and the page does not establish model-release status. Do not present it as documentary evidence or as the deck's illustrative patient."
+  },
+  {
+    "local_filename": "nurse-writing-notes.jpg",
+    "image_url": "https://upload.wikimedia.org/wikipedia/commons/1/11/Staff_Nurse_Andrea_writing_up_her_notes.jpg",
+    "source_page": "https://commons.wikimedia.org/wiki/File:Staff_Nurse_Andrea_writing_up_her_notes.jpg",
+    "author_credit": "goodcatmum (Flickr), titled “Staff Nurse Andrea writing up her notes”; attribution required under CC BY-SA 2.0.",
+    "license": "Creative Commons Attribution-ShareAlike 2.0 Generic; attribute, link the license, and note changes. Commons page warns that personality/model rights may restrict some reuse.",
+    "subject": "A nurse writing notes at a nurses' station in the United Kingdom.",
+    "suggested_slide_role": "Medical documentation or note-review context; do not label it as a doctor dictating or recording audio.",
+    "terms_or_caveats": "Real 2008 camera photo with EXIF and Flickr provenance. No model-release evidence was found."
+  },
+  {
+    "local_filename": "doctor-consultation.jpg",
+    "image_url": "https://upload.wikimedia.org/wikipedia/commons/7/7f/Doctor_consultation.jpg",
+    "source_page": "https://commons.wikimedia.org/wiki/File:Doctor_consultation.jpg",
+    "author_credit": "Thierry Falise (EXIF author); credited on Commons to ILO Asia-Pacific. Commons upload source: yaroslav-gordiychuk.com.ua.",
+    "license": "Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0); provide attribution and license link, indicate changes, and share adaptations under the same or compatible license.",
+    "subject": "A clinician writes notes while speaking with a patient during an outpatient consultation.",
+    "suggested_slide_role": "Generic consultation/documentation context; the country is not stated on the source page, so do not label it Indian or tie it to the case.",
+    "terms_or_caveats": "Commons lists the image date as 5 October 2012 and EXIF author Thierry Falise. Reuse under CC BY-SA 4.0. Location and depicted people identities are not established.",
+    "use_status": "selected"
+  },
+  {
+    "local_filename": "pallium-family-home-visit.jpg",
+    "image_url": "https://ehospice.com/wp-content/uploads/2024/07/2-1024x1024.jpg",
+    "source_page": "https://ehospice.com/india_posts/a-home-visit-away-from-home/",
+    "author_credit": "Pallium India home-care team field visit, Kerala, 4 June 2024, reported by Sayanditya Sen; individual photographer not credited in the article.",
+    "license": "Unknown. The page is actual NGO reportage but does not state an image reuse license or permission.",
+    "subject": "A home-care clinician checks an adult man's blood pressure during a visit in Kerala.",
+    "suggested_slide_role": "Indian community/palliative home-care context; it depicts a clinician visit, not a family caregiver or cancer-specific case.",
+    "terms_or_caveats": "Attribute to Pallium India / eHospice and the report. Reuse permission is unknown; reference only and not selected for the deck.",
+    "use_status": "reference_only_not_selected"
+  }
+]
