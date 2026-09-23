@@ -44,4 +44,9 @@ Hosted community membership/moderation, cross-device sharing, real-user validati
 
 ## Release
 
-Commit, production build and live URL verification will be recorded here after deployment completes.
+- Application commit: `2f59cca` — pushed to `main` on GitHub.
+- Vercel production deployment: `dpl_36PBB3kXNBVhHMkQZaiVnBSNkvsH`.
+- Deployment: https://continuity-loop-healthathon-j7xyobv93.vercel.app
+- Production alias: https://continuity-loop-healthathon.vercel.app
+- Vercel returned `READY`, target `production`, and confirmed the alias. The required production compilation and TypeScript pass completed successfully.
+- No additional production browser walkthrough was run after the user's instruction to stop checks. This record is a documentation-only follow-up to the deployed application commit.
