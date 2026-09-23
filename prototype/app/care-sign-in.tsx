@@ -15,17 +15,20 @@ export type CareSignInProps = {
 
 export function CareSignIn({ patients, hindi, onLanguage, onSignIn }: CareSignInProps) {
   const id = useId();
-  const [role, setRole] = useState<'patient' | 'doctor'>('patient');
+  const [role, setRole] = useState<CareSignInInput['role']>('patient');
   const [council, setCouncil] = useState('');
   const [selectedId] = useState(patients[0]?.id ?? '');
   const [identifier, setIdentifier] = useState('');
   const [error, setError] = useState<'abha' | 'doctor' | 'council' | null>(null);
   const [signingIn, setSigningIn] = useState(false);
+  const [autofilling, setAutofilling] = useState(true);
   const identifierInput = useRef<HTMLInputElement>(null);
   const submitting = useRef(false);
   const loadingTimer = useRef<number | null>(null);
+  const autofillTimer = useRef<number | null>(null);
+  const autofillStopped = useRef({ identifier: false, council: false });
   const patient = patients.find((item) => item.id === selectedId) ?? patients[0];
-  const name = role === 'doctor' ? 'Dr Sujay' : patient?.name ?? '';
+  const name = role === 'doctor' ? 'Dr Sujay' : role === 'family' ? (patient?.id === 'CANCER-20418' ? 'Kavya Raghavan' : 'Family member') : patient?.name ?? '';
   const t = (en: string, hi: string) => hindi ? hi : en;
   const roleArt: Record<CareSignInInput['role'], CareArtKind> = {
     family: 'home-help', patient: 'cancer-overview', doctor: 'doctor-pack',
@@ -35,9 +38,39 @@ export function CareSignIn({ patients, hindi, onLanguage, onSignIn }: CareSignIn
     if (loadingTimer.current !== null) window.clearTimeout(loadingTimer.current);
   }, []);
 
+  useEffect(() => {
+    // Fixed entry values only. No ABHA or medical-council verification is performed.
+    const value = role === 'doctor' ? 'MC/000000' : '00 0000 0000 2041';
+    const councilName = role === 'doctor' ? 'Karnataka Medical Council' : '';
+    autofillStopped.current = { identifier: false, council: false };
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let step = 0;
+
+    function fill() {
+      step = reducedMotion.matches ? Math.max(value.length, councilName.length) : step + 1;
+      if (!autofillStopped.current.identifier) setIdentifier(value.slice(0, step));
+      if (!autofillStopped.current.council) setCouncil(councilName.slice(0, step));
+      const identifierPending = !autofillStopped.current.identifier && step < value.length;
+      const councilPending = !autofillStopped.current.council && step < councilName.length;
+      autofillTimer.current = identifierPending || councilPending ? window.setTimeout(fill, 42) : null;
+      if (!identifierPending && !councilPending) setAutofilling(false);
+    }
+
+    if (reducedMotion.matches) fill();
+    else autofillTimer.current = window.setTimeout(fill, 140);
+    return () => {
+      if (autofillTimer.current !== null) window.clearTimeout(autofillTimer.current);
+      autofillTimer.current = null;
+    };
+  }, [role]);
+
+  const identifierValid = role === 'doctor'
+    ? /^(?=.*\d)[a-zA-Z0-9/ .-]{2,40}$/.test(identifier.trim())
+    : /^\d{14}$/.test(identifier.replace(/[\s-]/g, ''));
+
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (submitting.current || !patient || !name.trim()) return;
+    if (submitting.current || autofilling || !patient || !name.trim()) return;
     const value = identifier.trim();
     const valid = role === 'doctor'
       ? /^(?=.*\d)[a-zA-Z0-9/ .-]{2,40}$/.test(value)
@@ -50,6 +83,8 @@ export function CareSignIn({ patients, hindi, onLanguage, onSignIn }: CareSignIn
     }
     const input: CareSignInInput = { role, patientId: patient.id, name: name.trim() };
     submitting.current = true;
+    if (autofillTimer.current !== null) window.clearTimeout(autofillTimer.current);
+    autofillTimer.current = null;
     setError(null);
     setIdentifier('');
     setSigningIn(true);
@@ -79,15 +114,15 @@ export function CareSignIn({ patients, hindi, onLanguage, onSignIn }: CareSignIn
         <form className="care-sign-in-form" onSubmit={submit} aria-labelledby={`${id}-title`} noValidate>
           <h1 id={`${id}-title`}>{t('Your care starts here', 'देखभाल की शुरुआत यहीं से')}</h1>
           <fieldset className="care-sign-in-roles"><legend>{t('Sign in as', 'किसके तौर पर साइन इन करें')}</legend><div>{([
-            ['patient', 'Patient & family', 'मरीज़ और परिवार'], ['doctor', 'Doctor', 'डॉक्टर'],
-          ] as const).map(([value, en, hi]) => <button key={value} type="button" className={`care-sign-in-role care-sign-in-role-${value}`} aria-pressed={role === value} onClick={() => { if (role !== value) { setRole(value); setIdentifier(''); setError(null); } }}><CareArt kind={roleArt[value]} /><span>{t(en, hi)}</span></button>)}</div></fieldset>
-          {role === 'doctor' && <label className="care-sign-in-label" htmlFor={`${id}-council`}>{t('Medical council', 'मेडिकल काउंसिल')}<input id={`${id}-council`} list={`${id}-councils`} value={council} onChange={(event) => { setCouncil(event.target.value); setError(null); }} placeholder={t('Select or enter your council', 'अपनी काउंसिल चुनें या लिखें')} maxLength={120} autoComplete="off" required aria-invalid={error === 'council'} /><datalist id={`${id}-councils`}><option value="Delhi Medical Council" /><option value="Karnataka Medical Council" /><option value="Telangana Medical Council" /><option value="Andhra Pradesh Medical Council" /><option value="Maharashtra Medical Council" /></datalist></label>}
+            ['patient', 'Patient', 'मरीज़'], ['family', 'Family', 'परिवार'], ['doctor', 'Doctor', 'डॉक्टर'],
+          ] as const).map(([value, en, hi]) => <button key={value} type="button" className={`care-sign-in-role care-sign-in-role-${value}`} aria-pressed={role === value} onClick={() => { if (role !== value) { setRole(value); setIdentifier(''); setCouncil(''); setAutofilling(true); setError(null); } }}><CareArt kind={roleArt[value]} /><span>{t(en, hi)}</span></button>)}</div></fieldset>
+          {role === 'doctor' && <label className="care-sign-in-label" htmlFor={`${id}-council`}>{t('Medical council', 'मेडिकल काउंसिल')}<input id={`${id}-council`} list={`${id}-councils`} value={council} onFocus={() => { autofillStopped.current.council = true; }} onChange={(event) => { autofillStopped.current.council = true; setCouncil(event.target.value); setError(null); }} placeholder={t('Select or enter your council', 'अपनी काउंसिल चुनें या लिखें')} maxLength={120} autoComplete="off" required aria-invalid={error === 'council'} /><datalist id={`${id}-councils`}><option value="Delhi Medical Council" /><option value="Karnataka Medical Council" /><option value="Telangana Medical Council" /><option value="Andhra Pradesh Medical Council" /><option value="Maharashtra Medical Council" /></datalist></label>}
           <label className="care-sign-in-label" htmlFor={`${id}-identifier`}>
             {role === 'doctor' ? t('Medical registration number', 'मेडिकल रजिस्ट्रेशन नंबर') : t('Patient’s ABHA number', 'मरीज़ का ABHA नंबर')}
-            <input ref={identifierInput} id={`${id}-identifier`} type="text" inputMode={role === 'doctor' ? 'text' : 'numeric'} enterKeyHint="go" value={identifier} onChange={(event) => { setIdentifier(event.target.value); setError(null); }} placeholder={role === 'doctor' ? t('Registration number', 'रजिस्ट्रेशन नंबर') : t('14 digits', '14 अंक')} maxLength={role === 'doctor' ? 40 : 24} autoComplete="off" autoCapitalize="none" spellCheck={false} aria-invalid={Boolean(error)} aria-describedby={error ? `${id}-error` : undefined} required />
+            <input ref={identifierInput} id={`${id}-identifier`} type="text" inputMode={role === 'doctor' ? 'text' : 'numeric'} enterKeyHint="go" value={identifier} onFocus={() => { autofillStopped.current.identifier = true; }} onChange={(event) => { autofillStopped.current.identifier = true; setIdentifier(event.target.value); setError(null); }} placeholder={role === 'doctor' ? t('Registration number', 'रजिस्ट्रेशन नंबर') : t('14 digits', '14 अंक')} maxLength={role === 'doctor' ? 40 : 24} autoComplete="off" autoCapitalize="none" spellCheck={false} aria-invalid={Boolean(error)} aria-describedby={error ? `${id}-error` : undefined} required />
           </label>
           {error && <p id={`${id}-error`} className="care-sign-in-error" role="alert">{error === 'abha' ? t('Enter a 14-digit ABHA number.', '14 अंकों का ABHA नंबर डालें।') : error === 'council' ? t('Enter your medical council.', 'अपनी मेडिकल काउंसिल लिखें।') : t('Enter the number shown on your registration.', 'अपने रजिस्ट्रेशन पर दिया नंबर लिखें।')}</p>}
-          <button type="submit" className="care-sign-in-submit" disabled={!patient || !name.trim() || !identifier.trim()}><span>{t('Sign in', 'साइन इन करें')}</span><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg></button>
+          <button type="submit" className="care-sign-in-submit" disabled={autofilling || !patient || !name.trim() || !identifierValid || (role === 'doctor' && !council.trim())}><span>{t('Sign in', 'साइन इन करें')}</span><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg></button>
         </form>
       </div>
     </main>

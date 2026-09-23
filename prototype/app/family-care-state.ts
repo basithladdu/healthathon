@@ -32,3 +32,31 @@ export function setFamilyTaskCompleted(tasks: FamilyTask[], patientId: string, t
   if (!actor.trim()) return tasks;
   return tasks.map((task) => task.patientId === patientId && task.id === taskId ? { ...task, completedBy: complete ? actor : null } : task);
 }
+
+export function editFamilyTask(tasks: FamilyTask[], patientId: string, updated: FamilyTask): FamilyTask[] {
+  const previous = tasks.find((task) => task.patientId === patientId && task.id === updated.id);
+  if (!previous || updated.patientId !== patientId) return tasks;
+  const next: FamilyTask = {
+    ...previous,
+    title: updated.title.trim(), owner: updated.owner.trim(), kind: updated.kind, due: updated.due,
+  };
+  const changed = next.title !== previous.title || next.owner !== previous.owner || next.kind !== previous.kind || next.due !== previous.due;
+  if (!changed) return tasks;
+  const remaining = tasks.filter((task) => task !== previous);
+  if (addFamilyTask(remaining, next) === remaining) return tasks;
+  // A previous completion belongs to the previous wording, owner and schedule.
+  return tasks.map((task) => task === previous ? { ...next, completedBy: null } : task);
+}
+
+export function removeFamilyTask(tasks: FamilyTask[], patientId: string, taskId: string): FamilyTask[] {
+  if (!tasks.some((task) => task.patientId === patientId && task.id === taskId)) return tasks;
+  return tasks.filter((task) => task.patientId !== patientId || task.id !== taskId);
+}
+
+export function restoreFamilyTask(tasks: FamilyTask[], patientId: string, removed: FamilyTask): FamilyTask[] {
+  if (removed.patientId !== patientId || tasks.some((task) => task.id === removed.id)) return tasks;
+  // Completed tasks may coexist with a newer open task for the same appointment.
+  const forValidation = removed.completedBy ? { ...removed, appointmentId: undefined } : removed;
+  if (addFamilyTask(tasks, forValidation) === tasks) return tasks;
+  return [...tasks, { ...removed }];
+}

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { IconFileText, IconSparkles, IconClock } from './icons';
-import { CARE_NOTE_LABELS, type AssistedNote, type DoctorConversationEntry } from './doctor-conversation-state';
+import { CARE_NOTE_LABELS, organiseConversation, type AssistedNote, type DoctorConversationEntry } from './doctor-conversation-state';
 
 type RecognitionEvent = { resultIndex: number; results: ArrayLike<{ isFinal: boolean; 0: { transcript: string } }> };
 type Recognition = { continuous: boolean; interimResults: boolean; lang: string; start: () => void; stop: () => void; abort: () => void; onresult: ((event: RecognitionEvent) => void) | null; onerror: ((event: { error: string }) => void) | null; onend: (() => void) | null };
@@ -12,10 +12,11 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
 
-function isAssistedNote(value: unknown): value is AssistedNote {
+function isAssistedNote(value: unknown, source: string): value is AssistedNote {
   if (!isRecord(value) || !isRecord(value.fields) || !isRecord(value.excerpts)) return false;
   const { fields, excerpts } = value;
-  return Object.keys(CARE_NOTE_LABELS).every((key) => typeof fields[key] === 'string' && typeof excerpts[key] === 'string');
+  return Object.keys(CARE_NOTE_LABELS).every((key) => typeof fields[key] === 'string' && typeof excerpts[key] === 'string'
+    && fields[key] === excerpts[key] && (!fields[key] || source.includes(fields[key] as string)));
 }
 
 export function ConversationAudio({ file }: { file: File }) {
@@ -24,9 +25,9 @@ export function ConversationAudio({ file }: { file: File }) {
   return <audio controls preload="metadata" src={url} aria-label="Conversation recording" />;
 }
 
-export function DoctorConversation({ patientId, patientName, patients, physician, initialNote, hindi, onPatient, onSave, onHistory }: {
+export function DoctorConversation({ patientId, patientName, patients, physician, initialNote, referenceNote, hindi, onPatient, onSave, onHistory }: {
   patientId: string; patientName: string; patients: Array<{ id: string; name: string }>; physician: string;
-  initialNote: string; hindi: boolean; onPatient: (id: string) => void;
+  initialNote: string; referenceNote?: string; hindi: boolean; onPatient: (id: string) => void;
   onSave: (entry: DoctorConversationEntry, draft?: AssistedNote) => void; onHistory: () => void;
 }) {
   const [note, setNote] = useState(initialNote);
@@ -45,6 +46,7 @@ export function DoctorConversation({ patientId, patientName, patients, physician
   const stream = useRef<MediaStream | null>(null);
   const mounted = useRef(true);
   const assistRequest = useRef<AbortController | null>(null);
+  const preparing = useRef(false);
   const t = (en: string, hi: string) => hindi ? hi : en;
 
   useEffect(() => {
@@ -101,28 +103,38 @@ export function DoctorConversation({ patientId, patientName, patients, physician
   }
 
   function stopRecording() { recognition.current?.stop(); if (recorder.current?.state === 'recording') recorder.current.stop(); }
-  function save(draft?: AssistedNote) {
+  function save(draft?: AssistedNote, source = note.trim()) {
     if (recording || starting || (!note.trim() && !audio)) return;
-    onSave({ id: crypto.randomUUID(), patientId, physician, note: note.trim(), recordedAt: new Date().toISOString(), audio, recordingAgreed: agreed }, draft);
+    onSave({ id: crypto.randomUUID(), patientId, physician, note: source, recordedAt: new Date().toISOString(), audio, recordingAgreed: agreed }, draft);
   }
   async function assist() {
-    if (!note.trim() || busy) return;
+    if (!note.trim() || preparing.current || recording || starting) return;
+    const source = note.trim();
+    preparing.current = true;
     setBusy(true); setMessage('');
-    const request = new AbortController(); assistRequest.current = request;
     try {
-      const response = await fetch('/api/care-assist', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ source: note }), signal: request.signal });
-      const result = await response.json();
-      if (!mounted.current) return;
-      if (!response.ok) throw new Error(isRecord(result) && typeof result.error === 'string' ? result.error : 'The draft could not be prepared. Your note is still here.');
-      if (!isAssistedNote(result)) throw new Error('The draft could not be read. Your note is still here.');
-      if (!Object.values(result.fields).some((value) => value.trim())) throw new Error('No clear care-note sections were found. You can review the conversation as written.');
-      save(result);
-    } catch (error) { if (mounted.current) setMessage(error instanceof Error ? error.message : 'The draft could not be prepared.'); }
-    finally { if (mounted.current) setBusy(false); }
+      let draft = organiseConversation(source);
+      if (aiReady) {
+        const request = new AbortController(); assistRequest.current = request;
+        try {
+          const response = await fetch('/api/care-assist', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ source }), signal: request.signal });
+          const result: unknown = await response.json();
+          if (response.ok && isAssistedNote(result, source) && Object.values(result.fields).some((value) => value.trim())) draft = result;
+        } catch {
+          // The exact-text draft remains available if the optional service cannot respond.
+        }
+        if (request.signal.aborted) return;
+      }
+      if (mounted.current) save(draft, source);
+    } finally {
+      preparing.current = false;
+      assistRequest.current = null;
+      if (mounted.current) setBusy(false);
+    }
   }
 
   return <section className="doctor-conversation">
-    <header className="doctor-page-heading"><div><span className="doctor-eyebrow">{physician}</span><h1>{t('Record a conversation', 'बातचीत दर्ज करें')}</h1></div><select aria-label="Patient" value={patientId} disabled={recording || starting} onChange={(event) => onPatient(event.target.value)}>{patients.map((person) => <option key={person.id} value={person.id}>{person.name}</option>)}</select></header>
+    <header className="doctor-page-heading"><div><span className="doctor-eyebrow">{physician}</span><h1>{t('Record a conversation', 'बातचीत दर्ज करें')}</h1></div><select aria-label="Patient" value={patientId} disabled={recording || starting || busy} onChange={(event) => onPatient(event.target.value)}>{patients.map((person) => <option key={person.id} value={person.id}>{person.name}</option>)}</select></header>
     <div className="doctor-note-steps" aria-label="Care note steps"><strong><span>1</span> {t('Conversation', 'बातचीत')}</strong><span><span>2</span> {t('Review & sign', 'जाँचें और हस्ताक्षर करें')}</span><button type="button" onClick={onHistory}><IconClock /> {t('Note history', 'पुराने नोट')}</button></div>
     <div className="doctor-capture-grid">
       <section className={`doctor-record-card ${recording ? 'is-recording' : ''}`}>
@@ -135,10 +147,10 @@ export function DoctorConversation({ patientId, patientName, patients, physician
         {audio && <div className="doctor-audio-review"><ConversationAudio file={audio} /><button type="button" className="care-text-button" disabled={busy} onClick={() => setAudio(undefined)}>Remove recording</button></div>}
       </section>
       <section className="doctor-transcript-card"><div className="family-section-heading"><h2><IconFileText /> {t('Conversation note', 'बातचीत का नोट')}</h2><span>{patientName.split(' ')[0]}</span></div>
+        {referenceNote?.trim() && !note.trim() && !audio && !recording && !starting && <button className="care-text-button" type="button" disabled={busy} onClick={() => { setNote(referenceNote); setMessage(''); }}>{t('Use latest conversation', 'पिछली बातचीत लें')}</button>}
         <textarea aria-label="Conversation note" value={note} disabled={busy} maxLength={12000} rows={12} onChange={(event) => setNote(event.target.value)} placeholder={t('Record, type, or paste the conversation here.', 'बातचीत रिकॉर्ड करें, लिखें या यहाँ पेस्ट करें।')} />
         {interim && <p className="doctor-caption" aria-live="polite">{interim}</p>}
-        <div className="doctor-note-actions"><button className="primary-button" type="button" disabled={recording || starting || busy || (!note.trim() && !audio)} onClick={() => save()}>{!note.trim() && audio ? t('Save recording', 'रिकॉर्डिंग सेव करें') : t('Review & sign', 'जाँचें और हस्ताक्षर करें')} →</button>
-          <button className="doctor-ai-button" type="button" disabled={!aiReady || busy || recording || starting || !note.trim()} title={!aiReady ? 'AI provider setup is pending' : 'Only organise what was said. You review before signing.'} onClick={assist}><IconSparkles /> {busy ? 'Preparing draft…' : 'AI draft'}</button></div>
+        <div className="doctor-note-actions"><button className="primary-button" type="button" disabled={recording || starting || busy || (!note.trim() && !audio)} onClick={() => { if (note.trim()) void assist(); else save(); }}>{note.trim() && <IconSparkles />}{busy ? t('Preparing care note…', 'देखभाल नोट तैयार हो रहा है…') : !note.trim() && audio ? t('Save recording', 'रिकॉर्डिंग सेव करें') : t('Prepare care note', 'देखभाल नोट तैयार करें')} →</button></div>
       </section>
     </div>
     {message && <p className="doctor-action-message" role="status">{message}</p>}

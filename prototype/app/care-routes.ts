@@ -6,6 +6,9 @@ export const CARE_ROUTES = {
   community: '/support-groups',
   'document-search': '/find-in-documents',
   calendar: '/calendar',
+  'next-visit': '/next-visit',
+  medicines: '/medicines',
+  'care-circle': '/care-circle',
   'family-tasks': '/family-tasks',
   'visit-questions': '/next-visit-questions',
   'support-resources': '/support-resources',
@@ -55,12 +58,22 @@ export type CareView = keyof typeof CARE_ROUTES;
 export function careViewFromPath(path: string): CareView | undefined {
   const normalized = path.replace(/\/$/, '') || '/';
   if (normalized === '/next-doctor') return 'doctor-pack';
-  if (normalized === '/costs' || normalized === '/family-tasks' || normalized === '/saved-places') return 'daily-care';
+  if (normalized === '/saved-places') return 'daily-care';
+  if (normalized.startsWith('/workspace/')) {
+    if (['/workspace/draft', '/workspace/conversations'].includes(normalized)) return 'doctor-record';
+    if (normalized === '/workspace/review') return 'doctor-review';
+    if (['/workspace/history', '/workspace/records', '/workspace/retrieve'].includes(normalized)) return 'doctor-history';
+    if (normalized === '/workspace/family') return 'care-circle';
+    if (normalized === '/workspace/appointments') return 'calendar';
+    return 'home';
+  }
   if (normalized === '/questions') return 'visit-questions';
   return (Object.keys(CARE_ROUTES) as CareView[]).find((view) => CARE_ROUTES[view] === normalized);
 }
 
 export function canOpenCareView(view: CareView, role: 'family' | 'patient' | 'care-team', clinician: string) {
+  // The previous workspace contains clinical decision tools outside this product's scope.
+  if (CARE_ROUTES[view].startsWith('/workspace/')) return false;
   if (role !== 'care-team') {
     if (view === 'caregiver') return role === 'family';
     if (view === 'my-details' || view === 'consent') return true;

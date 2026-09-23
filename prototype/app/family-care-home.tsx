@@ -24,9 +24,17 @@ export function FamilyCareHome({ patientName, hindi, nextVisit }: FamilyCareHome
       <CareRouteLink view="my-plan" className="care-home-latest-note"><CareArt kind="care-story" /><strong>{t('My care note', 'मेरा देखभाल नोट')}</strong><IconArrowRight /></CareRouteLink>
       <CareRouteLink view="doctor-pack" className="care-home-summary"><CareArt kind="doctor-pack" /><strong>{t('Care summary', 'देखभाल का सार')}</strong><IconArrowRight /></CareRouteLink>
     </div>
+    <div className="care-home-family-links">
+      <CareRouteLink view="care-circle"><CareArt kind="home-help" /><strong>{t('My care circle', 'मेरे अपने')}</strong><IconArrowRight /></CareRouteLink>
+      <CareRouteLink view="family-tasks"><CareArt kind="open-questions" /><strong>{t('Who can help?', 'कौन मदद करेगा?')}</strong><IconArrowRight /></CareRouteLink>
+      <CareRouteLink view="medicines"><CareArt kind="cancer-overview" /><strong>{t('My medicines', 'मेरी दवाइयाँ')}</strong><IconArrowRight /></CareRouteLink>
+    </div>
     <div className="care-home-groups">{CARE_SECTIONS.map((section) => <CareRouteLink key={section.view} view={section.view} className={`care-home-group tone-${section.color}`}>
       <CareArt kind={section.art} /><strong>{hindi ? section.hi : section.en}</strong><IconArrowRight />
     </CareRouteLink>)}</div>
-    <CareRouteLink view="calendar" className="care-home-next-visit"><span><strong>{t('Treatment calendar', 'इलाज का कैलेंडर')}</strong>{nextVisit && <time dateTime={nextVisit.date}>{dateLabel} · {nextVisit.time} · {nextVisit.clinician}</time>}</span><IconArrowRight /></CareRouteLink>
+    <div className="care-home-visit-links">
+      <CareRouteLink view="calendar" className="care-home-next-visit"><span><strong>{t('Treatment calendar', 'इलाज का कैलेंडर')}</strong>{nextVisit && <time dateTime={nextVisit.date}>{dateLabel} · {nextVisit.time} · {nextVisit.clinician}</time>}</span><IconArrowRight /></CareRouteLink>
+      {nextVisit && <CareRouteLink view="next-visit" className="care-home-visit-ready"><CareArt kind="doctor-pack" /><span>{t('Get ready for this visit', 'इस मुलाकात की तैयारी')}</span><IconArrowRight /></CareRouteLink>}
+    </div>
   </section>;
 }

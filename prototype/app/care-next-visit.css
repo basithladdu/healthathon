@@ -1,0 +1,67 @@
+.care-next-visit { max-width: 1120px; min-width: 0; color: #473c32; font-family: var(--font-inter), sans-serif; }
+.care-next-visit * { box-sizing: border-box; }
+.care-next-visit svg { width: 22px; height: 22px; flex: none; }
+.care-next-visit button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 44px; padding: 9px 12px; border: 1px solid #d9c6aa; border-radius: 12px; color: #775034; background: #fffaf1; font: 600 12px/1.4 var(--font-inter), sans-serif; cursor: pointer; }
+.care-next-visit button:disabled { opacity: .5; cursor: not-allowed; }
+.care-next-visit :is(button, input, a):focus-visible { outline: 3px solid #80609a; outline-offset: 3px; }
+.care-next-visit :is(h1, h2, p) { margin: 0; }
+.next-visit-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 17px; }
+.next-visit-heading > div > span { display: block; margin-bottom: 4px; color: #856d58; font-size: 12px; }
+.next-visit-heading h1 { font: 650 30px/1.2 var(--font-sora), sans-serif; letter-spacing: -.8px; }
+.care-next-visit .next-visit-download { background: #a9573b; border-color: #a9573b; color: #fff; }
+.next-visit-top { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 14px; margin-bottom: 14px; }
+.next-visit-appointment { display: grid; grid-template-columns: 70px minmax(0, 1fr); align-items: start; gap: 15px; padding: 20px; border: 1px solid #eac586; border-radius: 22px; background: #ffe8bd; }
+.next-visit-date-icon { display: grid; justify-items: center; gap: 8px; padding: 13px 8px; border: 1px solid #efd2a2; border-radius: 17px; color: #96622c; background: #fff7e8; }
+.next-visit-date-icon strong { font-size: 29px; line-height: 1; }
+.next-visit-source { display: block; margin-bottom: 4px; color: #926b3e; font-size: 11px; }
+.next-visit-appointment h2 { font-size: 19px; line-height: 1.4; overflow-wrap: anywhere; }
+.next-visit-appointment time { display: block; margin-top: 7px; color: #77532e; font-size: 13px; font-weight: 600; line-height: 1.5; }
+.next-visit-appointment p { margin-top: 6px; font-size: 12px; line-height: 1.5; }
+.next-visit-appointment button { padding: 8px 0 0; justify-content: flex-start; background: transparent; border-color: transparent; }
+.next-visit-prep { padding: 20px; border: 1px solid #d8c2e7; border-radius: 22px; background: #eee2f8; }
+.next-visit-prep h2 { margin-bottom: 9px; color: #674b7b; font-size: 17px; }
+.next-visit-prep > p { color: #5d486a; font-size: 13px; line-height: 1.65; white-space: pre-wrap; overflow-wrap: anywhere; }
+.next-visit-prep > span { display: block; margin-top: 9px; color: #816591; font-size: 11px; }
+.next-visit-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; gap: 14px; }
+.next-visit-panel { min-width: 0; padding: 17px; border: 1px solid #e3cdb5; border-radius: 20px; background: #fff5e7; }
+.next-visit-questions { background: #fff4d6; border-color: #e8d39a; }
+.next-visit-help { background: #eaf0dd; border-color: #c9d9b4; }
+.next-visit-reports { background: #f5e5e0; border-color: #e6c7bb; }
+.next-visit-section-heading { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 2px 8px; margin-bottom: 9px; }
+.next-visit-section-heading h2 { display: flex; align-items: center; gap: 7px; font-size: 16px; line-height: 1.4; }
+.next-visit-section-heading button { min-height: 32px; padding: 4px 0; border-color: transparent; border-radius: 4px; background: transparent; font-size: 11px; }
+.next-visit-quick-add { display: flex; align-items: center; gap: 6px; }
+.care-next-visit input:not([type='checkbox']) { width: 100%; min-width: 0; min-height: 44px; padding: 10px; border: 1px solid #d4c4aa; border-radius: 11px; background: #fffdf7; color: #4d4035; font: 400 14px/1.4 var(--font-inter), sans-serif; }
+.next-visit-quick-add > input { flex: 1; }
+.next-visit-quick-add > button { flex: none; padding-inline: 10px; }
+.next-visit-checklist { list-style: none; margin: 10px 0 0; padding: 0; }
+.next-visit-checklist li + li { border-top: 1px solid #d5cbb44f; }
+.next-visit-checklist label { display: flex; align-items: flex-start; gap: 9px; padding: 11px 0; min-height: 44px; cursor: pointer; }
+.next-visit-checklist input { width: 19px; height: 19px; flex: 0 0 19px; margin: 1px 0 0; accent-color: #5b7843; }
+.next-visit-checklist label > span { min-width: 0; font-size: 13px; line-height: 1.5; overflow-wrap: anywhere; }
+.next-visit-checklist small { display: block; margin-top: 3px; color: #7a6b52; font-size: 11px; }
+.next-visit-checklist .is-done label > span { text-decoration: line-through; color: #718160; }
+.next-visit-checklist .is-done small { text-decoration: none; }
+.next-visit-help-options { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 9px; }
+.next-visit-help-options button { background: #f4f8e9; border-color: #c4d6a8; color: #57713b; font-size: 11px; }
+.next-visit-help-form { display: grid; gap: 7px; }
+.next-visit-report-list { list-style: none; margin: 0; padding: 0; }
+.next-visit-report-list li + li { border-top: 1px solid #dfc8bd; }
+.next-visit-report-list a { display: flex; align-items: center; gap: 9px; min-height: 62px; padding-block: 9px; color: #744e3e; text-decoration: none; }
+.visit-report-icon { display: grid; place-items: center; width: 33px; height: 39px; flex: none; border-radius: 9px; color: #966543; background: #ffe9d0; }
+.next-visit-report-list a > span:nth-child(2) { flex: 1; min-width: 0; }
+.next-visit-report-list strong { display: block; font-size: 12px; font-weight: 600; line-height: 1.5; overflow-wrap: anywhere; }
+.next-visit-report-list time { display: block; margin-top: 3px; color: #9a7563; font-size: 10px; }
+.next-visit-add-report { width: 100%; margin-top: 9px; }
+.care-next-visit .next-visit-empty-line { margin-top: 9px; font-size: 12px; line-height: 1.6; color: #866e54; }
+.care-next-visit .next-visit-message { margin: 0 0 12px; font-size: 13px; line-height: 1.5; color: #607148; }
+@media (max-width: 1050px) { .next-visit-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .next-visit-reports { grid-column: 1 / -1; } .next-visit-report-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 18px; } }
+@media (max-width: 680px) {
+  .next-visit-heading { gap: 10px; } .next-visit-heading h1 { font-size: 26px; }
+  .next-visit-top, .next-visit-grid { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .next-visit-appointment, .next-visit-prep { padding: 16px; border-radius: 18px; }
+  .next-visit-appointment { grid-template-columns: 58px minmax(0, 1fr); gap: 13px; }
+  .next-visit-date-icon { padding: 11px 6px; border-radius: 14px; } .next-visit-date-icon strong { font-size: 26px; }
+  .next-visit-panel { padding: 15px; border-radius: 18px; } .next-visit-report-list { grid-template-columns: minmax(0, 1fr); }
+  .next-visit-section-heading button { min-height: 44px; } .next-visit-section-heading { align-items: center; }
+}

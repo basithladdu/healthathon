@@ -20,8 +20,8 @@ export function SimpleCareShell({ children, view, role, hindi, saveStatus, onNav
     <header className="simple-care-header">
       <CareRouteLink className="simple-care-brand" view={role === 'doctor' ? 'home' : 'daily-care'} onOpen={() => onNavigate(role === 'doctor' ? 'home' : 'daily-care')}>Saanthvana</CareRouteLink>
       <div className="simple-care-switches"><button type="button" onClick={onLanguage} lang={hindi ? 'en' : 'hi'}>{hindi ? 'English' : 'हिन्दी'}</button>
-        <select aria-label={t('View as', 'किसका पेज')} value={role === 'doctor' ? 'doctor' : 'patient'} onChange={(event) => onRole(event.target.value as typeof role)}>
-          <option value="patient">{t('Patient & family', 'मरीज़ और परिवार')}</option><option value="doctor">{t('Doctor', 'डॉक्टर')}</option>
+        <select aria-label={t('View as', 'किसका पेज')} value={role} onChange={(event) => onRole(event.target.value as typeof role)}>
+          <option value="patient">{t('Patient', 'मरीज़')}</option><option value="family">{t('Family', 'परिवार')}</option><option value="doctor">{t('Doctor', 'डॉक्टर')}</option>
         </select>
         <button type="button" onClick={onSignOut}>{t('Sign out', 'साइन आउट')}</button>
       </div>

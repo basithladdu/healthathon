@@ -20,6 +20,7 @@ type Props = {
   onAppointmentInstructions: (patientId: string, appointmentId: string, value: Appointment['preparationInstructions']) => void;
   onAdd: (event: CareEvent) => void; onCheck: (id: string, date: string, complete: boolean) => void;
   onUpdate?: (event: CareEvent) => void;
+  onMedicines?: () => void;
   onTaskCheck: (id: string, complete: boolean) => void; onRemove: (id: string) => void;
   onRestore: (event: CareEvent, checks: CareCheck[]) => void;
   onReports: (reports: CareReport[]) => void; onRemoveReport: (id: string) => void; onCareTeam: () => void;
@@ -29,7 +30,7 @@ export function CareCalendar(props: Props) {
   return <CareCalendarContent key={`${props.patientId}:${props.author}`} {...props} />;
 }
 
-function CareCalendarContent({ patientId, author, today, hindi, appointments, tasks, events, checks, reports, reportSave, focusReports = false, documentText = [], onReadReport, onTestResults, onAppointmentInstructions, onAdd, onUpdate, onCheck, onTaskCheck, onRemove: removeEvent, onRestore, onReports, onRemoveReport: removeReport, onCareTeam }: Props) {
+function CareCalendarContent({ patientId, author, today, hindi, appointments, tasks, events, checks, reports, reportSave, focusReports = false, documentText = [], onReadReport, onTestResults, onAppointmentInstructions, onAdd, onUpdate, onMedicines, onCheck, onTaskCheck, onRemove: removeEvent, onRestore, onReports, onRemoveReport: removeReport, onCareTeam }: Props) {
   const id = useId();
   const eventForm = useRef<HTMLFormElement>(null);
   const t = (en: string, hi: string) => hindi ? hi : en;
@@ -63,6 +64,7 @@ function CareCalendarContent({ patientId, author, today, hindi, appointments, ta
   }
 
   function editEvent(item: CareEvent) {
+    if (item.kind === 'Medicine' && onMedicines) { onMedicines(); return; }
     setEditing(item); setKind(item.kind); setAdding(true); setMessage('');
   }
 

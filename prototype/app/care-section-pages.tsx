@@ -9,15 +9,19 @@ import './care-section-pages.css';
 export const CARE_SECTIONS: Array<{ view: CareView; en: string; hi: string; art: CareArtKind; color: string; items: Array<{ view: CareView; en: string; hi: string; art: CareArtKind }> }> = [
   { view: 'clinical-documents', en: 'My documents', hi: 'मेरे दस्तावेज़', art: 'care-story', color: 'peach', items: [
     { view: 'my-plan', en: 'Care note', hi: 'देखभाल का नोट', art: 'care-story' },
-    { view: 'reports', en: 'Cancer reports', hi: 'कैंसर की रिपोर्ट', art: 'lab-history' },
+    { view: 'reports', en: 'Reports & answers', hi: 'रिपोर्ट और जवाब', art: 'lab-history' },
     { view: 'lab-history', en: 'Test trends', hi: 'जाँच में बदलाव', art: 'lab-history' },
-    { view: 'document-search', en: 'Find in my documents', hi: 'दस्तावेज़ों में खोजें', art: 'doctor-pack' },
     { view: 'calendar', en: 'Treatment calendar', hi: 'इलाज का कैलेंडर', art: 'cancer-overview' },
+    { view: 'next-visit', en: 'Ready for the next visit', hi: 'अगली मुलाकात की तैयारी', art: 'doctor-pack' },
+    { view: 'medicines', en: 'My medicines', hi: 'मेरी दवाइयाँ', art: 'cancer-overview' },
     { view: 'care-story', en: 'Care timeline', hi: 'देखभाल का सफ़र', art: 'care-story' },
   ] },
   { view: 'access-care', en: 'Find support', hi: 'मदद ढूँढें', art: 'support-places', color: 'lavender', items: [
     { view: 'care-near-me', en: 'Palliative care centres', hi: 'पैलिएटिव देखभाल केंद्र', art: 'support-places' },
     { view: 'home-help', en: 'Help at home', hi: 'घर पर मदद', art: 'home-help' },
+    { view: 'care-circle', en: 'My care circle', hi: 'मेरे अपने', art: 'home-help' },
+    { view: 'family-tasks', en: 'Who can help?', hi: 'कौन मदद करेगा?', art: 'home-help' },
+    { view: 'cost-help', en: 'Costs & support', hi: 'खर्च और सहायता', art: 'cost-help' },
     { view: 'community', en: 'Support groups', hi: 'सहायता समूह', art: 'home-help' },
     { view: 'my-doctors', en: 'My care team', hi: 'मेरी देखभाल टीम', art: 'doctor-pack' },
   ] },

@@ -1,0 +1,27 @@
+.family-workspace .family-task-suggestions { display: flex; flex-wrap: wrap; gap: 7px; margin: 14px 0 12px; }
+.family-workspace .family-task-suggestions button { min-height: 44px; padding: 8px 11px; border: 1px solid #e7c79b; border-radius: 12px; background: #fff0d6; color: #7c542e; font: 500 12px/1.4 var(--font-inter), sans-serif; cursor: pointer; }
+.family-workspace .family-task-suggestions button:nth-child(2n) { background: #e6efda; border-color: #c7d7b1; color: #4e6739; }
+.family-workspace .family-task-suggestions button:nth-child(3n) { background: #eee3f7; border-color: #d8c3e8; color: #74548c; }
+.family-workspace .family-task-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 3px 0; }
+.family-workspace .family-task-row > label { min-width: 0; }
+.family-workspace .family-task-row > label > span { min-width: 0; }
+.family-workspace .family-task-row-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+.family-workspace .family-task-row-actions .care-text-button { font-size: 12px; }
+.family-workspace .family-task-row-actions .primary-button { width: auto; min-height: 44px; padding: 9px 13px; box-shadow: none; }
+.family-workspace .family-task-edit { grid-column: 1 / -1; display: grid; gap: 12px; padding: 14px; border: 1px solid #d6c4e3; border-radius: 14px; background: #f3eaf9; }
+.family-workspace .family-task-edit label { display: grid; gap: 6px; padding: 0; min-width: 0; min-height: 0; font-size: 12px; font-weight: 600; cursor: default; }
+.family-workspace .family-task-edit :is(input, select) { width: 100%; height: auto; min-width: 0; min-height: 44px; flex: initial; margin: 0; padding: 10px 11px; border: 1px solid #ccb8db; border-radius: 10px; background: #fffdf9; color: #4c3956; font: 400 15px/1.4 var(--font-inter), sans-serif; }
+.family-workspace .family-task-edit-fields { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, .9fr) minmax(0, 1fr); gap: 10px; }
+.family-workspace .family-task-undo { display: flex; align-items: center; justify-content: space-between; gap: 13px; padding: 6px 13px; margin-bottom: 13px; border: 1px solid #dfc891; border-radius: 13px; background: #fff0c5; color: #735626; font-size: 13px; }
+.family-workspace .family-task-undo > span { min-width: 0; overflow-wrap: anywhere; }
+.family-workspace .family-task-undo button { flex: none; color: #735626; text-decoration: underline; text-underline-offset: 3px; }
+.family-workspace .care-completed { max-width: none; }
+.family-workspace .family-task-suggestions button:focus-visible, .family-workspace .family-task-edit :is(button, input, select):focus-visible { outline: 3px solid #7b5b93; outline-offset: 3px; }
+@media (max-width: 620px) {
+  .family-workspace .family-task-row { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .family-workspace .family-task-row-actions { gap: 17px; }
+  .family-workspace .family-task-row > .family-task-row-actions { padding-left: 34px; }
+  .family-workspace .family-task-edit-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .family-workspace .family-task-edit-fields > label:first-child { grid-column: 1 / -1; }
+  .family-workspace .family-task-edit { padding: 12px; }
+}
