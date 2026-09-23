@@ -20,4 +20,12 @@ The full new attachment is preserved byte-for-byte at ignored local path `source
 
 Request sharing and statuses use the existing browser storage and role switch. Real identity verification, cross-device delivery, transcription/OCR providers and a verified dispensing-centre inventory are still unconnected. The care note records a discussion; it is not an advance medical directive or treatment order. The structured editor does not provide clinical recommendations.
 
-No automated test suite or local production build was run for this change. Vercel performs the required deployment build. Deployment outcome is recorded in the release response.
+No automated test suite or local production build was run for this change. Vercel's production compilation and TypeScript check passed. No live browser walkthrough was performed for this release.
+
+## Release
+
+- App commit: `cbf4511`, pushed to `main`.
+- Production deployment: `dpl_6S4WGADh5GhsvQnXae2bW2AQmc7p`, reported `READY` by Vercel.
+- Canonical address: https://continuity-loop-healthathon.vercel.app
+- Deployment address: https://continuity-loop-healthathon-oeb8xis1i.vercel.app
+- [Meeting minutes](../meetings/2026-09-23-minutes.md) and [next actions](../meetings/2026-09-23-actions.md) are saved alongside this release record.
