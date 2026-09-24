@@ -176,51 +176,17 @@ AI organises the records. The care team decides what treatment the patient needs
 
 ## Slide 6
 
-Care keeps moving when everyone knows their part.
+Your care, medicines and help in one place.
 
 Three sign-ins
 
-Patient
+Patients see their care.
 
-Family
+Families organise help.
 
-Doctor
+Doctors review and sign.
 
-01
-
-Keep the conversation together.
-
-The family opens the latest signed Care Note and keeps questions for the next visit.
-
-02
-
-Bring the right records.
-
-Priya gathers reports and checks the quoted sources and confirmed treatment dates.
-
-03
-
-Plan medicines and visits.
-
-Arjun checks reminders against the prescription and adds the next appointment.
-
-04
-
-Arrange help before leaving.
-
-Priya arranges a ride. Arjun calls to confirm home-care support and prescribed medicine availability.
-
-05
-
-Keep costs and papers together.
-
-Arjun keeps receipts, expenses and the paperwork needed to ask for financial help.
-
-06
-
-Make space for the caregiver.
-
-Priya records what feels difficult. The family shares tasks and looks for emotional support.
+Plan rides and home support. Keep medicine calls, costs, paperwork and emotional support together.
 
 Find a centre → call to confirm → keep the contact and visit plan.
 
