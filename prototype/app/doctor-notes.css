@@ -18,6 +18,9 @@
 .doctor-structured-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 12px; padding: 12px 0; }
 .doctor-structured-grid label { display: grid; gap: 5px; min-width: 0; color: #584a71; font-size: 12px; font-weight: 650; }
 .doctor-structured-grid textarea { width: 100%; min-width: 0; min-height: 68px; padding: 9px 10px; border: 1px solid #d4cbe2; border-radius: 9px; background: #fff; color: #40364e; font: 13px/1.55 var(--font-inter, sans-serif); resize: vertical; }
+.doctor-structured-group { border-bottom: 1px solid #e5deef; }
+.doctor-structured-group:last-child { border-bottom: 0; }
+.doctor-structured-group > summary { padding: 10px 0; color: #594877; font-size: 12px; font-weight: 700; cursor: pointer; }
 .doctor-page-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px 24px; margin-bottom: 16px; }
 .doctor-page-heading > div { min-width: 0; }
 .doctor-page-heading .doctor-eyebrow { display: block; margin-bottom: 6px; color: #66718e; font-size: 12px; font-weight: 650; }
@@ -28,15 +31,16 @@
 .doctor-source-import:focus-within { outline: 3px solid #c6973b; outline-offset: 3px; }
 .care-note-top-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
 .care-note-top-actions .primary-button { min-height: 46px; padding: 10px 14px; font-size: 13px; }
-.doctor-note-steps { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 22px; padding: 10px 14px; margin-bottom: 18px; border: 1px solid #d6ddec; border-radius: 14px; background: #f4f6fc; color: #758098; font-size: 13px; }
-.doctor-note-steps > :is(strong, span) { display: inline-flex; gap: 8px; align-items: center; min-height: 34px; }
-.doctor-note-steps > :is(strong, span) > span { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 9px; background: #e4e9f3; color: #697794; font-size: 12px; font-weight: 700; }
-.doctor-note-steps > strong { color: #29488d; }
-.doctor-note-steps > strong > span { background: #244cac; color: #fff; }
-.doctor-note-steps > button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 44px; padding: 8px 12px; border: 1px solid #d2daeb; border-radius: 10px; background: #fff; color: #4e648d; font: 600 12px var(--font-inter, sans-serif); cursor: pointer; }
-.doctor-note-steps > button:last-child { margin-left: auto; }
-.doctor-note-steps > button > span { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 9px; background: #e4e9f3; color: #697794; font-size: 12px; }
-.doctor-note-steps > button svg { width: 17px; height: 17px; }
+.doctor-note-steps { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 16px; padding: 10px 14px; margin: 0 0 18px; border: 1px solid #d6ddec; border-radius: 14px; background: #f4f6fc; color: #758098; font-size: 13px; list-style: none; }
+.doctor-note-steps > li { display: flex; min-height: 44px; align-items: center; }
+.doctor-note-steps > li > :is(strong, button, span) { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; }
+.doctor-note-steps > li > strong { color: #29488d; }
+.doctor-note-steps > li > :is(strong, button, span) > span { display: inline-grid; flex: 0 0 28px; place-items: center; width: 28px; height: 28px; border-radius: 9px; background: #e4e9f3; color: #697794; font-size: 12px; font-weight: 700; }
+.doctor-note-steps > li[aria-current='step'] > strong > span { background: #244cac; color: #fff; }
+.doctor-note-steps > li > button { justify-content: center; padding: 8px 12px; border: 1px solid #d2daeb; border-radius: 10px; background: #fff; color: #4e648d; font: 600 12px var(--font-inter, sans-serif); cursor: pointer; }
+.doctor-note-steps > li:last-child { margin-left: auto; }
+.doctor-note-steps > li:last-child > button { gap: 7px; }
+.doctor-note-steps > li > button svg { width: 17px; height: 17px; }
 .doctor-capture-grid { display: grid; grid-template-columns: minmax(280px, .72fr) minmax(0, 1.28fr); align-items: stretch; gap: 18px; }
 .doctor-record-card { display: flex; flex-direction: column; align-items: stretch; gap: 9px; min-width: 0; padding: 18px 20px; border: 1px solid #284991; border-radius: 23px; background: linear-gradient(150deg, #2855b8 0%, #283972 100%); color: #fff; box-shadow: 0 8px 22px #28397213; }
 .doctor-record-orb { display: grid; place-items: center; align-self: center; width: 64px; height: 64px; margin: 0; border: 1px solid #a9bffb61; border-radius: 50%; color: #f7d673; background: #ffffff16; }
@@ -274,10 +278,10 @@
   .simple-care-app .simple-care-content :is(.doctor-conversation, .doctor-note-review) .doctor-page-heading h1 { font-size: 27px; letter-spacing: -.7px; }
   .doctor-page-heading .doctor-eyebrow { margin-bottom: 4px; font-size: 11px; }
   .doctor-note-steps { padding: 9px; gap: 4px 12px; margin-bottom: 12px; font-size: 11px; }
-  .doctor-note-steps > :is(strong, span) { gap: 5px; }
-  .doctor-note-steps > button { margin-left: 0; padding: 6px 9px; min-height: 44px; font-size: 11px; }
-  .doctor-note-steps > button:last-child { margin-left: 0; }
-  .doctor-note-steps > :is(strong, span) > span { width: 24px; height: 24px; font-size: 11px; }
+  .doctor-note-steps > li > :is(strong, button, span) { gap: 5px; }
+  .doctor-note-steps > li > button { margin-left: 0; padding: 6px 9px; min-height: 44px; font-size: 11px; }
+  .doctor-note-steps > li:last-child { margin-left: 0; }
+  .doctor-note-steps > li > :is(strong, button, span) > span { flex-basis: 24px; width: 24px; height: 24px; font-size: 11px; }
   .doctor-record-card { padding: 18px; border-radius: 17px; }
   .doctor-record-orb { width: 60px; height: 60px; }
   .doctor-record-orb svg { width: 28px; height: 28px; }

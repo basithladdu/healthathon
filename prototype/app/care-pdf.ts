@@ -25,6 +25,7 @@ function loadFont() {
 export async function downloadCarePdf({ fileName, title, subtitle, sections, careNote }: CarePdfOptions): Promise<void> {
   if (careNote && hasChangedSignedCareNote(careNote.acknowledgements, careNote.release)) throw new Error('This note no longer matches its signed version.');
   const acknowledgements = careNote ? matchingCareNoteAcknowledgements(careNote.acknowledgements, careNote.release) : [];
+  const patientReviewed = acknowledgements.some((acknowledgement) => acknowledgement.signerRole === 'patient');
   const outputSections = [...sections];
   if (careNote) {
     const release = careNote.release;
@@ -33,7 +34,7 @@ export async function downloadCarePdf({ fileName, title, subtitle, sections, car
     outputSections.push({ heading: 'Version record', lines: [
       careNoteReleaseId(release),
       ...(release.priorVersion !== undefined ? [`Started from version ${release.priorVersion}; reviewed for this conversation.`] : []),
-      acknowledgements.length ? 'This version is saved with the signatures above. Changes require a new app version.' : release.signature && release.noteKind ? 'Patient/family review is pending.' : 'No separate patient/family signature is recorded.',
+      patientReviewed ? 'The patient reviewed this exact version. Changes require a new app version.' : release.signature && release.noteKind ? 'Patient review is pending. A family acknowledgement does not replace it.' : 'No patient signature is recorded.',
       'Typed names recorded in the app. This PDF has no verified digital signature or cryptographic seal.',
       'Care conversation record. Not a prescription or an advance medical directive.',
     ] });
@@ -47,8 +48,8 @@ export async function downloadCarePdf({ fileName, title, subtitle, sections, car
   const embeddedFont = await document.embedFont(bytes, { subset: false });
   const shapingFont = fontkit.create(bytes);
   document.setTitle(title);
-  document.setAuthor('Saanthvana');
-  document.setCreator('Saanthvana');
+  document.setAuthor('Saathi');
+  document.setCreator('Saathi');
 
   const [width, height] = pdf.PageSizes.A4;
   const margin = 44;
@@ -124,7 +125,7 @@ export async function downloadCarePdf({ fileName, title, subtitle, sections, car
   function newPage() {
     page = document.addPage([width, height]);
     y = height - 47;
-    draw('SAANTHVANA', margin, y, 9, accent);
+    draw('SAATHI', margin, y, 9, accent);
     y -= 28;
   }
 
@@ -138,7 +139,7 @@ export async function downloadCarePdf({ fileName, title, subtitle, sections, car
     }
   }
 
-  draw('SAANTHVANA', margin, y, 9, accent);
+    draw('SAATHI', margin, y, 9, accent);
   y -= 31;
   write(title, 21, ink, 30);
   if (subtitle) { y -= 2; write(subtitle, 10, muted, 16); }

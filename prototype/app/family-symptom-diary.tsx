@@ -127,7 +127,7 @@ function SymptomDiaryForPatient({ patientId, author, today, hindi, entries, onCh
 
   function download() {
     const url = URL.createObjectURL(new Blob([symptomDiaryText(entries, patientId, today, hindi)], { type: 'text/plain;charset=utf-8' }));
-    const link = document.createElement('a'); link.href = url; link.download = `saanthvana-feeling-notes-${today}.txt`; link.click(); URL.revokeObjectURL(url);
+    const link = document.createElement('a'); link.href = url; link.download = `saathi-feeling-notes-${today}.txt`; link.click(); URL.revokeObjectURL(url);
     setMessage(t('Your notes are ready to download.', 'आपके नोट डाउनलोड के लिए तैयार हैं।'));
   }
 

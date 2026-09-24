@@ -92,7 +92,7 @@ function SupportPlacesForPatient({ patientId, author, today, hindi, entries, onC
 
   function download() {
     const url = URL.createObjectURL(new Blob([supportPlacesText(entries, patientId)], { type: 'text/plain;charset=utf-8' }));
-    const link = document.createElement('a'); link.href = url; link.download = `saanthvana-places-${patientId.replace(/[^a-zA-Z0-9_-]/g, '-')}.txt`;
+    const link = document.createElement('a'); link.href = url; link.download = `saathi-places-${patientId.replace(/[^a-zA-Z0-9_-]/g, '-')}.txt`;
     document.body.appendChild(link); link.click(); link.remove(); window.setTimeout(() => URL.revokeObjectURL(url), 1000);
     setMessage(t('Your copy is downloading.', 'आपकी कॉपी डाउनलोड हो रही है।'));
   }

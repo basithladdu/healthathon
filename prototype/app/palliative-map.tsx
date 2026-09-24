@@ -153,7 +153,7 @@ export function PalliativeMap({ points, origin, selectedId, route, searchCentre,
       const button = document.createElement('button');
       button.type = 'button';
       button.className = `palliative-map-pin ${point.category}${selectedId === point.id ? ' is-selected' : ''}`;
-      button.setAttribute('aria-label', `${index + 1}. ${point.name}. ${point.category === 'palliative' ? 'Palliative care' : 'Hospital'}. Show route`);
+      button.setAttribute('aria-label', `${index + 1}. ${point.name}. ${point.category === 'palliative' ? 'Best supportive care' : 'Hospital'}. Show route`);
       button.setAttribute('aria-pressed', String(selectedId === point.id));
       button.title = point.name;
       const head = document.createElement('span');
@@ -175,7 +175,7 @@ export function PalliativeMap({ points, origin, selectedId, route, searchCentre,
         const label = document.createElement('div');
         label.className = `palliative-map-place ${point.category}`;
         const category = document.createElement('span');
-        category.textContent = point.category === 'palliative' ? 'Palliative care' : 'Hospital';
+        category.textContent = point.category === 'palliative' ? 'Best supportive care' : 'Hospital';
         const name = document.createElement('strong');
         name.textContent = point.name;
         label.appendChild(category);
@@ -248,7 +248,7 @@ export function PalliativeMap({ points, origin, selectedId, route, searchCentre,
   return <div className="palliative-map-shell">
     <div ref={container} className="palliative-map-canvas" role="region" aria-label="Care centres and road route" />
     <button type="button" className="palliative-map-fit" aria-label="Show all centres" disabled={!ready || (!points.length && !origin)} onClick={() => fitAll.current()}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5M8 8h8v8H8Z" /></svg>Show all</button>
-    <div className="palliative-map-legend" aria-label="Map key"><span className="palliative"><CategoryIcon category="palliative" />Palliative care</span><span className="hospital"><CategoryIcon category="hospital" />Hospital</span></div>
+    <div className="palliative-map-legend" aria-label="Map key"><span className="palliative"><CategoryIcon category="palliative" />Best supportive care</span><span className="hospital"><CategoryIcon category="hospital" />Hospital</span></div>
     {unavailable && <p className="palliative-map-error" role="status">Street map unavailable. You can still choose a centre.</p>}
   </div>;
 }

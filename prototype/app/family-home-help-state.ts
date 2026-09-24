@@ -56,7 +56,7 @@ export function homeHelpText(entries: HomeHelpEntry[], patientId: string, today:
   const t = (en: string, hi: string) => hindi ? hi : en;
   const statuses = { 'To arrange': 'इंतज़ाम बाकी है', Arranged: 'इंतज़ाम हो गया', Done: 'पूरा हो गया' };
   return [
-    t('Saanthvana — Help at home', 'सांत्वना — घर पर मदद'),
+    t('Saathi — Help at home', 'साथी — घर पर मदद'),
     `${t('Saved on', 'कॉपी की तारीख')}: ${today}`,
     t('Arrangements recorded by the family. No bookings or messages are sent by this list.', 'परिवार ने ये इंतज़ाम दर्ज किए हैं। यह सूची कोई बुकिंग या संदेश नहीं भेजती।'),
     ...selectHomeHelpEntries(entries, patientId).map((entry) => [

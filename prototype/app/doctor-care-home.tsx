@@ -6,11 +6,15 @@ import { latestSummaryRelease, type SummaryState } from './summary-state';
 import { VisitInstructions } from './visit-instructions';
 import { IconUsers, IconFileText, IconClock, IconCheckCircle, IconArrowRight } from './icons';
 import type { CareConversationRequest } from './care-conversation-request-state';
+import { CareConversationImpact } from './care-conversation-impact.tsx';
+import type { CareConversationImpactEpisode } from './care-conversation-impact.ts';
 
-export function DoctorCareHome({ patients, records, appointments, physician, today, hindi, conversationRequests = [], onReview, onRecord, onHistory, onInstructions, onStartConversationRequest, onOpenConversationVersion, onTasks }: {
+export function DoctorCareHome({ patients, records, appointments, physician, today, hindi, conversationRequests = [], conversationImpactEpisodes = [], conversationImpactLoading = false, onReview, onRecord, onHistory, onInstructions, onStartConversationRequest, onOpenConversationVersion, onTasks }: {
   patients: Array<{ id: string; name: string; diagnosis: string }>; records: Record<string, SummaryState>;
   appointments: Appointment[]; physician: string; today: string; hindi: boolean;
   conversationRequests?: CareConversationRequest[];
+  conversationImpactEpisodes?: CareConversationImpactEpisode[];
+  conversationImpactLoading?: boolean;
   onReview: (patientId: string) => void;
   onTasks?: (patientId: string) => void;
   onRecord: (patientId?: string) => void; onHistory: (patientId?: string) => void;
@@ -45,6 +49,7 @@ export function DoctorCareHome({ patients, records, appointments, physician, tod
       {activeConversationRequests.length > 0 ? <ul>{activeConversationRequests.map(renderConversationRequest)}</ul> : <p className="doctor-conversation-empty">{t('No open conversation requests.', 'बातचीत के खुले अनुरोध नहीं हैं।')}</p>}
       {completedConversationRequests.length > 0 && <details className="doctor-conversation-history"><summary>{t('Recorded conversations', 'दर्ज बातचीत')} · {completedConversationRequests.length}</summary><ul>{completedConversationRequests.map(renderConversationRequest)}</ul></details>}
     </section>}
+    <CareConversationImpact episodes={conversationImpactEpisodes} requests={conversationRequests} loading={conversationImpactLoading} />
     <div className="doctor-overview-cards">
       <button type="button" onClick={() => { setOnlyPending(false); document.getElementById('doctor-patient-queue')?.scrollIntoView({ block: 'nearest' }); }}><IconUsers /><strong>{patients.length}</strong><span>{t('People in care', 'देखभाल में लोग')}</span></button>
       <button type="button" onClick={() => { setOnlyPending(true); document.getElementById('doctor-patient-queue')?.scrollIntoView({ block: 'nearest' }); }}><IconFileText /><strong>{pending.length}</strong><span>{t('Notes to review', 'जाँचने के नोट')}</span></button>

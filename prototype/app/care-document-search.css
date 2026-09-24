@@ -94,6 +94,8 @@
 .care-document-editor :is(textarea, select, input) { width: 100%; min-width: 0; padding: 10px; border: 1px solid #d3c2dc; border-radius: 11px; color: var(--doc-ink); background: #fffefa; font: 400 14px/1.5 var(--font-inter), sans-serif; }
 .care-document-editor textarea { resize: vertical; min-height: 210px; }
 .care-document-editor textarea:disabled { opacity: .6; }
+.care-document-editor .care-document-confirm { display: flex; align-items: center; gap: 10px; min-height: 44px; line-height: 1.5; cursor: pointer; }
+.care-document-editor .care-document-confirm input { flex: none; width: 18px; height: 18px; min-height: 18px; padding: 0; accent-color: var(--doc-purple); }
 .care-document-text-field { display: grid; gap: 6px; }
 .care-document-text-field > div { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
 .care-document-text-field > div button { min-height: 30px; padding: 4px 7px; font-size: 11px; }

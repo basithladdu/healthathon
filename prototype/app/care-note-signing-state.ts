@@ -30,6 +30,15 @@ export function careNoteReleaseId(release: SummaryRelease): string {
   return release.id ?? `${release.patientId}:care-note:${release.number}:${release.releasedAt}`;
 }
 
+export function hasTypedCareNoteDoctorSignature(release: SummaryRelease | null | undefined): release is SummaryRelease & { signature: NonNullable<SummaryRelease['signature']> } {
+  if (!release?.signature || release.signature.method !== 'typed') return false;
+  const signedAt = Date.parse(release.signature.signedAt);
+  return Boolean(release.signature.name.trim())
+    && release.signature.name.trim().toLowerCase() === release.physician.trim().toLowerCase()
+    && Number.isFinite(signedAt)
+    && signedAt >= Date.parse(release.releasedAt);
+}
+
 // A canonical text snapshot binds an acknowledgement to the exact saved version.
 // It is not a cryptographic signature or an identity check.
 export function careNoteContentSnapshot(release: SummaryRelease): string {

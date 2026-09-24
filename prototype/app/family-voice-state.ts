@@ -52,7 +52,7 @@ export function selectVoiceJournalEntries(entries: VoiceJournalEntry[], patientI
 
 export function voiceJournalEntryText(entry: VoiceJournalEntry): string {
   return [
-    `SAANTHVANA — PERSONAL JOURNAL\nPatient ID: ${entry.patientId}\nDate: ${entry.date}`,
+    `SAATHI — PERSONAL JOURNAL\nPatient ID: ${entry.patientId}\nDate: ${entry.date}`,
     entry.title, entry.thought,
     entry.audio ? `Audio file: ${entry.audio.name}\nDownload the original audio separately.` : '',
     `Written by: ${entry.createdBy}${entry.updatedBy !== entry.createdBy ? `\nEdited by: ${entry.updatedBy}` : ''}`,

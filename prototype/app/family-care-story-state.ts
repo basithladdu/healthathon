@@ -1,4 +1,5 @@
 import { isValidAppointmentDate } from './appointment-state.ts';
+import type { CareDocumentTreatmentSource } from './care-document-treatment-state.ts';
 
 export const CARE_STORY_KINDS = ['Visit', 'Treatment', 'Treatment change', 'Report', 'Milestone', 'Past history'] as const;
 export type CareStoryKind = (typeof CARE_STORY_KINDS)[number];
@@ -19,6 +20,7 @@ export type CareStoryEntry = CareStoryDraft & {
   patientId: string;
   createdBy: string;
   updatedBy: string;
+  documentSource?: CareDocumentTreatmentSource;
 };
 
 function cleanDraft(draft: CareStoryDraft): CareStoryDraft | null {
@@ -66,12 +68,13 @@ export function selectCareStoryEntries(entries: CareStoryEntry[], patientId: str
 export function exportCareStory(entries: CareStoryEntry[], patientId: string): string {
   const story = selectCareStoryEntries(entries, patientId);
   return [
-    'SAANTHVANA — YOUR CARE STORY',
+    'SAATHI — YOUR CARE STORY',
     `Patient: ${patientId}`,
     'Family-added notes. Sources are recorded as entered; these notes are not a doctor-approved care note.',
     ...story.map((entry) => [
       `${entry.date} · ${entry.kind} · ${entry.title}`,
       entry.details,
+      entry.documentSource ? `Quoted from the document: ${entry.documentSource.quote}\n${entry.documentSource.page ? `Page ${entry.documentSource.page} · ` : ''}Text line ${entry.documentSource.line}\nSource checked by: ${entry.documentSource.recordedBy}` : '',
       entry.changeReason ? `What changed / reason as documented: ${entry.changeReason}` : '',
       entry.source ? `Source: ${entry.source}` : '',
       entry.sourceAuthor ? `Source written by: ${entry.sourceAuthor}` : '',

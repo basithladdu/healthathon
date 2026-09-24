@@ -30,7 +30,7 @@ import { CareArt } from './care-art';
 import { CareRouteLink } from './care-route-link';
 
 export type FamilyTool = 'symptom-diary' | 'care-story' | 'doctor-pack' | 'home-help' | 'support-places' | 'open-questions' | 'copy-tracker' | 'voice-journal' | 'cancer-overview' | 'cost-help' | 'lab-history';
-export function FamilyCareTools({ tool, patientId, patientName, author, today, hindi, symptoms, story, recordedStory, contacts, knownContacts, homeHelp, supportPlaces, questions, copies, releases, voiceJournal, onVoiceJournal, voiceSave, costs, onCosts, labResults, onLabResults, treatmentEvents, acknowledgements = [], signedRelease, diagnosis, team, reports, onOpen, onCareNote, onReports, onSymptoms, onStory, onContacts, onHomeHelp, onSupportPlaces, onQuestions, onCopies, note, calendarText, reportNames }: {
+export function FamilyCareTools({ tool, patientId, patientName, author, today, hindi, symptoms, story, recordedStory, contacts, knownContacts, homeHelp, supportPlaces, questions, copies, releases, voiceJournal, onVoiceJournal, voiceSave, costs, onCosts, labResults, onLabResults, treatmentEvents, acknowledgements = [], signedRelease, diagnosis, team, reports, onOpen, onCareNote, onReports, onReadReport, onSymptoms, onStory, onContacts, onHomeHelp, onSupportPlaces, onQuestions, onCopies, note, calendarText, reportNames }: {
   tool: FamilyTool; patientId: string; patientName: string; author: string; today: string; hindi: boolean;
   symptoms: SymptomEntry[]; story: CareStoryEntry[]; contacts: HandoverContact[];
   recordedStory?: readonly CareStoryEntry[];
@@ -43,6 +43,7 @@ export function FamilyCareTools({ tool, patientId, patientName, author, today, h
   labResults: LabResultEntry[]; onLabResults: (entries: LabResultEntry[]) => void;
   treatmentEvents?: readonly LabTreatmentEvent[]; acknowledgements?: readonly CareNoteAcknowledgement[]; signedRelease?: SummaryRelease;
   diagnosis: string; team: string; reports: CareReport[]; onOpen: (tool: FamilyTool) => void; onCareNote: () => void; onReports: () => void;
+  onReadReport?: (reportId: string) => void;
   onQuestions: (entries: OpenQuestion[]) => void; onCopies: (entries: CareCopyEntry[]) => void;
   onSymptoms: (entries: SymptomEntry[]) => void; onStory: (entries: CareStoryEntry[]) => void; onContacts: (entries: HandoverContact[]) => void;
   note: { version: number; physician: string; releasedAt: string; fields: Array<{ label: string; value: string }> } | null;
@@ -50,7 +51,7 @@ export function FamilyCareTools({ tool, patientId, patientName, author, today, h
 }) {
   return <div className="family-care-tools">
     {tool === 'symptom-diary' && <FamilySymptomDiary key={patientId} patientId={patientId} author={author} today={today} hindi={hindi} entries={symptoms} onChange={onSymptoms} />}
-    {tool === 'care-story' && <FamilyCareStory key={patientId} patientId={patientId} author={author} today={today} hindi={hindi} entries={story} recordedEntries={recordedStory} onChange={onStory} />}
+    {tool === 'care-story' && <FamilyCareStory key={patientId} patientId={patientId} author={author} today={today} hindi={hindi} entries={story} recordedEntries={recordedStory} reports={reports} onReadReport={onReadReport} onChange={onStory} />}
     {tool === 'doctor-pack' && <FamilyHandoverPack key={patientId} patientId={patientId} patientName={patientName} author={author} hindi={hindi} note={note} signedRelease={signedRelease} acknowledgements={acknowledgements} calendarText={calendarText} reportNames={reportNames} contacts={contacts} knownContacts={knownContacts} onContactsChange={onContacts} />}
     {tool === 'home-help' && <FamilyHomeHelp key={patientId} patientId={patientId} author={author} today={today} hindi={hindi} entries={homeHelp} onChange={onHomeHelp} />}
     {tool === 'support-places' && <FamilySupportPlaces key={patientId} patientId={patientId} author={author} today={today} hindi={hindi} entries={supportPlaces} onChange={onSupportPlaces} />}
@@ -70,7 +71,7 @@ export function FamilyToolButtons({ hindi, onOpen }: { hindi: boolean; onOpen: (
     { key: 'care-story', en: 'Your care story', hi: 'अब तक की देखभाल' },
     { key: 'lab-history', en: 'My test results', hi: 'मेरी जाँच के नतीजे' },
     { key: 'voice-journal', en: 'My journal', hi: 'मेरी डायरी' },
-    { key: 'doctor-pack', en: 'Care summary', hi: 'देखभाल का सार' },
+    { key: 'doctor-pack', en: 'Visit pack', hi: 'मुलाक़ात की फ़ाइल' },
     { key: 'home-help', en: 'Help at home', hi: 'घर पर मदद' },
     { key: 'copy-tracker', en: 'Who has the latest copy?', hi: 'नई कॉपी किसके पास है?' },
   ] as const;

@@ -62,11 +62,11 @@ export function careDocumentFileError(file: Pick<File, 'type' | 'name' | 'size'>
 
 const ignoredWords = new Set([
   'a', 'an', 'the', 'my', 'our', 'patient', 'was', 'were', 'is', 'are', 'has', 'have', 'had', 'did', 'do', 'does',
-  'when', 'what', 'where', 'which', 'how', 'who', 'why', 'last', 'latest', 'next', 'date', 'of', 'on', 'in', 'at', 'to',
+  'when', 'what', 'where', 'which', 'how', 'who', 'why', 'last', 'latest', 'next', 'date', 'dates', 'of', 'on', 'in', 'at', 'to',
   'for', 'from', 'and', 'or', 'tell', 'me', 'show', 'find', 'about', 'please', 'get', 'got', 'given', 'receive', 'received',
   'happen', 'happened', 'report', 'reports', 'document', 'documents', 'i', 'we', 'you', 'can', 'could', 'should', 'would',
   'need', 'needto', 'am', 'be', 'been', 'it', 'with', 'that', 'this', 'there', 'any', 'said', 'says', 'say', 'recorded', 'care',
-  'कब', 'क्या', 'है', 'था', 'की', 'का', 'के', 'में', 'मुझे', 'मेरा', 'मेरे', 'मेरी', 'आखिरी', 'तारीख', 'बताएँ', 'लिए', 'मैं', 'हूँ',
+  'कब', 'क्या', 'है', 'था', 'की', 'का', 'के', 'में', 'मुझे', 'मेरा', 'मेरे', 'मेरी', 'आखिरी', 'तारीख', 'तारीखें', 'बताएँ', 'लिए', 'मैं', 'हूँ',
 ]);
 const relatedTerms = [
   ['chemotherapy', 'chemo', 'कीमोथेरेपी', 'कीमो'],
@@ -84,6 +84,7 @@ const relatedTerms = [
   ['family', 'caregiver', 'caregivers', 'carer', 'carers', 'परिवार'],
   ['transport', 'travel', 'ride', 'यात्रा'],
   ['conversation', 'discussion', 'discussed', 'बातचीत'],
+  ['treatment', 'treatments', 'इलाज', 'chemotherapy', 'chemo', 'कीमोथेरेपी', 'कीमो', 'radiotherapy', 'radiation', 'रेडियोथेरेपी', 'रेडिएशन', 'procedure', 'surgery'],
 ];
 
 function words(text: string): string[] {

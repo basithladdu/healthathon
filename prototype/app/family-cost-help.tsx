@@ -100,10 +100,10 @@ function CostHelpContent({ patientId, author, today, hindi, state, onChange }: F
   function download() {
     // Keep older saved links intact while this page exports expenses and paperwork only.
     const text = exportFamilyCostState({ ...state, fundraisers: [] }, patientId)
-      .replace('SAANTHVANA — HELP WITH COSTS', 'SAANTHVANA — COSTS & SUPPORT')
+      .replace('SAATHI — HELP WITH COSTS', 'SAATHI — COSTS & SUPPORT')
       .replace('\n\nFUNDRAISER LINKS', '');
     const url = URL.createObjectURL(new Blob([text], { type: 'text/plain;charset=utf-8' }));
-    const link = document.createElement('a'); link.href = url; link.download = `saanthvana-costs-${patientId.replace(/[^a-zA-Z0-9_-]/g, '-')}.txt`; link.click(); URL.revokeObjectURL(url);
+    const link = document.createElement('a'); link.href = url; link.download = `saathi-costs-${patientId.replace(/[^a-zA-Z0-9_-]/g, '-')}.txt`; link.click(); URL.revokeObjectURL(url);
     setMessage(t('Your costs list was downloaded.', 'खर्च की सूची डाउनलोड हो गई।'));
   }
 

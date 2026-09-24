@@ -4,7 +4,9 @@ import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import type { CareReport } from './care-calendar-state';
 import { CarePdfReadError, extractCareDocumentPdf, type CarePdfText } from './care-document-extract';
-import { careDocumentFileError, careReportCategory, findCareDocumentText, removeCareDocument, restoreCareDocument, type RemovedCareDocument, type CareDocumentCategory, type CareDocumentText } from './care-document-state';
+import { careDocumentFileError, careReportCategory, findCareDocumentText, removeCareDocument, restoreCareDocument, type RemovedCareDocument, type CareDocumentCategory, type CareDocumentText, type CareDocumentMatch } from './care-document-state';
+import { CareDocumentTreatmentReview } from './care-document-treatment';
+import type { ConfirmedDocumentTreatment } from './care-document-treatment-state';
 import './care-document-search.css';
 
 export { careReportCategory, findCareDocumentText } from './care-document-state';
@@ -15,6 +17,8 @@ export type CareDocumentSearchProps = {
   reports: CareReport[]; documents: CareDocumentText[];
   onChange: (documents: CareDocumentText[]) => void;
   onReportsChange?: (reports: CareReport[]) => void;
+  onAddTreatment?: (entry: ConfirmedDocumentTreatment) => void;
+  onOpenCareStory?: () => void;
   editReportId?: string | null; onEditClose?: () => void;
 };
 
@@ -72,7 +76,7 @@ export function CareDocumentSearch(props: CareDocumentSearchProps) {
   return <DocumentSearchForPatient key={props.patientId} {...props} />;
 }
 
-function DocumentSearchForPatient({ patientId, author, hindi, reports, documents, onChange, onReportsChange, editReportId, onEditClose }: CareDocumentSearchProps) {
+function DocumentSearchForPatient({ patientId, author, hindi, reports, documents, onChange, onReportsChange, onAddTreatment, onOpenCareStory, editReportId, onEditClose }: CareDocumentSearchProps) {
   const router = useRouter();
   const uploadRequested = useRef(false);
   const returnToMedicines = useRef(false);
@@ -87,6 +91,7 @@ function DocumentSearchForPatient({ patientId, author, hindi, reports, documents
   const [upload, setUpload] = useState<CareReport | null>(null);
   const [queue, setQueue] = useState<CareReport[]>([]);
   const [text, setText] = useState('');
+  const [textChecked, setTextChecked] = useState(false);
   const [category, setCategory] = useState<CareDocumentCategory>('other');
   const [reportDate, setReportDate] = useState('');
   const [message, setMessage] = useState('');
@@ -136,19 +141,19 @@ function DocumentSearchForPatient({ patientId, author, hindi, reports, documents
   function resetEditor(report: CareReport) {
     const document = documents.find((item) => item.patientId === patientId && item.reportId === report.id);
     cancelRead(); setReadMessage(''); setError(''); setMessage('');
-    setPdfText(document?.textSource === 'pdf-text' ? { pagesRead: document.pagesRead ?? 0, pageCount: document.pageCount ?? 0, pagesWithoutText: document.pagesWithoutText ?? [] } : null);
+    setPdfText(document?.pageCount !== undefined ? { pagesRead: document.pagesRead ?? 0, pageCount: document.pageCount, pagesWithoutText: document.pagesWithoutText ?? [] } : null);
     setText(document?.text ?? ''); setCategory(careReportCategory(report, documents)); setReportDate(report.date);
-    setTextSource(document?.textSource ?? 'copied');
+    setTextSource(document?.textSource ?? 'copied'); setTextChecked(false);
   }
   function openText(report: CareReport) {
     resetEditor(report); setUpload(null); setQueue([]); setEditorId(report.id);
     if (!documents.find((document) => document.patientId === patientId && document.reportId === report.id)?.text.trim()) void readReport(report);
   }
   function closeEditor() {
-    cancelRead(); setEditorId(null); setUpload(null); setQueue([]); setText(''); setPdfText(null); setReadMessage(''); setError(''); onEditClose?.();
+    cancelRead(); setEditorId(null); setUpload(null); setQueue([]); setText(''); setTextChecked(false); setPdfText(null); setReadMessage(''); setError(''); onEditClose?.();
   }
   async function readReport(report: CareReport) {
-    cancelRead();
+    cancelRead(); setTextChecked(false);
     const controller = new AbortController(); reader.current = controller;
     const pdf = report.file.type === 'application/pdf' || /\.pdf$/i.test(report.file.name);
     const plain = report.file.type === 'text/plain' || /\.txt$/i.test(report.file.name);
@@ -189,7 +194,8 @@ function DocumentSearchForPatient({ patientId, author, hindi, reports, documents
     const parsed = new Date(`${reportDate}T12:00:00Z`);
     if (!/^\d{4}-\d{2}-\d{2}$/.test(reportDate) || Number.isNaN(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== reportDate || reportDate > localDate()) { setError(t('Choose the date printed on the document, up to today.', 'दस्तावेज़ पर लिखी तारीख चुनें, आज तक की।')); return; }
     if (text.length > 200000) { setError(t('Keep the text under 200,000 characters.', 'टेक्स्ट 2,00,000 अक्षरों तक रखें।')); return; }
-    const next: CareDocumentText = { reportId: editing.id, patientId, category, text: text.trim(), recordedBy: author.trim(), textSource, reviewedAt: new Date().toISOString(), ...(pdfText ?? {}) };
+    if (text.trim() && !textChecked) { setError(t('Check the text against the original, then tick the box.', 'टेक्स्ट को मूल दस्तावेज़ से मिलाएँ, फिर बॉक्स चुनें।')); return; }
+    const next: CareDocumentText = { reportId: editing.id, patientId, category, text: text.trim(), recordedBy: author.trim(), textSource, ...(text.trim() && textChecked ? { reviewedAt: new Date().toISOString() } : {}), ...(pdfText ?? {}) };
     const report = { ...editing, date: reportDate };
     onReportsChange?.(upload ? [...reports, report] : reports.map((item) => item.patientId === patientId && item.id === report.id ? report : item));
     onChange([...documents.filter((document) => document.patientId !== patientId || document.reportId !== editing.id), next]);
@@ -219,11 +225,17 @@ function DocumentSearchForPatient({ patientId, author, hindi, reports, documents
     setMessage(t('Document restored.', 'दस्तावेज़ वापस आ गया।')); setError('');
   }
   function download() {
-    const content = ['SAANTHVANA — DOCUMENT EXCERPTS', `${t('Question', 'सवाल')}: ${submitted}`,
-      ...matches.map(({ report, recordedBy, excerpts }) => [report.file.name, `${t('Document date', 'दस्तावेज़ की तारीख')}: ${report.date}`, `${t('Text checked by', 'टेक्स्ट जाँचने वाले')}: ${recordedBy}`, ...excerpts.map((excerpt) => `${excerpt.page ? `${t('Page', 'पृष्ठ')} ${excerpt.page} · ` : ''}${t('Line', 'पंक्ति')} ${excerpt.line}\n${excerpt.text}`)].join('\n')),
+    const content = ['SAATHI — DOCUMENT EXCERPTS', `${t('Question', 'सवाल')}: ${submitted}`,
+      ...matches.map(({ report, recordedBy, excerpts }) => [report.file.name, `${t('Document date', 'दस्तावेज़ की तारीख')}: ${report.date}`, `${t('Text recorded by', 'टेक्स्ट दर्ज करने वाले')}: ${recordedBy}`, ...excerpts.map((excerpt) => `${excerpt.page ? `${t('Page', 'पृष्ठ')} ${excerpt.page} · ` : ''}${t('Text line', 'टेक्स्ट पंक्ति')} ${excerpt.line}\n${excerpt.text}`)].join('\n')),
     ].join('\n\n');
     const url = URL.createObjectURL(new Blob([content], { type: 'text/plain;charset=utf-8' }));
-    const link = window.document.createElement('a'); link.href = url; link.download = 'saanthvana-document-excerpts.txt'; link.click(); window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    const link = window.document.createElement('a'); link.href = url; link.download = 'saathi-document-excerpts.txt'; link.click(); window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+  function sourcePassage(report: CareReport, excerpt: CareDocumentMatch['excerpts'][number]) {
+    const document = documents.find((item) => item.patientId === patientId && item.reportId === report.id);
+    return <div key={`${excerpt.line}:${excerpt.text}`}><blockquote><p>{excerpt.text}</p><cite>{excerpt.page ? `${t('Page', 'पृष्ठ')} ${excerpt.page} · ` : ''}{t('Text line', 'टेक्स्ट पंक्ति')} {excerpt.line}</cite></blockquote>
+      {document && onAddTreatment && <CareDocumentTreatmentReview patientId={patientId} author={author} today={localDate()} hindi={hindi} report={report} document={document} excerpt={excerpt} onSave={onAddTreatment} onOpenHistory={onOpenCareStory} />}
+    </div>;
   }
 
   if (editing) return <section className="care-document-search care-document-review" aria-labelledby={`${id}-review-heading`}>
@@ -233,7 +245,8 @@ function DocumentSearchForPatient({ patientId, author, hindi, reports, documents
       <div className="care-document-review-fields"><div className="care-document-fields-row"><label>{t('Keep under', 'कहाँ रखें')}<select value={category} onChange={(event) => setCategory(event.target.value as CareDocumentCategory)}><option value="cancer">{t('Cancer care', 'कैंसर की देखभाल')}</option><option value="monitoring">{t('Blood & lab tests', 'खून और लैब जाँच')}</option><option value="other">{t('Other', 'अन्य')}</option></select></label><label>{t('Document date', 'दस्तावेज़ की तारीख')}<input type="date" required max={localDate()} value={reportDate} disabled={!onReportsChange} onChange={(event) => setReportDate(event.target.value)} /></label></div>
         {reading && <div className="care-document-reading" role="status"><progress max={progress.total || 12} value={progress.page} /><span>{progress.total ? t(`Reading ${progress.page} of ${progress.total} pages`, `${progress.total} में से ${progress.page} पृष्ठ पढ़े`) : t('Opening your document…', 'दस्तावेज़ खोल रहे हैं…')}</span><button type="button" onClick={cancelRead}>{t('Stop', 'रोकें')}</button></div>}
         {readMessage && <p className="care-document-read-message" role="status">{readMessage}</p>}
-        <details className="care-document-text-details"><summary>{t('Text for search · optional', 'खोज के लिए टेक्स्ट · वैकल्पिक')}</summary><div className="care-document-text-field"><div><label htmlFor={`${id}-text`}>{t('Check the text', 'टेक्स्ट जाँचें')}</label>{isPdf && !reading && <button type="button" onClick={() => readReport(editing)}>{t('Read again', 'दोबारा पढ़ें')}</button>}</div><textarea id={`${id}-text`} value={text} disabled={reading} onChange={(event) => setText(event.target.value)} maxLength={200000} rows={5} placeholder={t('Copy the words you want to find later.', 'जो शब्द बाद में खोजने हों, उन्हें यहाँ लिखें।')} /></div></details>
+        <details className="care-document-text-details" open><summary>{t('Text for search · optional', 'खोज के लिए टेक्स्ट · वैकल्पिक')}</summary><div className="care-document-text-field"><div><label htmlFor={`${id}-text`}>{t('Check the text', 'टेक्स्ट जाँचें')}</label>{isPdf && !reading && <button type="button" onClick={() => readReport(editing)}>{t('Read again', 'दोबारा पढ़ें')}</button>}</div><textarea id={`${id}-text`} value={text} disabled={reading} onChange={(event) => { setText(event.target.value); setTextChecked(false); setTextSource('copied'); }} maxLength={200000} rows={5} placeholder={t('Copy the words you want to find later.', 'जो शब्द बाद में खोजने हों, उन्हें यहाँ लिखें।')} /></div></details>
+        {Boolean(text.trim()) && <label className="care-document-confirm"><input type="checkbox" required checked={textChecked} disabled={reading} onChange={(event) => setTextChecked(event.target.checked)} /><span>{t('I checked this text against the original document.', 'मैंने इस टेक्स्ट को मूल दस्तावेज़ से मिलाकर जाँचा है।')}</span></label>}
         {pdfText && (pdfText.pageCount > pdfText.pagesRead || pdfText.pagesWithoutText.length > 0) && <p className="care-document-read-scope">{pdfText.pageCount > pdfText.pagesRead ? t(`Read the first ${pdfText.pagesRead} of ${pdfText.pageCount} pages. `, `${pdfText.pageCount} में से पहले ${pdfText.pagesRead} पृष्ठ पढ़े। `) : ''}{pdfText.pagesWithoutText.length > 0 ? t(`No text on pages ${pdfText.pagesWithoutText.join(', ')}. Add their text here to include them in search.`, `पृष्ठ ${pdfText.pagesWithoutText.join(', ')} का टेक्स्ट नहीं मिला। खोज में शामिल करने के लिए यहाँ जोड़ें।`) : ''}</p>}
         {error && <p className="care-document-error" role="alert">{error}</p>}
         <div className="care-document-review-footer"><button type="submit" className="care-document-save" disabled={reading || !author.trim()}><DocumentIcon kind="check" />{queue.length ? t('Save & next', 'सेव करें और आगे बढ़ें') : t('Save document', 'दस्तावेज़ सेव करें')}</button>{queue.length > 0 && <span>{t(`${queue.length} more to review`, `${queue.length} और जाँचने हैं`)}</span>}{!upload && onReportsChange && <button type="button" className="care-document-remove" onClick={() => removeReport(editing.id)}><DocumentIcon kind="remove" />{t('Remove document', 'दस्तावेज़ हटाएँ')}</button>}</div>
@@ -247,15 +260,15 @@ function DocumentSearchForPatient({ patientId, author, hindi, reports, documents
     <header className="care-document-heading"><div className="care-document-heading-title"><span className="care-document-heading-icon"><DocumentIcon /></span><div><h2 id={`${id}-heading`}>{t('My documents', 'मेरे दस्तावेज़')}</h2><span className="care-document-count">{available.length} {t(available.length === 1 ? 'document' : 'documents', 'दस्तावेज़')}</span></div></div>{onReportsChange && <><input ref={input} className="care-document-file-input" type="file" multiple accept="application/pdf,image/jpeg,image/png,image/webp,text/plain,.txt" onChange={(event) => { addFiles(Array.from(event.target.files ?? [])); event.target.value = ''; }} aria-label={t('Choose documents', 'दस्तावेज़ चुनें')} /><button type="button" className="care-document-add" onClick={() => input.current?.click()}><DocumentIcon kind="upload" />{t('Upload report', 'रिपोर्ट अपलोड करें')}</button></>}</header>
     <div className="care-document-question-panel"><form className="care-document-search-form" onSubmit={(event) => { event.preventDefault(); search(query); }}>
       <label className="care-document-search-label" htmlFor={`${id}-query`}>{t('Ask your documents', 'अपने दस्तावेज़ों से पूछें')}</label><DocumentIcon kind="search" /><input ref={searchInput} id={`${id}-query`} type="search" value={query} maxLength={160} onChange={(event) => setQuery(event.target.value)} placeholder={t('Ask a question or find a word', 'सवाल पूछें या शब्द खोजें')} /><button type="submit" disabled={!query.trim()}>{t('Find', 'खोजें')}</button>
-    </form><div className="care-document-topics">{[['What should I bring to my next visit?', 'मुलाकात के लिए क्या लाना है?'], ['What matters to me?', 'मेरे लिए क्या महत्वपूर्ण है?'], ['My latest haemoglobin', 'मेरा आखिरी हीमोग्लोबिन']].map(([en, hi]) => <button key={en} type="button" aria-pressed={submitted === t(en, hi)} onClick={() => search(t(en, hi))}>{t(en, hi)} <span aria-hidden="true">↗</span></button>)}</div></div>
+    </form><div className="care-document-topics">{[['What should I bring to my next visit?', 'मुलाकात के लिए क्या लाना है?'], ['What matters to me?', 'मेरे लिए क्या महत्वपूर्ण है?'], ['My latest haemoglobin', 'मेरा आखिरी हीमोग्लोबिन'], ['Treatment dates', 'इलाज की तारीखें']].map(([en, hi]) => <button key={en} type="button" aria-pressed={submitted === t(en, hi)} onClick={() => search(t(en, hi))}>{t(en, hi)} <span aria-hidden="true">↗</span></button>)}</div></div>
     <div className="care-document-folders" role="group" aria-label={t('Document folders', 'दस्तावेज़ के फ़ोल्डर')}>{folders.map(({ key, name }) => <button key={key} type="button" data-folder={key} aria-pressed={folder === key} onClick={() => setFolder(key)}>{name}<span>{key === 'all' ? available.length : available.filter((report) => careReportCategory(report, documents) === key).length}</span></button>)}</div>
     {message && <p className="care-document-message" role="status"><DocumentIcon kind="check" />{message}</p>}{error && <p className="care-document-error" role="alert">{error}</p>}
     {removed.length > 0 && <div className="care-document-undo" role="status"><span>{t('Removed', 'हटाया')}: <strong>{removed[removed.length - 1].report.file.name}</strong></span><button type="button" onClick={undoRemoval}>{t('Undo', 'वापस लाएँ')}</button></div>}
     {submitted ? <div className="care-document-results" aria-live="polite"><div className="care-document-results-heading"><h3>{t('From your documents', 'आपके दस्तावेज़ों से')}</h3><button type="button" onClick={() => { setSubmitted(''); setQuery(''); }}>{t('Back to files', 'फ़ाइलों पर वापस')}</button></div>
-      {matches.length > 0 ? <><p className="care-document-source-count">{matches.length} {t(matches.length === 1 ? 'source' : 'sources', 'स्रोत')} · {t('Quoted from the checked text', 'जाँचे गए टेक्स्ट से लिए गए अंश')}</p>{matches.map(({ report, excerpts }) => <article className="care-document-match" key={report.id}>
+      {matches.length > 0 ? <><p className="care-document-source-count">{matches.length} {t(matches.length === 1 ? 'source' : 'sources', 'स्रोत')} · {t('Quoted from saved text', 'सेव किए गए टेक्स्ट से लिए गए अंश')}</p>{matches.map(({ report, excerpts }) => <article className="care-document-match" key={report.id}>
         <header><span className="care-document-file-icon" data-folder={careReportCategory(report, documents)}><DocumentIcon /></span><div><h4>{report.file.name}</h4><time dateTime={report.date}>{displayDate(report.date, hindi)}</time></div></header>
-        {excerpts.slice(0, 2).map((excerpt) => <blockquote key={excerpt.line}><p>{excerpt.text}</p><cite>{excerpt.page ? `${t('Page', 'पृष्ठ')} ${excerpt.page} · ` : ''}{t('Line', 'पंक्ति')} {excerpt.line}</cite></blockquote>)}
-        {excerpts.length > 2 && <details className="care-document-more"><summary>{t(`${excerpts.length - 2} more passages`, `${excerpts.length - 2} और अंश`)}</summary>{excerpts.slice(2).map((excerpt) => <blockquote key={excerpt.line}><p>{excerpt.text}</p><cite>{excerpt.page ? `${t('Page', 'पृष्ठ')} ${excerpt.page} · ` : ''}{t('Line', 'पंक्ति')} {excerpt.line}</cite></blockquote>)}</details>}
+        {excerpts.slice(0, 2).map((excerpt) => sourcePassage(report, excerpt))}
+        {excerpts.length > 2 && <details className="care-document-more"><summary>{t(`${excerpts.length - 2} more passages`, `${excerpts.length - 2} और अंश`)}</summary>{excerpts.slice(2).map((excerpt) => sourcePassage(report, excerpt))}</details>}
         <footer><button type="button" onClick={() => openText(report)}>{t('Read document', 'दस्तावेज़ पढ़ें')}</button><OriginalLink report={report} hindi={hindi} /></footer>
       </article>)}<button type="button" className="care-document-download" onClick={download}>{t('Download these passages', 'ये अंश डाउनलोड करें')}</button></>
         : <div className="care-document-empty"><DocumentIcon kind="search" /><h3>{t('Not found in these documents', 'इन दस्तावेज़ों में नहीं मिला')}</h3><p>{t('Try a report name, a medicine name, or fewer words.', 'जाँच का नाम, दवा का नाम या कम शब्द लिखकर खोजें।')}</p>{folder !== 'all' && <button type="button" onClick={() => setFolder('all')}>{t('Search all files', 'सभी फ़ाइलों में खोजें')}</button>}</div>}

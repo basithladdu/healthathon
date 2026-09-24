@@ -23,9 +23,10 @@ import type { CareTaskAssignee } from './family-care-state';
 import { CareMedicines } from './care-medicines';
 import { CareConversationRequestForm } from './care-conversation-request';
 import type { CareConversationRequest } from './care-conversation-request-state';
+import { careConversationRequestEpisodeId, recordCareConversationImpactEvent, type CareConversationImpactEpisode, type CareConversationImpactStage, type CareConversationInitiator } from './care-conversation-impact.ts';
 import { CareMedicineAccess } from './care-medicine-access';
 import type { MedicineAccessEntry } from './care-medicine-access-state';
-import { appendCareNoteAcknowledgement, type CareNoteAcknowledgement } from './care-note-signing-state';
+import { appendCareNoteAcknowledgement, hasTypedCareNoteDoctorSignature, type CareNoteAcknowledgement } from './care-note-signing-state';
 import { CareLoading } from './care-loading';
 import { DoctorNoteReview } from './doctor-note-review';
 import { prepareVisitNote, approveVisitNote } from './visit-note-state';
@@ -51,7 +52,8 @@ import { createEmptyFamilyCostState, type FamilyCostState } from './family-cost-
 import { DoctorCareHome } from './doctor-care-home';
 import type { LabResultEntry, LabTreatmentEvent } from './family-lab-state';
 import type { SymptomEntry } from './family-symptom-state';
-import type { CareStoryEntry } from './family-care-story-state';
+import { addCareStoryEntry, type CareStoryEntry } from './family-care-story-state';
+import type { ConfirmedDocumentTreatment } from './care-document-treatment-state';
 import type { HandoverContact } from './family-handover-state';
 import { INITIAL_FAMILY_TASKS, addFamilyTask, editFamilyTask, removeFamilyTask, restoreFamilyTask, setFamilyTaskCompleted, type FamilyTask } from './family-care-state';
 import { ectprQuickViews, EdQuickView, EmergencyCard } from './ectpr';
@@ -886,6 +888,8 @@ export function ContinuityPrototype() {
   const [doctorConversations, setDoctorConversations, conversationSave] = useCareLocalState<DoctorConversationEntry[]>('doctor-conversations', []);
   const [conversationRequests, setConversationRequests, requestSave] = useCareLocalState<CareConversationRequest[]>('conversation-requests', []);
   const [activeConversationRequests, setActiveConversationRequests, requestLinkSave] = useCareLocalState<Record<string, string>>('conversation-request-links', {});
+  const [conversationImpactEpisodes, setConversationImpactEpisodes, impactSave] = useCareLocalState<CareConversationImpactEpisode[]>('conversation-impact-episodes', []);
+  const [activeImpactEpisodes, setActiveImpactEpisodes] = useCareLocalState<Record<string, string>>('conversation-impact-active', {});
   const [medicineAccess, setMedicineAccess, medicineAccessSave] = useCareLocalState<Record<string, MedicineAccessEntry>>('medicine-access', {});
   const [noteSelection, setNoteSelection] = useState<{ patientId: string; version: number } | null>(null);
   const [newDoctorConversation, setNewDoctorConversation] = useState(true);
@@ -1340,15 +1344,45 @@ export function ContinuityPrototype() {
 
   function treatmentEventsFor(id: string): LabTreatmentEvent[] {
     return [
-      ...careStory.filter((entry) => canReadPortalView('my-plan', id) && entry.patientId === id && (entry.kind === 'Treatment' || entry.kind === 'Treatment change')).map((entry): LabTreatmentEvent => ({ id: entry.id, patientId: id, date: entry.date, title: entry.title, status: 'recorded', sourceName: entry.source || `Care timeline · ${entry.createdBy}` })),
+      ...careStory.filter((entry) => canReadPortalView('my-plan', id) && entry.patientId === id && (entry.kind === 'Treatment' || entry.kind === 'Treatment change')).map((entry): LabTreatmentEvent => ({ id: entry.id, patientId: id, date: entry.date, title: entry.title, status: entry.date > careToday ? 'planned' : 'recorded', sourceName: entry.source || `Care timeline · ${entry.createdBy}`, reportId: entry.documentSource?.reportId })),
       ...careEvents.filter((entry) => canReadPortalView('calendar', id) && entry.patientId === id && ['Chemotherapy', 'Radiotherapy', 'Procedure'].includes(entry.kind)).map((entry): LabTreatmentEvent => ({ id: entry.id, patientId: id, date: entry.date, title: entry.title, status: careChecks.some((check) => check.patientId === id && check.eventId === entry.id && check.date === entry.date) ? 'recorded' : 'planned', sourceName: `Treatment calendar · ${entry.addedBy}` })),
     ];
+  }
+
+  function saveDocumentTreatment(confirmed: ConfirmedDocumentTreatment) {
+    if (!canReadCareNote || !canReadReports || !careReports.some((report) => report.patientId === portalPatientId && report.id === confirmed.source.reportId)) return;
+    const entryId = `document-treatment-${crypto.randomUUID()}`;
+    setCareStory((current) => {
+      if (current.some((entry) => entry.patientId === portalPatientId && entry.date === confirmed.date && entry.title === confirmed.title
+        && entry.documentSource?.reportId === confirmed.source.reportId && entry.documentSource.quote === confirmed.source.quote)) return current;
+      const next = addCareStoryEntry(current, portalPatientId, portalAuthor, entryId, {
+        date: confirmed.date, kind: 'Treatment', title: confirmed.title, details: '', changeReason: '',
+        source: confirmed.source.fileName.slice(0, 240), sourceAuthor: '',
+      });
+      return next.map((entry) => entry.id === entryId ? { ...entry, documentSource: confirmed.source } : entry);
+    });
   }
 
   function saveDoctorConversation(entry: DoctorConversationEntry, draft?: AssistedNote) {
     if (!isTreatingPhysician || sessionType !== 'care-team' || entry.patientId !== selectedId) return;
     setDoctorConversations((entries) => [...entries, entry]);
+    const activeRequest = conversationRequests.find((request) => request.id === activeConversationRequests[entry.patientId] && request.patientId === entry.patientId);
+    let episodeId = activeRequest ? careConversationRequestEpisodeId(activeRequest.id) : activeImpactEpisodes[entry.patientId];
+    if (!episodeId) {
+      episodeId = `doctor:${entry.id}`;
+      recordImpactStage({ id: episodeId, patientId: entry.patientId, stage: 'started', at: entry.recordedAt, initiatedBy: 'doctor' });
+      setActiveImpactEpisodes((current) => ({ ...current, [entry.patientId]: episodeId! }));
+    }
+    recordImpactStage({
+      id: episodeId,
+      patientId: entry.patientId,
+      stage: 'completed',
+      at: entry.recordedAt,
+      initiatedBy: activeRequest?.role,
+      requestId: activeRequest?.id,
+    });
     if (entry.note.trim()) {
+      recordImpactStage({ id: episodeId, patientId: entry.patientId, stage: 'documented', at: entry.recordedAt, initiatedBy: activeRequest?.role, requestId: activeRequest?.id });
       updateSelectedRecord((current) => {
         let next = !current.versionPublished && entry.note.trim() === current.draftSource.trim() ? current : prepareVisitNote(current, entry.note, { carryForward: newDoctorConversation });
         if (draft) {
@@ -2010,10 +2044,31 @@ export function ContinuityPrototype() {
     updateSelectedRecord((current) => setSummaryFieldStatus(current, key, status));
   }
 
+  function recordImpactStage(input: {
+    id: string;
+    patientId: string;
+    stage: CareConversationImpactStage;
+    at: string;
+    initiatedBy?: CareConversationInitiator;
+    requestId?: string;
+    signedVersion?: number;
+  }) {
+    setConversationImpactEpisodes((current) => recordCareConversationImpactEvent(current, input));
+  }
+
+  function startDoctorImpactEpisode(patientId: string): string {
+    const id = `doctor:${crypto.randomUUID()}`;
+    const at = new Date().toISOString();
+    recordImpactStage({ id, patientId, stage: 'started', at, initiatedBy: 'doctor' });
+    setActiveImpactEpisodes((current) => ({ ...current, [patientId]: id }));
+    return id;
+  }
+
   function startConversation() {
     if (!isTreatingPhysician) return;
     const next = beginSummaryRevision(recordState);
     if (next !== recordState) {
+      if (!activeConversationRequests[selectedId] && !activeImpactEpisodes[selectedId]) startDoctorImpactEpisode(selectedId);
       updateSelectedRecord(() => ({
         ...next,
         conversationCoverage: Object.fromEntries(conversationDomains.map(({ key }) => [key, 'defer'])) as Record<ConversationDomainKey, ConversationDisposition>,
@@ -5306,8 +5361,12 @@ export function ContinuityPrototype() {
     if (!request) return;
     const resume = request.status === 'in-progress' && activeConversationRequests[request.patientId] === request.id
       && !recordStates[request.patientId]?.versionPublished && recordStates[request.patientId]?.draftIsNewConversation;
+    const episodeId = careConversationRequestEpisodeId(request.id);
+    recordImpactStage({ id: episodeId, patientId: request.patientId, stage: 'requested', at: request.createdAt, initiatedBy: request.role, requestId: request.id });
+    recordImpactStage({ id: episodeId, patientId: request.patientId, stage: 'started', at: new Date().toISOString(), initiatedBy: request.role, requestId: request.id });
     setConversationRequests((entries) => entries.map((entry) => entry.id === request.id ? { ...entry, status: 'in-progress', updatedAt: new Date().toISOString() } : entry));
     setActiveConversationRequests((links) => ({ ...links, [request.patientId]: request.id }));
+    setActiveImpactEpisodes((links) => ({ ...links, [request.patientId]: episodeId }));
     selectPatient(request.patientId);
     setNewDoctorConversation(!resume);
     setView(resume ? 'doctor-review' : 'doctor-record');
@@ -5435,8 +5494,15 @@ export function ContinuityPrototype() {
           onSave={(next) => {
             if (next.patientId !== portalPatientId || next.requestedBy !== portalAuthor || next.role !== sessionType) return;
             setConversationRequests((entries) => entries.some((entry) => entry.id === next.id) ? entries.map((entry) => entry.id === next.id ? next : entry) : [...entries, next]);
+            const impactId = careConversationRequestEpisodeId(next.id);
+            recordImpactStage({ id: impactId, patientId: next.patientId, stage: 'requested', at: next.createdAt, initiatedBy: next.role, requestId: next.id });
+            if (next.status === 'cancelled') recordImpactStage({ id: impactId, patientId: next.patientId, stage: 'cancelled', at: next.updatedAt, initiatedBy: next.role, requestId: next.id });
           }}
-          onCancel={() => { if (request) setConversationRequests((entries) => entries.map((entry) => entry.id === request.id ? { ...entry, status: 'cancelled', updatedAt: new Date().toISOString() } : entry)); }}
+          onCancel={() => { if (request) {
+            const cancelledAt = new Date().toISOString();
+            setConversationRequests((entries) => entries.map((entry) => entry.id === request.id ? { ...entry, status: 'cancelled', updatedAt: cancelledAt } : entry));
+            recordImpactStage({ id: careConversationRequestEpisodeId(request.id), patientId: request.patientId, stage: 'cancelled', at: cancelledAt, initiatedBy: request.role, requestId: request.id });
+          } }}
           onOpenSignedVersion={(version) => openConversationVersion(portalPatientId, version)} />;
       }
       case 'medicine-access': {
@@ -5447,7 +5513,7 @@ export function ContinuityPrototype() {
       }
       case 'reports':
       case 'document-search':
-        return <CareDocumentSearch key={portalPatientId} patientId={portalPatientId} author={portalAuthor} hindi={hindi} reports={careReports} documents={documentText} onChange={setDocumentText} onReportsChange={setCareReports} editReportId={editReportId} onEditClose={() => setEditReportId(null)} />;
+        return <CareDocumentSearch key={portalPatientId} patientId={portalPatientId} author={portalAuthor} hindi={hindi} reports={careReports} documents={documentText} onChange={setDocumentText} onReportsChange={setCareReports} editReportId={editReportId} onEditClose={() => setEditReportId(null)} onAddTreatment={canReadCareNote ? saveDocumentTreatment : undefined} onOpenCareStory={() => navigate('care-story')} />;
       case 'support-resources':
         return <SupportResources />;
       case 'prepare-conversation': {
@@ -5463,7 +5529,12 @@ export function ContinuityPrototype() {
       case 'daily-care': {
         const nextVisit = [...appointments.filter((item) => item.hospitalId === portalPatientId && item.status === 'Scheduled' && item.date >= careToday), ...careEvents.filter((item) => item.patientId === portalPatientId && item.kind !== 'Medicine' && item.date >= careToday).map((item) => ({ date: item.date, time: item.time, clinician: item.title }))]
           .sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`))[0];
-        return <FamilyCareHome patientName={portalPatientName} hindi={hindi} nextVisit={canReadCalendar ? nextVisit : undefined}
+        const signedHomeNote = [...(recordStates[portalPatientId]?.releases ?? [])]
+          .filter((release) => release.patientId === portalPatientId && hasTypedCareNoteDoctorSignature(release))
+          .sort((first, second) => second.number - first.number)[0];
+        return <FamilyCareHome patientName={portalPatientName} hindi={hindi}
+          signedCareNote={canReadCareNote && hasTypedCareNoteDoctorSignature(signedHomeNote) ? { version: signedHomeNote.number, releasedAt: signedHomeNote.releasedAt, physician: signedHomeNote.signature!.name } : undefined}
+          nextVisit={canReadCalendar ? nextVisit : undefined}
           patientId={portalPatientId} today={careToday} author={portalAuthor} role={isFamilySession ? 'family' : 'patient'}
           events={canReadCalendar ? careEvents.filter((event) => event.kind !== 'Medicine' || canReadReports) : []}
           appointments={canReadCalendar ? appointments : []} checks={canReadCalendar ? careChecks : []}
@@ -5568,10 +5639,11 @@ export function ContinuityPrototype() {
           voiceJournal={voiceJournal.filter((entry) => entry.patientId !== portalPatientId || entry.createdBy === author)} onVoiceJournal={(next) => setVoiceJournal((current) => [...current.filter((entry) => entry.patientId === portalPatientId && entry.createdBy !== author), ...next])} voiceSave={voiceSave}
           costs={familyCosts} onCosts={setFamilyCosts}
           labResults={canReadReports ? labResults : []} onLabResults={setLabResults} treatmentEvents={treatmentEventsFor(portalPatientId)}
-          acknowledgements={canReadCareNote ? noteAcknowledgements : []} signedRelease={canReadCareNote ? release ?? undefined : undefined}
+          acknowledgements={canReadCareNote ? noteAcknowledgements : []} signedRelease={canReadCareNote && hasTypedCareNoteDoctorSignature(release) ? release : undefined}
           diagnosis={patientProfiles[portalPatientId]?.diagnosis ?? patientProfiles[portalPatientId]?.stage.split(' · ')[0] ?? ''} team={patientProfiles[portalPatientId]?.team ?? ''}
           reports={canReadReports ? careReports : []} onOpen={navigate} onCareNote={() => navigate('my-plan')} onReports={() => navigate('reports')}
-          note={canReadCareNote && release ? { version: release.number, physician: release.physician, releasedAt: release.releasedAt, fields: planFieldsFor(portalPatientId) } : null}
+          onReadReport={canReadReports ? (reportId) => { setEditReportId(reportId); navigate('document-search'); } : undefined}
+          note={canReadCareNote && hasTypedCareNoteDoctorSignature(release) ? { version: release.number, physician: release!.signature!.name, releasedAt: release!.releasedAt, fields: planFieldsFor(portalPatientId) } : null}
           calendarText={canReadCalendar ? [
             ...appointments.filter((item) => item.hospitalId === portalPatientId && item.status === 'Scheduled').map((item) => `${item.date} ${item.time} — ${item.type}; ${item.clinician}${item.preparationInstructions ? `\nInstructions from ${item.preparationInstructions.givenBy}: ${item.preparationInstructions.text}\nWritten here by ${item.preparationInstructions.recordedBy}` : ''}`),
             ...careEvents.filter((item) => item.patientId === portalPatientId).map((item) => `${item.date} ${item.time}${item.repeatUntil ? `; daily until ${item.repeatUntil}` : ''} — ${item.title}\n${item.instructions}; added by ${item.addedBy}`),
@@ -5746,9 +5818,9 @@ export function ContinuityPrototype() {
         : role === 'doctor' && view === 'home' ? <DoctorCareHome
         patients={workItems.map((item) => ({ id: item.hospitalId, name: item.patient, diagnosis: patientProfiles[item.hospitalId]?.diagnosis ?? patientProfiles[item.hospitalId]?.stage.split(' · ')[0] ?? '' }))}
         records={recordStates} appointments={appointments} physician={currentRole.split(' · ')[0]} today={careToday} hindi={hindi}
-        conversationRequests={conversationRequests} onStartConversationRequest={startConversationRequest} onOpenConversationVersion={openConversationVersion}
+        conversationRequests={conversationRequests} conversationImpactEpisodes={conversationImpactEpisodes} conversationImpactLoading={impactSave === 'loading' || requestSave === 'loading'} onStartConversationRequest={startConversationRequest} onOpenConversationVersion={openConversationVersion}
         onReview={(id) => { selectPatient(id); setView('doctor-review'); }}
-        onRecord={(id) => { if (id) selectPatient(id); setNewDoctorConversation(true); setView('doctor-record'); }}
+        onRecord={(id) => { const patientId = id ?? selectedId; if (id) selectPatient(id); startDoctorImpactEpisode(patientId); setNewDoctorConversation(true); setView('doctor-record'); }}
         onHistory={(id) => { if (id) selectPatient(id); setView('doctor-history'); }} onInstructions={saveAppointmentInstructions}
         onTasks={(id) => { selectPatient(id); setView('family-tasks'); }} />
         : role === 'doctor' && view === 'doctor-record' ? <DoctorConversation key={`${selectedId}:${newDoctorConversation}`}
@@ -5770,9 +5842,10 @@ export function ContinuityPrototype() {
               if (!changed.length) return current;
               const nextFields = { ...current.draftFields }; const statuses = { ...current.draftStatuses }; const excerpts = { ...current.draftExcerpts };
               for (const key of changed) {
-                const value = fields[key].trim();
-                nextFields[key] = value || 'Not stated in this conversation.';
-                statuses[key] = !value || value === 'Not stated in this conversation.' ? 'not-stated' : 'ready';
+                const value = fields[key];
+                const trimmed = value.trim();
+                nextFields[key] = trimmed ? value : 'Not stated in this conversation.';
+                statuses[key] = !trimmed || trimmed === 'Not stated in this conversation.' ? 'not-stated' : 'ready';
                 excerpts[key] = statuses[key] === 'ready' ? current.draftSource : '';
               }
               const next = reviseSummary(current, { draftFields: nextFields, draftExcerpts: excerpts });
@@ -5790,11 +5863,14 @@ export function ContinuityPrototype() {
             const release = latestSummaryRelease(next)!;
             updateSelectedRecord(() => ({ ...next, retrievalAcknowledged: false, retrievalUnlocked: false, unlockedVersion: null }));
             const requestId = activeConversationRequests[selectedId];
+            const impactEpisodeId = requestId ? careConversationRequestEpisodeId(requestId) : activeImpactEpisodes[selectedId];
+            if (impactEpisodeId) recordImpactStage({ id: impactEpisodeId, patientId: selectedId, stage: 'signed', at: release.releasedAt, signedVersion: release.number });
             if (requestId) {
               setConversationRequests((entries) => entries.map((entry) => entry.id === requestId && entry.patientId === selectedId && entry.status === 'in-progress'
                 ? { ...entry, status: 'completed', signedVersion: release.number, updatedAt: release.releasedAt } : entry));
               setActiveConversationRequests((links) => { const nextLinks = { ...links }; delete nextLinks[selectedId]; return nextLinks; });
             }
+            if (impactEpisodeId) setActiveImpactEpisodes((links) => { const nextLinks = { ...links }; delete nextLinks[selectedId]; return nextLinks; });
             addAudit(`Signed care note version ${release.number}`, selectedItem.patient, 'PUBLISH', undefined, selectedId, release.number);
           }}
           onFinishLater={() => navigate('home')} onFamily={(version) => { if (version) openConversationVersion(selectedId, version); }} />
@@ -5839,7 +5915,7 @@ export function ContinuityPrototype() {
         >
           <span className="brand-mark" aria-hidden="true"><ContinuityMark /></span>
           <div className="brand-titles">
-            <strong>Saanthvana</strong>
+            <strong>Saathi</strong>
             <span>Care planning</span>
           </div>
         </button>
@@ -5879,7 +5955,7 @@ export function ContinuityPrototype() {
               onClick={() => navigate(isPatientSession ? 'my-plan' : isFamilySession ? 'caregiver' : 'home')}
             >
               <span className="brand-mark" aria-hidden="true"><ContinuityMark /></span>
-              <strong>Saanthvana</strong>
+              <strong>Saathi</strong>
             </button>
             <div className="environment-label">
 

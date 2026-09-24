@@ -54,7 +54,7 @@ const PATIENT_BRAND = {
   features: [
     { num: '01', title: 'My care plan', body: 'The summary your doctor verified.' },
     { num: '02', title: 'Emergency card', body: 'A wallet card for the ambulance crew.' },
-    { num: '03', title: 'Care near me', body: 'Palliative care, hospitals and clinics on a map.' },
+    { num: '03', title: 'Care near me', body: 'Best supportive care, hospitals and clinics on a map.' },
   ],
 };
 
@@ -76,7 +76,7 @@ function BrandPanel({ variant = 'care-team' }: { variant?: 'care-team' | 'family
         <div className="auth-brand-top">
           <div className="auth-brand-mark" aria-hidden="true">S</div>
           <div className="auth-brand-titles">
-            <strong>Saanthvana</strong>
+            <strong>Saathi</strong>
             <span>Care planning</span>
           </div>
         </div>
@@ -249,7 +249,7 @@ export function LoginScreen(props: {
           </details>
 
           <div className="auth-footer">
-            New to Saanthvana?{' '}
+            New to Saathi?{' '}
             <button type="button" className="auth-textbutton" onClick={onGoToSignup}>
               Create profile
             </button>

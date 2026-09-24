@@ -201,7 +201,7 @@ function VoiceJournalForPatient({ patientId, author, today, hindi, entries, onCh
 
   function downloadText(entry: VoiceJournalEntry) {
     const url = URL.createObjectURL(new Blob([voiceJournalEntryText(entry)], { type: 'text/plain;charset=utf-8' }));
-    const link = document.createElement('a'); link.href = url; link.download = `saanthvana-journal-${entry.id.replace(/[^a-zA-Z0-9_-]/g, '-')}.txt`;
+    const link = document.createElement('a'); link.href = url; link.download = `saathi-journal-${entry.id.replace(/[^a-zA-Z0-9_-]/g, '-')}.txt`;
     document.body.appendChild(link); link.click(); link.remove(); window.setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 

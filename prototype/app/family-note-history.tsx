@@ -36,7 +36,7 @@ function NoteHistoryContent({ patientId, patientName, hindi, releases }: FamilyN
     const link = document.createElement('a');
     link.href = url;
     const safeId = patientId.replace(/[^a-zA-Z0-9_-]/g, '-');
-    link.download = compare && comparison ? `saanthvana-${safeId}-versions-${comparison.earlier.number}-${comparison.later.number}.txt` : `saanthvana-${safeId}-care-note-v${selected.number}.txt`;
+    link.download = compare && comparison ? `saathi-${safeId}-versions-${comparison.earlier.number}-${comparison.later.number}.txt` : `saathi-${safeId}-care-note-v${selected.number}.txt`;
     link.click();
     URL.revokeObjectURL(url);
     setMessage(t(compare ? 'Comparison downloaded.' : 'Selected note downloaded.', compare ? 'तुलना डाउनलोड हो गई।' : 'चुना हुआ नोट डाउनलोड हो गया।'));
@@ -53,14 +53,14 @@ function NoteHistoryContent({ patientId, patientName, hindi, releases }: FamilyN
 
   return <section className="family-note-history" aria-labelledby={`${id}-heading`}>
     <details>
-      <summary id={`${id}-heading`}>{t('Care note history', 'डॉक्टर के पुराने नोट')} <span>({versions.length})</span></summary>
+      <summary id={`${id}-heading`}>{t('Care Note history', 'डॉक्टर के पुराने नोट')} <span>({versions.length})</span></summary>
       {selected ? <>
         <div className="family-note-version-controls">
           <label htmlFor={`${id}-version`}>{t('Open version', 'संस्करण खोलें')}<select id={`${id}-version`} value={selected.number} onChange={(event) => { setSelectedNumber(Number(event.target.value)); setMessage(''); }}>{versions.map((version, index) => <option key={version.number} value={version.number}>{t('Version', 'संस्करण')} {version.number}{index === 0 ? t(' · latest', ' · सबसे नया') : ''}</option>)}</select></label>
           {selected.number !== versions[0].number && <button type="button" className="secondary-button" onClick={() => { setSelectedNumber(null); setMessage(''); }}>{t('Latest note', 'सबसे नया नोट')}</button>}
           <button type="button" className="secondary-button" disabled={!familyNoteHasText(selected)} onClick={() => download()}>{t('Save this version', 'इसकी कॉपी डाउनलोड करें')}</button>
         </div>
-        <article className="family-note-selected" aria-label={`${t('Care note version', 'डॉक्टर का नोट संस्करण')} ${selected.number}`}>
+        <article className="family-note-selected" aria-label={`${t('Care Note version', 'डॉक्टर का नोट संस्करण')} ${selected.number}`}>
           {metadata(selected)}
           {selected.fields ? <dl>{FAMILY_NOTE_FIELDS.map(({ key, label, hindi: translated }) => <div key={key}><dt>{hindi ? translated : label}</dt><dd>{storedText(selected.fields![key])}</dd></div>)}</dl> : storedText(selected.source)}
         </article>

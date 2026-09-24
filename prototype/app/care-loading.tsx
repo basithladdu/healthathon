@@ -15,7 +15,7 @@ export function CareLoading({ hindi = false, className = '' }: { hindi?: boolean
         </svg>
         <span className="care-loading-petal" />
       </div>
-      <p className="care-loading-name">Saanthvana</p>
+      <p className="care-loading-name">{hindi ? 'साथी' : 'Saathi'}</p>
       <div className="care-loading-dots" aria-hidden="true"><span /><span /><span /></div>
       <span className="care-loading-status">{hindi ? 'आपकी देखभाल खुल रही है' : 'Opening your care'}</span>
     </div>

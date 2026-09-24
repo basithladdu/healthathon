@@ -49,7 +49,7 @@ function QuestionsContent(props: FamilyOpenQuestionsProps) {
 
   function download() {
     const url = URL.createObjectURL(new Blob([exportOpenQuestions(entries, patientId)], { type: 'text/plain;charset=utf-8' }));
-    const link = document.createElement('a'); link.href = url; link.download = `saanthvana-questions-${patientId.replace(/[^a-zA-Z0-9_-]/g, '-')}.txt`; link.click(); URL.revokeObjectURL(url);
+    const link = document.createElement('a'); link.href = url; link.download = `saathi-questions-${patientId.replace(/[^a-zA-Z0-9_-]/g, '-')}.txt`; link.click(); URL.revokeObjectURL(url);
     setMessage(t('Questions and saved replies downloaded.', 'सवाल और सेव किए हुए जवाब डाउनलोड हो गए।'));
   }
 

@@ -84,7 +84,7 @@ function PatientHandoverPack({ patientId, patientName, author, hindi, note, sign
   function packetSections(): CarePdfSection[] {
     const sections: CarePdfSection[] = [];
     if (selection.note && note) {
-      sections.push({ heading: t('Doctor-reviewed care note', 'डॉक्टर का मंज़ूर किया हुआ नोट'), lines: [`${t('Version', 'संस्करण')}: ${note.version}`, `${t('Doctor', 'डॉक्टर')}: ${note.physician}`, `${t('Released', 'जारी किया')}: ${note.releasedAt}`] });
+      sections.push({ heading: t('Care Note', 'देखभाल का नोट'), lines: [`${t('Version', 'संस्करण')}: ${note.version}`, `${t('Doctor', 'डॉक्टर')}: ${note.physician}`, `${t('Released', 'जारी किया')}: ${note.releasedAt}`] });
       sections.push(...note.fields.map(({ label, value }) => ({ heading: label, lines: [value] })));
       sections.push({ heading: t('Care conversation', 'देखभाल की बातचीत'), lines: [t('This reviewed conversation note is not a prescription or a legal directive.', 'यह मंज़ूर किया हुआ बातचीत का नोट है; दवा का पर्चा या क़ानूनी निर्देश नहीं।')] });
     }
@@ -99,7 +99,7 @@ function PatientHandoverPack({ patientId, patientName, author, hindi, note, sign
     if (!hasPack || downloading) return;
     setDownloading(true); setMessage('');
     try {
-      await downloadCarePdf({ fileName: handoverFileName(patientId, selection.note && note ? note.version : null), title: t('Care summary', 'देखभाल का सार'), subtitle: `${patientName} · ${patientId}`, sections: packetSections(), ...(selection.note && signedRelease ? { careNote: { release: signedRelease, acknowledgements } } : {}) });
+      await downloadCarePdf({ fileName: handoverFileName(patientId, selection.note && note ? note.version : null), title: t('Visit pack', 'मुलाक़ात की फ़ाइल'), subtitle: `${patientName} · ${patientId}`, sections: packetSections(), ...(selection.note && signedRelease ? { careNote: { release: signedRelease, acknowledgements } } : {}) });
       setMessage(t('Your PDF is downloading.', 'आपकी PDF डाउनलोड हो रही है।'));
     } catch (failure) {
       setMessage(failure instanceof Error ? failure.message : t('The PDF could not download. Try Print.', 'PDF डाउनलोड नहीं हुई। प्रिंट करें।'));
@@ -121,7 +121,7 @@ function PatientHandoverPack({ patientId, patientName, author, hindi, note, sign
     style.textContent = '@page{margin:16mm}body{margin:0;color:#203d33;font:11pt/1.55 Arial,sans-serif}h1{font-size:22pt;margin:0 0 6pt}h2{font-size:12pt;color:#99503a;break-after:avoid;margin:18pt 0 5pt}p{white-space:pre-wrap;overflow-wrap:anywhere;margin:0 0 6pt}header{border-bottom:1pt solid #cfd9ce;padding-bottom:12pt;margin-bottom:16pt}';
     page.head.appendChild(title); page.head.appendChild(style);
     const header = page.createElement('header'); const heading = page.createElement('h1'); heading.textContent = patientName;
-    const identity = page.createElement('p'); identity.textContent = `${t('Care summary', 'देखभाल का सार')} · ${patientId}`;
+    const identity = page.createElement('p'); identity.textContent = `${t('Visit pack', 'मुलाक़ात की फ़ाइल')} · ${patientId}`;
     header.appendChild(heading); header.appendChild(identity); page.body.appendChild(header);
     const printSections = packetSections();
     if (selection.note && signedRelease?.signature) printSections.push({ heading: t('Recorded signatures', 'दर्ज हस्ताक्षर'), lines: [signedRelease.signature.name, signedRelease.signature.signedAt, ...matchingCareNoteAcknowledgements(acknowledgements, signedRelease).map((entry) => `${entry.signerName} · ${entry.signerRole} · ${entry.signedAt} · V${entry.version}`), t('Typed names; no verified digital signature.', 'टाइप किए हुए नाम; सत्यापित डिजिटल हस्ताक्षर नहीं।')] });
@@ -141,18 +141,18 @@ function PatientHandoverPack({ patientId, patientName, author, hindi, note, sign
   }
 
   return <section className="family-handover-pack" aria-labelledby={`${id}-heading`}>
-    <div className="handover-heading"><h1 id={`${id}-heading`}>{t('Care summary', 'देखभाल का सार')}</h1><div className="handover-export-actions"><button type="button" className="primary-button" disabled={!hasPack || downloading} onClick={download}>{downloading ? t('Making PDF…', 'PDF बन रही है…') : t('Download PDF', 'PDF डाउनलोड करें')}</button><button type="button" disabled={!hasPack} onClick={print}>{t('Print', 'प्रिंट करें')}</button></div></div>
+    <div className="handover-heading"><h1 id={`${id}-heading`}>{t('Visit pack', 'मुलाक़ात की फ़ाइल')}</h1><div className="handover-export-actions"><button type="button" className="primary-button" disabled={!hasPack || downloading} onClick={download}>{downloading ? t('Making PDF…', 'PDF बन रही है…') : t('Download PDF', 'PDF डाउनलोड करें')}</button><button type="button" disabled={!hasPack} onClick={print}>{t('Print', 'प्रिंट करें')}</button></div></div>
     <fieldset className="handover-choices"><legend>{t('Include', 'शामिल करें')}</legend><div className="handover-choice-grid">
-      {choice('note', note ? t(`Doctor’s note · v${note.version}`, `डॉक्टर का नोट · v${note.version}`) : t('Awaiting doctor’s note', 'डॉक्टर के नोट का इंतज़ार'), Boolean(note))}
+      {choice('note', note ? t(`Care Note · v${note.version}`, `देखभाल का नोट · v${note.version}`) : t('Awaiting Care Note', 'देखभाल के नोट का इंतज़ार'), Boolean(note))}
       {choice('checklist', t('My checklist', 'मेरी सूची'), Boolean(calendarText.trim()))}
       {choice('reports', t(`Reports to bring · ${files.length}`, `साथ लाने वाली रिपोर्ट · ${files.length}`), files.length > 0)}
       {choice('contacts', t(`People to call · ${patientContacts.length}`, `संपर्क · ${patientContacts.length}`), patientContacts.length > 0)}
     </div></fieldset>
 
     <article className="handover-preview" aria-labelledby={`${id}-preview`}>
-      <header className="handover-preview-heading"><div><span className="handover-paper-label">SAANTHVANA</span><h2 id={`${id}-preview`}>{patientName}</h2></div><span className="handover-patient-id">{patientId}</span></header>
+      <header className="handover-preview-heading"><div><span className="handover-paper-label">SAATHI</span><h2 id={`${id}-preview`}>{patientName}</h2></div><span className="handover-patient-id">{patientId}</span></header>
       {selection.note && note && <section className="handover-reviewed">
-        <div className="handover-note-heading"><h3>{t('Doctor-reviewed note', 'डॉक्टर का मंज़ूर किया हुआ नोट')}</h3><span>v{note.version}</span></div>
+        <div className="handover-note-heading"><h3>{t('Care Note', 'देखभाल का नोट')}</h3><span>V{note.version}</span></div>
         <p className="handover-note-source">{note.physician} · <time dateTime={note.releasedAt}>{reviewedDate}</time></p>
         <dl className="handover-note-fields">{note.fields.map(({ label, value }, index) => <div key={`${index}-${label}`}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>
         <p className="handover-clinical-boundary">{t('A care conversation, not a prescription or legal directive.', 'देखभाल की बातचीत; दवा का पर्चा या क़ानूनी निर्देश नहीं।')}</p>

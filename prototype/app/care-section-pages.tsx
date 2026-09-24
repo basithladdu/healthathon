@@ -9,7 +9,7 @@ import './care-section-pages.css';
 
 export const CARE_SECTIONS: Array<{ view: CareView; en: string; hi: string; art: CareArtKind; color: string; items: Array<{ view: CareView; en: string; hi: string; art: CareArtKind }> }> = [
   { view: 'clinical-documents', en: 'My documents', hi: 'मेरे दस्तावेज़', art: 'care-story', color: 'peach', items: [
-    { view: 'my-plan', en: 'Care note', hi: 'देखभाल का नोट', art: 'care-story' },
+    { view: 'my-plan', en: 'Care Note', hi: 'देखभाल का नोट', art: 'care-story' },
     { view: 'reports', en: 'Reports & answers', hi: 'रिपोर्ट और जवाब', art: 'lab-history' },
     { view: 'lab-history', en: 'Test trends', hi: 'जाँच में बदलाव', art: 'lab-history' },
     { view: 'calendar', en: 'Treatment calendar', hi: 'इलाज का कैलेंडर', art: 'cancer-overview' },
@@ -18,7 +18,7 @@ export const CARE_SECTIONS: Array<{ view: CareView; en: string; hi: string; art:
     { view: 'care-story', en: 'Care timeline', hi: 'देखभाल का सफ़र', art: 'care-story' },
   ] },
   { view: 'access-care', en: 'Find support', hi: 'मदद ढूँढें', art: 'support-places', color: 'lavender', items: [
-    { view: 'care-near-me', en: 'Palliative care centres', hi: 'पैलिएटिव देखभाल केंद्र', art: 'support-places' },
+    { view: 'care-near-me', en: 'Best supportive care centres', hi: 'सर्वोत्तम सहायक देखभाल केंद्र', art: 'support-places' },
     { view: 'medicine-access', en: 'Find prescribed morphine', hi: 'लिखी हुई मॉर्फ़ीन कहाँ मिलेगी', art: 'cancer-overview' },
     { view: 'home-help', en: 'Help at home', hi: 'घर पर मदद', art: 'home-help' },
     { view: 'care-circle', en: 'My care circle', hi: 'मेरे अपने', art: 'home-help' },

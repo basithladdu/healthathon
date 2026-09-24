@@ -229,8 +229,8 @@ export function CareNearMe({ homeAddress }: CareNearMeProps): React.JSX.Element 
 
   return <section className="cnm-root" aria-label="Find care">
     <div className="cnm-toolbar">
-      <div className="cnm-topline"><h1>Find palliative care</h1><div className="cnm-categories" role="group" aria-label="Type of care">
-        {(['palliative', 'hospital', 'all'] as const).map((value) => <button type="button" key={value} aria-pressed={category === value} onClick={() => { clearDestination(); setCategory(value); }}>{value === 'all' ? 'All' : value === 'palliative' ? 'Palliative care' : 'Hospitals'}</button>)}
+      <div className="cnm-topline"><h1>Find best supportive care</h1><div className="cnm-categories" role="group" aria-label="Type of care">
+        {(['palliative', 'hospital', 'all'] as const).map((value) => <button type="button" key={value} aria-pressed={category === value} onClick={() => { clearDestination(); setCategory(value); }}>{value === 'all' ? 'All' : value === 'palliative' ? 'Best supportive care' : 'Hospitals'}</button>)}
       </div></div>
       <form className="cnm-start-row" onSubmit={searchOrigin}>
         <label>Starting point<input ref={startInput} value={startText} onChange={(event) => setStartText(event.target.value)} placeholder="City, area or address" autoComplete="off" /></label>
@@ -271,7 +271,7 @@ export function CareNearMe({ homeAddress }: CareNearMeProps): React.JSX.Element 
         <div className="cnm-list-heading"><span>{centres.length + filteredPlaces.length} centres</span>{(query || service || category !== 'palliative') && <button type="button" onClick={() => { clearDestination(); setQuery(''); setService(''); setCategory('palliative'); }}>Clear filters</button>}</div>
         <CareDirectory centres={centres} selectedId={selectedId} locatingId={locatingId} onSelect={selectCentre} pinNumbers={pinNumbers} distances={distances} />
         {filteredPlaces.length > 0 && <div className="cnm-nearby-list"><h3>Nearby map listings</h3>{filteredPlaces.map((place) => <article key={place.id} className={`cnm-place${selectedId === place.id ? ' is-selected' : ''}`}>
-          <button type="button" className="cnm-place-select" aria-pressed={selectedId === place.id} onClick={() => selectPoint(place.id)}><span>{pinNumbers[place.id] && <span className="care-centre-pin-number">{pinNumbers[place.id]}</span>}{place.category === 'palliative' ? 'Palliative care' : 'Hospital'}</span><strong>{place.name}</strong></button>
+          <button type="button" className="cnm-place-select" aria-pressed={selectedId === place.id} onClick={() => selectPoint(place.id)}><span>{pinNumbers[place.id] && <span className="care-centre-pin-number">{pinNumbers[place.id]}</span>}{place.category === 'palliative' ? 'Best supportive care' : 'Hospital'}</span><strong>{place.name}</strong></button>
           <address>{place.address || 'Address not listed'}</address>
           <p>{place.distanceKm.toFixed(1)} km away in a straight line</p>
           <div className="cnm-place-actions"><a href={directionsUrl(place, origin)} target="_blank" rel="noopener noreferrer">Directions ↗</a><a href={place.sourceUrl} target="_blank" rel="noopener noreferrer">Source ↗</a></div>
@@ -281,6 +281,6 @@ export function CareNearMe({ homeAddress }: CareNearMeProps): React.JSX.Element 
         {!centres.length && !filteredPlaces.length && nearbyStatus !== 'loading' && <p className="cnm-empty">No matching centres. Try another name, area or service.</p>}
       </div>
     </div>
-    <details className="cnm-sources"><summary>Sources and contact details</summary><p>Pallium India listings checked {DIRECTORY_CHECKED_ON}. Call to confirm services before travelling. Map listings do not confirm palliative services or availability.</p><p>Your starting point is not saved. Place searches use Photon; road routes send the two locations to OSRM.</p><a href="https://palliumindia.org/clinics" target="_blank" rel="noopener noreferrer">Pallium India care listings ↗</a></details>
+    <details className="cnm-sources"><summary>Sources and contact details</summary><p>Pallium India listings checked {DIRECTORY_CHECKED_ON}. Call to confirm services before travelling. Map listings do not confirm services or availability.</p><p>Your starting point is not saved. Place searches use Photon; road routes send the two locations to OSRM.</p><a href="https://palliumindia.org/clinics" target="_blank" rel="noopener noreferrer">Pallium India care listings ↗</a></details>
   </section>;
 }

@@ -2,26 +2,40 @@
 
 Entry: **Cancer → Patient / Caregiver → Family & Caregiver Support**.
 
-These revisions follow the 23 September meeting and the later WhatsApp discussion. The problem statement remains the team's existing statement. These two answers replace the solution and build answers; no submission has been made from this file.
+These revisions follow both meetings this week, the later WhatsApp discussion and the two clinician-authored Word documents. The problem statement remains the team's existing statement. These answers are ready for team review; they have not been pasted into or submitted through the portal.
 
 ## Solution name
 
-Saanthvana
+Saathi (साथी) — Companion
 
 ## Your solution
 
-Saanthvana helps cancer patients and their families keep track of what was discussed with the doctor. Its main tool supports goals-of-care conversations: what matters to the patient, what was agreed and what still needs talking about. Patients or family members can ask their doctor to start one. AI will help turn the conversation into a draft. The doctor checks, corrects and signs it. The patient chooses who in the family can read it.
+Saathi helps cancer patients and their families keep care conversations, reports and everyday plans together. Its core is a doctor-led conversation about what matters to the patient and what was agreed. AI helps prepare a draft from the recorded conversation. The doctor checks, corrects and signs the Care Note. The patient reviews and signs the same version, chooses family access and can find the latest note quickly through Home or its QR code.
 
-Around this, families can keep reports together, see past test results, track prescribed medicines and appointments, write down symptoms and moods, and ask a named person for help. They can look for nearby palliative care, contacts for prescribed morphine and support groups. Today's plan shows what is next. The app helps people stay organised; it does not diagnose or suggest treatment.
+Families can organise reports, prescribed medicines, appointments and symptoms, and give a named person a task. Nearby care contacts help them ask about home support or prescribed morphine. Travel arrangements, bills, assistance paperwork and support groups stay connected to the care journey. AI helps find information in their own documents and present it in their language, with the original available for checking. Clinical decisions remain with the care team.
 
 ## How you will build it
 
-The web app is built with Next.js, TypeScript and MapLibre. Next, connect voice-to-text and AI drafts that show where each detail came from. The doctor checks before signing. Add verified accounts, family access chosen by the patient, sharing between phones and a record of changes. People will check details read from reports and prescriptions. Hindi is partly available; more languages and native phone apps are planned.
+The working web app uses Next.js, TypeScript and MapLibre, with PDF export and QR access to a Care Note. We will connect Sarvam AI for Indian-language speech transcription, translation and read-aloud support. An AI assistant will organise consented conversations into drafts and find answers in the patient's own documents, showing the source. Report and prescription details will go through a review screen before they enter a calendar or record. Doctors will correct and sign notes; patients will review the same version and choose family access. Verified accounts, protected shared storage and a record of consent, edits and approvals will support sharing between phones. We will measure documentation, retrieval time and effort during a 60–90 day pilot.
+
+## Links
+
+- Website: https://saathi.wedevit.in/
+- Public source code: https://github.com/basithladdu/healthathon
+- Questions: https://wa.me/919553321211
+
+## Implementation status for the team
+
+The solution answer describes the proposed product. The current app contains the role journeys, document review, calendar, care-note review and typed-name signing, plus local coordination tools. Sarvam AI, a connected language model, verified accounts, delivered notifications and sharing between separate phones are not connected. A typed name is not a verified digital signature or a legal advance directive.
+
+Sarvam's official documentation supports the proposed [Indian-language speech and language tools](https://docs.sarvam.ai/api/getting-started/building-for-india). Choosing the provider does not imply a partnership with our team or guaranteed credits. See the [family-support research and source map](../docs/pitch/2026-09-24-family-support-research.md) for the reasons behind the supporting features.
 
 ## Changes from the earlier answers
 
 - AI-assisted conversation documentation leads; daily care tools support it.
 - Added reports, recorded lab trends, medicines, appointments, symptoms, mood and named tasks.
+- Connected home support, travel arrangements, costs and paperwork to the family's care journey.
+- Added Sarvam AI to the proposed stack and made the doctor-to-patient signing sequence explicit.
 - Removed claims of native apps already built, hospital sign-in, guaranteed India hosting, an immutable production audit trail and connected AI.
 - Removed the unsupported claim that no comparable Indian product exists.
 - Kept dispensing-centre availability separate from the care-centre map.

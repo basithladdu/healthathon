@@ -68,8 +68,8 @@ export async function createMiraDocumentLibrary(patientId: string): Promise<{ re
     const page = pdf.addPage([595.28, 841.89]);
     pdf.setTitle(`${fixture.title} - Meera Raghavan`);
     pdf.setSubject('Fictional product walkthrough fixture; not patient data');
-    pdf.setCreator('Saanthvana');
-    const header = ['Saanthvana', fixture.title, 'Meera Raghavan', `Document date: ${fixture.date}`];
+    pdf.setCreator('Saathi');
+    const header = ['Saathi', fixture.title, 'Meera Raghavan', `Document date: ${fixture.date}`];
     const lines: string[] = [];
     for (const paragraph of fixture.lines) {
       let line = '';

@@ -31,7 +31,7 @@ export function restoreComfortEntry(entries: ComfortEntry[], patientId: string, 
 
 export function exportComfortEntries(entries: ComfortEntry[], patientId: string, author: string): string {
   return [
-    'SAANTHVANA — MY COMFORT SPACE',
+    'SAATHI — MY COMFORT SPACE',
     `Patient: ${patientId}\nWritten by: ${author.trim()}`,
     'Personal check-ins. These entries were not sent to a doctor or family member.',
     ...selectComfortEntries(entries, patientId, author).map((entry) => `${entry.date} — ${entry.feeling}\nSaved at: ${entry.createdAt}\nWritten by: ${entry.author}`),

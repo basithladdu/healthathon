@@ -46,6 +46,8 @@
 .care-story-card-heading > div { display: flex; flex-shrink: 0; }
 .family-care-story .care-story-card h2 { color: #473b2d; font-size: 17px; line-height: 1.45; margin: 4px 0 8px; overflow-wrap: anywhere; }
 .care-story-note { margin-top: 3px; }
+.care-story-note blockquote { margin: 8px 0; padding-left: 12px; border-left: 3px solid var(--story-accent); }
+.care-story-note cite { display: block; font-size: 11px; line-height: 1.5; font-style: normal; color: #52665b; }
 .care-story-note :is(p, dd) { margin: 0 0 8px; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 13px; line-height: 1.65; color: #594f42; }
 .care-story-note h3, .care-story-note dt { margin: 0 0 5px; font-size: 13px; line-height: 1.6; font-weight: 600; color: #52665b; }
 .care-story-note dl { display: flex; flex-wrap: wrap; gap: 2px 22px; margin: 10px 0 0; }

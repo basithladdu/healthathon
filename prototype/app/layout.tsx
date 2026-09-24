@@ -50,9 +50,9 @@ const sora = Sora({
 });
 
 export const metadata: Metadata = {
-  title: 'Saanthvana | Family support for cancer care',
+  title: 'Saathi | Family support for cancer care',
   description:
-    'Coordinate family tasks and visits, prepare for goals-of-care conversations, and find palliative support with Saanthvana.',
+    'Coordinate family tasks and visits, prepare for goals-of-care conversations, and find best supportive care with Saathi.',
 };
 
 export default function RootLayout({

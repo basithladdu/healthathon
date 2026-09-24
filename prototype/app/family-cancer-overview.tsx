@@ -99,9 +99,9 @@ export function FamilyCancerOverview({ patientId, patientName, diagnosis, team, 
       </button>
 
       <button type="button" className="cancer-overview-card cancer-overview-note" onClick={onCareNote}>
-        <span className="cancer-overview-card-top"><span className="cancer-overview-icon" aria-hidden="true"><CareArt kind="doctor-pack" /></span><span className="cancer-overview-card-title">{t('Care note', 'डॉक्टर का नोट')}</span></span>
+        <span className="cancer-overview-card-top"><span className="cancer-overview-icon" aria-hidden="true"><CareArt kind="doctor-pack" /></span><span className="cancer-overview-card-title">{t('Care Note', 'डॉक्टर का नोट')}</span></span>
         <span className="cancer-overview-note-art" aria-hidden="true"><IconFileText /></span>
-        <span className="cancer-overview-card-action">{t('Open care note', 'देखभाल का नोट खोलें')}<IconArrowRight /></span>
+        <span className="cancer-overview-card-action">{t('Open Care Note', 'देखभाल का नोट खोलें')}<IconArrowRight /></span>
       </button>
     </div>
 

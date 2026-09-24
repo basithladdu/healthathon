@@ -1,0 +1,11 @@
+.care-impact-panel { margin: 0 0 18px; padding: 16px; border: 1px solid #ded8cd; border-radius: 16px; background: #fffdf8; }
+.care-impact-panel > header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.care-impact-panel h2 { margin: 0; color: #273b34; font: 600 17px/1.3 var(--font-inter),sans-serif; }
+.care-impact-panel button { min-height: 36px; padding: 7px 11px; border: 1px solid #c9c2b6; border-radius: 999px; color: #34483d; background: #fff; font: 600 12px var(--font-inter),sans-serif; cursor: pointer; }
+.care-impact-panel button:focus-visible { outline: 3px solid #437961; outline-offset: 2px; }
+.care-impact-panel dl { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 8px; margin: 14px 0 0; }
+.care-impact-panel dl > div { min-width: 0; padding: 10px 12px; border-radius: 11px; background: #f3f1eb; }
+.care-impact-panel dt { color: #626b63; font-size: 11px; line-height: 1.35; }
+.care-impact-panel dd { margin: 3px 0 0; color: #263b32; font: 500 22px/1.15 Georgia,serif; }
+.care-impact-panel p { margin: 11px 0 0; color: #68716a; font-size: 11px; line-height: 1.5; }
+@media(max-width:600px) { .care-impact-panel { padding: 13px; } .care-impact-panel dl { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 7px; } .care-impact-panel dl > div { padding: 9px; } }

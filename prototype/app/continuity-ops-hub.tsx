@@ -320,7 +320,7 @@ function QrBridgePane(props: {
   return (
     <div className="ops-qr-pane">
       <div className="ops-qr-generate">
-        <div className="ops-kicker">Saanthvana · Opaque locator QR</div>
+        <div className="ops-kicker">Saathi · Opaque locator QR</div>
         <h3>Handoff &amp; clinic check-in QR</h3>
         <p className="ops-muted">
           Encodes only a locator + checksum — never CPR ceilings or clinical text. Possessing the QR does not open the note.
@@ -329,7 +329,7 @@ function QrBridgePane(props: {
         <div className="ops-qr-frame">
           {qrDataUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={qrDataUrl} alt="Saanthvana handoff QR code" width={220} height={220} />
+            <img src={qrDataUrl} alt="Saathi handoff QR code" width={220} height={220} />
           ) : (
             <div className="ops-qr-placeholder">Building QR…</div>
           )}
@@ -634,7 +634,7 @@ function MroVaultPane(props: {
           <IconFileText className="w-5 h-5" />
           <div>
             <strong>{mroId}</strong>
-            <small>Saanthvana Medical Record Object</small>
+            <small>Saathi Medical Record Object</small>
           </div>
           <button type="button" className="ops-btn ops-btn-ghost" onClick={() => setExpanded((v) => !v)}>
             {expanded ? 'Collapse' : 'Expand'}

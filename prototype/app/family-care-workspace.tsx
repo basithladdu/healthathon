@@ -91,14 +91,14 @@ export function FamilyCareWorkspace({ patientId, patientName, author, tasks, app
 
   function download() {
     const text = [
-      `Saanthvana — ${patientName}'s checklist`,
-      `Written by ${author}. Personal notes; not a prescription or a doctor-approved care note.`,
+      `Saathi — ${patientName}'s checklist`,
+      `Written by ${author}. Personal notes; not a prescription or a doctor-approved Care Note.`,
       'VISITS', ...scheduled.map((item) => `${item.date} ${item.time} — ${item.type}, ${item.clinician}, ${item.mode}${item.preparationInstructions ? `\nInstructions from ${item.preparationInstructions.givenBy}: ${item.preparationInstructions.text}\nWritten here by ${item.preparationInstructions.recordedBy}` : ''}`),
       'TO DO AND ASK', ...patientTasks.map((task) => `${task.completedBy ? 'Done / asked' : 'Open'}: ${task.title}\n${task.owner}${task.due ? `; ${task.due}` : ''}${task.completedBy ? `; completed by ${task.completedBy}` : ''}`),
       calendarText,
     ].join('\n\n');
     const url = URL.createObjectURL(new Blob([text], { type: 'text/plain;charset=utf-8' }));
-    const link = document.createElement('a'); link.href = url; link.download = 'saanthvana-family-checklist.txt'; link.click(); URL.revokeObjectURL(url);
+    const link = document.createElement('a'); link.href = url; link.download = 'saathi-family-checklist.txt'; link.click(); URL.revokeObjectURL(url);
   }
 
   function taskRow(task: FamilyTask) {
@@ -127,7 +127,7 @@ export function FamilyCareWorkspace({ patientId, patientName, author, tasks, app
   return <section className="family-workspace" aria-labelledby={`${id}-title`}>
     <div className="family-workspace-heading"><h1 id={`${id}-title`}>{section === 'questions' ? t('Ask at the next visit', 'अगली मुलाकात में पूछें') : tasksOnly ? t('Family tasks', 'परिवार के काम') : `${patientName.split(' ')[0]}${t('’s care', ' की देखभाल')}`}</h1><button type="button" className="secondary-button" onClick={download}>{t('Save a copy', 'कॉपी डाउनलोड करें')}</button></div>
     {lastRemoved && <div className="family-task-undo" role="status"><span>{t('Removed', 'हटाया')}: {lastRemoved.title}</span>{onRestore && <button type="button" className="care-text-button" onClick={undoRemove}>{t('Undo', 'वापस लाएँ')}</button>}</div>}
-    {!tasksOnly && <div className="family-next-visit-line">{visit && <span>{t('Next visit', 'अगली मुलाकात')}: {dateLabel(visit.date)} · {visit.time} · {visit.clinician}</span>}<button className="care-text-button" type="button" onClick={onPlan}>{t('Read the care note', 'डॉक्टर का नोट पढ़ें')} →</button></div>}
+    {!tasksOnly && <div className="family-next-visit-line">{visit && <span>{t('Next visit', 'अगली मुलाकात')}: {dateLabel(visit.date)} · {visit.time} · {visit.clinician}</span>}<button className="care-text-button" type="button" onClick={onPlan}>{t('Read the Care Note', 'डॉक्टर का नोट पढ़ें')} →</button></div>}
     {calendar}
     {comfort}
     {onOpenTool && <FamilyToolButtons hindi={hindi} onOpen={onOpenTool} />}
@@ -136,7 +136,7 @@ export function FamilyCareWorkspace({ patientId, patientName, author, tasks, app
         {!calendar && !tasksOnly && <section className="care-next-visit" aria-labelledby={`${id}-visit`}>
           <div className="family-section-heading"><h2 id={`${id}-visit`}>{t('Next visit', 'अगली मुलाकात')}</h2><button className="care-text-button" type="button" onClick={onCareTeam}>{t('Care team', 'देखभाल टीम')} →</button></div>
           {visit ? <><p className="care-visit-time"><time dateTime={`${visit.date}T${visit.time}`}>{dateLabel(visit.date)} · {visit.time}</time></p><p>{visit.clinician} · {visit.mode}</p><p className="care-visit-purpose">{visit.type}</p></> : <p>{t('No visit is booked here yet.', 'यहाँ अभी कोई मुलाकात तय नहीं है।')}</p>}
-          <button className="care-text-button" type="button" onClick={onPlan}>{t('Read the care note', 'डॉक्टर का नोट पढ़ें')} →</button>
+          <button className="care-text-button" type="button" onClick={onPlan}>{t('Read the Care Note', 'डॉक्टर का नोट पढ़ें')} →</button>
         </section>}
         <section className="care-home-section" aria-labelledby={`${id}-tasks`}>
           <div className="family-section-heading"><h2 id={`${id}-tasks`}>{calendar ? t('Other tasks', 'बाकी काम') : t('Things to do', 'करने के काम')}</h2><span>{openTasks.length} {t('left', 'बाकी')}</span></div>

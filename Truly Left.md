@@ -4,7 +4,14 @@ Updated 24 September 2026. Entry: **Cancer > Patient / Caregiver > Family & Care
 
 ## Latest meeting: what changed
 
+- [x] **Put the latest Care Note on Home.** The patient and family can see the latest typed-name-signed version and its QR immediately. The link checks the patient and version before opening it. Older approved notes remain in history. Sharing that link across separate phones still needs the shared backend.
+- [x] **Make doctor review a visible step.** Prepare the note, check and edit it, then sign it. The separate handover bundle is called a Visit pack so the Care Note has one name.
+- [x] **Start counting the care-conversation workflow.** The doctor can see and export patient requests, family requests, doctor-started conversations, saved discussion records, documented Care Notes and signed notes. Older records with unknown origins are not assigned an invented origin. These are app activity counts; they are not a measured clinical outcome.
+- [x] **Use Saathi and show the whole team.** The active app and new deck use Saathi (साथी), meaning Companion. All five members are named, including Shirin Ayub. The cover has the working app link, GitHub and WhatsApp contact.
+- [x] **Use best supportive care in our wording.** Active product labels use the revised phrase. Research titles, quoted study findings, official centre names and historical records keep their original wording. The deck shows all three sign-in choices and visible, clickable URLs.
 - [x] **Make uploads easy to find.** Upload from Home, My documents or Medicines. Pick the file, check its folder and date, and save. Extra text is optional. If you upload a prescription, the app takes you back to adding the medicine with that prescription attached.
+- [x] **Check the words copied from a report.** Extracted text opens beside the original. A person checks it before saving it for search. Changing the text removes unsupported page references. Files can still be saved without searchable text.
+- [x] **Put a treatment date into the care story.** Open a passage from a report, enter the treatment name and the date it actually happened, then confirm that the report records it. The care story keeps the original words and a link back to the report. The app does not use the report's date as a treatment date or mark a planned treatment as completed.
 - [x] **Let the doctor finish signing.** Their name is already filled in. If something needs checking, the app says what. After signing, it opens that same note. Anything copied from an earlier conversation needs the doctor to confirm it still applies.
 - [x] **Show the day on Home.** The four primary sections are My documents, Find support, My space and Calendar. Today's medicines and appointments, or the next scheduled items, appear above Quick access. Incoming tasks show the sender.
 - [x] **Say who is doing the job.** “Bring reports” now goes to a named person. They accept it, then mark it done. The person who asked can see what happened. This works when switching roles in the app; sharing between different phones still needs connecting.
@@ -17,13 +24,14 @@ Updated 24 September 2026. Entry: **Cancer > Patient / Caregiver > Family & Care
 - [x] **Capture the missing details.** A compact, optional structured editor covers values, priorities, attendees, decision-makers, understanding, clinical context, agreed decisions, unresolved matters and follow-up. Populated details follow the note into review, signing and PDF.
 - [x] **Fix the home hierarchy.** My documents, Find support, My space and Calendar come first. Quick access sits below the daily plan.
 - [x] **Help find prescribed morphine.** A separate support page connects an entered area to the palliative-care map, links the directory, and keeps a contact/enquiry with call, copy, follow-up and undo.
-- [ ] **Obtain the dispensing-centre list.** The map lists care centres. It does not establish which institution dispenses oral morphine or what is available today. The team still needs the promised source list.
+- [x] **Find a source for medicine-access contacts.** Pallium India's [Telangana directory](https://palliumindia.org/clinics/telangana) lists services and morphine availability. Keep that source separate from today's availability.
+- [ ] **Verify and add dispensing details.** Check relevant entries, oral formulation, contact details and service requirements before describing them as dispensing options. The current map still lists care centres; a directory entry is not a live stock check.
 
 You can click through these steps in the app. Real sign-in checks, sharing between phones and the AI connection are still left. [Meeting decisions and actions](docs/meetings/2026-09-23-actions.md).
 
 ## What this is for
 
-Saanthvana helps cancer patients and their families understand what was agreed with the care team, know what needs doing next, and keep everyone working from the same care plan.
+Saathi helps cancer patients and their families understand what was agreed with the care team, know what needs doing next, and keep everyone working from the same care plan.
 
 The goals-of-care conversation is the centre: what matters to the patient, who was involved, what was discussed, what was agreed and what still needs an answer. Appointments, medicines, reports and practical help make that conversation useful between visits.
 
@@ -66,7 +74,8 @@ These ticks mean the feature exists in the app. Shared accounts, service connect
 ## First: finish the care conversation
 
 - [x] **Keep the older clinical tools out of the submitted flow.** Legacy `/workspace/*` URLs now resolve to the supported care screens; the older views cannot be opened through the route permission check. The submitted flow has no prognosis scoring, triage or treatment/dose tools. The old implementation remains in source and should be retired separately.
-- [ ] **Have the clinicians review the care-note form.** The five-section note now includes a compact structured editor based on the team's questionnaire. Separate treatment-choice matrices, capacity/witness declarations and a legal directive workflow are not implemented. Participants and agreement must stay specific to each discussion.
+- [x] **Use the doctors' questionnaire.** Optional groups now cover patient and care-team details, family contacts, understanding, values, declarations and care choices already discussed. They travel with the reviewed Care Note and PDF. The patient reviews the exact doctor-signed version; family acknowledgement stays separate. [Section coverage](docs/pitch/2026-09-24-clinician-form-coverage.md).
+- [ ] **Have the clinicians review the completed form.** Confirm the labels and recorded declarations against their workflow. Witness signing, legal directive execution, verified identity and shared delivery are still separate work. The app records discussions; it does not supply treatment choices or recommendations.
 - [ ] **Finish the voice workflow for a busy doctor.** Recording, browser captions and source-based note preparation are available. Reliable uploaded-audio transcription, speaker identification and connected AI remain unfinished. Keep consent and source audio/text traceable; the doctor corrects the note before signing.
 - [ ] **Let the family genuinely receive and review it.** Separate accounts, patient-controlled access, shared storage, exact-version acknowledgement and an audit trail must work across devices. Entering an ABHA or council number does not verify identity.
 - [ ] **Finish sharing with the next doctor.** A readable phone view, PDF and QR/link with controlled access, expiry and revocation. Do not promise that a downloaded PDF can be recalled. A typed name is not a verified digital signature or a legal advance directive.
@@ -89,13 +98,15 @@ This follows Basith's 22-23 September requests. The meeting had removed cost-hel
 - [ ] **Reduce report entry.** Extract printed test names, dates, values, units and report-provided ranges into a review screen. Preserve the source and corrections. Do not turn a range comparison into a clinical judgement. Scanned-report OCR and automatic value extraction remain unfinished.
 - [ ] **Carry review and corrections through every AI step.** The person can edit, reject or retry an output. Record the source, changes, reviewer and approved version. A note history on one browser is not the full shared audit system.
 - [ ] **Check language and effort with actual users.** Choose the pilot languages, complete the important screens and reviewed care-note translations, then observe a doctor and a patient/caregiver completing the core journey. Measure taps and time; do not just count translated labels.
-- [ ] **Run a 60-90 day operational pilot.** Establish a baseline for time spent writing/retrieving a care note, time a family needs to find the next step, and completion/acknowledgement of agreed tasks. Track extra doctor effort and errors too. Record results before claiming impact; no clinical outcome claims from a UI walkthrough.
-- [x] **Make the deck understandable without a presenter.** The [revised eight-slide deck](submission/Saanthvana_Round_1_Judge_2026-09-24.pptx) covers both meetings from this week, on 21 and 23 September, plus the later chat changes. It explains the family's problem first, shows the actual app early and gives AI two clear jobs: preparing a care-note draft and finding information in the patient's own records. Four real photographs and an editable study chart support the complete, plain-language sentences. The numbers now retain their dates, populations and source limits. The [slide text](submission/Saanthvana_Round_1_Judge_Text_2026-09-24.md) and [evidence with a meeting-to-slide map](docs/pitch/2026-09-24-verified-evidence.md) are saved alongside it. Connected AI, verified accounts and sharing between phones remain clearly marked as work to do.
+- [ ] **Run a 60-90 day operational pilot.** Compare patient requests, doctor-started discussions and documented conversations before and after deployment using the same eligible patient group. Keep requests, held discussions, documented notes and signatures separate. Report counts and denominators, clinician effort and errors. The [impact plan](docs/pitch/2026-09-24-impact-plan.md) defines the proposed baseline and measures. No trial results have been collected.
+- [x] **Make the deck understandable without a presenter.** The [eight-slide deck](submission/Saathi_Healthathon_Final.pptx) covers both meetings from 21 and 23 September and the later feedback. The cover introduces the app and all five team members. The story uses an attributed Indian care photograph. Five research findings, two pages explaining the intended AI features, fresh app screens, three sign-in choices, the broader family journey, proposed impact measures and all nine linked references follow. The writing uses complete, everyday sentences. The [PDF](output/pdf/Saathi_Healthathon_Final.pdf) contains 29 active links. [Slide text](submission/Saathi_Round_1_Text_2026-09-24.md) and [evidence with a meeting-to-slide map](docs/pitch/2026-09-24-verified-evidence.md) sit alongside it. AI, verified accounts and sharing between phones remain work to connect.
 - [ ] **Finish the Round 1 entry.** Paste the [revised answers](submission/Round_1_Answers_2026-09-24.md) into the portal, upload the deck and submit. Chrome disconnected before the answers could be changed. The live app does not mean the competition entry has been submitted.
 
 ## Every part of the caregiver brief
 
 The brief gives examples, not a requirement to build every service. This table keeps each stated need accounted for while keeping the cancer care conversation central.
+
+The [24 September research and practical journeys](docs/pitch/2026-09-24-family-support-research.md) connect the brief to Indian caregiver research, the two clinician-authored forms and Sarvam's proposed role. They explain what happens after someone asks for travel, home help, prescribed medicine or financial assistance. A selected contact or assigned task is not a completed external service.
 
 | The brief asks for | What exists | What is still needed |
 | --- | --- | --- |
@@ -169,7 +180,7 @@ These are research-informed requirements added after the meeting. Confidence is 
 
 ## Evidence and status
 
-Feature status above was checked against the application changes on 23 September 2026. [The earlier implementation record](docs/meetings/2026-09-21-implementation.md) preserves the 21 September release; it is not the inventory for this update. Deployment and verification of this batch are recorded separately in [the 23 September delivery record](docs/releases/2026-09-23-care-coordination.md).
+Feature status includes the application changes through 24 September 2026. [The earlier implementation record](docs/meetings/2026-09-21-implementation.md) preserves the 21 September release. See the [23 September delivery record](docs/releases/2026-09-23-care-coordination.md) and [24 September release](docs/releases/2026-09-24-saath.md) for the corresponding deployment and verification evidence.
 
 The current care data is held in the browser. Shared server-side accounts, identity checks, controlled link sharing and external service connections are still outstanding. No model provider, ABHA service, medical-register verification, uploaded-audio transcription service or notification delivery was added in this batch. End-to-end use with real documents and separate users is still required.
 

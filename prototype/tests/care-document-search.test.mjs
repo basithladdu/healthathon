@@ -39,6 +39,20 @@ test('latest questions order source dates and synonyms work without medical inte
   assert.deepEqual(findCareDocumentText('What should I do?', 'a', reports, docs), []);
 });
 
+test('treatment-date questions surface exact recorded and planned passages without turning document dates into treatment dates', () => {
+  const reports = [report('treatment', 'a', '2026-09-20')];
+  const text = '[Page 1]\nChemotherapy given on 12 September 2026.\nRadiotherapy planned for 25 September 2026.';
+  const documents = [source('treatment', text)];
+  for (const query of ['Treatment dates', 'इलाज की तारीखें']) {
+    const matches = findCareDocumentText(query, 'a', reports, documents);
+    assert.equal(matches.length, 1);
+    assert.equal(matches[0].report.date, '2026-09-20');
+    assert.ok(matches[0].excerpts.some((excerpt) => excerpt.text.includes('given on 12 September 2026.')));
+    assert.ok(matches[0].excerpts.some((excerpt) => excerpt.text.includes('planned for 25 September 2026.')));
+    for (const excerpt of matches[0].excerpts) assert.ok(text.includes(excerpt.text));
+  }
+});
+
 test('category is editable, patient-scoped and only a filename suggestion until reviewed', () => {
   assert.equal(careDocumentCategoryFromName('cbc-result.png'), 'monitoring');
   assert.equal(careDocumentCategoryFromName('biopsy_report.pdf'), 'cancer');

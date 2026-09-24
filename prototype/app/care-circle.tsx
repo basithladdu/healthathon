@@ -70,7 +70,7 @@ function CareCircleForPerson({ patientId, patientName, author, role, hindi, stat
   const [copyFallback, setCopyFallback] = useState('');
   const selectedMembers = memberAudience.filter((memberId) => activeMembers.some((member) => member.id === memberId));
   const labels: Record<CareCirclePermission, string> = {
-    careNote: t('Care note', 'देखभाल का नोट'), calendar: t('Calendar & tasks', 'कैलेंडर और काम'),
+    careNote: t('Care Note', 'देखभाल का नोट'), calendar: t('Calendar & tasks', 'कैलेंडर और काम'),
     reports: t('Reports', 'रिपोर्ट'), costs: t('Costs', 'खर्च'),
   };
   const action = () => ({ patientId, actor: author, role, at: new Date().toISOString() });

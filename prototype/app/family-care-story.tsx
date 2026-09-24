@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
+import type { CareReport } from './care-calendar-state';
 import {
   CARE_STORY_KINDS, addCareStoryEntry, removeCareStoryEntry, restoreCareStoryEntry,
   selectCareStoryEntries, updateCareStoryEntry, type CareStoryDraft, type CareStoryEntry, type CareStoryFilter, type CareStoryKind,
@@ -15,6 +16,8 @@ type FamilyCareStoryProps = {
   hindi: boolean;
   entries: CareStoryEntry[];
   recordedEntries?: readonly CareStoryEntry[];
+  reports?: readonly CareReport[];
+  onReadReport?: (reportId: string) => void;
   onChange: (entries: CareStoryEntry[]) => void;
 };
 
@@ -30,7 +33,7 @@ export function FamilyCareStory(props: FamilyCareStoryProps) {
   return <CareStoryContent key={`${props.patientId}:${props.author}`} {...props} />;
 }
 
-function CareStoryContent({ patientId, author, today, hindi, entries, recordedEntries = [], onChange }: FamilyCareStoryProps) {
+function CareStoryContent({ patientId, author, today, hindi, entries, recordedEntries = [], reports = [], onReadReport, onChange }: FamilyCareStoryProps) {
   const id = useId();
   const titleInput = useRef<HTMLInputElement>(null);
   const [filter, setFilter] = useState<CareStoryFilter>('All');
@@ -95,12 +98,13 @@ function CareStoryContent({ patientId, author, today, hindi, entries, recordedEn
 
   function download() {
     const text = [
-      'SAANTHVANA — YOUR CARE STORY', `Patient: ${patientId}`,
+      'SAATHI — YOUR CARE STORY', `Patient: ${patientId}`,
       'Existing records and family notes. Family notes do not change the original records.',
       ...allEntries.map((entry) => [
         `${entry.date} · ${entry.kind} · ${entry.title}`,
         entry.fromRecord ? 'From existing records' : 'Family note',
         entry.details,
+        entry.documentSource ? `Quoted from the document: ${entry.documentSource.quote}\n${entry.documentSource.page ? `Page ${entry.documentSource.page} · ` : ''}Text line ${entry.documentSource.line}\nSource checked by: ${entry.documentSource.recordedBy}` : '',
         entry.changeReason ? `What changed / reason as documented: ${entry.changeReason}` : '',
         entry.source ? `Source: ${entry.source}` : '',
         entry.sourceAuthor ? `Source written by: ${entry.sourceAuthor}` : '',
@@ -111,7 +115,7 @@ function CareStoryContent({ patientId, author, today, hindi, entries, recordedEn
     const url = URL.createObjectURL(new Blob([text], { type: 'text/plain;charset=utf-8' }));
     const link = document.createElement('a');
     link.href = url;
-    link.download = `saanthvana-care-story-${patientId.replace(/[^a-zA-Z0-9_-]/g, '-')}.txt`;
+    link.download = `saathi-care-story-${patientId.replace(/[^a-zA-Z0-9_-]/g, '-')}.txt`;
     link.click();
     URL.revokeObjectURL(url);
     setMessage(t('Your care story was downloaded.', 'आपकी देखभाल की कहानी डाउनलोड हो गई।'));
@@ -163,6 +167,7 @@ function CareStoryContent({ patientId, author, today, hindi, entries, recordedEn
           {entry.details && <p>{entry.details}</p>}
           {entry.changeReason && <div><h3>{t('What changed / reason as documented', 'क्या बदला / लिखी हुई वजह')}</h3><p>{entry.changeReason}</p></div>}
         </div>}
+        {entry.documentSource && <div className="care-story-note"><blockquote><p>{entry.documentSource.quote}</p><cite>{entry.documentSource.page ? `${t('Page', 'पृष्ठ')} ${entry.documentSource.page} · ` : ''}{t('Text line', 'टेक्स्ट पंक्ति')} {entry.documentSource.line} · {t('Checked by', 'जाँचने वाले')} {entry.documentSource.recordedBy}</cite></blockquote>{onReadReport && reports.some((report) => report.patientId === patientId && report.id === entry.documentSource!.reportId) ? <button type="button" className="secondary-button" onClick={() => onReadReport(entry.documentSource!.reportId)}>{t('Open source', 'मूल दस्तावेज़ खोलें')}</button> : <p>{t('The original file is not available in this view.', 'इस पेज पर मूल फ़ाइल उपलब्ध नहीं है।')}</p>}</div>}
         <p className="care-story-author">{entry.fromRecord ? [entry.source, entry.sourceAuthor || entry.createdBy].filter(Boolean).join(' · ') : `${t('Family note', 'परिवार का नोट')} · ${entry.createdBy}`}{!entry.fromRecord && entry.source && <> · {entry.source}{entry.sourceAuthor && ` · ${entry.sourceAuthor}`}</>}{entry.updatedBy !== entry.createdBy && <> · {t('edited by', 'बदला')} {entry.updatedBy}</>}</p>
       </article>
     </li>)}</ol> : <p className="care-story-empty">{allEntries.length ? t('No events of this type yet.', 'इस तरह की कोई बात अभी नहीं है।') : t('No care records yet.', 'अभी कोई देखभाल रिकॉर्ड नहीं है।')}</p>}

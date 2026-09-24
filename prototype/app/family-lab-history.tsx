@@ -213,7 +213,7 @@ function LabHistoryForPatient({ patientId, author, today, hindi, reports, entrie
 
   function download() {
     const url = URL.createObjectURL(new Blob([labHistoryText(entries, patientId, hindi, treatmentEvents)], { type: 'text/plain;charset=utf-8' }));
-    const link = document.createElement('a'); link.href = url; link.download = 'saanthvana-lab-results.txt'; link.click();
+    const link = document.createElement('a'); link.href = url; link.download = 'saathi-lab-results.txt'; link.click();
     setTimeout(() => URL.revokeObjectURL(url), 0);
     setMessage(t('Download started.', 'डाउनलोड शुरू हो गया।'));
   }

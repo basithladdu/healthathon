@@ -122,7 +122,7 @@ export function DoctorConversation({ patientId, patientName, patients, physician
       } else throw new Error('Choose a plain-text transcript or a text-based PDF.');
       if (!text.trim()) throw new Error('The selected file is empty.');
       setNote((current) => current.trim() ? `${current.trim()}\n\n[Text imported from ${file.name}]\n${text.trim()}` : text.trim());
-      setMessage(`Text imported from ${file.name}. Check the source before preparing the care note.`);
+      setMessage(`Text imported from ${file.name}. Check the source before preparing the Care Note.`);
     } catch (error) {
       const reason = error instanceof CarePdfReadError ? error.code === 'password' ? 'This PDF is password protected.' : error.code === 'too-much-text' ? 'This PDF is too large to read here.' : 'This PDF could not be read.' : error instanceof Error ? error.message : 'The selected file could not be read.';
       setMessage(reason);
@@ -160,7 +160,7 @@ export function DoctorConversation({ patientId, patientName, patients, physician
 
   return <section className="doctor-conversation">
     <header className="doctor-page-heading"><div><span className="doctor-eyebrow">{physician}</span><h1>{t('Record a conversation', 'बातचीत दर्ज करें')}</h1></div><label className="doctor-source-import">Add transcript or PDF<input ref={sourceFileInput} type="file" accept="text/plain,.txt,application/pdf,.pdf" disabled={recording || starting || busy} onChange={(event) => { const file = event.target.files?.[0]; if (file) void importSourceFile(file); }} /></label><select aria-label="Patient" value={patientId} disabled={recording || starting || busy} onChange={(event) => onPatient(event.target.value)}>{patients.map((person) => <option key={person.id} value={person.id}>{person.name}</option>)}</select></header>
-    <div className="doctor-note-steps" aria-label="Care note steps"><strong><span>1</span> {t('Conversation', 'बातचीत')}</strong><span><span>2</span> {t('Review & sign', 'जाँचें और हस्ताक्षर करें')}</span><button type="button" onClick={onHistory}><IconClock /> {t('Note history', 'पुराने नोट')}</button></div>
+    <ol className="doctor-note-steps" aria-label="Care Note workflow"><li aria-current="step"><strong><span>1</span> {t('Prepare draft', 'मसौदा तैयार करें')}</strong></li><li><span><span>2</span> {t('Review & edit', 'जाँचें और बदलें')}</span></li><li><span><span>3</span> {t('Sign Care Note', 'देखभाल के नोट पर हस्ताक्षर')}</span></li><li><button type="button" onClick={onHistory}><IconClock /> {t('Note history', 'पुराने नोट')}</button></li></ol>
     {requestContext && <section className="doctor-request-context"><h2>Requested discussion</h2><p>From {requestContext.requestedBy}</p>{requestContext.topics.length > 0 && <ul>{requestContext.topics.map((topic, index) => <li key={`${topic}-${index}`}>{topic}</li>)}</ul>}{requestContext.note.trim() && <p>{requestContext.note}</p>}</section>}
     {previousContext && <details className="doctor-previous-discussion"><summary><strong>Previous signed discussion · Version {previousContext.version}</strong><time dateTime={previousContext.releasedAt}>{new Date(previousContext.releasedAt).toLocaleDateString('en-GB')}</time></summary>{previousContext.fields && <dl>{(Object.keys(CARE_NOTE_LABELS) as DraftFieldKey[]).filter((key) => {
       const value = previousContext.fields?.[key]?.trim(); return Boolean(value && value !== 'Not stated in this conversation.');
@@ -179,7 +179,7 @@ export function DoctorConversation({ patientId, patientName, patients, physician
         {!previousContext && referenceNote?.trim() && !note.trim() && !audio && !recording && !starting && <button className="care-text-button" type="button" disabled={busy} onClick={() => { setNote(referenceNote); setMessage(''); }}>{t('Use latest conversation', 'पिछली बातचीत लें')}</button>}
         <textarea aria-label="Conversation note" value={note} disabled={busy} maxLength={12000} rows={12} onChange={(event) => setNote(event.target.value)} placeholder={t('Record, type, or paste the conversation here.', 'बातचीत रिकॉर्ड करें, लिखें या यहाँ पेस्ट करें।')} />
         {interim && <p className="doctor-caption" aria-live="polite">{interim}</p>}
-        <div className="doctor-note-actions"><button className="primary-button" type="button" disabled={recording || starting || busy || (!note.trim() && !audio)} onClick={() => { if (note.trim()) void assist(); else save(); }}>{note.trim() && <IconSparkles />}{busy ? t('Preparing care note…', 'देखभाल नोट तैयार हो रहा है…') : !note.trim() && audio ? t('Save recording', 'रिकॉर्डिंग सेव करें') : t('Prepare care note', 'देखभाल नोट तैयार करें')} →</button></div>
+        <div className="doctor-note-actions"><button className="primary-button" type="button" disabled={recording || starting || busy || (!note.trim() && !audio)} onClick={() => { if (note.trim()) void assist(); else save(); }}>{note.trim() && <IconSparkles />}{busy ? t('Preparing Care Note…', 'देखभाल नोट तैयार हो रहा है…') : !note.trim() && audio ? t('Save recording', 'रिकॉर्डिंग सेव करें') : t('Prepare Care Note', 'देखभाल नोट तैयार करें')} →</button></div>
       </section>
     </div>
     {message && <p className="doctor-action-message" role="status">{message}</p>}

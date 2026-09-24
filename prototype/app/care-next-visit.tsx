@@ -91,7 +91,7 @@ function NextVisitForPatient({ patientId, patientName, author, today, hindi, vie
     setSavingPdf(true); setMessage('');
     try {
       await downloadCarePdf({
-        fileName: `saanthvana-next-visit-${patientId.replace(/[^a-zA-Z0-9_-]/g, '-')}.pdf`,
+        fileName: `saathi-next-visit-${patientId.replace(/[^a-zA-Z0-9_-]/g, '-')}.pdf`,
         title: t('Next visit', 'अगली मुलाकात'), subtitle: patientName,
         sections: [
           { heading: t('Visit', 'मुलाकात'), lines: next ? [next.title, `${dateLabel(next.date)}${next.time ? ` · ${next.time}` : ''}`, ...[next.clinician, next.mode].filter(Boolean), next.source === 'appointment' ? t('From the appointment list', 'मुलाकात की सूची से') : t('From your calendar', 'आपके कैलेंडर से')] : [t('No upcoming visit added.', 'अगली मुलाकात अभी नहीं जोड़ी है।')] },
