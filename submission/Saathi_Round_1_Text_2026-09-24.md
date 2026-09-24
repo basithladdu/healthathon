@@ -1,6 +1,6 @@
 # Saathi: Round 1 slide text
 
-24 September 2026. Eight slides. The impact plan is proposed, and connected AI is unfinished.
+Updated 25 September 2026 after Sujay’s review. Eight slides. Original slide numbers reordered as 1, 2, 3, 5, 7, 6, 4, 8. The impact plan is proposed, and connected AI is unfinished.
 
 ## Slide 1
 
@@ -10,7 +10,7 @@ Saathi
 
 Companion
 
-Saathi helps families organise cancer care, from conversations and records to medicines, practical help and emotional support.
+Saathi is a palliative care companion that helps align cancer care with the patient’s values and makes care easier to access.
 
 OPEN THE WEBSITE - saathi.wedevit.in
 
@@ -38,7 +38,7 @@ Technical lead
 Shaik Muhammad
 Awaiz
 
-Technology
+Technical member
 
 Dr Sharada
 Vinod Kutty
@@ -52,15 +52,15 @@ Clinician
 
 Shirin Ayub
 
-Team member
+Medical student
 
 ## Slide 2
 
-When the care conversation gets lost
+When the patient’s voice is lost
+
+A 62-year-old woman with advanced breast cancer receives best supportive care.
 
 Mannar, Kerala · PIB photograph, 2011 · Not the story patient.
-
-Imagine a 62-year-old woman with advanced breast cancer receiving best supportive care.
 
 At the clinic
 
@@ -68,17 +68,17 @@ Her doctor discusses her wishes. Only her husband attends.
 
 Two months later
 
-She becomes unconscious and reaches hospital. The doctor asks what she would want if her heart stopped.
+She becomes unconscious and reaches the Emergency Department. The doctor asks if she wanted CPR if her heart stopped.
 
 The family disagrees
 
 Her husband says yes. Her daughter says no. Her son calls from another city. No one can find the earlier discussion.
 
-Families need the care plan, medicines, appointments and help in one place.
+Families need the patient’s wishes to guide care when the patient cannot speak.
 
 ## Slide 3
 
-Why families need support between visits
+Why a palliative care companion is needed
 
 15.6 lakh
 
@@ -90,7 +90,7 @@ https://gco.iarc.who.int/media/globocan/factsheets/populations/356-india-fact-sh
 
 98.39%
 
-Estimated unmet palliative-care need across 10 cancer types, among people whose cancer had spread.
+Estimated unmet palliative-care need in metastatic disease across 10 cancer types.
 
 Patil et al., 2024
 
@@ -98,7 +98,7 @@ https://doi.org/10.1136/spcare-2024-004978
 
 88%
 
-Wanted to choose treatment near the end of life. A 2019 survey of 2,400+ urban respondents.
+Surveyed patients wanted to choose their end-of-life treatment. 2,400+ urban respondents with a recent hospital stay (2019).
 
 IndiaSpend; seven-city survey
 
@@ -106,17 +106,19 @@ https://scroll.in/article/925875/73-urban-indians-do-not-know-about-their-right-
 
 11.5%
 
-45 of 391 doctors had training in advance directives: written wishes for future care. One hospital.
+45/391 doctors had training in advance directives and their practical aspects. One hospital.
 
 Jacob et al., CMC Vellore, 2026
 
 https://doi.org/10.25259/NMJI_817_2023
 
-One hospital improved documentation.
+Goals-of-care discussion
 
-A standard process helped staff document discussions for 24 of 26 eligible patients.
+A clinician-led conversation about a patient’s values, priorities and care preferences, used to agree care goals with the patient and, with consent, their family.
 
-Advanced pancreatic / colorectal cancer.
+A standard procedure improved goals-of-care documentation to 92% (24/26 eligible patients).
+
+Advanced pancreatic / colorectal cancer, Chennai.
 
 Thangasamy et al., 2025
 
@@ -124,61 +126,83 @@ https://doi.org/10.1177/26892820251392545
 
 Different study groups. These are not results from Saathi.
 
-Proposed 60–90 day study: compare before and after
+Proposed 60-90 day study: compare before and after
 
-Count patient requests and doctor-started discussions.
+Number of patient- and doctor-initiated goals-of-care discussions.
 
-Count written and signed Care Notes separately.
+Number of written and signed Care Notes per cancer facility.
 
-Time finding records and track completed family jobs.
+Time to retrieve goals-of-care discussions during an emergency.
 
 Chart: documented goals-of-care discussions increased from 0% to 92% in the cited Chennai project. This is a published study finding, not a Saathi result.
 
 ## Slide 4
 
-Saathi keeps your cancer care in one place.
+Physician leads. AI assists
 
-Medicines and prescription reminders
+The physician initiates the goals-of-care discussion. AI provides a structured guide.
 
-https://saathi.wedevit.in/medicines
+Every version of the goals-of-care discussion stays in the Care Note history.
 
-Visits, tests and treatment dates
+1. Record with consent.
 
-https://saathi.wedevit.in/calendar
+2. AI guides the physician through a structured goals-of-care discussion.
 
-Journals, support groups and shared family jobs
+3. AI drafts the Care Note.
 
-https://saathi.wedevit.in/my-space
+4. The physician reviews, edits and signs.
 
-Three sign-ins
+5. The patient reviews and signs.
 
-OPEN - saathi.wedevit.in
-
-https://saathi.wedevit.in/
-
-## Slide 5
-
-AI prepares the note. People check and sign it.
-
-The conversation stays with the family after the visit.
-
-Every signed Care Note stays in the history.
+Planned: an encrypted Care Note for the patient to keep for emergencies.
 
 Planned with Sarvam AI: Indian-language speech, translation and read-aloud.
 
 https://docs.sarvam.ai/api/getting-started/building-for-india
 
-1. Record with permission.
+## Slide 5
 
-2. AI prepares a draft.
+Help with palliative care near you
 
-3. The doctor checks and signs.
+Open the care map
 
-4. The patient reviews and signs.
+https://saathi.wedevit.in/find-support
+
+Pallium India directory
+
+https://palliumindia.org/clinics/telangana
+
+Map data: © OpenStreetMap contributors
+
+https://www.openstreetmap.org/copyright
+
+1. Find palliative care nearby
+
+https://saathi.wedevit.in/find-support
+
+Find palliative-care centres and hospitals, with phone numbers and directions.
+
+2. Access to prescribed opioids
+
+https://saathi.wedevit.in/medicine-access
+
+Ask about oral morphine, prescription documents and collection hours before travelling.
+
+3. Find your cancer-specific support group
+
+https://saathi.wedevit.in/support-groups
+
+Find patient and caregiver groups for your cancer type, locally or online.
+
+4. Plan travel and help at home
+
+https://saathi.wedevit.in/help-at-home
+
+Arrange a ride or ambulance, home nursing or medicine collection with your care circle.
 
 ## Slide 6
 
-AI helps families and doctors use patient records.
+AI helps families use patient records
 
 With the patient’s permission, find answers and see the original passage.
 
@@ -196,47 +220,29 @@ Check medicine reminders before saving.
 
 ## Slide 7
 
-After the visit, the family still needs help.
+Saathi also keeps your cancer care in one place
 
-Open the care map
+Medicines and prescription reminders
 
-https://saathi.wedevit.in/find-support
+https://saathi.wedevit.in/medicines
 
-Pallium India directory
+Visits, tests and treatment dates
 
-https://palliumindia.org/clinics/telangana
+https://saathi.wedevit.in/calendar
 
-Map data: © OpenStreetMap contributors
+Journals and symptom tracking
 
-https://www.openstreetmap.org/copyright
+https://saathi.wedevit.in/my-space
 
-Find care nearby
-
-https://saathi.wedevit.in/find-support
-
-Find best supportive-care centres and hospitals, with phone numbers and directions.
-
-Find prescribed medicines
-
-https://saathi.wedevit.in/medicine-access
-
-Ask about oral morphine, prescription paperwork and collection hours before travelling.
-
-Plan travel and help at home
-
-https://saathi.wedevit.in/help-at-home
-
-Name who will arrange a ride or ambulance, home nursing or medicine collection.
-
-Get help with care costs
+Financial tracking
 
 https://saathi.wedevit.in/costs
 
-Track paid and pending bills. Prepare questions and paperwork for financial assistance.
+Three sign-ins
 
-Give each job a person, a date and a confirmation.
+OPEN - saathi.wedevit.in
 
-https://saathi.wedevit.in/family-tasks
+https://saathi.wedevit.in/
 
 ## Slide 8
 

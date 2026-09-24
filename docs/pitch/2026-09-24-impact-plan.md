@@ -24,3 +24,11 @@ For each period, publish the funnel as `count / denominator`, including the deno
 Offering information about goals-of-care discussions to **all clinic patients** is only a possible opt-in communication approach to discuss with a future site. No partner is confirmed. It does not mean every patient is eligible, should have a discussion, or has consented.
 
 No measured results, savings, clinical outcomes, adoption, or accuracy claims are available. A signed Care Note is a workflow output, not proof that preferences were understood or that care changed.
+
+## Headline measures agreed for the pitch on 25 September
+
+1. Number of patient-initiated and doctor-initiated goals-of-care discussions, reported separately. Requests and offers remain separate from discussions held.
+2. Number of written and signed Care Notes per cancer facility. Count unique discussions and distinguish documentation from physician and patient signing.
+3. Time to retrieve the latest goals-of-care discussion during an emergency. Define the start as the request for the record and the end as opening the correct latest version. Record failed retrievals, wrong versions and whether the person had access. Begin with a standardised retrieval exercise agreed with the site; observing actual emergency care requires the site’s approval and must not delay treatment.
+
+Use the same definitions and retrieval scenario before and after deployment. These are proposed operational measures, not measured results.
