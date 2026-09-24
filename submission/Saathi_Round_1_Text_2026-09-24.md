@@ -90,7 +90,7 @@ https://gco.iarc.who.int/media/globocan/factsheets/populations/356-india-fact-sh
 
 98.39%
 
-Estimated unmet palliative-care need among people whose cancer had spread, across 10 cancer types.
+Estimated unmet palliative-care need across 10 cancer types, among people whose cancer had spread.
 
 Patil et al., 2024
 
@@ -98,23 +98,23 @@ https://doi.org/10.1136/spcare-2024-004978
 
 88%
 
-Wanted to choose their treatment near the end of life in a 2019 survey of 2,400+ urban respondents.
+Wanted to choose treatment near the end of life. A 2019 survey of 2,400+ urban respondents.
 
-IndiaSpend reporting; seven cities
+IndiaSpend; seven-city survey
 
 https://scroll.in/article/925875/73-urban-indians-do-not-know-about-their-right-to-make-a-living-will-finds-a-survey
 
 11.5%
 
-45 of 391 doctors at one hospital had training in advance directives, which record wishes for future care.
+45 of 391 doctors had training in advance directives: written wishes for future care. One hospital.
 
 Jacob et al., CMC Vellore, 2026
 
 https://doi.org/10.25259/NMJI_817_2023
 
-One Chennai hospital improved documentation.
+One hospital improved documentation.
 
-A standard process helped staff write down care discussions for 24 of 26 eligible patients.
+A standard process helped staff document discussions for 24 of 26 eligible patients.
 
 Advanced pancreatic / colorectal cancer.
 
@@ -122,7 +122,15 @@ Thangasamy et al., 2025
 
 https://doi.org/10.1177/26892820251392545
 
-Each study looked at a different group of people. These figures are not results from Saathi.
+Different study groups. These are not results from Saathi.
+
+Proposed 60–90 day study: compare before and after
+
+Count patient requests and doctor-started discussions.
+
+Count written and signed Care Notes separately.
+
+Time finding records and track completed family jobs.
 
 Chart: documented goals-of-care discussions increased from 0% to 92% in the cited Chennai project. This is a published study finding, not a Saathi result.
 
@@ -130,23 +138,23 @@ Chart: documented goals-of-care discussions increased from 0% to 92% in the cite
 
 Saathi keeps your cancer care in one place.
 
+Medicines and prescription reminders
+
+https://saathi.wedevit.in/medicines
+
+Visits, tests and treatment dates
+
+https://saathi.wedevit.in/calendar
+
+Journals, support groups and shared family jobs
+
+https://saathi.wedevit.in/my-space
+
 Three sign-ins
 
-Patients see their care.
-
-Families organise help.
-
-Doctors review and sign.
-
-Plan rides and home support. Keep medicine calls, costs, paperwork and emotional support together.
-
-OPEN THE WEBSITE - saathi.wedevit.in
+OPEN - saathi.wedevit.in
 
 https://saathi.wedevit.in/
-
-Find a centre and call to confirm.
-
-https://palliumindia.org/clinics/telangana
 
 ## Slide 5
 
@@ -188,33 +196,47 @@ Check medicine reminders before saving.
 
 ## Slide 7
 
-Will Saathi make care easier to organise?
+After the visit, the family still needs help.
 
-60–90 days
+Open the care map
 
-Proposed clinic study
+https://saathi.wedevit.in/find-support
 
-Before Saathi
+Pallium India directory
 
-Use Saathi
+https://palliumindia.org/clinics/telangana
 
-Compare
+Map data: © OpenStreetMap contributors
 
-Patients ask to talk.
+https://www.openstreetmap.org/copyright
 
-Count requests to discuss their care.
+Find care nearby
 
-Doctors start conversations.
+https://saathi.wedevit.in/find-support
 
-Count conversations a doctor starts.
+Find best supportive-care centres and hospitals, with phone numbers and directions.
 
-Care Notes are saved.
+Find prescribed medicines
 
-Count written notes and signed notes separately.
+https://saathi.wedevit.in/medicine-access
 
-Also time finding a record and checking a note, and count missing details.
+Ask about oral morphine, prescription paperwork and collection hours before travelling.
 
-The linked app shows the workflow. AI, verified sign-in and sharing between phones still need connecting.
+Plan travel and help at home
+
+https://saathi.wedevit.in/help-at-home
+
+Name who will arrange a ride or ambulance, home nursing or medicine collection.
+
+Get help with care costs
+
+https://saathi.wedevit.in/costs
+
+Track paid and pending bills. Prepare questions and paperwork for financial assistance.
+
+Give each job a person, a date and a confirmation.
+
+https://saathi.wedevit.in/family-tasks
 
 ## Slide 8
 
