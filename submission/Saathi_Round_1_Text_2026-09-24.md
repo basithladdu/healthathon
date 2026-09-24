@@ -4,6 +4,28 @@
 
 ## Slide 1
 
+Saathi keeps your cancer care in one place.
+
+Three sign-ins
+
+Patients see their care.
+
+Families organise help.
+
+Doctors review and sign.
+
+Plan rides and home support. Keep medicine calls, costs, paperwork and emotional support together.
+
+OPEN THE WEBSITE - saathi.wedevit.in
+
+https://saathi.wedevit.in/
+
+Find a centre and call to confirm.
+
+https://palliumindia.org/clinics/telangana
+
+## Slide 2
+
 Saathi
 
 साथी
@@ -54,7 +76,7 @@ Shirin Ayub
 
 Team member
 
-## Slide 2
+## Slide 3
 
 When the care conversation gets lost
 
@@ -76,7 +98,35 @@ Her husband says yes. Her daughter says no. Her son calls from another city. No 
 
 A checked Care Note gives the family the same starting point.
 
-## Slide 3
+## Slide 4
+
+AI prepares the note. People check and sign it.
+
+The doctor signs first. The patient then reviews and signs that version.
+
+Keep the source words and every signed version for the next conversation.
+
+Planned with Sarvam AI: Indian-language speech, translation and read-aloud.
+
+https://docs.sarvam.ai/api/getting-started/building-for-india
+
+1. Record with permission.
+
+Keep who said what in the conversation.
+
+2. AI prepares a draft.
+
+Separate agreed points from unanswered questions.
+
+3. The doctor checks and signs.
+
+Correct the note and record clinical choices.
+
+4. The patient signs that version.
+
+Review the exact version. Keep earlier notes.
+
+## Slide 5
 
 Why families need support between visits
 
@@ -126,35 +176,7 @@ Each study looked at a different group of people. These figures are not results 
 
 Chart: documented goals-of-care discussions increased from 0% to 92% in the cited Chennai project. This is a published study finding, not a Saathi result.
 
-## Slide 4
-
-AI prepares the note. People check and sign it.
-
-The doctor signs first. The patient then reviews and signs that version.
-
-Keep the source words and every signed version for the next conversation.
-
-Planned with Sarvam AI: Indian-language speech, translation and read-aloud.
-
-https://docs.sarvam.ai/api/getting-started/building-for-india
-
-1. Record with permission.
-
-Keep who said what in the conversation.
-
-2. AI prepares a draft.
-
-Separate agreed points from unanswered questions.
-
-3. The doctor checks and signs.
-
-Correct the note and record clinical choices.
-
-4. The patient signs that version.
-
-Review the exact version. Keep earlier notes.
-
-## Slide 5
+## Slide 6
 
 AI helps the family use its own records.
 
@@ -173,24 +195,6 @@ Add medicine reminders
 Read the names and times from a printed prescription. Let a person check them before adding reminders.
 
 AI organises the records. The care team decides what treatment the patient needs.
-
-## Slide 6
-
-Your care, medicines and help in one place.
-
-Three sign-ins
-
-Patients see their care.
-
-Families organise help.
-
-Doctors review and sign.
-
-Plan rides and home support. Keep medicine calls, costs, paperwork and emotional support together.
-
-Find a centre → call to confirm → keep the contact and visit plan.
-
-https://palliumindia.org/clinics/telangana
 
 ## Slide 7
 
