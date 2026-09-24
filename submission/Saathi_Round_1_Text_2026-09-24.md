@@ -74,7 +74,7 @@ The family disagrees
 
 Her husband says yes. Her daughter says no. Her son calls from another city. No one can find the earlier discussion.
 
-A checked Care Note gives the family the same starting point.
+Families need the care plan, medicines, appointments and help in one place.
 
 ## Slide 3
 
@@ -152,9 +152,13 @@ https://palliumindia.org/clinics/telangana
 
 AI prepares the note. People check and sign it.
 
-The doctor signs first. The patient then reviews and signs that version.
+The conversation stays with the family after the visit.
 
-Keep the source words and every signed version for the next conversation.
+Every signed Care Note stays in the history.
+
+Photo: Antoni Shkraba / Pexels
+
+https://www.pexels.com/photo/woman-consulting-a-doctor-5215008/
 
 Planned with Sarvam AI: Indian-language speech, translation and read-aloud.
 
@@ -162,19 +166,11 @@ https://docs.sarvam.ai/api/getting-started/building-for-india
 
 1. Record with permission.
 
-Keep who said what in the conversation.
-
 2. AI prepares a draft.
-
-Separate agreed points from unanswered questions.
 
 3. The doctor checks and signs.
 
-Correct the note and record clinical choices.
-
-4. The patient signs that version.
-
-Review the exact version. Keep earlier notes.
+4. The patient reviews and signs.
 
 ## Slide 6
 
@@ -182,43 +178,45 @@ AI helps families and doctors use patient records.
 
 With the patient’s permission, find answers and see the original passage.
 
-Find an answer in a report
+1. Add a report.
 
-Ask a question. See the exact part of the report the answer came from. Say when it cannot be found.
+Or a printed prescription.
 
-See what happened when
+2. Ask in your own words.
 
-Confirm that treatment happened and enter its date. Keep the quoted record beside it.
+3. Check the original text.
 
-Add medicine reminders
+Keep treatment dates in order.
 
-Read the names and times from a printed prescription. Let a person check them before adding reminders.
-
-AI organises the records. The care team decides what treatment the patient needs.
+Check medicine reminders before saving.
 
 ## Slide 7
 
-Does Saathi help more care conversations happen?
+Will Saathi make care easier to organise?
 
-We propose a 60–90 day study in a clinic, comparing care conversations before and after Saathi.
+60–90 days
 
-Patient requests
+Proposed clinic study
 
-Count patients who ask for a conversation about their care and wishes. Record family requests separately.
+Before Saathi
 
-Doctor-started discussions
+Use Saathi
 
-Count conversations a doctor starts. Keep these separate from invitations that did not lead to a conversation.
+Compare
 
-Conversations written down
+Patients ask to talk.
 
-Count conversations with a saved Care Note. Record how many the doctor has checked and signed.
+Count requests to discuss their care.
 
-Before vs after
+Doctors start conversations.
 
-Patients whose care discussion was written down ÷ all patients who fit the study’s agreed rules
+Count conversations a doctor starts.
 
-Also measure how long the work takes, what details were missed and whether doctors have more work.
+Care Notes are saved.
+
+Count written notes and signed notes separately.
+
+Also time finding a record and checking a note, and count missing details.
 
 The linked app shows the workflow. AI, verified sign-in and sharing between phones still need connecting.
 
