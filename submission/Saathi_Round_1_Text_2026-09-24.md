@@ -10,9 +10,9 @@ Saathi
 
 Companion
 
-Saathi helps families organise cancer care—from conversations and records to medicines, practical help and emotional support.
+Saathi helps families organise cancer care, from conversations and records to medicines, practical help and emotional support.
 
-OPEN THE WEBSITE
+OPEN THE WEBSITE - saathi.wedevit.in
 
 https://saathi.wedevit.in/
 
@@ -258,7 +258,7 @@ References
 
 1. IARC. Global Cancer Observatory, 2024.
 
-India — GLOBOCAN 2024 Fact Sheet
+India: GLOBOCAN 2024 Fact Sheet
 
 https://gco.iarc.who.int/media/globocan/factsheets/populations/356-india-fact-sheet.pdf
 
