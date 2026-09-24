@@ -156,10 +156,6 @@ The conversation stays with the family after the visit.
 
 Every signed Care Note stays in the history.
 
-Photo: Antoni Shkraba / Pexels
-
-https://www.pexels.com/photo/woman-consulting-a-doctor-5215008/
-
 Planned with Sarvam AI: Indian-language speech, translation and read-aloud.
 
 https://docs.sarvam.ai/api/getting-started/building-for-india
