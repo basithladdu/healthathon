@@ -61,7 +61,7 @@ function ComfortSpaceContent({ patientId, author, today, hindi, entries, onChang
   function download() {
     const text = exportComfortEntries(entries, patientId, author);
     const url = URL.createObjectURL(new Blob([text], { type: 'text/plain;charset=utf-8' }));
-    const link = document.createElement('a'); link.href = url; link.download = `saathi-comfort-${patientId.replace(/[^a-zA-Z0-9_-]/g, '-')}.txt`; link.click(); URL.revokeObjectURL(url);
+    const link = document.createElement('a'); link.href = url; link.download = `saanthvana-comfort-${patientId.replace(/[^a-zA-Z0-9_-]/g, '-')}.txt`; link.click(); URL.revokeObjectURL(url);
     setMessage(t('Your check-ins were downloaded.', 'आपका लिखा हुआ हाल डाउनलोड हो गया।'));
   }
 

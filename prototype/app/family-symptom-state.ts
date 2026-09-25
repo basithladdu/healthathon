@@ -77,7 +77,7 @@ export function symptomSeverityText(value: SymptomSeverity, hindi = false): stri
 export function symptomDiaryText(entries: SymptomEntry[], patientId: string, today: string, hindi = false): string {
   const t = (en: string, hi: string) => hindi ? hi : en;
   return [
-    t('Saathi — How I have been feeling', 'साथी — मेरी तबीयत के नोट'),
+    t('Saanthvana — How I have been feeling', 'सांत्वना — मेरी तबीयत के नोट'),
     `${t('Saved on', 'कॉपी की तारीख')}: ${today}`,
     t('Patient/family observations. Not sent to the care team.', 'मरीज़ या परिवार के लिखे नोट। देखभाल टीम को नहीं भेजे गए हैं।'),
     ...selectSymptomEntries(entries, patientId, today).map((entry) => [

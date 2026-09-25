@@ -150,7 +150,7 @@ function PatientHandoverPack({ patientId, patientName, author, hindi, note, sign
     </div></fieldset>
 
     <article className="handover-preview" aria-labelledby={`${id}-preview`}>
-      <header className="handover-preview-heading"><div><span className="handover-paper-label">SAATHI</span><h2 id={`${id}-preview`}>{patientName}</h2></div><span className="handover-patient-id">{patientId}</span></header>
+      <header className="handover-preview-heading"><div><span className="handover-paper-label">SAANTHVANA</span><h2 id={`${id}-preview`}>{patientName}</h2></div><span className="handover-patient-id">{patientId}</span></header>
       {selection.note && note && <section className="handover-reviewed">
         <div className="handover-note-heading"><h3>{t('Care Note', 'देखभाल का नोट')}</h3><span>V{note.version}</span></div>
         <p className="handover-note-source">{note.physician} · <time dateTime={note.releasedAt}>{reviewedDate}</time></p>

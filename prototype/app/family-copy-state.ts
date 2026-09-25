@@ -78,7 +78,7 @@ export function reviewedCopyText(releases: readonly SummaryRelease[], patientId:
   const release = approvedPatientCopies(releases, patientId).find((copy) => copy.number === version);
   if (!release?.fields) return null;
   return [
-    `SAATHI — DOCTOR-REVIEWED CARE NOTE\nPatient: ${patientName}\nPatient ID: ${patientId}`,
+    `SAANTHVANA — DOCTOR-REVIEWED CARE NOTE\nPatient: ${patientName}\nPatient ID: ${patientId}`,
     `Version: ${release.number}\nDoctor: ${release.physician}\nReleased: ${release.releasedAt}`,
     ...COPY_FIELDS.map(([key, label]) => `${label}\n${release.fields![key]}`),
     'A record of the reviewed conversation, not a prescription or a legal directive.',
@@ -89,7 +89,7 @@ export function careCopyLogText(entries: CareCopyEntry[], releases: readonly Sum
   const latest = approvedPatientCopies(releases, patientId)[0];
   const groups = groupCareCopyEntries(entries, releases, patientId);
   return [
-    `SAATHI — FAMILY COPY LOG\nPatient: ${patientName}\nPatient ID: ${patientId}`,
+    `SAANTHVANA — FAMILY COPY LOG\nPatient: ${patientName}\nPatient ID: ${patientId}`,
     'These are family-entered handover notes. The app does not check delivery, reading or who still holds a copy. Removing an entry does not retrieve or revoke a copy.',
     latest ? `Latest approved note here: version ${latest.number}\nDoctor: ${latest.physician}\nReleased: ${latest.releasedAt}` : 'No approved note is available here.',
     ...groups.map((group) => [

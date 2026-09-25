@@ -68,7 +68,7 @@ export function selectCareStoryEntries(entries: CareStoryEntry[], patientId: str
 export function exportCareStory(entries: CareStoryEntry[], patientId: string): string {
   const story = selectCareStoryEntries(entries, patientId);
   return [
-    'SAATHI — YOUR CARE STORY',
+    'SAANTHVANA — YOUR CARE STORY',
     `Patient: ${patientId}`,
     'Family-added notes. Sources are recorded as entered; these notes are not a doctor-approved care note.',
     ...story.map((entry) => [

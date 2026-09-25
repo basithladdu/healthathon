@@ -98,7 +98,7 @@ function CareStoryContent({ patientId, author, today, hindi, entries, recordedEn
 
   function download() {
     const text = [
-      'SAATHI — YOUR CARE STORY', `Patient: ${patientId}`,
+      'SAANTHVANA — YOUR CARE STORY', `Patient: ${patientId}`,
       'Existing records and family notes. Family notes do not change the original records.',
       ...allEntries.map((entry) => [
         `${entry.date} · ${entry.kind} · ${entry.title}`,
@@ -115,7 +115,7 @@ function CareStoryContent({ patientId, author, today, hindi, entries, recordedEn
     const url = URL.createObjectURL(new Blob([text], { type: 'text/plain;charset=utf-8' }));
     const link = document.createElement('a');
     link.href = url;
-    link.download = `saathi-care-story-${patientId.replace(/[^a-zA-Z0-9_-]/g, '-')}.txt`;
+    link.download = `saanthvana-care-story-${patientId.replace(/[^a-zA-Z0-9_-]/g, '-')}.txt`;
     link.click();
     URL.revokeObjectURL(url);
     setMessage(t('Your care story was downloaded.', 'आपकी देखभाल की कहानी डाउनलोड हो गई।'));

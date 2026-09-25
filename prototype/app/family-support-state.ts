@@ -110,7 +110,7 @@ export function restoreSupportPlace(entries: SupportPlace[], patientId: string, 
 export function supportPlacesText(entries: SupportPlace[], patientId: string): string {
   const places = entries.filter((entry) => entry.patientId === patientId);
   return [
-    `SAATHI — PLACES I’VE CHECKED\nPatient ID: ${patientId}`,
+    `SAANTHVANA — PLACES I’VE CHECKED\nPatient ID: ${patientId}`,
     `Public directory checked: ${DIRECTORY_CHECKED_ON}. Call notes are written by the family; they do not confirm current services, medicine stock or bookings.`,
     ...places.map((place) => {
       const centre = CARE_CENTRES.find((item) => item.id === place.centreId);

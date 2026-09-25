@@ -56,7 +56,7 @@ export function CareNoteReader({ patientId, patientName, releases, hindi, conver
     if (!selected || !sections.length || downloading || changedSignedNote) return;
     setDownloading(true); setError('');
     try {
-      await downloadCarePdf({ fileName: `saathi-${patientId}-care-note-v${selected.number}.pdf`, title: `${patientName} — Care Note`,
+      await downloadCarePdf({ fileName: `saanthvana-${patientId}-care-note-v${selected.number}.pdf`, title: `${patientName} — Care Note`,
         subtitle: `Version ${selected.number} · ${date(selected.releasedAt)} · ${selected.physician}`,
         sections, careNote: { release: selected, acknowledgements } });
     } catch { setError('The PDF could not be downloaded. Please try again.'); }

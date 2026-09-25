@@ -18,7 +18,7 @@ export const CARE_SECTIONS: Array<{ view: CareView; en: string; hi: string; art:
     { view: 'care-story', en: 'Care timeline', hi: 'देखभाल का सफ़र', art: 'care-story' },
   ] },
   { view: 'access-care', en: 'Find support', hi: 'मदद ढूँढें', art: 'support-places', color: 'lavender', items: [
-    { view: 'care-near-me', en: 'Best supportive care centres', hi: 'सर्वोत्तम सहायक देखभाल केंद्र', art: 'support-places' },
+    { view: 'care-near-me', en: 'Palliative care centres', hi: 'उपशामक देखभाल केंद्र', art: 'support-places' },
     { view: 'medicine-access', en: 'Find prescribed morphine', hi: 'लिखी हुई मॉर्फ़ीन कहाँ मिलेगी', art: 'cancer-overview' },
     { view: 'home-help', en: 'Help at home', hi: 'घर पर मदद', art: 'home-help' },
     { view: 'care-circle', en: 'My care circle', hi: 'मेरे अपने', art: 'home-help' },

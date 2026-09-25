@@ -225,11 +225,11 @@ function DocumentSearchForPatient({ patientId, author, hindi, reports, documents
     setMessage(t('Document restored.', 'दस्तावेज़ वापस आ गया।')); setError('');
   }
   function download() {
-    const content = ['SAATHI — DOCUMENT EXCERPTS', `${t('Question', 'सवाल')}: ${submitted}`,
+    const content = ['SAANTHVANA — DOCUMENT EXCERPTS', `${t('Question', 'सवाल')}: ${submitted}`,
       ...matches.map(({ report, recordedBy, excerpts }) => [report.file.name, `${t('Document date', 'दस्तावेज़ की तारीख')}: ${report.date}`, `${t('Text recorded by', 'टेक्स्ट दर्ज करने वाले')}: ${recordedBy}`, ...excerpts.map((excerpt) => `${excerpt.page ? `${t('Page', 'पृष्ठ')} ${excerpt.page} · ` : ''}${t('Text line', 'टेक्स्ट पंक्ति')} ${excerpt.line}\n${excerpt.text}`)].join('\n')),
     ].join('\n\n');
     const url = URL.createObjectURL(new Blob([content], { type: 'text/plain;charset=utf-8' }));
-    const link = window.document.createElement('a'); link.href = url; link.download = 'saathi-document-excerpts.txt'; link.click(); window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    const link = window.document.createElement('a'); link.href = url; link.download = 'saanthvana-document-excerpts.txt'; link.click(); window.setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
   function sourcePassage(report: CareReport, excerpt: CareDocumentMatch['excerpts'][number]) {
     const document = documents.find((item) => item.patientId === patientId && item.reportId === report.id);

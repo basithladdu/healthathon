@@ -89,7 +89,7 @@ export function selectOpenQuestions(entries: OpenQuestion[], patientId: string, 
 export function exportOpenQuestions(entries: OpenQuestion[], patientId: string): string {
   const status = { 'to-ask': 'To ask', waiting: 'Asked — no reply saved yet', replied: 'Reply saved by family', closed: 'Closed' };
   return [
-    'SAATHI — QUESTIONS TO FOLLOW UP', `Patient: ${patientId}`,
+    'SAANTHVANA — QUESTIONS TO FOLLOW UP', `Patient: ${patientId}`,
     'Family-written questions and replies. Names describe who the family says spoke; no message was received or sent by this app.',
     ...[...selectOpenQuestions(entries, patientId), ...selectOpenQuestions(entries, patientId, true)].map((question) => [
       question.topic, `Status: ${status[question.status]}`, `Added by ${question.createdBy} on ${question.createdOn}`,

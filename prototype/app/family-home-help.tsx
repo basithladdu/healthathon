@@ -105,7 +105,7 @@ function HomeHelpForPatient({ patientId, author, today, hindi, entries, onChange
 
   function download() {
     const url = URL.createObjectURL(new Blob([homeHelpText(entries, patientId, today, hindi)], { type: 'text/plain;charset=utf-8' }));
-    const link = document.createElement('a'); link.href = url; link.download = `saathi-help-at-home-${today}.txt`; link.click(); window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    const link = document.createElement('a'); link.href = url; link.download = `saanthvana-help-at-home-${today}.txt`; link.click(); window.setTimeout(() => URL.revokeObjectURL(url), 1000);
     setMessage(t('Your list is ready to download.', 'आपकी सूची डाउनलोड के लिए तैयार है।'));
   }
 

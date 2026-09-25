@@ -50,9 +50,10 @@ const sora = Sora({
 });
 
 export const metadata: Metadata = {
-  title: 'Saathi | Family support for cancer care',
+  metadataBase: new URL('https://continuity-loop-healthathon.vercel.app'),
+  title: 'Saanthvana | Family support for cancer care',
   description:
-    'Coordinate family tasks and visits, prepare for goals-of-care conversations, and find best supportive care with Saathi.',
+    'Coordinate family tasks and visits, prepare for goals-of-care conversations, and find palliative care with Saanthvana.',
 };
 
 export default function RootLayout({

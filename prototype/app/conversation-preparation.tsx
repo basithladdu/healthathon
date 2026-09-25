@@ -24,7 +24,7 @@ export function ConversationPreparation({ patientName, author, notes, onChange, 
   const hasNotes = QUESTIONS.some(([key]) => notes[key]?.trim());
   const t = (en: string, hi: string) => hindi ? hi : en;
   async function downloadNotes() {
-    try { await downloadCarePdf({ fileName: 'saathi-next-visit-notes.pdf', title: patientName + ' — Next visit', subtitle: 'Written by ' + author,
+    try { await downloadCarePdf({ fileName: 'saanthvana-next-visit-notes.pdf', title: patientName + ' — Next visit', subtitle: 'Written by ' + author,
       sections: QUESTIONS.filter(([key]) => notes[key]?.trim()).map(([key, en, hi]) => ({ heading: t(en, hi), lines: [notes[key]!.trim()] })) }); }
     catch { setError('The PDF could not be downloaded. Please try again.'); }
   }

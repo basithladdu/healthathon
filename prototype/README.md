@@ -1,12 +1,12 @@
-# Saathi prototype
+# Saanthvana
 
 Interactive Health-a-thon prototype for **Cancer / Patient & Caregiver / Family Caregiver Support**.
 
-Saathi (साथी), meaning Companion, helps patients and families organise documents, visits, daily care and questions for the care team, and find best supportive care. A doctor can prepare, review and sign a versioned Care Note, which the patient or family can review separately.
+Saanthvana (सांत्वना) helps patients and families organise documents, visits, daily care and questions for the care team, and find palliative care. A doctor can prepare, review and sign a versioned Care Note, which the patient or family can review separately.
 
-## Primary demonstration
+## Main flow
 
-1. Open a sample patient or family profile and use the Home, documents, calendar and care-circle sections.
+1. Sign in as a patient, family member or doctor and use the Home, documents, calendar and care-circle sections.
 2. Request a care conversation as a patient or family member, or start one from the doctor view.
 3. Record audio with microphone permission, upload an audio file, type a conversation, or import a text transcript or text-based PDF. Recordings can be played back and saved in this browser. Live captions depend on browser support and may use the browser provider's speech service.
 4. Prepare a draft from the source, then review and edit its sections. Unstated information remains unstated.
@@ -18,10 +18,10 @@ Saathi (साथी), meaning Companion, helps patients and families organise d
 
 ## Current boundaries
 
-- The seeded profiles and documents are fictional. Anything entered or uploaded during a demonstration is stored by that browser.
+- The included profiles and documents use fictional information. Anything entered or uploaded is stored by that browser.
 - Care data and saved files persist across reloads in IndexedDB, with a localStorage fallback. They are tied to the browser profile and site origin; clearing site data removes them. There is no shared database or cross-device sync.
-- Sign-in and account roles are local demonstration flows, not connected accounts or verified identities. Typed names record acknowledgements; they are not cryptographic signatures or legally verified consent.
-- The default draft organiser is deterministic. An optional AI endpoint exists but is disabled unless explicitly configured; AI is not connected in the current demonstration.
+- Sign-in and account roles are not connected to identity verification. Typed names record acknowledgements; they are not cryptographic signatures or legally verified consent.
+- The default draft organiser is deterministic. An optional AI endpoint exists but is disabled unless explicitly configured.
 - QR links do not transfer the note to another device. PDF download and the copy log support manual sharing; the app does not send a note, verify receipt or revoke downloaded copies.
 - No hospital system, ABDM service, messaging channel or clinical data source is connected.
 - The prototype documents conversations and organises family support. It does not diagnose, infer urgency or prognosis, recommend treatment, create a DNAR order or execute an Advance Medical Directive.
@@ -59,6 +59,6 @@ npm.cmd run build:next
 
 ## Deployment
 
-Vercel uses the native Next.js build through `vercel.json`. The linked project is `continuity-loop-healthathon`; the public app is <https://saathi.wedevit.in/> and its canonical Vercel alias is <https://continuity-loop-healthathon.vercel.app/>. The older project slug is retained while the product name is Saathi.
+Vercel uses the native Next.js build through `vercel.json`. The linked project is `continuity-loop-healthathon`; the public production address is <https://continuity-loop-healthathon.vercel.app/>. The requested address <https://saanthvana.wedevit.in/> still needs verification from the owner of `wedevit.in` and the DNS record Vercel provides. The old `saathi.wedevit.in` address redirects to the public production address.
 
 Confirm the `.vercel/project.json` project and team before a release, deploy from this directory, and check both Vercel's Ready state and the canonical URL. Source checks, browser checks, microphone/device checks and production deployment are separate verification steps.

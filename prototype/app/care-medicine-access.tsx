@@ -62,7 +62,7 @@ export function CareMedicineAccess({ hindi, entry = EMPTY_MEDICINE_ACCESS_ENTRY,
       <div className="cma-search-row"><label className="cma-visually-hidden" htmlFor="cma-location">{t('State, district or city', 'राज्य, ज़िला या शहर')}</label><input id="cma-location" value={entry.location} onChange={(event) => change({ location: event.target.value })} placeholder={t('State, district or city', 'राज्य, ज़िला या शहर')} />
         {searchUrl && <a href={searchUrl} target="_blank" rel="noopener noreferrer">{t('Search online', 'ऑनलाइन खोजें')} ↗</a>}
       </div>
-      <div className="cma-directory-links"><a href={mapUrl}>{t('Open nearby best supportive care map', 'पास के सर्वोत्तम सहायक देखभाल केंद्र देखें')} ↗</a><a href="https://palliumindia.org/clinics" target="_blank" rel="noopener noreferrer">{t('Pallium India centre list', 'पैलियम इंडिया की केंद्र सूची')} ↗</a><a href="https://www.palliativecare.in/palliative-care-directory-of-india/" target="_blank" rel="noopener noreferrer">{t('Indian Association of Palliative Care directory', 'इंडियन एसोसिएशन ऑफ़ पैलिएटिव केयर सूची')} ↗</a></div>
+      <div className="cma-directory-links"><a href={mapUrl}>{t('Find palliative care nearby', 'पास में उपशामक देखभाल खोजें')} ↗</a><a href="https://palliumindia.org/clinics" target="_blank" rel="noopener noreferrer">{t('Pallium India centre list', 'पैलियम इंडिया की केंद्र सूची')} ↗</a><a href="https://www.palliativecare.in/palliative-care-directory-of-india/" target="_blank" rel="noopener noreferrer">{t('Indian Association of Palliative Care directory', 'इंडियन एसोसिएशन ऑफ़ पैलिएटिव केयर सूची')} ↗</a></div>
       <p className="cma-boundary">{t('Call to confirm availability before travelling.', 'जाने से पहले फ़ोन करके उपलब्धता की पुष्टि करें।')}</p>
     </section>
 

@@ -91,14 +91,14 @@ export function FamilyCareWorkspace({ patientId, patientName, author, tasks, app
 
   function download() {
     const text = [
-      `Saathi — ${patientName}'s checklist`,
+      `Saanthvana — ${patientName}'s checklist`,
       `Written by ${author}. Personal notes; not a prescription or a doctor-approved Care Note.`,
       'VISITS', ...scheduled.map((item) => `${item.date} ${item.time} — ${item.type}, ${item.clinician}, ${item.mode}${item.preparationInstructions ? `\nInstructions from ${item.preparationInstructions.givenBy}: ${item.preparationInstructions.text}\nWritten here by ${item.preparationInstructions.recordedBy}` : ''}`),
       'TO DO AND ASK', ...patientTasks.map((task) => `${task.completedBy ? 'Done / asked' : 'Open'}: ${task.title}\n${task.owner}${task.due ? `; ${task.due}` : ''}${task.completedBy ? `; completed by ${task.completedBy}` : ''}`),
       calendarText,
     ].join('\n\n');
     const url = URL.createObjectURL(new Blob([text], { type: 'text/plain;charset=utf-8' }));
-    const link = document.createElement('a'); link.href = url; link.download = 'saathi-family-checklist.txt'; link.click(); URL.revokeObjectURL(url);
+    const link = document.createElement('a'); link.href = url; link.download = 'saanthvana-family-checklist.txt'; link.click(); URL.revokeObjectURL(url);
   }
 
   function taskRow(task: FamilyTask) {

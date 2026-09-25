@@ -125,7 +125,7 @@ export function exportFamilyFundraiserLink(state: FamilyCostState, patientId: st
 export function exportFamilyCostState(state: FamilyCostState, patientId: string): string {
   const totals = familyExpenseTotals(state, patientId);
   return [
-    'SAATHI — HELP WITH COSTS', `Patient: ${patientId}`,
+    'SAANTHVANA — HELP WITH COSTS', `Patient: ${patientId}`,
     'Only expenses and tasks entered by the family are included. This is not a payment statement or funding approval.',
     `RECORDED EXPENSES\nTotal: INR ${totals.totalRupees.toFixed(2)}\nMarked paid: INR ${totals.paidRupees.toFixed(2)}\nNot marked paid: INR ${totals.unpaidRupees.toFixed(2)}`,
     ...state.expenses.filter((item) => item.patientId === patientId).sort((a, b) => b.date.localeCompare(a.date)).map((item) => `${item.date} — ${item.title}\n${item.category} · INR ${item.amountRupees.toFixed(2)} · ${item.paid ? 'Marked paid' : 'Not marked paid'}\nAdded by: ${item.createdBy}\nLast edited by: ${item.updatedBy}`),

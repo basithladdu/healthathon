@@ -62,7 +62,7 @@ export function exportFamilyNoteVersion(releases: readonly SummaryRelease[], pat
   const release = selectFamilyNoteVersions(releases, patientId).find((version) => version.number === number);
   if (!release || !familyNoteHasText(release)) return null;
   return [
-    `SAATHI — CARE NOTE FOR ${patientName}`,
+    `SAANTHVANA — CARE NOTE FOR ${patientName}`,
     `Patient: ${patientId}`,
     noteMetadata(release),
     ...(release.fields ? FAMILY_NOTE_FIELDS.map(({ key, label }) => `${label}\n${release.fields![key]}`) : [`Saved conversation\n${release.source}`]),
@@ -74,7 +74,7 @@ export function exportFamilyNoteComparison(releases: readonly SummaryRelease[], 
   const comparison = compareFamilyNoteVersions(releases, patientId, firstNumber, secondNumber);
   if (!comparison) return null;
   return [
-    `SAATHI — CARE NOTE COMPARISON FOR ${patientName}`,
+    `SAANTHVANA — CARE NOTE COMPARISON FOR ${patientName}`,
     `Patient: ${patientId}`,
     noteMetadata(comparison.earlier),
     noteMetadata(comparison.later),

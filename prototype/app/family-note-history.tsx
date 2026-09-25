@@ -36,7 +36,7 @@ function NoteHistoryContent({ patientId, patientName, hindi, releases }: FamilyN
     const link = document.createElement('a');
     link.href = url;
     const safeId = patientId.replace(/[^a-zA-Z0-9_-]/g, '-');
-    link.download = compare && comparison ? `saathi-${safeId}-versions-${comparison.earlier.number}-${comparison.later.number}.txt` : `saathi-${safeId}-care-note-v${selected.number}.txt`;
+    link.download = compare && comparison ? `saanthvana-${safeId}-versions-${comparison.earlier.number}-${comparison.later.number}.txt` : `saanthvana-${safeId}-care-note-v${selected.number}.txt`;
     link.click();
     URL.revokeObjectURL(url);
     setMessage(t(compare ? 'Comparison downloaded.' : 'Selected note downloaded.', compare ? 'तुलना डाउनलोड हो गई।' : 'चुना हुआ नोट डाउनलोड हो गया।'));

@@ -78,7 +78,7 @@ function CopyTrackerForPatient({ patientId, patientName, author, today, hindi, r
     try {
       const fields = latest.fields;
       await downloadCarePdf({
-        fileName: `saathi-${patientId.replace(/[^a-zA-Z0-9_-]/g, '-')}-note-v${latest.number}.pdf`,
+        fileName: `saanthvana-${patientId.replace(/[^a-zA-Z0-9_-]/g, '-')}-note-v${latest.number}.pdf`,
         title: t('Doctor-reviewed Care Note', 'डॉक्टर का मंज़ूर किया हुआ नोट'),
         subtitle: `${patientName} · ${patientId}`,
         careNote: { release: latest, acknowledgements },
@@ -115,7 +115,7 @@ function CopyTrackerForPatient({ patientId, patientName, author, today, hindi, r
 
   return <section className="family-copy-tracker" aria-labelledby={`${id}-heading`}>
     <div className="copy-tracker-heading"><h1 id={`${id}-heading`}>{t('Who has the latest copy?', 'नई कॉपी किसके पास है?')}</h1><button type="button" disabled={!recipients.length} onClick={() => {
-      download(careCopyLogText(entries, releases, patientId, patientName), `saathi-copy-log-${patientId.replace(/[^a-zA-Z0-9_-]/g, '-')}.txt`); setMessage(t('Your copy log is downloading.', 'कॉपी की सूची डाउनलोड हो रही है।'));
+      download(careCopyLogText(entries, releases, patientId, patientName), `saanthvana-copy-log-${patientId.replace(/[^a-zA-Z0-9_-]/g, '-')}.txt`); setMessage(t('Your copy log is downloading.', 'कॉपी की सूची डाउनलोड हो रही है।'));
     }}>{t('Save this list', 'यह सूची डाउनलोड करें')}</button></div>
     <div className="copy-current-note"><div><h2>{latest ? t(`Latest note · version ${latest.number}`, `नया नोट · संस्करण ${latest.number}`) : t('No approved note here yet', 'यहाँ अभी मंज़ूर किया हुआ नोट नहीं है')}</h2>{latest && <p>{latest.physician} · {dateLabel(latest.releasedAt)}</p>}</div><button type="button" className="primary-button" disabled={!latest?.fields || downloading} onClick={downloadLatest}>{downloading ? t('Making PDF…', 'PDF बन रही है…') : t('Download latest PDF', 'नए नोट की PDF लें')}</button></div>
     {!formOpen && <div className="copy-log-start"><button type="button" onClick={() => openForm()} disabled={!copies.length}>{t('I gave someone a copy', 'मैंने किसी को कॉपी दी')}</button></div>}

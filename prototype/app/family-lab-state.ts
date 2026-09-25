@@ -120,7 +120,7 @@ export function labNumericSeries(entries: LabResultEntry[], patientId: string, t
 export function labHistoryText(entries: LabResultEntry[], patientId: string, hindi = false, treatmentEvents: readonly LabTreatmentEvent[] = []): string {
   const t = (en: string, hi: string) => hindi ? hi : en;
   return [
-    t('SAATHI — LAB RESULTS', 'साथी — जाँच के नतीजे'),
+    t('SAANTHVANA — LAB RESULTS', 'सांत्वना — जाँच के नतीजे'),
     t('Values, units, ranges and flags copied from reports. No interpretation is added.', 'नतीजे, इकाइयाँ, रेंज और फ़्लैग रिपोर्ट से लिखे गए हैं। इनकी व्याख्या नहीं की गई है।'),
     ...selectLabResults(entries, patientId).map((entry) => [
       `${entry.date} — ${entry.testName}`,
