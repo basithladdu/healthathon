@@ -1,6 +1,6 @@
 # Saanthvana: saved Round 1 answers
 
-Updated on 26 September 2026 in the team's [Healthathon Round 1 draft](https://healthathon.reskilll.com/round1). The saved answers were read back in Chrome. The entry has not been submitted, and no PDF or other file was uploaded.
+Updated on 27 September 2026 as the team's local [Healthathon Round 1 draft](https://healthathon.reskilll.com/round1). The earlier portal save was read back in Chrome on 26 September. The entry has not been submitted, and no PDF or other file was uploaded.
 
 ## Entry
 
@@ -28,17 +28,18 @@ Next.js and TypeScript power the web app; MapLibre shows palliative-care centres
 
 ## Prototype or MVP link
 
-https://continuity-loop-healthathon.vercel.app/
+https://saanthvana.wedevit.in/
 
 ## Supporting links
 
 https://github.com/basithladdu/healthathon
 https://github.com/basithladdu/healthathon/blob/main/submission/Saanthvana_Research_References_2026-09-24.md
 https://github.com/basithladdu/healthathon/blob/main/docs/pitch/2026-09-24-impact-plan.md
+https://drive.google.com/drive/folders/1WPtw-7iEZoMObEr4pzd9-Gziyo9D3VYV?usp=drive_link
 
 ## Saved state
 
-The portal shows five of six required items complete. The pitch deck is the remaining required item. Supporting links are complete; the video and supporting-file fields are blank.
+The last confirmed portal view showed five of six required items complete, with the pitch deck remaining. This browser now opens the portal sign-in page, so the updated website and Drive links below are saved here but have not been copied to the portal.
 
 | Answer | Words | Characters | Limit |
 | --- | ---: | ---: | --- |
@@ -46,7 +47,7 @@ The portal shows five of six required items complete. The pitch deck is the rema
 | Solution | 150 | 1,031 | 150 words / 1,200 characters |
 | Technology | 75 | 529 | 80 words / 600 characters |
 
-The supporting-links field has a 400-character limit. Its 241 characters link to the public repository, all nine research references, and the proposed impact plan.
+The supporting-links field has a 400-character limit. This local version uses 330 characters to link to the public repository, research references, impact plan and Drive folder. The folder is empty for now; the team plans to upload the video this weekend.
 
 ## What changed
 
@@ -58,5 +59,5 @@ The supporting-links field has a 400-character limit. Its 241 characters link to
 - Added the proposed 60-90 day measures: initiation source, written and signed notes per cancer facility, and emergency retrieval time.
 - Removed unsupported uniqueness and guaranteed clinical-benefit claims. The build answer names Sarvam AI and Gemini as planned integrations.
 
-The earlier clinician-authored answers remain preserved in [form.md](../form.md). The portal still needs its pitch deck before the entry can be submitted. The new `saanthvana.wedevit.in` domain is not yet connected; use the live Vercel address above in the meantime.
+The earlier clinician-authored answers remain preserved in [form.md](../form.md). The portal still needs its pitch deck before the entry can be submitted. The custom domain `saanthvana.wedevit.in` is live. The Drive folder link is ready, but the video has not been uploaded yet.
 
