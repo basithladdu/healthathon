@@ -15,12 +15,14 @@ export function CareDirectory({ centres = CARE_CENTRES, selectedId, locatingId, 
       <p className="care-centre-city">{pinNumbers?.[centre.id] && <span className="care-centre-pin-number" aria-label={`Map marker ${pinNumbers[centre.id]}`}>{pinNumbers[centre.id]}</span>}{centre.city} · {centre.state}{distances?.[centre.id] !== undefined && <span className="care-centre-distance">{distances[centre.id].toFixed(1)} km straight-line</span>}</p>
       <h3>{onSelect && (!pinNumbers || pinNumbers[centre.id]) ? <button type="button" className="care-centre-select" aria-pressed={selectedId === centre.id} onClick={() => onSelect(centre)}>{centre.name}<span aria-hidden="true">↗</span></button> : centre.name}</h3>
       <p className="care-centre-services">{centre.services.length ? centre.services.join(' · ') : 'Call for available services'}</p>
+      {centre.morphine && <p className={`care-centre-morphine is-${centre.morphine}`}>Morphine: {centre.morphine === 'available' ? 'Listed by Pallium' : centre.morphine === 'unavailable' ? 'Listed as unavailable' : 'Not listed'}<span>Call to confirm oral morphine and current stock.</span></p>}
+      {centre.morphineNote && <p className="care-directory-note">{centre.morphineNote}</p>}
       <address>{centre.address}</address>
       {centre.phoneNote && <p className="care-directory-note">{centre.phoneNote}</p>}
       {locatingId === centre.id && <p className="care-directory-note" role="status">Finding this centre on the map…</p>}
       <div className="care-centre-actions">
-        {onSelect && (!pinNumbers || pinNumbers[centre.id]) && <button type="button" className="care-centre-route" aria-label={`Show ${centre.name} on map`} onClick={() => onSelect(centre)}>Show on map</button>}
-        <a href={`tel:${centre.phone}`} aria-label={`Call ${centre.name}: ${centre.phone}`}>Call {centre.phone}</a>
+        {onSelect && <button type="button" className="care-centre-route" aria-label={`Show ${centre.name} on map`} onClick={() => onSelect(centre)}>Show on map</button>}
+        {(centre.phoneNumbers ?? [centre.phone]).map((phone) => <a key={phone} href={`tel:${phone.replace(/[^\d+]/g, '')}`} aria-label={`Call ${centre.name}: ${phone}`}>Call {phone}</a>)}
         <a href={centreDirectionsUrl(centre)} target="_blank" rel="noopener noreferrer" aria-label={`Directions to ${centre.name}`}>Directions ↗</a>
         <a href={centre.directoryUrl} target="_blank" rel="noopener noreferrer" aria-label={`Contact details for ${centre.name}`}>Source ↗</a>
       </div>

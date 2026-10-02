@@ -52,8 +52,8 @@ test('a later reviewed note replaces the export contents and file version withou
   assert.ok(result.includes(later.fields[0].value));
   assert.ok(!result.includes(note.fields[0].value));
   assert.equal(note.version, 3);
-  assert.equal(handoverFileName('patient-a', 4), 'saanthvana-patient-a-note-v4-care-pack.txt');
-  assert.equal(handoverFileName('patient-a', null), 'saanthvana-patient-a-care-pack.txt');
+  assert.equal(handoverFileName('patient-a', 4), 'saanthvana-patient-a-note-v4-care-pack.pdf');
+  assert.equal(handoverFileName('patient-a', null), 'saanthvana-patient-a-care-pack.pdf');
 });
 
 test('contact creation and editing reject cross-patient changes and leave other patients untouched', () => {

@@ -3,3 +3,8 @@
 .wrangler
 dist
 node_modules
+output
+.audit-current.json
+.env*
+tests
+supabase

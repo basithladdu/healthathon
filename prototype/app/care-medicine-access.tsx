@@ -1,10 +1,15 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { CareRouteLink } from './care-route-link';
+import { CareDirectory } from './care-directory';
+import { CareCentreReports } from './care-centre-reports';
+import { filterCareCentres } from './care-directory-data';
 import { IconArrowRight } from './icons';
 import { EMPTY_MEDICINE_ACCESS_ENTRY, type MedicineAccessEntry, type MedicineAccessSnapshot, type MedicineAccessStatus } from './care-medicine-access-state';
 import './care-medicine-access.css';
+import './care-directory.css';
 
 export function CareMedicineAccess({ hindi, entry = EMPTY_MEDICINE_ACCESS_ENTRY, onChange, careTeam }: {
   hindi: boolean;
@@ -13,6 +18,8 @@ export function CareMedicineAccess({ hindi, entry = EMPTY_MEDICINE_ACCESS_ENTRY,
   careTeam?: { name?: string; phone?: string };
 }) {
   const [copyStatus, setCopyStatus] = useState('');
+  const [showCentres, setShowCentres] = useState(false);
+  const centres = filterCareCentres(entry.location, 'Karnataka', '', 'available');
   const t = (en: string, hi: string) => hindi ? hi : en;
   const snapshot = (value: MedicineAccessEntry): MedicineAccessSnapshot => ({
     location: value.location,
@@ -35,7 +42,7 @@ export function CareMedicineAccess({ hindi, entry = EMPTY_MEDICINE_ACCESS_ENTRY,
     : '';
   const mapUrl = entry.location.trim() ? `/find-support?location=${encodeURIComponent(entry.location.trim())}` : '/find-support';
   const enquiryText = [
-    'I would like to ask about access to oral morphine.',
+    'Do you currently dispense prescribed oral morphine?',
     entry.location.trim() ? `Area: ${entry.location.trim()}` : '',
     entry.enquiry.trim() ? `My question: ${entry.enquiry.trim()}` : '',
   ].filter(Boolean).join('\n');
@@ -55,16 +62,23 @@ export function CareMedicineAccess({ hindi, entry = EMPTY_MEDICINE_ACCESS_ENTRY,
   }
 
   return <main className="care-medicine-access">
-    <header className="cma-heading"><div><p>{t('Find support', 'मदद ढूँढें')}</p><h1>{t('Ask about oral morphine access', 'ओरल मॉर्फ़ीन के बारे में पूछें')}</h1></div><CareRouteLink view="access-care" className="cma-back">{t('Care options', 'देखभाल के विकल्प')} <IconArrowRight /></CareRouteLink></header>
+    <header className="cma-heading"><div><h1>{t('Find oral morphine', 'ओरल मॉर्फ़ीन ढूँढें')}</h1></div><CareRouteLink view="access-care" className="cma-back">{t('Care options', 'देखभाल के विकल्प')} <IconArrowRight /></CareRouteLink></header>
 
     <section className="cma-search" aria-labelledby="cma-location-title">
-      <h2 id="cma-location-title">{t('Search by area', 'इलाके से खोजें')}</h2>
-      <div className="cma-search-row"><label className="cma-visually-hidden" htmlFor="cma-location">{t('State, district or city', 'राज्य, ज़िला या शहर')}</label><input id="cma-location" value={entry.location} onChange={(event) => change({ location: event.target.value })} placeholder={t('State, district or city', 'राज्य, ज़िला या शहर')} />
+      <h2 id="cma-location-title">{t('Karnataka hospitals', 'कर्नाटक के अस्पताल')}</h2>
+      <div className="cma-search-row"><label className="cma-visually-hidden" htmlFor="cma-location">{t('Hospital, district or city', 'अस्पताल, ज़िला या शहर')}</label><input id="cma-location" value={entry.location} onChange={(event) => change({ location: event.target.value })} placeholder={t('Hospital, district or city', 'अस्पताल, ज़िला या शहर')} />
         {searchUrl && <a href={searchUrl} target="_blank" rel="noopener noreferrer">{t('Search online', 'ऑनलाइन खोजें')} ↗</a>}
       </div>
-      <div className="cma-directory-links"><a href={mapUrl}>{t('Find palliative care nearby', 'पास में उपशामक देखभाल खोजें')} ↗</a><a href="https://palliumindia.org/clinics" target="_blank" rel="noopener noreferrer">{t('Pallium India centre list', 'पैलियम इंडिया की केंद्र सूची')} ↗</a><a href="https://www.palliativecare.in/palliative-care-directory-of-india/" target="_blank" rel="noopener noreferrer">{t('Indian Association of Palliative Care directory', 'इंडियन एसोसिएशन ऑफ़ पैलिएटिव केयर सूची')} ↗</a></div>
-      <p className="cma-boundary">{t('Call to confirm availability before travelling.', 'जाने से पहले फ़ोन करके उपलब्धता की पुष्टि करें।')}</p>
+      <div className="cma-directory-links"><Link href={mapUrl}>{t('Find palliative care nearby', 'पास में उपशामक देखभाल खोजें')} ↗</Link><a href="https://palliumindia.org/clinics/karnataka" target="_blank" rel="noopener noreferrer">{t('Pallium India centre list', 'पैलियम इंडिया की केंद्र सूची')} ↗</a><a href="https://www.palliativecare.in/palliative-care-directory-of-india/" target="_blank" rel="noopener noreferrer">{t('Indian Association of Palliative Care directory', 'इंडियन एसोसिएशन ऑफ़ पैलिएटिव केयर सूची')} ↗</a></div>
+      <p className="cma-boundary">{t('Pallium lists morphine at these centres. Call to confirm oral morphine and current stock.', 'पैलियम की सूची में इन केंद्रों पर मॉर्फ़ीन है। ओरल मॉर्फ़ीन और आज के स्टॉक की पुष्टि के लिए कॉल करें।')}</p>
+      <div className="cma-centres"><CareDirectory centres={showCentres ? centres : centres.slice(0, 3)} /></div>
+      {!centres.length && <p role="status">{t('No matching centre. Try another district or city.', 'कोई केंद्र नहीं मिला। दूसरा ज़िला या शहर खोजें।')}</p>}
+      {centres.length > 3 && <button className="cma-show-centres" type="button" onClick={() => setShowCentres(!showCentres)}>{showCentres ? t('Show fewer', 'कम दिखाएँ') : `${t('Show all', 'सभी दिखाएँ')} ${centres.length}`}</button>}
     </section>
+
+    <CareCentreReports />
+
+    <details className="cma-call-notes"><summary>{t('My calls and questions', 'मेरी कॉल और सवाल')}</summary>
 
     <section className="cma-questions" aria-labelledby="cma-questions-title">
       <h2 id="cma-questions-title">{t('Questions to ask', 'पूछने के सवाल')}</h2>
@@ -86,5 +100,6 @@ export function CareMedicineAccess({ hindi, entry = EMPTY_MEDICINE_ACCESS_ENTRY,
       </div>
       {entry.updatedAt && <p className="cma-saved">{t('Updated', 'अपडेट किया गया')} · {new Date(entry.updatedAt).toLocaleString(hindi ? 'hi-IN' : 'en-IN')}</p>}
     </section>
+    </details>
   </main>;
 }

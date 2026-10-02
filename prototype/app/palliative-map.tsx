@@ -8,6 +8,7 @@ import './palliative-map.css';
 
 export type CareMapPoint = {
   id: string; name: string; coordinates: [number, number]; category: 'palliative' | 'hospital';
+  source?: 'listed' | 'community' | 'openstreetmap';
 };
 export type CareMapOrigin = { label: string; coordinates: [number, number] };
 export type CareRoadRoute = { coordinates: [number, number][]; distance: number; duration: number };
@@ -60,7 +61,7 @@ export function PalliativeMap({ points, origin, selectedId, route, searchCentre,
           sources: { streets: { type: 'raster', tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'], tileSize: 256, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' } },
           layers: [{ id: 'streets', type: 'raster', source: 'streets' }],
         },
-        center: [78.96, 20.59], zoom: 4.2, attributionControl: { compact: true },
+        center: [76.2, 14.5], zoom: 6.3, attributionControl: { compact: true },
       });
       instance.current = map;
       map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
@@ -109,11 +110,13 @@ export function PalliativeMap({ points, origin, selectedId, route, searchCentre,
     }
     for (const members of groups) {
       const { index, point } = members[0];
+      const source = point.source ?? 'listed';
       if (members.length > 1) {
         const button = document.createElement('button');
         button.type = 'button';
         const mixed = members.some((member) => member.point.category !== point.category);
-        button.className = `palliative-map-cluster ${mixed ? 'is-mixed' : point.category}`;
+        const mixedSource = members.some((member) => (member.point.source ?? 'listed') !== source);
+        button.className = `palliative-map-cluster ${mixed ? 'is-mixed' : point.category} ${mixedSource ? 'is-mixed-source' : source}`;
         button.setAttribute('aria-label', `${members.length} centres. Zoom in to choose a centre`);
         const count = document.createElement('strong');
         count.textContent = String(members.length);
@@ -152,7 +155,7 @@ export function PalliativeMap({ points, origin, selectedId, route, searchCentre,
       }
       const button = document.createElement('button');
       button.type = 'button';
-      button.className = `palliative-map-pin ${point.category}${selectedId === point.id ? ' is-selected' : ''}`;
+      button.className = `palliative-map-pin ${point.category} ${source}${selectedId === point.id ? ' is-selected' : ''}`;
       button.setAttribute('aria-label', `${index + 1}. ${point.name}. ${point.category === 'palliative' ? 'Palliative care' : 'Hospital'}. Show route`);
       button.setAttribute('aria-pressed', String(selectedId === point.id));
       button.title = point.name;
@@ -173,7 +176,7 @@ export function PalliativeMap({ points, origin, selectedId, route, searchCentre,
       markers.current.push(new maplibregl.Marker({ element: button, anchor: 'bottom' }).setLngLat(point.coordinates).addTo(map!));
       if (selectedId === point.id) {
         const label = document.createElement('div');
-        label.className = `palliative-map-place ${point.category}`;
+        label.className = `palliative-map-place ${point.category} ${source}`;
         const category = document.createElement('span');
         category.textContent = point.category === 'palliative' ? 'Palliative care' : 'Hospital';
         const name = document.createElement('strong');
@@ -248,7 +251,7 @@ export function PalliativeMap({ points, origin, selectedId, route, searchCentre,
   return <div className="palliative-map-shell">
     <div ref={container} className="palliative-map-canvas" role="region" aria-label="Care centres and road route" />
     <button type="button" className="palliative-map-fit" aria-label="Show all centres" disabled={!ready || (!points.length && !origin)} onClick={() => fitAll.current()}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5M8 8h8v8H8Z" /></svg>Show all</button>
-    <div className="palliative-map-legend" aria-label="Map key"><span className="palliative"><CategoryIcon category="palliative" />Palliative care</span><span className="hospital"><CategoryIcon category="hospital" />Hospital</span></div>
+    <div className="palliative-map-legend" aria-label="Map key"><span className="listed"><CategoryIcon category="palliative" />Listed centre</span><span className="community"><CategoryIcon category="hospital" />Community hospital</span><span className="openstreetmap"><CategoryIcon category="hospital" />OpenStreetMap place</span></div>
     {unavailable && <p className="palliative-map-error" role="status">Street map unavailable. You can still choose a centre.</p>}
   </div>;
 }

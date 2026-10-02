@@ -31,7 +31,7 @@ function SupportPlacesForPatient({ patientId, author, today, hindi, entries, onC
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const formRef = useRef<HTMLFormElement>(null);
-  const matches = filterCareCentres(query, '', '');
+  const matches = filterCareCentres(query, 'Karnataka', '');
   const dateLabel = (value: string) => new Date(`${value}T12:00:00`).toLocaleDateString(hindi ? 'hi-IN' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
   const editingPlaceId = editor?.placeId;
   const editingNoteId = editor?.noteId;
