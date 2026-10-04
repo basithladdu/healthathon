@@ -1,10 +1,18 @@
 # Healthathon and TANUH project context map
 
+> **21 September 2026 update:** Use the [meeting feature card](MEETING_BRIEF_2026-09-21.md) and [implementation/check status](SAANTHVANA_IMPLEMENTATION_2026-09-21.md) for the current Cancer → Patient / Caregiver → Family & Caregiver Support app. It now starts with a short local sign-in and saves on the device; older current-app descriptions below are historical snapshots. The [deck feature audit](FEATURES_FROM_DECKS_2026-09-21.md) and [private Shirin attachment inventory](source-materials/private-context/2026-09-20/shirin-latest/README.md) extend source coverage without filling the missing 25 August DOCX or full 30 August meeting. Machine audio transcripts remain approximate.
+
+> The [user's 21 September clarification](source-materials/private-context/2026-09-21/SHIRIN_CLARIFICATION_USER_SUPPLIED.txt) asks for appointment instructions and dated Hb/RBC results with ranges and High/Low display. It is distinct from the rough machine transcript and from completed implementation. [Eight later visual references](source-materials/private-context/2026-09-21/design-references/manifest.json) are privately saved with hashes.
+
+> Updated context, full chat coverage, supplied decks, current portal selection and implementation: [20 September recovery report](CONTEXT_RECOVERY_2026-09-20.md). The older notes below retain their historical context.
+
 Prepared 13 September 2026, Asia/Calcutta
 
 This is the working map for the Health-a-thon project, the newer TANUH - C-CAMP opportunity, the clinician material, the team history, and the current local workspace. It separates direct source material from derived decisions and open questions.
 
 ## Current truth
+
+Latest proposal: [Family/caregiver direction](FAMILY_CAREGIVER_DIRECTION.md) captures the 20 September simplification and Shirin's feedback. [form.md](form.md) preserves the current saved portal answers. The app now opens directly to family care; the landing page and long clinical workflow are absent from the main path. This proposal does not rewrite the clinicians' saved wording.
 
 ### Two programmes are in scope
 
@@ -12,8 +20,8 @@ This is the working map for the Health-a-thon project, the newer TANUH - C-CAMP 
 
 - Programme source: `healthathon-2026-raw.txt`, now extended with the 6 September Connect webinar transcript.
 - Organisers named in the saved material: Koita Foundation, Koita Centre for Digital Health at IIT Bombay, Reskilll, FOGSI, National Cancer Grid and RSSDI.
-- Current account selection recorded in `LIVE_DASHBOARD_AUDIT.md`: `Cancer Care -> Clinician focused -> Patient Follow-up & Continuity of Care`.
-- Working product: `Continuity Loop`, a clinician-controlled goals-of-care follow-up and verified clinical-handoff workflow.
+- Current **team Round 1 draft**, checked in signed-in Chrome on 20 September 2026: `Cancer -> Patient / Caregiver -> Family & Caregiver Support`. The older personal-registration selection in `LIVE_DASHBOARD_AUDIT.md` is a separate surface.
+- Working product: **Saanthvana**, a palliative-care companion centred on physician-led goals-of-care conversations, a reviewed summary for patients and families, and finding nearby support. This name was accepted in the team chat on 17 September. Continuity Loop is the historical prototype name.
 - The 6 September webinar says idea submission is 12-25 September 2026, the Grand Finale is 28 November 2026 at IIT Bombay, and the Top 30 are ten teams per clinical track. This is transcript evidence, not a fresh live-dashboard check.
 - The programme permits teams to bring their own practical problem, combine clinician-facing and patient/caregiver-facing use cases, and use supporting PPTs or demo videos. The saved webinar describes evaluation through healthcare relevance/impact and solution/technical feasibility.
 - The programme's hard boundary is assistive, operational software. Diagnosis, treatment recommendations, clinical decision support, clinical risk scoring, interpretation that produces clinical guidance and autonomous clinical advice are out of scope.

@@ -1,5 +1,11 @@
 # Health-a-thon research source index
 
+> **21 September 2026:** [Meeting feature card](MEETING_BRIEF_2026-09-21.md) and [current local implementation/check status](SAANTHVANA_IMPLEMENTATION_2026-09-21.md) supersede older app-status descriptions. [All-deck feature audit](FEATURES_FROM_DECKS_2026-09-21.md) records the unique PPT text sources and Sujay's documents. Shirin's later six attachments and approximate machine transcripts are now saved in the [private inventory](source-materials/private-context/2026-09-20/shirin-latest/README.md); older missing files remain missing. Historical source dates and hashes below are unchanged.
+
+> The [user's 21 September clarification](source-materials/private-context/2026-09-21/SHIRIN_CLARIFICATION_USER_SUPPLIED.txt) asks for appointment instructions and dated Hb/RBC results with ranges and High/Low display. It is separate from the earlier approximate machine transcript; see implementation status for the adopted report-copying boundary and completion. [Eight supplied design-reference PNGs](source-materials/private-context/2026-09-21/design-references/manifest.json) are also saved privately with hashes.
+
+> Current recovery, decisions and remaining file gaps: [20 September report](CONTEXT_RECOVERY_2026-09-20.md). Older source entries below retain their original dates and hashes.
+
 ## Local primary sources
 
 | Source | Role | Integrity |
@@ -12,6 +18,8 @@
 | Raw Codex thread snapshot | Conversation, intermediate reasoning inputs and tool provenance | Copied into the dated local archive at the end of the work session |
 
 ## Derived working documents
+
+Current documents: `form.md` preserves the saved portal answers and selected category; `FAMILY_CAREGIVER_DIRECTION.md` maps the latest feedback to a smaller product; `SAANTHVANA_VERIFICATION_2026-09-20.md` records actual local behaviour and remaining gaps.
 
 | File | Purpose |
 | --- | --- |
@@ -66,3 +74,6 @@ Accessed 24-25 August 2026 unless the source itself is part of the saved raw cap
 - Published evidence supports the need for structured, revisitable documentation. It does not prove that this particular team has sufficient case volume, workflow ownership or pilot access; those remain meeting hypotheses.
 - Competitor observations are used only to reject generic reminder/scribe positioning. No claim of market uniqueness or being India's first is made.
 - No official entrant allocation by problem statement or cash-versus-credit payout table was found. Crowding and equal-payout arithmetic remain explicitly labelled estimates.
+# September 20 source recovery
+
+See [CONTEXT_RECOVERY_2026-09-20.md](CONTEXT_RECOVERY_2026-09-20.md) for the complete supplied WhatsApp export, both Claude sessions, the two new clinician presentations, both Vidhi PDFs, current decisions and remaining attachment gaps. Raw private conversations are preserved locally under the ignored `source-materials/private-context/2026-09-20/` directory.
