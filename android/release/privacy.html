@@ -3,20 +3,20 @@
 <title>Saanthvana Android privacy policy — draft</title>
 <style>body{max-width:48rem;margin:3rem auto;padding:0 1.3rem;font:17px/1.6 system-ui;color:#382e29;background:#fff8ee}h1,h2{line-height:1.2}a{color:#a83f27}.notice{padding:1rem;background:#ffdf96;border-radius:12px}</style>
 <main>
-<p class="notice">Draft for the native Android build, version 0.1.0. Final name and public policy URL are pending. This policy does not describe the separate website.</p>
-<h1>Your information stays with you</h1>
+<p class="notice">Draft for the native Android build, version 0.2.0. Final name and public policy URL are pending. This policy does not describe the separate website.</p>
+<h1>Your care information</h1>
 <p>Prepared 9 October 2026. Saanthvana is the current working name of this palliative care companion by the Devit team.</p>
 <h2>What the app keeps</h2>
-<p>The app stores the names you enter, care conversations, reviewed notes, confirmations, prescribed-medicine details, visits, tasks, check-ins and journal entries in its private storage on your phone. Conversation audio is saved there too. The developer does not receive these records.</p>
+<p>The app stores the names you enter, care conversations, reviewed notes, confirmations, prescribed-medicine details, visits, tasks, check-ins and journal entries in its private storage on your phone. Conversation audio is saved there too. If you sign in, the names, published care notes, confirmations and daily entries you add in that account are also stored with Supabase so you can use them across phones and share them with people you invite. Existing unsigned-in records are not automatically uploaded. Account email and password are processed by Supabase Auth; the app does not store your password.</p>
 <h2>Microphone and recordings</h2>
 <p>Microphone permission is requested when you choose to record. Ask everyone taking part for permission before recording. You can stop at any time; recording also stops when the app leaves the foreground. This version does not upload audio or transcribe it automatically.</p>
-<h2>Sharing and external links</h2>
+<h2>Sharing and maps</h2><p>Signed-in record owners can create invitations for one person, valid for three days, with read or edit permission. The owner can see an invited member’s email and remove their permission. Removing permission stops future online requests; it cannot recall copies already saved. OpenFreeMap supplies map tiles through MapLibre and receives network information such as your IP address and requested map area. The app does not request your precise GPS location.</p>
 <p>When you choose to share or export care notes, Android lets you choose another app and recipient. Those copies leave this app and follow the recipient service's policies. Check the contents and recipient first. Calls, directions and source links open the dialler, maps or your browser only when you select them. Those services may collect information under their own policies.</p>
 <h2>Storage, security and deletion</h2>
-<p>There is no clinical cloud sync, advertising or analytics in this build. The app has no internet permission. Android backup and transfer exclusions are configured for app records. Protect the phone with a screen lock. The app does not provide separate account authentication, verify doctor identity or independently encrypt its database beyond the protections provided by Android.</p>
-<p>Records remain until you remove them, clear app data or uninstall the app. Use More → Remove this person's records to delete their notes, recordings and entries from this phone. Copies you previously shared must be removed separately by their recipients. With no cloud backup, lost or removed records cannot be recovered by the developer.</p>
+<p>There is no advertising or analytics SDK. Network connections to Supabase and OpenFreeMap use HTTPS. Account tokens are encrypted using Android Keystore. Account caches are separated from each other and from unsigned-in records. Android backup and transfer exclusions are configured for app records. Protect the phone with a screen lock. The app does not verify doctor identity or independently encrypt its database beyond the protections provided by Android.</p>
+<p>Unsigned-in records remain until you remove them, clear app data or uninstall. Signed-in records remain online after uninstalling. Record owners can use More → Remove this person's records to remove those records online and clear the corresponding app cache. Other people’s saved copies must be removed separately. This draft build does not yet include account deletion or password recovery; those features and the final retention policy are required before public release.</p>
 <h2>Changes</h2>
-<p>Any future account, AI or sharing service will require an updated policy explaining what leaves the phone and why before that feature is used.</p>
+<p>An AI or audio-upload service would require an updated policy and consent before sending recordings. No such service is connected in this build.</p>
 <h2>Contact</h2>
 <p>Questions about this build: <a href="mailto:workwithdevit@gmail.com">workwithdevit@gmail.com</a>.</p>
 </main></html>

@@ -22,7 +22,7 @@ data class CareVersion(
     val contentHash: String
 )
 @Entity data class Acknowledgement(@PrimaryKey val versionId: String, val contentHash: String, val name: String, val relationship: String, val at: Long = System.currentTimeMillis())
-@Entity data class CareItem(@PrimaryKey val id: String = newId(), val personId: String, val kind: String, val title: String, val detail: String = "", val due: Long = 0, val doneOn: String = "", val created: Long = System.currentTimeMillis())
+@Entity data class CareItem(@PrimaryKey val id: String = newId(), val personId: String, val kind: String, val title: String, val detail: String = "", val due: Long = 0, val doneOn: String = "", val created: Long = System.currentTimeMillis(), @ColumnInfo(defaultValue = "0") val revision: Long = 0)
 
 @Dao interface CareDao {
     @Query("SELECT * FROM Person ORDER BY created") fun people(): Flow<List<Person>>
@@ -42,15 +42,29 @@ data class CareVersion(
     @Query("DELETE FROM Acknowledgement WHERE versionId IN (SELECT id FROM CareVersion WHERE personId = :id)") suspend fun deleteAcknowledgements(id: String)
     @Query("DELETE FROM CareVersion WHERE personId = :id") suspend fun deleteVersions(id: String)
     @Query("DELETE FROM CareItem WHERE personId = :id") suspend fun deleteItems(id: String)
+    @Query("DELETE FROM Person") suspend fun clearPeople()
+    @Query("DELETE FROM CareItem") suspend fun clearItems()
+    @Query("DELETE FROM CareVersion") suspend fun clearVersions()
+    @Query("DELETE FROM Acknowledgement") suspend fun clearAcknowledgements()
+    @Query("DELETE FROM Conversation WHERE personId NOT IN (SELECT id FROM Person)") suspend fun clearRemovedDrafts()
+    @Insert suspend fun addPeople(people: List<Person>)
+    @Insert suspend fun addItems(items: List<CareItem>)
+    @Insert suspend fun addVersions(versions: List<CareVersion>)
+    @Insert suspend fun addAcknowledgements(acknowledgements: List<Acknowledgement>)
 }
 
-@Database(entities = [Person::class, Conversation::class, CareVersion::class, Acknowledgement::class, CareItem::class], version = 1, exportSchema = true)
+@Database(entities = [Person::class, Conversation::class, CareVersion::class, Acknowledgement::class, CareItem::class], version = 2, exportSchema = true)
 abstract class CareDatabase : RoomDatabase() {
     abstract fun care(): CareDao
     companion object {
-        @Volatile private var instance: CareDatabase? = null
-        fun get(context: Context): CareDatabase = instance ?: synchronized(this) {
-            instance ?: Room.databaseBuilder(context.applicationContext, CareDatabase::class.java, "care.db").build().also { instance = it }
+        private val instances = mutableMapOf<String, CareDatabase>()
+        fun get(context: Context, account: String = ""): CareDatabase = synchronized(this) {
+            require(account.isEmpty() || runCatching { UUID.fromString(account) }.isSuccess)
+            val filename = if (account.isEmpty()) "care.db" else "care-$account.db"
+            instances.getOrPut(filename) { Room.databaseBuilder(context.applicationContext, CareDatabase::class.java, filename)
+                .addMigrations(object : androidx.room.migration.Migration(1, 2) {
+                    override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) { db.execSQL("ALTER TABLE CareItem ADD COLUMN revision INTEGER NOT NULL DEFAULT 0") }
+                }).build() }
         }
     }
 }

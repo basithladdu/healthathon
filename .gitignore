@@ -33,3 +33,5 @@ keystore.properties
 android/*.log
 output/android/*.apk
 output/android/*.aab
+
+android/supabase/.temp/

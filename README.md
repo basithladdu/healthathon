@@ -4,11 +4,15 @@
 
 ## Android
 
-Kotlin, Jetpack Compose, Room and native audio recording. The main flow is **conversation → doctor review → saved care note → patient/family confirmation of that exact version**. Earlier versions remain unchanged and the original words remain readable.
+Kotlin, Jetpack Compose, Room, MapLibre Native and consented audio recording. The main flow is **conversation → doctor review → saved care note → patient/family confirmation of that exact version**. Earlier versions remain unchanged and the original words remain readable.
 
-Also included: multiple people, prescribed-medicine lists, visits, tasks, check-ins, a journal, and 33 source-linked Karnataka care centres with search, service filters, calls and directions. Morphine listings do not establish current stock.
+Also included: multiple people, prescribed-medicine lists, visits, tasks, check-ins, a journal, and 33 source-linked Karnataka care centres with search, service filters, calls and directions. MapLibre with OpenFreeMap tiles shows nine checked hospital locations; the other 24 remain in the address list until coordinates are verified. Source links for each coordinate are retained in the directory asset. Morphine listings do not establish current stock.
 
-This build keeps records on the phone. It has no internet permission, analytics, clinical cloud sync or verified accounts. Doctor/family views and reviewer names are self-entered. Recording needs microphone permission and everyone's consent, and stops when the app leaves the foreground. The text organiser preserves entered words under explicit headings; it is not AI transcription or a clinical recommendation system. Care notes are not treatment orders or legal directives.
+The home screen shows saved visits, medicines, tasks, check-ins and journal entries. Forms use optional details, quick date choices and a single journal field. Tab position and filters survive navigation; animations follow system motion settings. Routine screens contain no demo, native-build or storage-explanation copy.
+
+Optional accounts use Supabase Auth. Signed-in people, daily entries, immutable care-note versions and exact-version confirmations are saved through the API and cached separately per account. Owners can issue one-use, three-day invitations with read or edit permission and remove members. The backend enforces those permissions and rejects conflicting edits. Refresh is available on Today and runs when the app opens. Failed saves keep the form filled. Existing unsigned-in records are not automatically uploaded. Recordings and unfinished conversations are not shared.
+
+Doctor/family views and reviewer names are self-entered; credentials are not verified. Recording needs microphone permission and everyone's consent and stops when the app leaves the foreground. The text organiser preserves entered words under explicit headings; it is not AI transcription or a clinical recommendation system. Care notes are not treatment orders or legal directives.
 
 ### Build
 
@@ -42,8 +46,16 @@ npm install
 npm run dev:next
 ```
 
-The web and Android implementations currently have different integration coverage. The website's shared centre-report service is not connected to this native build; its live care-assist readiness endpoint reported `ready: false` on 9 October. AI transcription, authenticated clinician/patient sharing, report uploads and medicine notifications remain Android work. Do not use a build result as evidence that these services work.
+The web and Android implementations currently have different integration coverage. The website's shared centre-report service is not connected to this native build; its live care-assist readiness endpoint reported `ready: false` on 9 October. AI transcription, shared hospital-report uploads and medicine notifications remain Android work. Email confirmation delivery, recovery and account deletion still need completion before public account rollout; the successful account checks use disposable verified test accounts. The shared Supabase project also has leaked-password protection disabled: [configuration guidance](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection). Do not use a build result as evidence that these services work.
 
 ## Team
 
 Dr Sharada Vinod Kutty · Dr Sujay Halkur Shankar · Shaik Abdul Basith · Shaik Muhammad Awaiz · Shirin Ayub
+
+### Backend and map sources
+
+- Reproducible schema and row-permission checks: `android/supabase/migrations/` and `android/supabase/tests/care_permissions.sql`. Only the publishable key is included in the client. No service key is shipped.
+- MapLibre Android: https://maplibre.org/maplibre-native/android/examples/getting-started/
+- OpenFreeMap style and attribution: https://openfreemap.org/quick_start/
+- Directory: https://palliumindia.org/clinics/karnataka
+- The private invitation table deliberately has no direct RLS policy; only bounded, authenticated functions can use it. Other existing Supabase tables were left unchanged.

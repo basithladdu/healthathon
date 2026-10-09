@@ -1,47 +1,90 @@
 {
-  "verifiedAt": "2026-10-09T20:27:26.3214631+05:30",
+  "verifiedAt": "2026-10-09T22:56:29.4719291+05:30",
   "applicationId": "in.wedevit.healthathon.development",
-  "version": "0.1.0",
+  "version": "0.2.0",
+  "versionCode": 2,
   "artifacts": [
     {
-      "filename": "Healthathon-Android-0.1.0-preview.apk",
-      "bytes": 19077704,
-      "sha256": "1F757762A1C78F0C8C53629F116E17EF72B62D72D49B8B0E14D5BC7ED97E951C"
+      "filename": "Healthathon-Android-0.2.0.apk",
+      "bytes": 69456861,
+      "sha256": "9E1BAF8216A873342A07DE9254F667529B81050DBA195151C708C99B903A1479"
     },
     {
-      "filename": "Healthathon-Android-0.1.0-unsigned.aab",
-      "bytes": 3726847,
-      "sha256": "A9A164DFA007054DFBD38D804D72C3D743F7D758C770DD0137DBEF2067E7C5AD"
+      "filename": "Healthathon-Android-0.2.0-unsigned.aab",
+      "bytes": 22165240,
+      "sha256": "55A8D336B71DD87295E0FF2D05D0E3EE6E70F6F92EA8453933CF2BC4198E138C"
     }
   ],
   "build": {
-    "lintWarningsDetail": "Library update notices, bitmap density placement and optional Kotlin URI extensions",
-    "lintErrors": 0,
-    "lintWarnings": 14,
+    "debugApk": "passed",
     "releaseBundle": "passed, unsigned",
-    "debugApk": "passed"
+    "lintErrors": 0,
+    "lintWarnings": 16,
+    "lintWarningsDetail": "Dependency update notices, bitmap density placement and optional Kotlin extensions",
+    "releaseBuildNote": "Final release succeeded with a 1024 MB heap and one processor after host memory exhaustion during the initial packaging attempt"
   },
   "tests": {
+    "unitTests": 6,
     "unitFailures": 0,
-    "lastResourceChange": "API 27 navigation-bar style qualifier and local SDK path; packages rebuilt and lint passed",
+    "unitErrors": 0,
+    "physicalDevice": "Samsung A34 SM-A346E, Android 16",
+    "deviceFlows": 8,
     "deviceFailures": 0,
-    "physicalDevice": "Samsung A34, Android 16",
-    "deviceFlows": 4,
-    "latestConversationAndLayoutRecheck": "passed",
-    "unitTests": 6
+    "deviceSkipped": 0,
+    "deviceRunner": "AndroidJUnitRunner through ADB; final run OK (8 tests)",
+    "verified": [
+      "MapLibre pin opens centre details",
+      "Directory search, filters and zero-result recovery",
+      "Saved daily entries appear on Today",
+      "Edit and delete persisted entries",
+      "Person isolation and Room reopen",
+      "Conversation review and exact note versions",
+      "Draft retention and activity recreation",
+      "Real account sign-in and saved cloud task on Today",
+      "Authenticated create, read, update and delete",
+      "Read-only sharing, conflict rejection, invitation reuse rejection and membership revocation",
+      "Sign-out clears saved session and survives app cold start"
+    ]
+  },
+  "backend": {
+    "provider": "Existing Supabase project",
+    "migrationsApplied": 4,
+    "rowPermissionChecks": "passed using rolled-back synthetic fixtures",
+    "temporaryAuthAccountsRemaining": 0,
+    "clinicianCredentials": "not verified",
+    "emailConfirmationDelivery": "not verified",
+    "accountRecoveryAndDeletion": "not implemented",
+    "sharedProjectPasswordProtection": "Leaked-password protection is disabled; existing shared project setting was not changed"
+  },
+  "centres": {
+    "renderer": "MapLibre Native 13.6.1",
+    "mapStyle": "OpenFreeMap Liberty",
+    "directorySource": "https://palliumindia.org/clinics/karnataka",
+    "listed": 33,
+    "checkedMapPins": 9,
+    "addressOnly": 24,
+    "stock": "Directory listing does not establish current medicine stock"
   },
   "screenshots": [
     "verification/today.png",
-    "verification/nearby.png"
+    "verification/nearby.png",
+    "verification/care.png",
+    "verification/centre-map.png",
+    "verification/checkin.png",
+    "verification/more.png",
+    "verification/today-saved.png",
+    "verification/account-today.png"
   ],
-  "installed": "Final debug APK installed successfully on the connected test phone",
+  "installed": "Final 0.2.0 debug APK installed and cold-launched on the connected phone; original unsigned-in records preserved",
   "notVerified": [
+    "Email confirmation delivery and app redirect",
     "Live microphone recording and playback",
     "AI transcription",
-    "Authenticated clinical cloud sync",
-    "Shared hospital report uploads in Android",
-    "Older Android device behaviour",
-    "Patient or clinician field use"
+    "Shared centre-report uploads in Android",
+    "Medicine notifications",
+    "Older Android devices",
+    "Patient or clinician field use",
+    "Optimized release runtime on a device"
   ],
-  "playSubmission": "Not uploaded. Final branding, permanent package, signing, account eligibility and declarations are pending."
+  "playSubmission": "Not uploaded. Final branding, permanent package, upload signing, account eligibility, public privacy policy and health/data declarations remain pending."
 }
