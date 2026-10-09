@@ -30,3 +30,6 @@ submission/.saanthvana-build-*/
 *.jks
 *.keystore
 keystore.properties
+android/*.log
+output/android/*.apk
+output/android/*.aab

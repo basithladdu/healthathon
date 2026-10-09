@@ -1,0 +1,47 @@
+{
+  "verifiedAt": "2026-10-09T20:27:26.3214631+05:30",
+  "applicationId": "in.wedevit.healthathon.development",
+  "version": "0.1.0",
+  "artifacts": [
+    {
+      "filename": "Healthathon-Android-0.1.0-preview.apk",
+      "bytes": 19077704,
+      "sha256": "1F757762A1C78F0C8C53629F116E17EF72B62D72D49B8B0E14D5BC7ED97E951C"
+    },
+    {
+      "filename": "Healthathon-Android-0.1.0-unsigned.aab",
+      "bytes": 3726847,
+      "sha256": "A9A164DFA007054DFBD38D804D72C3D743F7D758C770DD0137DBEF2067E7C5AD"
+    }
+  ],
+  "build": {
+    "lintWarningsDetail": "Library update notices, bitmap density placement and optional Kotlin URI extensions",
+    "lintErrors": 0,
+    "lintWarnings": 14,
+    "releaseBundle": "passed, unsigned",
+    "debugApk": "passed"
+  },
+  "tests": {
+    "unitFailures": 0,
+    "lastResourceChange": "API 27 navigation-bar style qualifier and local SDK path; packages rebuilt and lint passed",
+    "deviceFailures": 0,
+    "physicalDevice": "Samsung A34, Android 16",
+    "deviceFlows": 4,
+    "latestConversationAndLayoutRecheck": "passed",
+    "unitTests": 6
+  },
+  "screenshots": [
+    "verification/today.png",
+    "verification/nearby.png"
+  ],
+  "installed": "Final debug APK installed successfully on the connected test phone",
+  "notVerified": [
+    "Live microphone recording and playback",
+    "AI transcription",
+    "Authenticated clinical cloud sync",
+    "Shared hospital report uploads in Android",
+    "Older Android device behaviour",
+    "Patient or clinician field use"
+  ],
+  "playSubmission": "Not uploaded. Final branding, permanent package, signing, account eligibility and declarations are pending."
+}

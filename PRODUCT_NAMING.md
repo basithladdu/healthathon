@@ -1,5 +1,22 @@
 # Product naming recommendation
 
+## Current shortlist: 9 October 2026
+
+The team has not picked the final Android name. Saanthvana is only the current working name. The brief is short, familiar Hindi, with no known existing app using the same name. Do not publish a rebrand or final package ID until the team chooses.
+
+| Name | Hindi | Meaning | Assessment |
+| --- | --- | --- | --- |
+| **PaasHi** | पास ही | Right nearby | First choice: six letters, familiar spoken words, broad enough for conversations and everyday care. Pronounce it as two words, paas hi. |
+| **ApneSang** | अपने संग | With your own people | Warmer, more family-focused alternative. Slightly longer but easy to understand. |
+
+On 9 October, exact and spaced web searches did not surface an exact app or care-product match for either candidate. Direct Google Play searches in India / English (India) showed no exact-name listing: [PaasHi](https://play.google.com/store/search?q=PaasHi&c=apps&hl=en_IN&gl=IN) returned an unrelated archery game; [ApneSang](https://play.google.com/store/search?q=ApneSang&c=apps&hl=en_IN&gl=IN) returned an unrelated ringtone app. Search ranking and regional availability can change. This is a preliminary collision screen, not trademark or worldwide availability clearance. No domains or accounts were registered.
+
+Rejected: Saath (Cipla's [Saath-Saath](https://www.cipla.com/csr/cipla-foundation/health.html) palliative-care helpline), [Sukoon](https://play.google.com/store/apps/details?id=io.sukoonapp.sukoon), [Kehna](https://play.google.com/store/apps/details?id=app.kehna.mobile), Sunlo, [Sambhal](https://sambhal.app/), Sahej and Apnasa already have visible product uses. SunoSaath returned no Play results, but the phrasing is less natural than the two shortlisted names.
+
+## Historical recommendation: 13 September 2026
+
+The older English naming research below is retained as history and has been superseded by the Hindi brief above.
+
 Status: working recommendation for the Health-a-thon deck and MVP. Team confirmation is still required before a public rebrand.
 
 ## Recommendation
