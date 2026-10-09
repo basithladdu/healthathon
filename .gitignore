@@ -16,3 +16,17 @@ tmp/
 
 # Imported private conversations are local project context, not product assets.
 source-materials/private-context/
+
+# Local rendering/browser scratch; deliverables remain in submission/final.
+.chart-data-*/
+.playwright-cli/
+submission/.saanthvana-build-*/
+
+# Android build outputs and machine-specific signing/configuration.
+**/.gradle/
+**/.kotlin/
+**/build/
+**/local.properties
+*.jks
+*.keystore
+keystore.properties

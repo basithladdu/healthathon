@@ -1,5 +1,17 @@
 # Healthathon and TANUH project context map
 
+## 9 October 2026: shortlisted; Android build begins
+
+- Official email from Health-a-thon / Reskilll, 9 October 2026, 18:40 IST, subject **Congratulations! You're in the Top 120 | Health-a-thon 2026**, confirms Zeros and Ones advances to Phase 2 from over 450 submissions. A dedicated mentor and Build Sprint details will follow. The email does not specify a Top 20 final round.
+- Working checkout is now `F:\CODE\healthathon`. Website source remains in `prototype/`; the existing public website is https://saanthvana.wedevit.in/.
+- User requests a `SHORTLISTED` checkpoint and a separate **Healthathon Copy** repository before native Android development in the primary repository. Preserve all original source/context and approved deck assets. Private context and credentials stay local.
+- Android direction: Kotlin and Jetpack Compose, preserving the website's cream, terracotta, marigold and sage identity. Prioritise a consented conversation, source-linked goals-of-care record, clinician review, patient/family acknowledgement of the exact version, and a practical family home screen.
+- Name is undecided. Saanthvana remains the working name only. Do not lock a Play package or final branding to Santana. A development application ID is not the final store identity.
+- Play closed testing is intended; for affected personal accounts, 12 testers must remain opted in continuously for 14 days before applying for production access. Upload alone does not start that period or guarantee approval. Verify account requirements and final package before publication.
+- Current web source includes a bounded, exact-excerpt AI API at `prototype/app/api/care-assist/route.ts`; provider configuration and live execution are separate from source existence. Native clinical sync, verified accounts, transcription and live AI must be proven before being described as available.
+
+Older dated snapshots below remain as source history; do not treat them as the current implementation status.
+
 > **21 September 2026 update:** Use the [meeting feature card](MEETING_BRIEF_2026-09-21.md) and [implementation/check status](SAANTHVANA_IMPLEMENTATION_2026-09-21.md) for the current Cancer → Patient / Caregiver → Family & Caregiver Support app. It now starts with a short local sign-in and saves on the device; older current-app descriptions below are historical snapshots. The [deck feature audit](FEATURES_FROM_DECKS_2026-09-21.md) and [private Shirin attachment inventory](source-materials/private-context/2026-09-20/shirin-latest/README.md) extend source coverage without filling the missing 25 August DOCX or full 30 August meeting. Machine audio transcripts remain approximate.
 
 > The [user's 21 September clarification](source-materials/private-context/2026-09-21/SHIRIN_CLARIFICATION_USER_SUPPLIED.txt) asks for appointment instructions and dated Hb/RBC results with ranges and High/Low display. It is distinct from the rough machine transcript and from completed implementation. [Eight later visual references](source-materials/private-context/2026-09-21/design-references/manifest.json) are privately saved with hashes.
