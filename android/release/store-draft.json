@@ -1,13 +1,13 @@
 {
-  "status": "Local draft. Not submitted to Google Play.",
+  "status": "Closed testing Alpha submitted on 10 October 2026 with the final requested Play title Sahara: Palliative Companion. Google Play shows Changes in review while automated checks run; not yet approved or live. An hourly follow-up is active to check review and send invitations only after the link is live.",
   "preparedOn": "2026-10-10",
-  "workingTitle": "Sahara: Palliative Care",
+  "workingTitle": "Sahara: Palliative Companion",
   "fullProductName": "Sahara — A Palliative Care Companion",
   "privacyPolicyUrl": "https://sahara.wedevit.in/privacy",
   "accountDeletionUrl": "https://sahara.wedevit.in/delete-account",
   "titleFinal": true,
-  "shortDescription": "Palliative care notes, daily care and nearby support for you and your family.",
-  "fullDescription": "Sahara is a palliative care companion for patients, families and doctors.\n\nKeep the words that matter from a goals-of-care conversation. A doctor can review the note and save a version. The patient or family can read and confirm that same version. Earlier notes and the original conversation stay available.\n\nRecord a conversation with everyone's permission, or type the words you want to keep. Add prescribed medicines, visits, questions, tasks and daily notes. Find listed palliative care centres in Karnataka, call them or get directions. Directory entries do not confirm current medicine stock.\n\nSign in to save care notes and daily entries to your account. Invite family or care team members to read them, or allow them to make changes. Recordings and unfinished conversations are not uploaded. Find centres on a MapLibre map or in the list. There are no ads. This version does not transcribe audio automatically, verify clinician identity or send medicine reminders.\n\nThis app is not a medical device. It does not diagnose, treat, cure or prevent any medical condition, recommend treatment or replace professional medical care. Ask a qualified healthcare professional for medical advice. Care notes record a discussion; they are not prescriptions or legal directives.",
+  "shortDescription": "Sahara: A Palliative Care Companion. Care notes and daily support for families.",
+  "fullDescription": "Sahara: A Palliative Care Companion\n\nFor patients, families and doctors.\n\nKeep the words that matter from a goals-of-care conversation. A doctor can review the note and save a version. The patient or family can read and confirm that same version. Earlier notes and the original conversation stay available.\n\nRecord a conversation with everyone's permission, or type the words you want to keep. Add prescribed medicines, visits, questions, tasks and daily notes. Find listed palliative care centres in Karnataka, call them or get directions. Directory entries do not confirm current medicine stock.\n\nSign in to save care notes and daily entries to your account. Invite family or care team members to read them, or allow them to make changes. Recordings and unfinished conversations are not uploaded. Find centres on a MapLibre map or in the list. There are no ads. This version does not transcribe audio automatically, verify clinician identity or send medicine reminders.\n\nThis app is not a medical device. It does not diagnose, treat, cure or prevent any medical condition, recommend treatment or replace professional medical care. Ask a qualified healthcare professional for medical advice. Care notes record a discussion; they are not prescriptions or legal directives.",
   "categoryProposal": "Medical",
   "healthDeclarationFeaturesToReview": [
     "Healthcare Services and Management",
@@ -26,13 +26,12 @@
       "ACCESS_NETWORK_STATE for map connectivity",
       "RECORD_AUDIO, requested only to record"
     ],
-    "note": "Recheck against the final release binary and Google Play definitions before submitting the form. Any AI, sync or account integration changes these answers."
+    "note": "Saved to Google Play on 10 October 2026 against the 0.3.0 release. Any AI, sync or account integration changes require reassessing these answers."
   },
   "releaseDependencies": [
-    "Approve and save the exact deployed Sahara confirmation/recovery callback, then configure transactional SMTP and verify end-to-end delivery for ordinary testers; the default Supabase mail service is limited to project-team addresses",
-    "Complete Play organisation verification: website ownership and association are verified; the next required field is the company's nine-digit D-U-N-S number",
-    "Create the Play listing, complete content and health declarations, and provide the confirmed review-only account from private release credentials",
-    "Upload signed AAB and verify Google's acceptance",
+    "Wait for Google Play automated checks and review of the submitted closed test. App creation and bundle acceptance do not establish health-policy approval.",
+    "Verify the closed-testing opt-in page is live before emailing all 57 existing tester addresses. No invitation has been sent.",
+    "Ordinary tester signup and reset delivery remain incomplete: the exact Sahara callback allowlist is unapproved and Zoho work is paused at the user's request. Unsigned-in care flows and the dedicated reviewer login work; the default Supabase mail service is limited to project-team addresses.",
     "If applicable to the account, enrol at least 12 testers continuously for 14 days, then apply for production access; this does not guarantee approval"
   ],
   "listingAssets": {
@@ -40,26 +39,29 @@
     "featureGraphic": "output/android/play-listing/feature-graphic-1024x500.png",
     "phoneScreenshots": [
       "output/android/play-listing/screenshots/today.png",
-      "output/android/play-listing/screenshots/checkin.png",
       "output/android/play-listing/screenshots/care.png",
+      "output/android/play-listing/screenshots/checkin.png",
       "output/android/play-listing/screenshots/centre-map.png"
     ],
-    "screenshotEvidence": "Raw 1080 x 2340 captures from the matching-source 0.3.0 debug build on Samsung A34, using synthetic Test Person records. The signed release protects screenshots with FLAG_SECURE. The nearby.png loading-state capture is QA evidence only and is not a listing asset."
+    "screenshotEvidence": "Raw 1080 x 2340 captures from the matching-source 0.3.0 debug build on Samsung A34, using synthetic Test Person records. The signed release protects screenshots with FLAG_SECURE. The nearby.png loading-state capture is QA evidence only and is not a listing asset.",
+    "uploadStatus": "All assets saved in Google Play. Icon and feature graphic declared created or edited using AI; actual phone screenshots not labelled AI-generated."
   },
   "appContentDraft": {
     "containsAds": false,
-    "appAccess": "Some functionality is restricted. Basic notes, daily care and the directory work without sign-in; account sync and invitations require sign-in. A dedicated reviewer account has confirmed email, successful password sign-in and an authorised empty care-record read. Its credentials are private and must be entered in Play's restricted reviewer instructions before submission.",
-    "reviewInstructions": "Open the app and add a person. Today shows daily care. Talk starts a goals-of-care conversation; Care shows saved versions. Nearby opens the Karnataka directory. To review account features, open Your account, sign in with the supplied review credentials, add a person and open Your account again to create or join a care invitation. Doctor is a self-selected role, not a verified credential.",
+    "appAccess": "Some functionality is restricted. Basic notes, daily care and the directory work without sign-in; account sync and invitations require sign-in. A dedicated reviewer account has confirmed email, successful password sign-in and an authorised empty care-record read. Its credentials were saved privately in Play's reviewer instructions after explicit user approval.",
+    "reviewInstructions": "Open More > Your account and sign in. Add a person to see Today, Talk and Care. Save a conversation, switch to Doctor for review, then Family to confirm that version. Your account provides care invitations. Nearby works without sign-in. No payment, OTP or location restriction. Use fictional information only; this is a dedicated review account. Doctor is a self-selected role.",
     "targetAudienceProposal": "18 and over: adult patients, family caregivers and care professionals",
     "healthApp": true,
     "medicalDevice": false,
     "sensitivePermissions": "Microphone only, when the user starts a consented recording; no background audio, GPS, contacts, camera or photo-library permission",
     "accountCreation": "Email and password",
     "accountDeletionUrl": "https://sahara.wedevit.in/delete-account",
-    "contentRating": "Complete the IARC questionnaire against the actual app; do not invent a rating or describe private shared records as public social content"
+    "contentRating": "IARC completed 10 October 2026 after explicit terms approval: ESRB Everyone, PEGI 3, generic 3+, Users Interact. Medical drug references: often, reference only. Private user-content sharing and remote map content declared. Target audience remains 18 and over."
   },
   "dataSafetyDraft": {
-    "formSubmitted": false,
+    "formSubmitted": true,
+    "submissionStatus": "Saved in Play and included in submitted changes; review approval pending.",
+    "specificDataDeletionUrl": "https://sahara.wedevit.in/delete-account#specific",
     "collectsData": true,
     "encryptedInTransit": true,
     "deletionRequestsSupported": true,
@@ -86,14 +88,21 @@
     "privacyAndDeletionPages": "HTTP 200, rendered and checked at 390px on 10 October 2026",
     "websiteDeployment": "dpl_DUiaFHxeZ8Y8eGvXfi2Z7kYvPYyQ",
     "websiteChecks": "43 selected merged medicine-organiser and handover checks passed before the account-page change. The account flow passed 11 focused checks, scoped ESLint and TypeScript. The fresh remote Next.js build and TypeScript passed. Both domains return the new account page with no-store, no-referrer and frame protection; desktop and 390px missing/expired-link views passed visual and overflow checks.",
-    "accountRecovery": "https://sahara.wedevit.in/android-account is deployed. Supabase's exact redirect allowlist and transactional SMTP remain pending; no end-to-end reset-email claim.",
+    "accountRecovery": "https://sahara.wedevit.in/android-account is deployed. Supabase's exact redirect allowlist remains unapproved; Zoho setup is explicitly paused. No end-to-end reset-email claim.",
     "androidPackage": "in.wedevit.sahara; version 0.3.0 (3), signed and installed alongside the old app on Samsung A34",
     "androidChecks": "Six unit checks passed; APK/AAB signatures and static 16 KB ZIP/ELF alignment passed. On 10 October, six local flows passed on Samsung A34 against the matching-source debug build; one credential-dependent sign-in test was initially skipped. Current phone screenshots were captured. After the auth redirect/recovery change, the focused reviewer sign-in, cloud-record load and reopen check passed with no skips. The fresh signed APK/AAB passed vital lint, signature and static 16 KB ZIP/native checks; the signed APK was installed on Samsung A34. Optimized release interaction and a 16 KB runtime are not verified.",
     "uploadBundle": "output/android/Sahara-0.3.0.aab",
     "uploadBundleSha256": "EB0A14F7CE245230BE356A7737B952CF2B799A8895A009CA24A2C53242991589",
-    "playAccount": "Personal. Search Console ownership and the Play website association are verified. Organisation conversion now requires WEDEVIT PRIVATE LIMITED's nine-digit D-U-N-S number; no existing business payments profile was offered.",
+    "playAccount": "Existing Personal account, as explicitly requested. Organisation conversion stopped; D-U-N-S was required only by that optional conversion, not app creation. Search Console ownership and Play website association are verified. Google's review still determines health-policy eligibility.",
+    "playAppId": "4974759245808215344",
+    "closedTrackId": "4699010624330920429",
+    "closedTest": "Alpha, India. Version 0.3.0 (3) uploaded and 14 changes submitted. Play shows Changes in review while quick checks run. Native debug symbols warning is non-blocking.",
+    "testerLists": ["erus testers", "interns", "SecureSign additional testers", "Vikasam owner internal testing"],
+    "uniqueTesterAddresses": 57,
+    "optInUrl": "https://play.google.com/apps/testing/in.wedevit.sahara",
+    "optInLive": false,
     "accountClosure": "Applied sahara_account_closure (20261010123354). Service-only closure removes Sahara-owned care data and memberships atomically, blocks existing JWTs, and preserves shared Auth identities and other owners. Rollback regression passed; no real accounts were closed and all fixture counts returned to zero. Public policy describes the private account-ID/closure-date marker.",
-    "invitations": "Not sent. Send to the full existing tester list only after the closed-testing opt-in link is live."
+    "invitations": "Not sent. All four existing lists are selected; their 57 unique addresses exactly match the prior sent-email list. Send a short join-and-install email privately to all of them only after the closed-testing opt-in link is live."
   },
   "sources": {
     "accountRequirements": "https://support.google.com/googleplay/android-developer/answer/10788890?hl=en-GB",
@@ -102,7 +111,9 @@
     "dataSafety": "https://support.google.com/googleplay/android-developer/answer/10787469?hl=en",
     "reviewAccess": "https://support.google.com/googleplay/android-developer/answer/9859455?hl=en",
     "supabaseLogs": "https://supabase.com/docs/guides/observability/log-field-reference",
-    "mapPrivacy": "https://openfreemap.org/privacy/"
+    "mapPrivacy": "https://openfreemap.org/privacy/",
+    "nameLimit": "https://support.google.com/googleplay/android-developer/answer/9859152?hl=en",
+    "aiAssetDeclaration": "https://support.google.com/googleplay/android-developer/answer/17262077?hl=en"
   },
   "applicationId": "in.wedevit.sahara"
 }
