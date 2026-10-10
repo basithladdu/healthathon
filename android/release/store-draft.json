@@ -1,5 +1,5 @@
 {
-  "status": "Closed testing Alpha submitted on 10 October 2026 with the final requested Play title Sahara: Palliative Companion. Google Play shows Changes in review while automated checks run; not yet approved or live. An hourly follow-up is active to check review and send invitations only after the link is live.",
+  "status": "Rejected by Google Play on 10 October 2026: Play Console Requirements. Google says the app's category or declared features require an organisation account. Confirmed in Play at 22:40 IST. Closed testing is not live and no tester invitations have been sent. Account conversion remains outside the user's current authorisation.",
   "preparedOn": "2026-10-10",
   "workingTitle": "Sahara: Palliative Companion",
   "fullProductName": "Sahara — A Palliative Care Companion",
@@ -29,7 +29,7 @@
     "note": "Saved to Google Play on 10 October 2026 against the 0.3.0 release. Any AI, sync or account integration changes require reassessing these answers."
   },
   "releaseDependencies": [
-    "Wait for Google Play automated checks and review of the submitted closed test. App creation and bundle acceptance do not establish health-policy approval.",
+    "Resolve Google's organisation-account rejection. The user requested the existing Personal account and stopped conversion; obtain a new publishing decision before account changes. Do not resubmit unchanged or misstate the app's actual medical features.",
     "Verify the closed-testing opt-in page is live before emailing all 57 existing tester addresses. No invitation has been sent.",
     "Ordinary tester signup and reset delivery remain incomplete: the exact Sahara callback allowlist is unapproved and Zoho work is paused at the user's request. Unsigned-in care flows and the dedicated reviewer login work; the default Supabase mail service is limited to project-team addresses.",
     "If applicable to the account, enrol at least 12 testers continuously for 14 days, then apply for production access; this does not guarantee approval"
@@ -60,7 +60,7 @@
   },
   "dataSafetyDraft": {
     "formSubmitted": true,
-    "submissionStatus": "Saved in Play and included in submitted changes; review approval pending.",
+    "submissionStatus": "Saved in Play and included in the submission. Release rejected for the organisation-account requirement; declaration remains saved.",
     "specificDataDeletionUrl": "https://sahara.wedevit.in/delete-account#specific",
     "collectsData": true,
     "encryptedInTransit": true,
@@ -93,10 +93,12 @@
     "androidChecks": "Six unit checks passed; APK/AAB signatures and static 16 KB ZIP/ELF alignment passed. On 10 October, six local flows passed on Samsung A34 against the matching-source debug build; one credential-dependent sign-in test was initially skipped. Current phone screenshots were captured. After the auth redirect/recovery change, the focused reviewer sign-in, cloud-record load and reopen check passed with no skips. The fresh signed APK/AAB passed vital lint, signature and static 16 KB ZIP/native checks; the signed APK was installed on Samsung A34. Optimized release interaction and a 16 KB runtime are not verified.",
     "uploadBundle": "output/android/Sahara-0.3.0.aab",
     "uploadBundleSha256": "EB0A14F7CE245230BE356A7737B952CF2B799A8895A009CA24A2C53242991589",
-    "playAccount": "Existing Personal account, as explicitly requested. Organisation conversion stopped; D-U-N-S was required only by that optional conversion, not app creation. Search Console ownership and Play website association are verified. Google's review still determines health-policy eligibility.",
+    "playAccount": "Existing Personal account, as explicitly requested. App creation and bundle upload succeeded, but Google rejected distribution because the category or declared health features require an organisation account. Conversion remains stopped by the user. Search Console ownership and Play website association are verified.",
     "playAppId": "4974759245808215344",
     "closedTrackId": "4699010624330920429",
-    "closedTest": "Alpha, India. Version 0.3.0 (3) uploaded and 14 changes submitted. Play shows Changes in review while quick checks run. Native debug symbols warning is non-blocking.",
+    "closedTest": "Alpha, India. Version 0.3.0 (3) uploaded; submission rejected on 10 October 2026 under Play Console Requirements. Play shows App not available on Google Play and returns 14 changes to the unsubmitted queue. Native debug symbols warning was non-blocking.",
+    "policyIssueId": "4985856061480929924",
+    "policyIssueUrl": "https://play.google.com/console/u/1/developers/8795679408143615220/app/4974759245808215344/policy-center/issues/4985856061480929924/details",
     "testerLists": ["erus testers", "interns", "SecureSign additional testers", "Vikasam owner internal testing"],
     "uniqueTesterAddresses": 57,
     "optInUrl": "https://play.google.com/apps/testing/in.wedevit.sahara",
