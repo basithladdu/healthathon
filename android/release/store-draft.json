@@ -1,10 +1,10 @@
 {
   "status": "Local draft. Not submitted to Google Play.",
-  "preparedOn": "2026-10-09",
-  "workingTitle": "Saanthvana",
-  "titleFinal": false,
-  "shortDescription": "Keep care conversations, everyday notes and nearby support together.",
-  "fullDescription": "A palliative care companion for patients, families and doctors.\n\nKeep the words that matter from a goals-of-care conversation. A doctor can review the note and save a version. The patient or family can read and confirm that same version. Earlier notes and the original conversation stay available.\n\nRecord a conversation with everyone's permission, or type the words you want to keep. Add prescribed medicines, visits, questions, tasks and daily notes. Find listed palliative care centres in Karnataka, call them or get directions. Directory entries do not confirm current medicine stock.\n\nSign in to save care notes and daily entries to your account. Invite family or care team members to read them, or allow them to make changes. Recordings and unfinished conversations are not uploaded. Find centres on a MapLibre map or in the list. There are no ads. This version does not transcribe audio automatically, verify clinician identity or send medicine reminders.\n\nThis app is not a medical device. It does not diagnose, treat, cure or prevent any medical condition, recommend treatment or replace professional medical care. Ask a qualified healthcare professional for medical advice. Care notes record a discussion; they are not prescriptions or legal directives.",
+  "preparedOn": "2026-10-10",
+  "workingTitle": "Sahara: Palliative Care",
+  "titleFinal": true,
+  "shortDescription": "Palliative care notes, daily care and nearby support for you and your family.",
+  "fullDescription": "Sahara is a palliative care companion for patients, families and doctors.\n\nKeep the words that matter from a goals-of-care conversation. A doctor can review the note and save a version. The patient or family can read and confirm that same version. Earlier notes and the original conversation stay available.\n\nRecord a conversation with everyone's permission, or type the words you want to keep. Add prescribed medicines, visits, questions, tasks and daily notes. Find listed palliative care centres in Karnataka, call them or get directions. Directory entries do not confirm current medicine stock.\n\nSign in to save care notes and daily entries to your account. Invite family or care team members to read them, or allow them to make changes. Recordings and unfinished conversations are not uploaded. Find centres on a MapLibre map or in the list. There are no ads. This version does not transcribe audio automatically, verify clinician identity or send medicine reminders.\n\nThis app is not a medical device. It does not diagnose, treat, cure or prevent any medical condition, recommend treatment or replace professional medical care. Ask a qualified healthcare professional for medical advice. Care notes record a discussion; they are not prescriptions or legal directives.",
   "categoryProposal": "Medical",
   "healthDeclarationFeaturesToReview": [
     "Healthcare Services and Management",
@@ -26,9 +26,7 @@
   },
   "releaseDependencies": [
     "Verify confirmation-email delivery and redirects; implement account recovery and account deletion before public release",
-    "Team chooses the final name and permanent package ID",
     "Resolve Play account type: inspected account is named WEDEVIT PRIVATE LIMITED but marked Personal; check organisation eligibility for this medical app",
-    "Configure and back up a private upload signing key; do not commit it",
     "Publish the reviewed privacy policy at a stable public URL",
     "Create the Play listing, complete content and health declarations, and provide final branded screenshots and icon",
     "Upload signed AAB and verify Google's acceptance",
@@ -38,5 +36,6 @@
     "accountRequirements": "https://support.google.com/googleplay/android-developer/answer/10788890?hl=en-GB",
     "closedTesting": "https://support.google.com/googleplay/android-developer/answer/14151465",
     "healthDeclaration": "https://support.google.com/googleplay/android-developer/answer/14738291?hl=en"
-  }
+  },
+  "applicationId": "in.wedevit.sahara"
 }

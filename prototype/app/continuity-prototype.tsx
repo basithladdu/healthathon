@@ -5915,7 +5915,7 @@ export function ContinuityPrototype() {
         >
           <span className="brand-mark" aria-hidden="true"><ContinuityMark /></span>
           <div className="brand-titles">
-            <strong>Saanthvana</strong>
+            <strong>Sahara</strong>
             <span>Care planning</span>
           </div>
         </button>
@@ -5955,7 +5955,7 @@ export function ContinuityPrototype() {
               onClick={() => navigate(isPatientSession ? 'my-plan' : isFamilySession ? 'caregiver' : 'home')}
             >
               <span className="brand-mark" aria-hidden="true"><ContinuityMark /></span>
-              <strong>Saanthvana</strong>
+              <strong>Sahara</strong>
             </button>
             <div className="environment-label">
 

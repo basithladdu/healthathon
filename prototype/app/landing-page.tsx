@@ -44,7 +44,7 @@ export function LandingPage(props: {
       <header className="lp-nav">
         <div className="lp-brand">
           <span className="lp-brand-mark" aria-hidden="true">S</span>
-          <strong>Saanthvana</strong>
+          <strong>Sahara</strong>
         </div>
         <nav className="lp-nav-actions" aria-label="Account">
           <button type="button" className="lp-nav-btn" onClick={onSignIn}>Sign in</button>
@@ -132,7 +132,7 @@ export function LandingPage(props: {
           </details>
         </div>
       </main>
-      <footer className="lp-footer"><p>Saanthvana · Cancer care, with patients and families.</p></footer>
+      <footer className="lp-footer"><p>Sahara · Palliative care, with patients and families.</p></footer>
     </div>
   );
 }

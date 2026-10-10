@@ -113,7 +113,7 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
                     Button(onClick = { run { invite = cloud.invite(selected, allowChanges) } }, enabled = !busy) { Text("Create invitation") }
                     if (invite.isNotEmpty()) {
                         Spacer(Modifier.height(12.dp)); Text("One person · expires in 3 days", style = MaterialTheme.typography.bodySmall)
-                        TextButton(onClick = { open(context, Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, "Open Saanthvana, sign in, then choose Join someone's care. Your invitation code:\n$invite"), "Share invitation")) }) { Icon(Icons.Default.Share, null); Spacer(Modifier.width(8.dp)); Text("Share invitation") }
+                        TextButton(onClick = { open(context, Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, context.getString(R.string.share_care_invitation, context.getString(R.string.app_name), invite)), "Share invitation")) }) { Icon(Icons.Default.Share, null); Spacer(Modifier.width(8.dp)); Text("Share invitation") }
                         androidx.compose.foundation.text.selection.SelectionContainer { Text(invite, style = MaterialTheme.typography.bodySmall) }
                     }
                     members.forEach { member ->

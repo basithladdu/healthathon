@@ -48,8 +48,8 @@ export async function downloadCarePdf({ fileName, title, subtitle, sections, car
   const embeddedFont = await document.embedFont(bytes, { subset: false });
   const shapingFont = fontkit.create(bytes);
   document.setTitle(title);
-  document.setAuthor('Saanthvana');
-  document.setCreator('Saanthvana');
+  document.setAuthor('Sahara');
+  document.setCreator('Sahara');
 
   const [width, height] = pdf.PageSizes.A4;
   const margin = 44;
@@ -125,7 +125,7 @@ export async function downloadCarePdf({ fileName, title, subtitle, sections, car
   function newPage() {
     page = document.addPage([width, height]);
     y = height - 47;
-    draw('SAANTHVANA', margin, y, 9, accent);
+    draw('SAHARA', margin, y, 9, accent);
     y -= 28;
   }
 
@@ -139,7 +139,7 @@ export async function downloadCarePdf({ fileName, title, subtitle, sections, car
     }
   }
 
-    draw('SAANTHVANA', margin, y, 9, accent);
+    draw('SAHARA', margin, y, 9, accent);
   y -= 31;
   write(title, 21, ink, 30);
   if (subtitle) { y -= 2; write(subtitle, 10, muted, 16); }

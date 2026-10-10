@@ -1,8 +1,8 @@
-# Saanthvana
+# Sahara: Palliative Care
 
 Interactive Health-a-thon prototype for **Cancer / Patient & Caregiver / Family Caregiver Support**.
 
-Saanthvana (सांत्वना) helps patients and families organise documents, visits, daily care and questions for the care team, and find palliative care. A doctor can prepare, review and sign a versioned Care Note, which the patient or family can review separately.
+Sahara (सहारा) helps patients and families organise documents, visits, daily care and questions for the care team, and find palliative care. A doctor can prepare, review and sign a versioned Care Note, which the patient or family can review separately.
 
 ## Main flow
 

@@ -103,10 +103,10 @@ export function buildHandoverPack(input: HandoverInput): string | null {
   }
   if (familySections.length) sections.push(`FAMILY-ADDED INFORMATION\nAdded to this pack by ${author}. Not part of the doctor-reviewed note.\n\n${familySections.join('\n\n')}`);
   if (!sections.length) return null;
-  return [`SAANTHVANA — CARE TO TAKE WITH YOU`, `Patient: ${patientName}\nPatient ID: ${patientId}`, ...sections].join('\n\n');
+  return [`SAHARA — CARE TO TAKE WITH YOU`, `Patient: ${patientName}\nPatient ID: ${patientId}`, ...sections].join('\n\n');
 }
 
 export function handoverFileName(patientId: string, noteVersion: number | null): string {
   const safeId = patientId.replace(/[^a-zA-Z0-9_-]/g, '-').slice(0, 60) || 'patient';
-  return `saanthvana-${safeId}${noteVersion === null ? '' : `-note-v${noteVersion}`}-care-pack.pdf`;
+  return `sahara-${safeId}${noteVersion === null ? '' : `-note-v${noteVersion}`}-care-pack.pdf`;
 }

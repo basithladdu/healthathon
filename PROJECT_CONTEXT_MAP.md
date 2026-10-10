@@ -1,5 +1,13 @@
 # Healthathon and TANUH project context map
 
+## 10 October 2026: Sahara rebrand
+
+- The user approved **Sahara (सहारा)**; full title **Sahara: Palliative Care**. This supersedes every earlier naming recommendation below. Android release package: `in.wedevit.sahara`; debug package: `in.wedevit.sahara.development`; version 0.3.0 (3).
+- Pulled `main` before editing: already current at `0e7408c`. The remote patient-portal branch has no commits ahead of `main`. Preserve the four unrelated deleted deck-generation files.
+- Rebrand covers Android labels/invitations/About and website headers, Hindi branding, metadata and exported records. Existing website addresses, persistence identifiers and backend names remain compatible. Historical submissions and source evidence retain their original names.
+- The live Devit Play Console still labels developer 8795679408143615220 as **Personal**. The new-app form is prepared; policy/export declarations have not been accepted and no listing or upload is claimed. Organisation eligibility, account deletion/recovery, public privacy and Play declarations remain open. ADB currently lists no connected device.
+- Upload signing uses private, ignored credentials with a hash-verified local backup. Final build evidence is recorded under `output/android/`; old 0.2.0 device evidence does not verify the new release.
+
 ## 9 October 2026: shortlisted; Android build begins
 
 - Official email from Health-a-thon / Reskilll, 9 October 2026, 18:40 IST, subject **Congratulations! You're in the Top 120 | Health-a-thon 2026**, confirms Zeros and Ones advances to Phase 2 from over 450 submissions. A dedicated mentor and Build Sprint details will follow. The email does not specify a Top 20 final round.

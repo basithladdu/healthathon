@@ -1,6 +1,6 @@
-# Saanthvana — native Android care companion
+# Sahara: Palliative Care
 
-**Working name; the Hindi rebrand is undecided.** Zeros and Ones was shortlisted for Health-a-thon 2026 Phase 2. The primary project is now native Android; the existing website is preserved in `prototype/` and in [Healthathon-Copy](https://github.com/basithladdu/Healthathon-Copy).
+**Sahara (सहारा)** is the approved name, chosen on 10 October 2026. Zeros and Ones was shortlisted for Health-a-thon 2026 Phase 2. The primary project is now native Android; the website is in `prototype/` and its earlier checkpoint is preserved in [Healthathon-Copy](https://github.com/basithladdu/Healthathon-Copy).
 
 ## Android
 
@@ -28,7 +28,9 @@ cd android
 
 Use Android Studio to open `android/`, or set `ANDROID_HOME` / an ignored `android/local.properties`. On this computer, build caches and temporary files use F: because C: has little free space. Gradle uses one worker to avoid the observed memory-allocation failure.
 
-The application ID `in.wedevit.healthathon.development` is temporary. The release bundle is unsigned. Final name/package, upload signing, Play account eligibility, public privacy policy, Health apps declaration and Data safety answers must be resolved before submission. No Android app has been uploaded to Play yet. See `android/release/store-draft.json` for the prepared listing and remaining dependencies.
+The permanent application ID is `in.wedevit.sahara`; debug builds use `in.wedevit.sahara.development`. Release builds read the ignored `android/keystore.properties` file (`storeFile`, `storePassword`, `keyAlias`, `keyPassword`) and require an upload key. Never commit signing credentials. The previous development app remains a separate installation; its records are not migrated or removed by installing Sahara.
+
+The Play title is **Sahara: Palliative Care**. The Devit Play account was checked on 10 October and remains Personal; Google's medical-app rules require an organisation account. Account deletion/recovery, the public privacy policy and Play declarations remain release dependencies. No Play upload or release is claimed. See `android/release/store-draft.json` for the prepared listing.
 
 ## Website and submission
 

@@ -1,6 +1,10 @@
-# Product naming recommendation
+# Product name: Sahara
 
-## Current shortlist: 9 October 2026
+## Approved: 10 October 2026
+
+The user chose **Sahara (सहारा)**. Use **Sahara: Palliative Care** as the full product and Google Play title, and **Sahara** in compact app headers and the launcher. The permanent Android package is `in.wedevit.sahara`. This decision supersedes the shortlist below; the earlier naming research is retained as history.
+
+## Historical shortlist: 9 October 2026
 
 The team has not picked the final Android name. Saanthvana is only the current working name. The brief is short, familiar Hindi, with no known existing app using the same name. Do not publish a rebrand or final package ID until the team chooses.
 

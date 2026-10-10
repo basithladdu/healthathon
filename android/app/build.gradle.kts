@@ -1,23 +1,41 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
     id("com.google.devtools.ksp")
 }
+val uploadSigning = Properties().apply {
+    val config = rootProject.file("keystore.properties")
+    if (config.isFile) config.inputStream().use { load(it) }
+}
 android {
     namespace = "in.wedevit.care"
     compileSdk = 36
     defaultConfig {
-        // Development identity only. Confirm final package before first Play upload.
-        applicationId = "in.wedevit.healthathon.development"
+        applicationId = "in.wedevit.sahara"
         minSdk = 26
         targetSdk = 36
-        versionCode = 2
-        versionName = "0.2.0"
+        versionCode = 3
+        versionName = "0.3.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
+    signingConfigs {
+        create("upload") {
+            uploadSigning.getProperty("storeFile")?.let { storeFile = file(it) }
+            storePassword = uploadSigning.getProperty("storePassword")
+            keyAlias = uploadSigning.getProperty("keyAlias")
+            keyPassword = uploadSigning.getProperty("keyPassword")
+        }
+    }
     buildTypes {
-        release { isMinifyEnabled = true; proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt")) }
+        debug { applicationIdSuffix = ".development" }
+        release {
+            isMinifyEnabled = true
+            signingConfig = signingConfigs.getByName("upload")
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
+        }
     }
     compileOptions { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17 }
     kotlinOptions { jvmTarget = "17" }

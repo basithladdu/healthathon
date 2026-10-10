@@ -114,7 +114,7 @@ function JournalRecorder({ patientId, hindi, onRecorded, onBusy, onTextFallback 
         if (!blob.size || blob.size > 20 * 1024 * 1024) { setMessage(t('No usable audio was captured. Try again, or write below.', 'आवाज़ ठीक से रिकॉर्ड नहीं हुई। फिर कोशिश करें, या नीचे लिखें।')); onTextFallback(); return; }
         const duration = stoppedDuration.current ?? Math.min(90, Math.max(1, Math.round((performance.now() - startedAt.current) / 1000)));
         const extension = type.includes('mp4') ? 'm4a' : type.includes('ogg') ? 'ogg' : type.includes('webm') ? 'webm' : 'bin';
-        const file = new File([blob], `saanthvana-voice-${patientId.replace(/[^a-zA-Z0-9_-]/g, '-')}-${Date.now()}.${extension}`, { type });
+        const file = new File([blob], `sahara-voice-${patientId.replace(/[^a-zA-Z0-9_-]/g, '-')}-${Date.now()}.${extension}`, { type });
         onRecorded(file, duration); setElapsed(duration); setMessage(t('Ready to listen. Save it when you’re ready.', 'सुनने के लिए तैयार है। चाहें तो सेव करें।'));
       };
       startedAt.current = performance.now(); active.start(1000); setPhase('recording'); setElapsed(0);
@@ -201,7 +201,7 @@ function VoiceJournalForPatient({ patientId, author, today, hindi, entries, onCh
 
   function downloadText(entry: VoiceJournalEntry) {
     const url = URL.createObjectURL(new Blob([voiceJournalEntryText(entry)], { type: 'text/plain;charset=utf-8' }));
-    const link = document.createElement('a'); link.href = url; link.download = `saanthvana-journal-${entry.id.replace(/[^a-zA-Z0-9_-]/g, '-')}.txt`;
+    const link = document.createElement('a'); link.href = url; link.download = `sahara-journal-${entry.id.replace(/[^a-zA-Z0-9_-]/g, '-')}.txt`;
     document.body.appendChild(link); link.click(); link.remove(); window.setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 

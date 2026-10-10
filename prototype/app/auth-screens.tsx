@@ -76,7 +76,7 @@ function BrandPanel({ variant = 'care-team' }: { variant?: 'care-team' | 'family
         <div className="auth-brand-top">
           <div className="auth-brand-mark" aria-hidden="true">S</div>
           <div className="auth-brand-titles">
-            <strong>Saanthvana</strong>
+            <strong>Sahara</strong>
             <span>Care planning</span>
           </div>
         </div>
@@ -249,7 +249,7 @@ export function LoginScreen(props: {
           </details>
 
           <div className="auth-footer">
-            New to Saanthvana?{' '}
+            New to Sahara?{' '}
             <button type="button" className="auth-textbutton" onClick={onGoToSignup}>
               Create profile
             </button>

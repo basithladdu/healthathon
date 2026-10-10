@@ -431,7 +431,7 @@ val Peach = Color(0xFFFFD1B3)
             Spacer(Modifier.height(10.dp)); Text("You can delete a recording or remove a person's records here.")
         } }
         item { DetailPanel("About", Icons.Default.Info) {
-            Text("Cancer and palliative care notes, conversations and daily care.")
+            Text(androidx.compose.ui.res.stringResource(R.string.app_full_name))
             Spacer(Modifier.height(10.dp)); Text("Your doctor guides treatment. Names and roles in the app aren't verified.")
             Spacer(Modifier.height(10.dp)); Text("The app groups the words you type. Recordings aren't converted to text.")
             Spacer(Modifier.height(12.dp)); Text("Version ${BuildConfig.VERSION_NAME}", style = MaterialTheme.typography.bodySmall)
