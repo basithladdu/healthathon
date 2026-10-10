@@ -429,6 +429,7 @@ val Peach = Color(0xFFFFD1B3)
         item { DetailPanel("Privacy", Icons.Default.Lock) {
             Text("You choose which notes to share and with whom.")
             Spacer(Modifier.height(10.dp)); Text("You can delete a recording or remove a person's records here.")
+            TextButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.privacy_url)))) }) { Text("Privacy policy") }
         } }
         item { DetailPanel("About", Icons.Default.Info) {
             Text(androidx.compose.ui.res.stringResource(R.string.app_full_name))

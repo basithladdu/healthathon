@@ -2,6 +2,9 @@
   "status": "Local draft. Not submitted to Google Play.",
   "preparedOn": "2026-10-10",
   "workingTitle": "Sahara: Palliative Care",
+  "fullProductName": "Sahara — A Palliative Care Companion",
+  "privacyPolicyUrl": "https://sahara.wedevit.in/privacy",
+  "accountDeletionUrl": "https://sahara.wedevit.in/delete-account",
   "titleFinal": true,
   "shortDescription": "Palliative care notes, daily care and nearby support for you and your family.",
   "fullDescription": "Sahara is a palliative care companion for patients, families and doctors.\n\nKeep the words that matter from a goals-of-care conversation. A doctor can review the note and save a version. The patient or family can read and confirm that same version. Earlier notes and the original conversation stay available.\n\nRecord a conversation with everyone's permission, or type the words you want to keep. Add prescribed medicines, visits, questions, tasks and daily notes. Find listed palliative care centres in Karnataka, call them or get directions. Directory entries do not confirm current medicine stock.\n\nSign in to save care notes and daily entries to your account. Invite family or care team members to read them, or allow them to make changes. Recordings and unfinished conversations are not uploaded. Find centres on a MapLibre map or in the list. There are no ads. This version does not transcribe audio automatically, verify clinician identity or send medicine reminders.\n\nThis app is not a medical device. It does not diagnose, treat, cure or prevent any medical condition, recommend treatment or replace professional medical care. Ask a qualified healthcare professional for medical advice. Care notes record a discussion; they are not prescriptions or legal directives.",
@@ -20,22 +23,79 @@
     "backup": "Cloud backup and device-transfer exclusions configured",
     "permissions": [
       "INTERNET",
+      "ACCESS_NETWORK_STATE for map connectivity",
       "RECORD_AUDIO, requested only to record"
     ],
     "note": "Recheck against the final release binary and Google Play definitions before submitting the form. Any AI, sync or account integration changes these answers."
   },
   "releaseDependencies": [
-    "Verify confirmation-email delivery and redirects; implement account recovery and account deletion before public release",
+    "Verify confirmation-email delivery and redirects; complete account recovery before public release",
+    "Exercise the support team's account-deletion process with a synthetic account; the public request page is live",
     "Resolve Play account type: inspected account is named WEDEVIT PRIVATE LIMITED but marked Personal; check organisation eligibility for this medical app",
-    "Publish the reviewed privacy policy at a stable public URL",
-    "Create the Play listing, complete content and health declarations, and provide final branded screenshots and icon",
+    "Create the Play listing, complete content and health declarations, provide review-only account credentials, and capture final branded phone screenshots",
     "Upload signed AAB and verify Google's acceptance",
     "If applicable to the account, enrol at least 12 testers continuously for 14 days, then apply for production access; this does not guarantee approval"
   ],
+  "listingAssets": {
+    "icon": "output/android/play-listing/icon-512.png",
+    "featureGraphic": "output/android/play-listing/feature-graphic-1024x500.png",
+    "phoneScreenshots": "Pending capture of the current Android build; the earlier Saanthvana screenshots are historical evidence"
+  },
+  "appContentDraft": {
+    "containsAds": false,
+    "appAccess": "Some functionality is restricted. Basic notes, daily care and the directory work without sign-in; account sync and invitations require sign-in. Supply an active review-only account before submission.",
+    "reviewInstructions": "Open the app and add a person. Today shows daily care. Talk starts a goals-of-care conversation; Care shows saved versions. Nearby opens the Karnataka directory. To review account features, open Your account, sign in with the supplied review credentials, add a person and open Your account again to create or join a care invitation. Doctor is a self-selected role, not a verified credential.",
+    "targetAudienceProposal": "18 and over: adult patients, family caregivers and care professionals",
+    "healthApp": true,
+    "medicalDevice": false,
+    "sensitivePermissions": "Microphone only, when the user starts a consented recording; no background audio, GPS, contacts, camera or photo-library permission",
+    "accountCreation": "Email and password",
+    "accountDeletionUrl": "https://sahara.wedevit.in/delete-account",
+    "contentRating": "Complete the IARC questionnaire against the actual app; do not invent a rating or describe private shared records as public social content"
+  },
+  "dataSafetyDraft": {
+    "formSubmitted": false,
+    "collectsData": true,
+    "encryptedInTransit": true,
+    "deletionRequestsSupported": true,
+    "independentSecurityReview": false,
+    "collectedTypes": [
+      { "type": "Name", "optional": true, "ephemeral": false, "purposes": ["App functionality"] },
+      { "type": "Email address", "optional": true, "ephemeral": false, "purposes": ["Account management", "App functionality"] },
+      { "type": "User IDs", "optional": true, "ephemeral": false, "purposes": ["Account management", "App functionality"] },
+      { "type": "Health info", "optional": true, "ephemeral": false, "purposes": ["App functionality"] },
+      { "type": "Other user-generated content", "optional": true, "ephemeral": false, "purposes": ["App functionality"] },
+      { "type": "Approximate location", "optional": true, "ephemeral": false, "purposes": ["App functionality", "Fraud prevention, security, and compliance"] },
+      { "type": "Device or other IDs", "optional": true, "ephemeral": false, "purposes": ["App functionality", "Fraud prevention, security, and compliance"] },
+      { "type": "Diagnostics", "optional": true, "ephemeral": false, "purposes": ["App functionality", "Analytics", "Fraud prevention, security, and compliance"] }
+    ],
+    "optionalReason": "The app works without an account. Account and care types leave the device for signed-in records or account requests. Provider network metadata is processed when the user uses account or map features.",
+    "sharingAssessment": "Supabase processes signed-in records as a service provider. Care invitations and Android exports are explicit user-initiated sharing. Apply Google's stated exceptions rather than claiming that data never leaves the app.",
+    "audio": "Recordings remain on the device and are not collected by this version.",
+    "networkMetadata": "Provider sources checked on 10 October 2026: Supabase API logs capture IP, user-agent, IP-derived location and request diagnostics. OpenFreeMap normally omits IP from access logs, but can retain IP in error or security-incident logs. Therefore do not claim all processing is ephemeral. Network identifier and diagnostic categories conservatively cover these service logs; there is no advertising or client analytics SDK.",
+    "location": "Approximate location is declared because Supabase infrastructure can log IP-derived city/country metadata. The app does not read GPS. The selected map area alone is not the user's physical location."
+  },
+  "verifiedReleasePreparation": {
+    "website": "https://sahara.wedevit.in",
+    "legacyWebsitePreserved": "https://saanthvana.wedevit.in",
+    "privacyAndDeletionPages": "HTTP 200, rendered and checked at 390px on 10 October 2026",
+    "websiteDeployment": "dpl_FEqrJMbrmpKCsUo9dkN62cLQxV8o",
+    "websiteChecks": "43 selected merged medicine-organiser and handover checks passed; remote Next.js build and TypeScript check passed",
+    "androidPackage": "in.wedevit.sahara; version 0.3.0 (3), signed and installed alongside the old app on Samsung A34",
+    "androidChecks": "Six unit checks passed; APK/AAB signatures and static 16 KB ZIP/ELF alignment passed. Interactive release verification and current phone screenshots await phone unlock.",
+    "uploadBundle": "output/android/Sahara-0.3.0.aab",
+    "uploadBundleSha256": "AFA21E7DDD78C62C32CB109B7CC25A4A110519D942FAD20A11E60ADBE5F26120",
+    "playAccount": "Personal; organisation conversion remains gated on website verification",
+    "invitations": "Not sent. Send to the full existing tester list only after the closed-testing opt-in link is live."
+  },
   "sources": {
     "accountRequirements": "https://support.google.com/googleplay/android-developer/answer/10788890?hl=en-GB",
     "closedTesting": "https://support.google.com/googleplay/android-developer/answer/14151465",
-    "healthDeclaration": "https://support.google.com/googleplay/android-developer/answer/14738291?hl=en"
+    "healthDeclaration": "https://support.google.com/googleplay/android-developer/answer/14738291?hl=en",
+    "dataSafety": "https://support.google.com/googleplay/android-developer/answer/10787469?hl=en",
+    "reviewAccess": "https://support.google.com/googleplay/android-developer/answer/9859455?hl=en",
+    "supabaseLogs": "https://supabase.com/docs/guides/observability/log-field-reference",
+    "mapPrivacy": "https://openfreemap.org/privacy/"
   },
   "applicationId": "in.wedevit.sahara"
 }

@@ -2,7 +2,7 @@
 
 ## Approved: 10 October 2026
 
-The user chose **Sahara (सहारा)**. Use **Sahara: Palliative Care** as the full product and Google Play title, and **Sahara** in compact app headers and the launcher. The permanent Android package is `in.wedevit.sahara`. This decision supersedes the shortlist below; the earlier naming research is retained as history.
+The user chose **Sahara (सहारा) — A Palliative Care Companion**. Use **Sahara: Palliative Care** for Google Play's 30-character title field, and **Sahara** in compact app headers and the launcher. The permanent Android package is `in.wedevit.sahara`. The primary website is https://sahara.wedevit.in; https://saanthvana.wedevit.in remains available for submitted PPT links. This decision supersedes the shortlist below; the earlier naming research is retained as history.
 
 ## Historical shortlist: 9 October 2026
 

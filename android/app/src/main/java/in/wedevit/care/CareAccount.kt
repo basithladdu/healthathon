@@ -2,6 +2,7 @@
 package `in`.wedevit.care
 
 import android.content.Intent
+import android.net.Uri
 import android.app.Application
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -124,7 +125,9 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
                     }
                 }
                 TextButton(onClick = { signingOut = true }, enabled = !busy) { Text("Sign out") }
+                TextButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.delete_account_url)))) }, enabled = !busy) { Text("Delete account") }
             }
+            TextButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.privacy_url)))) }) { Text("Privacy policy") }
             notice?.let { Text(it, color = MaterialTheme.colorScheme.secondary) }
             error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
         }

@@ -1,0 +1,128 @@
+.page {
+  min-height: 100svh;
+  padding: 24px 22px 48px;
+  background: #fff8ee;
+  color: #382e29;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  line-height: 1.65;
+}
+
+.content {
+  max-width: 740px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid #dacfc0;
+}
+
+.brand {
+  font-family: Georgia, serif;
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.05em;
+}
+
+.page a {
+  color: #973b25;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  overflow-wrap: anywhere;
+}
+
+.page a:focus-visible {
+  outline: 3px solid #973b25;
+  outline-offset: 5px;
+  border-radius: 2px;
+}
+
+.header .brand {
+  color: #382e29;
+  text-decoration: none;
+}
+
+.header > a,
+.footer > a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+.page h1 {
+  margin: 28px 0 12px;
+  font-family: Georgia, serif;
+  font-size: clamp(32px, 6vw, 44px);
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -0.035em;
+}
+
+.page h2 {
+  margin: 28px 0 8px;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.page p {
+  margin: 10px 0;
+}
+
+.date {
+  color: #69594e;
+  font-size: 14px;
+}
+
+.request {
+  margin: 24px 0;
+  padding: 20px;
+  border: 1px solid #dccdb9;
+  border-radius: 18px;
+  background: #fffdf9;
+}
+
+.page .button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 10px 20px;
+  border-radius: 12px;
+  background: #a84028;
+  color: #fffdf9;
+  font-weight: 600;
+  line-height: 1.4;
+  text-decoration: none;
+}
+
+.page ul {
+  margin: 10px 0;
+  padding-left: 24px;
+  list-style: disc;
+}
+
+.page li + li {
+  margin-top: 8px;
+}
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  margin-top: 36px;
+  padding-top: 18px;
+  border-top: 1px solid #dacfc0;
+  font-size: 14px;
+}
+
+@media (max-width: 420px) {
+  .page { padding: 18px 18px 36px; }
+  .request { padding: 16px; }
+  .page .button { width: 100%; }
+}

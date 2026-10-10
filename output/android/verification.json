@@ -1,90 +1,245 @@
 {
-  "verifiedAt": "2026-10-09T22:56:29.4719291+05:30",
-  "applicationId": "in.wedevit.healthathon.development",
-  "version": "0.2.0",
-  "versionCode": 2,
+  "verifiedAt": "2026-10-10T17:12:58.3851731+05:30",
+  "applicationId": "in.wedevit.sahara",
+  "appName": "Sahara",
+  "fullProductName": "Sahara — A Palliative Care Companion",
+  "version": "0.3.0",
+  "versionCode": 3,
+  "minSdk": 26,
+  "targetSdk": 36,
   "artifacts": [
     {
-      "filename": "Healthathon-Android-0.2.0.apk",
-      "bytes": 69456861,
-      "sha256": "9E1BAF8216A873342A07DE9254F667529B81050DBA195151C708C99B903A1479"
+      "filename": "Sahara-0.3.0-release.apk",
+      "bytes": 51236946,
+      "sha256": "21DC8455F28EC844A00E943F67715B65DFF9DD47EA748EB92CB4685983069097"
     },
     {
-      "filename": "Healthathon-Android-0.2.0-unsigned.aab",
-      "bytes": 22165240,
-      "sha256": "55A8D336B71DD87295E0FF2D05D0E3EE6E70F6F92EA8453933CF2BC4198E138C"
+      "filename": "Sahara-0.3.0.aab",
+      "bytes": 22178819,
+      "sha256": "AFA21E7DDD78C62C32CB109B7CC25A4A110519D942FAD20A11E60ADBE5F26120"
     }
   ],
   "build": {
-    "debugApk": "passed",
-    "releaseBundle": "passed, unsigned",
-    "lintErrors": 0,
-    "lintWarnings": 16,
-    "lintWarningsDetail": "Dependency update notices, bitmap density placement and optional Kotlin extensions",
-    "releaseBuildNote": "Final release succeeded with a 1024 MB heap and one processor after host memory exhaustion during the initial packaging attempt"
+    "releaseApk": "Signed, optimized APK built and independently verified",
+    "releaseBundle": "Signed Android App Bundle built and jarsigner verified",
+    "releaseVitalLint": "passed",
+    "debugApk": "Matching source debug APK built; device UI tests not run because the phone is locked",
+    "releaseBuildNote": "Six unit tests and Kotlin compilation passed. R8 required a 1024 MB heap after the 768 MB attempt exhausted heap. Missing offline lint/test artifacts were copied from the existing C: dependency cache. No checks or optimization were disabled."
+  },
+  "signing": {
+    "apkScheme": "APK Signature Scheme v2",
+    "signer": "CN=Sahara, OU=Android, O=Devit, C=IN",
+    "keyAlgorithm": "RSA 3072",
+    "certificateSha256": "607d227a8b25bf7126bbcd742110bbba26f8ba9d75a2f47917013e9589341ad2",
+    "aabSignature": "jarsigner verified; self-signed upload certificate",
+    "secrets": "Keystore and passwords are excluded from version control"
+  },
+  "effectivePermissions": [
+    "android.permission.RECORD_AUDIO",
+    "android.permission.INTERNET",
+    "android.permission.ACCESS_NETWORK_STATE",
+    "in.wedevit.sahara.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+  ],
+  "removedUnusedPermissions": [
+    "android.permission.ACCESS_FINE_LOCATION",
+    "android.permission.ACCESS_COARSE_LOCATION",
+    "android.permission.ACCESS_WIFI_STATE"
+  ],
+  "pageAlignment": {
+    "apkZip16KB": "passed: zipalign -c -P 16 4",
+    "elf64BitLoadAndRelro": "All four arm64-v8a/x86_64 libraries passed LOAD alignment and the complete AOSP RELRO containment/prefix/suffix checks",
+    "checks": [
+      {
+        "library": "lib_arm64-v8a_libandroidx.graphics.path.so",
+        "sha256": "41E9A793C43A0F4FDDB19E33F346BACE464F30F888BA7B9EAF96294EA115BFB6",
+        "loadAlignments": [
+          16384,
+          16384,
+          16384
+        ],
+        "relroChecks": [
+          {
+            "passed": true,
+            "coversEntireLoadSections": true,
+            "startValid": true,
+            "endValid": false
+          }
+        ],
+        "passed": true
+      },
+      {
+        "library": "lib_arm64-v8a_libmaplibre.so",
+        "sha256": "1E154A4640E4078F4FDE31649771D93D4E5FEE6F731F608D565D3B3F755CA8F9",
+        "loadAlignments": [
+          16384,
+          16384,
+          16384
+        ],
+        "relroChecks": [
+          {
+            "passed": true,
+            "coversEntireLoadSections": true,
+            "startValid": true,
+            "endValid": true
+          }
+        ],
+        "passed": true
+      },
+      {
+        "library": "lib_x86_64_libandroidx.graphics.path.so",
+        "sha256": "4E56C996F13670E70082658DE7880C4020EABF4F25E43387F88ED78A713FC9F0",
+        "loadAlignments": [
+          16384,
+          16384,
+          16384
+        ],
+        "relroChecks": [
+          {
+            "passed": true,
+            "coversEntireLoadSections": true,
+            "startValid": true,
+            "endValid": false
+          }
+        ],
+        "passed": true
+      },
+      {
+        "library": "lib_x86_64_libmaplibre.so",
+        "sha256": "C1104B8F0A456A22D6539538666E234561CA17608BA1A778F572A2D15058E09E",
+        "loadAlignments": [
+          16384,
+          16384,
+          16384
+        ],
+        "relroChecks": [
+          {
+            "passed": true,
+            "coversEntireLoadSections": true,
+            "startValid": true,
+            "endValid": true
+          }
+        ],
+        "passed": true
+      }
+    ],
+    "officialInstructions": "https://developer.android.com/guide/practices/page-sizes",
+    "relroCheckSource": "https://android.googlesource.com/platform/tools/base/+/7765a1e4385997e1919311925a88cbd12218f818/sdk-common/src/main/java/com/android/ide/common/pagealign/PageAlignUtils.kt",
+    "device16KB": "Not run; connected phone reports 4096-byte pages"
   },
   "tests": {
     "unitTests": 6,
     "unitFailures": 0,
     "unitErrors": 0,
-    "physicalDevice": "Samsung A34 SM-A346E, Android 16",
-    "deviceFlows": 8,
-    "deviceFailures": 0,
-    "deviceSkipped": 0,
-    "deviceRunner": "AndroidJUnitRunner through ADB; final run OK (8 tests)",
-    "verified": [
-      "MapLibre pin opens centre details",
-      "Directory search, filters and zero-result recovery",
-      "Saved daily entries appear on Today",
-      "Edit and delete persisted entries",
-      "Person isolation and Room reopen",
-      "Conversation review and exact note versions",
-      "Draft retention and activity recreation",
-      "Real account sign-in and saved cloud task on Today",
-      "Authenticated create, read, update and delete",
-      "Read-only sharing, conflict rejection, invitation reuse rejection and membership revocation",
-      "Sign-out clears saved session and survives app cold start"
-    ]
+    "unitSkipped": 0,
+    "unitReportTimestamp": "2026-10-10T11:24:52.703Z",
+    "unitReport": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.NoteRulesTest.xml",
+    "physicalDevice": "Samsung A34 SM-A346E, Android 16/API 36",
+    "deviceCurrentEvidence": "Signed release installed successfully for user 0; package manager confirms in.wedevit.sahara, versionCode 3, versionName 0.3.0, minSdk 26, targetSdk 36",
+    "deviceInteractiveVerification": "Not performed for 0.3.0: keyguard is showing and input is restricted. No lock bypass attempted.",
+    "previousPackagePreserved": "in.wedevit.healthathon.development and its test package remain installed; no app data was cleared"
   },
-  "backend": {
-    "provider": "Existing Supabase project",
-    "migrationsApplied": 4,
-    "rowPermissionChecks": "passed using rolled-back synthetic fixtures",
-    "temporaryAuthAccountsRemaining": 0,
-    "clinicianCredentials": "not verified",
-    "emailConfirmationDelivery": "not verified",
-    "accountRecoveryAndDeletion": "not implemented",
-    "sharedProjectPasswordProtection": "Leaked-password protection is disabled; existing shared project setting was not changed"
-  },
-  "centres": {
-    "renderer": "MapLibre Native 13.6.1",
-    "mapStyle": "OpenFreeMap Liberty",
-    "directorySource": "https://palliumindia.org/clinics/karnataka",
-    "listed": 33,
-    "checkedMapPins": 9,
-    "addressOnly": 24,
-    "stock": "Directory listing does not establish current medicine stock"
-  },
-  "screenshots": [
-    "verification/today.png",
-    "verification/nearby.png",
-    "verification/care.png",
-    "verification/centre-map.png",
-    "verification/checkin.png",
-    "verification/more.png",
-    "verification/today-saved.png",
-    "verification/account-today.png"
-  ],
-  "installed": "Final 0.2.0 debug APK installed and cold-launched on the connected phone; original unsigned-in records preserved",
+  "privacyPolicyUrl": "https://sahara.wedevit.in/privacy",
+  "accountDeletionUrl": "https://sahara.wedevit.in/delete-account",
+  "screenshots": [],
+  "installed": "Sahara-0.3.0-release.apk installed alongside the old app. Installation is verified; interactive launch, current screenshots and release flows remain unverified.",
   "notVerified": [
-    "Email confirmation delivery and app redirect",
+    "Google Play AAB acceptance, closed testing availability or tester opt-ins",
+    "Interactive 0.3.0 device flows and fresh Play screenshots while phone is locked",
+    "16 KB device runtime",
+    "Confirmation email delivery, app redirect and account recovery",
     "Live microphone recording and playback",
-    "AI transcription",
-    "Shared centre-report uploads in Android",
-    "Medicine notifications",
-    "Older Android devices",
-    "Patient or clinician field use",
-    "Optimized release runtime on a device"
+    "AI transcription, medicine notifications and shared centre-report uploads in Android",
+    "Patient or clinician field use"
   ],
-  "playSubmission": "Not uploaded. Final branding, permanent package, upload signing, account eligibility, public privacy policy and health/data declarations remain pending."
+  "playSubmission": "Signed AAB is ready. Play Console submission is managed separately; this Android verification does not establish upload or closed testing acceptance.",
+  "previousRelease": {
+    "verifiedAt": "2026-10-09T22:56:29.4719291+05:30",
+    "applicationId": "in.wedevit.healthathon.development",
+    "version": "0.2.0",
+    "versionCode": 2,
+    "artifacts": [
+      {
+        "filename": "Healthathon-Android-0.2.0.apk",
+        "bytes": 69456861,
+        "sha256": "9E1BAF8216A873342A07DE9254F667529B81050DBA195151C708C99B903A1479"
+      },
+      {
+        "filename": "Healthathon-Android-0.2.0-unsigned.aab",
+        "bytes": 22165240,
+        "sha256": "55A8D336B71DD87295E0FF2D05D0E3EE6E70F6F92EA8453933CF2BC4198E138C"
+      }
+    ],
+    "build": {
+      "debugApk": "passed",
+      "releaseBundle": "passed, unsigned",
+      "lintErrors": 0,
+      "lintWarnings": 16,
+      "lintWarningsDetail": "Dependency update notices, bitmap density placement and optional Kotlin extensions",
+      "releaseBuildNote": "Final release succeeded with a 1024 MB heap and one processor after host memory exhaustion during the initial packaging attempt"
+    },
+    "tests": {
+      "unitTests": 6,
+      "unitFailures": 0,
+      "unitErrors": 0,
+      "physicalDevice": "Samsung A34 SM-A346E, Android 16",
+      "deviceFlows": 8,
+      "deviceFailures": 0,
+      "deviceSkipped": 0,
+      "deviceRunner": "AndroidJUnitRunner through ADB; final run OK (8 tests)",
+      "verified": [
+        "MapLibre pin opens centre details",
+        "Directory search, filters and zero-result recovery",
+        "Saved daily entries appear on Today",
+        "Edit and delete persisted entries",
+        "Person isolation and Room reopen",
+        "Conversation review and exact note versions",
+        "Draft retention and activity recreation",
+        "Real account sign-in and saved cloud task on Today",
+        "Authenticated create, read, update and delete",
+        "Read-only sharing, conflict rejection, invitation reuse rejection and membership revocation",
+        "Sign-out clears saved session and survives app cold start"
+      ]
+    },
+    "backend": {
+      "provider": "Existing Supabase project",
+      "migrationsApplied": 4,
+      "rowPermissionChecks": "passed using rolled-back synthetic fixtures",
+      "temporaryAuthAccountsRemaining": 0,
+      "clinicianCredentials": "not verified",
+      "emailConfirmationDelivery": "not verified",
+      "accountRecoveryAndDeletion": "not implemented",
+      "sharedProjectPasswordProtection": "Leaked-password protection is disabled; existing shared project setting was not changed"
+    },
+    "centres": {
+      "renderer": "MapLibre Native 13.6.1",
+      "mapStyle": "OpenFreeMap Liberty",
+      "directorySource": "https://palliumindia.org/clinics/karnataka",
+      "listed": 33,
+      "checkedMapPins": 9,
+      "addressOnly": 24,
+      "stock": "Directory listing does not establish current medicine stock"
+    },
+    "screenshots": [
+      "verification/today.png",
+      "verification/nearby.png",
+      "verification/care.png",
+      "verification/centre-map.png",
+      "verification/checkin.png",
+      "verification/more.png",
+      "verification/today-saved.png",
+      "verification/account-today.png"
+    ],
+    "installed": "Final 0.2.0 debug APK installed and cold-launched on the connected phone; original unsigned-in records preserved",
+    "notVerified": [
+      "Email confirmation delivery and app redirect",
+      "Live microphone recording and playback",
+      "AI transcription",
+      "Shared centre-report uploads in Android",
+      "Medicine notifications",
+      "Older Android devices",
+      "Patient or clinician field use",
+      "Optimized release runtime on a device"
+    ],
+    "playSubmission": "Not uploaded. Final branding, permanent package, upload signing, account eligibility, public privacy policy and health/data declarations remain pending."
+  }
 }

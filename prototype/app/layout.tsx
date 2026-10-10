@@ -50,7 +50,7 @@ const sora = Sora({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://continuity-loop-healthathon.vercel.app'),
+  metadataBase: new URL('https://sahara.wedevit.in'),
   title: 'Sahara - A Palliative Care Companion',
   description:
     'Coordinate family tasks and visits, prepare for goals-of-care conversations, and find palliative care with Sahara.',

@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Sahara</string>
-    <string name="app_full_name">Sahara: Palliative Care</string>
+    <string name="app_full_name">Sahara — A Palliative Care Companion</string>
+    <string name="privacy_url">https://sahara.wedevit.in/privacy</string>
+    <string name="delete_account_url">https://sahara.wedevit.in/delete-account</string>
     <string name="share_care_invitation">Open %1$s, sign in, then choose Join someone\'s care. Your invitation code:\n%2$s</string>
 </resources>
