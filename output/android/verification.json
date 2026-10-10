@@ -1,5 +1,5 @@
 {
-  "verifiedAt": "2026-10-10T17:12:58.3851731+05:30",
+  "verifiedAt": "2026-10-10T17:55:32.7630546+05:30",
   "applicationId": "in.wedevit.sahara",
   "appName": "Sahara",
   "fullProductName": "Sahara — A Palliative Care Companion",
@@ -11,20 +11,28 @@
     {
       "filename": "Sahara-0.3.0-release.apk",
       "bytes": 51236946,
-      "sha256": "21DC8455F28EC844A00E943F67715B65DFF9DD47EA748EB92CB4685983069097"
+      "sha256": "BF76DA985AC83A300457780CEF1D0D3F62A0C432B35D9E408195E3FD186CC13D",
+      "lastWriteTime": "2026-10-10T17:52:52.2207316+05:30"
     },
     {
       "filename": "Sahara-0.3.0.aab",
-      "bytes": 22178819,
-      "sha256": "AFA21E7DDD78C62C32CB109B7CC25A4A110519D942FAD20A11E60ADBE5F26120"
+      "bytes": 22179650,
+      "sha256": "EB0A14F7CE245230BE356A7737B952CF2B799A8895A009CA24A2C53242991589",
+      "lastWriteTime": "2026-10-10T17:53:02.8149349+05:30"
     }
   ],
   "build": {
-    "releaseApk": "Signed, optimized APK built and independently verified",
-    "releaseBundle": "Signed Android App Bundle built and jarsigner verified",
+    "releaseApk": "Fresh signed, optimized APK built and independently verified after the account callback/recovery changes",
+    "releaseBundle": "Fresh signed Android App Bundle built and jarsigner verified",
     "releaseVitalLint": "passed",
-    "debugApk": "Matching source debug APK built; device UI tests not run because the phone is locked",
-    "releaseBuildNote": "Six unit tests and Kotlin compilation passed. R8 required a 1024 MB heap after the 768 MB attempt exhausted heap. Missing offline lint/test artifacts were copied from the existing C: dependency cache. No checks or optimization were disabled."
+    "debugApk": "Matching-source debug and instrumentation APKs built; targeted real-account sign-in test passed on Samsung A34",
+    "releaseBuildNote": "Kotlin compilation completed. The combined build retained too much compiler heap during R8, so only the owned single-use daemon was stopped. R8 then passed in a fresh 1024 MB process; signing, packaging and vital lint passed separately in a 768 MB process. No checks or optimization were disabled.",
+    "successfulLogs": [
+      "android/sahara-auth-debug-build.log",
+      "android/sahara-auth-test-build.log",
+      "android/sahara-auth-optimize.log",
+      "android/sahara-auth-package.log"
+    ]
   },
   "signing": {
     "apkScheme": "APK Signature Scheme v2",
@@ -124,7 +132,10 @@
     ],
     "officialInstructions": "https://developer.android.com/guide/practices/page-sizes",
     "relroCheckSource": "https://android.googlesource.com/platform/tools/base/+/7765a1e4385997e1919311925a88cbd12218f818/sdk-common/src/main/java/com/android/ide/common/pagealign/PageAlignUtils.kt",
-    "device16KB": "Not run; connected phone reports 4096-byte pages"
+    "device16KB": "Not run; connected phone reports 4096-byte pages",
+    "checkedAt": "2026-10-10T17:55:32.7630546+05:30",
+    "checkedApkSha256": "BF76DA985AC83A300457780CEF1D0D3F62A0C432B35D9E408195E3FD186CC13D",
+    "freshBinaryEvidence": "Fresh APK passed zipalign -c -P 16 4. Each of its four 64-bit native libraries was SHA-256 matched against the exact previously inspected LOAD/RELRO binaries shown below; all four match."
   },
   "tests": {
     "unitTests": 6,
@@ -133,20 +144,63 @@
     "unitSkipped": 0,
     "unitReportTimestamp": "2026-10-10T11:24:52.703Z",
     "unitReport": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.NoteRulesTest.xml",
+    "unitEvidenceScope": "Six NoteRules tests passed earlier on 2026-10-10 before the auth-only change. NoteRules source is unchanged; these tests were not rerun for this rebuild.",
     "physicalDevice": "Samsung A34 SM-A346E, Android 16/API 36",
-    "deviceCurrentEvidence": "Signed release installed successfully for user 0; package manager confirms in.wedevit.sahara, versionCode 3, versionName 0.3.0, minSdk 26, targetSdk 36",
-    "deviceInteractiveVerification": "Not performed for 0.3.0: keyguard is showing and input is restricted. No lock bypass attempted.",
-    "previousPackagePreserved": "in.wedevit.healthathon.development and its test package remain installed; no app data was cleared"
+    "deviceCurrentEvidence": "Fresh signed release 0.3.0/code 3 installed successfully at 2026-10-10 17:54:07 local time. Interactive auth verification ran on the matching-source debug build.",
+    "deviceInteractiveVerification": "The targeted real-account sign-in test passed with no skips. Saved cloud records appeared on Today and survived activity recreation. The six earlier local flows are preserved under preAuthChangeVerification; they were not rerun after the auth-only change.",
+    "previousPackagePreserved": "in.wedevit.healthathon.development and its test package remain installed; no app data was cleared",
+    "deviceFlows": 1,
+    "deviceFailures": 0,
+    "deviceSkipped": 0,
+    "deviceRunner": "CareFlowTest#signInLoadsAccountRecordsOnToday through AndroidJUnitRunner; output OK (1 test), Time: 9.995",
+    "deviceTestCompletedAt": "2026-10-10T17:39:40.4074255+05:30",
+    "deviceLog": "Private QA log retained outside the repository; credentials and account screenshots are not public artifacts",
+    "debugApkSha256": "5C777A4CF4C786070E01FE5895A4C41EAD64FCB552A11CA3DA0534E1B266D8DE",
+    "testApkSha256": "11B8FF0C7557535FE052D28156C684EC463654722401C3DFDF4CF51B9BF23A70",
+    "sourceHashes": {
+      "CareCloudKt": "D54878E8342999BA120AE559944F77308B6B3168F58EB2757EC3E9599543D492",
+      "CareAccountKt": "B08F361B2660648F8F49E3D782B14F4A55C7E8619C6BC6810B11033ADBC1C4F7",
+      "CareFlowTestKt": "F76FB57DEA028D565FBA43A57A18E2CF7B7024590FEC7ADF27808801DA955AB8"
+    },
+    "verified": [
+      "Real reviewer sign-in loads the synthetic account person and saved task on Today",
+      "The cloud task remains visible after activity recreation",
+      "Sign in, Forgot password and Privacy policy are reachable with the Samsung keyboard open; password remains masked",
+      "Account sheet and saved Today screenshots were inspected privately; navigation/status areas and bottom controls remain usable"
+    ],
+    "fixtureCleanup": {
+      "scope": "Only the generated synthetic person and local test fixtures were removed; old app/data were preserved",
+      "confirmation": "Parent agent authenticated as the same reviewer and verified GET /healthathon_people?select=id,name returned HTTP 200 with exact JSON [] after the test",
+      "recordsRemaining": 0,
+      "verificationSession": "Parent verification session signed out with local scope"
+    }
   },
   "privacyPolicyUrl": "https://sahara.wedevit.in/privacy",
   "accountDeletionUrl": "https://sahara.wedevit.in/delete-account",
-  "screenshots": [],
-  "installed": "Sahara-0.3.0-release.apk installed alongside the old app. Installation is verified; interactive launch, current screenshots and release flows remain unverified.",
+  "serverAccountClosure": {
+    "migration": "20261010123354_sahara_account_closure",
+    "appliedOn": "2026-10-10",
+    "checks": "Rollback regression passed: service-only authority, private marker, atomic deletion and cascades, shared identity and other-owner preservation, existing-token denial, invitation preservation, ordinary editor flow, idempotency and marker lifecycle.",
+    "scope": "Installs support capability only. No real account was closed. The private marker contains Auth UUID and closure time and follows later Auth deletion.",
+    "cleanup": "People, memberships, records, invites, closure markers and the three temporary test Auth users all returned to zero.",
+    "activeAccountCheck": "Dedicated reviewer sign-in and authenticated people read still returned HTTP 200 with an empty list after migration; the temporary session signed out with HTTP 204."
+  },
+  "screenshots": [
+    "play-listing/screenshots/care.png",
+    "play-listing/screenshots/centre-map.png",
+    "play-listing/screenshots/checkin.png",
+    "play-listing/screenshots/more.png",
+    "play-listing/screenshots/nearby.png",
+    "play-listing/screenshots/today-saved.png",
+    "play-listing/screenshots/today.png"
+  ],
+  "installed": "Fresh signed Sahara 0.3.0/code 3 APK installed successfully alongside the old Healthathon app. No release UI flow was exercised; the targeted auth flow passed on matching-source debug.",
   "notVerified": [
     "Google Play AAB acceptance, closed testing availability or tester opt-ins",
-    "Interactive 0.3.0 device flows and fresh Play screenshots while phone is locked",
-    "16 KB device runtime",
-    "Confirmation email delivery, app redirect and account recovery",
+    "Interactive verification of the optimized 0.3.0 release binary; current auth device check used matching-source debug",
+    "16 KB device runtime; Samsung reports 4096-byte pages",
+    "Current-release cross-account sharing on the phone; SQL sharing and closure regression passed separately, and earlier 0.2.0 phone evidence is preserved under previousRelease",
+    "Confirmation/recovery email delivery and full confirmation or recovery callback flow from the phone; reset email was not triggered by this test",
     "Live microphone recording and playback",
     "AI transcription, medicine notifications and shared centre-report uploads in Android",
     "Patient or clinician field use"
@@ -241,5 +295,186 @@
       "Optimized release runtime on a device"
     ],
     "playSubmission": "Not uploaded. Final branding, permanent package, upload signing, account eligibility, public privacy policy and health/data declarations remain pending."
+  },
+  "screenshotProvenance": {
+    "capturedAt": "2026-10-10T17:22:58.6390317+05:30",
+    "device": "Samsung A34 SM-A346E, Android 16/API 36",
+    "sourcePackage": "in.wedevit.sahara.development",
+    "version": "0.3.0",
+    "versionCode": 3,
+    "debugApkSha256": "56161572107FA7B6BA4C62CD48A0C538D2ACE7CB216D71B39B9E2DD53F5D27B7",
+    "testApkSha256": "FDAB2DDF2BEA1F91819C3B77A1C5B382C4FF376D8F2A4747CB61E2D448994348",
+    "method": "Existing developer instrumentation tests captured real displayed UI. No adb input, lock bypass, generated screen content or manual screenshot alteration.",
+    "reason": "The signed release uses FLAG_SECURE to protect care records, so screenshot evidence comes from the matching-source debug build.",
+    "data": "Synthetic Test Person fixtures only; test-created records are cleaned up by the test suite",
+    "visuallyInspected": true,
+    "sourceScope": "These listing screenshots came from the dated pre-auth-change 0.3.0 debug build. The account callback/Forgot password changes do not affect their pictured local care screens. Fresh account screenshots are private QA only."
+  },
+  "screenshotEvidence": [
+    {
+      "file": "play-listing/screenshots/care.png",
+      "width": 1080,
+      "height": 2340,
+      "bytes": 101041,
+      "sha256": "606CAB59155D92EC75014F2D27855828C317BB5FD3A6F9CEE1BAD3D2324A428F",
+      "recommendedForListing": true,
+      "note": "Real device screenshot with synthetic test records; visually inspected"
+    },
+    {
+      "file": "play-listing/screenshots/centre-map.png",
+      "width": 1080,
+      "height": 2340,
+      "bytes": 198603,
+      "sha256": "5AE654695250BE34C5EF973C7FC1E8B7A30601634C1B10B0E6DF32374E228592",
+      "recommendedForListing": true,
+      "note": "Real device screenshot with synthetic test records; visually inspected"
+    },
+    {
+      "file": "play-listing/screenshots/checkin.png",
+      "width": 1080,
+      "height": 2340,
+      "bytes": 184462,
+      "sha256": "199B0D7FBA34FC19DAC837C707BFD76B5076E2B6DA3E6424A47B82AEF53A4817",
+      "recommendedForListing": true,
+      "note": "Real device screenshot with synthetic test records; visually inspected"
+    },
+    {
+      "file": "play-listing/screenshots/more.png",
+      "width": 1080,
+      "height": 2340,
+      "bytes": 145925,
+      "sha256": "95570FDE5565E097A998ABE928EEC25E629B423D59C14FAEF3F64B34166C7469",
+      "recommendedForListing": false,
+      "note": "Real device screenshot with synthetic test records; visually inspected"
+    },
+    {
+      "file": "play-listing/screenshots/nearby.png",
+      "width": 1080,
+      "height": 2340,
+      "bytes": 129755,
+      "sha256": "5695F8EF2D7A201DAA10BED66CB0A02CA064A2E382B817EBD12A640E09B67C30",
+      "recommendedForListing": false,
+      "note": "Captured while map was loading; keep as QA evidence, not a listing screenshot"
+    },
+    {
+      "file": "play-listing/screenshots/today-saved.png",
+      "width": 1080,
+      "height": 2340,
+      "bytes": 211874,
+      "sha256": "6A9AD4F48887FB9323ACC78FB2B626A1EB5F2F5ABCFA1EA7B08920CE3D02E2D0",
+      "recommendedForListing": false,
+      "note": "Real device screenshot with synthetic test records; visually inspected"
+    },
+    {
+      "file": "play-listing/screenshots/today.png",
+      "width": 1080,
+      "height": 2340,
+      "bytes": 198296,
+      "sha256": "FE731DDF4789A6E095C8D16F160D4D66D3233B904058C5B8ABEF9C7180F8C7D8",
+      "recommendedForListing": true,
+      "note": "Real device screenshot with synthetic test records; visually inspected"
+    }
+  ],
+  "preAuthChangeVerification": {
+    "verifiedAt": "2026-10-10T17:22:58.6390317+05:30",
+    "sourceScope": "Sahara 0.3.0 before the Android account callback and Forgot password changes; these results remain dated evidence for the unchanged local care screens.",
+    "applicationId": "in.wedevit.sahara",
+    "version": "0.3.0",
+    "versionCode": 3,
+    "artifacts": [
+      {
+        "filename": "Sahara-0.3.0-release.apk",
+        "bytes": 51236946,
+        "sha256": "21DC8455F28EC844A00E943F67715B65DFF9DD47EA748EB92CB4685983069097"
+      },
+      {
+        "filename": "Sahara-0.3.0.aab",
+        "bytes": 22178819,
+        "sha256": "AFA21E7DDD78C62C32CB109B7CC25A4A110519D942FAD20A11E60ADBE5F26120"
+      }
+    ],
+    "build": {
+      "releaseApk": "Signed, optimized APK built and independently verified",
+      "releaseBundle": "Signed Android App Bundle built and jarsigner verified",
+      "releaseVitalLint": "passed",
+      "debugApk": "Matching-source 0.3.0 debug APK and instrumentation APK built successfully; six local native flows passed on the physical phone",
+      "releaseBuildNote": "Six unit tests and Kotlin compilation passed. R8 required a 1024 MB heap after the 768 MB attempt exhausted heap. Missing offline lint/test artifacts were copied from the existing C: dependency cache. No checks or optimization were disabled."
+    },
+    "tests": {
+      "unitTests": 6,
+      "unitFailures": 0,
+      "unitErrors": 0,
+      "unitSkipped": 0,
+      "unitReportTimestamp": "2026-10-10T11:24:52.703Z",
+      "unitReport": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.NoteRulesTest.xml",
+      "physicalDevice": "Samsung A34 SM-A346E, Android 16/API 36",
+      "deviceCurrentEvidence": "Signed release remains installed. Matching-source in.wedevit.sahara.development version 0.3.0/code 3 and its test package were installed for developer verification without removing the old app or clearing its data.",
+      "deviceInteractiveVerification": "Six local flows passed on the matching-source debug 0.3.0 build on Samsung A34 after the user unlocked it. The separate sign-in test was skipped because no account credentials were provided. This does not establish interactive verification of the optimized release binary.",
+      "previousPackagePreserved": "in.wedevit.healthathon.development and its test package remain installed; no app data was cleared",
+      "deviceFlows": 6,
+      "deviceFailures": 0,
+      "deviceSkipped": 1,
+      "deviceRunner": "Existing CareFlowTest through AndroidJUnitRunner; output OK (7 tests), six completed flows and one account test skipped by its credentials assumption",
+      "deviceLog": "android/sahara-device-verification-20261010.log",
+      "verified": [
+        "Conversation review preserves original words and exact saved version across activity recreation",
+        "Directory search/filter state and recovery from zero results; loaded MapLibre pin opens Aster CMI Hospital details",
+        "Daily task create, edit and delete appears in Today and Care",
+        "Daily check-in saves selected words and optional note, then shows the saved result on Today",
+        "Switching people keeps drafts and completed task state separate",
+        "Room database persistence and person isolation survive database reopen"
+      ]
+    },
+    "screenshotProvenance": {
+      "capturedAt": "2026-10-10T17:22:58.6390317+05:30",
+      "device": "Samsung A34 SM-A346E, Android 16/API 36",
+      "sourcePackage": "in.wedevit.sahara.development",
+      "version": "0.3.0",
+      "versionCode": 3,
+      "debugApkSha256": "56161572107FA7B6BA4C62CD48A0C538D2ACE7CB216D71B39B9E2DD53F5D27B7",
+      "testApkSha256": "FDAB2DDF2BEA1F91819C3B77A1C5B382C4FF376D8F2A4747CB61E2D448994348",
+      "method": "Existing developer instrumentation tests captured real displayed UI. No adb input, lock bypass, generated screen content or manual screenshot alteration.",
+      "reason": "The signed release uses FLAG_SECURE to protect care records, so screenshot evidence comes from the matching-source debug build.",
+      "data": "Synthetic Test Person fixtures only; test-created records are cleaned up by the test suite",
+      "visuallyInspected": true
+    }
+  },
+  "privateAccountQa": {
+    "testCompletedAt": "2026-10-10T17:39:40.4074255+05:30",
+    "sourcePackage": "in.wedevit.sahara.development",
+    "debugApkSha256": "5C777A4CF4C786070E01FE5895A4C41EAD64FCB552A11CA3DA0534E1B266D8DE",
+    "testApkSha256": "11B8FF0C7557535FE052D28156C684EC463654722401C3DFDF4CF51B9BF23A70",
+    "storage": "Private QA directory outside the repository; not Play listing assets",
+    "method": "Existing developer instrumentation test captured real phone UI. No adb input, lock bypass, generated UI or screenshot alteration.",
+    "screenshots": [
+      {
+        "filename": "private-account-keyboard.png",
+        "bytes": 169603,
+        "width": 1080,
+        "height": 2340,
+        "sha256": "03A121D60E8510841B05E8E1B72ACBB3EB4EDBFA7E34E41EE165FE514DF0DFC8",
+        "publicListing": false,
+        "visuallyInspected": true
+      },
+      {
+        "filename": "private-account-actions.png",
+        "bytes": 160873,
+        "width": 1080,
+        "height": 2340,
+        "sha256": "C5258791848805883BDF777FAF81006BCE88ADB28C026EDA0112121034A966C3",
+        "publicListing": false,
+        "visuallyInspected": true
+      },
+      {
+        "filename": "account-today.png",
+        "bytes": 143460,
+        "width": 1080,
+        "height": 2340,
+        "sha256": "0E49AB3ED95CC5E1558FE3BF9BD5E359939BCE5BC1D1F8A8DE75E21DD5FC087E",
+        "publicListing": false,
+        "visuallyInspected": true
+      }
+    ],
+    "recoveryScope": "Forgot password control reachability was checked; email delivery and reset completion were not tested."
   }
 }

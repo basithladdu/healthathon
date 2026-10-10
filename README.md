@@ -2,7 +2,7 @@
 
 **Sahara (सहारा)** is the approved name, chosen on 10 October 2026. Zeros and Ones was shortlisted for Health-a-thon 2026 Phase 2. The primary project is now native Android; the website is in `prototype/` and its earlier checkpoint is preserved in [Healthathon-Copy](https://github.com/basithladdu/Healthathon-Copy).
 
-Website: https://sahara.wedevit.in. The earlier https://saanthvana.wedevit.in address remains active for the submitted deck. Android privacy and account-deletion requests are available at `/privacy` and `/delete-account` on either address.
+Website: https://sahara.wedevit.in. The earlier https://saanthvana.wedevit.in address remains active for the submitted deck. Android privacy and account-deletion requests are available at `/privacy` and `/delete-account` on either address. `/android-account` handles email confirmation and password recovery; the exact Supabase redirect and ordinary-tester email delivery still need provider setup.
 
 ## Android
 
@@ -12,7 +12,7 @@ Also included: multiple people, prescribed-medicine lists, visits, tasks, check-
 
 The home screen shows saved visits, medicines, tasks, check-ins and journal entries. Forms use optional details, quick date choices and a single journal field. Tab position and filters survive navigation; animations follow system motion settings. Routine screens contain no demo, native-build or storage-explanation copy.
 
-Optional accounts use Supabase Auth. Signed-in people, daily entries, immutable care-note versions and exact-version confirmations are saved through the API and cached separately per account. Owners can issue one-use, three-day invitations with read or edit permission and remove members. The backend enforces those permissions and rejects conflicting edits. Refresh is available on Today and runs when the app opens. Failed saves keep the form filled. Existing unsigned-in records are not automatically uploaded. Recordings and unfinished conversations are not shared.
+Optional accounts use Supabase Auth. Signed-in people, daily entries, immutable care-note versions and exact-version confirmations are saved through the API and cached separately per account. Owners can issue one-use, three-day invitations with read or edit permission and remove members. The backend enforces those permissions and rejects conflicting edits. Refresh is available on Today and runs when the app opens. Failed saves keep the form filled. Existing unsigned-in records are not automatically uploaded. Recordings and unfinished conversations are not shared. After verifying a deletion request, support can close Sahara access and remove its owned records through the service-only `healthathon_close_account` function; a shared sign-in and other owners' records remain intact. The closure is enforced for existing tokens. Its rollback regression passed without closing any real account.
 
 Doctor/family views and reviewer names are self-entered; credentials are not verified. Recording needs microphone permission and everyone's consent and stops when the app leaves the foreground. The text organiser preserves entered words under explicit headings; it is not AI transcription or a clinical recommendation system. Care notes are not treatment orders or legal directives.
 
@@ -32,11 +32,11 @@ Use Android Studio to open `android/`, or set `ANDROID_HOME` / an ignored `andro
 
 The permanent application ID is `in.wedevit.sahara`; debug builds use `in.wedevit.sahara.development`. Release builds read the ignored `android/keystore.properties` file (`storeFile`, `storePassword`, `keyAlias`, `keyPassword`) and require an upload key. Never commit signing credentials. The previous development app remains a separate installation; its records are not migrated or removed by installing Sahara.
 
-The Play title is **Sahara: Palliative Care**. The Devit Play account was checked on 10 October and remains Personal; Google's medical-app rules require an organisation account. Account deletion/recovery, the public privacy policy and Play declarations remain release dependencies. No Play upload or release is claimed. See `android/release/store-draft.json` for the prepared listing.
+The Play title is **Sahara: Palliative Care**. The Devit Play account was checked on 10 October and remains Personal; Google's medical-app rules require an organisation account. Website ownership and its Play association are verified. Organisation conversion now needs WEDEVIT PRIVATE LIMITED's nine-digit D-U-N-S number. The privacy and deletion-request pages are live; transactional email, the recovery redirect and Play declarations remain release dependencies. No Play app, upload or testing link exists yet. See `android/release/store-draft.json` for the prepared listing.
 
 ## Website and submission
 
-- [Current website](https://saanthvana.wedevit.in/)
+- [Current website](https://sahara.wedevit.in/)
 - [Website checkpoint](https://github.com/basithladdu/healthathon/commit/735149fc4071555268ddfd053743af48f2266e76) — `SHORTLISTED`
 - [Latest saved Round 1 deck](submission/final/Saanthvana_Healthathon_2026-10-03-final.pptx)
 - [Current project context](PROJECT_CONTEXT_MAP.md) and [name shortlist](PRODUCT_NAMING.md)
@@ -50,7 +50,7 @@ npm install
 npm run dev:next
 ```
 
-The web and Android implementations currently have different integration coverage. The website's shared centre-report service is not connected to this native build; its live care-assist readiness endpoint reported `ready: false` on 9 October. AI transcription, shared hospital-report uploads and medicine notifications remain Android work. Email confirmation delivery, recovery and account deletion still need completion before public account rollout; the successful account checks use disposable verified test accounts. The shared Supabase project also has leaked-password protection disabled: [configuration guidance](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection). Do not use a build result as evidence that these services work.
+The web and Android implementations currently have different integration coverage. The website's shared centre-report service is not connected to this native build; its live care-assist readiness endpoint reported `ready: false` on 9 October. AI transcription, shared hospital-report uploads and medicine notifications remain Android work. A dedicated reviewer account has confirmed email, API access and a successful Samsung sign-in/load/reopen check. Ordinary tester signup still needs transactional SMTP because Supabase's default mailer sends only to project-team addresses. Recovery has 11 focused passing checks and a deployed, mobile-checked callback page, but the redirect allowlist and end-to-end delivery remain pending. The shared Supabase project also has leaked-password protection disabled: [configuration guidance](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection). Build results do not establish live service behavior.
 
 ## Team
 

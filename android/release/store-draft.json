@@ -29,21 +29,26 @@
     "note": "Recheck against the final release binary and Google Play definitions before submitting the form. Any AI, sync or account integration changes these answers."
   },
   "releaseDependencies": [
-    "Verify confirmation-email delivery and redirects; complete account recovery before public release",
-    "Exercise the support team's account-deletion process with a synthetic account; the public request page is live",
-    "Resolve Play account type: inspected account is named WEDEVIT PRIVATE LIMITED but marked Personal; check organisation eligibility for this medical app",
-    "Create the Play listing, complete content and health declarations, provide review-only account credentials, and capture final branded phone screenshots",
+    "Approve and save the exact deployed Sahara confirmation/recovery callback, then configure transactional SMTP and verify end-to-end delivery for ordinary testers; the default Supabase mail service is limited to project-team addresses",
+    "Complete Play organisation verification: website ownership and association are verified; the next required field is the company's nine-digit D-U-N-S number",
+    "Create the Play listing, complete content and health declarations, and provide the confirmed review-only account from private release credentials",
     "Upload signed AAB and verify Google's acceptance",
     "If applicable to the account, enrol at least 12 testers continuously for 14 days, then apply for production access; this does not guarantee approval"
   ],
   "listingAssets": {
     "icon": "output/android/play-listing/icon-512.png",
     "featureGraphic": "output/android/play-listing/feature-graphic-1024x500.png",
-    "phoneScreenshots": "Pending capture of the current Android build; the earlier Saanthvana screenshots are historical evidence"
+    "phoneScreenshots": [
+      "output/android/play-listing/screenshots/today.png",
+      "output/android/play-listing/screenshots/checkin.png",
+      "output/android/play-listing/screenshots/care.png",
+      "output/android/play-listing/screenshots/centre-map.png"
+    ],
+    "screenshotEvidence": "Raw 1080 x 2340 captures from the matching-source 0.3.0 debug build on Samsung A34, using synthetic Test Person records. The signed release protects screenshots with FLAG_SECURE. The nearby.png loading-state capture is QA evidence only and is not a listing asset."
   },
   "appContentDraft": {
     "containsAds": false,
-    "appAccess": "Some functionality is restricted. Basic notes, daily care and the directory work without sign-in; account sync and invitations require sign-in. Supply an active review-only account before submission.",
+    "appAccess": "Some functionality is restricted. Basic notes, daily care and the directory work without sign-in; account sync and invitations require sign-in. A dedicated reviewer account has confirmed email, successful password sign-in and an authorised empty care-record read. Its credentials are private and must be entered in Play's restricted reviewer instructions before submission.",
     "reviewInstructions": "Open the app and add a person. Today shows daily care. Talk starts a goals-of-care conversation; Care shows saved versions. Nearby opens the Karnataka directory. To review account features, open Your account, sign in with the supplied review credentials, add a person and open Your account again to create or join a care invitation. Doctor is a self-selected role, not a verified credential.",
     "targetAudienceProposal": "18 and over: adult patients, family caregivers and care professionals",
     "healthApp": true,
@@ -79,13 +84,15 @@
     "website": "https://sahara.wedevit.in",
     "legacyWebsitePreserved": "https://saanthvana.wedevit.in",
     "privacyAndDeletionPages": "HTTP 200, rendered and checked at 390px on 10 October 2026",
-    "websiteDeployment": "dpl_FEqrJMbrmpKCsUo9dkN62cLQxV8o",
-    "websiteChecks": "43 selected merged medicine-organiser and handover checks passed; remote Next.js build and TypeScript check passed",
+    "websiteDeployment": "dpl_DUiaFHxeZ8Y8eGvXfi2Z7kYvPYyQ",
+    "websiteChecks": "43 selected merged medicine-organiser and handover checks passed before the account-page change. The account flow passed 11 focused checks, scoped ESLint and TypeScript. The fresh remote Next.js build and TypeScript passed. Both domains return the new account page with no-store, no-referrer and frame protection; desktop and 390px missing/expired-link views passed visual and overflow checks.",
+    "accountRecovery": "https://sahara.wedevit.in/android-account is deployed. Supabase's exact redirect allowlist and transactional SMTP remain pending; no end-to-end reset-email claim.",
     "androidPackage": "in.wedevit.sahara; version 0.3.0 (3), signed and installed alongside the old app on Samsung A34",
-    "androidChecks": "Six unit checks passed; APK/AAB signatures and static 16 KB ZIP/ELF alignment passed. Interactive release verification and current phone screenshots await phone unlock.",
+    "androidChecks": "Six unit checks passed; APK/AAB signatures and static 16 KB ZIP/ELF alignment passed. On 10 October, six local flows passed on Samsung A34 against the matching-source debug build; one credential-dependent sign-in test was initially skipped. Current phone screenshots were captured. After the auth redirect/recovery change, the focused reviewer sign-in, cloud-record load and reopen check passed with no skips. The fresh signed APK/AAB passed vital lint, signature and static 16 KB ZIP/native checks; the signed APK was installed on Samsung A34. Optimized release interaction and a 16 KB runtime are not verified.",
     "uploadBundle": "output/android/Sahara-0.3.0.aab",
-    "uploadBundleSha256": "AFA21E7DDD78C62C32CB109B7CC25A4A110519D942FAD20A11E60ADBE5F26120",
-    "playAccount": "Personal; organisation conversion remains gated on website verification",
+    "uploadBundleSha256": "EB0A14F7CE245230BE356A7737B952CF2B799A8895A009CA24A2C53242991589",
+    "playAccount": "Personal. Search Console ownership and the Play website association are verified. Organisation conversion now requires WEDEVIT PRIVATE LIMITED's nine-digit D-U-N-S number; no existing business payments profile was offered.",
+    "accountClosure": "Applied sahara_account_closure (20261010123354). Service-only closure removes Sahara-owned care data and memberships atomically, blocks existing JWTs, and preserves shared Auth identities and other owners. Rollback regression passed; no real accounts were closed and all fixture counts returned to zero. Public policy describes the private account-ID/closure-date marker.",
     "invitations": "Not sent. Send to the full existing tester list only after the closed-testing opt-in link is live."
   },
   "sources": {

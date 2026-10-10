@@ -128,6 +128,11 @@ export default function PrivacyPage() {
             shared account details before completing the request.
           </p>
           <p>
+            If another service still needs your sign-in, we keep only its account ID and
+            the Sahara closure date to keep Sahara access closed. This marker is removed
+            when that shared sign-in is deleted.
+          </p>
+          <p>
             We keep information while it is needed to provide your account and care records.
             We keep support correspondence while handling your request. If any information
             must be retained for a legal or security reason, we will tell you what is kept,

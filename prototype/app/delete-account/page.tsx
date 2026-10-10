@@ -57,6 +57,11 @@ export default function DeleteAccountPage() {
             If your sign-in is also used for another service, we handle Sahara data
             separately and explain any shared account details before completing the request.
           </p>
+          <p>
+            If another service still needs your sign-in, we keep only its account ID and
+            the Sahara closure date to keep Sahara access closed. This marker is removed
+            when that shared sign-in is deleted.
+          </p>
         </section>
 
         <section aria-labelledby="copies">
