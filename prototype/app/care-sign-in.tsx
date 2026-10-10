@@ -4,6 +4,7 @@ import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
 import { CareArt, type CareArtKind } from './care-art';
 import { CareLoading } from './care-loading';
 import './care-sign-in.css';
+import { SaharaLogo } from './sahara-logo';
 
 export type CareSignInInput = { role: 'family' | 'patient' | 'doctor'; patientId: string; name: string };
 export type CareSignInProps = {
@@ -98,7 +99,7 @@ export function CareSignIn({ patients, hindi, onLanguage, onSignIn }: CareSignIn
 
   return <div className="care-sign-in" lang={hindi ? 'hi' : 'en'}>
     <header className="care-sign-in-header">
-      <span className="care-sign-in-brand"><svg viewBox="0 0 36 36" fill="none" aria-hidden="true"><rect width="36" height="36" rx="12" fill="#267E72" /><path d="M18 27C14 24 8 19 8 14a6 6 0 0 1 10-4 6 6 0 0 1 10 4c0 5-6 10-10 13Z" fill="#FFE0A0" /><path d="M18 27V17" stroke="#267E72" strokeWidth="2" strokeLinecap="round" /></svg>{t('Sahara', 'सहारा')}</span>
+      <span className="care-sign-in-brand"><SaharaLogo className="care-sign-in-logo" priority /><span><strong>{t('Sahara', 'सहारा')}</strong><small>{t('- A Palliative Care Companion', '- पैलिएटिव केयर साथी')}</small></span></span>
       <button type="button" className="care-sign-in-language" onClick={onLanguage} lang={hindi ? 'en' : 'hi'}>{hindi ? 'English' : 'हिन्दी'}</button>
     </header>
     <main className="care-sign-in-main">

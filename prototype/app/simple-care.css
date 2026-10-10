@@ -1,7 +1,11 @@
 .simple-care-app { min-height: 100svh; background: #f6f5f0; color: #183f32; }
 .simple-care-header, .simple-care-nav, .simple-care-content, .simple-care-footer { width: min(1180px, 100%); margin-inline: auto; padding-inline: 36px; }
 .simple-care-header { min-height: 84px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
-.simple-care-brand { font: 700 26px var(--font-sora), sans-serif; letter-spacing: -1px; color: #123f32; background: none; border: 0; padding: 8px 0; min-height: 44px; cursor: pointer; }
+.simple-care-brand { display: flex; align-items: center; gap: 9px; color: #123f32; background: none; border: 0; padding: 8px 0; min-height: 44px; cursor: pointer; }
+.simple-care-brand-logo { width: 44px; height: 44px; flex: none; object-fit: contain; }
+.simple-care-brand-copy { display: grid; justify-items: start; gap: 2px; }
+.simple-care-brand-name { font: 700 26px/1 var(--font-sora), sans-serif; letter-spacing: -1px; }
+.simple-care-brand-tagline { font: 600 10px/1.25 var(--font-inter), sans-serif; letter-spacing: .02em; color: #657469; }
 .simple-care-switches { display: flex; align-items: center; gap: 12px; }
 .simple-care-switches > button, .simple-care-switches select, .doctor-note-review > .family-workspace-heading select { min-height: 44px; border: 1px solid #c6d0c3; border-radius: 8px; padding: 8px 12px; color: #183f32; background: transparent; font: inherit; font-size: 14px; cursor: pointer; }
 .simple-care-nav { display: flex; gap: 28px; border-bottom: 1px solid #d3dace; }
@@ -68,7 +72,9 @@
 @media (max-width: 700px) {
   .simple-care-header, .simple-care-nav, .simple-care-content, .simple-care-footer { padding-inline: 18px; }
   .simple-care-header { min-height: 74px; gap: 6px 10px; flex-wrap: wrap; padding-block: 8px; }
-  .simple-care-brand { font-size: 20px; letter-spacing: -.7px; }
+  .simple-care-brand-name { font-size: 20px; letter-spacing: -.7px; }
+  .simple-care-brand-tagline { max-width: 138px; font-size: 8px; }
+  .simple-care-brand-logo { width: 36px; height: 36px; }
   .simple-care-switches { gap: 6px; }
   .simple-care-switches > button, .simple-care-switches select { padding-inline: 8px; font-size: 13px; }
   .simple-care-nav { gap: 26px; }

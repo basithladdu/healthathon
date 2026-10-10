@@ -225,7 +225,7 @@ function DocumentSearchForPatient({ patientId, author, hindi, reports, documents
     setMessage(t('Document restored.', 'दस्तावेज़ वापस आ गया।')); setError('');
   }
   function download() {
-    const content = ['SAHARA — DOCUMENT EXCERPTS', `${t('Question', 'सवाल')}: ${submitted}`,
+    const content = ['SAHARA — A PALLIATIVE CARE COMPANION', 'DOCUMENT EXCERPTS', `${t('Question', 'सवाल')}: ${submitted}`,
       ...matches.map(({ report, recordedBy, excerpts }) => [report.file.name, `${t('Document date', 'दस्तावेज़ की तारीख')}: ${report.date}`, `${t('Text recorded by', 'टेक्स्ट दर्ज करने वाले')}: ${recordedBy}`, ...excerpts.map((excerpt) => `${excerpt.page ? `${t('Page', 'पृष्ठ')} ${excerpt.page} · ` : ''}${t('Text line', 'टेक्स्ट पंक्ति')} ${excerpt.line}\n${excerpt.text}`)].join('\n')),
     ].join('\n\n');
     const url = URL.createObjectURL(new Blob([content], { type: 'text/plain;charset=utf-8' }));

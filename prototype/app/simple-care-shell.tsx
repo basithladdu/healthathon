@@ -5,6 +5,7 @@ import type { SummaryRelease } from './summary-state';
 import { CareRouteLink } from './care-route-link';
 import type { CareView } from './care-routes';
 import { careSectionFor } from './care-section-pages';
+import { SaharaLogo } from './sahara-logo';
 
 export function SimpleCareShell({ children, view, role, hindi, saveStatus, onNavigate, onRole, onLanguage, onSignOut }: {
   children: ReactNode; view: string; role: 'family' | 'patient' | 'doctor'; hindi: boolean;
@@ -18,7 +19,10 @@ export function SimpleCareShell({ children, view, role, hindi, saveStatus, onNav
     : [{ key: 'daily-care', label: t('Home', 'होम') }, { key: 'clinical-documents', label: t('My documents', 'दस्तावेज़') }, { key: 'access-care', label: t('Find support', 'मदद') }, { key: 'my-space', label: t('My space', 'मेरी जगह') }, { key: 'doctor-pack', label: t('Visit pack', 'मुलाक़ात की फ़ाइल') }] as const;
   return <div className="simple-care-app">
     <header className="simple-care-header">
-      <CareRouteLink className="simple-care-brand" view={role === 'doctor' ? 'home' : 'daily-care'} onOpen={() => onNavigate(role === 'doctor' ? 'home' : 'daily-care')}>{t('Sahara', 'सहारा')}</CareRouteLink>
+      <CareRouteLink className="simple-care-brand" view={role === 'doctor' ? 'home' : 'daily-care'} onOpen={() => onNavigate(role === 'doctor' ? 'home' : 'daily-care')} aria-label={t('Sahara - A Palliative Care Companion', 'सहारा - पैलिएटिव केयर साथी')}>
+        <SaharaLogo className="simple-care-brand-logo" priority />
+        <span className="simple-care-brand-copy"><span className="simple-care-brand-name">{t('Sahara', 'सहारा')}</span><span className="simple-care-brand-tagline">{t('- A Palliative Care Companion', '- पैलिएटिव केयर साथी')}</span></span>
+      </CareRouteLink>
       <div className="simple-care-switches"><button type="button" onClick={onLanguage} lang={hindi ? 'en' : 'hi'}>{hindi ? 'English' : 'हिन्दी'}</button>
         <select aria-label={t('View as', 'किसका पेज')} value={role} onChange={(event) => onRole(event.target.value as typeof role)}>
           <option value="patient">{t('Patient', 'मरीज़')}</option><option value="family">{t('Family', 'परिवार')}</option><option value="doctor">{t('Doctor', 'डॉक्टर')}</option>
@@ -38,7 +42,7 @@ export function FamilyCareNote({ patientName, release, fields, onPrepare, hindi 
   const t = (en: string, hi: string) => hindi ? hi : en;
   const labels: Record<string, string> = { 'What matters to you': 'आपके लिए क्या ज़रूरी है', 'Who was there': 'कौन साथ था', 'What you discussed': 'क्या बात हुई', 'Still to discuss': 'क्या बात करना बाकी है', 'Next steps': 'आगे क्या करना है', Summary: 'नोट' };
   function download() {
-    const text = [`Sahara — Care Note for ${patientName}`, `Version ${release?.number} · ${release?.physician}`, ...fields.map(({ label, value }) => `${label}\n${value}`), 'A conversation note, not a prescription or legal directive.'].join('\n\n');
+    const text = [`Sahara — A Palliative Care Companion`, `Care Note for ${patientName}`, `Version ${release?.number} · ${release?.physician}`, ...fields.map(({ label, value }) => `${label}\n${value}`), 'A conversation note, not a prescription or legal directive.'].join('\n\n');
     const url = URL.createObjectURL(new Blob([text], { type: 'text/plain;charset=utf-8' }));
     const link = document.createElement('a'); link.href = url; link.download = 'sahara-care-note.txt'; link.click(); URL.revokeObjectURL(url);
   }

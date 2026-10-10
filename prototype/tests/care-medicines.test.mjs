@@ -3,13 +3,15 @@ import assert from 'node:assert/strict';
 import { literalPrescriptionTime, makeMedicineEvent, medicinePrescription, prescriptionLines } from '../app/care-medicines-state.ts';
 import { addCareEvent, updateCareEvent, careChecksAfterEventUpdate, setCareCheck } from '../app/care-calendar-state.ts';
 
-const draft = { title: 'Medicine from prescription', instructions: 'Original instructions, unchanged.', time: '08:00', date: '2026-09-23', lastDay: '2026-09-25', reportId: 'rx-a', sourceName: 'Prescription.pdf', sourceText: 'Original instructions, unchanged.', checked: true };
+const draft = { title: 'Medicine from prescription', instructions: 'Original instructions, unchanged.', time: '08:00', date: '2026-09-23', lastDay: '2026-09-25', reportId: 'rx-a', sourceName: 'Prescription.pdf', sourceText: 'Original instructions, unchanged.', durationDays: 3, prescriptionItemNumber: 2, checked: true };
 const context = { id: 'medicine-a', patientId: 'patient-a', author: 'Kavya', checkedAt: '2026-09-23T08:00:00Z', reportIds: ['rx-a'] };
 
 test('requires the prescription check and the current patient source', () => {
   assert.equal(makeMedicineEvent({ ...draft, checked: false }, context), null);
   assert.equal(makeMedicineEvent({ ...draft, reportId: 'other-patient-prescription' }, context), null);
   assert.equal(makeMedicineEvent({ ...draft, sourceName: '' }, context), null);
+  assert.equal(makeMedicineEvent({ ...draft, durationDays: 0 }, context), null);
+  assert.equal(makeMedicineEvent({ ...draft, prescriptionItemNumber: 1.5 }, context), null);
   assert.equal(makeMedicineEvent({ ...draft, reportId: '', sourceText: '' }, context), null);
   assert.equal(makeMedicineEvent(draft, { ...context, author: '' }), null);
   assert.ok(makeMedicineEvent({ ...draft, reportId: '', sourceText: 'Prescription copied exactly.' }, context));
@@ -28,13 +30,26 @@ test('validates time and course dates without choosing a dose or recurring perio
 test('prescription evidence survives the existing calendar add and update functions', () => {
   const medicine = makeMedicineEvent(draft, context);
   const events = addCareEvent([], medicine);
-  assert.deepEqual(medicinePrescription(events[0]), { reportId: draft.reportId, sourceName: draft.sourceName, sourceText: draft.sourceText, checkedBy: context.author, checkedAt: context.checkedAt });
+  assert.deepEqual(medicinePrescription(events[0]), { reportId: draft.reportId, sourceName: draft.sourceName, sourceText: draft.sourceText, checkedBy: context.author, checkedAt: context.checkedAt, durationDays: 3, prescriptionItemNumber: 2 });
   const edited = makeMedicineEvent({ ...draft, time: '09:00' }, { ...context, author: 'Meera', checkedAt: '2026-09-23T08:30:00Z' }, events[0]);
   const updated = updateCareEvent(events, context.patientId, edited);
   assert.equal(updated[0].addedBy, 'Kavya');
   assert.equal(medicinePrescription(updated[0]).checkedBy, 'Meera');
   assert.equal(medicinePrescription(updated[0]).sourceText, draft.sourceText);
   assert.equal(makeMedicineEvent(draft, { ...context, patientId: 'patient-b' }, events[0]), null);
+});
+
+test('keeps only the IndexedDB medicine image reference in a saved event', () => {
+  const medicine = makeMedicineEvent({
+    ...draft,
+    medicineImageName: 'strip.jpg',
+    medicineImageId: 'medicine-photo-1234:medicine:0',
+  }, context);
+  assert.ok(medicine);
+  const source = medicinePrescription(medicine);
+  assert.equal(source.medicineImageName, 'strip.jpg');
+  assert.equal(source.medicineImageId, 'medicine-photo-1234:medicine:0');
+  assert.equal(source.medicineImage, undefined);
 });
 
 test('Taken is scoped to a scheduled date and editing instructions clears earlier checks', () => {

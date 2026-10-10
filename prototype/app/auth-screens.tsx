@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { SaharaLogo } from './sahara-logo';
 
 export type AuthRole =
   | 'Dr Sujay · Clinical lead'
@@ -74,10 +75,10 @@ function BrandPanel({ variant = 'care-team' }: { variant?: 'care-team' | 'family
       <div className="auth-brand-noise" aria-hidden="true" />
       <div className="auth-brand-inner">
         <div className="auth-brand-top">
-          <div className="auth-brand-mark" aria-hidden="true">S</div>
+          <SaharaLogo className="auth-brand-mark" priority />
           <div className="auth-brand-titles">
             <strong>Sahara</strong>
-            <span>Care planning</span>
+            <span>- A Palliative Care Companion</span>
           </div>
         </div>
 

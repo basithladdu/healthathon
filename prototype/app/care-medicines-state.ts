@@ -1,4 +1,5 @@
 import { addCareEvent, type CareEvent } from './care-calendar-state.ts';
+import type { MedicineMealTiming } from './care-medicine-import-state.ts';
 
 export type MedicinePrescription = {
   reportId?: string;
@@ -6,17 +7,39 @@ export type MedicinePrescription = {
   sourceText: string;
   checkedBy: string;
   checkedAt: string;
+  mealTiming?: MedicineMealTiming;
+  medicineImageName?: string;
+  medicineImageId?: string;
+  medicineImage?: File;
+  prescriptionImage?: File;
+  prescriptionImages?: File[];
+  prescriptionPageIndexes?: number[];
+  durationDays?: number | null;
+  prescriptionItemNumber?: number | null;
+  regimenId?: string;
 };
 export type MedicineCareEvent = CareEvent & { prescription: MedicinePrescription };
 export type MedicineDraft = {
   title: string; instructions: string; time: string; date: string; lastDay: string;
   reportId: string; sourceName: string; sourceText: string; checked: boolean;
+  mealTiming?: MedicineMealTiming; medicineImageName?: string;
+  medicineImageId?: string | null;
+  medicineImage?: File; prescriptionImage?: File; prescriptionImages?: File[];
+  prescriptionPageIndexes?: number[]; durationDays?: number | null;
+  prescriptionItemNumber?: number | null; regimenId?: string; ongoing?: boolean;
 };
+
+function validOptionalPositiveInteger(value: number | null | undefined): boolean {
+  return value === undefined || value === null || (Number.isSafeInteger(value) && Number(value) > 0);
+}
 
 export function medicinePrescription(item: CareEvent): MedicinePrescription | null {
   const value = (item as Partial<MedicineCareEvent>).prescription;
   if (item.kind !== 'Medicine' || !value || typeof value.sourceName !== 'string' || typeof value.sourceText !== 'string'
-    || typeof value.checkedBy !== 'string' || typeof value.checkedAt !== 'string') return null;
+    || typeof value.checkedBy !== 'string' || typeof value.checkedAt !== 'string'
+    || (value.medicineImageId !== undefined && (typeof value.medicineImageId !== 'string' || !value.medicineImageId.trim()))
+    || !validOptionalPositiveInteger(value.durationDays)
+    || !validOptionalPositiveInteger(value.prescriptionItemNumber)) return null;
   return value;
 }
 
@@ -41,7 +64,9 @@ export function prescriptionLines(text: string): string[] {
 export function makeMedicineEvent(draft: MedicineDraft, context: {
   id: string; patientId: string; author: string; checkedAt: string; reportIds: readonly string[];
 }, previous?: CareEvent): MedicineCareEvent | null {
-  if (!draft.checked || !draft.sourceName.trim() || !draft.lastDay
+  if (!draft.checked || !draft.sourceName.trim() || (!draft.ongoing && !draft.lastDay)
+    || !validOptionalPositiveInteger(draft.durationDays)
+    || !validOptionalPositiveInteger(draft.prescriptionItemNumber)
     || (draft.reportId ? !context.reportIds.includes(draft.reportId) : !draft.sourceText.trim())
     || (previous && (previous.patientId !== context.patientId || previous.kind !== 'Medicine' || previous.id !== context.id))
     || !Number.isFinite(Date.parse(context.checkedAt))) return null;
@@ -49,12 +74,23 @@ export function makeMedicineEvent(draft: MedicineDraft, context: {
     ...previous,
     id: context.id, patientId: context.patientId, kind: 'Medicine',
     title: draft.title, instructions: draft.instructions, time: draft.time, date: draft.date,
-    repeatUntil: draft.lastDay === draft.date ? '' : draft.lastDay,
+    repeatUntil: draft.ongoing || draft.lastDay === draft.date ? '' : draft.lastDay,
+    ...(draft.ongoing ? { repeatForever: true } : {}),
     addedBy: previous?.addedBy ?? context.author,
     prescription: {
       ...(draft.reportId ? { reportId: draft.reportId } : {}),
       sourceName: draft.sourceName.trim(), sourceText: draft.sourceText,
       checkedBy: context.author, checkedAt: context.checkedAt,
+      ...(draft.mealTiming ? { mealTiming: draft.mealTiming } : {}),
+      ...(draft.medicineImageName ? { medicineImageName: draft.medicineImageName } : {}),
+      ...(draft.medicineImageId ? { medicineImageId: draft.medicineImageId.trim() } : {}),
+      ...(draft.medicineImage ? { medicineImage: draft.medicineImage } : {}),
+      ...(draft.prescriptionImage ? { prescriptionImage: draft.prescriptionImage } : {}),
+      ...(draft.prescriptionImages?.length ? { prescriptionImages: [...draft.prescriptionImages] } : {}),
+      ...(draft.prescriptionPageIndexes?.length ? { prescriptionPageIndexes: [...draft.prescriptionPageIndexes] } : {}),
+      ...(draft.durationDays !== undefined ? { durationDays: draft.durationDays } : {}),
+      ...(draft.prescriptionItemNumber !== undefined ? { prescriptionItemNumber: draft.prescriptionItemNumber } : {}),
+      ...(draft.regimenId ? { regimenId: draft.regimenId } : {}),
     },
   };
   if (!context.author.trim() || !addCareEvent([], event).length) return null;

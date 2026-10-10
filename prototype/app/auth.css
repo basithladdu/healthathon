@@ -50,15 +50,7 @@
 .auth-brand-mark {
   width: 36px;
   height: 36px;
-  border-radius: 10px;
-  display: grid;
-  place-items: center;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  color: var(--accent);
-  background: var(--surface, #fff);
-  border: 1px solid var(--accent-line);
+  object-fit: contain;
 }
 
 .auth-brand-titles {
@@ -791,10 +783,10 @@
   width: 44px;
   height: 44px;
   border: 0;
-  border-radius: 14px 14px 14px 5px;
-  background: var(--auth-citron);
-  color: var(--auth-forest);
-  box-shadow: 0 8px 0 rgba(245, 170, 134, 0.85);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  object-fit: contain;
 }
 
 .auth-brand-titles strong {

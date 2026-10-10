@@ -4,6 +4,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { IconArrowRight } from './icons';
+import { SaharaLogo } from './sahara-logo';
 
 type DemoRole = 'dr-sujay' | 'dr-isha' | 'anitha' | 'patient' | 'family';
 const ROLES: { title: string; roleKey: DemoRole; body: string }[] = [
@@ -43,8 +44,8 @@ export function LandingPage(props: {
     <div className="lp-page">
       <header className="lp-nav">
         <div className="lp-brand">
-          <span className="lp-brand-mark" aria-hidden="true">S</span>
-          <strong>Sahara</strong>
+          <SaharaLogo className="lp-brand-mark" priority />
+          <span className="lp-brand-copy"><strong>Sahara</strong><small>- A Palliative Care Companion</small></span>
         </div>
         <nav className="lp-nav-actions" aria-label="Account">
           <button type="button" className="lp-nav-btn" onClick={onSignIn}>Sign in</button>
@@ -132,7 +133,7 @@ export function LandingPage(props: {
           </details>
         </div>
       </main>
-      <footer className="lp-footer"><p>Sahara · Palliative care, with patients and families.</p></footer>
+      <footer className="lp-footer"><p>Sahara - A Palliative Care Companion</p></footer>
     </div>
   );
 }

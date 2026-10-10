@@ -1,0 +1,28 @@
+.medicine-card-photo { display: block; width: 48px; height: 48px; flex: none; object-fit: cover; border: 1px solid #dec9ac; border-radius: 12px; background: #fff; }
+button.medicine-photo-trigger { position: relative; display: grid; place-items: center; width: 48px; min-width: 48px; min-height: 48px; height: 48px; flex: none; padding: 0; border: 0; border-radius: 12px; background: #fff; overflow: hidden; box-shadow: 0 0 0 1px #dec9ac; cursor: pointer; touch-action: manipulation; }
+.medicine-photo-trigger .medicine-card-photo { width: 100%; height: 100%; border: 0; border-radius: inherit; }
+.medicine-photo-zoom { position: absolute; right: 3px; bottom: 3px; display: grid; place-items: center; width: 18px; height: 18px; border-radius: 7px; color: #fff; background: #433528d9; font-size: 11px; line-height: 1; }
+.medicine-photo-fallback { display: grid; place-items: center; width: 48px; height: 48px; flex: none; border: 1px dashed #d7c7b4; border-radius: 12px; color: #806b57; background: #fff9ef; }
+.medicine-photo-fallback svg { width: 23px; height: 23px; }
+.medicine-photo-dialog { width: min(92vw, 720px); max-width: 720px; max-height: 92dvh; padding: 0; border: 1px solid #dec9ac; border-radius: 22px; color: #443c32; background: #fffaf1; box-shadow: 0 24px 80px #2e211a55; overflow: hidden; }
+.medicine-photo-dialog[open] { position: fixed; inset: 0; margin: auto; }
+.medicine-photo-dialog::backdrop { background: #2b211bb8; -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+.medicine-photo-dialog-panel { display: grid; gap: 14px; padding: 16px; }
+.medicine-photo-dialog-panel header { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+.medicine-photo-dialog-panel strong { font: 650 19px/1.35 var(--font-sora, sans-serif); overflow-wrap: anywhere; }
+.medicine-photo-dialog-panel header button { min-height: 44px; flex: none; padding: 9px 13px; border: 1px solid #d8c9b3; border-radius: 12px; background: #fffaf0; color: #714d33; font: 600 13px/1.4 var(--font-inter, sans-serif); cursor: pointer; }
+.medicine-photo-large { display: block; width: 100%; height: min(66dvh, 620px); object-fit: contain; border: 1px solid #ead9c2; border-radius: 16px; background: #fff; }
+.medicine-photo-dialog-panel p { margin: 0; color: #6f604f; font-size: 12px; line-height: 1.55; text-align: center; }
+
+@media (hover: hover) {
+  button.medicine-photo-trigger:hover { box-shadow: 0 0 0 2px #76599a; transform: scale(1.03); }
+}
+
+@media (max-width: 440px) {
+  .medicine-photo-dialog-panel { padding: 12px; }
+  .medicine-photo-large { height: min(70dvh, 560px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button.medicine-photo-trigger { transition: none; }
+}

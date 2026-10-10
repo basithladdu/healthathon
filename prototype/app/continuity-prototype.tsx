@@ -7,6 +7,7 @@ import { CARE_ROUTES, careViewFromPath, canOpenCareView, type CareView as View }
 import React, { useMemo, useState, useEffect, useRef } from 'react';
 import type { FamilyMember, PatientAccount } from './auth-screens';
 import { SimpleCareShell } from './simple-care-shell';
+import { SaharaLogo } from './sahara-logo';
 import { DoctorConversation } from './doctor-conversation';
 import type { DoctorConversationEntry, AssistedNote } from './doctor-conversation-state';
 import { CareNoteReader } from './care-note-reader';
@@ -718,16 +719,6 @@ function IconIdCard({ className = 'w-4 h-4' }: { className?: string }) {
       <rect x="3" y="5" width="18" height="14" rx="2" strokeLinecap="round" strokeLinejoin="round" />
       <circle cx="8" cy="11" r="1.6" />
       <path strokeLinecap="round" strokeLinejoin="round" d="M6 15.5c.5-1.3 1.6-2 2-2s1.5.7 2 2M13 10h5M13 13h5" />
-    </svg>
-  );
-}
-
-function ContinuityMark({ className = '' }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 40 40" fill="none" aria-hidden="true">
-      <path d="M7.5 14.4c0-4.1 3.3-7.4 7.4-7.4 4.7 0 6.7 3.6 10 8 2.1 2.8 4.1 4.6 7.1 4.6 3.1 0 5.4-2.3 5.4-5.4" stroke="currentColor" strokeWidth="3.25" strokeLinecap="round" />
-      <path d="M32.5 25.6c0 4.1-3.3 7.4-7.4 7.4-4.7 0-6.7-3.6-10-8-2.1-2.8-4.1-4.6-7.1-4.6-3.1 0-5.4 2.3-5.4 5.4" stroke="currentColor" strokeWidth="3.25" strokeLinecap="round" />
-      <path d="m16.3 20.6 2.5 2.5 5.2-6" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -5535,7 +5526,7 @@ export function ContinuityPrototype() {
         return <FamilyCareHome patientName={portalPatientName} hindi={hindi}
           signedCareNote={canReadCareNote && hasTypedCareNoteDoctorSignature(signedHomeNote) ? { version: signedHomeNote.number, releasedAt: signedHomeNote.releasedAt, physician: signedHomeNote.signature!.name } : undefined}
           nextVisit={canReadCalendar ? nextVisit : undefined}
-          patientId={portalPatientId} today={careToday} author={portalAuthor} role={isFamilySession ? 'family' : 'patient'}
+          patientId={portalPatientId} today={careToday} currentTime={currentDate.toTimeString().slice(0, 5)} author={portalAuthor} role={isFamilySession ? 'family' : 'patient'}
           events={canReadCalendar ? careEvents.filter((event) => event.kind !== 'Medicine' || canReadReports) : []}
           appointments={canReadCalendar ? appointments : []} checks={canReadCalendar ? careChecks : []}
           tasks={canReadCalendar ? familyTasks : []} viewerId={taskViewerFor(portalPatientId).id}
@@ -5913,10 +5904,10 @@ export function ContinuityPrototype() {
           type="button"
           onClick={() => navigate(isPatientSession ? 'my-plan' : isFamilySession ? 'caregiver' : 'home')}
         >
-          <span className="brand-mark" aria-hidden="true"><ContinuityMark /></span>
+          <span className="brand-mark" aria-hidden="true"><SaharaLogo className="sahara-shell-logo" priority /></span>
           <div className="brand-titles">
             <strong>Sahara</strong>
-            <span>Care planning</span>
+            <span>- A Palliative Care Companion</span>
           </div>
         </button>
 
@@ -5954,7 +5945,7 @@ export function ContinuityPrototype() {
               type="button"
               onClick={() => navigate(isPatientSession ? 'my-plan' : isFamilySession ? 'caregiver' : 'home')}
             >
-              <span className="brand-mark" aria-hidden="true"><ContinuityMark /></span>
+              <span className="brand-mark" aria-hidden="true"><SaharaLogo className="sahara-shell-logo" priority /></span>
               <strong>Sahara</strong>
             </button>
             <div className="environment-label">

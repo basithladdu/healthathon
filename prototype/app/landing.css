@@ -28,15 +28,9 @@
 }
 
 .lp-brand-mark {
-  display: grid;
-  place-items: center;
   width: 36px;
   height: 36px;
-  border-radius: 10px;
-  background: #174d39;
-  color: #f4f3ed;
-  font-size: 22px;
-  font-weight: 700;
+  object-fit: contain;
 }
 
 .lp-brand strong {
@@ -44,6 +38,8 @@
   font-weight: 750;
   letter-spacing: -.04em;
 }
+.lp-brand-copy { display: grid; gap: 1px; }
+.lp-brand-copy small { color: #617167; font-size: 9px; font-weight: 650; letter-spacing: .02em; }
 
 .lp-nav-actions {
   display: flex;

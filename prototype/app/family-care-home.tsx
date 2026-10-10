@@ -20,6 +20,7 @@ export type FamilyCareHomeProps = {
   nextVisit?: { date: string; time: string; clinician: string };
   patientId: string;
   today: string;
+  currentTime: string;
   author: string;
   role: 'patient' | 'family';
   events: CareEvent[];
@@ -30,7 +31,7 @@ export type FamilyCareHomeProps = {
   viewerId?: string;
 };
 
-export function FamilyCareHome({ patientName, hindi, signedCareNote, patientId, today, author, role, events, appointments, checks, onMedicineTaken, tasks, viewerId }: FamilyCareHomeProps) {
+export function FamilyCareHome({ patientName, hindi, signedCareNote, patientId, today, currentTime, author, role, events, checks, onMedicineTaken }: FamilyCareHomeProps) {
   const t = (en: string, hi: string) => hindi ? hi : en;
   const id = useId();
   const [qr, setQr] = useState<{ patientId: string; version: number; dataUrl: string }>();
@@ -86,7 +87,7 @@ export function FamilyCareHome({ patientName, hindi, signedCareNote, patientId, 
         <CareArt kind={section.art} /><strong>{hindi ? section.hi : section.en}</strong><IconArrowRight />
       </CareRouteLink>)}
     </nav>
-    <CareToday patientId={patientId} today={today} author={author} role={role} events={events} appointments={appointments} checks={checks} onMedicineTaken={onMedicineTaken} tasks={tasks} viewerId={viewerId} hindi={hindi} />
+    <CareToday patientId={patientId} today={today} currentTime={currentTime} author={author} role={role} events={events} checks={checks} onMedicineTaken={onMedicineTaken} hindi={hindi} />
     <section className="care-home-quick-section" aria-labelledby={`${id}-quick-title`}>
       <h2 id={`${id}-quick-title`}>{t('Quick access', 'जल्दी खोलें')}</h2>
       <div className="care-home-quick-grid">
