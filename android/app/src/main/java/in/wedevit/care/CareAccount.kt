@@ -98,6 +98,10 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
                     if (create) { if (!cloud.signUp(email, password)) { notice = "Check your email to confirm your account, then sign in."; create = false; password = "" } }
                     else cloud.signIn(email, password)
                 } }, enabled = !busy && email.contains('@') && password.isNotEmpty(), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Text(if (busy) "Please wait…" else if (create) "Create account" else "Sign in") }
+                if (!create) TextButton(onClick = { run {
+                    cloud.sendPasswordReset(email)
+                    notice = "If that email has an account, you'll receive a reset link."
+                } }, enabled = !busy && email.contains('@')) { Text("Forgot password?") }
                 TextButton(onClick = { create = !create; error = null; notice = null }, enabled = !busy) { Text(if (create) "Already have an account? Sign in" else "Create an account") }
             } else {
                 Text(session!!.email)

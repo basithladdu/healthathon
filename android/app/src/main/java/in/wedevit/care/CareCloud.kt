@@ -14,6 +14,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
+import java.net.URLEncoder
 import java.security.KeyStore
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
@@ -31,6 +32,7 @@ class CareCloud(context: Context) {
     val session = MutableStateFlow(runCatching { preferences.getString("session", null)?.let { decodeSession(JSONObject(unseal(it))) } }.getOrNull())
     private val base = "https://cghlkqeqiokjqdionrkc.supabase.co"
     private val apiKey = "sb_publishable_43mvHQiHJXVGwS71SX0GVA_GWxXBVOC"
+    private val accountRedirect = URLEncoder.encode("https://sahara.wedevit.in/android-account", "UTF-8")
 
     suspend fun signIn(email: String, password: String) {
         val value = JSONObject(request("POST", "/auth/v1/token?grant_type=password", JSONObject().put("email", email.trim()).put("password", password), authenticated = false))
@@ -38,9 +40,12 @@ class CareCloud(context: Context) {
     }
     suspend fun signUp(email: String, password: String): Boolean {
         require(password.length >= 10) { "Use at least 10 characters for your password." }
-        val result = JSONObject(request("POST", "/auth/v1/signup", JSONObject().put("email", email.trim()).put("password", password), authenticated = false))
+        val result = JSONObject(request("POST", "/auth/v1/signup?redirect_to=$accountRedirect", JSONObject().put("email", email.trim()).put("password", password), authenticated = false))
         if (result.has("access_token")) { rememberSession(result); return true }
         return false
+    }
+    suspend fun sendPasswordReset(email: String) {
+        request("POST", "/auth/v1/recover?redirect_to=$accountRedirect", JSONObject().put("email", email.trim()), authenticated = false)
     }
     suspend fun signOut() {
         try { request("POST", "/auth/v1/logout", JSONObject()) }

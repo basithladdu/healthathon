@@ -151,7 +151,12 @@ class CareFlowTest {
             ui.onNodeWithText("Sign in to share care").performClick()
             ui.onNode(hasSetTextAction() and hasText("Email")).performTextInput(email!!)
             ui.onNode(hasSetTextAction() and hasText("Password")).performTextInput(password!!)
-            ui.onNode(hasText("Sign in") and hasClickAction()).performScrollTo().performClick()
+            ui.onNodeWithText("Forgot password?").performScrollTo().assertIsDisplayed().assertIsEnabled()
+            screenshot("private-account-keyboard")
+            ui.onNodeWithText("Privacy policy").performScrollTo().assertIsDisplayed()
+            ui.onNode(hasText("Sign in") and hasClickAction()).performScrollTo().assertIsDisplayed().assertIsEnabled()
+            screenshot("private-account-actions")
+            ui.onNode(hasText("Sign in") and hasClickAction()).performClick()
             ui.waitUntil(20000) { ui.activity.careModel.cloud != null && ui.activity.careModel.people.value.any { it.id == shared.id } }
             if (ui.activity.careModel.selected.value != shared.id) {
                 ui.onNodeWithContentDescription("Choose person").performClick()
