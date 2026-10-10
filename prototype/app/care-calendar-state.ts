@@ -5,12 +5,16 @@ export type CareEventKind = (typeof CARE_EVENT_KINDS)[number];
 export type CareEvent = {
   id: string; patientId: string; kind: CareEventKind; title: string;
   date: string; time: string; instructions: string; repeatUntil: string; addedBy: string;
+  /** Medicines may continue daily until the patient explicitly ends the regimen. */
+  repeatForever?: boolean;
 };
 export type CareCheck = { eventId: string; patientId: string; date: string; actor: string; checkedAt: string };
 export type CareReport = { id: string; patientId: string; date: string; addedBy: string; file: File };
 
 export function eventFallsOn(item: CareEvent, date: string): boolean {
-  return isValidAppointmentDate(date) && (item.date === date || Boolean(item.repeatUntil && date >= item.date && date <= item.repeatUntil));
+  return isValidAppointmentDate(date) && (item.date === date
+    || Boolean(item.repeatForever && date >= item.date)
+    || Boolean(item.repeatUntil && date >= item.date && date <= item.repeatUntil));
 }
 
 export function addCareEvent(items: CareEvent[], item: CareEvent): CareEvent[] {
@@ -18,6 +22,8 @@ export function addCareEvent(items: CareEvent[], item: CareEvent): CareEvent[] {
     || !CARE_EVENT_KINDS.includes(item.kind) || !isValidAppointmentDate(item.date)
     || (item.time && !isValidAppointmentTime(item.time))
     || (item.kind === 'Medicine' && (!item.time || !item.instructions.trim()))
+    || (item.repeatForever !== undefined && typeof item.repeatForever !== 'boolean')
+    || Boolean(item.repeatForever && item.repeatUntil)
     || (item.repeatUntil && (!isValidAppointmentDate(item.repeatUntil) || item.repeatUntil < item.date))
     || items.some((existing) => existing.id === item.id)) return items;
   return [...items, { ...item, title: item.title.trim(), instructions: item.instructions.trim(), addedBy: item.addedBy.trim() }];

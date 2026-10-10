@@ -1,8 +1,8 @@
-# Saanthvana
+# Sahara - A Palliative Care Companion
 
 Interactive Health-a-thon prototype for **Cancer / Patient & Caregiver / Family Caregiver Support**.
 
-Saanthvana (सांत्वना) helps patients and families organise documents, visits, daily care and questions for the care team, and find palliative care. A doctor can prepare, review and sign a versioned Care Note, which the patient or family can review separately.
+Sahara helps patients and families organise documents, visits, daily care and questions for the care team, and find palliative care. A doctor can prepare, review and sign a versioned Care Note, which the patient or family can review separately.
 
 ## Main flow
 
@@ -21,7 +21,7 @@ Saanthvana (सांत्वना) helps patients and families organise docum
 - The included profiles and documents use fictional information. Anything entered or uploaded is stored by that browser.
 - Care data and saved files persist across reloads in IndexedDB, with a localStorage fallback. They are tied to the browser profile and site origin; clearing site data removes them. There is no shared database or cross-device sync.
 - Sign-in and account roles are not connected to identity verification. Typed names record acknowledgements; they are not cryptographic signatures or legally verified consent.
-- The default draft organiser is deterministic. An optional AI endpoint exists but is disabled unless explicitly configured.
+- The conversation draft organiser is deterministic. Optional AI endpoints, including the medicine-photo organizer, stay disabled until their server-side provider secrets are configured.
 - QR links do not transfer the note to another device. PDF download and the copy log support manual sharing; the app does not send a note, verify receipt or revoke downloaded copies.
 - No hospital system, ABDM service, messaging channel or clinical data source is connected.
 - The prototype documents conversations and organises family support. It does not diagnose, infer urgency or prognosis, recommend treatment, create a DNAR order or execute an Advance Medical Directive.
@@ -33,6 +33,8 @@ Saanthvana (सांत्वना) helps patients and families organise docum
 - Next.js-compatible App Router through Vinext
 - Vite and the OpenAI Sites runtime
 - Native Next.js production build for Vercel
+- Supabase Edge Functions for protected third-party service calls
+- Gemini multimodal structured output for the optional medicine-photo organizer
 - Authored responsive CSS with no UI theme package
 
 ## Local use
@@ -45,6 +47,17 @@ npm.cmd run dev:next
 ```
 
 Open `http://localhost:3000/`. The alternative `npm.cmd run dev` starts the Vinext development runtime.
+
+## Medicine organizer setup
+
+The medicine organizer does not use CareNest or Firebase. The browser sends prepared images to the same-origin `/api/medicine-organizer` route, which forwards them to the `saanthvana-medicine-organizer` Supabase Edge Function. The Edge Function calls Gemini with structured JSON output and does not save the images or request Gemini interaction storage.
+
+Keep the existing prototype login unchanged until real Sahara authentication is introduced. Configure these server-side values before enabling the organizer:
+
+- Supabase Edge Function secrets: `GEMINI_API_KEY` and `SAANTHVANA_MEDICINE_ORGANIZER_SECRET`; `GEMINI_MODEL` is optional.
+- Next/Vercel secrets: `SAANTHVANA_SUPABASE_URL`, `SAANTHVANA_SUPABASE_PUBLISHABLE_KEY`, and the same `SAANTHVANA_MEDICINE_ORGANIZER_SECRET` value.
+
+Never prefix the Gemini key or organizer secret with `NEXT_PUBLIC_`. Deploy the Edge Function with gateway JWT verification disabled because it authorizes the same-origin server proxy with its own high-entropy capability; browsers never receive that capability.
 
 ## Validation
 

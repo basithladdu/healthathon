@@ -98,7 +98,7 @@ function CareStoryContent({ patientId, author, today, hindi, entries, recordedEn
 
   function download() {
     const text = [
-      'SAANTHVANA — YOUR CARE STORY', `Patient: ${patientId}`,
+      'SAHARA — A PALLIATIVE CARE COMPANION', 'YOUR CARE STORY', `Patient: ${patientId}`,
       'Existing records and family notes. Family notes do not change the original records.',
       ...allEntries.map((entry) => [
         `${entry.date} · ${entry.kind} · ${entry.title}`,

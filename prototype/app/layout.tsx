@@ -51,9 +51,13 @@ const sora = Sora({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://continuity-loop-healthathon.vercel.app'),
-  title: 'Saanthvana | Family support for cancer care',
+  title: 'Sahara - A Palliative Care Companion',
   description:
-    'Coordinate family tasks and visits, prepare for goals-of-care conversations, and find palliative care with Saanthvana.',
+    'Coordinate family tasks and visits, prepare for goals-of-care conversations, and find palliative care with Sahara.',
+  icons: {
+    icon: '/sahara-community-logo.png',
+    apple: '/sahara-community-logo.png',
+  },
 };
 
 export default function RootLayout({

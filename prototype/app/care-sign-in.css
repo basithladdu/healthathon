@@ -24,10 +24,11 @@
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  font: 700 24px/1.1 var(--font-sora), sans-serif;
-  letter-spacing: -1px;
 }
-.care-sign-in-brand svg { width: 36px; height: 36px; flex: none; }
+.care-sign-in-brand > span { display: grid; gap: 2px; }
+.care-sign-in-brand strong { font: 700 24px/1 var(--font-sora), sans-serif; letter-spacing: -1px; }
+.care-sign-in-brand small { color: #6a7c72; font: 600 9px/1.2 var(--font-inter), sans-serif; letter-spacing: .02em; }
+.care-sign-in-logo { width: 42px; height: 42px; flex: none; object-fit: contain; }
 .care-sign-in-language {
   min-height: 44px;
   min-width: 64px;
@@ -209,8 +210,9 @@
 @media (max-width: 760px) {
   .care-sign-in { padding: 16px 18px 10px; }
   .care-sign-in-header { width: min(430px, 100%); }
-  .care-sign-in-brand { font-size: 22px; letter-spacing: -.85px; gap: 8px; }
-  .care-sign-in-brand svg { width: 32px; height: 32px; }
+  .care-sign-in-brand { gap: 8px; }
+  .care-sign-in-brand strong { font-size: 22px; letter-spacing: -.85px; }
+  .care-sign-in-logo { width: 36px; height: 36px; }
   .care-sign-in-language { min-width: 60px; padding-inline: 11px; border-radius: 12px; }
   .care-sign-in-main { padding-block: 15px; }
   .care-sign-in-card { width: min(430px, 100%); grid-template-columns: minmax(0, 1fr); border-radius: 25px; }
