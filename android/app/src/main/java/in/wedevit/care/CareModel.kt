@@ -24,7 +24,9 @@ class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewMod
     private val preferences = app.getSharedPreferences(if (account.isEmpty()) "preferences" else "preferences-$account", 0)
     val people = dao.people().stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
     val selected = MutableStateFlow(preferences.getString("person", "") ?: "")
-    val clinician = MutableStateFlow(preferences.getBoolean("clinician", false))
+    val viewRole = MutableStateFlow(preferences.getString("viewRole", null)?.takeIf { it in listOf("Patient", "Family", "Doctor") }
+        ?: if (preferences.getBoolean("clinician", false)) "Doctor" else "Family")
+    val clinician = MutableStateFlow(viewRole.value == "Doctor")
     val draft = MutableStateFlow(Conversation(""))
     val message = MutableStateFlow<String?>(null)
     val actionError = MutableStateFlow<String?>(null)
@@ -41,6 +43,8 @@ class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewMod
     val recordings = MutableStateFlow<List<File>>(emptyList())
     val versions = selected.flatMapLatest { dao.versions(it).onStart { emit(emptyList()) } }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
     val items = selected.flatMapLatest { dao.items(it).onStart { emit(emptyList()) } }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+    val reports = selected.flatMapLatest { dao.reports(it).onStart { emit(emptyList()) } }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+    val reportFiles = ReportFiles(app, account)
     val acknowledgements = dao.acknowledgements().stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
     private val writes = Channel<Conversation>(Channel.UNLIMITED)
     private val draftCache = mutableMapOf<String, Conversation>()
@@ -96,7 +100,9 @@ class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewMod
                 dao.clearAcknowledgements(); dao.clearVersions(); dao.clearItems(); dao.clearPeople()
                 dao.addPeople(records.people); dao.addItems(records.entries); dao.addVersions(records.notes); dao.addAcknowledgements(records.confirmations)
                 dao.clearRemovedDrafts()
+                removed.forEach { dao.deleteReports(it) }
             }
+            withContext(Dispatchers.IO) { removed.forEach { reportFiles.removePerson(it) } }
             editable.value = records.editable; owned.value = records.owned
             if (selected.value in removed) { draft.value = Conversation(""); select(records.people.firstOrNull()?.id.orEmpty()) }
         }
@@ -106,7 +112,12 @@ class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewMod
         if (recording.value) stopRecording()
         selected.value = id; preferences.edit().putString("person", id).apply()
     }
-    fun role(value: Boolean) { clinician.value = value; preferences.edit().putBoolean("clinician", value).apply() }
+    fun role(value: Boolean) = role(if (value) "Doctor" else "Family")
+    fun role(value: String) {
+        require(value in listOf("Patient", "Family", "Doctor"))
+        viewRole.value = value; clinician.value = value == "Doctor"
+        preferences.edit().putString("viewRole", value).putBoolean("clinician", clinician.value).apply()
+    }
     fun addPerson(name: String, done: () -> Unit = {}) = action {
         require(name.trim().length in 1..100) { "Enter a name, up to 100 characters." }
         val person = Person(name = name.trim()); cloud?.addPerson(person); dao.addPerson(person)
@@ -157,6 +168,25 @@ class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewMod
     }
     private suspend fun storeItem(item: CareItem) { requireEdit(item.personId); dao.saveItem(cloud?.saveEntry(item) ?: item) }
     fun remove(item: CareItem) = action { requireEdit(item.personId); cloud?.removeEntry(item); dao.removeItem(item); message.value = "Removed" }
+    fun importReport(uri: android.net.Uri, personId: String) = action(waitForRefresh = true) {
+        require(people.value.any { it.id == personId }) { "Choose a person before adding a report." }
+        requireEdit(personId)
+        val report = try { reportFiles.copyFrom(uri, personId) }
+        catch (e: SecurityException) { throw IllegalArgumentException("Couldn't read this file. Choose it again from Files.", e) }
+        catch (e: java.io.IOException) { throw IllegalArgumentException("Couldn't add the report. Your original file is unchanged. Try again.", e) }
+        try { dao.addReport(report) }
+        catch (e: Exception) { withContext(NonCancellable + Dispatchers.IO) { reportFiles.file(report).delete() }; throw e }
+        message.value = "Report added"
+    }
+    fun removeReport(report: CareReport, done: () -> Unit) = action {
+        require(report.personId == selected.value && reports.value.any { it.id == report.id }) { "Choose a report for this person." }
+        requireEdit(report.personId)
+        withContext(Dispatchers.IO) {
+            val file = reportFiles.file(report)
+            require(!file.exists() || file.delete()) { "Couldn't remove this report. Try again." }
+        }
+        dao.removeReport(report); message.value = "Report removed"; done()
+    }
     fun removePerson(done: () -> Unit) {
         val id = selected.value
         action {
@@ -167,8 +197,8 @@ class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewMod
             lock.withLock {
                 deletedPeople.add(id)
                 draftCache.remove(id)
-                db.withTransaction { dao.deleteAcknowledgements(id); dao.deleteVersions(id); dao.deleteItems(id); dao.deleteDraft(id); dao.deletePersonRow(id) }
-                withContext(Dispatchers.IO) { File(audioRoot(), id).deleteRecursively() }
+                db.withTransaction { dao.deleteAcknowledgements(id); dao.deleteVersions(id); dao.deleteItems(id); dao.deleteReports(id); dao.deleteDraft(id); dao.deletePersonRow(id) }
+                withContext(Dispatchers.IO) { File(audioRoot(), id).deleteRecursively(); reportFiles.removePerson(id) }
             }
             select(""); message.value = "Records removed"; done()
         }
@@ -221,12 +251,12 @@ class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewMod
             refreshRecordings(id); message.value = "Recording removed"
         }
     }
-    private fun action(block: suspend () -> Unit) {
-        if (busy.value || refreshing.value) { message.value = "Please wait for your records to finish loading."; return }
+    private fun action(waitForRefresh: Boolean = false, block: suspend () -> Unit) {
+        if (busy.value || (refreshing.value && !waitForRefresh)) { message.value = "Please wait for your records to finish loading."; return }
         actionError.value = null
         busy.value = true
         viewModelScope.launch {
-            try { block() } catch (e: Exception) {
+            try { if (waitForRefresh) refreshing.first { !it }; block() } catch (e: Exception) {
                 if (e is CancellationException) throw e
                 val error = if (e is IllegalArgumentException) e.message else "Couldn't save. Your entry is still here; please try again."
                 actionError.value = error; message.value = error

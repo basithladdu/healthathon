@@ -17,10 +17,10 @@ export default function PrivacyPage() {
           <Link href="/delete-account">Delete your account</Link>
         </header>
         <h1>Your care information</h1>
-        <p className={styles.date}>Privacy policy · Updated 10 October 2026</p>
+        <p className={styles.date}>Privacy policy · Updated 11 October 2026</p>
         <p>
           Sahara — A Palliative Care Companion is provided by WEDEVIT PRIVATE LIMITED.
-          This policy covers the Sahara Android app, including version 0.3.0, rather
+          This policy covers the Sahara Android app, including version 0.3.1, rather
           than the separate website.
         </p>
 
@@ -62,6 +62,18 @@ export default function PrivacyPage() {
           </p>
         </section>
 
+        <section aria-labelledby="reports">
+          <h2 id="reports">Reports you add</h2>
+          <p>
+            From version 0.3.1, you can choose a PDF or photo using Android’s file
+            picker. Sahara saves a private copy for the selected person and account.
+            It does not read other files or upload reports to Supabase or an AI service.
+            Added reports stay on that phone until you remove them, remove the person’s
+            records or uninstall the app. Keep your original files. Removing a report
+            in Sahara does not delete the original.
+          </p>
+        </section>
+
         <section aria-labelledby="sharing">
           <h2 id="sharing">Who can see your records</h2>
           <p>
@@ -71,7 +83,7 @@ export default function PrivacyPage() {
             stops future online requests; it cannot recall copies already saved.
           </p>
           <p>
-            When you share or export care notes, Android lets you choose another app and
+            When you share reports or export care notes, Android lets you choose another app and
             recipient. Those copies leave Sahara and follow that service’s policies.
             Check the contents and recipient before sharing. Names and doctor roles are
             self-entered; Sahara does not verify professional credentials.

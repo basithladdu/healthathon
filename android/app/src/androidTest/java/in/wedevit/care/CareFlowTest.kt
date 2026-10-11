@@ -16,7 +16,7 @@ class CareFlowTest {
     private lateinit var vm: CareModel
     private var personId = ""
     private var previousPerson = ""
-    private var previousRole = false
+    private var previousRole = "Family"
     private val extraPeople = mutableListOf<String>()
     @Before fun setUp() {
         val account = ui.activity.careModel.cloud
@@ -26,14 +26,15 @@ class CareFlowTest {
             runBlocking { account.signOut() }
             ui.activityRule.scenario.recreate(); ui.waitForIdle()
         }
-        ui.runOnIdle { vm = ui.activity.careModel; previousPerson = vm.selected.value; previousRole = vm.clinician.value; vm.role(true); vm.addPerson("Test Person") }
-        ui.waitUntil(15000) { vm.people.value.any { it.name == "Test Person" } && vm.draft.value.personId == vm.selected.value && vm.selected.value.isNotBlank() }
+        ui.runOnIdle { vm = ui.activity.careModel; previousPerson = vm.selected.value; previousRole = vm.viewRole.value; vm.role(true); vm.addPerson("Test Person") }
+        ui.waitUntil(15000) { !vm.busy.value && vm.selected.value != previousPerson && vm.people.value.any { it.id == vm.selected.value && it.name == "Test Person" } && vm.draft.value.personId == vm.selected.value && vm.selected.value.isNotBlank() }
         personId = vm.selected.value
     }
     @After fun cleanup() = runBlocking {
         val dao = CareDatabase.get(ui.activity).care()
         (extraPeople + personId).filter { it.isNotBlank() }.forEach { id ->
-            dao.deleteAcknowledgements(id); dao.deleteVersions(id); dao.deleteItems(id); dao.deleteDraft(id); dao.deletePersonRow(id)
+            dao.deleteAcknowledgements(id); dao.deleteVersions(id); dao.deleteItems(id); dao.deleteReports(id); dao.deleteDraft(id); dao.deletePersonRow(id)
+            ReportFiles(ui.activity).removePerson(id)
         }
         ui.runOnIdle { vm = ui.activity.careModel; vm.select(previousPerson); vm.role(previousRole) }
     }
@@ -43,6 +44,97 @@ class CareFlowTest {
         val screen = androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().uiAutomation.takeScreenshot()
         file.outputStream().use { screen.compress(Bitmap.CompressFormat.PNG, 100, it) }
         screen.recycle()
+    }
+    @Test fun roleMenuKeepsDraftAndPatientChoiceAfterRecreation() {
+        val words = "Please keep my questions while I change views."
+        ui.runOnIdle { vm.edit(vm.draft.value.copy(source = words)) }
+        ui.onNodeWithTag("choose-role").performClick()
+        ui.onNodeWithTag("role-Patient").assertIsDisplayed()
+        ui.onNodeWithTag("role-Family").assertIsDisplayed()
+        screenshot("role-menu")
+        ui.onNodeWithTag("role-Patient").performClick()
+        ui.onNodeWithTag("nav-Docs").assertIsDisplayed().performClick()
+        ui.onNodeWithTag("documents-list").assertIsDisplayed()
+        ui.activityRule.scenario.recreate(); ui.waitForIdle()
+        ui.runOnIdle { vm = ui.activity.careModel }
+        ui.waitUntil(15000) { vm.draft.value.personId == personId }
+        assertEquals("Patient", vm.viewRole.value)
+        assertEquals(words, vm.draft.value.source)
+        ui.onNodeWithTag("choose-role").performClick()
+        ui.onNodeWithTag("role-Doctor").performClick()
+        ui.onNodeWithTag("nav-Talk").performClick()
+        ui.onNodeWithTag("conversation-list").performScrollToNode(hasSetTextAction() and hasText("Conversation"))
+        ui.onNode(hasSetTextAction() and hasText("Conversation")).assertTextContains(words)
+    }
+    @Test fun reportPickerPersistsSearchesSharesAndRemovesOnlyItsCopy() {
+        val source = CareReport(personId = personId, name = "Clinic report.pdf", mime = "application/pdf", fileName = "source.pdf", bytes = 0)
+        val original = vm.reportFiles.file(source).apply { parentFile!!.mkdirs() }
+        val pdf = android.graphics.pdf.PdfDocument()
+        try {
+            val page = pdf.startPage(android.graphics.pdf.PdfDocument.PageInfo.Builder(300, 400, 1).create())
+            page.canvas.drawText("Synthetic report for UI verification", 16f, 40f, android.graphics.Paint().apply { textSize = 13f })
+            pdf.finishPage(page); original.outputStream().use(pdf::writeTo)
+        } finally { pdf.close() }
+        val uri = androidx.core.content.FileProvider.getUriForFile(ui.activity, ui.activity.packageName + ".reports", original, source.name)
+        val instrumentation = androidx.test.platform.app.InstrumentationRegistry.getInstrumentation()
+        val filter = android.content.IntentFilter(android.content.Intent.ACTION_OPEN_DOCUMENT).apply { addCategory(android.content.Intent.CATEGORY_OPENABLE); addDataType("*/*") }
+        val monitor = instrumentation.addMonitor(filter, android.app.Instrumentation.ActivityResult(android.app.Activity.RESULT_OK, android.content.Intent().setData(uri)), true)
+        try {
+            ui.onNodeWithContentDescription("Documents").performClick()
+            ui.onNodeWithContentDescription("Add a report").performClick()
+            ui.waitUntil(15000) { vm.reports.value.size == 1 }
+            assertEquals(1, monitor.hits)
+        } finally { instrumentation.removeMonitor(monitor) }
+        val report = vm.reports.value.single()
+        assertEquals(source.name, report.name)
+        assertFalse(original == vm.reportFiles.file(report))
+        ui.onNodeWithText("Clinic report.pdf").assertIsDisplayed()
+        screenshot("documents")
+        ui.onNodeWithTag("document-search").performTextInput("no such document")
+        ui.onNodeWithText("No documents found").assertIsDisplayed()
+        ui.onNodeWithTag("nav-Today").performClick()
+        ui.onNodeWithContentDescription("Documents").performClick()
+        ui.onNodeWithTag("document-search").assertTextContains("no such document")
+        ui.activityRule.scenario.recreate(); ui.waitForIdle()
+        ui.runOnIdle { vm = ui.activity.careModel }
+        ui.waitUntil(15000) { vm.reports.value.size == 1 }
+        ui.onNodeWithContentDescription("Clear document search").performClick()
+        val share = vm.reportFiles.intent(report, true)
+        assertEquals(android.content.Intent.ACTION_SEND, share.action)
+        assertEquals("application/pdf", share.type)
+        assertTrue(share.flags and android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION != 0)
+        assertEquals(0, share.flags and android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+        val sharedBytes = ui.activity.contentResolver.openInputStream(share.clipData!!.getItemAt(0).uri)!!.use { it.readBytes() }
+        assertArrayEquals(original.readBytes(), sharedBytes)
+        ui.onNodeWithContentDescription("Options for Clinic report.pdf").performClick()
+        ui.onNodeWithText("Share").assertIsDisplayed()
+        ui.onNodeWithText("Remove", useUnmergedTree = true).performClick()
+        ui.onNodeWithText("Remove report", useUnmergedTree = true).performClick()
+        ui.waitUntil(15000) { vm.reports.value.isEmpty() && !vm.busy.value }
+        assertFalse(vm.reportFiles.file(report).exists())
+        assertTrue(original.exists())
+    }
+    @Test fun documentsOpenSavedVersionWithActionsAtTheTop() = runBlocking {
+        val note = NoteRules.publish(vm.people.value.first { it.id == personId }, Conversation(personId, source = "What matters: More time with family.", priorities = "More time with family."), "Test Doctor", true, 1)
+        CareDatabase.get(ui.activity).care().insertVersion(note)
+        ui.waitUntil(15000) { vm.versions.value.any { it.id == note.id } }
+        ui.onNodeWithContentDescription("Documents").performClick()
+        ui.onNodeWithText("Goals of care").performClick()
+        ui.onNodeWithText("Save copy").assertIsDisplayed()
+        ui.onNodeWithText("Share", useUnmergedTree = true).assertIsDisplayed()
+        ui.onNodeWithText("More time with family.").assertIsDisplayed()
+        screenshot("note-actions")
+        val target = vm.reportFiles.file(CareReport(personId = personId, name = "Care note.txt", mime = "text/plain", fileName = "exported-note.txt", bytes = 0)).apply { parentFile!!.mkdirs(); createNewFile() }
+        val uri = androidx.core.content.FileProvider.getUriForFile(ui.activity, ui.activity.packageName + ".reports", target)
+        val instrumentation = androidx.test.platform.app.InstrumentationRegistry.getInstrumentation()
+        val filter = android.content.IntentFilter(android.content.Intent.ACTION_CREATE_DOCUMENT).apply { addCategory(android.content.Intent.CATEGORY_OPENABLE); addDataType("text/plain") }
+        val monitor = instrumentation.addMonitor(filter, android.app.Instrumentation.ActivityResult(android.app.Activity.RESULT_OK, android.content.Intent().setData(uri)), true)
+        try {
+            ui.onNodeWithText("Save copy").performClick()
+            ui.waitUntil(15000) { target.length() > 0 }
+            assertEquals(NoteRules.text(note), target.readText())
+            assertEquals(1, monitor.hits)
+        } finally { instrumentation.removeMonitor(monitor) }
     }
     @Test fun conversationReviewSavesExactVersionAndSurvivesRecreation() {
         ui.onNodeWithText("Start talking").assertIsDisplayed()

@@ -1,5 +1,5 @@
 {
-  "status": "Rejected by Google Play on 10 October 2026: Play Console Requirements. Google says the app's category or declared features require an organisation account. Confirmed in Play at 22:40 IST. Closed testing is not live and no tester invitations have been sent. Account conversion remains outside the user's current authorisation.",
+  "status": "Rejected by Google Play on 10 October 2026: Play Console Requirements. Organisation conversion is authorised and in progress. Google accepted the existing company D-U-N-S number and created the identity profile. Website and contact verifications are complete. The incorporation certificate, new representative identity photographs and approved address are submitted. On 11 October Google confirmed Authorized representative: Submitted and Google is verifying your new payments profile. Document review and the final profile link remain. The account is still Personal, closed testing is not live and no tester invitations have been sent.",
   "preparedOn": "2026-10-10",
   "workingTitle": "Sahara: Palliative Companion",
   "fullProductName": "Sahara — A Palliative Care Companion",
@@ -29,7 +29,7 @@
     "note": "Saved to Google Play on 10 October 2026 against the 0.3.0 release. Any AI, sync or account integration changes require reassessing these answers."
   },
   "releaseDependencies": [
-    "Resolve Google's organisation-account rejection. The user requested the existing Personal account and stopped conversion; obtain a new publishing decision before account changes. Do not resubmit unchanged or misstate the app's actual medical features.",
+    "Wait for Google's review of the submitted organisation identity profile, then finish its final link to Devit. On 11 October the new physical PAN photographs and approved representative address were submitted successfully; Google shows Authorized representative: Submitted and Google is verifying your new payments profile. Do not repeat uploads while review is pending. D-U-N-S is accepted; do not create another application. After the account actually shows Organisation, record that time and wait at least 72 hours before resubmitting. Do not pay fees, mislabel identity documents or misstate medical features.",
     "Verify the closed-testing opt-in page is live before emailing all 57 existing tester addresses. No invitation has been sent.",
     "Ordinary tester signup and reset delivery remain incomplete: the exact Sahara callback allowlist is unapproved and Zoho work is paused at the user's request. Unsigned-in care flows and the dedicated reviewer login work; the default Supabase mail service is limited to project-team addresses.",
     "If applicable to the account, enrol at least 12 testers continuously for 14 days, then apply for production access; this does not guarantee approval"
@@ -67,14 +67,76 @@
     "deletionRequestsSupported": true,
     "independentSecurityReview": false,
     "collectedTypes": [
-      { "type": "Name", "optional": true, "ephemeral": false, "purposes": ["App functionality"] },
-      { "type": "Email address", "optional": true, "ephemeral": false, "purposes": ["Account management", "App functionality"] },
-      { "type": "User IDs", "optional": true, "ephemeral": false, "purposes": ["Account management", "App functionality"] },
-      { "type": "Health info", "optional": true, "ephemeral": false, "purposes": ["App functionality"] },
-      { "type": "Other user-generated content", "optional": true, "ephemeral": false, "purposes": ["App functionality"] },
-      { "type": "Approximate location", "optional": true, "ephemeral": false, "purposes": ["App functionality", "Fraud prevention, security, and compliance"] },
-      { "type": "Device or other IDs", "optional": true, "ephemeral": false, "purposes": ["App functionality", "Fraud prevention, security, and compliance"] },
-      { "type": "Diagnostics", "optional": true, "ephemeral": false, "purposes": ["App functionality", "Analytics", "Fraud prevention, security, and compliance"] }
+      {
+        "type": "Name",
+        "optional": true,
+        "ephemeral": false,
+        "purposes": [
+          "App functionality"
+        ]
+      },
+      {
+        "type": "Email address",
+        "optional": true,
+        "ephemeral": false,
+        "purposes": [
+          "Account management",
+          "App functionality"
+        ]
+      },
+      {
+        "type": "User IDs",
+        "optional": true,
+        "ephemeral": false,
+        "purposes": [
+          "Account management",
+          "App functionality"
+        ]
+      },
+      {
+        "type": "Health info",
+        "optional": true,
+        "ephemeral": false,
+        "purposes": [
+          "App functionality"
+        ]
+      },
+      {
+        "type": "Other user-generated content",
+        "optional": true,
+        "ephemeral": false,
+        "purposes": [
+          "App functionality"
+        ]
+      },
+      {
+        "type": "Approximate location",
+        "optional": true,
+        "ephemeral": false,
+        "purposes": [
+          "App functionality",
+          "Fraud prevention, security, and compliance"
+        ]
+      },
+      {
+        "type": "Device or other IDs",
+        "optional": true,
+        "ephemeral": false,
+        "purposes": [
+          "App functionality",
+          "Fraud prevention, security, and compliance"
+        ]
+      },
+      {
+        "type": "Diagnostics",
+        "optional": true,
+        "ephemeral": false,
+        "purposes": [
+          "App functionality",
+          "Analytics",
+          "Fraud prevention, security, and compliance"
+        ]
+      }
     ],
     "optionalReason": "The app works without an account. Account and care types leave the device for signed-in records or account requests. Provider network metadata is processed when the user uses account or map features.",
     "sharingAssessment": "Supabase processes signed-in records as a service provider. Care invitations and Android exports are explicit user-initiated sharing. Apply Google's stated exceptions rather than claiming that data never leaves the app.",
@@ -93,13 +155,18 @@
     "androidChecks": "Six unit checks passed; APK/AAB signatures and static 16 KB ZIP/ELF alignment passed. On 10 October, six local flows passed on Samsung A34 against the matching-source debug build; one credential-dependent sign-in test was initially skipped. Current phone screenshots were captured. After the auth redirect/recovery change, the focused reviewer sign-in, cloud-record load and reopen check passed with no skips. The fresh signed APK/AAB passed vital lint, signature and static 16 KB ZIP/native checks; the signed APK was installed on Samsung A34. Optimized release interaction and a 16 KB runtime are not verified.",
     "uploadBundle": "output/android/Sahara-0.3.0.aab",
     "uploadBundleSha256": "EB0A14F7CE245230BE356A7737B952CF2B799A8895A009CA24A2C53242991589",
-    "playAccount": "Existing Personal account, as explicitly requested. App creation and bundle upload succeeded, but Google rejected distribution because the category or declared health features require an organisation account. Conversion remains stopped by the user. Search Console ownership and Play website association are verified.",
+    "playAccount": "Existing Devit account remains Personal while Google reviews the new organisation identity profile. The existing company D-U-N-S number is accepted, website and email/phone checks are verified, and the incorporation certificate is submitted. On 11 October the new representative identity photographs and approved address were submitted successfully. Google confirms Authorized representative: Submitted and Google is verifying your new payments profile. Approval and the final profile link remain; no conversion timestamp is confirmed. No new paid developer account or merchant payout setup is authorised.",
     "playAppId": "4974759245808215344",
     "closedTrackId": "4699010624330920429",
     "closedTest": "Alpha, India. Version 0.3.0 (3) uploaded; submission rejected on 10 October 2026 under Play Console Requirements. Play shows App not available on Google Play and returns 14 changes to the unsubmitted queue. Native debug symbols warning was non-blocking.",
     "policyIssueId": "4985856061480929924",
     "policyIssueUrl": "https://play.google.com/console/u/1/developers/8795679408143615220/app/4974759245808215344/policy-center/issues/4985856061480929924/details",
-    "testerLists": ["erus testers", "interns", "SecureSign additional testers", "Vikasam owner internal testing"],
+    "testerLists": [
+      "erus testers",
+      "interns",
+      "SecureSign additional testers",
+      "Vikasam owner internal testing"
+    ],
     "uniqueTesterAddresses": 57,
     "optInUrl": "https://play.google.com/apps/testing/in.wedevit.sahara",
     "optInLive": false,
@@ -117,5 +184,23 @@
     "nameLimit": "https://support.google.com/googleplay/android-developer/answer/9859152?hl=en",
     "aiAssetDeclaration": "https://support.google.com/googleplay/android-developer/answer/17262077?hl=en"
   },
-  "applicationId": "in.wedevit.sahara"
+  "applicationId": "in.wedevit.sahara",
+  "nextBuild": {
+    "version": "0.3.1",
+    "versionCode": 4,
+    "ready": true,
+    "uploaded": false,
+    "bundle": "output/android/Sahara-0.3.1.aab",
+    "bundleSha256": "0509B65D448CEFDF3BE949023F03A1C3E28501881EACEE0DFC64D252DC7B2CEB",
+    "evidence": "output/android/verification.json pendingRelease",
+    "sourceBaseCommit": "d617333722e0408cb6cd544b305986423ac1870c",
+    "releaseNotes": "New Sahara logo, quicker view switching, clearer navigation, report files and easier care-note sharing.",
+    "listingUpdatesBeforeSubmission": [
+      "Use the latest candidate only after organisation conversion is confirmed and the required 72-hour waiting period has elapsed.",
+      "Refresh the store icon and screenshots to match the new original logo and phone UI. Current listing still shows 0.3.0.",
+      "Mention PDF/photo reports are saved privately on the phone and not cloud-synced; original files stay unchanged.",
+      "Verify the public privacy page includes the version 0.3.1 report section. No health declaration may be weakened."
+    ],
+    "checkedAt": "2026-10-11T13:49:04.185617+05:30"
+  }
 }

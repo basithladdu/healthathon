@@ -46,6 +46,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.time.*
 import java.time.format.DateTimeFormatter
@@ -69,6 +72,7 @@ val Peach = Color(0xFFFFD1B3)
     val people by vm.people.collectAsStateWithLifecycle()
     val selected by vm.selected.collectAsStateWithLifecycle()
     val clinician by vm.clinician.collectAsStateWithLifecycle()
+    val role by vm.viewRole.collectAsStateWithLifecycle()
     val message by vm.message.collectAsStateWithLifecycle()
     val actionError by vm.actionError.collectAsStateWithLifecycle()
     val activeRecording by vm.recording.collectAsStateWithLifecycle()
@@ -95,10 +99,13 @@ val Peach = Color(0xFFFFD1B3)
     LaunchedEffect(message) { message?.let { snackbar.showSnackbar(it); vm.message.value = null } }
     BackHandler(tab != 0 || activeRecording) { if (activeRecording) vm.stopRecording() else tab = 0 }
     Scaffold(containerColor = Cream, snackbarHost = { SnackbarHost(snackbar) }, topBar = {
-        Row(Modifier.statusBarsPadding().fillMaxWidth().padding(horizontal = 20.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+        Column {
+        Row(Modifier.statusBarsPadding().fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+            Image(painterResource(R.drawable.sahara_logo), null, Modifier.size(44.dp), contentScale = ContentScale.Fit)
+            Spacer(Modifier.width(4.dp))
             Box(Modifier.weight(1f)) {
                 Column(Modifier.clip(RoundedCornerShape(12.dp)).clickable(enabled = person != null && !activeRecording) { personMenu = true }.padding(vertical = 8.dp, horizontal = 2.dp)) {
-                    Text(androidx.compose.ui.res.stringResource(R.string.app_name), fontFamily = FontFamily.Serif, fontSize = 23.sp)
+                    Text(androidx.compose.ui.res.stringResource(R.string.app_name), fontFamily = FontFamily.Serif, fontSize = 22.sp)
                     if (person != null) Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(person.name, color = Rust, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
                         Icon(Icons.Default.ExpandMore, "Choose person", tint = Rust, modifier = Modifier.size(20.dp))
@@ -109,13 +116,13 @@ val Peach = Color(0xFFFFD1B3)
                     DropdownMenuItem(text = { Text("Add someone") }, onClick = { personMenu = false; dialog = "person" })
                 }
             }
-            Spacer(Modifier.width(12.dp))
-            TextButton(onClick = { dialog = "role" }, colors = ButtonDefaults.textButtonColors(contentColor = Ink)) {
-                Icon(Icons.Default.PersonOutline, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(if (clinician) "Doctor" else "Family")
-            }
+            if (person != null) IconButton(onClick = { if (activeRecording) vm.stopRecording(); tab = 5 }) { Icon(Icons.Default.FolderOpen, "Documents", tint = if (tab == 5) Rust else Ink) }
+            CareRoleMenu(role, enabled = !activeRecording) { vm.role(it) }
+        }
+        HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = .15f))
         }
     }, bottomBar = {
-        if (person != null) CareNavigation(tab) { next ->
+        if (person != null) CareNavigation(tab, clinician) { next ->
             if (activeRecording && next != 1) vm.stopRecording()
             tab = next
         }
@@ -128,6 +135,7 @@ val Peach = Color(0xFFFFD1B3)
                     1 -> Talk(vm, clinician && canEdit, onRead = { reading = it })
                     2 -> CareList(vm, onAdd = { if (canEdit) dialog = it else vm.message.value = "Ask the person who invited you to allow changes." })
                     3 -> Nearby(vm.centres)
+                    5 -> CareDocuments(vm, onRead = { reading = it }, onTalk = { tab = 1 })
                     else -> More(vm, person, onAccount = onAccount, onDelete = { dialog = "delete" })
                 } }
             } }
@@ -136,17 +144,10 @@ val Peach = Color(0xFFFFD1B3)
         }
     }
     if (dialog == "person") AddPerson(onDismiss = { dialog = "" }, busy = busy || refreshing, error = actionError, onSave = { vm.addPerson(it) { dialog = "" } })
-    if (dialog == "role") AlertDialog(onDismissRequest = { dialog = "" }, title = { Text("How are you using the app?") }, text = {
-        Column { Text("Choose your view. This doesn't verify a doctor's identity.")
-            Spacer(Modifier.height(16.dp)); listOf(false to "Patient or family", true to "Doctor").forEach { (role, name) ->
-                OutlinedButton(onClick = { vm.role(role); dialog = "" }, modifier = Modifier.fillMaxWidth()) { Text(name) }
-            }
-        }
-    }, confirmButton = {})
     if (dialog in listOf("medicine", "visit", "task", "checkin", "journal")) AddCareItem(dialog, vm, onDismiss = { dialog = "" })
     if (dialog == "delete") AlertDialog(onDismissRequest = { dialog = "" }, title = { Text("Remove ${person?.name}'s records?") },
-        text = { Text("This removes their notes, recordings and care entries. Export anything you want to keep first.") },
-        confirmButton = { TextButton(onClick = { val removedId = person?.id; vm.removePerson { (0..4).forEach { screens.removeState("$removedId:$it") }; dialog = "" } }, enabled = !busy) { Text("Remove records") } },
+        text = { Text("This removes their notes, reports, recordings and care entries. Export anything you want to keep first.") },
+        confirmButton = { TextButton(onClick = { val removedId = person?.id; vm.removePerson { (0..5).forEach { screens.removeState("$removedId:$it") }; dialog = "" } }, enabled = !busy) { Text("Remove records") } },
         dismissButton = { TextButton(onClick = { dialog = "" }) { Text("Keep records") } })
     reading?.let { note -> NoteReader(vm, note, onDismiss = { reading = null }) }
 }
@@ -154,7 +155,7 @@ val Peach = Color(0xFFFFD1B3)
 @Composable fun Welcome(onAccount: () -> Unit, onStart: () -> Unit) {
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp), verticalArrangement = Arrangement.Center) {
         Image(painterResource(R.drawable.conversation), "A patient and doctor talking", Modifier.fillMaxWidth().heightIn(max = 270.dp).clip(RoundedCornerShape(28.dp)), contentScale = ContentScale.Fit)
-        Spacer(Modifier.height(24.dp)); Heading("Cancer care,\ntogether.", 32)
+        Spacer(Modifier.height(24.dp)); Heading("Palliative care,\ntogether.", 32)
         Spacer(Modifier.height(12.dp)); Text("Care notes, medicines and visits.", fontSize = 17.sp)
         Spacer(Modifier.height(24.dp)); Button(onClick = onStart, shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) { Text("Add a person", fontSize = 17.sp); Spacer(Modifier.width(12.dp)); Icon(Icons.AutoMirrored.Filled.ArrowForward, null) }
         TextButton(onClick = onAccount, modifier = Modifier.fillMaxWidth()) { Text("Your account") }
@@ -305,12 +306,26 @@ val Peach = Color(0xFFFFD1B3)
     val ack = acks.firstOrNull { it.versionId == note.id && it.contentHash == note.contentHash }
     var name by rememberSaveable(note.id) { mutableStateOf("") }; var relationship by rememberSaveable(note.id) { mutableStateOf("Patient") }; var reviewed by rememberSaveable(note.id) { mutableStateOf(false) }
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var exporting by rememberSaveable { mutableStateOf<String?>(null) }
+    val saveNote = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/plain")) { uri ->
+        val text = exporting; exporting = null
+        if (uri != null && text != null) scope.launch {
+            try {
+                withContext(Dispatchers.IO) { (context.contentResolver.openOutputStream(uri) ?: error("File unavailable")).bufferedWriter().use { it.write(text) } }
+                vm.message.value = "Care note saved"
+            } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; vm.message.value = "Couldn't save the copy. Your care note is still here. Try again." }
+        }
+    }
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
         LazyColumn(Modifier.fillMaxWidth().imePadding(), contentPadding = PaddingValues(start = 22.dp, end = 22.dp, bottom = 40.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
             item { Heading("Goals of care"); Text("${note.personName} · Version ${note.version}"); Text("Reviewed by ${note.doctor} · ${date(note.published)}", style = MaterialTheme.typography.bodySmall) }
+            item { Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                OutlinedButton(onClick = { exporting = NoteRules.text(note, ack); saveNote.launch("Goals-of-care-v${note.version}.txt") }, modifier = Modifier.weight(1f)) { Icon(Icons.Default.FileDownload, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Save copy") }
+                FilledTonalButton(onClick = { open(context, Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, NoteRules.text(note, ack)), "Share care note")) }, modifier = Modifier.weight(1f), colors = ButtonDefaults.filledTonalButtonColors(containerColor = Gold, contentColor = Ink)) { Icon(Icons.Default.Share, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Share") }
+            } }
             items(NoteRules.labels.zip(NoteRules.values(note))) { (label, value) -> SurfaceCard(if (label == "What matters") Gold else Paper) { Text(label, fontWeight = FontWeight.Bold); Spacer(Modifier.height(8.dp)); SelectionContainerText(value.ifBlank { "Not recorded" }) } }
             item { var open by remember { mutableStateOf(false) }; TextButton(onClick = { open = !open }) { Text(if (open) "Hide original conversation" else "Read original conversation") }; if (open) SelectionContainerText(note.source) }
-            item { OutlinedButton(onClick = { context.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, NoteRules.text(note, ack)), "Share care note")) }, modifier = Modifier.fillMaxWidth()) { Icon(Icons.Default.Share, null); Spacer(Modifier.width(8.dp)); Text("Share this version") } }
             if (ack != null) item { SurfaceCard(Sage) { Text("Read and confirmed", fontWeight = FontWeight.Bold); Text("${ack.name} · ${ack.relationship} · ${date(ack.at)}") } }
             else if (versions.firstOrNull()?.id == note.id) {
                 item { HorizontalDivider(); Spacer(Modifier.height(12.dp)); Heading("Does this reflect\nyour conversation?", 26) }
@@ -429,6 +444,7 @@ val Peach = Color(0xFFFFD1B3)
         item { DetailPanel("Privacy", Icons.Default.Lock) {
             Text("You choose which notes to share and with whom.")
             Spacer(Modifier.height(10.dp)); Text("You can delete a recording or remove a person's records here.")
+            Spacer(Modifier.height(10.dp)); Text("Added reports stay on this phone. They aren't synced with your care team. Use Share to send a copy, and keep your originals before removing the app.")
             TextButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.privacy_url)))) }) { Text("Privacy policy") }
         } }
         item { DetailPanel("About", Icons.Default.Info) {

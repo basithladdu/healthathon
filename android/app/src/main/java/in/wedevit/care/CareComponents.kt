@@ -23,6 +23,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -43,18 +45,43 @@ import androidx.compose.ui.unit.sp
     Card(onClick = onClick, interactionSource = interaction, modifier = modifier.graphicsLayer { scaleX = scale; scaleY = scale }, shape = RoundedCornerShape(22.dp), colors = CardDefaults.cardColors(containerColor = color), content = content)
 }
 
-@Composable fun CareNavigation(selected: Int, onSelect: (Int) -> Unit) {
-    val labels = listOf("Today", "Talk", "Care", "Nearby", "More")
-    val icons = listOf(Icons.Default.WbSunny, Icons.Default.Forum, Icons.Default.FavoriteBorder, Icons.Default.Place, Icons.Default.MoreHoriz)
-    Surface(color = Paper) {
-        Row(Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 12.dp, vertical = 6.dp).selectableGroup()) {
+@Composable fun CareNavigation(selected: Int, clinician: Boolean, onSelect: (Int) -> Unit) {
+    val labels = listOf("Today", if (clinician) "Talk" else "Docs", "Care", "Nearby", "More")
+    val routes = listOf(0, if (clinician) 1 else 5, 2, 3, 4)
+    val icons = listOf(Icons.Default.WbSunny, if (clinician) Icons.Default.Forum else Icons.Default.FolderOpen, Icons.Default.FavoriteBorder, Icons.Default.Place, Icons.Default.MoreHoriz)
+    val duration = if (ValueAnimator.areAnimatorsEnabled()) 180 else 0
+    Surface(color = Paper, shadowElevation = 2.dp) {
+        Row(Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 12.dp, vertical = 6.dp).selectableGroup(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
             labels.forEachIndexed { index, label ->
-                val active = selected == index
-                val color by animateColorAsState(if (active) Gold else Color.Transparent, tween(180), label = "selected tab")
-                Column(Modifier.weight(1f).testTag("nav-$label").clip(RoundedCornerShape(16.dp)).selectable(selected = active, role = Role.Tab, onClick = { onSelect(index) }).padding(vertical = 5.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Box(Modifier.size(width = 48.dp, height = 32.dp).background(color, RoundedCornerShape(12.dp)), contentAlignment = Alignment.Center) { Icon(icons[index], null, Modifier.size(23.dp), tint = if (active) Ink else MaterialTheme.colorScheme.onSurfaceVariant) }
-                    Spacer(Modifier.height(4.dp)); Text(label, fontSize = 12.sp, fontWeight = if (active) FontWeight.Bold else FontWeight.Medium, color = Ink)
+                val active = selected == routes[index] || (!clinician && index == 1 && selected == 1)
+                val color by animateColorAsState(if (active) Color(0xFFFFE39A) else Color.Transparent, tween(duration), label = "selected tab")
+                Column(Modifier.weight(1f).testTag("nav-$label").clip(RoundedCornerShape(15.dp)).background(color)
+                    .selectable(selected = active, role = Role.Tab, onClick = { onSelect(routes[index]) }).heightIn(min = 58.dp).padding(vertical = 7.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+                    Icon(icons[index], null, Modifier.size(22.dp), tint = if (active) Ink else MaterialTheme.colorScheme.onSurfaceVariant)
+                    Spacer(Modifier.height(5.dp)); Text(label, fontSize = 11.sp, fontWeight = if (active) FontWeight.Bold else FontWeight.Medium, color = Ink)
                 }
+            }
+        }
+    }
+}
+
+@Composable fun CareRoleMenu(role: String, enabled: Boolean, onSelect: (String) -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
+    val duration = if (ValueAnimator.areAnimatorsEnabled()) 160 else 0
+    val rotation by animateFloatAsState(if (expanded) 180f else 0f, tween(duration), label = "role arrow")
+    Box {
+        OutlinedButton(onClick = { expanded = true }, enabled = enabled, shape = RoundedCornerShape(14.dp),
+            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("choose-role").semantics { contentDescription = "Change view, $role" },
+            colors = ButtonDefaults.outlinedButtonColors(contentColor = Ink, containerColor = Paper)) {
+            Text(role, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+            Spacer(Modifier.width(4.dp)); Icon(Icons.Default.ExpandMore, null, Modifier.size(18.dp).graphicsLayer { rotationZ = rotation })
+        }
+        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }, containerColor = Paper, shape = RoundedCornerShape(16.dp)) {
+            listOf("Patient", "Family", "Doctor").forEach { option ->
+                DropdownMenuItem(text = { Text(option) }, modifier = Modifier.widthIn(min = 166.dp).testTag("role-$option"),
+                    leadingIcon = { Icon(when (option) { "Doctor" -> Icons.Default.MedicalServices; "Family" -> Icons.Default.PeopleOutline; else -> Icons.Default.PersonOutline }, null) },
+                    trailingIcon = { if (role == option) Icon(Icons.Default.Check, null, tint = Rust) },
+                    onClick = { expanded = false; onSelect(option) })
             }
         }
     }

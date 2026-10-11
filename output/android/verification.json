@@ -476,5 +476,122 @@
       }
     ],
     "recoveryScope": "Forgot password control reachability was checked; email delivery and reset completion were not tested."
+  },
+  "pendingRelease": {
+    "verifiedAt": "2026-10-11T13:49:04.185617+05:30",
+    "version": "0.3.1",
+    "versionCode": 4,
+    "applicationId": "in.wedevit.sahara",
+    "status": "Signed release candidate installed on Samsung A34; not uploaded to Play. Organisation verification and the post-conversion waiting period still apply.",
+    "baseCommit": "d617333722e0408cb6cd544b305986423ac1870c",
+    "artifacts": [
+      {
+        "path": "output/android/Sahara-0.3.1-release.apk",
+        "bytes": 51594062,
+        "sha256": "8F02E37615B34B0FB8F68F72551D5CD299E48ED3F06A96A63CAE685AABF5BDBF"
+      },
+      {
+        "path": "output/android/Sahara-0.3.1.aab",
+        "bytes": 22583294,
+        "sha256": "0509B65D448CEFDF3BE949023F03A1C3E28501881EACEE0DFC64D252DC7B2CEB"
+      }
+    ],
+    "changes": [
+      "Original logo from Awaiz and adaptive launcher icon",
+      "Compact Patient/Family/Doctor menu with persistent view selection",
+      "Highlighted bottom navigation and a Docs shortcut for patient/family views",
+      "Working PDF/photo import, search, open, share and removal in Documents",
+      "Care-note Save copy and Share actions moved to the top",
+      "Room schema 2-to-3 migration preserves existing care records"
+    ],
+    "build": {
+      "debug": "passed",
+      "releaseCompile": "passed",
+      "releaseOptimization": "passed in a fresh 1024 MB Gradle process",
+      "releaseApk": "passed",
+      "releaseBundle": "passed",
+      "releaseVitalLint": "No issues found",
+      "privacyPageScopedEslint": "passed"
+    },
+    "signing": {
+      "apk": "APK Signature Scheme v2 verified",
+      "bundle": "jarsigner verified; expected self-signed upload certificate",
+      "certificateSha256": "607d227a8b25bf7126bbcd742110bbba26f8ba9d75a2f47917013e9589341ad2"
+    },
+    "phone": {
+      "device": "Samsung A34 / Android 16",
+      "installedReleaseVersion": "0.3.1 (4)",
+      "unitChecksPassed": 6,
+      "instrumentationSelected": 12,
+      "instrumentationPassed": 11,
+      "instrumentationSkipped": 1,
+      "skipped": "Credential-dependent sign-in test; no test credentials supplied for this UI run",
+      "method": "Matching-source debug instrumentation with synthetic records. File-picker result contracts are supplied by an instrumentation monitor; actual private copies, database records, exported text and URI read permissions are checked. No user files or real patient records were used.",
+      "screenshotsVisuallyInspected": true
+    },
+    "verified": [
+      "Role change and recreation preserve the conversation and Patient choice",
+      "Report import, search, recreation, read-only sharing URI and confirmed removal preserve the original file",
+      "Saved care-note version opens with visible Save copy and Share actions; exported text matches the exact note",
+      "Reject unsupported content, oversized files and path traversal",
+      "Report account/person isolation and metadata persistence",
+      "Version-2 database migration retains existing person and care-entry values",
+      "Existing conversation review, daily entries, check-ins, person switching and directory/map flows"
+    ],
+    "pageAlignment": {
+      "apkZip16KB": "passed",
+      "elf64BitLoad16KB": "all four arm64-v8a/x86_64 libraries passed",
+      "nativeLibraries": "All eight native library binaries are byte-identical to 0.3.0, including the four previously checked LOAD/RELRO binaries",
+      "runtime16KB": "Not run; connected Samsung reports 4096-byte pages",
+      "officialInstructions": "https://developer.android.com/guide/practices/page-sizes"
+    },
+    "privacy": "Reports are private on-phone copies separated by account and person, not cloud-synced. Only user-selected files are read. FileProvider is unexported and grants temporary read-only sharing; no storage/media permissions were added.",
+    "notVerified": [
+      "Optimized-release interactive flow; signed release installation succeeded",
+      "16 KB device runtime",
+      "Current-build authenticated sharing and signup/recovery mail delivery",
+      "External file-picker UI and third-party viewer/share-app behavior",
+      "Play review and testing availability; no invitations sent"
+    ],
+    "screenshots": [
+      {
+        "path": "output/android/verification/0.3.1/today.png",
+        "bytes": 203727,
+        "sha256": "CA241FB185D40ED1D0EF6556902961505B4BF74A5DCB5D9584159DF93EC64740"
+      },
+      {
+        "path": "output/android/verification/0.3.1/documents.png",
+        "bytes": 145158,
+        "sha256": "4174AEBDB143BD790F45DCEFCA4BE1A2F81E9EA2EC92BC89A8213EC8951CE56A"
+      },
+      {
+        "path": "output/android/verification/0.3.1/role-menu.png",
+        "bytes": 182667,
+        "sha256": "64F433CD6E4EDE3733134ACD759892DFE25FF0EAD3685D0D565CAE8566B0DAA4"
+      },
+      {
+        "path": "output/android/verification/0.3.1/note-actions.png",
+        "bytes": 139150,
+        "sha256": "D8339D5B8A228A4158FA852428A76653E8A4E68826B1DE1BFBCBCC954B3B2FFD"
+      }
+    ],
+    "debugApk": {
+      "path": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "bytes": 69582842,
+      "sha256": "42ED71EF6583425D3D8F1F8A6D8CC09E4A5BCE884B653A3EB817A32A604B060E"
+    },
+    "testApk": {
+      "path": "android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk",
+      "bytes": 1149420,
+      "sha256": "806680BF8EEF09BF5BDF03FF19AE87B47F8000887D54A5D3ECF4BAB8301866EC"
+    },
+    "sourceHashes": {
+      "CareUi.kt": "9A6B02AD67B34E82C0DA01B823EB8565F9A20F436149134C6B00BE2CEC186E01",
+      "CareComponents.kt": "BA4C596FE396B36B80EC5DD8E90F7B7C681E60307A6AA9697B6734AF296B1195",
+      "CareDocuments.kt": "722347EFC9C654F55A2DD8662A9C387797AE8027521397E9EA747AC268F51521",
+      "CareReports.kt": "AB654C6C7D64A68F5DEECA58AB24C7C2783D8051C459C8BB72692ED5815D254E",
+      "CareData.kt": "F77FF58844DD8BD382FBCCB05A02464BAC5E3A2DCCE45B117FA4D89015DD3320",
+      "CareModel.kt": "08CA04788995B956EC366E5F375A4AFB999964168C975133C912E3D32B31408F"
+    }
   }
 }

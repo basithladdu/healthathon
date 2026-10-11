@@ -23,6 +23,8 @@ data class CareVersion(
 )
 @Entity data class Acknowledgement(@PrimaryKey val versionId: String, val contentHash: String, val name: String, val relationship: String, val at: Long = System.currentTimeMillis())
 @Entity data class CareItem(@PrimaryKey val id: String = newId(), val personId: String, val kind: String, val title: String, val detail: String = "", val due: Long = 0, val doneOn: String = "", val created: Long = System.currentTimeMillis(), @ColumnInfo(defaultValue = "0") val revision: Long = 0)
+@Entity(indices = [Index("personId")])
+data class CareReport(@PrimaryKey val id: String = newId(), val personId: String, val name: String, val mime: String, val fileName: String, val bytes: Long, val created: Long = System.currentTimeMillis())
 
 @Dao interface CareDao {
     @Query("SELECT * FROM Person ORDER BY created") fun people(): Flow<List<Person>>
@@ -37,6 +39,10 @@ data class CareVersion(
     @Query("SELECT * FROM CareItem WHERE personId = :id ORDER BY created DESC") fun items(id: String): Flow<List<CareItem>>
     @Insert(onConflict = OnConflictStrategy.REPLACE) suspend fun saveItem(item: CareItem)
     @Delete suspend fun removeItem(item: CareItem)
+    @Query("SELECT * FROM CareReport WHERE personId = :id ORDER BY created DESC") fun reports(id: String): Flow<List<CareReport>>
+    @Insert suspend fun addReport(report: CareReport)
+    @Delete suspend fun removeReport(report: CareReport)
+    @Query("DELETE FROM CareReport WHERE personId = :id") suspend fun deleteReports(id: String)
     @Query("DELETE FROM Person WHERE id = :id") suspend fun deletePersonRow(id: String)
     @Query("DELETE FROM Conversation WHERE personId = :id") suspend fun deleteDraft(id: String)
     @Query("DELETE FROM Acknowledgement WHERE versionId IN (SELECT id FROM CareVersion WHERE personId = :id)") suspend fun deleteAcknowledgements(id: String)
@@ -53,7 +59,14 @@ data class CareVersion(
     @Insert suspend fun addAcknowledgements(acknowledgements: List<Acknowledgement>)
 }
 
-@Database(entities = [Person::class, Conversation::class, CareVersion::class, Acknowledgement::class, CareItem::class], version = 2, exportSchema = true)
+val ReportsMigration = object : androidx.room.migration.Migration(2, 3) {
+    override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
+        db.execSQL("CREATE TABLE IF NOT EXISTS CareReport (id TEXT NOT NULL, personId TEXT NOT NULL, name TEXT NOT NULL, mime TEXT NOT NULL, fileName TEXT NOT NULL, bytes INTEGER NOT NULL, created INTEGER NOT NULL, PRIMARY KEY(id))")
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_CareReport_personId ON CareReport (personId)")
+    }
+}
+
+@Database(entities = [Person::class, Conversation::class, CareVersion::class, Acknowledgement::class, CareItem::class, CareReport::class], version = 3, exportSchema = true)
 abstract class CareDatabase : RoomDatabase() {
     abstract fun care(): CareDao
     companion object {
@@ -64,7 +77,7 @@ abstract class CareDatabase : RoomDatabase() {
             instances.getOrPut(filename) { Room.databaseBuilder(context.applicationContext, CareDatabase::class.java, filename)
                 .addMigrations(object : androidx.room.migration.Migration(1, 2) {
                     override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) { db.execSQL("ALTER TABLE CareItem ADD COLUMN revision INTEGER NOT NULL DEFAULT 0") }
-                }).build() }
+                }, ReportsMigration).build() }
         }
     }
 }
