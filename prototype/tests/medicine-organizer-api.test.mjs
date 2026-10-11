@@ -4,19 +4,31 @@ import { GET, POST } from '../app/api/medicine-organizer/route.ts';
 import { handleMedicineOrganizer } from '../supabase/functions/saanthvana-medicine-organizer/index.ts';
 
 const endpoint = 'https://example.supabase.co';
+const androidEndpoint = 'https://android-example.supabase.co';
 const secret = 's'.repeat(64);
+const androidToken = 'header.payload.signature';
 const image = { name: 'medicine.jpg', mimeType: 'image/jpeg', data: 'AQ==' };
 const body = JSON.stringify({ prescriptionPages: [image], medicineImages: [image] });
 const originHeaders = { Origin: 'https://care.example', 'Sec-Fetch-Site': 'same-origin', 'Content-Type': 'application/json' };
+const nativeHeaders = { Authorization: `Bearer ${androidToken}`, 'Content-Type': 'application/json' };
 
 function setup(t, fetcher, { gemini = true } = {}) {
   const oldFetch = globalThis.fetch;
   const oldDeno = globalThis.Deno;
-  const names = ['SAANTHVANA_SUPABASE_URL', 'SAANTHVANA_SUPABASE_PUBLISHABLE_KEY', 'SAANTHVANA_SUPABASE_ANON_KEY', 'SAANTHVANA_MEDICINE_ORGANIZER_SECRET'];
+  const names = [
+    'SAANTHVANA_SUPABASE_URL',
+    'SAANTHVANA_SUPABASE_PUBLISHABLE_KEY',
+    'SAANTHVANA_SUPABASE_ANON_KEY',
+    'SAANTHVANA_MEDICINE_ORGANIZER_SECRET',
+    'SAHARA_ANDROID_SUPABASE_URL',
+    'SAHARA_ANDROID_SUPABASE_PUBLISHABLE_KEY',
+  ];
   const prior = Object.fromEntries(names.map((name) => [name, process.env[name]]));
   process.env.SAANTHVANA_SUPABASE_URL = endpoint;
   process.env.SAANTHVANA_SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_test';
   process.env.SAANTHVANA_MEDICINE_ORGANIZER_SECRET = secret;
+  process.env.SAHARA_ANDROID_SUPABASE_URL = androidEndpoint;
+  process.env.SAHARA_ANDROID_SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_android_test';
   globalThis.Deno = { env: { get: (name) => ({ SAANTHVANA_MEDICINE_ORGANIZER_SECRET: secret, GEMINI_API_KEY: gemini ? 'gemini-test-key' : undefined })[name] } };
   globalThis.fetch = fetcher || (() => { throw new Error('Unexpected network access'); });
   t.after(() => {
@@ -50,6 +62,54 @@ test('proxy sends images to Supabase with only the publishable key and private c
   });
   const response = await POST(new Request('https://care.example/api/medicine-organizer', { method: 'POST', headers: originHeaders, body }));
   assert.equal(response.status, 200);
+});
+
+test('native proxy verifies the Android Supabase user before forwarding the unchanged upload', async (t) => {
+  let calls = 0;
+  setup(t, async (url, init) => {
+    calls += 1;
+    if (calls === 1) {
+      assert.equal(url, `${androidEndpoint}/auth/v1/user`);
+      assert.equal(init.method, 'GET');
+      assert.equal(init.headers.apikey, 'sb_publishable_android_test');
+      assert.equal(init.headers.Authorization, `Bearer ${androidToken}`);
+      assert.equal(init.headers['X-Saanthvana-Organizer-Secret'], undefined);
+      assert.equal(init.cache, 'no-store');
+      assert.equal(init.redirect, 'error');
+      assert.ok(init.signal instanceof AbortSignal);
+      return Response.json({ id: 'android-user' });
+    }
+    assert.equal(url, `${endpoint}/functions/v1/saanthvana-medicine-organizer`);
+    assert.equal(init.headers.Authorization, undefined);
+    assert.equal(init.headers['X-Saanthvana-Organizer-Secret'], secret);
+    assert.equal(new TextDecoder().decode(init.body), body);
+    return Response.json({ medicines: [], unmatchedMedicineImageIndexes: [0], warnings: [] });
+  });
+  const response = await POST(new Request('https://care.example/api/medicine-organizer', { method: 'POST', headers: nativeHeaders, body }));
+  assert.equal(response.status, 200);
+  assert.equal(calls, 2);
+});
+
+test('native proxy rejects a missing bearer token before network access', async (t) => {
+  setup(t);
+  const response = await POST(new Request('https://care.example/api/medicine-organizer', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body }));
+  assert.equal(response.status, 401);
+  assert.equal((await response.json()).code, 'authentication_required');
+});
+
+test('native proxy rejects a bearer token refused by Android Supabase Auth', async (t) => {
+  let calls = 0;
+  setup(t, async (url, init) => {
+    calls += 1;
+    assert.equal(url, `${androidEndpoint}/auth/v1/user`);
+    assert.equal(init.headers.Authorization, `Bearer ${androidToken}`);
+    assert.equal(init.headers['X-Saanthvana-Organizer-Secret'], undefined);
+    return Response.json({ message: 'invalid JWT' }, { status: 401 });
+  });
+  const response = await POST(new Request('https://care.example/api/medicine-organizer', { method: 'POST', headers: nativeHeaders, body }));
+  assert.equal(response.status, 401);
+  assert.equal((await response.json()).code, 'invalid_authentication');
+  assert.equal(calls, 1);
 });
 
 test('Edge Function rejects callers without the server capability', async (t) => {

@@ -114,6 +114,30 @@ class CareFlowTest {
         ui.waitUntil(15000) { vm.items.value.none { it.title == "Bring the prescription" } }
         ui.onNodeWithText("Nothing added yet").assertIsDisplayed()
     }
+    @Test fun prescriptionScannerKeepsManualFallbackAndRequiresReviewBeforeSaving() {
+        ui.onNodeWithTag("nav-Care").performClick()
+        ui.onNodeWithText("Medicines").performClick()
+        ui.onNodeWithText("Scan a prescription").assertIsDisplayed()
+        ui.onNodeWithText("Scan & organize").performClick()
+        ui.onNodeWithTag("medicine-scanner-select").assertIsDisplayed()
+        ui.onNodeWithText("Choose pages").assertIsDisplayed()
+        ui.onNodeWithText("Choose medicine photos").assertIsDisplayed()
+        ui.onNodeWithText("Add one manually").performScrollTo().performClick()
+        ui.onNodeWithTag("medicine-scanner-review").assertIsDisplayed()
+        ui.activityRule.scenario.recreate()
+        ui.onNodeWithTag("medicine-scanner-select").assertIsDisplayed()
+        ui.onNodeWithText("Add one manually").performScrollTo().performClick()
+        ui.onNodeWithTag("medicine-scanner-review").assertIsDisplayed()
+        ui.onNode(hasSetTextAction() and hasText("Medicine name")).performTextInput("Test medicine")
+        ui.onNode(hasSetTextAction() and hasText("Strength")).performTextInput("10 mg")
+        ui.onNodeWithText("Save 1 medicine").performScrollTo().assertIsNotEnabled()
+        ui.onNodeWithText("I checked this medicine, dose and directions against the original prescription and packaging.", substring = true).performScrollTo().performClick()
+        ui.onNodeWithText("Save 1 medicine").performScrollTo().performClick()
+        ui.waitUntil(15000) { vm.items.value.any { it.kind == "medicine" && it.title == "Test medicine" } }
+        val saved = vm.items.value.single { it.kind == "medicine" && it.title == "Test medicine" }
+        assertTrue(saved.detail.contains("Dose: 10 mg"))
+        ui.onNodeWithText("Test medicine").assertIsDisplayed()
+    }
     @Test fun checkinSavesChosenWordsAndKeepsOptionalNote() {
         ui.runOnIdle { vm.role(false) }
         ui.onNodeWithText("How are you?").performClick()

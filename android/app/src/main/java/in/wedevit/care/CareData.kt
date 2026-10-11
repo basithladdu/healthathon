@@ -35,6 +35,7 @@ data class CareVersion(
     @Query("SELECT * FROM Acknowledgement") fun acknowledgements(): Flow<List<Acknowledgement>>
     @Insert(onConflict = OnConflictStrategy.ABORT) suspend fun acknowledge(acknowledgement: Acknowledgement)
     @Query("SELECT * FROM CareItem WHERE personId = :id ORDER BY created DESC") fun items(id: String): Flow<List<CareItem>>
+    @Query("SELECT * FROM CareItem WHERE id = :id LIMIT 1") suspend fun item(id: String): CareItem?
     @Insert(onConflict = OnConflictStrategy.REPLACE) suspend fun saveItem(item: CareItem)
     @Delete suspend fun removeItem(item: CareItem)
     @Query("DELETE FROM Person WHERE id = :id") suspend fun deletePersonRow(id: String)

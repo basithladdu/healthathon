@@ -17,10 +17,10 @@ export default function PrivacyPage() {
           <Link href="/delete-account">Delete your account</Link>
         </header>
         <h1>Your care information</h1>
-        <p className={styles.date}>Privacy policy · Updated 10 October 2026</p>
+        <p className={styles.date}>Privacy policy · Updated 11 October 2026</p>
         <p>
           Sahara — A Palliative Care Companion is provided by WEDEVIT PRIVATE LIMITED.
-          This policy covers the Sahara Android app, including version 0.3.0, rather
+          This policy covers the Sahara Android app, including version 0.4.0, rather
           than the separate website.
         </p>
 
@@ -56,9 +56,28 @@ export default function PrivacyPage() {
             Microphone permission is requested when you choose to record. Ask everyone
             taking part for permission first. You can stop at any time; recording also
             stops when the app leaves the foreground. Audio and unfinished conversation
-            drafts stay on your phone. This Android version does not upload audio or
-            send your care information to an AI service, and it does not transcribe
-            recordings automatically.
+            drafts stay on your phone. This Android version does not upload audio and
+            does not transcribe recordings automatically.
+          </p>
+        </section>
+
+        <section aria-labelledby="medicine-ai">
+          <h2 id="medicine-ai">Prescription and medicine photo organiser</h2>
+          <p>
+            If you choose Scan prescription, the prescription pages and medicine-strip
+            or box photos you select are compressed on your phone and sent over HTTPS
+            through Sahara’s protected service and a Supabase Edge Function to Google
+            Gemini. They are used only to transcribe and match the medicines for the
+            review screen. The organiser does not save the image payloads and asks the
+            AI provider not to store the interaction. Cancelling before Organise sends
+            nothing.
+          </p>
+          <p>
+            AI results can be incomplete or wrong. Unknown details stay blank. Check
+            every medicine name, strength, dose, timing, food instruction and course
+            length against the original prescription before confirming. Only the text
+            you review and save becomes part of the person’s care records; the selected
+            photos are not added to those records.
           </p>
         </section>
 
@@ -92,10 +111,11 @@ export default function PrivacyPage() {
           <h2 id="security">How information is protected</h2>
           <p>
             Sahara has no advertising or analytics SDK. We do not sell care information
-            or use it for advertising. Connections to Supabase and OpenFreeMap use HTTPS.
-            Sign-in tokens are encrypted using Android Keystore. Account caches are
-            separated from each other and from unsigned-in records, and app records are
-            excluded from Android backup and transfer.
+            or use it for advertising. Connections to Sahara’s service, Supabase,
+            Google Gemini and OpenFreeMap use HTTPS. Sign-in tokens are encrypted using
+            Android Keystore. Account caches are separated from each other and from
+            unsigned-in records, and app records are excluded from Android backup and
+            transfer.
           </p>
           <p>
             Protect your phone with a screen lock. The app’s records rely on Android’s
@@ -155,8 +175,9 @@ export default function PrivacyPage() {
             Contact WEDEVIT PRIVATE LIMITED at{' '}
             <a href="mailto:workwithdevit@gmail.com">workwithdevit@gmail.com</a> for privacy
             questions, corrections or deletion requests. We will update this page when
-            data handling changes. Any future audio upload or AI processing will require
-            an updated explanation and consent before that information is sent.
+            data handling changes. Any future audio upload or materially different AI
+            processing will require an updated explanation and consent before that
+            information is sent.
           </p>
         </section>
         <footer className={styles.footer}>

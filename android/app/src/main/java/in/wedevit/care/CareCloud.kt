@@ -114,6 +114,7 @@ class CareCloud(context: Context) {
         rememberSession(response)
         session.value!!.access
     }
+    internal suspend fun medicineOrganizerToken(): String = token()
     private suspend fun request(method: String, path: String, body: JSONObject? = null, authenticated: Boolean = true): String {
         val access = if (authenticated) token() else null
         return withContext(Dispatchers.IO) {
