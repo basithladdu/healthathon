@@ -55,8 +55,8 @@ export const metadata: Metadata = {
   description:
     'Coordinate family tasks and visits, prepare for goals-of-care conversations, and find palliative care with Sahara.',
   icons: {
-    icon: '/sahara-community-logo.png',
-    apple: '/sahara-community-logo.png',
+    icon: '/sahara-professional-logo.png',
+    apple: '/sahara-professional-logo.png',
   },
 };
 

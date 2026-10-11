@@ -3,7 +3,7 @@ import Image from 'next/image';
 export function SaharaLogo({ className, priority = false }: { className?: string; priority?: boolean }) {
   return (
     <Image
-      src="/sahara-community-logo.png"
+      src="/sahara-professional-logo.png"
       alt=""
       aria-hidden="true"
       width={512}

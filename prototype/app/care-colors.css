@@ -31,7 +31,8 @@
   letter-spacing: -1.2px;
 }
 .simple-care-app .simple-care-switches { gap: 8px; }
-.simple-care-app .simple-care-switches :is(button, select),
+.simple-care-app .simple-care-switches > button,
+.simple-care-app .simple-care-role-trigger,
 .care-sign-in .care-sign-in-header button {
   color: var(--care-ink);
   background: var(--care-surface);
@@ -398,12 +399,17 @@
 }
 
 @media (max-width: 700px) {
-  .simple-care-app .simple-care-header { min-height: 76px; flex-wrap: wrap; gap: 6px 12px; padding-block: 10px; }
+  .simple-care-app { padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
+  .simple-care-app .simple-care-header { min-height: 76px; flex-wrap: wrap; gap: 6px 12px; padding-block: 10px; border-bottom: 1px solid var(--care-line); }
   .simple-care-app .simple-care-brand { font-size: 27px; }
   .simple-care-app .simple-care-switches { gap: 6px; margin-left: auto; }
-  .simple-care-app .simple-care-switches :is(button, select) { padding: 8px 10px; font-size: 13px; }
-  .simple-care-app .simple-care-nav { gap: 4px; padding-bottom: 10px; }
-  .simple-care-app .simple-care-nav :is(a, button) { flex: 1; padding: 10px 6px; font-size: 12px; text-align: center; }
+  .simple-care-app .simple-care-switches > button, .simple-care-app .simple-care-role-trigger { padding: 8px 10px; font-size: 13px; }
+  .simple-care-app .simple-care-nav { position: fixed; z-index: 50; inset: auto 0 0; display: grid; width: 100%; max-width: none; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 5px; padding: 7px max(12px, env(safe-area-inset-right)) calc(7px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left)); border-top: 1px solid var(--care-line); border-bottom: 0; background: #fff8ee; box-shadow: 0 -8px 28px #5b3d2514; transform: translate3d(0, 0, 0); backface-visibility: hidden; }
+  .simple-care-app .simple-care-nav :is(a, button) { min-width: 0; min-height: 58px; padding: 6px 2px; border-radius: 14px; flex-direction: column; gap: 4px; font-size: 10px; line-height: 1; text-align: center; }
+  .simple-care-app .simple-care-nav :is(a, button)[aria-current='page'] { background: #ffe39a; box-shadow: inset 0 0 0 1px #e5b95555; }
+  .simple-care-app .simple-care-nav-icon { display: block; width: 21px; height: 21px; flex: none; }
+  .simple-care-app .simple-care-nav-label { display: none; }
+  .simple-care-app .simple-care-nav-short-label { display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .simple-care-app .simple-care-content { padding-top: 20px; }
   .simple-care-app .simple-care-content h1 { font-size: 31px; letter-spacing: -.9px; }
   .simple-care-app .simple-care-content :where(h2) { font-size: 22px; }
@@ -431,7 +437,7 @@
   .simple-care-app :is(.symptom-note, .home-help-card) { padding: 16px; }
   .simple-care-app :is(.care-story-card-heading h2, .support-place-title h2, .open-question-card h2, .copy-recipient-card h2, .copy-current-note h2, .handover-preview-heading h2) { font-size: 17px; }
   .simple-care-app :is(input:not([type='checkbox']):not([type='radio']), select, textarea) { font-size: 16px; }
-  .simple-care-app .simple-care-header .simple-care-switches select { font-size: 13px; }
+  .simple-care-app .simple-care-role-trigger { min-width: 94px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
