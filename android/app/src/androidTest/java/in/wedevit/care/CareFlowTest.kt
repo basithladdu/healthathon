@@ -75,7 +75,7 @@ class CareFlowTest {
             page.canvas.drawText("Synthetic report for UI verification", 16f, 40f, android.graphics.Paint().apply { textSize = 13f })
             pdf.finishPage(page); original.outputStream().use(pdf::writeTo)
         } finally { pdf.close() }
-        val uri = androidx.core.content.FileProvider.getUriForFile(ui.activity, ui.activity.packageName + ".reports", original, source.name)
+        val uri = androidx.core.content.FileProvider.getUriForFile(ui.activity, ui.activity.packageName + ".fileprovider", original, source.name)
         val instrumentation = androidx.test.platform.app.InstrumentationRegistry.getInstrumentation()
         val filter = android.content.IntentFilter(android.content.Intent.ACTION_OPEN_DOCUMENT).apply { addCategory(android.content.Intent.CATEGORY_OPENABLE); addDataType("*/*") }
         val monitor = instrumentation.addMonitor(filter, android.app.Instrumentation.ActivityResult(android.app.Activity.RESULT_OK, android.content.Intent().setData(uri)), true)
@@ -125,7 +125,7 @@ class CareFlowTest {
         ui.onNodeWithText("More time with family.").assertIsDisplayed()
         screenshot("note-actions")
         val target = vm.reportFiles.file(CareReport(personId = personId, name = "Care note.txt", mime = "text/plain", fileName = "exported-note.txt", bytes = 0)).apply { parentFile!!.mkdirs(); createNewFile() }
-        val uri = androidx.core.content.FileProvider.getUriForFile(ui.activity, ui.activity.packageName + ".reports", target)
+        val uri = androidx.core.content.FileProvider.getUriForFile(ui.activity, ui.activity.packageName + ".fileprovider", target)
         val instrumentation = androidx.test.platform.app.InstrumentationRegistry.getInstrumentation()
         val filter = android.content.IntentFilter(android.content.Intent.ACTION_CREATE_DOCUMENT).apply { addCategory(android.content.Intent.CATEGORY_OPENABLE); addDataType("text/plain") }
         val monitor = instrumentation.addMonitor(filter, android.app.Instrumentation.ActivityResult(android.app.Activity.RESULT_OK, android.content.Intent().setData(uri)), true)
@@ -180,6 +180,7 @@ class CareFlowTest {
         ui.onNode(hasSetTextAction()).performTextInput("Aster")
         ui.onNodeWithTag("nearby-list").performScrollToNode(hasTestTag("centre-map"))
         ui.waitUntil(30000) { ui.onAllNodes(SemanticsMatcher.expectValue(androidx.compose.ui.semantics.SemanticsProperties.StateDescription, "Map ready")).fetchSemanticsNodes().isNotEmpty() }
+        screenshot("centre-map-loaded")
         ui.onNodeWithTag("centre-map").performTouchInput { click(center) }
         ui.waitUntil(10000) { ui.onAllNodesWithText("Aster CMI Hospital").fetchSemanticsNodes().size >= 2 }
         screenshot("centre-map")
@@ -205,6 +206,36 @@ class CareFlowTest {
         ui.onNodeWithText("Remove", useUnmergedTree = true).performClick()
         ui.waitUntil(15000) { vm.items.value.none { it.title == "Bring the prescription" } }
         ui.onNodeWithText("Nothing added yet").assertIsDisplayed()
+    }
+    @Test fun prescriptionScannerKeepsManualFallbackAndRequiresReviewBeforeSaving() {
+        ui.onNodeWithTag("nav-Care").performClick()
+        ui.onNodeWithText("Medicines").performClick()
+        ui.onNodeWithText("Scan a prescription").assertIsDisplayed()
+        ui.onNodeWithText("Scan & organize").performClick()
+        ui.onNodeWithTag("medicine-scanner-select").assertIsDisplayed()
+        ui.onNodeWithText("Choose pages").assertIsDisplayed()
+        ui.onNodeWithText("Choose photos").assertIsDisplayed()
+        screenshot("medicine-scanner")
+        ui.onNodeWithTag("medicine-scanner-select").performScrollToNode(hasText("Add one manually"))
+        ui.onNodeWithText("Add one manually").performClick()
+        ui.onNodeWithTag("medicine-scanner-review").assertIsDisplayed()
+        ui.activityRule.scenario.recreate()
+        ui.onNodeWithTag("medicine-scanner-select").assertIsDisplayed()
+        ui.onNodeWithTag("medicine-scanner-select").performScrollToNode(hasText("Add one manually"))
+        ui.onNodeWithText("Add one manually").performClick()
+        ui.onNodeWithTag("medicine-scanner-review").assertIsDisplayed()
+        ui.onNode(hasSetTextAction() and hasText("Medicine name")).performTextInput("Test medicine")
+        ui.onNode(hasSetTextAction() and hasText("Strength")).performTextInput("10 mg")
+        screenshot("medicine-review")
+        ui.onNodeWithTag("medicine-scanner-review").performScrollToNode(hasText("Save 1 medicine"))
+        ui.onNodeWithText("Save 1 medicine").assertIsNotEnabled()
+        ui.onNodeWithText("I checked this medicine, dose and directions against the original prescription and packaging.", substring = true).performScrollTo().performClick()
+        ui.onNodeWithTag("medicine-scanner-review").performScrollToNode(hasText("Save 1 medicine"))
+        ui.onNodeWithText("Save 1 medicine").performClick()
+        ui.waitUntil(15000) { vm.items.value.any { it.kind == "medicine" && it.title == "Test medicine" } }
+        val saved = vm.items.value.single { it.kind == "medicine" && it.title == "Test medicine" }
+        assertTrue(saved.detail.contains("Dose: 10 mg"))
+        ui.onNodeWithText("Test medicine").assertIsDisplayed()
     }
     @Test fun checkinSavesChosenWordsAndKeepsOptionalNote() {
         ui.runOnIdle { vm.role(false) }

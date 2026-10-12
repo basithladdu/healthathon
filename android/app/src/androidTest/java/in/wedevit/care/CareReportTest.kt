@@ -21,7 +21,7 @@ class CareReportTest {
         val files = ReportFiles(context); val other = ReportFiles(context, otherAccount)
         val source = CareReport(personId = person, name = "Scan.pdf", mime = "application/pdf", fileName = "source.pdf", bytes = 0)
         val original = files.file(source).apply { parentFile!!.mkdirs() }
-        val uri = FileProvider.getUriForFile(context, context.packageName + ".reports", original, source.name)
+        val uri = FileProvider.getUriForFile(context, context.packageName + ".fileprovider", original, source.name)
         try {
             original.writeText("%PDF-1.7\nSynthetic fixture\n%%EOF")
             val report = files.copyFrom(uri, person)

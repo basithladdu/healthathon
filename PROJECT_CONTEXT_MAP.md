@@ -1,5 +1,13 @@
 # Healthathon and TANUH project context map
 
+## 13 October 2026: organisation conversion complete; Android 0.4.0 built
+
+- Google verified the company identity profile. The final profile link is complete and Play Console now shows **Organization**. Confirmation was observed on **13 October at 03:06 IST**. Google's 72-hour delay ends **16 October at 03:06 IST**; do not resubmit before that time. Existing app/package, developer account and rejection history are preserved. Private proof and exact UTC timestamps are in `F:\BuildKeys\sahara`.
+- The user resumed release work and requested Awaiz's latest changes. `origin/main` remains `b453efb`; its prescription organiser is combined with the navigation/Documents port and the tested conversation-focus fixes. Signed **0.4.0 (4)** APK/AAB are built and the APK is installed on Samsung A34. Release vital lint, APK/AAB signatures, ZIP alignment and all four 64-bit native libraries' 16 KB alignment checks passed. A 16 KB runtime and optimized-release interaction are not established by these checks.
+- Existing matching-source evidence from 11 October: 12 unit checks passed; Samsung instrumentation selected 13 checks, with 12 passes and one credential-dependent skip. All 12 prescription proxy/function tests passed again on 13 October. See `output/android/verification.json` and `android/release/store-draft.json` for the current candidate and hashes.
+- The prescription scanner remains blocked on live setup: the configured Supabase project has no medicine-organiser function or Gemini key, Vercel has no organiser capability secret, and the production GET reports `ready:false`. The user has been asked where Awaiz's existing Gemini key is saved. Do not describe photo recognition as working or submit this candidate until the service, privacy text and matching Play declarations are verified. Manual medicine entry works.
+- The existing release heartbeat is resumed. It must remain quiet during the 72-hour wait, then submit only after candidate prerequisites pass. Closed testing is not live; no tester invitations have been sent. Zoho and the unapproved Supabase callback remain outside scope.
+
 ## 11 October 2026: Awaiz's UI changes ported to Android 0.3.1
 
 - Pulled `d617333` (Awaiz's mobile navigation and document actions) with a fast-forward before editing. Android now uses his original logo, an adaptive launcher icon, compact Patient/Family/Doctor switching, highlighted bottom tabs, a Documents shortcut and top-of-note Save copy/Share actions. Existing care, conversation and centre routes remain available.

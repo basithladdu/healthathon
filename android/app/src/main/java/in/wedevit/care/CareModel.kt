@@ -156,6 +156,37 @@ class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewMod
             message.value = "Saved"; done()
         }
     }
+    fun saveMedicineList(drafts: List<MedicineDraft>, done: () -> Unit = {}) {
+        val person = selected.value
+        action {
+            require(person.isNotBlank() && selected.value == person) { "Choose who these medicines are for." }
+            require(drafts.isNotEmpty()) { "Add at least one medicine." }
+            require(drafts.all { it.confirmed }) { "Check and confirm every medicine before saving." }
+            val names = drafts.map { it.medicine.medicineName.trim() }
+            require(names.all { it.isNotBlank() && it.length <= 200 }) { "Add a medicine name to every entry." }
+            require(names.map { it.lowercase() }.distinct().size == names.size) { "Each medicine needs a different name." }
+            drafts.forEach { draft ->
+                val medicine = draft.medicine
+                require(medicine.strength.isNotBlank() || medicine.quantity.isNotBlank() || medicine.form.isNotBlank()) { "Add the prescribed dose for ${medicine.medicineName}." }
+                val detail = medicineCareDetail(medicine)
+                require(detail.isNotBlank() && detail.length <= 4000) { "Review the dose and directions for ${medicine.medicineName}." }
+                val existing = dao.item(draft.id)
+                require(existing == null || (existing.personId == person && existing.kind == "medicine")) { "One medicine could not be matched to this person. Start the scan again." }
+                storeItem(CareItem(
+                    id = draft.id,
+                    personId = person,
+                    kind = "medicine",
+                    title = medicine.medicineName.trim(),
+                    detail = detail,
+                    created = existing?.created ?: System.currentTimeMillis(),
+                    doneOn = existing?.doneOn.orEmpty(),
+                    revision = existing?.revision ?: 0,
+                ))
+            }
+            message.value = "${drafts.size} ${if (drafts.size == 1) "medicine" else "medicines"} saved"
+            done()
+        }
+    }
     fun toggle(item: CareItem) = action {
         val today = LocalDate.now().toString()
         val checked = if (item.kind == "medicine") item.doneOn == today else item.doneOn.isNotBlank()

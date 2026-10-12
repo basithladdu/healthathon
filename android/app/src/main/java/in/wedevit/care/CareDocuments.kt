@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -106,7 +107,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
                     Box {
                         IconButton(onClick = { menu = true }, modifier = Modifier.padding(end = 4.dp)) { Icon(Icons.Default.MoreHoriz, "Options for ${report.name}") }
                         DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
-                            DropdownMenuItem(text = { Text("Open") }, leadingIcon = { Icon(Icons.Default.OpenInNew, null) }, onClick = { menu = false; openReport(report, false) })
+                            DropdownMenuItem(text = { Text("Open") }, leadingIcon = { Icon(Icons.AutoMirrored.Filled.OpenInNew, null) }, onClick = { menu = false; openReport(report, false) })
                             DropdownMenuItem(text = { Text("Share") }, leadingIcon = { Icon(Icons.Default.Share, null) }, onClick = { menu = false; openReport(report, true) })
                             if (canEdit) DropdownMenuItem(text = { Text("Remove") }, leadingIcon = { Icon(Icons.Default.DeleteOutline, null) }, enabled = !busy, onClick = { menu = false; remove = report })
                         }

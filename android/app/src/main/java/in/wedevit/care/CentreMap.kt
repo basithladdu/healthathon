@@ -17,6 +17,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import org.maplibre.android.MapLibre
+import org.maplibre.android.RenderingEngine
+import org.maplibre.android.WellKnownTileServer
 import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.geometry.LatLngBounds
@@ -44,8 +46,9 @@ import org.maplibre.geojson.Point
     var zoom by rememberSaveable { mutableDoubleStateOf(9.5) }
     var filterSignature by rememberSaveable { mutableStateOf("") }
     val view = remember(retry) {
-        MapLibre.getInstance(context)
-        MapView(context, MapLibreMapOptions.createFromAttributes(context).textureMode(true)).apply {
+        // Some Android 17 emulators advertise Vulkan but cannot initialize it.
+        MapLibre.getInstance(context, null, WellKnownTileServer.MapLibre, RenderingEngine.Type.OPENGL)
+        MapView(context, MapLibreMapOptions.createFromAttributes(context)).apply {
             onCreate(null)
             setOnTouchListener { view, event ->
                 view.parent?.requestDisallowInterceptTouchEvent(event.actionMasked != android.view.MotionEvent.ACTION_UP && event.actionMasked != android.view.MotionEvent.ACTION_CANCEL)

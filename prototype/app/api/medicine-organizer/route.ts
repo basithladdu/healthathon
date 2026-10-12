@@ -5,8 +5,11 @@ export const maxDuration = 150;
 const MAX_BODY_BYTES = 12 * 1024 * 1024;
 const MAX_RESPONSE_BYTES = 512 * 1024;
 const BODY_TIMEOUT_MS = 15_000;
+const ANDROID_AUTH_TIMEOUT_MS = 8_000;
 const PROVIDER_TIMEOUT_MS = 135_000;
 const RATE_WINDOW_MS = 60_000;
+const DEFAULT_ANDROID_SUPABASE_URL = 'https://cghlkqeqiokjqdionrkc.supabase.co';
+const DEFAULT_ANDROID_SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_43mvHQiHJXVGwS71SX0GVA_GWxXBVOC';
 
 let rateWindowStarted = Date.now();
 let attempts = 0;
@@ -39,6 +42,46 @@ function sameOrigin(request: Request) {
     const expected = host ? new URL(`${url.protocol}//${host}`).origin : url.origin;
     return origin === expected;
   } catch { return false; }
+}
+
+function hasBrowserRequestMetadata(request: Request) {
+  return request.headers.has('origin') || request.headers.has('sec-fetch-site');
+}
+
+function androidAuthConfiguration() {
+  const url = process.env.SAHARA_ANDROID_SUPABASE_URL?.trim() || DEFAULT_ANDROID_SUPABASE_URL;
+  const key = process.env.SAHARA_ANDROID_SUPABASE_PUBLISHABLE_KEY?.trim() || DEFAULT_ANDROID_SUPABASE_PUBLISHABLE_KEY;
+  if (!/^https:\/\/[a-z0-9-]+\.supabase\.co$/.test(url) || !key || /\s/.test(key)) return null;
+  return { url, key };
+}
+
+function bearerToken(request: Request) {
+  const match = request.headers.get('authorization')?.match(/^Bearer ([^\s]+)$/i);
+  return match?.[1] ?? null;
+}
+
+async function validateAndroidUser(request: Request, token: string) {
+  const config = androidAuthConfiguration();
+  if (!config) return 'unavailable';
+  const signal = AbortSignal.any([request.signal, AbortSignal.timeout(ANDROID_AUTH_TIMEOUT_MS)]);
+  try {
+    const response = await fetch(`${config.url}/auth/v1/user`, {
+      method: 'GET',
+      headers: {
+        apikey: config.key,
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/json',
+      },
+      cache: 'no-store',
+      redirect: 'error',
+      signal,
+    });
+    void response.body?.cancel().catch(() => {});
+    if (response.ok) return 'valid';
+    return response.status >= 400 && response.status < 500 && response.status !== 429 ? 'invalid' : 'unavailable';
+  } catch {
+    return 'unavailable';
+  }
 }
 
 function configuration() {
@@ -84,7 +127,15 @@ export function GET() {
 }
 
 export async function POST(request: Request) {
-  if (!sameOrigin(request)) return failure(403, 'origin_rejected', 'Open this action from the Sahara app.');
+  if (hasBrowserRequestMetadata(request)) {
+    if (!sameOrigin(request)) return failure(403, 'origin_rejected', 'Open this action from the Sahara app.');
+  } else {
+    const token = bearerToken(request);
+    if (!token) return failure(401, 'authentication_required', 'Sign in to Sahara on Android and try again.');
+    const authentication = await validateAndroidUser(request, token);
+    if (authentication === 'invalid') return failure(401, 'invalid_authentication', 'Your Sahara sign-in has expired. Sign in again and retry.');
+    if (authentication !== 'valid') return failure(503, 'authentication_unavailable', 'Sahara could not verify your sign-in. Try again shortly.');
+  }
   if (request.headers.get('content-type')?.split(';')[0].trim().toLowerCase() !== 'application/json'
     || (request.headers.has('content-encoding') && request.headers.get('content-encoding') !== 'identity')) {
     return failure(415, 'unsupported_body', 'Send medicine images from the organizer.');

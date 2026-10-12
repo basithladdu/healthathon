@@ -478,6 +478,45 @@
     "recoveryScope": "Forgot password control reachability was checked; email delivery and reset completion were not tested."
   },
   "pendingRelease": {
+    "verifiedAt": "2026-10-12T21:46:31.1193007+00:00",
+    "version": "0.4.0",
+    "versionCode": 4,
+    "status": "built; release prerequisites pending",
+    "apk": "output/android/Sahara-0.4.0-release.apk",
+    "apkSha256": "90CBB5E07E46D38F338DD76E8899CA7E21F59DA2BF48301F062A5618D99C33A3",
+    "bundle": "output/android/Sahara-0.4.0.aab",
+    "bundleSha256": "0FF3A1064637F0BFD96BC7FFE735E273B4E7716E1960444D5C54808E40B12169",
+    "upstreamCommit": "b453efb2cb5ccbbf94a6a7b7a96f4c5dc1fb27f4",
+    "build": "Release APK/AAB, R8 and release vital lint passed",
+    "signing": "APK Signature Scheme v2 and AAB JAR signatures verified",
+    "alignment": "APK ZIP and all four 64-bit native ELF libraries passed 16 KB alignment; 16 KB runtime not tested",
+    "installed": "Samsung A34 / Android 16, verified package version 0.4.0 (4)",
+    "tests": {
+      "webProxyTestedOn": "2026-10-13",
+      "webProxyTestsPassed": 12,
+      "unitPassed": 12,
+      "sourceEvidenceOn": "2026-10-11",
+      "phonePassed": 12,
+      "phoneSelected": 13,
+      "phoneSkipped": 1,
+      "skipReason": "Credential-dependent sign-in check"
+    },
+    "screenshots": [
+      "output/android/verification/0.4.0/today.png",
+      "output/android/verification/0.4.0/documents.png",
+      "output/android/verification/0.4.0/note-actions.png",
+      "output/android/verification/0.4.0/centre-map-loaded.png"
+    ],
+    "notVerified": [
+      "Optimized-release interaction",
+      "16 KB device runtime",
+      "Live Gemini extraction and provider data handling",
+      "Current signup/recovery email delivery",
+      "Play review and testing availability"
+    ],
+    "submitted": false
+  },
+  "priorPendingRelease": {
     "verifiedAt": "2026-10-11T13:49:04.185617+05:30",
     "version": "0.3.1",
     "versionCode": 4,

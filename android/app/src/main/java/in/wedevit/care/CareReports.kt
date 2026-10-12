@@ -82,7 +82,7 @@ class ReportFiles(private val context: Context, account: String = "") {
     fun intent(report: CareReport, share: Boolean): Intent {
         val file = file(report)
         require(file.isFile) { "This report is missing. Add it again from Files." }
-        val uri = FileProvider.getUriForFile(context, context.packageName + ".reports", file, report.name)
+        val uri = FileProvider.getUriForFile(context, context.packageName + ".fileprovider", file, report.name)
         return Intent(if (share) Intent.ACTION_SEND else Intent.ACTION_VIEW).apply {
             if (share) { type = report.mime; putExtra(Intent.EXTRA_STREAM, uri) }
             else setDataAndType(uri, report.mime)

@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
@@ -59,13 +60,14 @@ val Paper = Color(0xFFFFFDF9)
 val Rust = Color(0xFFB9472C)
 val Gold = Color(0xFFFFCF5C)
 val Sage = Color(0xFFD9EAA8)
-val Lilac = Color(0xFFDDC8FF)
+val Mint = Color(0xFFDCEBE4)
 val Peach = Color(0xFFFFD1B3)
 
 @Composable fun CareTheme(content: @Composable () -> Unit) {
     MaterialTheme(colorScheme = lightColorScheme(primary = Rust, onPrimary = Color.White, secondary = Color(0xFF465E45),
         background = Cream, surface = Paper, onSurface = Ink, onBackground = Ink, surfaceVariant = Color(0xFFF1E9DE),
-        onSurfaceVariant = Color(0xFF65574E), outline = Color(0xFF8D7B70)), content = content)
+        onSurfaceVariant = Color(0xFF65574E), secondaryContainer = Mint, onSecondaryContainer = Ink,
+        outline = Color(0xFF8D7B70)), content = content)
 }
 
 @Composable fun CareApp(vm: CareModel, onAccount: () -> Unit) {
@@ -82,12 +84,17 @@ val Peach = Color(0xFFFFD1B3)
     val canEdit by vm.canEdit.collectAsStateWithLifecycle()
     var tab by rememberSaveable { mutableIntStateOf(0) }
     var dialog by rememberSaveable { mutableStateOf("") }
+    var medicineScanner by rememberSaveable { mutableStateOf(false) }
+    var medicineScannerPerson by rememberSaveable { mutableStateOf("") }
     var personMenu by remember { mutableStateOf(false) }
     var reading by remember { mutableStateOf<CareVersion?>(null) }
     val screens = rememberSaveableStateHolder()
     val snackbar = remember { SnackbarHostState() }
     val person = people.firstOrNull { it.id == selected }
-    LaunchedEffect(selected) { reading = null }
+    LaunchedEffect(selected) {
+        reading = null
+        if (medicineScanner && medicineScannerPerson != selected) medicineScanner = false
+    }
     val owner = LocalLifecycleOwner.current
     DisposableEffect(owner) {
         val observer = LifecycleEventObserver { _, event ->
@@ -97,11 +104,11 @@ val Peach = Color(0xFFFFD1B3)
         owner.lifecycle.addObserver(observer); onDispose { owner.lifecycle.removeObserver(observer) }
     }
     LaunchedEffect(message) { message?.let { snackbar.showSnackbar(it); vm.message.value = null } }
-    BackHandler(tab != 0 || activeRecording) { if (activeRecording) vm.stopRecording() else tab = 0 }
+    BackHandler(!medicineScanner && (tab != 0 || activeRecording)) { if (activeRecording) vm.stopRecording() else tab = 0 }
     Scaffold(containerColor = Cream, snackbarHost = { SnackbarHost(snackbar) }, topBar = {
-        Column {
+        if (!medicineScanner) Column {
         Row(Modifier.statusBarsPadding().fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-            Image(painterResource(R.drawable.sahara_logo), null, Modifier.size(44.dp), contentScale = ContentScale.Fit)
+            Image(painterResource(R.drawable.sahara_professional_logo), null, Modifier.size(44.dp), contentScale = ContentScale.Fit)
             Spacer(Modifier.width(4.dp))
             Box(Modifier.weight(1f)) {
                 Column(Modifier.clip(RoundedCornerShape(12.dp)).clickable(enabled = person != null && !activeRecording) { personMenu = true }.padding(vertical = 8.dp, horizontal = 2.dp)) {
@@ -122,18 +129,26 @@ val Peach = Color(0xFFFFD1B3)
         HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = .15f))
         }
     }, bottomBar = {
-        if (person != null) CareNavigation(tab, clinician) { next ->
+        if (person != null && !medicineScanner) CareNavigation(tab, clinician) { next ->
             if (activeRecording && next != 1) vm.stopRecording()
             tab = next
         }
     }) { padding ->
         Box(Modifier.padding(padding).consumeWindowInsets(padding).fillMaxSize()) {
-            if (person == null) Welcome(onAccount = onAccount, onStart = { dialog = "person" })
+            if (medicineScanner && person != null) MedicineScanner(vm, onClose = { medicineScanner = false }, onAccount = onAccount)
+            else if (person == null) Welcome(onAccount = onAccount, onStart = { dialog = "person" })
             else key(person.id, tab) { screens.SaveableStateProvider("${person.id}:$tab") {
                 ScreenEntrance { when (tab) {
                     0 -> Today(vm, clinician, onTalk = { tab = 1 }, onCare = { tab = 2 }, onNearby = { tab = 3 }, onAdd = { if (canEdit) dialog = it else vm.message.value = "Ask the person who invited you to allow changes." }, onRead = { reading = it })
                     1 -> Talk(vm, clinician && canEdit, onRead = { reading = it })
-                    2 -> CareList(vm, onAdd = { if (canEdit) dialog = it else vm.message.value = "Ask the person who invited you to allow changes." })
+                    2 -> CareList(vm,
+                        onAdd = { if (canEdit) dialog = it else vm.message.value = "Ask the person who invited you to allow changes." },
+                        onScanPrescription = {
+                            if (canEdit) {
+                                medicineScannerPerson = selected
+                                medicineScanner = true
+                            } else vm.message.value = "Ask the person who invited you to allow changes."
+                        })
                     3 -> Nearby(vm.centres)
                     5 -> CareDocuments(vm, onRead = { reading = it }, onTalk = { tab = 1 })
                     else -> More(vm, person, onAccount = onAccount, onDelete = { dialog = "delete" })
@@ -221,9 +236,9 @@ val Peach = Color(0xFFFFD1B3)
     val recordings by vm.recordings.collectAsStateWithLifecycle()
     val busy by vm.busy.collectAsStateWithLifecycle()
     var step by rememberSaveable { mutableIntStateOf(0) }; var consent by rememberSaveable { mutableStateOf(false) }
-    val scroll = rememberLazyListState()
-    var previousStep by rememberSaveable { mutableIntStateOf(step) }
-    LaunchedEffect(step) { if (step != previousStep) { scroll.scrollToItem(0); previousStep = step } }
+    val scroll = key(step) { rememberLazyListState() }
+    val focus = LocalFocusManager.current
+    fun nextStep(value: Int) { focus.clearFocus(); step = value }
     var permissionDialog by remember { mutableStateOf(false) }; var doctor by rememberSaveable { mutableStateOf("") }; var reviewed by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
     val permission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted -> if (granted) vm.startRecording(consent) else vm.message.value = "Microphone permission wasn't granted. You can still type the conversation." }
@@ -231,7 +246,7 @@ val Peach = Color(0xFFFFD1B3)
     LazyColumn(Modifier.fillMaxSize().imePadding().testTag("conversation-list"), state = scroll, contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         item { Heading(if (clinician) "Conversation" else "Care notes") }
         if (clinician) {
-            item { Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf("Conversation", "Review", "Save").forEachIndexed { i, name -> FilterChip(selected = step == i, onClick = { step = i }, label = { Text("${i + 1} $name", fontSize = 12.sp) }) } } }
+            item { Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf("Conversation", "Review", "Save").forEachIndexed { i, name -> FilterChip(selected = step == i, onClick = { nextStep(i) }, label = { Text("${i + 1} $name", fontSize = 12.sp) }) } } }
             when (step) {
                 0 -> {
                     item { SurfaceCard(Peach) {
@@ -245,7 +260,7 @@ val Peach = Color(0xFFFFD1B3)
                     } }
                     items(recordings, key = { it.absolutePath }) { file -> AudioPlayback(file.absolutePath, onDelete = { vm.deleteAudio(file.absolutePath) }) }
                     item { CareField(value = draft.source, onValueChange = { if (it.length <= 12000) vm.edit(draft.copy(source = it)) }, label = "Conversation", placeholder = "Write or paste what was said…", minLines = 5, supporting = "Recordings aren't converted to text.") }
-                    item { Button(onClick = { vm.organise(); step = 1 }, enabled = draft.source.isNotBlank() && !recording, modifier = Modifier.fillMaxWidth()) { Text("Organise and review"); Spacer(Modifier.width(8.dp)); Icon(Icons.AutoMirrored.Filled.ArrowForward, null) } }
+                    item { Button(onClick = { vm.organise(); nextStep(1) }, enabled = draft.source.isNotBlank() && !recording, modifier = Modifier.fillMaxWidth()) { Text("Organise and review"); Spacer(Modifier.width(8.dp)); Icon(Icons.AutoMirrored.Filled.ArrowForward, null) } }
                 }
                 1 -> {
                     item { Text("Check the words. Leave anything not discussed blank.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
@@ -255,14 +270,14 @@ val Peach = Color(0xFFFFD1B3)
                         }) }, label = label, minLines = 2)
                     }
                     item { SurfaceCard(Sage) { Text("Original words", fontWeight = FontWeight.Bold); Spacer(Modifier.height(8.dp)); SelectionContainerText(draft.source.ifBlank { "Add the conversation first." }) } }
-                    item { Button(onClick = { step = 2 }, enabled = draft.source.isNotBlank() && NoteRules.values(draft).any { it.isNotBlank() }, modifier = Modifier.fillMaxWidth()) { Text("Continue to save") } }
+                    item { Button(onClick = { nextStep(2) }, enabled = draft.source.isNotBlank() && NoteRules.values(draft).any { it.isNotBlank() }, modifier = Modifier.fillMaxWidth()) { Text("Continue to save") } }
                 }
                 else -> {
                     item { SurfaceCard(Gold) { Heading("Final check", 26); Spacer(Modifier.height(6.dp)); Text("Earlier versions stay available.") } }
                     item { CareField(value = doctor, onValueChange = { doctor = it.take(100) }, label = "Doctor's name", singleLine = true) }
                     item { CheckLine(reviewed, { reviewed = it }, "I checked every section against the conversation. This records what was discussed, without adding treatment advice.") }
                     item { Text("A typed name is not a verified identity or legal signature.", style = MaterialTheme.typography.bodySmall) }
-                    item { Button(onClick = { vm.publish(doctor, reviewed) { step = 0; reviewed = false } }, enabled = reviewed && doctor.isNotBlank() && !busy && draft.source.isNotBlank(), modifier = Modifier.fillMaxWidth()) { Text("Save care note") } }
+                    item { Button(onClick = { vm.publish(doctor, reviewed) { nextStep(0); reviewed = false } }, enabled = reviewed && doctor.isNotBlank() && !busy && draft.source.isNotBlank(), modifier = Modifier.fillMaxWidth()) { Text("Save care note") } }
                 }
             }
         } else {
@@ -339,7 +354,7 @@ val Peach = Color(0xFFFFD1B3)
     }
 }
 
-@Composable fun CareList(vm: CareModel, onAdd: (String) -> Unit) {
+@Composable fun CareList(vm: CareModel, onAdd: (String) -> Unit, onScanPrescription: () -> Unit) {
     val entries by vm.items.collectAsStateWithLifecycle(); var filter by rememberSaveable { mutableStateOf("All") }
     var adding by remember { mutableStateOf(false) }
     val kinds = linkedMapOf("Medicines" to "medicine", "Visits" to "visit", "To do" to "task", "Check-ins" to "checkin", "Journal" to "journal")
@@ -347,18 +362,23 @@ val Peach = Color(0xFFFFD1B3)
         item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Heading("Daily care", 30); Spacer(Modifier.weight(1f))
             Box {
-                FilledTonalButton(onClick = { kinds[filter]?.let(onAdd) ?: run { adding = true } }, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.filledTonalButtonColors(containerColor = Gold, contentColor = Ink)) { Icon(Icons.Default.Add, null, Modifier.size(19.dp)); Spacer(Modifier.width(6.dp)); Text("Add") }
+                FilledTonalButton(onClick = { kinds[filter]?.let { if (it == "medicine") onScanPrescription() else onAdd(it) } ?: run { adding = true } }, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.filledTonalButtonColors(containerColor = Gold, contentColor = Ink)) { Icon(Icons.Default.Add, null, Modifier.size(19.dp)); Spacer(Modifier.width(6.dp)); Text("Add") }
                 DropdownMenu(expanded = adding, onDismissRequest = { adding = false }) {
-                    kinds.forEach { (label, kind) -> DropdownMenuItem(text = { Text(label) }, leadingIcon = { Icon(careIcon(kind), null) }, onClick = { adding = false; onAdd(kind) }) }
+                    kinds.forEach { (label, kind) -> DropdownMenuItem(text = { Text(label) }, leadingIcon = { Icon(careIcon(kind), null) }, onClick = { adding = false; if (kind == "medicine") onScanPrescription() else onAdd(kind) }) }
                 }
             }
         } }
-        item { Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf("All", "Medicines", "Visits", "To do", "Check-ins", "Journal").forEach { label -> FilterChip(selected = filter == label, onClick = { filter = label }, label = { Text(label) }) } } }
+        item { Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf("All", "Medicines", "Visits", "To do", "Check-ins", "Journal").forEach { label -> FilterChip(selected = filter == label, onClick = { filter = label }, label = { Text(label) }, colors = FilterChipDefaults.filterChipColors(selectedContainerColor = Sage, selectedLabelColor = Ink)) } } }
+        if (filter == "Medicines") item { SurfaceCard(Sage) {
+            Row(verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.DocumentScanner, null, tint = Ink, modifier = Modifier.size(30.dp)); Spacer(Modifier.width(12.dp)); Column(Modifier.weight(1f)) { Text("Scan a prescription", fontSize = 18.sp, fontWeight = FontWeight.Bold); Text("Turn prescription and medicine photos into a list you review.", style = MaterialTheme.typography.bodySmall) } }
+            Spacer(Modifier.height(12.dp)); Button(onClick = onScanPrescription, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth()) { Icon(Icons.Default.AutoAwesome, null, Modifier.size(18.dp)); Spacer(Modifier.width(7.dp)); Text("Scan & organize") }
+            TextButton(onClick = { onAdd("medicine") }, modifier = Modifier.fillMaxWidth()) { Text("Add one manually") }
+        } }
         val filtered = entries.filter { filter == "All" || it.kind == kinds[filter] }
         if (filtered.isEmpty()) item { SurfaceCard {
             Icon(careIcon(kinds[filter] ?: "task"), null, Modifier.size(32.dp), tint = Rust)
             Spacer(Modifier.height(12.dp)); Text(if (filter == "All") "Nothing added yet" else "No ${filter.lowercase()} yet", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
-            TextButton(onClick = { kinds[filter]?.let(onAdd) ?: run { adding = true } }, contentPadding = PaddingValues(top = 10.dp, bottom = 4.dp)) { Icon(Icons.Default.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Add an entry") }
+            TextButton(onClick = { kinds[filter]?.let(onAdd) ?: run { adding = true } }, contentPadding = PaddingValues(top = 10.dp, bottom = 4.dp)) { Icon(Icons.Default.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(if (filter == "Medicines") "Add manually" else "Add an entry") }
         } }
         items(filtered, key = { it.id }) { Box(Modifier.animateItem()) { CareRow(it, vm) } }
     }
@@ -374,7 +394,7 @@ val Peach = Color(0xFFFFD1B3)
     val color by animateColorAsState(if (done) Color(0xFFE7EED6) else Paper, tween(180), label = "care completed")
     SurfaceCard(color) { Row(verticalAlignment = Alignment.CenterVertically) {
         if (item.kind in listOf("medicine", "task")) Checkbox(checked = done, onCheckedChange = { vm.toggle(item) }, enabled = canEdit && !busy)
-        else Surface(shape = RoundedCornerShape(12.dp), color = if (item.kind == "visit") Lilac else Peach, modifier = Modifier.padding(end = 12.dp)) { Icon(careIcon(item.kind), null, tint = Ink, modifier = Modifier.padding(10.dp).size(22.dp)) }
+        else Surface(shape = RoundedCornerShape(12.dp), color = if (item.kind == "visit") Mint else Peach, modifier = Modifier.padding(end = 12.dp)) { Icon(careIcon(item.kind), null, tint = Ink, modifier = Modifier.padding(10.dp).size(22.dp)) }
         Column(Modifier.weight(1f)) { Text(item.title, fontWeight = FontWeight.SemiBold); if (item.due > 0) Text(date(item.due), color = Rust, fontSize = 13.sp); if (item.detail.isNotBlank()) Text(item.detail, style = MaterialTheme.typography.bodyMedium); if (item.kind in listOf("checkin", "journal")) Text(date(item.created), style = MaterialTheme.typography.bodySmall) }
         Box {
             IconButton(onClick = { menu = true }, enabled = canEdit && !busy) { Icon(Icons.Default.MoreHoriz, "Options for ${item.title}", Modifier.size(22.dp)) }
@@ -444,7 +464,8 @@ val Peach = Color(0xFFFFD1B3)
         item { DetailPanel("Privacy", Icons.Default.Lock) {
             Text("You choose which notes to share and with whom.")
             Spacer(Modifier.height(10.dp)); Text("You can delete a recording or remove a person's records here.")
-            Spacer(Modifier.height(10.dp)); Text("Added reports stay on this phone. They aren't synced with your care team. Use Share to send a copy, and keep your originals before removing the app.")
+            Spacer(Modifier.height(10.dp)); Text("Reports added in Documents stay on this phone. They aren't synced with your care team. Use Share to send a copy, and keep your originals before removing the app.")
+            Spacer(Modifier.height(10.dp)); Text("Prescription scanning sends the photos you choose to Sahara's service and Google Gemini after you agree. Check every medicine before saving it.")
             TextButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.privacy_url)))) }) { Text("Privacy policy") }
         } }
         item { DetailPanel("About", Icons.Default.Info) {

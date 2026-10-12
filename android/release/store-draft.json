@@ -1,5 +1,5 @@
 {
-  "status": "Rejected by Google Play on 10 October 2026: Play Console Requirements. Organisation conversion is authorised and in progress. Google accepted the existing company D-U-N-S number and created the identity profile. Website and contact verifications are complete. The incorporation certificate, new representative identity photographs and approved address are submitted. On 11 October Google confirmed Authorized representative: Submitted and Google is verifying your new payments profile. Document review and the final profile link remain. The account is still Personal, closed testing is not live and no tester invitations have been sent.",
+  "status": "Organisation conversion completed on 13 October 2026 at 03:06 IST; Play Console shows Organization. Do not resubmit before 16 October 2026 at 03:06 IST. Sahara retains its 10 October rejection and is not live. Signed 0.4.0 (4) is built and installed; scanner service configuration, updated listing/declarations and live verification remain before review.",
   "preparedOn": "2026-10-10",
   "workingTitle": "Sahara: Palliative Companion",
   "fullProductName": "Sahara — A Palliative Care Companion",
@@ -29,7 +29,7 @@
     "note": "Saved to Google Play on 10 October 2026 against the 0.3.0 release. Any AI, sync or account integration changes require reassessing these answers."
   },
   "releaseDependencies": [
-    "Wait for Google's review of the submitted organisation identity profile, then finish its final link to Devit. On 11 October the new physical PAN photographs and approved representative address were submitted successfully; Google shows Authorized representative: Submitted and Google is verifying your new payments profile. Do not repeat uploads while review is pending. D-U-N-S is accepted; do not create another application. After the account actually shows Organisation, record that time and wait at least 72 hours before resubmitting. Do not pay fees, mislabel identity documents or misstate medical features.",
+    "Organisation conversion is complete. Wait until 2026-10-15T21:36:14Z (16 October 03:06 IST), then submit only after the candidate prerequisites are verified. No new D-U-N-S application, payment or identity upload is needed.",
     "Verify the closed-testing opt-in page is live before emailing all 57 existing tester addresses. No invitation has been sent.",
     "Ordinary tester signup and reset delivery remain incomplete: the exact Sahara callback allowlist is unapproved and Zoho work is paused at the user's request. Unsigned-in care flows and the dedicated reviewer login work; the default Supabase mail service is limited to project-team addresses.",
     "If applicable to the account, enrol at least 12 testers continuously for 14 days, then apply for production access; this does not guarantee approval"
@@ -155,7 +155,7 @@
     "androidChecks": "Six unit checks passed; APK/AAB signatures and static 16 KB ZIP/ELF alignment passed. On 10 October, six local flows passed on Samsung A34 against the matching-source debug build; one credential-dependent sign-in test was initially skipped. Current phone screenshots were captured. After the auth redirect/recovery change, the focused reviewer sign-in, cloud-record load and reopen check passed with no skips. The fresh signed APK/AAB passed vital lint, signature and static 16 KB ZIP/native checks; the signed APK was installed on Samsung A34. Optimized release interaction and a 16 KB runtime are not verified.",
     "uploadBundle": "output/android/Sahara-0.3.0.aab",
     "uploadBundleSha256": "EB0A14F7CE245230BE356A7737B952CF2B799A8895A009CA24A2C53242991589",
-    "playAccount": "Existing Devit account remains Personal while Google reviews the new organisation identity profile. The existing company D-U-N-S number is accepted, website and email/phone checks are verified, and the incorporation certificate is submitted. On 11 October the new representative identity photographs and approved address were submitted successfully. Google confirms Authorized representative: Submitted and Google is verifying your new payments profile. Approval and the final profile link remain; no conversion timestamp is confirmed. No new paid developer account or merchant payout setup is authorised.",
+    "playAccount": "Existing Devit developer account 8795679408143615220 now shows Organization. The verified company identity profile was linked; confirmation observed at 2026-10-12T21:36:14Z. Earliest resubmission is 2026-10-15T21:36:14Z. No new paid account or merchant payouts were created.",
     "playAppId": "4974759245808215344",
     "closedTrackId": "4699010624330920429",
     "closedTest": "Alpha, India. Version 0.3.0 (3) uploaded; submission rejected on 10 October 2026 under Play Console Requirements. Play shows App not available on Google Play and returns 14 changes to the unsubmitted queue. Native debug symbols warning was non-blocking.",
@@ -186,6 +186,36 @@
   },
   "applicationId": "in.wedevit.sahara",
   "nextBuild": {
+    "version": "0.4.0",
+    "versionCode": 4,
+    "releasePrerequisites": [
+      "Required 72-hour wait: no resubmission before 2026-10-15T21:36:14Z",
+      "Configure and verify the prescription service with the existing Gemini key and intended provider terms",
+      "Deploy combined privacy page and reassess Play Data safety for prescription/photo AI processing",
+      "Refresh listing screenshots, reviewer instructions and accurate description before submission"
+    ],
+    "built": true,
+    "ready": false,
+    "uploaded": false,
+    "status": "Signed 0.4.0 (4) built and installed on Samsung A34; not yet upload-ready because prescription service configuration, matching privacy/listing and Data safety review remain.",
+    "apk": "output/android/Sahara-0.4.0-release.apk",
+    "apkSha256": "90CBB5E07E46D38F338DD76E8899CA7E21F59DA2BF48301F062A5618D99C33A3",
+    "bundle": "output/android/Sahara-0.4.0.aab",
+    "bundleSha256": "0FF3A1064637F0BFD96BC7FFE735E273B4E7716E1960444D5C54808E40B12169",
+    "builtOn": "2026-10-13",
+    "submitNotBeforeUtc": "2026-10-15T21:36:14Z",
+    "upstreamCommit": "b453efb2cb5ccbbf94a6a7b7a96f4c5dc1fb27f4",
+    "verification": "Release build and vital lint passed. APK v2 and AAB JAR signatures verified; ZIP and four 64-bit ELF libraries passed 16 KB alignment. Signed APK installed as 0.4.0 (4). Existing 11 October matching-source checks: 12 unit passes, 12 device passes and one credential-dependent skip. Twelve web proxy/function tests passed on 13 October. No optimized-release interaction, 16 KB runtime or live photo extraction is claimed.",
+    "scannerReadiness": "Production GET reports ready:false. No medicine-organiser function or GEMINI_API_KEY exists in the configured Supabase project, and the Vercel organiser secret is absent. Awaiting the location of Awaiz's existing Gemini key.",
+    "listingAssets": [
+      "output/android/verification/0.4.0/today.png",
+      "output/android/verification/0.4.0/documents.png",
+      "output/android/verification/0.4.0/note-actions.png",
+      "output/android/verification/0.4.0/centre-map-loaded.png"
+    ],
+    "dataSafetyChanges": "Reassess optional prescription/packaging Photos and Health info transmitted through Sahara and Supabase to Gemini. Confirm actual provider plan, retention and processing terms before making ephemeral processing or sharing-exemption claims. Preserve existing accurate health declarations."
+  },
+  "previousUiCandidate": {
     "version": "0.3.1",
     "versionCode": 4,
     "ready": true,
@@ -201,6 +231,7 @@
       "Mention PDF/photo reports are saved privately on the phone and not cloud-synced; original files stay unchanged.",
       "Verify the public privacy page includes the version 0.3.1 report section. No health declaration may be weakened."
     ],
-    "checkedAt": "2026-10-11T13:49:04.185617+05:30"
+    "checkedAt": "2026-10-11T13:49:04.185617+05:30",
+    "supersededBy": "0.4.0 merging incoming b453efb"
   }
 }
