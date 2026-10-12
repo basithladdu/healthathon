@@ -478,10 +478,10 @@
     "recoveryScope": "Forgot password control reachability was checked; email delivery and reset completion were not tested."
   },
   "pendingRelease": {
-    "verifiedAt": "2026-10-12T21:46:31.1193007+00:00",
+    "verifiedAt": "2026-10-13T03:16:31.1193007+05:30",
     "version": "0.4.0",
     "versionCode": 4,
-    "status": "built; release prerequisites pending",
+    "status": "Built, installed and uploaded; saved in Play Publishing overview, not submitted",
     "apk": "output/android/Sahara-0.4.0-release.apk",
     "apkSha256": "90CBB5E07E46D38F338DD76E8899CA7E21F59DA2BF48301F062A5618D99C33A3",
     "bundle": "output/android/Sahara-0.4.0.aab",
@@ -510,11 +510,30 @@
     "notVerified": [
       "Optimized-release interaction",
       "16 KB device runtime",
-      "Live Gemini extraction and provider data handling",
+      "Real-prescription accuracy, patient-data processing terms and full phone upload flow",
       "Current signup/recovery email delivery",
       "Play review and testing availability"
     ],
-    "submitted": false
+    "submitted": false,
+    "uploaded": true,
+    "syntheticServiceCheck": {
+      "checkedAt": "2026-10-12T21:59:42.221Z",
+      "syntheticOnly": true,
+      "model": "gemini-3.8-flash",
+      "unauthorizedStatus": 401,
+      "httpStatus": 200,
+      "checks": {
+        "oneMedicine": true,
+        "name": true,
+        "strength": true,
+        "explicitTime": true,
+        "duration": true,
+        "package": true
+      },
+      "productionReadiness": {
+        "ready": false
+      }
+    }
   },
   "priorPendingRelease": {
     "verifiedAt": "2026-10-11T13:49:04.185617+05:30",

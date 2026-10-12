@@ -17,7 +17,7 @@ export default function PrivacyPage() {
           <Link href="/delete-account">Delete your account</Link>
         </header>
         <h1>Your care information</h1>
-        <p className={styles.date}>Privacy policy · Updated 11 October 2026</p>
+        <p className={styles.date}>Privacy policy · Updated 13 October 2026</p>
         <p>
           Sahara — A Palliative Care Companion is provided by WEDEVIT PRIVATE LIMITED.
           This policy covers the Sahara Android app, including version 0.4.0, rather
@@ -64,13 +64,18 @@ export default function PrivacyPage() {
         <section aria-labelledby="medicine-ai">
           <h2 id="medicine-ai">Prescription and medicine photo organiser</h2>
           <p>
-            If you choose Scan prescription, the prescription pages and medicine-strip
+            Photo scanning is currently off. Selected prescription and medicine photos
+            are not uploaded. You can add medicines by hand.
+          </p>
+          <p>
+            When scanning is enabled, the prescription pages and medicine-strip
             or box photos you select are compressed on your phone and sent over HTTPS
             through Sahara’s protected service and a Supabase Edge Function to Google
-            Gemini. They are used only to transcribe and match the medicines for the
-            review screen. The organiser does not save the image payloads and asks the
-            AI provider not to store the interaction. Cancelling before Organise sends
-            nothing.
+            Gemini to transcribe and match medicines for your review. The organiser
+            does not save the image payloads and asks Gemini not to store the
+            interaction. That setting does not remove Google’s separate safety and
+            abuse-prevention logging. We will confirm the provider’s data-processing
+            terms before enabling patient uploads. Cancelling before Organise sends nothing.
           </p>
           <p>
             AI results can be incomplete or wrong. Unknown details stay blank. Check

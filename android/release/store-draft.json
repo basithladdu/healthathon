@@ -1,5 +1,5 @@
 {
-  "status": "Organisation conversion completed on 13 October 2026 at 03:06 IST; Play Console shows Organization. Do not resubmit before 16 October 2026 at 03:06 IST. Sahara retains its 10 October rejection and is not live. Signed 0.4.0 (4) is built and installed; scanner service configuration, updated listing/declarations and live verification remain before review.",
+  "status": "Organisation conversion complete; 0.4.0 (4) built, installed and saved in Play as an unsubmitted Alpha release. Required waiting period ends 16 October 03:06 IST. Patient scanning remains off pending suitable provider terms/billing; testing is not live and invitations are not sent.",
   "preparedOn": "2026-10-10",
   "workingTitle": "Sahara: Palliative Companion",
   "fullProductName": "Sahara — A Palliative Care Companion",
@@ -7,7 +7,7 @@
   "accountDeletionUrl": "https://sahara.wedevit.in/delete-account",
   "titleFinal": true,
   "shortDescription": "Sahara: A Palliative Care Companion. Care notes and daily support for families.",
-  "fullDescription": "Sahara: A Palliative Care Companion\n\nFor patients, families and doctors.\n\nKeep the words that matter from a goals-of-care conversation. A doctor can review the note and save a version. The patient or family can read and confirm that same version. Earlier notes and the original conversation stay available.\n\nRecord a conversation with everyone's permission, or type the words you want to keep. Add prescribed medicines, visits, questions, tasks and daily notes. Find listed palliative care centres in Karnataka, call them or get directions. Directory entries do not confirm current medicine stock.\n\nSign in to save care notes and daily entries to your account. Invite family or care team members to read them, or allow them to make changes. Recordings and unfinished conversations are not uploaded. Find centres on a MapLibre map or in the list. There are no ads. This version does not transcribe audio automatically, verify clinician identity or send medicine reminders.\n\nThis app is not a medical device. It does not diagnose, treat, cure or prevent any medical condition, recommend treatment or replace professional medical care. Ask a qualified healthcare professional for medical advice. Care notes record a discussion; they are not prescriptions or legal directives.",
+  "fullDescription": "Sahara: A Palliative Care Companion\n\nFor patients, families and doctors.\n\nKeep the words that matter from a goals-of-care conversation. A doctor can review the note and save a version. The patient or family can read and confirm that same version. Earlier notes and the original conversation stay available.\n\nRecord a conversation with everyone's permission, or type the words you want to keep. Add prescribed medicines, visits, questions, tasks and daily notes. Find listed palliative care centres in Karnataka, call them or get directions. Directory entries do not confirm current medicine stock.\n\nKeep PDFs and photos together in Documents. Find a report by name, then open it or share a copy with your care team. Report files stay on your phone and are not synced to other devices.\n\nSign in to save care notes and daily entries to your account. Invite family or care team members to read them, or allow them to make changes. Recordings and unfinished conversations are not uploaded. Find centres on a MapLibre map or in the list. There are no ads. This version does not transcribe audio automatically, verify clinician identity or send medicine reminders.\n\nThis app is not a medical device. It does not diagnose, treat, cure or prevent any medical condition, recommend treatment or replace professional medical care. Ask a qualified healthcare professional for medical advice. Care notes record a discussion; they are not prescriptions or legal directives.",
   "categoryProposal": "Medical",
   "healthDeclarationFeaturesToReview": [
     "Healthcare Services and Management",
@@ -38,18 +38,18 @@
     "icon": "output/android/play-listing/icon-512.png",
     "featureGraphic": "output/android/play-listing/feature-graphic-1024x500.png",
     "phoneScreenshots": [
-      "output/android/play-listing/screenshots/today.png",
-      "output/android/play-listing/screenshots/care.png",
-      "output/android/play-listing/screenshots/checkin.png",
-      "output/android/play-listing/screenshots/centre-map.png"
+      "output/android/verification/0.4.0/today.png",
+      "output/android/verification/0.4.0/centre-map-loaded.png",
+      "output/android/verification/0.4.0/documents.png",
+      "output/android/verification/0.4.0/note-actions.png"
     ],
-    "screenshotEvidence": "Raw 1080 x 2340 captures from the matching-source 0.3.0 debug build on Samsung A34, using synthetic Test Person records. The signed release protects screenshots with FLAG_SECURE. The nearby.png loading-state capture is QA evidence only and is not a listing asset.",
-    "uploadStatus": "All assets saved in Google Play. Icon and feature graphic declared created or edited using AI; actual phone screenshots not labelled AI-generated."
+    "screenshotEvidence": "Actual 1080x2340 Samsung A34 captures from the matching-source 0.4.0 debug build, using fictional Test Person records. Four screenshots visually inspected before upload. App icon and feature graphic reuse Awaiz's original logo; the source logo was preserved unchanged.",
+    "uploadStatus": "Saved in Play on 13 October with the matching logo, feature graphic, four new phone screenshots and report-storage description. Play confirmed Change saved. Send for review in Publishing overview. Graphics labelled created or edited using AI; actual phone screenshots not labelled AI-generated. Not submitted."
   },
   "appContentDraft": {
     "containsAds": false,
     "appAccess": "Some functionality is restricted. Basic notes, daily care and the directory work without sign-in; account sync and invitations require sign-in. A dedicated reviewer account has confirmed email, successful password sign-in and an authorised empty care-record read. Its credentials were saved privately in Play's reviewer instructions after explicit user approval.",
-    "reviewInstructions": "Open More > Your account and sign in. Add a person to see Today, Talk and Care. Save a conversation, switch to Doctor for review, then Family to confirm that version. Your account provides care invitations. Nearby works without sign-in. No payment, OTP or location restriction. Use fictional information only; this is a dedicated review account. Doctor is a self-selected role.",
+    "reviewInstructions": "Open More > Your account and sign in. Add a person. Use Talk to save a goals-of-care note; switch to Doctor to review, then Family to confirm. Documents (folder icon) adds, opens and shares PDFs/photos. Care > Medicines supports manual entry; photo scanning is currently off. Nearby works without sign-in. No payment, OTP or location restriction. Use fictional information only. Doctor is self-selected.",
     "targetAudienceProposal": "18 and over: adult patients, family caregivers and care professionals",
     "healthApp": true,
     "medicalDevice": false,
@@ -142,7 +142,8 @@
     "sharingAssessment": "Supabase processes signed-in records as a service provider. Care invitations and Android exports are explicit user-initiated sharing. Apply Google's stated exceptions rather than claiming that data never leaves the app.",
     "audio": "Recordings remain on the device and are not collected by this version.",
     "networkMetadata": "Provider sources checked on 10 October 2026: Supabase API logs capture IP, user-agent, IP-derived location and request diagnostics. OpenFreeMap normally omits IP from access logs, but can retain IP in error or security-incident logs. Therefore do not claim all processing is ephemeral. Network identifier and diagnostic categories conservatively cover these service logs; there is no advertising or client analytics SDK.",
-    "location": "Approximate location is declared because Supabase infrastructure can log IP-derived city/country metadata. The app does not read GPS. The selected map area alone is not the user's physical location."
+    "location": "Approximate location is declared because Supabase infrastructure can log IP-derived city/country metadata. The app does not read GPS. The selected map area alone is not the user's physical location.",
+    "optionalPhotoProcessing": "Patient photo uploads are currently disabled at the public proxy. Existing report files are stored privately on the phone; explicit Android exports are user-initiated. Do not enable scanner uploads until Gemini/provider terms and an accurate Photos/Health info declaration have been reviewed and saved."
   },
   "verifiedReleasePreparation": {
     "website": "https://sahara.wedevit.in",
@@ -182,7 +183,8 @@
     "supabaseLogs": "https://supabase.com/docs/guides/observability/log-field-reference",
     "mapPrivacy": "https://openfreemap.org/privacy/",
     "nameLimit": "https://support.google.com/googleplay/android-developer/answer/9859152?hl=en",
-    "aiAssetDeclaration": "https://support.google.com/googleplay/android-developer/answer/17262077?hl=en"
+    "aiAssetDeclaration": "https://support.google.com/googleplay/android-developer/answer/17262077?hl=en",
+    "geminiTerms": "https://ai.google.dev/gemini-api/terms?hl=en"
   },
   "applicationId": "in.wedevit.sahara",
   "nextBuild": {
@@ -190,14 +192,14 @@
     "versionCode": 4,
     "releasePrerequisites": [
       "Required 72-hour wait: no resubmission before 2026-10-15T21:36:14Z",
-      "Configure and verify the prescription service with the existing Gemini key and intended provider terms",
-      "Deploy combined privacy page and reassess Play Data safety for prescription/photo AI processing",
-      "Refresh listing screenshots, reviewer instructions and accurate description before submission"
+      "Resolve provider data-processing terms and billing before enabling patient prescription uploads. Existing free-tier Gemini key passes synthetic tests but must not process private health data.",
+      "Before enabling patient uploads, review and save accurate Photos/Health info collection, retention and provider sharing answers. If the user chooses the first testing release with scanning off, retain that disabled state and do not claim photo collection or working scanning.",
+      "Confirm the user's first-release scanner choice. Matching listing artwork, screenshots, report description and reviewer instructions have been prepared for the current scanner-off state."
     ],
     "built": true,
     "ready": false,
-    "uploaded": false,
-    "status": "Signed 0.4.0 (4) built and installed on Samsung A34; not yet upload-ready because prescription service configuration, matching privacy/listing and Data safety review remain.",
+    "uploaded": true,
+    "status": "Uploaded and saved to Publishing overview as unsubmitted Alpha 0.4.0 (4). Native debug-symbols warning only. Earliest review submission is 2026-10-15T21:36:14Z, after scanner/provider and listing prerequisites are resolved.",
     "apk": "output/android/Sahara-0.4.0-release.apk",
     "apkSha256": "90CBB5E07E46D38F338DD76E8899CA7E21F59DA2BF48301F062A5618D99C33A3",
     "bundle": "output/android/Sahara-0.4.0.aab",
@@ -205,15 +207,24 @@
     "builtOn": "2026-10-13",
     "submitNotBeforeUtc": "2026-10-15T21:36:14Z",
     "upstreamCommit": "b453efb2cb5ccbbf94a6a7b7a96f4c5dc1fb27f4",
-    "verification": "Release build and vital lint passed. APK v2 and AAB JAR signatures verified; ZIP and four 64-bit ELF libraries passed 16 KB alignment. Signed APK installed as 0.4.0 (4). Existing 11 October matching-source checks: 12 unit passes, 12 device passes and one credential-dependent skip. Twelve web proxy/function tests passed on 13 October. No optimized-release interaction, 16 KB runtime or live photo extraction is claimed.",
-    "scannerReadiness": "Production GET reports ready:false. No medicine-organiser function or GEMINI_API_KEY exists in the configured Supabase project, and the Vercel organiser secret is absent. Awaiting the location of Awaiz's existing Gemini key.",
+    "verification": "Release build and vital lint passed. APK v2 and AAB JAR signatures verified; ZIP and four 64-bit ELF libraries passed 16 KB alignment. Signed APK installed as 0.4.0 (4). Existing 11 October matching-source checks: 12 unit passes, 12 device passes and one credential-dependent skip. Twelve web proxy/function tests passed on 13 October. Live synthetic-only Supabase/Gemini extraction passed; unauthorized requests returned 401. No optimized-release interaction, 16 KB runtime, real-prescription accuracy or complete phone-to-provider upload verification is claimed.",
+    "scannerReadiness": "Existing Saanthvana Gemini key found in Google AI Studio. Supabase function deployed and live synthetic-only extraction passed on 13 October; unauthorised calls returned 401. Key is on Free tier, whose terms exclude sensitive input. Public proxy remains ready:false; no patient uploads are enabled and no billing was created.",
     "listingAssets": [
       "output/android/verification/0.4.0/today.png",
+      "output/android/verification/0.4.0/centre-map-loaded.png",
       "output/android/verification/0.4.0/documents.png",
-      "output/android/verification/0.4.0/note-actions.png",
-      "output/android/verification/0.4.0/centre-map-loaded.png"
+      "output/android/verification/0.4.0/note-actions.png"
     ],
-    "dataSafetyChanges": "Reassess optional prescription/packaging Photos and Health info transmitted through Sahara and Supabase to Gemini. Confirm actual provider plan, retention and processing terms before making ephemeral processing or sharing-exemption claims. Preserve existing accurate health declarations."
+    "dataSafetyChanges": "Reassess optional prescription/packaging Photos and Health info transmitted through Sahara and Supabase to Gemini. Confirm actual provider plan, retention and processing terms before making ephemeral processing or sharing-exemption claims. Preserve existing accurate health declarations.",
+    "privacyDeployment": {
+      "id": "dpl_9d1DUV4mKvvf3V4fSg1eVwgcafFf",
+      "url": "https://continuity-loop-healthathon-zjgesitza.vercel.app",
+      "result": "Next.js build, TypeScript and scoped privacy-page ESLint passed. Both Sahara and Saanthvana privacy pages return 200 and state that patient scanning is off. Desktop and actual 390px viewport checked; no horizontal overflow.",
+      "verifiedOn": "2026-10-13"
+    },
+    "draftReleaseId": 2,
+    "submitted": false,
+    "draftUrl": "https://play.google.com/console/u/1/developers/8795679408143615220/app/4974759245808215344/publishing"
   },
   "previousUiCandidate": {
     "version": "0.3.1",
