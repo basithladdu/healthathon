@@ -1,5 +1,5 @@
 {
-  "status": "Organisation conversion complete; 0.4.0 (4) built, installed and saved in Play as an unsubmitted Alpha release. Required waiting period ends 16 October 03:06 IST. Patient scanning remains off pending suitable provider terms/billing; testing is not live and invitations are not sent.",
+  "status": "Google support confirmed account synchronization is still pending in enforcement systems. The user agreed to wait until 16 October 03:06 IST. Prepare and verify a higher-version retry after the deadline; testing is not live and no invitations have been sent. Photo scanning stays off.",
   "preparedOn": "2026-10-10",
   "workingTitle": "Sahara: Palliative Companion",
   "fullProductName": "Sahara — A Palliative Care Companion",
@@ -29,8 +29,8 @@
     "note": "Saved to Google Play on 10 October 2026 against the 0.3.0 release. Any AI, sync or account integration changes require reassessing these answers."
   },
   "releaseDependencies": [
-    "Organisation conversion is complete. Wait until 2026-10-15T21:36:14Z (16 October 03:06 IST), then submit only after the candidate prerequisites are verified. No new D-U-N-S application, payment or identity upload is needed.",
-    "Verify the closed-testing opt-in page is live before emailing all 57 existing tester addresses. No invitation has been sent.",
+    "Google support confirmed enforcement-system organisation sync is pending. Wait until 2026-10-15T21:36:14Z, then use a verified higher Version Code for the authorised retry. No new D-U-N-S, identity upload, account or payment is needed.",
+    "Verify closed-test opt-in and installation availability before emailing the original 57 and separate 2 additional testers. Neither invitation group has been sent.",
     "Ordinary tester signup and reset delivery remain incomplete: the exact Sahara callback allowlist is unapproved and Zoho work is paused at the user's request. Unsigned-in care flows and the dedicated reviewer login work; the default Supabase mail service is limited to project-team addresses.",
     "If applicable to the account, enrol at least 12 testers continuously for 14 days, then apply for production access; this does not guarantee approval"
   ],
@@ -188,43 +188,39 @@
   },
   "applicationId": "in.wedevit.sahara",
   "nextBuild": {
-    "version": "0.4.0",
-    "versionCode": 4,
-    "releasePrerequisites": [
-      "Required 72-hour wait: no resubmission before 2026-10-15T21:36:14Z",
-      "Resolve provider data-processing terms and billing before enabling patient prescription uploads. Existing free-tier Gemini key passes synthetic tests but must not process private health data.",
-      "Before enabling patient uploads, review and save accurate Photos/Health info collection, retention and provider sharing answers. If the user chooses the first testing release with scanning off, retain that disabled state and do not claim photo collection or working scanning.",
-      "Confirm the user's first-release scanner choice. Matching listing artwork, screenshots, report description and reviewer instructions have been prepared for the current scanner-off state."
-    ],
-    "built": true,
+    "version": "0.4.1",
+    "versionCode": 5,
+    "built": false,
     "ready": false,
-    "uploaded": true,
-    "status": "Uploaded and saved to Publishing overview as unsubmitted Alpha 0.4.0 (4). Native debug-symbols warning only. Earliest review submission is 2026-10-15T21:36:14Z, after scanner/provider and listing prerequisites are resolved.",
-    "apk": "output/android/Sahara-0.4.0-release.apk",
-    "apkSha256": "90CBB5E07E46D38F338DD76E8899CA7E21F59DA2BF48301F062A5618D99C33A3",
-    "bundle": "output/android/Sahara-0.4.0.aab",
-    "bundleSha256": "0FF3A1064637F0BFD96BC7FFE735E273B4E7716E1960444D5C54808E40B12169",
-    "builtOn": "2026-10-13",
+    "uploaded": false,
+    "submitted": false,
+    "status": "Source version is prepared; signed build and artifact verification are incomplete. Release is on hold at the user's request until the organisation sync deadline.",
+    "apk": "output/android/Sahara-0.4.1-release.apk",
+    "bundle": "output/android/Sahara-0.4.1.aab",
     "submitNotBeforeUtc": "2026-10-15T21:36:14Z",
-    "upstreamCommit": "b453efb2cb5ccbbf94a6a7b7a96f4c5dc1fb27f4",
-    "verification": "Release build and vital lint passed. APK v2 and AAB JAR signatures verified; ZIP and four 64-bit ELF libraries passed 16 KB alignment. Signed APK installed as 0.4.0 (4). Existing 11 October matching-source checks: 12 unit passes, 12 device passes and one credential-dependent skip. Twelve web proxy/function tests passed on 13 October. Live synthetic-only Supabase/Gemini extraction passed; unauthorized requests returned 401. No optimized-release interaction, 16 KB runtime, real-prescription accuracy or complete phone-to-provider upload verification is claimed.",
+    "releasePrerequisites": [
+      "Wait through the 72-hour organisation sync window ending 2026-10-15T21:36:14Z (16 October 03:06 IST). Google support explicitly recommended waiting and incrementing Version Code.",
+      "Build and verify signed 0.4.1 (5); verify manifest, signer and artifact hashes before setting built/ready or uploading. Existing build output files are stale 0.4.0 and must not be renamed as a new build.",
+      "Recheck that the account is Organization with no unfinished verification and inspect actual policy/support state before one authorised Alpha submission. Keep accurate Medical/health and Data safety declarations and scanning off.",
+      "Keep original 57 testers and the additional 2 in separate invitation groups. Only invite after an eligible tester can actually join and install; check Sent and private receipts immediately before each batch."
+    ],
     "scannerReadiness": "Existing Saanthvana Gemini key found in Google AI Studio. Supabase function deployed and live synthetic-only extraction passed on 13 October; unauthorised calls returned 401. Key is on Free tier, whose terms exclude sensitive input. Public proxy remains ready:false; no patient uploads are enabled and no billing was created.",
+    "scannerReleaseScope": "User requested review of the current prepared candidate on 13 October 2026. Proceed with photo scanning off and manual medicine entry available. Paid scanning remains separately unapproved.",
     "listingAssets": [
       "output/android/verification/0.4.0/today.png",
       "output/android/verification/0.4.0/centre-map-loaded.png",
       "output/android/verification/0.4.0/documents.png",
       "output/android/verification/0.4.0/note-actions.png"
     ],
-    "dataSafetyChanges": "Reassess optional prescription/packaging Photos and Health info transmitted through Sahara and Supabase to Gemini. Confirm actual provider plan, retention and processing terms before making ephemeral processing or sharing-exemption claims. Preserve existing accurate health declarations.",
+    "dataSafetyChanges": "Preserve the existing accurate collection and Medical/health declarations for this scanner-off release. Before any future patient photo scanning, resolve suitable provider terms and billing, verify the complete upload flow and update Photos/Health info collection, retention and provider-sharing answers.",
     "privacyDeployment": {
       "id": "dpl_9d1DUV4mKvvf3V4fSg1eVwgcafFf",
       "url": "https://continuity-loop-healthathon-zjgesitza.vercel.app",
       "result": "Next.js build, TypeScript and scoped privacy-page ESLint passed. Both Sahara and Saanthvana privacy pages return 200 and state that patient scanning is off. Desktop and actual 390px viewport checked; no horizontal overflow.",
       "verifiedOn": "2026-10-13"
     },
-    "draftReleaseId": 2,
-    "submitted": false,
-    "draftUrl": "https://play.google.com/console/u/1/developers/8795679408143615220/app/4974759245808215344/publishing"
+    "supportAppealStatus": "Closed: Google confirms enforcement-system account sync delay and requires an incremented Version Code after the sync window",
+    "verification": "Incomplete. No successful 0.4.1 build, signatures, manifest, hashes, installation or upload are claimed."
   },
   "previousUiCandidate": {
     "version": "0.3.1",
@@ -244,5 +240,51 @@
     ],
     "checkedAt": "2026-10-11T13:49:04.185617+05:30",
     "supersededBy": "0.4.0 merging incoming b453efb"
+  },
+  "rejectedBuild": {
+    "version": "0.4.0",
+    "versionCode": 4,
+    "releasePrerequisites": [
+      "Allow the 72-hour organisation account synchronization through 2026-10-15T21:36:14Z, unless the policy team explicitly clears the account check earlier. Do not repeatedly resubmit unchanged while this publisher-classification issue remains.",
+      "Check the single pending support request and any instructions before retrying. Confirm Play still shows Organization with no unfinished verification, inspect the actual policy status and recheck the saved 0.4.0 bundle hash. Keep Medical/health, Data safety and scanner-off listing/privacy accurate.",
+      "After the sync deadline and candidate checks, perform one authorised Alpha submission if no support instruction requires holding. Do not create another support ticket or change the package to conceal the rejection.",
+      "Verify eligible tester opt-in and installation availability before invitations. Keep the original 57 and separate additional 2 private and distinct; deduplicate Gmail Sent and private receipts before sending."
+    ],
+    "built": true,
+    "ready": false,
+    "uploaded": true,
+    "status": "Existing uploaded 0.4.0 (4) draft returned to unsubmitted changes after the 13 October account-type rejection. Policy support is Pending. Do not upload the bundle again or repeatedly resubmit before account sync is resolved.",
+    "apk": "output/android/Sahara-0.4.0-release.apk",
+    "apkSha256": "90CBB5E07E46D38F338DD76E8899CA7E21F59DA2BF48301F062A5618D99C33A3",
+    "bundle": "output/android/Sahara-0.4.0.aab",
+    "bundleSha256": "0FF3A1064637F0BFD96BC7FFE735E273B4E7716E1960444D5C54808E40B12169",
+    "builtOn": "2026-10-13",
+    "submitNotBeforeUtc": "2026-10-15T21:36:14Z",
+    "upstreamCommit": "b453efb2cb5ccbbf94a6a7b7a96f4c5dc1fb27f4",
+    "verification": "Release build and vital lint passed. APK v2 and AAB JAR signatures verified; ZIP and four 64-bit ELF libraries passed 16 KB alignment. Signed APK installed as 0.4.0 (4). Existing 11 October matching-source checks: 12 unit passes, 12 device passes and one credential-dependent skip. Twelve web proxy/function tests passed on 13 October. Live synthetic-only Supabase/Gemini extraction passed; unauthorized requests returned 401. No optimized-release interaction, 16 KB runtime, real-prescription accuracy or complete phone-to-provider upload verification is claimed.",
+    "scannerReadiness": "Existing Saanthvana Gemini key found in Google AI Studio. Supabase function deployed and live synthetic-only extraction passed on 13 October; unauthorised calls returned 401. Key is on Free tier, whose terms exclude sensitive input. Public proxy remains ready:false; no patient uploads are enabled and no billing was created.",
+    "listingAssets": [
+      "output/android/verification/0.4.0/today.png",
+      "output/android/verification/0.4.0/centre-map-loaded.png",
+      "output/android/verification/0.4.0/documents.png",
+      "output/android/verification/0.4.0/note-actions.png"
+    ],
+    "dataSafetyChanges": "Preserve the existing accurate collection and Medical/health declarations for this scanner-off release. Before any future patient photo scanning, resolve suitable provider terms and billing, verify the complete upload flow and update Photos/Health info collection, retention and provider-sharing answers.",
+    "privacyDeployment": {
+      "id": "dpl_9d1DUV4mKvvf3V4fSg1eVwgcafFf",
+      "url": "https://continuity-loop-healthathon-zjgesitza.vercel.app",
+      "result": "Next.js build, TypeScript and scoped privacy-page ESLint passed. Both Sahara and Saanthvana privacy pages return 200 and state that patient scanning is off. Desktop and actual 390px viewport checked; no horizontal overflow.",
+      "verifiedOn": "2026-10-13"
+    },
+    "draftReleaseId": 2,
+    "submitted": false,
+    "draftUrl": "https://play.google.com/console/u/1/developers/8795679408143615220/app/4974759245808215344/publishing",
+    "scannerReleaseScope": "User requested review of the current prepared candidate on 13 October 2026. Proceed with photo scanning off and manual medicine entry available. Paid scanning remains separately unapproved.",
+    "previousPlannedSubmitNotBeforeUtc": "2026-10-15T21:36:14Z",
+    "reviewStatus": "rejected",
+    "reviewConfirmedAtUtc": "2026-10-13T07:39:31Z",
+    "submissionTiming": "User explicitly insisted on closed testing now after the sync-wait explanation. Play allowed and accepted submission before the previously planned 72-hour deadline. This does not establish approval or complete propagation of the account conversion.",
+    "lastSubmissionReviewConfirmedAtUtc": "2026-10-13T07:39:31Z",
+    "supportAppealStatus": "Closed with reply: wait for account sync and increment Version Code before retrying"
   }
 }
