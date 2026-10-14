@@ -1,5 +1,5 @@
 {
-  "status": "New Alpha release 0.4.1 (5), release ID 3, uploaded and submitted on 14 October. Publishing overview confirms Changes in review with initial checks running. Not approved or available to testers yet. Organisation account shown live. Original 57 and separate 2 testers are saved; no invitations sent. Photo scanning stays off.",
+  "status": "Alpha 0.4.1 (5), release ID 3, is available to selected testers. Play shows release on 14 October at 17:49 IST. An eligible tester joined and Google Play showed Install. Invitations to all 59 confirmed addresses were verified in Gmail Sent in separate original-57 and additional-2 batches. This is closed testing, not a production release. Photo scanning stays off.",
   "preparedOn": "2026-10-10",
   "workingTitle": "Sahara: Palliative Companion",
   "fullProductName": "Sahara — A Palliative Care Companion",
@@ -29,10 +29,10 @@
     "note": "Saved to Google Play on 10 October 2026 against the 0.3.0 release. Any AI, sync or account integration changes require reassessing these answers."
   },
   "releaseDependencies": [
-    "Alpha 0.4.1 (5) was submitted once on 14 October at the user's explicit request before the 72-hour sync deadline. Google shows Changes in review with initial checks running. Do not duplicate the submission; if classification fails again, hold through the deadline and use the existing support case.",
-    "Verify closed-test opt-in and installation availability before emailing the original 57 and separate 2 additional testers. Neither invitation group has been sent.",
+    "Closed testing is live and both authorised invitation groups are sent. Tester installation, participation and production access have not been verified.",
     "Ordinary tester signup and reset delivery remain incomplete: the exact Sahara callback allowlist is unapproved and Zoho work is paused at the user's request. Unsigned-in care flows and the dedicated reviewer login work; the default Supabase mail service is limited to project-team addresses.",
-    "If applicable to the account, enrol at least 12 testers continuously for 14 days, then apply for production access; this does not guarantee approval"
+    "Public photo scanning remains off. Any future enablement needs suitable provider terms, authorised billing, complete flow verification and matching Play declarations.",
+    "If applicable to the account, enrol at least 12 testers continuously for 14 days, then apply for production access; this does not guarantee approval. No completed testing period is claimed."
   ],
   "listingAssets": {
     "icon": "output/android/play-listing/icon-512.png",
@@ -44,7 +44,7 @@
       "output/android/verification/0.4.0/note-actions.png"
     ],
     "screenshotEvidence": "Actual 1080x2340 Samsung A34 captures from the matching-source 0.4.0 debug build, using fictional Test Person records. Four screenshots visually inspected before upload. App icon and feature graphic reuse Awaiz's original logo; the source logo was preserved unchanged.",
-    "uploadStatus": "Matching listing assets and description were saved on 13 October and are included in the 14 October submission of 0.4.1 (5)."
+    "uploadStatus": "Matching listing assets and description were saved on 13 October and published with the approved 0.4.1 (5) closed-testing release on 14 October."
   },
   "appContentDraft": {
     "containsAds": false,
@@ -60,7 +60,7 @@
   },
   "dataSafetyDraft": {
     "formSubmitted": true,
-    "submissionStatus": "Saved in Play and included in the submission. Release rejected for the organisation-account requirement; declaration remains saved.",
+    "submissionStatus": "Saved and published with the approved scanner-off 0.4.1 (5) closed-testing release on 14 October. Prior account-classification rejection history is preserved.",
     "specificDataDeletionUrl": "https://sahara.wedevit.in/delete-account#specific",
     "collectsData": true,
     "encryptedInTransit": true,
@@ -156,23 +156,26 @@
     "androidChecks": "Six unit checks passed; APK/AAB signatures and static 16 KB ZIP/ELF alignment passed. On 10 October, six local flows passed on Samsung A34 against the matching-source debug build; one credential-dependent sign-in test was initially skipped. Current phone screenshots were captured. After the auth redirect/recovery change, the focused reviewer sign-in, cloud-record load and reopen check passed with no skips. The fresh signed APK/AAB passed vital lint, signature and static 16 KB ZIP/native checks; the signed APK was installed on Samsung A34. Optimized release interaction and a 16 KB runtime are not verified.",
     "uploadBundle": "output/android/Sahara-0.3.0.aab",
     "uploadBundleSha256": "EB0A14F7CE245230BE356A7737B952CF2B799A8895A009CA24A2C53242991589",
-    "playAccount": "Existing Devit developer account 8795679408143615220 now shows Organization. The verified company identity profile was linked; confirmation observed at 2026-10-12T21:36:14Z. Earliest resubmission is 2026-10-15T21:36:14Z. No new paid account or merchant payouts were created.",
+    "playAccount": "Existing Devit developer account 8795679408143615220 shows Organization. Final conversion was observed at 2026-10-12T21:36:14Z. Google published Alpha 0.4.1 (5) on 14 October; no further sync wait is needed for this already available release. No new paid account or merchant payouts were created.",
     "playAppId": "4974759245808215344",
     "closedTrackId": "4699010624330920429",
-    "closedTest": "Alpha, India. Version 0.3.0 (3) uploaded; submission rejected on 10 October 2026 under Play Console Requirements. Play shows App not available on Google Play and returns 14 changes to the unsubmitted queue. Native debug symbols warning was non-blocking.",
+    "closedTest": "Alpha, India. Release ID 3, 0.4.1 (5), is Available to selected testers, released on 14 October at 17:49 IST. Earlier 0.3.0 and 0.4.0 account-classification rejections remain in history. Native debug symbols warning was non-blocking.",
     "policyIssueId": "4985856061480929924",
     "policyIssueUrl": "https://play.google.com/console/u/1/developers/8795679408143615220/app/4974759245808215344/policy-center/issues/4985856061480929924/details",
     "testerLists": [
       "erus testers",
       "interns",
       "SecureSign additional testers",
-      "Vikasam owner internal testing"
+      "Vikasam owner internal testing",
+      "Sahara additional testers"
     ],
-    "uniqueTesterAddresses": 57,
+    "uniqueTesterAddresses": 59,
     "optInUrl": "https://play.google.com/apps/testing/in.wedevit.sahara",
-    "optInLive": false,
+    "optInLive": true,
     "accountClosure": "Applied sahara_account_closure (20261010123354). Service-only closure removes Sahara-owned care data and memberships atomically, blocks existing JWTs, and preserves shared Auth identities and other owners. Rollback regression passed; no real accounts were closed and all fixture counts returned to zero. Public policy describes the private account-ID/closure-date marker.",
-    "invitations": "Not sent. All four existing lists are selected; their 57 unique addresses exactly match the prior sent-email list. Send a short join-and-install email privately to all of them only after the closed-testing opt-in link is live."
+    "invitations": "Sent from the authorised Devit mailbox to all 59 confirmed addresses in separate original-57 and additional-2 batches. Gmail Sent and exact recipient coverage were verified; receipts and message IDs remain private. This does not confirm delivery, reading or installation.",
+    "originalTesterAddresses": 57,
+    "additionalTesterAddresses": 2
   },
   "sources": {
     "accountRequirements": "https://support.google.com/googleplay/android-developer/answer/10788890?hl=en-GB",
@@ -194,15 +197,14 @@
     "ready": true,
     "uploaded": true,
     "submitted": true,
-    "status": "New Alpha release 0.4.1 (5), release ID 3, uploaded and submitted on 14 October. Publishing overview confirms Changes in review with initial checks running. Not approved or available to testers yet.",
+    "status": "Alpha 0.4.1 (5), release ID 3, is available to selected testers. Play shows release on 14 October at 17:49 IST. An eligible tester joined and Google Play showed Install. Invitations to all 59 confirmed addresses were verified in Gmail Sent in separate original-57 and additional-2 batches. This is closed testing, not a production release. Photo scanning stays off.",
     "apk": "output/android/Sahara-0.4.1-release.apk",
     "bundle": "output/android/Sahara-0.4.1.aab",
     "submitNotBeforeUtc": null,
     "releasePrerequisites": [
-      "The user authorised one early higher-version retry on 14 October despite the sync guidance ending 2026-10-15T21:36:14Z. That release is now submitted; do not upload, withdraw, duplicate or resubmit it while review/initial checks are pending.",
-      "Inspect the actual Google decision. If the same publisher classification is rejected again, hold through the sync deadline and follow the existing support case before another authorised retry. Preserve accurate Medical/health and Data safety declarations.",
-      "Keep public photo scanning off. Manual medicine entry remains available; no new billing, callback change, Zoho setup or patient upload is authorised.",
-      "Verify an eligible tester can actually join and install before sending invitations. Keep original 57 and additional 2 separate, and check Gmail Sent/private receipts immediately before each batch."
+      "Closed testing and both invitation groups are complete. Do not duplicate this release or resend the same invitations.",
+      "Keep accurate Medical/health and Data safety declarations and photo scanning off. Paid scanner setup, Zoho and unapproved callbacks remain outside this release scope.",
+      "Tester installs, participation and production approval are not established by the published release or the sent invitations."
     ],
     "scannerReadiness": "Existing Saanthvana Gemini key found in Google AI Studio. Supabase function deployed and live synthetic-only extraction passed on 13 October; unauthorised calls returned 401. Key is on Free tier, whose terms exclude sensitive input. Public proxy remains ready:false; no patient uploads are enabled and no billing was created.",
     "scannerReleaseScope": "User requested review of the current prepared candidate on 13 October 2026. Proceed with photo scanning off and manual medicine entry available. Paid scanning remains separately unapproved.",
@@ -219,10 +221,10 @@
       "result": "Next.js build, TypeScript and scoped privacy-page ESLint passed. Both Sahara and Saanthvana privacy pages return 200 and state that patient scanning is off. Desktop and actual 390px viewport checked; no horizontal overflow.",
       "verifiedOn": "2026-10-13"
     },
-    "supportAppealStatus": "Closed: Google confirms enforcement-system account sync delay and requires an incremented Version Code after the sync window",
+    "supportAppealStatus": "Closed after advising an account-sync wait and higher Version Code. The later 0.4.1 (5) release is now available to selected testers; the original reply remains private history.",
     "verification": "Version-only change. Release APK/AAB build, R8 and vital lint passed. APK signature verified and signer matches 0.4.0; AAB JAR signature verified. APK and AAB manifests confirm in.wedevit.sahara / 0.4.1 / 5. ZIP 16 KB alignment and all four 64-bit ELF libraries passed; their bytes match 0.4.0 and the new AAB. No phone was connected for this version, so new installation/interaction and a 16 KB runtime are not claimed. Public scanning GET rechecked ready:false.",
-    "reviewStatus": "in_review",
-    "quickChecksStatus": "in_progress",
+    "reviewStatus": "approved",
+    "quickChecksStatus": "completed",
     "builtOn": "2026-10-14",
     "apkSha256": "65CA5F8933C762E8C05D4EE4911952C942E247BEBE71C34C32B52C34798513B2",
     "bundleSha256": "64E70664F68A7A63F5F712E7CA3E6804ED107981ABEBFC6C5916C0C891223914",
@@ -232,7 +234,28 @@
     "earlySubmissionAuthorised": true,
     "submissionTiming": "After being told approximately 34 hours remained and that the last retry was already from the Organization account, the user explicitly requested one more submission from that account. This supersedes the prior hold for this release only; do not duplicate or repeatedly resubmit.",
     "draftUrl": "https://play.google.com/console/u/1/developers/8795679408143615220/app/4974759245808215344/tracks/4699010624330920429/releases/3/details",
-    "installed": false
+    "installed": false,
+    "releaseAvailable": true,
+    "releasedAtLocal": "14 October 2026, 17:49 IST",
+    "availabilityObservedAtUtc": "2026-10-14T13:27:22.247117Z",
+    "optInLive": true,
+    "eligibleTesterJoined": true,
+    "installAvailable": true,
+    "invitationsSent": true,
+    "invitationCoverage": {
+      "original": 57,
+      "additional": 2,
+      "total": 59,
+      "groupsKeptSeparate": true,
+      "sentVerified": true
+    },
+    "availabilityEvidence": "Play Console release details show Available to selected testers. The authorised eligible account joined successfully and Google Play displayed enabled Install and device availability. No remote device installation was performed.",
+    "productionAccess": {
+      "createNewReleaseEnabled": true,
+      "testerQualificationGateShown": false,
+      "productionReleaseCreated": false,
+      "evidence": "On 14 October the Production page displayed enabled Create new release. There is no 12-tester/14-day access gate shown for this Organization account. Production still requires its own release and review."
+    }
   },
   "previousUiCandidate": {
     "version": "0.3.1",

@@ -481,7 +481,7 @@
     "verifiedAt": "2026-10-14T11:45:31Z",
     "version": "0.4.1",
     "versionCode": 5,
-    "status": "New Alpha release 0.4.1 (5), release ID 3, uploaded and submitted on 14 October. Publishing overview confirms Changes in review with initial checks running. Not approved or available to testers yet.",
+    "status": "Alpha 0.4.1 (5), release ID 3, is available to selected testers. Play shows release on 14 October at 17:49 IST. An eligible tester joined and Google Play showed Install. Invitations to all 59 confirmed addresses were verified in Gmail Sent in separate original-57 and additional-2 batches. This is closed testing, not a production release. Photo scanning stays off.",
     "apk": "output/android/Sahara-0.4.1-release.apk",
     "apkSha256": "65CA5F8933C762E8C05D4EE4911952C942E247BEBE71C34C32B52C34798513B2",
     "bundle": "output/android/Sahara-0.4.1.aab",
@@ -530,14 +530,27 @@
     "uploaded": true,
     "submitted": true,
     "releaseId": 3,
-    "reviewStatus": "in_review",
-    "quickChecksStatus": "in_progress",
+    "reviewStatus": "approved",
+    "quickChecksStatus": "completed",
     "notVerified": [
       "New 0.4.1 physical-device installation/interaction",
       "16 KB device runtime",
-      "Play approval and eligible-tester availability",
-      "Current signup/recovery email delivery"
-    ]
+      "Current signup/recovery email delivery",
+      "Tester installations, participation, mail delivery/read receipts and production approval"
+    ],
+    "releaseAvailable": true,
+    "releasedAtLocal": "14 October 2026, 17:49 IST",
+    "availabilityVerifiedAtUtc": "2026-10-14T13:27:22.247117Z",
+    "eligibleTesterJoined": true,
+    "installAvailable": true,
+    "invitationsSent": {
+      "original": 57,
+      "additional": 2,
+      "total": 59,
+      "sentVerified": true,
+      "groupsKeptSeparate": true
+    },
+    "availabilityEvidence": "Play Console release details show Available to selected testers. The authorised eligible account joined successfully and Google Play displayed enabled Install and device availability. No remote device installation was performed."
   },
   "priorPendingRelease": {
     "verifiedAt": "2026-10-11T13:49:04.185617+05:30",
