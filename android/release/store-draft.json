@@ -265,6 +265,11 @@
     "saved": true,
     "submitted": false,
     "reviewStatus": "not_submitted",
+    "userAuthorisedCurrentVersion": true,
+    "submissionConfirmationObserved": false,
+    "submissionAttemptsOn14October": 5,
+    "manualConfirmationPending": true,
+    "submissionProblem": "Normal, native and keyboard confirmation attempts, including after a full reload, closed the Send dialog but left both changes unsubmitted. Submission activity showed no new production entry. The exact prepared version remains unchanged; manual confirmation was requested in the retained Devit Chrome tab.",
     "countries": ["India"],
     "rollout": "First full production rollout after Google review",
     "bundleReusedFromPlayLibrary": true,
@@ -281,7 +286,7 @@
       "includedInExistingBuild": true,
       "remoteBranchesChecked": true
     },
-    "remainingPublicReadiness": "Ordinary signup and reset email delivery is still recorded as incomplete/unverified. Zoho remains explicitly paused and the exact Supabase recovery callback remains unapproved. Resolve and verify these public account flows before public launch; keep scanning off and declarations accurate."
+    "remainingPublicReadiness": "Ordinary signup and reset email delivery remains recorded as incomplete/unverified. After this was explained, the user explicitly requested submitting the current version as-is. These known limitations remain follow-up work; do not delay this authorised version for new provider setup. Zoho remains paused, the exact Supabase recovery callback remains unapproved, photo scanning stays off and declarations remain accurate."
   },
   "previousUiCandidate": {
     "version": "0.3.1",
