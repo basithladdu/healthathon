@@ -267,10 +267,11 @@
     "reviewStatus": "not_submitted",
     "userAuthorisedCurrentVersion": true,
     "submissionConfirmationObserved": false,
-    "submissionAttemptsOn14October": 5,
-    "manualConfirmationPending": true,
-    "submissionProblem": "Normal, native and keyboard confirmation attempts, including after a full reload, closed the Send dialog but left both changes unsubmitted. Submission activity showed no new production entry. The exact prepared version remains unchanged; manual confirmation was requested in the retained Devit Chrome tab.",
-    "countries": ["India"],
+    "manualConfirmationPending": false,
+    "submissionProblem": "The confirmation closes, but Google keeps the two current Production changes under Changes not yet submitted for review. The release details also say Not yet sent for review. Owner sign-in refresh, a fresh control session/tab, reversible queue restoration, native input and keyboard activation did not register the submission. Exact cause is unconfirmed; the failure was reported in the existing Google support email thread and verified in Sent.",
+    "countries": [
+      "India"
+    ],
     "rollout": "First full production rollout after Google review",
     "bundleReusedFromPlayLibrary": true,
     "bundleSha256": "64E70664F68A7A63F5F712E7CA3E6804ED107981ABEBFC6C5916C0C891223914",
@@ -278,7 +279,7 @@
     "warning": "Missing native debug symbols; non-blocking",
     "quickChecksStatus": "completed",
     "changesReadyToSubmit": 2,
-    "evidence": "Publishing overview shows Changes not yet submitted for review: Production 0.4.1 (5), Start full rollout, and India country selection. The saved changes persist after reload. No production submission or approval is claimed.",
+    "evidence": "Production 0.4.1 (5), release ID 1, and India remain saved with completed quick checks and two unsubmitted changes. No production submission or approval is claimed. Closed testing and all 59 invitations remain complete.",
     "sourcePull": {
       "result": "Already up to date on 14 October",
       "headAtPull": "73a2f16909c3be4eec67ec8dd9f3b4cefc1da616",
@@ -286,7 +287,23 @@
       "includedInExistingBuild": true,
       "remoteBranchesChecked": true
     },
-    "remainingPublicReadiness": "Ordinary signup and reset email delivery remains recorded as incomplete/unverified. After this was explained, the user explicitly requested submitting the current version as-is. These known limitations remain follow-up work; do not delay this authorised version for new provider setup. Zoho remains paused, the exact Supabase recovery callback remains unapproved, photo scanning stays off and declarations remain accurate."
+    "remainingPublicReadiness": "Ordinary signup and reset email delivery remains recorded as incomplete/unverified. After this was explained, the user explicitly requested submitting the current version as-is. These known limitations remain follow-up work; do not delay this authorised version for new provider setup. Zoho remains paused, the exact Supabase recovery callback remains unapproved, photo scanning stays off and declarations remain accurate.",
+    "agentHandlesConfirmation": true,
+    "lastVerifiedAtUtc": "2026-10-14T18:36:34.770Z",
+    "recoveryActions": [
+      "Existing owner sign-in refreshed; no new account or access created",
+      "Fresh task tab and documented browser-control reset",
+      "Saved both unchanged changes for later and restored them",
+      "Native click and keyboard confirmation tested"
+    ],
+    "supportFollowup": {
+      "existingCase": true,
+      "sent": true,
+      "verifiedInSent": true,
+      "newTicketCreated": false,
+      "privateEvidenceOnly": true
+    },
+    "initialRecordedFailedAttempts": 5
   },
   "previousUiCandidate": {
     "version": "0.3.1",
