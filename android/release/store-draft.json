@@ -29,7 +29,7 @@
     "note": "Saved to Google Play on 10 October 2026 against the 0.3.0 release. Any AI, sync or account integration changes require reassessing these answers."
   },
   "releaseDependencies": [
-    "Closed testing is live and both authorised invitation groups are sent. Tester installation, participation and production access have not been verified.",
+    "Closed testing is live and both authorised invitation groups are sent. Production access is unlocked; tester installations, participation and production approval have not been verified.",
     "Ordinary tester signup and reset delivery remain incomplete: the exact Sahara callback allowlist is unapproved and Zoho work is paused at the user's request. Unsigned-in care flows and the dedicated reviewer login work; the default Supabase mail service is limited to project-team addresses.",
     "Public photo scanning remains off. Any future enablement needs suitable provider terms, authorised billing, complete flow verification and matching Play declarations.",
     "If applicable to the account, enrol at least 12 testers continuously for 14 days, then apply for production access; this does not guarantee approval. No completed testing period is claimed."
@@ -253,9 +253,35 @@
     "productionAccess": {
       "createNewReleaseEnabled": true,
       "testerQualificationGateShown": false,
-      "productionReleaseCreated": false,
+      "productionReleaseCreated": true,
       "evidence": "On 14 October the Production page displayed enabled Create new release. There is no 12-tester/14-day access gate shown for this Organization account. Production still requires its own release and review."
     }
+  },
+  "productionRelease": {
+    "version": "0.4.1",
+    "versionCode": 5,
+    "trackId": "4697314269892725425",
+    "releaseId": 1,
+    "saved": true,
+    "submitted": false,
+    "reviewStatus": "not_submitted",
+    "countries": ["India"],
+    "rollout": "First full production rollout after Google review",
+    "bundleReusedFromPlayLibrary": true,
+    "bundleSha256": "64E70664F68A7A63F5F712E7CA3E6804ED107981ABEBFC6C5916C0C891223914",
+    "validationErrors": 0,
+    "warning": "Missing native debug symbols; non-blocking",
+    "quickChecksStatus": "completed",
+    "changesReadyToSubmit": 2,
+    "evidence": "Publishing overview shows Changes not yet submitted for review: Production 0.4.1 (5), Start full rollout, and India country selection. The saved changes persist after reload. No production submission or approval is claimed.",
+    "sourcePull": {
+      "result": "Already up to date on 14 October",
+      "headAtPull": "73a2f16909c3be4eec67ec8dd9f3b4cefc1da616",
+      "latestAwaizCommit": "b453efb",
+      "includedInExistingBuild": true,
+      "remoteBranchesChecked": true
+    },
+    "remainingPublicReadiness": "Ordinary signup and reset email delivery is still recorded as incomplete/unverified. Zoho remains explicitly paused and the exact Supabase recovery callback remains unapproved. Resolve and verify these public account flows before public launch; keep scanning off and declarations accurate."
   },
   "previousUiCandidate": {
     "version": "0.3.1",
