@@ -478,62 +478,66 @@
     "recoveryScope": "Forgot password control reachability was checked; email delivery and reset completion were not tested."
   },
   "pendingRelease": {
-    "verifiedAt": "2026-10-13T03:16:31.1193007+05:30",
-    "version": "0.4.0",
-    "versionCode": 4,
-    "status": "Built, installed and uploaded; saved in Play Publishing overview, not submitted",
-    "apk": "output/android/Sahara-0.4.0-release.apk",
-    "apkSha256": "90CBB5E07E46D38F338DD76E8899CA7E21F59DA2BF48301F062A5618D99C33A3",
-    "bundle": "output/android/Sahara-0.4.0.aab",
-    "bundleSha256": "0FF3A1064637F0BFD96BC7FFE735E273B4E7716E1960444D5C54808E40B12169",
-    "upstreamCommit": "b453efb2cb5ccbbf94a6a7b7a96f4c5dc1fb27f4",
-    "build": "Release APK/AAB, R8 and release vital lint passed",
-    "signing": "APK Signature Scheme v2 and AAB JAR signatures verified",
-    "alignment": "APK ZIP and all four 64-bit native ELF libraries passed 16 KB alignment; 16 KB runtime not tested",
-    "installed": "Samsung A34 / Android 16, verified package version 0.4.0 (4)",
-    "tests": {
-      "webProxyTestedOn": "2026-10-13",
-      "webProxyTestsPassed": 12,
-      "unitPassed": 12,
-      "sourceEvidenceOn": "2026-10-11",
-      "phonePassed": 12,
-      "phoneSelected": 13,
-      "phoneSkipped": 1,
-      "skipReason": "Credential-dependent sign-in check"
+    "verifiedAt": "2026-10-14T11:45:31Z",
+    "version": "0.4.1",
+    "versionCode": 5,
+    "status": "New Alpha release 0.4.1 (5), release ID 3, uploaded and submitted on 14 October. Publishing overview confirms Changes in review with initial checks running. Not approved or available to testers yet.",
+    "apk": "output/android/Sahara-0.4.1-release.apk",
+    "apkSha256": "65CA5F8933C762E8C05D4EE4911952C942E247BEBE71C34C32B52C34798513B2",
+    "bundle": "output/android/Sahara-0.4.1.aab",
+    "bundleSha256": "64E70664F68A7A63F5F712E7CA3E6804ED107981ABEBFC6C5916C0C891223914",
+    "build": "Release APK/AAB, R8 and vital lint passed",
+    "signing": "APK verified; signer matches 0.4.0. AAB JAR signature verified.",
+    "bundleManifest": {
+      "package": "in.wedevit.sahara",
+      "versionCode": "5",
+      "versionName": "0.4.1"
     },
-    "screenshots": [
-      "output/android/verification/0.4.0/today.png",
-      "output/android/verification/0.4.0/documents.png",
-      "output/android/verification/0.4.0/note-actions.png",
-      "output/android/verification/0.4.0/centre-map-loaded.png"
-    ],
-    "notVerified": [
-      "Optimized-release interaction",
-      "16 KB device runtime",
-      "Real-prescription accuracy, patient-data processing terms and full phone upload flow",
-      "Current signup/recovery email delivery",
-      "Play review and testing availability"
-    ],
-    "submitted": false,
-    "uploaded": true,
-    "syntheticServiceCheck": {
-      "checkedAt": "2026-10-12T21:59:42.221Z",
-      "syntheticOnly": true,
-      "model": "gemini-3.8-flash",
-      "unauthorizedStatus": 401,
-      "httpStatus": 200,
-      "checks": {
-        "oneMedicine": true,
-        "name": true,
-        "strength": true,
-        "explicitTime": true,
-        "duration": true,
-        "package": true
+    "nativeLibraries": [
+      {
+        "path": "lib/arm64-v8a/libandroidx.graphics.path.so",
+        "sha256": "41E9A793C43A0F4FDDB19E33F346BACE464F30F888BA7B9EAF96294EA115BFB6",
+        "sameAs040": true,
+        "bundleMatchesApk": true,
+        "elf16KbAligned": true
       },
-      "productionReadiness": {
-        "ready": false
+      {
+        "path": "lib/arm64-v8a/libmaplibre.so",
+        "sha256": "D3A1AB9B9D056D84B93F2AA5F676D20D2D76723952DFCD8BD8D203D6ECA6980D",
+        "sameAs040": true,
+        "bundleMatchesApk": true,
+        "elf16KbAligned": true
+      },
+      {
+        "path": "lib/x86_64/libandroidx.graphics.path.so",
+        "sha256": "4E56C996F13670E70082658DE7880C4020EABF4F25E43387F88ED78A713FC9F0",
+        "sameAs040": true,
+        "bundleMatchesApk": true,
+        "elf16KbAligned": true
+      },
+      {
+        "path": "lib/x86_64/libmaplibre.so",
+        "sha256": "55175BF2DFB64AA31A555CF8DF5846C1C736C10A4946162C175AE948AD189774",
+        "sameAs040": true,
+        "bundleMatchesApk": true,
+        "elf16KbAligned": true
       }
-    }
+    ],
+    "alignment": "ZIP and four 64-bit ELF libraries pass static 16 KB alignment",
+    "installed": false,
+    "installationReason": "ADB has no connected device on 14 October",
+    "sourceChange": "Version code/name only; behaviour and prior source checks unchanged",
+    "uploaded": true,
+    "submitted": true,
+    "releaseId": 3,
+    "reviewStatus": "in_review",
+    "quickChecksStatus": "in_progress",
+    "notVerified": [
+      "New 0.4.1 physical-device installation/interaction",
+      "16 KB device runtime",
+      "Play approval and eligible-tester availability",
+      "Current signup/recovery email delivery"
+    ]
   },
   "priorPendingRelease": {
     "verifiedAt": "2026-10-11T13:49:04.185617+05:30",
@@ -651,5 +655,65 @@
       "CareData.kt": "F77FF58844DD8BD382FBCCB05A02464BAC5E3A2DCCE45B117FA4D89015DD3320",
       "CareModel.kt": "08CA04788995B956EC366E5F375A4AFB999964168C975133C912E3D32B31408F"
     }
-  }
+  },
+  "releaseHistory": [
+    {
+      "verifiedAt": "2026-10-13T03:16:31.1193007+05:30",
+      "version": "0.4.0",
+      "versionCode": 4,
+      "status": "Built, installed and uploaded; saved in Play Publishing overview, not submitted",
+      "apk": "output/android/Sahara-0.4.0-release.apk",
+      "apkSha256": "90CBB5E07E46D38F338DD76E8899CA7E21F59DA2BF48301F062A5618D99C33A3",
+      "bundle": "output/android/Sahara-0.4.0.aab",
+      "bundleSha256": "0FF3A1064637F0BFD96BC7FFE735E273B4E7716E1960444D5C54808E40B12169",
+      "upstreamCommit": "b453efb2cb5ccbbf94a6a7b7a96f4c5dc1fb27f4",
+      "build": "Release APK/AAB, R8 and release vital lint passed",
+      "signing": "APK Signature Scheme v2 and AAB JAR signatures verified",
+      "alignment": "APK ZIP and all four 64-bit native ELF libraries passed 16 KB alignment; 16 KB runtime not tested",
+      "installed": "Samsung A34 / Android 16, verified package version 0.4.0 (4)",
+      "tests": {
+        "webProxyTestedOn": "2026-10-13",
+        "webProxyTestsPassed": 12,
+        "unitPassed": 12,
+        "sourceEvidenceOn": "2026-10-11",
+        "phonePassed": 12,
+        "phoneSelected": 13,
+        "phoneSkipped": 1,
+        "skipReason": "Credential-dependent sign-in check"
+      },
+      "screenshots": [
+        "output/android/verification/0.4.0/today.png",
+        "output/android/verification/0.4.0/documents.png",
+        "output/android/verification/0.4.0/note-actions.png",
+        "output/android/verification/0.4.0/centre-map-loaded.png"
+      ],
+      "notVerified": [
+        "Optimized-release interaction",
+        "16 KB device runtime",
+        "Real-prescription accuracy, patient-data processing terms and full phone upload flow",
+        "Current signup/recovery email delivery",
+        "Play review and testing availability"
+      ],
+      "submitted": false,
+      "uploaded": true,
+      "syntheticServiceCheck": {
+        "checkedAt": "2026-10-12T21:59:42.221Z",
+        "syntheticOnly": true,
+        "model": "gemini-3.8-flash",
+        "unauthorizedStatus": 401,
+        "httpStatus": 200,
+        "checks": {
+          "oneMedicine": true,
+          "name": true,
+          "strength": true,
+          "explicitTime": true,
+          "duration": true,
+          "package": true
+        },
+        "productionReadiness": {
+          "ready": false
+        }
+      }
+    }
+  ]
 }
