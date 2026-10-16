@@ -115,7 +115,7 @@ def check_source(run_id, source_dir):
 
 def prepare(run_id, scope="all", source_dir=None):
     data = check_run(run_id)
-    equality = check_source(run_id, source_dir) if scope == "focused" else None
+    equality = check_source(run_id, source_dir) if scope != "all" else None
     receipt = unique("build-source.txt")
     assert receipt.read_text().strip() == data["head_sha"], "API head and build receipt differ"
     manifest = unique("build-sha256.txt")
@@ -153,7 +153,7 @@ def prepare(run_id, scope="all", source_dir=None):
         return signed
     execution_debug, execution_test = debug, test
     corrected_test = None
-    if scope == "focused":
+    if scope != "all":
         corrected_test = ROOT / "android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk"
         assert corrected_test.is_file(), "Corrected instrumentation APK was not compiled"
         # A fresh CI debug keystore cannot match the original build's signer. Sign copies
@@ -171,7 +171,7 @@ def prepare(run_id, scope="all", source_dir=None):
             "debugSha256": sha(debug), "testSha256": sha(test), "unsignedReleaseSha256": sha(release),
             "executionDebugSha256":sha(execution_debug), "executionTestSha256":sha(execution_test),
             "correctedTestSha256":sha(corrected_test) if corrected_test else None,
-            "debugSignature":"Original app APK and corrected tests share an ephemeral CI signer; original app code unchanged." if scope == "focused" else "Original downloaded debug/test signatures retained.",
+            "debugSignature":"Original app APK and corrected tests share an ephemeral CI signer; original app code unchanged." if scope != "all" else "Original downloaded debug/test signatures retained.",
             "optimizedCiSha256": sha(optimized), "optimizedSignature": "Ephemeral CI key; differs from the private store upload key. Code and R8 output unchanged.",
             "preparedUtc": utc()}
     write("artifacts.json", info)
@@ -478,8 +478,9 @@ def run(scope="all"):
     write("host-memory.txt", cmd("free", "-m"))
     adb("install", "-r", info["debug"], timeout=180); adb("install", "-r", info["test"], timeout=180)
     adb("logcat", "-c")
-    if scope == "focused":
-        summary["matrix"] = instrument("matrix-focused-4", ",".join(FOCUSED_TESTS), 4)
+    if scope != "all":
+        selected_tests = FOCUSED_TESTS[1:3] if scope == "remaining" else FOCUSED_TESTS
+        summary["matrix"] = instrument("matrix-focused-"+str(len(selected_tests)), ",".join(selected_tests), len(selected_tests))
         summary["pdfSupplemental"] = {"notRepeated":True, "priorRunId":38882501784,
             "qualification":"Prior separate pagination test passed; not counted as a new focused-run check."}
     else:
@@ -500,19 +501,20 @@ def run(scope="all"):
             ui.tap("Cancel")
             summary["debugCapture"] = "Actual current-source debug doctor images captured; root must inspect readability, insets and absence of overlays. Original matrix screenshots are preserved separately."
         except Exception as error: summary["debugCapture"] = "Capture failed: " + str(error)
-    summary["optimizedRelease"] = optimized_smoke(info, focused=scope == "focused")
+    summary["optimizedRelease"] = ({"notRepeated":True, "priorRunId":38887001702, "qualification":"Optimized preview/PDF/exit passed in the preceding focused run; this run executes only the remaining two instrumentation checks."}
+        if scope == "remaining" else optimized_smoke(info, focused=scope == "focused"))
     write("logcat.txt", adb("logcat", "-d", "-v", "brief", check=False))
     summary["finishedUtc"] = utc()
-    summary["passed"] = summary["matrix"]["matrixComplete"] and (scope == "focused" or summary["pdfSupplemental"]["matrixComplete"]) and summary["optimizedRelease"]["passed"]
-    summary["qualification"] = "Focused correction run only; aggregate with original 38882501784 without concealing its four failures or repeating already passing checks." if scope == "focused" else "CI emulator only; 36-test matrix and separate PDF check are distinguished. Component fixtures do not establish real doctor assignment or patient delivery. No local Room upgrade claimed."
+    summary["passed"] = summary["matrix"]["matrixComplete"] and (scope != "all" or summary["pdfSupplemental"]["matrixComplete"]) and (scope == "remaining" or summary["optimizedRelease"]["passed"])
+    summary["qualification"] = "Focused correction run only; aggregate with original 38882501784 without concealing its four failures or repeating already passing checks." if scope != "all" else "CI emulator only; 36-test matrix and separate PDF check are distinguished. Component fixtures do not establish real doctor assignment or patient delivery. No local Room upgrade claimed."
     write("runtime-summary.json", summary)
     print(json.dumps({"matrix":summary["matrix"]["counts"], "pdf":summary["pdfSupplemental"].get("counts", "not repeated"),
-                      "optimizedPassed":summary["optimizedRelease"]["passed"], "passed":summary["passed"]}, indent=2))
+                      "optimizedPassed":summary["optimizedRelease"].get("passed", "not repeated"), "passed":summary["passed"]}, indent=2))
     return 0 if summary["passed"] else 1
 
 
 if __name__ == "__main__":
-    parser=argparse.ArgumentParser(); parser.add_argument("mode", choices=["check-run", "check-source", "prepare", "run"]); parser.add_argument("--run-id"); parser.add_argument("--scope", choices=["all", "focused"], default="all"); parser.add_argument("--source-dir")
+    parser=argparse.ArgumentParser(); parser.add_argument("mode", choices=["check-run", "check-source", "prepare", "run"]); parser.add_argument("--run-id"); parser.add_argument("--scope", choices=["all", "focused", "remaining"], default="all"); parser.add_argument("--source-dir")
     args=parser.parse_args(); OUT.mkdir(parents=True,exist_ok=True)
     try:
         if args.mode=="check-run": check_run(args.run_id)

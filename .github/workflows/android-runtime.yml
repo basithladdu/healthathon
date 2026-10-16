@@ -8,13 +8,14 @@ on:
         required: true
         type: string
       scope:
-        description: All checks, or four corrected checks and the unfinished optimized preview flow
+        description: All checks, focused corrections plus preview, or only the two remaining assertions
         required: true
         type: choice
         default: all
         options:
           - all
           - focused
+          - remaining
 
 permissions:
   contents: read
@@ -49,21 +50,21 @@ jobs:
           printf 'source_commit=%s\n' "$SOURCE" >> "$GITHUB_OUTPUT"
           gh run download "$BUILD_RUN_ID" --repo "$GITHUB_REPOSITORY" --name "sahara-android-$SOURCE" --dir runtime-artifacts
       - name: Fetch the exact original build source without retaining credentials
-        if: inputs.scope == 'focused'
+        if: inputs.scope != 'all'
         uses: actions/checkout@v4
         with:
           ref: ${{ steps.build.outputs.source_commit }}
           path: runtime-build-source
           persist-credentials: false
       - name: Require identical app source and build inputs before compiling corrected tests
-        if: inputs.scope == 'focused'
+        if: inputs.scope != 'all'
         env:
           BUILD_RUN_ID: ${{ inputs.build_run_id }}
         run: python3 android/scripts/ci-runtime.py check-source --run-id "$BUILD_RUN_ID" --source-dir runtime-build-source
       - name: Install matching Android tools
         run: '"$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;36.1.0"'
       - name: Compile corrected instrumentation APK only; keep downloaded app packages
-        if: inputs.scope == 'focused'
+        if: inputs.scope != 'all'
         working-directory: android
         run: >-
           bash ./gradlew --no-daemon --max-workers=2
