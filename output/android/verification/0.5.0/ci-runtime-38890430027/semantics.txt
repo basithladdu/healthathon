@@ -1,0 +1,354 @@
+D/SaharaPrivacyBefore( 2603): printToLog:
+D/SaharaPrivacyBefore( 2603): Printing with useUnmergedTree = 'true'
+D/SaharaPrivacyBefore( 2603): Node #1 at (l=0.0, t=0.0, r=720.0, b=1600.0)px
+D/SaharaPrivacyBefore( 2603):  |-Node #2 at (l=0.0, t=0.0, r=720.0, b=1600.0)px
+D/SaharaPrivacyBefore( 2603):    IsContainer = 'true'
+D/SaharaPrivacyBefore( 2603):     |-Node #310 at (l=0.0, t=233.0, r=720.0, b=1412.0)px
+D/SaharaPrivacyBefore( 2603):     |  |-Node #311 at (l=0.0, t=233.0, r=720.0, b=1412.0)px
+D/SaharaPrivacyBefore( 2603):     |    CollectionInfo = 'androidx.compose.ui.semantics.CollectionInfo@7f9d3e9'
+D/SaharaPrivacyBefore( 2603):     |    IsTraversalGroup = 'true'
+D/SaharaPrivacyBefore( 2603):     |    VerticalScrollAxisRange = 'ScrollAxisRange(value=0.0, maxValue=100.0, reverseScrolling=false)'
+D/SaharaPrivacyBefore( 2603):     |    Actions = [GetScrollViewportLength, IndexForKey, ScrollBy, ScrollByOffset, ScrollToIndex]
+D/SaharaPrivacyBefore( 2603):     |     |-Node #313 at (l=38.0, t=271.0, r=177.0, b=337.0)px
+D/SaharaPrivacyBefore( 2603):     |     | Text = '[More]'
+D/SaharaPrivacyBefore( 2603):     |     | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+D/SaharaPrivacyBefore( 2603):     |     |-Node #315 at (l=38.0, t=371.0, r=682.0, b=461.0)px, Tag: 'patient-feedback-entry'
+D/SaharaPrivacyBefore( 2603):     |     | Focused = 'false'
+D/SaharaPrivacyBefore( 2603):     |     | Role = 'Button'
+D/SaharaPrivacyBefore( 2603):     |     | Actions = [OnClick, RequestFocus]
+D/SaharaPrivacyBefore( 2603):     |     | MergeDescendants = 'true'
+D/SaharaPrivacyBefore( 2603):     |     |  |-Node #319 at (l=308.0, t=397.0, r=473.0, b=435.0)px
+D/SaharaPrivacyBefore( 2603):     |     |    Text = '[App feedback]'
+D/SaharaPrivacyBefore( 2603):     |     |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+D/SaharaPrivacyBefore( 2603):     |     |-Node #321 at (l=38.0, t=495.0, r=682.0, b=585.0)px, Tag: 'doctor-demo-entry'
+D/SaharaPrivacyBefore( 2603):     |     | Focused = 'false'
+D/SaharaPrivacyBefore( 2603):     |     | Role = 'Button'
+D/SaharaPrivacyBefore( 2603):     |     | Actions = [OnClick, RequestFocus]
+D/SaharaPrivacyBefore( 2603):     |     | MergeDescendants = 'true'
+D/SaharaPrivacyBefore( 2603):     |     |  |-Node #323 at (l=287.0, t=521.0, r=433.0, b=559.0)px
+D/SaharaPrivacyBefore( 2603):     |     |    Text = '[Doctor login]'
+D/SaharaPrivacyBefore( 2603):     |     |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+D/SaharaPrivacyBefore( 2603):     |     |-Node #326 at (l=38.0, t=619.0, r=242.0, b=747.0)px, Tag: 'shortcut-calendar'
+D/SaharaPrivacyBefore( 2603):     |     | Focused = 'false'
+D/SaharaPrivacyBefore( 2603):     |     | Actions = [OnClick, RequestFocus]
+D/SaharaPrivacyBefore( 2603):     |     | MergeDescendants = 'true'
+D/SaharaPrivacyBefore( 2603):     |     |  |-Node #331 at (l=92.0, t=694.0, r=188.0, b=724.0)px
+D/SaharaPrivacyBefore( 2603):     |     |    Text = '[Calendar]'
+D/SaharaPrivacyBefore( 2603):     |     |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+D/SaharaPrivacyBefore( 2603):     |     |-Node #332 at (l=257.0, t=619.0, r=462.0, b=747.0)px, Tag: 'shortcut-workflows'
+D/SaharaPrivacyBefore( 2603):     |     | Focused = 'false'
+D/SaharaPrivacyBefore( 2603):     |     | Actions = [OnClick, RequestFocus]
+D/SaharaPrivacyBefore( 2603):     |     | MergeDescendants = 'true'
+D/SaharaPrivacyBefore( 2603):     |     |  |-Node #337 at (l=305.0, t=694.0, r=415.0, b=724.0)px
+D/SaharaPrivacyBefore( 2603):     |     |    Text = '[Care team]'
+D/SaharaPrivacyBefore( 2603):     |     |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+D/SaharaPrivacyBefore( 2603):     |     |-Node #338 at (l=477.0, t=619.0, r=682.0, b=747.0)px, Tag: 'shortcut-labs'
+D/SaharaPrivacyBefore( 2603):     |     | Focused = 'false'
+D/SaharaPrivacyBefore( 2603):     |     | Actions = [OnClick, RequestFocus]
+D/SaharaPrivacyBefore( 2603):     |     | MergeDescendants = 'true'
+D/SaharaPrivacyBefore( 2603):     |     |  |-Node #343 at (l=520.0, t=694.0, r=639.0, b=724.0)px
+D/SaharaPrivacyBefore( 2603):     |     |    Text = '[Lab history]'
+D/SaharaPrivacyBefore( 2603):     |     |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+D/SaharaPrivacyBefore( 2603):     |     |-Node #345 at (l=38.0, t=781.0, r=682.0, b=879.0)px
+D/SaharaPrivacyBefore( 2603):     |     | Focused = 'false'
+D/SaharaPrivacyBefore( 2603):     |     | Role = 'Button'
+D/SaharaPrivacyBefore( 2603):     |     | Actions = [OnClick, RequestFocus]
+D/SaharaPrivacyBefore( 2603):     |     | MergeDescendants = 'true'
+D/SaharaPrivacyBefore( 2603):     |     |  |-Node #349 at (l=270.0, t=811.0, r=510.0, b=849.0)px
+D/SaharaPrivacyBefore( 2603):     |     |    Text = '[Sign in to share care]'
+D/SaharaPrivacyBefore( 2603):     |     |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+D/SaharaPrivacyBefore( 2603):     |     |-Node #351 at (l=38.0, t=913.0, r=682.0, b=1262.0)px
+D/SaharaPrivacyBefore( 2603):     |     | IsContainer = 'true'
+D/SaharaPrivacyBefore( 2603):     |     |  |-Node #355 at (l=68.0, t=1019.0, r=517.0, b=1066.0)px
+D/SaharaPrivacyBefore( 2603):     |     |  | Text = '[Test Person's care notes]'
+D/SaharaPrivacyBefore( 2603):     |     |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+D/SaharaPrivacyBefore( 2603):     |     |  |-Node #357 at (l=68.0, t=1074.0, r=178.0, b=1119.0)px
+D/SaharaPrivacyBefore( 2603):     |     |  | Text = '[0 saved]'
+D/SaharaPrivacyBefore( 2603):     |     |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+D/SaharaPrivacyBefore( 2603):     |     |  |-Node #359 at (l=68.0, t=1150.0, r=358.0, b=1225.0)px
+D/SaharaPrivacyBefore( 2603):     |     |    Role = 'Button'
+D/SaharaPrivacyBefore( 2603):     |     |    [Disabled]
+D/SaharaPrivacyBefore( 2603):     |     |    Actions = [OnClick]
+D/SaharaPrivacyBefore( 2603):     |     |    MergeDescendants = 'true'
+D/SaharaPrivacyBefore( 2603):     |     |     |-Node #363 at (l=162.0, t=1169.0, r=313.0, b=1207.0)px
+D/SaharaPrivacyBefore( 2603):     |     |       Text = '[Export notes]'
+D/SaharaPrivacyBefore( 2603):     |     |       Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+D/SaharaPrivacyBefore( 2603):     |     |-Node #365 at (l=38.0, t=1296.0, r=682.0, b=1409.0)px
+D/SaharaPrivacyBefore( 2603):     |       IsContainer = 'true'
+D/SaharaPrivacyBefore( 2603):     |        |-Node #367 at (l=38.0, t=1296.0, r=682.0, b=1409.0)px
+D/SaharaPrivacyBefore( 2603):     |          Focused = 'false'
+D/SaharaPrivacyBefore( 2603):     |          Actions = [OnClick, RequestFocus]
+D/SaharaPrivacyBefore( 2603):     |          MergeDescendants = 'true'
+D/SaharaPrivacyBefore( 2603):     |           |-Node #370 at (l=140.0, t=1330.0, r=603.0, b=1375.0)px
+D/SaharaPrivacyBefore( 2603):     |           | Text = '[Privacy]'
+D/SaharaPrivacyBefore( 2603):     |           | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+D/SaharaPrivacyBefore( 2603):     |           |-Node #371 at (l=603.0, t=1330.0, r=648.0, b=1375.0)px
+D/SaharaPrivacyBefore( 2603):     |             ContentDescription = '[Show Privacy]'
+D/SaharaPrivacyBefore( 2603):     |             Role = 'Image'
+D/SaharaPrivacyBefore( 2603):     |-Node #8 at (l=30.0, t=120.0, r=113.0, b=203.0)px
+D/SaharaPrivacyBefore( 2603):     |-Node #11 at (l=121.0, t=99.0, r=315.0, b=223.0)px
+D/SaharaPrivacyBefore( 2603):     | Focused = 'false'
+D/SaharaPrivacyBefore( 2603):     | Actions = [OnClick, RequestFocus]
+D/SaharaPrivacyBefore( 2603):     | MergeDescendants = 'true'
+D/SaharaPrivacyBefore( 2603):     |  |-Node #12 at (l=125.0, t=114.0, r=266.0, b=163.0)px
+D/SaharaPrivacyBefore( 2603):     |  | Text = '[Sahara]'
+D/SaharaPrivacyBefore( 2603):     |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+D/SaharaPrivacyBefore( 2603):     |  |-Node #44 at (l=125.0, t=163.0, r=273.0, b=208.0)px
+D/SaharaPrivacyBefore( 2603):     |  | Text = '[Test Person]'
+D/SaharaPrivacyBefore( 2603):     |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+D/SaharaPrivacyBefore( 2603):     |  |-Node #45 at (l=273.0, t=167.0, r=311.0, b=205.0)px
+D/SaharaPrivacyBefore( 2603):     |    ContentDescription = '[Choose person]'
+D/SaharaPrivacyBefore( 2603):     |    Role = 'Image'
+D/SaharaPrivacyBefore( 2603):     |-Node #46 at (l=447.0, t=124.0, r=522.0, b=199.0)px
+D/SaharaPrivacyBefore( 2603):     | Focused = 'false'
+D/SaharaPrivacyBefore( 2603):     | Role = 'Button'
+D/SaharaPrivacyBefore( 2603):     | Actions = [OnClick, RequestFocus]
+D/SaharaPrivacyBefore( 2603):     | MergeDescendants = 'true'
+D/SaharaPrivacyBefore( 2603):     |  |-Node #47 at (l=462.0, t=139.0, r=507.0, b=184.0)px
+D/SaharaPrivacyBefore( 2603):     |    ContentDescription = '[Documents]'
+D/SaharaPrivacyBefore( 2603):     |    Role = 'Image'
+D/SaharaPrivacyBefore( 2603):     |-Node #49 at (l=529.0, t=116.0, r=690.0, b=206.0)px, Tag: 'choose-role'
+D/SaharaPrivacyBefore( 2603):     | ContentDescription = '[Change view, Family]'
+D/SaharaPrivacyBefore( 2603):     | Focused = 'false'
+D/SaharaPrivacyBefore( 2603):     | Role = 'Button'
+D/SaharaPrivacyBefore( 2603):     | Actions = [OnClick, RequestFocus]
+D/SaharaPrivacyBefore( 2603):     | MergeDescendants = 'true'
+D/SaharaPrivacyBefore( 2603):     |  |-Node #51 at (l=552.0, t=142.0, r=625.0, b=180.0)px
+D/SaharaPrivacyBefore( 2603):     |  | Text = '[Family]'
+D/SaharaPrivacyBefore( 2603):     |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+D/SaharaPrivacyBefore( 2603):     |  |-Node #53 at (l=633.0, t=144.0, r=667.0, b=178.0)px
+D/SaharaPrivacyBefore( 2603):     |-Node #305 at (l=0.0, t=1276.0, r=720.0, b=1412.0)px
+D/SaharaPrivacyBefore( 2603):     | LiveRegion = 'Polite'
+D/SaharaPrivacyBefore( 2603):     | PaneTitle = 'Alert'
+D/SaharaPrivacyBefore( 2603):     | Actions = [Dismiss]
+D/SaharaPrivacyBefore( 2603):     |  |-Node #306 at (l=23.0, t=1299.0, r=697.0, b=1389.0)px
+D/SaharaPrivacyBefore( 2603):     |    IsContainer = 'true'
+D/SaharaPrivacyBefore( 2603):     |     |-Node #309 at (l=53.0, t=1325.0, r=127.0, b=1363.0)px
+D/SaharaPrivacyBefore( 2603):     |       Text = '[Saved]'
+D/SaharaPrivacyBefore( 2603):     |       Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+D/SaharaPrivacyBefore( 2603):     |-Node #54 at (l=0.0, t=1412.0, r=720.0, b=1600.0)px
+D/SaharaPrivacyBefore( 2603):       IsContainer = 'true'
+D/SaharaPrivacyBefore( 2603):        |-Node #55 at (l=23.0, t=1423.0, r=697.0, b=1544.0)px
+D/SaharaPrivacyBefore( 2603):          [SelectableGroup]
+D/SaharaPrivacyBefore( 2603):           |-Node #56 at (l=23.0, t=1423.0, r=152.0, b=1544.0)px, Tag: 'nav-Today'
+D/SaharaPrivacyBefore( 2603):           | Focused = 'false'
+D/SaharaPrivacyBefore( 2603):           | Role = 'Tab'
+D/SaharaPrivacyBefore( 2603):           | Selected = 'false'
+D/SaharaPrivacyBefore( 2603):           | Actions = [OnClick, RequestFocus]
+D/SaharaPrivacyBefore( 2603):           | MergeDescendants = 'true'
+D/SaharaPrivacyBefore( 2603):           |  |-Node #59 at (l=58.0, t=1486.0, r=117.0, b=1531.0)px
+D/SaharaPrivacyBefore( 2603):           |    Text = '[Today]'
+D/SaharaPrivacyBefore( 2603):           |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+D/SaharaPrivacyBefore( 2603):           |-Node #60 at (l=160.0, t=1423.0, r=289.0, b=1544.0)px, Tag: 'nav-Docs'
+D/SaharaPrivacyBefore( 2603):           | Focused = 'false'
+D/SaharaPrivacyBefore( 2603):           | Role = 'Tab'
+D/SaharaPrivacyBefore( 2603):           | Selected = 'false'
+D/SaharaPrivacyBefore( 2603):           | Actions = [OnClick, RequestFocus]
+D/SaharaPrivacyBefore( 2603):           | MergeDescendants = 'true'
+D/SaharaPrivacyBefore( 2603):           |  |-Node #63 at (l=201.0, t=1486.0, r=249.0, b=1531.0)px
+D/SaharaPrivacyBefore( 2603):           |    Text = '[Docs]'
+D/SaharaPrivacyBefore( 2603):           |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+D/SaharaPrivacyBefore( 2603):           |-Node #64 at (l=297.0, t=1423.0, r=425.0, b=1544.0)px, Tag: 'nav-Care'
+D/SaharaPrivacyBefore( 2603):           | Focused = 'false'
+D/SaharaPrivacyBefore( 2603):           | Role = 'Tab'
+D/SaharaPrivacyBefore( 2603):           | Selected = 'false'
+D/SaharaPrivacyBefore( 2603):           | Actions = [OnClick, RequestFocus]
+D/SaharaPrivacyBefore( 2603):           | MergeDescendants = 'true'
+D/SaharaPrivacyBefore( 2603):           |  |-Node #67 at (l=338.0, t=1486.0, r=384.0, b=1531.0)px
+D/SaharaPrivacyBefore( 2603):           |    Text = '[Care]'
+D/SaharaPrivacyBefore( 2603):           |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+D/SaharaPrivacyBefore( 2603):           |-Node #68 at (l=433.0, t=1423.0, r=561.0, b=1544.0)px, Tag: 'nav-Nearby'
+D/SaharaPrivacyBefore( 2603):           | Focused = 'false'
+D/SaharaPrivacyBefore( 2603):           | Role = 'Tab'
+D/SaharaPrivacyBefore( 2603):           | Selected = 'false'
+D/SaharaPrivacyBefore( 2603):           | Actions = [OnClick, RequestFocus]
+D/SaharaPrivacyBefore( 2603):           | MergeDescendants = 'true'
+D/SaharaPrivacyBefore( 2603):           |  |-Node #71 at (l=462.0, t=1486.0, r=532.0, b=1531.0)px
+D/SaharaPrivacyBefore( 2603):           |    Text = '[Nearby]'
+D/SaharaPrivacyBefore( 2603):           |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+D/SaharaPrivacyBefore( 2603):           |-Node #72 at (l=569.0, t=1423.0, r=697.0, b=1544.0)px, Tag: 'nav-More'
+D/SaharaPrivacyBefore( 2603):             Focused = 'false'
+D/SaharaPrivacyBefore( 2603):             Role = 'Tab'
+D/SaharaPrivacyBefore( 2603):             Selected = 'true'
+D/SaharaPrivacyBefore( 2603):             Actions = [OnClick, RequestFocus]
+D/SaharaPrivacyBefore( 2603):             MergeDescendants = 'true'
+D/SaharaPrivacyBefore( 2603):              |-Node #75 at (l=608.0, t=1486.0, r=659.0, b=1531.0)px
+D/SaharaPrivacyBefore( 2603):                Text = '[More]'
+D/SaharaPrivacyBefore( 2603):                Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+D/SaharaPrivacy( 2603): printToLog:
+D/SaharaPrivacy( 2603): Printing with useUnmergedTree = 'true'
+D/SaharaPrivacy( 2603): Node #1 at (l=0.0, t=0.0, r=720.0, b=1600.0)px
+D/SaharaPrivacy( 2603):  |-Node #2 at (l=0.0, t=0.0, r=720.0, b=1600.0)px
+D/SaharaPrivacy( 2603):    IsContainer = 'true'
+D/SaharaPrivacy( 2603):     |-Node #310 at (l=0.0, t=233.0, r=720.0, b=1412.0)px
+D/SaharaPrivacy( 2603):     |  |-Node #311 at (l=0.0, t=233.0, r=720.0, b=1412.0)px
+D/SaharaPrivacy( 2603):     |    CollectionInfo = 'androidx.compose.ui.semantics.CollectionInfo@7f9d3e9'
+D/SaharaPrivacy( 2603):     |    IsTraversalGroup = 'true'
+D/SaharaPrivacy( 2603):     |    VerticalScrollAxisRange = 'ScrollAxisRange(value=0.0, maxValue=100.0, reverseScrolling=false)'
+D/SaharaPrivacy( 2603):     |    Actions = [GetScrollViewportLength, IndexForKey, ScrollBy, ScrollByOffset, ScrollToIndex]
+D/SaharaPrivacy( 2603):     |     |-Node #313 at (l=38.0, t=271.0, r=177.0, b=337.0)px
+D/SaharaPrivacy( 2603):     |     | Text = '[More]'
+D/SaharaPrivacy( 2603):     |     | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+D/SaharaPrivacy( 2603):     |     |-Node #315 at (l=38.0, t=371.0, r=682.0, b=461.0)px, Tag: 'patient-feedback-entry'
+D/SaharaPrivacy( 2603):     |     | Focused = 'false'
+D/SaharaPrivacy( 2603):     |     | Role = 'Button'
+D/SaharaPrivacy( 2603):     |     | Actions = [OnClick, RequestFocus]
+D/SaharaPrivacy( 2603):     |     | MergeDescendants = 'true'
+D/SaharaPrivacy( 2603):     |     |  |-Node #319 at (l=308.0, t=397.0, r=473.0, b=435.0)px
+D/SaharaPrivacy( 2603):     |     |    Text = '[App feedback]'
+D/SaharaPrivacy( 2603):     |     |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+D/SaharaPrivacy( 2603):     |     |-Node #321 at (l=38.0, t=495.0, r=682.0, b=585.0)px, Tag: 'doctor-demo-entry'
+D/SaharaPrivacy( 2603):     |     | Focused = 'false'
+D/SaharaPrivacy( 2603):     |     | Role = 'Button'
+D/SaharaPrivacy( 2603):     |     | Actions = [OnClick, RequestFocus]
+D/SaharaPrivacy( 2603):     |     | MergeDescendants = 'true'
+D/SaharaPrivacy( 2603):     |     |  |-Node #323 at (l=287.0, t=521.0, r=433.0, b=559.0)px
+D/SaharaPrivacy( 2603):     |     |    Text = '[Doctor login]'
+D/SaharaPrivacy( 2603):     |     |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+D/SaharaPrivacy( 2603):     |     |-Node #326 at (l=38.0, t=619.0, r=242.0, b=747.0)px, Tag: 'shortcut-calendar'
+D/SaharaPrivacy( 2603):     |     | Focused = 'false'
+D/SaharaPrivacy( 2603):     |     | Actions = [OnClick, RequestFocus]
+D/SaharaPrivacy( 2603):     |     | MergeDescendants = 'true'
+D/SaharaPrivacy( 2603):     |     |  |-Node #331 at (l=92.0, t=694.0, r=188.0, b=724.0)px
+D/SaharaPrivacy( 2603):     |     |    Text = '[Calendar]'
+D/SaharaPrivacy( 2603):     |     |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+D/SaharaPrivacy( 2603):     |     |-Node #332 at (l=257.0, t=619.0, r=462.0, b=747.0)px, Tag: 'shortcut-workflows'
+D/SaharaPrivacy( 2603):     |     | Focused = 'false'
+D/SaharaPrivacy( 2603):     |     | Actions = [OnClick, RequestFocus]
+D/SaharaPrivacy( 2603):     |     | MergeDescendants = 'true'
+D/SaharaPrivacy( 2603):     |     |  |-Node #337 at (l=305.0, t=694.0, r=415.0, b=724.0)px
+D/SaharaPrivacy( 2603):     |     |    Text = '[Care team]'
+D/SaharaPrivacy( 2603):     |     |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+D/SaharaPrivacy( 2603):     |     |-Node #338 at (l=477.0, t=619.0, r=682.0, b=747.0)px, Tag: 'shortcut-labs'
+D/SaharaPrivacy( 2603):     |     | Focused = 'false'
+D/SaharaPrivacy( 2603):     |     | Actions = [OnClick, RequestFocus]
+D/SaharaPrivacy( 2603):     |     | MergeDescendants = 'true'
+D/SaharaPrivacy( 2603):     |     |  |-Node #343 at (l=520.0, t=694.0, r=639.0, b=724.0)px
+D/SaharaPrivacy( 2603):     |     |    Text = '[Lab history]'
+D/SaharaPrivacy( 2603):     |     |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+D/SaharaPrivacy( 2603):     |     |-Node #345 at (l=38.0, t=781.0, r=682.0, b=879.0)px
+D/SaharaPrivacy( 2603):     |     | Focused = 'false'
+D/SaharaPrivacy( 2603):     |     | Role = 'Button'
+D/SaharaPrivacy( 2603):     |     | Actions = [OnClick, RequestFocus]
+D/SaharaPrivacy( 2603):     |     | MergeDescendants = 'true'
+D/SaharaPrivacy( 2603):     |     |  |-Node #349 at (l=270.0, t=811.0, r=510.0, b=849.0)px
+D/SaharaPrivacy( 2603):     |     |    Text = '[Sign in to share care]'
+D/SaharaPrivacy( 2603):     |     |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+D/SaharaPrivacy( 2603):     |     |-Node #351 at (l=38.0, t=913.0, r=682.0, b=1262.0)px
+D/SaharaPrivacy( 2603):     |     | IsContainer = 'true'
+D/SaharaPrivacy( 2603):     |     |  |-Node #355 at (l=68.0, t=1019.0, r=517.0, b=1066.0)px
+D/SaharaPrivacy( 2603):     |     |  | Text = '[Test Person's care notes]'
+D/SaharaPrivacy( 2603):     |     |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+D/SaharaPrivacy( 2603):     |     |  |-Node #357 at (l=68.0, t=1074.0, r=178.0, b=1119.0)px
+D/SaharaPrivacy( 2603):     |     |  | Text = '[0 saved]'
+D/SaharaPrivacy( 2603):     |     |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+D/SaharaPrivacy( 2603):     |     |  |-Node #359 at (l=68.0, t=1150.0, r=358.0, b=1225.0)px
+D/SaharaPrivacy( 2603):     |     |    Role = 'Button'
+D/SaharaPrivacy( 2603):     |     |    [Disabled]
+D/SaharaPrivacy( 2603):     |     |    Actions = [OnClick]
+D/SaharaPrivacy( 2603):     |     |    MergeDescendants = 'true'
+D/SaharaPrivacy( 2603):     |     |     |-Node #363 at (l=162.0, t=1169.0, r=313.0, b=1207.0)px
+D/SaharaPrivacy( 2603):     |     |       Text = '[Export notes]'
+D/SaharaPrivacy( 2603):     |     |       Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+D/SaharaPrivacy( 2603):     |     |-Node #365 at (l=38.0, t=1296.0, r=682.0, b=1409.0)px
+D/SaharaPrivacy( 2603):     |       IsContainer = 'true'
+D/SaharaPrivacy( 2603):     |        |-Node #367 at (l=38.0, t=1296.0, r=682.0, b=1409.0)px
+D/SaharaPrivacy( 2603):     |          Focused = 'false'
+D/SaharaPrivacy( 2603):     |          Actions = [OnClick, RequestFocus]
+D/SaharaPrivacy( 2603):     |          MergeDescendants = 'true'
+D/SaharaPrivacy( 2603):     |           |-Node #370 at (l=140.0, t=1330.0, r=603.0, b=1375.0)px
+D/SaharaPrivacy( 2603):     |           | Text = '[Privacy]'
+D/SaharaPrivacy( 2603):     |           | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+D/SaharaPrivacy( 2603):     |           |-Node #371 at (l=603.0, t=1330.0, r=648.0, b=1375.0)px
+D/SaharaPrivacy( 2603):     |             ContentDescription = '[Show Privacy]'
+D/SaharaPrivacy( 2603):     |             Role = 'Image'
+D/SaharaPrivacy( 2603):     |-Node #8 at (l=30.0, t=120.0, r=113.0, b=203.0)px
+D/SaharaPrivacy( 2603):     |-Node #11 at (l=121.0, t=99.0, r=315.0, b=223.0)px
+D/SaharaPrivacy( 2603):     | Focused = 'false'
+D/SaharaPrivacy( 2603):     | Actions = [OnClick, RequestFocus]
+D/SaharaPrivacy( 2603):     | MergeDescendants = 'true'
+D/SaharaPrivacy( 2603):     |  |-Node #12 at (l=125.0, t=114.0, r=266.0, b=163.0)px
+D/SaharaPrivacy( 2603):     |  | Text = '[Sahara]'
+D/SaharaPrivacy( 2603):     |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+D/SaharaPrivacy( 2603):     |  |-Node #44 at (l=125.0, t=163.0, r=273.0, b=208.0)px
+D/SaharaPrivacy( 2603):     |  | Text = '[Test Person]'
+D/SaharaPrivacy( 2603):     |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+D/SaharaPrivacy( 2603):     |  |-Node #45 at (l=273.0, t=167.0, r=311.0, b=205.0)px
+D/SaharaPrivacy( 2603):     |    ContentDescription = '[Choose person]'
+D/SaharaPrivacy( 2603):     |    Role = 'Image'
+D/SaharaPrivacy( 2603):     |-Node #46 at (l=447.0, t=124.0, r=522.0, b=199.0)px
+D/SaharaPrivacy( 2603):     | Focused = 'false'
+D/SaharaPrivacy( 2603):     | Role = 'Button'
+D/SaharaPrivacy( 2603):     | Actions = [OnClick, RequestFocus]
+D/SaharaPrivacy( 2603):     | MergeDescendants = 'true'
+D/SaharaPrivacy( 2603):     |  |-Node #47 at (l=462.0, t=139.0, r=507.0, b=184.0)px
+D/SaharaPrivacy( 2603):     |    ContentDescription = '[Documents]'
+D/SaharaPrivacy( 2603):     |    Role = 'Image'
+D/SaharaPrivacy( 2603):     |-Node #49 at (l=529.0, t=116.0, r=690.0, b=206.0)px, Tag: 'choose-role'
+D/SaharaPrivacy( 2603):     | ContentDescription = '[Change view, Family]'
+D/SaharaPrivacy( 2603):     | Focused = 'false'
+D/SaharaPrivacy( 2603):     | Role = 'Button'
+D/SaharaPrivacy( 2603):     | Actions = [OnClick, RequestFocus]
+D/SaharaPrivacy( 2603):     | MergeDescendants = 'true'
+D/SaharaPrivacy( 2603):     |  |-Node #51 at (l=552.0, t=142.0, r=625.0, b=180.0)px
+D/SaharaPrivacy( 2603):     |  | Text = '[Family]'
+D/SaharaPrivacy( 2603):     |  | Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+D/SaharaPrivacy( 2603):     |  |-Node #53 at (l=633.0, t=144.0, r=667.0, b=178.0)px
+D/SaharaPrivacy( 2603):     |-Node #305 at (l=0.0, t=1276.0, r=720.0, b=1412.0)px
+D/SaharaPrivacy( 2603):     | LiveRegion = 'Polite'
+D/SaharaPrivacy( 2603):     | PaneTitle = 'Alert'
+D/SaharaPrivacy( 2603):     | Actions = [Dismiss]
+D/SaharaPrivacy( 2603):     |  |-Node #306 at (l=23.0, t=1299.0, r=697.0, b=1389.0)px
+D/SaharaPrivacy( 2603):     |    IsContainer = 'true'
+D/SaharaPrivacy( 2603):     |     |-Node #309 at (l=53.0, t=1325.0, r=127.0, b=1363.0)px
+D/SaharaPrivacy( 2603):     |       Text = '[Saved]'
+D/SaharaPrivacy( 2603):     |       Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+D/SaharaPrivacy( 2603):     |-Node #54 at (l=0.0, t=1412.0, r=720.0, b=1600.0)px
+D/SaharaPrivacy( 2603):       IsContainer = 'true'
+D/SaharaPrivacy( 2603):        |-Node #55 at (l=23.0, t=1423.0, r=697.0, b=1544.0)px
+D/SaharaPrivacy( 2603):          [SelectableGroup]
+D/SaharaPrivacy( 2603):           |-Node #56 at (l=23.0, t=1423.0, r=152.0, b=1544.0)px, Tag: 'nav-Today'
+D/SaharaPrivacy( 2603):           | Focused = 'false'
+D/SaharaPrivacy( 2603):           | Role = 'Tab'
+D/SaharaPrivacy( 2603):           | Selected = 'false'
+D/SaharaPrivacy( 2603):           | Actions = [OnClick, RequestFocus]
+D/SaharaPrivacy( 2603):           | MergeDescendants = 'true'
+D/SaharaPrivacy( 2603):           |  |-Node #59 at (l=58.0, t=1486.0, r=117.0, b=1531.0)px
+D/SaharaPrivacy( 2603):           |    Text = '[Today]'
+D/SaharaPrivacy( 2603):           |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+D/SaharaPrivacy( 2603):           |-Node #60 at (l=160.0, t=1423.0, r=289.0, b=1544.0)px, Tag: 'nav-Docs'
+D/SaharaPrivacy( 2603):           | Focused = 'false'
+D/SaharaPrivacy( 2603):           | Role = 'Tab'
+D/SaharaPrivacy( 2603):           | Selected = 'false'
+D/SaharaPrivacy( 2603):           | Actions = [OnClick, RequestFocus]
+D/SaharaPrivacy( 2603):           | MergeDescendants = 'true'
+D/SaharaPrivacy( 2603):           |  |-Node #63 at (l=201.0, t=1486.0, r=249.0, b=1531.0)px
+D/SaharaPrivacy( 2603):           |    Text = '[Docs]'
+D/SaharaPrivacy( 2603):           |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+D/SaharaPrivacy( 2603):           |-Node #64 at (l=297.0, t=1423.0, r=425.0, b=1544.0)px, Tag: 'nav-Care'
+D/SaharaPrivacy( 2603):           | Focused = 'false'
+D/SaharaPrivacy( 2603):           | Role = 'Tab'
+D/SaharaPrivacy( 2603):           | Selected = 'false'
+D/SaharaPrivacy( 2603):           | Actions = [OnClick, RequestFocus]
+D/SaharaPrivacy( 2603):           | MergeDescendants = 'true'
+D/SaharaPrivacy( 2603):           |  |-Node #67 at (l=338.0, t=1486.0, r=384.0, b=1531.0)px
+D/SaharaPrivacy( 2603):           |    Text = '[Care]'
+D/SaharaPrivacy( 2603):           |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+D/SaharaPrivacy( 2603):           |-Node #68 at (l=433.0, t=1423.0, r=561.0, b=1544.0)px, Tag: 'nav-Nearby'
+D/SaharaPrivacy( 2603):           | Focused = 'false'
+D/SaharaPrivacy( 2603):           | Role = 'Tab'
+D/SaharaPrivacy( 2603):           | Selected = 'false'
+D/SaharaPrivacy( 2603):           | Actions = [OnClick, RequestFocus]
+D/SaharaPrivacy( 2603):           | MergeDescendants = 'true'
+D/SaharaPrivacy( 2603):           |  |-Node #71 at (l=462.0, t=1486.0, r=532.0, b=1531.0)px
+D/SaharaPrivacy( 2603):           |    Text = '[Nearby]'
+D/SaharaPrivacy( 2603):           |    Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+D/SaharaPrivacy( 2603):           |-Node #72 at (l=569.0, t=1423.0, r=697.0, b=1544.0)px, Tag: 'nav-More'
+D/SaharaPrivacy( 2603):             Focused = 'false'
+D/SaharaPrivacy( 2603):             Role = 'Tab'
+D/SaharaPrivacy( 2603):             Selected = 'true'
+D/SaharaPrivacy( 2603):             Actions = [OnClick, RequestFocus]
+D/SaharaPrivacy( 2603):             MergeDescendants = 'true'
+D/SaharaPrivacy( 2603):              |-Node #75 at (l=608.0, t=1486.0, r=659.0, b=1531.0)px
+D/SaharaPrivacy( 2603):                Text = '[More]'
+D/SaharaPrivacy( 2603):                Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]

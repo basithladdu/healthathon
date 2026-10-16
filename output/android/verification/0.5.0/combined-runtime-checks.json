@@ -1,0 +1,966 @@
+{
+  "schemaVersion": 1,
+  "status": "All non-skipped matrix identities have a passing latest result across six unchanged-app runs; one credential-dependent Android sign-in case remains skipped",
+  "preparedAtUtc": "2026-10-16T11:14:46.7606329Z",
+  "sourceCommit": "ebffb7b043a5e8725f190ab8f8f3574c768d9058",
+  "originalBuildRunId": 38881300006,
+  "originalBuildUrl": "https://github.com/basithladdu/healthathon/actions/runs/38881300006",
+  "appMainSourceTree": "b1c5ad0d17f5a0148f7f51241e1b7644b2941471",
+  "originalAppSourceTree": "90adbbf8c22aa5f659b2d8c58baf4bd19fbd2b2b",
+  "package": "in.wedevit.sahara",
+  "versionName": "0.5.0",
+  "versionCode": 6,
+  "aggregation": {
+    "rule": "Use the latest observed result for each exact (class, test) identity in chronological run order; preserve all earlier run counts and failures.",
+    "counts": {
+      "pass": 35,
+      "skipped": 1,
+      "ignored": 0,
+      "failure": 0,
+      "error": 0,
+      "unknown": 0
+    },
+    "expectedUniqueTests": 36,
+    "observedUniqueTests": 36,
+    "allExpectedIdentitiesObserved": true,
+    "allNonSkippedTestsPassed": true,
+    "singleCleanFullSuiteRun": false,
+    "qualification": "35 latest passing results and one credential-dependent skip are aggregated across six runs of unchanged original app/build inputs. All earlier failed attempts remain recorded. This is not a clean 36-test run and does not verify the skipped Android sign-in flow.",
+    "skippedTests": [
+      {
+        "class": "in.wedevit.care.CareFlowTest",
+        "test": "signInLoadsAccountRecordsOnToday",
+        "reason": "Account credentials were deliberately not injected into public CI."
+      }
+    ],
+    "unresolvedTests": []
+  },
+  "pendingRun": null,
+  "runs": [
+    {
+      "runId": 38882501784,
+      "url": "https://github.com/basithladdu/healthathon/actions/runs/38882501784",
+      "scope": "all",
+      "harnessCommit": "91dc5db3c47ed2f28941a5618873ee7b67c0bf26",
+      "counts": {
+        "pass": 31,
+        "skipped": 1,
+        "ignored": 0,
+        "failure": 4,
+        "error": 0,
+        "unknown": 0
+      },
+      "expected": 36,
+      "observedTestRecords": 36,
+      "reportedMatrixComplete": false,
+      "runtimePassed": false,
+      "failedTests": [
+        "in.wedevit.care.CareFlowTest#roleMenuKeepsDraftAndPatientChoiceAfterRecreation",
+        "in.wedevit.care.CareFlowTest#conversationReviewSavesExactVersionAndSurvivesRecreation",
+        "in.wedevit.care.CareFlowTest#checkinSavesChosenWordsAndKeepsOptionalNote",
+        "in.wedevit.care.PatientDoctorUiTest#replacingPatientLinkClearsOldDetailsAndPendingIsNotVerified"
+      ],
+      "matrixEvidence": "output/android/verification/0.5.0/ci-runtime-38882501784/matrix-36.json",
+      "runtimeEvidence": "output/android/verification/0.5.0/ci-runtime-38882501784/runtime-summary.json",
+      "artifactsEvidence": "output/android/verification/0.5.0/ci-runtime-38882501784/artifacts.json",
+      "inspectionEvidence": "output/android/verification/0.5.0/ci-runtime-38882501784/inspection.json",
+      "originalPackageIdentitiesMatch": true,
+      "sourceEquality": null,
+      "finishedUtc": "2026-10-16T09:49:39.31066Z"
+    },
+    {
+      "runId": 38887001702,
+      "url": "https://github.com/basithladdu/healthathon/actions/runs/38887001702",
+      "scope": "focused",
+      "harnessCommit": "f597392e0ebc48df9355d5ba550da3cc006a1b37",
+      "counts": {
+        "pass": 2,
+        "skipped": 0,
+        "ignored": 0,
+        "failure": 2,
+        "error": 0,
+        "unknown": 0
+      },
+      "expected": 4,
+      "observedTestRecords": 4,
+      "reportedMatrixComplete": false,
+      "runtimePassed": false,
+      "failedTests": [
+        "in.wedevit.care.CareFlowTest#conversationReviewSavesExactVersionAndSurvivesRecreation",
+        "in.wedevit.care.CareFlowTest#checkinSavesChosenWordsAndKeepsOptionalNote"
+      ],
+      "matrixEvidence": "output/android/verification/0.5.0/ci-runtime-38887001702/matrix-focused-4.json",
+      "runtimeEvidence": "output/android/verification/0.5.0/ci-runtime-38887001702/runtime-summary.json",
+      "artifactsEvidence": "output/android/verification/0.5.0/ci-runtime-38887001702/artifacts.json",
+      "inspectionEvidence": "output/android/verification/0.5.0/ci-runtime-38887001702/inspection.json",
+      "originalPackageIdentitiesMatch": true,
+      "sourceEquality": {
+        "matched": true,
+        "changedPaths": [],
+        "evidence": "output/android/verification/0.5.0/ci-runtime-38887001702/source-equality.json"
+      },
+      "finishedUtc": "2026-10-16T10:31:57.426889Z"
+    },
+    {
+      "runId": 38888372729,
+      "url": "https://github.com/basithladdu/healthathon/actions/runs/38888372729",
+      "scope": "remaining",
+      "harnessCommit": "f8350bceab98f93c190b3d0c3ff0fc0ca49842cb",
+      "counts": {
+        "pass": 1,
+        "skipped": 0,
+        "ignored": 0,
+        "failure": 1,
+        "error": 0,
+        "unknown": 0
+      },
+      "expected": 2,
+      "observedTestRecords": 2,
+      "reportedMatrixComplete": false,
+      "runtimePassed": false,
+      "failedTests": [
+        "in.wedevit.care.CareFlowTest#checkinSavesChosenWordsAndKeepsOptionalNote"
+      ],
+      "matrixEvidence": "output/android/verification/0.5.0/ci-runtime-38888372729/matrix-focused-2.json",
+      "runtimeEvidence": "output/android/verification/0.5.0/ci-runtime-38888372729/runtime-summary.json",
+      "artifactsEvidence": "output/android/verification/0.5.0/ci-runtime-38888372729/artifacts.json",
+      "inspectionEvidence": "output/android/verification/0.5.0/ci-runtime-38888372729/inspection.json",
+      "originalPackageIdentitiesMatch": true,
+      "sourceEquality": {
+        "matched": true,
+        "changedPaths": [],
+        "evidence": "output/android/verification/0.5.0/ci-runtime-38888372729/source-equality.json"
+      },
+      "finishedUtc": "2026-10-16T10:44:02.41535Z"
+    },
+    {
+      "runId": 38889436917,
+      "url": "https://github.com/basithladdu/healthathon/actions/runs/38889436917",
+      "scope": "privacy",
+      "harnessCommit": "348bf95b4cbeaef2d6b1f0b9fa6ce08030ff5b5b",
+      "counts": {
+        "pass": 0,
+        "skipped": 0,
+        "ignored": 0,
+        "failure": 1,
+        "error": 0,
+        "unknown": 0
+      },
+      "expected": 1,
+      "observedTestRecords": 1,
+      "reportedMatrixComplete": false,
+      "runtimePassed": false,
+      "failedTests": [
+        "in.wedevit.care.CareFlowTest#checkinSavesChosenWordsAndKeepsOptionalNote"
+      ],
+      "matrixEvidence": "output/android/verification/0.5.0/ci-runtime-38889436917/matrix-focused-1.json",
+      "runtimeEvidence": "output/android/verification/0.5.0/ci-runtime-38889436917/runtime-summary.json",
+      "artifactsEvidence": "output/android/verification/0.5.0/ci-runtime-38889436917/artifacts.json",
+      "inspectionEvidence": "output/android/verification/0.5.0/ci-runtime-38889436917/inspection.json",
+      "originalPackageIdentitiesMatch": true,
+      "sourceEquality": {
+        "matched": true,
+        "changedPaths": [],
+        "evidence": "output/android/verification/0.5.0/ci-runtime-38889436917/source-equality.json"
+      },
+      "finishedUtc": "2026-10-16T10:53:42.610084Z"
+    },
+    {
+      "runId": 38890430027,
+      "url": "https://github.com/basithladdu/healthathon/actions/runs/38890430027",
+      "scope": "privacy",
+      "harnessCommit": "e0fe533bc9271502f1a61ad5985a9e983e4b36e5",
+      "counts": {
+        "pass": 0,
+        "skipped": 0,
+        "ignored": 0,
+        "failure": 1,
+        "error": 0,
+        "unknown": 0
+      },
+      "expected": 1,
+      "observedTestRecords": 1,
+      "reportedMatrixComplete": false,
+      "runtimePassed": false,
+      "failedTests": [
+        "in.wedevit.care.CareFlowTest#checkinSavesChosenWordsAndKeepsOptionalNote"
+      ],
+      "matrixEvidence": "output/android/verification/0.5.0/ci-runtime-38890430027/matrix-focused-1.json",
+      "runtimeEvidence": "output/android/verification/0.5.0/ci-runtime-38890430027/runtime-summary.json",
+      "artifactsEvidence": "output/android/verification/0.5.0/ci-runtime-38890430027/artifacts.json",
+      "inspectionEvidence": "output/android/verification/0.5.0/ci-runtime-38890430027/inspection.json",
+      "originalPackageIdentitiesMatch": true,
+      "sourceEquality": {
+        "matched": true,
+        "changedPaths": [],
+        "evidence": "output/android/verification/0.5.0/ci-runtime-38890430027/source-equality.json"
+      },
+      "finishedUtc": "2026-10-16T11:02:54.2686Z",
+      "touchDiagnostics": {
+        "semanticsEvidence": "output/android/verification/0.5.0/ci-runtime-38890430027/semantics.txt",
+        "privacyHeaderBoundsPx": [
+          38,
+          1296,
+          682,
+          1409
+        ],
+        "attemptedCenterPx": [
+          360,
+          1352.5
+        ],
+        "savedSnackbarBoundsPx": [
+          23,
+          1299,
+          697,
+          1389
+        ],
+        "centerCoveredBySavedSnackbar": true,
+        "beforeAndAfterPngIdentical": true,
+        "qualification": "Transient Saved snackbar covered the attempted center touch; the panel remained closed. This is not proof of an app expansion defect."
+      }
+    },
+    {
+      "runId": 38891431772,
+      "url": "https://github.com/basithladdu/healthathon/actions/runs/38891431772",
+      "scope": "privacy",
+      "harnessCommit": "ddb5c8418c3e8a452bec9c9fb7076d93c2a0d21c",
+      "counts": {
+        "pass": 1,
+        "skipped": 0,
+        "ignored": 0,
+        "failure": 0,
+        "error": 0,
+        "unknown": 0
+      },
+      "expected": 1,
+      "observedTestRecords": 1,
+      "reportedMatrixComplete": true,
+      "runtimePassed": true,
+      "failedTests": [],
+      "matrixEvidence": "output/android/verification/0.5.0/ci-runtime-38891431772/matrix-focused-1.json",
+      "runtimeEvidence": "output/android/verification/0.5.0/ci-runtime-38891431772/runtime-summary.json",
+      "artifactsEvidence": "output/android/verification/0.5.0/ci-runtime-38891431772/artifacts.json",
+      "inspectionEvidence": "output/android/verification/0.5.0/ci-runtime-38891431772/inspection.json",
+      "originalPackageIdentitiesMatch": true,
+      "sourceEquality": {
+        "matched": true,
+        "changedPaths": [],
+        "evidence": "output/android/verification/0.5.0/ci-runtime-38891431772/source-equality.json"
+      },
+      "finishedUtc": "2026-10-16T11:12:28.683321Z",
+      "privacyResolution": {
+        "semanticsEvidence": "output/android/verification/0.5.0/ci-runtime-38891431772/semantics.txt",
+        "beforeScreenshot": "output/android/verification/0.5.0/ci-runtime-38891431772/debug-captures/more-privacy-before.png",
+        "expandedHeaderScreenshot": "output/android/verification/0.5.0/ci-runtime-38891431772/debug-captures/more-privacy-expanded.png",
+        "bodyScreenshot": "output/android/verification/0.5.0/ci-runtime-38891431772/debug-captures/more.png",
+        "observation": "After synchronization with actual Saved snackbar disappearance, the existing Privacy header expanded, Hide Privacy was observed and the parent-list scroll/body visibility assertion passed against unchanged app code."
+      }
+    }
+  ],
+  "latestPerUniqueTest": [
+    {
+      "class": "in.wedevit.care.CareAcknowledgementMigrationTest",
+      "test": "versionThreeUpgradePreservesLegacyAckAndAllowsSeparateConfirmationsAfterReopen",
+      "result": "pass",
+      "instrumentationStatus": 0,
+      "latestRunId": 38882501784,
+      "matrixEvidence": "output/android/verification/0.5.0/ci-runtime-38882501784/matrix-36.json",
+      "history": [
+        {
+          "runId": 38882501784,
+          "result": "pass",
+          "instrumentationStatus": 0
+        }
+      ]
+    },
+    {
+      "class": "in.wedevit.care.CareFlowTest",
+      "test": "checkinSavesChosenWordsAndKeepsOptionalNote",
+      "result": "pass",
+      "instrumentationStatus": 0,
+      "latestRunId": 38891431772,
+      "matrixEvidence": "output/android/verification/0.5.0/ci-runtime-38891431772/matrix-focused-1.json",
+      "history": [
+        {
+          "runId": 38882501784,
+          "result": "failure",
+          "instrumentationStatus": -2
+        },
+        {
+          "runId": 38887001702,
+          "result": "failure",
+          "instrumentationStatus": -2
+        },
+        {
+          "runId": 38888372729,
+          "result": "failure",
+          "instrumentationStatus": -2
+        },
+        {
+          "runId": 38889436917,
+          "result": "failure",
+          "instrumentationStatus": -2
+        },
+        {
+          "runId": 38890430027,
+          "result": "failure",
+          "instrumentationStatus": -2
+        },
+        {
+          "runId": 38891431772,
+          "result": "pass",
+          "instrumentationStatus": 0
+        }
+      ]
+    },
+    {
+      "class": "in.wedevit.care.CareFlowTest",
+      "test": "conversationReviewSavesExactVersionAndSurvivesRecreation",
+      "result": "pass",
+      "instrumentationStatus": 0,
+      "latestRunId": 38888372729,
+      "matrixEvidence": "output/android/verification/0.5.0/ci-runtime-38888372729/matrix-focused-2.json",
+      "history": [
+        {
+          "runId": 38882501784,
+          "result": "failure",
+          "instrumentationStatus": -2
+        },
+        {
+          "runId": 38887001702,
+          "result": "failure",
+          "instrumentationStatus": -2
+        },
+        {
+          "runId": 38888372729,
+          "result": "pass",
+          "instrumentationStatus": 0
+        }
+      ]
+    },
+    {
+      "class": "in.wedevit.care.CareFlowTest",
+      "test": "dailyEntriesAppearOnTodayAndCanBeEditedAndRemoved",
+      "result": "pass",
+      "instrumentationStatus": 0,
+      "latestRunId": 38882501784,
+      "matrixEvidence": "output/android/verification/0.5.0/ci-runtime-38882501784/matrix-36.json",
+      "history": [
+        {
+          "runId": 38882501784,
+          "result": "pass",
+          "instrumentationStatus": 0
+        }
+      ]
+    },
+    {
+      "class": "in.wedevit.care.CareFlowTest",
+      "test": "directoryFiltersRecoverFromNoResults",
+      "result": "pass",
+      "instrumentationStatus": 0,
+      "latestRunId": 38882501784,
+      "matrixEvidence": "output/android/verification/0.5.0/ci-runtime-38882501784/matrix-36.json",
+      "history": [
+        {
+          "runId": 38882501784,
+          "result": "pass",
+          "instrumentationStatus": 0
+        }
+      ]
+    },
+    {
+      "class": "in.wedevit.care.CareFlowTest",
+      "test": "documentsOpenSavedVersionWithActionsAtTheTop",
+      "result": "pass",
+      "instrumentationStatus": 0,
+      "latestRunId": 38882501784,
+      "matrixEvidence": "output/android/verification/0.5.0/ci-runtime-38882501784/matrix-36.json",
+      "history": [
+        {
+          "runId": 38882501784,
+          "result": "pass",
+          "instrumentationStatus": 0
+        }
+      ]
+    },
+    {
+      "class": "in.wedevit.care.CareFlowTest",
+      "test": "manualSourceAndConsentSurviveAppStopWithoutStartingAMicrophone",
+      "result": "pass",
+      "instrumentationStatus": 0,
+      "latestRunId": 38882501784,
+      "matrixEvidence": "output/android/verification/0.5.0/ci-runtime-38882501784/matrix-36.json",
+      "history": [
+        {
+          "runId": 38882501784,
+          "result": "pass",
+          "instrumentationStatus": 0
+        }
+      ]
+    },
+    {
+      "class": "in.wedevit.care.CareFlowTest",
+      "test": "prescriptionScannerKeepsManualFallbackAndRequiresReviewBeforeSaving",
+      "result": "pass",
+      "instrumentationStatus": 0,
+      "latestRunId": 38882501784,
+      "matrixEvidence": "output/android/verification/0.5.0/ci-runtime-38882501784/matrix-36.json",
+      "history": [
+        {
+          "runId": 38882501784,
+          "result": "pass",
+          "instrumentationStatus": 0
+        }
+      ]
+    },
+    {
+      "class": "in.wedevit.care.CareFlowTest",
+      "test": "reportPickerPersistsSearchesSharesAndRemovesOnlyItsCopy",
+      "result": "pass",
+      "instrumentationStatus": 0,
+      "latestRunId": 38882501784,
+      "matrixEvidence": "output/android/verification/0.5.0/ci-runtime-38882501784/matrix-36.json",
+      "history": [
+        {
+          "runId": 38882501784,
+          "result": "pass",
+          "instrumentationStatus": 0
+        }
+      ]
+    },
+    {
+      "class": "in.wedevit.care.CareFlowTest",
+      "test": "roleMenuKeepsDraftAndPatientChoiceAfterRecreation",
+      "result": "pass",
+      "instrumentationStatus": 0,
+      "latestRunId": 38887001702,
+      "matrixEvidence": "output/android/verification/0.5.0/ci-runtime-38887001702/matrix-focused-4.json",
+      "history": [
+        {
+          "runId": 38882501784,
+          "result": "failure",
+          "instrumentationStatus": -2
+        },
+        {
+          "runId": 38887001702,
+          "result": "pass",
+          "instrumentationStatus": 0
+        }
+      ]
+    },
+    {
+      "class": "in.wedevit.care.CareFlowTest",
+      "test": "roomPersistsAndSeparatesPeopleAcrossDatabaseReopen",
+      "result": "pass",
+      "instrumentationStatus": 0,
+      "latestRunId": 38882501784,
+      "matrixEvidence": "output/android/verification/0.5.0/ci-runtime-38882501784/matrix-36.json",
+      "history": [
+        {
+          "runId": 38882501784,
+          "result": "pass",
+          "instrumentationStatus": 0
+        }
+      ]
+    },
+    {
+      "class": "in.wedevit.care.CareFlowTest",
+      "test": "signInLoadsAccountRecordsOnToday",
+      "result": "skipped",
+      "instrumentationStatus": -4,
+      "latestRunId": 38882501784,
+      "matrixEvidence": "output/android/verification/0.5.0/ci-runtime-38882501784/matrix-36.json",
+      "history": [
+        {
+          "runId": 38882501784,
+          "result": "skipped",
+          "instrumentationStatus": -4
+        }
+      ]
+    },
+    {
+      "class": "in.wedevit.care.CareFlowTest",
+      "test": "staleConfirmationCannotApplyAfterSwitchingPeople",
+      "result": "pass",
+      "instrumentationStatus": 0,
+      "latestRunId": 38882501784,
+      "matrixEvidence": "output/android/verification/0.5.0/ci-runtime-38882501784/matrix-36.json",
+      "history": [
+        {
+          "runId": 38882501784,
+          "result": "pass",
+          "instrumentationStatus": 0
+        }
+      ]
+    },
+    {
+      "class": "in.wedevit.care.CareFlowTest",
+      "test": "switchingPeopleClosesOrdinaryEntryWithoutSavingToTheNewPerson",
+      "result": "pass",
+      "instrumentationStatus": 0,
+      "latestRunId": 38882501784,
+      "matrixEvidence": "output/android/verification/0.5.0/ci-runtime-38882501784/matrix-36.json",
+      "history": [
+        {
+          "runId": 38882501784,
+          "result": "pass",
+          "instrumentationStatus": 0
+        }
+      ]
+    },
+    {
+      "class": "in.wedevit.care.CareFlowTest",
+      "test": "switchingPeopleKeepsLatestDraftAndCompletedTasks",
+      "result": "pass",
+      "instrumentationStatus": 0,
+      "latestRunId": 38882501784,
+      "matrixEvidence": "output/android/verification/0.5.0/ci-runtime-38882501784/matrix-36.json",
+      "history": [
+        {
+          "runId": 38882501784,
+          "result": "pass",
+          "instrumentationStatus": 0
+        }
+      ]
+    },
+    {
+      "class": "in.wedevit.care.CareReportTest",
+      "test": "reportCopiesAreIsolatedAndUnsafeFilesAreRejected",
+      "result": "pass",
+      "instrumentationStatus": 0,
+      "latestRunId": 38882501784,
+      "matrixEvidence": "output/android/verification/0.5.0/ci-runtime-38882501784/matrix-36.json",
+      "history": [
+        {
+          "runId": 38882501784,
+          "result": "pass",
+          "instrumentationStatus": 0
+        }
+      ]
+    },
+    {
+      "class": "in.wedevit.care.CareReportTest",
+      "test": "versionTwoUpgradePreservesCareAndReportMetadataAfterReopen",
+      "result": "pass",
+      "instrumentationStatus": 0,
+      "latestRunId": 38882501784,
+      "matrixEvidence": "output/android/verification/0.5.0/ci-runtime-38882501784/matrix-36.json",
+      "history": [
+        {
+          "runId": 38882501784,
+          "result": "pass",
+          "instrumentationStatus": 0
+        }
+      ]
+    },
+    {
+      "class": "in.wedevit.care.CombinedCareMigrationTest",
+      "test": "historicalLocalVersionThreePreservesConsentAndReview",
+      "result": "pass",
+      "instrumentationStatus": 0,
+      "latestRunId": 38882501784,
+      "matrixEvidence": "output/android/verification/0.5.0/ci-runtime-38882501784/matrix-36.json",
+      "history": [
+        {
+          "runId": 38882501784,
+          "result": "pass",
+          "instrumentationStatus": 0
+        }
+      ]
+    },
+    {
+      "class": "in.wedevit.care.CombinedCareMigrationTest",
+      "test": "localVersionFivePreservesReportsAndProvenance",
+      "result": "pass",
+      "instrumentationStatus": 0,
+      "latestRunId": 38882501784,
+      "matrixEvidence": "output/android/verification/0.5.0/ci-runtime-38882501784/matrix-36.json",
+      "history": [
+        {
+          "runId": 38882501784,
+          "result": "pass",
+          "instrumentationStatus": 0
+        }
+      ]
+    },
+    {
+      "class": "in.wedevit.care.CombinedCareMigrationTest",
+      "test": "localVersionFourPreservesTranscriptionAndConsent",
+      "result": "pass",
+      "instrumentationStatus": 0,
+      "latestRunId": 38882501784,
+      "matrixEvidence": "output/android/verification/0.5.0/ci-runtime-38882501784/matrix-36.json",
+      "history": [
+        {
+          "runId": 38882501784,
+          "result": "pass",
+          "instrumentationStatus": 0
+        }
+      ]
+    },
+    {
+      "class": "in.wedevit.care.CombinedCareMigrationTest",
+      "test": "upstreamReportsVersionThreePreservesReports",
+      "result": "pass",
+      "instrumentationStatus": 0,
+      "latestRunId": 38882501784,
+      "matrixEvidence": "output/android/verification/0.5.0/ci-runtime-38882501784/matrix-36.json",
+      "history": [
+        {
+          "runId": 38882501784,
+          "result": "pass",
+          "instrumentationStatus": 0
+        }
+      ]
+    },
+    {
+      "class": "in.wedevit.care.CombinedCareMigrationTest",
+      "test": "upstreamVersionFourPreservesMultipleConfirmationIds",
+      "result": "pass",
+      "instrumentationStatus": 0,
+      "latestRunId": 38882501784,
+      "matrixEvidence": "output/android/verification/0.5.0/ci-runtime-38882501784/matrix-36.json",
+      "history": [
+        {
+          "runId": 38882501784,
+          "result": "pass",
+          "instrumentationStatus": 0
+        }
+      ]
+    },
+    {
+      "class": "in.wedevit.care.CombinedCareMigrationTest",
+      "test": "versionOneReachesSupersetThroughRevisionAndReports",
+      "result": "pass",
+      "instrumentationStatus": 0,
+      "latestRunId": 38882501784,
+      "matrixEvidence": "output/android/verification/0.5.0/ci-runtime-38882501784/matrix-36.json",
+      "history": [
+        {
+          "runId": 38882501784,
+          "result": "pass",
+          "instrumentationStatus": 0
+        }
+      ]
+    },
+    {
+      "class": "in.wedevit.care.CombinedCareMigrationTest",
+      "test": "versionTwoReachesSupersetThroughReports",
+      "result": "pass",
+      "instrumentationStatus": 0,
+      "latestRunId": 38882501784,
+      "matrixEvidence": "output/android/verification/0.5.0/ci-runtime-38882501784/matrix-36.json",
+      "history": [
+        {
+          "runId": 38882501784,
+          "result": "pass",
+          "instrumentationStatus": 0
+        }
+      ]
+    },
+    {
+      "class": "in.wedevit.care.DailyCareFlowsTest",
+      "test": "calendarSavesChosenDayAndKeepsUndatedMedicinesOutOfThatSchedule",
+      "result": "pass",
+      "instrumentationStatus": 0,
+      "latestRunId": 38882501784,
+      "matrixEvidence": "output/android/verification/0.5.0/ci-runtime-38882501784/matrix-36.json",
+      "history": [
+        {
+          "runId": 38882501784,
+          "result": "pass",
+          "instrumentationStatus": 0
+        }
+      ]
+    },
+    {
+      "class": "in.wedevit.care.DailyCareFlowsTest",
+      "test": "familyRequestAppearsInDoctorQueueAndCanOpenConversation",
+      "result": "pass",
+      "instrumentationStatus": 0,
+      "latestRunId": 38882501784,
+      "matrixEvidence": "output/android/verification/0.5.0/ci-runtime-38882501784/matrix-36.json",
+      "history": [
+        {
+          "runId": 38882501784,
+          "result": "pass",
+          "instrumentationStatus": 0
+        }
+      ]
+    },
+    {
+      "class": "in.wedevit.care.DailyCareFlowsTest",
+      "test": "labsKeepPrintedValuesRangesAndSeriesWithoutLeakingToAnotherPerson",
+      "result": "pass",
+      "instrumentationStatus": 0,
+      "latestRunId": 38882501784,
+      "matrixEvidence": "output/android/verification/0.5.0/ci-runtime-38882501784/matrix-36.json",
+      "history": [
+        {
+          "runId": 38882501784,
+          "result": "pass",
+          "instrumentationStatus": 0
+        }
+      ]
+    },
+    {
+      "class": "in.wedevit.care.DailyCareFlowsTest",
+      "test": "namedTaskAcceptanceCompletionAndSenderStatusSurviveReload",
+      "result": "pass",
+      "instrumentationStatus": 0,
+      "latestRunId": 38882501784,
+      "matrixEvidence": "output/android/verification/0.5.0/ci-runtime-38882501784/matrix-36.json",
+      "history": [
+        {
+          "runId": 38882501784,
+          "result": "pass",
+          "instrumentationStatus": 0
+        }
+      ]
+    },
+    {
+      "class": "in.wedevit.care.DoctorLocalPreviewConsentTest",
+      "test": "localPreviewRequiresConsentButNeverAsksForCloudAuthentication",
+      "result": "pass",
+      "instrumentationStatus": 0,
+      "latestRunId": 38882501784,
+      "matrixEvidence": "output/android/verification/0.5.0/ci-runtime-38882501784/matrix-36.json",
+      "history": [
+        {
+          "runId": 38882501784,
+          "result": "pass",
+          "instrumentationStatus": 0
+        }
+      ]
+    },
+    {
+      "class": "in.wedevit.care.NativeMergeComponentsTest",
+      "test": "feedbackCanCloseWithoutWritingOrTouchingPatientStorage",
+      "result": "pass",
+      "instrumentationStatus": 0,
+      "latestRunId": 38882501784,
+      "matrixEvidence": "output/android/verification/0.5.0/ci-runtime-38882501784/matrix-36.json",
+      "history": [
+        {
+          "runId": 38882501784,
+          "result": "pass",
+          "instrumentationStatus": 0
+        }
+      ]
+    },
+    {
+      "class": "in.wedevit.care.NativeMergeComponentsTest",
+      "test": "localDoctorLoginAndFeedbackEntrySurvivePatientWorkflowMerge",
+      "result": "pass",
+      "instrumentationStatus": 0,
+      "latestRunId": 38882501784,
+      "matrixEvidence": "output/android/verification/0.5.0/ci-runtime-38882501784/matrix-36.json",
+      "history": [
+        {
+          "runId": 38882501784,
+          "result": "pass",
+          "instrumentationStatus": 0
+        }
+      ]
+    },
+    {
+      "class": "in.wedevit.care.NativeMergeComponentsTest",
+      "test": "newPatientShortcutsRetainTheirIndependentCallbacks",
+      "result": "pass",
+      "instrumentationStatus": 0,
+      "latestRunId": 38882501784,
+      "matrixEvidence": "output/android/verification/0.5.0/ci-runtime-38882501784/matrix-36.json",
+      "history": [
+        {
+          "runId": 38882501784,
+          "result": "pass",
+          "instrumentationStatus": 0
+        }
+      ]
+    },
+    {
+      "class": "in.wedevit.care.NativeMergeComponentsTest",
+      "test": "sourcePickerAndReaderKeepOriginalWordsAndPatientIdentity",
+      "result": "pass",
+      "instrumentationStatus": 0,
+      "latestRunId": 38882501784,
+      "matrixEvidence": "output/android/verification/0.5.0/ci-runtime-38882501784/matrix-36.json",
+      "history": [
+        {
+          "runId": 38882501784,
+          "result": "pass",
+          "instrumentationStatus": 0
+        }
+      ]
+    },
+    {
+      "class": "in.wedevit.care.PatientDoctorUiTest",
+      "test": "absentLinkIsHonestNonInteractiveAndDoesNotInventDoctor",
+      "result": "pass",
+      "instrumentationStatus": 0,
+      "latestRunId": 38882501784,
+      "matrixEvidence": "output/android/verification/0.5.0/ci-runtime-38882501784/matrix-36.json",
+      "history": [
+        {
+          "runId": 38882501784,
+          "result": "pass",
+          "instrumentationStatus": 0
+        }
+      ]
+    },
+    {
+      "class": "in.wedevit.care.PatientDoctorUiTest",
+      "test": "homeShowsNameOnlyAndDetailsDoNotClaimProfessionalVerification",
+      "result": "pass",
+      "instrumentationStatus": 0,
+      "latestRunId": 38882501784,
+      "matrixEvidence": "output/android/verification/0.5.0/ci-runtime-38882501784/matrix-36.json",
+      "history": [
+        {
+          "runId": 38882501784,
+          "result": "pass",
+          "instrumentationStatus": 0
+        }
+      ]
+    },
+    {
+      "class": "in.wedevit.care.PatientDoctorUiTest",
+      "test": "replacingPatientLinkClearsOldDetailsAndPendingIsNotVerified",
+      "result": "pass",
+      "instrumentationStatus": 0,
+      "latestRunId": 38887001702,
+      "matrixEvidence": "output/android/verification/0.5.0/ci-runtime-38887001702/matrix-focused-4.json",
+      "history": [
+        {
+          "runId": 38882501784,
+          "result": "failure",
+          "instrumentationStatus": -2
+        },
+        {
+          "runId": 38887001702,
+          "result": "pass",
+          "instrumentationStatus": 0
+        }
+      ]
+    }
+  ],
+  "originalArtifacts": [
+    {
+      "path": "app/build/outputs/apk/debug/app-debug.apk",
+      "sha256": "CF88F05FE8CAA4A2B0AD4EEA362C9B247ADF3E5B57EFB6B4D3783E16FCADBAC7",
+      "bytes": 63921092
+    },
+    {
+      "path": "app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk",
+      "sha256": "EA392FA7F1A6AC3F6DE10ED905DB0134DDDE64175B4B347D7EDF817E9A7568B7",
+      "bytes": 1344591
+    },
+    {
+      "path": "app/build/outputs/apk/release/app-release-unsigned.apk",
+      "sha256": "930517709947047DCC700E5A26DCAA8E65DE52893EF110C22025020A6385117D",
+      "bytes": 44597950
+    },
+    {
+      "path": "app/build/outputs/bundle/release/app-release.aab",
+      "sha256": "D7D515DD0341AB215E209BF89EE4CE81C30A011AC7A9EEE398A30E4D49784030",
+      "bytes": 21322207
+    }
+  ],
+  "packageContinuity": {
+    "originalFourDownloadedArtifactsMatchAcrossAllIncludedRuns": true,
+    "correctedRunsAppAndBuildInputsMatchOriginal": true,
+    "changedMainAppCodeForTestCorrections": false,
+    "correctedInstrumentationOnly": true,
+    "qualification": "The original debug and optimized R8 app packages were reused. Runtime packages used an ephemeral CI signer, not the private final store upload signer."
+  },
+  "supplementalPdf": {
+    "runId": 38882501784,
+    "counts": {
+      "pass": 1,
+      "skipped": 0,
+      "ignored": 0,
+      "failure": 0,
+      "error": 0,
+      "unknown": 0
+    },
+    "passed": true,
+    "separateFromMatrix": true,
+    "pages": 5,
+    "allSourceLines1Through130Preserved": true,
+    "allPagesHaveSampleWarningAndPageFooter": true,
+    "firstAndLastPagesVisuallyInspectedOnWhite": true,
+    "evidence": "output/android/verification/0.5.0/ci-runtime-38882501784/pdf-pagination.json",
+    "inspectionEvidence": "output/android/verification/0.5.0/ci-runtime-38882501784/inspection.json",
+    "qualification": "Fictional fixture export, not a patient document or provider-generated clinical output. Supplemental result is not added to the 36 unique matrix checks."
+  },
+  "optimizedRelease": {
+    "coverageCompletedAcrossRuns": true,
+    "singleCleanEndToEndRun": false,
+    "flagSecurePreserved": true,
+    "runtimeSignerQualification": "Ephemeral CI key; differs from the private store upload key. Code and R8 output unchanged.",
+    "originalRun": {
+      "runId": 38882501784,
+      "overallPassed": false,
+      "completedChecks": [
+        "Person saved with actual IME open and Continue above keyboard",
+        "Calendar saved with IME open; value survives process restart and reopens for editing",
+        "Named care task saved with IME open and survives process restart",
+        "Exact numeric lab value/unit saved with IME open and survives process restart",
+        "Main care recording consent is local-only in optimized release; start is disabled without consent, no cloud-processing option shown, microphone never opened",
+        "Doctor preview uses local consent; no upload/authentication action or microphone invoked"
+      ],
+      "terminalFailure": "Visible target not found: Load sample AI draft",
+      "evidence": "output/android/verification/0.5.0/ci-runtime-38882501784/optimized-release-smoke.json",
+      "qualification": "Six checks completed before the UI automation could not find Load sample AI draft. Earlier completed stages are retained as stage evidence; the overall run was failed."
+    },
+    "focusedRun": {
+      "runId": 38887001702,
+      "passed": true,
+      "completedChecks": [
+        "Person saved with actual IME open and Continue above keyboard",
+        "Doctor preview uses local consent; no upload/authentication action or microphone invoked",
+        "Explicitly fictional preview version and actual PDF created in optimized UI",
+        "Doctor workspace exit returns to the original main care person"
+      ],
+      "evidence": "output/android/verification/0.5.0/ci-runtime-38887001702/optimized-release-smoke.json",
+      "publishedVersionEvidence": "output/android/verification/0.5.0/ci-runtime-38887001702/published-version.xml",
+      "createdPdfEvidence": "output/android/verification/0.5.0/ci-runtime-38887001702/created-pdf.xml",
+      "returnedPersonEvidence": "output/android/verification/0.5.0/ci-runtime-38887001702/returned-person.xml",
+      "qualification": "Fictional doctor preview publication, actual preview PDF creation message and return to the original person were observed. This is a local sample workspace; no real clinician authentication or AI generation was exercised."
+    }
+  },
+  "environment": {
+    "freshDisposableCiEmulator": true,
+    "api": 36,
+    "architecture": "x86_64",
+    "resolution": "720x1600",
+    "densityDpi": 300,
+    "logicalWidthDp": 384,
+    "pageSizeBytes": 4096,
+    "physicalDevice": false,
+    "sixteenKbRuntimeTest": false,
+    "localWindowsEmulatorDataTouched": false,
+    "credentialsInjected": false,
+    "aiProviderCalls": false,
+    "microphoneOpened": false
+  },
+  "finalStoreArtifacts": {
+    "staticEvidence": "output/android/verification/0.5.0-artifacts.json",
+    "apkPath": "output/android/Sahara-0.5.0-release.apk",
+    "apkSha256": "92784229A6BDA11BCBA82371F975BD6E58126CD2D7E5F9BB3B8EE674872EC44E",
+    "bundlePath": "output/android/Sahara-0.5.0.aab",
+    "bundleSha256": "F6F9C281712A67F107B2F6EE51066B5F024936170C4D795B2E025A7E7E22009B",
+    "signerMatchesPrevious": true,
+    "runtimeSignerDiffers": true,
+    "qualification": "Final store-signed identities come from separate static verification; emulator runtime results do not constitute a device test of the final store-signed binary."
+  },
+  "limitations": [
+    "One credential-dependent Android sign-in case remains skipped. All other 35 matrix identities have passing latest results across six runs; no single clean full-suite rerun is claimed.",
+    "Each run and its original failures remain visible; latest-per-test aggregation is not a single all-pass full-suite run.",
+    "Cloud authentication UI check was skipped; separate synthetic backend evidence does not replace that Android UI check.",
+    "No real microphone, speech recognition or TTS voice execution, AI provider, patient, verified clinician or clinical-field validation.",
+    "No physical-device install or interaction test of 0.5.0 and no 16 KB runtime environment.",
+    "Debug screenshots show fictional fixtures. Optimized FLAG_SECURE was retained, with XML and keyboard/window evidence instead of screenshots.",
+    "Public photo scanning and cloud audio remain off; these checks do not demonstrate connected generative AI or transcription."
+  ]
+}

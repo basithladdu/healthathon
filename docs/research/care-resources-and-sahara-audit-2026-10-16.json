@@ -231,7 +231,7 @@
     "version": "0.5.0",
     "versionCode": 6,
     "applicationId": "in.wedevit.sahara",
-    "deliveryStatus": "CI run 38881300006 built the combined source with 104 unit tests across 16 suites passing, no failures/errors/skips, debug lint 0 errors/37 warnings and a successful lintVitalRelease task without separately collected release XML counts. Fresh APK/AAB packages were signed locally with the existing upload key and passed package, signature and static 16 KB verification. Current-source CI runtime has 31 passes, 1 credential-dependent skip and 4 outdated test expectations requiring a focused rerun; a separate five-page PDF pagination check passed. Optimized Calendar/Care team/Labs IME saves and restart persistence plus local-only consent passed, while doctor publication/PDF and exit remain unfinished after a harness scroll-bound error. No 0.5 upload, submission, physical-device or 16 KB runtime validation is confirmed.",
+    "deliveryStatus": "104 unit tests across 16 suites passed, debug lint 0 errors/37 warnings and vital release task passed. Signed unchanged-source 0.5.0 (6) uploaded once and saved as Alpha release 4 Draft; Production 0.4.1 review preserved. 35 latest passing Android test identities and one expected credential-dependent skip across six runs of unchanged original app code; not a single clean 36-test run. Exact-version publish/persistence, Privacy after actual Saved snackbar dismissal, optimized IME/restart and doctor publication/PDF/exit stages passed. Separate five-page/130-line PDF passed. No real speech/provider, physical-device or 16 KB runtime validation.",
     "delivery": [
       {
         "area": "Consented recording and attributable words",
@@ -331,7 +331,7 @@
       },
       {
         "area": "Fictional doctor workspace",
-        "status": "Combined source built and signed; current-source preview-consent guard and separate five-page debug PDF check passed, optimized publication/PDF and exit checks unfinished",
+        "status": "Combined source built and signed; preview consent, review/publication, optimized PDF creation and return to original main person passed. Separate five-page/130-line debug PDF check passed; real provider and clinician workflow remain unverified.",
         "implemented": "An isolated local preview includes patient search, dated sample progress and medicine reports, searchable text-summary reports, scheduling, consented local recording/playback, manual review, immutable unverified preview versions and explicitly marked PDF exports. It retains source/account separation and visible preview disclosures.",
         "remaining": "Fictional patients, self-entered review names and local preview responses do not verify clinicians, patient-family identities, real delivery, a shared server clinical workflow or generative clinical AI. The release does not upload or transcribe audio. Preview retention differs from real-account data: account changes/deletion do not clear the preview; individual preview-recording deletion is not available, and clearing app data/uninstalling removes it.",
         "evidence": [
@@ -380,14 +380,14 @@
           "numericIssueCountsEstablished": false
         },
         "runtime": {
-          "status": "partial; focused rerun required",
+          "status": "All non-skipped test identities passed across six unchanged-app runs",
           "ciRunId": 38882501784,
-          "receipt": "output/android/verification/0.5.0/ci-runtime-38882501784/inspection.json",
-          "currentSourcePassed": 31,
+          "receipt": "output/android/verification/0.5.0/combined-runtime-checks.json",
+          "currentSourcePassed": 35,
           "currentSourceSkipped": 1,
-          "currentSourceFailedExpectations": 4,
+          "currentSourceFailedExpectations": 0,
           "errors": 0,
-          "failureScope": "Two stale Conversation selectors, one offscreen privacy assertion and one exact-versus-partial Verification pending expectation; corrected rerun required, not counted as passes.",
+          "failureScope": "Original stale expectations corrected; Privacy touch retried after actual Saved snackbar disappearance. Earlier failed run evidence remains preserved.",
           "migrationFixturesPassed": 7,
           "environment": "Fresh disposable API 36 CI emulator, 384 dp, 4 KB pages; Windows emulator databases untouched, no credentials/provider/microphone used.",
           "localEmulatorRunning": false,
@@ -396,16 +396,27 @@
             "pages": 5,
             "sourceLines1Through130Preserved": true,
             "sampleWarningsAndFootersEveryPage": true,
-            "scope": "Fictional debug fixture; separate from unfinished optimized UI PDF creation."
+            "scope": "Separate fictional debug fixture; all five pages, 130 lines, sample warnings and page footers passed. Optimized UI PDF creation passed separately."
           },
           "optimizedRelease": {
-            "overallPassed": false,
+            "overallPassed": true,
             "ephemeralCiSignerDiffersFromStoreSigner": true,
             "flagSecurePreserved": true,
-            "passed": "Person creation; Calendar/Care team/Labs save above actual IME and process-restart persistence; main-care and doctor local-only consent guards without opening microphone.",
-            "unfinished": "Doctor preview publication/PDF and exit preserving original person; harness swipe started in bottom navigation outside the scrollable content. No app-code change was made for this gesture."
+            "passed": "Person creation; Calendar/Care team/Labs saves above actual keyboard and process-restart persistence; main/doctor local-only consent; fictional doctor reviewed publication/PDF creation and return to original care person.",
+            "unfinished": null,
+            "qualification": "Requested flow stages are covered across original and focused runs of identical optimized app code; runner-only ephemeral signer differs from store upload signer.",
+            "report": "output/android/verification/0.5.0/ci-runtime-38887001702/inspection.json"
           },
-          "remoteQa": "Actual first-run results inspected; focused corrections and doctor completion are being prepared separately."
+          "remoteQa": "Actual matrices/source equality and selected images/semantics inspected; no real provider, speech service or microphone used.",
+          "ciRunIds": [
+            38882501784,
+            38887001702,
+            38888372729,
+            38889436917,
+            38890430027,
+            38891431772
+          ],
+          "singleCleanFullSuiteRun": false
         },
         "signedRelease": {
           "builtAndVerified": true,
@@ -418,11 +429,13 @@
           "nativeElfLibraryCount": 4,
           "privateSigningMaterialUploaded": false,
           "runtime16KbVerified": false,
-          "optimizedReleaseUiVerified": false,
+          "optimizedReleaseUiVerified": true,
           "cleanVisualQaVerified": false,
           "physicalDevice050Verified": false,
-          "visualScope": "Selected current-source debug captures were inspected at 384 dp without OS overlays; complete optimized UI verification remains unfinished.",
-          "receipt": "output/android/verification/0.5.0-artifacts.json"
+          "visualScope": "Selected 384 dp debug captures, Privacy expansion and PDF first/last pages inspected; optimized flow verified through XML/IME/window evidence with ephemeral CI signer. No physical-device or 16 KB runtime claim.",
+          "receipt": "output/android/verification/0.5.0-artifacts.json",
+          "optimizedUiSignerQualification": "Original R8 code re-signed with ephemeral CI key. The final upload-key artifact was statically verified but not installed on a device.",
+          "selectedDebugVisualQaVerified": true
         }
       },
       "historicalBranchEvidence": {
@@ -479,11 +492,20 @@
     },
     "release": {
       "candidateReady": false,
-      "candidateUploaded": false,
+      "candidateUploaded": true,
       "candidateSubmitted": false,
-      "productionStatus": "Production 0.4.1 remains Changes in review; preserve that review. This is not production approval or availability of 0.5.",
-      "nextStep": "Complete the focused rerun of four corrected test expectations and optimized doctor publication/PDF/exit checks, inspect the actual results, then prepare one verified 0.5 Alpha draft without replacing Production 0.4.1 review. Build, existing-key signing and static verification are complete. Prepared listing/reviewer text remains local; do not change global review material used by the in-review version.",
-      "existingClosedTest": "Alpha 0.4.1 is already available and both original and additional invitation groups were sent. Do not resend invitations."
+      "productionStatus": "Production 0.4.1 (5) still Changes in review, reverified after saving Alpha draft on 16 October; preserved.",
+      "nextStep": "0.5.0 saved as Alpha release 4 Draft. Preserve in-review Production 0.4.1. Apply prepared matching listing/reviewer material and recheck actual Play state before a later 0.5 review; no provider/billing change authorised.",
+      "existingClosedTest": "Alpha 0.4.1 is already available and both original and additional invitation groups were sent. Do not resend invitations.",
+      "alphaReleaseId": 4,
+      "alphaState": "Draft 0.5.0 (6)",
+      "bundleUploadedOnce": true,
+      "evidence": [
+        "output/android/verification/0.5.0/play-alpha-draft.png",
+        "output/android/verification/0.5.0/play-production-still-in-review.png"
+      ],
+      "artifactAndStatedRuntimeChecksComplete": true,
+      "alphaDraftReady": true
     },
     "rawSourcePreservation": {
       "location": "Private ignored source-materials/private-context/2026-10-16-care-resources archive; no private email, chat, participant list or clinical original is included in this public audit.",
@@ -515,6 +537,7 @@
       "unsignedCiWorkflow": "63907b7",
       "buildWorkflowFix": "ebffb7b043a5e8725f190ab8f8f3574c768d9058",
       "scope": "Combined native care features and fictional doctor workspace. This replaces the earlier observation that no newer upstream source was available."
-    }
+    },
+    "featureReadinessReference": "android/release/store-draft.json featureReadiness: nine main areas, five implemented, two partial, two not ready. Implemented does not mean published or clinically validated."
   }
 }

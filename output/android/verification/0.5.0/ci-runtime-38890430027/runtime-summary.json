@@ -1,0 +1,55 @@
+{
+  "sourceCommit": "ebffb7b043a5e8725f190ab8f8f3574c768d9058",
+  "harnessCommit": "e0fe533bc9271502f1a61ad5985a9e983e4b36e5",
+  "startedUtc": "2026-10-16T11:02:04.724230Z",
+  "scope": "privacy",
+  "freshDisposableEmulator": true,
+  "physicalDevice": false,
+  "credentialsInjected": false,
+  "aiProviderCalls": false,
+  "microphoneOpened": false,
+  "windowsEmulatorDataTouched": false,
+  "environment": {
+    "size": "Physical size: 1080x2400\nOverride size: 720x1600",
+    "density": "Physical density: 420\nOverride density: 300",
+    "pageSize": "4096",
+    "api": "36",
+    "deviceMemory": "MemTotal:        2532296 kB\nMemFree:          124148 kB\nMemAvailable:    1437024 kB\nBuffers:           24480 kB\nCached:          1525276 kB\nSwapCached:            0 kB\nActive:          1229448 kB\nInactive:         842244 kB\nActive(anon):     404804 kB\nInactive(anon):   162404 kB\nActive(file):     824644 kB\nInactive(file):   679840 kB\nUnevictable:       39016 kB\nMlocked:           39016 kB\nSwapTotal:       1899216 kB\nSwapFree:        1893584 kB\nDirty:             47152 kB\nWriteback:             4 kB\nAnonPages:        561200 kB\nMapped:           817980 kB\nShmem:              7148 kB\nKReclaimable:      46944 kB\nSlab:             165732 kB\nSReclaimable:      46944 kB\nSUnreclaim:       118788 kB\nKernelStack:       22648 kB\nPageTables:        53888 kB\nSecPageTables:         0 kB\nNFS_Unstable:          0 kB\nBounce:                0 kB\nWritebackTmp:          0 kB\nCommitLimit:     3165364 kB\nCommitted_AS:   76409256 kB\nVmallocTotal:   34359738367 kB\nVmallocUsed:       47608 kB\nVmallocChunk:          0 kB\nPercpu:             2912 kB\nAnonHugePages:         0 kB\nShmemHugePages:        0 kB\nShmemPmdMapped:        0 kB\nFileHugePages:         0 kB\nFilePmdMapped:         0 kB\nCmaTotal:              0 kB\nCmaFree:               0 kB\nDirectMap4k:       51032 kB\nDirectMap2M:     2570240 kB"
+  },
+  "sixteenKbRuntimeTest": false,
+  "matrix": {
+    "tests": [
+      {
+        "class": "in.wedevit.care.CareFlowTest",
+        "test": "checkinSavesChosenWordsAndKeepsOptionalNote",
+        "status": -2,
+        "result": "failure"
+      }
+    ],
+    "counts": {
+      "pass": 0,
+      "skipped": 0,
+      "ignored": 0,
+      "failure": 1,
+      "error": 0,
+      "unknown": 0
+    },
+    "expected": 1,
+    "matrixComplete": false,
+    "durationSeconds": 32.759,
+    "finishedUtc": "2026-10-16T11:02:54.268600Z"
+  },
+  "pdfSupplemental": {
+    "notRepeated": true,
+    "priorRunId": 38882501784,
+    "qualification": "Prior separate pagination test passed; not counted as a new focused-run check."
+  },
+  "optimizedRelease": {
+    "notRepeated": true,
+    "priorRunId": 38887001702,
+    "qualification": "Optimized preview/PDF/exit passed in the preceding focused run; this run executes only its selected remaining instrumentation checks."
+  },
+  "finishedUtc": "2026-10-16T11:02:55.069547Z",
+  "passed": false,
+  "qualification": "Focused correction run only; aggregate with original 38882501784 without concealing its four failures or repeating already passing checks."
+}

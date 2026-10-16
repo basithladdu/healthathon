@@ -1,0 +1,110 @@
+{
+  "sourceCommit": "ebffb7b043a5e8725f190ab8f8f3574c768d9058",
+  "harnessCommit": "e0fe533bc9271502f1a61ad5985a9e983e4b36e5",
+  "workflowRunId": 38890430027,
+  "workflowUrl": "https://github.com/basithladdu/healthathon/actions/runs/38890430027",
+  "artifactZipSha256": "98c40069a39640f75c874b14d75967d2eccce84aa0a36205104d7ef87601e830",
+  "artifactZipHashVerified": true,
+  "originalAppAndBuildInputsMatch": true,
+  "matrix": {
+    "pass": 0,
+    "skipped": 0,
+    "ignored": 0,
+    "failure": 1,
+    "error": 0,
+    "unknown": 0
+  },
+  "expectedTests": 1,
+  "matrixPassed": false,
+  "remainingFailures": [
+    "CareFlowTest#checkinSavesChosenWordsAndKeepsOptionalNote: Hide Privacy.assertExists failed after a center touch on the actual Privacy header. Before and after diagnostics show the header remained closed while the Saved snackbar covered its center."
+  ],
+  "touchDiagnostics": {
+    "privacyClickableHeaderBoundsPx": [
+      38,
+      1296,
+      682,
+      1409
+    ],
+    "attemptedHeaderCenterPx": [
+      360,
+      1352.5
+    ],
+    "savedSnackbarBoundsPx": [
+      23,
+      1299,
+      697,
+      1389
+    ],
+    "centerCoveredBySavedSnackbar": true,
+    "beforeAndAfterPrivacyPngIdentical": true,
+    "observation": "Actual semantics and both captures show the transient Saved snackbar over the Privacy header center during the attempted touch. This explains an intercepted test touch; it does not establish an app expansion defect.",
+    "screenshots": [
+      "debug-captures/more-privacy-before.png",
+      "debug-captures/more-privacy-expanded.png"
+    ],
+    "qualification": "The file named more-privacy-expanded.png records the attempted expansion state; it visibly remained closed and is not evidence of successful expansion."
+  },
+  "semanticsProvenance": {
+    "path": "semantics.txt",
+    "sourceFilename": "logcat.txt",
+    "fullRawLogSha256": "53856D6C8E6DA293252F84B7466F6B320B7D5FD01C83C2492342B05F4F044A3C",
+    "fullRawLogBytes": 1892543,
+    "extraction": "Only complete original lines whose Android log tag is SaharaPrivacyBefore or SaharaPrivacy; line contents and original terminators retained in original order.",
+    "extractedLines": 354,
+    "originalOneBasedLineRanges": [
+      [
+        14128,
+        14304
+      ],
+      [
+        14478,
+        14654
+      ]
+    ],
+    "fullRawLogRetainedPrivately": true
+  },
+  "limitations": [
+    "The single selected instrumentation case failed and is not counted as a pass.",
+    "Diagnostics establish a transient overlay covering the attempted touch; successful expansion is not shown in this run.",
+    "Only the selected case ran; no full-suite pass is claimed.",
+    "Original app packages were reused with an ephemeral CI signer; this differs from the final store upload signer.",
+    "Disposable API 36 emulator uses 4096-byte pages; no physical-device or 16 KB runtime testing.",
+    "No credentials injected, AI provider calls or microphone opening; no clinical validation.",
+    "Selected raw evidence and screenshots are preserved byte for byte; only the two named log tags were extracted from the full raw log."
+  ],
+  "evidenceFiles": [
+    {
+      "path": "artifacts.json",
+      "sha256": "37FD34E629E1B393AD824D379BC33B73B520DAE466B4376CDA941F87C51FC727"
+    },
+    {
+      "path": "source-equality.json",
+      "sha256": "0CD4EDA50D813849A070B6B5C0E561EC29F38088BEF2CAC785A18886E82BC544"
+    },
+    {
+      "path": "matrix-focused-1.json",
+      "sha256": "B6CD5F2E27F091DDADB600655DBCA235D3E7ABF70358B671E1B49DC2B1A8E3B7"
+    },
+    {
+      "path": "matrix-focused-1.txt",
+      "sha256": "F0ADFAF01C133B89904BDAD39502211B50B16F6A25AC5C71F637153646D983C1"
+    },
+    {
+      "path": "runtime-summary.json",
+      "sha256": "9FA661B54D1A3D3CF0C11136716573EACE0B7BDCA12AF3355D623451F1CBC6DD"
+    },
+    {
+      "path": "debug-captures/more-privacy-before.png",
+      "sha256": "49721C085AC81D25786229E4D1C8DCDAB4A93716CA3039A9BF2F04217F4CF9EC"
+    },
+    {
+      "path": "debug-captures/more-privacy-expanded.png",
+      "sha256": "49721C085AC81D25786229E4D1C8DCDAB4A93716CA3039A9BF2F04217F4CF9EC"
+    },
+    {
+      "path": "semantics.txt",
+      "sha256": "ED779856288FD2F1E570FE42B3CE1587643ADF4B394A2997D72E7BCDF86092C1"
+    }
+  ]
+}

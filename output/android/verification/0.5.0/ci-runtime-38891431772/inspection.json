@@ -1,0 +1,99 @@
+{
+  "sourceCommit": "ebffb7b043a5e8725f190ab8f8f3574c768d9058",
+  "harnessCommit": "ddb5c8418c3e8a452bec9c9fb7076d93c2a0d21c",
+  "workflowRunId": 38891431772,
+  "workflowUrl": "https://github.com/basithladdu/healthathon/actions/runs/38891431772",
+  "artifactZipSha256": "1fb87a58c89653a8df873deeaf1d42a4b14f4fdf27be6d11921aa0fff293605f",
+  "artifactZipHashVerified": true,
+  "originalAppAndBuildInputsMatch": true,
+  "matrix": {
+    "pass": 1,
+    "skipped": 0,
+    "ignored": 0,
+    "failure": 0,
+    "error": 0,
+    "unknown": 0
+  },
+  "expectedTests": 1,
+  "matrixPassed": true,
+  "passedTests": [
+    "CareFlowTest#checkinSavesChosenWordsAndKeepsOptionalNote"
+  ],
+  "privacyResolution": {
+    "observation": "After observing the actual disappearance of the transient Saved snackbar, the test touched the real Privacy header. Semantics changed from Show Privacy to Hide Privacy, composed the existing body text and the body visibility assertion passed.",
+    "appCodeChanged": false,
+    "beforeScreenshot": "debug-captures/more-privacy-before.png",
+    "expandedHeaderScreenshot": "debug-captures/more-privacy-expanded.png",
+    "scrolledBodyScreenshot": "debug-captures/more.png",
+    "visualInspection": "Fictional Test Person only. Before capture has closed downward chevron and no Saved overlay. Expanded capture has upward chevron. Scrolled capture shows the beginning of You choose which notes to share and with whom.; the lower part extends to the bottom crop, so this image alone is not claimed to display every Privacy paragraph.",
+    "qualification": "Corrected synchronization and parent-list scrolling were exercised against the unchanged original debug app. Earlier failed attempts are retained as failures in their own runs."
+  },
+  "semanticsProvenance": {
+    "path": "semantics.txt",
+    "sourceFilename": "logcat.txt",
+    "fullRawLogSha256": "C88FFAF8A3CC8552ED39F28D75BFACBA8D3EAE3AE381861B264222F8EE92A309",
+    "fullRawLogBytes": 2472829,
+    "extraction": "Only complete original lines whose Android log tag is SaharaPrivacyBefore or SaharaPrivacy; contents and original terminators retained in original order.",
+    "extractedLines": 381,
+    "originalOneBasedLineRanges": [
+      [
+        19084,
+        19150
+      ],
+      [
+        19152,
+        19264
+      ],
+      [
+        19435,
+        19635
+      ]
+    ],
+    "fullRawLogRetainedPrivately": true
+  },
+  "limitations": [
+    "This is one passing selected instrumentation case, not a fresh full-suite run.",
+    "Only fictional local fixtures; no credentials, provider calls, microphone, real patient or clinical validation.",
+    "Original app uses an ephemeral CI signer that differs from the final private store upload signer.",
+    "Disposable API 36 emulator uses 4096-byte pages; no physical-device or 16 KB runtime test.",
+    "PDF pagination and optimized preview flow were not repeated; their previous results are cited separately."
+  ],
+  "evidenceFiles": [
+    {
+      "path": "artifacts.json",
+      "sha256": "044262249A95E0469FD4D287857DA18D278F49BA569106023AE05AF48CD3FE91"
+    },
+    {
+      "path": "source-equality.json",
+      "sha256": "4C0BADCAE95B354E8CA87C6103AFB83785317A8B02C1AEB1DC9660F2A7D4FD17"
+    },
+    {
+      "path": "matrix-focused-1.json",
+      "sha256": "13DDE53531EF271D826B34136A8E2DD76B6D0846C1A8306BFCE2F624BA56AF69"
+    },
+    {
+      "path": "matrix-focused-1.txt",
+      "sha256": "E945C76B52D7AD92478D98688EAA672F2D58A2BA50F153CE56FE89CA643EE523"
+    },
+    {
+      "path": "runtime-summary.json",
+      "sha256": "4A37CFC37674965705E65FF6400DBDC52D5B29F876A788A5D3A9D0508575EDB1"
+    },
+    {
+      "path": "debug-captures/more-privacy-before.png",
+      "sha256": "A1A34D19FA677DB7487A993E1BAF149B08E07925A611C21D9970F269B85FAB46"
+    },
+    {
+      "path": "debug-captures/more-privacy-expanded.png",
+      "sha256": "6463E9513FECB7D591DCCA4806640B8CA039745D40C98FBA347088B89E47655A"
+    },
+    {
+      "path": "debug-captures/more.png",
+      "sha256": "80D1D94F6BBAECE6584268D4531C0E644688FD0BE79657EE132CF20E1AA11606"
+    },
+    {
+      "path": "semantics.txt",
+      "sha256": "E27C3ECBD8DBC762DBBA3D17BB849D11EDF6949893BD7DB14FF0955561AA3A77"
+    }
+  ]
+}

@@ -195,10 +195,10 @@
     "versionCode": 6,
     "built": true,
     "ready": false,
-    "uploaded": false,
+    "uploaded": true,
     "submitted": false,
     "installed": false,
-    "status": "Signed 0.5.0 (6) built and statically verified; 104 unit passes, debug lint 0 errors / 37 warnings. First runtime has 31 passes, one expected auth skip and four stale expectations requiring focused rerun; separate PDF pagination passed. Alpha draft ID 4 has its name and release notes saved; no bundle upload or submission yet.",
+    "status": "Signed 0.5.0 (6) uploaded once and saved as Alpha release 4 Draft. Build and stated checks complete. Not submitted: Production 0.4.1 review remains in progress. New global listing/reviewer text remains local for later use.",
     "apk": "output/android/Sahara-0.5.0-release.apk",
     "bundle": "output/android/Sahara-0.5.0.aab",
     "sourceCommit": "ebffb7b043a5e8725f190ab8f8f3574c768d9058",
@@ -258,7 +258,7 @@
         "report": "output/android/verification/0.5.0/combined-build-checks.json"
       },
       "cloudRoundtrip": "PASS: synthetic lab/request/task payloads, task revisions, immutable note and separate confirmations; exact fixture cleanup. output/android/verification/0.5.0-cloud-roundtrip.json",
-      "runtime": "First run 38882501784: 31 pass, 1 auth skip, 4 failures, PDF pagination PASS, optimized smoke failed; causes under investigation. Do not claim ready or uploaded.",
+      "runtime": "35 latest passing Android test identities and one expected credential-dependent skip across six runs of unchanged original app code; not a single clean 36-test run. Exact-version publish/persistence, Privacy after actual Saved snackbar dismissal, optimized IME/restart and doctor publication/PDF/exit stages passed. Separate five-page/130-line PDF passed. No real speech/provider, physical-device or 16 KB runtime validation.",
       "buildMemory": "Local compilation was interrupted under shared-host memory pressure. Unsigned packages and checks completed on a standard GitHub runner; the upload key stays local. Current CI source and runtime evidence are recorded separately; no Windows emulator was restarted.",
       "releaseBuild": {
         "result": "PASS: actual current-source CI APK/AAB, local upload-key signatures and static checks verified",
@@ -298,14 +298,49 @@
         "url": "https://github.com/basithladdu/healthathon/actions/runs/38887001702",
         "harnessCommit": "f597392e0ebc48df9355d5ba550da3cc006a1b37",
         "buildSourceCommit": "ebffb7b043a5e8725f190ab8f8f3574c768d9058",
-        "status": "queued",
+        "status": "Completed: two passes and two further stale assertions. Optimized doctor publication/PDF/exit passed. Original failed run preserved.",
         "qualification": "Four corrected expectations plus unfinished optimized doctor PDF/exit; original passing checks preserved separately."
-      }
+      },
+      "remainingRuntime": {
+        "runId": 38888372729,
+        "url": "https://github.com/basithladdu/healthathon/actions/runs/38888372729",
+        "harnessCommit": "f8350bceab98f93c190b3d0c3ff0fc0ca49842cb",
+        "status": "Completed: one pass, one Privacy-panel failure; preserved without claiming success.",
+        "scope": "Only the two remaining corrected instrumentation checks; passing optimized/PDF checks are not repeated."
+      },
+      "privacyRuntime": {
+        "runId": 38889436917,
+        "status": "Completed: zero passes and one failure at Hide Privacy.assertExists; expansion diagnostics not reached.",
+        "report": "output/android/verification/0.5.0/ci-runtime-38889436917/inspection.json"
+      },
+      "privacyRuntimeRetry": {
+        "runId": 38890430027,
+        "url": "https://github.com/basithladdu/healthathon/actions/runs/38890430027",
+        "harnessCommit": "e0fe533",
+        "status": "Completed: zero passes, one intercepted touch. Screenshot and semantics confirm Saved snackbar covered the Privacy tap centre.",
+        "scope": "Clickable Privacy header with before/after evidence; original app unchanged.",
+        "report": "output/android/verification/0.5.0/ci-runtime-38890430027/inspection.json"
+      },
+      "privacyRuntimeAfterSnackbar": {
+        "runId": 38891431772,
+        "url": "https://github.com/basithladdu/healthathon/actions/runs/38891431772",
+        "harnessCommit": "ddb5c84",
+        "status": "success",
+        "scope": "Wait for actual Saved message dismissal; same real header click, Hide and body assertions.",
+        "passed": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "matrixComplete": true,
+        "finishedAtUtc": "2026-10-16T11:12:28.683321Z",
+        "report": "output/android/verification/0.5.0/ci-runtime-38891431772/inspection.json"
+      },
+      "runtimeReport": "output/android/verification/0.5.0/combined-runtime-checks.json"
     },
     "releasePrerequisites": [
-      "Finish current-source signatures, static verification and runtime/visual checks",
-      "Save one Alpha 0.5 draft without disturbing existing Production 0.4.1 review",
-      "Save matching listing/reviewer information before a later 0.5 review submission"
+      "Build/signatures/static and stated emulator checks complete; no physical-device, real speech/provider or clinical validation.",
+      "Verified bundle already uploaded once and saved in Alpha release 4. Reuse it; do not reupload or resend the 59 invitations.",
+      "Preserve Production 0.4.1 review. Before a later 0.5 review submission, apply matching listing/reviewer material and recheck actual policy/data-safety state without enabling unapproved providers."
     ],
     "supersededPreKeyboardBuild": {
       "sourceCommit": "4758218",
@@ -321,10 +356,21 @@
       "trackId": "4699010624330920429",
       "url": "https://play.google.com/console/u/1/developers/8795679408143615220/app/4974759245808215344/tracks/4699010624330920429/releases/4/prepare",
       "nameAndReleaseNotesSaved": true,
-      "bundleUploaded": false,
+      "bundleUploaded": true,
       "submitted": false,
-      "observedAtUtc": "2026-10-16T10:20:02.4794385Z"
-    }
+      "observedAtUtc": "2026-10-16T10:57:53.793787+00:00",
+      "uploadAttemptedAtUtc": "2026-10-16T10:56:08.959907+00:00",
+      "uploadStatus": "Uploaded once, processed as 6 (0.5.0), Save as draft confirmed Changes saved; not submitted",
+      "uploadedVersion": "0.5.0",
+      "uploadedVersionCode": 6,
+      "savedAsDraft": true,
+      "trackState": "Draft",
+      "proof": "output/android/verification/0.5.0/play-alpha-draft.png",
+      "finalTrackObservedAtUtc": "2026-10-16T11:15:36.156011+00:00"
+    },
+    "artifactVerified": true,
+    "runtimeVerified": true,
+    "draftReady": true
   },
   "productionRelease": {
     "version": "0.4.1",
@@ -358,7 +404,7 @@
     },
     "remainingPublicReadiness": "Ordinary signup and reset email delivery remains recorded as incomplete/unverified. After this was explained, the user explicitly requested submitting the current version as-is. These known limitations remain follow-up work; do not delay this authorised version for new provider setup. Zoho remains paused, the exact Supabase recovery callback remains unapproved, photo scanning stays off and declarations remain accurate.",
     "agentHandlesConfirmation": true,
-    "lastVerifiedAtUtc": "2026-10-16T06:53:44.649Z",
+    "lastVerifiedAtUtc": "2026-10-16T11:15:36.156011+00:00",
     "recoveryActions": [
       "Existing owner sign-in refreshed; no new account or access created",
       "Fresh task tab and documented browser-control reset",
@@ -374,7 +420,7 @@
     },
     "initialRecordedFailedAttempts": 5,
     "status": "In review",
-    "verifiedAt": "2026-10-16T06:53:44.649Z"
+    "verifiedAt": "2026-10-16T11:15:36.156011+00:00"
   },
   "previousUiCandidate": {
     "version": "0.3.1",
@@ -507,5 +553,49 @@
       "productionReleaseCreated": true,
       "evidence": "On 14 October the Production page displayed enabled Create new release. There is no 12-tester/14-day access gate shown for this Organization account. Production still requires its own release and review."
     }
+  },
+  "featureReadiness": {
+    "scope": "Nine main feature areas from the existing audit; implemented means built behavior, not publication, clinical validation or every extension complete.",
+    "implemented": 5,
+    "partial": 2,
+    "notReady": 2,
+    "areas": [
+      {
+        "area": "Consented recording and playback",
+        "status": "implemented"
+      },
+      {
+        "area": "Versioned reviewed notes and patient/family confirmations",
+        "status": "implemented"
+      },
+      {
+        "area": "Medicines, visits, journal and documents",
+        "status": "implemented"
+      },
+      {
+        "area": "Calendar, numeric labs, conversation queue and tasks",
+        "status": "implemented"
+      },
+      {
+        "area": "MapLibre centres directory",
+        "status": "implemented"
+      },
+      {
+        "area": "Shared web/native care workspace",
+        "status": "partial"
+      },
+      {
+        "area": "Speech and multilingual access",
+        "status": "partial"
+      },
+      {
+        "area": "Connected AI goals-of-care draft and saved-audio transcription",
+        "status": "not ready"
+      },
+      {
+        "area": "Patient prescription scanning",
+        "status": "not ready"
+      }
+    ]
   }
 }
