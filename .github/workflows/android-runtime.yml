@@ -1,0 +1,69 @@
+name: Android runtime verification
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_run_id:
+        description: Successful Android verified packages workflow run from this repository
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  runtime:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Download only a successful same-repository build
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BUILD_RUN_ID: ${{ inputs.build_run_id }}
+        run: |
+          set -euo pipefail
+          [[ "$BUILD_RUN_ID" =~ ^[0-9]+$ ]]
+          mkdir -p runtime-artifacts runtime-report
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$BUILD_RUN_ID" > runtime-report/build-run.json
+          python3 android/scripts/ci-runtime.py check-run --run-id "$BUILD_RUN_ID"
+          SOURCE=$(python3 -c 'import json; print(json.load(open("runtime-report/build-run.json"))["head_sha"])')
+          gh run download "$BUILD_RUN_ID" --repo "$GITHUB_REPOSITORY" --name "sahara-android-$SOURCE" --dir runtime-artifacts
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'build-tools;36.1.0'
+          python3 android/scripts/ci-runtime.py prepare --run-id "$BUILD_RUN_ID"
+      - name: Enable hardware acceleration on the disposable runner
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Exercise downloaded packages without rebuilding or private accounts
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 36
+          target: google_apis
+          arch: x86_64
+          profile: pixel_7
+          ram-size: 2048M
+          heap-size: 256M
+          cores: 2
+          disk-size: 4096M
+          disable-animations: true
+          enable-hw-keyboard: false
+          emulator-boot-timeout: 600
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none -camera-front none
+          script: python3 android/scripts/ci-runtime.py run
+      - name: Preserve actual runtime evidence, including failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sahara-runtime-${{ inputs.build_run_id }}-${{ github.run_id }}
+          retention-days: 3
+          if-no-files-found: error
+          path: runtime-report/
