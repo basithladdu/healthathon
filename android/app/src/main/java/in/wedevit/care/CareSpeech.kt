@@ -1,0 +1,280 @@
+package `in`.wedevit.care
+
+import android.Manifest
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.speech.RecognitionListener
+import android.speech.RecognizerIntent
+import android.speech.SpeechRecognizer
+import android.speech.tts.TextToSpeech
+import android.speech.tts.UtteranceProgressListener
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import java.util.Locale
+
+data class CareSpeechLanguage(val tag: String, val label: String)
+val careSpeechLanguages = listOf(
+    CareSpeechLanguage("en-IN", "English"), CareSpeechLanguage("hi-IN", "हिन्दी"),
+    CareSpeechLanguage("kn-IN", "ಕನ್ನಡ"), CareSpeechLanguage("te-IN", "తెలుగు"),
+    CareSpeechLanguage("ta-IN", "தமிழ்"), CareSpeechLanguage("ml-IN", "മലയാളം"),
+    CareSpeechLanguage("ur-IN", "اردو")
+)
+
+private class CareDictation(private val context: Context, val changed: () -> Unit, val preview: (String) -> Unit, val result: (String) -> Boolean) {
+    private var recognizer: SpeechRecognizer? = null
+    private var disposed = false
+    private var accepting = false
+    private var generation = 0
+    var listening = false; private set
+    var processing = false; private set
+    var partial = ""; private set
+    var level = 0f; private set
+    var status = ""; private set
+    var available = Build.VERSION.SDK_INT >= 31 && runCatching { SpeechRecognizer.isOnDeviceRecognitionAvailable(context) }.getOrDefault(false)
+        private set
+
+    private fun accepts(turn: Int) = turn == generation && accepting && !disposed
+    private fun recognizerFor(turn: Int): SpeechRecognizer {
+        if (Build.VERSION.SDK_INT < 31) throw IllegalStateException("On-device dictation requires Android 12 or later.")
+        check(available)
+        return SpeechRecognizer.createOnDeviceSpeechRecognizer(context).also { next ->
+                next.setRecognitionListener(object : RecognitionListener {
+                    override fun onReadyForSpeech(params: Bundle?) { if (accepts(turn)) { status = "Listening…"; changed() } }
+                    override fun onBeginningOfSpeech() = Unit
+                    override fun onRmsChanged(rmsdB: Float) { if (accepts(turn)) { level = ((rmsdB + 2f) / 12f).coerceIn(0f, 1f); changed() } }
+                    override fun onBufferReceived(buffer: ByteArray?) = Unit
+                    override fun onEndOfSpeech() { if (accepts(turn)) { listening = false; processing = true; level = 0f; status = "Checking the words…"; changed() } }
+                    override fun onError(error: Int) {
+                        if (!accepts(turn)) return
+                        accepting = false; listening = false; processing = false; partial = ""; level = 0f
+                        status = when (error) {
+                            SpeechRecognizer.ERROR_LANGUAGE_NOT_SUPPORTED, SpeechRecognizer.ERROR_LANGUAGE_UNAVAILABLE -> "This language isn't installed for dictation. Choose another language or type the words."
+                            SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS -> "Allow microphone access to dictate, or type the words."
+                            SpeechRecognizer.ERROR_NO_MATCH, SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> "No words were recognised. Tap Dictate to try again."
+                            SpeechRecognizer.ERROR_RECOGNIZER_BUSY -> "The microphone is busy. Stop other recording and try again."
+                            else -> "Dictation couldn't finish. Your earlier words are safe. Try again or type."
+                        }
+                        changed()
+                    }
+                    override fun onResults(results: Bundle?) {
+                        if (!accepts(turn)) return
+                        accepting = false; listening = false; processing = false; level = 0f
+                        val words = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.firstOrNull().orEmpty()
+                        partial = ""; status = when {
+                            words.isBlank() -> "No words were recognised. Try again or type."
+                            result(words) -> "Words added. Check them below."
+                            else -> "These words need attention before they can be added."
+                        }
+                        changed()
+                    }
+                    override fun onPartialResults(partialResults: Bundle?) { if (accepts(turn)) { partial = partialResults?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.firstOrNull().orEmpty(); if (partial.isNotBlank()) preview(partial); changed() } }
+                    override fun onEvent(eventType: Int, params: Bundle?) = Unit
+                })
+        }
+    }
+
+    fun start(language: String) {
+        if (disposed || accepting) return
+        if (!available) return
+        val turn = ++generation
+        accepting = true; listening = true; processing = false; partial = ""; level = 0f; status = "Starting microphone…"; changed()
+        try {
+            runCatching { recognizer?.destroy() }
+            val next = recognizerFor(turn).also { recognizer = it }
+            next.startListening(Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+                putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+                putExtra(RecognizerIntent.EXTRA_LANGUAGE, language)
+                putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
+                putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
+                putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true)
+            })
+        } catch (_: Exception) { accepting = false; listening = false; processing = false; status = "Couldn't start dictation. Check microphone access or type the words."; changed() }
+    }
+
+    fun stop() { if (accepting && listening) { listening = false; processing = true; status = "Finishing this turn…"; runCatching { recognizer?.stopListening() }.onFailure { cancel() }; changed() } }
+    fun cancel(keepWords: Boolean = true) { generation++; accepting = false; runCatching { recognizer?.cancel(); recognizer?.destroy() }; recognizer = null; listening = false; processing = false; status = if (keepWords && partial.isNotBlank()) "Listening stopped. Check the unfinished words." else "Listening stopped"; partial = ""; level = 0f; changed() }
+    fun close() { disposed = true; generation++; accepting = false; runCatching { recognizer?.cancel(); recognizer?.destroy() }; recognizer = null }
+}
+
+@Composable fun CareDictationPanel(
+    personId: String,
+    recording: Boolean,
+    enabled: Boolean,
+    onWords: (String, String, String) -> Boolean,
+    onConsent: () -> Unit,
+    onActiveChanged: (Boolean) -> Unit,
+) {
+    val context = LocalContext.current
+    val owner = LocalLifecycleOwner.current
+    var revision by remember { mutableIntStateOf(0) }
+    var languageTag by rememberSaveable(personId) { mutableStateOf("en-IN") }
+    var speaker by rememberSaveable(personId) { mutableStateOf("Patient") }
+    var consent by rememberSaveable(personId) { mutableStateOf(false) }
+    var showConsent by remember { mutableStateOf(false) }
+    var pendingSpeaker by rememberSaveable(personId) { mutableStateOf(speaker) }
+    var pendingLanguageTag by rememberSaveable(personId) { mutableStateOf(languageTag) }
+    val pendingLanguage = careSpeechLanguages.first { it.tag == pendingLanguageTag }
+    var permissionError by remember { mutableStateOf("") }
+    var heldWords by rememberSaveable(personId) { mutableStateOf("") }
+    val latestWords by rememberUpdatedState(onWords)
+    val latestConsent by rememberUpdatedState(onConsent)
+    val dictation = remember(personId) { CareDictation(context, { revision++ }, { words -> heldWords = words }) { words ->
+        latestWords(words, pendingSpeaker, careSpeechLanguages.first { it.tag == pendingLanguageTag }.label).also { added -> heldWords = if (added) "" else words }
+    } }
+    val permission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        if (granted && consent && enabled && !recording) { latestConsent(); dictation.start(pendingLanguage.tag) }
+        else if (!granted) permissionError = "Microphone access wasn't granted. You can type the conversation."
+    }
+    DisposableEffect(dictation, owner) {
+        val observer = LifecycleEventObserver { _, event -> if (event == Lifecycle.Event.ON_STOP) dictation.cancel() }
+        owner.lifecycle.addObserver(observer)
+        onDispose { owner.lifecycle.removeObserver(observer); dictation.close() }
+    }
+    // Read the callback revision so partial results and microphone amplitude redraw this panel.
+    @Suppress("UNUSED_VARIABLE") val callbackRevision = revision
+    val active = dictation.listening || dictation.processing
+    val latestActiveChanged by rememberUpdatedState(onActiveChanged)
+    LaunchedEffect(active) { latestActiveChanged(active) }
+    DisposableEffect(Unit) { onDispose { latestActiveChanged(false) } }
+    SurfaceCard(Mint) {
+        Row(verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.RecordVoiceOver, null, tint = Ink); Spacer(Modifier.width(10.dp)); Text("Speak a turn", fontWeight = FontWeight.Bold) }
+        Spacer(Modifier.height(8.dp))
+        Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(7.dp)) {
+            listOf("Patient", "Family / carer", "Doctor").forEach { role -> FilterChip(selected = speaker == role, onClick = { speaker = role }, enabled = !active, label = { Text(role) }) }
+        }
+        CareLanguageMenu(languageTag, enabled = !active) { languageTag = it }
+        if (dictation.available) {
+            if (active) LinearProgressIndicator(progress = { if (dictation.processing) .15f else dictation.level }, modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp), color = Rust)
+            if (dictation.partial.isNotBlank()) Text(dictation.partial, modifier = Modifier.padding(vertical = 8.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Button(onClick = {
+                    if (dictation.listening) dictation.stop() else {
+                        pendingSpeaker = speaker; pendingLanguageTag = languageTag
+                        permissionError = ""; consent = false; showConsent = true
+                    }
+                }, enabled = enabled && !recording && !dictation.processing && (heldWords.isBlank() || dictation.listening), modifier = Modifier.testTag("dictation-toggle")) {
+                    Icon(if (dictation.listening) Icons.Default.Stop else Icons.Default.Mic, null, Modifier.size(18.dp)); Spacer(Modifier.width(7.dp)); Text(if (dictation.listening) "Finish turn" else "Dictate")
+                }
+                if (active) TextButton(onClick = { dictation.cancel(keepWords = false); heldWords = "" }) { Text("Cancel turn") }
+            }
+            if (dictation.status.isNotBlank()) Text(dictation.status, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 6.dp))
+        } else Text("Dictation isn't available on this phone. Type the words or record audio below.", style = MaterialTheme.typography.bodySmall)
+        if (permissionError.isNotBlank()) Text(permissionError, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
+        if (heldWords.isNotBlank() && !active) {
+            Text("Unfinished words · $pendingSpeaker · ${pendingLanguage.label}", style = MaterialTheme.typography.labelMedium)
+            CareField(heldWords, { heldWords = it }, "Words to keep", minLines = 2)
+            TextButton(onClick = { if (latestWords(heldWords, pendingSpeaker, pendingLanguage.label)) heldWords = "" }) { Text("Add these words") }
+        }
+        if (recording) Text("Stop the audio recording before dictating.", style = MaterialTheme.typography.bodySmall)
+    }
+    if (showConsent) AlertDialog(onDismissRequest = { showConsent = false }, title = { Text("Before we listen") },
+        text = { Column { Text("Speak one person's turn, then check the words before using them in the care note."); Spacer(Modifier.height(12.dp)); CheckLine(consent, { consent = it }, "Everyone here agrees to the microphone being used for this turn.") } },
+        confirmButton = { TextButton(onClick = {
+            showConsent = false
+            if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) { latestConsent(); dictation.start(pendingLanguage.tag) }
+            else permission.launch(Manifest.permission.RECORD_AUDIO)
+        }, enabled = consent && enabled && !recording) { Text("Start listening") } },
+        dismissButton = { TextButton(onClick = { showConsent = false }) { Text("Cancel") } })
+}
+
+@Composable fun CareLanguageMenu(tag: String, enabled: Boolean = true, onSelect: (String) -> Unit) {
+    var open by remember { mutableStateOf(false) }
+    Box { TextButton(onClick = { open = true }, enabled = enabled) { Icon(Icons.Default.Language, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(careSpeechLanguages.firstOrNull { it.tag == tag }?.label ?: tag); Icon(Icons.Default.ExpandMore, null, Modifier.size(18.dp)) }
+        DropdownMenu(expanded = open, onDismissRequest = { open = false }) { careSpeechLanguages.forEach { language -> DropdownMenuItem(text = { Text(language.label) }, onClick = { onSelect(language.tag); open = false }) } }
+    }
+}
+
+private class CareReadAloud(context: Context, val changed: () -> Unit) {
+    private val handler = Handler(Looper.getMainLooper())
+    private var engine: TextToSpeech? = null
+    private var closed = false
+    private var ready = false
+    private var generation = 0
+    private var lastUtterance = ""
+    var speaking = false; private set
+    var status = "Preparing voice…"; private set
+    init {
+        engine = TextToSpeech(context.applicationContext) { result -> handler.post {
+            if (!closed) { ready = result == TextToSpeech.SUCCESS; status = if (ready) "" else "Read aloud isn't available on this phone."; changed() }
+        } }.also { tts ->
+            tts.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
+                override fun onStart(utteranceId: String?) = Unit
+                override fun onDone(utteranceId: String?) { handler.post { if (!closed && utteranceId == lastUtterance) { speaking = false; status = "Finished reading"; changed() } } }
+                @Deprecated("Required by Android TTS")
+                override fun onError(utteranceId: String?) { fail(utteranceId) }
+                override fun onError(utteranceId: String?, errorCode: Int) { fail(utteranceId) }
+            })
+        }
+    }
+    private fun fail(id: String?) { handler.post { if (!closed && id?.startsWith("care-$generation-") == true) { engine?.stop(); speaking = false; status = "Couldn't read this note. Try another installed language voice."; changed() } } }
+    fun read(text: String, languageTag: String) {
+        val tts = engine ?: return
+        if (closed) return
+        if (!ready) { status = "The voice is still preparing. Try Read aloud again in a moment."; changed(); return }
+        stop()
+        val language = Locale.forLanguageTag(languageTag)
+        val voices = runCatching { tts.voices.orEmpty() }.getOrDefault(emptySet())
+        val voice = voices.filter { !it.isNetworkConnectionRequired && it.locale.language == language.language && TextToSpeech.Engine.KEY_FEATURE_NOT_INSTALLED !in it.features.orEmpty() }
+            .sortedWith(compareByDescending<android.speech.tts.Voice> { it.locale.country == language.country }.thenByDescending { it.quality }).firstOrNull()
+        if (voice == null || tts.setVoice(voice) != TextToSpeech.SUCCESS) { status = "No downloaded voice for this language. Choose another language or install its voice in phone settings."; changed(); return }
+        val chunks = CareDraftAssist.speechChunks(text, TextToSpeech.getMaxSpeechInputLength().coerceAtLeast(1))
+        if (chunks.isEmpty()) return
+        generation++; lastUtterance = "care-$generation-${chunks.lastIndex}"
+        speaking = true; status = "Reading in ${careSpeechLanguages.firstOrNull { it.tag == languageTag }?.label ?: language.displayLanguage}"; changed()
+        chunks.forEachIndexed { index, chunk ->
+            if (tts.speak(chunk, if (index == 0) TextToSpeech.QUEUE_FLUSH else TextToSpeech.QUEUE_ADD, null, "care-$generation-$index") != TextToSpeech.SUCCESS) {
+                tts.stop(); speaking = false; status = "Couldn't start reading. Try again."; changed(); return
+            }
+        }
+    }
+    fun stop() { generation++; lastUtterance = ""; engine?.stop(); speaking = false; status = ""; changed() }
+    fun close() { closed = true; engine?.stop(); engine?.shutdown(); engine = null }
+}
+
+@Composable fun CareReadAloudControl(text: String, identity: String) {
+    val context = LocalContext.current
+    val owner = LocalLifecycleOwner.current
+    var revision by remember { mutableIntStateOf(0) }
+    var language by rememberSaveable(identity) { mutableStateOf("en-IN") }
+    val reader = remember(identity) { CareReadAloud(context) { revision++ } }
+    DisposableEffect(reader, owner) {
+        val observer = LifecycleEventObserver { _, event -> if (event == Lifecycle.Event.ON_STOP) reader.stop() }
+        owner.lifecycle.addObserver(observer)
+        onDispose { owner.lifecycle.removeObserver(observer); reader.close() }
+    }
+    LaunchedEffect(text, language) { reader.stop() }
+    @Suppress("UNUSED_VARIABLE") val callbackRevision = revision
+    SurfaceCard(Mint) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            FilledTonalButton(onClick = { if (reader.speaking) reader.stop() else reader.read(text, language) }, modifier = Modifier.testTag("note-read-aloud"), colors = ButtonDefaults.filledTonalButtonColors(containerColor = Sage, contentColor = Ink)) {
+                Icon(if (reader.speaking) Icons.Default.Stop else Icons.Default.VolumeUp, null, Modifier.size(18.dp)); Spacer(Modifier.width(7.dp)); Text(if (reader.speaking) "Stop reading" else "Read aloud")
+            }
+            Spacer(Modifier.weight(1f)); CareLanguageMenu(language) { language = it }
+        }
+        if (reader.status.isNotBlank()) Text(reader.status, style = MaterialTheme.typography.bodySmall)
+        Text("Voice language only; the note's words stay unchanged.", style = MaterialTheme.typography.bodySmall)
+    }
+}

@@ -35,3 +35,4 @@ output/android/*.apk
 output/android/*.aab
 
 android/supabase/.temp/
+android/scripts/__pycache__/

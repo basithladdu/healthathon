@@ -1,0 +1,227 @@
+{
+  "title": "Healthathon CARE resources and Sahara delivery audit",
+  "checkedDate": "2026-10-16",
+  "scope": "Read-only email, public resource and source audit. No implementation, provider activation, account creation, deployment, build or release action.",
+  "email": {
+    "date": "2026-10-15 14:05 IST",
+    "subject": "Health-a-thon 2026 | Build Sprint Resources from Open Healthcare Network",
+    "interpretation": "Optional opportunity to build on CARE and its plugins, not a requirement to migrate or proof of paid provider access.",
+    "resourceLinkCount": 7,
+    "accountActionLinksNotFollowed": "Unsubscribe link excluded from resource visits."
+  },
+  "context": {
+    "fullWhatsAppExport": "25 August–20 September 2026",
+    "fullExportEvidence": "CONTEXT_RECOVERY_2026-09-20.md:9",
+    "laterSuppliedExcerpts": "Separate Shirin discussion/attachments from 20–21 September and adopted meeting/WhatsApp feedback from 23–24 September. These do not constitute a newer full group export.",
+    "laterEvidence": [
+      "docs/meetings/2026-09-23-chat-follow-up.md:3",
+      "docs/meetings/2026-09-24-morning-feedback.md:3",
+      "CONTEXT_TIMELINE_2026-09-21.md:40"
+    ],
+    "gaps": [
+      "Complete 30 August team meeting recording/transcript",
+      "25 August technical DOCX",
+      "Omitted historical attachments",
+      "Newer complete WhatsApp export after 20 September"
+    ],
+    "gitFetch": "origin fetched; HEAD and origin/main both 3d4c637; no incoming main commits; no unmerged patient-portal redesign commits.",
+    "latestAwaiz": [
+      {
+        "commit": "b453efb",
+        "date": "2026-10-11",
+        "change": "Secure Android prescription organiser; already merged"
+      },
+      {
+        "commit": "d617333",
+        "date": "2026-10-11",
+        "change": "Mobile navigation and document actions; already merged"
+      }
+    ],
+    "noNewerAwaizChatContextFound": true,
+    "privacy": "Raw chat, participant details, identifiable design references and attachments stay in their existing private source location."
+  },
+  "resources": [
+    {
+      "name": "Build on Care",
+      "url": "https://ohc.network/build-on-care",
+      "visited": true,
+      "coverage": "Read official page",
+      "learned": "CARE supplies patients, encounters, forms, scheduling and organisational structure. Build one focused frontend/backend/integration extension rather than a separate general EMR.",
+      "implication": "Possible clinician-side host for Sahara; it does not automatically connect the existing app.",
+      "boundary": "Page recommends synthetic data, permission testing and further clinical/security/privacy validation."
+    },
+    {
+      "name": "How to Build Healthcare Apps on CARE",
+      "url": "https://www.loom.com/share/524a50d9b57142d7853c3acf35035250",
+      "visited": true,
+      "coverage": "Opened in Chrome; read public transcript through 02:08, visible summary/chapters and selected later plugin/video-consultation demonstration frames/captions. Full transcript is gated by signup. Not claimed as a complete verbatim video review.",
+      "learned": "Separates CARE core from extensions; shows platform clinical/operational capabilities, palliative/home-care use and a video-consultation extension demonstration.",
+      "boundary": "No Loom account created and no authentication or transcript gate bypassed. Auto-summary transcribes CARE as CAD; use the official CARE spelling."
+    },
+    {
+      "name": "Plugin system",
+      "url": "https://docs.ohc.network/contributing/plugins/",
+      "visited": true,
+      "coverage": "Read official architecture and development guide",
+      "learned": "Backend plugins are Django apps registered through PlugManager; frontend Care Apps are federated React bundles exposing a manifest. Extensions can be frontend-only, backend-only or both.",
+      "implication": "A Kotlin screen cannot directly load the React plugin contract; use a deliberate API/auth integration or a separate CARE clinician UI.",
+      "boundary": "Pin the target host contract and version; local in-tree development differs from production remote-entry loading. The guide's extra care_scribe example link returned 404 during this check."
+    },
+    {
+      "name": "Care scaffold",
+      "url": "https://github.com/ohcnetwork/care_scaffold",
+      "visited": true,
+      "branch": "main",
+      "revision": "a3ecf5e913da949dfff89b1107f5aad7f112584a",
+      "coverage": "Read README, bootstrap and architecture/auth guidance",
+      "learned": "Isolated development workspace plus Django backend and React/TypeScript/Vite frontend templates. Plugin owns models, migrations, API and UI without requiring a CARE core fork.",
+      "sourceUrls": [
+        "https://github.com/ohcnetwork/care_scaffold/blob/a3ecf5e913da949dfff89b1107f5aad7f112584a/skills/care-plugin-architecture/SKILL.md",
+        "https://github.com/ohcnetwork/care_scaffold/blob/a3ecf5e913da949dfff89b1107f5aad7f112584a/skills/care-auth-contexts/SKILL.md"
+      ],
+      "boundary": "Guidance inspected as source material; bootstrap and skills were not installed/executed. CARE staff JWT and patient OTP are separate scopes; Sahara's existing authentication is not automatically compatible."
+    },
+    {
+      "name": "OHC AI coding skills",
+      "url": "https://github.com/ohcnetwork/skills",
+      "visited": true,
+      "branch": "main",
+      "revision": "30f437fb55e9216a964476bfb7fcf46992051a2f",
+      "coverage": "Read developer skill inventory and key instructions",
+      "learned": "Developer aids for CARE code review, questionnaire JSON, Jinja reports, SQL review and Playwright verification. They are not clinical models or delivered patient features.",
+      "sourceUrls": [
+        "https://github.com/ohcnetwork/skills/blob/30f437fb55e9216a964476bfb7fcf46992051a2f/care-form-skill/form.skill.md"
+      ],
+      "boundary": "Validate generated forms against the actual host schema; examples/default conventions are not fully consistent. No skill was installed."
+    },
+    {
+      "name": "Care Filly",
+      "url": "https://github.com/ohcnetwork/care_filly",
+      "visited": true,
+      "branch": "develop",
+      "revision": "cccab7cdc62cd9bf6b84db71ffdab346443322cc",
+      "coverage": "Read current default README, endpoint, client and licence",
+      "learned": "Current default is a Medispeak session-token broker. It authenticates CARE users, checks facility permissions and retains the long-lived provider key on the server while issuing short-lived scoped sessions.",
+      "sourceUrls": [
+        "https://github.com/ohcnetwork/care_filly/blob/cccab7cdc62cd9bf6b84db71ffdab346443322cc/README.md",
+        "https://github.com/ohcnetwork/care_filly/blob/cccab7cdc62cd9bf6b84db71ffdab346443322cc/care_filly/api/viewsets/medispeak.py",
+        "https://github.com/ohcnetwork/care_filly/blob/cccab7cdc62cd9bf6b84db71ffdab346443322cc/care_filly/medispeak_client.py"
+      ],
+      "boundary": "The main branch describes an older Sarvam/Groq/OpenAI architecture; it is not the current default implementation. Audio travels to Medispeak, not only to the device. Sarvam sponsorship does not confer Medispeak access. Filly has an MIT LICENSE."
+    },
+    {
+      "name": "Care AI Vision",
+      "url": "https://github.com/ohcnetwork/care_ai_vision_fe",
+      "visited": true,
+      "branch": "medi",
+      "revision": "09f0fe5eeb6d0ea36a12410e3955b663810a1ed6",
+      "coverage": "Read current default README, manifest, OCR/session client and confidence prompt",
+      "learned": "React CARE extension fills registration/lab-report fields from documents using Filly-scoped Medispeak sessions, with user review and low-confidence flags.",
+      "sourceUrls": [
+        "https://github.com/ohcnetwork/care_ai_vision_fe/blob/09f0fe5eeb6d0ea36a12410e3955b663810a1ed6/README.md",
+        "https://github.com/ohcnetwork/care_ai_vision_fe/blob/09f0fe5eeb6d0ea36a12410e3955b663810a1ed6/src/manifest.tsx",
+        "https://github.com/ohcnetwork/care_ai_vision_fe/blob/09f0fe5eeb6d0ea36a12410e3955b663810a1ed6/src/lib/ocr/medispeak.ts",
+        "https://github.com/ohcnetwork/care_ai_vision_fe/blob/09f0fe5eeb6d0ea36a12410e3955b663810a1ed6/src/lib/ocr/care-ai.ts"
+      ],
+      "boundary": "Requires CARE host/auth/facility and Medispeak access. Model-reported 0.99 confidence is not measured 99% accuracy. Default frontend sends document modality but current Filly does not forward it: source-level protocol concern, not a reproduced runtime failure. A manifest MIT declaration is not a blanket repository licence verification."
+    }
+  ],
+  "extraPrimarySource": {
+    "title": "CARE Home Care Grid",
+    "url": "https://ohc.network/solutions/palliative-care",
+    "learned": "OHC already describes palliative/home-care registry, home visits, team assignment, follow-up, referrals and program visibility. This supports focusing Sahara on goals-of-care communication, rather than duplicating a general care grid.",
+    "evidenceLimit": "Provider's platform/deployment account, not an independent audit or a Sahara partnership."
+  },
+  "delivery": [
+    {
+      "area": "Consented native recording",
+      "status": "implemented in source",
+      "evidence": [
+        "android/app/src/main/java/in/wedevit/care/CareModel.kt:237"
+      ],
+      "gap": "Audio is saved and replayable, but stopRecording asks users to add the words manually. No native Sarvam/STT/TTS client."
+    },
+    {
+      "area": "Native AI goals-of-care draft",
+      "status": "not connected",
+      "evidence": [
+        "android/app/src/main/java/in/wedevit/care/CareData.kt:108"
+      ],
+      "gap": "organise() splits explicit headings. It is not generative transcription or a per-field source-linked AI draft."
+    },
+    {
+      "area": "Versioned review and acknowledgement",
+      "status": "implemented with limitations",
+      "evidence": [
+        "android/app/src/main/java/in/wedevit/care/CareData.kt:92",
+        "android/app/src/main/java/in/wedevit/care/CareData.kt:102",
+        "prototype/app/care-note-reader.tsx:103"
+      ],
+      "gap": "Native has one patient-or-family acknowledgement per version, not separate patient-first/family signatures. Doctor identity is self-entered; generic editor access is not clinician credential verification."
+    },
+    {
+      "area": "Shared care records",
+      "status": "partial",
+      "evidence": [
+        "android/app/src/main/java/in/wedevit/care/CareCloud.kt:61",
+        "prototype/app/continuity-prototype.tsx:858",
+        "prototype/app/care-circle-state.ts:58"
+      ],
+      "gap": "Native has authenticated Supabase calls and backend permission checks. Main web workflows remain browser-local; web and native do not form one shared end-to-end care workspace. Reports/audio stay private on-phone copies."
+    },
+    {
+      "area": "Medicines, visits, journal and document handling",
+      "status": "implemented in source",
+      "evidence": [
+        "android/app/src/main/java/in/wedevit/care/CareModel.kt:150",
+        "android/app/src/main/java/in/wedevit/care/CareDocuments.kt:49"
+      ],
+      "gap": "Native medicine alerts/notification integration is absent; scanner remains publicly off."
+    },
+    {
+      "area": "Calendar, lab trends, request queue and accepted tasks",
+      "status": "web source exists; native parity incomplete",
+      "evidence": [
+        "prototype/app/care-calendar.tsx:34",
+        "prototype/app/family-lab-history.tsx:79",
+        "prototype/app/care-conversation-request.tsx:26",
+        "prototype/app/care-task-inbox.tsx:24",
+        "android/app/src/main/java/in/wedevit/care/CareUi.kt:285"
+      ],
+      "gap": "Native has basic entries and a reminder to talk, not the richer web calendar, structured lab history, actual request/doctor queue or assignee/acceptance lifecycle."
+    },
+    {
+      "area": "Centres",
+      "status": "implemented with data limits",
+      "evidence": [
+        "android/app/src/main/java/in/wedevit/care/CentreMap.kt:75"
+      ],
+      "gap": "Bundled data has 33 entries and 9 coordinates. No verified live medicine stock, emergency capacity, dispatch or booking feed."
+    },
+    {
+      "area": "Read aloud and language access",
+      "status": "partial web only",
+      "evidence": [
+        "prototype/app/tts-speech.tsx:31",
+        "prototype/app/doctor-conversation.tsx:89"
+      ],
+      "gap": "Web uses browser speech recognition/synthesis and English voice selection. No validated reviewed multilingual Sarvam readback or native equivalent."
+    },
+    {
+      "area": "Prescription scanning",
+      "status": "client and synthetic service evidence; public scanning off",
+      "evidence": [
+        "android/app/src/main/java/in/wedevit/care/MedicineOrganizer.kt:116",
+        "prototype/app/api/medicine-organizer/route.ts:87",
+        "android/release/store-draft.json:209"
+      ],
+      "gap": "Provider sensitive-data terms remain unresolved. Do not claim a live patient scanner."
+    }
+  ],
+  "recommendation": {
+    "priority": "Complete the existing agreed conversation → attributed transcript → source-linked draft → clinician review → same-version patient/family record, rather than adding more disconnected screens.",
+    "careDirection": "Keep the Kotlin patient app and current web work. Evaluate a focused CARE clinician plugin and explicit authenticated adapter if the partner care setting uses CARE; do not silently replace the stack or duplicate patient stores.",
+    "providerDirection": "Sarvam is a separate speech/language integration path; current Filly/Vision default examples use Medispeak. Access, data-processing terms and compatibility are separate prerequisites.",
+    "verification": "Source inspection and existing handoff/test records only; no fresh build, phone test, live account/provider or clinical-field validation."
+  }
+}

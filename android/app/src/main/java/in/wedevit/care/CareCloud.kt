@@ -26,6 +26,13 @@ data class CareMember(val userId: String, val canEdit: Boolean, val email: Strin
 data class CloudRecords(val people: List<Person>, val entries: List<CareItem>, val notes: List<CareVersion>, val confirmations: List<Acknowledgement>, val editable: Set<String>, val owned: Set<String>)
 private class CareHttpException(val status: Int, message: String) : IllegalArgumentException(message)
 
+internal fun decodeAcknowledgement(row: JSONObject): Acknowledgement {
+    val data = row.getJSONObject("data")
+    val id = row.getString("id")
+    val versionId = data.optString("versionId").ifBlank { id }
+    return Acknowledgement(versionId, data.getString("contentHash"), data.getString("name"), data.getString("relationship"), data.getLong("at"), id)
+}
+
 class CareCloud(context: Context) {
     private val preferences = context.getSharedPreferences("care-account-kjnhtakqzboayqorrlue", Context.MODE_PRIVATE)
     private val refreshLock = Mutex()
@@ -71,7 +78,12 @@ class CareCloud(context: Context) {
         require(deleted.length() == 1) { "This entry changed. Refresh before removing it." }
     }
     suspend fun saveNote(note: CareVersion) { save("note", note.id, note.personId, noteJson(note), 0) }
-    suspend fun confirm(personId: String, ack: Acknowledgement) { save("ack", ack.versionId, personId, JSONObject().put("contentHash", ack.contentHash).put("name", ack.name).put("relationship", ack.relationship).put("at", ack.at), 0) }
+    suspend fun confirm(personId: String, ack: Acknowledgement): Acknowledgement {
+        val data = JSONObject().put("contentHash", ack.contentHash).put("name", ack.name).put("relationship", ack.relationship).put("at", ack.at)
+        // Retain the legacy patient payload/ID; separate family rows require the patient-first migration.
+        if (ack.id != ack.versionId) data.put("versionId", ack.versionId)
+        return decodeAcknowledgement(save("ack", ack.id, personId, data, 0))
+    }
     private suspend fun save(kind: String, id: String, person: String, data: JSONObject, revision: Long) = JSONObject(request("POST", "/rest/v1/rpc/healthathon_save_record", JSONObject().put("p_id", id).put("p_person", person).put("p_kind", kind).put("p_data", data).put("p_revision", revision)))
     suspend fun invite(personId: String, edit: Boolean): String = request("POST", "/rest/v1/rpc/healthathon_invite", JSONObject().put("p_person", personId).put("p_edit", edit)).trim().trim('"')
     suspend fun join(code: String) { request("POST", "/rest/v1/rpc/healthathon_join", JSONObject().put("p_code", code.trim())) }
@@ -100,7 +112,7 @@ class CareCloud(context: Context) {
                     reviewerVerification = d.optString("reviewerVerification", ReviewWorkflow.NOT_VERIFIED),
                     transcriptionModel = d.optString("transcriptionModel"), transcribedAt = d.optLong("transcribedAt"),
                 ))
-                "ack" -> acks.add(Acknowledgement(id, d.getString("contentHash"), d.getString("name"), d.getString("relationship"), d.getLong("at")))
+                "ack" -> acks.add(decodeAcknowledgement(row))
             }
         }
         return CloudRecords(personRows.map { Person(it.getString("id"), it.getString("name"), it.getLong("created_ms")) }, entries, notes, acks, editable, owned)

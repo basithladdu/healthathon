@@ -17,8 +17,8 @@ android {
         applicationId = "in.wedevit.sahara"
         minSdk = 26
         targetSdk = 36
-        versionCode = 5
-        versionName = "0.4.1"
+        versionCode = 6
+        versionName = "0.5.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {
@@ -73,9 +73,10 @@ dependencies {
     testImplementation("org.json:json:20251224")
     androidTestImplementation(platform("androidx.compose:compose-bom:2025.09.01"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+    // Espresso 3.7 replaces the InputManager reflection removed by Android 16.
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.7.0")
     androidTestImplementation("androidx.test.ext:junit:1.3.0")
     androidTestImplementation("androidx.test:runner:1.7.0")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.7.0")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 }

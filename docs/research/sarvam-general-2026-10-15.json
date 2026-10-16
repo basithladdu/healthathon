@@ -1,0 +1,1794 @@
+{
+  "title": "Sarvam AI:100 general-use proposals and8 documented non-medical examples",
+  "researchDate": "2026-10-15",
+  "scope": "General/non-medical possibilities for Sarvam AI. These are product-design proposals grounded in documented component capabilities, not100 independently observed products.",
+  "sponsorAccessStatus": "The root researcher confirmed the13October sponsor email names Sarvam AI and says credit-access instructions will be shared shortly. Amount, activation, API-key availability and usable quota are not established by this catalog.",
+  "counts": {
+    "proposals": 100,
+    "categories": 10,
+    "proposalsPerCategory": 10,
+    "documentedExamples": 8,
+    "primarySources": 22
+  },
+  "interpretationRules": [
+    "Evidence URLs support the named Sarvam capability, not a claim that the full proposed app or integration is already available.",
+    "Every proposed product still needs its own UX, authentication, storage, permissions, service connectors, fallback and meaningful end-to-end verification.",
+    "All8 examples are named deployments/workflows reported on Sarvam's official customer-story site. These are primary attributed claims, not independent audits.",
+    "Language variants are not counted as separate use cases. Categories group different user jobs, outputs or consequential actions.",
+    "These are research options, not an instruction to add100features to Sahara or to enable a paid/sensitive-data integration."
+  ],
+  "globalBoundaries": [
+    "Use a backend to hold API keys; never place them in Android assets, source control or public chat.",
+    "Do not send personal, financial, health, children’s or confidential records until the actual account terms, consent, retention, region, contractual rights and security fit have been checked.",
+    "Sahara currently has no newly enabled Sarvam patient-data flow. Existing provider and app restrictions remain unchanged.",
+    "Only synthesize authorised content. Voice cloning needs the speaker's explicit rights/consent and must not impersonate clinicians, relatives, officials or real callers.",
+    "Production telephony, WhatsApp, messaging, payments, calendars, inventory and government submissions require their own integrations and permissions; Sarvam language output is not a service receipt.",
+    "Consequential outputs remain drafts or assistive recommendations until the appropriate person confirms them. Use deterministic code for calculations, dates, validation and permission checks.",
+    "Record source links, original text/audio and user corrections where permitted. Build an abstain/escalate path when a model is uncertain.",
+    "Price, latency, regional-language accuracy and transcription performance must be measured with our representative inputs; this report does not promise a cost or SLA."
+  ],
+  "modelNotes": [
+    {
+      "topic": "Speech recognition",
+      "finding": "The opened Saaras model page lists saaras:v4 as recommended/default and v3 as available. V4 keyterm prompting is documented for REST/batch; do not assume it is supported by streaming.",
+      "sourceUrl": "https://docs.sarvam.ai/api/getting-started/models/saaras"
+    },
+    {
+      "topic": "Speech synthesis",
+      "finding": "The opened Bulbul page recommends bulbul:v4-flash for new integrations but still calls v3 the API default. It explicitly says Malayalam and Odia are not yet offered on v4 Flash, while v3 includes them. Pin and test the correct model/voice per language.",
+      "sourceUrl": "https://docs.sarvam.ai/api/getting-started/models/bulbul"
+    },
+    {
+      "topic": "Generation",
+      "finding": "Current docs identify Sarvam-105B and a conversation-oriented variant. The models index marks Sarvam-M and30B deprecated. Model availability can change; use the selected account's current API catalogue before implementation.",
+      "sourceUrl": "https://docs.sarvam.ai/api/getting-started/models/sarvam-105b"
+    },
+    {
+      "topic": "Language coverage",
+      "finding": "Coverage differs across STT, TTS, chat, translation and voice-agent products. Broad23-language recognition/OCR coverage does not establish an end-to-end23-language spoken assistant. Voice-agent overview counts and lists are not fully consistent, so test the specific deployment.",
+      "sourceUrl": "https://docs.sarvam.ai/voice-agents/overview"
+    },
+    {
+      "topic": "Free credits and commercial audio",
+      "finding": "The licensing page states consumed signup credits can generate commercially usable audio without a separate production licence SKU, subject to terms and voice rights. This does not establish the hackathon sponsor-credit amount or clinical-data permission.",
+      "sourceUrl": "https://docs.sarvam.ai/api/getting-started/commercial-licensing"
+    }
+  ],
+  "useCases": [
+    {
+      "id": "G001",
+      "category": "Customer support",
+      "title": "Voice intent routing",
+      "user": "Contact-centre caller",
+      "workflow": "Caller describes a problem -> transcribe and classify against supported queues -> offer the correct queue or human handoff.",
+      "sarvamCapability": "Saaras speech recognition; Voice Agents routing",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/saaras",
+        "https://docs.sarvam.ai/voice-agents/overview"
+      ],
+      "implementationBoundary": "The business supplies real queue routing and fallback; never treat guessed urgency as a verified emergency.",
+      "saharaReuse": "Reuse for routing a non-clinical support request.",
+      "status": "proposal"
+    },
+    {
+      "id": "G002",
+      "category": "Customer support",
+      "title": "Dictate a support ticket",
+      "user": "Customer who struggles with typing",
+      "workflow": "Voice note plus optional order reference -> transcribe and extract issue, device and desired resolution -> show a ticket draft for confirmation.",
+      "sarvamCapability": "Saaras; Sarvam-105B structured extraction",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/saaras",
+        "https://docs.sarvam.ai/api/integration/langchain"
+      ],
+      "implementationBoundary": "Ticket creation, identity checks and attachments need our backend; retain the original wording beside extracted fields.",
+      "saharaReuse": "Reuse for an approved help request with fewer form fields.",
+      "status": "proposal"
+    },
+    {
+      "id": "G003",
+      "category": "Customer support",
+      "title": "Answer from an approved help centre",
+      "user": "Self-service support user",
+      "workflow": "Question plus retrieved help articles -> generate an answer limited to those articles -> return a cited answer or an unanswered-question handoff.",
+      "sarvamCapability": "Sarvam-105B retrieval/tool workflow",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-105b",
+        "https://docs.sarvam.ai/api/integration/langchain"
+      ],
+      "implementationBoundary": "We build retrieval, source freshness and citations; a language model does not itself supply an authoritative knowledge base.",
+      "saharaReuse": "Reuse for app navigation and approved palliative-care education.",
+      "status": "proposal"
+    },
+    {
+      "id": "G004",
+      "category": "Customer support",
+      "title": "Carry context into a human handoff",
+      "user": "Support agent taking over",
+      "workflow": "Consented customer conversation -> extract issue, attempted fixes and unresolved question -> give the human a short handoff card.",
+      "sarvamCapability": "Saaras batch transcription; Sarvam-105B summarisation",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/saaras",
+        "https://docs.sarvam.ai/api/cookbook/guides/call-analytics-pipeline"
+      ],
+      "implementationBoundary": "The receiving agent checks the transcript; generated summaries must not silently drop contradictory facts.",
+      "saharaReuse": "Reuse for care-team handoffs only after a suitable health-data agreement.",
+      "status": "proposal"
+    },
+    {
+      "id": "G005",
+      "category": "Customer support",
+      "title": "Audit calls against a service checklist",
+      "user": "Contact-centre quality lead",
+      "workflow": "Consented call plus explicit checklist -> diarise and find evidence for each required service step -> produce a review queue with transcript spans.",
+      "sarvamCapability": "Saaras diarisation; call analytics pipeline",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/saaras",
+        "https://docs.sarvam.ai/api/cookbook/guides/call-analytics-pipeline"
+      ],
+      "implementationBoundary": "Scores assist a reviewer; they are not proof of staff misconduct or a basis for automatic disciplinary action.",
+      "saharaReuse": "Reuse for checking consent and communication steps in a supervised pilot.",
+      "status": "proposal"
+    },
+    {
+      "id": "G006",
+      "category": "Customer support",
+      "title": "Find repeated service failures",
+      "user": "Support operations manager",
+      "workflow": "De-identified tickets and transcripts -> cluster recurring causes and changes over time -> produce a product-fix backlog with examples.",
+      "sarvamCapability": "Sarvam-105B analysis; call analytics",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-105b",
+        "https://docs.sarvam.ai/api/cookbook/guides/call-analytics-pipeline"
+      ],
+      "implementationBoundary": "Deduplicate records and check categories; generated trend counts must be calculated from actual data outside the model.",
+      "saharaReuse": "Reuse for prioritising real Sahara usability problems.",
+      "status": "proposal"
+    },
+    {
+      "id": "G007",
+      "category": "Customer support",
+      "title": "Extract promises that need follow-up",
+      "user": "Support supervisor",
+      "workflow": "Resolved-call transcript -> identify explicit promised actions, owners and dates -> queue unfulfilled commitments for staff review.",
+      "sarvamCapability": "Sarvam-105B extraction; call analytics",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/integration/langchain",
+        "https://docs.sarvam.ai/api/cookbook/guides/call-analytics-pipeline"
+      ],
+      "implementationBoundary": "Do not invent an owner or due date; integration must reconcile promises with the actual ticket state.",
+      "saharaReuse": "Reuse for a care coordinator's non-clinical follow-up tasks.",
+      "status": "proposal"
+    },
+    {
+      "id": "G008",
+      "category": "Customer support",
+      "title": "Guide a repair checklist by voice",
+      "user": "Appliance owner",
+      "workflow": "Device model and spoken symptom -> retrieve its approved troubleshooting tree and ask one step at a time -> record completed checks or book a technician.",
+      "sarvamCapability": "Voice Agents; grounded tool workflow",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/voice-agents/overview",
+        "https://docs.sarvam.ai/api/integration/langchain"
+      ],
+      "implementationBoundary": "Use a vetted decision tree and stop at electrical or other safety limits; booking is a separate confirmed backend action.",
+      "saharaReuse": "Reuse the one-question-at-a-time interface, not appliance advice.",
+      "status": "proposal"
+    },
+    {
+      "id": "G009",
+      "category": "Customer support",
+      "title": "Check warranty evidence before submission",
+      "user": "Warranty desk employee",
+      "workflow": "Invoice scan, serial number and stated fault -> extract purchase details and compare with the company's warranty rules -> flag missing evidence and prepare the claim.",
+      "sarvamCapability": "Sarvam Vision; Sarvam-105B",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-vision",
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-105b"
+      ],
+      "implementationBoundary": "OCR is not document-authenticity verification; a person decides disputed eligibility.",
+      "saharaReuse": "Reuse the evidence checklist pattern for administrative documents.",
+      "status": "proposal"
+    },
+    {
+      "id": "G010",
+      "category": "Customer support",
+      "title": "Qualify a requested callback",
+      "user": "Customer waiting for a specialist",
+      "workflow": "Customer's callback request -> ask the permitted clarifying questions and confirm language and availability -> create a prioritised callback entry.",
+      "sarvamCapability": "Voice Agents",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/voice-agents/overview"
+      ],
+      "implementationBoundary": "Only call people who requested or otherwise validly consented; our queue supplies the actual callback and retry policy.",
+      "saharaReuse": "Reuse for scheduling a human callback without asking for a long form.",
+      "status": "proposal"
+    },
+    {
+      "id": "G011",
+      "category": "Commerce and operations",
+      "title": "Search a catalogue by speaking needs",
+      "user": "Shopper",
+      "workflow": "Spoken budget, size and use -> transcribe into catalogue filters and retrieve real inventory -> present a small matching shortlist.",
+      "sarvamCapability": "Saaras; Sarvam-105B tool calling",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/saaras",
+        "https://docs.sarvam.ai/api/integration/langchain"
+      ],
+      "implementationBoundary": "Prices, stock and specifications must come from the merchant system; do not invent products.",
+      "saharaReuse": "Reuse the conversational filtering pattern for a verified centre directory.",
+      "status": "proposal"
+    },
+    {
+      "id": "G012",
+      "category": "Commerce and operations",
+      "title": "Build and confirm a voice shopping basket",
+      "user": "Shopper with low typing confidence",
+      "workflow": "Spoken items and quantities -> resolve catalogue IDs and read back ambiguities -> show a basket for explicit confirmation.",
+      "sarvamCapability": "Voice Agents; tool calling",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/voice-agents/overview",
+        "https://docs.sarvam.ai/api/integration/langchain"
+      ],
+      "implementationBoundary": "The app controls item resolution and checkout; no order or charge without an explicit reviewed confirmation.",
+      "saharaReuse": "Reuse repeat-back confirmation for saved care tasks.",
+      "status": "proposal"
+    },
+    {
+      "id": "G013",
+      "category": "Commerce and operations",
+      "title": "Localise product catalogue copy",
+      "user": "Small online merchant",
+      "workflow": "Verified source descriptions and brand glossary -> translate and adapt tone -> generate reviewed regional-language catalogue fields.",
+      "sarvamCapability": "Mayura translation",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/mayura"
+      ],
+      "implementationBoundary": "Do not add efficacy, certifications or specifications; native-language review is needed for important product claims.",
+      "saharaReuse": "Reuse for approved app copy and directory descriptions.",
+      "status": "proposal"
+    },
+    {
+      "id": "G014",
+      "category": "Commerce and operations",
+      "title": "Explain a return route from store policy",
+      "user": "Customer returning an item",
+      "workflow": "Order facts and reason -> retrieve the exact current return policy and apply transparent rules -> explain the required evidence and available return route.",
+      "sarvamCapability": "Sarvam-105B grounded reasoning",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-105b",
+        "https://docs.sarvam.ai/api/integration/langchain"
+      ],
+      "implementationBoundary": "Rule execution and refund approval belong to the merchant; ambiguous cases go to staff.",
+      "saharaReuse": "Reuse policy explanation for account or document support.",
+      "status": "proposal"
+    },
+    {
+      "id": "G015",
+      "category": "Commerce and operations",
+      "title": "Read out an authenticated order status",
+      "user": "Customer on a phone line",
+      "workflow": "Verified order reference and question -> query the order system -> speak the actual shipment or fulfilment status.",
+      "sarvamCapability": "Voice Agents; Bulbul TTS",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/voice-agents/overview",
+        "https://docs.sarvam.ai/api/getting-started/models/bulbul"
+      ],
+      "implementationBoundary": "Authentication, tracking data and telephony are external integrations; never use a fluent answer as proof of a delivery.",
+      "saharaReuse": "Reuse for a real requested visit status if an authorised provider supplies it.",
+      "status": "proposal"
+    },
+    {
+      "id": "G016",
+      "category": "Commerce and operations",
+      "title": "Clarify a delivery address",
+      "user": "Delivery coordinator",
+      "workflow": "Spoken address and landmarks -> transcribe into a structured draft and ask about missing components -> return a customer-confirmed address.",
+      "sarvamCapability": "Saaras; structured output",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/saaras",
+        "https://docs.sarvam.ai/api/integration/langchain"
+      ],
+      "implementationBoundary": "Sarvam is not a geocoder; map matching and delivery-area validation need a real mapping service and explicit user correction.",
+      "saharaReuse": "Reuse for confirming a visit location before MapLibre navigation.",
+      "status": "proposal"
+    },
+    {
+      "id": "G017",
+      "category": "Commerce and operations",
+      "title": "Compare supplier quotations consistently",
+      "user": "Purchasing officer",
+      "workflow": "Supplier quotation documents -> extract item, unit, tax and lead-time fields into one schema -> show a comparison with unresolved differences.",
+      "sarvamCapability": "Sarvam Vision; Sarvam-105B",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-vision",
+        "https://docs.sarvam.ai/api/integration/langchain"
+      ],
+      "implementationBoundary": "Calculate totals outside the model and keep original pages; a recommendation is not purchasing authorisation.",
+      "saharaReuse": "Reuse for comparing equipment donations or procurement quotes.",
+      "status": "proposal"
+    },
+    {
+      "id": "G018",
+      "category": "Commerce and operations",
+      "title": "Capture a spoken stocktake",
+      "user": "Storekeeper",
+      "workflow": "Shelf item names and spoken counts -> resolve inventory IDs and ask about uncertain units -> create a reviewed stock-count import.",
+      "sarvamCapability": "Saaras; structured output",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/saaras",
+        "https://docs.sarvam.ai/api/integration/langchain"
+      ],
+      "implementationBoundary": "Physical counts remain the staff member's evidence; database updates need conflict checks and approval.",
+      "saharaReuse": "Reuse for tracking centre supplies, not automatically prescribing medicines.",
+      "status": "proposal"
+    },
+    {
+      "id": "G019",
+      "category": "Commerce and operations",
+      "title": "Draft grounded replies to customer reviews",
+      "user": "Merchant",
+      "workflow": "A public review and known resolution facts -> draft an appropriate reply in the reviewer's language -> staff approve and post.",
+      "sarvamCapability": "Sarvam-105B; Mayura",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-105b",
+        "https://docs.sarvam.ai/api/getting-started/models/mayura"
+      ],
+      "implementationBoundary": "Do not invent refunds, contact attempts or personal familiarity; posting remains a deliberate action.",
+      "saharaReuse": "Reuse for responding to real app feedback.",
+      "status": "proposal"
+    },
+    {
+      "id": "G020",
+      "category": "Commerce and operations",
+      "title": "Find purchase-order and invoice mismatches",
+      "user": "Accounts payable reviewer",
+      "workflow": "Purchase order, goods-received note and invoice -> align extracted lines -> flag quantity, tax and price discrepancies for review.",
+      "sarvamCapability": "Sarvam Vision; structured extraction",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-vision",
+        "https://docs.sarvam.ai/api/integration/langchain"
+      ],
+      "implementationBoundary": "Use deterministic arithmetic and source-linked comparison; no autonomous vendor payment or accusation of fraud.",
+      "saharaReuse": "Reuse for administrative procurement reconciliation.",
+      "status": "proposal"
+    },
+    {
+      "id": "G021",
+      "category": "Work and workforce",
+      "title": "Turn a meeting into assigned actions",
+      "user": "Project team",
+      "workflow": "Consented meeting audio -> separate speakers and extract decisions, open questions and explicit commitments -> publish a reviewed action list.",
+      "sarvamCapability": "Saaras diarisation; Sarvam-105B",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/saaras",
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-105b"
+      ],
+      "implementationBoundary": "Keep source timestamps. Participants confirm speaker identities, ownership and dates; diarisation labels do not identify people. Recording permission and access controls are separate implementation work.",
+      "saharaReuse": "Reuse for mentor and team meetings without patient identifiers.",
+      "status": "proposal"
+    },
+    {
+      "id": "G022",
+      "category": "Work and workforce",
+      "title": "Prepare an operational shift handover",
+      "user": "Factory or service shift lead",
+      "workflow": "Structured shift logs plus spoken updates -> reconcile completed work and unresolved incidents -> prepare a brief for the incoming shift.",
+      "sarvamCapability": "Saaras; Sarvam-105B",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/saaras",
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-105b"
+      ],
+      "implementationBoundary": "Keep source timestamps, outstanding hazards and contradictory reports visible. Confirm speaker and task-owner identity; do not infer a site is safe or assign a commitment from a voice label.",
+      "saharaReuse": "Reuse for a verified provider-team handover after clinical governance is approved.",
+      "status": "proposal"
+    },
+    {
+      "id": "G023",
+      "category": "Work and workforce",
+      "title": "Explain employee policies with sources",
+      "user": "Employee",
+      "workflow": "Question and approved HR policy documents -> retrieve the relevant clause and explain it -> answer with the policy source and HR escalation.",
+      "sarvamCapability": "Sarvam-105B grounded assistant",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-105b",
+        "https://docs.sarvam.ai/api/integration/langchain"
+      ],
+      "implementationBoundary": "No invented entitlement or legal determination; leave approvals and confidential personnel decisions stay with HR.",
+      "saharaReuse": "Reuse for Sahara organisation onboarding and access policy.",
+      "status": "proposal"
+    },
+    {
+      "id": "G024",
+      "category": "Work and workforce",
+      "title": "Draft a timesheet from a work diary",
+      "user": "Field employee",
+      "workflow": "Spoken work diary and actual appointment records -> extract activities and durations -> show a timesheet with uncertain periods highlighted.",
+      "sarvamCapability": "Saaras; structured output",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/saaras",
+        "https://docs.sarvam.ai/api/integration/langchain"
+      ],
+      "implementationBoundary": "Never fabricate worked hours or attendance; employee approval and payroll rules remain external.",
+      "saharaReuse": "Reuse for volunteer effort logs.",
+      "status": "proposal"
+    },
+    {
+      "id": "G025",
+      "category": "Work and workforce",
+      "title": "Handle recruitment logistics questions",
+      "user": "Job applicant",
+      "workflow": "Applicant's question -> retrieve a live job's process, location and dates -> explain the next application step or arrange staff contact.",
+      "sarvamCapability": "Voice Agents; grounded tools",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/voice-agents/overview",
+        "https://docs.sarvam.ai/api/integration/langchain"
+      ],
+      "implementationBoundary": "No inferred protected characteristics, automated hiring decision or invented vacancy; only collect necessary applicant data.",
+      "saharaReuse": "Reuse for volunteer recruitment logistics.",
+      "status": "proposal"
+    },
+    {
+      "id": "G026",
+      "category": "Work and workforce",
+      "title": "Capture a workplace incident report",
+      "user": "Employee reporting a hazard",
+      "workflow": "Spoken description and optional document evidence -> extract when, where, what happened and immediate actions -> create an editable incident draft.",
+      "sarvamCapability": "Saaras; Sarvam-105B structured extraction",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/saaras",
+        "https://docs.sarvam.ai/api/integration/langchain"
+      ],
+      "implementationBoundary": "Do not determine fault or replace emergency procedures; preserve the employee's original account.",
+      "saharaReuse": "Reuse for administrative incident reporting with access controls.",
+      "status": "proposal"
+    },
+    {
+      "id": "G027",
+      "category": "Work and workforce",
+      "title": "Dub onboarding training once for several teams",
+      "user": "Training producer",
+      "workflow": "Approved induction video -> transcribe, translate and synthesize a reviewed dub -> export a regional-language training version.",
+      "sarvamCapability": "Dubbing API",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/dubbing/overview",
+        "https://docs.sarvam.ai/api/getting-started/commercial-licensing"
+      ],
+      "implementationBoundary": "Obtain speaker and content rights; verify safety instructions and timings before staff use.",
+      "saharaReuse": "Reuse for consented volunteer and caregiver orientation content.",
+      "status": "proposal"
+    },
+    {
+      "id": "G028",
+      "category": "Work and workforce",
+      "title": "Create a daily operations briefing",
+      "user": "Small organisation manager",
+      "workflow": "Authorised calendar, task and email updates -> summarise today's deadlines and unresolved work -> produce a linked morning brief.",
+      "sarvamCapability": "Cowork connectors and scheduled agents",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/cowork/overview"
+      ],
+      "implementationBoundary": "Connector permissions and scheduling need configuration; a generated briefing must not imply a task was completed.",
+      "saharaReuse": "Reuse for coordinator workload planning without unnecessary health data.",
+      "status": "proposal"
+    },
+    {
+      "id": "G029",
+      "category": "Work and workforce",
+      "title": "Sort a shared inbox into actionable queues",
+      "user": "Operations assistant",
+      "workflow": "Permitted shared-inbox messages -> classify requests and draft replies from known facts -> create a review queue for the correct owner.",
+      "sarvamCapability": "Cowork; Sarvam-105B",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/cowork/overview",
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-105b"
+      ],
+      "implementationBoundary": "Email access and sending are separate permissions; do not send generated replies automatically by default.",
+      "saharaReuse": "Reuse for app-support triage.",
+      "status": "proposal"
+    },
+    {
+      "id": "G030",
+      "category": "Work and workforce",
+      "title": "Collect roster availability conversationally",
+      "user": "Shift planner",
+      "workflow": "Employees state availability and constraints -> extract explicit time windows -> present a conflict-checked availability grid to the planner.",
+      "sarvamCapability": "Saaras; structured output",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/saaras",
+        "https://docs.sarvam.ai/api/integration/langchain"
+      ],
+      "implementationBoundary": "A separate scheduler enforces labour rules and coverage; ask about contradictions instead of guessing.",
+      "saharaReuse": "Reuse for volunteer visit availability.",
+      "status": "proposal"
+    },
+    {
+      "id": "G031",
+      "category": "Learning and education",
+      "title": "Practice spoken English with contextual feedback",
+      "user": "Language learner",
+      "workflow": "Learner speaks a role-play answer -> transcribe or translate the question and generate feedback -> continue practice in a selected language.",
+      "sarvamCapability": "Saaras; Sarvam-105B",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/saaras",
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-105b"
+      ],
+      "implementationBoundary": "Transcription errors are not learner mistakes; let learners inspect and correct what was heard.",
+      "saharaReuse": "Reuse communication practice for staff using fictional scenarios.",
+      "status": "proposal"
+    },
+    {
+      "id": "G032",
+      "category": "Learning and education",
+      "title": "Build assisted reading exercises",
+      "user": "Beginning reader",
+      "workflow": "Teacher-selected short passage -> synthesize a clear reading model and compare learner transcript with expected text -> highlight words to practice.",
+      "sarvamCapability": "Bulbul; Saaras",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/bulbul",
+        "https://docs.sarvam.ai/api/getting-started/models/saaras"
+      ],
+      "implementationBoundary": "Do not claim a validated speech, learning or disability assessment; teachers review the exercise.",
+      "saharaReuse": "Reuse the listen-and-repeat interface for non-clinical app onboarding.",
+      "status": "proposal"
+    },
+    {
+      "id": "G033",
+      "category": "Learning and education",
+      "title": "Caption a live class",
+      "user": "Student needing text access",
+      "workflow": "Consented lecture audio -> stream transcription and optional translation -> display captions with a correctable saved transcript.",
+      "sarvamCapability": "Saaras streaming",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/saaras"
+      ],
+      "implementationBoundary": "Latency and errors need classroom testing; this does not guarantee sign-language access or legally sufficient accommodation.",
+      "saharaReuse": "Reuse for consented teaching sessions.",
+      "status": "proposal"
+    },
+    {
+      "id": "G034",
+      "category": "Learning and education",
+      "title": "Create an accessible textbook audiobook",
+      "user": "Student or publisher",
+      "workflow": "Licensed textbook text -> divide at meaningful sections and synthesize narration -> export navigable chapter audio with matching text.",
+      "sarvamCapability": "Bulbul TTS",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/bulbul",
+        "https://docs.sarvam.ai/api/getting-started/commercial-licensing"
+      ],
+      "implementationBoundary": "Obtain publishing rights and review formulas, abbreviations and pronunciation; audio is not automatically an accessible ebook.",
+      "saharaReuse": "Reuse for approved educational leaflets as offline audio.",
+      "status": "proposal"
+    },
+    {
+      "id": "G035",
+      "category": "Learning and education",
+      "title": "Draft teacher-reviewed practice worksheets",
+      "user": "Teacher",
+      "workflow": "Curriculum excerpt and learning objective -> generate exercises and an answer key -> teacher edits and releases a worksheet.",
+      "sarvamCapability": "Sarvam-105B",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-105b"
+      ],
+      "implementationBoundary": "Check every answer and age suitability; the model cannot certify curriculum alignment.",
+      "saharaReuse": "Reuse for volunteer-training exercises.",
+      "status": "proposal"
+    },
+    {
+      "id": "G036",
+      "category": "Learning and education",
+      "title": "Run an oral knowledge quiz",
+      "user": "Learner",
+      "workflow": "Approved question bank and spoken answer -> transcribe and compare with a supplied rubric -> give feedback and record a tentative practice result.",
+      "sarvamCapability": "Saaras; Sarvam-105B",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/saaras",
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-105b"
+      ],
+      "implementationBoundary": "Use for practice, not unsupervised high-stakes grading; a transcription correction must be possible.",
+      "saharaReuse": "Reuse for checking staff comprehension of approved procedures.",
+      "status": "proposal"
+    },
+    {
+      "id": "G037",
+      "category": "Learning and education",
+      "title": "Translate parent notices without losing key dates",
+      "user": "School administrator",
+      "workflow": "Verified notice and event details -> translate with a glossary and date checks -> send an approved parent-language notice.",
+      "sarvamCapability": "Mayura; Sarvam Translate",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/mayura",
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-translate"
+      ],
+      "implementationBoundary": "Human-check deadlines, fees and consent wording; school messaging infrastructure is a separate integration.",
+      "saharaReuse": "Reuse for accurate appointment-preparation notices.",
+      "status": "proposal"
+    },
+    {
+      "id": "G038",
+      "category": "Learning and education",
+      "title": "Explain programming concepts in familiar language",
+      "user": "Student developer",
+      "workflow": "Code excerpt and conceptual question -> explain the relevant concept and propose a small runnable example -> learner tests it.",
+      "sarvamCapability": "Sarvam-105B coding and reasoning",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-105b"
+      ],
+      "implementationBoundary": "Generated code is untrusted until tested; do not upload secrets or claim correctness from explanation alone.",
+      "saharaReuse": "Reuse for the Sahara team's internal learning.",
+      "status": "proposal"
+    },
+    {
+      "id": "G039",
+      "category": "Learning and education",
+      "title": "Give revision feedback on a draft essay",
+      "user": "Student writer",
+      "workflow": "Student's draft and rubric -> identify unclear structure and examples -> provide suggestions tied to existing passages.",
+      "sarvamCapability": "Sarvam-105B",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-105b"
+      ],
+      "implementationBoundary": "Keep authorship visible; do not fabricate sources, substitute an entire assessed submission or guarantee a grade.",
+      "saharaReuse": "Reuse for improving non-clinical communications.",
+      "status": "proposal"
+    },
+    {
+      "id": "G040",
+      "category": "Learning and education",
+      "title": "Plan study around real commitments",
+      "user": "Working learner",
+      "workflow": "Exam dates, topics, available time and progress -> reason over constraints -> produce an editable weekly study plan.",
+      "sarvamCapability": "Sarvam-105B structured planning",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-105b",
+        "https://docs.sarvam.ai/api/integration/langchain"
+      ],
+      "implementationBoundary": "Calendar writes need confirmation; the plan must preserve user-entered limits rather than invent free time.",
+      "saharaReuse": "Reuse the constraint-aware planning pattern for training.",
+      "status": "proposal"
+    },
+    {
+      "id": "G041",
+      "category": "Civic and rural services",
+      "title": "Explain a public scheme from current rules",
+      "user": "Citizen",
+      "workflow": "Question and official scheme notice -> retrieve eligibility and application rules -> give a cited plain-language explanation.",
+      "sarvamCapability": "Sarvam-105B; Mayura",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-105b",
+        "https://docs.sarvam.ai/api/getting-started/models/mayura"
+      ],
+      "implementationBoundary": "Use current official sources; no promise of eligibility, payment or government affiliation.",
+      "saharaReuse": "Reuse for verified assistance-scheme navigation.",
+      "status": "proposal"
+    },
+    {
+      "id": "G042",
+      "category": "Civic and rural services",
+      "title": "Prepare an application evidence checklist",
+      "user": "Citizen-service facilitator",
+      "workflow": "User's stated situation and official form requirements -> identify required versus missing documents -> produce a personalised checklist.",
+      "sarvamCapability": "Sarvam-105B structured output",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/integration/langchain"
+      ],
+      "implementationBoundary": "Do not submit forms, invent facts or collect full IDs unnecessarily; final eligibility remains with the authority.",
+      "saharaReuse": "Reuse for support-scheme paperwork assistance.",
+      "status": "proposal"
+    },
+    {
+      "id": "G043",
+      "category": "Civic and rural services",
+      "title": "File a civic grievance by voice",
+      "user": "Resident",
+      "workflow": "Spoken complaint and user-confirmed location -> extract a concise description and route category -> show a grievance draft and eventual real receipt.",
+      "sarvamCapability": "Saaras; Voice Agents",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/saaras",
+        "https://docs.sarvam.ai/voice-agents/overview"
+      ],
+      "implementationBoundary": "The municipality supplies the submission API and receipt; a generated reference number is forbidden.",
+      "saharaReuse": "Reuse for a real administrative feedback flow.",
+      "status": "proposal"
+    },
+    {
+      "id": "G044",
+      "category": "Civic and rural services",
+      "title": "Make public budget tables explorable",
+      "user": "Community researcher",
+      "workflow": "Official scanned budget pages -> extract tables and normalise labels -> provide searchable rows with links back to pages.",
+      "sarvamCapability": "Sarvam Vision",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-vision"
+      ],
+      "implementationBoundary": "Validate totals and units using code; OCR does not establish corruption or expenditure outcomes.",
+      "saharaReuse": "Reuse for public-sector funding analysis.",
+      "status": "proposal"
+    },
+    {
+      "id": "G045",
+      "category": "Civic and rural services",
+      "title": "Answer utility-outage questions from live notices",
+      "user": "Utility customer",
+      "workflow": "Authenticated locality and spoken question -> retrieve the utility's actual outage notice -> explain scope and published restoration estimate.",
+      "sarvamCapability": "Voice Agents; tool integration",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/voice-agents/overview",
+        "https://docs.sarvam.ai/api/integration/langchain"
+      ],
+      "implementationBoundary": "The provider supplies status; do not invent restoration times or conceal missing updates.",
+      "saharaReuse": "Reuse the verified-status pattern for service availability.",
+      "status": "proposal"
+    },
+    {
+      "id": "G046",
+      "category": "Civic and rural services",
+      "title": "Validate crop-survey entries with farmers",
+      "user": "Field survey team",
+      "workflow": "Existing crop record and consented farmer call -> read back crop and acreage fields and capture corrections -> flag records needing field verification.",
+      "sarvamCapability": "Voice Agents; structured output",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/voice-agents/overview",
+        "https://docs.sarvam.ai/api/integration/langchain"
+      ],
+      "implementationBoundary": "Corrections are claims for verification, not proof of acreage; field systems and consent remain necessary.",
+      "saharaReuse": "Reuse read-back confirmation of administrative records.",
+      "status": "proposal"
+    },
+    {
+      "id": "G047",
+      "category": "Civic and rural services",
+      "title": "Capture a spoken farm operations diary",
+      "user": "Farmer",
+      "workflow": "Spoken sowing, labour and input-use notes -> extract dated activities and units -> save a farmer-reviewed operations timeline.",
+      "sarvamCapability": "Saaras; structured output",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/saaras",
+        "https://docs.sarvam.ai/api/integration/langchain"
+      ],
+      "implementationBoundary": "Do not infer applications, quantities or crop health that were not stated; the farmer can revise records.",
+      "saharaReuse": "Reuse quick diary entry interaction.",
+      "status": "proposal"
+    },
+    {
+      "id": "G048",
+      "category": "Civic and rural services",
+      "title": "Read trusted market bulletins aloud",
+      "user": "Farmer or small trader",
+      "workflow": "Current official price bulletin -> translate and synthesize a concise crop/location-specific bulletin -> deliver audio with source date and market.",
+      "sarvamCapability": "Sarvam Translate; Bulbul",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-translate",
+        "https://docs.sarvam.ai/api/getting-started/models/bulbul"
+      ],
+      "implementationBoundary": "Market prices need a separate current feed; no price prediction, trade recommendation or assured sale price.",
+      "saharaReuse": "Reuse source-dated public-information audio.",
+      "status": "proposal"
+    },
+    {
+      "id": "G049",
+      "category": "Civic and rural services",
+      "title": "Prepare an agronomist consultation request",
+      "user": "Farmer",
+      "workflow": "Spoken crop problem and available context -> extract explicit observations, duration and requested help -> create a structured case for a qualified agronomist.",
+      "sarvamCapability": "Saaras; Sarvam-105B",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/saaras",
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-105b"
+      ],
+      "implementationBoundary": "Do not diagnose plant disease or recommend chemical dosage from the model; expert advice is a separate human service.",
+      "saharaReuse": "Reuse the request-preparation pattern while respecting clinical boundaries.",
+      "status": "proposal"
+    },
+    {
+      "id": "G050",
+      "category": "Civic and rural services",
+      "title": "Explain an approved preparedness plan",
+      "user": "Community organisation",
+      "workflow": "Local authority's preparedness guide and resident question -> retrieve the relevant procedure -> explain it in local-language text or audio.",
+      "sarvamCapability": "Sarvam-105B; Bulbul",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-105b",
+        "https://docs.sarvam.ai/api/getting-started/models/bulbul"
+      ],
+      "implementationBoundary": "Use official current instructions; not live hazard detection, emergency dispatch or an all-clear service.",
+      "saharaReuse": "Reuse pre-approved continuity and contingency information.",
+      "status": "proposal"
+    },
+    {
+      "id": "G051",
+      "category": "Finance and administration",
+      "title": "Sort expense receipts for bookkeeping",
+      "user": "Small-business bookkeeper",
+      "workflow": "Authorised receipt scans -> extract merchant, date and amount -> suggest ledger categories for a reviewed expense import.",
+      "sarvamCapability": "Sarvam Vision; structured output",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-vision",
+        "https://docs.sarvam.ai/api/integration/langchain"
+      ],
+      "implementationBoundary": "An accountant checks tax treatment and duplicates; deterministic code handles arithmetic and currency.",
+      "saharaReuse": "Reuse for operational expense administration.",
+      "status": "proposal"
+    },
+    {
+      "id": "G052",
+      "category": "Finance and administration",
+      "title": "Prepare an invoice accounts-payable entry",
+      "user": "Accounts clerk",
+      "workflow": "Supplier invoice -> extract vendor, due date, line items and payment terms -> create a source-linked payable draft.",
+      "sarvamCapability": "Sarvam Vision",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-vision"
+      ],
+      "implementationBoundary": "OCR is not vendor authentication; payment details need independent verification and no automatic transfer.",
+      "saharaReuse": "Reuse for organisation administration.",
+      "status": "proposal"
+    },
+    {
+      "id": "G053",
+      "category": "Finance and administration",
+      "title": "Explain an insurance policy in plain language",
+      "user": "Policyholder",
+      "workflow": "Actual policy wording and user question -> locate relevant exclusions and conditions -> produce a cited explanation and questions for the insurer.",
+      "sarvamCapability": "Sarvam-105B; Mayura",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-105b",
+        "https://docs.sarvam.ai/api/getting-started/models/mayura"
+      ],
+      "implementationBoundary": "Do not determine coverage, offer regulated advice or promise claims payment; retain the original policy as authoritative.",
+      "saharaReuse": "Reuse administrative insurance navigation with qualified support.",
+      "status": "proposal"
+    },
+    {
+      "id": "G054",
+      "category": "Finance and administration",
+      "title": "Remind customers of a verified due date",
+      "user": "Consenting customer",
+      "workflow": "Actual account due amount and date -> generate a permitted reminder and capture questions -> record acknowledgement or human callback request.",
+      "sarvamCapability": "Voice Agents",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/voice-agents/overview"
+      ],
+      "implementationBoundary": "Comply with calling, collections and privacy rules; no coercion, hidden fees or automatic debit.",
+      "saharaReuse": "Do not reuse for charging patients for essential care.",
+      "status": "proposal"
+    },
+    {
+      "id": "G055",
+      "category": "Finance and administration",
+      "title": "Explain a genuine fraud alert safely",
+      "user": "Bank support operator",
+      "workflow": "Bank-generated alert event and approved safety script -> translate and speak the alert -> direct the customer to the bank's verified channel.",
+      "sarvamCapability": "Voice Agents; Mayura",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/voice-agents/overview",
+        "https://docs.sarvam.ai/api/getting-started/models/mayura"
+      ],
+      "implementationBoundary": "Never ask for OTPs, PINs or passwords; fraud detection and trusted delivery originate from the bank, not the model.",
+      "saharaReuse": "Reuse anti-scam education using only approved public scripts.",
+      "status": "proposal"
+    },
+    {
+      "id": "G056",
+      "category": "Finance and administration",
+      "title": "Read a statement accessibly",
+      "user": "Account holder",
+      "workflow": "User-authorised statement and selected date range -> extract transactions and synthesize an itemised reading -> let the holder navigate entries.",
+      "sarvamCapability": "Sarvam Vision; Bulbul",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-vision",
+        "https://docs.sarvam.ai/api/getting-started/models/bulbul"
+      ],
+      "implementationBoundary": "Treat financial data as confidential; verify amounts and never speak private balances on an unverified shared channel.",
+      "saharaReuse": "Reuse private read-aloud controls after appropriate data safeguards.",
+      "status": "proposal"
+    },
+    {
+      "id": "G057",
+      "category": "Finance and administration",
+      "title": "Explain an unfamiliar fee line",
+      "user": "Customer reviewing a bill",
+      "workflow": "Exact fee description, bill and tariff document -> retrieve matching tariff wording -> explain the charge or draft a clarification request.",
+      "sarvamCapability": "Sarvam-105B grounded comparison",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-105b",
+        "https://docs.sarvam.ai/api/integration/langchain"
+      ],
+      "implementationBoundary": "The model cannot establish whether a fee is lawful; staff review and source evidence are needed for disputes.",
+      "saharaReuse": "Reuse transparent explanation of any institutional service charges.",
+      "status": "proposal"
+    },
+    {
+      "id": "G058",
+      "category": "Finance and administration",
+      "title": "Index paperwork for a tax professional",
+      "user": "Small business owner",
+      "workflow": "Permitted receipts, certificates and statements -> extract document types, periods and missing references -> create a source-linked preparation index.",
+      "sarvamCapability": "Sarvam Vision; Sarvam-105B",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-vision",
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-105b"
+      ],
+      "implementationBoundary": "Not tax calculation, filing or legal advice; retain original records and restrict access.",
+      "saharaReuse": "Reuse non-patient organisational compliance preparation.",
+      "status": "proposal"
+    },
+    {
+      "id": "G059",
+      "category": "Finance and administration",
+      "title": "Draft a grant utilisation narrative from evidence",
+      "user": "Nonprofit project manager",
+      "workflow": "Verified expenditure rows and activity logs -> draft narrative sections tied to each evidence item -> prepare a reviewer-ready grant report.",
+      "sarvamCapability": "Sarvam-105B structured generation",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-105b",
+        "https://docs.sarvam.ai/api/integration/langchain"
+      ],
+      "implementationBoundary": "Calculate figures separately; do not invent beneficiary counts, impact or approvals.",
+      "saharaReuse": "Reuse for a truthful Sahara CSR or grant report.",
+      "status": "proposal"
+    },
+    {
+      "id": "G060",
+      "category": "Finance and administration",
+      "title": "Translate a remittance receipt for its recipient",
+      "user": "Migrant worker",
+      "workflow": "Authorised transfer receipt -> extract reference, currency, fee and recipient information -> produce a reviewed translated explanation.",
+      "sarvamCapability": "Sarvam Vision; Sarvam Translate",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-vision",
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-translate"
+      ],
+      "implementationBoundary": "No currency conversion from model memory, payment initiation or proof of settlement beyond the source receipt.",
+      "saharaReuse": "Reuse source-faithful administrative document explanation.",
+      "status": "proposal"
+    },
+    {
+      "id": "G061",
+      "category": "Documents and knowledge",
+      "title": "Preserve a scanned cultural archive",
+      "user": "Library or cultural trust",
+      "workflow": "Rights-cleared scanned books -> OCR with reading order and headings -> create proofread searchable text linked to the scan.",
+      "sarvamCapability": "Sarvam Vision",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-vision"
+      ],
+      "implementationBoundary": "Special typography requires evaluation; digitisation is not proof that every character is accurate or copyright has expired.",
+      "saharaReuse": "Reuse the source-preservation and proofreading workbench pattern.",
+      "status": "proposal"
+    },
+    {
+      "id": "G062",
+      "category": "Documents and knowledge",
+      "title": "Digitise a handwritten attendance register",
+      "user": "Community organisation clerk",
+      "workflow": "Permitted register pages -> extract names, dates and recorded attendance -> show a row-by-row correction screen before import.",
+      "sarvamCapability": "Sarvam Vision",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-vision"
+      ],
+      "implementationBoundary": "Do not infer attendance from blank cells or accept OCR names without review; retain access-controlled originals.",
+      "saharaReuse": "Reuse for volunteer registers, not fabricated visit proof.",
+      "status": "proposal"
+    },
+    {
+      "id": "G063",
+      "category": "Documents and knowledge",
+      "title": "Recover tables from scanned reports",
+      "user": "Research analyst",
+      "workflow": "Scanned non-medical report tables -> extract cell structure and units -> export CSV with original page references.",
+      "sarvamCapability": "Sarvam Vision",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-vision"
+      ],
+      "implementationBoundary": "Merged cells, totals and decimal points need verification; exporting a table does not validate its source statistics.",
+      "saharaReuse": "Reuse for administrative research and published statistics.",
+      "status": "proposal"
+    },
+    {
+      "id": "G064",
+      "category": "Documents and knowledge",
+      "title": "Compare contract versions by clause",
+      "user": "Procurement or legal assistant",
+      "workflow": "Two authorised text versions -> align clauses and explain additions or deletions -> produce a source-linked change list.",
+      "sarvamCapability": "Sarvam-105B long-context analysis",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-105b"
+      ],
+      "implementationBoundary": "Qualified counsel reviews legal meaning; model-generated comparison is not legal advice or signature authority.",
+      "saharaReuse": "Reuse for vendor-contract preparation with review.",
+      "status": "proposal"
+    },
+    {
+      "id": "G065",
+      "category": "Documents and knowledge",
+      "title": "Translate a formatted operations manual",
+      "user": "Technical publisher",
+      "workflow": "Rights-cleared PDF or Office manual -> document translation with glossary review -> export translated files in the original format.",
+      "sarvamCapability": "Document Translation API",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/doc-translation/overview"
+      ],
+      "implementationBoundary": "Confirm formatting and safety-critical terminology; job success alone is not an approved usable manual.",
+      "saharaReuse": "Reuse for reviewed non-clinical training manuals.",
+      "status": "proposal"
+    },
+    {
+      "id": "G066",
+      "category": "Documents and knowledge",
+      "title": "Prefill a credential profile from certificates",
+      "user": "Training administrator",
+      "workflow": "User-provided course certificates -> extract issuer, course, dates and named person -> prepare a profile for confirmation.",
+      "sarvamCapability": "Sarvam Vision; structured output",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-vision",
+        "https://docs.sarvam.ai/api/integration/langchain"
+      ],
+      "implementationBoundary": "Extraction is not certificate authenticity or professional licence verification; check with issuers separately.",
+      "saharaReuse": "Reuse for staff training records, not automatic clinician credentialing.",
+      "status": "proposal"
+    },
+    {
+      "id": "G067",
+      "category": "Documents and knowledge",
+      "title": "Find blank or contradictory form entries",
+      "user": "Back-office reviewer",
+      "workflow": "Completed form and explicit validation rules -> extract fields and identify omissions or conflicting dates -> provide an actionable correction list.",
+      "sarvamCapability": "Sarvam Vision; Sarvam-105B",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-vision",
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-105b"
+      ],
+      "implementationBoundary": "Do not invent missing fields or override user responses; deterministic validation handles dates and formats.",
+      "saharaReuse": "Reuse for fewer failed administrative form submissions.",
+      "status": "proposal"
+    },
+    {
+      "id": "G068",
+      "category": "Documents and knowledge",
+      "title": "Queue cross-document discrepancies",
+      "user": "Caseworker",
+      "workflow": "Authorised documents from the same claimed record -> compare extracted names and dates -> flag potential mismatches with source snippets.",
+      "sarvamCapability": "Sarvam Vision; structured output",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-vision",
+        "https://docs.sarvam.ai/api/integration/langchain"
+      ],
+      "implementationBoundary": "This is not identity verification or a fraud verdict; humans resolve spelling variations and data rights.",
+      "saharaReuse": "Reuse for non-clinical paperwork consistency review.",
+      "status": "proposal"
+    },
+    {
+      "id": "G069",
+      "category": "Documents and knowledge",
+      "title": "Build a bilingual source-linked knowledge search",
+      "user": "Organisation knowledge steward",
+      "workflow": "Approved document corpus -> OCR where needed, index externally and retrieve passages -> answer questions with exact sources and language choice.",
+      "sarvamCapability": "Sarvam Vision; Sarvam-105B",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-vision",
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-105b"
+      ],
+      "implementationBoundary": "Search storage, retrieval and access control are ours to implement; answer abstention and source citations must be tested.",
+      "saharaReuse": "Reuse for an approved care-education library, with clinical review.",
+      "status": "proposal"
+    },
+    {
+      "id": "G070",
+      "category": "Documents and knowledge",
+      "title": "Draft a formal letter from verified facts",
+      "user": "Resident or administrator",
+      "workflow": "User-confirmed facts and a selected correspondence template -> generate a concise letter -> user reviews, exports and chooses whether to send.",
+      "sarvamCapability": "Sarvam-105B; Sarvam Translate",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-105b",
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-translate"
+      ],
+      "implementationBoundary": "No fabricated claims, signatures, legal status or submission receipt; sending is a separate authorised action.",
+      "saharaReuse": "Reuse for administrative requests and support correspondence.",
+      "status": "proposal"
+    },
+    {
+      "id": "G071",
+      "category": "Media and publishing",
+      "title": "Generate a narrated podcast from an approved script",
+      "user": "Audio producer",
+      "workflow": "Rights-cleared script with speaker labels -> synthesize distinct preset voices -> assemble a reviewed episode with chapter markers.",
+      "sarvamCapability": "Bulbul TTS",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/bulbul",
+        "https://docs.sarvam.ai/api/getting-started/commercial-licensing"
+      ],
+      "implementationBoundary": "Use appropriate output rights and disclose synthetic voices; editing and audio assembly are separate work.",
+      "saharaReuse": "Reuse for short approved educational audio episodes.",
+      "status": "proposal"
+    },
+    {
+      "id": "G072",
+      "category": "Media and publishing",
+      "title": "Dub an existing explainer video",
+      "user": "Video publisher",
+      "workflow": "Consented original recording -> translate the transcript and synthesize speaker-preserving audio -> export reviewed video, audio and subtitles.",
+      "sarvamCapability": "Dubbing API",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/dubbing/overview",
+        "https://docs.sarvam.ai/api/getting-started/commercial-licensing"
+      ],
+      "implementationBoundary": "Dubbing availability and voice consent must be checked; it does not automatically verify factual claims.",
+      "saharaReuse": "Reuse for approved regional-language caregiver explainers.",
+      "status": "proposal"
+    },
+    {
+      "id": "G073",
+      "category": "Media and publishing",
+      "title": "Narrate author-written audio descriptions",
+      "user": "Accessible-media editor",
+      "workflow": "Human-written scene descriptions and timings -> synthesize narration -> mix into an accessibility track.",
+      "sarvamCapability": "Bulbul TTS",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/bulbul"
+      ],
+      "implementationBoundary": "The human supplies the visual description; do not imply Sarvam TTS can inspect a video or guarantee accessibility compliance.",
+      "saharaReuse": "Reuse for accessible walkthroughs of the real app.",
+      "status": "proposal"
+    },
+    {
+      "id": "G074",
+      "category": "Media and publishing",
+      "title": "Prepare editable subtitle tracks from recordings",
+      "user": "Subtitling editor",
+      "workflow": "Consented recorded interview -> transcribe with timestamps and segment externally -> provide an editable subtitle timeline.",
+      "sarvamCapability": "Saaras batch transcription",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/saaras"
+      ],
+      "implementationBoundary": "Timestamps are chunk-level, not guaranteed word-level; a subtitle editor checks timing and speaker changes.",
+      "saharaReuse": "Reuse for recorded education content with human review.",
+      "status": "proposal"
+    },
+    {
+      "id": "G075",
+      "category": "Media and publishing",
+      "title": "Create a source-dated spoken news brief",
+      "user": "Regional publisher",
+      "workflow": "Licensed current articles -> draft a short source-linked summary and synthesize it -> publish an editor-approved audio bulletin.",
+      "sarvamCapability": "Sarvam-105B; Bulbul",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-105b",
+        "https://docs.sarvam.ai/api/getting-started/models/bulbul"
+      ],
+      "implementationBoundary": "News retrieval, licensing and fact checking remain editorial work; do not present model memory as current news.",
+      "saharaReuse": "Reuse the brief format for verified service announcements.",
+      "status": "proposal"
+    },
+    {
+      "id": "G076",
+      "category": "Media and publishing",
+      "title": "Adapt campaign copy across languages",
+      "user": "Small organisation communications lead",
+      "workflow": "Approved campaign facts and brand constraints -> generate culturally appropriate variants -> review and publish selected copy.",
+      "sarvamCapability": "Sarvam-105B; Mayura",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-105b",
+        "https://docs.sarvam.ai/api/getting-started/models/mayura"
+      ],
+      "implementationBoundary": "No invented endorsements, testimonials, medical benefits or misleading scarcity; review meaning in each target language.",
+      "saharaReuse": "Reuse for truthful awareness campaigns.",
+      "status": "proposal"
+    },
+    {
+      "id": "G077",
+      "category": "Media and publishing",
+      "title": "Produce dialogue assets for a game",
+      "user": "Game developer",
+      "workflow": "Original character lines -> synthesize selected authorised voices -> export and integrate reviewed audio assets.",
+      "sarvamCapability": "Bulbul TTS",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/bulbul",
+        "https://docs.sarvam.ai/api/getting-started/commercial-licensing"
+      ],
+      "implementationBoundary": "Check commercial output rights and prohibited impersonation; runtime game logic is not supplied by TTS.",
+      "saharaReuse": "Reuse only for fictional training role-plays, if needed.",
+      "status": "proposal"
+    },
+    {
+      "id": "G078",
+      "category": "Media and publishing",
+      "title": "Preserve an oral-history interview",
+      "user": "Community archivist",
+      "workflow": "Consented interview audio -> transcribe verbatim, label speakers and add translations -> provide a searchable archive with original audio.",
+      "sarvamCapability": "Saaras; Mayura",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/saaras",
+        "https://docs.sarvam.ai/api/getting-started/models/mayura"
+      ],
+      "implementationBoundary": "Consent must cover publication and reuse; retain uncertain passages rather than invent memories.",
+      "saharaReuse": "Reuse the consent and provenance approach for non-clinical storytelling.",
+      "status": "proposal"
+    },
+    {
+      "id": "G079",
+      "category": "Media and publishing",
+      "title": "Build a reviewed pronunciation asset library",
+      "user": "Publisher with local names",
+      "workflow": "Verified names, pronunciations and reusable phrases -> generate and human-check audio variants -> publish approved reusable clips.",
+      "sarvamCapability": "Bulbul TTS",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/bulbul"
+      ],
+      "implementationBoundary": "Native-speaker checking remains necessary; a generated pronunciation is not authoritative because the model is Indian-language focused.",
+      "saharaReuse": "Reuse for centre names and standard app prompts.",
+      "status": "proposal"
+    },
+    {
+      "id": "G080",
+      "category": "Media and publishing",
+      "title": "Check translated copy against a terminology glossary",
+      "user": "Bilingual editor",
+      "workflow": "Original text, candidate translation and approved glossary -> compare meaning and defined terms -> highlight passages for human correction.",
+      "sarvamCapability": "Sarvam-105B; Mayura",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-105b",
+        "https://docs.sarvam.ai/api/getting-started/models/mayura"
+      ],
+      "implementationBoundary": "Model agreement is not independent verification; qualified editors approve consequential wording.",
+      "saharaReuse": "Reuse for bilingual palliative-care terminology under clinical review.",
+      "status": "proposal"
+    },
+    {
+      "id": "G081",
+      "category": "Personal tools and accessibility",
+      "title": "Capture a daily task list by voice",
+      "user": "Busy or low-literacy user",
+      "workflow": "Spoken tasks and constraints -> extract separate tasks and ask about unclear wording -> save an editable checklist.",
+      "sarvamCapability": "Saaras; structured output",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/saaras",
+        "https://docs.sarvam.ai/api/integration/langchain"
+      ],
+      "implementationBoundary": "The app supplies persistence and undo; do not assign invented deadlines or contacts.",
+      "saharaReuse": "Reuse for caregiver non-clinical chores.",
+      "status": "proposal"
+    },
+    {
+      "id": "G082",
+      "category": "Personal tools and accessibility",
+      "title": "Set a reminder through a short conversation",
+      "user": "User who prefers speaking",
+      "workflow": "Spoken reminder request -> resolve the user's explicit local date and time and read it back -> schedule a confirmed device reminder.",
+      "sarvamCapability": "Saaras; Sarvam-105B tool calling",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/saaras",
+        "https://docs.sarvam.ai/api/integration/langchain"
+      ],
+      "implementationBoundary": "Scheduling, time-zone handling and notification delivery need native code; model output alone is not an active reminder.",
+      "saharaReuse": "Reuse for existing prescribed schedules without changing doses.",
+      "status": "proposal"
+    },
+    {
+      "id": "G083",
+      "category": "Personal tools and accessibility",
+      "title": "Fill an existing form through dictation",
+      "user": "Person with limited dexterity",
+      "workflow": "Chosen visible field and spoken answer -> transcribe into that field -> preserve an editable value and offer the next required field.",
+      "sarvamCapability": "Saaras",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/saaras"
+      ],
+      "implementationBoundary": "Respect field identity and accessibility focus; no automatic consequential submission or invention of user data.",
+      "saharaReuse": "Reuse to reduce typing in Sahara forms.",
+      "status": "proposal"
+    },
+    {
+      "id": "G084",
+      "category": "Personal tools and accessibility",
+      "title": "Read a printed notice aloud",
+      "user": "Person who cannot comfortably read the notice",
+      "workflow": "User-provided notice scan -> OCR and synthesize the selected passage -> provide audio with zoomable original text.",
+      "sarvamCapability": "Sarvam Vision; Bulbul",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-vision",
+        "https://docs.sarvam.ai/api/getting-started/models/bulbul"
+      ],
+      "implementationBoundary": "Ask about unclear dates and amounts; no guaranteed scene understanding or replacement for official advice.",
+      "saharaReuse": "Reuse for approved written instructions after verification.",
+      "status": "proposal"
+    },
+    {
+      "id": "G085",
+      "category": "Personal tools and accessibility",
+      "title": "Compose a message from a voice note",
+      "user": "User writing to a known contact",
+      "workflow": "Spoken intended message and chosen tone -> transcribe and lightly organise it -> return an editable text draft.",
+      "sarvamCapability": "Saaras; Sarvam-105B",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/saaras",
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-105b"
+      ],
+      "implementationBoundary": "No sending without user confirmation and no invented commitments or intimate familiarity.",
+      "saharaReuse": "Reuse to prepare a message to an existing care coordinator.",
+      "status": "proposal"
+    },
+    {
+      "id": "G086",
+      "category": "Personal tools and accessibility",
+      "title": "Prepare a travel booking shortlist",
+      "user": "Traveller",
+      "workflow": "Spoken dates, budget and accessibility needs -> query real authorised travel inventory -> compare a few options for review.",
+      "sarvamCapability": "Saaras; Sarvam-105B tools",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/saaras",
+        "https://docs.sarvam.ai/api/integration/langchain"
+      ],
+      "implementationBoundary": "A separate provider supplies availability and prices; booking and payment require explicit confirmation.",
+      "saharaReuse": "Reuse the comparison interface for verified transport options.",
+      "status": "proposal"
+    },
+    {
+      "id": "G087",
+      "category": "Personal tools and accessibility",
+      "title": "Translate a transport announcement",
+      "user": "Traveller who cannot understand the announcement",
+      "workflow": "Consented captured announcement -> transcribe and translate the text -> show original and translated wording.",
+      "sarvamCapability": "Saaras; Mayura",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/saaras",
+        "https://docs.sarvam.ai/api/getting-started/models/mayura"
+      ],
+      "implementationBoundary": "Noisy public-address audio needs testing; display uncertainty and do not promise platform changes or live travel status beyond the recording.",
+      "saharaReuse": "Reuse a source-visible translation interface.",
+      "status": "proposal"
+    },
+    {
+      "id": "G088",
+      "category": "Personal tools and accessibility",
+      "title": "Control permitted home devices by voice",
+      "user": "User with limited mobility",
+      "workflow": "Spoken device command -> extract an allow-listed intent and target -> ask confirmation where needed and invoke the authorised device API.",
+      "sarvamCapability": "Saaras; Sarvam-105B tool calling",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/saaras",
+        "https://docs.sarvam.ai/api/integration/langchain"
+      ],
+      "implementationBoundary": "Device integration, authentication and safety interlocks are separate; never unlock doors or operate hazardous equipment from an uncertain transcript.",
+      "saharaReuse": "Reuse only low-risk accessibility controls.",
+      "status": "proposal"
+    },
+    {
+      "id": "G089",
+      "category": "Personal tools and accessibility",
+      "title": "Screen unknown calls for a personal inbox",
+      "user": "User receiving unwanted calls",
+      "workflow": "Incoming caller conversation -> capture identity claim and stated purpose -> present a call summary and user-controlled callback option.",
+      "sarvamCapability": "Voice Agents; Saaras",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/voice-agents/overview",
+        "https://docs.sarvam.ai/api/getting-started/models/saaras"
+      ],
+      "implementationBoundary": "Telephony access, recording consent and call-routing support are prerequisites; claimed caller identity is not verified identity.",
+      "saharaReuse": "Reuse the human callback queue pattern; do not impersonate a clinician.",
+      "status": "proposal"
+    },
+    {
+      "id": "G090",
+      "category": "Personal tools and accessibility",
+      "title": "Search a private spoken journal",
+      "user": "User keeping personal notes",
+      "workflow": "Consented voice entries -> transcribe and index externally -> retrieve matching personal entries with dates and original snippets.",
+      "sarvamCapability": "Saaras; Sarvam-105B retrieval",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/saaras",
+        "https://docs.sarvam.ai/api/integration/langchain"
+      ],
+      "implementationBoundary": "Private storage, deletion and access controls are ours; no emotional diagnosis or claim of perfect memory.",
+      "saharaReuse": "Reuse a private search pattern only after appropriate health-data terms and consent.",
+      "status": "proposal"
+    },
+    {
+      "id": "G091",
+      "category": "Developer and data tools",
+      "title": "Draft a scoped code change from a requirement",
+      "user": "Software developer",
+      "workflow": "Repository excerpt, tests and a bounded requirement -> propose a patch with an explanation -> developer reviews and runs it in the existing project.",
+      "sarvamCapability": "Sarvam-105B coding",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-105b"
+      ],
+      "implementationBoundary": "Generated code needs testing and security review; never expose repository secrets or claim a deployed change from a code draft.",
+      "saharaReuse": "Reuse for Sahara maintenance with the normal review and build process.",
+      "status": "proposal"
+    },
+    {
+      "id": "G092",
+      "category": "Developer and data tools",
+      "title": "Design behaviour-focused test cases",
+      "user": "QA engineer",
+      "workflow": "Feature contract and known failure modes -> generate edge-case scenarios and expected outcomes -> produce a reviewed test plan or test skeletons.",
+      "sarvamCapability": "Sarvam-105B reasoning",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-105b"
+      ],
+      "implementationBoundary": "Tests must exercise real behaviour; generated passing-looking output is not evidence that any test ran.",
+      "saharaReuse": "Reuse for less-click flows and data-preservation regressions.",
+      "status": "proposal"
+    },
+    {
+      "id": "G093",
+      "category": "Developer and data tools",
+      "title": "Triage sanitised error logs",
+      "user": "Support engineer",
+      "workflow": "Redacted logs plus deployment facts -> group failures and propose likely causes -> return evidence-linked investigation steps.",
+      "sarvamCapability": "Sarvam-105B long-context analysis",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-105b"
+      ],
+      "implementationBoundary": "Remove secrets and personal data; hypotheses remain hypotheses until reproduced and fixed.",
+      "saharaReuse": "Reuse for private operational debugging without patient records.",
+      "status": "proposal"
+    },
+    {
+      "id": "G094",
+      "category": "Developer and data tools",
+      "title": "Ask questions of an allow-listed analytics database",
+      "user": "Operations analyst",
+      "workflow": "Natural-language question and approved schema -> draft a read-only query -> validate and execute through a constrained backend, then explain the actual result.",
+      "sarvamCapability": "Sarvam-105B tool calling and structured output",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-105b",
+        "https://docs.sarvam.ai/api/integration/langchain"
+      ],
+      "implementationBoundary": "Enforce row permissions and read-only access in code, not the prompt; never execute unrestricted model SQL.",
+      "saharaReuse": "Reuse for authorised aggregate product analytics after privacy review.",
+      "status": "proposal"
+    },
+    {
+      "id": "G095",
+      "category": "Developer and data tools",
+      "title": "Pre-label a language dataset for human annotation",
+      "user": "Research team",
+      "workflow": "Rights-cleared text and a fixed label guide -> suggest categories with supporting spans -> send uncertain cases to annotators.",
+      "sarvamCapability": "Sarvam-105B structured output",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-105b",
+        "https://docs.sarvam.ai/api/integration/langchain"
+      ],
+      "implementationBoundary": "Generated labels are provisional; use independent human checks and avoid fabricated confidence statistics.",
+      "saharaReuse": "Reuse for de-identified support categories, not autonomous clinical labels.",
+      "status": "proposal"
+    },
+    {
+      "id": "G096",
+      "category": "Developer and data tools",
+      "title": "Build a speech-recognition evaluation workbench",
+      "user": "Voice-product engineer",
+      "workflow": "Consented test audio and human reference transcripts -> run selected Saaras configurations and calculate error rates externally -> compare real measured errors by scenario.",
+      "sarvamCapability": "Saaras transcription modes",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/saaras"
+      ],
+      "implementationBoundary": "The app must implement scoring and sample governance; do not substitute vendor benchmarks for our measured accents, noise and terminology.",
+      "saharaReuse": "Reuse before any clinical dictation pilot, using synthetic or explicitly permitted data.",
+      "status": "proposal"
+    },
+    {
+      "id": "G097",
+      "category": "Developer and data tools",
+      "title": "Review software localisation in context",
+      "user": "Mobile app localisation editor",
+      "workflow": "UI string keys, screenshots described by the team and glossary -> translate strings and flag length or terminology risks -> produce a reviewable localisation file.",
+      "sarvamCapability": "Mayura; Sarvam-105B",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/mayura",
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-105b"
+      ],
+      "implementationBoundary": "Developers still check rendered layouts, placeholders and plural rules; translation alone does not verify UI fit.",
+      "saharaReuse": "Reuse directly for Sahara's Hindi, Kannada and other approved language screens.",
+      "status": "proposal"
+    },
+    {
+      "id": "G098",
+      "category": "Developer and data tools",
+      "title": "Generate synthetic conversation fixtures",
+      "user": "Conversational-product tester",
+      "workflow": "Explicit fictional personas and coverage goals -> generate varied test dialogues and optional synthetic audio -> feed a labelled test suite.",
+      "sarvamCapability": "Sarvam-105B; Bulbul",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-105b",
+        "https://docs.sarvam.ai/api/getting-started/models/bulbul"
+      ],
+      "implementationBoundary": "Keep fixtures visibly synthetic in test tooling; no real-person voice cloning or claims that simulated calls prove field performance.",
+      "saharaReuse": "Reuse for goals-of-care interaction tests without real patient conversations.",
+      "status": "proposal"
+    },
+    {
+      "id": "G099",
+      "category": "Developer and data tools",
+      "title": "Route a natural-language request to safe app tools",
+      "user": "Product engineer",
+      "workflow": "User request and an allow-list of app actions -> select a typed tool call with validated arguments -> show the resulting real action or a confirmation.",
+      "sarvamCapability": "Sarvam-105B tool calling",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/integration/langchain"
+      ],
+      "implementationBoundary": "Permissions, idempotency and confirmation are backend responsibilities; model tool selection does not confer authorisation.",
+      "saharaReuse": "Reuse for fewer taps when opening an existing record or drafting a task.",
+      "status": "proposal"
+    },
+    {
+      "id": "G100",
+      "category": "Developer and data tools",
+      "title": "Map requirements to missing verification evidence",
+      "user": "Delivery lead",
+      "workflow": "Adopted requirements, actual implementation notes and real test results -> map each requirement to evidence and gaps -> generate a reviewer checklist.",
+      "sarvamCapability": "Sarvam-105B document reasoning",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-105b"
+      ],
+      "implementationBoundary": "Do not invent test runs, approvals or coverage; retain links to the actual evidence and mark absent proof.",
+      "saharaReuse": "Reuse for Sahara release readiness without confusing a build with Play approval.",
+      "status": "proposal"
+    }
+  ],
+  "realExamples": [
+    {
+      "name": "Equal AI Call Screening Assistant",
+      "url": "https://www.sarvam.ai/stories/equal",
+      "sourceUrl": "https://www.sarvam.ai/stories/equal",
+      "evidenceType": "company-reported",
+      "whatBuilt": "A personal call assistant that speaks to incoming callers and returns their stated purpose, a summary and recording.",
+      "howSarvamUsed": "Sarvam's speech-recognition stack provides transcription, including Roman-script output, streaming, batch processing and diarisation. The story identifies Saaras v3 as its principal deployed model.",
+      "whatIsNotEstablished": "The story does not establish that Sarvam supplies every LLM, TTS or routing component. Volume and reliability claims are company-reported, not independently audited here.",
+      "verifiedDate": "2026-10-15"
+    },
+    {
+      "name": "Supernova Nova AI English tutor",
+      "url": "https://www.sarvam.ai/stories/supernova",
+      "sourceUrl": "https://www.sarvam.ai/stories/supernova",
+      "evidenceType": "company-reported",
+      "whatBuilt": "A conversational spoken-English learning product with feedback and support when a learner asks questions in a regional language.",
+      "howSarvamUsed": "Its reported integration sends learner speech through Sarvam STT in translate mode, yielding English text for downstream tutoring even when the learner switches languages.",
+      "whatIsNotEstablished": "This is not evidence of a clinically validated tutor, universal accent accuracy or that all downstream reasoning is Sarvam. Reported business metrics were not independently measured.",
+      "verifiedDate": "2026-10-15"
+    },
+    {
+      "name": "IIM Udaipur bilingual BBA lecture workflow",
+      "url": "https://www.sarvam.ai/stories/iim-udaipur",
+      "sourceUrl": "https://www.sarvam.ai/stories/iim-udaipur",
+      "evidenceType": "company-reported",
+      "whatBuilt": "A faculty-led Hindi master recording becomes an English dubbed lecture without requiring a second teaching recording.",
+      "howSarvamUsed": "Sarvam transcribes, translates and dubs while preserving speaker characteristics and timing; academic teams review terminology and translated meaning before release.",
+      "whatIsNotEstablished": "Reported annual content volumes and the three-year content goal should not be treated as all already completed. Human academic review remains part of the workflow.",
+      "verifiedDate": "2026-10-15"
+    },
+    {
+      "name": "Dezerv post-call analytics and searchable records",
+      "url": "https://www.sarvam.ai/stories/dezerv",
+      "sourceUrl": "https://www.sarvam.ai/stories/dezerv",
+      "evidenceType": "company-reported",
+      "whatBuilt": "Searchable, speaker-separated records from relationship-manager video meetings and calls, plus meeting note-taking.",
+      "howSarvamUsed": "Sarvam SDK and batch speech recognition with diarisation turn consented recordings into structured transcripts used by Dezerv's downstream analytics.",
+      "whatIsNotEstablished": "The story's zero-retention arrangement is specific to that customer's governance; it is not proof every public Sarvam account has identical terms. Financial advice remains outside this research.",
+      "verifiedDate": "2026-10-15"
+    },
+    {
+      "name": "Mahindra Finance voice agents",
+      "url": "https://www.sarvam.ai/stories/mahindra-finance-voice-agents",
+      "sourceUrl": "https://www.sarvam.ai/stories/mahindra-finance-voice-agents",
+      "evidenceType": "company-reported",
+      "whatBuilt": "Mahindra AI built multilingual conversational campaigns for customer engagement, collections and employee feedback.",
+      "howSarvamUsed": "Sarvam supplies the voice-agent platform; Mahindra's in-house predictive models choose campaign context and downstream pipelines connect results to operational systems.",
+      "whatIsNotEstablished": "This does not mean Sarvam alone supplies lending decisions, CRM, servicing, consent or payment execution. The reported call count is a named customer's claim.",
+      "verifiedDate": "2026-10-15"
+    },
+    {
+      "name": "UIDAI Aadhaar resident voice services",
+      "url": "https://www.sarvam.ai/stories/aadhaar",
+      "sourceUrl": "https://www.sarvam.ai/stories/aadhaar",
+      "evidenceType": "company-reported",
+      "whatBuilt": "Resident interactions for enrolment feedback, suspicious-authentication alerts and selected certification or age-verification processes.",
+      "howSarvamUsed": "The story describes a full Sarvam GenAI stack running on UIDAI-controlled air-gapped infrastructure with custom orchestration.",
+      "whatIsNotEstablished": "This is not a self-service public API integration or permission for Sahara to access Aadhaar data. Scale claims do not establish independent verification here.",
+      "verifiedDate": "2026-10-15"
+    },
+    {
+      "name": "Ekatra Gujarati literature digitisation",
+      "url": "https://www.sarvam.ai/stories/ekatra",
+      "sourceUrl": "https://www.sarvam.ai/stories/ekatra",
+      "evidenceType": "company-reported",
+      "whatBuilt": "A joint archive workflow converts historical Gujarati scans into editable, searchable, formatted ePub with human proofreading.",
+      "howSarvamUsed": "A specialised Sarvam pipeline recognises page structure and text in context; a proofreading workbench supports human correction before final output.",
+      "whatIsNotEstablished": "The50,000-book archive is a programme goal, not a verified count of finished books. The custom historical-text pipeline is not guaranteed identical to a generic public OCR request.",
+      "verifiedDate": "2026-10-15"
+    },
+    {
+      "name": "Digital Crop Survey farmer validation pilot",
+      "url": "https://www.sarvam.ai/stories/dcs",
+      "sourceUrl": "https://www.sarvam.ai/stories/dcs",
+      "evidenceType": "company-reported",
+      "whatBuilt": "A reported October2025 pilot collected farmers' confirmation or correction of administrative crop records in four states.",
+      "howSarvamUsed": "Multilingual Sarvam telephone agents were paired with WhatsApp follow-ups; discrepancies informed targeted field verification.",
+      "whatIsNotEstablished": "Later8-crore outreach and throughput figures are targets/capacity claims, not evidence those farmers were all reached. Farmer statements still require field/data verification.",
+      "verifiedDate": "2026-10-15"
+    }
+  ],
+  "sources": [
+    {
+      "title": "Saaras speech-recognition model",
+      "url": "https://docs.sarvam.ai/api/getting-started/models/saaras",
+      "verifiedDate": "2026-10-15",
+      "claim": "Current model page lists v4 as recommended and v3 as available; documents transcription modes, batch diarisation and streaming.",
+      "sourceType": "official primary source",
+      "verification": "Opened and read relevant page content; not an independent deployment audit."
+    },
+    {
+      "title": "Bulbul speech synthesis",
+      "url": "https://docs.sarvam.ai/api/getting-started/models/bulbul",
+      "verifiedDate": "2026-10-15",
+      "claim": "Current model page documents TTS, pace control, model-specific voice catalogues and differing language support.",
+      "sourceType": "official primary source",
+      "verification": "Opened and read relevant page content; not an independent deployment audit."
+    },
+    {
+      "title": "Sarvam-105B model",
+      "url": "https://docs.sarvam.ai/api/getting-started/models/sarvam-105b",
+      "verifiedDate": "2026-10-15",
+      "claim": "Documents text generation, reasoning, coding, long-context analysis and conversation-oriented variant.",
+      "sourceType": "official primary source",
+      "verification": "Opened and read relevant page content; not an independent deployment audit."
+    },
+    {
+      "title": "Mayura translation",
+      "url": "https://docs.sarvam.ai/api/getting-started/models/mayura",
+      "verifiedDate": "2026-10-15",
+      "claim": "Documents conversational translation, script and numeral control, with a limited supported language set.",
+      "sourceType": "official primary source",
+      "verification": "Opened and read relevant page content; not an independent deployment audit."
+    },
+    {
+      "title": "Sarvam Translate",
+      "url": "https://docs.sarvam.ai/api/getting-started/models/sarvam-translate",
+      "verifiedDate": "2026-10-15",
+      "claim": "Documents formal translation across 22 scheduled Indian languages and English.",
+      "sourceType": "official primary source",
+      "verification": "Opened and read relevant page content; not an independent deployment audit."
+    },
+    {
+      "title": "Sarvam Vision",
+      "url": "https://docs.sarvam.ai/api/getting-started/models/sarvam-vision",
+      "verifiedDate": "2026-10-15",
+      "claim": "Documents OCR, table extraction and document-structure preservation from scanned documents.",
+      "sourceType": "official primary source",
+      "verification": "Opened and read relevant page content; not an independent deployment audit."
+    },
+    {
+      "title": "Document Translation overview",
+      "url": "https://docs.sarvam.ai/api/api-guides-tutorials/doc-translation/overview",
+      "verifiedDate": "2026-10-15",
+      "claim": "Documents asynchronous, layout-preserving translation of supported document formats and per-language exports.",
+      "sourceType": "official primary source",
+      "verification": "Opened and read relevant page content; not an independent deployment audit."
+    },
+    {
+      "title": "Dubbing API overview",
+      "url": "https://docs.sarvam.ai/api/api-guides-tutorials/dubbing/overview",
+      "verifiedDate": "2026-10-15",
+      "claim": "Documents translating audio/video, speaker voice preservation and video/audio/subtitle exports; this is a distinct pipeline.",
+      "sourceType": "official primary source",
+      "verification": "Opened and read relevant page content; not an independent deployment audit."
+    },
+    {
+      "title": "Voice Agents overview",
+      "url": "https://docs.sarvam.ai/voice-agents/overview",
+      "verifiedDate": "2026-10-15",
+      "claim": "Documents conversational agent building across telephony, web, WhatsApp and API/SDK channels; service integrations still need configuration.",
+      "sourceType": "official primary source",
+      "verification": "Opened and read relevant page content; not an independent deployment audit."
+    },
+    {
+      "title": "Cowork overview",
+      "url": "https://docs.sarvam.ai/cowork/overview",
+      "verifiedDate": "2026-10-15",
+      "claim": "Documents connected-workspace workflows, reusable agents and scheduled tasks with external-system connectors.",
+      "sourceType": "official primary source",
+      "verification": "Opened and read relevant page content; not an independent deployment audit."
+    },
+    {
+      "title": "Call analytics cookbook",
+      "url": "https://docs.sarvam.ai/api/cookbook/guides/call-analytics-pipeline",
+      "verifiedDate": "2026-10-15",
+      "claim": "Official runnable design chains diarised transcription with structured analysis and summarisation; it is a recipe, not a customer deployment.",
+      "sourceType": "official primary source",
+      "verification": "Opened and read relevant page content; not an independent deployment audit."
+    },
+    {
+      "title": "WhatsApp bot cookbook",
+      "url": "https://docs.sarvam.ai/api/cookbook/guides/whats-app-bot",
+      "verifiedDate": "2026-10-15",
+      "claim": "Official recipe connects a Twilio WhatsApp webhook, STT, chat generation and optional TTS; production sender setup is separate.",
+      "sourceType": "official primary source",
+      "verification": "Opened and read relevant page content; not an independent deployment audit."
+    },
+    {
+      "title": "Official LangChain integration",
+      "url": "https://docs.sarvam.ai/api/integration/langchain",
+      "verifiedDate": "2026-10-15",
+      "claim": "Documents Sarvam-105B tool calling, streaming and structured-output integration; developers supply actual tools and safeguards.",
+      "sourceType": "official primary source",
+      "verification": "Opened and read relevant page content; not an independent deployment audit."
+    },
+    {
+      "title": "Commercial licensing",
+      "url": "https://docs.sarvam.ai/api/getting-started/commercial-licensing",
+      "verifiedDate": "2026-10-15",
+      "claim": "Documents consumed-credit audio output rights, no separate audio-production plan requirement, and consent obligations for voice cloning.",
+      "sourceType": "official primary source",
+      "verification": "Opened and read relevant page content; not an independent deployment audit."
+    },
+    {
+      "title": "Mahindra Finance customer story",
+      "url": "https://www.sarvam.ai/stories/mahindra-finance-voice-agents",
+      "verifiedDate": "2026-10-15",
+      "claim": "Vendor and named customer report agents built by Mahindra AI on Sarvam for sales, collections and employee feedback.",
+      "sourceType": "official primary source",
+      "verification": "Opened and read relevant page content; not an independent deployment audit."
+    },
+    {
+      "title": "IIM Udaipur customer story",
+      "url": "https://www.sarvam.ai/stories/iim-udaipur",
+      "verifiedDate": "2026-10-15",
+      "claim": "Named faculty describes reviewed Hindi-to-English lecture transcription, translation and dubbing with voice/timing preservation.",
+      "sourceType": "official primary source",
+      "verification": "Opened and read relevant page content; not an independent deployment audit."
+    },
+    {
+      "title": "Equal customer story",
+      "url": "https://www.sarvam.ai/stories/equal",
+      "verifiedDate": "2026-10-15",
+      "claim": "Vendor and named customer report the Call Screening Assistant uses Sarvam speech-recognition APIs including streaming, batch and diarisation.",
+      "sourceType": "official primary source",
+      "verification": "Opened and read relevant page content; not an independent deployment audit."
+    },
+    {
+      "title": "Dezerv customer story",
+      "url": "https://www.sarvam.ai/stories/dezerv",
+      "verifiedDate": "2026-10-15",
+      "claim": "Named customer describes SDK and batch diarised transcription for meetings and calls and searchable relationship records.",
+      "sourceType": "official primary source",
+      "verification": "Opened and read relevant page content; not an independent deployment audit."
+    },
+    {
+      "title": "Supernova customer story",
+      "url": "https://www.sarvam.ai/stories/supernova",
+      "verifiedDate": "2026-10-15",
+      "claim": "Named CTO describes Nova AI language learning using Sarvam STT translate mode for Indian-accented English and regional-language speech.",
+      "sourceType": "official primary source",
+      "verification": "Opened and read relevant page content; not an independent deployment audit."
+    },
+    {
+      "title": "UIDAI customer story",
+      "url": "https://www.sarvam.ai/stories/aadhaar",
+      "verifiedDate": "2026-10-15",
+      "claim": "Reports an on-premise air-gapped Sarvam platform for Aadhaar-related resident interactions; this is a custom institutional deployment.",
+      "sourceType": "official primary source",
+      "verification": "Opened and read relevant page content; not an independent deployment audit."
+    },
+    {
+      "title": "Ekatra Foundation customer story",
+      "url": "https://www.sarvam.ai/stories/ekatra",
+      "verifiedDate": "2026-10-15",
+      "claim": "Describes a joint Gujarati archive pipeline involving layout recognition, OCR and human proofreading to formatted ePub.",
+      "sourceType": "official primary source",
+      "verification": "Opened and read relevant page content; not an independent deployment audit."
+    },
+    {
+      "title": "Digital Crop Survey customer story",
+      "url": "https://www.sarvam.ai/stories/dcs",
+      "verifiedDate": "2026-10-15",
+      "claim": "Describes a completed October2025 multilingual telephone/WhatsApp farmer-validation pilot; later national targets are stated as plans.",
+      "sourceType": "official primary source",
+      "verification": "Opened and read relevant page content; not an independent deployment audit."
+    }
+  ]
+}
+

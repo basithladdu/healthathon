@@ -89,4 +89,46 @@ class NoteRulesTest {
         }
     }
     @Test fun hashCannotConfuseFieldBoundaries() { assertNotEquals(NoteRules.hash(listOf("ab", "c")), NoteRules.hash(listOf("a", "bc"))) }
+    @Test fun familyConfirmationsRequirePatientAndRemainDistinctAndIdempotent() {
+        val note=NoteRules.publish(person,NoteRules.organise(draft),"Reviewer",true,1)
+        assertThrows(IllegalArgumentException::class.java) {NoteRules.acknowledge(note,note,"Family one","Family / carer",true)}
+        val patient=NoteRules.acknowledge(note,note,"Patient","Patient",true)
+        val first=NoteRules.acknowledge(note,note,"Family one","Family / carer",true,listOf(patient))
+        val second=NoteRules.acknowledge(note,note,"Family two","Family / carer",true,listOf(patient,first))
+        assertEquals(3,setOf(patient.id,first.id,second.id).size)
+        assertEquals(first,NoteRules.acknowledge(note,note," family ONE ","Family / carer",true,listOf(patient,first,second)))
+        assertThrows(IllegalArgumentException::class.java) {NoteRules.acknowledge(note,note,"Another patient","Patient",true,listOf(patient))}
+        assertThrows(IllegalArgumentException::class.java) {NoteRules.acknowledge(note,note,"x".repeat(101),"Family / carer",true,listOf(patient))}
+    }
+    @Test fun legacyPublishedHashIsOpaqueAndStaleConfirmationsNeverCarryForward() {
+        val note=NoteRules.publish(person,NoteRules.organise(draft),"Reviewer",true,1).copy(contentHash="legacy-stored-hash")
+        val patient=NoteRules.acknowledge(note,note,"Patient","Patient",true)
+        assertEquals("legacy-stored-hash",patient.contentHash)
+        val newer=note.copy(id="new-note",version=2,contentHash="new-hash")
+        assertThrows(IllegalArgumentException::class.java) {NoteRules.acknowledge(newer,newer,"Family","Family / carer",true,listOf(patient))}
+        assertThrows(IllegalArgumentException::class.java) {NoteRules.acknowledge(note,note.copy(contentHash="tampered"),"Patient","Patient",true)}
+        assertFalse(NoteRules.text(newer,listOf(patient)).contains("Read and confirmed by"))
+        assertEquals("legacy-stored-hash",note.contentHash)
+    }
+    @Test fun exportsKeepAllExactVersionReadersAndHonestTranscriptionReview() {
+        val note=NoteRules.publish(person,NoteRules.organise(draft.copy(transcriptModel="fixture-model",transcribedAt=42)),"Reviewer",true,1)
+        val patient=NoteRules.acknowledge(note,note,"Patient","Patient",true)
+        val family=NoteRules.acknowledge(note,note,"Family","Family / carer",true,listOf(patient))
+        val text=NoteRules.text(note,listOf(family,patient))
+        assertTrue(text.indexOf("by Patient")<text.indexOf("by Family"))
+        assertTrue(text.contains("identity not verified"));assertTrue(text.contains("AI-generated"))
+        assertEquals(ReviewWorkflow.NOT_VERIFIED,note.reviewerVerification)
+    }
+    @Test fun importedVerificationStringsNeverBecomeTrustedClinicalIdentity() {
+        val original=NoteRules.publish(person,NoteRules.organise(draft),"Reviewer",true,1)
+        listOf("","unknown","verified","hospital_approved",ReviewWorkflow.NOT_VERIFIED).forEach {claim ->
+            val imported=original.copy(reviewStatus=ReviewWorkflow.CLINICIAN_VERIFIED,reviewerVerification=claim)
+            assertEquals("Imported review · identity not verified",ReviewWorkflow.label(imported))
+            assertFalse(NoteRules.text(imported).contains("Verified clinician review"))
+            assertEquals(claim,imported.reviewerVerification)
+            assertEquals(original.contentHash,imported.contentHash)
+        }
+        assertEquals("Review recorded · identity not verified",ReviewWorkflow.label(original))
+        assertEquals("Not clinically reviewed",ReviewWorkflow.label(original.copy(reviewStatus="unknown")))
+    }
 }

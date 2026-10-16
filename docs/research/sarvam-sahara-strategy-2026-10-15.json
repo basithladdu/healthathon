@@ -1,0 +1,360 @@
+{
+  "title": "Sarvam AI for Sahara: what to build and who could pay",
+  "researchDate": "2026-10-15",
+  "decision": "Use Sarvam for Indian-language care conversations, reviewed goals-of-care records and approved spoken explanations. Keep basic Sahara access free for patients and caregivers; sell the coordination workflow to care organisations.",
+  "scope": "Research and proposed product direction. No Sarvam integration, account activation, patient upload, billing, email, release or deployment was performed for this research.",
+  "benefits": [
+    {
+      "name": "Sarvam AI sponsor credits",
+      "evidence": "Health-a-thon Phase 2 update dated 13 October 2026 names Sarvam AI and says access instructions will follow.",
+      "confirmed": "The provider is Sarvam AI, rather than Servo AI.",
+      "unknown": "The sponsor allocation, redemption instructions, expiry, covered products, active balance and healthcare processing agreement are not established. No later access instructions were found in the connected email search.",
+      "nextUse": "Once access is issued, first run fictional Hindi/English/Telugu conversations and produce reviewed educational audio. Establish the account's healthcare data terms before using identifiable patient conversations."
+    },
+    {
+      "name": "ChatGPT Pro",
+      "evidence": "Health-a-thon offer dated 12 October 2026 promises one 30-day Pro subscription per team. A team reply is already present.",
+      "confirmed": "The email promises a subscription benefit; activation was not verified.",
+      "unknown": "It does not establish an OpenAI API allocation or an API budget for Sahara's users.",
+      "nextUse": "After Pro redemption, use it for development, literature synthesis with source checking, test design, synthetic multilingual fixtures and review of product copy. Use the intended account and share work outputs; do not assume shared credentials or patient-data permissions.",
+      "sourceUrls": [
+        "https://learn.chatgpt.com/docs/pricing"
+      ]
+    }
+  ],
+  "mechanisms": [
+    {
+      "name": "Speech recognition",
+      "tool": "Saaras",
+      "does": "Converts audio into editable text; batch diarisation separates speaker labels.",
+      "doesNot": "It does not know who a speaker is, validate a clinical statement or make a diagnosis.",
+      "sourceUrl": "https://docs.sarvam.ai/api/getting-started/models/saaras"
+    },
+    {
+      "name": "Generative drafting",
+      "tool": "Sarvam-105B",
+      "does": "Organises supplied text into a draft, extracts supported fields and rewrites approved content.",
+      "doesNot": "It does not supply a clinical evidence base, reliable citations or approved treatment by itself. Sahara must supply retrieval, validation and review.",
+      "sourceUrl": "https://docs.sarvam.ai/api/getting-started/models/sarvam-105b"
+    },
+    {
+      "name": "Translation",
+      "tool": "Sarvam Translate / Mayura",
+      "does": "Converts approved text between the selected supported languages.",
+      "doesNot": "It does not guarantee preservation of clinical negation, numbers or medicine names. Check the exact language/model pair.",
+      "sourceUrl": "https://docs.sarvam.ai/api/getting-started/models/mayura"
+    },
+    {
+      "name": "Speech synthesis",
+      "tool": "Bulbul",
+      "does": "Reads an approved text aloud using a supported preset voice.",
+      "doesNot": "Natural speech is not proof of a correct care plan. Use the approved version and make generated narration clear.",
+      "sourceUrl": "https://docs.sarvam.ai/api/getting-started/models/bulbul"
+    },
+    {
+      "name": "Document extraction",
+      "tool": "Sarvam Vision / extraction APIs",
+      "does": "Converts a supplied document into text or candidate structured fields.",
+      "doesNot": "It does not validate a prescription or justify changing a dose. Source image and clinician verification remain necessary.",
+      "sourceUrl": "https://docs.sarvam.ai/api/getting-started/models/sarvam-vision"
+    },
+    {
+      "name": "Conversational orchestration",
+      "tool": "Voice Agents",
+      "does": "Combines recognition, generation, speech and permitted tools for a conversation.",
+      "doesNot": "Bookings, authentication, verified directories, human handoff and actual writes still need a working service integration.",
+      "sourceUrl": "https://docs.sarvam.ai/voice-agents/overview"
+    }
+  ],
+  "shortlist": [
+    {
+      "rank": 1,
+      "title": "A reviewed goals-of-care record from a conversation",
+      "user": "Patient, family and palliative clinician",
+      "flow": "Consent to record → capture the conversation → edit transcript and confirm speakers → draft supported goals, understanding, preferences, decisions and open questions → clinician approves → patient sees the same dated version.",
+      "why": "This is Sahara's distinctive core and reduces repeated explanations across visits.",
+      "generativePart": "Source-constrained structuring, with each material statement linked to its transcript excerpt and speaker.",
+      "review": "Do not infer treatment limits, capacity, prognosis, DNR status or legal directives. Unknown and disputed statements stay visible. Approval is versioned; a later change needs a new review.",
+      "evidenceUrls": [
+        "https://www.sarvam.ai/stories/healthplix",
+        "https://www.sarvam.ai/stories/dezerv"
+      ],
+      "phase": "Core clinical pilot after data agreement and clinician-led evaluation",
+      "careGuidanceUrls": [
+        "https://www.ariadnelabs.org/resources/downloads/serious-illness-conversation-guide/"
+      ]
+    },
+    {
+      "rank": 2,
+      "title": "Listen to the approved plan",
+      "user": "Patient and caregiver",
+      "flow": "Open the clinician-approved plan → choose a tested language → listen, pause or replay a short section; keep the original text available.",
+      "why": "Useful when reading is tiring or the caregiver is more comfortable in another language.",
+      "generativePart": "Reviewed translation followed by speech synthesis; cache audio against the approved plan version.",
+      "review": "A bilingual clinical reviewer checks important numbers, medicine names and negation before patient-facing use. No invented expansion of instructions.",
+      "evidenceUrls": [
+        "https://www.sarvam.ai/stories/iim-udaipur",
+        "https://docs.sarvam.ai/api/getting-started/models/bulbul"
+      ],
+      "phase": "Start with approved general education; then personal plans after validation"
+    },
+    {
+      "rank": 3,
+      "title": "A voice diary that prepares the next visit",
+      "user": "Patient or caregiver",
+      "flow": "Speak a short update → confirm what was heard → save the dated note → create a source-linked visit brief and questions for the care team.",
+      "why": "Replaces a long form and helps families remember what changed.",
+      "generativePart": "Transcription, confirmed fact extraction and a chronological summary of the person's own reports.",
+      "review": "Label these entries patient-reported, separately from clinician-approved records. Do not turn self-reports into a diagnosis, predicted risk or a promise that a clinician is monitoring them. Display the agreed human contact route separately.",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/saaras",
+        "https://www.heypood.tech/"
+      ],
+      "phase": "Early assisted-record pilot; Pood is only a prototype precedent"
+    },
+    {
+      "rank": 4,
+      "title": "A practical caregiver handover",
+      "user": "Family caregivers and home-care nurses",
+      "flow": "Choose an approved care-plan version → dictate completed practical tasks and open questions → confirm owners → share a concise handover with permission.",
+      "why": "Reduces repeated calls when a different family member takes over.",
+      "generativePart": "Turns supported statements into a short, attributed checklist; read aloud if needed.",
+      "review": "Never silently assign medicines, alter administration instructions or identify the decision maker from a voice label. Real sharing requires authenticated roles and permission checks.",
+      "evidenceUrls": [
+        "https://www.sarvam.ai/stories/dezerv",
+        "https://docs.sarvam.ai/api/integration/langchain"
+      ],
+      "phase": "After authenticated sharing is verified",
+      "careGuidanceUrls": [
+        "https://www.cancer.gov/about-cancer/coping/family-friends/family-caregivers-pdq"
+      ]
+    },
+    {
+      "rank": 5,
+      "title": "Ask for care without completing another long form",
+      "user": "Family seeking a palliative service",
+      "flow": "Speak the location, language and access needs → confirm minimal details → search a maintained centre directory → show actual contact options and a draft enquiry.",
+      "why": "A clear support task that complements Sahara's MapLibre centres map.",
+      "generativePart": "Intent and location extraction, plain-language explanations and optionally spoken navigation.",
+      "review": "Availability, fees and bookings come from the service, not the model. Do not promise admission or send an enquiry without permission.",
+      "evidenceUrls": [
+        "https://www.sarvam.ai/stories/nha",
+        "https://docs.sarvam.ai/voice-agents/overview"
+      ],
+      "phase": "Early non-clinical flow"
+    },
+    {
+      "rank": 6,
+      "title": "Teach-back support for the nurse",
+      "user": "Nurse with patient or caregiver",
+      "flow": "Use an approved explanation → ask the person to describe it in their words → show a transcript beside the plan → nurse clarifies misunderstandings.",
+      "why": "Checks whether communication worked while preserving the human conversation.",
+      "generativePart": "Transcribe the response beside the approved explanation so the nurse can compare them. Automated highlighting of possible gaps is a later research option, requiring high-consequence omission and false-alarm evaluation.",
+      "review": "No pass/fail score for competence, consent or adherence; only a clinician can judge understanding and next steps.",
+      "evidenceUrls": [
+        "https://www.sarvam.ai/stories/supernova",
+        "https://docs.sarvam.ai/api/getting-started/models/saaras"
+      ],
+      "phase": "Later supervised usability study",
+      "careGuidanceUrls": [
+        "https://www.ahrq.gov/teamstepps-program/curriculum/communication/tools/teachback.html"
+      ]
+    }
+  ],
+  "architecture": {
+    "currentApp": "Keep the existing Kotlin / Jetpack Compose Android app, Room records and MapLibre centres. This research does not require a tech-stack change.",
+    "proposedFlow": [
+      "Explicit recording control and participant consent",
+      "Authenticated backend job with a minimum required audio segment",
+      "Saaras transcript; human-confirmed speaker identity",
+      "Source-linked structured draft with no unsupported fields",
+      "Clinician review and a dated immutable approved version",
+      "Checked translation and Bulbul audio tied to that version",
+      "Patient acknowledgement and role-limited sharing with access history"
+    ],
+    "backendWork": "API credentials stay server-side. Build real authentication, file permissions, job state, cancellation, retry/deduplication, deletion and audit history. Room persistence alone does not establish care-team sync.",
+    "dataTerms": "Sarvam's current terms apply a DPA for customer processing. They require professional involvement/review for tailored medical advice. The public privacy policy excludes enterprise content governed by customer agreements; it is not evidence of the exact retention, training or hosting terms for this account. Confirm those terms and healthcare scope before identifiable patient input.",
+    "localisation": "Use the clinic's actual languages and test model/voice pairs. Do not advertise one uniform 22-language clinical voice experience; API coverage differs. Current docs recommend Saaras v4 and Bulbul v4-flash for new integrations, with v3 still relevant to some TTS languages.",
+    "currentScanner": "Existing public photo scanning remains off. This research does not activate Sarvam, replace the scanner provider or change current release declarations.",
+    "sourceUrls": [
+      "https://www.sarvam.ai/terms-of-service",
+      "https://www.sarvam.ai/privacy-policy",
+      "https://docs.sarvam.ai/api/getting-started/models/saaras",
+      "https://docs.sarvam.ai/api/getting-started/models/bulbul"
+    ]
+  },
+  "validation": [
+    {
+      "step": "Synthetic language benchmark",
+      "method": "Use fictional consultations with code-switching, weak audio, overlapping speech, negation, names, numbers and corrections. Get bilingual clinical annotations; record critical errors, not just average word error."
+    },
+    {
+      "step": "Clinical draft review",
+      "method": "Count unsupported statements, omitted preferences, wrong speaker attribution and incorrect certainty. A material uncorrected clinical error blocks that output from sharing."
+    },
+    {
+      "step": "Small supervised partner pilot",
+      "method": "Agree patient consent, participant roles, storage, retention and an escalation contact with a palliative partner. Compare current workflow with reviewed drafts; do not launch unattended medical advice."
+    },
+    {
+      "step": "Useful operational measures",
+      "method": "Measure staff review minutes, correction burden, family plan retrieval, comprehension interviews, source traceability and completion of staff-assigned follow-up. Clinical benefit is not established by a faster transcript."
+    },
+    {
+      "step": "Cost and continuity",
+      "method": "Measure actual minutes, characters, tokens and storage per active family. Cap retries, cache approved audio, retain manual entry and recover work when credits expire or the network fails."
+    }
+  ],
+  "funding": {
+    "principle": "Basic access for patients and caregivers stays free. A care organisation pays for the staff workflow and deployment; this is a proposed business model, not a customer commitment.",
+    "buyers": [
+      {
+        "who": "Cancer hospitals and palliative-care services",
+        "whatTheyBuy": "Staff documentation, reviewed care-plan sharing, handovers, role permissions, audit history and integration/support.",
+        "priceStructure": "Annual or monthly institution licence with a defined active-family/usage allowance; setup and integration scoped separately.",
+        "whyTheyMightPay": "Less duplicate documentation and fewer communication gaps. Validate actual saved staff time and budget with buyers before setting a price.",
+        "stage": "Best first commercial hypothesis"
+      },
+      {
+        "who": "Hospices, charitable hospitals and palliative NGOs",
+        "whatTheyBuy": "Coordination for home-care teams and multilingual family communication, funded from an agreed project budget.",
+        "priceStructure": "A partner or donor underwrites a capped cohort; the family does not buy a subscription.",
+        "whyTheyMightPay": "Supports existing free services without adding a new patient fee.",
+        "stage": "Strong mission-aligned pilot hypothesis"
+      },
+      {
+        "who": "Corporate CSR or philanthropic sponsors through an eligible care partner",
+        "whatTheyBuy": "A defined deployment, training, support and an aggregate activity report with agreed privacy controls.",
+        "priceStructure": "Time-limited project funding with a continuation plan. Do not assume a for-profit company can receive CSR grants as an eligible implementing agency.",
+        "whyTheyMightPay": "Makes a specific free-care programme more accessible; Karunashraya publicly offers both free care and CSR participation.",
+        "stage": "Partner-led funding hypothesis; eligibility and contract need checking",
+        "sourceUrls": [
+          "https://karunashraya.org/patient-care-treatment/",
+          "https://karunashraya.org/csr-volunteering/"
+        ]
+      },
+      {
+        "who": "State NHM / district public-health programme",
+        "whatTheyBuy": "An authorised palliative-care deployment, staff training, interoperability and programme support through the applicable procurement route.",
+        "priceStructure": "State programme/procurement budget after a relevant pilot; not an automatic app reimbursement or open grant.",
+        "whyTheyMightPay": "DGHS describes palliative-care proposals through state PIPs under NHM's Mission Flexipool. This is a policy fit, not evidence of a current Sahara tender or award.",
+        "stage": "Later public-sector route, rather than the only possible payer",
+        "sourceUrls": [
+          "https://dghs.mohfw.gov.in/nppc.php"
+        ]
+      }
+    ],
+    "avoid": [
+      "Charging families to read their own approved care record or access essential support",
+      "Referral commissions that bias which care service a family sees",
+      "Advertising against sensitive conversations or selling patient data",
+      "An unlimited voice-call promise priced only from expiring sponsor credits"
+    ],
+    "buyerDiscovery": "Start with the assigned clinician/mentor and a palliative service lead. Ask who owns documentation, who reviews drafts, who has a software budget, which work takes time today, which languages matter and what a funded pilot must prove. No outreach was sent for this research.",
+    "costModel": {
+      "label": "Illustrative monthly provider spend for 100 active families; not a quote or a complete operating budget",
+      "basisDate": "2026-10-15",
+      "families": 100,
+      "lines": [
+        {
+          "item": "Consented multi-speaker transcription",
+          "assumption": "4 conversations × 10 minutes × 100 families = 4,000 minutes",
+          "rate": "Documentation rate ₹45/hour with diarisation",
+          "monthlyINR": 3000
+        },
+        {
+          "item": "Approved-plan speech",
+          "assumption": "15,000 generated characters/family = 1.5 million characters",
+          "rate": "Bulbul v3 ₹30/10,000 characters",
+          "monthlyINR": 4500
+        },
+        {
+          "item": "Structured drafting",
+          "assumption": "30,000 input + 5,000 output tokens/family = 3M input + 0.5M output",
+          "rate": "Sarvam-105B ₹15/M input + ₹60/M output; no cache discount assumed",
+          "monthlyINR": 75
+        },
+        {
+          "item": "Document extraction",
+          "assumption": "500 pages total",
+          "rate": "₹1/page for the extraction call; a separate digitisation call is not assumed",
+          "monthlyINR": 500
+        },
+        {
+          "item": "Optional separate text translation",
+          "assumption": "10,000 characters/family = 1 million characters",
+          "rate": "₹20/10,000 characters",
+          "monthlyINR": 2000,
+          "optional": true
+        }
+      ],
+      "baseMonthlyINR": 8075,
+      "basePerFamilyINR": 80.75,
+      "withTranslationMonthlyINR": 10075,
+      "withTranslationPerFamilyINR": 100.75,
+      "discrepancy": "The live API documentation says ₹45/hour for diarisation, while the live marketing page says ₹0.59/minute (=₹35.40/hour). Standard STT is ₹30/hour vs ₹0.49/minute. This example uses the higher documented rate. Marketing lists Bulbul v4-flash at ₹2/1,000 characters, cheaper than v3, but model/language suitability and actual account billing must be checked.",
+      "excluded": "GST or other tax treatment; hosting, storage, egress, telephony/WhatsApp/SMS, monitoring, support, clinical review, training, security work and integration. Managed Voice Agents have their own pricing and are not costed here. Character counts, tokenizer behaviour and retries affect actual usage.",
+      "interpretation": "This is raw API arithmetic. It does not establish a sustainable selling price, a gross margin, care-team capacity, willingness to pay or a clinical outcome. The sponsor grant amount is not included.",
+      "sourceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/pricing",
+        "https://www.sarvam.ai/api-pricing"
+      ]
+    }
+  },
+  "sourceList": [
+    {
+      "title": "Sarvam API pricing documentation",
+      "url": "https://docs.sarvam.ai/api/getting-started/pricing",
+      "verifiedDate": "2026-10-15",
+      "claim": "Opened current API table; used the documented rates in explicit scenario arithmetic. Search snippets differed and were not used."
+    },
+    {
+      "title": "Sarvam marketing API pricing",
+      "url": "https://www.sarvam.ai/api-pricing",
+      "verifiedDate": "2026-10-15",
+      "claim": "Opened current PAYG prices; documented disagreement with diarisation documentation and model-specific TTS prices."
+    },
+    {
+      "title": "Sarvam Terms of Service",
+      "url": "https://www.sarvam.ai/terms-of-service",
+      "verifiedDate": "2026-10-15",
+      "claim": "Effective 29 July 2026; medical review and disclosure restrictions, customer DPA and possible cross-border processing. No India-only assumption."
+    },
+    {
+      "title": "Sarvam privacy policy",
+      "url": "https://www.sarvam.ai/privacy-policy",
+      "verifiedDate": "2026-10-15",
+      "claim": "Public policy excludes enterprise customer content governed by customer agreements. It does not prove this account's patient-data terms."
+    },
+    {
+      "title": "Sarvam commercial audio licensing",
+      "url": "https://docs.sarvam.ai/api/getting-started/commercial-licensing",
+      "verifiedDate": "2026-10-15",
+      "claim": "Credit-consumed generated audio can be shipped subject to rights/terms; not a healthcare processing permission or sponsor grant confirmation."
+    },
+    {
+      "title": "OpenAI plan and API pricing distinction",
+      "url": "https://learn.chatgpt.com/docs/pricing",
+      "verifiedDate": "2026-10-15",
+      "claim": "Official page distinguishes subscription usage from API token pricing. The team email promises Pro, not a quantified API allocation."
+    },
+    {
+      "title": "DGHS National Programme for Palliative Care",
+      "url": "https://dghs.mohfw.gov.in/nppc.php",
+      "verifiedDate": "2026-10-15",
+      "claim": "State palliative proposals can enter PIPs seeking NHM financial support; no current Sahara procurement or award established."
+    },
+    {
+      "title": "Karunashraya patient care",
+      "url": "https://karunashraya.org/patient-care-treatment/",
+      "verifiedDate": "2026-10-15",
+      "claim": "Provider states its palliative care for eligible advanced-cancer patients is free. This does not mean every palliative service is free."
+    },
+    {
+      "title": "Karunashraya CSR and volunteering",
+      "url": "https://karunashraya.org/csr-volunteering/",
+      "verifiedDate": "2026-10-15",
+      "claim": "Primary provider page offers corporate participation in palliative care; precedent for partner-funded free services, not a Sahara sponsor commitment."
+    }
+  ]
+}

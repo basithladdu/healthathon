@@ -17,10 +17,10 @@ export default function PrivacyPage() {
           <Link href="/delete-account">Delete your account</Link>
         </header>
         <h1>Your care information</h1>
-        <p className={styles.date}>Privacy policy · Updated 13 October 2026</p>
+        <p className={styles.date}>Privacy policy · Updated 16 October 2026</p>
         <p>
           Sahara — A Palliative Care Companion is provided by WEDEVIT PRIVATE LIMITED.
-          This policy covers the Sahara Android app, including version 0.4.0, rather
+          This policy covers the Sahara Android app, including versions 0.4 and 0.5, rather
           than the separate website.
         </p>
 
@@ -28,7 +28,8 @@ export default function PrivacyPage() {
           <h2 id="information">What we use and why</h2>
           <p>
             The app keeps the names, care conversations, reviewed notes, confirmations,
-            prescribed-medicine details, visits, tasks, check-ins and journal entries
+            prescribed-medicine details, visits, tasks, lab results, conversation requests,
+            check-ins and journal entries
             you enter. We use them to show your care records, organise daily care and,
             when you sign in, share records with people you invite.
           </p>
@@ -56,8 +57,16 @@ export default function PrivacyPage() {
             Microphone permission is requested when you choose to record. Ask everyone
             taking part for permission first. You can stop at any time; recording also
             stops when the app leaves the foreground. Audio and unfinished conversation
-            drafts stay on your phone. This Android version does not upload audio and
+            drafts stay on your phone. The Android app does not upload audio and
             does not transcribe recordings automatically.
+          </p>
+          <p>
+            Version 0.5 adds optional turn-by-turn dictation using Android’s on-device
+            recognizer on supported phones. You choose the speaker and language and check
+            the words; speaker identity is not detected or verified. There is no cloud
+            speech fallback. Recognised words remain in your draft until you save a
+            reviewed care-note version. Read aloud uses an installed offline voice and
+            does not translate the text.
           </p>
         </section>
 

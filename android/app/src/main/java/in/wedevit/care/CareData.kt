@@ -30,7 +30,8 @@ data class CareVersion(
     @ColumnInfo(defaultValue = "''") val transcriptionModel: String = "",
     @ColumnInfo(defaultValue = "0") val transcribedAt: Long = 0,
 )
-@Entity data class Acknowledgement(@PrimaryKey val versionId: String, val contentHash: String, val name: String, val relationship: String, val at: Long = System.currentTimeMillis())
+@Entity(indices = [Index("versionId")])
+data class Acknowledgement(val versionId: String, val contentHash: String, val name: String, val relationship: String, val at: Long = System.currentTimeMillis(), @PrimaryKey val id: String = newId())
 @Entity data class CareItem(@PrimaryKey val id: String = newId(), val personId: String, val kind: String, val title: String, val detail: String = "", val due: Long = 0, val doneOn: String = "", val created: Long = System.currentTimeMillis(), @ColumnInfo(defaultValue = "0") val revision: Long = 0)
 @Entity(indices = [Index("personId")])
 data class CareReport(@PrimaryKey val id: String = newId(), val personId: String, val name: String, val mime: String, val fileName: String, val bytes: Long, val created: Long = System.currentTimeMillis())
@@ -52,6 +53,8 @@ data class CareReport(@PrimaryKey val id: String = newId(), val personId: String
     @Query("SELECT * FROM CareVersion WHERE personId = :id ORDER BY version DESC LIMIT 1") suspend fun latest(id: String): CareVersion?
     @Insert suspend fun insertVersion(version: CareVersion)
     @Query("SELECT * FROM Acknowledgement") fun acknowledgements(): Flow<List<Acknowledgement>>
+    @Query("SELECT * FROM Acknowledgement WHERE versionId = :versionId ORDER BY at") suspend fun confirmations(versionId: String): List<Acknowledgement>
+    @Query("SELECT * FROM Acknowledgement WHERE id = :id") suspend fun confirmation(id: String): Acknowledgement?
     @Insert(onConflict = OnConflictStrategy.ABORT) suspend fun acknowledge(acknowledgement: Acknowledgement)
     @Query("SELECT * FROM RecordingConsent WHERE personId = :id ORDER BY recordingConsentAt DESC") fun recordingConsents(id: String): Flow<List<RecordingConsent>>
     @Insert(onConflict = OnConflictStrategy.REPLACE) suspend fun saveRecordingConsent(consent: RecordingConsent)
@@ -82,6 +85,10 @@ data class CareReport(@PrimaryKey val id: String = newId(), val personId: String
     @Insert suspend fun addAcknowledgements(acknowledgements: List<Acknowledgement>)
 }
 
+val RevisionMigration = object : androidx.room.migration.Migration(1, 2) {
+    override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) { db.execSQL("ALTER TABLE CareItem ADD COLUMN revision INTEGER NOT NULL DEFAULT 0") }
+}
+
 val ReportsMigration = object : androidx.room.migration.Migration(2, 3) {
     override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
         db.execSQL("CREATE TABLE IF NOT EXISTS CareReport (id TEXT NOT NULL, personId TEXT NOT NULL, name TEXT NOT NULL, mime TEXT NOT NULL, fileName TEXT NOT NULL, bytes INTEGER NOT NULL, created INTEGER NOT NULL, PRIMARY KEY(id))")
@@ -89,10 +96,11 @@ val ReportsMigration = object : androidx.room.migration.Migration(2, 3) {
     }
 }
 
-val CombinedCareMigration3To5 = combinedCareMigration(3)
-val CombinedCareMigration4To5 = combinedCareMigration(4)
+val CombinedCareMigration3To6 = combinedCareMigration(3)
+val CombinedCareMigration4To6 = combinedCareMigration(4)
+val CombinedCareMigration5To6 = combinedCareMigration(5)
 
-private fun combinedCareMigration(from: Int) = object : androidx.room.migration.Migration(from, 5) {
+private fun combinedCareMigration(from: Int) = object : androidx.room.migration.Migration(from, 6) {
     override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
         ReportsMigration.migrate(db)
         db.execSQL("CREATE TABLE IF NOT EXISTS RecordingConsent (audioPath TEXT NOT NULL, personId TEXT NOT NULL, participants TEXT NOT NULL, recordingConsentAt INTEGER NOT NULL, transcriptionConsentAt INTEGER NOT NULL, noticeVersion INTEGER NOT NULL, PRIMARY KEY(audioPath))")
@@ -114,10 +122,24 @@ private fun combinedCareMigration(from: Int) = object : androidx.room.migration.
         addMissing("Conversation", "transcriptModel", "TEXT NOT NULL DEFAULT ''")
         addMissing("Conversation", "transcribedAt", "INTEGER NOT NULL DEFAULT 0")
         addMissing("Conversation", "transcriptAudioPath", "TEXT NOT NULL DEFAULT ''")
+        val acknowledgementColumns = mutableSetOf<String>()
+        db.query("PRAGMA table_info(`Acknowledgement`)").use { cursor ->
+            val name = cursor.getColumnIndexOrThrow("name")
+            while (cursor.moveToNext()) acknowledgementColumns.add(cursor.getString(name))
+        }
+        // Legacy branches allowed one confirmation per version. Preserve that row's
+        // stable identity; upstream id-key rows already support many and stay untouched.
+        if ("id" !in acknowledgementColumns) {
+            db.execSQL("CREATE TABLE Acknowledgement_v6 (versionId TEXT NOT NULL, contentHash TEXT NOT NULL, name TEXT NOT NULL, relationship TEXT NOT NULL, at INTEGER NOT NULL, id TEXT NOT NULL, PRIMARY KEY(id))")
+            db.execSQL("INSERT INTO Acknowledgement_v6 (versionId, contentHash, name, relationship, at, id) SELECT versionId, contentHash, name, relationship, at, versionId FROM Acknowledgement")
+            db.execSQL("DROP TABLE Acknowledgement")
+            db.execSQL("ALTER TABLE Acknowledgement_v6 RENAME TO Acknowledgement")
+        }
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_Acknowledgement_versionId ON Acknowledgement (versionId)")
     }
 }
 
-@Database(entities = [Person::class, Conversation::class, CareVersion::class, Acknowledgement::class, CareItem::class, CareReport::class, RecordingConsent::class], version = 5, exportSchema = true)
+@Database(entities = [Person::class, Conversation::class, CareVersion::class, Acknowledgement::class, CareItem::class, CareReport::class, RecordingConsent::class], version = 6, exportSchema = true)
 abstract class CareDatabase : RoomDatabase() {
     abstract fun care(): CareDao
     companion object {
@@ -126,9 +148,7 @@ abstract class CareDatabase : RoomDatabase() {
             require(account.isEmpty() || runCatching { UUID.fromString(account) }.isSuccess)
             val filename = if (account.isEmpty()) "care.db" else "care-$account.db"
             instances.getOrPut(filename) { Room.databaseBuilder(context.applicationContext, CareDatabase::class.java, filename)
-                .addMigrations(object : androidx.room.migration.Migration(1, 2) {
-                    override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) { db.execSQL("ALTER TABLE CareItem ADD COLUMN revision INTEGER NOT NULL DEFAULT 0") }
-                }, ReportsMigration, CombinedCareMigration3To5, CombinedCareMigration4To5).build() }
+                .addMigrations(RevisionMigration, ReportsMigration, CombinedCareMigration3To6, CombinedCareMigration4To6, CombinedCareMigration5To6).build() }
         }
     }
 }
@@ -142,7 +162,9 @@ object ReviewWorkflow {
     const val NOT_VERIFIED = "not_verified"
 
     fun label(version: CareVersion): String = when {
-        version.reviewStatus == CLINICIAN_VERIFIED && version.reviewerVerification != NOT_VERIFIED -> "Verified clinician review"
+        // Imported strings are not an authority proof. No trusted verification
+        // backend exists yet, so preserve metadata without granting a badge.
+        version.reviewStatus == CLINICIAN_VERIFIED -> "Imported review · identity not verified"
         version.reviewStatus == REVIEWED_UNVERIFIED -> "Review recorded · identity not verified"
         else -> "Not clinically reviewed"
     }
@@ -193,10 +215,16 @@ object NoteRules {
             nextSteps = draft.nextSteps, doctor = doctor.trim(), contentHash = hash, draftOrigin = origin,
             transcriptionModel = draft.transcriptModel, transcribedAt = draft.transcribedAt)
     }
-    fun acknowledge(version: CareVersion, latest: CareVersion?, name: String, relationship: String, reviewed: Boolean): Acknowledgement {
+    fun acknowledge(version: CareVersion, latest: CareVersion?, name: String, relationship: String, reviewed: Boolean, existing: List<Acknowledgement> = emptyList()): Acknowledgement {
         require(latest?.id == version.id && latest.contentHash == version.contentHash) { "A newer note is available. Open it before confirming." }
-        require(reviewed && name.trim().isNotBlank() && relationship in listOf("Patient", "Family / carer")) { "Read the note and add your name." }
-        return Acknowledgement(version.id, version.contentHash, name.trim(), relationship)
+        require(reviewed && name.trim().length in 1..100 && relationship in listOf("Patient", "Family / carer")) { "Read the note and add your name, up to 100 characters." }
+        val matching = existing.filter { it.versionId == version.id && it.contentHash == version.contentHash }
+        val patient = matching.firstOrNull { it.relationship == "Patient" }
+        require(relationship != "Family / carer" || patient != null) { "The patient needs to confirm this version before family adds a confirmation." }
+        matching.firstOrNull { it.relationship == relationship && it.name.trim().equals(name.trim(), ignoreCase = true) }?.let { return it }
+        require(relationship != "Patient" || patient == null) { "The patient's confirmation is already saved for this version." }
+        val id = if (relationship == "Patient" && existing.none { it.id == version.id }) version.id else newId()
+        return Acknowledgement(version.id, version.contentHash, name.trim(), relationship, id = id)
     }
     // Explicit section headings only: keeps negation, uncertainty and the patient's words intact.
     fun organise(draft: Conversation): Conversation {
@@ -208,14 +236,18 @@ object NoteRules {
         }
         return draft.copy(priorities = sections[0].toString(), participants = sections[1].toString(), topics = sections[2].toString(), questions = sections[3].toString(), nextSteps = sections[4].toString())
     }
-    fun text(v: CareVersion, ack: Acknowledgement? = null): String = buildString {
+    fun text(v: CareVersion, ack: Acknowledgement? = null): String = text(v, listOfNotNull(ack))
+    fun text(v: CareVersion, acknowledgements: List<Acknowledgement>): String = buildString {
         appendLine("GOALS OF CARE • ${v.personName} • Version ${v.version}")
         appendLine("Reviewer: ${v.doctor} • ${java.time.Instant.ofEpochMilli(v.published)}")
         appendLine("Review status: ${ReviewWorkflow.label(v)}")
         if (v.draftOrigin == ReviewWorkflow.TRANSCRIBED_DRAFT) appendLine("Transcript: AI-generated with ${v.transcriptionModel}; human review required")
         labels.zip(values(v)).forEach { (label, value) -> appendLine("\n$label\n${value.ifBlank { "Not recorded" }}") }
         appendLine("\nOriginal conversation\n${v.source}")
-        if (ack != null) appendLine("\nRead and confirmed by ${ack.name} (${ack.relationship})")
-        appendLine("\nNames are self-entered unless a version explicitly says the clinician was verified. This is a record of a discussion, not a treatment order or legal directive.")
+        acknowledgements.filter { it.versionId == v.id && it.contentHash == v.contentHash }
+            .sortedWith(compareBy<Acknowledgement> { it.relationship != "Patient" }.thenBy { it.at }).forEach { ack ->
+                appendLine("\nRead and confirmed by ${ack.name} (${ack.relationship}) • ${java.time.Instant.ofEpochMilli(ack.at)}")
+            }
+        appendLine("\nNames are self-entered. This is a record of a discussion, not a treatment order or legal directive.")
     }
 }

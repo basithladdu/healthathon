@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 4,
-    "identityHash": "1d39091eba7cabe072639d7232cfb95c",
+    "identityHash": "ef00881af3294a7e4a2dc394af188baf",
     "entities": [
       {
         "tableName": "Person",
@@ -36,7 +36,7 @@
       },
       {
         "tableName": "Conversation",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`personId` TEXT NOT NULL, `source` TEXT NOT NULL, `priorities` TEXT NOT NULL, `participants` TEXT NOT NULL, `topics` TEXT NOT NULL, `questions` TEXT NOT NULL, `nextSteps` TEXT NOT NULL, `audioPath` TEXT NOT NULL, `consentAt` INTEGER NOT NULL, `updated` INTEGER NOT NULL, `transcriptProvider` TEXT NOT NULL DEFAULT '', `transcriptModel` TEXT NOT NULL DEFAULT '', `transcribedAt` INTEGER NOT NULL DEFAULT 0, `transcriptAudioPath` TEXT NOT NULL DEFAULT '', PRIMARY KEY(`personId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`personId` TEXT NOT NULL, `source` TEXT NOT NULL, `priorities` TEXT NOT NULL, `participants` TEXT NOT NULL, `topics` TEXT NOT NULL, `questions` TEXT NOT NULL, `nextSteps` TEXT NOT NULL, `audioPath` TEXT NOT NULL, `consentAt` INTEGER NOT NULL, `updated` INTEGER NOT NULL, PRIMARY KEY(`personId`))",
         "fields": [
           {
             "fieldPath": "personId",
@@ -97,34 +97,6 @@
             "columnName": "updated",
             "affinity": "INTEGER",
             "notNull": true
-          },
-          {
-            "fieldPath": "transcriptProvider",
-            "columnName": "transcriptProvider",
-            "affinity": "TEXT",
-            "notNull": true,
-            "defaultValue": "''"
-          },
-          {
-            "fieldPath": "transcriptModel",
-            "columnName": "transcriptModel",
-            "affinity": "TEXT",
-            "notNull": true,
-            "defaultValue": "''"
-          },
-          {
-            "fieldPath": "transcribedAt",
-            "columnName": "transcribedAt",
-            "affinity": "INTEGER",
-            "notNull": true,
-            "defaultValue": "0"
-          },
-          {
-            "fieldPath": "transcriptAudioPath",
-            "columnName": "transcriptAudioPath",
-            "affinity": "TEXT",
-            "notNull": true,
-            "defaultValue": "''"
           }
         ],
         "primaryKey": {
@@ -136,7 +108,7 @@
       },
       {
         "tableName": "CareVersion",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `personId` TEXT NOT NULL, `version` INTEGER NOT NULL, `personName` TEXT NOT NULL, `source` TEXT NOT NULL, `priorities` TEXT NOT NULL, `participants` TEXT NOT NULL, `topics` TEXT NOT NULL, `questions` TEXT NOT NULL, `nextSteps` TEXT NOT NULL, `doctor` TEXT NOT NULL, `published` INTEGER NOT NULL, `contentHash` TEXT NOT NULL, `draftOrigin` TEXT NOT NULL DEFAULT 'manual', `reviewStatus` TEXT NOT NULL DEFAULT 'reviewed_unverified', `reviewerVerification` TEXT NOT NULL DEFAULT 'not_verified', `transcriptionModel` TEXT NOT NULL DEFAULT '', `transcribedAt` INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `personId` TEXT NOT NULL, `version` INTEGER NOT NULL, `personName` TEXT NOT NULL, `source` TEXT NOT NULL, `priorities` TEXT NOT NULL, `participants` TEXT NOT NULL, `topics` TEXT NOT NULL, `questions` TEXT NOT NULL, `nextSteps` TEXT NOT NULL, `doctor` TEXT NOT NULL, `published` INTEGER NOT NULL, `contentHash` TEXT NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -215,41 +187,6 @@
             "columnName": "contentHash",
             "affinity": "TEXT",
             "notNull": true
-          },
-          {
-            "fieldPath": "draftOrigin",
-            "columnName": "draftOrigin",
-            "affinity": "TEXT",
-            "notNull": true,
-            "defaultValue": "'manual'"
-          },
-          {
-            "fieldPath": "reviewStatus",
-            "columnName": "reviewStatus",
-            "affinity": "TEXT",
-            "notNull": true,
-            "defaultValue": "'reviewed_unverified'"
-          },
-          {
-            "fieldPath": "reviewerVerification",
-            "columnName": "reviewerVerification",
-            "affinity": "TEXT",
-            "notNull": true,
-            "defaultValue": "'not_verified'"
-          },
-          {
-            "fieldPath": "transcriptionModel",
-            "columnName": "transcriptionModel",
-            "affinity": "TEXT",
-            "notNull": true,
-            "defaultValue": "''"
-          },
-          {
-            "fieldPath": "transcribedAt",
-            "columnName": "transcribedAt",
-            "affinity": "INTEGER",
-            "notNull": true,
-            "defaultValue": "0"
           }
         ],
         "primaryKey": {
@@ -273,7 +210,7 @@
       },
       {
         "tableName": "Acknowledgement",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`versionId` TEXT NOT NULL, `contentHash` TEXT NOT NULL, `name` TEXT NOT NULL, `relationship` TEXT NOT NULL, `at` INTEGER NOT NULL, PRIMARY KEY(`versionId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`versionId` TEXT NOT NULL, `contentHash` TEXT NOT NULL, `name` TEXT NOT NULL, `relationship` TEXT NOT NULL, `at` INTEGER NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "versionId",
@@ -304,14 +241,31 @@
             "columnName": "at",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
           }
         ],
         "primaryKey": {
           "autoGenerate": false,
           "columnNames": [
-            "versionId"
+            "id"
           ]
-        }
+        },
+        "indices": [
+          {
+            "name": "index_Acknowledgement_versionId",
+            "unique": false,
+            "columnNames": [
+              "versionId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Acknowledgement_versionId` ON `${TABLE_NAME}` (`versionId`)"
+          }
+        ]
       },
       {
         "tableName": "CareItem",
@@ -381,12 +335,12 @@
         }
       },
       {
-        "tableName": "RecordingConsent",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`audioPath` TEXT NOT NULL, `personId` TEXT NOT NULL, `participants` TEXT NOT NULL, `recordingConsentAt` INTEGER NOT NULL, `transcriptionConsentAt` INTEGER NOT NULL, `noticeVersion` INTEGER NOT NULL, PRIMARY KEY(`audioPath`))",
+        "tableName": "CareReport",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `personId` TEXT NOT NULL, `name` TEXT NOT NULL, `mime` TEXT NOT NULL, `fileName` TEXT NOT NULL, `bytes` INTEGER NOT NULL, `created` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
-            "fieldPath": "audioPath",
-            "columnName": "audioPath",
+            "fieldPath": "id",
+            "columnName": "id",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -397,26 +351,32 @@
             "notNull": true
           },
           {
-            "fieldPath": "participants",
-            "columnName": "participants",
+            "fieldPath": "name",
+            "columnName": "name",
             "affinity": "TEXT",
             "notNull": true
           },
           {
-            "fieldPath": "recordingConsentAt",
-            "columnName": "recordingConsentAt",
+            "fieldPath": "mime",
+            "columnName": "mime",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fileName",
+            "columnName": "fileName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "bytes",
+            "columnName": "bytes",
             "affinity": "INTEGER",
             "notNull": true
           },
           {
-            "fieldPath": "transcriptionConsentAt",
-            "columnName": "transcriptionConsentAt",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "noticeVersion",
-            "columnName": "noticeVersion",
+            "fieldPath": "created",
+            "columnName": "created",
             "affinity": "INTEGER",
             "notNull": true
           }
@@ -424,25 +384,25 @@
         "primaryKey": {
           "autoGenerate": false,
           "columnNames": [
-            "audioPath"
+            "id"
           ]
         },
         "indices": [
           {
-            "name": "index_RecordingConsent_personId",
+            "name": "index_CareReport_personId",
             "unique": false,
             "columnNames": [
               "personId"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_RecordingConsent_personId` ON `${TABLE_NAME}` (`personId`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_CareReport_personId` ON `${TABLE_NAME}` (`personId`)"
           }
         ]
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '1d39091eba7cabe072639d7232cfb95c')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ef00881af3294a7e4a2dc394af188baf')"
     ]
   }
 }
