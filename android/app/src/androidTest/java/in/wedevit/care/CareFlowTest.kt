@@ -286,8 +286,12 @@ class CareFlowTest {
         ui.onNodeWithText("An okay day").assertIsDisplayed()
         screenshot("today-saved")
         ui.onNodeWithTag("nav-More").performClick()
-        ui.onNodeWithText("Privacy").performScrollTo().performClick()
-        ui.onNodeWithText("You choose which notes to share and with whom.").performScrollTo().assertIsDisplayed()
+        ui.onNodeWithContentDescription("Show Privacy").performScrollTo().performClick()
+        ui.onNodeWithContentDescription("Hide Privacy").assertExists()
+        ui.onRoot(useUnmergedTree = true).printToLog("SaharaPrivacy")
+        screenshot("more-privacy-expanded")
+        ui.onNode(hasScrollToIndexAction()).performScrollToNode(hasText("You choose which notes to share and with whom.", substring = true))
+        ui.onNodeWithText("You choose which notes to share and with whom.", substring = true).assertIsDisplayed()
         screenshot("more")
     }
     @Test fun signInLoadsAccountRecordsOnToday() {

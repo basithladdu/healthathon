@@ -479,13 +479,15 @@ def run(scope="all"):
     adb("install", "-r", info["debug"], timeout=180); adb("install", "-r", info["test"], timeout=180)
     adb("logcat", "-c")
     if scope != "all":
-        selected_tests = FOCUSED_TESTS[1:3] if scope == "remaining" else FOCUSED_TESTS
+        selected_tests = FOCUSED_TESTS[2:3] if scope == "privacy" else FOCUSED_TESTS[1:3] if scope == "remaining" else FOCUSED_TESTS
         summary["matrix"] = instrument("matrix-focused-"+str(len(selected_tests)), ",".join(selected_tests), len(selected_tests))
         summary["pdfSupplemental"] = {"notRepeated":True, "priorRunId":38882501784,
             "qualification":"Prior separate pagination test passed; not counted as a new focused-run check."}
     else:
         summary["matrix"] = instrument("matrix-36", ",".join("in.wedevit.care."+c for c in CLASSES), 36)
         summary["pdfSupplemental"] = instrument("pdf-pagination", "in.wedevit.care.DoctorWorkflowFlowTest#longPublishedPreviewExportsToMultipleReadablePages", 1)
+        adb("pull", "/sdcard/Android/data/"+DEBUG+"/files/verification", str(OUT / "debug-captures"), check=False)
+    if scope != "all":
         adb("pull", "/sdcard/Android/data/"+DEBUG+"/files/verification", str(OUT / "debug-captures"), check=False)
     if scope == "all":
         # New doctor surfaces are also captured in debug mode. FLAG_SECURE on optimized
@@ -501,11 +503,11 @@ def run(scope="all"):
             ui.tap("Cancel")
             summary["debugCapture"] = "Actual current-source debug doctor images captured; root must inspect readability, insets and absence of overlays. Original matrix screenshots are preserved separately."
         except Exception as error: summary["debugCapture"] = "Capture failed: " + str(error)
-    summary["optimizedRelease"] = ({"notRepeated":True, "priorRunId":38887001702, "qualification":"Optimized preview/PDF/exit passed in the preceding focused run; this run executes only the remaining two instrumentation checks."}
-        if scope == "remaining" else optimized_smoke(info, focused=scope == "focused"))
+    summary["optimizedRelease"] = ({"notRepeated":True, "priorRunId":38887001702, "qualification":"Optimized preview/PDF/exit passed in the preceding focused run; this run executes only its selected remaining instrumentation checks."}
+        if scope in ("remaining", "privacy") else optimized_smoke(info, focused=scope == "focused"))
     write("logcat.txt", adb("logcat", "-d", "-v", "brief", check=False))
     summary["finishedUtc"] = utc()
-    summary["passed"] = summary["matrix"]["matrixComplete"] and (scope != "all" or summary["pdfSupplemental"]["matrixComplete"]) and (scope == "remaining" or summary["optimizedRelease"]["passed"])
+    summary["passed"] = summary["matrix"]["matrixComplete"] and (scope != "all" or summary["pdfSupplemental"]["matrixComplete"]) and (scope in ("remaining", "privacy") or summary["optimizedRelease"]["passed"])
     summary["qualification"] = "Focused correction run only; aggregate with original 38882501784 without concealing its four failures or repeating already passing checks." if scope != "all" else "CI emulator only; 36-test matrix and separate PDF check are distinguished. Component fixtures do not establish real doctor assignment or patient delivery. No local Room upgrade claimed."
     write("runtime-summary.json", summary)
     print(json.dumps({"matrix":summary["matrix"]["counts"], "pdf":summary["pdfSupplemental"].get("counts", "not repeated"),
@@ -514,7 +516,7 @@ def run(scope="all"):
 
 
 if __name__ == "__main__":
-    parser=argparse.ArgumentParser(); parser.add_argument("mode", choices=["check-run", "check-source", "prepare", "run"]); parser.add_argument("--run-id"); parser.add_argument("--scope", choices=["all", "focused", "remaining"], default="all"); parser.add_argument("--source-dir")
+    parser=argparse.ArgumentParser(); parser.add_argument("mode", choices=["check-run", "check-source", "prepare", "run"]); parser.add_argument("--run-id"); parser.add_argument("--scope", choices=["all", "focused", "remaining", "privacy"], default="all"); parser.add_argument("--source-dir")
     args=parser.parse_args(); OUT.mkdir(parents=True,exist_ok=True)
     try:
         if args.mode=="check-run": check_run(args.run_id)

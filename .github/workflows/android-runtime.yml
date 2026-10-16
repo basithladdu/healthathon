@@ -16,6 +16,7 @@ on:
           - all
           - focused
           - remaining
+          - privacy
 
 permissions:
   contents: read
