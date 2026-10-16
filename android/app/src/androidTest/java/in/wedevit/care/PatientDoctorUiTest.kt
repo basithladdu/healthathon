@@ -43,7 +43,7 @@ class PatientDoctorUiTest {
         ui.onNodeWithTag("patient-doctor-empty").assertIsDisplayed()
         ui.runOnIdle { linked.value = LinkedDoctorSummary("fictional-doctor-b", "Dr Fictional B", clinic = "Clinic B", verification = PatientDoctorVerification.PENDING) }
         ui.onNodeWithTag("patient-doctor-name").assertTextEquals("Dr Fictional B").performClick()
-        ui.onNodeWithTag("patient-doctor-status").assertTextContains("pending", ignoreCase = true)
+        ui.onNodeWithTag("patient-doctor-status").assertTextContains("pending", substring = true, ignoreCase = true)
         ui.onNodeWithText("Clinic B").assertIsDisplayed()
         ui.onNodeWithText("Clinic A").assertDoesNotExist()
     }

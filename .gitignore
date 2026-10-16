@@ -36,3 +36,4 @@ output/android/*.aab
 
 android/supabase/.temp/
 android/scripts/__pycache__/
+output/android/*.idsig

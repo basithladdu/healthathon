@@ -7,6 +7,14 @@ on:
         description: Successful Android verified packages workflow run from this repository
         required: true
         type: string
+      scope:
+        description: All checks, or four corrected checks and the unfinished optimized preview flow
+        required: true
+        type: choice
+        default: all
+        options:
+          - all
+          - focused
 
 permissions:
   contents: read
@@ -16,6 +24,8 @@ jobs:
   runtime:
     runs-on: ubuntu-24.04
     timeout-minutes: 45
+    env:
+      RUNTIME_SCOPE: ${{ inputs.scope || 'all' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -25,6 +35,7 @@ jobs:
           distribution: temurin
           java-version: '21'
       - name: Download only a successful same-repository build
+        id: build
         env:
           GH_TOKEN: ${{ github.token }}
           BUILD_RUN_ID: ${{ inputs.build_run_id }}
@@ -35,15 +46,39 @@ jobs:
           gh api "repos/$GITHUB_REPOSITORY/actions/runs/$BUILD_RUN_ID" > runtime-report/build-run.json
           python3 android/scripts/ci-runtime.py check-run --run-id "$BUILD_RUN_ID"
           SOURCE=$(python3 -c 'import json; print(json.load(open("runtime-report/build-run.json"))["head_sha"])')
+          printf 'source_commit=%s\n' "$SOURCE" >> "$GITHUB_OUTPUT"
           gh run download "$BUILD_RUN_ID" --repo "$GITHUB_REPOSITORY" --name "sahara-android-$SOURCE" --dir runtime-artifacts
-          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'build-tools;36.1.0'
-          python3 android/scripts/ci-runtime.py prepare --run-id "$BUILD_RUN_ID"
+      - name: Fetch the exact original build source without retaining credentials
+        if: inputs.scope == 'focused'
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.build.outputs.source_commit }}
+          path: runtime-build-source
+          persist-credentials: false
+      - name: Require identical app source and build inputs before compiling corrected tests
+        if: inputs.scope == 'focused'
+        env:
+          BUILD_RUN_ID: ${{ inputs.build_run_id }}
+        run: python3 android/scripts/ci-runtime.py check-source --run-id "$BUILD_RUN_ID" --source-dir runtime-build-source
+      - name: Install matching Android tools
+        run: '"$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;36.1.0"'
+      - name: Compile corrected instrumentation APK only; keep downloaded app packages
+        if: inputs.scope == 'focused'
+        working-directory: android
+        run: >-
+          bash ./gradlew --no-daemon --max-workers=2
+          '-Dorg.gradle.jvmargs=-Xmx4096m -XX:ActiveProcessorCount=4 -Dfile.encoding=UTF-8'
+          -PunsignedRelease=true :app:assembleDebugAndroidTest
+      - name: Verify original hashes and prepare runner-only signatures
+        env:
+          BUILD_RUN_ID: ${{ inputs.build_run_id }}
+        run: python3 android/scripts/ci-runtime.py prepare --run-id "$BUILD_RUN_ID" --scope "$RUNTIME_SCOPE" --source-dir runtime-build-source
       - name: Enable hardware acceleration on the disposable runner
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
-      - name: Exercise downloaded packages without rebuilding or private accounts
+      - name: Exercise original downloaded app packages without private accounts
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 36
@@ -58,7 +93,7 @@ jobs:
           enable-hw-keyboard: false
           emulator-boot-timeout: 600
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none -camera-front none
-          script: python3 android/scripts/ci-runtime.py run
+          script: python3 android/scripts/ci-runtime.py run --scope "$RUNTIME_SCOPE"
       - name: Preserve actual runtime evidence, including failures
         if: always()
         uses: actions/upload-artifact@v4

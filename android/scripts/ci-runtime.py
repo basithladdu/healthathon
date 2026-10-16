@@ -1,7 +1,8 @@
-"""Run downloaded Sahara packages on an empty disposable CI emulator, without rebuilding.
+"""Run original downloaded Sahara app packages on an empty disposable CI emulator.
 
 No login credentials, private signing material, real microphone or AI-provider calls are used.
-The optimized APK gets an ephemeral CI signer; that is explicitly not the store upload signer.
+Focused mode compiles corrected instrumentation only, guarded by original source identity.
+Runner-only signatures are explicitly not the store upload signer.
 All fixtures and exported preview PDFs are fictional. UI evidence is saved even on failure.
 """
 import argparse
@@ -28,6 +29,19 @@ DEBUG = "in.wedevit.sahara.development"
 RELEASE = "in.wedevit.sahara"
 CLASSES = ["DailyCareFlowsTest", "CareAcknowledgementMigrationTest", "CareReportTest", "CareFlowTest",
            "CombinedCareMigrationTest", "NativeMergeComponentsTest", "PatientDoctorUiTest", "DoctorLocalPreviewConsentTest"]
+FOCUSED_TESTS = [
+    "in.wedevit.care.CareFlowTest#roleMenuKeepsDraftAndPatientChoiceAfterRecreation",
+    "in.wedevit.care.CareFlowTest#conversationReviewSavesExactVersionAndSurvivesRecreation",
+    "in.wedevit.care.CareFlowTest#checkinSavesChosenWordsAndKeepsOptionalNote",
+    "in.wedevit.care.PatientDoctorUiTest#replacingPatientLinkClearsOldDetailsAndPendingIsNotVerified",
+]
+BUILD_INPUTS = [
+    "android/app/src/main", "android/app/src/debug", "android/app/src/release", "android/app/schemas",
+    "android/app/build.gradle.kts", "android/app/build.gradle", "android/app/proguard-rules.pro",
+    "android/build.gradle.kts", "android/build.gradle", "android/settings.gradle.kts", "android/settings.gradle",
+    "android/gradle.properties", "android/gradle", "android/gradlew", "android/gradlew.bat",
+    "android/buildSrc", "android/build-logic", ".github/workflows/android-build.yml",
+]
 
 
 def utc():
@@ -75,8 +89,33 @@ def unique(pattern):
     return files[0]
 
 
-def prepare(run_id):
+def check_source(run_id, source_dir):
     data = check_run(run_id)
+    source_dir = Path(source_dir).resolve()
+    assert source_dir != ROOT.resolve(), "Original build source must be a separate checkout"
+    original_commit = cmd("git", "-C", source_dir, "rev-parse", "HEAD").decode().strip()
+    harness_commit = cmd("git", "rev-parse", "HEAD").decode().strip()
+    assert original_commit == data["head_sha"], "Fetched source differs from successful build head"
+    assert harness_commit == os.environ["GITHUB_SHA"], "Harness checkout differs from workflow head"
+    snapshots = []
+    for checkout in (source_dir, ROOT):
+        cmd("git", "-C", checkout, "diff", "--exit-code", "HEAD", "--", *BUILD_INPUTS)
+        raw = cmd("git", "-C", checkout, "ls-tree", "-r", "-z", "HEAD", "--", *BUILD_INPUTS)
+        snapshots.append({entry.split("\t", 1)[1]: entry.split("\t", 1)[0]
+                          for entry in raw.decode().split("\0") if entry})
+    original, current = snapshots
+    assert any(path.startswith("android/app/src/main/") for path in original), "Original app source missing"
+    changed = [path for path in sorted(original.keys() | current.keys()) if original.get(path) != current.get(path)]
+    result = {"sourceCommit":original_commit, "harnessCommit":harness_commit, "matched":not changed,
+              "checkedPaths":BUILD_INPUTS, "changedPaths":changed, "trackedInputs":original, "checkedUtc":utc()}
+    write("source-equality.json", result)
+    assert not changed, "App source or build inputs differ from original packages: " + ", ".join(changed)
+    return result
+
+
+def prepare(run_id, scope="all", source_dir=None):
+    data = check_run(run_id)
+    equality = check_source(run_id, source_dir) if scope == "focused" else None
     receipt = unique("build-source.txt")
     assert receipt.read_text().strip() == data["head_sha"], "API head and build receipt differ"
     manifest = unique("build-sha256.txt")
@@ -90,9 +129,12 @@ def prepare(run_id):
         verified.append({"path": relative, "sha256": expected.upper(), "bytes": path.stat().st_size})
     debug = unique("app-debug.apk")
     test = unique("app-debug-androidTest.apk")
+    bundle = unique("*.aab")
     releases = [p for p in ART.rglob("*.apk") if "/release/" in p.as_posix()]
     assert len(releases) == 1
     release = releases[0]
+    original_paths = {str((manifest.parent / item["path"]).resolve()) for item in verified}
+    assert len(verified) == 4 and original_paths == {str(path.resolve()) for path in (debug, test, release, bundle)}, "Expected exactly the four original packages"
     for path, package in [(debug, DEBUG), (release, RELEASE)]:
         badging = cmd(TOOLS / "aapt2", "dump", "badging", path).decode(errors="replace")
         assert f"package: name='{package}'" in badging
@@ -104,14 +146,32 @@ def prepare(run_id):
     key = signing / "runtime.jks"
     cmd("keytool", "-genkeypair", "-noprompt", "-keystore", key, "-alias", "runtime", "-storepass", "android", "-keypass", "android",
         "-dname", "CN=Sahara Synthetic CI", "-validity", "2", "-keyalg", "RSA", "-keysize", "2048")
+    def sign(original, name):
+        signed = signing / name
+        cmd(TOOLS / "apksigner", "sign", "--ks", key, "--ks-key-alias", "runtime", "--ks-pass", "pass:android", "--key-pass", "pass:android", "--out", signed, original)
+        write(name + "-signature.txt", cmd(TOOLS / "apksigner", "verify", "--verbose", "--print-certs", signed))
+        return signed
+    execution_debug, execution_test = debug, test
+    corrected_test = None
+    if scope == "focused":
+        corrected_test = ROOT / "android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk"
+        assert corrected_test.is_file(), "Corrected instrumentation APK was not compiled"
+        # A fresh CI debug keystore cannot match the original build's signer. Sign copies
+        # of the ORIGINAL app and corrected tests together; never install a rebuilt app.
+        execution_debug = sign(debug, "sahara-original-debug-ci.apk")
+        execution_test = sign(corrected_test, "sahara-corrected-tests-ci.apk")
     optimized = signing / "sahara-optimized-ci.apk"
     cmd(TOOLS / "apksigner", "sign", "--ks", key, "--ks-key-alias", "runtime", "--ks-pass", "pass:android", "--key-pass", "pass:android", "--out", optimized, release)
     cert = cmd(TOOLS / "apksigner", "verify", "--verbose", "--print-certs", optimized).decode(errors="replace")
     write("optimized-ci-signature.txt", cert)
     info = {"sourceCommit": data["head_sha"], "buildRunId": run_id, "buildUrl": data["html_url"],
-            "harnessCommit": os.environ["GITHUB_SHA"], "verifiedArtifacts": verified,
-            "debug": str(debug), "test": str(test), "unsignedRelease": str(release), "optimizedCiApk": str(optimized),
+            "harnessCommit": os.environ["GITHUB_SHA"], "scope":scope, "verifiedArtifacts": verified,
+            "sourceEquality":equality, "originalDebug":str(debug), "originalTest":str(test),
+            "debug": str(execution_debug), "test": str(execution_test), "unsignedRelease": str(release), "optimizedCiApk": str(optimized),
             "debugSha256": sha(debug), "testSha256": sha(test), "unsignedReleaseSha256": sha(release),
+            "executionDebugSha256":sha(execution_debug), "executionTestSha256":sha(execution_test),
+            "correctedTestSha256":sha(corrected_test) if corrected_test else None,
+            "debugSignature":"Original app APK and corrected tests share an ephemeral CI signer; original app code unchanged." if scope == "focused" else "Original downloaded debug/test signatures retained.",
             "optimizedCiSha256": sha(optimized), "optimizedSignature": "Ephemeral CI key; differs from the private store upload key. Code and R8 output unchanged.",
             "preparedUtc": utc()}
     write("artifacts.json", info)
@@ -133,6 +193,8 @@ def instrument(name, classes, expected):
             current = {}
     counts = {key:sum(t["result"] == key for t in cases) for key in ("pass", "skipped", "ignored", "failure", "error", "unknown")}
     complete = len(cases) == expected and not any(counts[k] for k in ("failure", "error", "unknown")) and f"OK ({expected} test" in output
+    if all("#" in selection for selection in classes.split(",")):
+        complete = complete and {case.get("class", "")+"#"+case["test"] for case in cases} == set(classes.split(","))
     if expected == 36:
         skipped = [case["test"] for case in cases if case["result"] == "skipped"]
         complete = complete and counts["pass"] == 35 and skipped == ["signInLoadsAccountRecordsOnToday"] and counts["ignored"] == 0
@@ -141,6 +203,14 @@ def instrument(name, classes, expected):
     result = {"tests":cases, "counts":counts, "expected":expected, "matrixComplete":complete,
               "durationSeconds":round(time.monotonic()-started, 3), "finishedUtc":utc()}
     write(name + ".json", result)
+    print(json.dumps({"phase":name, "counts":counts, "complete":complete,
+                      "tests":[{"test":case.get("class", "")+"#"+case["test"], "result":case["result"]} for case in cases]}, indent=2), flush=True)
+    if not complete:
+        # Only synthetic fixtures run here; preserve exact assertion stacks in the
+        # Actions log as well as artifacts so a slow download cannot hide failures.
+        print("::group::" + name + " actual instrumentation failure output", flush=True)
+        print(output, flush=True)
+        print("::endgroup::", flush=True)
     return result
 
 
@@ -181,9 +251,20 @@ class Ui:
         return None
     def swipe(self, tree, up=True):
         viewport = self.bounds(next(tree.iter("node")))
+        scrollables = []
+        for node in tree.iter("node"):
+            if node.get("scrollable") == "true" and node.get("package") == self.package:
+                try:
+                    bounds = self.bounds(node)
+                    if bounds[2]-bounds[0] > (viewport[2]-viewport[0])*.5 and bounds[3]-bounds[1] > 180:
+                        scrollables.append(bounds)
+                except AssertionError: pass
+        if scrollables:
+            # Gesture must start inside the observed scroll surface, above bottom nav.
+            viewport = max(scrollables, key=lambda a:(a[2]-a[0])*(a[3]-a[1]))
         ime = self.ime()
-        bottom = min(viewport[3] - 180, (ime[1] - 35) if ime else viewport[3] - 180)
-        top = max(220, viewport[1] + 190)
+        bottom = min(viewport[3] - 48, (ime[1] - 35) if ime else viewport[3] - 48)
+        top = max(160, viewport[1] + 55)
         assert bottom > top + 100
         x = (viewport[0] + viewport[2]) // 2
         start, end = (bottom, top) if up else (top, bottom)
@@ -286,7 +367,7 @@ class Ui:
         self.tap("Today", scroll=False)
 
 
-def optimized_smoke(info):
+def optimized_smoke(info, focused=False):
     ui = Ui("optimized-ui", RELEASE)
     result = {"startedUtc":utc(), "sourceCommit":info["sourceCommit"], "apkSha256":info["optimizedCiSha256"],
               "signerQualification":info["optimizedSignature"], "screenshotsTaken":False, "flagSecurePreserved":True, "checks":[]}
@@ -298,43 +379,44 @@ def optimized_smoke(info):
         ui.save_with_ime("Continue", "person")
         ui.expect("CI Release Fictional Person")
         result["checks"].append("Person saved with actual IME open and Continue above keyboard")
-        ui.tap("Calendar")
-        ui.tap("Add to calendar", desc=True)
-        ui.field("What is planned?", "CI fictional follow-up")
-        ui.save_with_ime("Save to calendar", "calendar")
-        ui.expect("CI fictional follow-up")
-        ui.restart(); ui.tap("Calendar"); ui.expect("CI fictional follow-up")
-        ui.tap("Edit CI fictional follow-up", desc=True)
-        ui.expect("CI fictional follow-up"); ui.key()
-        result["checks"].append("Calendar saved with IME open; value survives process restart and reopens for editing")
-        ui.key(); ui.tap("Care team")
-        ui.tap("Add task")
-        ui.field("What needs doing?", "CI fictional report collection")
-        ui.field("Who is this for?", "Fictional helper")
-        ui.save_with_ime("Add task", "task")
-        ui.expect("CI fictional report collection")
-        ui.restart(); ui.tap("Care team"); ui.expect("CI fictional report collection")
-        result["checks"].append("Named care task saved with IME open and survives process restart")
-        ui.key(); ui.tap("Lab history")
-        ui.tap("Add a lab result", desc=True)
-        ui.field("Test name on report", "Synthetic value")
-        ui.field("Value", "12.4")
-        ui.field("Printed unit", "g/dL")
-        ui.save_with_ime("Save result", "labs")
-        ui.expect("12.4 g/dL")
-        ui.restart(); ui.tap("Lab history"); ui.expect("12.4 g/dL")
-        result["checks"].append("Exact numeric lab value/unit saved with IME open and survives process restart")
-        ui.key()
-        ui.tap("Change view, Family", desc=True, scroll=False); ui.tap("Doctor", scroll=False)
-        ui.tap("Talk", scroll=False); ui.tap("Record conversation")
-        ui.expect("Before we record")
-        ui.expect("We understand the recording stays privately on this device.")
-        ui.absent(["Optional free-demo transcription", "Transcribe recording",
-                   "Everyone agrees to upload this fictional demo recording to Supabase and Google Gemini. It contains no real patient information, personal details or confidential information."])
-        ui.disabled("Start recording")
-        ui.tap("Cancel")
-        result["checks"].append("Main care recording consent is local-only in optimized release; start is disabled without consent, no cloud-processing option shown, microphone never opened")
-        ui.key(); ui.tap("Change view, Doctor", desc=True, scroll=False); ui.tap("Family", scroll=False)
+        if not focused:
+            ui.tap("Calendar")
+            ui.tap("Add to calendar", desc=True)
+            ui.field("What is planned?", "CI fictional follow-up")
+            ui.save_with_ime("Save to calendar", "calendar")
+            ui.expect("CI fictional follow-up")
+            ui.restart(); ui.tap("Calendar"); ui.expect("CI fictional follow-up")
+            ui.tap("Edit CI fictional follow-up", desc=True)
+            ui.expect("CI fictional follow-up"); ui.key()
+            result["checks"].append("Calendar saved with IME open; value survives process restart and reopens for editing")
+            ui.key(); ui.tap("Care team")
+            ui.tap("Add task")
+            ui.field("What needs doing?", "CI fictional report collection")
+            ui.field("Who is this for?", "Fictional helper")
+            ui.save_with_ime("Add task", "task")
+            ui.expect("CI fictional report collection")
+            ui.restart(); ui.tap("Care team"); ui.expect("CI fictional report collection")
+            result["checks"].append("Named care task saved with IME open and survives process restart")
+            ui.key(); ui.tap("Lab history")
+            ui.tap("Add a lab result", desc=True)
+            ui.field("Test name on report", "Synthetic value")
+            ui.field("Value", "12.4")
+            ui.field("Printed unit", "g/dL")
+            ui.save_with_ime("Save result", "labs")
+            ui.expect("12.4 g/dL")
+            ui.restart(); ui.tap("Lab history"); ui.expect("12.4 g/dL")
+            result["checks"].append("Exact numeric lab value/unit saved with IME open and survives process restart")
+            ui.key()
+            ui.tap("Change view, Family", desc=True, scroll=False); ui.tap("Doctor", scroll=False)
+            ui.tap("Talk", scroll=False); ui.tap("Record conversation")
+            ui.expect("Before we record")
+            ui.expect("We understand the recording stays privately on this device.")
+            ui.absent(["Optional free-demo transcription", "Transcribe recording",
+                       "Everyone agrees to upload this fictional demo recording to Supabase and Google Gemini. It contains no real patient information, personal details or confidential information."])
+            ui.disabled("Start recording")
+            ui.tap("Cancel")
+            result["checks"].append("Main care recording consent is local-only in optimized release; start is disabled without consent, no cloud-processing option shown, microphone never opened")
+            ui.key(); ui.tap("Change view, Doctor", desc=True, scroll=False); ui.tap("Family", scroll=False)
         ui.tap("More", scroll=False); ui.tap("Doctor login")
         ui.expect("Preview account prefilled")
         ui.tap("Open workspace")
@@ -359,8 +441,7 @@ def optimized_smoke(info):
         ui.tap("Create preview PDF")
         ui.expect("Preview PDF created on this device")
         result["checks"].append("Explicitly fictional preview version and actual PDF created in optimized UI")
-        ui.key(); ui.key(); ui.key()
-        # Return through actual workspace navigation without altering the main care person.
+        # The visible Account tab exits this preview directly without altering the main care person.
         ui.tap("Account", scroll=False); ui.tap("Back to Sahara")
         ui.expect("CI Release Fictional Person")
         result["checks"].append("Doctor workspace exit returns to the original main care person")
@@ -368,6 +449,9 @@ def optimized_smoke(info):
     except Exception as error:
         result["passed"] = False; result["failure"] = str(error)
         write("optimized-ui/failure-trace.txt", traceback.format_exc())
+        print("::group::Optimized UI actual failure", flush=True)
+        print(traceback.format_exc(), flush=True)
+        print("::endgroup::", flush=True)
         try: ui.dump("failure")
         except Exception: pass
     finally:
@@ -378,10 +462,10 @@ def optimized_smoke(info):
     return result
 
 
-def run():
+def run(scope="all"):
     info = json.loads((OUT / "artifacts.json").read_text())
     summary = {"sourceCommit":info["sourceCommit"], "harnessCommit":info["harnessCommit"], "startedUtc":utc(),
-               "freshDisposableEmulator":True, "physicalDevice":False, "credentialsInjected":False,
+               "scope":scope, "freshDisposableEmulator":True, "physicalDevice":False, "credentialsInjected":False,
                "aiProviderCalls":False, "microphoneOpened":False, "windowsEmulatorDataTouched":False}
     for key in ["window_animation_scale", "transition_animation_scale", "animator_duration_scale"]:
         adb("shell", "settings", "put", "global", key, "0")
@@ -394,39 +478,46 @@ def run():
     write("host-memory.txt", cmd("free", "-m"))
     adb("install", "-r", info["debug"], timeout=180); adb("install", "-r", info["test"], timeout=180)
     adb("logcat", "-c")
-    summary["matrix"] = instrument("matrix-36", ",".join("in.wedevit.care."+c for c in CLASSES), 36)
-    summary["pdfSupplemental"] = instrument("pdf-pagination", "in.wedevit.care.DoctorWorkflowFlowTest#longPublishedPreviewExportsToMultipleReadablePages", 1)
-    adb("pull", "/sdcard/Android/data/"+DEBUG+"/files/verification", str(OUT / "debug-captures"), check=False)
-    # New doctor surfaces are also captured in debug mode. FLAG_SECURE on optimized
-    # release remains intact; these images must never be labelled release screenshots.
-    try:
-        ui=Ui("debug-ui", DEBUG, screenshots=True); ui.restart(); ui.dump("entry")
-        ui.tap("Doctor login"); ui.dump("doctor-preview-login")
-        ui.tap("Open workspace"); ui.dump("doctor-workspace")
-        ui.tap("Patients", scroll=False); ui.tap("Asha"); ui.dump("fictional-patient-hub")
-        ui.tap("Conversations"); ui.tap("Open conversation workspace"); ui.tap("2 Document")
-        ui.expect("Record conversation"); ui.dump("doctor-local-capture")
-        ui.tap("Record conversation"); ui.expect("Before recording"); ui.dump("doctor-consent-unchecked")
-        ui.tap("Cancel")
-        summary["debugCapture"] = "Actual current-source debug doctor images captured; root must inspect readability, insets and absence of overlays. Original matrix screenshots are preserved separately."
-    except Exception as error: summary["debugCapture"] = "Capture failed: " + str(error)
-    summary["optimizedRelease"] = optimized_smoke(info)
+    if scope == "focused":
+        summary["matrix"] = instrument("matrix-focused-4", ",".join(FOCUSED_TESTS), 4)
+        summary["pdfSupplemental"] = {"notRepeated":True, "priorRunId":38882501784,
+            "qualification":"Prior separate pagination test passed; not counted as a new focused-run check."}
+    else:
+        summary["matrix"] = instrument("matrix-36", ",".join("in.wedevit.care."+c for c in CLASSES), 36)
+        summary["pdfSupplemental"] = instrument("pdf-pagination", "in.wedevit.care.DoctorWorkflowFlowTest#longPublishedPreviewExportsToMultipleReadablePages", 1)
+        adb("pull", "/sdcard/Android/data/"+DEBUG+"/files/verification", str(OUT / "debug-captures"), check=False)
+    if scope == "all":
+        # New doctor surfaces are also captured in debug mode. FLAG_SECURE on optimized
+        # release remains intact; these images must never be labelled release screenshots.
+        try:
+            ui=Ui("debug-ui", DEBUG, screenshots=True); ui.restart(); ui.dump("entry")
+            ui.tap("Doctor login"); ui.dump("doctor-preview-login")
+            ui.tap("Open workspace"); ui.dump("doctor-workspace")
+            ui.tap("Patients", scroll=False); ui.tap("Asha"); ui.dump("fictional-patient-hub")
+            ui.tap("Conversations"); ui.tap("Open conversation workspace"); ui.tap("2 Document")
+            ui.expect("Record conversation"); ui.dump("doctor-local-capture")
+            ui.tap("Record conversation"); ui.expect("Before recording"); ui.dump("doctor-consent-unchecked")
+            ui.tap("Cancel")
+            summary["debugCapture"] = "Actual current-source debug doctor images captured; root must inspect readability, insets and absence of overlays. Original matrix screenshots are preserved separately."
+        except Exception as error: summary["debugCapture"] = "Capture failed: " + str(error)
+    summary["optimizedRelease"] = optimized_smoke(info, focused=scope == "focused")
     write("logcat.txt", adb("logcat", "-d", "-v", "brief", check=False))
     summary["finishedUtc"] = utc()
-    summary["passed"] = summary["matrix"]["matrixComplete"] and summary["pdfSupplemental"]["matrixComplete"] and summary["optimizedRelease"]["passed"]
-    summary["qualification"] = "CI emulator only; 36-test matrix and separate PDF check are distinguished. Component fixtures do not establish real doctor assignment or patient delivery. No local Room upgrade claimed."
+    summary["passed"] = summary["matrix"]["matrixComplete"] and (scope == "focused" or summary["pdfSupplemental"]["matrixComplete"]) and summary["optimizedRelease"]["passed"]
+    summary["qualification"] = "Focused correction run only; aggregate with original 38882501784 without concealing its four failures or repeating already passing checks." if scope == "focused" else "CI emulator only; 36-test matrix and separate PDF check are distinguished. Component fixtures do not establish real doctor assignment or patient delivery. No local Room upgrade claimed."
     write("runtime-summary.json", summary)
-    print(json.dumps({"matrix":summary["matrix"]["counts"], "pdf":summary["pdfSupplemental"]["counts"],
+    print(json.dumps({"matrix":summary["matrix"]["counts"], "pdf":summary["pdfSupplemental"].get("counts", "not repeated"),
                       "optimizedPassed":summary["optimizedRelease"]["passed"], "passed":summary["passed"]}, indent=2))
     return 0 if summary["passed"] else 1
 
 
 if __name__ == "__main__":
-    parser=argparse.ArgumentParser(); parser.add_argument("mode", choices=["check-run", "prepare", "run"]); parser.add_argument("--run-id")
+    parser=argparse.ArgumentParser(); parser.add_argument("mode", choices=["check-run", "check-source", "prepare", "run"]); parser.add_argument("--run-id"); parser.add_argument("--scope", choices=["all", "focused"], default="all"); parser.add_argument("--source-dir")
     args=parser.parse_args(); OUT.mkdir(parents=True,exist_ok=True)
     try:
         if args.mode=="check-run": check_run(args.run_id)
-        elif args.mode=="prepare": prepare(args.run_id)
-        else: sys.exit(run())
+        elif args.mode=="check-source": check_source(args.run_id, args.source_dir)
+        elif args.mode=="prepare": prepare(args.run_id, args.scope, args.source_dir)
+        else: sys.exit(run(args.scope))
     except Exception:
         write("harness-failure.txt", traceback.format_exc()); raise

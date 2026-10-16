@@ -63,8 +63,8 @@ class CareFlowTest {
         ui.onNodeWithTag("choose-role").performClick()
         ui.onNodeWithTag("role-Doctor").performClick()
         ui.onNodeWithTag("nav-Talk").performClick()
-        ui.onNodeWithTag("conversation-list").performScrollToNode(hasSetTextAction() and hasText("Conversation"))
-        ui.onNode(hasSetTextAction() and hasText("Conversation")).assertTextContains(words)
+        ui.onNodeWithTag("conversation-list").performScrollToNode(hasSetTextAction() and hasText("Conversation transcript"))
+        ui.onNode(hasSetTextAction() and hasText("Conversation transcript")).assertTextContains(words)
     }
     @Test fun reportPickerPersistsSearchesSharesAndRemovesOnlyItsCopy() {
         val source = CareReport(personId = personId, name = "Clinic report.pdf", mime = "application/pdf", fileName = "source.pdf", bytes = 0)
@@ -141,8 +141,8 @@ class CareFlowTest {
         screenshot("today")
         ui.onNodeWithText("Talk", useUnmergedTree = true).performClick()
         val original = "What matters: I want to spend time with family.\nStill to discuss: I have not decided about hospital care.\nNext steps: Bring my questions to the next visit."
-        ui.onNodeWithTag("conversation-list").performScrollToNode(hasSetTextAction() and hasText("Conversation"))
-        ui.onNode(hasSetTextAction() and hasText("Conversation")).performTextInput(original)
+        ui.onNodeWithTag("conversation-list").performScrollToNode(hasSetTextAction() and hasText("Conversation transcript"))
+        ui.onNode(hasSetTextAction() and hasText("Conversation transcript")).performTextInput(original)
         ui.onNodeWithTag("conversation-list").performScrollToNode(hasText("Choose words and review"))
         ui.onNodeWithText("Choose words and review").performClick()
         ui.onNodeWithTag("conversation-list").performScrollToNode(hasText("Organise using section headings"))
@@ -287,7 +287,7 @@ class CareFlowTest {
         screenshot("today-saved")
         ui.onNodeWithTag("nav-More").performClick()
         ui.onNodeWithText("Privacy").performClick()
-        ui.onNodeWithText("You choose which notes to share and with whom.").assertIsDisplayed()
+        ui.onNodeWithText("You choose which notes to share and with whom.").performScrollTo().assertIsDisplayed()
         screenshot("more")
     }
     @Test fun signInLoadsAccountRecordsOnToday() {
