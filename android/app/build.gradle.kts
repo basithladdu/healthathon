@@ -32,6 +32,8 @@ android {
     buildTypes {
         debug {
             applicationIdSuffix = ".development"
+            // Synthetic developer tests only; the store build cannot upload audio.
+            buildConfigField("boolean", "CLOUD_AUDIO_ENABLED", "true")
             buildConfigField(
                 "String",
                 "CONVERSATION_TRANSCRIPTION_ENDPOINT",
@@ -40,6 +42,7 @@ android {
         }
         release {
             isMinifyEnabled = true
+            buildConfigField("boolean", "CLOUD_AUDIO_ENABLED", "false")
             buildConfigField(
                 "String",
                 "CONVERSATION_TRANSCRIPTION_ENDPOINT",

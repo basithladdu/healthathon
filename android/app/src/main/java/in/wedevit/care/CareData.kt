@@ -198,6 +198,7 @@ object RecordingConsentRules {
 }
 
 object NoteRules {
+    const val MAX_SOURCE_CHARS = 12_000
     val labels = listOf("What matters", "Who was there", "What we discussed", "Still to discuss", "Next steps")
     fun values(d: Conversation) = listOf(d.priorities, d.participants, d.topics, d.questions, d.nextSteps)
     fun values(v: CareVersion) = listOf(v.priorities, v.participants, v.topics, v.questions, v.nextSteps)
@@ -207,7 +208,7 @@ object NoteRules {
         require(person.id == draft.personId) { "This conversation belongs to a different person." }
         require(reviewed && doctor.trim().isNotEmpty()) { "Review the note and add the doctor's name." }
         require(draft.source.isNotBlank() && values(draft).any { it.isNotBlank() }) { "Add the conversation and review its sections." }
-        require(draft.source.length <= 60000 && values(draft).all { it.length <= 4000 }) { "Shorten this conversation before saving." }
+        require(draft.source.length <= MAX_SOURCE_CHARS && values(draft).all { it.length <= 4000 }) { "Shorten this conversation before saving." }
         val origin = if (draft.transcribedAt > 0 && draft.transcriptModel.isNotBlank()) ReviewWorkflow.TRANSCRIBED_DRAFT else ReviewWorkflow.MANUAL_DRAFT
         val hash = hash(listOf(person.id, person.name, draft.source, doctor.trim(), origin, ReviewWorkflow.REVIEWED_UNVERIFIED, ReviewWorkflow.NOT_VERIFIED, draft.transcriptModel, draft.transcribedAt.toString()) + values(draft))
         return CareVersion(personId = person.id, version = version, personName = person.name, source = draft.source,

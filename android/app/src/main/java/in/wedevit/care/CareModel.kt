@@ -335,6 +335,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewMod
     fun transcribeAudio(path: String, consent: RecordingConsent) {
         val personId = selected.value
         action {
+            require(BuildConfig.CLOUD_AUDIO_ENABLED) { "Online audio processing is not available in this release. Use on-device dictation or enter the conversation text." }
             requireEdit(personId)
             require(path == consent.audioPath && consent.personId == personId) { "Choose a recording for this person." }
             require(draft.value.personId == personId && draft.value.source.isBlank()) { "Clear the conversation text before creating a new transcript." }
@@ -348,6 +349,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewMod
                     if (error.code != ConversationTranscriptionError.AUTH_REQUIRED) throw error
                     conversationTranscriber.transcribe(File(path), consent, service.transcriptionToken(forceRefresh = true))
                 }
+                require(result.text.length <= NoteRules.MAX_SOURCE_CHARS) { "This transcript is too long for a shared care note. Keep the recording and enter a shorter selection." }
                 require(selected.value == personId && draft.value.personId == personId && draft.value.source.isBlank()) { "The conversation changed while transcription was running. The transcript was not inserted." }
                 edit(draft.value.copy(
                     source = result.text,

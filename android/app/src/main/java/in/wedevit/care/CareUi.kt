@@ -311,13 +311,13 @@ val Peach = Color(0xFFFFD1B3)
                             path = file.absolutePath,
                             consent = consent,
                             transcribing = transcribingPath == file.absolutePath,
-                            canTranscribe = consent?.let { it.transcriptionConsentAt > 0 && it.noticeVersion >= 2 } == true && draft.source.isBlank() && !busy && !dictating && !recording,
+                            canTranscribe = BuildConfig.CLOUD_AUDIO_ENABLED && consent?.let { it.transcriptionConsentAt > 0 && it.noticeVersion >= 2 } == true && draft.source.isBlank() && !busy && !dictating && !recording,
                             onTranscribe = { consent?.let { vm.transcribeAudio(file.absolutePath, it) } },
                             onDelete = { vm.deleteAudio(file.absolutePath) },
                         )
                     }
                     item { if (dictating) SurfaceCard { Text("Conversation", fontWeight = FontWeight.Bold); SelectionContainerText(draft.source); Text("Finish this turn to edit the conversation.", style = MaterialTheme.typography.bodySmall) }
-                        else CareField(value = draft.source, onValueChange = { if (it.length <= ConversationTranscriber.MAX_TRANSCRIPT_CHARS) { val current = vm.draft.value; if (current.personId == draft.personId) vm.edit(current.copy(source = it)) } }, label = "Conversation transcript", placeholder = "Speak, transcribe a consented recording, or type what was said…", minLines = 5, supporting = if (draft.transcribedAt > 0) "AI transcript · ${draft.transcriptModel}. Check every word against the audio." else "No AI transcript has been inserted.") }
+                        else CareField(value = draft.source, onValueChange = { if (it.length <= NoteRules.MAX_SOURCE_CHARS) { val current = vm.draft.value; if (current.personId == draft.personId) vm.edit(current.copy(source = it)) } }, label = "Conversation transcript", placeholder = if (BuildConfig.CLOUD_AUDIO_ENABLED) "Speak, transcribe a consented recording, or type what was said…" else "Speak one turn or type what was said…", minLines = 5, supporting = if (draft.transcribedAt > 0) "AI transcript · ${draft.transcriptModel}. Check every word against the audio." else "") }
                     item { Button(onClick = { nextStep(1) }, enabled = draft.source.isNotBlank() && !recording && !dictating, modifier = Modifier.fillMaxWidth()) { Text("Choose words and review"); Spacer(Modifier.width(8.dp)); Icon(Icons.AutoMirrored.Filled.ArrowForward, null) } }
                 }
                 1 -> {
@@ -363,12 +363,14 @@ val Peach = Color(0xFFFFD1B3)
             consentNames.forEach { name -> CheckLine(participantAgreements[name] == true, { participantAgreements[name] = it }, "$name agrees to the recording.") }
             HorizontalDivider()
             CheckLine(purposeAccepted, { purposeAccepted = it }, "We understand this recording is for preparing and checking a care-conversation note.")
-            CheckLine(storageAccepted, { storageAccepted = it }, "We understand the audio stays privately on this device unless someone shares it or separately agrees to cloud transcription below.")
+            CheckLine(storageAccepted, { storageAccepted = it }, if (BuildConfig.CLOUD_AUDIO_ENABLED) "We understand the audio stays privately on this device unless someone shares it or separately agrees to cloud transcription below." else "We understand the recording stays privately on this device.")
             CheckLine(accessAccepted, { accessAccepted = it }, "We understand people with access to this person's phone or shared records may be able to read the written note.")
+            if (BuildConfig.CLOUD_AUDIO_ENABLED) {
             HorizontalDivider()
             Text("Optional free-demo transcription", fontWeight = FontWeight.Bold)
             CheckLine(transcriptionAccepted, { transcriptionAccepted = it }, "Everyone agrees to upload this fictional demo recording to Supabase and Google Gemini. It contains no real patient information, personal details or confidential information.")
             Text("Use test conversations only. Google may use free-tier audio and transcripts to improve its products, including human review. Deleting the temporary upload does not undo that processing. Limit: five minutes / 3 MB, up to five attempts per account per day. Check the returned words against the audio.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
         }
     }, confirmButton = {
         TextButton(onClick = { permissionDialog = false; if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) startConsentedRecording() else permission.launch(Manifest.permission.RECORD_AUDIO) }, enabled = allParticipantsAgreed && purposeAccepted && storageAccepted && accessAccepted) { Text("Start recording") }
@@ -396,7 +398,7 @@ val Peach = Color(0xFFFFD1B3)
         Column(Modifier.weight(1f)) {
             Text("Conversation · " + Instant.ofEpochMilli(File(path).lastModified()).atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("d MMM, HH:mm")), fontSize = 14.sp)
             Text(if (consent == null) "Consent details unavailable" else "Consent recorded · ${RecordingConsentRules.names(consent.participants).joinToString()}", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 2, overflow = TextOverflow.Ellipsis)
-            if (consent != null) Text(when {
+            if (BuildConfig.CLOUD_AUDIO_ENABLED && consent != null) Text(when {
                 consent.transcriptionConsentAt <= 0 -> "Cloud transcription not agreed"
                 consent.noticeVersion < 2 -> "Older consent: record a new fictional demo"
                 else -> "Free-demo transcription agreed"
@@ -404,7 +406,7 @@ val Peach = Color(0xFFFFD1B3)
         }
         IconButton(onClick = { confirmDelete = true }) { Icon(Icons.Default.DeleteOutline, "Delete recording") }
     }
-        if ((consent?.transcriptionConsentAt ?: 0L) > 0L) {
+        if (BuildConfig.CLOUD_AUDIO_ENABLED && (consent?.transcriptionConsentAt ?: 0L) > 0L) {
             Spacer(Modifier.height(10.dp))
             Button(onClick = onTranscribe, enabled = canTranscribe && !transcribing, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp)) {
                 if (transcribing) { CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp, color = Color.White); Spacer(Modifier.width(8.dp)) }

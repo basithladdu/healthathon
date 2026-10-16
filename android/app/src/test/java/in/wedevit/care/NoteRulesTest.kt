@@ -23,6 +23,13 @@ class NoteRulesTest {
         assertThrows(IllegalArgumentException::class.java) { NoteRules.publish(person, draft.copy(personId = "other"), "Doctor", true, 1) }
         assertThrows(IllegalArgumentException::class.java) { NoteRules.publish(person, NoteRules.organise(draft), "Doctor", false, 1) }
     }
+    @Test fun publishedSourceFitsTheSharedRecordLimit() {
+        val boundary = draft.copy(source = "a".repeat(12_000), priorities = "Reviewed words")
+        assertEquals(12_000, NoteRules.publish(person, boundary, "Reviewer", true, 1).source.length)
+        assertThrows(IllegalArgumentException::class.java) {
+            NoteRules.publish(person, boundary.copy(source = boundary.source + "a"), "Reviewer", true, 1)
+        }
+    }
     @Test fun aNewVersionDoesNotAlterAnEarlierReviewedRecord() {
         val original = NoteRules.publish(person, NoteRules.organise(draft), "Doctor", true, 1)
         val revised = NoteRules.publish(person, NoteRules.organise(draft.copy(source = "What matters: I changed my mind.")), "Doctor", true, 2)

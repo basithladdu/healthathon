@@ -79,6 +79,9 @@ class ConversationTranscriber(
     }
 
     private fun requireConsent(file: File, consent: RecordingConsent) {
+        if (!BuildConfig.CLOUD_AUDIO_ENABLED) {
+            throw ConversationTranscriptionException(ConversationTranscriptionError.CONFIGURATION, "Online audio processing is not available in this release.")
+        }
         if (!file.isFile || file.absolutePath != File(consent.audioPath).absolutePath || file.extension.lowercase(Locale.ROOT) != "m4a") {
             throw ConversationTranscriptionException(ConversationTranscriptionError.INVALID_AUDIO, "Choose a saved Sahara conversation recording.")
         }
