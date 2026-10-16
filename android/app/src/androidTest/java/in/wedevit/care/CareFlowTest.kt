@@ -285,6 +285,11 @@ class CareFlowTest {
         ui.onNodeWithTag("today-list").performScrollToNode(hasText("An okay day"))
         ui.onNodeWithText("An okay day").assertIsDisplayed()
         screenshot("today-saved")
+        // A fresh save snackbar overlaps the first visible Privacy header.
+        // Wait for its actual dismissal before testing the next touch target.
+        ui.waitUntil(15000) {
+            ui.onAllNodesWithText("Saved", useUnmergedTree = true).fetchSemanticsNodes().isEmpty()
+        }
         ui.onNodeWithTag("nav-More").performClick()
         val privacyHeader = ui.onNode(hasText("Privacy") and hasClickAction())
         privacyHeader.performScrollTo().assertIsDisplayed()

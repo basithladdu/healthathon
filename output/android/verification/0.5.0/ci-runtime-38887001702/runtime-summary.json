@@ -1,0 +1,334 @@
+{
+  "sourceCommit": "ebffb7b043a5e8725f190ab8f8f3574c768d9058",
+  "harnessCommit": "f597392e0ebc48df9355d5ba550da3cc006a1b37",
+  "startedUtc": "2026-10-16T10:30:44.600000Z",
+  "scope": "focused",
+  "freshDisposableEmulator": true,
+  "physicalDevice": false,
+  "credentialsInjected": false,
+  "aiProviderCalls": false,
+  "microphoneOpened": false,
+  "windowsEmulatorDataTouched": false,
+  "environment": {
+    "size": "Physical size: 1080x2400\nOverride size: 720x1600",
+    "density": "Physical density: 420\nOverride density: 300",
+    "pageSize": "4096",
+    "api": "36",
+    "deviceMemory": "MemTotal:        2532304 kB\nMemFree:           91000 kB\nMemAvailable:    1539024 kB\nBuffers:           53192 kB\nCached:          1631700 kB\nSwapCached:            0 kB\nActive:          1083440 kB\nInactive:        1045176 kB\nActive(anon):     329056 kB\nInactive(anon):   159696 kB\nActive(file):     754384 kB\nInactive(file):   885480 kB\nUnevictable:       39132 kB\nMlocked:           39132 kB\nSwapTotal:       1899224 kB\nSwapFree:        1893592 kB\nDirty:             45484 kB\nWriteback:             0 kB\nAnonPages:        482932 kB\nMapped:           734132 kB\nShmem:              6908 kB\nKReclaimable:      46480 kB\nSlab:             152584 kB\nSReclaimable:      46480 kB\nSUnreclaim:       106104 kB\nKernelStack:       18712 kB\nPageTables:        43824 kB\nSecPageTables:         0 kB\nNFS_Unstable:          0 kB\nBounce:                0 kB\nWritebackTmp:          0 kB\nCommitLimit:     3165376 kB\nCommitted_AS:   59176480 kB\nVmallocTotal:   34359738367 kB\nVmallocUsed:       43640 kB\nVmallocChunk:          0 kB\nPercpu:             2840 kB\nAnonHugePages:         0 kB\nShmemHugePages:        0 kB\nShmemPmdMapped:        0 kB\nFileHugePages:         0 kB\nFilePmdMapped:         0 kB\nCmaTotal:              0 kB\nCmaFree:               0 kB\nDirectMap4k:       55128 kB\nDirectMap2M:     2566144 kB"
+  },
+  "sixteenKbRuntimeTest": false,
+  "matrix": {
+    "tests": [
+      {
+        "class": "in.wedevit.care.CareFlowTest",
+        "test": "roleMenuKeepsDraftAndPatientChoiceAfterRecreation",
+        "status": 0,
+        "result": "pass"
+      },
+      {
+        "class": "in.wedevit.care.CareFlowTest",
+        "test": "conversationReviewSavesExactVersionAndSurvivesRecreation",
+        "status": -2,
+        "result": "failure"
+      },
+      {
+        "class": "in.wedevit.care.CareFlowTest",
+        "test": "checkinSavesChosenWordsAndKeepsOptionalNote",
+        "status": -2,
+        "result": "failure"
+      },
+      {
+        "class": "in.wedevit.care.PatientDoctorUiTest",
+        "test": "replacingPatientLinkClearsOldDetailsAndPendingIsNotVerified",
+        "status": 0,
+        "result": "pass"
+      }
+    ],
+    "counts": {
+      "pass": 2,
+      "skipped": 0,
+      "ignored": 0,
+      "failure": 2,
+      "error": 0,
+      "unknown": 0
+    },
+    "expected": 4,
+    "matrixComplete": false,
+    "durationSeconds": 57.934,
+    "finishedUtc": "2026-10-16T10:31:57.426889Z"
+  },
+  "pdfSupplemental": {
+    "notRepeated": true,
+    "priorRunId": 38882501784,
+    "qualification": "Prior separate pagination test passed; not counted as a new focused-run check."
+  },
+  "optimizedRelease": {
+    "startedUtc": "2026-10-16T10:31:57.427310Z",
+    "sourceCommit": "ebffb7b043a5e8725f190ab8f8f3574c768d9058",
+    "apkSha256": "B1964C8FA65FAA3C23CA0E015A262D2460C62C5D30812304D7BE1C48B9E95B92",
+    "signerQualification": "Ephemeral CI key; differs from the private store upload key. Code and R8 output unchanged.",
+    "screenshotsTaken": false,
+    "flagSecurePreserved": true,
+    "checks": [
+      "Person saved with actual IME open and Continue above keyboard",
+      "Doctor preview uses local consent; no upload/authentication action or microphone invoked",
+      "Explicitly fictional preview version and actual PDF created in optimized UI",
+      "Doctor workspace exit returns to the original main care person"
+    ],
+    "passed": true,
+    "actions": [
+      {
+        "action": "tap",
+        "label": "Add a person",
+        "bounds": [
+          232,
+          1216,
+          420,
+          1254
+        ],
+        "atUtc": "2026-10-16T10:32:07.861761Z"
+      },
+      {
+        "action": "fill",
+        "label": "Name",
+        "syntheticValue": "CI Release Fictional Person",
+        "atUtc": "2026-10-16T10:32:16.777734Z"
+      },
+      {
+        "action": "verified-save-above-ime",
+        "label": "person",
+        "saveBounds": [
+          485,
+          674,
+          592,
+          712
+        ],
+        "imeBounds": [
+          0,
+          1039,
+          720,
+          1600
+        ]
+      },
+      {
+        "action": "tap",
+        "label": "Continue",
+        "bounds": [
+          485,
+          674,
+          592,
+          712
+        ],
+        "atUtc": "2026-10-16T10:32:22.901320Z"
+      },
+      {
+        "action": "tap",
+        "label": "More",
+        "bounds": [
+          608,
+          1486,
+          658,
+          1531
+        ],
+        "atUtc": "2026-10-16T10:32:29.144613Z"
+      },
+      {
+        "action": "tap",
+        "label": "Doctor login",
+        "bounds": [
+          287,
+          521,
+          433,
+          559
+        ],
+        "atUtc": "2026-10-16T10:32:32.668595Z"
+      },
+      {
+        "action": "tap",
+        "label": "Open workspace",
+        "bounds": [
+          218,
+          1254,
+          446,
+          1292
+        ],
+        "atUtc": "2026-10-16T10:32:38.203110Z"
+      },
+      {
+        "action": "tap",
+        "label": "Patients",
+        "bounds": [
+          223,
+          1495,
+          312,
+          1525
+        ],
+        "atUtc": "2026-10-16T10:32:41.440335Z"
+      },
+      {
+        "action": "tap",
+        "label": "Asha",
+        "bounds": [
+          68,
+          720,
+          152,
+          765
+        ],
+        "atUtc": "2026-10-16T10:32:44.241022Z"
+      },
+      {
+        "action": "tap",
+        "label": "Conversations",
+        "bounds": [
+          184,
+          1005,
+          425,
+          1050
+        ],
+        "atUtc": "2026-10-16T10:32:49.354923Z"
+      },
+      {
+        "action": "tap",
+        "label": "Open conversation workspace",
+        "bounds": [
+          182,
+          582,
+          539,
+          620
+        ],
+        "atUtc": "2026-10-16T10:32:51.794280Z"
+      },
+      {
+        "action": "tap",
+        "label": "2 Document",
+        "bounds": [
+          259,
+          486,
+          403,
+          524
+        ],
+        "atUtc": "2026-10-16T10:32:54.273319Z"
+      },
+      {
+        "action": "tap",
+        "label": "Record conversation",
+        "bounds": [
+          268,
+          1030,
+          512,
+          1068
+        ],
+        "atUtc": "2026-10-16T10:33:00.863028Z"
+      },
+      {
+        "action": "tap",
+        "label": "Cancel",
+        "bounds": [
+          270,
+          1229,
+          352,
+          1267
+        ],
+        "atUtc": "2026-10-16T10:33:07.432166Z"
+      },
+      {
+        "action": "tap",
+        "label": "Load sample AI draft",
+        "bounds": [
+          261,
+          709,
+          508,
+          747
+        ],
+        "atUtc": "2026-10-16T10:33:15.952518Z"
+      },
+      {
+        "action": "tap",
+        "label": "3 Review",
+        "bounds": [
+          478,
+          486,
+          585,
+          524
+        ],
+        "atUtc": "2026-10-16T10:34:00.528756Z"
+      },
+      {
+        "action": "check",
+        "label": "I checked the original source text",
+        "bounds": [
+          38,
+          1110,
+          128,
+          1200
+        ],
+        "atUtc": "2026-10-16T10:34:07.998345Z"
+      },
+      {
+        "action": "check",
+        "label": "I reviewed every section and unresolved point",
+        "bounds": [
+          38,
+          1200,
+          128,
+          1290
+        ],
+        "atUtc": "2026-10-16T10:34:12.510723Z"
+      },
+      {
+        "action": "tap",
+        "label": "Publish preview version",
+        "bounds": [
+          220,
+          1350,
+          500,
+          1388
+        ],
+        "atUtc": "2026-10-16T10:34:14.952410Z"
+      },
+      {
+        "action": "tap",
+        "label": "Create preview PDF",
+        "bounds": [
+          274,
+          1089,
+          506,
+          1127
+        ],
+        "atUtc": "2026-10-16T10:34:22.493009Z"
+      },
+      {
+        "action": "tap",
+        "label": "Account",
+        "bounds": [
+          592,
+          1495,
+          679,
+          1525
+        ],
+        "atUtc": "2026-10-16T10:34:26.971054Z"
+      },
+      {
+        "action": "tap",
+        "label": "Back to Sahara",
+        "bounds": [
+          296,
+          1299,
+          474,
+          1337
+        ],
+        "atUtc": "2026-10-16T10:34:32.404319Z"
+      }
+    ],
+    "finishedUtc": "2026-10-16T10:34:34.837046Z",
+    "limitations": [
+      "Fresh CI installation; local Windows emulator databases were not touched.",
+      "Ephemeral signer differs from final store signer.",
+      "No physical-device, real speech, AI-provider or clinical validation.",
+      "FLAG_SECURE respected; UIAutomator XML and actual keyboard/window evidence only."
+    ]
+  },
+  "finishedUtc": "2026-10-16T10:34:35.197928Z",
+  "passed": false,
+  "qualification": "Focused correction run only; aggregate with original 38882501784 without concealing its four failures or repeating already passing checks."
+}

@@ -1,0 +1,83 @@
+{
+  "sourceCommit": "ebffb7b043a5e8725f190ab8f8f3574c768d9058",
+  "harnessCommit": "348bf95b4cbeaef2d6b1f0b9fa6ce08030ff5b5b",
+  "workflowRunId": 38889436917,
+  "workflowUrl": "https://github.com/basithladdu/healthathon/actions/runs/38889436917",
+  "artifactZipSha256": "620a47ffc0c05806daff91c631014315ce5aa7a7a3f961e1313c0fea5f54df4a",
+  "artifactZipHashVerified": true,
+  "originalAppAndBuildInputsMatch": true,
+  "matrix": {
+    "pass": 0,
+    "skipped": 0,
+    "ignored": 0,
+    "failure": 1,
+    "error": 0,
+    "unknown": 0
+  },
+  "expectedTests": 1,
+  "matrixPassed": false,
+  "remainingFailures": [
+    "CareFlowTest#checkinSavesChosenWordsAndKeepsOptionalNote: Hide Privacy.assertExists failed after the Show Privacy click. The test ended before the subsequent semantics-log and expanded-Privacy screenshot diagnostics. This run does not establish the cause."
+  ],
+  "screenshotInspection": [
+    {
+      "path": "debug-captures/checkin.png",
+      "observed": "Fictional Test Person check-in sheet with An okay day selected; Save and Add a note visible."
+    },
+    {
+      "path": "debug-captures/today-saved.png",
+      "observed": "Fictional Test Person Today screen shows An okay day, Spent time with family and 16 Oct 2026. No expanded Privacy panel is shown."
+    }
+  ],
+  "supplementalChecks": {
+    "pdf": {
+      "repeated": false,
+      "priorRunId": 38882501784,
+      "qualification": "Prior separate pagination check is not a new result in this run."
+    },
+    "optimizedRelease": {
+      "repeated": false,
+      "priorRunId": 38887001702,
+      "qualification": "Preceding focused-run preview/PDF/exit result is not a new result in this run."
+    }
+  },
+  "limitations": [
+    "The single selected instrumentation case failed and is not counted as a pass.",
+    "Screenshots show only fictional check-in and saved Today states; they do not show Privacy expansion or establish the failure cause.",
+    "Only the selected Privacy-related case ran; no full-suite pass is claimed.",
+    "Original app packages were reused with an ephemeral CI signer; this differs from the final store upload signer.",
+    "Disposable API 36 emulator uses 4096-byte pages; no physical-device or 16 KB runtime testing.",
+    "No credentials injected, AI provider calls or microphone opening; no clinical validation.",
+    "Selected raw evidence and screenshots are preserved byte for byte; repetitive logcat, whole ZIP and package dumps remain outside Git."
+  ],
+  "evidenceFiles": [
+    {
+      "path": "artifacts.json",
+      "sha256": "12F8BFAA188976A2C5D9F6632DEFF15B77B4AE8E4ED69B0AFF427E635D6B5CD7"
+    },
+    {
+      "path": "source-equality.json",
+      "sha256": "F6471D7D0FE4021FD649F0D3D1E35EFFEAFE2A635ACB66CCC1277355A6287809"
+    },
+    {
+      "path": "matrix-focused-1.json",
+      "sha256": "3D5F9822EB685271F14C738EF2878BC562C54DC2FE96C6BE035BC07359CA3CF7"
+    },
+    {
+      "path": "matrix-focused-1.txt",
+      "sha256": "B5A6F19F35717CDBEEA8D91B379E7967CA40299075A8774134637E4FAD3C2AB9"
+    },
+    {
+      "path": "runtime-summary.json",
+      "sha256": "0469DCC38D57D6F89A40C435E4A9C7B1DB14779F62799F1431501DE99FB23EFC"
+    },
+    {
+      "path": "debug-captures/checkin.png",
+      "sha256": "B56BA516EA9E3040FE2FCB44A620C3FAE5BEA6EB2ECC10A8FC35108AF47468FA"
+    },
+    {
+      "path": "debug-captures/today-saved.png",
+      "sha256": "95F0CF6B51691877521C1247C87D1675C99842ACA7F0C9BF5810C66A2C4E2442"
+    }
+  ]
+}

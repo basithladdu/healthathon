@@ -1,0 +1,89 @@
+{
+  "sourceCommit": "ebffb7b043a5e8725f190ab8f8f3574c768d9058",
+  "harnessCommit": "f597392e0ebc48df9355d5ba550da3cc006a1b37",
+  "workflowRunId": 38887001702,
+  "workflowUrl": "https://github.com/basithladdu/healthathon/actions/runs/38887001702",
+  "artifactZipSha256": "516ab4e4fd4f082f0922d1602559ceeb2780c360b8e71848c972982017e4782a",
+  "originalAppAndBuildInputsMatch": true,
+  "matrix": {
+    "pass": 2,
+    "skipped": 0,
+    "ignored": 0,
+    "failure": 2,
+    "error": 0,
+    "unknown": 0
+  },
+  "matrixPassed": false,
+  "remainingFailures": [
+    "CareFlowTest#conversationReviewSavesExactVersionAndSurvivesRecreation: Continue to save / Save care note changed to clinical review / Publish reviewed version",
+    "CareFlowTest#checkinSavesChosenWordsAndKeepsOptionalNote: scroll Privacy header before activating its expansion"
+  ],
+  "optimized": {
+    "passed": true,
+    "checks": [
+      "Person saved with actual IME open and Continue above keyboard",
+      "Doctor preview uses local consent; no upload/authentication action or microphone invoked",
+      "Explicitly fictional preview version and actual PDF created in optimized UI",
+      "Doctor workspace exit returns to the original main care person"
+    ],
+    "xmlProof": {
+      "published-version": {
+        "path": "published-version.xml",
+        "originalPath": "optimized-ui\\047-find.xml"
+      },
+      "created-pdf": {
+        "path": "created-pdf.xml",
+        "originalPath": "optimized-ui\\050-find.xml"
+      },
+      "returned-person": {
+        "path": "returned-person.xml",
+        "originalPath": "optimized-ui\\007-find.xml"
+      }
+    },
+    "flagSecurePreserved": true,
+    "ephemeralSignerDiffersFromFinalUploadSigner": true
+  },
+  "limitations": [
+    "Two instrumentation assertions remain failed in this run; not counted as passes.",
+    "Optimized preview is fictional and local; no provider, microphone, clinical workflow or physical-device validation.",
+    "CI uses 4 KB pages, not a 16 KB runtime."
+  ],
+  "evidenceFiles": [
+    {
+      "path": "artifacts.json",
+      "sha256": "2A7C8018BA5F5E63BA780034B436F2D23AC897CAB3D72182EBC2D83EB4A8556F"
+    },
+    {
+      "path": "created-pdf.xml",
+      "sha256": "861EA032E35A899A49742883ADF514B1261CD6E1249DDBF36B58B1C34F8436AB"
+    },
+    {
+      "path": "matrix-focused-4.json",
+      "sha256": "5DCD76009F6B76448A739E35FBEFD50A35191EA9600F65F5673FDF75DF70CB65"
+    },
+    {
+      "path": "matrix-focused-4.txt",
+      "sha256": "A3BCA2B8D59D97C977AE0E5CA474AD4F3DF6B4E7476AEBB8F9A5794AA998A210"
+    },
+    {
+      "path": "optimized-release-smoke.json",
+      "sha256": "E0B6C2E56DC6A5D1CAE83D419C059F8897CC4D726F0CBDFF5B1EC105AD4EC241"
+    },
+    {
+      "path": "published-version.xml",
+      "sha256": "96D9D686E1EF982E9891886D906C9A66CA08400821526D56D4C0F59D91B6B5AB"
+    },
+    {
+      "path": "returned-person.xml",
+      "sha256": "87115C5C8FC1B3C209AC67021A287FF56C904311814BD230D01FD902A23C3BF3"
+    },
+    {
+      "path": "runtime-summary.json",
+      "sha256": "2655A88C1E75B13B1FCEA1C10857C6A6FA52A739BE905F484FB99122F95A1D1C"
+    },
+    {
+      "path": "source-equality.json",
+      "sha256": "A5DD4947AE947D2CEE7E2B9CF7B6658012D790724BC541F7D34B48DE39AFD4F7"
+    }
+  ]
+}

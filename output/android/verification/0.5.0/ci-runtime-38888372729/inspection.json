@@ -1,0 +1,70 @@
+{
+  "sourceCommit": "ebffb7b043a5e8725f190ab8f8f3574c768d9058",
+  "harnessCommit": "f8350bceab98f93c190b3d0c3ff0fc0ca49842cb",
+  "workflowRunId": 38888372729,
+  "workflowUrl": "https://github.com/basithladdu/healthathon/actions/runs/38888372729",
+  "artifactZipSha256": "6f1aac2594dff7d4d539d9baca1926fea67d1677d5a6cd19533e9bf1bcc784a9",
+  "originalAppAndBuildInputsMatch": true,
+  "matrix": {
+    "pass": 1,
+    "skipped": 0,
+    "ignored": 0,
+    "failure": 1,
+    "error": 0,
+    "unknown": 0
+  },
+  "expectedTests": 2,
+  "matrixPassed": false,
+  "passedTests": [
+    "CareFlowTest#conversationReviewSavesExactVersionAndSurvivesRecreation"
+  ],
+  "remainingFailures": [
+    "CareFlowTest#checkinSavesChosenWordsAndKeepsOptionalNote: performScrollTo could not find the offscreen Privacy body text. This whole test remains failed in this run."
+  ],
+  "screenshots": {
+    "present": false,
+    "qualification": "No screenshot files were included in this run artifact; no visual proof is claimed for this run."
+  },
+  "supplementalChecks": {
+    "pdf": {
+      "repeated": false,
+      "priorRunId": 38882501784,
+      "qualification": "Prior separate pagination check is not a new result in this run."
+    },
+    "optimizedRelease": {
+      "repeated": false,
+      "priorRunId": 38887001702,
+      "qualification": "Preceding focused-run preview/PDF/exit result is not a new result in this run."
+    }
+  },
+  "limitations": [
+    "One of two instrumentation cases failed; this run is not a clean full-suite pass.",
+    "Only two remaining checks were selected; prior checks were not rerun.",
+    "Original app packages were reused with an ephemeral CI signer; this differs from the final store upload signer.",
+    "Disposable API 36 emulator uses 4096-byte pages; no physical-device or 16 KB runtime testing.",
+    "No credentials injected, AI provider calls or microphone opening; no clinical validation.",
+    "Raw selected evidence is preserved byte for byte; repetitive logcat, whole ZIP and package dumps remain outside Git."
+  ],
+  "evidenceFiles": [
+    {
+      "path": "artifacts.json",
+      "sha256": "8DC96E955A12A2BC302755E142FE6C59A976083D1BC7B66C9135F3AE4F1067D2"
+    },
+    {
+      "path": "source-equality.json",
+      "sha256": "9C92351E5D35232801AE2E14F069735BA85BDA46434811D956C1455BD452D592"
+    },
+    {
+      "path": "matrix-focused-2.json",
+      "sha256": "113973565FF15F5D814883A6AC4B655A434EC61A9911AA03066F5DD609C9BFA6"
+    },
+    {
+      "path": "matrix-focused-2.txt",
+      "sha256": "E3208857DA6A3145C4288D7BBC403C54940C8B00A4647DB41D61C390D7744E99"
+    },
+    {
+      "path": "runtime-summary.json",
+      "sha256": "8A92D43D4522D52346E578D164AB8F1A4817BF0EEC831E57D8CFDAAC41BF2E17"
+    }
+  ]
+}

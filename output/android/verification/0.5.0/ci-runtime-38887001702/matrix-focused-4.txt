@@ -1,0 +1,136 @@
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareFlowTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=4
+INSTRUMENTATION_STATUS: stream=
+in.wedevit.care.CareFlowTest:
+INSTRUMENTATION_STATUS: test=roleMenuKeepsDraftAndPatientChoiceAfterRecreation
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareFlowTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=4
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=roleMenuKeepsDraftAndPatientChoiceAfterRecreation
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareFlowTest
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=4
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=conversationReviewSavesExactVersionAndSurvivesRecreation
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareFlowTest
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=4
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: No node found that matches Text + InputText + EditableText contains 'Continue to save' (ignoreCase: false) in scrollable container
+Semantics of the node:
+Node #719 at (l=0.0, t=233.0, r=720.0, b=1412.0)px, Tag: 'conversation-list'
+CollectionInfo = 'androidx.compose.ui.semantics.CollectionInfo@ba9f9d'
+IsTraversalGroup = 'true'
+VerticalScrollAxisRange = 'ScrollAxisRange(value=4172.0, maxValue=4172.0, reverseScrolling=false)'
+Actions = [GetScrollViewportLength, IndexForKey, ScrollBy, ScrollByOffset, ScrollToIndex]
+Has 8 children
+Selector used: (TestTag = 'conversation-list')
+
+	at androidx.compose.ui.test.ActionsKt.performScrollToNode(Actions.kt:257)
+	at in.wedevit.care.CareFlowTest.conversationReviewSavesExactVersionAndSurvivesRecreation(CareFlowTest.kt:152)
+
+INSTRUMENTATION_STATUS: stream=
+Error in conversationReviewSavesExactVersionAndSurvivesRecreation(in.wedevit.care.CareFlowTest):
+java.lang.AssertionError: No node found that matches Text + InputText + EditableText contains 'Continue to save' (ignoreCase: false) in scrollable container
+Semantics of the node:
+Node #719 at (l=0.0, t=233.0, r=720.0, b=1412.0)px, Tag: 'conversation-list'
+CollectionInfo = 'androidx.compose.ui.semantics.CollectionInfo@ba9f9d'
+IsTraversalGroup = 'true'
+VerticalScrollAxisRange = 'ScrollAxisRange(value=4172.0, maxValue=4172.0, reverseScrolling=false)'
+Actions = [GetScrollViewportLength, IndexForKey, ScrollBy, ScrollByOffset, ScrollToIndex]
+Has 8 children
+Selector used: (TestTag = 'conversation-list')
+
+	at androidx.compose.ui.test.ActionsKt.performScrollToNode(Actions.kt:257)
+	at in.wedevit.care.CareFlowTest.conversationReviewSavesExactVersionAndSurvivesRecreation(CareFlowTest.kt:152)
+
+INSTRUMENTATION_STATUS: test=conversationReviewSavesExactVersionAndSurvivesRecreation
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareFlowTest
+INSTRUMENTATION_STATUS: current=3
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=4
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=checkinSavesChosenWordsAndKeepsOptionalNote
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareFlowTest
+INSTRUMENTATION_STATUS: current=3
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=4
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: Action performScrollTo() failed.
+Reason: Expected exactly '1' node but could not find any node that satisfies: (Text + InputText + EditableText contains 'You choose which notes to share and with whom.' (ignoreCase: false))
+
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+	at androidx.compose.ui.test.ActionsKt.performScrollTo(Actions.kt:81)
+	at in.wedevit.care.CareFlowTest.checkinSavesChosenWordsAndKeepsOptionalNote(CareFlowTest.kt:290)
+
+INSTRUMENTATION_STATUS: stream=
+Error in checkinSavesChosenWordsAndKeepsOptionalNote(in.wedevit.care.CareFlowTest):
+java.lang.AssertionError: Action performScrollTo() failed.
+Reason: Expected exactly '1' node but could not find any node that satisfies: (Text + InputText + EditableText contains 'You choose which notes to share and with whom.' (ignoreCase: false))
+
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+	at androidx.compose.ui.test.ActionsKt.performScrollTo(Actions.kt:81)
+	at in.wedevit.care.CareFlowTest.checkinSavesChosenWordsAndKeepsOptionalNote(CareFlowTest.kt:290)
+
+INSTRUMENTATION_STATUS: test=checkinSavesChosenWordsAndKeepsOptionalNote
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_STATUS: class=in.wedevit.care.PatientDoctorUiTest
+INSTRUMENTATION_STATUS: current=4
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=4
+INSTRUMENTATION_STATUS: stream=
+in.wedevit.care.PatientDoctorUiTest:
+INSTRUMENTATION_STATUS: test=replacingPatientLinkClearsOldDetailsAndPendingIsNotVerified
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.PatientDoctorUiTest
+INSTRUMENTATION_STATUS: current=4
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=4
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=replacingPatientLinkClearsOldDetailsAndPendingIsNotVerified
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_RESULT: stream=
+
+Time: 47.279
+There were 2 failures:
+1) conversationReviewSavesExactVersionAndSurvivesRecreation(in.wedevit.care.CareFlowTest)
+java.lang.AssertionError: No node found that matches Text + InputText + EditableText contains 'Continue to save' (ignoreCase: false) in scrollable container
+Semantics of the node:
+Node #719 at (l=0.0, t=233.0, r=720.0, b=1412.0)px, Tag: 'conversation-list'
+CollectionInfo = 'androidx.compose.ui.semantics.CollectionInfo@ba9f9d'
+IsTraversalGroup = 'true'
+VerticalScrollAxisRange = 'ScrollAxisRange(value=4172.0, maxValue=4172.0, reverseScrolling=false)'
+Actions = [GetScrollViewportLength, IndexForKey, ScrollBy, ScrollByOffset, ScrollToIndex]
+Has 8 children
+Selector used: (TestTag = 'conversation-list')
+
+	at androidx.compose.ui.test.ActionsKt.performScrollToNode(Actions.kt:257)
+	at in.wedevit.care.CareFlowTest.conversationReviewSavesExactVersionAndSurvivesRecreation(CareFlowTest.kt:152)
+2) checkinSavesChosenWordsAndKeepsOptionalNote(in.wedevit.care.CareFlowTest)
+java.lang.AssertionError: Action performScrollTo() failed.
+Reason: Expected exactly '1' node but could not find any node that satisfies: (Text + InputText + EditableText contains 'You choose which notes to share and with whom.' (ignoreCase: false))
+
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow(SemanticsNodeInteraction.kt:178)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchOneOrThrow$default(SemanticsNodeInteraction.kt:150)
+	at androidx.compose.ui.test.SemanticsNodeInteraction.fetchSemanticsNode(SemanticsNodeInteraction.kt:84)
+	at androidx.compose.ui.test.ActionsKt.performScrollTo(Actions.kt:81)
+	at in.wedevit.care.CareFlowTest.checkinSavesChosenWordsAndKeepsOptionalNote(CareFlowTest.kt:290)
+
+FAILURES!!!
+Tests run: 4,  Failures: 2
+
+
+INSTRUMENTATION_CODE: -1

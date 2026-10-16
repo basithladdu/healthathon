@@ -1,0 +1,40 @@
+{
+  "tests": [
+    {
+      "class": "in.wedevit.care.CareFlowTest",
+      "test": "roleMenuKeepsDraftAndPatientChoiceAfterRecreation",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.CareFlowTest",
+      "test": "conversationReviewSavesExactVersionAndSurvivesRecreation",
+      "status": -2,
+      "result": "failure"
+    },
+    {
+      "class": "in.wedevit.care.CareFlowTest",
+      "test": "checkinSavesChosenWordsAndKeepsOptionalNote",
+      "status": -2,
+      "result": "failure"
+    },
+    {
+      "class": "in.wedevit.care.PatientDoctorUiTest",
+      "test": "replacingPatientLinkClearsOldDetailsAndPendingIsNotVerified",
+      "status": 0,
+      "result": "pass"
+    }
+  ],
+  "counts": {
+    "pass": 2,
+    "skipped": 0,
+    "ignored": 0,
+    "failure": 2,
+    "error": 0,
+    "unknown": 0
+  },
+  "expected": 4,
+  "matrixComplete": false,
+  "durationSeconds": 57.934,
+  "finishedUtc": "2026-10-16T10:31:57.426889Z"
+}
