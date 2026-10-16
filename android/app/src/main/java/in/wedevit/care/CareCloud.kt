@@ -34,11 +34,11 @@ internal fun decodeAcknowledgement(row: JSONObject): Acknowledgement {
 }
 
 class CareCloud(context: Context) {
-    private val preferences = context.getSharedPreferences("care-account", Context.MODE_PRIVATE)
+    private val preferences = context.getSharedPreferences("care-account-kjnhtakqzboayqorrlue", Context.MODE_PRIVATE)
     private val refreshLock = Mutex()
     val session = MutableStateFlow(runCatching { preferences.getString("session", null)?.let { decodeSession(JSONObject(unseal(it))) } }.getOrNull())
-    private val base = "https://cghlkqeqiokjqdionrkc.supabase.co"
-    private val apiKey = "sb_publishable_43mvHQiHJXVGwS71SX0GVA_GWxXBVOC"
+    private val base = "https://kjnhtakqzboayqorrlue.supabase.co"
+    private val apiKey = PUBLIC_API_KEY
     private val accountRedirect = URLEncoder.encode("https://sahara.wedevit.in/android-account", "UTF-8")
 
     suspend fun signIn(email: String, password: String) {
@@ -104,7 +104,14 @@ class CareCloud(context: Context) {
             val d = row.getJSONObject("data"); val id = row.getString("id"); val person = row.getString("person_id")
             when (row.getString("kind")) {
                 "entry" -> entries.add(CareItem(id, person, d.getString("kind"), d.getString("title"), d.optString("detail"), d.optLong("due"), d.optString("doneOn"), d.getLong("created"), row.getLong("revision")))
-                "note" -> notes.add(CareVersion(id, person, d.getInt("version"), d.getString("personName"), d.getString("source"), d.optString("priorities"), d.optString("participants"), d.optString("topics"), d.optString("questions"), d.optString("nextSteps"), d.getString("doctor"), d.getLong("published"), d.getString("contentHash")))
+                "note" -> notes.add(CareVersion(
+                    id = id, personId = person, version = d.getInt("version"), personName = d.getString("personName"), source = d.getString("source"),
+                    priorities = d.optString("priorities"), participants = d.optString("participants"), topics = d.optString("topics"), questions = d.optString("questions"),
+                    nextSteps = d.optString("nextSteps"), doctor = d.getString("doctor"), published = d.getLong("published"), contentHash = d.getString("contentHash"),
+                    draftOrigin = d.optString("draftOrigin", ReviewWorkflow.MANUAL_DRAFT), reviewStatus = d.optString("reviewStatus", ReviewWorkflow.REVIEWED_UNVERIFIED),
+                    reviewerVerification = d.optString("reviewerVerification", ReviewWorkflow.NOT_VERIFIED),
+                    transcriptionModel = d.optString("transcriptionModel"), transcribedAt = d.optLong("transcribedAt"),
+                ))
                 "ack" -> acks.add(decodeAcknowledgement(row))
             }
         }
@@ -119,14 +126,15 @@ class CareCloud(context: Context) {
         } while (page.length() == 500)
         return result
     }
-    private suspend fun token(): String = refreshLock.withLock {
+    private suspend fun token(forceRefresh: Boolean = false): String = refreshLock.withLock {
         val saved = session.value ?: throw IllegalArgumentException("Sign in to continue.")
-        if (saved.expires > System.currentTimeMillis() / 1000 + 60) return@withLock saved.access
+        if (!forceRefresh && saved.expires > System.currentTimeMillis() / 1000 + 60) return@withLock saved.access
         val response = JSONObject(request("POST", "/auth/v1/token?grant_type=refresh_token", JSONObject().put("refresh_token", saved.refresh), authenticated = false))
         rememberSession(response)
         session.value!!.access
     }
     internal suspend fun medicineOrganizerToken(): String = token()
+    internal suspend fun transcriptionToken(forceRefresh: Boolean = false): String = token(forceRefresh)
     private suspend fun request(method: String, path: String, body: JSONObject? = null, authenticated: Boolean = true): String {
         val access = if (authenticated) token() else null
         return withContext(Dispatchers.IO) {
@@ -172,7 +180,11 @@ class CareCloud(context: Context) {
     }
     private fun seal(value: String): String { val cipher = Cipher.getInstance("AES/GCM/NoPadding"); cipher.init(Cipher.ENCRYPT_MODE, key()); return Base64.encodeToString(cipher.iv + cipher.doFinal(value.toByteArray()), Base64.NO_WRAP) }
     private fun unseal(value: String): String { val bytes = Base64.decode(value, Base64.NO_WRAP); val cipher = Cipher.getInstance("AES/GCM/NoPadding"); cipher.init(Cipher.DECRYPT_MODE, key(), GCMParameterSpec(128, bytes.copyOfRange(0, 12))); return String(cipher.doFinal(bytes.copyOfRange(12, bytes.size))) }
+
+    companion object {
+        const val PUBLIC_API_KEY = "sb_publishable_bheyh26N5MKpXNEJDQgq8w_oDRhW8Xe"
+    }
 }
 
 private fun entryJson(i: CareItem) = JSONObject().put("kind", i.kind).put("title", i.title).put("detail", i.detail).put("due", i.due).put("doneOn", i.doneOn).put("created", i.created)
-private fun noteJson(n: CareVersion) = JSONObject().put("version", n.version).put("personName", n.personName).put("source", n.source).put("priorities", n.priorities).put("participants", n.participants).put("topics", n.topics).put("questions", n.questions).put("nextSteps", n.nextSteps).put("doctor", n.doctor).put("published", n.published).put("contentHash", n.contentHash)
+private fun noteJson(n: CareVersion) = JSONObject().put("version", n.version).put("personName", n.personName).put("source", n.source).put("priorities", n.priorities).put("participants", n.participants).put("topics", n.topics).put("questions", n.questions).put("nextSteps", n.nextSteps).put("doctor", n.doctor).put("published", n.published).put("contentHash", n.contentHash).put("draftOrigin", n.draftOrigin).put("reviewStatus", n.reviewStatus).put("reviewerVerification", n.reviewerVerification).put("transcriptionModel", n.transcriptionModel).put("transcribedAt", n.transcribedAt)

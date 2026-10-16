@@ -70,7 +70,7 @@ val Peach = Color(0xFFFFD1B3)
         outline = Color(0xFF8D7B70)), content = content)
 }
 
-@Composable fun CareApp(vm: CareModel, onAccount: () -> Unit) {
+@Composable fun CareApp(vm: CareModel, onAccount: () -> Unit, onDoctorDemo: () -> Unit = {}) {
     val people by vm.people.collectAsStateWithLifecycle()
     val selected by vm.selected.collectAsStateWithLifecycle()
     val clinician by vm.clinician.collectAsStateWithLifecycle()
@@ -88,6 +88,8 @@ val Peach = Color(0xFFFFD1B3)
     var medicineScannerPerson by rememberSaveable { mutableStateOf("") }
     var personMenu by remember { mutableStateOf(false) }
     var reading by remember { mutableStateOf<CareVersion?>(null) }
+    val feedbackAccountScope = vm.cloud?.session?.value?.userId ?: "guest-patient"
+    var feedbackOpen by rememberSaveable(feedbackAccountScope) { mutableStateOf(false) }
     val screens = rememberSaveableStateHolder()
     val snackbar = remember { SnackbarHostState() }
     val person = people.firstOrNull { it.id == selected }
@@ -104,6 +106,10 @@ val Peach = Color(0xFFFFD1B3)
         owner.lifecycle.addObserver(observer); onDispose { owner.lifecycle.removeObserver(observer) }
     }
     LaunchedEffect(message) { message?.let { snackbar.showSnackbar(it); vm.message.value = null } }
+    if (feedbackOpen) {
+        FeedbackScreen(accountScope = feedbackAccountScope, surface = "patient", onClose = { feedbackOpen = false })
+        return
+    }
     BackHandler(!medicineScanner && (tab != 0 || activeRecording)) { if (activeRecording) vm.stopRecording() else tab = 0 }
     Scaffold(containerColor = Cream, snackbarHost = { SnackbarHost(snackbar) }, topBar = {
         if (!medicineScanner) Column {
@@ -124,7 +130,8 @@ val Peach = Color(0xFFFFD1B3)
                 }
             }
             if (person != null) IconButton(onClick = { if (activeRecording) vm.stopRecording(); tab = 5 }) { Icon(Icons.Default.FolderOpen, "Documents", tint = if (tab == 5) Rust else Ink) }
-            CareRoleMenu(role, enabled = !activeRecording) { vm.role(it) }
+            if (person == null) OutlinedButton(onClick = onDoctorDemo, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-demo-entry")) { Text("Doctor login") }
+            else CareRoleMenu(role, enabled = !activeRecording) { vm.role(it) }
         }
         HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = .15f))
         }
@@ -154,7 +161,7 @@ val Peach = Color(0xFFFFD1B3)
                     6 -> CareCalendar(vm, onWorkflow = { tab = 7 })
                     7 -> CareWorkflows(vm, onTalk = { tab = 1 })
                     8 -> CareLabs(vm)
-                    else -> More(vm, person, onAccount = onAccount, onDelete = { dialog = "delete" }, onCalendar = { tab = 6 }, onWorkflow = { tab = 7 }, onLabs = { tab = 8 })
+                    else -> More(vm, person, onAccount = onAccount, onDelete = { dialog = "delete" }, onCalendar = { tab = 6 }, onWorkflow = { tab = 7 }, onLabs = { tab = 8 }, onDoctorDemo = onDoctorDemo, onFeedback = { if (activeRecording) vm.stopRecording(); feedbackOpen = true })
                 } }
             } }
             refreshError?.let { error -> Surface(Modifier.align(Alignment.TopCenter).fillMaxWidth(), color = Peach) { Row(verticalAlignment = Alignment.CenterVertically) { Text(error, Modifier.weight(1f).padding(12.dp), style = MaterialTheme.typography.bodySmall); TextButton(onClick = vm::refresh) { Text("Retry") } } } }
@@ -189,6 +196,10 @@ val Peach = Color(0xFFFFD1B3)
             Heading("Today", 30); Spacer(Modifier.weight(1f)); Text(LocalDate.now().format(DateTimeFormatter.ofPattern("EEE, d MMM")), color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp)
             if (vm.cloud != null) IconButton(onClick = vm::refresh) { Icon(Icons.Default.Refresh, "Refresh records") }
         } }
+        if (!clinician) item {
+            // Patient–doctor linking is not yet available. A typed note reviewer is not a relationship.
+            PatientDoctorRow(doctor = null)
+        }
         item { ActionCard(Gold, onClick = { if (!clinician && latest != null) onRead(latest) else onTalk() }) {
             Row(Modifier.fillMaxWidth().padding(18.dp), verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
@@ -205,7 +216,7 @@ val Peach = Color(0xFFFFD1B3)
             }
         } }
         if (clinician && latest != null) item { ActionCard(Paper, onClick = { onRead(latest) }) {
-            Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.Description, null, tint = Rust); Spacer(Modifier.width(12.dp)); Column(Modifier.weight(1f)) { Text("Latest care note", fontWeight = FontWeight.Bold); Text("${date(latest.published)} · ${latest.doctor}", style = MaterialTheme.typography.bodySmall) }; Icon(Icons.AutoMirrored.Filled.ArrowForward, "Read note", Modifier.size(20.dp)) }
+            Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.Description, null, tint = Rust); Spacer(Modifier.width(12.dp)); Column(Modifier.weight(1f)) { Text("Latest care note", fontWeight = FontWeight.Bold); Text("${date(latest.published)} · ${latest.doctor}", style = MaterialTheme.typography.bodySmall); Text(ReviewWorkflow.label(latest), style = MaterialTheme.typography.labelSmall, color = Rust) }; Icon(Icons.AutoMirrored.Filled.ArrowForward, "Read note", Modifier.size(20.dp)) }
         } }
         item { Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             Tile("How are you?", Icons.Default.WbSunny, Peach, Modifier.weight(1f)) { onAdd("checkin") }
@@ -241,20 +252,33 @@ val Peach = Color(0xFFFFD1B3)
     val draft by vm.draft.collectAsStateWithLifecycle(); val versions by vm.versions.collectAsStateWithLifecycle()
     val recording by vm.recording.collectAsStateWithLifecycle(); val seconds by vm.recordingSeconds.collectAsStateWithLifecycle(); val level by vm.amplitude.collectAsStateWithLifecycle()
     val recordings by vm.recordings.collectAsStateWithLifecycle()
+    val recordingConsents by vm.recordingConsents.collectAsStateWithLifecycle()
+    val transcribingPath by vm.transcribingPath.collectAsStateWithLifecycle()
     val busy by vm.busy.collectAsStateWithLifecycle()
-    var step by rememberSaveable { mutableIntStateOf(0) }; var consent by rememberSaveable { mutableStateOf(false) }
+    var step by rememberSaveable { mutableIntStateOf(0) }
     var dictating by remember { mutableStateOf(false) }
     val scroll = key(step) { rememberLazyListState() }
     val focus = LocalFocusManager.current
     fun nextStep(value: Int) { focus.clearFocus(); step = value }
     var permissionDialog by remember { mutableStateOf(false) }; var doctor by rememberSaveable { mutableStateOf("") }; var reviewed by rememberSaveable { mutableStateOf(false) }
+    var participantText by rememberSaveable { mutableStateOf("") }
+    val participantAgreements = remember { mutableStateMapOf<String, Boolean>() }
+    var purposeAccepted by rememberSaveable { mutableStateOf(false) }
+    var storageAccepted by rememberSaveable { mutableStateOf(false) }
+    var accessAccepted by rememberSaveable { mutableStateOf(false) }
+    var transcriptionAccepted by rememberSaveable { mutableStateOf(false) }
+    val consentNames = RecordingConsentRules.names(participantText)
+    val allParticipantsAgreed = consentNames.isNotEmpty() && consentNames.all { participantAgreements[it] == true }
     val context = LocalContext.current
-    val permission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted -> if (granted) vm.startRecording(consent) else vm.message.value = "Microphone permission wasn't granted. You can still type the conversation." }
+    val startConsentedRecording = {
+        vm.startRecording(participantText, participantAgreements.filterValues { it }.keys, purposeAccepted, storageAccepted, accessAccepted, transcriptionAccepted)
+    }
+    val permission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted -> if (granted) startConsentedRecording() else vm.message.value = "Microphone permission wasn't granted. You can still type the conversation." }
     LaunchedEffect(draft.source, draft.priorities, draft.participants, draft.topics, draft.questions, draft.nextSteps) { reviewed = false }
     LazyColumn(Modifier.fillMaxSize().imePadding().testTag("conversation-list"), state = scroll, contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         item { Heading(if (clinician) "Conversation" else "Care notes") }
         if (clinician) {
-            item { Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf("Conversation", "Review", "Save").forEachIndexed { i, name -> FilterChip(selected = step == i, onClick = { nextStep(i) }, label = { Text("${i + 1} $name", fontSize = 12.sp) }) } } }
+            item { Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf("Capture", "Review draft", "Publish").forEachIndexed { i, name -> FilterChip(selected = step == i, onClick = { nextStep(i) }, label = { Text("${i + 1} $name", fontSize = 12.sp) }) } } }
             when (step) {
                 0 -> {
                     item { CareDictationPanel(draft.personId, recording, enabled = !busy && draft.personId.isNotBlank(),
@@ -274,16 +298,34 @@ val Peach = Color(0xFFFFD1B3)
                         if (recording) {
                             val meter by animateFloatAsState(level.coerceIn(0f, 1f), tween(120), label = "microphone level")
                             LinearProgressIndicator(progress = { meter }, modifier = Modifier.fillMaxWidth(), color = Rust)
-                        } else Text("Ask everyone before recording.", style = MaterialTheme.typography.bodyMedium)
-                        Spacer(Modifier.height(12.dp)); Button(onClick = { if (recording) vm.stopRecording() else { consent = false; permissionDialog = true } }, shape = RoundedCornerShape(14.dp), enabled = draft.personId.isNotBlank() && !dictating) { Icon(if (recording) Icons.Default.Stop else Icons.Default.Mic, null); Spacer(Modifier.width(8.dp)); Text(if (recording) "Stop and save" else "Record conversation") }
+                        } else Text("Every participant must agree before recording.", style = MaterialTheme.typography.bodyMedium)
+                        Spacer(Modifier.height(12.dp)); Button(onClick = { if (recording) vm.stopRecording() else {
+                            participantText = draft.participants
+                            participantAgreements.clear(); purposeAccepted = false; storageAccepted = false; accessAccepted = false; transcriptionAccepted = false
+                            permissionDialog = true
+                        } }, shape = RoundedCornerShape(14.dp), enabled = draft.personId.isNotBlank() && !dictating) { Icon(if (recording) Icons.Default.Stop else Icons.Default.Mic, null); Spacer(Modifier.width(8.dp)); Text(if (recording) "Stop and save" else "Record conversation") }
                     } }
-                    items(recordings, key = { it.absolutePath }) { file -> AudioPlayback(file.absolutePath, onDelete = { vm.deleteAudio(file.absolutePath) }) }
+                    items(recordings, key = { it.absolutePath }) { file ->
+                        val consent = recordingConsents.firstOrNull { it.audioPath == file.absolutePath }
+                        AudioPlayback(
+                            path = file.absolutePath,
+                            consent = consent,
+                            transcribing = transcribingPath == file.absolutePath,
+                            canTranscribe = consent?.let { it.transcriptionConsentAt > 0 && it.noticeVersion >= 2 } == true && draft.source.isBlank() && !busy && !dictating && !recording,
+                            onTranscribe = { consent?.let { vm.transcribeAudio(file.absolutePath, it) } },
+                            onDelete = { vm.deleteAudio(file.absolutePath) },
+                        )
+                    }
                     item { if (dictating) SurfaceCard { Text("Conversation", fontWeight = FontWeight.Bold); SelectionContainerText(draft.source); Text("Finish this turn to edit the conversation.", style = MaterialTheme.typography.bodySmall) }
-                        else CareField(value = draft.source, onValueChange = { if (it.length <= 12000) { val current = vm.draft.value; if (current.personId == draft.personId) vm.edit(current.copy(source = it)) } }, label = "Conversation", placeholder = "Speak, write or paste what was said…", minLines = 5) }
+                        else CareField(value = draft.source, onValueChange = { if (it.length <= ConversationTranscriber.MAX_TRANSCRIPT_CHARS) { val current = vm.draft.value; if (current.personId == draft.personId) vm.edit(current.copy(source = it)) } }, label = "Conversation transcript", placeholder = "Speak, transcribe a consented recording, or type what was said…", minLines = 5, supporting = if (draft.transcribedAt > 0) "AI transcript · ${draft.transcriptModel}. Check every word against the audio." else "No AI transcript has been inserted.") }
                     item { Button(onClick = { nextStep(1) }, enabled = draft.source.isNotBlank() && !recording && !dictating, modifier = Modifier.fillMaxWidth()) { Text("Choose words and review"); Spacer(Modifier.width(8.dp)); Icon(Icons.AutoMirrored.Filled.ArrowForward, null) } }
                 }
                 1 -> {
-                    item { Text("Check the words. Leave anything not discussed blank.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                    item { SurfaceCard(Peach) {
+                        Text(if (draft.transcribedAt > 0) "AI transcript draft · not clinically reviewed" else "Structured draft · not clinically reviewed", fontWeight = FontWeight.Bold)
+                        Spacer(Modifier.height(6.dp)); Text(if (draft.transcribedAt > 0) "The recording was transcribed by ${draft.transcriptModel}. Speaker labels and words can be wrong; check them against the audio before publishing." else "Choose original words for each section, or organise explicit section headings. This review is not automatic audio transcription.", style = MaterialTheme.typography.bodySmall)
+                    } }
+                    item { Text("Check every word against the conversation. Leave anything not discussed blank.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
                     item { CareSourcePicker(draft) { section, line ->
                         try { val current = vm.draft.value; require(current.personId == draft.personId && vm.selected.value == draft.personId) { "Choose this person's conversation again." }; vm.edit(CareDraftAssist.assign(current, section, line)) }
                         catch (e: IllegalArgumentException) { vm.message.value = e.message }
@@ -294,14 +336,14 @@ val Peach = Color(0xFFFFD1B3)
                             CareSourceLinks(draft.source, NoteRules.values(draft)[index]) }
                     }
                     item { SurfaceCard(Sage) { Text("Original words", fontWeight = FontWeight.Bold); Spacer(Modifier.height(8.dp)); SelectionContainerText(draft.source.ifBlank { "Add the conversation first." }) } }
-                    item { Button(onClick = { nextStep(2) }, enabled = draft.source.isNotBlank() && NoteRules.values(draft).any { it.isNotBlank() }, modifier = Modifier.fillMaxWidth()) { Text("Continue to save") } }
+                    item { Button(onClick = { nextStep(2) }, enabled = draft.source.isNotBlank() && NoteRules.values(draft).any { it.isNotBlank() }, modifier = Modifier.fillMaxWidth()) { Text("Continue to clinical review") } }
                 }
                 else -> {
-                    item { SurfaceCard(Gold) { Heading("Final check", 26); Spacer(Modifier.height(6.dp)); Text("Earlier versions stay available.") } }
+                    item { SurfaceCard(Gold) { Heading("Clinical review", 26); Spacer(Modifier.height(6.dp)); Text("Publishing creates an exact version. Earlier versions stay available.") } }
                     item { CareField(value = doctor, onValueChange = { doctor = it.take(100) }, label = "Doctor's name", singleLine = true) }
                     item { CheckLine(reviewed, { reviewed = it }, "I checked every section against the conversation. This records what was discussed, without adding treatment advice.") }
-                    item { Text("A typed name is not a verified identity or legal signature.", style = MaterialTheme.typography.bodySmall) }
-                    item { Button(onClick = { vm.publish(doctor, reviewed) { nextStep(0); reviewed = false } }, enabled = reviewed && doctor.isNotBlank() && !busy && draft.source.isNotBlank(), modifier = Modifier.fillMaxWidth()) { Text("Save care note") } }
+                    item { SurfaceCard(Peach) { Text("Identity not verified", fontWeight = FontWeight.Bold); Spacer(Modifier.height(5.dp)); Text("This first implementation records a self-entered reviewer name. Hospital or medical-council verification is not connected, so this version will not claim to be verified.", style = MaterialTheme.typography.bodySmall) } }
+                    item { Button(onClick = { vm.publish(doctor, reviewed) { nextStep(0); reviewed = false } }, enabled = reviewed && doctor.isNotBlank() && !busy && draft.source.isNotBlank(), modifier = Modifier.fillMaxWidth()) { Text("Publish reviewed version") } }
                 }
             }
         } else {
@@ -311,15 +353,29 @@ val Peach = Color(0xFFFFD1B3)
         if (clinician) item { SectionTitle("Saved notes") }
         if (versions.isEmpty()) item { Text("Your first care note will appear here after a doctor reviews and saves it.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
         items(versions, key = { it.id }) { note -> Card(onClick = { onRead(note) }, colors = CardDefaults.cardColors(containerColor = Paper), shape = RoundedCornerShape(18.dp)) {
-            Row(Modifier.fillMaxWidth().padding(18.dp), verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.Description, null, tint = Rust); Spacer(Modifier.width(12.dp)); Column(Modifier.weight(1f)) { Text("Version ${note.version}" + if (note.id == versions.first().id) " · Latest" else " · Earlier", fontWeight = FontWeight.Bold); Text("${date(note.published)} · ${note.doctor}", style = MaterialTheme.typography.bodySmall) }; Icon(Icons.AutoMirrored.Filled.ArrowForward, "Read note") }
+            Row(Modifier.fillMaxWidth().padding(18.dp), verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.Description, null, tint = Rust); Spacer(Modifier.width(12.dp)); Column(Modifier.weight(1f)) { Text("Version ${note.version}" + if (note.id == versions.first().id) " · Latest" else " · Earlier", fontWeight = FontWeight.Bold); Text("${date(note.published)} · ${note.doctor}", style = MaterialTheme.typography.bodySmall); Text(ReviewWorkflow.label(note), style = MaterialTheme.typography.labelSmall, color = Rust) }; Icon(Icons.AutoMirrored.Filled.ArrowForward, "Read note") }
         } }
     }
-    if (permissionDialog) AlertDialog(onDismissRequest = { permissionDialog = false }, title = { Text("Before we record") }, text = { CheckLine(consent, { consent = it }, "Everyone here has agreed to this recording.") }, confirmButton = {
-        TextButton(onClick = { permissionDialog = false; if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) vm.startRecording(consent) else permission.launch(Manifest.permission.RECORD_AUDIO) }, enabled = consent) { Text("Start recording") }
+    if (permissionDialog) AlertDialog(onDismissRequest = { permissionDialog = false }, title = { Text("Before we record") }, text = {
+        Column(Modifier.heightIn(max = 520.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Text("Name each person who is here. Every named participant must agree.", style = MaterialTheme.typography.bodyMedium)
+            CareField(value = participantText, onValueChange = { participantText = it.take(600) }, label = "Participants", placeholder = "Patient, family member, doctor", minLines = 2, supporting = "Separate names with commas or new lines.")
+            consentNames.forEach { name -> CheckLine(participantAgreements[name] == true, { participantAgreements[name] = it }, "$name agrees to the recording.") }
+            HorizontalDivider()
+            CheckLine(purposeAccepted, { purposeAccepted = it }, "We understand this recording is for preparing and checking a care-conversation note.")
+            CheckLine(storageAccepted, { storageAccepted = it }, "We understand the audio stays privately on this device unless someone shares it or separately agrees to cloud transcription below.")
+            CheckLine(accessAccepted, { accessAccepted = it }, "We understand people with access to this person's phone or shared records may be able to read the written note.")
+            HorizontalDivider()
+            Text("Optional free-demo transcription", fontWeight = FontWeight.Bold)
+            CheckLine(transcriptionAccepted, { transcriptionAccepted = it }, "Everyone agrees to upload this fictional demo recording to Supabase and Google Gemini. It contains no real patient information, personal details or confidential information.")
+            Text("Use test conversations only. Google may use free-tier audio and transcripts to improve its products, including human review. Deleting the temporary upload does not undo that processing. Limit: five minutes / 3 MB, up to five attempts per account per day. Check the returned words against the audio.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+    }, confirmButton = {
+        TextButton(onClick = { permissionDialog = false; if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) startConsentedRecording() else permission.launch(Manifest.permission.RECORD_AUDIO) }, enabled = allParticipantsAgreed && purposeAccepted && storageAccepted && accessAccepted) { Text("Start recording") }
     }, dismissButton = { TextButton(onClick = { permissionDialog = false }) { Text("Cancel") } })
 }
 
-@Composable fun AudioPlayback(path: String, onDelete: () -> Unit) {
+@Composable fun AudioPlayback(path: String, consent: RecordingConsent?, transcribing: Boolean, canTranscribe: Boolean, onTranscribe: () -> Unit, onDelete: () -> Unit) {
     var player by remember(path) { mutableStateOf<MediaPlayer?>(null) }; var playing by remember(path) { mutableStateOf(false) }
     var confirmDelete by remember(path) { mutableStateOf(false) }
     val context = LocalContext.current
@@ -337,9 +393,26 @@ val Peach = Color(0xFFFFD1B3)
                 player = audio; audio.setOnCompletionListener { playing = false; it.release(); player = null }; audio.start(); playing = true
             } catch (_: Exception) { player?.release(); player = null; playing = false; android.widget.Toast.makeText(context, "Couldn't play this recording.", android.widget.Toast.LENGTH_LONG).show() }
         }) { Icon(if (playing) Icons.Default.Stop else Icons.Default.PlayArrow, if (playing) "Stop playback" else "Play recording") }
-        Text("Conversation · " + Instant.ofEpochMilli(File(path).lastModified()).atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("d MMM, HH:mm")), modifier = Modifier.weight(1f), fontSize = 14.sp)
+        Column(Modifier.weight(1f)) {
+            Text("Conversation · " + Instant.ofEpochMilli(File(path).lastModified()).atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("d MMM, HH:mm")), fontSize = 14.sp)
+            Text(if (consent == null) "Consent details unavailable" else "Consent recorded · ${RecordingConsentRules.names(consent.participants).joinToString()}", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 2, overflow = TextOverflow.Ellipsis)
+            if (consent != null) Text(when {
+                consent.transcriptionConsentAt <= 0 -> "Cloud transcription not agreed"
+                consent.noticeVersion < 2 -> "Older consent: record a new fictional demo"
+                else -> "Free-demo transcription agreed"
+            }, style = MaterialTheme.typography.labelSmall, color = if (consent.transcriptionConsentAt > 0 && consent.noticeVersion >= 2) MaterialTheme.colorScheme.secondary else Rust)
+        }
         IconButton(onClick = { confirmDelete = true }) { Icon(Icons.Default.DeleteOutline, "Delete recording") }
-    } }
+    }
+        if ((consent?.transcriptionConsentAt ?: 0L) > 0L) {
+            Spacer(Modifier.height(10.dp))
+            Button(onClick = onTranscribe, enabled = canTranscribe && !transcribing, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp)) {
+                if (transcribing) { CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp, color = Color.White); Spacer(Modifier.width(8.dp)) }
+                else { Icon(Icons.Default.AutoAwesome, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)) }
+                Text(if (transcribing) "Transcribing…" else "Create transcript")
+            }
+        }
+    }
     if (confirmDelete) AlertDialog(onDismissRequest = { confirmDelete = false }, title = { Text("Delete this recording?") }, text = { Text("Your written care notes stay available.") },
         confirmButton = { TextButton(onClick = { player?.release(); player = null; playing = false; confirmDelete = false; onDelete() }) { Text("Delete recording") } },
         dismissButton = { TextButton(onClick = { confirmDelete = false }) { Text("Keep recording") } })
@@ -366,7 +439,7 @@ val Peach = Color(0xFFFFD1B3)
     }
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
         LazyColumn(Modifier.fillMaxWidth().imePadding(), contentPadding = PaddingValues(start = 22.dp, end = 22.dp, bottom = 40.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            item { Heading("Goals of care"); Text("${note.personName} · Version ${note.version}"); Text("Reviewed by ${note.doctor} · ${date(note.published)}", style = MaterialTheme.typography.bodySmall) }
+            item { Heading("Goals of care"); Text("${note.personName} · Version ${note.version}"); Text("Reviewer: ${note.doctor} · ${date(note.published)}", style = MaterialTheme.typography.bodySmall); Text(ReviewWorkflow.label(note), style = MaterialTheme.typography.labelMedium, color = Rust) }
             item { Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 OutlinedButton(onClick = { exporting = NoteRules.text(note, confirmations); saveNote.launch("Goals-of-care-v${note.version}.txt") }, modifier = Modifier.weight(1f)) { Icon(Icons.Default.FileDownload, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Save copy") }
                 FilledTonalButton(onClick = { open(context, Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, NoteRules.text(note, confirmations)), "Share care note")) }, modifier = Modifier.weight(1f), colors = ButtonDefaults.filledTonalButtonColors(containerColor = Gold, contentColor = Ink)) { Icon(Icons.Default.Share, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Share") }
@@ -383,11 +456,11 @@ val Peach = Color(0xFFFFD1B3)
                     Text(if (patientConfirmation == null) "The patient confirms first. Family can then add their own confirmation to this same version." else "The patient's confirmation stays saved. Add your own after reading this version.", style = MaterialTheme.typography.bodySmall) }
                 item { CareField(value = name, onValueChange = { name = it.take(100) }, label = "Your name", singleLine = true) }
                 item { Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf("Patient", "Family / carer").forEach { role -> FilterChip(selected = relationship == role, onClick = { relationship = role }, enabled = if (role == "Patient") patientConfirmation == null else patientConfirmation != null, label = { Text(role) }) } } }
-                item { CheckLine(reviewed, { reviewed = it }, "I read this version and it reflects our conversation. I can ask my doctor to update it later.") }
+                item { CheckLine(reviewed, { reviewed = it }, "I have read this exact version. This acknowledgement is not a legal signature, medical consent or treatment decision. I can ask my doctor to update it later.") }
                 val alreadyConfirmed = confirmations.any { it.relationship == relationship && it.name.equals(name.trim(), ignoreCase = true) }
                 item { Button(onClick = { vm.confirm(note, name, relationship, reviewed) { reviewed = false; name = "" } }, enabled = reviewed && name.isNotBlank() && !busy && !alreadyConfirmed && (relationship == "Patient" || patientConfirmation != null), modifier = Modifier.fillMaxWidth()) { Text(if (alreadyConfirmed) "Confirmation already saved" else "Confirm this version") } }
             }
-            item { Text("This records a conversation. It is not a treatment order or legal directive. Names are self-entered.", style = MaterialTheme.typography.bodySmall) }
+            item { Text("This records a conversation. It is not a treatment order or legal directive. Names are self-entered unless this version explicitly shows verified clinician review.", style = MaterialTheme.typography.bodySmall) }
         }
     }
 }
@@ -487,11 +560,13 @@ val Peach = Color(0xFFFFD1B3)
     }
 }
 
-@Composable fun More(vm: CareModel, person: Person, onAccount: () -> Unit, onDelete: () -> Unit, onCalendar: () -> Unit = {}, onWorkflow: () -> Unit = {}, onLabs: () -> Unit = {}) {
+@Composable fun More(vm: CareModel, person: Person, onAccount: () -> Unit, onDelete: () -> Unit, onCalendar: () -> Unit = {}, onWorkflow: () -> Unit = {}, onLabs: () -> Unit = {}, onDoctorDemo: () -> Unit = {}, onFeedback: () -> Unit = {}) {
     val owner by vm.isOwner.collectAsStateWithLifecycle()
     val context = LocalContext.current; val versions by vm.versions.collectAsStateWithLifecycle(); val acks by vm.acknowledgements.collectAsStateWithLifecycle()
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(18.dp)) {
         item { Heading("More") }
+        item { OutlinedButton(onClick = onFeedback, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("patient-feedback-entry")) { Icon(Icons.Default.SentimentSatisfiedAlt, null); Spacer(Modifier.width(8.dp)); Text("App feedback") } }
+        item { OutlinedButton(onClick = onDoctorDemo, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-demo-entry")) { Text("Doctor login") } }
         item { DailyCareShortcuts(onCalendar, onWorkflow, onLabs) }
         item { OutlinedButton(onClick = onAccount, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Icon(Icons.Default.PersonOutline, null); Spacer(Modifier.width(8.dp)); Text(if (vm.cloud == null) "Sign in to share care" else "Your account and sharing") } }
         item { SurfaceCard(Gold) {

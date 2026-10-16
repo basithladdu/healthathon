@@ -22,6 +22,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewMod
     private val db = CareDatabase.get(app, account)
     private val dao = db.care()
     private val preferences = app.getSharedPreferences(if (account.isEmpty()) "preferences" else "preferences-$account", 0)
+    private val conversationTranscriber = ConversationTranscriber()
     val people = dao.people().stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
     val selected = MutableStateFlow(preferences.getString("person", "") ?: "")
     val viewRole = MutableStateFlow(preferences.getString("viewRole", null)?.takeIf { it in listOf("Patient", "Family", "Doctor") }
@@ -40,8 +41,10 @@ class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewMod
     val recording = MutableStateFlow(false)
     val amplitude = MutableStateFlow(0f)
     val recordingSeconds = MutableStateFlow(0)
+    val transcribingPath = MutableStateFlow<String?>(null)
     val recordings = MutableStateFlow<List<File>>(emptyList())
     val versions = selected.flatMapLatest { dao.versions(it).onStart { emit(emptyList()) } }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+    val recordingConsents = selected.flatMapLatest { dao.recordingConsents(it).onStart { emit(emptyList()) } }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
     val items = selected.flatMapLatest { dao.items(it).onStart { emit(emptyList()) } }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
     val reports = selected.flatMapLatest { dao.reports(it).onStart { emit(emptyList()) } }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
     val reportFiles = ReportFiles(app, account)
@@ -53,6 +56,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewMod
     private var recorder: MediaRecorder? = null
     private var recordingDraft: Conversation? = null
     private var recordingFile: File? = null
+    private var activeRecordingConsent: RecordingConsent? = null
     private var meter: Job? = null
     val centres: List<Centre> = JSONArray(app.assets.open("karnataka.json").bufferedReader().use { it.readText() }).let { data ->
         (0 until data.length()).map { i -> data.getJSONObject(i).let { c ->
@@ -99,7 +103,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewMod
             db.withTransaction {
                 dao.clearAcknowledgements(); dao.clearVersions(); dao.clearItems(); dao.clearPeople()
                 dao.addPeople(records.people); dao.addItems(records.entries); dao.addVersions(records.notes); dao.addAcknowledgements(records.confirmations)
-                dao.clearRemovedDrafts()
+                dao.clearRemovedDrafts(); dao.clearRemovedRecordingConsents()
                 removed.forEach { dao.deleteReports(it) }
             }
             withContext(Dispatchers.IO) { removed.forEach { reportFiles.removePerson(it) } }
@@ -243,29 +247,58 @@ class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewMod
             lock.withLock {
                 deletedPeople.add(id)
                 draftCache.remove(id)
-                db.withTransaction { dao.deleteAcknowledgements(id); dao.deleteVersions(id); dao.deleteItems(id); dao.deleteReports(id); dao.deleteDraft(id); dao.deletePersonRow(id) }
+                db.withTransaction { dao.deleteAcknowledgements(id); dao.deleteVersions(id); dao.deleteItems(id); dao.deleteReports(id); dao.deleteRecordingConsents(id); dao.deleteDraft(id); dao.deletePersonRow(id) }
                 withContext(Dispatchers.IO) { File(audioRoot(), id).deleteRecursively(); reportFiles.removePerson(id) }
             }
             select(""); message.value = "Records removed"; done()
         }
     }
-    fun startRecording(consent: Boolean) {
+    fun startRecording(
+        participants: String,
+        agreedParticipants: Set<String>,
+        purposeAccepted: Boolean,
+        storageAccepted: Boolean,
+        accessAccepted: Boolean,
+        transcriptionAccepted: Boolean,
+    ) {
         if (recording.value) return
-        if (!consent || draft.value.personId.isBlank() || !canEdit.value) { message.value = "Ask everyone before recording."; return }
-        val base = draft.value.copy(consentAt = System.currentTimeMillis())
+        if (draft.value.personId.isBlank() || !canEdit.value) { message.value = "Choose an editable person before recording."; return }
+        val consentAt = System.currentTimeMillis()
+        val base = draft.value.copy(consentAt = consentAt)
         val file = File(audioRoot(), "${base.personId}/${newId()}.m4a")
+        val consent = try {
+            RecordingConsentRules.create(
+                personId = base.personId,
+                audioPath = file.absolutePath,
+                participants = participants,
+                agreedParticipants = agreedParticipants,
+                purposeAccepted = purposeAccepted,
+                storageAccepted = storageAccepted,
+                accessAccepted = accessAccepted,
+                transcriptionAccepted = transcriptionAccepted,
+                now = consentAt,
+            )
+        } catch (e: IllegalArgumentException) {
+            message.value = e.message
+            return
+        }
         file.parentFile?.mkdirs()
         @Suppress("DEPRECATION")
         val next = if (android.os.Build.VERSION.SDK_INT >= 31) MediaRecorder(getApplication()) else MediaRecorder()
         try {
             next.setAudioSource(MediaRecorder.AudioSource.MIC); next.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
-            next.setAudioEncoder(MediaRecorder.AudioEncoder.AAC); next.setAudioEncodingBitRate(96000); next.setAudioSamplingRate(44100)
-            next.setMaxDuration(90 * 60 * 1000); next.setMaxFileSize(100L * 1024 * 1024)
+            next.setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
+            next.setAudioChannels(1)
+            next.setAudioEncodingBitRate(if (transcriptionAccepted) 64000 else 96000)
+            next.setAudioSamplingRate(if (transcriptionAccepted) 32000 else 44100)
+            // Leave one second for the AAC encoder's final frame/container padding.
+            next.setMaxDuration(if (transcriptionAccepted) 299 * 1000 else 90 * 60 * 1000)
+            next.setMaxFileSize(if (transcriptionAccepted) ConversationTranscriber.MAX_AUDIO_BYTES else 100L * 1024 * 1024)
             next.setOnInfoListener { _, what, _ -> if (what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED || what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_FILESIZE_REACHED) stopRecording() }
             next.setOutputFile(file.absolutePath); next.prepare(); next.start()
-            recorder = next; recordingDraft = base; recordingFile = file; recording.value = true; recordingSeconds.value = 0
+            recorder = next; recordingDraft = base; recordingFile = file; activeRecordingConsent = consent; recording.value = true; recordingSeconds.value = 0
             meter = viewModelScope.launch { var ticks = 0; while (isActive) { delay(200); amplitude.value = runCatching { next.maxAmplitude / 32767f }.getOrDefault(0f); ticks++; recordingSeconds.value = ticks / 5 } }
-        } catch (_: Exception) { next.release(); file.delete(); message.value = "Couldn't start the microphone. Check permission and try again." }
+        } catch (_: Exception) { next.release(); file.delete(); activeRecordingConsent = null; message.value = "Couldn't start the microphone. Check permission and try again." }
     }
     fun stopRecording() {
         val active = recorder ?: return
@@ -275,10 +308,11 @@ class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewMod
             val base = recordingDraft ?: return
             val current = if (draft.value.personId == base.personId) draft.value else base
             edit(current.copy(audioPath = recordingFile!!.absolutePath, consentAt = base.consentAt))
+            activeRecordingConsent?.let { consent -> viewModelScope.launch(Dispatchers.IO) { dao.saveRecordingConsent(consent) } }
             refreshRecordings(base.personId)
             message.value = "Recording saved. Add the words you want in the care note."
         } catch (_: Exception) { recordingFile?.delete(); message.value = "That recording was too short to save. Try again." }
-        finally { active.release(); recordingFile = null; recordingDraft = null }
+        finally { active.release(); recordingFile = null; recordingDraft = null; activeRecordingConsent = null }
     }
     private fun audioRoot() = File(getApplication<Application>().filesDir, if (account.isEmpty()) "recordings" else "recordings-$account")
     private fun recordingFiles(id: String): List<File> = if (id.isBlank()) emptyList() else
@@ -293,8 +327,39 @@ class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewMod
             require(recordings.value.any { it.absolutePath == path }) { "Choose a recording for this person." }
             val removed = withContext(Dispatchers.IO) { File(path).delete() }
             require(removed) { "Couldn't remove the recording. Please try again." }
+            dao.deleteRecordingConsent(path)
             if (draft.value.personId == id && draft.value.audioPath == path) edit(draft.value.copy(audioPath = "", consentAt = 0))
             refreshRecordings(id); message.value = "Recording removed"
+        }
+    }
+    fun transcribeAudio(path: String, consent: RecordingConsent) {
+        val personId = selected.value
+        action {
+            requireEdit(personId)
+            require(path == consent.audioPath && consent.personId == personId) { "Choose a recording for this person." }
+            require(draft.value.personId == personId && draft.value.source.isBlank()) { "Clear the conversation text before creating a new transcript." }
+            val service = cloud ?: throw IllegalArgumentException("Sign in to Sahara before sending audio for transcription.")
+            transcribingPath.value = path
+            try {
+                val result = try {
+                    conversationTranscriber.transcribe(File(path), consent, service.transcriptionToken())
+                } catch (error: ConversationTranscriptionException) {
+                    // Only an auth rejection is retried; provider/quota failures must not double-call Gemini.
+                    if (error.code != ConversationTranscriptionError.AUTH_REQUIRED) throw error
+                    conversationTranscriber.transcribe(File(path), consent, service.transcriptionToken(forceRefresh = true))
+                }
+                require(selected.value == personId && draft.value.personId == personId && draft.value.source.isBlank()) { "The conversation changed while transcription was running. The transcript was not inserted." }
+                edit(draft.value.copy(
+                    source = result.text,
+                    transcriptProvider = result.provider,
+                    transcriptModel = result.model,
+                    transcribedAt = System.currentTimeMillis(),
+                    transcriptAudioPath = path,
+                ))
+                message.value = "Transcript ready. Check every word before continuing."
+            } finally {
+                transcribingPath.value = null
+            }
         }
     }
     private fun action(waitForRefresh: Boolean = false, block: suspend () -> Unit) {
@@ -304,7 +369,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewMod
         viewModelScope.launch {
             try { if (waitForRefresh) refreshing.first { !it }; block() } catch (e: Exception) {
                 if (e is CancellationException) throw e
-                val error = if (e is IllegalArgumentException) e.message else "Couldn't save. Your entry is still here; please try again."
+                val error = if (e is IllegalArgumentException || e is ConversationTranscriptionException) e.message else "Couldn't save. Your entry is still here; please try again."
                 actionError.value = error; message.value = error
             }
             finally { busy.value = false }

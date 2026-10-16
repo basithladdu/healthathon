@@ -30,9 +30,21 @@ android {
         }
     }
     buildTypes {
-        debug { applicationIdSuffix = ".development" }
+        debug {
+            applicationIdSuffix = ".development"
+            buildConfigField(
+                "String",
+                "CONVERSATION_TRANSCRIPTION_ENDPOINT",
+                "\"https://kjnhtakqzboayqorrlue.supabase.co/functions/v1/saanthvana-conversation-transcription\"",
+            )
+        }
         release {
             isMinifyEnabled = true
+            buildConfigField(
+                "String",
+                "CONVERSATION_TRANSCRIPTION_ENDPOINT",
+                "\"https://kjnhtakqzboayqorrlue.supabase.co/functions/v1/saanthvana-conversation-transcription\"",
+            )
             signingConfig = signingConfigs.getByName("upload")
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
         }

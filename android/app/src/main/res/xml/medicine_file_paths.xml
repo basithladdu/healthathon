@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <paths xmlns:android="http://schemas.android.com/apk/res/android">
     <cache-path name="medicine_scan" path="medicine-scan/" />
+    <cache-path name="doctor_preview_exports" path="doctor-preview-exports/" />
     <files-path name="reports" path="reports/" />
 </paths>
