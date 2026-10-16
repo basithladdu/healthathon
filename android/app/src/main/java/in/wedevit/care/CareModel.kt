@@ -133,6 +133,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewMod
     fun publish(doctor: String, reviewed: Boolean, done: () -> Unit) {
         val captured = draft.value; val person = people.value.firstOrNull { it.id == captured.personId } ?: return
         action {
+            require(selected.value == person.id && clinician.value) { "Open this person's conversation in the doctor view before saving." }
             requireEdit(person.id)
                 val latest = dao.latest(person.id)
                 val version = NoteRules.publish(person, captured, doctor, reviewed, (latest?.version ?: 0) + 1)
@@ -143,15 +144,29 @@ class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewMod
         }
     }
     fun confirm(version: CareVersion, name: String, relationship: String, reviewed: Boolean, done: () -> Unit) = action {
-        val ack = NoteRules.acknowledge(version, dao.latest(version.personId), name, relationship, reviewed)
-        cloud?.confirm(version.personId, ack); dao.acknowledge(ack)
+        require(selected.value == version.personId) { "Open this person's care note before confirming." }
+        val ack = NoteRules.acknowledge(version, dao.latest(version.personId), name, relationship, reviewed, dao.confirmations(version.id))
+        val saved = cloud?.confirm(version.personId, ack) ?: ack
+        require(saved.versionId == version.id && saved.contentHash == version.contentHash && saved.relationship == relationship && saved.name.trim().equals(name.trim(), ignoreCase = true)) { "The saved confirmation didn't match this version. Refresh the care note before trying again." }
+        val previous = dao.confirmation(saved.id)
+        if (previous == null) dao.acknowledge(saved)
+        else require(previous == saved) { "This confirmation changed. Refresh the care note before trying again." }
         message.value = "Your confirmation is saved"; done()
     }
     fun saveItem(kind: String, title: String, detail: String, due: Long = 0, done: () -> Unit = {}, id: String = newId()) {
         val person = selected.value
         action {
-            require(person.isNotBlank() && title.trim().isNotEmpty()) { "Add a name or a short note." }
+            require(person.isNotBlank() && selected.value == person && title.trim().isNotEmpty()) { "Choose the right person and add a name or a short note." }
+            require(people.value.any { it.id == person }) { "This person's records are no longer available." }
             require(title.length <= 200 && detail.length <= 4000) { "Please shorten this entry." }
+            if (CareEntryCodec.isStructured(detail)) {
+                val entry = requireNotNull(CareEntryCodec.decode(detail)) { "This entry couldn't be read. Open it again." }
+                when (entry.type) {
+                    "task", "conversation" -> CareWorkflowRules.validate(title, entry)
+                    "lab" -> CareLabRules.validate(title, entry, due)
+                    "schedule" -> require(due > 0 && entry.category in setOf("Visit", "Test", "Follow-up", "Procedure")) { "Choose a date and type of care." }
+                }
+            }
             storeItem(CareItem(id = id, personId = person, kind = kind, title = title.trim(), detail = detail.trim(), due = due))
             message.value = "Saved"; done()
         }

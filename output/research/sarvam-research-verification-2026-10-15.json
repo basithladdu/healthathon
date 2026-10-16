@@ -1,0 +1,56 @@
+{
+  "verifiedDate": "2026-10-15",
+  "scope": "Sarvam research catalog; no app, account, provider or release changes",
+  "data": {
+    "general": 100,
+    "healthcare": 100,
+    "uniqueIds": 200,
+    "namedExamples": 20,
+    "primarySourcePages": 68,
+    "csvRows": 200,
+    "downloadedCSVMatches": true
+  },
+  "browser": {
+    "desktop": {
+      "clientWidth": 1521,
+      "scrollWidth": 1521,
+      "horizontalOverflow": false
+    },
+    "mobileViewport390": {
+      "clientWidth": 375,
+      "scrollWidth": 375,
+      "horizontalOverflow": false
+    },
+    "mobileViewport375": {
+      "clientWidth": 360,
+      "scrollWidth": 360,
+      "horizontalOverflow": false,
+      "tableClientWidth": 322,
+      "tableScrollWidth": 560,
+      "tableScrollContained": true
+    },
+    "checked": [
+      "Healthcare H022 search and source/review details",
+      "No-results search and Clear recovery",
+      "Category filter: 10 GOCD ideas",
+      "General show-all: 100 rendered rows",
+      "Healthcare next/previous pagination: H021 at page 2",
+      "Healthcare low-fit filter: 6 ideas",
+      "Named-example healthcare filter: 9 examples",
+      "HealthPlix component/limitations expanded",
+      "Source title search and clearing",
+      "250 families with translation: INR25187.50",
+      "Invalid zero family count and recovery to INR8075",
+      "Actual CSV download, source/download hash match"
+    ],
+    "console": "No catalog-origin errors observed; unrelated Chrome extension worker errors were logged",
+    "temporaryViewportReset": true,
+    "externalAssets": 0
+  },
+  "screenshot": "output/research/sarvam-catalog-desktop-2026-10-15.png",
+  "researchLimits": [
+    "Public reports are not independently audited deployments or clinical efficacy evidence",
+    "Sponsor balance and activation not verified",
+    "200 workflows are proposals, not 200 real products"
+  ]
+}

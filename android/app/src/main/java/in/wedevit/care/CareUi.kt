@@ -139,9 +139,9 @@ val Peach = Color(0xFFFFD1B3)
             else if (person == null) Welcome(onAccount = onAccount, onStart = { dialog = "person" })
             else key(person.id, tab) { screens.SaveableStateProvider("${person.id}:$tab") {
                 ScreenEntrance { when (tab) {
-                    0 -> Today(vm, clinician, onTalk = { tab = 1 }, onCare = { tab = 2 }, onNearby = { tab = 3 }, onAdd = { if (canEdit) dialog = it else vm.message.value = "Ask the person who invited you to allow changes." }, onRead = { reading = it })
-                    1 -> Talk(vm, clinician && canEdit, onRead = { reading = it })
-                    2 -> CareList(vm,
+                    0 -> Today(vm, clinician, onTalk = { tab = 1 }, onCare = { tab = 2 }, onNearby = { tab = 3 }, onAdd = { if (canEdit) dialog = it else vm.message.value = "Ask the person who invited you to allow changes." }, onRead = { reading = it }, onCalendar = { tab = 6 }, onWorkflow = { tab = 7 }, onLabs = { tab = 8 })
+                    1 -> Talk(vm, clinician && canEdit, onRead = { reading = it }, onRequestConversation = { tab = 7 })
+                    2 -> CareList(vm, onCalendar = { tab = 6 }, onWorkflow = { tab = 7 }, onLabs = { tab = 8 },
                         onAdd = { if (canEdit) dialog = it else vm.message.value = "Ask the person who invited you to allow changes." },
                         onScanPrescription = {
                             if (canEdit) {
@@ -151,7 +151,10 @@ val Peach = Color(0xFFFFD1B3)
                         })
                     3 -> Nearby(vm.centres)
                     5 -> CareDocuments(vm, onRead = { reading = it }, onTalk = { tab = 1 })
-                    else -> More(vm, person, onAccount = onAccount, onDelete = { dialog = "delete" })
+                    6 -> CareCalendar(vm, onWorkflow = { tab = 7 })
+                    7 -> CareWorkflows(vm, onTalk = { tab = 1 })
+                    8 -> CareLabs(vm)
+                    else -> More(vm, person, onAccount = onAccount, onDelete = { dialog = "delete" }, onCalendar = { tab = 6 }, onWorkflow = { tab = 7 }, onLabs = { tab = 8 })
                 } }
             } }
             refreshError?.let { error -> Surface(Modifier.align(Alignment.TopCenter).fillMaxWidth(), color = Peach) { Row(verticalAlignment = Alignment.CenterVertically) { Text(error, Modifier.weight(1f).padding(12.dp), style = MaterialTheme.typography.bodySmall); TextButton(onClick = vm::refresh) { Text("Retry") } } } }
@@ -162,7 +165,7 @@ val Peach = Color(0xFFFFD1B3)
     if (dialog in listOf("medicine", "visit", "task", "checkin", "journal")) AddCareItem(dialog, vm, onDismiss = { dialog = "" })
     if (dialog == "delete") AlertDialog(onDismissRequest = { dialog = "" }, title = { Text("Remove ${person?.name}'s records?") },
         text = { Text("This removes their notes, reports, recordings and care entries. Export anything you want to keep first.") },
-        confirmButton = { TextButton(onClick = { val removedId = person?.id; vm.removePerson { (0..5).forEach { screens.removeState("$removedId:$it") }; dialog = "" } }, enabled = !busy) { Text("Remove records") } },
+        confirmButton = { TextButton(onClick = { val removedId = person?.id; vm.removePerson { (0..8).forEach { screens.removeState("$removedId:$it") }; dialog = "" } }, enabled = !busy) { Text("Remove records") } },
         dismissButton = { TextButton(onClick = { dialog = "" }) { Text("Keep records") } })
     reading?.let { note -> NoteReader(vm, note, onDismiss = { reading = null }) }
 }
@@ -177,7 +180,7 @@ val Peach = Color(0xFFFFD1B3)
     }
 }
 
-@Composable fun Today(vm: CareModel, clinician: Boolean, onTalk: () -> Unit, onCare: () -> Unit, onNearby: () -> Unit, onAdd: (String) -> Unit, onRead: (CareVersion) -> Unit) {
+@Composable fun Today(vm: CareModel, clinician: Boolean, onTalk: () -> Unit, onCare: () -> Unit, onNearby: () -> Unit, onAdd: (String) -> Unit, onRead: (CareVersion) -> Unit, onCalendar: () -> Unit = {}, onWorkflow: () -> Unit = {}, onLabs: () -> Unit = {}) {
     val items by vm.items.collectAsStateWithLifecycle(); val versions by vm.versions.collectAsStateWithLifecycle()
     val latest = versions.firstOrNull()
     val dayStart = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
@@ -208,10 +211,14 @@ val Peach = Color(0xFFFFD1B3)
             Tile("How are you?", Icons.Default.WbSunny, Peach, Modifier.weight(1f)) { onAdd("checkin") }
             Tile("Find care", Icons.Default.Place, Sage, Modifier.weight(1f), onNearby)
         } }
+        item { DailyCareShortcuts(onCalendar, onWorkflow, onLabs) }
+        item { WorkflowSummary(vm, onWorkflow) }
+        val scheduledToday = calendarItems(items, LocalDate.now()).filter { CareEntryCodec.decode(it.detail)?.type == "schedule" }
+        if (scheduledToday.isNotEmpty()) item { Card(onClick = onCalendar, colors = CardDefaults.cardColors(containerColor = Mint), shape = RoundedCornerShape(18.dp), modifier = Modifier.fillMaxWidth()) { Column(Modifier.padding(16.dp)) { Text("${scheduledToday.size} planned today", fontWeight = FontWeight.SemiBold); scheduledToday.take(2).forEach { Text("${calendarCategory(it)} · ${it.title}", style = MaterialTheme.typography.bodyMedium) }; Text("Open calendar", color = Rust, style = MaterialTheme.typography.labelLarge) } } }
         val checkin = items.firstOrNull { it.kind == "checkin" && it.created >= dayStart }
         if (checkin != null) item { CareRow(checkin, vm) }
         item { SectionTitle("Up next", "Add visit") { onAdd("visit") } }
-        val visits = items.filter { it.kind == "visit" && (it.due == 0L || it.due >= LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()) }.sortedBy { it.due }
+        val visits = items.filter { it.kind == "visit" && !CareEntryCodec.isStructured(it.detail) && (it.due == 0L || it.due >= LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()) }.sortedBy { it.due }
         if (visits.isEmpty()) item { SurfaceCard { Row(verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.Event, null, tint = Rust); Spacer(Modifier.width(12.dp)); Text("No upcoming visits") } } }
         items(visits.take(2), key = { it.id }) { CareRow(it, vm) }
         item { SectionTitle("Medicines", "See all", onCare) }
@@ -219,7 +226,7 @@ val Peach = Color(0xFFFFD1B3)
         if (medicines.isEmpty()) item { OutlinedButton(onClick = { onAdd("medicine") }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Icon(Icons.Default.Add, null); Spacer(Modifier.width(8.dp)); Text("Add a medicine") } }
         items(medicines.take(3), key = { it.id }) { CareRow(it, vm) }
         item { SectionTitle("To do", "Add task") { onAdd("task") } }
-        val tasks = items.filter { it.kind == "task" }.sortedBy { it.doneOn.isNotBlank() }
+        val tasks = items.filter { it.kind == "task" && !CareEntryCodec.isStructured(it.detail) }.sortedBy { it.doneOn.isNotBlank() }
         if (tasks.isEmpty()) item { SurfaceCard { Text("Nothing to do yet", color = MaterialTheme.colorScheme.onSurfaceVariant) } }
         items(tasks.take(4), key = { it.id }) { CareRow(it, vm) }
         if (tasks.size > 4) item { TextButton(onClick = onCare) { Text("See all ${tasks.size} tasks") } }
@@ -230,12 +237,13 @@ val Peach = Color(0xFFFFD1B3)
     }
 }
 
-@Composable fun Talk(vm: CareModel, clinician: Boolean, onRead: (CareVersion) -> Unit) {
+@Composable fun Talk(vm: CareModel, clinician: Boolean, onRead: (CareVersion) -> Unit, onRequestConversation: (() -> Unit)? = null) {
     val draft by vm.draft.collectAsStateWithLifecycle(); val versions by vm.versions.collectAsStateWithLifecycle()
     val recording by vm.recording.collectAsStateWithLifecycle(); val seconds by vm.recordingSeconds.collectAsStateWithLifecycle(); val level by vm.amplitude.collectAsStateWithLifecycle()
     val recordings by vm.recordings.collectAsStateWithLifecycle()
     val busy by vm.busy.collectAsStateWithLifecycle()
     var step by rememberSaveable { mutableIntStateOf(0) }; var consent by rememberSaveable { mutableStateOf(false) }
+    var dictating by remember { mutableStateOf(false) }
     val scroll = key(step) { rememberLazyListState() }
     val focus = LocalFocusManager.current
     fun nextStep(value: Int) { focus.clearFocus(); step = value }
@@ -249,6 +257,17 @@ val Peach = Color(0xFFFFD1B3)
             item { Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf("Conversation", "Review", "Save").forEachIndexed { i, name -> FilterChip(selected = step == i, onClick = { nextStep(i) }, label = { Text("${i + 1} $name", fontSize = 12.sp) }) } } }
             when (step) {
                 0 -> {
+                    item { CareDictationPanel(draft.personId, recording, enabled = !busy && draft.personId.isNotBlank(),
+                        onWords = { words, speaker, language ->
+                            val current = vm.draft.value
+                            if (current.personId == draft.personId && vm.selected.value == draft.personId && vm.canEdit.value) try {
+                                val source = CareDraftAssist.appendTranscript(current.source, words, speaker, language, System.currentTimeMillis())
+                                vm.edit(current.copy(source = source))
+                                vm.draft.value.personId == current.personId && vm.draft.value.source == source
+                            } catch (e: IllegalArgumentException) { vm.message.value = e.message; false } else false
+                        },
+                        onConsent = { val current = vm.draft.value; if (current.personId == draft.personId) vm.edit(current.copy(consentAt = System.currentTimeMillis())) },
+                        onActiveChanged = { dictating = it }) }
                     item { SurfaceCard(Peach) {
                         Row(verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.Mic, null); Spacer(Modifier.width(10.dp)); Text(if (recording) "Recording · ${seconds / 60}:${(seconds % 60).toString().padStart(2, '0')}" else "Conversation audio", fontWeight = FontWeight.Bold) }
                         Spacer(Modifier.height(10.dp))
@@ -256,18 +275,23 @@ val Peach = Color(0xFFFFD1B3)
                             val meter by animateFloatAsState(level.coerceIn(0f, 1f), tween(120), label = "microphone level")
                             LinearProgressIndicator(progress = { meter }, modifier = Modifier.fillMaxWidth(), color = Rust)
                         } else Text("Ask everyone before recording.", style = MaterialTheme.typography.bodyMedium)
-                        Spacer(Modifier.height(12.dp)); Button(onClick = { if (recording) vm.stopRecording() else { consent = false; permissionDialog = true } }, shape = RoundedCornerShape(14.dp), enabled = draft.personId.isNotBlank()) { Icon(if (recording) Icons.Default.Stop else Icons.Default.Mic, null); Spacer(Modifier.width(8.dp)); Text(if (recording) "Stop and save" else "Record conversation") }
+                        Spacer(Modifier.height(12.dp)); Button(onClick = { if (recording) vm.stopRecording() else { consent = false; permissionDialog = true } }, shape = RoundedCornerShape(14.dp), enabled = draft.personId.isNotBlank() && !dictating) { Icon(if (recording) Icons.Default.Stop else Icons.Default.Mic, null); Spacer(Modifier.width(8.dp)); Text(if (recording) "Stop and save" else "Record conversation") }
                     } }
                     items(recordings, key = { it.absolutePath }) { file -> AudioPlayback(file.absolutePath, onDelete = { vm.deleteAudio(file.absolutePath) }) }
-                    item { CareField(value = draft.source, onValueChange = { if (it.length <= 12000) vm.edit(draft.copy(source = it)) }, label = "Conversation", placeholder = "Write or paste what was said…", minLines = 5, supporting = "Recordings aren't converted to text.") }
-                    item { Button(onClick = { vm.organise(); nextStep(1) }, enabled = draft.source.isNotBlank() && !recording, modifier = Modifier.fillMaxWidth()) { Text("Organise and review"); Spacer(Modifier.width(8.dp)); Icon(Icons.AutoMirrored.Filled.ArrowForward, null) } }
+                    item { if (dictating) SurfaceCard { Text("Conversation", fontWeight = FontWeight.Bold); SelectionContainerText(draft.source); Text("Finish this turn to edit the conversation.", style = MaterialTheme.typography.bodySmall) }
+                        else CareField(value = draft.source, onValueChange = { if (it.length <= 12000) { val current = vm.draft.value; if (current.personId == draft.personId) vm.edit(current.copy(source = it)) } }, label = "Conversation", placeholder = "Speak, write or paste what was said…", minLines = 5) }
+                    item { Button(onClick = { nextStep(1) }, enabled = draft.source.isNotBlank() && !recording && !dictating, modifier = Modifier.fillMaxWidth()) { Text("Choose words and review"); Spacer(Modifier.width(8.dp)); Icon(Icons.AutoMirrored.Filled.ArrowForward, null) } }
                 }
                 1 -> {
                     item { Text("Check the words. Leave anything not discussed blank.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                    item { CareSourcePicker(draft) { section, line ->
+                        try { val current = vm.draft.value; require(current.personId == draft.personId && vm.selected.value == draft.personId) { "Choose this person's conversation again." }; vm.edit(CareDraftAssist.assign(current, section, line)) }
+                        catch (e: IllegalArgumentException) { vm.message.value = e.message }
+                    } }
+                    if (NoteRules.values(draft).all { it.isBlank() }) item { TextButton(onClick = vm::organise) { Text("Organise using section headings") } }
                     items(NoteRules.labels.withIndex().toList(), key = { it.index }) { (index, label) ->
-                        CareField(value = NoteRules.values(draft)[index], onValueChange = { value -> if (value.length <= 4000) vm.edit(when (index) {
-                            0 -> draft.copy(priorities = value); 1 -> draft.copy(participants = value); 2 -> draft.copy(topics = value); 3 -> draft.copy(questions = value); else -> draft.copy(nextSteps = value)
-                        }) }, label = label, minLines = 2)
+                        Column { CareField(value = NoteRules.values(draft)[index], onValueChange = { value -> if (value.length <= 4000) { val current = vm.draft.value; if (current.personId == draft.personId) vm.edit(CareDraftAssist.withSection(current, index, value)) } }, label = label, minLines = 2)
+                            CareSourceLinks(draft.source, NoteRules.values(draft)[index]) }
                     }
                     item { SurfaceCard(Sage) { Text("Original words", fontWeight = FontWeight.Bold); Spacer(Modifier.height(8.dp)); SelectionContainerText(draft.source.ifBlank { "Add the conversation first." }) } }
                     item { Button(onClick = { nextStep(2) }, enabled = draft.source.isNotBlank() && NoteRules.values(draft).any { it.isNotBlank() }, modifier = Modifier.fillMaxWidth()) { Text("Continue to save") } }
@@ -282,7 +306,7 @@ val Peach = Color(0xFFFFD1B3)
             }
         } else {
             item { SurfaceCard(Gold) { Row(verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.Forum, null, Modifier.size(28.dp)); Spacer(Modifier.width(14.dp)); Text("Read together. Ask your doctor if anything needs changing.", modifier = Modifier.weight(1f)) } } }
-            item { OutlinedButton(onClick = { vm.saveItem("task", "Ask for a goals-of-care conversation", "Discuss what matters and questions for the care team.") }, modifier = Modifier.fillMaxWidth()) { Icon(Icons.Default.Add, null); Spacer(Modifier.width(6.dp)); Text("Add a reminder to talk") } }
+            item { OutlinedButton(onClick = { onRequestConversation?.invoke() ?: vm.saveItem("task", "Ask for a goals-of-care conversation", "Discuss what matters and questions for the care team.") }, modifier = Modifier.fillMaxWidth()) { Icon(Icons.Default.Add, null); Spacer(Modifier.width(6.dp)); Text(if (onRequestConversation == null) "Add a reminder to talk" else "Ask for a conversation") } }
         }
         if (clinician) item { SectionTitle("Saved notes") }
         if (versions.isEmpty()) item { Text("Your first care note will appear here after a doctor reviews and saves it.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
@@ -299,7 +323,12 @@ val Peach = Color(0xFFFFD1B3)
     var player by remember(path) { mutableStateOf<MediaPlayer?>(null) }; var playing by remember(path) { mutableStateOf(false) }
     var confirmDelete by remember(path) { mutableStateOf(false) }
     val context = LocalContext.current
-    DisposableEffect(path) { onDispose { player?.release() } }
+    val owner = LocalLifecycleOwner.current
+    DisposableEffect(path, owner) {
+        val observer = LifecycleEventObserver { _, event -> if (event == Lifecycle.Event.ON_STOP) { player?.release(); player = null; playing = false } }
+        owner.lifecycle.addObserver(observer)
+        onDispose { owner.lifecycle.removeObserver(observer); player?.release(); player = null; playing = false }
+    }
     SurfaceCard { Row(verticalAlignment = Alignment.CenterVertically) {
         IconButton(onClick = {
             if (playing) { player?.stop(); player?.release(); player = null; playing = false }
@@ -318,11 +347,14 @@ val Peach = Color(0xFFFFD1B3)
 
 @Composable fun NoteReader(vm: CareModel, note: CareVersion, onDismiss: () -> Unit) {
     val acks by vm.acknowledgements.collectAsStateWithLifecycle(); val versions by vm.versions.collectAsStateWithLifecycle(); val busy by vm.busy.collectAsStateWithLifecycle()
-    val ack = acks.firstOrNull { it.versionId == note.id && it.contentHash == note.contentHash }
+    val confirmations = acks.filter { it.versionId == note.id && it.contentHash == note.contentHash }
+        .sortedWith(compareBy<Acknowledgement> { it.relationship != "Patient" }.thenBy { it.at })
+    val patientConfirmation = confirmations.firstOrNull { it.relationship == "Patient" }
     var name by rememberSaveable(note.id) { mutableStateOf("") }; var relationship by rememberSaveable(note.id) { mutableStateOf("Patient") }; var reviewed by rememberSaveable(note.id) { mutableStateOf(false) }
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var exporting by rememberSaveable { mutableStateOf<String?>(null) }
+    LaunchedEffect(patientConfirmation?.id) { relationship = if (patientConfirmation == null) "Patient" else "Family / carer"; reviewed = false }
     val saveNote = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/plain")) { uri ->
         val text = exporting; exporting = null
         if (uri != null && text != null) scope.launch {
@@ -336,25 +368,31 @@ val Peach = Color(0xFFFFD1B3)
         LazyColumn(Modifier.fillMaxWidth().imePadding(), contentPadding = PaddingValues(start = 22.dp, end = 22.dp, bottom = 40.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
             item { Heading("Goals of care"); Text("${note.personName} · Version ${note.version}"); Text("Reviewed by ${note.doctor} · ${date(note.published)}", style = MaterialTheme.typography.bodySmall) }
             item { Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                OutlinedButton(onClick = { exporting = NoteRules.text(note, ack); saveNote.launch("Goals-of-care-v${note.version}.txt") }, modifier = Modifier.weight(1f)) { Icon(Icons.Default.FileDownload, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Save copy") }
-                FilledTonalButton(onClick = { open(context, Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, NoteRules.text(note, ack)), "Share care note")) }, modifier = Modifier.weight(1f), colors = ButtonDefaults.filledTonalButtonColors(containerColor = Gold, contentColor = Ink)) { Icon(Icons.Default.Share, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Share") }
+                OutlinedButton(onClick = { exporting = NoteRules.text(note, confirmations); saveNote.launch("Goals-of-care-v${note.version}.txt") }, modifier = Modifier.weight(1f)) { Icon(Icons.Default.FileDownload, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Save copy") }
+                FilledTonalButton(onClick = { open(context, Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, NoteRules.text(note, confirmations)), "Share care note")) }, modifier = Modifier.weight(1f), colors = ButtonDefaults.filledTonalButtonColors(containerColor = Gold, contentColor = Ink)) { Icon(Icons.Default.Share, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Share") }
             } }
-            items(NoteRules.labels.zip(NoteRules.values(note))) { (label, value) -> SurfaceCard(if (label == "What matters") Gold else Paper) { Text(label, fontWeight = FontWeight.Bold); Spacer(Modifier.height(8.dp)); SelectionContainerText(value.ifBlank { "Not recorded" }) } }
+            item { CareReadAloudControl(NoteRules.labels.zip(NoteRules.values(note)).filter { it.second.isNotBlank() }.joinToString("\n\n") { "${it.first}. ${it.second}" }, note.id) }
+            items(NoteRules.labels.zip(NoteRules.values(note))) { (label, value) -> SurfaceCard(if (label == "What matters") Gold else Paper) { Text(label, fontWeight = FontWeight.Bold); Spacer(Modifier.height(8.dp)); SelectionContainerText(value.ifBlank { "Not recorded" }); CareSourceLinks(note.source, value) } }
             item { var open by remember { mutableStateOf(false) }; TextButton(onClick = { open = !open }) { Text(if (open) "Hide original conversation" else "Read original conversation") }; if (open) SelectionContainerText(note.source) }
-            if (ack != null) item { SurfaceCard(Sage) { Text("Read and confirmed", fontWeight = FontWeight.Bold); Text("${ack.name} · ${ack.relationship} · ${date(ack.at)}") } }
-            else if (versions.firstOrNull()?.id == note.id) {
-                item { HorizontalDivider(); Spacer(Modifier.height(12.dp)); Heading("Does this reflect\nyour conversation?", 26) }
+            items(confirmations, key = { it.id }) { confirmation -> SurfaceCard(if (confirmation.relationship == "Patient") Sage else Mint) {
+                Text(if (confirmation.relationship == "Patient") "Patient confirmed this version" else "Family / carer confirmation", fontWeight = FontWeight.Bold)
+                Text("${confirmation.name} · ${date(confirmation.at)}")
+            } }
+            if (versions.firstOrNull()?.id == note.id) {
+                item { HorizontalDivider(); Spacer(Modifier.height(12.dp)); Heading(if (patientConfirmation == null) "Patient's review" else "Family's review", 26)
+                    Text(if (patientConfirmation == null) "The patient confirms first. Family can then add their own confirmation to this same version." else "The patient's confirmation stays saved. Add your own after reading this version.", style = MaterialTheme.typography.bodySmall) }
                 item { CareField(value = name, onValueChange = { name = it.take(100) }, label = "Your name", singleLine = true) }
-                item { Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf("Patient", "Family / carer").forEach { role -> FilterChip(selected = relationship == role, onClick = { relationship = role }, label = { Text(role) }) } } }
+                item { Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf("Patient", "Family / carer").forEach { role -> FilterChip(selected = relationship == role, onClick = { relationship = role }, enabled = if (role == "Patient") patientConfirmation == null else patientConfirmation != null, label = { Text(role) }) } } }
                 item { CheckLine(reviewed, { reviewed = it }, "I read this version and it reflects our conversation. I can ask my doctor to update it later.") }
-                item { Button(onClick = { vm.confirm(note, name, relationship, reviewed) {} }, enabled = reviewed && name.isNotBlank() && !busy, modifier = Modifier.fillMaxWidth()) { Text("Confirm this version") } }
+                val alreadyConfirmed = confirmations.any { it.relationship == relationship && it.name.equals(name.trim(), ignoreCase = true) }
+                item { Button(onClick = { vm.confirm(note, name, relationship, reviewed) { reviewed = false; name = "" } }, enabled = reviewed && name.isNotBlank() && !busy && !alreadyConfirmed && (relationship == "Patient" || patientConfirmation != null), modifier = Modifier.fillMaxWidth()) { Text(if (alreadyConfirmed) "Confirmation already saved" else "Confirm this version") } }
             }
             item { Text("This records a conversation. It is not a treatment order or legal directive. Names are self-entered.", style = MaterialTheme.typography.bodySmall) }
         }
     }
 }
 
-@Composable fun CareList(vm: CareModel, onAdd: (String) -> Unit, onScanPrescription: () -> Unit) {
+@Composable fun CareList(vm: CareModel, onAdd: (String) -> Unit, onScanPrescription: () -> Unit, onCalendar: () -> Unit = {}, onWorkflow: () -> Unit = {}, onLabs: () -> Unit = {}) {
     val entries by vm.items.collectAsStateWithLifecycle(); var filter by rememberSaveable { mutableStateOf("All") }
     var adding by remember { mutableStateOf(false) }
     val kinds = linkedMapOf("Medicines" to "medicine", "Visits" to "visit", "To do" to "task", "Check-ins" to "checkin", "Journal" to "journal")
@@ -368,13 +406,14 @@ val Peach = Color(0xFFFFD1B3)
                 }
             }
         } }
+        item { DailyCareShortcuts(onCalendar, onWorkflow, onLabs) }
         item { Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf("All", "Medicines", "Visits", "To do", "Check-ins", "Journal").forEach { label -> FilterChip(selected = filter == label, onClick = { filter = label }, label = { Text(label) }, colors = FilterChipDefaults.filterChipColors(selectedContainerColor = Sage, selectedLabelColor = Ink)) } } }
         if (filter == "Medicines") item { SurfaceCard(Sage) {
             Row(verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.DocumentScanner, null, tint = Ink, modifier = Modifier.size(30.dp)); Spacer(Modifier.width(12.dp)); Column(Modifier.weight(1f)) { Text("Scan a prescription", fontSize = 18.sp, fontWeight = FontWeight.Bold); Text("Turn prescription and medicine photos into a list you review.", style = MaterialTheme.typography.bodySmall) } }
             Spacer(Modifier.height(12.dp)); Button(onClick = onScanPrescription, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth()) { Icon(Icons.Default.AutoAwesome, null, Modifier.size(18.dp)); Spacer(Modifier.width(7.dp)); Text("Scan & organize") }
             TextButton(onClick = { onAdd("medicine") }, modifier = Modifier.fillMaxWidth()) { Text("Add one manually") }
         } }
-        val filtered = entries.filter { filter == "All" || it.kind == kinds[filter] }
+        val filtered = entries.filter { !CareEntryCodec.isStructured(it.detail) && (filter == "All" || it.kind == kinds[filter]) }
         if (filtered.isEmpty()) item { SurfaceCard {
             Icon(careIcon(kinds[filter] ?: "task"), null, Modifier.size(32.dp), tint = Rust)
             Spacer(Modifier.height(12.dp)); Text(if (filter == "All") "Nothing added yet" else "No ${filter.lowercase()} yet", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
@@ -448,18 +487,19 @@ val Peach = Color(0xFFFFD1B3)
     }
 }
 
-@Composable fun More(vm: CareModel, person: Person, onAccount: () -> Unit, onDelete: () -> Unit) {
+@Composable fun More(vm: CareModel, person: Person, onAccount: () -> Unit, onDelete: () -> Unit, onCalendar: () -> Unit = {}, onWorkflow: () -> Unit = {}, onLabs: () -> Unit = {}) {
     val owner by vm.isOwner.collectAsStateWithLifecycle()
     val context = LocalContext.current; val versions by vm.versions.collectAsStateWithLifecycle(); val acks by vm.acknowledgements.collectAsStateWithLifecycle()
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(18.dp)) {
         item { Heading("More") }
+        item { DailyCareShortcuts(onCalendar, onWorkflow, onLabs) }
         item { OutlinedButton(onClick = onAccount, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Icon(Icons.Default.PersonOutline, null); Spacer(Modifier.width(8.dp)); Text(if (vm.cloud == null) "Sign in to share care" else "Your account and sharing") } }
         item { SurfaceCard(Gold) {
             Icon(Icons.Default.Description, null, Modifier.size(28.dp)); Spacer(Modifier.height(12.dp))
             Text("${person.name}'s care notes", fontSize = 21.sp, fontWeight = FontWeight.SemiBold)
             Spacer(Modifier.height(4.dp)); Text("${versions.size} saved", color = Ink)
             Spacer(Modifier.height(12.dp))
-            Button(onClick = { val text = versions.joinToString("\n\n──────────\n\n") { v -> NoteRules.text(v, acks.firstOrNull { it.versionId == v.id }) }; open(context, Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text), "Export care notes")) }, enabled = versions.isNotEmpty(), shape = RoundedCornerShape(14.dp)) { Icon(Icons.Default.Share, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text("Export notes") }
+            Button(onClick = { val text = versions.joinToString("\n\n──────────\n\n") { v -> NoteRules.text(v, acks.filter { it.versionId == v.id && it.contentHash == v.contentHash }) }; open(context, Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text), "Export care notes")) }, enabled = versions.isNotEmpty(), shape = RoundedCornerShape(14.dp)) { Icon(Icons.Default.Share, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text("Export notes") }
         } }
         item { DetailPanel("Privacy", Icons.Default.Lock) {
             Text("You choose which notes to share and with whom.")
@@ -471,7 +511,7 @@ val Peach = Color(0xFFFFD1B3)
         item { DetailPanel("About", Icons.Default.Info) {
             Text(androidx.compose.ui.res.stringResource(R.string.app_full_name))
             Spacer(Modifier.height(10.dp)); Text("Your doctor guides treatment. Names and roles in the app aren't verified.")
-            Spacer(Modifier.height(10.dp)); Text("The app groups the words you type. Recordings aren't converted to text.")
+            Spacer(Modifier.height(10.dp)); Text("Dictate a speaker's turn on supported phones, then check the words. Saved recordings aren't transcribed. Read aloud uses an installed voice; it does not translate.")
             Spacer(Modifier.height(12.dp)); Text("Version ${BuildConfig.VERSION_NAME}", style = MaterialTheme.typography.bodySmall)
         } }
         if (owner) item { TextButton(onClick = onDelete) { Icon(Icons.Default.DeleteOutline, null); Spacer(Modifier.width(8.dp)); Text("Remove this person's records") } }
@@ -486,8 +526,11 @@ val Peach = Color(0xFFFFD1B3)
 
 @Composable fun AddCareItem(kind: String, vm: CareModel, onDismiss: () -> Unit, initial: CareItem? = null) {
     val entryId = rememberSaveable { initial?.id ?: newId() }
+    val selected by vm.selected.collectAsStateWithLifecycle()
+    val capturedPerson = rememberSaveable(entryId) { initial?.personId ?: selected }
     val error by vm.actionError.collectAsStateWithLifecycle()
     LaunchedEffect(entryId) { vm.actionError.value = null }
+    LaunchedEffect(selected) { if (selected != capturedPerson) onDismiss() }
     var title by rememberSaveable { mutableStateOf(initial?.title ?: "") }; var detail by rememberSaveable { mutableStateOf(initial?.detail ?: "") }; var due by rememberSaveable { mutableLongStateOf(initial?.due ?: 0) }
     val busy by vm.busy.collectAsStateWithLifecycle(); val context = LocalContext.current
     var extraNote by rememberSaveable { mutableStateOf(initial?.detail?.isNotBlank() == true) }
@@ -515,7 +558,7 @@ val Peach = Color(0xFFFFD1B3)
             if (kind == "visit") OutlinedButton(onClick = { val chosen = if (due > 0) Instant.ofEpochMilli(due).atZone(ZoneId.systemDefault()).toLocalDate() else LocalDate.now(); DatePickerDialog(context, { _, y, m, d -> due = LocalDate.of(y, m + 1, d).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli() }, chosen.year, chosen.monthValue - 1, chosen.dayOfMonth).show() }, shape = RoundedCornerShape(14.dp)) { Icon(Icons.Default.CalendarMonth, null); Spacer(Modifier.width(8.dp)); Text(if (due == 0L) "Choose date" else date(due)) }
             if (kind == "medicine") Text("Use your prescription. Medicine alerts aren't available.", style = MaterialTheme.typography.bodySmall)
             error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
-            Button(onClick = { if (initial == null) vm.saveItem(kind, title, detail, due, onDismiss, entryId) else vm.updateItem(initial.copy(title = title, detail = detail, due = due), onDismiss) }, enabled = title.isNotBlank() && !busy && (kind != "visit" || due > 0) && (kind != "medicine" || detail.isNotBlank()), shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 54.dp)) { Text(if (busy) "Saving…" else "Save", fontSize = 16.sp) }
+            Button(onClick = { if (vm.selected.value != capturedPerson) { onDismiss() } else if (initial == null) vm.saveItem(kind, title, detail, due, onDismiss, entryId) else vm.updateItem(initial.copy(title = title, detail = detail, due = due), onDismiss) }, enabled = selected == capturedPerson && title.isNotBlank() && !busy && (kind != "visit" || due > 0) && (kind != "medicine" || detail.isNotBlank()), shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 54.dp)) { Text(if (busy) "Saving…" else "Save", fontSize = 16.sp) }
         }
     }
 }

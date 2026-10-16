@@ -1,0 +1,25 @@
+{
+  "checkedAt": "2026-10-16T07:37:29.4891400+00:00",
+  "result": "PASS",
+  "scope": "One synthetic owned person using the approved reviewer account and public client API; not a two-user or Android UI test.",
+  "counts": {
+    "fixturePeople": 1,
+    "fixtureEntries": 3,
+    "fixtureNotes": 1,
+    "fixtureAcknowledgements": 2
+  },
+  "checks": {
+    "reviewerSignIn": true,
+    "numericLabRequestAndTaskSaved": true,
+    "taskAcceptanceCompletionRevisions": true,
+    "patientThenSeparateFamilyConfirmation": true,
+    "getExactPayloadsAndIDs": true,
+    "onlyFixtureDeletedAndCascadeVerified": true,
+    "baselineCountsRestored": true,
+    "onlyQASessionSignedOut": true
+  },
+  "cleanupConfirmed": true,
+  "localSessionSignedOut": true,
+  "failure": null,
+  "cleanupFailure": null
+}

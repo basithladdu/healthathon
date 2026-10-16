@@ -143,8 +143,11 @@ class CareFlowTest {
         val original = "What matters: I want to spend time with family.\nStill to discuss: I have not decided about hospital care.\nNext steps: Bring my questions to the next visit."
         ui.onNodeWithTag("conversation-list").performScrollToNode(hasSetTextAction() and hasText("Conversation"))
         ui.onNode(hasSetTextAction() and hasText("Conversation")).performTextInput(original)
-        ui.onNodeWithTag("conversation-list").performScrollToNode(hasText("Organise and review"))
-        ui.onNodeWithText("Organise and review").performClick()
+        ui.onNodeWithTag("conversation-list").performScrollToNode(hasText("Choose words and review"))
+        ui.onNodeWithText("Choose words and review").performClick()
+        ui.onNodeWithTag("conversation-list").performScrollToNode(hasText("Organise using section headings"))
+        ui.onNodeWithText("Organise using section headings").performClick()
+        ui.onNodeWithTag("conversation-list").performScrollToNode(hasSetTextAction() and hasText("What matters"))
         ui.onNode(hasSetTextAction() and hasText("What matters")).assertTextContains("I want to spend time with family.")
         ui.onNodeWithTag("conversation-list").performScrollToNode(hasText("Continue to save"))
         ui.onNodeWithText("Continue to save").performClick()
@@ -165,6 +168,37 @@ class CareFlowTest {
         val saved = runBlocking { CareDatabase.get(ui.activity).care().latest(personId) }
         assertEquals(first.contentHash, saved!!.contentHash)
         assertEquals(first.id, saved.id)
+    }
+    @Test fun manualSourceAndConsentSurviveAppStopWithoutStartingAMicrophone() {
+        val words = "[Patient · English · 16 Oct 14:05] I am not ready to decide.\nManually corrected words remain here."
+        val consentAt = 1_792_136_700_000L
+        ui.runOnIdle { vm.edit(vm.draft.value.copy(source = words, consentAt = consentAt)) }
+        ui.waitUntil(15000) { runBlocking { CareDatabase.get(ui.activity).care().draft(personId)?.source == words } }
+        ui.activityRule.scenario.moveToState(androidx.lifecycle.Lifecycle.State.CREATED)
+        ui.activityRule.scenario.moveToState(androidx.lifecycle.Lifecycle.State.RESUMED)
+        ui.waitForIdle()
+        assertFalse(vm.recording.value)
+        assertEquals(words, vm.draft.value.source)
+        assertEquals(consentAt, vm.draft.value.consentAt)
+        ui.activityRule.scenario.recreate(); ui.waitForIdle()
+        ui.runOnIdle { vm = ui.activity.careModel }
+        ui.waitUntil(15000) { vm.draft.value.personId == personId }
+        assertEquals(words, vm.draft.value.source)
+        assertEquals(consentAt, vm.draft.value.consentAt)
+    }
+    @Test fun staleConfirmationCannotApplyAfterSwitchingPeople() {
+        val note = NoteRules.publish(vm.people.value.first { it.id == personId }, Conversation(personId, source = "I want to ask again.", questions = "I want to ask again."), "Test Doctor", true, 1)
+        runBlocking { CareDatabase.get(ui.activity).care().insertVersion(note) }
+        ui.runOnIdle { vm.addPerson("Other confirmation person") }
+        ui.waitUntil(15000) { !vm.busy.value && vm.selected.value != personId && vm.draft.value.personId == vm.selected.value }
+        val otherPerson = vm.selected.value
+        extraPeople += otherPerson
+        ui.runOnIdle { vm.edit(vm.draft.value.copy(source = "Other person's words.")); vm.confirm(note, "Patient", "Patient", true) {} }
+        ui.waitUntil(15000) { !vm.busy.value && vm.actionError.value != null }
+        assertTrue(vm.actionError.value!!.contains("Open this person's care note"))
+        assertTrue(runBlocking { CareDatabase.get(ui.activity).care().confirmations(note.id) }.isEmpty())
+        assertEquals(otherPerson, vm.draft.value.personId)
+        assertEquals("Other person's words.", vm.draft.value.source)
     }
     @Test fun directoryFiltersRecoverFromNoResults() {
         ui.onNodeWithText("Nearby", useUnmergedTree = true).performClick()
@@ -322,6 +356,30 @@ class CareFlowTest {
         ui.runOnIdle { vm.toggle(oldTask) }
         ui.waitUntil(15000) { vm.items.value.firstOrNull { it.id == oldTask.id }?.doneOn == "" }
     }
+    @Test fun switchingPeopleClosesOrdinaryEntryWithoutSavingToTheNewPerson() {
+        ui.runOnIdle { vm.addPerson("Other entry recipient") }
+        ui.waitUntil(15000) { !vm.busy.value && vm.selected.value != personId && vm.selected.value.isNotBlank() }
+        val other = vm.selected.value; extraPeople += other
+        ui.runOnIdle { vm.select(personId) }
+        ui.waitUntil(15000) { vm.selected.value == personId && vm.draft.value.personId == personId }
+        ui.onNodeWithTag("nav-Today").performClick()
+        ui.onNodeWithTag("today-list").performScrollToNode(hasText("Add task"))
+        ui.onNodeWithText("Add task").performClick()
+        val title = "Questions belonging to the first person"
+        ui.onNode(hasSetTextAction() and hasText("What needs doing?")).performTextInput(title)
+        ui.runOnIdle { vm.select(other) }
+        ui.waitUntil(15000) {
+            vm.selected.value == other && vm.draft.value.personId == other &&
+                ui.onAllNodes(hasSetTextAction() and hasText("What needs doing?")).fetchSemanticsNodes().isEmpty()
+        }
+        ui.onNode(hasSetTextAction() and hasText("What needs doing?")).assertDoesNotExist()
+        val dao = CareDatabase.get(ui.activity).care()
+        val newPersonItems = runBlocking { dao.items(other).first() }
+        val oldPersonItems = runBlocking { dao.items(personId).first() }
+        assertTrue(newPersonItems.none { it.title == title })
+        assertTrue(oldPersonItems.none { it.title == title })
+    }
+
     @Test fun roomPersistsAndSeparatesPeopleAcrossDatabaseReopen() = runBlocking {
         val context = ApplicationProvider.getApplicationContext<android.content.Context>()
         val filename = "verification-${newId()}.db"

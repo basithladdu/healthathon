@@ -1,0 +1,12 @@
+{
+  "checkedAt": "2026-10-16T06:51:08.529224+00:00",
+  "result": "PASS",
+  "checks": [
+    "Actual five SQL statements extracted from Room3-to4 migration executed",
+    "Legacy family row preserved byte-for-value with id equal old versionId",
+    "Patient and second family can coexist on same version",
+    "versionId index created",
+    "Duplicate confirmation primary key rejected"
+  ],
+  "limit": "SQLite SQL check only; Room schema validation and Android runtime need instrumentation."
+}
