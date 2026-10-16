@@ -138,7 +138,7 @@ fun calendarItems(entries: List<CareItem>, day: LocalDate): List<CareItem> = ent
     var extra by rememberSaveable { mutableStateOf(detail.isNotBlank() || location.isNotBlank()) }
     LaunchedEffect(entryId) { vm.actionError.value = null }
     LaunchedEffect(selected) { if (selected != capturedPerson) onDismiss() }
-    ModalBottomSheet(onDismissRequest = { if (!busy) onDismiss() }, containerColor = Cream) {
+    ModalBottomSheet(onDismissRequest = { if (!busy) onDismiss() }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(start = 20.dp, end = 20.dp, bottom = 28.dp).testTag("schedule-editor"), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Heading(if (initial == null) "Plan care" else "Edit ${category.lowercase()}", 26)
             if (!legacy) Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) { listOf("Visit", "Test", "Follow-up", "Procedure").forEach { choice -> FilterChip(category == choice, { category = choice }, label = { Text(choice) }) } }

@@ -256,7 +256,7 @@ object CareLabRules {
     var error by remember { mutableStateOf("") }
     LaunchedEffect(entryId) { vm.actionError.value = null }
     LaunchedEffect(person) { if (person != capturedPerson) onDismiss() }
-    ModalBottomSheet(onDismissRequest = { if (!busy) onDismiss() }, containerColor = Cream) {
+    ModalBottomSheet(onDismissRequest = { if (!busy) onDismiss() }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(start = 20.dp, end = 20.dp, bottom = 28.dp).testTag("workflow-editor"), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Heading(if (initial != null) "Edit ${if (type == "conversation") "request" else "task"}" else if (type == "conversation") "Ask to talk" else "Ask for help", 26)
             OutlinedTextField(title, { title = it; error = "" }, label = { Text(if (type == "conversation") "What would you like to discuss?" else "What needs doing?") }, modifier = Modifier.fillMaxWidth(), maxLines = 3)

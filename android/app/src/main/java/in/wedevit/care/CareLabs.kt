@@ -130,7 +130,7 @@ fun labGroups(items: List<CareItem>): List<List<Pair<CareItem, CareEntry>>> = it
     var error by remember { mutableStateOf("") }
     LaunchedEffect(entryId) { vm.actionError.value = null }
     LaunchedEffect(selected) { if (selected != captured) onDismiss() }
-    ModalBottomSheet(onDismissRequest = { if (!busy) onDismiss() }, containerColor = Cream) {
+    ModalBottomSheet(onDismissRequest = { if (!busy) onDismiss() }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(start = 20.dp, end = 20.dp, bottom = 28.dp).testTag("lab-editor"), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Heading(if (initial == null) "Add a lab result" else "Edit lab result", 26)
             OutlinedTextField(name, { name = it; error = "" }, label = { Text("Test name on report") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
