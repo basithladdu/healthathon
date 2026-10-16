@@ -1,0 +1,660 @@
+{
+  "title": "Named third-party Sarvam AI products and deployments",
+  "verifiedDate": "2026-10-15",
+  "scope": "Public web evidence of actual Sarvam use. This is a precedent inventory, not a clinical validation or live product audit.",
+  "coverageAudit": {
+    "totalNamedExamples": 20,
+    "healthcareAndHealthAccessExamples": 9,
+    "generalExamples": 11,
+    "stageCounts": {
+      "reported_deployed_customer": 11,
+      "reported_live_pilot": 4,
+      "builder_self_report": 3,
+      "public_source_prototype": 2
+    },
+    "strongestHealthcareEvidence": "HealthPlix HALO has a detailed vendor case study with named customer attribution, actual STT model and workflow. NHA is a health-access outreach pilot, not a diagnostic product.",
+    "whatWasVerified": "Explicit Sarvam attribution and described workflows on opened primary vendor, builder, institution or repository pages.",
+    "whatWasNotVerified": "Customer contracts, paying usage, API traffic, current deployment health, independent clinical outcomes, privacy compliance or the accuracy of marketing metrics.",
+    "scarcity": "No evidence found for 100 distinct real Sarvam medical products. The requested 100 medical use cases must be presented as proposed applications, separately from these named precedents.",
+    "evidenceBias": "Most mature examples are Sarvam-published customer stories. Named customer quotes improve attribution but are not independent audits.",
+    "countingRules": "One organization/product is counted once even when it has multiple workflows. Sarvam's own APIs, Indus, Kaze, Edge and announced partnerships are not counted as third-party customer deployments.",
+    "sourceCaution": "A search result for a newer SBI Life SPARK story returned 404 when opened, so its added claims were excluded. Engageo is Ritu's builder and is counted once; its homepage has conflicting clinic counts, so no customer count is adopted.",
+    "clinicalBoundary": "Use evidence for language access, documentation and coordination patterns. It does not establish that an LLM may diagnose, prescribe, choose opioid doses or replace palliative clinicians."
+  },
+  "examples": [
+    {
+      "id": "RP01",
+      "name": "HealthPlix — H.A.L.O",
+      "sector": "healthcare_clinical_documentation",
+      "productUrl": "https://www.healthplix.com/halo",
+      "evidenceUrl": "https://www.sarvam.ai/stories/healthplix",
+      "evidencePublisher": "Sarvam, with named HealthPlix CPO attribution",
+      "evidenceDate": "2026-06-04",
+      "sourceIds": [
+        "S01",
+        "S02"
+      ],
+      "stage": "reported_deployed_customer",
+      "problem": "Code-mixed consultations create typing and documentation work.",
+      "actualSarvamComponent": "Speech to Text, Streaming V2.5.",
+      "generativeMechanism": "Sarvam transcribes; HealthPlix's proprietary clinical models structure the transcript. The source does not attribute clinical reasoning to Sarvam.",
+      "workflow": "Record consultation; transcribe; draft structured medical record; doctor reviews.",
+      "reportedOutcome": "Sarvam's customer story reports 50,000+ HALO consultations, 97%+ prescription accuracy and about five minutes saved per consultation.",
+      "limitation": "Vendor/customer-reported metrics; benchmark method and independent clinical outcomes are not established. Do not generalize prescription accuracy to other specialties or Sahara.",
+      "relevantSaharaLesson": "Draft goals-of-care notes from consented conversation, preserve speaker provenance and require clinician correction before sharing."
+    },
+    {
+      "id": "RP02",
+      "name": "National Health Authority — Ayushman Vay Vandana outreach",
+      "sector": "healthcare_access",
+      "productUrl": null,
+      "productUrlNote": "Programme deployment, not a separate public app.",
+      "evidenceUrl": "https://www.sarvam.ai/stories/nha",
+      "evidencePublisher": "Sarvam",
+      "evidenceDate": "2026-02-11",
+      "sourceIds": [
+        "S03"
+      ],
+      "stage": "reported_live_pilot",
+      "problem": "Older citizens may lack scheme awareness, smartphones or confidence with forms.",
+      "actualSarvamComponent": "Samvaad conversational voice-agent platform over basic telephone calls.",
+      "generativeMechanism": "Adaptive multilingual conversations explain programme information, answer questions and capture enrolment interest.",
+      "workflow": "Outbound call; explain benefits; respond in local language; record intent; route to enrolment support.",
+      "reportedOutcome": "Sarvam reports 1.4 million unique citizens reached in six days and a correlated 42% increase in daily enrolment versus the preceding 30 days.",
+      "limitation": "Source explicitly distinguishes correlation from causation. This was an outreach pilot, not treatment or verified clinical advice.",
+      "relevantSaharaLesson": "Voice can connect families to existing palliative services and benefits without requiring app literacy; retain staffed follow-up."
+    },
+    {
+      "id": "RP03",
+      "name": "Engageo — Ritu clinic receptionist",
+      "sector": "healthcare_operations",
+      "productUrl": "https://www.engageoagency.com/",
+      "evidenceUrl": "https://www.linkedin.com/posts/atulhooda_sarvamai-voiceai-buildinpublic-activity-7490388408024924161-rkTX",
+      "evidencePublisher": "Atul Hooda, builder; corroborating Engageo product site and technical blog",
+      "evidenceDate": null,
+      "evidenceDateNote": "LinkedIn shows relative age, not an exact verified publication date. Technical blog is dated 2026-05-26.",
+      "sourceIds": [
+        "S04",
+        "S05",
+        "S06"
+      ],
+      "stage": "builder_self_report",
+      "problem": "Clinics miss inbound patient calls and appointment requests.",
+      "actualSarvamComponent": "Builder explicitly says production STT and TTS; homepage explicitly credits Sarvam speech/voice.",
+      "generativeMechanism": "Conversational receptionist answers clinic questions and collects booking intent; speech models handle Indic conversation.",
+      "workflow": "Unanswered call forwards; agent answers; calendar booking; WhatsApp confirmation and reminders.",
+      "reportedOutcome": "Founder claims real-clinic production use. No quantitative benefit is adopted because deployment counts on the homepage conflict.",
+      "limitation": "Not independently audited. Builder's technical blog describes accent, language-switch and backchannel failures and says a quantitative outcome study was in progress.",
+      "relevantSaharaLesson": "Reduce missed care-navigation calls, but implement reliable calendar writes, duplicate protection, disclosure and human handoff."
+    },
+    {
+      "id": "RP04",
+      "name": "Medilite AI",
+      "sector": "healthcare_clinical_documentation",
+      "productUrl": "https://www.medilite-ai.com/",
+      "evidenceUrl": "https://www.medilite-ai.com/",
+      "evidencePublisher": "Medilite AI / Wingspire Labs",
+      "evidenceDate": null,
+      "sourceIds": [
+        "S07"
+      ],
+      "stage": "builder_self_report",
+      "problem": "Neighbourhood clinics juggle intake, queues and typed notes.",
+      "actualSarvamComponent": "Product site explicitly labels its AI voice scribe as Sarvam-powered; exact model/API unspecified.",
+      "generativeMechanism": "Spoken consultation is turned into Chief Complaint, Assessment and Plan drafts.",
+      "workflow": "WhatsApp intake; live queue; doctor records voice; doctor reviews and edits notes; discharge workflow.",
+      "reportedOutcome": "No verified adoption or numerical outcome found.",
+      "limitation": "Opened product website establishes the builder's claim only; no live patient workflow, named customer, clinical accuracy or production traffic was checked.",
+      "relevantSaharaLesson": "Voice drafts should land directly in a reviewable care record rather than create another standalone chatbot."
+    },
+    {
+      "id": "RP05",
+      "name": "MedCore",
+      "sector": "healthcare_operations_and_documentation",
+      "productUrl": "https://www.medcore.software/",
+      "evidenceUrl": "https://www.medcore.software/",
+      "evidencePublisher": "MedCore",
+      "evidenceDate": null,
+      "sourceIds": [
+        "S08"
+      ],
+      "stage": "builder_self_report",
+      "problem": "Hospitals use disconnected administrative and documentation tools.",
+      "actualSarvamComponent": "Website explicitly identifies India-region Sarvam ASR for multilingual transcription and ambient scribe; exact model unspecified.",
+      "generativeMechanism": "ASR feeds SOAP drafts and a broader agent workflow; the page does not establish Sarvam as every downstream reasoning model.",
+      "workflow": "Call or consultation; transcribe; produce note/queue action; human handoff with context.",
+      "reportedOutcome": "No Sarvam-specific independently verified result adopted.",
+      "limitation": "Marketing assertions, testimonials, clinical automation and compliance claims were not audited. The page alternates between eight and ten language claims.",
+      "relevantSaharaLesson": "A care-team inbox needs transcript context and an accountable handoff, not isolated AI answers."
+    },
+    {
+      "id": "RP06",
+      "name": "Pood / Podd Health Assistant",
+      "sector": "health_tracking_prototype",
+      "productUrl": "https://www.heypood.tech/",
+      "evidenceUrl": "https://www.heypood.tech/",
+      "evidencePublisher": "Pood builder",
+      "evidenceDate": null,
+      "sourceIds": [
+        "S09",
+        "S10"
+      ],
+      "stage": "public_source_prototype",
+      "problem": "Typing routine food and vital logs is cumbersome.",
+      "actualSarvamComponent": "Site credits Sarvam STT/TTS and Bulbul V3 for Hindi speech. Bulbul is the TTS component, not evidence of speech recognition by itself.",
+      "generativeMechanism": "Sarvam speech surrounds an OpenAI/LangGraph tool-calling agent; LocusGraph stores structured memory.",
+      "workflow": "ESP32 captures voice; cloud backend interprets; tool logs food/vitals; spoken reply.",
+      "reportedOutcome": "Public website and linked source repository exist; no deployment or clinical outcome verified.",
+      "limitation": "Prototype evidence. Repository README differs from the marketed architecture and has an unfinished licence placeholder; do not assume its advertised MIT status.",
+      "relevantSaharaLesson": "A spoken symptom diary is feasible; request confirmation for extracted values and separate reported symptoms from measured vitals."
+    },
+    {
+      "id": "RP07",
+      "name": "RK Hospital Voice Agent — SrinathS-21 repository",
+      "sector": "healthcare_booking_prototype",
+      "productUrl": "https://github.com/SrinathS-21/Sarvam-Voice-Agent",
+      "evidenceUrl": "https://github.com/SrinathS-21/Sarvam-Voice-Agent",
+      "evidencePublisher": "Repository author SrinathS-21",
+      "evidenceDate": null,
+      "sourceIds": [
+        "S11"
+      ],
+      "stage": "public_source_prototype",
+      "problem": "Multilingual telephone appointment booking.",
+      "actualSarvamComponent": "README specifies Saarika V2.5 STT, Bulbul V2 TTS and Sarvam-M, with Twilio, MongoDB, Sheets and Gemini File Search.",
+      "generativeMechanism": "Streaming speech-to-text to LLM to text-to-speech, with a separate hospital information retrieval path.",
+      "workflow": "Phone conversation; collect appointment details; consult hospital knowledge; persist booking; reminder call.",
+      "reportedOutcome": "Source code and architecture are public; no verified hospital deployment or measured sub-second latency.",
+      "limitation": "Repository description calls it a POC. README's production-ready and latency labels are claims, not completed integration or performance verification.",
+      "relevantSaharaLesson": "Useful architecture reference for booking, but every promised booking must be confirmed by the actual scheduling service."
+    },
+    {
+      "id": "RP08",
+      "name": "Gram Vaani — Riya",
+      "sector": "healthcare_information_pilot",
+      "productUrl": null,
+      "productUrlNote": "Public product endpoint not verified.",
+      "evidenceUrl": "https://www.sarvam.ai/stories/ekstep",
+      "evidencePublisher": "Sarvam / Listen at Scale report",
+      "evidenceDate": null,
+      "evidencePeriod": "January–February 2026",
+      "sourceIds": [
+        "S12"
+      ],
+      "stage": "reported_live_pilot",
+      "problem": "Private health questions.",
+      "actualSarvamComponent": "Voice Agents programme.",
+      "generativeMechanism": "Health/wellness dialogue.",
+      "workflow": "Consented voice questions.",
+      "reportedOutcome": "Report lists 2,500 unique users.",
+      "limitation": "Pilot; no clinical validation.",
+      "relevantSaharaLesson": "Private conversation needs escalation."
+    },
+    {
+      "id": "RP09",
+      "name": "CEGIS — IFA high-frequency monitoring",
+      "sector": "health_program_monitoring",
+      "productUrl": null,
+      "productUrlNote": "Programme deployment, not a verified public app.",
+      "evidenceUrl": "https://www.sarvam.ai/stories/ekstep",
+      "evidencePublisher": "Sarvam / Listen at Scale report",
+      "evidenceDate": null,
+      "evidencePeriod": "January–February 2026",
+      "sourceIds": [
+        "S12"
+      ],
+      "stage": "reported_live_pilot",
+      "problem": "Supplement receipt/consumption gaps.",
+      "actualSarvamComponent": "Voice Agents programme.",
+      "generativeMechanism": "Conversational monitoring.",
+      "workflow": "Ask pregnant/lactating beneficiaries about IFA access and problems.",
+      "reportedOutcome": "Report lists 8,500 unique beneficiaries.",
+      "limitation": "Self-reported access; no clinical efficacy.",
+      "relevantSaharaLesson": "Follow-ups must trigger staff action."
+    },
+    {
+      "id": "RP10",
+      "name": "Mahindra Finance voice agents",
+      "sector": "financial_services",
+      "productUrl": null,
+      "productUrlNote": "Internal customer and employee calling workflows.",
+      "evidenceUrl": "https://www.sarvam.ai/stories/mahindra-finance-voice-agents",
+      "evidencePublisher": "Sarvam, with named Mahindra Finance CEO attribution",
+      "evidenceDate": "2026-09-21",
+      "sourceIds": [
+        "S13"
+      ],
+      "stage": "reported_deployed_customer",
+      "problem": "Reach dispersed customers and field employees in their language.",
+      "actualSarvamComponent": "Voice agents on Sarvam's platform; Mahindra AI's own predictive models and orchestration.",
+      "generativeMechanism": "Predictions become spoken contextual conversations, followed by custom call analysis.",
+      "workflow": "Campaign selection; multilingual call; capture response; integrate downstream CRM and servicing actions.",
+      "reportedOutcome": "Customer story reports over one crore calls across twelve languages, sales, collections and employee engagement.",
+      "limitation": "Reported scale is not independently verified. Financial collection tactics should not be copied into vulnerable-patient engagement.",
+      "relevantSaharaLesson": "Use contextual follow-up backed by operational records and real staff actions; respect the family's preferred contact time."
+    },
+    {
+      "id": "RP11",
+      "name": "IIM Udaipur bilingual BBA curriculum",
+      "sector": "education",
+      "productUrl": "https://news.iimu.ac.in/iim-udaipur-launches-bba-program-with-bilingual-learning-support-applications-open-for-2026-cohort/",
+      "evidenceUrl": "https://www.sarvam.ai/stories/iim-udaipur",
+      "evidencePublisher": "Sarvam, with IIM Udaipur faculty attribution; programme corroborated by IIM",
+      "evidenceDate": "2026-09-03",
+      "sourceIds": [
+        "S14",
+        "S15"
+      ],
+      "stage": "reported_deployed_customer",
+      "problem": "Produce Hindi and English lectures without recording both.",
+      "actualSarvamComponent": "Transcription, translation and voice-preserving dubbing workflow; model names unspecified.",
+      "generativeMechanism": "Generate reviewed English script and dubbed speech from a Hindi recording.",
+      "workflow": "Faculty records; transcript and translation reviewed for academic meaning; dub, synchronize and release.",
+      "reportedOutcome": "Case study reports English versions already receiving at least half the views of Hindi originals; annual content volume is a requirement, not all completed delivery.",
+      "limitation": "Educational metrics are not proof of medical translation safety or complete three-year curriculum processing.",
+      "relevantSaharaLesson": "Publish clinician-approved regional-language explanations; review meaning before generating patient audio."
+    },
+    {
+      "id": "RP12",
+      "name": "Equal AI Call Screening Assistant",
+      "sector": "personal_assistant",
+      "productUrl": "https://myequal.ai/",
+      "evidenceUrl": "https://www.sarvam.ai/stories/equal",
+      "evidencePublisher": "Sarvam, with Equal CEO attribution; product site and store listing corroboration",
+      "evidenceDate": "2026-08-18",
+      "sourceIds": [
+        "S16",
+        "S17",
+        "S18"
+      ],
+      "stage": "reported_deployed_customer",
+      "problem": "People cannot identify which incoming calls matter.",
+      "actualSarvamComponent": "Speech Recognition APIs; Saaras V3 primary model, streaming/batch, diarization and transliteration.",
+      "generativeMechanism": "Sarvam supplies transcripts; Equal's assistant converses, identifies intent and returns summary/recording.",
+      "workflow": "Assistant answers caller; determines reason; supplies transcript and summary; user can take over.",
+      "reportedOutcome": "Customer story reports over one million daily live calls across nine Indian languages; roughly 97% of its STT calls use transliteration.",
+      "limitation": "Scale is customer-reported. Screening workflow should not silently intercept urgent medical calls.",
+      "relevantSaharaLesson": "Offer a clear human takeover and summary; don't force every user through a rigid language form."
+    },
+    {
+      "id": "RP13",
+      "name": "SLNG Indic voice infrastructure",
+      "sector": "developer_infrastructure",
+      "productUrl": "https://slng.ai/about-us",
+      "evidenceUrl": "https://www.sarvam.ai/stories/slng-indic-voice-ai",
+      "evidencePublisher": "Sarvam, with SLNG co-founder attribution",
+      "evidenceDate": "2026-08-17",
+      "sourceIds": [
+        "S19",
+        "S20"
+      ],
+      "stage": "reported_deployed_customer",
+      "problem": "Voice platforms need Indic speech and regional processing.",
+      "actualSarvamComponent": "Saaras STT and Bulbul TTS in SLNG's production cascade.",
+      "generativeMechanism": "Speech recognition; independently chosen LLM layer; generated speech.",
+      "workflow": "SLNG routes voice workloads through Indic STT and TTS while managing execution and region.",
+      "reportedOutcome": "Case study reports about one million API requests monthly. Larger future workloads are plans, not achieved usage.",
+      "limitation": "In-region processing claims do not establish Sahara's contract, retention policy or clinical safety.",
+      "relevantSaharaLesson": "Choose speech and reasoning independently; benchmark the full voice turn rather than a single model score."
+    },
+    {
+      "id": "RP14",
+      "name": "Dezerv post-call analytics and live notes",
+      "sector": "wealth_management",
+      "productUrl": "https://www.dezerv.in/investment-solutions/",
+      "evidenceUrl": "https://www.sarvam.ai/stories/dezerv",
+      "evidencePublisher": "Sarvam, with Dezerv co-founder attribution and explicit internal-data disclaimer",
+      "evidenceDate": "2026-08-10",
+      "sourceIds": [
+        "S21",
+        "S22"
+      ],
+      "stage": "reported_deployed_customer",
+      "problem": "Long multilingual adviser conversations are hard to search.",
+      "actualSarvamComponent": "Sarvam SDK and Speech to Text Batch API with speaker diarization.",
+      "generativeMechanism": "Speaker-separated transcript supports searchable relationship history and downstream analytics.",
+      "workflow": "Consent; transcribe calls/video; retain who said what and when; advisers revisit concerns and goals.",
+      "reportedOutcome": "Dezerv reports about 360,000 speech minutes in the preceding month and around 20% lower word error rate versus its previous setup.",
+      "limitation": "Internal results; zero-retention configuration is specific to that deployment and cannot be assumed for a new account.",
+      "relevantSaharaLesson": "Goals-of-care history must retain speaker, date and source so preferences are not flattened into an unattributed AI summary."
+    },
+    {
+      "id": "RP15",
+      "name": "Supernova — Nova AI spoken English tutor",
+      "sector": "education",
+      "productUrl": "https://www.getsupernova.ai/",
+      "evidenceUrl": "https://www.sarvam.ai/stories/supernova",
+      "evidencePublisher": "Sarvam, with Supernova CTO attribution",
+      "evidenceDate": "2026-08-03",
+      "sourceIds": [
+        "S23",
+        "S24"
+      ],
+      "stage": "reported_deployed_customer",
+      "problem": "Accent errors and code-switching interrupt spoken practice.",
+      "actualSarvamComponent": "Speech-to-Text API in translate mode; specific model version unspecified.",
+      "generativeMechanism": "Indic utterances become English text for Nova's feedback/conversation system; English is transcribed directly.",
+      "workflow": "Learner speaks and may switch languages; transcription/translation feeds feedback and continued practice.",
+      "reportedOutcome": "Customer story reports latency reduced to 550–650 ms, error rates halved, and five-to-eight percentage-point better scenario completion.",
+      "limitation": "Internal product metrics; source still reports roughly 19% word error rate, which is unsuitable as a blanket medical-accuracy assurance.",
+      "relevantSaharaLesson": "Let families code-switch, but review medicine names, doses, negation and distress language instead of trusting ordinary transcription quality."
+    },
+    {
+      "id": "RP16",
+      "name": "UIDAI / Aadhaar resident voice agents",
+      "sector": "government",
+      "productUrl": null,
+      "productUrlNote": "Internal resident-service deployment.",
+      "evidenceUrl": "https://www.sarvam.ai/stories/aadhaar",
+      "evidencePublisher": "Sarvam, with UIDAI CEO attribution",
+      "evidenceDate": "2026-03-09",
+      "sourceIds": [
+        "S25"
+      ],
+      "stage": "reported_deployed_customer",
+      "problem": "Accessible resident feedback and verification across language and literacy levels.",
+      "actualSarvamComponent": "Full-stack GenAI platform deployed on-premise inside UIDAI's air-gapped environment.",
+      "generativeMechanism": "Local model, inference, orchestration and interaction logic support spoken service workflows.",
+      "workflow": "Voice interaction for enrolment feedback, suspicious-activity alerts and pensioner/senior support.",
+      "reportedOutcome": "Case study reports four-plus deployed use cases and around four crore residents served.",
+      "limitation": "Vendor/customer report; a specially hosted government deployment does not mean ordinary public Sarvam API use is air-gapped.",
+      "relevantSaharaLesson": "If hospitals require stricter data control, assess a contracted deployment rather than describing every cloud API as private by default."
+    },
+    {
+      "id": "RP17",
+      "name": "Ekatra Foundation Gujarati literature pipeline",
+      "sector": "cultural_archives",
+      "productUrl": "https://www.ekatra.org/",
+      "evidenceUrl": "https://www.sarvam.ai/stories/ekatra",
+      "evidencePublisher": "Sarvam, with Ekatra co-founder attribution",
+      "evidenceDate": "2026-03-04",
+      "sourceIds": [
+        "S26",
+        "S27"
+      ],
+      "stage": "reported_deployed_customer",
+      "problem": "Historical Gujarati scans contain complex typography and archaic terms.",
+      "actualSarvamComponent": "Specialized layout, recognition and proofreading document pipeline; exact model identifiers unspecified.",
+      "generativeMechanism": "Layout-aware extraction plus contextual text reconstruction and instruction-driven proofreading.",
+      "workflow": "Scan; identify structure; recognize blocks; human proofreads; publish formatted ePub.",
+      "reportedOutcome": "Case study reports improvement from about one error per line to one every ten pages for mainstream books.",
+      "limitation": "Fifty thousand books is a target, not completed volume. Historical-literature accuracy does not verify handwritten prescription accuracy.",
+      "relevantSaharaLesson": "Preserve document layout and original evidence; make extracted text correctable before it becomes a care record."
+    },
+    {
+      "id": "RP18",
+      "name": "SBI Life multilingual WhatsApp sales assistant",
+      "sector": "insurance_operations",
+      "productUrl": null,
+      "productUrlNote": "Internal frontline WhatsApp assistant; public access endpoint not verified.",
+      "evidenceUrl": "https://www.sarvam.ai/stories/sbi-life",
+      "evidencePublisher": "Sarvam",
+      "evidenceDate": "2026-02-18",
+      "sourceIds": [
+        "S28"
+      ],
+      "stage": "reported_deployed_customer",
+      "problem": "A large frontline team needs product information in local languages.",
+      "actualSarvamComponent": "Sarvam AI multilingual WhatsApp assistant; precise model names unspecified.",
+      "generativeMechanism": "Question answering and personalized collateral generation, with calculation/guideline access.",
+      "workflow": "Sales agent asks within WhatsApp; assistant retrieves product or underwriting information and produces support material.",
+      "reportedOutcome": "Case study reports deployment to 350,000-plus frontline agents in eleven languages.",
+      "limitation": "No independent productivity measurement adopted; calculator outputs should not be assumed to be LLM arithmetic.",
+      "relevantSaharaLesson": "A staff-facing assistant can place approved care guidance beside daily workflow; keep calculations deterministic and sources visible."
+    },
+    {
+      "id": "RP19",
+      "name": "Tata Capital multilingual customer voice agents",
+      "sector": "financial_services",
+      "productUrl": null,
+      "productUrlNote": "Internal customer calling workflow.",
+      "evidenceUrl": "https://www.sarvam.ai/stories/tata-capital-ai-voice-transformation",
+      "evidencePublisher": "Sarvam, with Tata Capital CDO attribution",
+      "evidenceDate": "2026-02-18",
+      "sourceIds": [
+        "S29"
+      ],
+      "stage": "reported_deployed_customer",
+      "problem": "High-volume customer contact across language segments.",
+      "actualSarvamComponent": "Samvaad enterprise voice platform.",
+      "generativeMechanism": "Contextual voice conversations recognize intent and mixed-language speech with workflow controls.",
+      "workflow": "Automated conversation in English or ten Indian languages; nuanced interactions transfer to human agents.",
+      "reportedOutcome": "Case study says a significant share of calling is handled through voice AI; no numerical outcome is adopted.",
+      "limitation": "Qualitative enterprise claims; empathy descriptions are not evidence that AI can handle serious distress safely.",
+      "relevantSaharaLesson": "Route judgement-heavy or emotional conversations to people with the transcript and existing record."
+    },
+    {
+      "id": "RP20",
+      "name": "Ministry of Agriculture — Digital Crop Survey verification",
+      "sector": "government_agriculture",
+      "productUrl": null,
+      "productUrlNote": "Programme pilot; no separate public product endpoint verified.",
+      "evidenceUrl": "https://www.sarvam.ai/stories/dcs",
+      "evidencePublisher": "Sarvam",
+      "evidenceDate": "2025-10-24",
+      "sourceIds": [
+        "S30"
+      ],
+      "stage": "reported_live_pilot",
+      "problem": "Administrative crop records need confirmation by the farmer.",
+      "actualSarvamComponent": "Multilingual telephony voice agents with WhatsApp follow-up.",
+      "generativeMechanism": "Conversations ask people to confirm or correct existing structured data.",
+      "workflow": "Call farmer; compare crop/acreage details; capture corrections; target mismatches for field follow-up.",
+      "reportedOutcome": "Source reports more than 400,000 farmers across four states during the October 2025 pilot.",
+      "limitation": "Eight crore farmers was a future target, not a verified delivered total. Data verification is not proof of clinical record correctness.",
+      "relevantSaharaLesson": "Read back existing care information and let patients correct it, instead of repeatedly asking them to fill the same form."
+    }
+  ],
+  "sourceList": [
+    {
+      "id": "S01",
+      "title": "How HealthPlix turns doctor consultations into medical records with Sarvam",
+      "url": "https://www.sarvam.ai/stories/healthplix",
+      "verifiedDate": "2026-10-15",
+      "verificationMethod": "Opened primary web page; public assertions assessed, not product execution."
+    },
+    {
+      "id": "S02",
+      "title": "H.A.L.O | HealthPlix",
+      "url": "https://www.healthplix.com/halo",
+      "verifiedDate": "2026-10-15",
+      "verificationMethod": "Opened primary web page; public assertions assessed, not product execution."
+    },
+    {
+      "id": "S03",
+      "title": "NHA reached 1.4 million citizens to drive scheme awareness",
+      "url": "https://www.sarvam.ai/stories/nha",
+      "verifiedDate": "2026-10-15",
+      "verificationMethod": "Opened primary web page; public assertions assessed, not product execution."
+    },
+    {
+      "id": "S04",
+      "title": "Building Ritu with Sarvam Voice AI for Indian Clinics — Atul Hooda",
+      "url": "https://www.linkedin.com/posts/atulhooda_sarvamai-voiceai-buildinpublic-activity-7490388408024924161-rkTX",
+      "verifiedDate": "2026-10-15",
+      "verificationMethod": "Opened primary web page; public assertions assessed, not product execution."
+    },
+    {
+      "id": "S05",
+      "title": "Engageo — AI Missed Call Recovery",
+      "url": "https://www.engageoagency.com/",
+      "verifiedDate": "2026-10-15",
+      "verificationMethod": "Opened primary web page; public assertions assessed, not product execution."
+    },
+    {
+      "id": "S06",
+      "title": "Inside Engageo: multilingual voice AI engineering",
+      "url": "https://www.engageoagency.com/blog/engageo-multilingual-voice-ai-research-paper",
+      "verifiedDate": "2026-10-15",
+      "verificationMethod": "Opened primary web page; public assertions assessed, not product execution."
+    },
+    {
+      "id": "S07",
+      "title": "Medilite AI | Voice-First Clinic Flow",
+      "url": "https://www.medilite-ai.com/",
+      "verifiedDate": "2026-10-15",
+      "verificationMethod": "Opened primary web page; public assertions assessed, not product execution."
+    },
+    {
+      "id": "S08",
+      "title": "MedCore healthcare operating system",
+      "url": "https://www.medcore.software/",
+      "verifiedDate": "2026-10-15",
+      "verificationMethod": "Opened primary web page; public assertions assessed, not product execution."
+    },
+    {
+      "id": "S09",
+      "title": "Pood — Your AI Health Buddy",
+      "url": "https://www.heypood.tech/",
+      "verifiedDate": "2026-10-15",
+      "verificationMethod": "Opened primary web page; public assertions assessed, not product execution."
+    },
+    {
+      "id": "S10",
+      "title": "fnLog0/podd source repository",
+      "url": "https://github.com/fnLog0/podd",
+      "verifiedDate": "2026-10-15",
+      "verificationMethod": "Opened primary web page; public assertions assessed, not product execution."
+    },
+    {
+      "id": "S11",
+      "title": "SrinathS-21/Sarvam-Voice-Agent source repository",
+      "url": "https://github.com/SrinathS-21/Sarvam-Voice-Agent",
+      "verifiedDate": "2026-10-15",
+      "verificationMethod": "Opened primary web page; public assertions assessed, not product execution."
+    },
+    {
+      "id": "S12",
+      "title": "Listen at Scale — Jan–Feb 2026 programme report",
+      "url": "https://www.sarvam.ai/stories/ekstep",
+      "verifiedDate": "2026-10-15",
+      "verificationMethod": "Opened primary web page; public assertions assessed, not product execution."
+    },
+    {
+      "id": "S13",
+      "title": "Mahindra Finance voice agents",
+      "url": "https://www.sarvam.ai/stories/mahindra-finance-voice-agents",
+      "verifiedDate": "2026-10-15",
+      "verificationMethod": "Opened primary web page; public assertions assessed, not product execution."
+    },
+    {
+      "id": "S14",
+      "title": "IIM Udaipur bilingual curriculum case study",
+      "url": "https://www.sarvam.ai/stories/iim-udaipur",
+      "verifiedDate": "2026-10-15",
+      "verificationMethod": "Opened primary web page; public assertions assessed, not product execution."
+    },
+    {
+      "id": "S15",
+      "title": "IIM Udaipur BBA bilingual programme announcement",
+      "url": "https://news.iimu.ac.in/iim-udaipur-launches-bba-program-with-bilingual-learning-support-applications-open-for-2026-cohort/",
+      "verifiedDate": "2026-10-15",
+      "verificationMethod": "Opened primary web page; public assertions assessed, not product execution."
+    },
+    {
+      "id": "S16",
+      "title": "Equal Call Screening Assistant case study",
+      "url": "https://www.sarvam.ai/stories/equal",
+      "verifiedDate": "2026-10-15",
+      "verificationMethod": "Opened primary web page; public assertions assessed, not product execution."
+    },
+    {
+      "id": "S17",
+      "title": "Equal AI official product website",
+      "url": "https://myequal.ai/",
+      "verifiedDate": "2026-10-15",
+      "verificationMethod": "Opened primary web page; public assertions assessed, not product execution."
+    },
+    {
+      "id": "S18",
+      "title": "Equal AI Call Assistant store listing",
+      "url": "https://play.google.com/store/apps/details?id=in.equal.ai.assistant",
+      "verifiedDate": "2026-10-15",
+      "verificationMethod": "Opened primary web page; public assertions assessed, not product execution."
+    },
+    {
+      "id": "S19",
+      "title": "SLNG Indic voice infrastructure case study",
+      "url": "https://www.sarvam.ai/stories/slng-indic-voice-ai",
+      "verifiedDate": "2026-10-15",
+      "verificationMethod": "Opened primary web page; public assertions assessed, not product execution."
+    },
+    {
+      "id": "S20",
+      "title": "SLNG official website",
+      "url": "https://slng.ai/about-us",
+      "verifiedDate": "2026-10-15",
+      "verificationMethod": "Opened primary web page; public assertions assessed, not product execution."
+    },
+    {
+      "id": "S21",
+      "title": "Dezerv post-call analytics case study",
+      "url": "https://www.sarvam.ai/stories/dezerv",
+      "verifiedDate": "2026-10-15",
+      "verificationMethod": "Opened primary web page; public assertions assessed, not product execution."
+    },
+    {
+      "id": "S22",
+      "title": "Dezerv official investment solutions",
+      "url": "https://www.dezerv.in/investment-solutions/",
+      "verifiedDate": "2026-10-15",
+      "verificationMethod": "Opened primary web page; public assertions assessed, not product execution."
+    },
+    {
+      "id": "S23",
+      "title": "Supernova voice-first English tutor case study",
+      "url": "https://www.sarvam.ai/stories/supernova",
+      "verifiedDate": "2026-10-15",
+      "verificationMethod": "Opened primary web page; public assertions assessed, not product execution."
+    },
+    {
+      "id": "S24",
+      "title": "Supernova official product website",
+      "url": "https://www.getsupernova.ai/",
+      "verifiedDate": "2026-10-15",
+      "verificationMethod": "Opened primary web page; public assertions assessed, not product execution."
+    },
+    {
+      "id": "S25",
+      "title": "UIDAI Aadhaar voice agents case study",
+      "url": "https://www.sarvam.ai/stories/aadhaar",
+      "verifiedDate": "2026-10-15",
+      "verificationMethod": "Opened primary web page; public assertions assessed, not product execution."
+    },
+    {
+      "id": "S26",
+      "title": "Ekatra Gujarati literature case study",
+      "url": "https://www.sarvam.ai/stories/ekatra",
+      "verifiedDate": "2026-10-15",
+      "verificationMethod": "Opened primary web page; public assertions assessed, not product execution."
+    },
+    {
+      "id": "S27",
+      "title": "Ekatra Foundation digital library",
+      "url": "https://www.ekatra.org/",
+      "verifiedDate": "2026-10-15",
+      "verificationMethod": "Opened primary web page; public assertions assessed, not product execution."
+    },
+    {
+      "id": "S28",
+      "title": "SBI Life WhatsApp assistant case study",
+      "url": "https://www.sarvam.ai/stories/sbi-life",
+      "verifiedDate": "2026-10-15",
+      "verificationMethod": "Opened primary web page; public assertions assessed, not product execution."
+    },
+    {
+      "id": "S29",
+      "title": "Tata Capital multilingual voice case study",
+      "url": "https://www.sarvam.ai/stories/tata-capital-ai-voice-transformation",
+      "verifiedDate": "2026-10-15",
+      "verificationMethod": "Opened primary web page; public assertions assessed, not product execution."
+    },
+    {
+      "id": "S30",
+      "title": "Digital Crop Survey case study",
+      "url": "https://www.sarvam.ai/stories/dcs",
+      "verifiedDate": "2026-10-15",
+      "verificationMethod": "Opened primary web page; public assertions assessed, not product execution."
+    }
+  ]
+}

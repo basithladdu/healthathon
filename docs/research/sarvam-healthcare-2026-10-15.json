@@ -1,0 +1,1900 @@
+{
+  "title": "100 Sarvam AI healthcare workflow proposals for Sahara",
+  "verifiedDate": "2026-10-15",
+  "provider": "Sarvam AI; sponsor identity separately confirmed by root from email",
+  "count": 100,
+  "evidenceInterpretation": "H001-H100 are original proposals inferred from documented component capabilities and primary healthcare workflow references. They are not 100 shipped products, clinically validated capabilities, a partnership or features already in Sahara. Application/backend work is required beyond Sarvam APIs.",
+  "researchScope": "Read-only public-source research. No API call, patient upload, account/billing change, app implementation, mail or clinical deployment made.",
+  "capabilityCautions": [
+    "Current STT docs recommend Saaras v4 and the opened TTS guide documents Bulbul v4 Flash. Some quickstart/landing-page prose retains older versions. Pin and test the supported model/endpoint at implementation.",
+    "Language coverage differs by API. Opened STT and formal translation docs list 22 Indian languages plus English, while Bulbul v4 Flash lists 11 codes. Translation availability does not imply TTS availability.",
+    "Transcription is not clinical interpretation. HealthPlix uses a separate proprietary clinical layer after Sarvam STT. Source-linked structured output still requires clinical review; JSON shape does not establish truth.",
+    "Check negation, speaker attribution, numbers, units, medicine brands and uncertainty. Start with clinician-authored synthetic gold examples. Test representative patient data only after appropriate authorization and governance.",
+    "US educational sources and international tools provide workflow context, not Indian legal/clinical instructions. Local clinical approval, data-processing arrangements, consent and regulation remain prerequisites.",
+    "Ariadne and other tools may require license/adaptation permission. This catalog references their purpose without reproducing commercial-ready clinical scripts.",
+    "Credits do not authorize patient-data processing. Root handles provider terms, credit activation, retention, residency, costs and permitted healthcare scope.",
+    "No proposal performs autonomous diagnosis, prognosis, triage, prescribing, treatment selection or dosing. Existing emergency contact access must work without a model."
+  ],
+  "evidenceTypeLegend": {
+    "capability": "Official provider API documentation; modality evidence, not medical validation.",
+    "workflowContext": "Primary healthcare organization resource; supports the care job, not efficacy of proposed AI.",
+    "existingDeployment": "Named provider/customer case study; self-reported, not an independent trial.",
+    "researchCaution": "Original research preprint; limitations evidence, not certification of current models."
+  },
+  "prioritySaharaOpportunities": [
+    {
+      "id": "H001",
+      "priority": 1,
+      "why": "Voice navigation removes typing without changing the familiar UI; start with low-consequence screen-opening commands."
+    },
+    {
+      "id": "H061",
+      "priority": 2,
+      "why": "Conversational access to verified centre and MapLibre data gives a practical next step without inventing medical advice."
+    },
+    {
+      "id": "H031",
+      "priority": 3,
+      "why": "A short confirmed voice diary helps a tired patient report experience; a staffed clinician workflow owns interpretation."
+    },
+    {
+      "id": "H022",
+      "priority": 4,
+      "why": "Clinician-led GOCD drafting with source spans is Sahara-specific; clinical decisions stay with the clinician and patient."
+    },
+    {
+      "id": "H007",
+      "priority": 5,
+      "why": "A saved teach-back response lets a nurse check understanding rather than assume translation equals comprehension."
+    },
+    {
+      "id": "H002",
+      "priority": 6,
+      "why": "Approved-plan read-aloud improves access; verify numbers and medication pronunciation before patient use."
+    },
+    {
+      "id": "H051",
+      "priority": 7,
+      "why": "Practical caregiver handover makes daily coordination easier without autonomous clinical decisions."
+    },
+    {
+      "id": "H100",
+      "priority": 8,
+      "why": "Synthetic clinical-language evaluation is a prerequisite for expansion beyond low-consequence tasks."
+    }
+  ],
+  "documentedHealthcareExamples": [
+    {
+      "name": "HealthPlix HALO",
+      "evidenceType": "existingDeployment",
+      "url": "https://www.sarvam.ai/stories/healthplix",
+      "whatSarvamDoes": "Multilingual consultation speech transcription.",
+      "whatOtherSystemDoes": "HealthPlix proprietary models structure clinical content; doctors review the record.",
+      "generativeUse": "Sarvam speech recognition is one component; clinical interpretation/structuring belongs to a separate HealthPlix layer.",
+      "limitation": "Vendor/customer report, not independent validation. Reported prescription accuracy must not be attributed to standalone Sarvam or Sahara."
+    },
+    {
+      "name": "National Health Authority Ayushman awareness outreach",
+      "evidenceType": "existingDeployment",
+      "url": "https://www.sarvam.ai/stories/nha",
+      "whatSarvamDoes": "Multilingual telephone voice agents explain a health scheme and capture interest.",
+      "whatOtherSystemDoes": "NHA defines campaign messages and manages programme enrollment.",
+      "generativeUse": "Conversational information exchange over voice, not diagnosis.",
+      "limitation": "Administrative outreach case study; enrollment change is correlational and does not prove clinical outcomes or Sahara funding."
+    }
+  ],
+  "categories": [
+    {
+      "name": "Language access and accessible care",
+      "count": 10
+    },
+    {
+      "name": "Clinical documentation and record continuity",
+      "count": 10
+    },
+    {
+      "name": "Goals-of-care conversations and patient preferences",
+      "count": 10
+    },
+    {
+      "name": "Daily reporting and home-care communication",
+      "count": 10
+    },
+    {
+      "name": "Medicines, tests and clinical-document communication",
+      "count": 10
+    },
+    {
+      "name": "Caregiver support, family coordination and dignity",
+      "count": 10
+    },
+    {
+      "name": "Appointments, home visits and service navigation",
+      "count": 10
+    },
+    {
+      "name": "Oncology and specialist-care communication",
+      "count": 10
+    },
+    {
+      "name": "Provider operations, records and quality improvement",
+      "count": 10
+    },
+    {
+      "name": "Training, research and public-health learning",
+      "count": 10
+    }
+  ],
+  "sourceList": [
+    {
+      "id": "STT",
+      "title": "Speech-to-Text APIs",
+      "url": "https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/overview",
+      "verifiedDate": "2026-10-15",
+      "claim": "Saaras supports transcription modes, code mixing, timestamps and batch/streaming paths. Modality availability does not establish clinical accuracy.",
+      "evidenceType": "capability"
+    },
+    {
+      "id": "TTS",
+      "title": "Bulbul v4 Flash best practices",
+      "url": "https://docs.sarvam.ai/api/api-guides-tutorials/text-to-speech/best-practices",
+      "verifiedDate": "2026-10-15",
+      "claim": "Indian-language speech synthesis, pacing and streaming are available; medical pronunciation and numbers still require checking.",
+      "evidenceType": "capability"
+    },
+    {
+      "id": "CHAT",
+      "title": "Chat Completion API",
+      "url": "https://docs.sarvam.ai/api/api-guides-tutorials/chat-completion/overview",
+      "verifiedDate": "2026-10-15",
+      "claim": "Constrained JSON and tool calling are supported. Application code must still validate meaning and permissions.",
+      "evidenceType": "capability"
+    },
+    {
+      "id": "TRANS",
+      "title": "Sarvam Translate",
+      "url": "https://docs.sarvam.ai/api/getting-started/models/sarvam-translate",
+      "verifiedDate": "2026-10-15",
+      "claim": "Formal translation supports English and 22 scheduled Indian languages; this is not certified medical interpreting.",
+      "evidenceType": "capability"
+    },
+    {
+      "id": "DOC",
+      "title": "Document Intelligence Overview",
+      "url": "https://docs.sarvam.ai/api/api-guides-tutorials/document-intelligence/overview",
+      "verifiedDate": "2026-10-15",
+      "claim": "OCR and schema-based extraction are available. Clinical fields require checking against original documents.",
+      "evidenceType": "capability"
+    },
+    {
+      "id": "DOCTR",
+      "title": "Document Translation API Overview",
+      "url": "https://docs.sarvam.ai/api/api-guides-tutorials/doc-translation/overview",
+      "verifiedDate": "2026-10-15",
+      "claim": "Document translation is an API workflow; layout and clinical meaning need review before patient use.",
+      "evidenceType": "capability"
+    },
+    {
+      "id": "QUICK",
+      "title": "Developer Quickstart",
+      "url": "https://docs.sarvam.ai/api/getting-started/quickstart",
+      "verifiedDate": "2026-10-15",
+      "claim": "Speech, translation, chat and document APIs are offered. Credits, app integration and permission to process health data are separate.",
+      "evidenceType": "capability"
+    },
+    {
+      "id": "PC",
+      "title": "WHO Palliative care",
+      "url": "https://www.who.int/en/news-room/fact-sheets/detail/palliative-care",
+      "verifiedDate": "2026-10-15",
+      "claim": "Palliative care addresses physical, psychosocial, spiritual and practical needs through multidisciplinary, community and home services.",
+      "evidenceType": "workflowContext"
+    },
+    {
+      "id": "NCI",
+      "title": "NCI Palliative Care in Cancer",
+      "url": "https://www.cancer.gov/about-cancer/advanced-cancer/care-choices/palliative-care-fact-sheet",
+      "verifiedDate": "2026-10-15",
+      "claim": "Cancer palliative care includes caregiver support, care-team communication and goals-of-care discussions under licensed providers.",
+      "evidenceType": "workflowContext"
+    },
+    {
+      "id": "CG",
+      "title": "NCI Informal Caregivers in Cancer",
+      "url": "https://www.cancer.gov/about-cancer/coping/family-friends/family-caregivers-pdq",
+      "verifiedDate": "2026-10-15",
+      "claim": "Caregivers have coordination, information, emotional, social and financial needs. This is educational material, not a formal clinical guideline.",
+      "evidenceType": "workflowContext"
+    },
+    {
+      "id": "GOCD",
+      "title": "Ariadne Labs Serious Illness Conversation Guide",
+      "url": "https://www.ariadnelabs.org/resources/downloads/serious-illness-conversation-guide/",
+      "verifiedDate": "2026-10-15",
+      "claim": "The clinician tool addresses values, goals, information preferences and documentation. Adaptation requires license review and local approval.",
+      "evidenceType": "workflowContext"
+    },
+    {
+      "id": "TB",
+      "title": "AHRQ Tool: Teach-Back",
+      "url": "https://www.ahrq.gov/teamstepps-program/curriculum/communication/tools/teachback.html",
+      "verifiedDate": "2026-10-15",
+      "claim": "Teach-back asks people to explain instructions in their own words so the clinician can check clarity and understanding.",
+      "evidenceType": "workflowContext"
+    },
+    {
+      "id": "MED",
+      "title": "WHO Medication safety in transitions of care",
+      "url": "https://www.who.int/publications/i/item/WHO-UHC-SDS-2019.9",
+      "verifiedDate": "2026-10-15",
+      "claim": "Safe transitions need structured medication processes, reliable information, patient/family partnership and qualified staff.",
+      "evidenceType": "workflowContext"
+    },
+    {
+      "id": "QUEST",
+      "title": "NCI Questions to Ask Your Doctor about Advanced Cancer",
+      "url": "https://www.cancer.gov/about-cancer/advanced-cancer/questions",
+      "verifiedDate": "2026-10-15",
+      "claim": "This supports preparing questions for an oncology team, not AI prognosis or treatment selection.",
+      "evidenceType": "workflowContext"
+    },
+    {
+      "id": "PLAN",
+      "title": "NCI Plans and Decisions for End-of-Life Care as a Cancer Caregiver",
+      "url": "https://www.cancer.gov/about-cancer/advanced-cancer/caregivers/planning",
+      "verifiedDate": "2026-10-15",
+      "claim": "Care-team discussions help communicate patient choices and practical needs. US legal references are not Indian legal instructions.",
+      "evidenceType": "workflowContext"
+    },
+    {
+      "id": "RED",
+      "title": "AHRQ Re-Engineered Discharge Toolkit: Tool3 continued",
+      "url": "https://www.ahrq.gov/patient-safety/settings/hospital/red/toolkit/redtool3a.html",
+      "verifiedDate": "2026-10-15",
+      "claim": "Discharge communication covers follow-up visits, transport, medicines, instructions and checking understanding.",
+      "evidenceType": "workflowContext"
+    },
+    {
+      "id": "ETHICS",
+      "title": "WHO Ethics and governance of AI for health: large multi-modal models",
+      "url": "https://www.who.int/publications/b/70584",
+      "verifiedDate": "2026-10-15",
+      "claim": "Broad generative-AI capabilities do not prove safe or effective clinical use; governance and validation are needed.",
+      "evidenceType": "workflowContext"
+    },
+    {
+      "id": "ASR",
+      "title": "SamaVaani: Auditing and Debiasing Multilingual Clinical ASR for Indian Languages",
+      "url": "https://arxiv.org/abs/2606.26901",
+      "verifiedDate": "2026-10-15",
+      "claim": "Original-research preprint reports language and demographic variation across clinical ASR systems including Sarvam; not validation of current v4 or palliative use.",
+      "evidenceType": "researchCaution"
+    },
+    {
+      "id": "NPPC",
+      "title": "DGHS National Programme for Palliative Care",
+      "url": "https://dghs.mohfw.gov.in/nppc.php",
+      "verifiedDate": "2026-10-15",
+      "claim": "Indian programme context includes district integration, multidisciplinary care and community resources; it does not promise Sahara procurement or funding.",
+      "evidenceType": "workflowContext"
+    },
+    {
+      "id": "HALO",
+      "title": "Sarvam customer story: HealthPlix HALO",
+      "url": "https://www.sarvam.ai/stories/healthplix",
+      "verifiedDate": "2026-10-15",
+      "claim": "Sarvam transcribes; HealthPlix's separate proprietary clinical layer structures records for doctor review. This is vendor/customer reporting, not independent validation.",
+      "evidenceType": "existingDeployment"
+    },
+    {
+      "id": "NHA",
+      "title": "Sarvam customer story: National Health Authority",
+      "url": "https://www.sarvam.ai/stories/nha",
+      "verifiedDate": "2026-10-15",
+      "claim": "Multilingual telephone outreach about a health scheme is an administrative/public-health application, not diagnosis or patient treatment.",
+      "evidenceType": "existingDeployment"
+    }
+  ],
+  "useCases": [
+    {
+      "id": "H001",
+      "category": "Language access and accessible care",
+      "title": "Speak to navigate Sahara",
+      "user": "Patient with limited typing ability",
+      "workflow": "Spoken screen request -> recognize an allowed intent -> open matching screen and read its label",
+      "sarvamCapability": "Saaras STT / chat",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/overview",
+        "https://www.ahrq.gov/teamstepps-program/curriculum/communication/tools/teachback.html"
+      ],
+      "riskLevel": "moderate care communication",
+      "requiredHumanReview": "User confirms writes and sharing.",
+      "implementationBoundary": "Navigation only; no urgent-care decision inferred from intent.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H002",
+      "category": "Language access and accessible care",
+      "title": "Hear the signed care plan",
+      "user": "Patient or caregiver",
+      "workflow": "Clinician-approved plan -> synthesize unchanged text -> replay the latest signed instructions",
+      "sarvamCapability": "Bulbul TTS",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/text-to-speech/best-practices",
+        "https://www.ahrq.gov/teamstepps-program/curriculum/communication/tools/teachback.html"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Clinician approves source; bilingual reviewer checks clinical numbers and pronunciation.",
+      "implementationBoundary": "No invented instruction or dose change; retain readable source and version.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H003",
+      "category": "Language access and accessible care",
+      "title": "Consent-based consultation captions",
+      "user": "Patient with hearing difficulty and clinician",
+      "workflow": "Consented encounter audio -> transcribe with uncertain spans -> visible editable captions",
+      "sarvamCapability": "Saaras STT",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/overview",
+        "https://www.ahrq.gov/teamstepps-program/curriculum/communication/tools/teachback.html"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Clinician and patient resolve important errors during the encounter.",
+      "implementationBoundary": "A communication aid, not a certified interpreter or final clinical record.",
+      "saharaFit": "medium"
+    },
+    {
+      "id": "H004",
+      "category": "Language access and accessible care",
+      "title": "Interpreter-supported language relay",
+      "user": "Patient, clinician and trained interpreter",
+      "workflow": "Utterance -> transcribe and translate side by side -> interpreter verifies before action",
+      "sarvamCapability": "STT / translation / TTS",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-translate",
+        "https://www.ahrq.gov/teamstepps-program/curriculum/communication/tools/teachback.html"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Qualified interpreter or bilingual clinician verifies consequential meaning.",
+      "implementationBoundary": "Never replace human verification for consent, prognosis or emergency communication.",
+      "saharaFit": "medium"
+    },
+    {
+      "id": "H005",
+      "category": "Language access and accessible care",
+      "title": "Preserve names and preferred scripts",
+      "user": "Registration staff and patient",
+      "workflow": "Spoken name and preferred script -> propose spelling -> patient-confirmed profile name",
+      "sarvamCapability": "Saaras STT",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/overview",
+        "https://www.ahrq.gov/teamstepps-program/curriculum/communication/tools/teachback.html"
+      ],
+      "riskLevel": "moderate care communication",
+      "requiredHumanReview": "Patient or registrar verifies spelling and identity.",
+      "implementationBoundary": "No automatic patient matching or merging by similar names.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H006",
+      "category": "Language access and accessible care",
+      "title": "Plain-language discharge draft",
+      "user": "Discharge nurse",
+      "workflow": "Signed discharge instructions -> draft shorter explanation retaining facts -> approved patient handout",
+      "sarvamCapability": "Chat completion",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/chat-completion/overview",
+        "https://www.ahrq.gov/patient-safety/settings/hospital/red/toolkit/redtool3a.html"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Discharge clinician checks medicines, warnings, times and omissions.",
+      "implementationBoundary": "Do not compress away warnings; link the signed original.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H007",
+      "category": "Language access and accessible care",
+      "title": "Record teach-back for the nurse",
+      "user": "Patient and discharge nurse",
+      "workflow": "Patient explains agreed plan aloud -> exact transcript beside plan -> nurse checks understanding",
+      "sarvamCapability": "Saaras STT",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/overview",
+        "https://www.ahrq.gov/teamstepps-program/curriculum/communication/tools/teachback.html"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Nurse judges understanding and reteaches where needed.",
+      "implementationBoundary": "No automated pass/fail score or authorization for a clinical task.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H008",
+      "category": "Language access and accessible care",
+      "title": "Turn a voice concern into a message",
+      "user": "Patient or caregiver",
+      "workflow": "Spoken care-team question -> concise faithful message draft -> user previews and sends",
+      "sarvamCapability": "Saaras STT / chat",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/overview",
+        "https://www.cancer.gov/about-cancer/advanced-cancer/questions"
+      ],
+      "riskLevel": "moderate care communication",
+      "requiredHumanReview": "Sender confirms wording and recipient; clinician answers.",
+      "implementationBoundary": "Do not answer the clinical question while drafting it.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H009",
+      "category": "Language access and accessible care",
+      "title": "Listen to a verified document",
+      "user": "Patient with low vision or fatigue",
+      "workflow": "Selected document and verified text -> read section by section -> accessible playback with page reference",
+      "sarvamCapability": "Document AI / TTS",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/document-intelligence/overview",
+        "https://www.ahrq.gov/teamstepps-program/curriculum/communication/tools/teachback.html"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Clinical fields are checked against the image before playback.",
+      "implementationBoundary": "Uncertain medicine text must stop rather than be guessed aloud.",
+      "saharaFit": "medium"
+    },
+    {
+      "id": "H010",
+      "category": "Language access and accessible care",
+      "title": "Explain sharing choices accessibly",
+      "user": "Patient and authorized caregiver",
+      "workflow": "Actual sharing screen -> approved plain-language explanation/audio -> patient selects record access",
+      "sarvamCapability": "Voice workflow: STT / chat / TTS",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/quickstart",
+        "https://www.who.int/publications/b/70584"
+      ],
+      "riskLevel": "moderate care communication",
+      "requiredHumanReview": "Privacy lead approves explanations; patient chooses and may revise.",
+      "implementationBoundary": "AI does not consent for the person or establish caregiver legal authority.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H011",
+      "category": "Clinical documentation and record continuity",
+      "title": "Dictate a clinician visit note",
+      "user": "Palliative-care clinician",
+      "workflow": "Clinician dictation -> exact transcript and template placement -> unsigned editable note",
+      "sarvamCapability": "Saaras STT / chat",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/overview",
+        "https://www.cancer.gov/about-cancer/advanced-cancer/care-choices/palliative-care-fact-sheet"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Clinician verifies and signs.",
+      "implementationBoundary": "No inferred diagnosis, normal findings or treatment plan.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H012",
+      "category": "Clinical documentation and record continuity",
+      "title": "Capture a home nurse's observations",
+      "user": "Home-care nurse",
+      "workflow": "After-visit dictation -> organize stated observations and completed tasks -> reviewed visit entry",
+      "sarvamCapability": "Saaras STT / chat",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/overview",
+        "https://www.who.int/en/news-room/fact-sheets/detail/palliative-care"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Nurse checks facts and signs.",
+      "implementationBoundary": "Do not infer that an omitted examination was normal or a planned task happened.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H013",
+      "category": "Clinical documentation and record continuity",
+      "title": "Make an MDT action record",
+      "user": "Multidisciplinary care team",
+      "workflow": "Consented meeting audio -> attributed transcript and explicit decisions -> owners, deadlines and meeting draft",
+      "sarvamCapability": "Saaras STT / chat",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/overview",
+        "https://www.cancer.gov/about-cancer/advanced-cancer/care-choices/palliative-care-fact-sheet"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Meeting chair checks decisions, speakers and assignments.",
+      "implementationBoundary": "Speaker labels need confirmation; generate no new clinical consensus.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H014",
+      "category": "Clinical documentation and record continuity",
+      "title": "Prepare a transition handover",
+      "user": "Discharging clinician and receiving team",
+      "workflow": "Signed notes plus approved template -> source-linked relevant facts -> handover draft",
+      "sarvamCapability": "Document AI / chat",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/document-intelligence/overview",
+        "https://www.ahrq.gov/patient-safety/settings/hospital/red/toolkit/redtool3a.html"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Responsible clinician verifies and signs before transfer.",
+      "implementationBoundary": "No automatic chart export or disclosure without record-level authorization.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H015",
+      "category": "Clinical documentation and record continuity",
+      "title": "Document a nurse callback",
+      "user": "Telephone nurse",
+      "workflow": "Consented callback recording -> concerns, advice actually given and next steps -> approved call note",
+      "sarvamCapability": "Saaras STT / chat",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/overview",
+        "https://www.who.int/en/news-room/fact-sheets/detail/palliative-care"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Nurse checks against audio before saving.",
+      "implementationBoundary": "Never fill missing advice or invent a completed referral.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H016",
+      "category": "Clinical documentation and record continuity",
+      "title": "Assemble a referral packet",
+      "user": "Referring clinician",
+      "workflow": "Approved referral reason and selected documents -> organize dated references -> approved referral bundle",
+      "sarvamCapability": "Document AI / chat",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/document-intelligence/overview",
+        "https://www.cancer.gov/about-cancer/advanced-cancer/care-choices/palliative-care-fact-sheet"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Referrer verifies identity, reason and minimum necessary contents.",
+      "implementationBoundary": "No automatic eligibility decision or document sharing.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H017",
+      "category": "Clinical documentation and record continuity",
+      "title": "Build a patient-stated history timeline",
+      "user": "Clinician reviewing a new patient",
+      "workflow": "Confirmed patient statements and dated records -> chronological organization -> provenance-linked timeline",
+      "sarvamCapability": "Document AI / chat",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/document-intelligence/overview",
+        "https://www.who.int/publications/b/70584"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Clinician resolves conflicting accounts and dates.",
+      "implementationBoundary": "Separate reported and observed findings; infer no disease progression.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H018",
+      "category": "Clinical documentation and record continuity",
+      "title": "Find the right historical record",
+      "user": "Clinician or authorized records staff",
+      "workflow": "Question about a prior signed record -> search access-controlled OCR/metadata -> page and matching extract",
+      "sarvamCapability": "Document AI / chat",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/document-intelligence/overview",
+        "https://www.who.int/publications/b/70584"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "User opens original before using the clinical fact.",
+      "implementationBoundary": "No unsupported answer or cross-patient record merge.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H019",
+      "category": "Clinical documentation and record continuity",
+      "title": "Flag documentation gaps for completion",
+      "user": "Clinical records coordinator",
+      "workflow": "Unsigned draft plus local field schema -> locate blanks or unsupported fields -> completion checklist",
+      "sarvamCapability": "Chat completion",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/chat-completion/overview",
+        "https://www.who.int/publications/b/70584"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Author decides missing, not applicable or intentionally absent.",
+      "implementationBoundary": "Flag absence only; never fabricate values or infer consent.",
+      "saharaFit": "medium"
+    },
+    {
+      "id": "H020",
+      "category": "Clinical documentation and record continuity",
+      "title": "Link a correction to original words",
+      "user": "Clinician correcting a transcript",
+      "workflow": "Correction and audio timestamp -> align edited field to source -> auditable corrected note",
+      "sarvamCapability": "Saaras STT",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/overview",
+        "https://arxiv.org/abs/2606.26901"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Clinician approves correction and amendment history.",
+      "implementationBoundary": "No silent rewriting of the clinical record.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H021",
+      "category": "Goals-of-care conversations and patient preferences",
+      "title": "Prepare what matters before a visit",
+      "user": "Patient with serious illness",
+      "workflow": "Optional spoken reflections -> organize patient's own words -> private clinician-discussion agenda",
+      "sarvamCapability": "Saaras STT / chat",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/overview",
+        "https://www.ariadnelabs.org/resources/downloads/serious-illness-conversation-guide/"
+      ],
+      "riskLevel": "moderate care communication",
+      "requiredHumanReview": "Patient approves reflection; clinician interprets in visit.",
+      "implementationBoundary": "No prognosis, medical decision or advance directive from reflections.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H022",
+      "category": "Goals-of-care conversations and patient preferences",
+      "title": "Draft the clinician-led GOCD record",
+      "user": "Palliative-care clinician",
+      "workflow": "Consented goals-of-care discussion -> transcript and evidence-linked sections -> unsigned goals-of-care draft",
+      "sarvamCapability": "Saaras STT / chat",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/overview",
+        "https://www.ariadnelabs.org/resources/downloads/serious-illness-conversation-guide/"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Clinician reviews with patient and signs.",
+      "implementationBoundary": "Do not infer preferences, code status or decisions from silence or vague remarks.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H023",
+      "category": "Goals-of-care conversations and patient preferences",
+      "title": "Record information preferences",
+      "user": "Patient and clinician",
+      "workflow": "Patient states what they want to know and who may hear -> structured draft -> confirmed communication card",
+      "sarvamCapability": "Saaras STT / chat",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/overview",
+        "https://www.ariadnelabs.org/resources/downloads/serious-illness-conversation-guide/"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Patient and clinician confirm current preference.",
+      "implementationBoundary": "Does not establish capacity or substitute decision-maker authority.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H024",
+      "category": "Goals-of-care conversations and patient preferences",
+      "title": "Keep hopes and worries in the patient's words",
+      "user": "Patient and care team",
+      "workflow": "Patient-selected reflection -> faithful transcript and optional categories -> approved quotes beside notes",
+      "sarvamCapability": "Saaras STT",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/overview",
+        "https://www.ariadnelabs.org/resources/downloads/serious-illness-conversation-guide/"
+      ],
+      "riskLevel": "moderate care communication",
+      "requiredHumanReview": "Patient approves quotes to be shared.",
+      "implementationBoundary": "No sentiment score, psychiatric label or survival prediction.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H025",
+      "category": "Goals-of-care conversations and patient preferences",
+      "title": "Prepare participation for a family meeting",
+      "user": "Patient and care coordinator",
+      "workflow": "Named people, language needs and disclosure scope -> meeting checklist -> coordinator arranges participation",
+      "sarvamCapability": "Chat completion",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/chat-completion/overview",
+        "https://www.cancer.gov/about-cancer/advanced-cancer/caregivers/planning"
+      ],
+      "riskLevel": "moderate care communication",
+      "requiredHumanReview": "Patient confirms participation/disclosure; coordinator verifies contacts.",
+      "implementationBoundary": "Attendance gives no automatic decision authority or whole-record access.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H026",
+      "category": "Goals-of-care conversations and patient preferences",
+      "title": "Show changes in confirmed care goals",
+      "user": "Clinician and patient",
+      "workflow": "Dated signed goal records -> highlight explicit text differences -> review of current wishes",
+      "sarvamCapability": "Chat completion",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/chat-completion/overview",
+        "https://www.ariadnelabs.org/resources/downloads/serious-illness-conversation-guide/"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Clinician and patient confirm what still applies.",
+      "implementationBoundary": "No automatic replacement of goals or interpretation of contradictions.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H027",
+      "category": "Goals-of-care conversations and patient preferences",
+      "title": "Create a patient-approved GOCD recap",
+      "user": "Clinician, patient and caregiver",
+      "workflow": "Signed note -> plain-language translated draft -> reviewed take-home summary",
+      "sarvamCapability": "Text translation",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-translate",
+        "https://www.ariadnelabs.org/resources/downloads/serious-illness-conversation-guide/"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Clinician and bilingual reviewer verify; patient confirms meaning.",
+      "implementationBoundary": "No binding directive or medical order; link signed original.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H028",
+      "category": "Goals-of-care conversations and patient preferences",
+      "title": "Build an agenda for a difficult family discussion",
+      "user": "Clinical social worker",
+      "workflow": "Approved concerns and open questions -> organize neutral topics -> human-led meeting agenda",
+      "sarvamCapability": "Chat completion",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/chat-completion/overview",
+        "https://www.cancer.gov/about-cancer/advanced-cancer/caregivers/planning"
+      ],
+      "riskLevel": "moderate care communication",
+      "requiredHumanReview": "Social worker checks neutrality and patient priorities.",
+      "implementationBoundary": "No autonomous mediation or pressure toward a care option.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H029",
+      "category": "Goals-of-care conversations and patient preferences",
+      "title": "List unresolved care questions without deciding them",
+      "user": "Facilitating clinician",
+      "workflow": "Meeting transcript -> identify explicit unanswered/disputed points -> next-discussion question list",
+      "sarvamCapability": "Saaras STT / chat",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/overview",
+        "https://www.cancer.gov/about-cancer/advanced-cancer/caregivers/planning"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Facilitator checks attribution and omissions.",
+      "implementationBoundary": "No AI finding of best-interest treatment, capacity or who is right.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H030",
+      "category": "Goals-of-care conversations and patient preferences",
+      "title": "Track agreed GOCD follow-up actions",
+      "user": "Care coordinator",
+      "workflow": "Signed discussion's explicit actions -> convert approved actions into assigned tasks -> reminders and completion record",
+      "sarvamCapability": "Chat completion",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/chat-completion/overview",
+        "https://www.ariadnelabs.org/resources/downloads/serious-illness-conversation-guide/"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Clinician approves clinical tasks; person confirms completion.",
+      "implementationBoundary": "No new decision or completed-care claim from a reminder or checkbox.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H031",
+      "category": "Daily reporting and home-care communication",
+      "title": "Speak a daily symptom diary",
+      "user": "Patient or caregiver",
+      "workflow": "Today's experience in patient's words -> transcribe report fields -> confirm and save for team review",
+      "sarvamCapability": "Saaras STT / chat",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/overview",
+        "https://www.cancer.gov/about-cancer/advanced-cancer/care-choices/palliative-care-fact-sheet"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Patient confirms entry; clinician interprets clinical meaning.",
+      "implementationBoundary": "No diagnosis, urgency score or dosing advice; immediate help access stays separate.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H032",
+      "category": "Daily reporting and home-care communication",
+      "title": "Capture a clinician-selected symptom questionnaire",
+      "user": "Patient and nurse",
+      "workflow": "Approved instrument delivered aloud -> capture answers verbatim -> nurse receives responses",
+      "sarvamCapability": "Voice workflow: STT / chat / TTS",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/quickstart",
+        "https://www.who.int/en/news-room/fact-sheets/detail/palliative-care"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Clinician selects instrument and interprets; patient confirms recognized answers.",
+      "implementationBoundary": "Use licensed locally validated wording; scoring only deterministic and separately approved.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H033",
+      "category": "Daily reporting and home-care communication",
+      "title": "Summarize changes the patient reported",
+      "user": "Nurse preparing follow-up",
+      "workflow": "Confirmed dated diary entries -> compare explicit values/quotes -> source-linked change summary",
+      "sarvamCapability": "Chat completion",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/chat-completion/overview",
+        "https://www.cancer.gov/about-cancer/advanced-cancer/care-choices/palliative-care-fact-sheet"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Nurse checks sources and decides action.",
+      "implementationBoundary": "No progression inference, predicted deterioration or autonomous clinical prioritization.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H034",
+      "category": "Daily reporting and home-care communication",
+      "title": "Turn an unstructured worry into a callback request",
+      "user": "Patient or caregiver",
+      "workflow": "Spoken concern and contact preference -> capture request -> receipt in staffed team's queue",
+      "sarvamCapability": "Saaras STT / chat",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/overview",
+        "https://www.who.int/en/news-room/fact-sheets/detail/palliative-care"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Nurse reads concern and decides urgency using local protocol.",
+      "implementationBoundary": "Do not promise continuous monitoring; emergency route cannot depend on model interpretation.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H035",
+      "category": "Daily reporting and home-care communication",
+      "title": "Record sleep and meaningful activity",
+      "user": "Patient",
+      "workflow": "Patient describes rest and activities -> organize stated account -> functional diary",
+      "sarvamCapability": "Saaras STT / chat",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/overview",
+        "https://www.who.int/en/news-room/fact-sheets/detail/palliative-care"
+      ],
+      "riskLevel": "moderate care communication",
+      "requiredHumanReview": "Patient confirms; clinician reviews when clinically used.",
+      "implementationBoundary": "No insomnia diagnosis, performance-status estimate or exercise recommendation.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H036",
+      "category": "Daily reporting and home-care communication",
+      "title": "Log observations about food and fluids",
+      "user": "Caregiver and nurse",
+      "workflow": "Observed intake and uncertainty -> preserve exact quantities -> confirmed observation log",
+      "sarvamCapability": "Saaras STT / chat",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/overview",
+        "https://www.cancer.gov/about-cancer/advanced-cancer/care-choices/palliative-care-fact-sheet"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Caregiver confirms; nurse assesses need for action.",
+      "implementationBoundary": "No nutritional prescription, fluid target or judgement that intake is safe.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H037",
+      "category": "Daily reporting and home-care communication",
+      "title": "Prepare a pain conversation",
+      "user": "Patient and clinician",
+      "workflow": "Words about discomfort and worries -> questions plus attributed timeline -> appointment discussion aid",
+      "sarvamCapability": "Saaras STT / chat",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/overview",
+        "https://www.cancer.gov/about-cancer/advanced-cancer/questions"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Patient confirms; clinician assesses pain and treatment.",
+      "implementationBoundary": "No diagnosis, opioid recommendation or dose adjustment.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H038",
+      "category": "Daily reporting and home-care communication",
+      "title": "Retrieve an approved home-care instruction",
+      "user": "Caregiver",
+      "workflow": "Question plus current signed nursing plan -> retrieve approved passage -> source and exact read-aloud",
+      "sarvamCapability": "Voice workflow: STT / chat / TTS",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/quickstart",
+        "https://www.ahrq.gov/teamstepps-program/curriculum/communication/tools/teachback.html"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Nurse approves library and patient-specific applicability.",
+      "implementationBoundary": "If no approved match, offer staff contact instead of generating procedural steps.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H039",
+      "category": "Daily reporting and home-care communication",
+      "title": "Read back nurse-dictated measurements",
+      "user": "Home-care nurse",
+      "workflow": "Nurse dictates an already measured value, unit and time -> transcribe into separate fields -> read back for correction before saving",
+      "sarvamCapability": "Saaras STT / chat",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/overview",
+        "https://www.cancer.gov/about-cancer/coping/family-friends/family-caregivers-pdq"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Nurse verifies the exact value, unit, time and patient identity against the measurement before saving.",
+      "implementationBoundary": "Do not infer a missing unit, calculate a new measurement, interpret a reading or recommend a response. Keep the original dictation available; this does not connect a medical device.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H040",
+      "category": "Daily reporting and home-care communication",
+      "title": "Replay the clinician's emergency contact plan",
+      "user": "Patient or caregiver",
+      "workflow": "Approved contact plan -> exact accessible display/audio -> one-tap verified service call",
+      "sarvamCapability": "Bulbul TTS",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/text-to-speech/best-practices",
+        "https://www.ahrq.gov/patient-safety/settings/hospital/red/toolkit/redtool3a.html"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Care team verifies contacts and plan version.",
+      "implementationBoundary": "No AI triage, reassurance or delay; verified call access works without generation.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H041",
+      "category": "Medicines, tests and clinical-document communication",
+      "title": "Transcribe a prescription into a review screen",
+      "user": "Pharmacist or prescribing clinician",
+      "workflow": "Prescription image -> extract written fields with source links -> unconfirmed medicine draft",
+      "sarvamCapability": "Document AI / chat",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/document-intelligence/overview",
+        "https://www.who.int/publications/i/item/WHO-UHC-SDS-2019.9"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Pharmacist or prescriber verifies every field against original.",
+      "implementationBoundary": "No guessed handwriting, new prescription or reminder before professional approval.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H042",
+      "category": "Medicines, tests and clinical-document communication",
+      "title": "Prepare medication reconciliation discrepancies",
+      "user": "Pharmacist",
+      "workflow": "Two source lists -> highlight literal differences and provenance -> reconciliation worksheet",
+      "sarvamCapability": "Document AI / chat",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/document-intelligence/overview",
+        "https://www.who.int/publications/i/item/WHO-UHC-SDS-2019.9"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Pharmacist or clinician decides current list.",
+      "implementationBoundary": "Never automatically start, stop, merge or deduplicate medicines by fuzzy matching.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H043",
+      "category": "Medicines, tests and clinical-document communication",
+      "title": "Record a patient's medicine-taking statement",
+      "user": "Patient or caregiver",
+      "workflow": "Spoken account of what was taken and when -> read back uncertainties -> confirmed self-report log",
+      "sarvamCapability": "Saaras STT",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/overview",
+        "https://www.who.int/publications/i/item/WHO-UHC-SDS-2019.9"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Reporter confirms; pharmacist reviews discrepancies.",
+      "implementationBoundary": "No catch-up-dose advice, timing change or adherence inference from app opens.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H044",
+      "category": "Medicines, tests and clinical-document communication",
+      "title": "Draft a refill request",
+      "user": "Patient and dispensing service",
+      "workflow": "Verified medicine plus request -> unchanged enquiry draft -> patient approves pharmacy message",
+      "sarvamCapability": "Chat completion",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/chat-completion/overview",
+        "https://www.who.int/publications/i/item/WHO-UHC-SDS-2019.9"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Pharmacist checks validity and approves dispensing.",
+      "implementationBoundary": "No automatic controlled-drug order, renewal or availability promise.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H045",
+      "category": "Medicines, tests and clinical-document communication",
+      "title": "Collect questions for a pharmacist",
+      "user": "Patient or caregiver",
+      "workflow": "Spoken uncertainty and approved medicine list -> preserve exact question -> pharmacist message draft",
+      "sarvamCapability": "Saaras STT / chat",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/overview",
+        "https://www.who.int/publications/i/item/WHO-UHC-SDS-2019.9"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Patient confirms; pharmacist answers.",
+      "implementationBoundary": "No generated interaction, substitution, side-effect or dosing advice.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H046",
+      "category": "Medicines, tests and clinical-document communication",
+      "title": "Hear the approved medication schedule",
+      "user": "Patient with reading difficulty",
+      "workflow": "Professionally verified schedule -> exact spoken labels -> replayable schedule",
+      "sarvamCapability": "Bulbul TTS",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/text-to-speech/best-practices",
+        "https://www.who.int/publications/i/item/WHO-UHC-SDS-2019.9"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Pharmacist checks pronunciation, numbers and source version.",
+      "implementationBoundary": "No schedule from unverified OCR; keep units and warnings.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H047",
+      "category": "Medicines, tests and clinical-document communication",
+      "title": "Translate test preparation instructions",
+      "user": "Clinic nurse and patient",
+      "workflow": "Lab-approved preparation sheet -> translated draft -> reviewed pre-test instructions",
+      "sarvamCapability": "Document translation",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/doc-translation/overview",
+        "https://www.ahrq.gov/patient-safety/settings/hospital/red/toolkit/redtool3a.html"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Lab team and qualified bilingual reviewer check clinical meaning.",
+      "implementationBoundary": "Do not invent fasting times, medicine holds or test eligibility.",
+      "saharaFit": "medium"
+    },
+    {
+      "id": "H048",
+      "category": "Medicines, tests and clinical-document communication",
+      "title": "Find a value on an existing lab report",
+      "user": "Clinician",
+      "workflow": "Selected report image -> OCR with page/bounding box -> copyable source-linked value",
+      "sarvamCapability": "Document AI / chat",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/document-intelligence/overview",
+        "https://www.who.int/publications/b/70584"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Clinician checks original and units.",
+      "implementationBoundary": "No abnormality interpretation, diagnosis or mismatched-method trend comparison.",
+      "saharaFit": "medium"
+    },
+    {
+      "id": "H049",
+      "category": "Medicines, tests and clinical-document communication",
+      "title": "Record a suspected medicine problem accurately",
+      "user": "Patient and pharmacist",
+      "workflow": "Patient's experience -> exact transcript, uncertain names left uncertain -> callback/report record",
+      "sarvamCapability": "Saaras STT",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/overview",
+        "https://www.who.int/publications/i/item/WHO-UHC-SDS-2019.9"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Pharmacist or clinician assesses causality and urgency.",
+      "implementationBoundary": "No adverse-reaction diagnosis or advice to stop therapy; urgent contact independent of AI.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H050",
+      "category": "Medicines, tests and clinical-document communication",
+      "title": "Make a prescription clarification checklist",
+      "user": "Pharmacist",
+      "workflow": "Extracted fields and ambiguous spans -> list prescriber questions -> clarification worksheet",
+      "sarvamCapability": "Document AI / chat",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/document-intelligence/overview",
+        "https://www.who.int/publications/i/item/WHO-UHC-SDS-2019.9"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Pharmacist checks ambiguities and contacts prescriber.",
+      "implementationBoundary": "Never complete missing strength, route, frequency or duration.",
+      "saharaFit": "medium"
+    },
+    {
+      "id": "H051",
+      "category": "Caregiver support, family coordination and dignity",
+      "title": "Make a caregiver shift handover",
+      "user": "Family caregivers",
+      "workflow": "Approved practical tasks and notes -> concise handover by owner -> reviewed shift summary",
+      "sarvamCapability": "Chat completion",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/chat-completion/overview",
+        "https://www.cancer.gov/about-cancer/coping/family-friends/family-caregivers-pdq"
+      ],
+      "riskLevel": "moderate care communication",
+      "requiredHumanReview": "Outgoing caregiver approves; nurse handles clinical uncertainty.",
+      "implementationBoundary": "No clinical instructions beyond separately approved plan or unauthorized sharing.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H052",
+      "category": "Caregiver support, family coordination and dignity",
+      "title": "Split practical tasks among willing helpers",
+      "user": "Patient's chosen family circle",
+      "workflow": "Offered help and availability -> draft meals/travel/companionship rota -> helpers accept tasks",
+      "sarvamCapability": "Chat completion",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/chat-completion/overview",
+        "https://www.cancer.gov/about-cancer/coping/family-friends/family-caregivers-pdq"
+      ],
+      "riskLevel": "low admin",
+      "requiredHumanReview": "Helpers accept assignments; patient approves participation.",
+      "implementationBoundary": "No clinical staffing decisions or detailed diagnosis shared with helpers.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H053",
+      "category": "Caregiver support, family coordination and dignity",
+      "title": "Request respite or practical relief",
+      "user": "Caregiver and coordinator",
+      "workflow": "Needed support and time constraints -> structured request -> verified respite-service enquiry",
+      "sarvamCapability": "Saaras STT / chat",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/overview",
+        "https://www.cancer.gov/about-cancer/coping/family-friends/family-caregivers-pdq"
+      ],
+      "riskLevel": "moderate care communication",
+      "requiredHumanReview": "Caregiver approves request; coordinator checks suitability.",
+      "implementationBoundary": "No availability promise or assessment that an unattended patient is safe.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H054",
+      "category": "Caregiver support, family coordination and dignity",
+      "title": "Keep a caregiver needs journal",
+      "user": "Caregiver",
+      "workflow": "Optional reflection on workload -> summarize selected needs -> private journal or chosen support request",
+      "sarvamCapability": "Saaras STT / chat",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/overview",
+        "https://www.cancer.gov/about-cancer/coping/family-friends/family-caregivers-pdq"
+      ],
+      "riskLevel": "moderate care communication",
+      "requiredHumanReview": "Caregiver controls sharing; counselor reviews clinical concerns.",
+      "implementationBoundary": "No mental-health diagnosis, risk inference or emotional manipulation.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H055",
+      "category": "Caregiver support, family coordination and dignity",
+      "title": "Revisit nurse-taught caregiving material",
+      "user": "Caregiver",
+      "workflow": "Question about prior training -> retrieve approved teaching segment -> accessible replay and question button",
+      "sarvamCapability": "Voice workflow: STT / chat / TTS",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/quickstart",
+        "https://www.ahrq.gov/teamstepps-program/curriculum/communication/tools/teachback.html"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Clinical educator approves content; nurse checks skill with teach-back/show-me.",
+      "implementationBoundary": "No generated coaching for injections, feeding tubes or wound procedures.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H056",
+      "category": "Caregiver support, family coordination and dignity",
+      "title": "Arrange a counselor conversation",
+      "user": "Patient or caregiver and counselor",
+      "workflow": "User requests emotional support -> capture language/availability preferences -> counselor appointment request",
+      "sarvamCapability": "Saaras STT / chat",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/overview",
+        "https://www.cancer.gov/about-cancer/coping/family-friends/family-caregivers-pdq"
+      ],
+      "riskLevel": "moderate care communication",
+      "requiredHumanReview": "User approves contact; counselor assesses needs.",
+      "implementationBoundary": "No therapy replacement, diagnosis or automatic disclosure to relatives.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H057",
+      "category": "Caregiver support, family coordination and dignity",
+      "title": "Draft a consented family update",
+      "user": "Patient and designated caregiver",
+      "workflow": "Approved facts and selected recipients -> translated short update -> patient preview before sharing",
+      "sarvamCapability": "Text translation",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-translate",
+        "https://www.cancer.gov/about-cancer/advanced-cancer/caregivers/planning"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Patient and clinician verify clinical statements.",
+      "implementationBoundary": "No diagnosis or prognosis disclosure outside approved scope.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H058",
+      "category": "Caregiver support, family coordination and dignity",
+      "title": "Find bereavement support",
+      "user": "Bereaved family member",
+      "workflow": "Requested location and support preferences -> search vetted directory -> dated contact options",
+      "sarvamCapability": "Chat completion",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/chat-completion/overview",
+        "https://www.who.int/en/news-room/fact-sheets/detail/palliative-care"
+      ],
+      "riskLevel": "moderate care communication",
+      "requiredHumanReview": "Coordinator verifies directory; user chooses contact.",
+      "implementationBoundary": "No grief diagnosis, unsolicited follow-up or labels of normal/abnormal grief.",
+      "saharaFit": "medium"
+    },
+    {
+      "id": "H059",
+      "category": "Caregiver support, family coordination and dignity",
+      "title": "Preserve personal stories and messages",
+      "user": "Patient and chosen family",
+      "workflow": "Consented personal recording -> transcript and optional chapters -> patient-edited keepsake",
+      "sarvamCapability": "Saaras STT",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/overview",
+        "https://www.who.int/en/news-room/fact-sheets/detail/palliative-care"
+      ],
+      "riskLevel": "moderate care communication",
+      "requiredHumanReview": "Patient approves edits, storage and recipients.",
+      "implementationBoundary": "No voice cloning, invented memories or unapproved posthumous sharing.",
+      "saharaFit": "medium"
+    },
+    {
+      "id": "H060",
+      "category": "Caregiver support, family coordination and dignity",
+      "title": "Plan family travel for a care visit",
+      "user": "Caregiver and coordinator",
+      "workflow": "Confirmed location, dates and accessibility -> organize verified travel/stay options -> practical checklist",
+      "sarvamCapability": "Chat completion",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/chat-completion/overview",
+        "https://www.cancer.gov/about-cancer/coping/family-friends/family-caregivers-pdq"
+      ],
+      "riskLevel": "low admin",
+      "requiredHumanReview": "Family verifies details before purchase.",
+      "implementationBoundary": "No booking/payment without specific authorization or implied medical transport capability.",
+      "saharaFit": "medium"
+    },
+    {
+      "id": "H061",
+      "category": "Appointments, home visits and service navigation",
+      "title": "Ask for a suitable palliative-care centre",
+      "user": "Patient or caregiver",
+      "workflow": "Spoken location and service needs -> filter verified directory fields -> centre cards and MapLibre location",
+      "sarvamCapability": "Saaras STT / chat",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/overview",
+        "https://dghs.mohfw.gov.in/nppc.php"
+      ],
+      "riskLevel": "moderate care communication",
+      "requiredHumanReview": "Directory staff verifies facts; patient/clinician confirms clinical suitability.",
+      "implementationBoundary": "No AI quality ranking, diagnosis-based eligibility or bed promise.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H062",
+      "category": "Appointments, home visits and service navigation",
+      "title": "Hear a centre's real access instructions",
+      "user": "Patient with limited literacy",
+      "workflow": "Verified centre record -> read phone, hours and referral requirements -> accessible contact card",
+      "sarvamCapability": "Bulbul TTS",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/text-to-speech/best-practices",
+        "https://dghs.mohfw.gov.in/nppc.php"
+      ],
+      "riskLevel": "low admin",
+      "requiredHumanReview": "Service owner confirms current access information.",
+      "implementationBoundary": "Use verified dated metadata; never invent walk-in rules or hours.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H063",
+      "category": "Appointments, home visits and service navigation",
+      "title": "Book an allowed follow-up slot by voice",
+      "user": "Patient and clinic scheduler",
+      "workflow": "Spoken preference and real availability -> permitted slot proposal -> confirmation and backend booking receipt",
+      "sarvamCapability": "Voice workflow: STT / chat / TTS",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/quickstart",
+        "https://www.ahrq.gov/patient-safety/settings/hospital/red/toolkit/redtool3a.html"
+      ],
+      "riskLevel": "moderate care communication",
+      "requiredHumanReview": "Patient confirms; clinic system is final authority.",
+      "implementationBoundary": "Server-side identity, permission and slot checks; generated text is not a booking.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H064",
+      "category": "Appointments, home visits and service navigation",
+      "title": "Change or cancel a booked visit",
+      "user": "Patient or authorized caregiver",
+      "workflow": "Existing visit and change request -> check scheduling rules -> confirmation then audited update",
+      "sarvamCapability": "Voice workflow: STT / chat / TTS",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/quickstart",
+        "https://www.ahrq.gov/patient-safety/settings/hospital/red/toolkit/redtool3a.html"
+      ],
+      "riskLevel": "moderate care communication",
+      "requiredHumanReview": "Authorized user confirms exact change.",
+      "implementationBoundary": "No cancellation by predicted attendance or ambiguous speech; preserve booking on failure.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H065",
+      "category": "Appointments, home visits and service navigation",
+      "title": "Understand a missed-visit barrier",
+      "user": "Clinic coordinator",
+      "workflow": "Opt-in follow-up conversation -> record stated barrier and requested help -> staff action request",
+      "sarvamCapability": "Saaras STT / chat",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/overview",
+        "https://www.ahrq.gov/patient-safety/settings/hospital/red/toolkit/redtool3a.html"
+      ],
+      "riskLevel": "moderate care communication",
+      "requiredHumanReview": "Coordinator reviews; user confirms rebooking.",
+      "implementationBoundary": "No blame, automatic discharge or noncompliance inference; honor opt-outs.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H066",
+      "category": "Appointments, home visits and service navigation",
+      "title": "Arrange a home visit",
+      "user": "Home-care coordinator",
+      "workflow": "Access needs, availability and existing referral -> scheduling checklist -> coordinator-confirmed visit",
+      "sarvamCapability": "Saaras STT / chat",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/overview",
+        "https://www.who.int/en/news-room/fact-sheets/detail/palliative-care"
+      ],
+      "riskLevel": "moderate care communication",
+      "requiredHumanReview": "Coordinator validates referral and staff capability.",
+      "implementationBoundary": "No automatic urgency or staffing-safety decision; no visit claim before acceptance.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H067",
+      "category": "Appointments, home visits and service navigation",
+      "title": "Request accessible transport help",
+      "user": "Caregiver and social worker",
+      "workflow": "Stated mobility needs and appointment -> capture requirements -> reviewed transport enquiry",
+      "sarvamCapability": "Saaras STT / chat",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/overview",
+        "https://www.ahrq.gov/patient-safety/settings/hospital/red/toolkit/redtool3a.html"
+      ],
+      "riskLevel": "moderate care communication",
+      "requiredHumanReview": "Transport provider and care team confirm safe suitability.",
+      "implementationBoundary": "Do not decide ordinary transport is medically safe or replace an ambulance.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H068",
+      "category": "Appointments, home visits and service navigation",
+      "title": "Request prescribed equipment support",
+      "user": "Caregiver and equipment service",
+      "workflow": "Clinician-approved equipment requirement -> delivery/loan constraints -> verified service request",
+      "sarvamCapability": "Saaras STT / chat",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/overview",
+        "https://www.ahrq.gov/patient-safety/settings/hospital/red/toolkit/redtool3a.html"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Clinician confirms device; equipment team verifies specification/training.",
+      "implementationBoundary": "No device selection, oxygen setting, substitute or payment commitment.",
+      "saharaFit": "medium"
+    },
+    {
+      "id": "H069",
+      "category": "Appointments, home visits and service navigation",
+      "title": "Prepare documents for a benefit enquiry",
+      "user": "Patient and social worker",
+      "workflow": "Current official checklist and selected document metadata -> missing-paperwork draft -> social-worker review list",
+      "sarvamCapability": "Document AI / chat",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/document-intelligence/overview",
+        "https://dghs.mohfw.gov.in/nppc.php"
+      ],
+      "riskLevel": "moderate care communication",
+      "requiredHumanReview": "Social worker verifies scheme rules and details.",
+      "implementationBoundary": "No eligibility, coverage or reimbursement guarantee; no automatic submission.",
+      "saharaFit": "medium"
+    },
+    {
+      "id": "H070",
+      "category": "Appointments, home visits and service navigation",
+      "title": "Close the loop on a referral",
+      "user": "Referring team and patient",
+      "workflow": "Real referral identifier and service status -> reconcile actual acknowledgements -> next-action status card",
+      "sarvamCapability": "Chat completion",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/chat-completion/overview",
+        "https://www.ahrq.gov/patient-safety/settings/hospital/red/toolkit/redtool3a.html"
+      ],
+      "riskLevel": "moderate care communication",
+      "requiredHumanReview": "Coordinator confirms receipt, appointment and outcome.",
+      "implementationBoundary": "Sent message is not accepted referral or completed consultation.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H071",
+      "category": "Oncology and specialist-care communication",
+      "title": "Explain an oncology term from a curated glossary",
+      "user": "Patient and oncology nurse",
+      "workflow": "Selected unfamiliar term -> retrieve approved definition and translation draft -> source-linked explanation",
+      "sarvamCapability": "Text translation",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-translate",
+        "https://www.cancer.gov/about-cancer/advanced-cancer/questions"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Oncology educator and bilingual reviewer approve definitions.",
+      "implementationBoundary": "Vocabulary only; no personalized stage, diagnosis or prognosis inference.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H072",
+      "category": "Oncology and specialist-care communication",
+      "title": "Prepare an oncology appointment question list",
+      "user": "Patient and caregiver",
+      "workflow": "Priorities and uncertainties -> editable agenda -> questions for oncologist and palliative team",
+      "sarvamCapability": "Chat completion",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/chat-completion/overview",
+        "https://www.cancer.gov/about-cancer/advanced-cancer/questions"
+      ],
+      "riskLevel": "moderate care communication",
+      "requiredHumanReview": "Patient approves priorities; clinician answers.",
+      "implementationBoundary": "Do not choose therapy or answer life-expectancy questions.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H073",
+      "category": "Oncology and specialist-care communication",
+      "title": "Preserve the clinician's stated treatment intent",
+      "user": "Oncologist and patient",
+      "workflow": "Clinician explanation -> exact transcript -> doctor-reviewed intent note and recap",
+      "sarvamCapability": "Saaras STT",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/overview",
+        "https://www.cancer.gov/about-cancer/advanced-cancer/questions"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Oncologist verifies and discusses meaning with patient.",
+      "implementationBoundary": "Never infer cure, palliation or prognosis from regimen or stage.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H074",
+      "category": "Oncology and specialist-care communication",
+      "title": "Coordinate an approved treatment calendar",
+      "user": "Patient and oncology scheduler",
+      "workflow": "Actual visits and signed schedule -> organize dates unchanged -> confirmed calendar/travel reminders",
+      "sarvamCapability": "Chat completion",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/chat-completion/overview",
+        "https://www.ahrq.gov/patient-safety/settings/hospital/red/toolkit/redtool3a.html"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Oncology service verifies schedule and clinical changes.",
+      "implementationBoundary": "No chemotherapy timing, delay or dose recommendation; source systems authoritative.",
+      "saharaFit": "medium"
+    },
+    {
+      "id": "H075",
+      "category": "Oncology and specialist-care communication",
+      "title": "Localize approved radiotherapy preparation material",
+      "user": "Radiotherapy educator",
+      "workflow": "Centre-approved leaflet -> translated draft preserving details -> approved accessible handout",
+      "sarvamCapability": "Document translation",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/doc-translation/overview",
+        "https://www.ahrq.gov/teamstepps-program/curriculum/communication/tools/teachback.html"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Radiotherapy team and qualified language reviewer approve.",
+      "implementationBoundary": "No site-specific restrictions generated from generic material.",
+      "saharaFit": "medium"
+    },
+    {
+      "id": "H076",
+      "category": "Oncology and specialist-care communication",
+      "title": "Retrieve the team's approved aftercare contacts",
+      "user": "Patient after systemic treatment",
+      "workflow": "Current oncology aftercare plan -> requested approved section/contact -> source-linked instructions",
+      "sarvamCapability": "Chat completion",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/chat-completion/overview",
+        "https://www.ahrq.gov/patient-safety/settings/hospital/red/toolkit/redtool3a.html"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Oncology team verifies plan and escalation route.",
+      "implementationBoundary": "No toxicity grading, symptom triage or reassurance to delay; contact staff if source absent.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H077",
+      "category": "Oncology and specialist-care communication",
+      "title": "Prepare questions for a dietitian",
+      "user": "Patient or caregiver",
+      "workflow": "Stated food difficulties/priorities -> faithful questions -> dietitian consultation agenda",
+      "sarvamCapability": "Saaras STT / chat",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/overview",
+        "https://www.cancer.gov/about-cancer/advanced-cancer/care-choices/palliative-care-fact-sheet"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Patient confirms; dietitian assesses and advises.",
+      "implementationBoundary": "No meal plan, supplement or fluid prescription.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H078",
+      "category": "Oncology and specialist-care communication",
+      "title": "Communicate rehabilitation priorities",
+      "user": "Patient and occupational/physical therapist",
+      "workflow": "Meaningful activity goals -> stated barriers -> therapist-reviewed goals agenda",
+      "sarvamCapability": "Saaras STT / chat",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/overview",
+        "https://www.cancer.gov/about-cancer/advanced-cancer/care-choices/palliative-care-fact-sheet"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Therapist assesses capability and approves interventions.",
+      "implementationBoundary": "No exercise prescription, fall-risk score or claim an activity is safe.",
+      "saharaFit": "medium"
+    },
+    {
+      "id": "H079",
+      "category": "Oncology and specialist-care communication",
+      "title": "Search verified supportive-care study information",
+      "user": "Patient and research nurse",
+      "workflow": "Selected topic/location -> filter approved trial-directory metadata -> study links and nurse questions",
+      "sarvamCapability": "Chat completion",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/chat-completion/overview",
+        "https://www.cancer.gov/about-cancer/advanced-cancer/questions"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Research clinician verifies study status and eligibility discussion.",
+      "implementationBoundary": "No automatic eligibility, enrollment recommendation or invented recruitment status.",
+      "saharaFit": "low"
+    },
+    {
+      "id": "H080",
+      "category": "Oncology and specialist-care communication",
+      "title": "Prepare age-appropriate family communication material",
+      "user": "Pediatric palliative team and parents",
+      "workflow": "Team-approved scenario/content -> draft language adaptation -> professionally reviewed family material",
+      "sarvamCapability": "Text translation",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/models/sarvam-translate",
+        "https://www.cancer.gov/about-cancer/advanced-cancer/caregivers/planning"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Pediatric clinician, counselor and guardian review.",
+      "implementationBoundary": "No autonomous child companion or prognosis conversation; age/consent safeguards required.",
+      "saharaFit": "medium"
+    },
+    {
+      "id": "H081",
+      "category": "Provider operations, records and quality improvement",
+      "title": "Capture nonclinical intake by voice",
+      "user": "Receptionist and patient",
+      "workflow": "Contact, preferred language and visit purpose -> administrative prefill -> patient-confirmed registration draft",
+      "sarvamCapability": "Saaras STT / chat",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/overview",
+        "https://www.ahrq.gov/teamstepps-program/curriculum/communication/tools/teachback.html"
+      ],
+      "riskLevel": "low admin",
+      "requiredHumanReview": "Registrar verifies identity; patient confirms fields.",
+      "implementationBoundary": "No diagnosis coding or automatic patient merge; minimize data collection.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H082",
+      "category": "Provider operations, records and quality improvement",
+      "title": "Route an inbound service call",
+      "user": "Clinic reception",
+      "workflow": "Appointment/record/billing request -> allowed administrative queue -> human handoff or confirmed task",
+      "sarvamCapability": "Voice workflow: STT / chat / TTS",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/quickstart",
+        "https://www.ahrq.gov/patient-safety/settings/hospital/red/toolkit/redtool3a.html"
+      ],
+      "riskLevel": "moderate care communication",
+      "requiredHumanReview": "Staff owns resolution; caller confirms consequential actions.",
+      "implementationBoundary": "Clinical questions go to qualified staff; no triage or unstaffed emergency promise.",
+      "saharaFit": "medium"
+    },
+    {
+      "id": "H083",
+      "category": "Provider operations, records and quality improvement",
+      "title": "Keep the centre directory current",
+      "user": "Directory editor",
+      "workflow": "Official notices and confirmed calls -> changed service/contact draft -> editor-approved dated updates",
+      "sarvamCapability": "Document AI / chat",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/document-intelligence/overview",
+        "https://dghs.mohfw.gov.in/nppc.php"
+      ],
+      "riskLevel": "low admin",
+      "requiredHumanReview": "Editor verifies each change with centre.",
+      "implementationBoundary": "No publishing unverified scraped claims; retain provenance and corrections.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H084",
+      "category": "Provider operations, records and quality improvement",
+      "title": "Summarize service feedback themes",
+      "user": "Quality-improvement manager",
+      "workflow": "Consented de-identified feedback -> cluster administrative themes -> reviewed improvement backlog",
+      "sarvamCapability": "Chat completion",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/chat-completion/overview",
+        "https://www.who.int/publications/b/70584"
+      ],
+      "riskLevel": "low admin",
+      "requiredHumanReview": "Quality team checks themes and examples.",
+      "implementationBoundary": "No patient-level sentiment scores, clinical conclusions or invented impact metrics.",
+      "saharaFit": "medium"
+    },
+    {
+      "id": "H085",
+      "category": "Provider operations, records and quality improvement",
+      "title": "Turn a service complaint into a reviewable case",
+      "user": "Patient advocate",
+      "workflow": "Voice complaint -> faithful stated events and requested resolution -> reviewed complaint record",
+      "sarvamCapability": "Saaras STT / chat",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/overview",
+        "https://www.who.int/publications/b/70584"
+      ],
+      "riskLevel": "moderate care communication",
+      "requiredHumanReview": "Complainant confirms; advocate investigates.",
+      "implementationBoundary": "No negligence finding, legal conclusion or unapproved disclosure.",
+      "saharaFit": "medium"
+    },
+    {
+      "id": "H086",
+      "category": "Provider operations, records and quality improvement",
+      "title": "Prepare a pending-records request",
+      "user": "Referral coordinator",
+      "workflow": "Referral checklist and received metadata -> identify missing documents -> reviewed service request",
+      "sarvamCapability": "Chat completion",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/chat-completion/overview",
+        "https://www.ahrq.gov/patient-safety/settings/hospital/red/toolkit/redtool3a.html"
+      ],
+      "riskLevel": "moderate care communication",
+      "requiredHumanReview": "Coordinator confirms necessity and permission.",
+      "implementationBoundary": "No automatic record transfer or inference that missing paperwork means absent care.",
+      "saharaFit": "high"
+    },
+    {
+      "id": "H087",
+      "category": "Provider operations, records and quality improvement",
+      "title": "Index scanned clinical archives",
+      "user": "Authorized medical-records staff",
+      "workflow": "Legacy scans -> OCR and metadata -> access-controlled searchable archive",
+      "sarvamCapability": "Document AI / chat",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/document-intelligence/overview",
+        "https://www.who.int/publications/b/70584"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Staff checks patient linkage and extraction; clinician verifies clinical use.",
+      "implementationBoundary": "Do not destroy originals, infer history or train on records without separate authority.",
+      "saharaFit": "medium"
+    },
+    {
+      "id": "H088",
+      "category": "Provider operations, records and quality improvement",
+      "title": "Format a clinician-approved letter",
+      "user": "Clinician and clinic assistant",
+      "workflow": "Completed clinician content -> format and translate draft -> clinician-signed referral/support letter",
+      "sarvamCapability": "Document translation",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/doc-translation/overview",
+        "https://www.who.int/publications/b/70584"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Clinician checks facts/signs; translator checks meaning.",
+      "implementationBoundary": "No fabricated certificates, signatures, eligibility statements or diagnoses.",
+      "saharaFit": "medium"
+    },
+    {
+      "id": "H089",
+      "category": "Provider operations, records and quality improvement",
+      "title": "Check patient documents for accessibility problems",
+      "user": "Clinical communications team",
+      "workflow": "Approved leaflet text/layout -> flag jargon and density -> human editing checklist",
+      "sarvamCapability": "Chat completion",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/chat-completion/overview",
+        "https://www.ahrq.gov/teamstepps-program/curriculum/communication/tools/teachback.html"
+      ],
+      "riskLevel": "moderate care communication",
+      "requiredHumanReview": "Clinical editor approves wording and retained detail.",
+      "implementationBoundary": "Do not automatically delete warnings or claim measured comprehension from an AI score.",
+      "saharaFit": "medium"
+    },
+    {
+      "id": "H090",
+      "category": "Provider operations, records and quality improvement",
+      "title": "Draft a clinic stock request from staff dictation",
+      "user": "Clinic stores team",
+      "workflow": "Authorized item/quantity dictation -> catalog structure -> reviewed requisition",
+      "sarvamCapability": "Saaras STT / chat",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/overview",
+        "https://www.who.int/publications/i/item/WHO-UHC-SDS-2019.9"
+      ],
+      "riskLevel": "low admin",
+      "requiredHumanReview": "Stores officer verifies quantities and procurement approval.",
+      "implementationBoundary": "No autonomous controlled-drug purchase, substitution or spending; receipt needs actual records.",
+      "saharaFit": "low"
+    },
+    {
+      "id": "H091",
+      "category": "Training, research and public-health learning",
+      "title": "Practice a synthetic serious-illness conversation",
+      "user": "Clinician trainee and supervisor",
+      "workflow": "Educator-written fictional scenario -> patient role-play -> transcript for supervisor feedback",
+      "sarvamCapability": "Voice workflow: STT / chat / TTS",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/quickstart",
+        "https://www.ariadnelabs.org/resources/downloads/serious-illness-conversation-guide/"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Qualified educator reviews scenario and feedback.",
+      "implementationBoundary": "Synthetic training only; no patient details or certification claim.",
+      "saharaFit": "medium"
+    },
+    {
+      "id": "H092",
+      "category": "Training, research and public-health learning",
+      "title": "Practice difficult medical pronunciations",
+      "user": "Interpreter trainees and clinician educators",
+      "workflow": "Approved terminology and fictional utterances -> audio and transcript comparison -> educator-led practice",
+      "sarvamCapability": "Voice workflow: STT / chat / TTS",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/quickstart",
+        "https://arxiv.org/abs/2606.26901"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Bilingual clinician/interpreter judges pronunciation and meaning.",
+      "implementationBoundary": "No interpreter certification; include negation, numbers and uncertain speech.",
+      "saharaFit": "medium"
+    },
+    {
+      "id": "H093",
+      "category": "Training, research and public-health learning",
+      "title": "Create source-based palliative microlearning",
+      "user": "Nurse educator",
+      "workflow": "Locally approved curriculum/passages -> draft learning cards/audio scripts -> approved modules",
+      "sarvamCapability": "Chat completion",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/chat-completion/overview",
+        "https://www.who.int/en/news-room/fact-sheets/detail/palliative-care"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Palliative educator approves each claim.",
+      "implementationBoundary": "No invented recommendations, unlicensed copying or automatic protocol changes.",
+      "saharaFit": "medium"
+    },
+    {
+      "id": "H094",
+      "category": "Training, research and public-health learning",
+      "title": "Transcribe an approved qualitative study interview",
+      "user": "Clinical researcher",
+      "workflow": "Protocol-consented recording -> transcript in approved environment and reviewed de-identification -> analysis copy",
+      "sarvamCapability": "Saaras STT",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/overview",
+        "https://www.who.int/publications/b/70584"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Researchers verify consent, de-identification and fidelity.",
+      "implementationBoundary": "Institutional data approvals before upload; de-identification is not guaranteed by a prompt.",
+      "saharaFit": "low"
+    },
+    {
+      "id": "H095",
+      "category": "Training, research and public-health learning",
+      "title": "Administer a service-experience questionnaire aloud",
+      "user": "Quality researcher and participant",
+      "workflow": "Approved questionnaire/consent -> audio questions and verbatim answers -> confirmed dataset",
+      "sarvamCapability": "Voice workflow: STT / chat / TTS",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/getting-started/quickstart",
+        "https://www.ahrq.gov/teamstepps-program/curriculum/communication/tools/teachback.html"
+      ],
+      "riskLevel": "moderate care communication",
+      "requiredHumanReview": "Researchers approve wording, language validation and protocol.",
+      "implementationBoundary": "No changing validated questions, inducement or diagnostic conversion.",
+      "saharaFit": "medium"
+    },
+    {
+      "id": "H096",
+      "category": "Training, research and public-health learning",
+      "title": "Prepare a clinical-guideline change briefing",
+      "user": "Clinical governance team",
+      "workflow": "Two actual guideline versions -> cited explicit differences -> committee-reviewed briefing",
+      "sarvamCapability": "Chat completion",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/chat-completion/overview",
+        "https://www.who.int/publications/b/70584"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Specialist committee verifies evidence and decides adoption.",
+      "implementationBoundary": "No automatic practice recommendation or protocol replacement.",
+      "saharaFit": "low"
+    },
+    {
+      "id": "H097",
+      "category": "Training, research and public-health learning",
+      "title": "Extract a research paper's reported study fields",
+      "user": "Clinical researcher",
+      "workflow": "Selected full-text paper -> design/population/outcome extraction with locations -> reviewed evidence table",
+      "sarvamCapability": "Document AI / chat",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/document-intelligence/overview",
+        "https://www.who.int/publications/b/70584"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Researcher verifies all fields and limitations.",
+      "implementationBoundary": "No fabricated citations, pooled efficacy or treatment advice from unverified extraction.",
+      "saharaFit": "low"
+    },
+    {
+      "id": "H098",
+      "category": "Training, research and public-health learning",
+      "title": "Translate participant information for review",
+      "user": "Research ethics team",
+      "workflow": "Approved participant-information sheet -> translation retaining risks/rights -> reviewer-approved version",
+      "sarvamCapability": "Document translation",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/doc-translation/overview",
+        "https://www.who.int/publications/b/70584"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Ethics team and qualified translator approve; human obtains consent.",
+      "implementationBoundary": "AI cannot obtain consent alone or alter protocol language without approval.",
+      "saharaFit": "low"
+    },
+    {
+      "id": "H099",
+      "category": "Training, research and public-health learning",
+      "title": "Organize community palliative-service needs",
+      "user": "Public-health programme team",
+      "workflow": "Consented de-identified access interviews -> classify stated barriers -> human-reviewed needs report",
+      "sarvamCapability": "Chat completion",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/chat-completion/overview",
+        "https://dghs.mohfw.gov.in/nppc.php"
+      ],
+      "riskLevel": "moderate care communication",
+      "requiredHumanReview": "Researchers check themes, sampling and privacy.",
+      "implementationBoundary": "No small-group identity leakage, prevalence estimate or inferred clinical need from convenience data.",
+      "saharaFit": "medium"
+    },
+    {
+      "id": "H100",
+      "category": "Training, research and public-health learning",
+      "title": "Build a synthetic clinical-language safety test set",
+      "user": "Sahara engineering and clinical safety team",
+      "workflow": "Clinician-authored fictional utterances/gold transcripts -> error evaluation -> stratified report and release gates",
+      "sarvamCapability": "Saaras STT",
+      "evidenceUrls": [
+        "https://docs.sarvam.ai/api/api-guides-tutorials/speech-to-text/overview",
+        "https://arxiv.org/abs/2606.26901"
+      ],
+      "riskLevel": "high clinical-content",
+      "requiredHumanReview": "Bilingual clinicians verify labels and safety-critical errors.",
+      "implementationBoundary": "No patient data or generic word-error-rate-as-validation; test dialects, negation, drugs and numbers.",
+      "saharaFit": "high"
+    }
+  ]
+}
