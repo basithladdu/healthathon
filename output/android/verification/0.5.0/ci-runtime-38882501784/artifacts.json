@@ -1,0 +1,38 @@
+{
+  "sourceCommit": "ebffb7b043a5e8725f190ab8f8f3574c768d9058",
+  "buildRunId": "38881300006",
+  "buildUrl": "https://github.com/basithladdu/healthathon/actions/runs/38881300006",
+  "harnessCommit": "91dc5db3c47ed2f28941a5618873ee7b67c0bf26",
+  "verifiedArtifacts": [
+    {
+      "path": "app/build/outputs/apk/debug/app-debug.apk",
+      "sha256": "CF88F05FE8CAA4A2B0AD4EEA362C9B247ADF3E5B57EFB6B4D3783E16FCADBAC7",
+      "bytes": 63921092
+    },
+    {
+      "path": "app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk",
+      "sha256": "EA392FA7F1A6AC3F6DE10ED905DB0134DDDE64175B4B347D7EDF817E9A7568B7",
+      "bytes": 1344591
+    },
+    {
+      "path": "app/build/outputs/apk/release/app-release-unsigned.apk",
+      "sha256": "930517709947047DCC700E5A26DCAA8E65DE52893EF110C22025020A6385117D",
+      "bytes": 44597950
+    },
+    {
+      "path": "app/build/outputs/bundle/release/app-release.aab",
+      "sha256": "D7D515DD0341AB215E209BF89EE4CE81C30A011AC7A9EEE398A30E4D49784030",
+      "bytes": 21322207
+    }
+  ],
+  "debug": "/home/runner/work/healthathon/healthathon/runtime-artifacts/app/build/outputs/apk/debug/app-debug.apk",
+  "test": "/home/runner/work/healthathon/healthathon/runtime-artifacts/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk",
+  "unsignedRelease": "/home/runner/work/healthathon/healthathon/runtime-artifacts/app/build/outputs/apk/release/app-release-unsigned.apk",
+  "optimizedCiApk": "/home/runner/work/_temp/sahara-synthetic-signing/sahara-optimized-ci.apk",
+  "debugSha256": "CF88F05FE8CAA4A2B0AD4EEA362C9B247ADF3E5B57EFB6B4D3783E16FCADBAC7",
+  "testSha256": "EA392FA7F1A6AC3F6DE10ED905DB0134DDDE64175B4B347D7EDF817E9A7568B7",
+  "unsignedReleaseSha256": "930517709947047DCC700E5A26DCAA8E65DE52893EF110C22025020A6385117D",
+  "optimizedCiSha256": "825F5F3C4717356219653C7C1A3F5AD7AD89CED0B39D49782AD287ED1A7278DD",
+  "optimizedSignature": "Ephemeral CI key; differs from the private store upload key. Code and R8 output unchanged.",
+  "preparedUtc": "2026-10-16T09:44:40.568082Z"
+}

@@ -1,0 +1,232 @@
+{
+  "tests": [
+    {
+      "class": "in.wedevit.care.DailyCareFlowsTest",
+      "test": "calendarSavesChosenDayAndKeepsUndatedMedicinesOutOfThatSchedule",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.DailyCareFlowsTest",
+      "test": "labsKeepPrintedValuesRangesAndSeriesWithoutLeakingToAnotherPerson",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.DailyCareFlowsTest",
+      "test": "familyRequestAppearsInDoctorQueueAndCanOpenConversation",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.DailyCareFlowsTest",
+      "test": "namedTaskAcceptanceCompletionAndSenderStatusSurviveReload",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.CareAcknowledgementMigrationTest",
+      "test": "versionThreeUpgradePreservesLegacyAckAndAllowsSeparateConfirmationsAfterReopen",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.CareReportTest",
+      "test": "versionTwoUpgradePreservesCareAndReportMetadataAfterReopen",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.CareReportTest",
+      "test": "reportCopiesAreIsolatedAndUnsafeFilesAreRejected",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.CareFlowTest",
+      "test": "roleMenuKeepsDraftAndPatientChoiceAfterRecreation",
+      "status": -2,
+      "result": "failure"
+    },
+    {
+      "class": "in.wedevit.care.CareFlowTest",
+      "test": "dailyEntriesAppearOnTodayAndCanBeEditedAndRemoved",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.CareFlowTest",
+      "test": "directoryFiltersRecoverFromNoResults",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.CareFlowTest",
+      "test": "roomPersistsAndSeparatesPeopleAcrossDatabaseReopen",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.CareFlowTest",
+      "test": "documentsOpenSavedVersionWithActionsAtTheTop",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.CareFlowTest",
+      "test": "conversationReviewSavesExactVersionAndSurvivesRecreation",
+      "status": -2,
+      "result": "failure"
+    },
+    {
+      "class": "in.wedevit.care.CareFlowTest",
+      "test": "reportPickerPersistsSearchesSharesAndRemovesOnlyItsCopy",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.CareFlowTest",
+      "test": "checkinSavesChosenWordsAndKeepsOptionalNote",
+      "status": -2,
+      "result": "failure"
+    },
+    {
+      "class": "in.wedevit.care.CareFlowTest",
+      "test": "switchingPeopleClosesOrdinaryEntryWithoutSavingToTheNewPerson",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.CareFlowTest",
+      "test": "staleConfirmationCannotApplyAfterSwitchingPeople",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.CareFlowTest",
+      "test": "switchingPeopleKeepsLatestDraftAndCompletedTasks",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.CareFlowTest",
+      "test": "signInLoadsAccountRecordsOnToday",
+      "status": -4,
+      "result": "skipped"
+    },
+    {
+      "class": "in.wedevit.care.CareFlowTest",
+      "test": "prescriptionScannerKeepsManualFallbackAndRequiresReviewBeforeSaving",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.CareFlowTest",
+      "test": "manualSourceAndConsentSurviveAppStopWithoutStartingAMicrophone",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.CombinedCareMigrationTest",
+      "test": "localVersionFourPreservesTranscriptionAndConsent",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.CombinedCareMigrationTest",
+      "test": "upstreamReportsVersionThreePreservesReports",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.CombinedCareMigrationTest",
+      "test": "upstreamVersionFourPreservesMultipleConfirmationIds",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.CombinedCareMigrationTest",
+      "test": "historicalLocalVersionThreePreservesConsentAndReview",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.CombinedCareMigrationTest",
+      "test": "versionTwoReachesSupersetThroughReports",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.CombinedCareMigrationTest",
+      "test": "versionOneReachesSupersetThroughRevisionAndReports",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.CombinedCareMigrationTest",
+      "test": "localVersionFivePreservesReportsAndProvenance",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.NativeMergeComponentsTest",
+      "test": "feedbackCanCloseWithoutWritingOrTouchingPatientStorage",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.NativeMergeComponentsTest",
+      "test": "newPatientShortcutsRetainTheirIndependentCallbacks",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.NativeMergeComponentsTest",
+      "test": "localDoctorLoginAndFeedbackEntrySurvivePatientWorkflowMerge",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.NativeMergeComponentsTest",
+      "test": "sourcePickerAndReaderKeepOriginalWordsAndPatientIdentity",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.PatientDoctorUiTest",
+      "test": "replacingPatientLinkClearsOldDetailsAndPendingIsNotVerified",
+      "status": -2,
+      "result": "failure"
+    },
+    {
+      "class": "in.wedevit.care.PatientDoctorUiTest",
+      "test": "absentLinkIsHonestNonInteractiveAndDoesNotInventDoctor",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.PatientDoctorUiTest",
+      "test": "homeShowsNameOnlyAndDetailsDoNotClaimProfessionalVerification",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.DoctorLocalPreviewConsentTest",
+      "test": "localPreviewRequiresConsentButNeverAsksForCloudAuthentication",
+      "status": 0,
+      "result": "pass"
+    }
+  ],
+  "counts": {
+    "pass": 31,
+    "skipped": 1,
+    "ignored": 0,
+    "failure": 4,
+    "error": 0,
+    "unknown": 0
+  },
+  "expected": 36,
+  "matrixComplete": false,
+  "durationSeconds": 189.024,
+  "finishedUtc": "2026-10-16T09:49:39.310660Z"
+}

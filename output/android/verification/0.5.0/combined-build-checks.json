@@ -1,0 +1,339 @@
+{
+  "checkedAtUtc": "2026-10-16T10:01:08.601976+00:00",
+  "sourceCommit": "ebffb7b043a5e8725f190ab8f8f3574c768d9058",
+  "ci": {
+    "conclusion": "success",
+    "createdAt": "2026-10-16T09:33:44Z",
+    "headSha": "ebffb7b043a5e8725f190ab8f8f3574c768d9058",
+    "jobs": [
+      {
+        "completedAt": "2026-10-16T09:43:59Z",
+        "conclusion": "success",
+        "databaseId": 116908414740,
+        "name": "build",
+        "startedAt": "2026-10-16T09:33:48Z",
+        "status": "completed",
+        "steps": [
+          {
+            "completedAt": "2026-10-16T09:33:51Z",
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "startedAt": "2026-10-16T09:33:49Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-16T09:33:59Z",
+            "conclusion": "success",
+            "name": "Run actions/checkout@v4",
+            "number": 2,
+            "startedAt": "2026-10-16T09:33:51Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-16T09:33:59Z",
+            "conclusion": "success",
+            "name": "Run actions/setup-java@v4",
+            "number": 3,
+            "startedAt": "2026-10-16T09:33:59Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-16T09:34:08Z",
+            "conclusion": "success",
+            "name": "Install matching Android tools",
+            "number": 4,
+            "startedAt": "2026-10-16T09:33:59Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-16T09:43:51Z",
+            "conclusion": "success",
+            "name": "Build, unit checks and lint without private signing material",
+            "number": 5,
+            "startedAt": "2026-10-16T09:34:08Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-16T09:43:51Z",
+            "conclusion": "success",
+            "name": "Record source and package hashes",
+            "number": 6,
+            "startedAt": "2026-10-16T09:43:51Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-16T09:43:56Z",
+            "conclusion": "success",
+            "name": "Preserve packages and actual check reports",
+            "number": 7,
+            "startedAt": "2026-10-16T09:43:51Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-16T09:43:56Z",
+            "conclusion": "success",
+            "name": "Post Run actions/setup-java@v4",
+            "number": 13,
+            "startedAt": "2026-10-16T09:43:56Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-16T09:43:57Z",
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@v4",
+            "number": 14,
+            "startedAt": "2026-10-16T09:43:56Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-16T09:43:57Z",
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 15,
+            "startedAt": "2026-10-16T09:43:57Z",
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/basithladdu/healthathon/actions/runs/38881300006/job/116908414740"
+      }
+    ],
+    "status": "completed",
+    "updatedAt": "2026-10-16T09:44:00Z",
+    "url": "https://github.com/basithladdu/healthathon/actions/runs/38881300006"
+  },
+  "ciSourceFileSha256": "C7DB8E75D1A3FEE1409C0B24E7C3EC7421F1CFE259DC78A7FD13133476240C19",
+  "ciPackageHashes": [
+    {
+      "path": "app/build/outputs/apk/debug/app-debug.apk",
+      "sha256": "CF88F05FE8CAA4A2B0AD4EEA362C9B247ADF3E5B57EFB6B4D3783E16FCADBAC7",
+      "bytes": 63921092,
+      "hashMatchesCi": true
+    },
+    {
+      "path": "app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk",
+      "sha256": "EA392FA7F1A6AC3F6DE10ED905DB0134DDDE64175B4B347D7EDF817E9A7568B7",
+      "bytes": 1344591,
+      "hashMatchesCi": true
+    },
+    {
+      "path": "app/build/outputs/apk/release/app-release-unsigned.apk",
+      "sha256": "930517709947047DCC700E5A26DCAA8E65DE52893EF110C22025020A6385117D",
+      "bytes": 44597950,
+      "hashMatchesCi": true
+    },
+    {
+      "path": "app/build/outputs/bundle/release/app-release.aab",
+      "sha256": "D7D515DD0341AB215E209BF89EE4CE81C30A011AC7A9EEE398A30E4D49784030",
+      "bytes": 21322207,
+      "hashMatchesCi": true
+    }
+  ],
+  "releaseBuildConfig": {
+    "path": "app/build/generated/source/buildConfig/release/in/wedevit/care/BuildConfig.java",
+    "sha256": "980A264BE98FAAAE06BD9492CA895526A7032E5DA7FE26DC72DAB13D294654ED",
+    "package": "in.wedevit.sahara",
+    "versionCode": 6,
+    "versionName": "0.5.0",
+    "CLOUD_AUDIO_ENABLED": false
+  },
+  "unitTests": {
+    "suites": [
+      {
+        "name": "in.wedevit.care.CareAcknowledgementTest",
+        "path": "app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.CareAcknowledgementTest.xml",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "name": "in.wedevit.care.CareDraftAssistTest",
+        "path": "app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.CareDraftAssistTest.xml",
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "name": "in.wedevit.care.CareWorkflowTest",
+        "path": "app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.CareWorkflowTest.xml",
+        "tests": 15,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "name": "in.wedevit.care.DoctorDemoDataTest",
+        "path": "app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.DoctorDemoDataTest.xml",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "name": "in.wedevit.care.DoctorMedicinePresentationTest",
+        "path": "app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.DoctorMedicinePresentationTest.xml",
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "name": "in.wedevit.care.DoctorOverviewDataTest",
+        "path": "app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.DoctorOverviewDataTest.xml",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "name": "in.wedevit.care.DoctorPatientHubTest",
+        "path": "app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.DoctorPatientHubTest.xml",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "name": "in.wedevit.care.DoctorPatientTrackingTest",
+        "path": "app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.DoctorPatientTrackingTest.xml",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "name": "in.wedevit.care.DoctorProgressDataTest",
+        "path": "app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.DoctorProgressDataTest.xml",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "name": "in.wedevit.care.DoctorRecordingReviewTest",
+        "path": "app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.DoctorRecordingReviewTest.xml",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "name": "in.wedevit.care.DoctorReportsDataTest",
+        "path": "app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.DoctorReportsDataTest.xml",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "name": "in.wedevit.care.DoctorWorkflowTest",
+        "path": "app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.DoctorWorkflowTest.xml",
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "name": "in.wedevit.care.FeedbackTest",
+        "path": "app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.FeedbackTest.xml",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "name": "in.wedevit.care.MedicineOrganizerTest",
+        "path": "app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.MedicineOrganizerTest.xml",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "name": "in.wedevit.care.NoteRulesTest",
+        "path": "app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.NoteRulesTest.xml",
+        "tests": 16,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "name": "in.wedevit.care.PatientDoctorSummaryTest",
+        "path": "app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.PatientDoctorSummaryTest.xml",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    ],
+    "totals": {
+      "tests": 104,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "lint": [
+    {
+      "variant": "debug",
+      "path": "app/build/reports/lint-results-debug.xml",
+      "issueCount": 37,
+      "severity": {
+        "Warning": 37
+      },
+      "errors": 0,
+      "warnings": 37,
+      "countsById": {
+        "ExifInterface": 2,
+        "OldTargetApi": 1,
+        "AndroidGradlePluginVersion": 1,
+        "GradleDependency": 9,
+        "NewerVersionAvailable": 2,
+        "ObsoleteSdkInt": 1,
+        "UnusedResources": 1,
+        "IconLocation": 2,
+        "UseKtx": 18
+      }
+    }
+  ],
+  "deviceTestsIncluded": false,
+  "runtime16KbVerified": false,
+  "privateSigningMaterialUploaded": false,
+  "ciArtifact": {
+    "created_at": "2026-10-16T09:43:56Z",
+    "digest": "sha256:a22119020bfda66c8f42c3862a72b524d176e3f7f7470d98ed0f7fb70a49f917",
+    "expired": false,
+    "expires_at": "2026-10-19T09:43:51Z",
+    "id": 12037094839,
+    "name": "sahara-android-ebffb7b043a5e8725f190ab8f8f3574c768d9058",
+    "size_in_bytes": 78149133,
+    "workflow_run": {
+      "head_branch": "main",
+      "head_repository_id": 1325683460,
+      "head_sha": "ebffb7b043a5e8725f190ab8f8f3574c768d9058",
+      "id": 38881300006,
+      "repository_id": 1325683460
+    }
+  },
+  "ciArchiveDigestIndependentlyRecomputed": false,
+  "appSourceTree": "90adbbf8c22aa5f659b2d8c58baf4bd19fbd2b2b",
+  "workingTreeBuildInputsMatchCi": true,
+  "instrumentationVerification": "Separate runtime receipt; not established by this build report",
+  "buildTasksInSuccessfulCiStep": [
+    "assembleDebug",
+    "assembleDebugAndroidTest",
+    "testDebugUnitTest",
+    "assembleRelease",
+    "bundleRelease",
+    "lintDebug",
+    "lintVitalRelease"
+  ],
+  "releaseVitalLint": {
+    "taskInSuccessfulCiStep": true,
+    "separateXmlCollected": false,
+    "numericIssueCountsEstablished": false
+  },
+  "rawReportsLocalDirectory": "F:/BuildCaches/sahara-ci-38881300006/app/build"
+}

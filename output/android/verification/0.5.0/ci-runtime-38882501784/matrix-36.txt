@@ -1,0 +1,663 @@
+INSTRUMENTATION_STATUS: class=in.wedevit.care.DailyCareFlowsTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=
+in.wedevit.care.DailyCareFlowsTest:
+INSTRUMENTATION_STATUS: test=calendarSavesChosenDayAndKeepsUndatedMedicinesOutOfThatSchedule
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.DailyCareFlowsTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=calendarSavesChosenDayAndKeepsUndatedMedicinesOutOfThatSchedule
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=in.wedevit.care.DailyCareFlowsTest
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=labsKeepPrintedValuesRangesAndSeriesWithoutLeakingToAnotherPerson
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.DailyCareFlowsTest
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=labsKeepPrintedValuesRangesAndSeriesWithoutLeakingToAnotherPerson
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=in.wedevit.care.DailyCareFlowsTest
+INSTRUMENTATION_STATUS: current=3
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=familyRequestAppearsInDoctorQueueAndCanOpenConversation
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.DailyCareFlowsTest
+INSTRUMENTATION_STATUS: current=3
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=familyRequestAppearsInDoctorQueueAndCanOpenConversation
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=in.wedevit.care.DailyCareFlowsTest
+INSTRUMENTATION_STATUS: current=4
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=namedTaskAcceptanceCompletionAndSenderStatusSurviveReload
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.DailyCareFlowsTest
+INSTRUMENTATION_STATUS: current=4
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=namedTaskAcceptanceCompletionAndSenderStatusSurviveReload
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareAcknowledgementMigrationTest
+INSTRUMENTATION_STATUS: current=5
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=
+in.wedevit.care.CareAcknowledgementMigrationTest:
+INSTRUMENTATION_STATUS: test=versionThreeUpgradePreservesLegacyAckAndAllowsSeparateConfirmationsAfterReopen
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareAcknowledgementMigrationTest
+INSTRUMENTATION_STATUS: current=5
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=versionThreeUpgradePreservesLegacyAckAndAllowsSeparateConfirmationsAfterReopen
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareReportTest
+INSTRUMENTATION_STATUS: current=6
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=
+in.wedevit.care.CareReportTest:
+INSTRUMENTATION_STATUS: test=versionTwoUpgradePreservesCareAndReportMetadataAfterReopen
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareReportTest
+INSTRUMENTATION_STATUS: current=6
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=versionTwoUpgradePreservesCareAndReportMetadataAfterReopen
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareReportTest
+INSTRUMENTATION_STATUS: current=7
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=reportCopiesAreIsolatedAndUnsafeFilesAreRejected
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareReportTest
+INSTRUMENTATION_STATUS: current=7
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=reportCopiesAreIsolatedAndUnsafeFilesAreRejected
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareFlowTest
+INSTRUMENTATION_STATUS: current=8
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=
+in.wedevit.care.CareFlowTest:
+INSTRUMENTATION_STATUS: test=roleMenuKeepsDraftAndPatientChoiceAfterRecreation
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareFlowTest
+INSTRUMENTATION_STATUS: current=8
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: No node found that matches (SetText is defined) && (Text + InputText + EditableText contains 'Conversation' (ignoreCase: false)) in scrollable container
+Semantics of the node:
+Node #3423 at (l=0.0, t=233.0, r=720.0, b=1412.0)px, Tag: 'conversation-list'
+CollectionInfo = 'androidx.compose.ui.semantics.CollectionInfo@9881d1a'
+IsTraversalGroup = 'true'
+VerticalScrollAxisRange = 'ScrollAxisRange(value=1275.0, maxValue=1275.0, reverseScrolling=false)'
+Actions = [GetScrollViewportLength, IndexForKey, ScrollBy, ScrollByOffset, ScrollToIndex]
+Has 6 children
+Selector used: (TestTag = 'conversation-list')
+
+	at androidx.compose.ui.test.ActionsKt.performScrollToNode(Actions.kt:257)
+	at in.wedevit.care.CareFlowTest.roleMenuKeepsDraftAndPatientChoiceAfterRecreation(CareFlowTest.kt:66)
+
+INSTRUMENTATION_STATUS: stream=
+Error in roleMenuKeepsDraftAndPatientChoiceAfterRecreation(in.wedevit.care.CareFlowTest):
+java.lang.AssertionError: No node found that matches (SetText is defined) && (Text + InputText + EditableText contains 'Conversation' (ignoreCase: false)) in scrollable container
+Semantics of the node:
+Node #3423 at (l=0.0, t=233.0, r=720.0, b=1412.0)px, Tag: 'conversation-list'
+CollectionInfo = 'androidx.compose.ui.semantics.CollectionInfo@9881d1a'
+IsTraversalGroup = 'true'
+VerticalScrollAxisRange = 'ScrollAxisRange(value=1275.0, maxValue=1275.0, reverseScrolling=false)'
+Actions = [GetScrollViewportLength, IndexForKey, ScrollBy, ScrollByOffset, ScrollToIndex]
+Has 6 children
+Selector used: (TestTag = 'conversation-list')
+
+	at androidx.compose.ui.test.ActionsKt.performScrollToNode(Actions.kt:257)
+	at in.wedevit.care.CareFlowTest.roleMenuKeepsDraftAndPatientChoiceAfterRecreation(CareFlowTest.kt:66)
+
+INSTRUMENTATION_STATUS: test=roleMenuKeepsDraftAndPatientChoiceAfterRecreation
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareFlowTest
+INSTRUMENTATION_STATUS: current=9
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=dailyEntriesAppearOnTodayAndCanBeEditedAndRemoved
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareFlowTest
+INSTRUMENTATION_STATUS: current=9
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=dailyEntriesAppearOnTodayAndCanBeEditedAndRemoved
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareFlowTest
+INSTRUMENTATION_STATUS: current=10
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=directoryFiltersRecoverFromNoResults
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareFlowTest
+INSTRUMENTATION_STATUS: current=10
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=directoryFiltersRecoverFromNoResults
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareFlowTest
+INSTRUMENTATION_STATUS: current=11
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=roomPersistsAndSeparatesPeopleAcrossDatabaseReopen
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareFlowTest
+INSTRUMENTATION_STATUS: current=11
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=roomPersistsAndSeparatesPeopleAcrossDatabaseReopen
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareFlowTest
+INSTRUMENTATION_STATUS: current=12
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=documentsOpenSavedVersionWithActionsAtTheTop
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareFlowTest
+INSTRUMENTATION_STATUS: current=12
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=documentsOpenSavedVersionWithActionsAtTheTop
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareFlowTest
+INSTRUMENTATION_STATUS: current=13
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=conversationReviewSavesExactVersionAndSurvivesRecreation
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareFlowTest
+INSTRUMENTATION_STATUS: current=13
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: No node found that matches (SetText is defined) && (Text + InputText + EditableText contains 'Conversation' (ignoreCase: false)) in scrollable container
+Semantics of the node:
+Node #5173 at (l=0.0, t=233.0, r=720.0, b=1412.0)px, Tag: 'conversation-list'
+CollectionInfo = 'androidx.compose.ui.semantics.CollectionInfo@8f802fe'
+IsTraversalGroup = 'true'
+VerticalScrollAxisRange = 'ScrollAxisRange(value=1275.0, maxValue=1275.0, reverseScrolling=false)'
+Actions = [GetScrollViewportLength, IndexForKey, ScrollBy, ScrollByOffset, ScrollToIndex]
+Has 6 children
+Selector used: (TestTag = 'conversation-list')
+
+	at androidx.compose.ui.test.ActionsKt.performScrollToNode(Actions.kt:257)
+	at in.wedevit.care.CareFlowTest.conversationReviewSavesExactVersionAndSurvivesRecreation(CareFlowTest.kt:144)
+
+INSTRUMENTATION_STATUS: stream=
+Error in conversationReviewSavesExactVersionAndSurvivesRecreation(in.wedevit.care.CareFlowTest):
+java.lang.AssertionError: No node found that matches (SetText is defined) && (Text + InputText + EditableText contains 'Conversation' (ignoreCase: false)) in scrollable container
+Semantics of the node:
+Node #5173 at (l=0.0, t=233.0, r=720.0, b=1412.0)px, Tag: 'conversation-list'
+CollectionInfo = 'androidx.compose.ui.semantics.CollectionInfo@8f802fe'
+IsTraversalGroup = 'true'
+VerticalScrollAxisRange = 'ScrollAxisRange(value=1275.0, maxValue=1275.0, reverseScrolling=false)'
+Actions = [GetScrollViewportLength, IndexForKey, ScrollBy, ScrollByOffset, ScrollToIndex]
+Has 6 children
+Selector used: (TestTag = 'conversation-list')
+
+	at androidx.compose.ui.test.ActionsKt.performScrollToNode(Actions.kt:257)
+	at in.wedevit.care.CareFlowTest.conversationReviewSavesExactVersionAndSurvivesRecreation(CareFlowTest.kt:144)
+
+INSTRUMENTATION_STATUS: test=conversationReviewSavesExactVersionAndSurvivesRecreation
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareFlowTest
+INSTRUMENTATION_STATUS: current=14
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=reportPickerPersistsSearchesSharesAndRemovesOnlyItsCopy
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareFlowTest
+INSTRUMENTATION_STATUS: current=14
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=reportPickerPersistsSearchesSharesAndRemovesOnlyItsCopy
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareFlowTest
+INSTRUMENTATION_STATUS: current=15
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=checkinSavesChosenWordsAndKeepsOptionalNote
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareFlowTest
+INSTRUMENTATION_STATUS: current=15
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: Assert failed: The component with Text + InputText + EditableText contains 'You choose which notes to share and with whom.' (ignoreCase: false) is not displayed!
+	at androidx.compose.ui.test.AssertionsKt.assertIsDisplayed(Assertions.kt:34)
+	at in.wedevit.care.CareFlowTest.checkinSavesChosenWordsAndKeepsOptionalNote(CareFlowTest.kt:290)
+
+INSTRUMENTATION_STATUS: stream=
+Error in checkinSavesChosenWordsAndKeepsOptionalNote(in.wedevit.care.CareFlowTest):
+java.lang.AssertionError: Assert failed: The component with Text + InputText + EditableText contains 'You choose which notes to share and with whom.' (ignoreCase: false) is not displayed!
+	at androidx.compose.ui.test.AssertionsKt.assertIsDisplayed(Assertions.kt:34)
+	at in.wedevit.care.CareFlowTest.checkinSavesChosenWordsAndKeepsOptionalNote(CareFlowTest.kt:290)
+
+INSTRUMENTATION_STATUS: test=checkinSavesChosenWordsAndKeepsOptionalNote
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareFlowTest
+INSTRUMENTATION_STATUS: current=16
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=switchingPeopleClosesOrdinaryEntryWithoutSavingToTheNewPerson
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareFlowTest
+INSTRUMENTATION_STATUS: current=16
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=switchingPeopleClosesOrdinaryEntryWithoutSavingToTheNewPerson
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareFlowTest
+INSTRUMENTATION_STATUS: current=17
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=staleConfirmationCannotApplyAfterSwitchingPeople
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareFlowTest
+INSTRUMENTATION_STATUS: current=17
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=staleConfirmationCannotApplyAfterSwitchingPeople
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareFlowTest
+INSTRUMENTATION_STATUS: current=18
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=switchingPeopleKeepsLatestDraftAndCompletedTasks
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareFlowTest
+INSTRUMENTATION_STATUS: current=18
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=switchingPeopleKeepsLatestDraftAndCompletedTasks
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareFlowTest
+INSTRUMENTATION_STATUS: current=19
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=signInLoadsAccountRecordsOnToday
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareFlowTest
+INSTRUMENTATION_STATUS: current=19
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stack=org.junit.AssumptionViolatedException: got: <[null, null]>, expected: every item is not null
+	at org.junit.Assume.assumeThat(Assume.java:106)
+	at org.junit.Assume.assumeNotNull(Assume.java:84)
+	at in.wedevit.care.CareFlowTest.signInLoadsAccountRecordsOnToday(CareFlowTest.kt:296)
+
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=signInLoadsAccountRecordsOnToday
+INSTRUMENTATION_STATUS_CODE: -4
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareFlowTest
+INSTRUMENTATION_STATUS: current=20
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=prescriptionScannerKeepsManualFallbackAndRequiresReviewBeforeSaving
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareFlowTest
+INSTRUMENTATION_STATUS: current=20
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=prescriptionScannerKeepsManualFallbackAndRequiresReviewBeforeSaving
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareFlowTest
+INSTRUMENTATION_STATUS: current=21
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=manualSourceAndConsentSurviveAppStopWithoutStartingAMicrophone
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareFlowTest
+INSTRUMENTATION_STATUS: current=21
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=manualSourceAndConsentSurviveAppStopWithoutStartingAMicrophone
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CombinedCareMigrationTest
+INSTRUMENTATION_STATUS: current=22
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=
+in.wedevit.care.CombinedCareMigrationTest:
+INSTRUMENTATION_STATUS: test=localVersionFourPreservesTranscriptionAndConsent
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CombinedCareMigrationTest
+INSTRUMENTATION_STATUS: current=22
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=localVersionFourPreservesTranscriptionAndConsent
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CombinedCareMigrationTest
+INSTRUMENTATION_STATUS: current=23
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=upstreamReportsVersionThreePreservesReports
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CombinedCareMigrationTest
+INSTRUMENTATION_STATUS: current=23
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=upstreamReportsVersionThreePreservesReports
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CombinedCareMigrationTest
+INSTRUMENTATION_STATUS: current=24
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=upstreamVersionFourPreservesMultipleConfirmationIds
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CombinedCareMigrationTest
+INSTRUMENTATION_STATUS: current=24
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=upstreamVersionFourPreservesMultipleConfirmationIds
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CombinedCareMigrationTest
+INSTRUMENTATION_STATUS: current=25
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=historicalLocalVersionThreePreservesConsentAndReview
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CombinedCareMigrationTest
+INSTRUMENTATION_STATUS: current=25
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=historicalLocalVersionThreePreservesConsentAndReview
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CombinedCareMigrationTest
+INSTRUMENTATION_STATUS: current=26
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=versionTwoReachesSupersetThroughReports
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CombinedCareMigrationTest
+INSTRUMENTATION_STATUS: current=26
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=versionTwoReachesSupersetThroughReports
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CombinedCareMigrationTest
+INSTRUMENTATION_STATUS: current=27
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=versionOneReachesSupersetThroughRevisionAndReports
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CombinedCareMigrationTest
+INSTRUMENTATION_STATUS: current=27
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=versionOneReachesSupersetThroughRevisionAndReports
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CombinedCareMigrationTest
+INSTRUMENTATION_STATUS: current=28
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=localVersionFivePreservesReportsAndProvenance
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CombinedCareMigrationTest
+INSTRUMENTATION_STATUS: current=28
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=localVersionFivePreservesReportsAndProvenance
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=in.wedevit.care.NativeMergeComponentsTest
+INSTRUMENTATION_STATUS: current=29
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=
+in.wedevit.care.NativeMergeComponentsTest:
+INSTRUMENTATION_STATUS: test=feedbackCanCloseWithoutWritingOrTouchingPatientStorage
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.NativeMergeComponentsTest
+INSTRUMENTATION_STATUS: current=29
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=feedbackCanCloseWithoutWritingOrTouchingPatientStorage
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=in.wedevit.care.NativeMergeComponentsTest
+INSTRUMENTATION_STATUS: current=30
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=newPatientShortcutsRetainTheirIndependentCallbacks
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.NativeMergeComponentsTest
+INSTRUMENTATION_STATUS: current=30
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=newPatientShortcutsRetainTheirIndependentCallbacks
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=in.wedevit.care.NativeMergeComponentsTest
+INSTRUMENTATION_STATUS: current=31
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=localDoctorLoginAndFeedbackEntrySurvivePatientWorkflowMerge
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.NativeMergeComponentsTest
+INSTRUMENTATION_STATUS: current=31
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=localDoctorLoginAndFeedbackEntrySurvivePatientWorkflowMerge
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=in.wedevit.care.NativeMergeComponentsTest
+INSTRUMENTATION_STATUS: current=32
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=sourcePickerAndReaderKeepOriginalWordsAndPatientIdentity
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.NativeMergeComponentsTest
+INSTRUMENTATION_STATUS: current=32
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=sourcePickerAndReaderKeepOriginalWordsAndPatientIdentity
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=in.wedevit.care.PatientDoctorUiTest
+INSTRUMENTATION_STATUS: current=33
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=
+in.wedevit.care.PatientDoctorUiTest:
+INSTRUMENTATION_STATUS: test=replacingPatientLinkClearsOldDetailsAndPendingIsNotVerified
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.PatientDoctorUiTest
+INSTRUMENTATION_STATUS: current=33
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: Failed to assert the following: (Text + InputText + EditableText contains 'pending' (ignoreCase: true))
+Semantics of the node:
+Node #9535 at (l=105.0, t=233.0, r=348.0, b=271.0)px, Tag: 'patient-doctor-status'
+Text = '[Verification pending]'
+Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+Has 3 siblings
+Selector used: (TestTag = 'patient-doctor-status')
+
+	at androidx.compose.ui.test.AssertionsKt.assert(Assertions.kt:264)
+	at androidx.compose.ui.test.AssertionsKt.assert$default(Assertions.kt:254)
+	at androidx.compose.ui.test.AssertionsKt.assertTextContains(Assertions.kt:208)
+	at androidx.compose.ui.test.AssertionsKt.assertTextContains$default(Assertions.kt:204)
+	at in.wedevit.care.PatientDoctorUiTest.replacingPatientLinkClearsOldDetailsAndPendingIsNotVerified(PatientDoctorUiTest.kt:46)
+
+INSTRUMENTATION_STATUS: stream=
+Error in replacingPatientLinkClearsOldDetailsAndPendingIsNotVerified(in.wedevit.care.PatientDoctorUiTest):
+java.lang.AssertionError: Failed to assert the following: (Text + InputText + EditableText contains 'pending' (ignoreCase: true))
+Semantics of the node:
+Node #9535 at (l=105.0, t=233.0, r=348.0, b=271.0)px, Tag: 'patient-doctor-status'
+Text = '[Verification pending]'
+Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+Has 3 siblings
+Selector used: (TestTag = 'patient-doctor-status')
+
+	at androidx.compose.ui.test.AssertionsKt.assert(Assertions.kt:264)
+	at androidx.compose.ui.test.AssertionsKt.assert$default(Assertions.kt:254)
+	at androidx.compose.ui.test.AssertionsKt.assertTextContains(Assertions.kt:208)
+	at androidx.compose.ui.test.AssertionsKt.assertTextContains$default(Assertions.kt:204)
+	at in.wedevit.care.PatientDoctorUiTest.replacingPatientLinkClearsOldDetailsAndPendingIsNotVerified(PatientDoctorUiTest.kt:46)
+
+INSTRUMENTATION_STATUS: test=replacingPatientLinkClearsOldDetailsAndPendingIsNotVerified
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_STATUS: class=in.wedevit.care.PatientDoctorUiTest
+INSTRUMENTATION_STATUS: current=34
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=absentLinkIsHonestNonInteractiveAndDoesNotInventDoctor
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.PatientDoctorUiTest
+INSTRUMENTATION_STATUS: current=34
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=absentLinkIsHonestNonInteractiveAndDoesNotInventDoctor
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=in.wedevit.care.PatientDoctorUiTest
+INSTRUMENTATION_STATUS: current=35
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=homeShowsNameOnlyAndDetailsDoNotClaimProfessionalVerification
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.PatientDoctorUiTest
+INSTRUMENTATION_STATUS: current=35
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=homeShowsNameOnlyAndDetailsDoNotClaimProfessionalVerification
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=in.wedevit.care.DoctorLocalPreviewConsentTest
+INSTRUMENTATION_STATUS: current=36
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=
+in.wedevit.care.DoctorLocalPreviewConsentTest:
+INSTRUMENTATION_STATUS: test=localPreviewRequiresConsentButNeverAsksForCloudAuthentication
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.DoctorLocalPreviewConsentTest
+INSTRUMENTATION_STATUS: current=36
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=36
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=localPreviewRequiresConsentButNeverAsksForCloudAuthentication
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_RESULT: stream=
+
+Time: 177.835
+There were 4 failures:
+1) roleMenuKeepsDraftAndPatientChoiceAfterRecreation(in.wedevit.care.CareFlowTest)
+java.lang.AssertionError: No node found that matches (SetText is defined) && (Text + InputText + EditableText contains 'Conversation' (ignoreCase: false)) in scrollable container
+Semantics of the node:
+Node #3423 at (l=0.0, t=233.0, r=720.0, b=1412.0)px, Tag: 'conversation-list'
+CollectionInfo = 'androidx.compose.ui.semantics.CollectionInfo@9881d1a'
+IsTraversalGroup = 'true'
+VerticalScrollAxisRange = 'ScrollAxisRange(value=1275.0, maxValue=1275.0, reverseScrolling=false)'
+Actions = [GetScrollViewportLength, IndexForKey, ScrollBy, ScrollByOffset, ScrollToIndex]
+Has 6 children
+Selector used: (TestTag = 'conversation-list')
+
+	at androidx.compose.ui.test.ActionsKt.performScrollToNode(Actions.kt:257)
+	at in.wedevit.care.CareFlowTest.roleMenuKeepsDraftAndPatientChoiceAfterRecreation(CareFlowTest.kt:66)
+2) conversationReviewSavesExactVersionAndSurvivesRecreation(in.wedevit.care.CareFlowTest)
+java.lang.AssertionError: No node found that matches (SetText is defined) && (Text + InputText + EditableText contains 'Conversation' (ignoreCase: false)) in scrollable container
+Semantics of the node:
+Node #5173 at (l=0.0, t=233.0, r=720.0, b=1412.0)px, Tag: 'conversation-list'
+CollectionInfo = 'androidx.compose.ui.semantics.CollectionInfo@8f802fe'
+IsTraversalGroup = 'true'
+VerticalScrollAxisRange = 'ScrollAxisRange(value=1275.0, maxValue=1275.0, reverseScrolling=false)'
+Actions = [GetScrollViewportLength, IndexForKey, ScrollBy, ScrollByOffset, ScrollToIndex]
+Has 6 children
+Selector used: (TestTag = 'conversation-list')
+
+	at androidx.compose.ui.test.ActionsKt.performScrollToNode(Actions.kt:257)
+	at in.wedevit.care.CareFlowTest.conversationReviewSavesExactVersionAndSurvivesRecreation(CareFlowTest.kt:144)
+3) checkinSavesChosenWordsAndKeepsOptionalNote(in.wedevit.care.CareFlowTest)
+java.lang.AssertionError: Assert failed: The component with Text + InputText + EditableText contains 'You choose which notes to share and with whom.' (ignoreCase: false) is not displayed!
+	at androidx.compose.ui.test.AssertionsKt.assertIsDisplayed(Assertions.kt:34)
+	at in.wedevit.care.CareFlowTest.checkinSavesChosenWordsAndKeepsOptionalNote(CareFlowTest.kt:290)
+4) replacingPatientLinkClearsOldDetailsAndPendingIsNotVerified(in.wedevit.care.PatientDoctorUiTest)
+java.lang.AssertionError: Failed to assert the following: (Text + InputText + EditableText contains 'pending' (ignoreCase: true))
+Semantics of the node:
+Node #9535 at (l=105.0, t=233.0, r=348.0, b=271.0)px, Tag: 'patient-doctor-status'
+Text = '[Verification pending]'
+Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+Has 3 siblings
+Selector used: (TestTag = 'patient-doctor-status')
+
+	at androidx.compose.ui.test.AssertionsKt.assert(Assertions.kt:264)
+	at androidx.compose.ui.test.AssertionsKt.assert$default(Assertions.kt:254)
+	at androidx.compose.ui.test.AssertionsKt.assertTextContains(Assertions.kt:208)
+	at androidx.compose.ui.test.AssertionsKt.assertTextContains$default(Assertions.kt:204)
+	at in.wedevit.care.PatientDoctorUiTest.replacingPatientLinkClearsOldDetailsAndPendingIsNotVerified(PatientDoctorUiTest.kt:46)
+
+FAILURES!!!
+Tests run: 36,  Failures: 4
+
+
+INSTRUMENTATION_CODE: -1

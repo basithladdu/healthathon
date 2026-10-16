@@ -1,0 +1,762 @@
+{
+  "sourceCommit": "ebffb7b043a5e8725f190ab8f8f3574c768d9058",
+  "harnessCommit": "91dc5db3c47ed2f28941a5618873ee7b67c0bf26",
+  "startedUtc": "2026-10-16T09:46:15.855413Z",
+  "freshDisposableEmulator": true,
+  "physicalDevice": false,
+  "credentialsInjected": false,
+  "aiProviderCalls": false,
+  "microphoneOpened": false,
+  "windowsEmulatorDataTouched": false,
+  "environment": {
+    "size": "Physical size: 1080x2400\nOverride size: 720x1600",
+    "density": "Physical density: 420\nOverride density: 300",
+    "pageSize": "4096",
+    "api": "36",
+    "deviceMemory": "MemTotal:        2532300 kB\nMemFree:          130904 kB\nMemAvailable:    1525020 kB\nBuffers:           51168 kB\nCached:          1580320 kB\nSwapCached:            0 kB\nActive:          1082616 kB\nInactive:        1004124 kB\nActive(anon):     334960 kB\nInactive(anon):   165352 kB\nActive(file):     747656 kB\nInactive(file):   838772 kB\nUnevictable:       39076 kB\nMlocked:           39076 kB\nSwapTotal:       1899220 kB\nSwapFree:        1899220 kB\nDirty:             42204 kB\nWriteback:             0 kB\nAnonPages:        494432 kB\nMapped:           688292 kB\nShmem:              6996 kB\nKReclaimable:      45536 kB\nSlab:             157560 kB\nSReclaimable:      45536 kB\nSUnreclaim:       112024 kB\nKernelStack:       19976 kB\nPageTables:        46680 kB\nSecPageTables:         0 kB\nNFS_Unstable:          0 kB\nBounce:                0 kB\nWritebackTmp:          0 kB\nCommitLimit:     3165368 kB\nCommitted_AS:   64587888 kB\nVmallocTotal:   34359738367 kB\nVmallocUsed:       45032 kB\nVmallocChunk:          0 kB\nPercpu:             2888 kB\nAnonHugePages:         0 kB\nShmemHugePages:        0 kB\nShmemPmdMapped:        0 kB\nFileHugePages:         0 kB\nFilePmdMapped:         0 kB\nCmaTotal:              0 kB\nCmaFree:               0 kB\nDirectMap4k:       51032 kB\nDirectMap2M:     2570240 kB"
+  },
+  "sixteenKbRuntimeTest": false,
+  "matrix": {
+    "tests": [
+      {
+        "class": "in.wedevit.care.DailyCareFlowsTest",
+        "test": "calendarSavesChosenDayAndKeepsUndatedMedicinesOutOfThatSchedule",
+        "status": 0,
+        "result": "pass"
+      },
+      {
+        "class": "in.wedevit.care.DailyCareFlowsTest",
+        "test": "labsKeepPrintedValuesRangesAndSeriesWithoutLeakingToAnotherPerson",
+        "status": 0,
+        "result": "pass"
+      },
+      {
+        "class": "in.wedevit.care.DailyCareFlowsTest",
+        "test": "familyRequestAppearsInDoctorQueueAndCanOpenConversation",
+        "status": 0,
+        "result": "pass"
+      },
+      {
+        "class": "in.wedevit.care.DailyCareFlowsTest",
+        "test": "namedTaskAcceptanceCompletionAndSenderStatusSurviveReload",
+        "status": 0,
+        "result": "pass"
+      },
+      {
+        "class": "in.wedevit.care.CareAcknowledgementMigrationTest",
+        "test": "versionThreeUpgradePreservesLegacyAckAndAllowsSeparateConfirmationsAfterReopen",
+        "status": 0,
+        "result": "pass"
+      },
+      {
+        "class": "in.wedevit.care.CareReportTest",
+        "test": "versionTwoUpgradePreservesCareAndReportMetadataAfterReopen",
+        "status": 0,
+        "result": "pass"
+      },
+      {
+        "class": "in.wedevit.care.CareReportTest",
+        "test": "reportCopiesAreIsolatedAndUnsafeFilesAreRejected",
+        "status": 0,
+        "result": "pass"
+      },
+      {
+        "class": "in.wedevit.care.CareFlowTest",
+        "test": "roleMenuKeepsDraftAndPatientChoiceAfterRecreation",
+        "status": -2,
+        "result": "failure"
+      },
+      {
+        "class": "in.wedevit.care.CareFlowTest",
+        "test": "dailyEntriesAppearOnTodayAndCanBeEditedAndRemoved",
+        "status": 0,
+        "result": "pass"
+      },
+      {
+        "class": "in.wedevit.care.CareFlowTest",
+        "test": "directoryFiltersRecoverFromNoResults",
+        "status": 0,
+        "result": "pass"
+      },
+      {
+        "class": "in.wedevit.care.CareFlowTest",
+        "test": "roomPersistsAndSeparatesPeopleAcrossDatabaseReopen",
+        "status": 0,
+        "result": "pass"
+      },
+      {
+        "class": "in.wedevit.care.CareFlowTest",
+        "test": "documentsOpenSavedVersionWithActionsAtTheTop",
+        "status": 0,
+        "result": "pass"
+      },
+      {
+        "class": "in.wedevit.care.CareFlowTest",
+        "test": "conversationReviewSavesExactVersionAndSurvivesRecreation",
+        "status": -2,
+        "result": "failure"
+      },
+      {
+        "class": "in.wedevit.care.CareFlowTest",
+        "test": "reportPickerPersistsSearchesSharesAndRemovesOnlyItsCopy",
+        "status": 0,
+        "result": "pass"
+      },
+      {
+        "class": "in.wedevit.care.CareFlowTest",
+        "test": "checkinSavesChosenWordsAndKeepsOptionalNote",
+        "status": -2,
+        "result": "failure"
+      },
+      {
+        "class": "in.wedevit.care.CareFlowTest",
+        "test": "switchingPeopleClosesOrdinaryEntryWithoutSavingToTheNewPerson",
+        "status": 0,
+        "result": "pass"
+      },
+      {
+        "class": "in.wedevit.care.CareFlowTest",
+        "test": "staleConfirmationCannotApplyAfterSwitchingPeople",
+        "status": 0,
+        "result": "pass"
+      },
+      {
+        "class": "in.wedevit.care.CareFlowTest",
+        "test": "switchingPeopleKeepsLatestDraftAndCompletedTasks",
+        "status": 0,
+        "result": "pass"
+      },
+      {
+        "class": "in.wedevit.care.CareFlowTest",
+        "test": "signInLoadsAccountRecordsOnToday",
+        "status": -4,
+        "result": "skipped"
+      },
+      {
+        "class": "in.wedevit.care.CareFlowTest",
+        "test": "prescriptionScannerKeepsManualFallbackAndRequiresReviewBeforeSaving",
+        "status": 0,
+        "result": "pass"
+      },
+      {
+        "class": "in.wedevit.care.CareFlowTest",
+        "test": "manualSourceAndConsentSurviveAppStopWithoutStartingAMicrophone",
+        "status": 0,
+        "result": "pass"
+      },
+      {
+        "class": "in.wedevit.care.CombinedCareMigrationTest",
+        "test": "localVersionFourPreservesTranscriptionAndConsent",
+        "status": 0,
+        "result": "pass"
+      },
+      {
+        "class": "in.wedevit.care.CombinedCareMigrationTest",
+        "test": "upstreamReportsVersionThreePreservesReports",
+        "status": 0,
+        "result": "pass"
+      },
+      {
+        "class": "in.wedevit.care.CombinedCareMigrationTest",
+        "test": "upstreamVersionFourPreservesMultipleConfirmationIds",
+        "status": 0,
+        "result": "pass"
+      },
+      {
+        "class": "in.wedevit.care.CombinedCareMigrationTest",
+        "test": "historicalLocalVersionThreePreservesConsentAndReview",
+        "status": 0,
+        "result": "pass"
+      },
+      {
+        "class": "in.wedevit.care.CombinedCareMigrationTest",
+        "test": "versionTwoReachesSupersetThroughReports",
+        "status": 0,
+        "result": "pass"
+      },
+      {
+        "class": "in.wedevit.care.CombinedCareMigrationTest",
+        "test": "versionOneReachesSupersetThroughRevisionAndReports",
+        "status": 0,
+        "result": "pass"
+      },
+      {
+        "class": "in.wedevit.care.CombinedCareMigrationTest",
+        "test": "localVersionFivePreservesReportsAndProvenance",
+        "status": 0,
+        "result": "pass"
+      },
+      {
+        "class": "in.wedevit.care.NativeMergeComponentsTest",
+        "test": "feedbackCanCloseWithoutWritingOrTouchingPatientStorage",
+        "status": 0,
+        "result": "pass"
+      },
+      {
+        "class": "in.wedevit.care.NativeMergeComponentsTest",
+        "test": "newPatientShortcutsRetainTheirIndependentCallbacks",
+        "status": 0,
+        "result": "pass"
+      },
+      {
+        "class": "in.wedevit.care.NativeMergeComponentsTest",
+        "test": "localDoctorLoginAndFeedbackEntrySurvivePatientWorkflowMerge",
+        "status": 0,
+        "result": "pass"
+      },
+      {
+        "class": "in.wedevit.care.NativeMergeComponentsTest",
+        "test": "sourcePickerAndReaderKeepOriginalWordsAndPatientIdentity",
+        "status": 0,
+        "result": "pass"
+      },
+      {
+        "class": "in.wedevit.care.PatientDoctorUiTest",
+        "test": "replacingPatientLinkClearsOldDetailsAndPendingIsNotVerified",
+        "status": -2,
+        "result": "failure"
+      },
+      {
+        "class": "in.wedevit.care.PatientDoctorUiTest",
+        "test": "absentLinkIsHonestNonInteractiveAndDoesNotInventDoctor",
+        "status": 0,
+        "result": "pass"
+      },
+      {
+        "class": "in.wedevit.care.PatientDoctorUiTest",
+        "test": "homeShowsNameOnlyAndDetailsDoNotClaimProfessionalVerification",
+        "status": 0,
+        "result": "pass"
+      },
+      {
+        "class": "in.wedevit.care.DoctorLocalPreviewConsentTest",
+        "test": "localPreviewRequiresConsentButNeverAsksForCloudAuthentication",
+        "status": 0,
+        "result": "pass"
+      }
+    ],
+    "counts": {
+      "pass": 31,
+      "skipped": 1,
+      "ignored": 0,
+      "failure": 4,
+      "error": 0,
+      "unknown": 0
+    },
+    "expected": 36,
+    "matrixComplete": false,
+    "durationSeconds": 189.024,
+    "finishedUtc": "2026-10-16T09:49:39.310660Z"
+  },
+  "pdfSupplemental": {
+    "tests": [
+      {
+        "class": "in.wedevit.care.DoctorWorkflowFlowTest",
+        "test": "longPublishedPreviewExportsToMultipleReadablePages",
+        "status": 0,
+        "result": "pass"
+      }
+    ],
+    "counts": {
+      "pass": 1,
+      "skipped": 0,
+      "ignored": 0,
+      "failure": 0,
+      "error": 0,
+      "unknown": 0
+    },
+    "expected": 1,
+    "matrixComplete": true,
+    "durationSeconds": 4.788,
+    "finishedUtc": "2026-10-16T09:49:44.101476Z"
+  },
+  "debugCapture": "Actual current-source debug doctor images captured; root must inspect readability, insets and absence of overlays. Original matrix screenshots are preserved separately.",
+  "optimizedRelease": {
+    "startedUtc": "2026-10-16T09:50:29.674232Z",
+    "sourceCommit": "ebffb7b043a5e8725f190ab8f8f3574c768d9058",
+    "apkSha256": "825F5F3C4717356219653C7C1A3F5AD7AD89CED0B39D49782AD287ED1A7278DD",
+    "signerQualification": "Ephemeral CI key; differs from the private store upload key. Code and R8 output unchanged.",
+    "screenshotsTaken": false,
+    "flagSecurePreserved": true,
+    "checks": [
+      "Person saved with actual IME open and Continue above keyboard",
+      "Calendar saved with IME open; value survives process restart and reopens for editing",
+      "Named care task saved with IME open and survives process restart",
+      "Exact numeric lab value/unit saved with IME open and survives process restart",
+      "Main care recording consent is local-only in optimized release; start is disabled without consent, no cloud-processing option shown, microphone never opened",
+      "Doctor preview uses local consent; no upload/authentication action or microphone invoked"
+    ],
+    "passed": false,
+    "failure": "Visible target not found: Load sample AI draft",
+    "actions": [
+      {
+        "action": "tap",
+        "label": "Add a person",
+        "bounds": [
+          232,
+          1216,
+          420,
+          1254
+        ],
+        "atUtc": "2026-10-16T09:50:35.324113Z"
+      },
+      {
+        "action": "fill",
+        "label": "Name",
+        "syntheticValue": "CI Release Fictional Person",
+        "atUtc": "2026-10-16T09:50:42.307208Z"
+      },
+      {
+        "action": "verified-save-above-ime",
+        "label": "person",
+        "saveBounds": [
+          485,
+          674,
+          592,
+          712
+        ],
+        "imeBounds": [
+          0,
+          1039,
+          720,
+          1600
+        ]
+      },
+      {
+        "action": "tap",
+        "label": "Continue",
+        "bounds": [
+          485,
+          674,
+          592,
+          712
+        ],
+        "atUtc": "2026-10-16T09:50:46.852650Z"
+      },
+      {
+        "action": "tap",
+        "label": "Calendar",
+        "bounds": [
+          92,
+          1008,
+          188,
+          1038
+        ],
+        "atUtc": "2026-10-16T09:50:51.525949Z"
+      },
+      {
+        "action": "tap",
+        "label": "Add to calendar",
+        "bounds": [
+          615,
+          294,
+          660,
+          339
+        ],
+        "atUtc": "2026-10-16T09:50:54.022932Z"
+      },
+      {
+        "action": "fill",
+        "label": "What is planned?",
+        "syntheticValue": "CI fictional follow-up",
+        "atUtc": "2026-10-16T09:50:59.768162Z"
+      },
+      {
+        "action": "verified-save-above-ime",
+        "label": "calendar",
+        "saveBounds": [
+          261,
+          920,
+          459,
+          958
+        ],
+        "imeBounds": [
+          0,
+          1039,
+          720,
+          1600
+        ]
+      },
+      {
+        "action": "tap",
+        "label": "Save to calendar",
+        "bounds": [
+          261,
+          920,
+          459,
+          958
+        ],
+        "atUtc": "2026-10-16T09:51:04.269038Z"
+      },
+      {
+        "action": "tap",
+        "label": "Calendar",
+        "bounds": [
+          92,
+          1008,
+          188,
+          1038
+        ],
+        "atUtc": "2026-10-16T09:51:11.277918Z"
+      },
+      {
+        "action": "tap",
+        "label": "Edit CI fictional follow-up",
+        "bounds": [
+          585,
+          776,
+          630,
+          821
+        ],
+        "atUtc": "2026-10-16T09:51:15.834480Z"
+      },
+      {
+        "action": "tap",
+        "label": "Care team",
+        "bounds": [
+          305,
+          1008,
+          415,
+          1038
+        ],
+        "atUtc": "2026-10-16T09:51:21.434847Z"
+      },
+      {
+        "action": "tap",
+        "label": "Add task",
+        "bounds": [
+          494,
+          387,
+          600,
+          425
+        ],
+        "atUtc": "2026-10-16T09:51:23.893834Z"
+      },
+      {
+        "action": "fill",
+        "label": "What needs doing?",
+        "syntheticValue": "CI fictional report collection",
+        "atUtc": "2026-10-16T09:51:31.082892Z"
+      },
+      {
+        "action": "fill",
+        "label": "Who is this for?",
+        "syntheticValue": "Fictional helper",
+        "atUtc": "2026-10-16T09:51:35.536672Z"
+      },
+      {
+        "action": "verified-save-above-ime",
+        "label": "task",
+        "saveBounds": [
+          307,
+          920,
+          413,
+          958
+        ],
+        "imeBounds": [
+          0,
+          1039,
+          720,
+          1600
+        ]
+      },
+      {
+        "action": "tap",
+        "label": "Add task",
+        "bounds": [
+          307,
+          920,
+          413,
+          958
+        ],
+        "atUtc": "2026-10-16T09:51:40.018831Z"
+      },
+      {
+        "action": "tap",
+        "label": "Care team",
+        "bounds": [
+          305,
+          1008,
+          415,
+          1038
+        ],
+        "atUtc": "2026-10-16T09:51:47.020338Z"
+      },
+      {
+        "action": "tap",
+        "label": "Lab history",
+        "bounds": [
+          520,
+          1008,
+          639,
+          1038
+        ],
+        "atUtc": "2026-10-16T09:51:51.981453Z"
+      },
+      {
+        "action": "tap",
+        "label": "Add a lab result",
+        "bounds": [
+          615,
+          294,
+          660,
+          339
+        ],
+        "atUtc": "2026-10-16T09:51:54.446536Z"
+      },
+      {
+        "action": "fill",
+        "label": "Test name on report",
+        "syntheticValue": "Synthetic value",
+        "atUtc": "2026-10-16T09:51:59.667358Z"
+      },
+      {
+        "action": "fill",
+        "label": "Value",
+        "syntheticValue": "12.4",
+        "atUtc": "2026-10-16T09:52:03.315865Z"
+      },
+      {
+        "action": "fill",
+        "label": "Printed unit",
+        "syntheticValue": "g/dL",
+        "atUtc": "2026-10-16T09:52:06.791693Z"
+      },
+      {
+        "action": "verified-save-above-ime",
+        "label": "labs",
+        "saveBounds": [
+          294,
+          920,
+          426,
+          958
+        ],
+        "imeBounds": [
+          0,
+          1039,
+          720,
+          1600
+        ]
+      },
+      {
+        "action": "tap",
+        "label": "Save result",
+        "bounds": [
+          294,
+          920,
+          426,
+          958
+        ],
+        "atUtc": "2026-10-16T09:52:11.218796Z"
+      },
+      {
+        "action": "tap",
+        "label": "Lab history",
+        "bounds": [
+          520,
+          1008,
+          639,
+          1038
+        ],
+        "atUtc": "2026-10-16T09:52:18.458259Z"
+      },
+      {
+        "action": "tap",
+        "label": "Change view, Family",
+        "bounds": [
+          529,
+          116,
+          690,
+          206
+        ],
+        "atUtc": "2026-10-16T09:52:23.394831Z"
+      },
+      {
+        "action": "tap",
+        "label": "Doctor",
+        "bounds": [
+          470,
+          427,
+          551,
+          465
+        ],
+        "atUtc": "2026-10-16T09:52:25.908085Z"
+      },
+      {
+        "action": "tap",
+        "label": "Talk",
+        "bounds": [
+          204,
+          1486,
+          245,
+          1531
+        ],
+        "atUtc": "2026-10-16T09:52:28.377590Z"
+      },
+      {
+        "action": "tap",
+        "label": "Record conversation",
+        "bounds": [
+          173,
+          1089,
+          417,
+          1127
+        ],
+        "atUtc": "2026-10-16T09:52:30.834550Z"
+      },
+      {
+        "action": "tap",
+        "label": "Cancel",
+        "bounds": [
+          270,
+          1298,
+          352,
+          1336
+        ],
+        "atUtc": "2026-10-16T09:52:41.416467Z"
+      },
+      {
+        "action": "tap",
+        "label": "Change view, Doctor",
+        "bounds": [
+          526,
+          116,
+          690,
+          206
+        ],
+        "atUtc": "2026-10-16T09:52:44.300915Z"
+      },
+      {
+        "action": "tap",
+        "label": "Family",
+        "bounds": [
+          470,
+          337,
+          550,
+          375
+        ],
+        "atUtc": "2026-10-16T09:52:46.818662Z"
+      },
+      {
+        "action": "tap",
+        "label": "More",
+        "bounds": [
+          608,
+          1486,
+          658,
+          1531
+        ],
+        "atUtc": "2026-10-16T09:52:49.329606Z"
+      },
+      {
+        "action": "tap",
+        "label": "Doctor login",
+        "bounds": [
+          287,
+          521,
+          433,
+          559
+        ],
+        "atUtc": "2026-10-16T09:52:51.790005Z"
+      },
+      {
+        "action": "tap",
+        "label": "Open workspace",
+        "bounds": [
+          218,
+          1254,
+          446,
+          1292
+        ],
+        "atUtc": "2026-10-16T09:52:56.262325Z"
+      },
+      {
+        "action": "tap",
+        "label": "Patients",
+        "bounds": [
+          223,
+          1495,
+          312,
+          1525
+        ],
+        "atUtc": "2026-10-16T09:52:58.730544Z"
+      },
+      {
+        "action": "tap",
+        "label": "Asha",
+        "bounds": [
+          68,
+          720,
+          152,
+          765
+        ],
+        "atUtc": "2026-10-16T09:53:01.210580Z"
+      },
+      {
+        "action": "tap",
+        "label": "Conversations",
+        "bounds": [
+          184,
+          1005,
+          425,
+          1050
+        ],
+        "atUtc": "2026-10-16T09:53:05.753491Z"
+      },
+      {
+        "action": "tap",
+        "label": "Open conversation workspace",
+        "bounds": [
+          182,
+          582,
+          539,
+          620
+        ],
+        "atUtc": "2026-10-16T09:53:08.207006Z"
+      },
+      {
+        "action": "tap",
+        "label": "2 Document",
+        "bounds": [
+          259,
+          486,
+          403,
+          524
+        ],
+        "atUtc": "2026-10-16T09:53:10.675829Z"
+      },
+      {
+        "action": "tap",
+        "label": "Record conversation",
+        "bounds": [
+          268,
+          1030,
+          512,
+          1068
+        ],
+        "atUtc": "2026-10-16T09:53:17.237908Z"
+      },
+      {
+        "action": "tap",
+        "label": "Cancel",
+        "bounds": [
+          270,
+          1229,
+          352,
+          1267
+        ],
+        "atUtc": "2026-10-16T09:53:23.842573Z"
+      }
+    ],
+    "finishedUtc": "2026-10-16T09:54:56.924911Z",
+    "limitations": [
+      "Fresh CI installation; local Windows emulator databases were not touched.",
+      "Ephemeral signer differs from final store signer.",
+      "No physical-device, real speech, AI-provider or clinical validation.",
+      "FLAG_SECURE respected; UIAutomator XML and actual keyboard/window evidence only."
+    ]
+  },
+  "finishedUtc": "2026-10-16T09:54:57.278750Z",
+  "passed": false,
+  "qualification": "CI emulator only; 36-test matrix and separate PDF check are distinguished. Component fixtures do not establish real doctor assignment or patient delivery. No local Room upgrade claimed."
+}

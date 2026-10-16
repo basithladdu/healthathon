@@ -231,11 +231,11 @@
     "version": "0.5.0",
     "versionCode": 6,
     "applicationId": "in.wedevit.sahara",
-    "deliveryStatus": "Combined source is pushed. Its unsigned CI build and current-source runtime checks are pending; local dex processing was interrupted by a desktop failure. Earlier branch tests and signed 0.5 packages are historical and do not establish readiness of this merged candidate. No combined-source upload or submission is confirmed.",
+    "deliveryStatus": "CI run 38881300006 built the combined source with 104 unit tests across 16 suites passing, no failures/errors/skips, debug lint 0 errors/37 warnings and a successful lintVitalRelease task without separately collected release XML counts. Fresh APK/AAB packages were signed locally with the existing upload key and passed package, signature and static 16 KB verification. Current-source CI runtime has 31 passes, 1 credential-dependent skip and 4 outdated test expectations requiring a focused rerun; a separate five-page PDF pagination check passed. Optimized Calendar/Care team/Labs IME saves and restart persistence plus local-only consent passed, while doctor publication/PDF and exit remain unfinished after a harness scroll-bound error. No 0.5 upload, submission, physical-device or 16 KB runtime validation is confirmed.",
     "delivery": [
       {
         "area": "Consented recording and attributable words",
-        "status": "Combined native source implemented; current-source runtime and actual speech-service behavior not yet verified",
+        "status": "Combined source built and unit-checked; current-source manual-source/consent persistence and local-only consent guards passed, actual speech-service behavior unverified",
         "implemented": "Existing phone-private recording/replay remains. On supported Android 12+ phones, optional on-device turn dictation records the selected Patient, Family / carer or Doctor label, selected language and timestamp with editable words. Each turn requires microphone consent. Lifecycle and generation guards stop listening and reject late callbacks; no cloud speech fallback is configured.",
         "remaining": "The selected speaker is self-entered, not automatically identified or verified. Saved M4A recordings are not automatically transcribed. Language availability and speech accuracy depend on the installed on-device service and have not been validated in this emulator run.",
         "evidence": [
@@ -259,7 +259,7 @@
       },
       {
         "area": "Patient-first and separate family confirmations",
-        "status": "Implemented in combined source and restored backend; prior synthetic backend checks passed, current combined-source Android migration checks pending",
+        "status": "Implemented in combined source and restored backend; current-source Android preserving migration fixtures and restored-service synthetic backend checks passed",
         "implemented": "Room schema 6 retains separate immutable acknowledgement IDs and both branches' recording/confirmation metadata, with explicit preserving migrations from schemas 3, 4 and 5. A patient confirmation must exist before additional family confirmations for the exact latest note ID and content hash. Retries return the original confirmation. Legacy family-only rows are preserved without being treated as patient consent; the prior ID collision is handled. Backend permission and patient-first checks remain enforced.",
         "remaining": "Names and Patient, Family and Doctor roles remain self-entered. These records are not verified identities, legal signatures, consent directives or treatment orders. Cross-user Android interaction was not established by the synthetic API roundtrip.",
         "evidence": [
@@ -276,7 +276,7 @@
       },
       {
         "area": "Shared conversation requests and named tasks",
-        "status": "Combined native source implemented; earlier branch emulator/API evidence is historical, current-source runtime verification pending",
+        "status": "Current-source emulator request/queue and task persistence checks passed; optimized task save with IME and restart persistence passed",
         "implemented": "The care team view now stores actual conversation requests and named tasks. Doctor view presents a conversation queue. Acceptance and completion retain the entered actors and times; shared signed-in records use the existing authenticated backend and revision checks. Sender-facing status and saved task state survived emulator recreation.",
         "remaining": "These are care-circle records, not dispatched calls, push notifications or email. Entered names and generic edit permission do not verify a professional identity. Older 0.4 clients render the new structured details as ordinary tasks; care-team clients should update together.",
         "evidence": [
@@ -289,8 +289,8 @@
       },
       {
         "area": "Native calendar and numeric lab history",
-        "status": "Combined source implemented; current-source build, persistence and runtime checks pending",
-        "implemented": "The calendar uses actual dated medicines, visits, tests, procedures, follow-ups, requests and tasks; undated medicines are separate and no recurrence is invented. Lab history keeps numeric values, report dates, exact units, optional report links and copied printed limits. Incompatible units are separate series. High/Low labels compare only explicit numeric limits for that result; textual or age-specific range text is not interpreted. Switching people keeps records isolated. Calendar, lab and care-team editors now use the existing fully expanded sheet pattern to reduce keyboard-entry friction; current-source visual and keyboard verification is still required.",
+        "status": "Current-source debug persistence and person-isolation checks passed; optimized Calendar/Care team/Labs saves above actual IME and process-restart persistence passed",
+        "implemented": "The calendar uses actual dated medicines, visits, tests, procedures, follow-ups, requests and tasks; undated medicines are separate and no recurrence is invented. Lab history keeps numeric values, report dates, exact units, optional report links and copied printed limits. Incompatible units are separate series. High/Low labels compare only explicit numeric limits for that result; textual or age-specific range text is not interpreted. Switching people keeps records isolated. Calendar, lab and care-team editors use the existing fully expanded sheet pattern. Actual optimized-release IME/window evidence verifies their save controls above the keyboard; selected debug images were inspected at 384 dp without OS overlays. This is CI emulator evidence, not physical-device verification.",
         "remaining": "No diagnosis, clinical reference ranges, treatment recommendation, medicine-alert schedule or external appointment booking is supplied. Report links depend on a private report copy on that phone.",
         "evidence": [
           "android/app/src/main/java/in/wedevit/care/CareSchedule.kt:30",
@@ -331,7 +331,7 @@
       },
       {
         "area": "Fictional doctor workspace",
-        "status": "Upstream source merged; current combined-source build/runtime checks pending",
+        "status": "Combined source built and signed; current-source preview-consent guard and separate five-page debug PDF check passed, optimized publication/PDF and exit checks unfinished",
         "implemented": "An isolated local preview includes patient search, dated sample progress and medicine reports, searchable text-summary reports, scheduling, consented local recording/playback, manual review, immutable unverified preview versions and explicitly marked PDF exports. It retains source/account separation and visible preview disclosures.",
         "remaining": "Fictional patients, self-entered review names and local preview responses do not verify clinicians, patient-family identities, real delivery, a shared server clinical workflow or generative clinical AI. The release does not upload or transcribe audio. Preview retention differs from real-account data: account changes/deletion do not clear the preview; individual preview-recording deletion is not available, and clearing app data/uninstalling removes it.",
         "evidence": [
@@ -346,45 +346,83 @@
     "verification": {
       "currentCombinedSource": {
         "commit": "ebffb7b043a5e8725f190ab8f8f3574c768d9058",
+        "mainSourceTree": "b1c5ad0d17f5a0148f7f51241e1b7644b2941471",
+        "mainSourceUnchangedFromBuiltCommit": true,
         "expectedPackage": "in.wedevit.sahara",
         "expectedVersion": "0.5.0",
         "expectedVersionCode": 6,
         "build": {
-          "status": "pending",
+          "status": "success",
           "ciRunId": 38881300006,
           "ciUrl": "https://github.com/basithladdu/healthathon/actions/runs/38881300006",
           "unsignedBuildOnly": true,
-          "localCompletion": "Not established; desktop failure interrupted dex processing."
+          "unsignedPackageHashesMatched": true,
+          "receipt": "output/android/verification/0.5.0/combined-build-checks.json",
+          "localCompletion": "Local compilation was interrupted during dex processing; actual packages were built in CI and then signed and verified locally. No private signing material was uploaded."
         },
         "unitTests": {
-          "status": "pending",
-          "passed": null,
-          "failures": null,
-          "errors": null
+          "status": "passed",
+          "suites": 16,
+          "passed": 104,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
         },
         "fullLint": {
-          "status": "pending",
-          "errors": null,
-          "warnings": null
+          "status": "passed",
+          "variant": "debug",
+          "errors": 0,
+          "warnings": 37
+        },
+        "releaseVitalLint": {
+          "taskInSuccessfulCiStep": true,
+          "separateXmlCollected": false,
+          "numericIssueCountsEstablished": false
         },
         "runtime": {
-          "status": "pending",
-          "currentSourcePassed": null,
-          "currentSourceSkipped": null,
+          "status": "partial; focused rerun required",
+          "ciRunId": 38882501784,
+          "receipt": "output/android/verification/0.5.0/ci-runtime-38882501784/inspection.json",
+          "currentSourcePassed": 31,
+          "currentSourceSkipped": 1,
+          "currentSourceFailedExpectations": 4,
+          "errors": 0,
+          "failureScope": "Two stale Conversation selectors, one offscreen privacy assertion and one exact-versus-partial Verification pending expectation; corrected rerun required, not counted as passes.",
+          "migrationFixturesPassed": 7,
+          "environment": "Fresh disposable API 36 CI emulator, 384 dp, 4 KB pages; Windows emulator databases untouched, no credentials/provider/microphone used.",
           "localEmulatorRunning": false,
-          "remoteQa": "Being prepared separately; no result claimed."
+          "separatePdfPagination": {
+            "passed": true,
+            "pages": 5,
+            "sourceLines1Through130Preserved": true,
+            "sampleWarningsAndFootersEveryPage": true,
+            "scope": "Fictional debug fixture; separate from unfinished optimized UI PDF creation."
+          },
+          "optimizedRelease": {
+            "overallPassed": false,
+            "ephemeralCiSignerDiffersFromStoreSigner": true,
+            "flagSecurePreserved": true,
+            "passed": "Person creation; Calendar/Care team/Labs save above actual IME and process-restart persistence; main-care and doctor local-only consent guards without opening microphone.",
+            "unfinished": "Doctor preview publication/PDF and exit preserving original person; harness swipe started in bottom navigation outside the scrollable content. No app-code change was made for this gesture."
+          },
+          "remoteQa": "Actual first-run results inspected; focused corrections and doctor completion are being prepared separately."
         },
         "signedRelease": {
-          "builtAndVerified": false,
-          "packageAndVersionVerified": false,
-          "apkSignatureVerified": false,
-          "bundleJarSignatureVerified": false,
-          "sameSignerAs041Verified": false,
-          "static16KbZipAndElfAlignmentVerified": false,
+          "builtAndVerified": true,
+          "packageAndVersionVerified": true,
+          "apkNonDebuggable": true,
+          "apkSignatureVerified": true,
+          "bundleJarSignatureVerified": true,
+          "sameSignerAs041Verified": true,
+          "static16KbZipAndElfAlignmentVerified": true,
+          "nativeElfLibraryCount": 4,
+          "privateSigningMaterialUploaded": false,
           "runtime16KbVerified": false,
           "optimizedReleaseUiVerified": false,
           "cleanVisualQaVerified": false,
-          "physicalDevice050Verified": false
+          "physicalDevice050Verified": false,
+          "visualScope": "Selected current-source debug captures were inspected at 384 dp without OS overlays; complete optimized UI verification remains unfinished.",
+          "receipt": "output/android/verification/0.5.0-artifacts.json"
         }
       },
       "historicalBranchEvidence": {
@@ -431,6 +469,8 @@
         ".github/workflows/android-build.yml",
         "android/scripts/verify-release.py",
         "output/android/verification/0.5.0-artifacts.json",
+        "output/android/verification/0.5.0/combined-build-checks.json",
+        "output/android/verification/0.5.0/ci-runtime-38882501784/inspection.json",
         "output/android/verification/0.5.0/debug-runtime-result.json",
         "output/android/verification/0.5.0-cloud-roundtrip.json",
         "output/android/verification/ack-migration-sqlite-2026-10-16.json",
@@ -442,7 +482,7 @@
       "candidateUploaded": false,
       "candidateSubmitted": false,
       "productionStatus": "Production 0.4.1 remains Changes in review; preserve that review. This is not production approval or availability of 0.5.",
-      "nextStep": "Inspect actual combined-source CI and runtime results, sign and verify fresh same-package artifacts locally, then save one verified 0.5 Alpha draft without replacing Production 0.4.1 review. Prepared listing/reviewer text remains local; do not change global review material used by the in-review version.",
+      "nextStep": "Complete the focused rerun of four corrected test expectations and optimized doctor publication/PDF/exit checks, inspect the actual results, then prepare one verified 0.5 Alpha draft without replacing Production 0.4.1 review. Build, existing-key signing and static verification are complete. Prepared listing/reviewer text remains local; do not change global review material used by the in-review version.",
       "existingClosedTest": "Alpha 0.4.1 is already available and both original and additional invitation groups were sent. Do not resend invitations."
     },
     "rawSourcePreservation": {

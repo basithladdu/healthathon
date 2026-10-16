@@ -1,0 +1,207 @@
+{
+  "buildSourceCommit": "ebffb7b043a5e8725f190ab8f8f3574c768d9058",
+  "appSourceTree": "90adbbf8c22aa5f659b2d8c58baf4bd19fbd2b2b",
+  "harnessCommit": "91dc5db3c47ed2f28941a5618873ee7b67c0bf26",
+  "workflowRunId": 38882501784,
+  "workflowUrl": "https://github.com/basithladdu/healthathon/actions/runs/38882501784",
+  "artifactZipSha256": "F6DAEB2B09671A714A36A328E70F412E36764D0D524951F9D8AF2A71BC8C14E1",
+  "matrix": {
+    "pass": 31,
+    "credentialDependentSkip": 1,
+    "failures": 4,
+    "allPassed": false
+  },
+  "failureAnalysis": [
+    {
+      "test": "CareFlowTest#roleMenuKeepsDraftAndPatientChoiceAfterRecreation",
+      "observed": "Test requests old editable label Conversation; actual current label is Conversation transcript. Assertion never reaches saved text.",
+      "classification": "Stale test selector; corrected rerun required."
+    },
+    {
+      "test": "CareFlowTest#conversationReviewSavesExactVersionAndSurvivesRecreation",
+      "observed": "Same old editable label mismatch.",
+      "classification": "Stale test selector; complete publish/version flow still requires corrected rerun."
+    },
+    {
+      "test": "CareFlowTest#checkinSavesChosenWordsAndKeepsOptionalNote",
+      "observed": "Saved check-in was verified before an offscreen privacy-text assertIsDisplayed failed; test did not scroll new More layout.",
+      "classification": "Test viewport assumption; privacy assertion requires scrolling and rerun."
+    },
+    {
+      "test": "PatientDoctorUiTest#replacingPatientLinkClearsOldDetailsAndPendingIsNotVerified",
+      "observed": "Actual semantics say Verification pending; assertTextContains uses exact matching by default without substring=true.",
+      "classification": "Partial-text test expectation mismatch; corrected rerun required."
+    }
+  ],
+  "optimizedMode": {
+    "overallPassed": false,
+    "ephemeralCiSignerDiffersFromStoreSigner": true,
+    "flagSecurePreserved": true,
+    "passedActualChecks": [
+      "Person create with IME visible",
+      "Calendar save above visible IME plus process restart/reopen",
+      "Named task save above visible IME plus process restart",
+      "Lab value/unit save above visible IME plus process restart",
+      "Main care local-only recording consent without cloud option",
+      "Doctor local consent entry/cancel without cloud action"
+    ],
+    "unfinished": [
+      "Fictional doctor preview publish/PDF creation",
+      "Doctor exit preserving original main person"
+    ],
+    "harnessFailure": "Swipe started at y1420 inside bottom navigation; actual doctor scroll surface ends y1405. Current helper now derives gestures from the actual scrollable node bounds. No app code change made."
+  },
+  "pdf": {
+    "separateInstrumentedCheck": "pass",
+    "pages": 5,
+    "allSourceLines1Through130Preserved": true,
+    "allPagesHaveSampleWarningAndPageFooter": true,
+    "firstAndLastPagesVisuallyInspectedOnWhite": true,
+    "source": "Fictional fixture only; debug export is separate from unfinished optimized UI PDF creation."
+  },
+  "visualReview": {
+    "inspected": [
+      "calendar-dated-visit.png",
+      "lab-history-series.png",
+      "care-task-completed.png",
+      "conversation-request-picked-up.png",
+      "fictional-patient-hub.png",
+      "doctor-local-capture.png",
+      "doctor-consent-unchecked.png",
+      "pdf-page-1.png",
+      "pdf-page-5.png"
+    ],
+    "result": "Readable, no OS ANR overlay; actual 384dp layout and bottom navigation visible. Routine Saved toast is preserved. These are debug images, not optimized release screenshots."
+  },
+  "environment": {
+    "freshDisposableCiEmulator": true,
+    "api": 36,
+    "logicalWidthDp": 384,
+    "resolution": "720x1600",
+    "densityDpi": 300,
+    "pageSize": 4096,
+    "physicalDevice": false,
+    "sixteenKbRuntimeTest": false,
+    "windowsLocalDatabasesUntouched": true,
+    "sevenHistoricalMigrationFixturesPassed": true
+  },
+  "limitations": [
+    "No real provider, microphone, account credentials, physical device or clinical validation.",
+    "Four failed test expectations are not silently counted as passes.",
+    "Original optimized signer differs from final store upload signer."
+  ],
+  "evidenceFiles": [
+    {
+      "path": "artifacts.json",
+      "sha256": "FD2552055C7AE1B2C35CF4202F5835FAD64FE402AD37DC796390667317C62C01"
+    },
+    {
+      "path": "calendar-dated-visit.png",
+      "sha256": "F93CB0838B9A9551400403BA0124DCD3325F092E3989E2D71CBFC17FA89E1DE3"
+    },
+    {
+      "path": "care-task-completed.png",
+      "sha256": "1F63BABFCF5D29F961373C9A7E81AD6E9091CF2DD39D574B47636ACCDCC568FC"
+    },
+    {
+      "path": "conversation-request-picked-up.png",
+      "sha256": "6FBDB772F7379363871C6D0FECD44677AEA7A25EFD215B1BDD8DE53D850B97C1"
+    },
+    {
+      "path": "doctor-consent-unchecked.png",
+      "sha256": "05348B396A5C2612EC586101D81C9A6E5950862E4ACAC35902763A1B4000AF7B"
+    },
+    {
+      "path": "doctor-local-capture.png",
+      "sha256": "1E9C2FE54D0A39665B1D8641A19BD575139AD2EF2E8D29FF9FD5D5B9B5BF939D"
+    },
+    {
+      "path": "doctor-preview-login.png",
+      "sha256": "F672C40E479BB611DFB4ED87E0AAA444B8A20D39864F78DD35BAE9E3E6FEB806"
+    },
+    {
+      "path": "doctor-workspace.png",
+      "sha256": "DF1A4522658358D33161496931DECF7086D1D3964E1FC77DE333A629A1667944"
+    },
+    {
+      "path": "fictional-patient-hub.png",
+      "sha256": "FE28FA9332700868FA7A0F3BE59AEC1A00C1927F41E487AEE49811DCA4769CF1"
+    },
+    {
+      "path": "fictional-preview.pdf",
+      "sha256": "EBA7FB8509164C287A2E5C718E551E99A38B9EB540302897A7A5195A9B1753D8"
+    },
+    {
+      "path": "lab-history-series.png",
+      "sha256": "03DF40F9A896642BBCF0ED888230327958AE2FB8117DB9EAFF47B93F29EEEE48"
+    },
+    {
+      "path": "matrix-36.json",
+      "sha256": "876247B8E11BA9E64A69B76AE05857CFFE3159633B332236A11805506B46A706"
+    },
+    {
+      "path": "matrix-36.txt",
+      "sha256": "0D73ABFFEA1E6C72BD86DF9C22DCD1CB0EF1215BDD568B389FF4B2AA0F9F75D8"
+    },
+    {
+      "path": "optimized-release-smoke.json",
+      "sha256": "FA38E7DE9FC7DA8456DD92AF96E903028A608B7E7D92F569222A7FF6A7B728ED"
+    },
+    {
+      "path": "optimized-ui/093-failure.xml",
+      "sha256": "66A4A7912D871D6EA4631E615D8134F31C2D83714B2D301C4A5A43B636746EC7"
+    },
+    {
+      "path": "optimized-ui/calendar-ime.txt",
+      "sha256": "7BAD1D93CDD2AFB085C4622392609EA051850D488A3162F0ADFA5E5EE536361C"
+    },
+    {
+      "path": "optimized-ui/calendar-window.txt",
+      "sha256": "0C56D12A9FBA9654534E6596742F0E21DBCFA6EDD54AFDC70CD0E46AC9D14B25"
+    },
+    {
+      "path": "optimized-ui/failure-trace.txt",
+      "sha256": "BA15E2A140A139AA2E7CEF1DAF6C50551B97AB09316535FF9530A6E7CF94B0A3"
+    },
+    {
+      "path": "optimized-ui/labs-ime.txt",
+      "sha256": "6EDFD857C65C3E880CFD7BE53C0E3BD258BAFCE770DEC274443674EA7D74E80D"
+    },
+    {
+      "path": "optimized-ui/labs-window.txt",
+      "sha256": "BF266CE13347931431BB825564ED26835D647582F3DA3FDC63EA5BDD2406948D"
+    },
+    {
+      "path": "optimized-ui/person-ime.txt",
+      "sha256": "FEEB51A03DBC078B62E7C5DD9DDE09B2D61EC2A61C219ACF1402769B25C24C52"
+    },
+    {
+      "path": "optimized-ui/person-window.txt",
+      "sha256": "EDD3F28D8696B8B4A68B1C907BD00EC7EC545C5A5636EC47FE6383AC61C394F4"
+    },
+    {
+      "path": "optimized-ui/task-ime.txt",
+      "sha256": "85E718172682C0368C1E3B8594F3E87CEEBAC643D0A708FFC3CFAA4F95CFD5F8"
+    },
+    {
+      "path": "optimized-ui/task-window.txt",
+      "sha256": "CA1E9A13F3F01F4CA05F3B91AE0188576178C27FB3D8FF2FD970F61CE1A0C0CC"
+    },
+    {
+      "path": "pdf-page-1.png",
+      "sha256": "4D968CB95AF4C1326C43CB001293C9DEB5AAECB2DD919888CA77A0ED8EC0EFBE"
+    },
+    {
+      "path": "pdf-page-5.png",
+      "sha256": "CF408B6705FCBC0879B32CAC09B7DF9C2B8F3EE7856035B36253C5B9A6B08E94"
+    },
+    {
+      "path": "pdf-pagination.json",
+      "sha256": "9879FB2FE4FA912FFE899DE0B3C18E78A6C2C3992CFCDC9A079D20D6EA8D1DF8"
+    },
+    {
+      "path": "runtime-summary.json",
+      "sha256": "E7F146CC540C24FC4F55D7394820E33150419E9ABDA2EE027691FDCBBDF2622B"
+    }
+  ]
+}

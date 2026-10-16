@@ -4,3 +4,6 @@ source-materials/meetings/2026-09-21-transcript.txt -text
 source-materials/healthathon/2026-09-22-homepage-user-copy.txt -text whitespace=cr-at-eol
 # Keep PDF byte offsets intact on Windows checkouts.
 *.pdf binary
+# Keep captured CI evidence byte-identical; raw system dumps are not source code.
+output/android/verification/0.5.0/ci-runtime-*/** -text whitespace=cr-at-eol
+output/android/verification/0.5.0/ci-runtime-*/**/*.txt -diff

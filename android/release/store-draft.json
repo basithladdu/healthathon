@@ -193,12 +193,12 @@
   "nextBuild": {
     "version": "0.5.0",
     "versionCode": 6,
-    "built": false,
+    "built": true,
     "ready": false,
     "uploaded": false,
     "submitted": false,
     "installed": false,
-    "status": "Combined source built successfully in CI; local signing/static checks and current-source runtime verification are in progress. No 0.5 upload or submission yet. Production 0.4.1 remains in review.",
+    "status": "Signed 0.5.0 (6) built and statically verified; 104 unit passes, debug lint 0 errors / 37 warnings. First runtime has 31 passes, one expected auth skip and four stale expectations requiring focused rerun; separate PDF pagination passed. Alpha draft ID 4 has its name and release notes saved; no bundle upload or submission yet.",
     "apk": "output/android/Sahara-0.5.0-release.apk",
     "bundle": "output/android/Sahara-0.5.0.aab",
     "sourceCommit": "ebffb7b043a5e8725f190ab8f8f3574c768d9058",
@@ -240,22 +240,35 @@
       ],
       "service": "Reviewer sign-in and authenticated read PASS, no patient data printed",
       "unitTests": {
-        "result": "PASS in CI; exact XML counts pending artifact inspection"
+        "tests": 104,
+        "suites": 16,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "result": "PASS",
+        "report": "output/android/verification/0.5.0/combined-build-checks.json"
       },
       "fullLint": {
-        "result": "PASS in CI; exact XML counts pending artifact inspection"
+        "errors": 0,
+        "warnings": 37,
+        "result": "PASS",
+        "variant": "debug",
+        "vitalReleaseTaskPassed": true,
+        "separateReleaseXmlCollected": false,
+        "report": "output/android/verification/0.5.0/combined-build-checks.json"
       },
       "cloudRoundtrip": "PASS: synthetic lab/request/task payloads, task revisions, immutable note and separate confirmations; exact fixture cleanup. output/android/verification/0.5.0-cloud-roundtrip.json",
-      "runtime": "Current-source remote 36-test matrix, separate PDF pagination test and optimized UI smoke are running in CI 38882501784. Earlier 475 tests and 9bd packages are historical, not verification of the merged build.",
+      "runtime": "First run 38882501784: 31 pass, 1 auth skip, 4 failures, PDF pagination PASS, optimized smoke failed; causes under investigation. Do not claim ready or uploaded.",
       "buildMemory": "Local compilation was interrupted under shared-host memory pressure. Unsigned packages and checks completed on a standard GitHub runner; the upload key stays local. Current CI source and runtime evidence are recorded separately; no Windows emulator was restarted.",
       "releaseBuild": {
-        "result": "PASS in CI for assembleRelease, bundleRelease, unit tests, lintDebug and lintVitalRelease; final local signing/static verification pending",
+        "result": "PASS: actual current-source CI APK/AAB, local upload-key signatures and static checks verified",
         "log": "https://github.com/basithladdu/healthathon/actions/runs/38881300006",
         "tasks": "assembleRelease, bundleRelease, lintVitalRelease",
         "artifactReport": "output/android/verification/0.5.0-artifacts.json",
-        "packageVersionSignerAndSignatures": "Pending inspection of current CI packages and local signatures",
-        "static16KbZipAndElfAlignment": "Pending current CI package inspection",
-        "runtime16KbVerified": false
+        "packageVersionSignerAndSignatures": "PASS: in.wedevit.sahara, 0.5.0 (6), non-debuggable APK, APK v2/v3 and AAB JAR signature; same upload signer as 0.4.1",
+        "static16KbZipAndElfAlignment": "PASS: ZIP alignment and all four 64-bit ELF libraries; native bytes unchanged. Runtime page-size validation is separate.",
+        "runtime16KbVerified": false,
+        "releaseCloudAudioEnabled": false
       },
       "ciBuild": {
         "runId": 38881300006,
@@ -278,15 +291,15 @@
           "result": "PASS",
           "log": "android/sahara-050-lint-lowmem.log"
         },
-        "releaseBuild": {
-          "result": "PASS in CI for assembleRelease, bundleRelease, unit tests, lintDebug and lintVitalRelease; final local signing/static verification pending",
-          "log": "https://github.com/basithladdu/healthathon/actions/runs/38881300006",
-          "tasks": "assembleRelease, bundleRelease, lintVitalRelease",
-          "artifactReport": "output/android/verification/0.5.0-artifacts.json",
-          "packageVersionSignerAndSignatures": "Pending inspection of current CI packages and local signatures",
-          "static16KbZipAndElfAlignment": "Pending current CI package inspection",
-          "runtime16KbVerified": false
-        }
+        "qualification": "Earlier branch only; superseded pre-keyboard artifacts are recorded separately. These counts do not verify combined source."
+      },
+      "focusedRuntime": {
+        "runId": 38887001702,
+        "url": "https://github.com/basithladdu/healthathon/actions/runs/38887001702",
+        "harnessCommit": "f597392e0ebc48df9355d5ba550da3cc006a1b37",
+        "buildSourceCommit": "ebffb7b043a5e8725f190ab8f8f3574c768d9058",
+        "status": "queued",
+        "qualification": "Four corrected expectations plus unfinished optimized doctor PDF/exit; original passing checks preserved separately."
       }
     },
     "releasePrerequisites": [
@@ -299,6 +312,18 @@
       "apkSha256": "1A55AE8225525574732BB54340E60D24386B88006E5EFA07F077E64266516995",
       "bundleSha256": "5B81B459658CDEF443F61697603DED8229D65078C8D8BA4821CA6D8710361EC3",
       "reason": "Release smoke found avoidable partial-sheet expansion after keyboard entry. New Schedule/Labs/Workflow editors now match the existing full-expansion pattern."
+    },
+    "apkSha256": "92784229A6BDA11BCBA82371F975BD6E58126CD2D7E5F9BB3B8EE674872EC44E",
+    "bundleSha256": "F6F9C281712A67F107B2F6EE51066B5F024936170C4D795B2E025A7E7E22009B",
+    "playDraft": {
+      "releaseId": 4,
+      "track": "Alpha",
+      "trackId": "4699010624330920429",
+      "url": "https://play.google.com/console/u/1/developers/8795679408143615220/app/4974759245808215344/tracks/4699010624330920429/releases/4/prepare",
+      "nameAndReleaseNotesSaved": true,
+      "bundleUploaded": false,
+      "submitted": false,
+      "observedAtUtc": "2026-10-16T10:20:02.4794385Z"
     }
   },
   "productionRelease": {

@@ -1,0 +1,75 @@
+{
+  "checkedAtUtc": "2026-10-16T10:01:51.990187+00:00",
+  "apkManifest": {
+    "package": "in.wedevit.sahara",
+    "versionCode": "6",
+    "versionName": "0.5.0"
+  },
+  "bundleManifest": {
+    "package": "in.wedevit.sahara",
+    "versionCode": "6",
+    "versionName": "0.5.0"
+  },
+  "apkSha256": "92784229A6BDA11BCBA82371F975BD6E58126CD2D7E5F9BB3B8EE674872EC44E",
+  "bundleSha256": "F6F9C281712A67F107B2F6EE51066B5F024936170C4D795B2E025A7E7E22009B",
+  "nativeLibraries": [
+    {
+      "path": "lib/arm64-v8a/libandroidx.graphics.path.so",
+      "sha256": "41E9A793C43A0F4FDDB19E33F346BACE464F30F888BA7B9EAF96294EA115BFB6",
+      "elf16KbAligned": true,
+      "bundleMatchesApk": true,
+      "sameAsPrevious": true
+    },
+    {
+      "path": "lib/arm64-v8a/libmaplibre.so",
+      "sha256": "D3A1AB9B9D056D84B93F2AA5F676D20D2D76723952DFCD8BD8D203D6ECA6980D",
+      "elf16KbAligned": true,
+      "bundleMatchesApk": true,
+      "sameAsPrevious": true
+    },
+    {
+      "path": "lib/x86_64/libandroidx.graphics.path.so",
+      "sha256": "4E56C996F13670E70082658DE7880C4020EABF4F25E43387F88ED78A713FC9F0",
+      "elf16KbAligned": true,
+      "bundleMatchesApk": true,
+      "sameAsPrevious": true
+    },
+    {
+      "path": "lib/x86_64/libmaplibre.so",
+      "sha256": "55175BF2DFB64AA31A555CF8DF5846C1C736C10A4946162C175AE948AD189774",
+      "elf16KbAligned": true,
+      "bundleMatchesApk": true,
+      "sameAsPrevious": true
+    }
+  ],
+  "runtime16KbVerified": false,
+  "signatureVerification": {
+    "apkVerified": true,
+    "apkSchemes": {
+      "v1": false,
+      "v2": true,
+      "v3": true,
+      "v3.1": false,
+      "v4": false
+    },
+    "bundleJarVerified": true,
+    "bundleCertificateMatchesApk": true,
+    "uploadSignerSha256": "607d227a8b25bf7126bbcd742110bbba26f8ba9d75a2f47917013e9589341ad2",
+    "sameSignerAs041": true,
+    "zipAlignment16KbVerified": true
+  },
+  "sourceCommit": "ebffb7b043a5e8725f190ab8f8f3574c768d9058",
+  "appSourceTree": "90adbbf8c22aa5f659b2d8c58baf4bd19fbd2b2b",
+  "ciRunUrl": "https://github.com/basithladdu/healthathon/actions/runs/38881300006",
+  "ciBuildStatus": "success",
+  "ciBuildReceipt": "output/android/verification/0.5.0/combined-build-checks.json",
+  "releaseCloudAudioEnabled": false,
+  "unsignedCiPackageHashesMatched": true,
+  "workingTreeBuildInputsMatchCi": true,
+  "apkPath": "output/android/Sahara-0.5.0-release.apk",
+  "bundlePath": "output/android/Sahara-0.5.0.aab",
+  "privateSigningMaterialUploaded": false,
+  "apkDebuggable": false,
+  "zipCrcVerified": true,
+  "releaseDeviceVerification": "Not established by static verification; see separate runtime receipt"
+}
