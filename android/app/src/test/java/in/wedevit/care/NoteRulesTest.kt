@@ -37,5 +37,56 @@ class NoteRulesTest {
         assertEquals(original.id, ack.versionId)
         assertEquals(original.contentHash, ack.contentHash)
     }
+    @Test fun aPublishedDemoNoteCannotClaimVerifiedClinicalReview() {
+        val note = NoteRules.publish(person, NoteRules.organise(draft), "Doctor", true, 1)
+        assertEquals(ReviewWorkflow.MANUAL_DRAFT, note.draftOrigin)
+        assertEquals(ReviewWorkflow.REVIEWED_UNVERIFIED, note.reviewStatus)
+        assertEquals(ReviewWorkflow.NOT_VERIFIED, note.reviewerVerification)
+        assertTrue(ReviewWorkflow.label(note).contains("not verified"))
+    }
+    @Test fun recordingConsentNamesEveryParticipantAndRequiresEachAgreement() {
+        val participants = "Patient, Mother\nDr Rao, patient"
+        assertEquals(listOf("Patient", "Mother", "Dr Rao"), RecordingConsentRules.names(participants))
+        assertThrows(IllegalArgumentException::class.java) {
+            RecordingConsentRules.create(person.id, "/recording.m4a", participants, setOf("Patient", "Mother"), true, true, true, now = 123L)
+        }
+        val consent = RecordingConsentRules.create(person.id, "/recording.m4a", participants, setOf("Patient", "Mother", "Dr Rao"), true, true, true, now = 123L)
+        assertEquals("Patient\nMother\nDr Rao", consent.participants)
+        assertEquals(123L, consent.recordingConsentAt)
+        assertEquals(0L, consent.transcriptionConsentAt)
+    }
+    @Test fun recordingAndFutureTranscriptionConsentAreSeparate() {
+        assertThrows(IllegalArgumentException::class.java) {
+            RecordingConsentRules.create(person.id, "/recording.m4a", "Patient", setOf("Patient"), true, false, true)
+        }
+        val consent = RecordingConsentRules.create(
+            person.id, "/recording.m4a", "Patient", setOf("Patient"),
+            purposeAccepted = true, storageAccepted = true, accessAccepted = true,
+            transcriptionAccepted = true, now = 456L,
+        )
+        assertEquals(456L, consent.recordingConsentAt)
+        assertEquals(456L, consent.transcriptionConsentAt)
+    }
+    @Test fun transcribedDraftKeepsItsProvenanceWhenPublished() {
+        val transcribed = NoteRules.organise(draft.copy(
+            transcriptProvider = "google-gemini",
+            transcriptModel = "gemini-3.5-transcribe",
+            transcribedAt = 456L,
+            transcriptAudioPath = "/recording.m4a",
+        ))
+        val note = NoteRules.publish(person, transcribed, "Doctor", true, 1)
+        assertEquals(ReviewWorkflow.TRANSCRIBED_DRAFT, note.draftOrigin)
+        assertEquals("gemini-3.5-transcribe", note.transcriptionModel)
+        assertEquals(456L, note.transcribedAt)
+        assertTrue(NoteRules.text(note).contains("AI-generated"))
+    }
+    @Test fun transcriptResponseMustCarryTrustedProvenance() {
+        val transcript = sanitizeConversationTranscript("""{"transcript":"[00:01] spk_1: Hello","provider":"google-gemini","model":"gemini-3.5-transcribe","languages":["en-IN"]}""")
+        assertEquals("[00:01] spk_1: Hello", transcript.text)
+        assertEquals(listOf("en-IN"), transcript.languages)
+        assertThrows(ConversationTranscriptionException::class.java) {
+            sanitizeConversationTranscript("""{"transcript":"Hello","provider":"unknown","model":"model"}""")
+        }
+    }
     @Test fun hashCannotConfuseFieldBoundaries() { assertNotEquals(NoteRules.hash(listOf("ab", "c")), NoteRules.hash(listOf("a", "bc"))) }
 }

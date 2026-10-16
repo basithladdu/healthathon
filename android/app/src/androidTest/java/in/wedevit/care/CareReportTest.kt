@@ -59,13 +59,13 @@ class CareReportTest {
             old.execSQL("INSERT INTO CareItem(id,personId,kind,title,detail,due,doneOn,created,revision) VALUES(?,?,?,?,?,?,?,?,?)", arrayOf(task.id, person.id, task.kind, task.title, "", 0, task.doneOn, task.created, task.revision))
             old.version = 2
         }
-        var db = Room.databaseBuilder(context, CareDatabase::class.java, filename).addMigrations(ReportsMigration).build()
+        var db = Room.databaseBuilder(context, CareDatabase::class.java, filename).addMigrations(ReportsMigration, CombinedCareMigration3To5, CombinedCareMigration4To5).build()
         try {
             assertEquals(person, db.care().people().first().single())
             assertEquals(task, db.care().items(person.id).first().single())
             val report = CareReport(personId = person.id, name = "Saved scan.pdf", mime = "application/pdf", fileName = "test.pdf", bytes = 123)
             db.care().addReport(report); db.close()
-            db = Room.databaseBuilder(context, CareDatabase::class.java, filename).addMigrations(ReportsMigration).build()
+            db = Room.databaseBuilder(context, CareDatabase::class.java, filename).addMigrations(ReportsMigration, CombinedCareMigration3To5, CombinedCareMigration4To5).build()
             assertEquals(report, db.care().reports(person.id).first().single())
             assertTrue(db.care().reports(newId()).first().isEmpty())
             assertEquals(task, db.care().items(person.id).first().single())

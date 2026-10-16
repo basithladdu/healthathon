@@ -41,6 +41,11 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
 @Composable fun CareRoot(activity: MainActivity) {
     val root = remember { ViewModelProvider(activity)[CareRootModel::class.java] }
     val cloud = root.cloud
+    var demoOpen by rememberSaveable { mutableStateOf(false) }
+    if (demoOpen) {
+        DoctorDemo(onExit = { demoOpen = false }, cloud = cloud)
+        return
+    }
     val session by cloud.session.collectAsStateWithLifecycle()
     key(session?.userId.orEmpty()) {
         val store = remember { root.storeFor(session?.userId.orEmpty()) }
@@ -50,8 +55,34 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
         })[CareModel::class.java] }
         SideEffect { activity.careModel = model }
         var accountOpen by rememberSaveable { mutableStateOf(false) }
-        CareApp(model, onAccount = { accountOpen = true })
+        CareApp(model, onAccount = { accountOpen = true }, onDoctorDemo = {
+            if (model.recording.value) model.message.value = "Stop the recording before opening the doctor demo."
+            else demoOpen = true
+        })
         if (accountOpen) AccountSheet(cloud, model, onDismiss = { accountOpen = false })
+    }
+}
+
+/** Account authentication only. Never grants clinical verification or loads patient records. */
+@Composable fun DoctorAiAccountSheet(cloud:CareCloud,onDismiss:()->Unit) {
+    val session by cloud.session.collectAsStateWithLifecycle()
+    val scope=rememberCoroutineScope()
+    var email by rememberSaveable { mutableStateOf("") };var password by remember { mutableStateOf("") }
+    var busy by remember { mutableStateOf(false) };var error by remember { mutableStateOf<String?>(null) }
+    ModalBottomSheet(onDismissRequest={if(!busy)onDismiss()},sheetState=rememberModalBottomSheetState(skipPartiallyExpanded=true),containerColor=Cream) {
+        Column(Modifier.fillMaxWidth().imePadding().verticalScroll(rememberScrollState()).padding(22.dp),verticalArrangement=Arrangement.spacedBy(16.dp)) {
+            Heading("Sahara AI sign-in",26)
+            Text("Use your real Sahara account for authenticated online requests. This does not verify you as a doctor or grant access to any patient.")
+            if(session!=null) { Text("Account connected",color=Rust);TextButton(onClick=onDismiss) { Text("Return to conversation") } }
+            else {
+                OutlinedTextField(email,{email=it},singleLine=true,label={Text("Sahara account email")},keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Email),modifier=Modifier.fillMaxWidth())
+                OutlinedTextField(password,{password=it},singleLine=true,label={Text("Password")},visualTransformation=PasswordVisualTransformation(),keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Password),modifier=Modifier.fillMaxWidth())
+                Button(onClick={if(!busy){busy=true;error=null;scope.launch {try {cloud.signIn(email,password);password="";onDismiss()}catch(e:Exception){if(e is CancellationException)throw e;error="Sign-in did not finish. Check your email, password and confirmation status."}finally{busy=false}}}},enabled=!busy && email.contains('@') && password.isNotEmpty(),modifier=Modifier.fillMaxWidth().heightIn(min=52.dp)) { Text(if(busy) "Signing in…" else "Sign in") }
+                Text("The prefilled doctor preview credentials are not a real account. To create an account, return to Sahara → Your account.",style=MaterialTheme.typography.bodySmall)
+            }
+            error?.let {Text(it,color=MaterialTheme.colorScheme.error)}
+            TextButton(onClick=onDismiss,enabled=!busy) {Text("Close")}
+        }
     }
 }
 

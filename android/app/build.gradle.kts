@@ -30,9 +30,21 @@ android {
         }
     }
     buildTypes {
-        debug { applicationIdSuffix = ".development" }
+        debug {
+            applicationIdSuffix = ".development"
+            buildConfigField(
+                "String",
+                "CONVERSATION_TRANSCRIPTION_ENDPOINT",
+                "\"https://kjnhtakqzboayqorrlue.supabase.co/functions/v1/saanthvana-conversation-transcription\"",
+            )
+        }
         release {
             isMinifyEnabled = true
+            buildConfigField(
+                "String",
+                "CONVERSATION_TRANSCRIPTION_ENDPOINT",
+                "\"https://kjnhtakqzboayqorrlue.supabase.co/functions/v1/saanthvana-conversation-transcription\"",
+            )
             signingConfig = signingConfigs.getByName("upload")
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
         }
@@ -63,6 +75,7 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     androidTestImplementation("androidx.test.ext:junit:1.3.0")
     androidTestImplementation("androidx.test:runner:1.7.0")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.7.0")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 }

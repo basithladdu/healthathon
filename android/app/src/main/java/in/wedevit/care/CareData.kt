@@ -12,19 +12,36 @@ fun newId(): String = UUID.randomUUID().toString()
 @Entity data class Conversation(
     @PrimaryKey val personId: String, val source: String = "", val priorities: String = "", val participants: String = "",
     val topics: String = "", val questions: String = "", val nextSteps: String = "", val audioPath: String = "",
-    val consentAt: Long = 0, val updated: Long = System.currentTimeMillis()
+    val consentAt: Long = 0, val updated: Long = System.currentTimeMillis(),
+    @ColumnInfo(defaultValue = "''") val transcriptProvider: String = "",
+    @ColumnInfo(defaultValue = "''") val transcriptModel: String = "",
+    @ColumnInfo(defaultValue = "0") val transcribedAt: Long = 0,
+    @ColumnInfo(defaultValue = "''") val transcriptAudioPath: String = "",
 )
 @Entity(indices = [Index(value = ["personId", "version"], unique = true)])
 data class CareVersion(
     @PrimaryKey val id: String = newId(), val personId: String, val version: Int, val personName: String,
     val source: String, val priorities: String, val participants: String, val topics: String,
     val questions: String, val nextSteps: String, val doctor: String, val published: Long = System.currentTimeMillis(),
-    val contentHash: String
+    val contentHash: String,
+    @ColumnInfo(defaultValue = "'manual'") val draftOrigin: String = ReviewWorkflow.MANUAL_DRAFT,
+    @ColumnInfo(defaultValue = "'reviewed_unverified'") val reviewStatus: String = ReviewWorkflow.REVIEWED_UNVERIFIED,
+    @ColumnInfo(defaultValue = "'not_verified'") val reviewerVerification: String = ReviewWorkflow.NOT_VERIFIED,
+    @ColumnInfo(defaultValue = "''") val transcriptionModel: String = "",
+    @ColumnInfo(defaultValue = "0") val transcribedAt: Long = 0,
 )
 @Entity data class Acknowledgement(@PrimaryKey val versionId: String, val contentHash: String, val name: String, val relationship: String, val at: Long = System.currentTimeMillis())
 @Entity data class CareItem(@PrimaryKey val id: String = newId(), val personId: String, val kind: String, val title: String, val detail: String = "", val due: Long = 0, val doneOn: String = "", val created: Long = System.currentTimeMillis(), @ColumnInfo(defaultValue = "0") val revision: Long = 0)
 @Entity(indices = [Index("personId")])
 data class CareReport(@PrimaryKey val id: String = newId(), val personId: String, val name: String, val mime: String, val fileName: String, val bytes: Long, val created: Long = System.currentTimeMillis())
+@Entity(indices = [Index("personId")]) data class RecordingConsent(
+    @PrimaryKey val audioPath: String,
+    val personId: String,
+    val participants: String,
+    val recordingConsentAt: Long,
+    val transcriptionConsentAt: Long = 0,
+    val noticeVersion: Int = 1,
+)
 
 @Dao interface CareDao {
     @Query("SELECT * FROM Person ORDER BY created") fun people(): Flow<List<Person>>
@@ -36,6 +53,9 @@ data class CareReport(@PrimaryKey val id: String = newId(), val personId: String
     @Insert suspend fun insertVersion(version: CareVersion)
     @Query("SELECT * FROM Acknowledgement") fun acknowledgements(): Flow<List<Acknowledgement>>
     @Insert(onConflict = OnConflictStrategy.ABORT) suspend fun acknowledge(acknowledgement: Acknowledgement)
+    @Query("SELECT * FROM RecordingConsent WHERE personId = :id ORDER BY recordingConsentAt DESC") fun recordingConsents(id: String): Flow<List<RecordingConsent>>
+    @Insert(onConflict = OnConflictStrategy.REPLACE) suspend fun saveRecordingConsent(consent: RecordingConsent)
+    @Query("DELETE FROM RecordingConsent WHERE audioPath = :audioPath") suspend fun deleteRecordingConsent(audioPath: String)
     @Query("SELECT * FROM CareItem WHERE personId = :id ORDER BY created DESC") fun items(id: String): Flow<List<CareItem>>
     @Query("SELECT * FROM CareItem WHERE id = :id LIMIT 1") suspend fun item(id: String): CareItem?
     @Insert(onConflict = OnConflictStrategy.REPLACE) suspend fun saveItem(item: CareItem)
@@ -46,6 +66,7 @@ data class CareReport(@PrimaryKey val id: String = newId(), val personId: String
     @Query("DELETE FROM CareReport WHERE personId = :id") suspend fun deleteReports(id: String)
     @Query("DELETE FROM Person WHERE id = :id") suspend fun deletePersonRow(id: String)
     @Query("DELETE FROM Conversation WHERE personId = :id") suspend fun deleteDraft(id: String)
+    @Query("DELETE FROM RecordingConsent WHERE personId = :id") suspend fun deleteRecordingConsents(id: String)
     @Query("DELETE FROM Acknowledgement WHERE versionId IN (SELECT id FROM CareVersion WHERE personId = :id)") suspend fun deleteAcknowledgements(id: String)
     @Query("DELETE FROM CareVersion WHERE personId = :id") suspend fun deleteVersions(id: String)
     @Query("DELETE FROM CareItem WHERE personId = :id") suspend fun deleteItems(id: String)
@@ -54,6 +75,7 @@ data class CareReport(@PrimaryKey val id: String = newId(), val personId: String
     @Query("DELETE FROM CareVersion") suspend fun clearVersions()
     @Query("DELETE FROM Acknowledgement") suspend fun clearAcknowledgements()
     @Query("DELETE FROM Conversation WHERE personId NOT IN (SELECT id FROM Person)") suspend fun clearRemovedDrafts()
+    @Query("DELETE FROM RecordingConsent WHERE personId NOT IN (SELECT id FROM Person)") suspend fun clearRemovedRecordingConsents()
     @Insert suspend fun addPeople(people: List<Person>)
     @Insert suspend fun addItems(items: List<CareItem>)
     @Insert suspend fun addVersions(versions: List<CareVersion>)
@@ -67,7 +89,35 @@ val ReportsMigration = object : androidx.room.migration.Migration(2, 3) {
     }
 }
 
-@Database(entities = [Person::class, Conversation::class, CareVersion::class, Acknowledgement::class, CareItem::class, CareReport::class], version = 3, exportSchema = true)
+val CombinedCareMigration3To5 = combinedCareMigration(3)
+val CombinedCareMigration4To5 = combinedCareMigration(4)
+
+private fun combinedCareMigration(from: Int) = object : androidx.room.migration.Migration(from, 5) {
+    override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
+        ReportsMigration.migrate(db)
+        db.execSQL("CREATE TABLE IF NOT EXISTS RecordingConsent (audioPath TEXT NOT NULL, personId TEXT NOT NULL, participants TEXT NOT NULL, recordingConsentAt INTEGER NOT NULL, transcriptionConsentAt INTEGER NOT NULL, noticeVersion INTEGER NOT NULL, PRIMARY KEY(audioPath))")
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_RecordingConsent_personId ON RecordingConsent(personId)")
+        fun addMissing(table: String, name: String, definition: String) {
+            val columns = mutableSetOf<String>()
+            db.query("PRAGMA table_info(`$table`)").use { cursor ->
+                val index = cursor.getColumnIndexOrThrow("name")
+                while (cursor.moveToNext()) columns.add(cursor.getString(index))
+            }
+            if (name !in columns) db.execSQL("ALTER TABLE `$table` ADD COLUMN `$name` $definition")
+        }
+        addMissing("CareVersion", "draftOrigin", "TEXT NOT NULL DEFAULT 'manual'")
+        addMissing("CareVersion", "reviewStatus", "TEXT NOT NULL DEFAULT 'reviewed_unverified'")
+        addMissing("CareVersion", "reviewerVerification", "TEXT NOT NULL DEFAULT 'not_verified'")
+        addMissing("CareVersion", "transcriptionModel", "TEXT NOT NULL DEFAULT ''")
+        addMissing("CareVersion", "transcribedAt", "INTEGER NOT NULL DEFAULT 0")
+        addMissing("Conversation", "transcriptProvider", "TEXT NOT NULL DEFAULT ''")
+        addMissing("Conversation", "transcriptModel", "TEXT NOT NULL DEFAULT ''")
+        addMissing("Conversation", "transcribedAt", "INTEGER NOT NULL DEFAULT 0")
+        addMissing("Conversation", "transcriptAudioPath", "TEXT NOT NULL DEFAULT ''")
+    }
+}
+
+@Database(entities = [Person::class, Conversation::class, CareVersion::class, Acknowledgement::class, CareItem::class, CareReport::class, RecordingConsent::class], version = 5, exportSchema = true)
 abstract class CareDatabase : RoomDatabase() {
     abstract fun care(): CareDao
     companion object {
@@ -78,8 +128,50 @@ abstract class CareDatabase : RoomDatabase() {
             instances.getOrPut(filename) { Room.databaseBuilder(context.applicationContext, CareDatabase::class.java, filename)
                 .addMigrations(object : androidx.room.migration.Migration(1, 2) {
                     override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) { db.execSQL("ALTER TABLE CareItem ADD COLUMN revision INTEGER NOT NULL DEFAULT 0") }
-                }, ReportsMigration).build() }
+                }, ReportsMigration, CombinedCareMigration3To5, CombinedCareMigration4To5).build() }
         }
+    }
+}
+
+object ReviewWorkflow {
+    const val MANUAL_DRAFT = "manual"
+    const val AI_DRAFT = "ai"
+    const val TRANSCRIBED_DRAFT = "ai_transcript"
+    const val REVIEWED_UNVERIFIED = "reviewed_unverified"
+    const val CLINICIAN_VERIFIED = "clinician_verified"
+    const val NOT_VERIFIED = "not_verified"
+
+    fun label(version: CareVersion): String = when {
+        version.reviewStatus == CLINICIAN_VERIFIED && version.reviewerVerification != NOT_VERIFIED -> "Verified clinician review"
+        version.reviewStatus == REVIEWED_UNVERIFIED -> "Review recorded · identity not verified"
+        else -> "Not clinically reviewed"
+    }
+}
+
+object RecordingConsentRules {
+    fun names(value: String): List<String> = value.split(',', '\n')
+        .map(String::trim)
+        .filter(String::isNotBlank)
+        .distinctBy(String::lowercase)
+
+    fun create(
+        personId: String,
+        audioPath: String,
+        participants: String,
+        agreedParticipants: Set<String>,
+        purposeAccepted: Boolean,
+        storageAccepted: Boolean,
+        accessAccepted: Boolean,
+        transcriptionAccepted: Boolean = false,
+        now: Long = System.currentTimeMillis(),
+    ): RecordingConsent {
+        val names = names(participants)
+        require(personId.isNotBlank() && audioPath.isNotBlank()) { "Choose a person before recording." }
+        require(names.isNotEmpty()) { "Add everyone who is taking part." }
+        require(names.size <= 12 && names.all { it.length <= 100 }) { "Add up to 12 participant names, each under 100 characters." }
+        require(names.all { name -> agreedParticipants.any { it.equals(name, ignoreCase = true) } }) { "Each named participant must agree before recording." }
+        require(purposeAccepted && storageAccepted && accessAccepted) { "Review the recording purpose, storage and access details." }
+        return RecordingConsent(audioPath, personId, names.joinToString("\n"), now, if (transcriptionAccepted) now else 0, noticeVersion = 2)
     }
 }
 
@@ -93,11 +185,13 @@ object NoteRules {
         require(person.id == draft.personId) { "This conversation belongs to a different person." }
         require(reviewed && doctor.trim().isNotEmpty()) { "Review the note and add the doctor's name." }
         require(draft.source.isNotBlank() && values(draft).any { it.isNotBlank() }) { "Add the conversation and review its sections." }
-        require(draft.source.length <= 12000 && values(draft).all { it.length <= 4000 }) { "Shorten this conversation before saving." }
-        val hash = hash(listOf(person.id, person.name, draft.source, doctor.trim()) + values(draft))
+        require(draft.source.length <= 60000 && values(draft).all { it.length <= 4000 }) { "Shorten this conversation before saving." }
+        val origin = if (draft.transcribedAt > 0 && draft.transcriptModel.isNotBlank()) ReviewWorkflow.TRANSCRIBED_DRAFT else ReviewWorkflow.MANUAL_DRAFT
+        val hash = hash(listOf(person.id, person.name, draft.source, doctor.trim(), origin, ReviewWorkflow.REVIEWED_UNVERIFIED, ReviewWorkflow.NOT_VERIFIED, draft.transcriptModel, draft.transcribedAt.toString()) + values(draft))
         return CareVersion(personId = person.id, version = version, personName = person.name, source = draft.source,
             priorities = draft.priorities, participants = draft.participants, topics = draft.topics, questions = draft.questions,
-            nextSteps = draft.nextSteps, doctor = doctor.trim(), contentHash = hash)
+            nextSteps = draft.nextSteps, doctor = doctor.trim(), contentHash = hash, draftOrigin = origin,
+            transcriptionModel = draft.transcriptModel, transcribedAt = draft.transcribedAt)
     }
     fun acknowledge(version: CareVersion, latest: CareVersion?, name: String, relationship: String, reviewed: Boolean): Acknowledgement {
         require(latest?.id == version.id && latest.contentHash == version.contentHash) { "A newer note is available. Open it before confirming." }
@@ -116,10 +210,12 @@ object NoteRules {
     }
     fun text(v: CareVersion, ack: Acknowledgement? = null): String = buildString {
         appendLine("GOALS OF CARE • ${v.personName} • Version ${v.version}")
-        appendLine("Reviewed by ${v.doctor} • ${java.time.Instant.ofEpochMilli(v.published)}")
+        appendLine("Reviewer: ${v.doctor} • ${java.time.Instant.ofEpochMilli(v.published)}")
+        appendLine("Review status: ${ReviewWorkflow.label(v)}")
+        if (v.draftOrigin == ReviewWorkflow.TRANSCRIBED_DRAFT) appendLine("Transcript: AI-generated with ${v.transcriptionModel}; human review required")
         labels.zip(values(v)).forEach { (label, value) -> appendLine("\n$label\n${value.ifBlank { "Not recorded" }}") }
         appendLine("\nOriginal conversation\n${v.source}")
         if (ack != null) appendLine("\nRead and confirmed by ${ack.name} (${ack.relationship})")
-        appendLine("\nNames are self-entered. This is a record of a discussion, not a treatment order or legal directive.")
+        appendLine("\nNames are self-entered unless a version explicitly says the clinician was verified. This is a record of a discussion, not a treatment order or legal directive.")
     }
 }
