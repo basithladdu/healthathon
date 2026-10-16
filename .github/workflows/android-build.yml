@@ -1,0 +1,54 @@
+name: Android verified packages
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: android
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Install matching Android tools
+        run: sdkmanager 'platforms;android-36' 'build-tools;36.1.0'
+      - name: Build, unit checks and lint without private signing material
+        run: >-
+          bash ./gradlew --no-daemon --max-workers=2
+          '-Dorg.gradle.jvmargs=-Xmx4096m -XX:ActiveProcessorCount=4 -Dfile.encoding=UTF-8'
+          -PunsignedRelease=true
+          :app:assembleDebug :app:assembleDebugAndroidTest :app:testDebugUnitTest
+          :app:assembleRelease :app:bundleRelease :app:lintDebug :app:lintVitalRelease
+      - name: Record source and package hashes
+        if: success()
+        run: |
+          printf '%s\n' "$GITHUB_SHA" > build-source.txt
+          sha256sum app/build/outputs/apk/debug/*.apk app/build/outputs/apk/androidTest/debug/*.apk app/build/outputs/apk/release/*.apk app/build/outputs/bundle/release/*.aab > build-sha256.txt
+      - name: Preserve packages and actual check reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sahara-android-${{ github.sha }}
+          retention-days: 3
+          if-no-files-found: error
+          path: |
+            android/build-source.txt
+            android/build-sha256.txt
+            android/app/build/outputs/apk/**/*.apk
+            android/app/build/outputs/bundle/**/*.aab
+            android/app/build/outputs/logs/
+            android/app/build/test-results/testDebugUnitTest/
+            android/app/build/reports/lint-results-debug.*
+            android/app/build/reports/lint-results-release.*
+            android/app/build/generated/source/buildConfig/release/

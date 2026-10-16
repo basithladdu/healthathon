@@ -48,7 +48,9 @@ android {
                 "CONVERSATION_TRANSCRIPTION_ENDPOINT",
                 "\"https://kjnhtakqzboayqorrlue.supabase.co/functions/v1/saanthvana-conversation-transcription\"",
             )
-            signingConfig = signingConfigs.getByName("upload")
+            if (!providers.gradleProperty("unsignedRelease").map { it.toBoolean() }.getOrElse(false)) {
+                signingConfig = signingConfigs.getByName("upload")
+            }
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
         }
     }
