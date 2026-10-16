@@ -1,0 +1,25 @@
+{
+  "observedAtUtc": "2026-10-16T09:34:55.239Z",
+  "checks": [
+    {
+      "url": "https://sahara.wedevit.in/privacy",
+      "width": 375,
+      "height": 812,
+      "scrollWidth": 360,
+      "clientWidth": 360,
+      "noHorizontalOverflow": true,
+      "paragraphFont": "14px",
+      "screenshot": "output/research/privacy-retention-050-375.jpg"
+    },
+    {
+      "url": "https://sahara.wedevit.in/privacy#recordings",
+      "width": 390,
+      "height": 844,
+      "scrollWidth": 375,
+      "clientWidth": 375,
+      "noHorizontalOverflow": true,
+      "retentionTextPresent": true,
+      "screenshot": "output/research/privacy-retention-050-390.jpg"
+    }
+  ]
+}

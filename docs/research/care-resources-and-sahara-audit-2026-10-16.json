@@ -223,5 +223,258 @@
     "careDirection": "Keep the Kotlin patient app and current web work. Evaluate a focused CARE clinician plugin and explicit authenticated adapter if the partner care setting uses CARE; do not silently replace the stack or duplicate patient stores.",
     "providerDirection": "Sarvam is a separate speech/language integration path; current Filly/Vision default examples use Medispeak. Access, data-processing terms and compatibility are separate prerequisites.",
     "verification": "Source inspection and existing handoff/test records only; no fresh build, phone test, live account/provider or clinical-field validation."
+  },
+  "subsequentImplementation": {
+    "checkedDate": "2026-10-16",
+    "relationshipToOriginalAudit": "The scope, context, resources, delivery gap list and recommendation above are preserved as the original dated static audit. The following update records work completed after that audit. Use this mapping for the native 0.5 candidate; do not read the earlier native-gap descriptions as the current implementation state.",
+    "sourceCommit": "ebffb7b043a5e8725f190ab8f8f3574c768d9058",
+    "version": "0.5.0",
+    "versionCode": 6,
+    "applicationId": "in.wedevit.sahara",
+    "deliveryStatus": "Combined source is pushed. Its unsigned CI build and current-source runtime checks are pending; local dex processing was interrupted by a desktop failure. Earlier branch tests and signed 0.5 packages are historical and do not establish readiness of this merged candidate. No combined-source upload or submission is confirmed.",
+    "delivery": [
+      {
+        "area": "Consented recording and attributable words",
+        "status": "Combined native source implemented; current-source runtime and actual speech-service behavior not yet verified",
+        "implemented": "Existing phone-private recording/replay remains. On supported Android 12+ phones, optional on-device turn dictation records the selected Patient, Family / carer or Doctor label, selected language and timestamp with editable words. Each turn requires microphone consent. Lifecycle and generation guards stop listening and reject late callbacks; no cloud speech fallback is configured.",
+        "remaining": "The selected speaker is self-entered, not automatically identified or verified. Saved M4A recordings are not automatically transcribed. Language availability and speech accuracy depend on the installed on-device service and have not been validated in this emulator run.",
+        "evidence": [
+          "android/app/src/main/java/in/wedevit/care/CareSpeech.kt:46",
+          "android/app/src/main/java/in/wedevit/care/CareSpeech.kt:122",
+          "android/app/src/main/java/in/wedevit/care/CareDraftAssist.kt:65",
+          "android/app/src/main/java/in/wedevit/care/CareUi.kt:260"
+        ]
+      },
+      {
+        "area": "Source-linked care-note drafting and review",
+        "status": "Exact excerpt assignment implemented; generative draft remains unconnected",
+        "implemented": "Users assign exact source lines to care-note sections and inspect the original words from each saved version. Changed wording has no exact citation. Repeated wording exposes every matching source line instead of claiming one uniquely identified speaker. The existing explicit-heading organiser remains available and preserves negation and uncertainty.",
+        "remaining": "This is a reviewed excerpt workflow, not an AI summary. No Sarvam or other generative source-to-summary model, automatic saved-audio transcription, translation or clinically validated draft generation is connected. The merged upstream developer transcription path is retained behind release-disabled cloud-audio guards; its presence does not enable clinical audio or establish a provider deployment.",
+        "evidence": [
+          "android/app/src/main/java/in/wedevit/care/CareDraftAssist.kt:30",
+          "android/app/src/main/java/in/wedevit/care/CareDraftAssistUi.kt:17",
+          "android/app/src/main/java/in/wedevit/care/CareData.kt:105",
+          "android/app/src/test/java/in/wedevit/care/CareDraftAssistTest.kt"
+        ]
+      },
+      {
+        "area": "Patient-first and separate family confirmations",
+        "status": "Implemented in combined source and restored backend; prior synthetic backend checks passed, current combined-source Android migration checks pending",
+        "implemented": "Room schema 6 retains separate immutable acknowledgement IDs and both branches' recording/confirmation metadata, with explicit preserving migrations from schemas 3, 4 and 5. A patient confirmation must exist before additional family confirmations for the exact latest note ID and content hash. Retries return the original confirmation. Legacy family-only rows are preserved without being treated as patient consent; the prior ID collision is handled. Backend permission and patient-first checks remain enforced.",
+        "remaining": "Names and Patient, Family and Doctor roles remain self-entered. These records are not verified identities, legal signatures, consent directives or treatment orders. Cross-user Android interaction was not established by the synthetic API roundtrip.",
+        "evidence": [
+          "android/app/src/main/java/in/wedevit/care/CareData.kt:73",
+          "android/app/src/main/java/in/wedevit/care/CareData.kt:115",
+          "android/app/src/main/java/in/wedevit/care/CareModel.kt:146",
+          "android/supabase/migrations/20261016065132_patient_first_version_confirmations.sql",
+          "android/supabase/tests/patient_first_confirmations.sql",
+          "android/app/src/test/java/in/wedevit/care/CareAcknowledgementTest.kt",
+          "android/app/src/androidTest/java/in/wedevit/care/CareAcknowledgementMigrationTest.kt",
+          "output/android/verification/0.5.0-cloud-roundtrip.json",
+          "android/app/src/androidTest/java/in/wedevit/care/CombinedCareMigrationTest.kt"
+        ]
+      },
+      {
+        "area": "Shared conversation requests and named tasks",
+        "status": "Combined native source implemented; earlier branch emulator/API evidence is historical, current-source runtime verification pending",
+        "implemented": "The care team view now stores actual conversation requests and named tasks. Doctor view presents a conversation queue. Acceptance and completion retain the entered actors and times; shared signed-in records use the existing authenticated backend and revision checks. Sender-facing status and saved task state survived emulator recreation.",
+        "remaining": "These are care-circle records, not dispatched calls, push notifications or email. Entered names and generic edit permission do not verify a professional identity. Older 0.4 clients render the new structured details as ordinary tasks; care-team clients should update together.",
+        "evidence": [
+          "android/app/src/main/java/in/wedevit/care/CareWorkflow.kt:26",
+          "android/app/src/main/java/in/wedevit/care/CareWorkflow.kt:94",
+          "android/app/src/main/java/in/wedevit/care/CareWorkflow.kt:167",
+          "android/app/src/androidTest/java/in/wedevit/care/DailyCareFlowsTest.kt",
+          "output/android/verification/0.5.0-cloud-roundtrip.json"
+        ]
+      },
+      {
+        "area": "Native calendar and numeric lab history",
+        "status": "Combined source implemented; current-source build, persistence and runtime checks pending",
+        "implemented": "The calendar uses actual dated medicines, visits, tests, procedures, follow-ups, requests and tasks; undated medicines are separate and no recurrence is invented. Lab history keeps numeric values, report dates, exact units, optional report links and copied printed limits. Incompatible units are separate series. High/Low labels compare only explicit numeric limits for that result; textual or age-specific range text is not interpreted. Switching people keeps records isolated. Calendar, lab and care-team editors now use the existing fully expanded sheet pattern to reduce keyboard-entry friction; current-source visual and keyboard verification is still required.",
+        "remaining": "No diagnosis, clinical reference ranges, treatment recommendation, medicine-alert schedule or external appointment booking is supplied. Report links depend on a private report copy on that phone.",
+        "evidence": [
+          "android/app/src/main/java/in/wedevit/care/CareSchedule.kt:30",
+          "android/app/src/main/java/in/wedevit/care/CareLabs.kt:29",
+          "android/app/src/main/java/in/wedevit/care/CareWorkflow.kt:121",
+          "android/app/src/test/java/in/wedevit/care/CareWorkflowTest.kt",
+          "android/app/src/androidTest/java/in/wedevit/care/DailyCareFlowsTest.kt"
+        ]
+      },
+      {
+        "area": "Read aloud and language access",
+        "status": "Native source implemented; speech output not runtime-verified",
+        "implemented": "Read aloud selects an installed voice that does not require a network connection, chunks long text without losing words, and supports Stop and background stop. The chosen voice language does not change the text.",
+        "remaining": "No translation, validated multilingual care readback, connected Sarvam account or confirmed sponsor/provider clinical data terms. Neither dictation accuracy nor installed offline TTS behavior was exercised in this emulator run.",
+        "evidence": [
+          "android/app/src/main/java/in/wedevit/care/CareSpeech.kt:210",
+          "android/app/src/main/java/in/wedevit/care/CareDraftAssist.kt:75",
+          "android/app/src/main/java/in/wedevit/care/CareUi.kt:374",
+          "prototype/app/privacy/page.tsx:64"
+        ]
+      },
+      {
+        "area": "Existing records, documents, centres and scanner",
+        "status": "Existing functionality preserved; current service limits remain",
+        "implemented": "Medicines, check-ins, journal, document import/open/share and the MapLibre directory remain available. The authorised database restore completed and synthetic record/confirmation roundtrip checks passed with exact fixture cleanup. Privacy text covers the new labs, requests and on-device speech behavior on both preserved domains. The existing care-account token preferences and restored Sahara Supabase endpoint remain in place. Release cloud-audio controls are absent, and both the model and transport reject cloud processing before network access. Published source is capped at 12,000 characters to match the deployed service.",
+        "remaining": "Public photo scanning remains off. The free-tier private Gemini service has synthetic-only evidence and must not receive patient data. Reports and recordings stay phone-private. No verified live stock, emergency capacity, dispatch or booking feed was added. The main web workspace is still separate from native shared records. Ordinary signup/reset email remains limited; paused Zoho and the unapproved exact callback remain unchanged.",
+        "evidence": [
+          "android/app/src/main/java/in/wedevit/care/CareCloud.kt",
+          "android/app/src/main/java/in/wedevit/care/CareDocuments.kt",
+          "android/app/src/main/java/in/wedevit/care/CentreMap.kt",
+          "prototype/app/privacy/page.tsx",
+          "android/release/store-draft.json",
+          "output/android/verification/0.5.0-cloud-roundtrip.json",
+          "android/app/build.gradle.kts",
+          "android/app/src/main/java/in/wedevit/care/CareModel.kt",
+          "output/research/privacy-retention-050-verification.json"
+        ]
+      },
+      {
+        "area": "Fictional doctor workspace",
+        "status": "Upstream source merged; current combined-source build/runtime checks pending",
+        "implemented": "An isolated local preview includes patient search, dated sample progress and medicine reports, searchable text-summary reports, scheduling, consented local recording/playback, manual review, immutable unverified preview versions and explicitly marked PDF exports. It retains source/account separation and visible preview disclosures.",
+        "remaining": "Fictional patients, self-entered review names and local preview responses do not verify clinicians, patient-family identities, real delivery, a shared server clinical workflow or generative clinical AI. The release does not upload or transcribe audio. Preview retention differs from real-account data: account changes/deletion do not clear the preview; individual preview-recording deletion is not available, and clearing app data/uninstalling removes it.",
+        "evidence": [
+          "docs/doctor-demo-workspace.md",
+          "android/app/src/androidTest/java/in/wedevit/care/DoctorWorkflowFlowTest.kt",
+          "android/app/src/androidTest/java/in/wedevit/care/DoctorPatientHubFlowTest.kt",
+          "android/app/src/androidTest/java/in/wedevit/care/DoctorLocalPreviewConsentTest.kt",
+          "prototype/app/privacy/page.tsx"
+        ]
+      }
+    ],
+    "verification": {
+      "currentCombinedSource": {
+        "commit": "ebffb7b043a5e8725f190ab8f8f3574c768d9058",
+        "expectedPackage": "in.wedevit.sahara",
+        "expectedVersion": "0.5.0",
+        "expectedVersionCode": 6,
+        "build": {
+          "status": "pending",
+          "ciRunId": 38881300006,
+          "ciUrl": "https://github.com/basithladdu/healthathon/actions/runs/38881300006",
+          "unsignedBuildOnly": true,
+          "localCompletion": "Not established; desktop failure interrupted dex processing."
+        },
+        "unitTests": {
+          "status": "pending",
+          "passed": null,
+          "failures": null,
+          "errors": null
+        },
+        "fullLint": {
+          "status": "pending",
+          "errors": null,
+          "warnings": null
+        },
+        "runtime": {
+          "status": "pending",
+          "currentSourcePassed": null,
+          "currentSourceSkipped": null,
+          "localEmulatorRunning": false,
+          "remoteQa": "Being prepared separately; no result claimed."
+        },
+        "signedRelease": {
+          "builtAndVerified": false,
+          "packageAndVersionVerified": false,
+          "apkSignatureVerified": false,
+          "bundleJarSignatureVerified": false,
+          "sameSignerAs041Verified": false,
+          "static16KbZipAndElfAlignmentVerified": false,
+          "runtime16KbVerified": false,
+          "optimizedReleaseUiVerified": false,
+          "cleanVisualQaVerified": false,
+          "physicalDevice050Verified": false
+        }
+      },
+      "historicalBranchEvidence": {
+        "scope": "These earlier branch results are retained for provenance. They are not current combined-source build/runtime passes.",
+        "source4758218": {
+          "unitTests": {
+            "passed": 39,
+            "failures": 0,
+            "errors": 0
+          },
+          "fullLint": {
+            "result": "PASS",
+            "errors": 0,
+            "warnings": 33
+          },
+          "debugEmulator": {
+            "uniquePassed": 20,
+            "credentialDependentSkipped": 1,
+            "failures": 0,
+            "errors": 0,
+            "environment": "Isolated API 36.1 emulator; 4 KB pages; fictional records only.",
+            "limits": "The credential-dependent sign-in check was skipped. Actual dictation, recognition accuracy and offline TTS were not exercised. Initial screenshots had System UI overlays; later selected clean captures were reviewed."
+          }
+        },
+        "source9bd9bda": "Earlier 0.5 artifacts and their static checks belong to the keyboard-fix branch before the latest doctor-workspace merge. They must not be uploaded as proof of this combined source."
+      },
+      "backend": "The restored original Sahara service passed patient-first and care-permissions SQL rollback suites and an authenticated synthetic public-client record/confirmation roundtrip with fixture cleanup. This does not establish current combined-source two-user Android UI, clinician verification or clinical field validation.",
+      "websitePrivacy": {
+        "deployment": "dpl_6orhhiq4eQnLGSy2kGJLzwzBibsC",
+        "state": "READY",
+        "scopedEslint": "PASS",
+        "remoteNextBuild": "PASS",
+        "remoteTypescript": "PASS",
+        "bothDomainHttp200": true,
+        "renderedWidthsPx": [
+          375,
+          390
+        ],
+        "horizontalOverflow": false,
+        "scope": "Public privacy text and responsive rendering only; no provider activation, app runtime or clinical validation."
+      },
+      "evidence": [
+        "android/release/store-draft.json",
+        ".github/workflows/android-build.yml",
+        "android/scripts/verify-release.py",
+        "output/android/verification/0.5.0-artifacts.json",
+        "output/android/verification/0.5.0/debug-runtime-result.json",
+        "output/android/verification/0.5.0-cloud-roundtrip.json",
+        "output/android/verification/ack-migration-sqlite-2026-10-16.json",
+        "output/research/privacy-retention-050-verification.json"
+      ]
+    },
+    "release": {
+      "candidateReady": false,
+      "candidateUploaded": false,
+      "candidateSubmitted": false,
+      "productionStatus": "Production 0.4.1 remains Changes in review; preserve that review. This is not production approval or availability of 0.5.",
+      "nextStep": "Inspect actual combined-source CI and runtime results, sign and verify fresh same-package artifacts locally, then save one verified 0.5 Alpha draft without replacing Production 0.4.1 review. Prepared listing/reviewer text remains local; do not change global review material used by the in-review version.",
+      "existingClosedTest": "Alpha 0.4.1 is already available and both original and additional invitation groups were sent. Do not resend invitations."
+    },
+    "rawSourcePreservation": {
+      "location": "Private ignored source-materials/private-context/2026-10-16-care-resources archive; no private email, chat, participant list or clinical original is included in this public audit.",
+      "state": "The final private archive is verified: 469 entries, 42,484,216 bytes. ZIP CRC and every entry hash passed; earlier complete archive snapshots and original source bytes were preserved separately.",
+      "archive": {
+        "entries": 469,
+        "bytes": 42484216,
+        "sha256": "6f2951147f3f906990d8d6b7f7949ee05ccd64c7d9a3660eb1f3eeac66142615",
+        "zipCrcVerified": true,
+        "allEntryHashesVerified": true,
+        "priorArchiveSnapshotsPreserved": true
+      },
+      "privateCoverage": "Original email MIME bodies, pinned repository archives, located source recordings and supplied transcripts, source-read logs, complete concatenated raw text, unedited offline ASR outputs and the later real-Chrome Canva capture are preserved privately. Invitation/cancellation chronology and uncertain team relevance remain qualified. No new sponsor activation was found.",
+      "transcriptionBoundary": "Both located short recordings were processed locally; all three unedited machine outputs were read and 13 representative video frames inspected. The mixed-language video transcript remains unreliable after base and small model passes. Machine output is not a human-verified verbatim transcript or proof of clinical accuracy; the supplied clarification remains separate. This archival ASR work does not enable saved-recording transcription inside Sahara.",
+      "qualifiedCanvaFindings": {
+        "title": "CARE HMIS",
+        "sourceUrl": "https://www.canva.com/design/DAHIQdIl2qo/xDJLc5X_0oIqZyPMhMP2tw/view",
+        "capture": "Real Chrome opened the public presentation. All 56 captured slide text bodies were read; 56 JPEGs were preserved, 31 selected images inspected and eight render-lag pairings identified. The earlier unsupported-client response remains an initial fetch attempt, not the current deck-access state.",
+        "mediaLimit": "Observed embedded sources were session-only blob references. A supported downloadMedia() call on a loaded visible video returned 'Blob downloads are not supported by this browser.' No raw embedded clip, full playback/audio review or 56 matched rendered text/image pairs are claimed.",
+        "lessons": "The deck emphasizes connected care workflows, standard codes and units, existing CarePlan/Goal/Consent concepts, and clinician review of AI drafts. CARE already presents palliative, home-care and oncology use cases; Sahara's proposed distinction is attributable reviewed goals-of-care continuity. Filly, record summaries, document extraction and timeline-based discharge drafts are provider capability examples, not proof they are integrated or clinically validated in Sahara. Deployment totals and screenshots remain provider claims."
+      },
+      "accessGaps": "The full Loom recording/transcript remains signup-gated pending the required account/terms decision; no gate was bypassed. Original recordings for the three supplied meeting transcripts, the full 30 August meeting, 25 August technical DOCX, historical machine transcript files, omitted attachments and the newer complete WhatsApp export remain missing. Canva text access is resolved, while screenshot pairing and embedded-video preservation/review remain qualified limits."
+    },
+    "sourceIntegration": {
+      "upstream": "865f624",
+      "preservingMerge": "504b09b",
+      "accountStorageAndReleaseGuards": "51c0fec",
+      "keyboardSheetFixRetained": "9bd9bda",
+      "unsignedCiWorkflow": "63907b7",
+      "buildWorkflowFix": "ebffb7b043a5e8725f190ab8f8f3574c768d9058",
+      "scope": "Combined native care features and fictional doctor workspace. This replaces the earlier observation that no newer upstream source was available."
+    }
   }
 }

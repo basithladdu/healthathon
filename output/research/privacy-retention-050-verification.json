@@ -1,0 +1,107 @@
+{
+  "observedAtUtc": "2026-10-16T09:35:13.656Z",
+  "sourceCommit": "51c0fec",
+  "sourceDirtyPrivacyChange": true,
+  "project": {
+    "id": "prj_FqAFWfzZMRBFzA2vnG2qWDxAZJd4",
+    "name": "continuity-loop-healthathon",
+    "teamId": "team_ynpsikQsskNkS23u20iivqGX"
+  },
+  "deployment": {
+    "id": "dpl_6orhhiq4eQnLGSy2kGJLzwzBibsC",
+    "url": "https://continuity-loop-healthathon-4xnq7fubs.vercel.app",
+    "state": "READY",
+    "target": "production",
+    "singleNewDeployment": true
+  },
+  "validation": {
+    "scopedEslint": "passed",
+    "remoteNextBuild": true,
+    "remoteTypescript": true,
+    "remoteCompleted": true,
+    "localNextBuildRun": false,
+    "envAuthBillingProviderChanges": false,
+    "scopedEslintExit": 0,
+    "scopedEslintLog": "output/research/privacy-retention-050-eslint.log"
+  },
+  "sourceHashes": {
+    "tsxSha256": "3d9e98fd64feb579b9f7eb0ef163666dd9c4240c3742f00d83ad772033303bc0",
+    "androidHtmlSha256": "55b3490ac6bce966eeffc47404d3dd0399df3895c5c82c90e85ab7d09d1dfe1c"
+  },
+  "http": [
+    {
+      "url": "https://sahara.wedevit.in/",
+      "status": 200,
+      "finalUrl": "https://sahara.wedevit.in/",
+      "retention": null,
+      "htmlSha256": "568c0bdb016bd692c28638912fe7e018a4162f62a77fb549935e0d0c199a5b16"
+    },
+    {
+      "url": "https://saanthvana.wedevit.in/",
+      "status": 200,
+      "finalUrl": "https://saanthvana.wedevit.in/",
+      "retention": null,
+      "htmlSha256": "568c0bdb016bd692c28638912fe7e018a4162f62a77fb549935e0d0c199a5b16"
+    },
+    {
+      "url": "https://sahara.wedevit.in/privacy",
+      "status": 200,
+      "finalUrl": "https://sahara.wedevit.in/privacy",
+      "retention": {
+        "The fictional doctor preview": true,
+        "Changing or deleting a Sahara account does not clear this preview.": true,
+        "Only the newest preview recording is shown": true,
+        "preview recordings cannot currently be deleted individually in the app.": true,
+        "Clear Sahara app data in Android settings or uninstall the app": true,
+        "Preview PDFs are created in the app cache": true,
+        "Photo scanning is currently off.": true,
+        "The Android app does not upload audio": true
+      },
+      "htmlSha256": "eed15a42a8e05e607d13dcc630fedd9874cdd20c20f86972fdd729d914daeac3"
+    },
+    {
+      "url": "https://saanthvana.wedevit.in/privacy",
+      "status": 200,
+      "finalUrl": "https://saanthvana.wedevit.in/privacy",
+      "retention": {
+        "The fictional doctor preview": true,
+        "Changing or deleting a Sahara account does not clear this preview.": true,
+        "Only the newest preview recording is shown": true,
+        "preview recordings cannot currently be deleted individually in the app.": true,
+        "Clear Sahara app data in Android settings or uninstall the app": true,
+        "Preview PDFs are created in the app cache": true,
+        "Photo scanning is currently off.": true,
+        "The Android app does not upload audio": true
+      },
+      "htmlSha256": "eed15a42a8e05e607d13dcc630fedd9874cdd20c20f86972fdd729d914daeac3"
+    }
+  ],
+  "mobile": {
+    "observedAtUtc": "2026-10-16T09:34:55.239Z",
+    "checks": [
+      {
+        "url": "https://sahara.wedevit.in/privacy",
+        "width": 375,
+        "height": 812,
+        "scrollWidth": 360,
+        "clientWidth": 360,
+        "noHorizontalOverflow": true,
+        "paragraphFont": "14px",
+        "screenshot": "output/research/privacy-retention-050-375.jpg"
+      },
+      {
+        "url": "https://sahara.wedevit.in/privacy#recordings",
+        "width": 390,
+        "height": 844,
+        "scrollWidth": 375,
+        "clientWidth": 375,
+        "noHorizontalOverflow": true,
+        "retentionTextPresent": true,
+        "screenshot": "output/research/privacy-retention-050-390.jpg"
+      }
+    ]
+  },
+  "limitations": [
+    "Verification covers public policy text and responsive rendering; it does not prove clinical validation or scanner activation."
+  ]
+}

@@ -198,15 +198,16 @@
     "uploaded": false,
     "submitted": false,
     "installed": false,
-    "status": "In verification; do not replace or withdraw the in-review 0.4.1 production release.",
+    "status": "Combined source built successfully in CI; local signing/static checks and current-source runtime verification are in progress. No 0.5 upload or submission yet. Production 0.4.1 remains in review.",
     "apk": "output/android/Sahara-0.5.0-release.apk",
     "bundle": "output/android/Sahara-0.5.0.aab",
+    "sourceCommit": "ebffb7b043a5e8725f190ab8f8f3574c768d9058",
     "listingDraft": {
-      "fullDescription": "Sahara: A Palliative Care Companion\n\nFor patients, families and doctors.\n\nKeep the words that matter from a goals-of-care conversation. Type the conversation, record it with everyone's permission, or dictate one selected speaker's turn on a supported phone. Check the words and build the note from exact source excerpts. A doctor can review and save a version; the patient confirms first, then family can add separate confirmations of that same version. Names and roles are self-entered, not verified credentials or legal consent. Earlier versions and their original words remain available.\n\nAsk the care team to talk, pick up a request and keep named tasks with acceptance and completion status. Plan visits, tests, procedures and follow-ups in a dated calendar. Enter numeric lab results with the report's units and printed ranges, and view values over time. Lab history does not interpret results or recommend treatment. Add prescribed medicines, check-ins, questions and daily notes. Medicine reminders are not available.\n\nDocuments keeps user-selected PDFs and photos together. Open a report or share a copy using Android. Report files and recordings remain private phone copies and do not sync to other devices. Saved recordings are not automatically transcribed. Read aloud uses an installed offline voice and does not translate. Live dictation requires an installed on-device recognition service; typing and recording remain available when it is unsupported.\n\nSign in to save care notes and daily entries to your account. Invite family or care team members to read them or allow changes. Conversation requests and tasks are shared records, not dispatched calls or email. Unfinished conversations are not uploaded.\n\nFind listed palliative care centres in Karnataka on a MapLibre map or in the list. Call a centre or get directions. Directory entries do not confirm current medicine stock. There are no ads. Photo scanning is currently off; medicines can be entered manually.\n\nThis app is not a medical device. It does not diagnose, treat, cure or prevent a condition, recommend treatment or replace professional medical care. Ask a qualified healthcare professional for medical advice. Care notes record a discussion; they are not prescriptions or legal directives.",
-      "releaseNotes": "Plan care with a shared request queue, named tasks, calendar and lab history. Build a care note from exact conversation excerpts. Supported phones can dictate one selected speaker's turn and read notes aloud with an installed offline voice. Keep patient and family confirmations on the same saved version. Photo scanning remains off.",
-      "reviewInstructions": "Use fictional information. Basic care works without signing in; the approved reviewer login enables shared records. Add a person, use Talk to type a conversation or consent to on-device dictation if supported, and assign exact source excerpts to the note. Select Doctor to review and save. Open that note, confirm as Patient first, then add a separate Family / carer confirmation. Names and roles are self-entered, not verified credentials or legal consent. Today shortcuts open Care team, Calendar and Lab history. Create a conversation request, pick it up in Doctor view, and save a dated task or numeric lab result with the report's units/ranges. Documents adds, opens and shares phone-private copies. Photo scanning is off; use manual medicine entry. Dictation availability depends on an installed on-device service; saved M4A audio is not transcribed. Read aloud requires an installed offline voice and does not translate. No medication notifications, payment or location restriction.",
+      "fullDescription": "Sahara: A Palliative Care Companion\n\nFor patients, families and doctors.\n\nKeep the words that matter from a goals-of-care conversation. Type the conversation, record it with everyone's permission, or dictate one selected speaker's turn on a supported phone. Check the words and build the note from exact source excerpts. A doctor can review and save a version; the patient confirms first, then family can add separate confirmations of that same version. Names and roles are self-entered, not verified credentials or legal consent. Earlier versions and their original words remain available.\n\nAsk the care team to talk, pick up a request and keep named tasks with acceptance and completion status. Plan visits, tests, procedures and follow-ups in a dated calendar. Enter numeric lab results with the report's units and printed ranges, and view values over time. Lab history does not interpret results or recommend treatment. Add prescribed medicines, check-ins, questions and daily notes. Medicine reminders are not available.\n\nDocuments keeps user-selected PDFs and photos together. Open a report or share a copy using Android. Report files and recordings remain private phone copies and do not sync to other devices. Saved recordings are not automatically transcribed. Read aloud uses an installed offline voice and does not translate. Live dictation requires an installed on-device recognition service; typing and recording remain available when it is unsupported.\n\nSign in to save care notes and daily entries to your account. Invite family or care team members to read them or allow changes. Conversation requests and tasks are shared records, not dispatched calls or email. Unfinished conversations are not uploaded.\n\nFind listed palliative care centres in Karnataka on a MapLibre map or in the list. Call a centre or get directions. Directory entries do not confirm current medicine stock. There are no ads. Photo scanning is currently off; medicines can be entered manually.\n\nDoctor login opens an isolated fictional preview for exploring scheduling and note review. Its sample records and marked preview PDFs are not verified clinical records or connected patient accounts.\n\nThis app is not a medical device. It does not diagnose, treat, cure or prevent a condition, recommend treatment or replace professional medical care. Ask a qualified healthcare professional for medical advice. Care notes record a discussion; they are not prescriptions or legal directives.",
+      "releaseNotes": "New care-team requests and named tasks, calendar and numeric lab history. Build notes from exact conversation excerpts; patient and family confirm the same version. Supported phones can dictate a selected speaker and read notes aloud offline. Explore the separate fictional doctor workspace. Cloud audio and photo scanning stay off.",
+      "reviewInstructions": "Use fictional information. Basic care works without signing in; the approved reviewer login enables shared records. Add a person, use Talk to type a conversation or consent to on-device dictation if supported, and assign exact source excerpts to the note. Select Doctor to review and save. Open that note, confirm as Patient first, then add a separate Family / carer confirmation. Names and roles are self-entered, not verified credentials or legal consent. Today shortcuts open Care team, Calendar and Lab history. Create a conversation request, pick it up in Doctor view, and save a dated task or numeric lab result with the report's units/ranges. Documents adds, opens and shares phone-private copies. Photo scanning is off; use manual medicine entry. Dictation availability depends on an installed on-device service; saved M4A audio is not transcribed. Read aloud requires an installed offline voice and does not translate. No medication notifications, payment or location restriction. Doctor login opens a separate fictional local preview; it does not grant clinical access. Release builds cannot upload recordings or run online audio transcription.",
       "dataSafetyAssessment": "Existing Health info, Name and Other user-generated content categories cover signed-in labs, requests, tasks and separate confirmations. Consented on-device recognition and installed offline text-to-speech have no app fallback to a cloud provider. The unchanged microphone permission also serves dictation; package-visibility queries are not new runtime permissions. Photo scanning remains off. Preserve the existing accurate Medical/health declarations and provider-metadata categories; no new collection-type removal is justified.",
-      "privacyDeployment": "dpl_HjBG3HX3vZGtcNdLP95q311zdjet; both Sahara and Saanthvana /privacy pages verified live on 16 October",
+      "privacyDeployment": "dpl_6orhhiq4eQnLGSy2kGJLzwzBibsC; both domains and mobile 375/390 checks passed, including local preview retention",
       "savedInPlay": false
     },
     "changes": [
@@ -215,7 +216,10 @@
       "Offline-voice read aloud",
       "Patient-first and separate family confirmations on an immutable note version",
       "Shared conversation request queue and named task status",
-      "Dated calendar and numeric lab history with printed ranges and report links"
+      "Dated calendar and numeric lab history with printed ranges and report links",
+      "Merged fictional offline doctor workspace with scheduling, source review and marked preview PDF export",
+      "Preserving Room schema 6 migrations for both earlier branches",
+      "Full-height care editors for keyboard entry"
     ],
     "limits": [
       "No connected generative draft model or saved-audio transcription",
@@ -224,7 +228,9 @@
       "No medicine notification schedule",
       "Web workspace is not yet using the native shared record model",
       "Care-team clients need 0.5 to render its structured lab/request/task entries; 0.4 renders them as ordinary task details",
-      "Ordinary signup/reset email delivery remains limited; paused Zoho and unapproved callback remain unchanged"
+      "Ordinary signup/reset email delivery remains limited; paused Zoho and unapproved callback remain unchanged",
+      "Doctor workspace uses fictional local sample records; it is separate from real care accounts",
+      "Release builds block cloud audio in the interface, model and transport; upstream synthetic developer code is not public patient functionality"
     ],
     "verification": {
       "backendMigration": "20261016065132_patient_first_version_confirmations.sql deployed after authorised project restore",
@@ -232,13 +238,68 @@
         "patient_first_confirmations PASS",
         "care_permissions PASS"
       ],
-      "service": "Reviewer sign-in and authenticated read PASS, no patient data printed"
+      "service": "Reviewer sign-in and authenticated read PASS, no patient data printed",
+      "unitTests": {
+        "result": "PASS in CI; exact XML counts pending artifact inspection"
+      },
+      "fullLint": {
+        "result": "PASS in CI; exact XML counts pending artifact inspection"
+      },
+      "cloudRoundtrip": "PASS: synthetic lab/request/task payloads, task revisions, immutable note and separate confirmations; exact fixture cleanup. output/android/verification/0.5.0-cloud-roundtrip.json",
+      "runtime": "Current-source remote 36-test matrix, separate PDF pagination test and optimized UI smoke are running in CI 38882501784. Earlier 475 tests and 9bd packages are historical, not verification of the merged build.",
+      "buildMemory": "Local compilation was interrupted under shared-host memory pressure. Unsigned packages and checks completed on a standard GitHub runner; the upload key stays local. Current CI source and runtime evidence are recorded separately; no Windows emulator was restarted.",
+      "releaseBuild": {
+        "result": "PASS in CI for assembleRelease, bundleRelease, unit tests, lintDebug and lintVitalRelease; final local signing/static verification pending",
+        "log": "https://github.com/basithladdu/healthathon/actions/runs/38881300006",
+        "tasks": "assembleRelease, bundleRelease, lintVitalRelease",
+        "artifactReport": "output/android/verification/0.5.0-artifacts.json",
+        "packageVersionSignerAndSignatures": "Pending inspection of current CI packages and local signatures",
+        "static16KbZipAndElfAlignment": "Pending current CI package inspection",
+        "runtime16KbVerified": false
+      },
+      "ciBuild": {
+        "runId": 38881300006,
+        "url": "https://github.com/basithladdu/healthathon/actions/runs/38881300006",
+        "conclusion": "success",
+        "sourceCommit": "ebffb7b043a5e8725f190ab8f8f3574c768d9058",
+        "appSourceTree": "90adbbf8c22aa5f659b2d8c58baf4bd19fbd2b2b",
+        "signingMaterialUploaded": false
+      },
+      "historicalBaseline4758218": {
+        "unitTests": {
+          "tests": 39,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "fullLint": {
+          "errors": 0,
+          "warnings": 33,
+          "result": "PASS",
+          "log": "android/sahara-050-lint-lowmem.log"
+        },
+        "releaseBuild": {
+          "result": "PASS in CI for assembleRelease, bundleRelease, unit tests, lintDebug and lintVitalRelease; final local signing/static verification pending",
+          "log": "https://github.com/basithladdu/healthathon/actions/runs/38881300006",
+          "tasks": "assembleRelease, bundleRelease, lintVitalRelease",
+          "artifactReport": "output/android/verification/0.5.0-artifacts.json",
+          "packageVersionSignerAndSignatures": "Pending inspection of current CI packages and local signatures",
+          "static16KbZipAndElfAlignment": "Pending current CI package inspection",
+          "runtime16KbVerified": false
+        }
+      }
     },
     "releasePrerequisites": [
-      "Complete Android compile/unit/instrumentation and signed artifact checks",
-      "Keep existing Production 0.4.1 review intact",
-      "Update matching listing/privacy before any later new-version review submission"
-    ]
+      "Finish current-source signatures, static verification and runtime/visual checks",
+      "Save one Alpha 0.5 draft without disturbing existing Production 0.4.1 review",
+      "Save matching listing/reviewer information before a later 0.5 review submission"
+    ],
+    "supersededPreKeyboardBuild": {
+      "sourceCommit": "4758218",
+      "apkSha256": "1A55AE8225525574732BB54340E60D24386B88006E5EFA07F077E64266516995",
+      "bundleSha256": "5B81B459658CDEF443F61697603DED8229D65078C8D8BA4821CA6D8710361EC3",
+      "reason": "Release smoke found avoidable partial-sheet expansion after keyboard entry. New Schedule/Labs/Workflow editors now match the existing full-expansion pattern."
+    }
   },
   "productionRelease": {
     "version": "0.4.1",

@@ -68,6 +68,17 @@ export default function PrivacyPage() {
             reviewed care-note version. Read aloud uses an installed offline voice and
             does not translate the text.
           </p>
+          <p>
+            The fictional doctor preview keeps its sample records, edited drafts,
+            preview recordings and app feedback on this phone, separately from Sahara
+            accounts. Changing or deleting a Sahara account does not clear this preview.
+            Only the newest preview recording is shown; older recordings are not listed,
+            and preview recordings cannot currently be deleted individually in the app.
+            Clear Sahara app data in Android settings or uninstall the app to remove the
+            local preview data. This also clears other Sahara information stored on that
+            phone. Preview PDFs are created in the app cache, which Android may clear.
+            Copies you export or share remain with their recipients until they remove them.
+          </p>
         </section>
 
         <section aria-labelledby="medicine-ai">
