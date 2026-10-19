@@ -14,7 +14,11 @@ Primary contracts checked on 19 October: [Sarvam STT REST](https://docs.sarvam.a
 
 Sixteen injected-transport Node contract tests passed. A lightweight Kotlin/JUnit subset passed fifteen tests (eight new remote-assist checks and seven existing source-assist checks), using the actual assist modules with model/BuildConfig dependencies stubbed. These are source/contract tests: no app package, physical-device interaction, live Sarvam accuracy, speech, translated clinical meaning or runtime accessibility validation is established by them.
 
-Open **Doctor login** from the welcome screen or **More**. The prefilled fictional credentials are `doctor@demo.sahara.test` / `SaharaDemo`. They are a local preview gate, not credentials for a service. **Open workspace** continues as the fictional Dr Meera. The login footer, Preview chip and Account screen disclose that this is a local sample workspace, not verified clinician access.
+The primary **Doctor workspace** action on the welcome screen or **More** now opens the real account-backed shared-care workspace. Confirmed Sahara sign-in is separate from independent clinician verification and patient-granted access; opening the workspace grants neither clinical authority nor access to unrelated records. This new native source is not yet packaged or device-tested.
+
+## Preserved optional fictional walkthrough
+
+Choose the separate **Explore doctor walkthrough** action from the welcome screen or **More** to open the fictional **Doctor login**. The prefilled credentials are `doctor@demo.sahara.test` / `SaharaDemo`. They are a local preview gate, not credentials for a service. **Open workspace** continues as the fictional Dr Meera. The login footer, Preview chip and Account screen disclose that this is a local sample workspace, not verified clinician access. The walkthrough details and older build evidence below describe that separate experience.
 
 Home shows the next scheduled visit, today's agenda and quick patient access. Patients searches six fictional records; each opens Overview, Care notes, Medicines, Reports and Observations through wrapping icon selectors. Reports are sample text summaries, not uploaded files. Schedule supports a day strip/date picker, adding a visit, rescheduling, cancellation and completion. Appointments persist in the isolated `doctor-demo-v1` preferences. Account → Back to Sahara returns without signing an existing account out. Display names omit the fixture suffix “Demo”; stored names and IDs remain unchanged.
 
@@ -68,7 +72,7 @@ Patient/family Today now honestly shows “No doctor linked”: there is no pati
 
 ### Structured mock patient record
 
-The default Doctor login opens a local mock experience without another Sahara AI sign-in. Online recording/transcription components remain intact but are not shown or called in mock mode; the internal explicit `enableOnlineAi` option is false by default and does not bypass real authentication. Existing real-account transcript namespaces are not opened by the mock workspace.
+The separate **Explore doctor walkthrough** action opens a local mock experience without another Sahara AI sign-in; it is not the primary **Doctor workspace** action. Online recording/transcription components remain intact but are not shown or called in mock mode; the internal explicit `enableOnlineAi` option is false by default and does not bypass real authentication. Existing real-account transcript namespaces are not opened by the mock workspace.
 
 Patient records have Overview, Progress, Medicines, Conversations, Visits and Reports sections; only the selected section is shown. `DoctorPatientTracking` contains fictional patient-specific reports with a fixed sample reference time (15 October 2026, 12:00 UTC). Medicine reports distinguish scheduled time, reported taken time and logging time. Logging later does not imply late ingestion. “Late reported” compares the report's taken time against the fictional planned time, not a clinical tolerance. Upcoming, not logged and skipped reports remain distinct. These fixtures are not prescriptions, verified ingestion, clinical improvement scores or live patient-account sync. The actual patient medicine tracker currently stores only a date toggle and does not establish historical dose timeliness.
 

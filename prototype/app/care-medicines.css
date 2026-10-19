@@ -248,6 +248,10 @@
   .medicine-import-actions { position: sticky; z-index: 4; bottom: max(8px, env(safe-area-inset-bottom)); padding: 9px; border: 1px solid #e4d2ba; border-radius: 16px; background: #fffaf1f2; box-shadow: 0 8px 24px #4b321c1a; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
 }
 
+@media (max-width: 700px) {
+  .simple-care-app .medicine-import-actions { bottom: calc(80px + env(safe-area-inset-bottom)); }
+}
+
 @media (max-width: 600px) {
   .care-medicines :is(input:not([type='checkbox']), select, textarea) { font-size: 16px; }
   .medicine-heading { gap: 10px; }
