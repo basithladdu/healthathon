@@ -139,7 +139,7 @@
   text-wrap: balance;
 }
 .care-sign-in-roles { min-width: 0; margin: 0; padding: 0; border: 0; }
-.care-sign-in-roles legend { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+.care-sign-in-roles legend { margin-bottom: 9px; padding: 0; font-size: 13px; font-weight: 600; }
 .care-sign-in-roles > div { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; }
 .care-sign-in-role {
   min-width: 0;
@@ -195,13 +195,20 @@
   transition: background-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
 }
 .care-sign-in-submit svg { width: 23px; height: 23px; flex: none; }
+.care-sign-in-account { text-decoration: none; }
+.care-sign-in-tools { min-width: 0; border-top: 1px solid #e6ddd1; padding-top: 5px; }
+.care-sign-in-tools > summary { min-height: 44px; padding-block: 12px; color: #76675d; font-size: 14px; font-weight: 600; cursor: pointer; }
+.care-sign-in-tools-form { display: grid; min-width: 0; gap: 14px; padding-top: 5px; }
+.care-sign-in-tools-note { margin: 0; color: #76675d; font-size: 12px; line-height: 1.5; }
+.care-sign-in .care-sign-in-tools-submit { color: #382e29; background: #fff8ee; border-color: #d7c8bc; box-shadow: none; }
 .care-sign-in button:disabled { opacity: .5; cursor: not-allowed; }
-.care-sign-in :is(button, input):focus-visible { outline: 3px solid #397e69; outline-offset: 4px; }
+.care-sign-in :is(button, input, a, summary):focus-visible { outline: 3px solid #397e69; outline-offset: 4px; }
 
 @media (hover: hover) {
   .care-sign-in-role:hover { transform: translateY(-3px); box-shadow: 0 5px 0 #c6c4a647; }
   .care-sign-in-role[aria-pressed='true']:hover { box-shadow: 0 5px 0 #bad0ba; }
   .care-sign-in-submit:not(:disabled):hover { background: #974a34; transform: translateY(-1px); box-shadow: 0 5px 0 #8e4b3530; }
+  .care-sign-in .care-sign-in-tools-submit:not(:disabled):hover { background: #f1e9dd; box-shadow: none; }
   .care-sign-in-language:hover { background: #f1ebd9; }
 }
 .care-sign-in-role:active,
