@@ -28,7 +28,10 @@ SERIAL = "emulator-" + os.environ.get("EMULATOR_PORT", "5554")
 DEBUG = "in.wedevit.sahara.development"
 RELEASE = "in.wedevit.sahara"
 CLASSES = ["DailyCareFlowsTest", "CareAcknowledgementMigrationTest", "CareReportTest", "CareFlowTest",
-           "CombinedCareMigrationTest", "NativeMergeComponentsTest", "PatientDoctorUiTest", "DoctorLocalPreviewConsentTest"]
+           "CombinedCareMigrationTest", "NativeMergeComponentsTest", "PatientDoctorUiTest", "DoctorLocalPreviewConsentTest",
+           "DoctorConversationsUiTest"]
+MATRIX_EXPECTED = 39
+MATRIX_SKIPPED = {("in.wedevit.care.CareFlowTest", "signInLoadsAccountRecordsOnToday")}
 FOCUSED_TESTS = [
     "in.wedevit.care.CareFlowTest#roleMenuKeepsDraftAndPatientChoiceAfterRecreation",
     "in.wedevit.care.CareFlowTest#conversationReviewSavesExactVersionAndSurvivesRecreation",
@@ -89,6 +92,15 @@ def unique(pattern):
     return files[0]
 
 
+def release_version():
+    source = (ROOT / "android/app/build.gradle.kts").read_text()
+    codes = re.findall(r"^\s*versionCode\s*=\s*(\d+)\s*$", source, re.MULTILINE)
+    names = re.findall(r'^\s*versionName\s*=\s*"([^"]+)"\s*$', source, re.MULTILINE)
+    assert len(codes) == 1 and len(names) == 1, "Expected one explicit app version"
+    assert int(codes[0]) > 0 and re.fullmatch(r"\d+\.\d+\.\d+", names[0]), "Invalid app version"
+    return {"versionCode":int(codes[0]), "versionName":names[0]}
+
+
 def check_source(run_id, source_dir):
     data = check_run(run_id)
     source_dir = Path(source_dir).resolve()
@@ -135,10 +147,11 @@ def prepare(run_id, scope="all", source_dir=None):
     release = releases[0]
     original_paths = {str((manifest.parent / item["path"]).resolve()) for item in verified}
     assert len(verified) == 4 and original_paths == {str(path.resolve()) for path in (debug, test, release, bundle)}, "Expected exactly the four original packages"
+    expected_version = release_version()
     for path, package in [(debug, DEBUG), (release, RELEASE)]:
         badging = cmd(TOOLS / "aapt2", "dump", "badging", path).decode(errors="replace")
         assert f"package: name='{package}'" in badging
-        assert "versionCode='6'" in badging and "versionName='0.5.0'" in badging
+        assert f"versionCode='{expected_version['versionCode']}'" in badging and f"versionName='{expected_version['versionName']}'" in badging, "Package version differs from checked-out source"
         write("package-" + package + ".txt", badging)
     # Runner-only signing key; never uploaded and never substituted for the private store signer.
     signing = Path(os.environ["RUNNER_TEMP"]) / "sahara-synthetic-signing"
@@ -164,7 +177,7 @@ def prepare(run_id, scope="all", source_dir=None):
     cmd(TOOLS / "apksigner", "sign", "--ks", key, "--ks-key-alias", "runtime", "--ks-pass", "pass:android", "--key-pass", "pass:android", "--out", optimized, release)
     cert = cmd(TOOLS / "apksigner", "verify", "--verbose", "--print-certs", optimized).decode(errors="replace")
     write("optimized-ci-signature.txt", cert)
-    info = {"sourceCommit": data["head_sha"], "buildRunId": run_id, "buildUrl": data["html_url"],
+    info = {"sourceCommit": data["head_sha"], "buildRunId": run_id, "buildUrl": data["html_url"], "expectedVersion":expected_version,
             "harnessCommit": os.environ["GITHUB_SHA"], "scope":scope, "verifiedArtifacts": verified,
             "sourceEquality":equality, "originalDebug":str(debug), "originalTest":str(test),
             "debug": str(execution_debug), "test": str(execution_test), "unsignedRelease": str(release), "optimizedCiApk": str(optimized),
@@ -177,7 +190,7 @@ def prepare(run_id, scope="all", source_dir=None):
     write("artifacts.json", info)
 
 
-def instrument(name, classes, expected):
+def instrument(name, classes, expected, expected_skipped=None):
     started = time.monotonic()
     output = adb("shell", "am", "instrument", "-w", "-r", "-e", "class", classes,
                  DEBUG + ".test/androidx.test.runner.AndroidJUnitRunner", timeout=2100, check=False).decode(errors="replace")
@@ -193,11 +206,15 @@ def instrument(name, classes, expected):
             current = {}
     counts = {key:sum(t["result"] == key for t in cases) for key in ("pass", "skipped", "ignored", "failure", "error", "unknown")}
     complete = len(cases) == expected and not any(counts[k] for k in ("failure", "error", "unknown")) and f"OK ({expected} test" in output
+    identities = [(case.get("class", ""), case["test"]) for case in cases]
+    complete = complete and len(set(identities)) == expected
     if all("#" in selection for selection in classes.split(",")):
         complete = complete and {case.get("class", "")+"#"+case["test"] for case in cases} == set(classes.split(","))
-    if expected == 36:
-        skipped = [case["test"] for case in cases if case["result"] == "skipped"]
-        complete = complete and counts["pass"] == 35 and skipped == ["signInLoadsAccountRecordsOnToday"] and counts["ignored"] == 0
+    else:
+        complete = complete and {case.get("class", "") for case in cases} == set(classes.split(","))
+    if expected_skipped is not None:
+        skipped = {(case.get("class", ""), case["test"]) for case in cases if case["result"] == "skipped"}
+        complete = complete and counts["pass"] == expected - len(expected_skipped) and skipped == expected_skipped and counts["ignored"] == 0
     else:
         complete = complete and counts["pass"] == expected and not counts["skipped"] and not counts["ignored"]
     result = {"tests":cases, "counts":counts, "expected":expected, "matrixComplete":complete,
@@ -484,7 +501,7 @@ def run(scope="all"):
         summary["pdfSupplemental"] = {"notRepeated":True, "priorRunId":38882501784,
             "qualification":"Prior separate pagination test passed; not counted as a new focused-run check."}
     else:
-        summary["matrix"] = instrument("matrix-36", ",".join("in.wedevit.care."+c for c in CLASSES), 36)
+        summary["matrix"] = instrument("matrix-"+str(MATRIX_EXPECTED), ",".join("in.wedevit.care."+c for c in CLASSES), MATRIX_EXPECTED, expected_skipped=MATRIX_SKIPPED)
         summary["pdfSupplemental"] = instrument("pdf-pagination", "in.wedevit.care.DoctorWorkflowFlowTest#longPublishedPreviewExportsToMultipleReadablePages", 1)
         adb("pull", "/sdcard/Android/data/"+DEBUG+"/files/verification", str(OUT / "debug-captures"), check=False)
     if scope != "all":
@@ -508,7 +525,7 @@ def run(scope="all"):
     write("logcat.txt", adb("logcat", "-d", "-v", "brief", check=False))
     summary["finishedUtc"] = utc()
     summary["passed"] = summary["matrix"]["matrixComplete"] and (scope != "all" or summary["pdfSupplemental"]["matrixComplete"]) and (scope in ("remaining", "privacy") or summary["optimizedRelease"]["passed"])
-    summary["qualification"] = "Focused correction run only; aggregate with original 38882501784 without concealing its four failures or repeating already passing checks." if scope != "all" else "CI emulator only; 36-test matrix and separate PDF check are distinguished. Component fixtures do not establish real doctor assignment or patient delivery. No local Room upgrade claimed."
+    summary["qualification"] = "Focused correction run only; aggregate with original 38882501784 without concealing its four failures or repeating already passing checks." if scope != "all" else f"CI emulator only; {MATRIX_EXPECTED}-test matrix and separate PDF check are distinguished. The only permitted skip is the credential-dependent sign-in check. Component fixtures do not establish real doctor assignment or patient delivery. No local Room upgrade claimed."
     write("runtime-summary.json", summary)
     print(json.dumps({"matrix":summary["matrix"]["counts"], "pdf":summary["pdfSupplemental"].get("counts", "not repeated"),
                       "optimizedPassed":summary["optimizedRelease"].get("passed", "not repeated"), "passed":summary["passed"]}, indent=2))
