@@ -1,6 +1,6 @@
 # Feedback intake
 
-The `/feedback` website has two distinct, voluntary forms. App feedback is not a clinical report. The directory survey collects professional name/registration and optional professional follow-up contacts separately from hospital details. No patient information or attachments are requested. Both forms store consent and server-forced form/consent versions. Hospital submissions remain **pending review**; this feature does not verify clinicians, publish listings or update a map.
+The website has two distinct, voluntary forms: app feedback at `/feedback`, and the dedicated hospital survey at `/hospital-survery`. The older `/feedback?form=hospital` link and `/hospital-survey` spelling redirect to that dedicated survey. The survey has no app-feedback switch. App feedback is not a clinical report. The directory survey collects professional name/registration and optional professional follow-up contacts separately from hospital details. No patient information or attachments are requested. Both forms store consent and server-forced form/consent versions. Hospital submissions remain **pending review**; this feature does not verify clinicians, publish listings or update a map.
 
 ### Optional professional follow-up contacts
 

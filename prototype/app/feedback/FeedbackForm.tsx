@@ -1,8 +1,7 @@
 'use client';
 
-import { useEffect, useRef, useState, type CSSProperties, type FormEvent } from 'react';
+import { useRef, useState, type CSSProperties, type FormEvent } from 'react';
 import styles from './feedback.module.css';
-import HospitalSurvey from './HospitalSurvey';
 import Link from 'next/link';
 
 const ratings = ['Very difficult', 'Not great', 'Okay', 'Good', 'Really good'];
@@ -17,21 +16,7 @@ function Face({ value }: { value: number }) {
   return <svg viewBox="0 0 260 210" className={styles.face} aria-hidden="true"><ellipse cx="75" cy="73" rx={eyeWidth / 2} ry={eyeHeight / 2} /><ellipse cx="185" cy="73" rx={eyeWidth / 2} ry={eyeHeight / 2} /><path d={`M 93 151 Q 130 ${curve} 167 151`} fill="none" stroke="currentColor" strokeWidth="9" strokeLinecap="round" /></svg>;
 }
 
-export default function FeedbackForm({ initialMode = 'app' }: { initialMode?: 'app' | 'hospital' }) {
-  const [mode, setMode] = useState<'app' | 'hospital'>(initialMode);
-  useEffect(() => {
-    const syncMode = () => {
-      const values = new URLSearchParams(window.location.search).getAll('form');
-      setMode(values.length === 1 && values[0] === 'hospital' ? 'hospital' : 'app');
-    };
-    window.addEventListener('popstate', syncMode);
-    return () => window.removeEventListener('popstate', syncMode);
-  }, []);
-  function selectMode(next: 'app' | 'hospital') {
-    if (next === mode) return;
-    window.history.pushState(null, '', `${window.location.pathname}?form=${next}`);
-    setMode(next);
-  }
+export default function FeedbackForm() {
   const [rating, setRating] = useState(3);
   const [role, setRole] = useState('');
   const [category, setCategory] = useState('');
@@ -67,7 +52,7 @@ export default function FeedbackForm({ initialMode = 'app' }: { initialMode?: 'a
     } finally { pending.current = false; setBusy(false); }
   }
 
-  return <><nav className={styles.modes} aria-label="Choose a feedback form"><button type="button" aria-pressed={mode === 'app'} onClick={() => selectMode('app')} disabled={busy}>App feedback<span>Tell us about using Sahara</span></button><button type="button" aria-pressed={mode === 'hospital'} onClick={() => selectMode('hospital')} disabled={busy}>Hospital survey<span>Share palliative-care service information</span></button></nav><div hidden={mode !== 'hospital'}><HospitalSurvey /></div><div hidden={mode !== 'app'}><div className={styles.layout}>
+  return <div className={styles.layout}>
     <section className={styles.experience} aria-labelledby="feedback-title">
       <h1 id="feedback-title">How was Sahara{' '}<br />for you?</h1><p>Your experience can help us make the app easier to use.</p>
       <div className={styles.expression} data-feeling={rating <= 2 ? 'low' : rating >= 4 ? 'high' : 'middle'}><Face value={rating} /><span className={styles.feeling}>{ratings[Math.round(rating) - 1]}</span></div>
@@ -88,5 +73,5 @@ export default function FeedbackForm({ initialMode = 'app' }: { initialMode?: 'a
         <button className={styles.submit} type="submit" disabled={busy}>{busy ? 'Sending feedback…' : 'Send feedback'}<span aria-hidden="true">↗</span></button>
       </fieldset>
     </form>}
-  </div></div></>;
+  </div>;
 }

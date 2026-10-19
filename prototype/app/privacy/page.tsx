@@ -92,7 +92,7 @@ export default function PrivacyPage() {
             names, phone numbers, ABHA numbers or medical details.
           </p>
           <p>
-            The voluntary <Link href="/feedback?form=hospital">hospital survey</Link>
+            The voluntary <Link href="/hospital-survery">hospital survey</Link>
             collects your professional name, role, registering council, registration
             number and state, plus optional professional mobile and email. These
             professional and contact details are stored separately from hospital-service
