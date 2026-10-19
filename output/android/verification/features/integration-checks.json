@@ -1,7 +1,7 @@
 {
-  "checkedAtUtc": "2026-10-19T15:37:10.9500127Z",
+  "checkedAtUtc": "2026-10-19T16:13:40.1122280Z",
   "androidSource": "compiled current source; no APK/AAB task",
-  "androidTests": 130,
+  "androidTests": 131,
   "androidSuites": 20,
   "failures": 0,
   "errors": 0,
@@ -26,5 +26,39 @@
   "productionAiEnabled": false,
   "ordinaryEmailOnboardingReady": false,
   "packageCreated": false,
-  "playUploadMade": false
+  "playUploadMade": false,
+  "androidUiTestClassCompilation": "passed; no device execution",
+  "liveBrowserOcr": {
+    "reading": true,
+    "patientDataUsed": false,
+    "retainedOriginalOpened": true,
+    "manualCorrection": true,
+    "reviewRequiredValidation": true,
+    "nativeMlKitTested": false,
+    "fixture": "synthetic-only prescription",
+    "persistedAfterReload": true,
+    "saved": true
+  },
+  "productionWeb": {
+    "sourceCommit": "c222da8",
+    "reviewedDirectoryCount": 0,
+    "aiReady": false,
+    "legacyToolsAccessible": true,
+    "deploymentId": "dpl_8HAoPFStJW7MHptQrv2SuN3UDoqi",
+    "hospitalSurveyRemainsSeparate": true,
+    "primarySharedAccountEntryVerified": true,
+    "mobilePrescriptionActionClearancePx": 7.2,
+    "bothExistingDomainsVerified": true
+  },
+  "androidInternalMode": {
+    "legacyPhotoPostBytecodeConfirmed": true,
+    "nativeAutomaticTranslationAvailable": false,
+    "nativeGenerativeModelAvailable": false,
+    "deviceRuntimeVerified": false,
+    "debugCloudAudioEnabled": false,
+    "externalAiEnabled": false,
+    "finalCompileAndUnitRun": "passed",
+    "transportCallsInGuardTest": 0,
+    "bytecodeProof": "internal-photo-guard-bytecode.txt"
+  }
 }

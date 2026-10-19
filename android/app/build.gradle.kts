@@ -32,8 +32,8 @@ android {
     buildTypes {
         debug {
             applicationIdSuffix = ".development"
-            // Synthetic developer tests only; the store build cannot upload audio.
-            buildConfigField("boolean", "CLOUD_AUDIO_ENABLED", "true")
+            // Android uses on-device speech in development and store builds.
+            buildConfigField("boolean", "CLOUD_AUDIO_ENABLED", "false")
             buildConfigField(
                 "String",
                 "CONVERSATION_TRANSCRIPTION_ENDPOINT",

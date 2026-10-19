@@ -26,6 +26,7 @@ import kotlinx.coroutines.withContext
     onAppend: (String) -> Unit,
     client: CareRemoteAssist = remember { CareRemoteAssist() },
 ) {
+    if (!CareAndroidAssistPolicy.externalAiEnabled) return
     val scope = rememberCoroutineScope()
     val latestSource by rememberUpdatedState(source)
     val latestToken by rememberUpdatedState(token)
@@ -105,6 +106,7 @@ import kotlinx.coroutines.withContext
     onUseDraft: (CareAssistedDraft) -> Unit,
     client: CareRemoteAssist = remember { CareRemoteAssist() },
 ) {
+    if (!CareAndroidAssistPolicy.externalAiEnabled) return
     val scope = rememberCoroutineScope()
     val latestSource by rememberUpdatedState(source)
     val latestToken by rememberUpdatedState(token)
@@ -169,6 +171,7 @@ import kotlinx.coroutines.withContext
     token: suspend () -> String,
     client: CareRemoteAssist = remember { CareRemoteAssist() },
 ) {
+    if (!CareAndroidAssistPolicy.externalAiEnabled) return
     val scope = rememberCoroutineScope()
     val latestSource by rememberUpdatedState(source)
     val latestVersion by rememberUpdatedState(versionId)

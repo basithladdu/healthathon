@@ -24,6 +24,14 @@ data class CareAssistedTranscript(val original: String, val sourceHash: String, 
 data class CareAssistedTranslation(val original: String, val translation: String, val versionId: String, val sourceHash: String, val sourceLanguage: String, val targetLanguage: String)
 class CareAssistException(val code: String, message: String) : IOException(message)
 
+/** Android currently uses on-device dictation, downloaded voices and manual source review. */
+internal object CareAndroidAssistPolicy {
+    const val externalAiEnabled = false
+    fun requireExternalAi() {
+        if (!externalAiEnabled) throw CareAssistException("on_device_only", "Use on-device dictation or type the words. Online AI is off in this Android app.")
+    }
+}
+
 internal val careAssistFieldKeys = listOf("priorities", "participants", "topics", "openQuestions", "followUp")
 internal val careAssistLanguageCodes = setOf("en-IN", "hi-IN", "kn-IN", "te-IN", "ta-IN", "ml-IN", "mr-IN", "bn-IN", "gu-IN", "pa-IN", "od-IN", "ur-IN")
 fun careAssistSourceHash(source: String): String = MessageDigest.getInstance("SHA-256").digest(source.toByteArray(Charsets.UTF_8)).joinToString("") { "%02x".format(it) }
@@ -35,7 +43,9 @@ fun interface CareAssistTransport {
 
 class CareAssistHttpTransport(private val base: String = "https://sahara.wedevit.in/api/care-assist") : CareAssistTransport {
     init { require(base == "https://sahara.wedevit.in/api/care-assist") }
-    override suspend fun request(path: String, body: String?, accessToken: String): String = suspendCancellableCoroutine { continuation ->
+    override suspend fun request(path: String, body: String?, accessToken: String): String {
+        CareAndroidAssistPolicy.requireExternalAi()
+        return suspendCancellableCoroutine { continuation ->
         val active = AtomicReference<HttpURLConnection?>()
         val worker = CoroutineScope(Dispatchers.IO).launch {
             var connection: HttpURLConnection? = null
@@ -83,10 +93,32 @@ class CareAssistHttpTransport(private val base: String = "https://sahara.wedevit
             finally { connection?.disconnect() }
         }
         continuation.invokeOnCancellation { active.get()?.disconnect(); worker.cancel() }
+        }
     }
 }
 
 class CareRemoteAssist(private val transport: CareAssistTransport = CareAssistHttpTransport()) {
+    private val adapter = CareAssistProviderAdapter(transport)
+    suspend fun capabilities(): CareAssistCapabilities {
+        if (!CareAndroidAssistPolicy.externalAiEnabled) return CareAssistCapabilities(false, false, false)
+        return adapter.capabilities()
+    }
+    suspend fun draft(source: String, token: String, consent: Boolean): CareAssistedDraft {
+        CareAndroidAssistPolicy.requireExternalAi()
+        return adapter.draft(source, token, consent)
+    }
+    suspend fun transcribe(file: File, consent: RecordingConsent, durationMs: Long, language: String, token: String): CareAssistedTranscript {
+        CareAndroidAssistPolicy.requireExternalAi()
+        return adapter.transcribe(file, consent, durationMs, language, token)
+    }
+    suspend fun translate(source: String, versionId: String, sourceLanguage: String, targetLanguage: String, token: String, consent: Boolean): CareAssistedTranslation {
+        CareAndroidAssistPolicy.requireExternalAi()
+        return adapter.translate(source, versionId, sourceLanguage, targetLanguage, token, consent)
+    }
+}
+
+/** Retained for provider contract checks; the Android entry points above stay disabled. */
+internal class CareAssistProviderAdapter(private val transport: CareAssistTransport) {
     suspend fun capabilities(): CareAssistCapabilities {
         val value = JSONObject(transport.request("", null, ""))
         require(value.getString("provider") == "sarvam")

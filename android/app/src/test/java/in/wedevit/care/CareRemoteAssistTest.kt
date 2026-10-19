@@ -74,7 +74,7 @@ class CareRemoteAssistTest {
 
     @Test fun realClientUsesOneExplicitConsentedAttemptAndNoFixtureFallback() = runBlocking {
         val calls = mutableListOf<JSONObject>()
-        val client = CareRemoteAssist(CareAssistTransport { path, body, token ->
+        val client = CareAssistProviderAdapter(CareAssistTransport { path, body, token ->
             assertEquals("", path); assertEquals("actual-account-token", token)
             calls += JSONObject(body!!); draftJson().toString()
         })
@@ -87,8 +87,25 @@ class CareRemoteAssistTest {
 
     @Test fun failedProviderKeepsOriginalAndDoesNotReturnAnInventedDraft() = runBlocking {
         var calls = 0
-        val client = CareRemoteAssist(CareAssistTransport { _, _, _ -> calls++; throw CareAssistException("unavailable", "Unavailable") })
+        val client = CareAssistProviderAdapter(CareAssistTransport { _, _, _ -> calls++; throw CareAssistException("unavailable", "Unavailable") })
         try { client.draft(source, "account", true); fail("Expected failure") } catch (error: CareAssistException) { assertEquals("unavailable", error.code) }
         assertEquals(1, calls); assertTrue(source.contains("do not want"))
+    }
+
+    @Test fun androidEntryPointsNeverContactTheProviderInOnDeviceMode() = runBlocking {
+        var calls = 0
+        val client = CareRemoteAssist(CareAssistTransport { _, _, _ -> calls++; error("Unexpected network request") })
+        assertEquals(CareAssistCapabilities(false, false, false), client.capabilities())
+        val operations: List<suspend () -> Unit> = listOf(
+            { client.draft(source, "account", true); Unit },
+            { client.translate(source, "version-1", "en-IN", "hi-IN", "account", true); Unit },
+            { client.transcribe(java.io.File("unopened.m4a"), RecordingConsent("unopened.m4a", "person", "Patient", 1, 2), 1000, "en-IN", "account"); Unit },
+            { CareAssistHttpTransport().request("", null, ""); Unit },
+        )
+        operations.forEach { operation ->
+            try { operation(); fail("Expected on-device guard") }
+            catch (error: CareAssistException) { assertEquals("on_device_only", error.code) }
+        }
+        assertEquals(0, calls)
     }
 }

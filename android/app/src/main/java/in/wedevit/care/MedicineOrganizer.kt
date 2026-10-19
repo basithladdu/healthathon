@@ -428,6 +428,12 @@ class MedicineOrganizer(
     }
 
     private suspend fun post(body: ByteArray, token: String): String = withContext(Dispatchers.IO) {
+        if (!CareAndroidAssistPolicy.externalAiEnabled) {
+            throw MedicineOrganizerException(
+                MedicineOrganizerError.CONFIGURATION,
+                "Use on-device prescription reading. Online photo processing is off in this Android app.",
+            )
+        }
         val connection = try {
             endpoint.openConnection() as? HttpURLConnection
                 ?: throw MedicineOrganizerException(MedicineOrganizerError.UNAVAILABLE, "The medicine organizer could not connect.")

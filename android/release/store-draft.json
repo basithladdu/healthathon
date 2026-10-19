@@ -373,8 +373,8 @@
       "nameAndReleaseNotesSaved": true,
       "bundleUploaded": true,
       "submitted": false,
-      "observedAtUtc": "2026-10-16T10:57:53.793787+00:00",
-      "uploadAttemptedAtUtc": "2026-10-16T10:56:08.959907+00:00",
+      "observedAtUtc": "2026-10-16T16:27:53.793787+05:30",
+      "uploadAttemptedAtUtc": "2026-10-16T16:26:08.959907+05:30",
       "uploadStatus": "Uploaded once, processed as 6 (0.5.0), Save as draft confirmed Changes saved; not submitted",
       "uploadedVersion": "0.5.0",
       "uploadedVersionCode": 6,
@@ -663,7 +663,8 @@
     "submitted": false,
     "verification": {
       "androidCompilation": "compileDebugKotlin passed",
-      "androidUnitTests": 130,
+      "androidUiTestCompilation": "compileDebugAndroidTestKotlin passed; test classes compiled, not executed on a device",
+      "androidUnitTests": 131,
       "androidUnitSuites": 20,
       "androidUnitFailures": 0,
       "androidUnitErrors": 0,
@@ -674,9 +675,10 @@
       "directoryPostgresWasmChecks": 18,
       "livePostgresRollback": "passed including roles, patient-first confirmations, exact QR, suspension, account closure and directory privacy",
       "browser": "real confirmed-account sign-in/sign-out, inaccessible exact-link denial after refresh, 390px fit; no record mutation",
-      "localOcr": "actual Tesseract engine and shipped language assets, synthetic-only fixture; Node worker adapter, not browser UI/native ML Kit",
+      "localOcr": "actual shipped Tesseract engine and synthetic live-browser flow passed: image selection, reading, review-required validation, correction, save, reload and original access; no native ML Kit runtime claim",
       "physicalDeviceTested": false,
-      "emulatorTested": false
+      "emulatorTested": false,
+      "internalOnlyVerification": "final actual source compilation and 131 unit tests passed; native facade/HTTP/no-provider-call regression passed; legacy photo-post bytecode rejects before a connection"
     },
     "deliveredSource": [
       "Account-backed web/native care-note drafts and independently verified clinician workflow",
@@ -685,10 +687,10 @@
       "Local OCR with retained originals, reviewed page/line facts and extractive document answers",
       "Durable inexact Android reminder scheduling with permission and lifecycle recovery",
       "Private hospital moderation with audit, expiry and sanitized public projections",
-      "Consent/account/source-bound Sarvam assistance adapters, disabled pending actual provider setup"
+      "Consent/account/source-bound provider adapters retained for future use; Android external AI explicitly disabled by user direction"
     ],
     "operationalGates": [
-      "Existing Devit Sarvam workspace, one onboarding key and 100 credits verified; recoverable/usable secret and applicable processing agreement/disclosures remain unverified; no patient provider calls enabled",
+      "User says promised Healthathon Sarvam access has not arrived. Existing Devit workspace/100 credits are not assumed to be that allocation; no new key or training change authorised. Actual usable service configuration, processing terms, retention and live API verification remain pending; no patient provider calls enabled",
       "Custom SMTP and exact approved recovery callback are absent; new-account email confirmation and recovery remain unavailable; existing confirmed accounts work",
       "Real independent verifier assignment and clinician/family pilot remain pending; no staff or professional approvals were fabricated"
     ],
@@ -700,6 +702,29 @@
       "Keep current Production review intact; do not duplicate or withdraw 0.5.0 (6)"
     ],
     "hospitalSurvey": "web only",
-    "reportOriginals": "private phone/browser copies; copying facts into account entries does not synchronize original files"
+    "reportOriginals": "private phone/browser copies; copying facts into account entries does not synchronize original files",
+    "webRoutes": [
+      "https://sahara.wedevit.in/shared-care",
+      "https://sahara.wedevit.in/reviewed-centres",
+      "https://sahara.wedevit.in/hospital-survery"
+    ],
+    "webDeployment": {
+      "sourceCommit": "c222da8",
+      "id": "dpl_8HAoPFStJW7MHptQrv2SuN3UDoqi",
+      "status": "READY, promoted and verified on both existing domains; entry and prescription actions checked at 390px",
+      "domains": [
+        "https://sahara.wedevit.in",
+        "https://saanthvana.wedevit.in"
+      ]
+    },
+    "androidProcessingMode": {
+      "mode": "on-device services only for speech/OCR/read-aloud; shared account sync preserved",
+      "generativeSummaryAvailable": false,
+      "automaticTranslationAvailable": false,
+      "unsupportedLanguageFallback": "manual typing/review; no cloud recognizer fallback",
+      "debugCloudAudioEnabled": false,
+      "externalAiEnabled": false
+    },
+    "sourceBaseCommit": "c222da8"
   }
 }

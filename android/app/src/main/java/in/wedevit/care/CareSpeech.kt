@@ -160,14 +160,15 @@ private class CareDictation(private val context: Context, val changed: () -> Uni
     LaunchedEffect(active) { latestActiveChanged(active) }
     DisposableEffect(Unit) { onDispose { latestActiveChanged(false) } }
     SurfaceCard(Mint) {
-        Row(verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.RecordVoiceOver, null, tint = Ink); Spacer(Modifier.width(10.dp)); Text("Speak a turn", fontWeight = FontWeight.Bold) }
+        Row(verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.RecordVoiceOver, null, tint = Ink); Spacer(Modifier.width(10.dp)); Text("On-device dictation", fontWeight = FontWeight.Bold) }
         Spacer(Modifier.height(8.dp))
         Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(7.dp)) {
             listOf("Patient", "Family / carer", "Doctor").forEach { role -> FilterChip(selected = speaker == role, onClick = { speaker = role }, enabled = !active, label = { Text(role) }) }
         }
         CareLanguageMenu(languageTag, enabled = !active) { languageTag = it }
         if (dictation.available) {
-            if (active) LinearProgressIndicator(progress = { if (dictation.processing) .15f else dictation.level }, modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp), color = Rust)
+            if (dictation.processing) LinearProgressIndicator(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp), color = Rust)
+            else if (dictation.listening) LinearProgressIndicator(progress = { dictation.level }, modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp), color = Rust)
             if (dictation.partial.isNotBlank()) Text(dictation.partial, modifier = Modifier.padding(vertical = 8.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(onClick = {
@@ -181,7 +182,7 @@ private class CareDictation(private val context: Context, val changed: () -> Uni
                 if (active) TextButton(onClick = { dictation.cancel(keepWords = false); heldWords = "" }) { Text("Cancel turn") }
             }
             if (dictation.status.isNotBlank()) Text(dictation.status, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 6.dp))
-        } else Text("Dictation isn't available on this phone. Type the words or record audio below.", style = MaterialTheme.typography.bodySmall)
+        } else Text(if (Build.VERSION.SDK_INT < 31) "On-device dictation needs Android 12 or later. Type the words or keep an audio recording." else "On-device dictation isn't available on this phone. Type the words or keep an audio recording.", style = MaterialTheme.typography.bodySmall)
         if (permissionError.isNotBlank()) Text(permissionError, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
         if (heldWords.isNotBlank() && !active) {
             Text("Unfinished words · $pendingSpeaker · ${pendingLanguage.label}", style = MaterialTheme.typography.labelMedium)
@@ -275,6 +276,6 @@ private class CareReadAloud(context: Context, val changed: () -> Unit) {
             Spacer(Modifier.weight(1f)); CareLanguageMenu(language) { language = it }
         }
         if (reader.status.isNotBlank()) Text(reader.status, style = MaterialTheme.typography.bodySmall)
-        Text("Voice language only; the note's words stay unchanged.", style = MaterialTheme.typography.bodySmall)
+        Text("Downloaded voice only; the note's words stay unchanged.", style = MaterialTheme.typography.bodySmall)
     }
 }
