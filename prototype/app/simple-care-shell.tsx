@@ -6,6 +6,7 @@ import { CareRouteLink } from './care-route-link';
 import type { CareView } from './care-routes';
 import { careSectionFor } from './care-section-pages';
 import { SaharaLogo } from './sahara-logo';
+import Link from 'next/link';
 
 type CareNavIconName = 'home' | 'documents' | 'support' | 'space' | 'visit' | 'record' | 'review' | 'history' | 'care';
 
@@ -129,6 +130,7 @@ export function SimpleCareShell({ children, view, role, hindi, saveStatus, onNav
       </CareRouteLink>
       <div className="simple-care-switches"><button type="button" onClick={onLanguage} lang={hindi ? 'en' : 'hi'}>{hindi ? 'English' : 'हिन्दी'}</button>
         <CareRoleSwitcher role={role} hindi={hindi} onRole={onRole} />
+        <Link href="/feedback" style={{ color: '#b9472c', minHeight: 44, display: 'inline-flex', alignItems: 'center', paddingInline: 8, textUnderlineOffset: 4 }}>App feedback</Link>
         <button type="button" onClick={onSignOut}>{t('Sign out', 'साइन आउट')}</button>
       </div>
     </header>

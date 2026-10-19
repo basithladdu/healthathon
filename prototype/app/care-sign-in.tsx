@@ -5,6 +5,7 @@ import { CareArt, type CareArtKind } from './care-art';
 import { CareLoading } from './care-loading';
 import './care-sign-in.css';
 import { SaharaLogo } from './sahara-logo';
+import Link from 'next/link';
 
 export type CareSignInInput = { role: 'family' | 'patient' | 'doctor'; patientId: string; name: string };
 export type CareSignInProps = {
@@ -100,7 +101,7 @@ export function CareSignIn({ patients, hindi, onLanguage, onSignIn }: CareSignIn
   return <div className="care-sign-in" lang={hindi ? 'hi' : 'en'}>
     <header className="care-sign-in-header">
       <span className="care-sign-in-brand"><SaharaLogo className="care-sign-in-logo" priority /><span><strong>{t('Sahara', 'सहारा')}</strong><small>{t('- A Palliative Care Companion', '- पैलिएटिव केयर साथी')}</small></span></span>
-      <button type="button" className="care-sign-in-language" onClick={onLanguage} lang={hindi ? 'en' : 'hi'}>{hindi ? 'English' : 'हिन्दी'}</button>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}><Link href="/feedback" style={{ color: '#b9472c', minHeight: 44, display: 'inline-flex', alignItems: 'center', textUnderlineOffset: 4 }}>App feedback</Link><button type="button" className="care-sign-in-language" onClick={onLanguage} lang={hindi ? 'en' : 'hi'}>{hindi ? 'English' : 'हिन्दी'}</button></div>
     </header>
     <main className="care-sign-in-main">
       <div className="care-sign-in-card">
