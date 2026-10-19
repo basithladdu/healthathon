@@ -233,7 +233,8 @@ private val DoctorMist = Peach
                     onCancel = { cancellingId = it.id }, onComplete = { refresh(demoStore.complete(it.id)) }, onConversation={progressReportId=null;reportId=null;workflowRoute=shownPatient.id},showNavigation=false,
                     overview=DoctorOverviewData.build(shownPatient.id,workflow.versions(shownPatient.id),appointments,System.currentTimeMillis()),
                     progressReports=progressReports,onOpenReport={progressReportId=it},listState=when(recordTab) {"Progress"->progressListState;"Reports"->reportsListState;else->null},
-                    reports=reports,reportQuery=reportQuery,reportCategory=reportCategory,onReportQuery={reportQuery=it},onReportCategory={reportCategory=it},onReportOpen={focus.clearFocus();reportId=it})
+                    reports=reports,reportQuery=reportQuery,reportCategory=reportCategory,onReportQuery={reportQuery=it},onReportCategory={reportCategory=it},onReportOpen={focus.clearFocus();reportId=it},
+                    conversations=DoctorConversationsData.build(shownPatient.id,workflow.versions(shownPatient.id),workflow.draft(shownPatient.id),System.currentTimeMillis()))
                 destination.second == 0 -> DemoHome(demoStore.patients, appointments, ::openPatient, onSchedule = { tab = 2 }, onAdd = { creatingFor = demoStore.patients.first().id }, workflow = workflow, onRequests={workflowRoute="requests"}, onDraft={workflowRoute=it;patientId=it;recordTab="Conversations"})
                 destination.second == 1 -> DemoPatients(demoStore.patients, ::openPatient)
                 destination.second == 2 -> DemoSchedule(demoStore.patients, appointments, LocalDate.parse(selectedDay), { selectedDay = it.toString() }, ::openPatient,
@@ -362,7 +363,7 @@ private val DoctorMist = Peach
     }
 }
 
-@Composable internal fun DemoPatientDetail(patient: DoctorDemoPatient, selected: String, onSection: (String) -> Unit, appointments: List<DoctorDemoAppointment>, onSchedule: () -> Unit, onReschedule: (DoctorDemoAppointment) -> Unit, onCancel: (DoctorDemoAppointment) -> Unit, onComplete: (DoctorDemoAppointment) -> Unit, onConversation:()->Unit,showNavigation:Boolean=true,overview:DoctorPatientOverview?=null,progressReports:List<DoctorProgressReport>?=null,onOpenReport:(String)->Unit={},listState:LazyListState?=null,reports:List<DoctorReportSummary>?=null,reportQuery:String="",reportCategory:DoctorReportCategory?=null,onReportQuery:(String)->Unit={},onReportCategory:(DoctorReportCategory?)->Unit={},onReportOpen:(String)->Unit={}) {
+@Composable internal fun DemoPatientDetail(patient: DoctorDemoPatient, selected: String, onSection: (String) -> Unit, appointments: List<DoctorDemoAppointment>, onSchedule: () -> Unit, onReschedule: (DoctorDemoAppointment) -> Unit, onCancel: (DoctorDemoAppointment) -> Unit, onComplete: (DoctorDemoAppointment) -> Unit, onConversation:()->Unit,showNavigation:Boolean=true,overview:DoctorPatientOverview?=null,progressReports:List<DoctorProgressReport>?=null,onOpenReport:(String)->Unit={},listState:LazyListState?=null,reports:List<DoctorReportSummary>?=null,reportQuery:String="",reportCategory:DoctorReportCategory?=null,onReportQuery:(String)->Unit={},onReportCategory:(DoctorReportCategory?)->Unit={},onReportOpen:(String)->Unit={},conversations:DoctorConversationsModel?=null) {
     val defaultListState=rememberLazyListState()
     LazyColumn(Modifier.fillMaxSize().testTag("demo-patient-detail"),state=listState ?: defaultListState, contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         item { Row(verticalAlignment = Alignment.CenterVertically) { DoctorAvatar(patient.displayName(), 58); Spacer(Modifier.width(14.dp)); Column(verticalArrangement = Arrangement.spacedBy(4.dp)) { DoctorTitle(patient.displayName(), 24); Text("${patient.age} years", color = DoctorMuted); } }
@@ -383,9 +384,8 @@ private val DoctorMist = Peach
                 item {DoctorProgressTimeline(progressReports ?: DoctorProgressData.reports(patient.id,System.currentTimeMillis()),onOpenReport=onOpenReport)}
             }
             "Conversations", "Care notes" -> {
-                item { OutlinedButton(onClick=onConversation,modifier=Modifier.fillMaxWidth().heightIn(min=48.dp).testTag("workflow-open-conversation")) { Text("Open conversation workspace") } }
-                item { Text("Previous sample discussion",fontWeight=FontWeight.SemiBold) }
-                items(patient.careNotes) { Text(recordDisplayText(it),lineHeight=24.sp) }
+                val history=conversations ?: DoctorConversationsData.build(patient.id,emptyList(),null,System.currentTimeMillis())
+                if(history!=null) item {DoctorConversationsContent(history,onConversation)}
             }
             "Medicines" -> {
                 item {DoctorMedicineContent(DoctorPatientTracking.doses(patient.id),DoctorPatientTracking.asOf,demoZone)}
