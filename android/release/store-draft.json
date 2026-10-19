@@ -1,5 +1,5 @@
 {
-  "status": "Alpha 0.4.1 (5), release ID 3, is available to selected testers. Play shows release on 14 October at 17:49 IST. An eligible tester joined and Google Play showed Install. Invitations to all 59 confirmed addresses were verified in Gmail Sent in separate original-57 and additional-2 batches. This is closed testing, not a production release. Photo scanning stays off.",
+  "status": "Production 0.4.1 (5), release ID 1, is live in India with Install enabled. The authorised 0.5.0 (6) Production update, release ID 2, is now Changes in review, verified on 19 October 2026 with its matching listing, screenshots, reviewer flow and Calendar events disclosure. This is submission, not 0.5 approval. Its existing Alpha draft 4 is unchanged. All 59 tester invitations were already sent; do not resend. Photo scanning and release cloud audio stay off.",
   "preparedOn": "2026-10-10",
   "workingTitle": "Sahara: Palliative Companion",
   "fullProductName": "Sahara — A Palliative Care Companion",
@@ -26,10 +26,10 @@
       "ACCESS_NETWORK_STATE for map connectivity",
       "RECORD_AUDIO, requested only to record"
     ],
-    "note": "Saved to Google Play on 10 October 2026 against the 0.3.0 release. Any AI, sync or account integration changes require reassessing these answers."
+    "note": "Original disclosure saved on 10 October. On 19 October, the 0.5 assessment added optional, non-ephemeral Calendar events collection for App functionality because signed-in schedule entries are cloud records. Existing health, account, UGC and provider metadata categories are retained. Audio/photo uploads remain disabled."
   },
   "releaseDependencies": [
-    "Closed testing is live and both authorised invitation groups are sent. Production access is unlocked; tester installations, participation and production approval have not been verified.",
+    "Production 0.4.1 (5) is published in India, verified on 19 October 2026 in Console and on the public listing with Install enabled. Closed testing and both authorised invitation groups are complete. No new installation or tester-participation verification was performed.",
     "Ordinary tester signup and reset delivery remain incomplete: the exact Sahara callback allowlist is unapproved and Zoho work is paused at the user's request. Unsigned-in care flows and the dedicated reviewer login work; the default Supabase mail service is limited to project-team addresses.",
     "Public photo scanning remains off. Any future enablement needs suitable provider terms, authorised billing, complete flow verification and matching Play declarations.",
     "If applicable to the account, enrol at least 12 testers continuously for 14 days, then apply for production access; this does not guarantee approval. No completed testing period is claimed."
@@ -41,15 +41,19 @@
       "output/android/verification/0.4.0/today.png",
       "output/android/verification/0.4.0/centre-map-loaded.png",
       "output/android/verification/0.4.0/documents.png",
-      "output/android/verification/0.4.0/note-actions.png"
+      "output/android/verification/0.4.0/note-actions.png",
+      "output/android/verification/0.5.0/ci-runtime-38882501784/lab-history-series.png",
+      "output/android/verification/0.5.0/ci-runtime-38882501784/conversation-request-picked-up.png",
+      "output/android/verification/0.5.0/ci-runtime-38882501784/calendar-dated-visit.png",
+      "output/android/verification/0.5.0/ci-runtime-38882501784/care-task-completed.png"
     ],
-    "screenshotEvidence": "Actual 1080x2340 Samsung A34 captures from the matching-source 0.4.0 debug build, using fictional Test Person records. Four screenshots visually inspected before upload. App icon and feature graphic reuse Awaiz's original logo; the source logo was preserved unchanged.",
-    "uploadStatus": "Matching listing assets and description were saved on 13 October and published with the approved 0.4.1 (5) closed-testing release on 14 October."
+    "screenshotEvidence": "The original four 1080x2340 Samsung A34 captures remain. Four actual 720x1600 API 36 emulator captures from final 0.5 source ebffb7b were added on 19 October: labs, request pickup, calendar and completed task. Fictional fixtures, ordinary Saved snackbars, no OS overlays. These are debug UI evidence, not physical 0.5 device tests. All eight were inspected. App icon and feature graphic preserve Awaiz's original logo.",
+    "uploadStatus": "Eight phone screenshots and matching 0.5 full description are included in the authorised Production update's Changes in review on 19 October. The existing 0.4.1 listing remains public until Google publishes the new changes."
   },
   "appContentDraft": {
     "containsAds": false,
     "appAccess": "Some functionality is restricted. Basic notes, daily care and the directory work without sign-in; account sync and invitations require sign-in. A dedicated reviewer account has confirmed email, successful password sign-in and an authorised empty care-record read. Its credentials were saved privately in Play's reviewer instructions after explicit user approval.",
-    "reviewInstructions": "Open More > Your account and sign in. Add a person. Use Talk to save a goals-of-care note; switch to Doctor to review, then Family to confirm. Documents (folder icon) adds, opens and shares PDFs/photos. Care > Medicines supports manual entry; photo scanning is currently off. Nearby works without sign-in. No payment, OTP or location restriction. Use fictional information only. Doctor is self-selected.",
+    "reviewInstructions": "Use fictional data. More > Your account: sign in and add a person. Talk: type, link excerpts, Doctor review/save, Patient confirm, then Family confirm. Today: Care team, Calendar, Lab history. Doctor login is a separate fictional preview; roles are self-entered. Dictation and offline read aloud require installed services. Saved audio is not transcribed. Photo scanning, cloud audio and medicine reminders are off. Documents stay on this phone. No payment/OTP.",
     "targetAudienceProposal": "18 and over: adult patients, family caregivers and care professionals",
     "healthApp": true,
     "medicalDevice": false,
@@ -60,7 +64,7 @@
   },
   "dataSafetyDraft": {
     "formSubmitted": true,
-    "submissionStatus": "Saved and published with the approved scanner-off 0.4.1 (5) closed-testing release on 14 October. Prior account-classification rejection history is preserved.",
+    "submissionStatus": "Existing disclosures were published with 0.4.1. The 0.5 update adds optional non-ephemeral Calendar events for App functionality; saved and included in Changes in review on 19 October. Prior account-classification rejections remain history.",
     "specificDataDeletionUrl": "https://sahara.wedevit.in/delete-account#specific",
     "collectsData": true,
     "encryptedInTransit": true,
@@ -95,6 +99,14 @@
       },
       {
         "type": "Health info",
+        "optional": true,
+        "ephemeral": false,
+        "purposes": [
+          "App functionality"
+        ]
+      },
+      {
+        "type": "Calendar events",
         "optional": true,
         "ephemeral": false,
         "purposes": [
@@ -194,11 +206,11 @@
     "version": "0.5.0",
     "versionCode": 6,
     "built": true,
-    "ready": false,
+    "ready": true,
     "uploaded": true,
-    "submitted": false,
+    "submitted": true,
     "installed": false,
-    "status": "Signed 0.5.0 (6) uploaded once and saved as Alpha release 4 Draft. Build and stated checks complete. Not submitted: Production 0.4.1 review remains in progress. New global listing/reviewer text remains local for later use.",
+    "status": "Signed 0.5.0 (6) reused from the Play library for Production release 2. All four changes are Changes in review as of 19 October, after the matching listing/screenshots/reviewer instructions and Calendar events disclosure were saved. No duplicate bundle upload. Existing Alpha draft 4 stays unsubmitted. Production 0.4.1 remains live; 0.5 approval/publication is not yet confirmed.",
     "apk": "output/android/Sahara-0.5.0-release.apk",
     "bundle": "output/android/Sahara-0.5.0.aab",
     "sourceCommit": "ebffb7b043a5e8725f190ab8f8f3574c768d9058",
@@ -206,9 +218,12 @@
       "fullDescription": "Sahara: A Palliative Care Companion\n\nFor patients, families and doctors.\n\nKeep the words that matter from a goals-of-care conversation. Type the conversation, record it with everyone's permission, or dictate one selected speaker's turn on a supported phone. Check the words and build the note from exact source excerpts. A doctor can review and save a version; the patient confirms first, then family can add separate confirmations of that same version. Names and roles are self-entered, not verified credentials or legal consent. Earlier versions and their original words remain available.\n\nAsk the care team to talk, pick up a request and keep named tasks with acceptance and completion status. Plan visits, tests, procedures and follow-ups in a dated calendar. Enter numeric lab results with the report's units and printed ranges, and view values over time. Lab history does not interpret results or recommend treatment. Add prescribed medicines, check-ins, questions and daily notes. Medicine reminders are not available.\n\nDocuments keeps user-selected PDFs and photos together. Open a report or share a copy using Android. Report files and recordings remain private phone copies and do not sync to other devices. Saved recordings are not automatically transcribed. Read aloud uses an installed offline voice and does not translate. Live dictation requires an installed on-device recognition service; typing and recording remain available when it is unsupported.\n\nSign in to save care notes and daily entries to your account. Invite family or care team members to read them or allow changes. Conversation requests and tasks are shared records, not dispatched calls or email. Unfinished conversations are not uploaded.\n\nFind listed palliative care centres in Karnataka on a MapLibre map or in the list. Call a centre or get directions. Directory entries do not confirm current medicine stock. There are no ads. Photo scanning is currently off; medicines can be entered manually.\n\nDoctor login opens an isolated fictional preview for exploring scheduling and note review. Its sample records and marked preview PDFs are not verified clinical records or connected patient accounts.\n\nThis app is not a medical device. It does not diagnose, treat, cure or prevent a condition, recommend treatment or replace professional medical care. Ask a qualified healthcare professional for medical advice. Care notes record a discussion; they are not prescriptions or legal directives.",
       "releaseNotes": "New care-team requests and named tasks, calendar and numeric lab history. Build notes from exact conversation excerpts; patient and family confirm the same version. Supported phones can dictate a selected speaker and read notes aloud offline. Explore the separate fictional doctor workspace. Cloud audio and photo scanning stay off.",
       "reviewInstructions": "Use fictional information. Basic care works without signing in; the approved reviewer login enables shared records. Add a person, use Talk to type a conversation or consent to on-device dictation if supported, and assign exact source excerpts to the note. Select Doctor to review and save. Open that note, confirm as Patient first, then add a separate Family / carer confirmation. Names and roles are self-entered, not verified credentials or legal consent. Today shortcuts open Care team, Calendar and Lab history. Create a conversation request, pick it up in Doctor view, and save a dated task or numeric lab result with the report's units/ranges. Documents adds, opens and shares phone-private copies. Photo scanning is off; use manual medicine entry. Dictation availability depends on an installed on-device service; saved M4A audio is not transcribed. Read aloud requires an installed offline voice and does not translate. No medication notifications, payment or location restriction. Doctor login opens a separate fictional local preview; it does not grant clinical access. Release builds cannot upload recordings or run online audio transcription.",
-      "dataSafetyAssessment": "Existing Health info, Name and Other user-generated content categories cover signed-in labs, requests, tasks and separate confirmations. Consented on-device recognition and installed offline text-to-speech have no app fallback to a cloud provider. The unchanged microphone permission also serves dictation; package-visibility queries are not new runtime permissions. Photo scanning remains off. Preserve the existing accurate Medical/health declarations and provider-metadata categories; no new collection-type removal is justified.",
+      "dataSafetyAssessment": "Added Calendar events as collected, optional, non-ephemeral, for App functionality on 19 October. Signed-in calendar title/detail/due fields pass through CareModel to CareCloud and Supabase; this is not phone-private. Google's Calendar definition covers event notes independently of Android Calendar permissions. Existing Health info, Name and Other user-generated content categories remain for labs, requests, tasks and confirmations. On-device recognition/offline text-to-speech have no cloud fallback. Photo scanning stays off. Medical and provider-metadata declarations remain unchanged.",
       "privacyDeployment": "dpl_6orhhiq4eQnLGSy2kGJLzwzBibsC; both domains and mobile 375/390 checks passed, including local preview retention",
-      "savedInPlay": false
+      "savedInPlay": true,
+      "savedOn": "2026-10-19",
+      "reviewInstructionsSavedInPlay": "Use fictional data. More > Your account: sign in and add a person. Talk: type, link excerpts, Doctor review/save, Patient confirm, then Family confirm. Today: Care team, Calendar, Lab history. Doctor login is a separate fictional preview; roles are self-entered. Dictation and offline read aloud require installed services. Saved audio is not transcribed. Photo scanning, cloud audio and medicine reminders are off. Documents stay on this phone. No payment/OTP.",
+      "reviewerCredentialsUnchanged": true
     },
     "changes": [
       "Consented on-device speaker-turn dictation on supported Android devices",
@@ -340,7 +355,7 @@
     "releasePrerequisites": [
       "Build/signatures/static and stated emulator checks complete; no physical-device, real speech/provider or clinical validation.",
       "Verified bundle already uploaded once and saved in Alpha release 4. Reuse it; do not reupload or resend the 59 invitations.",
-      "Preserve Production 0.4.1 review. Before a later 0.5 review submission, apply matching listing/reviewer material and recheck actual policy/data-safety state without enabling unapproved providers."
+      "Production 0.5 release 2 is now Changes in review with matching listing/reviewer material and corrected Calendar events disclosure. Do not upload, withdraw, duplicate or resubmit it while review is pending. Keep cloud audio and photo scanning off."
     ],
     "supersededPreKeyboardBuild": {
       "sourceCommit": "4758218",
@@ -366,11 +381,39 @@
       "savedAsDraft": true,
       "trackState": "Draft",
       "proof": "output/android/verification/0.5.0/play-alpha-draft.png",
-      "finalTrackObservedAtUtc": "2026-10-16T11:15:36.156011+00:00"
+      "finalTrackObservedAtUtc": "2026-10-19T08:41:52Z",
+      "latestProof": "output/android/verification/sahara-alpha-draft-2026-10-19.png"
     },
     "artifactVerified": true,
     "runtimeVerified": true,
-    "draftReady": true
+    "draftReady": true,
+    "productionSubmission": {
+      "version": "0.5.0",
+      "versionCode": 6,
+      "trackId": "4697314269892725425",
+      "releaseId": 2,
+      "releaseUrl": "https://play.google.com/console/u/1/developers/8795679408143615220/app/4974759245808215344/tracks/4697314269892725425/releases/2/details",
+      "bundleReusedFromPlayLibrary": true,
+      "bundleSha256": "F6F9C281712A67F107B2F6EE51066B5F024936170C4D795B2E025A7E7E22009B",
+      "submitted": true,
+      "reviewStatus": "Changes in review",
+      "published": false,
+      "countries": [
+        "India"
+      ],
+      "rolloutPercentage": 100,
+      "managedPublishing": false,
+      "submittedChangeCount": 4,
+      "reviewerInstructionsUpdated": true,
+      "reviewerCredentialsUnchanged": true,
+      "calendarEventsCollectionDeclared": true,
+      "medicalDeclarationsUnchanged": true,
+      "proof": "output/android/verification/sahara-production-050-in-review-2026-10-19.png",
+      "observedAtUtc": "2026-10-19T09:05:11Z",
+      "evidence": "Publishing overview shows Changes in review for Production 0.5.0 (6), Start full rollout, full description, Phone screenshots and Data safety. Screenshot says Your changes are now in review. This is not approval or a device-install test.",
+      "submissionRecovery": "Initial confirmation closed without recording a submission and one website error appeared. Completed quick checks, a fresh release entry, native/keyboard confirmation and the existing owner's Google session refresh were tried without changing access or credentials. After the owner refresh, Google recorded Changes in review; the exact underlying cause is unconfirmed.",
+      "deviceInstall": "No phone or emulator was connected to local ADB on 19 October. Signed APK is available; no new device installation was performed."
+    }
   },
   "productionRelease": {
     "version": "0.4.1",
@@ -379,7 +422,7 @@
     "releaseId": 1,
     "saved": true,
     "submitted": true,
-    "reviewStatus": "Changes in review",
+    "reviewStatus": "Available on Google Play",
     "userAuthorisedCurrentVersion": true,
     "submissionConfirmationObserved": true,
     "manualConfirmationPending": false,
@@ -387,14 +430,14 @@
     "countries": [
       "India"
     ],
-    "rollout": "First full production rollout after Google review",
+    "rollout": "Published in Production, India",
     "bundleReusedFromPlayLibrary": true,
     "bundleSha256": "64E70664F68A7A63F5F712E7CA3E6804ED107981ABEBFC6C5916C0C891223914",
     "validationErrors": 0,
     "warning": "Missing native debug symbols; non-blocking",
     "quickChecksStatus": "completed",
     "changesReadyToSubmit": 0,
-    "evidence": "Publishing overview shows Changes in review: Production 0.4.1 (5), Start full rollout, India. This is not approval.",
+    "evidence": "Production Releases shows 0.4.1 (5), Available on Google Play, Released on Oct 19 12:08 PM. Publishing overview says Last published on October 19, 2026. Countries / regions lists India as Targeted. The public listing opens with the correct title, developer and enabled Install. No remote installation was performed.",
     "sourcePull": {
       "result": "Already up to date on 14 October",
       "headAtPull": "73a2f16909c3be4eec67ec8dd9f3b4cefc1da616",
@@ -404,7 +447,7 @@
     },
     "remainingPublicReadiness": "Ordinary signup and reset email delivery remains recorded as incomplete/unverified. After this was explained, the user explicitly requested submitting the current version as-is. These known limitations remain follow-up work; do not delay this authorised version for new provider setup. Zoho remains paused, the exact Supabase recovery callback remains unapproved, photo scanning stays off and declarations remain accurate.",
     "agentHandlesConfirmation": true,
-    "lastVerifiedAtUtc": "2026-10-16T11:15:36.156011+00:00",
+    "lastVerifiedAtUtc": "2026-10-19T08:41:52Z",
     "recoveryActions": [
       "Existing owner sign-in refreshed; no new account or access created",
       "Fresh task tab and documented browser-control reset",
@@ -416,11 +459,20 @@
       "sent": true,
       "verifiedInSent": true,
       "newTicketCreated": false,
-      "privateEvidenceOnly": true
+      "privateEvidenceOnly": true,
+      "replyReceived": true,
+      "replyDisplayedAtLocal": "15 October 2026, 03:05 IST",
+      "replySummary": "Google confirmed the Production update was received and in review; it asked for no further versions or changes during that review. Publication on 19 October satisfies that historical wait condition. No duplicate case was created."
     },
     "initialRecordedFailedAttempts": 5,
-    "status": "In review",
-    "verifiedAt": "2026-10-16T11:15:36.156011+00:00"
+    "status": "Published",
+    "published": true,
+    "publishedOn": "2026-10-19",
+    "consoleDisplayedReleaseTime": "Oct 19 12:08 PM; timezone not separately verified",
+    "publicUrl": "https://play.google.com/store/apps/details?id=in.wedevit.sahara&gl=IN&hl=en",
+    "publicListingInstallEnabled": true,
+    "proof": "output/android/verification/sahara-production-live-2026-10-19.png",
+    "verifiedAt": "2026-10-19T08:41:52Z"
   },
   "previousUiCandidate": {
     "version": "0.3.1",
