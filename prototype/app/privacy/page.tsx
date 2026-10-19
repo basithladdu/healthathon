@@ -3,8 +3,8 @@ import Link from 'next/link';
 import styles from './policy.module.css';
 
 export const metadata: Metadata = {
-  title: 'Privacy policy · Sahara Android',
-  description: 'How the Sahara Android app handles care information, recordings, sharing and account deletion.',
+  title: 'Privacy policy · Sahara',
+  description: 'How Sahara handles care information, recordings, voluntary feedback, hospital surveys and deletion.',
   alternates: { canonical: 'https://sahara.wedevit.in/privacy' },
 };
 
@@ -17,11 +17,12 @@ export default function PrivacyPage() {
           <Link href="/delete-account">Delete your account</Link>
         </header>
         <h1>Your care information</h1>
-        <p className={styles.date}>Privacy policy · Updated 16 October 2026</p>
+        <p className={styles.date}>Privacy policy · Updated 19 October 2026</p>
         <p>
           Sahara — A Palliative Care Companion is provided by WEDEVIT PRIVATE LIMITED.
-          This policy covers the Sahara Android app, including versions 0.4 and 0.5, rather
-          than the separate website.
+          This policy covers the Sahara Android app and the voluntary feedback and
+          hospital-survey forms on this website. The website’s separate care workspace
+          is not a shared copy of your Android records.
         </p>
 
         <section aria-labelledby="information">
@@ -78,6 +79,57 @@ export default function PrivacyPage() {
             local preview data. This also clears other Sahara information stored on that
             phone. Preview PDFs are created in the app cache, which Android may clear.
             Copies you export or share remain with their recipients until they remove them.
+          </p>
+        </section>
+
+        <section aria-labelledby="feedback">
+          <h2 id="feedback">Feedback and hospital surveys</h2>
+          <p>
+            You can share the <Link href="/feedback">app feedback form</Link> without
+            signing in. If you choose to send it, Sahara stores your rating,
+            self-described role, topic, optional comments, consent and submission receipt
+            in its Supabase database to improve the app. Please do not include patient
+            names, phone numbers, ABHA numbers or medical details.
+          </p>
+          <p>
+            The voluntary <Link href="/feedback?form=hospital">hospital survey</Link>
+            collects your professional name, role, registering council, registration
+            number and state, plus optional professional mobile and email. These
+            professional and contact details are stored separately from hospital-service
+            information and are not for public display. Optional contacts are used to
+            follow up about your submission, not for marketing. We do not verify your
+            identity, registration, contact ownership or hospital affiliation through
+            this form, and submitting does not send an OTP, email or SMS.
+          </p>
+          <p>
+            Hospital-service information includes the hospital name, institution type,
+            your connection to it, state, city, selected hospital map pin, palliative-care
+            services, morphine availability and any optional note for families. The pin
+            is a place you select, not your current GPS location. Submissions remain
+            pending review; they do not automatically create a public listing or a
+            verified professional profile. Reviewed hospital-service information may be
+            used in the care directory. Do not enter patient or family contact details.
+          </p>
+          <p>
+            On the website, place search sends your query and IP address to Photon.
+            Opening the hospital map sends the viewed area and IP address to
+            OpenStreetMap. The website uses a strictly necessary, HttpOnly feedback
+            cookie lasting 24 hours to limit repeated submissions. Only a keyed hash
+            of that random token is stored with the receipt, not the raw token or IP
+            address. Hosting and Supabase service logs may contain network diagnostics.
+          </p>
+          <p>
+            Only restricted service administration can read feedback and contributor
+            records; there is no public submission list. We retain them for app
+            improvement and hospital-directory review. There is currently no automatic
+            expiry or self-service deletion for these voluntary submissions. For a
+            correction or deletion, email{' '}
+            <a href="mailto:workwithdevit@gmail.com">workwithdevit@gmail.com</a> with
+            your receipt if available, or enough details to locate the submission.
+            We verify the request before changing or deleting it. Closing a Sahara
+            account does not automatically remove a separate, unsigned feedback or
+            survey submission. Separate on-phone feedback is not sent by these
+            website forms.
           </p>
         </section>
 

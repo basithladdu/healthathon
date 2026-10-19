@@ -5,6 +5,12 @@ dist
 node_modules
 output
 .audit-current.json
+.playwright-cli
 .env*
 tests
-supabase
+supabase/*
+!supabase/functions
+supabase/functions/*
+!supabase/functions/sahara-feedback
+supabase/functions/sahara-feedback/*
+!supabase/functions/sahara-feedback/schema.ts
