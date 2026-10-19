@@ -397,6 +397,9 @@
       "bundleSha256": "F6F9C281712A67F107B2F6EE51066B5F024936170C4D795B2E025A7E7E22009B",
       "submitted": true,
       "reviewStatus": "Changes in review",
+      "submissionId": 6,
+      "submissionActivityStatus": "In review",
+      "submissionDisplayedAt": "Oct 19, 2026, 2:34 PM",
       "published": false,
       "countries": [
         "India"
@@ -410,7 +413,7 @@
       "medicalDeclarationsUnchanged": true,
       "proof": "output/android/verification/sahara-production-050-in-review-2026-10-19.png",
       "observedAtUtc": "2026-10-19T09:05:11Z",
-      "evidence": "Publishing overview shows Changes in review for Production 0.5.0 (6), Start full rollout, full description, Phone screenshots and Data safety. Screenshot says Your changes are now in review. This is not approval or a device-install test.",
+      "evidence": "Publishing overview shows Changes in review for Production 0.5.0 (6), Start full rollout, full description, Phone screenshots and Data safety. Submission activity independently records submission 6, Oct 19 at 2:34 PM, Production / Store Listing / App Content, In review. This is not approval or a device-install test.",
       "submissionRecovery": "Initial confirmation closed without recording a submission and one website error appeared. Completed quick checks, a fresh release entry, native/keyboard confirmation and the existing owner's Google session refresh were tried without changing access or credentials. After the owner refresh, Google recorded Changes in review; the exact underlying cause is unconfirmed.",
       "deviceInstall": "No phone or emulator was connected to local ADB on 19 October. Signed APK is available; no new device installation was performed."
     }
