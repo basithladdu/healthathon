@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { loadMedicineImageFile } from './care-medicine-image-store';
+import { medicineStoredImageId } from './care-medicine-image-store';
 import './care-medicine-photo.css';
 
 function ObjectUrlImage({ file, alt, className }: { file: File; alt: string; className: string }) {
@@ -16,7 +17,7 @@ function ObjectUrlImage({ file, alt, className }: { file: File; alt: string; cla
   return <img ref={attachImage} className={className} alt={alt} />;
 }
 
-export function MedicinePhoto({ file, alt, hindi }: { file: File; alt: string; hindi: boolean }) {
+export function MedicinePhoto({ file, alt, hindi, prescription = false }: { file: File; alt: string; hindi: boolean; prescription?: boolean }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const titleId = useId();
   const t = (en: string, hi: string) => hindi ? hi : en;
@@ -29,10 +30,28 @@ export function MedicinePhoto({ file, alt, hindi }: { file: File; alt: string; h
       <div className="medicine-photo-dialog-panel">
         <header><strong id={titleId}>{alt}</strong><button type="button" onClick={() => dialog.current?.close()}>{t('Close', 'बंद करें')}</button></header>
         <ObjectUrlImage file={file} className="medicine-photo-large" alt={t(`${alt} medicine packaging`, `${alt} दवा की पैकिंग`)} />
-        <p>{t('Compare this photo with the medicine in your hand before taking it.', 'दवा लेने से पहले इस तस्वीर को अपने हाथ की दवा से मिलाएँ।')}</p>
+        <p>{prescription ? t('Compare every copied word and dose with this original page.', 'हर लिखे शब्द और खुराक को इस मूल पेज से मिलाएँ।') : t('Compare this photo with the medicine in your hand before taking it.', 'दवा लेने से पहले इस तस्वीर को अपने हाथ की दवा से मिलाएँ।')}</p>
       </div>
     </dialog>
   </>;
+}
+
+export function StoredPrescriptionPages({ importId, pages, hindi }: { importId: string; pages: readonly number[]; hindi: boolean }) {
+  const [files, setFiles] = useState<Array<{ page: number; file: File }>>([]);
+  const [missing, setMissing] = useState(false);
+  const positions = [...new Set(pages)].filter((page) => Number.isInteger(page) && page >= 0 && page < 5).sort((a, b) => a - b).join(',');
+  useEffect(() => {
+    let active = true;
+    const indexes = positions ? positions.split(',').map(Number) : [];
+    Promise.all(indexes.map(async (page) => ({ page, file: await loadMedicineImageFile(medicineStoredImageId(importId, 'prescription', page)) }))).then((loaded) => {
+      if (!active) return;
+      setFiles(loaded.filter((item): item is { page: number; file: File } => Boolean(item.file)));
+      setMissing(loaded.some((item) => !item.file));
+    }).catch(() => { if (active) setMissing(true); });
+    return () => { active = false; };
+  }, [importId, positions]);
+  if (!positions) return null;
+  return <details className="medicine-saved-source"><summary>{hindi ? 'मूल पर्चे के पेज देखें' : 'View original prescription pages'}</summary><div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>{files.map(({ page, file }) => <div key={page}><span>{hindi ? 'पेज' : 'Page'} {page + 1}</span><MedicinePhoto file={file} alt={`${hindi ? 'पर्चा · पेज' : 'Prescription · page'} ${page + 1}`} hindi={hindi} prescription /></div>)}</div>{missing && <p role="status">{hindi ? 'मूल तस्वीर अब इस डिवाइस पर उपलब्ध नहीं है। अपनी मूल फ़ाइल से जाँचें।' : 'An original photo is no longer available on this device. Check your original file.'}</p>}</details>;
 }
 
 function MedicinePhotoFallback() {

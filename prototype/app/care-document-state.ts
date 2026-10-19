@@ -7,7 +7,9 @@ export type CareDocumentText = {
   category: CareDocumentCategory;
   text: string;
   recordedBy: string;
-  textSource?: 'copied' | 'pdf-text' | 'text-file';
+  textSource?: 'copied' | 'pdf-text' | 'text-file' | 'image-ocr';
+  originalText?: string;
+  ocrPages?: number[];
   pagesRead?: number;
   pageCount?: number;
   pagesWithoutText?: number[];
@@ -108,7 +110,7 @@ export function findCareDocumentText(query: string, patientId: string, reports: 
     let sourcePage: number | undefined;
     const linePages = lines.map((line) => {
       const marker = /^\[Page (\d+)\]$/.exec(line.trim());
-      if (document.textSource === 'pdf-text' && marker) sourcePage = Number(marker[1]);
+      if ((document.textSource === 'pdf-text' || document.textSource === 'image-ocr') && marker) sourcePage = Number(marker[1]);
       return sourcePage;
     });
     const candidates: Array<{ first: number; last: number; score: number }> = [];

@@ -61,6 +61,7 @@ data class CareReport(@PrimaryKey val id: String = newId(), val personId: String
     @Query("DELETE FROM RecordingConsent WHERE audioPath = :audioPath") suspend fun deleteRecordingConsent(audioPath: String)
     @Query("SELECT * FROM CareItem WHERE personId = :id ORDER BY created DESC") fun items(id: String): Flow<List<CareItem>>
     @Query("SELECT * FROM CareItem WHERE id = :id LIMIT 1") suspend fun item(id: String): CareItem?
+    @Query("SELECT * FROM CareItem") suspend fun allItems(): List<CareItem>
     @Insert(onConflict = OnConflictStrategy.REPLACE) suspend fun saveItem(item: CareItem)
     @Delete suspend fun removeItem(item: CareItem)
     @Query("SELECT * FROM CareReport WHERE personId = :id ORDER BY created DESC") fun reports(id: String): Flow<List<CareReport>>
@@ -161,10 +162,12 @@ object ReviewWorkflow {
     const val CLINICIAN_VERIFIED = "clinician_verified"
     const val NOT_VERIFIED = "not_verified"
 
-    fun label(version: CareVersion): String = when {
-        // Imported strings are not an authority proof. No trusted verification
-        // backend exists yet, so preserve metadata without granting a badge.
+    fun label(version: CareVersion, serverReceiptConfirmed: Boolean = false): String = when {
+        serverReceiptConfirmed && version.reviewStatus == "clinician_reviewed" && version.reviewerVerification == "verified" -> "Reviewed by a verified clinician account"
+        // Imported strings alone are not an authority proof. Only a fresh
+        // account-bound server receipt can enable the verified review label.
         version.reviewStatus == CLINICIAN_VERIFIED -> "Imported review · identity not verified"
+        version.reviewStatus == "clinician_reviewed" -> "Account review · reconnect to verify receipt"
         version.reviewStatus == REVIEWED_UNVERIFIED -> "Review recorded · identity not verified"
         else -> "Not clinically reviewed"
     }

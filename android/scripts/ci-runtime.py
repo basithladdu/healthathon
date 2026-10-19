@@ -434,7 +434,7 @@ def optimized_smoke(info, focused=False):
             ui.tap("Cancel")
             result["checks"].append("Main care recording consent is local-only in optimized release; start is disabled without consent, no cloud-processing option shown, microphone never opened")
             ui.key(); ui.tap("Change view, Doctor", desc=True, scroll=False); ui.tap("Family", scroll=False)
-        ui.tap("More", scroll=False); ui.tap("Doctor login")
+        ui.tap("More", scroll=False); ui.tap("Explore doctor walkthrough")
         ui.expect("Preview account prefilled")
         ui.tap("Open workspace")
         ui.tap("Patients", scroll=False); ui.tap("Asha")
@@ -511,7 +511,7 @@ def run(scope="all"):
         # release remains intact; these images must never be labelled release screenshots.
         try:
             ui=Ui("debug-ui", DEBUG, screenshots=True); ui.restart(); ui.dump("entry")
-            ui.tap("Doctor login"); ui.dump("doctor-preview-login")
+            ui.tap("Explore doctor walkthrough"); ui.dump("doctor-preview-login")
             ui.tap("Open workspace"); ui.dump("doctor-workspace")
             ui.tap("Patients", scroll=False); ui.tap("Asha"); ui.dump("fictional-patient-hub")
             ui.tap("Conversations"); ui.tap("Open conversation workspace"); ui.tap("2 Document")

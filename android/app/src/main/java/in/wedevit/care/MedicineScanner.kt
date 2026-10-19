@@ -35,6 +35,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 
 private enum class MedicineScannerPhase { Select, Scanning, Review }
@@ -43,8 +45,10 @@ private enum class MedicineScannerPhase { Select, Scanning, Review }
 fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val organizer = remember(context) { MedicineOrganizer(context.applicationContext) }
+    val documentReader = remember(context) { CareDocumentReader(context.applicationContext) }
     val busy by vm.busy.collectAsStateWithLifecycle()
+    val selectedPerson by vm.selected.collectAsStateWithLifecycle()
+    val personAtOpen = rememberSaveable { vm.selected.value }
     // A running scan and its AI result intentionally stay in memory only. If Android
     // recreates the activity, return to the retained photo selection instead of
     // restoring a spinner or a review screen whose result no longer exists.
@@ -55,6 +59,7 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit) {
     var progress by remember { mutableStateOf<MedicineScanProgress?>(null) }
     var scanError by rememberSaveable { mutableStateOf<String?>(null) }
     var drafts by remember { mutableStateOf(emptyList<MedicineDraft>()) }
+    var savingSources by remember { mutableStateOf(false) }
     var warnings by remember { mutableStateOf(emptyList<String>()) }
     var unmatched by remember { mutableStateOf(emptyList<Int>()) }
     var unmatchedReviewed by rememberSaveable { mutableStateOf(false) }
@@ -126,8 +131,9 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit) {
     }
 
     fun returnToImages() {
-        scanJob?.cancel(); scanJob = null; progress = null; scanError = null; phase = MedicineScannerPhase.Select
+        scanJob?.cancel(); scanJob = null; progress = null; scanError = null; scanId = newId(); phase = MedicineScannerPhase.Select
     }
+    LaunchedEffect(selectedPerson) { if (selectedPerson != personAtOpen) { scanJob?.cancel(); onClose() } }
 
     BackHandler {
         if (phase == MedicineScannerPhase.Select) cleanAndClose() else returnToImages()
@@ -140,7 +146,7 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             item { ScannerHeader("Scan prescription", "1 / 2") { cleanAndClose() } }
-            item { Text("Add the prescription and medicine packaging. You'll check the list before saving.") }
+            item { Text("Add a clear prescription. Read and check the words before saving. Medicine packaging is optional for your own comparison.") }
             item {
                 PhotoSelectionCard(
                     title = "Prescription pages",
@@ -177,31 +183,22 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit) {
                     onMove = null,
                 )
             }
-            if (vm.cloud == null) item {
-                SurfaceCard(Peach) {
-                    Text("Sign in before using the protected photo organizer.", fontWeight = FontWeight.SemiBold)
-                    Text("Manual medicine entry continues to work without an account.", style = MaterialTheme.typography.bodySmall)
-                    TextButton(onClick = onAccount) { Icon(Icons.Default.PersonOutline, null); Spacer(Modifier.width(6.dp)); Text("Sign in") }
-                }
-            }
             scanError?.let { error -> item { Text(error, color = MaterialTheme.colorScheme.error) } }
             item {
-                Text("When you organise, these photos are sent to Sahara and Google Gemini to read the prescription.", style = MaterialTheme.typography.bodySmall)
+                Text("Reading happens on your phone. Printed Latin text is supported; handwriting may need manual entry. No dose or treatment is inferred.", style = MaterialTheme.typography.bodySmall)
                 Spacer(Modifier.height(12.dp))
                 Button(
                     onClick = {
-                        val cloud = vm.cloud
-                        if (cloud == null) { scanError = "Sign in to use the protected photo organizer."; return@Button }
                         scanError = null; phase = MedicineScannerPhase.Scanning
                         scanJob = scope.launch {
                             try {
-                                val token = cloud.medicineOrganizerToken()
-                                val result = organizer.organize(
-                                    prescriptionUris.map(Uri::parse), medicineUris.map(Uri::parse), token, scanId,
-                                ) { next -> scope.launch { progress = next } }
-                                drafts = result.drafts
-                                warnings = result.organization.warnings
-                                unmatched = result.organization.unmatchedMedicineImageIndexes
+                                val pages = documentReader.prescription(prescriptionUris.map(Uri::parse)) { done, total ->
+                                    progress = MedicineScanProgress(MedicineScanStage.PREPARING, done, total, "Prescription page ${done.coerceAtLeast(1)}")
+                                }
+                                val medicines = copiedPrescriptionMedicines(pages)
+                                drafts = medicines.mapIndexed { index, medicine -> MedicineDraft(stableMedicineDraftId(scanId, medicine, index), medicine) }
+                                warnings = listOf("Compare every copied line with the original page. The app has not matched brands, chosen doses or confirmed treatment.") + if (medicines.isEmpty()) listOf("No safe medicine lines were readable. Add medicines manually from the original prescription.") else emptyList()
+                                unmatched = medicineUris.indices.toList()
                                 unmatchedReviewed = unmatched.isEmpty()
                                 phase = MedicineScannerPhase.Review
                             } catch (error: Exception) {
@@ -211,10 +208,10 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit) {
                             } finally { scanJob = null }
                         }
                     },
-                    enabled = prescriptionUris.isNotEmpty() && medicineUris.isNotEmpty() && vm.cloud != null,
+                    enabled = prescriptionUris.isNotEmpty(),
                     modifier = Modifier.fillMaxWidth().heightIn(min = 54.dp),
                     shape = RoundedCornerShape(16.dp),
-                ) { Icon(Icons.Default.AutoAwesome, null); Spacer(Modifier.width(8.dp)); Text("Organize with Sahara AI") }
+                ) { Icon(Icons.Default.DocumentScanner, null); Spacer(Modifier.width(8.dp)); Text("Read prescription") }
                 TextButton(onClick = {
                     drafts = listOf(MedicineDraft(newId(), manualMedicine(), false)); warnings = emptyList(); unmatched = emptyList(); unmatchedReviewed = true; phase = MedicineScannerPhase.Review
                 }, modifier = Modifier.fillMaxWidth()) { Text("Add one manually") }
@@ -225,13 +222,13 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit) {
         MedicineScannerPhase.Scanning -> Box(Modifier.fillMaxSize().padding(28.dp), contentAlignment = Alignment.Center) {
             Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(14.dp)) {
                 CircularProgressIndicator(color = Rust)
-                Heading(if (progress?.stage == MedicineScanStage.PREPARING) "Preparing clear photos" else "Organizing medicines", 26)
+                Heading("Reading prescription", 26)
                 val value = progress
                 if (value?.stage == MedicineScanStage.PREPARING && value.total > 0) {
                     Text("${value.completed.coerceAtMost(value.total)} of ${value.total}")
                     if (value.fileName.isNotBlank()) Text(value.fileName, style = MaterialTheme.typography.bodySmall)
-                } else Text("Reading every prescription page and medicine photo together…", style = MaterialTheme.typography.bodyMedium)
-                Text("Photos are sent through Sahara’s protected service and are not saved by the organizer. Keep this screen open until review appears.", style = MaterialTheme.typography.bodySmall)
+                } else Text("Reading the selected pages…", style = MaterialTheme.typography.bodyMedium)
+                Text("Keep this screen open until review appears. You can cancel without changing saved medicines.", style = MaterialTheme.typography.bodySmall)
                 OutlinedButton(onClick = { returnToImages() }) { Text("Cancel") }
             }
         }
@@ -242,7 +239,13 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
             item { ScannerHeader("Review medicine list", "2 / 2") { returnToImages() } }
-            item { SurfaceCard(Sage) { Text("Check before saving", fontWeight = FontWeight.Bold); Text("AI can be wrong. Confirm each entry against the prescription and packaging. Sahara does not diagnose, prescribe or recommend treatment.") } }
+            item { SurfaceCard(Sage) { Text("Check before saving", fontWeight = FontWeight.Bold); Text("Text reading can be wrong. Confirm each entry against the prescription and packaging. Sahara does not diagnose, prescribe or recommend treatment.") } }
+            if (prescriptionUris.isNotEmpty()) item { SurfaceCard {
+                Text("Original pages", fontWeight = FontWeight.SemiBold)
+                prescriptionUris.forEachIndexed { index, uri -> TextButton(onClick = { runCatching {
+                    context.startActivity(Intent(Intent.ACTION_VIEW).setDataAndType(Uri.parse(uri), "image/*").addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION))
+                }.onFailure { scanError = "No image viewer is available. Open this photo in Files to compare it." } }) { Text("View prescription page ${index + 1}") } }
+            } }
             warnings.forEach { warning -> item(warning) { SurfaceCard(Peach) { Text(warning) } } }
             items(drafts.size, key = { drafts[it].id }) { index ->
                 MedicineReviewCard(
@@ -271,13 +274,24 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit) {
                 }
                 Button(onClick = {
                     scanError = null
-                    vm.saveMedicineList(drafts) {
-                        releaseSelectedPhotos()
-                        File(context.cacheDir, "medicine-scan").deleteRecursively()
-                        onClose()
+                    savingSources = true
+                    scope.launch {
+                        try {
+                            val sourceStore = MedicineSourceStore(context, vm.accountNamespace)
+                            val originals = sourceStore.save(personAtOpen, scanId, prescriptionUris.map(Uri::parse), vm.reportFiles)
+                            val references = withContext(Dispatchers.IO) { sourceStore.references(originals, vm.reportFiles) }
+                            val linked = drafts.map { draft -> if (references.isBlank()) draft else draft.copy(medicine = draft.medicine.copy(instructions = draft.medicine.instructions + "\nOriginal prescription references:\n" + references)) }
+                            require(vm.selected.value == personAtOpen) { "The selected person changed. Open this prescription for the right person." }
+                            vm.saveMedicineList(linked) {
+                                releaseSelectedPhotos()
+                                File(context.cacheDir, "medicine-scan").deleteRecursively()
+                                onClose()
+                            }
+                        } catch (failure: Exception) { if (failure is CancellationException) throw failure; scanError = failure.message ?: "Could not keep the original pages. Your medicine list has not been saved." }
+                        finally { savingSources = false }
                     }
-                }, enabled = valid && !busy, modifier = Modifier.fillMaxWidth().heightIn(min = 54.dp), shape = RoundedCornerShape(16.dp)) {
-                    Text(if (busy) "Saving…" else "Save ${drafts.size} ${if (drafts.size == 1) "medicine" else "medicines"}")
+                }, enabled = valid && !busy && !savingSources, modifier = Modifier.fillMaxWidth().heightIn(min = 54.dp), shape = RoundedCornerShape(16.dp)) {
+                    Text(if (busy || savingSources) "Saving…" else "Save ${drafts.size} ${if (drafts.size == 1) "medicine" else "medicines"}")
                 }
                 if (!valid) Text("Add a medicine name and dose, resolve unmatched photos, and confirm every entry before saving.", style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 8.dp))
                 TextButton(onClick = { returnToImages() }, enabled = !busy, modifier = Modifier.fillMaxWidth()) { Text("Back to photos") }
@@ -384,6 +398,10 @@ private fun MedicineReviewCard(draft: MedicineDraft, onChange: (MedicineDraft) -
         CareField(medicine.frequency, { change(medicine.copy(frequency = it.take(120))) }, "Frequency", singleLine = true)
         CareField(medicine.instructions, { change(medicine.copy(instructions = it.take(500))) }, "Directions from prescription", minLines = 2)
         Text("Food timing", fontWeight = FontWeight.SemiBold)
+        if (medicine.sourceQuote.isNotBlank()) {
+            Text("Original reading · ${medicine.prescriptionPageIndexes.joinToString { "page ${it + 1}" }}", style = MaterialTheme.typography.labelMedium)
+            Text(medicine.sourceQuote, style = MaterialTheme.typography.bodySmall)
+        }
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())) {
             MedicineMealTiming.entries.forEach { timing ->
                 FilterChip(selected = medicine.mealTiming == timing, onClick = { change(medicine.copy(mealTiming = timing)) }, label = { Text(mealTimingLabel(timing), fontSize = 11.sp) })

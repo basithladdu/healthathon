@@ -132,8 +132,9 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
                 if (!create) TextButton(onClick = { run {
                     cloud.sendPasswordReset(email)
                     notice = "If that email has an account, you'll receive a reset link."
-                } }, enabled = !busy && email.contains('@')) { Text("Forgot password?") }
-                TextButton(onClick = { create = !create; error = null; notice = null }, enabled = !busy) { Text(if (create) "Already have an account? Sign in" else "Create an account") }
+                } }, enabled = !busy && email.contains('@') && CareEmailAvailability.ready) { Text("Forgot password?") }
+                TextButton(onClick = { create = !create; error = null; notice = null }, enabled = !busy && (create || CareEmailAvailability.ready)) { Text(if (create) "Already have an account? Sign in" else "Create an account") }
+                if (!CareEmailAvailability.ready) Text("New accounts and password reset are temporarily unavailable. Existing confirmed accounts can sign in.", style = MaterialTheme.typography.bodySmall)
             } else {
                 Text(session!!.email)
                 OutlinedButton(onClick = { vm.refresh(); onDismiss() }, enabled = !busy) { Icon(Icons.Default.Refresh, null); Spacer(Modifier.width(8.dp)); Text("Refresh records") }

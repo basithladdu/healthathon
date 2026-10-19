@@ -90,6 +90,8 @@ val Peach = Color(0xFFFFD1B3)
     var reading by remember { mutableStateOf<CareVersion?>(null) }
     val feedbackAccountScope = vm.cloud?.session?.value?.userId ?: "guest-patient"
     var feedbackOpen by rememberSaveable(feedbackAccountScope) { mutableStateOf(false) }
+    var remindersOpen by rememberSaveable(feedbackAccountScope) { mutableStateOf(false) }
+    var sharedWorkspaceOpen by rememberSaveable(feedbackAccountScope) { mutableStateOf(false) }
     val screens = rememberSaveableStateHolder()
     val snackbar = remember { SnackbarHostState() }
     val person = people.firstOrNull { it.id == selected }
@@ -108,6 +110,14 @@ val Peach = Color(0xFFFFD1B3)
     LaunchedEffect(message) { message?.let { snackbar.showSnackbar(it); vm.message.value = null } }
     if (feedbackOpen) {
         FeedbackScreen(accountScope = feedbackAccountScope, surface = "patient", onClose = { feedbackOpen = false })
+        return
+    }
+    if (remindersOpen) {
+        CareReminderSettings(vm, onClose = { remindersOpen = false })
+        return
+    }
+    if (sharedWorkspaceOpen) {
+        CareSharedWorkspace(vm, onAccount = onAccount, onClose = { sharedWorkspaceOpen = false })
         return
     }
     BackHandler(!medicineScanner && (tab != 0 || activeRecording)) { if (activeRecording) vm.stopRecording() else tab = 0 }
@@ -130,7 +140,7 @@ val Peach = Color(0xFFFFD1B3)
                 }
             }
             if (person != null) IconButton(onClick = { if (activeRecording) vm.stopRecording(); tab = 5 }) { Icon(Icons.Default.FolderOpen, "Documents", tint = if (tab == 5) Rust else Ink) }
-            if (person == null) OutlinedButton(onClick = onDoctorDemo, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-demo-entry")) { Text("Doctor login") }
+            if (person == null) OutlinedButton(onClick = { sharedWorkspaceOpen = true }, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-workspace-entry")) { Text("Doctor workspace") }
             else CareRoleMenu(role, enabled = !activeRecording) { vm.role(it) }
         }
         HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = .15f))
@@ -143,10 +153,10 @@ val Peach = Color(0xFFFFD1B3)
     }) { padding ->
         Box(Modifier.padding(padding).consumeWindowInsets(padding).fillMaxSize()) {
             if (medicineScanner && person != null) MedicineScanner(vm, onClose = { medicineScanner = false }, onAccount = onAccount)
-            else if (person == null) Welcome(onAccount = onAccount, onStart = { dialog = "person" })
+            else if (person == null) Welcome(onAccount = onAccount, onStart = { dialog = "person" }, onSharedWorkspace = { sharedWorkspaceOpen = true }, onDoctorDemo = onDoctorDemo)
             else key(person.id, tab) { screens.SaveableStateProvider("${person.id}:$tab") {
                 ScreenEntrance { when (tab) {
-                    0 -> Today(vm, clinician, onTalk = { tab = 1 }, onCare = { tab = 2 }, onNearby = { tab = 3 }, onAdd = { if (canEdit) dialog = it else vm.message.value = "Ask the person who invited you to allow changes." }, onRead = { reading = it }, onCalendar = { tab = 6 }, onWorkflow = { tab = 7 }, onLabs = { tab = 8 })
+                    0 -> Today(vm, clinician, onTalk = { tab = 1 }, onCare = { tab = 2 }, onNearby = { tab = 3 }, onAdd = { if (canEdit) dialog = it else vm.message.value = "Ask the person who invited you to allow changes." }, onRead = { reading = it }, onCalendar = { tab = 6 }, onWorkflow = { tab = 7 }, onLabs = { tab = 8 }, onSharedWorkspace = { sharedWorkspaceOpen = true })
                     1 -> Talk(vm, clinician && canEdit, onRead = { reading = it }, onRequestConversation = { tab = 7 })
                     2 -> CareList(vm, onCalendar = { tab = 6 }, onWorkflow = { tab = 7 }, onLabs = { tab = 8 },
                         onAdd = { if (canEdit) dialog = it else vm.message.value = "Ask the person who invited you to allow changes." },
@@ -161,7 +171,7 @@ val Peach = Color(0xFFFFD1B3)
                     6 -> CareCalendar(vm, onWorkflow = { tab = 7 })
                     7 -> CareWorkflows(vm, onTalk = { tab = 1 })
                     8 -> CareLabs(vm)
-                    else -> More(vm, person, onAccount = onAccount, onDelete = { dialog = "delete" }, onCalendar = { tab = 6 }, onWorkflow = { tab = 7 }, onLabs = { tab = 8 }, onDoctorDemo = onDoctorDemo, onFeedback = { if (activeRecording) vm.stopRecording(); feedbackOpen = true })
+                    else -> More(vm, person, onAccount = onAccount, onDelete = { dialog = "delete" }, onCalendar = { tab = 6 }, onWorkflow = { tab = 7 }, onLabs = { tab = 8 }, onDoctorDemo = onDoctorDemo, onFeedback = { if (activeRecording) vm.stopRecording(); feedbackOpen = true }, onReminders = { if (activeRecording) vm.stopRecording(); remindersOpen = true }, onSharedWorkspace = { if (activeRecording) vm.stopRecording(); sharedWorkspaceOpen = true })
                 } }
             } }
             refreshError?.let { error -> Surface(Modifier.align(Alignment.TopCenter).fillMaxWidth(), color = Peach) { Row(verticalAlignment = Alignment.CenterVertically) { Text(error, Modifier.weight(1f).padding(12.dp), style = MaterialTheme.typography.bodySmall); TextButton(onClick = vm::refresh) { Text("Retry") } } } }
@@ -177,17 +187,26 @@ val Peach = Color(0xFFFFD1B3)
     reading?.let { note -> NoteReader(vm, note, onDismiss = { reading = null }) }
 }
 
-@Composable fun Welcome(onAccount: () -> Unit, onStart: () -> Unit) {
+/** Genuine account access and the fictional walkthrough have separate actions. */
+@Composable fun CareDoctorEntries(onWorkspace: () -> Unit, onWalkthrough: () -> Unit) {
+    Column(Modifier.fillMaxWidth()) {
+        FilledTonalButton(onClick = onWorkspace, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-workspace-entry"), colors = ButtonDefaults.filledTonalButtonColors(containerColor = Mint)) { Icon(Icons.Default.VerifiedUser, null); Spacer(Modifier.width(8.dp)); Text("Doctor workspace") }
+        TextButton(onClick = onWalkthrough, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-demo-entry")) { Text("Explore doctor walkthrough") }
+    }
+}
+
+@Composable fun Welcome(onAccount: () -> Unit, onStart: () -> Unit, onSharedWorkspace: () -> Unit = {}, onDoctorDemo: () -> Unit = {}) {
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp), verticalArrangement = Arrangement.Center) {
         Image(painterResource(R.drawable.conversation), "A patient and doctor talking", Modifier.fillMaxWidth().heightIn(max = 270.dp).clip(RoundedCornerShape(28.dp)), contentScale = ContentScale.Fit)
         Spacer(Modifier.height(24.dp)); Heading("Palliative care,\ntogether.", 32)
         Spacer(Modifier.height(12.dp)); Text("Care notes, medicines and visits.", fontSize = 17.sp)
         Spacer(Modifier.height(24.dp)); Button(onClick = onStart, shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) { Text("Add a person", fontSize = 17.sp); Spacer(Modifier.width(12.dp)); Icon(Icons.AutoMirrored.Filled.ArrowForward, null) }
         TextButton(onClick = onAccount, modifier = Modifier.fillMaxWidth()) { Text("Your account") }
+        CareDoctorEntries(onSharedWorkspace, onDoctorDemo)
     }
 }
 
-@Composable fun Today(vm: CareModel, clinician: Boolean, onTalk: () -> Unit, onCare: () -> Unit, onNearby: () -> Unit, onAdd: (String) -> Unit, onRead: (CareVersion) -> Unit, onCalendar: () -> Unit = {}, onWorkflow: () -> Unit = {}, onLabs: () -> Unit = {}) {
+@Composable fun Today(vm: CareModel, clinician: Boolean, onTalk: () -> Unit, onCare: () -> Unit, onNearby: () -> Unit, onAdd: (String) -> Unit, onRead: (CareVersion) -> Unit, onCalendar: () -> Unit = {}, onWorkflow: () -> Unit = {}, onLabs: () -> Unit = {}, onSharedWorkspace: () -> Unit = {}) {
     val items by vm.items.collectAsStateWithLifecycle(); val versions by vm.versions.collectAsStateWithLifecycle()
     val latest = versions.firstOrNull()
     val dayStart = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
@@ -197,8 +216,9 @@ val Peach = Color(0xFFFFD1B3)
             if (vm.cloud != null) IconButton(onClick = vm::refresh) { Icon(Icons.Default.Refresh, "Refresh records") }
         } }
         if (!clinician) item {
-            // Patient–doctor linking is not yet available. A typed note reviewer is not a relationship.
-            PatientDoctorRow(doctor = null)
+            // Do not infer a current relationship from a note's typed reviewer.
+            // The account workspace loads actual patient-controlled membership.
+            TextButton(onClick = onSharedWorkspace, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.Groups, null); Spacer(Modifier.width(8.dp)); Text("Your care team") }
         }
         item { ActionCard(Gold, onClick = { if (!clinician && latest != null) onRead(latest) else onTalk() }) {
             Row(Modifier.fillMaxWidth().padding(18.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -315,6 +335,15 @@ val Peach = Color(0xFFFFD1B3)
                             onTranscribe = { consent?.let { vm.transcribeAudio(file.absolutePath, it) } },
                             onDelete = { vm.deleteAudio(file.absolutePath) },
                         )
+                        if (vm.cloud != null && BuildConfig.CLOUD_AUDIO_ENABLED) CareRemoteTranscriptPanel(
+                            source = draft.source, identity = draft.personId, recording = file, recordingConsent = consent,
+                            token = { vm.cloud.transcriptionToken() }, onSaveConsent = vm::rememberTranscriptionConsent,
+                            onAppend = { source ->
+                                val current = vm.draft.value
+                                if (current.personId == draft.personId && vm.selected.value == draft.personId && current.source == draft.source && source.length <= NoteRules.MAX_SOURCE_CHARS) vm.edit(current.copy(source = source))
+                                else vm.message.value = "The conversation changed. Check the retained recording and try again."
+                            },
+                        )
                     }
                     item { if (dictating) SurfaceCard { Text("Conversation", fontWeight = FontWeight.Bold); SelectionContainerText(draft.source); Text("Finish this turn to edit the conversation.", style = MaterialTheme.typography.bodySmall) }
                         else CareField(value = draft.source, onValueChange = { if (it.length <= NoteRules.MAX_SOURCE_CHARS) { val current = vm.draft.value; if (current.personId == draft.personId) vm.edit(current.copy(source = it)) } }, label = "Conversation transcript", placeholder = if (BuildConfig.CLOUD_AUDIO_ENABLED) "Speak, transcribe a consented recording, or type what was said…" else "Speak one turn or type what was said…", minLines = 5, supporting = if (draft.transcribedAt > 0) "AI transcript · ${draft.transcriptModel}. Check every word against the audio." else "") }
@@ -330,6 +359,10 @@ val Peach = Color(0xFFFFD1B3)
                         try { val current = vm.draft.value; require(current.personId == draft.personId && vm.selected.value == draft.personId) { "Choose this person's conversation again." }; vm.edit(CareDraftAssist.assign(current, section, line)) }
                         catch (e: IllegalArgumentException) { vm.message.value = e.message }
                     } }
+                    if (vm.cloud != null) item { CareRemoteAssistPanel(source = draft.source, identity = draft.personId, token = { vm.cloud.transcriptionToken() }, onUseDraft = { assisted ->
+                        try { val current = vm.draft.value; require(current.personId == draft.personId && vm.selected.value == draft.personId); vm.edit(CareDraftAssist.applyAssisted(current, assisted)) }
+                        catch (e: IllegalArgumentException) { vm.message.value = e.message }
+                    }) }
                     if (NoteRules.values(draft).all { it.isBlank() }) item { TextButton(onClick = vm::organise) { Text("Organise using section headings") } }
                     items(NoteRules.labels.withIndex().toList(), key = { it.index }) { (index, label) ->
                         Column { CareField(value = NoteRules.values(draft)[index], onValueChange = { value -> if (value.length <= 4000) { val current = vm.draft.value; if (current.personId == draft.personId) vm.edit(CareDraftAssist.withSection(current, index, value)) } }, label = label, minLines = 2)
@@ -340,10 +373,10 @@ val Peach = Color(0xFFFFD1B3)
                 }
                 else -> {
                     item { SurfaceCard(Gold) { Heading("Clinical review", 26); Spacer(Modifier.height(6.dp)); Text("Publishing creates an exact version. Earlier versions stay available.") } }
-                    item { CareField(value = doctor, onValueChange = { doctor = it.take(100) }, label = "Doctor's name", singleLine = true) }
+                    if (vm.cloud == null) item { CareField(value = doctor, onValueChange = { doctor = it.take(100) }, label = "Doctor's name", singleLine = true) }
                     item { CheckLine(reviewed, { reviewed = it }, "I checked every section against the conversation. This records what was discussed, without adding treatment advice.") }
-                    item { SurfaceCard(Peach) { Text("Identity not verified", fontWeight = FontWeight.Bold); Spacer(Modifier.height(5.dp)); Text("This first implementation records a self-entered reviewer name. Hospital or medical-council verification is not connected, so this version will not claim to be verified.", style = MaterialTheme.typography.bodySmall) } }
-                    item { Button(onClick = { vm.publish(doctor, reviewed) { nextStep(0); reviewed = false } }, enabled = reviewed && doctor.isNotBlank() && !busy && draft.source.isNotBlank(), modifier = Modifier.fillMaxWidth()) { Text("Publish reviewed version") } }
+                    item { SurfaceCard(Peach) { Text(if (vm.cloud == null) "Identity not verified" else "Separate clinician review", fontWeight = FontWeight.Bold); Spacer(Modifier.height(5.dp)); Text(if (vm.cloud == null) "This records a self-entered reviewer name. It does not claim a verified clinical review." else "Your account draft is sent to the shared workspace. Only an independently verified clinician invited by this patient can publish a reviewed care-note version.", style = MaterialTheme.typography.bodySmall) } }
+                    item { Button(onClick = { vm.publish(doctor, reviewed) { nextStep(0); reviewed = false } }, enabled = reviewed && (vm.cloud != null || doctor.isNotBlank()) && !busy && draft.source.isNotBlank(), modifier = Modifier.fillMaxWidth()) { Text(if (vm.cloud == null) "Publish reviewed version" else "Send for clinician review") } }
                 }
             }
         } else {
@@ -422,14 +455,17 @@ val Peach = Color(0xFFFFD1B3)
 
 @Composable fun NoteReader(vm: CareModel, note: CareVersion, onDismiss: () -> Unit) {
     val acks by vm.acknowledgements.collectAsStateWithLifecycle(); val versions by vm.versions.collectAsStateWithLifecycle(); val busy by vm.busy.collectAsStateWithLifecycle()
+    val owner by vm.isOwner.collectAsStateWithLifecycle()
+    val authenticatedAcks by vm.authenticatedConfirmationIds.collectAsStateWithLifecycle()
+    val verifiedReviews by vm.verifiedReviewIds.collectAsStateWithLifecycle()
     val confirmations = acks.filter { it.versionId == note.id && it.contentHash == note.contentHash }
         .sortedWith(compareBy<Acknowledgement> { it.relationship != "Patient" }.thenBy { it.at })
-    val patientConfirmation = confirmations.firstOrNull { it.relationship == "Patient" }
+    val patientConfirmation = confirmations.firstOrNull { it.relationship == "Patient" && (vm.cloud == null || it.id in authenticatedAcks) }
     var name by rememberSaveable(note.id) { mutableStateOf("") }; var relationship by rememberSaveable(note.id) { mutableStateOf("Patient") }; var reviewed by rememberSaveable(note.id) { mutableStateOf(false) }
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var exporting by rememberSaveable { mutableStateOf<String?>(null) }
-    LaunchedEffect(patientConfirmation?.id) { relationship = if (patientConfirmation == null) "Patient" else "Family / carer"; reviewed = false }
+    LaunchedEffect(patientConfirmation?.id, owner) { relationship = if (vm.cloud != null) if (owner) "Patient" else "Family / carer" else if (patientConfirmation == null) "Patient" else "Family / carer"; reviewed = false }
     val saveNote = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/plain")) { uri ->
         val text = exporting; exporting = null
         if (uri != null && text != null) scope.launch {
@@ -441,7 +477,8 @@ val Peach = Color(0xFFFFD1B3)
     }
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
         LazyColumn(Modifier.fillMaxWidth().imePadding(), contentPadding = PaddingValues(start = 22.dp, end = 22.dp, bottom = 40.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            item { Heading("Goals of care"); Text("${note.personName} · Version ${note.version}"); Text("Reviewer: ${note.doctor} · ${date(note.published)}", style = MaterialTheme.typography.bodySmall); Text(ReviewWorkflow.label(note), style = MaterialTheme.typography.labelMedium, color = Rust) }
+            item { Heading("Goals of care"); Text("${note.personName} · Version ${note.version}"); Text("Reviewer: ${note.doctor} · ${date(note.published)}", style = MaterialTheme.typography.bodySmall); Text(ReviewWorkflow.label(note, note.id in verifiedReviews), style = MaterialTheme.typography.labelMedium, color = Rust) }
+            if (vm.cloud != null) item { OutlinedButton(onClick = { open(context, Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, sharedCareNoteUrl(note)), "Share exact care-note link")) }, modifier = Modifier.fillMaxWidth()) { Icon(Icons.Default.QrCode, null); Spacer(Modifier.width(8.dp)); Text("Share exact-version link") }; Text("The recipient must sign in with a permitted account. This link grants no public access.", style = MaterialTheme.typography.bodySmall) }
             item { Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 OutlinedButton(onClick = { exporting = NoteRules.text(note, confirmations); saveNote.launch("Goals-of-care-v${note.version}.txt") }, modifier = Modifier.weight(1f)) { Icon(Icons.Default.FileDownload, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Save copy") }
                 FilledTonalButton(onClick = { open(context, Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, NoteRules.text(note, confirmations)), "Share care note")) }, modifier = Modifier.weight(1f), colors = ButtonDefaults.filledTonalButtonColors(containerColor = Gold, contentColor = Ink)) { Icon(Icons.Default.Share, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Share") }
@@ -449,6 +486,7 @@ val Peach = Color(0xFFFFD1B3)
             item { CareReadAloudControl(NoteRules.labels.zip(NoteRules.values(note)).filter { it.second.isNotBlank() }.joinToString("\n\n") { "${it.first}. ${it.second}" }, note.id) }
             items(NoteRules.labels.zip(NoteRules.values(note))) { (label, value) -> SurfaceCard(if (label == "What matters") Gold else Paper) { Text(label, fontWeight = FontWeight.Bold); Spacer(Modifier.height(8.dp)); SelectionContainerText(value.ifBlank { "Not recorded" }); CareSourceLinks(note.source, value) } }
             item { var open by remember { mutableStateOf(false) }; TextButton(onClick = { open = !open }) { Text(if (open) "Hide original conversation" else "Read original conversation") }; if (open) SelectionContainerText(note.source) }
+            if (vm.cloud != null) item { CareTranslationPanel(source = note.source, versionId = note.id, token = { vm.cloud.transcriptionToken() }) }
             items(confirmations, key = { it.id }) { confirmation -> SurfaceCard(if (confirmation.relationship == "Patient") Sage else Mint) {
                 Text(if (confirmation.relationship == "Patient") "Patient confirmed this version" else "Family / carer confirmation", fontWeight = FontWeight.Bold)
                 Text("${confirmation.name} · ${date(confirmation.at)}")
@@ -457,9 +495,9 @@ val Peach = Color(0xFFFFD1B3)
                 item { HorizontalDivider(); Spacer(Modifier.height(12.dp)); Heading(if (patientConfirmation == null) "Patient's review" else "Family's review", 26)
                     Text(if (patientConfirmation == null) "The patient confirms first. Family can then add their own confirmation to this same version." else "The patient's confirmation stays saved. Add your own after reading this version.", style = MaterialTheme.typography.bodySmall) }
                 item { CareField(value = name, onValueChange = { name = it.take(100) }, label = "Your name", singleLine = true) }
-                item { Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf("Patient", "Family / carer").forEach { role -> FilterChip(selected = relationship == role, onClick = { relationship = role }, enabled = if (role == "Patient") patientConfirmation == null else patientConfirmation != null, label = { Text(role) }) } } }
+                item { Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf("Patient", "Family / carer").forEach { role -> FilterChip(selected = relationship == role, onClick = { relationship = role }, enabled = (vm.cloud == null || (role == "Patient") == owner) && if (role == "Patient") patientConfirmation == null else patientConfirmation != null, label = { Text(role) }) } } }
                 item { CheckLine(reviewed, { reviewed = it }, "I have read this exact version. This acknowledgement is not a legal signature, medical consent or treatment decision. I can ask my doctor to update it later.") }
-                val alreadyConfirmed = confirmations.any { it.relationship == relationship && it.name.equals(name.trim(), ignoreCase = true) }
+                val alreadyConfirmed = confirmations.any { it.relationship == relationship && it.name.equals(name.trim(), ignoreCase = true) && (vm.cloud == null || it.id in authenticatedAcks) }
                 item { Button(onClick = { vm.confirm(note, name, relationship, reviewed) { reviewed = false; name = "" } }, enabled = reviewed && name.isNotBlank() && !busy && !alreadyConfirmed && (relationship == "Patient" || patientConfirmation != null), modifier = Modifier.fillMaxWidth()) { Text(if (alreadyConfirmed) "Confirmation already saved" else "Confirm this version") } }
             }
             item { Text("This records a conversation. It is not a treatment order or legal directive. Names are self-entered unless this version explicitly shows verified clinician review.", style = MaterialTheme.typography.bodySmall) }
@@ -562,14 +600,15 @@ val Peach = Color(0xFFFFD1B3)
     }
 }
 
-@Composable fun More(vm: CareModel, person: Person, onAccount: () -> Unit, onDelete: () -> Unit, onCalendar: () -> Unit = {}, onWorkflow: () -> Unit = {}, onLabs: () -> Unit = {}, onDoctorDemo: () -> Unit = {}, onFeedback: () -> Unit = {}) {
+@Composable fun More(vm: CareModel, person: Person, onAccount: () -> Unit, onDelete: () -> Unit, onCalendar: () -> Unit = {}, onWorkflow: () -> Unit = {}, onLabs: () -> Unit = {}, onDoctorDemo: () -> Unit = {}, onFeedback: () -> Unit = {}, onReminders: () -> Unit = {}, onSharedWorkspace: () -> Unit = {}) {
     val owner by vm.isOwner.collectAsStateWithLifecycle()
     val context = LocalContext.current; val versions by vm.versions.collectAsStateWithLifecycle(); val acks by vm.acknowledgements.collectAsStateWithLifecycle()
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(18.dp)) {
         item { Heading("More") }
         item { OutlinedButton(onClick = onFeedback, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("patient-feedback-entry")) { Icon(Icons.Default.SentimentSatisfiedAlt, null); Spacer(Modifier.width(8.dp)); Text("App feedback") } }
-        item { OutlinedButton(onClick = onDoctorDemo, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-demo-entry")) { Text("Doctor login") } }
+        item { CareDoctorEntries(onSharedWorkspace, onDoctorDemo) }
         item { DailyCareShortcuts(onCalendar, onWorkflow, onLabs) }
+        item { OutlinedButton(onClick = onReminders, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.NotificationsNone, null); Spacer(Modifier.width(8.dp)); Text("Reminders") } }
         item { OutlinedButton(onClick = onAccount, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Icon(Icons.Default.PersonOutline, null); Spacer(Modifier.width(8.dp)); Text(if (vm.cloud == null) "Sign in to share care" else "Your account and sharing") } }
         item { SurfaceCard(Gold) {
             Icon(Icons.Default.Description, null, Modifier.size(28.dp)); Spacer(Modifier.height(12.dp))
@@ -582,13 +621,13 @@ val Peach = Color(0xFFFFD1B3)
             Text("You choose which notes to share and with whom.")
             Spacer(Modifier.height(10.dp)); Text("You can delete a recording or remove a person's records here.")
             Spacer(Modifier.height(10.dp)); Text("Reports added in Documents stay on this phone. They aren't synced with your care team. Use Share to send a copy, and keep your originals before removing the app.")
-            Spacer(Modifier.height(10.dp)); Text("Prescription scanning sends the photos you choose to Sahara's service and Google Gemini after you agree. Check every medicine before saving it.")
+            Spacer(Modifier.height(10.dp)); Text("Read prescription photos on this phone, then check the original and every medicine before saving it.")
             TextButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.privacy_url)))) }) { Text("Privacy policy") }
         } }
         item { DetailPanel("About", Icons.Default.Info) {
             Text(androidx.compose.ui.res.stringResource(R.string.app_full_name))
-            Spacer(Modifier.height(10.dp)); Text("Your doctor guides treatment. Names and roles in the app aren't verified.")
-            Spacer(Modifier.height(10.dp)); Text("Dictate a speaker's turn on supported phones, then check the words. Saved recordings aren't transcribed. Read aloud uses an installed voice; it does not translate.")
+            Spacer(Modifier.height(10.dp)); Text("Your doctor guides treatment. Selecting a role does not verify identity. Only independently approved, invited accounts can publish a verified review online.")
+            Spacer(Modifier.height(10.dp)); Text("Dictate a speaker's turn on supported phones, then check the words. Online AI requires a configured service and separate consent. Read aloud uses an installed voice.")
             Spacer(Modifier.height(12.dp)); Text("Version ${BuildConfig.VERSION_NAME}", style = MaterialTheme.typography.bodySmall)
         } }
         if (owner) item { TextButton(onClick = onDelete) { Icon(Icons.Default.DeleteOutline, null); Spacer(Modifier.width(8.dp)); Text("Remove this person's records") } }
@@ -633,7 +672,7 @@ val Peach = Color(0xFFFFD1B3)
                 listOf("Today" to 0L, "Tomorrow" to 1L).forEach { (label, days) -> val day = LocalDate.now().plusDays(days).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli(); FilterChip(selected = due == day, onClick = { due = day }, label = { Text(label) }) }
             }
             if (kind == "visit") OutlinedButton(onClick = { val chosen = if (due > 0) Instant.ofEpochMilli(due).atZone(ZoneId.systemDefault()).toLocalDate() else LocalDate.now(); DatePickerDialog(context, { _, y, m, d -> due = LocalDate.of(y, m + 1, d).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli() }, chosen.year, chosen.monthValue - 1, chosen.dayOfMonth).show() }, shape = RoundedCornerShape(14.dp)) { Icon(Icons.Default.CalendarMonth, null); Spacer(Modifier.width(8.dp)); Text(if (due == 0L) "Choose date" else date(due)) }
-            if (kind == "medicine") Text("Use your prescription. Medicine alerts aren't available.", style = MaterialTheme.typography.bodySmall)
+            if (kind == "medicine") Text("Use your prescription. Choose reminder times in Reminders. Android may delay alerts.", style = MaterialTheme.typography.bodySmall)
             error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
             Button(onClick = { if (vm.selected.value != capturedPerson) { onDismiss() } else if (initial == null) vm.saveItem(kind, title, detail, due, onDismiss, entryId) else vm.updateItem(initial.copy(title = title, detail = detail, due = due), onDismiss) }, enabled = selected == capturedPerson && title.isNotBlank() && !busy && (kind != "visit" || due > 0) && (kind != "medicine" || detail.isNotBlank()), shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 54.dp)) { Text(if (busy) "Saving…" else "Save", fontSize = 16.sp) }
         }

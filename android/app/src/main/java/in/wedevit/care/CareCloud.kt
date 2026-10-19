@@ -23,7 +23,7 @@ import javax.crypto.spec.GCMParameterSpec
 
 data class CareSession(val userId: String, val email: String, val access: String, val refresh: String, val expires: Long)
 data class CareMember(val userId: String, val canEdit: Boolean, val email: String)
-data class CloudRecords(val people: List<Person>, val entries: List<CareItem>, val notes: List<CareVersion>, val confirmations: List<Acknowledgement>, val editable: Set<String>, val owned: Set<String>)
+data class CloudRecords(val people: List<Person>, val entries: List<CareItem>, val notes: List<CareVersion>, val confirmations: List<Acknowledgement>, val editable: Set<String>, val owned: Set<String>, val verifiedReviews: Set<String> = emptySet(), val authenticatedConfirmations: Set<String> = emptySet())
 private class CareHttpException(val status: Int, message: String) : IllegalArgumentException(message)
 
 internal fun decodeAcknowledgement(row: JSONObject): Acknowledgement {
@@ -82,7 +82,10 @@ class CareCloud(context: Context) {
         val data = JSONObject().put("contentHash", ack.contentHash).put("name", ack.name).put("relationship", ack.relationship).put("at", ack.at)
         // Retain the legacy patient payload/ID; separate family rows require the patient-first migration.
         if (ack.id != ack.versionId) data.put("versionId", ack.versionId)
-        return decodeAcknowledgement(save("ack", ack.id, personId, data, 0))
+        data.put("versionId", ack.versionId)
+        val saved = save("ack", ack.id, personId, data, 0)
+        require(saved.getJSONObject("data").optString("actorId") == session.value?.userId) { "The account confirmation could not be verified. Refresh before trying again." }
+        return decodeAcknowledgement(saved)
     }
     private suspend fun save(kind: String, id: String, person: String, data: JSONObject, revision: Long) = JSONObject(request("POST", "/rest/v1/rpc/healthathon_save_record", JSONObject().put("p_id", id).put("p_person", person).put("p_kind", kind).put("p_data", data).put("p_revision", revision)))
     suspend fun invite(personId: String, edit: Boolean): String = request("POST", "/rest/v1/rpc/healthathon_invite", JSONObject().put("p_person", personId).put("p_edit", edit)).trim().trim('"')
@@ -99,7 +102,7 @@ class CareCloud(context: Context) {
         val membership = rows("healthathon_members?user_id=eq.$user")
         val owned = personRows.filter { it.getString("owner_id") == user }.map { it.getString("id") }.toSet()
         val editable = owned + membership.filter { it.getBoolean("can_edit") }.map { it.getString("person_id") }
-        val entries = mutableListOf<CareItem>(); val notes = mutableListOf<CareVersion>(); val acks = mutableListOf<Acknowledgement>()
+        val entries = mutableListOf<CareItem>(); val notes = mutableListOf<CareVersion>(); val acks = mutableListOf<Acknowledgement>(); val authenticatedAcks = mutableSetOf<String>()
         rows("healthathon_records?order=updated_at.asc").forEach { row ->
             val d = row.getJSONObject("data"); val id = row.getString("id"); val person = row.getString("person_id")
             when (row.getString("kind")) {
@@ -112,10 +115,12 @@ class CareCloud(context: Context) {
                     reviewerVerification = d.optString("reviewerVerification", ReviewWorkflow.NOT_VERIFIED),
                     transcriptionModel = d.optString("transcriptionModel"), transcribedAt = d.optLong("transcribedAt"),
                 ))
-                "ack" -> acks.add(decodeAcknowledgement(row))
+                "ack" -> { acks.add(decodeAcknowledgement(row)); if (runCatching { java.util.UUID.fromString(d.optString("actorId")) }.isSuccess) authenticatedAcks += id }
             }
         }
-        return CloudRecords(personRows.map { Person(it.getString("id"), it.getString("name"), it.getLong("created_ms")) }, entries, notes, acks, editable, owned)
+        // Missing review service leaves ordinary records usable, without granting a badge.
+        val receipts = runCatching { verifiedReviewIds() }.getOrDefault(emptySet())
+        return CloudRecords(personRows.map { Person(it.getString("id"), it.getString("name"), it.getLong("created_ms")) }, entries, notes, acks, editable, owned, receipts, authenticatedAcks)
     }
     private suspend fun rows(path: String): List<JSONObject> {
         val result = mutableListOf<JSONObject>(); var offset = 0
@@ -135,7 +140,7 @@ class CareCloud(context: Context) {
     }
     internal suspend fun medicineOrganizerToken(): String = token()
     internal suspend fun transcriptionToken(forceRefresh: Boolean = false): String = token(forceRefresh)
-    private suspend fun request(method: String, path: String, body: JSONObject? = null, authenticated: Boolean = true): String {
+    internal suspend fun request(method: String, path: String, body: JSONObject? = null, authenticated: Boolean = true): String {
         val access = if (authenticated) token() else null
         return withContext(Dispatchers.IO) {
             val connection = URL(base + path).openConnection() as HttpURLConnection

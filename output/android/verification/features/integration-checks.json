@@ -1,0 +1,30 @@
+{
+  "checkedAtUtc": "2026-10-19T15:37:10.9500127Z",
+  "androidSource": "compiled current source; no APK/AAB task",
+  "androidTests": 130,
+  "androidSuites": 20,
+  "failures": 0,
+  "errors": 0,
+  "skips": 0,
+  "webTests": 284,
+  "webTypeScript": "passed",
+  "postgresWasm": {
+    "directory": 18,
+    "shared": 47
+  },
+  "liveRollbackPassed": true,
+  "fixtureUsersAfter": 0,
+  "fixturePeopleAfter": 0,
+  "fixtureHospitalsAfter": 0,
+  "realStaffGrants": 0,
+  "actualBrowserConfirmedAccount": true,
+  "exactLinkNoSubstitutionAfterRefresh": true,
+  "mobile390NoOverflow": true,
+  "browserSignOutConfirmed": true,
+  "actualOfflineOcrProof": "ocr-synthetic/proof.json",
+  "nativeDeviceRuntimeTested": false,
+  "productionAiEnabled": false,
+  "ordinaryEmailOnboardingReady": false,
+  "packageCreated": false,
+  "playUploadMade": false
+}

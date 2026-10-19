@@ -20,9 +20,12 @@ export default function PrivacyPage() {
         <p className={styles.date}>Privacy policy · Updated 19 October 2026</p>
         <p>
           Sahara — A Palliative Care Companion is provided by WEDEVIT PRIVATE LIMITED.
-          This policy covers the Sahara Android app and the voluntary feedback and
-          hospital-survey forms on this website. The website’s separate care workspace
-          is not a shared copy of your Android records.
+          This policy covers the Sahara Android app, its website workspaces and the
+          voluntary feedback and hospital-survey forms. The older browser care
+          workspaces keep their own local records. The <Link href="/shared-care">shared
+          care workspace</Link> signs into the same Sahara account-backed records as
+          Android; it does not automatically import that older browser workspace or
+          unsigned-in phone records.
         </p>
 
         <section aria-labelledby="information">
@@ -36,9 +39,13 @@ export default function PrivacyPage() {
           </p>
           <p>
             Without signing in, these records stay in the app’s private storage on your
-            phone. If you sign in, names, published care notes, confirmations and daily
-            entries you add in that account are also stored with Supabase for syncing
-            and sharing. Existing unsigned-in records are not automatically uploaded.
+            phone. If you sign in, names, published care notes, confirmations, named
+            tasks and daily entries you add in that account are also stored with
+            Supabase for syncing and sharing. Conversation drafts and their original
+            words or reviewed sections are uploaded when you explicitly save or send
+            them to the shared clinician workspace. An unsent phone draft is not
+            automatically uploaded. Existing unsigned-in records are not automatically
+            imported into the account.
           </p>
           <p>
             Supabase Auth processes your account email and password for sign-in. The app
@@ -57,16 +64,21 @@ export default function PrivacyPage() {
           <p>
             Microphone permission is requested when you choose to record. Ask everyone
             taking part for permission first. You can stop at any time; recording also
-            stops when the app leaves the foreground. Audio and unfinished conversation
-            drafts stay on your phone. The Android app does not upload audio and
-            does not transcribe recordings automatically.
+            stops when the app leaves the foreground. Standard recordings remain on
+            your phone and are not transcribed automatically. The public cloud-audio
+            transcription service remains disabled. Optional remote assistance, if
+            separately enabled with suitable processing terms, must show the destination
+            and obtain your permission before sending selected audio or conversation
+            text. Saving or sending a text draft to the shared clinician workspace
+            uploads that text to your account; it does not upload its recording.
           </p>
           <p>
             Version 0.5 adds optional turn-by-turn dictation using Android’s on-device
             recognizer on supported phones. You choose the speaker and language and check
             the words; speaker identity is not detected or verified. There is no cloud
-            speech fallback. Recognised words remain in your draft until you save a
-            reviewed care-note version. Read aloud uses an installed offline voice and
+            speech fallback in this on-device dictation flow. Recognised words remain
+            in the draft until you explicitly save or send them to the shared workspace
+            or publish a reviewed care-note version. Read aloud uses an installed offline voice and
             does not translate the text.
           </p>
           <p>
@@ -79,6 +91,46 @@ export default function PrivacyPage() {
             local preview data. This also clears other Sahara information stored on that
             phone. Preview PDFs are created in the app cache, which Android may clear.
             Copies you export or share remain with their recipients until they remove them.
+          </p>
+        </section>
+
+        <section aria-labelledby="shared-clinical-records">
+          <h2 id="shared-clinical-records">Shared drafts, clinician review and care-team tasks</h2>
+          <p>
+            In the shared workspace, the record owner chooses family or clinician
+            access, the permitted record categories, whether changes are allowed and
+            when membership expires. Invitations are private, single-use and expire
+            after three days; the owner can cancel an unused invitation or revoke a
+            member. Expired or revoked permission blocks future service requests but
+            cannot recall previously saved or exported copies. An exact-version link
+            or QR code identifies a note; it does not bypass sign-in or grant public access.
+          </p>
+          <p>
+            A clinician-verification request stores the applicant’s registered name,
+            medical council, registration number, request status, revision and review
+            timestamps. A separately authorised verifier records the checked source,
+            decision and reason. Submitting a request or selecting a doctor view does
+            not grant approval or clinical access. The applicant can read their own
+            request; authorised verification staff can review it. These details are not
+            a public clinician directory. A patient’s separate invitation and current
+            permissions are also required for a verified clinician to review a shared
+            conversation.
+          </p>
+          <p>
+            Shared drafts keep the original source, sections, author account, revision
+            and submission state. A clinician review saves a distinct note version with
+            the reviewing account, checked draft revision and source hash. Patient and
+            family confirmations are separate, account-attributed events tied to the
+            exact note version; family confirmation follows the patient record owner’s
+            confirmation. These events record a discussion and acknowledgment, not
+            verified understanding, legal consent or a treatment order.
+          </p>
+          <p>
+            Named tasks store the author and recipient accounts, title, details, chosen
+            due time, acceptance or completion state and timestamps. Only the assigned
+            account can accept or complete the task. Workflow counts reflect these
+            saved events; they do not measure patient outcomes or clinical effectiveness.
+            Shared changes do not themselves dispatch a call, email or emergency alert.
           </p>
         </section>
 
@@ -119,8 +171,14 @@ export default function PrivacyPage() {
             address. Hosting and Supabase service logs may contain network diagnostics.
           </p>
           <p>
-            Only restricted service administration can read feedback and contributor
-            records; there is no public submission list. We retain them for app
+            Restricted service administration and authorised directory reviewers can
+            read hospital submissions and contributor details; app-feedback records are
+            limited to service administration. There is no public submission list.
+            An approval publishes a separate edited hospital listing with a dated
+            source check and recheck date, without contributor contacts or registration
+            identifiers. Withdrawal or expiry removes that listing from the reviewed
+            directory. Internal review decisions, evidence references and revision
+            history remain private. We retain these records for app
             improvement and hospital-directory review. There is currently no automatic
             expiry or self-service deletion for these voluntary submissions. For a
             correction or deletion, email{' '}
@@ -136,25 +194,41 @@ export default function PrivacyPage() {
         <section aria-labelledby="medicine-ai">
           <h2 id="medicine-ai">Prescription and medicine photo organiser</h2>
           <p>
-            Photo scanning is currently off. Selected prescription and medicine photos
-            are not uploaded. You can add medicines by hand.
+            Cloud photo scanning remains off. The Read prescription flow reads printed
+            English/Latin text on your device: Android uses a bundled ML Kit text model,
+            and the website runs Tesseract in a browser worker using engine and language
+            files served by Sahara. The selected photos and their recognised words are
+            not sent to Gemini, Supabase or another OCR service. Handwriting, small print
+            and other scripts may need manual entry. You can always add medicines by hand.
           </p>
           <p>
-            When scanning is enabled, the prescription pages and medicine-strip
-            or box photos you select are compressed on your phone and sent over HTTPS
-            through Sahara’s protected service and a Supabase Edge Function to Google
-            Gemini to transcribe and match medicines for your review. The organiser
-            does not save the image payloads and asks Gemini not to store the
-            interaction. That setting does not remove Google’s separate safety and
-            abuse-prevention logging. We will confirm the provider’s data-processing
-            terms before enabling patient uploads. Cancelling before Organise sends nothing.
+            Google’s Android ML Kit SDK can send technical diagnostics and usage metrics
+            to Google over HTTPS, including app and device information, a per-installation
+            identifier, performance, input/output sizes, API settings and feature events
+            or errors. These metrics do not include the selected image or recognised
+            text. See <a href="https://developers.google.com/ml-kit/android-data-disclosure" target="_blank" rel="noopener noreferrer">Google’s ML Kit data disclosure</a>.
+            Website OCR uses Sahara-hosted engine files; ordinary hosting logs can
+            record the request for those files and your IP address.
           </p>
           <p>
-            AI results can be incomplete or wrong. Unknown details stay blank. Check
-            every medicine name, strength, dose, timing, food instruction and course
-            length against the original prescription before confirming. Only the text
-            you review and save becomes part of the person’s care records; the selected
-            photos are not added to those records.
+            The reader supplies possible prescription lines for review. It does not
+            identify medicines from packaging, verify a brand match, calculate doses,
+            choose treatment or infer a clock time from a frequency such as twice daily.
+            Compare the words, name, strength, dose, food instruction, course dates and
+            any reminder times against the original before saving. Corrections are
+            separate from the original reading. Only records you explicitly confirm are
+            added to the selected person’s care list.
+          </p>
+          <p>
+            Website prescription and packaging images you save with the reviewed list
+            stay in this browser’s IndexedDB so you can view the original again; clearing
+            the site data removes them. Android keeps saved source copies within the
+            person’s private report files. Shared prescription originals remain while
+            medicines can refer to them; removing the person’s records, clearing app
+            data or uninstalling removes those copies. If you are signed in, copied medicine text or
+            calendar entries you confirm may sync with your shared care records, while
+            the original files remain local. Cloud scanning will not be enabled without
+            suitable provider terms, an updated explanation and consent before an upload.
           </p>
         </section>
 
@@ -167,6 +241,50 @@ export default function PrivacyPage() {
             Added reports stay on that phone until you remove them, remove the person’s
             records or uninstall the app. Keep your original files. Removing a report
             in Sahara does not delete the original.
+          </p>
+          <p>
+            If you choose Read and copy facts, Android can render up to the first twelve
+            PDF pages or read an image with on-device OCR. The website reads PDF text
+            directly and uses local browser OCR for scanned pages and photos. The
+            original remains available beside the text. Correct the reading and confirm
+            it against the original before it becomes searchable. Android keeps the
+            original file hash, page, line and checked excerpt with a copied fact;
+            website passages cite the selected report, page when available and text line.
+            Search returns matching source passages, not medical advice or an inferred
+            diagnosis. No supported passage means no answer. Unreadable or unprocessed
+            pages are identified; the reader does not claim to have checked the full file.
+          </p>
+          <p>
+            Reviewed text and corrections are stored with that account’s private report
+            review on Android and with the website’s separate local document workspace.
+            Removing a report or person’s private records removes its Android review
+            text. If you explicitly copy a fact into a signed-in care record, that copy
+            follows the care-record sharing and deletion rules above; removing its
+            source report does not silently remove previously confirmed care entries.
+          </p>
+        </section>
+
+        <section aria-labelledby="reminders">
+          <h2 id="reminders">Medicine and follow-up reminders</h2>
+          <p>
+            Android reminders are optional. Sahara asks for notification permission
+            when you enable them and keeps your selected times, course boundaries and
+            next scheduled alerts in private storage on the phone. Only the active
+            account sends alerts. Saved edits, completed or removed activities,
+            account changes, phone restarts and clock or time-zone changes reconcile
+            the next alerts. Medicine wall-clock times follow the phone’s current time
+            zone; dated visits retain their saved instant. No reminder information is
+            sent to an advertising or notification provider.
+          </p>
+          <p>
+            Notifications use a general Sahara reminder message without medicine names,
+            doses or patient names on the lock screen. Opening one returns to Sahara;
+            it does not mark a medicine as taken. Permission denial leaves the care
+            record intact, and you can return to notification settings. Android may
+            delay or block alerts because of battery restrictions, a disabled channel,
+            force-stop or a switched-off phone. These are inexact reminders, not an
+            urgent-care or guaranteed medication-administration service. The website’s
+            calendar alone cannot send an alert after its page is closed.
           </p>
         </section>
 
@@ -181,8 +299,12 @@ export default function PrivacyPage() {
           <p>
             When you share reports or export care notes, Android lets you choose another app and
             recipient. Those copies leave Sahara and follow that service’s policies.
-            Check the contents and recipient before sharing. Names and doctor roles are
-            self-entered; Sahara does not verify professional credentials.
+            Check the contents and recipient before sharing. Names and roles entered in
+            the legacy walkthrough are self-entered. In the shared workspace, a clinician
+            request remains pending until an authorised independent verifier checks the
+            professional register and the applicant’s identity/control. That review does
+            not certify treatment decisions, create a legal signature or replace the
+            patient’s separate invitation.
           </p>
         </section>
 
@@ -193,14 +315,17 @@ export default function PrivacyPage() {
             and the map area requested. Sahara does not request your precise GPS location.
             Calls, directions and source links open your dialler, maps or browser when
             you select them. Those services handle information under their own policies.
+            The website’s MapLibre maps use OpenStreetMap tiles; that provider receives
+            your IP address and the map areas requested.
           </p>
         </section>
 
         <section aria-labelledby="security">
           <h2 id="security">How information is protected</h2>
           <p>
-            Sahara has no advertising or analytics SDK. We do not sell care information
-            or use it for advertising. Connections to Sahara’s service, Supabase,
+            Sahara has no advertising SDK. We do not sell care information
+            or use it for advertising. ML Kit’s technical usage and diagnostic metrics
+            are described above. Connections to Sahara’s service, Supabase,
             Google Gemini and OpenFreeMap use HTTPS. Sign-in tokens are encrypted using
             Android Keystore. Account caches are separated from each other and from
             unsigned-in records, and app records are excluded from Android backup and
@@ -240,6 +365,15 @@ export default function PrivacyPage() {
             If another service still needs your sign-in, we keep only its account ID and
             the Sahara closure date to keep Sahara access closed. This marker is removed
             when that shared sign-in is deleted.
+          </p>
+          <p>
+            Closure removes active staff permissions, your clinician-verification request,
+            assistance-quota identifiers and unfinished drafts you authored. Open tasks
+            assigned to the closed account are cancelled, not marked completed. Reviewed
+            source conversations, care notes, confirmations and task history that belong
+            to another patient remain part of that patient’s record. Decision audit
+            evidence supporting those recorded reviews or professional approvals can
+            also remain; closing an account does not rewrite another patient’s history.
           </p>
           <p>
             We keep information while it is needed to provide your account and care records.

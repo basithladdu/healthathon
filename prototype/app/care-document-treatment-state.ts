@@ -31,7 +31,7 @@ export function confirmCareDocumentTreatment(input: CareDocumentTreatmentInput):
   if (last > lines.length || lines.slice(first, last).join('\n') !== excerpt.text) return fail('source');
 
   let page: number | undefined;
-  if (document.textSource === 'pdf-text') {
+  if (document.textSource === 'pdf-text' || document.textSource === 'image-ocr') {
     for (let index = 0; index < last; index += 1) {
       const marker = /^\[Page (\d+)\]$/.exec(lines[index].trim());
       if (!marker) continue;

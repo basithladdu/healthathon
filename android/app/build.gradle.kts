@@ -74,6 +74,7 @@ dependencies {
     ksp("androidx.room:room-compiler:2.7.0")
     implementation("androidx.core:core-ktx:1.17.0")
     implementation("org.maplibre.gl:android-sdk-opengl:13.6.1")
+    implementation("com.google.mlkit:text-recognition:16.0.1")
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.json:json:20251224")
     androidTestImplementation(platform("androidx.compose:compose-bom:2025.09.01"))

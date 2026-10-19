@@ -3,9 +3,10 @@
 import { useCallback, useEffect, useId, useRef, useState, type ChangeEvent } from 'react';
 import type { CareEvent } from './care-calendar-state';
 import {
-  organizeMedicineImagesWithAi,
   type CareMedicineAiProgress,
 } from './care-medicine-ai';
+import { readPrescriptionLocally } from './care-prescription-local';
+import { MedicinePhoto } from './care-medicine-photo';
 import {
   MEDICINE_MEAL_TIMINGS,
   manualMedicineFromImage,
@@ -143,7 +144,7 @@ export function CareMedicineImport({ patientId, author, today, hindi, onAdd, onC
     const selected = [...(event.target.files ?? [])];
     event.target.value = '';
     const valid = selected.filter((file) => ['image/jpeg', 'image/png', 'image/webp'].includes(file.type) && file.size > 0 && file.size <= 25 * 1024 * 1024);
-    if (valid.length !== selected.length) setError(t('Use JPG, PNG or WebP images smaller than 25 MB. They are compressed before upload.', '25 MB से छोटी JPG, PNG या WebP तस्वीरें चुनें। अपलोड से पहले वे छोटी की जाएँगी।'));
+    if (valid.length !== selected.length) setError(t('Use JPG, PNG or WebP images smaller than 25 MB. Reading happens on this device.', '25 MB से छोटी JPG, PNG या WebP तस्वीरें चुनें। टेक्स्ट इसी डिवाइस पर पढ़ा जाएगा।'));
     else setError('');
     const known = new Set(current.map((file) => `${file.name}:${file.size}:${file.lastModified}`));
     const next = [...current, ...valid.filter((file) => !known.has(`${file.name}:${file.size}:${file.lastModified}`))].slice(0, maximum);
@@ -157,15 +158,15 @@ export function CareMedicineImport({ patientId, author, today, hindi, onAdd, onC
   }
 
   async function organize() {
-    if (!prescriptions.length || !medicineImages.length) {
-      setError(t('Add at least one prescription page and one medicine-strip photo.', 'कम से कम एक पर्चे का पेज और एक दवा की स्ट्रिप की तस्वीर जोड़ें।'));
+    if (!prescriptions.length) {
+      setError(t('Add at least one prescription page. Packaging photos are optional.', 'कम से कम पर्चे का एक पेज जोड़ें। दवा की पैकिंग की तस्वीर वैकल्पिक है।'));
       return;
     }
     const controller = new AbortController();
     aborter.current = controller;
     setError(''); setProgress(null); setPhase('scanning');
     try {
-      const result = await organizeMedicineImagesWithAi(prescriptions, medicineImages, { signal: controller.signal, onProgress: setProgress });
+      const result = await readPrescriptionLocally(prescriptions, medicineImages, { signal: controller.signal, onProgress: setProgress });
       setPreparedPrescriptions(result.preparedPrescriptionPages);
       setPreparedMedicineImages(result.preparedMedicineImages);
       setDrafts(sortOrganizedMedicinesByPrescriptionOrder(result.medicines)
@@ -372,26 +373,27 @@ export function CareMedicineImport({ patientId, author, today, hindi, onAdd, onC
 
   if (phase === 'scanning') return <div className="medicine-scan-progress" role="status" aria-live="polite">
     <span className="medicine-scan-spinner" aria-hidden="true" />
-    <h2>{progress?.stage === 'organizing' ? t('Sahara AI is matching the medicines', 'सहारा AI दवाओं का मिलान कर रहा है') : t('Preparing clear, private copies', 'साफ़ और निजी प्रतियाँ तैयार हो रही हैं')}</h2>
-    <p>{progress?.stage === 'preparing' ? `${progress.completed + 1} / ${progress.total} · ${progress.fileName}` : t('Reading every prescription page and strip together…', 'पर्चे के सभी पेज और स्ट्रिप साथ में पढ़े जा रहे हैं…')}</p>
-    <p className="medicine-scan-privacy">{t('Photos are sent through Sahara’s protected Supabase function and are not saved by the organizer. Keep this page open until review appears.', 'तस्वीरें सहारा के सुरक्षित Supabase फ़ंक्शन से भेजी जाती हैं और ऑर्गनाइज़र उन्हें सेव नहीं करता। समीक्षा आने तक यह पेज खुला रखें।')}</p>
+    <h2>{t('Reading prescription pages', 'पर्चे के पेज पढ़ रहे हैं')}</h2>
+    <p>{progress?.stage === 'preparing' ? `${Math.min(progress.completed + 1, progress.total)} / ${progress.total} · ${progress.fileName}` : t('Reading prescription pages…', 'पर्चे के पेज पढ़ रहे हैं…')}</p>
+    <p className="medicine-scan-privacy">{t('Reading runs in this browser. Photos are not uploaded. Keep this page open until review appears.', 'टेक्स्ट इसी ब्राउज़र में पढ़ा जाता है। तस्वीरें अपलोड नहीं होतीं। समीक्षा आने तक यह पेज खुला रखें।')}</p>
     <button type="button" onClick={() => aborter.current?.abort()}>{t('Cancel', 'रद्द करें')}</button>
   </div>;
 
   if (phase === 'select') return <div className="medicine-import-flow">
-    <div className="medicine-import-intro"><div><p className="medicine-eyebrow">{t('Sahara AI organizer', 'सहारा AI ऑर्गनाइज़र')}</p><h2>{t('Turn prescription photos into a medicine list', 'पर्चे की तस्वीरों से दवाओं की सूची बनाएँ')}</h2><p>{t('Add prescription pages in order and one clear photo of each strip. Sahara reads and matches all images together, then you review every result.', 'पर्चे के पेज क्रम में और हर स्ट्रिप की एक साफ़ तस्वीर जोड़ें। सहारा सभी तस्वीरें साथ पढ़कर मिलान करता है, फिर आप हर नतीजा जाँचते हैं।')}</p></div><span className="medicine-import-step">1 / 2</span></div>
+    <div className="medicine-import-intro"><div><p className="medicine-eyebrow">{t('Read your prescription', 'अपना पर्चा पढ़ें')}</p><h2>{t('Turn prescription photos into a medicine list', 'पर्चे की तस्वीरों से दवाओं की सूची बनाएँ')}</h2><p>{t('Add prescription pages in order. Packaging photos are optional for your comparison. Check every copied line before saving.', 'पर्चे के पेज क्रम में जोड़ें। मिलान के लिए पैकिंग की तस्वीर वैकल्पिक है। सेव करने से पहले हर पंक्ति जाँचें।')}</p></div><span className="medicine-import-step">1 / 2</span></div>
     <div className="medicine-import-grid">
       <ImageGroup id={`${id}-prescriptions`} title={t('Prescription pages', 'पर्चे के पेज')} hint={t('Add in page order · up to 5', 'पेज के क्रम में · अधिकतम 5')} files={prescriptions} onChange={(event) => addFiles('prescription', event)} onRemove={(index) => removeFile('prescription', index)} cameraLabel={t('Photograph prescription', 'पर्चे की तस्वीर लें')} chooseLabel={t('Choose pages', 'पेज चुनें')} />
       <ImageGroup id={`${id}-strips`} title={t('Medicine strips or boxes', 'दवा की स्ट्रिप या डिब्बे')} hint={t('One clear photo per medicine · up to 10', 'हर दवा की एक साफ़ तस्वीर · अधिकतम 10')} files={medicineImages} onChange={(event) => addFiles('medicine', event)} onRemove={(index) => removeFile('medicine', index)} cameraLabel={t('Photograph medicine', 'दवा की तस्वीर लें')} chooseLabel={t('Choose medicine photos', 'दवा की तस्वीरें चुनें')} />
     </div>
-    <div className="medicine-import-note"><strong>{t('AI organizes; you decide.', 'AI सूची बनाता है; फैसला आपका है।')}</strong> {t('Unknown details stay blank. Verify every medicine, dose, food instruction and reminder against the original prescription.', 'अनजान जानकारी खाली रहती है। हर दवा, खुराक, खाने के निर्देश और रिमाइंडर को असली पर्चे से जाँचें।')}</div>
+    <div className="medicine-import-note"><strong>{t('Check the original.', 'मूल पर्चा जाँचें।')}</strong> {t('Unknown details stay blank. Verify every medicine, dose, food instruction and reminder against the original prescription.', 'अनजान जानकारी खाली रहती है। हर दवा, खुराक, खाने के निर्देश और रिमाइंडर को असली पर्चे से जाँचें।')}</div>
     {error && <p className="medicine-error" role="alert">{error}</p>}
-    <div className="medicine-form-actions"><button type="button" className="medicine-primary" disabled={!prescriptions.length || !medicineImages.length} onClick={organize}>{t('Organize with Sahara AI', 'सहारा AI से सूची बनाएँ')}</button><button type="button" onClick={() => { setPhase('review'); addManual(); }}>{t('Add one manually', 'एक दवा खुद जोड़ें')}</button><button type="button" onClick={onCancel}>{t('Cancel', 'रद्द करें')}</button></div>
+    <div className="medicine-form-actions"><button type="button" className="medicine-primary" disabled={!prescriptions.length} onClick={organize}>{t('Read prescription', 'पर्चा पढ़ें')}</button><button type="button" onClick={() => { setPhase('review'); addManual(); }}>{t('Add one manually', 'एक दवा खुद जोड़ें')}</button><button type="button" onClick={onCancel}>{t('Cancel', 'रद्द करें')}</button></div>
   </div>;
 
   return <div className="medicine-import-flow">
     <div className="medicine-import-intro"><div><p className="medicine-eyebrow">{t('Review before saving', 'सेव करने से पहले जाँचें')}</p><h2>{t(`${drafts.length} medicine${drafts.length === 1 ? '' : 's'} organized`, `${drafts.length} दवाओं की सूची तैयार है`)}</h2><p>{t('Correct anything that does not match the prescription. Unknown or uncertain details are called out below.', 'जो जानकारी पर्चे से मेल न खाए उसे ठीक करें। अनजान या संदिग्ध जानकारी नीचे दिखाई गई है।')}</p></div><span className="medicine-import-step">2 / 2</span></div>
-    {warnings.length > 0 && <div className="medicine-import-warnings"><strong>{t('Sahara AI notes', 'सहारा AI की टिप्पणी')}</strong><ul>{warnings.map((warning) => <li key={warning}>{warning}</li>)}</ul></div>}
+    {warnings.length > 0 && <div className="medicine-import-warnings"><strong>{t('Reading notes', 'पढ़ने की जानकारी')}</strong><ul>{warnings.map((warning) => <li key={warning}>{warning}</li>)}</ul></div>}
+    {prescriptions.length > 0 && <details className="medicine-saved-source"><summary>{t('View original prescription pages', 'मूल पर्चे के पेज देखें')}</summary><div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>{prescriptions.map((file, page) => <MedicinePhoto key={`${page}:${file.name}`} file={file} alt={t(`Prescription page ${page + 1}`, `पर्चे का पेज ${page + 1}`)} hindi={hindi} prescription />)}</div></details>}
     <div className="medicine-review-list">{drafts.map((draft, index) => <article id={`${id}-draft-${draft.id}`} className={`medicine-review-card${draft.confirmed ? ' is-checked' : ''}${invalidDraftId === draft.id ? ' has-error' : ''}`} key={draft.id}>
       <div className="medicine-review-card-head">{draft.medicineImageIndex >= 0 && medicineImages[draft.medicineImageIndex] ? <div className="medicine-review-photo"><FileThumbnail file={medicineImages[draft.medicineImageIndex]} alt={t(`Photo matched to medicine ${index + 1}`, `दवा ${index + 1} से मिली तस्वीर`)} /></div> : <div className="medicine-review-photo is-empty" aria-hidden="true">Rx</div>}<div><span>{draft.prescriptionItemNumber === null ? t(`Medicine ${index + 1}`, `दवा ${index + 1}`) : t(`Prescription item ${draft.prescriptionItemNumber}`, `पर्चे की दवा ${draft.prescriptionItemNumber}`)}</span><strong>{matchLabel(draft.matchQuality, hindi)}</strong>{draft.confidence !== null && <small>{t(`AI confidence ${Math.round(draft.confidence * 100)}%`, `AI भरोसा ${Math.round(draft.confidence * 100)}%`)}</small>}</div><button type="button" className="medicine-text-button" onClick={() => setDrafts((items) => items.filter((_, itemIndex) => itemIndex !== index))}>{t('Remove', 'हटाएँ')}</button></div>
       {draft.uncertainties.length > 0 && <div className="medicine-ai-uncertainties"><strong>{t('Check carefully', 'ध्यान से जाँचें')}</strong><ul>{draft.uncertainties.map((uncertainty) => <li key={uncertainty}>{uncertainty}</li>)}</ul></div>}
@@ -400,7 +402,7 @@ export function CareMedicineImport({ patientId, author, today, hindi, onAdd, onC
         <label>{t('Dose & quantity exactly as prescribed', 'पर्चे के अनुसार खुराक और मात्रा')}<input value={draft.dose} maxLength={160} onChange={(event) => patchDraft(index, { dose: event.target.value })} /></label>
         <label>{t('Frequency & instructions', 'कितनी बार और निर्देश')}<textarea rows={2} value={draft.instructions} maxLength={500} onChange={(event) => patchDraft(index, { instructions: event.target.value })} /></label>
         <fieldset className="medicine-meal-timing"><legend>{t('When to take it with food', 'खाने के हिसाब से कब लें')}</legend>{MEDICINE_MEAL_TIMINGS.map((value) => <button type="button" key={value} aria-pressed={draft.mealTiming === value} onClick={() => patchDraft(index, { mealTiming: value as MedicineMealTiming })}>{medicineMealTimingLabel(value, hindi)}</button>)}</fieldset>
-        <div className="medicine-review-times"><div className="medicine-review-times-heading"><div><strong>{t('Optional reminder times', 'वैकल्पिक रिमाइंडर समय')}</strong><span>{t('No time means no notification; the medicine still stays in your list.', 'समय न होने पर सूचना नहीं आएगी; दवा सूची में फिर भी रहेगी।')}</span></div><button type="button" disabled={draft.times.length >= 6} onClick={() => addTime(index)}>+ {t('Add time', 'समय जोड़ें')}</button></div>{draft.times.length === 0 ? <p className="medicine-no-reminders">{t('No reminder will be scheduled. You can add one later.', 'कोई रिमाइंडर तय नहीं होगा। आप बाद में जोड़ सकते हैं।')}</p> : draft.times.map((time, timeIndex) => <div className="medicine-review-time" key={`${draft.id}-${time}`}><input type="time" value={time} aria-label={t(`Time ${timeIndex + 1} for ${draft.title || `medicine ${index + 1}`}`, `${draft.title || `दवा ${index + 1}`} का समय ${timeIndex + 1}`)} onChange={(event) => patchTime(index, timeIndex, event.target.value)} /><button type="button" onClick={() => removeTime(index, timeIndex)} aria-label={t('Remove this time', 'यह समय हटाएँ')}>×</button></div>)}</div>
+        <div className="medicine-review-times"><div className="medicine-review-times-heading"><div><strong>{t('Optional reminder times', 'वैकल्पिक रिमाइंडर समय')}</strong><span>{t('These times organise your calendar. This website cannot alert you after the page closes; use Android reminders or export to your calendar.', 'ये समय कैलेंडर को व्यवस्थित करते हैं। पेज बंद होने के बाद वेबसाइट सूचना नहीं भेज सकती; Android रिमाइंडर या कैलेंडर में एक्सपोर्ट का उपयोग करें।')}</span></div><button type="button" disabled={draft.times.length >= 6} onClick={() => addTime(index)}>+ {t('Add time', 'समय जोड़ें')}</button></div>{draft.times.length === 0 ? <p className="medicine-no-reminders">{t('No reminder will be scheduled. You can add one later.', 'कोई रिमाइंडर तय नहीं होगा। आप बाद में जोड़ सकते हैं।')}</p> : draft.times.map((time, timeIndex) => <div className="medicine-review-time" key={`${draft.id}-${time}`}><input type="time" value={time} aria-label={t(`Time ${timeIndex + 1} for ${draft.title || `medicine ${index + 1}`}`, `${draft.title || `दवा ${index + 1}`} का समय ${timeIndex + 1}`)} onChange={(event) => patchTime(index, timeIndex, event.target.value)} /><button type="button" onClick={() => removeTime(index, timeIndex)} aria-label={t('Remove this time', 'यह समय हटाएँ')}>×</button></div>)}</div>
         <div className="medicine-course-dates"><label>{t('First day', 'पहला दिन')}<input type="date" value={draft.startDate} onChange={(event) => patchCourseStart(index, event.target.value)} /></label><label>{t('Course length (days)', 'कोर्स की अवधि (दिन)')}<input type="number" min="1" step="1" inputMode="numeric" value={draft.durationDays ?? ''} placeholder={t('Not stated', 'नहीं बताया')} onChange={(event) => patchCourseDuration(index, event.target.value)} /></label><label className="medicine-ongoing"><input type="checkbox" checked={draft.ongoing} onChange={(event) => patchOngoing(index, event.target.checked)} /><span>{t('Ongoing until I stop it', 'जब तक मैं रोकूँ तब तक जारी')}</span></label>{!draft.ongoing && <label>{t('Last day', 'आखिरी दिन')}<input type="date" min={draft.startDate} value={draft.endDate} onChange={(event) => patchCourseEnd(index, event.target.value)} /></label>}</div>
       </div>
       <label className="medicine-prescription-check"><input type="checkbox" checked={draft.confirmed} onChange={(event) => patchDraft(index, { confirmed: event.target.checked })} /><span>{t('I checked this medicine, dose, food instruction and time against the original prescription.', 'मैंने इस दवा, खुराक, खाने के निर्देश और समय को असली पर्चे से जाँच लिया है।')}</span></label>

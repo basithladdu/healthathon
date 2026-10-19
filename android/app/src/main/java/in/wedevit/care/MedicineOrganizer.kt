@@ -68,6 +68,7 @@ data class OrganizedMedicine(
     val confidence: Double?,
     val uncertainties: List<String>,
     val matchQuality: MedicineMatchQuality,
+    val sourceQuote: String = "",
 )
 
 data class MedicineOrganization(
@@ -727,6 +728,7 @@ fun medicineCareDetail(medicine: OrganizedMedicine): String {
         }
         medicine.durationDays?.let { add("Course: $it ${if (it == 1) "day" else "days"}") }
         if (medicine.instructions.isNotBlank()) add("Directions: ${medicine.instructions}")
+        if (medicine.sourceQuote.isNotBlank()) add("Copied source · prescription ${medicine.prescriptionPageIndexes.joinToString { "page ${it + 1}" }}:\n${medicine.sourceQuote}")
         if (medicine.uncertainties.isNotEmpty()) add("Review: ${medicine.uncertainties.joinToString(" ")}")
     }
     return (lines.ifEmpty { listOf("Check dose and directions against the original prescription.") })

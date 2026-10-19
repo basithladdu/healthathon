@@ -651,6 +651,55 @@
         "area": "Patient prescription scanning",
         "status": "not ready"
       }
-    ]
+    ],
+    "baseline": "0.5.0 (6) audit; later unpackaged feature integration is recorded separately below."
+  },
+  "unpackagedFeatureWork": {
+    "versionName": "0.6.0",
+    "versionCode": 7,
+    "status": "source integrated; packaging stopped by user",
+    "packaged": false,
+    "uploaded": false,
+    "submitted": false,
+    "verification": {
+      "androidCompilation": "compileDebugKotlin passed",
+      "androidUnitTests": 130,
+      "androidUnitSuites": 20,
+      "androidUnitFailures": 0,
+      "androidUnitErrors": 0,
+      "androidUnitSkipped": 0,
+      "webTests": 284,
+      "webTypeScript": "passed",
+      "sharedPostgresWasmChecks": 47,
+      "directoryPostgresWasmChecks": 18,
+      "livePostgresRollback": "passed including roles, patient-first confirmations, exact QR, suspension, account closure and directory privacy",
+      "browser": "real confirmed-account sign-in/sign-out, inaccessible exact-link denial after refresh, 390px fit; no record mutation",
+      "localOcr": "actual Tesseract engine and shipped language assets, synthetic-only fixture; Node worker adapter, not browser UI/native ML Kit",
+      "physicalDeviceTested": false,
+      "emulatorTested": false
+    },
+    "deliveredSource": [
+      "Account-backed web/native care-note drafts and independently verified clinician workflow",
+      "Patient-first exact-version confirmations, family permissions, expiry and revocation",
+      "Protected cross-device QR retrieval and named-account task transitions",
+      "Local OCR with retained originals, reviewed page/line facts and extractive document answers",
+      "Durable inexact Android reminder scheduling with permission and lifecycle recovery",
+      "Private hospital moderation with audit, expiry and sanitized public projections",
+      "Consent/account/source-bound Sarvam assistance adapters, disabled pending actual provider setup"
+    ],
+    "operationalGates": [
+      "Existing Devit Sarvam workspace, one onboarding key and 100 credits verified; recoverable/usable secret and applicable processing agreement/disclosures remain unverified; no patient provider calls enabled",
+      "Custom SMTP and exact approved recovery callback are absent; new-account email confirmation and recovery remain unavailable; existing confirmed accounts work",
+      "Real independent verifier assignment and clinician/family pilot remain pending; no staff or professional approvals were fabricated"
+    ],
+    "releasePrerequisites": [
+      "Respect explicit stop: do not package, sign or upload until release packaging is resumed",
+      "Run actual native OCR/reminder/permission/navigation interactions and appropriate Android runtime checks",
+      "Reassess ML Kit Device identifiers, Diagnostics and App interactions/analytics declarations against actual SDK behavior and update Play Data safety before upload",
+      "Update reviewer instructions/listing/privacy to the actual packaged features and provider readiness",
+      "Keep current Production review intact; do not duplicate or withdraw 0.5.0 (6)"
+    ],
+    "hospitalSurvey": "web only",
+    "reportOriginals": "private phone/browser copies; copying facts into account entries does not synchronize original files"
   }
 }

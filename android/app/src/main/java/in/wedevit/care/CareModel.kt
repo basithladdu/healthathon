@@ -19,8 +19,10 @@ data class Centre(val name: String, val city: String, val district: String, val 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewModel(app) {
     private val account = cloud?.session?.value?.userId.orEmpty()
+    val accountNamespace: String get() = account
     private val db = CareDatabase.get(app, account)
     private val dao = db.care()
+    private val reminderScheduler = CareReminderScheduler(app, account)
     private val preferences = app.getSharedPreferences(if (account.isEmpty()) "preferences" else "preferences-$account", 0)
     private val conversationTranscriber = ConversationTranscriber()
     val people = dao.people().stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
@@ -34,6 +36,8 @@ class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewMod
     val busy = MutableStateFlow(false)
     val refreshing = MutableStateFlow(false)
     val refreshError = MutableStateFlow<String?>(null)
+    val verifiedReviewIds = MutableStateFlow<Set<String>>(emptySet())
+    val authenticatedConfirmationIds = MutableStateFlow<Set<String>>(emptySet())
     private val editable = MutableStateFlow<Set<String>>(emptySet())
     private val owned = MutableStateFlow<Set<String>>(emptySet())
     val canEdit = combine(selected, editable) { id, ids -> cloud == null || id in ids }.stateIn(viewModelScope, SharingStarted.Eagerly, cloud == null)
@@ -67,6 +71,8 @@ class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewMod
         } }
     }
     init {
+        runCatching { reminderScheduler.activate() }
+        viewModelScope.launch { reconcileReminders() }
         if (cloud != null) refresh()
         viewModelScope.launch {
             for (value in writes) try { lock.withLock { if (value.personId !in deletedPeople) withContext(Dispatchers.IO) { dao.saveDraft(value) } } }
@@ -107,9 +113,10 @@ class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewMod
                 removed.forEach { dao.deleteReports(it) }
             }
             withContext(Dispatchers.IO) { removed.forEach { reportFiles.removePerson(it) } }
-            editable.value = records.editable; owned.value = records.owned
+            editable.value = records.editable; owned.value = records.owned; verifiedReviewIds.value = records.verifiedReviews; authenticatedConfirmationIds.value = records.authenticatedConfirmations
             if (selected.value in removed) { draft.value = Conversation(""); select(records.people.firstOrNull()?.id.orEmpty()) }
         }
+        reconcileReminders()
     }
     private fun requireEdit(id: String) { require(cloud == null || id in editable.value) { "You can read these records. Ask the person who invited you to allow changes." } }
     fun select(id: String) {
@@ -140,21 +147,34 @@ class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewMod
             require(selected.value == person.id && clinician.value) { "Open this person's conversation in the doctor view before saving." }
             requireEdit(person.id)
                 val latest = dao.latest(person.id)
-                val version = NoteRules.publish(person, captured, doctor, reviewed, (latest?.version ?: 0) + 1)
-                require(latest?.contentHash != version.contentHash) { "This exact note has already been saved." }
-                cloud?.saveNote(version)
-                dao.insertVersion(version)
-            message.value = "Care note saved"; done()
+                if (cloud != null) {
+                    require(reviewed && captured.source.isNotBlank() && NoteRules.values(captured).any { it.isNotBlank() }) { "Check the source and every section before sending for review." }
+                    val candidates = cloud.sharedDrafts(person.id)
+                    val previousId = preferences.getString("sharedDraft:${person.id}", null)
+                    val previous = candidates.firstOrNull { it.id == previousId && it.status != "reviewed" }
+                    val saved = cloud.saveSharedDraft(captured, previous?.id ?: newId(), previous?.revision ?: 0, submit = true)
+                    preferences.edit().putString("sharedDraft:${person.id}", saved.id).apply()
+                    message.value = "Sent for clinician review. Your original draft is retained."
+                } else {
+                    val version = NoteRules.publish(person, captured, doctor, reviewed, (latest?.version ?: 0) + 1)
+                    require(latest?.contentHash != version.contentHash) { "This exact note has already been saved." }
+                    dao.insertVersion(version)
+                    message.value = "Care note saved"
+                }
+            done()
         }
     }
     fun confirm(version: CareVersion, name: String, relationship: String, reviewed: Boolean, done: () -> Unit) = action {
         require(selected.value == version.personId) { "Open this person's care note before confirming." }
-        val ack = NoteRules.acknowledge(version, dao.latest(version.personId), name, relationship, reviewed, dao.confirmations(version.id))
+        val previousConfirmations = dao.confirmations(version.id).filter { cloud == null || it.id in authenticatedConfirmationIds.value }
+        val proposed = NoteRules.acknowledge(version, dao.latest(version.personId), name, relationship, reviewed, previousConfirmations)
+        val ack = if (cloud != null && dao.confirmation(proposed.id) != null && proposed.id !in authenticatedConfirmationIds.value) proposed.copy(id = newId()) else proposed
         val saved = cloud?.confirm(version.personId, ack) ?: ack
         require(saved.versionId == version.id && saved.contentHash == version.contentHash && saved.relationship == relationship && saved.name.trim().equals(name.trim(), ignoreCase = true)) { "The saved confirmation didn't match this version. Refresh the care note before trying again." }
         val previous = dao.confirmation(saved.id)
         if (previous == null) dao.acknowledge(saved)
         else require(previous == saved) { "This confirmation changed. Refresh the care note before trying again." }
+        if (cloud != null) authenticatedConfirmationIds.value += saved.id
         message.value = "Your confirmation is saved"; done()
     }
     fun saveItem(kind: String, title: String, detail: String, due: Long = 0, done: () -> Unit = {}, id: String = newId()) {
@@ -216,8 +236,13 @@ class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewMod
         require(item.title.length <= 200 && item.detail.length <= 4000) { "Please shorten this entry." }
         storeItem(item.copy(title = item.title.trim(), detail = item.detail.trim())); message.value = "Saved"; done()
     }
-    private suspend fun storeItem(item: CareItem) { requireEdit(item.personId); dao.saveItem(cloud?.saveEntry(item) ?: item) }
-    fun remove(item: CareItem) = action { requireEdit(item.personId); cloud?.removeEntry(item); dao.removeItem(item); message.value = "Removed" }
+    private suspend fun storeItem(item: CareItem) { requireEdit(item.personId); dao.saveItem(cloud?.saveEntry(item) ?: item); reconcileReminders() }
+    private suspend fun reconcileReminders() {
+        // Alerts are secondary to accepted care records. A platform alert failure
+        // must never announce that an already saved medicine/task failed to save.
+        runCatching { reminderScheduler.reconcile(dao.allItems()) }
+    }
+    fun remove(item: CareItem) = action { requireEdit(item.personId); cloud?.removeEntry(item); dao.removeItem(item); reconcileReminders(); message.value = "Removed" }
     fun importReport(uri: android.net.Uri, personId: String) = action(waitForRefresh = true) {
         require(people.value.any { it.id == personId }) { "Choose a person before adding a report." }
         requireEdit(personId)
@@ -236,6 +261,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewMod
             require(!file.exists() || file.delete()) { "Couldn't remove this report. Try again." }
         }
         dao.removeReport(report); message.value = "Report removed"; done()
+        CareDocumentReviewStore(getApplication(), account).remove(report)
     }
     fun removePerson(done: () -> Unit) {
         val id = selected.value
@@ -249,7 +275,9 @@ class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewMod
                 draftCache.remove(id)
                 db.withTransaction { dao.deleteAcknowledgements(id); dao.deleteVersions(id); dao.deleteItems(id); dao.deleteReports(id); dao.deleteRecordingConsents(id); dao.deleteDraft(id); dao.deletePersonRow(id) }
                 withContext(Dispatchers.IO) { File(audioRoot(), id).deleteRecursively(); reportFiles.removePerson(id) }
+                CareDocumentReviewStore(getApplication(), account).removePerson(id)
             }
+            reconcileReminders()
             select(""); message.value = "Records removed"; done()
         }
     }
@@ -363,6 +391,16 @@ class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewMod
                 transcribingPath.value = null
             }
         }
+    }
+    suspend fun rememberTranscriptionConsent(consent: RecordingConsent) {
+        val person = selected.value
+        requireEdit(person)
+        val saved = recordingConsents.value.firstOrNull { it.audioPath == consent.audioPath && it.personId == person }
+            ?: throw IllegalArgumentException("Open this person's consented recording again.")
+        require(consent.personId == person && consent.participants == saved.participants && consent.recordingConsentAt == saved.recordingConsentAt
+            && consent.transcriptionConsentAt > 0 && consent.noticeVersion >= 2) { "Review consent for this exact recording first." }
+        require(recordingFiles(person).any { it.absolutePath == consent.audioPath }) { "This recording is no longer available." }
+        dao.saveRecordingConsent(consent)
     }
     private fun action(waitForRefresh: Boolean = false, block: suspend () -> Unit) {
         if (busy.value || (refreshing.value && !waitForRefresh)) { message.value = "Please wait for your records to finish loading."; return }

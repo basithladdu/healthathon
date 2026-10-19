@@ -1,30 +1,15 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { IconFileText, IconSparkles, IconClock } from './icons';
+import { IconFileText, IconClock } from './icons';
 import { CARE_NOTE_LABELS, organiseConversation, type AssistedNote, type DoctorConversationEntry } from './doctor-conversation-state';
 import type { DraftFieldKey } from './summary-state';
 import { CarePdfReadError, extractCareDocumentPdf } from './care-document-extract';
 
-type RecognitionEvent = { resultIndex: number; results: ArrayLike<{ isFinal: boolean; 0: { transcript: string } }> };
-type Recognition = { continuous: boolean; interimResults: boolean; lang: string; start: () => void; stop: () => void; abort: () => void; onresult: ((event: RecognitionEvent) => void) | null; onerror: ((event: { error: string }) => void) | null; onend: (() => void) | null };
-type RecognitionWindow = Window & { SpeechRecognition?: new () => Recognition; webkitSpeechRecognition?: new () => Recognition };
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === 'object' && !Array.isArray(value);
-}
-
-function isAssistedNote(value: unknown, source: string): value is AssistedNote {
-  if (!isRecord(value) || !isRecord(value.fields) || !isRecord(value.excerpts)) return false;
-  const { fields, excerpts } = value;
-  return Object.keys(CARE_NOTE_LABELS).every((key) => typeof fields[key] === 'string' && typeof excerpts[key] === 'string'
-    && fields[key] === excerpts[key] && (!fields[key] || source.includes(fields[key] as string)));
-}
-
 export function ConversationAudio({ file }: { file: File }) {
-  const [url, setUrl] = useState('');
-  useEffect(() => { const next = URL.createObjectURL(file); setUrl(next); return () => URL.revokeObjectURL(next); }, [file]);
-  return <audio controls preload="metadata" src={url} aria-label="Conversation recording" />;
+  const audio = useRef<HTMLAudioElement | null>(null);
+  useEffect(() => { const next = URL.createObjectURL(file); if (audio.current) audio.current.src = next; return () => URL.revokeObjectURL(next); }, [file]);
+  return <audio ref={audio} controls preload="metadata" aria-label="Conversation recording" />;
 }
 
 export function DoctorConversation({ patientId, patientName, patients, physician, initialNote, referenceNote, previousContext, requestContext, hindi, onPatient, onSave, onHistory }: {
@@ -40,25 +25,19 @@ export function DoctorConversation({ patientId, patientName, patients, physician
   const [recording, setRecording] = useState(false);
   const [starting, setStarting] = useState(false);
   const [seconds, setSeconds] = useState(0);
-  const [interim, setInterim] = useState('');
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
   const [language, setLanguage] = useState(hindi ? 'hi-IN' : 'en-IN');
-  const [aiReady, setAiReady] = useState(false);
   const recorder = useRef<MediaRecorder | null>(null);
   const sourceFileInput = useRef<HTMLInputElement | null>(null);
-  const recognition = useRef<Recognition | null>(null);
   const stream = useRef<MediaStream | null>(null);
   const mounted = useRef(true);
-  const assistRequest = useRef<AbortController | null>(null);
   const preparing = useRef(false);
   const t = (en: string, hi: string) => hindi ? hi : en;
 
   useEffect(() => {
     mounted.current = true;
-    const controller = new AbortController();
-    fetch('/api/care-assist', { signal: controller.signal }).then((response) => response.json()).then((status) => setAiReady(isRecord(status) && status.ready === true)).catch(() => {});
-    return () => { mounted.current = false; controller.abort(); assistRequest.current?.abort(); recognition.current?.abort(); if (recorder.current?.state === 'recording') recorder.current.stop(); stream.current?.getTracks().forEach((track) => track.stop()); };
+    return () => { mounted.current = false; if (recorder.current?.state === 'recording') recorder.current.stop(); stream.current?.getTracks().forEach((track) => track.stop()); };
   }, []);
   useEffect(() => {
     if (!recording) return;
@@ -82,32 +61,18 @@ export function DoctorConversation({ patientId, patientName, patients, physician
         input.getTracks().forEach((track) => track.stop());
         if (!mounted.current) return;
         const type = capture.mimeType || 'audio/webm';
-        setAudio(new File(chunks, `conversation-${Date.now()}.${type.includes('mp4') ? 'm4a' : 'webm'}`, { type }));
-        setRecording(false); setInterim('');
+        setAudio(new File(chunks, `conversation-${language}-${Date.now()}.${type.includes('mp4') ? 'm4a' : 'webm'}`, { type }));
+        setRecording(false);
       };
       recorder.current = capture; capture.start(1000); setSeconds(0); setRecording(true);
-      const speechWindow = window as RecognitionWindow;
-      const Speech = speechWindow.SpeechRecognition ?? speechWindow.webkitSpeechRecognition;
-      if (Speech) {
-        const speech = new Speech(); recognition.current = speech; speech.lang = language; speech.continuous = true; speech.interimResults = true;
-        speech.onresult = (event) => {
-          let finalText = ''; let partial = '';
-          for (let index = event.resultIndex; index < event.results.length; index++) {
-            const text = event.results[index][0].transcript;
-            if (event.results[index].isFinal) finalText += `${text} `; else partial += text;
-          }
-          if (finalText.trim()) setNote((value) => `${value}${value ? '\n' : ''}${finalText.trim()}`);
-          setInterim(partial);
-        };
-        speech.onerror = () => { if (mounted.current) setMessage('Audio is recording. Live captions are unavailable; add or edit the note below.'); };
-        speech.onend = () => { if (mounted.current) { setInterim(''); if (recorder.current?.state === 'recording') setMessage('Live captions stopped. Audio is still recording; check the note below.'); } };
-        try { speech.start(); } catch { setMessage('Audio is recording. Add or edit the note below.'); }
-      } else setMessage('Audio is recording. Add or edit the note below.');
+      // Browser SpeechRecognition may silently use a remote recognizer. Online transcription
+      // belongs to the separately consented, authenticated provider flow in the shared workspace.
+      setMessage('Audio is recording. Add or edit a reviewed transcript below.');
     } catch (error) { stream.current?.getTracks().forEach((track) => track.stop()); setMessage(error instanceof Error && error.name !== 'NotAllowedError' ? error.message : 'Microphone access was not allowed. You can type or upload instead.'); }
     finally { setStarting(false); }
   }
 
-  function stopRecording() { recognition.current?.stop(); if (recorder.current?.state === 'recording') recorder.current.stop(); }
+  function stopRecording() { if (recorder.current?.state === 'recording') recorder.current.stop(); }
   async function importSourceFile(file: File) {
     setMessage(''); setBusy(true);
     try {
@@ -138,22 +103,11 @@ export function DoctorConversation({ patientId, patientName, patients, physician
     preparing.current = true;
     setBusy(true); setMessage('');
     try {
-      let draft = organiseConversation(source);
-      if (aiReady) {
-        const request = new AbortController(); assistRequest.current = request;
-        try {
-          const response = await fetch('/api/care-assist', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ source }), signal: request.signal });
-          const result: unknown = await response.json();
-          if (response.ok && isAssistedNote(result, source) && Object.values(result.fields).some((value) => value.trim())) draft = result;
-        } catch {
-          // The exact-text draft remains available if the optional service cannot respond.
-        }
-        if (request.signal.aborted) return;
-      }
+      // This local action organises original wording. It must never masquerade as a failed AI call.
+      const draft = organiseConversation(source);
       if (mounted.current) save(draft, source);
     } finally {
       preparing.current = false;
-      assistRequest.current = null;
       if (mounted.current) setBusy(false);
     }
   }
@@ -169,7 +123,7 @@ export function DoctorConversation({ patientId, patientName, patients, physician
       <section className={`doctor-record-card ${recording ? 'is-recording' : ''}`}>
         <div className="doctor-record-orb" aria-hidden="true"><svg viewBox="0 0 48 48"><rect x="17" y="6" width="14" height="25" rx="7"/><path d="M11 23v2a13 13 0 0 0 26 0v-2M24 38v6M17 44h14" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/></svg></div>
         <h2>{recording ? `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}` : t('Voice note', 'आवाज़ में नोट')}</h2>
-        <label className="doctor-record-consent"><input type="checkbox" checked={agreed} disabled={recording || starting} onChange={(event) => setAgreed(event.target.checked)} />{t('Everyone agreed to recording and live captions', 'सभी ने रिकॉर्डिंग और लाइव कैप्शन की अनुमति दी')}</label>
+        <label className="doctor-record-consent"><input type="checkbox" checked={agreed} disabled={recording || starting} onChange={(event) => setAgreed(event.target.checked)} />{t('Everyone agreed to recording', 'सभी ने रिकॉर्डिंग की अनुमति दी')}</label>
         <button type="button" className="primary-button doctor-record-button" disabled={!agreed || starting || busy || Boolean(audio)} onClick={recording ? stopRecording : startRecording}>{starting ? 'Opening microphone…' : recording ? t('Stop recording', 'रिकॉर्डिंग रोकें') : t('Start recording', 'रिकॉर्डिंग शुरू करें')}</button>
         <select aria-label="Recording language" value={language} disabled={recording || starting} onChange={(event) => setLanguage(event.target.value)}><option value="en-IN">English</option><option value="hi-IN">हिन्दी</option></select>
         <label className={`doctor-audio-upload ${!agreed || audio || busy ? 'is-disabled' : ''}`}>{t('Upload audio', 'ऑडियो जोड़ें')}<input type="file" accept="audio/*" disabled={!agreed || recording || starting || busy || Boolean(audio)} onChange={(event) => { const file = event.target.files?.[0]; if (!file || audio) return; if (file.size > 30 * 1024 * 1024) { setMessage('Choose an audio file under 30 MB.'); return; } setAudio(file); event.target.value = ''; }} /></label>
@@ -178,8 +132,8 @@ export function DoctorConversation({ patientId, patientName, patients, physician
       <section className="doctor-transcript-card"><div className="family-section-heading"><h2><IconFileText /> {t('Conversation note', 'बातचीत का नोट')}</h2><span>{patientName.split(' ')[0]}</span></div>
         {!previousContext && referenceNote?.trim() && !note.trim() && !audio && !recording && !starting && <button className="care-text-button" type="button" disabled={busy} onClick={() => { setNote(referenceNote); setMessage(''); }}>{t('Use latest conversation', 'पिछली बातचीत लें')}</button>}
         <textarea aria-label="Conversation note" value={note} disabled={busy} maxLength={12000} rows={12} onChange={(event) => setNote(event.target.value)} placeholder={t('Record, type, or paste the conversation here.', 'बातचीत रिकॉर्ड करें, लिखें या यहाँ पेस्ट करें।')} />
-        {interim && <p className="doctor-caption" aria-live="polite">{interim}</p>}
-        <div className="doctor-note-actions"><button className="primary-button" type="button" disabled={recording || starting || busy || (!note.trim() && !audio)} onClick={() => { if (note.trim()) void assist(); else save(); }}>{note.trim() && <IconSparkles />}{busy ? t('Preparing Care Note…', 'देखभाल नोट तैयार हो रहा है…') : !note.trim() && audio ? t('Save recording', 'रिकॉर्डिंग सेव करें') : t('Prepare Care Note', 'देखभाल नोट तैयार करें')} →</button></div>
+        <div className="doctor-note-actions"><button className="primary-button" type="button" disabled={recording || starting || busy || (!note.trim() && !audio)} onClick={() => { if (note.trim()) void assist(); else save(); }}>{busy ? t('Preparing Care Note…', 'देखभाल नोट तैयार हो रहा है…') : !note.trim() && audio ? t('Save recording', 'रिकॉर्डिंग सेव करें') : t('Prepare Care Note', 'देखभाल नोट तैयार करें')} →</button></div>
+        <p className="doctor-action-message">{t('This prepares a draft from your original wording for separate review.', 'आपके मूल शब्दों से मसौदा बनेगा; उसकी अलग से जाँच करें।')} <a href="/shared-care" target="_blank" rel="noopener noreferrer">{t('Online conversation assistance · sign in', 'ऑनलाइन बातचीत सहायता · साइन इन')}</a></p>
       </section>
     </div>
     {message && <p className="doctor-action-message" role="status">{message}</p>}

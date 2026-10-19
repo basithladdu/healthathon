@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
+import Link from 'next/link';
 import { CareDirectory } from './care-directory';
 import { CARE_CENTRES, DIRECTORY_CHECKED_ON, filterCareCentres, type CareCentre } from './care-directory-data';
 import { CareCentreReports, type PublicCentreReport } from './care-centre-reports';
@@ -411,6 +412,7 @@ export function CareNearMe({ homeAddress }: CareNearMeProps): React.JSX.Element 
       <div className="cnm-list" role="region" aria-label="Care centres" tabIndex={0}>
         <div className="cnm-list-heading"><span>{centres.length + visibleCommunityHospitals.length + filteredPlaces.length} centres</span>{(query || service || district || morphine || category !== 'all') && <button type="button" onClick={() => { clearDestination(); setQuery(''); setService(''); setDistrict(''); setMorphine(''); setCategory('all'); }}>Clear filters</button>}</div>
         <CareDirectory centres={centres} selectedId={selectedId} locatingId={locatingId} onSelect={selectCentre} pinNumbers={pinNumbers} distances={distances} />
+        <p className="cnm-message"><Link href="/reviewed-centres">Reviewed hospital updates across India ↗</Link></p>
         {visibleCommunityHospitals.length > 0 && <section className="cnm-community-hospitals" aria-labelledby="cnm-community-hospitals-title">
           <h3 id="cnm-community-hospitals-title">Community hospitals</h3>
           {visibleCommunityHospitals.map((group) => <article key={group.id} className={`cnm-community-hospital${selectedId === group.id ? ' is-selected' : ''}`}>

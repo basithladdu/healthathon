@@ -3,6 +3,7 @@ export type CarePdfText = {
   pagesRead: number;
   pageCount: number;
   pagesWithoutText: number[];
+  ocrPages?: number[];
 };
 export type CarePdfReadErrorCode = 'not-pdf' | 'password' | 'unreadable' | 'too-much-text';
 
@@ -41,6 +42,7 @@ export async function extractCareDocumentPdf(file: File, options: {
     const pagesRead = Math.min(12, pdf.numPages);
     const pages: string[] = [];
     const pagesWithoutText: number[] = [];
+    const ocrPages: number[] = [];
     let totalCharacters = 0;
     options.onProgress?.(0, pagesRead);
     for (let pageNumber = 1; pageNumber <= pagesRead; pageNumber += 1) {
@@ -66,7 +68,25 @@ export async function extractCareDocumentPdf(file: File, options: {
           if (item.hasEOL) flush();
         }
         flush();
-        const pageText = lines.join('\n');
+        let pageText = lines.join('\n');
+        if (!pageText.trim()) {
+          const viewport = page.getViewport({ scale: 1 });
+          const scale = Math.min(1600 / viewport.width, 2000 / viewport.height);
+          const rendered = page.getViewport({ scale });
+          const canvas = document.createElement('canvas'); canvas.width = Math.max(1, Math.round(rendered.width)); canvas.height = Math.max(1, Math.round(rendered.height));
+          const context = canvas.getContext('2d');
+          if (context) {
+            const render = page.render({ canvasContext: context, canvas, viewport: rendered });
+            const cancelRender = () => render.cancel(); options.signal?.addEventListener('abort', cancelRender, { once: true });
+            try {
+              await render.promise; cancelled();
+              const { readCareDocumentImage } = await import('./care-document-ocr');
+              pageText = await readCareDocumentImage(canvas, { signal: options.signal });
+              ocrPages.push(pageNumber);
+            } catch (error) { cancelled(); if (error instanceof DOMException && error.name === 'AbortError') throw error; /* Preserve original and continue with explicitly missing text. */ }
+            finally { options.signal?.removeEventListener('abort', cancelRender); canvas.width = 1; canvas.height = 1; }
+          }
+        }
         totalCharacters += pageText.length + 20;
         if (totalCharacters > 200000) throw new CarePdfReadError('too-much-text');
         if (!pageText.trim()) pagesWithoutText.push(pageNumber);
@@ -76,7 +96,7 @@ export async function extractCareDocumentPdf(file: File, options: {
         page.cleanup();
       }
     }
-    return { text: pagesWithoutText.length === pagesRead ? '' : pages.join('\n\n'), pagesRead, pageCount: pdf.numPages, pagesWithoutText };
+    return { text: pagesWithoutText.length === pagesRead ? '' : pages.join('\n\n'), pagesRead, pageCount: pdf.numPages, pagesWithoutText, ocrPages };
   } catch (error) {
     cancelled();
     if (error instanceof CarePdfReadError) throw error;

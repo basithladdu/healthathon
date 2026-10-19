@@ -13,6 +13,26 @@ data class CareSourceLine(val number: Int, val start: Int, val end: Int, val tex
 data class CareSourceReference(val line: CareSourceLine, val quote: String)
 
 object CareDraftAssist {
+    /** Apply only to the exact source the user reviewed; publishing remains a separate action. */
+    fun applyAssisted(draft: Conversation, selected: CareAssistedDraft): Conversation {
+        require(selected.sourceHash == careAssistSourceHash(draft.source)) { "The conversation changed. Prepare a fresh draft." }
+        require(selected.provider == "sarvam" && selected.model == "sarvam-105b")
+        return careAssistFieldKeys.foldIndexed(draft) { index, current, key ->
+            withSection(current, index, selected.fields.getValue(key))
+        }
+    }
+
+    fun appendReviewedTranscript(source: String, original: String, reviewed: String, speaker: String, language: String, confirmed: Boolean): String {
+        require(confirmed && original.isNotBlank() && reviewed.isNotBlank()) { "Check the words and speaker first." }
+        require(speaker in listOf("Patient", "Family / carer", "Doctor", "Unknown") && (language == "unknown" || language in careAssistLanguageCodes))
+        fun oneLine(words: String) = words.replace(Regex("[\\r\\n]+"), " ")
+        val retained = "[Unknown · $language · machine original] ${oneLine(original)}"
+        val checked = "[$speaker · $language · human-reviewed] ${oneLine(reviewed)}"
+        return listOf(source.trimEnd(), retained, checked).filter { it.isNotBlank() }.joinToString("\n").also {
+            require(it.length <= 12000) { "The conversation is full. Keep these words separately before starting another note." }
+        }
+    }
+
     fun lines(source: String): List<CareSourceLine> {
         var number = 0
         return Regex("[^\\r\\n]*(?:\\r?\\n|$)").findAll(source).mapNotNull { match ->

@@ -25,6 +25,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable fun CareDocuments(vm: CareModel, onRead: (CareVersion) -> Unit, onTalk: () -> Unit) {
     val savedReports by vm.reports.collectAsStateWithLifecycle()
@@ -34,12 +37,23 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
     val canEdit by vm.canEdit.collectAsStateWithLifecycle()
     val clinician by vm.clinician.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    val reports = savedReports.filter { it.personId == person }
+    val scope = rememberCoroutineScope()
+    var prescriptionOriginals by remember(person) { mutableStateOf(emptyList<CareReport>()) }
+    LaunchedEffect(person, busy) {
+        if (person.isNotBlank() && !busy) prescriptionOriginals = withContext(Dispatchers.IO) { runCatching { MedicineSourceStore(context.applicationContext, vm.accountNamespace).list(person) }.getOrDefault(emptyList()) }
+    }
+    val reports = (savedReports.filter { it.personId == person } + prescriptionOriginals).distinctBy { it.id }
     val notes = savedNotes.filter { it.personId == person }
     var search by rememberSaveable { mutableStateOf("") }
     var filter by rememberSaveable { mutableStateOf("All") }
     var importingFor by rememberSaveable { mutableStateOf("") }
     var remove by remember { mutableStateOf<CareReport?>(null) }
+    var review by remember { mutableStateOf<CareReport?>(null) }
+    var textMatches by remember(person) { mutableStateOf(emptyList<DocumentSearchExcerpt>()) }
+    var searchedText by remember(person) { mutableStateOf("") }
+    var searching by remember(person) { mutableStateOf(false) }
+    var textError by remember(person) { mutableStateOf("") }
+    review?.let { report -> CareDocumentReview(vm, report) { review = null }; return }
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null && importingFor.isNotEmpty()) vm.importReport(uri, importingFor)
         importingFor = ""
@@ -69,6 +83,34 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
         item { Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf("All", "Care notes", "Reports").forEach { label -> FilterChip(selected = filter == label, onClick = { filter = label }, label = { Text(label) }) }
         } }
+        item { TextButton(onClick = {
+            val query = search.trim(); val capturedPerson = person
+            searching = true; textError = ""
+            scope.launch {
+                try {
+                    val found = withContext(Dispatchers.IO) {
+                        val store = CareDocumentReviewStore(context.applicationContext, vm.accountNamespace)
+                        val saved = reports.mapNotNull { report -> store.loadVerified(report, vm.reportFiles.file(report)) }
+                        DocumentEvidenceRules.find(query, saved)
+                    }
+                    if (vm.selected.value == capturedPerson) { textMatches = found; searchedText = query }
+                } catch (_: Exception) { textError = "Couldn't search saved report text. The originals are unchanged. Try again." }
+                finally { searching = false }
+            }
+        }, enabled = search.isNotBlank() && !searching, modifier = Modifier.fillMaxWidth()) { Text(if (searching) "Finding source passages…" else "Find in reviewed report text") } }
+        if (textError.isNotBlank()) item { Text(textError, color = MaterialTheme.colorScheme.error) }
+        if (searchedText.isNotBlank()) {
+            item { SectionTitle("From your reports") }
+            if (textMatches.isEmpty()) item { SurfaceCard { Text("No supported passage found", fontWeight = FontWeight.SemiBold); Text("No answer was generated. Try fewer words, or open a report and review its text first.", style = MaterialTheme.typography.bodySmall) } }
+            items(textMatches, key = { "${it.reportId}:${it.page}:${it.line}" }) { match ->
+                reports.firstOrNull { it.id == match.reportId }?.let { report -> SurfaceCard(Sage) {
+                    Text(report.name, fontWeight = FontWeight.SemiBold)
+                    Text("Page ${match.page} · line ${match.line}", style = MaterialTheme.typography.labelMedium)
+                    Text(match.quote)
+                    TextButton(onClick = { review = report }) { Text("Read source and copy fact") }
+                } }
+            }
+        }
         if (visibleNotes.isEmpty() && visibleReports.isEmpty()) item { SurfaceCard {
             Icon(Icons.Default.FolderOpen, null, Modifier.size(36.dp), tint = Rust)
             Spacer(Modifier.height(12.dp)); Text(if (search.isNotBlank()) "No documents found" else when (filter) { "Reports" -> "No reports yet"; "Care notes" -> "No care notes yet"; else -> "Keep your care together" }, fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
@@ -108,8 +150,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
                         IconButton(onClick = { menu = true }, modifier = Modifier.padding(end = 4.dp)) { Icon(Icons.Default.MoreHoriz, "Options for ${report.name}") }
                         DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
                             DropdownMenuItem(text = { Text("Open") }, leadingIcon = { Icon(Icons.AutoMirrored.Filled.OpenInNew, null) }, onClick = { menu = false; openReport(report, false) })
+                            DropdownMenuItem(text = { Text("Read and copy facts") }, leadingIcon = { Icon(Icons.Default.DocumentScanner, null) }, onClick = { menu = false; review = report })
                             DropdownMenuItem(text = { Text("Share") }, leadingIcon = { Icon(Icons.Default.Share, null) }, onClick = { menu = false; openReport(report, true) })
-                            if (canEdit) DropdownMenuItem(text = { Text("Remove") }, leadingIcon = { Icon(Icons.Default.DeleteOutline, null) }, enabled = !busy, onClick = { menu = false; remove = report })
+                            if (canEdit && prescriptionOriginals.none { it.id == report.id }) DropdownMenuItem(text = { Text("Remove") }, leadingIcon = { Icon(Icons.Default.DeleteOutline, null) }, enabled = !busy, onClick = { menu = false; remove = report })
                         }
                     }
                 }

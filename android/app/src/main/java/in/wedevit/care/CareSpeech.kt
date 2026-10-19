@@ -254,11 +254,11 @@ private class CareReadAloud(context: Context, val changed: () -> Unit) {
     fun close() { closed = true; engine?.stop(); engine?.shutdown(); engine = null }
 }
 
-@Composable fun CareReadAloudControl(text: String, identity: String) {
+@Composable fun CareReadAloudControl(text: String, identity: String, initialLanguage: String = "en-IN") {
     val context = LocalContext.current
     val owner = LocalLifecycleOwner.current
     var revision by remember { mutableIntStateOf(0) }
-    var language by rememberSaveable(identity) { mutableStateOf("en-IN") }
+    var language by rememberSaveable(identity) { mutableStateOf(initialLanguage) }
     val reader = remember(identity) { CareReadAloud(context) { revision++ } }
     DisposableEffect(reader, owner) {
         val observer = LifecycleEventObserver { _, event -> if (event == Lifecycle.Event.ON_STOP) reader.stop() }

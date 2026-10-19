@@ -1,0 +1,14 @@
+{
+  "checkedAtUtc": "2026-10-19T15:33:34.425Z",
+  "kind": "actual local Tesseract7 recognition with Node message adapter and identical browser WASM/language assets",
+  "syntheticOnly": true,
+  "networkBlockedInMainAndWorker": true,
+  "browserUiTested": false,
+  "nativeMlKitTested": false,
+  "fixtureSha256": "ac4bccd68be476fd54516be933426ad0bcf5d73fdd7759ab46e8b2a629dbcb4e",
+  "engineSha256": "c58b46a4c796c0b8afccf77591d5b875b6896b45d402bbce8caa6f5362447b38",
+  "languageSha256": "45b4cb346724ac1774f1c36f42f182b887bcdb28ebe63e6fff90ac41f3fcff91",
+  "confidence": 95,
+  "actualText": "SYNTHETIC TEST ONLY\nTab EXAMPLE 500 mg\nDose: 1 tablet\n\nTime: 08:00\n\nSource page 1\n",
+  "assertionsPassed": 5
+}

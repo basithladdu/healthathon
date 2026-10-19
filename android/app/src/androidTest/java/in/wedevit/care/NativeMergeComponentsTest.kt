@@ -22,11 +22,18 @@ class NativeMergeComponentsTest {
 
     @Test fun newPatientShortcutsRetainTheirIndependentCallbacks() {
         val calls = mutableListOf<String>()
-        ui.setContent { CareTheme { DailyCareShortcuts(onCalendar = { calls += "calendar" }, onWorkflow = { calls += "care-team" }, onLabs = { calls += "labs" }) } }
+        ui.setContent { CareTheme { Column {
+            DailyCareShortcuts(onCalendar = { calls += "calendar" }, onWorkflow = { calls += "care-team" }, onLabs = { calls += "labs" })
+            CareDoctorEntries(onWorkspace = { calls += "account-workspace" }, onWalkthrough = { calls += "fictional-walkthrough" })
+        } } }
         ui.onNodeWithTag("shortcut-calendar").performClick()
         ui.onNodeWithTag("shortcut-workflows").performClick()
         ui.onNodeWithTag("shortcut-labs").performClick()
         ui.runOnIdle { assertEquals(listOf("calendar", "care-team", "labs"), calls) }
+        ui.onNodeWithTag("doctor-workspace-entry").performClick()
+        ui.runOnIdle { assertEquals(listOf("calendar", "care-team", "labs", "account-workspace"), calls) }
+        ui.onNodeWithText("Explore doctor walkthrough").performClick()
+        ui.runOnIdle { assertEquals(listOf("calendar", "care-team", "labs", "account-workspace", "fictional-walkthrough"), calls) }
     }
 
     @Test fun sourcePickerAndReaderKeepOriginalWordsAndPatientIdentity() {

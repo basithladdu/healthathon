@@ -10,7 +10,7 @@ import {
   saveStandaloneMedicineImage,
   standaloneMedicineImageImportId,
 } from './care-medicine-image-store';
-import { MedicinePhoto, StoredMedicinePhoto } from './care-medicine-photo';
+import { MedicinePhoto, StoredMedicinePhoto, StoredPrescriptionPages } from './care-medicine-photo';
 import { medicineMealTimingLabel, type MedicineMealTiming } from './care-medicine-import-state';
 import {
   loadMedicineRegimens,
@@ -326,6 +326,7 @@ function MedicinesForPatient({ patientId, author, today, hindi, events, checks, 
       {item.instructions && <p className="medicine-directions">{item.instructions}</p>}
       <div className="medicine-regimen-meta"><span className="medicine-meal-chip">{regimenMealLabel(item.mealTiming, hindi)}</span>{item.prescriptionItemNumber !== null && <span>{t(`Prescription item ${item.prescriptionItemNumber}`, `पर्चे की दवा ${item.prescriptionItemNumber}`)}</span>}{item.durationDays !== null && <span>{t(`${item.durationDays}-day course`, `${item.durationDays} दिन का कोर्स`)}</span>}<span>{item.endDate ? `${dateLabel(item.startDate)} – ${dateLabel(item.endDate)}` : t(`Ongoing from ${dateLabel(item.startDate)}`, `${dateLabel(item.startDate)} से जारी`)}</span>{item.prescriptionPageIndexes.length > 0 && <span>{t(`${item.prescriptionPageIndexes.length} prescription page${item.prescriptionPageIndexes.length === 1 ? '' : 's'} linked`, `${item.prescriptionPageIndexes.length} पर्चे के पेज जुड़े हैं`)}</span>}</div>
       <div className="medicine-regimen-times">{item.times.length ? item.times.map((time) => <time key={time}>{time}</time>) : <span>{t('No reminder scheduled', 'कोई रिमाइंडर तय नहीं')}</span>}</div>
+      <StoredPrescriptionPages importId={item.sourceImportId} pages={item.prescriptionPageIndexes} hindi={hindi} />
       {item.uncertainties.length > 0 && <details className="medicine-saved-source"><summary>{t('Review notes', 'जाँच की टिप्पणियाँ')}</summary><ul>{item.uncertainties.map((uncertainty) => <li key={uncertainty}>{uncertainty}</li>)}</ul></details>}
       <div className="medicine-card-actions">{confirmRemove === item.id ? <div className="medicine-remove-confirm"><span>{t('Remove this medicine and all reminders?', 'यह दवा और सभी रिमाइंडर हटाएँ?')}</span><button type="button" onClick={() => removeRegimen(item)}>{t('Remove', 'हटाएँ')}</button><button type="button" onClick={() => setConfirmRemove(null)}>{t('Keep', 'रहने दें')}</button></div> : <button type="button" className="medicine-text-button" onClick={() => setConfirmRemove(item.id)}>{t('Remove medicine', 'दवा हटाएँ')}</button>}</div>
     </article>)}</div>}

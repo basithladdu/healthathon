@@ -4,6 +4,7 @@ import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import type { CareReport } from './care-calendar-state';
 import { CarePdfReadError, extractCareDocumentPdf, type CarePdfText } from './care-document-extract';
+import { readCareDocumentImage } from './care-document-ocr';
 import { careDocumentFileError, careReportCategory, findCareDocumentText, removeCareDocument, restoreCareDocument, type RemovedCareDocument, type CareDocumentCategory, type CareDocumentText, type CareDocumentMatch } from './care-document-state';
 import { CareDocumentTreatmentReview } from './care-document-treatment';
 import type { ConfirmedDocumentTreatment } from './care-document-treatment-state';
@@ -91,6 +92,7 @@ function DocumentSearchForPatient({ patientId, author, hindi, reports, documents
   const [upload, setUpload] = useState<CareReport | null>(null);
   const [queue, setQueue] = useState<CareReport[]>([]);
   const [text, setText] = useState('');
+  const [originalText, setOriginalText] = useState('');
   const [textChecked, setTextChecked] = useState(false);
   const [category, setCategory] = useState<CareDocumentCategory>('other');
   const [reportDate, setReportDate] = useState('');
@@ -109,7 +111,6 @@ function DocumentSearchForPatient({ patientId, author, hindi, reports, documents
   const reviewHeading = useRef<HTMLHeadingElement>(null);
   const editing = upload ?? available.find((report) => report.id === editorId);
   const activeReportId = editing?.id;
-  const isPdf = editing && (editing.file.type === 'application/pdf' || /\.pdf$/i.test(editing.file.name));
   const filtered = folder === 'all' ? available : available.filter((report) => careReportCategory(report, documents) === folder);
   const matches = findCareDocumentText(submitted, patientId, filtered, documents);
   const folders: Array<{ key: CareDocumentCategory | 'all'; name: string }> = [
@@ -141,8 +142,8 @@ function DocumentSearchForPatient({ patientId, author, hindi, reports, documents
   function resetEditor(report: CareReport) {
     const document = documents.find((item) => item.patientId === patientId && item.reportId === report.id);
     cancelRead(); setReadMessage(''); setError(''); setMessage('');
-    setPdfText(document?.pageCount !== undefined ? { pagesRead: document.pagesRead ?? 0, pageCount: document.pageCount, pagesWithoutText: document.pagesWithoutText ?? [] } : null);
-    setText(document?.text ?? ''); setCategory(careReportCategory(report, documents)); setReportDate(report.date);
+    setPdfText(document?.pageCount !== undefined ? { pagesRead: document.pagesRead ?? 0, pageCount: document.pageCount, pagesWithoutText: document.pagesWithoutText ?? [], ocrPages: document.ocrPages ?? [] } : null);
+    setText(document?.text ?? ''); setOriginalText(document?.originalText ?? document?.text ?? ''); setCategory(careReportCategory(report, documents)); setReportDate(report.date);
     setTextSource(document?.textSource ?? 'copied'); setTextChecked(false);
   }
   function openText(report: CareReport) {
@@ -157,7 +158,6 @@ function DocumentSearchForPatient({ patientId, author, hindi, reports, documents
     const controller = new AbortController(); reader.current = controller;
     const pdf = report.file.type === 'application/pdf' || /\.pdf$/i.test(report.file.name);
     const plain = report.file.type === 'text/plain' || /\.txt$/i.test(report.file.name);
-    if (!pdf && !plain) { reader.current = null; setReadMessage(t('Add any text you want to find later.', 'जो टेक्स्ट बाद में खोजना हो, उसे जोड़ें।')); return; }
     setReading(true); setProgress({ page: 0, total: 0 }); setError(''); setReadMessage('');
     try {
       if (plain) {
@@ -165,12 +165,20 @@ function DocumentSearchForPatient({ patientId, author, hindi, reports, documents
         if (controller.signal.aborted) return;
         if (content.length > 200000) throw new CarePdfReadError('too-much-text');
         setText(content); setPdfText(null); setTextSource('text-file');
-      } else {
+        setOriginalText(content);
+      } else if (pdf) {
         const result = await extractCareDocumentPdf(report.file, { signal: controller.signal, onProgress: (page, total) => { if (!controller.signal.aborted) setProgress({ page, total }); } });
         if (controller.signal.aborted) return;
-        setPdfText({ pagesRead: result.pagesRead, pageCount: result.pageCount, pagesWithoutText: result.pagesWithoutText });
+        setPdfText({ pagesRead: result.pagesRead, pageCount: result.pageCount, pagesWithoutText: result.pagesWithoutText, ocrPages: result.ocrPages });
         if (!result.text.trim()) { setReadMessage(t('This file has no readable text. You can add text from the original.', 'इस फ़ाइल में पढ़ने लायक टेक्स्ट नहीं मिला। मूल फ़ाइल से टेक्स्ट जोड़ सकते हैं।')); return; }
-        setText(result.text); setTextSource('pdf-text');
+        setText(result.text); setOriginalText(result.text); setTextSource('pdf-text');
+      } else {
+        setProgress({ page: 0, total: 1 });
+        const read = await readCareDocumentImage(report.file, { signal: controller.signal });
+        if (controller.signal.aborted) return;
+        const content = read.trim() ? `[Page 1]\n${read}` : '';
+        setText(content); setOriginalText(content); setTextSource('image-ocr'); setPdfText({ pagesRead: 1, pageCount: 1, pagesWithoutText: content ? [] : [1], ocrPages: [1] });
+        if (!content) setReadMessage(t('No readable printed text found. Copy the words you can read from the original.', 'पढ़ने योग्य छपा टेक्स्ट नहीं मिला। मूल से पढ़े जा सकने वाले शब्द लिखें।'));
       }
     } catch (caught) {
       if (controller.signal.aborted) return;
@@ -195,7 +203,7 @@ function DocumentSearchForPatient({ patientId, author, hindi, reports, documents
     if (!/^\d{4}-\d{2}-\d{2}$/.test(reportDate) || Number.isNaN(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== reportDate || reportDate > localDate()) { setError(t('Choose the date printed on the document, up to today.', 'दस्तावेज़ पर लिखी तारीख चुनें, आज तक की।')); return; }
     if (text.length > 200000) { setError(t('Keep the text under 200,000 characters.', 'टेक्स्ट 2,00,000 अक्षरों तक रखें।')); return; }
     if (text.trim() && !textChecked) { setError(t('Check the text against the original, then tick the box.', 'टेक्स्ट को मूल दस्तावेज़ से मिलाएँ, फिर बॉक्स चुनें।')); return; }
-    const next: CareDocumentText = { reportId: editing.id, patientId, category, text: text.trim(), recordedBy: author.trim(), textSource, ...(text.trim() && textChecked ? { reviewedAt: new Date().toISOString() } : {}), ...(pdfText ?? {}) };
+    const next: CareDocumentText = { reportId: editing.id, patientId, category, text: text.trim(), originalText, recordedBy: author.trim(), textSource, ...(text.trim() && textChecked ? { reviewedAt: new Date().toISOString() } : {}), ...(pdfText ?? {}) };
     const report = { ...editing, date: reportDate };
     onReportsChange?.(upload ? [...reports, report] : reports.map((item) => item.patientId === patientId && item.id === report.id ? report : item));
     onChange([...documents.filter((document) => document.patientId !== patientId || document.reportId !== editing.id), next]);
@@ -245,7 +253,8 @@ function DocumentSearchForPatient({ patientId, author, hindi, reports, documents
       <div className="care-document-review-fields"><div className="care-document-fields-row"><label>{t('Keep under', 'कहाँ रखें')}<select value={category} onChange={(event) => setCategory(event.target.value as CareDocumentCategory)}><option value="cancer">{t('Cancer care', 'कैंसर की देखभाल')}</option><option value="monitoring">{t('Blood & lab tests', 'खून और लैब जाँच')}</option><option value="other">{t('Other', 'अन्य')}</option></select></label><label>{t('Document date', 'दस्तावेज़ की तारीख')}<input type="date" required max={localDate()} value={reportDate} disabled={!onReportsChange} onChange={(event) => setReportDate(event.target.value)} /></label></div>
         {reading && <div className="care-document-reading" role="status"><progress max={progress.total || 12} value={progress.page} /><span>{progress.total ? t(`Reading ${progress.page} of ${progress.total} pages`, `${progress.total} में से ${progress.page} पृष्ठ पढ़े`) : t('Opening your document…', 'दस्तावेज़ खोल रहे हैं…')}</span><button type="button" onClick={cancelRead}>{t('Stop', 'रोकें')}</button></div>}
         {readMessage && <p className="care-document-read-message" role="status">{readMessage}</p>}
-        <details className="care-document-text-details" open><summary>{t('Text for search · optional', 'खोज के लिए टेक्स्ट · वैकल्पिक')}</summary><div className="care-document-text-field"><div><label htmlFor={`${id}-text`}>{t('Check the text', 'टेक्स्ट जाँचें')}</label>{isPdf && !reading && <button type="button" onClick={() => readReport(editing)}>{t('Read again', 'दोबारा पढ़ें')}</button>}</div><textarea id={`${id}-text`} value={text} disabled={reading} onChange={(event) => { setText(event.target.value); setTextChecked(false); setTextSource('copied'); }} maxLength={200000} rows={5} placeholder={t('Copy the words you want to find later.', 'जो शब्द बाद में खोजने हों, उन्हें यहाँ लिखें।')} /></div></details>
+        <details className="care-document-text-details" open><summary>{t('Text for search · optional', 'खोज के लिए टेक्स्ट · वैकल्पिक')}</summary><div className="care-document-text-field"><div><label htmlFor={`${id}-text`}>{t('Check the text', 'टेक्स्ट जाँचें')}</label>{!reading && <button type="button" onClick={() => readReport(editing)}>{t('Read again', 'दोबारा पढ़ें')}</button>}</div><textarea id={`${id}-text`} value={text} disabled={reading} onChange={(event) => { setText(event.target.value); setTextChecked(false); }} maxLength={200000} rows={5} placeholder={t('Copy the words you want to find later.', 'जो शब्द बाद में खोजने हों, उन्हें यहाँ लिखें।')} /></div></details>
+        {originalText && originalText !== text && <details><summary>{t('Original reading', 'पहले पढ़ा गया टेक्स्ट')}</summary><pre style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>{originalText}</pre></details>}
         {Boolean(text.trim()) && <label className="care-document-confirm"><input type="checkbox" required checked={textChecked} disabled={reading} onChange={(event) => setTextChecked(event.target.checked)} /><span>{t('I checked this text against the original document.', 'मैंने इस टेक्स्ट को मूल दस्तावेज़ से मिलाकर जाँचा है।')}</span></label>}
         {pdfText && (pdfText.pageCount > pdfText.pagesRead || pdfText.pagesWithoutText.length > 0) && <p className="care-document-read-scope">{pdfText.pageCount > pdfText.pagesRead ? t(`Read the first ${pdfText.pagesRead} of ${pdfText.pageCount} pages. `, `${pdfText.pageCount} में से पहले ${pdfText.pagesRead} पृष्ठ पढ़े। `) : ''}{pdfText.pagesWithoutText.length > 0 ? t(`No text on pages ${pdfText.pagesWithoutText.join(', ')}. Add their text here to include them in search.`, `पृष्ठ ${pdfText.pagesWithoutText.join(', ')} का टेक्स्ट नहीं मिला। खोज में शामिल करने के लिए यहाँ जोड़ें।`) : ''}</p>}
         {error && <p className="care-document-error" role="alert">{error}</p>}
