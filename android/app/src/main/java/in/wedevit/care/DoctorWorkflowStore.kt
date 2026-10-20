@@ -53,6 +53,12 @@ class DoctorWorkflowStore(context: Context, private val now: () -> Long = { Syst
         if (text.isBlank() || text.length > 60000 || provider != "google-gemini" || model.isBlank() || clipId.isBlank() || consentAt <= 0) return "The transcript response was incomplete."
         return saveDraft(current.copy(sourceText = text, sourceIds = emptyList(), mockGenerated = false, transcriptProvider = provider, transcriptModel = model, transcribedAt = now(), audioClipId = clipId))
     }
+    @Synchronized fun importOfflineTranscript(patientId: String, clipId: String, review: OfflineTranscriptReview): String? {
+        val current = draft(patientId)
+        if (current.sourceText.isNotBlank()) return "The conversation changed. Your text was not replaced."
+        if (review.provider != OfflineSpeechModel.provider || review.model != OfflineSpeechModel.id || review.reviewedAt < review.createdAt || review.reviewedAt <= 0 || review.text.isBlank() || review.text.length > NoteRules.MAX_SOURCE_CHARS || clipId.isBlank()) return "Review the transcript against its recording first."
+        return saveDraft(current.copy(sourceText = review.text, sourceIds = emptyList(), mockGenerated = false, transcriptProvider = review.provider, transcriptModel = review.model, transcribedAt = review.createdAt, audioClipId = clipId))
+    }
     @Synchronized fun applyAiDraft(patientId: String, result: DoctorAiDraft, expectedSourceText: String): String? {
         val current = draft(patientId)
         if (current.sourceText != expectedSourceText || current.sourceText.isBlank()) return "The transcript changed. AI text was not inserted."

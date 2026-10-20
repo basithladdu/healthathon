@@ -45,13 +45,12 @@ class CareFlowTest {
         file.outputStream().use { screen.compress(Bitmap.CompressFormat.PNG, 100, it) }
         screen.recycle()
     }
-    @Test fun roleMenuKeepsDraftAndPatientChoiceAfterRecreation() {
+    @Test fun visibleRoleChoicesKeepDraftAndPatientChoiceAfterRecreation() {
         val words = "Please keep my questions while I change views."
         ui.runOnIdle { vm.edit(vm.draft.value.copy(source = words)) }
-        ui.onNodeWithTag("choose-role").performClick()
         ui.onNodeWithTag("role-Patient").assertIsDisplayed()
         ui.onNodeWithTag("role-Family").assertIsDisplayed()
-        screenshot("role-menu")
+        screenshot("role-choices")
         ui.onNodeWithTag("role-Patient").performClick()
         ui.onNodeWithTag("nav-Docs").assertIsDisplayed().performClick()
         ui.onNodeWithTag("documents-list").assertIsDisplayed()
@@ -60,7 +59,6 @@ class CareFlowTest {
         ui.waitUntil(15000) { vm.draft.value.personId == personId }
         assertEquals("Patient", vm.viewRole.value)
         assertEquals(words, vm.draft.value.source)
-        ui.onNodeWithTag("choose-role").performClick()
         ui.onNodeWithTag("role-Doctor").performClick()
         ui.onNodeWithTag("nav-Talk").performClick()
         ui.onNodeWithTag("conversation-list").performScrollToNode(hasSetTextAction() and hasText("Conversation transcript"))
@@ -106,9 +104,8 @@ class CareFlowTest {
         assertEquals(0, share.flags and android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
         val sharedBytes = ui.activity.contentResolver.openInputStream(share.clipData!!.getItemAt(0).uri)!!.use { it.readBytes() }
         assertArrayEquals(original.readBytes(), sharedBytes)
-        ui.onNodeWithContentDescription("Options for Clinic report.pdf").performClick()
-        ui.onNodeWithText("Share").assertIsDisplayed()
-        ui.onNodeWithText("Remove", useUnmergedTree = true).performClick()
+        ui.onNodeWithTag("report-share-${report.id}").performScrollTo().assertIsDisplayed()
+        ui.onNodeWithTag("report-remove-${report.id}").performScrollTo().performClick()
         ui.onNodeWithText("Remove report", useUnmergedTree = true).performClick()
         ui.waitUntil(15000) { vm.reports.value.isEmpty() && !vm.busy.value }
         assertFalse(vm.reportFiles.file(report).exists())
@@ -202,7 +199,10 @@ class CareFlowTest {
     }
     @Test fun directoryFiltersRecoverFromNoResults() {
         ui.onNodeWithText("Nearby", useUnmergedTree = true).performClick()
-        ui.onNodeWithText("Karnataka · 33 centres").assertIsDisplayed()
+        ui.onNodeWithText("All India · ${vm.centres.size} centres").assertIsDisplayed()
+        ui.onNodeWithText("Karnataka", useUnmergedTree = true).performScrollTo().performClick()
+        ui.onNodeWithText("Karnataka · ${vm.centres.count { it.state == "Karnataka" }} centres").assertIsDisplayed()
+        ui.onNodeWithText("All India", useUnmergedTree = true).performScrollTo().performClick()
         screenshot("nearby")
         ui.onNode(hasSetTextAction()).performTextInput("No such hospital xyz")
         ui.onNodeWithText("No centres match that search.").assertIsDisplayed()
@@ -210,7 +210,7 @@ class CareFlowTest {
         ui.onNodeWithTag("nav-Nearby").performClick()
         ui.onNode(hasSetTextAction()).assertTextContains("No such hospital xyz")
         ui.onNodeWithText("Clear filters").performClick()
-        ui.onNodeWithText("Karnataka · 33 centres").assertIsDisplayed()
+        ui.onNodeWithText("All India · ${vm.centres.size} centres").assertIsDisplayed()
         ui.onNode(hasSetTextAction()).performTextInput("Aster")
         ui.onNodeWithTag("nearby-list").performScrollToNode(hasTestTag("centre-map"))
         ui.waitUntil(30000) { ui.onAllNodes(SemanticsMatcher.expectValue(androidx.compose.ui.semantics.SemanticsProperties.StateDescription, "Map ready")).fetchSemanticsNodes().isNotEmpty() }
@@ -227,16 +227,17 @@ class CareFlowTest {
         ui.waitUntil(15000) { vm.items.value.any { it.title == "Bring questions" } }
         ui.onNodeWithTag("today-list").performScrollToNode(hasText("Bring questions"))
         ui.onNodeWithText("Bring questions").assertIsDisplayed()
-        ui.onNodeWithContentDescription("Options for Bring questions").performClick()
-        ui.onNodeWithText("Edit", useUnmergedTree = true).performClick()
+        val entryId = vm.items.value.single { it.title == "Bring questions" }.id
+        ui.onNodeWithTag("today-list").performScrollToNode(hasTestTag("care-edit-$entryId"))
+        ui.onNodeWithTag("care-edit-$entryId").performClick()
         ui.onNode(hasSetTextAction() and hasText("What needs doing?")).performTextReplacement("Bring the prescription")
         ui.onNodeWithText("Save", useUnmergedTree = true).performScrollTo().performClick()
         ui.waitUntil(15000) { vm.items.value.any { it.title == "Bring the prescription" } }
         ui.onNodeWithTag("nav-Care").performClick()
         ui.onNodeWithText("Bring the prescription").assertIsDisplayed()
         screenshot("care")
-        ui.onNodeWithContentDescription("Options for Bring the prescription").performClick()
-        ui.onNodeWithText("Remove", useUnmergedTree = true).performClick()
+        ui.onNodeWithTag("care-list").performScrollToNode(hasTestTag("care-remove-$entryId"))
+        ui.onNodeWithTag("care-remove-$entryId").performClick()
         ui.onNodeWithText("Remove", useUnmergedTree = true).performClick()
         ui.waitUntil(15000) { vm.items.value.none { it.title == "Bring the prescription" } }
         ui.onNodeWithText("Nothing added yet").assertIsDisplayed()
@@ -276,9 +277,8 @@ class CareFlowTest {
         ui.onNodeWithText("How are you?").performClick()
         ui.onNodeWithText("An okay day").performClick()
         screenshot("checkin")
-        ui.onNodeWithText("Add a note").performClick()
-        ui.onNode(hasSetTextAction() and hasText("Anything to add?")).performTextInput("Spent time with family")
-        ui.onNodeWithText("Hide note").performScrollTo().performClick()
+        ui.onNode(hasSetTextAction() and hasText("Anything to add? (optional)")).performScrollTo().performTextInput("Spent time with family")
+        androidx.test.espresso.Espresso.closeSoftKeyboard()
         ui.onNodeWithText("Save", useUnmergedTree = true).performScrollTo().performClick()
         ui.waitUntil(15000) { vm.items.value.any { it.kind == "checkin" } }
         assertEquals("Spent time with family", vm.items.value.single { it.kind == "checkin" }.detail)
@@ -291,15 +291,12 @@ class CareFlowTest {
             ui.onAllNodesWithText("Saved", useUnmergedTree = true).fetchSemanticsNodes().isEmpty()
         }
         ui.onNodeWithTag("nav-More").performClick()
-        val privacyHeader = ui.onNode(hasText("Privacy") and hasClickAction())
+        val privacyHeader = ui.onNode(hasText("Privacy"))
         privacyHeader.performScrollTo().assertIsDisplayed()
         ui.onRoot(useUnmergedTree = true).printToLog("SaharaPrivacyBefore")
         screenshot("more-privacy-before")
-        privacyHeader.performClick()
-        ui.waitForIdle()
         ui.onRoot(useUnmergedTree = true).printToLog("SaharaPrivacy")
-        screenshot("more-privacy-expanded")
-        ui.onNodeWithContentDescription("Hide Privacy").assertExists()
+        screenshot("more-privacy-visible")
         ui.onNode(hasScrollToIndexAction()).performScrollToNode(hasText("You choose which notes to share and with whom.", substring = true))
         ui.onNodeWithText("You choose which notes to share and with whom.", substring = true).assertIsDisplayed()
         screenshot("more")
@@ -330,8 +327,7 @@ class CareFlowTest {
             ui.onNode(hasText("Sign in") and hasClickAction()).performClick()
             ui.waitUntil(20000) { ui.activity.careModel.cloud != null && ui.activity.careModel.people.value.any { it.id == shared.id } }
             if (ui.activity.careModel.selected.value != shared.id) {
-                ui.onNodeWithContentDescription("Choose person").performClick()
-                ui.onNodeWithText("Shared Test Person").performClick()
+                ui.onNodeWithTag("person-${shared.id}").performScrollTo().performClick()
             }
             ui.waitUntil(20000) { ui.activity.careModel.cloud != null && ui.activity.careModel.items.value.any { it.title == "Bring the care note" } }
             ui.onNodeWithTag("today-list").performScrollToNode(hasText("Bring the care note"))

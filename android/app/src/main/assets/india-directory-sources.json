@@ -1,0 +1,1742 @@
+{
+  "retrievedOn": "2026-10-20",
+  "totalCentres": 1631,
+  "stateAndUtCoverage": 36,
+  "stateCounts": {
+    "Andaman and Nicobar Islands": 1,
+    "Andhra Pradesh": 41,
+    "Arunachal Pradesh": 2,
+    "Assam": 47,
+    "Bihar": 13,
+    "Chandigarh": 9,
+    "Chhattisgarh": 22,
+    "Dadra and Nagar Haveli and Daman and Diu": 1,
+    "Delhi": 40,
+    "Goa": 16,
+    "Gujarat": 33,
+    "Haryana": 30,
+    "Himachal Pradesh": 13,
+    "Jammu and Kashmir": 18,
+    "Jharkhand": 18,
+    "Karnataka": 53,
+    "Kerala": 684,
+    "Ladakh": 3,
+    "Lakshadweep": 2,
+    "Madhya Pradesh": 29,
+    "Maharashtra": 117,
+    "Manipur": 14,
+    "Meghalaya": 7,
+    "Mizoram": 15,
+    "Nagaland": 16,
+    "Odisha": 25,
+    "Puducherry": 10,
+    "Punjab": 22,
+    "Rajasthan": 22,
+    "Sikkim": 10,
+    "Tamil Nadu": 99,
+    "Telangana": 100,
+    "Tripura": 4,
+    "Uttar Pradesh": 41,
+    "Uttarakhand": 18,
+    "West Bengal": 36
+  },
+  "statesWithoutSourceListings": [],
+  "originalKarnataka": {
+    "records": 33,
+    "sha256Unchanged": "0871c5c454d109708280d20ec21814814866bfeb09062b48fad0b34a0de50522"
+  },
+  "totalParsedRowsBeforeDedupe": 1782,
+  "duplicatesMerged": 151,
+  "withCoordinates": 9,
+  "withPhone": 1509,
+  "independentlyVerifiedCentres": 0,
+  "caveats": [
+    "Public directory-listed centres, not independently verified or an exhaustive census.",
+    "Retrieval date is not the source's last centre verification date.",
+    "Published contacts and services may be outdated; call before travel.",
+    "Morphine source text is historical listing information; no live stock claim is made.",
+    "No inferred coordinates, city centroids or geocoded guesses are used.",
+    "Exact same-state/name plus matching address/phone, or the same preserved Karnataka identity, is deduplicated; possible name/address variants remain."
+  ],
+  "sources": [
+    {
+      "url": "https://palliumindia.org/clinics",
+      "status": "cached",
+      "sha256": "0b49549d85e55a38a983fed8cccfd678109b81d1409a01afa6f413d1647e9b6d",
+      "rawPath": "output/research/india-directory-20261020/pallium-index.html"
+    },
+    {
+      "url": "https://www.palliativecare.in/palliative-care-directory-of-india/",
+      "status": "cached",
+      "sha256": "5e529d2306e729958a0d9dc456e77ee929957152f496b230dbcd0958efc996fa",
+      "rawPath": "output/research/india-directory-20261020/iapc-index.html"
+    },
+    {
+      "url": "https://www.palliativecare.in/palliative-care-centres-kerala/",
+      "status": "cached",
+      "sha256": "5ab019a0061814659d26d002beafbd905fe3f081a9ccf2d0cf408fa884c1e053",
+      "rawPath": "output/research/india-directory-20261020/iapc-kerala-index.html"
+    },
+    {
+      "url": "https://www.palliativecare.in/wp-json/wp/v2/pages?search=palliative%20care%20centres&per_page=100&page=1",
+      "status": "cached",
+      "sha256": "bdc549a53dcdc1bb88795a90692059c32ea775f400b0b4546601aec6d3640443",
+      "rawPath": "output/research/india-directory-20261020/iapc-discovery-page-1.html"
+    },
+    {
+      "url": "https://www.palliativecare.in/wp-json/wp/v2/pages?search=palliative%20care%20centres&per_page=100&page=2",
+      "status": "cached",
+      "sha256": "7f58ee7f37ed08837b5b4c20fb83790d48d3aee8e00f1430a12cf74e14cf76d3",
+      "rawPath": "output/research/india-directory-20261020/iapc-discovery-page-2.html"
+    },
+    {
+      "url": "https://palliumindia.org/clinics/andaman",
+      "status": "cached",
+      "sha256": "4a7e7e9759ad859805f1e733adb242dca6053e770101e321ff4b12384243b0d3",
+      "rawPath": "output/research/india-directory-20261020/pallium-andamanandnicobarislands.html",
+      "state": "Andaman and Nicobar Islands",
+      "publisher": "Pallium India",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 1,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://palliumindia.org/clinics/andhra",
+      "status": "cached",
+      "sha256": "c846d1d01c9bb49ac85390002f2c820aec1db30001de96264329ffcb4e5ca302",
+      "rawPath": "output/research/india-directory-20261020/pallium-andhrapradesh.html",
+      "state": "Andhra Pradesh",
+      "publisher": "Pallium India",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 26,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://palliumindia.org/clinics/arunachalpradesh",
+      "status": "cached",
+      "sha256": "87a8bdba57d02f7b61267c505bf3d9691ff7f4f223b43f0523e84f3872d43b73",
+      "rawPath": "output/research/india-directory-20261020/pallium-arunachalpradesh.html",
+      "state": "Arunachal Pradesh",
+      "publisher": "Pallium India",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 2,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://palliumindia.org/clinics/assam",
+      "status": "cached",
+      "sha256": "2186642a8f30a32ac2b1c9d92cb9a539c7fb838922cd4c32ee8ff7484c348099",
+      "rawPath": "output/research/india-directory-20261020/pallium-assam.html",
+      "state": "Assam",
+      "publisher": "Pallium India",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 31,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://palliumindia.org/clinics/bihar",
+      "status": "cached",
+      "sha256": "619178941861176711104cea7cb9c550dd3e92caa28a1e05ea3b2326dd1026b6",
+      "rawPath": "output/research/india-directory-20261020/pallium-bihar.html",
+      "state": "Bihar",
+      "publisher": "Pallium India",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 10,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://palliumindia.org/clinics/chandigarh",
+      "status": "cached",
+      "sha256": "2b2b9b1ec864e45f5a02dccb2b24a7c11bf1505d02f4838032494e0ca48babff",
+      "rawPath": "output/research/india-directory-20261020/pallium-chandigarh.html",
+      "state": "Chandigarh",
+      "publisher": "Pallium India",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 5,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://palliumindia.org/clinics/chhattisgarh",
+      "status": "cached",
+      "sha256": "9f1797ddf1a05ddf681ea04ded5f536a63694eb3e148d2a1232612e14e99ba54",
+      "rawPath": "output/research/india-directory-20261020/pallium-chhattisgarh.html",
+      "state": "Chhattisgarh",
+      "publisher": "Pallium India",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 19,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://palliumindia.org/clinics/dadra",
+      "status": "cached",
+      "sha256": "0a6e01c7ed7494ce4095d2c6745f4cb7a79dd88a071ab66256bf387d271aff0f",
+      "rawPath": "output/research/india-directory-20261020/pallium-dadraandnagarhavelianddamananddiu.html",
+      "state": "Dadra and Nagar Haveli and Daman and Diu",
+      "publisher": "Pallium India",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 1,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://palliumindia.org/clinics/goa",
+      "status": "cached",
+      "sha256": "3c8c992c73b7c5efe3643f46c7b0883a664ecd3bf67143ec1807304964210fd9",
+      "rawPath": "output/research/india-directory-20261020/pallium-goa.html",
+      "state": "Goa",
+      "publisher": "Pallium India",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 15,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://palliumindia.org/clinics/gujarat",
+      "status": "cached",
+      "sha256": "a3c87864eba23510effd7c78d91bbc84da7da80f7c93d3d506cd9a8fb6b0f41e",
+      "rawPath": "output/research/india-directory-20261020/pallium-gujarat.html",
+      "state": "Gujarat",
+      "publisher": "Pallium India",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 24,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://palliumindia.org/clinics/haryana",
+      "status": "cached",
+      "sha256": "e1843bd4c2f42145c854c479d6d342152c8441bb6cea58bc1be565a66dcb7ebf",
+      "rawPath": "output/research/india-directory-20261020/pallium-haryana.html",
+      "state": "Haryana",
+      "publisher": "Pallium India",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 22,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://palliumindia.org/clinics/himachalpradesh",
+      "status": "cached",
+      "sha256": "b460981b58fa3af59938d33eee0708cd87d3aa9b7b3cb465bf342e20639ce48d",
+      "rawPath": "output/research/india-directory-20261020/pallium-himachalpradesh.html",
+      "state": "Himachal Pradesh",
+      "publisher": "Pallium India",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 9,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://palliumindia.org/clinics/jammukashmir",
+      "status": "cached",
+      "sha256": "5764738322c532c42ce7942a7206b17255c2cb503afcd092c863cea5d4f42502",
+      "rawPath": "output/research/india-directory-20261020/pallium-jammuandkashmir.html",
+      "state": "Jammu and Kashmir",
+      "publisher": "Pallium India",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 16,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://palliumindia.org/clinics/jharkhand",
+      "status": "cached",
+      "sha256": "dc9d7ca517667518aecb35ce8e5d663c6139cd2e7e2b964df048bf9698183f80",
+      "rawPath": "output/research/india-directory-20261020/pallium-jharkhand.html",
+      "state": "Jharkhand",
+      "publisher": "Pallium India",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 11,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://palliumindia.org/clinics/karnataka",
+      "status": "cached",
+      "sha256": "39fb894911bbb1e2570176552e36ba9a992060912b7c035eea3256c26b536a0f",
+      "rawPath": "output/research/india-directory-20261020/pallium-karnataka.html",
+      "state": "Karnataka",
+      "publisher": "Pallium India",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 33,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://palliumindia.org/clinics/kerala",
+      "status": "cached",
+      "sha256": "6be16aeb0628da6c11cee197b769f9c68df46b4560908da264a84322d812e0a1",
+      "rawPath": "output/research/india-directory-20261020/pallium-kerala.html",
+      "state": "Kerala",
+      "publisher": "Pallium India",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 419,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://palliumindia.org/clinics/ladakh",
+      "status": "cached",
+      "sha256": "3c52530515677b183013df5e5bded61af38563497392717c226a24241368cd4d",
+      "rawPath": "output/research/india-directory-20261020/pallium-ladakh.html",
+      "state": "Ladakh",
+      "publisher": "Pallium India",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 3,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://palliumindia.org/clinics/lakshadweep",
+      "status": "cached",
+      "sha256": "d37ce7ecebfa38c5921d95c4bc1a0a70ec935f1b5927e67149c16af550103dea",
+      "rawPath": "output/research/india-directory-20261020/pallium-lakshadweep.html",
+      "state": "Lakshadweep",
+      "publisher": "Pallium India",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 1,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://palliumindia.org/clinics/madhyapradesh",
+      "status": "cached",
+      "sha256": "35a4c33719555188a1ae689c81d14878353ee038099bde712dbe05a2e012a21f",
+      "rawPath": "output/research/india-directory-20261020/pallium-madhyapradesh.html",
+      "state": "Madhya Pradesh",
+      "publisher": "Pallium India",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 15,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://palliumindia.org/clinics/maharashtra",
+      "status": "cached",
+      "sha256": "d7702f461ef314fc6ae64758c45713d65cc1255a70d956f10c652f77c2679ff0",
+      "rawPath": "output/research/india-directory-20261020/pallium-maharashtra.html",
+      "state": "Maharashtra",
+      "publisher": "Pallium India",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 73,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://palliumindia.org/clinics/manipur",
+      "status": "cached",
+      "sha256": "a527c31389cc2f09198a2e6b2b44b02183505aeab0ba2b3a9f8e6413eee22459",
+      "rawPath": "output/research/india-directory-20261020/pallium-manipur.html",
+      "state": "Manipur",
+      "publisher": "Pallium India",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 12,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://palliumindia.org/clinics/meghalaya",
+      "status": "cached",
+      "sha256": "04489a64d6cd342f7a1d6dd8633078c122e915d93bf29f11f8adf3a1cf42216b",
+      "rawPath": "output/research/india-directory-20261020/pallium-meghalaya.html",
+      "state": "Meghalaya",
+      "publisher": "Pallium India",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 6,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://palliumindia.org/clinics/mizoram",
+      "status": "cached",
+      "sha256": "f16ff433a3833d3540b1899b1cd7de6e93f2d674c809b0e3366494c3e09d370c",
+      "rawPath": "output/research/india-directory-20261020/pallium-mizoram.html",
+      "state": "Mizoram",
+      "publisher": "Pallium India",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 14,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://palliumindia.org/clinics/nagaland",
+      "status": "cached",
+      "sha256": "6275260a348b472ed9d6fe9c1e58c30129a85defc83bc296476ac47894fea50b",
+      "rawPath": "output/research/india-directory-20261020/pallium-nagaland.html",
+      "state": "Nagaland",
+      "publisher": "Pallium India",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 14,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://palliumindia.org/clinics/newdelhi",
+      "status": "cached",
+      "sha256": "888e229d66ce38925dbcfe5ae5def6510bd61060aaf888630a293a72e24d6a8f",
+      "rawPath": "output/research/india-directory-20261020/pallium-delhi.html",
+      "state": "Delhi",
+      "publisher": "Pallium India",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 21,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://palliumindia.org/clinics/odisha",
+      "status": "cached",
+      "sha256": "76e60fc9c403246e804df6d358a42f6c874e82963c7c09aa58079be3330397d7",
+      "rawPath": "output/research/india-directory-20261020/pallium-odisha.html",
+      "state": "Odisha",
+      "publisher": "Pallium India",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 14,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://palliumindia.org/resources/clinics/puducherry",
+      "status": "cached",
+      "sha256": "9c8f3b1cd9c96f4814da9940462a65cc522620503e2a1747d9b89144333f24e9",
+      "rawPath": "output/research/india-directory-20261020/pallium-puducherry.html",
+      "state": "Puducherry",
+      "publisher": "Pallium India",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 6,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://palliumindia.org/clinics/punjab",
+      "status": "cached",
+      "sha256": "b1b2b69d8587fbbc8b2d4b97c9f3650d5dd13335dc1018684b0939b1c5183bb1",
+      "rawPath": "output/research/india-directory-20261020/pallium-punjab.html",
+      "state": "Punjab",
+      "publisher": "Pallium India",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 13,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://palliumindia.org/clinics/rajasthan",
+      "status": "cached",
+      "sha256": "208970e1fa5593baf487d1909fb8f847644fbf935312ee58c2f06b81f5611b81",
+      "rawPath": "output/research/india-directory-20261020/pallium-rajasthan.html",
+      "state": "Rajasthan",
+      "publisher": "Pallium India",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 14,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://palliumindia.org/clinics/sikkim",
+      "status": "cached",
+      "sha256": "c9536a2c4b2a6300aede2bae8a7ee491530a57f3e508d7b29edc92dd09af058a",
+      "rawPath": "output/research/india-directory-20261020/pallium-sikkim.html",
+      "state": "Sikkim",
+      "publisher": "Pallium India",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 9,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://palliumindia.org/clinics/tamilnadu",
+      "status": "cached",
+      "sha256": "58ff4ff89f465d87a7e3aa5d78ac15e0fadbadea6b707c61d7050d938fa7a5fa",
+      "rawPath": "output/research/india-directory-20261020/pallium-tamilnadu.html",
+      "state": "Tamil Nadu",
+      "publisher": "Pallium India",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 62,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://palliumindia.org/clinics/telangana",
+      "status": "cached",
+      "sha256": "0ca2ff3bf5ce1d62558238645cb7fbc9bb3eb92b162e578fd2b703dddf63def1",
+      "rawPath": "output/research/india-directory-20261020/pallium-telangana.html",
+      "state": "Telangana",
+      "publisher": "Pallium India",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 44,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://palliumindia.org/clinics/tripura",
+      "status": "cached",
+      "sha256": "5f29c365b0d6e70d0587a9a90fccb79c457cf03167be4fc12b25c5c3944fde1f",
+      "rawPath": "output/research/india-directory-20261020/pallium-tripura.html",
+      "state": "Tripura",
+      "publisher": "Pallium India",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 2,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://palliumindia.org/clinics/uttaranchal",
+      "status": "cached",
+      "sha256": "935321541fe95dc14de8d503f38c3fd67f6d085fdf47f6560c7296fe2dbe1140",
+      "rawPath": "output/research/india-directory-20261020/pallium-uttarakhand.html",
+      "state": "Uttarakhand",
+      "publisher": "Pallium India",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 14,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://palliumindia.org/clinics/uttarpradesh",
+      "status": "cached",
+      "sha256": "cda3a0d1ccdef451ed3a21df611f98bcfe421cfa3af188d8bb8de45bbd23e5f7",
+      "rawPath": "output/research/india-directory-20261020/pallium-uttarpradesh.html",
+      "state": "Uttar Pradesh",
+      "publisher": "Pallium India",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 23,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://palliumindia.org/clinics/westbengal",
+      "status": "cached",
+      "sha256": "112732f8ad47cdc7bf3875017cb3300b3bdf68f810ac50781dc94fcf8774076e",
+      "rawPath": "output/research/india-directory-20261020/pallium-westbengal.html",
+      "state": "West Bengal",
+      "publisher": "Pallium India",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 20,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://www.palliativecare.in/palliative-care-centres-sikkim/",
+      "status": "cached",
+      "sha256": "84bad7c85cd069b97b4ca9253372838b882d9e8b4957255d57d36c3ff356fd06",
+      "rawPath": "output/research/india-directory-20261020/iapc-sikkim.html",
+      "state": "Sikkim",
+      "publisher": "IAPC",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 1,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://www.palliativecare.in/palliative-care-centres-nagaland/",
+      "status": "cached",
+      "sha256": "6cce252c911932f15adfa2d2bbf7ac54f0816cbe38f1ad23ef3f545a96a9a718",
+      "rawPath": "output/research/india-directory-20261020/iapc-nagaland.html",
+      "state": "Nagaland",
+      "publisher": "IAPC",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 2,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://www.palliativecare.in/palliative-care-centres-chhattisgarh/",
+      "status": "cached",
+      "sha256": "353dfa15532d6d324d481eb61c99b36e04987a2821a31a0159d6024079d6f086",
+      "rawPath": "output/research/india-directory-20261020/iapc-chhattisgarh.html",
+      "state": "Chhattisgarh",
+      "publisher": "IAPC",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 4,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://www.palliativecare.in/palliative-care-centres-calicut-of-kerala/",
+      "status": "cached",
+      "sha256": "de5d64594f5014cba71d64150f4d1d24c45664b70d9a2570dfa1ad33e091d9e2",
+      "rawPath": "output/research/india-directory-20261020/iapc-palliative-care-centres-calicut-of-kerala.html",
+      "state": "Kerala",
+      "publisher": "IAPC",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 1,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://www.palliativecare.in/palliative-care-centres-west-bengal/",
+      "status": "cached",
+      "sha256": "123103c96f0922427e1ceaacc3b7b252012e5c7fc90d87caf7d23506e8343104",
+      "rawPath": "output/research/india-directory-20261020/iapc-westbengal.html",
+      "state": "West Bengal",
+      "publisher": "IAPC",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 18,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://www.palliativecare.in/palliative-care-centres-uttar-pradesh/",
+      "status": "cached",
+      "sha256": "4551764197a593a5fabd09df5ac8f4552122fd20bd561055e92280fc40c353ba",
+      "rawPath": "output/research/india-directory-20261020/iapc-uttarpradesh.html",
+      "state": "Uttar Pradesh",
+      "publisher": "IAPC",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 20,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://www.palliativecare.in/palliative-care-centres-uttarakhand/",
+      "status": "cached",
+      "sha256": "678d3ce2f1c62a10f53a99b7b81621775b6149e59793af26667557ea3a986d79",
+      "rawPath": "output/research/india-directory-20261020/iapc-uttarakhand.html",
+      "state": "Uttarakhand",
+      "publisher": "IAPC",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 4,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://www.palliativecare.in/palliative-care-centres-tripura/",
+      "status": "cached",
+      "sha256": "e5849605caea0ea0a78b734a38ea8e09f8a81403e41ab07b964f0d4eb0ff6386",
+      "rawPath": "output/research/india-directory-20261020/iapc-tripura.html",
+      "state": "Tripura",
+      "publisher": "IAPC",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 2,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://www.palliativecare.in/palliative-care-centres-telangana/",
+      "status": "cached",
+      "sha256": "c2029640375b17ad6c99b4c9ad8bb44536084298587ba25880e871da8d97a458",
+      "rawPath": "output/research/india-directory-20261020/iapc-telangana.html",
+      "state": "Telangana",
+      "publisher": "IAPC",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 59,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://www.palliativecare.in/palliative-care-centres-tamil-nadu/",
+      "status": "cached",
+      "sha256": "f5201bbcd3702dd42dd4ab7532d43bc3b5a481ab37214d06395a00fefae79f3c",
+      "rawPath": "output/research/india-directory-20261020/iapc-tamilnadu.html",
+      "state": "Tamil Nadu",
+      "publisher": "IAPC",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 45,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://www.palliativecare.in/palliative-care-centres-rajasthan/",
+      "status": "cached",
+      "sha256": "1e08864b0baaf00500be1f5db02082acb324016c803f0e40eca9ae4b7db612bf",
+      "rawPath": "output/research/india-directory-20261020/iapc-rajasthan.html",
+      "state": "Rajasthan",
+      "publisher": "IAPC",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 10,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://www.palliativecare.in/palliative-care-centres-punjab/",
+      "status": "cached",
+      "sha256": "0732710ee8609429d0eadf3cbef32c951ae7a5529b30c4199758557e30cb8d9c",
+      "rawPath": "output/research/india-directory-20261020/iapc-punjab.html",
+      "state": "Punjab",
+      "publisher": "IAPC",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 12,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://www.palliativecare.in/palliative-care-centres-pudducherry/",
+      "status": "cached",
+      "sha256": "42105e9ec4984002214c5a540831a0f2d0cef0ab56ce40ea2eea9b61b66c9c12",
+      "rawPath": "output/research/india-directory-20261020/iapc-puducherry.html",
+      "state": "Puducherry",
+      "publisher": "IAPC",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 5,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://www.palliativecare.in/palliative-care-centres-odisha/",
+      "status": "cached",
+      "sha256": "c7880121398b03d043a6d727e07746d2bcd08babdf8a063f09540e97bf01ec57",
+      "rawPath": "output/research/india-directory-20261020/iapc-odisha.html",
+      "state": "Odisha",
+      "publisher": "IAPC",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 12,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://www.palliativecare.in/palliative-care-centres-delhi/",
+      "status": "cached",
+      "sha256": "ef029627201d98fd6fddfe98e99fbae86a845cf50f39ad49fadac05e1f1a5b42",
+      "rawPath": "output/research/india-directory-20261020/iapc-delhi.html",
+      "state": "Delhi",
+      "publisher": "IAPC",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 26,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://www.palliativecare.in/palliative-care-centres-mizoram/",
+      "status": "cached",
+      "sha256": "1039e1ff10f33e7e553f08a6d68c81dac376e395faa60028617b490d085b8fd3",
+      "rawPath": "output/research/india-directory-20261020/iapc-mizoram.html",
+      "state": "Mizoram",
+      "publisher": "IAPC",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 2,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://www.palliativecare.in/palliative-care-centres-meghalaya/",
+      "status": "cached",
+      "sha256": "f4396d3690496735507a3ca4c01e50e82d9c5aa0224d26d7b837f78f770997e2",
+      "rawPath": "output/research/india-directory-20261020/iapc-meghalaya.html",
+      "state": "Meghalaya",
+      "publisher": "IAPC",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 1,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://www.palliativecare.in/palliative-care-centres-manipur/",
+      "status": "cached",
+      "sha256": "a13ac2cbed81bee3157e7bab26dabbb8cd70fa9a1700567aa3b19ea20c06b900",
+      "rawPath": "output/research/india-directory-20261020/iapc-manipur.html",
+      "state": "Manipur",
+      "publisher": "IAPC",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 2,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://www.palliativecare.in/palliative-care-centres-maharashtra/",
+      "status": "cached",
+      "sha256": "45541c68b87a3e7babe4d4e2d8af5ead0d92e4718c0efb797b654147fdd070c8",
+      "rawPath": "output/research/india-directory-20261020/iapc-maharashtra.html",
+      "state": "Maharashtra",
+      "publisher": "IAPC",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 44,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://www.palliativecare.in/palliative-care-centres-madhya-pradesh/",
+      "status": "cached",
+      "sha256": "05da23ec5ef6856c1213821b31a44c76f72cfe86d62b6420f77424d74382adf6",
+      "rawPath": "output/research/india-directory-20261020/iapc-madhyapradesh.html",
+      "state": "Madhya Pradesh",
+      "publisher": "IAPC",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 18,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://www.palliativecare.in/palliative-care-centres-lakshadweep/",
+      "status": "cached",
+      "sha256": "ba29dcbdb356857406b76c23794b5b9fde202cfdcc1f3f9f9b34d56244c75920",
+      "rawPath": "output/research/india-directory-20261020/iapc-lakshadweep.html",
+      "state": "Lakshadweep",
+      "publisher": "IAPC",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 1,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://www.palliativecare.in/palliative-care-centres-wayanad-of-kerala/",
+      "status": "cached",
+      "sha256": "2a53e2053a40efe666c17967c41e7df8f6aa117b408f233167d9d9872c6a0472",
+      "rawPath": "output/research/india-directory-20261020/iapc-palliative-care-centres-wayanad-of-kerala.html",
+      "state": "Kerala",
+      "publisher": "IAPC",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 24,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://www.palliativecare.in/palliative-care-centres-thrissur-of-kerala/",
+      "status": "cached",
+      "sha256": "adbc31c140178b8e3b739b555a29fac3b66f0d90aa4a38f1cda0693aced0dfe8",
+      "rawPath": "output/research/india-directory-20261020/iapc-palliative-care-centres-thrissur-of-kerala.html",
+      "state": "Kerala",
+      "publisher": "IAPC",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 34,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://www.palliativecare.in/palliative-care-centres-thiruvananthapuram-of-kerala/",
+      "status": "cached",
+      "sha256": "ce8af44dc3312f33bcc231a3f5c4ffb52bb03f7475c350c86019b241078bae15",
+      "rawPath": "output/research/india-directory-20261020/iapc-palliative-care-centres-thiruvananthapuram-of-kerala.html",
+      "state": "Kerala",
+      "publisher": "IAPC",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 35,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://www.palliativecare.in/palliative-care-centres-pathanamthitta-of-kerala/",
+      "status": "cached",
+      "sha256": "bbde02393a94847bac312156dc1ec28c003d80b183fa50495b4a5f6f8d9919f7",
+      "rawPath": "output/research/india-directory-20261020/iapc-palliative-care-centres-pathanamthitta-of-kerala.html",
+      "state": "Kerala",
+      "publisher": "IAPC",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 4,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://www.palliativecare.in/palliative-care-centres-palakkad-of-kerala/",
+      "status": "cached",
+      "sha256": "ee8e01fdbb32c1a95c53bfbfa088d13fefd53da44ac5a1288fedb4da6220eca2",
+      "rawPath": "output/research/india-directory-20261020/iapc-palliative-care-centres-palakkad-of-kerala.html",
+      "state": "Kerala",
+      "publisher": "IAPC",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 19,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://www.palliativecare.in/palliative-care-centres-malappuram-of-kerala/",
+      "status": "cached",
+      "sha256": "695ddd2d39c45b4c178deb0b597e5a26eb0cc6b8c53b533eb71340764db5a9f1",
+      "rawPath": "output/research/india-directory-20261020/iapc-palliative-care-centres-malappuram-of-kerala.html",
+      "state": "Kerala",
+      "publisher": "IAPC",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 68,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://www.palliativecare.in/palliative-care-centres-kannur-of-kerala/",
+      "status": "cached",
+      "sha256": "35438c3d497c1990f631d2df2453fa62633c85b12c7f82600109b5c81e70b2b2",
+      "rawPath": "output/research/india-directory-20261020/iapc-palliative-care-centres-kannur-of-kerala.html",
+      "state": "Kerala",
+      "publisher": "IAPC",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 22,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://www.palliativecare.in/palliative-care-centres-kottayam-of-kerala/",
+      "status": "cached",
+      "sha256": "87e98760e6c70fab01d9531443f8613ee972ae8312d3b34ced0999b8d2e4d9c9",
+      "rawPath": "output/research/india-directory-20261020/iapc-palliative-care-centres-kottayam-of-kerala.html",
+      "state": "Kerala",
+      "publisher": "IAPC",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 43,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://www.palliativecare.in/palliative-care-centres-kollam-of-kerala/",
+      "status": "cached",
+      "sha256": "6d2e2b7cfabad9755fe77aceb190585fa99e8bc09b3c33b5b1a3716f3e307651",
+      "rawPath": "output/research/india-directory-20261020/iapc-palliative-care-centres-kollam-of-kerala.html",
+      "state": "Kerala",
+      "publisher": "IAPC",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 13,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://www.palliativecare.in/palliative-care-centres-kasargod-of-kerala/",
+      "status": "cached",
+      "sha256": "bfb7613f0f727fce34c167cb8d7c70c50b5192ca7a1e3345f750725258c49f24",
+      "rawPath": "output/research/india-directory-20261020/iapc-palliative-care-centres-kasargod-of-kerala.html",
+      "state": "Kerala",
+      "publisher": "IAPC",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 8,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://www.palliativecare.in/palliative-care-centres-idukki-of-kerala/",
+      "status": "cached",
+      "sha256": "d4dead2edcfb2fdfd00cc696839223c525f9351921faabbbe2b2aaafabe93c0f",
+      "rawPath": "output/research/india-directory-20261020/iapc-palliative-care-centres-idukki-of-kerala.html",
+      "state": "Kerala",
+      "publisher": "IAPC",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 6,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://www.palliativecare.in/palliative-care-centres-alappuzha-of-kerala/",
+      "status": "cached",
+      "sha256": "91db60d868b960a615b0ca9bc918653e06f0b951e80ab59146b3c9d88cdad9a1",
+      "rawPath": "output/research/india-directory-20261020/iapc-palliative-care-centres-alappuzha-of-kerala.html",
+      "state": "Kerala",
+      "publisher": "IAPC",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 18,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://www.palliativecare.in/palliative-care-centres-ernakulum-of-kerala/",
+      "status": "cached",
+      "sha256": "c147493900de124b555bb6c27220e0b2f103c8c337c07d72c58b25aeec7cf415",
+      "rawPath": "output/research/india-directory-20261020/iapc-palliative-care-centres-ernakulum-of-kerala.html",
+      "state": "Kerala",
+      "publisher": "IAPC",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 65,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://www.palliativecare.in/palliative-care-centres-karnataka/",
+      "status": "cached",
+      "sha256": "84fd3ad776f8d1fba5716204df75c6ae9ce41bc2cee1a7df6f4dcee0243da294",
+      "rawPath": "output/research/india-directory-20261020/iapc-karnataka.html",
+      "state": "Karnataka",
+      "publisher": "IAPC",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 26,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://www.palliativecare.in/palliative-care-centres-jharkhand/",
+      "status": "cached",
+      "sha256": "643116be297d74b5a0a20796292fa41e06d71c00c29eb64bc68fdba826fd4dff",
+      "rawPath": "output/research/india-directory-20261020/iapc-jharkhand.html",
+      "state": "Jharkhand",
+      "publisher": "IAPC",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 10,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://www.palliativecare.in/palliative-care-centres-haryana/",
+      "status": "cached",
+      "sha256": "7b5ac6f0d7217fd042c665339d8b93d795c0a7e6ae76e4223aa2e2bf187e9e81",
+      "rawPath": "output/research/india-directory-20261020/iapc-haryana.html",
+      "state": "Haryana",
+      "publisher": "IAPC",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 9,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://www.palliativecare.in/palliative-care-centres-jammu-kashmir/",
+      "status": "cached",
+      "sha256": "7c3e2da6ff30b5025b8d7050dca7aea0bb750c12e3c5a6f264f1772940ac41c1",
+      "rawPath": "output/research/india-directory-20261020/iapc-jammuandkashmir.html",
+      "state": "Jammu and Kashmir",
+      "publisher": "IAPC",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 3,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://www.palliativecare.in/palliative-care-centres-himachal-pradesh/",
+      "status": "cached",
+      "sha256": "6312c5c293532c147036050fec0db5b4784ced8187f1a000ddcfd12f6e7f116b",
+      "rawPath": "output/research/india-directory-20261020/iapc-himachalpradesh.html",
+      "state": "Himachal Pradesh",
+      "publisher": "IAPC",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 4,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://www.palliativecare.in/palliative-care-centres-gujarat/",
+      "status": "cached",
+      "sha256": "e6f87fcd35922f8c9be1985d636f75470c935ef4ee9a4ef6e481b914100aaa6d",
+      "rawPath": "output/research/india-directory-20261020/iapc-gujarat.html",
+      "state": "Gujarat",
+      "publisher": "IAPC",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 11,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://www.palliativecare.in/palliative-care-centres-goa/",
+      "status": "cached",
+      "sha256": "5ff2208ff5ca640025fece88e3928bee9f8548ee234fca4ee80ce870c04d2163",
+      "rawPath": "output/research/india-directory-20261020/iapc-goa.html",
+      "state": "Goa",
+      "publisher": "IAPC",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 1,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://www.palliativecare.in/palliative-care-centres-chandigarh/",
+      "status": "cached",
+      "sha256": "02984c96502a502e2e8d88f67ba09863fc68d3b47cb95ee03a528bc114bf2d5c",
+      "rawPath": "output/research/india-directory-20261020/iapc-chandigarh.html",
+      "state": "Chandigarh",
+      "publisher": "IAPC",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 4,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://www.palliativecare.in/palliative-care-centres-bihar/",
+      "status": "cached",
+      "sha256": "d1464a5ae2117d3c7364cd3d3148e8ca80cb6a565baa47da630b51752001e1cb",
+      "rawPath": "output/research/india-directory-20261020/iapc-bihar.html",
+      "state": "Bihar",
+      "publisher": "IAPC",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 4,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://www.palliativecare.in/palliative-care-centres-assam/",
+      "status": "cached",
+      "sha256": "7aa111eac6598634a5bbf984814d05e6d3c506c4d839e3c13d582a6a3a1c02ee",
+      "rawPath": "output/research/india-directory-20261020/iapc-assam.html",
+      "state": "Assam",
+      "publisher": "IAPC",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 20,
+      "rejectedRows": 0
+    },
+    {
+      "url": "https://www.palliativecare.in/palliative-care-centres-andhra-pradesh/",
+      "status": "cached",
+      "sha256": "202672c84024892322e78c4b970a25a167b151f51c513b1019f5ba5c8a575e12",
+      "rawPath": "output/research/india-directory-20261020/iapc-andhrapradesh.html",
+      "state": "Andhra Pradesh",
+      "publisher": "IAPC",
+      "retrievedOn": "2026-10-20",
+      "parsedRows": 16,
+      "rejectedRows": 0
+    }
+  ],
+  "deduplication": [
+    {
+      "kept": "india-c8f4f00e42a1157d",
+      "merged": "india-5568e7a9894a6081",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-c8f4f00e42a1157d",
+      "merged": "india-799c34f044787c75",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-bcf9a67587123604",
+      "merged": "india-84e8f8595a279406",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-a457aa5f490d4b0c",
+      "merged": "india-6fcc393a17b68dab",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-960a0ac4823ebed8",
+      "merged": "india-17856918fde273d7",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-cd654ced8f8b76d5",
+      "merged": "india-70844d06e7484909",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-cd654ced8f8b76d5",
+      "merged": "india-43a826b55bc99af8",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-bcf7448735ca99bf",
+      "merged": "india-61c63ccf1a4d6c97",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-e15c17c2bf2b3caa",
+      "merged": "india-d2268521241b95ab",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-4518f4e54cc864bc",
+      "merged": "india-2f463ef6fc8439a9",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-4a2edeffebcf192b",
+      "merged": "india-d99fde10e92ab540",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-485bf109611f9416",
+      "merged": "india-c652295be26fe966",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-088197dfcb87b210",
+      "merged": "india-088197dfcb87b210",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-50d4d08da0a2f80d",
+      "merged": "india-50d4d08da0a2f80d",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-9251a2347a9a917c",
+      "merged": "india-8a4ba50ad7f9618f",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-a3397e3047190b59",
+      "merged": "india-af409e26d784154e",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-7b837f5c7aeb19d0",
+      "merged": "india-35fd4deb46786444",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-d5ba6ff88c976b2b",
+      "merged": "india-54514de0a7dac2d4",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-35a10d3dd1ef20d6",
+      "merged": "india-2a1618ff44706a91",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-3bd4f29d24e0fbda",
+      "merged": "india-3116316b293ebf6f",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-ac6c8802a49d3094",
+      "merged": "india-6066c0a070caeaa2",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-9e3cc4c23817eae6",
+      "merged": "india-d85342a5cf7842a2",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-056c26192e411d7c",
+      "merged": "india-5be29adfdfd6077a",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-1fbecaca4199af0c",
+      "merged": "india-163a5e69d3900257",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-a2fddb44d150455f",
+      "merged": "india-6bb9812b239ffff3",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-0755a0fb59a84258",
+      "merged": "india-0755a0fb59a84258",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-a4c757fdc9e3fa2d",
+      "merged": "india-a4c757fdc9e3fa2d",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-cc09727e0ad11210",
+      "merged": "india-cc09727e0ad11210",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-e46aacb3306a6bb0",
+      "merged": "india-256af80842229996",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-305831b1ba188a4f",
+      "merged": "india-796d1a6009e52689",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-019131671756fc54",
+      "merged": "india-a8f2eee6b57630e8",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-37d9326c2dbe6d99",
+      "merged": "india-294ed6c13b0979f7",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-74d6db9f6df094cb",
+      "merged": "india-240c5e3985e1cfa4",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-264d79613724601e",
+      "merged": "india-b27a31a30564a50c",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-0533822206f3a35e",
+      "merged": "india-d07cde5b3539ab70",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-4a603e06908c875d",
+      "merged": "india-01b80edb41299cd2",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-b388af90d394727c",
+      "merged": "india-b66757d2eabd4e96",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-e7a6f88f0c7bf062",
+      "merged": "india-eae5b83ea2e50575",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-f8986d864f602c7e",
+      "merged": "india-cfb9add446ee7b5d",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-726a34b87833eb45",
+      "merged": "india-0fc38d24a48f6035",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-e708dcf7ee4a5329",
+      "merged": "india-0c7cb9459fec9159",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-0d66fb2009e97192",
+      "merged": "india-90d932bb5e936bf0",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-842dfc66bb25882b",
+      "merged": "india-8b696d04ebae5c9e",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-98e57b116cde560c",
+      "merged": "india-b59c7f1957cc6442",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-a457aa5f490d4b0c",
+      "merged": "india-c4690cc96b7f8302",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-6e34558d0b2dfa7f",
+      "merged": "india-d004df6f7e28aad3",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-b494ccbefc528e94",
+      "merged": "india-17344c034f986391",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-e3e60095ca66c4da",
+      "merged": "india-f3237dce39a939cb",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-960a0ac4823ebed8",
+      "merged": "india-916d028894cedec1",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-810854e2622c8a7a",
+      "merged": "india-f3e04aac9d574f12",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-960a0ac4823ebed8",
+      "merged": "india-19d92affa1508b08",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-299665642f7edcc8",
+      "merged": "india-8fb0e0554b12f02f",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-22bb757dfbe04c18",
+      "merged": "india-0c170e4c347b98ae",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-9cbcf4a6322c7970",
+      "merged": "india-ba1daef7436127cd",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-43ee43e18d78858b",
+      "merged": "india-935435f0b482df9c",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-e6e5df8290d7675c",
+      "merged": "india-35a3312407f37085",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-1e9fdf45f780e5e8",
+      "merged": "india-1e9fdf45f780e5e8",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-a84d8de118c3ad81",
+      "merged": "india-6bbb59c803d39501",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-92cb33e18e476742",
+      "merged": "india-92cb33e18e476742",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-ff0a84b2a87a7355",
+      "merged": "india-ff0a84b2a87a7355",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-89751dbbf5914c2b",
+      "merged": "india-89751dbbf5914c2b",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-7530aa24e4a87dad",
+      "merged": "india-57a037e8b1d92678",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-f9017738e8fbd68b",
+      "merged": "india-4af0ddbf712c1037",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-e189292d4d4d86ba",
+      "merged": "india-a46dd23ef475c56b",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-23eeea9149e6f7c6",
+      "merged": "india-5eabb5a7d3ee9980",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-2d09826c2b3bfd27",
+      "merged": "india-3b1a50bf0db05525",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-51e7ff07f0da61ce",
+      "merged": "india-4af88c13a692c417",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-21ccde9f60f039df",
+      "merged": "india-21ecceb83b866dc6",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-4194a787d27c8461",
+      "merged": "india-8e62bebb53fd1ec6",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-8c49e8fa867a502c",
+      "merged": "india-8b9aa69f018a98f4",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-3dfeb3d98d2de56f",
+      "merged": "india-c3c85e0b9dc1fe56",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-5ec33d9ca39242d8",
+      "merged": "india-edc20f6c29b690d6",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-9612340894eb8f83",
+      "merged": "india-9612340894eb8f83",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-0daf0655b84c5c34",
+      "merged": "india-0daf0655b84c5c34",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-086c36b030615713",
+      "merged": "india-086c36b030615713",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-e04cfadcbc2014c5",
+      "merged": "india-e04cfadcbc2014c5",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-a9a5fced7274651a",
+      "merged": "india-a9a5fced7274651a",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-9aaeccba4f22702f",
+      "merged": "india-9aaeccba4f22702f",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-7008d94ff2ebae1e",
+      "merged": "india-7008d94ff2ebae1e",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-97bbd4bab8654478",
+      "merged": "india-97bbd4bab8654478",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-b68f7cda46b3e2f9",
+      "merged": "india-b68f7cda46b3e2f9",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-4fc20492fcc9d4d0",
+      "merged": "india-4fc20492fcc9d4d0",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-4303d6f40710df61",
+      "merged": "india-4303d6f40710df61",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-21bf677f80582bf5",
+      "merged": "india-21bf677f80582bf5",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-ed7e68b0b0bd927d",
+      "merged": "india-ed7e68b0b0bd927d",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-9f2419311645ce9c",
+      "merged": "india-9f2419311645ce9c",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-a562bcdd26f8ee34",
+      "merged": "india-a562bcdd26f8ee34",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-5f7cc28bfa991300",
+      "merged": "india-5f7cc28bfa991300",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-e8321eba6fdb72b1",
+      "merged": "india-e8321eba6fdb72b1",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-16062cb7de1d652e",
+      "merged": "india-16062cb7de1d652e",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-e51a7fc1ab499b49",
+      "merged": "india-e51a7fc1ab499b49",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-6860c47fee378f7f",
+      "merged": "india-6860c47fee378f7f",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-1264a4d774d24e2d",
+      "merged": "india-1264a4d774d24e2d",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-df8ba2643a5681c7",
+      "merged": "india-df8ba2643a5681c7",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-9258c0a5c4f0d205",
+      "merged": "india-c442623295be17c1",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-da79c8f84f58230a",
+      "merged": "india-da79c8f84f58230a",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-1990ed715769293d",
+      "merged": "india-1990ed715769293d",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-c529f57a4cba02bc",
+      "merged": "india-c529f57a4cba02bc",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-da36e09ddc730306",
+      "merged": "india-da36e09ddc730306",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-3bd894f26709c562",
+      "merged": "india-3bd894f26709c562",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-d53056a62df538b8",
+      "merged": "india-d53056a62df538b8",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-084741c047de30db",
+      "merged": "india-084741c047de30db",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-6755ab4dfa437302",
+      "merged": "india-6755ab4dfa437302",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-68fa0a22396dd6ef",
+      "merged": "india-68fa0a22396dd6ef",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-494571dabf820106",
+      "merged": "india-344081731a484ab7",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-0884330d63def2c6",
+      "merged": "india-13b17064abe4be0c",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-221eeaee08b79141",
+      "merged": "india-8462b32397cf7ee2",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-543e11c03079a13c",
+      "merged": "india-543e11c03079a13c",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-6a2f962214d87e7b",
+      "merged": "india-6a2f962214d87e7b",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-ecbccb3055b67021",
+      "merged": "india-ecbccb3055b67021",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-4e0c9b2ebd16b13d",
+      "merged": "india-4e0c9b2ebd16b13d",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-f00f0a839eb52acc",
+      "merged": "india-f00f0a839eb52acc",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-58d173317860875c",
+      "merged": "india-d9e1fafa2e35fce0",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-ec91dbd0b4b4e963",
+      "merged": "india-46b307e24e352eee",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-9d39d41b13da4ec3",
+      "merged": "india-9d39d41b13da4ec3",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-ee162edd4ba1c1ff",
+      "merged": "india-e889fc75596bb311",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-d3cae68c81a1e7f4",
+      "merged": "india-fd463f6d6f3f3731",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-472ca0b4bb550bae",
+      "merged": "india-472ca0b4bb550bae",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-ff22a3ccf5b73467",
+      "merged": "india-8f7a86cb3cc9bff4",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-a18846dae0bb746a",
+      "merged": "india-556228d7dba94b48",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-9c78c285ae1a04f0",
+      "merged": "india-9c78c285ae1a04f0",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-4ee0b36b217b1613",
+      "merged": "india-4ee0b36b217b1613",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-69d604e19bc222bc",
+      "merged": "india-69d604e19bc222bc",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-3943d9152c6aac6a",
+      "merged": "india-3943d9152c6aac6a",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-b69419593c115902",
+      "merged": "india-b69419593c115902",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-d8cbd3c4c9071242",
+      "merged": "india-d8cbd3c4c9071242",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-c928000d757868c3",
+      "merged": "india-8922ca55501310a0",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-4cfb58e3df6b8971",
+      "merged": "india-468bcdea92da3fb4",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-511b41cfec940f7d",
+      "merged": "india-24477137fd8df926",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-9757ba2ce6139d1d",
+      "merged": "india-cd7027d38d2982b2",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-4fb1c1a688a24ed8",
+      "merged": "india-8087ea0956734465",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-36aab2751bd31bc3",
+      "merged": "india-12ee947308190837",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "baptist-bengaluru",
+      "merged": "baptist-bengaluru",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "baptist-bengaluru",
+      "merged": "baptist-bengaluru",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "ave-maria-mangalore",
+      "merged": "ave-maria-mangalore",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "mysore-palliative-care",
+      "merged": "mysore-palliative-care",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "sharanya-hospice",
+      "merged": "sharanya-hospice",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "pushpa-hospital-chikmagaluru",
+      "merged": "pushpa-hospital-chikmagaluru",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "navajeevan-shivamogga",
+      "merged": "navajeevan-shivamogga",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "aster-cmi",
+      "merged": "aster-cmi",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-a1f91a410c4f8514",
+      "merged": "india-a1f91a410c4f8514",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-23ed88e2429d67c1",
+      "merged": "india-23ed88e2429d67c1",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-fbc34c0913643ce2",
+      "merged": "india-aadf210e593e4738",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-ba0e45dad668ebaa",
+      "merged": "india-6d40cdd5c276b5b3",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-18f32e847895c97a",
+      "merged": "india-b1fc6f14f96a947b",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-3cb5bfdd13976259",
+      "merged": "india-3f356274380ef89c",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-7f5b87f88a43b269",
+      "merged": "india-655d3902bc8868fd",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-ddca7cf5c7490ab6",
+      "merged": "india-ddca7cf5c7490ab6",
+      "reason": "preserved-original-id"
+    },
+    {
+      "kept": "india-91a2e90caa904434",
+      "merged": "india-9ff4140b51b72146",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-91a2e90caa904434",
+      "merged": "india-e8b03c3c125d8a70",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    },
+    {
+      "kept": "india-1d71b170fcdf2782",
+      "merged": "india-a1c4db21d326a43c",
+      "reason": "same-state-and-name-plus-address-or-phone"
+    }
+  ],
+  "parserSkippedRows": []
+}

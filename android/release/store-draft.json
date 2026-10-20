@@ -657,18 +657,18 @@
   "unpackagedFeatureWork": {
     "versionName": "0.6.0",
     "versionCode": 7,
-    "status": "source integrated; packaging stopped by user",
+    "status": "20 October test APK requested for mentor meeting; current compilation and checks running; no Play action",
     "packaged": false,
     "uploaded": false,
     "submitted": false,
     "verification": {
-      "androidCompilation": "compileDebugKotlin passed",
-      "androidUiTestCompilation": "compileDebugAndroidTestKotlin passed; test classes compiled, not executed on a device",
-      "androidUnitTests": 131,
-      "androidUnitSuites": 20,
-      "androidUnitFailures": 0,
-      "androidUnitErrors": 0,
-      "androidUnitSkipped": 0,
+      "androidCompilation": "20 October attempt reached compileDebugKotlin then failed with native JVM allocation under host memory/pagefile pressure; no combined pass yet",
+      "androidUiTestCompilation": "Current 20 October instrumentation sources not yet verified",
+      "androidUnitTests": null,
+      "androidUnitSuites": null,
+      "androidUnitFailures": null,
+      "androidUnitErrors": null,
+      "androidUnitSkipped": null,
       "webTests": 284,
       "webTypeScript": "passed",
       "sharedPostgresWasmChecks": 47,
@@ -678,7 +678,24 @@
       "localOcr": "actual shipped Tesseract engine and synthetic live-browser flow passed: image selection, reading, review-required validation, correction, save, reload and original access; no native ML Kit runtime claim",
       "physicalDeviceTested": false,
       "emulatorTested": false,
-      "internalOnlyVerification": "final actual source compilation and 131 unit tests passed; native facade/HTTP/no-provider-call regression passed; legacy photo-post bytecode rejects before a connection"
+      "internalOnlyVerification": "19 October baseline:131unitchecks and native facade/no-provider-call regression passed; current20Octoberchecks running",
+      "previous19OctoberChecks": {
+        "androidCompilation": "compileDebugKotlin passed",
+        "androidUiTestCompilation": "compileDebugAndroidTestKotlin passed; test classes compiled, not executed on a device",
+        "androidUnitTests": 131,
+        "androidUnitSuites": 20,
+        "androidUnitFailures": 0,
+        "androidUnitErrors": 0,
+        "androidUnitSkipped": 0
+      },
+      "directorySourceChecks": {
+        "passed": 8,
+        "recordCount": 1631,
+        "statesAndUnionTerritories": 36,
+        "sourcePages": 81,
+        "originalKarnatakaUnchanged": true
+      },
+      "nativeDeviceRuntimeTested": false
     },
     "deliveredSource": [
       "Account-backed web/native care-note drafts and independently verified clinician workflow",
@@ -695,11 +712,12 @@
       "Real independent verifier assignment and clinician/family pilot remain pending; no staff or professional approvals were fabricated"
     ],
     "releasePrerequisites": [
-      "Respect explicit stop: do not package, sign or upload until release packaging is resumed",
+      "User resumed test APK packaging on20October; signed release/AAB/Play review remains separate and unchanged",
       "Run actual native OCR/reminder/permission/navigation interactions and appropriate Android runtime checks",
       "Reassess ML Kit Device identifiers, Diagnostics and App interactions/analytics declarations against actual SDK behavior and update Play Data safety before upload",
       "Update reviewer instructions/listing/privacy to the actual packaged features and provider readiness",
-      "Keep current Production review intact; do not duplicate or withdraw 0.5.0 (6)"
+      "Keep current Production review intact; do not duplicate or withdraw 0.5.0 (6)",
+      "Before packaging 20 October source: complete combined compilation/unit/instrumentation-source checks and native Hindi/English speech/OCR/translation/reminder/UI interactions; update ML Kit and downloaded-model privacy/listing disclosures. Source-only status is not availability."
     ],
     "hospitalSurvey": "web only",
     "reportOriginals": "private phone/browser copies; copying facts into account entries does not synchronize original files",
@@ -720,11 +738,63 @@
     "androidProcessingMode": {
       "mode": "on-device services only for speech/OCR/read-aloud; shared account sync preserved",
       "generativeSummaryAvailable": false,
-      "automaticTranslationAvailable": false,
+      "automaticTranslationAvailable": true,
       "unsupportedLanguageFallback": "manual typing/review; no cloud recognizer fallback",
       "debugCloudAudioEnabled": false,
-      "externalAiEnabled": false
+      "externalAiEnabled": false,
+      "savedRecordingTranscriptionImplemented": true,
+      "speechModel": "Qwen3-ASR-0.6B int8",
+      "speechRuntime": "sherpa-onnx 1.13.8",
+      "speechModelDownloadBytes": 987015347,
+      "speechLanguageChoices": [
+        "Hindi + English (automatic)"
+      ],
+      "bundledOcrScripts": [
+        "Latin",
+        "Devanagari"
+      ],
+      "offlineHindiEnglishTranslationImplemented": true,
+      "translationProvider": "ML Kit on-device Google Translate models; not an open-source model",
+      "translationNeedsDownloadedLanguagePack": true,
+      "translationRequiresHumanReview": true,
+      "runtimeVerified": false,
+      "minimumAvailableMemoryBytes": 2684354560,
+      "requires64BitProcess": true
     },
-    "sourceBaseCommit": "c222da8"
+    "sourceBaseCommit": "c222da8",
+    "nationalDirectory": {
+      "asset": "android/app/src/main/assets/india.json",
+      "listings": 1631,
+      "statesAndUnionTerritories": 36,
+      "directoryPages": 81,
+      "listingsWithPhone": 1509,
+      "sourceManifest": "android/app/src/main/assets/india-directory-sources.json",
+      "independentlyVerified": false,
+      "exhaustiveCensus": false,
+      "mappedCoordinatePairs": 9,
+      "historicalMorphineClaimsSeparateFromStock": true
+    },
+    "visibleControls": {
+      "dropdownsRemoved": true,
+      "clickToExpandRemoved": true,
+      "instrumentationSuitesAdapted": 6,
+      "phoneLayoutVerified": false
+    },
+    "modelResearch": {
+      "medasr": "English-only, unsuitable for Hindi/Hinglish",
+      "gemma4": "Apache-2.0 audio-capable alternatives researched; no superiority or handset support claimed",
+      "choice": "Qwen0.6B int8 selected after actual Hindi/English/Hinglish public/synthetic CPU tests; human review required, handset runtime unverified",
+      "sources": [
+        "https://developers.google.com/health-ai-developer-foundations/medasr/model-card",
+        "https://github.com/openai/whisper",
+        "https://ai.google.dev/gemma/docs/core/model_card_4",
+        "https://developers.google.com/ml-kit/vision/text-recognition/v2/android",
+        "https://developers.google.com/ml-kit/language/translation/android",
+        "https://developers.google.com/ml-kit/language/translation/translation-terms",
+        "https://cloud.google.com/translate/attribution",
+        "https://huggingface.co/Qwen/Qwen3-ASR-0.6B",
+        "https://k2-fsa.github.io/sherpa/onnx/qwen3-asr/index.html"
+      ]
+    }
   }
 }

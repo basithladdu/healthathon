@@ -74,7 +74,6 @@ import java.time.format.DateTimeFormatter
 
 @Composable private fun ReminderItemSettings(item: CareItem, scheduler: CareReminderScheduler, revision: Int, changed: () -> Unit) {
     val option = remember(item.id, revision) { scheduler.option(item.id) }
-    var editing by rememberSaveable(item.id) { mutableStateOf(false) }
     var times by rememberSaveable(item.id) { mutableStateOf((option?.times ?: CareReminderRules.printedTimes(item.detail)).joinToString(", ")) }
     var starts by rememberSaveable(item.id) { mutableStateOf(option?.starts.orEmpty()) }
     var ends by rememberSaveable(item.id) { mutableStateOf(option?.ends.orEmpty()) }
@@ -83,14 +82,13 @@ import java.time.format.DateTimeFormatter
         Row { Column(Modifier.weight(1f)) { Text(item.title, fontWeight = FontWeight.SemiBold); Text(when { option?.muted == true -> "Paused"; item.kind == "medicine" -> (option?.times ?: CareReminderRules.printedTimes(item.detail)).joinToString(", ").ifBlank { "No time chosen" }; item.due > 0 -> DateTimeFormatter.ofPattern("dd MMM yyyy · HH:mm z").withZone(ZoneId.systemDefault()).format(Instant.ofEpochMilli(item.due)); else -> "No time chosen" }, style = MaterialTheme.typography.bodySmall) }
             Switch(checked = option?.muted != true, onCheckedChange = { enabled -> scheduler.configure(item.id, (option ?: ReminderOption(CareReminderRules.printedTimes(item.detail))).copy(muted = !enabled)); changed() }) }
         if (item.kind == "medicine") {
-            TextButton(onClick = { editing = !editing }) { Text(if (editing) "Close times" else "Choose reminder times") }
-            if (editing) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 CareField(times, { times = it; error = "" }, "Times · HH:mm, separated by commas", singleLine = true)
                 CareField(starts, { starts = it; error = "" }, "Start date · YYYY-MM-DD (optional)", singleLine = true)
                 CareField(ends, { ends = it; error = "" }, "Last date · YYYY-MM-DD (optional)", singleLine = true)
                 if (error.isNotBlank()) Text(error, color = MaterialTheme.colorScheme.error)
                 Button(onClick = { runCatching {
-                    scheduler.configure(item.id, ReminderOption(if (times.isBlank()) emptyList() else times.split(',').map(String::trim), starts.trim(), ends.trim(), option?.muted == true)); editing = false; changed()
+                    scheduler.configure(item.id, ReminderOption(if (times.isBlank()) emptyList() else times.split(',').map(String::trim), starts.trim(), ends.trim(), option?.muted == true)); changed()
                 }.onFailure { error = it.message ?: "Check the times and dates." } }, modifier = Modifier.fillMaxWidth()) { Text("Save reminder times") }
             }
         }

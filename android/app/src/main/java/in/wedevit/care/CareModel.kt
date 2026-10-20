@@ -14,7 +14,8 @@ import org.json.JSONArray
 import java.io.File
 import java.time.LocalDate
 
-data class Centre(val name: String, val city: String, val district: String, val address: String, val phone: String, val services: String, val morphine: String, val url: String, val id: String = name, val latitude: Double? = null, val longitude: Double? = null)
+data class Centre(val name: String, val city: String, val district: String, val address: String, val phone: String, val services: String, val morphine: String, val url: String, val id: String = name, val latitude: Double? = null, val longitude: Double? = null,
+    val state: String = "Karnataka", val sourceName: String = "Pallium India", val checkedOn: String = "2026-10-02", val verification: String = "directory_listed", val sourceListedMorphine: String = "")
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewModel(app) {
@@ -62,14 +63,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewMod
     private var recordingFile: File? = null
     private var activeRecordingConsent: RecordingConsent? = null
     private var meter: Job? = null
-    val centres: List<Centre> = JSONArray(app.assets.open("karnataka.json").bufferedReader().use { it.readText() }).let { data ->
-        (0 until data.length()).map { i -> data.getJSONObject(i).let { c ->
-            Centre(c.getString("name"), c.getString("city"), c.optString("district"), c.getString("address"),
-                c.optJSONArray("phoneNumbers")?.optString(0) ?: c.getString("phone"), c.getJSONArray("services").let { (0 until it.length()).joinToString(" · ") { j -> it.getString(j) } },
-                c.optString("morphine"), c.getString("directoryUrl"), c.getString("id"),
-                c.optDouble("latitude").takeIf { it.isFinite() }, c.optDouble("longitude").takeIf { it.isFinite() })
-        } }
-    }
+    val centres: List<Centre> = CareCentreDirectory.decode(app.assets.open("india.json").bufferedReader().use { it.readText() })
     init {
         runCatching { reminderScheduler.activate() }
         viewModelScope.launch { reconcileReminders() }
@@ -353,12 +347,31 @@ class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewMod
         val id = selected.value
         action {
             require(recordings.value.any { it.absolutePath == path }) { "Choose a recording for this person." }
-            val removed = withContext(Dispatchers.IO) { File(path).delete() }
+            val removed = withContext(Dispatchers.IO) {
+                File(path).delete().also { deleted -> if (deleted) File(File(path).parentFile, "${File(path).nameWithoutExtension}.offline-transcript.json").delete() }
+            }
             require(removed) { "Couldn't remove the recording. Please try again." }
             dao.deleteRecordingConsent(path)
             if (draft.value.personId == id && draft.value.audioPath == path) edit(draft.value.copy(audioPath = "", consentAt = 0))
             refreshRecordings(id); message.value = "Recording removed"
         }
+    }
+    /** A reviewed offline result is inserted only into the same empty person/account draft. */
+    fun useOfflineTranscript(path: String, review: OfflineTranscriptReview): Boolean {
+        return try {
+            val personId = selected.value
+            requireEdit(personId)
+            require(!recording.value && !busy.value && !refreshing.value) { "Finish the current action first." }
+            require(recordingFiles(personId).any { it.absolutePath == path }) { "Choose a recording for this person." }
+            val savedConsent = recordingConsents.value.firstOrNull { it.audioPath == path && it.personId == personId }
+                ?: error("Open this person's consented recording again.")
+            require(savedConsent.recordingConsentAt > 0 && draft.value.personId == personId && draft.value.source.isBlank()) { "The conversation changed. Your text was not replaced." }
+            require(review.provider == OfflineSpeechModel.provider && review.model == OfflineSpeechModel.id && review.reviewedAt >= review.createdAt && review.reviewedAt > 0 && review.text.isNotBlank() && review.text.length <= NoteRules.MAX_SOURCE_CHARS) { "Review the transcript first." }
+            edit(draft.value.copy(source = review.text, transcriptProvider = review.provider, transcriptModel = review.model,
+                transcribedAt = review.createdAt, transcriptAudioPath = path))
+            message.value = "Reviewed words added. Choose source words for the care note."
+            true
+        } catch (failure: Exception) { message.value = failure.message ?: "The transcript was not inserted."; false }
     }
     fun transcribeAudio(path: String, consent: RecordingConsent) {
         val personId = selected.value

@@ -72,19 +72,13 @@ private fun conversationDate(at: Long?) = at?.takeIf { it > 0 }?.let {
 }
 
 @Composable private fun DiscussionReadingCard(discussion: DoctorOverviewDiscussion, highlighted: Boolean) {
-    var expanded by remember(discussion) { mutableStateOf(false) }
     val fields = listOf("What matters to the patient" to discussion.priorities, "Who participated" to discussion.participants, "What was discussed" to discussion.topics, "Questions and concerns" to discussion.questions, "Still undecided" to discussion.undecided, "Next steps" to discussion.nextSteps)
-    val summary = listOf(discussion.topics, discussion.priorities, discussion.questions, discussion.nextSteps, discussion.sourceText).firstOrNull { it.isNotBlank() }.orEmpty()
     Surface(color = if (highlighted) SaharaApricot else Paper, shape = RoundedCornerShape(if (highlighted) 20.dp else 16.dp), border = if (highlighted) null else BorderStroke(1.dp, Ink.copy(alpha = .12f)), modifier = Modifier.fillMaxWidth().testTag("conversation-card-${discussion.id}")) {
         Column(Modifier.padding(if (highlighted) 20.dp else 18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(if (discussion.isPublishedPreview) "Care Note · Version ${discussion.versionNumber}" else "Original sample discussion", fontSize = 20.sp, lineHeight = 27.sp, fontWeight = FontWeight.SemiBold, color = Ink)
             Text(conversationDate(discussion.publishedAt), fontSize = 14.sp, lineHeight = 20.sp, color = Ink.copy(alpha = .75f))
             Text(if (discussion.isPublishedPreview) "Self-entered reviewer: ${discussion.reviewerName ?: "Name not recorded"} · identity not verified" else "Author not recorded · fictional sample", fontSize = 14.sp, lineHeight = 20.sp, color = Ink.copy(alpha = .75f))
-            if (!expanded) Text(summary, fontSize = 18.sp, lineHeight = 26.sp, color = Ink, maxLines = if (highlighted) 4 else 3, overflow = TextOverflow.Ellipsis)
-            TextButton(onClick = { expanded = !expanded }, modifier = Modifier.heightIn(min = 48.dp).testTag("conversation-expand-${discussion.id}")) {
-                Text(if (expanded) "Close discussion" else "Read full discussion", fontSize = 16.sp)
-            }
-            if (expanded) {
+            Column(Modifier.testTag("conversation-expand-${discussion.id}"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 if (discussion.isPublishedPreview) {
                     fields.filter { it.second.isNotBlank() }.forEach { (label, value) ->
                         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {

@@ -86,7 +86,6 @@ val Peach = Color(0xFFFFD1B3)
     var dialog by rememberSaveable { mutableStateOf("") }
     var medicineScanner by rememberSaveable { mutableStateOf(false) }
     var medicineScannerPerson by rememberSaveable { mutableStateOf("") }
-    var personMenu by remember { mutableStateOf(false) }
     var reading by remember { mutableStateOf<CareVersion?>(null) }
     val feedbackAccountScope = vm.cloud?.session?.value?.userId ?: "guest-patient"
     var feedbackOpen by rememberSaveable(feedbackAccountScope) { mutableStateOf(false) }
@@ -126,22 +125,18 @@ val Peach = Color(0xFFFFD1B3)
         Row(Modifier.statusBarsPadding().fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
             Image(painterResource(R.drawable.sahara_professional_logo), null, Modifier.size(44.dp), contentScale = ContentScale.Fit)
             Spacer(Modifier.width(4.dp))
-            Box(Modifier.weight(1f)) {
-                Column(Modifier.clip(RoundedCornerShape(12.dp)).clickable(enabled = person != null && !activeRecording) { personMenu = true }.padding(vertical = 8.dp, horizontal = 2.dp)) {
+            Column(Modifier.weight(1f).padding(vertical = 8.dp, horizontal = 2.dp)) {
                     Text(androidx.compose.ui.res.stringResource(R.string.app_name), fontFamily = FontFamily.Serif, fontSize = 22.sp)
-                    if (person != null) Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(person.name, color = Rust, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
-                        Icon(Icons.Default.ExpandMore, "Choose person", tint = Rust, modifier = Modifier.size(20.dp))
-                    }
-                }
-                DropdownMenu(expanded = personMenu, onDismissRequest = { personMenu = false }) {
-                    people.forEach { p -> DropdownMenuItem(text = { Text(p.name) }, onClick = { vm.select(p.id); reading = null; personMenu = false }) }
-                    DropdownMenuItem(text = { Text("Add someone") }, onClick = { personMenu = false; dialog = "person" })
-                }
             }
             if (person != null) IconButton(onClick = { if (activeRecording) vm.stopRecording(); tab = 5 }) { Icon(Icons.Default.FolderOpen, "Documents", tint = if (tab == 5) Rust else Ink) }
             if (person == null) OutlinedButton(onClick = { sharedWorkspaceOpen = true }, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-workspace-entry")) { Text("Doctor workspace") }
-            else CareRoleMenu(role, enabled = !activeRecording) { vm.role(it) }
+        }
+        if (person != null) {
+            Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                people.forEach { p -> FilterChip(selected = p.id == selected, onClick = { vm.select(p.id); reading = null }, enabled = !activeRecording, label = { Text(p.name) }, modifier = Modifier.heightIn(min = 48.dp).testTag("person-${p.id}")) }
+                AssistChip(onClick = { dialog = "person" }, enabled = !activeRecording, label = { Text("Add someone") }, leadingIcon = { Icon(Icons.Default.PersonAdd, null, Modifier.size(18.dp)) }, modifier = Modifier.heightIn(min = 48.dp))
+            }
+            Box(Modifier.padding(horizontal = 16.dp)) { CareRoleMenu(role, enabled = !activeRecording) { vm.role(it) } }
         }
         HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = .15f))
         }
@@ -335,6 +330,9 @@ val Peach = Color(0xFFFFD1B3)
                             onTranscribe = { consent?.let { vm.transcribeAudio(file.absolutePath, it) } },
                             onDelete = { vm.deleteAudio(file.absolutePath) },
                         )
+                        OfflineConversationTranscription(file = file, identity = "${vm.accountNamespace}:${draft.personId}", consent = consent,
+                            enabled = !busy && !dictating && !recording && draft.source.isBlank(),
+                            onUse = { vm.useOfflineTranscript(file.absolutePath, it) })
                         if (vm.cloud != null && BuildConfig.CLOUD_AUDIO_ENABLED) CareRemoteTranscriptPanel(
                             source = draft.source, identity = draft.personId, recording = file, recordingConsent = consent,
                             token = { vm.cloud.transcriptionToken() }, onSaveConsent = vm::rememberTranscriptionConsent,
@@ -346,7 +344,7 @@ val Peach = Color(0xFFFFD1B3)
                         )
                     }
                     item { if (dictating) SurfaceCard { Text("Conversation", fontWeight = FontWeight.Bold); SelectionContainerText(draft.source); Text("Finish this turn to edit the conversation.", style = MaterialTheme.typography.bodySmall) }
-                        else CareField(value = draft.source, onValueChange = { if (it.length <= NoteRules.MAX_SOURCE_CHARS) { val current = vm.draft.value; if (current.personId == draft.personId) vm.edit(current.copy(source = it)) } }, label = "Conversation transcript", placeholder = if (BuildConfig.CLOUD_AUDIO_ENABLED) "Speak, transcribe a consented recording, or type what was said…" else "Speak one turn or type what was said…", minLines = 5, supporting = if (draft.transcribedAt > 0) "AI transcript · ${draft.transcriptModel}. Check every word against the audio." else "") }
+                        else CareField(value = draft.source, onValueChange = { if (it.length <= NoteRules.MAX_SOURCE_CHARS) { val current = vm.draft.value; if (current.personId == draft.personId) vm.edit(current.copy(source = it)) } }, label = "Conversation transcript", placeholder = "Speak a turn, transcribe a saved recording, or type in Hindi or English…", minLines = 5, supporting = if (draft.transcribedAt > 0) "Transcript · ${draft.transcriptModel}. Check names, numbers and meaning against the audio." else "") }
                     item { Button(onClick = { nextStep(1) }, enabled = draft.source.isNotBlank() && !recording && !dictating, modifier = Modifier.fillMaxWidth()) { Text("Choose words and review"); Spacer(Modifier.width(8.dp)); Icon(Icons.AutoMirrored.Filled.ArrowForward, null) } }
                 }
                 1 -> {
@@ -485,8 +483,8 @@ val Peach = Color(0xFFFFD1B3)
             } }
             item { CareReadAloudControl(NoteRules.labels.zip(NoteRules.values(note)).filter { it.second.isNotBlank() }.joinToString("\n\n") { "${it.first}. ${it.second}" }, note.id) }
             items(NoteRules.labels.zip(NoteRules.values(note))) { (label, value) -> SurfaceCard(if (label == "What matters") Gold else Paper) { Text(label, fontWeight = FontWeight.Bold); Spacer(Modifier.height(8.dp)); SelectionContainerText(value.ifBlank { "Not recorded" }); CareSourceLinks(note.source, value) } }
-            item { var open by remember { mutableStateOf(false) }; TextButton(onClick = { open = !open }) { Text(if (open) "Hide original conversation" else "Read original conversation") }; if (open) SelectionContainerText(note.source) }
-            if (vm.cloud != null) item { CareTranslationPanel(source = note.source, versionId = note.id, token = { vm.cloud.transcriptionToken() }) }
+            item { SurfaceCard { Text("Original conversation", fontWeight = FontWeight.Bold); Spacer(Modifier.height(8.dp)); SelectionContainerText(note.source) } }
+            item { CareOfflineTranslationPanel(source = NoteRules.labels.zip(NoteRules.values(note)).filter { it.second.isNotBlank() }.joinToString("\n\n") { "${it.first}\n${it.second}" }, versionId = note.id) }
             items(confirmations, key = { it.id }) { confirmation -> SurfaceCard(if (confirmation.relationship == "Patient") Sage else Mint) {
                 Text(if (confirmation.relationship == "Patient") "Patient confirmed this version" else "Family / carer confirmation", fontWeight = FontWeight.Bold)
                 Text("${confirmation.name} · ${date(confirmation.at)}")
@@ -507,16 +505,14 @@ val Peach = Color(0xFFFFD1B3)
 
 @Composable fun CareList(vm: CareModel, onAdd: (String) -> Unit, onScanPrescription: () -> Unit, onCalendar: () -> Unit = {}, onWorkflow: () -> Unit = {}, onLabs: () -> Unit = {}) {
     val entries by vm.items.collectAsStateWithLifecycle(); var filter by rememberSaveable { mutableStateOf("All") }
-    var adding by remember { mutableStateOf(false) }
     val kinds = linkedMapOf("Medicines" to "medicine", "Visits" to "visit", "To do" to "task", "Check-ins" to "checkin", "Journal" to "journal")
     LazyColumn(Modifier.fillMaxSize().testTag("care-list"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Heading("Daily care", 30); Spacer(Modifier.weight(1f))
-            Box {
-                FilledTonalButton(onClick = { kinds[filter]?.let { if (it == "medicine") onScanPrescription() else onAdd(it) } ?: run { adding = true } }, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.filledTonalButtonColors(containerColor = Gold, contentColor = Ink)) { Icon(Icons.Default.Add, null, Modifier.size(19.dp)); Spacer(Modifier.width(6.dp)); Text("Add") }
-                DropdownMenu(expanded = adding, onDismissRequest = { adding = false }) {
-                    kinds.forEach { (label, kind) -> DropdownMenuItem(text = { Text(label) }, leadingIcon = { Icon(careIcon(kind), null) }, onClick = { adding = false; if (kind == "medicine") onScanPrescription() else onAdd(kind) }) }
-                }
+        } }
+        item { FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            kinds.filter { filter == "All" || it.key == filter }.forEach { (label, kind) ->
+                AssistChip(onClick = { if (kind == "medicine") onScanPrescription() else onAdd(kind) }, label = { Text("Add ${when (kind) { "medicine" -> "medicine"; "visit" -> "visit"; "task" -> "task"; "checkin" -> "check-in"; else -> "note" }}") }, leadingIcon = { Icon(careIcon(kind), null, Modifier.size(18.dp)) }, modifier = Modifier.heightIn(min = 48.dp))
             }
         } }
         item { DailyCareShortcuts(onCalendar, onWorkflow, onLabs) }
@@ -530,7 +526,7 @@ val Peach = Color(0xFFFFD1B3)
         if (filtered.isEmpty()) item { SurfaceCard {
             Icon(careIcon(kinds[filter] ?: "task"), null, Modifier.size(32.dp), tint = Rust)
             Spacer(Modifier.height(12.dp)); Text(if (filter == "All") "Nothing added yet" else "No ${filter.lowercase()} yet", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
-            TextButton(onClick = { kinds[filter]?.let(onAdd) ?: run { adding = true } }, contentPadding = PaddingValues(top = 10.dp, bottom = 4.dp)) { Icon(Icons.Default.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(if (filter == "Medicines") "Add manually" else "Add an entry") }
+            if (filter != "All") TextButton(onClick = { kinds[filter]?.let(onAdd) }, contentPadding = PaddingValues(top = 10.dp, bottom = 4.dp)) { Icon(Icons.Default.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(if (filter == "Medicines") "Add manually" else "Add an entry") }
         } }
         items(filtered, key = { it.id }) { Box(Modifier.animateItem()) { CareRow(it, vm) } }
     }
@@ -541,44 +537,50 @@ val Peach = Color(0xFFFFD1B3)
     val busy by vm.busy.collectAsStateWithLifecycle()
     var delete by remember { mutableStateOf(false) }
     var editing by remember { mutableStateOf(false) }
-    var menu by remember { mutableStateOf(false) }
     val done = if (item.kind == "medicine") item.doneOn == LocalDate.now().toString() else item.doneOn.isNotBlank()
     val color by animateColorAsState(if (done) Color(0xFFE7EED6) else Paper, tween(180), label = "care completed")
     SurfaceCard(color) { Row(verticalAlignment = Alignment.CenterVertically) {
         if (item.kind in listOf("medicine", "task")) Checkbox(checked = done, onCheckedChange = { vm.toggle(item) }, enabled = canEdit && !busy)
         else Surface(shape = RoundedCornerShape(12.dp), color = if (item.kind == "visit") Mint else Peach, modifier = Modifier.padding(end = 12.dp)) { Icon(careIcon(item.kind), null, tint = Ink, modifier = Modifier.padding(10.dp).size(22.dp)) }
         Column(Modifier.weight(1f)) { Text(item.title, fontWeight = FontWeight.SemiBold); if (item.due > 0) Text(date(item.due), color = Rust, fontSize = 13.sp); if (item.detail.isNotBlank()) Text(item.detail, style = MaterialTheme.typography.bodyMedium); if (item.kind in listOf("checkin", "journal")) Text(date(item.created), style = MaterialTheme.typography.bodySmall) }
-        Box {
-            IconButton(onClick = { menu = true }, enabled = canEdit && !busy) { Icon(Icons.Default.MoreHoriz, "Options for ${item.title}", Modifier.size(22.dp)) }
-            DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
-                DropdownMenuItem(text = { Text("Edit") }, leadingIcon = { Icon(Icons.Default.Edit, null) }, onClick = { menu = false; editing = true })
-                DropdownMenuItem(text = { Text("Remove") }, leadingIcon = { Icon(Icons.Default.DeleteOutline, null) }, onClick = { menu = false; delete = true })
-            }
+    }
+        if (canEdit) FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            TextButton(onClick = { editing = true }, enabled = !busy, modifier = Modifier.testTag("care-edit-${item.id}")) { Icon(Icons.Default.Edit, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Edit") }
+            TextButton(onClick = { delete = true }, enabled = !busy, modifier = Modifier.testTag("care-remove-${item.id}")) { Icon(Icons.Default.DeleteOutline, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Remove") }
         }
-    } }
+    }
     if (delete) AlertDialog(onDismissRequest = { delete = false }, title = { Text("Remove this entry?") }, text = { Text(item.title) }, confirmButton = { TextButton(onClick = { vm.remove(item); delete = false }) { Text("Remove") } }, dismissButton = { TextButton(onClick = { delete = false }) { Text("Keep") } })
     if (editing) AddCareItem(item.kind, vm, onDismiss = { editing = false }, initial = item)
 }
 
 @Composable fun Nearby(centres: List<Centre>) {
     var search by rememberSaveable { mutableStateOf("") }; var service by rememberSaveable { mutableStateOf("All") }; var morphine by rememberSaveable { mutableStateOf(false) }
-    var showMap by rememberSaveable { mutableStateOf(true) }
+    var view by rememberSaveable { mutableStateOf("Map & list") }
+    var state by rememberSaveable { mutableStateOf("All India") }
     var chosen by remember { mutableStateOf<Centre?>(null) }
-    val visible = centres.filter { c -> "${c.name} ${c.city} ${c.district} ${c.address}".contains(search.trim(), true) && (service == "All" || c.services.contains(service)) && (!morphine || c.morphine == "available") }
+    val states = remember(centres) { centres.map { it.state }.filter(String::isNotBlank).distinct().sorted() }
+    val visible = remember(centres, search, service, morphine, state) { centres.filter { c ->
+        "${c.name} ${c.city} ${c.district} ${c.address} ${c.state}".contains(search.trim(), true) &&
+            (state == "All India" || c.state == state) && (service == "All" || c.services.contains(service, ignoreCase = true)) && (!morphine || c.sourceListedMorphine == "available")
+    } }
     LazyColumn(Modifier.fillMaxSize().testTag("nearby-list"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
         item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Column(Modifier.weight(1f)) { Heading("Find care"); Text("Karnataka · ${visible.size} ${if (visible.size == 1) "centre" else "centres"}", color = Rust) }
-            IconButton(onClick = { showMap = !showMap }) { Icon(if (showMap) Icons.AutoMirrored.Filled.ListAlt else Icons.Default.Map, if (showMap) "Show list only" else "Show map") }
+            Column(Modifier.weight(1f)) { Heading("Find care"); Text("$state · ${visible.size} ${if (visible.size == 1) "centre" else "centres"}", color = Rust) }
         } }
         item { OutlinedTextField(value = search, onValueChange = { search = it }, placeholder = { Text("Place or hospital") }, leadingIcon = { Icon(Icons.Default.Search, null) }, trailingIcon = { if (search.isNotEmpty()) IconButton(onClick = { search = "" }) { Icon(Icons.Default.Close, "Clear search") } }, shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth(), singleLine = true) }
+        item { Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) { (listOf("All India") + states).forEach { option -> FilterChip(selected = state == option, onClick = { state = option }, label = { Text(option) }, modifier = Modifier.heightIn(min = 48.dp)) } } }
         item { Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf("All", "Home care", "Clinic visits", "Inpatient care").forEach { s -> FilterChip(selected = service == s, onClick = { service = s }, label = { Text(s) }) } } }
-        item { FilterChip(selected = morphine, onClick = { morphine = !morphine }, label = { Text("Morphine listed") }, leadingIcon = { Icon(Icons.Default.Medication, null, Modifier.size(18.dp)) }); Text("Pallium India · checked 2 Oct 2026. Call to confirm.", style = MaterialTheme.typography.bodySmall) }
-        if (showMap && visible.isNotEmpty()) item {
-            Column(Modifier.clip(RoundedCornerShape(20.dp))) { CentreMap(visible) { chosen = it } }
+        item { FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            listOf("Map & list", "List").forEach { option -> FilterChip(selected = view == option, onClick = { view = option }, label = { Text(option) }, modifier = Modifier.heightIn(min = 48.dp)) }
+            FilterChip(selected = morphine, onClick = { morphine = !morphine }, label = { Text("Morphine listed") }, leadingIcon = { Icon(Icons.Default.Medication, null, Modifier.size(18.dp)) }, modifier = Modifier.heightIn(min = 48.dp))
+        }; Text("Directory listings. Call to confirm services, availability and cost.", style = MaterialTheme.typography.bodySmall) }
+        if (view == "Map & list" && visible.isNotEmpty()) item {
             val located = visible.count { it.latitude != null && it.longitude != null }
+            if (located > 0) Column(Modifier.clip(RoundedCornerShape(20.dp))) { CentreMap(visible) { chosen = it } }
+            else Text("Use the published addresses and Directions below. This source has no exact map locations for this filter.", style = MaterialTheme.typography.bodySmall)
             if (located < visible.size) Text("$located mapped · ${visible.size - located} addresses in the list", style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 6.dp))
         }
-        if (visible.isEmpty()) item { SurfaceCard { Text("No centres match that search."); TextButton(onClick = { search = ""; service = "All"; morphine = false }) { Text("Clear filters") } } }
+        if (visible.isEmpty()) item { SurfaceCard { Text("No centres match that search."); TextButton(onClick = { search = ""; service = "All"; state = "All India"; morphine = false }) { Text("Clear filters") } } }
         items(visible, key = { it.id }) { c -> CentreCard(c) }
     }
     chosen?.let { centre -> ModalBottomSheet(onDismissRequest = { chosen = null }, containerColor = Cream) {
@@ -589,11 +591,12 @@ val Peach = Color(0xFFFFD1B3)
 @Composable fun CentreCard(c: Centre) {
     val context = LocalContext.current
     SurfaceCard {
-            Text(c.city.uppercase(), color = Rust, fontSize = 11.sp, letterSpacing = 1.sp); Spacer(Modifier.height(6.dp)); Text(c.name, fontSize = 19.sp, fontWeight = FontWeight.SemiBold)
+            Text(listOf(c.city, c.state).filter(String::isNotBlank).distinct().joinToString(" · "), color = Rust, style = MaterialTheme.typography.labelMedium); Spacer(Modifier.height(6.dp)); Text(c.name, fontSize = 19.sp, fontWeight = FontWeight.SemiBold)
             Spacer(Modifier.height(8.dp)); Text(c.services, style = MaterialTheme.typography.bodySmall); Text(c.address, style = MaterialTheme.typography.bodyMedium)
-            if (c.morphine == "available") Text("Morphine listed · stock not confirmed", fontSize = 12.sp, color = Color(0xFF465E45), modifier = Modifier.padding(top = 8.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                TextButton(onClick = { open(context, Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + c.phone.replace(Regex("[^+0-9]"), "")))) }) { Icon(Icons.Default.Call, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Call") }
+            if (c.sourceListedMorphine == "available") Text("Directory lists morphine · call to confirm", fontSize = 12.sp, color = Color(0xFF465E45), modifier = Modifier.padding(top = 8.dp))
+            Text(listOf(c.sourceName, c.checkedOn.takeIf { it.isNotBlank() }?.let { "Source retrieved $it" }).filterNotNull().filter(String::isNotBlank).joinToString(" · "), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (c.phone.any(Char::isDigit)) TextButton(onClick = { open(context, Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + c.phone.replace(Regex("[^+0-9]"), "")))) }) { Icon(Icons.Default.Call, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Call") }
                 TextButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com/maps/search/?api=1&query=" + Uri.encode(c.name + " " + c.address)))) }) { Text("Directions") }
                 TextButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse(c.url))) }) { Text("Source") }
             }
@@ -627,7 +630,7 @@ val Peach = Color(0xFFFFD1B3)
         item { DetailPanel("About", Icons.Default.Info) {
             Text(androidx.compose.ui.res.stringResource(R.string.app_full_name))
             Spacer(Modifier.height(10.dp)); Text("Your doctor guides treatment. Selecting a role does not verify identity. Only independently approved, invited accounts can publish a verified review online.")
-            Spacer(Modifier.height(10.dp)); Text("Dictate a speaker's turn on supported phones, then check the words. Online AI requires a configured service and separate consent. Read aloud uses an installed voice.")
+            Spacer(Modifier.height(10.dp)); Text("Dictate a speaker's turn or transcribe a recording with the downloaded Hindi/English pack, then check the words. Hindi/English reading uses Google Translate on-device models. Read aloud uses a downloaded voice.")
             Spacer(Modifier.height(12.dp)); Text("Version ${BuildConfig.VERSION_NAME}", style = MaterialTheme.typography.bodySmall)
         } }
         if (owner) item { TextButton(onClick = onDelete) { Icon(Icons.Default.DeleteOutline, null); Spacer(Modifier.width(8.dp)); Text("Remove this person's records") } }
@@ -649,7 +652,6 @@ val Peach = Color(0xFFFFD1B3)
     LaunchedEffect(selected) { if (selected != capturedPerson) onDismiss() }
     var title by rememberSaveable { mutableStateOf(initial?.title ?: "") }; var detail by rememberSaveable { mutableStateOf(initial?.detail ?: "") }; var due by rememberSaveable { mutableLongStateOf(initial?.due ?: 0) }
     val busy by vm.busy.collectAsStateWithLifecycle(); val context = LocalContext.current
-    var extraNote by rememberSaveable { mutableStateOf(initial?.detail?.isNotBlank() == true) }
     val headings = mapOf("medicine" to "Add a medicine", "visit" to "Add a visit", "task" to "Add a task", "checkin" to "How is today?", "journal" to "Write a note")
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(start = 22.dp, end = 22.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -657,16 +659,12 @@ val Peach = Color(0xFFFFD1B3)
             if (kind == "checkin") {
                 val moods = listOf(Triple("A good day", Icons.Default.SentimentSatisfiedAlt, Sage), Triple("An okay day", Icons.Default.SentimentNeutral, Gold), Triple("A hard day", Icons.Default.SentimentDissatisfied, Peach))
                 moods.forEach { (mood, icon, tint) -> ChoiceRow(mood, icon, tint, title == mood) { title = mood } }
-                TextButton(onClick = { extraNote = !extraNote }) { Icon(if (extraNote) Icons.Default.ExpandLess else Icons.Default.Add, null); Spacer(Modifier.width(6.dp)); Text(if (extraNote) "Hide note" else "Add a note") }
-                AnimatedVisibility(extraNote, enter = expandVertically(tween(180)) + fadeIn(tween(180)), exit = shrinkVertically(tween(150)) + fadeOut(tween(150))) {
-                    CareField(value = detail, onValueChange = { detail = it.take(4000) }, label = "Anything to add?", minLines = 2)
-                }
+                CareField(value = detail, onValueChange = { detail = it.take(4000) }, label = "Anything to add? (optional)", minLines = 2)
             } else if (kind == "journal" && initial == null) {
                 CareField(value = detail, onValueChange = { detail = it.take(4000); title = it.lineSequence().firstOrNull { line -> line.isNotBlank() }.orEmpty().take(80) }, label = "Your note", minLines = 4)
             } else {
                 CareField(value = title, onValueChange = { title = it.take(200) }, label = when (kind) { "medicine" -> "Medicine name"; "visit" -> "Doctor or hospital"; "task" -> "What needs doing?"; else -> "Title" }, singleLine = kind != "task")
-                if (kind == "medicine" || kind == "journal" || extraNote) CareField(value = detail, onValueChange = { detail = it.take(4000) }, label = when (kind) { "medicine" -> "Dose and times, as prescribed"; "visit" -> "Time, place and questions"; "task" -> "Details (optional)"; else -> "Your note" }, minLines = if (kind == "journal") 4 else 2)
-                if (kind in listOf("task", "visit")) TextButton(onClick = { extraNote = !extraNote }) { Text(if (extraNote) "Hide details" else "Add details") }
+                CareField(value = detail, onValueChange = { detail = it.take(4000) }, label = when (kind) { "medicine" -> "Dose and times, as prescribed"; "visit" -> "Time, place and questions (optional)"; "task" -> "Details (optional)"; else -> "Your note" }, minLines = if (kind == "journal") 4 else 2)
             }
             if (kind == "visit") Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 listOf("Today" to 0L, "Tomorrow" to 1L).forEach { (label, days) -> val day = LocalDate.now().plusDays(days).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli(); FilterChip(selected = due == day, onClick = { due = day }, label = { Text(label) }) }

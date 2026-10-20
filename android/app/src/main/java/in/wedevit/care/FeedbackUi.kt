@@ -58,7 +58,6 @@ import androidx.compose.ui.unit.sp
     var error by remember { mutableStateOf(store.error()) }
     var help by remember { mutableStateOf(false) }
     var discard by remember { mutableStateOf(false) }
-    var noteExpanded by rememberSaveable(accountScope, surface) { mutableStateOf(initial?.note?.isNotBlank() == true) }
     val dirty = score != savedScore || note != savedNote
     val close = { focus.clearFocus(); if (dirty) discard = true else onClose() }
     BackHandler { close() }
@@ -89,8 +88,7 @@ import androidx.compose.ui.unit.sp
                 TextButton(onClick = { score = value; saved = false; error = null }, contentPadding = PaddingValues(horizontal = 8.dp), modifier = Modifier.heightIn(min = 48.dp)) { Text(name, color = if (label == name) Rust else Ink.copy(alpha = .75f), fontWeight = if (label == name) FontWeight.Bold else FontWeight.Normal) }
             }
         }
-        TextButton(onClick = { noteExpanded = !noteExpanded; focus.clearFocus() }, modifier = Modifier.heightIn(min = 48.dp).testTag("feedback-add-note")) { Text(if (noteExpanded) "Hide note" else if (note.isBlank()) "Add a note (optional)" else "Edit your note", color = Rust) }
-        if (noteExpanded) OutlinedTextField(value = note, onValueChange = { if (it.length <= FeedbackRules.noteLimit) { note = it; saved = false; error = null } }, label = { Text("Anything to add? (optional)") }, placeholder = { Text("What felt easy, or what could be clearer?") }, supportingText = { Text("App feedback only. Don't include private health information. ${note.length}/500", fontSize = 12.sp) }, minLines = 2, maxLines = 5, modifier = Modifier.fillMaxWidth().testTag("feedback-note"), shape = RoundedCornerShape(18.dp), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Rust, focusedLabelColor = Rust, cursorColor = Rust, unfocusedBorderColor = Ink.copy(alpha = .25f), focusedContainerColor = Paper.copy(alpha = .7f), unfocusedContainerColor = Paper.copy(alpha = .55f)))
+        OutlinedTextField(value = note, onValueChange = { if (it.length <= FeedbackRules.noteLimit) { note = it; saved = false; error = null } }, label = { Text("Anything to add? (optional)") }, placeholder = { Text("What felt easy, or what could be clearer?") }, supportingText = { Text("App feedback only. Don't include private health information. ${note.length}/500", fontSize = 12.sp) }, minLines = 2, maxLines = 5, modifier = Modifier.fillMaxWidth().testTag("feedback-note"), shape = RoundedCornerShape(18.dp), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Rust, focusedLabelColor = Rust, cursorColor = Rust, unfocusedBorderColor = Ink.copy(alpha = .25f), focusedContainerColor = Paper.copy(alpha = .7f), unfocusedContainerColor = Paper.copy(alpha = .55f)))
         Spacer(Modifier.height(8.dp))
         error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.fillMaxWidth().semantics { liveRegion = LiveRegionMode.Polite }); Spacer(Modifier.height(8.dp)) }
         Button(onClick = { focus.clearFocus(); error = store.save(score, note); if (error == null) { saved = true; savedScore = score; savedNote = note } }, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("feedback-save"), shape = RoundedCornerShape(18.dp), colors = ButtonDefaults.buttonColors(containerColor = Rust, contentColor = Color.White)) {

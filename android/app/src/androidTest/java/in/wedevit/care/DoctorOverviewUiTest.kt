@@ -38,34 +38,29 @@ class DoctorOverviewUiTest {
         ui.onNodeWithTag("overview-clinical-assessment").assertTextEquals("Clinical assessment: Not recorded")
         ui.onNodeWithTag("overview-previous-professional").assertIsDisplayed()
         screenshot("doctor-overview-normal")
-        click("overview-source-demo-asha-latest")
-        ui.onNodeWithTag("overview-source-text").assertTextEquals("Exact fictional source for demo-asha-latest.")
+        ui.onNodeWithTag("overview-source-text-demo-asha-latest").performScrollTo().assertTextEquals("Exact fictional source for demo-asha-latest.")
         ui.onNodeWithText("Old preference must not be invented").assertDoesNotExist()
         screenshot("doctor-overview-latest-source")
-        click("overview-history-toggle")
+        ui.onNodeWithTag("overview-history-toggle").performScrollTo().assertExists()
         ui.onNodeWithTag("overview-history-demo-asha-latest").assertDoesNotExist()
-        click("overview-history-demo-asha-older")
-        ui.onNodeWithTag("overview-source-text").assertTextEquals("Exact fictional source for demo-asha-older.")
+        ui.onNodeWithTag("overview-source-text-demo-asha-older").performScrollTo().assertTextEquals("Exact fictional source for demo-asha-older.")
         listOf("overview-progress", "overview-reports", "demo-schedule-visit", "overview-conversations").forEach(::click)
         assertEquals(listOf("Progress", "Reports", "Schedule", "Conversations"), actions)
     }
 
-    @Test fun largeTextOverviewKeepsUnknownFieldsAndResetsExpandedSourcesWhenPatientChanges() {
+    @Test fun largeTextOverviewKeepsUnknownFieldsAndVisibleSourcesFollowPatientChanges() {
         val model = mutableStateOf(overview())
         render(model, 1.5f, mutableListOf())
         ui.onNodeWithTag("overview-last-discussion").performScrollTo().assertExists()
-        click("overview-discussion-details-toggle")
+        ui.onNodeWithTag("overview-discussion-details-toggle").performScrollTo().assertExists()
         ui.onNode(hasText("What matters to the patient")).assertExists()
         ui.onAllNodes(hasText("Not recorded") and hasAnyAncestor(hasTestTag("overview-last-discussion"))).assertCountEquals(4)
-        click("overview-source-demo-asha-latest")
-        click("overview-history-toggle")
+        ui.onNodeWithTag("overview-source-text-demo-asha-latest").performScrollTo().assertExists()
         ui.runOnIdle { model.value = overview("demo-ravi") }
-        ui.onNodeWithTag("overview-source-text").assertDoesNotExist()
-        ui.onNodeWithTag("overview-history-demo-ravi-older").assertDoesNotExist()
-        click("overview-source-demo-ravi-latest")
-        ui.onNodeWithTag("overview-source-text").assertTextEquals("Exact fictional source for demo-ravi-latest.")
+        ui.onNodeWithTag("overview-source-text-demo-asha-latest").assertDoesNotExist()
+        ui.onNodeWithTag("overview-history-demo-ravi-older").assertExists()
+        ui.onNodeWithTag("overview-source-text-demo-ravi-latest").performScrollTo().assertTextEquals("Exact fictional source for demo-ravi-latest.")
         ui.onNodeWithText("Exact fictional source for demo-asha-latest.").assertDoesNotExist()
-        ui.onNodeWithTag("overview-source-demo-ravi-latest").assertHeightIsAtLeast(48.dp)
         ui.onNodeWithTag("overview-previous-professional").performScrollTo()
         screenshot("doctor-overview-large-text-handover")
         ui.runOnIdle { model.value = DoctorOverviewData.build("demo-ravi", emptyList(), emptyList(), now)!! }
@@ -78,7 +73,7 @@ class DoctorOverviewUiTest {
             val wrapped=version("demo-ravi","short-wrapped",3)
             model.value=DoctorOverviewData.build("demo-ravi",listOf(wrapped.copy(draft=wrapped.draft.copy(topics=shortWrappingText))),emptyList(),now)!!
         }
-        ui.onNodeWithText("Read full field").performScrollTo().assertHeightIsAtLeast(48.dp).performClick()
+        ui.onNodeWithText("Read full field").assertDoesNotExist()
         val layouts=mutableListOf<androidx.compose.ui.text.TextLayoutResult>()
         ui.onNodeWithText(shortWrappingText).performScrollTo().performSemanticsAction(SemanticsActions.GetTextLayoutResult) {it(layouts)}
         assertTrue(layouts.single().lineCount>4)

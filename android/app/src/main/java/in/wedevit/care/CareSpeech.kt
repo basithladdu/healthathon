@@ -37,10 +37,10 @@ import java.util.Locale
 
 data class CareSpeechLanguage(val tag: String, val label: String)
 val careSpeechLanguages = listOf(
-    CareSpeechLanguage("en-IN", "English"), CareSpeechLanguage("hi-IN", "हिन्दी"),
+    CareSpeechLanguage("hi-IN", "हिन्दी"), CareSpeechLanguage("en-IN", "English"),
     CareSpeechLanguage("kn-IN", "ಕನ್ನಡ"), CareSpeechLanguage("te-IN", "తెలుగు"),
     CareSpeechLanguage("ta-IN", "தமிழ்"), CareSpeechLanguage("ml-IN", "മലയാളം"),
-    CareSpeechLanguage("ur-IN", "اردو")
+    CareSpeechLanguage("ur-IN", "اردو"), CareSpeechLanguage("hi-en", "हिन्दी + English")
 )
 
 private class CareDictation(private val context: Context, val changed: () -> Unit, val preview: (String) -> Unit, val result: (String) -> Boolean) {
@@ -99,6 +99,7 @@ private class CareDictation(private val context: Context, val changed: () -> Uni
     fun start(language: String) {
         if (disposed || accepting) return
         if (!available) return
+        if (language == "hi-en" && Build.VERSION.SDK_INT < 34) { status = "For Hindi + English together, transcribe a saved recording below. This phone's dictation supports one language per turn."; changed(); return }
         val turn = ++generation
         accepting = true; listening = true; processing = false; partial = ""; level = 0f; status = "Starting microphone…"; changed()
         try {
@@ -106,7 +107,13 @@ private class CareDictation(private val context: Context, val changed: () -> Uni
             val next = recognizerFor(turn).also { recognizer = it }
             next.startListening(Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
                 putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-                putExtra(RecognizerIntent.EXTRA_LANGUAGE, language)
+                putExtra(RecognizerIntent.EXTRA_LANGUAGE, if (language == "hi-en") "hi-IN" else language)
+                if (language == "hi-en" && Build.VERSION.SDK_INT >= 34) {
+                    putExtra(RecognizerIntent.EXTRA_ENABLE_LANGUAGE_DETECTION, true)
+                    putExtra(RecognizerIntent.EXTRA_ENABLE_LANGUAGE_SWITCH, RecognizerIntent.LANGUAGE_SWITCH_BALANCED)
+                    putStringArrayListExtra(RecognizerIntent.EXTRA_LANGUAGE_DETECTION_ALLOWED_LANGUAGES, arrayListOf("hi-IN", "en-IN"))
+                    putStringArrayListExtra(RecognizerIntent.EXTRA_LANGUAGE_SWITCH_ALLOWED_LANGUAGES, arrayListOf("hi-IN", "en-IN"))
+                }
                 putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
                 putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
                 putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true)
@@ -130,7 +137,7 @@ private class CareDictation(private val context: Context, val changed: () -> Uni
     val context = LocalContext.current
     val owner = LocalLifecycleOwner.current
     var revision by remember { mutableIntStateOf(0) }
-    var languageTag by rememberSaveable(personId) { mutableStateOf("en-IN") }
+    var languageTag by rememberSaveable(personId) { mutableStateOf("hi-IN") }
     var speaker by rememberSaveable(personId) { mutableStateOf("Patient") }
     var consent by rememberSaveable(personId) { mutableStateOf(false) }
     var showConsent by remember { mutableStateOf(false) }
@@ -165,7 +172,8 @@ private class CareDictation(private val context: Context, val changed: () -> Uni
         Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(7.dp)) {
             listOf("Patient", "Family / carer", "Doctor").forEach { role -> FilterChip(selected = speaker == role, onClick = { speaker = role }, enabled = !active, label = { Text(role) }) }
         }
-        CareLanguageMenu(languageTag, enabled = !active) { languageTag = it }
+        CareLanguageMenu(languageTag, enabled = !active, includeMixed = true) { languageTag = it }
+        if (languageTag == "hi-en") Text(if (Build.VERSION.SDK_INT >= 34) "Both phone language packs must be installed. If switching is unavailable, use the saved-recording transcript below." else "This phone uses one language per dictation turn. Hindi + English together is available for saved recordings below.", style = MaterialTheme.typography.bodySmall)
         if (dictation.available) {
             if (dictation.processing) LinearProgressIndicator(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp), color = Rust)
             else if (dictation.listening) LinearProgressIndicator(progress = { dictation.level }, modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp), color = Rust)
@@ -201,10 +209,13 @@ private class CareDictation(private val context: Context, val changed: () -> Uni
         dismissButton = { TextButton(onClick = { showConsent = false }) { Text("Cancel") } })
 }
 
-@Composable fun CareLanguageMenu(tag: String, enabled: Boolean = true, onSelect: (String) -> Unit) {
-    var open by remember { mutableStateOf(false) }
-    Box { TextButton(onClick = { open = true }, enabled = enabled) { Icon(Icons.Default.Language, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(careSpeechLanguages.firstOrNull { it.tag == tag }?.label ?: tag); Icon(Icons.Default.ExpandMore, null, Modifier.size(18.dp)) }
-        DropdownMenu(expanded = open, onDismissRequest = { open = false }) { careSpeechLanguages.forEach { language -> DropdownMenuItem(text = { Text(language.label) }, onClick = { onSelect(language.tag); open = false }) } }
+@OptIn(ExperimentalLayoutApi::class)
+@Composable fun CareLanguageMenu(tag: String, enabled: Boolean = true, includeMixed: Boolean = false, onSelect: (String) -> Unit) {
+    FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(7.dp)) {
+        careSpeechLanguages.filter { includeMixed || it.tag != "hi-en" }.forEach { language ->
+            FilterChip(selected = language.tag == tag, onClick = { onSelect(language.tag) }, enabled = enabled,
+                label = { Text(language.label) }, modifier = Modifier.testTag("care-language-${language.tag}"))
+        }
     }
 }
 
@@ -273,8 +284,8 @@ private class CareReadAloud(context: Context, val changed: () -> Unit) {
             FilledTonalButton(onClick = { if (reader.speaking) reader.stop() else reader.read(text, language) }, modifier = Modifier.testTag("note-read-aloud"), colors = ButtonDefaults.filledTonalButtonColors(containerColor = Sage, contentColor = Ink)) {
                 Icon(if (reader.speaking) Icons.Default.Stop else Icons.Default.VolumeUp, null, Modifier.size(18.dp)); Spacer(Modifier.width(7.dp)); Text(if (reader.speaking) "Stop reading" else "Read aloud")
             }
-            Spacer(Modifier.weight(1f)); CareLanguageMenu(language) { language = it }
         }
+        CareLanguageMenu(language) { language = it }
         if (reader.status.isNotBlank()) Text(reader.status, style = MaterialTheme.typography.bodySmall)
         Text("Downloaded voice only; the note's words stay unchanged.", style = MaterialTheme.typography.bodySmall)
     }

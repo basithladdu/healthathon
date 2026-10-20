@@ -16,7 +16,6 @@ import androidx.compose.ui.unit.dp
 
 @Composable fun CareSourcePicker(draft: Conversation, onAssign: (Int, CareSourceLine) -> Unit) {
     var section by rememberSaveable { mutableIntStateOf(0) }
-    var expanded by rememberSaveable { mutableStateOf(false) }
     val lines = remember(draft.source) { CareDraftAssist.lines(draft.source) }
     SurfaceCard(Mint) {
         Text("Build the note from their words", fontWeight = FontWeight.Bold)
@@ -26,7 +25,7 @@ import androidx.compose.ui.unit.dp
             NoteRules.labels.forEachIndexed { index, label -> FilterChip(selected = section == index, onClick = { section = index }, label = { Text(label) }) }
         }
         if (lines.isEmpty()) Text("Add the conversation first.")
-        (if (expanded) lines else lines.take(6)).forEach { line ->
+        lines.forEach { line ->
             HorizontalDivider(color = Ink.copy(alpha = .12f))
             Spacer(Modifier.height(8.dp))
             Text("Line ${line.number}", style = MaterialTheme.typography.labelSmall, color = Rust)
@@ -37,7 +36,6 @@ import androidx.compose.ui.unit.dp
                 Text(if (added) "Added to ${NoteRules.labels[section]}" else "Add to ${NoteRules.labels[section]}")
             }
         }
-        if (lines.size > 6) TextButton(onClick = { expanded = !expanded }) { Text(if (expanded) "Show fewer words" else "Show all ${lines.size} source lines") }
     }
 }
 

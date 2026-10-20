@@ -38,7 +38,6 @@ import kotlinx.coroutines.launch
     var name by rememberSaveable { mutableStateOf("") }
     var council by rememberSaveable { mutableStateOf("") }
     var registration by rememberSaveable { mutableStateOf("") }
-    var verificationOpen by rememberSaveable { mutableStateOf(false) }
     var reading by remember(selected) { mutableStateOf<SharedCareDraft?>(null) }
     val currentPerson by rememberUpdatedState(selected)
     val currentCloud by rememberUpdatedState(cloud)
@@ -75,8 +74,7 @@ import kotlinx.coroutines.launch
                 item { SurfaceCard(Mint) {
                     Text("Clinician verification", fontWeight = FontWeight.Bold)
                     Text(when (profile?.status) { "approved" -> "Registration reviewed. Patient invitation is also required before clinical review."; "pending" -> "Request received. An independent verifier must check your council registration."; "rejected", "suspended" -> "${profile?.status}: ${profile?.note}"; else -> "Your account is not verified as a clinician." })
-                    TextButton(onClick = { verificationOpen = !verificationOpen }) { Text(if (verificationOpen) "Close details" else "${if (profile == null) "Request" else "Update"} verification") }
-                    if (verificationOpen) {
+                    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                         CareField(name, { name = it.take(100) }, "Registered name", singleLine = true)
                         CareField(council, { council = it.take(160) }, "Medical council", singleLine = true)
                         CareField(registration, { registration = it.take(80) }, "Registration number", singleLine = true)

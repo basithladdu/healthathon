@@ -30,7 +30,6 @@ class FeedbackUiTest {
         val store = FeedbackStore(context, scope, "test")
         assertEquals(1f, store.latest()!!.score, .001f)
         assertEquals("", store.latest()!!.note)
-        ui.onNodeWithTag("feedback-add-note").performScrollTo().performClick()
         ui.onNodeWithTag("feedback-note").performScrollTo().performTextInput("Fictional app-interface feedback")
         androidx.test.espresso.Espresso.closeSoftKeyboard()
         ui.onNodeWithTag("feedback-save").performScrollTo().performClick()
@@ -42,8 +41,7 @@ class FeedbackUiTest {
     @Test fun unsavedBackOffersKeepEditingOrLeaveWithoutSaving() = isolated { context, scope ->
         var closed = false
         ui.setContent { CareTheme { FeedbackScreen(scope, "test", onClose = { closed = true }) } }
-        ui.onNodeWithTag("feedback-note").assertDoesNotExist()
-        ui.onNodeWithTag("feedback-add-note").performScrollTo().performClick()
+        ui.onNodeWithTag("feedback-note").performScrollTo().assertIsDisplayed()
         ui.onNodeWithTag("feedback-note").performScrollTo().performTextInput("Unsaved fictional interface note")
         androidx.test.espresso.Espresso.closeSoftKeyboard()
         ui.onNodeWithTag("feedback-close").performScrollTo().performClick()

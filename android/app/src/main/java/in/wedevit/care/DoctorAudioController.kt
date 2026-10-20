@@ -109,7 +109,7 @@ class DoctorAudioController(context:Context,val patientId:String,val accountId:S
         state.value=state.value.copy(durationMs=duration,playbackPositionMs=pendingSeekMs)
     }
     fun stopPlayback() { playbackJob?.cancel();playbackJob=null;playbackClipId=null;pendingSeekClipId=null;pendingSeekMs=0;val current=player;player=null;current?.run { try {runCatching {stop()}}finally {runCatching {release()}} };state.value=state.value.copy(playing=null,playbackPositionMs=0) }
-    fun remove(clip:DoctorAudioClip) { require(owns(clip));if(state.value.recording)return;stopPlayback();val removed=clip.file.delete();if(removed) File(directory,"${clip.id}.json").delete();state.value=state.value.copy(error=if(removed) null else "Recording could not be removed.");refresh() }
+    fun remove(clip:DoctorAudioClip) { require(owns(clip));if(state.value.recording)return;stopPlayback();val removed=clip.file.delete();if(removed) { File(directory,"${clip.id}.json").delete(); File(directory,"${clip.id}.offline-transcript.json").delete() };state.value=state.value.copy(error=if(removed) null else "Recording could not be removed.");refresh() }
     fun release() { stop();stopPlayback();meter?.cancel() }
     fun close() { closed=true;release() }
     private fun refresh() {

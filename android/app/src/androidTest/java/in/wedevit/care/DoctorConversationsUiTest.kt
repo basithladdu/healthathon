@@ -47,37 +47,32 @@ class DoctorConversationsUiTest {
         val originalDraft=state.value.currentDraft
         ui.onNodeWithTag("workflow-open-conversation").performScrollTo().assertHeightIsAtLeast(48.dp).performClick()
         assertEquals(1,continued);assertEquals(originalDraft,state.value.currentDraft)
-        expand("demo-leela-latest")
+        read("demo-leela-latest")
         ui.onNodeWithTag("conversation-source-demo-leela-latest").assertTextEquals(source("demo-leela-latest"))
-        expand("demo-leela-earlier")
+        read("demo-leela-earlier")
         ui.onNodeWithTag("conversation-source-demo-leela-earlier").assertTextEquals(source("demo-leela-earlier"))
         ui.onNodeWithTag("conversation-source-demo-leela-latest").assertTextEquals(source("demo-leela-latest"))
-        expand("demo-leela-prior")
+        read("demo-leela-prior")
         ui.onNodeWithTag("conversation-source-demo-leela-prior").assertTextEquals(state.value.priorSample!!.sourceText)
         ui.onNodeWithText("Date not recorded").assertExists()
         ui.onNodeWithText("Author not recorded · fictional sample").assertExists()
     }
 
-    @Test fun largeTextExactReaderClosesAndResetsForPatientAndSnapshotChanges() {
+    @Test fun largeTextExactReaderStaysVisibleAndFollowsPatientAndSnapshotChanges() {
         val state=mutableStateOf(model());render(state,1.5f) {}
-        expand("demo-leela-latest")
+        read("demo-leela-latest")
         val sourceNode=ui.onNodeWithTag("conversation-source-demo-leela-latest")
         sourceNode.performScrollTo().assertTextEquals(source("demo-leela-latest"))
         val layouts=mutableListOf<TextLayoutResult>()
         sourceNode.performSemanticsAction(SemanticsActions.GetTextLayoutResult) {it(layouts)}
         assertTrue(layouts.single().lineCount>3);assertFalse(layouts.single().multiParagraph.didExceedMaxLines)
-        screenshot("doctor-conversations-expanded-large")
-        expand("demo-leela-latest")
-        sourceNode.assertDoesNotExist()
-        expand("demo-leela-latest")
+        screenshot("doctor-conversations-visible-large")
+        ui.onNodeWithText("Close discussion").assertDoesNotExist()
         ui.runOnIdle {state.value=model(latestSource="Changed fictional source, same version identity.")}
-        ui.onNodeWithTag("conversation-source-demo-leela-latest").assertDoesNotExist()
-        expand("demo-leela-latest")
         ui.onNodeWithTag("conversation-source-demo-leela-latest").assertTextEquals("Changed fictional source, same version identity.")
         ui.runOnIdle {state.value=model("demo-ravi")}
         ui.onNodeWithTag("conversation-card-demo-leela-latest").assertDoesNotExist()
-        ui.onNodeWithTag("conversation-source-demo-ravi-latest").assertDoesNotExist()
-        expand("demo-ravi-latest")
+        read("demo-ravi-latest")
         ui.onNodeWithTag("conversation-source-demo-ravi-latest").assertTextEquals(source("demo-ravi-latest"))
         assertEquals("demo-ravi",state.value.currentDraft!!.patientId)
     }
@@ -106,8 +101,7 @@ class DoctorConversationsUiTest {
             val published=workflow.versions("demo-leela").single()
             ui.onNodeWithTag("workflow-back").performScrollTo().performClick()
             ui.onNodeWithTag("conversation-latest").assertExists()
-            ui.onNodeWithTag("demo-patient-detail").performScrollToNode(hasTestTag("conversation-expand-${published.id}"))
-            ui.onNodeWithTag("conversation-expand-${published.id}").performClick()
+            ui.onNodeWithTag("demo-patient-detail").performScrollToNode(hasTestTag("conversation-source-${published.id}"))
             ui.onNodeWithTag("conversation-source-${published.id}").assertTextEquals(draft.sourceText)
             assertEquals(draft.sourceText,workflow.draft("demo-leela").sourceText)
             assertEquals(draft.topics,workflow.draft("demo-leela").topics)
@@ -128,7 +122,7 @@ class DoctorConversationsUiTest {
             }
         }
     }
-    private fun expand(id:String) {ui.onNodeWithTag("conversation-expand-$id").performScrollTo().assertHeightIsAtLeast(48.dp).performClick()}
+    private fun read(id:String) {ui.onNodeWithTag("conversation-source-$id").performScrollTo().assertExists()}
     private fun screenshot(name:String) {
         ui.mainClock.advanceTimeBy(500);ui.waitForIdle()
         val instrumentation=InstrumentationRegistry.getInstrumentation()

@@ -1,0 +1,53 @@
+name: Android checks and optional test APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_apk:
+        description: 'Also build an installable test APK (no release signing or Play upload)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  check-source:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: android
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Install matching Android tools
+        run: '"$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;36.1.0"'
+      - name: Compile app and instrumentation sources; run unit checks
+        run: >-
+          bash ./gradlew --no-daemon --max-workers=2
+          '-Dorg.gradle.jvmargs=-Xmx3072m -XX:ActiveProcessorCount=2 -Dfile.encoding=UTF-8'
+          -PunsignedRelease=true
+          :app:compileDebugKotlin :app:compileDebugAndroidTestKotlin :app:testDebugUnitTest
+      - name: Build requested test APK
+        if: inputs.test_apk
+        run: >-
+          bash ./gradlew --no-daemon --max-workers=2
+          '-Dorg.gradle.jvmargs=-Xmx3072m -XX:ActiveProcessorCount=2 -Dfile.encoding=UTF-8'
+          -PunsignedRelease=true :app:assembleDebug
+      - name: Preserve actual check reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sahara-source-checks-${{ github.sha }}
+          retention-days: 3
+          if-no-files-found: warn
+          path: |
+            android/app/build/test-results/testDebugUnitTest/
+            android/app/build/reports/tests/testDebugUnitTest/
+            android/app/build/outputs/apk/debug/*.apk

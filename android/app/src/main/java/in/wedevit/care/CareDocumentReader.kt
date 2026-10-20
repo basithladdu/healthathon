@@ -8,20 +8,14 @@ import android.graphics.ImageDecoder
 import android.graphics.pdf.PdfRenderer
 import android.net.Uri
 import android.os.ParcelFileDescriptor
-import com.google.mlkit.vision.common.InputImage
-import com.google.mlkit.vision.text.TextRecognition
-import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import java.util.UUID
 import kotlin.coroutines.coroutineContext
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 import kotlin.math.roundToInt
 
 /** Bundled OCR: neither file bytes nor recognised text are sent to a server. */
@@ -34,15 +28,8 @@ class CareDocumentReader(private val context: Context) {
             while (true) { coroutineContext.ensureActive(); val read = input.read(buffer); if (read < 0) break; digest.update(buffer, 0, read) }
             digest.digest().joinToString("") { "%02x".format(it) }
         }
-        val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
-        suspend fun recognize(bitmap: Bitmap): String {
-            val task = try { recognizer.process(InputImage.fromBitmap(bitmap, 0)) } catch (error: Exception) { bitmap.recycle(); throw error }
-            task.addOnCompleteListener { if (!bitmap.isRecycled) bitmap.recycle() }
-            return suspendCancellableCoroutine { continuation ->
-                task.addOnSuccessListener { result -> if (continuation.isActive) continuation.resume(result.text.take(200_001)) }
-                    .addOnFailureListener { error -> if (continuation.isActive) continuation.resumeWithException(error) }
-            }
-        }
+        val recognizer = CareBilingualOcr()
+        suspend fun recognize(bitmap: Bitmap): String = recognizer.read(bitmap).take(200_001)
         try {
             val pages = mutableListOf<DocumentPageText>()
             var total = 0
@@ -91,7 +78,7 @@ class CareDocumentReader(private val context: Context) {
     /** SAF image path for prescription pages; the returned candidates retain page identity. */
     suspend fun prescription(uris: List<Uri>, progress: (Int, Int) -> Unit): List<DocumentPageText> = withContext(Dispatchers.IO) {
         require(uris.size in 1..5) { "Choose up to five prescription pages." }
-        val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+        val recognizer = CareBilingualOcr()
         try { uris.mapIndexed { index, uri ->
             coroutineContext.ensureActive(); progress(index, uris.size)
             require(uri.scheme == "content") { "Choose a photo using Files or the camera." }
@@ -116,12 +103,7 @@ class CareDocumentReader(private val context: Context) {
                     if (matrix.isIdentity) decoded else Bitmap.createBitmap(decoded, 0, 0, decoded.width, decoded.height, matrix, true).also { decoded.recycle() }
                 }
             } finally { source.delete() }
-            val task = try { recognizer.process(InputImage.fromBitmap(bitmap, 0)) } catch (error: Exception) { bitmap.recycle(); throw error }
-            task.addOnCompleteListener { if (!bitmap.isRecycled) bitmap.recycle() }
-            val text = suspendCancellableCoroutine<String> { continuation ->
-                task.addOnSuccessListener { if (continuation.isActive) continuation.resume(it.text) }
-                    .addOnFailureListener { if (continuation.isActive) continuation.resumeWithException(it) }
-            }
+            val text = recognizer.read(bitmap)
             require(text.length <= 40_000) { "This page has too much text. Use a smaller section." }
             progress(index + 1, uris.size); DocumentPageText(index + 1, text)
         } } finally { recognizer.close() }

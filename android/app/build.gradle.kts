@@ -10,6 +10,7 @@ val uploadSigning = Properties().apply {
     val config = rootProject.file("keystore.properties")
     if (config.isFile) config.inputStream().use { load(it) }
 }
+apply(from = rootProject.file("sherpa-offline.gradle"))
 android {
     namespace = "in.wedevit.care"
     compileSdk = 36
@@ -75,6 +76,8 @@ dependencies {
     implementation("androidx.core:core-ktx:1.17.0")
     implementation("org.maplibre.gl:android-sdk-opengl:13.6.1")
     implementation("com.google.mlkit:text-recognition:16.0.1")
+    implementation("com.google.mlkit:text-recognition-devanagari:16.0.1")
+    implementation("com.google.mlkit:translate:17.0.3")
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.json:json:20251224")
     androidTestImplementation(platform("androidx.compose:compose-bom:2025.09.01"))

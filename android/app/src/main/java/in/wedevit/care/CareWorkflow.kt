@@ -196,17 +196,11 @@ object CareLabRules {
     val role by vm.viewRole.collectAsStateWithLifecycle()
     var action by remember(item.id) { mutableStateOf("") }
     var editing by remember(item.id) { mutableStateOf(false) }
-    var menu by remember { mutableStateOf(false) }
     val active = data.status in setOf("open", "accepted")
     SurfaceCard(if (data.status == "completed") Sage.copy(alpha = .5f) else Paper) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(if (data.type == "conversation") Icons.Default.Forum else Icons.Default.Assignment, null, tint = Rust)
             Spacer(Modifier.width(10.dp)); Text(item.title, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
-            if (canEdit) Box { IconButton(onClick = { menu = true }, enabled = !busy) { Icon(Icons.Default.MoreHoriz, "Options for ${item.title}") }; DropdownMenu(menu, { menu = false }) {
-                if (data.status == "open") DropdownMenuItem(text = { Text("Edit") }, onClick = { menu = false; editing = true })
-                DropdownMenuItem(text = { Text(if (active) "Cancel" else "Reopen") }, onClick = { menu = false; action = if (active) "cancelled" else "open" })
-                DropdownMenuItem(text = { Text("Remove") }, onClick = { menu = false; action = "remove" })
-            } }
         }
         Text("${data.statusLabel()} · For ${data.assignee}", color = Rust, style = MaterialTheme.typography.labelLarge)
         if (data.sender.isNotBlank()) Text("From ${data.sender}", style = MaterialTheme.typography.bodySmall)
@@ -214,6 +208,11 @@ object CareLabRules {
         if (data.detail.isNotBlank()) Text(data.detail, modifier = Modifier.padding(top = 8.dp))
         if (data.acceptedBy.isNotBlank()) Text("Picked up by ${data.acceptedBy} · ${date(data.acceptedAt)}", style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 8.dp))
         if (data.completedBy.isNotBlank()) Text("Completed by ${data.completedBy} · ${date(data.completedAt)}", style = MaterialTheme.typography.bodySmall)
+        if (canEdit) FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            if (data.status == "open") TextButton(onClick = { editing = true }, enabled = !busy) { Text("Edit") }
+            TextButton(onClick = { action = if (active) "cancelled" else "open" }, enabled = !busy) { Text(if (active) "Cancel" else "Reopen") }
+            TextButton(onClick = { action = "remove" }, enabled = !busy) { Text("Remove") }
+        }
         if (canEdit && active && (data.type != "conversation" || role == "Doctor")) Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
             if (data.type == "conversation" && data.status == "accepted") TextButton(onClick = onTalk, enabled = !busy) { Text("Open conversation") }
             TextButton(onClick = { action = if (data.status == "open") "accepted" else "completed" }, enabled = !busy) { Icon(if (data.status == "open") Icons.Default.PersonAdd else Icons.Default.DoneAll, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(if (data.status == "open") "Pick up" else if (data.type == "conversation") "Conversation done" else "Mark done") }
@@ -252,7 +251,6 @@ object CareLabRules {
     var recipient by rememberSaveable { mutableStateOf(existing?.assignee ?: if (type == "conversation") "Doctor" else "") }
     var detail by rememberSaveable { mutableStateOf(existing?.detail.orEmpty()) }
     var due by rememberSaveable { mutableLongStateOf(initial?.due ?: 0) }
-    var detailsOpen by rememberSaveable { mutableStateOf(detail.isNotBlank() || due > 0) }
     var error by remember { mutableStateOf("") }
     LaunchedEffect(entryId) { vm.actionError.value = null }
     LaunchedEffect(person) { if (person != capturedPerson) onDismiss() }
@@ -264,8 +262,7 @@ object CareLabRules {
                 (if (type == "conversation") listOf("Goals of care", "Comfort and symptoms", "Care at home") else listOf("Collect medicines", "Arrange transport", "Bring reports")).forEach { suggestion -> SuggestionChip(onClick = { title = suggestion }, label = { Text(suggestion) }) }
             }
             OutlinedTextField(recipient, { recipient = it; error = "" }, label = { Text(if (type == "conversation") "Doctor or care team" else "Who is this for?") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
-            if (!detailsOpen) TextButton(onClick = { detailsOpen = true }) { Text("Add a date or details") }
-            if (detailsOpen) {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 CareDateButton(due, if (type == "conversation") "Preferred date" else "Due date", { due = it }, allowClear = true)
                 OutlinedTextField(detail, { detail = it }, label = { Text("Details (optional)") }, modifier = Modifier.fillMaxWidth(), maxLines = 4)
             }

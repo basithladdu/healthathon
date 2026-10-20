@@ -75,9 +75,7 @@ private fun requestLabel(status: WorkflowRequestStatus) = status.name.lowercase(
     var step by rememberSaveable(patient.id) { mutableIntStateOf(0) }
     var revision by remember { mutableIntStateOf(0) }
     var message by remember { mutableStateOf<String?>(null) }
-    var expandedSource by rememberSaveable { mutableStateOf<String?>(null) }
-    var showActivity by rememberSaveable { mutableStateOf(false) }
-    var showRecords by rememberSaveable { mutableStateOf(false) }
+    var historySection by rememberSaveable(patient.id) { mutableStateOf("Records") }
     var selectedVersion by rememberSaveable { mutableStateOf<String?>(null) }
     var participant by rememberSaveable { mutableStateOf("") }
     var purpose by rememberSaveable { mutableStateOf("Document the care discussion") }
@@ -89,6 +87,7 @@ private fun requestLabel(status: WorkflowRequestStatus) = status.name.lowercase(
     val sessionState=cloud?.session?.collectAsState()
     val accountId=sessionState?.value?.userId ?: "guest"
     val audio=rememberDoctorAudioController(patient.id,if(enableOnlineAi) accountId else "local-preview",if(enableOnlineAi) DoctorAudioStorage.LIVE else DoctorAudioStorage.LOCAL_PREVIEW)
+    val audioState by audio.state.collectAsState()
     val onlineScope=rememberCoroutineScope()
     var onlineJob by remember { mutableStateOf<Job?>(null) }
     var onlineBusy by remember { mutableStateOf(false) }
@@ -161,6 +160,19 @@ private fun requestLabel(status: WorkflowRequestStatus) = status.name.lowercase(
                     item { DoctorAudioCapture(audio,sessionState?.value!=null,onlineBusy,draft.sourceText.isBlank(),onSignIn,::transcribeAndDraft) }
                     item { Text("Use fictional test content only. Online processing is explicit; nothing is uploaded while recording. You can also type source text below.",color=MaterialTheme.colorScheme.onSurfaceVariant,style=MaterialTheme.typography.bodySmall) }
                 } else item { DoctorLocalPreviewCapture(audio,draft.sourceText,when {draft.sourceText.isBlank()->DoctorTranscriptKind.NONE;draft.mockGenerated->DoctorTranscriptKind.FICTIONAL_SAMPLE;else->DoctorTranscriptKind.MANUAL},onSourceEdit={update(draft.copy(sourceText=it.take(12000)))}) }
+                items(audioState.clips, key={"offline-audio-${it.id}"}) { clip ->
+                    OfflineConversationTranscription(file=clip.file,identity="$accountId:${patient.id}",consent=clip.consent,
+                        enabled=!audioState.recording && !onlineBusy && draft.sourceText.isBlank(),
+                        onUse={review ->
+                            if(audio.isClosed() || !audio.owns(clip) || audio.state.value.recording || audio.state.value.clips.none {it.id==clip.id}) false
+                            else try {
+                                val failure=store.importOfflineTranscript(patient.id,clip.id,review)
+                                if(failure!=null) {message=failure;false}
+                                else {draft=store.draft(patient.id);revision++;checked=false;sourceConfirmed=false;message="Checked transcript added. Review the original words before publishing.";true}
+                            }
+                            catch(error:Exception) {message=error.message ?: "Couldn't add this transcript. Your original recording is unchanged.";false}
+                        })
+                }
                 if(draft.transcribedAt>0) item { Text("Transcript: ${draft.transcriptProvider} / ${draft.transcriptModel} · ${workflowDate(draft.transcribedAt)}",color=Rust,style=MaterialTheme.typography.labelMedium) }
                 if(draft.aiModel.isNotBlank()) item { Text("Online AI draft: ${draft.aiProvider} / ${draft.aiModel} · not clinically reviewed",color=Rust,style=MaterialTheme.typography.labelMedium) }
                 returnedTranscript?.let { text -> item { WorkflowCard { Text("Returned transcript",fontWeight=FontWeight.SemiBold);Text(text);Text("Your existing work was not silently replaced.",style=MaterialTheme.typography.bodySmall) } } }
@@ -168,7 +180,7 @@ private fun requestLabel(status: WorkflowRequestStatus) = status.name.lowercase(
                 if(enableOnlineAi) item { OutlinedTextField(draft.sourceText, { update(draft.copy(sourceText=it.take(12000))) }, label={Text("Original source text")}, minLines=5, modifier=Modifier.fillMaxWidth().testTag("workflow-source-text")) }
                 item { WorkflowSection("Source references") }
                 if(draft.transcribedAt>0) item { WorkflowCard { Text("Consented conversation recording",fontWeight=FontWeight.SemiBold);Text("Transcript created ${workflowDate(draft.transcribedAt)} · ${draft.transcriptModel}",style=MaterialTheme.typography.bodySmall);Text("Check the transcript against its original audio before review.",style=MaterialTheme.typography.bodySmall) } }
-                else items(sources, key={it.id}) { source -> WorkflowCard { TextButton(onClick={expandedSource=if(expandedSource==source.id) null else source.id}, modifier=Modifier.testTag("workflow-source-${source.id}")) { Icon(Icons.Default.Description,null,Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(source.label) }; if(expandedSource==source.id) Text(source.text, modifier=Modifier.testTag("workflow-source-expanded")) } }
+                else items(sources, key={it.id}) { source -> WorkflowCard { Text(source.label,fontWeight=FontWeight.SemiBold,modifier=Modifier.testTag("workflow-source-${source.id}")); Text(source.text, modifier=Modifier.testTag("workflow-source-text-${source.id}")) } }
                 item { WorkflowCard { Text("Uncertainty stays visible", fontWeight=FontWeight.SemiBold); Text(if(draft.aiModel.isNotBlank()) "AI may miss or misattribute words. Verify source evidence, leave unsupported fields blank and keep unresolved questions visible." else "The sample fixture does not state patient priorities or a treatment choice. Do not infer agreement.");draft.aiWarnings.forEach { Text(it,color=Rust,style=MaterialTheme.typography.bodySmall) } } }
                 items(draft.evidence.withIndex().toList(),key={"evidence-${it.index}"}) { (_,evidence) -> WorkflowCard { Text("Source evidence · ${evidence.section}",fontWeight=FontWeight.Medium);Text(evidence.quote) } }
                 val fields = listOf("priorities" to "What matters most", "participants" to "Who participated", "topics" to "What was discussed", "questions" to "Questions & concerns", "undecided" to "Still undecided", "nextSteps" to "Next steps")
@@ -190,13 +202,14 @@ private fun requestLabel(status: WorkflowRequestStatus) = status.name.lowercase(
         item { OutlinedButton(onClick={message=store.saveDraft(draft); if(message==null) onBack()},modifier=Modifier.fillMaxWidth().heightIn(min=48.dp).testTag("workflow-finish-later")) { Text("Save & finish later") }; Text("Draft changes are saved on this device.", style=MaterialTheme.typography.bodySmall,color=MaterialTheme.colorScheme.onSurfaceVariant) }
         if(versions.isNotEmpty()) item { WorkflowSection("Version history") }
         items(versions,key={it.id}) { item -> OutlinedButton(onClick={selectedVersion=item.id},modifier=Modifier.fillMaxWidth().heightIn(min=48.dp).testTag("workflow-version-${item.id}")) { Text("Version ${item.number} · ${workflowDate(item.publishedAt)}") } }
-        item { OutlinedButton(onClick={showRecords=!showRecords},modifier=Modifier.fillMaxWidth().heightIn(min=48.dp).testTag("workflow-open-records")) { Icon(Icons.Default.FolderOpen,null);Spacer(Modifier.width(8.dp));Text(if(showRecords) "Hide records & timeline" else "Original records & timeline") } }
-        if(showRecords) {
+        item { FlowRow(horizontalArrangement=Arrangement.spacedBy(8.dp)) {
+            listOf("Records", "Activity").forEach { section -> FilterChip(selected=historySection==section,onClick={historySection=section},label={Text(if(section=="Records") "Records & timeline" else "Activity & updates")},modifier=Modifier.heightIn(min=48.dp).testTag(if(section=="Records") "workflow-open-records" else "workflow-open-activity")) }
+        } }
+        if(historySection=="Records") {
             items(store.attachments(patient.id),key={it.id}) { attachment -> WorkflowCard { Text(attachment.title,fontWeight=FontWeight.Medium); Text(attachment.text); Text("Sample text source; no uploaded original file.",style=MaterialTheme.typography.bodySmall,color=MaterialTheme.colorScheme.onSurfaceVariant) } }
             items(store.timeline(patient.id),key={"timeline-${it.id}"}) { entry -> Column { Text(entry.title,fontWeight=FontWeight.Medium); Text(entry.detail); Text(workflowDate(entry.at),style=MaterialTheme.typography.bodySmall,color=MaterialTheme.colorScheme.onSurfaceVariant) } }
         }
-        item { TextButton(onClick={showActivity=!showActivity},modifier=Modifier.heightIn(min=48.dp).testTag("workflow-open-activity")) { Icon(Icons.Default.History,null); Spacer(Modifier.width(8.dp)); Text(if(showActivity) "Hide local activity" else "Local activity & updates") } }
-        if(showActivity) { item { Text("In-app history only; no SMS, push or external delivery.",style=MaterialTheme.typography.bodySmall) }; items(store.activity(patient.id).take(30),key={it.id}) { entry -> Text("${workflowDate(entry.at)}\n${entry.action}",style=MaterialTheme.typography.bodySmall) } }
+        if(historySection=="Activity") { item { Text("In-app history only; no SMS, push or external delivery.",style=MaterialTheme.typography.bodySmall) }; items(store.activity(patient.id).take(30),key={it.id}) { entry -> Text("${workflowDate(entry.at)}\n${entry.action}",style=MaterialTheme.typography.bodySmall) } }
     }
 }
 

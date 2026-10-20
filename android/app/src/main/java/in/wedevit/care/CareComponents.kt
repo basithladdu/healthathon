@@ -66,23 +66,11 @@ import androidx.compose.ui.unit.sp
 }
 
 @Composable fun CareRoleMenu(role: String, enabled: Boolean, onSelect: (String) -> Unit) {
-    var expanded by remember { mutableStateOf(false) }
-    val duration = if (ValueAnimator.areAnimatorsEnabled()) 160 else 0
-    val rotation by animateFloatAsState(if (expanded) 180f else 0f, tween(duration), label = "role arrow")
-    Box {
-        OutlinedButton(onClick = { expanded = true }, enabled = enabled, shape = RoundedCornerShape(14.dp),
-            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("choose-role").semantics { contentDescription = "Change view, $role" },
-            colors = ButtonDefaults.outlinedButtonColors(contentColor = Ink, containerColor = Paper)) {
-            Text(role, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
-            Spacer(Modifier.width(4.dp)); Icon(Icons.Default.ExpandMore, null, Modifier.size(18.dp).graphicsLayer { rotationZ = rotation })
-        }
-        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }, containerColor = Paper, shape = RoundedCornerShape(16.dp)) {
-            listOf("Patient", "Family", "Doctor").forEach { option ->
-                DropdownMenuItem(text = { Text(option) }, modifier = Modifier.widthIn(min = 166.dp).testTag("role-$option"),
-                    leadingIcon = { Icon(when (option) { "Doctor" -> Icons.Default.MedicalServices; "Family" -> Icons.Default.PeopleOutline; else -> Icons.Default.PersonOutline }, null) },
-                    trailingIcon = { if (role == option) Icon(Icons.Default.Check, null, tint = Rust) },
-                    onClick = { expanded = false; onSelect(option) })
-            }
+    FlowRow(Modifier.fillMaxWidth().testTag("choose-role").selectableGroup(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        listOf("Patient", "Family", "Doctor").forEach { option ->
+            FilterChip(selected = role == option, onClick = { onSelect(option) }, enabled = enabled,
+                label = { Text(option) }, modifier = Modifier.heightIn(min = 48.dp).testTag("role-$option"),
+                leadingIcon = { Icon(when (option) { "Doctor" -> Icons.Default.MedicalServices; "Family" -> Icons.Default.PeopleOutline; else -> Icons.Default.PersonOutline }, null, Modifier.size(18.dp)) })
         }
     }
 }
@@ -102,17 +90,12 @@ import androidx.compose.ui.unit.sp
 }
 
 @Composable fun DetailPanel(title: String, icon: ImageVector, content: @Composable ColumnScope.() -> Unit) {
-    var expanded by rememberSaveable { mutableStateOf(false) }
     Surface(color = Paper, shape = RoundedCornerShape(20.dp)) {
-        Column(Modifier.fillMaxWidth()) {
-            Row(Modifier.fillMaxWidth().clickable { expanded = !expanded }.padding(18.dp), verticalAlignment = Alignment.CenterVertically) {
+        Column(Modifier.fillMaxWidth().padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Icon(icon, null, tint = Rust); Spacer(Modifier.width(12.dp)); Text(title, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
-                val rotation by animateFloatAsState(if (expanded) 180f else 0f, tween(180), label = "details arrow")
-                Icon(Icons.Default.ExpandMore, if (expanded) "Hide $title" else "Show $title", Modifier.graphicsLayer { rotationZ = rotation })
             }
-            AnimatedVisibility(expanded, enter = expandVertically(tween(180)) + fadeIn(tween(180)), exit = shrinkVertically(tween(150)) + fadeOut(tween(150))) {
-                Column(Modifier.padding(start = 18.dp, end = 18.dp, bottom = 18.dp), content = content)
-            }
+            content()
         }
     }
 }

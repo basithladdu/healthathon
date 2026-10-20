@@ -83,7 +83,7 @@ class DailyCareFlowsTest {
         assertEquals("conversation", CareEntryCodec.decode(item.detail)!!.type)
         ui.onNodeWithText("Requested · For Dr Test").assertIsDisplayed()
         ui.onNodeWithText("Pick up", useUnmergedTree = true).assertDoesNotExist()
-        ui.onNodeWithTag("choose-role").performClick(); ui.onNodeWithTag("role-Doctor").performClick()
+        ui.onNodeWithTag("role-Doctor").performClick()
         ui.onNodeWithText("Care queue").assertIsDisplayed()
         ui.onNodeWithText("Pick up", useUnmergedTree = true).performClick()
         enter("Your name", "Dr Test"); hideKeyboard()
@@ -136,7 +136,6 @@ class DailyCareFlowsTest {
             enter("Test name on report", "Haemoglobin")
             enter("Value", value); enter("Printed unit", "g/dL"); hideKeyboard()
             if (withRange) {
-                ui.onNodeWithText("Add printed range or report").performScrollTo().performClick()
                 enter("Lower", "12"); enter("Upper", "16"); hideKeyboard()
             }
             val oldCount = vm.items.value.count { CareEntryCodec.decode(it.detail)?.type == "lab" }
@@ -145,9 +144,9 @@ class DailyCareFlowsTest {
         }
         addLab("12.4", true); addLab("13.1", false)
         ui.onNodeWithText("2 results", substring = true).assertIsDisplayed()
-        ui.onNodeWithContentDescription("Show Haemoglobin history").performClick()
+        ui.onNodeWithTag("lab-history").performScrollToNode(hasText("Printed range: 12–16 g/dL"))
         ui.onNodeWithText("Printed range: 12–16 g/dL").assertIsDisplayed()
-        ui.onNodeWithText("12.4 g/dL").assertIsDisplayed()
+        ui.onAllNodesWithText("12.4 g/dL").onFirst().assertExists()
         screenshot("lab-history-series")
         recreate(); openShortcut("shortcut-labs")
         ui.onNodeWithText("2 results", substring = true).assertIsDisplayed()

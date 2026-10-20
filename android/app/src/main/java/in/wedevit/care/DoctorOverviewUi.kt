@@ -25,11 +25,6 @@ private fun overviewValue(value:String) = value.takeIf {it.isNotBlank()} ?: "Not
 
 /** Read-only handover. Sources stay attached to their exact selected discussion snapshot. */
 @Composable fun DoctorOverviewContent(overview:DoctorPatientOverview,onConversation:()->Unit,onSection:(String)->Unit,onSchedule:()->Unit) {
-    var sourceOpen by remember(overview) {mutableStateOf<String?>(null)}
-    var historyOpen by remember(overview) {mutableStateOf(false)}
-    var handoverOpen by remember(overview) {mutableStateOf(false)}
-    var backgroundOpen by remember(overview) {mutableStateOf(false)}
-    var discussionDetailsOpen by remember(overview) {mutableStateOf(false)}
     val discussion=overview.lastDiscussion
     val earlierDiscussions=overview.history.filter {it.id!=discussion?.id}
     Column(Modifier.fillMaxWidth().testTag("overview-content"),verticalArrangement=Arrangement.spacedBy(16.dp)) {
@@ -42,10 +37,8 @@ private fun overviewValue(value:String) = value.takeIf {it.isNotBlank()} ?: "Not
                     Text("Not a verified note author or an assigned doctor",style=MaterialTheme.typography.bodySmall,color=Rust)
                 }
                 Text("Clinical assessment: ${overview.clinicalAssessment}",fontWeight=FontWeight.Medium,modifier=Modifier.testTag("overview-clinical-assessment"))
-                Row {TextButton(onClick={handoverOpen=!handoverOpen},modifier=Modifier.heightIn(min=48.dp).testTag("overview-handover-toggle")) {Text(if(handoverOpen) "Hide handover context" else "About this handover")}}
-                if(handoverOpen) {Text(overview.previousProfessional?.role ?: "Professional role not recorded");Text(overview.previousProfessional?.disclosure ?: "No previous professional is documented.",style=MaterialTheme.typography.bodySmall)}
-                TextButton(onClick={backgroundOpen=!backgroundOpen},modifier=Modifier.heightIn(min=48.dp).testTag("overview-background-toggle")) {Text(if(backgroundOpen) "Hide background summary" else "Background summary")}
-                if(backgroundOpen) {Text(overview.background,lineHeight=24.sp);Text("Historical sample profile context, not a current clinical assessment.",style=MaterialTheme.typography.bodySmall,color=Ink.copy(alpha=.75f))}
+                Column(Modifier.testTag("overview-handover-toggle"), verticalArrangement=Arrangement.spacedBy(4.dp)) {Text(overview.previousProfessional?.role ?: "Professional role not recorded");Text(overview.previousProfessional?.disclosure ?: "No previous professional is documented.",style=MaterialTheme.typography.bodySmall)}
+                Column(Modifier.testTag("overview-background-toggle"), verticalArrangement=Arrangement.spacedBy(4.dp)) {Text("Background summary",fontWeight=FontWeight.SemiBold);Text(overview.background,lineHeight=24.sp);Text("Historical sample profile context, not a current clinical assessment.",style=MaterialTheme.typography.bodySmall,color=Ink.copy(alpha=.75f))}
             }
         }
         Text("Care handover",fontSize=21.sp,fontWeight=FontWeight.SemiBold)
@@ -61,14 +54,13 @@ private fun overviewValue(value:String) = value.takeIf {it.isNotBlank()} ?: "Not
                     OverviewDiscussionMeta(discussion)
                     OverviewLabel("Discussion brief",overviewValue(discussion.topics))
                     if(discussion.questions.isNotBlank()) Column(Modifier.testTag("overview-open-questions")) {OverviewLabel("Questions to carry forward",discussion.questions)}
-                    TextButton(onClick={discussionDetailsOpen=!discussionDetailsOpen},modifier=Modifier.heightIn(min=48.dp).testTag("overview-discussion-details-toggle")) {Text(if(discussionDetailsOpen) "Hide discussion details" else "Discussion details")}
-                    if(discussionDetailsOpen) {
+                    Column(Modifier.testTag("overview-discussion-details-toggle"), verticalArrangement=Arrangement.spacedBy(9.dp)) {
                         OverviewLabel("What matters to the patient",overviewValue(discussion.priorities))
                         OverviewLabel("Who participated",overviewValue(discussion.participants))
                         if(discussion.questions.isBlank()) OverviewLabel("Questions to carry forward","Not recorded")
                         OverviewLabel("Still undecided",overviewValue(discussion.undecided))
                     }
-                    OverviewSource(discussion,sourceOpen==discussion.id) {sourceOpen=if(sourceOpen==discussion.id) null else discussion.id}
+                    OverviewSource(discussion)
                 }
                 OutlinedButton(onClick=onConversation,modifier=Modifier.fillMaxWidth().heightIn(min=48.dp).testTag("overview-conversations")) {Text("Open conversations & Care Notes")}
             }
@@ -82,14 +74,14 @@ private fun overviewValue(value:String) = value.takeIf {it.isNotBlank()} ?: "Not
             }
         }
         if(earlierDiscussions.isNotEmpty()) {
-            TextButton(onClick={historyOpen=!historyOpen},modifier=Modifier.fillMaxWidth().heightIn(min=48.dp).testTag("overview-history-toggle")) {Text(if(historyOpen) "Hide earlier discussions" else "Earlier discussions (${earlierDiscussions.size})")}
-            if(historyOpen) earlierDiscussions.forEach {earlier ->
+            Text("Earlier discussions (${earlierDiscussions.size})",fontWeight=FontWeight.SemiBold,modifier=Modifier.testTag("overview-history-toggle"))
+            earlierDiscussions.forEach {earlier ->
                 Surface(color=Paper,shape=RoundedCornerShape(16.dp),border=BorderStroke(1.dp,Ink.copy(alpha=.1f))) {
                     Column(Modifier.fillMaxWidth().padding(16.dp),verticalArrangement=Arrangement.spacedBy(8.dp)) {
                         Text(overviewDate(earlier.publishedAt),style=MaterialTheme.typography.labelLarge,color=Rust)
                         OverviewDiscussionMeta(earlier)
-                        TextButton(onClick={sourceOpen=if(sourceOpen==earlier.id) null else earlier.id},modifier=Modifier.heightIn(min=48.dp).testTag("overview-history-${earlier.id}")) {Text(if(sourceOpen==earlier.id) "Hide this source" else "Read this discussion source")}
-                        if(sourceOpen==earlier.id) Text(earlier.sourceText.ifBlank {"Original source not recorded."},lineHeight=24.sp,modifier=Modifier.testTag("overview-source-text"))
+                        Text("Original discussion source",fontWeight=FontWeight.SemiBold,modifier=Modifier.testTag("overview-history-${earlier.id}"))
+                        Text(earlier.sourceText.ifBlank {"Original source not recorded."},lineHeight=24.sp,modifier=Modifier.testTag("overview-source-text-${earlier.id}"))
                     }
                 }
             }
@@ -97,13 +89,9 @@ private fun overviewValue(value:String) = value.takeIf {it.isNotBlank()} ?: "Not
     }
 }
 @Composable private fun OverviewLabel(label:String,value:String) {
-    var expanded by remember(label,value) {mutableStateOf(false)}
-    var overflows by remember(label,value) {mutableStateOf(false)}
     Column(verticalArrangement=Arrangement.spacedBy(4.dp)) {
         Text(label,style=MaterialTheme.typography.labelLarge,color=Ink.copy(alpha=.75f))
-        Text(value,lineHeight=24.sp,maxLines=if(expanded) Int.MAX_VALUE else 4,overflow=TextOverflow.Ellipsis,
-            onTextLayout={if(!expanded) overflows=it.didOverflowHeight || it.multiParagraph.didExceedMaxLines})
-        if(overflows) TextButton(onClick={expanded=!expanded},modifier=Modifier.heightIn(min=48.dp)) {Text(if(expanded) "Show less" else "Read full field")}
+        Text(value,lineHeight=24.sp)
     }
 }
 @Composable private fun OverviewDiscussionMeta(discussion:DoctorOverviewDiscussion) {
@@ -111,10 +99,10 @@ private fun overviewValue(value:String) = value.takeIf {it.isNotBlank()} ?: "Not
     Text(if(discussion.isPublishedPreview) "Self-entered reviewer: ${discussion.reviewerName ?: "Not recorded"} · identity not verified" else "Discussion author: ${discussion.reviewerName ?: "Not recorded"}",style=MaterialTheme.typography.bodySmall)
     Text("Source: ${discussion.sourceLabel}",style=MaterialTheme.typography.bodySmall,color=Ink.copy(alpha=.7f))
 }
-@Composable private fun OverviewSource(discussion:DoctorOverviewDiscussion,open:Boolean,onToggle:()->Unit) {
+@Composable private fun OverviewSource(discussion:DoctorOverviewDiscussion) {
     if(discussion.sourceText.isNotBlank()) {
-        TextButton(onClick=onToggle,modifier=Modifier.heightIn(min=48.dp).testTag("overview-source-${discussion.id}")) {Text(if(open) "Hide original source" else "Read original source")}
-        if(open) Text(discussion.sourceText,lineHeight=24.sp,modifier=Modifier.testTag("overview-source-text"))
+        Text("Original source",fontWeight=FontWeight.SemiBold,modifier=Modifier.testTag("overview-source-${discussion.id}"))
+        Text(discussion.sourceText,lineHeight=24.sp,modifier=Modifier.testTag("overview-source-text-${discussion.id}"))
     } else Text("Original source not recorded.",style=MaterialTheme.typography.bodySmall)
 }
 @Composable private fun OverviewTimeline(title:String,date:String,tint:Color,tag:String,content:@Composable ColumnScope.()->Unit) {

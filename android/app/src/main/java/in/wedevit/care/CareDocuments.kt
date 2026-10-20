@@ -134,10 +134,9 @@ import kotlinx.coroutines.withContext
         }
         if (visibleReports.isNotEmpty()) item { SectionTitle("Reports") }
         items(visibleReports, key = { it.id }) { report ->
-            var menu by remember { mutableStateOf(false) }
             Surface(Modifier.animateItem().fillMaxWidth(), shape = RoundedCornerShape(18.dp), color = Paper) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Row(Modifier.weight(1f).clickable { openReport(report, false) }.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                Column {
+                    Row(Modifier.fillMaxWidth().clickable { openReport(report, false) }.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
                         Surface(shape = RoundedCornerShape(12.dp), color = if (report.mime == "application/pdf") Peach else Sage) { Icon(if (report.mime == "application/pdf") Icons.Default.PictureAsPdf else Icons.Default.Image, null, Modifier.padding(10.dp).size(23.dp)) }
                         Spacer(Modifier.width(12.dp))
                         Column(Modifier.weight(1f)) {
@@ -146,14 +145,11 @@ import kotlinx.coroutines.withContext
                             Text(date(report.created), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
-                    Box {
-                        IconButton(onClick = { menu = true }, modifier = Modifier.padding(end = 4.dp)) { Icon(Icons.Default.MoreHoriz, "Options for ${report.name}") }
-                        DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
-                            DropdownMenuItem(text = { Text("Open") }, leadingIcon = { Icon(Icons.AutoMirrored.Filled.OpenInNew, null) }, onClick = { menu = false; openReport(report, false) })
-                            DropdownMenuItem(text = { Text("Read and copy facts") }, leadingIcon = { Icon(Icons.Default.DocumentScanner, null) }, onClick = { menu = false; review = report })
-                            DropdownMenuItem(text = { Text("Share") }, leadingIcon = { Icon(Icons.Default.Share, null) }, onClick = { menu = false; openReport(report, true) })
-                            if (canEdit && prescriptionOriginals.none { it.id == report.id }) DropdownMenuItem(text = { Text("Remove") }, leadingIcon = { Icon(Icons.Default.DeleteOutline, null) }, enabled = !busy, onClick = { menu = false; remove = report })
-                        }
+                    FlowRow(Modifier.fillMaxWidth().padding(horizontal = 8.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                        TextButton(onClick = { openReport(report, false) }, modifier = Modifier.testTag("report-open-${report.id}")) { Icon(Icons.AutoMirrored.Filled.OpenInNew, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Open") }
+                        TextButton(onClick = { review = report }, modifier = Modifier.testTag("report-review-${report.id}")) { Icon(Icons.Default.DocumentScanner, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Read and copy facts") }
+                        TextButton(onClick = { openReport(report, true) }, modifier = Modifier.testTag("report-share-${report.id}")) { Icon(Icons.Default.Share, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Share") }
+                        if (canEdit && prescriptionOriginals.none { it.id == report.id }) TextButton(enabled = !busy, onClick = { remove = report }, modifier = Modifier.testTag("report-remove-${report.id}")) { Icon(Icons.Default.DeleteOutline, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Remove") }
                     }
                 }
             }

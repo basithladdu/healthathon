@@ -465,14 +465,17 @@ private fun recordDisplayText(text: String) = text
     var type by rememberSaveable { mutableStateOf(existing?.type ?: "In person") }
     var note by rememberSaveable { mutableStateOf(existing?.note.orEmpty()) }
     var error by rememberSaveable { mutableStateOf<String?>(null) }
-    var patientMenu by remember { mutableStateOf(false) }
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = DoctorBackground) {
         Column(Modifier.fillMaxWidth().imePadding().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp).padding(bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
             DoctorTitle(if (existing == null) "Schedule a visit" else "Reschedule visit", 26)
             Text("Local schedule only. No invitations or reminders are sent.", color=DoctorMuted, style = MaterialTheme.typography.bodySmall)
             Text("Patient", fontWeight=FontWeight.SemiBold)
-            Box { OutlinedButton(onClick = { patientMenu = true }, enabled=!patientLocked, shape=RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("demo-visit-patient")) { Text(patients.first { it.id == selectedPatient }.displayName()); Spacer(Modifier.weight(1f)); Icon(if(patientLocked) Icons.Default.Link else Icons.Default.ExpandMore, null) }
-                DropdownMenu(patientMenu, onDismissRequest = { patientMenu = false }) { patients.forEach { patient -> DropdownMenuItem(text = { Text(patient.displayName()) }, onClick = { selectedPatient = patient.id; patientMenu = false }) } } }
+            FlowRow(Modifier.fillMaxWidth().testTag("demo-visit-patient"), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                patients.filter { !patientLocked || it.id == selectedPatient }.forEach { patient ->
+                    FilterChip(selected = patient.id == selectedPatient, onClick = { selectedPatient = patient.id; error = null }, enabled = !patientLocked,
+                        label = { Text(patient.displayName()) }, modifier = Modifier.heightIn(min = 48.dp).testTag("demo-visit-patient-${patient.id}"))
+                }
+            }
             if(patientLocked) Text("Patient linked to the conversation request",style=MaterialTheme.typography.bodySmall,color=DoctorMuted)
             Text("Date & time", fontWeight=FontWeight.SemiBold)
             val date = LocalDate.parse(day); val clock = LocalTime.parse(time)

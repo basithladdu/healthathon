@@ -81,13 +81,10 @@ import kotlinx.coroutines.withContext
             Text("Machine transcript · original", style = MaterialTheme.typography.labelLarge)
             SelectionContainerText(transcript.original)
             CareField(words, { words = it; checked = false }, "Checked words", minLines = 3)
-            Row {
-                var choose by remember { mutableStateOf(false) }
-                TextButton(onClick = { choose = true }) { Text("Speaker: $speaker") }
-                DropdownMenu(expanded = choose, onDismissRequest = { choose = false }) { listOf("Unknown", "Patient", "Family / carer", "Doctor").forEach { role ->
-                    DropdownMenuItem(text = { Text(role) }, onClick = { speaker = role; checked = false; choose = false })
-                } }
-            }
+            Text("Speaker", style = MaterialTheme.typography.labelLarge)
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf("Unknown", "Patient", "Family / carer", "Doctor").forEach { role ->
+                FilterChip(selected = speaker == role, onClick = { speaker = role; checked = false }, label = { Text(role) }, modifier = Modifier.heightIn(min = 48.dp))
+            } }
             CheckLine(checked, { checked = it }, "I checked the audio, these words and who spoke, including negation and uncertainty.")
             Button(onClick = {
                 try { latestAppend(CareDraftAssist.appendReviewedTranscript(latestSource, transcript.original, words, speaker, transcript.language, checked)); result = null; checked = false }

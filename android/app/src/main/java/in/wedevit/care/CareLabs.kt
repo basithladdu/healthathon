@@ -52,14 +52,12 @@ fun labGroups(items: List<CareItem>): List<List<Pair<CareItem, CareEntry>>> = it
 
 @Composable private fun LabHistoryCard(vm: CareModel, values: List<Pair<CareItem, CareEntry>>, onEdit: (CareItem) -> Unit) {
     val latest = values.first()
-    var expanded by rememberSaveable(latest.first.personId, latest.first.title, latest.second.unit) { mutableStateOf(false) }
     SurfaceCard {
-        Row(Modifier.fillMaxWidth().clickable { expanded = !expanded }, verticalAlignment = Alignment.CenterVertically) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) { Text(latest.first.title, fontWeight = FontWeight.SemiBold, fontSize = 18.sp); Text("${latest.second.value} ${latest.second.unit}", color = Rust, fontSize = 24.sp, fontWeight = FontWeight.SemiBold); Text("${date(latest.first.due)} · ${values.size} ${if (values.size == 1) "result" else "results"}", style = MaterialTheme.typography.bodySmall) }
-            Icon(if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore, if (expanded) "Collapse ${latest.first.title}" else "Show ${latest.first.title} history")
         }
-        if (expanded && values.size > 1) LabHistoryPlot(values)
-        (if (expanded) values else listOf(latest)).forEach { (item, data) -> LabResultRow(vm, item, data, showDate = expanded, onEdit = { onEdit(item) }) }
+        if (values.size > 1) LabHistoryPlot(values)
+        values.forEach { (item, data) -> LabResultRow(vm, item, data, showDate = true, onEdit = { onEdit(item) }) }
     }
 }
 
@@ -124,8 +122,6 @@ fun labGroups(items: List<CareItem>): List<List<Pair<CareItem, CareEntry>>> = it
     var detail by rememberSaveable { mutableStateOf(existing?.detail.orEmpty()) }
     var reportId by rememberSaveable { mutableStateOf(existing?.reportId.orEmpty()) }
     var reportName by rememberSaveable { mutableStateOf(existing?.reportName.orEmpty()) }
-    var extra by rememberSaveable { mutableStateOf(low.isNotBlank() || high.isNotBlank() || rangeText.isNotBlank() || detail.isNotBlank() || reportId.isNotBlank()) }
-    var reportMenu by remember { mutableStateOf(false) }
     var remove by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf("") }
     LaunchedEffect(entryId) { vm.actionError.value = null }
@@ -140,19 +136,18 @@ fun labGroups(items: List<CareItem>): List<List<Pair<CareItem, CareEntry>>> = it
                 OutlinedTextField(unit, { unit = it; error = "" }, label = { Text("Printed unit") }, modifier = Modifier.weight(1f), singleLine = true)
             }
             CareDateButton(due, "Report date", { due = it }, latest = LocalDate.now())
-            if (!extra) TextButton(onClick = { extra = true }) { Text("Add printed range or report") }
-            if (extra) {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Text("Printed reference range (optional)", style = MaterialTheme.typography.labelLarge)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedTextField(low, { low = it }, label = { Text("Lower") }, modifier = Modifier.weight(1f), singleLine = true, keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Decimal))
                     OutlinedTextField(high, { high = it }, label = { Text("Upper") }, modifier = Modifier.weight(1f), singleLine = true, keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Decimal))
                 }
                 OutlinedTextField(rangeText, { rangeText = it }, label = { Text("Or copy the printed range") }, modifier = Modifier.fillMaxWidth(), maxLines = 2)
-                Box {
-                    OutlinedButton(onClick = { reportMenu = true }, modifier = Modifier.fillMaxWidth()) { Icon(Icons.Default.AttachFile, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(reportName.ifBlank { "Link an existing report" }) }
-                    DropdownMenu(reportMenu, { reportMenu = false }) {
-                        DropdownMenuItem(text = { Text("No report link") }, onClick = { reportId = ""; reportName = ""; reportMenu = false })
-                        reports.filter { it.personId == captured }.forEach { report -> DropdownMenuItem(text = { Text(report.name) }, onClick = { reportId = report.id; reportName = report.name; reportMenu = false }) }
+                Text("Linked report", style = MaterialTheme.typography.labelLarge)
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    FilterChip(selected = reportId.isBlank(), onClick = { reportId = ""; reportName = "" }, label = { Text("No report link") }, modifier = Modifier.heightIn(min = 48.dp))
+                    reports.filter { it.personId == captured }.forEach { report ->
+                        FilterChip(selected = reportId == report.id, onClick = { reportId = report.id; reportName = report.name }, label = { Text(report.name) }, modifier = Modifier.heightIn(min = 48.dp))
                     }
                 }
                 if (reports.none { it.personId == captured }) Text("Add report files in Documents to link them here.", style = MaterialTheme.typography.bodySmall)

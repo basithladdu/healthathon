@@ -1,0 +1,28 @@
+// Official runtime is fetched reproducibly, never copied into Git or downloaded by the app.
+def sherpaVersion = '1.13.8'
+def sherpaSha256 = '633c24321e06b1fe79feafa03ea16cbc0f8a286641e2da3559bac91bdb13bd96'
+def sherpaAar = layout.buildDirectory.file("offline-dependencies/sherpa-onnx-${sherpaVersion}.aar").get().asFile
+def downloadSherpa = tasks.register('downloadVerifiedOfflineSpeechRuntime') {
+    inputs.property('version', sherpaVersion)
+    inputs.property('sha256', sherpaSha256)
+    outputs.file(sherpaAar)
+    doLast {
+        def hash = { File f ->
+            def digest = java.security.MessageDigest.getInstance('SHA-256')
+            f.withInputStream { input -> byte[] buffer = new byte[65536]; int n; while ((n = input.read(buffer)) != -1) digest.update(buffer, 0, n) }
+            digest.digest().encodeHex().toString()
+        }
+        if (sherpaAar.isFile() && hash(sherpaAar) == sherpaSha256) return
+        sherpaAar.parentFile.mkdirs()
+        def pending = new File(sherpaAar.parentFile, sherpaAar.name + '.part')
+        try {
+            def connection = new URI("https://github.com/k2-fsa/sherpa-onnx/releases/download/v${sherpaVersion}/sherpa-onnx-${sherpaVersion}.aar").toURL().openConnection()
+            connection.connectTimeout = 30000; connection.readTimeout = 60000
+            connection.getInputStream().withCloseable { input -> pending.withOutputStream { output -> output << input } }
+            if (hash(pending) != sherpaSha256) throw new GradleException('Offline speech runtime checksum mismatch')
+            java.nio.file.Files.move(pending.toPath(), sherpaAar.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING)
+        } finally { pending.delete() }
+    }
+}
+dependencies.add('implementation', files(sherpaAar).builtBy(downloadSherpa))
+android.buildTypes.release.proguardFile(file('proguard-offline-speech.pro'))
