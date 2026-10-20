@@ -657,18 +657,18 @@
   "unpackagedFeatureWork": {
     "versionName": "0.6.0",
     "versionCode": 7,
-    "status": "20 October test APK requested for mentor meeting; current compilation and checks running; no Play action",
-    "packaged": false,
+    "status": "20October test APK built and verified; 147unit checks passed; native phone interactions pending; no Play upload/submission",
+    "packaged": true,
     "uploaded": false,
     "submitted": false,
     "verification": {
-      "androidCompilation": "20 October attempt reached compileDebugKotlin then failed with native JVM allocation under host memory/pagefile pressure; no combined pass yet",
-      "androidUiTestCompilation": "Current 20 October instrumentation sources not yet verified",
-      "androidUnitTests": null,
-      "androidUnitSuites": null,
-      "androidUnitFailures": null,
-      "androidUnitErrors": null,
-      "androidUnitSkipped": null,
+      "androidCompilation": "compileDebugKotlin and assembleDebug passed20October",
+      "androidUiTestCompilation": "compileDebugAndroidTestKotlin passed; compiled only, not executed",
+      "androidUnitTests": 147,
+      "androidUnitSuites": 25,
+      "androidUnitFailures": 0,
+      "androidUnitErrors": 0,
+      "androidUnitSkipped": 0,
       "webTests": 284,
       "webTypeScript": "passed",
       "sharedPostgresWasmChecks": 47,
@@ -695,7 +695,11 @@
         "sourcePages": 81,
         "originalKarnatakaUnchanged": true
       },
-      "nativeDeviceRuntimeTested": false
+      "nativeDeviceRuntimeTested": false,
+      "currentBuildLog": "output/android/verification/features/mentor-apk-final.log",
+      "buildRecovery": "KSP incremental cache failed; current run passed with -Pksp.incremental=false, JBR21, bounded JVM/C1 and dedicated cache. GitHub39402505540 did not start because of account billing/spending limit; no settings changed.",
+      "apkSignatureVerified": true,
+      "apkZipAlignment16KB": true
     },
     "deliveredSource": [
       "Account-backed web/native care-note drafts and independently verified clinician workflow",
@@ -795,6 +799,20 @@
         "https://huggingface.co/Qwen/Qwen3-ASR-0.6B",
         "https://k2-fsa.github.io/sherpa/onnx/qwen3-asr/index.html"
       ]
+    },
+    "packageType": "Debug test APK only; no new signed release APK or AAB",
+    "testApk": {
+      "path": "output/android/Sahara-0.6.0-20Oct-test.apk",
+      "package": "in.wedevit.sahara.development",
+      "versionName": "0.6.0",
+      "versionCode": 7,
+      "bytes": 300504493,
+      "sha256": "5DC9D96176407A8E35A34709653D9897FBD4491FA79E9F908459933509BAC9AC",
+      "signing": "Android debug; installs alongside production package",
+      "nativeSourceCommit": "e683e7e",
+      "directoryAssetMatchesCurrentSource": true,
+      "phoneTested": false,
+      "uploadedToPlay": false
     }
   }
 }
