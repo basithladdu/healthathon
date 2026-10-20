@@ -37,3 +37,29 @@ output/android/*.aab
 android/supabase/.temp/
 android/scripts/__pycache__/
 output/android/*.idsig
+
+# Private or unreviewed portal/device captures and generated diagnostic binaries.
+# Sanitized test summaries, model diagnostics and reproducibility sources remain versioned.
+output/android/verification/sahara-*.jpg
+output/android/verification/sahara-*.png
+output/android/verification/**/*.xml
+output/android/verification/**/*.jar
+output/android/verification/0.5.0/clean-screens/
+output/android/verification/0.5.0/debug-screens/
+output/android/verification/0.5.0/release-ui/
+output/android/verification/0.5.0/guest-*.png
+output/android/verification/0.5.0/debug-runtime-logcat.txt
+output/android/verification/0.5.0/debug-runtime.txt
+output/android/verification/0.5.0/visual-recapture-*.txt
+
+# Reproducible scratch duplicates and deployment transport logs, not source handoff.
+output/android/verification/features/ocr-synthetic/browser-core-identical.cjs
+output/research/*deploy.log
+output/research/privacy-retention-050-eslint.log
+prototype/output/*deploy-*.log
+prototype/output/staged-shared-care.html
+prototype/output/playwright/sahara-feedback-desktop.png
+prototype/output/playwright/sahara-feedback-mobile-390.png
+prototype/output/playwright/sahara-hospital-confirm-mobile-375.png
+prototype/output/playwright/sahara-hospital-survery-live-mobile-390.png
+prototype/output/playwright/sahara-hospital-survey-fresh-success-2026-10-19.png

@@ -15,7 +15,7 @@ The import covers all 36 pages linked from [Pallium India's national directory](
 
 `verification` is always `directory_listed`, and `independentlyVerified` is always false. A retrieval date does not mean the centre was contacted or operationally checked. `morphine` is always `unknown`; a source's historical availability text is retained separately as `sourceListedMorphine`, never as live medicine stock. Published services and contact details can be stale, and callers should confirm before travelling.
 
-No patient data or private contact list was used. Only public directory contact telephone numbers are shipped; contact-person names/emails and entire website HTML are not copied into app records. Raw website snapshots remain local under `output/research/india-directory-20261020/` for provenance, separate from Android assets.
+No patient data or private contact list was used. Only public directory contact telephone numbers are shipped; contact-person names/emails and entire website HTML are not copied into app records. Raw public website snapshots are preserved under `output/research/india-directory-20261020/` for provenance, separate from Android assets. Private account/browser records are not part of that archive.
 
 ## Reproduce
 

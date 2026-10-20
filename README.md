@@ -1,5 +1,16 @@
 # Sahara — A Palliative Care Companion
 
+**Start with [the current team handoff](TEAM_HANDOFF.md).** It contains the latest APK/PDF locations, verification, remaining work, build commands and scope boundaries. [PROJECT_CONTEXT_MAP.md](PROJECT_CONTEXT_MAP.md) keeps the full timeline.
+
+Latest verified native update (20 October 2026): **0.6.0 (7) debug test APK**, national directory with 1,631 listings across 36 states/UTs, visible choices/actions, local Latin/Devanagari OCR and Hindi/English translation, and optional Qwen3-ASR recording transcription. The APK built and 147 unit checks passed; current phone and clinical-language validation remain pending. The 987 MB speech pack is a separate optional download with 64-bit / 2.5 GiB free RAM requirements. This test APK has not been uploaded to Play.
+
+Web: [shared care](https://sahara.wedevit.in/shared-care), [hospital survey (web only)](https://sahara.wedevit.in/hospital-survery). Last Play check 19 October: 0.4.1 production available ; 0.5 production update in review. See the release metadata before making a current release claim. No patient rollout is established.
+
+## Earlier project and release notes
+
+The following notes are retained from earlier checkpoints. Later implementation and status are described in the current handoff above; the older33-centre/dictation-only/preview-only descriptions do not describe the20 October source.
+
+
 **Sahara (सहारा)** is the approved name, chosen on 10 October 2026. Zeros and Ones was shortlisted for Health-a-thon 2026 Phase 2. The primary project is now native Android; the website is in `prototype/` and its earlier checkpoint is preserved in [Healthathon-Copy](https://github.com/basithladdu/Healthathon-Copy).
 
 Website: https://sahara.wedevit.in. The earlier https://saanthvana.wedevit.in address remains active for the submitted deck. Android privacy and account-deletion requests are available at `/privacy` and `/delete-account` on either address. `/android-account` handles email confirmation and password recovery; the exact Supabase redirect and ordinary-tester email delivery still need provider setup.
