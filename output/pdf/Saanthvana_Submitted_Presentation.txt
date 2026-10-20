@@ -1,0 +1,184 @@
+SLIDE 1
+Saanthvana स ांत्वन Comfort & reassurance
+Your palliative care companion for goals of care records, medicines, visits and local support. 
+Doctors and families can find what matters, when it matters.
+saanthvana.wedevit.in
+github.com/basithladdu/healthathon
+ Questions? Contact us
+wa.me/919553321211
+Video walkthrough
+By Zeros and Ones
+Shaik Abdul
+Basith
+Technical lead
+Shaik Muhammad
+Awaiz
+Technical member
+Dr Sharada
+Vinod Kutty
+Doctor partner
+Dr Sujay
+Halkur Shankar
+Clinician
+Shirin Ayub
+Medical student
+
+
+SLIDE 2
+A family is asked to decide without knowing her wishes
+A 62-year-old woman with advanced breast cancer receives best supportive care.
+Illustrative consultation photo.
+At the clinic
+Her doctor discusses her wishes. Only her husband 
+attends.
+Two months later
+She becomes unconscious and is brought to the 
+Emergency Department. The doctor asks if she wanted 
+CPR if her heart stopped.
+The family has not agreed
+Her husband says yes; her daughter says no. Her son pays 
+for her treatment but is unavailable. The family has not 
+agreed, and her earlier note is missing.
+Her family needs a clear record of what she wanted.
+
+SLIDE 3
+0%
+92%
+0%
+25%
+50%
+75%
+100%
+Before After
+Cancer care needs support between visits
+15.6 lakh
+Estimated new cancer cases in India 
+in 2024.
+IARC, GLOBOCAN 2024
+98.39%
+Estimated unmet palliative-care 
+need in metastatic disease across 
+10 cancer types.
+Patil et al., 2024
+88%
+Surveyed patients wanted to choose 
+their end-of-life treatment. 2,400+ 
+urban respondents with a recent 
+hospital stay (2019).
+IndiaSpend; seven-city survey
+11.5%
+45/391 doctors had training in 
+advance directives and their 
+practical aspects. One hospital.
+Jacob et al., CMC Vellore, 2026
+Goals-of-care discussion
+A clinician-led conversation about a patient’s values, 
+priorities and care preferences, used to agree care goals 
+with the patient and, with consent, their family.
+A standard procedure improved goals-of-care 
+documentation to 92% (24/26 eligible 
+patients).
+Advanced pancreatic / colorectal cancer, Chennai.
+Thangasamy et al., 2025
+Different study groups. These are not results from Saanthvana.
+Proposed 60-90 day study: compare before and after
+Number of patient- and doctor-initiated 
+goals-of-care discussions.
+Number of written and signed Care Notes 
+per cancer facility.
+Time to retrieve goals-of-care discussions 
+during an emergency.
+
+SLIDE 4
+Saanthvana keeps your cancer care in one place
+Medicines and prescription reminders
+Visits, tests and treatment dates
+Journals and symptom tracking
+ Financial tracking
+Three sign-ins
+OPEN - saanthvana.wedevit.in
+
+SLIDE 5
+Physician leads. AI assists
+The physician initiates the goals-of-care discussion. AI provides a structured guide.
+Every version of the goals-of-
+care discussion stays in the Care 
+Note history.
+1. Record with consent.
+2. AI guides the physician through 
+a structured goals-of-care 
+discussion.
+3. AI drafts the Care Note.
+4. The physician reviews, edits and 
+signs.
+5. The patient reviews and signs.
+Download the signed Care Note and keep it ready for an emergency.
+Sarvam AI can support Indian-language speech, translation and read-aloud.
+
+SLIDE 6
+AI helps doctors and families use patient records
+With the patient’s permission, find answers and see the original passage.
+1. Add a report.
+Or a printed prescription.
+2. Ask in your own 
+words.
+3. Check the original 
+text.
+Keep treatment dates in order.
+ Check medicine reminders before saving.
+
+SLIDE 7
+Help with palliative care near you
+Open the care map Pallium India directory
+Map data: © OpenStreetMap contributors
+1. Find palliative care nearby
+Find palliative-care centres and hospitals, with 
+phone numbers and directions.
+2. Access to prescribed opioids
+Ask about oral morphine, prescription documents 
+and collection hours before travelling.
+3. Find your cancer-specific support group
+Find patient and caregiver groups for your cancer 
+type, locally or online.
+4. Plan travel and help at home
+Write down who will handle a ride, home-nursing 
+visit or medicine pickup.
+
+SLIDE 8
+References
+1. IARC. Global Cancer Observatory, 2024.
+India: GLOBOCAN 2024 Fact Sheet
+https://gco.iarc.who.int/media/globocan/factsheets/populations/356-india-fact-sheet.pdf
+2. Patil S, et al. BMJ Support Palliat Care, 2024.
+Unmet need for cancer palliative care in India
+https://doi.org/10.1136/spcare-2024-004978
+3. Aslam N, Hayat A. J Pain Symptom Manage, 2024.
+Early Goal of Care Discussions in Healthcare: A Survey Case Report on Benefits 
+and Perceptions
+https://doi.org/10.1016/j.jpainsymman.2024.02.030
+4. Thangasamy DRJ, et al. Palliat Med Rep, 2025.
+Initiating and Documenting Goals of Care Discussion in Patients with Advanced 
+Pancreatic and Colorectal Cancers: A Quality Improvement Project in a Low 
+Resource Setting
+https://doi.org/10.1177/26892820251392545
+5. Sharma P . IndiaSpend / Scroll.in, 2019.
+73% urban Indians do not know about their right to make a living will, finds a 
+survey
+https://scroll.in/article/925875/73-urban-indians-do-not-know-about-their-right-to-make-a-living-
+will-finds-a-survey
+6. Jacob JA, et al. Natl Med J India, 2026.
+Knowledge and attitude towards advance directives for patients with terminal 
+illnesses among doctors working in a tertiary care hospital
+https://doi.org/10.25259/NMJI_817_2023
+7. Singh P , et al. medRxiv, 2025. Preprint.
+Barriers and Facilitators to Advance Care Planning Implementation for Patients 
+with Neurodegenerative Diseases among Indian Physicians: A Mixed-Methods 
+Analysis
+https://doi.org/10.1101/2025.10.17.25338242
+8. LeBaron V, et al. The Oncologist, 2014.
+An Ethnographic Study of Barriers to Cancer Pain Management and Opioid 
+Availability in India
+https://doi.org/10.1634/theoncologist.2013-0435
+9. Forsythe LP , et al. J Clin Oncol, 2013. U.S. cohort.
+Receipt of Psychosocial Care Among Cancer Survivors in the United States
+https://doi.org/10.1200/JCO.2012.46.2101

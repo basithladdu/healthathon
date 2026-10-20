@@ -1,0 +1,26 @@
+{
+  "candidate": "0.5.0(6) before bottom-sheet alignment",
+  "apkSha256": "1A55AE8225525574732BB54340E60D24386B88006E5EFA07F077E64266516995",
+  "status": "Incomplete: stopped for justified UI fix and rebuild; not final release smoke approval.",
+  "verified": [
+    "Signed release installed and launched; actual package in.wedevit.sahara, version0.5.0/code6.",
+    "Created synthetic Release Smoke Person through actual UI. Person Continue remained above visible IME and worked without hiding keyboard.",
+    "Calendar route and Plan care form opened in optimized release. Entered Follow-up visit, hid IME and expanded sheet using observed drag handle; Save to calendar became fully visible and saved entry appeared in Calendar.",
+    "Care team route and Add task sheet opened; no task save or task persistence claim."
+  ],
+  "keyboardDiagnostic": {
+    "observedImeFrame": "[0,1039][720,1600]",
+    "calendarSaveWhileIme": "[261,1289][459,1327], covered by IME",
+    "calendarTextWhileIme": "[38,795][682,915], visible",
+    "afterHidingIme": "Values preserved; Save initially partly below viewport at [261,1569][459,1600].",
+    "recovery": "Upward drag of observed sheet handle exposed Save at [261,1436][459,1474]. Save succeeded.",
+    "rootAction": "Root will use existing skipPartiallyExpanded=true pattern in three new editors; final QA must use rebuilt artifacts."
+  },
+  "limitations": [
+    "No release Labs entry/save/reopen yet.",
+    "No final post-fix release smoke yet.",
+    "FLAG_SECURE respected; release evidence is actual UIAutomator XML and IME/window status, not manufactured release screenshots.",
+    "No physical device,16KB runtime,dictation accuracy or TTS validation."
+  ],
+  "vmStoppedUtc": "2026-10-16T08:57:37.6387288Z"
+}

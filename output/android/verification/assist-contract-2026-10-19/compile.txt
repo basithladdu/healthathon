@@ -1,0 +1,3 @@
+android\app\src\main\java\in\wedevit\care\CareRemoteAssist.kt:45:30: warning: 'constructor(p0: String!): URL' is deprecated. Deprecated in Java.
+                connection = URL(base + path).openConnection() as HttpURLConnection
+                             ^^^

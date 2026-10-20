@@ -1,0 +1,12 @@
+✔ public projection retains dates and original source but discards private extras (2.0366ms)
+✔ empty reviewed directory is valid without fabricating facilities (1.5291ms)
+✔ expired or malformed date fails closed (0.9647ms)
+✔ unreviewed URL/coordinates/status are rejected (0.677ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 245.7167

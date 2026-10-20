@@ -1,0 +1,44 @@
+{
+  "evidence": "desktop CPU inference with the same pinned ONNX files and runtime version; no Android runtime or clinical accuracy claim",
+  "runtime": "1.13.8",
+  "modelSha256": {
+    "small-encoder.int8.onnx": "4cbe7b22fa9026b843b60a68640c747de05bafb1a11b57edc0e66c232d9f33a9",
+    "small-decoder.int8.onnx": "acad50b5c782696e91b55914cc5ab4f756f1532f76e22aa6fc615f39fb69a8ee",
+    "small-tokens.txt": "b34b360dbb493e781e479794586d661700670d65564001f23024971d1f2fa126"
+  },
+  "englishExpected": "Please write these words. I do not want to decide today. We can talk again on Monday.",
+  "patientDataUsed": false,
+  "fixturesUploaded": false,
+  "results": [
+    {
+      "fixture": "hindi-public",
+      "audioSeconds": 9.12,
+      "inferenceSeconds": 11.422,
+      "text": "कچ मे ्स्त्र केंक होता है, िस का मतल हा",
+      "nonempty": true,
+      "containsHindiScript": true,
+      "containsLatinScript": false,
+      "englishNegationRetained": false
+    },
+    {
+      "fixture": "english-synthetic",
+      "audioSeconds": 7.15,
+      "inferenceSeconds": 5.328,
+      "text": "Please write these words. I do not want to decide today. We can talk again on Monday.",
+      "nonempty": true,
+      "containsHindiScript": false,
+      "containsLatinScript": true,
+      "englishNegationRetained": true
+    },
+    {
+      "fixture": "hindi-english-concatenated",
+      "audioSeconds": 16.57,
+      "inferenceSeconds": 25.329,
+      "text": "कچ ो में ््र कें होता है, िसका मतल हां की न्में ोे ा िना किसी के से न",
+      "nonempty": true,
+      "containsHindiScript": true,
+      "containsLatinScript": false,
+      "englishNegationRetained": false
+    }
+  ]
+}

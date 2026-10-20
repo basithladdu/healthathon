@@ -1,0 +1,47 @@
+{
+  "evidence": "desktop CPU actual inference; no Android or clinical performance claim",
+  "patientDataUsed": false,
+  "fixturesUploaded": false,
+  "modelRepo": "csukuangfj/sherpa-onnx-omnilingual-asr-1600-languages-300M-ctc-int8-2025-11-12",
+  "revision": "6abf1ece20cd2308bdb7d13cd78ec1c44fa4c094",
+  "license": "Apache-2.0",
+  "modelSha256": {
+    "model.int8.onnx": "e7c4e54ee4c4c47829cc6667d5d00ed8ea7bef1dcfeef0fce766f77752a2726c",
+    "tokens.txt": "a7a044c52cb29cbe8b0dc1953e92cefd4ca16b0ed968177b6beab21f9a7d0b31"
+  },
+  "results": [
+    {
+      "fixture": "hindi-public",
+      "audioSeconds": 9.12,
+      "inferenceSeconds": 5.875,
+      "text": "कुछ अणुओं में आस्थ केंद्रक होता है जिसका मतलब यहा कि उनमें थोड़े या बिना किसी झटके से टूटने की प्रवत्ति होती है",
+      "expected": "कुछ अणुओं में अस्थिर केंद्रक होता है जिसका मतलब यह है कि उनमें थोड़े या बिना किसी झटके से टूटने की प्रवृत्ति होती है",
+      "nonempty": true,
+      "containsHindiScript": true,
+      "containsLatinScript": false,
+      "englishNegationRetained": false
+    },
+    {
+      "fixture": "english-synthetic",
+      "audioSeconds": 7.15,
+      "inferenceSeconds": 4.5,
+      "text": "please write these words i do not want to decide to-day we can talk again on monday",
+      "expected": "Please write these words. I do not want to decide today. We can talk again on Monday.",
+      "nonempty": true,
+      "containsHindiScript": false,
+      "containsLatinScript": true,
+      "englishNegationRetained": true
+    },
+    {
+      "fixture": "hindi-english-concatenated",
+      "audioSeconds": 16.57,
+      "inferenceSeconds": 10.578,
+      "text": "کچھ اڑوں میں اتر کیندرک ہوتا ہے جس کا مطلب یہا کہ ان میں تھوڑے یا بنا کسی جھٹکے سے ٹوٹنے کی پروتی ہوتی ہے pلease رit theسe woردs i دo nت wانt to dیcide toدay وe کaن تاlک اگain on مonday",
+      "expected": "कुछ अणुओं में अस्थिर केंद्रक होता है जिसका मतलब यह है कि उनमें थोड़े या बिना किसी झटके से टूटने की प्रवृत्ति होती है Please write these words. I do not want to decide today. We can talk again on Monday.",
+      "nonempty": true,
+      "containsHindiScript": false,
+      "containsLatinScript": true,
+      "englishNegationRetained": false
+    }
+  ]
+}

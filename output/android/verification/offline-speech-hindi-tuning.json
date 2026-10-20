@@ -1,0 +1,34 @@
+[
+  {
+    "language": "hi",
+    "padding": -1,
+    "fixture": "hindi",
+    "text": "कچ मे ्स्त्र केंक होता है, िस का मतल हा",
+    "detected": "hi",
+    "seconds": 13.24
+  },
+  {
+    "language": "hi",
+    "padding": -1,
+    "fixture": "mixed",
+    "text": "कچ ो में ््र कें होता है, िसका मतल हां की न्में ोे ा िना किसी के से न",
+    "detected": "hi",
+    "seconds": 32.81
+  },
+  {
+    "language": "hi",
+    "padding": 2500,
+    "fixture": "hindi",
+    "text": "क म  ् केंरक होता है, िस का मतल हा",
+    "detected": "hi",
+    "seconds": 18.61
+  },
+  {
+    "language": "hi",
+    "padding": 2500,
+    "fixture": "mixed",
+    "text": "कچ ो मे ्तर केंा कोता है, िसका मतल हा की न्मे ोे ा िना किसी के से ने की ्र",
+    "detected": "hi",
+    "seconds": 24.5
+  }
+]

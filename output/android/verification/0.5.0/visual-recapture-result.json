@@ -1,0 +1,71 @@
+{
+  "sourceCommit": "4758218",
+  "debugApkSha256": "AC8759DF1E2708E805D871D806B710D7004F256A9FC51EE15EAC7F85885B65EC",
+  "targetedChecks": {
+    "pass": 6,
+    "skip": 0,
+    "failure": 0,
+    "error": 0,
+    "durationSeconds": 263.081,
+    "finishedUtc": "2026-10-16T08:47:03.6823655Z"
+  },
+  "visualReview": "PASS: all six unobscured images inspected for readability, controls, layout and bottom insets at384dp. This is debug emulator evidence, not signed release screenshots.",
+  "environment": {
+    "width": 720,
+    "height": 1600,
+    "densityDpi": 300,
+    "logicalWidthDp": 384,
+    "pageSize": 4096,
+    "physicalDevice": false,
+    "taskOnlySettings": "wm size720x1600;wm density300; animations off. Visible SystemUI Wait action and Digital Wellbeing Close app action used; only guest Wellbeing/Play Store/search force-stopped. No system app was disabled."
+  },
+  "images": [
+    {
+      "name": "calendar-dated-visit.png",
+      "sha256": "907225fe41bdf293302a6afaf05fa7cd9f32c666f1128e3faa30138039696cd6"
+    },
+    {
+      "name": "care-task-completed.png",
+      "sha256": "22665cfced47cbe838446a53f3ca90f027bea1688f6e1d7b4c358b859234673e"
+    },
+    {
+      "name": "conversation-request-picked-up.png",
+      "sha256": "58f5b4ffd9b8d2699959280daaef50b0b2187e20186a4799570467aee9487764"
+    },
+    {
+      "name": "lab-history-dated-trend.png",
+      "sha256": "77ddc6f98f44d3c3e1cedfe123245feee4921dd6c4be935123244320aa9008c6"
+    },
+    {
+      "name": "lab-history-series.png",
+      "sha256": "6cec0acdaa84ddd5449bb70aa63d13b2def59c5cd49d3c1ec00ab173d3bc4c05"
+    },
+    {
+      "name": "note-actions.png",
+      "sha256": "80b99ee358f94a0df2c02ee5f3ad09dff5cfb57b62b81c6aaf85e68e0efc614f"
+    },
+    {
+      "name": "today.png",
+      "sha256": "e9fd42ef2664db491ee4abc770064126b1e73bd2fd69988acd0fea5c9e23ef99"
+    }
+  ],
+  "datedTrend": {
+    "method": "Entered using actual debug UI, including date picker; no database seeding.",
+    "fixtures": [
+      {
+        "test": "Haemoglobin",
+        "value": "12.4",
+        "unit": "g/dL",
+        "date": "2026-10-14"
+      },
+      {
+        "test": "Haemoglobin",
+        "value": "13.1",
+        "unit": "g/dL",
+        "date": "2026-10-16"
+      }
+    ],
+    "result": "PASS: two dated values persist in history and plot on different dates; no reference limits supplied."
+  },
+  "abortedAttempt": "visual-recapture-aborted.txt records stopped first attempt when unrelated Digital Wellbeing ANR appeared. That attempt is not a pass. Original obscured images are preserved in debug-screens."
+}

@@ -1,0 +1,142 @@
+Pallium India Andaman and Nicobar Islands cached 1
+Pallium India Andhra Pradesh cached 26
+Pallium India Arunachal Pradesh cached 2
+Pallium India Assam cached 31
+Pallium India Bihar cached 10
+Pallium India Chandigarh cached 5
+Pallium India Chhattisgarh cached 19
+Pallium India Dadra and Nagar Haveli and Daman and Diu cached 1
+Pallium India Goa cached 15
+Pallium India Gujarat cached 24
+Pallium India Haryana cached 22
+Pallium India Himachal Pradesh cached 9
+Pallium India Jammu and Kashmir cached 16
+Pallium India Jharkhand cached 11
+Pallium India Karnataka cached 33
+Pallium India Kerala cached 419
+Pallium India Ladakh cached 3
+Pallium India Lakshadweep cached 1
+Pallium India Madhya Pradesh cached 15
+Pallium India Maharashtra cached 73
+Pallium India Manipur cached 12
+Pallium India Meghalaya cached 6
+Pallium India Mizoram cached 14
+Pallium India Nagaland cached 14
+Pallium India Delhi cached 21
+Pallium India Odisha cached 14
+Pallium India Puducherry cached 6
+Pallium India Punjab cached 13
+Pallium India Rajasthan cached 14
+Pallium India Sikkim cached 9
+Pallium India Tamil Nadu cached 62
+Pallium India Telangana cached 44
+Pallium India Tripura cached 2
+Pallium India Uttarakhand cached 14
+Pallium India Uttar Pradesh cached 23
+Pallium India West Bengal cached 20
+IAPC Sikkim cached 1
+IAPC Nagaland cached 2
+IAPC Chhattisgarh cached 4
+IAPC Kerala cached 1
+IAPC West Bengal cached 18
+IAPC Uttar Pradesh cached 20
+IAPC Uttarakhand cached 4
+IAPC Tripura cached 2
+IAPC Telangana cached 59
+IAPC Tamil Nadu cached 45
+IAPC Rajasthan cached 10
+IAPC Punjab cached 12
+IAPC Puducherry cached 5
+IAPC Odisha cached 12
+IAPC Delhi cached 26
+IAPC Mizoram cached 2
+IAPC Meghalaya cached 1
+IAPC Manipur cached 2
+IAPC Maharashtra cached 44
+IAPC Madhya Pradesh cached 18
+IAPC Lakshadweep cached 1
+IAPC Kerala cached 24
+IAPC Kerala cached 34
+IAPC Kerala cached 35
+IAPC Kerala cached 4
+IAPC Kerala cached 19
+IAPC Kerala cached 68
+IAPC Kerala cached 22
+IAPC Kerala cached 43
+IAPC Kerala cached 13
+IAPC Kerala cached 8
+IAPC Kerala cached 6
+IAPC Kerala cached 18
+IAPC Kerala cached 65
+IAPC Karnataka cached 26
+IAPC Jharkhand cached 10
+IAPC Haryana cached 9
+IAPC Jammu and Kashmir cached 3
+IAPC Himachal Pradesh cached 4
+IAPC Gujarat cached 11
+IAPC Goa cached 1
+IAPC Chandigarh cached 4
+IAPC Bihar cached 4
+IAPC Assam cached 20
+IAPC Andhra Pradesh cached 16
+{
+  "retrievedOn": "2026-10-20",
+  "totalCentres": 1631,
+  "stateAndUtCoverage": 36,
+  "stateCounts": {
+    "Andaman and Nicobar Islands": 1,
+    "Andhra Pradesh": 41,
+    "Arunachal Pradesh": 2,
+    "Assam": 47,
+    "Bihar": 13,
+    "Chandigarh": 9,
+    "Chhattisgarh": 22,
+    "Dadra and Nagar Haveli and Daman and Diu": 1,
+    "Delhi": 40,
+    "Goa": 16,
+    "Gujarat": 33,
+    "Haryana": 30,
+    "Himachal Pradesh": 13,
+    "Jammu and Kashmir": 18,
+    "Jharkhand": 18,
+    "Karnataka": 53,
+    "Kerala": 684,
+    "Ladakh": 3,
+    "Lakshadweep": 2,
+    "Madhya Pradesh": 29,
+    "Maharashtra": 117,
+    "Manipur": 14,
+    "Meghalaya": 7,
+    "Mizoram": 15,
+    "Nagaland": 16,
+    "Odisha": 25,
+    "Puducherry": 10,
+    "Punjab": 22,
+    "Rajasthan": 22,
+    "Sikkim": 10,
+    "Tamil Nadu": 99,
+    "Telangana": 100,
+    "Tripura": 4,
+    "Uttar Pradesh": 41,
+    "Uttarakhand": 18,
+    "West Bengal": 36
+  },
+  "statesWithoutSourceListings": [],
+  "originalKarnataka": {
+    "records": 33,
+    "sha256Unchanged": "0871c5c454d109708280d20ec21814814866bfeb09062b48fad0b34a0de50522"
+  },
+  "totalParsedRowsBeforeDedupe": 1782,
+  "duplicatesMerged": 151,
+  "withCoordinates": 9,
+  "withPhone": 1509,
+  "independentlyVerifiedCentres": 0,
+  "caveats": [
+    "Public directory-listed centres, not independently verified or an exhaustive census.",
+    "Retrieval date is not the source's last centre verification date.",
+    "Published contacts and services may be outdated; call before travel.",
+    "Morphine source text is historical listing information; no live stock claim is made.",
+    "No inferred coordinates, city centroids or geocoded guesses are used.",
+    "Exact same-state/name plus matching address/phone, or the same preserved Karnataka identity, is deduplicated; possible name/address variants remain."
+  ]
+}

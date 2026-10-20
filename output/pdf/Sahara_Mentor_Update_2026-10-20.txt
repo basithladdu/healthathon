@@ -1,0 +1,36 @@
+Sahara
+MENTOR BRIEFING
+20 October 2026
+A Palliative Care Companion
+Help patients, families and clinicians keep one clear, source-linked record of what matters to the patient.
+The core journey
+01
+Listen. Record a consented goals-of-care conversation.
+02
+Review. Check the transcript, original evidence and copied facts.
+03
+Confirm. A clinician reviews the exact note version; the patient confirms it.
+04
+Share. Share by choice, with recipient permissions, expiry and revocation.
+What we have built
+Connected care records: shared web/native roles, clinician review, patient/family confirmations, protected
+exact-version QR retrieval and assigned tasks.
+Daily care on Android: medicines, visits, tasks, check-ins and reminders. Report originals stay available
+beside reviewed OCR and page/line-linked facts.
+National directory: 1,631 public listings across all 36 states/UTs, with search, state filters, call/directions and
+source dates. These are directory entries, not verified facilities or live medicine stock.
+Latest Android source: visible controls replace dropdowns/expanders; Latin + Devanagari OCR and on-device
+Hindi/English translation are added. Qwen3-ASR offline speech is included; Hindi/mixed-language phone
+validation remains pending.
+Where we are now
+The shared-care website is deployed. The updated Android test APK is built; 147 unit checks passed. Phone
+checks remain pending. Previous web/database checks passed: 284 web tests and 65 database checks.
+Transcripts and translations require human review. Original report/audio files remain on the phone; shared notes do
+not synchronize those files. Generative clinical drafting and the promised Sarvam integration are not enabled. A
+clinician/family pilot is still to be arranged.
+What we need from our mentor
+1. Validate minimum goals-of-care content and clinician/patient consent roles.
+2. Help shape a proposed 3-5 case clinician/family pilot and facility-data validation.
+3. Decide whether CARE integration is needed, and the first useful exchange.
+Open shared care | Hospital survey (web only)
+Zeros and Ones / WeDevit

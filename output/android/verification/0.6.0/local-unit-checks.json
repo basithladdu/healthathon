@@ -1,0 +1,297 @@
+{
+  "checkedAtUtc": "2026-10-19T14:38:38.963162+00:00",
+  "sourceCommit": "52be54c1695932f7f5f6295bc43705207e4a875e",
+  "environment": "Local Windows / JBR21 / Gradle8.14.3; GitHub job did not start",
+  "debugBuildPassed": true,
+  "testApkBuilt": true,
+  "suiteCount": 17,
+  "totals": {
+    "tests": 109,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "suites": [
+    {
+      "name": "in.wedevit.care.CareAcknowledgementTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sourceXmlSha256": "CDD95C693F3D6C7B66016E2910CE1639E09ABDEF66BD4C68D60F29F83783A790",
+      "cases": [
+        "legacyFamilyRowIsPreservedWithoutPretendingPatientConsent",
+        "decodeAcceptsLegacyAndSeparateRowsAndExportIncludesMatchingPeopleOnly",
+        "patientMustConfirmBeforeSeparateFamilyConfirmations",
+        "repeatConfirmationReturnsOriginalAndCannotReplacePatient",
+        "changedVersionOrHashDoesNotInheritPreviousPatientConfirmation"
+      ]
+    },
+    {
+      "name": "in.wedevit.care.CareDraftAssistTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sourceXmlSha256": "9C1B80C433D718D1CFB08B9F3B5ABCB061071603C323B96CA4E9A756A54497AF",
+      "cases": [
+        "staleExcerptAndDuplicateAssignmentCannotCorruptDraft",
+        "turnsAppendWithoutOverwritingEarlierSourceAndRequireSpeaker",
+        "longReadAloudKeepsEveryWordAndFitsEngineLimit",
+        "assigningWordsRetainsNegationAndLinksToOriginalSpeaker",
+        "editedMeaningNeverReceivesFuzzySourceLink",
+        "repeatedWordsExposeBothSourcesWithoutInferringWhoSaidThem",
+        "referencesPreserveLineNumbersAcrossBlankLinesAndCrLf"
+      ]
+    },
+    {
+      "name": "in.wedevit.care.CareWorkflowTest",
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sourceXmlSha256": "66F02C07755E49D1B30DB6B7AF8A6204693D340EAC3CF460210F734DC7FBB597",
+      "cases": [
+        "structuredRoundTripKeepsRecipientSourceAndStatusEvidence",
+        "historiesNeverMergeIncompatibleUnits",
+        "ordinaryNotesAndJsonAreNotReinterpretedAsWorkflows",
+        "datedPlainTasksKeepTheirOrdinaryEditorInsteadOfBecomingVisits",
+        "taskRequiresANamedRecipient",
+        "numericLabValuesAndPrintedRangesValidateWithoutInterpretation",
+        "taskCannotSkipAcceptanceAndKeepsWhoDidEachStep",
+        "transitionRequiresNameAndRejectsRepeatedCompletion",
+        "flagsDoNotInventLimitsOrInterpretTextualRanges",
+        "reportDatesMustBeRealAndNotFuture",
+        "calendarIncludesActualDatedKindsButNotLabsOrCancelledRequests",
+        "corruptOrFuturePayloadDoesNotThrowOrRenderJson",
+        "cancelledAndCompletedEntriesCanBeReopenedWithoutOldCurrentStatus",
+        "rejectsNonnumericNonfiniteMissingUnitsAndReversedLimits",
+        "flagsCompareOnlyTheLimitsCopiedForThatResult"
+      ]
+    },
+    {
+      "name": "in.wedevit.care.DoctorConversationsDataTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sourceXmlSha256": "B63135837BAB51A8451676B2A906F8BBD6D949377935811E2E63C629A8534052",
+      "cases": [
+        "validatedPublishedOrderMatchesOverviewAndKeepsDraftSeparate",
+        "emptyChecklistOnlyDraftIsNotAPublishedOrCurrentConversation",
+        "priorSamplePreservesExactOriginalAndUnknownDateAndAuthor",
+        "wrongPatientFutureAndInvalidVersionsCannotLeakIntoHistory",
+        "allExistingPatientSourcesRemainScopedAndUnmodified"
+      ]
+    },
+    {
+      "name": "in.wedevit.care.DoctorDemoDataTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sourceXmlSha256": "99A963373125E614D2753B78BD8C21DA867741AB7132CCF4B302D3F1AD544D1A",
+      "cases": [
+        "cancelAndCompleteAreTerminalButIdempotent",
+        "reschedulingIgnoresItselfButNotOtherBookings",
+        "fixturesAreFictionalCompleteAndAppointmentsReferencePatients",
+        "overlapIsCheckedAcrossPatientsAndCancelledBookingsDoNotBlock",
+        "completedHistoricalBookingIsValidButCannotBeRebookedInPast",
+        "invalidPatientTimeDurationTypeAndStatusAreRejected"
+      ]
+    },
+    {
+      "name": "in.wedevit.care.DoctorMedicinePresentationTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sourceXmlSha256": "2B4535D417E9B47367CDD7BEB22F389444C0C632F75E98A58E8E8AA21171E079",
+      "cases": [
+        "timezoneRetainsFullLocalDateNotJustClock",
+        "lateEntryDoesNotMakeOnTimeReportedIntakeLate",
+        "skippedNeverShowsTakenTimestamp",
+        "separatesPlannedActualAndEntryTimes",
+        "takenWithUnknownTimeRetainsReportButIncompleteOutcomeDoesNot",
+        "laterEntriesAndActualTimesCannotLeakIntoSnapshot",
+        "unreportedFutureIsUpcomingAndDueIsNotLogged"
+      ]
+    },
+    {
+      "name": "in.wedevit.care.DoctorOverviewDataTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sourceXmlSha256": "EA770AB240B207848904570B997322345739FE9F2D43998EFB2CAEB882D02B6A",
+      "cases": [
+        "undatedSampleAndIllustrativeProfessionalRemainSeparateFromUnknownAuthor",
+        "latestUsableSnapshotIsPatientScopedAndVersionNumberPrecedesClockTime",
+        "malformedOrUnpublishedFutureSnapshotsDoNotBecomeLastDiscussion",
+        "upcomingVisitMustBeFutureScheduledAndForThisPatient",
+        "reportedUpdateIsAttributedAndDoesNotBecomeClinicalAssessment",
+        "partialLatestHeadingsStayBlankInsteadOfBorrowingOlderPreferences"
+      ]
+    },
+    {
+      "name": "in.wedevit.care.DoctorPatientHubTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sourceXmlSha256": "2D4D2D242CFFE57D9AC51CB0B6EAD88A240E1EB40C61C0D5338D9FA62AEFBCD1",
+      "cases": [
+        "narrowAndLargeTextUseReadableSingleColumn"
+      ]
+    },
+    {
+      "name": "in.wedevit.care.DoctorPatientTrackingTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sourceXmlSha256": "CCF2E1A821170C49EF720F8BF71AEA1ADFAAD41F29B3E745AB7F6B0CEEC5AE39",
+      "cases": [
+        "sampleFixturesArePatientScopedAndDoNotInventUnknownPatientRecords",
+        "noReportNeverBecomesAssumedSkippedOrLate",
+        "lateUsesReportedTakenTimeNotTimeTheEntryWasLogged",
+        "explicitSkippedReportIsSeparateFromNotLogged",
+        "incompleteOrUnattributedReportDoesNotInventTakenStatus"
+      ]
+    },
+    {
+      "name": "in.wedevit.care.DoctorProgressDataTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sourceXmlSha256": "2CAE330489BDDAEC117DC8FF88001A5E1A81E02ABBFC3C0BA646BFCB2EA0CDBF",
+      "cases": [
+        "onlyThisPatientAndSameLocalDateAreJoined",
+        "fixtureDiscussionLinkIsExplicitAndPatientSpecific",
+        "localDateUsesInjectedZoneRatherThanUtcDay",
+        "lateMeansTakenAfterPlanNotLoggedAfterPlan",
+        "historicalCutoffHidesLaterLogsAndFutureTakenClaims",
+        "futureReportsAreNotVisibleAndHistoricalDayHasNoUnrelatedDoses"
+      ]
+    },
+    {
+      "name": "in.wedevit.care.DoctorRecordingReviewTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sourceXmlSha256": "EC94E6CB4A53A9DE0480A89F0E2C275005BAA89541388AEF33F6AE924243FE83",
+      "cases": [
+        "clippedNegationNeverBecomesEvidenceEvenWithManualCheckbox",
+        "recordingAloneNeverCreatesTranscriptOrCoverage",
+        "clocksAreSafeAndReadable",
+        "fullSourceOrManualReviewRequiredForDiscussed"
+      ]
+    },
+    {
+      "name": "in.wedevit.care.DoctorReportsDataTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sourceXmlSha256": "4CEDB4E149BF86076259D68D178FE417F1DF7D09513DF6B9983AA2DE11D9BB4F",
+      "cases": [
+        "reportsRetainExactPatientSpecificSourceAndUnknownFileMetadata",
+        "countsAreSummaryCountsAndIncludeEmptyCategories",
+        "declaredCategoriesMatchKnownFixturesOnly",
+        "searchAndCategoryFiltersWorkTogetherWithoutInventingItems"
+      ]
+    },
+    {
+      "name": "in.wedevit.care.DoctorWorkflowTest",
+      "tests": 11,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sourceXmlSha256": "AA3883B4BA3E615BFEDDB8944B94F1C00AEDE4829C396284B3005F9A291D63D0",
+      "cases": [
+        "checklistOnlyDraftIsNotTreatedAsConversationContent",
+        "fixtureHasTraceableSourceAndNoInventedPriorities",
+        "acknowledgementsBelongToPersonAndExactVersion",
+        "seedsContainOnlyKnownPatientsAndNoConsent",
+        "checklistDoesNotInventDiscussion",
+        "foreignPatientSourceIsRejected",
+        "editedFixturePreservesTextButDropsFixtureClaims",
+        "publicationRequiresReviewNameAndExplicitSourceCheck",
+        "requestsHaveExplicitTransitions",
+        "savedLaterDoesNotAlterPublishedVersion",
+        "patientSourcesAndMembershipsAreIsolated"
+      ]
+    },
+    {
+      "name": "in.wedevit.care.FeedbackTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sourceXmlSha256": "2FD0499E53B1A87B13B8DBAA03CE39DF38883D330D254762AA824042C98979D2",
+      "cases": [
+        "valuesAreValidated",
+        "ratingLabelsHaveAccessibleStates",
+        "faceMorphsContinuouslyRatherThanThreeImages"
+      ]
+    },
+    {
+      "name": "in.wedevit.care.MedicineOrganizerTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sourceXmlSha256": "EE285674A50855E743A01B40C21CE62F1AF3BCDEA643D68E7386AAF0B4BD4BA5",
+      "cases": [
+        "sanitizesStructuredResponseAndComputesUnusedPhotos",
+        "neverTreatsAStripPhotoAsPrescriptionEvidence",
+        "malformedOrMissingModelOutputFailsClosed",
+        "draftIdsAreDeterministicAndDetailIsBoundedAndReadable",
+        "permitsOnlyOneMedicinePerStripAndCapsUnsafeMatches",
+        "keepsSafeTimesExplicitDurationAndPrintedOrder"
+      ]
+    },
+    {
+      "name": "in.wedevit.care.NoteRulesTest",
+      "tests": 16,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sourceXmlSha256": "D8BD7D958738B70BFF9D6404F097B2E368D1E02F0ED6BC1893D59EDED03A8FFE",
+      "cases": [
+        "publishedSourceFitsTheSharedRecordLimit",
+        "recordingConsentNamesEveryParticipantAndRequiresEachAgreement",
+        "organisingPreservesNegationAndDoesNotInventMissingSections",
+        "unlabelledWordsRemainTogetherWithoutClinicalInference",
+        "legacyPublishedHashIsOpaqueAndStaleConfirmationsNeverCarryForward",
+        "hashCannotConfuseFieldBoundaries",
+        "aPublishedDemoNoteCannotClaimVerifiedClinicalReview",
+        "importedVerificationStringsNeverBecomeTrustedClinicalIdentity",
+        "aNewVersionDoesNotAlterAnEarlierReviewedRecord",
+        "familyConfirmationsRequirePatientAndRemainDistinctAndIdempotent",
+        "confirmationBindsExactContentAndRequiresReading",
+        "recordingAndFutureTranscriptionConsentAreSeparate",
+        "exportsKeepAllExactVersionReadersAndHonestTranscriptionReview",
+        "wrongPatientAndUnreviewedNotesCannotPublish",
+        "transcriptResponseMustCarryTrustedProvenance",
+        "transcribedDraftKeepsItsProvenanceWhenPublished"
+      ]
+    },
+    {
+      "name": "in.wedevit.care.PatientDoctorSummaryTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "sourceXmlSha256": "87EDB85E54579015EEF00BD3B1B042B20EB2B92F10A8A87789307C6C81B437BB",
+      "cases": [
+        "unverifiedIsDefaultAndVerifiedCannotBeClaimedWithoutTrustedSource",
+        "blankIdentityCannotProduceAnAssignedDoctorRow"
+      ]
+    }
+  ],
+  "instrumentationRun": false,
+  "releaseBuilt": false
+}

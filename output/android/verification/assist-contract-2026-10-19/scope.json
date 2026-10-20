@@ -1,0 +1,11 @@
+{
+  "scope": "Actual assist modules tested with stubbed Room-model, NoteRules and release BuildConfig dependencies; no app package or Android runtime check",
+  "junitExitCode": 0,
+  "checks": 15,
+  "sourceSha256": {
+    "android/app/src/main/java/in/wedevit/care/CareRemoteAssist.kt": "6a5d98a263f649ac49ffe88318c69d97f028e4edb86096e6473f340b5da462bf",
+    "android/app/src/main/java/in/wedevit/care/CareDraftAssist.kt": "8765c9ca0b1884bc5dea6ddab52c1ae77ceba6bb33c3084bbb52715d8876c61e",
+    "android/app/src/test/java/in/wedevit/care/CareRemoteAssistTest.kt": "e9e241b4e41b6facb48920d1231b5ba450cbe66ea27c7e78a3aa948e5e08d952",
+    "android/app/src/test/java/in/wedevit/care/CareDraftAssistTest.kt": "e31c1822ad134969213e9a3b21737dd496f39e5c7c602fe70f45346da7aa149d"
+  }
+}

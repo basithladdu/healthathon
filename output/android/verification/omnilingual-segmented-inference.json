@@ -1,0 +1,129 @@
+{
+  "model": "Omnilingual 300M CTC int8",
+  "policy": {
+    "frameSamples": 320,
+    "minimumChunk": 16000,
+    "maxChunk": 192000,
+    "quietSamples": 4000,
+    "rmsBelow": 0.003,
+    "peakBelow": 0.03,
+    "hardBoundaryOverlap": 4800
+  },
+  "evidence": "desktop actual inference; no phone or clinical validation",
+  "results": [
+    {
+      "fixture": "hindi",
+      "inferenceSeconds": 7.422,
+      "segments": [
+        {
+          "startMs": 0.0,
+          "endMs": 8600.0,
+          "text": "कुछ अणुों में आस्थिर केंद्रक होता है जिसका मतलब यहा कि उनमें थोड़े या बिना किसी झटके से टूटने की प्रवत्ति होती है"
+        },
+        {
+          "startMs": 8600.0,
+          "endMs": 9120.0,
+          "text": ""
+        }
+      ],
+      "text": "कुछ अणुों में आस्थिर केंद्रक होता है जिसका मतलब यहा कि उनमें थोड़े या बिना किसी झटके से टूटने की प्रवत्ति होती है\n",
+      "containsHindi": true,
+      "containsLatin": false,
+      "notRetained": false,
+      "unsupportedScript": false
+    },
+    {
+      "fixture": "english",
+      "inferenceSeconds": 3.75,
+      "segments": [
+        {
+          "startMs": 0.0,
+          "endMs": 1700.0,
+          "text": "please write these words"
+        },
+        {
+          "startMs": 1700.0,
+          "endMs": 4200.0,
+          "text": "i do not want to decide today"
+        },
+        {
+          "startMs": 4200.0,
+          "endMs": 6620.0,
+          "text": "we can talk again on monda"
+        }
+      ],
+      "text": "please write these words\ni do not want to decide today\nwe can talk again on monda",
+      "containsHindi": false,
+      "containsLatin": true,
+      "notRetained": true,
+      "unsupportedScript": false
+    },
+    {
+      "fixture": "mixed-gap-300ms",
+      "inferenceSeconds": 9.703,
+      "segments": [
+        {
+          "startMs": 0.0,
+          "endMs": 8600.0,
+          "text": "कुछ अणुों में आस्थिर केंद्रक होता है जिसका मतलब यहा कि उनमें थोड़े या बिना किसी झटके से टूटने की प्रवत्ति होती है"
+        },
+        {
+          "startMs": 8600.0,
+          "endMs": 9600.0,
+          "text": ""
+        },
+        {
+          "startMs": 9600.0,
+          "endMs": 11120.0,
+          "text": "please write these words"
+        },
+        {
+          "startMs": 11120.0,
+          "endMs": 13620.0,
+          "text": "i do not want to decide today"
+        },
+        {
+          "startMs": 13620.0,
+          "endMs": 16040.0,
+          "text": "we can talk again on monda"
+        }
+      ],
+      "text": "कुछ अणुों में आस्थिर केंद्रक होता है जिसका मतलब यहा कि उनमें थोड़े या बिना किसी झटके से टूटने की प्रवत्ति होती है\n\nplease write these words\ni do not want to decide today\nwe can talk again on monda",
+      "containsHindi": true,
+      "containsLatin": true,
+      "notRetained": true,
+      "unsupportedScript": false
+    },
+    {
+      "fixture": "mixed-gap-100ms",
+      "inferenceSeconds": 11.125,
+      "segments": [
+        {
+          "startMs": 0.0,
+          "endMs": 8600.0,
+          "text": "कुछ अणुों में आस्थिर केंद्रक होता है जिसका मतलब यहा कि उनमें थोड़े या बिना किसी झटके से टूटने की प्रवत्ति होती है"
+        },
+        {
+          "startMs": 8600.0,
+          "endMs": 10920.0,
+          "text": "please write these words"
+        },
+        {
+          "startMs": 10920.0,
+          "endMs": 13420.0,
+          "text": "i do not want to decide today"
+        },
+        {
+          "startMs": 13420.0,
+          "endMs": 15840.0,
+          "text": "we can talk again on monda"
+        }
+      ],
+      "text": "कुछ अणुों में आस्थिर केंद्रक होता है जिसका मतलब यहा कि उनमें थोड़े या बिना किसी झटके से टूटने की प्रवत्ति होती है\nplease write these words\ni do not want to decide today\nwe can talk again on monda",
+      "containsHindi": true,
+      "containsLatin": true,
+      "notRetained": true,
+      "unsupportedScript": false
+    }
+  ]
+}

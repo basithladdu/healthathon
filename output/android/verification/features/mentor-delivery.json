@@ -1,0 +1,64 @@
+{
+  "date": "2026-10-20",
+  "sourceCommit": "e683e7e",
+  "latestApk": {
+    "path": "output/android/Sahara-0.6.0-20Oct-test.apk",
+    "package": "in.wedevit.sahara.development",
+    "versionName": "0.6.0",
+    "versionCode": 7,
+    "bytes": 300504493,
+    "sha256": "5DC9D96176407A8E35A34709653D9897FBD4491FA79E9F908459933509BAC9AC",
+    "signing": "Android debug; installs alongside production package",
+    "nativeSourceCommit": "e683e7e",
+    "directoryAssetMatchesCurrentSource": true,
+    "phoneTested": false,
+    "uploadedToPlay": false
+  },
+  "fallbackApk": {
+    "path": "output/android/Sahara-0.6.0-previous-19Oct.apk",
+    "sourceDate": "2026-10-19",
+    "package": "in.wedevit.sahara.development",
+    "versionName": "0.6.0",
+    "versionCode": 7,
+    "signatureVerified": true,
+    "sha256": "013B5E2042BDF4838847060531677DACA0C71AE0A8F217DE613D016355FE28DC",
+    "includes20OctoberChanges": false
+  },
+  "pdfs": [
+    {
+      "path": "output/pdf/Sahara_Mentor_Update_2026-10-20.pdf",
+      "pages": 1,
+      "renderedAndInspected": true,
+      "sha256": "682bdb0651e987737dcee27a146dc7bf51f9702206913b24db0d81dcea4ce0f2",
+      "bytes": 76060
+    },
+    {
+      "path": "output/pdf/Saanthvana_Submitted_Presentation.pdf",
+      "pages": 8,
+      "source": "submission/final/Saanthvana_Healthathon_2026-10-03-final.pptx",
+      "sourceUnchanged": true,
+      "links": 41,
+      "renderedAndInspected": true,
+      "sha256": "f52474365ec5032b10ddedfedf6d9d4a4c8f754c1def4680fdecbfaecf15b1f1",
+      "bytes": 962810
+    }
+  ],
+  "cloudBuild": {
+    "run": 39402505540,
+    "started": false,
+    "reason": "GitHub rejected job startup due account payments or spending limit; no settings changed"
+  },
+  "currentPhoneConnected": false,
+  "playChanged": false,
+  "currentChecks": {
+    "unitTests": 147,
+    "suites": 25,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "instrumentationSourcesCompiled": true,
+    "instrumentationExecuted": false,
+    "apkSignatureVerified": true,
+    "apkZipAlignmentPassed": true
+  }
+}

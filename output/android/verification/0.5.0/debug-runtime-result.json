@@ -1,0 +1,233 @@
+{
+  "version": "0.5.0",
+  "versionCode": 6,
+  "sourceCommit": "4758218",
+  "debugApkSha256": "AC8759DF1E2708E805D871D806B710D7004F256A9FC51EE15EAC7F85885B65EC",
+  "testApkSha256": "AAA736AC77C63FE861158FD4621DAFB40FF3144D17576180E240B600AB82E261",
+  "startedUtc": "2026-10-16T08:06:45.5319843Z",
+  "finishedUtc": "2026-10-16T08:18:40.3364720Z",
+  "durationSeconds": 692.499,
+  "tests": [
+    {
+      "class": "in.wedevit.care.DailyCareFlowsTest",
+      "test": "calendarSavesChosenDayAndKeepsUndatedMedicinesOutOfThatSchedule",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.DailyCareFlowsTest",
+      "test": "labsKeepPrintedValuesRangesAndSeriesWithoutLeakingToAnotherPerson",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.DailyCareFlowsTest",
+      "test": "familyRequestAppearsInDoctorQueueAndCanOpenConversation",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.DailyCareFlowsTest",
+      "test": "namedTaskAcceptanceCompletionAndSenderStatusSurviveReload",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.CareAcknowledgementMigrationTest",
+      "test": "versionThreeUpgradePreservesLegacyAckAndAllowsSeparateConfirmationsAfterReopen",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.CareReportTest",
+      "test": "versionTwoUpgradePreservesCareAndReportMetadataAfterReopen",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.CareReportTest",
+      "test": "reportCopiesAreIsolatedAndUnsafeFilesAreRejected",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.CareFlowTest",
+      "test": "roleMenuKeepsDraftAndPatientChoiceAfterRecreation",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.CareFlowTest",
+      "test": "dailyEntriesAppearOnTodayAndCanBeEditedAndRemoved",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.CareFlowTest",
+      "test": "directoryFiltersRecoverFromNoResults",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.CareFlowTest",
+      "test": "roomPersistsAndSeparatesPeopleAcrossDatabaseReopen",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.CareFlowTest",
+      "test": "documentsOpenSavedVersionWithActionsAtTheTop",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.CareFlowTest",
+      "test": "conversationReviewSavesExactVersionAndSurvivesRecreation",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.CareFlowTest",
+      "test": "reportPickerPersistsSearchesSharesAndRemovesOnlyItsCopy",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.CareFlowTest",
+      "test": "checkinSavesChosenWordsAndKeepsOptionalNote",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.CareFlowTest",
+      "test": "switchingPeopleClosesOrdinaryEntryWithoutSavingToTheNewPerson",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.CareFlowTest",
+      "test": "staleConfirmationCannotApplyAfterSwitchingPeople",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.CareFlowTest",
+      "test": "switchingPeopleKeepsLatestDraftAndCompletedTasks",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.CareFlowTest",
+      "test": "signInLoadsAccountRecordsOnToday",
+      "status": -4,
+      "result": "skipped"
+    },
+    {
+      "class": "in.wedevit.care.CareFlowTest",
+      "test": "prescriptionScannerKeepsManualFallbackAndRequiresReviewBeforeSaving",
+      "status": 0,
+      "result": "pass"
+    },
+    {
+      "class": "in.wedevit.care.CareFlowTest",
+      "test": "manualSourceAndConsentSurviveAppStopWithoutStartingAMicrophone",
+      "status": 0,
+      "result": "pass"
+    }
+  ],
+  "counts": {
+    "pass": 20,
+    "skipped": 1,
+    "failure": 0,
+    "error": 0
+  },
+  "environment": {
+    "device": "isolated Android Emulator",
+    "serial": "emulator-5556",
+    "androidApi": "36.1",
+    "resolution": "1080x2400",
+    "densityDpi": 460,
+    "pageSize": 4096,
+    "hardwareDevice": false,
+    "sixteenKbRuntimeTest": false,
+    "noRealAccountOrPatientData": true,
+    "taskOnlySetup": "Animations disabled; only Sahara debug and test packages speed-compiled. Play Store/search force-stopped to reduce startup contention; no global host changes."
+  },
+  "visualStatus": "Not yet passed. Screenshots are raw and unusable for clean UI verification due to a System UI ANR overlay; clean recapture is pending. Compose assertions and Room assertions passed, but these do not establish unobscured physical touch or clean visual inspection.",
+  "obscuredScreenshots": [
+    {
+      "name": "calendar-dated-visit.png",
+      "sha256": "d0303ec232344d65c4a53c778af27bae7a7244aadd6dc36de5bc81081c801472"
+    },
+    {
+      "name": "care-task-completed.png",
+      "sha256": "72aafd3781a2ceb00e4f2d88191d123b6bfc10799d1badd1184cb1434cdd60ef"
+    },
+    {
+      "name": "care.png",
+      "sha256": "f395ee31568b2a7944577fe24941ec4418200bfa4990df3daee65dc8919071aa"
+    },
+    {
+      "name": "centre-map-loaded.png",
+      "sha256": "c7df013c58514a86af19638fbec4edd3a14516c80b91b9889f43a9dfceec5b7b"
+    },
+    {
+      "name": "centre-map.png",
+      "sha256": "c33b1dc3f19fd804f3667b3e850c31bdabdd6bdb41fc69057611f232290c9db6"
+    },
+    {
+      "name": "checkin.png",
+      "sha256": "602348f38875aeee929e26f7624d2701b825780b0011a80fdf2c4d135f855cee"
+    },
+    {
+      "name": "conversation-request-picked-up.png",
+      "sha256": "c83de4a5cbd343c35e33662f34d0c28cf0e90d0e96f867bc0f59583c04d29d2c"
+    },
+    {
+      "name": "documents.png",
+      "sha256": "899edfcc724635fe413d6369a4d5958d10cc42b897fcd680a10b27e8c77f6bbd"
+    },
+    {
+      "name": "lab-history-series.png",
+      "sha256": "a2717f30da3fa48e5c59a7b92e407271519bef76dc74315bc55406c67507dd5b"
+    },
+    {
+      "name": "medicine-review.png",
+      "sha256": "9a2778413a3ca51e9a69b7ccba537761dfc7a938a7324400be21bf17a344885f"
+    },
+    {
+      "name": "medicine-scanner.png",
+      "sha256": "6319fc1c60891a7954471e0eadec93845f477a87327a9f2fb1fc7fbf59d158e8"
+    },
+    {
+      "name": "more.png",
+      "sha256": "9e721b6393f7ce530096ffbf9b7ae8f0f58a59ab592ff0b3363a288741151304"
+    },
+    {
+      "name": "nearby.png",
+      "sha256": "937099cf44c97a7bb4ae8e2025e59c90a022d8737bc778e6db4b1fa2764ba3bb"
+    },
+    {
+      "name": "note-actions.png",
+      "sha256": "2d8869a176dc008b56f0dd2979942112b40d5b4691685855a1dd68235d0045eb"
+    },
+    {
+      "name": "role-menu.png",
+      "sha256": "b8c7a37bd54a896f7f74d457eb289a251b3331a51051e300877129051ab2353d"
+    },
+    {
+      "name": "today-saved.png",
+      "sha256": "9c8bd593ef2ba2e71ed4b2d81d8bb342d55f7ef4fc32e8d6eb70d87478febaee"
+    },
+    {
+      "name": "today.png",
+      "sha256": "68ec4ad797530ea3995e0d62d12ce71742ee1244584cf258293b73b4a7cb7acf"
+    }
+  ],
+  "limitations": [
+    "Credential-dependent account UI test skipped because no test credentials were injected.",
+    "On-device speech recognition, dictation audio accuracy and offline TTS not exercised.",
+    "No physical-device or 16 KB runtime test."
+  ],
+  "isolatedVmStoppedUtc": "2026-10-16T08:19:09.1597992Z"
+}

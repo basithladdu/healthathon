@@ -1,0 +1,17 @@
+✔ browser transport keeps its global receiver instead of invoking fetch as a client method (32.193ms)
+✔ exact-version QR retains patient/version/note and never silently substitutes another version (0.8958ms)
+✔ authentication validates the actual account and rejects a mismatched stored identity (1.2055ms)
+✔ password sign-in is an Auth request and clinical-role metadata never grants authority (1.2172ms)
+✔ concurrent expiry refresh is single flight and uses the refreshed token (2.0301ms)
+✔ sign-out during a refresh cannot resurrect the account (1.0806ms)
+✔ offline and conflicting draft writes preserve the original local source for recovery (1.2978ms)
+✔ a receipt for the wrong person, author or revision is never claimed as a saved draft (3.1423ms)
+✔ a service rollout gap retains ordinary records without claiming review readiness (1.9096ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 288.4483
