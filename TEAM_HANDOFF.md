@@ -22,7 +22,7 @@ This is the starting point for another developer or Codex chat. Latest native ve
 | Original submitted deck | `submission/final/Saanthvana_Healthathon_2026-10-03-final.pptx`; unchanged |
 | Detailed evidence | `output/android/verification/features/mentor-delivery.json`, `mentor-apk-final.log` and the release metadata |
 
-APK files are excluded from Git. The latest APK and mentor files are being attached to a **private draft GitHub release**, separate from Google Play; the verified draft-release URL is recorded in the context map once its upload completes. A normal clone includes source, PDFs and committed evidence, not signing keys, installed model weights or private records.
+APK files are excluded from Git. The latest APK and mentor files are uploaded to the [private draft GitHub release](https://github.com/basithladdu/healthathon/releases/tag/untagged-c800dc01b40aa7dbfd27), separate from Google Play. All four uploaded asset sizes and server SHA256 digests matched the local files; the handoff asset is refreshed after this link update. A normal clone includes source, PDFs and committed evidence, not signing keys, installed model weights or private records.
 
 ## What is implemented
 

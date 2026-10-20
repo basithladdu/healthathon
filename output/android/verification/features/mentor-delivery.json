@@ -60,5 +60,39 @@
     "instrumentationExecuted": false,
     "apkSignatureVerified": true,
     "apkZipAlignmentPassed": true
+  },
+  "githubDraftRelease": {
+    "url": "https://github.com/basithladdu/healthathon/releases/tag/untagged-c800dc01b40aa7dbfd27",
+    "tag": "sahara-0.6.0-mentor-20261020",
+    "isDraft": true,
+    "privateRepository": true,
+    "verifiedUploadedAssets": [
+      {
+        "name": "Saanthvana_Submitted_Presentation.pdf",
+        "size": 962810,
+        "state": "uploaded",
+        "digest": "sha256:f52474365ec5032b10ddedfedf6d9d4a4c8f754c1def4680fdecbfaecf15b1f1"
+      },
+      {
+        "name": "Sahara-0.6.0-20Oct-test.apk",
+        "size": 300504493,
+        "state": "uploaded",
+        "digest": "sha256:5dc9d96176407a8e35a34709653d9897fbd4491fa79e9f908459933509bac9ac"
+      },
+      {
+        "name": "Sahara_Mentor_Update_2026-10-20.pdf",
+        "size": 76060,
+        "state": "uploaded",
+        "digest": "sha256:682bdb0651e987737dcee27a146dc7bf51f9702206913b24db0d81dcea4ce0f2"
+      },
+      {
+        "name": "TEAM_HANDOFF.md",
+        "size": 14056,
+        "state": "uploaded",
+        "digest": "sha256:16bdda95b937a346112e61f89669be00286f4811482c7d9d8dd91bab6f93ad37"
+      }
+    ],
+    "verification": "All4 server digests/sizes matched local artifacts before updating the handoff link; handoff refreshed afterwards.",
+    "playReleaseChanged": false
   }
 }
