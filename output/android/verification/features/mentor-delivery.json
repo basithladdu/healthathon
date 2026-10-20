@@ -87,12 +87,12 @@
       },
       {
         "name": "TEAM_HANDOFF.md",
-        "size": 14056,
+        "size": 14184,
         "state": "uploaded",
-        "digest": "sha256:16bdda95b937a346112e61f89669be00286f4811482c7d9d8dd91bab6f93ad37"
+        "digest": "sha256:b102acd883492d249e40e2b105beb2e74cb6561d191660536c6bb1a049d86c75"
       }
     ],
-    "verification": "All4 server digests/sizes matched local artifacts before updating the handoff link; handoff refreshed afterwards.",
+    "verification": "All four final uploaded asset sizes and server SHA256 digests match local artifacts, including the handoff with its actual release link.",
     "playReleaseChanged": false
   }
 }
