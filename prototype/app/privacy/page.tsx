@@ -17,7 +17,7 @@ export default function PrivacyPage() {
           <Link href="/delete-account">Delete your account</Link>
         </header>
         <h1>Your care information</h1>
-        <p className={styles.date}>Privacy policy · Updated 19 October 2026</p>
+        <p className={styles.date}>Privacy policy · Updated 24 October 2026</p>
         <p>
           Sahara — A Palliative Care Companion is provided by WEDEVIT PRIVATE LIMITED.
           This policy covers the Sahara Android app, its website workspaces and the
@@ -33,7 +33,7 @@ export default function PrivacyPage() {
           <p>
             The app keeps the names, care conversations, reviewed notes, confirmations,
             prescribed-medicine details, visits, tasks, lab results, conversation requests,
-            check-ins and journal entries
+            symptom notes, check-ins and journal entries
             you enter. We use them to show your care records, organise daily care and,
             when you sign in, share records with people you invite.
           </p>
@@ -59,6 +59,25 @@ export default function PrivacyPage() {
           </p>
         </section>
 
+        <section aria-labelledby="symptom-notes">
+          <h2 id="symptom-notes">Personal symptom notes</h2>
+          <p>
+            A symptom note can contain the symptom, a number from zero to ten or an
+            unanswered rating, observation date and time, reporting period, who answered,
+            author name, pain location or triggers, reported change and optional words.
+            Comparisons use earlier entries for the same person, symptom and reporting
+            context. They do not diagnose a condition, calculate a clinical risk score
+            or decide treatment. This personal diary is not a validated clinical questionnaire.
+          </p>
+          <p>
+            In Android, these notes use the existing care-record store. Unsigned-in
+            notes stay on the phone; notes saved in a signed-in account also go to
+            Supabase and follow that person’s existing sharing permissions. The older
+            browser diary remains in its separate browser workspace. Sharing an export
+            sends the selected words to the app and recipient you choose.
+          </p>
+        </section>
+
         <section aria-labelledby="recordings">
           <h2 id="recordings">Microphone and recordings</h2>
           <p>
@@ -66,20 +85,39 @@ export default function PrivacyPage() {
             taking part for permission first. You can stop at any time; recording also
             stops when the app leaves the foreground. Standard recordings remain on
             your phone and are not transcribed automatically. The public cloud-audio
-            transcription service remains disabled. Optional remote assistance, if
-            separately enabled with suitable processing terms, must show the destination
-            and obtain your permission before sending selected audio or conversation
-            text. Saving or sending a text draft to the shared clinician workspace
+            transcription service remains disabled. Android does not send recordings
+            to a cloud speech or generative-AI provider. Saving or sending a text draft
+            to the shared clinician workspace
             uploads that text to your account; it does not upload its recording.
           </p>
           <p>
-            Version 0.5 adds optional turn-by-turn dictation using Android’s on-device
+            Optional turn-by-turn dictation uses Android’s on-device
             recognizer on supported phones. You choose the speaker and language and check
             the words; speaker identity is not detected or verified. There is no cloud
             speech fallback in this on-device dictation flow. Recognised words remain
             in the draft until you explicitly save or send them to the shared workspace
             or publish a reviewed care-note version. Read aloud uses an installed offline voice and
             does not translate the text.
+          </p>
+          <p>
+            From Android version 0.6.0, you can also choose to transcribe a saved,
+            consented recording with Qwen3-ASR running locally through sherpa-onnx.
+            This requires a separate approximately 987 MB language-pack download,
+            a 64-bit process and sufficient free memory. Download requests go to
+            Hugging Face and its content-delivery hosts, which receive network
+            information such as your IP address and the model file requested.
+            Downloading the model does not send your recording or care text to them.
+            After the download, transcription runs on the phone without a cloud fallback.
+          </p>
+          <p>
+            The original recording, recognised words, segment offsets and reviewed
+            corrections stay with that recording in private phone storage. Check the
+            words against the audio before using them in a care note; the model can
+            miss mixed-language words, names or numbers and does not identify speakers.
+            Removing the recording through Sahara also removes its saved local transcript.
+            If you choose to save recognised words in a signed-in care record or shared
+            draft, that text follows the account sharing rules above; the original audio
+            is not uploaded with it.
           </p>
           <p>
             The fictional doctor preview keeps its sample records, edited drafts,
@@ -91,6 +129,20 @@ export default function PrivacyPage() {
             local preview data. This also clears other Sahara information stored on that
             phone. Preview PDFs are created in the app cache, which Android may clear.
             Copies you export or share remain with their recipients until they remove them.
+          </p>
+        </section>
+
+        <section aria-labelledby="translation">
+          <h2 id="translation">Hindi and English reading</h2>
+          <p>
+            Android offers optional Hindi–English machine translation using Google
+            ML Kit on-device models. An initial language-pack download needs a
+            connection to Google; translation of care text then runs on the phone.
+            ML Kit does not send the input care text or translated output to Google
+            for translation. Technical SDK metrics and configured language settings
+            are handled as described below. The original remains visible beside the
+            translation. Check the result with a bilingual person before relying on
+            it; machine translation is not a clinical interpretation.
           </p>
         </section>
 
@@ -197,18 +249,25 @@ export default function PrivacyPage() {
           <h2 id="medicine-ai">Prescription and medicine photo organiser</h2>
           <p>
             Cloud photo scanning remains off. The Read prescription flow reads printed
-            English/Latin text on your device: Android uses a bundled ML Kit text model,
-            and the website runs Tesseract in a browser worker using engine and language
-            files served by Sahara. The selected photos and their recognised words are
+            English/Latin and Hindi/Devanagari text on your device: Android uses bundled
+            ML Kit text models. The website runs Tesseract in a browser worker using
+            engine and language files served by Sahara for English text. The selected
+            photos and their recognised words are
             not sent to Gemini, Supabase or another OCR service. Handwriting, small print
             and other scripts may need manual entry. You can always add medicines by hand.
           </p>
           <p>
-            Google’s Android ML Kit SDK can send technical diagnostics and usage metrics
+            Google’s Android ML Kit SDK sends technical diagnostics and usage metrics
             to Google over HTTPS, including app and device information, a per-installation
             identifier, performance, input/output sizes, API settings and feature events
-            or errors. These metrics do not include the selected image or recognised
-            text. See <a href="https://developers.google.com/ml-kit/android-data-disclosure" target="_blank" rel="noopener noreferrer">Google’s ML Kit data disclosure</a>.
+            or errors. Translation also reports configured source and destination
+            languages and uses Firebase remote configuration and installation services
+            for configuration diagnostics. ML Kit initialises with the Android app;
+            Sahara does not offer a setting to turn off these technical metrics. They
+            may be sent when Sahara starts, even if you do not use OCR or translation. These
+            metrics do not include the selected image, recognised words or care text.
+            See <a href="https://developers.google.com/ml-kit/android-data-disclosure" target="_blank" rel="noopener noreferrer">Google’s ML Kit data disclosure</a> and{' '}
+            <a href="https://developers.google.com/ml-kit/terms" target="_blank" rel="noopener noreferrer">ML Kit’s privacy terms</a>.
             Website OCR uses Sahara-hosted engine files; ordinary hosting logs can
             record the request for those files and your IP address.
           </p>
@@ -313,6 +372,14 @@ export default function PrivacyPage() {
         <section aria-labelledby="maps">
           <h2 id="maps">Maps and links</h2>
           <p>
+            Android version 0.6.0 includes 1,631 published directory listings across
+            36 Indian states and union territories. This directory snapshot was updated
+            on 20 October 2026; individual listings show their source-check dates.
+            These public listings do not confirm current services, opening hours
+            or medicine stock. Call the centre before travelling. Searching this
+            bundled list does not use your GPS location or upload your care records.
+          </p>
+          <p>
             OpenFreeMap supplies map tiles through MapLibre and receives your IP address
             and the map area requested. Sahara does not request your precise GPS location.
             Calls, directions and source links open your dialler, maps or browser when
@@ -328,7 +395,8 @@ export default function PrivacyPage() {
             Sahara has no advertising SDK. We do not sell care information
             or use it for advertising. ML Kit’s technical usage and diagnostic metrics
             are described above. Connections to Sahara’s service, Supabase,
-            Google Gemini and OpenFreeMap use HTTPS. Sign-in tokens are encrypted using
+            Google model and SDK services, Hugging Face model hosts and OpenFreeMap use
+            HTTPS. Sign-in tokens are encrypted using
             Android Keystore. Account caches are separated from each other and from
             unsigned-in records, and app records are excluded from Android backup and
             transfer.

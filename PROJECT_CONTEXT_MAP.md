@@ -1,5 +1,12 @@
 # Healthathon and TANUH project context map
 
+## 24 October 2026: Android symptom diary and current Play release
+
+- User authorised the latest Android production release, then requested the symptom tracker inside the native app and a teammate message packaging the CARE research. The diary is integrated with existing per-person care records; instrument selection and clinical validation remain separate. Fresh 156 JVM checks passed, including 9 diary rules checks. The new debug APK was installed beside production on Samsung A34; the locked phone prevents current UI interaction checks. Signed release packaging remains in progress.
+- Live Console confirmed Production 0.5.0 (6), release 2, available at 100% India rollout. New Production draft 3 is created for 0.6.0 (7), without a bundle upload or review submission. SDK Data safety changes are saved. Full listing/reviewer copy and a symptom-related health-feature review remain pending. The privacy update is production READY at `dpl_6cieWvkFSK2SkZsyQD1ARnTeVevq`; updated text returns HTTP 200 on both domains. Exact artifact/readiness state belongs in `android/release/store-draft.json`.
+- Browser control was lost during recovery; the official Windows Computer Use fallback then stopped because it could not confidently determine the current browser URL for policy enforcement. No further UI actions were taken. Resume the same existing draft when controls are restored; do not manufacture approval or duplicate the release.
+- CARE's palliative page and Build-on-CARE page were read again. CARE already covers palliative registries, home visits, teams and care plans. Optional platform/plugin reuse is the organiser email's offer; Sahara's goals-of-care review/confirmation connection remains proposed, not integrated or proven unique. The prepared, unsent team message is in `TEAM_HANDOFF.md`.
+
 ## 23 October 2026: Sujay's survey follow-up and visual revision
 
 - Exact supplied WhatsApp continuation is saved in `source-materials/team-context/2026-10-23/sujay-survey-symptom-followup.txt`, extending conversation continuity without claiming another full export. A real database check confirmed the S S Sparsh Hospital, RR Nagar submission and Pulmonary Medicine note; it remains pending directory review. Private receipt/contact details are excluded from Git.

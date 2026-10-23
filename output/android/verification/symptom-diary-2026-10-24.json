@@ -1,0 +1,91 @@
+{
+  "checkedAtUtc": "2026-10-23T20:39:13.534418+00:00",
+  "purpose": "Native personal symptom diary; no ESAS-r/IPOS instrument, automatic clinical total, triage or treatment recommendation is claimed.",
+  "sourceFreeze": {
+    "android/app/src/main/java/in/wedevit/care/CareSymptomData.kt": "13338EB3B8959489715ACEE2C12E7AEBB7AD5CCBBE02CE147454CAC949C42586",
+    "android/app/src/main/java/in/wedevit/care/CareSymptomUi.kt": "77B3555119139B3C596B1359B0D2E94B4F1A9E7BD2762AB399A0FA081542CDEF",
+    "android/app/src/main/java/in/wedevit/care/CareModel.kt": "D59C574EFC9B61AED03D64E6F4DA3766912175B19948DD60A470722235B01733",
+    "android/app/src/main/java/in/wedevit/care/CareUi.kt": "741C8A3A0C92831B58235AC238B9785A075E6F8EB6A1D2D13E045D9FDDDCA0C6",
+    "android/app/src/main/java/in/wedevit/care/CareWorkflow.kt": "2918DCC524755C1E661C5C9AC9F53B2C37295B8873549AAD2CCB5A69B6B5A966",
+    "android/app/src/test/java/in/wedevit/care/CareSymptomDiaryTest.kt": "360F1B01265607E39D8EFDF0672B8547DE3AA5C564BAF936399AD8FD31CDA24B",
+    "android/app/src/androidTest/java/in/wedevit/care/CareSymptomDiaryUiTest.kt": "7675985BAEDFA8BFA10B5B8F330378FB7891ACEB0967C7C2664F1664312C613E"
+  },
+  "sourceReview": [
+    "Today and Daily care route directly to the native diary; existing mood check-ins remain readable.",
+    "Structured versioned entries use the existing CareItem/Room/cloud record route and readable export.",
+    "Save requires the captured selected person and existing write permission; existing record identity and revision are preserved.",
+    "Editor closes on person switch; read-only views hide mutation actions and disable saving.",
+    "No rating is preselected; zero and explicit not rated remain different. Observation context and attribution are stored.",
+    "Baseline/previous comparisons use actual earlier compatible records for the same person; subjective change is separately attributed.",
+    "English/Hindi choices, editing, removal with confirmation, sharing and malformed/legacy record handling are implemented."
+  ],
+  "unit": {
+    "tests": 156,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suites": 26,
+    "firstTimestampUtc": "2026-10-23T20:30:00.817Z",
+    "lastTimestampUtc": "2026-10-23T20:30:05.282Z",
+    "newDiaryRules": {
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "build": {
+    "debugAssemblyCompleted": true,
+    "log": "output/android/verification/symptom-diary-2026-10-24-recovery.log",
+    "combinedCommandExitVerified": false,
+    "interruption": "Recovery/environment reset removed the exec session after instrumentation Kotlin compilation and javaPreCompile; no final BUILD SUCCESSFUL or fresh test APK receipt.",
+    "instrumentationKotlinCompiled": true,
+    "isolatedUiCasesCompiled": 5,
+    "instrumentationClassSha256": "1B05C5957B26AE3B845FD7C4C3F9FDC9266A94F210B0C0B52D6387FC41984F01",
+    "freshInstrumentationApkVerified": false,
+    "priorFailure": "Earlier test JVM launches failed under Windows native-memory/paging pressure. A bounded single SerialGC test JVM retry produced the fresh passing XML results.",
+    "warning": "256 MiB metaspace expiry warning during instrumentation compilation; unrelated existing Kotlin migration-test and insets deprecation warnings."
+  },
+  "debugArtifact": {
+    "path": "output/android/Sahara-0.6.0-24Oct-test.apk",
+    "bytes": 302360589,
+    "sha256": "458C67FBAEE29042253BC93402B6EE2023A0F19BFEEE9298555234E1FBCAF2A0",
+    "package": "in.wedevit.sahara.development",
+    "versionName": "0.6.0",
+    "versionCode": 7,
+    "signing": "Android debug; not a Play production artifact",
+    "old20OctoberArtifactPreserved": true
+  },
+  "phone": {
+    "model": "Samsung A34 SM-A346E",
+    "debugInstallSucceeded": true,
+    "method": "adb install -r -t; no uninstall, data clearing or production package replacement",
+    "installLog": "output/android/verification/symptom-diary-2026-10-24-install-debug.log",
+    "uiTestsExecuted": 0,
+    "newScreenshots": [],
+    "blocker": "Connected phone remained locked. No authentication bypass attempted. Installation does not establish runtime/UI behaviour."
+  },
+  "notVerified": [
+    "Device UI interaction, insets/keyboard and English/Hindi diary rendering",
+    "Actual new diary Room/cloud receipt/reload through a signed-in account",
+    "Clinical validation, clinical response ownership or patient use",
+    "Signed release packaging or Google Play submission; owned by the release task"
+  ],
+  "workingBuildRecipe": {
+    "jdk": "Existing Android Studio JBR 21",
+    "gradleCache": "F:/BuildCaches/healthathon-gradle",
+    "tasks": [
+      ":app:testDebugUnitTest",
+      ":app:assembleDebug",
+      ":app:assembleDebugAndroidTest"
+    ],
+    "jvm": "-Xms64m -Xmx384m -XX:+UseSerialGC -XX:ActiveProcessorCount=1 -XX:TieredStopAtLevel=1 -XX:MaxMetaspaceSize=256m -XX:ReservedCodeCacheSize=48m -Xss512k -Dfile.encoding=UTF-8",
+    "flags": [
+      "--no-daemon",
+      "--max-workers=1",
+      "-Pksp.incremental=false"
+    ],
+    "testJvmInit": "output/android/verification/symptom-low-memory.init.gradle",
+    "releaseCaveat": "The unit/debug heap is not proof R8 fits; permit 384 MiB metaspace for the separate release process."
+  }
+}

@@ -81,7 +81,7 @@ object CareEntryCodec {
             "schedule" -> listOf(entry.category, entry.location, entry.detail).filter(String::isNotBlank).joinToString(" · ")
             else -> listOf(entry.statusLabel(), entry.assignee, entry.detail).filter(String::isNotBlank).joinToString(" · ")
         }
-    } ?: if (isStructured(detail)) "This entry needs a newer app to open." else detail
+    } ?: if (SymptomNoteCodec.isStructured(detail)) SymptomNoteCodec.readable(detail) else if (isStructured(detail)) "This entry needs a newer app to open." else detail
 }
 
 fun CareEntry.statusLabel() = when (status) {

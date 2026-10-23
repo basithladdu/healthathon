@@ -151,9 +151,9 @@ val Peach = Color(0xFFFFD1B3)
             else if (person == null) Welcome(onAccount = onAccount, onStart = { dialog = "person" }, onSharedWorkspace = { sharedWorkspaceOpen = true }, onDoctorDemo = onDoctorDemo)
             else key(person.id, tab) { screens.SaveableStateProvider("${person.id}:$tab") {
                 ScreenEntrance { when (tab) {
-                    0 -> Today(vm, clinician, onTalk = { tab = 1 }, onCare = { tab = 2 }, onNearby = { tab = 3 }, onAdd = { if (canEdit) dialog = it else vm.message.value = "Ask the person who invited you to allow changes." }, onRead = { reading = it }, onCalendar = { tab = 6 }, onWorkflow = { tab = 7 }, onLabs = { tab = 8 }, onSharedWorkspace = { sharedWorkspaceOpen = true })
+                    0 -> Today(vm, clinician, onTalk = { tab = 1 }, onCare = { tab = 2 }, onNearby = { tab = 3 }, onAdd = { if (canEdit) dialog = it else vm.message.value = "Ask the person who invited you to allow changes." }, onRead = { reading = it }, onCalendar = { tab = 6 }, onWorkflow = { tab = 7 }, onLabs = { tab = 8 }, onSharedWorkspace = { sharedWorkspaceOpen = true }, onSymptoms = { tab = 9 })
                     1 -> Talk(vm, clinician && canEdit, onRead = { reading = it }, onRequestConversation = { tab = 7 })
-                    2 -> CareList(vm, onCalendar = { tab = 6 }, onWorkflow = { tab = 7 }, onLabs = { tab = 8 },
+                    2 -> CareList(vm, onCalendar = { tab = 6 }, onWorkflow = { tab = 7 }, onLabs = { tab = 8 }, onSymptoms = { tab = 9 },
                         onAdd = { if (canEdit) dialog = it else vm.message.value = "Ask the person who invited you to allow changes." },
                         onScanPrescription = {
                             if (canEdit) {
@@ -166,6 +166,7 @@ val Peach = Color(0xFFFFD1B3)
                     6 -> CareCalendar(vm, onWorkflow = { tab = 7 })
                     7 -> CareWorkflows(vm, onTalk = { tab = 1 })
                     8 -> CareLabs(vm)
+                    9 -> CareSymptomDiary(vm, onBack = { tab = 0 })
                     else -> More(vm, person, onAccount = onAccount, onDelete = { dialog = "delete" }, onCalendar = { tab = 6 }, onWorkflow = { tab = 7 }, onLabs = { tab = 8 }, onDoctorDemo = onDoctorDemo, onFeedback = { if (activeRecording) vm.stopRecording(); feedbackOpen = true }, onReminders = { if (activeRecording) vm.stopRecording(); remindersOpen = true }, onSharedWorkspace = { if (activeRecording) vm.stopRecording(); sharedWorkspaceOpen = true })
                 } }
             } }
@@ -177,7 +178,7 @@ val Peach = Color(0xFFFFD1B3)
     if (dialog in listOf("medicine", "visit", "task", "checkin", "journal")) AddCareItem(dialog, vm, onDismiss = { dialog = "" })
     if (dialog == "delete") AlertDialog(onDismissRequest = { dialog = "" }, title = { Text("Remove ${person?.name}'s records?") },
         text = { Text("This removes their notes, reports, recordings and care entries. Export anything you want to keep first.") },
-        confirmButton = { TextButton(onClick = { val removedId = person?.id; vm.removePerson { (0..8).forEach { screens.removeState("$removedId:$it") }; dialog = "" } }, enabled = !busy) { Text("Remove records") } },
+        confirmButton = { TextButton(onClick = { val removedId = person?.id; vm.removePerson { (0..9).forEach { screens.removeState("$removedId:$it") }; dialog = "" } }, enabled = !busy) { Text("Remove records") } },
         dismissButton = { TextButton(onClick = { dialog = "" }) { Text("Keep records") } })
     reading?.let { note -> NoteReader(vm, note, onDismiss = { reading = null }) }
 }
@@ -201,7 +202,7 @@ val Peach = Color(0xFFFFD1B3)
     }
 }
 
-@Composable fun Today(vm: CareModel, clinician: Boolean, onTalk: () -> Unit, onCare: () -> Unit, onNearby: () -> Unit, onAdd: (String) -> Unit, onRead: (CareVersion) -> Unit, onCalendar: () -> Unit = {}, onWorkflow: () -> Unit = {}, onLabs: () -> Unit = {}, onSharedWorkspace: () -> Unit = {}) {
+@Composable fun Today(vm: CareModel, clinician: Boolean, onTalk: () -> Unit, onCare: () -> Unit, onNearby: () -> Unit, onAdd: (String) -> Unit, onRead: (CareVersion) -> Unit, onCalendar: () -> Unit = {}, onWorkflow: () -> Unit = {}, onLabs: () -> Unit = {}, onSharedWorkspace: () -> Unit = {}, onSymptoms: () -> Unit = {}) {
     val items by vm.items.collectAsStateWithLifecycle(); val versions by vm.versions.collectAsStateWithLifecycle()
     val latest = versions.firstOrNull()
     val dayStart = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
@@ -237,6 +238,7 @@ val Peach = Color(0xFFFFD1B3)
             Tile("How are you?", Icons.Default.WbSunny, Peach, Modifier.weight(1f)) { onAdd("checkin") }
             Tile("Find care", Icons.Default.Place, Sage, Modifier.weight(1f), onNearby)
         } }
+        item { FilledTonalButton(onClick = onSymptoms, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("symptom-tracker-entry"), colors = ButtonDefaults.filledTonalButtonColors(containerColor = Mint)) { Icon(Icons.Default.MonitorHeart, null); Spacer(Modifier.width(8.dp)); Text("Symptom tracker · तबीयत के नोट") } }
         item { DailyCareShortcuts(onCalendar, onWorkflow, onLabs) }
         item { WorkflowSummary(vm, onWorkflow) }
         val scheduledToday = calendarItems(items, LocalDate.now()).filter { CareEntryCodec.decode(it.detail)?.type == "schedule" }
@@ -503,13 +505,14 @@ val Peach = Color(0xFFFFD1B3)
     }
 }
 
-@Composable fun CareList(vm: CareModel, onAdd: (String) -> Unit, onScanPrescription: () -> Unit, onCalendar: () -> Unit = {}, onWorkflow: () -> Unit = {}, onLabs: () -> Unit = {}) {
+@Composable fun CareList(vm: CareModel, onAdd: (String) -> Unit, onScanPrescription: () -> Unit, onCalendar: () -> Unit = {}, onWorkflow: () -> Unit = {}, onLabs: () -> Unit = {}, onSymptoms: () -> Unit = {}) {
     val entries by vm.items.collectAsStateWithLifecycle(); var filter by rememberSaveable { mutableStateOf("All") }
     val kinds = linkedMapOf("Medicines" to "medicine", "Visits" to "visit", "To do" to "task", "Check-ins" to "checkin", "Journal" to "journal")
     LazyColumn(Modifier.fillMaxSize().testTag("care-list"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Heading("Daily care", 30); Spacer(Modifier.weight(1f))
         } }
+        item { FilledTonalButton(onClick = onSymptoms, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("daily-symptom-tracker-entry"), colors = ButtonDefaults.filledTonalButtonColors(containerColor = Mint)) { Icon(Icons.Default.MonitorHeart, null); Spacer(Modifier.width(8.dp)); Text("Symptom tracker · तबीयत के नोट") } }
         item { FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             kinds.filter { filter == "All" || it.key == filter }.forEach { (label, kind) ->
                 AssistChip(onClick = { if (kind == "medicine") onScanPrescription() else onAdd(kind) }, label = { Text("Add ${when (kind) { "medicine" -> "medicine"; "visit" -> "visit"; "task" -> "task"; "checkin" -> "check-in"; else -> "note" }}") }, leadingIcon = { Icon(careIcon(kind), null, Modifier.size(18.dp)) }, modifier = Modifier.heightIn(min = 48.dp))
@@ -533,6 +536,7 @@ val Peach = Color(0xFFFFD1B3)
 }
 
 @Composable fun CareRow(item: CareItem, vm: CareModel) {
+    if (SymptomNoteCodec.isStructured(item.detail)) { SymptomNoteCard(item, vm); return }
     val canEdit by vm.canEdit.collectAsStateWithLifecycle()
     val busy by vm.busy.collectAsStateWithLifecycle()
     var delete by remember { mutableStateOf(false) }
