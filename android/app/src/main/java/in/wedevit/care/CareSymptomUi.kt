@@ -113,11 +113,12 @@ import java.time.format.DateTimeFormatter
     val canEdit by vm.canEdit.collectAsStateWithLifecycle()
     val actionError by vm.actionError.collectAsStateWithLifecycle()
     val capturedPerson = rememberSaveable(initial?.id) { initial?.personId ?: selected }
+    val expectedToken = rememberSaveable(initial?.id) { initial?.let(SymptomDiaryRules::editToken) }
     LaunchedEffect(initial?.id) { vm.actionError.value = null }
     LaunchedEffect(selected) { if (selected != capturedPerson) onClose() }
     SymptomNoteForm(personId = capturedPerson, personName = people.firstOrNull { it.id == capturedPerson }?.name.orEmpty(), entries = entries,
         hindi = hindi, initial = initial, busy = busy, canEdit = canEdit && selected == capturedPerson, actionError = actionError,
-        onSave = { id, value -> vm.saveSymptomNote(capturedPerson, id, value, onClose) }, onClose = onClose)
+        onSave = { id, value -> vm.saveSymptomNote(capturedPerson, id, value, expectedToken, onClose) }, onClose = onClose)
 }
 
 /** The same native form can be checked with isolated callback fixtures, without touching accounts or real records. */
@@ -199,7 +200,7 @@ import java.time.format.DateTimeFormatter
             OutlinedButton(onClick = { val d = runCatching { LocalDate.parse(startedOn) }.getOrDefault(LocalDate.parse(observedDate)); DatePickerDialog(context, { _, y, m, day -> startedOn = LocalDate.of(y, m + 1, day).toString() }, d.year, d.monthValue - 1, d.dayOfMonth).apply { datePicker.maxDate = LocalDate.parse(observedDate).atStartOfDay(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli() }.show() }, modifier = Modifier.heightIn(min = 48.dp)) { Text(if (startedOn.isBlank()) t("Started on… (optional)", "कब शुरू हुआ… (वैकल्पिक)") else "${t("Started", "शुरू हुआ")}: $startedOn") }
             if (startedOn.isNotBlank()) TextButton(onClick = { startedOn = "" }) { Text(t("Clear start date", "शुरू होने की तारीख हटाएँ")) }
             CareField(note, { note = it.take(500) }, t("Anything else? (optional)", "कुछ और? (वैकल्पिक)"), minLines = 2)
-            (localError.takeIf { it.isNotBlank() } ?: actionError)?.let { Text(if (hindi) "नोट सहेजा नहीं गया। जवाब यहीं हैं। तारीख, नाम और चुने हुए जवाब जाँचें।" else it, color = MaterialTheme.colorScheme.error) }
+            (localError.takeIf { it.isNotBlank() } ?: actionError)?.let { Text(if (hindi && it == SymptomDiaryRules.SAVE_CONFLICT) "यह नोट बदल गया है या हटा दिया गया है। आपके जवाब यहीं हैं। सहेजने से पहले यह फ़ॉर्म बंद करके मौजूदा नोट फिर खोलें।" else if (hindi) "नोट सहेजा नहीं गया। जवाब यहीं हैं। तारीख, नाम और चुने हुए जवाब जाँचें।" else it, color = MaterialTheme.colorScheme.error) }
             Button(onClick = {
                 val saved = value.copy(selfReportedChange = change.takeIf { comparison != null }.orEmpty(), comparedWithId = if (change.isNotBlank()) comparison?.previous?.id.orEmpty() else "")
                 localError = if (rating == -2) t("Choose a rating or Not rated.", "अंक चुनें या अंक नहीं बताया चुनें।") else SymptomDiaryRules.error(saved).orEmpty()

@@ -66,4 +66,22 @@ class CareSymptomDiaryTest {
         assertTrue(text.contains("9/10"))
         assertFalse(text.contains("Severe")); assertFalse(text.contains("distress", true)); assertFalse(text.contains("/90"))
     }
+    @Test fun staleEditorCannotOverwriteCloudOrRevisionZeroLocalChanges() {
+        val opened = row("edit", note())
+        val token = SymptomDiaryRules.editToken(opened)
+        assertNull(SymptomDiaryRules.saveConflict(opened, "person-a", token))
+        assertNotNull(SymptomDiaryRules.saveConflict(opened.copy(revision = 1), "person-a", token))
+        assertNotNull(SymptomDiaryRules.saveConflict(opened.copy(detail = SymptomNoteCodec.encode(note(8))), "person-a", token))
+        assertNotNull(SymptomDiaryRules.saveConflict(opened.copy(title = "Updated locally"), "person-a", token))
+    }
+    @Test fun deletedEditsAndUnexpectedInsertCollisionsCannotRecreateOrReplaceRecords() {
+        val opened = row("edit", note())
+        val token = SymptomDiaryRules.editToken(opened)
+        assertNotNull(SymptomDiaryRules.saveConflict(null, "person-a", token))
+        assertNotNull(SymptomDiaryRules.saveConflict(opened, "person-a", null))
+        assertNotNull(SymptomDiaryRules.saveConflict(opened, "person-b", token))
+        val wrongKind = opened.copy(kind = "journal")
+        assertNotNull(SymptomDiaryRules.saveConflict(wrongKind, "person-a", SymptomDiaryRules.editToken(wrongKind)))
+        assertNull(SymptomDiaryRules.saveConflict(null, "person-a", null))
+    }
 }

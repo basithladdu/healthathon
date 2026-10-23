@@ -17,6 +17,7 @@ data class SymptomNote(
 data class SymptomComparison(val baseline: CareItem, val previous: CareItem, val difference: Int)
 
 object SymptomDiaryRules {
+    const val SAVE_CONFLICT = "This note changed or was removed. Your answers are still here. Close this form and reopen the current note before saving."
     val symptoms = linkedMapOf("Pain" to "दर्द", "Tiredness" to "थकान", "Sleepiness" to "नींद आना", "Nausea" to "मतली", "Poor appetite" to "भूख कम लगना", "Breathlessness" to "साँस फूलना", "Sadness" to "उदासी", "Worry" to "चिंता", "Constipation" to "कब्ज़", "Sleep difficulty" to "सोने में परेशानी", "Other" to "अन्य")
     val recalls = linkedMapOf("now" to ("Right now" to "अभी"), "average-24h" to ("24-hour average" to "24 घंटे का औसत"), "worst-24h" to ("Worst in 24 hours" to "24 घंटे में सबसे ज़्यादा"))
     val respondents = linkedMapOf("patient" to ("Patient" to "मरीज़"), "assisted-patient" to ("Patient, with help" to "मरीज़ ने मदद से बताया"), "caregiver" to ("Caregiver observation" to "देखभाल करने वाले ने देखा"), "clinician" to ("Care-team observation" to "देखभाल टीम ने देखा"))
@@ -25,6 +26,15 @@ object SymptomDiaryRules {
     fun label(labels: Map<String, Pair<String, String>>, key: String, hindi: Boolean) = labels[key]?.let { if (hindi) it.second else it.first }.orEmpty()
     fun symptomLabel(value: String, hindi: Boolean) = if (hindi) symptoms[value] ?: value else value
     fun ratingLabel(value: Int?, hindi: Boolean = false) = value?.let { "$it/10" } ?: if (hindi) "अंक नहीं बताया" else "Not rated"
+    fun editToken(item: CareItem): String = JSONObject().put("id", item.id).put("personId", item.personId).put("kind", item.kind)
+        .put("title", item.title).put("detail", item.detail).put("due", item.due).put("doneOn", item.doneOn)
+        .put("created", item.created).put("revision", item.revision).toString()
+    fun saveConflict(existing: CareItem?, personId: String, expectedToken: String?): String? {
+        if (expectedToken == null && existing == null) return null
+        if (expectedToken != null && existing != null && existing.personId == personId && existing.kind == "checkin" && SymptomNoteCodec.isStructured(existing.detail)
+            && editToken(existing) == expectedToken) return null
+        return SAVE_CONFLICT
+    }
     fun error(value: SymptomNote, now: LocalDateTime = LocalDateTime.now()): String? {
         if (value.symptom.trim().length !in 1..80) return "Choose a symptom or add a short name."
         if (value.rating != null && value.rating !in 0..10) return "Choose a number from 0 to 10, or Not rated."

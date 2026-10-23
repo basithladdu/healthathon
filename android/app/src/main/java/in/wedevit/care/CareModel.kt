@@ -220,12 +220,12 @@ class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewMod
             done()
         }
     }
-    fun saveSymptomNote(personId: String, id: String, note: SymptomNote, done: () -> Unit = {}) = action {
+    fun saveSymptomNote(personId: String, id: String, note: SymptomNote, expectedToken: String?, done: () -> Unit = {}) = action {
         require(personId.isNotBlank() && selected.value == personId && people.value.any { it.id == personId }) { "Choose the right person before saving this note." }
         requireEdit(personId)
         SymptomDiaryRules.error(note)?.let { throw IllegalArgumentException(it) }
         val existing = dao.item(id)
-        require(existing == null || (existing.personId == personId && SymptomNoteCodec.isStructured(existing.detail))) { "This note could not be matched. Open it again." }
+        SymptomDiaryRules.saveConflict(existing, personId, expectedToken)?.let { throw IllegalArgumentException(it) }
         val candidate = CareItem(id = id, personId = personId, kind = "checkin", title = "${note.symptom} · ${SymptomDiaryRules.ratingLabel(note.rating)}",
             detail = SymptomNoteCodec.encode(note), created = existing?.created ?: System.currentTimeMillis(), revision = existing?.revision ?: 0)
         if (note.selfReportedChange.isNotBlank()) require(SymptomDiaryRules.comparison(dao.allItems(), candidate, note)?.previous?.id == note.comparedWithId) { "The previous note changed. Check the comparison and save again." }
