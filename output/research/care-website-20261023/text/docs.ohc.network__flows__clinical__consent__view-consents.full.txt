@@ -1,0 +1,157 @@
+View consents | Care
+Skip to main content
+Care
+Documentation
+Playbooks
+HMIS
+Palliative
+Contributing
+Deployment
+English
+English
+മലയാളം
+3.1
+3.1
+3.0
+Care documentation
+Concepts
+Clinical
+Definitions & Terminology
+Medications
+Scheduling
+Billing
+Supply & Inventory
+Facility
+Access & Governance
+Platform
+Flows
+Clinical
+Patient
+Encounter
+Allergy Intolerance
+Condition
+Service Request
+Specimen
+Diagnostic Report
+Consent
+Record a consent
+View consents
+Update a consent
+Verify a consent
+Files
+Questionnaire Response
+Care Team
+Notes
+Facility
+Medications
+Billing
+Scheduling
+Supply
+Access & Governance
+Platform
+Definitions
+References
+Foundation
+Clinical
+Definitions & Terminology
+Medications
+Scheduling
+Billing
+Supply & Inventory
+Facility
+Access & Governance
+Platform
+Flows
+Clinical
+Consent
+View consents
+Version: 3.1
+On this page
+View consents
+Overview
+​
+This flow describes how to view the
+consents
+recorded for an encounter. You can review each consent as a card, or open its full record.
+Pre-requisites
+​
+The patient is registered in Care, and you open an encounter of that patient.
+A member of staff recorded at least one consent for the encounter.
+You have the permissions listed below.
+Permissions
+​
+Permission
+Access
+Can view clinical data about patients
+Lets you view the consents of any patient you have access to.
+Can Read encounter related clinical data
+Lets you view the consents of the encounters you have access to.
+Steps
+​
+1. Open the Consents tab
+​
+Open the encounter of the patient. Select the
+Consents
+tab. Care shows each consent as a card.
+2. Review the consent cards
+​
+Each card shows the details below.
+Component
+What it shows
+Category badge
+The category of the consent.
+Expired badge
+Care shows this badge when the validity period has passed.
+Supporting documents
+The names of the attached files. Care shows "No files attached" when the consent has no files.
+Decision badge
+The decision of the consent:
+Permitted
+or
+Denied
+.
+Status badge
+The status of the consent.
+Consent Given On
+The date and time when the patient gave the consent.
+Valid Period
+The period for which the consent stays valid.
+3. Search for a consent
+​
+Enter a file name in the search box above the cards. Care shows only the consents that have an attached file with that name.
+4. Open the full consent record
+​
+Select
+See Details
+on the card. Care opens the consent record. The record shows the supporting documents, the note, and a
+Consent Details
+card with the category, the date, the valid period, the decision, and the status.
+You can view or download each attached file from this record.
+Expected Outcome
+​
+You see all the consents of the encounter as cards.
+You see the full record of the consent that you select.
+Related
+​
+Concepts:
+Consent
+Flows:
+Record a consent
+Update a consent
+Verify a consent
+Edit this page
+Previous
+Record a consent
+Next
+Update a consent
+Overview
+Pre-requisites
+Permissions
+Steps
+1. Open the Consents tab
+2. Review the consent cards
+3. Search for a consent
+4. Open the full consent record
+Expected Outcome
+Related
+Copyright © 2026 Open Healthcare Network Foundation. Built with Docusaurus.

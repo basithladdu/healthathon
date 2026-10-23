@@ -1,0 +1,86 @@
+FAQ — CARE & OHC - Open Healthcare Network
+Home
+Foundation
+CARE
+Solutions
+Impact
+Ecosystem
+Support
+Resources
+Frequently Asked Questions
+Common questions about CARE implementation, licensing, customization, and integrations.
+FAQ
+Common questions about CARE and OHC
+How fast can we implement?
+Implementation timelines depend on scope, integrations, hosting, data migration, training, and governance. OHC focuses on reusable playbooks so deployments do not begin from scratch each time.
+What about data ownership and licensing?
+MIT license; governments own code and data; no vendor lock‑in. You have complete control over your infrastructure and data sovereignty with zero ongoing licensing costs.
+Can we localize forms and terminologies?
+Yes—custom EMR forms map to FHIR; BYOT (Bring Your Own Terminology) supported. You can configure local terminologies, forms, and workflows while maintaining FHIR compliance.
+Does CARE support national programs like ABDM?
+Yes—ABDM workflows can be supported through CARE Apps and integration patterns. Deployment claims should be checked against current program metrics before publication.
+Can we add remote monitoring and AI tools?
+Yes—TeleICU (ONVIF), Care Scribe (AI voice fill) are available as Care Apps. AI tools integrate as plugins without modifying the core platform.
+What about security and compliance?
+CARE implements FHIR R5 compliance with RBAC, audit trails, and sovereign hosting options. Built-in security measures ensure data protection and regulatory compliance.
+How does CARE handle different healthcare settings?
+CARE adapts to various settings—hospitals, clinics, palliative care, veterinary practice. The modular architecture allows customization for different healthcare workflows.
+What support is available for implementation?
+We provide implementation guides, training materials, and community support. The global developer corps offers technical assistance and best practices sharing.
+Still have questions?
+Our team is here to help. Contact us for technical support, implementation guidance, or partnership opportunities.
+Contact us
+Join the community
+Build the commons
+Help steward open healthcare
+infrastructure for the long term.
+Governments can deploy, institutions can support, implementation partners can localize, and contributors can strengthen the shared core.
+Support the commons
+Start a partnership conversation
+Registered Address
+Open Healthcare Network Foundation
+1st Floor, C M Complex, Kalavath Road, Palarivattom, Kochi, Ernakulam, Kerala, India, 682025
+Corporate Identity Number (CIN)
+U88100KL2025NPL098818
+Email
+support@ohc.network
+Foundation
+Mission
+Governance
+Board & Advisors
+Foundation Team
+Foundation Docs
+ISO Certifications
+Support OHC
+How to Fund Us
+Supporters
+CARE Platform
+CARE Core
+CARE AI
+Apps & Integrations
+Standards & Architecture
+Security & Compliance
+Solutions
+Hospital Management
+TeleICU
+Palliative Care
+CARE Clinic
+Animal Health
+Ecosystem
+The Network
+Implementation Partners
+Clinicians
+Build on Care
+Developers
+Impact
+Resources
+Blog
+FAQ
+Browser requirements
+Press & Media
+Careers
+Contact
+Support metadata
+©
+2026
+Open Healthcare Network Foundation.

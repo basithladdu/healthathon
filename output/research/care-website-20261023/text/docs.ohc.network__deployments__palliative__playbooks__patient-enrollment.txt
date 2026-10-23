@@ -1,0 +1,99 @@
+On this page
+Enroll a patient into a community or facility-based palliative program. This playbook combines the
+register patient
+flow with palliative-specific intake, caregiver capture, and program assignment.
+Flows involved
+​
+Order
+Flow
+Purpose
+1
+Register a patient
+New patient with no existing record
+2
+Patient search
+Match returning patients before creating duplicates
+3
+Palliative program enrollment
+(coming soon)
+Assign program, care team, and visit cadence
+Happy path
+​
+Community nurse or intake coordinator searches by phone, national ID, or name.
+No match →
+Register new patient
+→ complete demographics and primary diagnosis.
+Record primary caregiver name, phone, and relationship.
+Assign palliative program (home-based, facility, or hybrid).
+Schedule first assessment visit and document consent for palliative care.
+Edge cases
+​
+Referred from hospital IP
+​
+Symptom:
+Discharge summary lists patient; family requests home palliative follow-up.
+Action:
+Search by hospital MRN or phone from referral slip.
+If patient exists → open record and add palliative program enrollment; do not create a duplicate.
+Import or attach discharge summary and active medication list.
+Flag
+transition of care
+for the assigned community nurse.
+Patient already in HMIS
+​
+Symptom:
+Same person registered at hospital OPD; palliative program runs on a shared Care instance.
+Action:
+Search existing HMIS record.
+Enroll in palliative program without duplicating demographics.
+Document palliative-specific goals of care separately from acute encounter notes.
+Caregiver-only contact at intake
+​
+Symptom:
+Family member calls; patient is bed-bound and cannot attend facility.
+Action:
+Register patient with available demographics.
+Add caregiver as related contact with callback number.
+Mark intake as
+pending patient verification
+until first home visit.
+Schedule home visit as first clinical contact.
+Limited demographics (rural outreach)
+​
+Symptom:
+Camp intake collects phone and village only.
+Action:
+Register with minimum fields allowed by facility questionnaire.
+Flag
+incomplete demographics
+.
+Complete address and ID verification on first home visit.
+Roles
+​
+Role
+Can
+Palliative intake coordinator
+Search, create, enroll in program
+Community nurse
+Update care plan, document home visits
+Palliative physician
+Approve program enrollment, adjust care goals
+Registration clerk (shared HMIS)
+Search and link existing hospital records
+Related
+​
+Concept:
+Patient
+Flow:
+Register a patient
+HMIS playbook:
+Outpatient registration
+Flows involved
+Happy path
+Edge cases
+Referred from hospital IP
+Patient already in HMIS
+Caregiver-only contact at intake
+Limited demographics (rural outreach)
+Roles
+Related

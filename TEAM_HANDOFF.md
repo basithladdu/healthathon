@@ -2,8 +2,18 @@
 
 This is the starting point for another developer or Codex chat. Latest native verification: **20 October 2026**. Play status below was last checked **19 October**, not refreshed by this push.
 
+## 23 October checkpoint: daily plan, Phase 2 and CARE
+
+- [`everyday.md`](everyday.md) records the daily priorities: one slide, survey, features, palliative-doctor feedback/outreach preparation, Play release work, CARE feasibility and a demonstration video. The main priority is a simple, rehearsed explanation that shows the actual product and clinical workflow.
+- The original13-slide emailed Phase 2 template is preserved unchanged at `source-materials/healthathon-phase-2/Health-a-thon-2026-Phase-2-Submission-Template-original.pptx` (SHA256 `1ABDBA1A2E2FDFF6FEA96544325C7AFB409CD99CD403053FBD79E8DC18735F60`). Current filled [PPTX](submission/phase-2/final/Sahara-Healthathon-Phase-2-first-filled-draft-v2.pptx) and [PDF](submission/phase-2/final/Sahara-Healthathon-Phase-2-first-filled-draft-v2.pdf) contain all13 sections, an editable team table and the user's **Yes** to public solution information. Both were rendered and inspected; these are drafts, not submitted entries.
+- The draft still needs team code, doctor details, biographies/photos, cost assumptions, updated demo access and validation evidence. [Sources and gaps](submission/phase-2/README.md) preserve dated0.5 screenshots, actual test results and current0.6 device limitations. PPTX SHA256: `6950B09E2AE73CA62C1B1A5EAFA8E37C2CD5CEF8911A85C8056448C6211BA4A8`; PDF SHA256: `FE63BA9477BD6879710E176387398A856C017832C162DB9F294D90AD2C1BF5D0`.
+- **Visual comparison:** the earlier deck uses patient scenes, product screens, a map, process visuals and a chart; the new draft has nine mostly-bullet slides. Restore that visual storytelling within the required sections next. Neither deck was redesigned by this comparison; team photos remain deferred.
+- CARE research: re-read the15October email; the offer to shortlisted teams is optional platform/plugin reuse. Archived and text-reviewed58 discoverable main-site pages and12 selected docs, with70 original page hashes verified. Original HTML, derived text, both sitemap inventories and integrity report are in `output/research/care-website-20261023/`; [current findings](docs/research/care-resources-and-sahara-audit-2026-10-16.json) extend the older dated audit. The473-page documentation sitemap was inventoried, not all read. CARE already has substantial palliative-care overlap; a Sahara plugin/API connection remains proposed and unbuilt.
+- This checkpoint publishes documentation, the organiser template, filled drafts and public research to the existing private repository. It does not build/submit an Android release, refresh Play status, enable providers, send outreach or onboard patients. Private mail, credentials, recordings and raw local context remain excluded; four pre-existing presentation-generator deletions remain outside this commit.
+
 ## Start here
 
+- Daily priorities and presentation practice: [`everyday.md`](everyday.md). Keep the official Phase 2 draft aligned with actual implementation and feedback; CARE integration remains proposed.
 - Repository: https://github.com/basithladdu/healthathon (private), branch `main`.
 - Primary checkout: `F:/CODE/healthathon`. `android/` is the Kotlin app; `prototype/` is the React/Next.js website. Do not recreate this as React Native or a web wrapper.
 - Read this handoff, then `PROJECT_CONTEXT_MAP.md` and `android/release/store-draft.json`. The latter preserves distinct published, pending, rejected and test-build histories.
@@ -14,6 +24,7 @@ This is the starting point for another developer or Codex chat. Latest native ve
 
 | Artifact | Location / identity |
 | --- | --- |
+| Phase 2 working slides | `submission/phase-2/final/Sahara-Healthathon-Phase-2-first-filled-draft-v2.pptx`; all13 organiser sections, editable team table and sourced progress; remaining discussion items in `submission/phase-2/README.md` |
 | Latest installable test APK | `output/android/Sahara-0.6.0-20Oct-test.apk`; 0.6.0 (7), 300,504,493 bytes; Android debug signature; installs beside the Play app |
 | APK SHA256 | `5DC9D96176407A8E35A34709653D9897FBD4491FA79E9F908459933509BAC9AC` |
 | Native source for that APK | `e683e7e`; subsequent handoff/PDF commits do not change its native source |

@@ -1,0 +1,153 @@
+Care Apps & Integrations — Extend CARE - Open Healthcare Network
+Home
+Foundation
+CARE
+Solutions
+Impact
+Ecosystem
+Support
+Resources
+Plugins extend the healthcare OS without forking the core.
+CARE Apps connect national rails, telemetry, documentation, labs, pharmacy, billing, analytics, messaging, video, and AI workflows to the same shared foundation.
+Build on Care
+Explore integrations
+Discuss an integration
+Architecture
+CARE Core stays stable. Plugins move around it.
+Apps and integrations extend CARE for national rails, TeleICU, AI documentation, labs, pharmacy, billing, messaging, video, devices, and analytics without fragmenting the shared clinical core.
+Core + Plugins
+CARE Core
+v3.0.0 / FHIR R5
+Administration
+Patients / Facilities / Users
+Definitions
+ValueSets / Questionnaires
+Clinical
+Encounters / Observations
+Scheduling
+Schedules / Slots / Bookings
+Pharmacy
+Dispense / Inventory
+Labs
+Service Req / Diagnostics
+Billing
+Claims / Coverage / Invoice
+Persistence /
+PostgreSQL
+/
+Redis
+/
+Object storage
+Runtime /
+Django
+/
+DRF
+/
+Celery
+Plugin runtime
+AI Scribe
+TeleICU
+Imaging
+Devices
+Messaging
+Analytics
+Enabled solutions
+Core + plugins enable
+Hospital OS
+Critical care
+Home care grid
+Clinic network
+Public health
+CARE Core provides the stable platform slab. Plugins add capabilities such as AI documentation, TeleICU, imaging, devices, messaging, analytics, claims, and terminology. Together they enable hospital, critical care, home care, clinic, and public health solutions.
+Featured
+Most popular integrations deployed across multiple states.
+ABDM
+National rails
+National Rails
+ABDM Integration
+M1, M2, M3 style workflows for demographic and biometric authentication through a plugin model.
+ONVIF
+Real-time Monitoring
+Telemetry
+TeleICU
+ONVIF camera and vitals monitor integration patterns for hub-and-spoke critical care workflows.
+AI
+Voice Fill
+AI & Documentation
+Care Scribe
+Multilingual AI voice fill for forms/notes with support for multiple languages and clinical terminology.
+Categories
+Browse integrations by category
+Pattern inspired by best‑practice plugin galleries with verified, production-ready integrations.
+National & ID
+ABDM, Aadhaar, National ID systems
+Telemetry & Video
+ONVIF, RTSP, medical device integration
+Documentation & AI
+Voice-to-text, AI scribe, clinical notes
+Labs & Diagnostics
+Lab equipment, diagnostic tools, results
+Pharmacy & Supply
+Inventory, procurement, supply chain
+Imaging
+DICOM, PACS, medical imaging systems
+Payments
+Billing, insurance, payment gateways
+Messaging
+SMS, email, notification systems
+Data & Dashboards
+Analytics, reporting, business intelligence
+Browse all integrations
+Build the commons
+Help steward open healthcare
+infrastructure for the long term.
+Governments can deploy, institutions can support, implementation partners can localize, and contributors can strengthen the shared core.
+Support the commons
+Start a partnership conversation
+Registered Address
+Open Healthcare Network Foundation
+1st Floor, C M Complex, Kalavath Road, Palarivattom, Kochi, Ernakulam, Kerala, India, 682025
+Corporate Identity Number (CIN)
+U88100KL2025NPL098818
+Email
+support@ohc.network
+Foundation
+Mission
+Governance
+Board & Advisors
+Foundation Team
+Foundation Docs
+ISO Certifications
+Support OHC
+How to Fund Us
+Supporters
+CARE Platform
+CARE Core
+CARE AI
+Apps & Integrations
+Standards & Architecture
+Security & Compliance
+Solutions
+Hospital Management
+TeleICU
+Palliative Care
+CARE Clinic
+Animal Health
+Ecosystem
+The Network
+Implementation Partners
+Clinicians
+Build on Care
+Developers
+Impact
+Resources
+Blog
+FAQ
+Browser requirements
+Press & Media
+Careers
+Contact
+Support metadata
+©
+2026
+Open Healthcare Network Foundation.

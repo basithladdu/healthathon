@@ -1,0 +1,90 @@
+Contact OHC - Build Open Health Systems - Open Healthcare Network
+Home
+Foundation
+CARE
+Solutions
+Impact
+Ecosystem
+Support
+Resources
+Contact
+Start the right conversation.
+Reach OHC Foundation for deployment models, implementation partnerships, funding conversations, contribution pathways, and clinical workflow collaboration.
+Email us at
+support@ohc.network
+Partnerships and deployments
+For governments, hospitals, public health programs, funders, and implementation partners exploring CARE or related open healthcare infrastructure.
+support@ohc.network
+Developer community
+Join the open-source community, read the docs, and contribute to CARE Core, apps, integrations, and implementation guides.
+Explore GitHub
+Slack and ecosystem
+Connect with maintainers, contributors, clinicians, and implementation teams working across the OHC ecosystem.
+Join Slack
+Before you write
+Useful starting points.
+These pages answer most first questions about the foundation, CARE, governance, implementation, and contribution.
+Foundation
+Mission, stewardship, and governance.
+CARE Core
+Platform primitives and architecture.
+Support
+Fund the open healthcare commons.
+OHC stewards healthcare
+Digital Public Goods
+.
+MIT License.
+Data ownership remains with deploying governments and institutions.
+Build the commons
+Help steward open healthcare
+infrastructure for the long term.
+Governments can deploy, institutions can support, implementation partners can localize, and contributors can strengthen the shared core.
+Support the commons
+Start a partnership conversation
+Registered Address
+Open Healthcare Network Foundation
+1st Floor, C M Complex, Kalavath Road, Palarivattom, Kochi, Ernakulam, Kerala, India, 682025
+Corporate Identity Number (CIN)
+U88100KL2025NPL098818
+Email
+support@ohc.network
+Foundation
+Mission
+Governance
+Board & Advisors
+Foundation Team
+Foundation Docs
+ISO Certifications
+Support OHC
+How to Fund Us
+Supporters
+CARE Platform
+CARE Core
+CARE AI
+Apps & Integrations
+Standards & Architecture
+Security & Compliance
+Solutions
+Hospital Management
+TeleICU
+Palliative Care
+CARE Clinic
+Animal Health
+Ecosystem
+The Network
+Implementation Partners
+Clinicians
+Build on Care
+Developers
+Impact
+Resources
+Blog
+FAQ
+Browser requirements
+Press & Media
+Careers
+Contact
+Support metadata
+©
+2026
+Open Healthcare Network Foundation.

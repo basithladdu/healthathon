@@ -1,0 +1,128 @@
+Security & Compliance — CARE Platform - Open Healthcare Network
+Home
+Foundation
+CARE
+Solutions
+Impact
+Ecosystem
+Support
+Resources
+Standards, privacy, and control—by design.
+CARE is designed for standards-based interoperability, strong access controls, auditability, and sovereign hosting choices.
+Standards
+Built on global healthcare standards for interoperability
+FHIR R5
+,
+SNOMED
+,
+LOINC
+,
+UCUM
+,
+ICD‑10
+; terminology server;
+BYOT
+.
+FHIR R5
+Fast Healthcare Interoperability Resources
+SNOMED
+Clinical terminology
+LOINC
+Laboratory codes
+ICD-10
+Diagnosis codes
+Access & Safety
+Hierarchical org model with RBAC and comprehensive logging
+RBAC
+Access Control
+Organization Model
+Hierarchical structure
+National → state → district → facility hierarchy with role-based access control.
+Audit
+Trails
+Logging & Monitoring
+Comprehensive audit trails
+All actions logged with detailed audit trails for compliance and security monitoring.
+Live
+Monitoring
+Dashboards
+Real-time monitoring
+Live dashboards for system monitoring, user activity, and security events.
+Sovereign infrastructure
+Deploy in your VPC/gov cloud with complete control
+Zero license fees
+; you own code and data. Deploy in your infrastructure with complete sovereignty and control.
+Your Infrastructure
+Deploy in your VPC, government cloud, or hybrid environment
+Zero License Fees
+MIT license means no ongoing licensing costs or vendor lock-in
+Data Ownership
+You own all data and code with complete control and sovereignty
+AI‑ready with guardrails
+AI tools integrate seamlessly without altering the core
+Voice-fill, AI scribe, and other assistive tools should work as plugins without modifying the core platform, preserving security, maintainability, and human review.
+AI Plugins
+AI tools work as plugins without modifying the core platform
+• Voice-to-text for clinical notes
+• AI scribe for documentation drafts
+• Summarization with clinician review
+• Document understanding for structured workflows
+Security Guardrails
+Built-in security measures ensure AI tools don't compromise data integrity
+• Role-based access controls
+• Audit trails for AI interactions
+• Clear draft and review states
+• Human accountability for clinical decisions
+Build the commons
+Help steward open healthcare
+infrastructure for the long term.
+Governments can deploy, institutions can support, implementation partners can localize, and contributors can strengthen the shared core.
+Support the commons
+Start a partnership conversation
+Registered Address
+Open Healthcare Network Foundation
+1st Floor, C M Complex, Kalavath Road, Palarivattom, Kochi, Ernakulam, Kerala, India, 682025
+Corporate Identity Number (CIN)
+U88100KL2025NPL098818
+Email
+support@ohc.network
+Foundation
+Mission
+Governance
+Board & Advisors
+Foundation Team
+Foundation Docs
+ISO Certifications
+Support OHC
+How to Fund Us
+Supporters
+CARE Platform
+CARE Core
+CARE AI
+Apps & Integrations
+Standards & Architecture
+Security & Compliance
+Solutions
+Hospital Management
+TeleICU
+Palliative Care
+CARE Clinic
+Animal Health
+Ecosystem
+The Network
+Implementation Partners
+Clinicians
+Build on Care
+Developers
+Impact
+Resources
+Blog
+FAQ
+Browser requirements
+Press & Media
+Careers
+Contact
+Support metadata
+©
+2026
+Open Healthcare Network Foundation.

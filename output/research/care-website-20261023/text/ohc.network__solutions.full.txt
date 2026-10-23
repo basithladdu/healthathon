@@ -1,0 +1,139 @@
+CARE Solutions - Open Healthcare Deployment Patterns - Open Healthcare Network
+Home
+Foundation
+CARE
+Solutions
+Impact
+Ecosystem
+Support
+Resources
+CARE Solutions
+Deployable healthcare workflows on one open core.
+CARE solutions are reusable blueprints for hospitals, critical care, home-based care, clinics, public health programs, and animal health, all built on the same standards-based healthcare operating layer.
+Explore CARE Core
+Discuss a deployment
+CARE HMIS
+Hospital Management
+An open Hospital Information System for OPD, emergency, inpatient, labs, pharmacy, billing, reporting, and AI-ready clinical workflows.
+CARE TeleICU
+TeleICU
+Hub-and-spoke critical-care workflows for remote ICU review, specialist hubs, CARE EMR documentation, video context, and protocols.
+Shared foundation
+CARE Core
+FHIR R5
+Patients
+Facilities
+Encounters
+Forms
+Orders
+Tasks
+Care plans
+Referrals
+Reports
+APIs
+RBAC
+Audit
+Home Care Grid
+Palliative Care
+A care-coordination grid for vulnerable patients, home visits, care teams, follow-ups, referrals, dashboards, and continuity at home.
+Your clinic’s own computer
+CARE Clinic
+A free, open-source Mac and Windows application that sets up CARE on a clinic computer, with patient records, appointments, prescriptions, billing and encrypted backups.
+CARE Janwar
+Animal Health
+A CARE blueprint for veterinary clinics, public animal-health programs, field visits, vaccination, diagnostics, pharmacy, and program dashboards.
+Solution blueprints
+Product depth without product fragmentation.
+Each solution is a deployment pattern on CARE Core. Some are already field-proven. Others are packaged as implementation-ready blueprints for partners and programs to localize.
+Field-ready
+CARE HMIS
+Hospital Management
+An open Hospital Information System for OPD, emergency, inpatient, labs, pharmacy, billing, reporting, and AI-ready clinical workflows.
+Explore solution
+Field-proven
+CARE TeleICU
+TeleICU
+Hub-and-spoke critical-care workflows for remote ICU review, specialist hubs, CARE EMR documentation, video context, and protocols.
+Explore solution
+Reference model
+Home Care Grid
+Palliative Care
+A care-coordination grid for vulnerable patients, home visits, care teams, follow-ups, referrals, dashboards, and continuity at home.
+Explore solution
+Download for Mac and Windows
+Your clinic’s own computer
+CARE Clinic
+A free, open-source Mac and Windows application that sets up CARE on a clinic computer, with patient records, appointments, prescriptions, billing and encrypted backups.
+Explore solution
+Deployment blueprint
+CARE Janwar
+Animal Health
+A CARE blueprint for veterinary clinics, public animal-health programs, field visits, vaccination, diagnostics, pharmacy, and program dashboards.
+Explore solution
+How OHC thinks about solutions
+The solution changes. The infrastructure stays shared.
+This is the difference between a product catalogue and a public infrastructure stack. CARE solutions reuse the same primitives, improve the same core, and avoid splitting health systems into isolated applications.
+One core, many workflows
+Solutions are assembled from CARE Core primitives, apps, plugins, forms, terminology, APIs, dashboards, and implementation playbooks.
+Field use before polish theatre
+Each page explains the actual workflow surface: who uses it, what gets recorded, what moves next, and how the system improves.
+AI on top of clean data
+AI is framed as assistive: documentation, summaries, form support, decision support, and workflow intelligence on trusted records.
+Implementation ecosystem
+Built for governments, hospitals, partners, and programs.
+OHC Foundation stewards CARE Core, standards alignment, release discipline, documentation, and shared architecture. Implementation partners can configure workflows, localize forms, integrate systems, train users, and contribute improvements back.
+Work with partners
+Apps and integrations
+Build the commons
+Help steward open healthcare
+infrastructure for the long term.
+Governments can deploy, institutions can support, implementation partners can localize, and contributors can strengthen the shared core.
+Support the commons
+Start a partnership conversation
+Registered Address
+Open Healthcare Network Foundation
+1st Floor, C M Complex, Kalavath Road, Palarivattom, Kochi, Ernakulam, Kerala, India, 682025
+Corporate Identity Number (CIN)
+U88100KL2025NPL098818
+Email
+support@ohc.network
+Foundation
+Mission
+Governance
+Board & Advisors
+Foundation Team
+Foundation Docs
+ISO Certifications
+Support OHC
+How to Fund Us
+Supporters
+CARE Platform
+CARE Core
+CARE AI
+Apps & Integrations
+Standards & Architecture
+Security & Compliance
+Solutions
+Hospital Management
+TeleICU
+Palliative Care
+CARE Clinic
+Animal Health
+Ecosystem
+The Network
+Implementation Partners
+Clinicians
+Build on Care
+Developers
+Impact
+Resources
+Blog
+FAQ
+Browser requirements
+Press & Media
+Careers
+Contact
+Support metadata
+©
+2026
+Open Healthcare Network Foundation.

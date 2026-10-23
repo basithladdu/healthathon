@@ -1,0 +1,27 @@
+Current team
+Foundation operating leads.
+This public roster starts intentionally small and is built to expand. Product, engineering, AI, community, partnerships, documentation, and operations leaders can be added as the foundation publishes those roles.
+0
+1
+Bodhish Thomas
+Chief Executive Officer
+0
+2
+Vignesh Hari
+Chief Technology Officer
+Operating model
+A small foundation team with high leverage.
+The foundation team exists to make CARE reusable, governable, and fundable beyond any one deployment. The roster will expand as roles become public.
+Product and AI
+Roadmap, workflow strategy, assistive AI direction, and product quality for healthcare users.
+Architecture and engineering
+CARE Core, APIs, plugins, implementation quality, and platform maintainability.
+Foundation operations
+Governance support, documentation, fundraising readiness, reporting, and institutional systems.
+Ecosystem enablement
+Implementation partners, hospitals, governments, funders, clinicians, and open-source contributors.
+Public roster
+Leadership should be visible, current, and deliberate.
+The foundation team page will expand as roles are confirmed for publication, with clear accountability for product, engineering, partnerships, operations, community, and stewardship.
+Stewardship signal
+A public roster helps governments, funders, hospitals, and contributors understand who is accountable for the institution behind CARE and related open healthcare infrastructure.

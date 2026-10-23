@@ -1,0 +1,29 @@
+ISO 27001:2022
+Information Security Management System
+International standard for information security management. Certifies that OHC Foundation has established, implemented, and maintains a robust ISMS covering risk management, access control, incident response, asset management, and continuous improvement of information security practices.
+Scope
+Applies to the management of information assets across the foundation and the CARE platform, including source code, deployment infrastructure, and patient data handling practices.
+Certified
+View certificate
+ISO 82304-1:2016
+Health Software — General Requirements for Product Safety
+Establishes requirements for the safety of health software products, covering design, development, testing, maintenance, and lifecycle management. Ensures CARE meets internationally recognised product safety standards for healthcare applications.
+Scope
+Covers CARE Core and related health software components used in clinical, hospital, and community care settings.
+Certified
+View certificate
+ISO 82304-2:2021
+Health and Wellness Apps — Quality and Reliability
+Provides guidance for the validation and reusability of health and wellness apps, addressing quality, safety, performance, usability, and data handling. Supports trustworthy deployment of health software across diverse care environments.
+Scope
+Applicable to CARE-based apps and wellness-oriented modules deployed in community and home-care programs.
+Certified
+View certificate
+Why certification matters
+Independent verification for healthcare-grade software.
+Healthcare deployments require trust
+Hospitals, governments, and public health programs need assurance that the software they adopt meets internationally recognised safety and security standards.
+Patient data demands rigour
+ISO 27001 certification confirms that information security is not an afterthought — it is a managed, audited, and continuously improved discipline within the foundation.
+Health software safety is non-negotiable
+ISO 82304 standards confirm that CARE is developed and maintained with documented processes for safety-critical health software, reducing clinical and operational risk for implementers.

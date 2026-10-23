@@ -1,0 +1,149 @@
+Notes | Care
+Skip to main content
+Care
+Documentation
+Playbooks
+HMIS
+Palliative
+Contributing
+Deployment
+English
+English
+മലയാളം
+3.1
+3.1
+3.0
+Care documentation
+Concepts
+Clinical
+Patient
+Encounter
+Allergy Intolerance
+Condition
+Observation
+Clinical - Service Request
+Clinical - Specimen
+Clinical - Diagnostic Report
+Consent
+Clinical - Files
+Questionnaire Response
+Clinical - Care Team
+Notes
+Definitions & Terminology
+Medications
+Scheduling
+Billing
+Supply & Inventory
+Facility
+Access & Governance
+Platform
+Flows
+Clinical
+Facility
+Medications
+Billing
+Scheduling
+Supply
+Access & Governance
+Platform
+Definitions
+References
+Foundation
+Clinical
+Definitions & Terminology
+Medications
+Scheduling
+Billing
+Supply & Inventory
+Facility
+Access & Governance
+Platform
+Concepts
+Clinical
+Notes
+Version: 3.1
+On this page
+Notes
+Definition
+​
+Clinical Notes
+is the space where staff record and exchange written notes about a patient. Care groups the messages into titled discussions, so different topics stay separate. You find Clinical Notes in the
+Notes
+tab, which shows a panel called
+Discussions
+.
+Clinical Notes is a Care feature for staff collaboration. Care does not map Clinical Notes to an FHIR R5 resource.
+Key Attributes
+​
+A discussion groups related messages under one title. A message is one entry in a discussion.
+Components
+What it captures
+Title
+The subject of the discussion. The title holds up to 255 characters.
+Message
+The text of one entry in a discussion. The text supports Markdown formatting.
+Author
+The staff member who wrote the message. Care records this for you.
+Time
+The date and time of the message. Care records this for you.
+A discussion holds a title only. A message holds text only. This module has no status, no category, and no coded value.
+Encounter discussions and patient discussions
+​
+Care keeps two separate spaces for discussions:
+Encounter discussions belong to one
+encounter
+. You see them in the Notes tab of that encounter.
+Patient discussions belong to the patient. You see them in the Notes tab of the patient profile.
+The two lists never overlap. A patient discussion never appears inside an encounter. An encounter discussion never appears on the patient profile.
+Order of discussions and messages
+​
+Care lists the discussions with the most recent first. Inside a discussion, the newest message appears at the bottom. Care loads older messages 20 at a time as you scroll up.
+Permanence
+​
+Care shows no way to delete a discussion. Care shows no way to delete a message. After you send a message, the message stays in the discussion.
+Attachments and mentions
+​
+Care does not support file attachments in messages. Care does not support user mentions in messages.
+Who can see and write
+​
+Action
+Permission
+Roles
+See encounter discussions and messages
+Can Read encounter related clinical data
+Doctor, Nurse, Admin, Facility Admin
+Start an encounter discussion, or post a message in one
+Update Encounter related clinical data
+Doctor, Nurse, Admin, Facility Admin
+See patient discussions and messages
+Can view clinical data about patients
+Staff, Doctor, Nurse, Admin, Facility Admin
+Start a patient discussion, or post a message in one
+Can Update a Patient's data
+Staff, Doctor, Nurse, Administrator, Admin, Facility Admin
+If the encounter is closed, you cannot start a discussion in it. You also cannot post a message in it. Care treats an encounter as closed when its status is Completed, Cancelled, Discontinued, or Entered in error.
+Note: No deployment setting changes how Clinical Notes behaves.
+Related
+​
+Flow:
+Start a discussion
+Flow:
+Post a message to a discussion
+Flow:
+Find discussions for a patient or an encounter
+Concept:
+Encounter
+Edit this page
+Previous
+Clinical - Care Team
+Next
+Definitions & Terminology
+Definition
+Key Attributes
+Encounter discussions and patient discussions
+Order of discussions and messages
+Permanence
+Attachments and mentions
+Who can see and write
+Related
+Copyright © 2026 Open Healthcare Network Foundation. Built with Docusaurus.

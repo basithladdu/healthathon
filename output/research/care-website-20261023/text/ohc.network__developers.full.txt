@@ -1,0 +1,187 @@
+Developers — Contribute to CARE Open Source EMR - Open Healthcare Network
+Home
+Foundation
+CARE
+Solutions
+Impact
+Ecosystem
+Support
+Resources
+Build open-source healthcare infrastructure.
+Contribute to CARE, an open-source EMR system built with Django DRF and React TypeScript, powering practical healthcare workflows in real clinical and public health settings.
+Star us on Github
+Join Slack
+Docs
+Public contributor community
+MIT License
+Building your own app or integration?
+Explore extension points, working examples, and a path to your first CARE plugin.
+Build on Care
+Tech Stack
+Built with modern technologies for scalable healthcare solutions
+Backend
+Django Rest Framework powers our robust API and data management
+Frontend
+React TypeScript provides a modern, type-safe user interface
+Prerequisites
+What you need to know before contributing
+Basic Requirements
+Git and GitHub familiarity
+Basic web development knowledge
+HTML, CSS, JavaScript understanding
+Command line basics
+Learning Path
+New to web development? Start here:
+WD101 Course by pupilfirst.school
+DjangoForAll for Django & DRF
+ReactForAll for React TypeScript
+Development Tools
+VS Code or preferred IDE
+Node.js and Python environments
+Docker for containerization
+Git for version control
+What you can build
+Plugins, modules, and integrations that extend CARE without changing the core
+Plugins
+TeleICU (ONVIF), ABDM M1–M3, Care Scribe, and more
+Modules
+LMIS, Pharmacy, Billing, Dashboards, and custom modules
+Forms & Terminologies
+Forms mapped to FHIR; terminology bridges (SNOMED/LOINC/UCUM)
+Integrations
+Connect with existing systems, devices, and third-party services
+Get started
+Everything you need to start contributing to CARE
+Quick Setup
+Get started in minutes
+Setup
+Environment Setup
+Clone repositories and set up your development environment with step-by-step instructions.
+Good First Issues
+Perfect for beginners
+GitHub
+Find Issues
+Browse issues labeled 'good first issue' and claim them to start contributing immediately.
+Slack Community
+Get help & connect
+Community
+Join Slack
+Connect with the community at slack.ohc.network for discussions, help, and collaboration.
+Quick Setup Steps
+Backend Setup
+Follow the installation guide for the Django backend.
+Backend README
+Frontend Setup
+Follow the installation guide for the React frontend.
+Frontend README
+How to contribute
+Step-by-step process to start contributing to CARE
+1. Find an Issue
+Browse issues on GitHub and look for issues labeled 'good first issue' to get started.
+Visit
+github.com/ohcnetwork/care_fe
+Look for issues with 'good first issue' label
+2. Claim the Issue
+Comment on the issue explaining your approach and request to be assigned to it.
+Comment with your understanding and explain your approach
+Request to be assigned to the issue
+3. Work on the Issue
+Fork the repository, create a branch, and start coding with proper testing.
+4. Submit a Pull Request
+Open a draft PR early and request review once ready for final submission.
+Learning Resources
+Comprehensive resources to master our tech stack
+Backend Development
+Django Documentation:
+Official Django docs
+for web framework
+DRF Documentation:
+Django Rest Framework
+for API development
+DjangoForAll:
+Comprehensive course
+for Django and DRF
+FHIR R5:
+Healthcare interoperability standards
+Frontend Development
+React Documentation:
+Official React docs
+and guides
+TypeScript Documentation:
+Type-safe JavaScript
+development
+ReactForAll:
+Complete React TypeScript course
+Modern CSS:
+Styling and responsive design
+Web Development Basics
+WD101 Course:
+Complete web development fundamentals
+Git & GitHub:
+Version control and collaboration
+HTML/CSS/JavaScript:
+Core web technologies
+Command Line:
+Terminal and development tools
+Healthcare Domain
+EMR Systems:
+Electronic Medical Records basics
+Healthcare Standards:
+FHIR, HL7, SNOMED, LOINC
+Medical Workflows:
+Patient care processes
+Data Privacy:
+HIPAA and healthcare compliance
+Build the commons
+Help steward open healthcare
+infrastructure for the long term.
+Governments can deploy, institutions can support, implementation partners can localize, and contributors can strengthen the shared core.
+Support the commons
+Start a partnership conversation
+Registered Address
+Open Healthcare Network Foundation
+1st Floor, C M Complex, Kalavath Road, Palarivattom, Kochi, Ernakulam, Kerala, India, 682025
+Corporate Identity Number (CIN)
+U88100KL2025NPL098818
+Email
+support@ohc.network
+Foundation
+Mission
+Governance
+Board & Advisors
+Foundation Team
+Foundation Docs
+ISO Certifications
+Support OHC
+How to Fund Us
+Supporters
+CARE Platform
+CARE Core
+CARE AI
+Apps & Integrations
+Standards & Architecture
+Security & Compliance
+Solutions
+Hospital Management
+TeleICU
+Palliative Care
+CARE Clinic
+Animal Health
+Ecosystem
+The Network
+Implementation Partners
+Clinicians
+Build on Care
+Developers
+Impact
+Resources
+Blog
+FAQ
+Browser requirements
+Press & Media
+Careers
+Contact
+Support metadata
+©
+2026
+Open Healthcare Network Foundation.

@@ -1,0 +1,23 @@
+Partnerships and deployments
+For governments, hospitals, public health programs, funders, and implementation partners exploring CARE or related open healthcare infrastructure.
+support@ohc.network
+Developer community
+Join the open-source community, read the docs, and contribute to CARE Core, apps, integrations, and implementation guides.
+Explore GitHub
+Slack and ecosystem
+Connect with maintainers, contributors, clinicians, and implementation teams working across the OHC ecosystem.
+Join Slack
+Before you write
+Useful starting points.
+These pages answer most first questions about the foundation, CARE, governance, implementation, and contribution.
+Foundation
+Mission, stewardship, and governance.
+CARE Core
+Platform primitives and architecture.
+Support
+Fund the open healthcare commons.
+OHC stewards healthcare
+Digital Public Goods
+.
+MIT License.
+Data ownership remains with deploying governments and institutions.

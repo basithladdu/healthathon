@@ -1,0 +1,286 @@
+CARE HMIS - Open Source Hospital Information System (HIS) - Open Healthcare Network
+Home
+Foundation
+CARE
+Solutions
+Impact
+Ecosystem
+Support
+Resources
+CARE HMIS
+The open hospital OS for connected care.
+CARE HMIS is an open-source Hospital Information System that connects patient flow, information flow, and revenue flow across outpatient, emergency, inpatient, labs, pharmacy, billing, and reporting workflows.
+Plan an HMIS deployment
+Explore CARE Core
+Live HIS workflow
+Encounters, orders, forms, reports, and operational context.
+100+
+hospitals
+5
+deployment states
+FHIR R5
+standards-first core
+MIT
+open-source licence
+Hospital Information System
+HIS depth with open-source ownership.
+CARE HMIS is built for hospitals that need more than a digital file. It combines EMR, HMIS, hospital operations, revenue cycle workflows, interoperability, and AI-ready clinical data in one reusable open platform.
+HIS layer
+Clinical record
+Patients, encounters, notes, diagnoses, orders, observations, medications, care plans, and discharge summaries.
+HIS layer
+Hospital operations
+Appointments, queues, beds, wards, departments, staff roles, stock movement, reports, and dashboards.
+HIS layer
+Revenue cycle
+Charge capture, invoices, payments, scheme coverage, claims direction, reconciliation, and accounting integration.
+HIS layer
+Interoperability layer
+FHIR-aligned APIs, terminology bindings, ABDM workflows, device integrations, and plugin-based extensions.
+The real problem
+Software exists. A connected workflow does not.
+The goal is not electronic records. It is a hospital that can coordinate care, measure quality, manage resources, and safely use assistive AI.
+Discrete fragments
+Registration, labs, medications, discharge, and billing live as separate events instead of one care story.
+Disconnected workflows
+Orders, results, prescriptions, stock, and dispensing move through silos with no single operational flow.
+Digital paper
+Forms were digitized without redesigning the work around them, so software becomes one more burden.
+Lost revenue
+Unbilled services, missed charges, and manual invoicing leave money on the table every day.
+Three flows at once
+Records become workflows. Workflows become operations.
+CARE HMIS treats a hospital as a living system. Every patient event, clinical decision, and financial transaction can move through one connected operating layer.
+0
+1
+Patient flow
+Registration, appointments, OPD, emergency, IPD, ICU, discharge, and follow-up.
+0
+2
+Information flow
+Encounters, orders, results, records, decisions, and longitudinal clinical context.
+0
+3
+Revenue flow
+Charges, invoices, scheme coverage, payments, and reconciliation as care is delivered.
+Every encounter
+One platform for every care setting.
+CARE supports the full patient journey, while keeping clinical documentation consistent across hospitals, clinics, homes, and virtual visits.
+Outpatient
+Clinical visits linked to the patient record.
+Emergency
+Priority care and emergency workflows.
+Inpatient
+Admissions, rounds, orders, notes, and discharge.
+Observation
+Short-stay monitoring with continuity.
+Home health
+Mobile documentation and care plans.
+Virtual care
+Remote consultation with structured records.
+Core modules
+The workflows a hospital expects, built on one core.
+Modules are not isolated applications. They share patients, encounters, orders, observations, roles, reports, and audit trails.
+Clinical data capture
+Structured forms, symptoms, conditions, orders, medication requests, and observations.
+Scheduling
+Appointment calendars, public facility pages, doctor availability, and open slots.
+Queues
+Doctor, department, pharmacy, billing, and custom service queues for high-volume settings.
+EMR form builder
+Configurable department forms mapped to interoperable clinical resources.
+Bed management
+Live locations, beds, admission status, hierarchy, and availability.
+Administrative hierarchy
+Facility, district, state, program, and national structures with data segregation.
+RBAC and audit
+Granular role-based access control for doctors, nurses, admins, and health workers.
+Dynamic reports
+Treatment summaries, discharge summaries, dashboards, and custom operational reports.
+Workflows in motion
+See the hospital OS as real product workflows.
+These are not static module names. CARE HMIS supports live workflows across bed management, clinical drawings, and dynamic reporting on the same shared patient and facility data layer.
+Bed management
+Track beds, locations, admissions, discharge states, and live availability across hospital hierarchies.
+Clinical drawings
+Capture drawings, body maps, annotations, and visual clinical context directly in the patient record.
+Dynamic reports
+Generate operational and clinical reports from shared encounters, forms, orders, and care activity.
+HIS coverage
+One operating layer across hospital departments.
+CARE HMIS gives hospitals a shared information system for clinical, administrative, operational, and financial work. Each department can keep its workflow while contributing to one longitudinal record.
+Front desk
+Registration, demographics, patient search, appointments, queues, and visit creation.
+OPD and clinics
+Consultations, notes, prescriptions, investigations, follow-up, referrals, and summaries.
+Emergency
+Rapid registration, triage direction, emergency encounters, orders, observation, and handover.
+Inpatient wards
+Admissions, bed allocation, rounds, nursing updates, orders, discharge, and transfers.
+ICU and critical care
+TeleICU extension, vitals/device direction, remote review, video, and escalation workflows.
+Laboratory
+Lab orders, specimen tracking direction, results, diagnostic reports, and LOINC/UCUM alignment.
+Pharmacy
+Prescriptions, dispensing, substitutions, stock alerts, procurement, inventory, and audit trails.
+Billing and accounts
+Service charges, invoices, payments, insurance/scheme support, and reconciliation workflows.
+Administration
+Facilities, departments, users, roles, access control, audit logs, reports, and operational analytics.
+Hospital operations
+The back office is clinical infrastructure.
+Labs, pharmacy, stock, billing, and accounting are not downstream admin tasks. They are part of the same clinical timeline.
+Lab and diagnostics / LMIS
+Clinicians order tests, labs track samples, results attach to the record, and observations use standard codes and units.
+Pharmacy and inventory
+Prescriptions flow into dispensing, substitutions, stock movement, alerts, procurement, and supply chain workflows.
+Billing and accounting
+Cash, insurance, government schemes, invoices, payment capture, and reconciliation connect back to care activity.
+Standards and architecture
+Built for exchange, analytics, and assistive AI.
+CARE HMIS is standards-first, API-first, modular, cloud agnostic, mobile-first, and designed to be extended without forking the core.
+FHIR R5
+clinical resources and APIs
+SNOMED CT
+clinical terminology
+LOINC
+labs and observations
+UCUM
+units of measure
+ICD-10
+classification support
+BYOT
+bring your own terminology
+Apps and AI
+Extend the hospital OS without breaking the core.
+CARE Apps add national rails, TeleICU, AI documentation, devices, claims, token display, messaging, and analytics through a plugin layer. AI drafts. Humans decide. CARE records.
+ABDM
+M1, M2, M3 and identity workflows through plugins.
+TeleICU
+Camera, vitals, remote review, and critical care extension.
+Care Scribe
+Multilingual voice fill and assistive documentation.
+Token display
+Queue and token screens for TVs and public counters.
+Labs and devices
+Orders, results, PACS, and bedside integrations.
+Claims and messaging
+HCX, reminders, analytics, and patient communication.
+Responsible AI
+Voice fill, document understanding, record summaries, discharge drafts, and decision support sit on top of structured clinical data with human review.
+Implementation model
+A serious HIS rollout is product, process, and governance.
+CARE HMIS deployments can start with a focused hospital workflow and expand into a complete Hospital Information System. The same open core supports phased adoption, local configuration, partner-led implementation, and long-term release upgrades.
+0
+1
+Master data
+Facilities, departments, rooms, beds, services, staff, user roles, tariffs, and drug catalogues.
+0
+2
+Workflow mapping
+OPD, emergency, IPD, pharmacy, lab, billing, and discharge flows aligned to local practice.
+0
+3
+Forms and terminology
+Configurable EMR forms, FHIR resources, ValueSets, SNOMED CT, LOINC, UCUM, and ICD-10.
+0
+4
+Integrations
+ABDM, devices, lab systems, accounting tools, messaging, analytics, payments, and partner plugins.
+0
+5
+Security model
+Role-based access, audit trails, hosting choices, data ownership, backup, and operational controls.
+0
+6
+Adoption plan
+Training, phased rollout, support desk, reporting cadence, feedback loops, and release upgrades.
+Deployment proof
+CARE HMIS 3.0 is live across multiple deployments.
+CARE HMIS 3.0 is now live across deployments in Kerala, Karnataka, Jharkhand, Assam, and Manipur, supporting 100+ hospitals through a reusable open-core model.
+Start a deployment conversation
+View impact
+Kerala
+live deployment
+Karnataka
+live deployment
+Jharkhand
+live deployment
+Assam
+live deployment
+Manipur
+live deployment
+100+
+hospitals
+HIS FAQ
+What hospitals usually ask before evaluating CARE HMIS.
+These answers are written for teams comparing open-source HIS, HMIS, EMR, and hospital management software options.
+What is CARE HMIS?
+CARE HMIS is an open-source Hospital Information System and Hospital Management Information System built around CARE Core. It connects clinical records, hospital operations, billing, reporting, integrations, and AI-ready workflows on one standards-based platform.
+Is CARE HMIS an EMR or a full HIS?
+CARE HMIS includes EMR capabilities, but it is broader than an electronic medical record. It supports patient registration, OPD, emergency, inpatient care, labs, pharmacy, inventory, billing, reporting, access control, integrations, and deployment workflows.
+Can CARE HMIS be self-hosted?
+Yes. CARE is designed for self-hosted, cloud, hybrid, and on-premise deployment models, so hospitals and governments can own their infrastructure and avoid software licence lock-in.
+Which hospital departments can CARE HMIS support?
+CARE HMIS can support front desk, OPD, emergency, inpatient wards, ICU and TeleICU workflows, laboratory, pharmacy, inventory, billing, administration, analytics, and patient-facing workflows.
+How does CARE HMIS support interoperability?
+CARE HMIS is standards-first, with FHIR R5-aligned resources, open APIs, terminology support for SNOMED CT, LOINC, UCUM and ICD-10, and plugin-based integrations for national rails, devices, labs, claims, messaging, and analytics.
+How is AI used in CARE HMIS?
+AI is assistive and human-in-the-loop. CARE HMIS can support voice fill, documentation drafts, document understanding, summaries, and decision-support workflows on top of structured clinical data and audit-aware processes.
+Intelligent hospitals need connected workflows first.
+CARE HMIS gives hospitals the shared operating layer for clinical work, operations, revenue, analytics, and carefully governed AI.
+Plan an HMIS deployment
+Explore apps and integrations
+Build the commons
+Help steward open healthcare
+infrastructure for the long term.
+Governments can deploy, institutions can support, implementation partners can localize, and contributors can strengthen the shared core.
+Support the commons
+Start a partnership conversation
+Registered Address
+Open Healthcare Network Foundation
+1st Floor, C M Complex, Kalavath Road, Palarivattom, Kochi, Ernakulam, Kerala, India, 682025
+Corporate Identity Number (CIN)
+U88100KL2025NPL098818
+Email
+support@ohc.network
+Foundation
+Mission
+Governance
+Board & Advisors
+Foundation Team
+Foundation Docs
+ISO Certifications
+Support OHC
+How to Fund Us
+Supporters
+CARE Platform
+CARE Core
+CARE AI
+Apps & Integrations
+Standards & Architecture
+Security & Compliance
+Solutions
+Hospital Management
+TeleICU
+Palliative Care
+CARE Clinic
+Animal Health
+Ecosystem
+The Network
+Implementation Partners
+Clinicians
+Build on Care
+Developers
+Impact
+Resources
+Blog
+FAQ
+Browser requirements
+Press & Media
+Careers
+Contact
+Support metadata
+©
+2026
+Open Healthcare Network Foundation.

@@ -1,0 +1,28 @@
+Boilerplate
+About Open Healthcare Network Foundation
+Open Healthcare Network Foundation stewards open digital public infrastructure for healthcare. The foundation maintains CARE and related open-source building blocks that help governments, hospitals, NGOs, and implementation partners deploy interoperable, self-hostable, standards-based health systems without vendor lock-in.
+CARE is an open-source Digital Public Good for healthcare workflows across hospitals, public health programs, critical care, palliative care, and care coordination. It is designed around open standards, modular architecture, and real-world frontline adoption.
+Public facts
+Use these as the publication floor.
+Foundation role
+Open Healthcare Network Foundation stewards CARE and related open-source Digital Public Goods for healthcare.
+CARE DPG listing
+CARE is listed in the Digital Public Goods registry as Care | Open Healthcare Network and is MIT licensed.
+Open source
+CARE is built in public with open-source repositories, contribution pathways, and reusable deployment patterns.
+Standards-first
+OHC public materials describe CARE around FHIR R5, SNOMED CT, LOINC, UCUM, ICD-10, ABDM, and open APIs.
+Assets
+Logos, product screenshots, deployment maps, and source links.
+Logos and brand assets
+Use approved OHC and CARE logos from the branding repository.
+Branding repository
+Deployment map
+Use maps with the metrics register so geography and current deployment status are not confused.
+Download map
+Metrics guidance
+Use only dated, approved metrics for press quotes, decks, and fact sheets.
+Verify a metric
+Media inquiries
+For interviews, fact-checks, and approved metrics, contact the OHC team.
+Contact OHC

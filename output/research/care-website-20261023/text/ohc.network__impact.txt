@@ -1,0 +1,66 @@
+1.3M+
+home-care consultations
+120+
+TeleICU hospitals
+100+
+HMIS hospitals
+1,385+
+GitHub contributors
+Where CARE runs
+One core. Many care delivery systems.
+These are not separate products. They are deployment patterns built on the same open healthcare operating layer.
+Kerala Palliative Care
+A statewide grid for home-based care.
+CARE powers daily operations across primary care centers, NGOs, clinicians, and field teams serving patients who need continuity beyond the hospital.
+1,300+
+primary care centers
+1,300+
+NGOs
+330,000+
+registered patients
+1.3M+
+home-care consultations
+12,000+
+daily users
+TeleICU
+Specialist critical care, extended through open infrastructure.
+CARE supports hub-and-spoke ICU workflows across hospitals, states, patients, and daily clinical users.
+120+
+hospitals
+7
+states
+150,000+
+patients
+1,696
+daily active users
+CARE HMIS 3.0
+A modern HMIS layer already live across multiple deployments.
+CARE HMIS 3.0 supports hospital workflows across registration, encounters, notes, orders, labs, pharmacy, billing, reporting, and analytics.
+5
+deployment states
+100+
+hospitals
+Kerala
+live deployment
+Karnataka
+live deployment
+Jharkhand, Assam, Manipur
+live deployments
+Care deployments map
+Deployment proof should be visible, navigable, and current.
+The map shows where CARE-powered programs have run across public health, hospitals, critical care, and community care. The 2026 updates page carries the current narrative as deployments mature.
+Download map
+Updates of 2026
+Beyond deployments
+Public-good signals that outlast any one program.
+OHC's impact is not only the software running in the field. It is the open-source community, licence, standards discipline, and external validation that make CARE reusable.
+Verified Digital Public Good
+CARE is listed in the DPGA registry and was last evaluated on 01.07.2025.
+MIT licensed
+The core remains reusable for governments, hospitals, NGOs, and implementation partners.
+Open-source community
+1,385+ code contributors have helped build the CARE ecosystem on GitHub.
+The point is not one deployment. It is reusable capacity.
+CARE gives health systems a shared operating layer they can adapt, own, and extend. OHC Foundation exists to keep that layer open, governed, and ready for the next program.
+Explore CARE Core
+Start a deployment conversation

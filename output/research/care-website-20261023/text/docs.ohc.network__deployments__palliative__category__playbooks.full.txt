@@ -1,0 +1,20 @@
+Palliative playbooks | Care
+Skip to main content
+Care
+←
+Documentation
+Palliative playbook
+Palliative playbooks
+Playbooks
+Palliative patient enrollment
+Playbooks
+Palliative playbooks
+Use cases that combine Care flows with palliative program configuration and community care edge cases.
+📄️
+Palliative patient enrollment
+Enroll a patient into a community or facility-based palliative program. This playbook combines the register patient flow with palliative-specific intake, caregiver capture, and program assignment.
+Previous
+Palliative playbooks
+Next
+Palliative patient enrollment
+Copyright © 2026 Open Healthcare Network Foundation. Built with Docusaurus.

@@ -1,0 +1,112 @@
+Governance - Open Healthcare Network Foundation - Open Healthcare Network
+Home
+Foundation
+CARE
+Solutions
+Impact
+Ecosystem
+Support
+Resources
+Governance
+Shared infrastructure needs visible decision-making.
+OHC Foundation exists so CARE is not controlled by one vendor, one donor, one state, or one implementation partner. Governance separates fiduciary stewardship from technical direction while keeping maintainers close to the work.
+Stewardship model
+Clear roles for institutional oversight and technical ownership.
+Foundation Board
+Mission, legal, fiduciary, financial, fundraising, risk, and long-term institutional stewardship.
+Technical Steering Committee
+Architecture, technical vision, maintainership, release discipline, and community process oversight.
+Project maintainers
+Day-to-day code review, roadmap execution, issue triage, documentation, and contributor mentorship.
+Project groups
+Focused ownership for CARE Core, Apps, standards, security, implementation guides, and clinical workflows.
+How decisions are made
+The board stewards the institution. Technical leaders steward the platform.
+Mission, legal, finance, risk
+Foundation Board
+Architecture and technical roadmap
+Technical Steering Committee
+Code review and release readiness
+Maintainers
+Plugin compatibility and extensions
+Project groups and maintainers
+Clinical workflow safety
+Clinicians, maintainers, and product leads
+Security disclosure and response
+Security maintainers and foundation
+Public commitments
+Governance should be published as operating practice, not branding.
+Open contribution
+Contributions should flow through public repositories, clear review rules, and a documented maintainer path.
+License clarity
+CARE code is MIT licensed. Documentation and implementation guides should use open content licenses where appropriate.
+Release governance
+Stable releases, compatibility expectations, and long-term support direction should be visible to implementers.
+Security reporting
+Vulnerability reporting, disclosure expectations, access-control practices, and auditability are foundation concerns.
+Conflict handling
+The foundation should make conflicts of interest and decision escalation paths explicit as the ecosystem grows.
+Clinical accountability
+Clinical workflow and AI-related changes need review paths that respect safety, auditability, and human accountability.
+Trust and safety
+Security, release quality, and clinical safety are governance work.
+Open healthcare infrastructure must be auditable, maintainable, and safe to operate in real clinical settings. Governance connects technical review, responsible disclosure, release compatibility, and human-in-the-loop AI practices.
+Security & compliance
+Contribute
+Audit trails
+Access controls
+Release readiness
+Maintainer review
+Build the commons
+Help steward open healthcare
+infrastructure for the long term.
+Governments can deploy, institutions can support, implementation partners can localize, and contributors can strengthen the shared core.
+Support the commons
+Start a partnership conversation
+Registered Address
+Open Healthcare Network Foundation
+1st Floor, C M Complex, Kalavath Road, Palarivattom, Kochi, Ernakulam, Kerala, India, 682025
+Corporate Identity Number (CIN)
+U88100KL2025NPL098818
+Email
+support@ohc.network
+Foundation
+Mission
+Governance
+Board & Advisors
+Foundation Team
+Foundation Docs
+ISO Certifications
+Support OHC
+How to Fund Us
+Supporters
+CARE Platform
+CARE Core
+CARE AI
+Apps & Integrations
+Standards & Architecture
+Security & Compliance
+Solutions
+Hospital Management
+TeleICU
+Palliative Care
+CARE Clinic
+Animal Health
+Ecosystem
+The Network
+Implementation Partners
+Clinicians
+Build on Care
+Developers
+Impact
+Resources
+Blog
+FAQ
+Browser requirements
+Press & Media
+Careers
+Contact
+Support metadata
+©
+2026
+Open Healthcare Network Foundation.

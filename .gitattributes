@@ -9,6 +9,9 @@ output/android/verification/0.5.0/ci-runtime-*/** -text whitespace=cr-at-eol
 output/android/verification/0.5.0/ci-runtime-*/**/*.txt -diff
 # Public directory snapshots are provenance originals; preserve their recorded byte hashes.
 output/research/india-directory-20261020/** -text -diff
+# Public CARE source captures retain their original byte hashes.
+output/research/care-website-20261023/html/** -text -diff
+output/research/care-website-20261023/*-sitemap.xml -text -diff
 # Generated diagnostic/extracted text keeps its original whitespace and line endings.
 output/android/verification/**/*.log -text whitespace=-blank-at-eol,-blank-at-eof
 output/android/verification/assist-contract-2026-10-19/*.txt -text whitespace=-blank-at-eol,-blank-at-eof

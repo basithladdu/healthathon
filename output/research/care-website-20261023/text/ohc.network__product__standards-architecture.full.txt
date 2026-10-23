@@ -1,0 +1,108 @@
+Standards & Architecture - CARE Platform - Open Healthcare Network
+Home
+Foundation
+CARE
+Solutions
+Impact
+Ecosystem
+Support
+Resources
+CARE standards and architecture
+Standards-first by design, not integration as an afterthought.
+CARE is designed as a standards-first core: configurable forms, FHIR-aligned resources, terminology bindings, plugins, open APIs, sovereign hosting, and AI-ready structured data.
+Explore CARE Core
+Security & compliance
+Standards layer
+CARE speaks the language of modern health systems.
+FHIR R5
+FHIR-aligned resources and APIs for modern health data exchange and workflow modeling.
+SNOMED CT
+Clinical terminology direction for structured observations, findings, procedures, and concepts.
+LOINC
+Laboratory and observation coding for diagnostic and measurement workflows.
+UCUM
+Standard units for measurements, vitals, labs, and quantitative observations.
+ICD-10
+Classification support for diagnosis grouping, reporting, and program analytics.
+ABDM
+India digital health alignment through CARE Apps and integration patterns.
+Architecture principles
+Modular workflows on a shared clinical data foundation.
+CARE avoids treating interoperability as a later integration project. The platform uses structured resources, configurable forms, terminology, and APIs so deployments can adapt locally while preserving data reuse.
+Configurable forms
+Questionnaires and EMR forms map operational workflows to structured clinical data.
+Terminology bindings
+Bring-your-own terminology and shared terminology services can align local workflows with standards.
+Open APIs
+API-first architecture lets hospitals, governments, and partners integrate without closed vendor gates.
+Plugin extensibility
+Apps and integrations extend CARE for national rails, TeleICU, AI documentation, labs, pharmacy, billing, and analytics.
+Sovereign deployment
+Health systems should be able to own their infrastructure and data.
+CARE is self-hostable and cloud-agnostic. Governments and institutions can run it in their own infrastructure, integrate with national systems, and maintain local control over data and operations.
+Self-hosted
+Government cloud
+Hospital VPC
+Hybrid deployments
+Cloud-agnostic infrastructure
+Mobile-first workflows
+AI-readiness
+AI works best when the underlying health record is structured, traceable, and interoperable.
+OHC frames AI as assistive and human-in-the-loop. CARE can support voice-native forms, documentation drafts, summarization, and document understanding because workflows are connected to structured data and audit trails.
+AI draft flags
+Auditability
+Role-based access
+Structured clinical data
+Build the commons
+Help steward open healthcare
+infrastructure for the long term.
+Governments can deploy, institutions can support, implementation partners can localize, and contributors can strengthen the shared core.
+Support the commons
+Start a partnership conversation
+Registered Address
+Open Healthcare Network Foundation
+1st Floor, C M Complex, Kalavath Road, Palarivattom, Kochi, Ernakulam, Kerala, India, 682025
+Corporate Identity Number (CIN)
+U88100KL2025NPL098818
+Email
+support@ohc.network
+Foundation
+Mission
+Governance
+Board & Advisors
+Foundation Team
+Foundation Docs
+ISO Certifications
+Support OHC
+How to Fund Us
+Supporters
+CARE Platform
+CARE Core
+CARE AI
+Apps & Integrations
+Standards & Architecture
+Security & Compliance
+Solutions
+Hospital Management
+TeleICU
+Palliative Care
+CARE Clinic
+Animal Health
+Ecosystem
+The Network
+Implementation Partners
+Clinicians
+Build on Care
+Developers
+Impact
+Resources
+Blog
+FAQ
+Browser requirements
+Press & Media
+Careers
+Contact
+Support metadata
+©
+2026
+Open Healthcare Network Foundation.

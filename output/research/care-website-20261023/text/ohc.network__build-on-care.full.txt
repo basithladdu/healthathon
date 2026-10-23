@@ -1,0 +1,230 @@
+Build on Care | Open Healthcare Network
+Skip to content
+Home
+Foundation
+CARE
+Solutions
+Impact
+Ecosystem
+Support
+Resources
+BUILD ON CARE
+Build your next healthcare application
+on Care.
+Create plugins, integrations and AI-assisted workflows on an open-source healthcare platform. Start with the walkthrough, use the developer tools, and bring your idea to life.
+Start building
+Watch the walkthrough
+Read the plugin docs
+Your idea. A shared foundation. Open source.
+THE BUILDING BLOCKS
+01 / THE FOUNDATION
+Care Core
++
+Patients & encounters
+Forms & questionnaires
+Scheduling
+Facilities & organizations
+02 / YOUR EXTENSION
+Make it your own.
+Frontend
+/
+Backend
+/
+Integration
+Choose what your workflow needs.
+03 / THE EXPERIENCE
+A useful workflow.
+For a care team, an administrator, or the people you build for.
+Care Core provides shared healthcare capabilities. Add the frontend, backend, or integration your feature needs to create a focused workflow.
+A PLACE TO BEGIN
+Watch
+Understand
+Build
+Explore
+01 / THE WALKTHROUGH
+See how to build on Care.
+A walkthrough to help you get started with Care’s developer tools and plugin ecosystem.
+Get oriented, then take the next step with the scaffold and documentation below.
+Go to the getting-started path
+CARE / DEVELOPER WALKTHROUGH
+See where your idea begins.
+Load the walkthrough
+↳
+Loads Loom only when you choose to watch.
+Watch on Loom
+02 / THE PLATFORM
+Extend the platform.
+Build your workflow.
+Reuse Care’s patient and encounter data, forms, scheduling, and organizational structure. Keep your extension focused on the new experience you want to create.
+01
+Frontend plugins
+Add the interface your users need: a view, a navigation entry, or a component in an existing workflow.
+React apps declare supported extension points in a
+manifest.tsx
+and can be delivered through Vite module federation.
+02
+Backend plugins
+Add server-side logic, APIs, or a connection to an external service. Keep service credentials on the server.
+Django apps register with Care’s PlugManager and expose their own namespaced API routes.
+03
+Integrations
+Connect a device or another system to a focused Care workflow using the available APIs and extension points.
+Use a frontend, a backend, or both as needed. Check the supported interfaces for your target Care version.
+Not every feature needs both a frontend and a backend plugin. Some ideas may need changes to core.
+Explore the architecture
+03 / YOUR FIRST BUILD
+From an idea to your first plugin.
+Start small. Make one workflow work from end to end.
+01
+Choose a focused workflow
+Define the user, their problem, and one useful outcome. Choose a small feature you can demonstrate with synthetic data.
+02
+Set up your workspace
+The Care scaffold brings together plugin-building guidance and frontend and backend templates in an isolated development workspace.
+Have Git, Node.js/npm, Python 3, and Docker with Compose available. Check the current setup instructions for required versions and environment checks.
+Open the scaffold
+Setup instructions
+03
+Build with the right tools
+With an AI coding agent:
+use the starter prompt and let the scaffold’s plugin-building guidance help shape your implementation.
+With the documentation:
+follow the plugin guide and use the templates as a starting point.
+Read the plugin guide
+04
+Test the workflow
+Run the demo end to end. Check permissions, write clear setup instructions, and document limitations. A working prototype is the starting point for further validation.
+YOUR IDEA → A PLAN
+Start a useful conversation.
+Give your coding agent the context it needs. Replace the feature description with your idea.
+STARTER PROMPT
+Help me plan and build a focused Care extension.
+
+My feature: [Describe the intended user, their problem, and one useful outcome.]
+
+Read https://github.com/ohcnetwork/care_scaffold and its current bootstrap instructions at https://github.com/ohcnetwork/care_scaffold/blob/main/bootstrap.prompt.md before proposing commands.
+
+Inspect the prerequisites and my local environment. Explain the planned setup, required services, ports, and changes before installing or running anything. Use a new, isolated development workspace; preserve existing projects and services.
+
+Choose a frontend app, backend plugin, or integration based on the feature. Use the scaffold's current guidance and templates. Check the target Care version and supported extension points; explain any core changes the feature might need.
+
+Use synthetic data only. Do not send patient records, secrets, or credentials to third-party AI tools. Build a small end-to-end demo, check permissions and failure states, and document setup steps and known limitations. Treat the result as a prototype requiring review before clinical use.
+Copy starter prompt
+Copies text only. Nothing is installed or run.
+Build with synthetic data.
+Use synthetic data while developing and demonstrating your project. Before using a solution in clinical care, validate the workflow and review security, access controls, privacy and operational requirements.
+04 / THE TOOLKIT
+Keep these
+within reach.
+A short path to the source.
+Start with the scaffold and the docs; go deeper when your idea needs it.
+Start here
+Care plugin scaffold
+Start with a development workspace, plugin-building guidance, and frontend and backend templates.
+Open the scaffold
+Guide
+Plugin documentation
+Understand the extension architecture and follow the development workflow.
+Read the docs
+Agent tools
+AI coding skills
+Reusable agent guidance for Care reviews, analytics queries, report templates, and browser verification.
+Explore the skills
+Template
+Backend plugin starter
+A focused Django plugin template when you need a backend starting point rather than the full scaffold workspace.
+View the template
+05 / IN THE OPEN
+Real code.
+Useful starting points.
+Look inside two extensions to see how the pieces fit. These are reference implementations; check their setup, dependencies, and compatibility with your Care version.
+Backend example
+Care Filly
+See a Django plugin authenticate Care users, check facility permissions, and issue short-lived Medispeak session tokens.
+Service credentials stay on the server.
+ohcnetwork / care_filly
+Explore the backend
+Frontend example
+Care AI Vision
+Explore a React app that extracts patient details from photographed forms and fills registration fields for user review.
+A reference for extending the Care interface.
+ohcnetwork / care_ai_vision_fe
+Explore the frontend
+IDEAS TO EXPLORE
+What will you build?
+Find a small problem worth solving.
+Use these ideas as a starting point.
+0
+1
+A care-team view for follow-ups and coordination
+0
+2
+An integration with a device or external service
+0
+3
+AI-assisted documentation with human review
+0
+4
+A focused operational dashboard
+Building at a hackathon?
+Start with one workflow, use synthetic data, and make the demo easy for someone else to run.
+YOUR DEMO CHECKLIST
+Problem & intended user
+Working workflow
+Setup instructions
+Synthetic sample data
+Known limitations
+BUILT IN THE OPEN. BUILT TO BE EXTENDED.
+Bring your idea to Care.
+Start with the scaffold, explore an example, and build a focused workflow.
+Start building
+Read the plugin docs
+Want to improve the shared platform?
+Contribute to Care
+Registered Address
+Open Healthcare Network Foundation
+1st Floor, C M Complex, Kalavath Road, Palarivattom, Kochi, Ernakulam, Kerala, India, 682025
+Corporate Identity Number (CIN)
+U88100KL2025NPL098818
+Email
+support@ohc.network
+Foundation
+Mission
+Governance
+Board & Advisors
+Foundation Team
+Foundation Docs
+ISO Certifications
+Support OHC
+How to Fund Us
+Supporters
+CARE Platform
+CARE Core
+CARE AI
+Apps & Integrations
+Standards & Architecture
+Security & Compliance
+Solutions
+Hospital Management
+TeleICU
+Palliative Care
+CARE Clinic
+Animal Health
+Ecosystem
+The Network
+Implementation Partners
+Clinicians
+Build on Care
+Developers
+Impact
+Resources
+Blog
+FAQ
+Browser requirements
+Press & Media
+Careers
+Contact
+Support metadata
+©
+2026
+Open Healthcare Network Foundation.

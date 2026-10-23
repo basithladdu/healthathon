@@ -1,0 +1,3 @@
+📄️
+Palliative patient enrollment
+Enroll a patient into a community or facility-based palliative program. This playbook combines the register patient flow with palliative-specific intake, caregiver capture, and program assignment.

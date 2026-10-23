@@ -1,0 +1,309 @@
+Open Healthcare Network Foundation - Open Health Infrastructure
+Home
+Foundation
+CARE
+Solutions
+Impact
+Ecosystem
+Support
+Resources
+Verified DPG
+/
+MIT licensed
+/
+Self-hostable
+The open operating system for healthcare.
+OHC Foundation stewards CARE Core, apps, standards, and integrations so governments, hospitals, and implementers can run interoperable health systems without vendor lock-in.
+Explore CARE
+Fund the commons
+Partner with OHC
+Core + Plugins
+CARE Core
+v3.0.0 / FHIR R5
+Administration
+Patients / Facilities / Users
+Definitions
+ValueSets / Questionnaires
+Clinical
+Encounters / Observations
+Scheduling
+Schedules / Slots / Bookings
+Pharmacy
+Dispense / Inventory
+Labs
+Service Req / Diagnostics
+Billing
+Claims / Coverage / Invoice
+Persistence /
+PostgreSQL
+/
+Redis
+/
+Object storage
+Runtime /
+Django
+/
+DRF
+/
+Celery
+Plugin runtime
+AI Scribe
+TeleICU
+Imaging
+Devices
+Messaging
+Analytics
+Enabled solutions
+Core + plugins enable
+Hospital OS
+Critical care
+Home care grid
+Clinic network
+Public health
+CARE Core provides the stable platform slab. Plugins add capabilities such as AI documentation, TeleICU, imaging, devices, messaging, analytics, claims, and terminology. Together they enable hospital, critical care, home care, clinic, and public health solutions.
+Public proof
+Open infrastructure, supported by real institutions and verifiable public-good signals.
+Verified DPG
+CARE is listed in the Digital Public Goods registry.
+MIT licensed
+Reusable by governments, hospitals, NGOs, and partners.
+FHIR-native
+Built around standards, terminology, and open APIs.
+Supported by
+Foundation layer
+The institution around the healthcare OS.
+Healthcare systems do not adopt source code alone. They need governance, releases, documentation, security, and an ecosystem that keeps the shared core dependable over years.
+0
+1
+Core platform
+Stable primitives, APIs, forms, access control, audit trails, reports, and extensibility.
+0
+2
+Standards
+FHIR-aligned modeling, terminology bindings, ABDM patterns, and implementation guides.
+0
+3
+Quality and security
+Release discipline, vulnerability handling, testing expectations, and documentation quality.
+0
+4
+Ecosystem
+Developer community, clinical review, implementation partners, and public-good funding paths.
+0
+5
+AI readiness
+Assistive, human-reviewed documentation and summarization on structured clinical data.
+CARE is the product proof
+One open core. Many real workflows.
+CARE Core provides the common primitives. CARE Apps extend the platform for national rails, HMIS, TeleICU, palliative care, AI documentation, LMIS, pharmacy, billing, and analytics.
+0
+1
+Longitudinal patient records
+0
+2
+OP, IP, emergency, observation, home visits
+0
+3
+Clinical notes, forms, orders, prescriptions
+0
+4
+Labs, pharmacy, inventory, radiology, billing
+0
+5
+Tasks, referrals, care plans, dashboards
+0
+6
+ABDM, TeleICU, AI documentation, open APIs
+CARE Core
+Apps & integrations
+Solutions
+Deployable workflows on the healthcare OS.
+CARE Core is the shared foundation. Solutions package that core into practical workflows for hospitals, critical care, home care, clinics, public health programs, and specialized field operations.
+CARE HMIS
+Hospital management workflows for registration, encounters, labs, pharmacy, billing, reports, and patient portal.
+Explore
+TeleICU
+Hub-and-spoke critical care workflows with remote rounds, escalation, devices, and video context.
+Explore
+Palliative Care Grid
+Home-based care coordination, longitudinal records, tasks, referrals, follow-up, and field workflows.
+Explore
+CARE Clinic
+Free, open-source clinic software for Mac and Windows. Run CARE on your own computer, with core workflows on the clinic network after online setup.
+Explore
+Care Janwar
+Animal health workflows built on the same open-core pattern for facilities and field programs.
+Explore
+View all solutions
+Architecture
+AI-ready because the data layer is structured first.
+CARE is designed around configurable forms, FHIR-aligned resources, terminology bindings, open APIs, audit trails, and role-based access. AI is framed as assistive and human-reviewed because clinical accountability cannot be automated away.
+FHIR R5
+SNOMED CT
+LOINC
+UCUM
+ICD-10
+ABDM
+Why this can scale
+A nonprofit with product leverage.
+The best nonprofit technology organizations compound: each implementation makes the infrastructure better, each partner expands distribution, and each funded release makes future adoption cheaper.
+0
+1
+Software leverage
+Each reusable module, form, and integration reduces the cost of the next public health deployment.
+0
+2
+Open distribution
+Governments, hospitals, implementers, clinicians, and developers can adopt without vendor permission.
+0
+3
+Data foundation for AI
+Assistive AI becomes safer when it sits on structured, interoperable, auditable health data.
+0
+4
+Governance moat
+The foundation turns open source into infrastructure institutions can trust for long-term operations.
+GitHub Story
+Open-source collaboration, shown through the work.
+The GitHub story is useful proof because it shows OHC as a real contributor network: clinicians, engineers, and institutions building healthcare infrastructure in the open.
+GitHub Story
+Open Healthcare Network in the open-source ecosystem.
+Evidence
+Field proof, handled with discipline.
+OHC has public proof across the DPG registry, open-source repositories, standards architecture, and program deployments. The site keeps metrics dated and program-specific so funders, governments, and media see disciplined claims instead of impact theater.
+View impact
+Press facts
+DPG
+Externally listed
+MIT
+Reusable by default
+Open APIs
+Built for integration
+Community Signals
+Recognition from people who understand infrastructure.
+“
+I had a chance to meet with the Open Healthcare Network, its fantastic to see what they are doing.
+”
+Satya Nadella
+CEO, Microsoft
+“
+One of the most active Open source contributor communities in India
+”
+Srikanth Nadhamuni
+Founder CTO Aadhaar
+“
+Great work by@10BedICU in putting 200+ tele-ICUs in remote districts in India.
+”
+Vinod Khosla
+Founder, Khosla Ventures
+“
+The Open Healthcare Network in India is a powerful example of people coming together to advance human progress – solving the problems that matter.
+”
+Kyle Daigle
+COO, GitHub
+“
+With CARE, we hope every healthcare provider, whether government or private, across the world has access to the best and most relevant technology to scale delivery and improve health outcomes at the lowest cost.
+”
+Sandeep Singhal
+Board Member, ACT Grants
+“
+What a journey it has been for CARE from a COVID dashboard fully run by volunteers for a district in Kerala to this... phew!!! In a symbolic view, for me this feels almost like an unicorn valuation equivalent for social sector
+”
+Sreevas Sahasranam
+University of Glasgow
+“
+One of the coolest non-profits operating in the healthcare space just turned 4 🐣 - they bring advanced ICU care to places in rural India.
+
+Meeting and working with the team has been a major highlight of the past couple months :)
+”
+Kai Chen
+OpenAI
+See the signals behind the open healthcare infrastructure community.
+Learn more
+Blog
+Notes for builders of public-good health infrastructure.
+Read the blog
+Jul 31, 2026
+Prescription, billing, and access improvements in CARE
+July 2026 spanned prescriptions and dosing, appointments and billing, observation and medication data aligned with FHIR, password reset by phone, and nutrition added to the administration workflow.
+Read essay
+May 27, 2026
+Why open healthcare infrastructure needs a foundation
+Code is necessary, but not sufficient. Health systems need stewardship, release discipline, documentation, security, and an ecosystem that can outlast any one deployment.
+Read essay
+May 20, 2026
+AI-ready, not AI-hyped
+Assistive AI in healthcare should sit on structured, interoperable data and human-reviewed workflows. The foundation layer matters before the model layer.
+Read essay
+Who should work with OHC
+One foundation, multiple high-leverage paths.
+Governments can deploy, funders can support, implementation partners can localize, developers can contribute, and clinicians can shape workflows.
+Governments
+Own, adapt, and scale health infrastructure locally.
+Funders
+Back the shared core, not one-off software delivery.
+Hospitals
+Deploy practical HMIS and EMR workflows without license lock-in.
+Implementation partners
+Localize CARE and contribute improvements back.
+Developers
+Build open-source healthcare infrastructure used in the field.
+Clinicians
+Shape workflows, forms, safety, and AI documentation behavior.
+Build the open healthcare commons.
+Help OHC Foundation maintain the shared core, governance, security, documentation, and ecosystem that let health systems deploy modern software without vendor lock-in.
+Fund the commons
+Start a conversation
+Build the commons
+Help steward open healthcare
+infrastructure for the long term.
+Governments can deploy, institutions can support, implementation partners can localize, and contributors can strengthen the shared core.
+Support the commons
+Start a partnership conversation
+Registered Address
+Open Healthcare Network Foundation
+1st Floor, C M Complex, Kalavath Road, Palarivattom, Kochi, Ernakulam, Kerala, India, 682025
+Corporate Identity Number (CIN)
+U88100KL2025NPL098818
+Email
+support@ohc.network
+Foundation
+Mission
+Governance
+Board & Advisors
+Foundation Team
+Foundation Docs
+ISO Certifications
+Support OHC
+How to Fund Us
+Supporters
+CARE Platform
+CARE Core
+CARE AI
+Apps & Integrations
+Standards & Architecture
+Security & Compliance
+Solutions
+Hospital Management
+TeleICU
+Palliative Care
+CARE Clinic
+Animal Health
+Ecosystem
+The Network
+Implementation Partners
+Clinicians
+Build on Care
+Developers
+Impact
+Resources
+Blog
+FAQ
+Browser requirements
+Press & Media
+Careers
+Contact
+Support metadata
+©
+2026
+Open Healthcare Network Foundation.

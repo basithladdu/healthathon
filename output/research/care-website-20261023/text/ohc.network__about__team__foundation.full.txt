@@ -1,0 +1,94 @@
+Foundation Team - Open Healthcare Network Foundation - Open Healthcare Network
+Home
+Foundation
+CARE
+Solutions
+Impact
+Ecosystem
+Support
+Resources
+Foundation team
+The operators building the institution.
+This page is the foundation team roster. It starts with the CEO and CTO, and is structured so product, engineering, AI, partnerships, documentation, community, and operations roles can be added as the foundation grows.
+Board and advisors
+Governance model
+Current team
+Foundation operating leads.
+This public roster starts intentionally small and is built to expand. Product, engineering, AI, community, partnerships, documentation, and operations leaders can be added as the foundation publishes those roles.
+0
+1
+Bodhish Thomas
+Chief Executive Officer
+0
+2
+Vignesh Hari
+Chief Technology Officer
+Operating model
+A small foundation team with high leverage.
+The foundation team exists to make CARE reusable, governable, and fundable beyond any one deployment. The roster will expand as roles become public.
+Product and AI
+Roadmap, workflow strategy, assistive AI direction, and product quality for healthcare users.
+Architecture and engineering
+CARE Core, APIs, plugins, implementation quality, and platform maintainability.
+Foundation operations
+Governance support, documentation, fundraising readiness, reporting, and institutional systems.
+Ecosystem enablement
+Implementation partners, hospitals, governments, funders, clinicians, and open-source contributors.
+Public roster
+Leadership should be visible, current, and deliberate.
+The foundation team page will expand as roles are confirmed for publication, with clear accountability for product, engineering, partnerships, operations, community, and stewardship.
+Stewardship signal
+A public roster helps governments, funders, hospitals, and contributors understand who is accountable for the institution behind CARE and related open healthcare infrastructure.
+Build the commons
+Help steward open healthcare
+infrastructure for the long term.
+Governments can deploy, institutions can support, implementation partners can localize, and contributors can strengthen the shared core.
+Support the commons
+Start a partnership conversation
+Registered Address
+Open Healthcare Network Foundation
+1st Floor, C M Complex, Kalavath Road, Palarivattom, Kochi, Ernakulam, Kerala, India, 682025
+Corporate Identity Number (CIN)
+U88100KL2025NPL098818
+Email
+support@ohc.network
+Foundation
+Mission
+Governance
+Board & Advisors
+Foundation Team
+Foundation Docs
+ISO Certifications
+Support OHC
+How to Fund Us
+Supporters
+CARE Platform
+CARE Core
+CARE AI
+Apps & Integrations
+Standards & Architecture
+Security & Compliance
+Solutions
+Hospital Management
+TeleICU
+Palliative Care
+CARE Clinic
+Animal Health
+Ecosystem
+The Network
+Implementation Partners
+Clinicians
+Build on Care
+Developers
+Impact
+Resources
+Blog
+FAQ
+Browser requirements
+Press & Media
+Careers
+Contact
+Support metadata
+©
+2026
+Open Healthcare Network Foundation.
