@@ -1,0 +1,701 @@
+Article
+Authors
+Metrics
+Comments
+Media Coverage
+Peer Review
+Reader Comments
+Figures
+Figures
+Abstract
+A culturally appropriate person-centred approach is needed in Indian palliative care settings to address the holistic concerns most distressing for patients with cancer. The study aimed to evaluate the measurement properties of the Hindi Integrated Palliative Outcome Scale (IPOS), a person-centred tool to assess the physical, emotional, and care-related concerns of patients living with serious illness in resource-limited settings.This validation study was conducted with 240 adults living with cancer and receiving home-based palliative care services through CanSupport, a charitable organisation operating across Delhi and National Capital Region. Using consecutive sampling, participants completed the Hindi IPOS, EuroQol 5-Dimension 5-Level questionnaire (EQ-5D-5L), and demographic schedules through in-person interviews. Half of the participants completed two follow-up assessments at four to six week intervals. Participant recruitment and outcome assessments at baseline and the first follow-up were conducted in person by home-based palliative care teams. Due to COVID-19constraints, the second follow-up assessment for a small subset of participants (10 patients) was completed via video call. Measurement properties assessed included structural validity (exploratory and confirmatory factor analysis), internal consistency, test–retest reliability, construct validity, and responsiveness to change. Confirmatory factor analysis supported a three-factor structure (CFI = 0.845, RMSEA = 0.062, TLI = 0.794), aligning with the hypothesized model. Internal consistency was moderate to high for physical (α = 0.67) and emotional (α = 0.74) subscales, while the communication and quality of care subscale demonstrated low consistency (α = 0.35). Construct and known-groups validity were supported by associations with EQ-5D-5L and cancer stage (p < 0.001). The physical subscale detected meaningful changes over time. Open-text responses provided insight into unaddressed symptoms and psychosocial needs. IPOS Hindi is a valid, reliable, and culturally appropriate tool to assess palliative care needs in patients with advanced cancer. It supports person-centred care and can inform policy and practice of palliative care delivery.
+Citation:
+Bhardwaj T, Chambers RL, Watson H, Rajvanshi A, Sharma R, Higginson IJ, et al.  (2026) Evaluating the measurement properties of the Hindi Integrated Palliative Care Outcome Scale (IPOS) in advanced cancer patients receiving home-based palliative care in India. PLOS Glob Public Health 6(4):
+           e0006189.
+        
+        https://doi.org/10.1371/journal.pgph.0006189
+Editor:
+Sonali Sarkar, JIPMER PSM: Jawaharlal Institute of Post Graduate Medical Education and Research Department of Preventive and Social Medicine, INDIA
+Received:
+June 30, 2025;
+Accepted:
+March 10, 2026;
+Published:
+April 3, 2026
+Copyright:
+© 2026 Bhardwaj et al. This is an open access article distributed under the terms of the
+Creative Commons Attribution License
+, which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.
+Data Availability:
+The minimal data set underlying the results presented in this manuscript—including the values behind summary statistics, measures of variation, and data used to generate figures and tables—is available from the Palliative Outcome Scale (POS) Team upon reasonable request. Due to ethical and confidentiality restrictions protecting the privacy of participants, the full dataset cannot be made publicly available. The Institutional Ethics Committee – CanSupport and the collaborating academic institution, Dr. Bhim Rao Ambedkar College, University of Delhi, have imposed restrictions on public data sharing because certain demographic variables may allow for participant re-identification even after de-identification procedures. Researchers who meet the criteria for access to confidential data may submit a formal request to the Palliative Outcome Scale (POS) Team, who serve as the non-author institutional point of contact for data access inquiries, at
+palliativecare@pos-pal.org
+. Requests will be reviewed in accordance with institutional and ethical guidelines. Ethics approval for this study was obtained from the Institutional Ethics Committee – CanSupport.
+Funding:
+The author(s) disclosed receipt of the following financial support for the research, authorship, and/or publication of this article: Support was from the National Institute for Health Research (NIHR), Applied Research Collaboration, South London, hosted at King’s College Hospital NHS Foundation Trust, Palliative Outcome Scale Development Team and Cicely Saunders International (Registered Charity No. 1087195). The funders of the study had no role in study design, data collection, data analysis, data interpretation, or writing of the report.
+Competing interests:
+The authors (TB, RLC, HW, AR, RS, IJH, MBH) declare that there are no potential conflicts of interest with respect to the research, authorship, and/or publication of this article. IJH, RLC, HW, and MBH are members of the POS Development Team at KCL.
+Introduction
+The global burden of serious health-related suffering (SHS) has risen sharply, with over 73 million people affected in 2021—an increase of 74% since 1990 [
+1
+]. Most of this burden is concentrated in low- and middle-income countries (LMICs), where access to timely, quality palliative care remains limited. The Lancet Commission calls for integrating palliative care into universal health coverage to address this growing need [
+1
+]. The
+Global Atlas of Palliative Care
+highlights the importance of culturally appropriate approaches, particularly in resource-limited settings [
+2
+]. Palliative care is holistic and person-centred, addressing not just physical symptoms but also emotional, social, and spiritual needs [
+3
+]. There remains a critical lack of robust tools to effectively monitor progress in alleviating pain and other forms of serious health-related suffering. Improved metrics and stronger evidence are urgently needed to support priority setting, accurately assess the global need for palliative care, and guide countries in implementing effective policies and programs [
+4
+].
+Palliative care services in India were introduced approximately forty years ago [
+5
+]. In 1984, palliative care provisions were introduced in the National Cancer Control Programs, making pain relief available in the community. In the absence of a national palliative care policy, low coverage and unequal access to palliative care are ongoing problems in India [
+6
+]. Only 2% of the population have access to palliative care services [
+6
+–
+8
+]. Home-based community palliative care models used in India are mainly provided by charity organizations or hospital home care teams. Home-based palliative care is delivered by a multidisciplinary team consisting of a medical doctor, a nurse, and a counsellor.
+Home based model adopted by the charity organization where this research was implemented follows the symptom severity design to offer services and decide the frequency of visits. Patients with severe pain, breathlessness, persistent vomiting, or other uncontrolled symptoms are visited up to five times a week and designated as high priority needs patients. These patients are often on morphine, bedridden, and can have fungating wounds. More stable patients whose symptoms are well controlled with oral medicines are designated as medium priority patients and visited every 10–15 days. Patients who are symptom-free for 2–3 years are designated as low priority and visited once a month in person or followed up by phone if they have moved out of area.
+In a resource limited setting, routine assessments of patient-centred outcomes are needed to understand the needs and concerns of patients [
+9
+–
+11
+] to appropriately provide specialized palliative care services to those who really need it most. Integrated Palliative Outcome scale (IPOS) is widely used patient-centric measure built on a reflective model capturing concerns and needs of patients living with life-limiting, advanced illness in community and hospital care settings [
+12
+]. There is an urgent need for a culturally adapted and validated brief palliative care measure to inform practitioners where the limited resources are most urgently needed. Previously, we have translated and culturally adapted IPOS to accurately describe the most important concerns of patients living with cancer in India [
+13
+]. In this study we field test and evaluate the measurement properties of the IPOS in Hindi-speaking adult cancer patients receiving home palliative care services in Delhi National Capital Region (NCR), India. The findings of this study have implications for cross-cultural palliative care research and practice [
+14
+], and benefit Hindi-speaking patients with cancer across India and other parts of the world.
+Methods
+Ethical approval was obtained from the Institutional Ethics Committee for Human Research of CanSupport Charity (IEC-CanSupport-1/2021 dated 5
+th
+Feb 2021). The original developer of IPOS provided permission for cultural adaptation and validation of the measurement instrument.
+Inclusivity in global research
+Additional information regarding the ethical, cultural, and scientific considerations specific to inclusivity in global research is included in the Supporting Information file (
+S1 Checklist
+).
+Design
+This is a validation study, including repeated measures to evaluate test–retest reliability and responsiveness over time.
+Setting
+Patients were recruited from CanSupport Charity which provides free home-based palliative care support to persons with life-limiting illnesses in all regions of Delhi NCR, India [
+15
+]. Patients to the Charity were referred by the treatment hospitals across the city. Referrals to the service were made based on symptoms burden, functional decline, or psychosocial need across all cancer stages. Therefore, some patients with earlier-stage disease were part of the service, hence included in the sample.
+Participants
+Adult (≥18) cancer patients receiving home-based palliative care from CanSupport, who were able to communicate and had the capacity to consent, scheduled to be visited by the home-based care team during the planned data collection period were eligible to participate in this study. Initial contact with participants was made by telephone to provide study information and obtain verbal agreement to be approached. Written informed consent was subsequently obtained in person prior to data collection. Participant recruitment and the first two assessments were conducted in person by the home-based palliative care teams during routine clinical visits. Only 10 patients during second follow up could not be reached in person due to covid restrictions in their respective geographical regions and hence contacted through virtual video calls. A sample of 240 participants were recruited using consecutive sampling techniques. The sample size was decided following recommendations by the IPOS developers [
+16
+] ensuring a minimum of 10 participants per questionnaire item [
+17
+] setting a minimum requirement of 170 patients. During the study recruitment period, (February-March 2021) approximately 400 patients received services from the home-based palliative care services of the charity organization in Dehi NCR. All eligible patients during the recruitment period were given opportunity to participate. Out of these, 240 consented and were enrolled in the study. Patients who were not adults, too sick to participate, unable to speak and unwilling to consent were excluded. To ensure representation of the patients from all parts of Delhi NCR, 24 teams from varied geographical locations of Delhi NCR collected data and recruited ten patients each making a sample of 240 patients.
+Data collection
+All participants completed IPOS at baseline, and half of them completed it at two more time points over a period of three months. Baseline data collection took place between February - March 2021, the first follow-up between March - April 2021 and the second follow-up April to May 2021. At baseline, IPOS Hindi, EQ-5D-5L Hindi versions and a demographic sheet were administered. At follow-up visits, the participants responded to a Global Rating of Change Question and IPOS Hindi.
+Counsellors administered the hardcopies of the study packs through in-person interview with the patient. The Principal Investigator of the study (TB) trained the counsellors on data collection, confidentiality, coding procedure, and monitored the data collection process, addressed any questions through telephone follow-ups with the counsellors. Training was repeated to ensure quality at each data collection time-point. At follow-up, the same counsellor administered the tool pack to the same patient. The completed forms were returned to the PI immediately following visits. The PI transferred data from paper to electronic format.
+Measures
+Integrated Palliative Outcome Scale (IPOS) is widely accepted among patients with advanced diseases [
+12
+], is responsive to change, and used in clinical care and research for cancer and non-cancer patients [
+12
+,
+18
+]. In addition to 17 closed ended questions on how specific concerns/problems affect them (0 = not at all to 4 = overwhelmingly), it includes an open-ended question, ‘What have been your main problems or concerns over the past week?’ which generates textual data. The original English is available to download from IPOS website [
+19
+] and the Hindi language version is attached in the supplementary files (Fig A in
+S1 File
+).
+EQ-5D-5L
+is a generic measure of health status developed by the EuroQol Group and covers five items around domains, namely mobility, self-care, usual activities, pain/discomfort, and anxiety/depression. [
+20
+] A vertical visual analogue scale (VAS) where the endpoints are labelled as ‘The best health you can imagine’ and ‘The worst health you can imagine’ captures the patient’s perception of their health status
+The Global Rating of Change Question (GRCQ) were administered first before IPOS Hindi in the follow-up assessments. The GRCQ asked, “Compared to the last time we visited you, how do you feel today?’ to which participants were asked to respond as ‘Better’, ‘Same’ or ‘Worse’.
+Relevant clinical and demographic data were also collected for all respondents during the first visit. Demographic details related to family and socio-economic status were assessed as self-perceived variables, while clinical data were collected from medical records. Data on co-morbidities were reported by the participants themselves. Cancer stage was recorded based on hospital documentation at the time of referral. The home-based palliative care service or research team did not independently assess disease stage.
+Data management and quality assurance
+Data was transferred from paper to electronic format by a team of researchers led by TB. IBM SPSS version 28 and SPSS AMOS were used for data management and analysis. MH drafted the SPSS spreadsheet in consultation with TB through MS Teams video meetings. Cancer diagnoses were re-coded using ICD-10 codes. To ensure the quality of data entry and controlling chance of human error, patients were assigned a number from 1 to 240 as their unique ID codes. Twelve questionnaire packs (5% of the total sample) were randomly selected by the PI (TB) through randomly generated numbers between 1–240 by MH. The corresponding questionnaire packs and responses were compared with electronically entered data during live online meetings with TB, MH, RC and HW to check the accuracy of data entry.
+Data analysis
+Qualitative analysis.
+The open-text questions on the three main concerns (IPOS Q.1) were thematically grouped, counted, and described using a word cloud. RC and HW identified the themes, and all authors reviewed them. The size of words in the word cloud represented the relative frequency of occurrence of the symptom. The more participants reported a concern, the bigger the size of the word.
+Measurement properties.
+For this study, we evaluated the psychometric qualities of the Hindi IPOS in line with internationally accepted recommendations, including COSMIN criteria [
+21
+] and guidance from the US FDA on Patient-Reported outcomes [
+22
+] (
+S2 File
+). Pairwise deletion [
+23
+] method was used for the missing data, where all available data is used for analysis. For IPOS, the total scores and the sub-scale scores have been calculated by simple addition of relevant item scores. No weighting has been used. Missing values have not been imputed, and cases with missing values were not included in analysis. If a participant was missing an item score from a subscale, the subscale score was not calculated for them.
+Structural Validity: To assess the scale’s structural validity and acceptability, we first explored the subscales with Exploratory Factor Analysis (EFA), principal axis extraction and oblique method (direct oblimin) [
+24
+] and compared them to the 3-factor structure proposed within the original measure [
+12
+]. Secondly, we undertook a first-order Confirmatory Factor Analysis (CFA) to assess how well the hypothesized 3-factor model fits the observed data. The model parameters were estimated using the Full Information Maximum Likelihood (FIML) method to make maximal use of all data [
+25
+]. Post-hoc modifications were undertaken to improve model fit. We evaluated model fit for standardized estimates of the model using chi-square, ratio of chi-square and degrees of freedom, confirmatory fit index (CFI), Tucker-Lewis index (TLI) and root mean square error of approximation (RMSEA) for small samples [
+26
+,
+27
+].
+Thirdly, once the structural validity was established, IPOS Hindi acceptability among the target group was assessed by examining the distribution of items and subscale scores, floor and ceiling effects, and data completeness with Missing Value Analysis.
+Reliability: We evaluated reliability in several ways. We examined the internal consistency and determined agreement among responses to items. Internal consistency of each subscale was examined using Cronbach’s alpha, which reflects how closely related the items are. [
+28
+] In addition, we assessed item–total correlations, setting 0.30 as the minimum acceptable threshold for an item to adequately differentiate between patients with more or less severe symptoms. [
+29
+] An item-total correlation below 0.30 implies that the item cannot discriminate well between patients severely and less severely affected by cancer [
+30
+,
+31
+].
+We also examined test-retest reliability in patients who felt the same since the last time they completed IPOS Hindi at the follow-up assessments. To the best of our knowledge, the evaluations took place under similar care conditions.
+We anticipated that test–retest analysis would demonstrate stability over time for patients whose health status remained unchanged. Specifically, we expected paired t-tests comparing baseline and follow-up scores to reveal no statistically significant differences, consistent with the assumption that mean change scores in such cases should approximate zero.
+We assessed inter-rater reproducibility to understand the consistency with multiple raters administering IPOS Hindi. Interclass Correlation Coefficients (ICCs) using two-way mixed effect models were obtained and ICCs for average measures were reported. The choice of the model was informed by the fact that multiple administrators from a selected pool carried out the assessments and consistency is critical [
+32
+]. ICCs less than 0.5 are poor, between 0.50 and 0.75 are moderate, between 0.75 and 0.90 are good, and above 0.90 indicates excellent reliability [
+32
+]. To evaluate consistency across different assessors, intraclass correlation coefficients (ICCs) were calculated using a two-way model. Using this model, both the raters and the subjects are considered sources of random effects. This model is often used to generalize the findings to any raters, beyond those used in this study [
+32
+,
+33
+].
+We also estimated the Standard Error of Measurement (SEM) to quantify potential error in repeated assessments, with values between 0.8 and 0.9 generally regarded as an indication of satisfactory precision [
+34
+].The formula for calculating Standard Error of Measurement (SEM) is given below:
+SEM between 0.80-0.90 is considered evidence of adequate measurement precision [
+35
+].
+Construct Validity: We assessed the construct validity in several ways
+.
+First, we examined the associations between IPOS Hindi with EQ-5D-5L individual items as well as ratings of health status and cancer staging (early and advanced) according to ‘a priori’ hypotheses. We hypothesized that patients who have more problems (higher scores) with aspects of quality of life captured by EQ-5D-5L and have worse self-rated health status indicated by lower scores on the VAS scale, are more severely affected by their condition and would therefore have higher IPOS Hindi scores. We formed two groups based on cancer stage at baseline, categorizing patients into ‘early’, and ‘advanced’ groups. We examined divergent validity by hypothesizing that patients at the advanced stages of cancer (Stage III and IV) would have higher IPOS Hindi scores, compared to those at earlier stages (Stage I and II). The strength and direction of the association of IPOS Hindi with EQ-5D-5L, VAS Scale, and with stages of cancer were evaluated using Spearman rank-order correlation coefficient. Cancer staging is based on pathological classification and extracted from medical notes by the data collection team.
+We examined discriminative or known-groups validity within these subgroups using independent sample t-tests. We hypothesized that the group of patients with advanced cancer have statistically significant (p ≤ 0.05) higher mean IPOS Hindi scores compared to those with early cancer. For interpretation of responsiveness, we classified effect sizes (Cohen’s d point estimate) as follows: values above 0.8 indicated a strong effect, those between 0.5 and 0.8 were viewed as moderate, scores from 0.2 to 0.4 as modest or small, and anything below 0.2 as having little to no meaningful impact [
+36
+,
+37
+].
+Responsiveness: We examined the responsiveness, the ability of IPOS Hindi to detect a change in the patient’s status [
+38
+] to inform sample size decisions evaluating effectiveness in future trials. We hypothesized that IPOS Hindi scores would capture improvement or deterioration and would stay the same when there were no changes in a patient’s status. We first calculated differences in IPOS Hindi scores between (i) baseline and time 1 (T1), (ii) time 1 (T1) and time 2 (T2) and (iii) baseline and time 2 (T2). We subtracted the earlier score from that of the later assessment. A positive change score indicated deterioration. We used patient self-rated anchors to define clinical change, based on the patient’s response to the global rate of change questions asked at the beginning of each follow-up assessment. We calculated effect sizes to capture clinically important changes [
+39
+]. Based on the self-rated anchor, the patients’ response to the Global Rating of Change question, patients who showed improvement and responded that they were ‘better’ compared to the previous assessment were included in effect size calculations [
+37
+,
+40
+].
+The effect sizes were calculated using the formulas below for baseline (T0) and first follow-up (T1) assessment, T1 and Second follow-up (T2) assessments respectively for each of the subscale scores [
+39
+]:
+To capture the ability of IPOS Hindi to detect change in general, Standardised Responsive Mean (SRM) and the effect sizes for change from baseline to final assessment were calculated using the formula below:
+We calculated Minimally Important Change (MIC) based on median change scores in patients who had
+improved
+or
+deteriorated
+between baseline and first follow-up assessments.
+Results
+Quality assurance
+During accuracy checks of data entry, a total of 13 errors were detected in 12 records of the patients from a total of 143 variables, giving us a very small and acceptable error rate of 0.7%, requiring no further checks.
+Participant characteristics
+The median age of the participants was 51 years, 69.6% were women, 27.6% had no formal education, 80% were Hindu. Breast cancer was the most prevalent cancer (28.2%), most were living with Stage 2–4 cancer. Hypertension and diabetes were the most common morbidity, majority were living with at least one self-reported co-morbidity. A big majority (83.75%) were either poor or belonged to lower middle class and were struggling with their current income (62.4%), (
+Table 1
+).
+Download:
+PNG
+larger image
+TIFF
+original image
+Table 1.
+Demographic and clinical characteristics of participants (n = 240).
+https://doi.org/10.1371/journal.pgph.0006189.t001
+Qualitative entries on Main Concerns of the patients
+IPOS helped us to understand the main concerns of the participants. A total of 105 patients reported three main concerns. Pain was the most reported concern, followed by fatigue, financial difficulty, being worried/tense, issues with wound or tube care, poor appetite, constipation and issues with their mouth like dryness, sore mouth, difficulty in eating food or mouth opening. Participants’ worry was mainly related to the health of other family members, settling down of children in life and how they could not be able to organize important life events such as weddings for their children.
+Fig 1
+summarizes the data in a word cloud.
+Download:
+PNG
+larger image
+TIFF
+original image
+Fig 1.
+Word cloud of the main concerns (the size of the script representing frequency).
+https://doi.org/10.1371/journal.pgph.0006189.g001
+Measurement properties
+Data completeness and structural validation.
+Data is complete, with acceptable levels of missingness. Twelve out of 17 items have 15% or more floor effects, and 4 items ceiling effects, but the subscales have no floor or ceiling effects (
+Table 2
+).
+Download:
+PNG
+larger image
+TIFF
+original image
+Table 2.
+Data completeness and distribution of IPOS items at baseline assessment (n = 240).
+https://doi.org/10.1371/journal.pgph.0006189.t002
+At the subscale level, floor or ceiling effects are within acceptable levels (
+Table 2
+).
+The 3-factor solution was very close to the original IPOS [
+12
+] (Table A in
+S1 File
+). The confirmatory factor analysis (CFA) fit indices (CFI = 0.719 and RMSEA = 0.081, TLI = 0.638) indicated medium fit of the model to the data (χ2 = 307.252, df = 119, χ2/df = 2.582, p < 0.0001) (Fig B in
+S1 File
+). Post-hoc modification involved parceling the three variables from physical domain, namely nausea, vomiting and constipation, to make them one gastrointestinal variable. The model fit following post-hoc modifications was improved with CFI = 0.845 and RMESA = 0.062, TLI = 0.794 (χ2 = 171.473, df = 90, χ2/df = 1.905, p < 0.0001). Since the CFI and RMSEA parameters approached the minimums, they were within the required defined parameters recommended for small samples [
+41
+]. Thus, the CFA indicates that there is a relatively good fit between the hypothesized model and the observed data confirming cross-cultural validity of IPOS.
+The standardized parameter estimates of the modified model are shown in
+Fig 2
+. Physical factors accounted for 70–17-%- of variance, Emotional factor for 75–52% and Communication (Communication and Quality of Care) show large variation and account for 82–13% of the relevant IPOS items. Communication subscale had poorly loaded items where information seeking and practical problems had factor loadings of 0.30 and 0.13 respectively (see
+Fig 2
+for distribution of scores), while in Turkish IPOS [
+9
+] emotional concerns had poor loading items which behaved quite well in IPOS Hindi. The physical and emotional factors have moderate correlation (0.59), emotional and communication have weak correlation (0.36), and physical and communication factors have poor correlation (0.08).
+Download:
+PNG
+larger image
+TIFF
+original image
+Fig 2.
+CFA Model following post-hoc modifications (n = 240).
+https://doi.org/10.1371/journal.pgph.0006189.g002
+Reliability: Physical and Emotional subscales show high to moderate internal consistency reliability (respectively α = 0.67 and α = 0.74). In contrast, the communication and quality of care subscale have low internal consistency (α = 0.35).
+Items of the communication and support subscale and 3 items of the physical subscale (poor appetite, sore/dry mouth and drowsiness)do not discriminate well between patients severely and less severely affected by cancer [
+30
+] (
+Table 3
+).
+Download:
+PNG
+larger image
+TIFF
+original image
+Table 3.
+Corrected Item-Total Correlations.
+https://doi.org/10.1371/journal.pgph.0006189.t003
+Test-retest reliability analysis failed to reject the null hypothesis (H
+0
+), and there was no significant difference between baseline and follow-up, confirming that IPOS could appropriately capture the concerns of the patients. (tested here is that the mean difference of IPOS subscale scores among baseline and follow-up assessment subscale scores in patients who felt the same) (Table B in
+S1 File
+). Interrater reliability is good with an ICC of 0.76 (0.71-0.80 95%CI, n = 209) for average measures. Standard Error of Measurement (SEM) is low (SEM = 4.19).
+Validity:
+As hypothesized, the associations between IPOS Hindi with EQ-5D-5L individual items and rating of health status were all significant (p < 0.001) (Table C in
+S1 File
+). The correlations between IPOS Hindi subscales and EQ-5D-5L items and VAS scores are in the direction predicted, positive with EQ-5D-5L items as higher scores on both indicate worse outcomes, and negative with VAS as higher scores indicate better health, and moderate levels. For example, IPOS Hindi Physical subscale correlates moderately with mobility, usual activity, and anxiety, but weakly with self-care, pain/discomfort, and self-rated health. Interestingly, emotional items seem to have moderate correlations with mobility, self-care and usual activity, and weak correlations with pain/discomfort, anxiety, and self-rated health.
+IPOS Physical subscale has discriminative or known-groups validity where patients with advanced cancer have higher mean IPOS Hindi scores (M = 13.2, SD = 5.65) compared to those with early cancer (M = 10.4, SD = 4.93), t (163.6) =-3.5, p < 0.001, with moderate effect size (Cohen’s d = -0.52, -0.82 - -0.22 95% CI) and the difference between means of Physical subscale scores between advanced and early cancer patients is more than 0.5 standard deviations. Emotional and Communication and Support subscales did not discriminate well between patients with different disease severities.
+Responsiveness and Minimally Important Difference (MID):
+We examined the ability of IPOS Hindi to detect changes in patients status [
+38
+] to inform sample size decisions evaluating effectiveness in future trials. We hypothesized that changes in IPOS Hindi scores would capture improvement or deterioration or would stay the same when there is no change in patient status based on patient-rated anchors. Self-rated anchor patients who showed
+improvement
+and responded that they were ‘better’ compared to the previous assessment were included in effect size calculations. Small to moderate effect sizes were observed in most subscales (Table D and E in
+S1 File
+). Standardised Responsive Mean (SRM) shows IPOS Hindi has small effect sizes for change from baseline to second follow-up assessment (Table F in
+S1 File
+).
+A change of -1 for Physical and Communication & Support subscale, and -2 for emotional subscales suggests clinically important improvement; while a change of 1.8 in Physical, 1 in Emotional and 0.5 in Communication suggests clinically important deterioration in this sample (
+Table 4
+).
+Download:
+PNG
+larger image
+TIFF
+original image
+Table 4.
+Minimally Important Difference (MID) based on median change scores in patients who have improved or deteriorated from baseline to first follow-up assessment.
+https://doi.org/10.1371/journal.pgph.0006189.t004
+Discussion
+Standardized Patient-Reported outcome measures primarily use closed-ended items to support consistent scoring and psychometric evaluation. The open-ended questions of IPOS are unique, add depth to the standardized measurement data, and capture concerns that are critical, personal to the patient and their life, and direct care and consultation to address these key concerns. This part of IPOS is therefore valuable to guide holistic practice. This part could also provide further evidence of the content validity of the measure. Pain in the study sample was reported as the main concern, and this has also been observed in other studies with IPOS [
+9
+,
+42
+–
+45
+]. This could be because only a very small portion of the population who needs pain medications, has access to it in India [
+46
+,
+47
+]. However, morphine and other opiates critical to pain are highly regulated and even unavailable in other countries as a result of government bans [
+48
+], leading to what the World Health Organisation calls ‘a preventable pain pandemic’ [
+49
+] which impacts life greatly. Fatigue was also frequently reported as one of the main concerns. Previous studies have shown how the two symptoms, i.e., pain and fatigue are associated, and contribute significantly to cancer related suffering [
+50
+]. Study participants also reported struggling with financial difficulties, and how these disrupt their relationships and worry them over how their care would be funded.
+IPOS yielded completeness of data with acceptable level of missingness. If missingness were to be high in future studies, we recommend considering appropriate imputation approaches; however, during initial validation studies, most authors caution against imputation, as it may distort psychometric properties [
+51
+]. Confirmatory factor analysis shows that IPOS Hindi demonstrates good fit with the hypothesized 3 factor model - Physical, Emotional and Communication & Support [
+12
+]. Twelve items demonstrated floor effects (≥15%), which may have limited sensitivity at the lower end of the scale. For this reason use of subscale scores to support clinical assessments rather than individual items is recommended. Similar, item floor effects have been observed in other studies with IPOS [
+52
+]. It is thus suggested that item-response theory-based approaches and re-calibration of items could be considered and explored in future work to improve measurement performance. The observed floor effects suggest that robust calibration will require larger, population-based samples [
+53
+]. Our current study was underpowered for this, but we plan to address it in future population-based work.
+Overall IPOS Hindi has acceptable levels of reliability. Internal consistency, i.e., reliability of the Physical and Emotional subscales is moderate to high; however, the Communication and Support subscale is low. one of the reasons for this could be that this subscale contains only 3 items and that average correlations between the 3 items are low in this sample. The internal consistency of the third subscale, i.e., communication and support subscale was relatively low in our sample (Cronbach’s α = 0.35). Notably, the original validation study also reported modest reliability for this subscale [
+54
+] (α = 0.58), suggesting that this dimension of the scale may have inherent limitations in internal consistency. Possible explanations include the small number of items, the heterogeneous nature of the construct, and contextual differences in how participants interpreted the items. While this indicates that findings related to this subscale should be interpreted with caution, the content remains theoretically important. Future work should consider revising or expanding the communication and support subscale by applying alternative reliability metrices, e.g., McDonald’s omega, test–retest and item expansion to better capture the construct in diverse settings. Low engagement with the ‘information’ and ‘sharing feelings’ items may also reflect cultural norms, literacy barriers, or trust dynamics between participants and interviewers rather than lack of relevance. These factors warrant deeper investigation in future research. IPOS Physical and Emotional domains have demonstrated higher internal consistency in other settings and populations too [
+55
+,
+56
+]. Further studies could inform internal consistency. IPOS produces similar results over time in persons who have self-rated themselves as feeling the same. IPOS Hindi also shows good inter-rater reliability and with low measurement error.
+IPOS Hindi has robust structural validity, where the associations between the items and subscales of IPOS and EQ-5D-5L are significant and in the predicted direction. These associations also reveal that in this population physical subscales correlate moderately with mobility and anxiety, and less so with pain. Physical subscales specifically show that patients living with advanced cancer experience more overwhelming effects of physical symptoms and have higher concerns and problems. The emotional burden seems to be similar irrespective of the disease stage in cancer patients. As Temoshok observed, the psychosocial impact could be related to the expected outcome at the point of diagnosis or later in disease progression [
+57
+].
+IPOS Hindi is responsive to patient-anchored and reported changes, where small and moderate effect sizes are observed. A change of 1 and 2 respectively suggests improvement in Physical and Communication & Quality subscales. Further work is needed to establish MID with the emotional subscale. Other studies similarly have shown greater responsiveness of physical aspects, health status, and quality of life [
+58
+].
+The study has several limitations. The three-factor model required parceling of GI items to achieve acceptable fit. Without parceling, fit indices were poor, indicating that this subdomain was unstable in our sample. While this justifies the analytic choice as used in other IPOS studies too [
+54
+], it alters the original IPOS construct and should be interpreted with caution. Future studies with larger samples should formally compare parceled and non-parcelled models to assess the robustness of the factor structure. Due to COVID-19 restrictions, data collection was restricted to Delhi NCR. Patients could not be recruited from other nearby states such as Uttar Pradesh, Haryana and Punjab in India, therefore this may affect the generalizability of our findings to Hindi Speaking populations in other regions. Ten patients had virtual second follow-up assessment rather than in-person interviews due to visiting restrictions and lockdowns in several localities. Our sample comprised only patients with cancer, and therefore the applicability of the Hindi IPOS to other chronic illnesses (such as organ failure or neurodegenerative conditions) remains to be established. Future validation in other Hindi-speaking regions and non-cancer populations is essential.
+The qualitative component in our study was based on brief open-text comments, which limited the depth of qualitative analysis. While we presented word cloud visualizations for descriptive purposes, it offers limited analytic depth. Future work using more in-depth qualitative methods (e.g., interviews, focus groups) will be important to generate richer thematic insights and support item refinement. Future studies may benefit from thematic analysis with illustrative quotes, potentially triangulated with qualitative interviews, to strengthen interpretive depth. The Emotional and Communication subscales showed weak responsiveness and did not discriminate by disease stage, which raises concerns about their utility in longitudinal or intervention-based studies. Our estimates of Minimally Important Difference (MID) were based on small subgroups (n = 20–43), which constrain precision. These findings should be considered preliminary, and future studies with larger samples should confirm them using bootstrapped confidence intervals and anchor-based validation.
+One of the key strengths of this study is that it is a critical collaborative study between two academic and research institutions and cancer charity, that engaged patients with lived experiences of socio-economic deprivation. Also, to the best of our knowledge, IPOS is the first validated tool to assess palliative outcomes in Hindi language.
+Conclusions
+IPOS Hindi is a valid and reliable tool for assessing palliative care concerns among patients with cancer receiving home-based care in India. The Physical and Emotional subscales demonstrated acceptable validity and reliability and were sensitive to clinically important changes over time. Open-text responses provided additional insight into patients’ needs.
+Further work is needed to address floor effects and improve the Communication and Quality of Care subscale. Future studies should also examine IPOS Hindi in acute care settings and broader populations.
+Aligned with global calls for better tools to measure suffering and guide palliative care implementation, IPOS Hindi offers a brief, person-centred measure suitable for use in low-resource settings.
+Supporting information
+S1 File.
+Supplementary Online File.
+https://doi.org/10.1371/journal.pgph.0006189.s001
+(DOCX)
+S2 File.
+COSMIN Checklist.
+https://doi.org/10.1371/journal.pgph.0006189.s002
+(DOC)
+S1 Checklist.
+Inclusivity in global research.
+https://doi.org/10.1371/journal.pgph.0006189.s003
+(DOCX)
+Acknowledgments
+We would like to acknowledge the support extended by CanSupport counsellors namely Surender Manjhi, Shashi Bhandari, Simranjeet, Sunita Sharma, Anju Sharma, Meena Sharma, Laxmi, Rajni Rajput, Jyoti Sharma, Shailly Sharma, Anjana Bisht, Anamika, Nikki, Poonam, Mausumi Bansali, Charanjeet Kaur, Divya Sharma, Rinky Pal, Anil Sharma, Ashish Samuel, and Renu Rajput for timely completion of data collection for the project. We also thank CanSupport Counselling Supervisors, Ms. Pallika Chaudhary and Mr. Nariender Gautam for monitoring field data collection.
+IJH is a National Institute for Health Research (NIHR) Emeritus Senior Investigator and is supported by the NIHR Applied Research Collaboration (ARC) South London (SL) at King’s College Hospital National Health Service Foundation Trust. IJH leads the Palliative and End of Life Care theme of the NIHR ARC SL and co-leads the national theme in this. RLC is funded by Cicely Saunders International and Marie Curie. MBH is supported by the NIHR ARC SL. The views expressed in this article are those of the authors and not necessarily those of the NIHR, or the Department of Health and Social Care.
+Research ethics and patient consent:
+Ethics approval was received from the Institutional Ethics committee of CanSupport, a charity located in Delhi,India where the study was implemented with approval dated 6th December 2017. All patients provided written informed consent.
+References
+1.
+Knaul FM, Arreola-Ornelas H, Kwete XJ, Bhadelia A, Rosa WE, Touchton M, et al. The evolution of serious health-related suffering from 1990 to 2021: an update to The Lancet Commission on global access to palliative care and pain relief. Lancet Glob Health. 2025;13(3):e422–36.  pmid:40021301
+View Article
+PubMed/NCBI
+Google Scholar
+2.
+Connor S, Bermedo MS. World Health Organization Global Atlas of Palliative Care at the End of Life. London: Worldwide Palliative Care Alliance. 2020.
+3.
+Ting R, Edmonds P, Higginson IJ, Sleeman KE. Palliative care for patients with severe covid-19. BMJ. 2020;370:m2710.  pmid:32665316
+View Article
+PubMed/NCBI
+Google Scholar
+4.
+Knaul F. Five questions with…Professor Felicia Knaul.
+https://www.globalhealthpartnerships.org/five-questions-with-prof-felicia-knaul/
+. 2018.
+5.
+Kar SS, Subitha L, Iswarya S. Palliative care in India: Situation assessment and future scope. Indian J Cancer. 2015;52(1):99–101.  pmid:26837989
+View Article
+PubMed/NCBI
+Google Scholar
+6.
+Rajagopal MR, Venkateswaran C. Palliative care in India: successes and limitations. J Pain Palliat Care Pharmacother. 2003;17(3–4):121–8; discussion 129-30. pmid:15022956
+View Article
+PubMed/NCBI
+Google Scholar
+7.
+Shelar J. Just 2% have access to palliative care in India, says the ‘father’ of palliative care in India. The Hindu. 2018.
+View Article
+Google Scholar
+8.
+Seamark D, Ajithakumari K, Burn G, Saraswalthi Devi P, Koshy R, Seamark C. Palliative care in India. J R Soc Med. 2000;93(6):292–5.  pmid:10911822
+View Article
+PubMed/NCBI
+Google Scholar
+9.
+Hocaoglu MB, Hepgul N, Tunnard I, Meltem E, Efe H, Ataoglu B, et al. Towards patient-centred cancer care: cross-cultural validity and responsiveness of the Turkish Integrated Palliative care Outcome Scale. Health Qual Life Outcomes. 2020;18(1):312.  pmid:32962717
+View Article
+PubMed/NCBI
+Google Scholar
+10.
+Black N. Patient reported outcome measures could help transform healthcare. BMJ. 2013;346(jan28 1):f167–f167.
+View Article
+Google Scholar
+11.
+Dambi JM, Cowan FM, Martin F, Sibanda S, Simms V, Willis N, et al. A conceptualization and psychometric evaluation of positive psychological outcome measures used in adolescents and young adults living with HIV: a mixed scoping and systematic review. PLOS Glob Public Health. 2024;4(8):e0002255.  pmid:39133709
+View Article
+PubMed/NCBI
+Google Scholar
+12.
+Murtagh FE, Ramsenthaler C, Firth A. A brief, patient- and proxy-reported outcome measure in advanced illness: validity, reliability and responsiveness of the Integrated Palliative care Outcome Scale (IPOS). Palliative Medicine. 2019.
+View Article
+Google Scholar
+13.
+Bhardwaj T, Chambers RL, Watson H, Higginson IJ, Hocaoglu MB. Translation and cross-cultural adaptation of the Integrated Palliative Care Outcome Scale in Hindi: toward capturing palliative needs and concerns in Hindi speaking patients. Palliat Med. 2023;37(3):391–401.  pmid:36719047
+View Article
+PubMed/NCBI
+Google Scholar
+14.
+Sousa VD, Rojjanasrirat W. Translation, adaptation and validation of instruments or scales for use in cross-cultural health care research: a clear and user-friendly guideline. J Eval Clin Pract. 2011;17(2):268–74.  pmid:20874835
+View Article
+PubMed/NCBI
+Google Scholar
+15.
+CanSupport. CanSupport-Leaders in Home based Palliative Care Services,
+https://cansupport.org/
+(2022, 2022).
+16.
+Antunes B, Brown A, Witt J. The Palliative care Outcome Scale family of measures; Manual for cross-cultural adaptation and psychometric validation. London. 2012.
+https://pos-pal.org/doct/Manual_for_cross-cultural_adaption_and_psychometric_testing_of_the_POS_family_of_measures_200715.pdf
+17.
+White M. Sample size in quantitative instrument validation studies: a systematic review of articles published in Scopus, 2021. Heliyon. 2022;8(12):e12223.  pmid:36568672
+View Article
+PubMed/NCBI
+Google Scholar
+18.
+Bausewein C, Schildmann E, Rosenbruch J, Haberland B, Tänzler S, Ramsenthaler C. Starting from scratch: implementing outcome measurement in clinical practice. Ann Palliat Med. 2018;7(Suppl 3):S253–61.  pmid:30180734
+View Article
+PubMed/NCBI
+Google Scholar
+19.
+CSI. Palliative Care Outcome Scale,
+https://pos-pal.org/
+(2012, 2025).
+20.
+Van Reenen M, Oppe M, Secnik BK, et al.
+EuroQol research foundation
+. 2018. EQ-5D-3L User Guide. 2018. Accessed December 18, 2018.
+https://euroqol.org
+21.
+Mokkink LB, Terwee CB, Patrick DL, Alonso J, Stratford PW, Knol DL, et al. The COSMIN checklist for assessing the methodological quality of studies on measurement properties of health status measurement instruments: an international Delphi study. Qual Life Res. 2010;19(4):539–49.  pmid:20169472
+View Article
+PubMed/NCBI
+Google Scholar
+22.
+Speight J, Barendse SM. FDA guidance on patient reported outcomes. BMJ. 2010;340:c2921.  pmid:20566597
+View Article
+PubMed/NCBI
+Google Scholar
+23.
+Newman DA. Missing data: five practical guidelines. Organizational Research Methods. 2014;17:372–411.
+View Article
+Google Scholar
+24.
+Costello AB, Osborne J. Best practices in exploratory factor analysis: four recommendations for getting the most from your analysis. Practical Assessment, Research, and Evaluation. 2019;24:1–9.
+View Article
+Google Scholar
+25.
+Albright JJPH. Confirmatory Factor Analysis Using Amos, LISREL, Mplus, and SAS/STAT CALIS. The University Information Technology Services (UITS) Center for Statistical and Mathematical Computing, Indiana University. 2009.
+26.
+Hu LT, Bentler PM. Cutoff criteria for fit indexes in covariance structure analysis: conventional criteria versus new alternatives. Structural equation modeling: a multidisciplinary journal. 1999;6:1–55.
+View Article
+Google Scholar
+27.
+Nye CD. Reviewer resources: confirmatory factor analysis. Organizational Research Methods. 2022;26(4):608–28.
+View Article
+Google Scholar
+28.
+Bobbitt Z. How to report cronbach’s alpha (with examples).
+https://www.statology.org/how-to-report-cronbachs-alpha/
+. 2023. Accessed 2022 October 12.
+29.
+Hocaoglu MB, Murtagh FEM, Walshe C, Chambers RL, Maddocks M, Sleeman KE, et al. Adaptation and multicentre validation of a patient-centred outcome scale for people severely ill with COVID (IPOS-COV). Health Qual Life Outcomes. 2023;21(1):29.  pmid:36964550
+View Article
+PubMed/NCBI
+Google Scholar
+30.
+Cohen J. A power primer. Psychol Bull. 1992;112(1):155–9.  pmid:19565683
+View Article
+PubMed/NCBI
+Google Scholar
+31.
+Shetty J, Perquier F, Campisi SC, Wasan Y, Aitken M, Korczak DJ, et al. Psychometric properties of the Sindhi version of the Mood and Feelings Questionnaire (MFQ) in a sample of early adolescents living in rural Pakistan. PLOS Glob Public Health. 2022;2(11):e0000968.  pmid:36962610
+View Article
+PubMed/NCBI
+Google Scholar
+32.
+Shrout PE, Fleiss JL. Intraclass correlations: uses in assessing rater reliability. Psychol Bull. 1979;86(2):420–8.  pmid:18839484
+View Article
+PubMed/NCBI
+Google Scholar
+33.
+Laschinger HK. Intraclass correlations as estimates of interrater reliability in nursing research. West J Nurs Res. 1992;14(2):246–51.  pmid:1561790
+View Article
+PubMed/NCBI
+Google Scholar
+34.
+Lapin B, Thompson NR, Schuster A, Katzan IL. Clinical Utility of Patient-Reported Outcome Measurement Information System Domain Scales. Circ Cardiovasc Qual Outcomes. 2019;12(1):e004753.  pmid:30587028
+View Article
+PubMed/NCBI
+Google Scholar
+35.
+Tighe J, McManus IC, Dewhurst NG, Chis L, Mucklow J. The standard error of measurement is a more appropriate measure of quality for postgraduate medical assessments than is reliability: an analysis of MRCP(UK) examinations. BMC Med Educ. 2010;10:40.  pmid:20525220
+View Article
+PubMed/NCBI
+Google Scholar
+36.
+Cohen J. Statistical power analysis for the behavioral sciences. Routledge. 2013.
+37.
+Middel B, van Sonderen E. Statistical significant change versus relevant or important change in (quasi) experimental design: some conceptual and methodological problems in estimating magnitude of intervention-related change in health services research. Int J Integr Care. 2002;2:e15.  pmid:16896390
+View Article
+PubMed/NCBI
+Google Scholar
+38.
+Mokkink L, Terwee C, de Vet H. Key concepts in clinical epidemiology: responsiveness, the longitudinal aspect of validity. J Clin Epidemiol. 2021;140:159–62.  pmid:34116141
+View Article
+PubMed/NCBI
+Google Scholar
+39.
+Terwee CB, Dekker FW, Wiersinga WM, Prummel MF, Bossuyt PMM. On assessing responsiveness of health-related quality of life instruments: guidelines for instrument evaluation. Qual Life Res. 2003;12(4):349–62.  pmid:12797708
+View Article
+PubMed/NCBI
+Google Scholar
+40.
+Cohen J. Statistical power analysis for the behavioural sciences. New York: Academic Press. 1977.
+41.
+Hu LT, Bentler PM. Evaluating model fit. 1995.
+42.
+Wilson KG, Graham ID, Viola RA, Chater S, de Faye BJ, Weaver LA, et al. Structured interview assessment of symptoms and concerns in palliative care. Can J Psychiatry. 2004;49(6):350–8.  pmid:15283529
+View Article
+PubMed/NCBI
+Google Scholar
+43.
+Fox H, Jackson K. Pain, palliative care, and compassion in India. J Pain Palliat Care Pharmacother. 2015;29:412–5.
+View Article
+Google Scholar
+44.
+Perron V, Schonwetter RS. Assessment and management of pain in palliative care patients. Cancer Control. 2001;8(1):15–24.  pmid:11176032
+View Article
+PubMed/NCBI
+Google Scholar
+45.
+Boström B, Sandh M, Lundberg D, Fridlund B. Cancer-related pain in palliative care: patients’ perceptions of pain management. J Adv Nurs. 2004;45(4):410–9.  pmid:14756835
+View Article
+PubMed/NCBI
+Google Scholar
+46.
+Rajagopal MR, Joranson DE. India: opioid availability. An update. J Pain Symptom Manage. 2007;33(5):615–22.  pmid:17482057
+View Article
+PubMed/NCBI
+Google Scholar
+47.
+Saini S, Bhatnagar S. Cancer pain management in developing countries. Indian J Palliat Care. 2016;22(4):373–7.  pmid:27803557
+View Article
+PubMed/NCBI
+Google Scholar
+48.
+Organisation WH. Palliative care.
+https://www.who.int/news-room/fact-sheets/detail/palliative-care
+. 2020. Accessed 2024 January 9.
+49.
+Organisation WH. The preventable pain pandemic.
+https://www.who.int/news-room/feature-stories/detail/the-preventable-pain-pandemic
+. 2016. Accessed 2024 January 9.
+50.
+Davis MP, Rybicki LA, Samala RV, et al. Pain or fatigue: which correlates more with suffering in hospitalized cancer patients? Supportive care in cancer: official journal of the Multinational Association of Supportive Care in Cancer 2021; 29: 4535–4542. 20210121.
+View Article
+Google Scholar
+51.
+Enders CK. Applied missing data analysis. Guilford Publications. 2022.
+52.
+Neo SH-S, Tan JY-T, Sim DK-L, Ng ES-L, Loh JKX, Yang GM, et al. Validity and reliability of the integrated palliative care outcome scale in asian heart failure patients. Palliat Med Rep. 2022;3(1):287–95.  pmid:36479550
+View Article
+PubMed/NCBI
+Google Scholar
+53.
+Cella D, Riley W, Stone A, Rothrock N, Reeve B, Yount S, et al. The Patient-Reported Outcomes Measurement Information System (PROMIS) developed and tested its first wave of adult self-reported health outcome item banks: 2005-2008. J Clin Epidemiol. 2010;63(11):1179–94.  pmid:20685078
+View Article
+PubMed/NCBI
+Google Scholar
+54.
+Murtagh FE, Ramsenthaler C, Firth A, Groeneveld EI, Lovell N, Simon ST, et al. A brief, patient- and proxy-reported outcome measure in advanced illness: validity, reliability and responsiveness of the Integrated Palliative care Outcome Scale (IPOS). Palliat Med. 2019;33(8):1045–57.  pmid:31185804
+View Article
+PubMed/NCBI
+Google Scholar
+55.
+Vlckova K, Hoschlova E, Chroustova E, Loucka M. Psychometric properties of the Czech Integrated Palliative Outcome Scale: reliability and content validity analysis. BMC Palliat Care. 2020;19(1):39.  pmid:32213172
+View Article
+PubMed/NCBI
+Google Scholar
+56.
+Long VJE, Cheung YB, Qu D, Lim K, Lee G, Yee ACP, et al. Validity and reliability of the English and translated Chinese versions of the Integrated Palliative care Outcome Scale (IPOS) in Singapore. BMC Palliat Care. 2021;20(1):40.  pmid:33750367
+View Article
+PubMed/NCBI
+Google Scholar
+57.
+Temoshok L. Personality, coping style, emotion and cancer: towards an integrative model. Cancer Surv. 1987;6(3):545–67. pmid:3326661
+View Article
+PubMed/NCBI
+Google Scholar
+58.
+Shi H-Y, Chang J-K, Wong C-Y, Wang J-W, Tu Y-K, Chiu H-C, et al. Responsiveness and minimal important differences after revision total hip arthroplasty. BMC Musculoskelet Disord. 2010;11:261.  pmid:21070675
+View Article
+PubMed/NCBI
+Google Scholar
+Download PDF
+Citation
+XML
+Print
+Share
+Reddit
+Facebook
+LinkedIn
+Mendeley
+Bluesky
+Email
+Advertisement
+Subject Areas
+?
+For more information about PLOS Subject Areas, click
+here
+.
+We want your feedback.
+Do these Subject Areas make sense for this article? Click the target next to the incorrect Subject Area and let us know. Thanks for your help!
+Palliative care
+Is the Subject Area
+"Palliative care"
+applicable to this article?
+Yes
+No
+Thanks for your feedback.
+Cancers and neoplasms
+Is the Subject Area
+"Cancers and neoplasms"
+applicable to this article?
+Yes
+No
+Thanks for your feedback.
+Emotions
+Is the Subject Area
+"Emotions"
+applicable to this article?
+Yes
+No
+Thanks for your feedback.
+India
+Is the Subject Area
+"India"
+applicable to this article?
+Yes
+No
+Thanks for your feedback.
+Pain
+Is the Subject Area
+"Pain"
+applicable to this article?
+Yes
+No
+Thanks for your feedback.
+Anxiety
+Is the Subject Area
+"Anxiety"
+applicable to this article?
+Yes
+No
+Thanks for your feedback.
+Breast cancer
+Is the Subject Area
+"Breast cancer"
+applicable to this article?
+Yes
+No
+Thanks for your feedback.
+Global health
+Is the Subject Area
+"Global health"
+applicable to this article?
+Yes
+No
+Thanks for your feedback.

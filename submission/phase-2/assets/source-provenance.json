@@ -1,0 +1,151 @@
+[
+  {
+    "path": "submission/phase-2/assets/consultation-family.png",
+    "source": "submission/final/Saanthvana_Healthathon_2026-10-03-final.pptx",
+    "part": "ppt/media/image2.png",
+    "bytes": 1279671,
+    "sha256": "5ca331845136d6d10c0398d1cc60188094d45c8ea4671f54390a85f0aceabc0e",
+    "size": [
+      1600,
+      883
+    ],
+    "scope": "Generated concept illustration from original submitted deck; not a patient photograph"
+  },
+  {
+    "path": "submission/phase-2/assets/family-report-concept.png",
+    "source": "submission/final/Saanthvana_Healthathon_2026-10-03-final.pptx",
+    "part": "ppt/media/image16.png",
+    "bytes": 1855217,
+    "sha256": "7b6e09fac04779dbfc8dda30e9c077cdd726e9f4f147793e5084cb723bc55679",
+    "size": [
+      1672,
+      941
+    ],
+    "scope": "Generated concept illustration from original submitted deck; not a patient photograph"
+  },
+  {
+    "path": "submission/phase-2/assets/recording-consultation-concept.png",
+    "source": "submission/final/Saanthvana_Healthathon_2026-10-03-final.pptx",
+    "part": "ppt/media/image23.png",
+    "bytes": 2106365,
+    "sha256": "3babe2cdd3fca6cd04b83f2930c5b3fecf4a5fb80d95dc735188670984bfd714",
+    "size": [
+      1254,
+      1254
+    ],
+    "scope": "Generated concept illustration from original submitted deck; not a patient photograph"
+  },
+  {
+    "path": "submission/phase-2/assets/recording-controls-prior-ui.png",
+    "source": "submission/final/Saanthvana_Healthathon_2026-10-03-final.pptx",
+    "part": "ppt/media/image24.png",
+    "bytes": 168351,
+    "sha256": "ffa8d33b84be541819c51c5fc0d5e6954b87a888793463811b79d36629cd7d42",
+    "size": [
+      1477,
+      691
+    ]
+  },
+  {
+    "path": "submission/phase-2/assets/old-map-capture.jpeg",
+    "source": "submission/final/Saanthvana_Healthathon_2026-10-03-final.pptx",
+    "part": "ppt/media/image3.jpeg",
+    "bytes": 87852,
+    "sha256": "72815eaf97c919306781bef90160063d243a444bed2082dd05de3f1b6d743529",
+    "size": [
+      763,
+      1032
+    ]
+  },
+  {
+    "path": "submission/phase-2/assets/sahara-app-icon.png",
+    "source": "output/android/play-listing/icon-512.png",
+    "bytes": 72295,
+    "sha256": "6c4d1646bab09b66444e3fedfc010e7006f0b68501fd05f669fc988793839cad",
+    "scope": "Actual Android app icon"
+  },
+  {
+    "path": "submission/phase-2/assets/historical-web-source-review-2026-09-24.png",
+    "source": "output/playwright/2026-09-24-doctor-note-review-filled.png",
+    "bytes": 300972,
+    "sha256": "4607cc84f3fea11442151997c7d2206ddcab8209727a0ac0ea549e11233e787b",
+    "scope": "Historical actual web screenshot; fictional record; 24 September"
+  },
+  {
+    "path": "submission/phase-2/assets/android-care-queue-050-2026-10-19.png",
+    "source": "output/android/verification/0.5.0/ci-runtime-38882501784/conversation-request-picked-up.png",
+    "bytes": 92689,
+    "sha256": "6fbdb772f7379363871c6d0fecd44677aea7a25efd215b1bdd8de53d850b97c1",
+    "scope": "Actual0.5emulator screenshot; fictional records; 19 October"
+  },
+  {
+    "path": "submission/phase-2/assets/android-patient-hub-050-2026-10-19.png",
+    "source": "output/android/verification/0.5.0/ci-runtime-38882501784/fictional-patient-hub.png",
+    "bytes": 118153,
+    "sha256": "fe28fa9332700868fa7a0f3be59aec1a00c1927f41e487aee49811dca4769cf1",
+    "scope": "Actual dated product capture. Historical records and map QA are fictional fixtures. Public intake is empty. No clinical or latest handset validation implied."
+  },
+  {
+    "path": "submission/phase-2/assets/android-doctor-workspace-050-2026-10-19.png",
+    "source": "output/android/verification/0.5.0/ci-runtime-38882501784/doctor-workspace.png",
+    "bytes": 111106,
+    "sha256": "df1a4522658358d33161496931decf7086d1d3964e1fc77de333a629a1667944",
+    "scope": "Actual dated product capture. Historical records and map QA are fictional fixtures. Public intake is empty. No clinical or latest handset validation implied."
+  },
+  {
+    "path": "submission/phase-2/assets/android-care-task-050-2026-10-19.png",
+    "source": "output/android/verification/0.5.0/ci-runtime-38882501784/care-task-completed.png",
+    "bytes": 94929,
+    "sha256": "1f63babfcf5d29f961373c9a7e81ad6e9091cf2dd39d574b47636accdcc568fc",
+    "scope": "Actual dated product capture. Historical records and map QA are fictional fixtures. Public intake is empty. No clinical or latest handset validation implied."
+  },
+  {
+    "path": "submission/phase-2/assets/android-local-capture-050-2026-10-19.png",
+    "source": "output/android/verification/0.5.0/ci-runtime-38882501784/doctor-local-capture.png",
+    "bytes": 128718,
+    "sha256": "1e9c2fe54d0a39665b1d8641a19bd575139ad2ef2e8d29ff9fd5d5b9b5bf939d",
+    "scope": "Actual dated product capture. Historical records and map QA are fictional fixtures. Public intake is empty. No clinical or latest handset validation implied."
+  },
+  {
+    "path": "submission/phase-2/assets/android-labs-050-2026-10-19.png",
+    "source": "output/android/verification/0.5.0/ci-runtime-38882501784/lab-history-series.png",
+    "bytes": 102258,
+    "sha256": "03df40f9a896642bbcf0ed888230327958ae2fb8117db9eaff47b93f29eeee48",
+    "scope": "Actual dated product capture. Historical records and map QA are fictional fixtures. Public intake is empty. No clinical or latest handset validation implied."
+  },
+  {
+    "path": "submission/phase-2/assets/historical-family-home-2026-09-24.png",
+    "source": "output/playwright/2026-09-24-home-note-desktop.png",
+    "bytes": 64228,
+    "sha256": "db4b4ccab6e02755dddc90843e6d97a50acbd42d9d7fae90c529860e482708bd",
+    "scope": "Actual dated product capture. Historical records and map QA are fictional fixtures. Public intake is empty. No clinical or latest handset validation implied."
+  },
+  {
+    "path": "submission/phase-2/assets/historical-note-history-2026-09-24.png",
+    "source": "output/playwright/2026-09-24-note-history.png",
+    "bytes": 77212,
+    "sha256": "bd735b9df4c05d92ea412c832b901e8eb578e8e93378305840cead8f0f1fa97a",
+    "scope": "Actual dated product capture. Historical records and map QA are fictional fixtures. Public intake is empty. No clinical or latest handset validation implied."
+  },
+  {
+    "path": "submission/phase-2/assets/survey-production-mobile-2026-10-23.png",
+    "source": "output/playwright/survey-2026-10-23/production-intake-mobile-390.png",
+    "bytes": 71992,
+    "sha256": "f2efb3b77b001217fca7723dfa0e58d4da6b205fb1a41b3d8220a4f0e7838e37",
+    "scope": "Actual dated product capture. Historical records and map QA are fictional fixtures. Public intake is empty. No clinical or latest handset validation implied."
+  },
+  {
+    "path": "submission/phase-2/assets/survey-production-desktop-2026-10-23.png",
+    "source": "output/playwright/survey-2026-10-23/production-intake-desktop.png",
+    "bytes": 82952,
+    "sha256": "0fdc09e286919b669a3d696e32322bcbf0097a063a41629a5cfa9712bdf5802b",
+    "scope": "Actual dated product capture. Historical records and map QA are fictional fixtures. Public intake is empty. No clinical or latest handset validation implied."
+  },
+  {
+    "path": "submission/phase-2/assets/survey-confirmed-map-2026-10-23.png",
+    "source": "output/playwright/survey-2026-10-23/.playwright-cli/element-2026-10-23T14-35-31-346Z.png",
+    "bytes": 172275,
+    "sha256": "d50d0e306a3185c0d721c4a5dc363a17395815f846f98f81d99a5e8a7316eb9b",
+    "scope": "Actual dated product capture. Historical records and map QA are fictional fixtures. Public intake is empty. No clinical or latest handset validation implied."
+  }
+]

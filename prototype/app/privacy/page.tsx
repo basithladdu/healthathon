@@ -146,7 +146,8 @@ export default function PrivacyPage() {
           <p>
             The voluntary <Link href="/hospital-survery">hospital survey</Link>
             collects your professional name, role, registering council, registration
-            number and state, plus optional professional mobile and email. These
+            number and state, plus optional professional email. The current form
+            does not request a mobile number. These
             professional and contact details are stored separately from hospital-service
             information and are not for public display. Optional contacts are used to
             follow up about your submission, not for marketing. We do not verify your
@@ -154,11 +155,12 @@ export default function PrivacyPage() {
             this form, and submitting does not send an OTP, email or SMS.
           </p>
           <p>
-            Hospital-service information includes the hospital name, institution type,
-            your connection to it, state, city, selected hospital map pin, palliative-care
+            Hospital-service information includes the hospital name and address, institution type,
+            your connection to it, state, city, confirmed hospital map pin, optional names
+            and departments of palliative-care physicians, palliative-care
             services, morphine availability and any optional note for families. The pin
             is a place you select, not your current GPS location. Submissions remain
-            pending review; they do not automatically create a public listing or a
+            pending review, including any named doctors; they do not automatically create a public listing or a
             verified professional profile. Reviewed hospital-service information may be
             used in the care directory. Do not enter patient or family contact details.
           </p>

@@ -1,0 +1,38 @@
+{
+  "slides": 13,
+  "powerpointRenderedAllSlides": true,
+  "powerpointInspectedSlides": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13
+  ],
+  "textOrTableCellOverflows": [],
+  "pdfLinks": [
+    "https://sahara.wedevit.in",
+    "mailto:workwithdevit@gmail.com"
+  ],
+  "pdfLinkRepair": {
+    "addedInvisibleURIAnnotations": [
+      "https://sahara.wedevit.in",
+      "mailto:workwithdevit@gmail.com"
+    ],
+    "basis": "Native PowerPoint hyperlink text-frame bounds; page content unchanged"
+  },
+  "layoutWarnings": [],
+  "pptxBytes": 6734306,
+  "pptxSha256": "30e853b44c9568d167079e9533af34f25751addf52144276f4d8e993242990cc",
+  "pdfBytes": 1256043,
+  "pdfSha256": "a4a7fa2ac09767242ce15f625b1f1a725cbff09c80ef9d39d9c942e245fadd0f",
+  "clinicalOrLatestHandsetValidationClaimed": false,
+  "olderV5Preserved": true
+}

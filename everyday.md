@@ -25,7 +25,7 @@ Make the idea understandable to someone hearing it for the first time—as simpl
 
 Rehearse aloud. Remove jargon and sentences we cannot explain naturally. Practise likely judge questions, transitions between teammates and recovery if the live demo fails. The slides, video and spoken explanation should tell the same story.
 
-**Visual priority after comparing the decks:** restore the earlier deck's patient story, purposeful photos, large app screens, care map, process visuals and evidence charts within the official13-section template. The first filled draft is mostly bullets and still needs that visual revision. Keep team photos/write-ups for the agreed later discussion.
+**Visual priority after comparing the decks:** keep improving the patient story, large app screens, care map and evidence visuals within the official13-section template. The user rejected the report-like first visual revision. The new v6 draft leads with large patient scenes, product captures and minimal body text. Keep team photos/write-ups for the agreed later discussion.
 
 ## End each work session
 
@@ -37,5 +37,6 @@ Rehearse aloud. Remove jargon and sentences we cannot explain naturally. Practis
 | Date | Slide | Survey / feature work | Doctor feedback | CARE / Play / video | Next action |
 | --- | --- | --- | --- | --- | --- |
 | 23 Oct 2026 | Official template downloaded; first 13-slide draft filled, including the team table and Yes to public solution information | Review current evidence before choosing the next task | Outreach and feedback to arrange | CARE website reviewed; integration not built. No new Play release submitted in this session | Review the draft with the team, fill the remaining details and rehearse the opening explanation |
+| 23 Oct 2026, follow-up | Product-led v6 revision across13 sections, rendered and checked | Survey changes and manual hospital entry live on Vercel; one actual390px submission/receipt verified and exact synthetic data removed.299 unit checks pass. Personal diary keeps separate ratings, respondent/time frame and real comparisons | Exact WhatsApp feedback saved; S S Sparsh entry received and pending review; clinical symptom report prepared for team discussion | No Android/Play change, patient onboarding or messages sent | Review the visual draft, choose clinical questionnaire with Shirin/Sujay, then rehearse one care-note journey |
 
 Current slide draft and remaining questions: [`submission/phase-2/README.md`](submission/phase-2/README.md).

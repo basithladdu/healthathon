@@ -58,6 +58,7 @@ output/research/*deploy.log
 output/research/privacy-retention-050-eslint.log
 prototype/output/*deploy-*.log
 prototype/output/staged-shared-care.html
+output/qa/vercel-*.log
 prototype/output/playwright/sahara-feedback-desktop.png
 prototype/output/playwright/sahara-feedback-mobile-390.png
 prototype/output/playwright/sahara-hospital-confirm-mobile-375.png

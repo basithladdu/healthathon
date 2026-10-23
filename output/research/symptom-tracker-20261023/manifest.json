@@ -1,0 +1,198 @@
+{
+  "scope": "Public original sources for internal clinical design review; no patient data; no registration or licence request; copied original tools are not approved app implementations.",
+  "sources": [
+    {
+      "file": "AHS-ESAS-r-manual-2019.pdf",
+      "url": "https://www.albertahealthservices.ca/assets/info/peolc/if-peolc-ed-esasr-admin-manual.pdf",
+      "error": "HTTPSConnectionPool(host='www.albertahealthservices.ca', port=443): Max retries exceeded with url: /assets/info/peolc/if-peolc-ed-esasr-admin-manual.pdf (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.albertahealthservices.ca', port=443) at 0x2053bf183b0>, 'Connection to www.albertahealthservices.ca timed out. (connect timeout=45)'))",
+      "rights": "Copyright University of Alberta; freely available for use with acknowledgement; no modification without prior author consent. Original internal research copy."
+    },
+    {
+      "file": "AHS-ESAS-r-original-form.pdf",
+      "url": "https://www.albertahealthservices.ca/frm-07903.pdf",
+      "error": "HTTPSConnectionPool(host='www.albertahealthservices.ca', port=443): Max retries exceeded with url: /frm-07903.pdf (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.albertahealthservices.ca', port=443) at 0x2053bf18230>, 'Connection to www.albertahealthservices.ca timed out. (connect timeout=45)'))",
+      "rights": "Original public instrument; preserve attribution; no app reproduction or modification authorised by download alone."
+    },
+    {
+      "file": "CCO-ESAS-r-Hindi-v1-2015.pdf",
+      "url": "https://www.cancercareontario.ca/sites/ccocancercare/files/assets/CCOESAS-Hindi.pdf",
+      "error": "403 Client Error: Forbidden for url: https://www.cancercareontario.ca/sites/ccocancercare/files/assets/CCOESAS-Hindi.pdf",
+      "rights": "Official Ontario Health posted Hindi form; internal review original. Availability is not proof of validation for Sahara."
+    },
+    {
+      "file": "CCO-ESAS-r-plus-English.pdf",
+      "url": "https://www.cancercareontario.ca/sites/ccocancercare/files/assets/CCOESAS-r-Plus.pdf",
+      "error": "403 Client Error: Forbidden for url: https://www.cancercareontario.ca/sites/ccocancercare/files/assets/CCOESAS-r-Plus.pdf",
+      "rights": "Official modified instrument, average past24hours; internal review original; do not mix with ESAS-r now."
+    },
+    {
+      "file": "CCO-ESAS-r-plus-Hindi.pdf",
+      "url": "https://www.cancercareontario.ca/sites/ccocancercare/files/assets/CCOESAS-r-Plus-Hindi.pdf",
+      "error": "403 Client Error: Forbidden for url: https://www.cancercareontario.ca/sites/ccocancercare/files/assets/CCOESAS-r-Plus-Hindi.pdf",
+      "rights": "Official Hindi translated modified instrument; original internal review copy."
+    },
+    {
+      "file": "Bhardwaj-2026-Hindi-IPOS-validation.html",
+      "url": "https://journals.plos.org/globalpublichealth/article?id=10.1371/journal.pgph.0006189",
+      "finalUrl": "https://journals.plos.org/globalpublichealth/article?id=10.1371/journal.pgph.0006189",
+      "retrievedUtc": "2026-10-23T14:17:27.127425+00:00",
+      "status": 200,
+      "bytes": 234145,
+      "sha256": "21b595880ae2282fe9619fbafb2ce1f27a881ccb5ec05dd149dabe227a859c78",
+      "rights": "Bhardwaj et al2026, PLOS Global Public Health; CC BY with attribution. Underlying IPOS instrument retains its own terms.",
+      "publicSupplementLinks": [
+        {
+          "text": "S1 File",
+          "url": "#pgph.0006189.s001"
+        },
+        {
+          "text": "S2 File",
+          "url": "#pgph.0006189.s002"
+        },
+        {
+          "text": "S1 File",
+          "url": "#pgph.0006189.s001"
+        },
+        {
+          "text": "S1 File",
+          "url": "#pgph.0006189.s001"
+        },
+        {
+          "text": "S1 File",
+          "url": "#pgph.0006189.s001"
+        },
+        {
+          "text": "S1 File",
+          "url": "#pgph.0006189.s001"
+        },
+        {
+          "text": "S1 File",
+          "url": "#pgph.0006189.s001"
+        },
+        {
+          "text": "S1 File",
+          "url": "#pgph.0006189.s001"
+        },
+        {
+          "text": "S1 File.",
+          "url": "article/file?type=supplementary&id=10.1371/journal.pgph.0006189.s001"
+        },
+        {
+          "text": "https://doi.org/10.1371/journal.pgph.0006189.s001",
+          "url": "https://doi.org/10.1371/journal.pgph.0006189.s001"
+        },
+        {
+          "text": "S2 File.",
+          "url": "article/file?type=supplementary&id=10.1371/journal.pgph.0006189.s002"
+        },
+        {
+          "text": "https://doi.org/10.1371/journal.pgph.0006189.s002",
+          "url": "https://doi.org/10.1371/journal.pgph.0006189.s002"
+        }
+      ]
+    },
+    {
+      "file": "UKRI-MRC-dyspnoea-scale.html",
+      "url": "https://www.ukri.org/councils/mrc/facilities-and-resources/find-an-mrc-facility-or-resource/mrc-dyspnoea-scale/",
+      "finalUrl": "https://www.ukri.org/councils/mrc/facilities-and-resources/find-an-mrc-facility-or-resource/mrc-dyspnoea-scale/",
+      "retrievedUtc": "2026-10-23T14:17:25.452738+00:00",
+      "status": 200,
+      "bytes": 68912,
+      "sha256": "a466865f252414893a84f9af312760d36b882abc1d5cbe4b84786bfc138e9666",
+      "rights": "UKRI public reuse permission for original MRC with attribution; does not authorise modified scales or translations.",
+      "publicSupplementLinks": []
+    },
+    {
+      "file": "Bhardwaj-2026-Hindi-IPOS-public-supplement-S1.docx",
+      "url": "https://journals.plos.org/globalpublichealth/article/file?type=supplementary&id=10.1371/journal.pgph.0006189.s001",
+      "finalUrl": "https://storage.googleapis.com/plos-corpus-prod/10.1371/journal.pgph.0006189/1/pgph.0006189.s001.docx?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=wombat-sa%40plos-prod.iam.gserviceaccount.com%2F20261023%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20261023T132401Z&X-Goog-Expires=86400&X-Goog-SignedHeaders=host&X-Goog-Signature=6ba5b839c9ecc1006b92041f7cbd92b464090b14b870b29ea5607ec384cd9aa7f2f5c8c6e13f36e87b12d2089851de85358c83e3767bc0c1d7ea5a2d8056c9a1e11874727aad1278be29d52927c58cc624038bfba565de35e05f647df8aea530451c31e41e3cbba806c0f89a3881f2bef69a04fc85d2166967c53f33f8890832d66c080acf1137494fa8d140c4003d32ae3a541877a712ff1206570ea4d4005d60f54fc72e4199452db01d83d4d676534fe40c08746d3fa79037513625690200f46d77b02dfea7dab8c75574ea7b9f52db5a92696c918604609ec8a34ab3bdc19ab79c9b10853201a6f06675fe83fd57c21f47129f04465f95314334d0f6c806",
+      "status": 200,
+      "bytes": 324346,
+      "sha256": "a884084f63c2084bea73f791cdfe70b71f57f1a4488a1c37701553299f4575b5",
+      "retrievedUtc": "2026-10-23T14:21:53.619835+00:00",
+      "rights": "Public supplementary research file linked by PLOS paper. Bhardwaj et al2026 CC BY paper. Embedded questionnaire retains separate IPOS instrument terms; not app-use permission.",
+      "extractedTextPath": "Bhardwaj-2026-Hindi-IPOS-public-supplement-S1.txt"
+    }
+  ],
+  "derivedFiles": [
+    {
+      "file": "Bhardwaj-2026-Hindi-IPOS-public-supplement-S1-image1.jpeg",
+      "bytes": 172963,
+      "sha256": "d1e47927ae7ce2268f5945017e71ab28303b76425f7c4d293d04f76d3687aedf",
+      "source": "Bhardwaj-2026-Hindi-IPOS-public-supplement-S1.docx",
+      "operation": "Lossless extraction from publicly linked original document"
+    },
+    {
+      "file": "Bhardwaj-2026-Hindi-IPOS-public-supplement-S1-image2.jpeg",
+      "bytes": 105032,
+      "sha256": "7e2f119425a087b6da1acaa43fd7100231b21e98cb63f54840f80dbf61612477",
+      "source": "Bhardwaj-2026-Hindi-IPOS-public-supplement-S1.docx",
+      "operation": "Lossless extraction from publicly linked original document"
+    },
+    {
+      "file": "Bhardwaj-2026-Hindi-IPOS-public-supplement-S1.txt",
+      "bytes": 5710,
+      "sha256": "b78832f75206a675d92d0c599b99be1b19e8e3a2cacdd3d9263568586ffe7349",
+      "source": "Bhardwaj-2026-Hindi-IPOS-public-supplement-S1.docx",
+      "operation": "Text extraction; not a rendered version of the document"
+    }
+  ],
+  "reviewedPublicPages": [
+    {
+      "url": "https://www.albertahealthservices.ca/assets/info/peolc/if-peolc-ed-esasr-admin-manual.pdf",
+      "review": "Web PDF text: administration sections, recall, rights; direct file download timed out."
+    },
+    {
+      "url": "https://www.cancercareontario.ca/sites/ccocancercare/files/assets/CCOESAS-Hindi.pdf",
+      "review": "Indexed PDF text; direct download and screenshot403; not visually checked."
+    },
+    {
+      "url": "https://www.cancercareontario.ca/sites/ccocancercare/files/assets/CCOESAS-r-Plus.pdf",
+      "review": "Indexed English original modified form: past24hours; direct403."
+    },
+    {
+      "url": "https://www.cancercareontario.ca/sites/ccocancercare/files/assets/CCOESAS-r-Plus-Hindi.pdf",
+      "review": "Indexed Hindi extended form; direct403."
+    },
+    {
+      "url": "https://pos-pal.org/maix/terms-and-conditions.php",
+      "review": "Official terms fully read; no registration, agreement submission, or account-gated download."
+    },
+    {
+      "url": "https://pos-pal.org/maix/ipos_in_english.php",
+      "review": "Official English versions/recall read."
+    },
+    {
+      "url": "https://pos-pal.org/maix/ipos-translations.php",
+      "review": "Official Hindi availability/developer and download conditions read."
+    },
+    {
+      "url": "https://journals.sagepub.com/doi/10.1177/20552076231190998",
+      "review": "Primary2023 eESAS-r paper, methods/results/limitations/electronic reuse permission read."
+    },
+    {
+      "url": "https://www.cancer.gov/about-cancer/treatment/side-effects/pain/pain-hp-pdq",
+      "review": "NCI pain assessment and special-population sections read; no treatment algorithm derived."
+    },
+    {
+      "url": "https://www.mdanderson.org/research/departments-labs-institutes/departments-divisions/symptom-research/symptom-assessment-tools/brief-pain-inventory.html",
+      "review": "Official owner tool details, Hindi validation listing and permission route read."
+    },
+    {
+      "url": "https://www.mdanderson.org/documents/Departments-and-Divisions/Symptom-Research/BPI_UserGuide.pdf",
+      "review": "Official copyright/terms excerpt read; not downloaded in this run."
+    },
+    {
+      "url": "https://borgperception.se/obtain-a-license/",
+      "review": "Official categories including IT/system providers read; no request submitted."
+    },
+    {
+      "url": "https://borgperception.se/obtain-a-license-for-research-and-education/",
+      "review": "Official free-academic conditions including no alteration read; no agreement accepted."
+    },
+    {
+      "url": "https://pubmed.ncbi.nlm.nih.gov/41956112/",
+      "review": "2026 NCCN guideline record read; current full instrument/terms inaccessible."
+    }
+  ]
+}
