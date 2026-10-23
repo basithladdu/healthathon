@@ -1,5 +1,11 @@
 # Preserve the supplied meeting transcript byte-for-byte.
 source-materials/meetings/2026-09-21-transcript.txt -text
+# User-authorized cleaned team-context copies: preserve recorded byte hashes on Windows.
+source-materials/team-context/2026-10-23/canonical-chat.txt -text whitespace=-blank-at-eol,-blank-at-eof
+source-materials/team-context/2026-10-23/latest-export/_chat.txt -text whitespace=-blank-at-eol,-blank-at-eof
+source-materials/team-context/2026-10-23/documents/*.docx binary
+source-materials/team-context/2026-10-23/documents/*.pdf binary
+source-materials/team-context/2026-10-23/documents/*.pptx binary
 # Preserve the supplied official homepage copy byte-for-byte.
 source-materials/healthathon/2026-09-22-homepage-user-copy.txt -text whitespace=cr-at-eol
 # Keep PDF byte offsets intact on Windows checkouts.
