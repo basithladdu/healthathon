@@ -1,0 +1,985 @@
+[25/08/26, 5:02:21 PM] ~ Sujay H S: ‎~ Sujay H S created this group
+[25/08/26, 5:02:30 PM] ~ Sujay H S: I do not have Awaiz's number
+[25/08/26, 5:02:33 PM] ~ Sujay H S: Please add him to the group
+[25/08/26, 5:02:54 PM] ~ Sujay H S: I am sharing some thoughts I had on the technical aspects of it. We can discuss further
+[25/08/26, 5:03:07 PM] ~ Sujay H S: We need to create some rough deadlines from both ends and what we will deliver
+[25/08/26, 5:05:56 PM] ~ Sujay H S: Round 1 ends in 17 days
+[25/08/26, 5:06:05 PM] ~ Sujay H S: We need to have a pitch deck and MVP by then
+‎[25/08/26, 5:06:21 PM] ~ Sujay H S: Technical thoughts and questions.docx ‎document omitted
+[25/08/26, 7:00:59 PM] Internal Zeros and Ones: ‎Messages and calls are end-to-end encrypted. Only people in this chat can read, listen to, or share them.
+[25/08/26, 7:00:59 PM] Internal Zeros and Ones: ‎Abdul Basith added you
+[25/08/26, 7:01:01 PM] Abdul Basith:
+[25/08/26, 7:01:01 PM] Abdul Basith:
+[25/08/26, 7:29:21 PM] Abdul Basith: Hello, 
+
+I have added @⁨Shaik Awaiz⁩ . There may or may not be just one more person so that the lifting on the technical side is easy. Will let you know
+[25/08/26, 7:30:14 PM] Abdul Basith: This is lovely.  I am going over the meeting transcription once again today and will send the website MVP link so that we all have something to play with.
+[25/08/26, 7:31:25 PM] ~ Sujay H S: Whatever you want, guys ‎<This message was edited>
+[25/08/26, 7:31:30 PM] ~ Sujay H S: Sounds good
+[25/08/26, 7:31:55 PM] ~ Sujay H S: Why did you choose the team name that you did? Just curious
+[25/08/26, 7:32:33 PM] ~ SVK: This is mostly what we discussed yesterday correct?
+[25/08/26, 7:32:39 PM] ~ SVK: Just checking if I'm missing something
+[25/08/26, 7:33:00 PM] ~ Sujay H S: Yes. With some additions may be and questions on our decided landings
+[25/08/26, 7:33:14 PM] ~ SVK: Cool
+[25/08/26, 7:33:46 PM] ~ Sujay H S: I thought if the tool is pretty basic, we can add an educational component to it with how to do GOCD and what not. But that can be for later
+[25/08/26, 7:34:41 PM] ~ Sujay H S: @⁨~SVK⁩ Let's talk tomorrow and decide on the structure we want to give the tech team? and anything else that we need to give them from our end
+[25/08/26, 7:34:55 PM] ~ SVK: Sure. Will do
+[25/08/26, 7:35:27 PM] Abdul Basith: Haha, I am so glad you asked. 
+
+Computers understand everything in 0s and 1s which is the binary language. 
+
+Zero means False
+One means True
+
+So any tech you have ever used in your life or will use boils down to zeros and ones.
+[25/08/26, 7:35:56 PM] ~ Sujay H S: Haha. That's nice
+[25/08/26, 7:36:08 PM] ~ SVK: Haha nice
+[25/08/26, 7:40:55 PM] Abdul Basith: Sujay, Sharada, this is also me scratching a personal itch.
+
+There are 11 problem statements, and having done a fair few hackathons, I wanted to ask if this is actually the best one to pursue, both for winning and for building into something real later.
+
+Especially because we developers are not really tapped into the medical world and probably don’t know half the use cases or problems that are obvious to people inside it.
+[25/08/26, 7:41:44 PM] ~ Sujay H S: 11 problem statements?
+‎[25/08/26, 7:43:25 PM] Abdul Basith: so when i was registering,  i chose patient followup and contuinity of care ‎<attached: 00003023-PHOTO-2026-08-25-19-43-25.jpg>
+[25/08/26, 7:43:52 PM] Abdul Basith: just asking if you both think we should go all in on this use case as i have no knowledge of the medical world
+[25/08/26, 7:49:10 PM] Abdul Basith: the question im asking is leaning more on the side of building into something real and meaningful later. ‎<This message was edited>
+[25/08/26, 7:50:01 PM] ~ Sujay H S: This is an idea we thought to pursue because it does not exist in India
+
+Having said that, this is an unconventional idea that does not fit into any use case in the way they have described it. I can tell you that probably no one else will be working on this idea so the space itself will be less crowded
+
+The downside is exactly that. Because it is not conventional, the probability of winning is low and the focus of these 
+
+Two additional things,
+I am putting up the key initiatives of NCG link here - Which to be honest does not include palliative care https://www.ncgindia.org/key-initiatives
+
+But, NCG has released its own palliative medicine guideline in 2021 focussing on multiple things - Of which end of life care is one aspect. In that, the very first step of the flowchart is documenting discussions (Attaching image here)
+‎[25/08/26, 7:50:15 PM] ~ Sujay H S: ‎<attached: 00003027-PHOTO-2026-08-25-19-50-15.jpg>
+[25/08/26, 7:51:40 PM] ~ Sujay H S: I understand your concern. If all of you want to build something more aligned with the key initiatives of NCG, happy to brainstorm. 
+
+Background - Dr. Sharada and I are pulmonary specialists who have worked extensively with lung cancer. I additionally have some palliative medicine exposure
+[25/08/26, 7:52:24 PM] ~ Sujay H S: The hack-a-thon specifically states that this should not be a decision making tool and so on. So what we will end up building will be process directed I am thinking
+[25/08/26, 7:52:36 PM] ~ Sujay H S: Maybe something in medical education
+[25/08/26, 7:52:43 PM] Abdul Basith: We can include these in our user flow. ‎<This message was edited>
+[25/08/26, 7:53:38 PM] Abdul Basith: Got it.  Makes sense.  I think the itch has been scratched.  We can continue with this unless YOU guys have a change of mind on the use case.
+[25/08/26, 7:58:23 PM] ~ Sujay H S: I honestly just want to get this out into the world. I do not know how this will be perceived or received by anyone in the panel. I am okay with not winning but I would want us to get to IIT Bombay for the final 10 so this idea gets more press. At least let it start something along the lines treating the suffering human behind the cancer rather than just treating the disease.
+
+But I'm damn chill. If anyone has a better idea, I would be happy to contribute to that and park this. I'll also continue to think of other ideas and put them here
+[25/08/26, 7:59:45 PM] ~ Sujay H S: I think a good way to start with great ideas is to visit the NCG website and see what their goals are aligned towards and work from there. Increases chances of winnign
+[25/08/26, 7:59:47 PM] Abdul Basith: You got it, boss.  We shall survive and thrive
+
+Yes, please do the thinking of the other ideas.  That would be really helpful
+[25/08/26, 8:00:57 PM] ~ Sujay H S: Let's take till this weekend to think of ideas. Everyone put some up here and we can debate. But beyond this week, I think we'll be a little pressed for time. We should lock an idea this week
+[26/08/26, 11:38:14 PM] ~ Sujay H S: Cancer patients have a very very long follow up 
+
+Can do something along the lines of a rolling care document which has reports of all the imaging a pathology and treatments given, side effects experienced. 
+
+It’s in a condensed form which is easy for clinicians to read at every visit but can be expanded at each step to show full reports of any stage of treatment
+[26/08/26, 11:39:07 PM] Abdul Basith: Cool, we will implement these.  
+
+We would like more context, the more the merrier to build the software.
+[27/08/26, 12:12:24 AM] ~ Sujay H S: Let’s wait till Monday. The Hackathon guy called me and said the last day for round 1 is 25th
+[27/08/26, 12:12:51 AM] ~ Sujay H S: Till then everyone put up more ideas. We can have a meeting on Sunday and discuss pros and cons of each and collectively decide what to go ahead with
+[27/08/26, 12:12:56 AM] ~ Sujay H S: Does this sound okay?
+[27/08/26, 12:23:53 AM] ~ Sujay H S: Source: OUP Academic https://share.google/tmRrPrXptPUtbHdY0
+[27/08/26, 12:25:17 AM] ~ Sujay H S: Usually cancer staging is done by referring to the staging sets each time. Can develop a model that extracts required details from reports and gives you the cancer staging - Otherwise it flags what exactly is missing from the available data for staging
+[27/08/26, 11:23:02 AM] Abdul Basith: Sounds good! Sunday it is
+[29/08/26, 12:23:38 AM] ~ Sujay H S: Chemotherapy adverse effects tracker. Most of the times chemo adverse events are volunteered by the patient and not actively probed by the physician till the side effect becomes too severe. We can make a tool that can track the blood reports that can be uploaded by the patient. It can also have a conversation with the patient about subjective side effects and when it started and so on. This can be presented to the physician in the next visit which can help them change treatment accordingly
+[29/08/26, 12:17:50 PM] ~ Sujay H S: What time do we meet tomorrow?
+‎[29/08/26, 1:38:07 PM] ~ Sujay H S: Hackathon_Problem_Statement_3.pdf • ‎2 pages ‎<attached: 00003047-Hackathon_Problem_Statement_3.pdf>
+[29/08/26, 1:38:11 PM] ~ Sujay H S: Some other team
+[29/08/26, 1:38:24 PM] ~ Sujay H S: Just putting here to help us get an idea of what others are doing
+[30/08/26, 1:43:46 PM] ~ Sujay H S: What time do we meet?
+[30/08/26, 1:44:08 PM] ~ SVK: Yes pls let me know.
+[30/08/26, 1:44:23 PM] ~ SVK: I'll be a silent partner today. Having a very bad sore throat
+[30/08/26, 3:02:40 PM] Abdul Basith: No worries, is 5 o clock okay?
+[30/08/26, 3:02:51 PM] Abdul Basith: or later is also fine with us ‎<This message was edited>
+[30/08/26, 3:24:21 PM] ~ Sujay H S: I’m okay with 5pm
+[30/08/26, 3:28:58 PM] ~ SVK: I'll join too. Will communicate via msgs mostly.
+[30/08/26, 4:57:10 PM] Abdul Basith: Guys, can we push it to 5:30
+
+Sorry for the last minute change, still driving.  
+
+@⁨Shaik Awaiz⁩ send the meeting link. thanks
+[30/08/26, 4:59:48 PM] Shaik Awaiz: [private invitation or meeting link removed from shared copy]
+[30/08/26, 5:00:16 PM] ~ Sujay H S: Sure
+[30/08/26, 5:31:37 PM] ~ SVK: I'll join in 5
+[30/08/26, 5:32:42 PM] ~ Sujay H S: Okay
+[30/08/26, 5:32:46 PM] ~ Sujay H S: Should we start
+[30/08/26, 5:36:16 PM] Abdul Basith: Are you joining any soon or do we start?
+[30/08/26, 6:25:11 PM] Abdul Basith: ‎Voice call, ‎‎7 min • ‎4 joined
+[30/08/26, 6:29:22 PM] ~ SVK: Saanthvanam
+[30/08/26, 6:29:27 PM] ~ SVK: How is this
+[30/08/26, 6:30:38 PM] ~ SVK: Nothing else from my end
+[30/08/26, 6:35:30 PM] Abdul Basith: By Wednesday, if @⁨~Sujay H S⁩ @⁨~SVK⁩  
+
+can please go through and tell me the exact use case for the hackathon
+
+because as i said they will club the teams together most probably and the judges as well so we cant be patient/caregiver facing product but be in the doctor/care team facing cluster. 
+
+they will out right dismiss us as we will be an odd one out
+[30/08/26, 6:36:18 PM] ~ Sujay H S: Got it
+[31/08/26, 5:40:21 PM] ~ Sujay H S: I was talking to a Palliative Medicine Colleague. Just putting it here for the group to decide. She was suggesting a one stop shop for Palliative Care
+- Clinical Case History
+- Goals of care discussions and consent forms - Important
+- Network of nearest palliative care centres 
+- Network of patient support groups
+- Network of home care centres, blood banks, or something where they can get stuff like oxygen from
+- Network of Closest RMIs (Registered Medical Institutes) - Where they can dispense morphine - This may be important
+- Some Medical Education Features for basic symptoms like breathlessness, cough, and pain and what not
+- AI Chatbot to reduce anxiety and to decide when it may be good to visit the doctor rather than just dealing with it on their own
+- Emergency phone numbers to contact in case of crisis
+
+I understand that incorporating these may dilute what we want to do. Just put up the ideas here if anyone wants to opine on any of this
+[31/08/26, 5:44:42 PM] ~ SVK: We will need to have one of this as primary depending on the use case scenario. The others parts would be secondary performance indicators i believe
+[31/08/26, 5:45:22 PM] ~ SVK: Using an AI chatbot with anxiety assessment is a gray area. Can lead to medicolegal concerns
+[31/08/26, 5:46:04 PM] ~ SVK: https://www.bbc.com/news/articles/cgerwp7rdlvo
+[31/08/26, 5:48:34 PM] ~ Sujay H S: Oh lol
+[31/08/26, 9:11:00 PM] Abdul Basith: Yea, it's pretty bad.
+[31/08/26, 10:40:30 PM] ~ Sujay H S: I think identifying RMIs is something if we can do, it’ll be great
+‎[02/09/26, 9:15:14 PM] ~ Sujay H S: ‎<attached: 00003077-PHOTO-2026-09-02-21-15-14.jpg>
+[02/09/26, 9:15:19 PM] ~ Sujay H S: Changed use case to this
+[02/09/26, 9:15:24 PM] ~ Sujay H S: Seemed to fit best
+[02/09/26, 9:51:09 PM] Abdul Basith: changed as in did you contact them?  cause we have no option to change it in our profile 
+
+if you didnt then i will send a mail to them lemme know
+[02/09/26, 9:58:10 PM] ~ Sujay H S: No. I changed it on the website. It allowed it. Didn’t have any problem
+[02/09/26, 9:58:13 PM] ~ Sujay H S: Just check it once
+[06/09/26, 11:21:23 AM] Abdul Basith: 🔴 We’re about to go LIVE!
+
+Join us for Health-a-thon 2026 Connect — a live session to get clarity on everything you need to know before you start building.
+
+We’ll cover use cases & focus areas, idea submissions, team formation, matchmaking, Phase 2 mentorship, and more.
+
+Have a doubt? Bring it with you — no question is too big or too small!
+
+🕛 12 PM IST
+💻 Live Webinar
+
+🔗 Join us live: https://www.youtube.com/live/x2-WqYLMi1E
+
+Set your reminder and see you at 12!
+[06/09/26, 11:21:54 AM] Abdul Basith: If any queries,  they will resolve those
+[06/09/26, 12:59:12 PM] ~ Sujay H S: When is it?
+[06/09/26, 12:59:41 PM] ~ Sujay H S: I’m abroad. I won’t be able to attend. Can some of you please attend and see what they’re saying?
+[06/09/26, 1:00:20 PM] Abdul Basith: Yes, will do.  
+
+I couldn’t attend it either.  
+
+I will provide a summary at last
+[06/09/26, 1:00:35 PM] ~ Sujay H S: Okay cool
+[06/09/26, 1:00:38 PM] ~ Sujay H S: Thank you
+[08/09/26, 1:12:49 PM] ~ Sujay H S: Hi guys
+Sorry I’ve been away for a conference 
+
+Dr. Sharada has come up with a great structure for the discussion. I need to go through it before sending it over to you both
+
+I’ll take some time out today and finish that work. We should be able to give you that by tomorrow
+[08/09/26, 1:13:07 PM] ~ Sujay H S: Did anyone attend that meeting? Any summary available?
+[08/09/26, 10:01:11 PM] Shaik Awaiz: The Health-a-thon 2026 Connect video is an orientation and Q&A session designed to clarify the goals, structure, and guidelines of the upcoming hackathon
+.
+Here is a detailed, structured summary of the key details from the session:
+1. Core Collaborative Ecosystem & Vision
+The Organizations Behind It: The event is an initiative by the Koita Foundation and the Koita Center for Digital Health (KCDH) at IIT Bombay, in collaboration with Ashoka University's Center for Digital Health, the National Cancer Grid (NCG), RSSDI, and FOGSI, powered by Reskilll
+.
+Bridging the Silos: A primary motivation for the hackathon is that in India, domains like banking and travel have rapidly digitized, while healthcare has lagged because engineers and medical professionals specialize early and work in silos
+.
+Strong Community Response: The hackathon has already garnered 2,000+ registrations, including 500+ doctors and medical students, alongside 1,500+ technologists and engineering students
+.
+Host Organizations:
+Koita Foundation: An 8-year-old not-for-profit focused entirely on the adoption of digital health and AI in India, founded by Mr. Rizwan Koita (founder of CitiusTech, India's 25th unicorn)
+. Rizwan Koita also chairs NABH, which defines digital health standards in India
+.
+National Cancer Grid (NCG): A network of 350+ cancer hospitals managing ~65% of India's cancer load
+.
+RSSDI: Asia's largest body of diabetologists, representing roughly 13,000 doctors
+.
+FOGSI: A Center of Excellence in obstetrics and gynaecology representing 45,000+ clinicians
+.
+2. Core Tenets & Unique Rules
+The organizers emphasize that two key features make this hackathon completely unique:
+A. Mandatory Doctor-Technologist Duo
+Team Size: Teams must consist of 2 to 5 members
+.
+Mandatory Structure: Every single team must have at least one qualified doctor (clinical lead) and at least one technology professional
+.
+Who Qualifies as a Clinical Lead? MBBS qualified doctors (and above), PG medical students/doctors, and BAMS, BHMS, BUMS, or BDS qualified doctors
+. Additionally, 4th-year MBBS students and above in their rotating internship can act as clinical leads
+.
+Frontline Specialists: Frontline coordinators (like chemotherapy coordinators, clinical pharmacists, or nurses) are encouraged to join, but they cannot replace the doctor requirement; the team must still include a qualified clinician to remain eligible
+.
+B. Strictly Non-Clinical Use Cases
+The Reason: Clinical AI solutions (like diagnostic risk predictors, X-ray/MRI imaging analysis, or dosage calculations) face massive regulatory uncertainties, data-access hurdles, and scaling challenges in India
+.
+The Focus: This hackathon is exclusively focused on non-clinical, administrative, operational, financial, or assistive use cases
+. These solutions do not require regulatory clearances and can be piloted and scaled immediately
+.
+Where the Line is Drawn:
+Clinical (Out of Scope): Any app that computes a drug's dosage, interprets scans, or guides a doctor/patient on clinical care pathways
+.
+Non-Clinical (In Scope): Any application assisting with workflows, operations, reminders, or billing
+. For example, a medication reminder app is non-clinical, whereas an app telling a patient what medicine to take based on symptoms is clinical
+.
+Illustrative Examples of Non-Clinical AI Use Cases:
+Hospital Operations: Simplifying patient registration, accelerating patient discharge processes, room booking, staff scheduling, or backend inventory management
+.
+Finance & Claims: Analyzing billing data to coordinate insurance claim settlements (TPA tracking)
+.
+Patient Engagement & Care: Automated medication reminders, patient education, caregiver tools, and neonatal care tracking
+.
+Agentic AI Solutions: Utilizing autonomous AI agents (leveraging modern LLM systems) for chronic clinic follow-ups and patient care coordination
+.
+3. Three Focused Problem Tracks
+Teams must align their ideas with at least one of three longitudinal health tracks:
+Cancer Care (focusing on long-term follow-ups and patient engagement)
+.
+Diabetes (chronic management over years or decades)
+.
+Maternal Health (Mother and Child) (neonatal cases, postpartum support, and tools for caregivers/mothers)
+.
+Note: If an idea is general-purpose (applies broadly to clinic operations), the team must still apply under one specific track for prize and shortlisting evaluation
+.
+4. Roadmap, Timeline, & Evaluation
+Phase 1: Registration & Team Formation (Current): Teams can register and complete their compositions on the dashboard
+. Registration closes around 25th September
+.
+Phase 2: Idea Submission (12th September – 25th September): Teams submit their target use case, proposed solution, technology approach, and build plans
+.
+Note: A working prototype is not required at this stage; supporting materials like PPTs or mock-up videos are welcome
+.
+Evaluation Lenses: Ideas are evaluated based on Healthcare Relevance & Workflow Fit (impact and practicality) and Technical Feasibility & AI Engineering
+.
+Phase 3: Build Sprint (4–5 Weeks): Shortlisted teams build their prototypes
+. Each team is assigned two structured mentor check-ins to receive feedback, refine their prototype, and practice their pitch
+.
+Grand Finale (28th November, 2026): The top 30 teams (10 per track) will be invited to IIT Bombay for an offline presentation and live demo
+.
+5. Key Q&A & Participant Insights
+Matchmaking & Team Formation: Technologists without a doctor, and clinicians without a developer, can use the platform's matchmaking tool (which suggests pairings based on shared interest tracks) or join the active WhatsApp community to form teams
+.
+Dataset Availability: The organizers will not provide datasets
+. Teams must utilize open-source platforms (such as the Government of India's AI coach) or collaborate with their team's doctor to leverage real-world clinical practice datasets
+.
+Modifying Submissions: Teams can edit their chosen problem statements or reshuffle team members directly on the dashboard via the "edit use case and problem" button
+.
+Use of Pre-existing Software: Teams cannot present pre-existing, live commercial products as-is
+. However, they can build innovative features or novel workflows on top of existing software components (such as integrating an administrative scheduling layer onto a standard voice-scribe application)
+.
+Hardware Solutions: Hardware-related projects are permitted if the team already has the hardware to demonstrate, though app-based solutions are generally easier to build in the hackathon's timeframe
+.
+Incentives & Career Upside:
+Cash prizes will be awarded to the top 10 teams
+.
+Finalists at IIT Bombay will pitch directly to India’s leading national clinical figures (including the president of FOGSI, RSSDI leaders, and the NCG national convenor) and members of the venture capital community
+.
+Rizwan Koita highlights that a previous winner of a Koita Foundation award (Adalat AI) went on to receive funding from Y Combinator, proving the incredible visibility and scaling opportunities this hackathon offers
+.
+[08/09/26, 10:02:17 PM] Shaik Awaiz: summary of meet 👆👆👆
+[08/09/26, 10:04:49 PM] Abdul Basith: Sure, we can have a meeting tomorrow if possible
+[08/09/26, 11:02:41 PM] ~ Sujay H S: Sounds good
+[08/09/26, 11:02:45 PM] ~ Sujay H S: Okay
+[08/09/26, 11:05:14 PM] ~ Sujay H S: https://lnkd.in/p/gseCTAn7
+[08/09/26, 11:05:26 PM] ~ Sujay H S: In case the team is interested
+[08/09/26, 11:05:36 PM] ~ Sujay H S: We can try and pitch something for this as well
+[08/09/26, 11:05:51 PM] ~ Sujay H S: Under chronic respiratory diseases
+[08/09/26, 11:08:41 PM] ~ Sujay H S: If we have a good idea, it can really go through. I work on the same floor as TANUH and know the head lol
+[08/09/26, 11:09:09 PM] ~ Sujay H S: I know they will be interested in something related to air pollution (indoor and outdoor) along with smoking and things like that
+[08/09/26, 11:18:05 PM] ~ Sujay H S: It can be something very simple also. TANUH is currently working on detection of oral cancer using digital photos that can be taken by Anganwadi workers using smartphones
+[08/09/26, 11:51:17 PM] Abdul Basith: Sorry, guys.  Too overstimulated by startup work.  
+
+Will go through everything tomorrow and we can fix a meeting
+[08/09/26, 11:52:28 PM] ~ Sujay H S: Cool
+[08/09/26, 11:52:41 PM] ~ Sujay H S: I’m overstimulated right now too 🤣
+[08/09/26, 11:57:03 PM] Abdul Basith: aren't we all😂😂
+‎[12/09/26, 12:20:56 PM] ~ Sujay H S: Healthathon form.docx ‎<attached: 00003108-Healthathon form.docx>
+‎[12/09/26, 12:20:57 PM] ~ Sujay H S: Saanthvana v 1.0.docx ‎<attached: 00003109-Saanthvana v 1.0.docx>
+[12/09/26, 12:22:01 PM] ~ Sujay H S: Sorry for the delay guys. The Saanthvana document is the one created by Dr. Sharada. The Health-a-thon form is the one I have distilled from that. That should be the guide for the AI guided conversation and the final document according to me. If any changes are needed, we can discuss
+[12/09/26, 12:22:45 PM] ~ Sujay H S: I am back tomorrow (13th). Happy to have a meeting. Will get on the ppt creation once I am back. Would require a couple of slides from you guys about what you have designed and what not
+[12/09/26, 12:38:51 PM] ~ Sujay H S: I have to deliver on some more things
+- Patient support group list - Available on NCG website
+- ⁠Palliative care doctor list
+- ⁠Morphine institute list
+[13/09/26, 2:12:37 PM] ~ Sujay H S: How many slides are these pitch decks usually?
+[13/09/26, 2:12:57 PM] Abdul Basith: Good afternoon
+[13/09/26, 2:13:10 PM] Abdul Basith: Yes, sure we will make the deck
+[13/09/26, 2:13:12 PM] Abdul Basith: no worries
+[13/09/26, 2:13:20 PM] Abdul Basith: Depends 8-10 is a sweet spot
+[13/09/26, 2:14:35 PM] ~ Sujay H S: Okay
+[13/09/26, 2:14:40 PM] ~ Sujay H S: How many slides would you need?
+[13/09/26, 2:31:14 PM] Abdul Basith: i think 10 is fine for the PPT. We will make it
+[13/09/26, 2:31:38 PM] Abdul Basith: This is great
+[13/09/26, 2:34:16 PM] Abdul Basith: Yes, we will provide our slides and then we can merge the PPT into one
+[13/09/26, 2:36:10 PM] Abdul Basith: our slides will have the prototype link. It will have the prototype screenshots, so basically our website or app visuals etc., will be on the PPT from our side, whatever Information slides that you want to include you can go ahead and put it from your side
+[13/09/26, 2:43:41 PM] ~ Sujay H S: Sounds good
+‎[13/09/26, 2:46:40 PM] Abdul Basith: round one requirements to submit ‎<attached: 00003125-PHOTO-2026-09-13-14-46-40.jpg>
+[14/09/26, 8:45:46 PM] ~ Sujay H S: These are the links to palliative care in the country - Hospital based and home based
+[14/09/26, 8:46:44 PM] ~ Sujay H S: https://cansupport.org/ - They have individual stuff - Like outpatient clinics and home based and so on
+[14/09/26, 8:46:59 PM] ~ Sujay H S: https://www.cancersupportindia.org/directory?service_type=
+
+They have a support directory but it sucks
+[14/09/26, 8:47:16 PM] ~ Sujay H S: https://palliumindia.org/clinics
+
+They have a good list of palliative care hospitals in the country
+[14/09/26, 8:47:37 PM] ~ Sujay H S: https://www.palliativecare.in/palliative-care-directory-of-india/
+
+They also have a directory but you have to enter each state and what not to retrieve it
+[14/09/26, 8:48:09 PM] ~ Sujay H S: The availability of morphine is more sketchy. The list is released statewise and I am unable to find uptodate lists for the same. That will take some more time
+[14/09/26, 8:49:26 PM] ~ Sujay H S: What I am realising is that the cancer NGO scene in India is too fragmented lol
+[14/09/26, 8:52:03 PM] ~ Sujay H S: We can start with the palliative centre map for the initial idea and then take our time with the RMI and NGOs. Just a thought
+[14/09/26, 8:57:51 PM] Abdul Basith: We can extract all that information using an agent
+[14/09/26, 9:09:14 PM] ~ Sujay H S: Oh. Crazy
+[14/09/26, 9:11:01 PM] ~ Sujay H S: Name of our thing?
+[14/09/26, 9:11:10 PM] ~ Sujay H S: Is Saanthvana okay with everyone? What does it mean
+[14/09/26, 9:41:05 PM] Abdul Basith: Will brainstorm some today
+[14/09/26, 9:41:13 PM] Abdul Basith: This one is also good
+[14/09/26, 9:41:39 PM] ~ Sujay H S: Yes please. I am terrible and this sort of stuff
+[14/09/26, 9:44:04 PM] Abdul Basith: haha thats okay.  i got you.
+‎[17/09/26, 11:50:11 AM] ~ Sujay H S: ‎<attached: 00003142-PHOTO-2026-09-17-11-50-11.jpg>
+[17/09/26, 11:50:24 AM] ~ Sujay H S: I’ve filled in the first 3. All of you please read it and see if any changes are needed
+[17/09/26, 11:50:44 AM] ~ Sujay H S: I think questions 4, 5, 7 are you guys @⁨Abdul Basith⁩
+[17/09/26, 11:50:54 AM] Abdul Basith: Will do.  We have also made a PPT and improved the product will share it as well
+[17/09/26, 11:50:58 AM] ~ Sujay H S: I’ll get on working with our part of the pitch deck today
+[17/09/26, 11:51:15 AM] ~ Sujay H S: Great. I’ll have the ppt from our side done by tonight
+[17/09/26, 11:51:49 AM] ~ Sujay H S: Name I’ve kept as Saanthvana till we decide to keep it or override with a different name
+[17/09/26, 11:51:55 AM] Abdul Basith: Yes, that works.
+[17/09/26, 11:52:17 AM] ~ SVK: Hey saanthvana be my major contribution 🫰🏻🥹
+[17/09/26, 11:52:21 AM] ~ SVK: Keep it
+[17/09/26, 11:53:02 AM] Abdul Basith: Haha, will do.
+‎[18/09/26, 2:41:40 PM] ~ Sujay H S: ‎<attached: 00003153-PHOTO-2026-09-18-14-41-40.jpg>
+[18/09/26, 2:41:49 PM] ~ Sujay H S: Do not know why this is showing up
+[18/09/26, 2:42:07 PM] ~ Sujay H S: Even though in the teams page, basith is designated as technical lead
+[18/09/26, 2:42:20 PM] ~ Sujay H S: Can you check Basith? Only you can make changes as the team lead
+‎[18/09/26, 5:10:27 PM] Abdul Basith: it does say i am the technical lead ‎<attached: 00003157-PHOTO-2026-09-18-17-10-27.jpg>
+‎[18/09/26, 5:12:11 PM] Abdul Basith: Healthathon_Continuity_Loop_Product_Visuals.pptx ‎<attached: 00003158-Healthathon_Continuity_Loop_Product_Visuals.pptx>
+[18/09/26, 5:13:56 PM] Abdul Basith: Some inconsistencies are there as the PPT has yet to be brought upto knowledge,  this was made a a week ago
+[18/09/26, 5:15:03 PM] Abdul Basith: probably just a warning toast
+[18/09/26, 5:23:01 PM] ~ Sujay H S: Okay
+[18/09/26, 7:24:27 PM] ~ Sujay H S: https://palliumindia.org/2024/06/living-will-and-attorney-authorisation
+
+Everyone please go through this
+‎[18/09/26, 7:31:21 PM] ~ Sujay H S: Vidhi_EOLC_Sample-Advance-Medical-Directive.pdf • ‎8 pages ‎<attached: 00003163-Vidhi_EOLC_Sample-Advance-Medical-Directive.pdf>
+‎[18/09/26, 7:31:21 PM] ~ Sujay H S: Vidhi-EOLC-Toolkit-FAQ.pdf • ‎37 pages ‎<attached: 00003164-Vidhi-EOLC-Toolkit-FAQ.pdf>
+[18/09/26, 8:18:02 PM] ~ Sujay H S: Looks good basith. We will have to focus this more on GOC discussions rather than a general continuity of care document. As in, make that aspect stronger
+
+Plus add the location mapping stuff
+‎[18/09/26, 8:44:42 PM] ~ Sujay H S: Presentation draft.pptx ‎<attached: 00003166-Presentation draft.pptx>
+‎[18/09/26, 8:45:21 PM] ~ Sujay H S: Saanthvana_Background_Rationale_1.pptx ‎<attached: 00003167-Saanthvana_Background_Rationale_1.pptx>
+[18/09/26, 8:45:42 PM] ~ Sujay H S: Shared this because you can use this to put into your own AI prompt so all the ppt will have a similar formatiing
+[18/09/26, 8:45:50 PM] ~ Sujay H S: Please do see the ppts and let me know
+[18/09/26, 8:52:22 PM] Abdul Basith: got it.   was looking for this feedback
+[18/09/26, 8:53:00 PM] Abdul Basith: yes i will add these into our existing and make it more colloquial and simple
+[18/09/26, 8:53:12 PM] Abdul Basith: send any other information.  always helpful
+[18/09/26, 8:53:34 PM] Abdul Basith: or just blunt feedback.
+[18/09/26, 8:56:57 PM] ~ Sujay H S: Same goes for you
+[18/09/26, 8:57:58 PM] ~ Sujay H S: Let’s have a meeting this weekend. Decide what goes into the ppt and the answers. Finalize and send? Maybe you can fill in the answers by then?
+[18/09/26, 8:58:31 PM] Abdul Basith: yes sure.  sounds good lmk when
+[18/09/26, 8:59:44 PM] ~ Sujay H S: I’m okay tomorrow before 5pm or Sunday after 5pm
+[18/09/26, 8:59:53 PM] ~ Sujay H S: Others?
+[20/09/26, 1:43:36 PM] ~ Sujay H S: Should we discuss today?
+[20/09/26, 1:51:16 PM] Abdul Basith: I have filled in some answers.  Will fill in the PPT and the prototype one after our meeting and refining the PPT
+[20/09/26, 1:52:48 PM] Abdul Basith: I'm out today, any time tomorrow is fine by me. ‎<This message was edited>
+[20/09/26, 1:55:15 PM] ~ Sujay H S: Okay
+[20/09/26, 1:56:40 PM] Abdul Basith: @⁨~SVK⁩ @⁨Shaik Awaiz⁩ @⁨~Sujay H S⁩ 
+
+Tomorrow at what time would be best for you all?
+[20/09/26, 1:57:02 PM] Shaik Awaiz: Any time will be fine
+[20/09/26, 1:57:30 PM] ~ SVK: I'll be at work tomo. 
+Can do 7-ish
+[20/09/26, 2:18:54 PM] ~ Sujay H S: Sounds okay
+[21/09/26, 6:58:06 PM] ~ Shirin: ‎Abdul Basith added ~ Shirin
+[21/09/26, 5:42:46 PM] ~ Sujay H S: Can we push to 8ish?
+[21/09/26, 5:42:55 PM] ~ SVK: Ok
+[21/09/26, 5:43:03 PM] Shaik Awaiz: yeah okay
+[21/09/26, 5:49:51 PM] ~ Sujay H S: Thanks
+[21/09/26, 6:58:08 PM] Abdul Basith:
+[21/09/26, 6:58:52 PM] Abdul Basith: I have added our fifth teammate, 
+
+Her name is Shirin Ayub.
+[21/09/26, 7:00:24 PM] ~ Shirin: Hi everyone 
+Im shirin 
+Im a fourth year medical student 
+Hope i can be of help as much as i can!
+[21/09/26, 7:57:19 PM] ~ Sujay H S: Share link for today's meeting?
+[21/09/26, 7:58:28 PM] ~ Sujay H S: Can we do teams instead of Google Meet?
+[21/09/26, 7:59:19 PM] Abdul Basith: yes that's okay
+[21/09/26, 7:59:31 PM] ~ Sujay H S: I'll create a link
+[21/09/26, 8:01:27 PM] ~ Sujay H S: https://teams.microsoft.com/meet/439912523058153?p=Z6URTzzZbZ7Mf5rlqT
+[21/09/26, 8:02:09 PM] ~ Sujay H S: Can join
+[21/09/26, 8:06:52 PM] ~ SVK: I'm having some issue with sign in
+[21/09/26, 8:07:26 PM] ~ Sujay H S: Okay. What now
+[21/09/26, 8:07:54 PM] ~ Sujay H S: You can join without signing in
+[21/09/26, 8:10:00 PM] Abdul Basith: can u guys hear me
+[21/09/26, 8:30:32 PM] ~ Sujay H S: This
+[21/09/26, 8:30:53 PM] ~ Sujay H S: This
+[23/09/26, 1:00:20 PM] ~ Sujay H S: What time today?
+[23/09/26, 6:08:16 PM] Abdul Basith: does 9 work?,
+[23/09/26, 6:08:20 PM] Abdul Basith: a lot of rains and power cuts
+[23/09/26, 6:31:36 PM] ~ Sujay H S: Sure
+[23/09/26, 7:25:45 PM] ~ SVK: Hey. Pls excuse me for today. I'll join tomorrow
+[23/09/26, 7:27:49 PM] ~ Sujay H S: I won’t be able to join tomorrow. So I think Dr Sharada can take over tomorrow for the both of us
+[23/09/26, 8:43:25 PM] ~ Sujay H S: https://teams.microsoft.com/meet/438165876755038?p=mI04Gm8zQQTo9Ij5ZH
+[23/09/26, 9:23:28 PM] ~ Sujay H S: *Pitch deck: 6 to 8 slides.* That is the guidance.
+
+The full rule:
+• Format: *PDF or PowerPoint*
+• Length: *6 to 8 slides*
+• Size: up to *25 MB*
+• It is the *only required attachment*
+
+A prototype link, a video and a supporting document are all *optional*. Do not hold up your submission waiting to make them.
+
+Six good slides beat twelve padded ones. The judges are reading a lot of these.
+
+*Round 1 closes Friday 25 September, 11:59 PM IST.* A draft that is never submitted is not judged.
+[23/09/26, 9:51:52 PM] ~ Sujay H S: linkedin.com/in/sujayhalkur
+[23/09/26, 10:30:07 PM] ~ Sujay H S: Basith
+[23/09/26, 10:30:19 PM] Abdul Basith: Yes?
+[23/09/26, 10:30:21 PM] ~ Sujay H S: Can you share the link to the Saanthvana website? I want to play around with it
+[23/09/26, 10:30:22 PM] ~ Sujay H S: Lol
+[23/09/26, 10:30:28 PM] Abdul Basith: yes please
+[23/09/26, 10:30:50 PM] Abdul Basith: https://continuity-loop-healthathon.vercel.app/home
+
+
+recheck once
+[23/09/26, 10:31:22 PM] ~ Sujay H S: Yup. Working
+[23/09/26, 10:36:23 PM] ~ Sujay H S: This is everything we are planning to have right? Am I missing something?
+- If they want goals of care discussion, then they can get their doctor to initiate it and get it documented
+- Shows the nearest hospital for emergencies, ambulance services and so on
+- Shows nearest palliative care specialist, nearest hospital to get oral morphine, access to patient care support groups 
+- Journal where they can put in their symptoms to show doctors to adjust meds later (Like pain and so on), a journal for their mood, and some other mental health shit
+- A space to store and trend their labs, and track their medications and chemo and all of that
+[23/09/26, 10:43:51 PM] ~ Shirin: Instead of putting the calender on the bottom can there be some option made where when the patient opens the main page the first few notifications (or something like that) show up saying stuff like todays medications or todays appointment? Can we add that?
+[23/09/26, 10:44:34 PM] Abdul Basith: Yes we can, shirin.
+[23/09/26, 10:45:12 PM] Abdul Basith: theres only some use cases where we can insert AI into this
+[23/09/26, 10:45:41 PM] ~ Sujay H S: Correct. So we need to highlight that as the main tool or something
+[23/09/26, 10:45:57 PM] ~ Sujay H S: Focus is AI. And should not be diluted for other features
+‎[23/09/26, 10:52:34 PM] ~ Shirin: I think the message this slide conveys could come off as wrong ‎<attached: 00003229-PHOTO-2026-09-23-22-52-34.jpg>
+[23/09/26, 10:53:05 PM] Abdul Basith: elaborate a lil.  what sould we incorporate
+[23/09/26, 10:53:49 PM] Abdul Basith: this is not the final PPT.  we are subtracting and adding a lot of things
+[23/09/26, 10:54:49 PM] ~ Shirin: I think it kind of implies the failure of medicine and not the fact that keeping the family informed well could’ve prevented the scene
+[23/09/26, 10:55:03 PM] ~ Shirin: Yes totally but it leaves a good impression if theres a slide like this
+[23/09/26, 10:55:19 PM] ~ Shirin: But i think we need to change up the scenario a little
+[23/09/26, 10:55:25 PM] ~ Shirin: Let me come up w something
+[23/09/26, 11:01:33 PM] ~ Shirin:
+‎[23/09/26, 11:01:34 PM] ~ Shirin: This is better no? Its the same as earlier scenerio but lets not mention dying here it conveys a more aggressive message ‎<attached: 00003237-PHOTO-2026-09-23-23-01-34.jpg>
+‎[23/09/26, 11:01:34 PM] ~ Shirin: ‎<attached: 00003238-PHOTO-2026-09-23-23-01-34.jpg>
+‎[23/09/26, 11:01:34 PM] ~ Shirin: ‎<attached: 00003239-PHOTO-2026-09-23-23-01-34.jpg>
+[23/09/26, 11:03:02 PM] Abdul Basith: yea.  we can use this story.  it is also colloquial and explains what we are trying to do
+[23/09/26, 11:08:24 PM] ~ Shirin: Yes
+[23/09/26, 11:08:58 PM] Abdul Basith: thanks for the input big dawg
+[23/09/26, 11:09:16 PM] ~ Shirin: Got u
+[23/09/26, 11:12:29 PM] ~ Sujay H S: Just change the initial palliative care to best supportive care
+[23/09/26, 11:13:03 PM] Abdul Basith: will do
+‎[23/09/26, 11:13:29 PM] ~ Sujay H S: Hi everyone! A cancer patient in India can carry a plastic bag full of reports from three different hospitals, while their oncologist has just two minutes to make sense of it. We're a team of three technical members building an AI tool to fix that, in the Cancer Care · NCG track on the Doctor Productivity & Knowledge Assistant use case. We don't have a doctor on the team yet, so we're looking for one to join us, ideally an oncologist or someone with oncology experience.
+team code 4Y21BB ‎<attached: 00003246-PHOTO-2026-09-23-23-13-29.jpg>
+[23/09/26, 11:13:51 PM] ~ Sujay H S: I think our team is just doing the job of everyone on that group 🤣 ‎<This message was edited>
+[23/09/26, 11:14:30 PM] Abdul Basith: hahahha
+[24/09/26, 7:41:55 AM] ~ Sujay H S:
+‎[24/09/26, 7:41:57 AM] ~ Sujay H S: ‎<attached: 00003250-PHOTO-2026-09-24-07-41-57.jpg>
+‎[24/09/26, 7:41:58 AM] ~ Sujay H S: ‎<attached: 00003251-PHOTO-2026-09-24-07-41-58.jpg>
+‎[24/09/26, 7:41:58 AM] ~ Sujay H S: ‎<attached: 00003252-PHOTO-2026-09-24-07-41-58.jpg>
+[24/09/26, 7:42:07 AM] ~ Sujay H S: We need to make sure we fit all of this
+[24/09/26, 7:42:36 AM] ~ Sujay H S: Important is measurable impact - We need to think about how we will measure the app impact
+[24/09/26, 9:48:54 AM] ~ Sujay H S: Kalyan — honest answer: *a detailed scoring rubric has not been published*, and I am not going to invent one and have you optimise against something I made up.
+
+What I can give you is better than a guess: *the form's own questions are the criteria.* Nothing is scored that you were not asked. So the entry that answers each question well is the entry that scores well.
+
+*What Round 1 actually asks you for:*
+• Which track you are submitting under
+• Who the primary user is — clinician, patient, or other
+• The use case or your own problem statement
+• *The problem* — what is broken, in the real world
+• *The solution* — what you will build
+• Your *tech stack*
+• Any *prior work* on this
+• Your *pitch deck* — the only required attachment
+• A confirmation that your solution stays *assistive*: it does not diagnose, recommend treatment, provide clinical decision support, or give autonomous clinical advice
+
+*On your specific examples:*
+• *Alignment with a problem statement* — yes, this matters. Make your chosen track and your problem description agree with each other.
+• *Effective use of AI* — there is no requirement to use AI at all. Use it if the problem needs it. A simple solution to a real problem beats AI applied for its own sake.
+• *Demo video of a prototype* — *optional.* Prototype link, video and supporting document are all optional. Only the pitch deck is required. Do not delay submitting to make a video.
+
+*The one thing I would say carries the most weight:* that out-of-scope confirmation is not a formality. A solution that diagnoses or prescribes is outside what this programme is for, whatever else it does well.
+
+If a formal rubric is published before tomorrow I will post it here immediately.
+
+*Round 1 closes tomorrow, Friday 25 September, 11:59 PM IST.*
+[24/09/26, 10:05:06 AM] ~ Sujay H S: So the goals of care discussion part 
+- It is called care document/care summary/doctors note - We need to make the wording uniform
+- On the patient landing page, we need to display in big the QR code and the latest version of the care document so it is easy to access - We are saying we need to retrieve in emergency, there should not be too many clicks and it should be distinctive
+[24/09/26, 10:38:34 AM] ~ Sujay H S: Even in the ppt, I think we need to amplify how AI is going to help in the goals of care discussion. It seems to be buried
+[24/09/26, 10:41:19 AM] ~ Sujay H S: We should also have a separate step which is shown. Once the AI generates the note, there should be another step where the doctor checks and modifies it as needed
+[24/09/26, 10:45:35 AM] ~ Sujay H S: I think the biggest problem we have is the measurable impact. We have to come up with something for that
+I think it can be after deployment. Like every cancer patient who walks into a deployed cancer centre, gets information about Saanthvana and is asked to use it.
+
+Then we can document 
+- Requests for patient initiated goals of care discussion
+- Number of doctor initiated GOCD
+- Number of Documented GOCD before and after deployment
+[24/09/26, 10:45:40 AM] ~ Sujay H S: Or something like that
+‎[24/09/26, 7:14:15 PM] Abdul Basith: Saathi_Healthathon_Final.pdf • ‎8 pages ‎<attached: 00003261-Saathi_Healthathon_Final.pdf>
+[24/09/26, 7:15:10 PM] Abdul Basith: bit clumsy as well it feels,  so any subtractions to make it less clumsy or any important points we missed lemme know
+[24/09/26, 7:17:14 PM] Abdul Basith: need to change the photo in second slide i think.
+[24/09/26, 7:17:33 PM] ~ SVK: I'll get back with thoughts in a bit
+[24/09/26, 7:19:20 PM] Abdul Basith: yes, take your time for more quality of feedback.  i think we the ppt marinate and get everyones suggestions by tomorrow 6 pm
+[24/09/26, 7:19:36 PM] ~ SVK: Ok 👌
+[24/09/26, 7:19:36 PM] Abdul Basith: and then we can have meeting at 8 or 9 and just submit
+[24/09/26, 7:22:23 PM] ~ Shirin: ‎This message was deleted.
+[24/09/26, 7:27:06 PM] Abdul Basith: @⁨~Shirin⁩ tell sup ‎<This message was edited>
+[24/09/26, 7:27:24 PM] ~ Shirin: No nvm i thought sumn was not included but it was
+[25/09/26, 12:51:12 AM] ~ Sujay H S: Comments in this
+‎[25/09/26, 12:51:15 AM] ~ Sujay H S: Saathi_Sujay.pdf • ‎8 pages ‎<attached: 00003272-Saathi_Sujay.pdf>
+[25/09/26, 12:52:18 AM] ~ Sujay H S: Slide order needs to change. It has to be 1 2 3 5 7 6 4 8
+‎[25/09/26, 12:52:55 AM] ~ Sujay H S: ‎<attached: 00003274-PHOTO-2026-09-25-00-52-55.jpg>
+[25/09/26, 12:53:01 AM] ~ Sujay H S: Photo for slide 1
+[25/09/26, 12:53:58 AM] ~ Sujay H S: We should not use too much layman language I think. There will be tech guys, but the panel will also have doctors from national cancer grid - they will have an excellent knowhow
+[25/09/26, 12:58:32 AM] Abdul Basith: lovely.  will read and change
+[25/09/26, 8:14:52 AM] ~ Sujay H S: I think we will have to rework the name. Saathi type of name in Indian medical system sounds like a government branded intrauterine device type of thing 
+
+We can discuss possibilities in the meeting today
+[25/09/26, 8:15:59 AM] ~ Sujay H S: What was your thinking behind and name?
+[25/09/26, 10:43:42 AM] ~ Shirin: MedMitra 
+CareLog
+CareFile
+CareCircle 
+A few options
+[25/09/26, 1:34:43 PM] Abdul Basith: sure.  lets come up with something
+[25/09/26, 1:36:11 PM] Abdul Basith: saathi just feels short and feels like a companionship i guess and name is easily understandable and fast to grasp like
+
+saathi app.  but people could also mistake it for a marriage matchmaking app so 😭
+[25/09/26, 1:39:08 PM] ~ Shirin: Yeah
+[25/09/26, 2:00:01 PM] ~ SVK: It also sounds like a copper t device
+[25/09/26, 5:52:28 PM] ~ Sujay H S: What time today?
+[25/09/26, 6:01:53 PM] ~ Sujay H S: Just my thought. But I think the word should be of like Hindi or something to show the Indian-ness of it 
+
+And we need to give words with some feelings. Something that make people feel safe, secure, guided. And so on…
+
+These names sound a little clinical
+[25/09/26, 6:05:37 PM] Abdul Basith: guys any more feedback apart from deciding the name.  please lmk the new name and i agree with sujay hindi shabd chahiye and ill do the changes and upload 
+
+dr sharada,  you said you would provide some pointers yesterday.  send them in.  
+
+also i dont think i can join the meeting today considering i have an impromptu interview by a news page tonight because i made the 
+
+fatdogsofdelhi.wedevit.in
+
+competition website for the best fat dog in delhi and it kinda went viral so now they want to interview us tonight so im counting on you guys to send me the changes for the ppt😭😭
+
+@⁨~Shirin⁩ @⁨~Sujay H S⁩ @⁨~SVK⁩
+[25/09/26, 6:08:25 PM] Abdul Basith: i will submit on the website just shy of 11 o clock and if the interview is done before 10  or postponed then we can have a meeting ‎<This message was edited>
+[25/09/26, 6:09:37 PM] ~ Sujay H S: Nice! Congratulations!
+[25/09/26, 6:09:51 PM] ~ Sujay H S: Okay. Please let me know. Would like to see the ppt before you submit
+[25/09/26, 6:11:37 PM] Abdul Basith: oh, but I have done yesterday’s changes that you mentioned in the comments. They were like 29 comments. So I will send the PPT right now. You can cross reference your comments, and if I forgot any, please let me know.
+‎[25/09/26, 6:12:24 PM] Abdul Basith: Saathi_Healthathon_Final.pdf • ‎8 pages ‎<attached: 00003292-Saathi_Healthathon_Final.pdf>
+[25/09/26, 6:12:37 PM] ~ SVK: O u were involved with that?
+[25/09/26, 6:14:36 PM] ~ SVK: I also voted haha
+[25/09/26, 6:14:37 PM] Abdul Basith: We will submit the empty drive link and we will upload the video by weekend 
+
+https://drive.google.com/drive/folders/1WPtw-7iEZoMObEr4pzd9-Gziyo9D3VYV?usp=drive_link
+[25/09/26, 6:14:37 PM] ~ SVK: It was fun
+[25/09/26, 6:15:08 PM] Abdul Basith: Haha, yes.  Who did you choose as the fat winner?
+[25/09/26, 6:16:16 PM] ~ Sujay H S: @⁨~SVK⁩ please check
+[25/09/26, 6:16:25 PM] ~ Sujay H S: This is after all the edits I’ve made
+[25/09/26, 6:16:31 PM] ~ Sujay H S: Name we have to change
+[25/09/26, 6:16:37 PM] ~ Sujay H S: Slide 2 picture needs to be different
+[25/09/26, 6:17:28 PM] ~ SVK: Yes 10 mins
+[25/09/26, 6:17:59 PM] Abdul Basith: yup,  sujay's changes are applied.  If @⁨~Shirin⁩ or @⁨~SVK⁩  have any final changes to pitch in. Send them in by 9:30pm and Please brainstorm the new name and the 2nd slide picture
+[25/09/26, 6:18:51 PM] ~ Shirin: The pic in second slide you can just put in the scenario in ai and you’ll get something suitable
+[25/09/26, 6:19:29 PM] Abdul Basith: macha give no
+[25/09/26, 6:19:49 PM] ~ Shirin: Arent you the tech guy bro
+‎[25/09/26, 6:22:40 PM] ~ Shirin: This is what chatgpt has given me but idk i dont like it ‎<attached: 00003307-PHOTO-2026-09-25-18-22-40.jpg>
+[25/09/26, 6:22:57 PM] ~ SVK: Didn't like it.
+[25/09/26, 6:23:08 PM] Abdul Basith: crazy picture😭
+[25/09/26, 6:23:18 PM] Abdul Basith: me neither
+[25/09/26, 6:23:20 PM] ~ Shirin: Yeah😭 need a better prompt
+[25/09/26, 6:24:42 PM] ~ Sujay H S: The ppt looks great Basith. Name and Slide 2 pictures someone please provide
+[25/09/26, 6:26:06 PM] ~ Sujay H S: Other than that, I think slides 5 to 7 kind of come up without any context.
+Like I am not understanding why those slides are there. 
+
+Maybe somewhere we can add that Saathi has the following features (Broad overview), then go on explaining each one. Just a thought. Others can weigh in.
+[25/09/26, 6:26:17 PM] ~ Sujay H S: That's all the comments from my side
+‎[25/09/26, 6:26:33 PM] ~ Shirin: 🤔🤔 ‎<attached: 00003315-PHOTO-2026-09-25-18-26-33.jpg>
+[25/09/26, 6:26:48 PM] ~ Sujay H S: Ask ChatGPT to keep only two or 3 people in the picture
+[25/09/26, 6:27:07 PM] ~ Sujay H S: The discussion should happen in OPD setting like in the previous image
+‎[25/09/26, 6:29:03 PM] ~ Shirin: How about this ‎<attached: 00003318-PHOTO-2026-09-25-18-29-03.jpg>
+[25/09/26, 6:29:21 PM] ~ Shirin: Since we’ve said in the slide that only the woman and her husband are being counselled
+[25/09/26, 6:29:32 PM] ~ SVK: Can we include the doctors face as well
+[25/09/26, 6:29:42 PM] ~ Sujay H S: This is perfect
+[25/09/26, 6:29:53 PM] ~ Sujay H S: Oh lol
+[25/09/26, 6:30:16 PM] ~ Shirin: I think this angle is good actuallt
+[25/09/26, 6:30:17 PM] ~ Sujay H S: I thought this was fine because ours is a patient facing app. So the focus is on them types
+[25/09/26, 6:30:29 PM] ~ SVK: Ok
+[25/09/26, 6:30:33 PM] ~ Shirin: But my gpt prompts are over for today any of you guys can try
+[25/09/26, 6:31:12 PM] ~ Sujay H S: I am still okay with the previous name - Saanthvana. It ticked all the boxes for me
+[25/09/26, 6:31:23 PM] ~ SVK: Same here
+[25/09/26, 6:31:43 PM] ~ Shirin: Why was it changed in the first place?
+[25/09/26, 6:31:56 PM] ~ Sujay H S: @⁨Abdul Basith⁩
+[25/09/26, 6:32:01 PM] ~ Shirin: Oh
+[25/09/26, 6:43:48 PM] ~ SVK: I agree with slides 5&7
+‎[25/09/26, 6:44:55 PM] ~ SVK: Saathi_Healthathon_Final.pptx ‎<attached: 00003333-Saathi_Healthathon_Final.pptx>
+[25/09/26, 6:44:57 PM] ~ SVK: Please take a look
+[25/09/26, 6:48:07 PM] ~ Sujay H S: I had kept the order that way because I thought after GOCD, access to palliative care was the next most important feature. Then probably the “Saathi Also” can come. Then maybe the AI does this and that just reinforce AI
+[25/09/26, 6:48:16 PM] ~ Sujay H S: Whatever everyone decides
+[25/09/26, 6:48:26 PM] ~ SVK: i have moved 5 and 7 only sujay
+[25/09/26, 6:56:37 PM] ~ Sujay H S: Okays
+‎[25/09/26, 7:02:11 PM] ~ Sujay H S: *IMPORTANT UPDATE | Health-a-thon 2026* 
+
+We’ve heard your requests - *the Idea Submission Deadline has been extended*!
+
+You now have until *3 October 2026* to submit your Health-a-thon 2026 idea.
+
+If you haven’t submitted yet, use this time to refine your problem statement, strengthen your idea, and complete your submission.
+
+Remember, shortlisted ideas will move forward to the Build Sprint.
+
+*New Deadline: 3 October 2026* 
+
+Submit your idea:
+ *https://healthathon.reskilll.com/* ‎<attached: 00003339-PHOTO-2026-09-25-19-02-11.jpg>
+[25/09/26, 7:02:34 PM] ~ Shirin: Great
+[25/09/26, 7:02:42 PM] Abdul Basith: Same ol’ trope.  I knew it
+[25/09/26, 7:02:50 PM] ~ Sujay H S: I still think we should preliminary submit today also. But continue working on it
+[25/09/26, 9:53:25 PM] ~ Sujay H S: Please do this @⁨Abdul Basith⁩
+[25/09/26, 10:16:35 PM] Abdul Basith: oh, then we cant refine the PPT.  is everyone okay with the final changes? 
+
+we can utilize the postponement deadline.  
+
+im okay either ways if you are all satisfied with the PPT
+[25/09/26, 10:17:15 PM] Abdul Basith: will put this and change name to saanthvana?
+[25/09/26, 10:17:41 PM] ~ SVK: Pls do check my comments as well
+[25/09/26, 10:17:41 PM] Abdul Basith: yea, i got the 200$ plan.  i gotchu
+[25/09/26, 10:17:48 PM] Abdul Basith: okay will do
+[25/09/26, 10:18:08 PM] ~ Sujay H S: We can refine even after uploading
+[25/09/26, 10:18:23 PM] ~ Sujay H S: Fancy man
+[25/09/26, 10:18:40 PM] Abdul Basith: i think submissions are final, and you cant change right?
+[25/09/26, 10:18:46 PM] ~ Sujay H S: No no
+[25/09/26, 10:19:00 PM] Abdul Basith: oh okay, then i will submit it
+[25/09/26, 10:22:03 PM] ~ Sujay H S: Just check once 🤣🤣
+[26/09/26, 11:54:28 AM] ~ Sujay H S: Guys. Now that we have some time. I think we should look at the different features. For all the location based features, let us pick one state so we can show how this stuff works.
+[26/09/26, 11:55:01 AM] ~ SVK: Let's pick karnataka
+[26/09/26, 11:55:06 AM] ~ SVK: ?
+[26/09/26, 11:55:16 AM] ~ SVK: U will know the places around
+[26/09/26, 11:55:35 AM] ~ Sujay H S: https://palliumindia.org/clinics/karnataka
+
+This is the Karnataka list from Pallium. They have clinics - Whether OP/IP/Home care
+They also mention which institutions have morphine.
+
+We can load this up into our features
+[26/09/26, 11:55:40 AM] ~ Sujay H S: Cool
+[26/09/26, 9:48:01 PM] ~ Sujay H S: So the more I go into it, the more I’m realising that the online lists for oral morphine are incomplete. We will have to build into the app an ability for patients to help patients. 
+
+If a patient gets oral morphine at a hospital which is not there in the list, he should be able to tag that hospital on our app. Upload the bill for the morphine maybe which can be used by AI to verify the claim is true. And that centre can be added to our app in a different colour. And we can keep like a live tracker sort of thing. If another patient goes there and he also gets it, then confidence in that institution increases and so on 
+
+I don’t know. Just an idea
+[26/09/26, 9:51:35 PM] ~ Sujay H S: Or we will have to find some sort of doctor directory like the Association of Physicians in India or Oncology Societies and put up a Google form during the sprint period where the doctors can tag their respective hospitals if they have access to oral morphine. We can then use that list to populate our app initially. Add in the patient interface later so it can self sustain
+[30/09/26, 12:03:55 PM] ~ Sujay H S: Have we made changes and submitted?
+[30/09/26, 12:04:37 PM] Abdul Basith: We have yet to submit.  Will do today after sending it in the group
+[30/09/26, 12:33:44 PM] ~ Sujay H S: Okay
+[02/10/26, 2:52:36 PM] ~ Sujay H S: Have we uploaded?
+[02/10/26, 3:15:19 PM] Abdul Basith: Should we add this feature in the PPT as well
+‎[02/10/26, 3:25:02 PM] Abdul Basith: Saanthvana_Healthathon_2026-09-27-Sharada-reviewed.pptx ‎<attached: 00003368-Saanthvana_Healthathon_2026-09-27-Sharada-reviewed.pptx>
+[02/10/26, 3:28:05 PM] ~ Sujay H S: @⁨~SVK⁩
+[02/10/26, 3:28:08 PM] ~ Sujay H S: Please see
+[02/10/26, 3:30:13 PM] ~ SVK: I think this looks good to go
+[02/10/26, 3:45:38 PM] ~ Sujay H S: Just change cancer care records in the first slide to goals of care records
+[02/10/26, 3:45:40 PM] ~ Sujay H S: Rest is fine
+[02/10/26, 3:45:57 PM] ~ Sujay H S: @⁨~SVK⁩ please give your photo so we can put it
+[02/10/26, 3:46:54 PM] Abdul Basith: Added 33 pallium karnataka centres on the platform
+[02/10/26, 3:48:42 PM] ~ Sujay H S: If we get through, let’s sit with each feature one one day and sort it out in detail
+[02/10/26, 3:50:44 PM] ~ Sujay H S: If we don’t get through, we’ll still do it but if we are able to find an investor Lolol
+[02/10/26, 3:54:45 PM] Abdul Basith: yes, let's give our best
+‎[02/10/26, 6:07:09 PM] ~ SVK: ‎<attached: 00003379-PHOTO-2026-10-02-18-07-09.jpg>
+[02/10/26, 6:07:12 PM] ~ SVK: Sorry for the delay
+[02/10/26, 6:08:05 PM] ~ Sujay H S: Looking like proper clinical lead 😛
+[02/10/26, 6:19:58 PM] ~ SVK: Lmao
+[03/10/26, 11:50:52 AM] ~ Sujay H S: If you haven’t submitted, then please change the line in the first slide to include the term “Palliative Care Companion”
+[03/10/26, 11:51:05 AM] ~ Sujay H S: It should be very evident that we are targeting palliative care
+[03/10/26, 11:51:16 AM] Abdul Basith: We have submitted but we can still change
+[03/10/26, 11:59:06 AM] ~ Sujay H S: Okay
+[05/10/26, 7:51:20 PM] ~ SVK: Hi
+[05/10/26, 7:51:25 PM] ~ SVK: when do we hear back on this
+[05/10/26, 7:51:46 PM] ~ Shirin: I think they said 8 oct
+[05/10/26, 7:52:00 PM] ~ SVK: oh ok
+[05/10/26, 7:52:01 PM] ~ SVK: nice
+[05/10/26, 7:52:58 PM] ~ SVK: fingers crossed
+[05/10/26, 7:53:06 PM] ~ Shirin: Yess
+[08/10/26, 9:53:50 PM] ~ SVK: Hey
+[08/10/26, 9:53:52 PM] ~ SVK: Any news?
+[08/10/26, 10:09:15 PM] ~ Sujay H S: Postponed to tomorrow
+[08/10/26, 10:09:36 PM] ~ SVK: Due to intense competition and amazing entries 😅😂
+[08/10/26, 10:10:07 PM] Abdul Basith: Well true,  its actually way too many people for a hackathon
+[08/10/26, 10:10:23 PM] ~ Sujay H S: How many teams do you suppose there are?
+[08/10/26, 10:11:30 PM] Abdul Basith: more than 140
+[08/10/26, 10:11:39 PM] Abdul Basith: probably 170
+[08/10/26, 10:13:16 PM] ~ Sujay H S: So 1/4sh don’t get through
+‎[08/10/26, 10:13:44 PM] Abdul Basith: well as wayne gretzky said.  you miss 100% of the shots you dont take.   and we took a shot. ‎<attached: 00003403-PHOTO-2026-10-08-22-13-44.jpg>
+[08/10/26, 10:13:48 PM] Abdul Basith: probably yeah
+[08/10/26, 10:13:57 PM] Abdul Basith: they said theyll select only 50
+[08/10/26, 10:13:57 PM] ~ Sujay H S: Honestly hope we don’t fall in this
+[08/10/26, 10:14:18 PM] ~ Sujay H S: What
+[08/10/26, 10:14:19 PM] ~ Sujay H S: They’ll select 40 per track for the build sprint right?
+[08/10/26, 10:14:35 PM] ~ Sujay H S: I love the office 🤣
+[08/10/26, 10:14:57 PM] Abdul Basith: i will enquire
+[08/10/26, 10:15:33 PM] Abdul Basith: the only competition will be products which are already were there in the industry since long before this hackathon
+[08/10/26, 10:15:48 PM] ~ Sujay H S: Right
+[09/10/26, 6:34:56 PM] ~ SVK: When are they going to announce noe
+[09/10/26, 6:34:58 PM] ~ SVK: Uff
+[09/10/26, 6:35:05 PM] ~ SVK: Too much anticipation
+[09/10/26, 6:35:19 PM] ~ Sujay H S: I’ve given up 🤣
+‎[09/10/26, 6:45:42 PM] Abdul Basith: Congratulations! You’re in the Top 120  Health-a-thon 2026.pdf • ‎1 page ‎<attached: 00003417-Congratulations! You’re in the Top 120  Health-a-thon 2026.pdf>
+[09/10/26, 6:45:56 PM] Abdul Basith: We made it
+[09/10/26, 6:46:31 PM] ~ SVK: Omg omg omg omg
+[09/10/26, 6:46:46 PM] Abdul Basith: They selected 25% and eliminated 75% of the teams
+[09/10/26, 6:47:03 PM] ~ SVK: @⁨~Sujay H S⁩ be happy now
+[09/10/26, 6:47:09 PM] Abdul Basith: It was 450 teams
+[09/10/26, 6:54:29 PM] ~ SVK: Such desi reactions by all of you 😂
+[09/10/26, 6:54:56 PM] ~ SVK: 450 teams etc etc. I'm so old I'm just happy to be past this stage
+[09/10/26, 6:54:57 PM] ~ SVK: 🤣
+[09/10/26, 6:57:15 PM] ~ Shirin: Woah guys
+[09/10/26, 6:57:20 PM] ~ Shirin: Congratulations 🥳
+[09/10/26, 7:09:59 PM] ~ Sujay H S: Good work guys! 
+Need to really think about how to go about this now
+
+I’m in the US between 18 to 27. That’s a significant portion of the time. We will have to work around that
+[09/10/26, 7:10:31 PM] ~ Shirin: We have to put on a presentation right?
+[09/10/26, 7:11:35 PM] ~ Sujay H S: We have to build for Bombay. Presentation plus live demo
+
+We will have to optimize the GOCD AI tool first then have 20 demo conversations and see how that does
+
+Tweak all the other stuff also
+[09/10/26, 7:11:58 PM] ~ Shirin: Okay
+[09/10/26, 7:12:34 PM] Abdul Basith: fun stuff, always wanted to make a medical product
+[09/10/26, 7:15:34 PM] ~ SVK: When is the next deadline
+[09/10/26, 7:15:44 PM] Abdul Basith: we have to rebuild it from bottom up.  
+
+unlearn everything we know and put ourself in shoes of actual people that will eventually use our product
+
+mentor sessions will also help.  theyll probably guide us with how to go about this and what not to do and stuff advice
+‎[09/10/26, 7:16:29 PM] Abdul Basith: 6th nov ‎<attached: 00003435-PHOTO-2026-10-09-19-16-29.jpg>
+[09/10/26, 7:17:30 PM] Abdul Basith: i think they will strip off some more teams after build sprint.  they wont have ALL 120 at iit bombay
+[09/10/26, 7:17:53 PM] ~ Shirin: Yeah true
+[09/10/26, 7:19:22 PM] ~ Sujay H S: Wah
+[09/10/26, 7:19:41 PM] ~ Sujay H S: IIT Bombay has only top 10 teams
+[09/10/26, 7:20:23 PM] ~ Sujay H S: It’s going to be hard
+[09/10/26, 7:20:59 PM] Abdul Basith: wait howd you know this
+[09/10/26, 7:21:02 PM] ~ SVK: So we get a mentor who will help us
+‎[09/10/26, 7:22:06 PM] ~ Sujay H S: ‎<attached: 00003443-PHOTO-2026-10-09-19-22-06.jpg>
+[09/10/26, 7:22:14 PM] ~ Sujay H S: Yes
+[09/10/26, 7:23:47 PM] ~ Sujay H S: We really have to make a product that is ready to be deployed. Otherwise we aren’t going to make it. Even then it’ll be hard
+[09/10/26, 7:24:34 PM] Abdul Basith: i just talked to ojaswi of the healthathon team.  its gonna be top 30 teams
+[09/10/26, 7:24:44 PM] ~ Sujay H S: 10 per track
+[09/10/26, 7:24:48 PM] ~ Sujay H S: I guess
+[09/10/26, 7:25:09 PM] ~ Sujay H S: But we don’t know the distribution of tracks in the 120 that have been selected
+[09/10/26, 7:25:15 PM] Abdul Basith: no, we should deploy it on play store the app atleast ‎<This message was edited>
+[09/10/26, 7:25:19 PM] Abdul Basith: yeah makes sense
+[09/10/26, 7:26:18 PM] ~ Sujay H S: Sounds good. I can talk to a hospital or some palliative care physician or someone to see if it can be deployed on the doctors side
+[09/10/26, 7:27:09 PM] Abdul Basith: me and @⁨Shaik Awaiz⁩ will start building the android app since its a android dense country.   
+
+and put it on play store tomorrow from my startup account.  it will take 14 days to get approved and another 7 days to go public and available for everyone to download on Play Store
+[09/10/26, 7:27:39 PM] ~ Sujay H S: Okay. We can keep working on it till it goes public right?
+[09/10/26, 7:27:43 PM] Abdul Basith: we can release updates of the app as we build it.  so thats no worries
+[09/10/26, 7:27:49 PM] ~ Sujay H S: Play
+[09/10/26, 7:27:51 PM] ~ Sujay H S: Okay
+[09/10/26, 7:31:28 PM] ~ Sujay H S: @⁨Abdul Basith⁩ @⁨Shaik Awaiz⁩ 
+
+Get us to IIT Bombay. I’ll get T-shirts printed for us 🤣
+[09/10/26, 7:37:25 PM] Abdul Basith: Haha, we will give it our all.  
+
+Also still wanna go with the name? I feel like we have to rebrand it to a more Hindi name or like use like a shorter Hindi/English or mix of Hindi, English name, so please throw in the suggestions by the end of the day. I’m drafting the Play Store release today
+[09/10/26, 7:37:52 PM] ~ Sujay H S: Are we allowed to change the name now?
+[09/10/26, 7:38:21 PM] Abdul Basith: Yeah. Name should be just fine
+[09/10/26, 7:38:25 PM] Abdul Basith: We can change it
+[09/10/26, 7:39:29 PM] ~ Sujay H S: Okay
+[09/10/26, 7:40:04 PM] ~ Sujay H S: I’m bad at this. I’m okay with the current name. I leave it up to the rest of you all. I’ll just know a name I don’t want when you all throw suggestions. That’s the best I can do
+‎[09/10/26, 7:40:11 PM] ~ SVK: ‎<attached: 00003465-STICKER-2026-10-09-19-40-11.webp>
+[09/10/26, 7:43:24 PM] Abdul Basith: i wanted to do Saathi but feels too marriage bureau-y
+[09/10/26, 7:44:49 PM] ~ SVK: राही
+[09/10/26, 7:44:59 PM] ~ SVK: Aka traveller
+[09/10/26, 7:53:22 PM] Abdul Basith: @⁨Shaik Awaiz⁩ @⁨~Shirin⁩ any other name suggestions ?
+[09/10/26, 8:00:19 PM] ~ Shirin: Will ponder about it
+[09/10/26, 10:08:52 PM] ~ Sujay H S: https://www.instagram.com/p/DeR37ThFEx8/?utm_source=ig_web_copy_link&mdxt=MzRlODBiNWFlZA==&srtk=MzRlODBiNWFlZA==
+[09/10/26, 10:09:01 PM] ~ Sujay H S: 50 teams selected from each track
+[09/10/26, 10:09:32 PM] ~ Sujay H S: TANUH is also participating. Crazy
+[09/10/26, 10:11:32 PM] ~ SVK: Who/what is tanuh
+[09/10/26, 10:13:39 PM] ~ Sujay H S: TANUH is a company incubated at IISc. They are using AI for universal healthcare. Developing stuff in noncommunicable diseases - Mental health, Cancer, Kidney, Eye, Diabetes and so on
+
+Stuff like using smart phone photos to diganose oral cancer and what not
+[09/10/26, 10:13:48 PM] ~ SVK: Acha ok
+[09/10/26, 10:14:32 PM] ~ Sujay H S: They are very rich
+[09/10/26, 10:14:38 PM] ~ Sujay H S: Unlimited resources
+[09/10/26, 10:14:42 PM] ~ SVK: Ok ask them for some money then
+[09/10/26, 10:14:51 PM] ~ Sujay H S: Lolol. I wish it were that easy
+[09/10/26, 10:14:54 PM] Abdul Basith: crazy stuff
+[10/10/26, 6:30:44 AM] ~ Shirin: Aasra (shelter) 
+SehatNama 
+SehatSaathi 
+SehatPatra 
+Parwah
+Sahara
+[10/10/26, 8:08:17 AM] ~ SVK: I likes aasra
+[10/10/26, 8:40:35 AM] ~ SVK: But i guess sehatnama will make more sense to the essence of the app
+[10/10/26, 1:11:55 PM] Abdul Basith: sahara feels good asw
+[10/10/26, 1:12:02 PM] Abdul Basith: ApneSang?
+[10/10/26, 1:14:55 PM] ~ Sujay H S: I'm okay with Aasara or Sahara
+[10/10/26, 1:15:39 PM] ~ Sujay H S: I do not like anything which suggests a generic care app. Cancer care or whatever. This is specialized to palliative care and it should state that. Otherwise many other teams will be doing the same thing
+[10/10/26, 2:50:38 PM] Abdul Basith: Sahara - A Palliative Care App
+[10/10/26, 2:50:49 PM] Abdul Basith: good title on play store?
+[10/10/26, 2:51:06 PM] Abdul Basith: or Sahara - Cancer Companion App
+[10/10/26, 3:18:05 PM] Shaik Awaiz: This is better
+[10/10/26, 3:32:50 PM] ~ Sujay H S: This is better than
+[10/10/26, 3:33:05 PM] ~ Sujay H S: Palliative care companion rather than app?
+[10/10/26, 3:34:31 PM] ~ Shirin: Yes sounds good
+‎[10/10/26, 3:42:16 PM] Shaik Awaiz: ‎<attached: 00003496-PHOTO-2026-10-10-15-42-16.jpg>
+[10/10/26, 3:42:26 PM] Shaik Awaiz: this is gonna be the logo of app
+[10/10/26, 3:42:32 PM] Shaik Awaiz: what do you guys says
+[10/10/26, 3:42:36 PM] Abdul Basith: looks good
+[10/10/26, 3:43:08 PM] ~ Shirin: Looks kinda like a google app dont you think?
+[10/10/26, 3:43:30 PM] ~ Shirin: Its okay but i think there can be a better one
+[10/10/26, 3:43:44 PM] ~ SVK: I think this can be better
+[10/10/26, 3:43:55 PM] ~ SVK: I'm sorry for being blunt
+[10/10/26, 3:44:06 PM] ~ SVK: But it looks generic and too many colors
+‎[10/10/26, 3:44:22 PM] Abdul Basith: ‎<attached: 00003505-PHOTO-2026-10-10-15-44-22.jpg>
+[10/10/26, 3:44:37 PM] ~ SVK: This already exists.?
+[10/10/26, 3:45:15 PM] Abdul Basith: almost all healthcare apps have heart and two icons holding hands🤣
+[10/10/26, 3:45:54 PM] ~ SVK: It's annoying haha
+[10/10/26, 3:53:42 PM] ~ Sujay H S: So palliative care is usually symbolized with colours of the sun like orange and golden yellow. They use flowers like Marigold and Sunflower for representation
+[10/10/26, 3:54:21 PM] ~ Sujay H S: Orange heart is the official thing I think
+‎[10/10/26, 3:58:53 PM] ~ Sujay H S: ‎<attached: 00003511-PHOTO-2026-10-10-15-58-53.jpg>
+[10/10/26, 3:58:58 PM] ~ Sujay H S: I know this is too simple
+[10/10/26, 3:59:06 PM] ~ Sujay H S: But it’s a sunflower in cupped hands lol
+[10/10/26, 3:59:11 PM] ~ Sujay H S: Minimalistic style
+[10/10/26, 4:00:09 PM] ~ Sujay H S: It also looks like a lamp 🪔 so whatever lol
+[10/10/26, 4:03:43 PM] ~ Sujay H S: @⁨~SVK⁩ @⁨~Shirin⁩ 
+
+I think till these guys do that, we need to come up with a final format for the GOCD documentation and the structure of conversation
+
+Plus I think let’s just put out the doctors survey for availability of oral morphine and palliative care at their respective centres so we have a better initial database to populate the app with 
+
+What do you guys say?
+[10/10/26, 4:04:29 PM] ~ SVK: Ok
+[10/10/26, 4:04:59 PM] ~ SVK: Can u pls share the last one that we used. I mean the last updated version
+[10/10/26, 4:05:15 PM] ~ Sujay H S: Yes. I’ll share
+[10/10/26, 4:05:37 PM] ~ SVK: Thank you
+[10/10/26, 4:06:50 PM] ~ Sujay H S: @⁨Abdul Basith⁩ @⁨Shaik Awaiz⁩ 
+
+Any thoughts on how we should get the survey data? Like what will help you pull data later easily?
+
+If they just give name of the hospital? Or city or PIN code?
+
+How much detail do you actually need? 
+
+Because I don’t think Google forms has something to tag a location on maps yet
+[10/10/26, 4:07:55 PM] Abdul Basith: i think we will make a form in the website itself,  we can pull the location from there or ask for google maps link
+[10/10/26, 4:08:15 PM] Abdul Basith: but do you think these surveyors will go through the hassle of properly filling the form?
+[10/10/26, 4:08:37 PM] Abdul Basith: if yeah.  then we will make the form in our sahara website and you can just send it to them
+[10/10/26, 4:09:42 PM] ~ Sujay H S: I think the easiest way to do it would be that the form takes less than a minute or so to fill
+
+Just four questions or so
+Which hospital?
+Palliative care yes or no 
+If yes, outpatient, inpatient, home based
+Oral morphine available or no 
+
+Do we need any more details than this?
+[10/10/26, 4:09:58 PM] ~ Sujay H S: I know that those who fill the form will fill it properly. Just the numbers may be low
+[10/10/26, 4:10:34 PM] Abdul Basith: is there any sources we can scrape the data from? apart from survey
+[10/10/26, 4:11:46 PM] ~ SVK: Where will this survey be run? This is for pilot data correct?
+[10/10/26, 4:14:44 PM] ~ Sujay H S: I thought we’ll share link with oncology groups and palliative care groups so they can enter 
+
+This is to collect better data for availability of oral morphine and palliative care because most online databases are outdated and biased against corporate hospitals
+[10/10/26, 4:15:02 PM] ~ Sujay H S: Pallium India has morphine data and its statewise
+[10/10/26, 4:15:26 PM] Abdul Basith: We can scrape that and use that as well
+[10/10/26, 4:15:44 PM] ~ Sujay H S: We can colour it differently. Pallium official database in blue or something. Our study in green. We can also pick up and show how many extra we picked up for the purposes of this app by the survey
+[10/10/26, 4:15:51 PM] ~ Sujay H S: Definitely
+[10/10/26, 4:15:52 PM] ~ SVK: Ok so we share with our friends and networks
+[10/10/26, 4:15:57 PM] ~ Sujay H S: Yes
+[10/10/26, 4:16:37 PM] ~ Sujay H S: Our work will be less. But if this works out, impact can be high I feel
+[10/10/26, 4:22:55 PM] ~ SVK: Do we need burden of cases?
+[10/10/26, 4:23:57 PM] ~ Sujay H S: Not sure if Oncologists will have that data? But we can try
+[10/10/26, 4:29:55 PM] ~ SVK: No if we don't need it for now then we can let it be i suppose
+‎[10/10/26, 4:37:35 PM] ~ Sujay H S: Sahara Survey.docx ‎<attached: 00003540-Sahara Survey.docx>
+[10/10/26, 4:38:01 PM] ~ Sujay H S: Can everyone check this? I do not think more information than this is needed. I am open to even cutting down on some of the information
+[10/10/26, 4:40:20 PM] ~ Sujay H S: Instead of pallium and our survey in different colours, we can have colours based on level of confidence. If only from one source, then confidence is low. But if both together, then confidence is high. Then we can have a tool where once patients visit a centre, they should be able to tell for each centre if morphine was available that day or not + add hospitals (may be risky -- and we may have to verify hospitals based on some list) that are not on the list already. With each vote, confidence in availability of morphine increases
+[10/10/26, 4:40:25 PM] ~ Sujay H S: This was my initial idea
+[10/10/26, 4:40:27 PM] ~ Sujay H S: Lol
+‎[10/10/26, 4:44:16 PM] ~ Sujay H S: ‎<attached: 00003545-PHOTO-2026-10-10-16-44-16.jpg>
+[10/10/26, 4:45:01 PM] ~ Sujay H S: I think everyone on this team should know the difference between advance care planning (Which is what we are doing) vs advance medical directives (Legal document). We have to be clear on this to avoid legal issues
+[10/10/26, 4:52:12 PM] ~ Sujay H S: This seems to have disappeared from my phone. Anyone else have access to this?
+‎[10/10/26, 4:52:37 PM] ~ Sujay H S: Healthathon form.docx ‎<attached: 00003548-Healthathon form.docx>
+‎[10/10/26, 4:53:00 PM] ~ Sujay H S: Goals of Care Conversation Template-1.pdf • ‎4 pages ‎<attached: 00003549-Goals of Care Conversation Template-1.pdf>
+‎[10/10/26, 4:53:01 PM] ~ Sujay H S: Vidhi_EOLC_Sample-Advance-Medical-Directive.pdf • ‎8 pages ‎<attached: 00003550-Vidhi_EOLC_Sample-Advance-Medical-Directive.pdf>
+[10/10/26, 4:53:05 PM] ~ Sujay H S: I think this was it
+[10/10/26, 4:53:29 PM] ~ Sujay H S: This was drafted by Vidhi centre for legal policy - It's a good model to follow
+[10/10/26, 7:37:40 PM] Abdul Basith: Sahara: Palliative Care
+[10/10/26, 7:37:53 PM] Abdul Basith: is the app name.  only 30 characters allowed by play store
+[10/10/26, 7:39:29 PM] Abdul Basith: or Sahara: Palliative Companion ‎<This message was edited>
+[10/10/26, 7:40:11 PM] ~ Shirin: This better
+[10/10/26, 7:52:57 PM] Abdul Basith: give emails of android phones so i can add you guys as testers.  if you have ios then give mails of someone you know who has an android
+[10/10/26, 7:54:54 PM] ~ SVK: sharada.vinod@gmail.com
+[10/10/26, 7:59:10 PM] ~ Sujay H S: I have iOS
+[10/10/26, 8:01:26 PM] ~ Shirin: shirinayub07@gmail.com
+[11/10/26, 9:04:36 AM] ~ Sujay H S: Kidwai’s home-based palliative care reaches over 3,000 patients and caregivers
+
+Read full article: https://www.thehindu.com/news/national/karnataka/kidwais-home-based-palliative-care-reaches-over-3000-patients-and-caregivers/article71568102.ece
+
+For the best experience read this on The Hindu App. https://bit.ly/THNewsApp
+[11/10/26, 9:05:06 AM] ~ Sujay H S: This is the news. But Pallium India directory says Kidwai has only OPD and IP. No home care
+[11/10/26, 9:05:24 AM] ~ Sujay H S: This is why we need the survey
+[12/10/26, 9:07:26 PM] Abdul Basith: They gave a 200$ chatgpt plan to the tech lead.  This is apparently being sponsored by OpenAI.
+[12/10/26, 9:08:08 PM] Abdul Basith: More requirement ellicitation is required 
+
+Playstore rejected our App as it comes under Medical
+
+We are going through some other verification processes.
+[12/10/26, 9:09:58 PM] ~ Sujay H S: What is requirement ellicitation?
+[12/10/26, 9:47:51 PM] Abdul Basith: just gathering software feature requirements
+[12/10/26, 9:48:42 PM] ~ Sujay H S: Ah okay
+‎[13/10/26, 12:08:49 PM] Abdul Basith: Health-a-thon 2026  Phase 2- Important Updates and Next Steps.pdf • ‎1 page ‎<attached: 00003569-Health-a-thon 2026  Phase 2- Important Updates and Next Steps.pdf>
+[13/10/26, 8:00:08 PM] ~ Sujay H S: Thanks for sharing
+‎[15/10/26, 3:22:30 PM] Abdul Basith: Health-a-thon 2026  Build Sprint Resources from Open Healthcare Network.pdf • ‎2 pages ‎<attached: 00003571-Health-a-thon 2026  Build Sprint Resources from Open Healthcare Network.pdf>
+[15/10/26, 4:01:16 PM] ~ Sujay H S: They should have ideally told us all this before now. Cause some ideas may depend on this. For example, our idea could have been integrated but we’ve built as a standalone thing
+[16/10/26, 4:25:29 PM] Abdul Basith: ‎Abdul Basith changed the group name to “Internal Zeros and Ones”
+[16/10/26, 4:19:10 PM] Abdul Basith: they have a palliative thing as well
+[16/10/26, 4:19:32 PM] ~ Sujay H S: Where is this
+[16/10/26, 4:24:28 PM] Abdul Basith: [private invitation or meeting link removed from shared copy]
+[16/10/26, 4:24:32 PM] Abdul Basith: guys join the mentor group
+[16/10/26, 4:25:07 PM] ~ Sujay H S: Need to change the name of this group
+[16/10/26, 4:25:11 PM] ~ Sujay H S: It is clashing
+[19/10/26, 7:48:16 PM] Abdul Basith: https://sahara.wedevit.in/feedback?form=hospital
+
+Feedback form, we have a meeting tomorrow with the mentor
+[19/10/26, 7:55:06 PM] ~ SVK: What are we doing at this point. I'm getting a bit confused with all the activity. What is expected from us tomo?
+[19/10/26, 7:56:30 PM] Abdul Basith: Nothing really,  i think we just show up and explain them our vision and what we are trying to do and maybe they will help us
+[19/10/26, 7:56:47 PM] ~ SVK: Ohk
+[19/10/26, 8:05:42 PM] ~ Sujay H S: I will not be able to attend
+[19/10/26, 8:14:03 PM] Abdul Basith: https://sahara.wedevit.in/hospital-survery
+[19/10/26, 8:14:11 PM] Abdul Basith: changed the URL
+[19/10/26, 8:16:13 PM] Abdul Basith: If you could explain what problem we are trying to solve just to get the mentor on-board then i will explain the technical part and what we have done and how we put the app on play store etc etc
+[19/10/26, 8:16:24 PM] ~ SVK: Sure that works
+[20/10/26, 2:44:50 PM] Abdul Basith: the meeting is at 3 PM.  is everyone joining except sujay?
+[20/10/26, 2:58:42 PM] Shaik Awaiz: [private invitation or meeting link removed from shared copy]
+[20/10/26, 3:29:51 PM] Abdul Basith: He’s a tech person.  I expected a medical person but anyways😭
+[20/10/26, 3:30:26 PM] ~ SVK: What i understand is 
+1. We use dummy data
+2. Have to fine tune the algorithm for gocd
+3. Kpi to be achieved (stress reduction, money saved by families, time saved in hospital)
+[20/10/26, 3:30:34 PM] ~ SVK: This is what we focus on ?
+[20/10/26, 3:30:54 PM] Abdul Basith: yep pretty much.  will share minutes of meeting in a bit
+[20/10/26, 3:34:59 PM] Shaik Awaiz: .
+‎[21/10/26, 7:10:03 PM] Shaik Awaiz: Health-a-thon 2026 Submission Template (1).pptx ‎<attached: 00003596-Health-a-thon 2026 Submission Template (1).pptx>
+[21/10/26, 7:12:15 PM] ~ Sujay H S: My schedule open tomorrow. Can we have a meeting and decide game plan. Submission is on 7th
+[21/10/26, 7:55:07 PM] Abdul Basith: Yes.  I am down
+[21/10/26, 8:09:59 PM] ~ Sujay H S: Please let me know a time. I’m in Nashville. That would be the timezone to work with
+[21/10/26, 8:43:03 PM] ~ SVK: I am at the conference. I can join for a meeting on the 24th. In case you'll meet tomo, let me know what needs to be done
+[22/10/26, 4:05:54 PM] ~ Sujay H S: Hi guys
+[22/10/26, 4:05:58 PM] ~ Sujay H S: What time today?
+[22/10/26, 4:06:08 PM] ~ Sujay H S: Or even early tomorrow morning for you guys can work
+[22/10/26, 4:06:12 PM] ~ Sujay H S: This works better
+[22/10/26, 9:21:01 PM] Abdul Basith: 11:30 PM Nashville?
+[22/10/26, 9:21:20 PM] Abdul Basith: so thats 9:00 AM IST for us
+[22/10/26, 9:21:46 PM] ~ Sujay H S: Sounds good
+[23/10/26, 9:57:02 AM] ~ Sujay H S: We do just WhatsApp call? That’s okay?
+[23/10/26, 9:57:59 AM] Abdul Basith: Thats fine.  Yes
+[23/10/26, 9:58:18 AM] Shaik Awaiz: Yeah sure
+[23/10/26, 9:58:46 AM] ~ Sujay H S: Yeah. You can call whenever
+[23/10/26, 9:58:55 AM] ~ Sujay H S: I’m free

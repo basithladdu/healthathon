@@ -1,0 +1,283 @@
+{
+  "packageDate": "2026-10-23",
+  "authorization": "User requested chat plus DOCX/PDF/PPT in the private GitHub repository and selected cleaned copies after privacy review.",
+  "repositoryVisibilityAtPreparation": "private",
+  "source": "Exact nested continued WhatsApp export; immutable originals preserved in ignored local private-context archive.",
+  "privacy": "Not fully anonymized. Ordinary participant/project names, professional metadata and publicly supplied contact information may remain; private invitation/meeting links removed as recorded. No standalone media exports included.",
+  "counts": {
+    "sourceDocumentFiles": 21,
+    "docx": 4,
+    "pdf": 11,
+    "pptx": 6,
+    "cleanedDocuments": 2,
+    "sourceIdenticalDocuments": 19,
+    "chatCopies": 2,
+    "standaloneImages": 0
+  },
+  "chronology": {
+    "firstSourceDate": "2026-08-25",
+    "lastSourceDate": "2026-10-23",
+    "incomingRecords": 619,
+    "priorArchiveRecords": 619,
+    "uniqueMatchedPairs": 580,
+    "historicalAmbiguousIncomingRetained": 6,
+    "newContinuationRecords": 33,
+    "combinedArchiveRepresentations": 658,
+    "caveat": "Representations are not necessarily unique real-world messages. Original multiline text and provenance retained apart from visible link-removal labels."
+  },
+  "chats": [
+    {
+      "publishedPath": "canonical-chat.txt",
+      "sourceSha256": "02c2ef74ed50d2f580f59bdc50be48cceecb5a0cab4e4fb1ee83f56aaad53ac9",
+      "sourceBytes": 285042,
+      "publishedSha256": "cd0c5de4467d14c51c1ebba823a1cbff366c2976d37d3c19afcec4b2dca38c28",
+      "publishedBytes": 285095,
+      "status": "cleaned-copy",
+      "redactionCount": 3,
+      "redactions": "Private WhatsApp invitation and Google Meet/Zoom link URLs replaced with visible labels; message text otherwise retained."
+    },
+    {
+      "publishedPath": "latest-export/_chat.txt",
+      "sourceSha256": "93e55b5ff6c73ea3aceabc120bd9ecf063b25f02e64320a3c5e14e681264de41",
+      "sourceBytes": 79833,
+      "publishedSha256": "21191362e57972790fe986cf8b9d8adb04f172aa07b9f8e70cc95491f176318e",
+      "publishedBytes": 79886,
+      "status": "cleaned-copy",
+      "redactionCount": 3,
+      "redactions": "Private WhatsApp invitation and Google Meet/Zoom link URLs replaced with visible labels; message text otherwise retained."
+    }
+  ],
+  "documents": [
+    {
+      "originalFilename": "00003047-Hackathon_Problem_Statement_3.pdf",
+      "sourceSha256": "e1a9cd0fa2ede994fc550d2f0b95480fb563d56d6a713bcbe94f13d9487a5cb4",
+      "sourceBytes": 256979,
+      "publishedPath": "documents/00003047-Hackathon_Problem_Statement_3.pdf",
+      "publishedSha256": "e1a9cd0fa2ede994fc550d2f0b95480fb563d56d6a713bcbe94f13d9487a5cb4",
+      "publishedBytes": 256979,
+      "status": "source-identical-copy",
+      "redactionCount": 0,
+      "cleanup": "No content changes; reviewed source copy."
+    },
+    {
+      "originalFilename": "00003108-Healthathon form.docx",
+      "sourceSha256": "453257cc911e10433352910810dfe69e40a7a33f90f6b0c9a7c3505464c28d95",
+      "sourceBytes": 38826,
+      "publishedPath": "documents/00003108-Healthathon form.docx",
+      "publishedSha256": "453257cc911e10433352910810dfe69e40a7a33f90f6b0c9a7c3505464c28d95",
+      "publishedBytes": 38826,
+      "status": "source-identical-copy",
+      "redactionCount": 0,
+      "cleanup": "No content changes; reviewed source copy."
+    },
+    {
+      "originalFilename": "00003109-Saanthvana v 1.0.docx",
+      "sourceSha256": "ec782bcd9384f6d58237918b3b3c655a9f0d7fbd2a226a9371b09a1d78662241",
+      "sourceBytes": 55264,
+      "publishedPath": "documents/00003109-Saanthvana v 1.0.docx",
+      "publishedSha256": "e3668c8a597d109540113fb7b9a3772bcc60638a823445dae2dc5f1505858add",
+      "publishedBytes": 50547,
+      "status": "cleaned-copy",
+      "redactionCount": 2,
+      "cleanup": "Two creator/editor metadata fields cleared in docProps/core.xml; all other ZIP members unchanged. The supplied body is a blank clinical template, not an identified patient record."
+    },
+    {
+      "originalFilename": "00003158-Healthathon_Continuity_Loop_Product_Visuals.pptx",
+      "sourceSha256": "207dfa2877e75f21c59ccdb84a4f63f06897c17a787bd1bed6fea6ecf78bae79",
+      "sourceBytes": 8395758,
+      "publishedPath": "documents/00003158-Healthathon_Continuity_Loop_Product_Visuals.pptx",
+      "publishedSha256": "207dfa2877e75f21c59ccdb84a4f63f06897c17a787bd1bed6fea6ecf78bae79",
+      "publishedBytes": 8395758,
+      "status": "source-identical-copy",
+      "redactionCount": 0,
+      "cleanup": "No content changes; reviewed source copy."
+    },
+    {
+      "originalFilename": "00003163-Vidhi_EOLC_Sample-Advance-Medical-Directive.pdf",
+      "sourceSha256": "60f791a8af3c021ca032078188c438453e14abd8fea40043c09a8be43bee7062",
+      "sourceBytes": 216783,
+      "publishedPath": "documents/00003163-Vidhi_EOLC_Sample-Advance-Medical-Directive.pdf",
+      "publishedSha256": "60f791a8af3c021ca032078188c438453e14abd8fea40043c09a8be43bee7062",
+      "publishedBytes": 216783,
+      "status": "source-identical-copy",
+      "redactionCount": 0,
+      "cleanup": "No content changes; reviewed source copy."
+    },
+    {
+      "originalFilename": "00003164-Vidhi-EOLC-Toolkit-FAQ.pdf",
+      "sourceSha256": "7f1d5442fa4f68eabeb80787217c405f34cfa0dabc8af29dc41c66c3b04635fb",
+      "sourceBytes": 437534,
+      "publishedPath": "documents/00003164-Vidhi-EOLC-Toolkit-FAQ.pdf",
+      "publishedSha256": "7f1d5442fa4f68eabeb80787217c405f34cfa0dabc8af29dc41c66c3b04635fb",
+      "publishedBytes": 437534,
+      "status": "source-identical-copy",
+      "redactionCount": 0,
+      "cleanup": "No content changes; reviewed source copy."
+    },
+    {
+      "originalFilename": "00003166-Presentation draft.pptx",
+      "sourceSha256": "f2a74a392c2e93f906817c54757fa5a9a5e9945989aeffbc399036718a18d604",
+      "sourceBytes": 49388,
+      "publishedPath": "documents/00003166-Presentation draft.pptx",
+      "publishedSha256": "f2a74a392c2e93f906817c54757fa5a9a5e9945989aeffbc399036718a18d604",
+      "publishedBytes": 49388,
+      "status": "source-identical-copy",
+      "redactionCount": 0,
+      "cleanup": "No content changes; reviewed source copy."
+    },
+    {
+      "originalFilename": "00003167-Saanthvana_Background_Rationale_1.pptx",
+      "sourceSha256": "f3efd55775c6d98cc25ba7cec546898a2167067da24d0220067d4dbec2db802c",
+      "sourceBytes": 93547,
+      "publishedPath": "documents/00003167-Saanthvana_Background_Rationale_1.pptx",
+      "publishedSha256": "f3efd55775c6d98cc25ba7cec546898a2167067da24d0220067d4dbec2db802c",
+      "publishedBytes": 93547,
+      "status": "source-identical-copy",
+      "redactionCount": 0,
+      "cleanup": "No content changes; reviewed source copy."
+    },
+    {
+      "originalFilename": "00003261-Saathi_Healthathon_Final.pdf",
+      "sourceSha256": "f60595dec0ce5be90e7863b741d6d4009ff412c188b314f415cf87203b60d640",
+      "sourceBytes": 5995080,
+      "publishedPath": "documents/00003261-Saathi_Healthathon_Final.pdf",
+      "publishedSha256": "f60595dec0ce5be90e7863b741d6d4009ff412c188b314f415cf87203b60d640",
+      "publishedBytes": 5995080,
+      "status": "source-identical-copy",
+      "redactionCount": 0,
+      "cleanup": "No content changes; reviewed source copy."
+    },
+    {
+      "originalFilename": "00003272-Saathi_Sujay.pdf",
+      "sourceSha256": "e36489fe59caf4d49f5b97567d7abc56d886f1daa5d67f26a8c233d28623989d",
+      "sourceBytes": 4797351,
+      "publishedPath": "documents/00003272-Saathi_Sujay.pdf",
+      "publishedSha256": "e36489fe59caf4d49f5b97567d7abc56d886f1daa5d67f26a8c233d28623989d",
+      "publishedBytes": 4797351,
+      "status": "source-identical-copy",
+      "redactionCount": 0,
+      "cleanup": "No content changes; reviewed source copy."
+    },
+    {
+      "originalFilename": "00003292-Saathi_Healthathon_Final.pdf",
+      "sourceSha256": "6fbc1ab71a5783c580db3922d87816789c5ad3d9332e71ee5cfcf4fefe13e7b2",
+      "sourceBytes": 5903945,
+      "publishedPath": "documents/00003292-Saathi_Healthathon_Final.pdf",
+      "publishedSha256": "6fbc1ab71a5783c580db3922d87816789c5ad3d9332e71ee5cfcf4fefe13e7b2",
+      "publishedBytes": 5903945,
+      "status": "source-identical-copy",
+      "redactionCount": 0,
+      "cleanup": "No content changes; reviewed source copy."
+    },
+    {
+      "originalFilename": "00003333-Saathi_Healthathon_Final.pptx",
+      "sourceSha256": "2085f1ef04ce4d28fa00bc00b569b047b642d25b05383b6519c80614e84cff7f",
+      "sourceBytes": 1114978,
+      "publishedPath": "documents/00003333-Saathi_Healthathon_Final.pptx",
+      "publishedSha256": "2085f1ef04ce4d28fa00bc00b569b047b642d25b05383b6519c80614e84cff7f",
+      "publishedBytes": 1114978,
+      "status": "source-identical-copy",
+      "redactionCount": 0,
+      "cleanup": "No content changes; reviewed source copy."
+    },
+    {
+      "originalFilename": "00003368-Saanthvana_Healthathon_2026-09-27-Sharada-reviewed.pptx",
+      "sourceSha256": "0160637ced9f9e87ab32599c4e16de33a9bc49d26517645df85d39a18871b9b3",
+      "sourceBytes": 8886411,
+      "publishedPath": "documents/00003368-Saanthvana_Healthathon_2026-09-27-Sharada-reviewed.pptx",
+      "publishedSha256": "0160637ced9f9e87ab32599c4e16de33a9bc49d26517645df85d39a18871b9b3",
+      "publishedBytes": 8886411,
+      "status": "source-identical-copy",
+      "redactionCount": 0,
+      "cleanup": "No content changes; reviewed source copy."
+    },
+    {
+      "originalFilename": "00003417-Congratulations! YouΓÇÖre in the Top 120  Health-a-thon 2026.pdf",
+      "sourceSha256": "7a32f33c80727f3b972eef5be8b3f95fe259de14abe7592dd8c0803044d6ff66",
+      "sourceBytes": 70167,
+      "publishedPath": "documents/00003417-Congratulations! YouΓÇÖre in the Top 120  Health-a-thon 2026.pdf",
+      "publishedSha256": "7a32f33c80727f3b972eef5be8b3f95fe259de14abe7592dd8c0803044d6ff66",
+      "publishedBytes": 70167,
+      "status": "source-identical-copy",
+      "redactionCount": 0,
+      "cleanup": "No content changes; reviewed source copy."
+    },
+    {
+      "originalFilename": "00003540-Sahara Survey.docx",
+      "sourceSha256": "2add89448246b0597d3077a9cd0491f9e912f54c8a9e89440104aaf913519a90",
+      "sourceBytes": 20172,
+      "publishedPath": "documents/00003540-Sahara Survey.docx",
+      "publishedSha256": "2add89448246b0597d3077a9cd0491f9e912f54c8a9e89440104aaf913519a90",
+      "publishedBytes": 20172,
+      "status": "source-identical-copy",
+      "redactionCount": 0,
+      "cleanup": "No content changes; reviewed source copy."
+    },
+    {
+      "originalFilename": "00003548-Healthathon form.docx",
+      "sourceSha256": "453257cc911e10433352910810dfe69e40a7a33f90f6b0c9a7c3505464c28d95",
+      "sourceBytes": 38826,
+      "publishedPath": "documents/00003548-Healthathon form.docx",
+      "publishedSha256": "453257cc911e10433352910810dfe69e40a7a33f90f6b0c9a7c3505464c28d95",
+      "publishedBytes": 38826,
+      "status": "source-identical-copy",
+      "redactionCount": 0,
+      "cleanup": "No content changes; reviewed source copy."
+    },
+    {
+      "originalFilename": "00003549-Goals of Care Conversation Template-1.pdf",
+      "sourceSha256": "99ff80068b261e9f850a2e761050748a8cc9b22d5f6571986c83596235ea4c58",
+      "sourceBytes": 790927,
+      "publishedPath": "documents/00003549-Goals of Care Conversation Template-1.pdf",
+      "publishedSha256": "99ff80068b261e9f850a2e761050748a8cc9b22d5f6571986c83596235ea4c58",
+      "publishedBytes": 790927,
+      "status": "source-identical-copy",
+      "redactionCount": 0,
+      "cleanup": "No content changes; reviewed source copy."
+    },
+    {
+      "originalFilename": "00003550-Vidhi_EOLC_Sample-Advance-Medical-Directive.pdf",
+      "sourceSha256": "60f791a8af3c021ca032078188c438453e14abd8fea40043c09a8be43bee7062",
+      "sourceBytes": 216783,
+      "publishedPath": "documents/00003550-Vidhi_EOLC_Sample-Advance-Medical-Directive.pdf",
+      "publishedSha256": "60f791a8af3c021ca032078188c438453e14abd8fea40043c09a8be43bee7062",
+      "publishedBytes": 216783,
+      "status": "source-identical-copy",
+      "redactionCount": 0,
+      "cleanup": "No content changes; reviewed source copy."
+    },
+    {
+      "originalFilename": "00003569-Health-a-thon 2026  Phase 2- Important Updates and Next Steps.pdf",
+      "sourceSha256": "6d94fe6566353f1925dc8dc9924541ade5a108866c55467b775cd002aa3cace6",
+      "sourceBytes": 58688,
+      "publishedPath": "documents/00003569-Health-a-thon 2026  Phase 2- Important Updates and Next Steps.pdf",
+      "publishedSha256": "06a4af56d01b325562d1cb083ee16bd2cb824c434397a27b762384bdadebace4",
+      "publishedBytes": 56734,
+      "status": "cleaned-copy",
+      "redactionCount": 1,
+      "cleanup": "One visible private WhatsApp invitation URL region truly removed and replaced with a neutral notice; nonincremental clean PDF rewrite. No URI annotations existed; none removed. Rendered copy reviewed."
+    },
+    {
+      "originalFilename": "00003571-Health-a-thon 2026  Build Sprint Resources from Open Healthcare Network.pdf",
+      "sourceSha256": "4e7c7404c62b234fa599f2ec04a5fd6f6e1134d402f7d59bfb266fbf91cc434d",
+      "sourceBytes": 51256,
+      "publishedPath": "documents/00003571-Health-a-thon 2026  Build Sprint Resources from Open Healthcare Network.pdf",
+      "publishedSha256": "4e7c7404c62b234fa599f2ec04a5fd6f6e1134d402f7d59bfb266fbf91cc434d",
+      "publishedBytes": 51256,
+      "status": "source-identical-copy",
+      "redactionCount": 0,
+      "cleanup": "No content changes; reviewed source copy."
+    },
+    {
+      "originalFilename": "00003596-Health-a-thon 2026 Submission Template (1).pptx",
+      "sourceSha256": "1abdba1a2e2fdff6fea96544325c7afb409cd99cd403053fbd79e8dc18735f60",
+      "sourceBytes": 101320,
+      "publishedPath": "documents/00003596-Health-a-thon 2026 Submission Template (1).pptx",
+      "publishedSha256": "1abdba1a2e2fdff6fea96544325c7afb409cd99cd403053fbd79e8dc18735f60",
+      "publishedBytes": 101320,
+      "status": "source-identical-copy",
+      "redactionCount": 0,
+      "cleanup": "No content changes; reviewed source copy."
+    }
+  ]
+}
