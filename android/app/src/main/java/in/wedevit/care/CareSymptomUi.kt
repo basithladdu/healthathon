@@ -113,7 +113,7 @@ import java.time.format.DateTimeFormatter
     val canEdit by vm.canEdit.collectAsStateWithLifecycle()
     val actionError by vm.actionError.collectAsStateWithLifecycle()
     val capturedPerson = rememberSaveable(initial?.id) { initial?.personId ?: selected }
-    val expectedToken = rememberSaveable(initial?.id) { initial?.let(SymptomDiaryRules::editToken) }
+    val expectedToken by rememberSaveable(initial?.id) { mutableStateOf(initial?.let(SymptomDiaryRules::editToken)) }
     LaunchedEffect(initial?.id) { vm.actionError.value = null }
     LaunchedEffect(selected) { if (selected != capturedPerson) onClose() }
     SymptomNoteForm(personId = capturedPerson, personName = people.firstOrNull { it.id == capturedPerson }?.name.orEmpty(), entries = entries,
