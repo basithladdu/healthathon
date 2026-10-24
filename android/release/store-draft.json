@@ -29,10 +29,10 @@
       "POST_NOTIFICATIONS requested for optional care reminders on supported Android versions",
       "RECEIVE_BOOT_COMPLETED to restore saved reminders; no exact-alarm permission"
     ],
-    "note": "Earlier SDK fields were saved; new clinician details, contacts and explicit test audio/photo/document fields are pending. Local OCR/ASR alone do not collect contents; explicit Supabase file storage does. This source audit establishes no live deletion, new Play form save or review submission."
+    "note": "Current candidate's clinician details, manual contacts and explicit test audio/photo/document fields are saved in Play alongside retained prior fields. Local OCR/ASR alone do not collect contents; explicit private Supabase file storage does. No live deletion execution or review approval is claimed."
   },
   "releaseDependencies": [
-    "Production 0.4.1 (5) is published in India, verified on 19 October 2026 in Console and on the public listing with Install enabled. Closed testing and both authorised invitation groups are complete. No new installation or tester-participation verification was performed.",
+    "Production0.5.0(6), release2, is Available on Google Play in India, verified live24October2026. Closed testing and all59 earlier invitation deliveries are complete; do not resend. Next0.6.0(7) remains existing Production draft3, with no AAB upload or submission yet.",
     "Ordinary tester signup and reset delivery remain incomplete: the exact Sahara callback allowlist is unapproved and Zoho work is paused at the user's request. Unsigned-in care flows and the dedicated reviewer login work; the default Supabase mail service is limited to project-team addresses.",
     "Public photo scanning remains off. Any future enablement needs suitable provider terms, authorised billing, complete flow verification and matching Play declarations.",
     "If applicable to the account, enrol at least 12 testers continuously for 14 days, then apply for production access; this does not guarantee approval. No completed testing period is claimed."
@@ -181,8 +181,8 @@
           "Account management",
           "Fraud prevention, security, and compliance"
         ],
-        "savedInPlay": false,
-        "reason": "Native clinician verification submits medical council, professional registration and review status through the existing RPC. Root conservatively maps professional details to Other info using Google's broad definition; registration identifiers are additionally covered by existing User IDs. The public privacy policy already describes these fields. Do not claim this pending form change is saved.",
+        "savedInPlay": true,
+        "reason": "Native clinician verification submits medical council, professional registration and review status through the existing RPC. Root conservatively maps professional details to Other info using Google's broad definition; registration identifiers are additionally covered by existing User IDs. The public privacy policy already describes these fields. This addition was saved in Play for the current candidate; see the dated save receipt.",
         "source": "android/app/src/main/java/in/wedevit/care/CareSharedCloud.kt:69",
         "definitionSource": "https://support.google.com/googleplay/android-developer/answer/10787469?hl=en#data_types"
       },
@@ -196,7 +196,7 @@
         "purposes": [
           "App functionality"
         ],
-        "savedInPlay": false,
+        "savedInPlay": true,
         "reason": "Manual care-team names/relationship/role/phone sync; no address-book import.",
         "definitionSource": "https://support.google.com/googleplay/android-developer/answer/10787469?hl=en#data_types"
       },
@@ -210,7 +210,7 @@
         "purposes": [
           "App functionality"
         ],
-        "savedInPlay": false,
+        "savedInPlay": true,
         "reason": "Conservative mapping for optional manually entered self-contact phone; other people contacts principally fall under Contacts.",
         "definitionSource": "https://support.google.com/googleplay/android-developer/answer/10787469?hl=en#data_types"
       },
@@ -224,7 +224,7 @@
         "purposes": [
           "App functionality"
         ],
-        "savedInPlay": false,
+        "savedInPlay": true,
         "reason": "Explicit permitted selected fictional recordings uploaded to private Supabase.",
         "definitionSource": "https://support.google.com/googleplay/android-developer/answer/10787469?hl=en#data_types"
       },
@@ -238,7 +238,7 @@
         "purposes": [
           "App functionality"
         ],
-        "savedInPlay": false,
+        "savedInPlay": true,
         "reason": "Selected-file flow accepts other supported user-provided audio, not only app recordings.",
         "definitionSource": "https://support.google.com/googleplay/android-developer/answer/10787469?hl=en#data_types"
       },
@@ -252,7 +252,7 @@
         "purposes": [
           "App functionality"
         ],
-        "savedInPlay": false,
+        "savedInPlay": true,
         "reason": "Explicit permitted fictional report-image uploads, separate from local OCR/disabled AI scanner.",
         "definitionSource": "https://support.google.com/googleplay/android-developer/answer/10787469?hl=en#data_types"
       },
@@ -266,7 +266,7 @@
         "purposes": [
           "App functionality"
         ],
-        "savedInPlay": false,
+        "savedInPlay": true,
         "reason": "Selected PDFs/report files and file title/type/size/fingerprint metadata stored with test dataset.",
         "definitionSource": "https://support.google.com/googleplay/android-developer/answer/10787469?hl=en#data_types"
       }
@@ -327,7 +327,7 @@
     "uploaded": false,
     "submitted": false,
     "installed": false,
-    "status": "Latest Awaiz source merged; interactive 3D pain entry/history and clinical catalogue implemented. Current post-history Android unit/debug checks are running. Signed packaging/upload/submission remain unconfirmed.",
+    "status": "Current0.6.0(7) debug APK verified;308 JVM checks and live3D web-history QA passed. Android runtime was stopped before assertions because host commit headroom fell below500MB. Signed packaging is waiting for sufficient memory; no current AAB upload/review. Two backend migrations remain permission-blocked.",
     "playDraft": {
       "trackId": "4697314269892725425",
       "releaseId": 3,
@@ -335,10 +335,11 @@
       "created": true
     },
     "releasePrerequisites": [
-      "Finish and check native symptom diary.",
-      "Build and verify actual signed release APK/AAB with existing upload key.",
-      "Update accurate0.6 listing, review instructions, privacy and Data safety before submission.",
-      "No cloud patient-audio/photo provider activation, billing or auth/callback changes."
+      "Complete actual Android WebView/diary runtime checks and signed release APK/AAB verification with the existing upload key.",
+      "Restore authorised Supabase migration-write access, apply only the two reviewed conversation/prescription migrations and verify permissions/runtime; no DDL workaround after the connector denial.",
+      "Upload verified version7 once to existing Production draft3 and inspect Play validation. Keep as draft while backend prerequisites are incomplete.",
+      "Current listing, reviewer instructions, Data safety and health declarations are saved in Play; retain accurate Medical scope and explicit doctor-test upload/deletion exceptions.",
+      "No cloud patient-audio/photo provider activation, billing, clinician-role grants or auth/callback changes."
     ],
     "disclosures": {
       "sourceAudit": "output/android/verification/0.6.0/release-disclosure-audit.json",
@@ -348,35 +349,48 @@
       "reviewerInstructionsSavedInPlay": true,
       "dataSafetySavedInPlay": true,
       "healthDeclarationAdditionalFeatureToReview": "Diseases and Conditions Management; symptom diary support for palliative condition monitoring. Existing health declarations must remain. No clinical-decision-support claim.",
-      "privacyDeployment": "dpl_6cieWvkFSK2SkZsyQD1ARnTeVevq",
-      "privacyLiveChecks": "output/android/verification/0.6.0/live-privacy-checks.json",
-      "privacyLive": "READY production; HTTP200 and new symptom/Qwen/Devanagari/directory/date text verified on Sahara and Saanthvana. Rendered browser review not yet performed after recovery.",
+      "privacyDeployment": "dpl_8nL3CtJF2SP51MyGxdebVuMaUF6C",
+      "privacyLiveChecks": "output/playwright/pain-body-2026-10-24/app-full-report.json",
+      "privacyLive": "Current deployment READY; both affected policy pages rendered successfully in live browser QA with explicit selected-upload and verified support-removal wording.",
       "privacySourceSha256": "B12737C7C3B07D5D7A87CCF9F83F9EDA30CB484FA292A58DBB732842D10B5D9B",
-      "privacyChecks": "Scoped ESLint and remote production build passed; Vercel READY and updated public policy text HTTP200 verified on both domains. No fresh rendered browser review after tool recovery.",
+      "privacyChecks": "Scoped ESLint, remote Next build and full TypeScript passed. Current live browser QA verified privacy/deletion HTTP200 and visible required exceptions.",
       "otherPersonalInfoPending": false,
       "restrictedClinicianReviewerAccess": "Existing ordinary reviewer credentials are retained. Independently approved clinician-review access is not established by this release evidence; check App access truthfully and do not fabricate a clinical verification or grant new authority.",
       "additionalDataSafetyPending": false,
-      "privacyUpdatePendingDeployment": true,
+      "privacyUpdatePendingDeployment": false,
       "healthDeclarationAdditionalFeatureSavedInPlay": true,
       "healthDeclarationStatus": "Root reports Diseases and Conditions Management saved in Play; Healthcare Services and Medication/Treatment retained. No other new health claims.",
-      "privacyCurrentUpdate": "Explicit private doctor-test uploads and contacts qualified in source; final public policy/deletion deployment remains pending. Local OCR/ASR remain distinct from manual uploads.",
+      "privacyCurrentUpdate": "Explicit private doctor-test uploads and contacts are qualified in deployed public policies, Play listing and Data safety. Local OCR/ASR remain distinct from manual selected uploads.",
       "doctorTestDeletionOperationalPrerequisite": "Verified-email support handling must separately remove private objects and owned test-dataset rows; normal-care closure RPC does not. No live purge is claimed.",
       "dataSafetyCurrentCandidateCompleteInPlay": true,
-      "listingHistorySentencePendingSave": true
+      "listingHistorySentencePendingSave": false,
+      "listingReadyForReviewInPlay": true,
+      "playSaveReceipt": "output/android/verification/0.6.0/play-saved-settings-2026-10-24.json"
     },
     "checks": {
-      "currentSourceUnitVerified": false,
-      "currentSourceInstrumentationCompiled": false,
+      "currentSourceUnitVerified": true,
+      "currentSourceInstrumentationCompiled": true,
       "currentSourceRuntimeVerified": false,
-      "unitTests": null,
+      "unitTests": 308,
       "webFocusedTests": 24,
       "webFocusedTestsPassed": true,
       "sharedViewerOriginalChecks": 25,
       "sharedViewerOriginalEvidence": "output/playwright/pain-body-2026-10-24/shared-viewer-qa.json",
       "webBaselinePersistenceChecks": 4,
       "webBaselinePersistencePassed": true,
-      "webHistoryRuntimeVerified": false,
-      "note": "Original viewer and live baseline checks predate the optional read-only-history viewer update. No new Android test pass is inferred from historical counts."
+      "webHistoryRuntimeVerified": true,
+      "note": "Current 308 JVM checks cover final 3D/history production source. 4 baseline plus 24 complete browser checks verify isolated patient care tools, not authenticated backend sharing, physical Android or signed release runtime. Original25 viewer checks remain separately dated.",
+      "unitSuites": 55,
+      "unitFailures": 0,
+      "unitErrors": 0,
+      "unitSkipped": 0,
+      "unitEvidence": "output/android/verification/0.6.0/anatomy-history-unit-checks.json",
+      "nativeCompilationInputSha256": "C0C101D4BE3747105560F3808FA93B8DB0575E7B239E932B6B767593646BC1F3",
+      "webHistoryRuntimeChecks": 24,
+      "webHistoryRuntimeEvidence": "output/playwright/pain-body-2026-10-24/app-full-report.json",
+      "webHistorySourceCommit": "031492a",
+      "runtimeEvidence": "output/android/verification/0.6.0/anatomy-runtime-receipt.json",
+      "runtimeStatus": "IsolatedAPI36/4KB emulator booted; host memory pressure during installation caused safe shutdown before app assertions. No app failure or runtime pass is established."
     },
     "debugDeviceEvidence": {
       "package": "in.wedevit.sahara.development",
@@ -393,14 +407,15 @@
     },
     "browserBlocker": null,
     "buildProcess": {
-      "status": "Post-history unit/instrumentation compilation and debug packaging running once",
+      "status": "Unit/debug lane succeeded. Actual signedR8 lane held before JVM launch because measured commit headroom3136MB was below its3500MB safety gate.",
       "exitReceipt": "output/android/verification/0.6.0/anatomy-history-debug-build-exit.json",
       "log": "output/android/verification/0.6.0/anatomy-history-debug-checks.log",
       "sourceInputs": "output/android/verification/0.6.0/anatomy-history-inputs-before.json",
       "previousAttempt": "output/android/verification/0.6.0/anatomy-debug-build-exit.json",
-      "previousFailure": "Main app Kotlin compiled; test fixture lacked CareItem.title, now fixed. No tests or packages were accepted from that failed lane."
+      "previousFailure": "Main app Kotlin compiled; test fixture lacked CareItem.title, now fixed. No tests or packages were accepted from that failed lane.",
+      "releaseReceipt": "output/android/verification/0.6.0/anatomy-history-release-build-exit.json"
     },
-    "sourceCommit": "e906f8ef21ca2ae93441170effbc2f2b1c4a6e18",
+    "sourceCommit": "031492ae392eb7e7504ff47fae082711a5ed3366",
     "browserRecoveryEvidence": "output/android/verification/0.6.0/play-browser-resume-2026-10-24.json",
     "priorSourceChecks": {
       "unitTests": 156,
@@ -428,7 +443,34 @@
       "finalDebugFailureReceipt": "output/android/verification/0.6.0/final-debug-build-exit.json",
       "finalDebugReceipt": "output/android/verification/0.6.0/final-debug-fixed-build-exit.json",
       "finalDebugLog": "output/android/verification/0.6.0/final-debug-fixed-768-2026-10-24.log"
-    }
+    },
+    "currentDebugBuild": {
+      "artifact": "output/android/Sahara-0.6.0-24Oct-anatomy-history-debug.apk",
+      "sha256": "32DE22E2E0E6E6B5C11CDFFCF66FE0226E346AFA19876F58CA956022A1D0E03D",
+      "bytes": 313375525,
+      "manifest": {
+        "name": "in.wedevit.sahara.development",
+        "versionCode": "7",
+        "versionName": "0.6.0"
+      },
+      "signatureVerified": true,
+      "zip16KbAlignment": true,
+      "evidence": "output/android/verification/0.6.0/anatomy-history-debug-artifacts.json",
+      "physicalDeviceVerified": false,
+      "note": "Debug build; not the Play upload artifact. No current physical-device installation is claimed."
+    },
+    "backendReadiness": {
+      "ready": false,
+      "status": "Two tested migrations not deployed: Supabase apply_migration explicitly denied permission. Read-only postcheck confirms no server changes.",
+      "evidence": "output/android/verification/0.6.0/backend-runtime-permission-block.json",
+      "isolatedChecks": 105,
+      "migrationFiles": [
+        "android/supabase/migrations/20261023070323_conversation_scope_context.sql",
+        "android/supabase/migrations/20261023071214_doctor_prescription_groups.sql"
+      ],
+      "userActionPending": "Reconnect Supabase with Migrations Read-write or choose to keep the AAB in Play draft."
+    },
+    "lastEvidenceReconciledAtUtc": "2026-10-24T14:13:13.924316+00:00"
   },
   "productionRelease": {
     "version": "0.5.0",

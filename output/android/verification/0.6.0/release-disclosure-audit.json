@@ -1,15 +1,18 @@
 {
   "schemaVersion": 1,
   "preparedOn": "2026-10-24",
-  "status": "Source disclosure review and release-text drafts; deployment, signed package and store submission are separate parent-owned checks.",
+  "status": "Current source and live web verified; Google Play draft settings saved. Android runtime and signed release packaging are pending; two backend migrations are permission-blocked. No 0.6.0 upload or review submission.",
   "applicationId": "in.wedevit.sahara",
   "versionName": "0.6.0",
   "versionCode": 7,
-  "sourceHead": "258099c8e145df6cfcc793a2001fa05b4b8b6241",
+  "sourceHead": "031492ae392eb7e7504ff47fae082711a5ed3366",
   "sourceFreeze": {
-    "scope": "Only prototype/app/privacy/page.tsx is frozen by this agent. Android and release metadata are being changed concurrently by other agents.",
+    "scope": "Current integrated disclosure source at 031492a, independently read for evidence reconciliation. This checkpoint does not sign or upload an Android release. Original source-only freeze is retained in historicalPreparation.",
     "privacyPath": "prototype/app/privacy/page.tsx",
-    "privacySha256": "7BA2F6567F4F1BB52C33A373BAC4850D5603545D0364AAC6E720ED9F15F755D5"
+    "privacySha256": "B12737C7C3B07D5D7A87CCF9F83F9EDA30CB484FA292A58DBB732842D10B5D9B",
+    "deleteAccountPath": "prototype/app/delete-account/page.tsx",
+    "deleteAccountSha256": "EF3CF6EB8F4AF4832908C14C6152A85C37F141C6158DB19D8F5657859EFBABE9",
+    "viewerSha256": "CADD14703A708731440DDCE4988A2189B8A19F6A644F02CAEB8C5A5263004874"
   },
   "verifiedFacts": {
     "directory": {
@@ -119,7 +122,7 @@
     }
   },
   "dataSafety": {
-    "state": "Parent reports the corrected Google Play fields were already saved this turn; this agent did not edit or independently re-verify the live form.",
+    "state": "All seven reviewed optional additions saved in the existing Production draft 3; live Google saved states and private screenshot hashes are recorded in play-saved-settings-2026-10-24.json. Saved settings are not submission or approval.",
     "preserveSavedChanges": [
       "App interactions includes Analytics.",
       "Diagnostics and device/other IDs are required because ML Kit initialises with the app and no app-level opt-out exists.",
@@ -127,7 +130,7 @@
       "Preserve existing optional health-data declaration for optional account sync/sharing.",
       "Do not add patient audio/photo collection solely for local OCR, local transcription or translation."
     ],
-    "retainedScope": "Preserve saved SDK/health/account/calendar/UGC/provider metadata; add pending clinician info, manual contacts and explicit test file categories without removing the upload feature.",
+    "retainedScope": "Retained SDK/health/account/calendar/UGC/provider metadata; professional information, manual contacts and explicit doctor-test media/document categories added without removing the upload feature.",
     "pendingTypeUpdates": [
       {
         "type": "Other info",
@@ -141,10 +144,11 @@
           "Account management",
           "Fraud prevention, security, and compliance"
         ],
-        "savedInPlay": false,
-        "reason": "Native clinician verification submits medical council, professional registration and review status through the existing RPC. Root conservatively maps professional details to Other info using Google's broad definition; registration identifiers are additionally covered by existing User IDs. The public privacy policy already describes these fields. Do not claim this pending form change is saved.",
+        "savedInPlay": true,
+        "reason": "Native clinician verification submits medical council, professional registration and review status through the existing RPC. Root conservatively maps professional details to Other info using Google's broad definition; registration identifiers are additionally covered by existing User IDs. The public privacy policy already describes these fields.",
         "source": "android/app/src/main/java/in/wedevit/care/CareSharedCloud.kt:32",
-        "definitionSource": "https://support.google.com/googleplay/android-developer/answer/10787469?hl=en#data_types"
+        "definitionSource": "https://support.google.com/googleplay/android-developer/answer/10787469?hl=en#data_types",
+        "savedEvidence": "output/android/verification/0.6.0/play-saved-settings-2026-10-24.json"
       },
       {
         "type": "Contacts",
@@ -156,9 +160,10 @@
         "purposes": [
           "App functionality"
         ],
-        "savedInPlay": false,
+        "savedInPlay": true,
         "reason": "Manual care-team names/relationship/role/phone sync; no address-book import.",
-        "definitionSource": "https://support.google.com/googleplay/android-developer/answer/10787469?hl=en#data_types"
+        "definitionSource": "https://support.google.com/googleplay/android-developer/answer/10787469?hl=en#data_types",
+        "savedEvidence": "output/android/verification/0.6.0/play-saved-settings-2026-10-24.json"
       },
       {
         "type": "Phone number",
@@ -170,9 +175,10 @@
         "purposes": [
           "App functionality"
         ],
-        "savedInPlay": false,
+        "savedInPlay": true,
         "reason": "Conservative mapping for optional manually entered self-contact phone; other people contacts principally fall under Contacts.",
-        "definitionSource": "https://support.google.com/googleplay/android-developer/answer/10787469?hl=en#data_types"
+        "definitionSource": "https://support.google.com/googleplay/android-developer/answer/10787469?hl=en#data_types",
+        "savedEvidence": "output/android/verification/0.6.0/play-saved-settings-2026-10-24.json"
       },
       {
         "type": "Voice or sound recordings",
@@ -184,9 +190,10 @@
         "purposes": [
           "App functionality"
         ],
-        "savedInPlay": false,
+        "savedInPlay": true,
         "reason": "Explicit permitted selected fictional recordings uploaded to private Supabase.",
-        "definitionSource": "https://support.google.com/googleplay/android-developer/answer/10787469?hl=en#data_types"
+        "definitionSource": "https://support.google.com/googleplay/android-developer/answer/10787469?hl=en#data_types",
+        "savedEvidence": "output/android/verification/0.6.0/play-saved-settings-2026-10-24.json"
       },
       {
         "type": "Other audio files",
@@ -198,9 +205,10 @@
         "purposes": [
           "App functionality"
         ],
-        "savedInPlay": false,
+        "savedInPlay": true,
         "reason": "Selected-file flow accepts other supported user-provided audio, not only app recordings.",
-        "definitionSource": "https://support.google.com/googleplay/android-developer/answer/10787469?hl=en#data_types"
+        "definitionSource": "https://support.google.com/googleplay/android-developer/answer/10787469?hl=en#data_types",
+        "savedEvidence": "output/android/verification/0.6.0/play-saved-settings-2026-10-24.json"
       },
       {
         "type": "Photos",
@@ -212,9 +220,10 @@
         "purposes": [
           "App functionality"
         ],
-        "savedInPlay": false,
+        "savedInPlay": true,
         "reason": "Explicit permitted fictional report-image uploads, separate from local OCR/disabled AI scanner.",
-        "definitionSource": "https://support.google.com/googleplay/android-developer/answer/10787469?hl=en#data_types"
+        "definitionSource": "https://support.google.com/googleplay/android-developer/answer/10787469?hl=en#data_types",
+        "savedEvidence": "output/android/verification/0.6.0/play-saved-settings-2026-10-24.json"
       },
       {
         "type": "Files and docs",
@@ -226,11 +235,13 @@
         "purposes": [
           "App functionality"
         ],
-        "savedInPlay": false,
+        "savedInPlay": true,
         "reason": "Selected PDFs/report files and file title/type/size/fingerprint metadata stored with test dataset.",
-        "definitionSource": "https://support.google.com/googleplay/android-developer/answer/10787469?hl=en#data_types"
+        "definitionSource": "https://support.google.com/googleplay/android-developer/answer/10787469?hl=en#data_types",
+        "savedEvidence": "output/android/verification/0.6.0/play-saved-settings-2026-10-24.json"
       }
-    ]
+    ],
+    "pendingTypeUpdateCount": 0
   },
   "drafts": {
     "fullDescription": "Sahara — A Palliative Care Companion\n\nKeep goals-of-care conversations, daily care and useful information together for patients, families and care teams.\n\nKeep the words that matter\nRecord a conversation with everyone's permission, dictate a speaker's turn on a supported phone, or type it. Review the original words, keep earlier note versions and share the exact version you discussed. In shared care, clinical review requires independent clinician approval and a separate patient invitation. Patient and family confirmations are recorded separately.\n\nFollow daily care\nKeep prescribed medicines, appointments, questions and tasks together. Keep baseline symptom details for quicker follow-ups, with fresh 0–10 or unrated answers, observation times and separate sadness and worry ratings. View dated severity trends for matching context. Rotate the 3D body and tap a pain location, or use the body-area buttons. Saved points follow your care record; red intensity follows your entered pain rating. This is a personal diary, not ESAS-r/IPOS, a diagnosis or a clinical risk score. Optional reminders can be delayed by phone settings and are not an emergency service.\n\nFind palliative care centres\nBrowse 1,631 published listings across 36 Indian states and union territories. Search the list, open a map, call a centre or get directions. Listings include dated sources and do not confirm current services or medicine stock. Call before travelling.\n\nKeep and read your reports\nAdd PDFs or photos to Documents. Read printed English and Hindi text on your phone, compare it with the original and correct it before saving medicine details or copied facts. The Documents flow keeps original files on the phone unless you choose to share a copy. Its local OCR does not upload them.\n\nOptional Hindi and English tools\nTranscribe a saved, consented recording locally with Qwen3-ASR after a separate 987 MB model download. This requires a supported 64-bit phone and sufficient free memory. There is no cloud speech fallback. Check names, numbers and mixed-language words against the recording before using the text.\nOptional Hindi–English translation runs on your phone after a language-pack download. The original remains available. Machine translation is not a clinical interpretation.\n\nDoctor test workspace\nExplore separate fictional test patients with your Sahara login. Save test drafts, note versions and reported doses to your account. Separately chosen, permitted test recordings, PDFs or report images can be uploaded to private Supabase storage. Uploading does not transcribe or analyse them and grants no clinical access. Use no real patient or confidential files. Request removal of online test files through support; uninstalling does not delete them.\n\nChoose what you share\nBasic records work without an account. Sign in to save care records and share permitted information with people you invite. Symptom notes saved in that account follow its sharing rules. Unsent phone drafts, recordings and original report files are not automatically uploaded. Text you explicitly save or send to shared care is stored with your account. There are no ads. Google ML Kit sends technical usage metrics and diagnostics as explained in the privacy policy.\n\nSahara is not a medical device. It does not diagnose, treat, cure or prevent a medical condition, recommend treatment or replace professional medical care. Ask a qualified healthcare professional for medical advice. Care notes record a discussion; they are not prescriptions or legal directives.",
@@ -249,7 +260,8 @@
       "fullDescription": 3542,
       "releaseNotes": 347,
       "reviewerInstructions": 460
-    }
+    },
+    "status": "Earlier source-text drafts retained for provenance. Final saved listing is 3619 characters according to the Play save receipt; use current android/release/store-draft.json for final release copy."
   },
   "references": [
     {
@@ -305,7 +317,126 @@
         "submitted": false
       },
       "scopedDiffCheck": "Passed on all four owned files; no whitespace errors.",
-      "deletionRequestScope": "Full account deletion request includes account-owned doctor test dataset/uploads; support purge implementation/execution is not claimed."
-    }
+      "deletionRequestScope": "Full account deletion request includes account-owned doctor test dataset/uploads; support purge implementation/execution is not claimed.",
+      "auditPhase": "Historical source-only audit before live Play saves and final debug checks; its pendingPlayTypes/build flags are not the current release state. See currentReconciliation."
+    },
+    "disclosureArtifactPhase": "Historical earlier draft character counts; final saved listing/setting evidence is in currentReconciliation.play."
+  },
+  "historicalPreparation": {
+    "status": "Source disclosure review and release-text drafts; deployment, signed package and store submission are separate parent-owned checks.",
+    "sourceHead": "258099c8e145df6cfcc793a2001fa05b4b8b6241",
+    "sourceFreeze": {
+      "scope": "Only prototype/app/privacy/page.tsx is frozen by this agent. Android and release metadata are being changed concurrently by other agents.",
+      "privacyPath": "prototype/app/privacy/page.tsx",
+      "privacySha256": "7BA2F6567F4F1BB52C33A373BAC4850D5603545D0364AAC6E720ED9F15F755D5"
+    },
+    "note": "Original source-only preparation snapshot. Earlier pending Play fields and build flags in historical checks predate the final reconciliation below."
+  },
+  "currentReconciliation": {
+    "checkedAtUtc": "2026-10-24T14:15:33.797057+00:00",
+    "scope": "Read-only receipt/source reconciliation plus these audit/handoff edits; no build, deployment, backend write, upload or submission by this reconciliation.",
+    "sourceCommit": "031492ae392eb7e7504ff47fae082711a5ed3366",
+    "collaboratorSource": {
+      "awaizCommit": "73c5000",
+      "mergeCommit": "78cbbc6"
+    },
+    "web": {
+      "deployment": "dpl_8nL3CtJF2SP51MyGxdebVuMaUF6C",
+      "state": "READY",
+      "route": "https://sahara.wedevit.in/how-i-feel",
+      "baselineChecks": 4,
+      "baselinePassed": 4,
+      "finalChecks": 24,
+      "finalPassed": 24,
+      "sourceCommit": "031492a",
+      "viewerSha256": "CADD14703A708731440DDCE4988A2189B8A19F6A644F02CAEB8C5A5263004874",
+      "evidence": [
+        "output/playwright/pain-body-2026-10-24/app-baseline-report.json",
+        "output/playwright/pain-body-2026-10-24/app-full-report.json"
+      ],
+      "scope": "Actual isolated fictional local care-tools UI, including exact point save/reload, fresh follow-up, dated graph/history, history immutability, missing rating, Hindi, keyboard/WebGL fallback and desktop and 390px layouts; not authenticated backend sharing or clinical validation.",
+      "policyChecks": {
+        "privacyHttp200": true,
+        "deletionHttp200": true,
+        "explicitDoctorUploadExceptionVisible": true,
+        "separateSupportRemovalVisible": true
+      },
+      "assertionAudit": "Final report retains the original over-specific deletion-page assertion and corrected concrete requirement check."
+    },
+    "native": {
+      "unitTests": 308,
+      "unitSuites": 55,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "unitEvidence": "output/android/verification/0.6.0/anatomy-history-unit-checks.json",
+      "debugBuilt": true,
+      "debugVerified": true,
+      "debugArtifact": "output/android/Sahara-0.6.0-24Oct-anatomy-history-debug.apk",
+      "debugSha256": "32DE22E2E0E6E6B5C11CDFFCF66FE0226E346AFA19876F58CA956022A1D0E03D",
+      "debugManifest": {
+        "name": "in.wedevit.sahara.development",
+        "versionCode": "7",
+        "versionName": "0.6.0"
+      },
+      "debugSignatureVerified": true,
+      "static16KbAlignment": true,
+      "debugEvidence": "output/android/verification/0.6.0/anatomy-history-debug-artifacts.json",
+      "runtimeStatusAtReconciliation": "running",
+      "runtimeEvidence": "output/android/verification/0.6.0/anatomy-runtime-receipt.json",
+      "runtimeVerified": false,
+      "physicalDeviceVerified": false,
+      "signedReleaseVerified": false,
+      "note": "Debug and static checks do not establish signed release, runtime 16 KB or physical-device success; running runtime/packaging receipts may change after this checkpoint."
+    },
+    "play": {
+      "evidence": "output/android/verification/0.6.0/play-saved-settings-2026-10-24.json",
+      "receiptRecordedAtUtc": "2026-10-24T14:14:40.269532+00:00",
+      "track": "Production",
+      "draftReleaseId": 3,
+      "listingSaved": true,
+      "listingCharacterCount": 3619,
+      "historyWordingSaved": true,
+      "reviewerInstructionsSaved": true,
+      "dataSafetySaved": true,
+      "healthDeclarationsSaved": true,
+      "releaseNameAndNotesSaved": true,
+      "uploaded": false,
+      "submitted": false,
+      "approved": false,
+      "note": "Receipt reconciles observed Google saved states; screenshot bytes and reviewer credentials remain private. Production 0.5.0(6) remains the last verified public release."
+    },
+    "backend": {
+      "ready": false,
+      "evidence": "output/android/verification/0.6.0/backend-runtime-permission-block.json",
+      "conversationIsolatedChecks": 74,
+      "prescriptionIsolatedChecks": 31,
+      "applyMigrationOutcome": "Explicit permission denial",
+      "serverChangesMade": false,
+      "postcheckTargetTablesAbsent": true,
+      "migrationLedgerUnchanged": true,
+      "migrations": [
+        "android/supabase/migrations/20261023070323_conversation_scope_context.sql",
+        "android/supabase/migrations/20261023071214_doctor_prescription_groups.sql"
+      ],
+      "userActionPending": "Reconnect the intended project with Migrations Read-write using an authorised account, or keep the Play release in draft.",
+      "noBypass": "Do not route denied migration through execute_sql DDL or another write path."
+    },
+    "releaseReady": false,
+    "remaining": [
+      "Actual Android runtime and final signed APK/AAB verification.",
+      "Authorised migration-write permission, the two reviewed migration deployments and actual permission/runtime verification.",
+      "Only after prerequisites: upload verified version 7 once to existing Production draft 3 and inspect actual validation/review status."
+    ]
+  },
+  "currentAndroidRuntime": {
+    "status": "aborted_host_commit_pressure",
+    "beforeAppAssertions": true,
+    "bootConfirmed": true,
+    "api": 36,
+    "pageSize": 4096,
+    "evidence": "output/android/verification/0.6.0/anatomy-runtime-receipt.json",
+    "runtimePassed": false,
+    "physicalDeviceVerified": false
   }
 }

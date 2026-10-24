@@ -1,0 +1,51 @@
+{
+  "status": "BLOCKED: root apply_migration was denied by connector permission; no backend migrations applied. Reauthorise migration-write permission before any retry.",
+  "applyExactlyInOrder": [
+    {
+      "path": "android/supabase/migrations/20261023070323_conversation_scope_context.sql",
+      "sha256": "4A8A12AE39E11DFD293C50BF3545EA6A7E9153F1E5CC7A6F07D97987EBD4AA74",
+      "test": "74 isolated checks PASS; transaction ROLLBACK verified",
+      "changes": [
+        "Create two private RLS scope/audience tables.",
+        "Wrap original note/draft/review/receipt paths, retaining validated context-free legacy writes/reviews.",
+        "Strict v2 byte-exact hash/evidence and patient-owner audience approval plus current membership/permission.",
+        "Add restrictive note/ack read policy and publication trigger. Public functions security-invoker; private helpers fixed search_path and guarded. No clinical-role approval mutation."
+      ]
+    },
+    {
+      "path": "android/supabase/migrations/20261023071214_doctor_prescription_groups.sql",
+      "sha256": "C1931C45FD4FC52FBE5195D942370E173D2A8917055F5CCDBE98714DA9A7BFCF",
+      "test": "31 isolated checks PASS; transaction ROLLBACK verified",
+      "dependenciesAlreadyLive": [
+        "public.healthathon_medicine_courses",
+        "public.healthathon_medicine_events",
+        "healthathon_private.medicine_access(uuid,boolean)",
+        "healthathon_private.medicine_record_access(uuid,uuid,boolean)",
+        "healthathon_private.can_read_record(uuid,text,jsonb)",
+        "healthathon_private.require_open_account()"
+      ],
+      "changes": [
+        "Create four RLS RPC-only prescription/history/mutation tables.",
+        "Public capability, snapshot and atomic save RPCs security-invoker; no anonymous/service-role execution.",
+        "Private guarded helper functions; original medicine access required for every linked item.",
+        "Serialize medicine/course changes at patient row, exact revision and legacy fingerprint, idempotent per-actor request receipt; originals/events retained."
+      ]
+    }
+  ],
+  "doNotReplay": [
+    "android/supabase/migrations/20261023053251_care_team_contacts.sql",
+    "android/supabase/migrations/20261023053321_doctor_medicine_history.sql",
+    "20261022190713_synthetic_doctor_workspace",
+    "20261022190911_synthetic_doctor_indexes"
+  ],
+  "reason": "Catalog shows contacts, medicine history and doctor tables/functions already live despite local/history name differences. Never bulk push all local migrations.",
+  "beforeApply": "Recheck backend-runtime-preflight.sql, confirm exact file hashes, apply each unapplied source as one migration transaction using root-approved MCP. Stop on conflicting existing objects.",
+  "afterApply": "Run backend-runtime-postcheck.sql (READ ONLY), compare security advisors to baseline, preserve actual migration receipt. No production fixture insertion or clinical role grants.",
+  "rollback": "Each source encloses DDL in BEGIN/COMMIT: an application error must roll back that migration transaction. After a successful commit, do not drop populated tables or replay rename migration; use a reviewed forward repair. Before root apply, preserve original helper definitions privately if restoration is required.",
+  "offlineCommands": [
+    "$env:PGLITE_MODULE='F:/BuildCaches/sahara-sql-check/node_modules/@electric-sql/pglite/dist/index.js'; node android/scripts/test-conversation-scope-sql.mjs",
+    "$env:PGLITE_MODULE='F:/BuildCaches/sahara-sql-check/node_modules/@electric-sql/pglite/dist/index.js'; node output/android/verification/0.6.0/test-prescription-rollback.mjs"
+  ],
+  "noLiveWritesOrDeployPerformedByThisAgent": true,
+  "permissionBlockEvidence": "output/android/verification/0.6.0/backend-runtime-permission-block.json"
+}

@@ -1,0 +1,515 @@
+{
+  "checkedAtUtc": "2026-10-24T14:04:40.319232+00:00",
+  "sourceCommit": "031492ae392eb7e7504ff47fae082711a5ed3366",
+  "runStartedAtUtc": "2026-10-24T13:53:29.3989868Z",
+  "nativeCompilationInputSha256": "C0C101D4BE3747105560F3808FA93B8DB0575E7B239E932B6B767593646BC1F3",
+  "verificationInputSha256": "5DCEA434B6B94791A9A90AB4636A73143E854C5F72E7DF7F9983DF5B96CA8E90",
+  "allFrozenInputsUnchanged": true,
+  "allXmlFresh": true,
+  "suiteCount": 55,
+  "totals": {
+    "tests": 308,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "suites": [
+    {
+      "name": "in.wedevit.care.CareAccountBoundaryTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.CareAccountBoundaryTest.xml",
+      "sha256": "BDDEE6EBE77D1E5AA8E73B5C1CB33D87CF273E3A5749649CD574383F433AD22A"
+    },
+    {
+      "name": "in.wedevit.care.CareAcknowledgementTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.CareAcknowledgementTest.xml",
+      "sha256": "E73023400161C993CFF88A41BC5492DB714274121DDF7D2366D62E65E39DF4B6"
+    },
+    {
+      "name": "in.wedevit.care.CareCentreDirectoryTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.CareCentreDirectoryTest.xml",
+      "sha256": "90A9D60D170611AC0AB9CE943E878866D7956BEA836CF8C94987D8277D8ED69B"
+    },
+    {
+      "name": "in.wedevit.care.CareDocumentEvidenceTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.CareDocumentEvidenceTest.xml",
+      "sha256": "B7C107659752577D31AD33DA9E385E6D959161579C90FA659A78CEB0C3D37FE4"
+    },
+    {
+      "name": "in.wedevit.care.CareDraftAssistTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.CareDraftAssistTest.xml",
+      "sha256": "D1FFEEF74AEDA676D7AFB3D6461C8B3443AFD10716CD2530DE9D86C886D68BC8"
+    },
+    {
+      "name": "in.wedevit.care.CareEditContextTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.CareEditContextTest.xml",
+      "sha256": "630B0C50F2BEB3D8E3A6676D8FB64FE2C8470B025DA072FFCDE61A0F9C6DA9C4"
+    },
+    {
+      "name": "in.wedevit.care.CareModulesTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.CareModulesTest.xml",
+      "sha256": "035D722DF65F563EFAD98A30E5E75BB616716950956FF1EA2403F44932C911E0"
+    },
+    {
+      "name": "in.wedevit.care.CareOcrLinesTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.CareOcrLinesTest.xml",
+      "sha256": "5FE3AEAAC5A1B08B5E9AE4B9A6BB4DE7E131E4B4DB77E889543E1F9808C70F68"
+    },
+    {
+      "name": "in.wedevit.care.CarePainBodyMapTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.CarePainBodyMapTest.xml",
+      "sha256": "84779F8FAB89E17E14AD20191C5C4ADAA99AEB5AEC6B073B0946711A2C9F98FD"
+    },
+    {
+      "name": "in.wedevit.care.CarePainHistoryTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.CarePainHistoryTest.xml",
+      "sha256": "4E22F656C8D1D536F504AE7899E486982827E8BDA53257EB4BB1C4F007022D28"
+    },
+    {
+      "name": "in.wedevit.care.CareReminderRulesTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.CareReminderRulesTest.xml",
+      "sha256": "CD36D5329B88F163B7C37B6F878D85876C555AA6B473C789235C2F0AA4FC7CB7"
+    },
+    {
+      "name": "in.wedevit.care.CareRemoteAssistTest",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.CareRemoteAssistTest.xml",
+      "sha256": "900050F18EC2D873B4FEB68FA80D461F470EA041AF2DEA808A7CDBD4CE0904EE"
+    },
+    {
+      "name": "in.wedevit.care.CareSymptomDiaryTest",
+      "tests": 16,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.CareSymptomDiaryTest.xml",
+      "sha256": "ECB123C7098CC4D6A28DB075E22A464F10D9B9AFA39AF659D298B07A5B49E436"
+    },
+    {
+      "name": "in.wedevit.care.CareTranslationRulesTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.CareTranslationRulesTest.xml",
+      "sha256": "8327009956007016438228EB6CFAE84BC9C2CF40164B17E607AE2E152CB1B482"
+    },
+    {
+      "name": "in.wedevit.care.CareWorkflowTest",
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.CareWorkflowTest.xml",
+      "sha256": "F11D8333D0AC797F71363113F2463F44433CB7FC8B032371D3BF691CE25147BE"
+    },
+    {
+      "name": "in.wedevit.care.CarriedForwardDraftTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.CarriedForwardDraftTest.xml",
+      "sha256": "336B0E1A4DEB52F282F64A3F08D3908DFD46ECAB3FC6319A1B5AB2AA8E91F1EA"
+    },
+    {
+      "name": "in.wedevit.care.CheckInMoodTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.CheckInMoodTest.xml",
+      "sha256": "3DC67E9AE5204437306DCE065E713D681B5D45708BD5392395E4491FF83A67B4"
+    },
+    {
+      "name": "in.wedevit.care.DoctorAttendeesTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.DoctorAttendeesTest.xml",
+      "sha256": "E938EDD84F7BA1EFD97A0BC1C798A4D9E853360A138137150C3E5703AEAA5D01"
+    },
+    {
+      "name": "in.wedevit.care.DoctorCareDemoFixtureTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.DoctorCareDemoFixtureTest.xml",
+      "sha256": "2A8174C81D6D8F24AA372E23A852A9C9FE29B2B3238AD52748DC8BEFF039F114"
+    },
+    {
+      "name": "in.wedevit.care.DoctorCareTeamContextTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.DoctorCareTeamContextTest.xml",
+      "sha256": "D560008D25012017AE54223CA4E21D77C528AD2293244DB585410788CD619910"
+    },
+    {
+      "name": "in.wedevit.care.DoctorConnectedDataTest",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.DoctorConnectedDataTest.xml",
+      "sha256": "E056BE0433A31218369DAE24D3B84E1137EFB78705B804EBF6A7AAC1038D10FF"
+    },
+    {
+      "name": "in.wedevit.care.DoctorContributionChartTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.DoctorContributionChartTest.xml",
+      "sha256": "D7A1742758D95ACD91186C2959A193B877A8B048D78B2C202B782B9BEA238025"
+    },
+    {
+      "name": "in.wedevit.care.DoctorConversationContextTest",
+      "tests": 11,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.DoctorConversationContextTest.xml",
+      "sha256": "CEBDB492FC222306CEFA77E286AB0D4D1FA803BB4748DE484540B9E41042BEA9"
+    },
+    {
+      "name": "in.wedevit.care.DoctorConversationsDataTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.DoctorConversationsDataTest.xml",
+      "sha256": "B29DF0F820BC9CD64FAD5917946CBD34DEA2AA294B08C811B39809B99B680E70"
+    },
+    {
+      "name": "in.wedevit.care.DoctorDemoDataTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.DoctorDemoDataTest.xml",
+      "sha256": "38D1BE78518B88BF7D6AE82F0CB8F7C95FAE737FA6C2050A536F0BB1FDC11D29"
+    },
+    {
+      "name": "in.wedevit.care.DoctorLocalAudioRulesTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.DoctorLocalAudioRulesTest.xml",
+      "sha256": "F40B1ED6195DAFECB15E63B0F21BAEDF2674C359A7C24B68F8869CA46C35125C"
+    },
+    {
+      "name": "in.wedevit.care.DoctorMedicinePresentationTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.DoctorMedicinePresentationTest.xml",
+      "sha256": "D7711BCBDCD2A2593683E226CD82616F5F40D2E4553DE452260616DCDC4E5C9D"
+    },
+    {
+      "name": "in.wedevit.care.DoctorOverviewDataTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.DoctorOverviewDataTest.xml",
+      "sha256": "0BEC44D608F6F947D1BBB0DEF05F8DE0F319B2790F05B81762BD2855EDDA018F"
+    },
+    {
+      "name": "in.wedevit.care.DoctorPatientDayRulesTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.DoctorPatientDayRulesTest.xml",
+      "sha256": "B6DD06C36D9FFBD946D2E5862ADAEC3D6BADA71B35D057324E6060662A7BFBA0"
+    },
+    {
+      "name": "in.wedevit.care.DoctorPatientHubTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.DoctorPatientHubTest.xml",
+      "sha256": "CFFD481B72D0E8CD9DF6C846EE5D7925815A9A8931EEE1D9630121AA68297306"
+    },
+    {
+      "name": "in.wedevit.care.DoctorPatientNavigationTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.DoctorPatientNavigationTest.xml",
+      "sha256": "1A498F9D71C1CB56338E0BED9820695CFAA41894257E49DB06669388EF1176CA"
+    },
+    {
+      "name": "in.wedevit.care.DoctorPatientTrackingTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.DoctorPatientTrackingTest.xml",
+      "sha256": "56CF45FA4C66D9F319BB72AF8B4AF1E0401F6225DBB5D34D03683532A117409D"
+    },
+    {
+      "name": "in.wedevit.care.DoctorPreparationQuestionsTest",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.DoctorPreparationQuestionsTest.xml",
+      "sha256": "46619BA5DBE52585E8DA8EDFA9AB90A633FECC0EBEB6B205EC57BB2703B05A37"
+    },
+    {
+      "name": "in.wedevit.care.DoctorPreparationStoreTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.DoctorPreparationStoreTest.xml",
+      "sha256": "5E7087267D3D8AA2B3854D3F54921E107B780C14AFBD3CC5EB8101187E6F5E9F"
+    },
+    {
+      "name": "in.wedevit.care.DoctorPrescriptionRulesTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.DoctorPrescriptionRulesTest.xml",
+      "sha256": "0854470AEAAA45C7DFDB478D7F78055264C0F78C02C3D1CE8C4DD2A30E089DF8"
+    },
+    {
+      "name": "in.wedevit.care.DoctorProgressDataTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.DoctorProgressDataTest.xml",
+      "sha256": "44F1E44C8369648ECA28CC261FB70AF40979DEA1CCD8E75C9AF52B2D655A328A"
+    },
+    {
+      "name": "in.wedevit.care.DoctorRecordingReviewTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.DoctorRecordingReviewTest.xml",
+      "sha256": "1CEE00C45FC5910581D3AD252CCC3E0C17F0466AF8B6AC8BF8C7D64C21C00FE6"
+    },
+    {
+      "name": "in.wedevit.care.DoctorReportsDataTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.DoctorReportsDataTest.xml",
+      "sha256": "0B592D3DD56544118719E160078EC73B3A803FD6568640FEBABEA911815E09DD"
+    },
+    {
+      "name": "in.wedevit.care.DoctorSavedAudioSheetTest",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.DoctorSavedAudioSheetTest.xml",
+      "sha256": "4CBCFC8DA3F5B80DF2ADCE58B056275AC7C600A33875424AD158A516CF3A4318"
+    },
+    {
+      "name": "in.wedevit.care.DoctorTestProfilesTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.DoctorTestProfilesTest.xml",
+      "sha256": "8274DC37642CBA9191CAC540557DAED512D8A2562AA2ED75CEE79CA4ECE32838"
+    },
+    {
+      "name": "in.wedevit.care.DoctorTranscriptGoalsTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.DoctorTranscriptGoalsTest.xml",
+      "sha256": "8C8DB438949075EDE623FF773DA6E5899033B67D4B05A0AE6863BAFA64E82A3D"
+    },
+    {
+      "name": "in.wedevit.care.DoctorVisitContractTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.DoctorVisitContractTest.xml",
+      "sha256": "D40D63F88CED4FF163103BEF7E15103376E3C3ED4A1305E92CE417393FD790F6"
+    },
+    {
+      "name": "in.wedevit.care.DoctorVisitsRulesTest",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.DoctorVisitsRulesTest.xml",
+      "sha256": "41809A310F75FEDDA59F24E3C363387EEC3378D3649AD9452DAA1429731CA6F5"
+    },
+    {
+      "name": "in.wedevit.care.DoctorWorkflowTest",
+      "tests": 11,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.DoctorWorkflowTest.xml",
+      "sha256": "1A34F559F708FEE5A1C045E6325BFDF43E193D864F4844A40B290A54F2152BB0"
+    },
+    {
+      "name": "in.wedevit.care.EmbeddedPatientContextTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.EmbeddedPatientContextTest.xml",
+      "sha256": "CAE37C81A8E1225695EA0A65FD24BB11386735EEC9E5D5DCEB96BF832424ABC9"
+    },
+    {
+      "name": "in.wedevit.care.FeedbackTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.FeedbackTest.xml",
+      "sha256": "28DD80E2ACD6515172A9E276EC13BA3C463E6168E2C88285FE2981C490C577D8"
+    },
+    {
+      "name": "in.wedevit.care.LocalDraftSuggestionsTest",
+      "tests": 12,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.LocalDraftSuggestionsTest.xml",
+      "sha256": "5BBD06E93D80272931670F48FABF1BF9804DD206E96B9EA14A238A426BF4BB3F"
+    },
+    {
+      "name": "in.wedevit.care.MedicineHistoryRulesTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.MedicineHistoryRulesTest.xml",
+      "sha256": "C53D61CE408BA7C5EFC5D55EFA7BBA633011C50F84D79DABD98D87016B429FC6"
+    },
+    {
+      "name": "in.wedevit.care.MedicineOrganizerTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.MedicineOrganizerTest.xml",
+      "sha256": "BF5AA466ABD7E980A7DA3410A712031E01B3D133538A95C2266ED84D891751B9"
+    },
+    {
+      "name": "in.wedevit.care.NoteRulesTest",
+      "tests": 16,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.NoteRulesTest.xml",
+      "sha256": "433FEFDE70AEA723B196EA553E6F8F334E9CEF3875931261E0F0A0C5E04ABD83"
+    },
+    {
+      "name": "in.wedevit.care.OfflineSpeechRulesTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.OfflineSpeechRulesTest.xml",
+      "sha256": "B5604A5DF49EDE7A4B26349FAF96673276B5561CFB6BFD0EA37C84AC9B8F6BBB"
+    },
+    {
+      "name": "in.wedevit.care.OfflineSpeechSegmenterTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.OfflineSpeechSegmenterTest.xml",
+      "sha256": "4793A54746EBE9366377BBCBE85AA75A916936327D379801CA2FAFDA08DEB788"
+    },
+    {
+      "name": "in.wedevit.care.PatientDoctorSummaryTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.PatientDoctorSummaryTest.xml",
+      "sha256": "C950DDC8E636FE1F7D18F4675F285378CE76E2CF5DFFEA4D3EB3CD442C2FC56A"
+    },
+    {
+      "name": "in.wedevit.care.PatientWalkthroughTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.PatientWalkthroughTest.xml",
+      "sha256": "341D36AD38E32F94574D06782ACECDE73CB606AC6B0790A7EDA97D307B099F62"
+    },
+    {
+      "name": "in.wedevit.care.WelcomePanelStyleTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "path": "android/app/build/test-results/testDebugUnitTest/TEST-in.wedevit.care.WelcomePanelStyleTest.xml",
+      "sha256": "B5953E0A09B376659744D2F1390BF9ADA818B3FE6495E046B29FE384DB46697E"
+    }
+  ],
+  "instrumentationExecution": false,
+  "physicalDeviceVerified": false
+}

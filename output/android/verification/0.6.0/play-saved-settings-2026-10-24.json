@@ -1,0 +1,46 @@
+{
+  "recordedAtUtc": "2026-10-24T14:14:40.269532+00:00",
+  "scope": "Prior live Chrome saves from this release session, reconciled from the observed Google success states and private screenshots; not a new live review check.",
+  "app": "in.wedevit.sahara",
+  "version": "0.6.0",
+  "versionCode": 7,
+  "track": "Production",
+  "draftReleaseId": 3,
+  "saved": {
+    "dataSafety": "Change saved; added clinician professional information, manual contacts and separately chosen doctor-test media/documents with reviewed collection purposes and optionality. Prior fields retained.",
+    "health": "Diseases and Conditions Management saved; Healthcare Services and Medication/Treatment retained.",
+    "listing": "3619-character full description saved through Review and Save; Changes ready to send for review.",
+    "appAccess": "Existing reviewer credentials unchanged; updated symptom/history/fictional doctor-test instructions saved.",
+    "release": "0.6.0(7) name and en-US notes saved; no bundle7 uploaded."
+  },
+  "uploaded": false,
+  "submitted": false,
+  "privateEvidence": [
+    {
+      "privateScreenshotName": "data-safety-saved.jpg",
+      "sha256": "C6691EF787DD01A85585C38F065F5DDAFF940B6DA9579522BF8FDB5F08BCFDA7",
+      "savedAtUtc": "2026-10-24T13:49:11.003745+00:00"
+    },
+    {
+      "privateScreenshotName": "listing-draft-saved.jpg",
+      "sha256": "25E76C10D284B19D0BE4E69E47CC8B643A68E743870FC0A5EADB0CD9D847748A",
+      "savedAtUtc": "2026-10-24T13:51:16.698393+00:00"
+    },
+    {
+      "privateScreenshotName": "listing-ready-for-review.jpg",
+      "sha256": "6671E07A6A3CBCD3E8EE866D3A26C8A4F668ED6BC9B773DDA5D534B2804DE2C9",
+      "savedAtUtc": "2026-10-24T14:00:44.285852+00:00"
+    },
+    {
+      "privateScreenshotName": "reviewer-instructions-saved.jpg",
+      "sha256": "80D137D35EA0411F08B2653CF0A27F77B20C2D78D670EF73ECD9187C57B5D130",
+      "savedAtUtc": "2026-10-24T13:55:17.200733+00:00"
+    },
+    {
+      "privateScreenshotName": "release-draft-prepared.jpg",
+      "sha256": "E6B9B457933BB6B02211C1CB8B86FAE69A715E469850B737F9FC5A0E96C15B90",
+      "savedAtUtc": "2026-10-24T14:05:16.540637+00:00"
+    }
+  ],
+  "privateScreenshotContentsInGit": false
+}

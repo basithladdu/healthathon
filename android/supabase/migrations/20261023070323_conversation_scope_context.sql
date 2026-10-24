@@ -121,8 +121,10 @@ alter function healthathon_private.valid_draft(jsonb) rename to valid_draft_befo
 create function healthathon_private.valid_draft(p_data jsonb) returns boolean
 language plpgsql immutable set search_path='' as $$
 begin
- if not(p_data ? 'contextVersion') then return healthathon_private.valid_draft_before_context(p_data); end if;
- if p_data->'contextVersion'<>'1'::jsonb or jsonb_typeof(p_data->'contextJson')<>'string' or jsonb_typeof(p_data->'conversationId')<>'string' then return false; end if;
+ -- Only the original six-field draft can use the unchanged legacy validator.
+ -- A partial context envelope or an unknown hash marker must never downgrade.
+ if not(p_data ?| array['contextVersion','contextJson','conversationId','hashScheme']) then return healthathon_private.valid_draft_before_context(p_data); end if;
+ if p_data->'contextVersion' is distinct from '1'::jsonb or jsonb_typeof(p_data->'contextJson') is distinct from 'string' or jsonb_typeof(p_data->'conversationId') is distinct from 'string' then return false; end if;
  perform (p_data->>'conversationId')::uuid;
  return healthathon_private.valid_draft_before_context(p_data-array['conversationId','contextVersion','contextJson']) and healthathon_private.valid_conversation_context(p_data->>'source',p_data->>'contextJson');
 exception when others then return false;
@@ -134,11 +136,12 @@ declare saved public.healthathon_care_drafts;previous public.healthathon_care_dr
 begin
  perform healthathon_private.require_open_account();
  if auth.uid() is null or not coalesce(healthathon_private.can_edit(p_person),false) or not coalesce(healthathon_private.has_permission(p_person,'careNote'),false) then raise exception 'You cannot change this conversation.' using errcode='42501'; end if;
- if p_data ? 'contextVersion' then
+ select * into previous from public.healthathon_care_drafts where id=p_id and person_id=p_person and author_id=auth.uid() for update;
+ if found and previous.data ?| array['contextVersion','contextJson','conversationId','hashScheme'] and not(p_data ?| array['contextVersion','contextJson','conversationId','hashScheme']) then raise exception 'A conversation-context draft cannot be downgraded to the older format.'; end if;
+ if p_data ?| array['contextVersion','contextJson','conversationId','hashScheme'] then
   if not coalesce(healthathon_private.valid_draft(p_data),false) then raise exception 'Review the original words, context and evidence.'; end if;
   conversation:=(p_data->>'conversationId')::uuid;
-  select * into previous from public.healthathon_care_drafts where id=p_id and person_id=p_person and author_id=auth.uid() for update;
-  if found and previous.data ? 'conversationId' and previous.data->>'conversationId'<>conversation::text then raise exception 'A saved draft cannot switch conversations.'; end if;
+  if previous.id is not null and previous.data ? 'conversationId' and previous.data->>'conversationId'<>conversation::text then raise exception 'A saved draft cannot switch conversations.'; end if;
   if exists(select 1 from healthathon_private.conversation_scopes where conversation_id=conversation and person_id<>p_person) then raise exception 'This conversation belongs to a different care profile.' using errcode='42501'; end if;
  end if;
  saved:=healthathon_private.save_draft_before_context(p_id,p_person,p_data,p_revision,p_submit);
@@ -162,7 +165,7 @@ begin
   select data into note from public.healthathon_records where kind='note' and person_id=p_person and id=target;
   if not found then return false; end if;
  elsif p_kind='note' then note:=p_data; else return true; end if;
- if not(note ? 'contextVersion' or note ? 'conversationId' or note ? 'contextJson' or coalesce(note->>'hashScheme'='sha256-framed-v2',false)) then return true; end if;
+ if not(note ?| array['contextVersion','conversationId','contextJson']) and (not(note ? 'hashScheme') or note->>'hashScheme'='sha256-json-v1') then return true; end if;
  if note->'contextVersion' is distinct from '1'::jsonb or note->>'hashScheme' is distinct from 'sha256-framed-v2' or not coalesce(healthathon_private.valid_conversation_context(note->>'source',note->>'contextJson'),false)
  or note->>'contentHash' is distinct from healthathon_private.conversation_hash(p_person,note) then return false; end if;
  return healthathon_private.conversation_allowed(p_person,(note->>'conversationId')::uuid);
@@ -179,11 +182,16 @@ language plpgsql security definer set search_path='' as $$
 declare n public.healthathon_records;saved public.healthathon_records;target uuid;actor_data jsonb;
 begin
  perform healthathon_private.require_open_account();
- if p_kind<>'ack' then return healthathon_private.save_record_before_context(p_id,p_person,p_kind,p_data,p_revision); end if;
+ if p_kind<>'ack' then
+  if p_kind='note' and not(p_data ?| array['contextVersion','conversationId','contextJson']) and (not(p_data ? 'hashScheme') or p_data->>'hashScheme'='sha256-json-v1')
+   and exists(select 1 from public.healthathon_records r where r.id=p_id and r.person_id=p_person and r.kind='note' and (r.data ?| array['contextVersion','conversationId','contextJson'] or (r.data ? 'hashScheme' and r.data->>'hashScheme' is distinct from 'sha256-json-v1')))
+  then raise exception 'A conversation-context note cannot be downgraded to the older format.' using errcode='42501'; end if;
+  return healthathon_private.save_record_before_context(p_id,p_person,p_kind,p_data,p_revision);
+ end if;
  begin target:=(p_data->>'versionId')::uuid; exception when others then raise exception 'Open the exact care-note version.'; end;
  select * into n from public.healthathon_records where id=target and person_id=p_person and kind='note';
  if not found then raise exception 'Open an accessible care-note version.' using errcode='42501'; end if;
- if not(n.data ? 'contextVersion' or n.data ? 'conversationId' or n.data ? 'contextJson' or coalesce(n.data->>'hashScheme'='sha256-framed-v2',false)) then return healthathon_private.save_record_before_context(p_id,p_person,p_kind,p_data,p_revision); end if;
+ if not(n.data ?| array['contextVersion','conversationId','contextJson']) and (not(n.data ? 'hashScheme') or n.data->>'hashScheme'='sha256-json-v1') then return healthathon_private.save_record_before_context(p_id,p_person,p_kind,p_data,p_revision); end if;
  if auth.uid() is null or not coalesce(healthathon_private.can_read_record(p_person,'note',n.data),false) then raise exception 'You cannot confirm this conversation.' using errcode='42501'; end if;
  if p_revision is distinct from 0 or jsonb_typeof(p_data)<>'object' or length(btrim(coalesce(p_data->>'name',''))) not between 1 and 100 or p_data->>'contentHash' is distinct from n.data->>'contentHash' then raise exception 'Read the exact note and add your name.'; end if;
  perform 1 from public.healthathon_people where id=p_person for update;
@@ -206,6 +214,9 @@ language plpgsql security definer set search_path='' as $$
 begin
  if new.kind='note' then
   perform healthathon_private.require_open_account();
+  -- Existing clients retain their original guarded/validated note workflow.
+  -- Context-bearing notes, including incomplete envelopes, always use v2 below.
+  if not(new.data ?| array['contextVersion','conversationId','contextJson']) and (not(new.data ? 'hashScheme') or new.data->>'hashScheme'='sha256-json-v1') then return new; end if;
   if new.data->>'hashScheme' is distinct from 'sha256-framed-v2' or not coalesce(healthathon_private.can_read_record(new.person_id,'note',new.data),false) or not exists(select 1 from healthathon_private.conversation_scopes where conversation_id=(new.data->>'conversationId')::uuid and person_id=new.person_id and approved_revision=revision) then raise exception 'Requires updated conversation format and owner-approved audience before publishing.' using errcode='42501'; end if;
  end if;
  return new;
@@ -223,6 +234,10 @@ begin
  if not coalesce(p_confirm,false) then raise exception 'Read the source and every goal before publishing.'; end if;
  if draft.status='reviewed' then select * into saved from public.healthathon_records where id=draft.reviewed_note_id and kind='note'; if not coalesce(healthathon_private.can_read_record(saved.person_id,'note',saved.data),false) then raise exception 'Conversation access changed.' using errcode='42501'; end if; return saved; end if;
  if draft.revision is distinct from p_revision or draft.status<>'submitted' then raise exception 'This conversation changed. Refresh before reviewing.' using errcode='40001'; end if;
+ if not(draft.data ?| array['contextVersion','contextJson','conversationId','hashScheme']) then
+  if not coalesce(healthathon_private.valid_draft_before_context(draft.data),false) then raise exception 'Review the original conversation and its sections.'; end if;
+  return healthathon_private.review_draft_before_context(p_id,p_revision,p_confirm);
+ end if;
  if draft.data->'contextVersion' is distinct from '1'::jsonb or not coalesce(healthathon_private.valid_draft(draft.data),false) then raise exception 'This draft needs a conversation-context upgrade before publishing.'; end if;
  perform 1 from healthathon_private.conversation_scopes where person_id=draft.person_id and conversation_id=(draft.data->>'conversationId')::uuid and approved_revision=revision for share;
  if not found then raise exception 'The owner must approve this conversation audience first.' using errcode='42501'; end if;

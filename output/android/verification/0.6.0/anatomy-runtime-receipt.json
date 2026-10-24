@@ -1,0 +1,16 @@
+{
+  "startedAtUtc": "2026-10-24T14:11:26.0275905Z",
+  "finishedAtUtc": "2026-10-24T14:16:25.6659826Z",
+  "status": "aborted_host_commit_pressure",
+  "serial": "emulator-5582",
+  "physicalDevice": false,
+  "syntheticInMemoryFixturesOnly": true,
+  "accountOrPatientDataUsed": false,
+  "bootConfirmed": true,
+  "tests": [],
+  "api": "36",
+  "pageSize": "4096",
+  "webViewProvider": "Current WebView package (name, version): (com.google.android.webview, 134.0.6998.135)",
+  "note": "Fresh emulator booted, but host commit headroom fell to421MB during APK installation. Stopped only task-owned runner/emulator before any runtime assertion. No app failure or runtime pass established.",
+  "stopCommitHeadroomMB": 491.0
+}

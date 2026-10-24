@@ -1,0 +1,29 @@
+{
+  "startedAtUtc": "2026-10-24T13:53:29.3989868Z",
+  "finishedAtUtc": "2026-10-24T14:06:17.4369033Z",
+  "version": "0.6.0",
+  "versionCode": 7,
+  "applicationId": "in.wedevit.sahara.development",
+  "status": "completed",
+  "exitCode": 0,
+  "verificationOnly": true,
+  "finalViewerAssetsFrozen": true,
+  "tasks": [
+    ":app:testDebugUnitTest",
+    ":app:compileDebugAndroidTestKotlin",
+    ":app:assembleDebug",
+    ":app:assembleDebugAndroidTest"
+  ],
+  "sourceInputs": "output/android/verification/0.6.0/anatomy-history-inputs-before.json",
+  "log": "output/android/verification/0.6.0/anatomy-history-debug-checks.log",
+  "memoryBefore": {
+    "commitHeadroomMB": 3213.0,
+    "availablePhysicalMB": 1459,
+    "heapMB": 1024,
+    "metaspaceMB": 512,
+    "testForkMaxHeapMB": 128
+  },
+  "nativeCompilationInputSha256": "C0C101D4BE3747105560F3808FA93B8DB0575E7B239E932B6B767593646BC1F3",
+  "verificationInputSha256": "5DCEA434B6B94791A9A90AB4636A73143E854C5F72E7DF7F9983DF5B96CA8E90",
+  "baseCommit": "879d4f317154dc94e1a3075c4b04d5f37307c1c8"
+}

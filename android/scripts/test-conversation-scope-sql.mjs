@@ -16,6 +16,9 @@ create table storage.buckets(id text primary key,name text,public boolean,file_s
 create table storage.objects(id uuid primary key default gen_random_uuid(),bucket_id text,name text,metadata jsonb,unique(bucket_id,name));alter table storage.objects enable row level security;grant select,insert,update,delete on storage.objects to anon,authenticated;`);
 const migration='20261023070323_conversation_scope_context.sql';
 for(const file of (await readdir('android/supabase/migrations')).filter(x=>x.endsWith('.sql')&&x!==migration).sort())await db.exec(await readFile('android/supabase/migrations/'+file,'utf8'));
+// Every fictional account, role membership and clinical approval below is rolled
+// back. Strip only this migration's outer transaction so its DDL joins that test.
+await db.exec('begin');
 const ids=Array.from({length:10},(_,i)=>`${i+1}`.repeat(8)+'-'+`${i+1}`.repeat(4)+'-4'+`${i+1}`.repeat(3)+'-8'+`${i+1}`.repeat(3)+'-'+`${i+1}`.repeat(12));
 const [owner,family,excluded,clinician,stranger,person,conversation,draftId,legacy]=ids;
 for(const id of [owner,family,excluded,clinician,stranger])await db.query('insert into auth.users values($1,$2)',[id,'fixture@example.invalid']);
@@ -24,8 +27,8 @@ for(const member of [family,excluded,clinician])await db.query("insert into publ
 await db.query("insert into public.healthathon_clinician_requests(user_id,name,council,registration,status) values($1,'Synthetic clinician','Synthetic council','TEST','approved')",[clinician]);
 const old={version:1,personName:'Synthetic person',source:'Legacy source',priorities:'',participants:'',topics:'Legacy content',questions:'',nextSteps:'',doctor:'Legacy label',published:1,contentHash:'a'.repeat(64)};
 await db.query("insert into public.healthathon_records(id,person_id,kind,data) values($1,$2,'note',$3)",[legacy,person,old]);
-await db.exec(await readFile('android/supabase/migrations/'+migration,'utf8'));
-let checks=0;const ok=(x,m)=>{assert.ok(x,m);checks++};const denied=async f=>{await assert.rejects(f);checks++};
+await db.exec((await readFile('android/supabase/migrations/'+migration,'utf8')).replace(/^begin;\s*/,'').replace(/commit;\s*$/,''));
+let checks=0;const ok=(x,m)=>{assert.ok(x,m);checks++};const denied=async f=>{await db.exec('savepoint expected_denial');try{await assert.rejects(f);checks++}finally{await db.exec('rollback to savepoint expected_denial;release savepoint expected_denial')}};
 const scalar=async(sql,args=[])=>Object.values((await db.query(sql,args)).rows[0])[0];
 async function as(id,fn){await db.exec(`set role authenticated;select set_config('request.jwt.claim.sub','${id}',false)`);try{return await fn()}finally{await db.exec('reset role')}}
 const source='नमस्ते 👩🏽‍⚕️ family time';const sourceHash=createHash('sha256').update(source).digest('hex');
@@ -33,9 +36,19 @@ const quote='👩🏽‍⚕️';const start=Buffer.byteLength(source.slice(0,sou
 const goalKeys=['patient_priorities','understanding_questions','participants','concerns_uncertainty','next_steps'];
 const context={schemaVersion:1,sourceHash,goals:goalKeys.map((key,i)=>({key,status:i?'not_recorded':'needs_review',origin:'manual',answer:i?'':quote,evidence:i?[]:[{start,end,quote}]})),recorderUid:null,recorderLabel:'Self-entered example',audioRef:null,audioHash:null,transcription:{provider:'Fixture provider',model:'Fixture model',at:123,sourceHash:null},englishDraft:{text:'Hello. Family time.',sourceHash,origin:'assisted',reviewed:false}};
 const exact=JSON.stringify(context,null,1);const payload={source,priorities:quote,participants:'',topics:'Discussion summary',questions:'',nextSteps:'',conversationId:conversation,contextVersion:1,contextJson:exact};
+const legacyDraft={source:'Legacy conversation source',priorities:'Family time',participants:'',topics:'Discussion',questions:'',nextSteps:''};
+for(const partial of [{contextVersion:1},{contextJson:exact},{conversationId:conversation},{hashScheme:'sha256-framed-v2'},{hashScheme:'unknown'}]){
+ const invalid={...legacyDraft,...partial};
+ ok(!await scalar('select healthathon_private.valid_draft($1)',[invalid]),'partial context/hash marker cannot use legacy validator');
+ await as(owner,()=>denied(()=>db.query('select public.healthathon_save_draft(gen_random_uuid(),$1,$2,0,false)',[person,invalid])));
+}
+const missingVersion={...payload};delete missingVersion.contextVersion;
+ok(!await scalar('select healthathon_private.valid_draft($1)',[missingVersion]),'complete envelope without version fails closed');
+await as(owner,()=>denied(()=>db.query('select public.healthathon_save_draft(gen_random_uuid(),$1,$2,0,false)',[person,missingVersion])));
 ok(await scalar('select healthathon_private.valid_conversation_context($1,$2)',[source,exact]),'Hindi/emoji byte-exact evidence valid');
 for(const invalid of [{...context,sourceHash:'b'.repeat(64)},{...context,goals:context.goals.map((g,i)=>i?g:{...g,evidence:[{start:start+1,end,quote}]})},{...context,audioRef:'/private/path'}, {...context,englishDraft:{...context.englishDraft,sourceHash:'c'.repeat(64)}}])ok(!await scalar('select healthathon_private.valid_conversation_context($1,$2)',[source,JSON.stringify(invalid)]),'malformed context denied');
 await as(owner,()=>scalar('select public.healthathon_save_draft($1,$2,$3,0,false)',[draftId,person,payload]));
+await as(owner,()=>denied(()=>db.query('select public.healthathon_save_draft($1,$2,$3,1,false)',[draftId,person,legacyDraft])));
 await as(owner,async()=>{const scope=await scalar('select public.healthathon_conversation_scope_at($1,$2)',[person,conversation]);ok(scope.revision===1&&!scope.approved&&scope.memberIds.length===0,'new scope starts with no audience');});
 await as(clinician,()=>denied(()=>db.query('select public.healthathon_review_draft($1,1,true)',[draftId])));
 await as(family,()=>denied(()=>db.query('select public.healthathon_conversation_scope($1,$2,1,$3,true)',[person,conversation,[family]])));
@@ -64,7 +77,22 @@ await db.query("update public.healthathon_clinician_requests set status='pending
 await as(clinician,async()=>{ok(await scalar('select count(*)::int from public.healthathon_records where id=$1',[note.id])===0,'doctor role alone does not grant note access');await denied(()=>db.query('select public.healthathon_conversation_scope($1,$2,4,$3,true)',[person,conversation,[family]]));});
 await db.query("update public.healthathon_clinician_requests set status='approved' where user_id=$1",[clinician]);
 await as(excluded,async()=>{ok(await scalar("select count(*)::int from public.healthathon_records where id=$1",[note.id])===0,'unselected family cannot read');ok(!(await db.query('select * from public.healthathon_review_receipts()')).rows.some(x=>x.note_id===note.id),'no receipt leak');await denied(()=>db.query('select public.healthathon_save_record(gen_random_uuid(),$1,\'ack\',$2,0)',[person,{versionId:note.id,contentHash:note.data.contentHash,name:'Excluded',relationship:'Family / carer'}]));ok(await scalar('select count(*)::int from public.healthathon_records where id=$1',[legacy])===1,'legacy visibility preserved');});
-await as(owner,()=>denied(()=>db.query("select public.healthathon_save_record(gen_random_uuid(),$1,'note',$2,0)",[person,{...old,version:3}])));
+const legacyNew=await as(owner,()=>scalar("select to_jsonb(public.healthathon_save_record(gen_random_uuid(),$1,'note',$2,0))",[person,{...old,version:3}]));
+ok(legacyNew.data.source===old.source&&!('contextVersion' in legacyNew.data),'legacy client can still publish an unverified context-free note');
+await as(stranger,()=>denied(()=>db.query("select public.healthathon_save_record(gen_random_uuid(),$1,'note',$2,0)",[person,{...old,version:4}])));
+await as(owner,()=>denied(()=>db.query("select public.healthathon_save_record(gen_random_uuid(),$1,'note',$2,0)",[person,{...old,version:4,reviewStatus:'clinician_reviewed',reviewerVerification:'verified',reviewerId:owner}])));
+await as(owner,()=>denied(()=>db.query("select public.healthathon_save_record($1,$2,'note',$3,$4)",[note.id,person,{...old,version:note.data.version},note.revision])));
+for(const partial of [{contextVersion:1},{contextJson:exact},{conversationId:conversation},{hashScheme:'sha256-framed-v2'},{hashScheme:'unknown'},{hashScheme:null}])await as(owner,()=>denied(()=>db.query("select public.healthathon_save_record(gen_random_uuid(),$1,'note',$2,0)",[person,{...old,version:4,...partial}])));
+const legacyReviewDraft='cccccccc-cccc-4ccc-8ccc-cccccccccccc';
+await as(owner,()=>db.query('select public.healthathon_save_draft($1,$2,$3,0,true)',[legacyReviewDraft,person,legacyDraft]));
+await as(family,()=>denied(()=>db.query('select public.healthathon_review_draft($1,1,true)',[legacyReviewDraft])));
+await as(clinician,()=>denied(()=>db.query('select public.healthathon_review_draft($1,1,false)',[legacyReviewDraft])));
+const legacyReviewed=await as(clinician,()=>scalar('select to_jsonb(public.healthathon_review_draft($1,1,true))',[legacyReviewDraft]));
+ok(legacyReviewed.data.hashScheme==='sha256-json-v1'&&legacyReviewed.data.reviewerId===clinician&&legacyReviewed.data.reviewerVerification==='verified','original invited/approved clinician review remains supported');
+await as(owner,async()=>ok((await db.query('select * from public.healthathon_review_receipts()')).rows.some(x=>x.note_id===legacyReviewed.id),'legacy reviewed receipt remains verifiable'));
+const malformedDraft='dddddddd-dddd-4ddd-8ddd-dddddddddddd';
+await db.query("insert into public.healthathon_care_drafts(id,person_id,author_id,data,status) values($1,$2,$3,$4,'submitted')",[malformedDraft,person,owner,missingVersion]);
+await as(clinician,()=>denied(()=>db.query('select public.healthathon_review_draft($1,1,true)',[malformedDraft])));
 await as(owner,()=>db.query("select public.healthathon_save_record(gen_random_uuid(),$1,'ack',$2,0)",[person,{versionId:note.id,contentHash:note.data.contentHash,name:'Owner',relationship:'Patient'}]));
 await as(family,()=>db.query("select public.healthathon_save_record(gen_random_uuid(),$1,'ack',$2,0)",[person,{versionId:note.id,contentHash:note.data.contentHash,name:'Family',relationship:'Family / carer'}]));
 const secondConversation='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',secondDraft='bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
@@ -76,9 +104,9 @@ const otherNote=await as(clinician,()=>scalar('select to_jsonb(public.healthatho
 await as(family,async()=>{ok(await scalar('select count(*)::int from public.healthathon_records where id=$1',[otherNote.id])===0,'one conversation does not grant another');await db.query("select public.healthathon_save_record(gen_random_uuid(),$1,'ack',$2,0)",[person,{versionId:note.id,contentHash:note.data.contentHash,name:'Family',relationship:'Family / carer'}]);ok(true,'hidden newer conversation does not block exact allowed confirmation');await denied(()=>db.query('select public.healthathon_care_progress($1)',[person]));});
 await as(excluded,async()=>{ok(await scalar('select count(*)::int from public.healthathon_records where kind=\'ack\' and data->>\'versionId\'=$1',[note.id])===0,'hidden conversation ack read blocked');ok(await scalar('select count(*)::int from public.healthathon_care_drafts where id=$1',[draftId])===0,'unselected family cannot read another author draft');});
 await db.query("update public.healthathon_members set expires_at=now()-interval '1 second' where person_id=$1 and user_id=$2",[person,family]);
-await as(family,async()=>ok(await scalar('select count(*)::int from public.healthathon_records where id=$1',[note.id])===0,'expiry revokes note'));
+await as(family,async()=>{ok(await scalar('select count(*)::int from public.healthathon_records where id=$1',[note.id])===0,'expiry revokes note');await denied(()=>db.query("select public.healthathon_save_record(gen_random_uuid(),$1,'ack',$2,0)",[person,{versionId:note.id,contentHash:note.data.contentHash,name:'Family',relationship:'Family / carer'}]));});
 await db.query('delete from public.healthathon_members where person_id=$1 and user_id=$2',[person,family]);
-await as(family,async()=>ok(await scalar('select count(*)::int from public.healthathon_records where id=$1',[note.id])===0,'membership revocation overrides selected audience'));
+await as(family,async()=>{ok(await scalar('select count(*)::int from public.healthathon_records where id=$1',[note.id])===0,'membership revocation overrides selected audience');await denied(()=>db.query("select public.healthathon_save_record(gen_random_uuid(),$1,'ack',$2,0)",[person,{versionId:note.id,contentHash:note.data.contentHash,name:'Family',relationship:'Family / carer'}]));});
 assert.deepEqual(await scalar('select data from public.healthathon_records where id=$1',[legacy]),old);checks++;
 ok(!await scalar("select has_function_privilege('anon','public.healthathon_conversation_scope(uuid,uuid,bigint,uuid[],boolean)','execute')"),'anonymous audience denied');
 await as(stranger,()=>denied(()=>db.query('select public.healthathon_save_draft($1,$2,$3,1,false)',[draftId,person,payload])));
@@ -87,4 +115,5 @@ ok(!await scalar("select has_function_privilege('anon','healthathon_private.save
 ok(!await scalar("select has_function_privilege('service_role','healthathon_private.save_record(uuid,uuid,text,jsonb,bigint)','execute')"),'service role user RPC denied');
 await db.query('insert into healthathon_private.closed_accounts(user_id) values($1)',[owner]);
 await as(owner,async()=>{await denied(()=>db.query('select public.healthathon_conversation_scope_at($1,$2)',[person,conversation]));await denied(()=>db.query('select public.healthathon_save_draft($1,$2,$3,1,false)',[draftId,person,payload]));await denied(()=>db.query('select * from public.healthathon_review_receipts()'));});
-console.log(`Conversation context/scope: ${checks} isolated checks PASS`);await db.close();
+await db.exec('rollback');ok(await scalar('select count(*)::int from auth.users')===0,'all fictional accounts and approvals rolled back');
+console.log(`Conversation context/scope: ${checks} isolated checks PASS; fictional fixture transaction ROLLBACK verified`);await db.close();

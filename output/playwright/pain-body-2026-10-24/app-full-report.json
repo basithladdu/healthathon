@@ -1,0 +1,345 @@
+{
+  "stage": "complete-live-local-care-tools-qa",
+  "scope": "Isolated local care-tools flow; baseline is actual UI-saved fixture from prior deployment, restored only in this ephemeral browser",
+  "checks": [
+    {
+      "name": "New history restores prior UI-saved exact point and rating",
+      "pass": true
+    },
+    {
+      "name": "Quick follow-up keeps exact location but no rating or old note",
+      "pass": true
+    },
+    {
+      "name": "Follow-up adds new 3/10 entry and preserves original 7/10",
+      "pass": true
+    },
+    {
+      "name": "Follow-up keeps point model and records own comparison against actual predecessor",
+      "pass": true
+    },
+    {
+      "name": "Actual graph contains saved 7 and 3 ratings",
+      "pass": true,
+      "detail": [
+        "2026-10-23 08:30: 7/10",
+        "2026-10-24 10:30: 3/10"
+      ]
+    },
+    {
+      "name": "Read-only history drag and tap emit no selection and do not mutate saved records",
+      "pass": true
+    },
+    {
+      "name": "Visible date chooser displays selected entry 3/10 with its actual exact points",
+      "pass": true
+    },
+    {
+      "name": "Desktop 1440px has no horizontal overflow",
+      "pass": true,
+      "detail": {
+        "viewport": 1440,
+        "scrollWidth": 1440,
+        "pass": true
+      }
+    },
+    {
+      "name": "Historical dates, ratings and exact points survive app reload",
+      "pass": true
+    },
+    {
+      "name": "Missing rating rejects save and preserves existing records",
+      "pass": true
+    },
+    {
+      "name": "Explicit unable-to-rate saves null, not zero",
+      "pass": true
+    },
+    {
+      "name": "Unrated graph has no fabricated zero dot",
+      "pass": true
+    },
+    {
+      "name": "Well-being visibly anchors zero as best and ten as worst",
+      "pass": true
+    },
+    {
+      "name": "Well-being zero is saved independently",
+      "pass": true
+    },
+    {
+      "name": "Hindi covers diary, history and actual saved-map status",
+      "pass": true
+    },
+    {
+      "name": "Mobile 390px has no horizontal overflow",
+      "pass": true,
+      "detail": {
+        "viewport": 390,
+        "scrollWidth": 390,
+        "pass": true
+      }
+    },
+    {
+      "name": "Body-area choices work by keyboard without inventing exact points",
+      "pass": true
+    },
+    {
+      "name": "Unsubmitted keyboard selection leaves saved records unchanged",
+      "pass": true
+    },
+    {
+      "name": "Real WebGL failure shows saved-history SVG fallback instead of a broken viewer",
+      "pass": true
+    },
+    {
+      "name": "Keyboard body-area selection remains usable with WebGL disabled",
+      "pass": true
+    },
+    {
+      "name": "Fallback interaction does not alter saved historical points or ratings",
+      "pass": true
+    },
+    {
+      "name": "Fallback at 390px has no horizontal overflow",
+      "pass": true,
+      "detail": {
+        "viewport": 390,
+        "scrollWidth": 390,
+        "pass": true
+      }
+    },
+    {
+      "name": "Live privacy page visibly explains doctor uploads and deletion exception",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "selectedFileUpload": true,
+        "noIndividualDelete": true
+      }
+    },
+    {
+      "name": "Live deletion page visibly covers doctor files, persistence and separate verified removal",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "workspaceCovered": true,
+        "remainsOnline": true,
+        "separateVerifiedHandling": true,
+        "noIndividualButton": true,
+        "normalClosureException": true,
+        "contact": "mailto:workwithdevit@gmail.com?subject=Delete%20my%20Sahara%20account&body=Please%20delete%20my%20Sahara%20account%20and%20the%20associated%20care%20information.%0A%0AI%20am%20sending%20this%20from%20my%20registered%20email%20address."
+      }
+    }
+  ],
+  "errors": [],
+  "baseline": [
+    {
+      "symptom": "Pain",
+      "severity": 7,
+      "date": "2026-10-23",
+      "startedOn": "2026-10-23",
+      "note": "QA fictional observation only",
+      "scale": "sahara-personal-nrs-v1",
+      "time": "08:30",
+      "recall": "now",
+      "respondent": "patient",
+      "painLocation": "",
+      "painBodySites": [
+        "left-arm"
+      ],
+      "painBodyPoints": [
+        {
+          "site": "left-arm",
+          "x": 0.794,
+          "y": 0.523,
+          "z": -0.188
+        }
+      ],
+      "painBodyModel": "sahara-body-v1",
+      "painTriggers": [],
+      "id": "60cd6de8-d49c-4668-bdac-0d8172a18d80",
+      "patientId": "CANCER-20418",
+      "author": "Meera Raghavan",
+      "recordedAt": "2026-10-24T13:47:29.138Z"
+    },
+    {
+      "symptom": "Nausea",
+      "severity": 2,
+      "date": "2026-10-23",
+      "startedOn": "2026-10-23",
+      "note": "QA fictional observation only",
+      "scale": "sahara-personal-nrs-v1",
+      "time": "08:30",
+      "recall": "now",
+      "respondent": "patient",
+      "id": "924ce953-de3f-4e88-9903-478617edc99a",
+      "patientId": "CANCER-20418",
+      "author": "Meera Raghavan",
+      "recordedAt": "2026-10-24T13:47:29.138Z"
+    }
+  ],
+  "saved": [
+    {
+      "symptom": "Pain",
+      "severity": 7,
+      "date": "2026-10-23",
+      "startedOn": "2026-10-23",
+      "note": "QA fictional observation only",
+      "scale": "sahara-personal-nrs-v1",
+      "time": "08:30",
+      "recall": "now",
+      "respondent": "patient",
+      "painLocation": "",
+      "painBodySites": [
+        "left-arm"
+      ],
+      "painBodyPoints": [
+        {
+          "site": "left-arm",
+          "x": 0.794,
+          "y": 0.523,
+          "z": -0.188
+        }
+      ],
+      "painBodyModel": "sahara-body-v1",
+      "painTriggers": [],
+      "id": "60cd6de8-d49c-4668-bdac-0d8172a18d80",
+      "patientId": "CANCER-20418",
+      "author": "Meera Raghavan",
+      "recordedAt": "2026-10-24T13:47:29.138Z"
+    },
+    {
+      "symptom": "Nausea",
+      "severity": 2,
+      "date": "2026-10-23",
+      "startedOn": "2026-10-23",
+      "note": "QA fictional observation only",
+      "scale": "sahara-personal-nrs-v1",
+      "time": "08:30",
+      "recall": "now",
+      "respondent": "patient",
+      "id": "924ce953-de3f-4e88-9903-478617edc99a",
+      "patientId": "CANCER-20418",
+      "author": "Meera Raghavan",
+      "recordedAt": "2026-10-24T13:47:29.138Z"
+    },
+    {
+      "symptom": "Pain",
+      "severity": 3,
+      "date": "2026-10-24",
+      "startedOn": "2026-10-23",
+      "note": "",
+      "scale": "sahara-personal-nrs-v1",
+      "time": "10:30",
+      "recall": "now",
+      "respondent": "patient",
+      "painLocation": "",
+      "painBodySites": [
+        "left-arm"
+      ],
+      "painBodyPoints": [
+        {
+          "site": "left-arm",
+          "x": 0.794,
+          "y": 0.523,
+          "z": -0.188
+        }
+      ],
+      "painBodyModel": "sahara-body-v1",
+      "painTriggers": [],
+      "selfReportedChange": "better",
+      "comparedWithId": "60cd6de8-d49c-4668-bdac-0d8172a18d80",
+      "id": "becb3f46-65cb-43ce-99ee-6e96436f39da",
+      "patientId": "CANCER-20418",
+      "author": "Meera Raghavan",
+      "recordedAt": "2026-10-24T13:59:46.613Z"
+    },
+    {
+      "symptom": "Diarrhoea",
+      "severity": null,
+      "date": "2026-10-24",
+      "startedOn": "",
+      "note": "",
+      "scale": "sahara-personal-nrs-v1",
+      "time": "19:29",
+      "recall": "now",
+      "respondent": "patient",
+      "id": "4f184af6-6032-42a8-a7f8-a71e51361bd2",
+      "patientId": "CANCER-20418",
+      "author": "Meera Raghavan",
+      "recordedAt": "2026-10-24T14:00:46.146Z"
+    },
+    {
+      "symptom": "Overall well-being",
+      "severity": 0,
+      "date": "2026-10-24",
+      "startedOn": "",
+      "note": "",
+      "scale": "sahara-personal-nrs-v1",
+      "time": "19:30",
+      "recall": "now",
+      "respondent": "patient",
+      "id": "df58ad63-65df-483d-a397-8c72048ec363",
+      "patientId": "CANCER-20418",
+      "author": "Meera Raghavan",
+      "recordedAt": "2026-10-24T14:00:46.577Z"
+    }
+  ],
+  "desktopOverflow": {
+    "viewport": 1440,
+    "scrollWidth": 1440,
+    "pass": true
+  },
+  "mobileOverflow": {
+    "viewport": 390,
+    "scrollWidth": 390,
+    "pass": true
+  },
+  "fallbackOverflow": {
+    "viewport": 390,
+    "scrollWidth": 390,
+    "pass": true
+  },
+  "privacy": {
+    "status": 200,
+    "selectedFileUpload": true,
+    "noIndividualDelete": true
+  },
+  "deletion": {
+    "status": 200,
+    "doctorException": true,
+    "supabaseMention": false,
+    "text": "the care records you own. Your membership in care records owned by someone else. Your account-owned doctor test workspace and uploaded files, through separate verified support removal. If your sign-in is also used for another service, we handle Sahara data separately and explain any shared account details before completing the request. If another service still needs your sign-in, we keep only its account ID and the Sahara closure date to keep Sahara access closed. This marker is removed when that shared sign-in is deleted. Records and copies to check Care records owned by someone else remain with their owner. Deleting your account cannot recall files you exported or copies that recipients sa"
+  },
+  "assertionAudit": {
+    "originalDeletionCheck": {
+      "name": "Live deletion page visibly covers doctor test-workspace files",
+      "pass": false,
+      "detail": {
+        "status": 200,
+        "doctorException": true,
+        "supabaseMention": false,
+        "text": "the care records you own. Your membership in care records owned by someone else. Your account-owned doctor test workspace and uploaded files, through separate verified support removal. If your sign-in is also used for another service, we handle Sahara data separately and explain any shared account details before completing the request. If another service still needs your sign-in, we keep only its account ID and the Sahara closure date to keep Sahara access closed. This marker is removed when that shared sign-in is deleted. Records and copies to check Care records owned by someone else remain with their owner. Deleting your account cannot recall files you exported or copies that recipients sa"
+      }
+    },
+    "reason": "The initial QA assertion unnecessarily required the provider brand name on the deletion page. The actual requirement is that uploaded doctor-test files, persistence and separate verified deletion handling are visibly explained. These concrete conditions are checked below."
+  },
+  "exportVerification": {
+    "realDownload": true,
+    "hasWellbeingAnchors": true,
+    "hasPainAreas": true,
+    "noOtherPatient": true
+  },
+  "deployment": "dpl_8nL3CtJF2SP51MyGxdebVuMaUF6C",
+  "sourceCommit": "031492a",
+  "viewerSha256": "CADD14703A708731440DDCE4988A2189B8A19F6A644F02CAEB8C5A5263004874",
+  "browserClosed": true,
+  "visualReview": {
+    "inspected": [
+      "app-history-mobile390-hindi.png",
+      "app-mobile390-no-webgl-keyboard.png"
+    ],
+    "observed": "Saved date/rating, neutral mannequin and selected pain colour are legible at 390 px; Hindi labels and front-view patient right/left are consistent. Fallback shows the selected coarse right-leg region and visible body-area controls. The fixed mobile navigation is present; element screenshots do not certify all scroll positions or physical-device insets."
+  }
+}

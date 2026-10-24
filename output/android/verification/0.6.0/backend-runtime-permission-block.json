@@ -1,0 +1,171 @@
+{
+  "checkedAt": "2026-10-24T14:07:47.317682+00:00",
+  "status": "BLOCKED: migration write permission denied; source and isolated tests pass, backend runtime additions are not deployed.",
+  "attemptedByRoot": {
+    "tool": "supabase_apply_migration",
+    "migration": "20261023070323_conversation_scope_context.sql",
+    "outcome": "ProtocolError MCP-32600: You do not have permission to perform this action.",
+    "isError": true,
+    "prescriptionAttempted": false
+  },
+  "noDeploymentConfirmed": {
+    "targetTablesRemainAbsent": true,
+    "renameTargetsRemainAbsent": true,
+    "migrationCount": 16,
+    "lastMigration": {
+      "version": "20261023142157",
+      "name": "sahara_hospital_pin_confirmation"
+    },
+    "ledgerHasConversationOrPrescription": false
+  },
+  "readOnlyVerification": {
+    "checked_at": "2026-10-24T14:07:47.317682+00:00",
+    "dependencies": [
+      {
+        "signature": "extensions.digest(text,text)",
+        "required_present": true
+      },
+      {
+        "signature": "healthathon_private.can_read_record(uuid,text,jsonb)",
+        "required_present": true
+      },
+      {
+        "signature": "healthathon_private.has_permission(uuid,text)",
+        "required_present": true
+      },
+      {
+        "signature": "healthathon_private.medicine_access(uuid,boolean)",
+        "required_present": true
+      },
+      {
+        "signature": "healthathon_private.medicine_record_access(uuid,uuid,boolean)",
+        "required_present": true
+      },
+      {
+        "signature": "healthathon_private.require_open_account()",
+        "required_present": true
+      },
+      {
+        "signature": "healthathon_private.review_draft(uuid,bigint,boolean)",
+        "required_present": true
+      },
+      {
+        "signature": "healthathon_private.review_receipts()",
+        "required_present": true
+      },
+      {
+        "signature": "healthathon_private.save_draft(uuid,uuid,jsonb,bigint,boolean)",
+        "required_present": true
+      },
+      {
+        "signature": "healthathon_private.save_record(uuid,uuid,text,jsonb,bigint)",
+        "required_present": true
+      },
+      {
+        "signature": "healthathon_private.valid_draft(jsonb)",
+        "required_present": true
+      }
+    ],
+    "missing_tables": [
+      {
+        "name": "healthathon_private.conversation_audience",
+        "must_be_absent": true
+      },
+      {
+        "name": "healthathon_private.conversation_scopes",
+        "must_be_absent": true
+      },
+      {
+        "name": "public.healthathon_prescription_medicines",
+        "must_be_absent": true
+      },
+      {
+        "name": "public.healthathon_prescription_mutations",
+        "must_be_absent": true
+      },
+      {
+        "name": "public.healthathon_prescription_state",
+        "must_be_absent": true
+      },
+      {
+        "name": "public.healthathon_prescriptions",
+        "must_be_absent": true
+      }
+    ],
+    "rename_targets": [
+      {
+        "signature": "healthathon_private.can_read_record_before_context(uuid,text,jsonb)",
+        "must_be_absent": true
+      },
+      {
+        "signature": "healthathon_private.review_draft_before_context(uuid,bigint,boolean)",
+        "must_be_absent": true
+      },
+      {
+        "signature": "healthathon_private.review_receipts_before_context()",
+        "must_be_absent": true
+      },
+      {
+        "signature": "healthathon_private.save_draft_before_context(uuid,uuid,jsonb,bigint,boolean)",
+        "must_be_absent": true
+      },
+      {
+        "signature": "healthathon_private.save_record_before_context(uuid,uuid,text,jsonb,bigint)",
+        "must_be_absent": true
+      },
+      {
+        "signature": "healthathon_private.valid_draft_before_context(jsonb)",
+        "must_be_absent": true
+      }
+    ],
+    "already_live_do_not_replay": [
+      {
+        "name": "public.healthathon_care_contacts",
+        "present": true
+      },
+      {
+        "name": "public.healthathon_medicine_courses",
+        "present": true
+      },
+      {
+        "name": "public.healthathon_medicine_events",
+        "present": true
+      }
+    ]
+  },
+  "executionMetadata": {
+    "execution_database_role": "postgres",
+    "session_database_role": "postgres",
+    "transaction_read_only": "off",
+    "default_transaction_read_only": "off"
+  },
+  "localConnectorConfiguration": "No Supabase entry in inspected project .mcp.json/user config locations; hosted connector grant details not exposed. No credentials or tokens read.",
+  "permissionFinding": {
+    "verified": "Official MCP tool permission matrix requires Migrations (Read-write) for apply_migration; execute_sql and list_migrations require separate Read permissions.",
+    "inference": "Missing connector migration-write scope or account project permission is plausible; exact configured OAuth scopes/human organization role not visible.",
+    "source": "https://supabase.com/docs/guides/platform/personal-access-tokens",
+    "toolScopeLines": [
+      "| Migrations                       | Read            | [Get a migration](/docs/reference/api/v1-get-a-migration)                                                           |",
+      "| `apply_migration`           | **Migrations** (Read-write)                                                   |",
+      "| `execute_sql`               | **Database** (Read)                                                           |",
+      "| `list_migrations`           | **Migrations** (Read)                                                         |"
+    ]
+  },
+  "requiredNextAction": "Reauthorise the connected Supabase app for the intended project with Migrations Read-write using an account whose project role permits migrations. Never share tokens in chat. Do not route denied migration through execute_sql DDL or another write path.",
+  "notPerformed": [
+    "No execute_sql DDL workaround",
+    "No alternate write attempt",
+    "No role/access grants",
+    "No live accounts/approvals/patient fixtures",
+    "No prescription migration attempt by this agent"
+  ],
+  "offlineTests": {
+    "conversation": 74,
+    "prescription": 31,
+    "allFictionalFixturesRolledBack": true
+  },
+  "reviewedSourceHashes": {
+    "conversation": "4A8A12AE39E11DFD293C50BF3545EA6A7E9153F1E5CC7A6F07D97987EBD4AA74",
+    "prescription": "C1931C45FD4FC52FBE5195D942370E173D2A8917055F5CCDBE98714DA9A7BFCF"
+  }
+}

@@ -1,0 +1,491 @@
+{
+  "checkedAt": "2026-10-24T13:56:51.8979+00:00",
+  "scope": "Schema-only readiness audit of the canonical Sahara Android backend. No application/account row contents read, no schema/data/access mutations performed.",
+  "status": "BLOCKED: two runtime migrations remain missing. Root apply_migration was denied with MCP-32600; read-only schema/ledger verification confirms no deployment.",
+  "present": {
+    "doctorTables": [
+      {
+        "rls": true,
+        "table": "sahara_doctor_dataset_members",
+        "exists": true,
+        "auth_delete": false,
+        "auth_insert": false,
+        "auth_select": true,
+        "auth_update": false,
+        "policy_count": 1
+      },
+      {
+        "rls": true,
+        "table": "sahara_doctor_datasets",
+        "exists": true,
+        "auth_delete": false,
+        "auth_insert": true,
+        "auth_select": true,
+        "auth_update": false,
+        "policy_count": 2
+      },
+      {
+        "rls": true,
+        "table": "sahara_doctor_doses",
+        "exists": true,
+        "auth_delete": false,
+        "auth_insert": true,
+        "auth_select": true,
+        "auth_update": false,
+        "policy_count": 2
+      },
+      {
+        "rls": true,
+        "table": "sahara_doctor_files",
+        "exists": true,
+        "auth_delete": false,
+        "auth_insert": true,
+        "auth_select": true,
+        "auth_update": false,
+        "policy_count": 2
+      },
+      {
+        "rls": true,
+        "table": "sahara_doctor_notes",
+        "exists": true,
+        "auth_delete": false,
+        "auth_insert": true,
+        "auth_select": true,
+        "auth_update": false,
+        "policy_count": 3
+      },
+      {
+        "rls": true,
+        "table": "sahara_doctor_patients",
+        "exists": true,
+        "auth_delete": false,
+        "auth_insert": true,
+        "auth_select": true,
+        "auth_update": false,
+        "policy_count": 2
+      }
+    ],
+    "doctorRpcs": [
+      {
+        "name": "sahara_doctor_complete_file",
+        "exists": true,
+        "result": "sahara_doctor_files",
+        "arguments": "p_id uuid",
+        "anon_execute": false,
+        "security_definer": false,
+        "authenticated_execute": true
+      },
+      {
+        "name": "sahara_doctor_save_note",
+        "exists": true,
+        "result": "sahara_doctor_notes",
+        "arguments": "p_patient uuid, p_id uuid, p_revision bigint, p_payload jsonb, p_publish boolean",
+        "anon_execute": false,
+        "security_definer": false,
+        "authenticated_execute": true
+      },
+      {
+        "name": "sahara_doctor_seed",
+        "exists": true,
+        "result": "uuid",
+        "arguments": "p_patients jsonb",
+        "anon_execute": false,
+        "security_definer": false,
+        "authenticated_execute": true
+      }
+    ],
+    "doctorPrivateBucket": {
+      "exists": true,
+      "public": false,
+      "file_size_limit": 4194304,
+      "allowed_mime_types": [
+        "application/pdf",
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+        "audio/mp4",
+        "audio/mpeg",
+        "audio/wav",
+        "audio/x-wav",
+        "audio/ogg"
+      ]
+    },
+    "doctorStoragePolicyNames": [
+      {
+        "name": "doctor_object_delete_guard",
+        "command": "DELETE",
+        "roles": [
+          "anon",
+          "authenticated"
+        ],
+        "permissive": "RESTRICTIVE"
+      },
+      {
+        "name": "doctor_object_insert",
+        "command": "INSERT",
+        "roles": [
+          "authenticated"
+        ],
+        "permissive": "PERMISSIVE"
+      },
+      {
+        "name": "doctor_object_insert_guard",
+        "command": "INSERT",
+        "roles": [
+          "anon",
+          "authenticated"
+        ],
+        "permissive": "RESTRICTIVE"
+      },
+      {
+        "name": "doctor_object_read",
+        "command": "SELECT",
+        "roles": [
+          "authenticated"
+        ],
+        "permissive": "PERMISSIVE"
+      },
+      {
+        "name": "doctor_object_read_guard",
+        "command": "SELECT",
+        "roles": [
+          "anon",
+          "authenticated"
+        ],
+        "permissive": "RESTRICTIVE"
+      },
+      {
+        "name": "doctor_object_update_guard",
+        "command": "UPDATE",
+        "roles": [
+          "anon",
+          "authenticated"
+        ],
+        "permissive": "RESTRICTIVE"
+      }
+    ],
+    "doctorGuards": [
+      {
+        "table": "sahara_doctor_doses",
+        "enabled": "O",
+        "trigger": "doctor_dose_guard",
+        "function": "doctor_dose_guard"
+      },
+      {
+        "table": "sahara_doctor_files",
+        "enabled": "O",
+        "trigger": "doctor_file_guard",
+        "function": "doctor_file_guard"
+      },
+      {
+        "table": "sahara_doctor_notes",
+        "enabled": "O",
+        "trigger": "doctor_note_guard",
+        "function": "doctor_note_guard"
+      }
+    ],
+    "careContactsRpcs": [
+      {
+        "name": "healthathon_care_team_permissions",
+        "exists": true,
+        "result": "jsonb",
+        "arguments": "p_person uuid",
+        "anon_execute": false,
+        "security_definer": false,
+        "authenticated_execute": true
+      },
+      {
+        "name": "healthathon_care_team_share",
+        "exists": true,
+        "result": "void",
+        "arguments": "p_person uuid, p_member uuid, p_enabled boolean",
+        "anon_execute": false,
+        "security_definer": false,
+        "authenticated_execute": true
+      },
+      {
+        "name": "healthathon_invite_care_team",
+        "exists": true,
+        "result": "text",
+        "arguments": "p_person uuid, p_edit boolean, p_care_team boolean",
+        "anon_execute": false,
+        "security_definer": false,
+        "authenticated_execute": true
+      },
+      {
+        "name": "healthathon_list_care_contacts",
+        "exists": true,
+        "result": "jsonb",
+        "arguments": "p_person uuid",
+        "anon_execute": false,
+        "security_definer": false,
+        "authenticated_execute": true
+      },
+      {
+        "name": "healthathon_remove_care_contact",
+        "exists": true,
+        "result": "void",
+        "arguments": "p_person uuid, p_id uuid, p_revision bigint",
+        "anon_execute": false,
+        "security_definer": false,
+        "authenticated_execute": true
+      },
+      {
+        "name": "healthathon_request_clinician",
+        "exists": true,
+        "result": "healthathon_clinician_requests",
+        "arguments": "p_name text, p_council text, p_registration text",
+        "anon_execute": false,
+        "security_definer": false,
+        "authenticated_execute": true
+      },
+      {
+        "name": "healthathon_save_care_contact",
+        "exists": true,
+        "result": "jsonb",
+        "arguments": "p_contact jsonb",
+        "anon_execute": false,
+        "security_definer": false,
+        "authenticated_execute": true
+      }
+    ],
+    "medicineHistoryAlreadyPresent": true
+  },
+  "missingRpcs": [
+    "healthathon_conversation_candidates",
+    "healthathon_conversation_capabilities",
+    "healthathon_conversation_scope",
+    "healthathon_conversation_scope_at",
+    "healthathon_prescription_capabilities",
+    "healthathon_prescription_snapshot",
+    "healthathon_save_prescription"
+  ],
+  "missingTables": [
+    "healthathon_private.conversation_scopes",
+    "healthathon_private.conversation_audience",
+    "public.healthathon_prescriptions",
+    "public.healthathon_prescription_state",
+    "public.healthathon_prescription_medicines",
+    "public.healthathon_prescription_mutations"
+  ],
+  "preflight": [
+    {
+      "signature": "extensions.digest(text,text)",
+      "exists": true
+    },
+    {
+      "signature": "healthathon_private.can_read_record_before_context(uuid,text,jsonb)",
+      "exists": false
+    },
+    {
+      "signature": "healthathon_private.can_read_record(uuid,text,jsonb)",
+      "exists": true
+    },
+    {
+      "signature": "healthathon_private.has_permission(uuid,text)",
+      "exists": true
+    },
+    {
+      "signature": "healthathon_private.medicine_access(uuid,boolean)",
+      "exists": true
+    },
+    {
+      "signature": "healthathon_private.medicine_record_access(uuid,uuid,boolean)",
+      "exists": true
+    },
+    {
+      "signature": "healthathon_private.require_open_account()",
+      "exists": true
+    },
+    {
+      "signature": "healthathon_private.review_draft_before_context(uuid,bigint,boolean)",
+      "exists": false
+    },
+    {
+      "signature": "healthathon_private.review_draft(uuid,bigint,boolean)",
+      "exists": true
+    },
+    {
+      "signature": "healthathon_private.review_receipts_before_context()",
+      "exists": false
+    },
+    {
+      "signature": "healthathon_private.review_receipts()",
+      "exists": true
+    },
+    {
+      "signature": "healthathon_private.save_draft_before_context(uuid,uuid,jsonb,bigint,boolean)",
+      "exists": false
+    },
+    {
+      "signature": "healthathon_private.save_draft(uuid,uuid,jsonb,bigint,boolean)",
+      "exists": true
+    },
+    {
+      "signature": "healthathon_private.save_record_before_context(uuid,uuid,text,jsonb,bigint)",
+      "exists": false
+    },
+    {
+      "signature": "healthathon_private.save_record(uuid,uuid,text,jsonb,bigint)",
+      "exists": true
+    },
+    {
+      "signature": "healthathon_private.valid_draft_before_context(jsonb)",
+      "exists": false
+    },
+    {
+      "signature": "healthathon_private.valid_draft(jsonb)",
+      "exists": true
+    }
+  ],
+  "compatibility": {
+    "legacyNoteWrites": "Preserved only for context-free original payloads through original validated/authorised path.",
+    "legacyClinicianReviews": "Preserved only for context-free original drafts, independently approved and invited clinician, explicit confirmation and exact submitted revision.",
+    "v2": "All context/conversation markers and unknown hash schemes fail closed; no partial-envelope or existing-v2 downgrade fallback.",
+    "testChecks": 74,
+    "fixtures": "Isolated PGlite transaction ROLLBACK verified."
+  },
+  "prescriptionTest": {
+    "checks": 31,
+    "runner": "output/android/verification/0.6.0/test-prescription-rollback.mjs",
+    "fixtures": "Isolated PGlite transaction ROLLBACK verified.",
+    "trackedTestUnchanged": true
+  },
+  "boundaries": [
+    "Normal account-closure function does not include the synthetic doctor tables or object bucket; retain documented manual support deletion scope.",
+    "Real signed-in device/server note/upload/prescription UI flow is not established by schema or offline tests.",
+    "No clinical approvals, memberships, users, patient rows, records or uploads were added to the live project."
+  ],
+  "securityAdvisorBaseline": [
+    {
+      "name": "rls_enabled_no_policy",
+      "level": "INFO",
+      "count": 16,
+      "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy",
+      "entities": [
+        {
+          "schema": "healthathon_private",
+          "name": "assist_reservations",
+          "type": "table"
+        },
+        {
+          "schema": "healthathon_private",
+          "name": "clinician_reviews",
+          "type": "table"
+        },
+        {
+          "schema": "healthathon_private",
+          "name": "closed_accounts",
+          "type": "table"
+        },
+        {
+          "schema": "healthathon_private",
+          "name": "directory_review_history",
+          "type": "table"
+        },
+        {
+          "schema": "healthathon_private",
+          "name": "directory_reviews",
+          "type": "table"
+        },
+        {
+          "schema": "healthathon_private",
+          "name": "invites",
+          "type": "table"
+        },
+        {
+          "schema": "healthathon_private",
+          "name": "staff_roles",
+          "type": "table"
+        },
+        {
+          "schema": "public",
+          "name": "healthathon_care_contacts",
+          "type": "table"
+        },
+        {
+          "schema": "public",
+          "name": "movies",
+          "type": "table"
+        },
+        {
+          "schema": "public",
+          "name": "saanthvana_centre_reports",
+          "type": "table"
+        },
+        {
+          "schema": "public",
+          "name": "saanthvana_report_attempts",
+          "type": "table"
+        },
+        {
+          "schema": "public",
+          "name": "saanthvana_report_settings",
+          "type": "table"
+        },
+        {
+          "schema": "public",
+          "name": "sahara_app_feedback",
+          "type": "table"
+        },
+        {
+          "schema": "public",
+          "name": "sahara_feedback_receipts",
+          "type": "table"
+        },
+        {
+          "schema": "public",
+          "name": "sahara_hospital_contributors",
+          "type": "table"
+        },
+        {
+          "schema": "public",
+          "name": "sahara_hospital_submissions",
+          "type": "table"
+        }
+      ]
+    },
+    {
+      "name": "anon_security_definer_function_executable",
+      "level": "WARN",
+      "count": 1,
+      "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0028_anon_security_definer_function_executable",
+      "entities": [
+        {
+          "schema": "public",
+          "name": "sahara_directory_list"
+        }
+      ]
+    },
+    {
+      "name": "authenticated_security_definer_function_executable",
+      "level": "WARN",
+      "count": 1,
+      "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable",
+      "entities": [
+        {
+          "schema": "public",
+          "name": "sahara_directory_list"
+        }
+      ]
+    },
+    {
+      "name": "auth_leaked_password_protection",
+      "level": "WARN",
+      "count": 1,
+      "remediation": "https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection",
+      "entities": [
+        {
+          "type": "auth"
+        }
+      ]
+    }
+  ],
+  "expectedNewAdvisorInfo": [
+    "healthathon_private.conversation_scopes: RLS enabled without direct client policies; private RPC-only.",
+    "healthathon_private.conversation_audience: RLS enabled without direct client policies; private RPC-only.",
+    "public.healthathon_prescription_mutations: RLS enabled without client policy or table grants; RPC-only receipt."
+  ],
+  "advisorBoundary": "Existing public sahara_directory_list SECURITY DEFINER notices and leaked-password-protection warning predate these changes. No unrelated fixes authorised.",
+  "permissionBlockEvidence": "output/android/verification/0.6.0/backend-runtime-permission-block.json"
+}
