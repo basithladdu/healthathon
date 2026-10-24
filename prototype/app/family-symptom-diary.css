@@ -16,6 +16,7 @@
 .symptom-scale-key { margin: -5px 0 0; color: #6f5b51; font-size: 12px; line-height: 1.5; }
 .symptom-diary-form .symptom-rating { padding: 12px; border: 1px solid #e8d0be; border-radius: 16px; background: #fff9f2; }
 .symptom-diary-form .symptom-rating legend { display: flex; align-items: baseline; gap: 8px; width: 100%; float: left; padding: 0; margin-bottom: 10px; }
+.symptom-rating .symptom-scale-key { clear: both; margin: 0 0 8px; }
 .symptom-rating legend > span:first-child { flex: 1; min-width: 0; overflow-wrap: anywhere; }
 .symptom-rating-value { flex-shrink: 0; color: #91533d; font-size: 13px; font-variant-numeric: tabular-nums; }
 .symptom-rating-options { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; clear: both; }
@@ -58,3 +59,21 @@
 @media (max-width: 400px) {
   .symptom-rating-options { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 }
+
+.pain-body-picker { min-width: 0; }
+.pain-body-view { margin-bottom: 8px; }
+.pain-body-view button:disabled { opacity: .5; cursor: default; }
+.pain-body-side-key, .pain-body-selection { color: #566b5e; font-size: 13px; line-height: 1.45; margin: 8px 0; }
+.pain-body-layout { display: grid; grid-template-columns: minmax(120px, 160px) minmax(0, 1fr); gap: 12px; align-items: center; }
+.pain-body-diagram { width: 100%; height: auto; overflow: visible; background: #f9fbf7; border-radius: 16px; }
+.pain-body-region { cursor: pointer; outline: none; }
+.pain-body-region path { fill: #d6dfd2; stroke: #6b8675; stroke-width: 1.5px; transition: fill 120ms; }
+.pain-body-region:hover path { fill: #bed0ba; }
+.pain-body-region[aria-pressed='true'] path { fill: #b85d45; stroke: #873b2b; stroke-width: 2px; }
+.pain-body-region:focus-visible path { stroke: #163e82; stroke-width: 4px; }
+.pain-body-side-label { fill: #566b5e; font-size: 10px; font-weight: 600; }
+.pain-body-text-options { align-content: start; gap: 6px; }
+.pain-body-text-options button { flex: 1 1 100px; font-size: 13px; }
+.pain-body-selection { min-height: 20px; color: #174c3b; font-weight: 600; }
+@media (max-width: 400px) { .pain-body-layout { grid-template-columns: 125px minmax(0, 1fr); gap: 8px; } .pain-body-text-options button { padding: 8px 5px; } }
+@media (prefers-reduced-motion: reduce) { .pain-body-region path, .family-symptom-diary .symptom-rating-options button { transition: none; } }

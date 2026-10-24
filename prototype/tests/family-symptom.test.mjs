@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {
   addSymptomEntry, updateSymptomEntry, removeSymptomEntry, restoreSymptomEntry,
   selectSymptomEntries, symptomDiaryText, validateSymptomInput,
-  SYMPTOM_SCALE, symptomComparison, sameSymptomContext,
+  SYMPTOM_SCALE, SYMPTOM_OPTIONS, symptomName, symptomScaleAnchors, symptomComparison, sameSymptomContext,
 } from '../app/family-symptom-state.ts';
 
 const today = '2026-09-21';
@@ -162,4 +162,51 @@ test('filters and export exclude other patients and use an inclusive seven-day w
   assert.match(copy, /Not sent to the care team/);
   assert.doesNotMatch(copy, /Other family|Private note from another family/);
   assert.equal(entries[0], entry);
+});
+
+
+test('clinical choices offer distinct patient symptoms and keep retired choices out of new entries', () => {
+  const names = SYMPTOM_OPTIONS.map((item) => item.value);
+  assert.equal(new Set(names).size, names.length);
+  for (const name of ['Diarrhoea', 'Dry or sore mouth', 'Overall well-being', 'Pain', 'Constipation',
+    'Difficulty swallowing', 'Cough', 'Bowel or bladder leakage', 'Nausea', 'Vomiting', 'Other']) {
+    assert.ok(names.includes(name), name);
+  }
+  for (const name of ['Sleep trouble', 'Overall discomfort', 'Weight loss', 'Dizziness', 'Irritability / restlessness']) {
+    assert.ok(!names.includes(name), name);
+  }
+  assert.ok(SYMPTOM_OPTIONS.every((item) => item.en && item.hi));
+  assert.equal(symptomName('Tiredness'), 'Fatigue / lack of energy');
+  assert.equal(symptomName('Dry or sore mouth', true), 'मुँह सूखना या दुखना');
+});
+
+test('well-being has best-to-worst anchors and never inherits the no-symptom label', () => {
+  assert.deepEqual(symptomScaleAnchors('Overall well-being'), {
+    zero: 'Best possible well-being', ten: 'Worst possible well-being',
+  });
+  assert.deepEqual(symptomScaleAnchors('Overall well-being', true), {
+    zero: 'सबसे अच्छी तबीयत', ten: 'सबसे खराब तबीयत',
+  });
+  assert.equal(symptomScaleAnchors('Nausea').zero, 'Not at all');
+  const current = observed('well-being', today, 0, { symptom: 'Overall well-being' });
+  const copy = symptomDiaryText([current], 'patient-a', today);
+  assert.match(copy, /Overall well-being — 0\/10/);
+  assert.match(copy, /0 = Best possible well-being; 10 = Worst possible well-being/);
+});
+
+test('retired and custom symptoms survive editing, filtering and export without becoming well-being', () => {
+  const old = observed('legacy', '2026-09-18', 4, { symptom: 'Overall discomfort' });
+  const sleep = observed('sleep', '2026-09-19', 5, { symptom: 'Sleep trouble' });
+  const custom = observed('custom', today, null, { symptom: 'Hiccups' });
+  const wellBeing = observed('new', today, 3, { symptom: 'Overall well-being' });
+  const changed = updateSymptomEntry([old, sleep, custom], 'patient-a', 'legacy', { ...old, note: 'Still bothers me' }, 'Helper', today);
+  assert.equal(changed[0].symptom, 'Overall discomfort');
+  assert.equal(changed[0].id, 'legacy');
+  assert.equal(selectSymptomEntries(changed, 'patient-a', today, 'all', 'Sleep trouble')[0].id, 'sleep');
+  assert.equal(symptomComparison(changed, wellBeing), null);
+  const copy = symptomDiaryText(changed, 'patient-a', today, true);
+  assert.match(copy, /कुल मिलाकर परेशानी/);
+  assert.match(copy, /नींद की परेशानी/);
+  assert.match(copy, /Hiccups/);
+  assert.doesNotMatch(copy, /सबसे अच्छी तबीयत/);
 });

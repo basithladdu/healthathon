@@ -118,6 +118,36 @@ class CareSymptomDiaryUiTest {
         ui.runOnIdle { assertEquals("Nausea", saved!!.symptom); assertEquals(0, saved!!.rating); assertEquals("patient", saved!!.respondent) }
     }
 
+    @Test fun overallWellbeingUsesBestWorstAnchorsAndSavesAnAttributedPatientEntry() {
+        var saved: SymptomNote? = null
+        ui.setContent { CareTheme { SymptomNoteForm("fixture-wellbeing", "Fictional patient", emptyList(), false,
+            onSave = { _, value -> saved = value }, onClose = {}) } }
+        ui.onNodeWithTag("symptom-choice-Overall well-being").performScrollTo().performClick()
+        ui.onNodeWithTag("diary-choice-patient").performScrollTo().performClick()
+        ui.onNodeWithTag("symptom-rating-anchors").performScrollTo().assertTextContains("0 = best possible well-being · 10 = worst possible well-being")
+        ui.onNodeWithTag("symptom-rating-0").performScrollTo().performClick()
+        ui.onNodeWithTag("symptom-save").performScrollTo().performClick()
+        ui.runOnIdle {
+            assertEquals("Overall well-being", saved!!.symptom)
+            assertEquals(SymptomDiaryRules.WELLBEING_SCALE, saved!!.scale)
+            assertEquals(0, saved!!.rating)
+            assertEquals("patient", saved!!.respondent)
+            assertEquals("Fictional patient", saved!!.author)
+        }
+    }
+
+    @Test fun editingAnOlderSleepDifficultyRecordKeepsItsNameRatingAndScale() {
+        val value = SymptomNote("Sleep difficulty", 6, LocalDate.now().minusDays(1).toString(), "10:00", "now", "patient", "Fictional patient")
+        val row = CareItem(id = "fixture-legacy-sleep", personId = "fixture-legacy", kind = "checkin", title = "Sleep difficulty", detail = SymptomNoteCodec.encode(value))
+        var saved: SymptomNote? = null
+        ui.setContent { CareTheme { SymptomNoteForm("fixture-legacy", "Fictional patient", listOf(row), false, initial = row,
+            onSave = { _, next -> saved = next }, onClose = {}) } }
+        ui.onNodeWithTag("symptom-choice-Sleep difficulty").assertDoesNotExist()
+        ui.onNodeWithText("Symptom name").performScrollTo().assertTextContains("Sleep difficulty")
+        ui.onNodeWithTag("symptom-save").performScrollTo().performClick()
+        ui.runOnIdle { assertEquals(value, saved) }
+    }
+
     private fun screenshot(name: String) {
         val instrumentation = InstrumentationRegistry.getInstrumentation()
         val bitmap = instrumentation.uiAutomation.takeScreenshot()

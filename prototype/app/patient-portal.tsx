@@ -244,7 +244,7 @@ export function MyCarePlan(props: {
               }}
               onClick={onOpenSymptomTracker}
             >
-              <span>📊 {lang === 'hi' ? 'लक्षण ट्रैकर (ESAS)' : 'Track Symptoms (ESAS)'}</span>
+              <span>{lang === 'hi' ? 'लक्षण लिखें' : 'Track symptoms'}</span>
             </button>
           )}
 

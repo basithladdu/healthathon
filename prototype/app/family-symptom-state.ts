@@ -1,4 +1,5 @@
 import { isValidAppointmentDate } from './appointment-state.ts';
+import { isPainBodySite, painBodySiteName, type PainBodySite } from './pain-body-map-state.ts';
 
 export const SYMPTOM_SEVERITIES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as const;
 const LEGACY_SYMPTOM_SEVERITIES = ['Mild', 'Moderate', 'Severe'] as const;
@@ -8,6 +9,48 @@ export type SymptomRecall = 'now' | 'average-24h' | 'worst-24h';
 export type SymptomChange = 'better' | 'same' | 'worse' | 'not-sure';
 export type PainTrigger = 'rest' | 'turning' | 'walking' | 'coughing' | 'other' | 'not-sure';
 export const SYMPTOM_SCALE = 'sahara-personal-nrs-v1' as const;
+// Keep stored names stable: revised choices must not rename older observations.
+export const SYMPTOM_OPTIONS = [
+  { value: 'Tiredness', en: 'Fatigue / lack of energy', hi: 'थकान / ऊर्जा की कमी' },
+  { value: 'Pain', en: 'Pain', hi: 'दर्द' },
+  { value: 'Low appetite', en: 'Loss of appetite', hi: 'भूख कम लगना' },
+  { value: 'Dry or sore mouth', en: 'Dry or sore mouth', hi: 'मुँह सूखना या दुखना' },
+  { value: 'Breathlessness', en: 'Shortness of breath', hi: 'साँस फूलना' },
+  { value: 'Constipation', en: 'Constipation', hi: 'कब्ज़' },
+  { value: 'Nausea', en: 'Nausea', hi: 'जी मिचलाना' },
+  { value: 'Vomiting', en: 'Vomiting', hi: 'उल्टी' },
+  { value: 'Difficulty swallowing', en: 'Difficulty swallowing', hi: 'निगलने में परेशानी' },
+  { value: 'Drowsiness', en: 'Drowsiness / excessive sleepiness', hi: 'उनींदापन / बहुत नींद आना' },
+  { value: 'Cough', en: 'Cough', hi: 'खाँसी' },
+  { value: 'Bowel or bladder leakage', en: 'Bowel or bladder leakage', hi: 'मल या पेशाब निकल जाना' },
+  { value: 'Low mood', en: 'Low mood / feeling depressed', hi: 'मन उदास होना' },
+  { value: 'Anxiety', en: 'Anxiety', hi: 'घबराहट' },
+  { value: 'Diarrhoea', en: 'Diarrhoea', hi: 'दस्त' },
+  { value: 'Overall well-being', en: 'Overall well-being', hi: 'कुल मिलाकर तबीयत' },
+  { value: 'Other', en: 'Other', hi: 'कुछ और' },
+] as const;
+
+export function symptomName(value: string, hindi = false): string {
+  const option = SYMPTOM_OPTIONS.find((item) => item.value === value);
+  if (option) return hindi ? option.hi : option.en;
+  // Retired choices remain readable and editable through Other, without migration.
+  const legacyHindi: Record<string, string> = {
+    'Sleep trouble': 'नींद की परेशानी', 'Overall discomfort': 'कुल मिलाकर परेशानी', 'Weight loss': 'वज़न घटना',
+    Dizziness: 'चक्कर आना', 'Irritability / restlessness': 'चिड़चिड़ापन / बेचैनी',
+  };
+  return hindi ? legacyHindi[value] ?? value : value;
+}
+
+export function symptomScaleAnchors(symptom: string, hindi = false): { zero: string; ten: string } {
+  if (symptom.trim().toLowerCase() === 'overall well-being') return {
+    zero: hindi ? 'सबसे अच्छी तबीयत' : 'Best possible well-being',
+    ten: hindi ? 'सबसे खराब तबीयत' : 'Worst possible well-being',
+  };
+  return {
+    zero: hindi ? 'बिल्कुल नहीं' : 'Not at all',
+    ten: hindi ? 'सबसे ज़्यादा जितना आप सोच सकते हैं' : 'Worst you can imagine',
+  };
+}
 export type SymptomInput = {
   symptom: string;
   severity: SymptomSeverity;
@@ -19,6 +62,7 @@ export type SymptomInput = {
   recall?: SymptomRecall;
   respondent?: SymptomRespondent;
   painLocation?: string;
+  painBodySites?: PainBodySite[];
   painTriggers?: PainTrigger[];
   selfReportedChange?: SymptomChange;
   comparedWithId?: string;
@@ -53,9 +97,10 @@ export function validateSymptomInput(input: SymptomInput, today: string): Sympto
   if (input.note.trim().length > 500) return 'note';
   const contextProvided = input.scale !== undefined || input.time !== undefined || input.recall !== undefined || input.respondent !== undefined;
   if (contextProvided && !hasSymptomContext(input)) return 'context';
-  if ((input.painLocation?.trim().length ?? 0) > 100
+  if ((input.painBodySites !== undefined && (!Array.isArray(input.painBodySites) || input.painBodySites.some((value) => !isPainBodySite(value))))
+    || (input.painLocation?.trim().length ?? 0) > 100
     || (input.painTriggers !== undefined && (!Array.isArray(input.painTriggers) || input.painTriggers.some((value) => !painTriggers.includes(value))))) return 'pain';
-  if ((input.painLocation || input.painTriggers?.length) && input.symptom.trim().toLowerCase() !== 'pain') return 'pain';
+  if ((input.painLocation || input.painTriggers?.length || input.painBodySites?.length) && input.symptom.trim().toLowerCase() !== 'pain') return 'pain';
   if ((input.selfReportedChange !== undefined && !changes.includes(input.selfReportedChange))
     || Boolean(input.selfReportedChange) !== Boolean(input.comparedWithId)) return 'comparison';
   return null;
@@ -66,6 +111,7 @@ function cleanInput(input: SymptomInput): SymptomInput {
     symptom: input.symptom.trim(), severity: input.severity, date: input.date, startedOn: input.startedOn, note: input.note.trim(),
     ...(input.scale !== undefined ? { scale: input.scale, time: input.time, recall: input.recall, respondent: input.respondent } : {}),
     ...(input.painLocation !== undefined ? { painLocation: input.painLocation.trim() } : {}),
+    ...(input.painBodySites !== undefined ? { painBodySites: [...new Set(input.painBodySites)].sort() } : {}),
     ...(input.painTriggers !== undefined ? { painTriggers: [...new Set(input.painTriggers)].sort() } : {}),
     ...(input.selfReportedChange ? { selfReportedChange: input.selfReportedChange, comparedWithId: input.comparedWithId } : {}),
   };
@@ -79,6 +125,7 @@ export function sameSymptomContext(a: SymptomEntry, b: SymptomEntry): boolean {
     && a.scale === b.scale && a.recall === b.recall && a.respondent === b.respondent
     && (!['caregiver', 'clinician'].includes(a.respondent ?? '') || a.author === b.author)
     && (a.painLocation ?? '').trim().toLowerCase() === (b.painLocation ?? '').trim().toLowerCase()
+    && [...(a.painBodySites ?? [])].sort().join('|') === [...(b.painBodySites ?? [])].sort().join('|')
     && [...(a.painTriggers ?? [])].sort().join('|') === [...(b.painTriggers ?? [])].sort().join('|');
 }
 
@@ -149,9 +196,11 @@ export function symptomDiaryText(entries: SymptomEntry[], patientId: string, tod
     `${t('Saved on', 'कॉपी की तारीख')}: ${today}`,
     t('Patient/family observations. Not sent to the care team.', 'मरीज़ या परिवार के लिखे नोट। देखभाल टीम को नहीं भेजे गए हैं।'),
     ...selectSymptomEntries(entries, patientId, today).map((entry) => [
-      `${entry.date}${entry.time ? ` ${entry.time}` : ''} — ${entry.symptom} — ${symptomSeverityText(entry.severity, hindi)}`,
+      `${entry.date}${entry.time ? ` ${entry.time}` : ''} — ${symptomName(entry.symptom, hindi)} — ${symptomSeverityText(entry.severity, hindi)}`,
+      entry.symptom === 'Overall well-being' ? `0 = ${symptomScaleAnchors(entry.symptom, hindi).zero}; 10 = ${symptomScaleAnchors(entry.symptom, hindi).ten}` : '',
       entry.recall ? `${t('Time frame', 'समय अवधि')}: ${symptomRecallText(entry.recall, hindi)}` : '',
       entry.respondent ? `${t('Reported by', 'किसने बताया')}: ${symptomRespondentText(entry.respondent, hindi)}` : '',
+      entry.painBodySites?.length ? `${t('Pain areas', 'दर्द की जगहें')}: ${entry.painBodySites.map((value) => painBodySiteName(value, hindi)).join(', ')}` : '',
       entry.painLocation ? `${t('Pain location', 'दर्द की जगह')}: ${entry.painLocation}` : '',
       entry.painTriggers?.length ? `${t('When it happens', 'कब होता है')}: ${entry.painTriggers.map((value) => painTriggerText(value, hindi)).join(', ')}` : '',
       entry.selfReportedChange ? `${t('Their comparison', 'उनके मुताबिक बदलाव')}: ${symptomChangeText(entry.selfReportedChange, hindi)}` : '',

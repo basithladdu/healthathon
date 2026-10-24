@@ -1,7 +1,7 @@
 'use client';
 
 import { useId } from 'react';
-import { symptomSeverityText, type SymptomEntry } from './family-symptom-state';
+import { symptomName, symptomSeverityText, type SymptomEntry } from './family-symptom-state';
 import type { CareStoryEntry } from './family-care-story-state';
 import type { CareReport } from './care-calendar-state';
 import { IconArrowRight, IconFileText } from './icons';
@@ -23,11 +23,6 @@ export type FamilyCancerOverviewProps = {
   onReports: () => void;
 };
 
-const symptomHindi: Record<string, string> = {
-  Pain: 'दर्द', Nausea: 'जी मिचलाना', Tiredness: 'थकान', 'Low appetite': 'भूख कम लगना',
-  'Sleep trouble': 'नींद की परेशानी', Breathlessness: 'साँस फूलना', 'Low mood': 'मन उदास होना',
-};
-
 export function FamilyCancerOverview({ patientId, patientName, diagnosis, team, hindi, symptoms, story, reports, onCareStory, onCareNote, onSymptoms, onReports }: FamilyCancerOverviewProps) {
   const id = useId();
   const t = (en: string, hi: string) => hindi ? hi : en;
@@ -38,7 +33,7 @@ export function FamilyCancerOverview({ patientId, patientName, diagnosis, team, 
   const latestStory = patientStory[0];
   const latestSymptom = patientSymptoms[0];
   const latestReport = patientReports[0];
-  const symptomLabel = (value: string) => hindi ? symptomHindi[value] ?? value : value;
+  const symptomLabel = (value: string) => symptomName(value, hindi);
   const timeline = [
     ...patientStory.map((entry) => ({
       key: `story:${entry.id}`, date: entry.date, title: entry.title,

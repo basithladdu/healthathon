@@ -132,6 +132,7 @@ import java.time.format.DateTimeFormatter
     val t = { en: String, hi: String -> if (hindi) hi else en }
     var symptom by rememberSaveable(id) { mutableStateOf(original?.symptom.orEmpty()) }
     var otherSymptom by rememberSaveable(id) { mutableStateOf(original?.symptom?.let { it !in SymptomDiaryRules.symptoms } ?: false) }
+    var scale by rememberSaveable(id) { mutableStateOf(original?.scale ?: SymptomDiaryRules.PERSONAL_SCALE) }
     var rating by rememberSaveable(id) { mutableIntStateOf(if (original == null) -2 else original.rating ?: -1) }
     var observedDate by rememberSaveable(id) { mutableStateOf(original?.observedDate ?: LocalDate.now().toString()) }
     var observedTime by rememberSaveable(id) { mutableStateOf(original?.observedTime ?: LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"))) }
@@ -145,13 +146,13 @@ import java.time.format.DateTimeFormatter
     var change by rememberSaveable(id) { mutableStateOf(original?.selfReportedChange.orEmpty()) }
     var localError by rememberSaveable(id) { mutableStateOf("") }
     val value = SymptomNote(symptom, rating.takeIf { it >= 0 }, observedDate, observedTime, recall, respondent,
-        if (respondent == "patient") personName else author, startedOn, note, location, triggerValues.split('|').filter(String::isNotBlank))
+        if (respondent == "patient") personName else author, startedOn, note, location, triggerValues.split('|').filter(String::isNotBlank), scale = scale)
     val current = initial ?: CareItem(id = id, personId = capturedPerson, kind = "checkin", title = symptom)
     val comparison = if (rating >= 0 && respondent.isNotBlank() && value.author.isNotBlank()) SymptomDiaryRules.comparison(entries, current, value) else null
     // A changed question/reference cannot retain a prior subjective comparison.
-    var referenceKey by rememberSaveable(id) { mutableStateOf(if (original != null) "${original.symptom}|${original.recall}|${original.respondent}|${original.author}|${original.painLocation}|${original.painTriggers.sorted()}|${original.observedDate}|${original.observedTime}|${original.comparedWithId}" else "") }
-    LaunchedEffect(symptom, recall, respondent, value.author, location, triggerValues, observedDate, observedTime, comparison?.previous?.id) {
-        val key = "$symptom|$recall|$respondent|${value.author}|$location|${value.painTriggers.sorted()}|$observedDate|$observedTime|${comparison?.previous?.id.orEmpty()}"
+    var referenceKey by rememberSaveable(id) { mutableStateOf(if (original != null) "${original.symptom}|${original.scale}|${original.recall}|${original.respondent}|${original.author}|${original.painLocation}|${original.painTriggers.sorted()}|${original.observedDate}|${original.observedTime}|${original.comparedWithId}" else "") }
+    LaunchedEffect(symptom, scale, recall, respondent, value.author, location, triggerValues, observedDate, observedTime, comparison?.previous?.id) {
+        val key = "$symptom|$scale|$recall|$respondent|${value.author}|$location|${value.painTriggers.sorted()}|$observedDate|$observedTime|${comparison?.previous?.id.orEmpty()}"
         if (referenceKey.isNotBlank() && referenceKey != key) change = ""
         referenceKey = key
     }
@@ -160,11 +161,12 @@ import java.time.format.DateTimeFormatter
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(start = 20.dp, end = 20.dp, bottom = 28.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Heading(t(if (initial == null) "How are you feeling?" else "Edit symptom note", if (initial == null) "तबीयत कैसी है?" else "तबीयत का नोट बदलें"), 27)
             Text(personName, fontWeight = FontWeight.SemiBold)
-            Text(t("What is bothering you?", "क्या परेशानी है?"), fontWeight = FontWeight.SemiBold)
+            Text(t("What would you like to note?", "किस बारे में नोट लिखना है?"), fontWeight = FontWeight.SemiBold)
             FlowRow(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
-                SymptomDiaryRules.symptoms.forEach { (en, hi) -> FilterChip(if (en == "Other") otherSymptom else !otherSymptom && symptom == en, {
-                    otherSymptom = en == "Other"; symptom = if (otherSymptom) "" else en; if (en != "Pain") { location = ""; triggerValues = "" }; rating = -2
-                }, label = { Text(if (hindi) hi else en) }, modifier = Modifier.heightIn(min = 48.dp).testTag("symptom-choice-$en")) }
+                SymptomDiaryRules.symptoms.forEach { (en, _) -> FilterChip(if (en == "Other") otherSymptom else !otherSymptom && symptom == en, {
+                    otherSymptom = en == "Other"; symptom = if (otherSymptom) "" else en; scale = SymptomDiaryRules.scaleForSymptom(en)
+                    if (en != "Pain") { location = ""; triggerValues = "" }; rating = -2
+                }, label = { Text(SymptomDiaryRules.symptomLabel(en, hindi)) }, modifier = Modifier.heightIn(min = 48.dp).testTag("symptom-choice-$en")) }
             }
             if (otherSymptom) CareField(symptom, { symptom = it.take(80) }, t("Symptom name", "परेशानी का नाम"), singleLine = true)
             Text(t("Who reported this?", "किसने बताया?"), fontWeight = FontWeight.SemiBold)
@@ -172,8 +174,8 @@ import java.time.format.DateTimeFormatter
             if (respondent.isNotBlank() && respondent != "patient") CareField(author, { author = it.take(120) }, t(if (respondent == "assisted-patient") "Written with help from" else "Observer's name", if (respondent == "assisted-patient") "लिखने में किसने मदद की" else "देखने वाले का नाम"), singleLine = true)
             Text(t("Time frame", "समय अवधि"), fontWeight = FontWeight.SemiBold)
             DiaryChoices(SymptomDiaryRules.recalls, recall, hindi) { recall = it }
-            Text(t("How strong is it?", "कितनी परेशानी है?"), fontWeight = FontWeight.SemiBold)
-            Text(t("0 = none · 10 = worst imaginable", "0 = बिलकुल नहीं · 10 = सबसे ज़्यादा"), style = MaterialTheme.typography.bodySmall)
+            Text(SymptomDiaryRules.ratingQuestion(scale, hindi), fontWeight = FontWeight.SemiBold)
+            Text(SymptomDiaryRules.ratingAnchors(scale, hindi), style = MaterialTheme.typography.bodySmall, modifier = Modifier.testTag("symptom-rating-anchors"))
             FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 (0..10).forEach { number -> FilterChip(rating == number, { rating = number }, label = { Text(number.toString()) }, modifier = Modifier.defaultMinSize(minWidth = 44.dp).heightIn(min = 48.dp).testTag("symptom-rating-$number")) }
                 FilterChip(rating == -1, { rating = -1; change = "" }, label = { Text(t("Not rated / unable to rate", "अंक नहीं बताया / बता नहीं सकते")) }, modifier = Modifier.heightIn(min = 48.dp).testTag("symptom-unrated"))
