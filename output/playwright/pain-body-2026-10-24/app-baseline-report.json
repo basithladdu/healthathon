@@ -1,0 +1,79 @@
+{
+  "stage": "baseline-reload-verified",
+  "today": "2026-10-24",
+  "yesterday": "2026-10-23",
+  "pick": {
+    "type": "pick",
+    "site": "left-arm",
+    "point": {
+      "x": 0.794,
+      "y": 0.523,
+      "z": -0.188
+    }
+  },
+  "saved": [
+    {
+      "symptom": "Pain",
+      "severity": 7,
+      "date": "2026-10-23",
+      "startedOn": "2026-10-23",
+      "note": "QA fictional observation only",
+      "scale": "sahara-personal-nrs-v1",
+      "time": "08:30",
+      "recall": "now",
+      "respondent": "patient",
+      "painLocation": "",
+      "painBodySites": [
+        "left-arm"
+      ],
+      "painBodyPoints": [
+        {
+          "site": "left-arm",
+          "x": 0.794,
+          "y": 0.523,
+          "z": -0.188
+        }
+      ],
+      "painBodyModel": "sahara-body-v1",
+      "painTriggers": [],
+      "id": "60cd6de8-d49c-4668-bdac-0d8172a18d80",
+      "patientId": "CANCER-20418",
+      "author": "Meera Raghavan",
+      "recordedAt": "2026-10-24T13:47:29.138Z"
+    },
+    {
+      "symptom": "Nausea",
+      "severity": 2,
+      "date": "2026-10-23",
+      "startedOn": "2026-10-23",
+      "note": "QA fictional observation only",
+      "scale": "sahara-personal-nrs-v1",
+      "time": "08:30",
+      "recall": "now",
+      "respondent": "patient",
+      "id": "924ce953-de3f-4e88-9903-478617edc99a",
+      "patientId": "CANCER-20418",
+      "author": "Meera Raghavan",
+      "recordedAt": "2026-10-24T13:47:29.138Z"
+    }
+  ],
+  "checks": [
+    {
+      "name": "Actual 3D pick persists normalized point and model",
+      "pass": true
+    },
+    {
+      "name": "Independent pain and nausea ratings",
+      "pass": true
+    },
+    {
+      "name": "UI-saved records and exact points survive reload",
+      "pass": true
+    },
+    {
+      "name": "Edit restores saved pain rating and selected region alongside 3D",
+      "pass": true
+    }
+  ],
+  "errors": []
+}

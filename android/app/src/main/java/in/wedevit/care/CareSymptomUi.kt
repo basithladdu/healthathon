@@ -43,6 +43,7 @@ import java.time.format.DateTimeFormatter
     val preferences = remember(vm.accountNamespace) { context.getSharedPreferences("sahara-symptom-language-${vm.accountNamespace}", 0) }
     var hindi by rememberSaveable(vm.accountNamespace) { mutableStateOf(preferences.getBoolean("hindi", false)) }
     var adding by rememberSaveable(selected) { mutableStateOf(false) }
+    var showingPainHistory by rememberSaveable(selected) { mutableStateOf(false) }
     val person = people.firstOrNull { it.id == selected }
     val notes = entries.filter { it.personId == selected && SymptomNoteCodec.isStructured(it.detail) }
         .sortedByDescending { SymptomNoteCodec.decode(it.detail)?.let { n -> "${n.observedDate}T${n.observedTime}" }.orEmpty() }
@@ -66,6 +67,9 @@ import java.time.format.DateTimeFormatter
                 Icon(Icons.Default.Add, null); Spacer(Modifier.width(8.dp)); Text(t("How are you feeling?", "तबीयत कैसी है?"))
             }
         }
+        if (person != null && PainHistoryRules.entries(entries, person.id).isNotEmpty()) item {
+            OutlinedButton(onClick = { showingPainHistory = true }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("symptom-pain-history")) { Text(t("Pain history on body", "शरीर पर दर्द का इतिहास")) }
+        }
         if (notes.isEmpty()) item { SurfaceCard(Mint) { Text(t("No symptom notes yet", "अभी तबीयत का कोई नोट नहीं है"), fontWeight = FontWeight.SemiBold) } }
         if (notes.isNotEmpty()) item {
             TextButton(onClick = {
@@ -77,6 +81,7 @@ import java.time.format.DateTimeFormatter
         items(notes, key = { it.id }) { SymptomNoteCard(it, vm, hindi) }
     }
     if (adding && person != null) SymptomNoteEditor(vm, hindi, onClose = { adding = false })
+    if (showingPainHistory && person != null) PainBodyHistorySheet(entries, person.id, hindi, onClose = { showingPainHistory = false })
 }
 
 @Composable fun SymptomNoteCard(item: CareItem, vm: CareModel, hindi: Boolean = false) {
@@ -86,6 +91,7 @@ import java.time.format.DateTimeFormatter
     var editing by rememberSaveable(item.id) { mutableStateOf(false) }
     var followingUp by rememberSaveable(item.id) { mutableStateOf(false) }
     var showingTrend by rememberSaveable(item.id) { mutableStateOf(false) }
+    var showingPainHistory by rememberSaveable(item.id) { mutableStateOf(false) }
     var removing by rememberSaveable(item.id) { mutableStateOf(false) }
     val t = { en: String, hi: String -> if (hindi) hi else en }
     val note = SymptomNoteCodec.decode(item.detail)
@@ -106,11 +112,13 @@ import java.time.format.DateTimeFormatter
             TextButton(onClick = { editing = true }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp).testTag("symptom-edit-${item.id}")) { Icon(Icons.Default.Edit, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Edit", "बदलें")) }
             TextButton(onClick = { removing = true }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Remove", "हटाएँ")) }
         }
+        if (note?.symptom?.trim()?.equals("Pain", true) == true) TextButton(onClick = { showingPainHistory = true }, modifier = Modifier.heightIn(min = 48.dp).testTag("symptom-pain-history-${item.id}")) { Text(t("View pain on body", "शरीर पर दर्द देखें")) }
         if (note != null) TextButton(onClick = { showingTrend = true }, modifier = Modifier.heightIn(min = 48.dp).testTag("symptom-trend-${item.id}")) { Text(t("View trend", "अंकों का बदलाव देखें")) }
     }
     if (editing) SymptomNoteEditor(vm, hindi, initial = item, onClose = { editing = false })
     if (followingUp) SymptomNoteEditor(vm, hindi, followup = item, onClose = { followingUp = false })
     if (showingTrend && note != null) SymptomTrendSheet(entries, item, note, hindi, onClose = { showingTrend = false })
+    if (showingPainHistory && note != null) PainBodyHistorySheet(entries, item.personId, hindi, initialId = item.id, onClose = { showingPainHistory = false })
     if (removing) AlertDialog(onDismissRequest = { removing = false }, title = { Text(t("Remove this note?", "यह नोट हटाएँ?")) }, text = { Text(item.title) },
         confirmButton = { TextButton(onClick = { vm.remove(item); removing = false }, enabled = !busy) { Text(t("Remove", "हटाएँ")) } },
         dismissButton = { TextButton(onClick = { removing = false }) { Text(t("Keep", "रखें")) } })

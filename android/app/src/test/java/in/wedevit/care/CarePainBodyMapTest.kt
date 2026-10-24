@@ -45,7 +45,7 @@ class CarePainBodyMapTest {
     }
     @Test fun changingAnActualPainPointOrRegionStartsADifferentComparisonSeries() {
         val value = note()
-        val row = CareItem(id = "one", personId = "person", kind = "checkin", detail = SymptomNoteCodec.encode(value))
+        val row = CareItem(id = "one", personId = "person", kind = "checkin", title = "Pain", detail = SymptomNoteCodec.encode(value))
         assertTrue(SymptomDiaryRules.sameContext(row, value, row, value))
         assertFalse(SymptomDiaryRules.sameContext(row, value, row, value.copy(painBodyPoints = listOf(PainBodyPoint3d("left-leg", .4, .3, .4)))))
         assertFalse(SymptomDiaryRules.sameContext(row, value, row, value.copy(painBodyPoints = emptyList(), painBodyModel = "")))

@@ -30,6 +30,8 @@ test('3D picks use fixed patient coordinates even when camera rotates', () => {
 test('viewer accepts only whitelisted sites, valid scores and bounded associated points', () => {
   const state = { selected: ['left-arm'], rating: 7, hindi: false, points: [{ site: 'left-arm', x: 0.7, y: 0.6, z: 0.1 }] };
   assert.ok(validPainViewerState(state));
+  assert.ok(validPainViewerState({ ...state, readOnly: true }));
+  assert.equal(validPainViewerState({ ...state, readOnly: 'true' }), false);
   assert.ok(validPainViewerState({ ...state, rating: null }));
   for (const change of [
     { rating: 11 }, { rating: -1 }, { rating: 1.2 }, { rating: '7' }, { hindi: 'false' },

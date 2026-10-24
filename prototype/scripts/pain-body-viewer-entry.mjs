@@ -5,7 +5,7 @@ import { classifyPainBodyPoint, quantizePainBodyPoint, validPainViewerState } fr
 
 const surface = document.getElementById('surface');
 const status = document.getElementById('status');
-let state = { selected: [], rating: null, hindi: false, points: [] };
+let state = { selected: [], rating: null, hindi: false, points: [], readOnly: false };
 let applyState = () => {};
 let changeView = () => {};
 
@@ -17,7 +17,7 @@ function emit(message) {
 window.SaharaPainViewer = {
   setState(next) {
     if (!validPainViewerState(next)) return false;
-    state = { selected: [...next.selected], rating: next.rating, hindi: next.hindi, points: (next.points ?? []).map(quantizePainBodyPoint) };
+    state = { selected: [...next.selected], rating: next.rating, hindi: next.hindi, points: (next.points ?? []).map(quantizePainBodyPoint), readOnly: next.readOnly === true };
     applyState();
     return true;
   },
@@ -117,7 +117,12 @@ try {
         marker.position.set(saved.x * worldSize.x / 2, bounds.min.y + saved.y * worldSize.y, saved.z * worldSize.z / 2);
         markers.add(marker);
       }
-      status.textContent = state.hindi ? 'घुमाने के लिए खींचें · दर्द की जगह छुएँ' : 'Drag to rotate · tap where it hurts';
+      status.textContent = state.readOnly
+        ? state.hindi ? 'सेव किया दर्द का मैप · घुमाने के लिए खींचें' : 'Saved pain map · drag to rotate'
+        : state.hindi ? 'घुमाने के लिए खींचें · दर्द की जगह छुएँ' : 'Drag to rotate · tap where it hurts';
+      renderer.domElement.setAttribute('aria-label', state.readOnly
+        ? state.hindi ? 'सेव किया दर्द का मैप। घुमाने के लिए खींचें। जगह नहीं बदल सकती।' : 'Saved pain map. Drag to rotate. Locations cannot be changed.'
+        : state.hindi ? 'शरीर घुमाने के लिए खींचें; दर्द की जगह छुएँ' : 'Rotate the body with a drag; tap a body area to select it');
       render();
     };
     let down = null;
@@ -125,7 +130,7 @@ try {
     renderer.domElement.addEventListener('pointercancel', () => { down = null; });
     renderer.domElement.addEventListener('pointerup', (event) => {
       const start = down; down = null;
-      if (!start || !event.isPrimary || Math.hypot(event.clientX - start.x, event.clientY - start.y) > 7) return;
+      if (state.readOnly || !start || !event.isPrimary || Math.hypot(event.clientX - start.x, event.clientY - start.y) > 7) return;
       const rect = renderer.domElement.getBoundingClientRect();
       pointer.set(((event.clientX - rect.left) / rect.width) * 2 - 1, -((event.clientY - rect.top) / rect.height) * 2 + 1);
       raycaster.setFromCamera(pointer, camera);

@@ -35,20 +35,20 @@ import org.json.JSONObject
 import java.io.ByteArrayInputStream
 
 /** A bundled 3D model plus visible region buttons, with a 2D fallback if this WebView cannot render it. */
-@Composable fun CarePainBodyMap(selected: List<String>, points: List<PainBodyPoint3d>, rating: Int?, hindi: Boolean, onChange: (List<String>, List<PainBodyPoint3d>) -> Unit) {
+@Composable fun CarePainBodyMap(selected: List<String>, points: List<PainBodyPoint3d>, rating: Int?, hindi: Boolean, readOnly: Boolean = false, onChange: (List<String>, List<PainBodyPoint3d>) -> Unit) {
     var back by rememberSaveable { mutableStateOf(false) }
     val t = { en: String, hi: String -> if (hindi) hi else en }
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(t("Where is the pain? (optional)", "दर्द कहाँ है? (वैकल्पिक)"), fontWeight = FontWeight.SemiBold)
+        Text(if (readOnly) t("Saved pain areas", "सहेजी गई दर्द की जगह") else t("Where is the pain? (optional)", "दर्द कहाँ है? (वैकल्पिक)"), fontWeight = FontWeight.SemiBold)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             FilterChip(!back, { back = false }, label = { Text(t("Front", "सामने")) }, modifier = Modifier.heightIn(min = 48.dp).testTag("pain-body-front"))
             FilterChip(back, { back = true }, label = { Text(t("Back", "पीछे")) }, modifier = Modifier.heightIn(min = 48.dp).testTag("pain-body-back"))
-            if (selected.isNotEmpty()) TextButton(onClick = { onChange(emptyList(), emptyList()) }, modifier = Modifier.heightIn(min = 48.dp).testTag("pain-body-clear")) { Text(t("Clear", "हटाएँ")) }
+            if (!readOnly && selected.isNotEmpty()) TextButton(onClick = { onChange(emptyList(), emptyList()) }, modifier = Modifier.heightIn(min = 48.dp).testTag("pain-body-clear")) { Text(t("Clear", "हटाएँ")) }
         }
-        Text(t("Drag to turn. Tap a region or choose below. Left and right mean the patient's sides.", "घुमाने के लिए खींचें। शरीर पर छुएँ या नीचे चुनें। बायाँ और दायाँ मरीज़ की तरफ़ से हैं।"), style = MaterialTheme.typography.bodySmall)
-        LocalPainBodyViewer(selected, points, rating, hindi, back, onChange)
+        Text(if (readOnly) t("Drag to turn or zoom. Saved locations stay unchanged. Left and right mean the patient's sides.", "घुमाएँ या ज़ूम करें। सहेजी हुई जगह नहीं बदलेगी। बायाँ और दायाँ मरीज़ की तरफ़ से हैं।") else t("Drag to turn. Tap a region or choose below. Left and right mean the patient's sides.", "घुमाने के लिए खींचें। शरीर पर छुएँ या नीचे चुनें। बायाँ और दायाँ मरीज़ की तरफ़ से हैं।"), style = MaterialTheme.typography.bodySmall)
+        LocalPainBodyViewer(selected, points, rating, hindi, back, readOnly, onChange)
         Text(if (rating == null) t("Not rated — no pain intensity shown", "अंक नहीं बताया — दर्द की तीव्रता नहीं दिखाई गई") else "${t("Pain", "दर्द")}: $rating/10 · ${t("Colour follows this number", "रंग इसी अंक के अनुसार है")}", style = MaterialTheme.typography.bodySmall)
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
+        if (!readOnly) FlowRow(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
             PainBodyMapRules.sites.forEach { (id, _) ->
                 FilterChip(id in selected, { val next = PainBodyMapRules.toggled(selected, id); onChange(next, points.filter { it.site in next }) }, label = { Text(PainBodyMapRules.label(id, hindi)) },
                     modifier = Modifier.heightIn(min = 48.dp).testTag("pain-body-site-$id"))
@@ -59,14 +59,15 @@ import java.io.ByteArrayInputStream
 }
 
 @SuppressLint("SetJavaScriptEnabled")
-@Composable private fun LocalPainBodyViewer(selected: List<String>, points: List<PainBodyPoint3d>, rating: Int?, hindi: Boolean, back: Boolean, onChange: (List<String>, List<PainBodyPoint3d>) -> Unit) {
+@Composable private fun LocalPainBodyViewer(selected: List<String>, points: List<PainBodyPoint3d>, rating: Int?, hindi: Boolean, back: Boolean, readOnly: Boolean, onChange: (List<String>, List<PainBodyPoint3d>) -> Unit) {
     var webView by remember { mutableStateOf<WebView?>(null) }
     var ready by remember { mutableStateOf(false) }
     var failed by remember { mutableStateOf(false) }
     val latestSelected by rememberUpdatedState(selected)
     val latestPoints by rememberUpdatedState(points)
     val latestOnChange by rememberUpdatedState(onChange)
-    val state = JSONObject().put("selected", JSONArray(selected.filter { it in PainBodyMapRules.sites })).put("rating", rating?.takeIf { it in 0..10 } ?: JSONObject.NULL).put("hindi", hindi).put("points", PainBodyMapRules.encodePoints(points)).toString()
+    val latestReadOnly by rememberUpdatedState(readOnly)
+    val state = JSONObject().put("selected", JSONArray(selected.filter { it in PainBodyMapRules.sites })).put("rating", rating?.takeIf { it in 0..10 } ?: JSONObject.NULL).put("hindi", hindi).put("readOnly", readOnly).put("points", PainBodyMapRules.encodePoints(points)).toString()
     LaunchedEffect(webView, ready, state) {
         if (ready) webView?.evaluateJavascript("window.SaharaPainViewer?.setState($state);", null)
     }
@@ -74,12 +75,12 @@ import java.io.ByteArrayInputStream
         if (ready) webView?.evaluateJavascript("window.SaharaPainViewer?.setView('${if (back) "back" else "front"}');", null)
     }
     if (failed) {
-        Text(if (hindi) "इस फ़ोन पर 3D नहीं खुला। नीचे नक्शे या बटन से जगह चुनें।" else "3D could not open on this phone. Choose on the map or the buttons below.", style = MaterialTheme.typography.bodySmall)
-        PainBodyFallback(selected, rating, back, hindi) { next -> onChange(next, points.filter { it.site in next }) }
+        Text(if (readOnly) { if (hindi) "इस फ़ोन पर 3D नहीं खुला। सहेजे हुए हिस्से नीचे नक्शे पर हैं।" else "3D could not open on this phone. Saved areas are shown on the diagram." } else if (hindi) "इस फ़ोन पर 3D नहीं खुला। नीचे नक्शे या बटन से जगह चुनें।" else "3D could not open on this phone. Choose on the map or the buttons below.", style = MaterialTheme.typography.bodySmall)
+        PainBodyFallback(selected, rating, back, hindi, readOnly) { next -> if (!readOnly) onChange(next, points.filter { it.site in next }) }
     } else {
         if (!ready) Text(if (hindi) "शरीर का नक्शा खुल रहा है…" else "Opening body map…", style = MaterialTheme.typography.bodySmall)
         AndroidView(modifier = Modifier.fillMaxWidth().height(320.dp).testTag("pain-body-3d").semantics {
-            contentDescription = if (hindi) "घुमाने वाला दर्द की जगह का नक्शा। नीचे जगह के बटन से भी चुन सकते हैं।" else "Rotatable pain location map. Accessible region buttons are below."
+            contentDescription = if (readOnly) { if (hindi) "सहेजी गई दर्द की जगह का घुमाने वाला नक्शा। जगह बदली नहीं जा सकती।" else "Rotatable saved pain map. Saved locations cannot be changed here." } else if (hindi) "घुमाने वाला दर्द की जगह का नक्शा। नीचे जगह के बटन से भी चुन सकते हैं।" else "Rotatable pain location map. Accessible region buttons are below."
         }, factory = { context ->
             WebView(context).apply {
                 webView = this
@@ -123,11 +124,11 @@ import java.io.ByteArrayInputStream
                                     when (type) {
                                         "ready" -> ready = true
                                         "error" -> failed = true
-                                        "toggle" -> PainViewerPolicy.toggledSite(data)?.let { site ->
+                                        "toggle" -> if (!latestReadOnly) PainViewerPolicy.toggledSite(data)?.let { site ->
                                             val next = PainBodyMapRules.toggled(latestSelected, site)
                                             latestOnChange(next, latestPoints.filter { it.site in next })
                                         }
-                                        "pick" -> PainViewerPolicy.pickedPoint(data)?.let { point ->
+                                        "pick" -> if (!latestReadOnly) PainViewerPolicy.pickedPoint(data)?.let { point ->
                                             val next = PainBodyMapRules.sites.keys.filter { it in latestSelected || it == point.site }
                                             val markers = (latestPoints.filter { it.site != point.site } + point).sortedBy { it.site }
                                             latestOnChange(next, markers)
@@ -148,14 +149,14 @@ import java.io.ByteArrayInputStream
     }
 }
 
-@Composable private fun PainBodyFallback(selected: List<String>, rating: Int?, back: Boolean, hindi: Boolean, onChange: (List<String>) -> Unit) {
+@Composable private fun PainBodyFallback(selected: List<String>, rating: Int?, back: Boolean, hindi: Boolean, readOnly: Boolean, onChange: (List<String>) -> Unit) {
     val latestSelected by rememberUpdatedState(selected)
     val latestOnChange by rememberUpdatedState(onChange)
     val colors = MaterialTheme.colorScheme
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
         Text(if (back) { if (hindi) "बायाँ" else "Left" } else if (hindi) "दायाँ" else "Right", style = MaterialTheme.typography.labelMedium)
-        Canvas(Modifier.height(300.dp).width(150.dp).testTag("pain-body-map").pointerInput(back) {
-            detectTapGestures { point -> PainBodyMapRules.hit(back, point.x * 100f / size.width, point.y * 200f / size.height)?.let { latestOnChange(PainBodyMapRules.toggled(latestSelected, it)) } }
+        Canvas(Modifier.height(300.dp).width(150.dp).testTag("pain-body-map").pointerInput(back, readOnly) {
+            if (!readOnly) detectTapGestures { point -> PainBodyMapRules.hit(back, point.x * 100f / size.width, point.y * 200f / size.height)?.let { latestOnChange(PainBodyMapRules.toggled(latestSelected, it)) } }
         }) {
             PainBodyMapRules.regions(back).forEach { region ->
                 val path = Path().apply { region.outline.forEachIndexed { index, point ->

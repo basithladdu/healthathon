@@ -1,5 +1,5 @@
 {
-  "checkedAtUtc": "2026-10-24T13:30:13.147828+00:00",
+  "checkedAtUtc": "2026-10-24T13:51:54.962931+00:00",
   "source": "prototype/public/pain-body-viewer",
   "destination": "android/app/src/main/assets/pain-body-viewer",
   "files": [
@@ -17,8 +17,8 @@
     },
     {
       "file": "viewer.js",
-      "bytes": 644816,
-      "sha256": "89EB42771A3BCBD58A625E3C51C9987439D1D67F356AB9D42A790BA2EAAA8588",
+      "bytes": 645915,
+      "sha256": "CADD14703A708731440DDCE4988A2189B8A19F6A644F02CAEB8C5A5263004874",
       "sameBytes": true
     },
     {
@@ -67,5 +67,6 @@
     "https://developer.android.com/develop/ui/views/layout/webapps/load-local-content",
     "https://developer.android.com/privacy-and-security/risks/insecure-webview-native-bridges",
     "https://developer.android.com/jetpack/androidx/releases/webkit"
-  ]
+  ],
+  "historyMode": "Read-only state blocks picks in shared viewer and native message handler; orbit, zoom and front/back remain available; each frame uses one same-person saved observation"
 }

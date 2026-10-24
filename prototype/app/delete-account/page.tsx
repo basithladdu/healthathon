@@ -49,9 +49,10 @@ export default function DeleteAccountPage() {
         <section aria-labelledby="removed">
           <h2 id="removed">What will be removed</h2>
           <ul>
-            <li>Your Sahara account details and care records you own, including saved care notes, confirmations and daily entries.</li>
+            <li>Your Sahara account details and care records you own, including saved care notes, confirmations, daily entries and manually added care-team contacts.</li>
             <li>Invitations and shared access to the care records you own.</li>
             <li>Your membership in care records owned by someone else.</li>
+            <li>Your account-owned doctor test workspace and uploaded files, through separate verified support removal.</li>
           </ul>
           <p>
             If your sign-in is also used for another service, we handle Sahara data
@@ -72,10 +73,22 @@ export default function DeleteAccountPage() {
             Ask recipients to remove those copies if needed.
           </p>
           <p>
-            Audio, unfinished drafts and unsigned-in records stay on your phone. Remove
+            Standard recordings, unfinished phone drafts and unsigned-in records stay on your phone unless you separately upload a permitted test file. Remove
             them in the app, clear Sahara’s app data in Android Settings, or uninstall
             after exporting anything you need. Uninstalling alone does not delete your
             online account.
+          </p>
+          <p>
+            The account-backed doctor test workspace is separate. Its saved test notes,
+            reported doses and explicitly uploaded recordings, PDFs or images remain
+            online after uninstalling or removing a normal care profile. An account-deletion
+            request covers your owned doctor test workspace and uploads; you can also
+            request removal of only a selected test file. After verifying account control, support must handle protected
+            storage objects and owned test-dataset rows separately; the normal care
+            closure operation alone does not remove them. There is currently no
+            individual test-file deletion button or automatic file expiry. A request
+            is not confirmation that deletion has already happened. Do not attach the
+            files themselves to your request.
           </p>
           <p>
             We keep support correspondence while handling the request. If any information
@@ -90,7 +103,7 @@ export default function DeleteAccountPage() {
             If you own those records, choose the person in Sahara, then More → Remove
             this person’s records. This removes their care notes, recordings and daily
             entries without closing your account. You can also email us to request
-            deletion of specific information.
+            deletion of specific information, including a selected doctor-test upload. Doctor-test files need separate verified support handling and are not removed by this normal-care action.
           </p>
         </section>
         <footer className={styles.footer}>

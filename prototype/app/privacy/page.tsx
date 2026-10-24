@@ -92,7 +92,8 @@ export default function PrivacyPage() {
             Microphone permission is requested when you choose to record. Ask everyone
             taking part for permission first. You can stop at any time; recording also
             stops when the app leaves the foreground. Standard recordings remain on
-            your phone and are not transcribed automatically. The public cloud-audio
+            your phone unless you separately upload a selected fictional test recording
+            through the doctor test workspace described below. They are not transcribed automatically. The public cloud-audio
             transcription service remains disabled. Android does not send recordings
             to a cloud speech or generative-AI provider. Saving or sending a text draft
             to the shared clinician workspace
@@ -140,6 +141,46 @@ export default function PrivacyPage() {
           </p>
         </section>
 
+        <section aria-labelledby="doctor-test-workspace">
+          <h2 id="doctor-test-workspace">Account-backed doctor test workspace</h2>
+          <p>
+            This separate workspace uses a real Sahara login but only fictional test
+            patients. Creating it stores sample patient details, edited source text,
+            draft sections, note versions, dose reports and account-attributed timestamps
+            in Supabase. It does not verify a clinician, grant access to actual patients
+            or send appointment requests to another person.
+          </p>
+          <p>
+            A separate permission checkbox and upload action can send one selected
+            recording, PDF or report image to private Supabase storage for the selected
+            test patient. The file may be up to 4 MiB. We also store its title, type,
+            size, fingerprint, uploader account, permission attestation, upload state
+            and timestamps. Only fictional, non-confidential test content is permitted;
+            every participant must separately permit uploading a test recording.
+            Choosing or recording a file does not upload it automatically.
+          </p>
+          <p>
+            These uploads provide private storage and retrieval, not cloud transcription,
+            OCR, generative-AI processing or photo scanning. Access is checked against
+            the current test-dataset permissions. Opening a downloaded copy passes it
+            to the viewer app you choose. A permission checkbox is the uploader’s
+            statement, not proof that every person consented or that a file is authentic.
+          </p>
+          <p>
+            Online test records and uploads are separate from the phone’s Documents
+            collection and local doctor preview. Uninstalling, clearing app data or
+            removing a normal care profile does not remove these online files. This
+            test workspace currently has no individual file-deletion control. Request
+            removal of its records or files through the <Link href="/delete-account#specific">deletion page</Link>{' '}
+            from your registered email. We verify control of the account before
+            handling the request. Removing protected storage objects and test-dataset
+            rows requires separate support handling; the normal care-account closure
+            operation alone does not remove them. Do not send the file contents with
+            a deletion request. Files have no automatic expiry. We confirm by email after
+            a verified removal request has been handled.
+          </p>
+        </section>
+
         <section aria-labelledby="translation">
           <h2 id="translation">Hindi and English reading</h2>
           <p>
@@ -164,6 +205,16 @@ export default function PrivacyPage() {
             member. Expired or revoked permission blocks future service requests but
             cannot recall previously saved or exported copies. An exact-version link
             or QR code identifies a note; it does not bypass sign-in or grant public access.
+          </p>
+          <p>
+            Care-profile owners can manually add care-team or family contact names,
+            relationships, roles and an optional phone number. Signed-in contacts are
+            stored in Supabase; unsigned-in contacts stay on the phone. Contacts are
+            private unless the owner explicitly shares care-team contacts with an
+            invited account. Adding a contact does not invite them, verify a clinician
+            or grant account access. We do not read your phone’s address book. Owners
+            can edit or remove these contacts; removing the owned care profile also
+            removes its saved contacts.
           </p>
           <p>
             A clinician-verification request stores the applicant’s registered name,
@@ -306,7 +357,9 @@ export default function PrivacyPage() {
           <p>
             From version 0.4.0, you can choose a PDF or photo using Android’s file
             picker. Sahara saves a private copy for the selected person and account.
-            It does not read other files or upload reports to Supabase or an AI service.
+            This Documents flow does not read other files or upload reports to Supabase or
+            an AI service. The separate doctor test workspace has an explicit selected-file
+            upload described above; adding a document here does not trigger it.
             Added reports stay on that phone until you remove them, remove the person’s
             records or uninstall the app. Keep your original files. Removing a report
             in Sahara does not delete the original.

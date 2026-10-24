@@ -7,6 +7,7 @@ import {
   SYMPTOM_SCALE, SYMPTOM_OPTIONS, symptomFollowUpInput, symptomName, symptomScaleAnchors, symptomComparison, symptomRecallText, symptomRespondentText, symptomChangeText, painTriggerText,
   type SymptomEntry, type SymptomRange, type SymptomSeverity, type SymptomRespondent, type SymptomRecall, type SymptomChange, type PainTrigger,
 } from './family-symptom-state';
+import { FamilyPainHistory } from './family-pain-history';
 import { FamilySymptomTrends } from './family-symptom-trends';
 import { PainBodyMap } from './pain-body-map';
 import { PAIN_BODY_MODEL, painBodySiteName, type PainBodySite, type PainBodyPoint } from './pain-body-map-state';
@@ -240,6 +241,7 @@ function SymptomDiaryForPatient({ patientId, author, today, hindi, entries, onCh
         {!visibleEntries.length && <p className="symptom-empty">{patientEntries.length ? t('No notes match these filters.', 'इन फ़िल्टर के लिए कोई नोट नहीं है।') : t('Your first note will appear here.', 'आपका पहला नोट यहाँ दिखेगा।')}</p>}
       </section>
     </div>
+    <FamilyPainHistory key={patientId} entries={entries} patientId={patientId} today={today} hindi={hindi} />
     <FamilySymptomTrends entries={entries} patientId={patientId} today={today} hindi={hindi} />
     <div className="symptom-status"><p role="status">{saveStatus === 'unavailable' ? t('Saving failed. Keep this page open and save a copy of your entries.', 'सेव नहीं हुआ। पेज खुला रखें और नोटों की कॉपी डाउनलोड करें।') : saveStatus === 'saving' ? t('Saving entries…', 'नोट सेव हो रहे हैं…') : message}</p>{removed.length > 0 && <button type="button" className="care-text-button" onClick={undo}>{t('Undo last removal', 'पिछला हटाया नोट वापस लाएँ')}</button>}</div>
   </section>;

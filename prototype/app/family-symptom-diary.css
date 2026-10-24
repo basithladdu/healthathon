@@ -69,7 +69,7 @@
 .pain-body-region { cursor: pointer; outline: none; }
 .pain-body-region path { fill: #d6dfd2; stroke: #6b8675; stroke-width: 1.5px; transition: fill 120ms; }
 .pain-body-region:hover path { fill: #bed0ba; }
-.pain-body-region[aria-pressed='true'] path { fill: #b85d45; stroke: #873b2b; stroke-width: 2px; }
+.pain-body-region[data-selected='true'] path { fill: #b85d45; stroke: #873b2b; stroke-width: 2px; }
 .pain-body-region:focus-visible path { stroke: #163e82; stroke-width: 4px; }
 .pain-body-side-label { fill: #566b5e; font-size: 10px; font-weight: 600; }
 .pain-body-text-options { align-content: start; gap: 6px; }
@@ -92,3 +92,14 @@
 .symptom-trend-values { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 8px; max-height: 180px; overflow-y: auto; font-size: 12px; }
 .symptom-trend-values span { display: flex; gap: 8px; white-space: nowrap; }
 @media (max-width: 540px) { .symptom-note-footer > div { flex-wrap: wrap; } .symptom-trend-chart text { font-size: 18px; } }
+
+.pain-history { margin-top: 24px; border-top: 1px solid #d4ddd1; padding-top: 20px; }
+.pain-history h2 { margin: 0 0 12px; font-size: 20px; }
+.pain-history-dates { gap: 8px; }
+.pain-history-navigation { margin: 10px 0; align-items: center; }
+.pain-history-navigation span { min-width: 44px; text-align: center; font-size: 13px; }
+.pain-history-entry { font-size: 14px; line-height: 1.6; }
+.pain-history .pain-body-layout { grid-template-columns: minmax(220px, 480px) minmax(120px, 1fr); align-items: start; }
+.pain-history .pain-body-frame { height: 420px; }
+.pain-body-saved-site { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 12px; border: 1px solid #b9cabc; border-radius: 7px; background: #e9f0e5; }
+@media (max-width: 540px) { .pain-history .pain-body-layout { grid-template-columns: 1fr; } .pain-history .pain-body-frame { height: 370px; } }

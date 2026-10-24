@@ -62,13 +62,14 @@ export function classifyPainBodyPoint(point: { x: number; y: number; z: number }
   return y >= 0.64 ? 'upper-back' : 'lower-back';
 }
 
-export function validPainViewerState(value: unknown): value is { selected: PainBodySite[]; rating: number | null; hindi: boolean; points?: PainBodyPoint[] } {
+export function validPainViewerState(value: unknown): value is { selected: PainBodySite[]; rating: number | null; hindi: boolean; points?: PainBodyPoint[]; readOnly?: boolean } {
   if (!value || typeof value !== 'object') return false;
   const state = value as Record<string, unknown>;
   return Array.isArray(state.selected) && state.selected.length <= PAIN_BODY_SITES.length
     && state.selected.every(isPainBodySite) && new Set(state.selected).size === state.selected.length
     && (state.rating === null || (typeof state.rating === 'number' && Number.isInteger(state.rating) && state.rating >= 0 && state.rating <= 10))
     && typeof state.hindi === 'boolean'
+    && (state.readOnly === undefined || typeof state.readOnly === 'boolean')
     && (state.points === undefined || (Array.isArray(state.points) && state.points.length <= PAIN_BODY_SITES.length
       && state.points.every(isPainBodyPoint) && new Set(state.points.map((point) => point.site)).size === state.points.length
       && state.points.every((point) => (state.selected as unknown[]).includes(point.site))));
