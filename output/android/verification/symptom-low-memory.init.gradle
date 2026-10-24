@@ -1,0 +1,8 @@
+allprojects {
+    tasks.withType(Test).configureEach {
+        minHeapSize = '32m'
+        maxHeapSize = '128m'
+        maxParallelForks = 1
+        jvmArgs '-XX:+UseSerialGC', '-XX:ActiveProcessorCount=1', '-XX:TieredStopAtLevel=1', '-XX:MaxMetaspaceSize=128m', '-XX:ReservedCodeCacheSize=48m', '-Xss256k'
+    }
+}

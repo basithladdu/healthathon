@@ -1,0 +1,14 @@
+{
+  "observedAtUtc": "2026-10-23T20:56:35.198736Z",
+  "version": "0.6.0",
+  "versionCode": 7,
+  "attempt": "detached640MB",
+  "result": "Owned R8 daemon stopped after measured GC thrashing",
+  "ownedDaemonPid": 76592,
+  "gcEvidence": "Old and Eden100%; full GC181to183 over2seconds; total GC246to249seconds out of about300CPU seconds",
+  "freePhysicalMemoryMB": 642,
+  "freeVirtualMemoryMB": 1081,
+  "action": "Stop only this task-owned daemon and resume cached release with1024MB heap; preserve interrupted log and receipt",
+  "unrelatedProcessesStopped": false,
+  "actualLoggedError": "java.lang.OutOfMemoryError: Java heap space in daemon expiration check; daemon disappeared, exit1"
+}

@@ -1,0 +1,16 @@
+{
+  "startedAtUtc": "2026-10-23T20:49:48.2637837Z",
+  "finishedAtUtc": "2026-10-23T20:56:36.3717056Z",
+  "version": "0.6.0",
+  "versionCode": 7,
+  "applicationId": "in.wedevit.sahara",
+  "status": "failed",
+  "exitCode": 1,
+  "tasks": [
+    ":app:assembleRelease",
+    ":app:bundleRelease",
+    ":app:lintVitalRelease"
+  ],
+  "log": "output/android/verification/0.6.0/release-build-detached-2026-10-24.log",
+  "note": "Resumes unfinished release packaging from compiler caches after host recovery interrupted R8. No source or signing identity changes."
+}

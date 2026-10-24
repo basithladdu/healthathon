@@ -1,0 +1,17 @@
+{
+  "startedAtUtc": "2026-10-23T21:04:25.5063204Z",
+  "finishedAtUtc": "2026-10-23T21:19:17.8440877Z",
+  "version": "0.6.0",
+  "versionCode": 7,
+  "applicationId": "in.wedevit.sahara.development",
+  "sourceCommit": "810c4f9",
+  "status": "failed",
+  "exitCode": 1,
+  "tasks": [
+    ":app:testDebugUnitTest",
+    ":app:compileDebugAndroidTestKotlin",
+    ":app:assembleDebug"
+  ],
+  "log": "output/android/verification/0.6.0/final-debug-2026-10-24.log",
+  "note": "Fresh post-conflict-fix checks; separate from historical156-test/pre-conflict APK evidence."
+}

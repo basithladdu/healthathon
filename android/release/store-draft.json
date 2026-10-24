@@ -20,12 +20,14 @@
     "clinicalDataSentToDeveloper": true,
     "storage": "Room cache; signed-in care records stored in Supabase. Audio and unfinished conversations remain app-private.",
     "userInitiatedSharing": "Private single-use invitations with read or edit permission; Android share sheet for care notes and invitation codes.",
-    "thirdPartyDestinations": "Supabase receives account details and signed-in care records. OpenFreeMap receives map tile/style requests and IP address. Dialler, external maps and source pages open when selected.",
+    "thirdPartyDestinations": "Supabase receives account details and signed-in care records. OpenFreeMap receives tile/style/network requests. Optional Qwen model files download from Hugging Face/CDN hosts. Google ML Kit receives SDK technical metrics and optional translation-model requests, not OCR photos or translation input/output. External dialler/maps/share destinations open when chosen.",
     "backup": "Cloud backup and device-transfer exclusions configured",
     "permissions": [
       "INTERNET",
-      "ACCESS_NETWORK_STATE for map connectivity",
-      "RECORD_AUDIO, requested only to record"
+      "ACCESS_NETWORK_STATE for map/download connectivity",
+      "RECORD_AUDIO only for user-started recording/dictation",
+      "POST_NOTIFICATIONS requested for optional care reminders on supported Android versions",
+      "RECEIVE_BOOT_COMPLETED to restore saved reminders; no exact-alarm permission"
     ],
     "note": "0.6 Data safety preview saved24OctoberIST: App interactions forAnalytics added; Diagnostics andDevice IDs required; IDsAnalytics added. Health/account/calendar/UGC/provider-location categories retained. Local photo/audio contents not collected solely by on-device processing. Full release not submitted."
   },
@@ -58,7 +60,7 @@
     "targetAudienceProposal": "18 and over: adult patients, family caregivers and care professionals",
     "healthApp": true,
     "medicalDevice": false,
-    "sensitivePermissions": "Microphone only, when the user starts a consented recording; no background audio, GPS, contacts, camera or photo-library permission",
+    "sensitivePermissions": "Microphone for consented user-started recording/dictation; notification permission for optional reminders; boot receiver restores reminders. No background microphone, GPS, contacts, camera, broad media-library or exact-alarm permission.",
     "accountCreation": "Email and password",
     "accountDeletionUrl": "https://sahara.wedevit.in/delete-account",
     "contentRating": "IARC completed 10 October 2026 after explicit terms approval: ESRB Everyone, PEGI 3, generic 3+, Users Interact. Medical drug references: often, reference only. Private user-content sharing and remote map content declared. Target audience remains 18 and over."
@@ -165,7 +167,26 @@
     "audio": "Recordings remain on the device and are not collected by this version.",
     "networkMetadata": "Supabase/map provider metadata declarations retained. Bundled OCR and optional ML Kit translation can send technical diagnostics, installation IDs, API events and configured languages to Google over HTTPS. Optional local ASR model downloads expose request/IP metadata to Hugging Face/CDN hosts; audio and text are not uploaded by that processing.",
     "location": "Approximate location is declared because Supabase infrastructure can log IP-derived city/country metadata. The app does not read GPS. The selected map area alone is not the user's physical location.",
-    "optionalPhotoProcessing": "Patient photo uploads are currently disabled at the public proxy. Existing report files are stored privately on the phone; explicit Android exports are user-initiated. Do not enable scanner uploads until Gemini/provider terms and an accurate Photos/Health info declaration have been reviewed and saved."
+    "optionalPhotoProcessing": "Patient photo uploads are currently disabled at the public proxy. Existing report files are stored privately on the phone; explicit Android exports are user-initiated. Do not enable scanner uploads until Gemini/provider terms and an accurate Photos/Health info declaration have been reviewed and saved.",
+    "pendingTypeUpdates": [
+      {
+        "type": "Other info",
+        "category": "Personal info",
+        "collected": true,
+        "shared": false,
+        "optional": true,
+        "ephemeral": false,
+        "purposes": [
+          "App functionality",
+          "Account management",
+          "Fraud prevention, security, and compliance"
+        ],
+        "savedInPlay": false,
+        "reason": "Native clinician verification submits medical council, professional registration and review status through the existing RPC. Root conservatively maps professional details to Other info using Google's broad definition; registration identifiers are additionally covered by existing User IDs. The public privacy policy already describes these fields. Do not claim this pending form change is saved.",
+        "source": "android/app/src/main/java/in/wedevit/care/CareSharedCloud.kt:32",
+        "definitionSource": "https://support.google.com/googleplay/android-developer/answer/10787469?hl=en#data_types"
+      }
+    ]
   },
   "verifiedReleasePreparation": {
     "website": "https://sahara.wedevit.in",
@@ -220,7 +241,7 @@
     "uploaded": false,
     "submitted": false,
     "installed": false,
-    "status": "Authorised production update in preparation; native personal symptom diary is being added. A signed release bundle has not yet been verified.",
+    "status": "Native personal symptom diary and stale-edit protection pushed; final fixed-source verification and signed packaging are pending. Production0.5 remains live;0.6 draft3 has no upload/submission.",
     "playDraft": {
       "trackId": "4697314269892725425",
       "releaseId": 3,
@@ -245,7 +266,9 @@
       "privacyLiveChecks": "output/android/verification/0.6.0/live-privacy-checks.json",
       "privacyLive": "READY production; HTTP200 and new symptom/Qwen/Devanagari/directory/date text verified on Sahara and Saanthvana. Rendered browser review not yet performed after recovery.",
       "privacySourceSha256": "7BA2F6567F4F1BB52C33A373BAC4850D5603545D0364AAC6E720ED9F15F755D5",
-      "privacyChecks": "Scoped ESLint and remote production build passed; Vercel READY and updated public policy text HTTP200 verified on both domains. No fresh rendered browser review after tool recovery."
+      "privacyChecks": "Scoped ESLint and remote production build passed; Vercel READY and updated public policy text HTTP200 verified on both domains. No fresh rendered browser review after tool recovery.",
+      "otherPersonalInfoPending": true,
+      "restrictedClinicianReviewerAccess": "Existing ordinary reviewer credentials are retained. Independently approved clinician-review access is not established by this release evidence; check App access truthfully and do not fabricate a clinical verification or grant new authority."
     },
     "checks": {
       "unitTests": 156,
@@ -254,7 +277,12 @@
       "unitErrors": 0,
       "unitSkipped": 0,
       "newSymptomRulesTests": 9,
-      "evidenceStatus": "Fresh recovery JVM checks passed; source agent completing debug instrumentation compilation. No new symptom UI device pass established."
+      "evidenceStatus": "Prior156-test/debug-install evidence predates the final stale-edit fix810c4f9. Fresh verification of the fixed source is pending; no new UI device pass.",
+      "instrumentationKotlinCompiled": true,
+      "newSymptomUiCasesCompiled": 5,
+      "deviceUiCasesExecuted": 0,
+      "evidence": "output/android/verification/symptom-diary-2026-10-24.json",
+      "currentSourceUnitVerified": false
     },
     "debugDeviceEvidence": {
       "package": "in.wedevit.sahara.development",
@@ -264,9 +292,26 @@
       "installationMethod": "adb install -r -t; production package/data preserved",
       "apkSha256": "458C67FBAEE29042253BC93402B6EE2023A0F19BFEEE9298555234E1FBCAF2A0",
       "deviceInteractionVerified": false,
-      "reason": "Device connected but locked; user asked to unlock. No authentication bypass."
+      "reason": "Device connected but locked; user asked to unlock. No authentication bypass.",
+      "apk": "output/android/Sahara-0.6.0-24Oct-test.apk",
+      "bytes": 302360589,
+      "sourceBoundary": "Earlier91a6871 source, before810c4f9 stale-edit fix; preserve as historical installation, not current fixed-source runtime evidence."
     },
-    "browserBlocker": "After recovery the browser control tool was unavailable; official Windows Computer Use fallback stopped because it could not determine the browser URL confidently enough to enforce policy. No more UI actions were taken. Production draft3 and saved Data safety remain; signed bundle upload, listing/reviewer/health updates and review submission are still pending."
+    "browserBlocker": "After recovery the browser control tool was unavailable; official Windows Computer Use fallback stopped because it could not determine the browser URL confidently enough to enforce policy. No more UI actions were taken. Production draft3 and saved Data safety remain; signed bundle upload, listing/reviewer/health updates and review submission are still pending.",
+    "buildProcess": {
+      "status": "One bounded768MiB post-fix unit/debug/instrumentation-compile retry is running after diagnosed384MiB Kotlin heap exhaustion. Final signed APK/AAB remains unverified.",
+      "exitReceipt": "output/android/verification/0.6.0/release-build-exit-1024.json",
+      "log": "output/android/verification/0.6.0/release-build-detached-1024-2026-10-24.log",
+      "sourceInputs": "output/android/verification/0.6.0/release-inputs-before.json",
+      "inputFingerprint": "56DF09A1C926BBEB1809A534D6936326A0ED4033E8DFEF6D48B84B859CD1933D",
+      "sourceCommit": "810c4f93fe212d29b3b2d6772dbbae6e0356f6b5",
+      "priorAttemptExit": "output/android/verification/0.6.0/release-build-exit.json",
+      "memoryRecoveryEvidence": "output/android/verification/0.6.0/release-memory-recovery.json",
+      "finalDebugFailureReceipt": "output/android/verification/0.6.0/final-debug-build-exit.json",
+      "finalDebugReceipt": "output/android/verification/0.6.0/final-debug-build-exit-768.json",
+      "finalDebugLog": "output/android/verification/0.6.0/final-debug-768-2026-10-24.log"
+    },
+    "sourceCommit": "810c4f93fe212d29b3b2d6772dbbae6e0356f6b5"
   },
   "productionRelease": {
     "version": "0.5.0",

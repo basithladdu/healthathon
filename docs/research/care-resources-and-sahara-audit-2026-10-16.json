@@ -546,7 +546,13 @@
       "date": "2026-10-15 14:05 IST",
       "subject": "Health-a-thon 2026 | Build Sprint Resources from Open Healthcare Network",
       "purpose": "OHC offered all shortlisted teams optional reuse of CARE's existing EMR capabilities, developer tooling and plugin examples so they can focus on a specific healthcare workflow.",
-      "notEstablished": ["Mandatory CARE migration", "A condition on a grant", "Dedicated hosting", "Medispeak/Sarvam access", "A clinical partnership or access to real patients"],
+      "notEstablished": [
+        "Mandatory CARE migration",
+        "A condition on a grant",
+        "Dedicated hosting",
+        "Medispeak/Sarvam access",
+        "A clinical partnership or access to real patients"
+      ],
       "developmentRequirement": "Synthetic data; document intended user, workflow, setup and limitations. Clinical deployment needs further validation and security/privacy review."
     },
     "publicArchive": {
@@ -612,5 +618,33 @@
       "requirement": "All teams must use the template and substantiate actual MVP/AI progress, evaluation, limitations and deployment assumptions. Submission process, deadline and assessment details will follow separately; no deadline is invented here.",
       "userDirection": "Fill verified fields now, carry previous slide information forward, leave team discussion/biographies/photos for later. User explicitly selected Yes for sharing solution information on the programme website; this does not authorise disclosure of private records or credentials."
     }
+  },
+  "currentReview20261024": {
+    "scope": "Targeted official-source refresh for the user-requested plain-language teammate guide; no CARE installation, integration, provider setup or patient data transfer.",
+    "guide": "TEAM_HANDOFF.md, 24 October team-message draft",
+    "findings": [
+      "CARE already covers palliative registries, care teams, home visits, symptoms, referrals and care plans.",
+      "Plugins may use a React frontend, a Django backend, or both. Existing Kotlin Android needs a deliberate authenticated API integration.",
+      "Current consent documentation marks Comfort Care selection and patient/family verification screens as missing. These are candidate workflow gaps, not proof of uniqueness or legal/clinical validity.",
+      "Current Observation API is read-only; observations normally arise through questionnaire submissions. Check target schema or use a plugin-owned linked record.",
+      "Staff and patient authentication contexts differ; Sahara Supabase authentication is not CARE authorisation.",
+      "Core backend/frontend MIT licences verified; hosting and external providers are separate."
+    ],
+    "sources": [
+      "https://ohc.network/solutions/palliative-care",
+      "https://ohc.network/build-on-care",
+      "https://docs.ohc.network/contributing/plugins/",
+      "https://github.com/ohcnetwork/care_scaffold",
+      "https://docs.ohc.network/concepts/clinical/consent/",
+      "https://docs.ohc.network/flows/clinical/consent/verify-a-consent/",
+      "https://docs.ohc.network/concepts/clinical/observation/",
+      "https://github.com/ohcnetwork/care_scaffold/blob/main/skills/care-auth-contexts/SKILL.md",
+      "https://github.com/ohcnetwork/care/blob/develop/LICENSE",
+      "https://github.com/ohcnetwork/care_fe/blob/develop/LICENSE",
+      "https://ohc.network/ecosystem/implementation-partners"
+    ],
+    "coverageBoundary": "This refresh is targeted. It does not claim all473 documentation pages, the full gated Loom transcript or every repository line were reviewed.",
+    "firstSlice": "Proposed isolated fictional-patient demo: CARE clinician page, explicit patient/encounter mapping, one selected symptom entry or reviewed conversation note, access and duplicate/correction checks.",
+    "currentIntegration": "Not built or deployed."
   }
 }

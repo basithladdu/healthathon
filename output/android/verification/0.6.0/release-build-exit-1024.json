@@ -1,0 +1,16 @@
+{
+  "startedAtUtc": "2026-10-23T20:56:49.4575510Z",
+  "finishedAtUtc": "2026-10-23T21:02:24.7351022Z",
+  "version": "0.6.0",
+  "versionCode": 7,
+  "applicationId": "in.wedevit.sahara",
+  "status": "failed",
+  "exitCode": 1,
+  "tasks": [
+    ":app:assembleRelease",
+    ":app:bundleRelease",
+    ":app:lintVitalRelease"
+  ],
+  "log": "output/android/verification/0.6.0/release-build-detached-1024-2026-10-24.log",
+  "note": "Resumes cached R8 after the preserved640MB attempt exhausted Java heap. Bounded1024MB heap,384MB metaspace, one worker. No source or signing identity changes."
+}

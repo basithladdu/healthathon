@@ -6,15 +6,59 @@ This is the starting point for another developer or Codex chat. Read the latest 
 
 - Live Play Console confirmed Production **0.5.0 (6), release 2, Available on Google Play**, with 100% rollout in India and no policy issues. The authorised new Production draft is **release 3 for 0.6.0 (7)**. Version code 7 was absent from the bundle library. The new bundle is **not uploaded or submitted**. Signed packaging is running; do not treat an old artifact as this release.
 - The native symptom diary opens from Today and Daily care. It keeps separate 0–10 or explicitly unrated entries, Hindi/English controls, observation time/period, respondent/author, optional pain context, and dated comparisons only against matching real earlier entries. Existing per-person storage, permissions and mood history are retained. This is a personal diary, not a validated clinical instrument or triage/treatment recommendation.
+- A final source audit found that an open form could reuse a newer cloud revision and overwrite a concurrent edit. Commit `810c4f9` now retains the original full-record edit token; changed/deleted records, local revision-zero changes, wrong kinds and insert collisions reject with answers retained and English/Hindi recovery. Two regression cases were added. The earlier 156-test/debug-install evidence below predates this fix; fresh checks and packaging of the fixed source are in progress.
 - Fresh **156 JVM tests across 26 suites passed**, including all 9 new diary rules checks; zero failures, errors or skips. The matching-source debug APK was built, copied to [`Sahara-0.6.0-24Oct-test.apk`](output/android/Sahara-0.6.0-24Oct-test.apk) and installed beside the Play app on Samsung A34 without clearing data. SHA256: `458C67FBAEE29042253BC93402B6EE2023A0F19BFEEE9298555234E1FBCAF2A0`. Instrumentation Kotlin compiled, including 5 diary cases, but no current UI execution or final test-APK packaging receipt is established. The phone remains locked; unlock was requested without bypassing authentication. The earlier 20 October test APK is preserved.
-- Play Data safety changes were saved: ML Kit App interactions/Analytics added; Diagnostics and Device IDs conservatively required because SDK initialisation is automatic and no app opt-out exists; Analytics added to IDs. Existing health/account/calendar/UGC/provider metadata disclosures remain. Local audio/image processing does not itself upload those contents. The new full description and reviewer instructions are prepared in the [release audit](output/android/verification/0.6.0/release-disclosure-audit.json), but **not saved in Play**. Review the additional Diseases and Conditions Management health feature for the symptom diary; retain all accurate medical declarations.
+- Play Data safety changes were saved: ML Kit App interactions/Analytics added; Diagnostics and Device IDs conservatively required because SDK initialisation is automatic and no app opt-out exists; Analytics added to IDs. Existing health/account/calendar/UGC/provider metadata disclosures remain. Local audio/image processing does not itself upload those contents. The new full description and reviewer instructions are prepared in the [release audit](output/android/verification/0.6.0/release-disclosure-audit.json), but **not saved in Play**. Before submission, add/review optional Personal info > Other info for medical council/professional verification details, and the Diseases and Conditions Management health feature for the symptom diary. These additional fields are not saved in Play; retain all accurate existing declarations. Confirm reviewer access for the independently approved clinician flow without fabricating verification or silently granting authority.
 - The privacy update is deployed in production as `dpl_6cieWvkFSK2SkZsyQD1ARnTeVevq`, verified READY with Sahara and Saanthvana aliases. Both public policy routes return HTTP 200 with the new symptom, Qwen, Devanagari, directory and date text. Scoped ESLint and remote Next build passed. There was no fresh rendered browser review after recovery.
 - **Browser blocker:** after the Codex interruption, the browser-control tool was unavailable. The official Windows Computer Use fallback then stopped because it could not verify the current browser URL confidently enough to enforce policy. No further UI actions were taken. Resume the existing draft after browser control is restored; do not create a duplicate draft or claim review submission. The release metadata/private follow-up preserve the current state.
 - All 59 earlier tester invitations remain complete; do not resend. No patient enrolment, paid provider, CARE connection, billing, callback change or clinician-role approval is included. The hospital survey stays web-only.
 
 **Team message draft — prepared only, not sent:**
 
-> We reviewed CARE, the open-source platform Healthathon shared. It already supports palliative-care registries, home visits, care teams, referrals and care plans. They offered it as an optional base so we can reuse that infrastructure; we do not have to replace Sahara. Our possible contribution is a focused goals-of-care workflow: keep the original conversation, let a clinician review the exact note, then let the patient/family confirm and retrieve it later. We can keep the Android app and explore a CARE plugin/API connection for the clinical side. That connection is not built yet, and we still need to compare the workflows and validate it with the clinical team. CARE overview: https://ohc.network/solutions/palliative-care
+CARE is an existing, open-source healthcare platform from Open Healthcare Network. It gives hospitals and care teams shared patient records, visits, forms, permissions and follow-up workflows. Instead of building all that infrastructure again, we can add the part that makes Sahara useful. [CARE overview](https://docs.ohc.network/)
+
+For example, a patient is registered, a nurse is assigned a home visit, symptoms and care needs are recorded, a doctor reviews them, and someone owns the next follow-up. CARE already supports that palliative-care coordination. It includes caregivers, referrals, care plans and programme dashboards. A basic palliative patient registry would therefore overlap heavily with what it already offers. [Palliative-care platform](https://ohc.network/solutions/palliative-care)
+
+The Healthathon email shared CARE as an optional foundation and gave us development resources. Our archived email does not say we must replace Sahara, and it does not establish free hosting, AI-provider access or access to patients. Their public guidance says to build one focused extension and demonstrate it with fictional data. [Build on CARE](https://ohc.network/build-on-care)
+
+A plugin simply means an extra feature inside CARE. For Sahara, the practical division could be:
+
+| Piece | What we would build |
+| --- | --- |
+| Patient/family app | Keep our Kotlin/Compose Android app. |
+| Doctor's CARE screen | A React/TypeScript screen for viewing and reviewing the selected Sahara note. |
+| Connection and storage | A Django backend extension/API that links to the correct CARE patient and visit, checks permissions and retains our source/version history. |
+
+Plugins can contain a frontend, a backend, or both. CARE's React plugin is not a library we can drop into the Kotlin app; exchanging records requires an actual API connection. [Plugin documentation](https://docs.ohc.network/contributing/plugins/)
+
+The workflow worth testing is: preserve a goals-of-care conversation, let a clinician review the exact note, let the patient/family confirm that version, and make it retrievable at the next visit. CARE already has care plans and consent records, so we cannot call the whole idea new just because we added a form. Its current documentation specifically flags missing Comfort Care selection and patient/family consent-verification screens. Those are useful gaps to investigate with the clinical team, not proof that our proposed workflow is unique or clinically validated. A note confirmation must not be presented as a legally valid directive. [Consent model](https://docs.ohc.network/concepts/clinical/consent/) · [Verification limitation](https://docs.ohc.network/flows/clinical/consent/verify-a-consent/)
+
+The first build should stay small:
+
+1. Run a separate local CARE installation with a fictional patient, facility and care team.
+2. Add a Sahara page for the clinician.
+3. Explicitly link one fictional Sahara person to the correct CARE patient and visit.
+4. Transfer one selected symptom entry or reviewed conversation note, including its date, author and version.
+5. Check save/reload, wrong-user access, retries and corrections.
+6. Review that working flow with our clinicians before expanding it.
+
+CARE and Sahara have separate logins; our Supabase account does not automatically grant CARE access. Staff and patient sessions also have different permissions. We must design that connection, rather than put a staff/admin credential in the app. [Authentication guidance](https://github.com/ohcnetwork/care_scaffold/blob/main/skills/care-auth-contexts/SKILL.md)
+
+For symptom data, CARE's documented Observation API is read-only; questionnaire submissions normally create observations. We must use the supported questionnaire route after checking its schema, or start with our extension's own linked record. We cannot assume there is a generic endpoint that accepts our scores. [Observation documentation](https://docs.ohc.network/concepts/clinical/observation/)
+
+The supplied resources are:
+
+- [Build on CARE](https://ohc.network/build-on-care) — explanation and starting path.
+- [Developer walkthrough](https://www.loom.com/share/524a50d9b57142d7853c3acf35035250) — video introduction; our earlier review did not obtain the complete gated transcript.
+- [Plugin documentation](https://docs.ohc.network/contributing/plugins/) — how extensions fit into CARE.
+- [CARE scaffold](https://github.com/ohcnetwork/care_scaffold) — starter workspace and templates. It needs Git, Node/npm, Python and Docker Compose; on Windows, check the Bash/WSL setup before running its scripts.
+- [OHC coding skills](https://github.com/ohcnetwork/skills) — guidance for coding agents, not a supplied clinical AI model.
+- [Care Filly](https://github.com/ohcnetwork/care_filly) — a backend/provider-integration example; external service access is separate.
+- [Care AI Vision](https://github.com/ohcnetwork/care_ai_vision_fe) — a document-to-form frontend example that still needs its host and provider setup.
+
+CARE's core backend and frontend use MIT licences, so the code can be reused subject to their notices. Hosting, maintenance, support and any external AI usage still have costs. A possible model is an institution/NGO/government paying for implementation and support while basic patient access stays free; that is a proposal, not an existing contract. [Backend licence](https://github.com/ohcnetwork/care/blob/develop/LICENSE) · [Frontend licence](https://github.com/ohcnetwork/care_fe/blob/develop/LICENSE) · [Implementation partners](https://ohc.network/ecosystem/implementation-partners)
+
+Sahara is not connected to CARE today. We have researched it; the small connection above is what we should test next if the clinical workflow and intended partner justify it.
 
 ## 23 October follow-up: Sujay's survey and visual slides
 
@@ -49,15 +93,15 @@ This is the starting point for another developer or Codex chat. Read the latest 
 | Artifact | Location / identity |
 | --- | --- |
 | Phase 2 working slides | `submission/phase-2/final/Sahara-Healthathon-Phase-2-visual-draft-v6-ready.pptx`; all13 organiser sections, editable team table and sourced progress; remaining discussion items in `submission/phase-2/README.md` |
-| Latest installable test APK | `output/android/Sahara-0.6.0-20Oct-test.apk`; 0.6.0 (7), 300,504,493 bytes; Android debug signature; installs beside the Play app |
-| APK SHA256 | `5DC9D96176407A8E35A34709653D9897FBD4491FA79E9F908459933509BAC9AC` |
-| Native source for that APK | `e683e7e`; subsequent handoff/PDF commits do not change its native source |
+| Latest installable test APK | `output/android/Sahara-0.6.0-24Oct-test.apk`; 0.6.0 (7), 302,360,589 bytes; Android debug signature; installed beside the Play app |
+| APK SHA256 | `458C67FBAEE29042253BC93402B6EE2023A0F19BFEEE9298555234E1FBCAF2A0` |
+| Native source for that APK | `91a6871`; source-freeze hashes are in `output/android/verification/symptom-diary-2026-10-24.json` |
 | One-page mentor update | `output/pdf/Sahara_Mentor_Update_2026-10-20.pdf`; editable `build_sahara_mentor_update.py` alongside it |
 | Presentation PDF | `output/pdf/Saanthvana_Submitted_Presentation.pdf`; 8 slides, 41 original links retained |
 | Original submitted deck | `submission/final/Saanthvana_Healthathon_2026-10-03-final.pptx`; unchanged |
 | Detailed evidence | `output/android/verification/features/mentor-delivery.json`, `mentor-apk-final.log` and the release metadata |
 
-APK files are excluded from Git. The latest APK and mentor files are uploaded to the [private draft GitHub release](https://github.com/basithladdu/healthathon/releases/tag/untagged-c800dc01b40aa7dbfd27), separate from Google Play. All four uploaded asset sizes and server SHA256 digests matched the local files; the handoff asset is refreshed after this link update. A normal clone includes source, PDFs and committed evidence, not signing keys, installed model weights or private records.
+APK files are excluded from Git. The 24 October test APK is saved locally; it has not been uploaded to that GitHub draft. The earlier 20 October APK and mentor files were uploaded to the [private draft GitHub release](https://github.com/basithladdu/healthathon/releases/tag/untagged-c800dc01b40aa7dbfd27), separate from Google Play. All four uploaded asset sizes and server SHA256 digests matched the local files; the earlier handoff asset was refreshed then; the current handoff is this repository copy. A normal clone includes source, PDFs and committed evidence, not signing keys, installed model weights or private records.
 
 ## What is implemented
 
@@ -72,7 +116,7 @@ APK files are excluded from Git. The latest APK and mentor files are uploaded to
 
 ## What was actually verified
 
-- Latest local build: `assembleDebug`, `testDebugUnitTest`, `compileDebugAndroidTestKotlin` succeeded. **147 unit tests / 25 suites; zero failures, errors or skips**. Instrumentation sources compiled; no new instrumentation/device execution is claimed.
+- Fresh 24 October checks: **156 JVM tests / 26 suites**, including 9 symptom rules tests, passed with zero failures, errors or skips. The matching debug APK assembled and installed on Samsung A34. Five isolated diary UI cases compiled, but the locked phone prevented execution; no fresh final test-APK/combined-command success is claimed. The earlier 20 October build completed `assembleDebug`, `testDebugUnitTest` and `compileDebugAndroidTestKotlin` with 147 tests / 25 suites; that dated result remains separate.
 - APK signature, package/version, packaged current directory bytes and Qwen notice, and 16 KB ZIP alignment were checked. The Sherpa AAR's eight 64-bit native libraries passed static alignment inspection; this is not a 16 KB runtime test.
 - All 8 directory source/parser/preservation checks passed. Raw public directory snapshots and source hashes are preserved under `output/research/india-directory-20261020/`, separately from app assets.
 - Previous 19 October web checks: **284 tests**, TypeScript/scoped lint, real sign-in/sign-out/reload and390 px browser flows. Database evidence:47 workflow +18 directory checks and real role-isolation tests within rollback. These are dated previous results, not fresh21October live verification.
@@ -80,7 +124,7 @@ APK files are excluded from Git. The latest APK and mentor files are uploaded to
 
 ## What is still incomplete
 
-1. **Current APK phone testing**: no phone was connected for this build. Exercise installation/update, microphone consent, saved-audio ASR, Hindi/English OCR/translation, app navigation/insets/keyboard, reminders/permissions/reboot, account switching and safe retry/reload. Use fictional/non-patient inputs first.
+1. **Current APK phone testing**: the 24 October matching-source debug update is installed on the connected Samsung A34, with data preserved. The phone remained locked, so no new UI tests ran. After normal unlock, exercise diary save/edit/history, keyboard/insets, account switching and persistence with fictional inputs. Saved-audio ASR, OCR/translation and reminder runtime checks also remain unverified for this source.
 2. **Clinical language validation**: Qwen had promising narrow desktop Hindi/English/public Hinglish results with errors. Whisper-small performed badly on Hindi/mixed speech and was rejected. None of this establishes clinical accuracy, speaker identification or reliable rapid code switching. Keep original audio/text and mandatory review.
 3. **Account operations**: the last recorded check still had incomplete ordinary signup/reset delivery, no custom SMTP and no approved Sahara callback. Existing confirmed-account sign-in works. Recheck actual state before making changes. Zoho remains paused; do not alter callbacks or provider/billing settings without authorisation.
 4. **Human governance/pilot**: actual independent verifier assignment and a clinician/family pilot remain pending. No patients have been onboarded by this work. Before identifiable patient use, validate access/deletion/recovery, explain recording/sharing in the participant's language and obtain the clinical institution's permission. If conducting health research, have its ethics committee determine review before recruitment; a small 'pilot' is not automatically exempt. [ICMR handbook](https://www.icmr.gov.in/icmrobject/uploads/Guidelines/1724914217_handbook_on_icmr_ethical_guidelines_2018.pdf).
@@ -89,7 +133,7 @@ APK files are excluded from Git. The latest APK and mentor files are uploaded to
 
 ## Play and release boundaries
 
-Last live check 19 October: Production **0.4.1 (5) available in India**; **0.5.0 (6) Production changes in review**. These statuses can change; inspect Console before reporting them as current. The existing Devit account is Organization; do not restart DUNS/identity conversion. Earlier rejections stay in history. All 59 tester invitations were already sent in separate 57 + 2 groups; do not resend or copy recipient lists into Git. This push does not authorise changing Play, account billing, payouts, identity documents or patient enrolment.
+Last live check **24 October IST**: Production **0.5.0 (6), release 2, available in India at 100% rollout**, with no policy issues. Production **0.6.0 (7), draft 3**, is not uploaded or submitted. The user explicitly authorised this update; browser control is currently stopped because its safety check could not verify the current URL. Resume the same draft only when controls are restored and the actual signed candidate and matching disclosures are checked. The existing Devit account is Organization; do not restart DUNS/identity conversion. Earlier rejections remain history. All 59 tester invitations were already sent in separate 57 + 2 groups; do not resend or expose recipients. Billing, payouts, identity documents, new provider activation, clinician-role approval and patient enrolment are outside this update.
 
 ## Reproduce the current build
 

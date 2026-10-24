@@ -1,0 +1,13 @@
+{
+  "observedAtUtc": "2026-10-23T21:02:24.2704749Z",
+  "version": "0.6.0",
+  "versionCode": 7,
+  "attempt": "detached1024MB",
+  "status": "cancelled_before_verification",
+  "reason": "Root found a material stale symptom-editor revision/lost-update bug. Source is being fixed; current build inputs must not be treated as final.",
+  "taskOwnedDaemonPid": 86760,
+  "unrelatedProcessesStopped": false,
+  "artifactVerified": false,
+  "uploaded": false,
+  "submitted": false
+}

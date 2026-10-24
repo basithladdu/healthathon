@@ -1,0 +1,13 @@
+{
+  "observedAtUtc": "2026-10-24T11:40:13.0166598Z",
+  "attempt": "final-debug384MB",
+  "result": "failed",
+  "sourceCommit": "810c4f93fe212d29b3b2d6772dbbae6e0356f6b5",
+  "cause": "Owned daemon log explicitly reports OutOfMemoryError: Java heap space and failure at compileDebugKotlin. Client reported Could not receive a message from daemon.",
+  "unitTestsRunForFixedSource": false,
+  "oldTestXmlPredatesFixedBuild": true,
+  "newNativeCrashLog": false,
+  "javaProcessesRemain": false,
+  "freeVirtualMemoryMB": 4394,
+  "nextAction": "One bounded768MB debug/unit/instrumentation-compile retry; no source edits or unrelated process kills."
+}
