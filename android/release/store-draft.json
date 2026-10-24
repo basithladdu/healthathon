@@ -1,5 +1,5 @@
 {
-  "status": "Production0.5.0(6), release2, remains last verified Available on Google Play inIndia. Corrected0.6.0(7) is uploaded once, processed and saved in existingProductiondraft3; not submitted/published. Native interaction and backend migration prerequisites remain unfinished. All59 earlier invitation batches remain complete; do not resend.",
+  "status": "Production0.5.0(6) remains last verified public release. Existing0.6.0(7)Productionrelease3 uploaded and prepared; user now explicitly requests submissionas-is. Quick checks passed; actual submission not yet confirmed while owner-session refresh requires password/passkey. Backend migrations now applied/verified. All59 older invitations remain complete; do not resend.",
   "preparedOn": "2026-10-10",
   "workingTitle": "Sahara: Palliative Companion",
   "fullProductName": "Sahara — A Palliative Care Companion",
@@ -32,7 +32,7 @@
     "note": "Current candidate's clinician details, manual contacts and explicit test audio/photo/document fields are saved in Play alongside retained prior fields. Local OCR/ASR alone do not collect contents; explicit private Supabase file storage does. No live deletion execution or review approval is claimed."
   },
   "releaseDependencies": [
-    "Production0.5.0(6), release2, remains last verified Available on Google Play inIndia. Corrected0.6.0(7) is uploaded once, processed and saved in existingProductiondraft3; not submitted/published. Native interaction and backend migration prerequisites remain unfinished. All59 earlier invitation batches remain complete; do not resend.",
+    "Production0.5.0(6) remains last verified public release. Existing0.6.0(7)Productionrelease3 uploaded and prepared; user now explicitly requests submissionas-is. Quick checks passed; actual submission not yet confirmed while owner-session refresh requires password/passkey. Backend migrations now applied/verified. All59 older invitations remain complete; do not resend.",
     "Ordinary tester signup and reset delivery remain incomplete: the exact Sahara callback allowlist is unapproved and Zoho work is paused at the user's request. Unsigned-in care flows and the dedicated reviewer login work; the default Supabase mail service is limited to project-team addresses.",
     "Public photo scanning remains off. Any future enablement needs suitable provider terms, authorised billing, complete flow verification and matching Play declarations.",
     "Historical personal-account12tester/14day rules are not an established current gate: this existingOrganizationaccount already has published Production0.5.0(6). No completed14day period is claimed."
@@ -329,7 +329,7 @@
     "uploaded": true,
     "submitted": false,
     "installed": false,
-    "status": "Corrected signed0.6.0(7) uploaded once, processed and saved in existingProductiondraft3. Preview has0blockingerrors and1nonblocking download-size warning. Not submitted or published. Backend migration permission and corrected native interaction checks remain unfinished.",
+    "status": "Existing0.6.0(7)Productionrelease3 preview saved; all4 changes prepared. User explicitly directs submit current as-is. Google quick checks passed, but repeated documented confirmation actions have not yet produced a recorded submission. Owner-session recovery is at Google password/passkey check. Backend updates are now applied/verified; native interaction remains unverified.",
     "playDraft": {
       "trackId": "4697314269892725425",
       "releaseId": 3,
@@ -350,14 +350,16 @@
       "uploadReceipt": "output/android/verification/0.6.0/play-production-060-draft-upload.json",
       "previewErrors": 0,
       "previewWarning": "Significant APK download-size increase; nonblocking. Native symbols/ReTrace attached.",
-      "previewConfirmed": false
+      "previewConfirmed": true,
+      "finalPreviewSaved": true,
+      "savedToPublishingOverview": true
     },
     "releasePrerequisites": [
-      "Complete corrected native3D tap/front-back/read-only history and affected diary checks on a stable emulator or authorised unlocked phone. Fresh2048MB emulator booted/installed but SystemUI ANR blocked app launch; no corrected runtime pass.",
-      "Restore authorised Supabase migration-write access, apply only the two reviewed conversation/prescription migrations and verify permissions/runtime; no DDL workaround after the connector denial.",
-      "Verified version7 is uploaded once and saved in existingProductiondraft3. Do not upload it again. Complete native/backend prerequisites, then preview and save/send this existing release for review.",
-      "Current listing, reviewer instructions, Data safety and health declarations are saved in Play; retain accurate Medical scope and explicit doctor-test upload/deletion exceptions.",
-      "No cloud patient-audio/photo provider activation, billing, clinician-role grants or auth/callback changes."
+      "User explicitly authorised submitting this existing candidate as-is; native verification remains a follow-up limitation, not a renewed discretionary hold.",
+      "Complete existing-owner Google session verification and record actual Changes in review/submission activity for existingrelease3; no new upload or release.",
+      "Both reviewed backend migrations are now applied/verified on actualCareCloud; do not apply again or request reconnect based on historical wrong-target denial.",
+      "Keep listing/health/Data safety and reviewer disclosures accurate; no cloudAI/provider/billing/clinical grant/auth callback changes.",
+      "Once review is recorded, do not withdraw,duplicate,resubmit or replace this version while pending."
     ],
     "disclosures": {
       "sourceAudit": "output/android/verification/0.6.0/release-disclosure-audit.json",
@@ -460,7 +462,7 @@
       "bytes": 302360589,
       "sourceBoundary": "Earlier91a6871 source, before810c4f9 stale-edit fix; preserve as historical installation, not current fixed-source runtime evidence."
     },
-    "browserBlocker": null,
+    "browserBlocker": "Google owner-session recovery requires the account owner password/passkey in open Chrome. No credential is requested in chat; existing Console confirmation closed without a recorded submission.",
     "buildProcess": {
       "status": "Corrected asset packaging completed exit0; APK/AAB signatures, same signer, identity, source parity and static16KB checks verified. Fresh runtime pending.",
       "exitReceipt": "output/android/verification/0.6.0/anatomy-sizing-fixed-build-exit.json",
@@ -517,17 +519,20 @@
       "note": "Corrected CSS debug package for pending native runtime checks; not the Play artifact."
     },
     "backendReadiness": {
-      "ready": false,
-      "status": "Two tested migrations not deployed: Supabase apply_migration explicitly denied permission. Read-only postcheck confirms no server changes.",
-      "evidence": "output/android/verification/0.6.0/backend-runtime-permission-block.json",
+      "ready": true,
+      "projectId": "cghlkqeqiokjqdionrkc",
+      "status": "Both reviewed conversation/prescription migrations applied through normal approved MCP on source-confirmed CareCloud. Catalog/permissions/legacy compatibility verified; no new security WARN/ERROR.",
+      "evidence": "output/android/verification/0.6.0/backend-corrected-target-current-result.json",
       "isolatedChecks": 105,
       "migrationFiles": [
         "android/supabase/migrations/20261023070323_conversation_scope_context.sql",
         "android/supabase/migrations/20261023071214_doctor_prescription_groups.sql"
       ],
-      "userActionPending": "Reconnect Supabase with Migrations Read-write or choose to keep the AAB in Play draft."
+      "signedInClientFlowVerified": false,
+      "historicalDenialCorrection": "Original denied apply targeted separate disabled transcription endpoint kjnhtakqzboayqorrlue; not CareCloud. Historical evidence preserved. No reconnect/write-permission user action remains for actual CareCloud.",
+      "userActionPending": null
     },
-    "lastEvidenceReconciledAtUtc": "2026-10-24T15:32:03.524153+00:00",
+    "lastEvidenceReconciledAtUtc": "2026-10-24T17:44:09.773602+00:00",
     "supersededSignedBuildBeforeViewportFix": {
       "apk": "output/android/Sahara-0.6.0-24Oct-anatomy-history-release.apk",
       "bundle": "output/android/Sahara-0.6.0-24Oct-anatomy-history-release.aab",
@@ -555,7 +560,59 @@
       "signerCertificateSha256": "607D227A8B25BF7126BBCD742110BBBA26F8BA9D75A2F47917013E9589341AD2",
       "runtime16KbVerified": false,
       "physicalDeviceVerified": false
-    }
+    },
+    "submissionAuthorisation": {
+      "userExplicitlyRequestedCurrentVersionNow": true,
+      "scope": "Existing0.6.0(7)Productionrelease3 plus all4 saved changes,as-is; user was told native/backend limits before direction.",
+      "backendNowApplied": true,
+      "nativeRuntimeUnverified": true,
+      "newBundleUploadRequired": false
+    },
+    "currentSubmissionAttempt": {
+      "observedAtUtc": "2026-10-24T17:44:09.773602+00:00",
+      "version": "0.6.0",
+      "versionCode": 7,
+      "track": "Production",
+      "trackId": "4697314269892725425",
+      "releaseId": 3,
+      "bundleSha256": "71CCB15901C69FB37BC52B7BFF243B8CC1F841B09CFCCCFF126476FAD5285B7B",
+      "userAuthorisedCurrentVersionAsIs": true,
+      "previewConfirmed": true,
+      "preparedChangeCount": 4,
+      "preparedChanges": [
+        "Production0.6.0(7)fullrollout",
+        "Storelistingfull description",
+        "Datasafety",
+        "Healthappsdeclaration"
+      ],
+      "reviewerInstructionsSaved": true,
+      "quickChecksCompleted": true,
+      "actualObservedStatus": "Changes not yet submitted for review; Your changes can now be sent for review.",
+      "submitted": false,
+      "published": false,
+      "confirmationInteractions": 5,
+      "attemptedMethods": [
+        "DocumentedEnterconfirmation",
+        "Documentedbuttonclick",
+        "FreshpageSpaceconfirmation",
+        "DirectChromeaccessibilityclick",
+        "DirectChromecoordinateclick"
+      ],
+      "submissionActivityLatestRecordedId": 6,
+      "newSubmissionActivityRowObserved": false,
+      "noBundleReupload": true,
+      "noNewReleaseCreated": true,
+      "rootCauseOfUnrecordedSubmission": "Unconfirmed. Confirmation closes without new submission activity. No console error was captured.",
+      "recovery": "FreshConsolepage and existing-owner login refresh. Google asks for password/passkey; user asked to complete it in openChrome, no credentials in chat.",
+      "ownerRefreshRequiresHumanInput": true,
+      "otherSignedInAccount": "Existing alternate Devit account has no developer account access; no account created or permission changed.",
+      "proof": "output/android/verification/0.6.0/play-production-060-submit-unconfirmed.png",
+      "backendNowApplied": "output/android/verification/0.6.0/backend-corrected-target-current-result.json",
+      "nativeInteractionVerified": false,
+      "instruction": "Continue existing release after owner verification, inspect actual recorded status, do not claim submission from button click alone.",
+      "proofSha256": "0499652A7A31FA61B6725B8689F3A48F13A3DB4C5B7E229E307EBFA2FDB665D4"
+    },
+    "releaseReadyUnderKnownLimitations": false
   },
   "productionRelease": {
     "version": "0.5.0",

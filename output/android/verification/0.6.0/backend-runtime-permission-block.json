@@ -167,5 +167,9 @@
   "reviewedSourceHashes": {
     "conversation": "4A8A12AE39E11DFD293C50BF3545EA6A7E9153F1E5CC7A6F07D97987EBD4AA74",
     "prescription": "C1931C45FD4FC52FBE5195D942370E173D2A8917055F5CCDBE98714DA9A7BFCF"
-  }
+  },
+  "historical": true,
+  "originalDeniedProjectId": "kjnhtakqzboayqorrlue",
+  "supersededBy": "output/android/verification/0.6.0/backend-corrected-target-current-result.json",
+  "correction": "Exact original call linkage confirms denied apply targeted separate disabled-transcription project, not actual CareCloud. Both reviewed migrations have now been applied and verified on actual CareCloud cghlkqeqiokjqdionrkc via normal approved tool. Original error preserved."
 }

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "preparedOn": "2026-10-24",
-  "status": "Corrected0.6.0(7) signed and saved in PlayProductiondraft3; current disclosures saved. Not release-ready: native interaction and backend migrations unfinished. No review submission.",
+  "status": "Both reviewed backend migrations applied/verified. Userauthorised current0.6.0submissionas-is; all4changes prepared and quickcheckspassed, but Googleconfirmation has not recorded a newsubmission. Existingownerrefresh requires password/passkey. Nativeinteraction remainsunverified.",
   "applicationId": "in.wedevit.sahara",
   "versionName": "0.6.0",
   "versionCode": 7,
@@ -471,7 +471,12 @@
       "savedAsDraft": true,
       "uploaded": true,
       "uploadReceipt": "output/android/verification/0.6.0/play-production-060-draft-upload.json",
-      "draftProof": "output/android/verification/0.6.0/play-production-060-draft-saved.png"
+      "draftProof": "output/android/verification/0.6.0/play-production-060-draft-saved.png",
+      "previewConfirmed": true,
+      "preparedChangeCount": 4,
+      "quickChecksCompleted": true,
+      "currentStatus": "Changes not yet submitted for review; Your changes can now be sent for review.",
+      "currentAttemptEvidence": "output/android/verification/0.6.0/play-production-060-current-submission-attempt.json"
     },
     "backend": {
       "ready": false,
@@ -500,7 +505,8 @@
       "nativeRuntimeStatus": "Corrected-asset emulator runtime pending; initial failures and zero-height diagnostics retained.",
       "uploadTransferCompleted": false,
       "note": "Earlier checkpoint before the final guest obstacle and single browser transfer; original failed logs are retained."
-    }
+    },
+    "backendCurrentEvidence": "output/android/verification/0.6.0/backend-corrected-target-current-result.json"
   },
   "currentAndroidRuntime": {
     "status": "not_executed_guest_system_ui_anr",
@@ -589,5 +595,56 @@
     "evidence": "output/android/verification/0.6.0/anatomy-runtime-receipt.json",
     "runtimePassed": false,
     "physicalDeviceVerified": false
+  },
+  "currentSubmissionAttempt": {
+    "observedAtUtc": "2026-10-24T17:44:09.773602+00:00",
+    "version": "0.6.0",
+    "versionCode": 7,
+    "track": "Production",
+    "trackId": "4697314269892725425",
+    "releaseId": 3,
+    "bundleSha256": "71CCB15901C69FB37BC52B7BFF243B8CC1F841B09CFCCCFF126476FAD5285B7B",
+    "userAuthorisedCurrentVersionAsIs": true,
+    "previewConfirmed": true,
+    "preparedChangeCount": 4,
+    "preparedChanges": [
+      "Production0.6.0(7)fullrollout",
+      "Storelistingfull description",
+      "Datasafety",
+      "Healthappsdeclaration"
+    ],
+    "reviewerInstructionsSaved": true,
+    "quickChecksCompleted": true,
+    "actualObservedStatus": "Changes not yet submitted for review; Your changes can now be sent for review.",
+    "submitted": false,
+    "published": false,
+    "confirmationInteractions": 5,
+    "attemptedMethods": [
+      "DocumentedEnterconfirmation",
+      "Documentedbuttonclick",
+      "FreshpageSpaceconfirmation",
+      "DirectChromeaccessibilityclick",
+      "DirectChromecoordinateclick"
+    ],
+    "submissionActivityLatestRecordedId": 6,
+    "newSubmissionActivityRowObserved": false,
+    "noBundleReupload": true,
+    "noNewReleaseCreated": true,
+    "rootCauseOfUnrecordedSubmission": "Unconfirmed. Confirmation closes without new submission activity. No console error was captured.",
+    "recovery": "FreshConsolepage and existing-owner login refresh. Google asks for password/passkey; user asked to complete it in openChrome, no credentials in chat.",
+    "ownerRefreshRequiresHumanInput": true,
+    "otherSignedInAccount": "Existing alternate Devit account has no developer account access; no account created or permission changed.",
+    "proof": "output/android/verification/0.6.0/play-production-060-submit-unconfirmed.png",
+    "backendNowApplied": "output/android/verification/0.6.0/backend-corrected-target-current-result.json",
+    "nativeInteractionVerified": false,
+    "instruction": "Continue existing release after owner verification, inspect actual recorded status, do not claim submission from button click alone.",
+    "proofSha256": "0499652A7A31FA61B6725B8689F3A48F13A3DB4C5B7E229E307EBFA2FDB665D4"
+  },
+  "backendCurrentState": {
+    "appliedAndCatalogVerified": true,
+    "projectId": "cghlkqeqiokjqdionrkc",
+    "historicalPermissionDenialWrongTarget": true,
+    "evidence": "output/android/verification/0.6.0/backend-corrected-target-current-result.json",
+    "signedInClientFlowVerified": false
   }
 }

@@ -1,0 +1,551 @@
+{
+  "status": "APPLIED AND SCHEMA/SECURITY VERIFIED on source-confirmed CareCloud; no signed-in device/client workflow or clinical validation claim.",
+  "project_id": "cghlkqeqiokjqdionrkc",
+  "sourceConfirmation": {
+    "file": "android/app/src/main/java/in/wedevit/care/CareCloud.kt",
+    "line": 40,
+    "scope": "Canonical care-record backend; separate disabled transcription endpoint was not changed."
+  },
+  "originalWrongTargetDenial": {
+    "preservedHistoricalEvidence": "output/android/verification/0.6.0/backend-runtime-permission-block.json",
+    "actualOriginalProjectId": "kjnhtakqzboayqorrlue",
+    "originalTool": "supabase_apply_migration",
+    "originalName": "conversation_scope_context_legacy_compatible",
+    "callTimestamp": "2026-10-24T14:06:36.300Z",
+    "errorTimestamp": "2026-10-24T14:06:38.983Z",
+    "callId": "call_8098ebd2a9704972848382c2afd8bf8e",
+    "error": "ProtocolError MCP-32600 permission denied",
+    "correction": "The denied original call targeted the separate disabled transcription service. It was not a denial of migration access to CareCloud. Exact original tool arguments/error linkage were verified in the known thread rollout without exporting SQL, credentials or private content."
+  },
+  "authorisation": "Root explicitly authorised these two reviewed migrations sequentially through normal approved apply_migration, correcting the proven wrong target. No denied write was routed through execute_sql or another tool.",
+  "preflight": {
+    "checked_at": "2026-10-24T17:39:00.657536+00:00",
+    "dependencies": [
+      {
+        "signature": "extensions.digest(text,text)",
+        "required_present": true
+      },
+      {
+        "signature": "healthathon_private.can_read_record(uuid,text,jsonb)",
+        "required_present": true
+      },
+      {
+        "signature": "healthathon_private.has_permission(uuid,text)",
+        "required_present": true
+      },
+      {
+        "signature": "healthathon_private.medicine_access(uuid,boolean)",
+        "required_present": true
+      },
+      {
+        "signature": "healthathon_private.medicine_record_access(uuid,uuid,boolean)",
+        "required_present": true
+      },
+      {
+        "signature": "healthathon_private.require_open_account()",
+        "required_present": true
+      },
+      {
+        "signature": "healthathon_private.review_draft(uuid,bigint,boolean)",
+        "required_present": true
+      },
+      {
+        "signature": "healthathon_private.review_receipts()",
+        "required_present": true
+      },
+      {
+        "signature": "healthathon_private.save_draft(uuid,uuid,jsonb,bigint,boolean)",
+        "required_present": true
+      },
+      {
+        "signature": "healthathon_private.save_record(uuid,uuid,text,jsonb,bigint)",
+        "required_present": true
+      },
+      {
+        "signature": "healthathon_private.valid_draft(jsonb)",
+        "required_present": true
+      }
+    ],
+    "missing_tables": [
+      {
+        "name": "healthathon_private.conversation_audience",
+        "must_be_absent": true
+      },
+      {
+        "name": "healthathon_private.conversation_scopes",
+        "must_be_absent": true
+      },
+      {
+        "name": "public.healthathon_prescription_medicines",
+        "must_be_absent": true
+      },
+      {
+        "name": "public.healthathon_prescription_mutations",
+        "must_be_absent": true
+      },
+      {
+        "name": "public.healthathon_prescription_state",
+        "must_be_absent": true
+      },
+      {
+        "name": "public.healthathon_prescriptions",
+        "must_be_absent": true
+      }
+    ],
+    "rename_targets": [
+      {
+        "signature": "healthathon_private.can_read_record_before_context(uuid,text,jsonb)",
+        "must_be_absent": true
+      },
+      {
+        "signature": "healthathon_private.review_draft_before_context(uuid,bigint,boolean)",
+        "must_be_absent": true
+      },
+      {
+        "signature": "healthathon_private.review_receipts_before_context()",
+        "must_be_absent": true
+      },
+      {
+        "signature": "healthathon_private.save_draft_before_context(uuid,uuid,jsonb,bigint,boolean)",
+        "must_be_absent": true
+      },
+      {
+        "signature": "healthathon_private.save_record_before_context(uuid,uuid,text,jsonb,bigint)",
+        "must_be_absent": true
+      },
+      {
+        "signature": "healthathon_private.valid_draft_before_context(jsonb)",
+        "must_be_absent": true
+      }
+    ],
+    "already_live_do_not_replay": [
+      {
+        "name": "public.healthathon_care_contacts",
+        "present": true
+      },
+      {
+        "name": "public.healthathon_medicine_courses",
+        "present": true
+      },
+      {
+        "name": "public.healthathon_medicine_events",
+        "present": true
+      }
+    ]
+  },
+  "offlineEvidence": {
+    "conversationChecks": 74,
+    "prescriptionChecks": 31,
+    "fixtures": "Previously executed in isolated PGlite with verified fixture transaction ROLLBACK; no production fixtures."
+  },
+  "applies": [
+    {
+      "project_id": "cghlkqeqiokjqdionrkc",
+      "source": "android/supabase/migrations/20261023070323_conversation_scope_context.sql",
+      "sha256": "4A8A12AE39E11DFD293C50BF3545EA6A7E9153F1E5CC7A6F07D97987EBD4AA74",
+      "name": "conversation_scope_context_legacy_compatible",
+      "receipt": {
+        "success": true
+      },
+      "ledger": {
+        "version": "20261024173915",
+        "name": "conversation_scope_context_legacy_compatible"
+      }
+    },
+    {
+      "project_id": "cghlkqeqiokjqdionrkc",
+      "source": "android/supabase/migrations/20261023071214_doctor_prescription_groups.sql",
+      "sha256": "C1931C45FD4FC52FBE5195D942370E173D2A8917055F5CCDBE98714DA9A7BFCF",
+      "name": "doctor_prescription_groups",
+      "receipt": {
+        "success": true
+      },
+      "ledger": {
+        "version": "20261024173949",
+        "name": "doctor_prescription_groups"
+      }
+    }
+  ],
+  "postcheck": {
+    "rpcs": [
+      {
+        "present": true,
+        "arguments": "p_person uuid",
+        "signature": "public.healthathon_conversation_candidates(uuid)",
+        "authenticated_execute": true,
+        "anon_execute_must_be_false": false,
+        "public_security_definer_must_be_false": false
+      },
+      {
+        "present": true,
+        "arguments": "",
+        "signature": "public.healthathon_conversation_capabilities()",
+        "authenticated_execute": true,
+        "anon_execute_must_be_false": false,
+        "public_security_definer_must_be_false": false
+      },
+      {
+        "present": true,
+        "arguments": "p_person uuid, p_conversation uuid",
+        "signature": "public.healthathon_conversation_scope_at(uuid,uuid)",
+        "authenticated_execute": true,
+        "anon_execute_must_be_false": false,
+        "public_security_definer_must_be_false": false
+      },
+      {
+        "present": true,
+        "arguments": "p_person uuid, p_conversation uuid, p_revision bigint, p_members uuid[], p_approve boolean",
+        "signature": "public.healthathon_conversation_scope(uuid,uuid,bigint,uuid[],boolean)",
+        "authenticated_execute": true,
+        "anon_execute_must_be_false": false,
+        "public_security_definer_must_be_false": false
+      },
+      {
+        "present": true,
+        "arguments": "",
+        "signature": "public.healthathon_prescription_capabilities()",
+        "authenticated_execute": true,
+        "anon_execute_must_be_false": false,
+        "public_security_definer_must_be_false": false
+      },
+      {
+        "present": true,
+        "arguments": "p_person uuid",
+        "signature": "public.healthathon_prescription_snapshot(uuid)",
+        "authenticated_execute": true,
+        "anon_execute_must_be_false": false,
+        "public_security_definer_must_be_false": false
+      },
+      {
+        "present": true,
+        "arguments": "p_id uuid, p_revision bigint, p_confirm boolean",
+        "signature": "public.healthathon_review_draft(uuid,bigint,boolean)",
+        "authenticated_execute": true,
+        "anon_execute_must_be_false": false,
+        "public_security_definer_must_be_false": false
+      },
+      {
+        "present": true,
+        "arguments": "p_id uuid, p_person uuid, p_data jsonb, p_revision bigint, p_submit boolean",
+        "signature": "public.healthathon_save_draft(uuid,uuid,jsonb,bigint,boolean)",
+        "authenticated_execute": true,
+        "anon_execute_must_be_false": false,
+        "public_security_definer_must_be_false": false
+      },
+      {
+        "present": true,
+        "arguments": "p_request jsonb",
+        "signature": "public.healthathon_save_prescription(jsonb)",
+        "authenticated_execute": true,
+        "anon_execute_must_be_false": false,
+        "public_security_definer_must_be_false": false
+      },
+      {
+        "present": true,
+        "arguments": "p_id uuid, p_person uuid, p_kind text, p_data jsonb, p_revision bigint",
+        "signature": "public.healthathon_save_record(uuid,uuid,text,jsonb,bigint)",
+        "authenticated_execute": true,
+        "anon_execute_must_be_false": false,
+        "public_security_definer_must_be_false": false
+      }
+    ],
+    "tables": [
+      {
+        "rls": true,
+        "name": "healthathon_private.conversation_audience",
+        "present": true,
+        "policy_count": 0,
+        "anon_select_must_be_false": false,
+        "direct_client_write_must_be_false": false
+      },
+      {
+        "rls": true,
+        "name": "healthathon_private.conversation_scopes",
+        "present": true,
+        "policy_count": 0,
+        "anon_select_must_be_false": false,
+        "direct_client_write_must_be_false": false
+      },
+      {
+        "rls": true,
+        "name": "public.healthathon_prescription_medicines",
+        "present": true,
+        "policy_count": 1,
+        "anon_select_must_be_false": false,
+        "direct_client_write_must_be_false": false
+      },
+      {
+        "rls": true,
+        "name": "public.healthathon_prescription_mutations",
+        "present": true,
+        "policy_count": 0,
+        "anon_select_must_be_false": false,
+        "direct_client_write_must_be_false": false
+      },
+      {
+        "rls": true,
+        "name": "public.healthathon_prescription_state",
+        "present": true,
+        "policy_count": 1,
+        "anon_select_must_be_false": false,
+        "direct_client_write_must_be_false": false
+      },
+      {
+        "rls": true,
+        "name": "public.healthathon_prescriptions",
+        "present": true,
+        "policy_count": 1,
+        "anon_select_must_be_false": false,
+        "direct_client_write_must_be_false": false
+      }
+    ],
+    "policies": [
+      {
+        "cmd": "SELECT",
+        "qual": "healthathon_private.prescription_group_access(person_id, prescription_id)",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "healthathon_prescription_medicines",
+        "permissive": "PERMISSIVE",
+        "policyname": "prescription_medicine_read",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "healthathon_private.prescription_group_access(person_id, current_id)",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "healthathon_prescription_state",
+        "permissive": "PERMISSIVE",
+        "policyname": "prescription_state_read",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "healthathon_private.prescription_group_access(person_id, id)",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "healthathon_prescriptions",
+        "permissive": "PERMISSIVE",
+        "policyname": "prescription_read",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "healthathon_private.can_read_record(person_id, kind, data)",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "healthathon_records",
+        "permissive": "RESTRICTIVE",
+        "policyname": "records_conversation_scope",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "healthathon_private.can_read_record(person_id, kind, data)",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "healthathon_records",
+        "permissive": "PERMISSIVE",
+        "policyname": "records_read",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "DELETE",
+        "qual": "((kind = 'entry'::text) AND healthathon_private.can_edit(person_id) AND healthathon_private.can_read_record(person_id, kind, data))",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "healthathon_records",
+        "permissive": "PERMISSIVE",
+        "policyname": "records_remove",
+        "schemaname": "public",
+        "with_check": null
+      }
+    ],
+    "triggers": [
+      {
+        "name": "prescription_course_serialization",
+        "table": "healthathon_medicine_courses",
+        "enabled": "O"
+      },
+      {
+        "name": "prescription_entry_serialization",
+        "table": "healthathon_records",
+        "enabled": "O"
+      },
+      {
+        "name": "require_new_note_context",
+        "table": "healthathon_records",
+        "enabled": "O"
+      }
+    ],
+    "checked_at": "2026-10-24T17:39:55.332663+00:00",
+    "legacy_helpers": [
+      {
+        "present": true,
+        "signature": "healthathon_private.can_read_record_before_context(uuid,text,jsonb)",
+        "anon_execute_must_be_false": false,
+        "authenticated_execute_must_be_false": false
+      },
+      {
+        "present": true,
+        "signature": "healthathon_private.review_draft_before_context(uuid,bigint,boolean)",
+        "anon_execute_must_be_false": false,
+        "authenticated_execute_must_be_false": false
+      },
+      {
+        "present": true,
+        "signature": "healthathon_private.review_receipts_before_context()",
+        "anon_execute_must_be_false": false,
+        "authenticated_execute_must_be_false": false
+      },
+      {
+        "present": true,
+        "signature": "healthathon_private.save_draft_before_context(uuid,uuid,jsonb,bigint,boolean)",
+        "anon_execute_must_be_false": false,
+        "authenticated_execute_must_be_false": false
+      },
+      {
+        "present": true,
+        "signature": "healthathon_private.save_record_before_context(uuid,uuid,text,jsonb,bigint)",
+        "anon_execute_must_be_false": false,
+        "authenticated_execute_must_be_false": false
+      },
+      {
+        "present": true,
+        "signature": "healthathon_private.valid_draft_before_context(jsonb)",
+        "anon_execute_must_be_false": false,
+        "authenticated_execute_must_be_false": false
+      }
+    ],
+    "partial_context_rejected": true,
+    "legacy_six_field_draft_valid": true
+  },
+  "verificationPasses": {
+    "allTenPublicEndpointsPresentAuthenticatedOnlyAndSecurityInvoker": true,
+    "allSixTablesPresentRlsNoAnonReadNoDirectClientWrite": true,
+    "allSixLegacyHelpersExistAndClientExecutionRevoked": true,
+    "allThreeTriggersEnabled": true,
+    "partialContextRejected": true,
+    "legacySixFieldDraftValid": true,
+    "expectedThreeNewInformationalAdvisoriesOnly": true,
+    "noNewSecurityWarningsOrErrors": true
+  },
+  "finalMigrationLedgerCount": 18,
+  "advisors": {
+    "before": [
+      {
+        "name": "rls_enabled_no_policy",
+        "level": "INFO",
+        "count": 16
+      },
+      {
+        "name": "anon_security_definer_function_executable",
+        "level": "WARN",
+        "count": 1
+      },
+      {
+        "name": "authenticated_security_definer_function_executable",
+        "level": "WARN",
+        "count": 1
+      },
+      {
+        "name": "auth_leaked_password_protection",
+        "level": "WARN",
+        "count": 1
+      }
+    ],
+    "after": [
+      {
+        "name": "rls_enabled_no_policy",
+        "level": "INFO",
+        "count": 19
+      },
+      {
+        "name": "anon_security_definer_function_executable",
+        "level": "WARN",
+        "count": 1
+      },
+      {
+        "name": "authenticated_security_definer_function_executable",
+        "level": "WARN",
+        "count": 1
+      },
+      {
+        "name": "auth_leaked_password_protection",
+        "level": "WARN",
+        "count": 1
+      }
+    ],
+    "newFindings": [
+      {
+        "key": "rls_enabled_no_policy|INFO|healthathon_private|conversation_audience",
+        "name": "rls_enabled_no_policy",
+        "level": "INFO",
+        "metadata": {
+          "name": "conversation_audience",
+          "type": "table",
+          "schema": "healthathon_private"
+        },
+        "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy"
+      },
+      {
+        "key": "rls_enabled_no_policy|INFO|healthathon_private|conversation_scopes",
+        "name": "rls_enabled_no_policy",
+        "level": "INFO",
+        "metadata": {
+          "name": "conversation_scopes",
+          "type": "table",
+          "schema": "healthathon_private"
+        },
+        "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy"
+      },
+      {
+        "key": "rls_enabled_no_policy|INFO|public|healthathon_prescription_mutations",
+        "name": "rls_enabled_no_policy",
+        "level": "INFO",
+        "metadata": {
+          "name": "healthathon_prescription_mutations",
+          "type": "table",
+          "schema": "public"
+        },
+        "remediation": "https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy"
+      }
+    ],
+    "removedFindings": [],
+    "interpretation": "Only three expected INFO notices for deliberately RPC-only private scope/audience and receipt tables with RLS/no direct client policies. Existing directory SECURITY DEFINER and leaked-password warnings unchanged; no unrelated settings altered."
+  },
+  "documentation": {
+    "skill": "Supabase skill reread before deployment",
+    "changelog": "https://supabase.com/changelog.md",
+    "relevantReviewed": [
+      "https://supabase.com/changelog/45329-breaking-change-tables-not-exposed-to-data-and-graphql-api-automatically",
+      "https://supabase.com/changelog/postgres-15-19-17-11-breaking-changes",
+      "https://supabase.com/docs/guides/database/functions"
+    ],
+    "scope": "Explicit RPC-only grants/RLS retained. No table exposure broadening, index/operator migration or legacy-cipher decryption change was required by these source files."
+  },
+  "boundaries": {
+    "patientOrAccountRowsRead": false,
+    "liveFixturesInserted": false,
+    "clinicalRolesOrApprovalsGranted": false,
+    "existingContactOrMedicineHistoryMigrationsReplayed": false,
+    "otherProjectMutated": false,
+    "storeDraftOrPrivateStatusOrHandoffEditedByThisAgent": false,
+    "playActionByThisAgent": false,
+    "signedInClientFlowVerified": false
+  },
+  "remaining": "Verify the intended authenticated app workflow separately. This deployment/catalog proof does not establish physical-device interaction, Play review/approval or clinical readiness."
+}
+
