@@ -1,0 +1,30 @@
+{
+  "changedAtUtc": "2026-10-24T15:02:35.224219+00:00",
+  "reason": "Actual Android WebView had native1080x840/innerHeight320 but body,surface,canvas DOM height0 and framebufferheight1; real tap could not target the zero-area canvas. Explicit viewport heights plus positioned body restore definite renderer/caption layout.",
+  "scope": "Exactly two production CSS copies; colors, controls, JS, origin/network policy and test assertions unchanged. No build/deploy run by this agent.",
+  "files": [
+    {
+      "path": "prototype/public/pain-body-viewer/viewer.css",
+      "oldSha256": "58350F37780A3B9C76A314178F28BA946BECE2AE259709181081C57A8380D192",
+      "newSha256": "ED2B9AA35D77284367FFAC1473008C90C9C6A33380B2D90ECC8823DA91346943",
+      "oldBytes": 374,
+      "newBytes": 450
+    },
+    {
+      "path": "android/app/src/main/assets/pain-body-viewer/viewer.css",
+      "oldSha256": "58350F37780A3B9C76A314178F28BA946BECE2AE259709181081C57A8380D192",
+      "newSha256": "ED2B9AA35D77284367FFAC1473008C90C9C6A33380B2D90ECC8823DA91346943",
+      "oldBytes": 374,
+      "newBytes": 450
+    }
+  ],
+  "copiesMatch": true,
+  "runtimeRetestPending": true,
+  "delta": [
+    "--- before",
+    "+++ after",
+    "@@ -1 +1 @@",
+    "-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#f7f9f4;color:#345444;font:13px system-ui,sans-serif}#surface{position:absolute;inset:0}canvas{display:block;width:100%;height:100%;touch-action:none}#status{position:absolute;bottom:8px;left:8px;right:8px;margin:0;text-align:center;pointer-events:none;background:#f7f9f4dd;border-radius:8px;padding:5px}",
+    "+html,body{margin:0;width:100%;height:100vh;height:100dvh;overflow:hidden;background:#f7f9f4;color:#345444;font:13px system-ui,sans-serif}body{position:relative}#surface{position:absolute;inset:0;width:100%;height:100vh;height:100dvh}canvas{display:block;width:100%;height:100%;touch-action:none}#status{position:absolute;bottom:8px;left:8px;right:8px;margin:0;text-align:center;pointer-events:none;background:#f7f9f4dd;border-radius:8px;padding:5px}"
+  ]
+}

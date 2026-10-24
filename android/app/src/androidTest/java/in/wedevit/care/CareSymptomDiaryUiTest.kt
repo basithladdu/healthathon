@@ -29,7 +29,7 @@ class CareSymptomDiaryUiTest {
         ui.onNodeWithTag("diary-choice-average-24h").performScrollTo().performClick()
         ui.onNodeWithTag("symptom-rating-6").performScrollTo().performClick()
         ui.onNodeWithTag("symptom-rating-4").performScrollTo().performClick()
-        ui.onNodeWithTag("symptom-previous-reference").performScrollTo().assertTextContains("$day 10:00 · 6/10")
+        ui.onNodeWithTag("symptom-previous-reference").performScrollTo().assertTextEquals("Previous matching note: $day 10:00 · 6/10")
         ui.onNodeWithTag("diary-choice-better").performScrollTo().performClick()
         screenshot("symptom-comparison")
         ui.onNodeWithTag("symptom-save").performScrollTo().performClick()

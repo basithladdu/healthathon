@@ -2,8 +2,11 @@ package `in`.wedevit.care
 
 import android.app.Activity
 import android.os.SystemClock
+import android.graphics.Rect
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.webkit.WebView
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.rememberScrollState
@@ -20,6 +23,8 @@ import java.util.concurrent.atomic.AtomicReference
 import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
+import org.json.JSONObject
+import org.json.JSONTokener
 
 /** Only fictional Compose state and bundled appassets. No account, database or save operation. */
 class CarePainWebViewRuntimeTest {
@@ -39,9 +44,16 @@ class CarePainWebViewRuntimeTest {
         waitForViewer("Drag to rotate")
         assertEquals(PainViewerPolicy.PAGE, onMain { viewer().url })
         assertTrue(js("document.querySelector('canvas').width > 0").contains("true"))
+        recordDiagnostics("ready-before-first-tap", observePointerEvents = true)
         screenshot("pain-webview-ready")
         ui.onNodeWithTag("pain-body-3d").performTouchInput { click(center) }
-        ui.waitUntil(15_000) { points.value.isNotEmpty() }
+        recordDiagnostics("immediately-after-first-tap")
+        try {
+            ui.waitUntil(15_000) { points.value.isNotEmpty() }
+        } finally {
+            recordDiagnostics("after-first-pick-wait")
+            screenshot("pain-webview-after-first-pick-wait")
+        }
         ui.runOnIdle {
             assertEquals(1, calls)
             assertTrue(points.value.single().z > 0)
@@ -50,8 +62,13 @@ class CarePainWebViewRuntimeTest {
         screenshot("pain-webview-raycast")
         ui.onNodeWithTag("pain-body-back").performScrollTo().performClick()
         ui.onNodeWithTag("pain-body-3d").performScrollTo()
+        recordDiagnostics("before-back-tap")
         ui.onNodeWithTag("pain-body-3d").performTouchInput { click(center) }
-        ui.waitUntil(15_000) { points.value.any { it.z < 0 } }
+        try {
+            ui.waitUntil(15_000) { points.value.any { it.z < 0 } }
+        } finally {
+            recordDiagnostics("after-back-pick-wait")
+        }
         val before = ui.runOnIdle { readOnly.value = true; points.value.toList() }
         waitForViewer("Saved pain map")
         val beforeCalls = ui.runOnIdle { calls }
@@ -63,6 +80,58 @@ class CarePainWebViewRuntimeTest {
         SystemClock.sleep(350)
         ui.runOnIdle { assertEquals(before, points.value); assertEquals(beforeCalls, calls) }
         screenshot("pain-webview-readonly")
+    }
+
+    /** Records real layout/bridge/touch evidence; never sends a callback or changes viewer state. */
+    private fun recordDiagnostics(stage: String, observePointerEvents: Boolean = false) {
+        val result = JSONObject().put("stage", stage).put("uptimeMs", SystemClock.uptimeMillis())
+        runCatching {
+            result.put("nativeOpeningLabels", ui.onAllNodesWithText("Opening body map…").fetchSemanticsNodes().size)
+            result.put("composeBoundsInRoot", ui.onNodeWithTag("pain-body-3d").fetchSemanticsNode().boundsInRoot.toString())
+            result.put("native", onMain {
+                val web = viewer()
+                val location = IntArray(2).also(web::getLocationOnScreen)
+                val visible = Rect()
+                val hasVisibleRect = web.getGlobalVisibleRect(visible)
+                val activity = ActivityLifecycleMonitorRegistry.getInstance().getActivitiesInStage(Stage.RESUMED).single()
+                JSONObject().put("url", web.url).put("width", web.width).put("height", web.height)
+                    .put("x", web.x).put("y", web.y).put("screenX", location[0]).put("screenY", location[1])
+                    .put("globalVisibleRect", visible.toShortString()).put("hasVisibleRect", hasVisibleRect)
+                    .put("attached", web.isAttachedToWindow).put("shown", web.isShown).put("visibility", web.visibility)
+                    .put("windowVisibility", web.windowVisibility).put("hardwareAccelerated", web.isHardwareAccelerated)
+                    .put("layerType", web.layerType).put("scrollX", web.scrollX).put("scrollY", web.scrollY)
+                    .put("activity", activity.javaClass.name).put("windowFlags", Integer.toHexString(activity.window.attributes.flags))
+                    .put("windowHardwareFlag", activity.window.attributes.flags and WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED != 0)
+                    .put("decorHardwareAccelerated", activity.window.decorView.isHardwareAccelerated)
+            })
+            val script = """
+                (() => {
+                  const canvas = document.querySelector('canvas');
+                  const rect = el => el ? (() => { const r = el.getBoundingClientRect(); return {x:r.x,y:r.y,width:r.width,height:r.height,top:r.top,bottom:r.bottom}; })() : null;
+                  if ($observePointerEvents && canvas && !window.__saharaPainPointerAudit) {
+                    window.__saharaPainPointerAudit = [];
+                    for (const type of ['pointerdown','pointerup','pointercancel','touchstart','touchend']) {
+                      canvas.addEventListener(type, event => {
+                        const touch = event.changedTouches?.[0];
+                        window.__saharaPainPointerAudit.push({type:event.type,x:event.clientX ?? touch?.clientX,y:event.clientY ?? touch?.clientY,isPrimary:event.isPrimary,pointerType:event.pointerType,time:event.timeStamp});
+                        if (window.__saharaPainPointerAudit.length > 12) window.__saharaPainPointerAudit.shift();
+                      }, {capture:true,passive:true});
+                    }
+                  }
+                  return {url:location.href,origin:location.origin,readyState:document.readyState,visibility:document.visibilityState,
+                    bridgeType:typeof window.SaharaPainNative,postMessageType:typeof window.SaharaPainNative?.postMessage,
+                    viewerType:typeof window.SaharaPainViewer,status:document.getElementById('status')?.textContent,
+                    innerWidth,innerHeight,devicePixelRatio,scrollX,scrollY,body:rect(document.body),surface:rect(document.getElementById('surface')),
+                    canvas:canvas?{rect:rect(canvas),width:canvas.width,height:canvas.height,display:getComputedStyle(canvas).display,visibility:getComputedStyle(canvas).visibility}:null,
+                    pointerEvents:window.__saharaPainPointerAudit ?? []};
+                })()
+            """.trimIndent()
+            result.put("javascript", JSONTokener(js(script)).nextValue())
+        }.onFailure { result.put("diagnosticError", "${it.javaClass.simpleName}: ${it.message}") }
+        val line = result.toString()
+        Log.i("SaharaPainRuntime", line)
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        File(context.getExternalFilesDir(null), "pain-webview-diagnostics.jsonl").appendText("$line\n")
     }
 
     private fun waitForViewer(expected: String) {
