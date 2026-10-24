@@ -17,23 +17,25 @@ import java.util.UUID
 class FeedbackUiTest {
     @get:Rule val ui = createComposeRule()
 
-    @Test fun continuousSliderShowsThreeStatesAndSavesOptionalNoteLocally() = isolated { context, scope ->
+    @Test fun ratingTilesStartUnselectedAndSaveOptionalNoteLocally() = isolated { context, scope ->
         var closed = false
         ui.setContent { CareTheme { FeedbackScreen(scope, "test", onClose = { closed = true }) } }
-        listOf(0f to "Not great", .5f to "Okay", 1f to "Good").forEach { (value, label) ->
-            ui.onNodeWithTag("feedback-slider").performScrollTo().performSemanticsAction(SemanticsActions.SetProgress) { assertTrue(it(value)) }
-            ui.onNodeWithTag("feedback-state").assertTextEquals(label)
-            screenshot("feedback-${label.lowercase().replace(' ', '-')}")
-        }
-        ui.onNodeWithTag("feedback-save").performScrollTo().performClick()
-        ui.onNodeWithText("Saved on this device").assertExists()
+        ui.onNodeWithTag("feedback-save").performScrollTo().assertIsNotEnabled()
+        (1..5).forEach { ui.onNodeWithTag("feedback-rating-$it").performScrollTo().assertIsDisplayed().assertIsNotSelected() }
         val store = FeedbackStore(context, scope, "test")
-        assertEquals(1f, store.latest()!!.score, .001f)
-        assertEquals("", store.latest()!!.note)
+        assertNull(store.latest())
+        ui.onNodeWithTag("feedback-rating-5").performScrollTo().performClick()
+        ui.onNodeWithTag("feedback-rating-5").assertIsSelected()
+        screenshot("feedback-rating-5")
         ui.onNodeWithTag("feedback-note").performScrollTo().performTextInput("Fictional app-interface feedback")
         androidx.test.espresso.Espresso.closeSoftKeyboard()
-        ui.onNodeWithTag("feedback-save").performScrollTo().performClick()
+        ui.onNodeWithTag("feedback-save").performScrollTo().assertIsEnabled().performClick()
+        ui.onNodeWithText("Saved on this device").assertExists()
+        assertEquals(1f, store.latest()!!.score, .001f)
         assertEquals("Fictional app-interface feedback", store.latest()!!.note)
+        ui.onNodeWithTag("feedback-rating-1").performScrollTo().performClick()
+        ui.onNodeWithTag("feedback-save").performScrollTo().performClick()
+        assertEquals(0f, store.latest()!!.score, .001f)
         ui.onNodeWithTag("feedback-close").performScrollTo().performClick()
         ui.runOnIdle { assertTrue(closed) }
     }

@@ -24,7 +24,7 @@ class DoctorPatientRecordUiTest {
                 DemoPatientDetail(DoctorDemoData.patients.first(), section.value, { section.value = it }, emptyList(), {}, {}, {}, {}, {}, showNavigation = false)
             }
         }
-        ui.onNodeWithText("Sample record · not connected to a patient account").assertExists()
+        ui.onNodeWithText(DoctorDemoData.patients.first().careContext).assertExists()
         listOf("Summary", "Progress", "Medicines", "Conversations", "Visits", "Reports").forEach { ui.onNodeWithTag("demo-record-$it").assertDoesNotExist() }
         ui.onNodeWithTag("demo-dose-demo-asha-dose-1").assertDoesNotExist()
         select("Medicines")
@@ -36,7 +36,7 @@ class DoctorPatientRecordUiTest {
         ui.onNodeWithTag("workflow-open-conversation").assertDoesNotExist()
         select("Progress")
         ui.onNodeWithTag("demo-dose-demo-asha-dose-1").assertDoesNotExist()
-        ui.onNodeWithText("Fictional patient/family reports", substring = true).assertExists()
+        ui.onNodeWithText("A history of patient and family reports, not a clinical assessment.").assertExists()
         select("Conversations")
         ui.onNodeWithTag("demo-patient-detail").performScrollToNode(hasTestTag("workflow-open-conversation"))
         ui.onNodeWithTag("workflow-open-conversation").assertIsDisplayed()
@@ -46,7 +46,7 @@ class DoctorPatientRecordUiTest {
         ui.onNodeWithTag("demo-schedule-visit").assertIsDisplayed()
         ui.onNodeWithTag("workflow-open-conversation").assertDoesNotExist()
         select("Reports")
-        ui.onNodeWithText("Sample summaries only. No original files attached.").assertExists()
+        ui.onNodeWithText("1 summary · 0 attached files").assertExists()
         ui.onNodeWithTag("demo-dose-demo-asha-dose-1").assertDoesNotExist()
     }
 

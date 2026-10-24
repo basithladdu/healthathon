@@ -32,10 +32,11 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 
-private fun workflowDate(time: Long) = if (time == 0L) "Sample context" else DateTimeFormatter.ofPattern("d MMM, h:mm a").withZone(ZoneId.systemDefault()).format(Instant.ofEpochMilli(time))
+private fun workflowDate(time: Long) = if (time == 0L) "Date not recorded" else DateTimeFormatter.ofPattern("d MMM, h:mm a").withZone(ZoneId.systemDefault()).format(Instant.ofEpochMilli(time))
+private fun ackWords(status: WorkflowAckStatus) = when(status) { WorkflowAckStatus.READ->"they said they read it"; WorkflowAckStatus.CONCERN->"they raised a concern"; else->"they said they are not ready" }
 private fun requestLabel(status: WorkflowRequestStatus) = status.name.lowercase().replaceFirstChar { it.uppercase() }
-@Composable private fun WorkflowTitle(text: String) { Text(text, fontSize = 25.sp, lineHeight = 31.sp, fontWeight = FontWeight.SemiBold, color = Ink) }
-@Composable private fun WorkflowSection(text: String) { Text(text, fontSize = 18.sp, fontWeight = FontWeight.SemiBold) }
+@Composable private fun WorkflowTitle(text: String) { Text(text, fontSize = 25.sp, lineHeight = 31.sp, fontWeight = FontWeight.Medium, color = Ink, fontFamily = SaharaTitleFont) }
+@Composable private fun WorkflowSection(text: String) { Text(text, fontSize = 18.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont) }
 @Composable private fun WorkflowCard(content: @Composable ColumnScope.() -> Unit) {
     Surface(color = Paper, shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant), modifier = Modifier.fillMaxWidth()) { Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp), content = content) }
 }
@@ -46,8 +47,8 @@ private fun requestLabel(status: WorkflowRequestStatus) = status.name.lowercase(
     var message by remember { mutableStateOf<String?>(null) }
     val requests = remember(store, revision, refreshToken) { store.requests() }
     LazyColumn(Modifier.fillMaxSize().testTag("workflow-request-list"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        item { TextButton(onClick = onBack, modifier = Modifier.testTag("workflow-back")) { Icon(Icons.Default.ChevronLeft, null); Text("Workspace") }; WorkflowTitle("Conversation requests"); Spacer(Modifier.height(6.dp)); Text("Review, organise and continue each discussion.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
-        item { FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf("All", "New", "Accepted", "Scheduled", "Deferred", "Completed").forEach { value -> FilterChip(filter == value, onClick = { filter = value }, label = { Text(value) }, modifier = Modifier.heightIn(min = 48.dp)) } } }
+        item { DoctorRequestQueueHeader(onBack) }
+        item { DoctorRequestFilters(filter) { filter = it } }
         message?.let { item { Text(it, color = Rust, modifier = Modifier.testTag("workflow-status")) } }
         val shown = requests.filter { filter == "All" || requestLabel(it.status) == filter }
         if (shown.isEmpty()) item { Text("No requests in this group.") }
@@ -55,18 +56,34 @@ private fun requestLabel(status: WorkflowRequestStatus) = status.name.lowercase(
             val patient = patients.firstOrNull { it.id == request.patientId }
             WorkflowCard {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { Text(patient?.name?.removeSuffix(" Demo") ?: "Patient", fontSize = 19.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f)); Text(requestLabel(request.status), color = Rust, style = MaterialTheme.typography.labelLarge) }
-                Text("${request.requestedBy} · ${workflowDate(request.createdAt)}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text("Listed under ${request.requestedBy.lowercase()} · ${workflowDate(request.createdAt)}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Text(request.reason)
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    if (request.status in listOf(WorkflowRequestStatus.NEW, WorkflowRequestStatus.DEFERRED)) Button(onClick = { message = store.transitionRequest(request.id, WorkflowRequestStatus.ACCEPTED) ?: "Request accepted locally"; revision++ }, modifier = Modifier.heightIn(min = 48.dp).testTag("workflow-accept-${request.id}")) { Text("Accept") }
+                    if (request.status in listOf(WorkflowRequestStatus.NEW, WorkflowRequestStatus.DEFERRED)) Button(onClick = { message = store.transitionRequest(request.id, WorkflowRequestStatus.ACCEPTED) ?: "Marked as planned on this device"; revision++ }, modifier = Modifier.heightIn(min = 48.dp).testTag("workflow-accept-${request.id}")) { Text("Plan this") }
                     if (request.status == WorkflowRequestStatus.ACCEPTED) Button(onClick = { onSchedule(request) }, modifier = Modifier.heightIn(min = 48.dp).testTag("workflow-schedule-${request.id}")) { Text("Schedule visit") }
-                    if (request.status in listOf(WorkflowRequestStatus.NEW, WorkflowRequestStatus.ACCEPTED, WorkflowRequestStatus.SCHEDULED)) TextButton(onClick = { message = store.transitionRequest(request.id, WorkflowRequestStatus.DEFERRED) ?: "Request deferred locally"; revision++ }, modifier = Modifier.heightIn(min = 48.dp).testTag("workflow-defer-${request.id}")) { Text("Defer") }
-                    if (request.status == WorkflowRequestStatus.SCHEDULED) TextButton(onClick = { message = store.transitionRequest(request.id, WorkflowRequestStatus.COMPLETED) ?: "Request completed locally"; revision++ }, modifier = Modifier.heightIn(min = 48.dp).testTag("workflow-complete-${request.id}")) { Text("Complete discussion") }
+                    if (request.status in listOf(WorkflowRequestStatus.NEW, WorkflowRequestStatus.ACCEPTED, WorkflowRequestStatus.SCHEDULED)) TextButton(onClick = { message = store.transitionRequest(request.id, WorkflowRequestStatus.DEFERRED) ?: "Deferred on this device"; revision++ }, modifier = Modifier.heightIn(min = 48.dp).testTag("workflow-defer-${request.id}")) { Text("Defer") }
+                    if (request.status == WorkflowRequestStatus.SCHEDULED) TextButton(onClick = { message = store.transitionRequest(request.id, WorkflowRequestStatus.COMPLETED) ?: "Marked complete on this device"; revision++ }, modifier = Modifier.heightIn(min = 48.dp).testTag("workflow-complete-${request.id}")) { Text("Complete discussion") }
                 }
                 OutlinedButton(onClick = { onOpen(request.patientId) }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("workflow-request-${request.id}")) { Text("Open conversation"); Spacer(Modifier.width(8.dp)); Icon(Icons.Default.ChevronRight, null) }
             }
         }
-        item { Text("Local request simulation. Status changes do not notify a patient or reserve a hospital appointment.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+        item { Text("This is your own list. Status changes stay on this device: nobody is notified, invited or called, and no hospital appointment is reserved.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+    }
+}
+
+@Composable internal fun DoctorRequestQueueHeader(onBack: () -> Unit) {
+    Column(verticalArrangement=Arrangement.spacedBy(12.dp)) {
+        TextButton(onClick=onBack,modifier=Modifier.heightIn(min=48.dp).testTag("workflow-back")) { Icon(Icons.Default.ChevronLeft,null);Text("Workspace") }
+        WorkflowTitle("Conversations to plan")
+        Text("Your own list. Nothing here was sent to you by a patient or family member.",color=MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+}
+
+@Composable internal fun DoctorRequestFilters(filter: String, onFilter: (String) -> Unit) {
+    FlowRow(Modifier.fillMaxWidth().testTag("workflow-request-filters"),horizontalArrangement=Arrangement.spacedBy(8.dp),verticalArrangement=Arrangement.spacedBy(10.dp)) {
+        listOf("All","New","Accepted","Scheduled","Deferred","Completed").forEach { value ->
+            FilterChip(filter==value,onClick={onFilter(value)},label={Text(value)},modifier=Modifier.heightIn(min=48.dp).testTag("workflow-filter-$value"))
+        }
     }
 }
 
@@ -139,8 +156,8 @@ private fun requestLabel(status: WorkflowRequestStatus) = status.name.lowercase(
             0 -> {
                 item { WorkflowSection("Previous discussion") }
                 val previous = versions.firstOrNull()
-                if (previous != null) item { WorkflowCard { Text("Care Note preview v${previous.number}", fontWeight = FontWeight.SemiBold); Text(previous.draft.nextSteps.ifBlank { "No next steps recorded." }); TextButton(onClick = { selectedVersion = previous.id }, modifier = Modifier.testTag("workflow-version-${previous.id}")) { Text("Read exact version") } } }
-                else item { WorkflowCard { Text(sources.firstOrNull()?.label ?: "No previous discussion", fontWeight = FontWeight.SemiBold); Text(sources.firstOrNull()?.text ?: "Start a conversation below."); Text("Sample source, not a verified clinical note.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) } }
+                if (previous != null) item { WorkflowCard { Text("Care Note preview v${previous.number}", fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont); Text(previous.draft.nextSteps.ifBlank { "No next steps recorded." }); TextButton(onClick = { selectedVersion = previous.id }, modifier = Modifier.testTag("workflow-version-${previous.id}")) { Text("Read exact version") } } }
+                else item { WorkflowCard { Text(sources.firstOrNull()?.label ?: "No previous discussion", fontWeight = FontWeight.SemiBold); Text(sources.firstOrNull()?.text ?: "Start a conversation below."); Text("Source text as entered, not a verified clinical note.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) } }
                 item { WorkflowSection("Guided discussion checklist"); Text("Record what was covered. Leaving a topic open does not imply agreement.", color = MaterialTheme.colorScheme.onSurfaceVariant) }
                 items(draft.checklist.withIndex().toList(), key = { it.index }) { (index, topic) -> WorkflowCard {
                     Text(topic.title, fontWeight = FontWeight.Medium)
@@ -158,7 +175,7 @@ private fun requestLabel(status: WorkflowRequestStatus) = status.name.lowercase(
                 if(enableOnlineAi) {
                     item { WorkflowSection("Audio → transcript → draft") }
                     item { DoctorAudioCapture(audio,sessionState?.value!=null,onlineBusy,draft.sourceText.isBlank(),onSignIn,::transcribeAndDraft) }
-                    item { Text("Use fictional test content only. Online processing is explicit; nothing is uploaded while recording. You can also type source text below.",color=MaterialTheme.colorScheme.onSurfaceVariant,style=MaterialTheme.typography.bodySmall) }
+                    item { Text("Use non-confidential, non-patient content only. Online processing is explicit; nothing is uploaded while recording. You can also type source text below.",color=MaterialTheme.colorScheme.onSurfaceVariant,style=MaterialTheme.typography.bodySmall) }
                 } else item { DoctorLocalPreviewCapture(audio,draft.sourceText,when {draft.sourceText.isBlank()->DoctorTranscriptKind.NONE;draft.mockGenerated->DoctorTranscriptKind.FICTIONAL_SAMPLE;else->DoctorTranscriptKind.MANUAL},onSourceEdit={update(draft.copy(sourceText=it.take(12000)))}) }
                 items(audioState.clips, key={"offline-audio-${it.id}"}) { clip ->
                     OfflineConversationTranscription(file=clip.file,identity="$accountId:${patient.id}",consent=clip.consent,
@@ -176,12 +193,12 @@ private fun requestLabel(status: WorkflowRequestStatus) = status.name.lowercase(
                 if(draft.transcribedAt>0) item { Text("Transcript: ${draft.transcriptProvider} / ${draft.transcriptModel} · ${workflowDate(draft.transcribedAt)}",color=Rust,style=MaterialTheme.typography.labelMedium) }
                 if(draft.aiModel.isNotBlank()) item { Text("Online AI draft: ${draft.aiProvider} / ${draft.aiModel} · not clinically reviewed",color=Rust,style=MaterialTheme.typography.labelMedium) }
                 returnedTranscript?.let { text -> item { WorkflowCard { Text("Returned transcript",fontWeight=FontWeight.SemiBold);Text(text);Text("Your existing work was not silently replaced.",style=MaterialTheme.typography.bodySmall) } } }
-                item { OutlinedButton(onClick = { val error=store.loadMockDraft(patient.id); message=error ?: "Sample AI draft loaded from the linked fictional source"; if(error==null) { draft=store.draft(patient.id); revision++ } }, enabled = listOf(draft.sourceText,draft.priorities,draft.participants,draft.topics,draft.questions,draft.undecided,draft.nextSteps).all { it.isBlank() }, modifier=Modifier.fillMaxWidth().heightIn(min=48.dp).testTag("workflow-load-mock")) { Icon(Icons.Default.AutoAwesome,null,Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text("Load sample AI draft") }; if(draft.mockGenerated) Text("Sample AI draft · fixture only, not clinically reviewed", color=Rust, style=MaterialTheme.typography.labelMedium) }
+                item { OutlinedButton(onClick = { val error=store.loadMockDraft(patient.id); message=error ?: "AI draft loaded from the linked source"; if(error==null) { draft=store.draft(patient.id); revision++ } }, enabled = listOf(draft.sourceText,draft.priorities,draft.participants,draft.topics,draft.questions,draft.undecided,draft.nextSteps).all { it.isBlank() }, modifier=Modifier.fillMaxWidth().heightIn(min=48.dp).testTag("workflow-load-mock")) { Icon(Icons.Default.AutoAwesome,null,Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text("Load AI draft") }; if(draft.mockGenerated) Text("AI draft · not clinically reviewed", color=Rust, style=MaterialTheme.typography.labelMedium) }
                 if(enableOnlineAi) item { OutlinedTextField(draft.sourceText, { update(draft.copy(sourceText=it.take(12000))) }, label={Text("Original source text")}, minLines=5, modifier=Modifier.fillMaxWidth().testTag("workflow-source-text")) }
                 item { WorkflowSection("Source references") }
                 if(draft.transcribedAt>0) item { WorkflowCard { Text("Consented conversation recording",fontWeight=FontWeight.SemiBold);Text("Transcript created ${workflowDate(draft.transcribedAt)} · ${draft.transcriptModel}",style=MaterialTheme.typography.bodySmall);Text("Check the transcript against its original audio before review.",style=MaterialTheme.typography.bodySmall) } }
                 else items(sources, key={it.id}) { source -> WorkflowCard { Text(source.label,fontWeight=FontWeight.SemiBold,modifier=Modifier.testTag("workflow-source-${source.id}")); Text(source.text, modifier=Modifier.testTag("workflow-source-text-${source.id}")) } }
-                item { WorkflowCard { Text("Uncertainty stays visible", fontWeight=FontWeight.SemiBold); Text(if(draft.aiModel.isNotBlank()) "AI may miss or misattribute words. Verify source evidence, leave unsupported fields blank and keep unresolved questions visible." else "The sample fixture does not state patient priorities or a treatment choice. Do not infer agreement.");draft.aiWarnings.forEach { Text(it,color=Rust,style=MaterialTheme.typography.bodySmall) } } }
+                item { WorkflowCard { Text("Uncertainty stays visible", fontWeight=FontWeight.SemiBold); Text(if(draft.aiModel.isNotBlank()) "AI may miss or misattribute words. Verify source evidence, leave unsupported fields blank and keep unresolved questions visible." else "The source does not state patient priorities or a treatment choice. Do not infer agreement.");draft.aiWarnings.forEach { Text(it,color=Rust,style=MaterialTheme.typography.bodySmall) } } }
                 items(draft.evidence.withIndex().toList(),key={"evidence-${it.index}"}) { (_,evidence) -> WorkflowCard { Text("Source evidence · ${evidence.section}",fontWeight=FontWeight.Medium);Text(evidence.quote) } }
                 val fields = listOf("priorities" to "What matters most", "participants" to "Who participated", "topics" to "What was discussed", "questions" to "Questions & concerns", "undecided" to "Still undecided", "nextSteps" to "Next steps")
                 items(fields, key={it.first}) { (id,label) ->
@@ -192,7 +209,7 @@ private fun requestLabel(status: WorkflowRequestStatus) = status.name.lowercase(
             }
             else -> {
                 item { WorkflowSection("Check the exact draft") }
-                item { WorkflowCard { Text("Unverified local preview", fontWeight=FontWeight.SemiBold, color=Rust); Text("Professional verification is not connected. Publishing here creates a sample version, not a verified clinical record.") } }
+                item { WorkflowCard { Text("Unverified local preview", fontWeight=FontWeight.Medium, color=Rust, fontFamily = SaharaTitleFont); Text("Professional verification is not connected. Publishing here creates an unverified version, not a verified clinical record.") } }
                 item { WorkflowDraftSummary(draft) }
                 item { OutlinedTextField(reviewer,{reviewer=it; checked=false},label={Text("Reviewer name (self-entered)")},singleLine=true,modifier=Modifier.fillMaxWidth().testTag("workflow-reviewer")) }
                 item { WorkflowCheck(sourceConfirmed,{sourceConfirmed=it},"I checked the original source text", "workflow-source-confirmed"); WorkflowCheck(checked,{checked=it},"I reviewed every section and unresolved point", "workflow-review-checked") }
@@ -206,7 +223,7 @@ private fun requestLabel(status: WorkflowRequestStatus) = status.name.lowercase(
             listOf("Records", "Activity").forEach { section -> FilterChip(selected=historySection==section,onClick={historySection=section},label={Text(if(section=="Records") "Records & timeline" else "Activity & updates")},modifier=Modifier.heightIn(min=48.dp).testTag(if(section=="Records") "workflow-open-records" else "workflow-open-activity")) }
         } }
         if(historySection=="Records") {
-            items(store.attachments(patient.id),key={it.id}) { attachment -> WorkflowCard { Text(attachment.title,fontWeight=FontWeight.Medium); Text(attachment.text); Text("Sample text source; no uploaded original file.",style=MaterialTheme.typography.bodySmall,color=MaterialTheme.colorScheme.onSurfaceVariant) } }
+            items(store.attachments(patient.id),key={it.id}) { attachment -> WorkflowCard { Text(attachment.title,fontWeight=FontWeight.Medium); Text(attachment.text); Text("Text source; no uploaded original file.",style=MaterialTheme.typography.bodySmall,color=MaterialTheme.colorScheme.onSurfaceVariant) } }
             items(store.timeline(patient.id),key={"timeline-${it.id}"}) { entry -> Column { Text(entry.title,fontWeight=FontWeight.Medium); Text(entry.detail); Text(workflowDate(entry.at),style=MaterialTheme.typography.bodySmall,color=MaterialTheme.colorScheme.onSurfaceVariant) } }
         }
         if(historySection=="Activity") { item { Text("In-app history only; no SMS, push or external delivery.",style=MaterialTheme.typography.bodySmall) }; items(store.activity(patient.id).take(30),key={it.id}) { entry -> Text("${workflowDate(entry.at)}\n${entry.action}",style=MaterialTheme.typography.bodySmall) } }
@@ -226,12 +243,12 @@ private fun requestLabel(status: WorkflowRequestStatus) = status.name.lowercase(
         item { TextButton(onClick=onBack,modifier=Modifier.testTag("workflow-version-back")) { Icon(Icons.Default.ChevronLeft,null); Text("Conversation") }; WorkflowTitle("Care Note · Version ${version.number}"); Text("${patient.name.removeSuffix(" Demo")} · ${workflowDate(version.publishedAt)}",color=Rust); Text(version.reviewLabel,style=MaterialTheme.typography.bodySmall); Text("Reviewer: ${version.reviewerName} (self-entered)",style=MaterialTheme.typography.bodySmall) }
         item { WorkflowDraftSummary(version.draft) }
         item { WorkflowCard { Text("Exact source",fontWeight=FontWeight.SemiBold); Text(version.draft.sourceText); Text(if(version.draft.transcribedAt>0) "Recorded conversation · ${workflowDate(version.draft.transcribedAt)} · ${version.draft.transcriptModel}" else DoctorWorkflowData.sources(patient.id).filter { it.id in version.draft.sourceIds }.joinToString("\n") { it.label }.ifBlank { "Manually entered source" },style=MaterialTheme.typography.bodySmall);if(version.draft.aiModel.isNotBlank())Text("AI draft: ${version.draft.aiProvider} / ${version.draft.aiModel}",style=MaterialTheme.typography.bodySmall);version.draft.aiWarnings.forEach {Text(it,style=MaterialTheme.typography.bodySmall,color=Rust)} } }
-        item { WorkflowSection("Preview patient & family responses"); Text("Choose a fictional identity to simulate its own response to this exact version. This is not actual patient consent or external confirmation.",color=MaterialTheme.colorScheme.onSurfaceVariant) }
+        item { WorkflowSection("Record what they told you"); Text("This version has not been shared with anyone, so no one has responded in the app. If the patient or a family member told you something about it in person, note it here as your own record. It is not their acknowledgement, consent or agreement.",color=MaterialTheme.colorScheme.onSurfaceVariant) }
         items(DoctorWorkflowData.members(patient.id),key={it.id}) { member -> WorkflowCard {
             Text(member.name,fontWeight=FontWeight.SemiBold)
             val ack=acknowledgements.firstOrNull { it.memberId==member.id }
-            Text(if(ack==null) "No response to this version" else "${ack.status.name.lowercase().replace('_',' ')} · ${workflowDate(ack.at)}",color=Rust,modifier=Modifier.testTag("workflow-ack-state-${member.id}"))
-            FlowRow(horizontalArrangement=Arrangement.spacedBy(6.dp)) { WorkflowAckStatus.entries.forEach { status -> OutlinedButton(onClick={message=store.acknowledge(version.id,member.id,status);revision++},modifier=Modifier.heightIn(min=48.dp).testTag("workflow-ack-${member.id}-${status.name}")) { Text(when(status) { WorkflowAckStatus.READ->"Read"; WorkflowAckStatus.CONCERN->"Concern"; else->"Not ready" }) } } }
+            Text(if(ack==null) "Nothing recorded for this version" else "You noted: ${ackWords(ack.status)} · ${workflowDate(ack.at)}",color=Rust,modifier=Modifier.testTag("workflow-ack-state-${member.id}"))
+            FlowRow(horizontalArrangement=Arrangement.spacedBy(6.dp)) { WorkflowAckStatus.entries.forEach { status -> OutlinedButton(onClick={message=store.recordToldToClinician(version.id,member.id,status);revision++},modifier=Modifier.heightIn(min=48.dp).testTag("workflow-ack-${member.id}-${status.name}")) { Text(when(status) { WorkflowAckStatus.READ->"Told me they read it"; WorkflowAckStatus.CONCERN->"Told me a concern"; else->"Told me not ready" }) } } }
         } }
         message?.let { item { Text(it,color=Rust,modifier=Modifier.testTag("workflow-status")) } }
         item { Button(onClick={runCatching { DoctorWorkflowPdf.create(context,version,patient.name.removeSuffix(" Demo")) }.onSuccess { exported=it;message="Preview PDF created on this device" }.onFailure { message="Could not create the preview PDF. Try again." }},modifier=Modifier.fillMaxWidth().heightIn(min=48.dp).testTag("workflow-export-pdf")) { Icon(Icons.Default.PictureAsPdf,null);Spacer(Modifier.width(8.dp));Text("Create preview PDF") } }

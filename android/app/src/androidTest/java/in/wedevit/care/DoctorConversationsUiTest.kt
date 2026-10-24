@@ -24,17 +24,17 @@ import org.junit.Test
 import java.io.File
 import java.util.UUID
 
-/** Stateless fictional catalogues only. No actual account, store, audio or provider. */
+/** Stateless catalogues only. No actual account, store, audio or provider. */
 class DoctorConversationsUiTest {
     @get:Rule val ui=createComposeRule()
     private val now=DoctorPatientTracking.asOf+86_400_000L
     private fun source(id:String)="[$id] Patient: I do not want a decision invented.\n[$id] Family: We have questions for the next conversation.\n[$id] Patient: Please keep my exact words together."
     private fun version(patient:String,id:String,number:Int)=WorkflowVersion(id,patient,number,
-        WorkflowDraft(patient,sourceText=source(id),topics="Fictional discussion $id",questions="Questions remain open."),"Sample reviewer $id",now-number*1000L)
+        WorkflowDraft(patient,sourceText=source(id),topics="Discussion $id",questions="Questions remain open."),"Dr Anita Sen",now-number*1000L)
     private fun model(patient:String="demo-leela",latestSource:String?=null):DoctorConversationsModel {
         val latest=version(patient,"$patient-latest",2).let {if(latestSource==null) it else it.copy(draft=it.draft.copy(sourceText=latestSource))}
         return DoctorConversationsData.build(patient,listOf(version(patient,"$patient-earlier",1),latest),
-            WorkflowDraft(patient,sourceText="Unfinished fictional draft; never a published discussion.",updatedAt=now-500),now)!!
+            WorkflowDraft(patient,sourceText="Unfinished draft; never a published discussion.",updatedAt=now-500),now)!!
     }
 
     @Test fun normalCatalogueSeparatesDraftAndPublishedVersionsAndReadsExactSources() {
@@ -55,7 +55,7 @@ class DoctorConversationsUiTest {
         read("demo-leela-prior")
         ui.onNodeWithTag("conversation-source-demo-leela-prior").assertTextEquals(state.value.priorSample!!.sourceText)
         ui.onNodeWithText("Date not recorded").assertExists()
-        ui.onNodeWithText("Author not recorded · fictional sample").assertExists()
+        ui.onNodeWithText("Author not recorded").assertExists()
     }
 
     @Test fun largeTextExactReaderStaysVisibleAndFollowsPatientAndSnapshotChanges() {
@@ -68,8 +68,8 @@ class DoctorConversationsUiTest {
         assertTrue(layouts.single().lineCount>3);assertFalse(layouts.single().multiParagraph.didExceedMaxLines)
         screenshot("doctor-conversations-visible-large")
         ui.onNodeWithText("Close discussion").assertDoesNotExist()
-        ui.runOnIdle {state.value=model(latestSource="Changed fictional source, same version identity.")}
-        ui.onNodeWithTag("conversation-source-demo-leela-latest").assertTextEquals("Changed fictional source, same version identity.")
+        ui.runOnIdle {state.value=model(latestSource="Changed source, same version identity.")}
+        ui.onNodeWithTag("conversation-source-demo-leela-latest").assertTextEquals("Changed source, same version identity.")
         ui.runOnIdle {state.value=model("demo-ravi")}
         ui.onNodeWithTag("conversation-card-demo-leela-latest").assertDoesNotExist()
         read("demo-ravi-latest")
@@ -84,7 +84,7 @@ class DoctorConversationsUiTest {
         val workflowName="doctor-workflow-conversations-$suffix"
         val demo=DoctorDemoStore(context,preferencesName=demoName)
         val workflow=DoctorWorkflowStore(context,preferencesName=workflowName)
-        val draft=WorkflowDraft("demo-leela",sourceText="Fictional unchanged workspace source.",topics="Fictional workspace topic.")
+        val draft=WorkflowDraft("demo-leela",sourceText="Unchanged workspace source.",topics="Workspace topic.")
         assertNull(workflow.saveDraft(draft))
         try {
             ui.setContent {CareTheme {DoctorDemo({},demo,workflow)}}
@@ -97,7 +97,7 @@ class DoctorConversationsUiTest {
             ui.onNodeWithTag("conversation-latest").assertDoesNotExist()
             ui.onNodeWithTag("demo-patient-detail").performScrollToNode(hasTestTag("workflow-open-conversation"))
             ui.onNodeWithTag("workflow-open-conversation").performClick()
-            ui.runOnIdle {assertNull(workflow.publish("demo-leela","Fictional reviewer",true,true))}
+            ui.runOnIdle {assertNull(workflow.publish("demo-leela","Dr Vikram Rao",true,true))}
             val published=workflow.versions("demo-leela").single()
             ui.onNodeWithTag("workflow-back").performScrollTo().performClick()
             ui.onNodeWithTag("conversation-latest").assertExists()

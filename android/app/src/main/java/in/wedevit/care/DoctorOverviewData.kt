@@ -61,8 +61,8 @@ object DoctorOverviewData {
             )
         }
         val professional = previousSource?.let { source -> illustrativeProfessionals[patientId]?.let { name ->
-            DoctorPreviousProfessional(name, "Previous clinician (fictional example)", source.id,
-                "Illustrative handover metadata linked to this patient's previous sample discussion. Not a verified note author or an assigned doctor. The original sample does not record its author or date.")
+            DoctorPreviousProfessional(name, "Previous clinician", source.id,
+                "Handover metadata linked to the previous discussion. Not a verified note author or an assigned doctor; the original discussion does not record its author or date.")
         } }
         val report = DoctorPatientTracking.checkIns(patientId).filter { it.patientId == patientId && it.at > 0 && it.at <= nowMillis && it.text.isNotBlank() }.maxByOrNull { it.at }
         val next = appointments.filter { it.patientId == patientId && it.status == "Scheduled" && it.startMillis > nowMillis && it.startMillis > 0 && it.id.isNotBlank() && it.durationMinutes in 1..480 }

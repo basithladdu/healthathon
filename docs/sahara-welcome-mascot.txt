@@ -1,0 +1,8 @@
+Sahara welcome mascot
+
+Asset: android/app/src/main/res/drawable-nodpi/sahara_welcome_mascot.png
+Created 2026-10-21 with the built-in image-generation tool.
+Purpose: decorative welcome artwork introducing care notes, medicine organisation,
+and visits through a friendly orange heart mascot with notebook, calendar and
+organiser. It does not imply clinical assessment or professional verification.
+Transparent PNG, drawable-nodpi; unrelated illustrations remain unchanged.

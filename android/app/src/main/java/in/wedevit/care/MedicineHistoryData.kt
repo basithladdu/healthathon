@@ -1,0 +1,38 @@
+package `in`.wedevit.care
+
+import java.time.Instant
+import java.time.LocalDate
+
+data class MedicineCourse(val medicineId: String, val name: String, val directions: String, val past: Boolean, val changedAt: Long, val reason: String = "", val revision: Long = 0)
+data class MedicineIntakeEvent(val id: String, val medicineId: String, val name: String, val outcome: String,
+    val plannedAt: Long? = null, val reportedTakenAt: Long? = null, val reportedDate: String = "",
+    val loggedAt: Long, val reporter: String = "", val note: String = "", val source: String = "manual")
+data class MedicineHistorySnapshot(val courses: List<MedicineCourse> = emptyList(), val events: List<MedicineIntakeEvent> = emptyList()) {
+    val pastIds: Set<String> get() = courses.filter { it.past }.map { it.medicineId }.toSet()
+}
+
+object MedicineHistoryRules {
+    val outcomes = setOf("taken", "skipped", "planned", "unmarked", "course_past", "course_current")
+    fun validate(event: MedicineIntakeEvent, now: Long) {
+        require(event.id.isNotBlank() && event.medicineId.isNotBlank() && event.name.trim().length in 1..200)
+        require(event.outcome in outcomes && event.loggedAt > 0 && event.note.length <= 2000 && event.reporter.length <= 100)
+        require(event.plannedAt == null || event.plannedAt > 0) { "Choose a valid planned time." }
+        require(event.reportedTakenAt == null || (event.outcome == "taken" && event.reportedTakenAt > 0 && event.reportedTakenAt <= now)) { "A taken time must be in the past and belong to a Taken report." }
+        require(event.outcome != "planned" || (event.plannedAt != null && event.reportedTakenAt == null)) { "A planned dose needs its scheduled time." }
+        require(event.reportedDate.isEmpty() || runCatching { LocalDate.parse(event.reportedDate) }.isSuccess) { "Invalid reported date." }
+    }
+    fun status(event: MedicineIntakeEvent, now: Long): String = when(event.outcome) {
+        "taken" -> if (event.plannedAt != null && event.reportedTakenAt != null && event.reportedTakenAt > event.plannedAt) "Late reported" else "Taken reported"
+        "skipped" -> "Skipped reported"
+        "unmarked" -> "Check-off corrected"
+        "course_past" -> "Moved to past medicines"
+        "course_current" -> "Returned to current medicines"
+        else -> if (event.plannedAt != null && event.plannedAt > now) "Upcoming" else "Not logged"
+    }
+    fun current(items: List<CareItem>, personId: String, snapshot: MedicineHistorySnapshot) = items.filter { it.personId == personId && it.kind == "medicine" && it.id !in snapshot.pastIds }
+    fun status(event: MedicineIntakeEvent, all: List<MedicineIntakeEvent>, now: Long): String =
+        if (event.outcome == "planned" && all.any { it.medicineId == event.medicineId && it.plannedAt == event.plannedAt && it.outcome in setOf("taken", "skipped") }) "Plan followed by a report" else status(event, now)
+    fun legacyDate(item: CareItem): String? = item.doneOn.takeIf { it.isNotBlank() && runCatching { LocalDate.parse(it) }.isSuccess }
+}
+
+internal fun medicineInstant(at: Long) = Instant.ofEpochMilli(at).toString()

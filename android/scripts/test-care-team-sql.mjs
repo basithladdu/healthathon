@@ -1,0 +1,52 @@
+// Isolated PostgreSQL WASM fixtures only. Never contacts a Supabase project.
+import {readFile,readdir} from 'node:fs/promises';
+import {pathToFileURL} from 'node:url';
+import assert from 'node:assert/strict';
+const {PGlite}=await import(pathToFileURL(process.env.PGLITE_MODULE).href);
+const db=new PGlite();
+await db.exec(`create role anon; create role authenticated; create role service_role bypassrls;
+create schema auth; create schema extensions; create schema storage;
+create table auth.users(id uuid primary key,email text);
+create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
+create function auth.jwt() returns jsonb language sql stable as $$select '{}'::jsonb$$;
+grant usage on schema auth,extensions,storage to anon,authenticated;
+create function extensions.digest(text,text) returns bytea language sql immutable as $$select sha256(convert_to($1,'UTF8'))$$;
+create function extensions.gen_random_bytes(integer) returns bytea language sql volatile as $$select substring(decode(repeat(replace(gen_random_uuid()::text,'-',''),8),'hex') from 1 for $1)$$;
+create table storage.buckets(id text primary key,name text,public boolean,file_size_limit bigint,allowed_mime_types text[]);
+create table storage.objects(id uuid primary key default gen_random_uuid(),bucket_id text,name text,metadata jsonb,unique(bucket_id,name));
+alter table storage.objects enable row level security; grant select,insert,update,delete on storage.objects to anon,authenticated;`);
+for(const file of (await readdir('android/supabase/migrations')).filter(f=>f.endsWith('.sql')).sort()) await db.exec(await readFile('android/supabase/migrations/'+file,'utf8'));
+const owner='11111111-1111-4111-8111-111111111111',member='22222222-2222-4222-8222-222222222222',person='33333333-3333-4333-8333-333333333333',id='44444444-4444-4444-8444-444444444444';
+await db.query('insert into auth.users values($1,$2),($3,$4)',[owner,'owner@example.invalid',member,'member@example.invalid']);
+await db.query("insert into public.healthathon_people(id,owner_id,name,created_ms) values($1,$2,'Fixture',1)",[person,owner]);
+await db.query('insert into public.healthathon_members(person_id,user_id,can_edit) values($1,$2,true)',[person,member]);
+async function as(user,fn){await db.exec(`set role authenticated;select set_config('request.jwt.claim.sub','${user}',false)`);try{return await fn()}finally{await db.exec('reset role')}}
+async function result(sql,args=[]){return Object.values((await db.query(sql,args)).rows[0])[0]}
+const contact={id,person_id:person,display_name:'Synthetic contact',relationship:'Sibling',role:'family',phone:'',revision:0};
+await as(owner,async()=>{assert.equal((await result('select public.healthathon_save_care_contact($1)',[contact])).revision,1);});
+await as(member,async()=>{assert.equal((await result('select public.healthathon_list_care_contacts($1)',[person])).readable,false);await assert.rejects(()=>db.query('select public.healthathon_save_care_contact($1)',[{...contact,revision:1}]));await assert.rejects(()=>db.query('select * from public.healthathon_care_contacts'));});
+await as(owner,()=>db.query('select public.healthathon_care_team_share($1,$2,true)',[person,member]));
+await as(member,async()=>{const value=await result('select public.healthathon_list_care_contacts($1)',[person]);assert.equal(value.contacts.length,1);assert.equal(value.readable,true);await assert.rejects(()=>db.query('select public.healthathon_care_team_share($1,$2,false)',[person,member]));});
+await db.query("update public.healthathon_members set expires_at=now()-interval '1 second' where person_id=$1 and user_id=$2",[person,member]);
+await as(member,()=>assert.rejects(()=>db.query('select public.healthathon_list_care_contacts($1)',[person])));
+await db.query('delete from public.healthathon_members where person_id=$1 and user_id=$2',[person,member]);
+await as(member,()=>assert.rejects(()=>db.query('select public.healthathon_list_care_contacts($1)',[person])));
+await as(owner,async()=>{await assert.rejects(()=>db.query('select public.healthathon_save_care_contact($1)',[{...contact,revision:9}]));assert.equal((await result('select public.healthathon_save_care_contact($1)',[{...contact,revision:1}])).revision,2);await db.query('select public.healthathon_remove_care_contact($1,$2,2)',[person,id]);});
+await db.query("insert into public.healthathon_members(person_id,user_id,can_edit,role,permissions) values($1,$2,true,'clinician','{\"careTeam\":true}')",[person,member]);
+await as(member,()=>assert.rejects(()=>db.query('select public.healthathon_list_care_contacts($1)',[person])));
+await as(owner,()=>assert.rejects(()=>db.query('select public.healthathon_save_care_contact($1)',[{...contact,person_id:'55555555-5555-4555-8555-555555555555'}])));
+await as(owner,async()=>{
+ const legacy=await result('select public.healthathon_invite($1,false)',[person]);
+ const explicit=await result('select public.healthathon_invite_care_team($1,false,true)',[person]);
+ assert.equal(legacy.length,48);assert.equal(explicit.length,48);
+ await assert.rejects(()=>db.query('select public.healthathon_invite_care_team($1,null,true)',[person]));
+});
+assert.equal(await result("select count(*)::int from healthathon_private.invites where permissions->>'careTeam'='true'"),1);
+assert.equal(await result("select has_function_privilege('anon','public.healthathon_list_care_contacts(uuid)','execute')"),false);
+assert.equal(await result("select has_function_privilege('anon','healthathon_private.list_care_contacts(uuid)','execute')"),false);
+assert.equal(await result("select prosecdef from pg_proc where oid='public.healthathon_list_care_contacts(uuid)'::regprocedure"),false);
+await as('',()=>assert.rejects(()=>db.query('select public.healthathon_list_care_contacts($1)',[person])));
+await db.query('insert into healthathon_private.closed_accounts(user_id) values($1)',[owner]);
+await as(owner,()=>assert.rejects(()=>db.query('select public.healthathon_list_care_contacts($1)',[person])));
+console.log('Care-team SQL: default-off, owner CRUD, explicit share, direct-table denial, expiry, revocation and revision fixtures PASS');
+await db.close();

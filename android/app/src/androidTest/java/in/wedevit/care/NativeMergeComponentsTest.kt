@@ -82,7 +82,8 @@ class NativeMergeComponentsTest {
         val store = FeedbackStore(context, scope, "integration-test")
         var closed = false
         ui.setContent { CareTheme { FeedbackScreen(scope, "integration-test", onClose = { closed = true }) } }
-        ui.onNodeWithTag("feedback-slider").performScrollTo().assertExists()
+        (1..5).forEach { ui.onNodeWithTag("feedback-rating-$it").performScrollTo().assertExists() }
+        ui.onNodeWithTag("feedback-save").performScrollTo().assertIsNotEnabled()
         ui.onNodeWithTag("feedback-close").performScrollTo().performClick()
         ui.runOnIdle { assertTrue(closed); assertNull(store.latest()) }
     }

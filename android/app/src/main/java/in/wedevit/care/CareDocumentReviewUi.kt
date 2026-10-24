@@ -30,7 +30,7 @@ import java.time.ZoneId
 @Composable fun CareDocumentReview(vm: CareModel, report: CareReport, onClose: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val store = remember(context, vm.accountNamespace) { CareDocumentReviewStore(context.applicationContext, vm.accountNamespace) }
+    val store = remember(context, vm.storageNamespace) { CareDocumentReviewStore(context.applicationContext, vm.storageNamespace) }
     val busy by vm.busy.collectAsStateWithLifecycle()
     val selected by vm.selected.collectAsStateWithLifecycle()
     val canEdit by vm.canEdit.collectAsStateWithLifecycle()
@@ -70,7 +70,7 @@ import java.time.ZoneId
 
     LazyColumn(Modifier.fillMaxSize().imePadding().testTag("document-review"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { Row { IconButton(onClick = { job?.cancel(); onClose() }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back to documents") }; Column(Modifier.weight(1f)) { Heading("Review report", 26); Text(report.name) } } }
-        item { OutlinedButton(onClick = { runCatching { open(context, vm.reportFiles.intent(report, false)) }.onFailure { error = "No app could open this original. Your file is unchanged." } }, modifier = Modifier.fillMaxWidth()) { Icon(Icons.Default.OpenInNew, null); Spacer(Modifier.width(8.dp)); Text("View original") } }
+        item { OutlinedButton(onClick = { runCatching { open(context, vm.reportFiles.intent(report, false)) }.onFailure { error = "No app could open this original. Your file is unchanged." } }, enabled = !vm.demoMode, modifier = Modifier.fillMaxWidth()) { Icon(Icons.Default.OpenInNew, null); Spacer(Modifier.width(8.dp)); Text(if (vm.demoMode) "View original · unavailable in demo" else "View original") } }
         item { Text("Read text, correct any mistakes, then copy only the facts you checked. Handwriting and small print may not be readable.", style = MaterialTheme.typography.bodySmall) }
         if (loading) item { SurfaceCard { LinearProgressIndicator(Modifier.fillMaxWidth()); Text("Reading page ${progress.first} of ${progress.second.coerceAtLeast(1)}"); TextButton(onClick = { job?.cancel(); loading = false }) { Text("Cancel reading") } } }
         if (error.isNotBlank()) item { SurfaceCard(Peach) { Text(error, color = MaterialTheme.colorScheme.error); TextButton(onClick = ::read, enabled = !loading) { Text("Read again") } } }

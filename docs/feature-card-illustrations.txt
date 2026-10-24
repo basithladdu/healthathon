@@ -1,0 +1,13 @@
+Feature-card illustrations
+
+Created 2026-10-21 with the built-in image-generation tool.
+Assets:
+- android/app/src/main/res/drawable-nodpi/wellbeing_checkin_illustration.png
+- android/app/src/main/res/drawable-nodpi/nearby_care_illustration.png
+
+Decorative paper-cut style artwork matching the Care Notes illustration:
+the wellbeing card has a friendly peach conversation bubble, heart and sun;
+the nearby-care card has a clinic, location marker and map.
+Transparent PNGs are stored in drawable-nodpi to avoid density-driven upscaling.
+These images do not represent clinical assessment, hospital verification, or
+availability of any service. Existing card actions and labels are unchanged.

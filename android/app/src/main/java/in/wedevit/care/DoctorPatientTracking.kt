@@ -5,7 +5,7 @@ import java.time.Instant
 enum class SampleReportSource { PATIENT, FAMILY }
 enum class SampleDoseOutcome { TAKEN, SKIPPED }
 
-/** Fictional reports, never evidence of ingestion or a prescription. */
+/** Reported entries, never evidence of ingestion or a prescription. */
 data class SampleMedicineDose(
     val id:String, val patientId:String, val medicineLabel:String, val scheduledAt:Long,
     val reportedTakenAt:Long?=null, val loggedAt:Long?=null,

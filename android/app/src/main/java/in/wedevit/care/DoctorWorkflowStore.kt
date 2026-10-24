@@ -30,7 +30,7 @@ class DoctorWorkflowStore(context: Context, private val now: () -> Long = { Syst
             val appointment = appointmentId?.let { appointmentLookup?.invoke(it) }
             if (appointment == null || appointment.patientId != request.patientId || appointment.status != "Scheduled") return@change "Choose a saved scheduled visit for this patient." to state
         }
-        null to logged(state.copy(requests = state.requests.map { if (it.id == id) it.copy(status = status, appointmentId = if (status == WorkflowRequestStatus.SCHEDULED) appointmentId else it.appointmentId) else it }), request.patientId, "Request ${status.name.lowercase()} locally; no notification sent")
+        null to logged(state.copy(requests = state.requests.map { if (it.id == id) it.copy(status = status, appointmentId = if (status == WorkflowRequestStatus.SCHEDULED) appointmentId else it.appointmentId) else it }), request.patientId, "You marked a conversation ${status.name.lowercase()} on this device; nobody was notified")
     }
     @Synchronized fun saveDraft(value: WorkflowDraft): String? = change { state ->
         if (value.patientId !in DoctorWorkflowData.patientIds) return@change "Patient not found." to state
@@ -44,7 +44,7 @@ class DoctorWorkflowStore(context: Context, private val now: () -> Long = { Syst
     @Synchronized fun loadMockDraft(patientId: String): String? {
         if (patientId !in DoctorWorkflowData.patientIds) return "Patient not found."
         val previous = draft(patientId)
-        if (DoctorWorkflowData.hasDraftContent(previous)) return "Save your current work separately before loading a fictional fixture. Existing work was not replaced."
+        if (DoctorWorkflowData.hasDraftContent(previous)) return "Save your current work separately before loading an AI draft. Existing work was not replaced."
         return saveDraft(DoctorWorkflowData.mockDraft(patientId, now()).copy(checklist = previous.checklist.toList()))
     }
     @Synchronized fun importTranscript(patientId: String, text: String, provider: String, model: String, clipId: String, consentAt: Long, expectedSourceText: String): String? {
@@ -73,16 +73,16 @@ class DoctorWorkflowStore(context: Context, private val now: () -> Long = { Syst
         val version = WorkflowVersion(newId(), patientId, (state.versions.filter { it.patientId == patientId }.maxOfOrNull { it.number } ?: 0) + 1, draft.copy(checklist = draft.checklist.toList(), sourceIds = draft.sourceIds.toList()), reviewerName.trim(), now())
         null to logged(state.copy(versions = state.versions + version), patientId, "Published unverified local preview v${version.number}; not externally delivered")
     }
-    @Synchronized fun acknowledge(versionId: String, memberId: String, status: WorkflowAckStatus): String? = change { state ->
+    @Synchronized fun recordToldToClinician(versionId: String, memberId: String, status: WorkflowAckStatus): String? = change { state ->
         val version = state.versions.firstOrNull { it.id == versionId } ?: return@change "Version not found." to state
-        if (DoctorWorkflowData.members(version.patientId).none { it.id == memberId }) return@change "Choose this patient's fictional patient or family identity." to state
+        if (DoctorWorkflowData.members(version.patientId).none { it.id == memberId }) return@change "Choose who told you, from this patient's list." to state
         val value = WorkflowAcknowledgement(versionId, memberId, status, now())
-        null to logged(state.copy(acknowledgements = state.acknowledgements.filterNot { it.versionId == versionId && it.memberId == memberId } + value), version.patientId, "Simulated ${status.name.lowercase()} by selected fictional identity; not consent or agreement")
+        null to logged(state.copy(acknowledgements = state.acknowledgements.filterNot { it.versionId == versionId && it.memberId == memberId } + value), version.patientId, "You noted that the ${DoctorWorkflowData.members(version.patientId).first { it.id == memberId }.name.lowercase()} told you: ${status.name.lowercase().replace('_', ' ')}. Your own note; nobody responded in the app")
     }
     @Synchronized fun recordConsent(patientId: String, participant: String, purpose: String, recording: Boolean, cloudProcessing: Boolean): String? = change { state ->
         if (patientId !in DoctorWorkflowData.patientIds || participant.isBlank() || purpose.isBlank()) return@change "Enter participant and purpose for this patient." to state
         val consent = WorkflowConsent(newId(), patientId, participant.trim(), purpose.trim(), recording, cloudProcessing, now())
-        null to logged(state.copy(consents = state.consents + consent), patientId, "Saved simulated consent selections; no audio recorded or uploaded")
+        null to logged(state.copy(consents = state.consents + consent), patientId, "Saved consent selections; no audio recorded or uploaded")
     }
     private fun logged(state: DoctorWorkflowState, patientId: String, action: String): DoctorWorkflowState {
         // Autosave records one event per editing run, not one event per keystroke.

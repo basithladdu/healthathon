@@ -21,6 +21,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import java.time.Instant
 import java.time.LocalDate
@@ -38,9 +39,9 @@ fun calendarItems(entries: List<CareItem>, day: LocalDate): List<CareItem> = ent
 }.sortedWith(compareBy<CareItem> { if (it.kind == "medicine") it.doneOn == day.toString() else it.doneOn.isNotBlank() }.thenBy { it.due }.thenBy { it.title.lowercase() })
 
 @Composable fun DailyCareShortcuts(onCalendar: () -> Unit, onWorkflow: () -> Unit, onLabs: () -> Unit) {
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    Row(Modifier.fillMaxWidth().height(IntrinsicSize.Max), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
         listOf(Triple("Calendar", Icons.Default.CalendarMonth, onCalendar), Triple("Care team", Icons.Default.Groups, onWorkflow), Triple("Lab history", Icons.Default.Science, onLabs)).forEach { (label, icon, action) ->
-            Card(onClick = action, modifier = Modifier.weight(1f).testTag(when (label) { "Calendar" -> "shortcut-calendar"; "Care team" -> "shortcut-workflows"; else -> "shortcut-labs" }), shape = RoundedCornerShape(14.dp), colors = CardDefaults.cardColors(containerColor = Paper)) { Column(Modifier.fillMaxWidth().padding(horizontal = 6.dp, vertical = 12.dp), horizontalAlignment = Alignment.CenterHorizontally) { Icon(icon, null, tint = Rust, modifier = Modifier.size(23.dp)); Spacer(Modifier.height(5.dp)); Text(label, style = MaterialTheme.typography.labelMedium) } }
+            Card(onClick = action, modifier = Modifier.weight(1f).fillMaxHeight().heightIn(min = 48.dp).testTag(when (label) { "Calendar" -> "shortcut-calendar"; "Care team" -> "shortcut-workflows"; else -> "shortcut-labs" }), shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = when (label) { "Calendar" -> SaharaSoftBlue; "Care team" -> SaharaLavender; else -> SaharaApricot })) { Column(Modifier.fillMaxSize().padding(horizontal = 8.dp, vertical = 14.dp), horizontalAlignment = Alignment.CenterHorizontally) { Icon(icon, null, tint = DoctorAccent, modifier = Modifier.size(26.dp)); Spacer(Modifier.height(6.dp)); Text(label, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, textAlign = androidx.compose.ui.text.style.TextAlign.Center); Text(when (label) { "Calendar" -> "Dates and reminders"; "Care team" -> "Tasks and chats"; else -> "Past test results" }, fontSize = 12.sp, lineHeight = 15.sp, color = DoctorCardSub, textAlign = androidx.compose.ui.text.style.TextAlign.Center) } }
         }
     }
 }
@@ -57,7 +58,7 @@ fun calendarItems(entries: List<CareItem>, day: LocalDate): List<CareItem> = ent
     }
 }
 
-@Composable fun CareCalendar(vm: CareModel, onWorkflow: () -> Unit = {}) {
+@Composable fun CareCalendar(vm: CareModel, onWorkflow: () -> Unit = {}, onAddDoctorVisit: (() -> Unit)? = null) {
     val entries by vm.items.collectAsStateWithLifecycle()
     val person by vm.selected.collectAsStateWithLifecycle()
     val canEdit by vm.canEdit.collectAsStateWithLifecycle()
@@ -69,7 +70,8 @@ fun calendarItems(entries: List<CareItem>, day: LocalDate): List<CareItem> = ent
     val visible = calendarItems(entries.filter { it.personId == person }, day).filter { filter == "All" || calendarCategory(it) == filter }
     val undated = entries.filter { it.personId == person && it.kind == "medicine" && it.due == 0L }
     LazyColumn(Modifier.fillMaxSize().testTag("care-calendar"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { Heading("Calendar"); Spacer(Modifier.weight(1f)); if (canEdit) FilledTonalIconButton(onClick = { adding = true }, colors = IconButtonDefaults.filledTonalIconButtonColors(containerColor = Gold)) { Icon(Icons.Default.Add, "Add to calendar") } } }
+        if (onAddDoctorVisit != null && canEdit) item { TextButton(onClick = { adding = true }) { Text("Add a test or other calendar entry") } }
+        item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { Heading("Calendar"); Spacer(Modifier.weight(1f)); if (canEdit) FilledTonalIconButton(onClick = { if (onAddDoctorVisit != null) onAddDoctorVisit() else adding = true }, colors = IconButtonDefaults.filledTonalIconButtonColors(containerColor = Gold)) { Icon(Icons.Default.Add, "Add to calendar") } } }
         item { Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = { dayString = day.minusDays(1).toString() }) { Icon(Icons.Default.ChevronLeft, "Previous day") }
             Box(Modifier.weight(1f)) { CareDateButton(careEpoch(day), "", { dayString = careDay(it).toString() }) }
@@ -80,7 +82,7 @@ fun calendarItems(entries: List<CareItem>, day: LocalDate): List<CareItem> = ent
         } }
         item { Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) { listOf("All", "Medicine", "Visit", "Test", "Follow-up", "Procedure", "Task", "Conversation").forEach { category -> FilterChip(filter == category, { filter = category }, label = { Text(category) }) } } }
         if (day != LocalDate.now()) item { TextButton(onClick = { dayString = LocalDate.now().toString() }) { Text("Back to today") } }
-        if (visible.isEmpty()) item { SurfaceCard { Text("Nothing dated for ${day.format(DateTimeFormatter.ofPattern("d MMM"))}", fontWeight = FontWeight.SemiBold); if (canEdit) TextButton(onClick = { adding = true }) { Text("Add a visit, test or follow-up") } } }
+        if (visible.isEmpty()) item { SurfaceCard { Text("Nothing dated for ${day.format(DateTimeFormatter.ofPattern("d MMM"))}", fontWeight = FontWeight.SemiBold); if (canEdit) TextButton(onClick = { if (onAddDoctorVisit != null) onAddDoctorVisit() else adding = true }) { Text(if (onAddDoctorVisit != null) "Add a visit" else "Add a visit, test or follow-up") } } }
         items(visible, key = { it.id }) { item ->
             val data = CareEntryCodec.decode(item.detail)
             if (data != null && data.type in setOf("task", "conversation")) Card(onClick = onWorkflow, colors = CardDefaults.cardColors(containerColor = Mint), shape = RoundedCornerShape(18.dp), modifier = Modifier.fillMaxWidth()) {
@@ -103,6 +105,7 @@ fun calendarItems(entries: List<CareItem>, day: LocalDate): List<CareItem> = ent
 @Composable private fun CalendarEntryCard(vm: CareModel, item: CareItem, day: LocalDate, onEdit: () -> Unit) {
     val canEdit by vm.canEdit.collectAsStateWithLifecycle()
     val busy by vm.busy.collectAsStateWithLifecycle()
+    val capturedAccount = remember(item.id) { vm.accountNamespace }
     val payload = CareEntryCodec.decode(item.detail)
     val done = if (item.kind == "medicine") item.doneOn == day.toString() else item.doneOn.isNotBlank()
     val time = if (payload?.timed == true) Instant.ofEpochMilli(item.due).atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("h:mm a")) else ""
@@ -113,7 +116,7 @@ fun calendarItems(entries: List<CareItem>, day: LocalDate): List<CareItem> = ent
             if (canEdit) IconButton(onClick = onEdit, enabled = !busy) { Icon(Icons.Default.EditCalendar, "Edit ${item.title}") }
         }
         if (item.detail.isNotBlank()) Text(CareEntryCodec.readable(item.detail), modifier = Modifier.padding(top = 8.dp))
-        if (canEdit && (item.kind != "medicine" || day == LocalDate.now())) Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) { TextButton(onClick = { vm.toggle(item) }, enabled = !busy) { Text(if (done) "Undo done" else if (item.kind == "medicine") "Taken today" else "Mark done") } }
+        if (canEdit && (item.kind != "medicine" || day == LocalDate.now())) Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) { TextButton(onClick = { if (canEditCareContext(vm, item.personId, capturedAccount)) vm.toggle(item) }, enabled = !busy) { Text(if (done) "Undo done" else if (item.kind == "medicine") "Taken today" else "Mark done") } }
     }
 }
 
@@ -125,6 +128,7 @@ fun calendarItems(entries: List<CareItem>, day: LocalDate): List<CareItem> = ent
     val context = LocalContext.current
     val existing = initial?.let { CareEntryCodec.decode(it.detail) }
     val capturedPerson = remember { selected }
+    val capturedAccount = remember { vm.accountNamespace }
     val entryId = rememberSaveable { initial?.id ?: newId() }
     val legacy = initial != null && existing == null
     var category by rememberSaveable { mutableStateOf(existing?.category ?: if (initial?.kind == "medicine") "Medicine" else "Visit") }
@@ -158,7 +162,7 @@ fun calendarItems(entries: List<CareItem>, day: LocalDate): List<CareItem> = ent
             }
             (error.ifBlank { saveError.orEmpty() }).takeIf(String::isNotBlank)?.let { Text(it, color = MaterialTheme.colorScheme.error) }
             Button(onClick = { runCatching {
-                require(selected == capturedPerson && canEdit) { "Choose the right person before saving." }
+                require(canEditCareContext(vm, capturedPerson, capturedAccount)) { "Choose the right person before saving." }
                 require(title.trim().length in 1..200 && due > 0) { "Add a title and date." }
                 require(detail.length <= 1600 && location.length <= 160) { "Shorten the details before saving." }
                 val text = if (initial?.kind == "medicine") detail else CareEntryCodec.encode(CareEntry(type = "schedule", category = category, detail = detail.trim(), location = location.trim(), timed = timed))
@@ -168,5 +172,5 @@ fun calendarItems(entries: List<CareItem>, day: LocalDate): List<CareItem> = ent
             if (initial != null && canEdit) TextButton(onClick = { remove = true }, enabled = !busy, modifier = Modifier.fillMaxWidth()) { Text("Remove entry") }
         }
     }
-    if (remove && initial != null) AlertDialog(onDismissRequest = { remove = false }, title = { Text("Remove this entry?") }, text = { Text(initial.title) }, confirmButton = { TextButton(onClick = { vm.remove(initial); remove = false; onDismiss() }, enabled = !busy) { Text("Remove") } }, dismissButton = { TextButton(onClick = { remove = false }) { Text("Keep") } })
+    if (remove && initial != null) AlertDialog(onDismissRequest = { remove = false }, title = { Text("Remove this entry?") }, text = { Text(initial.title) }, confirmButton = { TextButton(onClick = { if (canEditCareContext(vm, initial.personId, capturedAccount)) vm.remove(initial); remove = false; onDismiss() }, enabled = !busy) { Text("Remove") } }, dismissButton = { TextButton(onClick = { remove = false }) { Text("Keep") } })
 }

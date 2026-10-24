@@ -70,7 +70,7 @@ import kotlinx.coroutines.launch
         }
         if (error.isNotBlank()) Text(error, color = MaterialTheme.colorScheme.error)
         if (result.isNotEmpty()) {
-            Text("Original and machine translation · मूल और अनुवाद", fontWeight = FontWeight.Bold)
+            Text("Original and machine translation · मूल और अनुवाद", fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
             result.forEach { line ->
                 Column(Modifier.padding(vertical = 6.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     SelectionContainerText(line.original)

@@ -16,7 +16,7 @@ import org.junit.Test
 import java.io.File
 import java.util.UUID
 
-/** Real mock routes with isolated fictional preferences; never CareRoot/auth/microphone. */
+/** Real mock routes with isolated preferences; never CareRoot/auth/microphone. */
 class DoctorProgressRouteTest {
     @get:Rule val ui=createComposeRule()
     @Test fun reportBackPreservesProgressScrollAndPatientScopeAtLargeText() {

@@ -22,7 +22,7 @@ import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
 
 data class CareSession(val userId: String, val email: String, val access: String, val refresh: String, val expires: Long)
-data class CareMember(val userId: String, val canEdit: Boolean, val email: String)
+data class CareMember(val userId: String, val canEdit: Boolean, val email: String, val careTeamRead: Boolean = false, val careTeamPermissionKnown: Boolean = false)
 data class CloudRecords(val people: List<Person>, val entries: List<CareItem>, val notes: List<CareVersion>, val confirmations: List<Acknowledgement>, val editable: Set<String>, val owned: Set<String>, val verifiedReviews: Set<String> = emptySet(), val authenticatedConfirmations: Set<String> = emptySet())
 private class CareHttpException(val status: Int, message: String) : IllegalArgumentException(message)
 
@@ -69,8 +69,8 @@ class CareCloud(context: Context) {
         request("POST", "/rest/v1/healthathon_people", JSONObject().put("id", person.id).put("name", person.name).put("created_ms", person.created))
     }
     suspend fun removePerson(id: String) { require(JSONArray(request("DELETE", "/rest/v1/healthathon_people?id=eq.$id")).length() == 1) { "These records changed. Refresh and try again." } }
-    suspend fun saveEntry(item: CareItem): CareItem {
-        val result = save("entry", item.id, item.personId, entryJson(item), item.revision)
+    suspend fun saveEntry(item: CareItem, expectedAccountId: String? = null): CareItem {
+        val result = save("entry", item.id, item.personId, entryJson(item), item.revision, expectedAccountId)
         return item.copy(revision = result.getLong("revision"))
     }
     suspend fun removeEntry(item: CareItem) {
@@ -87,12 +87,22 @@ class CareCloud(context: Context) {
         require(saved.getJSONObject("data").optString("actorId") == session.value?.userId) { "The account confirmation could not be verified. Refresh before trying again." }
         return decodeAcknowledgement(saved)
     }
-    private suspend fun save(kind: String, id: String, person: String, data: JSONObject, revision: Long) = JSONObject(request("POST", "/rest/v1/rpc/healthathon_save_record", JSONObject().put("p_id", id).put("p_person", person).put("p_kind", kind).put("p_data", data).put("p_revision", revision)))
-    suspend fun invite(personId: String, edit: Boolean): String = request("POST", "/rest/v1/rpc/healthathon_invite", JSONObject().put("p_person", personId).put("p_edit", edit)).trim().trim('"')
+    private suspend fun save(kind: String, id: String, person: String, data: JSONObject, revision: Long, expectedAccountId: String? = null) = JSONObject(request("POST", "/rest/v1/rpc/healthathon_save_record", JSONObject().put("p_id", id).put("p_person", person).put("p_kind", kind).put("p_data", data).put("p_revision", revision), expectedAccountId = expectedAccountId))
+    suspend fun invite(personId: String, edit: Boolean, careTeam: Boolean = false): String = request("POST", "/rest/v1/rpc/${if (careTeam) "healthathon_invite_care_team" else "healthathon_invite"}", JSONObject().put("p_person", personId).put("p_edit", edit).also { if (careTeam) it.put("p_care_team", true) }).trim().trim('"')
+    suspend fun inviteAccess(personId: String, role: String, edit: Boolean, permissions: Map<String, Boolean>, days: Int, expectedAccountId: String? = null): String {
+        require(role == "family" || role == "clinician") { "Choose who you are inviting." }
+        require(days in 1..365) { "Choose how long access lasts." }
+        val body = JSONObject().put("p_person", personId).put("p_role", role).put("p_edit", edit).put("p_permissions", JSONObject().also { json -> permissions.forEach { (key, value) -> json.put(key, value) } }).put("p_days", days)
+        val code = request("POST", "/rest/v1/rpc/healthathon_invite_access", body, expectedAccountId = expectedAccountId).trim().trim('"')
+        require(Regex("[a-f0-9]{48}").matches(code)) { "The invitation receipt did not match. Refresh before retrying." }
+        return code
+    }
     suspend fun join(code: String) { request("POST", "/rest/v1/rpc/healthathon_join", JSONObject().put("p_code", code.trim())) }
     suspend fun members(personId: String): List<CareMember> {
         val rows = JSONArray(request("POST", "/rest/v1/rpc/healthathon_members_list", JSONObject().put("p_person", personId)))
-        return (0 until rows.length()).map { rows.getJSONObject(it).let { row -> CareMember(row.getString("user_id"), row.getBoolean("can_edit"), row.getString("email")) } }
+        val permissions = runCatching { JSONArray(request("POST", "/rest/v1/rpc/healthathon_care_team_permissions", JSONObject().put("p_person", personId))) }.getOrNull()
+        val enabled = permissions?.let { values -> (0 until values.length()).associate { values.getJSONObject(it).let { row -> row.getString("user_id") to row.getBoolean("care_team") } } }
+        return (0 until rows.length()).map { rows.getJSONObject(it).let { row -> CareMember(row.getString("user_id"), row.getBoolean("can_edit"), row.getString("email"), enabled?.get(row.getString("user_id")) == true, enabled != null) } }
     }
     suspend fun removeMember(personId: String, userId: String) { request("DELETE", "/rest/v1/healthathon_members?person_id=eq.$personId&user_id=eq.$userId") }
 
@@ -114,7 +124,12 @@ class CareCloud(context: Context) {
                     draftOrigin = d.optString("draftOrigin", ReviewWorkflow.MANUAL_DRAFT), reviewStatus = d.optString("reviewStatus", ReviewWorkflow.REVIEWED_UNVERIFIED),
                     reviewerVerification = d.optString("reviewerVerification", ReviewWorkflow.NOT_VERIFIED),
                     transcriptionModel = d.optString("transcriptionModel"), transcribedAt = d.optLong("transcribedAt"),
-                ))
+                    conversationId=d.optString("conversationId"),contextJson=d.optString("contextJson"),hashScheme=d.optString("hashScheme","legacy"),
+                ).also {
+                    if(it.hashScheme==DoctorConversationContext.HASH_SCHEME)require(d.getInt("contextVersion")==1)
+                    else require(!d.has("contextVersion") && it.conversationId.isBlank() && it.contextJson.isBlank()) { "This conversation format requires an updated app." }
+                    DoctorConversationContext.validateVersion(it)
+                })
                 "ack" -> { acks.add(decodeAcknowledgement(row)); if (runCatching { java.util.UUID.fromString(d.optString("actorId")) }.isSuccess) authenticatedAcks += id }
             }
         }
@@ -140,8 +155,32 @@ class CareCloud(context: Context) {
     }
     internal suspend fun medicineOrganizerToken(): String = token()
     internal suspend fun transcriptionToken(forceRefresh: Boolean = false): String = token(forceRefresh)
-    internal suspend fun request(method: String, path: String, body: JSONObject? = null, authenticated: Boolean = true): String {
+    /** Binary transport is deliberately restricted to the private synthetic-file bucket. */
+    internal suspend fun doctorFileRequest(method: String, objectPath: String, bytes: ByteArray? = null, mime: String = "application/octet-stream"): ByteArray {
+        require(method in setOf("POST", "GET") && Regex("[a-f0-9-]{36}/[a-f0-9-]{36}/[a-f0-9-]{36}").matches(objectPath))
+        require(bytes == null || bytes.size in 1..4_194_304)
+        val access = token()
+        return withContext(Dispatchers.IO) {
+            val action = if (method == "GET") "authenticated/" else ""
+            val connection = URL("$base/storage/v1/object/${action}sahara-doctor-test-files/$objectPath").openConnection() as HttpURLConnection
+            try {
+                connection.requestMethod = method; connection.connectTimeout = 12000; connection.readTimeout = 45000; connection.instanceFollowRedirects = false
+                connection.setRequestProperty("apikey", apiKey); connection.setRequestProperty("Authorization", "Bearer $access")
+                connection.setRequestProperty("Content-Type", mime); connection.setRequestProperty("x-upsert", "false")
+                bytes?.let { connection.doOutput = true; connection.setFixedLengthStreamingMode(it.size); connection.outputStream.use { stream -> stream.write(it) } }
+                require(connection.responseCode in 200..299) { "The protected file request failed. Check your account access and try again." }
+                connection.inputStream.use { stream ->
+                    val output = java.io.ByteArrayOutputStream(); val buffer = ByteArray(8192)
+                    while (true) { val n = stream.read(buffer); if (n < 0) break; require(output.size() + n <= 4_194_304) { "This file exceeds the protected download limit." }; output.write(buffer, 0, n) }
+                    output.toByteArray()
+                }
+            } finally { connection.disconnect() }
+        }
+    }
+    internal suspend fun request(method: String, path: String, body: JSONObject? = null, authenticated: Boolean = true, expectedAccountId: String? = null): String {
+        if (expectedAccountId != null) require(session.value?.userId == expectedAccountId) { "The signed-in account changed. Reopen this care profile." }
         val access = if (authenticated) token() else null
+        if (expectedAccountId != null) require(session.value?.userId == expectedAccountId) { "The signed-in account changed. Reopen this care profile." }
         return withContext(Dispatchers.IO) {
             val connection = URL(base + path).openConnection() as HttpURLConnection
             try {
@@ -157,6 +196,7 @@ class CareCloud(context: Context) {
                     val error = runCatching { JSONObject(text) }.getOrNull()
                     val code = error?.optString("code").orEmpty()
                     val friendly = when {
+                        error?.optString("message").orEmpty().startsWith("Clinician verification") -> error?.optString("message").orEmpty()
                         code == "40001" || code == "23505" -> "This record changed. Refresh and try again."
                         status == 401 -> "Sign in again to continue."
                         status == 403 || code == "42501" -> "You don't have permission to change these records."
@@ -192,4 +232,4 @@ class CareCloud(context: Context) {
 }
 
 private fun entryJson(i: CareItem) = JSONObject().put("kind", i.kind).put("title", i.title).put("detail", i.detail).put("due", i.due).put("doneOn", i.doneOn).put("created", i.created)
-private fun noteJson(n: CareVersion) = JSONObject().put("version", n.version).put("personName", n.personName).put("source", n.source).put("priorities", n.priorities).put("participants", n.participants).put("topics", n.topics).put("questions", n.questions).put("nextSteps", n.nextSteps).put("doctor", n.doctor).put("published", n.published).put("contentHash", n.contentHash).put("draftOrigin", n.draftOrigin).put("reviewStatus", n.reviewStatus).put("reviewerVerification", n.reviewerVerification).put("transcriptionModel", n.transcriptionModel).put("transcribedAt", n.transcribedAt)
+private fun noteJson(n: CareVersion) = JSONObject().put("version", n.version).put("personName", n.personName).put("source", n.source).put("priorities", n.priorities).put("participants", n.participants).put("topics", n.topics).put("questions", n.questions).put("nextSteps", n.nextSteps).put("doctor", n.doctor).put("published", n.published).put("contentHash", n.contentHash).put("draftOrigin", n.draftOrigin).put("reviewStatus", n.reviewStatus).put("reviewerVerification", n.reviewerVerification).put("transcriptionModel", n.transcriptionModel).put("transcribedAt", n.transcribedAt).also { if(n.contextJson.isNotBlank())it.put("conversationId",n.conversationId).put("contextJson",n.contextJson).put("contextVersion",1).put("hashScheme",n.hashScheme) }

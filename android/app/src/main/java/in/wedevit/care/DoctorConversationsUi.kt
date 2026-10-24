@@ -25,19 +25,19 @@ private fun conversationDate(at: Long?) = at?.takeIf { it > 0 }?.let {
 /** Read-only history. Continuing opens the existing patient draft without replacing it. */
 @Composable fun DoctorConversationsContent(model: DoctorConversationsModel, onContinue: () -> Unit, modifier: Modifier = Modifier) {
     Column(modifier.fillMaxWidth().testTag("doctor-conversations"), verticalArrangement = Arrangement.spacedBy(24.dp)) {
-        Surface(color = SaharaLavender, shape = RoundedCornerShape(22.dp)) {
-            Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Surface(color = DoctorCardConversation, shape = RoundedCornerShape(20.dp)) {
+            Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
-                    Icon(Icons.Default.Forum, null, tint = Rust, modifier = Modifier.size(24.dp))
-                    Text("Conversation workspace", fontSize = 21.sp, lineHeight = 27.sp, fontWeight = FontWeight.SemiBold, color = Ink)
+                    Icon(Icons.Default.Forum, null, tint = DoctorAccent, modifier = Modifier.size(24.dp))
+                    Text("Conversation workspace", fontFamily = SaharaTitleFont, fontSize = 21.sp, lineHeight = 27.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
                 }
-                Text("Prepare the next discussion, or continue your saved words.", fontSize = 16.sp, lineHeight = 23.sp, color = Ink)
+                Text("Prepare the next discussion, or continue your saved words.", fontSize = 15.sp, lineHeight = 23.sp, color = DoctorCardInk)
                 if (model.currentDraft != null) {
                     Column(Modifier.testTag("conversation-draft"), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text("Saved draft · not a published Care Note", fontWeight = FontWeight.Medium, fontSize = 14.sp, lineHeight = 20.sp, color = Ink.copy(alpha = .75f))
+                        Text("Saved draft · not a published Care Note", fontWeight = FontWeight.Medium, fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub)
                     }
                 }
-                Button(onClick = onContinue, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("workflow-open-conversation"), colors = ButtonDefaults.buttonColors(containerColor = Rust, contentColor = Paper), shape = RoundedCornerShape(14.dp)) {
+                Button(onClick = onContinue, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("workflow-open-conversation"), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent, contentColor = Paper), shape = RoundedCornerShape(14.dp)) {
                     Text(if (model.currentDraft != null) "Continue discussion draft" else "Open conversation workspace", fontSize = 16.sp)
                 }
             }
@@ -56,43 +56,49 @@ private fun conversationDate(at: Long?) = at?.takeIf { it > 0 }?.let {
         }
         model.priorSample?.let { discussion ->
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                ConversationHeading("Previous sample discussion")
-                Text("An undated example from this patient's sample record. It is separate from published local preview versions.", fontSize = 16.sp, lineHeight = 23.sp, color = Ink.copy(alpha = .75f))
+                ConversationHeading("Previous discussion on record")
+                Text("An undated discussion from this patient's earlier record. It is separate from the versions saved here.", fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub)
                 DiscussionReadingCard(discussion, highlighted = false)
             }
         }
         if (model.latestPublished == null && model.priorSample == null) {
-            Text("No saved discussion is recorded yet. You can prepare one in the workspace.", fontSize = 18.sp, lineHeight = 26.sp, color = Ink)
+            Text("No saved discussion is recorded yet. You can prepare one in the workspace.", fontSize = 15.sp, lineHeight = 23.sp, color = DoctorCardInk)
         }
+        DoctorFootnote("The reviewer's identity is not verified. Audio is not automatically transcribed, so the words must be checked by a person. Audio stays on this device and is not included when a written note is shared.")
     }
 }
 
 @Composable private fun ConversationHeading(text: String) {
-    Text(text, fontSize = 22.sp, lineHeight = 29.sp, fontWeight = FontWeight.SemiBold, color = Ink)
+    Text(text, fontSize = 21.sp, lineHeight = 27.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, fontFamily = SaharaTitleFont)
 }
 
 @Composable private fun DiscussionReadingCard(discussion: DoctorOverviewDiscussion, highlighted: Boolean) {
     val fields = listOf("What matters to the patient" to discussion.priorities, "Who participated" to discussion.participants, "What was discussed" to discussion.topics, "Questions and concerns" to discussion.questions, "Still undecided" to discussion.undecided, "Next steps" to discussion.nextSteps)
-    Surface(color = if (highlighted) SaharaApricot else Paper, shape = RoundedCornerShape(if (highlighted) 20.dp else 16.dp), border = if (highlighted) null else BorderStroke(1.dp, Ink.copy(alpha = .12f)), modifier = Modifier.fillMaxWidth().testTag("conversation-card-${discussion.id}")) {
-        Column(Modifier.padding(if (highlighted) 20.dp else 18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text(if (discussion.isPublishedPreview) "Care Note · Version ${discussion.versionNumber}" else "Original sample discussion", fontSize = 20.sp, lineHeight = 27.sp, fontWeight = FontWeight.SemiBold, color = Ink)
-            Text(conversationDate(discussion.publishedAt), fontSize = 14.sp, lineHeight = 20.sp, color = Ink.copy(alpha = .75f))
-            Text(if (discussion.isPublishedPreview) "Self-entered reviewer: ${discussion.reviewerName ?: "Name not recorded"} · identity not verified" else "Author not recorded · fictional sample", fontSize = 14.sp, lineHeight = 20.sp, color = Ink.copy(alpha = .75f))
+    val author = discussion.reviewerName?.takeIf { it.isNotBlank() } ?: "Author not recorded"
+    val brief = discussion.topics.ifBlank { discussion.priorities }.ifBlank { "No summary recorded" }
+    Surface(color = if (highlighted) DoctorCardConversation else DoctorCardReport, shape = RoundedCornerShape(20.dp), border = if (highlighted) null else BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("conversation-card-${discussion.id}")) {
+        Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text(if (discussion.isPublishedPreview) "Version ${discussion.versionNumber}" else "Earlier discussion", fontSize = 21.sp, lineHeight = 26.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, fontFamily = SaharaTitleFont)
+                Text(conversationDate(discussion.publishedAt), fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub)
+                Text(author, fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub)
+            }
+            Text(brief, fontSize = 15.sp, lineHeight = 23.sp, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            HorizontalDivider(color = DoctorHairline)
             Column(Modifier.testTag("conversation-expand-${discussion.id}"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 if (discussion.isPublishedPreview) {
                     fields.filter { it.second.isNotBlank() }.forEach { (label, value) ->
-                        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                            Text(label, fontSize = 17.sp, lineHeight = 24.sp, fontWeight = FontWeight.SemiBold, color = Ink)
-                            SelectionContainer { Text(value, fontSize = 18.sp, lineHeight = 26.sp, color = Ink) }
+                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            Text(label, fontSize = 13.sp, lineHeight = 18.sp, fontWeight = FontWeight.Medium, color = DoctorCardSub)
+                            SelectionContainer { Text(value, fontSize = 15.sp, lineHeight = 23.sp, color = DoctorCardInk) }
                         }
                     }
-                    if (fields.any { it.second.isBlank() }) Text("Other headings were not recorded in this version.", fontSize = 14.sp, lineHeight = 20.sp, color = Ink.copy(alpha = .75f))
-                    HorizontalDivider(color = Ink.copy(alpha = .12f))
+                    if (fields.any { it.second.isBlank() }) Text("Other headings were not recorded in this version.", fontSize = 12.sp, lineHeight = 16.sp, color = DoctorCardFaint)
+                    HorizontalDivider(color = DoctorHairline)
                 }
-                Text("Original words", fontSize = 20.sp, fontWeight = FontWeight.SemiBold, color = Ink)
-                Text(discussion.sourceLabel, fontSize = 14.sp, lineHeight = 20.sp, color = Ink.copy(alpha = .75f))
-                SelectionContainer { Text(discussion.sourceText, fontSize = 18.sp, lineHeight = 26.sp, color = Ink, modifier = Modifier.testTag("conversation-source-${discussion.id}")) }
-                Text("Local preview only · not a verified clinical record", fontSize = 14.sp, lineHeight = 20.sp, color = Rust)
+                Text("Original words", fontSize = 19.sp, lineHeight = 24.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, fontFamily = SaharaTitleFont)
+                Text(discussion.sourceLabel, fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub)
+                SelectionContainer { Text(discussion.sourceText, fontSize = 15.sp, lineHeight = 24.sp, color = DoctorCardInk, modifier = Modifier.testTag("conversation-source-${discussion.id}")) }
             }
         }
     }

@@ -20,7 +20,7 @@ import java.util.Locale
 
 data class DoctorMedicinePresentation(val status:String,val planned:String,val taken:String,val logged:String,val reporter:String)
 
-/** A report-time view: a later entry must not leak into an earlier sample snapshot. */
+/** A report-time view: a later entry must not leak into an earlier snapshot. */
 fun doctorMedicinePresentation(dose:SampleMedicineDose,asOf:Long,zone:ZoneId):DoctorMedicinePresentation {
     fun time(value:Long)=DateTimeFormatter.ofPattern("dd MMM yyyy · h:mm a",Locale.ENGLISH).withZone(zone).format(Instant.ofEpochMilli(value))
     val snapshot=DoctorProgressData.historicalDose(dose,asOf)
@@ -41,8 +41,8 @@ fun doctorMedicinePresentation(dose:SampleMedicineDose,asOf:Long,zone:ZoneId):Do
 
 @Composable fun DoctorMedicineContent(doses:List<SampleMedicineDose>,asOf:Long,zone:ZoneId=ZoneId.systemDefault()) {
     Column(Modifier.fillMaxWidth().testTag("doctor-medicine-content"),verticalArrangement=Arrangement.spacedBy(14.dp)) {
-        Text("Medicine reports",fontSize=22.sp,fontWeight=FontWeight.SemiBold)
-        Text("Fictional sample · as of ${DateTimeFormatter.ofPattern("dd MMM yyyy · h:mm a",Locale.ENGLISH).withZone(zone).format(Instant.ofEpochMilli(asOf))} · ${zone.id}",fontSize=14.sp,lineHeight=20.sp)
+        Text("Medicine reports",fontSize=22.sp,fontWeight=FontWeight.Medium, fontFamily = SaharaTitleFont)
+        Text("As of ${DateTimeFormatter.ofPattern("dd MMM yyyy · h:mm a",Locale.ENGLISH).withZone(zone).format(Instant.ofEpochMilli(asOf))} · ${zone.id}",fontSize=14.sp,lineHeight=20.sp)
         Text("Reported activity is not proof of ingestion or prescribing advice.",fontSize=14.sp,lineHeight=20.sp,color=Ink.copy(alpha=.75f))
         Text("Planned = schedule · Reported taken = reported intake · Logged = entry time",fontSize=14.sp,lineHeight=20.sp,color=Ink.copy(alpha=.75f))
         if(doses.isEmpty()) Text("No medicine reports recorded.")

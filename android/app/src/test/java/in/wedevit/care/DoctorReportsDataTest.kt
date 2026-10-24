@@ -19,8 +19,8 @@ class DoctorReportsDataTest {
     @Test fun searchAndCategoryFiltersWorkTogetherWithoutInventingItems() {
         val reports = DoctorDemoData.patients.flatMap { DoctorReportsData.reports(it.id) }
         assertEquals(2, DoctorReportsData.filter(reports, "", DoctorReportCategory.CLINIC_LETTERS).size)
-        assertEquals(2, DoctorReportsData.filter(reports, " FOLLOW-UP ", DoctorReportCategory.CLINIC_LETTERS).size)
-        assertEquals(1, DoctorReportsData.filter(reports, "discussion requested", DoctorReportCategory.CLINIC_LETTERS).size)
+        assertEquals(2, DoctorReportsData.filter(reports, " LETTER ", DoctorReportCategory.CLINIC_LETTERS).size)
+        assertEquals(1, DoctorReportsData.filter(reports, "oncology review", DoctorReportCategory.CLINIC_LETTERS).size)
         assertTrue(DoctorReportsData.filter(reports, "no match", null).isEmpty())
         assertTrue(DoctorReportsData.filter(reports, "", DoctorReportCategory.PRESCRIPTIONS).isEmpty())
     }

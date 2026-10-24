@@ -41,7 +41,7 @@ class DoctorWorkflowTest {
         val version = WorkflowVersion("v1", draft.patientId, 1, draft, "Reviewer", 100)
         val later = draft.copy(nextSteps = "Later draft", updatedAt = 200)
         assertNotEquals(later.nextSteps, version.draft.nextSteps)
-        assertTrue(version.reviewLabel.contains("Unverified"))
+        assertTrue(version.reviewLabel.contains("Not a verified clinical record"))
         assertEquals("UNVERIFIED", DoctorWorkflowData.verificationStatus)
     }
     @Test fun acknowledgementsBelongToPersonAndExactVersion() {

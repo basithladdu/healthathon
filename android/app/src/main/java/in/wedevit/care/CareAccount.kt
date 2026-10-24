@@ -42,11 +42,15 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
     val root = remember { ViewModelProvider(activity)[CareRootModel::class.java] }
     val cloud = root.cloud
     var demoOpen by rememberSaveable { mutableStateOf(false) }
-    if (demoOpen) {
-        DoctorDemo(onExit = { demoOpen = false }, cloud = cloud)
-        return
-    }
+    var walkthroughPatient by rememberSaveable { mutableStateOf<String?>(null) }
+    var patientWalkthroughUser by rememberSaveable { mutableStateOf<String?>(null) }
+    var doctorOpen by rememberSaveable { mutableStateOf(false) }
+    var doctorEntryPending by rememberSaveable { mutableStateOf(false) }
     val session by cloud.session.collectAsStateWithLifecycle()
+    LaunchedEffect(session?.userId) {
+        if (session != null && doctorEntryPending) { doctorOpen = true; doctorEntryPending = false }
+        if (session == null) doctorOpen = false
+    }
     key(session?.userId.orEmpty()) {
         val store = remember { root.storeFor(session?.userId.orEmpty()) }
         val owner = remember { object : ViewModelStoreOwner { override val viewModelStore = store } }
@@ -55,11 +59,25 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
         })[CareModel::class.java] }
         SideEffect { activity.careModel = model }
         var accountOpen by rememberSaveable { mutableStateOf(false) }
-        CareApp(model, onAccount = { accountOpen = true }, onDoctorDemo = {
+        if (patientWalkthroughUser != null) PatientWalkthroughHost(patientWalkthroughUser!!, onExit = { patientWalkthroughUser = null })
+        else if (demoOpen) DoctorDemo(onExit = { demoOpen = false; walkthroughPatient = null }, cloud = cloud, initialPatientId = walkthroughPatient, careModel = model, onCareAccount = { accountOpen = true })
+        else if (doctorOpen && session != null) ConnectedDoctorWorkspace(cloud, model, onExit = { doctorOpen = false }, onAccount = { accountOpen = true }, onWalkthrough = { walkthroughPatient = it; demoOpen = true })
+        else CareApp(model, onAccount = { accountOpen = true }, onDoctorDemo = {
             if (model.recording.value) model.message.value = "Stop the recording before opening the doctor demo."
-            else demoOpen = true
-        })
-        if (accountOpen) AccountSheet(cloud, model, onDismiss = { accountOpen = false })
+            else { walkthroughPatient = null; demoOpen = true }
+        }, onPatientWalkthrough = { if (model.recording.value) model.message.value = "Stop the recording before opening the walkthrough." else patientWalkthroughUser = it },
+            onDoctorWorkspace = { doctorEntryPending = true; if (session != null) { doctorOpen = true; doctorEntryPending = false } else accountOpen = true },
+            welcomeAccountContent = { close, onBusy -> AccountContent(cloud, model, close, onBusyChange = onBusy) },
+            welcomeDoctorContent = { close, onBusy ->
+                if (session == null) AccountContent(cloud, model, close, heading = "Doctor sign in", onBusyChange = onBusy)
+                else Column(Modifier.padding(22.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                    Heading("Your doctor workspace", 26)
+                    Text(session!!.email)
+                    Text("Use your own account. Professional verification and patient access are separate.")
+                    Button(onClick = { doctorOpen = true; doctorEntryPending = false }, modifier = Modifier.fillMaxWidth()) { Text("Open workspace") }
+                }
+            }, onWelcomePanelChanged = { doctorEntryPending = it == "doctor" })
+        if (accountOpen) AccountSheet(cloud, model, onDismiss = { accountOpen = false; if (cloud.session.value == null) doctorEntryPending = false })
     }
 }
 
@@ -87,6 +105,14 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
 }
 
 @Composable fun AccountSheet(cloud: CareCloud, vm: CareModel, onDismiss: () -> Unit) {
+    var busy by remember { mutableStateOf(false) }
+    ModalBottomSheet(onDismissRequest = { if (!busy) onDismiss() }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
+        AccountContent(cloud, vm, onDismiss, onBusyChange = { busy = it })
+    }
+}
+
+/** The same genuine account form, reusable inside the welcome panel. */
+@Composable fun AccountContent(cloud: CareCloud, vm: CareModel, onDismiss: () -> Unit, heading: String? = null, onBusyChange: (Boolean) -> Unit = {}) {
     val session by cloud.session.collectAsStateWithLifecycle()
     val people by vm.people.collectAsStateWithLifecycle()
     val selected by vm.selected.collectAsStateWithLifecycle()
@@ -101,10 +127,19 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
     var notice by remember { mutableStateOf<String?>(null) }
     var code by rememberSaveable { mutableStateOf("") }
     var allowChanges by rememberSaveable { mutableStateOf(false) }
+    var allowCareTeam by rememberSaveable(selected) { mutableStateOf(false) }
     var invite by rememberSaveable(selected) { mutableStateOf("") }
+    var inviteDoctor by rememberSaveable(selected) { mutableStateOf(false) }
+    var doctorEdit by rememberSaveable(selected) { mutableStateOf(false) }
+    var doctorNotes by rememberSaveable(selected) { mutableStateOf(true) }
+    var doctorCalendar by rememberSaveable(selected) { mutableStateOf(true) }
+    var doctorReports by rememberSaveable(selected) { mutableStateOf(false) }
+    var doctorCosts by rememberSaveable(selected) { mutableStateOf(false) }
+    var doctorDays by rememberSaveable(selected) { mutableStateOf(30) }
     var members by remember(selected) { mutableStateOf<List<CareMember>>(emptyList()) }
     var removing by remember { mutableStateOf<CareMember?>(null) }
     var signingOut by remember { mutableStateOf(false) }
+    SideEffect { onBusyChange(busy) }
     fun run(action: suspend () -> Unit) {
         if (busy) return
         busy = true; error = null; notice = null
@@ -117,9 +152,8 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
         if (session != null && owner && selected.isNotBlank()) try { members = cloud.members(selected) }
         catch (e: Exception) { if (e is CancellationException) throw e; error = "Couldn't load the people you've invited." }
     }
-    ModalBottomSheet(onDismissRequest = { if (!busy) onDismiss() }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(horizontal = 22.dp).padding(bottom = 30.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-            Heading(if (session == null) if (create) "Create an account" else "Sign in" else "Your account", 28)
+            Heading(heading ?: if (session == null) if (create) "Create an account" else "Sign in" else "Your account", 28)
             if (session == null) {
                 Text("Sign in to share care notes and daily care with people you invite.")
                 OutlinedTextField(email, { email = it }, label = { Text("Email") }, singleLine = true, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email), modifier = Modifier.fillMaxWidth())
@@ -145,11 +179,30 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
                     Button(onClick = { run { cloud.join(code); vm.refresh(); code = ""; notice = "Joined. Their records will appear in your list." } }, enabled = !busy && code.trim().length == 48) { Text("Join") }
                 }
                 if (owner && selected.isNotBlank()) DetailPanel("Share ${people.firstOrNull { it.id == selected }?.name.orEmpty()}'s care", Icons.Default.PersonAdd) {
-                    Text("Invited people can read the care notes and daily entries. Recordings and unfinished conversations aren't shared.")
-                    CheckLine(allowChanges, { allowChanges = it }, "Allow them to add and change records")
-                    Button(onClick = { run { invite = cloud.invite(selected, allowChanges) } }, enabled = !busy) { Text("Create invitation") }
+                    Text("Who are you inviting?", style = MaterialTheme.typography.bodyMedium)
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        FilterChip(selected = !inviteDoctor, onClick = { inviteDoctor = false; invite = "" }, modifier = Modifier.heightIn(min = 48.dp), label = { Text("Family") })
+                        FilterChip(selected = inviteDoctor, onClick = { inviteDoctor = true; invite = "" }, modifier = Modifier.heightIn(min = 48.dp), label = { Text("Doctor") })
+                    }
+                    if (!inviteDoctor) {
+                        Text("Invited people can read the care notes and daily entries. Recordings and unfinished conversations aren't shared.")
+                        CheckLine(allowChanges, { allowChanges = it; invite = "" }, "Allow them to add and change records")
+                        CheckLine(allowCareTeam, { allowCareTeam = it; invite = "" }, "Share family and care-team contacts")
+                    } else {
+                        Text("This creates a one-person code that you share yourself. Nothing is sent to the doctor, and creating it does not verify them.", style = MaterialTheme.typography.bodySmall)
+                        Text("A doctor can only join with this code after their clinician verification has been approved. Until then, joining with it will fail with a verification message.", style = MaterialTheme.typography.bodySmall)
+                        Text("What they can open", style = MaterialTheme.typography.bodyMedium)
+                        CheckLine(doctorNotes, { doctorNotes = it; invite = "" }, "Care notes and conversations")
+                        CheckLine(doctorCalendar, { doctorCalendar = it; invite = "" }, "Calendar, medicines and tasks")
+                        CheckLine(doctorReports, { doctorReports = it; invite = "" }, "Report-derived records")
+                        CheckLine(doctorCosts, { doctorCosts = it; invite = "" }, "Costs")
+                        CheckLine(doctorEdit, { doctorEdit = it; invite = "" }, "Allow them to add and change records (otherwise read-only)")
+                        Text("Access lasts", style = MaterialTheme.typography.bodyMedium)
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf(1, 7, 30, 90).forEach { d -> FilterChip(selected = doctorDays == d, onClick = { doctorDays = d; invite = "" }, modifier = Modifier.heightIn(min = 48.dp), label = { Text("$d days") }) } }
+                    }
+                    Button(onClick = { val person = selected; val account = session!!.userId; val doctor = inviteDoctor; run { val code = if (doctor) cloud.inviteAccess(person, "clinician", doctorEdit, mapOf("careNote" to doctorNotes, "calendar" to doctorCalendar, "reports" to doctorReports, "costs" to doctorCosts), doctorDays, expectedAccountId = account) else cloud.invite(person, allowChanges, allowCareTeam); if (vm.selected.value == person && cloud.session.value?.userId == account && vm.isOwner.value) invite = code } }, enabled = !busy && (!inviteDoctor || doctorNotes || doctorCalendar || doctorReports || doctorCosts), modifier = Modifier.heightIn(min = 48.dp)) { Text(if (inviteDoctor) "Create doctor invitation" else "Create invitation") }
                     if (invite.isNotEmpty()) {
-                        Spacer(Modifier.height(12.dp)); Text("One person · expires in 3 days", style = MaterialTheme.typography.bodySmall)
+                        Spacer(Modifier.height(12.dp)); Text(if (inviteDoctor) "One person · the code expires in 3 days · works only for an approved clinician account" else "One person · expires in 3 days", style = MaterialTheme.typography.bodySmall)
                         TextButton(onClick = { open(context, Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, context.getString(R.string.share_care_invitation, context.getString(R.string.app_name), invite)), "Share invitation")) }) { Icon(Icons.Default.Share, null); Spacer(Modifier.width(8.dp)); Text("Share invitation") }
                         androidx.compose.foundation.text.selection.SelectionContainer { Text(invite, style = MaterialTheme.typography.bodySmall) }
                     }
@@ -158,7 +211,10 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
                             Column(Modifier.weight(1f).padding(top = 12.dp)) { Text(member.email); Text(if (member.canEdit) "Can make changes" else "Can read", style = MaterialTheme.typography.bodySmall) }
                             TextButton(onClick = { removing = member }, enabled = !busy) { Text("Remove") }
                         }
+                        CheckLine(member.careTeamRead, { enabled -> val person = selected; val account = session!!.userId; run { require(vm.selected.value == person && cloud.session.value?.userId == account && vm.isOwner.value); cloud.setCareTeamSharing(person, member.userId, enabled); if (vm.selected.value == person && cloud.session.value?.userId == account) members = cloud.members(person) } }, "Share care-team contacts with this person")
+                        if (!member.careTeamPermissionKnown) Text("Care-team sharing is unavailable until the server update is installed.", style = MaterialTheme.typography.bodySmall)
                     }
+                    CareContactManager(vm, selected)
                 }
                 TextButton(onClick = { signingOut = true }, enabled = !busy) { Text("Sign out") }
                 TextButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.delete_account_url)))) }, enabled = !busy) { Text("Delete account") }
@@ -167,7 +223,6 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
             notice?.let { Text(it, color = MaterialTheme.colorScheme.secondary) }
             error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
         }
-    }
     removing?.let { member -> AlertDialog(onDismissRequest = { removing = null }, title = { Text("Stop sharing with this person?") }, text = { Text("They won't be able to read or change these records online. Copies they've already saved cannot be recalled.") }, confirmButton = { TextButton(onClick = { removing = null; run { cloud.removeMember(selected, member.userId); members = cloud.members(selected) } }) { Text("Stop sharing") } }, dismissButton = { TextButton(onClick = { removing = null }) { Text("Keep sharing") } }) }
     if (signingOut) AlertDialog(onDismissRequest = { signingOut = false }, title = { Text("Sign out?") }, confirmButton = { TextButton(onClick = { signingOut = false; run { vm.stopRecording(); cloud.signOut() } }) { Text("Sign out") } }, dismissButton = { TextButton(onClick = { signingOut = false }) { Text("Cancel") } })
 }
