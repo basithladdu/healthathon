@@ -4,11 +4,12 @@ import { useId, useRef, useState, type FormEvent } from 'react';
 import {
   SYMPTOM_SEVERITIES, addSymptomEntry, updateSymptomEntry, removeSymptomEntry,
   restoreSymptomEntry, selectSymptomEntries, symptomDiaryText, symptomSeverityText, validateSymptomInput,
-  SYMPTOM_SCALE, SYMPTOM_OPTIONS, symptomName, symptomScaleAnchors, symptomComparison, symptomRecallText, symptomRespondentText, symptomChangeText, painTriggerText,
+  SYMPTOM_SCALE, SYMPTOM_OPTIONS, symptomFollowUpInput, symptomName, symptomScaleAnchors, symptomComparison, symptomRecallText, symptomRespondentText, symptomChangeText, painTriggerText,
   type SymptomEntry, type SymptomRange, type SymptomSeverity, type SymptomRespondent, type SymptomRecall, type SymptomChange, type PainTrigger,
 } from './family-symptom-state';
+import { FamilySymptomTrends } from './family-symptom-trends';
 import { PainBodyMap } from './pain-body-map';
-import { painBodySiteName, type PainBodySite } from './pain-body-map-state';
+import { PAIN_BODY_MODEL, painBodySiteName, type PainBodySite, type PainBodyPoint } from './pain-body-map-state';
 import type { CareSaveStatus } from './care-local-store';
 import './family-symptom-diary.css';
 
@@ -42,6 +43,7 @@ function SymptomDiaryForPatient({ patientId, author, today, hindi, entries, onCh
   const [ownChanges, setOwnChanges] = useState<Partial<Record<string, SymptomChange>>>({});
   const [painLocation, setPainLocation] = useState('');
   const [painBodySites, setPainBodySites] = useState<PainBodySite[]>([]);
+  const [painBodyPoints, setPainBodyPoints] = useState<PainBodyPoint[]>([]);
   const [painTriggers, setPainTriggers] = useState<PainTrigger[]>([]);
   const [startedOn, setStartedOn] = useState('');
   const [note, setNote] = useState('');
@@ -61,14 +63,14 @@ function SymptomDiaryForPatient({ patientId, author, today, hindi, entries, onCh
   function clearForm() {
     setSelectedSymptoms([]); setCustomSymptom(''); setSymptomSeverities({});
     setDate(today); setTime(clockTime()); setStartedOn(''); setNote(''); setEditingId(null); setError('');
-    setOwnChanges({}); setPainLocation(''); setPainTriggers([]); setPainBodySites([]);
+    setOwnChanges({}); setPainLocation(''); setPainTriggers([]); setPainBodySites([]); setPainBodyPoints([]);
   }
 
   function toggleSymptom(value: string) {
     if (editingId) {
       if (!selectedSymptoms.includes(value)) setSymptomSeverities({});
       setSelectedSymptoms([value]);
-      if (value !== 'Pain') { setPainBodySites([]); setPainLocation(''); setPainTriggers([]); }
+      if (value !== 'Pain') { setPainBodySites([]); setPainBodyPoints([]); setPainLocation(''); setPainTriggers([]); }
       setError(''); return;
     }
     const next = selectedSymptoms.includes(value) ? selectedSymptoms.filter((item) => item !== value) : [...selectedSymptoms, value];
@@ -76,7 +78,7 @@ function SymptomDiaryForPatient({ patientId, author, today, hindi, entries, onCh
       setSymptomSeverities((previous) => { const updated = { ...previous }; delete updated[value]; return updated; });
     }
     setSelectedSymptoms(next);
-    if (!next.includes('Pain')) { setPainBodySites([]); setPainLocation(''); setPainTriggers([]); }
+    if (!next.includes('Pain')) { setPainBodySites([]); setPainBodyPoints([]); setPainLocation(''); setPainTriggers([]); }
     setError('');
   }
 
@@ -88,7 +90,7 @@ function SymptomDiaryForPatient({ patientId, author, today, hindi, entries, onCh
       symptom: value === 'Other' ? customSymptom.trim() : value,
       severity: symptomSeverities[value] as SymptomSeverity,
       date, time, startedOn, note, scale: SYMPTOM_SCALE, recall, respondent,
-      ...(value === 'Pain' ? { painLocation, painTriggers, painBodySites } : {}),
+      ...(value === 'Pain' ? { painLocation, painTriggers, painBodySites, painBodyPoints, ...(painBodyPoints.length ? { painBodyModel: PAIN_BODY_MODEL } : {}) } : {}),
       };
       const comparison = symptomComparison(entries, { ...input, id: editingId ?? '', patientId, author: entryAuthor });
       return { ...input, ...(ownChanges[value] && comparison ? { selfReportedChange: ownChanges[value], comparedWithId: comparison.previous.id } : {}) };
@@ -124,14 +126,29 @@ function SymptomDiaryForPatient({ patientId, author, today, hindi, entries, onCh
   }
 
   function edit(entry: SymptomEntry) {
+    if (entry.painBodyPoints?.length && entry.painBodyModel !== PAIN_BODY_MODEL) { setMessage(t('This body-map version cannot be edited here. Your saved note is unchanged.', 'इस बॉडी मैप का संस्करण यहाँ नहीं बदल सकता। सेव किया नोट सुरक्षित है।')); return; }
     const known = SYMPTOM_OPTIONS.some(({ value }) => value !== 'Other' && value === entry.symptom);
     setSelectedSymptoms([known ? entry.symptom : 'Other']); setCustomSymptom(known ? '' : entry.symptom);
     setSymptomSeverities({ [known ? entry.symptom : 'Other']: entry.severity });
     setDate(entry.date); setStartedOn(entry.startedOn); setNote(entry.note); setEditingId(entry.id); setError(''); setMessage('');
     setTime(entry.time ?? ''); setRecall(entry.recall); setRespondent(entry.respondent);
-    setPainLocation(entry.painLocation ?? ''); setPainTriggers(entry.painTriggers ?? []); setPainBodySites(entry.painBodySites ?? []);
+    setPainLocation(entry.painLocation ?? ''); setPainTriggers(entry.painTriggers ?? []); setPainBodySites(entry.painBodySites ?? []); setPainBodyPoints(entry.painBodyPoints ?? []);
     setOwnChanges(entry.selfReportedChange ? { [known ? entry.symptom : 'Other']: entry.selfReportedChange } : {});
-    formRef.current?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    formRef.current?.scrollIntoView({ block: 'start', behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    formRef.current?.focus({ preventScroll: true });
+  }
+
+  function followUp(entry: SymptomEntry) {
+    if (entry.painBodyPoints?.length && entry.painBodyModel !== PAIN_BODY_MODEL) { setMessage(t('This saved body-map version cannot be reused here. Add a new note; the original stays unchanged.', 'यह बॉडी मैप यहाँ दोबारा इस्तेमाल नहीं हो सकता। नया नोट जोड़ें; पुराना सुरक्षित रहेगा।')); return; }
+    const input = symptomFollowUpInput(entry, today, clockTime());
+    const known = SYMPTOM_OPTIONS.some(({ value }) => value !== 'Other' && value === input.symptom);
+    setSelectedSymptoms([known ? input.symptom : 'Other']); setCustomSymptom(known ? '' : input.symptom);
+    setSymptomSeverities({}); setDate(input.date); setTime(input.time!); setEditingId(null); setError('');
+    setStartedOn(input.startedOn); setNote(input.note); setRecall(input.recall); setRespondent(input.respondent);
+    setPainLocation(input.painLocation ?? ''); setPainTriggers(input.painTriggers ?? []);
+    setPainBodySites(input.painBodySites ?? []); setPainBodyPoints(input.painBodyPoints ?? []); setOwnChanges({});
+    setMessage(t('New follow-up: choose today’s rating. The earlier note stays unchanged.', 'नया फ़ॉलो-अप: आज का अंक चुनें। पुराना नोट नहीं बदलेगा।'));
+    formRef.current?.scrollIntoView({ block: 'start', behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
     formRef.current?.focus({ preventScroll: true });
   }
 
@@ -176,7 +193,7 @@ function SymptomDiaryForPatient({ patientId, author, today, hindi, entries, onCh
             const comparison = rating === undefined ? null : symptomComparison(entries, {
               id: editingId ?? '', patientId, author: entryAuthor, symptom: value === 'Other' ? customSymptom : value,
               severity: rating, date, time, startedOn, note, scale: SYMPTOM_SCALE, recall, respondent,
-              ...(value === 'Pain' ? { painLocation, painTriggers, painBodySites } : {}),
+              ...(value === 'Pain' ? { painLocation, painTriggers, painBodySites, painBodyPoints, ...(painBodyPoints.length ? { painBodyModel: PAIN_BODY_MODEL } : {}) } : {}),
             });
             return <fieldset className="symptom-rating" key={value}>
               <legend><span>{label}</span><span className="symptom-rating-value">{rating === undefined ? t('Choose 0–10', '0–10 चुनें') : symptomSeverityText(rating, hindi)}</span></legend>
@@ -194,7 +211,7 @@ function SymptomDiaryForPatient({ patientId, author, today, hindi, entries, onCh
         <div className="symptom-date-fields"><label>{t('Day', 'दिन')}<input type="date" value={date} max={today} onChange={(event) => { setDate(event.target.value); setOwnChanges({}); if (event.target.value !== today) setTime(''); }} required /></label><label>{t('Time being described', 'किस समय की हालत है')}<input type="time" value={time} onChange={(event) => { setTime(event.target.value); setOwnChanges({}); }} required /></label></div>
         <label>{t(selectedSymptoms.length > 1 ? 'When did these start? (optional)' : 'When did it start? (optional)', 'कब शुरू हुआ? (ज़रूरी नहीं)')}<input type="date" value={startedOn} max={date || today} onChange={(event) => setStartedOn(event.target.value)} /></label>
         {selectedSymptoms.includes('Pain') && <>
-          <PainBodyMap selected={painBodySites} onChange={(sites) => { setPainBodySites(sites); setOwnChanges({}); }} hindi={hindi} />
+          <PainBodyMap points={painBodyPoints} onPointsChange={(points) => { setPainBodyPoints(points); setOwnChanges({}); }} rating={typeof symptomSeverities.Pain === 'number' ? symptomSeverities.Pain : null} selected={painBodySites} onChange={(sites) => { setPainBodySites(sites); setOwnChanges({}); }} hindi={hindi} />
           <label>{t('More about the location (optional)', 'जगह के बारे में और लिखें (ज़रूरी नहीं)')}<input maxLength={100} value={painLocation} onChange={(event) => { setPainLocation(event.target.value); setOwnChanges({}); }} /></label>
           <fieldset><legend>{t('When does it happen? (optional)', 'कब होता है? (ज़रूरी नहीं)')}</legend><div className="symptom-choices">{(['rest', 'turning', 'walking', 'coughing', 'other', 'not-sure'] as const).map((trigger) => <button key={trigger} type="button" aria-pressed={painTriggers.includes(trigger)} onClick={() => { setPainTriggers((previous) => previous.includes(trigger) ? previous.filter((item) => item !== trigger) : [...previous, trigger]); setOwnChanges({}); }}>{painTriggerText(trigger, hindi)}</button>)}</div></fieldset>
         </>}
@@ -218,11 +235,12 @@ function SymptomDiaryForPatient({ patientId, author, today, hindi, entries, onCh
           {entry.selfReportedChange && <p>{t('Their comparison', 'उनके मुताबिक बदलाव')}: {symptomChangeText(entry.selfReportedChange, hindi)}{ownReference ? ` · ${dateLabel(ownReference.date)} ${ownReference.time ?? ''}` : ` · ${t('previous note removed', 'पिछला नोट हटा दिया गया')}`}</p>}
           {Boolean(entry.painLocation || entry.painTriggers?.length || entry.painBodySites?.length) && <p>{[entry.painBodySites?.map((value) => painBodySiteName(value, hindi)).join(', '), entry.painLocation, entry.painTriggers?.map((value) => painTriggerText(value, hindi)).join(', ')].filter(Boolean).join(' · ')}</p>}
           {entry.note && <p className="symptom-note-text">{entry.note}</p>}
-          <div className="symptom-note-footer"><span>{entry.editedBy ? `${t('Edited by', 'बदला')} ${entry.editedBy}` : `${t('Written by', 'लिखा')} ${entry.author}`}</span><div><button type="button" onClick={() => edit(entry)} aria-label={`${t('Edit', 'बदलें')}: ${symptomLabel(entry.symptom)}, ${entry.date}`}>{t('Edit', 'बदलें')}</button><button type="button" onClick={() => remove(entry)} aria-label={`${t('Remove', 'हटाएँ')}: ${symptomLabel(entry.symptom)}, ${entry.date}`}>{t('Remove', 'हटाएँ')}</button></div></div>
+          <div className="symptom-note-footer"><span>{entry.editedBy ? `${t('Edited by', 'बदला')} ${entry.editedBy}` : `${t('Written by', 'लिखा')} ${entry.author}`}</span><div><button type="button" onClick={() => followUp(entry)} aria-label={`${t('Update rating', 'नया अंक जोड़ें')}: ${symptomLabel(entry.symptom)}, ${entry.date}`}>{t('Update rating', 'नया अंक जोड़ें')}</button><button type="button" onClick={() => edit(entry)} aria-label={`${t('Edit', 'बदलें')}: ${symptomLabel(entry.symptom)}, ${entry.date}`}>{t('Edit', 'बदलें')}</button><button type="button" onClick={() => remove(entry)} aria-label={`${t('Remove', 'हटाएँ')}: ${symptomLabel(entry.symptom)}, ${entry.date}`}>{t('Remove', 'हटाएँ')}</button></div></div>
         </article>; })}</div>
         {!visibleEntries.length && <p className="symptom-empty">{patientEntries.length ? t('No notes match these filters.', 'इन फ़िल्टर के लिए कोई नोट नहीं है।') : t('Your first note will appear here.', 'आपका पहला नोट यहाँ दिखेगा।')}</p>}
       </section>
     </div>
+    <FamilySymptomTrends entries={entries} patientId={patientId} today={today} hindi={hindi} />
     <div className="symptom-status"><p role="status">{saveStatus === 'unavailable' ? t('Saving failed. Keep this page open and save a copy of your entries.', 'सेव नहीं हुआ। पेज खुला रखें और नोटों की कॉपी डाउनलोड करें।') : saveStatus === 'saving' ? t('Saving entries…', 'नोट सेव हो रहे हैं…') : message}</p>{removed.length > 0 && <button type="button" className="care-text-button" onClick={undo}>{t('Undo last removal', 'पिछला हटाया नोट वापस लाएँ')}</button>}</div>
   </section>;
 }

@@ -1,0 +1,35 @@
+async(page) => {
+const out='F:/CODE/healthathon/output/playwright/pain-body-2026-10-24/';
+await page.evaluate(()=>{qa.picks=[];qa.events=qa.events.filter(e=>e.type==='ready');qa.state={selected:[],points:[],rating:null,hindi:false};qa.view('front');qa.apply();window.qaReport={desktop:[],errors:[]};});
+page.on('pageerror',e=>page.evaluate(m=>qaReport.errors.push(m),e.message));
+const hit=async(name,x,y,expected)=>{const before=await page.evaluate(()=>qa.picks.length);await page.mouse.click(x,y);await page.waitForFunction(n=>qa.picks.length>n,before,{timeout:3000});const actual=await page.evaluate(()=>qa.picks.at(-1));await page.evaluate(({name,expected,actual})=>qaReport.desktop.push({name,expected,actual,pass:actual?.site===expected}),{name,expected,actual});};
+await hit('Front torso chest',500,245,'chest');
+await hit('Front patient left arm',560,330,'left-arm');
+await hit('Front patient right arm',440,330,'right-arm');
+await hit('Front patient left leg',525,465,'left-leg');
+await hit('Front patient right leg',477,465,'right-leg');
+await hit('Head',500,110,'head');
+await hit('Neck',500,166,'neck');
+const before=await page.evaluate(()=>qa.picks.length);
+await page.mouse.move(500,275);await page.mouse.down();await page.mouse.move(650,275,{steps:12});await page.mouse.up();
+const after=await page.evaluate(()=>qa.picks.length);
+await page.evaluate(({before,after})=>qaReport.desktop.push({name:'Orbit drag does not select',before,after,pass:before===after}),{before,after});
+await page.screenshot({path:out+'desktop-orbit.png'});
+await page.getByRole('button',{name:'Back',exact:true}).click();await hit('Back torso upper back',500,245,'upper-back');
+await hit('Back torso lower back',500,320,'lower-back');
+await hit('Back patient left arm screen left',440,330,'left-arm');
+await hit('Back patient right arm screen right',560,330,'right-arm');
+await page.screenshot({path:out+'desktop-back-picked.png'});
+await page.getByRole('button',{name:'Front',exact:true}).click();await page.evaluate(()=>{qa.state={selected:[],points:[],rating:null,hindi:false};qa.apply()});
+await hit('Retap start',500,245,'chest');const first=await page.evaluate(()=>qa.state.points[0]);await hit('Retap moved',505,253,'chest');const second=await page.evaluate(()=>qa.state.points[0]);
+await page.evaluate(({first,second})=>qaReport.desktop.push({name:'Retap same region moves persisted point without removing region',first,second,selected:qa.state.selected,pass:qa.state.selected.length===1&&qa.state.points.length===1&&JSON.stringify(first)!==JSON.stringify(second)}),{first,second});
+await page.getByRole('button',{name:'Pain 1',exact:true}).click();await page.screenshot({path:out+'desktop-rating-1.png'});
+await page.getByRole('button',{name:'Pain 9',exact:true}).click();await page.screenshot({path:out+'desktop-rating-9.png'});
+await page.getByRole('button',{name:'Unrated',exact:true}).click();await page.screenshot({path:out+'desktop-rating-null.png'});
+const saved=await page.evaluate(()=>JSON.stringify(qa.state));await page.getByRole('button',{name:'Clear',exact:true}).click();const cleared=await page.evaluate(()=>qa.state.selected.length===0&&qa.state.points.length===0);await page.screenshot({path:out+'desktop-cleared.png'});await page.getByRole('button',{name:'Restore',exact:true}).click();const restored=await page.evaluate(()=>JSON.stringify(qa.state));
+await page.evaluate(({saved,cleared,restored})=>qaReport.desktop.push({name:'Clear and exact marker restore',cleared,restored:JSON.parse(restored),pass:cleared&&saved===restored}),{saved,cleared,restored});
+const invalid=await page.frames().find(f=>f.url().includes('/viewer/')).evaluate(()=>SaharaPainViewer.setState({selected:['chest'],points:[{site:'chest',x:NaN,y:.6,z:.1}],rating:5,hindi:false}));
+await page.evaluate(invalid=>qaReport.desktop.push({name:'Reject nonfinite marker state',actual:invalid,pass:invalid===false}),invalid);
+await page.evaluate(()=>{qa.state.hindi=true;qa.apply()});const hindiStatus=await page.frames().find(f=>f.url().includes('/viewer/')).locator('#status').textContent();await page.evaluate(hindiStatus=>qaReport.desktop.push({name:'Hindi status',actual:hindiStatus,pass:hindiStatus.includes('घुमाने')}),hindiStatus);
+await page.screenshot({path:out+'desktop-hindi-restored.png'});
+}

@@ -3,6 +3,12 @@ package `in`.wedevit.care
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
+import kotlin.math.roundToLong
+import org.json.JSONArray
+import org.json.JSONObject
+
+/** Shared renderer coordinates: patient's left +x, feet-to-head y, front +z. */
+data class PainBodyPoint3d(val site: String, val x: Double, val y: Double, val z: Double)
 
 data class PainBodyPoint(val x: Float, val y: Float)
 data class PainBodyRegion(val id: String, val outline: List<PainBodyPoint>) {
@@ -20,14 +26,22 @@ data class PainBodyRegion(val id: String, val outline: List<PainBodyPoint>) {
 
 /** Original coarse body regions, in a 100 by 200 coordinate space. Sides always refer to the patient. */
 object PainBodyMapRules {
+    const val MODEL = "sahara-body-v1"
     val sites = linkedMapOf(
         "head" to ("Head" to "सिर"), "neck" to ("Neck" to "गर्दन"), "chest" to ("Chest" to "छाती"),
         "abdomen" to ("Abdomen" to "पेट"), "upper-back" to ("Upper back" to "पीठ का ऊपरी हिस्सा"),
         "lower-back" to ("Lower back" to "पीठ का निचला हिस्सा"), "left-shoulder" to ("Left shoulder" to "बायाँ कंधा"),
-        "right-shoulder" to ("Right shoulder" to "दायाँ कंधा"), "left-arm" to ("Left arm" to "बायाँ हाथ"),
-        "right-arm" to ("Right arm" to "दायाँ हाथ"), "left-leg" to ("Left leg" to "बायाँ पैर"), "right-leg" to ("Right leg" to "दायाँ पैर"),
+        "right-shoulder" to ("Right shoulder" to "दायाँ कंधा"), "left-arm" to ("Left arm / hand" to "बायाँ हाथ"),
+        "right-arm" to ("Right arm / hand" to "दायाँ हाथ"), "left-leg" to ("Left leg / foot" to "बायाँ पैर"), "right-leg" to ("Right leg / foot" to "दायाँ पैर"),
     )
     fun label(id: String, hindi: Boolean): String = sites[id]?.let { if (hindi) it.second else it.first } ?: id
+    fun validPoint(point: PainBodyPoint3d): Boolean = point.site in sites && point.x.isFinite() && point.y.isFinite() && point.z.isFinite() && point.x in -1.0..1.0 && point.y in 0.0..1.0 && point.z in -1.0..1.0
+    fun pointContext(points: List<PainBodyPoint3d>) = points.sortedBy { it.site }.map { "${it.site}:${(it.x * 1000).roundToLong()}:${(it.y * 1000).roundToLong()}:${(it.z * 1000).roundToLong()}" }
+    fun encodePoints(points: List<PainBodyPoint3d>): JSONArray = JSONArray(points.sortedBy { it.site }.map { JSONObject().put("site", it.site).put("x", it.x).put("y", it.y).put("z", it.z) })
+    fun decodePoints(values: JSONArray?): List<PainBodyPoint3d> = values?.let { list -> (0 until list.length()).map { index ->
+        val point = list.getJSONObject(index)
+        PainBodyPoint3d(point.getString("site"), point.getDouble("x"), point.getDouble("y"), point.getDouble("z"))
+    } }.orEmpty()
     private fun polygon(id: String, vararg xy: Float) = PainBodyRegion(id, xy.toList().chunked(2).map { PainBodyPoint(it[0], it[1]) })
     private fun mirrored(region: PainBodyRegion, id: String) = PainBodyRegion(id, region.outline.map { PainBodyPoint(100f - it.x, it.y) })
     fun regions(back: Boolean): List<PainBodyRegion> {
@@ -47,6 +61,10 @@ object PainBodyMapRules {
             leg, mirrored(leg, "$viewerRightSide-leg"))
     }
     fun hit(back: Boolean, x: Float, y: Float): String? = regions(back).firstOrNull { it.contains(PainBodyPoint(x, y)) }?.id
-    fun toggled(selected: List<String>, id: String): List<String> = if (id !in sites) selected else
-        sites.keys.filter { it in selected.toSet().let { values -> if (id in values) values - id else values + id } }
+    fun toggled(selected: List<String>, id: String): List<String> {
+        if (id !in sites) return selected
+        val next = selected.toMutableSet()
+        if (!next.add(id)) next.remove(id)
+        return sites.keys.filter { it in next }
+    }
 }

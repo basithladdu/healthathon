@@ -1,0 +1,83 @@
+{
+  "asset": "body.glb",
+  "bytes": 162136,
+  "sha256": "3A88834F17AF8391DA6B0761F257FCE4E9DAD0923CA4B92ED1458C9C4B3ECD6E",
+  "sourceRepository": "https://github.com/UMRAM-Bilkent/supine-human-model",
+  "sourceCommit": "728f23ab5eb9d6cb2c8fb39acb3440bd81db0d3e",
+  "sourcePublishedAt": "2026-06-18T05:42:50Z",
+  "sourcePath": "assets/human_posed.glb",
+  "sourceSha256": "E0098C68B09FC10EC3E5BB29DA8986DE073C6915DF29F14A99C3C22F99823B78",
+  "sourceBytes": 162136,
+  "license": "CC0-1.0",
+  "credit": "Quaternius (original character); UMRAM, Bilkent University (prepared static pose). Sahara coordinate adaptation.",
+  "adaptation": "Baked rigid rotation (x,y,z) -> (-z,y,x) into position and normal buffers. Updated position accessor bounds. No shape, topology or material change. No node transforms.",
+  "technical": {
+    "glbVersion": 2,
+    "meshCount": 1,
+    "materialCount": 1,
+    "vertexCount": 4733,
+    "triangleCount": 1578,
+    "externalUris": [],
+    "textures": 0,
+    "animations": 0,
+    "rig": false,
+    "requiredExtensions": []
+  },
+  "coordinates": {
+    "up": "+Y",
+    "front": "+Z",
+    "patientLeft": "+X",
+    "patientRight": "-X",
+    "bounds": {
+      "min": [
+        -0.8266726136207581,
+        -2.7676429748535156,
+        -0.524854838848114
+      ],
+      "max": [
+        0.8266726136207581,
+        2.7676429748535156,
+        0.524854838848114
+      ]
+    },
+    "center": [
+      0,
+      0,
+      0
+    ],
+    "size": [
+      1.6533452272415161,
+      5.535285949707031,
+      1.049709677696228
+    ],
+    "scaleForHeight2": 0.3613182802427497,
+    "height2Bounds": {
+      "min": [
+        -0.2986919270772314,
+        -1.0,
+        -0.18963964774968609
+      ],
+      "max": [
+        0.2986919270772314,
+        1.0,
+        0.18963964774968609
+      ]
+    },
+    "pointNormalization": "Use inverse scene transform, then x/height, (y-minY)/height, z/height. Store stable body-local xyz and explicit side/region labels; never screen-left as patient-left."
+  },
+  "limitations": [
+    "Stylised adult mannequin, not patient-specific anatomy or validated medical measurement.",
+    "Single mesh has no anatomical semantic labels, organ structures or segment IDs. Region classification is an interface heuristic and needs patient correction.",
+    "Changing red intensity must reflect the entered severity; no severity should be inferred from the selected position.",
+    "Upstream README orientation was contradicted by independent four-view vertex render. Delivered coordinates are independently corrected."
+  ],
+  "rightsEvidence": {
+    "upstreamReadme": "https://github.com/UMRAM-Bilkent/supine-human-model/blob/728f23ab5eb9d6cb2c8fb39acb3440bd81db0d3e/README.md#source--license",
+    "upstreamLicense": "https://github.com/UMRAM-Bilkent/supine-human-model/blob/728f23ab5eb9d6cb2c8fb39acb3440bd81db0d3e/LICENSE",
+    "quaterniusFaq": "https://quaternius.com/faq.html",
+    "specificCurrentPackCC0Example": "https://quaternius.com/packs/universalbasecharacters.html",
+    "currentGeneralLicense": "https://quaternius.com/license.html",
+    "basis": "Pinned prepared mesh was publicly released under CC0 in June 2026 with explicit Quaternius source attribution. Current creator FAQ and specific base-character page also state CC0. Current general QAL page changed August 2026 and says future changes are not retroactive; do not generalize this asset license to other current Quaternius downloads. Exact original character pack is not identified by the upstream repository."
+  },
+  "checkedDate": "2026-10-24"
+}

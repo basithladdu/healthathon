@@ -1,0 +1,15 @@
+{
+  "1": {
+    "redPixels": 610,
+    "meanRedMinusGreen": 4.194375
+  },
+  "9": {
+    "redPixels": 884,
+    "meanRedMinusGreen": 8.73
+  },
+  "null": {
+    "redPixels": 0,
+    "meanRedMinusGreen": -9.0909375
+  },
+  "pass": true
+}

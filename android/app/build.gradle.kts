@@ -74,6 +74,7 @@ dependencies {
     implementation("androidx.room:room-ktx:2.7.0")
     ksp("androidx.room:room-compiler:2.7.0")
     implementation("androidx.core:core-ktx:1.17.0")
+    implementation("androidx.webkit:webkit:1.14.0")
     implementation("org.maplibre.gl:android-sdk-opengl:13.6.1")
     implementation("com.google.mlkit:text-recognition:16.0.1")
     implementation("com.google.mlkit:text-recognition-devanagari:16.0.1")

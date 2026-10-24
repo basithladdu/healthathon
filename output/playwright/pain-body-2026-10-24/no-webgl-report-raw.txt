@@ -1,0 +1,22 @@
+### Result
+{
+  "details": {
+    "status": "3D unavailable. Use the body-area buttons below.",
+    "canvases": 0,
+    "nativeMessages": [
+      {
+        "type": "error"
+      }
+    ]
+  },
+  "parentEvents": [
+    {
+      "type": "error"
+    }
+  ],
+  "pass": true
+}
+### Ran Playwright code
+```js
+await page.evaluate('() => failureReport');
+```

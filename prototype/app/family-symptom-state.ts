@@ -1,5 +1,5 @@
 import { isValidAppointmentDate } from './appointment-state.ts';
-import { isPainBodySite, painBodySiteName, type PainBodySite } from './pain-body-map-state.ts';
+import { PAIN_BODY_MODEL, isPainBodySite, isPainBodyPoint, quantizePainBodyPoint, painBodyPointContext, painBodySiteName, type PainBodySite, type PainBodyPoint } from './pain-body-map-state.ts';
 
 export const SYMPTOM_SEVERITIES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as const;
 const LEGACY_SYMPTOM_SEVERITIES = ['Mild', 'Moderate', 'Severe'] as const;
@@ -63,6 +63,8 @@ export type SymptomInput = {
   respondent?: SymptomRespondent;
   painLocation?: string;
   painBodySites?: PainBodySite[];
+  painBodyPoints?: PainBodyPoint[];
+  painBodyModel?: typeof PAIN_BODY_MODEL;
   painTriggers?: PainTrigger[];
   selfReportedChange?: SymptomChange;
   comparedWithId?: string;
@@ -84,7 +86,8 @@ const painTriggers: readonly string[] = ['rest', 'turning', 'walking', 'coughing
 
 export function hasSymptomContext(input: SymptomInput): boolean {
   return input.scale === SYMPTOM_SCALE && /^([01]\d|2[0-3]):[0-5]\d$/.test(input.time ?? '')
-    && recalls.includes(input.recall ?? '') && respondents.includes(input.respondent ?? '');
+    && recalls.includes(input.recall ?? '') && respondents.includes(input.respondent ?? '')
+    && (!input.painBodyPoints?.length || input.painBodyModel === PAIN_BODY_MODEL);
 }
 
 export function validateSymptomInput(input: SymptomInput, today: string): SymptomInputError | null {
@@ -98,9 +101,14 @@ export function validateSymptomInput(input: SymptomInput, today: string): Sympto
   const contextProvided = input.scale !== undefined || input.time !== undefined || input.recall !== undefined || input.respondent !== undefined;
   if (contextProvided && !hasSymptomContext(input)) return 'context';
   if ((input.painBodySites !== undefined && (!Array.isArray(input.painBodySites) || input.painBodySites.some((value) => !isPainBodySite(value))))
+    || (input.painBodyModel !== undefined && input.painBodyModel !== PAIN_BODY_MODEL)
+    || (input.painBodyPoints?.length && input.painBodyModel !== PAIN_BODY_MODEL)
+    || (input.painBodyPoints !== undefined && (!Array.isArray(input.painBodyPoints) || input.painBodyPoints.length > 12
+      || input.painBodyPoints.some((value) => !isPainBodyPoint(value) || !input.painBodySites?.includes(value.site))
+      || new Set(input.painBodyPoints.map((value) => value.site)).size !== input.painBodyPoints.length))
     || (input.painLocation?.trim().length ?? 0) > 100
     || (input.painTriggers !== undefined && (!Array.isArray(input.painTriggers) || input.painTriggers.some((value) => !painTriggers.includes(value))))) return 'pain';
-  if ((input.painLocation || input.painTriggers?.length || input.painBodySites?.length) && input.symptom.trim().toLowerCase() !== 'pain') return 'pain';
+  if ((input.painLocation || input.painTriggers?.length || input.painBodySites?.length || input.painBodyPoints?.length) && input.symptom.trim().toLowerCase() !== 'pain') return 'pain';
   if ((input.selfReportedChange !== undefined && !changes.includes(input.selfReportedChange))
     || Boolean(input.selfReportedChange) !== Boolean(input.comparedWithId)) return 'comparison';
   return null;
@@ -112,6 +120,7 @@ function cleanInput(input: SymptomInput): SymptomInput {
     ...(input.scale !== undefined ? { scale: input.scale, time: input.time, recall: input.recall, respondent: input.respondent } : {}),
     ...(input.painLocation !== undefined ? { painLocation: input.painLocation.trim() } : {}),
     ...(input.painBodySites !== undefined ? { painBodySites: [...new Set(input.painBodySites)].sort() } : {}),
+    ...(input.painBodyPoints !== undefined ? { painBodyPoints: input.painBodyPoints.map(quantizePainBodyPoint).sort((a, b) => a.site.localeCompare(b.site)), ...(input.painBodyPoints.length ? { painBodyModel: PAIN_BODY_MODEL } : {}) } : {}),
     ...(input.painTriggers !== undefined ? { painTriggers: [...new Set(input.painTriggers)].sort() } : {}),
     ...(input.selfReportedChange ? { selfReportedChange: input.selfReportedChange, comparedWithId: input.comparedWithId } : {}),
   };
@@ -126,6 +135,8 @@ export function sameSymptomContext(a: SymptomEntry, b: SymptomEntry): boolean {
     && (!['caregiver', 'clinician'].includes(a.respondent ?? '') || a.author === b.author)
     && (a.painLocation ?? '').trim().toLowerCase() === (b.painLocation ?? '').trim().toLowerCase()
     && [...(a.painBodySites ?? [])].sort().join('|') === [...(b.painBodySites ?? [])].sort().join('|')
+    && (a.painBodyModel ?? '') === (b.painBodyModel ?? '')
+    && painBodyPointContext(a.painBodyPoints) === painBodyPointContext(b.painBodyPoints)
     && [...(a.painTriggers ?? [])].sort().join('|') === [...(b.painTriggers ?? [])].sort().join('|');
 }
 
@@ -139,6 +150,18 @@ export function symptomComparison(entries: readonly SymptomEntry[], current: Sym
   if (!earlier.length) return null;
   const previous = earlier[earlier.length - 1];
   return { baseline: earlier[0], previous, difference: current.severity - (previous.severity as number) };
+}
+
+export function symptomFollowUpInput(entry: SymptomEntry, today: string, time: string): Omit<SymptomInput, 'severity'> {
+  return {
+    symptom: entry.symptom, date: today, time, startedOn: entry.startedOn, note: '', scale: SYMPTOM_SCALE,
+    recall: entry.recall ?? 'now', respondent: entry.respondent,
+    ...(entry.symptom === 'Pain' ? {
+      painLocation: entry.painLocation ?? '', painTriggers: [...(entry.painTriggers ?? [])],
+      painBodySites: [...(entry.painBodySites ?? [])], painBodyPoints: (entry.painBodyPoints ?? []).map((point) => ({ ...point })),
+      ...(entry.painBodyPoints?.length ? { painBodyModel: entry.painBodyModel } : {}),
+    } : {}),
+  };
 }
 
 function validComparisonReference(entries: readonly SymptomEntry[], entry: SymptomEntry): boolean {

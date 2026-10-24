@@ -148,6 +148,51 @@ class CareSymptomDiaryUiTest {
         ui.runOnIdle { assertEquals(value, saved) }
     }
 
+    @Test fun quickFollowupRequiresANewRatingAndKeepsTheSavedBodyPoint() {
+        val point = PainBodyPoint3d("left-leg", .2, .3, .4)
+        val old = SymptomNote("Pain", 8, LocalDate.now().minusDays(1).toString(), "10:00", "now", "patient", "Fictional patient",
+            painLocation = "Left knee", painBodySites = listOf("left-leg"), painBodyPoints = listOf(point), painBodyModel = PainBodyMapRules.MODEL)
+        val row = CareItem(id = "fixture-followup-old", personId = "fixture-followup", kind = "checkin", title = "Pain", detail = SymptomNoteCodec.encode(old))
+        var savedId: String? = null
+        var saved: SymptomNote? = null
+        ui.setContent { CareTheme { SymptomNoteForm("fixture-followup", "Fictional patient", listOf(row), false, followup = row,
+            onSave = { id, value -> savedId = id; saved = value }, onClose = {}) } }
+        ui.onNodeWithTag("symptom-quick-mode").assertIsSelected()
+        ui.onNodeWithTag("symptom-rating-8").performScrollTo().assertIsNotSelected()
+        ui.onNodeWithTag("symptom-save").performScrollTo().performClick()
+        ui.onNodeWithText("Choose a rating or Not rated.").assertExists()
+        ui.runOnIdle { assertNull(saved) }
+        ui.onNodeWithTag("symptom-rating-2").performScrollTo().performClick()
+        ui.onNodeWithTag("symptom-save").performScrollTo().performClick()
+        ui.runOnIdle {
+            assertNotEquals(row.id, savedId)
+            assertEquals(2, saved!!.rating)
+            assertEquals(listOf(point), saved!!.painBodyPoints)
+            assertEquals("Left knee", saved!!.painLocation)
+            assertEquals(LocalDate.now().toString(), saved!!.observedDate)
+        }
+    }
+
+    @Test fun painRegionButtonsRetainLateralityClearSelectionAndSaveWithoutA3dHit() {
+        var saved: SymptomNote? = null
+        ui.setContent { CareTheme { SymptomNoteForm("fixture-body", "Fictional patient", emptyList(), true,
+            onSave = { _, value -> saved = value }, onClose = {}) } }
+        ui.onNodeWithTag("symptom-choice-Pain").performScrollTo().performClick()
+        ui.onNodeWithTag("diary-choice-patient").performScrollTo().performClick()
+        ui.onNodeWithTag("symptom-rating-4").performScrollTo().performClick()
+        ui.onNodeWithTag("pain-body-site-left-leg").performScrollTo().assertTextContains("बायाँ पैर").performClick()
+        ui.onNodeWithTag("pain-body-back").performScrollTo().performClick()
+        ui.onNodeWithTag("pain-body-site-left-leg").performScrollTo().assertIsSelected()
+        ui.onNodeWithTag("pain-body-clear").performScrollTo().performClick()
+        ui.onNodeWithTag("pain-body-site-right-arm").performScrollTo().performClick()
+        ui.onNodeWithTag("symptom-save").performScrollTo().performClick()
+        ui.runOnIdle {
+            assertEquals(listOf("right-arm"), saved!!.painBodySites)
+            assertTrue(saved!!.painBodyPoints.isEmpty())
+            assertEquals(4, saved!!.rating)
+        }
+    }
+
     private fun screenshot(name: String) {
         val instrumentation = InstrumentationRegistry.getInstrumentation()
         val bitmap = instrumentation.uiAutomation.takeScreenshot()

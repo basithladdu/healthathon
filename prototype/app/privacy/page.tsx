@@ -65,6 +65,8 @@ export default function PrivacyPage() {
             A symptom note can contain the symptom, a number from zero to ten or an
             unanswered rating, observation date and time, reporting period, who answered,
             author name, pain location or triggers, reported change and optional words.
+            Pain locations can include the body regions and specific points you select
+            on the rotatable body map, together with the model version used to show them.
             Comparisons use earlier entries for the same person, symptom and reporting
             context. They do not diagnose a condition, calculate a clinical risk score
             or decide treatment. This personal diary is not a validated clinical questionnaire.
@@ -75,6 +77,12 @@ export default function PrivacyPage() {
             Supabase and follow that person’s existing sharing permissions. The older
             browser diary remains in its separate browser workspace. Sharing an export
             sends the selected words to the app and recipient you choose.
+          </p>
+          <p>
+            The body viewer uses files bundled with Android or served by the Sahara
+            website. It does not send your selected pain points to an external model
+            provider. Its colour follows your recorded pain rating. Saved locations
+            follow the same storage, sharing and deletion rules as the symptom note.
           </p>
         </section>
 

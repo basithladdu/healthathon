@@ -1,0 +1,106 @@
+{
+  "checks": [
+    {
+      "name": "Touch front chest",
+      "expected": "chest",
+      "actual": {
+        "type": "pick",
+        "site": "chest",
+        "point": {
+          "x": 0,
+          "y": 0.663,
+          "z": 0.479
+        }
+      },
+      "pass": true
+    },
+    {
+      "name": "Touch patient left arm",
+      "expected": "left-arm",
+      "actual": {
+        "type": "pick",
+        "site": "left-arm",
+        "point": {
+          "x": 0.822,
+          "y": 0.494,
+          "z": -0.209
+        }
+      },
+      "pass": true
+    },
+    {
+      "name": "Touch patient right arm",
+      "expected": "right-arm",
+      "actual": {
+        "type": "pick",
+        "site": "right-arm",
+        "point": {
+          "x": -0.822,
+          "y": 0.494,
+          "z": -0.209
+        }
+      },
+      "pass": true
+    },
+    {
+      "name": "Touch orbit drag does not select",
+      "before": 3,
+      "after": 3,
+      "pass": true
+    },
+    {
+      "name": "Touch back upper back",
+      "expected": "upper-back",
+      "actual": {
+        "type": "pick",
+        "site": "upper-back",
+        "point": {
+          "x": 0,
+          "y": 0.66,
+          "z": -0.982
+        }
+      },
+      "pass": true
+    }
+  ],
+  "viewport": [
+    390,
+    844
+  ],
+  "state": {
+    "selected": [
+      "chest",
+      "left-arm",
+      "right-arm",
+      "upper-back"
+    ],
+    "rating": 9,
+    "hindi": false,
+    "points": [
+      {
+        "site": "chest",
+        "x": 0,
+        "y": 0.663,
+        "z": 0.479
+      },
+      {
+        "site": "left-arm",
+        "x": 0.822,
+        "y": 0.494,
+        "z": -0.209
+      },
+      {
+        "site": "right-arm",
+        "x": -0.822,
+        "y": 0.494,
+        "z": -0.209
+      },
+      {
+        "site": "upper-back",
+        "x": 0,
+        "y": 0.66,
+        "z": -0.982
+      }
+    ]
+  }
+}

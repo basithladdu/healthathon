@@ -1,0 +1,71 @@
+{
+  "checkedAtUtc": "2026-10-24T13:30:13.147828+00:00",
+  "source": "prototype/public/pain-body-viewer",
+  "destination": "android/app/src/main/assets/pain-body-viewer",
+  "files": [
+    {
+      "file": "index.html",
+      "bytes": 591,
+      "sha256": "E0D1F63911F5C85A3F76FB33C5CAC6B319F3E9F6BDD68A50B72C46BE328E7EF4",
+      "sameBytes": true
+    },
+    {
+      "file": "viewer.css",
+      "bytes": 374,
+      "sha256": "58350F37780A3B9C76A314178F28BA946BECE2AE259709181081C57A8380D192",
+      "sameBytes": true
+    },
+    {
+      "file": "viewer.js",
+      "bytes": 644816,
+      "sha256": "89EB42771A3BCBD58A625E3C51C9987439D1D67F356AB9D42A790BA2EAAA8588",
+      "sameBytes": true
+    },
+    {
+      "file": "viewer.js.LEGAL.txt",
+      "bytes": 188,
+      "sha256": "CC7CC7E2F53D5DB0235AB2226E85FC6E91655161573B39813B41BB00E5919674",
+      "sameBytes": true
+    },
+    {
+      "file": "THREE-LICENSE.txt",
+      "bytes": 1081,
+      "sha256": "8B378EBE60E2FE500158CB0AC71CB5E8B7D92953C2ABCC63A0EB90499653B5BC",
+      "sameBytes": true
+    },
+    {
+      "file": "body.glb",
+      "bytes": 162136,
+      "sha256": "3A88834F17AF8391DA6B0761F257FCE4E9DAD0923CA4B92ED1458C9C4B3ECD6E",
+      "sameBytes": true
+    },
+    {
+      "file": "body-model.json",
+      "bytes": 3633,
+      "sha256": "EE2A66D0B677E97444EB8C7B48C882953A16FECBF9BE3FDC187FB055915D1CB4",
+      "sameBytes": true
+    },
+    {
+      "file": "body-SOURCE.txt",
+      "bytes": 1705,
+      "sha256": "4A966EE808D6C0956A71170C897AE957AA9ADAFAEC28D03081921412EE279AB3",
+      "sameBytes": true
+    },
+    {
+      "file": "body-LICENSE-CC0.txt",
+      "bytes": 7048,
+      "sha256": "2F976AEAE6AB25F75A68B01189B58E9BE68BAAC37F1BAD7CA34621A82084D835",
+      "sameBytes": true
+    }
+  ],
+  "runtimeVerified": false,
+  "networkPolicy": "Only bundled appassets HTTPS path accepted; all other requests/nav blocked; no patient text or identity passed to renderer",
+  "bridge": "Origin-checked, main-frame-only WebMessageListener; whitelisted coarse sites and normalized bounded clicked points; no JavascriptInterface",
+  "modelVersion": "sahara-body-v1",
+  "pointCoordinates": "x -1..1 patient-left positive; y 0 feet to 1 head; z -1..1 front positive; 3-decimal renderer picks",
+  "sources": [
+    "https://developer.android.com/develop/ui/views/layout/webapps/load-local-content",
+    "https://developer.android.com/privacy-and-security/risks/insecure-webview-native-bridges",
+    "https://developer.android.com/jetpack/androidx/releases/webkit"
+  ]
+}

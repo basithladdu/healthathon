@@ -4,6 +4,16 @@ Research checked: 23 October 2026. Prepared for the clinical team, Shirin and Su
 
 ## The decision to make
 
+### 24 October team continuation
+
+Raw supplied messages and both screenshots are preserved in [`source-materials/team-context/2026-10-24/manifest.json`](../../source-materials/team-context/2026-10-24/manifest.json), separately from this interpretation. Sujay corrected the original removal number at18:02:25: **keep Pain; remove Weight loss (item3)**. Retire sleep disturbances, dizziness and irritability/restlessness from new-entry choices while preserving history. Add diarrhoea, sore/dry mouth and overall well-being. Anxiety and low mood/depression remain **separate reported scores**, not a combined mental-health diagnosis or an assessment of the caregiver.
+
+Shirin asked that her reduced form be the skeleton and the ESAS-r/IPOS examples guide measurement. Her actual final form/second page is not supplied here. Do not merge all forms or label a custom shortened/translated diary as a completed validated instrument. The current personal diary can retain independent0–10 symptom entries; well-being needs explicit0best/10worst anchors and its own comparable scale/context. IPOS uses different response semantics and recall periods, as recorded below.
+
+The team requested fuller initial context, quick subsequent severity entry, optional revisable details, actual dates for observations/new symptoms and graphs of comparable real entries. The user then explicitly requested an interactive rotatable3D body map with saved pain points and colour derived from the reported severity. Preserve a keyboard/text alternative, patient-relative laterality and typed location. A mannequin is a location picker, not anatomical diagnosis; no risk bands or automatic medication recommendation follow from colour.
+
+Routine frequency was discussed as daily/weekly/optional and a24-hour minimum, but no complete clinical protocol was settled. Implement patient-led updates and an optional routine cadence; never prevent reporting a new/changing symptom solely because24hours has not elapsed. A quick follow-up reuses context, never silently reuses the previous severity. Formal instrument frequency, missing answers and wording remain clinical decisions.
+
 Use **one clinician-selected, versioned instrument** for a formal assessment, with a short personal diary alongside it. Do not combine convenient questions from different scales and call the result ESAS-r, IPOS, a clinical distress score or triage.
 
 For discussion: **ESAS-r** is the simpler repeated symptom-severity candidate; **Hindi/English IPOS** is the stronger candidate for a broader palliative review covering physical, emotional, practical and communication concerns. A longer clinical review does not have to run every day. The team should choose the instrument, recall period, frequency and who actually reads the results before implementation.

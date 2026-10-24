@@ -1,0 +1,25 @@
+{
+  "checkedAtUtc": "2026-10-24T13:25:38.868535+00:00",
+  "asset": "prototype/public/pain-body-viewer/body.glb",
+  "sha256": "3A88834F17AF8391DA6B0761F257FCE4E9DAD0923CA4B92ED1458C9C4B3ECD6E",
+  "bytes": 162136,
+  "checks": {
+    "headerMagic": true,
+    "version2": true,
+    "declaredTotalBytes": true,
+    "jsonChunkType": true,
+    "binaryChunkType": true,
+    "chunkLengths": true,
+    "noExternalUris": true,
+    "noExtensionsRequired": true,
+    "identityMeshNode": true,
+    "bufferViewsInBounds": true,
+    "POSITIONFinite": true,
+    "storedBoundsMatch": true,
+    "NORMALFinite": true,
+    "indicesInRange": true
+  },
+  "allPassed": true,
+  "visualEvidence": "output/research/pain-body-model-2026-10-24/body-corrected-orthographic-check.png",
+  "visualScope": "Four orthographic projections of actual delivered triangles, independently inspected for upright front/back and side orientation; not a WebGL runtime interaction test."
+}

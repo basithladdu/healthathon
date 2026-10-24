@@ -1,0 +1,78 @@
+{
+  "checkedAtUtc": "2026-10-24T13:34:38.942954+00:00",
+  "route": "http://127.0.0.1:8796/harness.html",
+  "viewerRoute": "http://127.0.0.1:8796/viewer/index.html",
+  "scope": "Actual shared static body viewer only, isolated same-origin QA parent harness; not Sahara app integration, clinical validity, Play availability or physical Android runtime.",
+  "browser": "Existing Chromium headless shell1243, software WebGL2/ANGLE SwiftShader, dedicated ephemeral Playwright CLI session sahara-pain-qa; one context at a time.",
+  "viewports": {
+    "desktop": [
+      1000,
+      800
+    ],
+    "mobile": [
+      390,
+      844
+    ],
+    "mobileHasTouch": true,
+    "deviceScaleFactor": 1,
+    "desktopIframe": [
+      500,
+      580
+    ],
+    "mobileIframe": [
+      390,
+      580
+    ]
+  },
+  "source": {
+    "viewerSha256": "89EB42771A3BCBD58A625E3C51C9987439D1D67F356AB9D42A790BA2EAAA8588",
+    "modelSha256": "3A88834F17AF8391DA6B0761F257FCE4E9DAD0923CA4B92ED1458C9C4B3ECD6E"
+  },
+  "results": {
+    "desktopChecks": 18,
+    "desktopPassed": 18,
+    "mobileChecks": 5,
+    "mobilePassed": 5,
+    "severityPixelsPassed": true,
+    "noWebGlErrorBridgePassed": true,
+    "desktopPageErrors": []
+  },
+  "allScopedChecksPassed": true,
+  "evidence": [
+    "desktop-report.json",
+    "mobile-report.json",
+    "no-webgl-report.json",
+    "severity-pixel-checks.json",
+    "desktop-initial.png",
+    "desktop-orbit.png",
+    "desktop-back-picked.png",
+    "desktop-rating-1.png",
+    "desktop-rating-9.png",
+    "desktop-rating-null.png",
+    "desktop-cleared.png",
+    "desktop-hindi-restored.png",
+    "mobile-390-initial.png",
+    "mobile-390-orbit.png",
+    "mobile-390-back-severity.png",
+    "mobile-390-no-webgl.png"
+  ],
+  "boundaries": [
+    "Keyboard region controls and no-WebGL usable controls live outside the iframe in app wrappers and were not served or tested here. Root/web agent must verify their integration.",
+    "Native error bridge was simulated only to verify shared JS emits its actual error; no Android WebView or physical-device interaction is claimed.",
+    "Point state restoration was verified through the public viewer API and QA parent state, not clinical record persistence.",
+    "The deliberate no-WebGL failure produces the expected renderer console error; it emits parent/native error and instructs use of body-area buttons.",
+    "No production/authenticated Chrome profiles or Play Console were used."
+  ],
+  "cleanup": {
+    "headlessBrowserClosed": true,
+    "browserPidsGone": [
+      31808,
+      7072
+    ],
+    "staticServerStopped": true,
+    "staticServerPid": 40316,
+    "port": 8796,
+    "onlyTaskOwnedProcessesStopped": true,
+    "hostCommitHeadroomBytesLastSample": 965742592
+  }
+}

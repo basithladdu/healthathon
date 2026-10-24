@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "capturedOn": "2026-10-24",
+  "source": "User-pasted WhatsApp continuations and two attached screenshots in this Codex chat",
+  "coverage": "Three supplied excerpts, including overlap and edited-message markers. Not a complete WhatsApp export. Names and wording are retained in the authorised private repository; no patient record is included.",
+  "rawText": [
+    "pasted-followup-part-1.txt",
+    "pasted-followup-part-2.txt",
+    "pasted-followup-part-3.txt"
+  ],
+  "images": [
+    {
+      "path": "original-symptom-list.jpg",
+      "sourceAttachment": "71AF74D0-9655-4C38-9767-A6BE84C7B076/1-Pasted-Image-1.jpg",
+      "meaning": "Original17-item proposed list, superseded by the following chat corrections. Byte-identical copy."
+    },
+    {
+      "path": "trend-reference.jpg",
+      "sourceAttachment": "15BAB2E5-7A67-4D0F-A9CF-2621BC9628A8/1-Pasted-Image-1.jpg",
+      "meaning": "Illustrative severity-over-time design reference. No patient measurements or sample values imported into the app. Byte-identical copy."
+    }
+  ],
+  "decisions": [
+    "Sujay corrected remove2 to remove3 Weight loss at18:02:25: keep Pain; retire Weight loss, Sleep disturbances, Dizziness and Irritability/restlessness from new choices, preserving existing records.",
+    "Add Diarrhoea, combine sore/dry mouth, add Overall well-being. Keep anxiety and depression/low-mood ratings distinct.",
+    "Use Shirin's reduced form as the intended skeleton; ESAS-r and IPOS are references, not a request to append all questionnaires or claim a validated hybrid.",
+    "Record baseline context once, allow quick severity follow-ups and optional details, retain actual observation/onset dates and graph real comparable entries.",
+    "Discussed frequency is optional/patient-led with24-hour routine cadence; exact clinical schedule remains unresolved. Do not block reporting a new or changing symptom with a hard24-hour lock.",
+    "User explicitly requested a rotatable open-source3D body model with tapped pain locations and colour reflecting the patient's actual severity rating."
+  ],
+  "missingInputs": [
+    "Shirin's final reduced form and its referenced second page were not attached in these messages. Do not invent their contents."
+  ],
+  "interpretation": "Implementation and clinical interpretation live separately in TEAM_HANDOFF.md and the existing symptom-tracker clinical brief. Text above does not establish clinical validation, treatment rules, medicine stock or legal validity.",
+  "files": [
+    {
+      "path": "pasted-followup-part-1.txt",
+      "bytes": 5007,
+      "sha256": "C216E1C994F1D237EB4D0E74BF5EEDC9AED063F734D71D2047649F328E715F81"
+    },
+    {
+      "path": "pasted-followup-part-2.txt",
+      "bytes": 3430,
+      "sha256": "9487A98F30AED026880FE92657D5A02CBF66F5C97940572398F52D3E32431716"
+    },
+    {
+      "path": "pasted-followup-part-3.txt",
+      "bytes": 497,
+      "sha256": "0F96D1EB90A5707D0A4138E3FB747690586CCF0E114EDF0ADF8882380665DE43"
+    },
+    {
+      "path": "original-symptom-list.jpg",
+      "bytes": 104905,
+      "sha256": "D86D57FE273CBC92A0992B04A450248454FFD7B4AABB9134B0EF1307C01670F8"
+    },
+    {
+      "path": "trend-reference.jpg",
+      "bytes": 91604,
+      "sha256": "D57951A6D6FC46B2345D44E52F28954849830FBC441F6ACDAD93BB1570071C95"
+    }
+  ]
+}

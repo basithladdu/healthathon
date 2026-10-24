@@ -1,0 +1,52 @@
+[10/24/26, 5:58:17 PM] Sujay H S IISC: Can remove 2, 11, 13, 17
+Add diarrhea
+Add sore mouth to dry mouth 
+Add overall well-being 
+
+There are two scores that you can model this on 
+ESAS-r
+IPOS
+[10/24/26, 5:59:26 PM] Shirin Ayub: Why not pain? I think its needed na
+[10/24/26, 5:59:54 PM] Shirin Ayub: Ill remove the rest👍
+[10/24/26, 6:02:25 PM] Sujay H S IISC: Sorry. I meant 3. Weight loss
+[10/24/26, 6:02:36 PM] Shirin Ayub: Okay ill remove that
+[10/24/26, 6:02:54 PM] Sujay H S IISC: This we can use to model the mood journal tool that we have or something like that. Others can weigh in
+[10/24/26, 6:03:01 PM] Sujay H S IISC: Thanks. Will check it out
+[10/24/26, 6:20:11 PM] Shirin Ayub: What I’ve come up with so far
+[10/24/26, 6:20:26 PM] Shirin Ayub: I’ve reduced the number of symptoms for it to not seem like a big task
+[10/24/26, 6:20:35 PM] Shirin Ayub: Please lmk if any changes
+[10/24/26, 6:25:12 PM] Shaik Abdul Basith: these look good.   how frequently should we take this?  daily? weekly? or only when the symptoms show up ‎<This message was edited>
+[10/24/26, 6:25:53 PM] Shaik Abdul Basith: got it.  will have a mix of it ‎<This message was edited>
+[10/24/26, 6:26:23 PM] Shirin Ayub: I actually dont know. Daily would be good but doesnt that seem like a big task?
+[10/24/26, 6:26:38 PM] ~ SVK: Weekly would be good
+[10/24/26, 6:26:49 PM] Shaik Abdul Basith: @⁨Awaiz⁩ check 2nd page 
+
+lets put the human body anatomy so that users can tap and show where the pain is and we will log it
+[10/24/26, 6:27:03 PM] Shirin Ayub: Weekly twice?
+[10/24/26, 6:27:04 PM] ~ SVK: Or it could open to the patient. Whenever they feel like they can update
+[10/24/26, 6:27:23 PM] ~ SVK: It doesn't burden any patient. They can decide na
+[10/24/26, 6:27:30 PM] Shirin Ayub: Yeah but there should be a minimum time period right before which they should update
+[10/24/26, 6:27:39 PM] ~ SVK: Once daily in that case
+[10/24/26, 6:27:44 PM] Shaik Abdul Basith: lmk final decision of frequency and which form 
+
+sujay sent 3
+shirin sent 1 form
+
+or do we mix all
+
+symptoms are overlapping so i guess we append all forms?
+[10/24/26, 6:28:46 PM] Shirin Ayub: Use mine, the ones sujay sent were examples of how we can put it in and measure it so you can use those as examples and use mine as a skeleton
+[10/24/26, 6:29:59 PM] Shirin Ayub: We need to decide how often we require them to fill it up though
+[10/24/26, 6:32:15 PM] ~ SVK: I think it should be optional and up to the patient
+[10/24/26, 6:32:27 PM] ~ SVK: Minimum duration 24 hours
+[10/24/26, 6:33:31 PM] Shirin Ayub: Okay
+[10/24/26, 6:36:55 PM] Sujay H S IISC: Great work
+Can it be made that initially it logs all the details and every day we don’t need all the details so just the severity would be every day and the rest of it can be a optional details under toggle headings which the patient can use if needed (compulsory only at baseline)
+
+We should also make sure the system logs the date at which each symptom was logged. So we can track when new symptoms come up 
+
+We should also be able to graphically trend the severity over time so the doctor can adjust meds
+[10/24/26, 6:37:12 PM] Shirin Ayub: Yess
+[10/24/26, 6:37:22 PM] Shirin Ayub: I was thinking the doctor can get a graph of it
+[10/24/26, 6:37:25 PM] Shirin Ayub: Something like
+[10/24/26, 6:37:36 PM] Sujay H S IISC: Exactly

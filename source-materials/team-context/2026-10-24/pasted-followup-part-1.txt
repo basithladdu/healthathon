@@ -1,0 +1,75 @@
+[10/23/26, 6:12:34 PM] Sujay H S IISC: So the discussion we had, we thought we should work on each tool.
+@⁨Shirin Ayub⁩ - Is there a specific tool you want to work on? I would be happy to discuss your thoughts and help you out with it.
+
+If you do not have a choice right now, I think the symptom tracker can be worked on from a clinical standpoint to make it both patient friendly and also give out clinically relevant information.
+
+Please do let me know
+[10/23/26, 6:13:29 PM] Sujay H S IISC: ....hospital name "and" address instead of "or"
+[10/23/26, 6:14:03 PM] ~ SVK: Hey where is the survey? Didn't find it
+[10/23/26, 6:14:15 PM] Sujay H S IISC: Ye wala
+[10/23/26, 6:14:53 PM] Sujay H S IISC: @⁨~SVK⁩ @⁨Shirin Ayub⁩ 
+Please do try out the survey today before these guys work on it more. Your inputs can be incorporated side by side
+[10/23/26, 6:16:27 PM] Shirin Ayub: Yes sure what work do you want me to put on it? Like you want me to come up w a list of symptoms they can choose from as a set of options?
+[10/23/26, 6:19:24 PM] Shirin Ayub: Okay ill ask my hospital people about the morphine and fill this out
+[10/23/26, 6:21:22 PM] ~ SVK: I'll go through in a while. Traveling
+[10/23/26, 6:23:45 PM] Sujay H S IISC: Correct. As I am thinking through it, I feel this part is going to be a little hard. You will have to really think through it 
+
+Maybe go through some palliative specific resources and see what symptoms are commonly tracked 
+
+Then I think for each symptom, at baseline, you will have to have a clinically relevant scale that the patient can use to quantify how bad it is. Then for follow up we can continue that scale and add if it is better than yesterday or worse than yesterday and by how much 
+
+
+See what you can come up with, and then we can talk about how to refine it. Because this is something subjective that we are trying to make a little objective - it’ll be hard
+
+Like pain - can use a VAS scale to quantify. But we might want to know what makes it worse - like movement and so on
+[10/23/26, 6:24:37 PM] Shirin Ayub: Okay sure
+[10/24/26, 11:33:52 AM] Shaik Abdul Basith: so we can do this for symptoms
+[10/24/26, 11:34:10 AM] Shirin Ayub: But theres no clinical notes we can get out of this, if we incorporate this under the symptom tracker it’ll be better instead of just generally feeling good or not
+[10/24/26, 11:34:13 AM] Shirin Ayub: Yeah
+[10/24/26, 11:34:27 AM] Shirin Ayub: Or are we doing this for mental health assessment?
+[10/24/26, 11:34:40 AM] Shirin Ayub: For the caretaker?
+[10/24/26, 11:36:33 AM] Shaik Abdul Basith: this is from patient interface so you guys tell us where to implement this and what symptoms to ask for
+
+such as pain nausea etc and we will put the tracker but i think this should be on patient side
+[10/24/26, 11:36:55 AM] Shirin Ayub: Okay
+[10/24/26, 4:53:05 PM] Sujay H S IISC: @⁨Shaik Abdul Basith⁩ @⁨Awaiz⁩ 
+
+Can you share the CARE thing?
+[10/24/26, 5:07:56 PM] Shaik Abdul Basith: Sujay, your SS Sparsh entry is saved. The survey changes you mentioned are live 
+
+https://sahara.wedevit.in/hospital-survey
+[10/24/26, 5:08:07 PM] Shaik Abdul Basith: Sending wait
+[10/24/26, 5:21:27 PM] Sujay H S IISC: Perfect
+@⁨~SVK⁩  @⁨Shirin Ayub⁩ 
+
+Please check this before we can send it out
+[10/24/26, 5:21:55 PM] ~ SVK: When do we plan to send this out?
+[10/24/26, 5:21:58 PM] ~ SVK: Tonight?
+[10/24/26, 5:24:31 PM] Shirin Ayub: Or are these too many
+[10/24/26, 5:25:16 PM] ~ SVK: Headache
+[10/24/26, 5:25:50 PM] ~ SVK: When we already have point 10, then point 11 is vague
+[10/24/26, 5:26:05 PM] Shirin Ayub: Okay
+[10/24/26, 5:26:20 PM] ~ SVK: 11 can instead be insomnia
+[10/24/26, 5:26:34 PM] Shirin Ayub: Yes
+[10/24/26, 5:30:03 PM] Shaik Abdul Basith: https://ohc.network/solutions/palliative-care
+[10/24/26, 5:30:07 PM] Shaik Abdul Basith: CARE is an existing healthcare platform that we can build on. It gives hospitals and care teams shared patient records, visits, forms, staff permissions and follow-ups. We can reuse that foundation and build the particular workflow Sahara needs. CARE overview⁠￼
+
+Imagine a patient receiving care at home. A nurse records a visit, a doctor reviews the patient’s needs, and someone is assigned the next follow-up. CARE keeps those people and records connected.
+
+Its palliative-care platform already includes:
+
+* Patient and caregiver records.
+* Care-team assignments and home visits.
+* Symptoms, medicine needs and caregiver concerns.
+* Referrals, care plans and follow-ups.
+* Dashboards showing overdue visits and service gaps.
+
+So there is substantial overlap with our work already. We need to identify what Sahara adds beyond another patient register. CARE’s palliative-care platform⁠￼
+[10/24/26, 5:58:17 PM] Sujay H S IISC: Can remove 2, 11, 13, 17
+Add diarrhea
+Add sore mouth to dry mouth 
+Add overall well-being 
+
+There are two scores that you can model this on 
+ESAS-r
+IPOS

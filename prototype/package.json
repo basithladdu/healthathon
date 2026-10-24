@@ -12,7 +12,8 @@
     "build": "vinext build",
     "build:next": "next build",
     "start": "vinext start",
-    "lint": "eslint . --ignore-pattern dist --ignore-pattern .next"
+    "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
+    "build:pain-body-viewer": "node scripts/build-pain-body-viewer.mjs"
   },
   "dependencies": {
     "@pdf-lib/fontkit": "^1.1.1",
@@ -38,10 +39,12 @@
     "@types/react-dom": "19.2.3",
     "@vitejs/plugin-react": "6.0.2",
     "@vitejs/plugin-rsc": "0.5.26",
+    "esbuild": "0.27.3",
     "eslint": "9.39.4",
     "eslint-config-next": "16.3.8",
     "react-server-dom-webpack": "19.2.6",
     "tailwindcss": "4.2.1",
+    "three": "0.186.0",
     "typescript": "5.9.3",
     "vinext": "1.0.0-beta.3",
     "vite": "8.0.13",

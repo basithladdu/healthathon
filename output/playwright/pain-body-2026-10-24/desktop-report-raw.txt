@@ -1,0 +1,247 @@
+### Result
+{
+  "desktop": [
+    {
+      "name": "Front torso chest",
+      "expected": "chest",
+      "actual": {
+        "type": "pick",
+        "site": "chest",
+        "point": {
+          "x": 0,
+          "y": 0.663,
+          "z": 0.479
+        }
+      },
+      "pass": true
+    },
+    {
+      "name": "Front patient left arm",
+      "expected": "left-arm",
+      "actual": {
+        "type": "pick",
+        "site": "left-arm",
+        "point": {
+          "x": 0.822,
+          "y": 0.494,
+          "z": -0.209
+        }
+      },
+      "pass": true
+    },
+    {
+      "name": "Front patient right arm",
+      "expected": "right-arm",
+      "actual": {
+        "type": "pick",
+        "site": "right-arm",
+        "point": {
+          "x": -0.822,
+          "y": 0.494,
+          "z": -0.209
+        }
+      },
+      "pass": true
+    },
+    {
+      "name": "Front patient left leg",
+      "expected": "left-leg",
+      "actual": {
+        "type": "pick",
+        "site": "left-leg",
+        "point": {
+          "x": 0.337,
+          "y": 0.222,
+          "z": 0.202
+        }
+      },
+      "pass": true
+    },
+    {
+      "name": "Front patient right leg",
+      "expected": "right-leg",
+      "actual": {
+        "type": "pick",
+        "site": "right-leg",
+        "point": {
+          "x": -0.31,
+          "y": 0.222,
+          "z": 0.202
+        }
+      },
+      "pass": true
+    },
+    {
+      "name": "Head",
+      "expected": "head",
+      "actual": {
+        "type": "pick",
+        "site": "head",
+        "point": {
+          "x": 0,
+          "y": 0.932,
+          "z": 0.406
+        }
+      },
+      "pass": true
+    },
+    {
+      "name": "Neck",
+      "expected": "neck",
+      "actual": {
+        "type": "pick",
+        "site": "neck",
+        "point": {
+          "x": 0,
+          "y": 0.823,
+          "z": 0.217
+        }
+      },
+      "pass": true
+    },
+    {
+      "name": "Orbit drag does not select",
+      "before": 7,
+      "after": 7,
+      "pass": true
+    },
+    {
+      "name": "Back torso upper back",
+      "expected": "upper-back",
+      "actual": {
+        "type": "pick",
+        "site": "upper-back",
+        "point": {
+          "x": 0,
+          "y": 0.66,
+          "z": -0.982
+        }
+      },
+      "pass": true
+    },
+    {
+      "name": "Back torso lower back",
+      "expected": "lower-back",
+      "actual": {
+        "type": "pick",
+        "site": "lower-back",
+        "point": {
+          "x": 0,
+          "y": 0.515,
+          "z": -0.911
+        }
+      },
+      "pass": true
+    },
+    {
+      "name": "Back patient left arm screen left",
+      "expected": "left-arm",
+      "actual": {
+        "type": "pick",
+        "site": "left-arm",
+        "point": {
+          "x": 0.799,
+          "y": 0.495,
+          "z": -0.451
+        }
+      },
+      "pass": true
+    },
+    {
+      "name": "Back patient right arm screen right",
+      "expected": "right-arm",
+      "actual": {
+        "type": "pick",
+        "site": "right-arm",
+        "point": {
+          "x": -0.799,
+          "y": 0.495,
+          "z": -0.451
+        }
+      },
+      "pass": true
+    },
+    {
+      "name": "Retap start",
+      "expected": "chest",
+      "actual": {
+        "type": "pick",
+        "site": "chest",
+        "point": {
+          "x": 0,
+          "y": 0.663,
+          "z": 0.479
+        }
+      },
+      "pass": true
+    },
+    {
+      "name": "Retap moved",
+      "expected": "chest",
+      "actual": {
+        "type": "pick",
+        "site": "chest",
+        "point": {
+          "x": 0.066,
+          "y": 0.647,
+          "z": 0.464
+        }
+      },
+      "pass": true
+    },
+    {
+      "name": "Retap same region moves persisted point without removing region",
+      "first": {
+        "site": "chest",
+        "x": 0,
+        "y": 0.663,
+        "z": 0.479
+      },
+      "second": {
+        "site": "chest",
+        "x": 0.066,
+        "y": 0.647,
+        "z": 0.464
+      },
+      "selected": [
+        "chest"
+      ],
+      "pass": true
+    },
+    {
+      "name": "Clear and exact marker restore",
+      "cleared": true,
+      "restored": {
+        "selected": [
+          "chest"
+        ],
+        "points": [
+          {
+            "site": "chest",
+            "x": 0.066,
+            "y": 0.647,
+            "z": 0.464
+          }
+        ],
+        "rating": null,
+        "hindi": false
+      },
+      "pass": true
+    },
+    {
+      "name": "Reject nonfinite marker state",
+      "actual": false,
+      "pass": true
+    },
+    {
+      "name": "Hindi status",
+      "actual": "घुमाने के लिए खींचें · दर्द की जगह छुएँ",
+      "pass": true
+    }
+  ],
+  "errors": []
+}
+### Ran Playwright code
+```js
+await page.evaluate('() => qaReport');
+```

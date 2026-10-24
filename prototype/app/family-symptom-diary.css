@@ -64,7 +64,7 @@
 .pain-body-view { margin-bottom: 8px; }
 .pain-body-view button:disabled { opacity: .5; cursor: default; }
 .pain-body-side-key, .pain-body-selection { color: #566b5e; font-size: 13px; line-height: 1.45; margin: 8px 0; }
-.pain-body-layout { display: grid; grid-template-columns: minmax(120px, 160px) minmax(0, 1fr); gap: 12px; align-items: center; }
+.pain-body-layout { display: grid; grid-template-columns: minmax(170px, 1fr) minmax(120px, .8fr); gap: 12px; align-items: center; }
 .pain-body-diagram { width: 100%; height: auto; overflow: visible; background: #f9fbf7; border-radius: 16px; }
 .pain-body-region { cursor: pointer; outline: none; }
 .pain-body-region path { fill: #d6dfd2; stroke: #6b8675; stroke-width: 1.5px; transition: fill 120ms; }
@@ -77,3 +77,18 @@
 .pain-body-selection { min-height: 20px; color: #174c3b; font-weight: 600; }
 @media (max-width: 400px) { .pain-body-layout { grid-template-columns: 125px minmax(0, 1fr); gap: 8px; } .pain-body-text-options button { padding: 8px 5px; } }
 @media (prefers-reduced-motion: reduce) { .pain-body-region path, .family-symptom-diary .symptom-rating-options button { transition: none; } }
+
+.pain-body-stage { position: relative; min-width: 0; }
+.pain-body-frame { display: block; width: 100%; height: 360px; border: 1px solid #d6dfd0; border-radius: 16px; background: #f7f9f4; }
+.pain-viewer-loading { position: absolute; top: 12px; left: 8px; right: 8px; margin: 0; font-size: 13px; text-align: center; }
+@media (max-width: 540px) { .pain-body-layout { grid-template-columns: 1fr; } .pain-body-frame { height: 350px; } .pain-body-text-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); } .pain-body-diagram { max-height: 350px; } }
+
+.symptom-trends { margin-top: 24px; border-top: 1px solid #d4ddd1; padding-top: 20px; }
+.symptom-trends h2 { margin: 0 0 12px; font-size: 20px; }
+.symptom-trend-contexts { margin: 12px 0; }
+.symptom-trend-contexts button { text-align: start; font-size: 12px; }
+.symptom-trend-chart { display: block; width: 100%; max-width: 760px; margin-top: 12px; background: #f9fbf7; border: 1px solid #d4ddd1; border-radius: 12px; }
+.symptom-trend-chart text { fill: #566b5e; font: 12px system-ui,sans-serif; }
+.symptom-trend-values { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 8px; max-height: 180px; overflow-y: auto; font-size: 12px; }
+.symptom-trend-values span { display: flex; gap: 8px; white-space: nowrap; }
+@media (max-width: 540px) { .symptom-note-footer > div { flex-wrap: wrap; } .symptom-trend-chart text { font-size: 18px; } }
