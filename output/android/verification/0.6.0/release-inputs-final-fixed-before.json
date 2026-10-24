@@ -1,0 +1,442 @@
+{
+  "capturedAtUtc": "2026-10-24T11:43:27.914021+00:00",
+  "baseCommit": "fac35137ce023f589c597bd28bbcbdc40ed691b6",
+  "inputs": [
+    {
+      "path": "android/app/build.gradle.kts",
+      "sha256": "C132B176F58026E6B7C4996FC26B1FD68089255121A98C536F97F7DEB8E323F4"
+    },
+    {
+      "path": "android/app/proguard-offline-speech.pro",
+      "sha256": "204FE6855F83CC9735C8E3D63B17C1E422C0270905F2F5B0F1D0BD27CCB54567"
+    },
+    {
+      "path": "android/app/schemas/in.wedevit.care.CareDatabase/1.json",
+      "sha256": "6DFBB908B6F903C1E1586DAFA989084E03802580BF9CA0EBC034FEC944646307"
+    },
+    {
+      "path": "android/app/schemas/in.wedevit.care.CareDatabase/2.json",
+      "sha256": "E4DDBFB12D6CD716F3F214C03359B56BD266267BFBD149645FA5C5BA1F714D22"
+    },
+    {
+      "path": "android/app/schemas/in.wedevit.care.CareDatabase/3.json",
+      "sha256": "C977C8C9F298A75397E177E664BA189DA17CDAABE1DB9B0BCEDB874E848D9E45"
+    },
+    {
+      "path": "android/app/schemas/in.wedevit.care.CareDatabase/4.json",
+      "sha256": "1483417ED4C512B79749284440064F4BAD084D45BA0954C2D65E5E6828485485"
+    },
+    {
+      "path": "android/app/schemas/in.wedevit.care.CareDatabase/5.json",
+      "sha256": "8BE062069E48B013160982E36D572CBA9EB124CAEF364B8D667B80D73FCB74C0"
+    },
+    {
+      "path": "android/app/schemas/in.wedevit.care.CareDatabase/6.json",
+      "sha256": "538EB3E72420BF20AC6C00C0D857CA76DE6F4C6C9CE7A76CD0D0254E80547A43"
+    },
+    {
+      "path": "android/app/src/main/AndroidManifest.xml",
+      "sha256": "8CCD95F7B5D9C66F9E1C365847105D843F05156E39EC95AC6130077BB73C3EBC"
+    },
+    {
+      "path": "android/app/src/main/assets/india-directory-sources.json",
+      "sha256": "91B046BD894AEC0397E33DD104F7DDBFE624CBFE2072DCCFE61819C4249F8F81"
+    },
+    {
+      "path": "android/app/src/main/assets/india.json",
+      "sha256": "FE797F9F8E0007EC861AEE630C753C2BC8D0FC60E25C1A34393204F3F0BD7B37"
+    },
+    {
+      "path": "android/app/src/main/assets/karnataka.json",
+      "sha256": "0871C5C454D109708280D20EC21814814866BFEB09062B48FAD0B34A0DE50522"
+    },
+    {
+      "path": "android/app/src/main/assets/offline-speech-NOTICE.txt",
+      "sha256": "56A3DE3E7D6643F598DADB4A1D551E841BDF7292F692C32418678B98A8D70649"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/CareAccount.kt",
+      "sha256": "F7C7556ACDC3E0771173267FD5D86282C1D688BD3C2CE700B2D8C7E4526434FD"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/CareBilingualOcr.kt",
+      "sha256": "3B1C2F7654777FD429F9BA5ED96B9454C7D7699FA46CA752B0B9F1E60D4593F4"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/CareCentreDirectory.kt",
+      "sha256": "900637DED89D254495C691B2A9F85BFD251D5D6FA48D56E227EA31917F941A6B"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/CareCloud.kt",
+      "sha256": "66F34530710A5E83405133B69A1EE8B4AA6774F09AD08DF43CFAA7253BEB6423"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/CareComponents.kt",
+      "sha256": "97CC396EDE21D19B0E0771CB4AF8326835C7400C094C1BC71B0A36A03B5B2DEC"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/CareData.kt",
+      "sha256": "A938D905BE0736E291BE8075DAD126DBEEF4118C084220E69F2AB62E4E9E1705"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/CareDocumentEvidence.kt",
+      "sha256": "372A4D51F4A378B7DEC35E1238426F05E7A97D88AC501A8C71097238185A4CCD"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/CareDocumentReader.kt",
+      "sha256": "0C2687CD5F16D14D0FD8CB6D7F905CD52257E95BB8E99DBD017F38C5A87C6BA4"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/CareDocumentReviewUi.kt",
+      "sha256": "DA938F68CE179934C26F9D6F80FEC51B14DCF4DCE2029BADAD68D0BBC816787F"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/CareDocuments.kt",
+      "sha256": "4DE23845E9378ACE1FC38D154696ECC51E030B9892E295B514A38D3D7E1970FC"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/CareDraftAssist.kt",
+      "sha256": "8765C9CA0B1884BC5DEA6DDAB52C1AE77CEBA6BB33C3084BBB52715D8876C61E"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/CareDraftAssistUi.kt",
+      "sha256": "8792CE5CB730094FE3C0D895DA379750FE70396954BB1A7AFA5D5EE4351665ED"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/CareEmailAvailability.kt",
+      "sha256": "444A606A823492D9771CE35AA295200803FC8B171BDAA0D27D12308E4103B62B"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/CareLabs.kt",
+      "sha256": "2BE3F0365C16801D0733DF0E6D65CF89EDA0B958E680410B737FBAC24329A2D7"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/CareModel.kt",
+      "sha256": "73586DB3669A9408B63A190425C08F24E3E12D9A5EC76B9E24CFBCEC9D41284B"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/CareOcrLines.kt",
+      "sha256": "7F18F4410AA11A94D39796353565F90F53803BECEC41A20AD2E27C10FD45122C"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/CareOfflineTranslation.kt",
+      "sha256": "464543A4B3878386A4A58DC26BDA42DE4AB5E67FC725562BBE6432970FDBF2D1"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/CareOfflineTranslationUi.kt",
+      "sha256": "85E248DDBCBC5D3FDB650BDE264D2DE3FA5BDE6BBE8854F19963AFC2805F1F71"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/CarePrescriptionText.kt",
+      "sha256": "E2F2FEB0A1B392DD781673ED1BFBC3847D7A56E088C91411C39C447FB91118DC"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/CareReminderRules.kt",
+      "sha256": "E6736FC07AFBA3AB7BEBCED93C7C207A4697EFFA00A8D5457F7B3608A1E24493"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/CareReminders.kt",
+      "sha256": "E20C887FFBE9B7C520A089D37EA6D77845416C37C941300C9BEFB680F749AD79"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/CareReminderUi.kt",
+      "sha256": "949B6C7F8063A7C295E94D7FC8A2A9C95C55EAE2C6D8EA96535C0EC090E451F4"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/CareRemoteAssist.kt",
+      "sha256": "23D84071BC5DC0E886E60C4BB8E4A693533D7C4C233B73B40E0E11E26BCA76EE"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/CareRemoteAssistUi.kt",
+      "sha256": "1E62F1F2B38C03D9BF6EB86F7B8E75ABA5CC86F9BA8F90615B8C8732ECD71BCE"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/CareReports.kt",
+      "sha256": "DE3CE6146D321A49CD65E010E77E12E61AABE443C1BCCDBA8FD0A45AD05B138F"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/CareSchedule.kt",
+      "sha256": "1421BB303D1F8B616E7DF863C9BCA40D2704DBE5F4EB9A3246DB790252C4F576"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/CareSharedCloud.kt",
+      "sha256": "43AD79AED14B63DC8815590A9F521C76DCF1E8B883F282AFAC8B6817EDA23EB0"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/CareSharedUi.kt",
+      "sha256": "F61537143E6C0DFCEBB81243A6FCBB6594CC9C609C03C21944D582321F7033CA"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/CareSpeech.kt",
+      "sha256": "18C92B26E48B3CE14F898F772D1F36128680B6FF13AF41ACDDE4A3086E7455F8"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/CareSymptomData.kt",
+      "sha256": "7FE646738BD243E0ED54E02950D8B3965DE652FFC854D57C1EFBEA58841E375C"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/CareSymptomUi.kt",
+      "sha256": "258F93BBDF23E52961D3A60316C5261BFD674EA862D053647C9A510F74B30726"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/CareTranslationRules.kt",
+      "sha256": "01325F310681FD2358CCB4EDBD8E8E07EB4E312087868AE5EBE9C434B3F05548"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/CareUi.kt",
+      "sha256": "741C8A3A0C92831B58235AC238B9785A075E6F8EB6A1D2D13E045D9FDDDCA0C6"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/CareWorkflow.kt",
+      "sha256": "2918DCC524755C1E661C5C9AC9F53B2C37295B8873549AAD2CCB5A69B6B5A966"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/CentreMap.kt",
+      "sha256": "966F5809E8E81AA1243B2DACA59610387C91A63B8553277AFD8F75653FC8DF68"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/ConversationTranscriber.kt",
+      "sha256": "0F18D1002893157E2125EEA31403C30E34507095099B58FC0113E995D5D79EA6"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/DoctorAiClient.kt",
+      "sha256": "4B701CA60361BBCC5EE4A9EE263C77571E5FE3D07B4198346075926D5CDD22A2"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/DoctorAudioCapture.kt",
+      "sha256": "E37B2A45DB993A5C61BB592BAA014E203CEAA79B05A024A6D27391B52D023EDE"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/DoctorAudioController.kt",
+      "sha256": "220A1EFFC6B2A28FF3F4C22F75B7EEE252B5371F446FCB721213E29088C91BC6"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/DoctorConversationsData.kt",
+      "sha256": "859D9DED05F950B64831FE14A6404D244E0B72B864BFA55848113212FFD8366B"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/DoctorConversationsUi.kt",
+      "sha256": "3C1DE7BD774347CC912F14373BBB1EA57158F5E3B4F525A4A9B987C3E5E0A7B6"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/DoctorDemoData.kt",
+      "sha256": "4B197A509781ADA833F5EC47DA8C61B04F7885582D2B1615570B20E78EC4ED8E"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/DoctorDemoStore.kt",
+      "sha256": "C5DD2D83903AD0C30EF04FC1D67D01298F16FB5E1C10C14BE1092B188B4BED6F"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/DoctorDemoUi.kt",
+      "sha256": "B5A1853FE01C306E08FCBC1B8611CE5656B36D9B54C429ED19118FBAB6A6CB4B"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/DoctorLocalPreviewCapture.kt",
+      "sha256": "E4817BF20DE4A72940199178DA55F602BCB30179D2C7A7F7E5D8359F040BA51A"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/DoctorMedicineUi.kt",
+      "sha256": "FC7F95AC3348A1FA36F9EEA428B639A2E487001502A875D4291D5ED4F53A3BE6"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/DoctorOverviewData.kt",
+      "sha256": "409FC3B1BBFBCAC35F19385E56360D94C1C659F7940CBCE6ED0ECB0BD8FB2CB7"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/DoctorOverviewUi.kt",
+      "sha256": "6A11762CF27E7E25ABD1B38F4E30FCBCAADB510FECBF92E17CD820A1AD4C1CD4"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/DoctorPatientHubUi.kt",
+      "sha256": "CC2B13590E1B23792AE93CAA9A30D9215F5E720395AE24E063E4052A462092E2"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/DoctorPatientTracking.kt",
+      "sha256": "B1BD5DCF11BA0D3B21F70E0250365A8F18DFA23E20FC4967B7BD6DAB053D7E86"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/DoctorProgressData.kt",
+      "sha256": "0872E81B0024482ACC4163215AD4037640895CCB88CE1B103760B69E0A914334"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/DoctorProgressUi.kt",
+      "sha256": "914E2E41567951DA32844C4462770A6F344E92DCA5FFFE5348BF354EAB220042"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/DoctorRecordingReviewUi.kt",
+      "sha256": "F3D482B27EB18F57FB7C91E0BDDEEBC280E358187A3F4A9DFFFB5908FF74E079"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/DoctorReportsData.kt",
+      "sha256": "EBB617BDC8B09D73DB612DD5DD79907FFDCF7B7B769E48A0B2F7266BD312E68D"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/DoctorReportsUi.kt",
+      "sha256": "58F51D5C2DDC5010733912ABA2964B60ED576E79C0B86BFDC7F3726D5C8913AC"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/DoctorWorkflowData.kt",
+      "sha256": "CC9E795E43FB97AB0D913BD4CCA52C35546A2D38E9617820C8715BC30EB89A53"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/DoctorWorkflowPdf.kt",
+      "sha256": "E0613314E9D56E9CB38EED7AFE161EB9401A67BE390731364E1F74E55CD22626"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/DoctorWorkflowStore.kt",
+      "sha256": "D9E9BB626585B870EDB4895CA93877C6D3C18D2B79106C76555702C4E87C3ABE"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/DoctorWorkflowUi.kt",
+      "sha256": "BB2C0D04D95B341CEEBBC0AF7A4B3AAFA9D47FDF70B35BC8541A192253DE9A1E"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/FeedbackData.kt",
+      "sha256": "5E255D0E47A3FDDE54CB5C4F7F8DDFD020138AC4E4656BCA0F4BC2B91BA80A53"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/FeedbackStore.kt",
+      "sha256": "62E16BE0B9B11D6BEA01C08DDC1FF75205F049E7E8DAFD5AA3D9B118369343D7"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/FeedbackUi.kt",
+      "sha256": "B9B4F33DCA0275B03277D66DC8FC05FDB22F10985D64E746055B2651029B8461"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/MainActivity.kt",
+      "sha256": "40863C3336AE181DE1DF08CEF41CF9D023861C38623DBA98D568C8016F409D05"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/MedicineOrganizer.kt",
+      "sha256": "6E0A4B88EFFFD83537D3DB83820CF454DD2D13D92D107817053E21963B374763"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/MedicineScanner.kt",
+      "sha256": "457CFB75D7AE63943E51A379939338B5DBA323B51776AB1394F419D274D75ED8"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/MedicineSourceStore.kt",
+      "sha256": "12E5AF68CEF5AE6718F7708ED55538D3C70236328FC1089C9B07B72E0BF97430"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/OfflineAudioDecoder.kt",
+      "sha256": "4F4453546CB7F1B10D1DFA050EA5F1FD3187451657A406DF56A09CCA67DED3C6"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/OfflineConversationTranscriber.kt",
+      "sha256": "9C4A00C001F46398CD310E269A1B9B6F0DA50196F2601B3491FE974EDFD93937"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/OfflineSpeechModelStore.kt",
+      "sha256": "C0CF297B3115F762D315FBDF7542154504820A5748C8C05499A036A691B84142"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/OfflineSpeechRules.kt",
+      "sha256": "A0B95D8E6D461436391F17A9C38F2134E476AC758E14AA16427FD2B4AB9DE0C3"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/OfflineSpeechSegmenter.kt",
+      "sha256": "7FA82E764609EAEA334AFCF515BF948F996B303BA8F06F665473A6712209448E"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/OfflineSpeechUi.kt",
+      "sha256": "0AE9B96C892DB4D01976630663155A15BA286E8733E28735AE6E55203AA92C0F"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/PatientDoctorUi.kt",
+      "sha256": "72CD1E020FFD54FE31795DF3614CD2C5158E1A5C72EAA970F9019EACDB3E59F0"
+    },
+    {
+      "path": "android/app/src/main/java/in/wedevit/care/SaharaPalette.kt",
+      "sha256": "14304399FFB148858909C922BCAD666CB8EFE42DA754BE4B2CAA775D4B28D3FB"
+    },
+    {
+      "path": "android/app/src/main/res/drawable/conversation.jpg",
+      "sha256": "D6A2C0DBBA94712CE5E0F2830678E427A077638F50C0057151C1B2EC0C04A77F"
+    },
+    {
+      "path": "android/app/src/main/res/drawable/doctor_login_mascot.png",
+      "sha256": "700BAAAACB9BEBC8DA9120C3B2835B265FB9B4975902A40A610121A11E3B3F4E"
+    },
+    {
+      "path": "android/app/src/main/res/drawable/ic_care.xml",
+      "sha256": "7A9C518EBBA98FE694DD21D64AFDC809603C51201CA1EB8D6EFC0946C4EFDDCF"
+    },
+    {
+      "path": "android/app/src/main/res/drawable-nodpi/google_translate_attribution.png",
+      "sha256": "13BA2624DD65B0BD00B41CF775DF73F5A1D6C898C78EA7675485DC8B10715380"
+    },
+    {
+      "path": "android/app/src/main/res/drawable-nodpi/sahara_professional_logo.png",
+      "sha256": "5C92F991A7C2D56D475F9E844D05FD4BB5BEABBE60CD99BA0AF72357F6B44D3C"
+    },
+    {
+      "path": "android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml",
+      "sha256": "1E11A395CEC1E7786EB3732788931FB6CB273DB83AF6DDC1E2B44651BDB0BF23"
+    },
+    {
+      "path": "android/app/src/main/res/values/colors.xml",
+      "sha256": "C7A487F1114528D5D0C44BC3DB3A1C6A734FC2D9C5EBD9B43D4304395F175A48"
+    },
+    {
+      "path": "android/app/src/main/res/values/strings.xml",
+      "sha256": "85D73A963CB1B9EE5066DB6AF4ADB7482B55401F6D1A7DC2CFE6A2D3A1AD3E47"
+    },
+    {
+      "path": "android/app/src/main/res/values/styles.xml",
+      "sha256": "9E9F45AF2E1432F4B9A45049B6F4725657B68C464FB57F4FA55B77B244568405"
+    },
+    {
+      "path": "android/app/src/main/res/values-v27/styles.xml",
+      "sha256": "9DDD1C5B049CAD290CAE75BDA3BAD4B551E574AE581408BAE74646F3B1973F70"
+    },
+    {
+      "path": "android/app/src/main/res/xml/backup_rules.xml",
+      "sha256": "6235C99AEEDC4702F2738276DFE65A70523CFD7F8796E29F7054B5B332135F2D"
+    },
+    {
+      "path": "android/app/src/main/res/xml/data_extraction_rules.xml",
+      "sha256": "8BE827692B21716F2B24280CCF1970ED9BB9768BC8FD7B59AB30C7E4A37EF489"
+    },
+    {
+      "path": "android/app/src/main/res/xml/medicine_file_paths.xml",
+      "sha256": "0440C969FD462819D681A310876AEA246515ADD8C2D6894DAF720693FD9DCE0A"
+    },
+    {
+      "path": "android/build.gradle.kts",
+      "sha256": "619BFDCC691031773611873BBE8EFC0AD09921C25416FBA23AF6538AB34122C3"
+    },
+    {
+      "path": "android/gradle/wrapper/gradle-wrapper.jar",
+      "sha256": "76805E32C009C0CF0DD5D206BDDC9FB22EA42E84DB904B764F3047DE095493F3"
+    },
+    {
+      "path": "android/gradle/wrapper/gradle-wrapper.properties",
+      "sha256": "7E0821D895908883350587C74476B717016AB416320C44DC82A10DEF916C6FB5"
+    },
+    {
+      "path": "android/gradle.properties",
+      "sha256": "954613EDFF6FF22F8C97D5475A21E00F347411B4472BC38D66FB5ED0E599C09B"
+    },
+    {
+      "path": "android/gradlew",
+      "sha256": "8CD81D7A40A14119B8E9E64647E02822B3511E9E4A536AB92C88DAA3B0E170BC"
+    },
+    {
+      "path": "android/gradlew.bat",
+      "sha256": "07A4BB3EC77DCC9F4B486423E6EC45F4D7D9523787B95681726C30DBBA3079CD"
+    },
+    {
+      "path": "android/settings.gradle.kts",
+      "sha256": "192A97EE6B5B7624AE8C458FB8DFD29E39A52A07CE412B41B7C2F2A6D0C87AE4"
+    },
+    {
+      "path": "android/sherpa-offline.gradle",
+      "sha256": "E882017569FE5C46C156DBDA2AD6E8935B9CFB7542D2567A5FAB2F26E3F104C1"
+    }
+  ],
+  "inputManifestSha256": "90D73D40801C25EEFB1E5FFDB7424E46A99CBBA830497E5B7EBE63134E45452D",
+  "excludes": "Private signing config, local SDK paths, credentials, caches and test fixtures are not exported.",
+  "sourceCommit": "e906f8ef21ca2ae93441170effbc2f2b1c4a6e18",
+  "note": "Pinned final native inputs include nullable-token compile correction and original-revision lost-update guard."
+}

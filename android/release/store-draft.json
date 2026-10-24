@@ -277,7 +277,7 @@
       "unitErrors": 0,
       "unitSkipped": 0,
       "newSymptomRulesTests": 9,
-      "evidenceStatus": "Prior156-test/debug-install evidence predates the final stale-edit fix810c4f9. Fresh verification of the fixed source is pending; no new UI device pass.",
+      "evidenceStatus": "Prior156-test/debug-install evidence predates final stale-edit guard and Compose compile fix. Current e906f8e verification is running; no new pass claimed.",
       "instrumentationKotlinCompiled": true,
       "newSymptomUiCasesCompiled": 5,
       "deviceUiCasesExecuted": 0,
@@ -297,21 +297,22 @@
       "bytes": 302360589,
       "sourceBoundary": "Earlier91a6871 source, before810c4f9 stale-edit fix; preserve as historical installation, not current fixed-source runtime evidence."
     },
-    "browserBlocker": "After recovery the browser control tool was unavailable; official Windows Computer Use fallback stopped because it could not determine the browser URL confidently enough to enforce policy. No more UI actions were taken. Production draft3 and saved Data safety remain; signed bundle upload, listing/reviewer/health updates and review submission are still pending.",
+    "browserBlocker": "Restored CUA documentation loaded, but its first browser inventory timed out and reset before any tab URL/profile was established. No further UI action or new store change. Existing draft3 remains without upload/submission; matching listing/reviewer/Other info/health changes pending.",
     "buildProcess": {
-      "status": "One bounded768MiB post-fix unit/debug/instrumentation-compile retry is running after diagnosed384MiB Kotlin heap exhaustion. Final signed APK/AAB remains unverified.",
+      "status": "Final768MiB checks running after one-line Compose nullable-token compile correction. No final signed artifact verified.",
       "exitReceipt": "output/android/verification/0.6.0/release-build-exit-1024.json",
       "log": "output/android/verification/0.6.0/release-build-detached-1024-2026-10-24.log",
-      "sourceInputs": "output/android/verification/0.6.0/release-inputs-before.json",
-      "inputFingerprint": "56DF09A1C926BBEB1809A534D6936326A0ED4033E8DFEF6D48B84B859CD1933D",
-      "sourceCommit": "810c4f93fe212d29b3b2d6772dbbae6e0356f6b5",
+      "sourceInputs": "output/android/verification/0.6.0/release-inputs-final-fixed-before.json",
+      "inputFingerprint": "90D73D40801C25EEFB1E5FFDB7424E46A99CBBA830497E5B7EBE63134E45452D",
+      "sourceCommit": "e906f8ef21ca2ae93441170effbc2f2b1c4a6e18",
       "priorAttemptExit": "output/android/verification/0.6.0/release-build-exit.json",
       "memoryRecoveryEvidence": "output/android/verification/0.6.0/release-memory-recovery.json",
       "finalDebugFailureReceipt": "output/android/verification/0.6.0/final-debug-build-exit.json",
-      "finalDebugReceipt": "output/android/verification/0.6.0/final-debug-build-exit-768.json",
-      "finalDebugLog": "output/android/verification/0.6.0/final-debug-768-2026-10-24.log"
+      "finalDebugReceipt": "output/android/verification/0.6.0/final-debug-fixed-build-exit.json",
+      "finalDebugLog": "output/android/verification/0.6.0/final-debug-fixed-768-2026-10-24.log"
     },
-    "sourceCommit": "810c4f93fe212d29b3b2d6772dbbae6e0356f6b5"
+    "sourceCommit": "e906f8ef21ca2ae93441170effbc2f2b1c4a6e18",
+    "browserRecoveryEvidence": "output/android/verification/0.6.0/play-browser-resume-2026-10-24.json"
   },
   "productionRelease": {
     "version": "0.5.0",
