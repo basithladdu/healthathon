@@ -1,5 +1,5 @@
 {
-  "status": "Production0.5.0(6) remains last verified public release. Existing0.6.0(7)Productionrelease3 uploaded and prepared; user now explicitly requests submissionas-is. Quick checks passed; actual submission not yet confirmed while owner-session refresh requires password/passkey. Backend migrations now applied/verified. All59 older invitations remain complete; do not resend.",
+  "status": "Production 0.5.0 (6) remains the last verified public release. Google recorded all four changes for Production 0.6.0 (7), release 3, sent for review at 2026-10-24T17:52:49Z. Quick checks completed; Publishing overview and submission activity 7 confirm In review. Approval/publication and corrected native interaction are not established. Backend migrations are applied/verified. All 59 previous invitations remain complete; do not resend.",
   "preparedOn": "2026-10-10",
   "workingTitle": "Sahara: Palliative Companion",
   "fullProductName": "Sahara — A Palliative Care Companion",
@@ -327,9 +327,9 @@
     "built": true,
     "ready": false,
     "uploaded": true,
-    "submitted": false,
-    "installed": false,
-    "status": "Existing0.6.0(7)Productionrelease3 preview saved; all4 changes prepared. User explicitly directs submit current as-is. Google quick checks passed, but repeated documented confirmation actions have not yet produced a recorded submission. Owner-session recovery is at Google password/passkey check. Backend updates are now applied/verified; native interaction remains unverified.",
+    "submitted": true,
+    "installed": true,
+    "status": "Google confirmed 4 changes sent for review for existing Production 0.6.0 (7), release 3, at 2026-10-24T17:52:49Z. Quick checks completed; Publishing overview shows Changes in review and submission activity 7 is In review. Owner/session verification is complete. Backend updates are applied/verified; corrected native interaction remains unverified. This is submission confirmation, not approval or publication.",
     "playDraft": {
       "trackId": "4697314269892725425",
       "releaseId": 3,
@@ -339,11 +339,11 @@
       "uploadTransferCompleted": true,
       "bundleProcessing": false,
       "bundleUploaded": true,
-      "submitted": false,
+      "submitted": true,
       "uploadFile": "output/android/Sahara-0.6.0-24Oct-anatomy-sizing-fixed-release.aab",
       "uploadSha256": "71CCB15901C69FB37BC52B7BFF243B8CC1F841B09CFCCCFF126476FAD5285B7B",
       "uploadObservedAtUtc": "2026-10-24T15:32:03.524153+00:00",
-      "uploadStatus": "0.6.0 (7) uploaded once and processed; final preview saved to Publishing overview with four changes ready. Google quick checks completed. Review submission is NOT recorded.",
+      "uploadStatus": "0.6.0 (7) uploaded once and processed; final preview saved to Publishing overview. Google confirmed all four changes sent for review at 2026-10-24T17:52:49Z. Quick checks completed; formal review is In review.",
       "processedBundleConfirmed": true,
       "savedAsDraft": true,
       "proof": "output/android/verification/0.6.0/play-production-060-draft-saved.png",
@@ -352,14 +352,28 @@
       "previewWarning": "Significant APK download-size increase; nonblocking. Native symbols/ReTrace attached.",
       "previewConfirmed": true,
       "finalPreviewSaved": true,
-      "savedToPublishingOverview": true
+      "savedToPublishingOverview": true,
+      "submissionObservedAtUtc": "2026-10-24T17:52:49Z",
+      "submissionProof": "output/android/verification/0.6.0/play-production-060-submitted.png",
+      "submissionReceipt": "output/android/verification/0.6.0/play-production-060-current-submission-attempt.json",
+      "submittedChangeCount": 4,
+      "publishingOverviewStatus": "Changes in review",
+      "reviewStatus": "In review",
+      "quickChecksStatus": "completed",
+      "submissionActivityId": 7,
+      "submissionActivityRecordedAt": "24 October 2026, 11:22 PM IST",
+      "submissionActivitySections": [
+        "Production",
+        "Store Listing",
+        "App Content"
+      ]
     },
     "releasePrerequisites": [
-      "User explicitly authorised submitting this existing candidate as-is; native verification remains a follow-up limitation, not a renewed discretionary hold.",
-      "Complete existing-owner Google session verification and record actual Changes in review/submission activity for existingrelease3; no new upload or release.",
-      "Both reviewed backend migrations are now applied/verified on actualCareCloud; do not apply again or request reconnect based on historical wrong-target denial.",
-      "Keep listing/health/Data safety and reviewer disclosures accurate; no cloudAI/provider/billing/clinical grant/auth callback changes.",
-      "Once review is recorded, do not withdraw,duplicate,resubmit or replace this version while pending."
+      "Google has recorded this existing release as In review after completed quick checks. Monitor the actual review decision; do not claim approval or publication.",
+      "Do not upload again, create a duplicate release, withdraw, replace or resubmit Production release 3 while queued or in review.",
+      "Both reviewed backend migrations are applied/verified on actual CareCloud. Do not apply again or request reconnect based on the historical wrong-target denial.",
+      "Corrected native interaction, physical-device and 16 KB runtime verification remain unverified follow-up limitations. The user explicitly authorised this submitted candidate as-is.",
+      "Keep listing, health, Data safety and reviewer disclosures accurate. Do not enable cloud patient AI, create billing, grant clinical roles or change authentication callbacks."
     ],
     "disclosures": {
       "sourceAudit": "output/android/verification/0.6.0/release-disclosure-audit.json",
@@ -462,7 +476,7 @@
       "bytes": 302360589,
       "sourceBoundary": "Earlier91a6871 source, before810c4f9 stale-edit fix; preserve as historical installation, not current fixed-source runtime evidence."
     },
-    "browserBlocker": "Google owner-session recovery requires the account owner password/passkey in open Chrome. No credential is requested in chat; existing Console confirmation closed without a recorded submission.",
+    "browserBlocker": null,
     "buildProcess": {
       "status": "Corrected asset packaging completed exit0; APK/AAB signatures, same signer, identity, source parity and static16KB checks verified. Fresh runtime pending.",
       "exitReceipt": "output/android/verification/0.6.0/anatomy-sizing-fixed-build-exit.json",
@@ -532,7 +546,7 @@
       "historicalDenialCorrection": "Original denied apply targeted separate disabled transcription endpoint kjnhtakqzboayqorrlue; not CareCloud. Historical evidence preserved. No reconnect/write-permission user action remains for actual CareCloud.",
       "userActionPending": null
     },
-    "lastEvidenceReconciledAtUtc": "2026-10-24T17:44:09.773602+00:00",
+    "lastEvidenceReconciledAtUtc": "2026-10-24T17:54:25.066874+00:00",
     "supersededSignedBuildBeforeViewportFix": {
       "apk": "output/android/Sahara-0.6.0-24Oct-anatomy-history-release.apk",
       "bundle": "output/android/Sahara-0.6.0-24Oct-anatomy-history-release.aab",
@@ -569,7 +583,7 @@
       "newBundleUploadRequired": false
     },
     "currentSubmissionAttempt": {
-      "observedAtUtc": "2026-10-24T17:44:09.773602+00:00",
+      "observedAtUtc": "2026-10-24T17:53:51.527865+00:00",
       "version": "0.6.0",
       "versionCode": 7,
       "track": "Production",
@@ -587,32 +601,57 @@
       ],
       "reviewerInstructionsSaved": true,
       "quickChecksCompleted": true,
-      "actualObservedStatus": "Changes not yet submitted for review; Your changes can now be sent for review.",
-      "submitted": false,
+      "actualObservedStatus": "Changes in review; Your changes are now in review. We may find additional issues when reviewing your app.",
+      "submitted": true,
       "published": false,
-      "confirmationInteractions": 5,
+      "confirmationInteractions": 7,
       "attemptedMethods": [
         "DocumentedEnterconfirmation",
         "Documentedbuttonclick",
         "FreshpageSpaceconfirmation",
         "DirectChromeaccessibilityclick",
-        "DirectChromecoordinateclick"
+        "DirectChromecoordinateclick",
+        "DocumentedbuttonclickAfterUserReportedSignIn",
+        "DocumentedbuttonclickAfterExactOwnerVerification"
       ],
-      "submissionActivityLatestRecordedId": 6,
-      "newSubmissionActivityRowObserved": false,
+      "submissionActivityLatestRecordedId": 7,
+      "newSubmissionActivityRowObserved": true,
       "noBundleReupload": true,
       "noNewReleaseCreated": true,
-      "rootCauseOfUnrecordedSubmission": "Unconfirmed. Confirmation closes without new submission activity. No console error was captured.",
-      "recovery": "FreshConsolepage and existing-owner login refresh. Google asks for password/passkey; user asked to complete it in openChrome, no credentials in chat.",
-      "ownerRefreshRequiresHumanInput": true,
+      "rootCauseOfUnrecordedSubmission": "Not conclusively established. Earlier confirmations had no receipt; submission succeeded after the exact owner verification was completed.",
+      "recovery": "User completed the exact existing Play owner verification. The next normal saved-release confirmation produced a Google receipt and Submission ID 7. Initial quick checks then completed and formal in-review status was observed.",
+      "ownerRefreshRequiresHumanInput": false,
       "otherSignedInAccount": "Existing alternate Devit account has no developer account access; no account created or permission changed.",
-      "proof": "output/android/verification/0.6.0/play-production-060-submit-unconfirmed.png",
+      "proof": "output/android/verification/0.6.0/play-production-060-submitted.png",
       "backendNowApplied": "output/android/verification/0.6.0/backend-corrected-target-current-result.json",
       "nativeInteractionVerified": false,
-      "instruction": "Continue existing release after owner verification, inspect actual recorded status, do not claim submission from button click alone.",
-      "proofSha256": "0499652A7A31FA61B6725B8689F3A48F13A3DB4C5B7E229E307EBFA2FDB665D4"
+      "instruction": "Existing Production release 3 is formally in review as submission 7. Do not upload, withdraw, duplicate, replace or resubmit while pending. Approval/publication and native runtime verification remain separate.",
+      "proofSha256": "F739E7229D3604B6FC36A1464EB8B8221C40CDF73C26EA72BAE673762BDE99D3",
+      "diagnosticLimit": "Read-only CDP diagnostics unavailable while Browser Use was resolving a paused document response; no network replay, hidden endpoint or bypass used.",
+      "submittedAtUtc": "2026-10-24T17:52:49Z",
+      "confirmationToast": "4 changes sent for review",
+      "submissionActivityDisplayedTime": "Oct 24, 2026, 11:22 PM IST",
+      "ownerVerificationCompleted": true,
+      "previousUnconfirmedProof": "output/android/verification/0.6.0/play-production-060-submit-unconfirmed.png",
+      "submissionActivityProof": "output/android/verification/0.6.0/play-production-060-submission-activity.png",
+      "submissionActivityProofSha256": "6C7BB169C4BADE9C7BB90A7CF7E5FFC8DCB178642541D8823565DD57228D025C"
     },
-    "releaseReadyUnderKnownLimitations": false
+    "releaseReadyUnderKnownLimitations": false,
+    "currentPhysicalDeviceInstall": {
+      "receipt": "output/android/verification/0.6.0/user-device-current-signed-install.json",
+      "installed": true,
+      "installedAtUtc": "2026-10-24T17:54:43.662202+00:00",
+      "device": "Samsung A34 (SM_A346E)",
+      "package": "in.wedevit.sahara",
+      "version": "0.6.0",
+      "versionCode": 7,
+      "apkSha256": "8FD9A63C870CA70AE67133A96A1AB130AF8BE0785F6DE5AEA471944E26C6F513",
+      "normalLaunchConfirmed": true,
+      "dataCleared": false,
+      "uninstalled": false,
+      "clinicalOr3dInteractionTested": false,
+      "verificationScope": "Signed APK installed and one MainActivity launch confirmed. User will inspect the feature flow; no native interaction, backend end-to-end or16KB runtime pass is inferred."
+    }
   },
   "productionRelease": {
     "version": "0.5.0",

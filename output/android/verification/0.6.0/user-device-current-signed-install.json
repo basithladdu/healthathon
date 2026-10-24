@@ -1,0 +1,54 @@
+{
+  "startedAtUtc": "2026-10-24T17:54:23.109740+00:00",
+  "finishedAtUtc": "2026-10-24T17:54:43.662202+00:00",
+  "status": "installed_and_version_verified",
+  "apk": "output/android/Sahara-0.6.0-24Oct-anatomy-sizing-fixed-release.apk",
+  "expectedApkSha256": "8FD9A63C870CA70AE67133A96A1AB130AF8BE0785F6DE5AEA471944E26C6F513",
+  "package": "in.wedevit.sahara",
+  "versionName": "0.6.0",
+  "versionCode": 7,
+  "physicalDevice": true,
+  "dataCleared": false,
+  "uninstalled": false,
+  "downgradeRequested": false,
+  "developmentBuildSubstituted": false,
+  "clinicalFlowExercised": false,
+  "runtimeTestsClaimed": false,
+  "serialStoredPrivatelyOnly": true,
+  "deviceModel": "SM_A346E",
+  "apkSha256": "8FD9A63C870CA70AE67133A96A1AB130AF8BE0785F6DE5AEA471944E26C6F513",
+  "apkSignerCertificateSha256": "607D227A8B25BF7126BBCD742110BBBA26F8BA9D75A2F47917013E9589341AD2",
+  "sourceManifest": {
+    "name": "in.wedevit.sahara",
+    "versionCode": "7",
+    "versionName": "0.6.0"
+  },
+  "installedBefore": {
+    "versionCode": 4,
+    "versionName": "0.4.0"
+  },
+  "existingPackagePresent": true,
+  "installAdbExitCode": 0,
+  "installOutput": "Performing Streamed Install\r\nSuccess",
+  "installSucceeded": true,
+  "installedAfter": {
+    "versionCode": 7,
+    "versionName": "0.6.0"
+  },
+  "normalLaunch": {
+    "Status": "ok",
+    "Activity": "in.wedevit.sahara/in.wedevit.care.MainActivity",
+    "LaunchState": "COLD",
+    "TotalTime": "1309",
+    "WaitTime": "1319",
+    "adbExitCode": 0,
+    "requested": true,
+    "activityStartConfirmed": true
+  },
+  "productionPackagePathReturnedInShellDefaultProfile": false,
+  "preExistingInstallationInAnotherDeviceProfile": true,
+  "preInstallSignerInspection": "Exact source APK signature and signer verified. Existing app metadata was present in another device profile; shell default profile returned no APK path. No installed APK was pulled. Android accepted adb install -r under its signature enforcement.",
+  "installedApkPulled": false,
+  "verificationScope": "Exact source hash and signature, installed package version0.6.0/code7, and one normal MainActivity launch only. No symptom/3D/clinical/runtime tests performed.",
+  "receiptAuditedAtUtc": "2026-10-24T17:56:01.306350+00:00"
+}
