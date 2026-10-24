@@ -343,7 +343,7 @@
       "uploadFile": "output/android/Sahara-0.6.0-24Oct-anatomy-sizing-fixed-release.aab",
       "uploadSha256": "71CCB15901C69FB37BC52B7BFF243B8CC1F841B09CFCCCFF126476FAD5285B7B",
       "uploadObservedAtUtc": "2026-10-24T15:32:03.524153+00:00",
-      "uploadStatus": "Processed7(0.6.0), Save as draft confirmed Changes saved; returned from preview with persisted artifact. No final previewSave/review submission.",
+      "uploadStatus": "0.6.0 (7) uploaded once and processed; final preview saved to Publishing overview with four changes ready. Google quick checks completed. Review submission is NOT recorded.",
       "processedBundleConfirmed": true,
       "savedAsDraft": true,
       "proof": "output/android/verification/0.6.0/play-production-060-draft-saved.png",

@@ -1,5 +1,5 @@
 {
-  "observedAtUtc": "2026-10-24T17:44:09.773602+00:00",
+  "observedAtUtc": "2026-10-24T17:51:05.504189+00:00",
   "version": "0.6.0",
   "versionCode": 7,
   "track": "Production",
@@ -20,25 +20,27 @@
   "actualObservedStatus": "Changes not yet submitted for review; Your changes can now be sent for review.",
   "submitted": false,
   "published": false,
-  "confirmationInteractions": 5,
+  "confirmationInteractions": 6,
   "attemptedMethods": [
     "DocumentedEnterconfirmation",
     "Documentedbuttonclick",
     "FreshpageSpaceconfirmation",
     "DirectChromeaccessibilityclick",
-    "DirectChromecoordinateclick"
+    "DirectChromecoordinateclick",
+    "DocumentedbuttonclickAfterUserReportedSignIn"
   ],
   "submissionActivityLatestRecordedId": 6,
   "newSubmissionActivityRowObserved": false,
   "noBundleReupload": true,
   "noNewReleaseCreated": true,
   "rootCauseOfUnrecordedSubmission": "Unconfirmed. Confirmation closes without new submission activity. No console error was captured.",
-  "recovery": "FreshConsolepage and existing-owner login refresh. Google asks for password/passkey; user asked to complete it in openChrome, no credentials in chat.",
+  "recovery": "After user reported Signed in, one resumed confirmation still did not record submission. The earlier verification screen showed the alternate signed-in account. Recovery now explicitly selects the actual Play owner and shows its Welcome/password or passkey screen; human completion is pending.",
   "ownerRefreshRequiresHumanInput": true,
   "otherSignedInAccount": "Existing alternate Devit account has no developer account access; no account created or permission changed.",
   "proof": "output/android/verification/0.6.0/play-production-060-submit-unconfirmed.png",
   "backendNowApplied": "output/android/verification/0.6.0/backend-corrected-target-current-result.json",
   "nativeInteractionVerified": false,
   "instruction": "Continue existing release after owner verification, inspect actual recorded status, do not claim submission from button click alone.",
-  "proofSha256": "0499652A7A31FA61B6725B8689F3A48F13A3DB4C5B7E229E307EBFA2FDB665D4"
+  "proofSha256": "AAAC2C432D440F95552C63F336B71103658796E947B17CB5D9AC41B13F8E9787",
+  "diagnosticLimit": "Read-only CDP diagnostics unavailable while Browser Use was resolving a paused document response; no network replay, hidden endpoint or bypass used."
 }
