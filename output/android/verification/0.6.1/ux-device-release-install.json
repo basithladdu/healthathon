@@ -1,0 +1,28 @@
+{
+  "startedAt": "2026-10-24T19:37:41.464210+00:00",
+  "versionName": "0.6.1",
+  "versionCode": 8,
+  "device": "Samsung A34",
+  "dataCleared": false,
+  "uninstalled": false,
+  "playUploaded": false,
+  "privateDeviceDetails": "Stored outside the repository",
+  "status": "installed_and_launched",
+  "apk": "android/app/build/outputs/apk/release/app-release.apk",
+  "apkSha256": "1FD4B7C7951A3DD767104A3C64E0F5864719DAF139BFCEE8F2481EF40E36022B",
+  "signerCertificateSha256": "607D227A8B25BF7126BBCD742110BBBA26F8BA9D75A2F47917013E9589341AD2",
+  "samePreviouslyAuthorizedDevice": true,
+  "installedBefore": {
+    "versionCode": 7,
+    "versionName": "0.6.0"
+  },
+  "installSucceeded": true,
+  "installedAfter": {
+    "versionCode": 8,
+    "versionName": "0.6.1"
+  },
+  "launchConfirmed": true,
+  "finishedAt": "2026-10-24T19:38:08.862026+00:00",
+  "postLaunchProcessAlive": true,
+  "postLaunchCheckedAt": "2026-10-24T19:38:39.935376+00:00"
+}

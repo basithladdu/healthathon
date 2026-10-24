@@ -1,0 +1,20 @@
+{
+  "copiedAt": "2026-10-24T19:36:35.671292+00:00",
+  "versionName": "0.6.1",
+  "versionCode": 8,
+  "copies": [
+    {
+      "kind": "apk",
+      "path": "output/android/Sahara-0.6.1-25Oct-ux-release.apk",
+      "bytes": 289445519,
+      "sha256": "1FD4B7C7951A3DD767104A3C64E0F5864719DAF139BFCEE8F2481EF40E36022B"
+    },
+    {
+      "kind": "aab",
+      "path": "output/android/Sahara-0.6.1-25Oct-ux-release.aab",
+      "bytes": 190822733,
+      "sha256": "355B7D7283337998A895085AFA15C80B3BAF0FB8E0081A734CA1357F9125C96F"
+    }
+  ],
+  "playUploaded": false
+}

@@ -103,7 +103,7 @@ import kotlinx.coroutines.launch
         }
     }
     if (embedded) content(PaddingValues(0.dp))
-    else Scaffold(containerColor = Cream, topBar = { TopAppBar(title = { Text("Shared clinician workspace") }, navigationIcon = { IconButton(onClick = onClose, enabled = !busy) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back") } }, colors = TopAppBarDefaults.topAppBarColors(containerColor = Cream)) }, content = content)
+    else Scaffold(containerColor = Cream, topBar = { TopAppBar(title = { Text("Care team") }, navigationIcon = { IconButton(onClick = onClose, enabled = !busy) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back") } }, colors = TopAppBarDefaults.topAppBarColors(containerColor = Cream)) }, content = content)
     reading?.let { draft ->
         var confirmed by remember(draft.id, draft.revision) { mutableStateOf(false) }
         ModalBottomSheet(onDismissRequest = { if (!busy) reading = null }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {

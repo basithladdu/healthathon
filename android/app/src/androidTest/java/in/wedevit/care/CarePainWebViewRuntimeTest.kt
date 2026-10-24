@@ -44,6 +44,7 @@ class CarePainWebViewRuntimeTest {
         waitForViewer("Drag to rotate")
         assertEquals(PainViewerPolicy.PAGE, onMain { viewer().url })
         assertTrue(js("document.querySelector('canvas').width > 0").contains("true"))
+        assertTrue("A ready canvas must have real visible height", js("document.querySelector('canvas').getBoundingClientRect().height > 0 && document.getElementById('surface').clientHeight > 0").contains("true"))
         recordDiagnostics("ready-before-first-tap", observePointerEvents = true)
         screenshot("pain-webview-ready")
         ui.onNodeWithTag("pain-body-3d").performTouchInput { click(center) }
@@ -70,6 +71,7 @@ class CarePainWebViewRuntimeTest {
             recordDiagnostics("after-back-pick-wait")
         }
         val before = ui.runOnIdle { readOnly.value = true; points.value.toList() }
+        ui.waitForIdle() // Apply Compose's scheduled read-only state before polling the separate WebView event loop.
         waitForViewer("Saved pain map")
         val beforeCalls = ui.runOnIdle { calls }
         ui.onNodeWithTag("pain-body-3d").performTouchInput {
@@ -167,7 +169,10 @@ class CarePainWebViewRuntimeTest {
         return result.get()
     }
     private fun screenshot(name: String) {
+        ui.waitForIdle()
         val instrumentation = InstrumentationRegistry.getInstrumentation()
+        instrumentation.waitForIdleSync()
+        SystemClock.sleep(150)
         val bitmap = instrumentation.uiAutomation.takeScreenshot()
         File(instrumentation.targetContext.getExternalFilesDir(null), "$name.png").outputStream().use {
             bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it)

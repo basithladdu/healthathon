@@ -1,0 +1,305 @@
+{
+  "checkedAtUtc": "2026-10-24T19:35:43.485989+00:00",
+  "verified": true,
+  "localCandidateOnly": true,
+  "uploaded": false,
+  "submitted": false,
+  "deviceInteractionVerified": false,
+  "runtime16KbVerified": false,
+  "completedBuild": {
+    "receipt": "output/android/verification/0.6.1/ux-release-build-exit.json",
+    "sha256": "0F1B25E51EFF65BEECC81AC6987B2550F4463861446F503E2476915D9EA90790",
+    "finishedAt": "2026-10-24T19:35:11.4588821Z",
+    "startedAt": "2026-10-24T19:26:44.2983726Z",
+    "exitCode": 0
+  },
+  "frozenInputs": {
+    "path": "output/android/verification/0.6.1/ux-inputs-before.json",
+    "sha256": "875C7ACC547F7363B2A6BFD3C834F438E6DBE8F9585A066A61D7DB8560069019",
+    "fileCount": 39,
+    "allFrozenChangedInputsUnchanged": true
+  },
+  "bundle": "android/app/build/outputs/bundle/release/app-release.aab",
+  "bundleBytes": 190822733,
+  "bundleSha256": "355B7D7283337998A895085AFA15C80B3BAF0FB8E0081A734CA1357F9125C96F",
+  "bundleManifest": {
+    "package": "in.wedevit.sahara",
+    "versionCode": "8",
+    "versionName": "0.6.1"
+  },
+  "bundletoolValidated": true,
+  "bundletoolJarSha256": "675786493983787FFA11550BDB7C0715679A44E1643F3FF980A529E9C822595C",
+  "zipCrcVerified": true,
+  "jarSignatureVerified": true,
+  "allArchivePayloadsSigned": true,
+  "signerCertificateSha256": "607D227A8B25BF7126BBCD742110BBBA26F8BA9D75A2F47917013E9589341AD2",
+  "signerMatchesCurrentReleaseApk": true,
+  "verifiedApk": "android/app/build/outputs/apk/release/app-release.apk",
+  "verifiedApkSha256": "1FD4B7C7951A3DD767104A3C64E0F5864719DAF139BFCEE8F2481EF40E36022B",
+  "apkProof": "output/android/verification/0.6.1/ux-artifacts-verification.json",
+  "apkProofSha256": "886FB8BED83998FB08DF74566293C9BA2BDC8F8A8DB075FB46B23FA74EB243A2",
+  "sourceAssets": [
+    {
+      "name": "body-LICENSE-CC0.txt",
+      "bytes": 7048,
+      "sha256": "2F976AEAE6AB25F75A68B01189B58E9BE68BAAC37F1BAD7CA34621A82084D835",
+      "bundleAndVerifiedApkMatchAndroidSource": true
+    },
+    {
+      "name": "body-model.json",
+      "bytes": 3633,
+      "sha256": "EE2A66D0B677E97444EB8C7B48C882953A16FECBF9BE3FDC187FB055915D1CB4",
+      "bundleAndVerifiedApkMatchAndroidSource": true
+    },
+    {
+      "name": "body-SOURCE.txt",
+      "bytes": 1705,
+      "sha256": "4A966EE808D6C0956A71170C897AE957AA9ADAFAEC28D03081921412EE279AB3",
+      "bundleAndVerifiedApkMatchAndroidSource": true
+    },
+    {
+      "name": "body.glb",
+      "bytes": 162136,
+      "sha256": "3A88834F17AF8391DA6B0761F257FCE4E9DAD0923CA4B92ED1458C9C4B3ECD6E",
+      "bundleAndVerifiedApkMatchAndroidSource": true
+    },
+    {
+      "name": "index.html",
+      "bytes": 591,
+      "sha256": "E0D1F63911F5C85A3F76FB33C5CAC6B319F3E9F6BDD68A50B72C46BE328E7EF4",
+      "bundleAndVerifiedApkMatchAndroidSource": true
+    },
+    {
+      "name": "THREE-LICENSE.txt",
+      "bytes": 1081,
+      "sha256": "8B378EBE60E2FE500158CB0AC71CB5E8B7D92953C2ABCC63A0EB90499653B5BC",
+      "bundleAndVerifiedApkMatchAndroidSource": true
+    },
+    {
+      "name": "viewer.css",
+      "bytes": 450,
+      "sha256": "ED2B9AA35D77284367FFAC1473008C90C9C6A33380B2D90ECC8823DA91346943",
+      "bundleAndVerifiedApkMatchAndroidSource": true
+    },
+    {
+      "name": "viewer.js",
+      "bytes": 646306,
+      "sha256": "CF831F8814631E8034A131AC826FC86581F1AA9E603A0A2EA29CCF4B6CC8A900",
+      "bundleAndVerifiedApkMatchAndroidSource": true
+    },
+    {
+      "name": "viewer.js.LEGAL.txt",
+      "bytes": 188,
+      "sha256": "CC7CC7E2F53D5DB0235AB2226E85FC6E91655161573B39813B41BB00E5919674",
+      "bundleAndVerifiedApkMatchAndroidSource": true
+    }
+  ],
+  "native64BitLibraries": [
+    {
+      "path": "lib/arm64-v8a/libandroidx.graphics.path.so",
+      "bytes": 10096,
+      "sha256": "41E9A793C43A0F4FDDB19E33F346BACE464F30F888BA7B9EAF96294EA115BFB6",
+      "bundleBytesMatchVerifiedCurrentApk": true
+    },
+    {
+      "path": "lib/arm64-v8a/libmaplibre.so",
+      "bytes": 10846016,
+      "sha256": "D3A1AB9B9D056D84B93F2AA5F676D20D2D76723952DFCD8BD8D203D6ECA6980D",
+      "bundleBytesMatchVerifiedCurrentApk": true
+    },
+    {
+      "path": "lib/arm64-v8a/libmlkit_google_ocr_pipeline.so",
+      "bytes": 11064544,
+      "sha256": "FA41D509A661E8AA8B3E3AC1A28541F8823F308414FCAD733FE26D61FEEA2646",
+      "bundleBytesMatchVerifiedCurrentApk": true
+    },
+    {
+      "path": "lib/arm64-v8a/libonnxruntime.so",
+      "bytes": 22249552,
+      "sha256": "7A2FB92EB67037837C3F0E428BD732FD0D05CED0546D9E740090C07573D8249A",
+      "bundleBytesMatchVerifiedCurrentApk": true
+    },
+    {
+      "path": "lib/arm64-v8a/libsherpa-onnx-c-api.so",
+      "bytes": 4465168,
+      "sha256": "C85E2382E2CA12B0513826BE926EACCFEA896B4CBF568182E287671BA526F80D",
+      "bundleBytesMatchVerifiedCurrentApk": true
+    },
+    {
+      "path": "lib/arm64-v8a/libsherpa-onnx-cxx-api.so",
+      "bytes": 440688,
+      "sha256": "5EABB2BCF5A8AF66AEAB37431C09FAB4A9C65CDEBF02BD7E50F8C589044BD70E",
+      "bundleBytesMatchVerifiedCurrentApk": true
+    },
+    {
+      "path": "lib/arm64-v8a/libsherpa-onnx-jni.so",
+      "bytes": 4771760,
+      "sha256": "3C6492EA91EA68FD3B72B9495EFDDE6DD913F6B58C387E3B07389CF335F4D26F",
+      "bundleBytesMatchVerifiedCurrentApk": true
+    },
+    {
+      "path": "lib/arm64-v8a/libtranslate_jni.so",
+      "bytes": 16361032,
+      "sha256": "45040FF0CDD194D6E601589D759E6F1BA733DE5F95790F76CC3E2046919046BE",
+      "bundleBytesMatchVerifiedCurrentApk": true
+    },
+    {
+      "path": "lib/x86_64/libandroidx.graphics.path.so",
+      "bytes": 10760,
+      "sha256": "4E56C996F13670E70082658DE7880C4020EABF4F25E43387F88ED78A713FC9F0",
+      "bundleBytesMatchVerifiedCurrentApk": true
+    },
+    {
+      "path": "lib/x86_64/libmaplibre.so",
+      "bytes": 11207424,
+      "sha256": "55175BF2DFB64AA31A555CF8DF5846C1C736C10A4946162C175AE948AD189774",
+      "bundleBytesMatchVerifiedCurrentApk": true
+    },
+    {
+      "path": "lib/x86_64/libmlkit_google_ocr_pipeline.so",
+      "bytes": 11626128,
+      "sha256": "3DDFFB498B60F7F9512E341D4EE3ABE4E1580C4FD65EF9B2C8CE9E490DE467D8",
+      "bundleBytesMatchVerifiedCurrentApk": true
+    },
+    {
+      "path": "lib/x86_64/libonnxruntime.so",
+      "bytes": 25581112,
+      "sha256": "B626C070616D88BD643A6E63DC996D8D478D061176B056D52CE44C961BD355AA",
+      "bundleBytesMatchVerifiedCurrentApk": true
+    },
+    {
+      "path": "lib/x86_64/libsherpa-onnx-c-api.so",
+      "bytes": 4927096,
+      "sha256": "631CA2828E47B61D8AFE4B3C75A157423CBAFABA6F8C0DB89C27D21F1B173D9A",
+      "bundleBytesMatchVerifiedCurrentApk": true
+    },
+    {
+      "path": "lib/x86_64/libsherpa-onnx-cxx-api.so",
+      "bytes": 436952,
+      "sha256": "09CD2EA23B15AE3234B0B4678FBEF14639C58792DD36D2CD435C030DC030C5D0",
+      "bundleBytesMatchVerifiedCurrentApk": true
+    },
+    {
+      "path": "lib/x86_64/libsherpa-onnx-jni.so",
+      "bytes": 5201192,
+      "sha256": "1DC24C88FB364F1022A5217B70AB3BC3C9CAE3120AE2E1ED358E1F68ED120B04",
+      "bundleBytesMatchVerifiedCurrentApk": true
+    },
+    {
+      "path": "lib/x86_64/libtranslate_jni.so",
+      "bytes": 17371616,
+      "sha256": "A757F9544D2731838E5E775F4FA06782AEA7944D9039D24D9F2C57D81EFA4265",
+      "bundleBytesMatchVerifiedCurrentApk": true
+    }
+  ],
+  "priorStaticAlignmentBasis": {
+    "baselineApk": "output/android/Sahara-0.6.0-24Oct-anatomy-sizing-fixed-release.apk",
+    "baselineApkSha256": "8FD9A63C870CA70AE67133A96A1AB130AF8BE0785F6DE5AEA471944E26C6F513",
+    "priorStaticAlignmentReceipt": "output/android/verification/0.6.0/anatomy-sizing-fixed-release-verification.json",
+    "priorStaticAlignmentReceiptSha256": "8CB669D8B25847DC55B1A919DA4457542EB5D38462449B24BB34D75CB107F6B2",
+    "prior64BitElf16KbAlignmentVerified": true,
+    "nativeLibraryCount": 16,
+    "all64BitNativeBytesUnchanged": true,
+    "libraries": [
+      {
+        "path": "lib/arm64-v8a/libandroidx.graphics.path.so",
+        "bytes": 10096,
+        "sha256": "41E9A793C43A0F4FDDB19E33F346BACE464F30F888BA7B9EAF96294EA115BFB6",
+        "bytesIdenticalToPreservedSigned060Apk": true
+      },
+      {
+        "path": "lib/arm64-v8a/libmaplibre.so",
+        "bytes": 10846016,
+        "sha256": "D3A1AB9B9D056D84B93F2AA5F676D20D2D76723952DFCD8BD8D203D6ECA6980D",
+        "bytesIdenticalToPreservedSigned060Apk": true
+      },
+      {
+        "path": "lib/arm64-v8a/libmlkit_google_ocr_pipeline.so",
+        "bytes": 11064544,
+        "sha256": "FA41D509A661E8AA8B3E3AC1A28541F8823F308414FCAD733FE26D61FEEA2646",
+        "bytesIdenticalToPreservedSigned060Apk": true
+      },
+      {
+        "path": "lib/arm64-v8a/libonnxruntime.so",
+        "bytes": 22249552,
+        "sha256": "7A2FB92EB67037837C3F0E428BD732FD0D05CED0546D9E740090C07573D8249A",
+        "bytesIdenticalToPreservedSigned060Apk": true
+      },
+      {
+        "path": "lib/arm64-v8a/libsherpa-onnx-c-api.so",
+        "bytes": 4465168,
+        "sha256": "C85E2382E2CA12B0513826BE926EACCFEA896B4CBF568182E287671BA526F80D",
+        "bytesIdenticalToPreservedSigned060Apk": true
+      },
+      {
+        "path": "lib/arm64-v8a/libsherpa-onnx-cxx-api.so",
+        "bytes": 440688,
+        "sha256": "5EABB2BCF5A8AF66AEAB37431C09FAB4A9C65CDEBF02BD7E50F8C589044BD70E",
+        "bytesIdenticalToPreservedSigned060Apk": true
+      },
+      {
+        "path": "lib/arm64-v8a/libsherpa-onnx-jni.so",
+        "bytes": 4771760,
+        "sha256": "3C6492EA91EA68FD3B72B9495EFDDE6DD913F6B58C387E3B07389CF335F4D26F",
+        "bytesIdenticalToPreservedSigned060Apk": true
+      },
+      {
+        "path": "lib/arm64-v8a/libtranslate_jni.so",
+        "bytes": 16361032,
+        "sha256": "45040FF0CDD194D6E601589D759E6F1BA733DE5F95790F76CC3E2046919046BE",
+        "bytesIdenticalToPreservedSigned060Apk": true
+      },
+      {
+        "path": "lib/x86_64/libandroidx.graphics.path.so",
+        "bytes": 10760,
+        "sha256": "4E56C996F13670E70082658DE7880C4020EABF4F25E43387F88ED78A713FC9F0",
+        "bytesIdenticalToPreservedSigned060Apk": true
+      },
+      {
+        "path": "lib/x86_64/libmaplibre.so",
+        "bytes": 11207424,
+        "sha256": "55175BF2DFB64AA31A555CF8DF5846C1C736C10A4946162C175AE948AD189774",
+        "bytesIdenticalToPreservedSigned060Apk": true
+      },
+      {
+        "path": "lib/x86_64/libmlkit_google_ocr_pipeline.so",
+        "bytes": 11626128,
+        "sha256": "3DDFFB498B60F7F9512E341D4EE3ABE4E1580C4FD65EF9B2C8CE9E490DE467D8",
+        "bytesIdenticalToPreservedSigned060Apk": true
+      },
+      {
+        "path": "lib/x86_64/libonnxruntime.so",
+        "bytes": 25581112,
+        "sha256": "B626C070616D88BD643A6E63DC996D8D478D061176B056D52CE44C961BD355AA",
+        "bytesIdenticalToPreservedSigned060Apk": true
+      },
+      {
+        "path": "lib/x86_64/libsherpa-onnx-c-api.so",
+        "bytes": 4927096,
+        "sha256": "631CA2828E47B61D8AFE4B3C75A157423CBAFABA6F8C0DB89C27D21F1B173D9A",
+        "bytesIdenticalToPreservedSigned060Apk": true
+      },
+      {
+        "path": "lib/x86_64/libsherpa-onnx-cxx-api.so",
+        "bytes": 436952,
+        "sha256": "09CD2EA23B15AE3234B0B4678FBEF14639C58792DD36D2CD435C030DC030C5D0",
+        "bytesIdenticalToPreservedSigned060Apk": true
+      },
+      {
+        "path": "lib/x86_64/libsherpa-onnx-jni.so",
+        "bytes": 5201192,
+        "sha256": "1DC24C88FB364F1022A5217B70AB3BC3C9CAE3120AE2E1ED358E1F68ED120B04",
+        "bytesIdenticalToPreservedSigned060Apk": true
+      },
+      {
+        "path": "lib/x86_64/libtranslate_jni.so",
+        "bytes": 17371616,
+        "sha256": "A757F9544D2731838E5E775F4FA06782AEA7944D9039D24D9F2C57D81EFA4265",
+        "bytesIdenticalToPreservedSigned060Apk": true
+      }
+    ],
+    "staticAlignmentBasis": "Exact byte comparison with the preserved 0.6.0 signed APK whose referenced receipt verified 64-bit ELF 16 KB alignment; this is not a new runtime test.",
+    "runtime16KbVerified": false
+  },
+  "verificationBoundary": "Manifest, bundle validation, signatures, archive CRC and byte parity only; no device/runtime or Play approval claim."
+}

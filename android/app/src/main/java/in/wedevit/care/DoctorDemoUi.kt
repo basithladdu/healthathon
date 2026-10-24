@@ -22,6 +22,7 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -230,7 +231,7 @@ private val DoctorMist = Peach
                 Column(Modifier.weight(1f)) {
                     Text(if(sampleCareOpen) DoctorTestProfiles.profiles.firstOrNull {DoctorTestProfiles.personId(it)==testCarePerson}?.name ?: "Earlier practice care" else if (carePersonId != null) carePerson?.name ?: "Care profile unavailable" else if (patient != null) patient.displayName() else "Sahara", fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 20.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     if(sampleCareOpen && DoctorTestProfiles.contains(testCarePerson)) Text("Care record",color=DoctorMuted,fontSize=12.sp)
-                    else Text(if(sampleCareOpen) "Separate from your records" else if (carePersonId != null) { if (careModel?.cloud == null) "Device-local care · not synced" else "Real shared care" } else if (patient != null) "Patient record" else "Doctor workspace", color = DoctorMuted, fontSize = 12.sp)
+                    else Text(if(sampleCareOpen) "Separate from your records" else if (carePersonId != null) { if (careModel?.cloud == null) "Device-local care · not synced" else "Real shared care" } else if (patient != null) "Patient record" else "Doctor", color = DoctorMuted, fontSize = 12.sp)
                 }
                 if(sampleCareOpen && !DoctorTestProfiles.contains(testCarePerson)) Text("Demo",color=Rust) else if (!sampleCareOpen && carePersonId == null) PreviewLabel()
                 Spacer(Modifier.width(10.dp))
@@ -257,7 +258,7 @@ private val DoctorMist = Peach
             else if (carePersonId != null && careModel != null) {
                 if (carePerson == null) Column(Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) { Text("This care profile is unavailable", style = MaterialTheme.typography.titleLarge); Text("No other person's records are shown instead."); TextButton(onClick = { carePersonId = null }) { Text("Back to patients") } }
                 else if (careSection == "Hub") DoctorSharedPatientHub(carePerson, { next -> navigateCare { careSection = next } }, deviceLocal = careModel.cloud == null)
-                else key(careSelection!!.stateKey) { embeddedCareStates.SaveableStateProvider("${careSelection.stateKey}:care") { EmbeddedPatientCare(careModel, carePersonId!!, careSection, { next -> careSection = next }, onCareAccount, { carePersonId = null }, onNavigationBlockedChange = { careNavigationBlocked = it }, allowDeviceLocal = careModel.cloud == null, onHeaderBackChange = { careNestedBack = it }) } }
+                else key(careSelection!!.stateKey) { embeddedCareStates.SaveableStateProvider("${careSelection.stateKey}:care") { EmbeddedPatientCare(careModel, carePersonId!!, careSection, { next -> careSection = next }, onCareAccount, { carePersonId = null }, onNavigationBlockedChange = { careNavigationBlocked = it }, allowDeviceLocal = careModel.cloud == null, onHeaderBackChange = { careNestedBack = it }, feedbackHandledByParent = true) } }
             }
             else if(workflowRoute == "requests") DoctorRequestQueue(workflow,demoStore.patients,onBack={workflowRoute=null},onOpen={ id -> patientId=id;recordTab="Conversations";workflowRoute=id },onSchedule={ request -> schedulingRequestId=request.id;creatingFor=request.patientId },refreshToken=appointments.hashCode())
             else if(workflowRoute != null) {
@@ -539,6 +540,7 @@ private val DoctorMist = Peach
     var note by rememberSaveable { mutableStateOf(existing?.note.orEmpty()) }
     var error by rememberSaveable { mutableStateOf<String?>(null) }
     var patientMenuOpen by remember { mutableStateOf(false) }
+    LaunchedEffect(patientLocked, patients.map { it.id }) { patientMenuOpen = false }
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = DoctorBackground) {
         Column(Modifier.fillMaxWidth().imePadding().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp).padding(bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -551,12 +553,7 @@ private val DoctorMist = Peach
                     val patient = patients.firstOrNull { it.id == selectedPatient }
                     DoctorAvatar(patient?.displayName().orEmpty())
                     Column(Modifier.weight(1f)) { Text("Patient", color = DoctorMuted, style = MaterialTheme.typography.labelMedium); Text(patient?.displayName().orEmpty(), fontSize = 20.sp, fontWeight = FontWeight.SemiBold); patient?.let { Text("${it.age} years", color = DoctorMuted, style = MaterialTheme.typography.bodySmall) } }
-                    if (!patientLocked) Box {
-                        TextButton(onClick = { patientMenuOpen = true }, modifier = Modifier.heightIn(min = 48.dp).testTag("demo-change-patient")) { Text("Change"); Icon(Icons.Default.ExpandMore, null, Modifier.size(18.dp)) }
-                        DropdownMenu(expanded = patientMenuOpen, onDismissRequest = { patientMenuOpen = false }) {
-                            patients.forEach { person -> DropdownMenuItem(text = { Text(person.displayName()) }, onClick = { selectedPatient = person.id; error = null; patientMenuOpen = false }, leadingIcon = { Icon(if(person.id == selectedPatient) Icons.Default.CheckCircle else Icons.Default.PersonOutline, null) }, modifier = Modifier.heightIn(min = 48.dp).testTag("demo-visit-patient-${person.id}")) }
-                        }
-                    }
+                    if (!patientLocked) TextButton(onClick = { patientMenuOpen = true }, modifier = Modifier.heightIn(min = 48.dp).testTag("demo-change-patient")) { Text("Change"); Icon(Icons.Default.ChevronRight, null, Modifier.size(18.dp)) }
                 }
             }
             if(patientLocked) Text("Patient linked to the conversation request",style=MaterialTheme.typography.bodySmall,color=DoctorMuted)
@@ -595,14 +592,33 @@ private val DoctorMist = Peach
             TextButton(onClick = onDismiss, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text("Close") }
         }
     }
+    if (patientMenuOpen && !patientLocked) AlertDialog(
+        onDismissRequest = { patientMenuOpen = false },
+        shape = RoundedCornerShape(24.dp), containerColor = Paper,
+        title = { Text("Choose patient", fontWeight = FontWeight.SemiBold) },
+        text = {
+            Column(Modifier.fillMaxWidth().heightIn(max = 360.dp).verticalScroll(rememberScrollState())) {
+                patients.forEach { person ->
+                    val chosen = person.id == selectedPatient
+                    Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).selectable(selected = chosen, role = Role.RadioButton, onClick = {
+                        selectedPatient = person.id; error = null; patientMenuOpen = false
+                    }).testTag("demo-visit-patient-${person.id}"), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        RadioButton(selected = chosen, onClick = null)
+                        Text(person.displayName(), Modifier.weight(1f))
+                    }
+                }
+            }
+        },
+        confirmButton = { TextButton(onClick = { patientMenuOpen = false }, modifier = Modifier.heightIn(min = 48.dp)) { Text("Close") } },
+    )
 }
 
 @Composable private fun DemoAccount(onExit: () -> Unit, onFeedback:()->Unit) {
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp), verticalArrangement = Arrangement.spacedBy(18.dp)) {
         DoctorTitle("Account")
-        Surface(color=Paper, shape=RoundedCornerShape(20.dp), modifier=Modifier.fillMaxWidth()) { Row(Modifier.padding(20.dp), verticalAlignment=Alignment.CenterVertically) { DoctorAvatar("Meera", 60); Spacer(Modifier.width(16.dp)); Column(verticalArrangement=Arrangement.spacedBy(5.dp)) { DoctorTitle("Dr Meera", 22); Text("Doctor workspace", color=DoctorMuted); PreviewLabel() } } }
-        DoctorSection("About this workspace")
-        Text("A guided walkthrough of the doctor workspace.", fontWeight=FontWeight.Medium, modifier=Modifier.testTag("demo-account-disclosure"))
+        Surface(color=Paper, shape=RoundedCornerShape(20.dp), modifier=Modifier.fillMaxWidth()) { Row(Modifier.padding(20.dp), verticalAlignment=Alignment.CenterVertically) { DoctorAvatar("Meera", 60); Spacer(Modifier.width(16.dp)); Column(verticalArrangement=Arrangement.spacedBy(5.dp)) { DoctorTitle("Dr Meera", 22); Text("Doctor", color=DoctorMuted); PreviewLabel() } } }
+        DoctorSection("About this example")
+        Text("Explore the doctor tools with fictional records.", fontWeight=FontWeight.Medium, modifier=Modifier.testTag("demo-account-disclosure"))
         Text("Records here are saved on this device, separately from your Sahara account.", color=DoctorMuted, lineHeight=23.sp)
         HorizontalDivider(color=MaterialTheme.colorScheme.outlineVariant)
         Row(verticalAlignment=Alignment.Top) { Icon(Icons.Default.EventNote,null,tint=DoctorTeal); Spacer(Modifier.width(12.dp)); Column { Text("Local scheduling", fontWeight=FontWeight.Medium, fontFamily = SaharaTitleFont); Text("No invitations, calls or reminders are sent.", color=DoctorMuted, style=MaterialTheme.typography.bodyMedium) } }

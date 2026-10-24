@@ -122,9 +122,8 @@ private fun medicineTime(at: Long?) = at?.let { DateTimeFormatter.ofPattern("d M
             }
             if(loaded&&shown.isEmpty()&&(tab=="Current"||prescriptions?.groups?.none {it.id!=prescriptions?.state?.currentId}!=false)&&!(tab=="Past"&&prescriptions?.medicines?.any {it.prescriptionId==prescriptions?.state?.currentId&&it.removedAt>0}==true))item {SurfaceCard(DoctorCardReport){Text(if(tab=="Current")"No current medicines recorded" else "No past medicines recorded",fontSize=20.sp,fontFamily=SaharaTitleFont,color=DoctorCardInk);Text(if(tab=="Current")"Add a prescription or enter medicines manually. Nothing is inferred from a report image." else "Moving a medicine here preserves its directions and intake reports.",fontSize=13.sp,color=DoctorCardSub)}}
             items(shown,key={it.id}) {medicine->MedicineSurface(tab=="Current") {
-                var menu by remember(medicine.id){mutableStateOf(false)}
                 val lines=medicine.detail.lines().filter {it.isNotBlank()}
-                Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween){Text(medicine.title,fontSize=20.sp,fontWeight=FontWeight.Medium,modifier=Modifier.weight(1f), fontFamily = SaharaTitleFont,color=DoctorCardInk);Box {IconButton(onClick={menu=true},modifier=Modifier.size(48.dp)){Icon(Icons.Default.MoreVert,"Medicine actions",tint=DoctorCardSub)};DropdownMenu(menu,{menu=false}){DropdownMenuItem(text={Text("Edit list")},onClick={menu=false;if(prescriptions!=null)openPrescription(false)else edit=medicine},enabled=editable&&!busy);DropdownMenuItem(text={Text("Record report")},onClick={menu=false;if(same(true)&&loaded)report=medicine},enabled=editable&&loaded&&!busy);DropdownMenuItem(text={Text("Intake history")},onClick={menu=false;tab="Intake history"})}}}
+                Text(medicine.title,fontSize=20.sp,fontWeight=FontWeight.Medium,modifier=Modifier.fillMaxWidth(),fontFamily=SaharaTitleFont,color=DoctorCardInk)
                 Text(lines.firstOrNull()?:"Directions not recorded",fontSize=15.sp,lineHeight=22.sp,color=DoctorCardInk)
                 if(lines.size>1)Text(lines.drop(1).joinToString("\n"),fontSize=13.sp,color=DoctorCardSub)
                 if(medicine.id !in groupedIds) Text("Prescription group/date not recorded",fontSize=12.sp,color=DoctorCardFaint)
@@ -134,6 +133,11 @@ private fun medicineTime(at: Long?) = at?.let { DateTimeFormatter.ofPattern("d M
                 if(last!=null)MedicineStatusChip(MedicineHistoryRules.status(last,snapshot.events,System.currentTimeMillis()),last.outcome)
                 else MedicineHistoryRules.legacyDate(medicine)?.let {date->MedicineStatusChip("Taken reported","taken");Text("Check-off on $date; exact time and reporter not recorded.",fontSize=12.sp,color=DoctorCardFaint)}
                 if(last==null&&MedicineHistoryRules.legacyDate(medicine)==null) MedicineStatusChip("Report not recorded","planned")
+                FlowRow(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(8.dp),verticalArrangement=Arrangement.spacedBy(4.dp)) {
+                    TextButton(onClick={if(prescriptions!=null)openPrescription(false)else edit=medicine},enabled=editable&&!busy,modifier=Modifier.heightIn(min=48.dp),colors=ButtonDefaults.textButtonColors(contentColor=DoctorAccent)){Text("Edit list")}
+                    TextButton(onClick={if(same(true)&&loaded)report=medicine},enabled=editable&&loaded&&!busy,modifier=Modifier.heightIn(min=48.dp),colors=ButtonDefaults.textButtonColors(contentColor=DoctorAccent)){Text("Record report")}
+                    TextButton(onClick={tab="Intake history"},modifier=Modifier.heightIn(min=48.dp),colors=ButtonDefaults.textButtonColors(contentColor=DoctorAccent)){Text("Intake history")}
+                }
                 if(medicine.id !in groupedIds) TextButton(onClick={if(same(true)&&loaded&&!busy){retireTargetPast=tab!="Past";retireRevision=course?.revision ?: 0;retire=medicine;reason=""}},enabled=editable&&loaded&&!busy,modifier=Modifier.heightIn(min=48.dp)){Text(if(tab=="Past")"Return to current medicines" else "Move to past medicines",color=DoctorAccent)}
             }}
             if(tab=="Past") {

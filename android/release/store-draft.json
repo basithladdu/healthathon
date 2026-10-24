@@ -653,6 +653,121 @@
       "verificationScope": "Signed APK installed and one MainActivity launch confirmed. User will inspect the feature flow; no native interaction, backend end-to-end or16KB runtime pass is inferred."
     }
   },
+  "localUxCandidate": {
+    "versionName": "0.6.1",
+    "versionCode": 8,
+    "localOnly": true,
+    "built": true,
+    "artifactVerified": true,
+    "readyForPlay": false,
+    "uploaded": false,
+    "submitted": false,
+    "installed": true,
+    "status": "Local signed UX candidate built, verified, installed and normally launched on the same authorised Samsung A34, upgrading the regular package from 0.6.0 (7) to 0.6.1 (8) without data clearing or uninstall. 317 JVM tests and 44 development-package instrumentation tests passed. No version 8 Play upload/submission; existing Production 0.6.0 (7) remains in review.",
+    "applicationId": "in.wedevit.sahara",
+    "developmentApplicationId": "in.wedevit.sahara.development",
+    "sourceSnapshot": {
+      "path": "output/android/verification/0.6.1/ux-inputs-before.json",
+      "sha256": "875C7ACC547F7363B2A6BFD3C834F438E6DBE8F9585A066A61D7DB8560069019",
+      "fileCount": 39,
+      "allFrozenChangedInputsUnchanged": true
+    },
+    "sourceBaseCommit": "1ee542cba888368770a54ac5217ee82ee5023368",
+    "releaseBuild": {
+      "receipt": "output/android/verification/0.6.1/ux-release-build-exit.json",
+      "finishedAt": "2026-10-24T19:35:11.4588821Z",
+      "startedAt": "2026-10-24T19:26:44.2983726Z",
+      "exitCode": 0,
+      "r8Passed": true,
+      "vitalLintPassed": true
+    },
+    "artifacts": {
+      "apk": {
+        "kind": "apk",
+        "path": "output/android/Sahara-0.6.1-25Oct-ux-release.apk",
+        "bytes": 289445519,
+        "sha256": "1FD4B7C7951A3DD767104A3C64E0F5864719DAF139BFCEE8F2481EF40E36022B"
+      },
+      "aab": {
+        "kind": "aab",
+        "path": "output/android/Sahara-0.6.1-25Oct-ux-release.aab",
+        "bytes": 190822733,
+        "sha256": "355B7D7283337998A895085AFA15C80B3BAF0FB8E0081A734CA1357F9125C96F"
+      }
+    },
+    "artifactCopiesReceipt": "output/android/verification/0.6.1/ux-local-artifact-copies.json",
+    "apkVerification": "output/android/verification/0.6.1/ux-artifacts-verification.json",
+    "bundleVerification": "output/android/verification/0.6.1/ux-bundle-verification.json",
+    "signerCertificateSha256": "607D227A8B25BF7126BBCD742110BBBA26F8BA9D75A2F47917013E9589341AD2",
+    "signerMatchesPreviousUploadKey": true,
+    "bundletoolValidated": true,
+    "bundleJarSignatureVerified": true,
+    "zipCrcVerified": true,
+    "apkZip16KbAlignment": true,
+    "nativeLibraries": {
+      "count": 16,
+      "bytesUnchangedFromVerified060": true,
+      "prior64BitElf16KbAlignmentBasisVerified": true,
+      "bundleBytesMatchCurrentVerifiedApk": true,
+      "runtime16KbVerified": false
+    },
+    "painViewerAssets": {
+      "count": 9,
+      "apkAndBundleMatchCurrentAndroidSource": true,
+      "sharedPublicViewerJavascriptByteIdentical": true
+    },
+    "unitChecks": {
+      "tests": 317,
+      "suites": 57,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "freshForFrozenSource": true
+    },
+    "developmentPackageDeviceChecks": {
+      "device": "Samsung A34",
+      "tests": 44,
+      "classes": 11,
+      "allPassed": true,
+      "receipt": "output/android/verification/0.6.1/ux-device-test-results.json",
+      "scope": "Fictional or UUID-scoped fixtures, including guarded in-memory Room; no production accounts or patient writes."
+    },
+    "signedReleaseInstallation": {
+      "confirmed": true,
+      "status": "installed_and_launched",
+      "device": "Samsung A34",
+      "installedBefore": {
+        "versionCode": 7,
+        "versionName": "0.6.0"
+      },
+      "installedAfter": {
+        "versionCode": 8,
+        "versionName": "0.6.1"
+      },
+      "installSucceeded": true,
+      "launchConfirmed": true,
+      "samePreviouslyAuthorizedDevice": true,
+      "dataCleared": false,
+      "uninstalled": false,
+      "playUploaded": false,
+      "finishedAt": "2026-10-24T19:38:08.862026+00:00",
+      "receipt": "output/android/verification/0.6.1/ux-device-release-install.json",
+      "scope": "Signed release installation and ordinary launch only. The 44 interaction tests were on the matching development package, not a signed-release instrumentation variant.",
+      "earlierPreInstallStop": "output/android/verification/0.6.1/ux-device-install-model-format-stop.json",
+      "recovery": "An initial model-format guard stopped before installation. The corrected helper confirmed the exact same previously authorised device before updating."
+    },
+    "buildRecovery": {
+      "failedAttempt": "output/android/verification/0.6.1/ux-release-1024-memory-pressure-exit.json",
+      "status": "The bounded 1024 MB R8 attempt stopped after sustained full GC/heap pressure; a separate 1536 MB attempt completed. Failed diagnostics remain historical and are not pass evidence."
+    },
+    "verificationLimits": [
+      "No authenticated live-account or end-to-end cloud verification by these fixtures.",
+      "In-memory Room fixtures do not establish disk/process persistence or clinical validity.",
+      "No 16 KB page-size runtime claim.",
+      "No Play upload, release replacement or review submission for version code 8. Existing in-review version code 7 stays untouched.",
+      "Account creation/reset remain unavailable under the existing email configuration; no provider, billing, permission or authentication callback changes."
+    ]
+  },
   "productionRelease": {
     "version": "0.5.0",
     "versionCode": 6,

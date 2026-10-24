@@ -1,0 +1,9 @@
+{
+  "stoppedAt": "2026-10-24T19:26:44.0993310Z",
+  "reason": "R8 reached 100 percent old generation; jstat observed 237 full collections and more than438seconds in full GC. Only task-owned release daemon was stopped; no artifact success claimed.",
+  "unrelatedProcessesStopped": false,
+  "nextHeap": "1536m",
+  "nextNewRatio": 4,
+  "sourceChanged": false,
+  "debugTestsRepeated": false
+}

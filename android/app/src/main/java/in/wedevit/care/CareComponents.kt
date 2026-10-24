@@ -26,7 +26,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -48,16 +47,17 @@ import androidx.compose.ui.unit.sp
     Card(onClick = onClick, interactionSource = interaction, modifier = modifier.graphicsLayer { scaleX = scale; scaleY = scale }, shape = RoundedCornerShape(22.dp), colors = CardDefaults.cardColors(containerColor = color), content = content)
 }
 
+@Suppress("UNUSED_PARAMETER") // The same five routes stay available in every display role.
 @Composable fun CareNavigation(selected: Int, clinician: Boolean, onSelect: (Int) -> Unit) {
-    val labels = listOf("Today", if (clinician) "Talk" else "Docs", "Care", "Nearby", "More")
-    val routes = listOf(0, if (clinician) 1 else 5, 2, 3, 4)
-    val icons = listOf(Icons.Default.WbSunny, if (clinician) Icons.Default.Forum else Icons.Default.FolderOpen, Icons.Default.FavoriteBorder, Icons.Default.Place, Icons.Default.MoreHoriz)
+    val labels = listOf("Today", "Symptoms", "Care", "Nearby", "Account")
+    val routes = listOf(0, 9, 2, 3, 4)
+    val icons = listOf(Icons.Default.WbSunny, Icons.Default.MonitorHeart, Icons.Default.Favorite, Icons.Default.Place, Icons.Default.AccountCircle)
     val duration = if (ValueAnimator.areAnimatorsEnabled()) 180 else 0
     Surface(color = Paper, shadowElevation = 2.dp) {
         Row(Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 12.dp, vertical = 6.dp).selectableGroup(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
             labels.forEachIndexed { index, label ->
-                val active = selected == routes[index] || (!clinician && index == 1 && selected == 1)
-                val color by animateColorAsState(if (active) Color(0xFFFFE39A) else Color.Transparent, tween(duration), label = "selected tab")
+                val active = selected == routes[index]
+                val color by animateColorAsState(if (active) MaterialTheme.colorScheme.secondaryContainer else Color.Transparent, tween(duration), label = "selected tab")
                 Column(Modifier.weight(1f).testTag("nav-$label").clip(RoundedCornerShape(15.dp)).background(color)
                     .selectable(selected = active, role = Role.Tab, onClick = { onSelect(routes[index]) }).heightIn(min = 58.dp).padding(vertical = 7.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
                     Icon(icons[index], null, Modifier.size(22.dp), tint = if (active) Ink else MaterialTheme.colorScheme.onSurfaceVariant)
@@ -77,17 +77,48 @@ import androidx.compose.ui.unit.sp
             shape = RoundedCornerShape(14.dp), contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
             colors = ButtonDefaults.textButtonColors(contentColor = Rust)) {
             Text(role, fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1)
-            Spacer(Modifier.width(4.dp)); Icon(Icons.Default.ExpandMore, null, Modifier.size(18.dp))
+            Spacer(Modifier.width(4.dp)); Icon(Icons.Default.SwapHoriz, null, Modifier.size(18.dp))
         }
-        DropdownMenu(expanded = expanded && enabled, onDismissRequest = { expanded = false }) {
-            listOf("Patient", "Family", "Doctor").forEach { option ->
-                DropdownMenuItem(text = { Text(option) }, modifier = Modifier.testTag("role-$option").semantics { selected = role == option },
-                    leadingIcon = { Icon(when (option) { "Doctor" -> Icons.Default.MedicalServices; "Family" -> Icons.Default.PeopleOutline; else -> Icons.Default.PersonOutline }, null) },
-                    trailingIcon = { if (role == option) Icon(Icons.Default.Check, "Selected", tint = Rust) },
-                    onClick = { expanded = false; onSelect(option) })
-            }
-        }
+        if (expanded && enabled) CareSelectionDialog(
+            title = "Choose your view",
+            description = "This changes the view, not your access to care records.",
+            options = listOf("Patient", "Family", "Doctor").map { option ->
+                CareSelectionOption(option, option, "role-$option", when (option) { "Doctor" -> Icons.Default.MedicalServices; "Family" -> Icons.Default.PeopleOutline; else -> Icons.Default.PersonOutline })
+            }, selectedId = role, onDismiss = { expanded = false },
+            onSelect = { if (enabled) { expanded = false; onSelect(it) } },
+        )
     }
+}
+
+private data class CareSelectionOption(val id: String, val label: String, val tag: String, val icon: ImageVector)
+
+@Composable private fun CareSelectionDialog(title: String, options: List<CareSelectionOption>, selectedId: String,
+    onSelect: (String) -> Unit, onDismiss: () -> Unit, description: String? = null) {
+    AlertDialog(
+        onDismissRequest = onDismiss, shape = RoundedCornerShape(24.dp), containerColor = MaterialTheme.colorScheme.surface,
+        title = { Text(title, fontWeight = FontWeight.SemiBold) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                description?.let { Text(it, style = MaterialTheme.typography.bodyMedium) }
+                Column(Modifier.fillMaxWidth().heightIn(max = 320.dp).verticalScroll(rememberScrollState()).selectableGroup(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    options.forEach { option ->
+                        val chosen = option.id == selectedId
+                        Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag(option.tag).clip(RoundedCornerShape(14.dp))
+                            .background(if (chosen) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surface)
+                            .selectable(selected = chosen, role = Role.RadioButton, onClick = { onSelect(option.id) }).padding(horizontal = 12.dp, vertical = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                            Icon(option.icon, null, Modifier.size(22.dp), tint = MaterialTheme.colorScheme.primary)
+                            Text(option.label, Modifier.weight(1f), fontWeight = if (chosen) FontWeight.SemiBold else FontWeight.Normal)
+                            RadioButton(selected = chosen, onClick = null)
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(onClick = onDismiss, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp), shape = RoundedCornerShape(14.dp)) { Text("Close") }
+        },
+    )
 }
 
 /** The selected care profile stays visible; switching profiles never changes account permissions. */
@@ -107,15 +138,14 @@ import androidx.compose.ui.unit.sp
                 Spacer(Modifier.width(10.dp))
                 Text(name, modifier = Modifier.weight(1f, fill = false), fontSize = 16.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Spacer(Modifier.width(6.dp))
-                Icon(Icons.Default.ExpandMore, null, Modifier.size(18.dp), tint = Rust)
+                Icon(Icons.Default.SwapHoriz, null, Modifier.size(18.dp), tint = Rust)
             }
-            DropdownMenu(expanded = expanded && enabled, onDismissRequest = { expanded = false }) {
-                people.forEach { (id, personName) ->
-                    DropdownMenuItem(text = { Text(personName) }, modifier = Modifier.testTag("person-$id"),
-                        leadingIcon = { Icon(if (id == selectedId) Icons.Default.CheckCircle else Icons.Default.PersonOutline, null, tint = if (id == selectedId) Rust else Ink) },
-                        onClick = { expanded = false; onSelect(id) })
-                }
-            }
+            if (expanded && enabled) CareSelectionDialog(
+                title = "Choose a care profile",
+                options = people.map { (id, personName) -> CareSelectionOption(id, personName, "person-$id", Icons.Default.PersonOutline) },
+                selectedId = selectedId, onDismiss = { expanded = false },
+                onSelect = { id -> if (enabled && people.any { it.first == id }) { expanded = false; onSelect(id) } },
+            )
         }
         if (canAdd) IconButton(onClick = onAdd, enabled = enabled, modifier = Modifier.size(52.dp).testTag("add-care-person").semantics { contentDescription = "Add person" }) {
             Box(Modifier.size(36.dp).clip(CircleShape).border(1.dp, if (enabled) Rust.copy(alpha = .6f) else MaterialTheme.colorScheme.outline.copy(alpha = .3f), CircleShape), contentAlignment = Alignment.Center) {
@@ -125,8 +155,8 @@ import androidx.compose.ui.unit.sp
     }
 }
 
-@Composable fun CareField(value: String, onValueChange: (String) -> Unit, label: String, minLines: Int = 1, singleLine: Boolean = false, placeholder: String? = null, supporting: String? = null) {
-    OutlinedTextField(value = value, onValueChange = onValueChange, label = { Text(label) }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp), minLines = minLines, singleLine = singleLine,
+@Composable fun CareField(value: String, onValueChange: (String) -> Unit, label: String, minLines: Int = 1, singleLine: Boolean = false, placeholder: String? = null, supporting: String? = null, enabled: Boolean = true) {
+    OutlinedTextField(value = value, onValueChange = onValueChange, enabled = enabled, label = { Text(label) }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp), minLines = minLines, singleLine = singleLine,
         placeholder = placeholder?.let { { Text(it) } }, supportingText = supporting?.let { { Text(it) } },
         colors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = Paper, focusedContainerColor = Paper))
 }

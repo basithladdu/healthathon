@@ -14,12 +14,12 @@ import org.junit.Test
 
 class SaharaTitleTypographyTest {
     @get:Rule val ui = createComposeRule()
-    @Test fun originalSystemSerifTitlesAndDefaultBodyControlsAreRestored() {
+    @Test fun nativeTitlesKeepBodySizingAndHindiReadable() {
         val base = Typography()
         val styled = saharaTitleTypography(base)
         assertEquals(SaharaTitleFont, styled.headlineLarge.fontFamily)
         assertEquals(SaharaTitleFont, styled.titleLarge.fontFamily)
-        assertEquals(FontFamily.Serif, SaharaTitleFont)
+        assertEquals(FontFamily.SansSerif, SaharaTitleFont)
         assertEquals(FontFamily.Default, SaharaBodyFont)
         assertEquals(base.titleLarge.fontWeight, styled.titleLarge.fontWeight)
         assertEquals(base.bodyLarge, styled.bodyLarge)

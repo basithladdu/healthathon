@@ -1,36 +1,32 @@
+@file:OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class, androidx.compose.material3.ExperimentalMaterial3Api::class)
 package `in`.wedevit.care
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.draggable
-import androidx.compose.foundation.gestures.rememberDraggableState
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlin.math.PI
-import kotlin.math.abs
 import kotlin.math.sin
-import kotlinx.coroutines.launch
 
 /** Record-step stage colours. Terracotta is the stage; deep terracotta is the icon on the cream button. */
 internal val DoctorStageTerracotta = Color(0xFFC9785A)
@@ -54,56 +50,68 @@ fun doctorStageStatus(recording: Boolean, saving: Boolean, seconds: Long): Strin
     }
 }
 
-/**
- * Walkthrough record step: terracotta stage + persistent draggable "Saved Audio" sheet peeking at the bottom (tap or drag up to expand, drag down / back to collapse).
- * The caller owns recording, consent and playback; [sheet] is the expanded page body.
- */
+/** Visible capture modes and separate Record / Saved audio pages; consent and recording stay caller-owned. */
 @Composable fun DoctorRecordStage(mode: String, onMode: (String) -> Unit, recording: Boolean, saving: Boolean, saveError: Boolean, onRetry: () -> Unit, level: Float, seconds: Long, recordEnabled: Boolean, onRecord: () -> Unit, onStop: () -> Unit,
     onBack: (() -> Unit)?, backEnabled: Boolean, demo: Boolean, localRecordingAllowed: Boolean, testRecord: Boolean, menuEnabled: Boolean, onStartNew: (() -> Unit)?, onBackToWho: () -> Unit, backToWhoEnabled: Boolean, audioCount: Int, sheet: @Composable () -> Unit) {
-    var menu by remember { mutableStateOf(false) }
+    var savedAudioPage by rememberSaveable { mutableStateOf(false) }
     val white = Color.White
-    BoxWithConstraints(Modifier.fillMaxSize().background(DoctorStageTerracotta).testTag("record-stage")) {
-        val peek = 80.dp; val density = LocalDensity.current; val rangePx = with(density) { (maxHeight - peek).toPx() }.coerceAtLeast(1f)
-        val frac = remember { Animatable(0f) }; val scope = rememberCoroutineScope()
-        val expanded = frac.targetValue > 0.5f
-        BackHandler(expanded) { scope.launch { frac.animateTo(0f) } }
-        Column(Modifier.fillMaxSize().padding(start = 20.dp, end = 8.dp, top = 8.dp, bottom = peek), horizontalAlignment = Alignment.CenterHorizontally) {
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+    val navigationEnabled = menuEnabled && !recording && !saving && !saveError
+    val audioPageEnabled = !recording && !saving && !saveError
+    LaunchedEffect(recording, saving, saveError) { if (!audioPageEnabled) savedAudioPage = false }
+    BackHandler(savedAudioPage) { savedAudioPage = false }
+    Column(Modifier.fillMaxSize().background(DoctorStageTerracotta).testTag("record-stage")) {
+        Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp).padding(top = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 if (onBack != null) TextButton(onClick = onBack, enabled = backEnabled, colors = ButtonDefaults.textButtonColors(contentColor = white, disabledContentColor = white.copy(alpha = .5f)), contentPadding = PaddingValues(0.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-capture-back")) { Text("Back to conversations", fontSize = 14.sp) }
-                Spacer(Modifier.weight(1f))
-                Box { IconButton(onClick = { menu = true }, enabled = menuEnabled, modifier = Modifier.size(48.dp).testTag("doctor-capture-mode")) { Icon(Icons.Default.MoreVert, "Choose Record, Dictate or Type, start new, or go back to who is here", tint = white.copy(alpha = if (menuEnabled) 1f else .5f)) }
-                    DropdownMenu(menu, { menu = false }) {
-                        listOf("Record", "Dictate", "Type").forEach { value -> val available = when (value) { "Record" -> localRecordingAllowed; "Dictate" -> !demo; else -> true }; DropdownMenuItem(text = { Text(value + if (!available) if (testRecord) " · unavailable" else " · unavailable in demo" else if (value == mode) " · current" else "") }, enabled = available, onClick = { onMode(value); menu = false }) }
-                        HorizontalDivider()
-                        if (onStartNew != null) DropdownMenuItem(text = { Text("Start new · archive this draft") }, enabled = menuEnabled, onClick = { menu = false; onStartNew() }, modifier = Modifier.testTag("record-stage-start-new"))
-                        DropdownMenuItem(text = { Text("Back to who is here") }, enabled = backToWhoEnabled, onClick = { menu = false; onBackToWho() }, modifier = Modifier.testTag("record-stage-who"))
-                    } }
+                TextButton(onClick = onBackToWho, enabled = navigationEnabled && backToWhoEnabled,
+                    colors = ButtonDefaults.textButtonColors(contentColor = white, disabledContentColor = white.copy(alpha = .5f)),
+                    modifier = Modifier.heightIn(min = 48.dp).testTag("record-stage-who")) { Text("Who is here", fontSize = 14.sp) }
             }
-            Column(Modifier.fillMaxWidth().padding(end = 12.dp)) {
-                Text("Conversation", fontFamily = SaharaTitleFont, fontSize = 36.sp, lineHeight = 42.sp, fontWeight = FontWeight.Medium, color = white)
-                Text(doctorStageStatus(recording, saving, seconds), fontSize = 16.sp, lineHeight = 22.sp, color = white, modifier = Modifier.testTag("record-stage-status"))
-                Text("Audio stays on this device and is not included when a written note is shared. It is not automatically transcribed.", fontSize = 12.sp, lineHeight = 16.sp, color = white, modifier = Modifier.padding(top = 4.dp).testTag("record-stage-privacy"))
-            }
-            Spacer(Modifier.weight(1f))
-            DoctorWaveform(level, recording, Modifier.padding(end = 12.dp))
-            Spacer(Modifier.height(28.dp))
-            Surface(onClick = { if (recording) onStop() else onRecord() }, enabled = recordEnabled, shape = CircleShape, color = DoctorStageCream, contentColor = DoctorStageDeep, modifier = Modifier.size(88.dp).testTag("record-stage-button")) { Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Icon(if (recording) Icons.Default.Stop else Icons.Default.Mic, if (recording) "Stop and save" else "Record conversation", Modifier.size(40.dp), tint = DoctorStageDeep.copy(alpha = if (recordEnabled) 1f else .4f)) } }
-            if (saving || saveError) Column(Modifier.padding(top = 12.dp, end = 12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(if (saving) "Saving local audio and its consent record…" else "The audio file was retained, but its recording details could not be saved. Retry before continuing.", fontSize = 13.sp, lineHeight = 18.sp, color = white, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
-                if (saveError) OutlinedButton(onClick = onRetry, enabled = !saving, colors = ButtonDefaults.outlinedButtonColors(contentColor = white), modifier = Modifier.heightIn(min = 48.dp).testTag("retry-saving-audio")) { Text("Retry saving audio") }
-            }
-            Spacer(Modifier.weight(1f))
-        }
-        val heightDp = with(density) { (peek.toPx() + rangePx * frac.value).toDp() }
-        Surface(Modifier.align(Alignment.BottomCenter).fillMaxWidth().height(heightDp), color = Color.White, shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp), shadowElevation = 8.dp) {
-            Column(Modifier.fillMaxSize()) {
-                Column(Modifier.fillMaxWidth().height(peek)
-                    .draggable(rememberDraggableState { d -> scope.launch { frac.snapTo((frac.value - d / rangePx).coerceIn(0f, 1f)) } }, Orientation.Vertical, onDragStopped = { v -> scope.launch { frac.animateTo(if (abs(v) > 900f) (if (v < 0) 1f else 0f) else if (frac.value > 0.5f) 1f else 0f) } })
-                    .clickable(role = Role.Button, onClickLabel = if (expanded) "Collapse saved audio" else "Expand saved audio") { scope.launch { frac.animateTo(if (expanded) 0f else 1f) } }.testTag("saved-audio-peek"), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-                    Box(Modifier.width(40.dp).height(5.dp).background(DoctorStageTerracotta, RoundedCornerShape(3.dp)))
-                    Text(if (audioCount > 0) "Saved Audio · $audioCount" else "Saved Audio", fontFamily = SaharaTitleFont, fontSize = 22.sp, lineHeight = 28.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.padding(top = 8.dp).testTag("saved_audio_title"))
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.testTag("doctor-capture-modes")) {
+                listOf("Record", "Dictate", "Type").forEach { value ->
+                    val available = when (value) { "Record" -> localRecordingAllowed; "Dictate" -> !demo; else -> true }
+                    FilterChip(selected = value == mode, onClick = { if (navigationEnabled && available) onMode(value) }, enabled = navigationEnabled && available,
+                        label = { Text(value) },
+                        leadingIcon = { Icon(when (value) { "Record" -> Icons.Default.Mic; "Dictate" -> Icons.Default.KeyboardVoice; else -> Icons.Default.Keyboard }, null, Modifier.size(18.dp), tint = if (!navigationEnabled || !available) white.copy(alpha = .5f) else if (value == mode) DoctorStageDeep else white) },
+                        colors = FilterChipDefaults.filterChipColors(containerColor = Color.Transparent, labelColor = white,
+                            selectedContainerColor = DoctorStageCream, selectedLabelColor = DoctorStageDeep, selectedLeadingIconColor = DoctorStageDeep,
+                            disabledContainerColor = Color.Transparent, disabledLabelColor = white.copy(alpha = .5f), disabledLeadingIconColor = white.copy(alpha = .5f), disabledSelectedContainerColor = white.copy(alpha = .2f)),
+                        border = FilterChipDefaults.filterChipBorder(enabled = navigationEnabled && available, selected = value == mode, borderColor = white.copy(alpha = .65f), disabledBorderColor = white.copy(alpha = .25f)),
+                        modifier = Modifier.heightIn(min = 48.dp).testTag("record-stage-mode-$value"))
                 }
-                if (frac.value > 0.02f) sheet()
+            }
+            if (demo) Text(if (testRecord && localRecordingAllowed) "Dictation is unavailable in this demo." else "Recording and dictation are unavailable in this demo.", color = white, fontSize = 12.sp)
+            if (onStartNew != null) OutlinedButton(onClick = onStartNew, enabled = navigationEnabled,
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = white, disabledContentColor = white.copy(alpha = .5f)), border = BorderStroke(1.dp, white.copy(alpha = .45f)),
+                    modifier = Modifier.heightIn(min = 48.dp).testTag("record-stage-start-new")) { Text("Start new · archive draft", fontSize = 13.sp) }
+            Text("Conversation", fontFamily = SaharaTitleFont, fontSize = 30.sp, lineHeight = 36.sp, fontWeight = FontWeight.Medium, color = white)
+            Text(doctorStageStatus(recording, saving, seconds), fontSize = 16.sp, lineHeight = 22.sp, color = white, modifier = Modifier.testTag("record-stage-status"))
+            Text("Audio stays on this device and is not included when a written note is shared. It is not automatically transcribed.", fontSize = 12.sp, lineHeight = 16.sp, color = white, modifier = Modifier.testTag("record-stage-privacy"))
+        }
+        PrimaryTabRow(selectedTabIndex = if (savedAudioPage) 1 else 0, containerColor = DoctorStageTerracotta, contentColor = white, modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
+            Tab(selected = !savedAudioPage, onClick = { savedAudioPage = false }, selectedContentColor = white, unselectedContentColor = white.copy(alpha = .8f),
+                text = { Text("Record") }, modifier = Modifier.heightIn(min = 48.dp).testTag("record-stage-page-record"))
+            Tab(selected = savedAudioPage, onClick = { if (audioPageEnabled) savedAudioPage = true }, enabled = audioPageEnabled,
+                selectedContentColor = white, unselectedContentColor = white.copy(alpha = if (audioPageEnabled) .8f else .45f),
+                text = { Text(if (audioCount > 0) "Saved audio · $audioCount" else "Saved audio", modifier = Modifier.testTag("saved_audio_title")) },
+                modifier = Modifier.heightIn(min = 48.dp).testTag("record-stage-page-saved"))
+        }
+        if (savedAudioPage) Surface(Modifier.weight(1f).fillMaxWidth(), color = Color.White) {
+            Box(Modifier.fillMaxSize().padding(top = 12.dp)) { sheet() }
+        } else BoxWithConstraints(Modifier.weight(1f).fillMaxWidth()) {
+            Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).heightIn(min = maxHeight).padding(horizontal = 20.dp, vertical = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+                DoctorWaveform(level, recording)
+                Spacer(Modifier.height(20.dp))
+                Surface(onClick = { if (recording) onStop() else onRecord() }, enabled = recordEnabled, shape = CircleShape, color = DoctorStageCream, contentColor = DoctorStageDeep,
+                    modifier = Modifier.size(88.dp).testTag("record-stage-button")) {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Icon(if (recording) Icons.Default.Stop else Icons.Default.Mic, if (recording) "Stop and save" else "Record conversation", Modifier.size(40.dp), tint = DoctorStageDeep.copy(alpha = if (recordEnabled) 1f else .4f)) }
+                }
+                Text(if (recording) "Stop and save" else "Record conversation", color = white, fontSize = 15.sp, modifier = Modifier.padding(top = 8.dp))
+                if (saving || saveError) Column(Modifier.padding(top = 12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(if (saving) "Saving local audio and its consent record…" else "The audio file was retained, but its recording details could not be saved. Retry before continuing.", fontSize = 13.sp, lineHeight = 18.sp, color = white, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+                    if (saveError) OutlinedButton(onClick = onRetry, enabled = !saving, colors = ButtonDefaults.outlinedButtonColors(contentColor = white), modifier = Modifier.heightIn(min = 48.dp).testTag("retry-saving-audio")) { Text("Retry saving audio") }
+                }
             }
         }
     }

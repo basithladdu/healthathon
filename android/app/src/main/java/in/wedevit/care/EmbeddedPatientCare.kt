@@ -53,6 +53,7 @@ fun EmbeddedPatientCare(
     onNavigationBlockedChange: (Boolean) -> Unit = {},
     allowDeviceLocal: Boolean = false,
     onHeaderBackChange: ((() -> Unit)?) -> Unit = {},
+    feedbackHandledByParent: Boolean = false,
 ) {
     val account = vm.accountNamespace
     val session = vm.cloud?.session?.collectAsStateWithLifecycle()?.value
@@ -68,6 +69,7 @@ fun EmbeddedPatientCare(
     val refreshing by vm.refreshing.collectAsStateWithLifecycle()
     val refreshError by vm.refreshError.collectAsStateWithLifecycle()
     val message by vm.message.collectAsStateWithLifecycle()
+    val feedback by vm.feedback.collectAsStateWithLifecycle()
     val recording by vm.recording.collectAsStateWithLifecycle()
     val transcription by vm.transcribingPath.collectAsStateWithLifecycle()
     val person = people.firstOrNull { it.id == personId }
@@ -76,6 +78,7 @@ fun EmbeddedPatientCare(
         entries.map { it.personId } + versions.map { it.personId } + reports.map { it.personId },
         allowDeviceLocal = allowDeviceLocal && vm.cloud == null)
     var tool by rememberSaveable(account, personId) { mutableStateOf("") }
+    var symptomsReturnTool by rememberSaveable(account, personId) { mutableStateOf("") }
     var dialog by rememberSaveable(account, personId) { mutableStateOf("") }
     var reading by remember(account, personId) { mutableStateOf<CareVersion?>(null) }
     var talkInteraction by remember(account, personId) { mutableStateOf(false) }
@@ -109,20 +112,29 @@ fun EmbeddedPatientCare(
         lifecycle.lifecycle.addObserver(observer)
         onDispose { lifecycle.lifecycle.removeObserver(observer) }
     }
-    LaunchedEffect(message) { message?.let { snackbar.showSnackbar(it); if (vm.message.value == it) vm.message.value = null } }
-    LaunchedEffect(ready) { if (!ready) { tool = ""; dialog = ""; reading = null; talkInteraction = false; sharedBusy = false; medicineBusy = false;visitBusy=false;visitBack=null } }
+    if (!feedbackHandledByParent) LaunchedEffect(message) {
+        message?.let { vm.notifyNotice(it); if (vm.message.value == it) vm.message.value = null }
+    }
+    LaunchedEffect(ready) { if (!ready) { tool = ""; symptomsReturnTool = ""; dialog = ""; reading = null; talkInteraction = false; sharedBusy = false; medicineBusy = false;visitBusy=false;visitBack=null } }
     LaunchedEffect(canEdit, isOwner) {
         if ((!canEdit && dialog != "delete") || (!isOwner && dialog == "delete")) dialog = ""
         if (!canEdit && tool == "scanner") tool = ""
     }
     fun samePerson() = ready && vm.selected.value == personId && vm.draft.value.personId == personId &&
         vm.accountNamespace == account && (if (vm.cloud == null) allowDeviceLocal else vm.cloud.session.value?.userId == account)
-    fun leaveTool() { if (!navigating) { vm.stopRecording(); tool = "" } }
+    fun leaveTool() { if (!navigating) {
+        vm.stopRecording()
+        tool = if (tool == "symptoms") symptomsReturnTool else ""
+        symptomsReturnTool = ""
+    } }
     fun openTool(next: String) { if (samePerson() && !navigating) {
         if(vm.demoMode && next in listOf("scanner","nearby","feedback","reminders","shared","resources")) vm.message.value="This online, account or device action is unavailable in the walkthrough. Your own care profiles are unchanged."
-        else {vm.stopRecording(); tool = next}
+        else {
+            if (next == "symptoms") symptomsReturnTool = if (tool == "daily") "daily" else ""
+            vm.stopRecording(); tool = next
+        }
     } }
-    fun changeSection(next: String) { if (samePerson() && !navigating) { vm.stopRecording(); tool = ""; onSection(next) } }
+    fun changeSection(next: String) { if (samePerson() && !navigating) { vm.stopRecording(); tool = ""; symptomsReturnTool = ""; onSection(next) } }
     fun add(kind: String) {
         if (samePerson() && vm.canEdit.value && !navigating) dialog = kind
         else vm.message.value = "Ask the person who invited you to allow changes."
@@ -149,7 +161,13 @@ fun EmbeddedPatientCare(
 
     // Check-ins use the full-screen slider so both entry points record the same way; it replaces the content rather than sitting under it.
     if (ready && dialog == "checkin" && canEdit) {
-        FeedbackScreen(accountScope = vm.accountNamespace.ifBlank { "guest" }, surface = "patient-checkin", onClose = { dialog = "" }, careModel = vm, personId = personId)
+        Box(Modifier.fillMaxSize()) {
+            FeedbackScreen(accountScope = vm.accountNamespace.ifBlank { "guest" }, surface = "patient-checkin", onClose = { dialog = "" }, careModel = vm, personId = personId)
+            if (!feedbackHandledByParent) {
+                CareSnackbarHost(snackbar, Modifier.align(Alignment.BottomCenter).imePadding())
+                CareFeedbackPresenter(feedback, snackbar, vm::dismissFeedback)
+            }
+        }
         return
     }
     Column(Modifier.fillMaxSize().testTag("embedded-patient-care")) {
@@ -169,14 +187,15 @@ fun EmbeddedPatientCare(
                 }
             }
             if (tool.isNotEmpty() && tool !in listOf("scanner", "feedback", "reminders")) Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-                TextButton(onClick = ::leaveTool, enabled = !navigating, modifier = Modifier.heightIn(min = 48.dp).testTag("embedded-care-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null); Spacer(Modifier.width(6.dp)); Text("Back to ${if (section == "Tools") "tools" else "patient care"}") }
+                TextButton(onClick = ::leaveTool, enabled = !navigating, modifier = Modifier.heightIn(min = 48.dp).testTag("embedded-care-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null); Spacer(Modifier.width(6.dp)); Text("Back to ${if (tool == "symptoms" && symptomsReturnTool == "daily") "daily care" else if (section == "Tools") "care tools" else "patient care"}") }
             }
             Box(Modifier.weight(1f).fillMaxWidth()) {
                 if (refreshing) Column(Modifier.fillMaxWidth().padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) { LinearProgressIndicator(Modifier.fillMaxWidth()); Text("Refreshing this person's access and records…") }
                 else key(account, personId, section, tool) { screens.SaveableStateProvider("$account:$personId:$section:$tool") {
                     when (tool) {
                         "scanner" -> if (canEdit) MedicineScanner(vm, onClose = { tool = "" }, onAccount = onAccount) else Text("Editing access is no longer available.", Modifier.padding(20.dp))
-                        "daily" -> CareList(vm, ::add, { openTool("scanner") }, { openTool("calendar") }, { openTool("workflows") }, { openTool("labs") }, onReadNote = ::read)
+                        "daily" -> CareList(vm, ::add, { openTool("scanner") }, { openTool("calendar") }, { openTool("workflows") }, { openTool("labs") }, onReadNote = ::read, onSymptoms = { openTool("symptoms") }, onDocuments = { openTool("documents") })
+                        "symptoms" -> CareSymptomDiary(vm, onBack = ::leaveTool)
                         "calendar" -> CareCalendar(vm, onWorkflow = { openTool("workflows") }, onAddDoctorVisit = { add("doctor-visit") })
                         "workflows" -> CareWorkflows(vm, onTalk = { changeSection("Conversations") })
                         "labs" -> CareLabs(vm)
@@ -204,12 +223,13 @@ fun EmbeddedPatientCare(
             }
             refreshError?.let { Surface(color = Peach) { Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) { Text(it, Modifier.weight(1f), style = MaterialTheme.typography.bodySmall); TextButton(onClick = vm::refresh, enabled = !busy) { Text("Retry") } } } }
         }
-        SnackbarHost(snackbar)
+        if (!feedbackHandledByParent) CareSnackbarHost(snackbar)
     }
     if (ready && dialog in listOf("medicine", "visit", "task", "journal") && canEdit) AddCareItem(dialog, vm, onDismiss = { dialog = "" })
     if (ready && dialog == "doctor-visit" && canEdit) DoctorVisitEditor(vm, personId, onDismiss = { dialog = "" })
     if (ready && dialog == "delete" && isOwner) AlertDialog(onDismissRequest = { if (!busy) dialog = "" }, title = { Text("Remove ${person?.name}'s records?") }, text = { Text("This removes their notes, reports, recordings and care entries. Export anything you want to keep first.") }, confirmButton = { TextButton(onClick = { if (samePerson() && vm.isOwner.value && !vm.busy.value) vm.removePerson { dialog = ""; onExit() } }, enabled = !busy) { Text("Remove records") } }, dismissButton = { TextButton(onClick = { dialog = "" }, enabled = !busy) { Text("Keep records") } })
     if (ready) reading?.takeIf { it.personId == personId }?.let { NoteReader(vm, it, onDismiss = { reading = null }) }
+    if (!feedbackHandledByParent) CareFeedbackPresenter(feedback, snackbar, vm::dismissFeedback)
 }
 
 /** Existing verification/review controls without another Scaffold or navigation bar. */
@@ -222,6 +242,7 @@ fun EmbeddedSharedCare(vm: CareModel, onAccount: () -> Unit, onClose: () -> Unit
 internal fun EmbeddedCareTools(onOpen: (String) -> Unit) {
     val tools = listOf(
         Triple("daily", "Daily care", "Medicines, tasks, check-ins and journal"),
+        Triple("symptoms", "Symptoms", "Symptom notes, pain locations and dated trends"),
         Triple("calendar", "Calendar", "Planned care activities and visits"),
         Triple("workflows", "Care team & requests", "Existing shared-care tasks and discussion requests"),
         Triple("labs", "Lab history", "Reported results and earlier entries"),
@@ -229,11 +250,11 @@ internal fun EmbeddedCareTools(onOpen: (String) -> Unit) {
         Triple("documents", "Documents & care notes", "Local reports, saved versions and sharing"),
         Triple("reminders", "Reminders", "Medicine and dated-care notifications on this device"),
         Triple("shared", "Shared care & clinical review", "Patient access, verification and submitted conversations"),
-        Triple("resources", "Privacy, exports & more", "Export care notes and manage this care profile"),
+        Triple("resources", "Privacy & exports", "Export care notes and manage this care profile"),
         Triple("feedback", "App feedback", "Tell us about your experience"),
     )
     LazyColumn(Modifier.fillMaxSize().testTag("embedded-care-tools"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { Heading("Daily care & tools", 28); Text("Everything for this person, without leaving the doctor workspace.", style = MaterialTheme.typography.bodyMedium) }
+        item { Heading("Care tools", 28) }
         items(tools, key = { it.first }) { (key, title, subtitle) ->
             OutlinedCard(onClick = { onOpen(key) }, modifier = Modifier.fillMaxWidth().heightIn(min = 72.dp).testTag("embedded-tool-$key")) {
                 Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {

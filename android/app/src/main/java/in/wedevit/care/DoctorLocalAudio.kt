@@ -18,7 +18,7 @@ internal data class DoctorLocalAudioInfo(val bytes: Long, val durationMicros: Lo
 
 internal suspend fun awaitDoctorLocalAudioSave(job: Job?, failure: () -> String?) {
     job?.join()
-    check(job?.isCancelled!=true && failure()==null) { "The recording's consent could not be saved. Keep this workspace open and retry saving." }
+    check(job?.isCancelled!=true && failure()==null) { "The recording's consent could not be saved. Keep this screen open and retry saving." }
 }
 
 internal suspend fun persistDoctorLocalAudioMetadata(consent: RecordingConsent, ref: DoctorLocalAudioRef, personExists: suspend () -> Boolean, writeBoth: suspend () -> Unit) {

@@ -48,7 +48,7 @@ fun savedAudioFormatTime(at: Long, zone: ZoneId = ZoneId.systemDefault()): Strin
     val labels = savedAudioLabels(rows)
     val current = rows.indexOfFirst { it.id == nowPlaying }
     Column(modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(bottom = 16.dp).testTag("saved_audio_sheet")) {
-        if (rows.isEmpty()) Surface(Modifier.fillMaxWidth().testTag("saved_audio_empty"), color = Color.White, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline)) { Text("No audio recorded yet. Drag this down and record to add one.", fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk, modifier = Modifier.padding(16.dp)) }
+        if (rows.isEmpty()) Surface(Modifier.fillMaxWidth().testTag("saved_audio_empty"), color = Color.White, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline)) { Text("No audio recorded yet. Choose Record to add one.", fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk, modifier = Modifier.padding(16.dp)) }
         LazyColumn(Modifier.weight(1f).testTag("saved_audio_list"), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             items(rows.size, key = { rows[it].id }) { i ->
                 val r = rows[i]; val checked = r.id in selected; val playing = r.id == nowPlaying

@@ -53,14 +53,34 @@ try {
   controls.target.set(0, 0, 0); controls.enablePan = false; controls.enableDamping = false;
   controls.minDistance = 2.3; controls.maxDistance = 5.5;
   controls.minPolarAngle = Math.PI * 0.25; controls.maxPolarAngle = Math.PI * 0.75;
-  const render = () => renderer.render(scene, camera);
+  let hasViewport = false;
+  let usesPixelViewportHeight = false;
+  const render = () => { if (hasViewport) renderer.render(scene, camera); };
   controls.addEventListener('change', render);
   changeView = (view) => { camera.position.set(0, 0.05, view === 'back' ? -3.95 : 3.95); controls.update(); render(); };
   const resize = () => {
-    const width = Math.max(surface.clientWidth, 1), height = Math.max(surface.clientHeight, 1);
+    // Some Android WebViews resolve viewport CSS units to zero even with a real innerHeight.
+    // Use that measured viewport in pixels, and keep it in sync with actual viewport changes.
+    if (usesPixelViewportHeight || surface.clientHeight <= 0) {
+      const viewportHeight = window.visualViewport?.height || window.innerHeight;
+      if (Number.isFinite(viewportHeight) && viewportHeight > 0) {
+        usesPixelViewportHeight = true;
+        const pixelHeight = `${Math.ceil(viewportHeight)}px`;
+        for (const element of [document.documentElement, document.body, surface]) {
+          if (element.style.height !== pixelHeight) element.style.height = pixelHeight;
+        }
+      }
+    }
+    const width = surface.clientWidth, height = surface.clientHeight;
+    hasViewport = Number.isFinite(width) && Number.isFinite(height) && width > 1 && height > 1;
+    if (!hasViewport) return false;
     renderer.setSize(width, height, false); camera.aspect = width / height; camera.updateProjectionMatrix(); render();
+    return true;
   };
-  new ResizeObserver(resize).observe(surface); resize();
+  new ResizeObserver(resize).observe(surface);
+  window.addEventListener('resize', resize);
+  window.visualViewport?.addEventListener('resize', resize);
+  resize();
   renderer.domElement.addEventListener('webglcontextlost', (event) => { event.preventDefault(); fail(); });
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
@@ -140,6 +160,6 @@ try {
       const site = classifyPainBodyPoint(normalized);
       if (site) { const selectedPoint = quantizePainBodyPoint({ site, ...normalized }); emit({ type: 'pick', site, point: { x: selectedPoint.x, y: selectedPoint.y, z: selectedPoint.z } }); }
     });
-    applyState(); resize(); emit({ type: 'ready' });
+    applyState(); if (resize()) emit({ type: 'ready' }); else fail();
   }, undefined, fail);
 } catch { fail(); }

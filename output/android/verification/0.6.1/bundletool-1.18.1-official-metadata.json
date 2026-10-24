@@ -1,0 +1,14 @@
+{
+  "checkedAtUtc": "2026-10-24T19:03:52.941976+00:00",
+  "repository": "google/bundletool",
+  "releaseApiUrl": "https://api.github.com/repos/google/bundletool/releases/tags/1.18.1",
+  "releaseUrl": "https://github.com/google/bundletool/releases/tag/1.18.1",
+  "releaseId": 204093133,
+  "tag": "1.18.1",
+  "publishedAt": "2025-03-06T12:00:45Z",
+  "assetId": 235114272,
+  "assetName": "bundletool-all-1.18.1.jar",
+  "downloadUrl": "https://github.com/google/bundletool/releases/download/1.18.1/bundletool-all-1.18.1.jar",
+  "bytes": 32505571,
+  "officialApiDigest": null
+}

@@ -8,8 +8,14 @@ import android.webkit.WebResourceResponse
 import android.webkit.WebSettings
 import android.webkit.WebView
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AccessibilityNew
+import androidx.compose.material.icons.outlined.RotateRight
+import androidx.compose.material.icons.outlined.RestartAlt
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -40,18 +46,26 @@ import java.io.ByteArrayInputStream
     val t = { en: String, hi: String -> if (hindi) hi else en }
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(if (readOnly) t("Saved pain areas", "सहेजी गई दर्द की जगह") else t("Where is the pain? (optional)", "दर्द कहाँ है? (वैकल्पिक)"), fontWeight = FontWeight.SemiBold)
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            FilterChip(!back, { back = false }, label = { Text(t("Front", "सामने")) }, modifier = Modifier.heightIn(min = 48.dp).testTag("pain-body-front"))
-            FilterChip(back, { back = true }, label = { Text(t("Back", "पीछे")) }, modifier = Modifier.heightIn(min = 48.dp).testTag("pain-body-back"))
-            if (!readOnly && selected.isNotEmpty()) TextButton(onClick = { onChange(emptyList(), emptyList()) }, modifier = Modifier.heightIn(min = 48.dp).testTag("pain-body-clear")) { Text(t("Clear", "हटाएँ")) }
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            FilterChip(!back, { back = false }, label = { Text(t("Front", "सामने")) }, leadingIcon = { Icon(Icons.Outlined.AccessibilityNew, null, Modifier.size(19.dp)) },
+                colors = FilterChipDefaults.filterChipColors(selectedContainerColor = Mint, selectedLabelColor = Ink, selectedLeadingIconColor = Rust),
+                modifier = Modifier.heightIn(min = 48.dp).testTag("pain-body-front"))
+            FilterChip(back, { back = true }, label = { Text(t("Back", "पीछे")) }, leadingIcon = { Icon(Icons.Outlined.RotateRight, null, Modifier.size(19.dp)) },
+                colors = FilterChipDefaults.filterChipColors(selectedContainerColor = Mint, selectedLabelColor = Ink, selectedLeadingIconColor = Rust),
+                modifier = Modifier.heightIn(min = 48.dp).testTag("pain-body-back"))
+            if (!readOnly && selected.isNotEmpty()) TextButton(onClick = { onChange(emptyList(), emptyList()) }, modifier = Modifier.heightIn(min = 48.dp).testTag("pain-body-clear")) {
+                Icon(Icons.Outlined.RestartAlt, null, Modifier.size(19.dp)); Spacer(Modifier.width(4.dp)); Text(t("Clear", "हटाएँ"))
+            }
         }
         Text(if (readOnly) t("Drag to turn or zoom. Saved locations stay unchanged. Left and right mean the patient's sides.", "घुमाएँ या ज़ूम करें। सहेजी हुई जगह नहीं बदलेगी। बायाँ और दायाँ मरीज़ की तरफ़ से हैं।") else t("Drag to turn. Tap a region or choose below. Left and right mean the patient's sides.", "घुमाने के लिए खींचें। शरीर पर छुएँ या नीचे चुनें। बायाँ और दायाँ मरीज़ की तरफ़ से हैं।"), style = MaterialTheme.typography.bodySmall)
-        LocalPainBodyViewer(selected, points, rating, hindi, back, readOnly, onChange)
+        Surface(shape = RoundedCornerShape(16.dp), color = Cream, border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)) {
+            Column(Modifier.fillMaxWidth().padding(8.dp)) { LocalPainBodyViewer(selected, points, rating, hindi, back, readOnly, onChange) }
+        }
         Text(if (rating == null) t("Not rated — no pain intensity shown", "अंक नहीं बताया — दर्द की तीव्रता नहीं दिखाई गई") else "${t("Pain", "दर्द")}: $rating/10 · ${t("Colour follows this number", "रंग इसी अंक के अनुसार है")}", style = MaterialTheme.typography.bodySmall)
-        if (!readOnly) FlowRow(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
+        if (!readOnly) FlowRow(horizontalArrangement = Arrangement.spacedBy(7.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             PainBodyMapRules.sites.forEach { (id, _) ->
                 FilterChip(id in selected, { val next = PainBodyMapRules.toggled(selected, id); onChange(next, points.filter { it.site in next }) }, label = { Text(PainBodyMapRules.label(id, hindi)) },
-                    modifier = Modifier.heightIn(min = 48.dp).testTag("pain-body-site-$id"))
+                    colors = FilterChipDefaults.filterChipColors(selectedContainerColor = Mint, selectedLabelColor = Ink), modifier = Modifier.heightIn(min = 48.dp).testTag("pain-body-site-$id"))
             }
         }
         if (selected.isNotEmpty()) Text(selected.joinToString { PainBodyMapRules.label(it, hindi) }, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.testTag("pain-body-selected"))

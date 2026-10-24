@@ -1,0 +1,16 @@
+{
+  "startedAt": "2026-10-24T19:36:35.898475+00:00",
+  "versionName": "0.6.1",
+  "versionCode": 8,
+  "device": "Samsung A34",
+  "dataCleared": false,
+  "uninstalled": false,
+  "playUploaded": false,
+  "privateDeviceDetails": "Stored outside the repository",
+  "status": "failed",
+  "apk": "android/app/build/outputs/apk/release/app-release.apk",
+  "apkSha256": "1FD4B7C7951A3DD767104A3C64E0F5864719DAF139BFCEE8F2481EF40E36022B",
+  "signerCertificateSha256": "607D227A8B25BF7126BBCD742110BBBA26F8BA9D75A2F47917013E9589341AD2",
+  "error": "Connected device is not the previously selected Samsung A34",
+  "finishedAt": "2026-10-24T19:36:42.929070+00:00"
+}

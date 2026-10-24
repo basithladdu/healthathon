@@ -3,8 +3,8 @@ package `in`.wedevit.care
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.font.FontFamily
 
-/** Original app pairing: system serif titles and Android's default body/control font. */
-internal val SaharaTitleFont = FontFamily.Serif
+/** One native sans-serif family keeps headings, forms and actions visually consistent. */
+internal val SaharaTitleFont = FontFamily.SansSerif
 internal val SaharaBodyFont = FontFamily.Default
 
 /** Preserve original role sizes, weights and spacing; body and controls stay exactly base. */

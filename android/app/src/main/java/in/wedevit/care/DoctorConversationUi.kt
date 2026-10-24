@@ -10,6 +10,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.*
@@ -18,7 +19,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Keyboard
+import androidx.compose.material.icons.filled.KeyboardVoice
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
@@ -70,7 +72,6 @@ private fun conversationDate(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy
     val editorState = rememberSaveableStateHolder()
     var doctorFilter by rememberSaveable(person) { mutableStateOf("") }
     var dateFilter by rememberSaveable(person) { mutableStateOf("") }
-    var doctorMenu by remember { mutableStateOf(false) }
     var archiveDetail by remember(person) {mutableStateOf<DoctorConversationArchive?>(null)}
     val context = LocalContext.current
     val own = versions.filter { it.personId == person }.sortedByDescending { it.published }
@@ -109,11 +110,13 @@ private fun conversationDate(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy
         item { Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { Icon(Icons.Default.History, null, tint = Rust); SectionTitle("Conversation history") }; Text("All saved conversation versions.", style = MaterialTheme.typography.bodySmall) }
         item {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Box {
-                OutlinedButton(onClick = { doctorMenu = true }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(doctorFilter.ifBlank { "All recorded doctors" }) }
-                DropdownMenu(doctorMenu, { doctorMenu = false }) {
-                    DropdownMenuItem(text = { Text("All recorded doctors") }, onClick = { doctorFilter = ""; doctorMenu = false })
-                    own.map { it.doctor }.filter(String::isNotBlank).distinct().sorted().forEach { name -> DropdownMenuItem(text = { Text(name) }, onClick = { doctorFilter = name; doctorMenu = false }) }
+            Text("Recorded doctor", style = MaterialTheme.typography.labelLarge)
+            Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).testTag("doctor-history-doctor-filters"), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                FilterChip(selected = doctorFilter.isBlank(), onClick = { doctorFilter = "" }, label = { Text("All recorded doctors") },
+                    modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-history-doctor-all"))
+                own.map { it.doctor }.filter(String::isNotBlank).distinct().sorted().forEachIndexed { index, name ->
+                    FilterChip(selected = doctorFilter == name, onClick = { doctorFilter = name }, label = { Text(name) },
+                        modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-history-doctor-$index"))
                 }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -348,17 +351,21 @@ internal fun doctorContextGoals(draft: Conversation): List<DoctorGoalContext> = 
         Text("Choose each status yourself. An answer or AI draft does not prove the topic was discussed.", style = MaterialTheme.typography.bodySmall)
         if (goals.isEmpty()) Text("This review context is unavailable or needs a newer app. Its original text has been retained; nothing was replaced.", color = MaterialTheme.colorScheme.error)
         goals.forEach { goal ->
-            var expanded by rememberSaveable(goal.key) { mutableStateOf(true) }
-            var menu by remember { mutableStateOf(false) }
-            OutlinedCard(Modifier.fillMaxWidth()) { Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                TextButton(onClick = { expanded = !expanded }, modifier = Modifier.fillMaxWidth()) { Text(labels[DoctorConversationContext.keys.indexOf(goal.key)], Modifier.weight(1f)); Text(if (expanded) "Hide" else "Expand") }
-                Box { OutlinedButton(onClick = { menu = true }) { Text(goal.status.replace('_',' ')) }; DropdownMenu(menu, { menu = false }) { DoctorConversationContext.statuses.forEach { status -> DropdownMenuItem(text = { Text(status.replace('_',' ')) }, onClick = { onGoal(goal.copy(status = status, answer = if(status=="not_recorded") "" else goal.answer, evidence = if(status=="not_recorded") emptyList() else goal.evidence)); menu = false }) } } }
-                if (expanded) {
-                    if (CarriedForward.isOrigin(goal.origin)) DoctorCarriedForwardBanner(goal, onConfirm = { onGoal(CarriedForward.confirm(goal)) })
-                    CareField(goal.answer, { value -> onGoal(goal.copy(answer = value, status = if(value.isBlank()) "not_recorded" else "needs_review", origin = "manual", evidence = emptyList())) }, labels[DoctorConversationContext.keys.indexOf(goal.key)], minLines = 2)
-                    Text("Origin: ${if (CarriedForward.isOrigin(goal.origin)) "carried forward from version ${CarriedForward.version(goal.origin)}" else goal.origin}. ${if(goal.evidence.isEmpty()) "No exact source excerpt attached." else "${goal.evidence.size} exact source excerpts attached."}", style = MaterialTheme.typography.bodySmall)
-                    goal.evidence.forEach { Text(it.quote, style = MaterialTheme.typography.bodyMedium) }
+            OutlinedCard(Modifier.fillMaxWidth().testTag("doctor-goal-${goal.key}")) { Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(labels[DoctorConversationContext.keys.indexOf(goal.key)], style = MaterialTheme.typography.titleMedium)
+                Text("Status", style = MaterialTheme.typography.labelLarge)
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    DoctorConversationContext.statuses.forEach { status ->
+                        FilterChip(selected = goal.status == status,
+                            onClick = { onGoal(goal.copy(status = status, answer = if(status=="not_recorded") "" else goal.answer, evidence = if(status=="not_recorded") emptyList() else goal.evidence)) },
+                            label = { Text(status.replace('_',' ').replaceFirstChar { it.titlecase() }) },
+                            modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-goal-status-${goal.key}-$status"))
+                    }
                 }
+                if (CarriedForward.isOrigin(goal.origin)) DoctorCarriedForwardBanner(goal, onConfirm = { onGoal(CarriedForward.confirm(goal)) })
+                CareField(goal.answer, { value -> onGoal(goal.copy(answer = value, status = if(value.isBlank()) "not_recorded" else "needs_review", origin = "manual", evidence = emptyList())) }, labels[DoctorConversationContext.keys.indexOf(goal.key)], minLines = 2)
+                Text("Origin: ${if (CarriedForward.isOrigin(goal.origin)) "carried forward from version ${CarriedForward.version(goal.origin)}" else goal.origin}. ${if(goal.evidence.isEmpty()) "No exact source excerpt attached." else "${goal.evidence.size} exact source excerpts attached."}", style = MaterialTheme.typography.bodySmall)
+                goal.evidence.forEach { Text(it.quote, style = MaterialTheme.typography.bodyMedium) }
             } }
         }
     }
@@ -396,8 +403,7 @@ internal fun assignDoctorSource(vm: CareModel, expected: Conversation, index: In
 }
 
 @Composable fun DoctorCaptureHeader(mode: String, onMode: (String) -> Unit, recording: Boolean, dictating: Boolean, level: Float, seconds: Long, demo: Boolean, onBack: (() -> Unit)? = null, backEnabled: Boolean = true, localRecordingAllowed: Boolean = !demo, testRecord: Boolean = false) {
-    var menu by remember { mutableStateOf(false) }
-    // One quiet header: title, live/idle state and mode. The single record control, consent and transcript live in the panel below.
+    // Visible modes stay beside the live state; recording, consent and transcript remain caller-owned.
     Surface(color = DoctorCardConversation, contentColor = DoctorCardInk, shape = RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp), modifier = Modifier.fillMaxWidth().testTag("doctor-capture-hero")) {
         Column(Modifier.padding(horizontal = 20.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             if (onBack != null) TextButton(onClick = onBack, enabled = backEnabled, colors = ButtonDefaults.textButtonColors(contentColor = DoctorAccent), contentPadding = PaddingValues(0.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-capture-back")) { Text("Back to conversations", fontSize = 13.sp) }
@@ -409,21 +415,30 @@ internal fun assignDoctorSource(vm: CareModel, expected: Conversation, index: In
                         Text(if (recording) "Recording ${seconds / 60}:${(seconds % 60).toString().padStart(2, '0')}" else if (dictating) "Dictation in progress" else "$mode mode \u00B7 ready when you are", fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub)
                     }
                 }
-                Box { IconButton(onClick = { menu = true }, enabled = !recording && !dictating, modifier = Modifier.size(48.dp).testTag("doctor-capture-mode")) { Icon(Icons.Default.MoreVert, "Choose Record, Dictate or Type", tint = DoctorCardInk) }; DropdownMenu(menu, { menu = false }) { listOf("Record", "Dictate", "Type").forEach { value -> val available = when(value) { "Record" -> localRecordingAllowed; "Dictate" -> !demo; else -> true }; DropdownMenuItem(text = { Text(value + if (!available) if(testRecord) " \u00B7 unavailable" else " \u00B7 unavailable in demo" else "") }, enabled = available, onClick = { onMode(value); menu = false }) } } }
             }
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.testTag("doctor-capture-modes")) {
+                listOf("Record", "Dictate", "Type").forEach { value ->
+                    val available = when (value) { "Record" -> localRecordingAllowed; "Dictate" -> !demo; else -> true }
+                    val enabled = available && !recording && !dictating
+                    FilterChip(selected = value == mode, onClick = { if (enabled) onMode(value) }, enabled = enabled,
+                        label = { Text(value) },
+                        leadingIcon = { Icon(when (value) { "Record" -> Icons.Default.Mic; "Dictate" -> Icons.Default.KeyboardVoice; else -> Icons.Default.Keyboard }, null, Modifier.size(18.dp)) },
+                        modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-capture-mode-$value"))
+                }
+            }
+            if (demo) Text(if (testRecord && localRecordingAllowed) "Dictation is unavailable in this demo." else "Recording and dictation are unavailable in this demo.", color = DoctorCardSub, fontSize = 12.sp)
             DoctorFootnote("Audio stays on this device and is not included when a written note is shared. It is not automatically transcribed.")
         }
     }
 }
 
 @Composable fun DoctorGoalEditor(label: String, value: String, source: String, onValue: (String) -> Unit) {
-    var expanded by rememberSaveable(label) { mutableStateOf(value.isBlank()) }
     val lines = value.lines().map(String::trim).filter(String::isNotBlank)
     val quoted = lines.isNotEmpty() && lines.all { source.contains(it) }
     OutlinedCard(Modifier.fillMaxWidth()) { Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        TextButton(onClick = { expanded = !expanded }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(label, modifier = Modifier.weight(1f)); Text(if (expanded) "Hide" else "Expand") }
+        Text(label, style = MaterialTheme.typography.titleMedium)
         Text(if (value.isBlank()) "Not recorded" else if (quoted) "Exact words found in the source · check context" else "Manually entered · verify against the source", style = MaterialTheme.typography.labelMedium, color = Rust)
-        if (expanded) { CareField(value, onValue, label, minLines = 2); CareSourceLinks(source, value) }
-        else Text(value.ifBlank { "No answer has been recorded for this section." })
+        CareField(value, onValue, label, minLines = 2)
+        CareSourceLinks(source, value)
     } }
 }

@@ -73,7 +73,7 @@ private fun requestLabel(status: WorkflowRequestStatus) = status.name.lowercase(
 
 @Composable internal fun DoctorRequestQueueHeader(onBack: () -> Unit) {
     Column(verticalArrangement=Arrangement.spacedBy(12.dp)) {
-        TextButton(onClick=onBack,modifier=Modifier.heightIn(min=48.dp).testTag("workflow-back")) { Icon(Icons.Default.ChevronLeft,null);Text("Workspace") }
+        TextButton(onClick=onBack,modifier=Modifier.heightIn(min=48.dp).testTag("workflow-back")) { Icon(Icons.Default.ChevronLeft,null);Text("Care team") }
         WorkflowTitle("Conversations to plan")
         Text("Your own list. Nothing here was sent to you by a patient or family member.",color=MaterialTheme.colorScheme.onSurfaceVariant)
     }

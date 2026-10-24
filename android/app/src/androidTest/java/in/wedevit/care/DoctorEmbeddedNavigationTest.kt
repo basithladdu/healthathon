@@ -26,7 +26,7 @@ class DoctorEmbeddedNavigationTest {
 
     @Test fun embeddedToolsKeepExistingDailyCareAndSupportingFeaturesReachable() {
         val opened = mutableListOf<String>()
-        val keys = listOf("daily", "calendar", "workflows", "labs", "nearby", "documents", "reminders", "shared", "resources", "feedback")
+        val keys = listOf("daily", "symptoms", "calendar", "workflows", "labs", "nearby", "documents", "reminders", "shared", "resources", "feedback")
         ui.setContent {
             val density = LocalDensity.current
             CompositionLocalProvider(LocalDensity provides Density(density.density, 1.5f)) {

@@ -1,0 +1,105 @@
+{
+  "device": "Samsung A34",
+  "scope": "Fictional or UUID-scoped fixtures only; no live accounts or production patient writes",
+  "classes": [
+    {
+      "class": "CarePainWebViewRuntimeTest",
+      "startedAt": "2026-10-24T19:13:49.6340179Z",
+      "finishedAt": "2026-10-24T19:13:58.4247993Z",
+      "adbExitCode": 0,
+      "passed": true,
+      "tests": 1,
+      "log": "CarePainWebViewRuntimeTest-device.log"
+    },
+    {
+      "class": "CareFeedbackUiTest",
+      "startedAt": "2026-10-24T19:13:58.4717245Z",
+      "finishedAt": "2026-10-24T19:14:09.5576728Z",
+      "adbExitCode": 0,
+      "passed": true,
+      "tests": 4,
+      "log": "CareFeedbackUiTest-device.log"
+    },
+    {
+      "class": "CareSymptomRoomFlowTest",
+      "startedAt": "2026-10-24T19:14:09.5622234Z",
+      "finishedAt": "2026-10-24T19:14:30.8457384Z",
+      "adbExitCode": 0,
+      "passed": true,
+      "tests": 4,
+      "log": "CareSymptomRoomFlowTest-device.log"
+    },
+    {
+      "class": "WelcomeInlinePanelTest",
+      "startedAt": "2026-10-24T19:14:30.8486900Z",
+      "finishedAt": "2026-10-24T19:14:40.0276124Z",
+      "adbExitCode": 0,
+      "passed": true,
+      "tests": 4,
+      "log": "WelcomeInlinePanelTest-device.log"
+    },
+    {
+      "class": "CareInformationUiTest",
+      "startedAt": "2026-10-24T19:14:40.0318085Z",
+      "finishedAt": "2026-10-24T19:14:45.1418963Z",
+      "adbExitCode": 0,
+      "passed": true,
+      "tests": 2,
+      "log": "CareInformationUiTest-device.log"
+    },
+    {
+      "class": "CareVisibleActionsUiTest",
+      "startedAt": "2026-10-24T19:14:45.1454010Z",
+      "finishedAt": "2026-10-24T19:14:57.2432635Z",
+      "adbExitCode": 0,
+      "passed": true,
+      "tests": 6,
+      "log": "CareVisibleActionsUiTest-device.log"
+    },
+    {
+      "class": "DoctorCaptureHeroTest",
+      "startedAt": "2026-10-24T19:14:57.2458261Z",
+      "finishedAt": "2026-10-24T19:15:03.8489940Z",
+      "adbExitCode": 0,
+      "passed": true,
+      "tests": 3,
+      "log": "DoctorCaptureHeroTest-device.log"
+    },
+    {
+      "class": "DoctorEmbeddedNavigationTest",
+      "startedAt": "2026-10-24T19:15:03.8525155Z",
+      "finishedAt": "2026-10-24T19:15:15.0917693Z",
+      "adbExitCode": 0,
+      "passed": true,
+      "tests": 3,
+      "log": "DoctorEmbeddedNavigationTest-device.log"
+    },
+    {
+      "class": "SaharaTitleTypographyTest",
+      "startedAt": "2026-10-24T19:15:15.0954021Z",
+      "finishedAt": "2026-10-24T19:15:18.2884795Z",
+      "adbExitCode": 0,
+      "passed": true,
+      "tests": 1,
+      "log": "SaharaTitleTypographyTest-device.log"
+    },
+    {
+      "class": "CareSymptomDiaryUiTest",
+      "startedAt": "2026-10-24T19:15:18.2913172Z",
+      "finishedAt": "2026-10-24T19:16:03.3477163Z",
+      "adbExitCode": 0,
+      "passed": true,
+      "tests": 14,
+      "log": "CareSymptomDiaryUiTest-device.log"
+    },
+    {
+      "class": "CarePainHistoryUiTest",
+      "startedAt": "2026-10-24T19:16:03.3506207Z",
+      "finishedAt": "2026-10-24T19:16:08.9633786Z",
+      "adbExitCode": 0,
+      "passed": true,
+      "tests": 2,
+      "log": "CarePainHistoryUiTest-device.log"
+    }
+  ]
+}

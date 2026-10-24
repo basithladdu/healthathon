@@ -76,18 +76,24 @@ class CareFlowTest {
     @Test fun visibleRoleChoicesKeepDraftAndPatientChoiceAfterRecreation() {
         val words = "Please keep my questions while I change views."
         ui.runOnIdle { vm.edit(vm.draft.value.copy(source = words)) }
+        ui.onNodeWithTag("choose-role").assertIsDisplayed().performClick()
+        ui.onNodeWithText("Choose your view").assertIsDisplayed()
         ui.onNodeWithTag("role-Patient").assertIsDisplayed()
         ui.onNodeWithTag("role-Family").assertIsDisplayed()
         screenshot("role-choices")
         ui.onNodeWithTag("role-Patient").performClick()
-        ui.onNodeWithTag("nav-Docs").assertIsDisplayed().performClick()
+        ui.onNodeWithTag("nav-Care").assertIsDisplayed().performClick()
+        ui.onNodeWithTag("care-list").performScrollToNode(hasTestTag("care-documents-entry"))
+        ui.onNodeWithTag("care-documents-entry").performClick()
         ui.onNodeWithTag("documents-list").assertIsDisplayed()
         ui.activityRule.scenario.recreate(); ui.waitForIdle()
         ui.runOnIdle { vm = ui.activity.careModel }
         ui.waitUntil(15000) { vm.draft.value.personId == personId }
         assertEquals("Patient", vm.viewRole.value)
         assertEquals(words, vm.draft.value.source)
-        ui.onNodeWithTag("role-Doctor").performClick()
+        ui.onNodeWithTag("choose-role").assertContentDescriptionEquals("Choose role, current role Patient").performClick()
+        ui.onNodeWithTag("role-Patient").assertIsSelected()
+        ui.onNodeWithTag("role-Doctor").assertIsDisplayed().performClick()
         ui.onNodeWithTag("nav-Talk").performClick()
         openTranscriptStep()
         ui.onNodeWithTag("conversation-list").performScrollToNode(hasSetTextAction() and hasText("Conversation transcript"))
@@ -273,9 +279,9 @@ class CareFlowTest {
         ui.onNodeWithText("Save", useUnmergedTree = true).performScrollTo().performClick()
         ui.waitUntil(15000) { vm.items.value.any { it.title == "Bring the prescription" } }
         ui.onNodeWithTag("nav-Care").performClick()
-        // Daily care groups entries into modules; To do starts collapsed.
-        ui.onNodeWithTag("care-list").performScrollToNode(hasTestTag("care-module-to-do-toggle"))
-        ui.onNodeWithTag("care-module-to-do-toggle").performClick()
+        // Daily care exposes direct section choices; no collapsed heading is needed.
+        ui.onNodeWithTag("care-list").performScrollToNode(hasTestTag("care-section-to-do"))
+        ui.onNodeWithTag("care-section-to-do").performClick()
         ui.onNodeWithTag("care-list").performScrollToNode(hasText("Bring the prescription"))
         ui.onNodeWithText("Bring the prescription").assertIsDisplayed()
         screenshot("care")
@@ -287,10 +293,9 @@ class CareFlowTest {
     }
     @Test fun prescriptionScannerKeepsManualFallbackAndRequiresReviewBeforeSaving() {
         ui.onNodeWithTag("nav-Care").performClick()
-        // The Medicines module is open by default and holds the scan entry.
-        ui.onNodeWithTag("care-list").performScrollToNode(hasText("Scan a prescription"))
-        ui.onNodeWithText("Scan a prescription").assertIsDisplayed()
-        ui.onNodeWithText("Scan & organize").performClick()
+        // The scan action remains available even before the first care entry.
+        ui.onNodeWithTag("care-list").performScrollToNode(hasTestTag("care-add-scan"))
+        ui.onNodeWithTag("care-add-scan").performClick()
         ui.onNodeWithTag("medicine-scanner-select").assertIsDisplayed()
         ui.onNodeWithText("Choose pages").assertIsDisplayed()
         ui.onNodeWithText("Choose photos").assertIsDisplayed()
@@ -335,7 +340,7 @@ class CareFlowTest {
         ui.waitUntil(15000) {
             ui.onAllNodesWithText("Saved", useUnmergedTree = true).fetchSemanticsNodes().isEmpty()
         }
-        ui.onNodeWithTag("nav-More").performClick()
+        ui.onNodeWithTag("nav-Account").performClick()
         val privacyHeader = ui.onNode(hasText("Privacy"))
         privacyHeader.performScrollTo().assertIsDisplayed()
         ui.onRoot(useUnmergedTree = true).printToLog("SaharaPrivacyBefore")
@@ -360,7 +365,7 @@ class CareFlowTest {
                 cloud.saveEntry(CareItem(personId = shared.id, kind = "task", title = "Bring the care note"))
                 cloud.signOut()
             }
-            ui.onNodeWithTag("nav-More").performClick()
+            ui.onNodeWithTag("nav-Account").performClick()
             ui.onNodeWithText("Sign in to share care").performClick()
             ui.onNode(hasSetTextAction() and hasText("Email")).performTextInput(email!!)
             ui.onNode(hasSetTextAction() and hasText("Password")).performTextInput(password!!)
