@@ -167,7 +167,7 @@ private class CareDictation(private val context: Context, val changed: () -> Uni
     LaunchedEffect(active) { latestActiveChanged(active) }
     DisposableEffect(Unit) { onDispose { latestActiveChanged(false) } }
     SurfaceCard(Mint) {
-        Row(verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.RecordVoiceOver, null, tint = Ink); Spacer(Modifier.width(10.dp)); Text("On-device dictation", fontWeight = FontWeight.Bold) }
+        Row(verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.RecordVoiceOver, null, tint = Ink); Spacer(Modifier.width(10.dp)); Text("On-device dictation", fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont) }
         Spacer(Modifier.height(8.dp))
         Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(7.dp)) {
             listOf("Patient", "Family / carer", "Doctor").forEach { role -> FilterChip(selected = speaker == role, onClick = { speaker = role }, enabled = !active, label = { Text(role) }) }

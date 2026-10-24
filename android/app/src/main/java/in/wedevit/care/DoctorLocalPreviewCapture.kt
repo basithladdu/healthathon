@@ -46,7 +46,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
     var coverage by remember(controller,sourceText,clip?.id,state.recording) {mutableStateOf(defaultDoctorCoverage())}
     var reviewing by remember(controller,sourceText,clip?.id,state.recording) {mutableStateOf<Int?>(null)}
     var quote by remember(reviewing) {mutableStateOf("")}
-    Text("Local preview—on this device, not linked to a real patient. Use fictional speech. Recording does not upload audio or create a transcript.",style=MaterialTheme.typography.bodySmall)
+    Text("Local preview—on this device, not linked to a real patient. Use only non-confidential speech, never real patient information. The recording stays on this device, does not upload audio and does not create a transcript.",style=MaterialTheme.typography.bodySmall)
     if(clip!=null && sourceText.isNotBlank()) Text("Existing text below was not generated from this recording. It is kept unchanged.",color=Rust,style=MaterialTheme.typography.bodySmall)
     DoctorRecordingReview(
         state=DoctorRecordingReviewState(recording=state.recording,paused=state.paused,seconds=state.seconds,levels=state.levels,
@@ -61,7 +61,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
     Text("Goals of Care review selections apply only to this review session and are reset when the source or recording changes.",style=MaterialTheme.typography.bodySmall)
     if(consentOpen) AlertDialog(containerColor=Paper,onDismissRequest={consentOpen=false},title={Text("Before recording")},text={
         Column(Modifier.heightIn(max=500.dp).verticalScroll(rememberScrollState()),verticalArrangement=Arrangement.spacedBy(10.dp)) {
-            Text("Every participant must agree. Fictional, non-confidential test conversation only.")
+            Text("Every participant must agree before recording. Record only non-confidential content that is not real patient information.")
             OutlinedTextField(participants,{participants=it.take(600)},label={Text("Participant names")},supportingText={Text("Separate names with commas or new lines")},modifier=Modifier.testTag("preview-record-participants"))
             names.forEachIndexed {i,name -> PreviewRecordingCheck(agreements[name]==true,{agreements[name]=it},"$name agrees to recording","preview-record-person-$i")}
             PreviewRecordingCheck(purpose,{purpose=it},"We understand this recording is for a local care-conversation preview.","preview-record-purpose")

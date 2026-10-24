@@ -1,6 +1,7 @@
 package `in`.wedevit.care
 
 import android.graphics.Bitmap
+import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.room.Room
@@ -38,6 +39,33 @@ class CareFlowTest {
         }
         ui.runOnIdle { vm = ui.activity.careModel; vm.select(previousPerson); vm.role(previousRole) }
     }
+    private val attendeeConsent = SemanticsMatcher("doctor attendee consent checkbox") { node ->
+        node.config.getOrNull(androidx.compose.ui.semantics.SemanticsProperties.TestTag)?.startsWith("doctor-attendee-consent-") == true
+    }
+    private fun clickContinue(label: String) {
+        ui.onNodeWithTag("conversation-list").performScrollToNode(hasText(label))
+        ui.onNodeWithText(label).assertIsEnabled().performClick()
+    }
+    /** Step 0 "Who's here": tick every attendee's consent box (the gate is satisfied, never bypassed), then continue. */
+    private fun consentEveryoneAndContinue() {
+        ui.onNodeWithTag("conversation-list").performScrollToNode(hasTestTag("doctor-attendees"))
+        ui.waitUntil(15000) { ui.onAllNodes(attendeeConsent).fetchSemanticsNodes().isNotEmpty() }
+        val total = ui.onAllNodes(attendeeConsent).fetchSemanticsNodes().size
+        // Consent is never pre-ticked, so recording must be unreachable until every person is ticked.
+        assertEquals(total, ui.onAllNodes(attendeeConsent and isOff()).fetchSemanticsNodes().size)
+        ui.onNodeWithText("Continue to recording").assertIsNotEnabled()
+        repeat(total) {
+            ui.onAllNodes(attendeeConsent and isOff())[0].performScrollTo().performClick()
+            ui.waitForIdle()
+        }
+        ui.waitUntil(15000) { ui.onAllNodes(attendeeConsent and isOff()).fetchSemanticsNodes().isEmpty() }
+        clickContinue("Continue to recording")
+    }
+    /** Step 0 to Step 3 "Transcript". */
+    private fun openTranscriptStep() {
+        consentEveryoneAndContinue()
+        clickContinue("Continue to transcript")
+    }
     private fun screenshot(name: String) {
         ui.waitForIdle()
         val file = File(ui.activity.getExternalFilesDir(null), "verification/$name.png"); file.parentFile!!.mkdirs()
@@ -61,6 +89,7 @@ class CareFlowTest {
         assertEquals(words, vm.draft.value.source)
         ui.onNodeWithTag("role-Doctor").performClick()
         ui.onNodeWithTag("nav-Talk").performClick()
+        openTranscriptStep()
         ui.onNodeWithTag("conversation-list").performScrollToNode(hasSetTextAction() and hasText("Conversation transcript"))
         ui.onNode(hasSetTextAction() and hasText("Conversation transcript")).assertTextContains(words)
     }
@@ -138,16 +167,26 @@ class CareFlowTest {
         screenshot("today")
         ui.onNodeWithText("Talk", useUnmergedTree = true).performClick()
         val original = "What matters: I want to spend time with family.\nStill to discuss: I have not decided about hospital care.\nNext steps: Bring my questions to the next visit."
+        openTranscriptStep()
         ui.onNodeWithTag("conversation-list").performScrollToNode(hasSetTextAction() and hasText("Conversation transcript"))
         ui.onNode(hasSetTextAction() and hasText("Conversation transcript")).performTextInput(original)
-        ui.onNodeWithTag("conversation-list").performScrollToNode(hasText("Choose words and review"))
-        ui.onNodeWithText("Choose words and review").performClick()
+        clickContinue("Continue to answers")
+        // The five note sections are off the main path now; open them from the Answers step.
+        ui.onNodeWithTag("conversation-list").performScrollToNode(hasText("Edit the five note sections"))
+        ui.onNodeWithText("Edit the five note sections").performClick()
         ui.onNodeWithTag("conversation-list").performScrollToNode(hasText("Organise using section headings"))
         ui.onNodeWithText("Organise using section headings").performClick()
         ui.onNodeWithTag("conversation-list").performScrollToNode(hasSetTextAction() and hasText("What matters"))
         ui.onNode(hasSetTextAction() and hasText("What matters")).assertTextContains("I want to spend time with family.")
-        ui.onNodeWithTag("conversation-list").performScrollToNode(hasText("Continue to clinical review"))
-        ui.onNodeWithText("Continue to clinical review").performClick()
+        // Build shows one section per screen; step through all five, the last "Next" reads "Review note".
+        repeat(NoteRules.labels.size - 1) {
+            ui.onNodeWithTag("conversation-list").performScrollToNode(hasTestTag("build-next"))
+            ui.onNodeWithTag("build-next").performClick()
+        }
+        ui.onNodeWithTag("conversation-list").performScrollToNode(hasTestTag("build-next"))
+        ui.onNodeWithTag("build-next").assertTextContains("Review note").performClick()
+        ui.onNodeWithTag("conversation-list").performScrollToNode(hasText("Continue to publish"))
+        ui.onNodeWithText("Continue to publish").performClick()
         ui.onNodeWithTag("conversation-list").performScrollToNode(hasSetTextAction() and hasText("Doctor's name"))
         ui.onNode(hasSetTextAction() and hasText("Doctor's name")).performTextInput("Test Doctor")
         ui.onNodeWithTag("conversation-list").performScrollToNode(hasText("Publish reviewed version"))
@@ -234,6 +273,10 @@ class CareFlowTest {
         ui.onNodeWithText("Save", useUnmergedTree = true).performScrollTo().performClick()
         ui.waitUntil(15000) { vm.items.value.any { it.title == "Bring the prescription" } }
         ui.onNodeWithTag("nav-Care").performClick()
+        // Daily care groups entries into modules; To do starts collapsed.
+        ui.onNodeWithTag("care-list").performScrollToNode(hasTestTag("care-module-to-do-toggle"))
+        ui.onNodeWithTag("care-module-to-do-toggle").performClick()
+        ui.onNodeWithTag("care-list").performScrollToNode(hasText("Bring the prescription"))
         ui.onNodeWithText("Bring the prescription").assertIsDisplayed()
         screenshot("care")
         ui.onNodeWithTag("care-list").performScrollToNode(hasTestTag("care-remove-$entryId"))
@@ -244,7 +287,8 @@ class CareFlowTest {
     }
     @Test fun prescriptionScannerKeepsManualFallbackAndRequiresReviewBeforeSaving() {
         ui.onNodeWithTag("nav-Care").performClick()
-        ui.onNodeWithText("Medicines").performClick()
+        // The Medicines module is open by default and holds the scan entry.
+        ui.onNodeWithTag("care-list").performScrollToNode(hasText("Scan a prescription"))
         ui.onNodeWithText("Scan a prescription").assertIsDisplayed()
         ui.onNodeWithText("Scan & organize").performClick()
         ui.onNodeWithTag("medicine-scanner-select").assertIsDisplayed()
@@ -275,11 +319,12 @@ class CareFlowTest {
     @Test fun checkinSavesChosenWordsAndKeepsOptionalNote() {
         ui.runOnIdle { vm.role(false) }
         ui.onNodeWithText("How are you?").performClick()
-        ui.onNodeWithText("An okay day").performClick()
+        // The check-in is now the slider screen: pick the middle mood, which stores "An okay day".
+        ui.onNodeWithTag("checkin-mood-0.5").performScrollTo().performClick()
         screenshot("checkin")
         ui.onNode(hasSetTextAction() and hasText("Anything to add? (optional)")).performScrollTo().performTextInput("Spent time with family")
         androidx.test.espresso.Espresso.closeSoftKeyboard()
-        ui.onNodeWithText("Save", useUnmergedTree = true).performScrollTo().performClick()
+        ui.onNodeWithTag("feedback-save").performScrollTo().performClick()
         ui.waitUntil(15000) { vm.items.value.any { it.kind == "checkin" } }
         assertEquals("Spent time with family", vm.items.value.single { it.kind == "checkin" }.detail)
         ui.onNodeWithTag("today-list").performScrollToNode(hasText("An okay day"))

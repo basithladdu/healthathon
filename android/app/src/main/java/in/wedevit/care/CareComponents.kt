@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -25,7 +26,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -66,11 +69,58 @@ import androidx.compose.ui.unit.sp
 }
 
 @Composable fun CareRoleMenu(role: String, enabled: Boolean, onSelect: (String) -> Unit) {
-    FlowRow(Modifier.fillMaxWidth().testTag("choose-role").selectableGroup(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        listOf("Patient", "Family", "Doctor").forEach { option ->
-            FilterChip(selected = role == option, onClick = { onSelect(option) }, enabled = enabled,
-                label = { Text(option) }, modifier = Modifier.heightIn(min = 48.dp).testTag("role-$option"),
-                leadingIcon = { Icon(when (option) { "Doctor" -> Icons.Default.MedicalServices; "Family" -> Icons.Default.PeopleOutline; else -> Icons.Default.PersonOutline }, null, Modifier.size(18.dp)) })
+    var expanded by remember { mutableStateOf(false) }
+    LaunchedEffect(enabled) { if (!enabled) expanded = false }
+    Box {
+        TextButton(onClick = { expanded = true }, enabled = enabled,
+            modifier = Modifier.heightIn(min = 48.dp).testTag("choose-role").semantics { contentDescription = "Choose role, current role $role" },
+            shape = RoundedCornerShape(14.dp), contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
+            colors = ButtonDefaults.textButtonColors(contentColor = Rust)) {
+            Text(role, fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1)
+            Spacer(Modifier.width(4.dp)); Icon(Icons.Default.ExpandMore, null, Modifier.size(18.dp))
+        }
+        DropdownMenu(expanded = expanded && enabled, onDismissRequest = { expanded = false }) {
+            listOf("Patient", "Family", "Doctor").forEach { option ->
+                DropdownMenuItem(text = { Text(option) }, modifier = Modifier.testTag("role-$option").semantics { selected = role == option },
+                    leadingIcon = { Icon(when (option) { "Doctor" -> Icons.Default.MedicalServices; "Family" -> Icons.Default.PeopleOutline; else -> Icons.Default.PersonOutline }, null) },
+                    trailingIcon = { if (role == option) Icon(Icons.Default.Check, "Selected", tint = Rust) },
+                    onClick = { expanded = false; onSelect(option) })
+            }
+        }
+    }
+}
+
+/** The selected care profile stays visible; switching profiles never changes account permissions. */
+@Composable fun CarePersonSelector(name: String, people: List<Pair<String, String>>, selectedId: String,
+    enabled: Boolean, onSelect: (String) -> Unit, onAdd: () -> Unit, canAdd: Boolean = true) {
+    var expanded by remember { mutableStateOf(false) }
+    LaunchedEffect(enabled) { if (!enabled) expanded = false }
+    Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+        Box(Modifier.weight(1f)) {
+            Row(Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("selected-care-profile")
+                .clip(RoundedCornerShape(12.dp)).clickable(enabled = enabled, role = Role.Button, onClick = { expanded = true })
+                .semantics { contentDescription = "Switch care profile, $name" }.padding(vertical = 6.dp),
+                verticalAlignment = Alignment.CenterVertically) {
+                Box(Modifier.size(40.dp).clip(CircleShape).background(Peach), contentAlignment = Alignment.Center) {
+                    Icon(Icons.Default.PersonOutline, null, Modifier.size(22.dp), tint = Rust)
+                }
+                Spacer(Modifier.width(10.dp))
+                Text(name, modifier = Modifier.weight(1f, fill = false), fontSize = 16.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Spacer(Modifier.width(6.dp))
+                Icon(Icons.Default.ExpandMore, null, Modifier.size(18.dp), tint = Rust)
+            }
+            DropdownMenu(expanded = expanded && enabled, onDismissRequest = { expanded = false }) {
+                people.forEach { (id, personName) ->
+                    DropdownMenuItem(text = { Text(personName) }, modifier = Modifier.testTag("person-$id"),
+                        leadingIcon = { Icon(if (id == selectedId) Icons.Default.CheckCircle else Icons.Default.PersonOutline, null, tint = if (id == selectedId) Rust else Ink) },
+                        onClick = { expanded = false; onSelect(id) })
+                }
+            }
+        }
+        if (canAdd) IconButton(onClick = onAdd, enabled = enabled, modifier = Modifier.size(52.dp).testTag("add-care-person").semantics { contentDescription = "Add person" }) {
+            Box(Modifier.size(36.dp).clip(CircleShape).border(1.dp, if (enabled) Rust.copy(alpha = .6f) else MaterialTheme.colorScheme.outline.copy(alpha = .3f), CircleShape), contentAlignment = Alignment.Center) {
+                Icon(Icons.Default.PersonAdd, null, Modifier.size(18.dp), tint = if (enabled) Rust else MaterialTheme.colorScheme.onSurface.copy(alpha = .38f))
+            }
         }
     }
 }
@@ -93,7 +143,7 @@ import androidx.compose.ui.unit.sp
     Surface(color = Paper, shape = RoundedCornerShape(20.dp)) {
         Column(Modifier.fillMaxWidth().padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Icon(icon, null, tint = Rust); Spacer(Modifier.width(12.dp)); Text(title, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
+                Icon(icon, null, tint = Rust); Spacer(Modifier.width(12.dp)); Text(title, fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f), fontFamily = SaharaTitleFont)
             }
             content()
         }

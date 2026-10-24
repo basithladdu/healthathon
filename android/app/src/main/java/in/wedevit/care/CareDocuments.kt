@@ -40,7 +40,7 @@ import kotlinx.coroutines.withContext
     val scope = rememberCoroutineScope()
     var prescriptionOriginals by remember(person) { mutableStateOf(emptyList<CareReport>()) }
     LaunchedEffect(person, busy) {
-        if (person.isNotBlank() && !busy) prescriptionOriginals = withContext(Dispatchers.IO) { runCatching { MedicineSourceStore(context.applicationContext, vm.accountNamespace).list(person) }.getOrDefault(emptyList()) }
+        if (person.isNotBlank() && !busy) prescriptionOriginals = withContext(Dispatchers.IO) { runCatching { MedicineSourceStore(context.applicationContext, vm.storageNamespace).list(person) }.getOrDefault(emptyList()) }
     }
     val reports = (savedReports.filter { it.personId == person } + prescriptionOriginals).distinctBy { it.id }
     val notes = savedNotes.filter { it.personId == person }
@@ -55,14 +55,15 @@ import kotlinx.coroutines.withContext
     var textError by remember(person) { mutableStateOf("") }
     review?.let { report -> CareDocumentReview(vm, report) { review = null }; return }
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-        if (uri != null && importingFor.isNotEmpty()) vm.importReport(uri, importingFor)
+        if (!vm.demoMode && uri != null && importingFor.isNotEmpty()) vm.importReport(uri, importingFor)
         importingFor = ""
     }
-    val addReport = { importingFor = person; picker.launch(arrayOf("application/pdf", "image/jpeg", "image/png", "image/webp")) }
+    val addReport = { if (vm.demoMode) vm.message.value = "Import is unavailable in demo." else { importingFor = person; picker.launch(arrayOf("application/pdf", "image/jpeg", "image/png", "image/webp")) } }
     val visibleReports = reports.filter { filter != "Care notes" && it.name.contains(search.trim(), true) }
     val visibleNotes = notes.filter { filter != "Reports" && "Goals of care ${it.personName} ${it.doctor} Version ${it.version}".contains(search.trim(), true) }
 
     fun openReport(report: CareReport, share: Boolean) {
+        if (vm.demoMode) { if (!share) review = report else vm.message.value = "Sharing is unavailable in demo."; return }
         try {
             val intent = vm.reportFiles.intent(report, share)
             open(context, if (share) Intent.createChooser(intent, "Share report") else intent)
@@ -75,8 +76,9 @@ import kotlinx.coroutines.withContext
                 Heading("Documents", 30)
                 Text("${notes.size} care ${if (notes.size == 1) "note" else "notes"} · ${reports.size} ${if (reports.size == 1) "report" else "reports"}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
-            if (canEdit) FilledTonalIconButton(onClick = addReport, enabled = !busy, shape = RoundedCornerShape(14.dp), modifier = Modifier.size(48.dp), colors = IconButtonDefaults.filledTonalIconButtonColors(containerColor = Gold, contentColor = Ink)) { Icon(Icons.Default.UploadFile, "Add a report") }
+            if (canEdit) FilledTonalIconButton(onClick = addReport, enabled = !busy && !vm.demoMode, shape = RoundedCornerShape(14.dp), modifier = Modifier.size(48.dp), colors = IconButtonDefaults.filledTonalIconButtonColors(containerColor = Gold, contentColor = Ink)) { Icon(Icons.Default.UploadFile, if (vm.demoMode) "Import unavailable in demo" else "Add a report") }
         } }
+        if (vm.demoMode) item { Text("Example documents stay inside this demo. Import and external sharing are unavailable in demo.", style = MaterialTheme.typography.bodySmall) }
         item { OutlinedTextField(value = search, onValueChange = { search = it }, placeholder = { Text("Search documents") }, leadingIcon = { Icon(Icons.Default.Search, null) },
             trailingIcon = { if (search.isNotEmpty()) IconButton(onClick = { search = "" }) { Icon(Icons.Default.Close, "Clear document search") } },
             modifier = Modifier.fillMaxWidth().testTag("document-search"), shape = RoundedCornerShape(16.dp), singleLine = true) }
@@ -89,7 +91,7 @@ import kotlinx.coroutines.withContext
             scope.launch {
                 try {
                     val found = withContext(Dispatchers.IO) {
-                        val store = CareDocumentReviewStore(context.applicationContext, vm.accountNamespace)
+                        val store = CareDocumentReviewStore(context.applicationContext, vm.storageNamespace)
                         val saved = reports.mapNotNull { report -> store.loadVerified(report, vm.reportFiles.file(report)) }
                         DocumentEvidenceRules.find(query, saved)
                     }
@@ -104,7 +106,7 @@ import kotlinx.coroutines.withContext
             if (textMatches.isEmpty()) item { SurfaceCard { Text("No supported passage found", fontWeight = FontWeight.SemiBold); Text("No answer was generated. Try fewer words, or open a report and review its text first.", style = MaterialTheme.typography.bodySmall) } }
             items(textMatches, key = { "${it.reportId}:${it.page}:${it.line}" }) { match ->
                 reports.firstOrNull { it.id == match.reportId }?.let { report -> SurfaceCard(Sage) {
-                    Text(report.name, fontWeight = FontWeight.SemiBold)
+                    Text(report.name, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
                     Text("Page ${match.page} · line ${match.line}", style = MaterialTheme.typography.labelMedium)
                     Text(match.quote)
                     TextButton(onClick = { review = report }) { Text("Read source and copy fact") }
@@ -113,7 +115,7 @@ import kotlinx.coroutines.withContext
         }
         if (visibleNotes.isEmpty() && visibleReports.isEmpty()) item { SurfaceCard {
             Icon(Icons.Default.FolderOpen, null, Modifier.size(36.dp), tint = Rust)
-            Spacer(Modifier.height(12.dp)); Text(if (search.isNotBlank()) "No documents found" else when (filter) { "Reports" -> "No reports yet"; "Care notes" -> "No care notes yet"; else -> "Keep your care together" }, fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
+            Spacer(Modifier.height(12.dp)); Text(if (search.isNotBlank()) "No documents found" else when (filter) { "Reports" -> "No reports yet"; "Care notes" -> "No care notes yet"; else -> "Keep your care together" }, fontSize = 20.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
             Spacer(Modifier.height(6.dp)); Text(if (search.isNotBlank()) "Try a name or clear your search." else "Your reviewed care notes and reports appear here.", style = MaterialTheme.typography.bodyMedium)
             if (search.isNotBlank()) TextButton(onClick = { search = ""; filter = "All" }) { Text("Clear search") }
             else if (filter != "Care notes" && canEdit) TextButton(onClick = addReport, enabled = !busy) { Icon(Icons.Default.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Add a report") }
@@ -124,7 +126,7 @@ import kotlinx.coroutines.withContext
                 Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.Description, null, Modifier.size(26.dp)); Spacer(Modifier.width(12.dp))
                     Column(Modifier.weight(1f)) {
-                        Text("Goals of care", fontWeight = FontWeight.SemiBold)
+                        Text("Goals of care", fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
                         Text("Version ${note.version}" + if (note.id == notes.firstOrNull()?.id) " · Latest" else " · Earlier", style = MaterialTheme.typography.bodySmall)
                         Text("${date(note.published)} · ${note.doctor}", style = MaterialTheme.typography.bodySmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
                     }
@@ -140,7 +142,7 @@ import kotlinx.coroutines.withContext
                         Surface(shape = RoundedCornerShape(12.dp), color = if (report.mime == "application/pdf") Peach else Sage) { Icon(if (report.mime == "application/pdf") Icons.Default.PictureAsPdf else Icons.Default.Image, null, Modifier.padding(10.dp).size(23.dp)) }
                         Spacer(Modifier.width(12.dp))
                         Column(Modifier.weight(1f)) {
-                            Text(report.name, fontWeight = FontWeight.SemiBold, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                            Text(report.name, fontWeight = FontWeight.Medium, maxLines = 2, overflow = TextOverflow.Ellipsis, fontFamily = SaharaTitleFont)
                             Text(Formatter.formatShortFileSize(context, report.bytes), style = MaterialTheme.typography.bodySmall)
                             Text(date(report.created), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
@@ -148,7 +150,7 @@ import kotlinx.coroutines.withContext
                     FlowRow(Modifier.fillMaxWidth().padding(horizontal = 8.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                         TextButton(onClick = { openReport(report, false) }, modifier = Modifier.testTag("report-open-${report.id}")) { Icon(Icons.AutoMirrored.Filled.OpenInNew, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Open") }
                         TextButton(onClick = { review = report }, modifier = Modifier.testTag("report-review-${report.id}")) { Icon(Icons.Default.DocumentScanner, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Read and copy facts") }
-                        TextButton(onClick = { openReport(report, true) }, modifier = Modifier.testTag("report-share-${report.id}")) { Icon(Icons.Default.Share, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Share") }
+                        TextButton(onClick = { openReport(report, true) }, enabled = !vm.demoMode, modifier = Modifier.testTag("report-share-${report.id}")) { Icon(Icons.Default.Share, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Share") }
                         if (canEdit && prescriptionOriginals.none { it.id == report.id }) TextButton(enabled = !busy, onClick = { remove = report }, modifier = Modifier.testTag("report-remove-${report.id}")) { Icon(Icons.Default.DeleteOutline, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Remove") }
                     }
                 }

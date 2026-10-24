@@ -30,23 +30,23 @@ private fun overviewValue(value:String) = value.takeIf {it.isNotBlank()} ?: "Not
     Column(Modifier.fillMaxWidth().testTag("overview-content"),verticalArrangement=Arrangement.spacedBy(16.dp)) {
         Surface(color=SaharaSoftBlue,shape=RoundedCornerShape(20.dp)) {
             Column(Modifier.padding(18.dp),verticalArrangement=Arrangement.spacedBy(8.dp)) {
-                Text("Handover at a glance",fontSize=19.sp,fontWeight=FontWeight.SemiBold)
+                Text("Handover at a glance",fontSize=19.sp,fontWeight=FontWeight.Medium, fontFamily = SaharaTitleFont)
                 Column(Modifier.testTag("overview-previous-professional"),verticalArrangement=Arrangement.spacedBy(4.dp)) {
-                    Text("Previous care professional · fictional example",style=MaterialTheme.typography.labelMedium,color=Ink.copy(alpha=.75f))
-                    Text(overview.previousProfessional?.name ?: "Name not recorded",fontWeight=FontWeight.SemiBold,fontSize=18.sp)
-                    Text("Not a verified note author or an assigned doctor",style=MaterialTheme.typography.bodySmall,color=Rust)
+                    Text("Previous care professional",style=MaterialTheme.typography.labelMedium,color=DoctorCardSub)
+                    Text(overview.previousProfessional?.name ?: "Name not recorded",fontWeight=FontWeight.Medium,fontSize=18.sp, fontFamily = SaharaTitleFont)
+                    Text("Not a verified note author or an assigned doctor",fontSize=12.sp,color=DoctorCardFaint)
                 }
                 Text("Clinical assessment: ${overview.clinicalAssessment}",fontWeight=FontWeight.Medium,modifier=Modifier.testTag("overview-clinical-assessment"))
                 Column(Modifier.testTag("overview-handover-toggle"), verticalArrangement=Arrangement.spacedBy(4.dp)) {Text(overview.previousProfessional?.role ?: "Professional role not recorded");Text(overview.previousProfessional?.disclosure ?: "No previous professional is documented.",style=MaterialTheme.typography.bodySmall)}
-                Column(Modifier.testTag("overview-background-toggle"), verticalArrangement=Arrangement.spacedBy(4.dp)) {Text("Background summary",fontWeight=FontWeight.SemiBold);Text(overview.background,lineHeight=24.sp);Text("Historical sample profile context, not a current clinical assessment.",style=MaterialTheme.typography.bodySmall,color=Ink.copy(alpha=.75f))}
+                Column(Modifier.testTag("overview-background-toggle"), verticalArrangement=Arrangement.spacedBy(4.dp)) {Text("Background summary",fontWeight=FontWeight.SemiBold);Text(overview.background,lineHeight=24.sp);Text("Background recorded earlier; not a current clinical assessment.",fontSize=12.sp,color=DoctorCardFaint)}
             }
         }
-        Text("Care handover",fontSize=21.sp,fontWeight=FontWeight.SemiBold)
+        Text("Care handover",fontSize=21.sp,fontWeight=FontWeight.Medium, fontFamily = SaharaTitleFont)
         Column {
             val report=overview.latestReport
             OverviewTimeline("Last reported update",overviewDate(report?.at),SaharaSoftBlue,"overview-latest-report") {
                 Text(report?.text ?: "No patient or family update recorded.",lineHeight=24.sp)
-                if(report!=null) Text("${report.source.name.lowercase().replaceFirstChar {it.uppercase()}} report · fictional check-in",style=MaterialTheme.typography.bodySmall,color=Rust)
+                if(report!=null) Text("${report.source.name.lowercase().replaceFirstChar {it.uppercase()}} report",style=MaterialTheme.typography.bodySmall,color=DoctorAccent)
                 TextButton(onClick={onSection("Progress")},modifier=Modifier.heightIn(min=48.dp).testTag("overview-progress")) {Text("View reported updates")}
             }
             OverviewTimeline("Last conversation",overviewDate(discussion?.publishedAt),SaharaLavender,"overview-last-discussion") {
@@ -74,13 +74,13 @@ private fun overviewValue(value:String) = value.takeIf {it.isNotBlank()} ?: "Not
             }
         }
         if(earlierDiscussions.isNotEmpty()) {
-            Text("Earlier discussions (${earlierDiscussions.size})",fontWeight=FontWeight.SemiBold,modifier=Modifier.testTag("overview-history-toggle"))
+            Text("Earlier discussions (${earlierDiscussions.size})",fontWeight=FontWeight.Medium,modifier=Modifier.testTag("overview-history-toggle"), fontFamily = SaharaTitleFont)
             earlierDiscussions.forEach {earlier ->
                 Surface(color=Paper,shape=RoundedCornerShape(16.dp),border=BorderStroke(1.dp,Ink.copy(alpha=.1f))) {
                     Column(Modifier.fillMaxWidth().padding(16.dp),verticalArrangement=Arrangement.spacedBy(8.dp)) {
                         Text(overviewDate(earlier.publishedAt),style=MaterialTheme.typography.labelLarge,color=Rust)
                         OverviewDiscussionMeta(earlier)
-                        Text("Original discussion source",fontWeight=FontWeight.SemiBold,modifier=Modifier.testTag("overview-history-${earlier.id}"))
+                        Text("Original discussion source",fontWeight=FontWeight.Medium,modifier=Modifier.testTag("overview-history-${earlier.id}"), fontFamily = SaharaTitleFont)
                         Text(earlier.sourceText.ifBlank {"Original source not recorded."},lineHeight=24.sp,modifier=Modifier.testTag("overview-source-text-${earlier.id}"))
                     }
                 }
@@ -95,13 +95,13 @@ private fun overviewValue(value:String) = value.takeIf {it.isNotBlank()} ?: "Not
     }
 }
 @Composable private fun OverviewDiscussionMeta(discussion:DoctorOverviewDiscussion) {
-    Text(if(discussion.isPublishedPreview) "Local preview version ${discussion.versionNumber} · not a verified clinical note" else "Previous sample discussion · not a verified clinical note",style=MaterialTheme.typography.labelMedium,color=Rust)
+    Text(if(discussion.isPublishedPreview) "Version ${discussion.versionNumber} · not a verified clinical note" else "Earlier discussion · not a verified clinical note",style=MaterialTheme.typography.labelMedium,color=DoctorAccent)
     Text(if(discussion.isPublishedPreview) "Self-entered reviewer: ${discussion.reviewerName ?: "Not recorded"} · identity not verified" else "Discussion author: ${discussion.reviewerName ?: "Not recorded"}",style=MaterialTheme.typography.bodySmall)
     Text("Source: ${discussion.sourceLabel}",style=MaterialTheme.typography.bodySmall,color=Ink.copy(alpha=.7f))
 }
 @Composable private fun OverviewSource(discussion:DoctorOverviewDiscussion) {
     if(discussion.sourceText.isNotBlank()) {
-        Text("Original source",fontWeight=FontWeight.SemiBold,modifier=Modifier.testTag("overview-source-${discussion.id}"))
+        Text("Original source",fontWeight=FontWeight.Medium,modifier=Modifier.testTag("overview-source-${discussion.id}"), fontFamily = SaharaTitleFont)
         Text(discussion.sourceText,lineHeight=24.sp,modifier=Modifier.testTag("overview-source-text-${discussion.id}"))
     } else Text("Original source not recorded.",style=MaterialTheme.typography.bodySmall)
 }
@@ -111,7 +111,7 @@ private fun overviewValue(value:String) = value.takeIf {it.isNotBlank()} ?: "Not
     }.padding(start=24.dp,bottom=18.dp),verticalArrangement=Arrangement.spacedBy(9.dp)) {
         Surface(color=tint,shape=RoundedCornerShape(10.dp)) {Text(date,Modifier.padding(horizontal=10.dp,vertical=5.dp),style=MaterialTheme.typography.labelMedium,color=Ink)}
         Surface(color=Paper,shape=RoundedCornerShape(18.dp),border=BorderStroke(1.dp,Ink.copy(alpha=.08f))) {
-            Column(Modifier.fillMaxWidth().padding(16.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {Text(title,fontWeight=FontWeight.SemiBold,fontSize=18.sp);content()}
+            Column(Modifier.fillMaxWidth().padding(16.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {Text(title,fontWeight=FontWeight.Medium,fontSize=18.sp, fontFamily = SaharaTitleFont);content()}
         }
     }
 }

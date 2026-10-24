@@ -42,13 +42,16 @@ import java.io.File
 private enum class MedicineScannerPhase { Select, Scanning, Review }
 
 @Composable
-fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit) {
+fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, onReviewedMedicines: ((List<MedicineDraft>) -> Unit)? = null) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val documentReader = remember(context) { CareDocumentReader(context.applicationContext) }
     val busy by vm.busy.collectAsStateWithLifecycle()
     val selectedPerson by vm.selected.collectAsStateWithLifecycle()
     val personAtOpen = rememberSaveable { vm.selected.value }
+    val accountAtOpen = rememberSaveable { vm.accountNamespace }
+    fun stagingAllowed() = vm.selected.value == personAtOpen && vm.accountNamespace == accountAtOpen && vm.canEdit.value &&
+        (vm.cloud == null || vm.cloud.session.value?.userId == accountAtOpen)
     // A running scan and its AI result intentionally stay in memory only. If Android
     // recreates the activity, return to the retained photo selection instead of
     // restoring a spinner or a review screen whose result no longer exists.
@@ -239,7 +242,7 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
             item { ScannerHeader("Review medicine list", "2 / 2") { returnToImages() } }
-            item { SurfaceCard(Sage) { Text("Check before saving", fontWeight = FontWeight.Bold); Text("Text reading can be wrong. Confirm each entry against the prescription and packaging. Sahara does not diagnose, prescribe or recommend treatment.") } }
+            item { SurfaceCard(Sage) { Text("Check before saving", fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont); Text("Text reading can be wrong. Confirm each entry against the prescription and packaging. Sahara does not diagnose, prescribe or recommend treatment.") } }
             if (prescriptionUris.isNotEmpty()) item { SurfaceCard {
                 Text("Original pages", fontWeight = FontWeight.SemiBold)
                 prescriptionUris.forEachIndexed { index, uri -> TextButton(onClick = { runCatching {
@@ -277,12 +280,17 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit) {
                     savingSources = true
                     scope.launch {
                         try {
+                            if(onReviewedMedicines != null) require(stagingAllowed() && !vm.demoMode) { "This prescription's care profile or edit access changed." }
                             val sourceStore = MedicineSourceStore(context, vm.accountNamespace)
                             val originals = sourceStore.save(personAtOpen, scanId, prescriptionUris.map(Uri::parse), vm.reportFiles)
                             val references = withContext(Dispatchers.IO) { sourceStore.references(originals, vm.reportFiles) }
                             val linked = drafts.map { draft -> if (references.isBlank()) draft else draft.copy(medicine = draft.medicine.copy(instructions = draft.medicine.instructions + "\nOriginal prescription references:\n" + references)) }
                             require(vm.selected.value == personAtOpen) { "The selected person changed. Open this prescription for the right person." }
-                            vm.saveMedicineList(linked) {
+                            if(onReviewedMedicines != null) {
+                                require(stagingAllowed()) { "This prescription's account or edit access changed. Nothing was saved." }
+                                onReviewedMedicines(linked)
+                                releaseSelectedPhotos()
+                            } else vm.saveMedicineList(linked) {
                                 releaseSelectedPhotos()
                                 File(context.cacheDir, "medicine-scan").deleteRecursively()
                                 onClose()
@@ -291,7 +299,7 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit) {
                         finally { savingSources = false }
                     }
                 }, enabled = valid && !busy && !savingSources, modifier = Modifier.fillMaxWidth().heightIn(min = 54.dp), shape = RoundedCornerShape(16.dp)) {
-                    Text(if (busy || savingSources) "Saving…" else "Save ${drafts.size} ${if (drafts.size == 1) "medicine" else "medicines"}")
+                    Text(if (busy || savingSources) "Saving…" else if(onReviewedMedicines != null) "Use ${drafts.size} reviewed medicines" else "Save ${drafts.size} ${if (drafts.size == 1) "medicine" else "medicines"}")
                 }
                 if (!valid) Text("Add a medicine name and dose, resolve unmatched photos, and confirm every entry before saving.", style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 8.dp))
                 TextButton(onClick = { returnToImages() }, enabled = !busy, modifier = Modifier.fillMaxWidth()) { Text("Back to photos") }
@@ -308,7 +316,7 @@ private fun ScannerHeader(title: String, step: String, onBack: () -> Unit) {
         Text(
             text = title,
             modifier = Modifier.weight(1f),
-            fontFamily = FontFamily.Serif,
+            fontFamily = SaharaTitleFont,
             fontSize = 24.sp,
             lineHeight = 28.sp,
             letterSpacing = (-0.7).sp,

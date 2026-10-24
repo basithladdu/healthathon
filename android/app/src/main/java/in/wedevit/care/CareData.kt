@@ -17,6 +17,8 @@ fun newId(): String = UUID.randomUUID().toString()
     @ColumnInfo(defaultValue = "''") val transcriptModel: String = "",
     @ColumnInfo(defaultValue = "0") val transcribedAt: Long = 0,
     @ColumnInfo(defaultValue = "''") val transcriptAudioPath: String = "",
+    @ColumnInfo(defaultValue = "''") val conversationId: String = "",
+    @ColumnInfo(defaultValue = "''") val contextJson: String = "",
 )
 @Entity(indices = [Index(value = ["personId", "version"], unique = true)])
 data class CareVersion(
@@ -29,6 +31,9 @@ data class CareVersion(
     @ColumnInfo(defaultValue = "'not_verified'") val reviewerVerification: String = ReviewWorkflow.NOT_VERIFIED,
     @ColumnInfo(defaultValue = "''") val transcriptionModel: String = "",
     @ColumnInfo(defaultValue = "0") val transcribedAt: Long = 0,
+    @ColumnInfo(defaultValue = "''") val conversationId: String = "",
+    @ColumnInfo(defaultValue = "''") val contextJson: String = "",
+    @ColumnInfo(defaultValue = "'legacy'") val hashScheme: String = "legacy",
 )
 @Entity(indices = [Index("versionId")])
 data class Acknowledgement(val versionId: String, val contentHash: String, val name: String, val relationship: String, val at: Long = System.currentTimeMillis(), @PrimaryKey val id: String = newId())
@@ -49,6 +54,7 @@ data class CareReport(@PrimaryKey val id: String = newId(), val personId: String
     @Insert suspend fun addPerson(person: Person)
     @Query("SELECT * FROM Conversation WHERE personId = :id") suspend fun draft(id: String): Conversation?
     @Insert(onConflict = OnConflictStrategy.REPLACE) suspend fun saveDraft(draft: Conversation)
+    @Query("UPDATE Conversation SET audioPath = :path, consentAt = :consentAt WHERE personId = :person AND conversationId = :conversation") suspend fun attachLocalRecording(person: String, conversation: String, path: String, consentAt: Long): Int
     @Query("SELECT * FROM CareVersion WHERE personId = :id ORDER BY version DESC") fun versions(id: String): Flow<List<CareVersion>>
     @Query("SELECT * FROM CareVersion WHERE personId = :id ORDER BY version DESC LIMIT 1") suspend fun latest(id: String): CareVersion?
     @Insert suspend fun insertVersion(version: CareVersion)
@@ -140,16 +146,28 @@ private fun combinedCareMigration(from: Int) = object : androidx.room.migration.
     }
 }
 
-@Database(entities = [Person::class, Conversation::class, CareVersion::class, Acknowledgement::class, CareItem::class, CareReport::class, RecordingConsent::class], version = 6, exportSchema = true)
+val CombinedCareMigration6To7 = object : androidx.room.migration.Migration(6,7) {
+    override fun migrate(db:androidx.sqlite.db.SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE Conversation ADD COLUMN conversationId TEXT NOT NULL DEFAULT ''")
+        db.execSQL("ALTER TABLE Conversation ADD COLUMN contextJson TEXT NOT NULL DEFAULT ''")
+        db.execSQL("ALTER TABLE CareVersion ADD COLUMN conversationId TEXT NOT NULL DEFAULT ''")
+        db.execSQL("ALTER TABLE CareVersion ADD COLUMN contextJson TEXT NOT NULL DEFAULT ''")
+        db.execSQL("ALTER TABLE CareVersion ADD COLUMN hashScheme TEXT NOT NULL DEFAULT 'legacy'")
+        DoctorConversationSchema.create(db);DoctorPrescriptionSchema.create(db)
+    }
+}
+@Database(entities = [Person::class, Conversation::class, CareVersion::class, Acknowledgement::class, CareItem::class, CareReport::class, RecordingConsent::class,DoctorConversationArchive::class,DoctorLocalAudioRef::class,DoctorPrescription::class,DoctorPrescriptionState::class,DoctorPrescriptionMedicine::class,DoctorPrescriptionMutation::class], version = 7, exportSchema = true)
 abstract class CareDatabase : RoomDatabase() {
     abstract fun care(): CareDao
+    abstract fun conversations():DoctorConversationDao
+    abstract fun prescriptions():DoctorPrescriptionDao
     companion object {
         private val instances = mutableMapOf<String, CareDatabase>()
         fun get(context: Context, account: String = ""): CareDatabase = synchronized(this) {
             require(account.isEmpty() || runCatching { UUID.fromString(account) }.isSuccess)
             val filename = if (account.isEmpty()) "care.db" else "care-$account.db"
             instances.getOrPut(filename) { Room.databaseBuilder(context.applicationContext, CareDatabase::class.java, filename)
-                .addMigrations(RevisionMigration, ReportsMigration, CombinedCareMigration3To6, CombinedCareMigration4To6, CombinedCareMigration5To6).build() }
+                .addMigrations(RevisionMigration, ReportsMigration, CombinedCareMigration3To6, CombinedCareMigration4To6, CombinedCareMigration5To6,CombinedCareMigration6To7).build() }
         }
     }
 }
@@ -200,6 +218,31 @@ object RecordingConsentRules {
     }
 }
 
+/** Origin for goals copied from an earlier published version: "carried_forward:N". Never a source quote, never freshly discussed. */
+object CarriedForward {
+    const val PREFIX = "carried_forward:"
+    fun origin(version: Int) = "$PREFIX$version"
+    fun isOrigin(origin: String) = origin.startsWith(PREFIX) && origin.removePrefix(PREFIX).toIntOrNull()?.let { it > 0 } == true
+    fun version(origin: String): Int? = if (isOrigin(origin)) origin.removePrefix(PREFIX).toInt() else null
+    /** Carried and the clinician has not yet confirmed it (confirming sets status "discussed" and keeps this origin). */
+    fun unconfirmed(g: DoctorGoalContext) = isOrigin(g.origin) && g.status != "discussed"
+    /** Goal key -> section value; "What we discussed" has no goal of its own so it rides on concerns_uncertainty. */
+    private fun answers(v: CareVersion) = listOf(v.priorities, v.questions, v.participants, v.topics, v.nextSteps)
+    /** New draft pre-filled from the latest published version. Evidence is dropped; every non-blank section needs confirmation. */
+    fun draftFrom(personId: String, conversationId: String, previous: CareVersion?): Conversation {
+        val blank = Conversation(personId, conversationId = conversationId)
+        if (previous == null || previous.personId != personId) return blank.copy(contextJson = DoctorConversationContext.initial(blank))
+        val base = blank.copy(priorities = previous.priorities, participants = previous.participants, topics = previous.topics, questions = previous.questions, nextSteps = previous.nextSteps)
+        val goals = DoctorConversationContext.keys.zip(answers(previous)).map { (key, text) ->
+            if (text.isBlank()) DoctorGoalContext(key, "not_recorded", "manual") else DoctorGoalContext(key, "needs_review", origin(previous.version), text, emptyList())
+        }
+        val context = org.json.JSONObject(DoctorConversationContext.initial(base)).put("goals", org.json.JSONArray(goals.map { DoctorConversationContext.goalJson(it) }))
+        return base.copy(contextJson = context.toString())
+    }
+    /** Confirming keeps the carried origin (it is still not from this conversation) and records that the clinician reviewed it. */
+    fun confirm(g: DoctorGoalContext) = if (isOrigin(g.origin) && g.answer.isNotBlank()) g.copy(status = "discussed", evidence = emptyList()) else g
+}
+
 object NoteRules {
     const val MAX_SOURCE_CHARS = 12_000
     val labels = listOf("What matters", "Who was there", "What we discussed", "Still to discuss", "Next steps")
@@ -214,10 +257,16 @@ object NoteRules {
         require(draft.source.length <= MAX_SOURCE_CHARS && values(draft).all { it.length <= 4000 }) { "Shorten this conversation before saving." }
         val origin = if (draft.transcribedAt > 0 && draft.transcriptModel.isNotBlank()) ReviewWorkflow.TRANSCRIBED_DRAFT else ReviewWorkflow.MANUAL_DRAFT
         val hash = hash(listOf(person.id, person.name, draft.source, doctor.trim(), origin, ReviewWorkflow.REVIEWED_UNVERIFIED, ReviewWorkflow.NOT_VERIFIED, draft.transcriptModel, draft.transcribedAt.toString()) + values(draft))
-        return CareVersion(personId = person.id, version = version, personName = person.name, source = draft.source,
+        val saved = CareVersion(personId = person.id, version = version, personName = person.name, source = draft.source,
             priorities = draft.priorities, participants = draft.participants, topics = draft.topics, questions = draft.questions,
             nextSteps = draft.nextSteps, doctor = doctor.trim(), contentHash = hash, draftOrigin = origin,
             transcriptionModel = draft.transcriptModel, transcribedAt = draft.transcribedAt)
+        if (draft.contextJson.isBlank() && draft.conversationId.isBlank()) return saved
+        UUID.fromString(draft.conversationId)
+        DoctorConversationContext.validate(draft.source,draft.contextJson)
+        require(DoctorConversationContext.goals(draft).none(CarriedForward::unconfirmed)) { "Confirm or edit the sections carried forward from an earlier version before saving." }
+        val contextual=saved.copy(conversationId=draft.conversationId,contextJson=draft.contextJson,hashScheme=DoctorConversationContext.HASH_SCHEME)
+        return contextual.copy(contentHash=DoctorConversationContext.framedHash(contextual))
     }
     fun acknowledge(version: CareVersion, latest: CareVersion?, name: String, relationship: String, reviewed: Boolean, existing: List<Acknowledgement> = emptyList()): Acknowledgement {
         require(latest?.id == version.id && latest.contentHash == version.contentHash) { "A newer note is available. Open it before confirming." }
@@ -247,6 +296,7 @@ object NoteRules {
         appendLine("Review status: ${ReviewWorkflow.label(v)}")
         if (v.draftOrigin == ReviewWorkflow.TRANSCRIBED_DRAFT) appendLine("Transcript: AI-generated with ${v.transcriptionModel}; human review required")
         labels.zip(values(v)).forEach { (label, value) -> appendLine("\n$label\n${value.ifBlank { "Not recorded" }}") }
+        DoctorConversationContext.readable(v).takeIf(String::isNotBlank)?.let { appendLine("\n$it") }
         appendLine("\nOriginal conversation\n${v.source}")
         acknowledgements.filter { it.versionId == v.id && it.contentHash == v.contentHash }
             .sortedWith(compareBy<Acknowledgement> { it.relationship != "Patient" }.thenBy { it.at }).forEach { ack ->

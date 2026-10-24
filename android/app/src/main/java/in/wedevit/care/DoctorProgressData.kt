@@ -14,11 +14,11 @@ data class DoctorProgressReport(
     val linkedDiscussion: WorkflowSource? = null,
 )
 
-/** Read-only fictional history. Time proximity is never evidence of a discussion or visit link. */
+/** Read-only walkthrough history. Time proximity is never evidence of a discussion or visit link. */
 object DoctorProgressData {
     private const val questionRequest = "Would like time to ask questions at the next visit."
     private const val practicalHelp = "Family is arranging practical help for the next appointment."
-    // Explicit NEW sample metadata: these existing sample report IDs refer to their own prior source.
+    // Explicit link metadata: these existing report IDs refer to their own prior source.
     private val sampleDiscussionLinks = DoctorDemoData.patients.associate { "${it.id}-check-3" to "${it.id}-prior" }
 
     fun reports(patientId: String, nowMillis: Long, zone: ZoneId = ZoneId.systemDefault()): List<DoctorProgressReport> =

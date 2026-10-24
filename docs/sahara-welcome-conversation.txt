@@ -1,0 +1,8 @@
+Sahara welcome conversation illustration
+
+Asset: android/app/src/main/res/drawable-nodpi/sahara_welcome_conversation.png
+Created 2026-10-21 with the built-in image-generation tool.
+Purpose: warm mascot-style doctor-and-patient illustration for the welcome screen.
+Transparent PNG, drawable-nodpi, matching Sahara's orange and cream palette.
+This is decorative artwork, not a representation of an identified person or a
+professionally verified clinician.

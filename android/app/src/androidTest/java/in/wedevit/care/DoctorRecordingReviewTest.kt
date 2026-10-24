@@ -45,7 +45,7 @@ class DoctorRecordingReviewTest {
         ui.onNodeWithTag("record-timer").assertDoesNotExist()
         assertTrue(ui.onNodeWithTag("record-hero").fetchSemanticsNode().boundsInRoot.height < expandedHeight)
         ui.onNodeWithTag("record-transcribe").assertDoesNotExist()
-        ui.onNodeWithTag("record-transcript-origin").performScrollTo().assertTextEquals("Not transcribed. Stopping a recording does not create text.")
+        ui.onNodeWithTag("record-transcript-origin").performScrollTo().assertTextEquals("No transcript yet")
         assertEquals("", state.value.sourceText)
         assertEquals(0, transcribed)
         state.value.coverage.indices.forEach { index ->
@@ -69,7 +69,7 @@ class DoctorRecordingReviewTest {
                 DoctorCoverageItem("Not yet assessed"))))
         var reviewed = -1
         render(state, onCoverage = { reviewed = it })
-        ui.onNodeWithTag("record-transcript-origin").performScrollTo().assertTextEquals("Fictional sample—not from this recording")
+        ui.onNodeWithTag("record-transcript-origin").performScrollTo().assertTextEquals("Prepared transcript · not taken from this recording")
         ui.onNodeWithTag("record-coverage-0").performScrollTo().assert(SemanticsMatcher.expectValue(SemanticsProperties.StateDescription, "Needs review"))
         ui.onNodeWithTag("record-coverage-1").performScrollTo().assert(SemanticsMatcher.expectValue(SemanticsProperties.StateDescription, "Discussed · source linked"))
         ui.onNodeWithTag("record-coverage-2").performScrollTo().assert(SemanticsMatcher.expectValue(SemanticsProperties.StateDescription, "Not assessed")).performClick()
@@ -80,7 +80,7 @@ class DoctorRecordingReviewTest {
         androidx.test.espresso.Espresso.closeSoftKeyboard()
         assertEquals(DoctorTranscriptKind.MANUAL, state.value.sourceKind)
         assertTrue(state.value.coverage.all { it.status == DoctorCoverageStatus.NOT_ASSESSED })
-        ui.onNodeWithTag("record-transcript-origin").assertTextEquals("Manually entered source · check wording and speakers")
+        ui.onNodeWithTag("record-transcript-origin").assertTextEquals("Manually entered · check wording and speakers")
     }
 
     @Test fun busyAndUnavailableControlsCannotInvokeAnyTransportOrChangeSource() {

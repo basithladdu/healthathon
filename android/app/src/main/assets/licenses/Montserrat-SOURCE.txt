@@ -1,0 +1,8 @@
+Montserrat Medium static TrueType, unmodified official upstream binary.
+Source commit: 555facfb2a18c72c3c0380f0d9c0f060453a9058
+https://github.com/JulietaUla/Montserrat/tree/555facfb2a18c72c3c0380f0d9c0f060453a9058
+Font source: fonts/ttf/Montserrat-Medium.ttf
+License source: OFL.txt (SIL Open Font License 1.1), full text packaged as Montserrat-OFL.txt.
+Font SHA-256: dae47428bb041f9716604e0e07b5b0c8585b3bdd8183362f75c69fe7bb3cfaf4
+License SHA-256: 8b7141c03fa4f8d44e6345d5d4931709290f0f67875e452e95ac1fd3a027802e
+App resource name: montserrat_medium.ttf; weight 500.

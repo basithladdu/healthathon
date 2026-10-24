@@ -18,17 +18,70 @@ data class Centre(val name: String, val city: String, val district: String, val 
     val state: String = "Karnataka", val sourceName: String = "Pallium India", val checkedOn: String = "2026-10-02", val verification: String = "directory_listed", val sourceListedMorphine: String = "")
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewModel(app) {
-    private val account = cloud?.session?.value?.userId.orEmpty()
+class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Boolean = false, val walkthroughRole: String? = null) : AndroidViewModel(app) {
+    init { require(!demoMode || cloud == null) { "Doctor examples cannot use a cloud account." } }
+    init { require(walkthroughRole == null || (demoMode && cloud == null && walkthroughRole in listOf("Patient", "Family"))) { "The patient walkthrough is local and read as Patient or Family only." } }
+    companion object {
+        const val DOCTOR_DEMO_STORAGE = "4b68f5f1-36f4-4bd7-96b3-c8eb728951f1"
+        private var pendingDemoClose: Job? = null
+        private val demoStorageLock = Mutex()
+        fun createDoctorDemo(app: Application) = CareModel(app, cloud = null, demoMode = true)
+        /** Local patient or family walkthrough over the same offline namespace; its role is never stored. */
+        fun createPatientWalkthrough(app: Application, role: String) = CareModel(app, cloud = null, demoMode = true, walkthroughRole = role)
+    }
+    private val account = cloud?.session?.value?.userId.orEmpty().also {
+        require(cloud == null || it.isNotBlank()) { "Sign in again before opening cloud care records." }
+    }
     val accountNamespace: String get() = account
-    private val db = CareDatabase.get(app, account)
+    val storageNamespace: String = if (demoMode) DOCTOR_DEMO_STORAGE else account
+    val localAudioRecordingAllowed: Boolean get() = DoctorLocalAudioRules.allowed(demoMode,cloud!=null,account,storageNamespace,selected.value,DoctorTestProfiles.contains(selected.value))
+    private val db = CareDatabase.get(app, storageNamespace)
     private val dao = db.care()
-    private val reminderScheduler = CareReminderScheduler(app, account)
-    private val preferences = app.getSharedPreferences(if (account.isEmpty()) "preferences" else "preferences-$account", 0)
+    private var demoCloseJob: Job? = null
+    private val activeConversationIds = mutableMapOf<String,String>()
+    /** Only the isolated Doctor example database is exposed to the fixture importer. */
+    suspend fun seedDoctorDemo(block: suspend (CareDao) -> Unit) {
+        check(demoMode && cloud == null && account.isBlank() && storageNamespace == DOCTOR_DEMO_STORAGE)
+        synchronized(Companion) { pendingDemoClose }?.let { pending ->
+            pending.join()
+            check(!pending.isCancelled) { "The previous practice draft could not be saved. Reopen Doctor examples after resolving the save error." }
+        }
+        withContext(Dispatchers.IO) {
+            demoStorageLock.withLock { db.withTransaction { block(dao) } }
+            val person = selected.value
+            if (person.isNotBlank()) {
+                draftCache.remove(person)
+                draft.value = dao.draft(person) ?: Conversation(person)
+            }
+        }
+    }
+    fun closeDoctorDemo(): Job {
+        check(demoMode && cloud == null)
+        demoCloseJob?.takeUnless { it.isCancelled }?.let { return it }
+        stopRecording()
+        val audioWrite=recordingSaveJob
+        val writer = viewModelScope.coroutineContext[Job]
+        // The route may disappear, but its final practice draft must outlive UI disposal.
+        return synchronized(Companion) {
+            val errors = CoroutineExceptionHandler { _, _ -> message.value = "The practice draft could not be saved. Keep Doctor examples open and try again." }
+            CoroutineScope(SupervisorJob() + Dispatchers.IO + errors).launch(start = CoroutineStart.LAZY) {
+                awaitDoctorLocalAudioSave(audioWrite) {recordingSaveError.value}
+                val snapshots=withContext(Dispatchers.Main.immediate) {
+                    val values=draftCache.values.toList() to pendingContextArchives.values.toList()
+                    writer?.cancel()
+                    values
+                }
+                writer?.join()
+                demoStorageLock.withLock { db.withTransaction { snapshots.second.forEach { db.conversations().archive(it) };snapshots.first.forEach { dao.saveDraft(it) } } }
+            }.also { demoCloseJob = it; pendingDemoClose = it; it.start() }
+        }
+    }
+    private val reminderScheduler = if (demoMode) null else CareReminderScheduler(app, account)
+    private val preferences = app.getSharedPreferences(if (storageNamespace.isEmpty()) "preferences" else "preferences-$storageNamespace", 0)
     private val conversationTranscriber = ConversationTranscriber()
     val people = dao.people().stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
     val selected = MutableStateFlow(preferences.getString("person", "") ?: "")
-    val viewRole = MutableStateFlow(preferences.getString("viewRole", null)?.takeIf { it in listOf("Patient", "Family", "Doctor") }
+    val viewRole = MutableStateFlow(walkthroughRole ?: preferences.getString("viewRole", null)?.takeIf { it in listOf("Patient", "Family", "Doctor") }
         ?: if (preferences.getBoolean("clinician", false)) "Doctor" else "Family")
     val clinician = MutableStateFlow(viewRole.value == "Doctor")
     val draft = MutableStateFlow(Conversation(""))
@@ -43,18 +96,32 @@ class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewMod
     private val owned = MutableStateFlow<Set<String>>(emptySet())
     val canEdit = combine(selected, editable) { id, ids -> cloud == null || id in ids }.stateIn(viewModelScope, SharingStarted.Eagerly, cloud == null)
     val isOwner = combine(selected, owned) { id, ids -> cloud == null || id in ids }.stateIn(viewModelScope, SharingStarted.Eagerly, cloud == null)
+    val careContacts = MutableStateFlow<List<CareContact>>(emptyList())
+    val careContactsLoading = MutableStateFlow(false)
+    val careContactsError = MutableStateFlow<String?>(null)
+    val canReadCareTeam = MutableStateFlow(cloud == null)
+    private val localContacts = LocalCareContacts(app, if (demoMode) storageNamespace else "")
     val recording = MutableStateFlow(false)
+    val recordingSaving = MutableStateFlow(false)
+    val recordingSaveError = MutableStateFlow<String?>(null)
     val amplitude = MutableStateFlow(0f)
     val recordingSeconds = MutableStateFlow(0)
     val transcribingPath = MutableStateFlow<String?>(null)
     val recordings = MutableStateFlow<List<File>>(emptyList())
     val versions = selected.flatMapLatest { dao.versions(it).onStart { emit(emptyList()) } }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
     val recordingConsents = selected.flatMapLatest { dao.recordingConsents(it).onStart { emit(emptyList()) } }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
-    val items = selected.flatMapLatest { dao.items(it).onStart { emit(emptyList()) } }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+    private val medicineHistory = MedicineHistoryRepo(app, cloud, storageNamespace)
+    private val medicinePastIds = MutableStateFlow<Set<String>>(emptySet())
+    private val prescriptionExcludedIds=selected.flatMapLatest { db.prescriptions().excludedIds(it) }.stateIn(viewModelScope,SharingStarted.Eagerly,emptyList())
+    val allItems = selected.flatMapLatest { dao.items(it).onStart { emit(emptyList()) } }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+    val items = combine(allItems, medicinePastIds,prescriptionExcludedIds) { rows, past,excluded -> rows.filterNot { it.kind == "medicine" && (it.id in past || it.id in excluded) } }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+    val conversationArchives=selected.flatMapLatest { db.conversations().archives(it) }.stateIn(viewModelScope,SharingStarted.Eagerly,emptyList())
     val reports = selected.flatMapLatest { dao.reports(it).onStart { emit(emptyList()) } }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
-    val reportFiles = ReportFiles(app, account)
+    val reportFiles = ReportFiles(app, storageNamespace)
     val acknowledgements = dao.acknowledgements().stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
-    private val writes = Channel<Conversation>(Channel.UNLIMITED)
+    private data class DraftWrite(val value:Conversation,val archive:DoctorConversationArchive?=null)
+    private val writes = Channel<DraftWrite>(Channel.UNLIMITED)
+    private val pendingContextArchives=java.util.concurrent.ConcurrentHashMap<String,DoctorConversationArchive>()
     private val draftCache = mutableMapOf<String, Conversation>()
     private val lock = Mutex()
     private val deletedPeople = mutableSetOf<String>()
@@ -62,14 +129,23 @@ class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewMod
     private var recordingDraft: Conversation? = null
     private var recordingFile: File? = null
     private var activeRecordingConsent: RecordingConsent? = null
+    private var activeRecorderUid: String = ""
     private var meter: Job? = null
+    private var recordingSaveJob: Job? = null
+    private var pendingRecordingMetadata: Pair<RecordingConsent,DoctorLocalAudioRef>? = null
     val centres: List<Centre> = CareCentreDirectory.decode(app.assets.open("india.json").bufferedReader().use { it.readText() })
     init {
-        runCatching { reminderScheduler.activate() }
+        runCatching { reminderScheduler?.activate() }
         viewModelScope.launch { reconcileReminders() }
+        viewModelScope.launch { prescriptionExcludedIds.collectLatest { reconcileReminders() } }
         if (cloud != null) refresh()
         viewModelScope.launch {
-            for (value in writes) try { lock.withLock { if (value.personId !in deletedPeople) withContext(Dispatchers.IO) { dao.saveDraft(value) } } }
+            for (write in writes) try { val value=write.value;lock.withLock { if (value.personId !in deletedPeople) withContext(Dispatchers.IO) {
+                val archives=pendingContextArchives.values.filter { it.personId==value.personId }
+                db.withTransaction {
+                archives.forEach { db.conversations().archive(it) }
+                if(activeConversationIds[value.personId]==null || activeConversationIds[value.personId]==value.conversationId)dao.saveDraft(value)
+            };archives.forEach { pendingContextArchives.remove(it.id) } } } }
             catch (_: Exception) { message.value = "Couldn't save the conversation. Keep this screen open and try again." }
         }
         viewModelScope.launch {
@@ -80,6 +156,8 @@ class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewMod
                 // A person switch must not reload an older draft ahead of queued writes.
                 draft.value = draftCache[id] ?: saved ?: Conversation(id)
                 recordings.value = withContext(Dispatchers.IO) { recordingFiles(id) }
+                refreshCareContacts(id)
+                refreshMedicineHistory(id)
             }
         }
         viewModelScope.launch {
@@ -96,30 +174,93 @@ class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewMod
         }
     }
     private suspend fun reload() {
-        val records = cloud?.load() ?: return
+        val service = cloud ?: return
+        fun requireSameAccount() = check(careCloudAccountMatches(account, service.session.value?.userId)) {
+            "The signed-in account changed. Reopen your care records."
+        }
+        requireSameAccount()
+        val records = service.load()
+        requireSameAccount()
         lock.withLock {
-            val removed = people.value.map { it.id }.toSet() - records.people.map { it.id }.toSet()
-            removed.forEach { draftCache.remove(it); deletedPeople.add(it) }
+            requireSameAccount()
+            val removed = dao.people().first().map { it.id }.toSet() - records.people.map { it.id }.toSet()
+            removed.forEach { person -> draftCache.remove(person); deletedPeople.add(person);pendingContextArchives.entries.removeAll { it.value.personId==person } }
             db.withTransaction {
+                requireSameAccount()
                 dao.clearAcknowledgements(); dao.clearVersions(); dao.clearItems(); dao.clearPeople()
                 dao.addPeople(records.people); dao.addItems(records.entries); dao.addVersions(records.notes); dao.addAcknowledgements(records.confirmations)
                 dao.clearRemovedDrafts(); dao.clearRemovedRecordingConsents()
                 removed.forEach { dao.deleteReports(it) }
+                removed.forEach { db.prescriptions().purgePerson(it);db.conversations().purgePerson(it) }
+                requireSameAccount()
             }
             withContext(Dispatchers.IO) { removed.forEach { reportFiles.removePerson(it) } }
             editable.value = records.editable; owned.value = records.owned; verifiedReviewIds.value = records.verifiedReviews; authenticatedConfirmationIds.value = records.authenticatedConfirmations
             if (selected.value in removed) { draft.value = Conversation(""); select(records.people.firstOrNull()?.id.orEmpty()) }
         }
         reconcileReminders()
+        refreshCareContacts(selected.value)
+        refreshMedicineHistory(selected.value)
     }
     private fun requireEdit(id: String) { require(cloud == null || id in editable.value) { "You can read these records. Ask the person who invited you to allow changes." } }
     fun select(id: String) {
         if (recording.value) stopRecording()
         selected.value = id; preferences.edit().putString("person", id).apply()
+        careContacts.value = emptyList(); canReadCareTeam.value = cloud == null; careContactsError.value = null; careContactsLoading.value = false
+        medicinePastIds.value = if (id.isBlank()) emptySet() else runCatching { medicineHistory.cached(id).pastIds }.getOrDefault(emptySet())
+    }
+    private fun sameCareContext(personId: String, expectedAccount: String, ownerOnly: Boolean = false): Boolean =
+        careContextMatches(expectedAccount, cloud?.session?.value?.userId.orEmpty(), personId, selected.value,
+            people.value.any { it.id == personId } && (cloud == null || personId in if (ownerOnly) owned.value else editable.value)) && account == expectedAccount
+    fun refreshCareContacts() { val person = selected.value; viewModelScope.launch { refreshCareContacts(person) } }
+    fun refreshMedicineHistory() { val person = selected.value; viewModelScope.launch { refreshMedicineHistory(person) } }
+    private suspend fun refreshMedicineHistory(person: String) {
+        if (person.isBlank()) return
+        try { val snapshot = medicineHistory.load(person); if (selected.value == person && cloud?.session?.value?.userId.orEmpty() == account) { medicinePastIds.value = snapshot.pastIds; reconcileReminders() } }
+        catch (e: Exception) { if (e is CancellationException) throw e /* Keep last-known scoped regimen; never report cloud success. */ }
+    }
+    private suspend fun refreshCareContacts(personId: String) {
+        if (personId.isBlank()) return
+        careContactsLoading.value = true; careContactsError.value = null
+        try {
+            val snapshot = if (cloud == null) CareContactSnapshot(true, withContext(Dispatchers.IO) { localContacts.list(personId) }) else cloud.careContacts(personId)
+            if (selected.value == personId && (cloud?.session?.value?.userId.orEmpty() == account)) { careContacts.value = snapshot.contacts; canReadCareTeam.value = snapshot.readable }
+        } catch (e: Exception) {
+            if (e is CancellationException) throw e
+            if (selected.value == personId) { careContacts.value = emptyList(); canReadCareTeam.value = false; careContactsError.value = "Care-team contacts couldn't be loaded. Nothing was uploaded or changed." }
+        } finally { if (selected.value == personId) careContactsLoading.value = false }
+    }
+    fun saveCareContact(contact: CareContact, expectedAccount: String, done: () -> Unit) = action {
+        require(sameCareContext(contact.personId, expectedAccount, ownerOnly = true)) { "Only this care profile's owner can manage its contacts." }
+        CareContactRules.validate(contact.name, contact.relationship, contact.role, contact.phone)
+        val saved = if (cloud == null) withContext(Dispatchers.IO) { localContacts.save(contact) } else cloud.saveCareContact(contact)
+        if (sameCareContext(contact.personId, expectedAccount, ownerOnly = true)) { careContacts.value = careContacts.value.filterNot { it.id == saved.id } + saved; canReadCareTeam.value = true; done() }
+    }
+    fun removeCareContact(contact: CareContact, expectedAccount: String, done: () -> Unit) = action {
+        require(sameCareContext(contact.personId, expectedAccount, ownerOnly = true)) { "Only this care profile's owner can manage its contacts." }
+        if (cloud == null) withContext(Dispatchers.IO) { localContacts.remove(contact) } else cloud.removeCareContact(contact)
+        if (sameCareContext(contact.personId, expectedAccount, ownerOnly = true)) { careContacts.value = careContacts.value.filterNot { it.id == contact.id }; done() }
+    }
+    fun saveDoctorVisit(expectedPersonId: String, expectedAccountId: String, doctorName: String, startsAt: Long, location: String, note: String, onSaved: () -> Unit, id: String = newId(), createdAt: Long = System.currentTimeMillis(), initial: CareItem? = null) = action {
+        require(sameCareContext(expectedPersonId, expectedAccountId)) { "Care access changed. Reopen the selected profile." }
+        var item = DoctorVisitRules.item(id, expectedPersonId, doctorName, startsAt, location, note).copy(created = createdAt)
+        if (initial != null) {
+            val current = dao.item(initial.id)
+            require(initial.personId == expectedPersonId && current == initial && initial.id == id) { "This visit changed. Reopen it before editing." }
+            val old = CareEntryCodec.decode(initial.detail)
+            val next = CareEntryCodec.decode(item.detail)!!
+            item = item.copy(created = initial.created, revision = initial.revision, doneOn = initial.doneOn, detail = CareEntryCodec.encode(next.copy(status = old?.status ?: "open", completedAt = old?.completedAt ?: 0, completedBy = old?.completedBy.orEmpty())))
+        }
+        val saved = cloud?.saveEntry(item, expectedAccountId) ?: item
+        // Persist only to the account-scoped local database; never switch to a different selected person.
+        require(saved.personId == expectedPersonId)
+        dao.saveItem(saved); reconcileReminders()
+        if (sameCareContext(expectedPersonId, expectedAccountId)) { message.value = if (cloud == null) "Visit saved on this device" else "Visit saved to shared care. The patient can see it after refreshing."; onSaved() }
     }
     fun role(value: Boolean) = role(if (value) "Doctor" else "Family")
     fun role(value: String) {
         require(value in listOf("Patient", "Family", "Doctor"))
+        if (walkthroughRole != null) return // The walkthrough user is fixed and never written to saved preferences.
         viewRole.value = value; clinician.value = value == "Doctor"
         preferences.edit().putString("viewRole", value).putBoolean("clinician", clinician.value).apply()
     }
@@ -129,29 +270,173 @@ class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewMod
         editable.value += person.id; owned.value += person.id; select(person.id); done()
     }
     fun edit(value: Conversation) {
-        if (value.personId != selected.value || value.personId.isBlank() || (cloud != null && value.personId !in editable.value)) return
-        draft.value = value.copy(updated = System.currentTimeMillis())
+        if (value.personId != selected.value || value.personId.isBlank() || (cloud != null && (!careCloudAccountMatches(account,cloud.session.value?.userId) || value.personId !in editable.value))) return
+        val previous=draft.value
+        var next=value
+        var archive:DoctorConversationArchive?=null
+        if(previous.personId==value.personId && previous.contextJson.isNotBlank() && previous.source!=value.source) {
+            val change=runCatching { DoctorConversationContext.validate(previous.source,previous.contextJson);DoctorConversationContext.sourceChanged(previous,value.source) }
+            if(change.isFailure) { message.value="This saved review context is unsupported or damaged. Its original words were kept; do not overwrite it.";return }
+            change.onSuccess { (context,keep) ->
+                val rebound=org.json.JSONObject(context)
+                if(value.transcribedAt>0 && (value.transcribedAt!=previous.transcribedAt || value.transcriptModel!=previous.transcriptModel || value.transcriptProvider!=previous.transcriptProvider)) {
+                    rebound.put("transcription",org.json.JSONObject().put("provider",value.transcriptProvider).put("model",value.transcriptModel).put("at",value.transcribedAt).put("sourceHash",DoctorConversationContext.sha256(value.source.toByteArray(Charsets.UTF_8))))
+                }
+                next=value.copy(contextJson=rebound.toString())
+                if(keep)archive=DoctorConversationArchive(newId(),previous.personId,previous.conversationId.ifBlank { newId() },DoctorConversationContext.archiveJson(previous),System.currentTimeMillis())
+            }
+        }
+        draft.value = next.copy(updated = System.currentTimeMillis())
         draftCache[value.personId] = draft.value
-        writes.trySend(draft.value)
+        archive?.let { pendingContextArchives[it.id]=it }
+        writes.trySend(DraftWrite(draft.value,archive))
     }
     fun organise() { edit(NoteRules.organise(draft.value)); message.value = "Ready to review" }
+    fun prepareDoctorConversation() {
+        val current=draft.value
+        if(current.personId!=selected.value || current.personId.isBlank()) return
+        if(editableDoctorContext(current)==null)return
+        edit(current.copy(conversationId=current.conversationId.ifBlank { newId() },contextJson=current.contextJson.ifBlank { DoctorConversationContext.initial(current) }))
+    }
+    private fun sameDoctorConversation(expected:DoctorConversationIdentity):Boolean {
+        val current=draft.value
+        return doctorConversationIdentityMatches(expected,DoctorConversationIdentity(account,current.personId,current.conversationId,DoctorConversationContext.sha256(current.source.toByteArray(Charsets.UTF_8))),sameCareContext(expected.personId,expected.accountId))
+    }
+    private fun editableDoctorContext(current:Conversation):org.json.JSONObject? = runCatching {
+        val text=current.contextJson.ifBlank { DoctorConversationContext.initial(current) }
+        DoctorConversationContext.validate(current.source,text);org.json.JSONObject(text)
+    }.getOrElse { message.value="This saved review context is unsupported or damaged. Its original content was kept.";null }
+    fun updateDoctorGoal(goal:DoctorGoalContext,expected:DoctorConversationIdentity) {
+        if(!sameDoctorConversation(expected)) { message.value="The conversation changed. Reopen it before editing.";return }
+        val current=draft.value
+        try {
+            require(goal.key in DoctorConversationContext.keys && goal.status in DoctorConversationContext.statuses && (goal.origin in DoctorConversationContext.origins || CarriedForward.isOrigin(goal.origin)))
+            val context=editableDoctorContext(current) ?: return
+            val goals=context.getJSONArray("goals")
+            for(i in 0 until goals.length()) if(goals.getJSONObject(i).getString("key")==goal.key) goals.put(i,DoctorConversationContext.goalJson(goal))
+            DoctorConversationContext.validate(current.source,context.toString())
+            val next=current.copy(conversationId=current.conversationId.ifBlank { newId() },contextJson=context.toString())
+            edit(when(goal.key) {
+                "patient_priorities"->next.copy(priorities=goal.answer)
+                "understanding_questions"->next.copy(questions=goal.answer)
+                "participants"->next.copy(participants=goal.answer)
+                "next_steps"->next.copy(nextSteps=goal.answer)
+                else->next
+            })
+        } catch(_:Exception) { message.value="The original words or review changed. Check the source before saving this goal." }
+    }
+    fun startNewDoctorConversation(expected:DoctorConversationIdentity,done:()->Unit={}) {
+        if(!sameDoctorConversation(expected)) { message.value="The conversation changed. Nothing was reset.";return }
+        val captured=draft.value;val person=captured.personId
+        action {
+            require(!recording.value && !recordingSaving.value && recordingSaveError.value==null && transcribingPath.value==null && person==selected.value && person.isNotBlank()) { "Finish the current recording or action first." }
+            requireEdit(person)
+            val fresh=CarriedForward.draftFrom(person,newId(),dao.latest(person))
+            lock.withLock {
+                db.withTransaction {
+                    require(draft.value==captured && sameCareContext(person,account)) { "The conversation or care access changed. Nothing was reset." }
+                    if(captured.source.isNotBlank() || NoteRules.values(captured).any(String::isNotBlank) || captured.audioPath.isNotBlank()) {
+                        db.conversations().archive(DoctorConversationArchive(newId(),person,captured.conversationId.ifBlank { newId() },DoctorConversationContext.archiveJson(captured),System.currentTimeMillis()))
+                    }
+                    dao.saveDraft(fresh)
+                    require(draft.value==captured && sameCareContext(person,account)) { "The conversation or care access changed. Nothing was reset." }
+                }
+                activeConversationIds[person]=fresh.conversationId
+                draftCache[person]=fresh;draft.value=fresh
+            }
+            done()
+        }
+    }
+    fun updateDoctorEnglishDraft(text:String,reviewed:Boolean,expected:DoctorConversationIdentity,origin:String="manual") {
+        if(!sameDoctorConversation(expected)) { message.value="The conversation changed. Reopen it before editing.";return }
+        val current=draft.value
+        if((origin !in DoctorConversationContext.origins && !CarriedForward.isOrigin(origin)) || text.length>NoteRules.MAX_SOURCE_CHARS)return
+        val context=editableDoctorContext(current) ?: return
+        val previous=context.optJSONObject("englishDraft")
+        val explicitlyReviewed=reviewed && previous?.optString("text")==text
+        context.put("englishDraft",if(text.isBlank()) org.json.JSONObject.NULL else org.json.JSONObject().put("text",text).put("sourceHash",DoctorConversationContext.sha256(current.source.toByteArray(Charsets.UTF_8))).put("origin",origin).put("reviewed",explicitlyReviewed))
+        edit(current.copy(conversationId=current.conversationId.ifBlank { newId() },contextJson=context.toString()))
+    }
+    fun updateDoctorRecorderLabel(label:String,expected:DoctorConversationIdentity) {
+        if(!sameDoctorConversation(expected)) { message.value="The conversation changed. Reopen it before editing.";return }
+        val current=draft.value
+        val context=(editableDoctorContext(current) ?: return).put("recorderLabel",label.take(120))
+        edit(current.copy(conversationId=current.conversationId.ifBlank { newId() },contextJson=context.toString()))
+    }
+    fun saveDoctorSharedDraftForAudience(expected:DoctorConversationIdentity,done:(SharedCareDraft)->Unit) = action {
+        require(!recording.value && !recordingSaving.value && recordingSaveError.value==null) { "Finish saving the local recording before sharing." }
+        require(sameDoctorConversation(expected)) { "The conversation changed. Reopen it before sharing." }
+        val service=cloud ?: error("Conversation-specific family access requires a signed-in shared care account.")
+        val captured=draft.value
+        require(captured.conversationId.isNotBlank()) { "Start this conversation before choosing its audience." }
+        DoctorConversationContext.validate(captured.source,captured.contextJson)
+        service.requireConversationCapabilities(account)
+        val candidates=service.sharedDrafts(captured.personId,expectedAccountId=account)
+        require(sameDoctorConversation(expected) && draft.value==captured) { "The conversation changed. Your local draft was kept." }
+        val key="sharedDraft:${captured.personId}:${captured.conversationId}"
+        val previous=candidates.firstOrNull { it.id==preferences.getString(key,null) && it.authorId==account && it.status!="reviewed" && it.conversation.conversationId==captured.conversationId }
+        val saved=service.saveSharedDraft(captured,previous?.id ?: newId(),previous?.revision ?: 0,submit=false,expectedAccountId=account)
+        preferences.edit().putString(key,saved.id).apply()
+        if(sameDoctorConversation(expected) && draft.value==captured)done(saved)
+        else message.value="The earlier snapshot was saved. Reopen the current conversation before choosing its audience."
+    }
+    fun attachDoctorRecording(path:String,expected:DoctorConversationIdentity) = action {
+        require(sameDoctorConversation(expected)) { "The conversation changed. Attach the recording again." }
+        val current=draft.value;val person=current.personId
+        require(person==selected.value && person.isNotBlank());requireEdit(person)
+        require(recordingFiles(person).any { it.absolutePath==path }) { "Choose a recording for this care profile." }
+        val consent=dao.recordingConsents(person).first().firstOrNull { it.audioPath==path && it.recordingConsentAt>0 } ?: error("Recording consent is not available.")
+        val conversation=current.conversationId.ifBlank { newId() }
+        val old=db.conversations().audioForPath(path,person)
+        val ref=old?.takeIf { it.conversationId==conversation } ?: withContext(Dispatchers.IO) {
+            DoctorLocalAudioRef(newId(),person,conversation,path,DoctorConversationContext.fileSha256(File(path)),consent.recordingConsentAt,old?.recorderUid.orEmpty(),System.currentTimeMillis()).also { db.conversations().addAudio(it) }
+        }
+        val context=org.json.JSONObject(current.contextJson.ifBlank { DoctorConversationContext.initial(current) })
+        context.put("audioRef",ref.id).put("audioHash",ref.sha256).put("recorderUid",ref.recorderUid.takeIf(String::isNotBlank) ?: org.json.JSONObject.NULL)
+        require(sameDoctorConversation(expected) && draft.value==current) { "The conversation changed. Attach the recording again." }
+        edit(current.copy(conversationId=conversation,contextJson=context.toString()))
+        message.value="Recording linked on this device only. Audio is not shared."
+    }
+    suspend fun doctorAudioFor(note:CareVersion):File? {
+        if(note.personId!=selected.value || versions.value.none { it.id==note.id && it.contentHash==note.contentHash }) return null
+        if(runCatching { DoctorConversationContext.validateVersion(note) }.isFailure)return null
+        val context=runCatching { org.json.JSONObject(note.contextJson) }.getOrNull() ?: return null
+        val id=context.optString("audioRef").takeIf { runCatching { java.util.UUID.fromString(it) }.isSuccess } ?: return null
+        val ref=db.conversations().audio(id,note.personId) ?: return null
+        if(ref.conversationId!=note.conversationId)return null
+        val file=File(ref.localPath)
+        return withContext(Dispatchers.IO) {
+            val folder=File(audioRoot(),note.personId).canonicalFile
+            file.takeIf { it.isFile && it.canonicalFile.parentFile==folder && ref.sha256==context.optString("audioHash") && DoctorConversationContext.fileSha256(it)==ref.sha256 }
+        }?.takeIf { note.personId==selected.value && versions.value.any { current -> current.id==note.id && current.contentHash==note.contentHash } && (cloud==null || careCloudAccountMatches(account,cloud.session.value?.userId)) }
+    }
     fun publish(doctor: String, reviewed: Boolean, done: () -> Unit) {
         val captured = draft.value; val person = people.value.firstOrNull { it.id == captured.personId } ?: return
         action {
+            require(!recording.value && !recordingSaving.value && recordingSaveError.value==null) { "Finish saving the local recording before publishing." }
             require(selected.value == person.id && clinician.value) { "Open this person's conversation in the doctor view before saving." }
+            require(sameCareContext(person.id,account)) { "The signed-in account or care access changed. Your draft was kept." }
             requireEdit(person.id)
                 val latest = dao.latest(person.id)
                 if (cloud != null) {
                     require(reviewed && captured.source.isNotBlank() && NoteRules.values(captured).any { it.isNotBlank() }) { "Check the source and every section before sending for review." }
-                    val candidates = cloud.sharedDrafts(person.id)
-                    val previousId = preferences.getString("sharedDraft:${person.id}", null)
-                    val previous = candidates.firstOrNull { it.id == previousId && it.status != "reviewed" }
-                    val saved = cloud.saveSharedDraft(captured, previous?.id ?: newId(), previous?.revision ?: 0, submit = true)
-                    preferences.edit().putString("sharedDraft:${person.id}", saved.id).apply()
+                    cloud.requireConversationCapabilities(account)
+                    val contextual=captured.copy(conversationId=captured.conversationId.ifBlank { newId() },contextJson=captured.contextJson.ifBlank { DoctorConversationContext.initial(captured) })
+                    DoctorConversationContext.validate(contextual.source,contextual.contextJson)
+                    require(draft.value==captured && sameCareContext(person.id,account)) { "The conversation changed. Review it again before sharing." }
+                    edit(contextual)
+                    val reviewedSnapshot=draft.value
+                    val candidates = cloud.sharedDrafts(person.id,expectedAccountId=account)
+                    val draftKey="sharedDraft:${person.id}:${contextual.conversationId}"
+                    val previousId = preferences.getString(draftKey, null)
+                    val previous = candidates.firstOrNull { it.id == previousId && it.status != "reviewed" && it.conversation.conversationId==contextual.conversationId }
+                    require(sameCareContext(person.id,account) && draft.value==reviewedSnapshot) { "The conversation or signed-in account changed. Your draft was kept." }
+                    val saved = cloud.saveSharedDraft(contextual, previous?.id ?: newId(), previous?.revision ?: 0, submit = true,expectedAccountId=account)
+                    preferences.edit().putString(draftKey, saved.id).apply()
                     message.value = "Sent for clinician review. Your original draft is retained."
                 } else {
                     val version = NoteRules.publish(person, captured, doctor, reviewed, (latest?.version ?: 0) + 1)
-                    require(latest?.contentHash != version.contentHash) { "This exact note has already been saved." }
+                    require(latest==null || !DoctorConversationContext.sameContent(latest,version)) { "This exact note has already been saved." }
                     dao.insertVersion(version)
                     message.value = "Care note saved"
                 }
@@ -235,7 +520,16 @@ class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewMod
     fun toggle(item: CareItem) = action {
         val today = LocalDate.now().toString()
         val checked = if (item.kind == "medicine") item.doneOn == today else item.doneOn.isNotBlank()
-        storeItem(item.copy(doneOn = if (checked) "" else today))
+        require(item.personId == selected.value) { "Reopen the selected care profile." }
+        val changed = item.copy(doneOn = if (checked) "" else today)
+        storeItem(changed)
+        if (cloud == null && item.kind == "medicine") {
+            try { appendLocalMedicineCheckoff(getApplication(), storageNamespace, item, item.doneOn, changed.doneOn) }
+            catch (e: Exception) {
+                if (e is CancellationException) throw e
+                message.value = "Daily check-off saved, but detailed history could not be recorded."
+            }
+        }
     }
     fun updateItem(item: CareItem, done: () -> Unit) = action {
         require(item.personId == selected.value && item.title.isNotBlank()) { "Choose the right person and enter a name." }
@@ -244,12 +538,20 @@ class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewMod
     }
     private suspend fun storeItem(item: CareItem) { requireEdit(item.personId); dao.saveItem(cloud?.saveEntry(item) ?: item); reconcileReminders() }
     private suspend fun reconcileReminders() {
+        if (demoMode) return
         // Alerts are secondary to accepted care records. A platform alert failure
         // must never announce that an already saved medicine/task failed to save.
-        runCatching { reminderScheduler.reconcile(dao.allItems()) }
+        runCatching {
+            val rows = dao.allItems()
+            val past = rows.map { it.personId }.distinct().associateWith { person ->
+                (if (person == selected.value) medicinePastIds.value else runCatching { medicineHistory.cached(person).pastIds }.getOrDefault(emptySet())) + db.prescriptions().excludedIds(person).first()
+            }
+            reminderScheduler?.reconcile(rows.filterNot { it.kind == "medicine" && it.id in past[it.personId].orEmpty() })
+        }
     }
     fun remove(item: CareItem) = action { requireEdit(item.personId); cloud?.removeEntry(item); dao.removeItem(item); reconcileReminders(); message.value = "Removed" }
     fun importReport(uri: android.net.Uri, personId: String) = action(waitForRefresh = true) {
+        require(!demoMode) { "File import is unavailable in Doctor examples." }
         require(people.value.any { it.id == personId }) { "Choose a person before adding a report." }
         requireEdit(personId)
         val report = try { reportFiles.copyFrom(uri, personId) }
@@ -267,7 +569,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewMod
             require(!file.exists() || file.delete()) { "Couldn't remove this report. Try again." }
         }
         dao.removeReport(report); message.value = "Report removed"; done()
-        CareDocumentReviewStore(getApplication(), account).remove(report)
+        CareDocumentReviewStore(getApplication(), storageNamespace).remove(report)
     }
     fun removePerson(done: () -> Unit) {
         val id = selected.value
@@ -279,9 +581,10 @@ class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewMod
             lock.withLock {
                 deletedPeople.add(id)
                 draftCache.remove(id)
-                db.withTransaction { dao.deleteAcknowledgements(id); dao.deleteVersions(id); dao.deleteItems(id); dao.deleteReports(id); dao.deleteRecordingConsents(id); dao.deleteDraft(id); dao.deletePersonRow(id) }
+                pendingContextArchives.entries.removeAll { it.value.personId==id }
+                db.withTransaction { dao.deleteAcknowledgements(id); dao.deleteVersions(id); dao.deleteItems(id); dao.deleteReports(id); dao.deleteRecordingConsents(id); db.prescriptions().purgePerson(id);db.conversations().purgePerson(id);dao.deleteDraft(id); dao.deletePersonRow(id) }
                 withContext(Dispatchers.IO) { File(audioRoot(), id).deleteRecursively(); reportFiles.removePerson(id) }
-                CareDocumentReviewStore(getApplication(), account).removePerson(id)
+                CareDocumentReviewStore(getApplication(), storageNamespace).removePerson(id)
             }
             reconcileReminders()
             select(""); message.value = "Records removed"; done()
@@ -294,9 +597,14 @@ class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewMod
         storageAccepted: Boolean,
         accessAccepted: Boolean,
         transcriptionAccepted: Boolean,
+        expected: DoctorConversationIdentity? = null,
     ) {
-        if (recording.value) return
-        if (draft.value.personId.isBlank() || !canEdit.value) { message.value = "Choose an editable person before recording."; return }
+        if (recording.value || recordingSaving.value) return
+        if(pendingRecordingMetadata!=null) {message.value="Finish saving the previous recording's consent details before recording again.";return}
+        if (!localAudioRecordingAllowed || selected.value != draft.value.personId || !canEdit.value || (cloud!=null && cloud.session.value?.userId!=account)) { message.value = "Choose an editable care profile before recording."; return }
+        if ((demoMode && (expected==null || expected.conversationId.isBlank())) || (expected!=null && !sameDoctorConversation(expected))) {message.value="The conversation changed. Review consent again before recording.";return}
+        if (getApplication<Application>().checkSelfPermission(android.Manifest.permission.RECORD_AUDIO)!=android.content.pm.PackageManager.PERMISSION_GRANTED) {message.value="Microphone permission is required. You can still type the conversation.";return}
+        if (demoMode && transcriptionAccepted) {message.value="Test recordings stay on this device. Online transcription is unavailable.";return}
         val consentAt = System.currentTimeMillis()
         val base = draft.value.copy(consentAt = consentAt)
         val file = File(audioRoot(), "${base.personId}/${newId()}.m4a")
@@ -330,8 +638,8 @@ class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewMod
             next.setMaxFileSize(if (transcriptionAccepted) ConversationTranscriber.MAX_AUDIO_BYTES else 100L * 1024 * 1024)
             next.setOnInfoListener { _, what, _ -> if (what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED || what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_FILESIZE_REACHED) stopRecording() }
             next.setOutputFile(file.absolutePath); next.prepare(); next.start()
-            recorder = next; recordingDraft = base; recordingFile = file; activeRecordingConsent = consent; recording.value = true; recordingSeconds.value = 0
-            meter = viewModelScope.launch { var ticks = 0; while (isActive) { delay(200); amplitude.value = runCatching { next.maxAmplitude / 32767f }.getOrDefault(0f); ticks++; recordingSeconds.value = ticks / 5 } }
+            recorder = next; recordingDraft = base; recordingFile = file; activeRecordingConsent = consent; activeRecorderUid=cloud?.session?.value?.userId?.takeIf { it==account }.orEmpty();recording.value = true; recordingSeconds.value = 0
+            meter = viewModelScope.launch { var ticks = 0; while (isActive) { delay(200); amplitude.value = runCatching { DoctorLocalAudioRules.level(next.maxAmplitude) }.getOrDefault(0f); ticks++; recordingSeconds.value = ticks / 5 } }
         } catch (_: Exception) { next.release(); file.delete(); activeRecordingConsent = null; message.value = "Couldn't start the microphone. Check permission and try again." }
     }
     fun stopRecording() {
@@ -340,15 +648,48 @@ class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewMod
         try {
             active.stop()
             val base = recordingDraft ?: return
-            val current = if (draft.value.personId == base.personId) draft.value else base
-            edit(current.copy(audioPath = recordingFile!!.absolutePath, consentAt = base.consentAt))
-            activeRecordingConsent?.let { consent -> viewModelScope.launch(Dispatchers.IO) { dao.saveRecordingConsent(consent) } }
-            refreshRecordings(base.personId)
-            message.value = "Recording saved. Add the words you want in the care note."
-        } catch (_: Exception) { recordingFile?.delete(); message.value = "That recording was too short to save. Try again." }
-        finally { active.release(); recordingFile = null; recordingDraft = null; activeRecordingConsent = null }
+            val file=recordingFile ?: error("The recording file is unavailable.")
+            inspectDoctorLocalAudio(file,audioRoot(),base.personId)
+            activeRecordingConsent?.let { consent ->
+                val ref=DoctorLocalAudioRef(newId(),base.personId,base.conversationId,file.absolutePath,"",consent.recordingConsentAt,activeRecorderUid,System.currentTimeMillis())
+                pendingRecordingMetadata=consent to ref
+                savePendingRecordingMetadata()
+            }
+        } catch (_: Exception) { message.value = "The recording could not be finalized. Its original file was kept on this device; it may have been too short." }
+        finally { active.release(); recordingFile = null; recordingDraft = null; activeRecordingConsent = null;activeRecorderUid="" }
     }
-    private fun audioRoot() = File(getApplication<Application>().filesDir, if (account.isEmpty()) "recordings" else "recordings-$account")
+    fun retrySavingRecording() { if(!recordingSaving.value)savePendingRecordingMetadata() }
+    private fun savePendingRecordingMetadata() {
+        val pending=pendingRecordingMetadata ?: return
+        recordingSaving.value=true;recordingSaveError.value=null
+        recordingSaveJob=CoroutineScope(SupervisorJob()+Dispatchers.IO).launch {
+            try {
+                val file=File(pending.second.localPath)
+                inspectDoctorLocalAudio(file,audioRoot(),pending.first.personId)
+                val verified=pending.second.copy(sha256=DoctorConversationContext.fileSha256(file))
+                db.withTransaction {
+                    persistDoctorLocalAudioMetadata(pending.first,verified,{dao.people().first().any {it.id==pending.first.personId}}) {
+                        dao.saveRecordingConsent(pending.first)
+                        if(verified.conversationId.isNotBlank())db.conversations().addAudio(verified)
+                        dao.attachLocalRecording(verified.personId,verified.conversationId,verified.localPath,verified.consentAt)
+                    }
+                }
+                pendingRecordingMetadata=null
+                withContext(Dispatchers.Main.immediate) {
+                    val current=draft.value
+                    if(DoctorLocalAudioRules.sameDraft(account,if(cloud==null)account else cloud.session.value?.userId.orEmpty(),verified.personId,current.personId,verified.conversationId,current.conversationId) && selected.value==verified.personId && canEdit.value) {
+                        edit(current.copy(audioPath=verified.localPath,consentAt=verified.consentAt))
+                        refreshRecordings(verified.personId)
+                    }
+                    message.value="Recording saved on this device. No transcript was generated."
+                }
+            } catch (_: Exception) {
+                recordingSaveError.value="The audio file was kept, but its consent details could not be saved. Retry saving before leaving."
+                message.value=recordingSaveError.value
+            } finally {recordingSaving.value=false}
+        }
+    }
+    private fun audioRoot() = File(getApplication<Application>().filesDir, if (storageNamespace.isEmpty()) "recordings" else "recordings-$storageNamespace")
     private fun recordingFiles(id: String): List<File> = if (id.isBlank()) emptyList() else
         File(audioRoot(), id).listFiles()?.filter { it.extension == "m4a" }?.sortedByDescending { it.lastModified() } ?: emptyList()
     private fun refreshRecordings(id: String) { viewModelScope.launch {
@@ -364,6 +705,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewMod
             }
             require(removed) { "Couldn't remove the recording. Please try again." }
             dao.deleteRecordingConsent(path)
+            db.conversations().removeAudioPath(id,path)
             if (draft.value.personId == id && draft.value.audioPath == path) edit(draft.value.copy(audioPath = "", consentAt = 0))
             refreshRecordings(id); message.value = "Recording removed"
         }
@@ -379,13 +721,14 @@ class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewMod
                 ?: error("Open this person's consented recording again.")
             require(savedConsent.recordingConsentAt > 0 && draft.value.personId == personId && draft.value.source.isBlank()) { "The conversation changed. Your text was not replaced." }
             require(review.provider == OfflineSpeechModel.provider && review.model == OfflineSpeechModel.id && review.reviewedAt >= review.createdAt && review.reviewedAt > 0 && review.text.isNotBlank() && review.text.length <= NoteRules.MAX_SOURCE_CHARS) { "Review the transcript first." }
-            edit(draft.value.copy(source = review.text, transcriptProvider = review.provider, transcriptModel = review.model,
-                transcribedAt = review.createdAt, transcriptAudioPath = path))
+            edit(DoctorConversationContext.acceptedTranscript(draft.value.copy(source = review.text, transcriptProvider = review.provider, transcriptModel = review.model,
+                transcribedAt = review.createdAt, transcriptAudioPath = path)))
             message.value = "Reviewed words added. Choose source words for the care note."
             true
         } catch (failure: Exception) { message.value = failure.message ?: "The transcript was not inserted."; false }
     }
     fun transcribeAudio(path: String, consent: RecordingConsent) {
+        if (demoMode) { message.value = "Online transcription is unavailable in Doctor examples."; return }
         val personId = selected.value
         action {
             require(BuildConfig.CLOUD_AUDIO_ENABLED) { "Online audio processing is not available in this release. Use on-device dictation or enter the conversation text." }
@@ -404,13 +747,13 @@ class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewMod
                 }
                 require(result.text.length <= NoteRules.MAX_SOURCE_CHARS) { "This transcript is too long for a shared care note. Keep the recording and enter a shorter selection." }
                 require(selected.value == personId && draft.value.personId == personId && draft.value.source.isBlank()) { "The conversation changed while transcription was running. The transcript was not inserted." }
-                edit(draft.value.copy(
+                edit(DoctorConversationContext.acceptedTranscript(draft.value.copy(
                     source = result.text,
                     transcriptProvider = result.provider,
                     transcriptModel = result.model,
                     transcribedAt = System.currentTimeMillis(),
                     transcriptAudioPath = path,
-                ))
+                )))
                 message.value = "Transcript ready. Check every word before continuing."
             } finally {
                 transcribingPath.value = null
@@ -440,5 +783,5 @@ class CareModel(app: Application, val cloud: CareCloud? = null) : AndroidViewMod
             finally { busy.value = false }
         }
     }
-    override fun onCleared() { recorder?.release(); meter?.cancel(); super.onCleared() }
+    override fun onCleared() { stopRecording(); meter?.cancel(); super.onCleared() }
 }

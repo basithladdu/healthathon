@@ -85,7 +85,7 @@ class DoctorDemoFlowTest {
         try {
             ui.setContent { CareTheme { if (!exited.value) DoctorDemo(onExit = { exited.value = true }, store = store) } }
             ui.onNodeWithTag("demo-preview-disclosure").performScrollTo()
-                .assertTextEquals("Sample records · local preview\nNo account is created or authenticated.")
+                .assertTextEquals("No account is created and nothing is sent.")
             ui.onNodeWithText("Demo only").assertDoesNotExist()
             ui.onNodeWithContentDescription("Show password").performScrollTo().performClick()
             ui.onNodeWithContentDescription("Hide password").assertIsDisplayed().performClick()
@@ -154,7 +154,7 @@ class DoctorDemoFlowTest {
             })
             onView(withId(android.R.id.button1)).perform(click())
             saveVisit()
-            ui.onNodeWithTag("demo-appointment-error").assertTextEquals("This overlaps another appointment for this demo doctor.")
+            ui.onNodeWithTag("demo-appointment-error").assertTextEquals("This overlaps another appointment.")
             ui.onNodeWithText("Close", useUnmergedTree = true).performScrollTo().performClick()
             visitAction(booked.id, "Cancel visit")
             ui.onNodeWithTag("demo-confirm-cancel").performClick()

@@ -13,14 +13,19 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -158,60 +163,78 @@ import java.time.format.DateTimeFormatter
     }
     LaunchedEffect(personId) { if (personId != capturedPerson) onClose() }
     ModalBottomSheet(onDismissRequest = onClose, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
-        Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(start = 20.dp, end = 20.dp, bottom = 28.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Heading(t(if (initial == null) "How are you feeling?" else "Edit symptom note", if (initial == null) "तबीयत कैसी है?" else "तबीयत का नोट बदलें"), 27)
-            Text(personName, fontWeight = FontWeight.SemiBold)
-            Text(t("What would you like to note?", "किस बारे में नोट लिखना है?"), fontWeight = FontWeight.SemiBold)
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
-                SymptomDiaryRules.symptoms.forEach { (en, _) -> FilterChip(if (en == "Other") otherSymptom else !otherSymptom && symptom == en, {
-                    otherSymptom = en == "Other"; symptom = if (otherSymptom) "" else en; scale = SymptomDiaryRules.scaleForSymptom(en)
-                    if (en != "Pain") { location = ""; triggerValues = "" }; rating = -2
-                }, label = { Text(SymptomDiaryRules.symptomLabel(en, hindi)) }, modifier = Modifier.heightIn(min = 48.dp).testTag("symptom-choice-$en")) }
+        Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(start = 16.dp, end = 16.dp, bottom = 28.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            Column(Modifier.padding(horizontal = 4.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Heading(t(if (initial == null) "How are you feeling?" else "Edit symptom note", if (initial == null) "तबीयत कैसी है?" else "तबीयत का नोट बदलें"), 28)
+                Text(personName, color = DoctorCardSub, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
             }
-            if (otherSymptom) CareField(symptom, { symptom = it.take(80) }, t("Symptom name", "परेशानी का नाम"), singleLine = true)
-            Text(t("Who reported this?", "किसने बताया?"), fontWeight = FontWeight.SemiBold)
-            DiaryChoices(SymptomDiaryRules.respondents, respondent, hindi) { respondent = it }
-            if (respondent.isNotBlank() && respondent != "patient") CareField(author, { author = it.take(120) }, t(if (respondent == "assisted-patient") "Written with help from" else "Observer's name", if (respondent == "assisted-patient") "लिखने में किसने मदद की" else "देखने वाले का नाम"), singleLine = true)
-            Text(t("Time frame", "समय अवधि"), fontWeight = FontWeight.SemiBold)
-            DiaryChoices(SymptomDiaryRules.recalls, recall, hindi) { recall = it }
-            Text(SymptomDiaryRules.ratingQuestion(scale, hindi), fontWeight = FontWeight.SemiBold)
-            Text(SymptomDiaryRules.ratingAnchors(scale, hindi), style = MaterialTheme.typography.bodySmall, modifier = Modifier.testTag("symptom-rating-anchors"))
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                (0..10).forEach { number -> FilterChip(rating == number, { rating = number }, label = { Text(number.toString()) }, modifier = Modifier.defaultMinSize(minWidth = 44.dp).heightIn(min = 48.dp).testTag("symptom-rating-$number")) }
-                FilterChip(rating == -1, { rating = -1; change = "" }, label = { Text(t("Not rated / unable to rate", "अंक नहीं बताया / बता नहीं सकते")) }, modifier = Modifier.heightIn(min = 48.dp).testTag("symptom-unrated"))
+            SymptomSection(1, t("What would you like to note?", "किस बारे में नोट लिखना है?"), t("Pick one.", "एक चुनें।")) {
+                SymptomDiaryRules.symptoms.entries.chunked(2).forEach { pair ->
+                    Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        pair.forEach { (en, _) -> SymptomTile(if (en == "Other") otherSymptom else !otherSymptom && symptom == en, SymptomDiaryRules.symptomLabel(en, hindi), symptomIcon(en), "symptom-choice-$en", Modifier.weight(1f).fillMaxHeight()) {
+                            otherSymptom = en == "Other"; symptom = if (otherSymptom) "" else en; scale = SymptomDiaryRules.scaleForSymptom(en); if (en != "Pain") { location = ""; triggerValues = "" }; rating = -2
+                        } }
+                        if (pair.size == 1) Spacer(Modifier.weight(1f))
+                    }
+                }
+                if (otherSymptom) CareField(symptom, { symptom = it.take(80) }, t("Symptom name", "परेशानी का नाम"), singleLine = true)
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedButton(onClick = { val d = LocalDate.parse(observedDate); DatePickerDialog(context, { _, y, m, day -> observedDate = LocalDate.of(y, m + 1, day).toString() }, d.year, d.monthValue - 1, d.dayOfMonth).apply { datePicker.maxDate = System.currentTimeMillis() }.show() }, modifier = Modifier.weight(1f).heightIn(min = 48.dp)) { Text(observedDate) }
-                OutlinedButton(onClick = { val time = LocalTime.parse(observedTime); TimePickerDialog(context, { _, h, m -> observedTime = "%02d:%02d".format(h, m) }, time.hour, time.minute, true).show() }, modifier = Modifier.weight(1f).heightIn(min = 48.dp)) { Text(observedTime) }
+            SymptomSection(2, t("Who reported this?", "किसने बताया?"), t("Who is describing the symptom.", "लक्षण कौन बता रहा है।")) {
+                DiaryChoices(SymptomDiaryRules.respondents, respondent, hindi) { respondent = it }
+                if (respondent.isNotBlank() && respondent != "patient") CareField(author, { author = it.take(120) }, t(if (respondent == "assisted-patient") "Written with help from" else "Observer's name", if (respondent == "assisted-patient") "लिखने में किसने मदद की" else "देखने वाले का नाम"), singleLine = true)
             }
-            if (symptom == "Pain") {
+            SymptomSection(3, t("Time frame", "समय अवधि"), t("Which period does your answer cover?", "आपका जवाब किस समय के बारे में है?")) {
+                DiaryChoices(SymptomDiaryRules.recalls, recall, hindi) { recall = it }
+            }
+            SymptomSection(4, SymptomDiaryRules.ratingQuestion(scale, hindi)) {
+                Text(SymptomDiaryRules.ratingAnchors(scale, hindi), style = MaterialTheme.typography.bodySmall, modifier = Modifier.testTag("symptom-rating-anchors"))
+                RatingReadout(rating, hindi)
+                listOf(0..5, 6..10).forEach { range ->
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                        range.forEach { number -> RatingButton(number, rating == number, Modifier.weight(1f).aspectRatio(1f)) { rating = number } }
+                        if (range.count() < 6) Spacer(Modifier.weight(1f))
+                    }
+                }
+                SymptomPill(rating == -1, t("Not rated / unable to rate", "अंक नहीं बताया / बता नहीं सकते"), "symptom-unrated", Modifier.fillMaxWidth()) { rating = -1; change = "" }
+            }
+            SymptomSection(5, t("When was this?", "यह कब हुआ?"), t("Change the date or time if it was earlier.", "पहले का हो तो तारीख या समय बदलें।")) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedButton(onClick = { val d = LocalDate.parse(observedDate); DatePickerDialog(context, { _, y, m, day -> observedDate = LocalDate.of(y, m + 1, day).toString() }, d.year, d.monthValue - 1, d.dayOfMonth).apply { datePicker.maxDate = System.currentTimeMillis() }.show() }, modifier = Modifier.weight(1f).heightIn(min = 48.dp)) { Icon(Icons.Default.CalendarMonth, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(observedDate, color = DoctorCardInk) }
+                    OutlinedButton(onClick = { val time = LocalTime.parse(observedTime); TimePickerDialog(context, { _, h, m -> observedTime = "%02d:%02d".format(h, m) }, time.hour, time.minute, true).show() }, modifier = Modifier.weight(1f).heightIn(min = 48.dp)) { Icon(Icons.Default.Schedule, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(observedTime, color = DoctorCardInk) }
+                }
+            }
+            if (symptom == "Pain") SymptomSection(null, t("About the pain", "दर्द के बारे में"), t("Optional details.", "वैकल्पिक जानकारी।")) {
                 CareField(location, { location = it.take(100) }, t("Pain location (optional)", "दर्द की जगह (वैकल्पिक)"), singleLine = true)
-                Text(t("When does it happen? (optional)", "कब होता है? (वैकल्पिक)"), fontWeight = FontWeight.SemiBold)
-                FlowRow(horizontalArrangement = Arrangement.spacedBy(7.dp)) { SymptomDiaryRules.triggers.forEach { (key, labels) ->
-                    FilterChip(key in value.painTriggers, { val next = value.painTriggers.toMutableSet(); if (!next.add(key)) next.remove(key); triggerValues = next.sorted().joinToString("|") }, label = { Text(if (hindi) labels.second else labels.first) }, modifier = Modifier.heightIn(min = 48.dp))
+                Text(t("When does it happen? (optional)", "कब होता है? (वैकल्पिक)"), color = DoctorCardInk, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { SymptomDiaryRules.triggers.forEach { (key, labels) ->
+                    SymptomPill(key in value.painTriggers, if (hindi) labels.second else labels.first, null, multi = true) { val next = value.painTriggers.toMutableSet(); if (!next.add(key)) next.remove(key); triggerValues = next.sorted().joinToString("|") }
                 } }
             }
             if (comparison != null) {
                 val previous = SymptomNoteCodec.decode(comparison.previous.detail)!!
-                SurfaceCard(Mint) {
-                    Text("${t("Previous matching note", "पिछला समान नोट")}: ${previous.observedDate} ${previous.observedTime} · ${previous.rating}/10", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.testTag("symptom-previous-reference"))
-                    Text(t("Compared with that note (optional)", "उस नोट के मुकाबले (वैकल्पिक)"), fontWeight = FontWeight.SemiBold)
+                SymptomSection(null, t("Compared with that note (optional)", "उस नोट के मुकाबले (वैकल्पिक)")) {
+                    Surface(shape = RoundedCornerShape(14.dp), color = DoctorStatusGoodBg, modifier = Modifier.fillMaxWidth()) {
+                        Text("${t("Previous matching note", "पिछला समान नोट")}: ${previous.observedDate} ${previous.observedTime} · ${previous.rating}/10", color = DoctorCardInk, fontSize = 15.sp, modifier = Modifier.padding(12.dp).testTag("symptom-previous-reference"))
+                    }
                     DiaryChoices(SymptomDiaryRules.changes, change, hindi) { change = if (change == it) "" else it }
                 }
-            } else if (rating >= 0 && respondent.isNotBlank()) Text(t("No earlier matching rating", "पहले का समान अंक नहीं है"), style = MaterialTheme.typography.bodySmall)
-            OutlinedButton(onClick = { val d = runCatching { LocalDate.parse(startedOn) }.getOrDefault(LocalDate.parse(observedDate)); DatePickerDialog(context, { _, y, m, day -> startedOn = LocalDate.of(y, m + 1, day).toString() }, d.year, d.monthValue - 1, d.dayOfMonth).apply { datePicker.maxDate = LocalDate.parse(observedDate).atStartOfDay(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli() }.show() }, modifier = Modifier.heightIn(min = 48.dp)) { Text(if (startedOn.isBlank()) t("Started on… (optional)", "कब शुरू हुआ… (वैकल्पिक)") else "${t("Started", "शुरू हुआ")}: $startedOn") }
-            if (startedOn.isNotBlank()) TextButton(onClick = { startedOn = "" }) { Text(t("Clear start date", "शुरू होने की तारीख हटाएँ")) }
-            CareField(note, { note = it.take(500) }, t("Anything else? (optional)", "कुछ और? (वैकल्पिक)"), minLines = 2)
-            (localError.takeIf { it.isNotBlank() } ?: actionError)?.let { Text(if (hindi && it == SymptomDiaryRules.SAVE_CONFLICT) "यह नोट बदल गया है या हटा दिया गया है। आपके जवाब यहीं हैं। सहेजने से पहले यह फ़ॉर्म बंद करके मौजूदा नोट फिर खोलें।" else if (hindi) "नोट सहेजा नहीं गया। जवाब यहीं हैं। तारीख, नाम और चुने हुए जवाब जाँचें।" else it, color = MaterialTheme.colorScheme.error) }
+            } else if (rating >= 0 && respondent.isNotBlank()) Text(t("No earlier matching rating", "पहले का समान अंक नहीं है"), color = DoctorCardSub, fontSize = 14.sp, modifier = Modifier.padding(horizontal = 4.dp))
+            SymptomSection(null, t("More details", "और जानकारी"), t("Optional.", "वैकल्पिक।")) {
+                OutlinedButton(onClick = { val d = runCatching { LocalDate.parse(startedOn) }.getOrDefault(LocalDate.parse(observedDate)); DatePickerDialog(context, { _, y, m, day -> startedOn = LocalDate.of(y, m + 1, day).toString() }, d.year, d.monthValue - 1, d.dayOfMonth).apply { datePicker.maxDate = LocalDate.parse(observedDate).atStartOfDay(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli() }.show() }, modifier = Modifier.heightIn(min = 48.dp)) { Text(if (startedOn.isBlank()) t("Started on… (optional)", "कब शुरू हुआ… (वैकल्पिक)") else "${t("Started", "शुरू हुआ")}: $startedOn", color = DoctorCardInk) }
+                if (startedOn.isNotBlank()) TextButton(onClick = { startedOn = "" }) { Text(t("Clear start date", "शुरू होने की तारीख हटाएँ")) }
+                CareField(note, { note = it.take(500) }, t("Anything else? (optional)", "कुछ और? (वैकल्पिक)"), minLines = 2)
+            }
+            (localError.takeIf { it.isNotBlank() } ?: actionError)?.let { Text(if (hindi && it == SymptomDiaryRules.SAVE_CONFLICT) "यह नोट बदल गया है या हटा दिया गया है। आपके जवाब यहीं हैं। सहेजने से पहले यह फ़ॉर्म बंद करके मौजूदा नोट फिर खोलें।" else if (hindi) "नोट सहेजा नहीं गया। जवाब यहीं हैं। तारीख, नाम और चुने हुए जवाब जाँचें।" else it, color = MaterialTheme.colorScheme.error, fontSize = 15.sp, fontWeight = FontWeight.SemiBold) }
             Button(onClick = {
                 val saved = value.copy(selfReportedChange = change.takeIf { comparison != null }.orEmpty(), comparedWithId = if (change.isNotBlank()) comparison?.previous?.id.orEmpty() else "")
                 localError = if (rating == -2) t("Choose a rating or Not rated.", "अंक चुनें या अंक नहीं बताया चुनें।") else SymptomDiaryRules.error(saved).orEmpty()
                 if (localError.isBlank()) onSave(id, saved)
-            }, enabled = !busy && canEdit && personId == capturedPerson, modifier = Modifier.fillMaxWidth().heightIn(min = 54.dp).testTag("symptom-save")) { Text(if (busy) t("Saving…", "सहेज रहे हैं…") else t("Save note", "नोट सहेजें")) }
+            }, enabled = !busy && canEdit && personId == capturedPerson, shape = RoundedCornerShape(16.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent, contentColor = Color.White), modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("symptom-save")) { Text(if (busy) t("Saving…", "सहेज रहे हैं…") else t("Save note", "नोट सहेजें"), fontSize = 17.sp, fontWeight = FontWeight.SemiBold) }
+            TextButton(onClick = onClose, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Cancel", "रद्द करें"), color = DoctorCardSub, fontSize = 16.sp) }
         }
     }
 }
 
 @Composable private fun DiaryChoices(options: Map<String, Pair<String, String>>, selected: String, hindi: Boolean, onSelect: (String) -> Unit) {
-    FlowRow(horizontalArrangement = Arrangement.spacedBy(7.dp)) { options.forEach { (key, label) -> FilterChip(selected == key, { onSelect(key) }, label = { Text(if (hindi) label.second else label.first) }, modifier = Modifier.heightIn(min = 48.dp).testTag("diary-choice-$key")) } }
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { options.forEach { (key, label) -> SymptomPill(selected == key, if (hindi) label.second else label.first, "diary-choice-$key", onClick = { onSelect(key) }) } }
 }

@@ -74,7 +74,7 @@ fun effectiveDoctorCoverage(item: DoctorCoverageItem, sourceText: String): Docto
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.Mic, null, Modifier.size(25.dp)); Spacer(Modifier.width(10.dp))
                     Column(Modifier.weight(1f)) {
-                        Text(if (state.recording) if (state.paused) "Recording paused" else "Recording audio" else if (state.clipLabel != null) "Conversation audio" else "Record audio", fontWeight = FontWeight.SemiBold, fontSize = 20.sp)
+                        Text(if (state.recording) if (state.paused) "Recording paused" else "Recording audio" else if (state.clipLabel != null) "Conversation audio" else "Record audio", fontWeight = FontWeight.Medium, fontSize = 20.sp, fontFamily = SaharaTitleFont)
                         if (state.clipLabel != null && !state.recording) Text(state.clipLabel, fontSize = 12.sp, color = Color.White.copy(alpha = .84f))
                     }
                     if (!state.recording && state.clipLabel != null) Icon(Icons.Default.CheckCircle, "Saved locally", Modifier.size(21.dp))
@@ -112,17 +112,18 @@ fun effectiveDoctorCoverage(item: DoctorCoverageItem, sourceText: String): Docto
         state.error?.let { Text(it, color = Rust, modifier = Modifier.testTag("record-review-error"), style = MaterialTheme.typography.bodyMedium) }
         AnimatedVisibility(visible = !state.recording, enter = expandVertically(tween(260)) + fadeIn(tween(180)), exit = shrinkVertically(tween(180)) + fadeOut(tween(120))) {
         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        Surface(color = Paper, contentColor = Ink, shape = RoundedCornerShape(24.dp), border = BorderStroke(1.dp, Ink.copy(alpha = .1f)), modifier = Modifier.fillMaxWidth()) {
-            Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.Notes, null, tint = Rust); Spacer(Modifier.width(10.dp)); Text("Conversation transcript", fontSize = 20.sp, fontWeight = FontWeight.SemiBold) }
-                Text(when (state.sourceKind) { DoctorTranscriptKind.FICTIONAL_SAMPLE -> "Fictional sample—not from this recording"; DoctorTranscriptKind.ONLINE -> "Online transcript · check every word against the audio"; DoctorTranscriptKind.MANUAL -> "Manually entered source · check wording and speakers"; DoctorTranscriptKind.NONE -> "Not transcribed. Stopping a recording does not create text." }, color = Rust, style = MaterialTheme.typography.bodySmall, modifier = Modifier.testTag("record-transcript-origin"))
-                OutlinedTextField(value = state.sourceText, onValueChange = { if (it.length <= 12000) onSourceEdit(it) }, enabled = !state.busy && !state.recording, label = { Text("Source text") }, placeholder = { Text("Type or paste what was said. A separate transcription step is required for audio.") }, minLines = 4, maxLines = 10, modifier = Modifier.fillMaxWidth().testTag("record-transcript"), shape = RoundedCornerShape(15.dp), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Rust, focusedLabelColor = Rust, cursorColor = Rust))
+        Surface(color = DoctorCardReport, contentColor = DoctorCardInk, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
+            Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.Notes, null, tint = DoctorAccent); Spacer(Modifier.width(10.dp)); Text("Conversation transcript", fontSize = 20.sp, lineHeight = 26.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, color = DoctorCardInk) }
+                Text(if (state.clipLabel != null) "Written from the conversation audio above. Play it back while you read." else "Not linked to a recording yet.", fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub)
+                Text(when (state.sourceKind) { DoctorTranscriptKind.FICTIONAL_SAMPLE -> "Prepared transcript · not taken from this recording"; DoctorTranscriptKind.ONLINE -> "Online transcript · check every word against the audio"; DoctorTranscriptKind.MANUAL -> "Manually entered · check wording and speakers"; DoctorTranscriptKind.NONE -> "No transcript yet" }, fontSize = 13.sp, lineHeight = 18.sp, fontWeight = FontWeight.Medium, color = DoctorAccent, modifier = Modifier.testTag("record-transcript-origin"))
+                OutlinedTextField(value = state.sourceText, onValueChange = { if (it.length <= 12000) onSourceEdit(it) }, enabled = !state.busy && !state.recording, label = { Text("Transcript · tap to edit") }, placeholder = { Text("Type or paste what was said, then correct any words that are wrong.") }, supportingText = { Text("${state.sourceText.length} / 12000", fontSize = 12.sp, color = DoctorCardFaint) }, textStyle = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp, lineHeight = 26.sp, color = DoctorCardInk), minLines = 6, maxLines = 14, modifier = Modifier.fillMaxWidth().testTag("record-transcript"), shape = RoundedCornerShape(16.dp), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = DoctorAccent, focusedLabelColor = DoctorAccent, cursorColor = DoctorAccent, unfocusedBorderColor = DoctorCardSub, unfocusedLabelColor = DoctorCardSub, disabledTextColor = DoctorCardSub))
             }
         }
-        Surface(color = Paper, contentColor = Ink, shape = RoundedCornerShape(24.dp), border = BorderStroke(1.dp, Ink.copy(alpha = .1f)), modifier = Modifier.fillMaxWidth()) {
+        Surface(color = DoctorCardReport, contentColor = DoctorCardInk, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
             Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text("Goals of Care review", fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
-                Text("Check what was covered. Missing text does not mean a topic was not discussed or that anyone agreed.", color = Ink.copy(alpha = .75f), style = MaterialTheme.typography.bodySmall, lineHeight = 18.sp)
+                Text("Goals of Care review", fontSize = 20.sp, lineHeight = 26.sp, color = DoctorCardInk, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
+                Text("Check what was covered. Missing text does not mean a topic was not discussed or that anyone agreed.", fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub)
                 state.coverage.forEachIndexed { index, item ->
                     val status = effectiveDoctorCoverage(item, state.sourceText)
                     val label = when (status) { DoctorCoverageStatus.NOT_ASSESSED -> "Not assessed"; DoctorCoverageStatus.REVIEWED_DISCUSSED -> if (item.manuallyReviewed) "Discussed · manually reviewed" else "Discussed · source linked"; DoctorCoverageStatus.NOT_FOUND_IN_TRANSCRIPT -> "Not found in transcript"; DoctorCoverageStatus.NEEDS_REVIEW -> "Needs review" }
@@ -130,12 +131,13 @@ fun effectiveDoctorCoverage(item: DoctorCoverageItem, sourceText: String): Docto
                         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                             Text(item.question, fontWeight = FontWeight.Medium, lineHeight = 23.sp)
                             Row(verticalAlignment = Alignment.CenterVertically) { Icon(if (status == DoctorCoverageStatus.REVIEWED_DISCUSSED) Icons.Default.CheckCircleOutline else Icons.Default.RadioButtonUnchecked, null, tint = Rust, modifier = Modifier.size(17.dp)); Spacer(Modifier.width(6.dp)); Text(label, color = Rust, style = MaterialTheme.typography.labelMedium); Spacer(Modifier.weight(1f)); Icon(Icons.Default.ChevronRight, null, tint = Rust, modifier = Modifier.size(18.dp)) }
-                            if (isDoctorSourceQuote(state.sourceText, item.quote)) Text("Source: ${item.quote}", color = Ink.copy(alpha = .75f), style = MaterialTheme.typography.bodySmall, lineHeight = 18.sp)
+                            if (isDoctorSourceQuote(state.sourceText, item.quote)) Text("Source: ${item.quote}", fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub)
                         }
                     }
                 }
             }
         }
+        DoctorFootnote("Audio is not automatically transcribed, so the words must be checked by a person. Audio stays on this device and is not included when a written note is shared.")
         }
         }
     }

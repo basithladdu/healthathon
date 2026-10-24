@@ -12,8 +12,9 @@ class DoctorDemoDataTest {
     @Test fun fixturesAreFictionalCompleteAndAppointmentsReferencePatients() {
         assertEquals(6, DoctorDemoData.patients.size)
         assertEquals(6, DoctorDemoData.patients.map { it.id }.distinct().size)
+        assertEquals(6, DoctorDemoData.patients.map { it.name }.distinct().size)
         DoctorDemoData.patients.forEach {
-            assertTrue(it.name.contains("Demo")); assertTrue(it.careNotes.isNotEmpty())
+            assertTrue(it.id.startsWith("demo-")); assertTrue(it.name.isNotBlank()); assertTrue(it.careNotes.isNotEmpty())
             assertTrue(it.medicines.isNotEmpty()); assertTrue(it.reportSummaries.isNotEmpty()); assertTrue(it.observations.isNotEmpty())
         }
         val values = DoctorDemoData.seedAppointments(now)

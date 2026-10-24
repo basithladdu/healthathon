@@ -13,7 +13,6 @@ import androidx.compose.material.icons.outlined.GridView
 import androidx.compose.material.icons.outlined.Insights
 import androidx.compose.material.icons.outlined.Medication
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,47 +32,52 @@ import androidx.compose.ui.unit.sp
 internal fun doctorHubSingleColumn(widthDp: Float, fontScale: Float): Boolean = widthDp < 340f || fontScale >= 1.3f
 
 /** Tiles only: the caller owns the patient header, scroll surface, routes and Back behaviour. */
-@Composable fun DoctorPatientHub(patient: DoctorDemoPatient, onSection: (String) -> Unit, modifier: Modifier = Modifier) {
-    BoxWithConstraints(modifier.fillMaxWidth().testTag("doctor-patient-hub-${patient.id}")) {
-        val single = doctorHubSingleColumn(maxWidth.value, LocalDensity.current.fontScale)
+@Composable fun DoctorPatientHub(patient: DoctorDemoPatient, onSection: (String) -> Unit, modifier: Modifier = Modifier, meta: Map<String,String> = emptyMap()) {
+    DoctorPatientNavigationTiles(onSection,modifier.testTag("doctor-patient-hub-${patient.id}"),"demo-record",340f,meta)
+}
+
+/** Doctor-only navigation presentation; contains no patient data beyond the caller's supplied counts. */
+@Composable internal fun DoctorPatientNavigationTiles(onSection:(String)->Unit,modifier:Modifier=Modifier,tagPrefix:String="doctor-shared",minimumPairedWidth:Float=300f,meta:Map<String,String> = emptyMap()) {
+    BoxWithConstraints(modifier.fillMaxWidth()) {
+        val single = maxWidth.value < minimumPairedWidth || LocalDensity.current.fontScale >= 1.3f
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            PatientHubTile("Overview", "Care story and next steps", "Summary", Icons.Outlined.GridView, Peach.copy(alpha = .7f), wide = true, onSection = onSection)
+            PatientHubTile("Overview", "Care story and next steps", "Summary", Icons.Outlined.GridView, DoctorCardOverview, wide = true, onSection = onSection,tagPrefix=tagPrefix,meta=meta["Summary"])
             if (single) {
-                PatientHubTile("Progress", "Patient and family reports", "Progress", Icons.Outlined.Insights, SaharaSoftBlue, wide = true, onSection = onSection)
-                PatientHubTile("Medicines", "Reported dose history", "Medicines", Icons.Outlined.Medication, lerpHubGold(), wide = true, onSection = onSection)
-            } else Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                PatientHubTile("Progress", "Reported updates", "Progress", Icons.Outlined.Insights, SaharaSoftBlue, modifier = Modifier.weight(1f), onSection = onSection)
-                PatientHubTile("Medicines", "Reported doses", "Medicines", Icons.Outlined.Medication, lerpHubGold(), modifier = Modifier.weight(1f), onSection = onSection)
+                PatientHubTile("Progress", "Patient and family reports", "Progress", Icons.Outlined.Insights, DoctorCardProgress, wide = true, onSection = onSection,tagPrefix=tagPrefix,meta=meta["Progress"])
+                PatientHubTile("Medicines", "Medicine list and intake history", "Medicines", Icons.Outlined.Medication, DoctorCardMedicine, wide = true, onSection = onSection,tagPrefix=tagPrefix,meta=meta["Medicines"])
+            } else Row(Modifier.height(IntrinsicSize.Min),horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                PatientHubTile("Progress", "Reported updates", "Progress", Icons.Outlined.Insights, DoctorCardProgress, modifier = Modifier.weight(1f).fillMaxHeight(), onSection = onSection,tagPrefix=tagPrefix,meta=meta["Progress"])
+                PatientHubTile("Medicines", "List and intake history", "Medicines", Icons.Outlined.Medication, DoctorCardMedicine, modifier = Modifier.weight(1f).fillMaxHeight(), onSection = onSection,tagPrefix=tagPrefix,meta=meta["Medicines"])
             }
-            PatientHubTile("Conversations", "Discussions and Care Notes", "Conversations", Icons.Outlined.Forum, SaharaLavender, wide = true, onSection = onSection)
+            PatientHubTile("Conversations", "Discussions and Care Notes", "Conversations", Icons.Outlined.Forum, DoctorCardConversation, wide = true, onSection = onSection,tagPrefix=tagPrefix,meta=meta["Conversations"])
             if (single) {
-                PatientHubTile("Visits", "Appointments and follow-up", "Visits", Icons.Outlined.CalendarMonth, Peach.copy(alpha = .45f), wide = true, onSection = onSection)
-                PatientHubTile("Reports", "Document summaries", "Reports", Icons.Outlined.FolderOpen, Cream, wide = true, onSection = onSection)
-            } else Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                PatientHubTile("Visits", "Appointments", "Visits", Icons.Outlined.CalendarMonth, Peach.copy(alpha = .45f), modifier = Modifier.weight(1f), onSection = onSection)
-                PatientHubTile("Reports", "Documents", "Reports", Icons.Outlined.FolderOpen, Cream, modifier = Modifier.weight(1f), onSection = onSection)
+                PatientHubTile("Visits", "Appointments and follow-up", "Visits", Icons.Outlined.CalendarMonth, DoctorCardVisit, wide = true, onSection = onSection,tagPrefix=tagPrefix,meta=meta["Visits"])
+                PatientHubTile("Reports", "Documents", "Reports", Icons.Outlined.FolderOpen, DoctorCardReport, wide = true, onSection = onSection,tagPrefix=tagPrefix,meta=meta["Reports"])
+            } else Row(Modifier.height(IntrinsicSize.Min),horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                PatientHubTile("Visits", "Appointments", "Visits", Icons.Outlined.CalendarMonth, DoctorCardVisit, modifier = Modifier.weight(1f).fillMaxHeight(), onSection = onSection,tagPrefix=tagPrefix,meta=meta["Visits"])
+                PatientHubTile("Reports", "Documents", "Reports", Icons.Outlined.FolderOpen, DoctorCardReport, modifier = Modifier.weight(1f).fillMaxHeight(), onSection = onSection,tagPrefix=tagPrefix,meta=meta["Reports"])
             }
         }
     }
 }
 
-private fun lerpHubGold() = SaharaSoftGold
-
-@Composable private fun PatientHubTile(title: String, description: String, section: String, icon: ImageVector, color: Color, modifier: Modifier = Modifier, wide: Boolean = false, onSection: (String) -> Unit) {
-    Surface(onClick = { onSection(section) }, modifier = modifier.fillMaxWidth().heightIn(min = if (wide) 104.dp else 120.dp).testTag("demo-record-$section").semantics { role = Role.Button }, shape = RoundedCornerShape(if (wide) 24.dp else 20.dp), color = color, contentColor = Ink, border = BorderStroke(1.dp, Rust.copy(alpha = .12f))) {
-        if (wide) Row(Modifier.padding(18.dp), verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.size(46.dp).background(Paper.copy(alpha = .75f), RoundedCornerShape(15.dp)), contentAlignment = Alignment.Center) { Icon(icon, null, tint = Rust, modifier = Modifier.size(25.dp)) }
+@Composable private fun PatientHubTile(title: String, description: String, section: String, icon: ImageVector, color: Color, modifier: Modifier = Modifier, wide: Boolean = false, onSection: (String) -> Unit,tagPrefix:String="demo-record",meta:String?=null) {
+    Surface(onClick = { onSection(section) }, modifier = modifier.fillMaxWidth().heightIn(min = if (wide) 96.dp else 124.dp).testTag("$tagPrefix-$section").semantics { role = Role.Button }, shape = RoundedCornerShape(22.dp), color = color, contentColor = DoctorCardInk, border = if(color==DoctorCardReport)BorderStroke(1.dp,DoctorHairline)else null) {
+        if (wide) Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.size(46.dp).background(Paper.copy(alpha = .9f), RoundedCornerShape(14.dp)), contentAlignment = Alignment.Center) { Icon(icon, null, tint = DoctorAccent, modifier = Modifier.size(23.dp)) }
             Spacer(Modifier.width(14.dp))
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                Text(title, fontSize = 19.sp, lineHeight = 24.sp, fontWeight = FontWeight.SemiBold)
-                Text(description, style = MaterialTheme.typography.bodySmall, color = Ink.copy(alpha = .75f), lineHeight = 18.sp)
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                Text(title, fontSize = 18.sp, lineHeight = 23.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, color = DoctorCardInk)
+                Text(description, fontSize=13.sp, color = DoctorCardSub, lineHeight = 18.sp)
+                if(!meta.isNullOrBlank()) Text(meta, fontSize=12.sp, color = DoctorAccent, lineHeight = 16.sp, fontWeight = FontWeight.Medium, modifier = Modifier.testTag("$tagPrefix-$section-meta"))
             }
-            Spacer(Modifier.width(8.dp)); Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = Rust, modifier = Modifier.size(20.dp))
-        } else Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { Icon(icon, null, tint = Rust, modifier = Modifier.size(25.dp)); Spacer(Modifier.weight(1f)); Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = Rust.copy(alpha = .7f), modifier = Modifier.size(17.dp)) }
+            Spacer(Modifier.width(8.dp)); Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = DoctorAccent, modifier = Modifier.size(20.dp))
+        } else Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { Icon(icon, null, tint = DoctorAccent, modifier = Modifier.size(20.dp)); Spacer(Modifier.weight(1f)); Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = DoctorAccent, modifier = Modifier.size(18.dp)) }
             Spacer(Modifier.height(4.dp))
-            Text(title, fontSize = 18.sp, lineHeight = 23.sp, fontWeight = FontWeight.SemiBold)
-            Text(description, style = MaterialTheme.typography.bodySmall, color = Ink.copy(alpha = .75f), lineHeight = 17.sp)
+            Text(title, fontSize = 18.sp, lineHeight = 23.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, color = DoctorCardInk)
+            Text(description, fontSize=13.sp, color = DoctorCardSub, lineHeight = 18.sp)
+            if(!meta.isNullOrBlank()) Text(meta, fontSize=12.sp, color = DoctorAccent, lineHeight = 16.sp, fontWeight = FontWeight.Medium, modifier = Modifier.testTag("$tagPrefix-$section-meta"))
         }
     }
 }

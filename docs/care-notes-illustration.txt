@@ -1,0 +1,17 @@
+Care Notes feature illustration
+
+Asset: android/app/src/main/res/drawable-nodpi/care_notes_illustration.png
+Created: 2026-10-21 with the built-in image-generation tool.
+Purpose: decorative artwork for the yellow Today / Your care notes feature card.
+It is not a clinical document or a medical verification symbol.
+
+Prompt direction:
+Stylized concept; small Care Note feature-card illustration with a care-plan
+notebook, two or three checkmarks and abstract lines, an orange conversation
+bubble with a heart, and a pencil. Premium paper-cut matte finish. Palette:
+rust #BA4427, peach #FFD1B3, ivory #FFF8EF, brown #3B3028, with a muted lavender
+accent. Transparent background. No people, readable text, logos, or medical
+verification seals.
+
+The generated PNG is kept in drawable-nodpi to avoid density-driven bitmap
+upscaling. The existing conversation artwork remains in use on the welcome screen.

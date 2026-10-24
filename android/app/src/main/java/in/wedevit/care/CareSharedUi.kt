@@ -22,8 +22,8 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
-/** Real account records only. The separate fictional doctor walkthrough is unchanged. */
-@Composable fun CareSharedWorkspace(vm: CareModel, onAccount: () -> Unit, onClose: () -> Unit) {
+/** Real account records only. The separate doctor walkthrough is unchanged. */
+@Composable fun CareSharedWorkspace(vm: CareModel, onAccount: () -> Unit, onClose: () -> Unit, embedded: Boolean = false, onBusyChange: (Boolean) -> Unit = {}) {
     val cloud = vm.cloud
     val selected by vm.selected.collectAsStateWithLifecycle()
     val owner by vm.isOwner.collectAsStateWithLifecycle()
@@ -33,6 +33,8 @@ import kotlinx.coroutines.launch
     var profile by remember { mutableStateOf<CareClinicianProfile?>(null) }
     var drafts by remember(selected) { mutableStateOf<List<SharedCareDraft>>(emptyList()) }
     var busy by remember { mutableStateOf(false) }
+    SideEffect { onBusyChange(busy) }
+    DisposableEffect(Unit) { onDispose { onBusyChange(false) } }
     var error by remember { mutableStateOf("") }
     var notice by remember { mutableStateOf("") }
     var name by rememberSaveable { mutableStateOf("") }
@@ -63,8 +65,8 @@ import kotlinx.coroutines.launch
         if (cloud != null) run { refresh() }
     }
     DisposableEffect(cloud) { onDispose { actionJob?.cancel() } }
-    BackHandler(onBack = onClose)
-    Scaffold(containerColor = Cream, topBar = { TopAppBar(title = { Text("Shared clinician workspace") }, navigationIcon = { IconButton(onClick = onClose) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back") } }, colors = TopAppBarDefaults.topAppBarColors(containerColor = Cream)) }) { padding ->
+    BackHandler { if (!busy) onClose() }
+    val content: @Composable (PaddingValues) -> Unit = { padding ->
         LazyColumn(Modifier.fillMaxSize().padding(padding).imePadding(), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
             if (cloud == null) item { SurfaceCard { Heading("Sign in to your records", 25); Text("Use an existing confirmed Sahara account. A selected doctor role does not verify your identity."); Button(onClick = onAccount) { Text("Your account") } } }
             else {
@@ -72,7 +74,7 @@ import kotlinx.coroutines.launch
                 if (error.isNotBlank()) item { SurfaceCard(Peach) { Text(error); TextButton(onClick = { run { refresh() } }, enabled = !busy) { Text("Retry") } } }
                 if (notice.isNotBlank()) item { Text(notice, color = Rust) }
                 item { SurfaceCard(Mint) {
-                    Text("Clinician verification", fontWeight = FontWeight.Bold)
+                    Text("Clinician verification", fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
                     Text(when (profile?.status) { "approved" -> "Registration reviewed. Patient invitation is also required before clinical review."; "pending" -> "Request received. An independent verifier must check your council registration."; "rejected", "suspended" -> "${profile?.status}: ${profile?.note}"; else -> "Your account is not verified as a clinician." })
                     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                         CareField(name, { name = it.take(100) }, "Registered name", singleLine = true)
@@ -83,7 +85,7 @@ import kotlinx.coroutines.launch
                     }
                 } }
                 item { SurfaceCard(Gold) {
-                    Text("Patient-controlled access", fontWeight = FontWeight.Bold)
+                    Text("Patient-controlled access", fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
                     Text(if (owner) "Invite a separately verified clinician or chosen family account, choose access and expiry, and cancel or revoke access online." else "The patient record owner controls your access. A display-role change cannot increase your permissions.")
                     OutlinedButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse("https://sahara.wedevit.in/shared-care?person=$selected"))) }) { Icon(Icons.Default.OpenInNew, null); Spacer(Modifier.width(8.dp)); Text("Open shared care, tasks and progress") }
                     Text("Sign in with the same Sahara account on the website. Links never grant public access.", style = MaterialTheme.typography.bodySmall)
@@ -100,12 +102,14 @@ import kotlinx.coroutines.launch
             item { Text("Clinical review is a separate step by a verified, invited account. It records a discussion; it does not execute a legal advance directive or authorise treatment.", style = MaterialTheme.typography.bodySmall) }
         }
     }
+    if (embedded) content(PaddingValues(0.dp))
+    else Scaffold(containerColor = Cream, topBar = { TopAppBar(title = { Text("Shared clinician workspace") }, navigationIcon = { IconButton(onClick = onClose, enabled = !busy) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back") } }, colors = TopAppBarDefaults.topAppBarColors(containerColor = Cream)) }, content = content)
     reading?.let { draft ->
         var confirmed by remember(draft.id, draft.revision) { mutableStateOf(false) }
         ModalBottomSheet(onDismissRequest = { if (!busy) reading = null }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
             LazyColumn(Modifier.imePadding().fillMaxWidth(), contentPadding = PaddingValues(22.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
                 item { Heading("Review conversation", 26); Text("Revision ${draft.revision} · ${draft.status}", style = MaterialTheme.typography.bodySmall) }
-                item { SurfaceCard(Gold) { Text("Original words", fontWeight = FontWeight.Bold); SelectionContainerText(draft.conversation.source) } }
+                item { SurfaceCard(Gold) { Text("Original words", fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont); SelectionContainerText(draft.conversation.source) } }
                 items(NoteRules.labels.zip(NoteRules.values(draft.conversation))) { (label, value) -> SurfaceCard { Text(label, fontWeight = FontWeight.Bold); SelectionContainerText(value.ifBlank { "Not recorded" }); CareSourceLinks(draft.conversation.source, value) } }
                 if (profile?.status == "approved" && draft.status == "submitted" && !owner && cloud != null) {
                     item { CheckLine(confirmed, { confirmed = it }, "I checked this exact source and every section as the patient's invited clinician.") }

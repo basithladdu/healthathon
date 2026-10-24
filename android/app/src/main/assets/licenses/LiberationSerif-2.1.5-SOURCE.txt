@@ -1,0 +1,12 @@
+Liberation Serif, version 2.1.5 (unmodified regular and bold binaries).
+Upstream: https://github.com/liberationfonts/liberation-fonts/releases/tag/2.1.5
+Archive: https://github.com/liberationfonts/liberation-fonts/files/7261482/liberation-fonts-ttf-2.1.5.tar.gz
+License: SIL Open Font License 1.1; full accompanying LICENSE is packaged beside this file.
+This Times-compatible face is not Microsoft Times New Roman.
+
+SHA-256 archive: 7191c669bf38899f73a2094ed00f7b800553364f90e2637010a69c0e268f25d0
+SHA-256 LiberationSerif-Regular.ttf: 058ea80864aef09a23f45cbec2bb5400bc3dfbdea01c3f10538a21fcb497fb74
+SHA-256 LiberationSerif-Bold.ttf: d754ba427cfe0bca54ae052384baa8f842da5bd6550ad4da024ac441e7a7d5ce
+
+App resource names: liberation_serif_regular.ttf / liberation_serif_bold.ttf.
+Android's normal font fallback handles characters absent from this family.

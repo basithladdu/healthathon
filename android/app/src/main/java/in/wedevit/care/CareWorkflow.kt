@@ -78,7 +78,7 @@ object CareEntryCodec {
     fun readable(detail: String): String = decode(detail)?.let { entry ->
         when (entry.type) {
             "lab" -> "${entry.value} ${entry.unit}".trim()
-            "schedule" -> listOf(entry.category, entry.location, entry.detail).filter(String::isNotBlank).joinToString(" · ")
+            "schedule" -> listOf(entry.category, entry.location, if (entry.category == "Visit") DoctorVisitDetails.readable(entry.detail) else entry.detail).filter(String::isNotBlank).joinToString(" · ")
             else -> listOf(entry.statusLabel(), entry.assignee, entry.detail).filter(String::isNotBlank).joinToString(" · ")
         }
     } ?: if (SymptomNoteCodec.isStructured(detail)) SymptomNoteCodec.readable(detail) else if (isStructured(detail)) "This entry needs a newer app to open." else detail
@@ -196,11 +196,12 @@ object CareLabRules {
     val role by vm.viewRole.collectAsStateWithLifecycle()
     var action by remember(item.id) { mutableStateOf("") }
     var editing by remember(item.id) { mutableStateOf(false) }
+    val capturedAccount = remember(item.id) { vm.accountNamespace }
     val active = data.status in setOf("open", "accepted")
     SurfaceCard(if (data.status == "completed") Sage.copy(alpha = .5f) else Paper) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(if (data.type == "conversation") Icons.Default.Forum else Icons.Default.Assignment, null, tint = Rust)
-            Spacer(Modifier.width(10.dp)); Text(item.title, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
+            Spacer(Modifier.width(10.dp)); Text(item.title, fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f), fontFamily = SaharaTitleFont)
         }
         Text("${data.statusLabel()} · For ${data.assignee}", color = Rust, style = MaterialTheme.typography.labelLarge)
         if (data.sender.isNotBlank()) Text("From ${data.sender}", style = MaterialTheme.typography.bodySmall)
@@ -229,7 +230,8 @@ object CareLabRules {
             if (action == "accepted") Text("Names are self-entered and visible to this care circle.", style = MaterialTheme.typography.bodySmall)
             (error.ifBlank { savingError.orEmpty() }).takeIf(String::isNotBlank)?.let { Text(it, color = MaterialTheme.colorScheme.error) }
         } }, confirmButton = { TextButton(enabled = !busy, onClick = {
-            if (action == "remove") { vm.remove(item); action = "" }
+            if (!canEditCareContext(vm, item.personId, capturedAccount)) { error = "Care access changed. Reopen this person's records." }
+            else if (action == "remove") { vm.remove(item); action = "" }
             else runCatching {
                 val name = if (action in setOf("accepted", "completed")) actor else actor.ifBlank { vm.cloud?.session?.value?.email.orEmpty().ifBlank { role } }
                 val changed = CareWorkflowRules.transition(data, action, name)
@@ -246,6 +248,7 @@ object CareLabRules {
     val saveError by vm.actionError.collectAsStateWithLifecycle()
     val role by vm.viewRole.collectAsStateWithLifecycle()
     val capturedPerson = remember { person }
+    val capturedAccount = remember { vm.accountNamespace }
     val entryId = rememberSaveable { initial?.id ?: newId() }
     var title by rememberSaveable { mutableStateOf(initial?.title.orEmpty()) }
     var recipient by rememberSaveable { mutableStateOf(existing?.assignee ?: if (type == "conversation") "Doctor" else "") }
@@ -269,7 +272,7 @@ object CareLabRules {
             (error.ifBlank { saveError.orEmpty() }).takeIf(String::isNotBlank)?.let { Text(it, color = MaterialTheme.colorScheme.error) }
             Button(onClick = {
                 runCatching {
-                    require(capturedPerson == person && canEdit) { "Choose the right person before saving." }
+                    require(canEditCareContext(vm, capturedPerson, capturedAccount)) { "Choose the right person before saving." }
                     val payload = (existing ?: CareEntry(type, sender = vm.cloud?.session?.value?.email.orEmpty().ifBlank { role })).copy(assignee = recipient.trim(), detail = detail.trim())
                     CareWorkflowRules.validate(title, payload)
                     val encoded = CareEntryCodec.encode(payload)

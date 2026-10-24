@@ -52,7 +52,7 @@ class DoctorOverviewDataTest {
         assertNull(prior.versionNumber)
         assertEquals(DoctorWorkflowData.sources("demo-asha").first().text, prior.sourceText)
         assertTrue(prior.priorities.isBlank())
-        assertTrue(result.previousProfessional!!.role.contains("fictional"))
+        assertEquals("Previous clinician", result.previousProfessional!!.role)
         assertEquals(prior.sourceId, result.previousProfessional!!.sourceId)
         assertTrue(result.previousProfessional!!.disclosure.contains("Not a verified note author or an assigned doctor"))
         val withReviewer = DoctorOverviewData.build("demo-asha", listOf(version("entered-name", 1)), emptyList(), now)!!

@@ -45,7 +45,7 @@ import kotlinx.coroutines.withContext
     LaunchedEffect(identity, client) { capabilities = try { client.capabilities() } catch (cancel: CancellationException) { throw cancel } catch (_: Exception) { null } }
     DisposableEffect(identity, recording.path, source) { onDispose { job?.cancel() } }
     SurfaceCard(Mint) {
-        Text("Transcribe a recorded turn", fontWeight = FontWeight.Bold)
+        Text("Transcribe a recorded turn", fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
         Text("One person at a time, up to 30 seconds and 2 MB. Listen to the original recording and check who spoke.", style = MaterialTheme.typography.bodySmall)
         if (capabilities?.audioReady != true) Text("Online audio processing is unavailable in this release. Your recording and manual conversation remain available.", style = MaterialTheme.typography.bodySmall)
         else {
@@ -120,7 +120,7 @@ import kotlinx.coroutines.withContext
     }
     DisposableEffect(identity, source) { onDispose { job?.cancel() } }
     SurfaceCard(Mint) {
-        Text("Prepare a source-linked draft", fontWeight = FontWeight.Bold)
+        Text("Prepare a source-linked draft", fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
         val ready = capabilities?.ready == true
         if (!ready) Text("Online assistance is unavailable. You can keep building the note from the original words below.", style = MaterialTheme.typography.bodySmall)
         else {
@@ -143,7 +143,7 @@ import kotlinx.coroutines.withContext
         }
         result?.let { draft ->
             Spacer(Modifier.height(8.dp))
-            Text("AI draft · review the exact source", fontWeight = FontWeight.Bold)
+            Text("AI draft · review the exact source", fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
             careAssistFieldKeys.forEachIndexed { index, key ->
                 val words = draft.fields[key].orEmpty()
                 Text(NoteRules.labels[index], style = MaterialTheme.typography.labelLarge)
@@ -185,7 +185,7 @@ import kotlinx.coroutines.withContext
     LaunchedEffect(versionId, client) { capabilities = try { client.capabilities() } catch (cancel: CancellationException) { throw cancel } catch (_: Exception) { null } }
     DisposableEffect(versionId, source, from, to) { onDispose { job?.cancel() } }
     SurfaceCard(Mint) {
-        Text("Read in another language", fontWeight = FontWeight.Bold)
+        Text("Read in another language", fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
         if (capabilities?.translationReady != true) Text("Translation is unavailable. The original note and downloaded-language read aloud remain available.", style = MaterialTheme.typography.bodySmall)
         else {
             Text("Original language", style = MaterialTheme.typography.labelLarge)
@@ -210,7 +210,7 @@ import kotlinx.coroutines.withContext
             }
         }
         result?.let { translated ->
-            Text("AI translation · check against the original", fontWeight = FontWeight.Bold)
+            Text("AI translation · check against the original", fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
             SelectionContainerText(translated.translation)
             CheckLine(reviewed, { reviewed = it }, "A person who understands both languages checked this translation, including names, numbers, negation and uncertainty.")
             if (reviewed) CareReadAloudControl(translated.translation, "translation-${translated.versionId}-${translated.sourceHash}-${translated.targetLanguage}", translated.targetLanguage)

@@ -1,0 +1,32 @@
+Conversation card illustrations — 23 October 2026
+Mode: native built-in image_gen.imagegen, three separate generation calls.
+transparent_background=true. No reference images or CLI/API fallback.
+Original generated PNG alpha preserved unchanged; originals copied into drawable-nodpi.
+All assets: 1254 x 1254 pixels, PNG color type 6 (RGBA).
+
+Asset: android/app/src/main/res/drawable-nodpi/conversation_recent_art.png
+Use case: stylized-concept
+Asset type: transparent decorative illustration for a healthcare app conversation card, not a UI screenshot.
+Subject: a kind female doctor and an adult female patient seated facing each other in a warm calm conversation, simple polished fictional clay figures, full figures visible, small unobtrusive blank speech bubble.
+Style: soft matte 3D clay, friendly rounded forms, premium simplified healthcare mascot illustration; not realistic people.
+Composition: one centered compact cluster on square canvas, generous transparent padding; readable silhouette when small, gentle translucent contact shadow only. No room or solid backdrop.
+Palette: mint #DCEDE7, cream, warm orange #D97757 accents, restrained dark brown facial/hair details.
+Constraints: genuinely transparent background; no words, letters, digits, logos, watermarks, medical treatment details, busy details, borders or card UI.
+
+Asset: android/app/src/main/res/drawable-nodpi/conversation_record_art.png
+Use case: stylized-concept
+Asset type: transparent decorative illustration for a healthcare app record-conversation card, not a UI screenshot.
+Subject: a friendly rounded standing microphone beside a small blank notebook and one empty speech bubble, one compact recognizable cluster.
+Style: soft matte 3D clay, premium simple rounded healthcare mascot accessory illustration, gentle polished edges, not a flat Material glyph.
+Composition: centered cluster on square canvas, generous transparent padding, clear silhouette when small, gentle translucent contact shadow only. No room or solid backdrop.
+Palette: peach #FFD2B4, cream, warm orange #D97757 accents, restrained deep brown details.
+Constraints: genuinely transparent background; no words, letters, digits, logos, watermarks, medical treatment details, busy details, borders or card UI.
+
+Asset: android/app/src/main/res/drawable-nodpi/conversation_history_art.png
+Use case: stylized-concept
+Asset type: transparent decorative illustration for a healthcare app conversation-history card, not a UI screenshot.
+Subject: a small orderly stack of archived care-note folders with a simple miniature calendar beside it; calendar has blank date cells, folders have blank labels, one compact recognizable cluster.
+Style: soft matte 3D clay, premium simple rounded healthcare mascot accessory illustration, gentle polished edges, not a flat Material glyph.
+Composition: centered cluster on square canvas, generous transparent padding, clear silhouette when small, gentle translucent contact shadow only. No room or solid backdrop.
+Palette: lavender #EAE2F3, cream, warm orange #D97757 accents, restrained deep brown details.
+Constraints: genuinely transparent background; no words, letters, digits, logos, watermarks, medical treatment details, busy details, borders or card UI.
