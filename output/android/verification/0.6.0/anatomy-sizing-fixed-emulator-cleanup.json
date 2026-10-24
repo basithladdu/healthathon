@@ -1,0 +1,16 @@
+{
+  "checkedAtUtc": "2026-10-24T15:26:53.1955240Z",
+  "status": "stopped_task_owned_guest",
+  "serial": "emulator-5576",
+  "qemuPid": 30300,
+  "launcherPid": 43484,
+  "ownershipVerifiedBy": "Exact listener port, clone path and launcher parent matched before stop",
+  "qemuExited": true,
+  "launcherExited": true,
+  "portClosed": true,
+  "originalAvdConfigUnchanged": true,
+  "originalAvdUserDataTouched": false,
+  "noSnapshotsSaved": true,
+  "reason": "Parent requested stop after repeated guest System UI ANR blocked corrected app/test execution; no reboot loop",
+  "commitHeadroomAfterMB": 7166.0
+}

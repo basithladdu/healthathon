@@ -1,0 +1,32 @@
+{
+  "startedAtUtc": "2026-10-24T15:06:51.8930367Z",
+  "finishedAtUtc": "2026-10-24T15:11:11.5592606Z",
+  "status": "failed",
+  "exitCode": 1,
+  "version": "0.6.0",
+  "versionCode": 7,
+  "package": "in.wedevit.sahara",
+  "signingConfigured": true,
+  "signedArtifactVerified": false,
+  "uploaded": false,
+  "submitted": false,
+  "sourceInputs": "anatomy-sizing-fixed-inputs-before.json",
+  "tasks": [
+    ":app:assembleDebug",
+    ":app:assembleDebugAndroidTest",
+    ":app:assembleRelease",
+    ":app:bundleRelease",
+    ":app:lintVitalRelease"
+  ],
+  "unitRerun": false,
+  "delta": "viewer.css only; prior308-unit Kotlin/JVM/build/schema inputs unchanged",
+  "log": "anatomy-sizing-fixed-build.log",
+  "memoryBefore": {
+    "commitHeadroomMB": 3664.0,
+    "availablePhysicalMB": 1554,
+    "heapMB": 768,
+    "metaspaceMB": 384
+  },
+  "nativeCompilationInputSha256": "65A63EA40DD9EEBF43E419869A6C4C3739F7B32963EE307C08E10ABE4F0D61E6",
+  "sourceCommit": "d0aa4dad50e0de0bc026d05587151ff2d06c5981"
+}

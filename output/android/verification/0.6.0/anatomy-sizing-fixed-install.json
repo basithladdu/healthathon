@@ -1,0 +1,23 @@
+{
+  "startedAtUtc": "2026-10-24T15:20:28.493641+00:00",
+  "finishedAtUtc": "2026-10-24T15:23:47.680143+00:00",
+  "status": "completed",
+  "serial": "emulator-5576",
+  "physicalDevice": false,
+  "originalAvdUserDataTouched": false,
+  "productionDataCleared": false,
+  "installations": [
+    {
+      "path": "output/android/Sahara-0.6.0-24Oct-anatomy-sizing-fixed-debug.apk",
+      "sha256": "070D9D2579EBA79E06F2F0943406704177DE4BB845C30360B2C82CFECD906DF6",
+      "exitCode": 0,
+      "output": "Performing Streamed Install\r\nSuccess\r\n"
+    },
+    {
+      "path": "output/android/Sahara-0.6.0-24Oct-anatomy-sizing-fixed-androidTest.apk",
+      "sha256": "403791DE5E6B8A710858AF2DEE24B7BB1A589BD067BE8FF48FEEF6C93F08FC6A",
+      "exitCode": 0,
+      "output": "Performing Streamed Install\r\nSuccess\r\n"
+    }
+  ]
+}

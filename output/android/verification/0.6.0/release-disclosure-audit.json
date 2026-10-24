@@ -1,18 +1,19 @@
 {
   "schemaVersion": 1,
   "preparedOn": "2026-10-24",
-  "status": "Current source and live web verified; Google Play draft settings saved. Android runtime and signed release packaging are pending; two backend migrations are permission-blocked. No 0.6.0 upload or review submission.",
+  "status": "Corrected0.6.0(7) signed and saved in PlayProductiondraft3; current disclosures saved. Not release-ready: native interaction and backend migrations unfinished. No review submission.",
   "applicationId": "in.wedevit.sahara",
   "versionName": "0.6.0",
   "versionCode": 7,
-  "sourceHead": "031492ae392eb7e7504ff47fae082711a5ed3366",
+  "sourceHead": "d0aa4dad50e0de0bc026d05587151ff2d06c5981",
   "sourceFreeze": {
-    "scope": "Current integrated disclosure source at 031492a, independently read for evidence reconciliation. This checkpoint does not sign or upload an Android release. Original source-only freeze is retained in historicalPreparation.",
+    "scope": "Integrated source at d0aa4da. Privacy/deletion text and JS/model bytes are unchanged; both bundled CSS copies have the viewport-height correction. Earlier source-only freeze is retained in historicalPreparation.",
     "privacyPath": "prototype/app/privacy/page.tsx",
     "privacySha256": "B12737C7C3B07D5D7A87CCF9F83F9EDA30CB484FA292A58DBB732842D10B5D9B",
     "deleteAccountPath": "prototype/app/delete-account/page.tsx",
     "deleteAccountSha256": "EF3CF6EB8F4AF4832908C14C6152A85C37F141C6158DB19D8F5657859EFBABE9",
-    "viewerSha256": "CADD14703A708731440DDCE4988A2189B8A19F6A644F02CAEB8C5A5263004874"
+    "viewerSha256": "CADD14703A708731440DDCE4988A2189B8A19F6A644F02CAEB8C5A5263004874",
+    "viewerCssSha256": "ED2B9AA35D77284367FFAC1473008C90C9C6A33380B2D90ECC8823DA91346943"
   },
   "verifiedFacts": {
     "directory": {
@@ -333,22 +334,22 @@
     "note": "Original source-only preparation snapshot. Earlier pending Play fields and build flags in historical checks predate the final reconciliation below."
   },
   "currentReconciliation": {
-    "checkedAtUtc": "2026-10-24T14:15:33.797057+00:00",
+    "checkedAtUtc": "2026-10-24T15:32:03.524153+00:00",
     "scope": "Read-only receipt/source reconciliation plus these audit/handoff edits; no build, deployment, backend write, upload or submission by this reconciliation.",
-    "sourceCommit": "031492ae392eb7e7504ff47fae082711a5ed3366",
+    "sourceCommit": "d0aa4dad50e0de0bc026d05587151ff2d06c5981",
     "collaboratorSource": {
       "awaizCommit": "73c5000",
       "mergeCommit": "78cbbc6"
     },
     "web": {
-      "deployment": "dpl_8nL3CtJF2SP51MyGxdebVuMaUF6C",
+      "deployment": "dpl_aCPddhUYZ1YbKwVk33szokJjcfB7",
       "state": "READY",
       "route": "https://sahara.wedevit.in/how-i-feel",
       "baselineChecks": 4,
       "baselinePassed": 4,
       "finalChecks": 24,
       "finalPassed": 24,
-      "sourceCommit": "031492a",
+      "sourceCommit": "d0aa4da",
       "viewerSha256": "CADD14703A708731440DDCE4988A2189B8A19F6A644F02CAEB8C5A5263004874",
       "evidence": [
         "output/playwright/pain-body-2026-10-24/app-baseline-report.json",
@@ -361,7 +362,26 @@
         "explicitDoctorUploadExceptionVisible": true,
         "separateSupportRemovalVisible": true
       },
-      "assertionAudit": "Final report retains the original over-specific deletion-page assertion and corrected concrete requirement check."
+      "assertionAudit": "Final report retains the original over-specific deletion-page assertion and corrected concrete requirement check.",
+      "fullFlowEvidenceSourceCommit": "031492a",
+      "fullFlowEvidenceDeployment": "dpl_8nL3CtJF2SP51MyGxdebVuMaUF6C",
+      "cssSha256": "ED2B9AA35D77284367FFAC1473008C90C9C6A33380B2D90ECC8823DA91346943",
+      "cssRegression": {
+        "checks": 16,
+        "passed": 16,
+        "evidence": "output/playwright/pain-body-2026-10-24/app-css-regression-report.json",
+        "browserClosed": true,
+        "scope": "One ephemeral browser, actual local care-tools UI and fictional prior UI-saved pain records only",
+        "visualReview": {
+          "inspected": [
+            "app-css-history-1440.png",
+            "app-css-history-390.png",
+            "app-css-input-390.png"
+          ],
+          "observed": "Actual mannequin and reported-rating colour are visible at both widths; saved date choices and patient-side labels are readable. Mobile editable fallback body-area buttons remain visible alongside the rendered model. Screenshots show fixed mobile navigation; this bounded check does not certify every scroll position or physical-device insets."
+        },
+        "note": "Current actual corrected-CSS regression. Earlier 4 baseline + 24 full-flow checks are preserved with their original source/deployment provenance."
+      }
     },
     "native": {
       "unitTests": 308,
@@ -372,8 +392,8 @@
       "unitEvidence": "output/android/verification/0.6.0/anatomy-history-unit-checks.json",
       "debugBuilt": true,
       "debugVerified": true,
-      "debugArtifact": "output/android/Sahara-0.6.0-24Oct-anatomy-history-debug.apk",
-      "debugSha256": "32DE22E2E0E6E6B5C11CDFFCF66FE0226E346AFA19876F58CA956022A1D0E03D",
+      "debugArtifact": "output/android/Sahara-0.6.0-24Oct-anatomy-sizing-fixed-debug.apk",
+      "debugSha256": "070D9D2579EBA79E06F2F0943406704177DE4BB845C30360B2C82CFECD906DF6",
       "debugManifest": {
         "name": "in.wedevit.sahara.development",
         "versionCode": "7",
@@ -381,13 +401,47 @@
       },
       "debugSignatureVerified": true,
       "static16KbAlignment": true,
-      "debugEvidence": "output/android/verification/0.6.0/anatomy-history-debug-artifacts.json",
-      "runtimeStatusAtReconciliation": "running",
-      "runtimeEvidence": "output/android/verification/0.6.0/anatomy-runtime-receipt.json",
+      "debugEvidence": "output/android/verification/0.6.0/anatomy-sizing-fixed-debug-artifacts.json",
+      "runtimeStatusAtReconciliation": "not_executed_guest_system_ui_anr",
+      "runtimeEvidence": "output/android/verification/0.6.0/anatomy-sizing-fixed-runtime-obstacle.json",
       "runtimeVerified": false,
       "physicalDeviceVerified": false,
-      "signedReleaseVerified": false,
-      "note": "Debug and static checks do not establish signed release, runtime 16 KB or physical-device success; running runtime/packaging receipts may change after this checkpoint."
+      "signedReleaseVerified": true,
+      "note": "Successful corrected debug/test installation and signed/static proof do not establish native execution. Zero app assertions ran in the final guest; no retry boot/install loop or physical-device pass is claimed.",
+      "signedReleaseVerificationScope": "Cryptographic, manifest, signer, asset-parity and static alignment only; not runtime, backend readiness or Google review.",
+      "signedReleaseEvidence": "output/android/verification/0.6.0/anatomy-sizing-fixed-release-verification.json",
+      "signedReleaseApk": "output/android/Sahara-0.6.0-24Oct-anatomy-sizing-fixed-release.apk",
+      "signedReleaseApkSha256": "8FD9A63C870CA70AE67133A96A1AB130AF8BE0785F6DE5AEA471944E26C6F513",
+      "signedReleaseBundle": "output/android/Sahara-0.6.0-24Oct-anatomy-sizing-fixed-release.aab",
+      "signedReleaseBundleSha256": "71CCB15901C69FB37BC52B7BFF243B8CC1F841B09CFCCCFF126476FAD5285B7B",
+      "uploadSignerMatches": true,
+      "all64BitElf16KbAligned": true,
+      "sourceAssetsMatch": true,
+      "packagingExitCode": 0,
+      "packagingFinishedAtUtc": "2026-10-24T15:14:32.7407558Z",
+      "packagingEvidence": "output/android/verification/0.6.0/anatomy-sizing-fixed-build-exit.json",
+      "unitApplicability": "308 tests cover unchanged Kotlin/JVM/build/schema inputs; CSS-only production delta is separately repackaged and runtime rechecked",
+      "supersededBundle": {
+        "path": "output/android/Sahara-0.6.0-24Oct-anatomy-history-release.aab",
+        "sha256": "E6ADFA98150BE37D94ADE18BD11B5B8B6F623AF54847DD9BA1FAA97A2E3D49AF",
+        "superseded": true,
+        "uploadAllowed": false,
+        "reason": "Pre-correction CSS can produce a zero-height Android WebView canvas."
+      },
+      "runtimeAssertionsExecuted": 0,
+      "runtimeTestsExecuted": 0,
+      "saharaAppOrTestLaunched": false,
+      "runtimeObstacle": "Repeated guest System UI ANR at launcher before any Sahara app or instrumentation launch.",
+      "appCrashEstablished": false,
+      "connectedPhysicalDevices": 0,
+      "runtime16KbVerified": false,
+      "correctedDebugInstalled": true,
+      "correctedTestApkInstalled": true,
+      "installEvidence": "output/android/verification/0.6.0/anatomy-sizing-fixed-install.json",
+      "ownedGuestStopped": true,
+      "originalAvdConfigUnchanged": true,
+      "originalAvdUserdataTouched": false,
+      "cleanupEvidence": "output/android/verification/0.6.0/anatomy-sizing-fixed-emulator-cleanup.json"
     },
     "play": {
       "evidence": "output/android/verification/0.6.0/play-saved-settings-2026-10-24.json",
@@ -401,10 +455,23 @@
       "dataSafetySaved": true,
       "healthDeclarationsSaved": true,
       "releaseNameAndNotesSaved": true,
-      "uploaded": false,
       "submitted": false,
       "approved": false,
-      "note": "Receipt reconciles observed Google saved states; screenshot bytes and reviewer credentials remain private. Production 0.5.0(6) remains the last verified public release."
+      "note": "Exactly one corrected71CC AAB upload processed as7(0.6.0) and saved in existingProductiondraft3. Preview0errors/1nonblocking size warning; no final previewSave or review submission. Native/backend prerequisites remain unfinished.",
+      "uploadTransferCompleted": true,
+      "uploadTransferCount": 1,
+      "transferredBundleSha256": "71CCB15901C69FB37BC52B7BFF243B8CC1F841B09CFCCCFF126476FAD5285B7B",
+      "googleProcessingStatus": "Optimizing distribution",
+      "processedBundleConfirmed": true,
+      "processedVersion7RowObserved": false,
+      "noDuplicateUpload": true,
+      "uploadObservationSource": "Release owner observed the browser transfer and current Google optimization in this session; handoff updater did not independently re-open Play. The saved-settings receipt predates this transfer.",
+      "googleProcessing": false,
+      "bundleUploaded": true,
+      "savedAsDraft": true,
+      "uploaded": true,
+      "uploadReceipt": "output/android/verification/0.6.0/play-production-060-draft-upload.json",
+      "draftProof": "output/android/verification/0.6.0/play-production-060-draft-saved.png"
     },
     "backend": {
       "ready": false,
@@ -424,12 +491,96 @@
     },
     "releaseReady": false,
     "remaining": [
-      "Actual Android runtime and final signed APK/AAB verification.",
+      "Actual corrected-asset Android runtime verification after the launcher obstacle; final guest executed zero assertions.",
       "Authorised migration-write permission, the two reviewed migration deployments and actual permission/runtime verification.",
-      "Only after prerequisites: upload verified version 7 once to existing Production draft 3 and inspect actual validation/review status."
-    ]
+      "Observe Google finished processing and actual version 7 bundle in existing draft 3 without another upload. Keep draft while runtime/backend prerequisites remain incomplete; no review submission."
+    ],
+    "priorNativeAndPlayObservation": {
+      "checkedAtUtc": "2026-10-24T15:17:41.300159+00:00",
+      "nativeRuntimeStatus": "Corrected-asset emulator runtime pending; initial failures and zero-height diagnostics retained.",
+      "uploadTransferCompleted": false,
+      "note": "Earlier checkpoint before the final guest obstacle and single browser transfer; original failed logs are retained."
+    }
   },
   "currentAndroidRuntime": {
+    "status": "not_executed_guest_system_ui_anr",
+    "beforeAppAssertions": true,
+    "bootConfirmed": true,
+    "api": 36,
+    "guestRamMB": 2048,
+    "pageSize": 4096,
+    "debugInstalled": true,
+    "testApkInstalled": true,
+    "appAssertionsExecuted": 0,
+    "runtimePassed": false,
+    "physicalDeviceVerified": false,
+    "runtime16KbVerified": false,
+    "evidence": "output/android/verification/0.6.0/anatomy-sizing-fixed-runtime-obstacle.json",
+    "cleanupEvidence": "output/android/verification/0.6.0/anatomy-sizing-fixed-emulator-cleanup.json"
+  },
+  "historicalReconciliations": [
+    {
+      "checkedAtUtc": "2026-10-24T14:15:33.797057+00:00",
+      "sourceCommit": "031492ae392eb7e7504ff47fae082711a5ed3366",
+      "webDeployment": "dpl_8nL3CtJF2SP51MyGxdebVuMaUF6C",
+      "baselineChecks": 4,
+      "fullFlowChecks": 24,
+      "debugArtifact": "output/android/Sahara-0.6.0-24Oct-anatomy-history-debug.apk",
+      "debugSha256": "32DE22E2E0E6E6B5C11CDFFCF66FE0226E346AFA19876F58CA956022A1D0E03D",
+      "debugEvidence": "output/android/verification/0.6.0/anatomy-history-debug-artifacts.json",
+      "releaseStateAtCheckpoint": "Signed-release verification was then pending; later pre-CSS signed candidate is now superseded. Earlier native runtime failures and logs are retained separately."
+    }
+  ],
+  "finalPlayDraft": {
+    "observedAtUtc": "2026-10-24T15:32:03.524153+00:00",
+    "version": "0.6.0",
+    "versionCode": 7,
+    "package": "in.wedevit.sahara",
+    "track": "Production",
+    "trackId": "4697314269892725425",
+    "releaseId": 3,
+    "sourceCommit": "d0aa4dad50e0de0bc026d05587151ff2d06c5981",
+    "bundle": "output/android/Sahara-0.6.0-24Oct-anatomy-sizing-fixed-release.aab",
+    "bundleSha256": "71CCB15901C69FB37BC52B7BFF243B8CC1F841B09CFCCCFF126476FAD5285B7B",
+    "uploadAttempts": 1,
+    "processedBundleConfirmed": true,
+    "savedAsDraft": true,
+    "submitted": false,
+    "published": false,
+    "previewInspected": true,
+    "previewConfirmed": false,
+    "previewErrors": 0,
+    "previewWarnings": [
+      {
+        "type": "significant_download_size_increase",
+        "text": "This artifact significantly increases the size of APK(s) downloaded by users.",
+        "blocking": false
+      }
+    ],
+    "playEstimatedDelivery": {
+      "newInstallMB": 42.6,
+      "previousNewInstallMB": 35.8,
+      "updateMB": 34.8,
+      "downloadSeconds": 24,
+      "qualification": "Play preview estimates, not measured handset download time or installed size."
+    },
+    "nativeDebugSymbolsAndReTraceAttached": true,
+    "draftUrl": "https://play.google.com/console/u/1/developers/8795679408143615220/app/4974759245808215344/tracks/4697314269892725425/releases/3/prepare",
+    "saveConfirmation": "Changes saved. You can now preview your release before sending it for review.",
+    "persistenceCheck": "After preview and Back, processed7(0.6.0) row remained; Save as draft disabled and Next enabled. Preview finalSave not used.",
+    "proof": "output/android/verification/0.6.0/play-production-060-draft-saved.png",
+    "proofSha256": "8BA50B0750CED56E4CB6DFCF5C03A183949252BBA880E7E3E6BA98FA322292E9",
+    "validationProof": "output/android/verification/0.6.0/play-production-060-validation.png",
+    "validationProofSha256": "95A2F0334CF4FD3F2ED821BCC32C854297B35FA6F46A2913B72648DBE73B5FBB",
+    "releaseReady": false,
+    "holdReasons": [
+      "Corrected native3D touch/history verification not executed: emulatorSystemUI ANR before app/test launch; no phone connected.",
+      "Two tested backend migrations denied by Supabase migration-write permission; no server changes."
+    ],
+    "noDuplicateUpload": true
+  },
+  "releaseReady": false,
+  "historicalFirstAndroidRuntime": {
     "status": "aborted_host_commit_pressure",
     "beforeAppAssertions": true,
     "bootConfirmed": true,

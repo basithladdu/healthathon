@@ -1,0 +1,131 @@
+{
+  "checkedAtUtc": "2026-10-24T15:15:39.492664+00:00",
+  "apkManifest": {
+    "package": "in.wedevit.sahara",
+    "versionCode": "7",
+    "versionName": "0.6.0"
+  },
+  "bundleManifest": {
+    "package": "in.wedevit.sahara",
+    "versionCode": "7",
+    "versionName": "0.6.0"
+  },
+  "apkSha256": "8FD9A63C870CA70AE67133A96A1AB130AF8BE0785F6DE5AEA471944E26C6F513",
+  "bundleSha256": "71CCB15901C69FB37BC52B7BFF243B8CC1F841B09CFCCCFF126476FAD5285B7B",
+  "nativeLibraries": [
+    {
+      "path": "lib/arm64-v8a/libandroidx.graphics.path.so",
+      "sha256": "41E9A793C43A0F4FDDB19E33F346BACE464F30F888BA7B9EAF96294EA115BFB6",
+      "elf16KbAligned": true,
+      "bundleMatchesApk": true,
+      "sameAsPrevious": false
+    },
+    {
+      "path": "lib/arm64-v8a/libmaplibre.so",
+      "sha256": "D3A1AB9B9D056D84B93F2AA5F676D20D2D76723952DFCD8BD8D203D6ECA6980D",
+      "elf16KbAligned": true,
+      "bundleMatchesApk": true,
+      "sameAsPrevious": false
+    },
+    {
+      "path": "lib/arm64-v8a/libmlkit_google_ocr_pipeline.so",
+      "sha256": "FA41D509A661E8AA8B3E3AC1A28541F8823F308414FCAD733FE26D61FEEA2646",
+      "elf16KbAligned": true,
+      "bundleMatchesApk": true,
+      "sameAsPrevious": false
+    },
+    {
+      "path": "lib/arm64-v8a/libonnxruntime.so",
+      "sha256": "7A2FB92EB67037837C3F0E428BD732FD0D05CED0546D9E740090C07573D8249A",
+      "elf16KbAligned": true,
+      "bundleMatchesApk": true,
+      "sameAsPrevious": false
+    },
+    {
+      "path": "lib/arm64-v8a/libsherpa-onnx-c-api.so",
+      "sha256": "C85E2382E2CA12B0513826BE926EACCFEA896B4CBF568182E287671BA526F80D",
+      "elf16KbAligned": true,
+      "bundleMatchesApk": true,
+      "sameAsPrevious": false
+    },
+    {
+      "path": "lib/arm64-v8a/libsherpa-onnx-cxx-api.so",
+      "sha256": "5EABB2BCF5A8AF66AEAB37431C09FAB4A9C65CDEBF02BD7E50F8C589044BD70E",
+      "elf16KbAligned": true,
+      "bundleMatchesApk": true,
+      "sameAsPrevious": false
+    },
+    {
+      "path": "lib/arm64-v8a/libsherpa-onnx-jni.so",
+      "sha256": "3C6492EA91EA68FD3B72B9495EFDDE6DD913F6B58C387E3B07389CF335F4D26F",
+      "elf16KbAligned": true,
+      "bundleMatchesApk": true,
+      "sameAsPrevious": false
+    },
+    {
+      "path": "lib/arm64-v8a/libtranslate_jni.so",
+      "sha256": "45040FF0CDD194D6E601589D759E6F1BA733DE5F95790F76CC3E2046919046BE",
+      "elf16KbAligned": true,
+      "bundleMatchesApk": true,
+      "sameAsPrevious": false
+    },
+    {
+      "path": "lib/x86_64/libandroidx.graphics.path.so",
+      "sha256": "4E56C996F13670E70082658DE7880C4020EABF4F25E43387F88ED78A713FC9F0",
+      "elf16KbAligned": true,
+      "bundleMatchesApk": true,
+      "sameAsPrevious": false
+    },
+    {
+      "path": "lib/x86_64/libmaplibre.so",
+      "sha256": "55175BF2DFB64AA31A555CF8DF5846C1C736C10A4946162C175AE948AD189774",
+      "elf16KbAligned": true,
+      "bundleMatchesApk": true,
+      "sameAsPrevious": false
+    },
+    {
+      "path": "lib/x86_64/libmlkit_google_ocr_pipeline.so",
+      "sha256": "3DDFFB498B60F7F9512E341D4EE3ABE4E1580C4FD65EF9B2C8CE9E490DE467D8",
+      "elf16KbAligned": true,
+      "bundleMatchesApk": true,
+      "sameAsPrevious": false
+    },
+    {
+      "path": "lib/x86_64/libonnxruntime.so",
+      "sha256": "B626C070616D88BD643A6E63DC996D8D478D061176B056D52CE44C961BD355AA",
+      "elf16KbAligned": true,
+      "bundleMatchesApk": true,
+      "sameAsPrevious": false
+    },
+    {
+      "path": "lib/x86_64/libsherpa-onnx-c-api.so",
+      "sha256": "631CA2828E47B61D8AFE4B3C75A157423CBAFABA6F8C0DB89C27D21F1B173D9A",
+      "elf16KbAligned": true,
+      "bundleMatchesApk": true,
+      "sameAsPrevious": false
+    },
+    {
+      "path": "lib/x86_64/libsherpa-onnx-cxx-api.so",
+      "sha256": "09CD2EA23B15AE3234B0B4678FBEF14639C58792DD36D2CD435C030DC030C5D0",
+      "elf16KbAligned": true,
+      "bundleMatchesApk": true,
+      "sameAsPrevious": false
+    },
+    {
+      "path": "lib/x86_64/libsherpa-onnx-jni.so",
+      "sha256": "1DC24C88FB364F1022A5217B70AB3BC3C9CAE3120AE2E1ED358E1F68ED120B04",
+      "elf16KbAligned": true,
+      "bundleMatchesApk": true,
+      "sameAsPrevious": false
+    },
+    {
+      "path": "lib/x86_64/libtranslate_jni.so",
+      "sha256": "A757F9544D2731838E5E775F4FA06782AEA7944D9039D24D9F2C57D81EFA4265",
+      "elf16KbAligned": true,
+      "bundleMatchesApk": true,
+      "sameAsPrevious": false
+    }
+  ],
+  "runtime16KbVerified": false,
+  "signatureVerification": "Run apksigner/jarsigner separately"
+}

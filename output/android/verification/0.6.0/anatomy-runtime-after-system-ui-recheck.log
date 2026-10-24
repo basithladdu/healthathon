@@ -1,0 +1,773 @@
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CarePainWebViewRuntimeTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=21
+INSTRUMENTATION_STATUS: stream=
+in.wedevit.care.CarePainWebViewRuntimeTest:
+INSTRUMENTATION_STATUS: test=actualBundledWebGlRaycastReachesNativeAndReadOnlyRotationDoesNotMutate
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CarePainWebViewRuntimeTest
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=21
+INSTRUMENTATION_STATUS: stack=androidx.compose.ui.test.ComposeTimeoutException: Condition still not satisfied after 15000 ms
+	at androidx.compose.ui.test.AndroidComposeUiTestEnvironment$AndroidComposeUiTestImpl.waitUntil(ComposeUiTest.android.kt:755)
+	at androidx.compose.ui.test.junit4.AndroidComposeTestRule.waitUntil(AndroidComposeTestRule.android.kt:362)
+	at in.wedevit.care.CarePainWebViewRuntimeTest.actualBundledWebGlRaycastReachesNativeAndReadOnlyRotationDoesNotMutate(CarePainWebViewRuntimeTest.kt:44)
+
+INSTRUMENTATION_STATUS: stream=
+Error in actualBundledWebGlRaycastReachesNativeAndReadOnlyRotationDoesNotMutate(in.wedevit.care.CarePainWebViewRuntimeTest):
+androidx.compose.ui.test.ComposeTimeoutException: Condition still not satisfied after 15000 ms
+	at androidx.compose.ui.test.AndroidComposeUiTestEnvironment$AndroidComposeUiTestImpl.waitUntil(ComposeUiTest.android.kt:755)
+	at androidx.compose.ui.test.junit4.AndroidComposeTestRule.waitUntil(AndroidComposeTestRule.android.kt:362)
+	at in.wedevit.care.CarePainWebViewRuntimeTest.actualBundledWebGlRaycastReachesNativeAndReadOnlyRotationDoesNotMutate(CarePainWebViewRuntimeTest.kt:44)
+
+INSTRUMENTATION_STATUS: test=actualBundledWebGlRaycastReachesNativeAndReadOnlyRotationDoesNotMutate
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareSymptomDiaryUiTest
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=21
+INSTRUMENTATION_STATUS: stream=
+in.wedevit.care.CareSymptomDiaryUiTest:
+INSTRUMENTATION_STATUS: test=overallWellbeingUsesBestWorstAnchorsAndSavesAnAttributedPatientEntry
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareSymptomDiaryUiTest
+INSTRUMENTATION_STATUS: current=2
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=21
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=overallWellbeingUsesBestWorstAnchorsAndSavesAnAttributedPatientEntry
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareSymptomDiaryUiTest
+INSTRUMENTATION_STATUS: current=3
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=21
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=editingAnOlderSleepDifficultyRecordKeepsItsNameRatingAndScale
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareSymptomDiaryUiTest
+INSTRUMENTATION_STATUS: current=3
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=21
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=editingAnOlderSleepDifficultyRecordKeepsItsNameRatingAndScale
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareSymptomDiaryUiTest
+INSTRUMENTATION_STATUS: current=4
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=21
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=personSwitchClosesCapturedDraftAndPreventsSaveToTheNewPerson
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareSymptomDiaryUiTest
+INSTRUMENTATION_STATUS: current=4
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=21
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=personSwitchClosesCapturedDraftAndPreventsSaveToTheNewPerson
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareSymptomDiaryUiTest
+INSTRUMENTATION_STATUS: current=5
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=21
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=freshRatingsKeepRecallObserverAndActualSamePersonReference
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareSymptomDiaryUiTest
+INSTRUMENTATION_STATUS: current=5
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=21
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: Failed to assert the following: (Text + InputText + EditableText contains '2026-10-23 10:00 ┬╖ 6/10' (ignoreCase: false))
+Semantics of the node:
+Node #1110 at (l=116.0, t=2211.0, r=964.0, b=2337.0)px, Tag: 'symptom-previous-reference'
+Text = '[Previous matching note: 2026-10-23 10:00 ┬╖ 6/10]'
+Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+Selector used: (TestTag = 'symptom-previous-reference')
+
+	at androidx.compose.ui.test.AssertionsKt.assert(Assertions.kt:264)
+	at androidx.compose.ui.test.AssertionsKt.assert$default(Assertions.kt:254)
+	at androidx.compose.ui.test.AssertionsKt.assertTextContains(Assertions.kt:208)
+	at androidx.compose.ui.test.AssertionsKt.assertTextContains$default(Assertions.kt:204)
+	at in.wedevit.care.CareSymptomDiaryUiTest.freshRatingsKeepRecallObserverAndActualSamePersonReference(CareSymptomDiaryUiTest.kt:32)
+
+INSTRUMENTATION_STATUS: stream=
+Error in freshRatingsKeepRecallObserverAndActualSamePersonReference(in.wedevit.care.CareSymptomDiaryUiTest):
+java.lang.AssertionError: Failed to assert the following: (Text + InputText + EditableText contains '2026-10-23 10:00 ┬╖ 6/10' (ignoreCase: false))
+Semantics of the node:
+Node #1110 at (l=116.0, t=2211.0, r=964.0, b=2337.0)px, Tag: 'symptom-previous-reference'
+Text = '[Previous matching note: 2026-10-23 10:00 ┬╖ 6/10]'
+Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+Selector used: (TestTag = 'symptom-previous-reference')
+
+	at androidx.compose.ui.test.AssertionsKt.assert(Assertions.kt:264)
+	at androidx.compose.ui.test.AssertionsKt.assert$default(Assertions.kt:254)
+	at androidx.compose.ui.test.AssertionsKt.assertTextContains(Assertions.kt:208)
+	at androidx.compose.ui.test.AssertionsKt.assertTextContains$default(Assertions.kt:204)
+	at in.wedevit.care.CareSymptomDiaryUiTest.freshRatingsKeepRecallObserverAndActualSamePersonReference(CareSymptomDiaryUiTest.kt:32)
+
+INSTRUMENTATION_STATUS: test=freshRatingsKeepRecallObserverAndActualSamePersonReference
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareSymptomDiaryUiTest
+INSTRUMENTATION_STATUS: current=6
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=21
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=painRegionButtonsRetainLateralityClearSelectionAndSaveWithoutA3dHit
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareSymptomDiaryUiTest
+INSTRUMENTATION_STATUS: current=6
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=21
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=painRegionButtonsRetainLateralityClearSelectionAndSaveWithoutA3dHit
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareSymptomDiaryUiTest
+INSTRUMENTATION_STATUS: current=7
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=21
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=editKeepsRecordIdentityAndClearsAnIncompatibleComparison
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareSymptomDiaryUiTest
+INSTRUMENTATION_STATUS: current=7
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=21
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=editKeepsRecordIdentityAndClearsAnIncompatibleComparison
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareSymptomDiaryUiTest
+INSTRUMENTATION_STATUS: current=8
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=21
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=readOnlyFormCannotSaveAndMissingRatingCanBeCorrectedWithoutLosingAnswers
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareSymptomDiaryUiTest
+INSTRUMENTATION_STATUS: current=8
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=21
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=readOnlyFormCannotSaveAndMissingRatingCanBeCorrectedWithoutLosingAnswers
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareSymptomDiaryUiTest
+INSTRUMENTATION_STATUS: current=9
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=21
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=hindiExplicitUnratedIsNotZeroAndKeepsPatientAttribution
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareSymptomDiaryUiTest
+INSTRUMENTATION_STATUS: current=9
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=21
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=hindiExplicitUnratedIsNotZeroAndKeepsPatientAttribution
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareSymptomDiaryUiTest
+INSTRUMENTATION_STATUS: current=10
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=21
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=quickFollowupRequiresANewRatingAndKeepsTheSavedBodyPoint
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareSymptomDiaryUiTest
+INSTRUMENTATION_STATUS: current=10
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=21
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=quickFollowupRequiresANewRatingAndKeepsTheSavedBodyPoint
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CarePainHistoryUiTest
+INSTRUMENTATION_STATUS: current=11
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=21
+INSTRUMENTATION_STATUS: stream=
+in.wedevit.care.CarePainHistoryUiTest:
+INSTRUMENTATION_STATUS: test=noHistoryShowsAnHonestEmptyStateAndHindiCloseWorks
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CarePainHistoryUiTest
+INSTRUMENTATION_STATUS: current=11
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=21
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=noHistoryShowsAnHonestEmptyStateAndHindiCloseWorks
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CarePainHistoryUiTest
+INSTRUMENTATION_STATUS: current=12
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=21
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=datedHistorySwitchesSavedRecordsWithoutOfferingEditingOrPaintingMissingPoints
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CarePainHistoryUiTest
+INSTRUMENTATION_STATUS: current=12
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=21
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: Failed to assert the following: (Text + InputText + EditableText contains 'Not rated' (ignoreCase: false))
+Semantics of the node:
+Node #2298 at (l=53.0, t=555.0, r=637.0, b=618.0)px, Tag: 'pain-history-observation'
+Text = '[2026-10-23 10:00 ┬╖ Not rated]'
+Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+Has 16 siblings
+Selector used: (TestTag = 'pain-history-observation')
+
+	at androidx.compose.ui.test.AssertionsKt.assert(Assertions.kt:264)
+	at androidx.compose.ui.test.AssertionsKt.assert$default(Assertions.kt:254)
+	at androidx.compose.ui.test.AssertionsKt.assertTextContains(Assertions.kt:208)
+	at androidx.compose.ui.test.AssertionsKt.assertTextContains$default(Assertions.kt:204)
+	at in.wedevit.care.CarePainHistoryUiTest.datedHistorySwitchesSavedRecordsWithoutOfferingEditingOrPaintingMissingPoints(CarePainHistoryUiTest.kt:29)
+
+INSTRUMENTATION_STATUS: stream=
+Error in datedHistorySwitchesSavedRecordsWithoutOfferingEditingOrPaintingMissingPoints(in.wedevit.care.CarePainHistoryUiTest):
+java.lang.AssertionError: Failed to assert the following: (Text + InputText + EditableText contains 'Not rated' (ignoreCase: false))
+Semantics of the node:
+Node #2298 at (l=53.0, t=555.0, r=637.0, b=618.0)px, Tag: 'pain-history-observation'
+Text = '[2026-10-23 10:00 ┬╖ Not rated]'
+Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+Has 16 siblings
+Selector used: (TestTag = 'pain-history-observation')
+
+	at androidx.compose.ui.test.AssertionsKt.assert(Assertions.kt:264)
+	at androidx.compose.ui.test.AssertionsKt.assert$default(Assertions.kt:254)
+	at androidx.compose.ui.test.AssertionsKt.assertTextContains(Assertions.kt:208)
+	at androidx.compose.ui.test.AssertionsKt.assertTextContains$default(Assertions.kt:204)
+	at in.wedevit.care.CarePainHistoryUiTest.datedHistorySwitchesSavedRecordsWithoutOfferingEditingOrPaintingMissingPoints(CarePainHistoryUiTest.kt:29)
+
+INSTRUMENTATION_STATUS: test=datedHistorySwitchesSavedRecordsWithoutOfferingEditingOrPaintingMissingPoints
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_STATUS: class=in.wedevit.care.DoctorContextMigrationTest
+INSTRUMENTATION_STATUS: current=13
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=21
+INSTRUMENTATION_STATUS: stream=
+in.wedevit.care.DoctorContextMigrationTest:
+INSTRUMENTATION_STATUS: test=additiveUpgradePreservesOldDraftHashAndAcknowledgement
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.DoctorContextMigrationTest
+INSTRUMENTATION_STATUS: current=13
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=21
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=additiveUpgradePreservesOldDraftHashAndAcknowledgement
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CombinedCareMigrationTest
+INSTRUMENTATION_STATUS: current=14
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=21
+INSTRUMENTATION_STATUS: stream=
+in.wedevit.care.CombinedCareMigrationTest:
+INSTRUMENTATION_STATUS: test=localVersionFourPreservesTranscriptionAndConsent
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CombinedCareMigrationTest
+INSTRUMENTATION_STATUS: current=14
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=21
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: expected:<6> but was:<7>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:120)
+	at org.junit.Assert.assertEquals(Assert.java:146)
+	at in.wedevit.care.CombinedCareMigrationTest$verifyUpgrade$1.invokeSuspend(CombinedCareMigrationTest.kt:117)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+	at in.wedevit.care.CombinedCareMigrationTest.verifyUpgrade(CombinedCareMigrationTest.kt:26)
+	at in.wedevit.care.CombinedCareMigrationTest.localVersionFourPreservesTranscriptionAndConsent(CombinedCareMigrationTest.kt:20)
+
+INSTRUMENTATION_STATUS: stream=
+Error in localVersionFourPreservesTranscriptionAndConsent(in.wedevit.care.CombinedCareMigrationTest):
+java.lang.AssertionError: expected:<6> but was:<7>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:120)
+	at org.junit.Assert.assertEquals(Assert.java:146)
+	at in.wedevit.care.CombinedCareMigrationTest$verifyUpgrade$1.invokeSuspend(CombinedCareMigrationTest.kt:117)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+	at in.wedevit.care.CombinedCareMigrationTest.verifyUpgrade(CombinedCareMigrationTest.kt:26)
+	at in.wedevit.care.CombinedCareMigrationTest.localVersionFourPreservesTranscriptionAndConsent(CombinedCareMigrationTest.kt:20)
+
+INSTRUMENTATION_STATUS: test=localVersionFourPreservesTranscriptionAndConsent
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CombinedCareMigrationTest
+INSTRUMENTATION_STATUS: current=15
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=21
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=upstreamReportsVersionThreePreservesReports
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CombinedCareMigrationTest
+INSTRUMENTATION_STATUS: current=15
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=21
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: expected:<6> but was:<7>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:120)
+	at org.junit.Assert.assertEquals(Assert.java:146)
+	at in.wedevit.care.CombinedCareMigrationTest$verifyUpgrade$1.invokeSuspend(CombinedCareMigrationTest.kt:117)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+	at in.wedevit.care.CombinedCareMigrationTest.verifyUpgrade(CombinedCareMigrationTest.kt:26)
+	at in.wedevit.care.CombinedCareMigrationTest.upstreamReportsVersionThreePreservesReports(CombinedCareMigrationTest.kt:18)
+
+INSTRUMENTATION_STATUS: stream=
+Error in upstreamReportsVersionThreePreservesReports(in.wedevit.care.CombinedCareMigrationTest):
+java.lang.AssertionError: expected:<6> but was:<7>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:120)
+	at org.junit.Assert.assertEquals(Assert.java:146)
+	at in.wedevit.care.CombinedCareMigrationTest$verifyUpgrade$1.invokeSuspend(CombinedCareMigrationTest.kt:117)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+	at in.wedevit.care.CombinedCareMigrationTest.verifyUpgrade(CombinedCareMigrationTest.kt:26)
+	at in.wedevit.care.CombinedCareMigrationTest.upstreamReportsVersionThreePreservesReports(CombinedCareMigrationTest.kt:18)
+
+INSTRUMENTATION_STATUS: test=upstreamReportsVersionThreePreservesReports
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CombinedCareMigrationTest
+INSTRUMENTATION_STATUS: current=16
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=21
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=upstreamVersionFourPreservesMultipleConfirmationIds
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CombinedCareMigrationTest
+INSTRUMENTATION_STATUS: current=16
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=21
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: expected:<6> but was:<7>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:120)
+	at org.junit.Assert.assertEquals(Assert.java:146)
+	at in.wedevit.care.CombinedCareMigrationTest$verifyUpgrade$1.invokeSuspend(CombinedCareMigrationTest.kt:117)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+	at in.wedevit.care.CombinedCareMigrationTest.verifyUpgrade(CombinedCareMigrationTest.kt:26)
+	at in.wedevit.care.CombinedCareMigrationTest.upstreamVersionFourPreservesMultipleConfirmationIds(CombinedCareMigrationTest.kt:21)
+
+INSTRUMENTATION_STATUS: stream=
+Error in upstreamVersionFourPreservesMultipleConfirmationIds(in.wedevit.care.CombinedCareMigrationTest):
+java.lang.AssertionError: expected:<6> but was:<7>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:120)
+	at org.junit.Assert.assertEquals(Assert.java:146)
+	at in.wedevit.care.CombinedCareMigrationTest$verifyUpgrade$1.invokeSuspend(CombinedCareMigrationTest.kt:117)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+	at in.wedevit.care.CombinedCareMigrationTest.verifyUpgrade(CombinedCareMigrationTest.kt:26)
+	at in.wedevit.care.CombinedCareMigrationTest.upstreamVersionFourPreservesMultipleConfirmationIds(CombinedCareMigrationTest.kt:21)
+
+INSTRUMENTATION_STATUS: test=upstreamVersionFourPreservesMultipleConfirmationIds
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CombinedCareMigrationTest
+INSTRUMENTATION_STATUS: current=17
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=21
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=historicalLocalVersionThreePreservesConsentAndReview
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CombinedCareMigrationTest
+INSTRUMENTATION_STATUS: current=17
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=21
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: expected:<6> but was:<7>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:120)
+	at org.junit.Assert.assertEquals(Assert.java:146)
+	at in.wedevit.care.CombinedCareMigrationTest$verifyUpgrade$1.invokeSuspend(CombinedCareMigrationTest.kt:117)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+	at in.wedevit.care.CombinedCareMigrationTest.verifyUpgrade(CombinedCareMigrationTest.kt:26)
+	at in.wedevit.care.CombinedCareMigrationTest.historicalLocalVersionThreePreservesConsentAndReview(CombinedCareMigrationTest.kt:19)
+
+INSTRUMENTATION_STATUS: stream=
+Error in historicalLocalVersionThreePreservesConsentAndReview(in.wedevit.care.CombinedCareMigrationTest):
+java.lang.AssertionError: expected:<6> but was:<7>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:120)
+	at org.junit.Assert.assertEquals(Assert.java:146)
+	at in.wedevit.care.CombinedCareMigrationTest$verifyUpgrade$1.invokeSuspend(CombinedCareMigrationTest.kt:117)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+	at in.wedevit.care.CombinedCareMigrationTest.verifyUpgrade(CombinedCareMigrationTest.kt:26)
+	at in.wedevit.care.CombinedCareMigrationTest.historicalLocalVersionThreePreservesConsentAndReview(CombinedCareMigrationTest.kt:19)
+
+INSTRUMENTATION_STATUS: test=historicalLocalVersionThreePreservesConsentAndReview
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CombinedCareMigrationTest
+INSTRUMENTATION_STATUS: current=18
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=21
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=versionTwoReachesSupersetThroughReports
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CombinedCareMigrationTest
+INSTRUMENTATION_STATUS: current=18
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=21
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: expected:<6> but was:<7>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:120)
+	at org.junit.Assert.assertEquals(Assert.java:146)
+	at in.wedevit.care.CombinedCareMigrationTest$verifyUpgrade$1.invokeSuspend(CombinedCareMigrationTest.kt:117)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+	at in.wedevit.care.CombinedCareMigrationTest.verifyUpgrade(CombinedCareMigrationTest.kt:26)
+	at in.wedevit.care.CombinedCareMigrationTest.versionTwoReachesSupersetThroughReports(CombinedCareMigrationTest.kt:24)
+
+INSTRUMENTATION_STATUS: stream=
+Error in versionTwoReachesSupersetThroughReports(in.wedevit.care.CombinedCareMigrationTest):
+java.lang.AssertionError: expected:<6> but was:<7>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:120)
+	at org.junit.Assert.assertEquals(Assert.java:146)
+	at in.wedevit.care.CombinedCareMigrationTest$verifyUpgrade$1.invokeSuspend(CombinedCareMigrationTest.kt:117)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+	at in.wedevit.care.CombinedCareMigrationTest.verifyUpgrade(CombinedCareMigrationTest.kt:26)
+	at in.wedevit.care.CombinedCareMigrationTest.versionTwoReachesSupersetThroughReports(CombinedCareMigrationTest.kt:24)
+
+INSTRUMENTATION_STATUS: test=versionTwoReachesSupersetThroughReports
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CombinedCareMigrationTest
+INSTRUMENTATION_STATUS: current=19
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=21
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=versionOneReachesSupersetThroughRevisionAndReports
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CombinedCareMigrationTest
+INSTRUMENTATION_STATUS: current=19
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=21
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: expected:<6> but was:<7>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:120)
+	at org.junit.Assert.assertEquals(Assert.java:146)
+	at in.wedevit.care.CombinedCareMigrationTest$verifyUpgrade$1.invokeSuspend(CombinedCareMigrationTest.kt:117)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+	at in.wedevit.care.CombinedCareMigrationTest.verifyUpgrade(CombinedCareMigrationTest.kt:26)
+	at in.wedevit.care.CombinedCareMigrationTest.versionOneReachesSupersetThroughRevisionAndReports(CombinedCareMigrationTest.kt:23)
+
+INSTRUMENTATION_STATUS: stream=
+Error in versionOneReachesSupersetThroughRevisionAndReports(in.wedevit.care.CombinedCareMigrationTest):
+java.lang.AssertionError: expected:<6> but was:<7>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:120)
+	at org.junit.Assert.assertEquals(Assert.java:146)
+	at in.wedevit.care.CombinedCareMigrationTest$verifyUpgrade$1.invokeSuspend(CombinedCareMigrationTest.kt:117)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+	at in.wedevit.care.CombinedCareMigrationTest.verifyUpgrade(CombinedCareMigrationTest.kt:26)
+	at in.wedevit.care.CombinedCareMigrationTest.versionOneReachesSupersetThroughRevisionAndReports(CombinedCareMigrationTest.kt:23)
+
+INSTRUMENTATION_STATUS: test=versionOneReachesSupersetThroughRevisionAndReports
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CombinedCareMigrationTest
+INSTRUMENTATION_STATUS: current=20
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=21
+INSTRUMENTATION_STATUS: stream=
+INSTRUMENTATION_STATUS: test=localVersionFivePreservesReportsAndProvenance
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CombinedCareMigrationTest
+INSTRUMENTATION_STATUS: current=20
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=21
+INSTRUMENTATION_STATUS: stack=java.lang.AssertionError: expected:<6> but was:<7>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:120)
+	at org.junit.Assert.assertEquals(Assert.java:146)
+	at in.wedevit.care.CombinedCareMigrationTest$verifyUpgrade$1.invokeSuspend(CombinedCareMigrationTest.kt:117)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:98)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+	at in.wedevit.care.CombinedCareMigrationTest.verifyUpgrade(CombinedCareMigrationTest.kt:26)
+	at in.wedevit.care.CombinedCareMigrationTest.localVersionFivePreservesReportsAndProvenance(CombinedCareMigrationTest.kt:22)
+
+INSTRUMENTATION_STATUS: stream=
+Error in localVersionFivePreservesReportsAndProvenance(in.wedevit.care.CombinedCareMigrationTest):
+java.lang.AssertionError: expected:<6> but was:<7>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:120)
+	at org.junit.Assert.assertEquals(Assert.java:146)
+	at in.wedevit.care.CombinedCareMigrationTest$verifyUpgrade$1.invokeSuspend(CombinedCareMigrationTest.kt:117)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:98)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+	at in.wedevit.care.CombinedCareMigrationTest.verifyUpgrade(CombinedCareMigrationTest.kt:26)
+	at in.wedevit.care.CombinedCareMigrationTest.localVersionFivePreservesReportsAndProvenance(CombinedCareMigrationTest.kt:22)
+
+INSTRUMENTATION_STATUS: test=localVersionFivePreservesReportsAndProvenance
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareAcknowledgementMigrationTest
+INSTRUMENTATION_STATUS: current=21
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=21
+INSTRUMENTATION_STATUS: stream=
+in.wedevit.care.CareAcknowledgementMigrationTest:
+INSTRUMENTATION_STATUS: test=versionThreeUpgradePreservesLegacyAckAndAllowsSeparateConfirmationsAfterReopen
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=in.wedevit.care.CareAcknowledgementMigrationTest
+INSTRUMENTATION_STATUS: current=21
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=21
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=versionThreeUpgradePreservesLegacyAckAndAllowsSeparateConfirmationsAfterReopen
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_RESULT: stream=
+
+Time: 272.983
+There were 10 failures:
+1) actualBundledWebGlRaycastReachesNativeAndReadOnlyRotationDoesNotMutate(in.wedevit.care.CarePainWebViewRuntimeTest)
+androidx.compose.ui.test.ComposeTimeoutException: Condition still not satisfied after 15000 ms
+	at androidx.compose.ui.test.AndroidComposeUiTestEnvironment$AndroidComposeUiTestImpl.waitUntil(ComposeUiTest.android.kt:755)
+	at androidx.compose.ui.test.junit4.AndroidComposeTestRule.waitUntil(AndroidComposeTestRule.android.kt:362)
+	at in.wedevit.care.CarePainWebViewRuntimeTest.actualBundledWebGlRaycastReachesNativeAndReadOnlyRotationDoesNotMutate(CarePainWebViewRuntimeTest.kt:44)
+2) freshRatingsKeepRecallObserverAndActualSamePersonReference(in.wedevit.care.CareSymptomDiaryUiTest)
+java.lang.AssertionError: Failed to assert the following: (Text + InputText + EditableText contains '2026-10-23 10:00 ┬╖ 6/10' (ignoreCase: false))
+Semantics of the node:
+Node #1110 at (l=116.0, t=2211.0, r=964.0, b=2337.0)px, Tag: 'symptom-previous-reference'
+Text = '[Previous matching note: 2026-10-23 10:00 ┬╖ 6/10]'
+Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+Selector used: (TestTag = 'symptom-previous-reference')
+
+	at androidx.compose.ui.test.AssertionsKt.assert(Assertions.kt:264)
+	at androidx.compose.ui.test.AssertionsKt.assert$default(Assertions.kt:254)
+	at androidx.compose.ui.test.AssertionsKt.assertTextContains(Assertions.kt:208)
+	at androidx.compose.ui.test.AssertionsKt.assertTextContains$default(Assertions.kt:204)
+	at in.wedevit.care.CareSymptomDiaryUiTest.freshRatingsKeepRecallObserverAndActualSamePersonReference(CareSymptomDiaryUiTest.kt:32)
+3) datedHistorySwitchesSavedRecordsWithoutOfferingEditingOrPaintingMissingPoints(in.wedevit.care.CarePainHistoryUiTest)
+java.lang.AssertionError: Failed to assert the following: (Text + InputText + EditableText contains 'Not rated' (ignoreCase: false))
+Semantics of the node:
+Node #2298 at (l=53.0, t=555.0, r=637.0, b=618.0)px, Tag: 'pain-history-observation'
+Text = '[2026-10-23 10:00 ┬╖ Not rated]'
+Actions = [ClearTextSubstitution, GetTextLayoutResult, SetTextSubstitution, ShowTextSubstitution]
+Has 16 siblings
+Selector used: (TestTag = 'pain-history-observation')
+
+	at androidx.compose.ui.test.AssertionsKt.assert(Assertions.kt:264)
+	at androidx.compose.ui.test.AssertionsKt.assert$default(Assertions.kt:254)
+	at androidx.compose.ui.test.AssertionsKt.assertTextContains(Assertions.kt:208)
+	at androidx.compose.ui.test.AssertionsKt.assertTextContains$default(Assertions.kt:204)
+	at in.wedevit.care.CarePainHistoryUiTest.datedHistorySwitchesSavedRecordsWithoutOfferingEditingOrPaintingMissingPoints(CarePainHistoryUiTest.kt:29)
+4) localVersionFourPreservesTranscriptionAndConsent(in.wedevit.care.CombinedCareMigrationTest)
+java.lang.AssertionError: expected:<6> but was:<7>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:120)
+	at org.junit.Assert.assertEquals(Assert.java:146)
+	at in.wedevit.care.CombinedCareMigrationTest$verifyUpgrade$1.invokeSuspend(CombinedCareMigrationTest.kt:117)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+	at in.wedevit.care.CombinedCareMigrationTest.verifyUpgrade(CombinedCareMigrationTest.kt:26)
+	at in.wedevit.care.CombinedCareMigrationTest.localVersionFourPreservesTranscriptionAndConsent(CombinedCareMigrationTest.kt:20)
+5) upstreamReportsVersionThreePreservesReports(in.wedevit.care.CombinedCareMigrationTest)
+java.lang.AssertionError: expected:<6> but was:<7>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:120)
+	at org.junit.Assert.assertEquals(Assert.java:146)
+	at in.wedevit.care.CombinedCareMigrationTest$verifyUpgrade$1.invokeSuspend(CombinedCareMigrationTest.kt:117)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+	at in.wedevit.care.CombinedCareMigrationTest.verifyUpgrade(CombinedCareMigrationTest.kt:26)
+	at in.wedevit.care.CombinedCareMigrationTest.upstreamReportsVersionThreePreservesReports(CombinedCareMigrationTest.kt:18)
+6) upstreamVersionFourPreservesMultipleConfirmationIds(in.wedevit.care.CombinedCareMigrationTest)
+java.lang.AssertionError: expected:<6> but was:<7>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:120)
+	at org.junit.Assert.assertEquals(Assert.java:146)
+	at in.wedevit.care.CombinedCareMigrationTest$verifyUpgrade$1.invokeSuspend(CombinedCareMigrationTest.kt:117)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+	at in.wedevit.care.CombinedCareMigrationTest.verifyUpgrade(CombinedCareMigrationTest.kt:26)
+	at in.wedevit.care.CombinedCareMigrationTest.upstreamVersionFourPreservesMultipleConfirmationIds(CombinedCareMigrationTest.kt:21)
+7) historicalLocalVersionThreePreservesConsentAndReview(in.wedevit.care.CombinedCareMigrationTest)
+java.lang.AssertionError: expected:<6> but was:<7>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:120)
+	at org.junit.Assert.assertEquals(Assert.java:146)
+	at in.wedevit.care.CombinedCareMigrationTest$verifyUpgrade$1.invokeSuspend(CombinedCareMigrationTest.kt:117)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+	at in.wedevit.care.CombinedCareMigrationTest.verifyUpgrade(CombinedCareMigrationTest.kt:26)
+	at in.wedevit.care.CombinedCareMigrationTest.historicalLocalVersionThreePreservesConsentAndReview(CombinedCareMigrationTest.kt:19)
+8) versionTwoReachesSupersetThroughReports(in.wedevit.care.CombinedCareMigrationTest)
+java.lang.AssertionError: expected:<6> but was:<7>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:120)
+	at org.junit.Assert.assertEquals(Assert.java:146)
+	at in.wedevit.care.CombinedCareMigrationTest$verifyUpgrade$1.invokeSuspend(CombinedCareMigrationTest.kt:117)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+	at in.wedevit.care.CombinedCareMigrationTest.verifyUpgrade(CombinedCareMigrationTest.kt:26)
+	at in.wedevit.care.CombinedCareMigrationTest.versionTwoReachesSupersetThroughReports(CombinedCareMigrationTest.kt:24)
+9) versionOneReachesSupersetThroughRevisionAndReports(in.wedevit.care.CombinedCareMigrationTest)
+java.lang.AssertionError: expected:<6> but was:<7>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:120)
+	at org.junit.Assert.assertEquals(Assert.java:146)
+	at in.wedevit.care.CombinedCareMigrationTest$verifyUpgrade$1.invokeSuspend(CombinedCareMigrationTest.kt:117)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+	at in.wedevit.care.CombinedCareMigrationTest.verifyUpgrade(CombinedCareMigrationTest.kt:26)
+	at in.wedevit.care.CombinedCareMigrationTest.versionOneReachesSupersetThroughRevisionAndReports(CombinedCareMigrationTest.kt:23)
+10) localVersionFivePreservesReportsAndProvenance(in.wedevit.care.CombinedCareMigrationTest)
+java.lang.AssertionError: expected:<6> but was:<7>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:120)
+	at org.junit.Assert.assertEquals(Assert.java:146)
+	at in.wedevit.care.CombinedCareMigrationTest$verifyUpgrade$1.invokeSuspend(CombinedCareMigrationTest.kt:117)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:98)
+	at kotlinx.coroutines.EventLoopImplBase.processNextEvent(EventLoop.common.kt:263)
+	at kotlinx.coroutines.BlockingCoroutine.joinBlocking(Builders.kt:94)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking(Builders.kt:70)
+	at kotlinx.coroutines.BuildersKt.runBlocking(Unknown Source:1)
+	at kotlinx.coroutines.BuildersKt__BuildersKt.runBlocking$default(Builders.kt:48)
+	at kotlinx.coroutines.BuildersKt.runBlocking$default(Unknown Source:1)
+	at in.wedevit.care.CombinedCareMigrationTest.verifyUpgrade(CombinedCareMigrationTest.kt:26)
+	at in.wedevit.care.CombinedCareMigrationTest.localVersionFivePreservesReportsAndProvenance(CombinedCareMigrationTest.kt:22)
+
+FAILURES!!!
+Tests run: 21,  Failures: 10
+
+
+INSTRUMENTATION_CODE: -1

@@ -1,0 +1,48 @@
+{
+  "observedAtUtc": "2026-10-24T15:32:03.524153+00:00",
+  "version": "0.6.0",
+  "versionCode": 7,
+  "package": "in.wedevit.sahara",
+  "track": "Production",
+  "trackId": "4697314269892725425",
+  "releaseId": 3,
+  "sourceCommit": "d0aa4dad50e0de0bc026d05587151ff2d06c5981",
+  "bundle": "output/android/Sahara-0.6.0-24Oct-anatomy-sizing-fixed-release.aab",
+  "bundleSha256": "71CCB15901C69FB37BC52B7BFF243B8CC1F841B09CFCCCFF126476FAD5285B7B",
+  "uploadAttempts": 1,
+  "processedBundleConfirmed": true,
+  "savedAsDraft": true,
+  "submitted": false,
+  "published": false,
+  "previewInspected": true,
+  "previewConfirmed": false,
+  "previewErrors": 0,
+  "previewWarnings": [
+    {
+      "type": "significant_download_size_increase",
+      "text": "This artifact significantly increases the size of APK(s) downloaded by users.",
+      "blocking": false
+    }
+  ],
+  "playEstimatedDelivery": {
+    "newInstallMB": 42.6,
+    "previousNewInstallMB": 35.8,
+    "updateMB": 34.8,
+    "downloadSeconds": 24,
+    "qualification": "Play preview estimates, not measured handset download time or installed size."
+  },
+  "nativeDebugSymbolsAndReTraceAttached": true,
+  "draftUrl": "https://play.google.com/console/u/1/developers/8795679408143615220/app/4974759245808215344/tracks/4697314269892725425/releases/3/prepare",
+  "saveConfirmation": "Changes saved. You can now preview your release before sending it for review.",
+  "persistenceCheck": "After preview and Back, processed7(0.6.0) row remained; Save as draft disabled and Next enabled. Preview finalSave not used.",
+  "proof": "output/android/verification/0.6.0/play-production-060-draft-saved.png",
+  "proofSha256": "8BA50B0750CED56E4CB6DFCF5C03A183949252BBA880E7E3E6BA98FA322292E9",
+  "validationProof": "output/android/verification/0.6.0/play-production-060-validation.png",
+  "validationProofSha256": "95A2F0334CF4FD3F2ED821BCC32C854297B35FA6F46A2913B72648DBE73B5FBB",
+  "releaseReady": false,
+  "holdReasons": [
+    "Corrected native3D touch/history verification not executed: emulatorSystemUI ANR before app/test launch; no phone connected.",
+    "Two tested backend migrations denied by Supabase migration-write permission; no server changes."
+  ],
+  "noDuplicateUpload": true
+}

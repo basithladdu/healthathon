@@ -1,0 +1,41 @@
+{
+  "checkedAtUtc": "2026-10-24T15:26:37.107959+00:00",
+  "status": "not_executed_guest_system_ui_anr",
+  "passed": false,
+  "serial": "emulator-5576",
+  "androidApi": 36,
+  "guestRamMB": 2048,
+  "headless": true,
+  "readonly": true,
+  "physicalDevice": false,
+  "connectedPhysicalDevices": 0,
+  "debugApk": "output/android/Sahara-0.6.0-24Oct-anatomy-sizing-fixed-debug.apk",
+  "debugSha256": "070D9D2579EBA79E06F2F0943406704177DE4BB845C30360B2C82CFECD906DF6",
+  "testApk": "output/android/Sahara-0.6.0-24Oct-anatomy-sizing-fixed-androidTest.apk",
+  "testApkSha256": "403791DE5E6B8A710858AF2DEE24B7BB1A589BD067BE8FF48FEEF6C93F08FC6A",
+  "installReceipt": "anatomy-sizing-fixed-install.json",
+  "bootReceipt": "anatomy-sizing-fixed-boot.json",
+  "bootCompleted": true,
+  "obstacle": "System UI ANR at the Nexus launcher before any Sahara app or instrumentation launch. Ordinary Wait was tapped once; subsequent screenshot and window focus still showed that ANR.",
+  "evidenceScreenshots": [
+    "anatomy-sizing-fixed-before-runtime.png",
+    "anatomy-sizing-fixed-after-wait.png"
+  ],
+  "observedFacts": {
+    "focus": [
+      "mCurrentFocus=Window{2b77ece u0 Application Not Responding: com.android.systemui}",
+      "mFocusedApp=ActivityRecord{17155013 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t6}"
+    ],
+    "runtimePageBytes": 4096
+  },
+  "appAssertionExecuted": false,
+  "instrumentationTestsRun": 0,
+  "correctedNativeRaycastVerified": false,
+  "correctedNativeReadOnlyHistoryVerified": false,
+  "appCrashAttribution": "No Sahara app/test launch was attempted in this corrected-asset guest; this final hold occurred before app assertions.",
+  "assertionsWeakened": false,
+  "sourceChangedForEmulator": false,
+  "runtime16KbVerified": false,
+  "originalAvdUserdataTouched": false,
+  "followup": "No further boot/install loop. Parent will retain verified signed bundle as Play draft while runtime/backend prerequisites remain unfinished."
+}

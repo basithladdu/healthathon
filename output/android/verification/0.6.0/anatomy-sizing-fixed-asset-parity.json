@@ -1,0 +1,63 @@
+{
+  "checkedAtUtc": "2026-10-24T15:27:35.328549+00:00",
+  "nativeCompilationInputSha256": "65A63EA40DD9EEBF43E419869A6C4C3739F7B32963EE307C08E10ABE4F0D61E6",
+  "files": [
+    {
+      "file": "body-LICENSE-CC0.txt",
+      "bytes": 7048,
+      "sha256": "2F976AEAE6AB25F75A68B01189B58E9BE68BAAC37F1BAD7CA34621A82084D835",
+      "webNativeBytesEqual": true
+    },
+    {
+      "file": "body-model.json",
+      "bytes": 3633,
+      "sha256": "EE2A66D0B677E97444EB8C7B48C882953A16FECBF9BE3FDC187FB055915D1CB4",
+      "webNativeBytesEqual": true
+    },
+    {
+      "file": "body-SOURCE.txt",
+      "bytes": 1705,
+      "sha256": "4A966EE808D6C0956A71170C897AE957AA9ADAFAEC28D03081921412EE279AB3",
+      "webNativeBytesEqual": true
+    },
+    {
+      "file": "body.glb",
+      "bytes": 162136,
+      "sha256": "3A88834F17AF8391DA6B0761F257FCE4E9DAD0923CA4B92ED1458C9C4B3ECD6E",
+      "webNativeBytesEqual": true
+    },
+    {
+      "file": "index.html",
+      "bytes": 591,
+      "sha256": "E0D1F63911F5C85A3F76FB33C5CAC6B319F3E9F6BDD68A50B72C46BE328E7EF4",
+      "webNativeBytesEqual": true
+    },
+    {
+      "file": "THREE-LICENSE.txt",
+      "bytes": 1081,
+      "sha256": "8B378EBE60E2FE500158CB0AC71CB5E8B7D92953C2ABCC63A0EB90499653B5BC",
+      "webNativeBytesEqual": true
+    },
+    {
+      "file": "viewer.css",
+      "bytes": 450,
+      "sha256": "ED2B9AA35D77284367FFAC1473008C90C9C6A33380B2D90ECC8823DA91346943",
+      "webNativeBytesEqual": true
+    },
+    {
+      "file": "viewer.js",
+      "bytes": 645915,
+      "sha256": "CADD14703A708731440DDCE4988A2189B8A19F6A644F02CAEB8C5A5263004874",
+      "webNativeBytesEqual": true
+    },
+    {
+      "file": "viewer.js.LEGAL.txt",
+      "bytes": 188,
+      "sha256": "CC7CC7E2F53D5DB0235AB2226E85FC6E91655161573B39813B41BB00E5919674",
+      "webNativeBytesEqual": true
+    }
+  ],
+  "all9Match": true,
+  "supersedesCurrentUseOf": "pain-viewer-asset-parity.json",
+  "previousReportRetainedAsHistorical": true
+}

@@ -1,0 +1,16 @@
+{
+  "startedAtUtc": "2026-10-24T15:00:00.6914264Z",
+  "finishedAtUtc": "2026-10-24T15:02:37.1152518Z",
+  "status": "test_failures",
+  "physicalDevice": false,
+  "serial": "emulator-5666",
+  "classes": "in.wedevit.care.CarePainWebViewRuntimeTest,in.wedevit.care.CareSymptomDiaryUiTest,in.wedevit.care.CarePainHistoryUiTest,in.wedevit.care.CombinedCareMigrationTest",
+  "productionSourceChanged": false,
+  "bridgeAssertionsChanged": false,
+  "correctedExpectationFiles": 3,
+  "priorAttempt": "anatomy-runtime-after-system-ui-recheck.json",
+  "environmentRecovery": "Four test-only corrections/diagnostics; unchanged production package; prior failed attempts preserved",
+  "passed": false,
+  "testCount": 0,
+  "log": "anatomy-runtime-diagnostics.log"
+}
