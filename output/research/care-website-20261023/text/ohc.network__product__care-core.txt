@@ -1,0 +1,122 @@
+Architecture
+A kernel for healthcare workflows.
+CARE Core keeps the primitives stable so hospitals, public health programs, implementation partners, and AI tools can build on the same record, the same permissions, and the same integration surface.
+Stable shared core
+Patients, facilities, providers, encounters, observations, orders, forms, tasks, care plans, reports, roles, and audit trails live in one reusable foundation.
+Configurable workflows
+Programs can model clinical and operational workflows through questionnaires, forms, terminology bindings, and deployment-specific configuration.
+Plugin-ready surface
+Apps and integrations add AI scribe, TeleICU, devices, labs, pharmacy, billing, messaging, claims, analytics, and national rails without fragmenting the core.
+Core primitives
+Reusable building blocks, not one-off screens.
+Each CARE deployment can look different at the workflow layer while sharing the same data model, access model, audit trail, and API surface underneath.
+Patients and identity
+Facilities and hierarchy
+Providers and teams
+Encounters and episodes
+Questionnaires and forms
+Observations and vitals
+Orders and requests
+Medications and pharmacy
+Labs and diagnostics
+Scheduling and slots
+Access control and audit
+Reports and analytics
+Workflow modules
+The Core becomes visible where work happens.
+CARE Core is not a blank data platform. It ships with real clinical, operational, and financial workflows that can be composed into HMIS, EMR, care coordination, and public health deployments.
+Clinical data capture
+Structured forms, observations, notes, terminology, and clinical context captured inside the longitudinal record.
+Configurable EMR forms
+Program and hospital teams can shape workflows without turning every deployment into a new product fork.
+Lab management
+Orders, samples, diagnostic reports, values, units, and results flow back into the same patient timeline.
+Pharmacy and inventory
+Prescriptions connect to dispense, stock movement, substitutions, alerts, procurement, and inventory visibility.
+Billing and accounting
+Invoices, payments, claims, coverage, scheme support, and reconciliation stay connected to real care activity.
+Dynamic reports
+Clinical and operational reports are generated from the same structured workflows, not rebuilt in spreadsheets later.
+Core + plugins
+Keep the foundation stable. Let solutions move faster.
+CARE Apps extend the platform for AI documentation, TeleICU, devices, messaging, claims, analytics, terminology, national rails, and deployment-specific workflows. The result is reuse without lock-in, and extension without fragmentation.
+Explore apps and integrations
+CARE AI
+Core + Plugins
+CARE Core
+v3.0.0 / FHIR R5
+Administration
+Patients / Facilities / Users
+Definitions
+ValueSets / Questionnaires
+Clinical
+Encounters / Observations
+Scheduling
+Schedules / Slots / Bookings
+Pharmacy
+Dispense / Inventory
+Labs
+Service Req / Diagnostics
+Billing
+Claims / Coverage / Invoice
+Persistence /
+PostgreSQL
+/
+Redis
+/
+Object storage
+Runtime /
+Django
+/
+DRF
+/
+Celery
+Plugin runtime
+AI Scribe
+TeleICU
+Imaging
+Devices
+Messaging
+Analytics
+Enabled solutions
+Core + plugins enable
+Hospital OS
+Critical care
+Home care grid
+Clinic network
+Public health
+CARE Core provides the stable platform slab. Plugins add capabilities such as AI documentation, TeleICU, imaging, devices, messaging, analytics, claims, and terminology. Together they enable hospital, critical care, home care, clinic, and public health solutions.
+Standards layer
+Designed for interoperability before the first integration.
+CARE Core models healthcare data and workflows around open standards, open APIs, configurable terminology, and deployment patterns that institutions can own.
+FHIR R5
+resource model and APIs
+SNOMED CT
+clinical terminology direction
+LOINC
+labs and observations
+UCUM
+units of measure
+ICD-10
+classification support
+Open APIs
+integration by design
+Deployment model
+Built for institutions that need ownership.
+CARE Core is open-source and self-hostable. Governments, hospitals, and implementation partners can deploy it locally, integrate it with their ecosystem, and keep improving the shared core.
+Sovereign hosting
+Deploy in a government cloud, hospital VPC, managed cloud, hybrid model, or on-prem environment.
+Mobile-first care
+Support wards, clinics, home visits, field teams, and frontline workflows from the same platform primitives.
+AI-ready records
+Assistive AI works best when patient context, forms, encounters, permissions, and audit trails already exist.
+Foundation stewardship
+Open healthcare infrastructure needs more than code.
+OHC Foundation stewards CARE Core so it can serve as durable public-good infrastructure: release discipline, security, documentation, standards alignment, implementation guidance, contributor pathways, and a neutral home for governments, hospitals, funders, developers, and implementation partners.
+Governance model
+Fund the commons
+Build on CARE Core
+One open foundation. Many healthcare systems.
+Use CARE Core to deploy hospital systems, critical care networks, palliative care grids, clinic workflows, public health programs, and AI-assisted healthcare tools without starting from scratch.
+Explore CARE HMIS
+Talk to OHC

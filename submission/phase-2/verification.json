@@ -1,0 +1,149 @@
+{
+  "schemaVersion": "presentation-finalization.v1",
+  "finalSha256": "6950b09e2ae73ca62c1b1a5eafa8e37c2cd5cef8911a85c8056448c6211ba4a8",
+  "byteCount": 390331,
+  "packageIntegrity": {
+    "chart_count": 0,
+    "claim_boundary": "Structural package checks only; no slide text, notes, formulas, chart values, or native PowerPoint execution were inspected.",
+    "finding_count": 0,
+    "findings": [],
+    "notes_parts_skipped": 13,
+    "relationship_part_count": 41,
+    "slide_count": 13,
+    "status": "pass",
+    "exitCode": 0,
+    "findingCount": 0,
+    "warnings": []
+  },
+  "presentationLayout": {
+    "finding_count": 0,
+    "findings": [],
+    "font_policy": {
+      "checked_text_script_count": 128,
+      "native_font_rendering_verified": false,
+      "observed_font_families": [
+        "Arial",
+        "Calibri"
+      ],
+      "observed_font_use_counts": {
+        "Arial": 81,
+        "Calibri": 47
+      },
+      "passed": true,
+      "performed": true
+    },
+    "slide_count": 13,
+    "slide_size_in": [
+      13.3333,
+      7.5
+    ],
+    "warning_count": 0,
+    "warnings": [],
+    "exitCode": 0,
+    "findingCount": 0,
+    "fontPolicy": {
+      "checked_text_script_count": 128,
+      "native_font_rendering_verified": false,
+      "observed_font_families": [
+        "Arial",
+        "Calibri"
+      ],
+      "observed_font_use_counts": {
+        "Arial": 81,
+        "Calibri": 47
+      },
+      "passed": true,
+      "performed": true
+    }
+  },
+  "fontSelection": {
+    "basis": "reference",
+    "approvedFamilies": [
+      "Arial",
+      "Calibri"
+    ],
+    "scriptFonts": {},
+    "referenceSha256": "1abdba1a2e2fdff6fea96544325c7afb409cd99cd403053fbd79e8dc18735f60",
+    "referenceFontsVerifiedInEncodedText": true,
+    "checked_text_script_count": 128,
+    "native_font_rendering_verified": false,
+    "observed_font_families": [
+      "Arial",
+      "Calibri"
+    ],
+    "observed_font_use_counts": {
+      "Arial": 81,
+      "Calibri": 47
+    },
+    "passed": true,
+    "performed": true
+  },
+  "firstPartyImport": {
+    "performed": true,
+    "passed": true,
+    "slideCount": 13,
+    "sha256": "6950b09e2ae73ca62c1b1a5eafa8e37c2cd5cef8911a85c8056448c6211ba4a8",
+    "runtimeNodeModules": "C:\\Users\\basit\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\node_modules",
+    "nodeExecutable": "C:\\Users\\basit\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe"
+  },
+  "nativeTableArithmetic": {
+    "performed": true,
+    "checked_column_count": 0,
+    "checks": [],
+    "claim_boundary": "Displayed-value arithmetic with rounding tolerance; not source-data verification.",
+    "eligible_table_count": 0,
+    "finding_count": 0,
+    "findings": [],
+    "native_table_count": 1,
+    "passed": true,
+    "schema_version": "presentation-native-table-arithmetic.v1",
+    "skipped_tables": [
+      {
+        "reason": "no_numeric_amounts",
+        "slide": 2,
+        "table": 1
+      }
+    ],
+    "slide_count": 13,
+    "warning_count": 0,
+    "warnings": []
+  },
+  "nativeChartTitles": {
+    "performed": true,
+    "checks": [],
+    "finding_count": 0,
+    "findings": [],
+    "native_chart_count": 0,
+    "native_powerpoint_verified": false,
+    "passed": true,
+    "presentation_sha256": "6950b09e2ae73ca62c1b1a5eafa8e37c2cd5cef8911a85c8056448c6211ba4a8",
+    "schema_version": "presentation-native-chart-titles.v1",
+    "slide_count": 13,
+    "source_text_emitted": false,
+    "unresolved_linked_title_count": 0
+  },
+  "sourceDerivedPolicyFlags": [
+    "--expected-slide-size-emu",
+    "12192000,6858000",
+    "--validate-bullet-geometry",
+    "--validate-heading-fit",
+    "--require-native-table-slide",
+    "2",
+    "--cover-role",
+    "none",
+    "--expected-slide-count",
+    "13",
+    "--approved-font-family",
+    "Arial",
+    "--approved-font-family",
+    "Calibri"
+  ],
+  "nativeChartValidation": {
+    "detectedOwnerSlides": [],
+    "detectedChartCount": 0,
+    "targetApplication": "portable",
+    "sourceChartOwnersExplicitlyDeclared": true,
+    "validatorRan": false,
+    "passed": true
+  }
+}

@@ -1,0 +1,47 @@
+Stewardship model
+Clear roles for institutional oversight and technical ownership.
+Foundation Board
+Mission, legal, fiduciary, financial, fundraising, risk, and long-term institutional stewardship.
+Technical Steering Committee
+Architecture, technical vision, maintainership, release discipline, and community process oversight.
+Project maintainers
+Day-to-day code review, roadmap execution, issue triage, documentation, and contributor mentorship.
+Project groups
+Focused ownership for CARE Core, Apps, standards, security, implementation guides, and clinical workflows.
+How decisions are made
+The board stewards the institution. Technical leaders steward the platform.
+Mission, legal, finance, risk
+Foundation Board
+Architecture and technical roadmap
+Technical Steering Committee
+Code review and release readiness
+Maintainers
+Plugin compatibility and extensions
+Project groups and maintainers
+Clinical workflow safety
+Clinicians, maintainers, and product leads
+Security disclosure and response
+Security maintainers and foundation
+Public commitments
+Governance should be published as operating practice, not branding.
+Open contribution
+Contributions should flow through public repositories, clear review rules, and a documented maintainer path.
+License clarity
+CARE code is MIT licensed. Documentation and implementation guides should use open content licenses where appropriate.
+Release governance
+Stable releases, compatibility expectations, and long-term support direction should be visible to implementers.
+Security reporting
+Vulnerability reporting, disclosure expectations, access-control practices, and auditability are foundation concerns.
+Conflict handling
+The foundation should make conflicts of interest and decision escalation paths explicit as the ecosystem grows.
+Clinical accountability
+Clinical workflow and AI-related changes need review paths that respect safety, auditability, and human accountability.
+Trust and safety
+Security, release quality, and clinical safety are governance work.
+Open healthcare infrastructure must be auditable, maintainable, and safe to operate in real clinical settings. Governance connects technical review, responsible disclosure, release compatibility, and human-in-the-loop AI practices.
+Security & compliance
+Contribute
+Audit trails
+Access controls
+Release readiness
+Maintainer review

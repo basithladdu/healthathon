@@ -1,0 +1,28 @@
+[
+  {
+    "url": "https://sahara.wedevit.in/privacy",
+    "httpStatus": 200,
+    "expectedText": {
+      "Personal symptom notes": true,
+      "Qwen3-ASR": true,
+      "Devanagari": true,
+      "1,631": true,
+      "36": true,
+      "24 October 2026": true
+    },
+    "sha256": "8b28bae70335d68cbf331788011ab3876b28e2a0672e1801f3e37467301d1214"
+  },
+  {
+    "url": "https://saanthvana.wedevit.in/privacy",
+    "httpStatus": 200,
+    "expectedText": {
+      "Personal symptom notes": true,
+      "Qwen3-ASR": true,
+      "Devanagari": true,
+      "1,631": true,
+      "36": true,
+      "24 October 2026": true
+    },
+    "sha256": "8b28bae70335d68cbf331788011ab3876b28e2a0672e1801f3e37467301d1214"
+  }
+]

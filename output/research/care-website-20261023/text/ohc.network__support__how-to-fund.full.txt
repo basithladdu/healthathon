@@ -1,0 +1,158 @@
+How to Fund OHC Foundation - Open Healthcare Network
+Home
+Foundation
+CARE
+Solutions
+Impact
+Ecosystem
+Support
+Resources
+Open Healthcare Network Foundation
+How to fund us.
+Send a direct bank transfer or international wire to OHC Foundation. Donations support open healthcare infrastructure used by hospitals, public health programs, and governments.
+Contact finance team
+View legal documents
+Bank transfer
+NEFT / RTGS / IMPS
+Transfer directly to the foundation's current account. Use your organisation name or donor name as the reference.
+Account name
+Open Healthcare Network Foundation
+Account number
+50200117363340
+IFSC code
+HDFC0001512
+Bank
+HDFC Bank
+Branch
+Kaloor Branch
+Account type
+Current Account
+SWIFT / BIC
+HDFCINBB
+* Contact
+finance@ohc.network
+after transfer to receive a donation receipt.
+International wire
+From outside India
+For international donors and institutional funders, please contact the finance team before initiating a transfer. We will confirm current FCRA status and provide the correct wire details.
+finance@ohc.network
+Foundation details
+Payee and compliance identifiers.
+Use these for grant applications, wire transfers, donation forms, or when your compliance team needs to verify the receiving entity.
+Entity name
+Open Healthcare Network Foundation
+PAN
+AAECO9546J
+80G certificate
+AAECO9546JF20261
+12A certificate
+AAECO9546JF20251
+GST
+32AAECO9546J1Z5
+CIN
+U88100KL2025NPL098818
+Registered address
+1st Floor, C M Complex, Kalavath Road, Palarivattom, Kochi, Ernakulam, Kerala – 682025
+View all foundation documents
+Tax benefits
+80G deduction for Indian donors.
+OHC Foundation holds a provisional 80G registration. Indian resident individuals and companies can claim deduction on donations under Section 80G of the Income Tax Act, 1961.
+Request a donation receipt
+80G deduction
+Indian resident donors can claim deduction on the donated amount under Section 80G of the Income Tax Act, 1961.
+Donation receipts
+Official receipts for all donations are issued by the foundation. Contact finance@ohc.network after transferring funds.
+FCRA status
+For international wire transfers, contact us to confirm current FCRA status and applicable compliance requirements.
+What your funding supports
+The institutional work behind every deployment.
+Funding OHC Foundation is not funding one hospital or one deployment. It funds the shared platform, governance, release practices, documentation, security, and implementation ecosystem that make many deployments safer and less expensive to repeat.
+CARE Core
+Shared healthcare primitives, APIs, workflows, FHIR-aligned data models, and platform reliability that every deployment depends on.
+Security and LTS
+Release discipline, quality assurance, vulnerability response, auditability, and long-term support across active deployments.
+Documentation and guides
+Implementation guides, deployment packs, technical references, training material, and reusable playbooks for new deployments.
+Implementation ecosystem
+System integrator enablement, plugin compatibility, contribution pathways, and localization support across languages and regions.
+Assistive AI for health
+Human-in-the-loop documentation, voice-native forms, summarization, and safe workflow support for clinicians and staff.
+South-to-South reuse
+Deployment patterns and country-ready infrastructure that can be adapted beyond one state or program.
+Funding structures
+Flexible arrangements for any funder type.
+Funding can be structured as a one-time grant, annual sponsorship, institutional membership, or program-targeted support. Contact the finance team to discuss the arrangement that fits your organisation.
+Visionary Sponsor
+Major philanthropic or institutional support for stewarding open healthcare digital public infrastructure at scale.
+Contact us to discuss scope and structure.
+Foundation Member
+Annual membership for companies, healthcare providers, implementation partners, and ecosystem organizations.
+Includes governance participation rights.
+Program Sponsor
+Targeted support for CARE Core, security, AI documentation, palliative care, TeleICU, or deployment packs.
+Defined scope with regular reporting.
+Individual Supporter
+One-time or recurring support from individuals who want to back open healthcare infrastructure and the OHC mission.
+80G tax deduction eligible for Indian donors.
+Get in touch
+We'll guide you through the process.
+Whether you're sending a small individual contribution or structuring a large institutional grant, the finance team is available to help with receipts, documentation, compliance, and reporting.
+Finance team
+Receipts, wire instructions, grant documentation.
+finance@ohc.network
+Foundation documents
+COI, MOA, PAN, 80G, 12A, GST, and other legal certificates.
+View all documents
+Build the commons
+Help steward open healthcare
+infrastructure for the long term.
+Governments can deploy, institutions can support, implementation partners can localize, and contributors can strengthen the shared core.
+Support the commons
+Start a partnership conversation
+Registered Address
+Open Healthcare Network Foundation
+1st Floor, C M Complex, Kalavath Road, Palarivattom, Kochi, Ernakulam, Kerala, India, 682025
+Corporate Identity Number (CIN)
+U88100KL2025NPL098818
+Email
+support@ohc.network
+Foundation
+Mission
+Governance
+Board & Advisors
+Foundation Team
+Foundation Docs
+ISO Certifications
+Support OHC
+How to Fund Us
+Supporters
+CARE Platform
+CARE Core
+CARE AI
+Apps & Integrations
+Standards & Architecture
+Security & Compliance
+Solutions
+Hospital Management
+TeleICU
+Palliative Care
+CARE Clinic
+Animal Health
+Ecosystem
+The Network
+Implementation Partners
+Clinicians
+Build on Care
+Developers
+Impact
+Resources
+Blog
+FAQ
+Browser requirements
+Press & Media
+Careers
+Contact
+Support metadata
+©
+2026
+Open Healthcare Network Foundation.

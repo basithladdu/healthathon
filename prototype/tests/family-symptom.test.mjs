@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   addSymptomEntry, updateSymptomEntry, removeSymptomEntry, restoreSymptomEntry,
   selectSymptomEntries, symptomDiaryText, validateSymptomInput,
+  SYMPTOM_SCALE, symptomComparison, sameSymptomContext,
 } from '../app/family-symptom-state.ts';
 
 const today = '2026-09-21';
@@ -19,6 +20,103 @@ test('dates are real, cannot be future observations and onset cannot follow the 
   assert.equal(validateSymptomInput({ ...entry, severity: '' }, today), 'severity');
   assert.equal(validateSymptomInput({ ...entry, symptom: ' ' }, today), 'symptom');
   assert.equal(validateSymptomInput({ ...entry, note: 'a'.repeat(501) }, today), 'note');
+});
+
+const observed = (id, date, severity = 4, extra = {}) => ({
+  id, patientId: 'patient-a', author: 'Patient A', symptom: 'Pain', severity,
+  date, time: '18:00', startedOn: '', note: '', scale: SYMPTOM_SCALE,
+  recall: 'now', respondent: 'patient', recordedAt: `${date}T12:30:00Z`, ...extra,
+});
+
+test('missing ratings remain missing, explicit unable-to-rate is not zero and new context must be complete', () => {
+  const candidate = observed('one', today);
+  assert.equal(validateSymptomInput({ ...candidate, severity: undefined }, today), 'severity');
+  assert.equal(validateSymptomInput({ ...candidate, severity: null }, today), null);
+  assert.equal(validateSymptomInput({ ...candidate, severity: 0 }, today), null);
+  for (const change of [{ time: '25:00' }, { time: '' }, { respondent: undefined }, { recall: 'last-week' }, { scale: 'ESAS-r' }]) {
+    assert.equal(validateSymptomInput({ ...candidate, ...change }, today), 'context');
+  }
+  assert.equal(validateSymptomInput({ ...candidate, painLocation: 'a'.repeat(101) }, today), 'pain');
+  assert.equal(validateSymptomInput({ ...candidate, painTriggers: ['jumping'] }, today), 'pain');
+  assert.equal(validateSymptomInput({ ...candidate, symptom: 'Nausea', painTriggers: ['walking'] }, today), 'pain');
+});
+
+test('baseline and previous are real dated entries; first, skipped and legacy entries have no fabricated comparison', () => {
+  const baseline = observed('baseline', '2026-09-18', 6);
+  const previous = observed('previous', '2026-09-20', 3);
+  const current = observed('current', today, 5);
+  assert.equal(symptomComparison([], current), null);
+  assert.equal(symptomComparison([baseline], baseline), null);
+  assert.equal(symptomComparison([baseline], { ...current, severity: null }), null);
+  assert.equal(symptomComparison([{ ...entry, severity: 7 }], current), null);
+  const comparison = symptomComparison([previous, baseline, observed('future', '2026-09-22', 0)], current);
+  assert.equal(comparison.baseline.id, 'baseline');
+  assert.equal(comparison.previous.id, 'previous');
+  assert.equal(comparison.difference, 2);
+  assert.equal(symptomComparison([observed('zero', '2026-09-19', 0)], current).previous.severity, 0);
+});
+
+test('comparisons never cross person, symptom, recall, observer, scale or pain activity/location context', () => {
+  const baseline = observed('baseline', '2026-09-18');
+  const current = observed('current', today);
+  for (const change of [
+    { patientId: 'patient-b' }, { symptom: 'Tiredness' }, { recall: 'average-24h' },
+    { respondent: 'caregiver' }, { scale: undefined }, { time: undefined },
+    { painLocation: 'Back' }, { painTriggers: ['walking'] },
+  ]) assert.equal(symptomComparison([{ ...baseline, ...change }], current), null);
+  assert.equal(sameSymptomContext(
+    { ...baseline, painLocation: ' Back ', painTriggers: ['walking', 'coughing'] },
+    { ...current, painLocation: 'back', painTriggers: ['coughing', 'walking'] },
+  ), true);
+  assert.equal(sameSymptomContext(
+    { ...baseline, respondent: 'caregiver', author: 'Caregiver A' },
+    { ...current, respondent: 'caregiver', author: 'Caregiver B' },
+  ), false);
+});
+
+test('self-reported change attaches only to the actual previous matching observation', () => {
+  const baseline = observed('baseline', '2026-09-18', 6);
+  const previous = observed('previous', '2026-09-20', 4);
+  const current = observed('current', today, 3, { selfReportedChange: 'worse', comparedWithId: 'previous' });
+  // The person's own experience can disagree with the numeric difference.
+  const result = addSymptomEntry([baseline, previous], current, today);
+  assert.equal(result.at(-1).selfReportedChange, 'worse');
+  assert.equal(symptomComparison(result, result.at(-1)).difference, -1);
+  assert.strictEqual(addSymptomEntry([baseline, previous], { ...current, comparedWithId: 'baseline' }, today).length, 2);
+  assert.equal(validateSymptomInput({ ...current, comparedWithId: undefined }, today), 'comparison');
+  assert.equal(validateSymptomInput({ ...current, selfReportedChange: 'recovered' }, today), 'comparison');
+});
+
+test('stored round trip and exported copy retain context and attribution without leaking another patient', () => {
+  const baseline = observed('baseline', '2026-09-18', 6, { painLocation: 'Back', painTriggers: ['walking'] });
+  const current = observed('current', today, null, { painLocation: 'Back', painTriggers: ['walking'], respondent: 'assisted-patient' });
+  const rows = addSymptomEntry([baseline, other], current, today);
+  const restored = JSON.parse(JSON.stringify({ version: 1, value: rows })).value;
+  assert.deepEqual(restored.at(-1), rows.at(-1));
+  assert.equal(restored.at(-1).severity, null);
+  assert.equal(restored.at(-1).recordedAt, `${today}T12:30:00Z`);
+  const copy = symptomDiaryText(restored, 'patient-a', today);
+  assert.match(copy, /Not rated/);
+  assert.match(copy, /18:00/);
+  assert.match(copy, /Patient, with help/);
+  assert.match(copy, /At this time/);
+  assert.match(copy, /Back/);
+  assert.match(copy, /Standing or walking/);
+  assert.doesNotMatch(copy, /Private note from another family/);
+});
+
+test('editing clears a stale comparison and keeps first-author identity and original creation time', () => {
+  const baseline = observed('baseline', '2026-09-18', 6);
+  const current = observed('current', today, 3, { selfReportedChange: 'better', comparedWithId: 'baseline' });
+  const changed = updateSymptomEntry([baseline, current], 'patient-a', 'current', {
+    ...current, selfReportedChange: undefined, comparedWithId: undefined, recall: 'worst-24h',
+  }, 'Helper', today);
+  assert.equal(changed[1].selfReportedChange, undefined);
+  assert.equal(changed[1].comparedWithId, undefined);
+  assert.equal(changed[1].recordedAt, current.recordedAt);
+  assert.equal(changed[1].author, 'Patient A');
+  assert.equal(changed[1].editedBy, 'Helper');
+  assert.equal(symptomComparison(changed, changed[1]), null);
 });
 
 test('add and edit keep identities scoped and never mutate the original note', () => {

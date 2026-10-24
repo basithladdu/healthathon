@@ -1,0 +1,10 @@
+{
+  "result": "PASS",
+  "originalPageHashesVerified": 70,
+  "mainDomain": 58,
+  "selectedDocumentation": 12,
+  "failures": 0,
+  "originalTemplateBytes": 101320,
+  "originalTemplateSha256": "1abdba1a2e2fdff6fea96544325c7afb409cd99cd403053fbd79e8dc18735f60",
+  "scope": "Original download integrity and corpus coverage only; not feature/runtime/clinical validation."
+}

@@ -1,0 +1,119 @@
+Why CARE Janwar
+Animal health needs records, workflows, stock, and program visibility.
+Veterinary care is more than a visit note. It involves owners, keepers, locations, species, vaccination schedules, medicines, lab results, field teams, public programs, and operational reporting. CARE Janwar packages those workflows on the same open foundation.
+Veterinary clinics
+Registration, consultations, prescriptions, vaccination, billing, follow-up, and pharmacy workflows.
+Public animal hospitals
+Facility operations, OPD load, pharmacy, diagnostics, reports, user roles, and program oversight.
+Mobile and field teams
+Field visits, location context, offline-friendly direction, vaccination camps, and follow-up lists.
+Animal-health programs
+Vaccination campaigns, disease surveillance direction, welfare workflows, labs, and district dashboards.
+Animal-health workflow
+From registration to field follow-up.
+CARE Janwar can connect clinic visits, vaccination, diagnostics, pharmacy, field teams, and dashboards through one longitudinal record.
+01
+Register
+Create animal, owner or keeper, facility, and location context.
+02
+Triage
+Capture reason for visit, species-specific observations, and risk flags.
+03
+Examine
+Record clinical notes, vitals, findings, diagnosis, and care advice.
+04
+Order
+Request lab tests, imaging direction, procedures, medications, or referrals.
+05
+Vaccinate
+Track vaccination schedules, doses, batch details, and reminders.
+06
+Dispense
+Connect prescriptions to pharmacy, inventory, and audit trails.
+07
+Follow up
+Schedule review, field visit, referral, or program-level action.
+08
+Report
+See clinical activity, stock, vaccination coverage, and program signals.
+Product capabilities
+The building blocks for veterinary and public animal-health programs.
+CARE Janwar adapts the CARE operating model for clinical records, field workflows, vaccination, diagnostics, pharmacy, inventory, billing, and program dashboards.
+Animal and owner records
+Longitudinal animal records linked to owners, keepers, facilities, locations, identifiers, and visit history.
+Veterinary encounters
+Outpatient, inpatient, observation, field-visit, and follow-up workflows with configurable clinical forms.
+Vaccination workflows
+Vaccination schedules, dose records, batch details, reminders, campaign reporting, and coverage dashboards.
+Diagnostics and lab
+Lab orders, sample tracking direction, diagnostic reports, results review, and structured observations.
+Pharmacy and inventory
+Medication requests, dispensing, substitutions, stock alerts, procurement, expiry review, and movement logs.
+Billing and accounts
+Service charges, invoices, receipts, payment capture, scheme direction, and daily financial reports.
+Field and mobile care
+Mobile-first workflows for farm visits, field clinics, outbreak follow-up, community camps, and remote areas.
+Program dashboards
+Track visits, disease categories, vaccination, stock, lab activity, geographic coverage, and operational load.
+Built on CARE Core
+A specialized workflow should not require a separate foundation.
+CARE Janwar is a solution blueprint on top of the same open core: records, encounters, forms, users, roles, orders, tasks, reports, APIs, audit trails, and plugin-based extensions.
+Adapted from CARE Core primitives
+Open-source and MIT-licensed
+Configurable forms and terminology
+Self-hostable for public-sector ownership
+Role-based access and audit trails
+Extensible with pharmacy, lab, billing, dashboards, and AI plugins
+Implementation model
+Start with the care record. Expand into the public-health layer.
+Animal-health deployments can begin with clinic workflows and extend into field teams, vaccination campaigns, labs, inventory, and program dashboards.
+0
+1
+Model the care setting
+Define clinic, hospital, field, program, vaccination, lab, pharmacy, and reporting workflows.
+0
+2
+Configure records and forms
+Set animal attributes, species and breed fields, encounter templates, vaccination forms, and follow-up logic.
+0
+3
+Launch the core loop
+Start with registration, encounter, prescription, vaccination, billing, reports, and stock movement.
+0
+4
+Scale by program
+Extend into field visits, campaign dashboards, diagnostics, procurement, surveillance direction, and AI support.
+AI-ready animal health
+AI should assist field and clinical teams, with review.
+CARE Janwar can make structured animal-health data available for assistive workflows such as field-note drafting, summaries, missing-field prompts, stock review, and program monitoring.
+Field-note drafts
+Convert field observations and spoken notes into structured draft records for review.
+Record summaries
+Summarize animal history, vaccinations, treatments, pending follow-ups, and recent diagnostics.
+Program signals
+Help program teams scan patterns, missing fields, overdue follow-ups, stock gaps, and unusual activity.
+Outcomes to measure
+Measure care continuity and public-health visibility.
+Care continuity
+repeat visits, follow-up completion, vaccination reminders
+Program coverage
+field visits, campaign coverage, geography, facility activity
+Operations
+stock levels, expiry, billing, lab turnaround, staff workload
+Data quality
+complete records, coded fields, duplicate reduction, dashboard usage
+CARE Janwar FAQ
+Animal-health deployment, explained plainly.
+What is CARE Janwar?
+CARE Janwar is a CARE Core blueprint for veterinary and public animal-health workflows. It adapts CARE concepts such as records, encounters, forms, orders, pharmacy, inventory, billing, reports, access control, and dashboards for animal health settings.
+Is CARE Janwar a separate platform?
+It is best treated as a solution built on CARE Core, not a disconnected product. The deployment can use veterinary-specific records, forms, terminology, reports, and workflows while continuing to strengthen the shared CARE architecture.
+Can it support public animal-health programs?
+Yes. The blueprint can support vaccination campaigns, field visits, public animal hospitals, lab workflows, pharmacy and inventory, district dashboards, and program reporting when localized for a specific program.
+Does this replace veterinary judgment?
+No. CARE Janwar records and coordinates workflows. AI, where used, should remain assistive, reviewed, role-governed, and audit-aware.
+Deploy CARE Janwar
+Build animal-health workflows on the same open foundation.
+CARE Janwar gives implementation partners and public programs a starting point for veterinary records, field workflows, vaccination, diagnostics, pharmacy, inventory, billing, and program visibility.
+Start a workflow conversation
+CARE Core

@@ -1,0 +1,309 @@
+Health system first
+AI in healthcare should not sit outside the health system.
+Most healthcare AI tools start with a model. CARE AI starts with the health system: patients, encounters, facilities, users, roles, forms, orders, labs, medications, referrals, care plans, tasks, audit trails, APIs, and standards-based data models.
+It should understand the patient record.
+It should respect clinical workflows.
+It should follow permissions and audit trails.
+It should help health workers, not replace them.
+Our principle
+AI drafts. Humans decide. CARE records. Systems learn.
+CARE AI is not a standalone chatbot, an AI doctor, or a black-box tool outside the clinical workflow. It is a set of AI skills powered by CARE Core and designed for accountable care teams.
+Grounded in context
+AI should use patient, encounter, facility, role, form, task, and workflow context from CARE Core.
+Reviewed before saving
+AI can listen, extract, summarize, suggest, calculate, and draft. The care team remains in control.
+Traceable to sources
+Summaries, handovers, care plans, and discharge drafts should point back to source information wherever possible.
+Governed by roles
+Doctors, nurses, field workers, administrators, volunteers, and researchers should not have the same AI permissions.
+Designed for safety
+AI should reduce burden without reducing accountability, and every capability should be evaluated in real care settings.
+Recorded by CARE
+Accepted AI output becomes part of the same auditable, standards-aligned health record where care is delivered.
+Powered by CARE Core
+Workflow-aware, patient-aware, and accountable.
+A doctor opening an encounter needs different AI support from a nurse preparing a handover, a field worker completing a home visit, a registration staff member scanning documents, or a program manager improving a clinical form. CARE AI is designed for that reality.
+Longitudinal patient records
+Clinical forms and submissions
+Encounter history
+Medications, allergies, vitals, labs, and observations
+Care plans, tasks, referrals, and follow-ups
+Facility and user context
+Role-based permissions
+Audit trails
+APIs and plugin architecture
+Standards-aligned data models
+CARE AI capabilities
+From AI medical scribe to learning clinical workflows.
+CARE AI is a capability layer, not one feature. Each skill is meant to reduce burden, improve structured data capture, surface relevant patient context, and make healthcare workflows easier to complete.
+AI medical scribe
+Care Scribe
+Voice-based documentation assistance grounded in the patient record and the active CARE workflow.
+Clinical notes and visit summaries
+Structured form filling
+Nursing and field visit documentation
+Review before saving
+Audit of generated and accepted content
+Voice EMR
+Realtime Voice Scribe
+Realtime speech support that structures documentation while the consultation is happening.
+Realtime transcription
+History, symptoms, examination, assessment, and plan detection
+Structured field suggestions
+Missing information prompts
+Clinician edit, approval, and save
+Front-desk AI
+Vision for Patient Registration
+Registration intelligence for cleaner patient records and lower manual data entry at the front door of care.
+Extract details from forms, IDs, or documents
+Auto-fill registration fields
+Suggest possible duplicate records
+Flag missing or inconsistent information
+Attach source documents to the patient record
+Healthcare document AI
+Vision for Documentation
+Document understanding for scanned reports, prescriptions, referral letters, lab reports, and historical notes.
+Read uploaded documents and images
+Extract key fields from reports
+Convert paper records into structured data
+Summarize referral letters
+Review extracted data before saving
+Clinical summarization
+AI Summary on Records
+Patient summaries that help care teams reach the right part of a long record faster.
+One-line patient overview
+Recent visit summary
+Problem-oriented summary
+Medication and lab trend summaries
+Pending task and follow-up summaries
+Pre-encounter context
+Doctor Summary
+A concise view of the patient before the consultation begins, designed to reduce cognitive load.
+Chief concern and relevant history
+Active problems and medications
+Allergies and recent labs
+Pending investigations
+Risk flags and follow-up needs
+Doctor copilot
+Care Ask
+A doctor-facing copilot for patient-context questions and workflow support across the CARE record.
+What changed since the last visit?
+Show recent abnormal labs
+Summarize the current admission
+List current medications
+Generate patient instructions from today’s plan
+Clinical reasoning support
+Differential Diagnosis Support
+Careful, clinician-led reasoning support for structured checklists, red flags, and missing history prompts.
+Differential checklist generation
+Red-flag reminders
+Suggested examination questions
+Investigation prompts
+Consider, ask, check, and rule out suggestions
+Actionable care plans
+Care Plan Generation
+Draft care plans that can become tasks, reminders, referrals, follow-ups, and measurable continuity.
+Problems and goals
+Medications and investigations
+Counseling and follow-up
+Referrals and home-care tasks
+Monitoring plans and caregiver instructions
+Clinical scoring
+AI-Powered Score Calculators
+Score calculators connected to structured data and the escalation workflows that follow.
+BMI, MEWS, NEWS2, and GCS
+Program-specific scores
+Palliative-care risk scores
+NCD risk scores
+Follow-up and escalation routing
+Medication safety
+Drug Safety Alerts
+Relevant, explainable, severity-ranked prescribing alerts where medication decisions happen.
+Allergy and interaction risks
+Duplicate therapy
+Contraindications and dose concerns
+Renal, hepatic, pregnancy, and age cautions
+Override with reason where appropriate
+Continuity after discharge
+Discharge Summary Builder
+Draft discharge summaries generated from the actual hospital timeline, then reviewed and signed.
+Admission reason and diagnoses
+Procedures and clinical course
+Medication changes and lab trends
+Pending results
+Follow-up and referral notes
+Care transitions
+Handover Chart
+Structured handover notes for shifts, wards, teams, and high-risk transitions of care.
+Patient status and current risks
+Pending labs and tasks
+Medication changes
+Escalation needs
+Nursing priorities and discharge readiness
+Guideline to workflow
+Care Form Builder Skill
+AI support for converting guidelines, PDFs, SOPs, and paper forms into draft CARE forms and workflows.
+Form sections and field definitions
+Validations and conditional logic
+Terminology mappings
+Indicators and role-specific views
+Draft workflow structure
+Learning workflows
+Care Form Enhancer
+Submission analysis that suggests how program forms can become clearer, faster, and more structured.
+Frequently empty fields
+Confusing labels and duplicate fields
+Validation failures
+Long completion time and drop-off points
+Free-text patterns that should become structured fields
+Built for care teams
+Different teams need different intelligence.
+CARE AI is designed for doctors, nurses, field workers, hospitals, public-health programs, and implementation partners who need AI that is practical, responsible, and grounded in real health-system data.
+For doctors
+Spend less time searching and typing, and more time making decisions.
+Care Scribe
+Realtime voice documentation
+Doctor Summary
+Care Ask
+Differential diagnosis support
+Drug safety alerts
+Discharge summary builder
+For nurses
+Document faster, coordinate better, and reduce handover risk.
+Realtime nursing notes
+Handover charts
+Score calculators
+Pending task summaries
+Patient status summaries
+Ward-level documentation support
+For field workers
+Complete structured documentation with less typing and better local-language support.
+Voice-native forms
+Home-visit summaries
+Follow-up prompts
+Risk flag suggestions
+Caregiver instruction drafts
+Local-language support
+For hospitals
+Improve documentation quality, discharge workflows, patient handovers, and medication safety.
+Discharge summary builder
+Handover chart
+Drug safety alerts
+Doctor summaries
+Score calculators
+Documentation analytics
+For public-health programs
+Move from guidelines to better digital workflows and stronger program learning loops.
+Care Form Builder Skill
+Care Form Enhancer
+Program workflow summaries
+Indicator extraction
+Submission quality review
+Field-level improvement suggestions
+Extensible by design
+CARE can be the trusted substrate for partner AI.
+Not every AI capability needs to be built by OHC Foundation. CARE should make it possible for trusted AI partners, research institutions, public-sector AI initiatives, and local model providers to integrate safely into healthcare workflows.
+External scribe providers
+CARE can support voice-to-discrete-data integrations where a partner scribe transforms doctor-patient conversations into structured notes while CARE remains the patient-context layer and system of record.
+Eka Scribe via V2DD-style integrations
+A scribe partner can provide structured voice outputs, while CARE provides workflow context, review surfaces, final save, and auditability.
+India AI models and AI Centers of Excellence
+As Indian foundational models, local-language models, and healthcare AI research mature, CARE can provide the real-world health-system layer for responsible evaluation and use.
+Research and government-approved AI models
+Trusted partners can bring speech, vision, drug-safety, score-calculation, summarization, and program-specific models through plugin patterns.
+Safety and governance
+Healthcare AI must be designed for trust.
+CARE AI follows a safety-first posture: source grounding, human review, role-based access, audit trails, clinical accountability, and real-world evaluation.
+Human review
+AI-generated clinical content should be reviewed before becoming part of the medical record.
+Source grounding
+Summaries, discharge notes, handovers, and care plans should link back to source records wherever possible.
+Role-based access
+A doctor, nurse, volunteer, administrator, and researcher should not have the same AI capabilities or data access.
+Audit trails
+Every AI interaction should log who used it, what context was used, what was generated, what was edited, and what was saved.
+Clinical accountability
+AI supports the care team. It does not replace clinical responsibility.
+Evaluation
+Every AI feature should be measured by workflow impact, safety, adoption, quality, and outcomes.
+Useful evaluation metrics
+Documentation time saved
+Form completion rate
+Correction rate
+Data completeness
+Summary accuracy
+Discharge turnaround time
+Handover completeness
+Alert acceptance rate
+Override rate
+Clinician satisfaction
+Follow-up completion
+Safety incidents
+Roadmap
+From documentation relief to learning health systems.
+Horizon 1
+Documentation relief
+Reduce typing and improve structured capture.
+Care Scribe
+Realtime voice documentation
+Vision for documentation
+AI summaries
+Doctor Summary
+Discharge summary builder
+Handover chart
+Horizon 2
+Workflow intelligence
+Make CARE workflows AI-assisted.
+Care Ask Doctor Copilot
+Care plan generation
+AI-powered score calculators
+Drug safety alerts
+Care Form Builder Skill
+Care Form Enhancer
+Vision for registration
+Horizon 3
+Learning health systems
+Move from assistance to continuous improvement.
+Differential diagnosis support
+Program copilots
+Quality improvement analytics
+Risk stratification
+Operational intelligence
+AI evaluation infrastructure
+South-to-South reusable AI workflows
+The CARE AI difference
+A safer, faster interface to trusted healthcare infrastructure.
+The goal is not to make healthcare workers depend on another black-box product. The goal is to give them a smarter interface to open, accountable infrastructure.
+Workflow-native
+Embedded where care happens.
+Patient-aware
+Grounded in CARE records.
+Human-reviewed
+Designed for clinical accountability.
+Standards-aligned
+Built on open healthcare data models.
+Audit-ready
+Traceable and governable.
+Extensible
+Ready for partner models and AI integrations.
+Public-good oriented
+Designed to strengthen open healthcare infrastructure.
+FAQ
+What CARE AI is, and what it is not.
+What is CARE AI?
+CARE AI is the assistive intelligence layer built on top of CARE Core. It brings AI-powered documentation, summarization, voice workflows, form intelligence, clinical context, care planning, safety alerts, and workflow support into the same open healthcare platform where care is delivered.
+Is CARE AI an AI doctor?
+No. CARE AI is not an AI doctor, autonomous diagnosis tool, or black-box product outside the clinical workflow. It drafts, extracts, summarizes, suggests, and calculates while humans review and decide.
+What is the CARE AI principle?
+AI drafts. Humans decide. CARE records. Systems learn. CARE AI is built around human review, clinical accountability, source grounding, role-based permissions, and audit trails.
+What is Care Scribe?
+Care Scribe helps doctors, nurses, and care teams convert speech and clinical conversations into structured documentation inside CARE. It is documentation assistance grounded in the patient record and active workflow.
+How is CARE AI different from a standalone chatbot?
+CARE AI starts with the health system. It uses CARE Core context such as patients, encounters, forms, roles, orders, medications, labs, care plans, tasks, audit trails, APIs, and standards-based data models.
+Can external AI partners integrate with CARE AI?
+Yes. CARE AI is designed as an open and extensible AI layer where trusted scribe providers, speech models, vision models, local-language models, drug-safety engines, score calculators, and research models can integrate safely into CARE workflows.
+AI for the healthcare commons.
+CARE Core gives AI the context. CARE AI gives health workers the interface. Human review keeps care accountable. Open infrastructure makes the model reusable.
+CARE AI is responsible AI on trusted healthcare infrastructure.
+Discuss CARE AI
+Explore CARE Core

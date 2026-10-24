@@ -1,0 +1,145 @@
+Verify a consent | Care
+Skip to main content
+Care
+Documentation
+Playbooks
+HMIS
+Palliative
+Contributing
+Deployment
+English
+English
+മലയാളം
+3.1
+3.1
+3.0
+Care documentation
+Concepts
+Clinical
+Definitions & Terminology
+Medications
+Scheduling
+Billing
+Supply & Inventory
+Facility
+Access & Governance
+Platform
+Flows
+Clinical
+Patient
+Encounter
+Allergy Intolerance
+Condition
+Service Request
+Specimen
+Diagnostic Report
+Consent
+Record a consent
+View consents
+Update a consent
+Verify a consent
+Files
+Questionnaire Response
+Care Team
+Notes
+Facility
+Medications
+Billing
+Scheduling
+Supply
+Access & Governance
+Platform
+Definitions
+References
+Foundation
+Clinical
+Definitions & Terminology
+Medications
+Scheduling
+Billing
+Supply & Inventory
+Facility
+Access & Governance
+Platform
+Flows
+Clinical
+Consent
+Verify a consent
+Version: 3.1
+On this page
+Verify a consent
+Overview
+​
+This flow describes the verification of a
+consent
+. A verification is a second confirmation of a consent that a member of staff recorded for a patient.
+Note: The current version of Care has no screen for consent verification. You cannot add, view, or remove a verification from the web application. The steps below record what the system holds today. Review this flow again after the product adds the screen.
+Pre-requisites
+​
+The patient has an encounter at the facility, and a member of staff recorded a consent for that encounter.
+You did not verify this consent before. Care refuses a second verification from the same user.
+You have the permission listed below.
+Permissions
+​
+Permission
+Access
+Update Encounter related clinical data
+Lets you add a verification to a consent, and remove a verification from a consent.
+The Admin, Doctor, Nurse, and Facility Admin roles hold this permission.
+Steps
+​
+1. Open the consent
+​
+Open the encounter of the patient. Select the
+Consents
+tab. Select
+See Details
+on the consent that you want to verify.
+2. Add the verification
+​
+The consent record has no verification section, so you cannot add a verification here.
+When you add a verification, Care holds this information:
+Component
+What it captures
+Verification Type
+The source of the confirmation:
+Family
+for a family member or a representative, or
+Validation
+for the patient.
+Verified by
+The name of the user who confirms the consent.
+Verification date
+The date and time of the confirmation.
+Care accepts one verification for each user on one consent. A second verification from the same user gives an error.
+3. Remove the verification
+​
+The consent record has no verification section, so you cannot remove a verification here.
+Care removes only a verification that the same user added.
+Expected Outcome
+​
+Care holds the verification type, the name of the verifier, and the date and time of the verification.
+Care does not show this information on any screen in the current version.
+Related
+​
+Concepts:
+Consent
+Flows:
+Record a consent
+View consents
+Update a consent
+Edit this page
+Previous
+Update a consent
+Next
+Upload a file
+Overview
+Pre-requisites
+Permissions
+Steps
+1. Open the consent
+2. Add the verification
+3. Remove the verification
+Expected Outcome
+Related
+Copyright © 2026 Open Healthcare Network Foundation. Built with Docusaurus.

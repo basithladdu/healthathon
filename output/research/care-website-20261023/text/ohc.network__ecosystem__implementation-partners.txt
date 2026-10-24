@@ -1,0 +1,27 @@
+What partners can implement
+CARE is a platform for many deployment shapes, not one fixed app.
+Hospital HMIS and EMR deployments
+TeleICU and hub-and-spoke critical care workflows
+Palliative care and home-based care coordination
+ABDM, national rails, and identity integrations
+Labs, pharmacy, billing, inventory, and analytics modules
+Custom forms, terminology bindings, reports, and dashboards
+Partner expectations
+Commercial opportunity and public-good discipline can work together.
+Deploy without fragmenting
+Localize workflows through configuration, plugins, and documented extensions before forking the core.
+Contribute improvements back
+Bug fixes, reusable modules, forms, integrations, and documentation should strengthen the shared core.
+Respect release compatibility
+Implementations should track supported releases, upgrade paths, and security advisories.
+Build clinical trust
+Workflow changes should be tested with frontline staff and reviewed for safety, usability, and auditability.
+Partner program direction
+The ecosystem needs playbooks, not one-off handholding.
+OHC can support more deployments by publishing implementation guides, compatibility expectations, contribution rules, and training paths that let partners deliver locally while improving the shared commons.
+Partner onboarding
+Implementation guides
+Plugin submission rules
+Training and certification direction
+Deployment quality checklist
+Support and escalation boundaries

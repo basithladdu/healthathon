@@ -1,0 +1,288 @@
+Blog
+Writing for the open healthcare commons.
+Foundation essays, release notes, field stories, and implementation guidance from Open Healthcare Network.
+Featured
+Essays and field notes that frame the CARE platform as open healthcare infrastructure.
+Friday, July 31, 2026
+Prescription, billing, and access improvements in CARE
+July 2026 spanned prescriptions and dosing, appointments and billing, observation and medication data aligned with FHIR, password reset by phone, and nutrition added to the administration workflow.
+Open Healthcare Network Foundation
+Wednesday, May 27, 2026
+Why open healthcare infrastructure needs a foundation
+Code is necessary, but not sufficient. Health systems need stewardship, release discipline, documentation, security, and an ecosystem that can outlast any one deployment.
+Open Healthcare Network Foundation
+Wednesday, May 20, 2026
+AI-ready, not AI-hyped
+Assistive AI in healthcare should sit on structured, interoperable data and human-reviewed workflows. The foundation layer matters before the model layer.
+Open Healthcare Network Foundation
+Browse themes
+CARE
+(
+23
+)
+HMIS
+(
+10
+)
+Deployment
+(
+9
+)
+Product
+(
+6
+)
+Operations
+(
+5
+)
+Standards
+(
+4
+)
+Architecture
+(
+3
+)
+Digital Public Infrastructure
+(
+3
+)
+AI
+(
+2
+)
+Palliative Care
+(
+2
+)
+Foundation
+(
+1
+)
+RSS Feed
+Wednesday, September 30, 2026
+4
+min read
+Open Healthcare Network Foundation
+CARE
+Product
+Quicker queues, a sharper pharmacy and clearer billing in CARE
+September 2026 brings quicker queue handling, pharmacy medicine mapping, inventory expiry tracking, clearer billing, facility level patient identifiers and a round of mobile fixes.
+Read article
+Monday, August 31, 2026
+3
+min read
+Open Healthcare Network Foundation
+CARE
+Product
+A new questionnaire builder and simpler pharmacy billing in CARE
+August 2026 launched version two of CARE's questionnaire builder and forms, streamlined pharmacy billing, made medication records safer to review, and simplified how encounters are managed.
+Read article
+Friday, July 31, 2026
+4
+min read
+Open Healthcare Network Foundation
+CARE
+Product
+Prescription, billing, and access improvements in CARE
+July 2026 spanned prescriptions and dosing, appointments and billing, observation and medication data aligned with FHIR, password reset by phone, and nutrition added to the administration workflow.
+Read article
+Tuesday, June 30, 2026
+2
+min read
+Open Healthcare Network Foundation
+CARE
+HMIS
+Encounter lookup, versioned valuesets, and steadier releases in CARE
+June was a month of tightening the core. Staff can now go straight to an encounter by its ID, service requests carry the location they belong to, and clinical valuesets are versioned so every deployment knows exactly which terminology it is working with. CARE also became more dependable after each release, with fixes that stop the app failing to load after an update and builds that can be traced to the moment they were made. The new plugin extension points from the month are covered briefly at the end.
+Read article
+Sunday, May 31, 2026
+7
+min read
+Open Healthcare Network Foundation
+CARE
+Architecture
+Plugs V3 and the extensible future of CARE
+May 2026 rebuilt CARE's plugin architecture, improved clinical documentation speed, expanded HMIS reporting, strengthened inventory and billing workflows, and matured analytics across palliative deployments.
+Read article
+Wednesday, May 27, 2026
+6
+min read
+Open Healthcare Network Foundation
+Foundation
+Digital Public Infrastructure
+Why open healthcare infrastructure needs a foundation
+Code is necessary, but not sufficient. Health systems need stewardship, release discipline, documentation, security, and an ecosystem that can outlast any one deployment.
+Read article
+Wednesday, May 20, 2026
+6
+min read
+Open Healthcare Network Foundation
+AI
+Standards
+AI-ready, not AI-hyped
+Assistive AI in healthcare should sit on structured, interoperable data and human-reviewed workflows. The foundation layer matters before the model layer.
+Read article
+Wednesday, May 13, 2026
+5
+min read
+Open Healthcare Network Foundation
+CARE
+Architecture
+CARE Core as an operating layer for healthcare workflows
+CARE Core provides reusable primitives for patient records, encounters, orders, observations, tasks, care plans, reports, access control, audit trails, and APIs.
+Read article
+Thursday, April 30, 2026
+6
+min read
+Open Healthcare Network Foundation
+CARE
+Product
+Smarter dashboards, queues, and clinical forms in CARE
+April 2026 focused on clinical extensibility, FHIRPath form logic, mobile queue boards, payment traceability, HMIS dashboards, and continued scale for the Kerala Palliative Care Grid.
+Read article
+Tuesday, March 31, 2026
+6
+min read
+Open Healthcare Network Foundation
+CARE
+Standards
+Analytics and governance for the next phase of CARE
+March 2026 advanced CARE through scan-based check-in, LOINC mapping, hospital dashboards, palliative governance structures, and independent operation at Sree Sudheendra.
+Read article
+Saturday, February 28, 2026
+5
+min read
+Open Healthcare Network Foundation
+CARE
+HMIS
+From go-live support to stable hospital operations
+February 2026 moved CARE HMIS into a stable post go-live phase, with independent hospital usage, dashboards, billing auditability, templates, pharmacy improvements, and Kerala CARE governance enhancements.
+Read article
+Saturday, January 31, 2026
+5
+min read
+Open Healthcare Network Foundation
+CARE
+HMIS
+CARE HMIS go-live at Sree Sudheendra Hospital
+January 2026 marked the full CARE HMIS go-live at Sree Sudheendra Medical Mission Hospital, including on-premise infrastructure, data migration, digital token systems, and inpatient workflow digitization.
+Read article
+Wednesday, December 31, 2025
+5
+min read
+Open Healthcare Network Foundation
+CARE
+Deployment
+One million encounters and paperless governance
+December 2025 crossed a major Kerala CARE scale milestone, launched CARE at Pallium India, moved Sudheendra HMIS toward go-live, and built dashboards for paperless governance.
+Read article
+Sunday, November 30, 2025
+5
+min read
+Open Healthcare Network Foundation
+CARE
+Deployment
+Dashboards, testing discipline, and new CARE deployments
+November 2025 strengthened CARE through facility dashboards, Playwright testing, billing safeguards, new palliative care deployments, and deeper readiness at Sudheendra Hospital.
+Read article
+Friday, October 31, 2025
+6
+min read
+Open Healthcare Network Foundation
+CARE
+HMIS
+Refining CARE HMIS across hospital departments
+October 2025 expanded CARE HMIS across pediatric OP, inpatient workflows, pharmacy, lab, inventory, accounting, and the Kerala Palliative Care Grid's volunteer and dashboard capabilities.
+Read article
+Tuesday, September 30, 2025
+6
+min read
+Open Healthcare Network Foundation
+CARE
+HMIS
+CARE HMIS goes live in a multi-specialty hospital pilot
+September 2025 marked the launch of the CARE HMIS pilot at Sree Sudheendra Medical Mission Hospital, with reception, ENT, casualty, pharmacy, lab, billing, and scheduling workflows in live use.
+Read article
+Sunday, August 31, 2025
+6
+min read
+Open Healthcare Network Foundation
+CARE
+HMIS
+Token management and hospital workflow groundwork
+August 2025 introduced token management, ERP integration planning, faster encounters, stronger scheduling, and the operational groundwork for the Sudheendra HMIS pilot.
+Read article
+Thursday, July 31, 2025
+6
+min read
+Open Healthcare Network Foundation
+CARE
+HMIS
+Patient accounts and the next layer of CARE HMIS
+July 2025 added patient accounts, configurable identifiers, richer encounter views, appointment search, and the groundwork for deploying CARE HMIS in a real hospital environment.
+Read article
+Monday, June 30, 2025
+6
+min read
+Open Healthcare Network Foundation
+CARE
+HMIS
+Pharmacy workflows and the scale of Kerala CARE
+June 2025 delivered a FHIR-aligned pharmacy module, questionnaire builder upgrades, rapid registration, a public launch milestone, and deep adoption across the Kerala Palliative Care Grid.
+Read article
+Saturday, May 31, 2025
+6
+min read
+Open Healthcare Network Foundation
+CARE
+HMIS
+Building the FHIR-aligned lab module for CARE
+May 2025 advanced CARE HMIS with a FHIR-aligned lab module, Arike's CARE 3.0 migration, palliative care scale-out, and deeper hospital workflow discovery.
+Read article
+Wednesday, April 30, 2025
+6
+min read
+Open Healthcare Network Foundation
+CARE
+Product
+Stabilizing CARE after statewide launch
+April 2025 was about turning launch momentum into daily use, with 80,000 new registrations, home-based care workflows, RBAC, 2FA, dynamic forms, and CARE 3.0 upgrades.
+Read article
+Monday, March 31, 2025
+6
+min read
+Open Healthcare Network Foundation
+CARE
+Deployment
+Launching the Kerala Palliative Care Grid
+March 2025 marked the statewide launch of the Kerala Palliative Care Grid, followed by district training, operational handover, Malayalam localization, and early digital care delivery.
+Read article
+Friday, February 28, 2025
+6
+min read
+Open Healthcare Network Foundation
+CARE
+Deployment
+Preparing CARE for statewide palliative care rollout
+February 2025 focused on scaling the palliative care pilots, Malayalam support, security certification, CARE 3.0 architecture, and new HMIS modules for real-world use.
+Read article
+Friday, January 31, 2025
+5
+min read
+Open Healthcare Network Foundation
+CARE
+Deployment
+Field pilots for the Kerala Palliative Care Grid
+January 2025 moved CARE from planning to field use, with pilots in Ayyampuzha and Calicut, hands-on nurse training, early home visit records, and HMIS discovery work.
+Read article
+Tuesday, December 31, 2024
+6
+min read
+Open Healthcare Network Foundation
+CARE
+Architecture
+Building CARE as open healthcare infrastructure
+The first phase of the CARE expansion focused on the foundations: technical stewardship, FHIR and SNOMED CT alignment, palliative care workflows, and the early HMIS roadmap.
+Read article

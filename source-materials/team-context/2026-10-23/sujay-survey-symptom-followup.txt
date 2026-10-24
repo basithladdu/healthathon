@@ -1,0 +1,44 @@
+[10/23/26, 9:58:46 AM] Sujay H S IISC: Yeah. You can call whenever
+[10/23/26, 9:58:55 AM] Sujay H S IISC: I’m free
+[10/23/26, 6:10:19 PM] Sujay H S IISC: The survey is really good guys. I really appreciate how you put this up. Came out exactly as I had imagined it. It is insane.
+
+Regarding survey
+Page 1
+- Help patients find *palliative* care
+- ....palliative-care services *at hospitals you work with* 
+- Remove mobile number
+Page 2
+- Hospital search - I have put the state of the hospital as Karnataka but when I searched hospital name, the first hits were from Maharashtra and the hospital I wanted to put up did not show up - I had to be very specific about the name and then it could find it
+- It should be hospital name and address I feel
+- Right now it looks like the map is optional - I think you should make it compulsary - Like they check the hospital pin on the map after the address tags it on the map (I like that the address directly tags it on the map)
+Page 3
+- Do you think we should have a text field to request for names of palliative physicians there? For example, the hospital I have mentioned, does not advertise palliative care, but one of the doctors there in the Pulmonary department practices palliative care - I have mentioned that in the note that she practices but in the department of Pulmonary Medicine (Not sure how to tackle this) - But may be nice to have a text field for that
+
+I have put in an entry, @⁨Shaik Abdul Basith⁩ @⁨Awaiz⁩ can you check if the output is showing up as you guys want on your end?
+
+I think once these changes are made, we can send it out
+[10/23/26, 6:12:34 PM] Sujay H S IISC: So the discussion we had, we thought we should work on each tool.
+@⁨Shirin Ayub⁩ - Is there a specific tool you want to work on? I would be happy to discuss your thoughts and help you out with it.
+
+If you do not have a choice right now, I think the symptom tracker can be worked on from a clinical standpoint to make it both patient friendly and also give out clinically relevant information.
+
+Please do let me know
+[10/23/26, 6:13:29 PM] Sujay H S IISC: ....hospital name "and" address instead of "or"
+[10/23/26, 6:14:03 PM] ~ SVK: Hey where is the survey? Didn't find it
+[10/23/26, 6:14:15 PM] Sujay H S IISC: Ye wala
+[10/23/26, 6:14:53 PM] Sujay H S IISC: @⁨~SVK⁩ @⁨Shirin Ayub⁩ 
+Please do try out the survey today before these guys work on it more. Your inputs can be incorporated side by side
+[10/23/26, 6:16:27 PM] Shirin Ayub: Yes sure what work do you want me to put on it? Like you want me to come up w a list of symptoms they can choose from as a set of options?
+[10/23/26, 6:19:24 PM] Shirin Ayub: Okay ill ask my hospital people about the morphine and fill this out
+[10/23/26, 6:21:22 PM] ~ SVK: I'll go through in a while. Traveling
+[10/23/26, 6:23:45 PM] Sujay H S IISC: Correct. As I am thinking through it, I feel this part is going to be a little hard. You will have to really think through it 
+
+Maybe go through some palliative specific resources and see what symptoms are commonly tracked 
+
+Then I think for each symptom, at baseline, you will have to have a clinically relevant scale that the patient can use to quantify how bad it is. Then for follow up we can continue that scale and add if it is better than yesterday or worse than yesterday and by how much 
+
+
+See what you can come up with, and then we can talk about how to refine it. Because this is something subjective that we are trying to make a little objective - it’ll be hard
+
+Like pain - can use a VAS scale to quantify. But we might want to know what makes it worse - like movement and so on
+[10/23/26, 6:24:37 PM] Shirin Ayub: Okay sure

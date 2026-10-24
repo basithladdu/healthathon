@@ -1,0 +1,81 @@
+{
+  "checkedAt": "2026-10-23T14:53:14.6783069Z",
+  "browser": "Fresh Chrome via Playwright CLI, software WebGL",
+  "routes": [
+    "https://sahara.wedevit.in/hospital-survery",
+    "https://sahara.wedevit.in/how-i-feel"
+  ],
+  "viewports": [
+    {
+      "height": 900,
+      "width": 1365
+    },
+    {
+      "height": 844,
+      "width": 390
+    }
+  ],
+  "survey": {
+    "outcome": "passed",
+    "mainFlow": "Unlisted hospital -> manual name/address -> manually placed map pin -> explicit confirmation -> optional physician/department note -> consent review -> actual saved receipt",
+    "actualPosts": 1,
+    "actualResponseStatus": 201,
+    "receiptHeadingVerified": true,
+    "noMobileInput": true,
+    "noHorizontalOverflow": true,
+    "requiredFieldsAndFocus": true,
+    "pinSelectionDoesNotAutoConfirm": true,
+    "addressChangeInvalidatesPin": true,
+    "sourceResultIdNotRequired": true,
+    "keyboardMapAndManualFocus": true,
+    "unlistedQueryShowsNoResult": true,
+    "exactBranchSearchAliasesVerified": [
+      "S S Sparsh",
+      "Sparsh RR Nagar"
+    ],
+    "realMapTilesAndPinVisuallyInspected": true,
+    "databaseVerification": "Root verified new fields and pending review, removed only the synthetic fixture, and confirmed original counts restored",
+    "originalEntries": "Root confirmed preserved",
+    "recipientOrProfessionalDetailsIncludedInThisReport": false
+  },
+  "symptomDiary": {
+    "outcome": "passed",
+    "fixture": "Fresh fictional guest only",
+    "initiallySelectedScore": false,
+    "savedScores": {
+      "Nausea": 7,
+      "Pain": 3
+    },
+    "saveActionCount": 1,
+    "reloadPersistence": true,
+    "reporterAndTimeframeRetained": true,
+    "noHorizontalOverflow": true,
+    "note": "Stray zero fixed by root and verified absent in final production; Pain3/10, Nausea7/10 and fictional notes still persist after reload.",
+    "strayZeroOnFinalProduction": false
+  },
+  "screenshots": [
+    "output/playwright/survey-2026-10-23/production-intake-desktop.png",
+    "output/playwright/survey-2026-10-23/production-intake-mobile-390.png",
+    "output/playwright/survey-2026-10-23/review-mobile-390.png",
+    "output/playwright/survey-2026-10-23/manual-map-mobile-390.png",
+    "output/playwright/survey-2026-10-23/manual-map-mobile-390-keyboard.png",
+    "output/playwright/survey-2026-10-23/symptom-diary-production-mobile-390.png",
+    "output/playwright/survey-2026-10-23/.playwright-cli/element-2026-10-23T14-35-31-346Z.png",
+    "output/playwright/survey-2026-10-23/symptom-diary-final-production-mobile-390.png"
+  ],
+  "limitations": [
+    "Desktop Chrome responsive emulation, not physical Android verification",
+    "Unsent survey reload returns to empty About you; drafts persist during back/edit/validation recovery only",
+    "The one server survey fixture was synthetic and subsequently cleaned up; this is not a real professional verification or published listing",
+    "Symptom data was fictional guest data; no clinical validation or cloud-sync claim",
+    "No actual provider/network outage was injected",
+    "Three selected public screenshots are committed; additional browser capture paths are local QA scratch."
+  ],
+  "deployment": {
+    "surveyReceiptVerifiedOn": "dpl_CRAGwBsq21vZ9tYTSnwFNKy1uDTa",
+    "finalProduction": "dpl_AcVpwonvetw3A7usj23yWMteZNUh",
+    "finalDiaryBrowserCheck": "Same public Sahara guest session reloaded after final promotion; no additional survey POST",
+    "diaryBrowserVerifiedOn": "dpl_GALHJNYRE5rG5TDE2fKjVJVb7thw",
+    "laterLabelOnlyRevision": "Two ESAS launch labels renamed to Symptom notes after browser checks; root verified new production JS assets and Next build. No flow or storage change."
+  }
+}

@@ -1,0 +1,197 @@
+Consent | Care
+Skip to main content
+Care
+Documentation
+Playbooks
+HMIS
+Palliative
+Contributing
+Deployment
+English
+English
+മലയാളം
+3.1
+3.1
+3.0
+Care documentation
+Concepts
+Clinical
+Patient
+Encounter
+Allergy Intolerance
+Condition
+Observation
+Clinical - Service Request
+Clinical - Specimen
+Clinical - Diagnostic Report
+Consent
+Clinical - Files
+Questionnaire Response
+Clinical - Care Team
+Notes
+Definitions & Terminology
+Medications
+Scheduling
+Billing
+Supply & Inventory
+Facility
+Access & Governance
+Platform
+Flows
+Clinical
+Facility
+Medications
+Billing
+Scheduling
+Supply
+Access & Governance
+Platform
+Definitions
+References
+Foundation
+Clinical
+Definitions & Terminology
+Medications
+Scheduling
+Billing
+Supply & Inventory
+Facility
+Access & Governance
+Platform
+Concepts
+Clinical
+Consent
+Version: 3.1
+On this page
+Consent
+Definition
+​
+A
+consent
+in Care is a record of the permission or the refusal that a patient gives for a treatment, for a research study, or for the sharing of information. Each consent belongs to one encounter. Care shows the consents of an encounter on the
+Consents
+tab of that encounter, as a list of cards.
+Key Attributes
+​
+Components
+What it captures
+Status
+The current state of the consent.
+Category
+The subject that the patient gives permission or refusal for.
+Consent Decision
+Whether the patient permits or denies the subject of the consent.
+Consent Given On
+The date and time when the patient gives the consent.
+Consent Valid From
+The date and time from which the consent is valid.
+Consent Valid Until
+The date and time until which the consent is valid.
+Note
+Free text that records more information about the consent.
+Supporting Documents
+Files that you attach to the consent, for example a scanned signed consent form.
+Consent Decision
+​
+Consent Decision records the answer of the patient. Select one of these values:
+Consent Decision
+Description
+Permit
+The patient allows the subject of the consent.
+Deny
+The patient refuses the subject of the consent.
+On the consent card, Care shows
+Permitted
+for Permit, and
+Denied
+for Deny.
+Category
+​
+Category records the subject of the consent. The consent form shows these categories, with a short description for each one:
+Category
+Description
+Research
+Consent to take part in a research protocol and to share information.
+Privacy Consent
+Consent to collect, access, use, or share information.
+Treatment
+Consent to undergo a specific treatment.
+Do Not Resuscitate
+Consent to not receive CPR or resuscitation in a cardiac event.
+Advance Directive
+Consent that the patient gives before a possible need for medical treatment.
+Advance Care Directive
+Consent for the actions to take if the patient can no longer decide.
+Note: Care also holds a
+Comfort Care
+category, but the consent form has no option for it. You cannot select Comfort Care. This is a known gap in the product.
+Verification
+​
+Care can hold a verification for a consent. A verification records who confirmed the consent, when they confirmed it, and the type of the confirmation. The type is
+Family
+for a confirmation by a family member or a representative. The type is
+Validation
+for a confirmation by the patient.
+Note: The current version of Care has no screen to add, show, or remove a verification. This is a known gap in the product. For more information, see
+Verify a consent
+.
+Changes after creation
+​
+Care fixes the Category, the Consent Decision, the Consent Given On date, and the validity period when you record the consent. The edit form does not show these fields. After creation, you can change the Status and the Note.
+Status
+​
+Status
+Description
+Draft
+You prepared the consent, but it is not in effect.
+Active
+The consent is in effect.
+Inactive
+The consent is no longer in effect.
+Not Done
+The consent did not happen.
+Entered in Error
+Someone recorded the consent by mistake.
+Permissions
+​
+Action
+Permission
+View a consent
+Can view clinical data about patients, or Can Read encounter related clinical data.
+Record a consent
+Update Encounter related clinical data.
+Update a consent
+Update Encounter related clinical data.
+The Admin, Doctor, Nurse, and Facility Admin roles hold the
+Update Encounter related clinical data
+permission.
+Note: Care shows the buttons that record and change a consent only when the encounter is active, and only when you open the encounter from the facility.
+Related
+​
+Concept:
+Encounter
+Concept:
+Files
+Flow:
+Record a consent
+Flow:
+View consents
+Flow:
+Update a consent
+Flow:
+Verify a consent
+Edit this page
+Previous
+Clinical - Diagnostic Report
+Next
+Clinical - Files
+Definition
+Key Attributes
+Consent Decision
+Category
+Verification
+Changes after creation
+Status
+Permissions
+Related
+Copyright © 2026 Open Healthcare Network Foundation. Built with Docusaurus.

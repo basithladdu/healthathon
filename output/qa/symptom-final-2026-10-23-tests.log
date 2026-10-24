@@ -1,0 +1,18 @@
+✔ dates are real, cannot be future observations and onset cannot follow the note (2.6046ms)
+✔ missing ratings remain missing, explicit unable-to-rate is not zero and new context must be complete (0.9834ms)
+✔ baseline and previous are real dated entries; first, skipped and legacy entries have no fabricated comparison (17.2953ms)
+✔ comparisons never cross person, symptom, recall, observer, scale or pain activity/location context (0.652ms)
+✔ self-reported change attaches only to the actual previous matching observation (1.144ms)
+✔ stored round trip and exported copy retain context and attribution without leaking another patient (4.5483ms)
+✔ editing clears a stale comparison and keeps first-author identity and original creation time (0.5506ms)
+✔ add and edit keep identities scoped and never mutate the original note (0.3646ms)
+✔ remove and undo affect only the selected patient, preserve the edited note and do not duplicate it (0.5687ms)
+✔ filters and export exclude other patients and use an inclusive seven-day window (7.1187ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 911.0877

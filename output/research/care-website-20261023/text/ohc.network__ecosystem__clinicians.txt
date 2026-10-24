@@ -1,0 +1,29 @@
+Where clinicians shape the platform
+Clinical governance belongs close to product decisions.
+Clinical notes and rounds
+Make documentation fit real bedside, outpatient, emergency, home care, and critical care workflows.
+Forms and terminology
+Review questionnaires, SNOMED CT, LOINC, UCUM, ICD-10 mappings, and local terminology needs.
+Care coordination
+Shape tasks, referrals, care plans, home visits, follow-up, and continuity of care patterns.
+AI documentation review
+Guide voice-native forms, AI draft flags, summarization, and human-in-the-loop safety expectations.
+Safety and adoption
+Better records only matter if frontline teams can actually use them.
+CARE's clinical design should reduce documentation burden, preserve accountability, and support continuity of care across facilities, home visits, referrals, and program workflows.
+Clinical safety before automation
+Human-in-the-loop review for AI-assisted documentation
+Structured data without burdening frontline staff
+Auditability for clinical and administrative actions
+Local language and local workflow sensitivity
+Open feedback loops with maintainers and implementers
+Assistive AI
+Voice and AI should draft, not decide.
+Care Scribe and related AI workflows should help clinicians capture structured notes, forms, summaries, and care plans with clear draft states, review paths, and traceability.
+The foundation's role is to make AI safer by grounding it in open standards, structured clinical data, human review, and deployment choices that health systems can govern locally.
+Get involved
+Help turn clinical reality into reusable open workflows.
+Share workflow needs
+Review forms and modules
+Test AI documentation flows
+Mentor implementation teams

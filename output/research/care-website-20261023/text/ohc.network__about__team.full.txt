@@ -1,0 +1,131 @@
+Board, Advisors, and Maintainers - Open Healthcare Network Foundation - Open Healthcare Network
+Home
+Foundation
+CARE
+Solutions
+Impact
+Ecosystem
+Support
+Resources
+Leadership and governance layers
+A full institution around CARE Core.
+OHC Foundation is being built as a durable home for open healthcare infrastructure: board stewardship, independent advisors, foundation operators, and maintainers close to the code and field deployments.
+Governance model
+Foundation team
+Governance map
+Board, advisors, team, and maintainers have different jobs.
+This separation matters. The board safeguards the institution. Advisors sharpen direction. The foundation team operates the roadmap. Maintainers protect technical quality.
+0
+1
+Foundation Board
+Mission, fiduciary oversight, risk, funding, legal accountability, and long-term institutional stewardship.
+0
+2
+Advisory Board
+Independent guidance from public infrastructure, health systems, philanthropy, technology, and open-source leaders.
+0
+3
+Foundation Team
+Product, engineering, AI, community, partnerships, and operating leadership for OHC Foundation.
+0
+4
+Maintainers
+Architecture, code review, release discipline, security, documentation, and contributor pathways.
+Foundation Board
+Board stewardship for a neutral healthcare commons.
+The foundation board provides institutional oversight for mission, fiduciary responsibility, partnerships, and long-term trust.
+Srikanth Nadhamuni
+Founding CTO, Aadhaar / Chairman, 10BedICU Project
+Sandeep Singal
+Board Member, ACT Grants
+Sanjay Vijayakumar
+Director / Strategic Operations
+Dr. Athul Joseph Manuel
+President, IMA Kochi / Chief Medical Officer
+Bodhish Thomas
+Chief Executive Officer
+GitHub
+LinkedIn
+Website
+Vignesh Hari
+Chief Technology Officer
+GitHub
+LinkedIn
+Gigin Chandy George
+CTO, eGov Healthcare
+GitHub
+LinkedIn
+Pinaki Krishna
+Director - Resources & Partnerships
+LinkedIn
+Advisory Board
+Independent guidance for public-good infrastructure.
+The advisory board section is designed to grow as OHC adds leaders from digital public infrastructure, healthcare, philanthropy, standards, and open source.
+Srikanth Nadhamuni
+Founding CTO, Aadhaar / Chairman, 10BedICU Project
+Maintainers and contributors
+The wider technical community remains central.
+The public roster will grow as maintainer, clinical, and project committee roles are confirmed. For now, this page reserves the structure for a complete foundation team page.
+Technical Steering Committee
+Project maintainers
+Clinical reviewers
+Security and release owners
+Implementation partners
+Open-source contributors
+Open healthcare infrastructure needs visible stewardship.
+The roster will expand as the foundation formalizes additional board, advisory, maintainer, clinical, and operating roles.
+Read governance model
+Support the foundation
+Build the commons
+Help steward open healthcare
+infrastructure for the long term.
+Governments can deploy, institutions can support, implementation partners can localize, and contributors can strengthen the shared core.
+Support the commons
+Start a partnership conversation
+Registered Address
+Open Healthcare Network Foundation
+1st Floor, C M Complex, Kalavath Road, Palarivattom, Kochi, Ernakulam, Kerala, India, 682025
+Corporate Identity Number (CIN)
+U88100KL2025NPL098818
+Email
+support@ohc.network
+Foundation
+Mission
+Governance
+Board & Advisors
+Foundation Team
+Foundation Docs
+ISO Certifications
+Support OHC
+How to Fund Us
+Supporters
+CARE Platform
+CARE Core
+CARE AI
+Apps & Integrations
+Standards & Architecture
+Security & Compliance
+Solutions
+Hospital Management
+TeleICU
+Palliative Care
+CARE Clinic
+Animal Health
+Ecosystem
+The Network
+Implementation Partners
+Clinicians
+Build on Care
+Developers
+Impact
+Resources
+Blog
+FAQ
+Browser requirements
+Press & Media
+Careers
+Contact
+Support metadata
+©
+2026
+Open Healthcare Network Foundation.

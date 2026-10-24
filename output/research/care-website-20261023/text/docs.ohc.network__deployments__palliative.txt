@@ -1,0 +1,22 @@
+On this page
+Palliative care playbooks wire
+flows
+into home-based and facility palliative programs. Each playbook lists the flows involved, the care team path, and edge cases specific to palliative deployments.
+How playbooks relate to core docs
+​
+Layer
+Location
+Example
+Concept
+Core docs
+What is a patient?
+Flow
+Core docs
+How do I register a patient?
+Playbook
+Here
+Enrolling a patient in community palliative care
+Start from the
+documentation home
+if you are new to this structure.
+How playbooks relate to core docs

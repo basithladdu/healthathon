@@ -1,0 +1,96 @@
+Clinicians - Shape CARE Workflows - Open Healthcare Network
+Home
+Foundation
+CARE
+Solutions
+Impact
+Ecosystem
+Support
+Resources
+Clinical community
+CARE should feel like clinical infrastructure, not only IT.
+OHC needs clinicians and frontline workers to shape workflows, forms, terminology, safety practices, and assistive AI tools so CARE reflects how care is actually delivered.
+Join clinical review
+Review CARE modules
+Where clinicians shape the platform
+Clinical governance belongs close to product decisions.
+Clinical notes and rounds
+Make documentation fit real bedside, outpatient, emergency, home care, and critical care workflows.
+Forms and terminology
+Review questionnaires, SNOMED CT, LOINC, UCUM, ICD-10 mappings, and local terminology needs.
+Care coordination
+Shape tasks, referrals, care plans, home visits, follow-up, and continuity of care patterns.
+AI documentation review
+Guide voice-native forms, AI draft flags, summarization, and human-in-the-loop safety expectations.
+Safety and adoption
+Better records only matter if frontline teams can actually use them.
+CARE's clinical design should reduce documentation burden, preserve accountability, and support continuity of care across facilities, home visits, referrals, and program workflows.
+Clinical safety before automation
+Human-in-the-loop review for AI-assisted documentation
+Structured data without burdening frontline staff
+Auditability for clinical and administrative actions
+Local language and local workflow sensitivity
+Open feedback loops with maintainers and implementers
+Assistive AI
+Voice and AI should draft, not decide.
+Care Scribe and related AI workflows should help clinicians capture structured notes, forms, summaries, and care plans with clear draft states, review paths, and traceability.
+The foundation's role is to make AI safer by grounding it in open standards, structured clinical data, human review, and deployment choices that health systems can govern locally.
+Get involved
+Help turn clinical reality into reusable open workflows.
+Share workflow needs
+Review forms and modules
+Test AI documentation flows
+Mentor implementation teams
+Build the commons
+Help steward open healthcare
+infrastructure for the long term.
+Governments can deploy, institutions can support, implementation partners can localize, and contributors can strengthen the shared core.
+Support the commons
+Start a partnership conversation
+Registered Address
+Open Healthcare Network Foundation
+1st Floor, C M Complex, Kalavath Road, Palarivattom, Kochi, Ernakulam, Kerala, India, 682025
+Corporate Identity Number (CIN)
+U88100KL2025NPL098818
+Email
+support@ohc.network
+Foundation
+Mission
+Governance
+Board & Advisors
+Foundation Team
+Foundation Docs
+ISO Certifications
+Support OHC
+How to Fund Us
+Supporters
+CARE Platform
+CARE Core
+CARE AI
+Apps & Integrations
+Standards & Architecture
+Security & Compliance
+Solutions
+Hospital Management
+TeleICU
+Palliative Care
+CARE Clinic
+Animal Health
+Ecosystem
+The Network
+Implementation Partners
+Clinicians
+Build on Care
+Developers
+Impact
+Resources
+Blog
+FAQ
+Browser requirements
+Press & Media
+Careers
+Contact
+Support metadata
+©
+2026
+Open Healthcare Network Foundation.

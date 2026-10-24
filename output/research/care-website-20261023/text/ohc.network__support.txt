@@ -1,0 +1,35 @@
+Why fund
+Funding OHC is not funding one deployment.
+It funds the shared platform, governance, release practices, documentation, security, and implementation ecosystem that make many deployments safer and less expensive to repeat.
+The foundation model lets funders support public-good infrastructure that governments, hospitals, NGOs, and implementation partners can reuse without license lock-in.
+What support funds
+The institutional work behind reusable deployments.
+CARE Core
+Shared healthcare primitives, APIs, workflows, FHIR-aligned data models, and platform reliability.
+Security and LTS
+Release discipline, quality assurance, vulnerability response, auditability, and long-term support direction.
+Documentation and guides
+Implementation guides, deployment packs, technical references, training material, and reusable playbooks.
+Implementation ecosystem
+System integrator enablement, plugin compatibility, contribution pathways, and localization support.
+Assistive AI for health
+Human-in-the-loop documentation, voice-native forms, summarization, and safe workflow support.
+South-to-South reuse
+Deployment patterns and country-ready infrastructure that can be adapted beyond one state or program.
+Sponsor paths
+Institutional support for a public-good infrastructure layer.
+Funding conversations can be structured around the public funding.json plans while tailoring scope, governance, reporting, and compliance needs directly with the foundation.
+Visionary Sponsor
+Major philanthropic or institutional support for stewarding open healthcare digital public infrastructure.
+Foundation Member
+Company, healthcare provider, implementation partner, or ecosystem organization support for long-term stewardship.
+Program Sponsor
+Targeted support for CARE Core, security, AI documentation, palliative care, TeleICU, or deployment packs.
+Individual Sponsor
+Support from individuals who want to back open healthcare infrastructure and the OHC mission.
+Start the conversation
+Back the commons that health systems can own, adapt, and scale.
+Grants and sponsorships
+finance@ohc.network
+Partnerships
+Government, hospital, SI, and ecosystem conversations.

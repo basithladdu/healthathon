@@ -539,5 +539,78 @@
       "scope": "Combined native care features and fictional doctor workspace. This replaces the earlier observation that no newer upstream source was available."
     },
     "featureReadinessReference": "android/release/store-draft.json featureReadiness: nine main areas, five implemented, two partial, two not ready. Implemented does not mean published or clinically validated."
+  },
+  "currentReview20261023": {
+    "scope": "Read-only CARE research and local Phase 2 template preparation. No CARE installation/integration, patient upload, provider setup, application submission or external correspondence.",
+    "emailRechecked": {
+      "date": "2026-10-15 14:05 IST",
+      "subject": "Health-a-thon 2026 | Build Sprint Resources from Open Healthcare Network",
+      "purpose": "OHC offered all shortlisted teams optional reuse of CARE's existing EMR capabilities, developer tooling and plugin examples so they can focus on a specific healthcare workflow.",
+      "notEstablished": ["Mandatory CARE migration", "A condition on a grant", "Dedicated hosting", "Medispeak/Sarvam access", "A clinical partnership or access to real patients"],
+      "developmentRequirement": "Synthetic data; document intended user, workflow, setup and limitations. Clinical deployment needs further validation and security/privacy review."
+    },
+    "publicArchive": {
+      "path": "output/research/care-website-20261023/manifest.json",
+      "script": "scripts/archive_care_website.py",
+      "reproduction": "Use a new empty --output-dir for a later snapshot; the script refuses to overwrite this archive. It emits original and extracted-text hashes. Semantic-reading annotations and the independent integrity report belong to this dated review and are not automatically claimed by a new capture.",
+      "mainDomainSitemapEntries": 32,
+      "mainDomainPublicPages": 58,
+      "selectedDocumentationPages": 12,
+      "successfulPageCaptures": 70,
+      "captureFailures": 0,
+      "extractedMainTextWords": 52278,
+      "documentationSitemapEntries": 473,
+      "coverageBoundary": "All sitemap-listed and recursively linked public HTML pages on the main domain were archived and text-reviewed across the research team. Separate documentation was inventoried, with targeted pages reviewed; all 473 documentation pages, external sites, linked PDFs, videos and every repository line were not reviewed. Public content/deployment claims are not independent clinical or runtime validation."
+    },
+    "palliativeFindings": [
+      {
+        "url": "https://ohc.network/solutions/palliative-care",
+        "finding": "CARE Home Care Grid already covers registries, caregivers, assignments, home visits, goals/care plans, referrals, follow-ups and programme dashboards. Do not present a generic palliative registry as a capability absent from CARE. Deployment counts remain OHC's dated provider claims."
+      },
+      {
+        "url": "https://ohc.network/blog/stabilizing-care-after-statewide-launch",
+        "finding": "OHC already describes procedure/data-sharing consent, voice-assisted documentation and printable summaries. These are not unique Sahara inventions."
+      },
+      {
+        "url": "https://docs.ohc.network/deployments/palliative/playbooks/patient-enrollment/",
+        "finding": "The playbook calls for caregiver capture, shared patient matching and palliative goals of care separate from acute notes. Its programme-enrollment flow is marked coming soon; an intended playbook is not proof every step is shipped."
+      },
+      {
+        "url": "https://docs.ohc.network/concepts/clinical/consent/",
+        "finding": "Consent includes DNR, advance directives and a backend comfort-care category. Current docs flag comfort-care selection and patient/family verification UI as gaps. These data fields do not establish legal validity."
+      },
+      {
+        "url": "https://docs.ohc.network/flows/clinical/consent/verify-a-consent/",
+        "finding": "CARE can store Family/Validation verification, but documentation says its current web UI cannot add/show/remove it. Backend staff attribution alone does not prove that a patient personally authenticated or signed."
+      }
+    ],
+    "sourceInspection": {
+      "backendRevision": "2bae933466a0bdc2f49504e298b87cca537a1407",
+      "frontendRevision": "4ad8f0117f5abcbd903454e01bde7e593b630404",
+      "backendSpec": "https://github.com/ohcnetwork/care/blob/2bae933466a0bdc2f49504e298b87cca537a1407/care/emr/resources/consent/spec.py",
+      "frontendCategories": "https://github.com/ohcnetwork/care_fe/blob/4ad8f0117f5abcbd903454e01bde7e593b630404/src/types/consent/consent.ts",
+      "frontendDetail": "https://github.com/ohcnetwork/care_fe/blob/4ad8f0117f5abcbd903454e01bde7e593b630404/src/pages/Encounters/ConsentDetail.tsx",
+      "finding": "Inspected source agrees that comfort-care selection/verification UI is absent while backend/API structures exist. This was static inspection, not a live CARE test. Do not infer strict backend immutability or verifier ownership guarantees from UI/documentation descriptions without testing the actual target version."
+    },
+    "recommendation": {
+      "position": "A source-linked goals-of-care conversation, exact-note clinician review and patient/family confirmation workflow is a candidate focused extension. Its uniqueness and clinical value need comparison and validation; CARE already has substantial overlap.",
+      "developerMeaning": "A plugin adds a focused feature inside CARE: a federated React screen and, if needed, a Django backend module. The existing Kotlin/Compose Sahara app can instead remain separate and connect through an explicitly implemented authenticated API integration. It is not integrated today.",
+      "costBoundary": "MIT-licensed core code does not include free hosted operations or external AI accounts. Hosting, maintenance, training and safe clinical rollout remain real work; no new cost commitment is authorised.",
+      "sustainabilitySource": "https://ohc.network/ecosystem/implementation-partners",
+      "sustainability": "Institution-funded implementation, configuration, training and support is a possible model compatible with free basic patient access. It is a proposed model, not an agreed customer contract."
+    },
+    "phase2Email": {
+      "date": "2026-10-21 16:54 IST",
+      "subject": "Health-a-thon 2026 | Phase 2 Final Submission Template – Top 150 Teams",
+      "originalAttachment": "source-materials/healthathon-phase-2/Health-a-thon-2026-Phase-2-Submission-Template-original.pptx",
+      "originalBytes": 101320,
+      "originalSha256": "1ABDBA1A2E2FDFF6FEA96544325C7AFB409CD99CD403053FBD79E8DC18735F60",
+      "slides": 13,
+      "filledDraft": "submission/phase-2/final/Sahara-Healthathon-Phase-2-first-filled-draft-v2.pptx",
+      "draftGapsAndSources": "submission/phase-2/README.md",
+      "draftState": "First filled local review copy; not submitted. Team discussion, costing and clinical/runtime validation still needed.",
+      "requirement": "All teams must use the template and substantiate actual MVP/AI progress, evaluation, limitations and deployment assumptions. Submission process, deadline and assessment details will follow separately; no deadline is invented here.",
+      "userDirection": "Fill verified fields now, carry previous slide information forward, leave team discussion/biographies/photos for later. User explicitly selected Yes for sharing solution information on the programme website; this does not authorise disclosure of private records or credentials."
+    }
   }
 }

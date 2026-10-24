@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "preparedOn": "2026-10-24",
+  "status": "Source disclosure review and release-text drafts; deployment, signed package and store submission are separate parent-owned checks.",
+  "applicationId": "in.wedevit.sahara",
+  "versionName": "0.6.0",
+  "versionCode": 7,
+  "sourceHead": "258099c8e145df6cfcc793a2001fa05b4b8b6241",
+  "sourceFreeze": {
+    "scope": "Only prototype/app/privacy/page.tsx is frozen by this agent. Android and release metadata are being changed concurrently by other agents.",
+    "privacyPath": "prototype/app/privacy/page.tsx",
+    "privacySha256": "7BA2F6567F4F1BB52C33A373BAC4850D5603545D0364AAC6E720ED9F15F755D5"
+  },
+  "verifiedFacts": {
+    "directory": {
+      "file": "android/app/src/main/assets/india.json",
+      "count": 1631,
+      "stateAndUnionTerritoryCount": 36,
+      "snapshotDate": "2026-10-20",
+      "individualSourceCheckDates": [
+        "2026-10-02",
+        "2026-10-20"
+      ],
+      "sources": [
+        "Pallium India",
+        "IAPC"
+      ],
+      "boundary": "Published listings, not independently verified current services or morphine stock."
+    },
+    "offlineAsr": {
+      "model": "Qwen3-ASR 0.6B int8",
+      "runtime": "sherpa-onnx 1.13.8",
+      "downloadBytes": 987015347,
+      "files": 6,
+      "revision": "68818b2313fe77bd06f6a7c5068ff3ef59d02b8a",
+      "source": "https://huggingface.co/csukuangfj2/sherpa-onnx-qwen3-asr-0.6B-int8-2026-03-25",
+      "requires64Bit": true,
+      "minimumAvailableMemoryBytes": 2684354560,
+      "network": "Fixed public model-file GETs to Hugging Face/CDN; IP/network metadata and requested file are visible to those hosts. Audio and care text are not request parameters.",
+      "processing": "Local inference after verified model download; no cloud audio fallback.",
+      "sourceFiles": [
+        "android/app/src/main/java/in/wedevit/care/OfflineSpeechRules.kt",
+        "android/app/src/main/java/in/wedevit/care/OfflineSpeechModelStore.kt",
+        "android/app/src/main/java/in/wedevit/care/OfflineConversationTranscriber.kt"
+      ]
+    },
+    "symptomDiary": {
+      "storage": "Existing checkin care records; unsigned-in data local, signed-in data saved through existing care sync and sharing permissions.",
+      "sourceFiles": [
+        "android/app/src/main/java/in/wedevit/care/CareSymptomData.kt",
+        "android/app/src/main/java/in/wedevit/care/CareSymptomUi.kt",
+        "android/app/src/main/java/in/wedevit/care/CareModel.kt"
+      ],
+      "boundary": "Personal notes and context-matched comparisons, not a validated clinical questionnaire, diagnosis or risk score."
+    },
+    "mlKit": {
+      "bundledOcr": [
+        "com.google.mlkit:text-recognition:16.0.1",
+        "com.google.mlkit:text-recognition-devanagari:16.0.1"
+      ],
+      "translation": "com.google.mlkit:translate:17.0.3",
+      "localInputs": "Selected photos, recognised words and translation input/output are processed locally; local processing alone is not audio/photo collection.",
+      "telemetry": "Technical usage metrics, diagnostics, app/device details, per-installation identifiers and configured source/destination languages go to Google. No app-level telemetry opt-out. Startup provider present in debug merged manifest; final release manifest verification remains parent-owned.",
+      "manifestEvidence": "android/app/build/intermediates/merged_manifest/debug/processDebugMainManifest/AndroidManifest.xml",
+      "sourceFiles": [
+        "android/app/build.gradle.kts",
+        "android/app/src/main/java/in/wedevit/care/CareBilingualOcr.kt",
+        "android/app/src/main/java/in/wedevit/care/CareOfflineTranslation.kt"
+      ]
+    },
+    "clinicalAccess": {
+      "boundary": "Independently authorised clinician verification does not replace the patient's separate invitation and current permissions.",
+      "sourceFile": "android/app/src/main/java/in/wedevit/care/CareSharedUi.kt"
+    }
+  },
+  "dataSafety": {
+    "state": "Parent reports the corrected Google Play fields were already saved this turn; this agent did not edit or independently re-verify the live form.",
+    "preserveSavedChanges": [
+      "App interactions includes Analytics.",
+      "Diagnostics and device/other IDs are required because ML Kit initialises with the app and no app-level opt-out exists.",
+      "Device/other IDs includes Analytics.",
+      "Preserve existing optional health-data declaration for optional account sync/sharing.",
+      "Do not add patient audio/photo collection solely for local OCR, local transcription or translation."
+    ],
+    "retainedScope": "Existing survey, feedback, report, account, sharing, clinician review and deletion disclosures preserved."
+  },
+  "drafts": {
+    "fullDescription": "Sahara — A Palliative Care Companion\n\nKeep goals-of-care conversations, daily care and useful information together for patients, families and care teams.\n\nKeep the words that matter\nRecord a conversation with everyone's permission, dictate a speaker's turn on a supported phone, or type it. Review the original words, keep earlier note versions and share the exact version you discussed. In shared care, clinical review requires independent clinician approval and a separate patient invitation. Patient and family confirmations are recorded separately.\n\nFollow daily care\nKeep prescribed medicines, appointments, questions and tasks together. Add personal symptom notes with a 0–10 rating or an unrated response, the time, who answered and any words you want to keep. Compare entries with matching context and share them with your care team. The diary does not diagnose symptoms or calculate a clinical risk score. Optional Android reminders can be delayed by phone settings and are not an emergency service.\n\nFind palliative care centres\nBrowse 1,631 published listings across 36 Indian states and union territories. Search the list, open a map, call a centre or get directions. Listings include dated sources and do not confirm current services or medicine stock. Call before travelling.\n\nKeep and read your reports\nAdd PDFs or photos to Documents. Read printed English and Hindi text on your phone, compare it with the original and correct it before saving medicine details or copied facts. Original report files stay on the phone unless you choose to share a copy.\n\nOptional Hindi and English tools\nTranscribe a saved, consented recording locally with Qwen3-ASR after a separate 987 MB model download. This requires a supported 64-bit phone and sufficient free memory. There is no cloud speech fallback. Check names, numbers and mixed-language words against the recording before using the text.\nOptional Hindi–English translation runs on your phone after a language-pack download. The original remains available. Machine translation is not a clinical interpretation.\n\nChoose what you share\nBasic records work without an account. Sign in to save care records and share permitted information with people you invite. Symptom notes saved in that account follow its sharing rules. Unsent phone drafts, recordings and original report files are not automatically uploaded. Text you explicitly save or send to shared care is stored with your account. There are no ads. Google ML Kit sends technical usage metrics and diagnostics as explained in the privacy policy.\n\nSahara is not a medical device. It does not diagnose, treat, cure or prevent a medical condition, recommend treatment or replace professional medical care. Ask a qualified healthcare professional for medical advice. Care notes record a discussion; they are not prescriptions or legal directives.",
+    "releaseNotes": "Add personal symptom notes with ratings, context-matched comparisons and sharing. Browse 1,631 published care-centre listings across 36 states and union territories. Optional Hindi/English recording transcription runs on your phone after a 987 MB download. Read printed Hindi/English text, use offline translation and set care reminders. Shared clinical review requires independent clinician approval and a patient invitation. Check recognised words against the original.",
+    "reviewerInstructions": "Use fictional data. Basic notes and directory work without sign-in. More > Your account: use the review credentials already supplied in App access for sync/sharing. Today > Symptom tracker adds, edits and shares personal notes. Doctor preview is fictional, separate from the account. Real clinical review requires independent clinician approval plus the patient's invitation. Optional audio transcription needs a 987 MB download, 64-bit phone and 2.5 GiB free memory; audio stays on the phone.",
+    "reviewerNotes": [
+      "Keep the actual review-account credentials in Play App access; none are copied into this artifact. The prefilled Doctor preview credentials are synthetic and do not sign into a real account.",
+      "In Symptom tracker, create a note, choose a rating or Not rated, save, reopen/edit and share using fictional information. Signed-in notes use the existing account's permissions.",
+      "For saved audio, record with permission, stop, choose the optional language download, then Transcribe recording. The six model files total 987,015,347 bytes. Runtime checks require a 64-bit process and at least 2.5 GiB available memory. A model/device limitation must not be treated as a completed transcript.",
+      "Read prescription uses bundled Latin/Devanagari OCR. Hindi–English reading downloads Google's translation model; input/output text is processed locally. Correct recognised/translated text against the original.",
+      "The shared clinical review flow needs a genuinely independently approved clinician account and an explicit patient invitation. Existing App access credentials must cover any restricted flow reviewers are expected to exercise; this artifact does not establish that a clinician reviewer account has been approved.",
+      "The directory contains public dated listings, not confirmation of current medicine stock. Original report files and recordings remain on the phone unless the user explicitly shares them through another app. Cloud patient-audio and photo-scanning providers remain disabled."
+    ],
+    "characterCounts": {
+      "fullDescription": 2857,
+      "releaseNotes": 471,
+      "reviewerInstructions": 493
+    }
+  },
+  "references": [
+    {
+      "url": "https://developers.google.com/ml-kit/android-data-disclosure",
+      "checkedOn": "2026-10-24",
+      "use": "Technical metrics, identifiers, event types, configured translation languages, Firebase configuration/installation services."
+    },
+    {
+      "url": "https://developers.google.com/ml-kit/terms",
+      "checkedOn": "2026-10-24",
+      "use": "Input data and outputs processed on device; technical metrics sent to Google."
+    },
+    {
+      "url": "https://developers.google.com/ml-kit/language/translation/android",
+      "checkedOn": "2026-10-24",
+      "use": "On-demand translation model download and local translation API."
+    }
+  ],
+  "checks": {
+    "nextInstructions": "Read prototype/AGENTS.md and installed metadata guide before editing.",
+    "directoryCounts": "Passed against actual india.json, not just its summary manifest.",
+    "asrBytes": "Passed: summed the six pinned model-file sizes to 987015347.",
+    "scopedLint": "Passed: node node_modules/eslint/bin/eslint.js app/privacy/page.tsx exited 0 with no diagnostics.",
+    "scopedDiffCheck": "Passed: final git diff --check for prototype/app/privacy/page.tsx after the directory-date correction.",
+    "preservation": "Existing survey/report/account sections retained. No backend, provider, billing, auth callback, store-draft or signing changes.",
+    "notPerformed": [
+      "No local build or Android rebuild.",
+      "No browser QA or live deployment by this agent.",
+      "No actual model download, ASR/OCR/translation execution or device QA by this agent.",
+      "No Google Play submission or account/provider changes."
+    ],
+    "artifactIgnore": "The requested path was not matched by current Git ignore rules when checked; left unstaged and parent notified.",
+    "disclosureArtifact": "Passed: valid JSON; all 15 existing privacy sections retained; final privacy SHA-256 matches source freeze; description (2857), release notes (471) and reviewer instructions (493) fit their respective 4000/500/500-character limits."
+  }
+}

@@ -1,5 +1,5 @@
 {
-  "status": "Production 0.4.1 (5), release ID 1, is live in India with Install enabled. The authorised 0.5.0 (6) Production update, release ID 2, is now Changes in review, verified on 19 October 2026 with its matching listing, screenshots, reviewer flow and Calendar events disclosure. This is submission, not 0.5 approval. Its existing Alpha draft 4 is unchanged. All 59 tester invitations were already sent; do not resend. Photo scanning and release cloud audio stay off.",
+  "status": "Production0.5.0(6), release2, is Available on Google Play at100% India rollout, verified live24OctoberIST. Next0.6.0(7) productiondraft3 is in preparation, not uploaded/submitted. All59 earlier tester invitations remain complete; do not resend.",
   "preparedOn": "2026-10-10",
   "workingTitle": "Sahara: Palliative Companion",
   "fullProductName": "Sahara — A Palliative Care Companion",
@@ -7,15 +7,16 @@
   "accountDeletionUrl": "https://sahara.wedevit.in/delete-account",
   "titleFinal": true,
   "shortDescription": "Sahara: A Palliative Care Companion. Care notes and daily support for families.",
-  "fullDescription": "Sahara: A Palliative Care Companion\n\nFor patients, families and doctors.\n\nKeep the words that matter from a goals-of-care conversation. A doctor can review the note and save a version. The patient or family can read and confirm that same version. Earlier notes and the original conversation stay available.\n\nRecord a conversation with everyone's permission, or type the words you want to keep. Add prescribed medicines, visits, questions, tasks and daily notes. Find listed palliative care centres in Karnataka, call them or get directions. Directory entries do not confirm current medicine stock.\n\nKeep PDFs and photos together in Documents. Find a report by name, then open it or share a copy with your care team. Report files stay on your phone and are not synced to other devices.\n\nSign in to save care notes and daily entries to your account. Invite family or care team members to read them, or allow them to make changes. Recordings and unfinished conversations are not uploaded. Find centres on a MapLibre map or in the list. There are no ads. This version does not transcribe audio automatically, verify clinician identity or send medicine reminders.\n\nThis app is not a medical device. It does not diagnose, treat, cure or prevent any medical condition, recommend treatment or replace professional medical care. Ask a qualified healthcare professional for medical advice. Care notes record a discussion; they are not prescriptions or legal directives.",
+  "fullDescription": "Sahara — A Palliative Care Companion\n\nKeep goals-of-care conversations, daily care and useful information together for patients, families and care teams.\n\nKeep the words that matter\nRecord a conversation with everyone's permission, dictate a speaker's turn on a supported phone, or type it. Review the original words, keep earlier note versions and share the exact version you discussed. In shared care, clinical review requires independent clinician approval and a separate patient invitation. Patient and family confirmations are recorded separately.\n\nFollow daily care\nKeep prescribed medicines, appointments, questions and tasks together. Add personal symptom notes with a 0–10 rating or an unrated response, the time, who answered and any words you want to keep. Compare entries with matching context and share them with your care team. The diary does not diagnose symptoms or calculate a clinical risk score. Optional Android reminders can be delayed by phone settings and are not an emergency service.\n\nFind palliative care centres\nBrowse 1,631 published listings across 36 Indian states and union territories. Search the list, open a map, call a centre or get directions. Listings include dated sources and do not confirm current services or medicine stock. Call before travelling.\n\nKeep and read your reports\nAdd PDFs or photos to Documents. Read printed English and Hindi text on your phone, compare it with the original and correct it before saving medicine details or copied facts. Original report files stay on the phone unless you choose to share a copy.\n\nOptional Hindi and English tools\nTranscribe a saved, consented recording locally with Qwen3-ASR after a separate 987 MB model download. This requires a supported 64-bit phone and sufficient free memory. There is no cloud speech fallback. Check names, numbers and mixed-language words against the recording before using the text.\nOptional Hindi–English translation runs on your phone after a language-pack download. The original remains available. Machine translation is not a clinical interpretation.\n\nChoose what you share\nBasic records work without an account. Sign in to save care records and share permitted information with people you invite. Symptom notes saved in that account follow its sharing rules. Unsent phone drafts, recordings and original report files are not automatically uploaded. Text you explicitly save or send to shared care is stored with your account. There are no ads. Google ML Kit sends technical usage metrics and diagnostics as explained in the privacy policy.\n\nSahara is not a medical device. It does not diagnose, treat, cure or prevent a medical condition, recommend treatment or replace professional medical care. Ask a qualified healthcare professional for medical advice. Care notes record a discussion; they are not prescriptions or legal directives.",
   "categoryProposal": "Medical",
   "healthDeclarationFeaturesToReview": [
+    "Diseases and Conditions Management",
     "Healthcare Services and Management",
     "Medication and Treatment Management"
   ],
   "dataSafetyEvidence": {
     "internetPermission": true,
-    "analyticsOrAdvertisingSdk": false,
+    "analyticsOrAdvertisingSdk": "ML Kit technical diagnostics and usage analytics; no advertising SDK",
     "clinicalDataSentToDeveloper": true,
     "storage": "Room cache; signed-in care records stored in Supabase. Audio and unfinished conversations remain app-private.",
     "userInitiatedSharing": "Private single-use invitations with read or edit permission; Android share sheet for care notes and invitation codes.",
@@ -26,7 +27,7 @@
       "ACCESS_NETWORK_STATE for map connectivity",
       "RECORD_AUDIO, requested only to record"
     ],
-    "note": "Original disclosure saved on 10 October. On 19 October, the 0.5 assessment added optional, non-ephemeral Calendar events collection for App functionality because signed-in schedule entries are cloud records. Existing health, account, UGC and provider metadata categories are retained. Audio/photo uploads remain disabled."
+    "note": "0.6 Data safety preview saved24OctoberIST: App interactions forAnalytics added; Diagnostics andDevice IDs required; IDsAnalytics added. Health/account/calendar/UGC/provider-location categories retained. Local photo/audio contents not collected solely by on-device processing. Full release not submitted."
   },
   "releaseDependencies": [
     "Production 0.4.1 (5) is published in India, verified on 19 October 2026 in Console and on the public listing with Install enabled. Closed testing and both authorised invitation groups are complete. No new installation or tester-participation verification was performed.",
@@ -53,7 +54,7 @@
   "appContentDraft": {
     "containsAds": false,
     "appAccess": "Some functionality is restricted. Basic notes, daily care and the directory work without sign-in; account sync and invitations require sign-in. A dedicated reviewer account has confirmed email, successful password sign-in and an authorised empty care-record read. Its credentials were saved privately in Play's reviewer instructions after explicit user approval.",
-    "reviewInstructions": "Use fictional data. More > Your account: sign in and add a person. Talk: type, link excerpts, Doctor review/save, Patient confirm, then Family confirm. Today: Care team, Calendar, Lab history. Doctor login is a separate fictional preview; roles are self-entered. Dictation and offline read aloud require installed services. Saved audio is not transcribed. Photo scanning, cloud audio and medicine reminders are off. Documents stay on this phone. No payment/OTP.",
+    "reviewInstructions": "Use fictional data. Basic notes and directory work without sign-in. More > Your account: use the review credentials already supplied in App access for sync/sharing. Today > Symptom tracker adds, edits and shares personal notes. Doctor preview is fictional, separate from the account. Real clinical review requires independent clinician approval plus the patient's invitation. Optional audio transcription needs a 987 MB download, 64-bit phone and 2.5 GiB free memory; audio stays on the phone.",
     "targetAudienceProposal": "18 and over: adult patients, family caregivers and care professionals",
     "healthApp": true,
     "medicalDevice": false,
@@ -64,7 +65,7 @@
   },
   "dataSafetyDraft": {
     "formSubmitted": true,
-    "submissionStatus": "Existing disclosures were published with 0.4.1. The 0.5 update adds optional non-ephemeral Calendar events for App functionality; saved and included in Changes in review on 19 October. Prior account-classification rejections remain history.",
+    "submissionStatus": "0.6 SDK disclosure changes saved successfully in Publishing overview on24OctoberIST; not yet sent for review. Previous health/account/calendar declarations retained.",
     "specificDataDeletionUrl": "https://sahara.wedevit.in/delete-account#specific",
     "collectsData": true,
     "encryptedInTransit": true,
@@ -132,28 +133,37 @@
       },
       {
         "type": "Device or other IDs",
-        "optional": true,
+        "optional": false,
         "ephemeral": false,
         "purposes": [
           "App functionality",
-          "Fraud prevention, security, and compliance"
+          "Fraud prevention, security, and compliance",
+          "Analytics"
         ]
       },
       {
         "type": "Diagnostics",
-        "optional": true,
+        "optional": false,
         "ephemeral": false,
         "purposes": [
           "App functionality",
           "Analytics",
           "Fraud prevention, security, and compliance"
         ]
+      },
+      {
+        "type": "App interactions",
+        "optional": false,
+        "ephemeral": false,
+        "purposes": [
+          "Analytics"
+        ]
       }
     ],
-    "optionalReason": "The app works without an account. Account and care types leave the device for signed-in records or account requests. Provider network metadata is processed when the user uses account or map features.",
+    "optionalReason": "Account/care/calendar/user-content collection is optional because unsigned-in flows remain. ML Kit technical diagnostics, installation identifiers and API-event usage metrics are declared required conservatively: the merged manifest initializes ML Kit at startup and the app offers no SDK telemetry opt-out. No claim that all provider processing is ephemeral.",
     "sharingAssessment": "Supabase processes signed-in records as a service provider. Care invitations and Android exports are explicit user-initiated sharing. Apply Google's stated exceptions rather than claiming that data never leaves the app.",
     "audio": "Recordings remain on the device and are not collected by this version.",
-    "networkMetadata": "Provider sources checked on 10 October 2026: Supabase API logs capture IP, user-agent, IP-derived location and request diagnostics. OpenFreeMap normally omits IP from access logs, but can retain IP in error or security-incident logs. Therefore do not claim all processing is ephemeral. Network identifier and diagnostic categories conservatively cover these service logs; there is no advertising or client analytics SDK.",
+    "networkMetadata": "Supabase/map provider metadata declarations retained. Bundled OCR and optional ML Kit translation can send technical diagnostics, installation IDs, API events and configured languages to Google over HTTPS. Optional local ASR model downloads expose request/IP metadata to Hugging Face/CDN hosts; audio and text are not uploaded by that processing.",
     "location": "Approximate location is declared because Supabase infrastructure can log IP-derived city/country metadata. The app does not read GPS. The selected map area alone is not the user's physical location.",
     "optionalPhotoProcessing": "Patient photo uploads are currently disabled at the public proxy. Existing report files are stored privately on the phone; explicit Android exports are user-initiated. Do not enable scanner uploads until Gemini/provider terms and an accurate Photos/Health info declaration have been reviewed and saved."
   },
@@ -203,279 +213,94 @@
   },
   "applicationId": "in.wedevit.sahara",
   "nextBuild": {
-    "version": "0.5.0",
-    "versionCode": 6,
-    "built": true,
-    "ready": true,
-    "uploaded": true,
-    "submitted": true,
+    "version": "0.6.0",
+    "versionCode": 7,
+    "built": false,
+    "ready": false,
+    "uploaded": false,
+    "submitted": false,
     "installed": false,
-    "status": "Signed 0.5.0 (6) reused from the Play library for Production release 2. All four changes are Changes in review as of 19 October, after the matching listing/screenshots/reviewer instructions and Calendar events disclosure were saved. No duplicate bundle upload. Existing Alpha draft 4 stays unsubmitted. Production 0.4.1 remains live; 0.5 approval/publication is not yet confirmed.",
-    "apk": "output/android/Sahara-0.5.0-release.apk",
-    "bundle": "output/android/Sahara-0.5.0.aab",
-    "sourceCommit": "ebffb7b043a5e8725f190ab8f8f3574c768d9058",
-    "listingDraft": {
-      "fullDescription": "Sahara: A Palliative Care Companion\n\nFor patients, families and doctors.\n\nKeep the words that matter from a goals-of-care conversation. Type the conversation, record it with everyone's permission, or dictate one selected speaker's turn on a supported phone. Check the words and build the note from exact source excerpts. A doctor can review and save a version; the patient confirms first, then family can add separate confirmations of that same version. Names and roles are self-entered, not verified credentials or legal consent. Earlier versions and their original words remain available.\n\nAsk the care team to talk, pick up a request and keep named tasks with acceptance and completion status. Plan visits, tests, procedures and follow-ups in a dated calendar. Enter numeric lab results with the report's units and printed ranges, and view values over time. Lab history does not interpret results or recommend treatment. Add prescribed medicines, check-ins, questions and daily notes. Medicine reminders are not available.\n\nDocuments keeps user-selected PDFs and photos together. Open a report or share a copy using Android. Report files and recordings remain private phone copies and do not sync to other devices. Saved recordings are not automatically transcribed. Read aloud uses an installed offline voice and does not translate. Live dictation requires an installed on-device recognition service; typing and recording remain available when it is unsupported.\n\nSign in to save care notes and daily entries to your account. Invite family or care team members to read them or allow changes. Conversation requests and tasks are shared records, not dispatched calls or email. Unfinished conversations are not uploaded.\n\nFind listed palliative care centres in Karnataka on a MapLibre map or in the list. Call a centre or get directions. Directory entries do not confirm current medicine stock. There are no ads. Photo scanning is currently off; medicines can be entered manually.\n\nDoctor login opens an isolated fictional preview for exploring scheduling and note review. Its sample records and marked preview PDFs are not verified clinical records or connected patient accounts.\n\nThis app is not a medical device. It does not diagnose, treat, cure or prevent a condition, recommend treatment or replace professional medical care. Ask a qualified healthcare professional for medical advice. Care notes record a discussion; they are not prescriptions or legal directives.",
-      "releaseNotes": "New care-team requests and named tasks, calendar and numeric lab history. Build notes from exact conversation excerpts; patient and family confirm the same version. Supported phones can dictate a selected speaker and read notes aloud offline. Explore the separate fictional doctor workspace. Cloud audio and photo scanning stay off.",
-      "reviewInstructions": "Use fictional information. Basic care works without signing in; the approved reviewer login enables shared records. Add a person, use Talk to type a conversation or consent to on-device dictation if supported, and assign exact source excerpts to the note. Select Doctor to review and save. Open that note, confirm as Patient first, then add a separate Family / carer confirmation. Names and roles are self-entered, not verified credentials or legal consent. Today shortcuts open Care team, Calendar and Lab history. Create a conversation request, pick it up in Doctor view, and save a dated task or numeric lab result with the report's units/ranges. Documents adds, opens and shares phone-private copies. Photo scanning is off; use manual medicine entry. Dictation availability depends on an installed on-device service; saved M4A audio is not transcribed. Read aloud requires an installed offline voice and does not translate. No medication notifications, payment or location restriction. Doctor login opens a separate fictional local preview; it does not grant clinical access. Release builds cannot upload recordings or run online audio transcription.",
-      "dataSafetyAssessment": "Added Calendar events as collected, optional, non-ephemeral, for App functionality on 19 October. Signed-in calendar title/detail/due fields pass through CareModel to CareCloud and Supabase; this is not phone-private. Google's Calendar definition covers event notes independently of Android Calendar permissions. Existing Health info, Name and Other user-generated content categories remain for labs, requests, tasks and confirmations. On-device recognition/offline text-to-speech have no cloud fallback. Photo scanning stays off. Medical and provider-metadata declarations remain unchanged.",
-      "privacyDeployment": "dpl_6orhhiq4eQnLGSy2kGJLzwzBibsC; both domains and mobile 375/390 checks passed, including local preview retention",
-      "savedInPlay": true,
-      "savedOn": "2026-10-19",
-      "reviewInstructionsSavedInPlay": "Use fictional data. More > Your account: sign in and add a person. Talk: type, link excerpts, Doctor review/save, Patient confirm, then Family confirm. Today: Care team, Calendar, Lab history. Doctor login is a separate fictional preview; roles are self-entered. Dictation and offline read aloud require installed services. Saved audio is not transcribed. Photo scanning, cloud audio and medicine reminders are off. Documents stay on this phone. No payment/OTP.",
-      "reviewerCredentialsUnchanged": true
-    },
-    "changes": [
-      "Consented on-device speaker-turn dictation on supported Android devices",
-      "Exact source-linked care-note excerpt review",
-      "Offline-voice read aloud",
-      "Patient-first and separate family confirmations on an immutable note version",
-      "Shared conversation request queue and named task status",
-      "Dated calendar and numeric lab history with printed ranges and report links",
-      "Merged fictional offline doctor workspace with scheduling, source review and marked preview PDF export",
-      "Preserving Room schema 6 migrations for both earlier branches",
-      "Full-height care editors for keyboard entry"
-    ],
-    "limits": [
-      "No connected generative draft model or saved-audio transcription",
-      "No translation, automatic speaker identification or verified clinician identity",
-      "Photo scanning remains off; report/audio files remain phone-private",
-      "No medicine notification schedule",
-      "Web workspace is not yet using the native shared record model",
-      "Care-team clients need 0.5 to render its structured lab/request/task entries; 0.4 renders them as ordinary task details",
-      "Ordinary signup/reset email delivery remains limited; paused Zoho and unapproved callback remain unchanged",
-      "Doctor workspace uses fictional local sample records; it is separate from real care accounts",
-      "Release builds block cloud audio in the interface, model and transport; upstream synthetic developer code is not public patient functionality"
-    ],
-    "verification": {
-      "backendMigration": "20261016065132_patient_first_version_confirmations.sql deployed after authorised project restore",
-      "sqlSuites": [
-        "patient_first_confirmations PASS",
-        "care_permissions PASS"
-      ],
-      "service": "Reviewer sign-in and authenticated read PASS, no patient data printed",
-      "unitTests": {
-        "tests": 104,
-        "suites": 16,
-        "failures": 0,
-        "errors": 0,
-        "skipped": 0,
-        "result": "PASS",
-        "report": "output/android/verification/0.5.0/combined-build-checks.json"
-      },
-      "fullLint": {
-        "errors": 0,
-        "warnings": 37,
-        "result": "PASS",
-        "variant": "debug",
-        "vitalReleaseTaskPassed": true,
-        "separateReleaseXmlCollected": false,
-        "report": "output/android/verification/0.5.0/combined-build-checks.json"
-      },
-      "cloudRoundtrip": "PASS: synthetic lab/request/task payloads, task revisions, immutable note and separate confirmations; exact fixture cleanup. output/android/verification/0.5.0-cloud-roundtrip.json",
-      "runtime": "35 latest passing Android test identities and one expected credential-dependent skip across six runs of unchanged original app code; not a single clean 36-test run. Exact-version publish/persistence, Privacy after actual Saved snackbar dismissal, optimized IME/restart and doctor publication/PDF/exit stages passed. Separate five-page/130-line PDF passed. No real speech/provider, physical-device or 16 KB runtime validation.",
-      "buildMemory": "Local compilation was interrupted under shared-host memory pressure. Unsigned packages and checks completed on a standard GitHub runner; the upload key stays local. Current CI source and runtime evidence are recorded separately; no Windows emulator was restarted.",
-      "releaseBuild": {
-        "result": "PASS: actual current-source CI APK/AAB, local upload-key signatures and static checks verified",
-        "log": "https://github.com/basithladdu/healthathon/actions/runs/38881300006",
-        "tasks": "assembleRelease, bundleRelease, lintVitalRelease",
-        "artifactReport": "output/android/verification/0.5.0-artifacts.json",
-        "packageVersionSignerAndSignatures": "PASS: in.wedevit.sahara, 0.5.0 (6), non-debuggable APK, APK v2/v3 and AAB JAR signature; same upload signer as 0.4.1",
-        "static16KbZipAndElfAlignment": "PASS: ZIP alignment and all four 64-bit ELF libraries; native bytes unchanged. Runtime page-size validation is separate.",
-        "runtime16KbVerified": false,
-        "releaseCloudAudioEnabled": false
-      },
-      "ciBuild": {
-        "runId": 38881300006,
-        "url": "https://github.com/basithladdu/healthathon/actions/runs/38881300006",
-        "conclusion": "success",
-        "sourceCommit": "ebffb7b043a5e8725f190ab8f8f3574c768d9058",
-        "appSourceTree": "90adbbf8c22aa5f659b2d8c58baf4bd19fbd2b2b",
-        "signingMaterialUploaded": false
-      },
-      "historicalBaseline4758218": {
-        "unitTests": {
-          "tests": 39,
-          "failures": 0,
-          "errors": 0,
-          "skipped": 0
-        },
-        "fullLint": {
-          "errors": 0,
-          "warnings": 33,
-          "result": "PASS",
-          "log": "android/sahara-050-lint-lowmem.log"
-        },
-        "qualification": "Earlier branch only; superseded pre-keyboard artifacts are recorded separately. These counts do not verify combined source."
-      },
-      "focusedRuntime": {
-        "runId": 38887001702,
-        "url": "https://github.com/basithladdu/healthathon/actions/runs/38887001702",
-        "harnessCommit": "f597392e0ebc48df9355d5ba550da3cc006a1b37",
-        "buildSourceCommit": "ebffb7b043a5e8725f190ab8f8f3574c768d9058",
-        "status": "Completed: two passes and two further stale assertions. Optimized doctor publication/PDF/exit passed. Original failed run preserved.",
-        "qualification": "Four corrected expectations plus unfinished optimized doctor PDF/exit; original passing checks preserved separately."
-      },
-      "remainingRuntime": {
-        "runId": 38888372729,
-        "url": "https://github.com/basithladdu/healthathon/actions/runs/38888372729",
-        "harnessCommit": "f8350bceab98f93c190b3d0c3ff0fc0ca49842cb",
-        "status": "Completed: one pass, one Privacy-panel failure; preserved without claiming success.",
-        "scope": "Only the two remaining corrected instrumentation checks; passing optimized/PDF checks are not repeated."
-      },
-      "privacyRuntime": {
-        "runId": 38889436917,
-        "status": "Completed: zero passes and one failure at Hide Privacy.assertExists; expansion diagnostics not reached.",
-        "report": "output/android/verification/0.5.0/ci-runtime-38889436917/inspection.json"
-      },
-      "privacyRuntimeRetry": {
-        "runId": 38890430027,
-        "url": "https://github.com/basithladdu/healthathon/actions/runs/38890430027",
-        "harnessCommit": "e0fe533",
-        "status": "Completed: zero passes, one intercepted touch. Screenshot and semantics confirm Saved snackbar covered the Privacy tap centre.",
-        "scope": "Clickable Privacy header with before/after evidence; original app unchanged.",
-        "report": "output/android/verification/0.5.0/ci-runtime-38890430027/inspection.json"
-      },
-      "privacyRuntimeAfterSnackbar": {
-        "runId": 38891431772,
-        "url": "https://github.com/basithladdu/healthathon/actions/runs/38891431772",
-        "harnessCommit": "ddb5c84",
-        "status": "success",
-        "scope": "Wait for actual Saved message dismissal; same real header click, Hide and body assertions.",
-        "passed": 1,
-        "failures": 0,
-        "errors": 0,
-        "skipped": 0,
-        "matrixComplete": true,
-        "finishedAtUtc": "2026-10-16T11:12:28.683321Z",
-        "report": "output/android/verification/0.5.0/ci-runtime-38891431772/inspection.json"
-      },
-      "runtimeReport": "output/android/verification/0.5.0/combined-runtime-checks.json"
+    "status": "Authorised production update in preparation; native personal symptom diary is being added. A signed release bundle has not yet been verified.",
+    "playDraft": {
+      "trackId": "4697314269892725425",
+      "releaseId": 3,
+      "draftUrl": "https://play.google.com/console/u/1/developers/8795679408143615220/app/4974759245808215344/tracks/4697314269892725425/releases/3/prepare",
+      "created": true
     },
     "releasePrerequisites": [
-      "Build/signatures/static and stated emulator checks complete; no physical-device, real speech/provider or clinical validation.",
-      "Verified bundle already uploaded once and saved in Alpha release 4. Reuse it; do not reupload or resend the 59 invitations.",
-      "Production 0.5 release 2 is now Changes in review with matching listing/reviewer material and corrected Calendar events disclosure. Do not upload, withdraw, duplicate or resubmit it while review is pending. Keep cloud audio and photo scanning off."
+      "Finish and check native symptom diary.",
+      "Build and verify actual signed release APK/AAB with existing upload key.",
+      "Update accurate0.6 listing, review instructions, privacy and Data safety before submission.",
+      "No cloud patient-audio/photo provider activation, billing or auth/callback changes."
     ],
-    "supersededPreKeyboardBuild": {
-      "sourceCommit": "4758218",
-      "apkSha256": "1A55AE8225525574732BB54340E60D24386B88006E5EFA07F077E64266516995",
-      "bundleSha256": "5B81B459658CDEF443F61697603DED8229D65078C8D8BA4821CA6D8710361EC3",
-      "reason": "Release smoke found avoidable partial-sheet expansion after keyboard entry. New Schedule/Labs/Workflow editors now match the existing full-expansion pattern."
+    "disclosures": {
+      "sourceAudit": "output/android/verification/0.6.0/release-disclosure-audit.json",
+      "listingTextPrepared": true,
+      "reviewerInstructionsPrepared": true,
+      "listingSavedInPlay": false,
+      "reviewerInstructionsSavedInPlay": false,
+      "dataSafetySavedInPlay": true,
+      "healthDeclarationAdditionalFeatureToReview": "Diseases and Conditions Management; symptom diary support for palliative condition monitoring. Existing health declarations must remain. No clinical-decision-support claim.",
+      "privacyDeployment": "dpl_6cieWvkFSK2SkZsyQD1ARnTeVevq",
+      "privacyLiveChecks": "output/android/verification/0.6.0/live-privacy-checks.json",
+      "privacyLive": "READY production; HTTP200 and new symptom/Qwen/Devanagari/directory/date text verified on Sahara and Saanthvana. Rendered browser review not yet performed after recovery.",
+      "privacySourceSha256": "7BA2F6567F4F1BB52C33A373BAC4850D5603545D0364AAC6E720ED9F15F755D5",
+      "privacyChecks": "Scoped ESLint and remote production build passed; Vercel READY and updated public policy text HTTP200 verified on both domains. No fresh rendered browser review after tool recovery."
     },
-    "apkSha256": "92784229A6BDA11BCBA82371F975BD6E58126CD2D7E5F9BB3B8EE674872EC44E",
-    "bundleSha256": "F6F9C281712A67F107B2F6EE51066B5F024936170C4D795B2E025A7E7E22009B",
-    "playDraft": {
-      "releaseId": 4,
-      "track": "Alpha",
-      "trackId": "4699010624330920429",
-      "url": "https://play.google.com/console/u/1/developers/8795679408143615220/app/4974759245808215344/tracks/4699010624330920429/releases/4/prepare",
-      "nameAndReleaseNotesSaved": true,
-      "bundleUploaded": true,
-      "submitted": false,
-      "observedAtUtc": "2026-10-16T16:27:53.793787+05:30",
-      "uploadAttemptedAtUtc": "2026-10-16T16:26:08.959907+05:30",
-      "uploadStatus": "Uploaded once, processed as 6 (0.5.0), Save as draft confirmed Changes saved; not submitted",
-      "uploadedVersion": "0.5.0",
-      "uploadedVersionCode": 6,
-      "savedAsDraft": true,
-      "trackState": "Draft",
-      "proof": "output/android/verification/0.5.0/play-alpha-draft.png",
-      "finalTrackObservedAtUtc": "2026-10-19T08:41:52Z",
-      "latestProof": "output/android/verification/sahara-alpha-draft-2026-10-19.png"
+    "checks": {
+      "unitTests": 156,
+      "unitSuites": 26,
+      "unitFailures": 0,
+      "unitErrors": 0,
+      "unitSkipped": 0,
+      "newSymptomRulesTests": 9,
+      "evidenceStatus": "Fresh recovery JVM checks passed; source agent completing debug instrumentation compilation. No new symptom UI device pass established."
     },
-    "artifactVerified": true,
-    "runtimeVerified": true,
-    "draftReady": true,
-    "productionSubmission": {
-      "version": "0.5.0",
-      "versionCode": 6,
-      "trackId": "4697314269892725425",
-      "releaseId": 2,
-      "releaseUrl": "https://play.google.com/console/u/1/developers/8795679408143615220/app/4974759245808215344/tracks/4697314269892725425/releases/2/details",
-      "bundleReusedFromPlayLibrary": true,
-      "bundleSha256": "F6F9C281712A67F107B2F6EE51066B5F024936170C4D795B2E025A7E7E22009B",
-      "submitted": true,
-      "reviewStatus": "Changes in review",
-      "submissionId": 6,
-      "submissionActivityStatus": "In review",
-      "submissionDisplayedAt": "Oct 19, 2026, 2:34 PM",
-      "published": false,
-      "countries": [
-        "India"
-      ],
-      "rolloutPercentage": 100,
-      "managedPublishing": false,
-      "submittedChangeCount": 4,
-      "reviewerInstructionsUpdated": true,
-      "reviewerCredentialsUnchanged": true,
-      "calendarEventsCollectionDeclared": true,
-      "medicalDeclarationsUnchanged": true,
-      "proof": "output/android/verification/sahara-production-050-in-review-2026-10-19.png",
-      "observedAtUtc": "2026-10-19T09:05:11Z",
-      "evidence": "Publishing overview shows Changes in review for Production 0.5.0 (6), Start full rollout, full description, Phone screenshots and Data safety. Submission activity independently records submission 6, Oct 19 at 2:34 PM, Production / Store Listing / App Content, In review. This is not approval or a device-install test.",
-      "submissionRecovery": "Initial confirmation closed without recording a submission and one website error appeared. Completed quick checks, a fresh release entry, native/keyboard confirmation and the existing owner's Google session refresh were tried without changing access or credentials. After the owner refresh, Google recorded Changes in review; the exact underlying cause is unconfirmed.",
-      "deviceInstall": "No phone or emulator was connected to local ADB on 19 October. Signed APK is available; no new device installation was performed."
-    }
+    "debugDeviceEvidence": {
+      "package": "in.wedevit.sahara.development",
+      "version": "0.6.0",
+      "versionCode": 7,
+      "installedOn": "Samsung A34",
+      "installationMethod": "adb install -r -t; production package/data preserved",
+      "apkSha256": "458C67FBAEE29042253BC93402B6EE2023A0F19BFEEE9298555234E1FBCAF2A0",
+      "deviceInteractionVerified": false,
+      "reason": "Device connected but locked; user asked to unlock. No authentication bypass."
+    },
+    "browserBlocker": "After recovery the browser control tool was unavailable; official Windows Computer Use fallback stopped because it could not determine the browser URL confidently enough to enforce policy. No more UI actions were taken. Production draft3 and saved Data safety remain; signed bundle upload, listing/reviewer/health updates and review submission are still pending."
   },
   "productionRelease": {
-    "version": "0.4.1",
-    "versionCode": 5,
+    "version": "0.5.0",
+    "versionCode": 6,
     "trackId": "4697314269892725425",
-    "releaseId": 1,
-    "saved": true,
+    "releaseId": 2,
+    "releaseUrl": "https://play.google.com/console/u/1/developers/8795679408143615220/app/4974759245808215344/tracks/4697314269892725425/releases/2/details",
+    "bundleReusedFromPlayLibrary": true,
+    "bundleSha256": "F6F9C281712A67F107B2F6EE51066B5F024936170C4D795B2E025A7E7E22009B",
     "submitted": true,
     "reviewStatus": "Available on Google Play",
-    "userAuthorisedCurrentVersion": true,
-    "submissionConfirmationObserved": true,
-    "manualConfirmationPending": false,
-    "priorSubmissionProblem": "On 14–15 October the confirmation closed without recording the submission. That prior failure was reported in the existing support thread. It is superseded by the 16 October live observation of Changes in review; the exact recovery mechanism is unconfirmed.",
+    "submissionId": 6,
+    "submissionActivityStatus": "In review",
+    "submissionDisplayedAt": "Oct 19, 2026, 2:34 PM",
+    "published": true,
     "countries": [
       "India"
     ],
-    "rollout": "Published in Production, India",
-    "bundleReusedFromPlayLibrary": true,
-    "bundleSha256": "64E70664F68A7A63F5F712E7CA3E6804ED107981ABEBFC6C5916C0C891223914",
-    "validationErrors": 0,
-    "warning": "Missing native debug symbols; non-blocking",
-    "quickChecksStatus": "completed",
-    "changesReadyToSubmit": 0,
-    "evidence": "Production Releases shows 0.4.1 (5), Available on Google Play, Released on Oct 19 12:08 PM. Publishing overview says Last published on October 19, 2026. Countries / regions lists India as Targeted. The public listing opens with the correct title, developer and enabled Install. No remote installation was performed.",
-    "sourcePull": {
-      "result": "Already up to date on 14 October",
-      "headAtPull": "73a2f16909c3be4eec67ec8dd9f3b4cefc1da616",
-      "latestAwaizCommit": "b453efb",
-      "includedInExistingBuild": true,
-      "remoteBranchesChecked": true
-    },
-    "remainingPublicReadiness": "Ordinary signup and reset email delivery remains recorded as incomplete/unverified. After this was explained, the user explicitly requested submitting the current version as-is. These known limitations remain follow-up work; do not delay this authorised version for new provider setup. Zoho remains paused, the exact Supabase recovery callback remains unapproved, photo scanning stays off and declarations remain accurate.",
-    "agentHandlesConfirmation": true,
-    "lastVerifiedAtUtc": "2026-10-19T08:41:52Z",
-    "recoveryActions": [
-      "Existing owner sign-in refreshed; no new account or access created",
-      "Fresh task tab and documented browser-control reset",
-      "Saved both unchanged changes for later and restored them",
-      "Native click and keyboard confirmation tested"
-    ],
-    "supportFollowup": {
-      "existingCase": true,
-      "sent": true,
-      "verifiedInSent": true,
-      "newTicketCreated": false,
-      "privateEvidenceOnly": true,
-      "replyReceived": true,
-      "replyDisplayedAtLocal": "15 October 2026, 03:05 IST",
-      "replySummary": "Google confirmed the Production update was received and in review; it asked for no further versions or changes during that review. Publication on 19 October satisfies that historical wait condition. No duplicate case was created."
-    },
-    "initialRecordedFailedAttempts": 5,
+    "rolloutPercentage": 100,
+    "managedPublishing": false,
+    "submittedChangeCount": 4,
+    "reviewerInstructionsUpdated": true,
+    "reviewerCredentialsUnchanged": true,
+    "calendarEventsCollectionDeclared": true,
+    "medicalDeclarationsUnchanged": true,
+    "proof": "output/android/verification/sahara-production-050-in-review-2026-10-19.png",
+    "observedAtUtc": "2026-10-19T09:05:11Z",
+    "evidence": "Live Console Production release2 showed0.5.0(6), Available on Google Play,100% rollout,India1/1, on24OctoberIST. Policy status showedNo policy issues found. This does not establish patient use or the new0.6 release.",
+    "submissionRecovery": "Initial confirmation closed without recording a submission and one website error appeared. Completed quick checks, a fresh release entry, native/keyboard confirmation and the existing owner's Google session refresh were tried without changing access or credentials. After the owner refresh, Google recorded Changes in review; the exact underlying cause is unconfirmed.",
+    "deviceInstall": "No phone or emulator was connected to local ADB on 19 October. Signed APK is available; no new device installation was performed.",
     "status": "Published",
-    "published": true,
-    "publishedOn": "2026-10-19",
-    "consoleDisplayedReleaseTime": "Oct 19 12:08 PM; timezone not separately verified",
-    "publicUrl": "https://play.google.com/store/apps/details?id=in.wedevit.sahara&gl=IN&hl=en",
-    "publicListingInstallEnabled": true,
-    "proof": "output/android/verification/sahara-production-live-2026-10-19.png",
-    "verifiedAt": "2026-10-19T08:41:52Z"
+    "availabilityObservedAtUtc": "2026-10-23T20:10:30.784087+00:00",
+    "consoleDisplayedReleaseTime": "Oct22 5:41AM; Console timezone not separately verified",
+    "publicUrl": "https://play.google.com/store/apps/details?id=in.wedevit.sahara&gl=IN&hl=en"
   },
   "previousUiCandidate": {
     "version": "0.3.1",
@@ -814,5 +639,289 @@
       "phoneTested": false,
       "uploadedToPlay": false
     }
-  }
+  },
+  "publishedProductionUpdate": {
+    "version": "0.5.0",
+    "versionCode": 6,
+    "built": true,
+    "ready": true,
+    "uploaded": true,
+    "submitted": true,
+    "installed": false,
+    "status": "Production0.5.0(6), release2, published22October05:41 as displayed byConsole;100% India rollout. Verified live24OctoberIST.",
+    "apk": "output/android/Sahara-0.5.0-release.apk",
+    "bundle": "output/android/Sahara-0.5.0.aab",
+    "sourceCommit": "ebffb7b043a5e8725f190ab8f8f3574c768d9058",
+    "listingDraft": {
+      "fullDescription": "Sahara: A Palliative Care Companion\n\nFor patients, families and doctors.\n\nKeep the words that matter from a goals-of-care conversation. Type the conversation, record it with everyone's permission, or dictate one selected speaker's turn on a supported phone. Check the words and build the note from exact source excerpts. A doctor can review and save a version; the patient confirms first, then family can add separate confirmations of that same version. Names and roles are self-entered, not verified credentials or legal consent. Earlier versions and their original words remain available.\n\nAsk the care team to talk, pick up a request and keep named tasks with acceptance and completion status. Plan visits, tests, procedures and follow-ups in a dated calendar. Enter numeric lab results with the report's units and printed ranges, and view values over time. Lab history does not interpret results or recommend treatment. Add prescribed medicines, check-ins, questions and daily notes. Medicine reminders are not available.\n\nDocuments keeps user-selected PDFs and photos together. Open a report or share a copy using Android. Report files and recordings remain private phone copies and do not sync to other devices. Saved recordings are not automatically transcribed. Read aloud uses an installed offline voice and does not translate. Live dictation requires an installed on-device recognition service; typing and recording remain available when it is unsupported.\n\nSign in to save care notes and daily entries to your account. Invite family or care team members to read them or allow changes. Conversation requests and tasks are shared records, not dispatched calls or email. Unfinished conversations are not uploaded.\n\nFind listed palliative care centres in Karnataka on a MapLibre map or in the list. Call a centre or get directions. Directory entries do not confirm current medicine stock. There are no ads. Photo scanning is currently off; medicines can be entered manually.\n\nDoctor login opens an isolated fictional preview for exploring scheduling and note review. Its sample records and marked preview PDFs are not verified clinical records or connected patient accounts.\n\nThis app is not a medical device. It does not diagnose, treat, cure or prevent a condition, recommend treatment or replace professional medical care. Ask a qualified healthcare professional for medical advice. Care notes record a discussion; they are not prescriptions or legal directives.",
+      "releaseNotes": "New care-team requests and named tasks, calendar and numeric lab history. Build notes from exact conversation excerpts; patient and family confirm the same version. Supported phones can dictate a selected speaker and read notes aloud offline. Explore the separate fictional doctor workspace. Cloud audio and photo scanning stay off.",
+      "reviewInstructions": "Use fictional information. Basic care works without signing in; the approved reviewer login enables shared records. Add a person, use Talk to type a conversation or consent to on-device dictation if supported, and assign exact source excerpts to the note. Select Doctor to review and save. Open that note, confirm as Patient first, then add a separate Family / carer confirmation. Names and roles are self-entered, not verified credentials or legal consent. Today shortcuts open Care team, Calendar and Lab history. Create a conversation request, pick it up in Doctor view, and save a dated task or numeric lab result with the report's units/ranges. Documents adds, opens and shares phone-private copies. Photo scanning is off; use manual medicine entry. Dictation availability depends on an installed on-device service; saved M4A audio is not transcribed. Read aloud requires an installed offline voice and does not translate. No medication notifications, payment or location restriction. Doctor login opens a separate fictional local preview; it does not grant clinical access. Release builds cannot upload recordings or run online audio transcription.",
+      "dataSafetyAssessment": "Added Calendar events as collected, optional, non-ephemeral, for App functionality on 19 October. Signed-in calendar title/detail/due fields pass through CareModel to CareCloud and Supabase; this is not phone-private. Google's Calendar definition covers event notes independently of Android Calendar permissions. Existing Health info, Name and Other user-generated content categories remain for labs, requests, tasks and confirmations. On-device recognition/offline text-to-speech have no cloud fallback. Photo scanning stays off. Medical and provider-metadata declarations remain unchanged.",
+      "privacyDeployment": "dpl_6orhhiq4eQnLGSy2kGJLzwzBibsC; both domains and mobile 375/390 checks passed, including local preview retention",
+      "savedInPlay": true,
+      "savedOn": "2026-10-19",
+      "reviewInstructionsSavedInPlay": "Use fictional data. More > Your account: sign in and add a person. Talk: type, link excerpts, Doctor review/save, Patient confirm, then Family confirm. Today: Care team, Calendar, Lab history. Doctor login is a separate fictional preview; roles are self-entered. Dictation and offline read aloud require installed services. Saved audio is not transcribed. Photo scanning, cloud audio and medicine reminders are off. Documents stay on this phone. No payment/OTP.",
+      "reviewerCredentialsUnchanged": true
+    },
+    "changes": [
+      "Consented on-device speaker-turn dictation on supported Android devices",
+      "Exact source-linked care-note excerpt review",
+      "Offline-voice read aloud",
+      "Patient-first and separate family confirmations on an immutable note version",
+      "Shared conversation request queue and named task status",
+      "Dated calendar and numeric lab history with printed ranges and report links",
+      "Merged fictional offline doctor workspace with scheduling, source review and marked preview PDF export",
+      "Preserving Room schema 6 migrations for both earlier branches",
+      "Full-height care editors for keyboard entry"
+    ],
+    "limits": [
+      "No connected generative draft model or saved-audio transcription",
+      "No translation, automatic speaker identification or verified clinician identity",
+      "Photo scanning remains off; report/audio files remain phone-private",
+      "No medicine notification schedule",
+      "Web workspace is not yet using the native shared record model",
+      "Care-team clients need 0.5 to render its structured lab/request/task entries; 0.4 renders them as ordinary task details",
+      "Ordinary signup/reset email delivery remains limited; paused Zoho and unapproved callback remain unchanged",
+      "Doctor workspace uses fictional local sample records; it is separate from real care accounts",
+      "Release builds block cloud audio in the interface, model and transport; upstream synthetic developer code is not public patient functionality"
+    ],
+    "verification": {
+      "backendMigration": "20261016065132_patient_first_version_confirmations.sql deployed after authorised project restore",
+      "sqlSuites": [
+        "patient_first_confirmations PASS",
+        "care_permissions PASS"
+      ],
+      "service": "Reviewer sign-in and authenticated read PASS, no patient data printed",
+      "unitTests": {
+        "tests": 104,
+        "suites": 16,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "result": "PASS",
+        "report": "output/android/verification/0.5.0/combined-build-checks.json"
+      },
+      "fullLint": {
+        "errors": 0,
+        "warnings": 37,
+        "result": "PASS",
+        "variant": "debug",
+        "vitalReleaseTaskPassed": true,
+        "separateReleaseXmlCollected": false,
+        "report": "output/android/verification/0.5.0/combined-build-checks.json"
+      },
+      "cloudRoundtrip": "PASS: synthetic lab/request/task payloads, task revisions, immutable note and separate confirmations; exact fixture cleanup. output/android/verification/0.5.0-cloud-roundtrip.json",
+      "runtime": "35 latest passing Android test identities and one expected credential-dependent skip across six runs of unchanged original app code; not a single clean 36-test run. Exact-version publish/persistence, Privacy after actual Saved snackbar dismissal, optimized IME/restart and doctor publication/PDF/exit stages passed. Separate five-page/130-line PDF passed. No real speech/provider, physical-device or 16 KB runtime validation.",
+      "buildMemory": "Local compilation was interrupted under shared-host memory pressure. Unsigned packages and checks completed on a standard GitHub runner; the upload key stays local. Current CI source and runtime evidence are recorded separately; no Windows emulator was restarted.",
+      "releaseBuild": {
+        "result": "PASS: actual current-source CI APK/AAB, local upload-key signatures and static checks verified",
+        "log": "https://github.com/basithladdu/healthathon/actions/runs/38881300006",
+        "tasks": "assembleRelease, bundleRelease, lintVitalRelease",
+        "artifactReport": "output/android/verification/0.5.0-artifacts.json",
+        "packageVersionSignerAndSignatures": "PASS: in.wedevit.sahara, 0.5.0 (6), non-debuggable APK, APK v2/v3 and AAB JAR signature; same upload signer as 0.4.1",
+        "static16KbZipAndElfAlignment": "PASS: ZIP alignment and all four 64-bit ELF libraries; native bytes unchanged. Runtime page-size validation is separate.",
+        "runtime16KbVerified": false,
+        "releaseCloudAudioEnabled": false
+      },
+      "ciBuild": {
+        "runId": 38881300006,
+        "url": "https://github.com/basithladdu/healthathon/actions/runs/38881300006",
+        "conclusion": "success",
+        "sourceCommit": "ebffb7b043a5e8725f190ab8f8f3574c768d9058",
+        "appSourceTree": "90adbbf8c22aa5f659b2d8c58baf4bd19fbd2b2b",
+        "signingMaterialUploaded": false
+      },
+      "historicalBaseline4758218": {
+        "unitTests": {
+          "tests": 39,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "fullLint": {
+          "errors": 0,
+          "warnings": 33,
+          "result": "PASS",
+          "log": "android/sahara-050-lint-lowmem.log"
+        },
+        "qualification": "Earlier branch only; superseded pre-keyboard artifacts are recorded separately. These counts do not verify combined source."
+      },
+      "focusedRuntime": {
+        "runId": 38887001702,
+        "url": "https://github.com/basithladdu/healthathon/actions/runs/38887001702",
+        "harnessCommit": "f597392e0ebc48df9355d5ba550da3cc006a1b37",
+        "buildSourceCommit": "ebffb7b043a5e8725f190ab8f8f3574c768d9058",
+        "status": "Completed: two passes and two further stale assertions. Optimized doctor publication/PDF/exit passed. Original failed run preserved.",
+        "qualification": "Four corrected expectations plus unfinished optimized doctor PDF/exit; original passing checks preserved separately."
+      },
+      "remainingRuntime": {
+        "runId": 38888372729,
+        "url": "https://github.com/basithladdu/healthathon/actions/runs/38888372729",
+        "harnessCommit": "f8350bceab98f93c190b3d0c3ff0fc0ca49842cb",
+        "status": "Completed: one pass, one Privacy-panel failure; preserved without claiming success.",
+        "scope": "Only the two remaining corrected instrumentation checks; passing optimized/PDF checks are not repeated."
+      },
+      "privacyRuntime": {
+        "runId": 38889436917,
+        "status": "Completed: zero passes and one failure at Hide Privacy.assertExists; expansion diagnostics not reached.",
+        "report": "output/android/verification/0.5.0/ci-runtime-38889436917/inspection.json"
+      },
+      "privacyRuntimeRetry": {
+        "runId": 38890430027,
+        "url": "https://github.com/basithladdu/healthathon/actions/runs/38890430027",
+        "harnessCommit": "e0fe533",
+        "status": "Completed: zero passes, one intercepted touch. Screenshot and semantics confirm Saved snackbar covered the Privacy tap centre.",
+        "scope": "Clickable Privacy header with before/after evidence; original app unchanged.",
+        "report": "output/android/verification/0.5.0/ci-runtime-38890430027/inspection.json"
+      },
+      "privacyRuntimeAfterSnackbar": {
+        "runId": 38891431772,
+        "url": "https://github.com/basithladdu/healthathon/actions/runs/38891431772",
+        "harnessCommit": "ddb5c84",
+        "status": "success",
+        "scope": "Wait for actual Saved message dismissal; same real header click, Hide and body assertions.",
+        "passed": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "matrixComplete": true,
+        "finishedAtUtc": "2026-10-16T11:12:28.683321Z",
+        "report": "output/android/verification/0.5.0/ci-runtime-38891431772/inspection.json"
+      },
+      "runtimeReport": "output/android/verification/0.5.0/combined-runtime-checks.json"
+    },
+    "releasePrerequisites": [
+      "Build/signatures/static and stated emulator checks complete; no physical-device, real speech/provider or clinical validation.",
+      "Verified bundle already uploaded once and saved in Alpha release 4. Reuse it; do not reupload or resend the 59 invitations.",
+      "Production 0.5 release 2 is now Changes in review with matching listing/reviewer material and corrected Calendar events disclosure. Do not upload, withdraw, duplicate or resubmit it while review is pending. Keep cloud audio and photo scanning off."
+    ],
+    "supersededPreKeyboardBuild": {
+      "sourceCommit": "4758218",
+      "apkSha256": "1A55AE8225525574732BB54340E60D24386B88006E5EFA07F077E64266516995",
+      "bundleSha256": "5B81B459658CDEF443F61697603DED8229D65078C8D8BA4821CA6D8710361EC3",
+      "reason": "Release smoke found avoidable partial-sheet expansion after keyboard entry. New Schedule/Labs/Workflow editors now match the existing full-expansion pattern."
+    },
+    "apkSha256": "92784229A6BDA11BCBA82371F975BD6E58126CD2D7E5F9BB3B8EE674872EC44E",
+    "bundleSha256": "F6F9C281712A67F107B2F6EE51066B5F024936170C4D795B2E025A7E7E22009B",
+    "playDraft": {
+      "releaseId": 4,
+      "track": "Alpha",
+      "trackId": "4699010624330920429",
+      "url": "https://play.google.com/console/u/1/developers/8795679408143615220/app/4974759245808215344/tracks/4699010624330920429/releases/4/prepare",
+      "nameAndReleaseNotesSaved": true,
+      "bundleUploaded": true,
+      "submitted": false,
+      "observedAtUtc": "2026-10-16T16:27:53.793787+05:30",
+      "uploadAttemptedAtUtc": "2026-10-16T16:26:08.959907+05:30",
+      "uploadStatus": "Uploaded once, processed as 6 (0.5.0), Save as draft confirmed Changes saved; not submitted",
+      "uploadedVersion": "0.5.0",
+      "uploadedVersionCode": 6,
+      "savedAsDraft": true,
+      "trackState": "Draft",
+      "proof": "output/android/verification/0.5.0/play-alpha-draft.png",
+      "finalTrackObservedAtUtc": "2026-10-19T08:41:52Z",
+      "latestProof": "output/android/verification/sahara-alpha-draft-2026-10-19.png"
+    },
+    "artifactVerified": true,
+    "runtimeVerified": true,
+    "draftReady": true,
+    "productionSubmission": {
+      "version": "0.5.0",
+      "versionCode": 6,
+      "trackId": "4697314269892725425",
+      "releaseId": 2,
+      "releaseUrl": "https://play.google.com/console/u/1/developers/8795679408143615220/app/4974759245808215344/tracks/4697314269892725425/releases/2/details",
+      "bundleReusedFromPlayLibrary": true,
+      "bundleSha256": "F6F9C281712A67F107B2F6EE51066B5F024936170C4D795B2E025A7E7E22009B",
+      "submitted": true,
+      "reviewStatus": "Changes in review",
+      "submissionId": 6,
+      "submissionActivityStatus": "In review",
+      "submissionDisplayedAt": "Oct 19, 2026, 2:34 PM",
+      "published": false,
+      "countries": [
+        "India"
+      ],
+      "rolloutPercentage": 100,
+      "managedPublishing": false,
+      "submittedChangeCount": 4,
+      "reviewerInstructionsUpdated": true,
+      "reviewerCredentialsUnchanged": true,
+      "calendarEventsCollectionDeclared": true,
+      "medicalDeclarationsUnchanged": true,
+      "proof": "output/android/verification/sahara-production-050-in-review-2026-10-19.png",
+      "observedAtUtc": "2026-10-19T09:05:11Z",
+      "evidence": "Publishing overview shows Changes in review for Production 0.5.0 (6), Start full rollout, full description, Phone screenshots and Data safety. Submission activity independently records submission 6, Oct 19 at 2:34 PM, Production / Store Listing / App Content, In review. This is not approval or a device-install test.",
+      "submissionRecovery": "Initial confirmation closed without recording a submission and one website error appeared. Completed quick checks, a fresh release entry, native/keyboard confirmation and the existing owner's Google session refresh were tried without changing access or credentials. After the owner refresh, Google recorded Changes in review; the exact underlying cause is unconfirmed.",
+      "deviceInstall": "No phone or emulator was connected to local ADB on 19 October. Signed APK is available; no new device installation was performed."
+    },
+    "reviewStatus": "Available on Google Play",
+    "releaseAvailable": true,
+    "availabilityObservedAtUtc": "2026-10-23T20:10:30.784087+00:00"
+  },
+  "previousProductionRelease": {
+    "version": "0.4.1",
+    "versionCode": 5,
+    "trackId": "4697314269892725425",
+    "releaseId": 1,
+    "saved": true,
+    "submitted": true,
+    "reviewStatus": "Available on Google Play",
+    "userAuthorisedCurrentVersion": true,
+    "submissionConfirmationObserved": true,
+    "manualConfirmationPending": false,
+    "priorSubmissionProblem": "On 14–15 October the confirmation closed without recording the submission. That prior failure was reported in the existing support thread. It is superseded by the 16 October live observation of Changes in review; the exact recovery mechanism is unconfirmed.",
+    "countries": [
+      "India"
+    ],
+    "rollout": "Published in Production, India",
+    "bundleReusedFromPlayLibrary": true,
+    "bundleSha256": "64E70664F68A7A63F5F712E7CA3E6804ED107981ABEBFC6C5916C0C891223914",
+    "validationErrors": 0,
+    "warning": "Missing native debug symbols; non-blocking",
+    "quickChecksStatus": "completed",
+    "changesReadyToSubmit": 0,
+    "evidence": "Production Releases shows 0.4.1 (5), Available on Google Play, Released on Oct 19 12:08 PM. Publishing overview says Last published on October 19, 2026. Countries / regions lists India as Targeted. The public listing opens with the correct title, developer and enabled Install. No remote installation was performed.",
+    "sourcePull": {
+      "result": "Already up to date on 14 October",
+      "headAtPull": "73a2f16909c3be4eec67ec8dd9f3b4cefc1da616",
+      "latestAwaizCommit": "b453efb",
+      "includedInExistingBuild": true,
+      "remoteBranchesChecked": true
+    },
+    "remainingPublicReadiness": "Ordinary signup and reset email delivery remains recorded as incomplete/unverified. After this was explained, the user explicitly requested submitting the current version as-is. These known limitations remain follow-up work; do not delay this authorised version for new provider setup. Zoho remains paused, the exact Supabase recovery callback remains unapproved, photo scanning stays off and declarations remain accurate.",
+    "agentHandlesConfirmation": true,
+    "lastVerifiedAtUtc": "2026-10-19T08:41:52Z",
+    "recoveryActions": [
+      "Existing owner sign-in refreshed; no new account or access created",
+      "Fresh task tab and documented browser-control reset",
+      "Saved both unchanged changes for later and restored them",
+      "Native click and keyboard confirmation tested"
+    ],
+    "supportFollowup": {
+      "existingCase": true,
+      "sent": true,
+      "verifiedInSent": true,
+      "newTicketCreated": false,
+      "privateEvidenceOnly": true,
+      "replyReceived": true,
+      "replyDisplayedAtLocal": "15 October 2026, 03:05 IST",
+      "replySummary": "Google confirmed the Production update was received and in review; it asked for no further versions or changes during that review. Publication on 19 October satisfies that historical wait condition. No duplicate case was created."
+    },
+    "initialRecordedFailedAttempts": 5,
+    "status": "Published",
+    "published": true,
+    "publishedOn": "2026-10-19",
+    "consoleDisplayedReleaseTime": "Oct 19 12:08 PM; timezone not separately verified",
+    "publicUrl": "https://play.google.com/store/apps/details?id=in.wedevit.sahara&gl=IN&hl=en",
+    "publicListingInstallEnabled": true,
+    "proof": "output/android/verification/sahara-production-live-2026-10-19.png",
+    "verifiedAt": "2026-10-19T08:41:52Z"
+  },
+  "previousPublishedListing": {
+    "fullDescription": "Sahara: A Palliative Care Companion\n\nFor patients, families and doctors.\n\nKeep the words that matter from a goals-of-care conversation. A doctor can review the note and save a version. The patient or family can read and confirm that same version. Earlier notes and the original conversation stay available.\n\nRecord a conversation with everyone's permission, or type the words you want to keep. Add prescribed medicines, visits, questions, tasks and daily notes. Find listed palliative care centres in Karnataka, call them or get directions. Directory entries do not confirm current medicine stock.\n\nKeep PDFs and photos together in Documents. Find a report by name, then open it or share a copy with your care team. Report files stay on your phone and are not synced to other devices.\n\nSign in to save care notes and daily entries to your account. Invite family or care team members to read them, or allow them to make changes. Recordings and unfinished conversations are not uploaded. Find centres on a MapLibre map or in the list. There are no ads. This version does not transcribe audio automatically, verify clinician identity or send medicine reminders.\n\nThis app is not a medical device. It does not diagnose, treat, cure or prevent any medical condition, recommend treatment or replace professional medical care. Ask a qualified healthcare professional for medical advice. Care notes record a discussion; they are not prescriptions or legal directives.",
+    "reviewInstructions": "Use fictional data. More > Your account: sign in and add a person. Talk: type, link excerpts, Doctor review/save, Patient confirm, then Family confirm. Today: Care team, Calendar, Lab history. Doctor login is a separate fictional preview; roles are self-entered. Dictation and offline read aloud require installed services. Saved audio is not transcribed. Photo scanning, cloud audio and medicine reminders are off. Documents stay on this phone. No payment/OTP.",
+    "scope": "Published0.5 wording preserved before0.6 update"
+  },
+  "releaseNotes": "Add personal symptom notes with ratings, context-matched comparisons and sharing. Browse 1,631 published care-centre listings across 36 states and union territories. Optional Hindi/English recording transcription runs on your phone after a 987 MB download. Read printed Hindi/English text, use offline translation and set care reminders. Shared clinical review requires independent clinician approval and a patient invitation. Check recognised words against the original."
 }

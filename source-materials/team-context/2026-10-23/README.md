@@ -4,6 +4,7 @@ The user explicitly requested sharing the continued chat and DOCX/PDF/PPT attach
 
 ## Contents
 
+- `sujay-survey-symptom-followup.txt`: later user-supplied WhatsApp excerpt,23October09:58 and18:10–18:24. Preserves the supplied wording; it is a pasted continuation, not a new complete export. It requests survey fixes and clinician-led symptom-tracker research. It contains no private invitation links. Sujay's actual hospital submission and professional contact/registration data stay in the private review database and are not copied into this transcript or Git.
 - `canonical-chat.txt`: cleaned derived chronology, 658 archive representations, with source provenance. Counts are not necessarily unique real-world messages.
 - `latest-export/_chat.txt`: cleaned copy of the latest supplied 619-record export, covering 25 August–23 October 2026. It is not the byte-identical private original.
 - `documents/`: all 21 supplied document filenames: four DOCX, eleven PDF and six PPTX. Byte-identical copies of 12 document filenames already appear in the current tracked tree; original export filenames are retained here for traceability. Git reuses identical blobs automatically.
@@ -22,3 +23,5 @@ The complete unmodified exports, original documents, all media and prior variant
 The new 13-slide submission template is generic guidance, not a completed Sahara presentation or a verified deadline. Chat discussion of dummy data, goals-of-care refinement and stress/money/time KPIs records proposed priorities, not achieved outcomes or validated clinical effectiveness. Neither a forwarded official-looking email nor a chat claim establishes implementation, release approval, identity verification, actual morphine stock or a clinical decision.
 
 See [the context map](../../../PROJECT_CONTEXT_MAP.md) and [source index](../../../SOURCE_INDEX.md) for the redacted discussion summary and historical limits.
+
+The 23 October survey/symptom follow-up is preserved verbatim in [`sujay-survey-symptom-followup.txt`](sujay-survey-symptom-followup.txt). Its implementation/status report lives in the existing [`TEAM_HANDOFF.md`](../../../TEAM_HANDOFF.md); the sourced [`symptom-tracker clinical brief`](../../../docs/research/symptom-tracker-clinical-brief-2026-10-23.md) records what can be built now and which clinical decisions still need the team. The actual hospital submission and private receipt are not included in this package.

@@ -1,0 +1,161 @@
+Questionnaire Response | Care
+Skip to main content
+Care
+Documentation
+Playbooks
+HMIS
+Palliative
+Contributing
+Deployment
+English
+English
+മലയാളം
+3.1
+3.1
+3.0
+Care documentation
+Concepts
+Clinical
+Patient
+Encounter
+Allergy Intolerance
+Condition
+Observation
+Clinical - Service Request
+Clinical - Specimen
+Clinical - Diagnostic Report
+Consent
+Clinical - Files
+Questionnaire Response
+Clinical - Care Team
+Notes
+Definitions & Terminology
+Medications
+Scheduling
+Billing
+Supply & Inventory
+Facility
+Access & Governance
+Platform
+Flows
+Clinical
+Facility
+Medications
+Billing
+Scheduling
+Supply
+Access & Governance
+Platform
+Definitions
+References
+Foundation
+Clinical
+Definitions & Terminology
+Medications
+Scheduling
+Billing
+Supply & Inventory
+Facility
+Access & Governance
+Platform
+Concepts
+Clinical
+Questionnaire Response
+Version: 3.1
+On this page
+Questionnaire Response
+Definition
+​
+A
+questionnaire response
+in Care is the record of one submitted form. Care files a response each time a user submits a form for a patient. Care also files a response when a user saves a structured clinical record, such as an allergy or a diagnosis.
+This module explains how to read the submission history. To learn how to fill in a form, read the module of that form.
+Key Attributes
+​
+Components
+What it captures
+Form
+The form that the response comes from. A response that a structured clinical record creates has no form.
+Filed By
+The user who filed the response.
+Filed On
+The date and the time of the submission.
+Status
+The state of the response.
+Answers
+The values that the user entered in the form, with the note on each answer.
+Patient
+The patient that the response belongs to.
+Encounter
+The encounter that the response belongs to. A patient-level form has no encounter.
+Where Care shows responses
+​
+Care shows the responses of a patient in three places:
+The
+Updates
+tab of the patient. This tab lists the responses to patient-level forms.
+The
+Responses
+tab of the encounter. This tab lists the responses to the forms of that encounter.
+The
+Clinical History
+page of the patient. The
+Responses
+section lists the responses across all encounters of the patient.
+Status
+​
+Care uses two states for a response.
+Status
+Description
+Completed
+The user filed the response, and the answers are valid.
+Entered in Error
+The user filed the response by mistake. Care shows the response as invalid.
+You cannot change a response after Care marks it as entered in error.
+Note: A time limit applies to the Entered in Error status. After that time, only a system administrator can mark the response as entered in error. Your deployment's configuration sets the time limit.
+Permissions
+​
+Permission
+What it allows
+Can view questionnaire responses on patient
+View the responses of a patient.
+Can view clinical data about patients
+View the responses of an encounter of the patient.
+Can Read encounter related clinical data
+View the responses of an encounter.
+Can submit questionnaire about patients
+Mark a patient-level response as entered in error.
+Can submit questionnaire about patient encounters
+Mark a response of an encounter as entered in error.
+FHIR R5 alignment
+​
+Care follows the FHIR R5 QuestionnaireResponse resource as a concept model. The form, the answers, the author, and the submission time match that model. Care does not export a fully validated FHIR QuestionnaireResponse resource.
+Related
+​
+Flow:
+View questionnaire responses
+Flow:
+Print a questionnaire response
+Flow:
+Mark a response as entered in error
+Concept:
+Patient
+Concept:
+Encounter
+Concept:
+Condition
+Concept:
+Allergy
+Edit this page
+Previous
+Clinical - Files
+Next
+Clinical - Care Team
+Definition
+Key Attributes
+Where Care shows responses
+Status
+Permissions
+FHIR R5 alignment
+Related
+Copyright © 2026 Open Healthcare Network Foundation. Built with Docusaurus.

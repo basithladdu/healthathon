@@ -3986,7 +3986,7 @@ export function ContinuityPrototype() {
               style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
             >
               <IconSparkles className="w-4 h-4 text-amber-600" />
-              <span>ESAS Symptoms</span>
+              <span>Symptom notes</span>
             </button>
             <button
               type="button"
@@ -4926,10 +4926,10 @@ export function ContinuityPrototype() {
                   }}
                   type="button"
                   onClick={() => setEsasOpen(true)}
-                  title="Edmonton Symptom Assessment System (ESAS-r) Radar & Tracker"
+                  title="Personal symptom notes"
                 >
                   <IconSparkles className="w-3.5 h-3.5" />
-                  <span>ESAS Symptoms</span>
+                  <span>Symptom notes</span>
                 </button>
                 <button
                   className="secondary-button"
@@ -6255,11 +6255,12 @@ export function ContinuityPrototype() {
             <EsasSymptomTracker
               patientId={selectedItem.hospitalId}
               patientName={selectedItem.patient}
+              author={portalAuthor}
+              hindi={hindi}
+              entries={symptoms}
+              onEntriesChange={setSymptoms}
+              saveStatus={symptomSave}
               onClose={() => setEsasOpen(false)}
-              onSave={(_scores, total) => {
-                setToast({ message: `ESAS Symptom Assessment saved (Distress Score: ${total}/90)` });
-                setEsasOpen(false);
-              }}
             />
           </section>
         </div>

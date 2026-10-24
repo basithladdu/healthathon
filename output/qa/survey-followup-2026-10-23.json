@@ -1,0 +1,137 @@
+{
+  "date": "2026-10-23",
+  "scope": "Sujay survey follow-up and personal symptom diary; web only",
+  "checks": {
+    "unitTests": 299,
+    "failures": 0,
+    "skipped": 0,
+    "typescript": "passed locally and Vercel production build",
+    "scopedEslint": "passed for survey and symptom files",
+    "sql": "v1/v2/v3 validation, exact stored fields, idempotency and anonymous isolation passed in rolled-back synthetic transaction",
+    "sourceContractReview": "No additional material contract bug; city-only fallback fixed and regression checked"
+  },
+  "deployment": {
+    "id": "dpl_AcVpwonvetw3A7usj23yWMteZNUh",
+    "state": "READY",
+    "target": "production",
+    "url": "https://continuity-loop-healthathon-hdv88hvxr.vercel.app",
+    "aliases": [
+      "https://sahara.wedevit.in",
+      "https://saanthvana.wedevit.in"
+    ],
+    "directHttpChecks": [
+      {
+        "path": "/hospital-survery",
+        "status": 200,
+        "bothAliases": true
+      },
+      {
+        "path": "/privacy",
+        "status": 200,
+        "noMobileCollectionText": true,
+        "physiciansDisclosure": true
+      }
+    ],
+    "followup": "After one rendering-guard correction and verified guest reload, renamed two obsolete ESAS launch labels to Symptom notes. No survey/backend change. Final Next build passed; production JS assets contain new labels and no old ESAS button label.",
+    "finalHttpAndAssetCheck": {
+      "root": 200,
+      "survey": 200,
+      "newSymptomNotesTitle": true,
+      "obsoleteEsasButtonLabelPresent": false
+    }
+  },
+  "finalBrowserSubmission": {
+    "status": "passed",
+    "browser": "fresh Chrome via Playwright CLI",
+    "viewport": "390px",
+    "path": "/hospital-survery",
+    "mode": "manual hospital entry, no provider result required",
+    "actualHttpStatus": 201,
+    "actualReceipt": "pending_review",
+    "storedFieldsChecked": [
+      "hospitalAddress",
+      "palliativePhysicians",
+      "locationConfirmed",
+      "coordinates",
+      "form_version",
+      "consent_version"
+    ],
+    "privateContactsNull": true,
+    "contributorDetailsExcludedFromFacility": true,
+    "exactSyntheticFixtureRemoved": true,
+    "countsBeforeAndAfter": {
+      "submissions": 2,
+      "contributors": 2,
+      "hospitalReceipts": 2
+    },
+    "realEntriesChanged": false,
+    "verifiedDeployment": "dpl_CRAGwBsq21vZ9tYTSnwFNKy1uDTa"
+  },
+  "sourceHashes": [
+    {
+      "path": "prototype/app/continuity-prototype.tsx",
+      "sha256": "c5579f5a6ec88b5b6a748f373a977d3c007df05e8f405fcc5b7324f219130384"
+    },
+    {
+      "path": "prototype/app/esas-symptom-tracker.tsx",
+      "sha256": "569aa56b150e33edf98dfdffbab18030f6a989bf41bae8ab4eb0cb3d4a1154fc"
+    },
+    {
+      "path": "prototype/app/family-symptom-diary.tsx",
+      "sha256": "06f46bb1f16775bdf7b16b91266b0664644cbb854822c9b5f8474d4a08daa454"
+    },
+    {
+      "path": "prototype/app/family-symptom-state.ts",
+      "sha256": "c49459f36392efb5d1c59528bf33bf23d29829d55c383d1a7388d1b7b936f74d"
+    },
+    {
+      "path": "prototype/app/feedback/HospitalMap.tsx",
+      "sha256": "86ad9a4c121e38739446be8924abb03fb98789212b0f5205413e5b6881da7b77"
+    },
+    {
+      "path": "prototype/app/feedback/HospitalSurvey.tsx",
+      "sha256": "c8fe71bec75471cf72d2ec42233c35fbf1a6f1e47ceba162b48f0620ad4cd719"
+    },
+    {
+      "path": "prototype/app/feedback/feedback.module.css",
+      "sha256": "06d42295d71206c5bbdf787552755d6999d5d455a7e95c60de1d3fbc65747728"
+    },
+    {
+      "path": "prototype/app/feedback/hospital-location.ts",
+      "sha256": "8485177c7e9fd32603f2a0c01a0faa5335f5019484bcf18ec7b706563faf7923"
+    },
+    {
+      "path": "prototype/app/privacy/page.tsx",
+      "sha256": "bffbc8f9fd3fe7190e92312108e21107338ee52ea233a3afa149c6e97624305c"
+    },
+    {
+      "path": "prototype/supabase/functions/sahara-feedback/schema.ts",
+      "sha256": "9aa7ff3b8836b5cb1613e4daf9dff4080601371e9260f36f976f5029cd873427"
+    },
+    {
+      "path": "prototype/supabase/migrations/20261023142157_sahara_hospital_pin_confirmation.sql",
+      "sha256": "d82c3c88867a73c1a8714189a2c94ed265712a77c46a4df07251b3d116dc2c71"
+    }
+  ],
+  "limits": [
+    "No clinical validation or adoption of a formal ESAS/IPOS instrument",
+    "No Android build or Play change",
+    "Survey answers survive back/edit/errors but unsent professional identity is not retained after reload"
+  ],
+  "symptomBrowserVerification": {
+    "status": "passed",
+    "viewport": 390,
+    "initiallySelectedScore": false,
+    "separateScores": [
+      3,
+      7
+    ],
+    "savedTogether": true,
+    "persistedAfterReload": true,
+    "finalStrayZeroAbsent": true,
+    "data": "fictional guest only",
+    "cloudSyncClaim": false,
+    "report": "output/qa/survey-browser-2026-10-23.json",
+    "verifiedDeployment": "dpl_GALHJNYRE5rG5TDE2fKjVJVb7thw"
+  }
+}

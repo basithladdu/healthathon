@@ -6,6 +6,7 @@ export type FeedbackPayload = Record<string, string | number | boolean | string[
 export type Validation = { value: FeedbackPayload; error?: never } | { error: string; value?: never };
 const appKeys = ['kind','submissionId','website','rating','role','category','message','consent'];
 const hospitalKeys = ['kind','submissionId','website','role','roleOther','fullName','council','councilOther','registrationState','registrationNumber','hospitalName','institutionType','institutionOther','connection','connectionOther','state','city','latitude','longitude','services','morphine','supply','familyNotes','accuracy','consent'];
+const hospitalLocationKeys = ['hospitalAddress','palliativePhysicians','locationConfirmed'];
 export function normalizeMobile(input: unknown): string | null {
   if (typeof input !== 'string' || input.length > 64) return null;
   if (input.trim() === '') return '';
@@ -28,12 +29,14 @@ export function validateFeedback(input: unknown): Validation {
   if (!input || typeof input !== 'object' || Array.isArray(input)) return { error: 'Send a valid form.' };
   const data = input as Record<string, unknown>;
   const contacts = data.kind === 'hospital' && ('mobile' in data || 'email' in data);
-  const keys = data.kind === 'app' ? appKeys : data.kind === 'hospital' ? [...hospitalKeys,...(contacts ? ['mobile','email'] : [])] : [];
+  const confirmedLocation = data.kind === 'hospital' && hospitalLocationKeys.some(key => key in data);
+  const keys = data.kind === 'app' ? appKeys : data.kind === 'hospital' ? [...hospitalKeys,...(contacts ? ['mobile','email'] : []),...(confirmedLocation ? hospitalLocationKeys : [])] : [];
   if (!keys.length || Object.keys(data).length !== keys.length || Object.keys(data).some(key => !keys.includes(key))) return { error: 'Send only the form fields shown.' };
   if (typeof data.submissionId !== 'string' || !UUID.test(data.submissionId) || data.website !== '' || data.consent !== true) return { error: 'Check the consent and reload the form if needed.' };
   if (data.kind === 'app') {
     if (!Number.isInteger(data.rating) || Number(data.rating) < 1 || Number(data.rating) > 5 || !choice(data.role, ['patient','caregiver','clinician','other']) || !choice(data.category, ['navigation','design','bug','idea','other']) || !text(data.message, 0, 1000)) return { error: 'Check your rating, role and feedback.' };
   } else {
+    if (confirmedLocation && (!contacts || data.mobile !== '' || !text(data.hospitalAddress,5,500) || !text(data.palliativePhysicians,0,1000) || data.locationConfirmed !== true)) return { error: 'Enter the hospital address and confirm its pin on the map. Doctor names and departments are optional.' };
     if (contacts && (normalizeMobile(data.mobile) === null || normalizeEmail(data.email) === null)) return { error: 'Check your optional mobile number and email, or leave them blank.' };
     if (!choice(data.role,['oncologist','palliative_physician','physician','resident','nurse','pharmacist','other']) || !choice(data.council,['nmc','state_medical','state_nursing','state_pharmacy','other']) || !choice(data.institutionType,['government_hospital','government_medical_college','private_hospital','private_medical_college','private_clinic','ngo_hospice','other']) || !choice(data.connection,['works_here','refers_here','other'])) return { error: 'Choose your role, council and hospital details.' };
     for (const [selected, extra] of [['role','roleOther'],['council','councilOther'],['institutionType','institutionOther'],['connection','connectionOther']]) {

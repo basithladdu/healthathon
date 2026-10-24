@@ -1,0 +1,101 @@
+Foundation - Mission and Stewardship - Open Healthcare Network
+Home
+Foundation
+CARE
+Solutions
+Impact
+Ecosystem
+Support
+Resources
+Open Healthcare Network Foundation
+A neutral home for open healthcare infrastructure.
+OHC Foundation exists to ensure that open healthcare digital public infrastructure has durable governance, accountable stewardship, release discipline, documentation, security, and a community that can outlast any single deployment.
+Governance model
+Support the foundation
+Mission
+Steward open, standards-based digital public infrastructure for healthcare.
+The foundation maintains CARE and related open-source building blocks that help governments, hospitals, NGOs, and implementation partners deploy interoperable, self-hostable health systems without vendor lock-in.
+CARE is the flagship platform and proof point. The foundation's broader role is to protect the commons around it: governance, standards, releases, documentation, security, contributor pathways, and ecosystem participation.
+Why a foundation
+Public-good infrastructure needs an institution, not only a repo.
+Open healthcare systems must be trusted by governments, clinicians, hospitals, system integrators, and funders. That trust comes from visible governance, clear contribution rules, reliable releases, security processes, and a neutral home where adoption does not mean dependency on a single vendor.
+Open by default
+MIT-licensed software, open standards, open APIs, and public contribution pathways.
+Neutral stewardship
+A shared home where governments, hospitals, vendors, NGOs, funders, and contributors can collaborate.
+Standards-first
+FHIR, SNOMED CT, LOINC, UCUM, ICD-10, ABDM alignment, terminology bindings, and interoperable APIs.
+Long-term trust
+Release discipline, security, documentation, quality assurance, and implementation ecosystem enablement.
+What we steward
+A healthcare commons that can be owned locally and reused globally.
+OHC's work spans product, governance, and ecosystem layers. CARE Core provides the common operating layer. CARE Apps and deployment patterns adapt it to hospitals, public health programs, national rails, TeleICU, palliative care, and assistive AI documentation.
+CARE Core and common healthcare primitives
+CARE Apps and implementation patterns
+Standards and terminology alignment
+Security, quality, and release processes
+Developer, clinician, and implementation communities
+Documentation, funding, and ecosystem sustainability
+Institutional trust
+OHC Foundation is designed to separate stewardship from vendor control.
+Board oversight
+Mission, fiduciary, legal, financial, and strategic stewardship.
+Technical governance
+Maintainers and technical committees guide architecture, releases, and contribution processes.
+Security posture
+Security reporting, access-control expectations, and accountable release practices.
+Open license
+MIT-licensed code and open documentation patterns keep the commons reusable.
+Build the commons
+Help steward open healthcare
+infrastructure for the long term.
+Governments can deploy, institutions can support, implementation partners can localize, and contributors can strengthen the shared core.
+Support the commons
+Start a partnership conversation
+Registered Address
+Open Healthcare Network Foundation
+1st Floor, C M Complex, Kalavath Road, Palarivattom, Kochi, Ernakulam, Kerala, India, 682025
+Corporate Identity Number (CIN)
+U88100KL2025NPL098818
+Email
+support@ohc.network
+Foundation
+Mission
+Governance
+Board & Advisors
+Foundation Team
+Foundation Docs
+ISO Certifications
+Support OHC
+How to Fund Us
+Supporters
+CARE Platform
+CARE Core
+CARE AI
+Apps & Integrations
+Standards & Architecture
+Security & Compliance
+Solutions
+Hospital Management
+TeleICU
+Palliative Care
+CARE Clinic
+Animal Health
+Ecosystem
+The Network
+Implementation Partners
+Clinicians
+Build on Care
+Developers
+Impact
+Resources
+Blog
+FAQ
+Browser requirements
+Press & Media
+Careers
+Contact
+Support metadata
+©
+2026
+Open Healthcare Network Foundation.

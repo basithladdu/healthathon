@@ -1,0 +1,93 @@
+Press & Media - Open Healthcare Network Foundation - Open Healthcare Network
+Home
+Foundation
+CARE
+Solutions
+Impact
+Ecosystem
+Support
+Resources
+Press and media
+Clear language for the foundation and CARE.
+Use source-aware language when covering OHC Foundation, CARE, and open healthcare digital public infrastructure. Impact numbers should be checked against the metrics register before publication.
+Boilerplate
+About Open Healthcare Network Foundation
+Open Healthcare Network Foundation stewards open digital public infrastructure for healthcare. The foundation maintains CARE and related open-source building blocks that help governments, hospitals, NGOs, and implementation partners deploy interoperable, self-hostable, standards-based health systems without vendor lock-in.
+CARE is an open-source Digital Public Good for healthcare workflows across hospitals, public health programs, critical care, palliative care, and care coordination. It is designed around open standards, modular architecture, and real-world frontline adoption.
+Public facts
+Use these as the publication floor.
+Foundation role
+Open Healthcare Network Foundation stewards CARE and related open-source Digital Public Goods for healthcare.
+CARE DPG listing
+CARE is listed in the Digital Public Goods registry as Care | Open Healthcare Network and is MIT licensed.
+Open source
+CARE is built in public with open-source repositories, contribution pathways, and reusable deployment patterns.
+Standards-first
+OHC public materials describe CARE around FHIR R5, SNOMED CT, LOINC, UCUM, ICD-10, ABDM, and open APIs.
+Assets
+Logos, product screenshots, deployment maps, and source links.
+Logos and brand assets
+Use approved OHC and CARE logos from the branding repository.
+Branding repository
+Deployment map
+Use maps with the metrics register so geography and current deployment status are not confused.
+Download map
+Metrics guidance
+Use only dated, approved metrics for press quotes, decks, and fact sheets.
+Verify a metric
+Media inquiries
+For interviews, fact-checks, and approved metrics, contact the OHC team.
+Contact OHC
+Build the commons
+Help steward open healthcare
+infrastructure for the long term.
+Governments can deploy, institutions can support, implementation partners can localize, and contributors can strengthen the shared core.
+Support the commons
+Start a partnership conversation
+Registered Address
+Open Healthcare Network Foundation
+1st Floor, C M Complex, Kalavath Road, Palarivattom, Kochi, Ernakulam, Kerala, India, 682025
+Corporate Identity Number (CIN)
+U88100KL2025NPL098818
+Email
+support@ohc.network
+Foundation
+Mission
+Governance
+Board & Advisors
+Foundation Team
+Foundation Docs
+ISO Certifications
+Support OHC
+How to Fund Us
+Supporters
+CARE Platform
+CARE Core
+CARE AI
+Apps & Integrations
+Standards & Architecture
+Security & Compliance
+Solutions
+Hospital Management
+TeleICU
+Palliative Care
+CARE Clinic
+Animal Health
+Ecosystem
+The Network
+Implementation Partners
+Clinicians
+Build on Care
+Developers
+Impact
+Resources
+Blog
+FAQ
+Browser requirements
+Press & Media
+Careers
+Contact
+Support metadata
+©
+2026
+Open Healthcare Network Foundation.

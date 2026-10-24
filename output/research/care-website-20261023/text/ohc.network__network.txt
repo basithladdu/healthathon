@@ -1,0 +1,34 @@
+Ecosystem
+A shared core, many roles.
+Governments
+Deploy open, standards-based infrastructure with local ownership and long-term public-sector control.
+Hospitals
+Adopt practical HMIS and EMR workflows without license lock-in.
+Implementation partners
+Localize, integrate, train, support, and contribute back to the shared core.
+Clinicians
+Shape clinical workflows, forms, terminology, safety, and assistive AI behavior.
+Developers
+Maintain open-source healthcare infrastructure used in real care settings.
+Funders
+Sustain the public-good infrastructure, release discipline, documentation, and ecosystem.
+Journey
+From crisis response to foundation-stewarded healthcare commons.
+The network story should show evolution without freezing OHC in its pandemic origin. The durable identity is open healthcare infrastructure under neutral stewardship.
+Pandemic response roots
+CARE began as open-source infrastructure for health system coordination during the COVID-19 response.
+Digital Public Good verification
+CARE is listed in the Digital Public Goods registry as Care | Open Healthcare Network with MIT license.
+Critical care and TeleICU
+CARE evolved to support hub-and-spoke critical care workflows and TeleICU integrations.
+HMIS and palliative care
+The platform now supports broader hospital, community, and home-based care workflows.
+Foundation stewardship
+OHC Foundation provides the neutral institutional home for governance, quality, security, documentation, and ecosystem enablement.
+Commons model
+The network is not a vendor channel. It is how the commons stays useful.
+A foundation-led ecosystem lets many institutions build and deploy CARE while sharing improvements, avoiding fragmentation, and giving health systems more control over technology and data.
+Open-source contribution
+Clinical workflow feedback
+Implementation playbooks
+Reusable standards work
