@@ -81,6 +81,10 @@ object PainBodyMapRules {
             leg, mirrored(leg, "$viewerRightSide-leg"))
     }
     fun hit(back: Boolean, x: Float, y: Float): String? = regions(back).firstOrNull { it.contains(PainBodyPoint(x, y)) }?.id
+    /** Adds one area without ever removing it (the "Mark whole part" action); unknown ids change nothing. */
+    fun marked(selected: List<String>, id: String): List<String> = if (id !in sites) selected else sites.keys.filter { it in selected || it == id }
+    /** Removes one area (the "Remove" action on the zoomed part). */
+    fun unmarked(selected: List<String>, id: String): List<String> = selected.filter { it != id }
     fun toggled(selected: List<String>, id: String): List<String> {
         if (id !in sites) return selected
         val next = selected.toMutableSet()

@@ -62,7 +62,7 @@ try {
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'low-power' });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
-  renderer.setClearColor(0xf7f9f4, 1);
+  renderer.setClearColor(0x000000, 0); // transparent: the CSS radial background shows through
   surface.appendChild(renderer.domElement);
   renderer.domElement.setAttribute('aria-label', 'Rotate the body with a drag; tap a body area to select it');
   const scene = new THREE.Scene();

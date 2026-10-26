@@ -8,6 +8,17 @@ import android.webkit.WebResourceResponse
 import android.webkit.WebSettings
 import android.webkit.WebView
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccessibilityNew
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.RotateRight
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.border
 import androidx.compose.foundation.background
@@ -41,39 +52,75 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.ByteArrayInputStream
 
-/** A bundled 3D model plus visible region buttons, with a 2D fallback if this WebView cannot render it. */
+/** A bundled 3D model plus visible region buttons, with a 2D fallback if this WebView cannot render it. Part buttons only zoom; a tap on the model (or "Mark whole part") records the pain. */
 @Composable fun CarePainBodyMap(selected: List<String>, points: List<PainBodyPoint3d>, rating: Int?, hindi: Boolean, readOnly: Boolean = false, onRatingChange: ((Int) -> Unit)? = null, onChange: (List<String>, List<PainBodyPoint3d>) -> Unit) {
     var back by rememberSaveable { mutableStateOf(false) }
     var focus by rememberSaveable { mutableStateOf<String?>(null) }
     var focusNonce by rememberSaveable { mutableIntStateOf(0) }
     val t = { en: String, hi: String -> if (hindi) hi else en }
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(if (readOnly) t("Saved pain areas", "सहेजी गई दर्द की जगह") else t("Where is the pain? (optional)", "दर्द कहाँ है? (वैकल्पिक)"), fontWeight = FontWeight.SemiBold)
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            FilterChip(!back, { if (back) { back = false; focus = null; focusNonce++ } }, label = { Text(t("Front", "सामने")) }, modifier = Modifier.heightIn(min = 48.dp).testTag("pain-body-front"))
-            FilterChip(back, { if (!back) { back = true; focus = null; focusNonce++ } }, label = { Text(t("Back", "पीछे")) }, modifier = Modifier.heightIn(min = 48.dp).testTag("pain-body-back"))
-            if (!readOnly && selected.isNotEmpty()) TextButton(onClick = { onChange(emptyList(), emptyList()) }, modifier = Modifier.heightIn(min = 48.dp).testTag("pain-body-clear")) { Text(t("Clear", "हटाएँ")) }
-        }
-        // The model sits above the parts list so a zoom is visible without scrolling.
-        Text(if (readOnly) t("Pick a part to zoom in. Saved locations stay unchanged. Left and right mean the patient's sides.", "ज़ूम करने के लिए हिस्सा चुनें। सहेजी हुई जगह नहीं बदलेगी। बायाँ और दायाँ मरीज़ की तरफ़ से हैं।") else t("Pick a part to zoom in, then tap exactly where it hurts. Left and right mean the patient's sides.", "ज़ूम करने के लिए हिस्सा चुनें, फिर ठीक वहाँ छुएँ जहाँ दर्द है। बायाँ और दायाँ मरीज़ की तरफ़ से हैं।"), style = MaterialTheme.typography.bodySmall)
+    val markColor = if (rating != null) Color(PainBodyMapRules.heatColor(rating)) else Rust
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Text(if (readOnly) t("Pick a part to zoom in. Saved locations stay unchanged. Left and right mean the patient's sides.", "ज़ूम करने के लिए हिस्सा चुनें। सहेजी हुई जगह नहीं बदलेगी। बायाँ और दायाँ मरीज़ की तरफ़ से हैं।") else t("Pick a part to zoom in, then tap the model exactly where it hurts. Left and right mean the patient's sides.", "ज़ूम करने के लिए हिस्सा चुनें, फिर मॉडल पर ठीक वहाँ छुएँ जहाँ दर्द है। बायाँ और दायाँ मरीज़ की तरफ़ से हैं।"), color = DoctorCardSub, fontSize = 14.sp, lineHeight = 19.sp)
         LocalPainBodyViewer(selected, points, rating, hindi, back, readOnly, focus, focusNonce, onChange)
-        if (!readOnly && onRatingChange != null && selected.isNotEmpty()) PainStrengthSlider(rating, hindi, onRatingChange)
-        Text(if (rating == null) t("Not rated — no pain intensity shown", "अंक नहीं बताया — दर्द की तीव्रता नहीं दिखाई गई") else "${t("Pain", "दर्द")}: $rating/10 · ${t("Colour follows this number", "रंग इसी अंक के अनुसार है")}", style = MaterialTheme.typography.bodySmall)
-        // One list per side: a part zooms the model and marks it; tapping the zoomed, marked part again unmarks it.
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
-            FilterChip(focus == null, { focus = null; focusNonce++ }, label = { Text(t("Full body", "पूरा शरीर")) }, modifier = Modifier.heightIn(min = 48.dp).testTag("pain-body-focus-full"))
-            PainBodyMapRules.sitesFor(back).forEach { id ->
-                // Selected means marked as hurting; the zoomed part gets a heavier border.
-                val marked = if (readOnly) focus == id else id in selected
-                FilterChip(marked, {
-                    if (!readOnly && (id !in selected || focus == id)) { val next = PainBodyMapRules.toggled(selected, id); onChange(next, points.filter { it.site in next }) }
-                    focus = id; focusNonce++
-                }, label = { Text(PainBodyMapRules.focusLabel(id, back, hindi)) },
-                    border = if (focus == id) BorderStroke(2.dp, Rust) else FilterChipDefaults.filterChipBorder(enabled = true, selected = marked),
-                    modifier = Modifier.heightIn(min = 48.dp).testTag(if (readOnly) "pain-body-focus-$id" else "pain-body-site-$id"))
+        if (!readOnly && onRatingChange != null && selected.isNotEmpty()) Surface(shape = RoundedCornerShape(16.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) { Box(Modifier.padding(14.dp)) { PainStrengthSlider(rating, hindi, onRatingChange) } }
+        Text(if (rating == null) t("Not rated — no pain intensity shown", "अंक नहीं बताया — दर्द की तीव्रता नहीं दिखाई गई") else "${t("Pain", "दर्द")}: $rating/10 · ${t("Colour follows this number", "रंग इसी अंक के अनुसार है")}", color = DoctorCardSub, fontSize = 13.sp)
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Text(if (readOnly) t("Saved pain areas", "सहेजी गई दर्द की जगह") else t("Where is the pain? (optional)", "दर्द कहाँ है? (वैकल्पिक)"), color = DoctorCardInk, fontSize = 17.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
+            if (!readOnly && selected.isNotEmpty()) TextButton(onClick = { onChange(emptyList(), emptyList()) }, modifier = Modifier.heightIn(min = 48.dp).testTag("pain-body-clear")) { Text(t("Clear", "हटाएँ"), color = Rust, fontWeight = FontWeight.SemiBold) }
+        }
+        Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Color(0x14382E29)).padding(4.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            PainSideOption(!back, t("Front", "सामने"), Icons.Default.AccessibilityNew, "pain-body-front", Modifier.weight(1f)) { if (back) { back = false; focus = null; focusNonce++ } }
+            PainSideOption(back, t("Back", "पीछे"), Icons.Default.RotateRight, "pain-body-back", Modifier.weight(1f)) { if (!back) { back = true; focus = null; focusNonce++ } }
+        }
+        val tiles = listOf<String?>(null) + PainBodyMapRules.sitesFor(back)
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            tiles.chunked(3).forEach { row ->
+                Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    row.forEach { id ->
+                        if (id == null) PainPartTile(focus == null, false, t("Full body", "पूरा शरीर"), t("Full body, zoom out", "पूरा शरीर, ज़ूम आउट"), markColor, "pain-body-focus-full", Icons.Default.Person, t("Marked", "चिह्नित"), Modifier.weight(1f).fillMaxHeight()) { focus = null; focusNonce++ }
+                        else {
+                            val label = PainBodyMapRules.focusLabel(id, back, hindi); val marked = id in selected
+                            PainPartTile(focus == id, marked, label, "${t("Zoom to", "ज़ूम करें:")} $label${if (marked) t(", marked as pain", ", दर्द के रूप में चिह्नित") else ""}", markColor, if (readOnly) "pain-body-focus-$id" else "pain-body-site-$id", null, t("Marked", "चिह्नित"), Modifier.weight(1f).fillMaxHeight()) { focus = id; focusNonce++ }
+                        }
+                    }
+                    repeat(3 - row.size) { Spacer(Modifier.weight(1f)) }
+                }
             }
         }
-        if (selected.isNotEmpty()) Text(selected.joinToString { PainBodyMapRules.label(it, hindi) }, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.testTag("pain-body-selected"))
+        val zoomed = focus
+        if (!readOnly && zoomed != null && zoomed in PainBodyMapRules.sites) {
+            val part = PainBodyMapRules.focusLabel(zoomed, back, hindi)
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                if (zoomed in selected) {
+                    Text("$part · ${t("Marked as pain", "दर्द चिह्नित")}", color = DoctorCardInk, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
+                    TextButton(onClick = { val next = PainBodyMapRules.unmarked(selected, zoomed); onChange(next, points.filter { it.site in next }) }, modifier = Modifier.heightIn(min = 48.dp).testTag("pain-body-unmark-$zoomed")) { Icon(Icons.Default.Close, null, Modifier.size(18.dp), tint = Rust); Spacer(Modifier.width(4.dp)); Text(t("Remove", "हटाएँ"), color = Rust, fontWeight = FontWeight.SemiBold) }
+                } else {
+                    Text(t("Tap the model where it hurts, or", "मॉडल पर जहाँ दर्द है वहाँ छुएँ, या"), color = DoctorCardSub, fontSize = 14.sp, lineHeight = 19.sp, modifier = Modifier.weight(1f))
+                    TextButton(onClick = { val next = PainBodyMapRules.marked(selected, zoomed); onChange(next, points.filter { it.site in next }) }, modifier = Modifier.heightIn(min = 48.dp).testTag("pain-body-mark-$zoomed")) { Text(t("Mark whole $part", "पूरा $part चिह्नित करें"), color = Rust, fontWeight = FontWeight.SemiBold) }
+                }
+            }
+        }
+        if (selected.isNotEmpty()) Text(selected.joinToString { PainBodyMapRules.label(it, hindi) }, color = DoctorCardInk, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.testTag("pain-body-selected"))
+    }
+}
+
+/** One half of the Front/Back segmented toggle. */
+@Composable private fun PainSideOption(on: Boolean, label: String, icon: ImageVector, tag: String, modifier: Modifier, onClick: () -> Unit) {
+    Row(modifier.heightIn(min = 48.dp).clip(RoundedCornerShape(12.dp)).background(if (on) Rust else Color.Transparent).selectable(on, onClick = onClick, role = Role.RadioButton).padding(horizontal = 12.dp).testTag(tag), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+        Icon(icon, null, Modifier.size(20.dp), tint = if (on) Color.White else DoctorCardInk); Spacer(Modifier.width(8.dp)); Text(label, color = if (on) Color.White else DoctorCardInk, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+    }
+}
+
+/** A body-part tile: outlined by default, filled accent when zoomed, with a pain-colour dot and "Marked" label when recorded as pain. */
+@Composable private fun PainPartTile(zoomed: Boolean, marked: Boolean, label: String, description: String, markColor: Color, tag: String, icon: ImageVector?, markedWord: String, modifier: Modifier, onClick: () -> Unit) {
+    val shape = RoundedCornerShape(14.dp); val ink = if (zoomed) Color.White else DoctorCardInk
+    Box(modifier.heightIn(min = 56.dp).clip(shape).background(if (zoomed) Rust else Paper).border(if (zoomed) 2.dp else 1.5.dp, if (zoomed) Rust else Color(0x66382E29), shape)
+        .selectable(zoomed, onClick = onClick, role = Role.RadioButton).semantics(mergeDescendants = true) { contentDescription = description }.testTag(tag).padding(horizontal = 6.dp, vertical = 8.dp), contentAlignment = Alignment.Center) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            if (icon != null) Icon(icon, null, Modifier.size(18.dp), tint = ink)
+            Text(label, color = ink, fontSize = 13.sp, lineHeight = 17.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center, maxLines = 3)
+            if (marked) Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) { Box(Modifier.size(10.dp).background(markColor, CircleShape).border(1.5.dp, Color.White, CircleShape)); Text(markedWord, color = ink, fontSize = 11.sp, fontWeight = FontWeight.Medium) }
+        }
     }
 }
 
@@ -119,8 +166,10 @@ import java.io.ByteArrayInputStream
         Text(if (readOnly) { if (hindi) "इस फ़ोन पर 3D नहीं खुला। सहेजे हुए हिस्से नीचे नक्शे पर हैं।" else "3D could not open on this phone. Saved areas are shown on the diagram." } else if (hindi) "इस फ़ोन पर 3D नहीं खुला। नीचे नक्शे या बटन से जगह चुनें।" else "3D could not open on this phone. Choose on the map or the buttons below.", style = MaterialTheme.typography.bodySmall)
         PainBodyFallback(selected, rating, back, hindi, readOnly) { next -> if (!readOnly) onChange(next, points.filter { it.site in next }) }
     } else {
-        if (!ready) Text(if (hindi) "शरीर का नक्शा खुल रहा है…" else "Opening body map…", style = MaterialTheme.typography.bodySmall)
-        AndroidView(modifier = Modifier.fillMaxWidth().height(320.dp).testTag("pain-body-3d").semantics {
+        val frame = RoundedCornerShape(20.dp)
+        Box(Modifier.fillMaxWidth().height(440.dp).clip(frame).background(Color(0xFF2A2421)).border(1.dp, Color(0xFF4A403A), frame)) {
+        if (!ready) Text(if (hindi) "शरीर का नक्शा खुल रहा है…" else "Opening body map…", color = Color(0xFFF4ECE3), fontSize = 13.sp, modifier = Modifier.align(Alignment.Center))
+        AndroidView(modifier = Modifier.fillMaxSize().testTag("pain-body-3d").semantics {
             contentDescription = if (readOnly) { if (hindi) "सहेजी गई दर्द की जगह का घुमाने वाला नक्शा। जगह बदली नहीं जा सकती।" else "Rotatable saved pain map. Saved locations cannot be changed here." } else if (hindi) "घुमाने वाला दर्द की जगह का नक्शा। नीचे जगह के बटन से भी चुन सकते हैं।" else "Rotatable pain location map. Accessible region buttons are below."
         }, factory = { context ->
             WebView(context).apply {
@@ -187,6 +236,7 @@ import java.io.ByteArrayInputStream
             view.stopLoading(); view.destroy()
             if (webView === view) webView = null
         })
+        }
     }
 }
 

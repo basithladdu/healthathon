@@ -194,10 +194,19 @@ class CareSymptomDiaryUiTest {
             onSave = { _, value -> saved = value }, onClose = {}) } }
         ui.onNodeWithTag("symptom-choice-Pain").performScrollTo().performClick()
         ui.onNodeWithTag("pain-body-site-left-leg").performScrollTo().assertTextContains("बायाँ पैर").performClick()
+        ui.onNodeWithTag("pain-body-site-left-leg").assertIsSelected() // zoomed only
+        ui.onNodeWithTag("pain-body-selected").assertDoesNotExist() // a zoom never marks pain
+        ui.onNodeWithTag("pain-body-mark-left-leg").performScrollTo().performClick()
+        ui.onNodeWithTag("pain-body-selected").performScrollTo().assertTextContains("बायाँ पैर")
         ui.onNodeWithTag("pain-body-back").performScrollTo().performClick()
-        ui.onNodeWithTag("pain-body-site-left-leg").performScrollTo().assertIsSelected()
+        ui.onNodeWithTag("pain-body-site-left-leg").performScrollTo().assertIsNotSelected() // side change resets the zoom, the mark stays
+        ui.onNodeWithTag("pain-body-selected").assertExists()
         ui.onNodeWithTag("pain-body-clear").performScrollTo().performClick()
+        ui.onNodeWithTag("pain-body-selected").assertDoesNotExist()
         ui.onNodeWithTag("pain-body-site-right-arm").performScrollTo().performClick()
+        ui.onNodeWithTag("pain-body-mark-right-arm").performScrollTo().performClick()
+        ui.onNodeWithTag("pain-body-unmark-right-arm").assertExists()
+        ui.onNodeWithTag("pain-body-selected").assertExists()
         ui.onNodeWithTag("symptom-step-next").performScrollTo().performClick()
         ui.onNodeWithTag("diary-choice-patient").performScrollTo().performClick()
         ui.onNodeWithTag("symptom-rating-4").performScrollTo().performClick()

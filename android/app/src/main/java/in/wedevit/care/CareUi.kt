@@ -169,7 +169,6 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
                 Text(if (compactWelcomeHeader) "Doctor" else "Doctor workspace", fontSize = 14.sp, maxLines = 1)
             }
         }
-        if (person != null && walkthrough != null) Text("Walkthrough · ${walkthrough.label}", Modifier.fillMaxWidth().background(Mint).padding(horizontal = 16.dp, vertical = 6.dp).testTag("walkthrough-banner"), fontSize = 13.sp, fontWeight = FontWeight.Medium)
         if (person != null) {
             CarePersonSelector(person.name, people.map { it.id to it.name }, selected,
                 enabled = !activeRecording,

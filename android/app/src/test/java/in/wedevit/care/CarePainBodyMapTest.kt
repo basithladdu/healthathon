@@ -91,4 +91,12 @@ class CarePainBodyMapTest {
         assertEquals(listOf("None", "Mild", "Mild", "Moderate", "Severe", "Worst"), listOf(0, 3, 1, 5, 8, 10).map { PainBodyMapRules.strengthWord(it, false) })
         assertEquals("हल्का", PainBodyMapRules.strengthWord(2, true)); assertEquals("सबसे ज़्यादा", PainBodyMapRules.strengthWord(10, true))
     }
+    @Test fun markingAndUnmarkingAreIdempotentAndKeepBodyOrder() {
+        val marked = PainBodyMapRules.marked(listOf("left-leg"), "head")
+        assertEquals(listOf("head", "left-leg"), marked)
+        assertEquals(marked, PainBodyMapRules.marked(marked, "head"))
+        assertEquals(marked, PainBodyMapRules.marked(marked, "not-an-area"))
+        assertEquals(listOf("left-leg"), PainBodyMapRules.unmarked(marked, "head"))
+        assertEquals(listOf("left-leg"), PainBodyMapRules.unmarked(listOf("left-leg"), "head"))
+    }
 }
