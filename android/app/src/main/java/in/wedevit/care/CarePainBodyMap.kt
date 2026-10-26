@@ -13,7 +13,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.background
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.semantics.stateDescription
 import kotlin.math.roundToInt
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -78,17 +77,17 @@ import java.io.ByteArrayInputStream
     }
 }
 
-/** Blue-to-red pain strength slider. Untouched means no rating: the model stays grey and nothing is stored until the user moves it. */
+/** Wong-Baker style pain strength slider: six solid green-to-red blocks. Untouched means no rating: the model stays grey and nothing is stored until the user moves it. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable private fun PainStrengthSlider(rating: Int?, hindi: Boolean, onRatingChange: (Int) -> Unit) {
     val t = { en: String, hi: String -> if (hindi) hi else en }
-    val stops = PainBodyMapRules.heatStops.map { Color(it) }
+    val stops = PainBodyMapRules.heatStops.map { Color(it) }; val blockWeights = listOf(1.5f, 2f, 2f, 2f, 2f, 0.5f) // block edges sit between integers so the thumb always lies over its own block
     Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(2.dp)) {
         Text(t("How strong is the pain?", "दर्द कितना तेज़ है?"), fontWeight = FontWeight.SemiBold)
         Text(if (rating == null) t("Slide to set. Not rated yet.", "अंक चुनने के लिए खिसकाएँ। अभी अंक नहीं बताया।") else "$rating/10 · ${PainBodyMapRules.strengthWord(rating, hindi)}", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold, color = if (rating == null) MaterialTheme.colorScheme.onSurfaceVariant else Color(PainBodyMapRules.heatColor(rating)), modifier = Modifier.testTag("pain-strength-value"))
         Slider(value = (rating ?: 0).toFloat(), onValueChange = { onRatingChange(it.roundToInt().coerceIn(0, 10)) }, valueRange = 0f..10f, steps = 9,
-            modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("pain-strength-slider").semantics { contentDescription = t("Pain strength from 0 blue to 10 red", "दर्द की तीव्रता, 0 नीला से 10 लाल"); stateDescription = if (rating == null) t("Not rated", "अंक नहीं बताया") else "$rating, ${PainBodyMapRules.strengthWord(rating, hindi)}" },
-            track = { Box(Modifier.fillMaxWidth().height(12.dp).clip(CircleShape).background(Brush.horizontalGradient(stops))) },
+            modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("pain-strength-slider").semantics { contentDescription = t("Pain strength from 0 green to 10 red", "दर्द की तीव्रता, 0 हरा से 10 लाल"); stateDescription = if (rating == null) t("Not rated", "अंक नहीं बताया") else "$rating, ${PainBodyMapRules.strengthWord(rating, hindi)}" },
+            track = { Row(Modifier.fillMaxWidth().height(14.dp).clip(CircleShape), horizontalArrangement = Arrangement.spacedBy(2.dp)) { stops.forEachIndexed { i, c -> Box(Modifier.weight(blockWeights[i]).fillMaxHeight().background(c)) } } },
             thumb = { Box(Modifier.size(28.dp).background(if (rating == null) Color.Gray else Color(PainBodyMapRules.heatColor(rating)), CircleShape).border(3.dp, Color.White, CircleShape).border(1.dp, Color.DarkGray, CircleShape)) })
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { Text("0 ${PainBodyMapRules.strengthWord(0, hindi)}", style = MaterialTheme.typography.labelSmall); Text("10 ${PainBodyMapRules.strengthWord(10, hindi)}", style = MaterialTheme.typography.labelSmall) }
     }

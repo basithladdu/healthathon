@@ -151,15 +151,13 @@ try {
   const point = new THREE.Vector3();
   const meshes = [];
   const neutral = new THREE.Color('#ced8ca');
-  // Heat ramp, pain 0 (blue) to 10 (red) in steps of 2; keep in sync with PainBodyMapRules.heatStops in Kotlin.
-  const HEAT = ['#2b59d9', '#16c1d9', '#3cc552', '#f2d531', '#f28a1f', '#d62a1f'].map((hex) => new THREE.Color(hex));
+  // Wong-Baker style solid blocks, pain 0-1, 2-3, 4-5, 6-7, 8-9, 10: green to red. Keep in sync with PainBodyMapRules.heatStops in Kotlin.
+  const HEAT = ['#4ca64c', '#8cc152', '#f6d743', '#f2a33a', '#e8693a', '#d9363e'].map((hex) => new THREE.Color(hex));
   const unratedGlow = new THREE.Color('#8d978c');
-  const heatColor = (rating, target = new THREE.Color()) => {
-    const x = Math.min(10, Math.max(0, rating)) / 2, i = Math.min(HEAT.length - 2, Math.floor(x));
-    return target.copy(HEAT[i]).lerp(HEAT[i + 1], x - i);
-  };
-  // Heat-map glow: painted per fragment on the body material from world-space points (Gaussian falloff), so it stays smooth on a low-poly mesh.
-  const MAX_GLOW = 12, GLOW_SIGMA = 0.045; // world units are about metres (body height 1.8)
+  const heatColor = (rating, target = new THREE.Color()) => target.copy(HEAT[Math.min(5, Math.floor(Math.min(10, Math.max(0, rating)) / 2))]);
+  // Contour heat map: concentric quantised bands around each point in world space (about metres; body height 1.8),
+  // distance perturbed by low-frequency noise so the outline is organic, each band edge slightly soft.
+  const MAX_GLOW = 12, GLOW_BANDS = 8, GLOW_RADIUS = 0.13;
   const glow = { count: { value: 0 }, pts: { value: Array.from({ length: MAX_GLOW }, () => new THREE.Vector3()) }, cols: { value: Array.from({ length: MAX_GLOW }, () => new THREE.Vector3()) }, strength: { value: 1 } };
   const makeBodyMaterial = () => {
     const material = new THREE.MeshStandardMaterial({ color: 0xffffff, vertexColors: true, roughness: 0.75, metalness: 0.02 });
@@ -176,11 +174,22 @@ uniform vec3 uGlowPts[${MAX_GLOW}];
 uniform vec3 uGlowCols[${MAX_GLOW}];
 uniform float uGlowStrength;`)
         .replace('#include <color_fragment>', `#include <color_fragment>
-for (int i = 0; i < ${MAX_GLOW}; i++) {
-  if (float(i) >= uGlowCount) break;
-  vec3 gd = vGlowPos - uGlowPts[i];
-  float g = exp(-dot(gd, gd) / (2.0 * ${(GLOW_SIGMA * GLOW_SIGMA).toFixed(6)})) * uGlowStrength;
-  diffuseColor.rgb = mix(diffuseColor.rgb, uGlowCols[i], g);
+{
+  float bestL = ${GLOW_BANDS}.0; vec3 bestC = vec3(0.0);
+  float wob = 0.5 * sin(vGlowPos.x * 43.0 + vGlowPos.y * 17.0) + 0.3 * sin(vGlowPos.y * 37.0 - vGlowPos.z * 29.0 + 1.3) + 0.2 * sin(vGlowPos.z * 51.0 + vGlowPos.x * 23.0 + 2.1);
+  for (int i = 0; i < ${MAX_GLOW}; i++) {
+    if (float(i) >= uGlowCount) break;
+    float d = length(vGlowPos - uGlowPts[i]) * (1.0 + 0.2 * wob);
+    float s = d / ${GLOW_RADIUS.toFixed(4)} * ${GLOW_BANDS}.0;
+    float lv = floor(s) + smoothstep(0.88, 1.0, fract(s));
+    if (lv < bestL) { bestL = lv; bestC = uGlowCols[i]; }
+  }
+  if (bestL < ${GLOW_BANDS}.0) {
+    float u = clamp(bestL / ${GLOW_BANDS - 1}.0, 0.0, 1.0);
+    vec3 tint = mix(bestC, vec3(0.973, 0.894, 0.863), pow(u, 1.5) * 0.92);
+    float a = bestL <= ${GLOW_BANDS - 1}.0 ? mix(1.0, 0.5, u) : mix(0.5, 0.0, bestL - ${GLOW_BANDS - 1}.0);
+    diffuseColor.rgb = mix(diffuseColor.rgb, tint, a * uGlowStrength);
+  }
 }`);
     };
     material.customProgramCacheKey = () => 'sahara-pain-heat';

@@ -83,10 +83,11 @@ class CarePainBodyMapTest {
         assertEquals("बायाँ हाथ", PainBodyMapRules.focusLabel("left-arm", true, true))
         assertEquals("Upper back", PainBodyMapRules.focusLabel("upper-back", true, false))
     }
-    @Test fun heatRampRunsBlueToRedAndWordsFollowBands() {
-        assertEquals(0xFF2B59D9L, PainBodyMapRules.heatColor(0)); assertEquals(0xFFD62A1FL, PainBodyMapRules.heatColor(10))
-        assertEquals(0xFF3CC552L, PainBodyMapRules.heatColor(4)); assertEquals(PainBodyMapRules.heatColor(10), PainBodyMapRules.heatColor(99)); assertEquals(PainBodyMapRules.heatColor(0), PainBodyMapRules.heatColor(-3))
-        val mid = PainBodyMapRules.heatColor(5); assertTrue(((mid shr 16) and 0xFF) in 0x3CL..0xF2L && ((mid shr 8) and 0xFF) in 0xC5L..0xD5L)
+    @Test fun heatBlocksRunGreenToRedAndWordsFollowBands() {
+        assertEquals(0xFF4CA64CL, PainBodyMapRules.heatColor(0)); assertEquals(0xFFD9363EL, PainBodyMapRules.heatColor(10))
+        assertEquals(PainBodyMapRules.heatColor(0), PainBodyMapRules.heatColor(1)); assertEquals(0xFF8CC152L, PainBodyMapRules.heatColor(2)); assertEquals(0xFF8CC152L, PainBodyMapRules.heatColor(3)); assertEquals(0xFFF6D743L, PainBodyMapRules.heatColor(4))
+        assertEquals(0xFFE8693AL, PainBodyMapRules.heatColor(9)); assertEquals(PainBodyMapRules.heatColor(10), PainBodyMapRules.heatColor(99)); assertEquals(PainBodyMapRules.heatColor(0), PainBodyMapRules.heatColor(-3))
+        assertEquals(6, (0..10).map { PainBodyMapRules.heatColor(it) }.toSet().size)
         assertEquals(listOf("None", "Mild", "Mild", "Moderate", "Severe", "Worst"), listOf(0, 3, 1, 5, 8, 10).map { PainBodyMapRules.strengthWord(it, false) })
         assertEquals("हल्का", PainBodyMapRules.strengthWord(2, true)); assertEquals("सबसे ज़्यादा", PainBodyMapRules.strengthWord(10, true))
     }
