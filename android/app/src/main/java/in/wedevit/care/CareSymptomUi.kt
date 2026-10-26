@@ -240,7 +240,7 @@ import java.time.format.DateTimeFormatter
                     if (otherSymptom) CareField(symptom, { symptom = it.take(80) }, t("Symptom name", "परेशानी का नाम"), singleLine = true)
                 }
                 if (!quick && cur == "where" && symptom == "Pain") SymptomSection(null, t("Where does it hurt?", "कहाँ दर्द है?"), t("Optional details.", "वैकल्पिक जानकारी।")) {
-                    CarePainBodyMap(value.painBodySites, value.painBodyPoints, rating.takeIf { it >= 0 }, hindi) { sites, points -> bodySites = sites.joinToString("|"); bodyPoints = PainBodyMapRules.encodePoints(points).toString() }
+                    CarePainBodyMap(value.painBodySites, value.painBodyPoints, rating.takeIf { it >= 0 }, hindi, onRatingChange = { rating = it }) { sites, points -> bodySites = sites.joinToString("|"); bodyPoints = PainBodyMapRules.encodePoints(points).toString() }
                     CareField(location, { location = it.take(100) }, t("Pain location (optional)", "दर्द की जगह (वैकल्पिक)"), singleLine = true)
                     Text(t("When does it happen? (optional)", "कब होता है? (वैकल्पिक)"), color = DoctorCardInk, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { SymptomDiaryRules.triggers.forEach { (key, labels) ->

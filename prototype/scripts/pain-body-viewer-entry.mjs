@@ -150,11 +150,42 @@ try {
   const pointer = new THREE.Vector2();
   const point = new THREE.Vector3();
   const meshes = [];
-  const markers = new THREE.Group(); scene.add(markers);
-  const markerGeometry = new THREE.SphereGeometry(0.018, 12, 8);
   const neutral = new THREE.Color('#ced8ca');
-  const low = new THREE.Color('#e4b3a5');
-  const high = new THREE.Color('#ad302d');
+  // Heat ramp, pain 0 (blue) to 10 (red) in steps of 2; keep in sync with PainBodyMapRules.heatStops in Kotlin.
+  const HEAT = ['#2b59d9', '#16c1d9', '#3cc552', '#f2d531', '#f28a1f', '#d62a1f'].map((hex) => new THREE.Color(hex));
+  const unratedGlow = new THREE.Color('#8d978c');
+  const heatColor = (rating, target = new THREE.Color()) => {
+    const x = Math.min(10, Math.max(0, rating)) / 2, i = Math.min(HEAT.length - 2, Math.floor(x));
+    return target.copy(HEAT[i]).lerp(HEAT[i + 1], x - i);
+  };
+  // Heat-map glow: painted per fragment on the body material from world-space points (Gaussian falloff), so it stays smooth on a low-poly mesh.
+  const MAX_GLOW = 12, GLOW_SIGMA = 0.045; // world units are about metres (body height 1.8)
+  const glow = { count: { value: 0 }, pts: { value: Array.from({ length: MAX_GLOW }, () => new THREE.Vector3()) }, cols: { value: Array.from({ length: MAX_GLOW }, () => new THREE.Vector3()) }, strength: { value: 1 } };
+  const makeBodyMaterial = () => {
+    const material = new THREE.MeshStandardMaterial({ color: 0xffffff, vertexColors: true, roughness: 0.75, metalness: 0.02 });
+    material.onBeforeCompile = (shader) => {
+      shader.uniforms.uGlowCount = glow.count; shader.uniforms.uGlowPts = glow.pts; shader.uniforms.uGlowCols = glow.cols; shader.uniforms.uGlowStrength = glow.strength;
+      shader.vertexShader = shader.vertexShader
+        .replace('#include <common>', '#include <common>\nvarying vec3 vGlowPos;')
+        .replace('#include <begin_vertex>', '#include <begin_vertex>\nvGlowPos =(modelMatrix * vec4(transformed, 1.0)).xyz;');
+      shader.fragmentShader = shader.fragmentShader
+        .replace('#include <common>', `#include <common>
+varying vec3 vGlowPos;
+uniform float uGlowCount;
+uniform vec3 uGlowPts[${MAX_GLOW}];
+uniform vec3 uGlowCols[${MAX_GLOW}];
+uniform float uGlowStrength;`)
+        .replace('#include <color_fragment>', `#include <color_fragment>
+for (int i = 0; i < ${MAX_GLOW}; i++) {
+  if (float(i) >= uGlowCount) break;
+  vec3 gd = vGlowPos - uGlowPts[i];
+  float g = exp(-dot(gd, gd) / (2.0 * ${(GLOW_SIGMA * GLOW_SIGMA).toFixed(6)})) * uGlowStrength;
+  diffuseColor.rgb = mix(diffuseColor.rgb, uGlowCols[i], g);
+}`);
+    };
+    material.customProgramCacheKey = () => 'sahara-pain-heat';
+    return material;
+  };
 
   new GLTFLoader().load('./body.glb', (gltf) => {
     const body = gltf.scene;
@@ -177,7 +208,7 @@ try {
       const positions = object.geometry.getAttribute('position');
       const colors = new THREE.BufferAttribute(new Float32Array(positions.count * 3), 3);
       object.geometry.setAttribute('color', colors);
-      object.material = new THREE.MeshStandardMaterial({ color: 0xffffff, vertexColors: true, roughness: 0.75, metalness: 0.02 });
+      object.material = makeBodyMaterial();
       const sites = [];
       for (let index = 0; index < positions.count; index++) {
         point.fromBufferAttribute(positions, index); object.localToWorld(point);
@@ -188,21 +219,25 @@ try {
     applyState = () => {
       const selected = new Set(state.selected);
       const hasRating = state.rating !== null;
-      const tint = state.rating === 0 ? neutral : low.clone().lerp(high, (state.rating || 0) / 10);
+      const tint = hasRating ? heatColor(state.rating) : unratedGlow;
+      const pointed = new Set(state.points.map((saved) => saved.site));
+      // Parts marked without a tapped point keep a soft region tint; tapped points glow on the surface instead.
+      const regionTint = neutral.clone().lerp(tint, 0.45);
       for (const mesh of meshes) {
         const colors = mesh.geometry.getAttribute('color');
         mesh.userData.painSites.forEach((site, index) => {
-          const color = hasRating && selected.has(site) ? tint : neutral;
+          const color = selected.has(site) && !pointed.has(site) ? regionTint : neutral;
           colors.setXYZ(index, color.r, color.g, color.b);
         });
         colors.needsUpdate = true;
       }
-      for (const marker of [...markers.children]) { markers.remove(marker); marker.material.dispose(); }
-      for (const saved of state.points) {
-        const marker = new THREE.Mesh(markerGeometry, new THREE.MeshStandardMaterial({ color: hasRating ? tint : 0x647865, roughness: 0.6 }));
-        marker.position.set(saved.x * worldSize.x / 2, bounds.min.y + saved.y * worldSize.y, saved.z * worldSize.z / 2);
-        markers.add(marker);
-      }
+      const shown = state.points.slice(0, MAX_GLOW);
+      shown.forEach((saved, index) => {
+        glow.pts.value[index].set(saved.x * worldSize.x / 2, bounds.min.y + saved.y * worldSize.y, saved.z * worldSize.z / 2);
+        glow.cols.value[index].set(tint.r, tint.g, tint.b);
+      });
+      glow.count.value = shown.length;
+      glow.strength.value = hasRating ? 1 : 0.7;
       status.textContent = state.readOnly
         ? state.hindi ? 'सेव किया दर्द का मैप · घुमाने के लिए खींचें' : 'Saved pain map · drag to rotate'
         : state.hindi ? 'घुमाने के लिए खींचें · दर्द की जगह छुएँ' : 'Drag to rotate · tap where it hurts';

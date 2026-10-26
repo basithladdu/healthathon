@@ -27,6 +27,18 @@ data class PainBodyRegion(val id: String, val outline: List<PainBodyPoint>) {
 /** Original coarse body regions, in a 100 by 200 coordinate space. Sides always refer to the patient. */
 object PainBodyMapRules {
     const val MODEL = "sahara-body-v1"
+    /** Pain heat ramp as opaque ARGB, rating 0 (blue) to 10 (red) in steps of 2: blue, cyan, green, yellow, orange, red. The 3D viewer uses the same stops. */
+    val heatStops = listOf(0xFF2B59D9L, 0xFF16C1D9L, 0xFF3CC552L, 0xFFF2D531L, 0xFFF28A1FL, 0xFFD62A1FL)
+    fun heatColor(rating: Int): Long {
+        val x = rating.coerceIn(0, 10) / 2f; val i = minOf(heatStops.size - 2, x.toInt()); val f = x - i
+        fun ch(shift: Int) = (((heatStops[i] shr shift) and 0xFF) + (((heatStops[i + 1] shr shift) and 0xFF) - ((heatStops[i] shr shift) and 0xFF)) * f).toLong().coerceIn(0, 255) shl shift
+        return 0xFF000000L or ch(16) or ch(8) or ch(0)
+    }
+    /** Plain-word band for the pain strength slider; 0 None, 1-3 Mild, 4-6 Moderate, 7-9 Severe, 10 Worst. */
+    fun strengthWord(rating: Int, hindi: Boolean): String = when (rating.coerceIn(0, 10)) {
+        0 -> if (hindi) "कोई नहीं" else "None"; in 1..3 -> if (hindi) "हल्का" else "Mild"; in 4..6 -> if (hindi) "मध्यम" else "Moderate"
+        in 7..9 -> if (hindi) "तेज़" else "Severe"; else -> if (hindi) "सबसे ज़्यादा" else "Worst"
+    }
     val sites = linkedMapOf(
         "head" to ("Head" to "सिर"), "neck" to ("Neck" to "गर्दन"), "chest" to ("Chest" to "छाती"),
         "abdomen" to ("Abdomen" to "पेट"), "upper-back" to ("Upper back" to "पीठ का ऊपरी हिस्सा"),

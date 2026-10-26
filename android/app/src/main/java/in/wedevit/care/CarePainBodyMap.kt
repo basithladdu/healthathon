@@ -9,6 +9,13 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.border
+import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.semantics.stateDescription
+import kotlin.math.roundToInt
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -36,7 +43,7 @@ import org.json.JSONObject
 import java.io.ByteArrayInputStream
 
 /** A bundled 3D model plus visible region buttons, with a 2D fallback if this WebView cannot render it. */
-@Composable fun CarePainBodyMap(selected: List<String>, points: List<PainBodyPoint3d>, rating: Int?, hindi: Boolean, readOnly: Boolean = false, onChange: (List<String>, List<PainBodyPoint3d>) -> Unit) {
+@Composable fun CarePainBodyMap(selected: List<String>, points: List<PainBodyPoint3d>, rating: Int?, hindi: Boolean, readOnly: Boolean = false, onRatingChange: ((Int) -> Unit)? = null, onChange: (List<String>, List<PainBodyPoint3d>) -> Unit) {
     var back by rememberSaveable { mutableStateOf(false) }
     var focus by rememberSaveable { mutableStateOf<String?>(null) }
     var focusNonce by rememberSaveable { mutableIntStateOf(0) }
@@ -51,6 +58,7 @@ import java.io.ByteArrayInputStream
         // The model sits above the parts list so a zoom is visible without scrolling.
         Text(if (readOnly) t("Pick a part to zoom in. Saved locations stay unchanged. Left and right mean the patient's sides.", "ज़ूम करने के लिए हिस्सा चुनें। सहेजी हुई जगह नहीं बदलेगी। बायाँ और दायाँ मरीज़ की तरफ़ से हैं।") else t("Pick a part to zoom in, then tap exactly where it hurts. Left and right mean the patient's sides.", "ज़ूम करने के लिए हिस्सा चुनें, फिर ठीक वहाँ छुएँ जहाँ दर्द है। बायाँ और दायाँ मरीज़ की तरफ़ से हैं।"), style = MaterialTheme.typography.bodySmall)
         LocalPainBodyViewer(selected, points, rating, hindi, back, readOnly, focus, focusNonce, onChange)
+        if (!readOnly && onRatingChange != null && selected.isNotEmpty()) PainStrengthSlider(rating, hindi, onRatingChange)
         Text(if (rating == null) t("Not rated — no pain intensity shown", "अंक नहीं बताया — दर्द की तीव्रता नहीं दिखाई गई") else "${t("Pain", "दर्द")}: $rating/10 · ${t("Colour follows this number", "रंग इसी अंक के अनुसार है")}", style = MaterialTheme.typography.bodySmall)
         // One list per side: a part zooms the model and marks it; tapping the zoomed, marked part again unmarks it.
         FlowRow(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
@@ -67,6 +75,22 @@ import java.io.ByteArrayInputStream
             }
         }
         if (selected.isNotEmpty()) Text(selected.joinToString { PainBodyMapRules.label(it, hindi) }, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.testTag("pain-body-selected"))
+    }
+}
+
+/** Blue-to-red pain strength slider. Untouched means no rating: the model stays grey and nothing is stored until the user moves it. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable private fun PainStrengthSlider(rating: Int?, hindi: Boolean, onRatingChange: (Int) -> Unit) {
+    val t = { en: String, hi: String -> if (hindi) hi else en }
+    val stops = PainBodyMapRules.heatStops.map { Color(it) }
+    Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        Text(t("How strong is the pain?", "दर्द कितना तेज़ है?"), fontWeight = FontWeight.SemiBold)
+        Text(if (rating == null) t("Slide to set. Not rated yet.", "अंक चुनने के लिए खिसकाएँ। अभी अंक नहीं बताया।") else "$rating/10 · ${PainBodyMapRules.strengthWord(rating, hindi)}", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold, color = if (rating == null) MaterialTheme.colorScheme.onSurfaceVariant else Color(PainBodyMapRules.heatColor(rating)), modifier = Modifier.testTag("pain-strength-value"))
+        Slider(value = (rating ?: 0).toFloat(), onValueChange = { onRatingChange(it.roundToInt().coerceIn(0, 10)) }, valueRange = 0f..10f, steps = 9,
+            modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("pain-strength-slider").semantics { contentDescription = t("Pain strength from 0 blue to 10 red", "दर्द की तीव्रता, 0 नीला से 10 लाल"); stateDescription = if (rating == null) t("Not rated", "अंक नहीं बताया") else "$rating, ${PainBodyMapRules.strengthWord(rating, hindi)}" },
+            track = { Box(Modifier.fillMaxWidth().height(12.dp).clip(CircleShape).background(Brush.horizontalGradient(stops))) },
+            thumb = { Box(Modifier.size(28.dp).background(if (rating == null) Color.Gray else Color(PainBodyMapRules.heatColor(rating)), CircleShape).border(3.dp, Color.White, CircleShape).border(1.dp, Color.DarkGray, CircleShape)) })
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { Text("0 ${PainBodyMapRules.strengthWord(0, hindi)}", style = MaterialTheme.typography.labelSmall); Text("10 ${PainBodyMapRules.strengthWord(10, hindi)}", style = MaterialTheme.typography.labelSmall) }
     }
 }
 
