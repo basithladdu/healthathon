@@ -81,8 +81,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
     private val conversationTranscriber = ConversationTranscriber()
     val people = dao.people().stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
     val selected = MutableStateFlow(preferences.getString("person", "") ?: "")
-    val viewRole = MutableStateFlow(walkthroughRole ?: preferences.getString("viewRole", null)?.takeIf { it in listOf("Patient", "Family", "Doctor") }
-        ?: if (preferences.getBoolean("clinician", false)) "Doctor" else "Family")
+    val viewRole = MutableStateFlow(walkthroughRole ?: CareRoles.forOwner(cloud == null))
     val clinician = MutableStateFlow(viewRole.value == "Doctor")
     val draft = MutableStateFlow(Conversation(""))
     val message = MutableStateFlow<String?>(null)
@@ -96,6 +95,12 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
     private val owned = MutableStateFlow<Set<String>>(emptySet())
     val canEdit = combine(selected, editable) { id, ids -> cloud == null || id in ids }.stateIn(viewModelScope, SharingStarted.Eagerly, cloud == null)
     val isOwner = combine(selected, owned) { id, ids -> cloud == null || id in ids }.stateIn(viewModelScope, SharingStarted.Eagerly, cloud == null)
+    init { // The role is computed, never chosen from a menu: owner (or on-device profile) = Patient, invited member = Family. Older installs may hold a stored Doctor preference; drop it.
+        if (walkthroughRole == null) {
+            CareRoles.staleKeys(preferences.all).takeIf { it.isNotEmpty() }?.let { keys -> preferences.edit().apply { keys.forEach { remove(it) } }.apply() }
+            viewModelScope.launch { isOwner.collect { if (viewRole.value != "Doctor") role(CareRoles.forOwner(it)) } }
+        }
+    }
     val careContacts = MutableStateFlow<List<CareContact>>(emptyList())
     val careContactsLoading = MutableStateFlow(false)
     val careContactsError = MutableStateFlow<String?>(null)
@@ -259,12 +264,11 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
         dao.saveItem(saved); reconcileReminders()
         if (sameCareContext(expectedPersonId, expectedAccountId)) { message.value = if (cloud == null) "Visit saved on this device" else "Visit saved to shared care. The patient can see it after refreshing."; onSaved() }
     }
-    fun role(value: Boolean) = role(if (value) "Doctor" else "Family")
+    fun role(value: Boolean) = role(if (value) "Doctor" else CareRoles.forOwner(isOwner.value))
     fun role(value: String) {
         require(value in listOf("Patient", "Family", "Doctor"))
         if (walkthroughRole != null) return // The walkthrough user is fixed and never written to saved preferences.
-        viewRole.value = value; clinician.value = value == "Doctor"
-        preferences.edit().putString("viewRole", value).putBoolean("clinician", clinician.value).apply()
+        viewRole.value = value; clinician.value = value == "Doctor" // In memory only: the Doctor workspace and tests may set it, but it is never saved.
     }
     fun addPerson(name: String, done: () -> Unit = {}) = action {
         require(name.trim().length in 1..100) { "Enter a name, up to 100 characters." }
@@ -785,4 +789,11 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
         }
     }
     override fun onCleared() { stopRecording(); meter?.cancel(); super.onCleared() }
+}
+
+/** The patient app's role is derived from the account's relationship to the person, never chosen. Doctors use the Doctor workspace. */
+object CareRoles {
+    fun forOwner(owner: Boolean) = if (owner) "Patient" else "Family"
+    /** Saved role preferences from older installs (a menu choice, possibly Doctor) that must be dropped so the computed role applies. */
+    fun staleKeys(all: Map<String, *>): List<String> = listOf("viewRole", "clinician").filter { it in all }
 }

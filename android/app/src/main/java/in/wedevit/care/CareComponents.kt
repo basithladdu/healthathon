@@ -68,24 +68,24 @@ import androidx.compose.ui.unit.sp
     }
 }
 
-@Composable fun CareRoleMenu(role: String, enabled: Boolean, onSelect: (String) -> Unit) {
+/** Walkthrough only: shows who is being tried and switches between the ready-made users. Real users have no role menu; their role is computed. */
+@Composable fun WalkthroughUserMenu(user: PatientWalkthrough.User, onSwitch: (String) -> Unit, onLeave: () -> Unit) {
     var expanded by remember { mutableStateOf(false) }
-    LaunchedEffect(enabled) { if (!enabled) expanded = false }
     Box {
-        TextButton(onClick = { expanded = true }, enabled = enabled,
-            modifier = Modifier.heightIn(min = 48.dp).testTag("choose-role").semantics { contentDescription = "Choose role, current role $role" },
-            shape = RoundedCornerShape(14.dp), contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
-            colors = ButtonDefaults.textButtonColors(contentColor = Rust)) {
-            Text(role, fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1)
+        TextButton(onClick = { expanded = true }, modifier = Modifier.heightIn(min = 48.dp).testTag("walkthrough-user-menu").semantics { contentDescription = "Walkthrough user, currently ${user.name}, ${user.role}" },
+            shape = RoundedCornerShape(14.dp), contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp), colors = ButtonDefaults.textButtonColors(contentColor = Rust)) {
+            Text(user.label, fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1)
             Spacer(Modifier.width(4.dp)); Icon(Icons.Default.ExpandMore, null, Modifier.size(18.dp))
         }
-        DropdownMenu(expanded = expanded && enabled, onDismissRequest = { expanded = false }) {
-            listOf("Patient", "Family", "Doctor").forEach { option ->
-                DropdownMenuItem(text = { Text(option) }, modifier = Modifier.testTag("role-$option").semantics { selected = role == option },
-                    leadingIcon = { Icon(when (option) { "Doctor" -> Icons.Default.MedicalServices; "Family" -> Icons.Default.PeopleOutline; else -> Icons.Default.PersonOutline }, null) },
-                    trailingIcon = { if (role == option) Icon(Icons.Default.Check, "Selected", tint = Rust) },
-                    onClick = { expanded = false; onSelect(option) })
+        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            PatientWalkthrough.users.forEach { option ->
+                DropdownMenuItem(text = { Text("${option.name} — ${option.role}") }, modifier = Modifier.testTag("walkthrough-switch-${option.key}").semantics { selected = option.key == user.key },
+                    leadingIcon = { Icon(if (option.role == "Family") Icons.Default.PeopleOutline else Icons.Default.PersonOutline, null) },
+                    trailingIcon = { if (option.key == user.key) Icon(Icons.Default.Check, "Selected", tint = Rust) },
+                    onClick = { expanded = false; onSwitch(option.key) })
             }
+            HorizontalDivider()
+            DropdownMenuItem(text = { Text("Leave walkthrough") }, modifier = Modifier.testTag("leave-walkthrough"), onClick = { expanded = false; onLeave() })
         }
     }
 }

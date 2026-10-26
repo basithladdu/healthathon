@@ -76,7 +76,7 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
         LaunchedEffect(pending?.code, session?.userId) { if (pending != null && session == null) accountOpen = true }
         LaunchedEffect(linkNotice) { linkNotice?.let { model.message.value = it; root.linkNotice.value = null } }
         val joinBanner = pending?.let { "Sign in or create an account to join ${it.possessive} care" }
-        if (patientWalkthroughUser != null) PatientWalkthroughHost(patientWalkthroughUser!!, onExit = { patientWalkthroughUser = null })
+        if (patientWalkthroughUser != null) PatientWalkthroughHost(patientWalkthroughUser!!, onExit = { patientWalkthroughUser = null }, onSwitch = { patientWalkthroughUser = it })
         else if (demoOpen) DoctorDemo(onExit = { demoOpen = false; walkthroughPatient = null }, cloud = cloud, initialPatientId = walkthroughPatient, careModel = model, onCareAccount = { accountOpen = true })
         else if (doctorOpen && session != null) ConnectedDoctorWorkspace(cloud, model, onExit = { doctorOpen = false }, onAccount = { accountOpen = true }, onWalkthrough = { walkthroughPatient = it; demoOpen = true })
         else CareApp(model, onAccount = { accountOpen = true }, onDoctorDemo = {

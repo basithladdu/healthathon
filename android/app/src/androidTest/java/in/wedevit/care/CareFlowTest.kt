@@ -73,21 +73,20 @@ class CareFlowTest {
         file.outputStream().use { screen.compress(Bitmap.CompressFormat.PNG, 100, it) }
         screen.recycle()
     }
-    @Test fun visibleRoleChoicesKeepDraftAndPatientChoiceAfterRecreation() {
+    @Test fun realUsersHaveNoRoleMenuAndKeepDraftAndComputedRoleAfterRecreation() {
         val words = "Please keep my questions while I change views."
         ui.runOnIdle { vm.edit(vm.draft.value.copy(source = words)) }
-        ui.onNodeWithTag("role-Patient").assertIsDisplayed()
-        ui.onNodeWithTag("role-Family").assertIsDisplayed()
-        screenshot("role-choices")
-        ui.onNodeWithTag("role-Patient").performClick()
+        ui.onNodeWithTag("choose-role").assertDoesNotExist()
+        ui.onNodeWithTag("walkthrough-user-menu").assertDoesNotExist()
+        screenshot("no-role-menu")
         ui.onNodeWithTag("nav-Docs").assertIsDisplayed().performClick()
         ui.onNodeWithTag("documents-list").assertIsDisplayed()
         ui.activityRule.scenario.recreate(); ui.waitForIdle()
         ui.runOnIdle { vm = ui.activity.careModel }
         ui.waitUntil(15000) { vm.draft.value.personId == personId }
-        assertEquals("Patient", vm.viewRole.value)
+        assertEquals(CareRoles.forOwner(vm.isOwner.value), vm.viewRole.value)
         assertEquals(words, vm.draft.value.source)
-        ui.onNodeWithTag("role-Doctor").performClick()
+        ui.runOnIdle { vm.role("Doctor") }
         ui.onNodeWithTag("nav-Talk").performClick()
         openTranscriptStep()
         ui.onNodeWithTag("conversation-list").performScrollToNode(hasSetTextAction() and hasText("Conversation transcript"))
