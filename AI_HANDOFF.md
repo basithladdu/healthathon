@@ -21,7 +21,7 @@ Written 26 Oct 2026 for the next AI assistant picking up this work. The user is 
 |---|---|
 | Repo | `github.com/basithladdu/healthathon` (owner basithladdu; Awaiz pushes as `shaik2501`) |
 | Working copy | `E:\Healthathon\sahara-merged-20261016` (a **git worktree**; don't `cd` to other checkouts) |
-| Branch | `awaiz/at-73c5000` (also on GitHub). `main` on GitHub = this branch's content as of `f486038` |
+| Branch | `awaiz/at-73c5000`. GitHub `main` = this branch as of `f486038`. **Local and not pushed:** `b7a9f82` (recording + walkthrough tools) and `63c5b27` (Saanthvana, sign-up, Add family) |
 | Android app | `android/` — Kotlin 2.2.20, Jetpack Compose, Room v7, AGP 8.13, SDK 36/min 26, package `in.wedevit.sahara` (debug: `in.wedevit.sahara.development`), version **0.6.0 (7)** |
 | Source | `android/app/src/main/java/in/wedevit/care/` |
 | Build + test | from `android/`: `JAVA_HOME=/d/SetUp-files/Android/jbr ANDROID_HOME=/d/SetUp-files/AndroidSdk cmd //c "E:\\Healthathon\\sahara-merged-20261016\\android\\gradlew.bat" assembleDebug testDebugUnitTest compileDebugAndroidTestKotlin -Pksp.incremental=false --no-daemon --max-workers=1 --console=plain` (~3 min). Last green: **315 unit tests / 55 suites, 0 failures** |
@@ -45,18 +45,16 @@ Written 26 Oct 2026 for the next AI assistant picking up this work. The user is 
 - **Goal:** every account, sharing and invite feature runs against Saanthvana.
 - **Status:**
   - ✅ **Database:** the 9 missing updates were applied to Saanthvana (now 14 of 14; existing 1 user and 1 profile untouched). Supabase recorded them under new version stamps (`20261026171032`…`20261026171544`), so **don't run `supabase db push`** on it blindly.
-  - 🟡 **App:** `CareCloud.kt` now uses `base = "https://kjnhtakqzboayqorrlue.supabase.co"` and `PUBLIC_API_KEY = "sb_publishable_bheyh26N5MKpXNEJDQgq8w_oDRhW8Xe"` (the public, client-safe key). **Not built and not committed yet.**
+  - ✅ **App:** `CareCloud.kt` now uses `base = "https://kjnhtakqzboayqorrlue.supabase.co"` and `PUBLIC_API_KEY = "sb_publishable_bheyh26N5MKpXNEJDQgq8w_oDRhW8Xe"` (the public, client-safe key). **Built and committed locally in `63c5b27`.** Not yet tried against the server on a device.
 - **Continue:**
-  1. Build.
-  2. Sign up and sign in on the emulator.
-  3. Create a care profile while signed in and confirm a row appears in `public.healthathon_people`.
-  4. Commit.
+  1. Sign up and sign in on the emulator.
+  2. Create a care profile while signed in and confirm a row appears in `public.healthathon_people`.
 
 ### B. Turn sign-up back on (email + password)
 - **For:** new patients and family must be able to create an account. It was hidden because email delivery wasn't set up.
 - **Goal:** "Create account" and "Forgot password?" work for anyone.
 - **Status:**
-  - 🟡 **App:** `CareEmailAvailability.ready = true` (changed, not built or committed).
+  - ✅ **App:** `CareEmailAvailability.ready = true` (built and committed in `63c5b27`).
   - ⛔ **Server:** **waiting on the user** in the Supabase dashboard. Supabase's built-in email only reaches team addresses, so either turn **off "Confirm email"** (Authentication → Sign In / Providers → Email; for testing) or add **custom SMTP**, e.g. free Brevo (Authentication → Emails → SMTP).
 - **Continue:** once the user confirms the setting, test sign-up with a fresh email on the emulator.
 - **Decision already made:** the user chose **email + password only**. No Google or phone OTP.
@@ -64,7 +62,14 @@ Written 26 Oct 2026 for the next AI assistant picking up this work. The user is 
 ### C. Add family by WhatsApp link with auto-join
 - **For:** families found joining hard; they had to copy a 48-character code into Account → Join.
 - **Goal:** the patient adds family like a contact. A WhatsApp link opens Sahara, and after sign-in the family member is joined automatically.
-- **Status:** 🟡 **a worker was building this when this file was written.** Files touched: `CareAccount.kt`, `MainActivity.kt`, `CareModel.kt`, new `CareInviteLink.kt`, `AndroidManifest.xml`, and possibly `prototype/public/.well-known/assetlinks.json`. **Uncompiled; check `git diff` first.**
+- **Status:** 🟡 **code written, builds, unit tests pass, committed locally in `63c5b27`. Not yet tried on a device.**
+  - **Files:** new `CareInviteLink.kt` (link/code parsing, pending-join store, invite log) and `CareAddFamily.kt` (`AddFamilySheet`, `PendingJoinDialog`); changes in `CareAccount.kt`, `CareModel.kt` (`joinedRefresh`), `CareUi.kt` ("Invite family" card on Today), `MainActivity.kt` (reads the link) and `AndroidManifest.xml`.
+  - **Asset links:** `prototype/public/.well-known/assetlinks.json` lists the debug SHA-256 `01:6D:61:8B:5F:D2:DC:7E:B0:AD:9C:2E:96:46:5F:DF:0E:E0:BA:AB:9C:2B:6A:76:27:93:FB:13:88:85:F8:5B`. The release entry is the placeholder `REPLACE_ME_RELEASE_SIGNING_SHA256_FINGERPRINT_BEFORE_DEPLOY`, which must be replaced or removed before deploying.
+  - **Share text:** "You're invited to see Rahul's care in Sahara. Tap to join: https://sahara.wedevit.in/join?c=<code>&n=Rahul", followed by the code as a backup.
+  - **Caveats:**
+    - The "Joined" label is a guess: the oldest open invite is marked when the member count rises.
+    - The `n=` name in the link is display-only and could be spoofed. The confirm card also shows the user's email.
+    - `MainActivity` uses the standard launch mode, so a link starts a new instance; the pending join survives through SharedPreferences.
 - **Intended design:**
   - An "Add family" button on Today (and in Account) opens a sheet with name, relationship chips and access (**Can view** / **Can view and add**), then **Send invite on WhatsApp**.
   - The share text includes `https://sahara.wedevit.in/join?c=<48-char code>`, with the code as a backup.
