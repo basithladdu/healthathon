@@ -19,6 +19,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.animation.animateContentSize
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -46,7 +47,8 @@ private fun readerFallbackGoals(note: CareVersion): List<ReaderGoal> = listOf(no
         val stored = runCatching { DoctorPreparationStore(context, vm.storageNamespace).load(DoctorPreparationStore.scope(vm.accountNamespace, note.personId, note.conversationId)) }.getOrDefault(emptyList())
         if (stored.isNotEmpty()) stored.map { ReaderGoal(it.id, it.text.trim(), it.answer.trim().ifBlank { "Not answered in this conversation" }) } else readerFallbackGoals(note)
     }
-    Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
+    // The audio card is looked up after the first frame; the body grows smoothly instead of pushing the transcript down in one jump.
+    Column(Modifier.animateContentSize(), verticalArrangement = Arrangement.spacedBy(20.dp)) {
         NoteReaderAudio(vm, note)
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             ReaderHeading("Transcription")

@@ -253,7 +253,7 @@ private fun doctorPlural(n: Int) = if (n == 1) "1 update" else "$n updates"
     val shown = checks.filter { c -> (picked.isEmpty() || doctorMood(c.title) in picked) && (needle.isEmpty() || c.title.contains(needle, true) || c.detail.contains(needle, true)) }
     val recent = checks.filter { it.created >= now - 30L * 86_400_000L }
     val grouped = shown.groupBy { java.time.YearMonth.from(Instant.ofEpochMilli(it.created).atZone(zone)) }
-    LazyColumn(Modifier.fillMaxSize().testTag("doctor-checkin-history"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    LazyColumn(Modifier.fillMaxSize().imePadding().testTag("doctor-checkin-history"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { Heading("Reported condition history", 27); Text("Dated self-reports, not a clinical score.", Modifier.padding(top = 4.dp), fontSize = 12.sp, lineHeight = 16.sp, color = DoctorCardFaint) }
         if (checks.isEmpty()) item { SurfaceCard { Text("No check-ins recorded yet", fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk); Text("Updates will appear here when recorded.", fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk) } } else {
             item {

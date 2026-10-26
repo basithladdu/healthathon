@@ -7,6 +7,10 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebSettings
 import android.webkit.WebView
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -179,7 +183,6 @@ import java.io.ByteArrayInputStream
     } else {
         val frame = RoundedCornerShape(20.dp)
         Box(Modifier.fillMaxWidth().height(440.dp).clip(frame).background(Color(0xFF2A2421)).border(1.dp, Color(0xFF4A403A), frame)) {
-        if (!ready) Text(if (hindi) "शरीर का नक्शा खुल रहा है…" else "Opening body map…", color = Color(0xFFF4ECE3), fontSize = 13.sp, modifier = Modifier.align(Alignment.Center))
         AndroidView(modifier = Modifier.fillMaxSize().testTag("pain-body-3d").semantics {
             contentDescription = if (readOnly) { if (hindi) "सहेजी गई दर्द की जगह का घुमाने वाला नक्शा। जगह बदली नहीं जा सकती।" else "Rotatable saved pain map. Saved locations cannot be changed here." } else if (hindi) "घुमाने वाला दर्द की जगह का नक्शा। नीचे जगह के बटन से भी चुन सकते हैं।" else "Rotatable pain location map. Accessible region buttons are below."
         }, factory = { context ->
@@ -247,6 +250,13 @@ import java.io.ByteArrayInputStream
             view.stopLoading(); view.destroy()
             if (webView === view) webView = null
         })
+        // One calm loading cover above the page (the page's own background and status would otherwise flash in), faded out once the model is drawn.
+        AnimatedVisibility(!ready, Modifier.matchParentSize(), enter = EnterTransition.None, exit = fadeOut(tween(260))) {
+            Column(Modifier.fillMaxSize().background(Color(0xFF2A2421)), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically)) {
+                CircularProgressIndicator(Modifier.size(28.dp), color = Color(0xFFF4ECE3).copy(alpha = .8f), strokeWidth = 2.5.dp)
+                Text(if (hindi) "शरीर का नक्शा खुल रहा है…" else "Opening body map…", color = Color(0xFFF4ECE3), fontSize = 13.sp)
+            }
+        }
         }
     }
 }

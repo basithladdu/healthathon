@@ -5,6 +5,8 @@ import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Intent
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.SizeTransform
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -55,8 +57,8 @@ import java.time.format.DateTimeFormatter
     var adding by rememberSaveable(selected) { mutableStateOf(false) }
     var showingPainHistory by rememberSaveable(selected) { mutableStateOf(false) }
     val person = people.firstOrNull { it.id == selected }
-    val notes = entries.filter { it.personId == selected && SymptomNoteCodec.isStructured(it.detail) }
-        .sortedByDescending { SymptomNoteCodec.decode(it.detail)?.let { n -> "${n.observedDate}T${n.observedTime}" }.orEmpty() }
+    val notes = remember(entries, selected) { entries.filter { it.personId == selected && SymptomNoteCodec.isStructured(it.detail) }
+        .sortedByDescending { SymptomNoteCodec.decode(it.detail)?.let { n -> "${n.observedDate}T${n.observedTime}" }.orEmpty() } }
     val t = { en: String, hi: String -> if (hindi) hi else en }
     BackHandler(onBack = onBack)
     LazyColumn(Modifier.fillMaxSize().testTag("symptom-diary"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -261,8 +263,11 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
     val goBack: () -> Unit = { if (quick || pos <= 0) onClose() else stepKey = steps[pos - 1] }
     val scroll = rememberScrollState()
     LaunchedEffect(cur) { scroll.scrollTo(0) }
+    // System back steps back through the form; a swipe down or scrim tap only closes it before anything is chosen, so answers are never dropped by accident (Cancel always closes).
     BackHandler(onBack = goBack)
-    ModalBottomSheet(onDismissRequest = onClose, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
+    val gestureCloses by rememberUpdatedState(initial == null && prior == null && pos == 0 && symptom.isBlank())
+    ModalBottomSheet(onDismissRequest = onClose, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true, confirmValueChange = { it != SheetValue.Hidden || gestureCloses }), containerColor = Cream,
+        properties = ModalBottomSheetProperties(shouldDismissOnBackPress = false)) {
         Column(Modifier.fillMaxWidth().imePadding()) {
             Column(Modifier.padding(horizontal = 20.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Heading(t(if (prior != null && initial == null) "Update rating" else if (initial == null) "How are you feeling?" else "Edit symptom note", if (prior != null && initial == null) "नया अंक लिखें" else if (initial == null) "तबीयत कैसी है?" else "तबीयत का नोट बदलें"), 26)
@@ -272,7 +277,9 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
                     Text("${t("Step", "चरण")} ${pos + 1} ${t("of", "/")} ${steps.size} · $stepTitle", color = DoctorCardSub, fontSize = 14.sp, modifier = Modifier.testTag("symptom-step-indicator"))
                 }
             }
-            Column(Modifier.weight(1f, fill = false).verticalScroll(scroll).padding(horizontal = 16.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            Column(Modifier.weight(1f, fill = false).verticalScroll(scroll).padding(horizontal = 16.dp, vertical = 12.dp)) {
+              AnimatedContent(cur, transitionSpec = { stepTransition(steps.indexOf(targetState) >= steps.indexOf(initialState)) using SizeTransform(clip = false) }, label = "symptom-step") { cur ->
+              Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
                 if (prior != null && initial == null) {
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         FilterChip(!fullDetails, { fullDetails = false }, label = { Text(t("Quick rating", "सिर्फ़ नया अंक")) }, modifier = Modifier.heightIn(min = 48.dp).testTag("symptom-quick-mode"))
@@ -353,6 +360,8 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
                     if (startedOn.isNotBlank()) TextButton(onClick = { startedOn = "" }) { Text(t("Clear start date", "शुरू होने की तारीख हटाएँ")) }
                     CareField(note, { note = it.take(500) }, t("Note (optional)", "नोट (वैकल्पिक)"), minLines = 2)
                 }
+              }
+              }
             }
             Column(Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 20.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 (localError.takeIf { it.isNotBlank() } ?: actionError)?.let { Text(if (hindi && it == SymptomDiaryRules.SAVE_CONFLICT) "यह नोट बदल गया है या हटा दिया गया है। आपके जवाब यहीं हैं। सहेजने से पहले यह फ़ॉर्म बंद करके मौजूदा नोट फिर खोलें।" else if (hindi) "नोट सहेजा नहीं गया। जवाब यहीं हैं। तारीख, नाम और चुने हुए जवाब जाँचें।" else it, color = MaterialTheme.colorScheme.error, fontSize = 15.sp, fontWeight = FontWeight.SemiBold) }

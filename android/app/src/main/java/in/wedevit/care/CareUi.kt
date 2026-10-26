@@ -386,8 +386,6 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
     var audienceBusy by remember { mutableStateOf(false) }
     var preparationBusy by remember { mutableStateOf(false) }
     var captureMode by rememberSaveable(draft.personId) { mutableStateOf(if (vm.demoMode && !DoctorTestProfiles.contains(draft.personId)) "Type" else "Record") }
-    val scroll = key(step) { rememberLazyListState() }
-    LaunchedEffect(step, buildSection) { scroll.scrollToItem(0) }
     val focus = LocalFocusManager.current
     val context = LocalContext.current
     val session = vm.cloud?.session?.collectAsStateWithLifecycle()?.value
@@ -400,13 +398,16 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
     val attendeesConsented = doctorAttendeesAllConsented(attendees)
     var buildOpen by rememberSaveable { mutableStateOf(false) }
     fun nextStep(value: Int) { if (!recordingSaving && recordingSaveError == null) { if (value >= 1 && step < 1 && !attendeesConsented) { vm.message.value = "Recording is available once everyone listed has agreed."; return }; focus.clearFocus(); topStep = ConversationPages.top(value); subPage = ConversationPages.sub(value) } }
+    // System back goes one page back, exactly like each page's own Back button.
+    fun previousPage() { when (step) { 1 -> nextStep(0); 2 -> nextStep(1); 3 -> if (buildOpen) { focus.clearFocus(); if (buildSection == 0) buildOpen = false else buildSection -= 1 } else nextStep(2); 4 -> { buildSection = 0; buildOpen = true; nextStep(3) }; 5 -> nextStep(4) } }
     var permissionDialog by remember { mutableStateOf(false) }; var doctor by rememberSaveable { mutableStateOf("") }; var reviewed by rememberSaveable { mutableStateOf(false) }
     var recordingExpected by remember { mutableStateOf<DoctorConversationIdentity?>(null) }
     // Saved audio: one session can hold several recordings, and the clinician ticks the ones this note is built from.
     var savedAudioPicked by rememberSaveable { mutableStateOf(setOf<String>()) }
     var playingPath by remember { mutableStateOf<String?>(null) }
     var playingNow by remember { mutableStateOf(false) }
-    val audioPlayer = remember { android.media.MediaPlayer() }
+    // When a recording plays to the end, the player bar goes back to Play instead of staying on Pause.
+    val audioPlayer = remember { android.media.MediaPlayer().apply { setOnCompletionListener { playingNow = false } } }
     DisposableEffect(Unit) { onDispose { runCatching { audioPlayer.release() } } }
     SideEffect { onInteractionActiveChange(dictating || permissionDialog || audienceBusy || preparationBusy || recordingSaving || recordingSaveError != null) }
     DisposableEffect(Unit) { onDispose { onInteractionActiveChange(false) } }
@@ -440,12 +441,9 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
     }
     val permission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted -> if (granted) startConsentedRecording() else vm.message.value = "Microphone permission wasn't granted. You can still type the conversation." }
     LaunchedEffect(draft.source, draft.priorities, draft.participants, draft.topics, draft.questions, draft.nextSteps) { reviewed = false }
-    val doctorCapture = doctorPresentation && clinician && step == 1
     val captureCallback by rememberUpdatedState(onDoctorCaptureChange)
-    DisposableEffect(doctorCapture) { captureCallback(doctorCapture); onDispose { captureCallback(false) } }
-    fun androidx.compose.foundation.lazy.LazyListScope.captureItem(content: @Composable () -> Unit) {
-        item { Box(Modifier.fillMaxWidth().padding(horizontal = if (doctorCapture) 20.dp else 0.dp)) { content() } }
-    }
+    val capturing = doctorPresentation && clinician && step == 1
+    DisposableEffect(capturing) { captureCallback(capturing); onDispose { captureCallback(false) } }
     // Record mode of the doctor walkthrough: terracotta stage + persistent "Saved Audio" peek sheet instead of the list.
     // Oldest first, so "Audio 1" keeps its name when more recordings are added in the same sitting.
     val audioRows = remember(recordings) { recordings.map { SavedAudioRow(it.absolutePath, it.absolutePath, it.lastModified()) }.sortedBy { it.recordedAt } }
@@ -453,6 +451,15 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
         runCatching { audioPlayer.reset(); audioPlayer.setDataSource(row.path); audioPlayer.prepare(); audioPlayer.start() }
             .onSuccess { playingPath = row.id; playingNow = true }
             .onFailure { playingNow = false; vm.message.value = "That recording could not be played." }
+    }
+    BackHandler(doctorPresentation && clinician && step > 0 && !recording && !dictating && !recordingSaving && recordingSaveError == null && !permissionDialog && !audienceBusy) { previousPage() }
+    // Pages slide in the direction of travel; each page keeps its own list position while the other fades out.
+    AnimatedContent(step, transitionSpec = { stepTransition(targetState >= initialState) }, label = "conversation-page") { step ->
+    val doctorCapture = doctorPresentation && clinician && step == 1
+    val scroll = rememberLazyListState()
+    LaunchedEffect(buildSection) { scroll.scrollToItem(0) }
+    fun androidx.compose.foundation.lazy.LazyListScope.captureItem(content: @Composable () -> Unit) {
+        item { Box(Modifier.fillMaxWidth().padding(horizontal = if (doctorCapture) 20.dp else 0.dp)) { content() } }
     }
     if (doctorCapture && captureMode == "Record") DoctorRecordStage(mode = captureMode, onMode = { captureMode = it }, recording = recording, saving = recordingSaving, saveError = recordingSaveError != null, onRetry = vm::retrySavingRecording, level = level, seconds = seconds.toLong(),
         recordEnabled = recordingCanEdit && recordingSaveError == null && vm.localAudioRecordingAllowed && !recordingSaving && draft.personId.isNotBlank() && !dictating && (!busy || recording),
@@ -639,6 +646,7 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
         } }
         }
     }
+    }
     if (permissionDialog && vm.localAudioRecordingAllowed) AlertDialog(onDismissRequest = { permissionDialog = false }, title = { Text("Before we record") }, text = {
         Column(Modifier.heightIn(max = 520.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Text(if (consentNames.isEmpty()) "Go back to “Who's here” and name everyone present before recording." else "Everyone named in “Who's here” has agreed: ${consentNames.joinToString(", ")}.", style = MaterialTheme.typography.bodyMedium)
@@ -656,6 +664,13 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
     }, confirmButton = {
         TextButton(onClick = { if (vm.canEdit.value && vm.localAudioRecordingAllowed && !vm.recordingSaving.value && vm.recordingSaveError.value == null) { permissionDialog = false; if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) startConsentedRecording() else permission.launch(Manifest.permission.RECORD_AUDIO) } }, enabled = recordingCanEdit && recordingSaveError == null && !recordingSaving && vm.localAudioRecordingAllowed && allParticipantsAgreed && purposeAccepted && storageAccepted && accessAccepted) { Text("Start recording") }
     }, dismissButton = { TextButton(onClick = { permissionDialog = false }) { Text("Cancel") } })
+}
+
+/** Page-to-page motion inside a multi-step flow (conversation pages, symptom steps): a short drift in the direction of travel with a quick cross-fade. */
+internal fun stepTransition(forward: Boolean): ContentTransform {
+    val sign = if (forward) 1 else -1
+    return (fadeIn(tween(190, delayMillis = 50, easing = LinearOutSlowInEasing)) + slideInHorizontally(tween(240, easing = FastOutSlowInEasing)) { sign * it / 12 }) togetherWith
+        (fadeOut(tween(120, easing = FastOutSlowInEasing)) + slideOutHorizontally(tween(240, easing = FastOutSlowInEasing)) { -sign * it / 24 })
 }
 
 @Composable fun AudioPlayback(path: String, consent: RecordingConsent?, transcribing: Boolean, canTranscribe: Boolean, onTranscribe: () -> Unit, onDelete: () -> Unit) {
