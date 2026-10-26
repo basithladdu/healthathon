@@ -35,10 +35,6 @@ internal fun symptomIcon(key: String): ImageVector = when (key) {
 }
 
 internal fun ratingColor(n: Int): Color = if (n <= 5) lerp(DoctorStatusGood, Color(0xFFB8860B), n / 5f) else lerp(Color(0xFFB8860B), Color(0xFF8E2F1C), (n - 5) / 5f)
-internal fun ratingWord(n: Int, hindi: Boolean) = when {
-    n == 0 -> if (hindi) "कोई परेशानी नहीं" else "None"; n <= 3 -> if (hindi) "हल्की" else "Mild"; n <= 6 -> if (hindi) "मध्यम" else "Moderate"
-    n <= 9 -> if (hindi) "तेज़" else "Severe"; else -> if (hindi) "सबसे ज़्यादा" else "Worst imaginable"
-}
 
 /** A numbered, rounded section card with a short helper line. */
 @Composable internal fun SymptomSection(number: Int?, title: String, helper: String? = null, content: @Composable ColumnScope.() -> Unit) {
@@ -90,11 +86,17 @@ internal fun ratingWord(n: Int, hindi: Boolean) = when {
     }
 }
 
-/** Large readout of the chosen value and its word. */
-@Composable internal fun RatingReadout(rating: Int, hindi: Boolean) {
+/** Display the patient's actual number without inventing clinical severity bands. */
+@Composable internal fun RatingReadout(rating: Int, hindi: Boolean, scale: String = SymptomDiaryRules.PERSONAL_SCALE) {
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         when {
-            rating >= 0 -> { Text(rating.toString(), color = ratingColor(rating), fontFamily = SaharaTitleFont, fontSize = 44.sp, lineHeight = 48.sp); Text("/ 10 · ${ratingWord(rating, hindi)}", color = DoctorCardInk, fontSize = 17.sp, fontWeight = FontWeight.SemiBold) }
+            rating >= 0 -> {
+                Text(rating.toString(), color = ratingColor(rating), fontFamily = SaharaTitleFont, fontSize = 44.sp, lineHeight = 48.sp)
+                Text("/ 10", color = DoctorCardInk, fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
+                if (scale == SymptomDiaryRules.WELLBEING_SCALE && rating in setOf(0, 10)) Text(if (rating == 0) {
+                    if (hindi) "सबसे अच्छी तबीयत" else "Best possible well-being"
+                } else if (hindi) "सबसे खराब तबीयत" else "Worst possible well-being", color = DoctorCardInk, fontSize = 15.sp, modifier = Modifier.weight(1f))
+            }
             rating == -1 -> Text(if (hindi) "अंक नहीं बताया" else "Not rated", color = DoctorCardInk, fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
             else -> Text(if (hindi) "नीचे से एक अंक चुनें" else "Tap a number below", color = DoctorCardSub, fontSize = 15.sp)
         }

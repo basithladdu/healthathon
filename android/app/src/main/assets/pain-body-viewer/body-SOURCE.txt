@@ -1,0 +1,15 @@
+Sahara body-location picker model
+
+Original character: Quaternius (https://quaternius.com).
+Prepared static pose: UMRAM, Bilkent University.
+Pinned source: https://github.com/UMRAM-Bilkent/supine-human-model/tree/728f23ab5eb9d6cb2c8fb39acb3440bd81db0d3e
+Source asset: assets/human_posed.glb, published 18 June 2026.
+
+Licence for this pinned source asset and prepared version: CC0 1.0 Universal.
+The source repository explicitly identifies both the original character and its prepared mesh as CC0 and permits commercial reuse and redistribution. Full CC0 text is in body-LICENSE-CC0.txt. Credit is retained as a courtesy. No endorsement is implied.
+
+Sahara adaptation: a rigid coordinate rotation was baked into mesh positions and normals so +Y is up, +Z is front, and +X is the patient's left. Geometry proportions, topology and material are unchanged. Original bytes, README and licence are preserved in output/research/pain-body-model-2026-10-24 in the source repository. See body-model.json for hashes, bounds and the exact licence evidence.
+
+Rights scope: Quaternius's current general licence page changed to QAL in August 2026, while its FAQ and specific base-character page still state CC0. We rely on the explicit June 2026 CC0 release of this pinned asset, not a blanket claim that every current Quaternius asset is CC0. The QAL page says updates do not apply retroactively. The upstream does not identify the exact original character pack.
+
+Use: a stylised body-location picker only. It is not anatomically precise, a diagnosis tool or a representation of the individual patient. Patient-selected locations and separately entered severity are records, not anatomical measurements.

@@ -84,4 +84,58 @@ class CareSymptomDiaryTest {
         assertNotNull(SymptomDiaryRules.saveConflict(wrongKind, "person-a", SymptomDiaryRules.editToken(wrongKind)))
         assertNull(SymptomDiaryRules.saveConflict(null, "person-a", null))
     }
+    @Test fun clinicalReviewChoicesUseStableStoredIdentifiersAndRetainLegacyRecords() {
+        listOf("Pain", "Tiredness", "Poor appetite", "Dry mouth", "Breathlessness", "Constipation", "Nausea", "Vomiting",
+            "Difficulty swallowing", "Sleepiness", "Cough", "Bowel / bladder incontinence", "Sadness", "Worry", "Diarrhea", "Overall well-being", "Other").forEach {
+            assertTrue(it, it in SymptomDiaryRules.symptoms)
+        }
+        assertFalse("Sleep difficulty" in SymptomDiaryRules.symptoms)
+        assertFalse("Weight loss" in SymptomDiaryRules.symptoms)
+        assertFalse("Dizziness" in SymptomDiaryRules.symptoms)
+        assertFalse("Irritability / restlessness" in SymptomDiaryRules.symptoms)
+        assertEquals("Fatigue / lack of energy", SymptomDiaryRules.symptomLabel("Tiredness", false))
+        assertEquals("Dry / sore mouth", SymptomDiaryRules.symptomLabel("Dry mouth", false))
+        val legacy = note().copy(symptom = "Sleep difficulty", painLocation = "", painTriggers = emptyList())
+        assertEquals(legacy, SymptomNoteCodec.decode(SymptomNoteCodec.encode(legacy)))
+        assertEquals("सोने में परेशानी", SymptomDiaryRules.symptomLabel(legacy.symptom, true))
+        assertEquals("Other", SymptomDiaryRules.symptoms.keys.last())
+    }
+    @Test fun overallWellbeingHasExplicitBestWorstAnchorsAndItsOwnNonDiagnosticScale() {
+        val value = note(0).copy(symptom = "Overall well-being", painLocation = "", painTriggers = emptyList(), scale = SymptomDiaryRules.scaleForSymptom("Overall well-being"))
+        assertEquals(SymptomDiaryRules.WELLBEING_SCALE, value.scale)
+        assertNull(SymptomDiaryRules.error(value, now))
+        assertEquals(value, SymptomNoteCodec.decode(SymptomNoteCodec.encode(value)))
+        val text = SymptomNoteCodec.readable(SymptomNoteCodec.encode(value))
+        assertTrue(text.contains("0 = best possible well-being"))
+        assertTrue(text.contains("10 = worst possible well-being"))
+        assertFalse(text.contains("0 = none"))
+        assertTrue(SymptomDiaryRules.ratingAnchors(value.scale, true).contains("सबसे अच्छी तबीयत"))
+        assertNotNull(SymptomDiaryRules.error(value.copy(symptom = "Cough"), now))
+    }
+    @Test fun newWellbeingNeverReinterpretsEarlierCustomSymptomRatingsOrComparesDifferentAnchors() {
+        val value = note(4).copy(symptom = "Overall well-being", painLocation = "", painTriggers = emptyList(), scale = SymptomDiaryRules.WELLBEING_SCALE)
+        val earlierCustom = value.copy(observedDate = "2026-10-21", rating = 7, scale = SymptomDiaryRules.PERSONAL_SCALE)
+        assertEquals(earlierCustom, SymptomNoteCodec.decode(SymptomNoteCodec.encode(earlierCustom)))
+        assertNull(SymptomDiaryRules.comparison(listOf(row("earlier", earlierCustom)), row("current", value), value))
+        assertEquals(-3, SymptomDiaryRules.comparison(listOf(row("earlier", earlierCustom.copy(scale = SymptomDiaryRules.WELLBEING_SCALE))), row("current", value), value)!!.difference)
+        assertEquals("0 = none · 10 = worst imaginable", SymptomDiaryRules.ratingAnchors(earlierCustom.scale, false))
+    }
+    @Test fun quickFollowupKeepsRealContextButNeverPrefillsANewRatingOrReusesTheOldNarrative() {
+        val old = note(9).copy(note = "Yesterday", startedOn = "2026-10-20", selfReportedChange = "worse", comparedWithId = "old",
+            painBodySites = listOf("left-leg"), painBodyPoints = listOf(PainBodyPoint3d("left-leg", .2, .3, .4)), painBodyModel = PainBodyMapRules.MODEL)
+        val next = SymptomDiaryRules.followUp(old, now)
+        assertNull(next.rating); assertEquals("", next.note); assertEquals("", next.selfReportedChange); assertEquals("", next.comparedWithId)
+        assertEquals("2026-10-24", next.observedDate); assertEquals("18:00", next.observedTime)
+        assertEquals(old.painBodyPoints, next.painBodyPoints); assertEquals(old.painBodySites, next.painBodySites); assertEquals(old.painLocation, next.painLocation)
+        assertEquals(old.startedOn, next.startedOn); assertEquals(old.respondent, next.respondent); assertEquals(old.recall, next.recall)
+        assertNull(SymptomDiaryRules.error(next, now))
+    }
+    @Test fun trendOnlyUsesActualChronologicalRatedEntriesFromTheSameContext() {
+        val current = row("current", note(4))
+        val matching = row("first", note(8, "2026-10-20"))
+        val wrongSite = row("other-site", note(7, "2026-10-21").copy(painBodySites = listOf("right-leg")))
+        val values = SymptomDiaryRules.series(listOf(current, wrongSite, row("unrated", note(null)), matching, matching.copy(id = "other-person", personId = "other")), current, note(4))
+        assertEquals(listOf("first", "current"), values.map { it.first.id })
+        assertEquals(listOf(8, 4), values.map { it.second.rating })
+    }
 }
