@@ -173,6 +173,8 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
             finally { refreshing.value = false }
         }
     }
+    /** After joining someone's care: reload records, then open the newly visible person. */
+    suspend fun joinedRefresh(before: Set<String>): Person? { reload(); val added = dao.people().first().firstOrNull { it.id !in before }; if (added != null) select(added.id); return added }
     private suspend fun reload() {
         val service = cloud ?: return
         fun requireSameAccount() = check(careCloudAccountMatches(account, service.session.value?.userId)) {

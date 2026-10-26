@@ -111,6 +111,7 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
     val canEdit by vm.canEdit.collectAsStateWithLifecycle()
     var tab by rememberSaveable { mutableIntStateOf(0) }
     var dialog by rememberSaveable { mutableStateOf("") }
+    var inviteFamilyOpen by rememberSaveable { mutableStateOf(false) }
     var medicineScanner by rememberSaveable { mutableStateOf(false) }
     var medicineScannerPerson by rememberSaveable { mutableStateOf("") }
     var reading by remember { mutableStateOf<CareVersion?>(null) }
@@ -192,7 +193,7 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
                 entryBusy = busy || refreshing, addPersonContent = { close -> AddPersonContent(busy = busy || refreshing, error = actionError, onDismiss = close, onSave = { vm.addPerson(it) { close() } }) })
             else key(person.id, tab) { screens.SaveableStateProvider("${person.id}:$tab") {
                 ScreenEntrance { when (tab) {
-                    0 -> Today(vm, clinician, onTalk = { tab = 1 }, onCare = { tab = 2 }, onNearby = { tab = 3 }, onAdd = { if (canEdit) dialog = it else vm.message.value = "Ask the person who invited you to allow changes." }, onRead = { reading = it }, onCalendar = { tab = 6 }, onWorkflow = { tab = 7 }, onLabs = { tab = 8 }, onSharedWorkspace = if (walkthrough != null) ({ tab = 7 }) else openDoctorWorkspace, onSymptoms = { tab = 9 })
+                    0 -> Today(vm, clinician, onTalk = { tab = 1 }, onCare = { tab = 2 }, onNearby = { tab = 3 }, onAdd = { if (canEdit) dialog = it else vm.message.value = "Ask the person who invited you to allow changes." }, onRead = { reading = it }, onCalendar = { tab = 6 }, onWorkflow = { tab = 7 }, onLabs = { tab = 8 }, onSharedWorkspace = if (walkthrough != null) ({ tab = 7 }) else openDoctorWorkspace, onSymptoms = { tab = 9 }, onInviteFamily = { inviteFamilyOpen = true })
                     1 -> Talk(vm, clinician && canEdit, onRead = { reading = it }, onRequestConversation = { tab = 7 })
                     2 -> CareList(vm, onReadNote = { reading = it }, onCalendar = { tab = 6 }, onWorkflow = { tab = 7 }, onLabs = { tab = 8 }, onSymptoms = { tab = 9 },
                         onAdd = { if (canEdit) dialog = it else vm.message.value = "Ask the person who invited you to allow changes." },
@@ -215,6 +216,7 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
             if (busy || refreshing) LinearProgressIndicator(Modifier.fillMaxWidth().align(Alignment.TopCenter), color = Rust)
         }
     }
+    if (inviteFamilyOpen) AddFamilySheet(vm, onDismiss = { inviteFamilyOpen = false }, onSignIn = onAccount)
     if (dialog == "person") AddPerson(onDismiss = { dialog = "" }, busy = busy || refreshing, error = actionError, onSave = { vm.addPerson(it) { dialog = "" } })
     if (dialog in listOf("medicine", "visit", "task", "journal")) AddCareItem(dialog, vm, onDismiss = { dialog = "" })
     if (dialog == "delete") AlertDialog(onDismissRequest = { dialog = "" }, title = { Text("Remove ${person?.name}'s records?") },
@@ -302,7 +304,8 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
     }
 }
 
-@Composable fun Today(vm: CareModel, clinician: Boolean, onTalk: () -> Unit, onCare: () -> Unit, onNearby: () -> Unit, onAdd: (String) -> Unit, onRead: (CareVersion) -> Unit, onCalendar: () -> Unit = {}, onWorkflow: () -> Unit = {}, onLabs: () -> Unit = {}, onSharedWorkspace: () -> Unit = {}, onSymptoms: () -> Unit = {}) {
+@Composable fun Today(vm: CareModel, clinician: Boolean, onTalk: () -> Unit, onCare: () -> Unit, onNearby: () -> Unit, onAdd: (String) -> Unit, onRead: (CareVersion) -> Unit, onCalendar: () -> Unit = {}, onWorkflow: () -> Unit = {}, onLabs: () -> Unit = {}, onSharedWorkspace: () -> Unit = {}, onSymptoms: () -> Unit = {}, onInviteFamily: () -> Unit = {}) {
+    val ownerOfRecords by vm.isOwner.collectAsStateWithLifecycle(); val todayPeople by vm.people.collectAsStateWithLifecycle(); val todaySelected by vm.selected.collectAsStateWithLifecycle()
     val items by vm.items.collectAsStateWithLifecycle(); val versions by vm.versions.collectAsStateWithLifecycle()
     val latest = versions.firstOrNull()
     val dayStart = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
@@ -315,6 +318,15 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
             // Do not infer a current relationship from a note's typed reviewer.
             // The account workspace loads actual patient-controlled membership.
             TextButton(onClick = onSharedWorkspace, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.Groups, null); Spacer(Modifier.width(8.dp)); Text("Your care team") }
+        }
+        if (!clinician && ownerOfRecords) item {
+            ActionCard(Mint, onClick = onInviteFamily) {
+                Row(Modifier.fillMaxWidth().heightIn(min = 64.dp).padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.PersonAdd, null, tint = Rust); Spacer(Modifier.width(12.dp))
+                    Column(Modifier.weight(1f)) { Text(if (vm.cloud == null) "Add family" else "Invite family", fontWeight = FontWeight.Bold, fontSize = 16.sp); Text("Let family see ${todayPeople.firstOrNull { it.id == todaySelected }?.name.orEmpty()}'s care on their own phone", fontSize = 13.sp) }
+                    Icon(Icons.AutoMirrored.Filled.ArrowForward, null, Modifier.size(19.dp))
+                }
+            }
         }
         item { ActionCard(Gold, onClick = { if (!clinician && latest != null) onRead(latest) else onTalk() }) {
             Row(Modifier.fillMaxWidth().padding(18.dp), verticalAlignment = Alignment.CenterVertically) {

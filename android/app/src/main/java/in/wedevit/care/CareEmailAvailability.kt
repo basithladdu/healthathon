@@ -1,9 +1,10 @@
 package `in`.wedevit.care
 
-/** Operationally verified 19 October 2026: no custom SMTP or allowed recovery URL.
- * Keep confirmation on. Enable only after delivery and the exact callback have
- * actually been configured and verified; never equate a signup HTTP 200 with mail.
+/** 26 October 2026: sign-up and reset are shown again for the Saanthvana project.
+ * Supabase's built-in mailer only reaches the project team's own addresses, so
+ * other people's confirmation mail needs custom SMTP (or confirmation turned off
+ * for testing) in the dashboard. A signup HTTP 200 still does not mean mail arrived.
  */
 internal object CareEmailAvailability {
-    const val ready = false
+    const val ready = true
 }
