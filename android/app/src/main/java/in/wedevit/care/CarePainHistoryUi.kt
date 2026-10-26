@@ -60,14 +60,14 @@ object PainHistoryRules {
             Text("${note.observedDate} ${note.observedTime} · ${SymptomDiaryRules.ratingLabel(note.rating, hindi)}", fontWeight = FontWeight.SemiBold, modifier = Modifier.testTag("pain-history-observation"))
             Text("${SymptomDiaryRules.label(SymptomDiaryRules.recalls, note.recall, hindi)} · ${SymptomDiaryRules.label(SymptomDiaryRules.respondents, note.respondent, hindi)} · ${note.author}", style = MaterialTheme.typography.bodySmall, modifier = Modifier.testTag("pain-history-context"))
             when (PainHistoryRules.locationKind(note)) {
-                "points" -> Text(t("Exact saved points. Colour shows this entry's rating for its selected areas.", "सहेजे हुए सटीक बिंदु। रंग इस नोट के चुने हुए हिस्सों का अंक दिखाता है।"), style = MaterialTheme.typography.bodySmall)
+                "points" -> Text(if (note.painBodyRatings.isNotEmpty()) t("Exact saved points. Each spot shows its own saved rating.", "सहेजे हुए सटीक बिंदु। हर जगह का रंग उसका अपना अंक दिखाता है।") else t("Exact saved points. Colour shows this entry's rating for its selected areas.", "सहेजे हुए सटीक बिंदु। रंग इस नोट के चुने हुए हिस्सों का अंक दिखाता है।"), style = MaterialTheme.typography.bodySmall)
                 "regions" -> Text(t("Body areas were saved; no exact 3D point was recorded.", "शरीर के हिस्से सहेजे थे; सटीक 3D बिंदु नहीं लिखा था।"), style = MaterialTheme.typography.bodySmall)
                 "text" -> Text(t("This entry has a written location only; no point is added to the body.", "इस नोट में जगह केवल लिखी है; शरीर पर कोई बिंदु नहीं जोड़ा गया है।"), style = MaterialTheme.typography.bodySmall)
                 "unsupported-model" -> Text(t("This body map version cannot be displayed here. The original record is retained.", "यह शरीर के नक्शे का संस्करण यहाँ नहीं खुल सकता। मूल नोट सुरक्षित है।"), style = MaterialTheme.typography.bodySmall)
                 else -> Text(t("No body location was recorded for this entry.", "इस नोट में शरीर पर दर्द की जगह नहीं लिखी थी।"), style = MaterialTheme.typography.bodySmall)
             }
             if (note.painLocation.isNotBlank()) Text(note.painLocation, modifier = Modifier.testTag("pain-history-location"))
-            if (PainHistoryRules.locationKind(note) != "unsupported-model") CarePainBodyMap(note.painBodySites, note.painBodyPoints, note.rating, hindi, readOnly = true) { _, _ -> }
+            if (PainHistoryRules.locationKind(note) != "unsupported-model") CarePainBodyMap(note.painBodySites, note.painBodyPoints, note.rating, hindi, readOnly = true, ratings = note.painBodyRatings) { _, _ -> }
             if (note.startedOn.isNotBlank()) Text("${t("Started", "शुरू हुआ")}: ${note.startedOn}", style = MaterialTheme.typography.bodySmall)
             if (note.painTriggers.isNotEmpty()) Text(note.painTriggers.joinToString { SymptomDiaryRules.label(SymptomDiaryRules.triggers, it, hindi) }, style = MaterialTheme.typography.bodySmall)
             if (note.note.isNotBlank()) Text(note.note)

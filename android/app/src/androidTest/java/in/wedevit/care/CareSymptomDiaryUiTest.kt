@@ -1,6 +1,7 @@
 package `in`.wedevit.care
 
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.espresso.Espresso.closeSoftKeyboard
@@ -17,26 +18,26 @@ class CareSymptomDiaryUiTest {
 
     @Test fun freshRatingsKeepRecallObserverAndActualSamePersonReference() {
         val day = LocalDate.now().minusDays(1).toString()
-        val previous = SymptomNote("Pain", 6, day, "10:00", "average-24h", "caregiver", "Fixture observer")
+        val previous = SymptomNote("Pain", 6, day, "10:00", "average-24h", "caregiver", "Fixture observer", painBodySites = listOf("head"), painBodyRatings = mapOf("head" to 6))
         val row = CareItem(id = "fixture-prior", personId = "fixture-person", kind = "checkin", title = "Pain", detail = SymptomNoteCodec.encode(previous))
         var saved: SymptomNote? = null
         ui.setContent { CareTheme { SymptomNoteForm("fixture-person", "Fictional patient", listOf(row, row.copy(id = "other-person", personId = "different-person")), false,
             onSave = { _, value -> saved = value }, onClose = {}) } }
         ui.onNodeWithTag("symptom-choice-Pain").performScrollTo().performClick()
+        markWholePart("head"); ui.onNodeWithTag("pain-strength-target").performScrollTo().assertTextContains("Head"); setStrength(6f); setStrength(4f)
         ui.onNodeWithTag("symptom-step-next").performScrollTo().performClick()
+        ui.onNodeWithTag("symptom-rating-4").assertDoesNotExist() // Pain strength is set per spot; step 3 has no number card
         ui.onNodeWithTag("diary-choice-caregiver").performScrollTo().performClick()
         ui.onNodeWithText("Observer's name").performScrollTo().performTextInput("Fixture observer")
         closeSoftKeyboard()
         ui.onNodeWithTag("diary-choice-average-24h").performScrollTo().performClick()
-        ui.onNodeWithTag("symptom-rating-6").performScrollTo().performClick()
-        ui.onNodeWithTag("symptom-rating-4").performScrollTo().performClick()
         ui.onNodeWithTag("symptom-step-next").performScrollTo().performClick()
         ui.onNodeWithTag("symptom-previous-reference").performScrollTo().assertTextEquals("Previous matching note: $day 10:00 · 6/10")
         ui.onNodeWithTag("diary-choice-better").performScrollTo().performClick()
         screenshot("symptom-comparison")
         ui.onNodeWithTag("symptom-save").performScrollTo().performClick()
         ui.runOnIdle {
-            assertEquals(4, saved!!.rating)
+            assertEquals(4, saved!!.rating); assertEquals(mapOf("head" to 4), saved!!.painBodyRatings)
             assertEquals("average-24h", saved!!.recall)
             assertEquals("caregiver", saved!!.respondent)
             assertEquals("Fixture observer", saved!!.author)
@@ -75,7 +76,7 @@ class CareSymptomDiaryUiTest {
         ui.onNodeWithTag("symptom-choice-Pain").performScrollTo().performClick()
         ui.onNodeWithTag("symptom-step-next").performScrollTo().performClick()
         ui.onNodeWithTag("diary-choice-patient").performScrollTo().performClick()
-        ui.onNodeWithTag("symptom-rating-0").performScrollTo().performClick()
+        ui.onNodeWithTag("symptom-unrated").performScrollTo().performClick() // Pain with no rated spot: Not rated
         ui.runOnIdle { person.value = "second-person" }
         ui.waitForIdle()
         ui.onNodeWithTag("symptom-step-next").performScrollTo().performClick()
@@ -207,17 +208,62 @@ class CareSymptomDiaryUiTest {
         ui.onNodeWithTag("pain-body-mark-right-arm").performScrollTo().performClick()
         ui.onNodeWithTag("pain-body-unmark-right-arm").assertExists()
         ui.onNodeWithTag("pain-body-selected").assertExists()
+        setStrength(4f) // the marked right arm is the active spot
         ui.onNodeWithTag("symptom-step-next").performScrollTo().performClick()
         ui.onNodeWithTag("diary-choice-patient").performScrollTo().performClick()
-        ui.onNodeWithTag("symptom-rating-4").performScrollTo().performClick()
         ui.onNodeWithTag("symptom-step-next").performScrollTo().performClick()
         ui.onNodeWithTag("symptom-save").performScrollTo().performClick()
         ui.runOnIdle {
             assertEquals(listOf("right-arm"), saved!!.painBodySites)
             assertTrue(saved!!.painBodyPoints.isEmpty())
-            assertEquals(4, saved!!.rating)
+            assertEquals(4, saved!!.rating); assertEquals(mapOf("right-arm" to 4), saved!!.painBodyRatings)
         }
     }
+
+    @Test fun eachMarkedSpotKeepsItsOwnRatingAndTheNoteTakesTheHighest() {
+        var saved: SymptomNote? = null
+        ui.setContent { CareTheme { SymptomNoteForm("fixture-spots", "Fictional patient", emptyList(), false, onSave = { _, value -> saved = value }, onClose = {}) } }
+        ui.onNodeWithTag("symptom-choice-Pain").performScrollTo().performClick()
+        markWholePart("head"); setStrength(9f)
+        markWholePart("neck")
+        ui.onNodeWithTag("pain-strength-target").performScrollTo().assertTextContains("Neck")
+        ui.onNodeWithTag("pain-strength-value").assertTextContains("Slide to set. Not rated yet.") // a new spot starts unrated; the head keeps its 9
+        setStrength(3f)
+        ui.onNodeWithTag("pain-body-site-head").performScrollTo().performClick() // a marked part tile makes that spot active again
+        ui.onNodeWithTag("pain-strength-target").assertTextContains("Head")
+        ui.onNodeWithTag("pain-strength-value").assertTextContains("9/10")
+        ui.onNodeWithTag("symptom-step-next").performScrollTo().performClick()
+        ui.onNodeWithTag("diary-choice-patient").performScrollTo().performClick()
+        ui.onNodeWithTag("symptom-unrated").assertDoesNotExist(); ui.onNodeWithTag("symptom-rating-9").assertDoesNotExist()
+        ui.onNodeWithTag("symptom-step-next").performScrollTo().assertIsEnabled().performClick()
+        ui.onNodeWithTag("symptom-save").performScrollTo().performClick()
+        ui.runOnIdle { assertEquals(mapOf("head" to 9, "neck" to 3), saved!!.painBodyRatings); assertEquals(9, saved!!.rating) }
+    }
+
+    @Test fun painWithoutAnyRatedSpotOffersBackToRateOrNotRatedAndBlocksNextUntilOneIsChosen() {
+        var saved: SymptomNote? = null
+        ui.setContent { CareTheme { SymptomNoteForm("fixture-unrated", "Fictional patient", emptyList(), false, onSave = { _, value -> saved = value }, onClose = {}) } }
+        ui.onNodeWithTag("symptom-choice-Pain").performScrollTo().performClick()
+        markWholePart("neck") // marked but not rated
+        ui.onNodeWithTag("symptom-step-next").performScrollTo().performClick()
+        ui.onNodeWithTag("diary-choice-patient").performScrollTo().performClick()
+        ui.onNodeWithText("No pain strength set yet.").assertExists()
+        ui.onNodeWithTag("symptom-step-next").assertIsNotEnabled()
+        ui.onNodeWithTag("symptom-pain-rate-back").performScrollTo().performClick()
+        ui.onNodeWithTag("pain-strength-slider").assertExists()
+        setStrength(0f) // 0 is a real rating: no colour, but the step can continue
+        ui.onNodeWithTag("symptom-step-next").performScrollTo().performClick()
+        ui.onNodeWithTag("symptom-step-next").assertIsEnabled()
+        ui.onNodeWithTag("symptom-step-next").performScrollTo().performClick()
+        ui.onNodeWithTag("symptom-save").performScrollTo().performClick()
+        ui.runOnIdle { assertEquals(0, saved!!.rating); assertEquals(mapOf("neck" to 0), saved!!.painBodyRatings) }
+    }
+
+    private fun markWholePart(site: String) {
+        ui.onNodeWithTag("pain-body-site-$site").performScrollTo().performClick()
+        ui.onNodeWithTag("pain-body-mark-$site").performScrollTo().performClick()
+    }
+    private fun setStrength(value: Float) { ui.onNodeWithTag("pain-strength-slider").performScrollTo().performSemanticsAction(SemanticsActions.SetProgress) { it(value) } }
 
     private fun screenshot(name: String) {
         val instrumentation = InstrumentationRegistry.getInstrumentation()

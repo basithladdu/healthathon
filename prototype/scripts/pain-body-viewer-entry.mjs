@@ -5,7 +5,7 @@ import { classifyPainBodyPoint, quantizePainBodyPoint, validPainViewerState } fr
 
 const surface = document.getElementById('surface');
 const status = document.getElementById('status');
-let state = { selected: [], rating: null, hindi: false, points: [], readOnly: false };
+let state = { selected: [], rating: null, ratings: undefined, hindi: false, points: [], readOnly: false };
 let applyState = () => {};
 let changeView = () => {};
 let focusRegion = () => false;
@@ -36,7 +36,7 @@ function emit(message) {
 window.SaharaPainViewer = {
   setState(next) {
     if (!validPainViewerState(next)) return false;
-    state = { selected: [...next.selected], rating: next.rating, hindi: next.hindi, points: (next.points ?? []).map(quantizePainBodyPoint), readOnly: next.readOnly === true };
+    state = { selected: [...next.selected], rating: next.rating, ratings: next.ratings ? { ...next.ratings } : undefined, hindi: next.hindi, points: (next.points ?? []).map(quantizePainBodyPoint), readOnly: next.readOnly === true };
     applyState();
     return true;
   },
@@ -151,18 +151,22 @@ try {
   const point = new THREE.Vector3();
   const meshes = [];
   const neutral = new THREE.Color('#ced8ca');
-  // Wong-Baker style solid blocks, pain 0-1, 2-3, 4-5, 6-7, 8-9, 10: green to red. Keep in sync with PainBodyMapRules.heatStops in Kotlin.
+  // Wong-Baker style solid blocks, pain 1, 2-3, 4-5, 6-7, 8-9, 10: green to red. 0 has no heat colour at all (neutral).
+  // Keep in sync with PainBodyMapRules.heatStops / heatColor in Kotlin.
   const HEAT = ['#4ca64c', '#8cc152', '#f6d743', '#f2a33a', '#e8693a', '#d9363e'].map((hex) => new THREE.Color(hex));
   const unratedGlow = new THREE.Color('#8d978c');
-  const heatColor = (rating, target = new THREE.Color()) => target.copy(HEAT[Math.min(5, Math.floor(Math.min(10, Math.max(0, rating)) / 2))]);
+  const zeroRing = new THREE.Color('#7f8580');
+  const heatColor = (rating, target = new THREE.Color()) => rating <= 0 ? target.copy(neutral) : target.copy(HEAT[Math.min(5, Math.floor(Math.min(10, Math.max(0, rating)) / 2))]);
+  // Each spot has its own rating: state.ratings (site to 0-10) when present, else the single legacy rating. null = not rated.
+  const ratingFor = (site) => state.ratings ? (Object.prototype.hasOwnProperty.call(state.ratings, site) ? state.ratings[site] : null) : state.rating;
   // Contour heat map: concentric quantised bands around each point in world space (about metres; body height 1.8),
   // distance perturbed by low-frequency noise so the outline is organic, each band edge slightly soft.
   const MAX_GLOW = 12, GLOW_BANDS = 8, GLOW_RADIUS = 0.13;
-  const glow = { count: { value: 0 }, pts: { value: Array.from({ length: MAX_GLOW }, () => new THREE.Vector3()) }, cols: { value: Array.from({ length: MAX_GLOW }, () => new THREE.Vector3()) }, strength: { value: 1 } };
+  const glow = { kind: { value: new Array(MAX_GLOW).fill(0) }, count: { value: 0 }, pts: { value: Array.from({ length: MAX_GLOW }, () => new THREE.Vector3()) }, cols: { value: Array.from({ length: MAX_GLOW }, () => new THREE.Vector3()) }, strength: { value: 1 } };
   const makeBodyMaterial = () => {
     const material = new THREE.MeshStandardMaterial({ color: 0xffffff, vertexColors: true, roughness: 0.75, metalness: 0.02 });
     material.onBeforeCompile = (shader) => {
-      shader.uniforms.uGlowCount = glow.count; shader.uniforms.uGlowPts = glow.pts; shader.uniforms.uGlowCols = glow.cols; shader.uniforms.uGlowStrength = glow.strength;
+      shader.uniforms.uGlowKind = glow.kind; shader.uniforms.uGlowCount = glow.count; shader.uniforms.uGlowPts = glow.pts; shader.uniforms.uGlowCols = glow.cols; shader.uniforms.uGlowStrength = glow.strength;
       shader.vertexShader = shader.vertexShader
         .replace('#include <common>', '#include <common>\nvarying vec3 vGlowPos;')
         .replace('#include <begin_vertex>', '#include <begin_vertex>\nvGlowPos =(modelMatrix * vec4(transformed, 1.0)).xyz;');
@@ -172,24 +176,31 @@ varying vec3 vGlowPos;
 uniform float uGlowCount;
 uniform vec3 uGlowPts[${MAX_GLOW}];
 uniform vec3 uGlowCols[${MAX_GLOW}];
+uniform float uGlowKind[${MAX_GLOW}];
 uniform float uGlowStrength;`)
         .replace('#include <color_fragment>', `#include <color_fragment>
 {
-  float bestL = ${GLOW_BANDS}.0; vec3 bestC = vec3(0.0);
+  float bestL = ${GLOW_BANDS}.0; vec3 bestC = vec3(0.0); float bestK = 0.0; float ringA = 0.0; vec3 ringC = vec3(0.5);
   float wob = 0.5 * sin(vGlowPos.x * 43.0 + vGlowPos.y * 17.0) + 0.3 * sin(vGlowPos.y * 37.0 - vGlowPos.z * 29.0 + 1.3) + 0.2 * sin(vGlowPos.z * 51.0 + vGlowPos.x * 23.0 + 2.1);
   for (int i = 0; i < ${MAX_GLOW}; i++) {
     if (float(i) >= uGlowCount) break;
     float d = length(vGlowPos - uGlowPts[i]) * (1.0 + 0.2 * wob);
+    if (uGlowKind[i] > 1.5) { // rated 0: no heat colour, only a faint neutral outline ring so the location stays visible
+      float ring = 1.0 - smoothstep(0.0025, 0.0065, abs(d - ${(GLOW_RADIUS * 0.72).toFixed(4)}));
+      if (ring > ringA) { ringA = ring; ringC = uGlowCols[i]; }
+      continue;
+    }
     float s = d / ${GLOW_RADIUS.toFixed(4)} * ${GLOW_BANDS}.0;
     float lv = floor(s) + smoothstep(0.88, 1.0, fract(s));
-    if (lv < bestL) { bestL = lv; bestC = uGlowCols[i]; }
+    if (lv < bestL) { bestL = lv; bestC = uGlowCols[i]; bestK = uGlowKind[i]; }
   }
   if (bestL < ${GLOW_BANDS}.0) {
     float u = clamp(bestL / ${GLOW_BANDS - 1}.0, 0.0, 1.0);
     vec3 tint = mix(bestC, vec3(0.973, 0.894, 0.863), pow(u, 1.5) * 0.92);
     float a = bestL <= ${GLOW_BANDS - 1}.0 ? mix(1.0, 0.5, u) : mix(0.5, 0.0, bestL - ${GLOW_BANDS - 1}.0);
-    diffuseColor.rgb = mix(diffuseColor.rgb, tint, a * uGlowStrength);
+    diffuseColor.rgb = mix(diffuseColor.rgb, tint, a * uGlowStrength * (bestK > 0.5 ? 0.7 : 1.0));
   }
+  if (ringA > 0.0) diffuseColor.rgb = mix(diffuseColor.rgb, ringC, ringA * 0.85);
 }`);
     };
     material.customProgramCacheKey = () => 'sahara-pain-heat';
@@ -227,15 +238,17 @@ uniform float uGlowStrength;`)
     });
     applyState = () => {
       const selected = new Set(state.selected);
-      const hasRating = state.rating !== null;
-      const tint = hasRating ? heatColor(state.rating) : unratedGlow;
       const pointed = new Set(state.points.map((saved) => saved.site));
-      // Parts marked without a tapped point keep a soft region tint; tapped points glow on the surface instead.
-      const regionTint = neutral.clone().lerp(tint, 0.45);
+      // Parts marked without a tapped point keep a soft region tint from their own rating (0: faint grey, unrated: soft grey); tapped points glow on the surface instead.
+      const regionTints = new Map();
+      for (const site of selected) {
+        const rating = ratingFor(site);
+        regionTints.set(site, rating === null ? neutral.clone().lerp(unratedGlow, 0.45) : rating === 0 ? neutral.clone().lerp(zeroRing, 0.3) : neutral.clone().lerp(heatColor(rating), 0.45));
+      }
       for (const mesh of meshes) {
         const colors = mesh.geometry.getAttribute('color');
         mesh.userData.painSites.forEach((site, index) => {
-          const color = selected.has(site) && !pointed.has(site) ? regionTint : neutral;
+          const color = selected.has(site) && !pointed.has(site) ? regionTints.get(site) : neutral;
           colors.setXYZ(index, color.r, color.g, color.b);
         });
         colors.needsUpdate = true;
@@ -243,10 +256,13 @@ uniform float uGlowStrength;`)
       const shown = state.points.slice(0, MAX_GLOW);
       shown.forEach((saved, index) => {
         glow.pts.value[index].set(saved.x * worldSize.x / 2, bounds.min.y + saved.y * worldSize.y, saved.z * worldSize.z / 2);
+        const rating = ratingFor(saved.site);
+        const tint = rating === null ? unratedGlow : rating === 0 ? zeroRing : heatColor(rating);
         glow.cols.value[index].set(tint.r, tint.g, tint.b);
+        glow.kind.value[index] = rating === null ? 1 : rating === 0 ? 2 : 0;
       });
       glow.count.value = shown.length;
-      glow.strength.value = hasRating ? 1 : 0.7;
+      glow.strength.value = 1;
       status.textContent = state.readOnly
         ? state.hindi ? 'सेव किया दर्द का मैप · घुमाने के लिए खींचें' : 'Saved pain map · drag to rotate'
         : state.hindi ? 'घुमाने के लिए खींचें · दर्द की जगह छुएँ' : 'Drag to rotate · tap where it hurts';

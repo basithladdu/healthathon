@@ -62,13 +62,21 @@ export function classifyPainBodyPoint(point: { x: number; y: number; z: number }
   return y >= 0.64 ? 'upper-back' : 'lower-back';
 }
 
-export function validPainViewerState(value: unknown): value is { selected: PainBodySite[]; rating: number | null; hindi: boolean; points?: PainBodyPoint[]; readOnly?: boolean } {
+// Optional per-spot strength: site id to an integer 0-10, only for sites in the same state. Absent means every spot uses the single legacy `rating`.
+export function validPainSiteRatings(value: unknown, selected: readonly unknown[]): value is Partial<Record<PainBodySite, number>> {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  return Object.entries(value as Record<string, unknown>).every(([site, rating]) => isPainBodySite(site) && selected.includes(site)
+    && typeof rating === 'number' && Number.isInteger(rating) && rating >= 0 && rating <= 10);
+}
+
+export function validPainViewerState(value: unknown): value is { selected: PainBodySite[]; rating: number | null; hindi: boolean; points?: PainBodyPoint[]; ratings?: Partial<Record<PainBodySite, number>>; readOnly?: boolean } {
   if (!value || typeof value !== 'object') return false;
   const state = value as Record<string, unknown>;
   return Array.isArray(state.selected) && state.selected.length <= PAIN_BODY_SITES.length
     && state.selected.every(isPainBodySite) && new Set(state.selected).size === state.selected.length
     && (state.rating === null || (typeof state.rating === 'number' && Number.isInteger(state.rating) && state.rating >= 0 && state.rating <= 10))
     && typeof state.hindi === 'boolean'
+    && (state.ratings === undefined || validPainSiteRatings(state.ratings, state.selected))
     && (state.readOnly === undefined || typeof state.readOnly === 'boolean')
     && (state.points === undefined || (Array.isArray(state.points) && state.points.length <= PAIN_BODY_SITES.length
       && state.points.every(isPainBodyPoint) && new Set(state.points.map((point) => point.site)).size === state.points.length

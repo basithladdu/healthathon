@@ -84,12 +84,42 @@ class CarePainBodyMapTest {
         assertEquals("Upper back", PainBodyMapRules.focusLabel("upper-back", true, false))
     }
     @Test fun heatBlocksRunGreenToRedAndWordsFollowBands() {
-        assertEquals(0xFF4CA64CL, PainBodyMapRules.heatColor(0)); assertEquals(0xFFD9363EL, PainBodyMapRules.heatColor(10))
-        assertEquals(PainBodyMapRules.heatColor(0), PainBodyMapRules.heatColor(1)); assertEquals(0xFF8CC152L, PainBodyMapRules.heatColor(2)); assertEquals(0xFF8CC152L, PainBodyMapRules.heatColor(3)); assertEquals(0xFFF6D743L, PainBodyMapRules.heatColor(4))
+        assertEquals(0xFF4CA64CL, PainBodyMapRules.heatColor(1)); assertEquals(0xFFD9363EL, PainBodyMapRules.heatColor(10))
+        assertEquals(0xFF8CC152L, PainBodyMapRules.heatColor(2)); assertEquals(0xFF8CC152L, PainBodyMapRules.heatColor(3)); assertEquals(0xFFF6D743L, PainBodyMapRules.heatColor(4))
         assertEquals(0xFFE8693AL, PainBodyMapRules.heatColor(9)); assertEquals(PainBodyMapRules.heatColor(10), PainBodyMapRules.heatColor(99)); assertEquals(PainBodyMapRules.heatColor(0), PainBodyMapRules.heatColor(-3))
-        assertEquals(6, (0..10).map { PainBodyMapRules.heatColor(it) }.toSet().size)
+        assertEquals(PainBodyMapRules.NEUTRAL, PainBodyMapRules.heatColor(0)); assertFalse(PainBodyMapRules.heatStops.contains(PainBodyMapRules.heatColor(0))); assertNotEquals(PainBodyMapRules.heatColor(0), PainBodyMapRules.heatColor(1)) // zero carries no heat colour
+        assertEquals(7, (0..10).map { PainBodyMapRules.heatColor(it) }.toSet().size)
         assertEquals(listOf("None", "Mild", "Mild", "Moderate", "Severe", "Worst"), listOf(0, 3, 1, 5, 8, 10).map { PainBodyMapRules.strengthWord(it, false) })
         assertEquals("हल्का", PainBodyMapRules.strengthWord(2, true)); assertEquals("सबसे ज़्यादा", PainBodyMapRules.strengthWord(10, true))
+    }
+    @Test fun perSpotRatingsRoundTripValidateAndOldNotesStillLoad() {
+        val spots = note().copy(painBodySites = listOf("head", "left-leg"), painBodyRatings = mapOf("head" to 10, "left-leg" to 0))
+        val encoded = SymptomNoteCodec.encode(spots)
+        assertEquals(spots, SymptomNoteCodec.decode(encoded))
+        assertTrue(SymptomNoteCodec.readable(encoded).contains("Head 10/10, Left leg / foot 0/10"))
+        // Old records have no painBodyRatings key at all: they load with an empty map and encode back without one.
+        val old = note(); val oldEncoded = SymptomNoteCodec.encode(old)
+        assertFalse(JSONObject(oldEncoded.removePrefix(SymptomNoteCodec.PREFIX)).has("painBodyRatings"))
+        assertEquals(emptyMap<String, Int>(), SymptomNoteCodec.decode(oldEncoded)!!.painBodyRatings)
+        assertNull(SymptomDiaryRules.error(spots.copy(painBodyPoints = emptyList(), painBodyModel = ""), java.time.LocalDateTime.of(2026, 10, 24, 0, 0)))
+        val now = java.time.LocalDateTime.of(2026, 10, 24, 0, 0)
+        listOf(spots.copy(painBodyRatings = mapOf("head" to 11)), spots.copy(painBodyRatings = mapOf("head" to -1)), spots.copy(painBodyRatings = mapOf("neck" to 3)),
+            note().copy(symptom = "Nausea", painLocation = "", painBodySites = emptyList(), painBodyPoints = emptyList(), painBodyModel = "", painBodyRatings = mapOf("head" to 3))).forEach { assertNotNull(SymptomDiaryRules.error(it, now)) }
+        // A follow-up is a new observation: spot ratings are cleared while the location stays.
+        assertTrue(SymptomDiaryRules.followUp(spots).painBodyRatings.isEmpty()); assertEquals(spots.painBodySites, SymptomDiaryRules.followUp(spots).painBodySites)
+        // Ratings are values, not context: two notes at the same places with different spot ratings are the same series.
+        val a = CareItem(id = "a", personId = "p", kind = "checkin", title = "Pain"); assertTrue(SymptomDiaryRules.sameContext(a, spots, a, spots.copy(painBodyRatings = mapOf("head" to 2))))
+    }
+    @Test fun overallIsTheHighestRatedSpotAndNullWhenNoneAreRated() {
+        assertEquals(10, PainBodyMapRules.overall(mapOf("head" to 10, "neck" to 5))); assertEquals(0, PainBodyMapRules.overall(mapOf("neck" to 0))); assertNull(PainBodyMapRules.overall(emptyMap()))
+        val key = PainBodyMapRules.ratingsKey(mapOf("neck" to 5, "head" to 10)); assertEquals("head:10|neck:5", key)
+        assertEquals(mapOf("head" to 10, "neck" to 5), PainBodyMapRules.parseRatingsKey(key)); assertEquals(mapOf("head" to 1), PainBodyMapRules.parseRatingsKey("head:1|x:3|neck:12|neck:abc"))
+    }
+    @Test fun friendlyDateWordsFollowTheCalendar() {
+        val today = java.time.LocalDate.of(2026, 10, 26)
+        assertTrue(friendlyWhen("2026-10-26", "16:01", false, today).startsWith("Today, 4:01")); assertTrue(friendlyWhen("2026-10-25", "09:05", false, today).startsWith("Yesterday, 9:05"))
+        assertTrue(friendlyWhen("2026-10-20", "16:01", false, today).startsWith("20 Oct, 4:01")); assertTrue(friendlyWhen("2025-10-20", "16:01", false, today).startsWith("20 Oct 2025, 4:01"))
+        assertTrue(friendlyWhen("2026-10-26", "16:01", true, today).startsWith("आज, ")); assertEquals("bad 99", friendlyWhen("bad", "99", false, today))
     }
     @Test fun markingAndUnmarkingAreIdempotentAndKeepBodyOrder() {
         val marked = PainBodyMapRules.marked(listOf("left-leg"), "head")

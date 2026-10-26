@@ -15,6 +15,8 @@ data class SymptomNote(
     val painBodySites: List<String> = emptyList(),
     val painBodyPoints: List<PainBodyPoint3d> = emptyList(),
     val painBodyModel: String = "",
+    /** Optional per-spot strength, site id to 0-10 (one spot per site, with or without an exact point). Empty on older notes, which fall back to [rating]. */
+    val painBodyRatings: Map<String, Int> = emptyMap(),
 )
 
 data class SymptomComparison(val baseline: CareItem, val previous: CareItem, val difference: Int)
@@ -68,9 +70,10 @@ object SymptomDiaryRules {
         if (value.note.length > 500 || value.painLocation.length > 100 || value.painTriggers.any { it !in triggers }) return "Shorten the note or review the pain details."
         if (value.painBodySites.size > PainBodyMapRules.sites.size || value.painBodySites.any { it !in PainBodyMapRules.sites }) return "Choose a listed pain area."
         if (value.painBodyPoints.size > 12 || value.painBodyPoints.map { it.site }.distinct().size != value.painBodyPoints.size || value.painBodyPoints.any { !PainBodyMapRules.validPoint(it) || it.site !in value.painBodySites }) return "Choose a valid point on a selected pain area."
+        if (value.painBodyRatings.any { (site, r) -> site !in value.painBodySites || r !in 0..10 }) return "Choose a number from 0 to 10 for a selected pain area."
         if (value.painBodyPoints.isNotEmpty() && value.painBodyModel != PainBodyMapRules.MODEL) return "This body map version cannot be edited here."
         if (value.painBodyModel.isNotEmpty() && value.painBodyModel != PainBodyMapRules.MODEL) return "This body map version cannot be edited here."
-        if (value.symptom != "Pain" && (value.painLocation.isNotBlank() || value.painTriggers.isNotEmpty() || value.painBodySites.isNotEmpty() || value.painBodyPoints.isNotEmpty())) return "Pain details belong to a pain entry."
+        if (value.symptom != "Pain" && (value.painLocation.isNotBlank() || value.painTriggers.isNotEmpty() || value.painBodySites.isNotEmpty() || value.painBodyPoints.isNotEmpty() || value.painBodyRatings.isNotEmpty())) return "Pain details belong to a pain entry."
         if (value.selfReportedChange.isNotEmpty() && value.selfReportedChange !in changes) return "Choose a comparison."
         if (value.selfReportedChange.isEmpty() != value.comparedWithId.isEmpty()) return "Choose the previous entry for this comparison."
         return null
@@ -87,7 +90,7 @@ object SymptomDiaryRules {
             .sortedWith(compareBy<Pair<CareItem, SymptomNote>> { "${it.second.observedDate}T${it.second.observedTime}" }.thenBy { it.first.id })
     fun followUp(value: SymptomNote, now: LocalDateTime = LocalDateTime.now()): SymptomNote = value.copy(
         rating = null, observedDate = now.toLocalDate().toString(), observedTime = now.toLocalTime().withSecond(0).withNano(0).toString(),
-        note = "", selfReportedChange = "", comparedWithId = "",
+        note = "", selfReportedChange = "", comparedWithId = "", painBodyRatings = emptyMap(),
     )
     fun comparison(entries: List<CareItem>, current: CareItem, value: SymptomNote): SymptomComparison? {
         val rating = value.rating ?: return null
@@ -110,6 +113,7 @@ object SymptomNoteCodec {
         .put("painBodySites", JSONArray(value.painBodySites.distinct().sorted()))
         .put("painBodyPoints", PainBodyMapRules.encodePoints(value.painBodyPoints))
         .put("painBodyModel", value.painBodyModel)
+        .also { if (value.painBodyRatings.isNotEmpty()) it.put("painBodyRatings", PainBodyMapRules.encodeRatings(value.painBodyRatings)) }
         .put("selfReportedChange", value.selfReportedChange).put("comparedWithId", value.comparedWithId).toString()
     fun decode(text: String): SymptomNote? {
         if (!isStructured(text)) return null
@@ -118,7 +122,7 @@ object SymptomNoteCodec {
             SymptomNote(j.getString("symptom"), if (j.isNull("rating")) null else j.getInt("rating"), j.getString("observedDate"), j.getString("observedTime"),
                 j.getString("recall"), j.getString("respondent"), j.getString("author"), j.optString("startedOn"), j.optString("note"), j.optString("painLocation"),
                 (0 until triggers.length()).map { triggers.getString(it) }, j.optString("selfReportedChange"), j.optString("comparedWithId"), j.getString("scale"),
-                sites?.let { list -> (0 until list.length()).map { list.getString(it) } }.orEmpty(), PainBodyMapRules.decodePoints(j.optJSONArray("painBodyPoints")), j.optString("painBodyModel"))
+                sites?.let { list -> (0 until list.length()).map { list.getString(it) } }.orEmpty(), PainBodyMapRules.decodePoints(j.optJSONArray("painBodyPoints")), j.optString("painBodyModel"), PainBodyMapRules.decodeRatings(j.optJSONObject("painBodyRatings")))
                 .also { require(SymptomDiaryRules.error(it) == null) }
         }.getOrNull()
     }
@@ -126,7 +130,7 @@ object SymptomNoteCodec {
         listOf("${n.observedDate} ${n.observedTime} · ${SymptomDiaryRules.ratingLabel(n.rating, hindi)}", SymptomDiaryRules.ratingAnchors(n.scale, hindi).takeIf { n.scale == SymptomDiaryRules.WELLBEING_SCALE }.orEmpty(), SymptomDiaryRules.label(SymptomDiaryRules.recalls, n.recall, hindi),
             "${SymptomDiaryRules.label(SymptomDiaryRules.respondents, n.respondent, hindi)} · ${n.author}",
             n.startedOn.takeIf { it.isNotBlank() }?.let { "${if (hindi) "शुरू हुआ" else "Started"}: $it" }.orEmpty(),
-            n.painLocation, n.painBodySites.takeIf { it.isNotEmpty() }?.joinToString(prefix = if (hindi) "दर्द की जगह: " else "Pain areas: ") { PainBodyMapRules.label(it, hindi) }.orEmpty(), n.painTriggers.joinToString { SymptomDiaryRules.label(SymptomDiaryRules.triggers, it, hindi) },
+            n.painLocation, n.painBodySites.takeIf { it.isNotEmpty() }?.joinToString(prefix = if (hindi) "दर्द की जगह: " else "Pain areas: ") { PainBodyMapRules.label(it, hindi) + (n.painBodyRatings[it]?.let { r -> " $r/10" } ?: "") }.orEmpty(), n.painTriggers.joinToString { SymptomDiaryRules.label(SymptomDiaryRules.triggers, it, hindi) },
             n.selfReportedChange.takeIf { it.isNotBlank() }?.let { "${if (hindi) "उनके मुताबिक बदलाव" else "Reported change"}: ${SymptomDiaryRules.label(SymptomDiaryRules.changes, it, hindi)}" }.orEmpty(), n.note).filter(String::isNotBlank).joinToString("\n")
     } ?: if (hindi) "यह नोट पढ़ा नहीं जा सका। मूल रिकॉर्ड सुरक्षित है।" else "This symptom note could not be read. The original record is retained."
 }

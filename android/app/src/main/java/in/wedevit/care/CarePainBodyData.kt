@@ -29,7 +29,16 @@ object PainBodyMapRules {
     const val MODEL = "sahara-body-v1"
     /** Wong-Baker style solid blocks as opaque ARGB: green, light green, yellow, orange, orange-red, red for ratings 0-1, 2-3, 4-5, 6-7, 8-9, 10. The 3D viewer uses the same colours. */
     val heatStops = listOf(0xFF4CA64CL, 0xFF8CC152L, 0xFFF6D743L, 0xFFF2A33AL, 0xFFE8693AL, 0xFFD9363EL)
-    fun heatColor(rating: Int): Long = heatStops[minOf(heatStops.size - 1, rating.coerceIn(0, 10) / 2)]
+    /** Rating 0 carries no heat colour: it is this neutral grey (thumb, dot), never green. Green starts at 1. */
+    const val NEUTRAL = 0xFFB9B0A6L
+    fun heatColor(rating: Int): Long = if (rating <= 0) NEUTRAL else heatStops[minOf(heatStops.size - 1, rating.coerceIn(0, 10) / 2)]
+    /** The note's overall score from per-spot ratings: the highest rated spot, or null when no spot is rated. */
+    fun overall(ratings: Map<String, Int>): Int? = ratings.values.maxOrNull()
+    /** Per-spot ratings (site id to 0-10) as a compact saveable string "head:7|neck:4", and back; unknown ids and bad values are dropped. */
+    fun ratingsKey(ratings: Map<String, Int>): String = sites.keys.filter { it in ratings }.joinToString("|") { "$it:${ratings.getValue(it)}" }
+    fun parseRatingsKey(text: String): Map<String, Int> = text.split('|').mapNotNull { part -> part.split(':').takeIf { it.size == 2 && it[0] in sites }?.let { p -> p[1].toIntOrNull()?.takeIf { it in 0..10 }?.let { p[0] to it } } }.toMap()
+    fun encodeRatings(ratings: Map<String, Int>): JSONObject = JSONObject().also { o -> sites.keys.filter { it in ratings }.forEach { o.put(it, ratings.getValue(it)) } }
+    fun decodeRatings(value: JSONObject?): Map<String, Int> = value?.let { o -> o.keys().asSequence().associateWith { o.getInt(it) } }.orEmpty()
     /** Plain-word band for the pain strength slider; 0 None, 1-3 Mild, 4-6 Moderate, 7-9 Severe, 10 Worst. */
     fun strengthWord(rating: Int, hindi: Boolean): String = when (rating.coerceIn(0, 10)) {
         0 -> if (hindi) "कोई नहीं" else "None"; in 1..3 -> if (hindi) "हल्का" else "Mild"; in 4..6 -> if (hindi) "मध्यम" else "Moderate"
