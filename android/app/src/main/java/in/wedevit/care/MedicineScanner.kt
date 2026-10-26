@@ -280,7 +280,7 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
                     savingSources = true
                     scope.launch {
                         try {
-                            if(onReviewedMedicines != null) require(stagingAllowed() && !vm.demoMode) { "This prescription's care profile or edit access changed." }
+                            if(onReviewedMedicines != null) require(stagingAllowed()) { "This prescription's care profile or edit access changed." }
                             val sourceStore = MedicineSourceStore(context, vm.accountNamespace)
                             val originals = sourceStore.save(personAtOpen, scanId, prescriptionUris.map(Uri::parse), vm.reportFiles)
                             val references = withContext(Dispatchers.IO) { sourceStore.references(originals, vm.reportFiles) }

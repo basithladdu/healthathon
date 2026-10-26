@@ -34,7 +34,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
     }
     val accountNamespace: String get() = account
     val storageNamespace: String = if (demoMode) DOCTOR_DEMO_STORAGE else account
-    val localAudioRecordingAllowed: Boolean get() = DoctorLocalAudioRules.allowed(demoMode,cloud!=null,account,storageNamespace,selected.value,DoctorTestProfiles.contains(selected.value))
+    val localAudioRecordingAllowed: Boolean get() = DoctorLocalAudioRules.allowed(demoMode,cloud!=null,account,storageNamespace,selected.value)
     private val db = CareDatabase.get(app, storageNamespace)
     private val dao = db.care()
     private var demoCloseJob: Job? = null
@@ -551,7 +551,6 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
     }
     fun remove(item: CareItem) = action { requireEdit(item.personId); cloud?.removeEntry(item); dao.removeItem(item); reconcileReminders(); message.value = "Removed" }
     fun importReport(uri: android.net.Uri, personId: String) = action(waitForRefresh = true) {
-        require(!demoMode) { "File import is unavailable in Doctor examples." }
         require(people.value.any { it.id == personId }) { "Choose a person before adding a report." }
         requireEdit(personId)
         val report = try { reportFiles.copyFrom(uri, personId) }

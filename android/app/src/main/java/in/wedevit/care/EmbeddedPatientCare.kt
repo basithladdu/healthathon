@@ -119,7 +119,7 @@ fun EmbeddedPatientCare(
         vm.accountNamespace == account && (if (vm.cloud == null) allowDeviceLocal else vm.cloud.session.value?.userId == account)
     fun leaveTool() { if (!navigating) { vm.stopRecording(); tool = "" } }
     fun openTool(next: String) { if (samePerson() && !navigating) {
-        if(vm.demoMode && next in listOf("scanner","nearby","feedback","reminders","shared","resources")) vm.message.value="This online, account or device action is unavailable in the walkthrough. Your own care profiles are unchanged."
+        if(vm.demoMode && next in listOf("nearby","feedback","reminders","shared","resources")) vm.message.value="This online, account or device action is unavailable in the walkthrough. Your own care profiles are unchanged."
         else {vm.stopRecording(); tool = next}
     } }
     fun changeSection(next: String) { if (samePerson() && !navigating) { vm.stopRecording(); tool = ""; onSection(next) } }

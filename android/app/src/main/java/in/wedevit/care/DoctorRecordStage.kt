@@ -73,7 +73,7 @@ fun doctorStageStatus(recording: Boolean, saving: Boolean, seconds: Long): Strin
                 Spacer(Modifier.weight(1f))
                 Box { IconButton(onClick = { menu = true }, enabled = menuEnabled, modifier = Modifier.size(48.dp).testTag("doctor-capture-mode")) { Icon(Icons.Default.MoreVert, "Choose Record, Dictate or Type, start new, or go back to who is here", tint = white.copy(alpha = if (menuEnabled) 1f else .5f)) }
                     DropdownMenu(menu, { menu = false }) {
-                        listOf("Record", "Dictate", "Type").forEach { value -> val available = when (value) { "Record" -> localRecordingAllowed; "Dictate" -> !demo; else -> true }; DropdownMenuItem(text = { Text(value + if (!available) if (testRecord) " · unavailable" else " · unavailable in demo" else if (value == mode) " · current" else "") }, enabled = available, onClick = { onMode(value); menu = false }) }
+                        listOf("Record", "Dictate", "Type").forEach { value -> val available = when (value) { "Record" -> localRecordingAllowed; "Dictate" -> !demo; else -> true }; DropdownMenuItem(text = { Text(value + if (!available) " · unavailable" else if (value == mode) " · current" else "") }, enabled = available, onClick = { onMode(value); menu = false }) }
                         HorizontalDivider()
                         if (onStartNew != null) DropdownMenuItem(text = { Text("Start new · archive this draft") }, enabled = menuEnabled, onClick = { menu = false; onStartNew() }, modifier = Modifier.testTag("record-stage-start-new"))
                         DropdownMenuItem(text = { Text("Back to who is here") }, enabled = backToWhoEnabled, onClick = { menu = false; onBackToWho() }, modifier = Modifier.testTag("record-stage-who"))

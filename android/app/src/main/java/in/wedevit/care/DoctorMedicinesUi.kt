@@ -78,8 +78,7 @@ private fun medicineTime(at: Long?) = at?.let { DateTimeFormatter.ofPattern("d M
     BackHandler(busy||add||edit!=null||report!=null||retire!=null||prescriptionEditor!=null||pastGroupId!=null) {if(!busy){add=false;edit=null;report=null;retire=null;prescriptionEditor=null;pastGroupId=null}}
     if(!same()) {Text("This person's medicine record is unavailable. Return to Patients.",Modifier.padding(20.dp));return}
     if(scannerOpen) {
-        if(vm.demoMode) {Text("Scanning is unavailable in this care mode.");TextButton(onClick={scannerOpen=false}){Text("Back to reviewed list")}}
-        else MedicineScanner(vm,onClose={scannerOpen=false},onAccount={},onReviewedMedicines={drafts ->
+        MedicineScanner(vm,onClose={scannerOpen=false},onAccount={},onReviewedMedicines={drafts ->
             if(same(true)) {prescriptionDraftRows=(prescriptionDraftRows.orEmpty().filter {it.name.isNotBlank()}+drafts.map {PrescriptionMedicineInput(it.id,it.medicine.medicineName.trim(),medicineCareDetail(it.medicine))}).distinctBy {it.id};scannerOpen=false}
         })
         return
