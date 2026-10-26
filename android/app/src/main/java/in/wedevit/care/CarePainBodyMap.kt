@@ -7,6 +7,7 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebSettings
 import android.webkit.WebView
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
@@ -37,21 +38,32 @@ import java.io.ByteArrayInputStream
 /** A bundled 3D model plus visible region buttons, with a 2D fallback if this WebView cannot render it. */
 @Composable fun CarePainBodyMap(selected: List<String>, points: List<PainBodyPoint3d>, rating: Int?, hindi: Boolean, readOnly: Boolean = false, onChange: (List<String>, List<PainBodyPoint3d>) -> Unit) {
     var back by rememberSaveable { mutableStateOf(false) }
+    var focus by rememberSaveable { mutableStateOf<String?>(null) }
+    var focusNonce by rememberSaveable { mutableIntStateOf(0) }
     val t = { en: String, hi: String -> if (hindi) hi else en }
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(if (readOnly) t("Saved pain areas", "सहेजी गई दर्द की जगह") else t("Where is the pain? (optional)", "दर्द कहाँ है? (वैकल्पिक)"), fontWeight = FontWeight.SemiBold)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            FilterChip(!back, { back = false }, label = { Text(t("Front", "सामने")) }, modifier = Modifier.heightIn(min = 48.dp).testTag("pain-body-front"))
-            FilterChip(back, { back = true }, label = { Text(t("Back", "पीछे")) }, modifier = Modifier.heightIn(min = 48.dp).testTag("pain-body-back"))
+            FilterChip(!back, { if (back) { back = false; focus = null; focusNonce++ } }, label = { Text(t("Front", "सामने")) }, modifier = Modifier.heightIn(min = 48.dp).testTag("pain-body-front"))
+            FilterChip(back, { if (!back) { back = true; focus = null; focusNonce++ } }, label = { Text(t("Back", "पीछे")) }, modifier = Modifier.heightIn(min = 48.dp).testTag("pain-body-back"))
             if (!readOnly && selected.isNotEmpty()) TextButton(onClick = { onChange(emptyList(), emptyList()) }, modifier = Modifier.heightIn(min = 48.dp).testTag("pain-body-clear")) { Text(t("Clear", "हटाएँ")) }
         }
-        Text(if (readOnly) t("Drag to turn or zoom. Saved locations stay unchanged. Left and right mean the patient's sides.", "घुमाएँ या ज़ूम करें। सहेजी हुई जगह नहीं बदलेगी। बायाँ और दायाँ मरीज़ की तरफ़ से हैं।") else t("Drag to turn. Tap a region or choose below. Left and right mean the patient's sides.", "घुमाने के लिए खींचें। शरीर पर छुएँ या नीचे चुनें। बायाँ और दायाँ मरीज़ की तरफ़ से हैं।"), style = MaterialTheme.typography.bodySmall)
-        LocalPainBodyViewer(selected, points, rating, hindi, back, readOnly, onChange)
+        // The model sits above the parts list so a zoom is visible without scrolling.
+        Text(if (readOnly) t("Pick a part to zoom in. Saved locations stay unchanged. Left and right mean the patient's sides.", "ज़ूम करने के लिए हिस्सा चुनें। सहेजी हुई जगह नहीं बदलेगी। बायाँ और दायाँ मरीज़ की तरफ़ से हैं।") else t("Pick a part to zoom in, then tap exactly where it hurts. Left and right mean the patient's sides.", "ज़ूम करने के लिए हिस्सा चुनें, फिर ठीक वहाँ छुएँ जहाँ दर्द है। बायाँ और दायाँ मरीज़ की तरफ़ से हैं।"), style = MaterialTheme.typography.bodySmall)
+        LocalPainBodyViewer(selected, points, rating, hindi, back, readOnly, focus, focusNonce, onChange)
         Text(if (rating == null) t("Not rated — no pain intensity shown", "अंक नहीं बताया — दर्द की तीव्रता नहीं दिखाई गई") else "${t("Pain", "दर्द")}: $rating/10 · ${t("Colour follows this number", "रंग इसी अंक के अनुसार है")}", style = MaterialTheme.typography.bodySmall)
-        if (!readOnly) FlowRow(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
-            PainBodyMapRules.sites.forEach { (id, _) ->
-                FilterChip(id in selected, { val next = PainBodyMapRules.toggled(selected, id); onChange(next, points.filter { it.site in next }) }, label = { Text(PainBodyMapRules.label(id, hindi)) },
-                    modifier = Modifier.heightIn(min = 48.dp).testTag("pain-body-site-$id"))
+        // One list per side: a part zooms the model and marks it; tapping the zoomed, marked part again unmarks it.
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
+            FilterChip(focus == null, { focus = null; focusNonce++ }, label = { Text(t("Full body", "पूरा शरीर")) }, modifier = Modifier.heightIn(min = 48.dp).testTag("pain-body-focus-full"))
+            PainBodyMapRules.sitesFor(back).forEach { id ->
+                // Selected means marked as hurting; the zoomed part gets a heavier border.
+                val marked = if (readOnly) focus == id else id in selected
+                FilterChip(marked, {
+                    if (!readOnly && (id !in selected || focus == id)) { val next = PainBodyMapRules.toggled(selected, id); onChange(next, points.filter { it.site in next }) }
+                    focus = id; focusNonce++
+                }, label = { Text(PainBodyMapRules.focusLabel(id, back, hindi)) },
+                    border = if (focus == id) BorderStroke(2.dp, Rust) else FilterChipDefaults.filterChipBorder(enabled = true, selected = marked),
+                    modifier = Modifier.heightIn(min = 48.dp).testTag(if (readOnly) "pain-body-focus-$id" else "pain-body-site-$id"))
             }
         }
         if (selected.isNotEmpty()) Text(selected.joinToString { PainBodyMapRules.label(it, hindi) }, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.testTag("pain-body-selected"))
@@ -59,7 +71,7 @@ import java.io.ByteArrayInputStream
 }
 
 @SuppressLint("SetJavaScriptEnabled")
-@Composable private fun LocalPainBodyViewer(selected: List<String>, points: List<PainBodyPoint3d>, rating: Int?, hindi: Boolean, back: Boolean, readOnly: Boolean, onChange: (List<String>, List<PainBodyPoint3d>) -> Unit) {
+@Composable private fun LocalPainBodyViewer(selected: List<String>, points: List<PainBodyPoint3d>, rating: Int?, hindi: Boolean, back: Boolean, readOnly: Boolean, focus: String?, focusNonce: Int, onChange: (List<String>, List<PainBodyPoint3d>) -> Unit) {
     var webView by remember { mutableStateOf<WebView?>(null) }
     var ready by remember { mutableStateOf(false) }
     var failed by remember { mutableStateOf(false) }
@@ -73,6 +85,12 @@ import java.io.ByteArrayInputStream
     }
     LaunchedEffect(webView, ready, back) {
         if (ready) webView?.evaluateJavascript("window.SaharaPainViewer?.setView('${if (back) "back" else "front"}');", null)
+    }
+    LaunchedEffect(webView, ready, focus, focusNonce) {
+        if (!ready) return@LaunchedEffect
+        // The id is one of PainBodyMapRules.sites keys, so it is safe to place inside the script string.
+        if (focus != null && focus in PainBodyMapRules.sites) webView?.evaluateJavascript("window.SaharaPainViewer?.focusRegion('$focus','${if (back) "back" else "front"}');", null)
+        else if (focusNonce > 0) webView?.evaluateJavascript("window.SaharaPainViewer?.focusFull();", null)
     }
     if (failed) {
         Text(if (readOnly) { if (hindi) "इस फ़ोन पर 3D नहीं खुला। सहेजे हुए हिस्से नीचे नक्शे पर हैं।" else "3D could not open on this phone. Saved areas are shown on the diagram." } else if (hindi) "इस फ़ोन पर 3D नहीं खुला। नीचे नक्शे या बटन से जगह चुनें।" else "3D could not open on this phone. Choose on the map or the buttons below.", style = MaterialTheme.typography.bodySmall)

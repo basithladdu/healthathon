@@ -23,12 +23,14 @@ class CareSymptomDiaryUiTest {
         ui.setContent { CareTheme { SymptomNoteForm("fixture-person", "Fictional patient", listOf(row, row.copy(id = "other-person", personId = "different-person")), false,
             onSave = { _, value -> saved = value }, onClose = {}) } }
         ui.onNodeWithTag("symptom-choice-Pain").performScrollTo().performClick()
+        ui.onNodeWithTag("symptom-step-next").performScrollTo().performClick()
         ui.onNodeWithTag("diary-choice-caregiver").performScrollTo().performClick()
         ui.onNodeWithText("Observer's name").performScrollTo().performTextInput("Fixture observer")
         closeSoftKeyboard()
         ui.onNodeWithTag("diary-choice-average-24h").performScrollTo().performClick()
         ui.onNodeWithTag("symptom-rating-6").performScrollTo().performClick()
         ui.onNodeWithTag("symptom-rating-4").performScrollTo().performClick()
+        ui.onNodeWithTag("symptom-step-next").performScrollTo().performClick()
         ui.onNodeWithTag("symptom-previous-reference").performScrollTo().assertTextEquals("Previous matching note: $day 10:00 · 6/10")
         ui.onNodeWithTag("diary-choice-better").performScrollTo().performClick()
         screenshot("symptom-comparison")
@@ -48,10 +50,12 @@ class CareSymptomDiaryUiTest {
         ui.setContent { CareTheme { SymptomNoteForm("fixture-hindi", "काल्पनिक मरीज़", emptyList(), true,
             onSave = { _, value -> saved = value }, onClose = {}) } }
         ui.onNodeWithTag("symptom-choice-Pain").performScrollTo().assertTextContains("दर्द").performClick()
+        ui.onNodeWithTag("symptom-step-next").performScrollTo().performClick()
         ui.onNodeWithTag("diary-choice-patient").performScrollTo().performClick()
         ui.onNodeWithTag("diary-choice-worst-24h").performScrollTo().performClick()
         ui.onNodeWithTag("symptom-unrated").performScrollTo().performClick()
         screenshot("symptom-hindi-unrated")
+        ui.onNodeWithTag("symptom-step-next").performScrollTo().performClick()
         ui.onNodeWithTag("symptom-save").performScrollTo().assertTextContains("नोट सहेजें").performClick()
         ui.runOnIdle {
             assertNotNull(saved); assertNull(saved!!.rating)
@@ -69,10 +73,12 @@ class CareSymptomDiaryUiTest {
         ui.setContent { CareTheme { SymptomNoteForm(person.value, "Fictional patient", emptyList(), false,
             onSave = { _, _ -> saved = true }, onClose = { closed = true }) } }
         ui.onNodeWithTag("symptom-choice-Pain").performScrollTo().performClick()
+        ui.onNodeWithTag("symptom-step-next").performScrollTo().performClick()
         ui.onNodeWithTag("diary-choice-patient").performScrollTo().performClick()
         ui.onNodeWithTag("symptom-rating-0").performScrollTo().performClick()
         ui.runOnIdle { person.value = "second-person" }
         ui.waitForIdle()
+        ui.onNodeWithTag("symptom-step-next").performScrollTo().performClick()
         ui.onNodeWithTag("symptom-save").performScrollTo().assertIsNotEnabled()
         ui.runOnIdle { assertTrue(closed); assertFalse(saved) }
     }
@@ -87,9 +93,12 @@ class CareSymptomDiaryUiTest {
         var saved: SymptomNote? = null
         ui.setContent { CareTheme { SymptomNoteForm("fixture-edit", "Fictional patient", listOf(priorRow, initial), false, initial = initial,
             onSave = { id, value -> savedId = id; saved = value }, onClose = {}) } }
+        ui.onNodeWithTag("symptom-step-indicator").assertTextContains("Step 3 of 3")
+        ui.onNodeWithTag("symptom-step-back").performClick()
         ui.onNodeWithTag("symptom-rating-5").performScrollTo().assertIsSelected()
         ui.onNodeWithTag("diary-choice-average-24h").performScrollTo().performClick()
         ui.onNodeWithTag("symptom-rating-3").performScrollTo().performClick()
+        ui.onNodeWithTag("symptom-step-next").performScrollTo().performClick()
         ui.onNodeWithTag("symptom-save").performScrollTo().performClick()
         ui.runOnIdle {
             assertEquals(initial.id, savedId)
@@ -106,15 +115,16 @@ class CareSymptomDiaryUiTest {
         var saved: SymptomNote? = null
         ui.setContent { CareTheme { SymptomNoteForm("fixture-readonly", "Fictional patient", emptyList(), false, canEdit = editable.value,
             onSave = { _, value -> saved = value }, onClose = {}) } }
-        ui.onNodeWithTag("symptom-save").performScrollTo().assertIsNotEnabled()
-        ui.runOnIdle { assertNull(saved); editable.value = true }
+        ui.onNodeWithTag("symptom-step-next").assertIsNotEnabled()
         ui.onNodeWithTag("symptom-choice-Nausea").performScrollTo().performClick()
         ui.onNodeWithTag("diary-choice-patient").performScrollTo().performClick()
-        ui.onNodeWithTag("symptom-save").performScrollTo().performClick()
+        ui.onNodeWithTag("symptom-step-next").assertIsNotEnabled()
         ui.onNodeWithText("Choose a rating or Not rated.").assertExists()
-        ui.runOnIdle { assertNull(saved) }
         ui.onNodeWithTag("symptom-rating-0").performScrollTo().performClick()
-        ui.onNodeWithTag("symptom-save").performScrollTo().performClick()
+        ui.onNodeWithTag("symptom-step-next").performScrollTo().assertIsEnabled().performClick()
+        ui.onNodeWithTag("symptom-save").performScrollTo().assertIsNotEnabled()
+        ui.runOnIdle { assertNull(saved); editable.value = true }
+        ui.onNodeWithTag("symptom-save").performScrollTo().assertIsEnabled().performClick()
         ui.runOnIdle { assertEquals("Nausea", saved!!.symptom); assertEquals(0, saved!!.rating); assertEquals("patient", saved!!.respondent) }
     }
 
@@ -126,6 +136,7 @@ class CareSymptomDiaryUiTest {
         ui.onNodeWithTag("diary-choice-patient").performScrollTo().performClick()
         ui.onNodeWithTag("symptom-rating-anchors").performScrollTo().assertTextContains("0 = best possible well-being · 10 = worst possible well-being")
         ui.onNodeWithTag("symptom-rating-0").performScrollTo().performClick()
+        ui.onNodeWithTag("symptom-step-next").performScrollTo().performClick()
         ui.onNodeWithTag("symptom-save").performScrollTo().performClick()
         ui.runOnIdle {
             assertEquals("Overall well-being", saved!!.symptom)
@@ -142,8 +153,12 @@ class CareSymptomDiaryUiTest {
         var saved: SymptomNote? = null
         ui.setContent { CareTheme { SymptomNoteForm("fixture-legacy", "Fictional patient", listOf(row), false, initial = row,
             onSave = { _, next -> saved = next }, onClose = {}) } }
+        ui.onNodeWithTag("symptom-step-back").performClick()
+        ui.onNodeWithTag("symptom-step-back").performClick()
         ui.onNodeWithTag("symptom-choice-Sleep difficulty").assertDoesNotExist()
         ui.onNodeWithText("Symptom name").performScrollTo().assertTextContains("Sleep difficulty")
+        ui.onNodeWithTag("symptom-step-next").performScrollTo().performClick()
+        ui.onNodeWithTag("symptom-step-next").performScrollTo().performClick()
         ui.onNodeWithTag("symptom-save").performScrollTo().performClick()
         ui.runOnIdle { assertEquals(value, saved) }
     }
@@ -178,13 +193,15 @@ class CareSymptomDiaryUiTest {
         ui.setContent { CareTheme { SymptomNoteForm("fixture-body", "Fictional patient", emptyList(), true,
             onSave = { _, value -> saved = value }, onClose = {}) } }
         ui.onNodeWithTag("symptom-choice-Pain").performScrollTo().performClick()
-        ui.onNodeWithTag("diary-choice-patient").performScrollTo().performClick()
-        ui.onNodeWithTag("symptom-rating-4").performScrollTo().performClick()
         ui.onNodeWithTag("pain-body-site-left-leg").performScrollTo().assertTextContains("बायाँ पैर").performClick()
         ui.onNodeWithTag("pain-body-back").performScrollTo().performClick()
         ui.onNodeWithTag("pain-body-site-left-leg").performScrollTo().assertIsSelected()
         ui.onNodeWithTag("pain-body-clear").performScrollTo().performClick()
         ui.onNodeWithTag("pain-body-site-right-arm").performScrollTo().performClick()
+        ui.onNodeWithTag("symptom-step-next").performScrollTo().performClick()
+        ui.onNodeWithTag("diary-choice-patient").performScrollTo().performClick()
+        ui.onNodeWithTag("symptom-rating-4").performScrollTo().performClick()
+        ui.onNodeWithTag("symptom-step-next").performScrollTo().performClick()
         ui.onNodeWithTag("symptom-save").performScrollTo().performClick()
         ui.runOnIdle {
             assertEquals(listOf("right-arm"), saved!!.painBodySites)

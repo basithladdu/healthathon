@@ -34,6 +34,18 @@ object PainBodyMapRules {
         "right-shoulder" to ("Right shoulder" to "दायाँ कंधा"), "left-arm" to ("Left arm / hand" to "बायाँ हाथ"),
         "right-arm" to ("Right arm / hand" to "दायाँ हाथ"), "left-leg" to ("Left leg / foot" to "बायाँ पैर"), "right-leg" to ("Right leg / foot" to "दायाँ पैर"),
     )
+    private val frontOnly = setOf("chest", "abdomen")
+    private val backOnly = setOf("upper-back", "lower-back")
+    /** True when the region can be seen from that side of the 3D model (shared regions appear on both). */
+    fun visibleFrom(id: String, back: Boolean): Boolean = id in sites && if (back) id !in frontOnly else id !in backOnly
+    /** Region ids offered as zoom targets for one side, in body order top to bottom. */
+    fun sitesFor(back: Boolean): List<String> = sites.keys.filter { visibleFrom(it, back) }
+    /** Label for the zoom list; the head and neck read differently when viewed from behind. */
+    fun focusLabel(id: String, back: Boolean, hindi: Boolean): String = when {
+        back && id == "head" -> if (hindi) "सिर का पिछला हिस्सा" else "Back of head"
+        back && id == "neck" -> if (hindi) "गर्दन (पीछे)" else "Neck (back)"
+        else -> label(id, hindi)
+    }
     fun label(id: String, hindi: Boolean): String = sites[id]?.let { if (hindi) it.second else it.first } ?: id
     fun validPoint(point: PainBodyPoint3d): Boolean = point.site in sites && point.x.isFinite() && point.y.isFinite() && point.z.isFinite() && point.x in -1.0..1.0 && point.y in 0.0..1.0 && point.z in -1.0..1.0
     fun pointContext(points: List<PainBodyPoint3d>) = points.sortedBy { it.site }.map { "${it.site}:${(it.x * 1000).roundToLong()}:${(it.y * 1000).roundToLong()}:${(it.z * 1000).roundToLong()}" }

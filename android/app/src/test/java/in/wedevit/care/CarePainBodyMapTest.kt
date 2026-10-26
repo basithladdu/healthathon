@@ -64,4 +64,23 @@ class CarePainBodyMapTest {
         assertNull(PainViewerPolicy.toggledSite("{\"type\":\"delete-record\",\"site\":\"left-leg\"}"))
         assertNull(PainViewerPolicy.toggledSite("x".repeat(181)))
     }
+    @Test fun zoomListIsFilteredBySideAndOnlyUsesKnownSites() {
+        val front = PainBodyMapRules.sitesFor(false)
+        val back = PainBodyMapRules.sitesFor(true)
+        assertTrue(front.containsAll(listOf("head", "neck", "chest", "abdomen", "left-arm", "right-leg")))
+        assertTrue(back.containsAll(listOf("head", "neck", "upper-back", "lower-back", "left-arm", "right-leg")))
+        assertTrue(front.none { it == "upper-back" || it == "lower-back" })
+        assertTrue(back.none { it == "chest" || it == "abdomen" })
+        assertEquals(PainBodyMapRules.sites.keys.toSet(), (front + back).toSet())
+        assertEquals(PainBodyMapRules.sites.keys.toList().filter { it in front }, front)
+        assertFalse(PainBodyMapRules.visibleFrom("not-an-area", false))
+    }
+    @Test fun backViewHeadAndNeckHaveOwnBilingualFocusLabels() {
+        assertEquals("Back of head", PainBodyMapRules.focusLabel("head", true, false))
+        assertEquals("Head", PainBodyMapRules.focusLabel("head", false, false))
+        assertEquals("Neck (back)", PainBodyMapRules.focusLabel("neck", true, false))
+        assertEquals("सिर का पिछला हिस्सा", PainBodyMapRules.focusLabel("head", true, true))
+        assertEquals("बायाँ हाथ", PainBodyMapRules.focusLabel("left-arm", true, true))
+        assertEquals("Upper back", PainBodyMapRules.focusLabel("upper-back", true, false))
+    }
 }
