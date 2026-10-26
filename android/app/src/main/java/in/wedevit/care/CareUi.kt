@@ -305,6 +305,8 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
 
 @Composable fun Today(vm: CareModel, clinician: Boolean, onTalk: () -> Unit, onCare: () -> Unit, onNearby: () -> Unit, onAdd: (String) -> Unit, onRead: (CareVersion) -> Unit, onCalendar: () -> Unit = {}, onWorkflow: () -> Unit = {}, onLabs: () -> Unit = {}, onSharedWorkspace: () -> Unit = {}, onSymptoms: () -> Unit = {}) {
     val items by vm.items.collectAsStateWithLifecycle(); val versions by vm.versions.collectAsStateWithLifecycle()
+    val selectedPerson by vm.selected.collectAsStateWithLifecycle(); val loadedFor by vm.itemsLoadedFor.collectAsStateWithLifecycle()
+    val loaded = loadedFor == selectedPerson
     val latest = versions.firstOrNull()
     val dayStart = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
     LazyColumn(Modifier.fillMaxSize().testTag("today-list"), contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
@@ -348,20 +350,20 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
         if (checkin != null) item { CareRow(checkin, vm) }
         item { SectionTitle("Up next", "Add visit") { onAdd("visit") } }
         val visits = items.filter { it.kind == "visit" && (!CareEntryCodec.isStructured(it.detail) || isDoctorStructuredVisit(it)) && CareEntryCodec.decode(it.detail)?.status !in listOf("cancelled", "completed") && (it.due == 0L || it.due >= LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()) }.sortedBy { it.due }
-        if (visits.isEmpty()) item { SurfaceCard { Row(verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.Event, null, tint = Rust); Spacer(Modifier.width(12.dp)); Text("No upcoming visits") } } }
+        if (visits.isEmpty() && loaded) item { SurfaceCard { Row(verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.Event, null, tint = Rust); Spacer(Modifier.width(12.dp)); Text("No upcoming visits") } } }
         items(visits.take(2), key = { it.id }) { if (isDoctorStructuredVisit(it)) DoctorVisitSummary(it, onOpen = onCalendar) else CareRow(it, vm) }
         item { SectionTitle("Medicines", "See all", onCare) }
         val medicines = items.filter { it.kind == "medicine" }
-        if (medicines.isEmpty()) item { OutlinedButton(onClick = { onAdd("medicine") }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Icon(Icons.Default.Add, null); Spacer(Modifier.width(8.dp)); Text("Add a medicine") } }
+        if (medicines.isEmpty() && loaded) item { OutlinedButton(onClick = { onAdd("medicine") }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Icon(Icons.Default.Add, null); Spacer(Modifier.width(8.dp)); Text("Add a medicine") } }
         items(medicines.take(3), key = { it.id }) { CareRow(it, vm) }
         item { SectionTitle("To do", "Add task") { onAdd("task") } }
         val tasks = items.filter { it.kind == "task" && !CareEntryCodec.isStructured(it.detail) }.sortedBy { it.doneOn.isNotBlank() }
-        if (tasks.isEmpty()) item { SurfaceCard { Text("Nothing to do yet", color = MaterialTheme.colorScheme.onSurfaceVariant) } }
+        if (tasks.isEmpty() && loaded) item { SurfaceCard { Text("Nothing to do yet", color = MaterialTheme.colorScheme.onSurfaceVariant) } }
         items(tasks.take(4), key = { it.id }) { CareRow(it, vm) }
         if (tasks.size > 4) item { TextButton(onClick = onCare) { Text("See all ${tasks.size} tasks") } }
         item { SectionTitle("Journal", "Write a note") { onAdd("journal") } }
         val notes = items.filter { it.kind == "journal" }
-        if (notes.isEmpty()) item { SurfaceCard { Text("No notes yet", color = MaterialTheme.colorScheme.onSurfaceVariant) } }
+        if (notes.isEmpty() && loaded) item { SurfaceCard { Text("No notes yet", color = MaterialTheme.colorScheme.onSurfaceVariant) } }
         items(notes.take(2), key = { it.id }) { CareRow(it, vm) }
     }
 }
@@ -762,6 +764,7 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
     val now = remember(entries) { System.currentTimeMillis() }; val (upcoming, pastVisits) = CareModules.splitVisits(shown.filter { it.kind == "visit" }, now)
     val tasks = shown.filter { it.kind == "task" }; val checkins = shown.filter { it.kind == "checkin" }; val journal = shown.filter { it.kind == "journal" }
     val empty = shown.isEmpty() && pastMeds.isEmpty() && versions.isEmpty()
+    val selectedPerson by vm.selected.collectAsStateWithLifecycle(); val loadedFor by vm.itemsLoadedFor.collectAsStateWithLifecycle()
     LaunchedEffect(target) { val index = CareModules.order.indexOf(target); if (index >= 0) listState.animateScrollToItem(3 + index) }
     @Composable fun module(name: String, icon: ImageVector, tint: Color, count: Int, content: @Composable ColumnScope.() -> Unit) = CareModuleCard(name.lowercase().replace(' ', '-'), name, icon, tint, count, defaultOpen = name in CareModules.order.take(2), forceOpen = name == target, content = content)
     @Composable fun visit(item: CareItem) = if (isDoctorStructuredVisit(item)) DoctorVisitSummary(item, onOpen = onCalendar) else CareRow(item, vm)
@@ -772,7 +775,7 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
         } }
         item { FilledTonalButton(onClick = onSymptoms, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("daily-symptom-tracker-entry"), colors = ButtonDefaults.filledTonalButtonColors(containerColor = Mint)) { Icon(Icons.Default.MonitorHeart, null); Spacer(Modifier.width(8.dp)); Text("Symptom tracker · तबीयत के नोट") } }
         item { DailyCareShortcuts(onCalendar, onWorkflow, onLabs) }
-        if (empty) item { SurfaceCard(Paper) {
+        if (loadedFor != selectedPerson) Unit else if (empty) item { SurfaceCard(Paper) {
             Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                 Surface(shape = CircleShape, color = SaharaApricot) { Icon(careIcon("task"), null, Modifier.padding(14.dp).size(30.dp), tint = DoctorAccent) }
                 Spacer(Modifier.height(12.dp)); Text("Nothing added yet", fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
@@ -805,19 +808,19 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
     if (SymptomNoteCodec.isStructured(item.detail)) { SymptomNoteCard(item, vm); return }
     val canEdit by vm.canEdit.collectAsStateWithLifecycle()
     val busy by vm.busy.collectAsStateWithLifecycle()
-    var delete by remember { mutableStateOf(false) }
-    var editing by remember { mutableStateOf(false) }
+    var delete by rememberSaveable(item.id) { mutableStateOf(false) }
+    var editing by rememberSaveable(item.id) { mutableStateOf(false) }
     val capturedAccount = remember(item.id) { vm.accountNamespace }
     val done = if (item.kind == "medicine") item.doneOn == LocalDate.now().toString() else item.doneOn.isNotBlank()
     val color by animateColorAsState(if (done) Color(0xFFE7EED6) else Paper, tween(180), label = "care completed")
     SurfaceCard(color) { Row(verticalAlignment = Alignment.CenterVertically) {
-        if (item.kind in listOf("medicine", "task")) Checkbox(checked = done, onCheckedChange = { if (canEditCareContext(vm, item.personId, capturedAccount)) vm.toggle(item) }, enabled = canEdit && !busy)
+        if (item.kind in listOf("medicine", "task")) Checkbox(checked = done, onCheckedChange = { if (!busy && canEditCareContext(vm, item.personId, capturedAccount)) vm.toggle(item) }, enabled = canEdit)
         else Surface(shape = RoundedCornerShape(12.dp), color = if (item.kind == "visit") Mint else Peach, modifier = Modifier.padding(end = 12.dp)) { Icon(careIcon(item.kind), null, tint = Ink, modifier = Modifier.padding(10.dp).size(22.dp)) }
         Column(Modifier.weight(1f)) { Text(item.title, fontWeight = FontWeight.SemiBold); if (item.due > 0) Text(date(item.due), color = Rust, fontSize = 13.sp); if (item.detail.isNotBlank()) Text(item.detail, style = MaterialTheme.typography.bodyMedium); if (item.kind in listOf("checkin", "journal")) Text(date(item.created), style = MaterialTheme.typography.bodySmall) }
     }
         if (canEdit) FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            TextButton(onClick = { editing = true }, enabled = !busy, modifier = Modifier.testTag("care-edit-${item.id}")) { Icon(Icons.Default.Edit, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Edit") }
-            TextButton(onClick = { delete = true }, enabled = !busy, modifier = Modifier.testTag("care-remove-${item.id}")) { Icon(Icons.Default.DeleteOutline, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Remove") }
+            TextButton(onClick = { editing = true }, modifier = Modifier.testTag("care-edit-${item.id}")) { Icon(Icons.Default.Edit, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Edit") }
+            TextButton(onClick = { delete = true }, modifier = Modifier.testTag("care-remove-${item.id}")) { Icon(Icons.Default.DeleteOutline, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Remove") }
         }
     }
     if (delete) AlertDialog(onDismissRequest = { delete = false }, title = { Text("Remove this entry?") }, text = { Text(item.title) }, confirmButton = { TextButton(onClick = { if (canEditCareContext(vm, item.personId, capturedAccount)) vm.remove(item); delete = false }, enabled = !busy && canEdit) { Text("Remove") } }, dismissButton = { TextButton(onClick = { delete = false }) { Text("Keep") } })
@@ -829,6 +832,7 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
     var view by rememberSaveable { mutableStateOf("Map & list") }
     var state by rememberSaveable { mutableStateOf("All India") }
     var chosen by remember { mutableStateOf<Centre?>(null) }
+    val focus = LocalFocusManager.current
     val states = remember(centres) { centres.map { it.state }.filter(String::isNotBlank).distinct().sorted() }
     val visible = remember(centres, search, service, morphine, state) { centres.filter { c ->
         "${c.name} ${c.city} ${c.district} ${c.address} ${c.state}".contains(search.trim(), true) &&
@@ -838,7 +842,8 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
         item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) { Heading("Find care"); Text("$state · ${visible.size} ${if (visible.size == 1) "centre" else "centres"}", color = Rust) }
         } }
-        item { OutlinedTextField(value = search, onValueChange = { search = it }, placeholder = { Text("Place or hospital") }, leadingIcon = { Icon(Icons.Default.Search, null) }, trailingIcon = { if (search.isNotEmpty()) IconButton(onClick = { search = "" }) { Icon(Icons.Default.Close, "Clear search") } }, shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth(), singleLine = true) }
+        item { OutlinedTextField(value = search, onValueChange = { search = it }, placeholder = { Text("Place or hospital") }, leadingIcon = { Icon(Icons.Default.Search, null) }, trailingIcon = { if (search.isNotEmpty()) IconButton(onClick = { search = "" }) { Icon(Icons.Default.Close, "Clear search") } }, shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth(), singleLine = true,
+            keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(imeAction = androidx.compose.ui.text.input.ImeAction.Search), keyboardActions = androidx.compose.foundation.text.KeyboardActions(onSearch = { focus.clearFocus() })) }
         item { Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) { (listOf("All India") + states).forEach { option -> FilterChip(selected = state == option, onClick = { state = option }, label = { Text(option) }, modifier = Modifier.heightIn(min = 48.dp)) } } }
         item { Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf("All", "Home care", "Clinic visits", "Inpatient care").forEach { s -> FilterChip(selected = service == s, onClick = { service = s }, label = { Text(s) }) } } }
         item { FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -936,7 +941,12 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
     val error by vm.actionError.collectAsStateWithLifecycle()
     LaunchedEffect(entryId) { vm.actionError.value = null }
     LaunchedEffect(selected) { if (selected != capturedPerson) onDismiss() }
-    var title by rememberSaveable { mutableStateOf(initial?.title ?: "") }; var detail by rememberSaveable { mutableStateOf(initial?.detail ?: "") }; var due by rememberSaveable { mutableLongStateOf(initial?.due ?: 0) }
+    val draftKey = if (initial == null) "$capturedAccount:$capturedPerson:$kind" else null
+    val draft = remember(draftKey) { draftKey?.let(CareAddDrafts::get) }
+    var title by rememberSaveable { mutableStateOf(initial?.title ?: draft?.title ?: "") }; var detail by rememberSaveable { mutableStateOf(initial?.detail ?: draft?.detail ?: "") }; var due by rememberSaveable { mutableLongStateOf(initial?.due ?: draft?.due ?: 0) }
+    var saved by remember { mutableStateOf(false) }
+    DisposableEffect(draftKey) { onDispose { if (draftKey != null) { if (saved) CareAddDrafts.clear(draftKey) else CareAddDrafts.keep(draftKey, CareAddDrafts.Draft(title, detail, due)) } } }
+    val savedAndClose = { saved = true; onDismiss() }
     val busy by vm.busy.collectAsStateWithLifecycle(); val context = LocalContext.current
     val headings = mapOf("medicine" to "Add a medicine", "visit" to "Add a visit", "task" to "Add a task", "checkin" to "How is today?", "journal" to "Write a note")
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
@@ -958,7 +968,7 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
             if (kind == "visit") OutlinedButton(onClick = { val chosen = if (due > 0) Instant.ofEpochMilli(due).atZone(ZoneId.systemDefault()).toLocalDate() else LocalDate.now(); DatePickerDialog(context, { _, y, m, d -> due = LocalDate.of(y, m + 1, d).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli() }, chosen.year, chosen.monthValue - 1, chosen.dayOfMonth).show() }, shape = RoundedCornerShape(14.dp)) { Icon(Icons.Default.CalendarMonth, null); Spacer(Modifier.width(8.dp)); Text(if (due == 0L) "Choose date" else date(due)) }
             if (kind == "medicine") Text("Use your prescription. Choose reminder times in Reminders. Android may delay alerts.", style = MaterialTheme.typography.bodySmall)
             error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
-            Button(onClick = { if (!canEditCareContext(vm, capturedPerson, capturedAccount)) { vm.message.value = "Care access changed. Reopen this person's records before saving."; onDismiss() } else if (initial == null) vm.saveItem(kind, title, detail, due, onDismiss, entryId) else vm.updateItem(initial.copy(title = title, detail = detail, due = due), onDismiss) }, enabled = selected == capturedPerson && title.isNotBlank() && !busy && (kind != "visit" || due > 0) && (kind != "medicine" || detail.isNotBlank()), shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 54.dp)) { Text(if (busy) "Saving…" else "Save", fontSize = 16.sp) }
+            Button(onClick = { if (!canEditCareContext(vm, capturedPerson, capturedAccount)) { vm.message.value = "Care access changed. Reopen this person's records before saving."; onDismiss() } else if (initial == null) vm.saveItem(kind, title, detail, due, savedAndClose, entryId) else vm.updateItem(initial.copy(title = title, detail = detail, due = due), onDismiss) }, enabled = selected == capturedPerson && title.isNotBlank() && !busy && (kind != "visit" || due > 0) && (kind != "medicine" || detail.isNotBlank()), shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 54.dp)) { Text(if (busy) "Saving…" else "Save", fontSize = 16.sp) }
         }
     }
 }

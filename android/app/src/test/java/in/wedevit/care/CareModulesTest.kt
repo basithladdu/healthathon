@@ -15,4 +15,10 @@ class CareModulesTest {
         assertEquals(listOf("u1", "u2", "none"), up.map { it.id }); assertEquals(listOf("p2", "p1"), past.map { it.id })
     }
     @Test fun initialFilterMapsToModuleCaseInsensitively() { assertEquals("To do", CareModules.moduleFor("to do")); assertNull(CareModules.moduleFor("All")) }
+    @Test fun dismissedAddEntryKeepsItsTextUntilSavedAndBlankDraftsAreDropped() {
+        CareAddDrafts.keep("a:p:task", CareAddDrafts.Draft("Buy pads", "", 0))
+        assertEquals("Buy pads", CareAddDrafts.get("a:p:task")?.title); assertNull(CareAddDrafts.get("a:p:journal"))
+        CareAddDrafts.keep("a:p:task", CareAddDrafts.Draft(" ", "", 0)); assertNull(CareAddDrafts.get("a:p:task"))
+        CareAddDrafts.keep("a:p:visit", CareAddDrafts.Draft("", "", 5)); CareAddDrafts.clear("a:p:visit"); assertNull(CareAddDrafts.get("a:p:visit"))
+    }
 }

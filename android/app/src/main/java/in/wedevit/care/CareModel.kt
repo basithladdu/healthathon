@@ -113,7 +113,9 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
     private val medicineHistory = MedicineHistoryRepo(app, cloud, storageNamespace)
     private val medicinePastIds = MutableStateFlow<Set<String>>(emptySet())
     private val prescriptionExcludedIds=selected.flatMapLatest { db.prescriptions().excludedIds(it) }.stateIn(viewModelScope,SharingStarted.Eagerly,emptyList())
-    val allItems = selected.flatMapLatest { dao.items(it).onStart { emit(emptyList()) } }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+    /** Person whose care entries have arrived from the database; empty-state cards wait for it so they never flash before the first rows. */
+    val itemsLoadedFor = MutableStateFlow("")
+    val allItems = selected.flatMapLatest { person -> dao.items(person).onEach { itemsLoadedFor.value = person }.onStart { emit(emptyList()) } }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
     val items = combine(allItems, medicinePastIds,prescriptionExcludedIds) { rows, past,excluded -> rows.filterNot { it.kind == "medicine" && (it.id in past || it.id in excluded) } }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
     val conversationArchives=selected.flatMapLatest { db.conversations().archives(it) }.stateIn(viewModelScope,SharingStarted.Eagerly,emptyList())
     val reports = selected.flatMapLatest { dao.reports(it).onStart { emit(emptyList()) } }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
