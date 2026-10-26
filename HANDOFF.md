@@ -18,6 +18,8 @@ This note lists every change I made to the Android app, what the app is like rig
 
 **About main.** After `73c5000`, basithladdu pushed 15 commits to main (24–25 Oct). I rolled my version back to `73c5000` and then brought in **only** these parts of his work: the 3D pain body, pain history, symptom trends, the new symptom list and two fixes (see section 4). His other app changes are **not** in this version (see section 5).
 
+**On 26 Oct this version became main.** Main's files are now exactly this branch. It was done with a merge commit, not a force push, so basithladdu's 15 commits are still in main's history and anything from them can be brought back, for example with `git checkout 6ab303e -- <path>`. Files from those commits that are no longer on main include his app redesign, the website's 3D pain and privacy pages, `android/release/store-draft.json`, the Play Store and backend verification records, and the CARE guide notes. The app version on main is back to 0.6.0 (7). **The next Play Store upload must use versionCode 9 or higher**: 0.6.0 (7) is in Google's review, and 0.6.1 (8) was built locally (not uploaded) from the version this replaces.
+
 ---
 
 ## 2. What the app is like now
