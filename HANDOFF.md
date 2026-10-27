@@ -188,3 +188,102 @@ Start the emulator with `emulator -avd Sahara_Doctor_Demo -memory 4096 -no-snaps
 | Doctor home and hub | `DoctorDemoUi.kt`, `DoctorPatientHubUi.kt`, `DoctorVisitsUi.kt` |
 | Feedback and check-in | `FeedbackUi.kt` |
 | Palette | `SaharaPalette.kt` |
+
+---
+
+## 27 Oct 2026 — open items from team chats and this session
+
+Added by the owner's session on 27 Oct; nothing above was changed. The full audit of the team chats and meetings (25 Aug–23 Oct) is in [`docs/research/CHAT_AUDIT_2026-10-27.md`](docs/research/CHAT_AUDIT_2026-10-27.md): 126 items, of which 49 are done, 36 partial, 24 not done, 4 dropped and 13 owner-only. Item numbers below match that file.
+
+Also read:
+- [`CLAUDE_TRANSCRIPT.md`](CLAUDE_TRANSCRIPT.md) §3 (owner tasks) and §4 (screens and features that don't work yet);
+- the [CARE brief](docs/research/CARE_BRIEF_2026-10-27.md) and [`docs/research/CARE_FAMILY_SIDE_FIT.md`](docs/research/CARE_FAMILY_SIDE_FIT.md).
+
+**Who:**
+- **Awaiz:** app work.
+- **Owner:** Basith.
+- **Team:** the clinicians (Sujay, Sharada, Shirin).
+
+### Do first (before the 7 Nov Phase 2 submission)
+| Item | Next step | Who |
+|---|---|---|
+| A17, H18 | Pick CARE option A, A+B or A+C (CARE brief §4), then write the integration answer in the deck | Owner |
+| H15 | Fill team code, doctor details and costs in the v6 draft, then submit by 7 Nov | Owner + team |
+| H13 | Record a narrated screen demo of the app (walkthrough: conversation → note → family confirms) | Owner + Awaiz |
+| A20, A21 | Choose 2–3 measurable KPIs and a baseline (documented conversations, retrieval time, family stress/money/time), and put them on the evaluation slide | Team + owner |
+| — | Test 0.6 on a real phone: the full checklist is in `CLAUDE_TRANSCRIPT.md` §3 ("Test on a real phone") | Awaiz |
+| — | Strength-bar swipe: check after the polish lane lands | Awaiz |
+| F5 | Next Play upload must use versionCode 9 or higher; don't touch 0.6.0 (7) while it is in review | Owner |
+| I3 | Clinicians send the approved goals-of-care note format and conversation structure | Team |
+| E2, E3 | Shirin and Sujay choose the symptom list and a scale per symptom (see the symptom brief) | Team |
+
+### Goals-of-care conversation
+| Item | Next step | Who |
+|---|---|---|
+| A10, A19, B6 | Turn on real AI note drafting once a provider and consent terms are chosen (`CLAUDE_TRANSCRIPT.md` §3 "Decide"); until then, say "word matching" in the pitch | Owner decides, Awaiz builds |
+| B2 | Show the goals questions as a live checklist during recording (covered / left open) | Awaiz |
+| B3 | Replace the pre-written walkthrough transcript with real on-device transcription on a phone that can run it | Awaiz |
+| B4 | Speaker separation (doctor side vs family side): later, needs a model | Awaiz (later) |
+| B5 | Typed capture works; add more languages only after Hindi is complete | Awaiz (later) |
+| B7 | Tap an answer to jump to the transcript line it came from | Awaiz |
+| B9 | Real signatures are out of scope for now; keep the "exact-version confirmation" wording | — |
+| B10 | Add one outcome field: "consensus reached among patient and family" yes/no | Awaiz (after team OK) |
+| B11 | Mark each note as a "general discussion" or a "decision recorded" (the doctor picks; AI later) | Awaiz (after team OK) |
+| B17 | Run 20 simulated conversations with different people and note the results | Team + owner |
+| B18 | Check that doctor search by patient ID works with real accounts | Awaiz |
+| B1 | Screening tool to flag patients: hold, it borders on clinical judgement | Team decides |
+| A22 | Teaching cards on holding the conversation: after the hackathon | Team |
+
+### Getting the note in an emergency
+| Item | Next step | Who |
+|---|---|---|
+| C1–C4 | Decide on the hospital QR card (3–5 days plus server work). If yes: large QR on Today, single-use browser link, printable, saveable offline, can be replaced if leaked | Owner decides, Awaiz builds |
+| C5 | Password-protect the PDF copy | Awaiz |
+
+### Access to care
+| Item | Next step | Who |
+|---|---|---|
+| D2 | Add imaging, pharmacy and ambulance to the centre services when the source data has them | Awaiz |
+| D3, D11, D12 | Morphine: keep "listed, call to confirm". Showing confidence or patient reports needs a review process first | Team decides |
+| D4, D19 | Support-group, palliative-doctor and morphine-institute lists (promised 12 Sep) | Team (Sujay) |
+| D5, D6 | Add emergency numbers and nearest-hospital/ambulance to Nearby; then home-care, oxygen and blood-bank sources | Awaiz |
+| D7, D10 | Help at home (transport, nursing, medicine delivery) and expenses are web only; decide whether the app needs them | Owner |
+| D16, D17, D18 | Send the fixed hospital survey to oncology and palliative groups; SVK and Shirin to try it; Shirin to ask her hospital | Team |
+| D21 | Patient community: after the hackathon | Team |
+
+### Daily care and reports
+| Item | Next step | Who |
+|---|---|---|
+| A6, A8 | Short patient-side summary with expandable sections; side-effect notes for the doctor at the next visit | Awaiz (later) |
+| E5 | Fill Lab history from scanned reports, with the original line kept | Awaiz |
+| E6 | Add a "cancer documents" category (PET-CT, biopsy) in Docs | Awaiz |
+| E7 | Mark chemo/radiotherapy days on the Lab history chart | Awaiz |
+| E8, E9 | Clinicians to re-confirm whether patients may type daily medicines, or only scan printed prescriptions | Team |
+| E11 | Timeline summary from documents (last chemo or radiotherapy, with source) | Awaiz (later) |
+| E13 | Voice journal themes: no decision; hold | Team |
+| E16 | Quick access to the note and QR on Today, once C1 is decided | Awaiz |
+
+### Language, identity, data
+| Item | Next step | Who |
+|---|---|---|
+| F1 | Hindi across the whole app (2–3 days; `CLAUDE_TRANSCRIPT.md` §3), then Telugu | Owner decides, Awaiz builds |
+| F2 | iPhone users use the website; no iOS app before the final | Owner |
+| G1, G2 | Doctor approval stays manual for now; real doctor account and Supabase email setting (`CLAUDE_TRANSCRIPT.md` §3 "Set up / do") | Owner |
+| G3 | ABHA link: later | Owner |
+| G4 | Identity check for the patient confirmation: later | Owner |
+| G5, G6 | DPDP review and who holds the data (company or new entity) before any real patient use | Owner |
+| — | Family invite links: publish the app-link file and redeploy the website (`CLAUDE_TRANSCRIPT.md` §3) | Owner |
+| — | Supabase security warnings: leaked-password protection, lock `rls_auto_enable()` (`WORK_STATUS.md` §3) | Owner |
+| — | Send the CARE team message in `TEAM_HANDOFF.md` with the corrected line from the CARE brief | Owner |
+| — | Re-tapping a marked body part: move the spot or add a new one? About 1 h once decided | Owner decides, Awaiz builds |
+
+### Other open items from the chats
+| Item | Next step | Who |
+|---|---|---|
+| A11, H17, I1, I2, I4 | Pilot: name one centre and a doctor-side contact (Sujay offered on 9 Oct), and check whether ethics review is needed | Team + owner |
+| A14 | Agree the final logo (palliative orange/marigold; sunflower idea) | Awaiz + team |
+| A16 | Go through each tool with the clinicians, one session per tool | Team |
+| H14 | Decide how judges can see the code (the repo is private) | Owner |
+| I7 | Write up the 20 Oct mentor-meeting minutes (dummy data, refine the goals algorithm, KPIs) | Owner |
+| I9 | TANUH pitch draft: keep or drop | Owner |
+| I10 | Find or recreate `Technical thoughts and questions.docx` | Team (Sujay) |
