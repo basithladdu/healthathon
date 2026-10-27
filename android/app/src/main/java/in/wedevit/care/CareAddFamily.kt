@@ -20,6 +20,8 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 
 internal val CareRelations = listOf("Son", "Daughter", "Spouse", "Brother", "Sister", "Parent", "Other")
+/** Shown in place of the saved English relation when Hindi is chosen. */
+internal val CareRelationsHindi = mapOf("Son" to "बेटा", "Daughter" to "बेटी", "Spouse" to "पति/पत्नी", "Brother" to "भाई", "Sister" to "बहन", "Parent" to "माता/पिता", "Other" to "कोई और")
 
 /** Opens WhatsApp (or WhatsApp Business) with the text ready to send; falls back to the share sheet. */
 internal fun shareCareInvite(context: Context, text: String, whatsApp: Boolean) {
@@ -38,6 +40,7 @@ internal fun shareCareInvite(context: Context, text: String, whatsApp: Boolean) 
     var canAdd by rememberSaveable { mutableStateOf(false) }; var careTeam by rememberSaveable { mutableStateOf(false) }
     var code by rememberSaveable { mutableStateOf("") }
     var busy by remember { mutableStateOf(false) }; var error by remember { mutableStateOf<String?>(null) }
+    val hindi = careHindi(); val t = careText()
     fun send(whatsApp: Boolean) {
         val service = cloud ?: return
         if (busy) return
@@ -49,7 +52,7 @@ internal fun shareCareInvite(context: Context, text: String, whatsApp: Boolean) 
                 if (invite.isEmpty()) {
                     val before = runCatching { service.members(person).size }.getOrDefault(-1)
                     invite = service.invite(person, canAdd, careTeam)
-                    require(CareInviteLink.isCode(invite)) { "The invitation didn't look right. Please try again." }
+                    require(CareInviteLink.isCode(invite)) { t("The invitation didn't look right. Please try again.", "निमंत्रण ठीक नहीं बना। कृपया फिर कोशिश करें।") }
                     if (vm.selected.value == person && service.session.value?.userId == account && vm.isOwner.value) {
                         code = invite
                         if (before >= 0) careInviteStore(context).add(account, CareInviteEntry(person, label, relation, System.currentTimeMillis(), before))
@@ -57,33 +60,33 @@ internal fun shareCareInvite(context: Context, text: String, whatsApp: Boolean) 
                     }
                 }
                 shareCareInvite(context, CareInviteLink.shareText(patient, invite), whatsApp)
-            } catch (e: Exception) { if (e is CancellationException) throw e; error = e.message ?: "Couldn't create the invitation. Please try again." }
+            } catch (e: Exception) { if (e is CancellationException) throw e; error = e.message ?: t("Couldn't create the invitation. Please try again.", "निमंत्रण नहीं बन सका। कृपया फिर कोशिश करें।") }
             finally { busy = false }
         }
     }
     ModalBottomSheet(onDismissRequest = { if (!busy) onDismiss() }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(horizontal = 22.dp).padding(bottom = 30.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-            Heading("Add family", 28)
+            Heading(t("Add family", "परिवार जोड़ें"), 28)
             if (cloud == null) {
-                Text("To let family see ${patient.ifBlank { "this person" }}'s care on their own phone, you first need to sign in. It takes a minute.")
-                Button(onClick = { onDismiss(); onSignIn() }, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Icon(Icons.Default.AccountCircle, null); Spacer(Modifier.width(8.dp)); Text("Sign in or create an account") }
+                Text(t("To let family see ${patient.ifBlank { "this person" }}'s care on their own phone, you first need to sign in. It takes a minute.", "परिवार अपने फ़ोन पर ${patient.ifBlank { "इस व्यक्ति" }} की देखभाल देख सके, इसके लिए पहले साइन इन करें। इसमें बस एक मिनट लगता है।"))
+                Button(onClick = { onDismiss(); onSignIn() }, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Icon(Icons.Default.AccountCircle, null); Spacer(Modifier.width(8.dp)); Text(t("Sign in or create an account", "साइन इन करें या खाता बनाएँ")) }
             } else if (!owner || selected.isBlank()) {
-                Text("Only the person who set up these records can invite family.")
+                Text(t("Only the person who set up these records can invite family.", "परिवार को सिर्फ़ वही बुला सकते हैं जिन्होंने ये रिकॉर्ड बनाए हैं।"))
             } else {
-                Text("Let family see $patient's care on their own phone.")
-                CareField(name, { name = it.take(40); code = "" }, "Name", singleLine = true, placeholder = "For example, Arjun")
-                Text("How are they related?", style = MaterialTheme.typography.bodyMedium)
-                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) { CareRelations.forEach { r -> FilterChip(selected = relation == r, onClick = { relation = if (relation == r) "" else r }, modifier = Modifier.heightIn(min = 48.dp), label = { Text(r) }) } }
-                Text("What can they do?", style = MaterialTheme.typography.bodyMedium)
-                ChoiceRow("Can view", Icons.Default.Visibility, Mint, !canAdd) { canAdd = false; code = "" }
-                ChoiceRow("Can view and add", Icons.Default.Edit, Mint, canAdd) { canAdd = true; code = "" }
-                CheckLine(careTeam, { careTeam = it; code = "" }, "Share care-team contacts")
-                Text("They can read care notes and daily entries. Recordings and unfinished conversations aren't shared. The link works once and expires in 3 days. They will need to sign in, and you will see them listed here once they join.", style = MaterialTheme.typography.bodySmall)
-                Button(onClick = { send(true) }, enabled = !busy && name.isNotBlank(), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Icon(Icons.Default.PersonAdd, null); Spacer(Modifier.width(8.dp)); Text(if (busy) "Please wait…" else "Send invite on WhatsApp") }
-                OutlinedButton(onClick = { send(false) }, enabled = !busy && name.isNotBlank(), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.Share, null); Spacer(Modifier.width(8.dp)); Text("Share another way") }
+                Text(t("Let family see $patient's care on their own phone.", "परिवार अपने फ़ोन पर $patient की देखभाल देख सके।"))
+                CareField(name, { name = it.take(40); code = "" }, t("Name", "नाम"), singleLine = true, placeholder = t("For example, Arjun", "जैसे, अर्जुन"))
+                Text(t("How are they related?", "उनसे क्या रिश्ता है?"), style = MaterialTheme.typography.bodyMedium)
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) { CareRelations.forEach { r -> FilterChip(selected = relation == r, onClick = { relation = if (relation == r) "" else r }, modifier = Modifier.heightIn(min = 48.dp), label = { Text(if (hindi) CareRelationsHindi[r] ?: r else r) }) } }
+                Text(t("What can they do?", "वे क्या कर सकेंगे?"), style = MaterialTheme.typography.bodyMedium)
+                ChoiceRow(t("Can view", "सिर्फ़ देख सकें"), Icons.Default.Visibility, Mint, !canAdd) { canAdd = false; code = "" }
+                ChoiceRow(t("Can view and add", "देख सकें और जोड़ सकें"), Icons.Default.Edit, Mint, canAdd) { canAdd = true; code = "" }
+                CheckLine(careTeam, { careTeam = it; code = "" }, t("Share care-team contacts", "देखभाल टीम के नंबर भी साझा करें"))
+                Text(t("They can read care notes and daily entries. Recordings and unfinished conversations aren't shared. The link works once and expires in 3 days. They will need to sign in, and you will see them listed here once they join.", "वे देखभाल नोट और रोज़ की जानकारी पढ़ सकेंगे। रिकॉर्डिंग और अधूरी बातचीत साझा नहीं होती। लिंक एक ही बार चलता है और 3 दिन में बंद हो जाता है। उन्हें साइन इन करना होगा, और जुड़ने के बाद उनका नाम यहाँ दिखेगा।"), style = MaterialTheme.typography.bodySmall)
+                Button(onClick = { send(true) }, enabled = !busy && name.isNotBlank(), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Icon(Icons.Default.PersonAdd, null); Spacer(Modifier.width(8.dp)); Text(if (busy) t("Please wait…", "कृपया रुकें…") else t("Send invite on WhatsApp", "WhatsApp पर निमंत्रण भेजें")) }
+                OutlinedButton(onClick = { send(false) }, enabled = !busy && name.isNotBlank(), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.Share, null); Spacer(Modifier.width(8.dp)); Text(t("Share another way", "किसी और तरीके से भेजें")) }
             }
             error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
-            TextButton(onClick = onDismiss, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text("Close") }
+            TextButton(onClick = onDismiss, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Close", "बंद करें")) }
         }
     }
 }
@@ -91,10 +94,10 @@ internal fun shareCareInvite(context: Context, text: String, whatsApp: Boolean) 
 /** Asks before joining from an invite link. */
 @Composable fun PendingJoinDialog(cloud: CareCloud, vm: CareModel, pending: PendingJoin, email: String, onClear: () -> Unit) {
     val scope = rememberCoroutineScope()
-    var busy by remember { mutableStateOf(false) }
+    var busy by remember { mutableStateOf(false) }; val t = careText()
     AlertDialog(onDismissRequest = { if (!busy) onClear() },
-        title = { Text("Join ${pending.possessive} care?") },
-        text = { Text("${pending.who.replaceFirstChar { it.uppercase() }} will see your email ($email).") },
+        title = { Text(t("Join ${pending.possessive} care?", "क्या आप इस देखभाल से जुड़ना चाहते हैं?")) },
+        text = { Text(t("${pending.who.replaceFirstChar { it.uppercase() }} will see your email ($email).", "बुलाने वाले व्यक्ति को आपका ईमेल ($email) दिखेगा।")) },
         confirmButton = { TextButton(onClick = {
             if (busy) return@TextButton
             busy = true
@@ -103,10 +106,10 @@ internal fun shareCareInvite(context: Context, text: String, whatsApp: Boolean) 
                     val before = vm.people.value.map { it.id }.toSet()
                     cloud.join(pending.code)
                     val added = vm.joinedRefresh(before)
-                    vm.message.value = "You can now see ${added?.name?.let { "$it's" } ?: pending.possessive} care"
+                    vm.message.value = added?.name?.let { t("You can now see $it's care", "अब आप $it की देखभाल देख सकते हैं") } ?: t("You can now see ${pending.possessive} care", "अब आप यह देखभाल देख सकते हैं")
                 } catch (e: Exception) { if (e is CancellationException) throw e; vm.message.value = careJoinFailureMessage(e.message) }
                 finally { busy = false; onClear() }
             }
-        }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text(if (busy) "Joining…" else "Join") } },
-        dismissButton = { TextButton(onClick = onClear, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text("Not now") } })
+        }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text(if (busy) t("Joining…", "जुड़ रहे हैं…") else t("Join", "जुड़ें")) } },
+        dismissButton = { TextButton(onClick = onClear, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Not now", "अभी नहीं")) } })
 }
