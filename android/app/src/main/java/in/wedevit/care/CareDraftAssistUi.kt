@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.sp
             .filterNot { s -> NoteRules.values(draft)[section].lines().any { it.trim() == s.line.words } }
         if (picks.isNotEmpty()) Surface(shape = RoundedCornerShape(14.dp), color = DoctorStatusWarnBg, modifier = Modifier.fillMaxWidth().testTag("build-suggestions-$section")) {
             Column(Modifier.padding(horizontal = 14.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("Suggested for this section", fontSize = 13.sp, fontWeight = FontWeight.Medium, color = DoctorStatusWarn)
+                Text("Suggested for this section · word matching, not AI · शब्द मिलान, AI नहीं", fontSize = 13.sp, fontWeight = FontWeight.Medium, color = DoctorStatusWarn)
                 Text("Matched from the words already in the transcript. Nothing is written for you — check each one before adding it.", fontSize = 12.sp, lineHeight = 16.sp, color = DoctorCardFaint)
                 picks.forEach { s ->
                     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
