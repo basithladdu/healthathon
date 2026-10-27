@@ -453,8 +453,8 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
             .onFailure { playingNow = false; vm.message.value = "That recording could not be played." }
     }
     BackHandler(doctorPresentation && clinician && step > 0 && !recording && !dictating && !recordingSaving && recordingSaveError == null && !permissionDialog && !audienceBusy) { previousPage() }
-    // Pages slide in the direction of travel; each page keeps its own list position while the other fades out.
-    AnimatedContent(step, transitionSpec = { stepTransition(targetState >= initialState) }, label = "conversation-page") { step ->
+    // Pages move with the app's shared motion in the direction of travel; each page keeps its own list position while the other fades out.
+    AnimatedContent(step, transitionSpec = { SaharaMotion.transform(if (targetState >= initialState) SaharaMotion.Direction.Forward else SaharaMotion.Direction.Back) }, label = "conversation-page") { step ->
     val doctorCapture = doctorPresentation && clinician && step == 1
     val scroll = rememberLazyListState()
     LaunchedEffect(buildSection) { scroll.scrollToItem(0) }
@@ -664,13 +664,6 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
     }, confirmButton = {
         TextButton(onClick = { if (vm.canEdit.value && vm.localAudioRecordingAllowed && !vm.recordingSaving.value && vm.recordingSaveError.value == null) { permissionDialog = false; if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) startConsentedRecording() else permission.launch(Manifest.permission.RECORD_AUDIO) } }, enabled = recordingCanEdit && recordingSaveError == null && !recordingSaving && vm.localAudioRecordingAllowed && allParticipantsAgreed && purposeAccepted && storageAccepted && accessAccepted) { Text("Start recording") }
     }, dismissButton = { TextButton(onClick = { permissionDialog = false }) { Text("Cancel") } })
-}
-
-/** Page-to-page motion inside a multi-step flow (conversation pages, symptom steps): a short drift in the direction of travel with a quick cross-fade. */
-internal fun stepTransition(forward: Boolean): ContentTransform {
-    val sign = if (forward) 1 else -1
-    return (fadeIn(tween(190, delayMillis = 50, easing = LinearOutSlowInEasing)) + slideInHorizontally(tween(240, easing = FastOutSlowInEasing)) { sign * it / 12 }) togetherWith
-        (fadeOut(tween(120, easing = FastOutSlowInEasing)) + slideOutHorizontally(tween(240, easing = FastOutSlowInEasing)) { -sign * it / 24 })
 }
 
 @Composable fun AudioPlayback(path: String, consent: RecordingConsent?, transcribing: Boolean, canTranscribe: Boolean, onTranscribe: () -> Unit, onDelete: () -> Unit) {

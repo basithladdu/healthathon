@@ -6,7 +6,6 @@ import android.app.TimePickerDialog
 import android.content.Intent
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.SizeTransform
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -278,7 +277,7 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
                 }
             }
             Column(Modifier.weight(1f, fill = false).verticalScroll(scroll).padding(horizontal = 16.dp, vertical = 12.dp)) {
-              AnimatedContent(cur, transitionSpec = { stepTransition(steps.indexOf(targetState) >= steps.indexOf(initialState)) using SizeTransform(clip = false) }, label = "symptom-step") { cur ->
+              AnimatedContent(cur, transitionSpec = { SaharaMotion.transform(if (steps.indexOf(targetState) >= steps.indexOf(initialState)) SaharaMotion.Direction.Forward else SaharaMotion.Direction.Back) }, label = "symptom-step") { cur ->
               Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
                 if (prior != null && initial == null) {
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
