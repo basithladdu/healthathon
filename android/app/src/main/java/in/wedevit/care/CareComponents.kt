@@ -42,7 +42,10 @@ import androidx.compose.ui.unit.sp
 }
 
 @Composable fun CareNavigation(selected: Int, clinician: Boolean, onSelect: (Int) -> Unit) {
-    val labels = listOf("Today", if (clinician) "Talk" else "Docs", "Care", "Nearby", "More")
+    // [keys] stay English for test tags; [labels] follow the family's English/Hindi choice.
+    val t = careText()
+    val keys = listOf("Today", if (clinician) "Talk" else "Docs", "Care", "Nearby", "More")
+    val labels = listOf(t("Today", "आज"), if (clinician) t("Talk", "बातचीत") else t("Docs", "कागज़ात"), t("Care", "देखभाल"), t("Nearby", "आसपास"), t("More", "और"))
     val routes = listOf(0, if (clinician) 1 else 5, 2, 3, 4)
     val icons = listOf(Icons.Default.WbSunny, if (clinician) Icons.Default.Forum else Icons.Default.FolderOpen, Icons.Default.FavoriteBorder, Icons.Default.Place, Icons.Default.MoreHoriz)
     val duration = if (ValueAnimator.areAnimatorsEnabled()) 180 else 0
@@ -51,7 +54,7 @@ import androidx.compose.ui.unit.sp
             labels.forEachIndexed { index, label ->
                 val active = selected == routes[index] || (!clinician && index == 1 && selected == 1)
                 val color by animateColorAsState(if (active) Color(0xFFFFE39A) else Color.Transparent, tween(duration), label = "selected tab")
-                Column(Modifier.weight(1f).testTag("nav-$label").clip(RoundedCornerShape(15.dp)).background(color)
+                Column(Modifier.weight(1f).testTag("nav-${keys[index]}").clip(RoundedCornerShape(15.dp)).background(color)
                     .selectable(selected = active, role = Role.Tab, onClick = { onSelect(routes[index]) }).heightIn(min = 58.dp).padding(vertical = 7.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
                     Icon(icons[index], null, Modifier.size(22.dp), tint = if (active) Ink else MaterialTheme.colorScheme.onSurfaceVariant)
                     Spacer(Modifier.height(5.dp)); Text(label, fontSize = cappedLabelSize(11f), fontWeight = if (active) FontWeight.Bold else FontWeight.Medium, color = Ink, maxLines = 1)
@@ -89,13 +92,13 @@ import androidx.compose.ui.unit.sp
 /** The selected care profile stays visible; switching profiles never changes account permissions. */
 @Composable fun CarePersonSelector(name: String, people: List<Pair<String, String>>, selectedId: String,
     enabled: Boolean, onSelect: (String) -> Unit, onAdd: () -> Unit, canAdd: Boolean = true) {
-    var expanded by remember { mutableStateOf(false) }
+    var expanded by remember { mutableStateOf(false) }; val t = careText()
     LaunchedEffect(enabled) { if (!enabled) expanded = false }
     Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
         Box(Modifier.weight(1f)) {
             Row(Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("selected-care-profile")
                 .clip(RoundedCornerShape(12.dp)).clickable(enabled = enabled, role = Role.Button, onClick = { expanded = true })
-                .semantics { contentDescription = "Switch care profile, $name" }.padding(vertical = 6.dp),
+                .semantics { contentDescription = t("Switch care profile, $name", "देखभाल प्रोफ़ाइल बदलें, $name") }.padding(vertical = 6.dp),
                 verticalAlignment = Alignment.CenterVertically) {
                 Box(Modifier.size(40.dp).clip(CircleShape).background(Peach), contentAlignment = Alignment.Center) {
                     Icon(Icons.Default.PersonOutline, null, Modifier.size(22.dp), tint = Rust)
@@ -113,7 +116,7 @@ import androidx.compose.ui.unit.sp
                 }
             }
         }
-        if (canAdd) IconButton(onClick = onAdd, enabled = enabled, modifier = Modifier.size(52.dp).testTag("add-care-person").semantics { contentDescription = "Add person" }) {
+        if (canAdd) IconButton(onClick = onAdd, enabled = enabled, modifier = Modifier.size(52.dp).testTag("add-care-person").semantics { contentDescription = t("Add person", "व्यक्ति जोड़ें") }) {
             Box(Modifier.size(36.dp).clip(CircleShape).border(1.dp, if (enabled) Rust.copy(alpha = .6f) else MaterialTheme.colorScheme.outline.copy(alpha = .3f), CircleShape), contentAlignment = Alignment.Center) {
                 Icon(Icons.Default.PersonAdd, null, Modifier.size(18.dp), tint = if (enabled) Rust else MaterialTheme.colorScheme.onSurface.copy(alpha = .38f))
             }
