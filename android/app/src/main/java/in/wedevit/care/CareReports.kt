@@ -13,6 +13,17 @@ import java.io.File
 import java.util.UUID
 import kotlin.coroutines.coroutineContext
 
+/** A report's name is only a label in Sahara; the stored file name never changes. */
+object ReportNameRules {
+    fun error(name: String): String? = when {
+        name.isBlank() -> "Add a name. · नाम लिखें।"
+        name.trim().length > 160 -> "Use 160 characters or fewer. · 160 अक्षर तक।"
+        name.any { it.isISOControl() } || name.contains('/') || name.contains('\\') -> "Don't use / or \\ in the name. · / या \\ न लिखें।"
+        else -> null
+    }
+    fun clean(name: String): String { error(name)?.let { throw IllegalArgumentException(it) }; return name.trim() }
+}
+
 /** Private copies, isolated in the same account and person boundaries as the Room cache. */
 class ReportFiles(private val context: Context, account: String = "") {
     private val root = File(context.filesDir, "reports/" + account.ifEmpty { "guest" })

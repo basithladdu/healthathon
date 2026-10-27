@@ -45,5 +45,31 @@ class CareDocumentEvidenceTest {
         assertTrue(DocumentEvidenceRules.find("cure diagnosis", listOf(saved)).isEmpty())
         assertTrue(DocumentEvidenceRules.find("Example", listOf(value)).isEmpty())
     }
+    @Test fun hindiQueryWordsFindEnglishAndHindiReportLines() {
+        val report = DocumentEvidenceRules.confirm(ReviewedDocumentText("report-2", "person-1", "b".repeat(64), listOf(DocumentPageText(1,
+            "Department of Pathology\nHaemoglobin 10.2 g/dL 12.0 - 15.5\n\n\nPlatelet count 1,50,000 /cumm\n\n\nखून की जाँच सामान्य\n\n\nPET-CT whole body")), 1), true, 100)
+        assertTrue(DocumentEvidenceRules.find("हीमोग्लोबिन", listOf(report)).single().quote.contains("Haemoglobin 10.2"))
+        assertTrue(DocumentEvidenceRules.find("मेरी प्लेटलेट रिपोर्ट", listOf(report)).single().quote.contains("Platelet count"))
+        // चाँद/चांद spelling: the typed anusvara still finds the printed chandrabindu.
+        assertTrue(DocumentEvidenceRules.find("खून जांच", listOf(report)).single().quote.contains("खून की जाँच"))
+        assertTrue(DocumentEvidenceRules.find("पेट-सीटी", listOf(report)).single().quote.contains("PET-CT"))
+        assertTrue(DocumentEvidenceRules.find("कैंसर", listOf(report)).isEmpty())
+    }
+    @Test fun reportNamesMatchHindiWordsAndNuktaSpellings() {
+        assertTrue(DocumentSearchWords.matchesName("बायोप्सी", "Breast biopsy result.pdf"))
+        assertTrue(DocumentSearchWords.matchesName("खून की जांच", "Blood test March.jpg"))
+        assertTrue(DocumentSearchWords.matchesName("डॉक्टर ज़ैदी", "डॉक्टर जैदी letter.pdf"))
+        assertTrue(DocumentSearchWords.matchesName("march", "Blood test March.jpg"))
+        assertTrue(DocumentSearchWords.matchesName("", "Anything.pdf"))
+        assertFalse(DocumentSearchWords.matchesName("बायोप्सी", "Blood test March.jpg"))
+        assertFalse(DocumentSearchWords.matchesName("पेट दर्द", "PET CT.pdf"))
+    }
+    @Test fun reportNamesAreTrimmedLabelsWithoutPaths() {
+        assertEquals("PET-CT March", ReportNameRules.clean("  PET-CT March "))
+        assertNotNull(ReportNameRules.error("   "))
+        assertNotNull(ReportNameRules.error("../other.pdf"))
+        assertNotNull(ReportNameRules.error("a".repeat(161)))
+        assertNull(ReportNameRules.error("बायोप्सी रिपोर्ट"))
+    }
     private fun fails(action: () -> Unit) { try { action(); fail("Expected source validation to reject this value") } catch (_: IllegalArgumentException) { } catch (_: IllegalStateException) { } }
 }

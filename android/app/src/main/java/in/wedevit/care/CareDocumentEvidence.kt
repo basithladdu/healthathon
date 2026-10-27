@@ -14,20 +14,63 @@ data class DocumentFactSource(
 )
 data class DocumentSearchExcerpt(val reportId: String, val page: Int, val line: Int, val quote: String)
 
+/** Query words in English or Hindi (Devanagari). Hindi words are matched to the English words reports usually print; nothing is translated or interpreted. */
+object DocumentSearchWords {
+    /** Same spelling for चाँद/चांद and for letters typed with or without a nukta. */
+    fun normalize(text: String) = java.text.Normalizer.normalize(text.lowercase(), java.text.Normalizer.Form.NFD).replace('\u0901', '\u0902').replace("\u093c", "").replace(Regex("पेट[\\s-]*सीटी"), "pet ct")
+    fun words(text: String) = Regex("[\\p{L}\\p{M}\\p{N}]+").findAll(normalize(text)).map { it.value }.toList()
+    private val ignored = setOf("a", "an", "the", "my", "our", "what", "when", "where", "who", "which", "how", "is", "are", "was", "were", "to", "of", "in", "on", "at", "for", "and", "or", "tell", "me", "show", "find", "please", "last", "latest", "report", "reports", "document", "documents", "should", "can", "i", "we", "did", "do", "have", "has", "had", "with", "from", "about",
+        "क्या", "है", "हैं", "था", "थी", "थे", "कब", "कहां", "कौन", "कितना", "कितनी", "मेरे", "मेरी", "मेरा", "हमारे", "हमारी", "हमारा", "की", "का", "के", "में", "पर", "से", "को", "और", "या", "मुझे", "वाली", "वाला", "वाले", "आखिरी", "पिछली", "पिछला", "रिपोर्ट", "कागज", "दिखाओ", "दिखाइए", "बताओ", "बताइए", "ढूंढो", "ढूंढें")
+    private val groups = listOf(
+        setOf("medicine", "medicines", "medication", "prescription", "दवा", "दवाई", "दवाइयां", "दवाएं", "पर्चा"),
+        setOf("visit", "visits", "appointment", "appointments", "followup", "मुलाकात", "अपॉइंटमेंट"),
+        setOf("chemotherapy", "chemo", "कीमो", "कीमोथेरेपी"),
+        setOf("radiotherapy", "radiation", "रेडियोथेरेपी", "रेडिएशन", "सिकाई"),
+        setOf("hemoglobin", "haemoglobin", "hb", "हीमोग्लोबिन"),
+        setOf("blood", "cbc", "खून", "रक्त"),
+        setOf("test", "tests", "lab", "जांच"),
+        setOf("sugar", "glucose", "शुगर"),
+        setOf("platelet", "platelets", "प्लेटलेट", "प्लेटलेट्स"),
+        setOf("cancer", "carcinoma", "malignancy", "कैंसर"),
+        setOf("biopsy", "fnac", "बायोप्सी"),
+        setOf("histopathology", "hpe", "हिस्टोपैथोलॉजी"),
+        setOf("staging", "stage", "tnm", "स्टेज", "स्टेजिंग"),
+        setOf("pet", "petct", "पीईटी"),
+        setOf("ct", "सीटी"),
+        setOf("scan", "स्कैन"),
+        setOf("urine", "पेशाब", "मूत्र"),
+        setOf("kidney", "किडनी", "गुर्दा"),
+        setOf("liver", "लिवर", "जिगर"),
+        setOf("thyroid", "थायराइड"),
+        setOf("pain", "दर्द"),
+        setOf("morphine", "मॉर्फिन"),
+        setOf("doctor", "dr", "डॉक्टर", "डॉ"),
+        setOf("discharge", "डिस्चार्ज"),
+        setOf("bring", "carry", "prepare", "preparation", "लाना"),
+    )
+    /** Each query word becomes the set of words that count as a match for it. */
+    fun terms(query: String): List<Set<String>> = words(query).filterNot { it in ignored }.distinct().map { term -> groups.firstOrNull { term in it } ?: setOf(term) }
+    /** File names and labels: the plain text match still works; otherwise every query word (or its English/Hindi match) must appear. */
+    fun matchesName(query: String, name: String): Boolean {
+        val trimmed = query.trim()
+        if (trimmed.isEmpty() || name.contains(trimmed, ignoreCase = true)) return true
+        val terms = terms(trimmed); if (terms.isEmpty()) return false
+        val text = normalize(name); val found = words(name)
+        return terms.all { group -> group.any { it in found || (it.length >= 4 && text.contains(it)) } }
+    }
+}
+
 object DocumentEvidenceRules {
     /** Extractive retrieval only. Unsupported questions return no answer rather than generated medical advice. */
     fun find(query: String, documents: List<ReviewedDocumentText>): List<DocumentSearchExcerpt> {
-        fun words(text: String) = Regex("[\\p{L}\\p{M}\\p{N}]+").findAll(text.lowercase()).map { it.value }.toList()
-        val ignored = setOf("a", "an", "the", "my", "our", "what", "when", "where", "who", "which", "how", "is", "are", "was", "were", "to", "of", "in", "on", "at", "for", "and", "or", "tell", "me", "show", "find", "please", "last", "latest", "report", "reports", "document", "documents", "should", "can", "i", "we", "did", "do", "have", "has", "had", "with", "from", "about", "क्या", "है", "कब", "मेरे", "मेरी", "मेरा", "की", "का", "के", "में", "मुझे")
-        val groups = listOf(setOf("medicine", "medicines", "medication", "prescription", "दवा"), setOf("visit", "visits", "appointment", "appointments", "followup", "मुलाकात"), setOf("chemotherapy", "chemo", "कीमो"), setOf("hemoglobin", "haemoglobin", "hb", "हीमोग्लोबिन"), setOf("bring", "carry", "prepare", "preparation", "लाना"))
-        val terms = words(query).filterNot { it in ignored }.distinct().map { term -> groups.firstOrNull { term in it } ?: setOf(term) }
+        val terms = DocumentSearchWords.terms(query)
         if (terms.isEmpty()) return emptyList()
         return documents.filter { it.reviewedAt > 0 }.flatMap { document -> document.pages.flatMap { page ->
             val lines = page.reviewedText.split('\n')
             lines.mapIndexedNotNull { index, line ->
                 if (line.isBlank()) return@mapIndexedNotNull null
                 val first = (index - 1).coerceAtLeast(0); val last = (index + 1).coerceAtMost(lines.lastIndex)
-                val window = lines.subList(first, last + 1).joinToString("\n"); val found = words(window)
+                val window = lines.subList(first, last + 1).joinToString("\n"); val found = DocumentSearchWords.words(window)
                 if (window.length <= 2000 && terms.all { group -> group.any { it in found } }) DocumentSearchExcerpt(document.reportId, page.page, first + 1, window) else null
             }.distinctBy { it.page to it.line }.take(4)
         } }.take(20)
