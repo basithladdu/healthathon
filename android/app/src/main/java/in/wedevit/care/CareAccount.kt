@@ -175,7 +175,7 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
     val inviteStore = remember { careInviteStore(context) }
     var removing by remember { mutableStateOf<CareMember?>(null) }
     var signingOut by remember { mutableStateOf(false) }
-    val t = careText()
+    val t = careText(); val careHindiNow = careHindi()
     SideEffect { onBusyChange(busy) }
     fun run(action: suspend () -> Unit) {
         if (busy) return
@@ -221,7 +221,7 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
                     CareField(code, { code = CareInviteLink.parse(it)?.code ?: it.trim().take(4000) }, t("Invitation code or link", "निमंत्रण कोड या लिंक"), singleLine = true)
                     OutlinedButton(onClick = { val pasted = (context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as? android.content.ClipboardManager)?.primaryClip?.takeIf { it.itemCount > 0 }?.getItemAt(0)?.coerceToText(context)?.toString(); val invite = CareInviteLink.parse(pasted); if (invite != null) { code = invite.code; error = null; notice = t("Invite pasted. Tap Join.", "निमंत्रण चिपका दिया। अब “जुड़ें” दबाएँ।") } else { notice = null; error = t("No Sahara invite found on the clipboard. Copy the WhatsApp message or link first.", "कॉपी किए गए टेक्स्ट में Sahara का निमंत्रण नहीं मिला। पहले WhatsApp संदेश या लिंक कॉपी करें।") } }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Icon(Icons.Default.ContentPaste, null); Spacer(Modifier.width(8.dp)); Text(t("Paste invite", "निमंत्रण चिपकाएँ")) }
                     Spacer(Modifier.height(10.dp))
-                    Button(onClick = { run { val before = vm.people.value.map { it.id }.toSet(); try { cloud.join(code) } catch (e: Exception) { if (e is CancellationException) throw e; throw IllegalArgumentException(careJoinFailureMessage(e.message), e) }; code = ""; val added = vm.joinedRefresh(before); notice = added?.name?.let { t("You can now see $it's care.", "अब आप $it की देखभाल देख सकते हैं।") } ?: t("You can now see their care.", "अब आप उनकी देखभाल देख सकते हैं।") } }, enabled = !busy && code.trim().length == 48) { Text(t("Join", "जुड़ें")) }
+                    Button(onClick = { run { val before = vm.people.value.map { it.id }.toSet(); try { cloud.join(code) } catch (e: Exception) { if (e is CancellationException) throw e; throw IllegalArgumentException(careJoinFailureMessage(e.message, careHindiNow), e) }; code = ""; val added = vm.joinedRefresh(before); notice = added?.name?.let { t("You can now see $it's care.", "अब आप $it की देखभाल देख सकते हैं।") } ?: t("You can now see their care.", "अब आप उनकी देखभाल देख सकते हैं।") } }, enabled = !busy && code.trim().length == 48) { Text(t("Join", "जुड़ें")) }
                 }
                 if (owner && selected.isNotBlank()) DetailPanel(people.firstOrNull { it.id == selected }?.name.orEmpty().let { t("Share $it's care", "$it की देखभाल साझा करें") }, Icons.Default.PersonAdd) {
                     Button(onClick = { addFamily = true }, enabled = !busy, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Icon(Icons.Default.PersonAdd, null); Spacer(Modifier.width(8.dp)); Text(t("Add family", "परिवार जोड़ें")) }

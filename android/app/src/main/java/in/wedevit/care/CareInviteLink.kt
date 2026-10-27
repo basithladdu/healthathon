@@ -59,12 +59,12 @@ class CarePendingJoinStore(private val kv: CareKeyValue, private val ttlMs: Long
 }
 
 /** Plain messages for a failed join. */
-fun careJoinFailureMessage(raw: String?): String = when {
-    raw.isNullOrBlank() -> "This invitation couldn't be used. Ask for a new one."
+fun careJoinFailureMessage(raw: String?, hindi: Boolean = false): String = when {
+    raw.isNullOrBlank() -> if (hindi) "यह निमंत्रण इस्तेमाल नहीं हो सका। नया निमंत्रण माँगें।" else "This invitation couldn't be used. Ask for a new one."
     raw.startsWith("Clinician verification") -> raw
-    raw.startsWith("Couldn't reach") -> "No connection right now. Check your internet and open the link again."
-    raw.startsWith("Sign in again") -> "Please sign in again, then open the invitation link again."
-    else -> "This invitation has expired or was already used. Ask for a new one."
+    raw.startsWith("Couldn't reach") -> if (hindi) "अभी इंटरनेट नहीं है। इंटरनेट जाँचें और लिंक फिर खोलें।" else "No connection right now. Check your internet and open the link again."
+    raw.startsWith("Sign in again") -> if (hindi) "कृपया फिर से साइन इन करें, फिर निमंत्रण का लिंक दोबारा खोलें।" else "Please sign in again, then open the invitation link again."
+    else -> if (hindi) "यह निमंत्रण पुराना हो गया है या पहले ही इस्तेमाल हो चुका है। नया निमंत्रण माँगें।" else "This invitation has expired or was already used. Ask for a new one."
 }
 
 /** Local record of invitations the owner sent, so the list can show name, relationship and status. */

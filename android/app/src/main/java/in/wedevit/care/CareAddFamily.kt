@@ -94,7 +94,7 @@ internal fun shareCareInvite(context: Context, text: String, whatsApp: Boolean) 
 /** Asks before joining from an invite link. */
 @Composable fun PendingJoinDialog(cloud: CareCloud, vm: CareModel, pending: PendingJoin, email: String, onClear: () -> Unit) {
     val scope = rememberCoroutineScope()
-    var busy by remember { mutableStateOf(false) }; val t = careText()
+    var busy by remember { mutableStateOf(false) }; val t = careText(); val careHindiNow = careHindi()
     AlertDialog(onDismissRequest = { if (!busy) onClear() },
         title = { Text(t("Join ${pending.possessive} care?", "क्या आप इस देखभाल से जुड़ना चाहते हैं?")) },
         text = { Text(t("${pending.who.replaceFirstChar { it.uppercase() }} will see your email ($email).", "बुलाने वाले व्यक्ति को आपका ईमेल ($email) दिखेगा।")) },
@@ -107,7 +107,7 @@ internal fun shareCareInvite(context: Context, text: String, whatsApp: Boolean) 
                     cloud.join(pending.code)
                     val added = vm.joinedRefresh(before)
                     vm.message.value = added?.name?.let { t("You can now see $it's care", "अब आप $it की देखभाल देख सकते हैं") } ?: t("You can now see ${pending.possessive} care", "अब आप यह देखभाल देख सकते हैं")
-                } catch (e: Exception) { if (e is CancellationException) throw e; vm.message.value = careJoinFailureMessage(e.message) }
+                } catch (e: Exception) { if (e is CancellationException) throw e; vm.message.value = careJoinFailureMessage(e.message, careHindiNow) }
                 finally { busy = false; onClear() }
             }
         }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text(if (busy) t("Joining…", "जुड़ रहे हैं…") else t("Join", "जुड़ें")) } },
