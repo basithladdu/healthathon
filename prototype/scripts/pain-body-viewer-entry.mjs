@@ -76,7 +76,8 @@ try {
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.target.set(0, 0, 0); controls.enablePan = false; controls.enableDamping = false;
   controls.minDistance = 0.5; controls.maxDistance = 5.5;
-  controls.minPolarAngle = Math.PI * 0.25; controls.maxPolarAngle = Math.PI * 0.75;
+  // Turn left/right only: up/down drags belong to the page scroll (the Android host hands vertical drags to the page), so tilt is fixed at the Front/Back camera height.
+  controls.minPolarAngle = controls.maxPolarAngle = Math.PI / 2 - 0.013;
   let hasViewport = false;
   let usesPixelViewportHeight = false;
   const render = () => { if (hasViewport) renderer.render(scene, camera); };

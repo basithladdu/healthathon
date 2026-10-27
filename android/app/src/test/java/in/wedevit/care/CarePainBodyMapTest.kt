@@ -51,6 +51,15 @@ class CarePainBodyMapTest {
         assertFalse(SymptomDiaryRules.sameContext(row, value, row, value.copy(painBodyPoints = emptyList(), painBodyModel = "")))
         assertFalse(SymptomDiaryRules.sameContext(row, value, row, value.copy(painBodySites = listOf("right-leg"))))
     }
+    @Test fun upDownDragsScrollThePageWhileSidewaysDragsAndPinchesStayWithTheModel() {
+        val slop = 16f
+        assertFalse(PainViewerPolicy.viewerKeepsGesture(2f, 3f, 1, slop)) // still a tap
+        assertFalse(PainViewerPolicy.viewerKeepsGesture(4f, 30f, 1, slop)) // up/down: page scrolls
+        assertFalse(PainViewerPolicy.viewerKeepsGesture(-10f, -10f, 1, slop)) // diagonal: page decides
+        assertTrue(PainViewerPolicy.viewerKeepsGesture(9f, 2f, 1, slop)) // sideways: turn the model
+        assertTrue(PainViewerPolicy.viewerKeepsGesture(-12f, 5f, 1, slop))
+        assertTrue(PainViewerPolicy.viewerKeepsGesture(0f, 0f, 2, slop)) // pinch: zoom the model
+    }
     @Test fun offlineViewerOnlyLoadsItsOwnBundledSubtreeAndAcceptsWhitelistedMessages() {
         assertTrue(PainViewerPolicy.localResource(PainViewerPolicy.PAGE))
         assertTrue(PainViewerPolicy.localResource("${PainViewerPolicy.ORIGIN}/assets/pain-body-viewer/body.glb"))

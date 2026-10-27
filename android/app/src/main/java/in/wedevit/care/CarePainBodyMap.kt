@@ -3,6 +3,7 @@ package `in`.wedevit.care
 
 import android.annotation.SuppressLint
 import android.view.MotionEvent
+import android.view.ViewConfiguration
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebSettings
@@ -214,8 +215,17 @@ import java.io.ByteArrayInputStream
                     override fun onReceivedError(view: WebView, request: WebResourceRequest, error: androidx.webkit.WebResourceErrorCompat) { if (request.isForMainFrame) view.post { failed = true } }
                     override fun onRenderProcessGone(view: WebView, detail: android.webkit.RenderProcessGoneDetail): Boolean { failed = true; return true }
                 }
+                // Up/down drags stay with the page so it scrolls; the model keeps only sideways drags (turn) and two-finger pinches (zoom). A tap still reaches the page.
+                val slop = ViewConfiguration.get(context).scaledTouchSlop.toFloat()
+                var downX = 0f; var downY = 0f; var claimed = false
                 setOnTouchListener { view, event ->
-                    view.parent?.requestDisallowInterceptTouchEvent(event.actionMasked !in setOf(MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL))
+                    when (event.actionMasked) {
+                        MotionEvent.ACTION_DOWN -> { downX = event.x; downY = event.y; claimed = false }
+                        MotionEvent.ACTION_MOVE, MotionEvent.ACTION_POINTER_DOWN -> if (!claimed && PainViewerPolicy.viewerKeepsGesture(event.x - downX, event.y - downY, event.pointerCount, slop)) {
+                            claimed = true; view.parent?.requestDisallowInterceptTouchEvent(true)
+                        }
+                        MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> { claimed = false; view.parent?.requestDisallowInterceptTouchEvent(false) }
+                    }
                     false
                 }
                 if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) {

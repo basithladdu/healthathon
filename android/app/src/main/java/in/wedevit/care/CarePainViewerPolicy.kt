@@ -17,6 +17,9 @@ object PainViewerPolicy {
         val uri = URI(url)
         uri.scheme == "https" && uri.host == "appassets.androidplatform.net" && uri.port in setOf(-1, 443) && uri.userInfo == null && uri.query == null && uri.fragment == null && uri.path.orEmpty() in setOf("", "/")
     }.getOrDefault(false)
+    /** True once a touch on the 3D model should stay with the model: a second finger (pinch) or a mostly sideways drag. Up/down drags return false so the page scrolls. */
+    fun viewerKeepsGesture(dx: Float, dy: Float, pointerCount: Int, touchSlop: Float): Boolean =
+        pointerCount > 1 || (kotlin.math.abs(dx) >= touchSlop / 2 && kotlin.math.abs(dx) > kotlin.math.abs(dy))
     fun toggledSite(message: String): String? = if (message.length > 180) null else runCatching {
         val json = JSONObject(message)
         json.optString("site").takeIf { json.optString("type") == "toggle" && it in PainBodyMapRules.sites }

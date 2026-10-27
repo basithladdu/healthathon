@@ -150,7 +150,8 @@ private val DoctorMist = Peach
     var earlierWorkspace by rememberSaveable {mutableStateOf(false)}
     var homePending by remember {mutableStateOf<List<HomeCarePending>>(emptyList())}
     var homeVisits by remember {mutableStateOf<List<HomeVisit>>(emptyList())}
-    LaunchedEffect(sampleCareOpen) {if(!sampleCareOpen) {homePending=loadHomeCarePending(context); homeVisits=loadHomeVisits(context)}}
+    var homeLoaded by remember {mutableStateOf(false)} // until the first device read finishes, the visit and draft tiles show "—" instead of a false 0
+    LaunchedEffect(sampleCareOpen) {if(!sampleCareOpen) {homePending=loadHomeCarePending(context); homeVisits=loadHomeVisits(context); homeLoaded=true}}
     var sampleCareBack by remember {mutableStateOf<(() -> Unit)?>(null)}
     val embeddedCareStates = rememberSaveableStateHolder()
     val carePerson = carePeople.firstOrNull { it.id == carePersonId }
@@ -286,7 +287,7 @@ private val DoctorMist = Peach
                     reports=reports,reportQuery=reportQuery,reportCategory=reportCategory,onReportQuery={reportQuery=it},onReportCategory={reportCategory=it},onReportOpen={focus.clearFocus();reportId=it},
                     conversations=DoctorConversationsData.build(shownPatient.id,workflow.versions(shownPatient.id),workflow.draft(shownPatient.id),System.currentTimeMillis()))
                 destination.second == 0 && earlierWorkspace -> DemoHome(demoStore.patients, appointments, ::openPatient, onSchedule = { tab = 2 }, onAdd = { creatingFor = demoStore.patients.first().id }, workflow = workflow, onRequests={workflowRoute="requests"}, onDraft={workflowRoute=it;patientId=it;recordTab="Conversations"})
-                destination.second == 0 -> DoctorHomeWorkday(DoctorTestProfiles.profiles.map { DoctorTestProfiles.personId(it) }.let { ids -> ids.size + carePeople.count { it.id !in ids } }, demoStore.patients, homePending, homeVisits, workflow, onPatients={tab=1}, onSchedule={tab=2}, onProfile={p->navigateCare {testCarePerson=DoctorTestProfiles.personId(p);testInitialSection="Hub";sampleCareOpen=true}}, onPending={c->navigateCare {testCarePerson=DoctorTestProfiles.personId(c.profile);testInitialSection=c.section;sampleCareOpen=true}}, onConversation={id->workflowRoute=id}, onRequests={workflowRoute="requests"})
+                destination.second == 0 -> DoctorHomeWorkday(DoctorTestProfiles.profiles.map { DoctorTestProfiles.personId(it) }.let { ids -> ids.size + carePeople.count { it.id !in ids } }, demoStore.patients, homePending, homeVisits, homeLoaded, workflow, onPatients={tab=1}, onSchedule={tab=2}, onProfile={p->navigateCare {testCarePerson=DoctorTestProfiles.personId(p);testInitialSection="Hub";sampleCareOpen=true}}, onPending={c->navigateCare {testCarePerson=DoctorTestProfiles.personId(c.profile);testInitialSection=c.section;sampleCareOpen=true}}, onConversation={id->workflowRoute=id}, onRequests={workflowRoute="requests"})
                 destination.second == 1 -> LazyColumn(Modifier.fillMaxSize().testTag("walkthrough-patients-list"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
                     item { DoctorTitle("Patients"); Text("Choose a person to open their care.", fontSize = 16.sp) }
                     if (careModel != null) {
@@ -656,7 +657,7 @@ private suspend fun loadHomeVisits(context: android.content.Context): List<HomeV
 }
 
 /** Home for the doctor walkthrough. Conversation and request rows come only from this device's workflow store and visit list, and always open the person they belong to. */
-@Composable private fun DoctorHomeWorkday(careCount: Int, patients: List<DoctorDemoPatient>, pending: List<HomeCarePending>, visits: List<HomeVisit>, workflow: DoctorWorkflowStore, onPatients: () -> Unit, onSchedule: () -> Unit, onProfile: (DoctorTestProfiles.Profile) -> Unit, onPending: (HomeCarePending) -> Unit, onConversation: (String) -> Unit, onRequests: () -> Unit) {
+@Composable private fun DoctorHomeWorkday(careCount: Int, patients: List<DoctorDemoPatient>, pending: List<HomeCarePending>, visits: List<HomeVisit>, loaded: Boolean, workflow: DoctorWorkflowStore, onPatients: () -> Unit, onSchedule: () -> Unit, onProfile: (DoctorTestProfiles.Profile) -> Unit, onPending: (HomeCarePending) -> Unit, onConversation: (String) -> Unit, onRequests: () -> Unit) {
     val byId = patients.associateBy { it.id }
     val state = workflow.snapshot()
     val newRequests = state.requests.filter { it.status == WorkflowRequestStatus.NEW && it.patientId in byId }.sortedByDescending { it.createdAt }
@@ -673,14 +674,14 @@ private suspend fun loadHomeVisits(context: android.content.Context): List<HomeV
             val drafts = pending.filter { it.section == "Conversations" }
             val tiles = listOf<Triple<String, String, Color>>(
                 Triple("Patients in your care", careCount.toString(), DoctorCardOverview),
-                Triple("Visits, next 7 days", visits.size.toString(), DoctorCardProgress),
-                Triple("Unfinished drafts", drafts.size.toString(), DoctorCardConversation),
+                Triple("Visits, next 7 days", if (loaded) visits.size.toString() else "—", DoctorCardProgress),
+                Triple("Unfinished drafts", if (loaded) drafts.size.toString() else "—", DoctorCardConversation),
                 Triple("Conversations to plan", newRequests.size.toString(), DoctorCardMedicine))
             val clicks = listOf<() -> Unit>(onPatients, onSchedule, { drafts.firstOrNull()?.let(onPending) ?: onPatients() }, onRequests)
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 for (r in 0..1) Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) { for (c in 0..1) { val i = r * 2 + c; val t = tiles[i]
-                    Surface(onClick = clicks[i], color = t.third, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.weight(1f).heightIn(min = 88.dp).semantics(mergeDescendants = true) { contentDescription = "${t.second} ${t.first}. Opens it." }) {
-                        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) { Text(t.second, fontFamily = SaharaTitleFont, fontSize = 30.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk); Text(t.first, fontSize = 13.sp, lineHeight = 17.sp, color = DoctorCardSub) }
+                    Surface(onClick = clicks[i], color = t.third, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.weight(1f).heightIn(min = 88.dp).semantics(mergeDescendants = true) { contentDescription = if (t.second == "—") "${t.first}, loading. Opens it." else "${t.second} ${t.first}. Opens it." }) {
+                        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) { Crossfade(t.second, animationSpec = tween(SaharaMotion.ENTER_MS), label = "home-tile-count") { value -> Text(value, fontFamily = SaharaTitleFont, fontSize = 30.sp, fontWeight = FontWeight.Medium, color = if (value == "—") DoctorCardSub else DoctorCardInk) }; Text(t.first, fontSize = 13.sp, lineHeight = 17.sp, color = DoctorCardSub) }
                     } } }
             }
         }

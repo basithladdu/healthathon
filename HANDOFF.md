@@ -158,7 +158,7 @@ From basithladdu's `6ab303e` (25 Oct) and the release commits:
 - **Not run:** the instrumentation (on-device UI) tests. They were updated for the new screens but haven't been run on a phone or emulator.
 
 ## 7. Known issues and open items
-- **Scrolling:** swiping up/down over the 3D model rotates it instead of scrolling the page, and swiping over the strength bar changes the score. Scroll from the text or tiles. A fix would let vertical swipes scroll the page.
+- **Scrolling:** swiping up/down over the 3D model now scrolls the page (27 Oct); sideways drags turn the model and two-finger pinches zoom it. Swiping over the strength bar can still change the score; scroll from the text or tiles there.
 - **Not seen on screen yet:** the grey outline for a spot rated 0, the "No pain strength set yet" card, the ⋮ menu, the Back-side zooms, and saving a full pain note.
 - **Zoom framing** was set by eye; some parts may sit too close (the right leg may cut off at the feet).
 - **Body parts are limited to the 12** the 3D model knows (no buttocks or separate upper/lower arm).
