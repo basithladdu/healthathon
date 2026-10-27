@@ -3,7 +3,7 @@
 One place for the team to understand what we researched, how we reasoned, what we decided and what is still open. Written in plain words. Nothing here was run against a live CARE server; anything about how CARE behaves when running is marked [unverified] in the sources.
 
 ## Start here (5-minute read)
-1. **Team deck (9 slides):** [`../../presentations/Sahara_CARE_Team_Briefing_2026-10-27.pdf`](../../presentations/Sahara_CARE_Team_Briefing_2026-10-27.pdf)
+1. **Team deck (11 slides, updated with the full crawl, 84 repos and partner research):** [`../../presentations/Sahara_CARE_Team_Briefing_2026-10-27.pdf`](../../presentations/Sahara_CARE_Team_Briefing_2026-10-27.pdf)
 2. **CARE vs Sahara in plain words (two big tables):** [`../CARE_VS_SAHARA_FOR_TEAM.md`](../CARE_VS_SAHARA_FOR_TEAM.md)
 3. **What is left to do:** `everyday.md` → "What is genuinely left" and `HANDOFF.md` → "27 Oct 2026 — open items".
 4. **The full conversation with Claude:** [`../../../CLAUDE_TRANSCRIPT.md`](../../../CLAUDE_TRANSCRIPT.md)

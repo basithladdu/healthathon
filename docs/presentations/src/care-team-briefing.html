@@ -3,11 +3,12 @@
 <head>
 <meta charset="utf-8">
 <title>Sahara and CARE: team briefing</title>
-<!-- Source for docs/presentations/Sahara_CARE_Team_Briefing_2026-10-27.pdf (9 slides).
+<!-- Source for docs/presentations/Sahara_CARE_Team_Briefing_2026-10-27.pdf (11 slides).
      Build: node docs/presentations/src/build.js
      Content comes only from docs/research/CARE_VS_SAHARA_FOR_TEAM.md, CARE_FAMILY_SIDE_FIT.md,
      CARE_BRIEF_2026-10-27.md, CHAT_AUDIT_2026-10-27.md, HANDOFF.md (27 Oct open items)
-     and CLAUDE_TRANSCRIPT.md section 2. Fonts and colours are the Android app's own. -->
+     and CLAUDE_TRANSCRIPT.md section 2,
+     and docs/research/handoff-2026-10-27/ (docs crawl, 84 repos, partner research). Fonts and colours are the Android app's own. -->
 <style>
 @font-face { font-family: "Montserrat"; font-weight: 500; src: url("../../../android/app/src/main/res/font/montserrat_medium.ttf"); }
 @font-face { font-family: "SaharaSerif"; font-weight: 400; src: url("../../../android/app/src/main/res/font/liberation_serif_regular.ttf"); }
@@ -91,7 +92,7 @@ tr:last-child td { border-bottom: none; }
   <h1 style="font-size:72px; margin-bottom:24px;">Sahara and CARE:<br>where we fit</h1>
   <p class="lead" style="max-width:860px;">CARE is the hospital staff's system. Sahara is the family's phone app. What is different, and what we need to decide.</p>
   <p class="lead serif" style="margin-top:36px; color:var(--rust-text); font-weight:700;">27 October 2026</p>
-  <div class="foot"><span>Sahara · internal team briefing · 27 Oct 2026</span><span>1 / 9</span></div>
+  <div class="foot"><span>Sahara · internal team briefing · 27 Oct 2026</span><span>1 / 11</span></div>
 </section>
 
 <!-- 2 One picture -->
@@ -125,7 +126,7 @@ tr:last-child td { border-bottom: none; }
   </div>
   <p class="lead" style="margin-top:16px; text-align:center;"><b>CARE has no family side, and no door for one yet.</b> That gap is where we fit.</p>
   <div class="src">Source: CARE_VS_SAHARA_FOR_TEAM.md; CARE_FAMILY_SIDE_FIT.md §1, §3.1; CARE_BRIEF §1–2. CARE code read, not run.</div>
-  <div class="foot"><span>Sahara · internal team briefing · 27 Oct 2026</span><span>2 / 9</span></div>
+  <div class="foot"><span>Sahara · internal team briefing · 27 Oct 2026</span><span>2 / 11</span></div>
 </section>
 
 <!-- 3 Words -->
@@ -147,7 +148,7 @@ tr:last-child td { border-bottom: none; }
     <div class="card" style="padding:12px 16px;"><b>ABDM</b><br>India's national digital health system. Sahara is not linked to it (ABHA link: later).</div>
   </div>
   <div class="src">Source: CARE_VS_SAHARA_FOR_TEAM.md "First, the words"; CARE_FAMILY_SIDE_FIT.md §3.2 (CARE is not a FHIR server); CHAT_AUDIT_2026-10-27.md G3 (ABHA later)</div>
-  <div class="foot"><span>Sahara · internal team briefing · 27 Oct 2026</span><span>3 / 9</span></div>
+  <div class="foot"><span>Sahara · internal team briefing · 27 Oct 2026</span><span>3 / 11</span></div>
 </section>
 
 <!-- 4 We have, CARE doesn't -->
@@ -165,10 +166,10 @@ tr:last-child td { border-bottom: none; }
     <tr><td class="thing">Goals-of-care questions</td><td><span class="chip no">No</span></td><td class="note">CARE docs say "do it separately" and "coming soon".</td></tr>
     <tr><td class="thing">Record the talk</td><td><span class="chip no">No</span></td><td class="note">Each person in the room says "yes" first.</td></tr>
     <tr><td class="thing">Family confirms the note</td><td><span class="chip no">No</span></td><td class="note">"I read version 3". CARE: staff mark a consent "checked with family".</td></tr>
-    <tr><td class="thing">Works without internet</td><td><span class="chip no">No</span></td><td class="note">Phone keeps a copy; recordings and report files never leave it.</td></tr>
+    <tr><td class="thing">One record, any hospital</td><td><span class="chip no">No</span></td><td class="note">Family keeps one record online. Each CARE is a separate hospital server.</td></tr>
   </table>
   <div class="src">Both have: medicines list, visits, lab results, documents. Honest: our transcript is pre-written, answers use word matching, AI is off. Full: Table 1 in CARE_VS_SAHARA_FOR_TEAM.md</div>
-  <div class="foot"><span>Sahara · internal team briefing · 27 Oct 2026</span><span>4 / 9</span></div>
+  <div class="foot"><span>Sahara · internal team briefing · 27 Oct 2026</span><span>4 / 11</span></div>
 </section>
 
 <!-- 5 CARE has, we don't -->
@@ -189,7 +190,7 @@ tr:last-child td { border-bottom: none; }
     <tr><td class="thing">Coded records, plugins</td><td><span class="chip no">No</span></td><td class="note">Medical code lists (SNOMED, LOINC). A plugin could be our way in later.</td></tr>
   </table>
   <div class="src">Both have: caregiver details (ours: many relatives), symptoms, medicines taken, files. CARE "care plan": on its web page, not in its code. Full: Table 2</div>
-  <div class="foot"><span>Sahara · internal team briefing · 27 Oct 2026</span><span>5 / 9</span></div>
+  <div class="foot"><span>Sahara · internal team briefing · 27 Oct 2026</span><span>5 / 11</span></div>
 </section>
 
 <!-- 6 Same thing different way -->
@@ -207,7 +208,7 @@ tr:last-child td { border-bottom: none; }
     <tr><td class="thing">Where data lives</td><td>No account: phone only. Signed in: saved on Sahara's server for family and doctor.</td><td>On the hospital's server.</td><td class="note">Recordings and report files stay on the phone. Anonymising for the doctor: planned, not built.</td></tr>
   </table>
   <div class="src">Kerala's own home-visit form: <span class="unv">[unverified]</span> · Source: CARE_VS_SAHARA_FOR_TEAM.md "Same thing, different form or scale" and "Decisions"</div>
-  <div class="foot"><span>Sahara · internal team briefing · 27 Oct 2026</span><span>6 / 9</span></div>
+  <div class="foot"><span>Sahara · internal team briefing · 27 Oct 2026</span><span>6 / 11</span></div>
 </section>
 
 <!-- 7 What to say -->
@@ -217,7 +218,7 @@ tr:last-child td { border-bottom: none; }
   <div class="cols c2" style="grid-template-columns: 1fr 1.15fr; gap:26px;">
     <div class="card" style="background:var(--no-bg); border-color:transparent;">
       <h2>Do not say</h2>
-      <ul class="plain" style="font-size:19px;">
+      <ul class="plain" style="font-size:17px;">
         <li>"Sahara integrates / syncs with CARE." Nothing connects.</li>
         <li>"Sahara fills CARE's consent gap." Related, not the same.</li>
         <li>"CARE has a family app or login."</li>
@@ -225,6 +226,7 @@ tr:last-child td { border-bottom: none; }
         <li>"Sahara writes care plans into CARE."</li>
         <li>"A family yes is a verified clinical record."</li>
         <li>"Our diary is ESAS-r or IPOS" (official scales).</li>
+        <li>"Works fully offline." Signed-in data goes to our server.</li>
       </ul>
     </div>
     <div class="card mint">
@@ -236,8 +238,42 @@ tr:last-child td { border-bottom: none; }
       </ol>
     </div>
   </div>
-  <div class="src">Source: CARE_FAMILY_SIDE_FIT.md §6; CARE_VS_SAHARA_FOR_TEAM.md "What to say to judges in 3 lines". Line 2 assumes an export exists; today it does not (see next slide).</div>
-  <div class="foot"><span>Sahara · internal team briefing · 27 Oct 2026</span><span>7 / 9</span></div>
+  <div class="src">Source: CARE_FAMILY_SIDE_FIT.md §6; CARE_VS_SAHARA_FOR_TEAM.md "What to say to judges in 3 lines". Line 2 assumes an export exists; today it does not (see slide 10).</div>
+  <div class="foot"><span>Sahara · internal team briefing · 27 Oct 2026</span><span>7 / 11</span></div>
+</section>
+
+<!-- 8 What reading everything taught us -->
+<section class="slide">
+  <div class="kicker">New: we read all of it</div>
+  <h1>What reading everything taught us</h1>
+  <p class="muted small" style="margin:-8px 0 14px;">All 473 docs pages, 75 site pages, all 84 OHC GitHub repos (27 Oct). Read only; no CARE server run.</p>
+  <div class="cols c2" style="gap:18px 24px; font-size:18px;">
+    <div class="card blue" style="padding:14px 20px;"><h2 style="font-size:23px;">Can we pull CARE data? No.</h2>Each hospital's CARE needs a <b>staff login</b> or the patient's own <b>OTP</b>. Only code lists, the plugin list and SBOMs are free to use.</div>
+    <div class="card" style="padding:14px 20px;"><h2 style="font-size:23px;">Forms need a superuser</h2>Only the hospital's <b>superuser</b> can load or edit a <b>questionnaire</b>. A live form is frozen; it can only be retired. Name (slug) 5–25 letters.</div>
+    <div class="card mint" style="padding:14px 20px;"><h2 style="font-size:23px;">A relative can be let in</h2>Staff can give a relative <b>one-patient access</b> (custom role), and a reading can be marked "told by <b>related person</b>". Staff-made, not a family app.</div>
+    <div class="card peach" style="padding:14px 20px;"><h2 style="font-size:23px;">OHC pieces we can reuse</h2><code>cdci</code> (Indian drug + lab codes), <code>care_pressure_sore_fe</code> (body map), <code>care_zoom</code> (video visits), <code>care_im_wrapper</code> (WhatsApp links).</div>
+  </div>
+  <div class="card" style="margin-top:14px; padding:10px 20px; font-size:17px; background:var(--no-bg); border-color:transparent;"><b>Careful:</b> CARE's docs home says "FHIR-native"; its own reference pages say "FHIR-aligned, minimal subset". We keep saying "FHIR-aligned, no FHIR endpoint". Two OHC security issues go to OHC privately, not in slides.</div>
+  <div class="src">Source: handoff-2026-10-27/care-docs-crawl/findings-docs*.md, findings-site.md; ohc-repos/repos-r1..r4.md; CARE_DEEP_DIVE_2026-10-27.md</div>
+  <div class="foot"><span>Sahara · internal team briefing · 27 Oct 2026</span><span>8 / 11</span></div>
+</section>
+
+<!-- 9 Who already runs CARE -->
+<section class="slide">
+  <div class="kicker">New: pilot partners</div>
+  <h1>Who already runs CARE, and what they lack</h1>
+  <table style="font-size:17px;">
+    <colgroup><col style="width:22%"><col style="width:40%"><col></colgroup>
+    <tr><th>Who</th><th>What they are</th><th>Gap Sahara fills / first ask</th></tr>
+    <tr><td class="thing">Pallium India</td><td>Trivandrum. 16 home-care teams; 5,215 patients, 13,955 home visits (FY24-25). CARE live 5 Dec 2025.</td><td class="note">Visits ~2× a month, no family app. Ask: Bengaluru unit, 10–15 families, 8 weeks.</td></tr>
+    <tr><td class="thing">Arike</td><td>Kochi, 24/7 home care. 12,224 home-care visits (AR25). On CARE 3.0.</td><td class="note">Plans patient apps. Needs Malayalam.</td></tr>
+    <tr><td class="thing">IAPC / IAPC Kerala</td><td>National palliative body: courses, journal, IAPCON. No patients. care.iapckerala.in now forwards to Arike's CARE.</td><td class="note">A channel, not a site. Ask: IAPCON 2027 abstract; pilot via Arike.</td></tr>
+    <tr><td class="thing">Niram</td><td>Tumkur, Karnataka. Home care since Oct 2025. Own CARE, Kannada on.</td><td class="note">Names phone follow-up, ACP, bereavement as jobs. Needs Kannada.</td></tr>
+    <tr><td class="thing">Kerala grid</td><td>State grid on CARE, launched Mar 2025. OHC claims 330,000+ patients <span class="unv">[unverified]</span>. New government May 2026.</td><td class="note">PHC nurse visits monthly. Too big for a first pilot.</td></tr>
+  </table>
+  <div class="card gold" style="margin-top:12px; padding:10px 20px; font-size:18px;"><b>Why it matters:</b> every likely partner runs CARE, so connecting to CARE matters more. Warm intro: Dr Athul Joseph Manuel (OHC CMO, Pallium advisor).</div>
+  <div class="src">Source: handoff-2026-10-27/partners/pallium-india.md, arike.md, iapc.md, niram.md, kerala-government-grid.md</div>
+  <div class="foot"><span>Sahara · internal team briefing · 27 Oct 2026</span><span>9 / 11</span></div>
 </section>
 
 <!-- 8 To decide -->
@@ -248,16 +284,16 @@ tr:last-child td { border-bottom: none; }
     <colgroup><col style="width:21%"><col style="width:32%"><col style="width:15%"><col></colgroup>
     <tr><th>Option</th><th>What it means</th><th>Effort</th><th>Risk, in plain words</th></tr>
     <tr><td class="thing">A. Describe only <span class="chip yes" style="min-width:0; font-size:16px; margin-left:4px;">suggested</span></td><td>Deck slide 11 says: Sahara is the family side and can feed a hospital's CARE.</td><td>1–2 hours</td><td class="note">Low. Only words; we must say nothing is built.</td></tr>
-    <tr><td class="thing">A + B. Our forms in CARE</td><td>Our 3 forms as CARE Questionnaires (symptoms, pain areas, goals-of-care). Not loaded into CARE yet.</td><td>1–2 days</td><td class="note">CARE won't block a 14 on 0–10; no body picker; no CARE charts.</td></tr>
+    <tr><td class="thing">A + B. Our forms in CARE</td><td>Our 3 forms as CARE Questionnaires (symptoms, pain areas, goals-of-care). Not loaded into CARE yet.</td><td>1–2 days</td><td class="note">Only the hospital's CARE <b>superuser</b> can load forms. Name ≤25 letters. No body picker.</td></tr>
     <tr><td class="thing">A + C. Plugin</td><td>A small Lego piece inside CARE, e.g. a family-confirmation tab.</td><td>15–20 days <span class="unv">[guess]</span></td><td class="note">After 7 Nov, with a partner unit. A nurse accepts each family entry.</td></tr>
     <tr><td class="thing">D. Move onto CARE</td><td>Replace Sahara's backend with CARE.</td><td>Weeks</td><td class="note">Very high. A rewrite that throws away a working app. Not suggested.</td></tr>
   </table>
   <div class="cols c2" style="margin-top:16px; gap:20px; font-size:19px;">
-    <div class="card gold" style="padding:14px 20px;"><b>Questions for the team:</b> A, A+B or A+C? Who writes the slide 11 answer? Is there time for B after the video?</div>
+    <div class="card gold" style="padding:14px 20px;"><b>Build on CARE? No.</b> Connect next to it. <b>Questions:</b> A, A+B or A+C? Who writes the slide 11 answer?</div>
     <div class="card" style="padding:14px 20px;"><b>What we don't know:</b> whether judges reward building on CARE. No known judging rule mentions it. CARE is optional.</div>
   </div>
   <div class="src">Source: CARE_BRIEF_2026-10-27.md §4–5; CARE_DEEP_DIVE_2026-10-27.md; CARE_FAMILY_SIDE_FIT.md §5 (P1 export, P2 plugin, P3 pilot); HANDOFF.md items A17, H18. "Suggested" = the brief's view (moderate confidence), not a decision.</div>
-  <div class="foot"><span>Sahara · internal team briefing · 27 Oct 2026</span><span>8 / 9</span></div>
+  <div class="foot"><span>Sahara · internal team briefing · 27 Oct 2026</span><span>10 / 11</span></div>
 </section>
 
 <!-- 9 Sources -->
@@ -273,6 +309,7 @@ tr:last-child td { border-bottom: none; }
         <li>docs/research/CARE_BRIEF_2026-10-27.md (options, organiser email)</li>
         <li>HANDOFF.md, "27 Oct 2026 — open items"</li>
         <li>CLAUDE_TRANSCRIPT.md §2</li>
+        <li>docs/research/handoff-2026-10-27/ (crawl, repos, partners, landscape)</li>
         <li>Our app: android/app/src/main/java/in/wedevit/care/ at 7abf52e</li>
       </ul>
     </div>
@@ -285,11 +322,12 @@ tr:last-child td { border-bottom: none; }
         <li>docs.ohc.network/concepts/clinical/consent/</li>
         <li>docs.ohc.network/flows/clinical/consent/verify-a-consent/</li>
         <li>docs.ohc.network/deployments/palliative/playbooks/patient-enrollment</li>
+        <li>All docs.ohc.network pages + 84 github.com/ohcnetwork repos (handoff pack)</li>
       </ul>
     </div>
   </div>
-  <div class="card gold" style="margin-top:20px; font-size:19px;">We read CARE's code and docs (27 Oct). We did not run a CARE server. Everything marked <span class="unv">[unverified]</span> still needs checking.</div>
-  <div class="foot"><span>Sahara · internal team briefing · 27 Oct 2026</span><span>9 / 9</span></div>
+  <div class="card gold" style="margin-top:20px; font-size:19px;">We read all of CARE's docs, site and 84 repos, plus partner sites and papers (27 Oct). We did not run a CARE server. Everything marked <span class="unv">[unverified]</span> still needs checking.</div>
+  <div class="foot"><span>Sahara · internal team briefing · 27 Oct 2026</span><span>11 / 11</span></div>
 </section>
 
 </body>

@@ -1592,3 +1592,37 @@ I'm still holding off on writing to HANDOFF.md and everyday.md until you say so.
 
 FIND OUT ANYTHING ADN EVEYRHTING ABOUT INDIA AN DPALLIATIVE PRODUCTS OR WHATEVER ADD IN REPO ITSELF THE THOUGH PORCFESS TRASNCIPTION OF US TALKIGNN AND EVEYRHTING AND WHAT YOU FOUND OUT SO IT CAN BE EASILY HANDED OUT
 
+
+### Owner · 2026-10-27 (evening)
+
+eveyrhing to our repo in our itself
+
+### Claude
+
+Saved all five partner reports (Pallium India, IAPC/IAPC Kerala, Arike, Niram, Kerala grid) to `docs/research/handoff-2026-10-27/partners/`.
+
+- **Pallium:** 16 home-care teams; 5,215 patients and 13,955 home visits in FY24-25. CARE has been live since 5 Dec 2025. Families get visits about twice a month and have no family app. Best first ask: the Bengaluru Karnataka Mission, 10–15 families for 8 weeks.
+- **IAPC:** the national umbrella body for palliative care in India. It runs no patient care. care.iapckerala.in now forwards to Arike's CARE. The best caregiver check-in for Sahara is the 3-item Brief AMC-CBI from Kerala (PMID 42694816).
+
+### Owner
+
+update the CARE pdf with all the new findings and push · so shud we still build on top o care
+
+### Claude
+
+**Build on top of CARE: no, connect next to it** (high confidence). The new research strengthens this. Every likely pilot partner already runs CARE, so a family side that feeds CARE is worth more. Rebuilding Sahara on CARE still makes no sense:
+- Sahara would only work for hospitals that run CARE.
+- Only a hospital's CARE superuser can load our forms.
+- Family members can't add anything themselves.
+
+The deck went from 9 to 11 slides:
+- New slide 8, "What reading everything taught us":
+  - We can't pull CARE data.
+  - Forms need a superuser and a slug of 25 characters or fewer.
+  - A hospital can give a relative one-patient access.
+  - There are OHC repos we can reuse.
+  - CARE's docs say "FHIR-native", but its reference pages say "FHIR-aligned".
+- New slide 9, "Who already runs CARE": Pallium, Arike, IAPC, Niram and the Kerala grid, each with the gap Sahara fills and the first ask.
+- Slide 4: the "Works without internet" row was wrong, so it is replaced with "One record, any hospital".
+- Slide 7: added "Works fully offline" to the "do not say" list.
+- Slide 10 (the decision slide): states "Build on CARE? No" and the superuser limit on option A+B.
