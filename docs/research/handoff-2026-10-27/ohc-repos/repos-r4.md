@@ -1,0 +1,12 @@
+# r4 (15 repos) key points
+- cdci (code MIT; data CC BY 4.0 NRCeS + SNOMED CT Affiliate India-only + LOINC terms): static Indian drug codes (CDCI/SNOMED ~186k) + lab codes (CLCI 1,473 LOINC). data/source/GenericMaster.txt, BrandMaster.txt, SubstanceMaster.txt (TSV, 19 MB); morphine forms, fentanyl/tramadol/haloperidol/ondansetron (107 rows). HIGH: offline medicine picker for Sahara with attribution (DATA_LICENSE.md, NOTICE). No API, no permission needed.
+- care_zoom_be/fe (MIT): video appointments; endpoints staff / patient OTP (otp/appointments, JWTTokenPatientAuthentication + OTPAuthenticatedPermission, care_zoom/views.py ~236-259) / guest with per-appointment secret. Patient-portal "Video appointments" panel. Family teleconsult pattern; IMPLEMENTATION.md.
+- care_vision_prescription_fe (MIT pkg.json): custom question group template src/manifest.tsx registeredQuestionGroups (type, schema, validate, component, repeats, subjects).
+- care_spec (README MIT, no LICENSE → ask): FHIR R5 IG of CARE models; input/resources/*.json, input/pagecontent/mapping.md. Documentation only.
+- ccm_uhi (MIT): Beckn/UHI booking; ALL endpoints auth OFF; booking-ID lookup returns patient name/phone/DOB/address (POST /appointment/status/) → privacy issue to report to OHC; notifications to patients via curebay gateway (Celery) — design model.
+- careui (README MIT, no LICENSE): React/Tailwind components, registry https://careui.ohc.network/registry.json.
+- care_tools (no licence): Apps Script pulling OHC Metabase with credentials — internal.
+- care_super_batch_be (MIT): chained API calls (staff auth).
+- create-care-mfe-plug (MIT): scaffold CARE FE plugin.
+- NONE/LOW: care_serial_scanner_fe, care_system_diagnostics_fe, care_token_display(_fe), commission (AGPL — avoid).
+- No public data API in this lane.

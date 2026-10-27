@@ -1,0 +1,12 @@
+# r2 (15 repos) key points
+- care_fe (MIT): patient portal (OTP login, home, nearby facilities, self-book) src/Routers/PatientRouter.tsx, src/pages/PublicAppointments/; questionnaire engine src/components/Questionnaire/QuestionTypes/; locales ml/ta/kn/hi/mr public/locale/; plugin slots src/pluginTypes.ts. No-auth: /api/v1/otp/send/, /otp/login/, /otp/password_reset/*; patient OTP token: /api/v1/otp/patient/, /otp/slots/get_slots_for_day/, get_appointments/, create_appointment/, cancel_appointment/. Probably public: /api/v1/getallfacilities/ (confirm).
+- care_im_wrapper (MIT, upstream 8sami): WhatsApp Meta Cloud API — 15 patient notification triggers, inbound bot (phone + year of birth login; weak), expiring 256-bit document links (7-day TTL). docs/usage.md, documents.md, notification-triggers.md. Best family-channel design to borrow (not the weak login). care_im_wrapper_fe public document page.
+- care_filly (MIT): broker for commercial Medispeak scribe API (token-broker pattern; transcription not open).
+- care_excalidraw_fe (MIT): blank canvas drawings saved as meta_artifacts; no body template.
+- care_io_balance_fe (MIT): fluid intake/output LOINC catalogue (SCHEMA.md: 9187-6, 8999-5, 9000-1, 8974-8, 8975-5, 8952-4, 8953-2, 81661-1).
+- care_mcp (MIT, code on branch claude/care-mcp-plugin-m9ktd9): ~550 tools from OpenAPI via service account; needs hospital install + token.
+- care_notifications_be (MIT setup.py): patient SMS only for token bookings; staff in-app/web push.
+- care_experience_be (MIT): seeded demo facility sandbox (superuser).
+- care_filly_character (MIT pkg.json, OHC brand): mascot — ask before using likeness.
+- LOW: care_encounter_auto_close_be, care_fasterappointments_fe, care_hello(_fe ISC), care_multihost_files_be.
+- No bulk patient data without hospital permission (high confidence).

@@ -1,0 +1,84 @@
+.github	2025-03-26	Reimagining Pandemic Management
+analytics_plug	2025-12-31	Analytics
+branding	2025-12-05	
+care	2026-10-27	Care is a Digital Public Good enabling Decentralized Administration of Healthcare.
+care-abdm	2026-10-21	ABDM integration for Care as a plug
+care-ecs-tofu	2026-05-26	
+care-india-state-data	2026-07-15	Indian govt state and lsg data for CARE
+care-load-test	2026-07-29	Locust configuration for load testing care backend
+care-plugin-cookiecutter	2025-11-12	Cookiecutter template for OHC Care Plugins
+care-usage-tracker	2026-10-16	Static dashboard tracking CARE ecosystem adoption across public health platforms.
+care_101_vta_actions	2026-06-03	Repo for storing Care 101 course related VTA scripts/actions
+care_ai	2026-08-28	
+care_ai_be	2026-04-29	
+care_ai_vision_fe	2026-10-15	AI-powered CARE App (plugin) to extract and auto-fill patient registration details from scanned or photographed forms.
+care_ai_widgets_fe	2026-09-10	AI-powered clinical widgets for Care frontend — configurable, prompt-driven insights embedded in patient encounter views.
+care_analytics_fe	2026-05-06	care plugins for analytics dashboard
+care_analytics_sql	2026-10-26	SQL questions used in metabase dashboards
+care_api_backup	2025-12-01	
+care_apps_registry	2026-07-02	
+care_ask_fe	2026-07-08	
+care_be_plug_config_generator	2025-11-20	
+care_cash_management_fe	2026-05-06	
+care_clinic	2026-10-21	
+care_create	2026-09-21	Spin up a full local CARE stack in one command.
+care_demo_facility_setup	2026-08-31	This plug helps to setup a facility 
+care_demo_facility_setup_fe	2026-09-11	The frontend plug which helps setup a demo facility with required data from admin dashboard  
+care_dental_fe	2026-10-18	Dental chart (odontogram) question type for the CARE questionnaire — a frontend-only CARE plugin
+care_eka_scribe_fe	2026-10-18	EkaScribe plugin for care_fe, voice-to-form for the CARE EMR.
+care_encounter_auto_close_be	2026-08-22	
+care_excalidraw_fe	2026-10-03	A care plugin to support drawing using Excalidraw.
+care_experience_be	2026-10-12	
+care_fasterappointments_fe	2026-10-20	Faster CARE appointments: auto token and invoice, in-page payment, print invoice.
+care_fe	2026-10-27	Care is a Digital Public Good enabling accelerated healthcare delivery. 
+care_filly	2026-08-23	Backend plugin for care_filly_fe
+care_filly_character	2026-10-26	Filly, the CARE mascot: an expressive 3D character and interactive playground.
+care_hello	2024-09-30	Care backend plugin boilerplate
+care_hello_fe	2026-06-21	
+care_im_wrapper	2026-08-31	BE plugin for the Care IM Wrapper. The link to FE: https://github.com/8sami/care_im_wrapper_fe
+care_im_wrapper_fe	2026-10-22	Frontend plugin repo of the IM Wrapper Plugin
+care_io_balance_fe	2026-10-24	
+care_mcp	2026-10-06	
+care_multihost_files_be	2026-10-15	
+care_notifications_be	2026-07-06	Plug for CARE that sends SMS notifications to patients on booking
+care_notifications_fe	2026-10-18	A CARE frontend plugin that provides in-app notifications and web push notification support.
+care_odoo_be	2026-10-26	Plug for connecting Care with Odoo for accounting
+care_onboarding_fe	2026-10-17	A CARE frontend plugin for guided facility setup
+care_patient_geo_fe	2026-10-18	care_patient_geo_fe is a Care Frontend plugin for field and home-visit registration that attaches the patient’s current location to their address.
+care_people_be	2026-08-11	
+care_people_fe	2026-10-18	A CARE frontend plug that adds a facility-scoped People directory and the primary_facility patient extension
+care_pressure_sore_fe	2026-10-24	
+care_pretty_print_fe	2026-07-13	A Care plugin to support a number of printers
+care_report_templates	2026-05-06	
+care_sbom	2026-10-24	
+care_scaffold	2026-10-11	
+care_scanner_bridge	2026-03-02	WebSocket bridge for connecting serial barcode scanners to browsers lacking Web Serial API support.
+care_serial_scanner_fe	2026-06-12	Cross-platform barcode scanner integration for CARE with Web Serial and WebSocket bridge support.
+care_spec	2025-11-18	
+care_super_batch_be	2026-05-20	
+care_system_diagnostics_fe	2026-06-30	Diagnostic tool for CARE to validate resources, plugins, connectivity, generate printable analysis reports and more.
+care_token_display	2026-09-17	Care plugin for rendering token display pages with automatic refresh.
+care_token_display_fe	2026-10-23	MFE to manage service points and service account associated to a token display
+care_tools	2026-03-24	
+care_vision_prescription_fe	2026-10-18	Adds support for Vision Prescription as a structured question into Care as a MFE plug.
+care_zoom_be	2026-10-11	
+care_zoom_fe	2026-10-13	
+careui	2026-10-26	
+ccm_uhi	2026-06-02	
+cdci	2026-10-18	
+commission	2025-12-29	Odoo Commission Management
+create-care-mfe-plug	2025-11-21	CLI tool to scaffold Care MFE plugins quickly and easily.
+deployments_registry	2026-02-25	All Care Deployments
+docs	2026-09-24	
+erd	2025-10-03	
+landing	2026-10-26	The landing page for Open Healthcare Network
+leaderboard	2026-10-21	Leaderboard collects data from various data scrapers and show off the work of our open source contributors!
+leaderboard-data	2026-10-27	Flat data and configuration repository for Open Healthcare Network's leaderboard deployment
+leaderboard-github-plugin	2026-08-28	Leaderboard scraper to track activities of a github organization. 
+leaderboard-slack-plugin	2026-08-28	Leaderboard scraper to track EOD messages from a slack channel
+legacy-docs	2026-02-07	
+odoo_connector	2026-10-18	Hospital Management
+open-healthcare-terminology-server	2026-10-07	OHTS - Lightweight terminology that can support multiple usecases. 
+parayu_ohc	2026-04-17	
+python-magic-bin	2026-04-02	
+skills	2026-09-11	

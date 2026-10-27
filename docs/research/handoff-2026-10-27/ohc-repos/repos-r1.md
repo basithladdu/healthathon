@@ -1,0 +1,11 @@
+# r1 (13 repos) key points
+- care_dental_fe (MIT file): odontogram question type, frontend-only, sub_results rows; best template for a pain body-map question (src/manifest.tsx registeredQuestionGroups, SCHEMA.md, src/lib/{group,markers,validate}.ts, ~2.4k lines with tests).
+- care_api_backup (MIT): Bruno collection, 216 CARE v1 API URLs; patient OTP flow /api/v1/otp/send/ → /otp/login/ → patient JWT (patient_login) → /otp/patient/, /otp/slots/*. Two auth:none requests: facility/{id}/schedulable_users/, get_users/{id}/. HYGIENE: committed demo usernames/passwords (incl. care-api.do.ohc.network) and expired 2024 patient JWTs with a real-looking phone number — tell OHC, don't copy.
+- care_analytics_sql (NO licence): Metabase SQL tagged _kc/_pallium/_ssmm — palliative metrics (mobility status by district, comfort-device referrals, Pallium medication dispense/returns). Reference only.
+- care_eka_scribe_fe (MIT): voice→form via paid Eka Care SDK (@eka-care/ekascribe-ts-sdk 3.0.36), token baked at build time — issue tokens server-side instead.
+- care_clinic (MIT): offline single-machine CARE (Docker, backups, LAN, Tailscale home access); USE_SMS=False by default.
+- care_create (MIT pkg): npx @ohcn/care create local stack; ABDM plugins from 10bedicu/care_abdm(_fe).
+- care_demo_facility_setup (MIT): seed packs (patients, users, questionnaires) + sample forms — synthetic test data and CARE questionnaire JSON shape.
+- care_apps_registry (MIT pkg): public index.json of 17 plugins (care-kutumba, livekit, scribe, abdm, doctor-connect…).
+- care_ask_fe (ISC pkg): sends patient context to OpenAI from browser with user key — avoid.
+- LOW/NONE: care_analytics_fe, care_be_plug_config_generator, care_cash_management_fe, care_demo_facility_setup_fe.

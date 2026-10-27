@@ -1,0 +1,12 @@
+# r3 (12 repos) key points
+- care_pressure_sore_fe (MIT): front/back body-map SVGs, 40 regions + wound schema (region, LxW cm, exudate, tissue, note). REUSE: public/images/pressure-sore-anterior.svg, -posterior.svg, src/lib/bodyPaths.json, SCHEMA.md, src/lib/group.ts. No persistent wound ID.
+- care_scaffold (no licence): skills/care-auth-contexts/SKILL.md documents staff JWT (care_access_token) vs patient OTP (care_patient_token, type patient_login); patient plugin routes under otp/, filtered by phone, read-mostly; self-booking only is_public schedules + facility mapped to district.
+- care_patient_geo_fe (MIT pkg.json): "Get current location" → appends Google Maps https link to address text (src/lib/geo.ts); home-visit pattern.
+- care_notifications_fe (MIT pkg.json): staff in-app + web push; events bookings/report ready/service request/med expiry/low stock; needs staff JWT. No patient SMS here.
+- care_onboarding_fe (MIT): data_source/ questionnaire_fixtures.json, template_fixtures.json, states-and-districts.json, activity definitions — CARE questionnaire JSON format examples.
+- care_report_templates (NO licence): Jinja A4 discharge/treatment/medication summaries, certificates.
+- care_pretty_print_fe (MIT): patient ID card with QR.
+- care_sbom (MIT): public SBOM JSON https://sbom.ohc.network/care/sbom.json (no auth).
+- Open endpoints only health/ping (care_odoo ping, care_people_be health). All data endpoints staff JWT.
+- Licence gaps: report_templates, scaffold none; notifications_fe/patient_geo_fe MIT only in package.json; people_fe MIT vs ISC conflict.
+- LOW/NONE: care_odoo_be, care_people_be/fe (pattern), care_scanner_bridge.
