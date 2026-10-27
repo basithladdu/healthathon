@@ -215,7 +215,7 @@ private fun clipboardText(context: android.content.Context): String? = (context.
             throw IllegalArgumentException(careAuthMessage(e.message, hindi), e)
         }
     }
-    fun day(ms: Long) = java.time.Instant.ofEpochMilli(ms).atZone(java.time.ZoneId.systemDefault()).format(careDateFormat("d MMM", hindi))
+    fun day(ms: Long) = java.time.Instant.ofEpochMilli(ms).atZone(java.time.ZoneId.systemDefault()).format(careDateFormat(CARE_SHORT_DATE, hindi))
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(horizontal = 22.dp).padding(bottom = 30.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
             Heading(heading ?: if (session == null) if (create) t("Create an account", "खाता बनाएँ") else t("Sign in", "साइन इन करें") else t("Your account", "आपका खाता"), 28)
             banner?.let { Surface(color = Mint, shape = RoundedCornerShape(14.dp)) { Text(it, Modifier.fillMaxWidth().padding(14.dp), fontWeight = FontWeight.Medium) } }
@@ -228,7 +228,7 @@ private fun clipboardText(context: android.content.Context): String? = (context.
                     if (create) when (cloud.signUp(email, password)) {
                         CareSignUp.SIGNED_IN -> password = ""
                         CareSignUp.CONFIRMATION_SENT -> { awaitingConfirmation = email.trim(); create = false; password = ""; notice = t("Account created. The server was asked to email a confirmation link to ${email.trim()}. Open that link on this phone, then sign in here. Check spam too. If nothing arrives in 10 minutes, tap Resend confirmation email; if it still doesn't come, Sahara's email setup isn't finished yet. Write to workwithdevit@gmail.com.", "खाता बन गया। सर्वर से ${email.trim()} पर पुष्टि का लिंक भेजने को कहा गया है। वह लिंक इसी फ़ोन पर खोलें, फिर यहाँ साइन इन करें। स्पैम में भी देखें। 10 मिनट में ईमेल न आए तो “पुष्टि ईमेल फिर भेजें” दबाएँ; फिर भी न आए तो Sahara की ईमेल सेवा अभी पूरी चालू नहीं है। workwithdevit@gmail.com पर लिखें।") }
-                        CareSignUp.ALREADY_REGISTERED -> { create = false; password = ""; error = careAuthMessage("already registered", hindi) }
+                        CareSignUp.ALREADY_REGISTERED -> { create = false; password = ""; error = careAuthMessage(CARE_ALREADY_REGISTERED, hindi) }
                     }
                     else { cloud.signIn(email, password); awaitingConfirmation = "" }
                 } }, enabled = !busy && email.contains('@') && password.isNotEmpty(), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Text(if (busy) t("Please wait…", "कृपया रुकें…") else if (create) t("Create account", "खाता बनाएँ") else t("Sign in", "साइन इन करें")) }
