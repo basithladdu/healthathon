@@ -84,7 +84,12 @@ object CareEntryCodec {
     } ?: if (SymptomNoteCodec.isStructured(detail)) SymptomNoteCodec.readable(detail) else if (isStructured(detail)) "This entry needs a newer app to open." else detail
 }
 
-fun CareEntry.statusLabel() = when (status) {
+fun CareEntry.statusLabel(hindi: Boolean = false) = if (hindi) when (status) {
+    "accepted" -> if (type == "conversation") "लिया गया" else "स्वीकार"
+    "completed" -> "पूरा हुआ"
+    "cancelled" -> "रद्द"
+    else -> if (type == "conversation") "अनुरोध भेजा" else "करना है"
+} else when (status) {
     "accepted" -> if (type == "conversation") "Picked up" else "Accepted"
     "completed" -> "Completed"
     "cancelled" -> "Cancelled"
@@ -166,7 +171,7 @@ object CareLabRules {
     }
 }
 
-@Composable fun CareWorkflows(vm: CareModel, onTalk: () -> Unit = {}) {
+@Composable fun CareWorkflows(vm: CareModel, onTalk: () -> Unit = {}) { val t = careText();
     val entries by vm.items.collectAsStateWithLifecycle()
     val person by vm.selected.collectAsStateWithLifecycle()
     val canEdit by vm.canEdit.collectAsStateWithLifecycle()
@@ -178,20 +183,20 @@ object CareLabRules {
     val visible = workflows.filter { (_, data) -> (filter == "All" || data.type == if (filter == "Tasks") "task" else "conversation") && (showFinished || data.status !in setOf("completed", "cancelled")) }
         .sortedWith(compareBy<Pair<CareItem, CareEntry>> { it.second.status in setOf("completed", "cancelled") }.thenBy { it.first.due.takeIf { due -> due > 0 } ?: Long.MAX_VALUE }.thenByDescending { it.first.created })
     LazyColumn(Modifier.fillMaxSize().testTag("workflow-list"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { Heading(if (role == "Doctor") "Care queue" else "Care team"); Spacer(Modifier.weight(1f)); if (vm.cloud != null) IconButton(onClick = vm::refresh) { Icon(Icons.Default.Refresh, "Refresh care team") } } }
+        item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { Heading(if (role == "Doctor") t("Care queue", "देखभाल की सूची") else t("Care team", "देखभाल टीम")); Spacer(Modifier.weight(1f)); if (vm.cloud != null) IconButton(onClick = vm::refresh) { Icon(Icons.Default.Refresh, t("Refresh care team", "देखभाल टीम ताज़ा करें")) } } }
         if (canEdit) item { Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            FilledTonalButton(onClick = { adding = "conversation" }, modifier = Modifier.weight(1f), colors = ButtonDefaults.filledTonalButtonColors(containerColor = Gold)) { Icon(Icons.Default.Forum, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Ask to talk") }
-            OutlinedButton(onClick = { adding = "task" }, modifier = Modifier.weight(1f)) { Icon(Icons.Default.AddTask, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Add task") }
+            FilledTonalButton(onClick = { adding = "conversation" }, modifier = Modifier.weight(1f), colors = ButtonDefaults.filledTonalButtonColors(containerColor = Gold)) { Icon(Icons.Default.Forum, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Ask to talk", "बात करने को कहें")) }
+            OutlinedButton(onClick = { adding = "task" }, modifier = Modifier.weight(1f)) { Icon(Icons.Default.AddTask, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Add task", "काम जोड़ें")) }
         } }
-        item { Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf("All", "Conversations", "Tasks").forEach { label -> FilterChip(filter == label, { filter = label }, label = { Text(label) }) } } }
-        item { FilterChip(showFinished, { showFinished = !showFinished }, label = { Text("Include finished") }, leadingIcon = { Icon(Icons.Default.CheckCircleOutline, null, Modifier.size(18.dp)) }) }
-        if (visible.isEmpty()) item { SurfaceCard { Text(if (showFinished) "No matching requests or tasks" else "Nothing waiting here", fontWeight = FontWeight.SemiBold); if (canEdit) TextButton(onClick = { adding = if (filter == "Tasks") "task" else "conversation" }) { Text(if (filter == "Tasks") "Add a task" else "Ask for a conversation") } } }
+        item { Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf("All", "Conversations", "Tasks").forEach { label -> FilterChip(filter == label, { filter = label }, label = { Text(when (label) { "Conversations" -> t("Conversations", "बातचीत"); "Tasks" -> t("Tasks", "काम"); else -> t("All", "सभी") }) }) } } }
+        item { FilterChip(showFinished, { showFinished = !showFinished }, label = { Text(t("Include finished", "पूरे हुए भी दिखाएँ")) }, leadingIcon = { Icon(Icons.Default.CheckCircleOutline, null, Modifier.size(18.dp)) }) }
+        if (visible.isEmpty()) item { SurfaceCard { Text(if (showFinished) t("No matching requests or tasks", "कोई अनुरोध या काम नहीं मिला") else t("Nothing waiting here", "यहाँ कुछ बाक़ी नहीं"), fontWeight = FontWeight.SemiBold); if (canEdit) TextButton(onClick = { adding = if (filter == "Tasks") "task" else "conversation" }) { Text(if (filter == "Tasks") t("Add a task", "काम जोड़ें") else t("Ask for a conversation", "बातचीत के लिए कहें")) } } }
         items(visible, key = { it.first.id }) { (item, data) -> WorkflowCard(vm, item, data, onTalk) }
     }
     if (adding.isNotEmpty()) CareWorkflowEditor(vm, adding) { adding = "" }
 }
 
-@Composable fun WorkflowCard(vm: CareModel, item: CareItem, entry: CareEntry? = CareEntryCodec.decode(item.detail), onTalk: () -> Unit = {}) {
+@Composable fun WorkflowCard(vm: CareModel, item: CareItem, entry: CareEntry? = CareEntryCodec.decode(item.detail), onTalk: () -> Unit = {}) { val t = careText();
     val data = entry ?: return
     val canEdit by vm.canEdit.collectAsStateWithLifecycle()
     val busy by vm.busy.collectAsStateWithLifecycle()
@@ -205,20 +210,20 @@ object CareLabRules {
             Icon(if (data.type == "conversation") Icons.Default.Forum else Icons.Default.Assignment, null, tint = Rust)
             Spacer(Modifier.width(10.dp)); Text(item.title, fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f), fontFamily = SaharaTitleFont)
         }
-        Text("${data.statusLabel()} · For ${data.assignee}", color = Rust, style = MaterialTheme.typography.labelLarge)
-        if (data.sender.isNotBlank()) Text("From ${data.sender}", style = MaterialTheme.typography.bodySmall)
-        if (item.due > 0) Text("${if (data.type == "conversation") "Preferred" else "Due"} ${date(item.due)}", style = MaterialTheme.typography.bodySmall)
+        Text(data.statusLabel(careHindi()) + " · " + t("For ${data.assignee}", "${data.assignee} के लिए"), color = Rust, style = MaterialTheme.typography.labelLarge)
+        if (data.sender.isNotBlank()) Text(t("From ${data.sender}", "भेजने वाले: ${data.sender}"), style = MaterialTheme.typography.bodySmall)
+        if (item.due > 0) Text(if (data.type == "conversation") t("Preferred ${date(item.due)}", "पसंद की तारीख़ ${date(item.due)}") else t("Due ${date(item.due)}", "आख़िरी तारीख़ ${date(item.due)}"), style = MaterialTheme.typography.bodySmall)
         if (data.detail.isNotBlank()) Text(data.detail, modifier = Modifier.padding(top = 8.dp))
-        if (data.acceptedBy.isNotBlank()) Text("Picked up by ${data.acceptedBy} · ${date(data.acceptedAt)}", style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 8.dp))
-        if (data.completedBy.isNotBlank()) Text("Completed by ${data.completedBy} · ${date(data.completedAt)}", style = MaterialTheme.typography.bodySmall)
+        if (data.acceptedBy.isNotBlank()) Text(t("Picked up by ${data.acceptedBy} · ${date(data.acceptedAt)}", "${data.acceptedBy} ने लिया · ${date(data.acceptedAt)}"), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 8.dp))
+        if (data.completedBy.isNotBlank()) Text(t("Completed by ${data.completedBy} · ${date(data.completedAt)}", "${data.completedBy} ने पूरा किया · ${date(data.completedAt)}"), style = MaterialTheme.typography.bodySmall)
         if (canEdit) FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            if (data.status == "open") TextButton(onClick = { editing = true }, enabled = !busy) { Text("Edit") }
-            TextButton(onClick = { action = if (active) "cancelled" else "open" }, enabled = !busy) { Text(if (active) "Cancel" else "Reopen") }
-            TextButton(onClick = { action = "remove" }, enabled = !busy) { Text("Remove") }
+            if (data.status == "open") TextButton(onClick = { editing = true }, enabled = !busy) { Text(t("Edit", "बदलें")) }
+            TextButton(onClick = { action = if (active) "cancelled" else "open" }, enabled = !busy) { Text(if (active) t("Cancel", "रद्द करें") else t("Reopen", "फिर खोलें")) }
+            TextButton(onClick = { action = "remove" }, enabled = !busy) { Text(t("Remove", "हटाएँ")) }
         }
         if (canEdit && active && (data.type != "conversation" || role == "Doctor")) Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-            if (data.type == "conversation" && data.status == "accepted") TextButton(onClick = onTalk, enabled = !busy) { Text("Open conversation") }
-            TextButton(onClick = { action = if (data.status == "open") "accepted" else "completed" }, enabled = !busy) { Icon(if (data.status == "open") Icons.Default.PersonAdd else Icons.Default.DoneAll, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(if (data.status == "open") "Pick up" else if (data.type == "conversation") "Conversation done" else "Mark done") }
+            if (data.type == "conversation" && data.status == "accepted") TextButton(onClick = onTalk, enabled = !busy) { Text(t("Open conversation", "बातचीत खोलें")) }
+            TextButton(onClick = { action = if (data.status == "open") "accepted" else "completed" }, enabled = !busy) { Icon(if (data.status == "open") Icons.Default.PersonAdd else Icons.Default.DoneAll, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(if (data.status == "open") t("Pick up", "यह मैं लूँगा/लूँगी") else if (data.type == "conversation") t("Conversation done", "बातचीत हो गई") else t("Mark done", "हो गया")) }
         }
     }
     if (editing) CareWorkflowEditor(vm, data.type, item, data) { editing = false }
@@ -226,24 +231,24 @@ object CareLabRules {
         var actor by remember(action) { mutableStateOf(if (action == "completed") data.acceptedBy else "") }
         var error by remember(action) { mutableStateOf("") }
         val savingError by vm.actionError.collectAsStateWithLifecycle()
-        AlertDialog(onDismissRequest = { if (!busy) action = "" }, title = { Text(when (action) { "accepted" -> "Pick up this ${if (data.type == "conversation") "conversation" else "task"}?"; "completed" -> "Mark completed?"; "cancelled" -> "Cancel this entry?"; "remove" -> "Remove this entry?"; else -> "Reopen this entry?" }) }, text = { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        AlertDialog(onDismissRequest = { if (!busy) action = "" }, title = { Text(when (action) { "accepted" -> if (data.type == "conversation") t("Pick up this conversation?", "यह बातचीत आप लेंगे?") else t("Pick up this task?", "यह काम आप लेंगे?"); "completed" -> t("Mark completed?", "पूरा हुआ मानें?"); "cancelled" -> t("Cancel this entry?", "इसे रद्द करें?"); "remove" -> t("Remove this entry?", "इसे हटाएँ?"); else -> t("Reopen this entry?", "इसे फिर खोलें?") }) }, text = { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(item.title)
-            if (action !in setOf("remove", "cancelled", "open")) OutlinedTextField(actor, { actor = it; error = "" }, label = { Text("Your name") }, singleLine = true)
-            if (action == "accepted") Text("Names are self-entered and visible to this care circle.", style = MaterialTheme.typography.bodySmall)
+            if (action !in setOf("remove", "cancelled", "open")) OutlinedTextField(actor, { actor = it; error = "" }, label = { Text(t("Your name", "आपका नाम")) }, singleLine = true)
+            if (action == "accepted") Text(t("Names are self-entered and visible to this care circle.", "नाम लोग ख़ुद लिखते हैं और इस देखभाल समूह को दिखते हैं।"), style = MaterialTheme.typography.bodySmall)
             (error.ifBlank { savingError.orEmpty() }).takeIf(String::isNotBlank)?.let { Text(it, color = MaterialTheme.colorScheme.error) }
         } }, confirmButton = { TextButton(enabled = !busy, onClick = {
-            if (!canEditCareContext(vm, item.personId, capturedAccount)) { error = "Care access changed. Reopen this person's records." }
+            if (!canEditCareContext(vm, item.personId, capturedAccount)) { error = t("Care access changed. Reopen this person's records.", "देखभाल की अनुमति बदल गई है। इस व्यक्ति के रिकॉर्ड फिर खोलें।") }
             else if (action == "remove") { vm.remove(item); action = "" }
             else runCatching {
                 val name = if (action in setOf("accepted", "completed")) actor else actor.ifBlank { vm.cloud?.session?.value?.email.orEmpty().ifBlank { role } }
                 val changed = CareWorkflowRules.transition(data, action, name)
                 vm.updateItem(item.copy(detail = CareEntryCodec.encode(changed), doneOn = if (action == "completed") LocalDate.now().toString() else "")) { action = "" }
             }.onFailure { error = it.message.orEmpty() }
-        }, modifier = Modifier.testTag("workflow-confirm-action")) { Text(if (busy) "Saving…" else when (action) { "accepted" -> "Pick up"; "completed" -> "Mark done"; "cancelled" -> "Cancel entry"; "remove" -> "Remove"; else -> "Reopen" }) } }, dismissButton = { TextButton(onClick = { action = "" }, enabled = !busy) { Text("Back") } })
+        }, modifier = Modifier.testTag("workflow-confirm-action")) { Text(if (busy) t("Saving…", "सहेज रहे हैं…") else when (action) { "accepted" -> t("Pick up", "यह मैं लूँगा/लूँगी"); "completed" -> t("Mark done", "हो गया"); "cancelled" -> t("Cancel entry", "रद्द करें"); "remove" -> t("Remove", "हटाएँ"); else -> t("Reopen", "फिर खोलें") }) } }, dismissButton = { TextButton(onClick = { action = "" }, enabled = !busy) { Text(t("Back", "वापस")) } })
     }
 }
 
-@Composable private fun CareWorkflowEditor(vm: CareModel, type: String, initial: CareItem? = null, existing: CareEntry? = null, onDismiss: () -> Unit) {
+@Composable private fun CareWorkflowEditor(vm: CareModel, type: String, initial: CareItem? = null, existing: CareEntry? = null, onDismiss: () -> Unit) { val t = careText();
     val person by vm.selected.collectAsStateWithLifecycle()
     val busy by vm.busy.collectAsStateWithLifecycle()
     val canEdit by vm.canEdit.collectAsStateWithLifecycle()
@@ -261,27 +266,27 @@ object CareLabRules {
     LaunchedEffect(person) { if (person != capturedPerson) onDismiss() }
     ModalBottomSheet(onDismissRequest = { if (!busy) onDismiss() }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(start = 20.dp, end = 20.dp, bottom = 28.dp).testTag("workflow-editor"), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Heading(if (initial != null) "Edit ${if (type == "conversation") "request" else "task"}" else if (type == "conversation") "Ask to talk" else "Ask for help", 26)
-            OutlinedTextField(title, { title = it; error = "" }, label = { Text(if (type == "conversation") "What would you like to discuss?" else "What needs doing?") }, modifier = Modifier.fillMaxWidth(), maxLines = 3)
+            Heading(if (initial != null) (if (type == "conversation") t("Edit request", "अनुरोध बदलें") else t("Edit task", "काम बदलें")) else if (type == "conversation") t("Ask to talk", "बात करने को कहें") else t("Ask for help", "मदद माँगें"), 26)
+            OutlinedTextField(title, { title = it; error = "" }, label = { Text(if (type == "conversation") t("What would you like to discuss?", "आप किस बारे में बात करना चाहते हैं?") else t("What needs doing?", "क्या करना है?")) }, modifier = Modifier.fillMaxWidth(), maxLines = 3)
             if (title.isEmpty()) Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                (if (type == "conversation") listOf("Goals of care", "Comfort and symptoms", "Care at home") else listOf("Collect medicines", "Arrange transport", "Bring reports")).forEach { suggestion -> SuggestionChip(onClick = { title = suggestion }, label = { Text(suggestion) }) }
+                (if (type == "conversation") listOf(t("Goals of care", "देखभाल के लक्ष्य"), t("Comfort and symptoms", "आराम और लक्षण"), t("Care at home", "घर पर देखभाल")) else listOf(t("Collect medicines", "दवाएँ लाना"), t("Arrange transport", "आने-जाने का इंतज़ाम"), t("Bring reports", "रिपोर्टें साथ लाना"))).forEach { suggestion -> SuggestionChip(onClick = { title = suggestion }, label = { Text(suggestion) }) }
             }
-            OutlinedTextField(recipient, { recipient = it; error = "" }, label = { Text(if (type == "conversation") "Doctor or care team" else "Who is this for?") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
+            OutlinedTextField(recipient, { recipient = it; error = "" }, label = { Text(if (type == "conversation") t("Doctor or care team", "डॉक्टर या देखभाल टीम") else t("Who is this for?", "यह किसके लिए है?")) }, modifier = Modifier.fillMaxWidth(), singleLine = true)
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                CareDateButton(due, if (type == "conversation") "Preferred date" else "Due date", { due = it }, allowClear = true)
-                OutlinedTextField(detail, { detail = it }, label = { Text("Details (optional)") }, modifier = Modifier.fillMaxWidth(), maxLines = 4)
+                CareDateButton(due, if (type == "conversation") t("Preferred date", "पसंद की तारीख़") else t("Due date", "आख़िरी तारीख़"), { due = it }, allowClear = true)
+                OutlinedTextField(detail, { detail = it }, label = { Text(t("Details (optional)", "जानकारी (चाहें तो)")) }, modifier = Modifier.fillMaxWidth(), maxLines = 4)
             }
             (error.ifBlank { saveError.orEmpty() }).takeIf(String::isNotBlank)?.let { Text(it, color = MaterialTheme.colorScheme.error) }
             Button(onClick = {
                 runCatching {
-                    require(canEditCareContext(vm, capturedPerson, capturedAccount)) { "Choose the right person before saving." }
+                    require(canEditCareContext(vm, capturedPerson, capturedAccount)) { t("Choose the right person before saving.", "सहेजने से पहले सही व्यक्ति चुनें।") }
                     val payload = (existing ?: CareEntry(type, sender = vm.cloud?.session?.value?.email.orEmpty().ifBlank { role })).copy(assignee = recipient.trim(), detail = detail.trim())
                     CareWorkflowRules.validate(title, payload)
                     val encoded = CareEntryCodec.encode(payload)
                     if (initial == null) vm.saveItem("task", title, encoded, due, done = onDismiss, id = entryId)
                     else vm.updateItem(initial.copy(title = title, detail = encoded, due = due), onDismiss)
                 }.onFailure { error = it.message.orEmpty() }
-            }, enabled = !busy && canEdit && title.isNotBlank() && recipient.isNotBlank(), modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp).testTag("workflow-save"), shape = RoundedCornerShape(14.dp)) { Text(if (busy) "Saving…" else if (initial != null) "Save changes" else if (type == "conversation") "Send request" else "Add task") }
+            }, enabled = !busy && canEdit && title.isNotBlank() && recipient.isNotBlank(), modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp).testTag("workflow-save"), shape = RoundedCornerShape(14.dp)) { Text(if (busy) t("Saving…", "सहेज रहे हैं…") else if (initial != null) t("Save changes", "बदलाव सहेजें") else if (type == "conversation") t("Send request", "अनुरोध भेजें") else t("Add task", "काम जोड़ें")) }
         }
     }
 }
