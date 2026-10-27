@@ -12,6 +12,25 @@ function mocked(t,fetcher){const f=globalThis.fetch,d=globalThis.Deno;globalThis
 test('both exact schemas validate; choices include all36 states',()=>{assert.ok(validateFeedback(app).value);assert.ok(validateFeedback(hospital).value);assert.equal(INDIA_STATES.length,36);});
 test('app bounds exact properties consent honeypot and role are enforced',()=>{for(const extra of [{rating:0},{rating:1.5},{rating:6},{role:'verified_doctor'},{category:'clinical'},{consent:false},{website:'spam'},{message:'x'.repeat(1001)},{patientId:'private'},{submissionId:'notuuid'}]) assert.ok(validateFeedback({...app,...extra}).error);});
 test('professional and facility conditional fields enforce survey branches',()=>{for(const extra of [{fullName:''},{registrationNumber:'bad @'},{registrationState:''},{council:'nmc'},{roleOther:''},{institutionOther:''},{connectionOther:''},{state:'Unknown'},{latitude:99},{longitude:NaN},{accuracy:false}])assert.ok(validateFeedback({...hospital,...extra}).error);assert.ok(validateFeedback({...hospital,council:'nmc',councilOther:'',registrationState:''}).value);});
+test('all Other descriptions require meaningful text and survive normalization without leaking into changed choices',()=>{
+  const branches=[['role','roleOther','nurse'],['council','councilOther','state_medical'],['institutionType','institutionOther','private_hospital'],['connection','connectionOther','works_here']];
+  const descriptions={roleOther:'  Community health educator  ',councilOther:'  Synthetic allied health council  ',institutionOther:'  Community care centre  ',connectionOther:'  I volunteer with the home-care team  '};
+  for(const [selected,detail,replacement] of branches){
+    for(const invalid of ['', '   ', 'x', ' x ']){
+      const result=validateFeedback({...hospitalV3,[detail]:invalid});
+      assert.equal(result.error,'Complete the Other details only where selected.',`${detail} rejects ${JSON.stringify(invalid)}`);
+      assert.equal(result.value,undefined);
+    }
+    assert.equal(validateFeedback({...hospitalV3,[selected]:replacement}).error,'Complete the Other details only where selected.',`${detail} cannot survive a different selection`);
+    const cleared=validateFeedback({...hospitalV3,[selected]:replacement,[detail]:''});
+    assert.ok(cleared.value,`${detail} may be cleared after changing the selection`);
+    assert.equal(cleared.value[detail],'');
+  }
+  const accepted=validateFeedback({...hospitalV3,...descriptions});
+  assert.ok(accepted.value);
+  for(const [detail,description] of Object.entries(descriptions))assert.equal(accepted.value[detail],description.trim(),detail);
+  assert.deepEqual(validateFeedback(JSON.parse(JSON.stringify(accepted.value))).value,accepted.value);
+});
 test('services exclusive and morphine supply optional but conditional',()=>{for(const extra of [{services:[]},{services:['none','opd']},{services:['unknown','home']},{services:['opd','opd']},{services:['inferred']},{morphine:'no',supply:'regular'}])assert.ok(validateFeedback({...hospital,...extra}).error);assert.ok(validateFeedback({...hospital,morphine:'no',supply:''}).value);assert.ok(validateFeedback({...hospital,services:['home','ipd','opd']}).value);});
 test('normalization deterministic without accepting hidden fields',()=>{const a=validateFeedback({...app,message:'  sample  '}).value;assert.equal(a.message,'sample');assert.deepEqual(validateFeedback({...hospital,services:['opd','home']}).value.services,['home','opd']);assert.ok(validateFeedback({...hospital,verified:true}).error);});
 test('legacy hospital payload retains exact content and no synthesized contact keys',()=>{const value=validateFeedback(hospital).value;assert.deepEqual(value,hospital);assert.equal(JSON.stringify(value),JSON.stringify(hospital));assert.equal('mobile' in value,false);assert.equal('email' in value,false);assert.deepEqual(validateFeedback(app).value,app);});

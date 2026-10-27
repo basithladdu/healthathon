@@ -1,6 +1,14 @@
 # Sahara team handoff
 
-This is the starting point for another developer or Codex chat. Read the latest 24 October checkpoint first; older dated verification and release snapshots remain historical.
+This is the starting point for another developer or Codex chat. Read the latest dated checkpoint first and the current Android `HANDOFF.md` / `AI_HANDOFF.md`; older verification and release snapshots remain historical.
+
+## 27 October: survey Other details clarified and deployed
+
+- The user clarified that respondents need to specify what they mean after choosing Other; the earlier suggestion to replace dropdowns was superseded. Existing Other fields were present in production. The web fix makes all four branches explicit with "Other (please specify)", a directly attached detail box, automatic focus and contextual placeholders.
+- Role, registering council, institution type and hospital connection retain typed answers across selection changes and Back/Continue. Blank, whitespace-only or one-character descriptions are caught before advancing, matching the existing server requirement of 2-120 trimmed characters. Registration eligibility, backend schema and stored survey records are unchanged.
+- Scoped ESLint and all 20 feedback API tests passed. Live Chrome checks at 390x844 and 1440x1000 verified all four fields, focus, invalid input recovery, selection/step draft retention and no horizontal overflow. Review and trimmed payload coverage, failed-send recovery and stable retry IDs passed with intercepted synthetic responses; no real database write occurred. Unsent survey drafts are still not persisted after reload.
+- Vercel production deployment `dpl_3ZjtZF3LD5ZijCkN23yGLJ6dzk3E` reached READY and was promoted to the existing project. The new controls were verified on https://sahara.wedevit.in/hospital-survery. The `/hospital-survey` alias remains available. Browser captures and three check scripts are under `prototype/output/playwright/survey-other-*` locally.
+- This release is web-only. No Android/Play release, CARE connection, external message or clinical-data processing changed. Prior research/transcript edits and unrelated deleted files remain separate from the bounded source checkpoint.
 
 ## 24 October: native symptom diary and release preparation
 
