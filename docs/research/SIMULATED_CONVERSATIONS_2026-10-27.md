@@ -4,6 +4,8 @@
 
 **Short answer: on these 20 invented conversations, the app found none of the 130 answers. It pre-filled a wrong line 22 times, and 21 of those 22 were the doctor's own question.**
 
+**Update, same day: after the matcher fix it suggests a right line for 110 of 130 answers, with 1 wrong suggestion. See [After the matcher fix](#after-the-matcher-fix) at the end. The test set is small and was partly seen while the rules were written, so treat these as optimistic.**
+
 Everything here is synthetic. The people, illnesses and words are invented. No real patient data is used.
 
 ## What was tested
@@ -257,3 +259,102 @@ Ideas only, not tested:
 | C20 | Q6 | wrong | 18 | L17 (score 5, words: anything like talk covered) Is there anything you would like to talk about that we have not covered? |
 | C20 | Q7 | miss | 20 | nothing found |
 | C20 | Q8 | miss | 22 | nothing found |
+
+## After the matcher fix
+
+27 October 2026, lane `sa5-matcher` (branched from the convo lane `sa3-convo`, with this test merged in). Still no AI, no network: fixed rules and word lists, on the phone, the same output for the same input.
+
+### What changed
+
+The matcher is `LocalQuestionMatcher.match` in `CareDraftAssist.kt`; the word lists are in `GoalsQuestionVocabulary.kt`.
+
+1. **Find where the question was asked.** A line counts as asking when it has `?` or `？`. In plain speech-to-text with no punctuation, it counts when it starts with a question word or has a Hindi/Hinglish question word (क्या, कौन, kya, kaun …). The asked line must fit exactly one question best. "Fit" means the question's own words plus fixed wording for each of the 8 standard questions: English paraphrases, Hindi and Hinglish (for example "matters most", "सबसे ज़रूरी", "sabse zaroori"; "involve*", "फैसल*", "faisle"; "worr*", "चिंता", "chinta", "dar"). If two questions fit equally, the line counts for neither.
+2. **Suggest the reply, not the question.** The suggestion is the first line after the question (within 3 lines) that does not itself ask something. The lines straight after it are added as 2nd and 3rd suggestions. Speaker labels are not needed. If they are there (`[Doctor · …]`, `D:`, `Patient:`), a doctor line is not taken as the reply, and the extra lines must come from the same speaker.
+3. **Stop rather than guess.** The search for a reply ends when the next goals question is asked, or when the patient or family answers with a question of their own. If the reply puts the topic off, the question stays open and nothing is suggested. "Putting off" means a fixed list: "let's leave it", "not now", "God knows", "I don't know", "you know better", "you're the doctor", "पता नहीं", "बाद में बात", "आप जो ठीक समझें", "jo hona hai" …
+4. **Never offer the question.** A line that asks something is never offered. Neither is a line that is mostly the question's own words (70% or more of 3+ words), unless it is labelled as the patient or family.
+5. **Old rule only as a last resort.** The old shared-words rule is used only when no reply was found. It never uses a line that is already another question's reply.
+6. **Concept words** (for example "home, hospital, घर, अस्पताल" for next steps; "ventilator, CPR, machine, मशीन" for hopes) only raise the confidence shown for a reply that was already found. They never pick a line on their own. That was not tried, to keep wrong suggestions down.
+7. **The screen stays honest.** The card says "Suggested from the transcript · found by matching words · line N". Under it, it says why the line was picked ("The reply after the question on line M" or "This line shares words with the question"), in English and Hindi. Nothing is saved until the doctor presses Accept (or edits it).
+
+Every Hindi and Hinglish phrase in `GoalsQuestionVocabulary.kt` was written by the lane, not by a clinician or a native-speaker reviewer **[needs clinician review]**.
+
+### Before and after (same 20 conversations, same scoring, speaker labels as in the files)
+
+| Question | Answered | Before: hit / miss / wrong / wrong\* | After: hit / miss / wrong / wrong\* | After: left open (right) |
+|---|---|---|---|---|
+| Q1 What matters most | 20 | 0 / 20 / 0 / 0 | 19 / 1 / 0 / 0 | 0 |
+| Q2 Hoping for from care | 18 | 0 / 18 / 0 / 0 | 15 / 3 / 0 / 1 | 1 |
+| Q3 Who is involved in decisions | 17 | 0 / 6 / 11 / 0 | 17 / 0 / 0 / 0 | 3 |
+| Q4 Understanding of health | 18 | 0 / 13 / 5 / 1 | 17 / 1 / 0 / 0 | 2 |
+| Q5 Worries about the future | 15 | 0 / 15 / 0 / 0 | 12 / 3 / 0 / 0 | 5 |
+| Q6 Anything not covered | 11 | 0 / 6 / 5 / 0 | 3 / 8 / 0 / 0 | 9 |
+| Q7 What happens next | 20 | 0 / 20 / 0 / 0 | 16 / 4 / 0 / 0 | 0 |
+| Q8 Who should hear | 11 | 0 / 11 / 0 / 0 | 11 / 0 / 0 / 0 | 9 |
+| **All** | **130** | **0 / 109 / 21 / 1** | **110 / 20 / 0 / 1** | **29 of 30** |
+
+| Language | Answered | Before: hit / miss / wrong / wrong\* | After: hit / miss / wrong / wrong\* | After: recall |
+|---|---|---|---|---|
+| English | 79 | 0 / 60 / 19 / 1 | 67 / 12 / 0 / 1 | 85% |
+| Hinglish, Roman script | 27 | 0 / 26 / 1 / 0 | 24 / 3 / 0 / 0 | 89% |
+| Hindi, Devanagari | 18 | 0 / 18 / 0 / 0 | 13 / 5 / 0 / 0 | 72% |
+| Hindi with English words, Devanagari | 6 | 0 / 5 / 1 / 0 | 6 / 0 / 0 / 0 | 100% |
+
+- **Precision** (right ÷ everything suggested): 99% (110/111). **Recall** (right ÷ answered): 85% (110/130). Top-3 recall is also 85%: when the first suggestion is not right, nothing is suggested at all.
+- **Without speaker labels:** the test now also strips the `[Doctor · …]` labels and runs again. The numbers are exactly the same: 110 / 20 / 0 / 1. In these files the doctor's follow-up lines rarely fall between a question and its answer. Real transcripts may differ.
+- **The one wrong suggestion** (C13 Q2) is sarcasm: "That you stop asking difficult questions!", given as the reply to "What are you hoping for from your care?". The hand-marking counts it as not answered.
+
+### Per conversation, after
+
+| Conversation | Language | Q1 | Q2 | Q3 | Q4 | Q5 | Q6 | Q7 | Q8 |
+|---|---|---|---|---|---|---|---|---|---|
+| C01 | English | hit | hit | hit | hit | hit | hit | hit | hit |
+| C02 | English | hit | miss | hit | miss | hit | — | miss | — |
+| C03 | Hinglish, Roman script | hit | hit | hit | hit | — | miss | hit | — |
+| C04 | Hindi, Devanagari | hit | hit | hit | hit | hit | — | miss | — |
+| C05 | English | hit | hit | hit | hit | hit | hit | hit | hit |
+| C06 | English | hit | hit | hit | hit | hit | miss | hit | hit |
+| C07 | Hinglish, Roman script | hit | hit | hit | hit | miss | — | hit | — |
+| C08 | English | hit | hit | hit | hit | hit | miss | hit | hit |
+| C09 | Hindi, Devanagari | hit | miss | hit | hit | — | miss | miss | — |
+| C10 | English | hit | hit | hit | hit | hit | — | hit | hit |
+| C11 | Hinglish, Roman script | hit | hit | hit | hit | hit | miss | hit | hit |
+| C12 | English | hit | hit | hit | hit | hit | — | hit | — |
+| C13 | English | hit | wrong* | — | — | — | miss | miss | — |
+| C14 | Hindi with English words, Devanagari | hit | hit | hit | hit | hit | — | hit | — |
+| C15 | English | hit | hit | hit | hit | hit | miss | hit | hit |
+| C16 | Hinglish, Roman script | hit | hit | hit | hit | hit | — | hit | hit |
+| C17 | English | hit | hit | hit | hit | miss | miss | hit | hit |
+| C18 | English | hit | — | — | — | — | — | hit | — |
+| C19 | Hindi, Devanagari | hit | hit | — | hit | miss | — | hit | hit |
+| C20 | English | miss | miss | hit | hit | — | hit | hit | hit |
+
+### What it still misses, and why (20 misses)
+
+- **Q6, 8 misses: the answer is itself a question.** Examples: "When can I go home?", "Is there any government scheme that covers this drug?". The rule is never to offer a line that asks something, so these are left for the doctor. That is by design. If the clinical team wants a patient's own question offered for Q6 only, it is a small change, but it would also let through clarifying questions such as "Mean what?" [untested].
+- **Q7, 4 misses: the plan is said by the doctor, and no "what next" question was asked.** Example: "अगली बार हम दो हफ्ते बाद मिलेंगे". Word matching cannot tell a plan from other doctor talk without guessing.
+- **Put off first, answered later (C20 Q1, C09 Q2).** "God knows" or "आप जो ठीक समझें" comes first, and the family then prompts an answer. The rule closes the question at the first put-off. Letting it look further gave +1 hit and +1 wrong, so it was not kept.
+- **Paraphrases with no listed wording (C02 Q2, Q4).** Examples: "what would you like it to do for you", "How do you see your lungs". To find these, the list would have to be written around this test.
+- **A reply split by a question (C17 Q5).** The family's line "Money. … how do we pay for the medicines?" ends with a question, so the search stops before the patient's "Yes, the costs".
+
+### Be fair: limits of these numbers
+
+- **Not a clean test.** The lane read C01, C03 and C04 before writing the word lists. After the first run, it read the conversations behind the wrong and missed cells and added rules:
+  - single-word "hope*" / "expect*" and "next kya";
+  - the "you know better / you're the doctor / jo hona hai" put-offs;
+  - "a patient's question ends the reply".
+- **The first run, before those additions,** gave 106 hit / 21 miss / 3 wrong / 4 wrong\*. That is the less-tuned figure. On new conversations, expect something between the two runs, or worse.
+- **Same caveats as above.** The conversations are invented, clean typed text, and the ground truth has not been reviewed by a clinician. 20 conversations is small.
+- **Real speech-to-text will be harder.** It may lose question marks; the rule then falls back on question words, which is less reliable. It may also merge or split lines, and mis-hear Hindi.
+- **Only the 8 standard questions get the extra wording.** A question the doctor types gets only its own words, and the reply-after-the-question rule.
+
+### Honest pitch wording, updated
+
+- **Say:** "While the doctor talks, Sahara finds where each goals question was asked and suggests the reply that followed. The doctor accepts or edits every answer. It uses fixed word rules on the phone, not AI. In our 20 invented test conversations, it suggested a right line for 110 of 130 answers and a wrong line once. It leaves a question open rather than guess."
+- **Do not say** "AI fills the goals of care", or that it understands the conversation. It does not; it matches words and positions.
+- **Do not quote 85% as real-world accuracy.** It is from synthetic, partly-seen conversations.
+
+### How this was run
+
+`./gradlew --no-daemon testDebugUnitTest` ran once, under the gradle lock, on 27 Oct 2026. It passed (380 tests, 0 failures), including `SimulatedGoalsConversationsTest` (numbers above), the new `GoalsReplyMatcherTest` and the existing matcher tests.
+
+`SimulatedGoalsConversationsTest` was changed only to compile against the convo lane: the convo lane shows Suggested/Open and needs Accept, with no automatic pre-fill. It also gained the no-labels run. Its scoring and the conversations are unchanged.

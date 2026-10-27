@@ -195,13 +195,13 @@ object LocalDraftSuggestions {
 /** A question the clinician prepared before the conversation. [section] is the 0-based note section (NoteRules.labels order) an accepted answer belongs to. */
 data class CareQuestion(val id: String, val text: String, val section: Int)
 
-/** A verbatim span of the source (the words of one line) that shares words with a question. start/end are UTF-8 byte offsets as in saved evidence; charStart/charEnd index the Kotlin string. Always needs human review. */
+/** A verbatim span of the source (the words of one line) suggested as an answer to a question. start/end are UTF-8 byte offsets as in saved evidence; charStart/charEnd index the Kotlin string. [askedOnLine] is the line where the question was asked when this line is the reply after it, else null. Always needs human review. */
 data class QuestionMatch(
     val line: CareSourceLine, val quote: String, val start: Int, val end: Int, val charStart: Int, val charEnd: Int,
     val rank: Int, val score: Int, val confidence: LocalSuggestionConfidence, val matchedWords: List<String>, val followsQuestion: Boolean,
+    val askedOnLine: Int? = null,
 ) { val needsHumanReview: Boolean get() = true }
 
-/** One question with its best lines. An empty [matches] means UNANSWERED: the UI should show the question with an empty field for a typed answer. */
 data class QuestionAnswer(val question: CareQuestion, val matches: List<QuestionMatch>) { val isUnanswered: Boolean get() = matches.isEmpty() }
 
 data class QuestionMatchResult(val answers: List<QuestionAnswer>) {
@@ -210,7 +210,18 @@ data class QuestionMatchResult(val answers: List<QuestionAnswer>) {
     fun forQuestion(id: String): QuestionAnswer? = answers.firstOrNull { it.question.id == id }
 }
 
-/** Rule-based local matching of transcript lines to the clinician's own questions (no AI, model or transcription). It only points at verbatim lines; it never writes, paraphrases or summarises, and never pads: no match means unanswered. */
+/**
+ * Rule-based local matching of transcript lines to the clinician's questions (no AI, model, network or transcription). It only points at verbatim lines; it never writes, paraphrases or summarises, and never pads: no match means unanswered.
+ *
+ * How a line is chosen, in order:
+ * 1. Find where each question was ASKED: a line that asks something (it has '?' or '？', or, in unpunctuated text, starts with or contains a question word)
+ *    and whose words fit exactly one question best, by the question's own words plus, for the 8 standard questions, [GOALS_QUESTION_VOCABULARY] wording in English, Hindi and Hinglish.
+ * 2. Suggest the REPLY: the first line after it (within [REPLY_WINDOW] lines) that does not itself ask something, plus the lines straight after it (same speaker, when labelled).
+ *    When the transcript has speaker labels ("[Doctor · …]", "D:", "Patient:"), a doctor line is not taken as the reply. A line that puts the topic off
+ *    ([GOALS_DEFERRAL_PHRASES]) closes the question: nothing is suggested. Another question being asked ends the search.
+ * 3. Only for a question that was never recognisably asked: a line that itself shares enough of the question's words (the older rule).
+ * A line that asks something, or that is mostly the question's own words (unless labelled as the patient or family), is never offered.
+ */
 object LocalQuestionMatcher {
     /** A line needs MIN_SCORE in total, of which MIN_OVERLAP_SCORE must come from shared content words, so the follows-a-question boost can never create a match alone. */
     const val MIN_SCORE = 4
@@ -218,6 +229,13 @@ object LocalQuestionMatcher {
     /** Added when the line directly follows a question-shaped line; taken off a line that is itself question-shaped (it is usually the question, not the answer). */
     const val FOLLOWS_QUESTION_BOOST = 2
     const val QUESTION_LINE_PENALTY = 2
+    /** A line must score at least this (own words + standard wording) for one question, and more than for any other, to count as asking it. */
+    const val ASK_MIN_SCORE = 3
+    /** The reply must start within this many lines after the question. */
+    const val REPLY_WINDOW = 3
+    /** A line with at least this many content words, this share of them from the question, is a restated question, not an answer. */
+    const val ECHO_MIN_WORDS = 3
+    const val ECHO_SHARE = 0.7
     /** Word weight by length in characters (code points): longer words are more distinctive. */
     const val LONG_WORD_LENGTH = 8
     const val MEDIUM_WORD_LENGTH = 5
@@ -248,18 +266,110 @@ object LocalQuestionMatcher {
     }
     private fun questionShaped(body: String) = body.contains('?') || body.contains('？') || wordPattern.find(body)?.value?.lowercase()?.let { it in QUESTION_STARTERS } == true
 
-    /** For each question, up to [perQuestion] best lines (best score first, ties in source order). A question nothing answers gets no matches: it is reported unanswered, never matched to noise. Same input gives the same output. */
+    /** Words that make an unpunctuated line a question in Hindi or Hinglish wherever they stand ("aage kya karna hai"). */
+    val INTERROGATIVES = setOf("kya", "kaun", "kaunsa", "kise", "kisko", "kaise", "kab", "kahan", "kyun", "kyon", "kitna", "क्या", "कौन", "किसे", "किसको", "कैसे", "कब", "कहाँ", "कहां", "क्यों", "कितना")
+
+    private enum class Speaker { DOCTOR, PATIENT_OR_FAMILY, NONE }
+    private val bracketLabel = Regex("^\\[(Patient|Family / carer|Doctor|Unknown) · [^\\]]+\\]\\s*")
+    private val plainLabel = Regex("^(D|P|F|Dr|Doctor|Patient|Family|Carer|Family / carer|Relative|डॉक्टर|मरीज़|मरीज|परिवार)\\s*[:：]\\s*", RegexOption.IGNORE_CASE)
+    private val doctorLabels = setOf("d", "dr", "doctor", "डॉक्टर")
+    private fun speaker(text: String): Speaker {
+        bracketLabel.find(text)?.let { return when (it.groupValues[1]) { "Doctor" -> Speaker.DOCTOR; "Unknown" -> Speaker.NONE; else -> Speaker.PATIENT_OR_FAMILY } }
+        return plainLabel.find(text)?.let { if (it.groupValues[1].lowercase() in doctorLabels) Speaker.DOCTOR else Speaker.PATIENT_OR_FAMILY } ?: Speaker.NONE
+    }
+    private fun body(text: String) = text.replace(bracketLabel, "").replace(plainLabel, "")
+    /** The speaker label exactly as written ("patient", "f", …), or blank. */
+    private fun who(text: String) = (bracketLabel.find(text) ?: plainLabel.find(text))?.groupValues?.get(1)?.lowercase().orEmpty()
+
+    /** Lower-case words with the nukta dropped and chandrabindu written as anusvara, so "ज़रूरी"/"जरूरी" and "कहाँ"/"कहां" meet. */
+    private fun tokens(text: String) = wordPattern.findAll(text.lowercase().replace("\u093C", "").replace('\u0901', '\u0902')).map { it.value }.toList()
+    private fun phrase(p: String) = p.trim().lowercase().replace("\u093C", "").replace('\u0901', '\u0902').split(Regex("[^\\p{L}\\p{M}\\p{N}*]+")).filter { it.isNotEmpty() }
+    /** True when [words] appear next to each other in [line]; a word ending in '*' also matches longer words. */
+    private fun has(line: List<String>, words: List<String>): Boolean {
+        if (words.isEmpty() || words.size > line.size) return false
+        return (0..line.size - words.size).any { i -> words.indices.all { k -> val w = words[k]; if (w.endsWith('*')) line[i + k].startsWith(w.dropLast(1)) else line[i + k] == w } }
+    }
+    private val deferrals by lazy { GOALS_DEFERRAL_PHRASES.map(::phrase) }
+    private class Vocab(val triggers: List<Pair<List<String>, Int>>, val concepts: List<Pair<String, List<String>>>)
+    private val vocab by lazy { GOALS_QUESTION_VOCABULARY.mapValues { (_, v) -> Vocab(v.triggers.map { phrase(it.first) to it.second }, v.concepts.map { it to phrase(it) }) } }
+
+    /** Asks something: a question mark, or, in a line with no sentence punctuation at all (plain speech-to-text), a question word first or a Hindi/Hinglish question word anywhere. */
+    private fun asks(body: String): Boolean {
+        if (body.contains('?') || body.contains('？')) return true
+        if (body.any { it == '.' || it == '!' || it == '।' }) return false
+        val t = tokens(body)
+        return t.firstOrNull()?.let { it in QUESTION_STARTERS } == true || t.any { it in INTERROGATIVES }
+    }
+
+    /**
+     * For each question, up to [perQuestion] lines (replies first, in transcript order, then direct word matches best first). A question nothing answers gets no matches:
+     * it is reported unanswered, never matched to noise. Same input gives the same output.
+     */
     fun match(source: String, questions: List<CareQuestion>, perQuestion: Int = DEFAULT_PER_QUESTION): QuestionMatchResult {
         require(perQuestion > 0) { "Ask for at least one match per question." }
         val lines = CareDraftAssist.lines(source)
-        val bodies = lines.map { it.words }
-        val lineStems = bodies.map { body -> contentWords(body).map { stem(it) }.toSet() }
+        val speakers = lines.map { speaker(it.text) }
+        val names = lines.map { who(it.text) }
+        val labelled = speakers.any { it != Speaker.NONE }
+        val bodies = lines.map { body(it.text) }
+        val lineStems = bodies.map { b -> contentWords(b).map { stem(it) }.toSet() }
+        val lineTokens = bodies.map(::tokens)
         val shaped = bodies.map { questionShaped(it) }
-        return QuestionMatchResult(questions.map { q ->
-            val wanted = contentWords(q.text).groupBy { stem(it) }.mapValues { (_, words) -> words.first() to words.maxOf { weight(it) } }
-            val found = if (wanted.isEmpty()) emptyList() else lines.indices.mapNotNull { i -> score(source, lines[i], wanted, lineStems[i], i > 0 && shaped[i - 1], shaped[i]) }
-            QuestionAnswer(q, found.sortedWith(compareByDescending<QuestionMatch> { it.score }.thenBy { it.charStart }).take(perQuestion).mapIndexed { i, m -> m.copy(rank = i + 1) })
+        val asking = bodies.map(::asks)
+        val deferring = lineTokens.map { t -> deferrals.any { has(t, it) } }
+        val wanted = questions.map { q -> contentWords(q.text).groupBy { stem(it) }.mapValues { (_, words) -> words.first() to words.maxOf { weight(it) } } }
+        val extra = questions.map { vocab[it.text.trim()] }
+        fun overlap(k: Int, i: Int) = wanted[k].filterKeys { it in lineStems[i] }.values.sumOf { it.second }
+        fun echo(k: Int, i: Int) = speakers[i] != Speaker.PATIENT_OR_FAMILY && lineStems[i].size >= ECHO_MIN_WORDS && lineStems[i].count { it in wanted[k] } >= ECHO_SHARE * lineStems[i].size
+
+        // 1. Which question each asking line asks: one clear best, never a tie.
+        val askedBy = IntArray(lines.size) { -1 }
+        val askScore = IntArray(lines.size)
+        lines.indices.filter { asking[it] }.forEach { i ->
+            val scores = questions.indices.map { k -> overlap(k, i) + (extra[k]?.triggers?.filter { has(lineTokens[i], it.first) }?.sumOf { it.second } ?: 0) }
+            val best = scores.maxOrNull() ?: return@forEach
+            if (best >= ASK_MIN_SCORE && scores.count { it == best } == 1) { askedBy[i] = scores.indexOf(best); askScore[i] = best }
+        }
+
+        // 2. The reply after each asking line.
+        val replies = questions.indices.map { mutableListOf<QuestionMatch>() }
+        val claimed = mutableSetOf<Int>()
+        val closed = BooleanArray(questions.size)
+        askedBy.forEachIndexed { i, k ->
+            if (k < 0) return@forEachIndexed
+            var j = i + 1; var taken = 0; var first = -1
+            while (j < lines.size && taken < perQuestion && (taken > 0 || j <= i + REPLY_WINDOW)) {
+                val doctor = labelled && speakers[j] == Speaker.DOCTOR
+                val skip = asking[j] || doctor || echo(k, j)
+                // Another question, or the patient or family answering with a question of their own, ends the reply.
+                if (askedBy[j] >= 0 || (skip && taken > 0) || (asking[j] && !doctor)) break
+                // Lines after the first reply belong to it only while the same labelled speaker goes on.
+                if (taken > 0 && labelled && names[j] != names[first]) break
+                if (!skip) {
+                    if (deferring[j]) { if (taken == 0) closed[k] = true; break }
+                    val concepts = extra[k]?.concepts?.filter { has(lineTokens[j], it.second) }?.map { it.first }.orEmpty()
+                    val score = askScore[i] + FOLLOWS_QUESTION_BOOST - taken
+                    replies[k] += quoteMatch(source, lines[j], score, if (concepts.isNotEmpty() && taken == 0) LocalSuggestionConfidence.HIGH else LocalSuggestionConfidence.MEDIUM, concepts, i + 1 == j && taken == 0, lines[i].number)
+                    if (taken == 0) first = j
+                    claimed += j; taken++
+                }
+                j++
+            }
+        }
+
+        // 3. Direct word matches, never a line that asks, restates the question, puts it off, or is another question's reply.
+        return QuestionMatchResult(questions.mapIndexed { k, q ->
+            val direct = if (wanted[k].isEmpty() || closed[k]) emptyList() else lines.indices.filter { i -> !asking[i] && !deferring[i] && i !in claimed && !echo(k, i) }
+                .mapNotNull { i -> score(source, lines[i], wanted[k], lineStems[i], i > 0 && shaped[i - 1], shaped[i]) }
+                .sortedWith(compareByDescending<QuestionMatch> { it.score }.thenBy { it.charStart })
+            QuestionAnswer(q, (replies[k] + direct).distinctBy { it.line.number }.take(perQuestion).mapIndexed { i, m -> m.copy(rank = i + 1) })
         })
+    }
+
+    private fun quoteMatch(source: String, line: CareSourceLine, score: Int, confidence: LocalSuggestionConfidence, words: List<String>, follows: Boolean, askedOn: Int): QuestionMatch {
+        val charStart = line.start + (line.text.length - line.words.length)
+        val start = LocalDraftSuggestions.utf8Length(source, 0, charStart)
+        return QuestionMatch(line, source.substring(charStart, line.end), start, start + LocalDraftSuggestions.utf8Length(source, charStart, line.end), charStart, line.end, 0, score, confidence, words, follows, askedOn)
     }
 
     /** Just the questions nothing answered, in the order given, for the "type an answer" list. */
