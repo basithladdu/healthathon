@@ -81,6 +81,8 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
         val joinBanner = pending?.let { rt("Sign in or create an account to join ${it.possessive} care", "${it.name.ifBlank { "इस व्यक्ति" }} की देखभाल से जुड़ने के लिए साइन इन करें या खाता बनाएँ") }
         val mode = when { patientWalkthroughUser != null -> "patient-walkthrough"; demoOpen -> "doctor-walkthrough"; doctorOpen && session != null -> "doctor"; else -> "care" }
         // Entering a walkthrough or workspace moves forward; leaving it moves back to the welcome/care app.
+        // One language choice for every screen, the doctor workspace and walkthroughs included.
+        CompositionLocalProvider(LocalCareLanguage provides rootLanguage) {
         SaharaScreenHost(mode, Modifier.fillMaxSize().background(Cream), label = "Sahara root", direction = { _, to -> if (to == "care") SaharaMotion.Direction.Back else SaharaMotion.Direction.Forward }) { shown -> when (shown) {
         "patient-walkthrough" -> patientWalkthroughUser?.let { PatientWalkthroughHost(it, onExit = { patientWalkthroughUser = null }, onSwitch = { patientWalkthroughUser = it }) }
         "doctor-walkthrough" -> DoctorDemo(onExit = { demoOpen = false; walkthroughPatient = null }, cloud = cloud, initialPatientId = walkthroughPatient, careModel = model, onCareAccount = { accountOpen = true })
@@ -101,6 +103,7 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
                 }
             }, onWelcomePanelChanged = { doctorEntryPending = it == "doctor" })
         } }
+        }
         CompositionLocalProvider(LocalCareLanguage provides rootLanguage) {
         if (accountOpen) AccountSheet(cloud, model, onDismiss = { accountOpen = false; if (cloud.session.value == null) doctorEntryPending = false }, banner = joinBanner)
         val joinSession = session

@@ -40,7 +40,7 @@ val LocalCareLanguage = staticCompositionLocalOf<CareLanguageChoice?> { null }
 
 @Composable fun rememberCareLanguage(namespace: String): CareLanguageChoice { val context = LocalContext.current; return remember(namespace) { CareLanguageChoice.of(context, namespace) } }
 
-/** True when the family chose Hindi. Screens shown outside the care app (doctor side) stay English. */
+/** True when Hindi is chosen. CareRoot provides the choice to every screen, family and doctor side alike. */
 @Composable fun careHindi(): Boolean = LocalCareLanguage.current?.hindi ?: false
 
 /** The inline pair picker used across the app: `t("English", "हिन्दी")`. */
