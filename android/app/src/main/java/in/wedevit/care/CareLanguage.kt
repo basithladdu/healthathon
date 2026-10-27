@@ -69,3 +69,22 @@ fun careCategoryLabel(category: String, hindi: Boolean): String = if (!hindi) ca
 fun checkInMoodLabel(title: String, hindi: Boolean): String = if (!hindi) title else when (title) {
     CheckInMood.GOOD -> "अच्छा दिन"; CheckInMood.OKAY -> "ठीक-ठाक दिन"; CheckInMood.HARD -> "मुश्किल दिन"; else -> title
 }
+
+/** Hindi for the symptom diary's save checks (SymptomDiaryRules.error returns the English text, which tests rely on). */
+internal val SymptomErrorsHindi = mapOf(
+    "Choose a symptom or add a short name." to "लक्षण चुनें या छोटा नाम लिखें।",
+    "Choose a number from 0 to 10, or Not rated." to "0 से 10 तक कोई अंक चुनें, या अंक नहीं बताया चुनें।",
+    "Choose a valid date and time." to "सही तारीख़ और समय चुनें।",
+    "The observation cannot be in the future." to "देखने का समय आगे का नहीं हो सकता।",
+    "The start date must be on or before this observation." to "शुरू होने की तारीख़ इस दिन या इससे पहले की होनी चाहिए।",
+    "Choose who reported this and the time frame." to "चुनें कि किसने बताया और कितने समय की बात है।",
+    "Add who wrote or observed this note." to "लिखें कि यह नोट किसने लिखा या देखा।",
+    "Shorten the note or review the pain details." to "नोट छोटा करें या दर्द की जानकारी देखें।",
+    "Choose a listed pain area." to "सूची से दर्द की जगह चुनें।",
+    "Choose a valid point on a selected pain area." to "चुनी हुई दर्द की जगह पर सही बिंदु चुनें।",
+    "Choose a number from 0 to 10 for a selected pain area." to "चुनी हुई दर्द की जगह के लिए 0 से 10 तक अंक चुनें।",
+    "This body map version cannot be edited here." to "शरीर के नक्शे का यह संस्करण यहाँ नहीं बदला जा सकता।",
+    "Pain details belong to a pain entry." to "दर्द की जानकारी सिर्फ़ दर्द वाले नोट में होती है।",
+    "Choose a comparison." to "तुलना चुनें।",
+    "Choose the previous entry for this comparison." to "इस तुलना के लिए पिछला नोट चुनें।",
+)

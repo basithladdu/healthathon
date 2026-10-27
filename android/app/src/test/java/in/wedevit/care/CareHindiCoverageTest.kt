@@ -13,19 +13,32 @@ import java.time.LocalDate
  */
 class CareHindiCoverageTest {
     private val screens = mapOf(
-        "CareUi.kt" to listOf("CareApp", "Today", "CareList", "CareRow", "More", "AddPerson", "AddPersonContent", "AddCareItem"),
-        "CareComponents.kt" to listOf("CareNavigation", "CarePersonSelector"),
+        "CareUi.kt" to listOf("CareApp", "Today", "CareList", "CareRow", "More", "AddPerson", "AddPersonContent", "AddCareItem", "Welcome", "NoteReader", "AudioPlayback", "Nearby", "CentreCard", "InfoDisclosure", "RawTranscriptPanel"),
+        "CentreMap.kt" to listOf("CentreMap"),
+        "CareDocuments.kt" to listOf("CareDocuments"),
+        "CareDocumentReviewUi.kt" to listOf("CareDocumentReview"),
+        "MedicineScanner.kt" to listOf("MedicineScanner", "ScannerHeader", "PhotoSelectionCard", "MedicineReviewCard"),
+        "CareLabs.kt" to listOf("CareLabs", "LabHistoryCard", "LabHistoryPlot", "LabResultRow", "CareLabEditor"),
+        "CareReminderUi.kt" to listOf("CareReminderSettings", "ReminderItemSettings"),
+        "FeedbackUi.kt" to listOf("FeedbackExperienceScreen"),
+        "CareComponents.kt" to listOf("CareNavigation", "CarePersonSelector", "WalkthroughUserMenu"),
         "CareDailyUi.kt" to listOf("CareAddMenuButton", "CareModuleCard", "CareModuleList", "ConversationRow", "MedicineScanAction"),
-        "CareSchedule.kt" to listOf("DailyCareShortcuts"),
-        "CareWorkflow.kt" to listOf("WorkflowSummary"),
+        "CareSchedule.kt" to listOf("DailyCareShortcuts", "CareDateButton", "CareCalendar", "CalendarEntryCard", "CareScheduleEditor"),
+        "CareWorkflow.kt" to listOf("WorkflowSummary", "CareWorkflows", "WorkflowCard", "CareWorkflowEditor"),
         "CareAddFamily.kt" to listOf("AddFamilySheet", "PendingJoinDialog"),
-        "CareAccount.kt" to listOf("AccountContent"),
+        "CareAccount.kt" to listOf("AccountContent", "CareRoot"),
         "CareSymptomUi.kt" to listOf("CareSymptomDiary", "SymptomNoteCard", "SymptomNoteForm"),
     )
 
     /** Literals that are keys, animation labels or format patterns, never shown as text. */
     private val notShown = setOf("English", "EEE, d MMM", "EEEE, d MMMM", "Care overlay", "Care tab", "care completed", "selected tab", "guest-patient",
-        "To do", "Care team", "Lab history", "Choose a valid date and time.", "The observation cannot be in the future.")
+        "To do", "Care team", "Lab history", "Choose a valid date and time.", "The observation cannot be in the future.",
+        // Filter and category keys matched against saved or directory data; their labels are paired separately.
+        "All India", "Home care", "Clinic visits", "Inpatient care", "Care notes", "Not great", "Goals of care {} {} Version {}",
+        // Saved into records, file names, errors that are caught, and as-printed lab test names.
+        "\\nOriginal prescription references:\\n", "Goals-of-care-v{}.txt", "File unavailable", "Recording unavailable", "What matters", "Red blood cells",
+        "Sahara root", "feedback expression", "feedback warmth", "d MMM", "d MMM, HH:mm", "h:mm a", "dd MMM yyyy · HH:mm z",
+        "https://tiles.openfreemap.org/styles/liberty", "https://www.google.com/maps/search/?api=1&query=")
 
     @Test fun everyMainScreenStringHasAHindiPair() {
         val dir = listOf("src/main/java/in/wedevit/care", "app/src/main/java/in/wedevit/care", "android/app/src/main/java/in/wedevit/care").map(::File).first { it.isDirectory }
@@ -53,6 +66,29 @@ class CareHindiCoverageTest {
             assertTrue(HindiScan.hasHindi(checkInMoodLabel(it, true)))
         }
         assertEquals("Felt tired", checkInMoodLabel("Felt tired", true))
+    }
+
+    @Test fun everySymptomSaveCheckHasHindi() {
+        val dir = listOf("src/main/java/in/wedevit/care", "app/src/main/java/in/wedevit/care", "android/app/src/main/java/in/wedevit/care").map(::File).first { it.isDirectory }
+        val source = File(dir, "CareSymptomData.kt").readText(); val start = source.indexOf("fun error(")
+        val messages = Regex("return \"([^\"]+)\"").findAll(source.substring(start, source.indexOf("\n    fun ", start + 1))).map { it.groupValues[1] }.toSet()
+        assertTrue(messages.size >= 10)
+        assertEquals(emptySet<String>(), messages - SymptomErrorsHindi.keys)
+        SymptomErrorsHindi.values.forEach { assertTrue(it, HindiScan.hasHindi(it)) }
+    }
+
+    @Test fun calendarCategoriesKeepEnglishValues() {
+        listOf("All", "Medicine", "Visit", "Test", "Follow-up", "Procedure", "Task", "Conversation").forEach {
+            assertEquals(it, careCategoryLabel(it, false)); assertTrue(it, HindiScan.hasHindi(careCategoryLabel(it, true)))
+        }
+    }
+
+    @Test fun hindiChoiceCarriesOverToANewAccount() {
+        val device = MemoryPreferences()
+        CareLanguageChoice(MemoryPreferences(), device).choose(true)
+        assertTrue(CareLanguageChoice(MemoryPreferences(), device).hindi)
+        val own = MemoryPreferences().also { it.edit().putBoolean("hindi", false).apply() }
+        assertEquals(false, CareLanguageChoice(own, device).hindi)
     }
 
     @Test fun hindiDatesUseHindiNames() {
@@ -150,5 +186,32 @@ internal object HindiScan {
             if (words || shownAlone) bad += lit.text
         }
         return bad
+    }
+}
+
+/** In-memory SharedPreferences for the language choice test. */
+private class MemoryPreferences : android.content.SharedPreferences {
+    private val values = mutableMapOf<String, Any?>()
+    override fun getAll(): MutableMap<String, *> = values
+    override fun getString(key: String?, defValue: String?) = values[key] as? String ?: defValue
+    override fun getStringSet(key: String?, defValues: MutableSet<String>?) = defValues
+    override fun getInt(key: String?, defValue: Int) = values[key] as? Int ?: defValue
+    override fun getLong(key: String?, defValue: Long) = values[key] as? Long ?: defValue
+    override fun getFloat(key: String?, defValue: Float) = values[key] as? Float ?: defValue
+    override fun getBoolean(key: String?, defValue: Boolean) = values[key] as? Boolean ?: defValue
+    override fun contains(key: String?) = key in values
+    override fun registerOnSharedPreferenceChangeListener(listener: android.content.SharedPreferences.OnSharedPreferenceChangeListener?) {}
+    override fun unregisterOnSharedPreferenceChangeListener(listener: android.content.SharedPreferences.OnSharedPreferenceChangeListener?) {}
+    override fun edit(): android.content.SharedPreferences.Editor = object : android.content.SharedPreferences.Editor {
+        override fun putString(key: String?, value: String?): android.content.SharedPreferences.Editor { values[key!!] = value; return this }
+        override fun putStringSet(key: String?, values: MutableSet<String>?): android.content.SharedPreferences.Editor = this
+        override fun putInt(key: String?, value: Int): android.content.SharedPreferences.Editor { values[key!!] = value; return this }
+        override fun putLong(key: String?, value: Long): android.content.SharedPreferences.Editor { values[key!!] = value; return this }
+        override fun putFloat(key: String?, value: Float): android.content.SharedPreferences.Editor { values[key!!] = value; return this }
+        override fun putBoolean(key: String?, value: Boolean): android.content.SharedPreferences.Editor { values[key!!] = value; return this }
+        override fun remove(key: String?): android.content.SharedPreferences.Editor { values.remove(key); return this }
+        override fun clear(): android.content.SharedPreferences.Editor { values.clear(); return this }
+        override fun commit() = true
+        override fun apply() {}
     }
 }
