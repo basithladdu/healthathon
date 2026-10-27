@@ -49,6 +49,7 @@ import java.time.format.DateTimeFormatter
     val enabled = remember(revision) { scheduler.enabled() }
     val allowed = remember(revision) { scheduler.allowed() }
     val count = remember(revision) { scheduler.scheduledCount() }
+    val exact = remember(revision) { scheduler.exactAllowed() }
     LazyColumn(Modifier.fillMaxSize().imePadding().testTag("care-reminder-settings"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { Row { IconButton(onClick = onClose) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस")) }; Heading(t("Reminders", "रिमाइंडर"), 28) } }
         item { SurfaceCard(Sage) {
@@ -63,10 +64,15 @@ import java.time.format.DateTimeFormatter
             Text(t("Alerts can be delayed by Android, battery settings or a switched-off phone. They are a reminder to check the record, not an urgent-care service.", "Android, बैटरी सेटिंग या बंद फ़ोन की वजह से अलर्ट देर से आ सकते हैं। ये रिकॉर्ड देखने की याद दिलाते हैं, आपातकालीन सेवा नहीं हैं।"), style = MaterialTheme.typography.bodySmall)
             Text(t("Only the active account sends alerts. Medicine times follow the phone’s current time zone; dated visits keep their saved time.", "सिर्फ़ चालू खाता अलर्ट भेजता है। दवा का समय फ़ोन के अभी के समय क्षेत्र से चलता है; तय मुलाक़ातें अपने सहेजे समय पर रहती हैं।"), style = MaterialTheme.typography.bodySmall)
             if (!allowed) TextButton(onClick = { runCatching { context.startActivity(Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)) }.onFailure { error = t("Open Android Settings → Apps → Sahara → Notifications.", "Android Settings → Apps → Sahara → Notifications खोलें।") } }) { Text(t("Open notification settings", "सूचना सेटिंग खोलें")) }
+            if (enabled && allowed && !exact && Build.VERSION.SDK_INT >= 31) {
+                Text(t("Android may send these alerts late. Allow on-time alerts so they arrive at the set time.", "Android ये सूचनाएँ देर से भेज सकता है। समय पर सूचना की अनुमति दें, ताकि वे तय समय पर आएँ।"), style = MaterialTheme.typography.bodySmall, modifier = Modifier.testTag("reminder-exact-off"))
+                TextButton(onClick = { runCatching { context.startActivity(Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, android.net.Uri.parse("package:${context.packageName}"))) }.onFailure { error = t("Open Android Settings → Apps → Sahara → Alarms & reminders.", "Android सेटिंग्स → ऐप्स → Sahara → अलार्म और रिमाइंडर खोलें।") } }) { Text(t("Allow on-time alerts", "समय पर सूचना की अनुमति दें")) }
+            }
         } }
         if (error.isNotBlank()) item { Text(error, color = MaterialTheme.colorScheme.error) }
         item { Text(t("Choose times from the existing prescription. Sahara does not calculate or change doses. Marking a medicine done completes that whole entry for the day.", "पर्चे में लिखे समय चुनें। सहारा ख़ुराक तय या नहीं बदलता। दवा को 'हो गया' करने से उस दिन की पूरी दवा पूरी मानी जाती है।"), style = MaterialTheme.typography.bodySmall) }
-        val eligible = items.filter { it.personId == selected && (it.kind == "medicine" || it.due > 0) }
+        val today = java.time.LocalDate.now()
+        val eligible = items.filter { it.personId == selected && CareReminderRules.listed(it, today) }
         if (eligible.isEmpty()) item { SurfaceCard { Text(t("No dated care activities or medicines yet.", "अभी कोई तारीख़ वाली देखभाल या दवा नहीं है।")); Text(t("Add a medicine or choose a time in Calendar first.", "पहले दवा जोड़ें या कैलेंडर में समय चुनें।"), style = MaterialTheme.typography.bodySmall) } }
         items(eligible, key = { it.id }) { item -> ReminderItemSettings(item, scheduler, revision) { revision++ } }
     }
@@ -78,8 +84,11 @@ import java.time.format.DateTimeFormatter
     var starts by rememberSaveable(item.id) { mutableStateOf(option?.starts.orEmpty()) }
     var ends by rememberSaveable(item.id) { mutableStateOf(option?.ends.orEmpty()) }
     var error by rememberSaveable(item.id) { mutableStateOf("") }
+    val dateOnly = CareReminderRules.dateOnly(item)
     SurfaceCard {
-        Row { Column(Modifier.weight(1f)) { Text(item.title, fontWeight = FontWeight.SemiBold); Text(when { option?.muted == true -> t("Paused", "रुका हुआ"); item.kind == "medicine" -> (option?.times ?: CareReminderRules.printedTimes(item.detail)).joinToString(", ").ifBlank { t("No time chosen", "समय नहीं चुना") }; item.due > 0 -> DateTimeFormatter.ofPattern("dd MMM yyyy · HH:mm z").withZone(ZoneId.systemDefault()).format(Instant.ofEpochMilli(item.due)); else -> t("No time chosen", "समय नहीं चुना") }, style = MaterialTheme.typography.bodySmall) }
+        Row { Column(Modifier.weight(1f)) { Text(item.title, fontWeight = FontWeight.SemiBold); Text(when { option?.muted == true -> t("Paused", "रुका हुआ"); item.kind == "medicine" -> (option?.times ?: CareReminderRules.printedTimes(item.detail)).joinToString(", ").ifBlank { t("No time chosen", "समय नहीं चुना") }
+            dateOnly -> DateTimeFormatter.ofPattern("dd MMM yyyy").withZone(ZoneId.systemDefault()).format(Instant.ofEpochMilli(item.due)) + " · " + option?.times.orEmpty().joinToString(", ").ifBlank { t("No alert time chosen", "सूचना का समय नहीं चुना") }
+            item.due > 0 -> DateTimeFormatter.ofPattern("dd MMM yyyy · HH:mm z").withZone(ZoneId.systemDefault()).format(Instant.ofEpochMilli(item.due)); else -> t("No time chosen", "समय नहीं चुना") }, style = MaterialTheme.typography.bodySmall, modifier = Modifier.testTag("reminder-when-${item.id}")) }
             Switch(checked = option?.muted != true, onCheckedChange = { enabled -> scheduler.configure(item.id, (option ?: ReminderOption(CareReminderRules.printedTimes(item.detail))).copy(muted = !enabled)); changed() }) }
         if (item.kind == "medicine") {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -90,6 +99,15 @@ import java.time.format.DateTimeFormatter
                 Button(onClick = { runCatching {
                     scheduler.configure(item.id, ReminderOption(if (times.isBlank()) emptyList() else times.split(',').map(String::trim), starts.trim(), ends.trim(), option?.muted == true)); changed()
                 }.onFailure { error = it.message ?: t("Check the times and dates.", "समय और तारीख़ें जाँचें।") } }, modifier = Modifier.fillMaxWidth()) { Text(t("Save reminder times", "रिमाइंडर का समय सहेजें")) }
+            }
+        } else if (dateOnly) {
+            // Saved with a date only: no alert until a time on that day is chosen here (never a midnight alert).
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                CareField(times, { times = it; error = "" }, t("Alert time on that day (HH:mm)", "उस दिन सूचना का समय (HH:mm)"), singleLine = true)
+                if (error.isNotBlank()) Text(error, color = MaterialTheme.colorScheme.error)
+                Button(onClick = { runCatching {
+                    scheduler.configure(item.id, ReminderOption(if (times.isBlank()) emptyList() else times.split(',').map(String::trim), muted = option?.muted == true)); changed()
+                }.onFailure { error = it.message ?: t("Use HH:mm, such as 08:30.", "HH:mm लिखें, जैसे 08:30।") } }, modifier = Modifier.fillMaxWidth().testTag("reminder-save-${item.id}")) { Text(t("Save alert time", "समय सहेजें")) }
             }
         }
     }

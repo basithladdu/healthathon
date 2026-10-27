@@ -37,7 +37,7 @@ class CareHindiCoverageTest {
         "All India", "Home care", "Clinic visits", "Inpatient care", "Care notes", "Not great", "Goals of care {} {} Version {}",
         // Saved into records, file names, errors that are caught, and as-printed lab test names.
         "\\nOriginal prescription references:\\n", "Goals-of-care-v{}.txt", "File unavailable", "Recording unavailable", "What matters", "Red blood cells",
-        "Sahara root", "microphone level", "feedback expression", "feedback warmth", "d MMM", "d MMM, HH:mm", "h:mm a", "dd MMM yyyy · HH:mm z",
+        "Sahara root", "microphone level", "feedback expression", "feedback warmth", "d MMM", "d MMM, HH:mm", "h:mm a", "dd MMM yyyy · HH:mm z", "dd MMM yyyy",
         "https://tiles.openfreemap.org/styles/liberty", "https://www.google.com/maps/search/?api=1&query=")
 
     @Test fun everyMainScreenStringHasAHindiPair() {
