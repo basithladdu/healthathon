@@ -912,7 +912,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
         item { Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf("All", "Home care", "Clinic visits", "Inpatient care").forEach { s -> FilterChip(selected = service == s, onClick = { service = s }, label = { Text(optionLabel(s)) }, modifier = Modifier.heightIn(min = 48.dp)) } } }
         item { FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf("Map & list", "List").forEach { option -> FilterChip(selected = view == option, onClick = { view = option }, label = { Text(optionLabel(option)) }, modifier = Modifier.heightIn(min = 48.dp)) }
-            FilterChip(selected = morphine, onClick = { morphine = !morphine }, label = { Text(t("Morphine listed", "मॉर्फ़ीन उपलब्ध")) }, leadingIcon = { Icon(Icons.Default.Medication, null, Modifier.size(18.dp)) }, modifier = Modifier.heightIn(min = 48.dp))
+            FilterChip(selected = morphine, onClick = { morphine = !morphine }, label = { Text(t("Morphine listed", "मॉर्फ़ीन सूची में")) }, leadingIcon = { Icon(Icons.Default.Medication, null, Modifier.size(18.dp)) }, modifier = Modifier.heightIn(min = 48.dp))
         }; Text(t("Directory listings. Call to confirm services, availability and cost.", "यह सूची से ली गई जानकारी है। सेवा, उपलब्धता और ख़र्च फ़ोन करके पक्का करें।"), style = MaterialTheme.typography.bodySmall) }
         if (view == "Map & list" && visible.isNotEmpty()) item {
             val located = visible.count { it.latitude != null && it.longitude != null }
@@ -936,7 +936,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
             if (c.sourceListedMorphine == "available") Text(t("Directory lists morphine · call to confirm", "सूची में मॉर्फ़ीन लिखा है · फ़ोन करके पक्का करें"), fontSize = 12.sp, color = Color(0xFF465E45), modifier = Modifier.padding(top = 8.dp))
             Text(listOf(c.sourceName, c.checkedOn.takeIf { it.isNotBlank() }?.let { t("Source retrieved $it", "जानकारी ली गई $it") }).filterNotNull().filter(String::isNotBlank).joinToString(" · "), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                if (c.phone.any(Char::isDigit)) TextButton(onClick = { open(context, Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + c.phone.replace(Regex("[^+0-9]"), "")))) }) { Icon(Icons.Default.Call, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Call", "फ़ोन करें")) }
+                if (c.phone.any(Char::isDigit)) TextButton(onClick = { open(context, Intent(Intent.ACTION_DIAL, Uri.parse(NearbyHelp.dialUri(c.phone)))) }) { Icon(Icons.Default.Call, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Call", "फ़ोन करें")) }
                 TextButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com/maps/search/?api=1&query=" + Uri.encode(c.name + " " + c.address)))) }) { Text(t("Directions", "रास्ता")) }
                 TextButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse(c.url))) }) { Text(t("Source", "स्रोत")) }
             }
