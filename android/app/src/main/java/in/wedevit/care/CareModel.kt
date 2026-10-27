@@ -142,9 +142,12 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
     private var meter: Job? = null
     private var recordingSaveJob: Job? = null
     private var pendingRecordingMetadata: Pair<RecordingConsent,DoctorLocalAudioRef>? = null
-    val centres: List<Centre> = CareCentreDirectory.decode(app.assets.open("india.json").bufferedReader().use { it.readText() })
+    /** The 1.5 MB bundled directory is parsed once per process, off the start-up path (warmed below on a background thread). */
+    val centres: List<Centre> get() = CareCentreDirectory.bundled(getApplication())
+    /** Activating reminders commits preferences and re-sets every alarm; it runs in the background, before any reminder reconcile. */
+    private val reminderActivation = viewModelScope.async(Dispatchers.IO) { runCatching { reminderScheduler?.activate() } }
     init {
-        runCatching { reminderScheduler?.activate() }
+        viewModelScope.launch(Dispatchers.Default) { centres }
         viewModelScope.launch { reconcileReminders() }
         viewModelScope.launch { prescriptionExcludedIds.collectLatest { reconcileReminders() } }
         if (cloud != null) refresh()
@@ -551,13 +554,15 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
         if (demoMode) return
         // Alerts are secondary to accepted care records. A platform alert failure
         // must never announce that an already saved medicine/task failed to save.
-        runCatching {
+        // Preference reads/commits and up to 200 alarm calls: keep them off the main thread.
+        runCatching { withContext(Dispatchers.IO) {
+            reminderActivation.await()
             val rows = dao.allItems()
             val past = rows.map { it.personId }.distinct().associateWith { person ->
                 (if (person == selected.value) medicinePastIds.value else runCatching { medicineHistory.cached(person).pastIds }.getOrDefault(emptySet())) + db.prescriptions().excludedIds(person).first()
             }
             reminderScheduler?.reconcile(rows.filterNot { it.kind == "medicine" && it.id in past[it.personId].orEmpty() })
-        }
+        } }
     }
     fun remove(item: CareItem) = action { requireEdit(item.personId); cloud?.removeEntry(item); dao.removeItem(item); reconcileReminders(); message.value = "Removed" }
     fun importReport(uri: android.net.Uri, personId: String) = action {

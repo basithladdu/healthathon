@@ -43,6 +43,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -156,27 +157,190 @@ import java.io.ByteArrayInputStream
     }
 }
 
+/** The loaded 3D page plus the callbacks of whichever screen currently shows it. */
+private class PainViewerHost(val view: WebView, val activity: android.app.Activity?) {
+    var ready = false
+    var dead = false
+    var reused = false
+    var onReady: (() -> Unit)? = null
+    var onFailed: (() -> Unit)? = null
+    var onMessage: ((String?, String) -> Unit)? = null
+    fun fail() { dead = true; onFailed?.invoke() }
+}
+
+/**
+ * One 3D viewer kept per activity. Leaving "Where does it hurt?" (Next, Back, closing a history sheet) only detaches it,
+ * so the next visit shows the already loaded model instead of loading three.js and the body model again.
+ * A second viewer open at the same time gets its own WebView, destroyed as before. The kept one is destroyed with the activity or under memory pressure.
+ */
+private object PainViewerHosts {
+    private var kept: PainViewerHost? = null
+    private var inUse = false
+    private val live = mutableListOf<PainViewerHost>()
+    private var watched: android.app.Activity? = null
+    private var memoryWatch = false
+
+    fun ownerOf(view: WebView): PainViewerHost? = live.firstOrNull { it.view === view }
+
+    fun acquire(context: android.content.Context): PainViewerHost {
+        val activity = context.findActivity()
+        kept?.let { host ->
+            if (!inUse && !host.dead && host.activity === activity) { inUse = true; host.reused = true; return host }
+            if (!inUse) drop()
+        }
+        val host = PainViewerHost(createPainViewer(context), activity).also { live += it }
+        if (kept == null && activity != null) { kept = host; inUse = true; watch(activity) }
+        return host
+    }
+
+    fun release(host: PainViewerHost) {
+        host.onReady = null; host.onFailed = null; host.onMessage = null
+        if (host === kept && !host.dead) { inUse = false; host.view.onPause(); (host.view.parent as? android.view.ViewGroup)?.removeView(host.view) }
+        else { if (host === kept) { inUse = false; kept = null }; destroy(host.view) }
+    }
+
+    private fun watch(activity: android.app.Activity) {
+        if (!memoryWatch) {
+            memoryWatch = true
+            activity.application.registerComponentCallbacks(object : android.content.ComponentCallbacks2 {
+                override fun onTrimMemory(level: Int) { if (level >= android.content.ComponentCallbacks2.TRIM_MEMORY_RUNNING_LOW && !inUse) drop() }
+                override fun onConfigurationChanged(newConfig: android.content.res.Configuration) = Unit
+                @Deprecated("Deprecated in Java") override fun onLowMemory() { if (!inUse) drop() }
+            })
+        }
+        if (watched === activity) return
+        watched = activity
+        (activity as? androidx.lifecycle.LifecycleOwner)?.lifecycle?.addObserver(object : androidx.lifecycle.DefaultLifecycleObserver {
+            override fun onDestroy(owner: androidx.lifecycle.LifecycleOwner) {
+                if (kept?.activity === activity) { inUse = false; drop() }
+                if (watched === activity) watched = null
+            }
+        })
+    }
+
+    private fun drop() { kept?.let { destroy(it.view) }; kept = null }
+
+    /** Safe to call twice: only a live view is destroyed. */
+    private fun destroy(view: WebView) {
+        if (!live.removeAll { it.view === view }) return
+        (view.parent as? android.view.ViewGroup)?.removeView(view)
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) WebViewCompat.removeWebMessageListener(view, "SaharaPainNative")
+        view.stopLoading(); view.destroy()
+    }
+}
+
+private tailrec fun android.content.Context.findActivity(): android.app.Activity? = when (this) {
+    is android.app.Activity -> this
+    is android.content.ContextWrapper -> baseContext.findActivity()
+    else -> null
+}
+
+/** Builds the locked-down viewer page. Messages and failures go to whichever [PainViewerHost] owns the view at that moment. */
 @SuppressLint("SetJavaScriptEnabled")
+private fun createPainViewer(context: android.content.Context): WebView =
+    WebView(context).apply {
+        setBackgroundColor(android.graphics.Color.TRANSPARENT)
+        settings.javaScriptEnabled = true
+        settings.domStorageEnabled = false
+        settings.allowFileAccess = false
+        settings.allowContentAccess = false
+        settings.blockNetworkLoads = true
+        settings.mixedContentMode = WebSettings.MIXED_CONTENT_NEVER_ALLOW
+        settings.setSupportMultipleWindows(false)
+        settings.javaScriptCanOpenWindowsAutomatically = false
+        isVerticalScrollBarEnabled = false
+        isHorizontalScrollBarEnabled = false
+        val assetLoader = WebViewAssetLoader.Builder().addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(context)).build()
+        webViewClient = object : WebViewClientCompat() {
+            override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean = request.url.toString() != PainViewerPolicy.PAGE
+            override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse {
+                if (request.method == "GET" && PainViewerPolicy.localResource(request.url.toString())) {
+                    assetLoader.shouldInterceptRequest(request.url)?.let { response ->
+                        response.responseHeaders = mapOf("Cache-Control" to "no-store")
+                        return response
+                    }
+                }
+                return WebResourceResponse("text/plain", "utf-8", 403, "Blocked", emptyMap(), ByteArrayInputStream(ByteArray(0)))
+            }
+            override fun onReceivedError(view: WebView, request: WebResourceRequest, error: androidx.webkit.WebResourceErrorCompat) { if (request.isForMainFrame) view.post { PainViewerHosts.ownerOf(view)?.fail() } }
+            override fun onRenderProcessGone(view: WebView, detail: android.webkit.RenderProcessGoneDetail): Boolean { PainViewerHosts.ownerOf(view)?.fail(); return true }
+        }
+        // Up/down drags stay with the page so it scrolls; the model keeps only sideways drags (turn) and two-finger pinches (zoom). A tap still reaches the page.
+        val slop = ViewConfiguration.get(context).scaledTouchSlop.toFloat()
+        var downX = 0f; var downY = 0f; var claimed = false
+        setOnTouchListener { touched, event ->
+            when (event.actionMasked) {
+                MotionEvent.ACTION_DOWN -> { downX = event.x; downY = event.y; claimed = false }
+                MotionEvent.ACTION_MOVE, MotionEvent.ACTION_POINTER_DOWN -> if (!claimed && PainViewerPolicy.viewerKeepsGesture(event.x - downX, event.y - downY, event.pointerCount, slop)) {
+                    claimed = true; touched.parent?.requestDisallowInterceptTouchEvent(true)
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> { claimed = false; touched.parent?.requestDisallowInterceptTouchEvent(false) }
+            }
+            false
+        }
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) {
+            WebViewCompat.addWebMessageListener(this, "SaharaPainNative", setOf(PainViewerPolicy.ORIGIN)) { view, message, origin, mainFrame, _ ->
+                if (mainFrame && PainViewerPolicy.trustedOrigin(origin.toString())) {
+                    val data = message.data.orEmpty()
+                    if (data.length <= 180) {
+                        val type = runCatching { JSONObject(data).optString("type") }.getOrNull()
+                        view.post { PainViewerHosts.ownerOf(view)?.let { owner ->
+                            when (type) {
+                                "ready" -> { owner.ready = true; owner.onReady?.invoke() }
+                                "error" -> owner.fail()
+                                else -> owner.onMessage?.invoke(type, data)
+                            }
+                        } }
+                    }
+                }
+            }
+            loadUrl(PainViewerPolicy.PAGE)
+        }
+    }
+
 @Composable private fun LocalPainBodyViewer(selected: List<String>, points: List<PainBodyPoint3d>, ratings: Map<String, Int>, hindi: Boolean, back: Boolean, readOnly: Boolean, focus: String?, focusNonce: Int, onChange: (List<String>, List<PainBodyPoint3d>) -> Unit) {
-    var webView by remember { mutableStateOf<WebView?>(null) }
-    var ready by remember { mutableStateOf(false) }
-    var failed by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val host = remember { PainViewerHosts.acquire(context) }
+    var ready by remember { mutableStateOf(host.ready) }
+    var failed by remember { mutableStateOf(host.dead || !WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) }
     val latestSelected by rememberUpdatedState(selected)
     val latestPoints by rememberUpdatedState(points)
     val latestOnChange by rememberUpdatedState(onChange)
     val latestReadOnly by rememberUpdatedState(readOnly)
+    DisposableEffect(host) {
+        host.onReady = { ready = true }
+        host.onFailed = { failed = true }
+        if (host.ready) ready = true
+        if (host.dead) failed = true
+        host.onMessage = { type, data ->
+            when (type) {
+                "toggle" -> if (!latestReadOnly) PainViewerPolicy.toggledSite(data)?.let { site ->
+                    val next = PainBodyMapRules.toggled(latestSelected, site)
+                    latestOnChange(next, latestPoints.filter { it.site in next })
+                }
+                "pick" -> if (!latestReadOnly) PainViewerPolicy.pickedPoint(data)?.let { point ->
+                    val next = PainBodyMapRules.sites.keys.filter { it in latestSelected || it == point.site }
+                    val markers = (latestPoints.filter { it.site != point.site } + point).sortedBy { it.site }
+                    latestOnChange(next, markers)
+                }
+            }
+        }
+        onDispose { PainViewerHosts.release(host) }
+    }
+    val webView = host.view
     val state = JSONObject().put("selected", JSONArray(selected.filter { it in PainBodyMapRules.sites })).put("rating", JSONObject.NULL).put("ratings", PainBodyMapRules.encodeRatings(ratings.filterValues { it in 0..10 })).put("hindi", hindi).put("readOnly", readOnly).put("points", PainBodyMapRules.encodePoints(points)).toString()
-    LaunchedEffect(webView, ready, state) {
-        if (ready) webView?.evaluateJavascript("window.SaharaPainViewer?.setState($state);", null)
+    LaunchedEffect(ready, state) {
+        if (ready) webView.evaluateJavascript("window.SaharaPainViewer?.setState($state);", null)
     }
-    LaunchedEffect(webView, ready, back) {
-        if (ready) webView?.evaluateJavascript("window.SaharaPainViewer?.setView('${if (back) "back" else "front"}');", null)
+    LaunchedEffect(ready, back) {
+        if (ready) webView.evaluateJavascript("window.SaharaPainViewer?.setView('${if (back) "back" else "front"}');", null)
     }
-    LaunchedEffect(webView, ready, focus, focusNonce) {
+    LaunchedEffect(ready, focus, focusNonce) {
         if (!ready) return@LaunchedEffect
         // The id is one of PainBodyMapRules.sites keys, so it is safe to place inside the script string.
-        if (focus != null && focus in PainBodyMapRules.sites) webView?.evaluateJavascript("window.SaharaPainViewer?.focusRegion('$focus','${if (back) "back" else "front"}');", null)
-        else if (focusNonce > 0) webView?.evaluateJavascript("window.SaharaPainViewer?.focusFull();", null)
+        if (focus != null && focus in PainBodyMapRules.sites) webView.evaluateJavascript("window.SaharaPainViewer?.focusRegion('$focus','${if (back) "back" else "front"}');", null)
+        // A kept viewer may still be zoomed from its last screen; start this one on the full body like a fresh page.
+        else if (focusNonce > 0 || host.reused) webView.evaluateJavascript("window.SaharaPainViewer?.focusFull();", null)
     }
     if (failed) {
         Text(if (readOnly) { if (hindi) "इस फ़ोन पर 3D नहीं खुला। सहेजे हुए हिस्से नीचे नक्शे पर हैं।" else "3D could not open on this phone. Saved areas are shown on the diagram." } else if (hindi) "इस फ़ोन पर 3D नहीं खुला। नीचे नक्शे या बटन से जगह चुनें।" else "3D could not open on this phone. Choose on the map or the buttons below.", style = MaterialTheme.typography.bodySmall)
@@ -186,79 +350,10 @@ import java.io.ByteArrayInputStream
         Box(Modifier.fillMaxWidth().height(440.dp).clip(frame).background(Color(0xFF2A2421)).border(1.dp, Color(0xFF4A403A), frame)) {
         AndroidView(modifier = Modifier.fillMaxSize().testTag("pain-body-3d").semantics {
             contentDescription = if (readOnly) { if (hindi) "सहेजी गई दर्द की जगह का घुमाने वाला नक्शा। जगह बदली नहीं जा सकती।" else "Rotatable saved pain map. Saved locations cannot be changed here." } else if (hindi) "घुमाने वाला दर्द की जगह का नक्शा। नीचे जगह के बटन से भी चुन सकते हैं।" else "Rotatable pain location map. Accessible region buttons are below."
-        }, factory = { context ->
-            WebView(context).apply {
-                webView = this
-                setBackgroundColor(android.graphics.Color.TRANSPARENT)
-                settings.javaScriptEnabled = true
-                settings.domStorageEnabled = false
-                settings.allowFileAccess = false
-                settings.allowContentAccess = false
-                settings.blockNetworkLoads = true
-                settings.mixedContentMode = WebSettings.MIXED_CONTENT_NEVER_ALLOW
-                settings.setSupportMultipleWindows(false)
-                settings.javaScriptCanOpenWindowsAutomatically = false
-                isVerticalScrollBarEnabled = false
-                isHorizontalScrollBarEnabled = false
-                val assetLoader = WebViewAssetLoader.Builder().addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(context)).build()
-                webViewClient = object : WebViewClientCompat() {
-                    override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean = request.url.toString() != PainViewerPolicy.PAGE
-                    override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse {
-                        if (request.method == "GET" && PainViewerPolicy.localResource(request.url.toString())) {
-                            assetLoader.shouldInterceptRequest(request.url)?.let { response ->
-                                response.responseHeaders = mapOf("Cache-Control" to "no-store")
-                                return response
-                            }
-                        }
-                        return WebResourceResponse("text/plain", "utf-8", 403, "Blocked", emptyMap(), ByteArrayInputStream(ByteArray(0)))
-                    }
-                    override fun onReceivedError(view: WebView, request: WebResourceRequest, error: androidx.webkit.WebResourceErrorCompat) { if (request.isForMainFrame) view.post { failed = true } }
-                    override fun onRenderProcessGone(view: WebView, detail: android.webkit.RenderProcessGoneDetail): Boolean { failed = true; return true }
-                }
-                // Up/down drags stay with the page so it scrolls; the model keeps only sideways drags (turn) and two-finger pinches (zoom). A tap still reaches the page.
-                val slop = ViewConfiguration.get(context).scaledTouchSlop.toFloat()
-                var downX = 0f; var downY = 0f; var claimed = false
-                setOnTouchListener { view, event ->
-                    when (event.actionMasked) {
-                        MotionEvent.ACTION_DOWN -> { downX = event.x; downY = event.y; claimed = false }
-                        MotionEvent.ACTION_MOVE, MotionEvent.ACTION_POINTER_DOWN -> if (!claimed && PainViewerPolicy.viewerKeepsGesture(event.x - downX, event.y - downY, event.pointerCount, slop)) {
-                            claimed = true; view.parent?.requestDisallowInterceptTouchEvent(true)
-                        }
-                        MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> { claimed = false; view.parent?.requestDisallowInterceptTouchEvent(false) }
-                    }
-                    false
-                }
-                if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) {
-                    WebViewCompat.addWebMessageListener(this, "SaharaPainNative", setOf(PainViewerPolicy.ORIGIN)) { view, message, origin, mainFrame, _ ->
-                        if (mainFrame && PainViewerPolicy.trustedOrigin(origin.toString())) {
-                            val data = message.data.orEmpty()
-                            if (data.length <= 180) {
-                                val type = runCatching { JSONObject(data).optString("type") }.getOrNull()
-                                view.post {
-                                    when (type) {
-                                        "ready" -> ready = true
-                                        "error" -> failed = true
-                                        "toggle" -> if (!latestReadOnly) PainViewerPolicy.toggledSite(data)?.let { site ->
-                                            val next = PainBodyMapRules.toggled(latestSelected, site)
-                                            latestOnChange(next, latestPoints.filter { it.site in next })
-                                        }
-                                        "pick" -> if (!latestReadOnly) PainViewerPolicy.pickedPoint(data)?.let { point ->
-                                            val next = PainBodyMapRules.sites.keys.filter { it in latestSelected || it == point.site }
-                                            val markers = (latestPoints.filter { it.site != point.site } + point).sortedBy { it.site }
-                                            latestOnChange(next, markers)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    loadUrl(PainViewerPolicy.PAGE)
-                } else failed = true
-            }
-        }, onReset = null, onRelease = { view ->
-            if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) WebViewCompat.removeWebMessageListener(view, "SaharaPainNative")
-            view.stopLoading(); view.destroy()
-            if (webView === view) webView = null
+        }, factory = { _ ->
+            (webView.parent as? android.view.ViewGroup)?.removeView(webView)
+            webView.onResume()
+            webView
         })
         // One calm loading cover above the page (the page's own background and status would otherwise flash in), faded out once the model is drawn.
         AnimatedVisibility(!ready, Modifier.matchParentSize(), enter = EnterTransition.None, exit = fadeOut(tween(260))) {

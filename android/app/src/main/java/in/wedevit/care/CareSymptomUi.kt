@@ -56,8 +56,11 @@ import java.time.format.DateTimeFormatter
     var adding by rememberSaveable(selected) { mutableStateOf(false) }
     var showingPainHistory by rememberSaveable(selected) { mutableStateOf(false) }
     val person = people.firstOrNull { it.id == selected }
+    // Decode each note once for sorting; a decode inside the comparator ran on every comparison.
     val notes = remember(entries, selected) { entries.filter { it.personId == selected && SymptomNoteCodec.isStructured(it.detail) }
-        .sortedByDescending { SymptomNoteCodec.decode(it.detail)?.let { n -> "${n.observedDate}T${n.observedTime}" }.orEmpty() } }
+        .map { it to SymptomNoteCodec.decode(it.detail)?.let { n -> "${n.observedDate}T${n.observedTime}" }.orEmpty() }
+        .sortedByDescending { it.second }.map { it.first } }
+    val hasPainHistory = remember(entries, person?.id) { person != null && PainHistoryRules.entries(entries, person.id).isNotEmpty() }
     val t = { en: String, hi: String -> if (hindi) hi else en }
     BackHandler(onBack = onBack)
     LazyColumn(Modifier.fillMaxSize().testTag("symptom-diary"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -78,7 +81,7 @@ import java.time.format.DateTimeFormatter
                 Icon(Icons.Default.Add, null); Spacer(Modifier.width(8.dp)); Text(t("How are you feeling?", "तबीयत कैसी है?"))
             }
         }
-        if (person != null && PainHistoryRules.entries(entries, person.id).isNotEmpty()) item {
+        if (person != null && hasPainHistory) item {
             OutlinedButton(onClick = { showingPainHistory = true }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("symptom-pain-history")) { Text(t("Pain history on body", "शरीर पर दर्द का इतिहास")) }
         }
         if (notes.isEmpty()) item { SurfaceCard(Mint) { Text(t("No symptom notes yet", "अभी तबीयत का कोई नोट नहीं है"), fontWeight = FontWeight.SemiBold) } }
@@ -124,7 +127,7 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
     var removing by rememberSaveable(item.id) { mutableStateOf(false) }
     var menuOpen by remember(item.id) { mutableStateOf(false) }
     val t = { en: String, hi: String -> if (hindi) hi else en }
-    val note = SymptomNoteCodec.decode(item.detail)
+    val note = remember(item.detail) { SymptomNoteCodec.decode(item.detail) }
     val isPain = note?.symptom?.trim()?.equals("Pain", true) == true
     Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) { Column(Modifier.padding(start = 16.dp, top = 12.dp, end = 8.dp, bottom = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -158,7 +161,7 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
             if (details.isNotEmpty()) Text(details.joinToString("\n"), style = MaterialTheme.typography.bodySmall, color = DoctorCardSub)
             if (note.note.isNotBlank()) Text(note.note, maxLines = 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, style = MaterialTheme.typography.bodyMedium, color = DoctorCardInk)
         } else Text(SymptomNoteCodec.readable(item.detail, hindi), style = MaterialTheme.typography.bodyMedium)
-        val comparison = note?.let { SymptomDiaryRules.comparison(entries, item, it) }
+        val comparison = remember(entries, item, note) { note?.let { SymptomDiaryRules.comparison(entries, item, it) } }
         if (comparison != null) {
             val baseline = SymptomNoteCodec.decode(comparison.baseline.detail)!!
             val previous = SymptomNoteCodec.decode(comparison.previous.detail)!!

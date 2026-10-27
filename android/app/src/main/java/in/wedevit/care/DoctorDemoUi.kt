@@ -49,7 +49,6 @@ import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -227,7 +226,7 @@ private val DoctorMist = Peach
                 if(sampleCareOpen) IconButton(onClick={sampleCareBack?.invoke() ?: run {sampleCareOpen=false}},enabled=!careNavigationBlocked){Icon(Icons.AutoMirrored.Filled.ArrowBack,"Back to patient care")}
                 else if (carePersonId != null) IconButton(onClick = { if (careNestedBack != null) careNestedBack?.invoke() else navigateCare { if (careSection == "Hub") carePersonId = null else careSection = "Hub" } }, enabled = !careNavigationBlocked) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back to patient care") }
                 else if (patient != null) IconButton(onClick = ::backPatient,modifier=Modifier.testTag("demo-patient-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, if(reportId!=null) "Back to reports" else if(progressReportId!=null) "Back to progress" else if(recordTab=="Hub") "Back to patients" else "Back to patient profile") }
-                else { Image(painterResource(R.drawable.sahara_professional_logo), null, Modifier.size(34.dp)); Spacer(Modifier.width(8.dp)) }
+                else { Image(saharaImage(R.drawable.sahara_professional_logo, 34.dp), null, Modifier.size(34.dp)); Spacer(Modifier.width(8.dp)) }
                 Column(Modifier.weight(1f)) {
                     Text(if(sampleCareOpen) DoctorTestProfiles.profiles.firstOrNull {DoctorTestProfiles.personId(it)==testCarePerson}?.name ?: "Earlier practice care" else if (carePersonId != null) carePerson?.name ?: "Care profile unavailable" else if (patient != null) patient.displayName() else "Sahara", fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 20.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     if(sampleCareOpen && DoctorTestProfiles.contains(testCarePerson)) Text("Care record",color=DoctorMuted,fontSize=12.sp)
@@ -352,9 +351,9 @@ private val DoctorMist = Peach
     Column(Modifier.fillMaxSize().background(DoctorBackground).safeDrawingPadding().imePadding().verticalScroll(rememberScrollState()).padding(horizontal = 24.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(18.dp)) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onExit) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back to Sahara") }
-            Spacer(Modifier.weight(1f)); Image(painterResource(R.drawable.sahara_professional_logo), null, Modifier.size(30.dp)); Spacer(Modifier.width(6.dp)); Text("Sahara", fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
+            Spacer(Modifier.weight(1f)); Image(saharaImage(R.drawable.sahara_professional_logo, 30.dp), null, Modifier.size(30.dp)); Spacer(Modifier.width(6.dp)); Text("Sahara", fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
         }
-        Image(painterResource(R.drawable.doctor_login_mascot), "A caring companion holding a notepad", Modifier.fillMaxWidth().height(180.dp), contentScale=androidx.compose.ui.layout.ContentScale.Fit)
+        Image(saharaImage(R.drawable.doctor_login_mascot, 180.dp), "A caring companion holding a notepad", Modifier.fillMaxWidth().height(180.dp), contentScale=androidx.compose.ui.layout.ContentScale.Fit)
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) { DoctorTitle("Welcome back", 30); Text("Manage patient records and appointments.", color = DoctorMuted, fontSize = 16.sp, lineHeight = 23.sp) }
         Text("Doctor login", fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 18.sp)
         OutlinedTextField(email, { email = it; error = null }, singleLine = true, label = { Text("Email") }, leadingIcon = { Icon(Icons.Default.MailOutline, null) }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email), shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().testTag("demo-email"))

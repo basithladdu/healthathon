@@ -19,7 +19,6 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.unit.dp
 
@@ -48,7 +47,7 @@ internal fun WelcomeHero(modifier: Modifier = Modifier) {
             thoughtCloud(size.width - cloudWidth - 6f * unit, 3f * unit, cloudWidth, unit, orange, doctor = false)
         }
         Image(
-            painterResource(R.drawable.sahara_welcome_conversation),
+            saharaImage(R.drawable.sahara_welcome_conversation, 260.dp),
             "A doctor and patient talking about care",
             Modifier.widthIn(max = 260.dp).fillMaxWidth().height(215.dp).testTag("welcome-hero-illustration"),
             alignment = Alignment.Center,

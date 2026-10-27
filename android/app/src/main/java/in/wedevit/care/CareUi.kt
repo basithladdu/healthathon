@@ -40,7 +40,6 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -159,7 +158,7 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
     Scaffold(containerColor = Cream, snackbarHost = { SnackbarHost(snackbar) }, topBar = {
         if (!medicineScanner) Column {
         Row(Modifier.statusBarsPadding().fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-            Image(painterResource(R.drawable.sahara_professional_logo), null, Modifier.size(44.dp), contentScale = ContentScale.Fit)
+            Image(saharaImage(R.drawable.sahara_professional_logo, 44.dp), null, Modifier.size(44.dp), contentScale = ContentScale.Fit)
             Spacer(Modifier.width(4.dp))
             Column(Modifier.weight(1f).padding(vertical = 8.dp, horizontal = 2.dp)) {
                     Text(androidx.compose.ui.res.stringResource(R.string.app_name), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 22.sp, maxLines = 1)
@@ -339,7 +338,7 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
                     }
                 }
                 Spacer(Modifier.width(10.dp))
-                Image(painterResource(R.drawable.care_notes_illustration), null, Modifier.size(104.dp), contentScale = ContentScale.Fit)
+                Image(saharaImage(R.drawable.care_notes_illustration, 104.dp), null, Modifier.size(104.dp), contentScale = ContentScale.Fit)
             }
         } }
         if (clinician && latest != null) item { ActionCard(Paper, onClick = { onRead(latest) }) {
@@ -750,7 +749,7 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
                 FilledTonalButton(onClick = { open(context, Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, NoteRules.text(note, confirmations)), "Share care note")) }, modifier = Modifier.weight(1f), colors = ButtonDefaults.filledTonalButtonColors(containerColor = Gold, contentColor = Ink)) { Icon(Icons.Default.Share, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Share") }
             } }
             item { CareReadAloudControl(NoteRules.labels.zip(NoteRules.values(note)).filter { it.second.isNotBlank() }.joinToString("\n\n") { "${it.first}. ${it.second}" }, note.id) }
-            if (note.hashScheme != DoctorConversationContext.HASH_SCHEME) items(NoteRules.labels.zip(NoteRules.values(note))) { (label, value) -> SurfaceCard(if (label == "What matters") Gold else Paper) { Text(label, fontWeight = FontWeight.Bold); Spacer(Modifier.height(8.dp)); SelectionContainerText(value.ifBlank { "Not recorded" }); CareSourceLinks(note.source, value) } }
+            if (note.hashScheme != DoctorConversationContext.HASH_SCHEME) items(NoteRules.labels.zip(NoteRules.values(note)), key = { it.first }) { (label, value) -> SurfaceCard(if (label == "What matters") Gold else Paper) { Text(label, fontWeight = FontWeight.Bold); Spacer(Modifier.height(8.dp)); SelectionContainerText(value.ifBlank { "Not recorded" }); CareSourceLinks(note.source, value) } }
             if (note.hashScheme != DoctorConversationContext.HASH_SCHEME) item { SurfaceCard { Text("Original conversation", fontWeight = FontWeight.Bold); Spacer(Modifier.height(8.dp)); SelectionContainerText(note.source) } }
             if (!vm.demoMode) item { CareOfflineTranslationPanel(source = NoteRules.labels.zip(NoteRules.values(note)).filter { it.second.isNotBlank() }.joinToString("\n\n") { "${it.first}\n${it.second}" }, versionId = note.id) }
             items(confirmations, key = { it.id }) { confirmation -> SurfaceCard(if (confirmation.relationship == "Patient") Sage else Mint) {
@@ -849,8 +848,10 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
     var chosen by remember { mutableStateOf<Centre?>(null) }
     val focus = LocalFocusManager.current
     val states = remember(centres) { centres.map { it.state }.filter(String::isNotBlank).distinct().sorted() }
-    val visible = remember(centres, search, service, morphine, state) { centres.filter { c ->
-        "${c.name} ${c.city} ${c.district} ${c.address} ${c.state}".contains(search.trim(), true) &&
+    // Build each centre's search text once, not for all 1,600 centres on every typed letter.
+    val searchText = remember(centres) { centres.map { c -> "${c.name} ${c.city} ${c.district} ${c.address} ${c.state}" } }
+    val visible = remember(centres, search, service, morphine, state) { centres.filterIndexed { index, c ->
+        searchText[index].contains(search.trim(), true) &&
             (state == "All India" || c.state == state) && (service == "All" || c.services.contains(service, ignoreCase = true)) && (!morphine || c.sourceListedMorphine == "available")
     } }
     LazyColumn(Modifier.fillMaxSize().testTag("nearby-list"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
@@ -992,7 +993,7 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
     ActionCard(color, modifier, onClick) {
         Column(Modifier.fillMaxWidth().padding(16.dp)) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
-                Image(painterResource(illustration), null, Modifier.size(64.dp), contentScale = ContentScale.Fit)
+                Image(saharaImage(illustration, 64.dp), null, Modifier.size(64.dp), contentScale = ContentScale.Fit)
                 Spacer(Modifier.weight(1f))
                 Icon(Icons.AutoMirrored.Filled.ArrowForward, null, Modifier.size(17.dp))
             }

@@ -110,7 +110,7 @@ import kotlinx.coroutines.launch
             LazyColumn(Modifier.imePadding().fillMaxWidth(), contentPadding = PaddingValues(22.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
                 item { Heading("Review conversation", 26); Text("Revision ${draft.revision} · ${draft.status}", style = MaterialTheme.typography.bodySmall) }
                 item { SurfaceCard(Gold) { Text("Original words", fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont); SelectionContainerText(draft.conversation.source) } }
-                items(NoteRules.labels.zip(NoteRules.values(draft.conversation))) { (label, value) -> SurfaceCard { Text(label, fontWeight = FontWeight.Bold); SelectionContainerText(value.ifBlank { "Not recorded" }); CareSourceLinks(draft.conversation.source, value) } }
+                items(NoteRules.labels.zip(NoteRules.values(draft.conversation)), key = { it.first }) { (label, value) -> SurfaceCard { Text(label, fontWeight = FontWeight.Bold); SelectionContainerText(value.ifBlank { "Not recorded" }); CareSourceLinks(draft.conversation.source, value) } }
                 if (profile?.status == "approved" && draft.status == "submitted" && !owner && cloud != null) {
                     item { CheckLine(confirmed, { confirmed = it }, "I checked this exact source and every section as the patient's invited clinician.") }
                     item { Button(onClick = { run { cloud.reviewSharedDraft(draft); reading = null; refresh(); vm.refresh(); notice = "Reviewed care-note version published. The patient reviews this exact version next." } }, enabled = confirmed && !busy, modifier = Modifier.fillMaxWidth()) { Text("Publish reviewed care note") } }

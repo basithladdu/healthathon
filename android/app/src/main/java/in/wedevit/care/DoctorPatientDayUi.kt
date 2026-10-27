@@ -28,7 +28,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -135,7 +134,7 @@ private fun doctorRecordedTime(at: Long, zone: ZoneId) = if (at <= 0) "Date not 
                 Text("Care story and next steps", fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk)
                 Row(Modifier.heightIn(min = 32.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) { Text("Read overview", fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = DoctorAccent); Icon(Icons.AutoMirrored.Filled.ArrowForward, null, Modifier.size(20.dp), tint = DoctorAccent) }
             }
-            Image(painterResource(R.drawable.care_notes_illustration), null, Modifier.size(72.dp), contentScale = ContentScale.Fit)
+            Image(saharaImage(R.drawable.care_notes_illustration, 72.dp), null, Modifier.size(72.dp), contentScale = ContentScale.Fit)
         }
     }
 }
@@ -144,7 +143,7 @@ private fun doctorRecordedTime(at: Long, zone: ZoneId) = if (at <= 0) "Date not 
     Card(onClick = onOpen, colors = CardDefaults.cardColors(containerColor = DoctorCardProgress), shape = RoundedCornerShape(20.dp), modifier = modifier.heightIn(min=if(compact)152.dp else 0.dp).testTag("doctor-condition-today")) {
         Box(Modifier.fillMaxWidth()) {
         Box(Modifier.matchParentSize(), contentAlignment = Alignment.CenterEnd) {
-            Image(painterResource(R.drawable.wellbeing_checkin_illustration), null, Modifier.size(160.dp).testTag("doctor-condition-illustration"), contentScale = ContentScale.Fit, alpha = .15f)
+            Image(saharaImage(R.drawable.wellbeing_checkin_illustration, 160.dp), null, Modifier.size(160.dp).testTag("doctor-condition-illustration"), contentScale = ContentScale.Fit, alpha = .15f)
         }
         Column(Modifier.fillMaxWidth().padding(if(compact) 14.dp else 18.dp).testTag("doctor-condition-copy"), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(if(compact) "Reported condition" else "Today's reported condition", modifier=Modifier.fillMaxWidth(),textAlign=TextAlign.Start,fontSize = if(compact)18.sp else 20.sp, lineHeight = if(compact)22.sp else 25.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, color = DoctorCardInk)
