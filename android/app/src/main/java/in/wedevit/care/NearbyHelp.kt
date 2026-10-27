@@ -41,15 +41,60 @@ object NearbyHelp {
      */
     fun visible(centres: List<Centre>, searchText: List<String>, search: String, state: String, district: String,
                 service: String, morphine: Boolean): List<Centre> {
+        val words = queryWords(search)
         val matches = centres.filterIndexed { index, c ->
-            searchText[index].contains(search.trim(), true) &&
-                (state == ALL_INDIA || c.state == state) && (service == ALL_SERVICES || c.services.contains(service, ignoreCase = true)) &&
+            matches(searchText[index], words) &&
+                (state == ALL_INDIA || c.state == state) && servesAs(c, service) &&
                 (!morphine || c.sourceListedMorphine == "available") &&
                 (district.isBlank() || c.district.equals(district, true) || c.address.contains(district, true))
         }
         return if (district.isBlank()) matches else matches.sortedBy { !it.district.equals(district, true) }
     }
 
+    /** Service chips, in the order shown. Each one is in the bundled directory; "Hospice" means the listing's name or address says hospice. */
+    val serviceOptions = listOf(ALL_SERVICES, "Home care", "Clinic visits", "Inpatient care", "Day care", "Physiotherapy", HOSPICE)
+
+    fun servesAs(c: Centre, service: String): Boolean = when (service) {
+        ALL_SERVICES -> true
+        HOSPICE -> c.name.contains("hospice", true) || c.address.contains("hospice", true) || c.services.contains("hospice", true)
+        else -> c.services.contains(service, ignoreCase = true)
+    }
+
+    /** One lower-case string to search per centre: name, place, address, state and services, plus the address with PIN digits joined ("560 034" → "560034"). */
+    fun searchKey(c: Centre): String = listOf(c.name, c.city, c.district, c.address, c.state, c.services, c.address.replace(Regex("(?<=\\d)\\s+(?=\\d)"), ""))
+        .joinToString(" ").lowercase()
+
+    /** Every query word must appear somewhere in the key (any case, part of a word is enough); a word with known other spellings matches any of them. */
+    fun matches(key: String, words: List<String>): Boolean = words.all { word -> (aliases.firstOrNull { word in it } ?: listOf(word)).any { key.contains(it, ignoreCase = true) } }
+
+    /** Query words, with Hindi place and service names turned into the English the directory uses. */
+    fun queryWords(search: String): List<String> {
+        var text = search.lowercase()
+        hindi.entries.sortedByDescending { it.key.length }.forEach { (hi, en) -> text = text.replace(hi, " $en ") }
+        return text.split(Regex("[\\s,]+")).filter(String::isNotBlank)
+    }
+
+    /** Spellings the directory mixes for the same place. */
+    private val aliases = listOf(listOf("bengaluru", "bangalore"), listOf("mumbai", "bombay"), listOf("kochi", "cochin"), listOf("thiruvananthapuram", "trivandrum"),
+        listOf("chennai", "madras"), listOf("gurugram", "gurgaon"), listOf("ernakulam", "ernakulum"), listOf("kolkata", "calcutta"))
+
+    /** Hindi names a person may type for states, large cities and services. */
+    private val hindi = mapOf("केरल" to "kerala", "कर्नाटक" to "karnataka", "तमिलनाडु" to "tamil nadu", "तमिल नाडु" to "tamil nadu", "आंध्र प्रदेश" to "andhra pradesh",
+        "तेलंगाना" to "telangana", "महाराष्ट्र" to "maharashtra", "दिल्ली" to "delhi", "उत्तर प्रदेश" to "uttar pradesh", "बिहार" to "bihar", "पश्चिम बंगाल" to "west bengal",
+        "गुजरात" to "gujarat", "राजस्थान" to "rajasthan", "मध्य प्रदेश" to "madhya pradesh", "पंजाब" to "punjab", "हरियाणा" to "haryana", "ओडिशा" to "odisha", "असम" to "assam",
+        "झारखंड" to "jharkhand", "छत्तीसगढ़" to "chhattisgarh", "उत्तराखंड" to "uttarakhand", "हिमाचल प्रदेश" to "himachal pradesh", "गोवा" to "goa", "पुडुचेरी" to "puducherry",
+        "चंडीगढ़" to "chandigarh", "मुंबई" to "mumbai", "बेंगलुरु" to "bengaluru", "बैंगलोर" to "bangalore", "चेन्नई" to "chennai", "कोलकाता" to "kolkata", "हैदराबाद" to "hyderabad",
+        "पुणे" to "pune", "जयपुर" to "jaipur", "लखनऊ" to "lucknow", "अहमदाबाद" to "ahmedabad", "कोच्चि" to "kochi", "तिरुवनंतपुरम" to "thiruvananthapuram", "पटना" to "patna",
+        "भोपाल" to "bhopal", "नागपुर" to "nagpur", "कोयंबटूर" to "coimbatore", "हॉस्पिस" to "hospice", "होस्पिस" to "hospice", "घर पर देखभाल" to "home care", "फ़िज़ियोथेरेपी" to "physiotherapy")
+
+    /** Text to send with Share: the listing as published, a directions link, and the reminder to call first. */
+    fun shareText(c: Centre): String = listOf(c.name, c.address, listOf(c.city, c.district, c.state).filter(String::isNotBlank).distinct().joinToString(", "),
+        c.phone.takeIf { it.any(Char::isDigit) }?.let { "Phone / फ़ोन: $it" }, "Directions / रास्ता: " + directionsUrl(c),
+        "Directory listing, call to confirm services. · सूची की जानकारी है, सेवाएँ फ़ोन करके पक्की करें।").filterNotNull().filter(String::isNotBlank).joinToString("\n")
+
+    fun directionsUrl(c: Centre): String = "https://www.google.com/maps/search/?api=1&query=" + java.net.URLEncoder.encode(c.name + " " + c.address, "UTF-8")
+
     const val ALL_INDIA = "All India"
     const val ALL_SERVICES = "All"
+    const val HOSPICE = "Hospice"
 }
