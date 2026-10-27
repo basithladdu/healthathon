@@ -499,3 +499,28 @@ Nothing below was tried on a device; there was no phone or emulator in the sessi
 - "SO AS YOU SAY THE CARE CONVERSATION JUST ADD THIS TRANSCRIPT MESSAGES INTO CLAUDE_TRANSCRIPT AND PUSH IN REPO" → done (c6b7584).
 - "everything we conversed about the sahara thing put it on the md" → this file.
 - "and also the tasks that we had that u wanted me to do put it, doesn't matter if we will do those, but just put it, and the screens don't work things as well" → sections 3 and 4.
+
+---
+
+## Deep dive (27 Oct)
+
+Owner: "do more research, dig in more, and probably clone the CARE thing as well."
+
+**How it was done:**
+- Shallow-cloned and read 14 public OHC repos, including `care@2bae933`, `care_fe@81e7515`, `care_scaffold`, `care_filly`, `care_ai_vision_fe`, `skills`, the docs source and the app registry.
+- Nothing was installed, built or run.
+- `care_abdm`, `care_scribe` and `care_hcx` could not be read anonymously.
+- All clones were deleted afterwards.
+
+**Full write-up:** [`docs/research/CARE_DEEP_DIVE_2026-10-27.md`](docs/research/CARE_DEEP_DIVE_2026-10-27.md). It covers the Kerala grid set-up, exactly what a patient token can reach, a `care_family` plugin blueprint, three CARE questionnaire JSONs for our forms (checked against CARE's form rules), ABDM, licences, peers, corrections to the earlier CARE docs, and the updated recommendation.
+
+**Headlines:**
+- The Kerala grid is plain CARE plus questionnaires it built itself. No care plan or caregiver record exists in code.
+- Our symptom diary, pain map and goals-of-care prompts can be CARE questionnaires today, with three limits:
+  - no 0–10 range check;
+  - no body-site picker when filling a form;
+  - no observation charts for patient-level answers.
+- The patient portal has no plugin hooks in today's care_fe.
+- A staff-reviewed "family inbox" plugin is about 15–20 developer-days, after 7 Nov.
+- ABDM needs NHA registration and the patient's consent. A file can't simply be pushed to a hospital.
+- **Recommendation:** slide text plus the three form files before 7 Nov. Build the plugin only with a named partner unit.
