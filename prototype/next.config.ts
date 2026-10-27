@@ -11,6 +11,15 @@ const nextConfig: NextConfig = {
         { key: 'Referrer-Policy', value: 'no-referrer' },
         { key: 'Cache-Control', value: 'private, no-store, max-age=0' },
       ],
+    }, {
+      source: '/emergency',
+      headers: [
+        { key: 'X-Frame-Options', value: 'DENY' },
+        { key: 'Content-Security-Policy', value: "frame-ancestors 'none'" },
+        { key: 'Referrer-Policy', value: 'no-referrer' },
+        { key: 'Cache-Control', value: 'private, no-store, max-age=0' },
+        { key: 'X-Robots-Tag', value: 'noindex, nofollow' },
+      ],
     }];
   },
   async redirects() {
