@@ -487,7 +487,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
                 when (entry.type) {
                     "task", "conversation" -> CareWorkflowRules.validate(title, entry)
                     "lab" -> CareLabRules.validate(title, entry, due)
-                    "schedule" -> require(due > 0 && entry.category in setOf("Visit", "Test", "Follow-up", "Procedure")) { "Choose a date and type of care." }
+                    "schedule" -> require(due > 0 && entry.category in setOf("Visit", "Test", "Follow-up", "Procedure") + TreatmentDayRules.categories) { "Choose a date and type of care." }
                 }
             }
             storeItem(CareItem(id = id, personId = person, kind = kind, title = title.trim(), detail = detail.trim(), due = due))
@@ -590,6 +590,12 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
         try { dao.addReport(report) }
         catch (e: Exception) { withContext(NonCancellable + Dispatchers.IO) { reportFiles.file(report).delete() }; throw e }
         message.value = "Report added"
+    }
+    fun renameReport(report: CareReport, name: String, done: () -> Unit) = action {
+        require(report.personId == selected.value && reports.value.any { it.id == report.id }) { "Choose a report for this person." }
+        requireEdit(report.personId)
+        require(dao.renameReport(report.id, report.personId, ReportNameRules.clean(name)) == 1) { "Couldn't rename this report. Try again." }
+        message.value = "Report renamed · नाम बदल गया"; done()
     }
     fun removeReport(report: CareReport, done: () -> Unit) = action {
         require(report.personId == selected.value && reports.value.any { it.id == report.id }) { "Choose a report for this person." }

@@ -240,7 +240,7 @@ Also read:
 | Item | Next step | Who |
 |---|---|---|
 | C1–C4 | Decide on the hospital QR card (3–5 days plus server work). If yes: large QR on Today, single-use browser link, printable, saveable offline, can be replaced if leaked | Owner decides, Awaiz builds |
-| C5 | Password-protect the PDF copy | Awaiz |
+| C5 | ~~Password-protect the PDF copy~~ done, fd208b5 (locked AES-256 ZIP; Android cannot encrypt the PDF itself) | Awaiz |
 
 ### Access to care
 | Item | Next step | Who |
@@ -257,9 +257,9 @@ Also read:
 | Item | Next step | Who |
 |---|---|---|
 | A6, A8 | Short patient-side summary with expandable sections; side-effect notes for the doctor at the next visit | Awaiz (later) |
-| E5 | Fill Lab history from scanned reports, with the original line kept | Awaiz |
-| E6 | Add a "cancer documents" category (PET-CT, biopsy) in Docs | Awaiz |
-| E7 | Mark chemo/radiotherapy days on the Lab history chart | Awaiz |
+| E5 | ~~Fill Lab history from scanned reports, with the original line kept~~ done, docs lane | Awaiz |
+| E6 | ~~Add a "cancer documents" category (PET-CT, biopsy) in Docs~~ done, docs lane | Awaiz |
+| E7 | ~~Mark chemo/radiotherapy days on the Lab history chart~~ done, docs lane | Awaiz |
 | E8, E9 | Clinicians to re-confirm whether patients may type daily medicines, or only scan printed prescriptions | Team |
 | E11 | Timeline summary from documents (last chemo or radiotherapy, with source) | Awaiz (later) |
 | E13 | Voice journal themes: no decision; hold | Team |
@@ -322,3 +322,6 @@ Sources: `docs/research/CARE_DEEP_DIVE_2026-10-27.md`, `CARE_VS_SAHARA_FOR_TEAM.
 - **Meds lane:** bundled 3,300 medicine *names* from OHC's CDCI copy (NRCeS/C-DAC, CC BY 4.0; 88 KB, names + SNOMED substance code only, no strengths/forms/brands, so it cannot suggest a dose) as offline spelling suggestions under every medicine-name field (Add medicine, scan review, doctor prescription editor). Attribution in `android/app/src/main/assets/medicine-names/` (`NOTICE.txt`, `DATA_LICENSE.md`, `CDCI-License.txt`) and More → About; rebuild with `android/scripts/build-cdci-medicine-names.py`. The CDCI licence allows redistribution only within India.
 - Family Daily care: each medicine now has **Missed today** (appends a "skipped" report to the intake history, server RPC `healthathon_report_medicine` when signed in) and **History** (that medicine's taken/missed reports); ticking the box already logged "taken" on the server via the check-off trigger. Doctor's Medicines screen gets an **Intake history** tab next to Current/Past, so family reports are one tap away. Scan review can open unmatched medicine photos; the practice-workspace medicine list is labelled as sample data. Unit tests: `MedicineNamesTest`, `MedicineMissedReportTest`. Not tried on a phone. Owner to confirm migrations `20261023053321_doctor_medicine_history` and `20261023071214_doctor_prescription_groups` are applied on the server.
 - **Doctor lane (33ac1f5):** the signed-in doctor Home now shows real upcoming visits and this week's check-ins across the doctor's connected patients (tap opens that patient's Visits or Progress), with a Refresh; Schedule lists every open real visit; Patients has search by name or patient ID (`SH-` + first 8 characters of the care-profile ID, or the full ID; B18) and a Join box for a doctor invitation code. The family's doctor-invite screen shows the patient ID. A verification card shows pending / approved / not approved with "Check again" (approval stays manual in the database, G1). Sample patients appear only in a card labelled "Walkthrough · sample patients"; the old synthetic server workspace no longer loads on entry. Logic unit-tested in `DoctorConnectedHomeTest`. Not tried on a phone.
+- **Docs / Lab history (sa3-docs):** E6 "Cancer documents" filter (PET-CT, biopsy, histopathology, staging; file name suggests, family sets or clears; label kept on the phone). E5 "Lab result" in Read and copy facts fills name/value/unit/range from the OCR line; the saved entry keeps the original line, page and file hash. E7 chemo/radiotherapy days (all-day Calendar entries) drawn as dashed lines on Lab history charts.
+- Report search takes Hindi query words (हीमोग्लोबिन, खून, जांच, बायोप्सी, पेट-सीटी …) for file names and reviewed text. Reports can now be renamed and scanned with the camera; Docs says report files stay on this phone and are not uploaded.
+- C5: optional password on the care-note PDF puts it in an AES-256 ZIP (receiver needs 7-Zip/WinRAR-type app). Not tried on a phone; not compiled by this lane after the build freeze beyond one unit-test run.

@@ -74,6 +74,7 @@ data class CareReport(@PrimaryKey val id: String = newId(), val personId: String
     @Query("SELECT * FROM CareReport WHERE personId = :id ORDER BY created DESC") fun reports(id: String): Flow<List<CareReport>>
     @Insert suspend fun addReport(report: CareReport)
     @Delete suspend fun removeReport(report: CareReport)
+    @Query("UPDATE CareReport SET name = :name WHERE id = :id AND personId = :personId") suspend fun renameReport(id: String, personId: String, name: String): Int
     @Query("DELETE FROM CareReport WHERE personId = :id") suspend fun deleteReports(id: String)
     @Query("DELETE FROM Person WHERE id = :id") suspend fun deletePersonRow(id: String)
     @Query("DELETE FROM Conversation WHERE personId = :id") suspend fun deleteDraft(id: String)

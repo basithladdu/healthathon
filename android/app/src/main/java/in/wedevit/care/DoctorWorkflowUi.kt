@@ -20,6 +20,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.foundation.shape.RoundedCornerShape
 import java.io.File
 import java.time.Instant
@@ -237,6 +239,8 @@ private fun requestLabel(status: WorkflowRequestStatus) = status.name.lowercase(
     var revision by remember { mutableIntStateOf(0) }
     var message by remember { mutableStateOf<String?>(null) }
     var exported by remember(version.id) { mutableStateOf<File?>(null) }
+    var pdfPassword by remember(version.id) { mutableStateOf("") }
+    var showPassword by remember(version.id) { mutableStateOf(false) }
     val context=LocalContext.current
     val acknowledgements=remember(revision) { store.acknowledgements(version.id) }
     LazyColumn(Modifier.fillMaxSize().testTag("workflow-version-reader"),contentPadding=PaddingValues(20.dp),verticalArrangement=Arrangement.spacedBy(16.dp)) {
@@ -251,8 +255,15 @@ private fun requestLabel(status: WorkflowRequestStatus) = status.name.lowercase(
             FlowRow(horizontalArrangement=Arrangement.spacedBy(6.dp)) { WorkflowAckStatus.entries.forEach { status -> OutlinedButton(onClick={message=store.recordToldToClinician(version.id,member.id,status);revision++},modifier=Modifier.heightIn(min=48.dp).testTag("workflow-ack-${member.id}-${status.name}")) { Text(when(status) { WorkflowAckStatus.READ->t("Told me they read it", "बताया कि पढ़ लिया"); WorkflowAckStatus.CONCERN->t("Told me a concern", "कोई चिंता बताई"); else->t("Told me not ready", "बताया कि अभी तैयार नहीं") }) } } }
         } }
         message?.let { item { Text(it,color=Rust,modifier=Modifier.testTag("workflow-status")) } }
-        item { Button(onClick={runCatching { DoctorWorkflowPdf.create(context,version,patient.name.removeSuffix(" Demo")) }.onSuccess { exported=it;message=t("Preview PDF created on this device", "झलक PDF इसी फ़ोन पर बनी") }.onFailure { message=t("Could not create the preview PDF. Try again.", "झलक PDF नहीं बन सकी। फिर कोशिश करें।") }},modifier=Modifier.fillMaxWidth().heightIn(min=48.dp).testTag("workflow-export-pdf")) { Icon(Icons.Default.PictureAsPdf,null);Spacer(Modifier.width(8.dp));Text(t("Create preview PDF", "झलक PDF बनाएँ")) } }
-        exported?.let { file -> item { Text("${file.name} · ${file.length()/1024} KB",style=MaterialTheme.typography.bodySmall,modifier=Modifier.testTag("workflow-pdf-ready")); OutlinedButton(onClick={runCatching { DoctorWorkflowPdf.share(context,file) }.onFailure { message=t("No PDF sharing app is available.", "PDF भेजने के लिए कोई ऐप नहीं है।") }},modifier=Modifier.fillMaxWidth().heightIn(min=48.dp).testTag("workflow-share-pdf")) { Icon(Icons.Default.Share,null);Spacer(Modifier.width(8.dp));Text(t("Share preview PDF", "झलक PDF भेजें")) } } }
+        item { WorkflowCard {
+            Text(t("Password (optional)", "पासवर्ड (चाहें तो)"),fontWeight=FontWeight.SemiBold)
+            Text(t("This phone can't put a password on the PDF itself. With a password, the PDF is put inside a locked ZIP file (AES-256). To open it, the other person needs the password and an app that opens locked ZIPs, such as 7-Zip or WinRAR. Tell them the password by phone, not in the same message.", "PDF एक लॉक ZIP (AES-256) में जाएगी। खोलने के लिए पासवर्ड और 7-Zip या WinRAR जैसा ऐप चाहिए। पासवर्ड फ़ोन पर बताएँ, उसी मैसेज में नहीं।"),style=MaterialTheme.typography.bodySmall)
+            OutlinedTextField(pdfPassword,{ pdfPassword=it.take(64) },label={Text(t("Leave empty for a normal PDF", "खाली छोड़ें तो सामान्य PDF"))},singleLine=true,visualTransformation=if(showPassword) VisualTransformation.None else PasswordVisualTransformation(),
+                trailingIcon={ IconButton(onClick={showPassword=!showPassword}) { Icon(if(showPassword) Icons.Default.VisibilityOff else Icons.Default.Visibility,if(showPassword) t("Hide password", "पासवर्ड छिपाएँ") else t("Show password", "पासवर्ड दिखाएँ")) } },
+                supportingText=pdfPassword.takeIf { it.isNotEmpty() }?.let(CareLockedZip::passwordError)?.let { { Text(it) } },modifier=Modifier.fillMaxWidth().testTag("workflow-pdf-password"))
+        } }
+        item { Button(onClick={runCatching { if(pdfPassword.isEmpty()) DoctorWorkflowPdf.create(context,version,patient.name.removeSuffix(" Demo")) else DoctorWorkflowPdf.createLocked(context,version,patient.name.removeSuffix(" Demo"),pdfPassword) }.onSuccess { exported=it;message=if(pdfPassword.isEmpty()) t("Preview PDF created on this device", "झलक PDF इसी फ़ोन पर बनी") else t("Locked ZIP created on this device", "लॉक ZIP इसी फ़ोन पर बनी") }.onFailure { message=(it as? IllegalArgumentException)?.message ?: t("Could not create the preview PDF. Try again.", "झलक PDF नहीं बन सकी। फिर कोशिश करें।") }},enabled=pdfPassword.isEmpty()||CareLockedZip.passwordError(pdfPassword)==null,modifier=Modifier.fillMaxWidth().heightIn(min=48.dp).testTag("workflow-export-pdf")) { Icon(if(pdfPassword.isEmpty()) Icons.Default.PictureAsPdf else Icons.Default.Lock,null);Spacer(Modifier.width(8.dp));Text(if(pdfPassword.isEmpty()) t("Create preview PDF", "झलक PDF बनाएँ") else t("Create locked file", "लॉक फ़ाइल बनाएँ")) } }
+        exported?.let { file -> item { Text("${file.name} · ${file.length()/1024} KB",style=MaterialTheme.typography.bodySmall,modifier=Modifier.testTag("workflow-pdf-ready")); OutlinedButton(onClick={runCatching { DoctorWorkflowPdf.share(context,file) }.onFailure { message=t("No sharing app is available.", "भेजने के लिए कोई ऐप नहीं है।") }},modifier=Modifier.fillMaxWidth().heightIn(min=48.dp).testTag("workflow-share-pdf")) { Icon(Icons.Default.Share,null);Spacer(Modifier.width(8.dp));Text(if(file.extension=="zip") t("Share locked file", "लॉक फ़ाइल भेजें") else t("Share preview PDF", "झलक PDF भेजें")) } } }
         item { WorkflowCard { Text(t("Emergency QR retrieval", "आपातकालीन QR से देखना"),fontWeight=FontWeight.SemiBold); Text(t("Secure hospital retrieval is not connected. No QR code or public patient link is created in this local preview.", "अस्पताल के लिए सुरक्षित देखना अभी जुड़ा नहीं है। इस लोकल झलक में कोई QR कोड या सार्वजनिक लिंक नहीं बनता।"),style=MaterialTheme.typography.bodySmall) } }
     }
 }

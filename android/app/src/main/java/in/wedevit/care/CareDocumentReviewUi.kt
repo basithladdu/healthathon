@@ -47,6 +47,14 @@ import java.time.ZoneId
     var dateText by rememberSaveable(report.id) { mutableStateOf(LocalDate.now().toString()) }
     var timeText by rememberSaveable(report.id) { mutableStateOf("") }
     var factChecked by rememberSaveable(report.id) { mutableStateOf(false) }
+    var labValue by rememberSaveable(report.id) { mutableStateOf("") }
+    var labUnit by rememberSaveable(report.id) { mutableStateOf("") }
+    var labLow by rememberSaveable(report.id) { mutableStateOf("") }
+    var labHigh by rememberSaveable(report.id) { mutableStateOf("") }
+    fun suggestLab(line: String) {
+        val found = LabLineParser.parse(line)
+        title = found?.name ?: line.take(160); labValue = found?.value.orEmpty(); labUnit = found?.unit.orEmpty(); labLow = found?.low.orEmpty(); labHigh = found?.high.orEmpty()
+    }
     val currentPage = value?.pages?.firstOrNull { it.page == page }
 
     fun read() {
@@ -92,22 +100,46 @@ import java.time.ZoneId
                     item { SectionTitle(t("Copy a checked fact", "जाँची हुई बात कॉपी करें")) }
                     item { Text(t("Choose the exact line to keep with a medicine, test or follow-up. A copied record does not confirm treatment happened.", "दवा, जाँच या अगली मुलाक़ात के लिए सही पंक्ति चुनें। कॉपी करने से यह पक्का नहीं होता कि इलाज हुआ।"), style = MaterialTheme.typography.bodySmall) }
                     shown.reviewedText.split('\n').forEachIndexed { index, line -> if (line.isNotBlank() && line.length <= 2000) item("line-$page-$index") {
-                        FilterChip(selected = factLine == index + 1, onClick = { factLine = index + 1; title = line.take(160); factChecked = false }, label = { Text("${index + 1}. $line") }, modifier = Modifier.fillMaxWidth())
+                        FilterChip(selected = factLine == index + 1, onClick = { factLine = index + 1; if (kind == "Lab result") suggestLab(line) else title = line.take(160); factChecked = false }, label = { Text("${index + 1}. $line") }, modifier = Modifier.fillMaxWidth())
                     } }
                     if (factLine > 0) {
-                        item { CareField(title, { title = it.take(160); factChecked = false }, t("Record name", "रिकॉर्ड का नाम"), singleLine = true) }
-                        item { Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) { listOf("Record", "Medicine", "Follow-up", "Test").forEach { option -> FilterChip(selected = kind == option, onClick = { kind = option; factChecked = false }, label = { Text(when (option) { "Medicine" -> t("Medicine", "दवा"); "Follow-up" -> t("Follow-up", "अगली मुलाक़ात"); "Test" -> t("Test", "जाँच"); else -> t("Record", "रिकॉर्ड") }) }) } } }
+                        item { CareField(title, { title = it.take(160); factChecked = false }, if (kind == "Lab result") t("Test name on report", "रिपोर्ट पर जाँच का नाम") else t("Record name", "रिकॉर्ड का नाम"), singleLine = true) }
+                        item { Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) { listOf("Record", "Medicine", "Follow-up", "Test", "Lab result").forEach { option -> FilterChip(selected = kind == option, onClick = {
+                            if (option == "Lab result" && kind != option) currentPage?.reviewedText?.split('\n')?.getOrNull(factLine - 1)?.let(::suggestLab)
+                            kind = option; factChecked = false
+                        }, label = { Text(when (option) { "Medicine" -> t("Medicine", "दवा"); "Follow-up" -> t("Follow-up", "अगली मुलाक़ात"); "Test" -> t("Test", "जाँच"); "Lab result" -> t("Lab result", "लैब का नतीजा"); else -> t("Record", "रिकॉर्ड") }) }, modifier = Modifier.testTag("document-kind-$option")) } } }
+                        if (kind == "Lab result") {
+                            item { Text(t("Filled in from the chosen line. Check each box against the original report. The result and this line are saved with the care record; the report file stays on this phone.", "चुनी पंक्ति से भरा गया है। हर खाना असली रिपोर्ट से मिलाएँ। नतीजा और यह पंक्ति देखभाल रिकॉर्ड में सेव होंगे; रिपोर्ट फ़ाइल इसी फ़ोन पर रहेगी।"), style = MaterialTheme.typography.bodySmall) }
+                            item { Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                Box(Modifier.weight(1f)) { CareField(labValue, { labValue = it.take(40); factChecked = false }, t("Value", "नतीजा"), singleLine = true) }
+                                Box(Modifier.weight(1f)) { CareField(labUnit, { labUnit = it.take(40); factChecked = false }, t("Printed unit", "छपी इकाई"), singleLine = true) }
+                            } }
+                            item { Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                Box(Modifier.weight(1f)) { CareField(labLow, { labLow = it.take(40); factChecked = false }, t("Printed lower (optional)", "छपी निचली सीमा (ज़रूरी नहीं)"), singleLine = true) }
+                                Box(Modifier.weight(1f)) { CareField(labHigh, { labHigh = it.take(40); factChecked = false }, t("Printed upper (optional)", "छपी ऊपरी सीमा (ज़रूरी नहीं)"), singleLine = true) }
+                            } }
+                            item { CareField(dateText, { dateText = it; factChecked = false }, t("Report date · YYYY-MM-DD", "रिपोर्ट की तारीख़ · YYYY-MM-DD"), singleLine = true) }
+                        }
                         if (kind in listOf("Follow-up", "Test")) {
                             item { CareField(dateText, { dateText = it; factChecked = false }, t("Date · YYYY-MM-DD", "तारीख़ · YYYY-MM-DD"), singleLine = true) }
                             item { CareField(timeText, { timeText = it; factChecked = false }, t("Time · HH:mm", "समय · HH:mm"), singleLine = true) }
                         }
-                        item { CheckLine(factChecked, { factChecked = it }, if (kind == "Medicine") t("I am copying an existing prescription, including its exact dose and directions. I am not changing treatment.", "मैं पहले से लिखा पर्चा, उसकी सही ख़ुराक और तरीक़े के साथ, कॉपी कर रहा/रही हूँ। मैं इलाज नहीं बदल रहा/रही।") else t("I checked the chosen line, name and any date against the original.", "मैंने चुनी पंक्ति, नाम और तारीख़ असली फ़ाइल से मिला ली है।")) }
+                        item { CheckLine(factChecked, { factChecked = it }, if (kind == "Lab result") t("I checked the test name, value, unit, range and date against the original.", "मैंने जाँच का नाम, नतीजा, इकाई, सीमा और तारीख़ असली रिपोर्ट से मिला ली है।") else if (kind == "Medicine") t("I am copying an existing prescription, including its exact dose and directions. I am not changing treatment.", "मैं पहले से लिखा पर्चा, उसकी सही ख़ुराक और तरीक़े के साथ, कॉपी कर रहा/रही हूँ। मैं इलाज नहीं बदल रहा/रही।") else t("I checked the chosen line, name and any date against the original.", "मैंने चुनी पंक्ति, नाम और तारीख़ असली फ़ाइल से मिला ली है।")) }
                         item { Button(onClick = {
                             try {
                                 require(title.trim().isNotBlank()) { t("Add a record name.", "रिकॉर्ड का नाम लिखें।") }
                                 val current = requireNotNull(value); val quote = current.pages.single { it.page == page }.reviewedText.split('\n')[factLine - 1]
                                 val source = DocumentEvidenceRules.source(current, page, factLine, quote)
                                 val detail = DocumentEvidenceRules.copiedDetail(source, report.name)
+                                if (kind == "Lab result") {
+                                    require(factChecked) { t("Check this result first.", "पहले यह नतीजा जाँचें।") }
+                                    require(detail.length <= 800) { t("Choose a shorter line so the original line stays with this result.", "छोटी पंक्ति चुनें ताकि असली पंक्ति इस नतीजे के साथ रहे।") }
+                                    val day = runCatching { LocalDate.parse(dateText.trim()) }.getOrElse { throw IllegalArgumentException(t("Enter the report date as YYYY-MM-DD.", "रिपोर्ट की तारीख़ YYYY-MM-DD में लिखें।")) }
+                                    val lab = CareEntry(type = "lab", detail = detail, sender = vm.cloud?.session?.value?.email.orEmpty(), value = labValue.trim(), unit = labUnit.trim(), rangeLow = labLow.trim(), rangeHigh = labHigh.trim(), reportId = report.id, reportName = report.name)
+                                    CareLabRules.validate(title, lab, careEpoch(day))
+                                    vm.saveItem("task", title.trim(), CareEntryCodec.encode(lab), careEpoch(day), done = { factLine = 0; factChecked = false; vm.message.value = t("Added to Lab history", "लैब इतिहास में जुड़ गया") })
+                                    error = ""; return@Button
+                                }
                                 val due = if (kind in listOf("Follow-up", "Test")) LocalDateTime.of(LocalDate.parse(dateText), LocalTime.parse(timeText)).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() else 0
                                 require(factChecked) { t("Check this copied record first.", "पहले इस कॉपी किए रिकॉर्ड को जाँचें।") }
                                 val targetKind = when(kind) { "Medicine" -> "medicine"; "Follow-up", "Test" -> "visit"; else -> "journal" }
@@ -118,7 +150,7 @@ import java.time.ZoneId
                                 vm.saveItem(targetKind, title, savedDetail, due, done = { factLine = 0; factChecked = false; vm.message.value = if (due > 0) t("Copied to Calendar. Check Reminders to enable alerts.", "कैलेंडर में कॉपी हो गया। अलर्ट के लिए रिमाइंडर देखें।") else t("Checked fact copied", "जाँची हुई बात कॉपी हो गई") })
                                 error = ""
                             } catch (failure: Exception) { error = failure.message ?: t("Check the date and exact time.", "तारीख़ और सही समय जाँचें।") }
-                        }, enabled = factChecked && !busy, modifier = Modifier.fillMaxWidth().testTag("document-copy-fact")) { Text(if (busy) t("Saving…", "सहेज रहे हैं…") else if (kind in listOf("Follow-up", "Test")) t("Copy to Calendar", "कैलेंडर में कॉपी करें") else t("Copy checked fact", "जाँची हुई बात कॉपी करें")) } }
+                        }, enabled = factChecked && !busy, modifier = Modifier.fillMaxWidth().testTag("document-copy-fact")) { Text(if (busy) t("Saving…", "सहेज रहे हैं…") else if (kind == "Lab result") t("Add to Lab history", "लैब इतिहास में जोड़ें") else if (kind in listOf("Follow-up", "Test")) t("Copy to Calendar", "कैलेंडर में कॉपी करें") else t("Copy checked fact", "जाँची हुई बात कॉपी करें")) } }
                     }
                 }
             }

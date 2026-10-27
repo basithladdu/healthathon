@@ -2,6 +2,7 @@
 <paths xmlns:android="http://schemas.android.com/apk/res/android">
     <cache-path name="medicine_scan" path="medicine-scan/" />
     <cache-path name="doctor_preview_exports" path="doctor-preview-exports/" />
+    <cache-path name="report_scan" path="report-scan/" />
     <files-path name="reports" path="reports/" />
     <files-path name="emergency_cards" path="emergency-cards/" />
 </paths>
