@@ -248,7 +248,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
     var panel by rememberSaveable { mutableStateOf("") }
     var formBusy by remember { mutableStateOf(false) }
     var walkthroughChooser by rememberSaveable { mutableStateOf(false) }
-    val focus = LocalFocusManager.current
+    val focus = LocalFocusManager.current; val t = careText()
     val panelGap = welcomePanelGapDp(LocalConfiguration.current.screenHeightDp, LocalDensity.current.fontScale)
     val heroTopPadding = welcomeHeroTopPaddingDp(LocalConfiguration.current.screenHeightDp, LocalDensity.current.fontScale)
     fun select(value: String) { if (!formBusy && !entryBusy) { focus.clearFocus(); panel = value; onPanelChanged(value) } }
@@ -260,8 +260,8 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(start = 24.dp, end = 24.dp, top = heroTopPadding.dp, bottom = 24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                 WelcomeHero()
-                Text("Palliative care,\ntogether.", Modifier.fillMaxWidth(), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 30.sp, lineHeight = 36.sp, textAlign = TextAlign.Center)
-                Spacer(Modifier.height(10.dp)); Text("Care notes, medicines and visits.", Modifier.fillMaxWidth(), fontSize = 16.sp, textAlign = TextAlign.Center)
+                Text(t("Palliative care,\ntogether.", "पैलिएटिव देखभाल,\nसाथ मिलकर।"), Modifier.fillMaxWidth(), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 30.sp, lineHeight = 36.sp, textAlign = TextAlign.Center)
+                Spacer(Modifier.height(10.dp)); Text(t("Care notes, medicines and visits.", "देखभाल नोट, दवाएँ और मुलाक़ातें।"), Modifier.fillMaxWidth(), fontSize = 16.sp, textAlign = TextAlign.Center)
             }
             }
         }
@@ -271,35 +271,36 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
         Surface(color = WelcomePanelOrange, contentColor = WelcomePanelInk, shape = RoundedCornerShape(topStart = 48.dp, topEnd = 48.dp), modifier = Modifier.fillMaxWidth().then(if (panel.isEmpty()) Modifier else Modifier.weight(1f)).animateContentSize().testTag("welcome-orange-panel")) {
             Column(if (panel.isEmpty()) Modifier.fillMaxWidth() else Modifier.fillMaxSize()) {
                 if (panel.isEmpty()) Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(start = 22.dp, end = 22.dp, top = 22.dp, bottom = 14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Text("Welcome to Sahara", modifier = Modifier.fillMaxWidth().testTag("welcome-panel-heading"), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 26.sp, textAlign = TextAlign.Center)
-                    Text("Choose where you would like to begin.", modifier = Modifier.fillMaxWidth().testTag("welcome-panel-description"), style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Center)
-                    Button(onClick = { select("family") }, enabled = !entryBusy, colors = ButtonDefaults.buttonColors(containerColor = Paper, contentColor = Rust), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("welcome-patient-family")) { Icon(Icons.Default.People, null); Spacer(Modifier.width(10.dp)); Text("Patient & family") }
-                    TextButton(onClick = { select("doctor") }, enabled = !entryBusy, colors = ButtonDefaults.textButtonColors(contentColor = WelcomePanelInk), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-workspace-entry")) { Text("Doctor workspace", textDecoration = TextDecoration.Underline) }
+                    Text(t("Welcome to Sahara", "सहारा में आपका स्वागत है"), modifier = Modifier.fillMaxWidth().testTag("welcome-panel-heading"), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 26.sp, textAlign = TextAlign.Center)
+                    Text(t("Choose where you would like to begin.", "चुनें कि कहाँ से शुरू करना है।"), modifier = Modifier.fillMaxWidth().testTag("welcome-panel-description"), style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Center)
+                    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { CareLanguageSwitch() }
+                    Button(onClick = { select("family") }, enabled = !entryBusy, colors = ButtonDefaults.buttonColors(containerColor = Paper, contentColor = Rust), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("welcome-patient-family")) { Icon(Icons.Default.People, null); Spacer(Modifier.width(10.dp)); Text(t("Patient & family", "मरीज़ और परिवार")) }
+                    TextButton(onClick = { select("doctor") }, enabled = !entryBusy, colors = ButtonDefaults.textButtonColors(contentColor = WelcomePanelInk), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-workspace-entry")) { Text(t("Doctor workspace", "डॉक्टर के लिए"), textDecoration = TextDecoration.Underline) }
                 } else {
                     Row(Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                        IconButton(onClick = close, enabled = !formBusy && !entryBusy, modifier = Modifier.testTag("welcome-panel-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, if (panel == "person" || panel == "account") "Back to patient and family" else "Back to welcome", tint = WelcomePanelInk) }
-                        Text(when(panel) { "family" -> "Patient & family"; "person" -> "Add a person"; "doctor" -> "Doctor workspace"; else -> "Your account" }, fontFamily = SaharaTitleFont, fontSize = 22.sp, fontWeight = FontWeight.Medium)
+                        IconButton(onClick = close, enabled = !formBusy && !entryBusy, modifier = Modifier.testTag("welcome-panel-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, if (panel == "person" || panel == "account") t("Back to patient and family", "मरीज़ और परिवार पर वापस") else t("Back to welcome", "शुरुआत पर वापस"), tint = WelcomePanelInk) }
+                        Text(when(panel) { "family" -> t("Patient & family", "मरीज़ और परिवार"); "person" -> t("Add a person", "व्यक्ति जोड़ें"); "doctor" -> t("Doctor workspace", "डॉक्टर के लिए"); else -> t("Your account", "आपका खाता") }, fontFamily = SaharaTitleFont, fontSize = 22.sp, fontWeight = FontWeight.Medium)
                     }
                     Surface(color = Paper, contentColor = Ink, shape = RoundedCornerShape(topStart = 26.dp, topEnd = 26.dp), modifier = Modifier.fillMaxWidth().weight(1f)) {
                         Box(Modifier.fillMaxSize().padding(top = 20.dp)) { when(panel) {
                             "family" -> Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(22.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                                Heading("Care, together", 27)
-                                Text("Start a care profile, or sign in to the records you already use.", style = MaterialTheme.typography.bodyLarge)
-                                Button(onClick = { if (addPersonContent == null) onStart() else select("person") }, enabled = !entryBusy, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("welcome-add-person")) { Icon(Icons.Default.PersonAdd, null); Spacer(Modifier.width(10.dp)); Text("Add a person") }
-                                OutlinedButton(onClick = { if (accountContent == null) onAccount() else select("account") }, enabled = !entryBusy, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("welcome-account")) { Icon(Icons.Default.AccountCircle, null); Spacer(Modifier.width(10.dp)); Text("Sign in to your account") }
-                                TextButton(onClick = { walkthroughChooser = true }, enabled = !entryBusy, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("patient-walkthrough-entry")) { Text("Try the walkthrough") }
+                                Heading(t("Care, together", "साथ मिलकर देखभाल"), 27)
+                                Text(t("Start a care profile, or sign in to the records you already use.", "नई देखभाल प्रोफ़ाइल बनाएँ, या अपने पुराने रिकॉर्ड के लिए साइन इन करें।"), style = MaterialTheme.typography.bodyLarge)
+                                Button(onClick = { if (addPersonContent == null) onStart() else select("person") }, enabled = !entryBusy, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("welcome-add-person")) { Icon(Icons.Default.PersonAdd, null); Spacer(Modifier.width(10.dp)); Text(t("Add a person", "व्यक्ति जोड़ें")) }
+                                OutlinedButton(onClick = { if (accountContent == null) onAccount() else select("account") }, enabled = !entryBusy, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("welcome-account")) { Icon(Icons.Default.AccountCircle, null); Spacer(Modifier.width(10.dp)); Text(t("Sign in to your account", "अपने खाते में साइन इन करें")) }
+                                TextButton(onClick = { walkthroughChooser = true }, enabled = !entryBusy, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("patient-walkthrough-entry")) { Text(t("Try the walkthrough", "डेमो देखें")) }
                             }
                             "person" -> addPersonContent?.invoke(close)
                             "doctor" -> Column(Modifier.fillMaxSize()) {
                                 Box(Modifier.fillMaxWidth().weight(1f)) {
                                     if (doctorContent != null) doctorContent.invoke(close) { formBusy = it }
                                     else Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(22.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                                        Heading("Doctor sign in", 27)
-                                        Text("Open your account-connected workspace.")
-                                        Button(onClick = onSharedWorkspace, enabled = !formBusy && !entryBusy, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("welcome-open-doctor-workspace")) { Text("Open doctor workspace") }
+                                        Heading(t("Doctor sign in", "डॉक्टर साइन इन"), 27)
+                                        Text(t("Open your account-connected workspace.", "अपने खाते से जुड़ा कार्यक्षेत्र खोलें।"))
+                                        Button(onClick = onSharedWorkspace, enabled = !formBusy && !entryBusy, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("welcome-open-doctor-workspace")) { Text(t("Open doctor workspace", "डॉक्टर कार्यक्षेत्र खोलें")) }
                                     }
                                 }
-                                TextButton(onClick = onDoctorDemo, enabled = !formBusy && !entryBusy, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-demo-entry")) { Text("Try the walkthrough") }
+                                TextButton(onClick = onDoctorDemo, enabled = !formBusy && !entryBusy, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-demo-entry")) { Text(t("Try the walkthrough", "डेमो देखें")) }
                             }
                             else -> accountContent?.invoke(close) { formBusy = it }
                         } }
@@ -691,7 +692,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
 @Composable fun AudioPlayback(path: String, consent: RecordingConsent?, transcribing: Boolean, canTranscribe: Boolean, onTranscribe: () -> Unit, onDelete: () -> Unit) {
     var player by remember(path) { mutableStateOf<MediaPlayer?>(null) }; var playing by remember(path) { mutableStateOf(false) }
     var confirmDelete by remember(path) { mutableStateOf(false) }
-    val context = LocalContext.current
+    val context = LocalContext.current; val t = careText()
     val owner = LocalLifecycleOwner.current
     DisposableEffect(path, owner) {
         val observer = LifecycleEventObserver { _, event -> if (event == Lifecycle.Event.ON_STOP) { player?.release(); player = null; playing = false } }
@@ -704,31 +705,31 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
             else try {
                 val audio = MediaPlayer.create(context, Uri.fromFile(File(path))) ?: error("Recording unavailable")
                 player = audio; audio.setOnCompletionListener { playing = false; it.release(); player = null }; audio.start(); playing = true
-            } catch (_: Exception) { player?.release(); player = null; playing = false; android.widget.Toast.makeText(context, "Couldn't play this recording.", android.widget.Toast.LENGTH_LONG).show() }
-        }) { Icon(if (playing) Icons.Default.Stop else Icons.Default.PlayArrow, if (playing) "Stop playback" else "Play recording") }
+            } catch (_: Exception) { player?.release(); player = null; playing = false; android.widget.Toast.makeText(context, t("Couldn't play this recording.", "यह रिकॉर्डिंग नहीं चल सकी।"), android.widget.Toast.LENGTH_LONG).show() }
+        }) { Icon(if (playing) Icons.Default.Stop else Icons.Default.PlayArrow, if (playing) t("Stop playback", "रोकें") else t("Play recording", "रिकॉर्डिंग चलाएँ")) }
         Column(Modifier.weight(1f)) {
-            Text("Conversation · " + Instant.ofEpochMilli(File(path).lastModified()).atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("d MMM, HH:mm")), fontSize = 14.sp)
-            Text(if (consent == null) "Consent details unavailable" else "Consent recorded · ${RecordingConsentRules.names(consent.participants).joinToString()}", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 2, overflow = TextOverflow.Ellipsis)
+            Text(t("Conversation · ", "बातचीत · ") + Instant.ofEpochMilli(File(path).lastModified()).atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("d MMM, HH:mm")), fontSize = 14.sp)
+            Text(if (consent == null) t("Consent details unavailable", "सहमति की जानकारी नहीं मिली") else t("Consent recorded · ${RecordingConsentRules.names(consent.participants).joinToString()}", "सहमति दर्ज · ${RecordingConsentRules.names(consent.participants).joinToString()}"), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 2, overflow = TextOverflow.Ellipsis)
             if (BuildConfig.CLOUD_AUDIO_ENABLED && consent != null) Text(when {
-                consent.transcriptionConsentAt <= 0 -> "Cloud transcription not agreed"
-                consent.noticeVersion < 2 -> "Older consent: record a new fictional demo"
-                else -> "Free-demo transcription agreed"
+                consent.transcriptionConsentAt <= 0 -> t("Cloud transcription not agreed", "क्लाउड पर लिखाई की सहमति नहीं")
+                consent.noticeVersion < 2 -> t("Older consent: record a new fictional demo", "पुरानी सहमति: नया काल्पनिक डेमो रिकॉर्ड करें")
+                else -> t("Free-demo transcription agreed", "मुफ़्त डेमो लिखाई की सहमति दी")
             }, style = MaterialTheme.typography.labelSmall, color = if (consent.transcriptionConsentAt > 0 && consent.noticeVersion >= 2) MaterialTheme.colorScheme.secondary else Rust)
         }
-        IconButton(onClick = { confirmDelete = true }) { Icon(Icons.Default.DeleteOutline, "Delete recording") }
+        IconButton(onClick = { confirmDelete = true }) { Icon(Icons.Default.DeleteOutline, t("Delete recording", "रिकॉर्डिंग मिटाएँ")) }
     }
         if (BuildConfig.CLOUD_AUDIO_ENABLED && (consent?.transcriptionConsentAt ?: 0L) > 0L) {
             Spacer(Modifier.height(10.dp))
             Button(onClick = onTranscribe, enabled = canTranscribe && !transcribing, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp)) {
                 if (transcribing) { CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp, color = Color.White); Spacer(Modifier.width(8.dp)) }
                 else { Icon(Icons.Default.AutoAwesome, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)) }
-                Text(if (transcribing) "Transcribing…" else "Create transcript")
+                Text(if (transcribing) t("Transcribing…", "लिख रहे हैं…") else t("Create transcript", "लिखित रूप बनाएँ"))
             }
         }
     }
-    if (confirmDelete) AlertDialog(onDismissRequest = { confirmDelete = false }, title = { Text("Delete this recording?") }, text = { Text("Your written care notes stay available.") },
-        confirmButton = { TextButton(onClick = { player?.release(); player = null; playing = false; confirmDelete = false; onDelete() }) { Text("Delete recording") } },
-        dismissButton = { TextButton(onClick = { confirmDelete = false }) { Text("Keep recording") } })
+    if (confirmDelete) AlertDialog(onDismissRequest = { confirmDelete = false }, title = { Text(t("Delete this recording?", "यह रिकॉर्डिंग मिटाएँ?")) }, text = { Text(t("Your written care notes stay available.", "आपके लिखे देखभाल नोट बने रहेंगे।")) },
+        confirmButton = { TextButton(onClick = { player?.release(); player = null; playing = false; confirmDelete = false; onDelete() }) { Text(t("Delete recording", "रिकॉर्डिंग मिटाएँ")) } },
+        dismissButton = { TextButton(onClick = { confirmDelete = false }) { Text(t("Keep recording", "रिकॉर्डिंग रखें")) } })
 }
 
 @Composable fun NoteReader(vm: CareModel, note: CareVersion, onDismiss: () -> Unit) {
@@ -740,7 +741,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
         .sortedWith(compareBy<Acknowledgement> { it.relationship != "Patient" }.thenBy { it.at })
     val patientConfirmation = confirmations.firstOrNull { it.relationship == "Patient" && (vm.cloud == null || it.id in authenticatedAcks) }
     var name by rememberSaveable(note.id) { mutableStateOf("") }; var relationship by rememberSaveable(note.id) { mutableStateOf("Patient") }; var reviewed by rememberSaveable(note.id) { mutableStateOf(false) }
-    val context = LocalContext.current
+    val context = LocalContext.current; val t = careText()
     val scope = rememberCoroutineScope()
     var exporting by rememberSaveable { mutableStateOf<String?>(null) }
     val familyOnly = vm.cloud == null && vm.walkthroughRole == "Family"
@@ -750,37 +751,37 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
         if (uri != null && text != null) scope.launch {
             try {
                 withContext(Dispatchers.IO) { (context.contentResolver.openOutputStream(uri) ?: error("File unavailable")).bufferedWriter().use { it.write(text) } }
-                vm.message.value = "Care note saved"
-            } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; vm.message.value = "Couldn't save the copy. Your care note is still here. Try again." }
+                vm.message.value = t("Care note saved", "देखभाल नोट सहेज लिया")
+            } catch (e: Exception) { if (e is kotlinx.coroutines.CancellationException) throw e; vm.message.value = t("Couldn't save the copy. Your care note is still here. Try again.", "कॉपी सहेजी नहीं जा सकी। आपका देखभाल नोट यहीं है। फिर कोशिश करें।") }
         }
     }
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
         LazyColumn(Modifier.fillMaxWidth().imePadding(), contentPadding = PaddingValues(start = 22.dp, end = 22.dp, bottom = 40.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            item { Heading(if (note.hashScheme == DoctorConversationContext.HASH_SCHEME) "Transcription notes" else "Goals of care"); Text("${note.personName} · Version ${note.version}"); Text("Reviewer: ${note.doctor} · ${date(note.published)}", style = MaterialTheme.typography.bodySmall); Text(ReviewWorkflow.label(note, note.id in verifiedReviews), style = MaterialTheme.typography.labelMedium, color = Rust) }
+            item { Heading(if (note.hashScheme == DoctorConversationContext.HASH_SCHEME) t("Transcription notes", "बातचीत के नोट") else t("Goals of care", "देखभाल के लक्ष्य")); Text("${note.personName} · " + t("Version ${note.version}", "संस्करण ${note.version}")); Text(t("Reviewer: ${note.doctor} · ${date(note.published)}", "जाँचने वाले: ${note.doctor} · ${date(note.published)}"), style = MaterialTheme.typography.bodySmall); Text(ReviewWorkflow.label(note, note.id in verifiedReviews), style = MaterialTheme.typography.labelMedium, color = Rust) }
             if(note.hashScheme==DoctorConversationContext.HASH_SCHEME) item { DoctorNoteReaderBody(vm, note) }
-            if (vm.cloud != null) item { OutlinedButton(onClick = { open(context, Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, sharedCareNoteUrl(note)), "Share exact care-note link")) }, modifier = Modifier.fillMaxWidth()) { Icon(Icons.Default.QrCode, null); Spacer(Modifier.width(8.dp)); Text("Share exact-version link") }; Text("The recipient must sign in with a permitted account. This link grants no public access.", style = MaterialTheme.typography.bodySmall) }
+            if (vm.cloud != null) item { OutlinedButton(onClick = { open(context, Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, sharedCareNoteUrl(note)), t("Share exact care-note link", "इसी देखभाल नोट का लिंक भेजें"))) }, modifier = Modifier.fillMaxWidth()) { Icon(Icons.Default.QrCode, null); Spacer(Modifier.width(8.dp)); Text(t("Share exact-version link", "इसी संस्करण का लिंक भेजें")) }; Text(t("The recipient must sign in with a permitted account. This link grants no public access.", "पाने वाले को अनुमति वाले खाते से साइन इन करना होगा। यह लिंक सबके लिए खुला नहीं है।"), style = MaterialTheme.typography.bodySmall) }
             item { Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                OutlinedButton(onClick = { exporting = NoteRules.text(note, confirmations); saveNote.launch("Goals-of-care-v${note.version}.txt") }, modifier = Modifier.weight(1f)) { Icon(Icons.Default.FileDownload, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Save copy") }
-                FilledTonalButton(onClick = { open(context, Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, NoteRules.text(note, confirmations)), "Share care note")) }, modifier = Modifier.weight(1f), colors = ButtonDefaults.filledTonalButtonColors(containerColor = Gold, contentColor = Ink)) { Icon(Icons.Default.Share, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Share") }
+                OutlinedButton(onClick = { exporting = NoteRules.text(note, confirmations); saveNote.launch("Goals-of-care-v${note.version}.txt") }, modifier = Modifier.weight(1f)) { Icon(Icons.Default.FileDownload, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Save copy", "कॉपी सहेजें")) }
+                FilledTonalButton(onClick = { open(context, Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, NoteRules.text(note, confirmations)), t("Share care note", "देखभाल नोट भेजें"))) }, modifier = Modifier.weight(1f), colors = ButtonDefaults.filledTonalButtonColors(containerColor = Gold, contentColor = Ink)) { Icon(Icons.Default.Share, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Share", "भेजें")) }
             } }
             item { CareReadAloudControl(NoteRules.labels.zip(NoteRules.values(note)).filter { it.second.isNotBlank() }.joinToString("\n\n") { "${it.first}. ${it.second}" }, note.id) }
-            if (note.hashScheme != DoctorConversationContext.HASH_SCHEME) items(NoteRules.labels.zip(NoteRules.values(note)), key = { it.first }) { (label, value) -> SurfaceCard(if (label == "What matters") Gold else Paper) { Text(label, fontWeight = FontWeight.Bold); Spacer(Modifier.height(8.dp)); SelectionContainerText(value.ifBlank { "Not recorded" }); CareSourceLinks(note.source, value) } }
-            if (note.hashScheme != DoctorConversationContext.HASH_SCHEME) item { SurfaceCard { Text("Original conversation", fontWeight = FontWeight.Bold); Spacer(Modifier.height(8.dp)); SelectionContainerText(note.source) } }
+            if (note.hashScheme != DoctorConversationContext.HASH_SCHEME) items(NoteRules.labels.zip(NoteRules.values(note)), key = { it.first }) { (label, value) -> SurfaceCard(if (label == "What matters") Gold else Paper) { Text(label, fontWeight = FontWeight.Bold); Spacer(Modifier.height(8.dp)); SelectionContainerText(value.ifBlank { t("Not recorded", "दर्ज नहीं") }); CareSourceLinks(note.source, value) } }
+            if (note.hashScheme != DoctorConversationContext.HASH_SCHEME) item { SurfaceCard { Text(t("Original conversation", "असली बातचीत"), fontWeight = FontWeight.Bold); Spacer(Modifier.height(8.dp)); SelectionContainerText(note.source) } }
             if (!vm.demoMode) item { CareOfflineTranslationPanel(source = NoteRules.labels.zip(NoteRules.values(note)).filter { it.second.isNotBlank() }.joinToString("\n\n") { "${it.first}\n${it.second}" }, versionId = note.id) }
             items(confirmations, key = { it.id }) { confirmation -> SurfaceCard(if (confirmation.relationship == "Patient") Sage else Mint) {
-                Text(if (confirmation.relationship == "Patient") "Patient confirmed this version" else "Family / carer confirmation", fontWeight = FontWeight.Bold)
+                Text(if (confirmation.relationship == "Patient") t("Patient confirmed this version", "मरीज़ ने इस संस्करण की पुष्टि की") else t("Family / carer confirmation", "परिवार / देखभाल करने वाले की पुष्टि"), fontWeight = FontWeight.Bold)
                 Text("${confirmation.name} · ${date(confirmation.at)}")
             } }
             if (versions.firstOrNull()?.id == note.id) {
-                item { HorizontalDivider(); Spacer(Modifier.height(12.dp)); Heading(if (patientConfirmation == null) "Patient's review" else "Family's review", 26)
-                    Text(if (patientConfirmation == null) "The patient confirms first. Family can then add their own confirmation to this same version." else "The patient's confirmation stays saved. Add your own after reading this version.", style = MaterialTheme.typography.bodySmall) }
-                item { CareField(value = name, onValueChange = { name = it.take(100) }, label = "Your name", singleLine = true) }
-                item { Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf("Patient", "Family / carer").forEach { role -> FilterChip(selected = relationship == role, onClick = { relationship = role }, enabled = (vm.cloud == null || (role == "Patient") == owner) && !(familyOnly && role == "Patient") && if (role == "Patient") patientConfirmation == null else patientConfirmation != null, label = { Text(role) }) } } }
-                item { CheckLine(reviewed, { reviewed = it }, "I have read this exact version. This acknowledgement is not a legal signature, medical consent or treatment decision. I can ask my doctor to update it later.") }
+                item { HorizontalDivider(); Spacer(Modifier.height(12.dp)); Heading(if (patientConfirmation == null) t("Patient's review", "मरीज़ की जाँच") else t("Family's review", "परिवार की जाँच"), 26)
+                    Text(if (patientConfirmation == null) t("The patient confirms first. Family can then add their own confirmation to this same version.", "पहले मरीज़ पुष्टि करें। फिर परिवार इसी संस्करण पर अपनी पुष्टि जोड़ सकता है।") else t("The patient's confirmation stays saved. Add your own after reading this version.", "मरीज़ की पुष्टि सहेजी रहेगी। यह संस्करण पढ़कर अपनी पुष्टि जोड़ें।"), style = MaterialTheme.typography.bodySmall) }
+                item { CareField(value = name, onValueChange = { name = it.take(100) }, label = t("Your name", "आपका नाम"), singleLine = true) }
+                item { Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf("Patient", "Family / carer").forEach { role -> FilterChip(selected = relationship == role, onClick = { relationship = role }, enabled = (vm.cloud == null || (role == "Patient") == owner) && !(familyOnly && role == "Patient") && if (role == "Patient") patientConfirmation == null else patientConfirmation != null, label = { Text(if (role == "Patient") t("Patient", "मरीज़") else t("Family / carer", "परिवार / देखभाल करने वाले")) }) } } }
+                item { CheckLine(reviewed, { reviewed = it }, t("I have read this exact version. This acknowledgement is not a legal signature, medical consent or treatment decision. I can ask my doctor to update it later.", "मैंने यही संस्करण पढ़ा है। यह पुष्टि क़ानूनी हस्ताक्षर, इलाज की सहमति या इलाज का फ़ैसला नहीं है। मैं बाद में डॉक्टर से इसे बदलवा सकता/सकती हूँ।")) }
                 val alreadyConfirmed = confirmations.any { it.relationship == relationship && it.name.equals(name.trim(), ignoreCase = true) && (vm.cloud == null || it.id in authenticatedAcks) }
-                item { Button(onClick = { vm.confirm(note, name, relationship, reviewed) { reviewed = false; name = "" } }, enabled = reviewed && name.isNotBlank() && !busy && !alreadyConfirmed && (relationship == "Patient" || patientConfirmation != null), modifier = Modifier.fillMaxWidth()) { Text(if (alreadyConfirmed) "Confirmation already saved" else "Confirm this version") } }
+                item { Button(onClick = { vm.confirm(note, name, relationship, reviewed) { reviewed = false; name = "" } }, enabled = reviewed && name.isNotBlank() && !busy && !alreadyConfirmed && (relationship == "Patient" || patientConfirmation != null), modifier = Modifier.fillMaxWidth()) { Text(if (alreadyConfirmed) t("Confirmation already saved", "पुष्टि पहले से सहेजी है") else t("Confirm this version", "इस संस्करण की पुष्टि करें")) } }
             }
-            item { Text("This records a conversation. It is not a treatment order or legal directive. Names are self-entered unless this version explicitly shows verified clinician review.", style = MaterialTheme.typography.bodySmall) }
+            item { Text(t("This records a conversation. It is not a treatment order or legal directive. Names are self-entered unless this version explicitly shows verified clinician review.", "यह एक बातचीत का रिकॉर्ड है। यह इलाज का आदेश या क़ानूनी निर्देश नहीं है। जब तक डॉक्टर की पक्की जाँच न दिखे, नाम लोगों ने ख़ुद लिखे हैं।"), style = MaterialTheme.typography.bodySmall) }
         }
     }
 }
@@ -1071,28 +1072,28 @@ object ConversationPages {
 }
 
 @Composable fun InfoDisclosure(title: String, color: Color = Paper, content: @Composable ColumnScope.() -> Unit) {
-    var open by rememberSaveable(title) { mutableStateOf(false) }
+    var open by rememberSaveable(title) { mutableStateOf(false) }; val t = careText()
     Surface(shape = RoundedCornerShape(20.dp), color = color, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("info-disclosure")) { Column {
-        Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable(onClickLabel = if (open) "Hide details" else "Show details") { open = !open }.padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable(onClickLabel = if (open) t("Hide details", "जानकारी छिपाएँ") else t("Show details", "जानकारी देखें")) { open = !open }.padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
             Icon(Icons.Outlined.Info, null, Modifier.size(20.dp), tint = DoctorAccent); Spacer(Modifier.width(10.dp))
             Text(title, Modifier.weight(1f), fontFamily = SaharaTitleFont, fontSize = 17.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
-            Icon(if (open) Icons.Default.ExpandLess else Icons.Default.ExpandMore, if (open) "Collapse" else "Expand", tint = DoctorCardSub)
+            Icon(if (open) Icons.Default.ExpandLess else Icons.Default.ExpandMore, if (open) t("Collapse", "बंद करें") else t("Expand", "खोलें"), tint = DoctorCardSub)
         }
         if (open) Column(Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp), content = content)
     } }
 }
 
 @Composable fun RawTranscriptPanel(source: String) {
-    var open by rememberSaveable { mutableStateOf(true) }
+    var open by rememberSaveable { mutableStateOf(true) }; val t = careText()
     Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("raw-transcript")) { Column {
-        Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable(onClickLabel = if (open) "Collapse raw transcript" else "Expand raw transcript") { open = !open }.padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
-            Text("Raw transcript", Modifier.weight(1f), fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
-            Text("${source.trim().split(Regex("\\s+")).count { it.isNotEmpty() }} words", fontSize = 12.sp, color = DoctorCardFaint); Spacer(Modifier.width(8.dp))
+        Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable(onClickLabel = if (open) t("Collapse raw transcript", "पूरी लिखाई बंद करें") else t("Expand raw transcript", "पूरी लिखाई खोलें")) { open = !open }.padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text(t("Raw transcript", "पूरी लिखाई"), Modifier.weight(1f), fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
+            Text("${source.trim().split(Regex("\\s+")).count { it.isNotEmpty() }} " + t("words", "शब्द"), fontSize = 12.sp, color = DoctorCardFaint); Spacer(Modifier.width(8.dp))
             Icon(if (open) Icons.Default.ExpandLess else Icons.Default.ExpandMore, null, tint = DoctorCardSub)
         }
         if (open) Column(Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Read-only. Edit the transcript on the transcript step.", fontSize = 12.sp, color = DoctorCardFaint)
-            Box(Modifier.fillMaxWidth().heightIn(max = 280.dp).verticalScroll(rememberScrollState())) { androidx.compose.foundation.text.selection.SelectionContainer { Text(source.ifBlank { "No transcript captured yet." }, fontSize = 15.sp, lineHeight = 24.sp, color = DoctorCardInk) } }
+            Text(t("Read-only. Edit the transcript on the transcript step.", "सिर्फ़ पढ़ने के लिए। लिखाई को उसके अपने चरण में बदलें।"), fontSize = 12.sp, color = DoctorCardFaint)
+            Box(Modifier.fillMaxWidth().heightIn(max = 280.dp).verticalScroll(rememberScrollState())) { androidx.compose.foundation.text.selection.SelectionContainer { Text(source.ifBlank { t("No transcript captured yet.", "अभी कोई लिखाई नहीं बनी।") }, fontSize = 15.sp, lineHeight = 24.sp, color = DoctorCardInk) } }
         }
     } }
 }
