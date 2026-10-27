@@ -49,6 +49,10 @@ internal object CheckInMood {
     const val GOOD = "A good day"; const val OKAY = "An okay day"; const val HARD = "A hard day"
     const val noteLimit = 4000
     fun title(score: Float): String = when { score < 1f / 3f -> HARD; score < 2f / 3f -> OKAY; else -> GOOD }
+    /** Symptom notes also use checkin storage; only an ordinary mood entry may be updated here. */
+    fun today(items: List<CareItem>, personId: String, dayStart: Long): CareItem? = items.firstOrNull {
+        it.kind == "checkin" && it.personId == personId && it.created >= dayStart && !SymptomNoteCodec.isStructured(it.detail)
+    }
 }
 
 @Composable fun FeedbackScreen(accountScope: String, surface: String, onClose: () -> Unit, careModel: CareModel? = null, personId: String? = null) {
@@ -65,7 +69,7 @@ internal object CheckInMood {
     val modelError by (careModel?.actionError ?: remember { kotlinx.coroutines.flow.MutableStateFlow<String?>(null) }).collectAsStateWithLifecycle()
     val selectedPerson by (careModel?.selected ?: remember { kotlinx.coroutines.flow.MutableStateFlow("") }).collectAsStateWithLifecycle()
     val dayStart = remember { java.time.LocalDate.now().atStartOfDay(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli() }
-    val today = if (checkIn) items.firstOrNull { it.kind == "checkin" && it.personId == personId && it.created >= dayStart } else null
+    val today = if (checkIn) CheckInMood.today(items, personId!!, dayStart) else null
     if (checkIn) {
         LaunchedEffect(Unit) { careModel!!.actionError.value = null }
         LaunchedEffect(selectedPerson) { if (selectedPerson != personId) onClose() }
