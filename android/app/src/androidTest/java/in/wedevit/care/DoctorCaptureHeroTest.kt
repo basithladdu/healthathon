@@ -31,7 +31,7 @@ class DoctorCaptureHeroTest {
         ui.onNodeWithText("Back to conversations").performClick()
         assertTrue(back)
         ui.onNodeWithTag("doctor-capture-mode").performClick()
-        ui.onNodeWithText("Record · unavailable in demo").assertIsNotEnabled()
+        ui.onNodeWithText("Record · unavailable").assertIsNotEnabled()
         ui.onNodeWithText("Type").performClick()
         assertEquals("Type", mode)
     }

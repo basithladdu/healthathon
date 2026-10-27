@@ -33,9 +33,9 @@ import org.junit.Test
 class CareHeaderUiTest {
     @get:Rule val ui = createComposeRule()
 
-    @Test fun compactHeaderKeepsProfileSwitchAddAndRoleSelectionIndependent() {
+    @Test fun compactHeaderKeepsProfileSwitchAddAndWalkthroughUserSelectionIndependent() {
         val selected = mutableStateOf("first")
-        val role = mutableStateOf("Patient")
+        val user = mutableStateOf(PatientWalkthrough.users[0]); var left = 0
         var additions = 0
         ui.setContent {
             val density = LocalDensity.current.density
@@ -43,7 +43,7 @@ class CareHeaderUiTest {
                 CareTheme { Column(Modifier.width(320.dp)) {
                     CarePersonSelector(if (selected.value == "first") "ff" else "Asha", listOf("first" to "ff", "second" to "Asha"), selected.value,
                         enabled = true, onSelect = { selected.value = it }, onAdd = { additions++ })
-                    CareRoleMenu(role.value, true) { role.value = it }
+                    WalkthroughUserMenu(user.value, { user.value = PatientWalkthrough.user(it)!! }, { left++ })
                 } }
             }
         }
@@ -53,23 +53,20 @@ class CareHeaderUiTest {
         ui.onNodeWithTag("person-second").performClick()
         ui.onNodeWithText("Asha").assertIsDisplayed()
         ui.onNodeWithTag("add-care-person").performClick()
-        ui.onNodeWithTag("choose-role").performClick()
-        ui.onNodeWithTag("role-Patient").assertIsSelected()
-        ui.onNodeWithTag("role-Family").assertIsDisplayed()
-        ui.onNodeWithTag("role-Doctor").performClick()
-        ui.onNodeWithContentDescription("Choose role, current role Doctor").assertIsDisplayed()
-        ui.runOnIdle { assertEquals("second", selected.value); assertEquals(1, additions); assertEquals("Doctor", role.value) }
+        ui.onNodeWithTag("walkthrough-user-menu").performClick()
+        ui.onNodeWithTag("walkthrough-switch-rahul").assertIsSelected()
+        ui.onNodeWithTag("leave-walkthrough").assertIsDisplayed()
+        ui.onNodeWithTag("walkthrough-switch-arjun").performClick()
+        ui.onNodeWithContentDescription("Walkthrough user, currently Arjun, Family").assertIsDisplayed()
+        ui.runOnIdle { assertEquals("second", selected.value); assertEquals(1, additions); assertEquals("arjun", user.value.key); assertEquals(0, left) }
     }
 
-    @Test fun recordingDisabledHeaderDoesNotPermitProfileOrRoleChanges() {
+    @Test fun recordingDisabledHeaderDoesNotPermitProfileChanges() {
         ui.setContent { CareTheme { Column {
             CarePersonSelector("Asha", listOf("first" to "Asha"), "first", false, {}, {})
-            CareRoleMenu("Family", false) {}
         } } }
         ui.onNodeWithTag("selected-care-profile").assertIsNotEnabled()
         ui.onNodeWithTag("add-care-person").assertIsNotEnabled()
-        ui.onNodeWithTag("choose-role").assertIsNotEnabled()
-        ui.onNodeWithTag("role-Family").assertDoesNotExist()
     }
 
     @Test fun illustratedFeatureCardsKeepTheirIndependentActions() {
@@ -113,7 +110,7 @@ class CareHeaderUiTest {
                     Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
                         Image(painterResource(R.drawable.sahara_professional_logo), null, Modifier.size(40.dp))
                         Text("Sahara", modifier = Modifier.weight(1f), fontSize = 22.sp)
-                        CareRoleMenu("Patient", true) {}
+                        WalkthroughUserMenu(PatientWalkthrough.users[0], {}, {})
                     }
                     CarePersonSelector("Asha", listOf("fixture" to "Asha"), "fixture", true, {}, {})
                     Row(Modifier.padding(16.dp).height(IntrinsicSize.Min)) {
@@ -133,8 +130,8 @@ class CareHeaderUiTest {
             finally { bitmap.recycle() }
         }
         screenshot("compact-closed.png")
-        ui.onNodeWithTag("choose-role").performClick()
-        ui.onNodeWithTag("role-Patient").assertIsSelected()
+        ui.onNodeWithTag("walkthrough-user-menu").performClick()
+        ui.onNodeWithTag("walkthrough-switch-rahul").assertIsSelected()
         ui.waitForIdle()
         screenshot("compact-open.png")
     }

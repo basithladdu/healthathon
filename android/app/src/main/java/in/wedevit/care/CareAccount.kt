@@ -6,6 +6,8 @@ import android.net.Uri
 import android.app.Application
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -37,6 +39,16 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
         return careStore
     }
     override fun onCleared() { careStore.clear(); super.onCleared() }
+    private val pendingStore = CarePendingJoinStore(CarePrefsKeyValue(app.getSharedPreferences("care_pending_join", android.content.Context.MODE_PRIVATE)))
+    val pendingJoin = kotlinx.coroutines.flow.MutableStateFlow(pendingStore.load(System.currentTimeMillis()))
+    val linkNotice = kotlinx.coroutines.flow.MutableStateFlow<String?>(null)
+    /** Called by MainActivity for https://sahara.wedevit.in/join and sahara://join links. */
+    fun offerInviteLink(link: String) {
+        val invite = CareInviteLink.parse(link)
+        if (invite == null) { linkNotice.value = "That invitation link isn't complete. Ask for a new one, or paste the code under Join someone's care."; return }
+        PendingJoin(invite.code, invite.name, System.currentTimeMillis()).also { pendingStore.save(it); pendingJoin.value = it }
+    }
+    fun clearPendingJoin() { pendingStore.clear(); pendingJoin.value = null }
 }
 
 @Composable fun CareRoot(activity: MainActivity) {
@@ -47,6 +59,8 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
     var patientWalkthroughUser by rememberSaveable { mutableStateOf<String?>(null) }
     var doctorOpen by rememberSaveable { mutableStateOf(false) }
     var doctorEntryPending by rememberSaveable { mutableStateOf(false) }
+    val pending by root.pendingJoin.collectAsStateWithLifecycle()
+    val linkNotice by root.linkNotice.collectAsStateWithLifecycle()
     val session by cloud.session.collectAsStateWithLifecycle()
     LaunchedEffect(session?.userId) {
         if (session != null && doctorEntryPending) { doctorOpen = true; doctorEntryPending = false }
@@ -60,10 +74,13 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
         })[CareModel::class.java] }
         SideEffect { activity.careModel = model }
         var accountOpen by rememberSaveable { mutableStateOf(false) }
+        LaunchedEffect(pending?.code, session?.userId) { if (pending != null && session == null) accountOpen = true }
+        LaunchedEffect(linkNotice) { linkNotice?.let { model.message.value = it; root.linkNotice.value = null } }
+        val joinBanner = pending?.let { "Sign in or create an account to join ${it.possessive} care" }
         val mode = when { patientWalkthroughUser != null -> "patient-walkthrough"; demoOpen -> "doctor-walkthrough"; doctorOpen && session != null -> "doctor"; else -> "care" }
         // Entering a walkthrough or workspace moves forward; leaving it moves back to the welcome/care app.
         SaharaScreenHost(mode, Modifier.fillMaxSize().background(Cream), label = "Sahara root", direction = { _, to -> if (to == "care") SaharaMotion.Direction.Back else SaharaMotion.Direction.Forward }) { shown -> when (shown) {
-        "patient-walkthrough" -> patientWalkthroughUser?.let { PatientWalkthroughHost(it, onExit = { patientWalkthroughUser = null }) }
+        "patient-walkthrough" -> patientWalkthroughUser?.let { PatientWalkthroughHost(it, onExit = { patientWalkthroughUser = null }, onSwitch = { patientWalkthroughUser = it }) }
         "doctor-walkthrough" -> DoctorDemo(onExit = { demoOpen = false; walkthroughPatient = null }, cloud = cloud, initialPatientId = walkthroughPatient, careModel = model, onCareAccount = { accountOpen = true })
         "doctor" -> ConnectedDoctorWorkspace(cloud, model, onExit = { doctorOpen = false }, onAccount = { accountOpen = true }, onWalkthrough = { walkthroughPatient = it; demoOpen = true })
         else -> CareApp(model, onAccount = { accountOpen = true }, onDoctorDemo = {
@@ -71,7 +88,7 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
             else { walkthroughPatient = null; demoOpen = true }
         }, onPatientWalkthrough = { if (model.recording.value) model.message.value = "Stop the recording before opening the walkthrough." else patientWalkthroughUser = it },
             onDoctorWorkspace = { doctorEntryPending = true; if (session != null) { doctorOpen = true; doctorEntryPending = false } else accountOpen = true },
-            welcomeAccountContent = { close, onBusy -> AccountContent(cloud, model, close, onBusyChange = onBusy) },
+            welcomeAccountContent = { close, onBusy -> AccountContent(cloud, model, close, onBusyChange = onBusy, banner = joinBanner) },
             welcomeDoctorContent = { close, onBusy ->
                 if (session == null) AccountContent(cloud, model, close, heading = "Doctor sign in", onBusyChange = onBusy)
                 else Column(Modifier.padding(22.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
@@ -82,7 +99,9 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
                 }
             }, onWelcomePanelChanged = { doctorEntryPending = it == "doctor" })
         } }
-        if (accountOpen) AccountSheet(cloud, model, onDismiss = { accountOpen = false; if (cloud.session.value == null) doctorEntryPending = false })
+        if (accountOpen) AccountSheet(cloud, model, onDismiss = { accountOpen = false; if (cloud.session.value == null) doctorEntryPending = false }, banner = joinBanner)
+        val joinSession = session
+        if (joinSession != null && pending != null) PendingJoinDialog(cloud, model, pending!!, joinSession.email, onClear = root::clearPendingJoin)
     }
 }
 
@@ -109,15 +128,15 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
     }
 }
 
-@Composable fun AccountSheet(cloud: CareCloud, vm: CareModel, onDismiss: () -> Unit) {
+@Composable fun AccountSheet(cloud: CareCloud, vm: CareModel, onDismiss: () -> Unit, banner: String? = null) {
     var busy by remember { mutableStateOf(false) }
     ModalBottomSheet(onDismissRequest = { if (!busy) onDismiss() }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
-        AccountContent(cloud, vm, onDismiss, onBusyChange = { busy = it })
+        AccountContent(cloud, vm, onDismiss, onBusyChange = { busy = it }, banner = banner)
     }
 }
 
 /** The same genuine account form, reusable inside the welcome panel. */
-@Composable fun AccountContent(cloud: CareCloud, vm: CareModel, onDismiss: () -> Unit, heading: String? = null, onBusyChange: (Boolean) -> Unit = {}) {
+@Composable fun AccountContent(cloud: CareCloud, vm: CareModel, onDismiss: () -> Unit, heading: String? = null, onBusyChange: (Boolean) -> Unit = {}, banner: String? = null) {
     val session by cloud.session.collectAsStateWithLifecycle()
     val people by vm.people.collectAsStateWithLifecycle()
     val selected by vm.selected.collectAsStateWithLifecycle()
@@ -142,6 +161,11 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
     var doctorCosts by rememberSaveable(selected) { mutableStateOf(false) }
     var doctorDays by rememberSaveable(selected) { mutableStateOf(30) }
     var members by remember(selected) { mutableStateOf<List<CareMember>>(emptyList()) }
+    var membersLoaded by remember(selected) { mutableStateOf(false) }
+    var addFamily by remember { mutableStateOf(false) }
+    var inviteTick by remember { mutableStateOf(0) }
+    var invites by remember(selected) { mutableStateOf<List<CareInviteEntry>>(emptyList()) }
+    val inviteStore = remember { careInviteStore(context) }
     var removing by remember { mutableStateOf<CareMember?>(null) }
     var signingOut by remember { mutableStateOf(false) }
     SideEffect { onBusyChange(busy) }
@@ -153,12 +177,19 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
             finally { busy = false }
         }
     }
+    LaunchedEffect(selected, members, membersLoaded, inviteTick, session?.userId) {
+        val acct = session?.userId ?: return@LaunchedEffect; val now = System.currentTimeMillis()
+        val all = inviteStore.all(acct)
+        val next = if (membersLoaded) CareInviteLog.reconcile(all, selected, members.size, now).also { if (it != all) inviteStore.save(acct, it) } else all
+        invites = next.filter { it.person == selected }.sortedByDescending { it.createdAt }
+    }
     LaunchedEffect(selected, owner) {
-        if (session != null && owner && selected.isNotBlank()) try { members = cloud.members(selected) }
+        if (session != null && owner && selected.isNotBlank()) try { members = cloud.members(selected); membersLoaded = true }
         catch (e: Exception) { if (e is CancellationException) throw e; error = "Couldn't load the people you've invited." }
     }
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(horizontal = 22.dp).padding(bottom = 30.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
             Heading(heading ?: if (session == null) if (create) "Create an account" else "Sign in" else "Your account", 28)
+            banner?.let { Surface(color = Mint, shape = RoundedCornerShape(14.dp)) { Text(it, Modifier.fillMaxWidth().padding(14.dp), fontWeight = FontWeight.Medium) } }
             if (session == null) {
                 Text("Sign in to share care notes and daily care with people you invite.")
                 OutlinedTextField(email, { email = it }, label = { Text("Email") }, singleLine = true, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email), modifier = Modifier.fillMaxWidth())
@@ -179,11 +210,14 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
                 OutlinedButton(onClick = { vm.refresh(); onDismiss() }, enabled = !busy) { Icon(Icons.Default.Refresh, null); Spacer(Modifier.width(8.dp)); Text("Refresh records") }
                 DetailPanel("Join someone's care", Icons.Default.GroupAdd) {
                     Text("The person who invited you will see your email.", style = MaterialTheme.typography.bodySmall)
-                    CareField(code, { code = it }, "Invitation code", singleLine = true)
+                    CareField(code, { code = CareInviteLink.parse(it)?.code ?: it.trim().take(4000) }, "Invitation code or link", singleLine = true)
+                    OutlinedButton(onClick = { val pasted = (context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as? android.content.ClipboardManager)?.primaryClip?.takeIf { it.itemCount > 0 }?.getItemAt(0)?.coerceToText(context)?.toString(); val invite = CareInviteLink.parse(pasted); if (invite != null) { code = invite.code; error = null; notice = "Invite pasted. Tap Join." } else { notice = null; error = "No Sahara invite found on the clipboard. Copy the WhatsApp message or link first." } }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Icon(Icons.Default.ContentPaste, null); Spacer(Modifier.width(8.dp)); Text("Paste invite") }
                     Spacer(Modifier.height(10.dp))
-                    Button(onClick = { run { cloud.join(code); vm.refresh(); code = ""; notice = "Joined. Their records will appear in your list." } }, enabled = !busy && code.trim().length == 48) { Text("Join") }
+                    Button(onClick = { run { val before = vm.people.value.map { it.id }.toSet(); try { cloud.join(code) } catch (e: Exception) { if (e is CancellationException) throw e; throw IllegalArgumentException(careJoinFailureMessage(e.message), e) }; code = ""; val added = vm.joinedRefresh(before); notice = "You can now see ${added?.name?.let { "$it's" } ?: "their"} care." } }, enabled = !busy && code.trim().length == 48) { Text("Join") }
                 }
                 if (owner && selected.isNotBlank()) DetailPanel("Share ${people.firstOrNull { it.id == selected }?.name.orEmpty()}'s care", Icons.Default.PersonAdd) {
+                    Button(onClick = { addFamily = true }, enabled = !busy, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Icon(Icons.Default.PersonAdd, null); Spacer(Modifier.width(8.dp)); Text("Add family") }
+                    Text("Let family see ${people.firstOrNull { it.id == selected }?.name.orEmpty()}'s care on their own phone", style = MaterialTheme.typography.bodySmall)
                     Text("Who are you inviting?", style = MaterialTheme.typography.bodyMedium)
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         FilterChip(selected = !inviteDoctor, onClick = { inviteDoctor = false; invite = "" }, modifier = Modifier.heightIn(min = 48.dp), label = { Text("Family") })
@@ -208,9 +242,10 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
                     Button(onClick = { val person = selected; val account = session!!.userId; val doctor = inviteDoctor; run { val code = if (doctor) cloud.inviteAccess(person, "clinician", doctorEdit, mapOf("careNote" to doctorNotes, "calendar" to doctorCalendar, "reports" to doctorReports, "costs" to doctorCosts), doctorDays, expectedAccountId = account) else cloud.invite(person, allowChanges, allowCareTeam); if (vm.selected.value == person && cloud.session.value?.userId == account && vm.isOwner.value) invite = code } }, enabled = !busy && (!inviteDoctor || doctorNotes || doctorCalendar || doctorReports || doctorCosts), modifier = Modifier.heightIn(min = 48.dp)) { Text(if (inviteDoctor) "Create doctor invitation" else "Create invitation") }
                     if (invite.isNotEmpty()) {
                         Spacer(Modifier.height(12.dp)); Text(if (inviteDoctor) "One person · the code expires in 3 days · works only for an approved clinician account" else "One person · expires in 3 days", style = MaterialTheme.typography.bodySmall)
-                        TextButton(onClick = { open(context, Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, context.getString(R.string.share_care_invitation, context.getString(R.string.app_name), invite)), "Share invitation")) }) { Icon(Icons.Default.Share, null); Spacer(Modifier.width(8.dp)); Text("Share invitation") }
+                        TextButton(onClick = { open(context, Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, CareInviteLink.shareText(people.firstOrNull { it.id == selected }?.name.orEmpty(), invite)), "Share invitation")) }) { Icon(Icons.Default.Share, null); Spacer(Modifier.width(8.dp)); Text("Share invitation") }
                         androidx.compose.foundation.text.selection.SelectionContainer { Text(invite, style = MaterialTheme.typography.bodySmall) }
                     }
+                    if (invites.isNotEmpty()) { Text("Invitations", fontWeight = FontWeight.Medium); invites.forEach { Text(CareInviteLog.label(it, System.currentTimeMillis()), Modifier.padding(vertical = 4.dp), style = MaterialTheme.typography.bodyMedium) } }
                     members.forEach { member ->
                         Row(Modifier.fillMaxWidth()) {
                             Column(Modifier.weight(1f).padding(top = 12.dp)) { Text(member.email); Text(if (member.canEdit) "Can make changes" else "Can read", style = MaterialTheme.typography.bodySmall) }
@@ -228,6 +263,7 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
             notice?.let { Text(it, color = MaterialTheme.colorScheme.secondary) }
             error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
         }
+    if (addFamily) AddFamilySheet(vm, onDismiss = { addFamily = false }, onSignIn = {}, onInvited = { inviteTick++ })
     removing?.let { member -> AlertDialog(onDismissRequest = { removing = null }, title = { Text("Stop sharing with this person?") }, text = { Text("They won't be able to read or change these records online. Copies they've already saved cannot be recalled.") }, confirmButton = { TextButton(onClick = { removing = null; run { cloud.removeMember(selected, member.userId); members = cloud.members(selected) } }) { Text("Stop sharing") } }, dismissButton = { TextButton(onClick = { removing = null }) { Text("Keep sharing") } }) }
     if (signingOut) AlertDialog(onDismissRequest = { signingOut = false }, title = { Text("Sign out?") }, confirmButton = { TextButton(onClick = { signingOut = false; run { vm.stopRecording(); cloud.signOut() } }) { Text("Sign out") } }, dismissButton = { TextButton(onClick = { signingOut = false }) { Text("Cancel") } })
 }

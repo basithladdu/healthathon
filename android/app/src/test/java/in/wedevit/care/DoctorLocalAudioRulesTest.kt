@@ -6,12 +6,15 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.*
 
 class DoctorLocalAudioRulesTest {
-    @Test fun onlyExplicitIsolatedTestProfilesCanRecordInDemo() {
-        assertTrue(DoctorLocalAudioRules.allowed(true,false,"",CareModel.DOCTOR_DEMO_STORAGE,"rahul",true))
-        assertFalse(DoctorLocalAudioRules.allowed(true,false,"",CareModel.DOCTOR_DEMO_STORAGE,"old-sample",false))
-        assertFalse(DoctorLocalAudioRules.allowed(true,true,"account",CareModel.DOCTOR_DEMO_STORAGE,"rahul",true))
-        assertFalse(DoctorLocalAudioRules.allowed(true,false,"","","rahul",true))
-        assertFalse(DoctorLocalAudioRules.allowed(false,true,"","account","person",false))
+    @Test fun anyWalkthroughPatientCanRecordOnlyInLocalDemoStorage() {
+        assertTrue(DoctorLocalAudioRules.allowed(true,false,"",CareModel.DOCTOR_DEMO_STORAGE,"rahul"))
+        assertTrue(DoctorLocalAudioRules.allowed(true,false,"",CareModel.DOCTOR_DEMO_STORAGE,"old-sample"))
+        assertFalse(DoctorLocalAudioRules.allowed(true,false,"",CareModel.DOCTOR_DEMO_STORAGE,""))
+        assertFalse(DoctorLocalAudioRules.allowed(true,true,"account",CareModel.DOCTOR_DEMO_STORAGE,"rahul"))
+        assertFalse(DoctorLocalAudioRules.allowed(true,false,"account",CareModel.DOCTOR_DEMO_STORAGE,"rahul"))
+        assertFalse(DoctorLocalAudioRules.allowed(true,false,"","","old-sample"))
+        assertTrue(DoctorLocalAudioRules.allowed(false,true,"account","account","person"))
+        assertFalse(DoctorLocalAudioRules.allowed(false,true,"","account","person"))
     }
     @Test fun stoppedAudioNeverAttachesToAnotherPersonConversationOrAccount() {
         assertTrue(DoctorLocalAudioRules.sameDraft("a","a","p","p","c","c"))

@@ -83,7 +83,7 @@ class DailyCareFlowsTest {
         assertEquals("conversation", CareEntryCodec.decode(item.detail)!!.type)
         ui.onNodeWithText("Requested · For Dr Test").assertIsDisplayed()
         ui.onNodeWithText("Pick up", useUnmergedTree = true).assertDoesNotExist()
-        ui.onNodeWithTag("role-Doctor").performClick()
+        ui.runOnIdle { vm.role("Doctor") }
         ui.onNodeWithText("Care queue").assertIsDisplayed()
         ui.onNodeWithText("Pick up", useUnmergedTree = true).performClick()
         enter("Your name", "Dr Test"); hideKeyboard()

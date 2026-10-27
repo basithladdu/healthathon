@@ -7,8 +7,8 @@ import kotlinx.coroutines.Job
 
 internal object DoctorLocalAudioRules {
     fun level(measured: Int): Float = measured.coerceIn(0,32767)/32767f
-    fun allowed(demo: Boolean, cloud: Boolean, account: String, storage: String, person: String, testPerson: Boolean): Boolean =
-        person.isNotBlank() && if (demo) !cloud && account.isBlank() && storage == CareModel.DOCTOR_DEMO_STORAGE && testPerson else !cloud || account.isNotBlank()
+    fun allowed(demo: Boolean, cloud: Boolean, account: String, storage: String, person: String): Boolean =
+        person.isNotBlank() && if (demo) !cloud && account.isBlank() && storage == CareModel.DOCTOR_DEMO_STORAGE else !cloud || account.isNotBlank()
 
     fun sameDraft(account: String, liveAccount: String, person: String, livePerson: String, conversation: String, liveConversation: String): Boolean =
         account == liveAccount && person.isNotBlank() && person == livePerson && conversation == liveConversation

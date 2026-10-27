@@ -1,0 +1,23 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "in.wedevit.sahara",
+      "sha256_cert_fingerprints": [
+        "01:6D:61:8B:5F:D2:DC:7E:B0:AD:9C:2E:96:46:5F:DF:0E:E0:BA:AB:9C:2B:6A:76:27:93:FB:13:88:85:F8:5B",
+        "REPLACE_ME_RELEASE_SIGNING_SHA256_FINGERPRINT_BEFORE_DEPLOY"
+      ]
+    }
+  },
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "in.wedevit.sahara.development",
+      "sha256_cert_fingerprints": [
+        "01:6D:61:8B:5F:D2:DC:7E:B0:AD:9C:2E:96:46:5F:DF:0E:E0:BA:AB:9C:2B:6A:76:27:93:FB:13:88:85:F8:5B"
+      ]
+    }
+  }
+]

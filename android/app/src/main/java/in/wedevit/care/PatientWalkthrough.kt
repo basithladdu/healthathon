@@ -76,7 +76,7 @@ object PatientWalkthrough {
 }
 
 /** Hosts the normal patient app on a local model fixed to one walkthrough user. Leaving restores the real app. */
-@Composable fun PatientWalkthroughHost(userKey: String, onExit: () -> Unit) {
+@Composable fun PatientWalkthroughHost(userKey: String, onExit: () -> Unit, onSwitch: (String) -> Unit = {}) {
     val user = PatientWalkthrough.user(userKey)
     if (user == null) { LaunchedEffect(Unit) { onExit() }; return }
     val context = LocalContext.current.applicationContext
@@ -86,6 +86,7 @@ object PatientWalkthrough {
     var closing by remember(userKey) { mutableStateOf(false) }; var attempt by remember { mutableIntStateOf(0) }
     val people by vm.people.collectAsState(); val selected by vm.selected.collectAsState(); val draft by vm.draft.collectAsState()
     fun leave() { if (!closing) { closing = true; scope.launch { val job = vm.closeDoctorDemo(); job.join(); onExit() } } }
+    fun switchTo(key: String) { if (key == userKey) return; if (!closing) { closing = true; scope.launch { val job = vm.closeDoctorDemo(); job.join(); onSwitch(key) } } }
     DisposableEffect(vm) { onDispose { vm.closeDoctorDemo() } }
     LaunchedEffect(vm, attempt) {
         try { PatientWalkthrough.seed(vm, context); vm.select(PatientWalkthrough.personId); vm.refreshCareContacts(); vm.refreshMedicineHistory(); ready = true }
@@ -106,6 +107,6 @@ object PatientWalkthrough {
         "error" -> Box(Modifier.fillMaxSize().safeDrawingPadding(), contentAlignment = Alignment.Center) { SaharaEmpty(error ?: "", actionLabel = "Retry", onAction = { error = null; attempt++ }, secondaryLabel = "Leave walkthrough", onSecondary = ::leave) }
         "removed" -> Box(Modifier.fillMaxSize().safeDrawingPadding(), contentAlignment = Alignment.Center) { SaharaEmpty("Rahul's walkthrough record was removed. It will not be recreated automatically.", secondaryLabel = "Leave walkthrough", onSecondary = ::leave) }
         "opening" -> SaharaLoading("Opening care records…")
-        else -> CareApp(vm, onAccount = { vm.message.value = "Account and sharing are unavailable in the walkthrough." }, walkthrough = user, onLeaveWalkthrough = ::leave)
+        else -> CareApp(vm, onAccount = { vm.message.value = "Account and sharing are unavailable in the walkthrough." }, walkthrough = user, onLeaveWalkthrough = ::leave, onSwitchWalkthrough = ::switchTo)
     } }
 }

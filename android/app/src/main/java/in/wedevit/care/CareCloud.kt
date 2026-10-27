@@ -37,7 +37,8 @@ class CareCloud(context: Context) {
     private val preferences = context.getSharedPreferences("care-account", Context.MODE_PRIVATE)
     private val refreshLock = Mutex()
     val session = MutableStateFlow(runCatching { preferences.getString("session", null)?.let { decodeSession(JSONObject(unseal(it))) } }.getOrNull())
-    private val base = "https://cghlkqeqiokjqdionrkc.supabase.co"
+    // Saanthvana project (26 Oct 2026): accounts, sharing and invites run here.
+    private val base = "https://kjnhtakqzboayqorrlue.supabase.co"
     private val apiKey = PUBLIC_API_KEY
     private val accountRedirect = URLEncoder.encode("https://sahara.wedevit.in/android-account", "UTF-8")
 
@@ -227,7 +228,7 @@ class CareCloud(context: Context) {
     private fun unseal(value: String): String { val bytes = Base64.decode(value, Base64.NO_WRAP); val cipher = Cipher.getInstance("AES/GCM/NoPadding"); cipher.init(Cipher.DECRYPT_MODE, key(), GCMParameterSpec(128, bytes.copyOfRange(0, 12))); return String(cipher.doFinal(bytes.copyOfRange(12, bytes.size))) }
 
     companion object {
-        const val PUBLIC_API_KEY = "sb_publishable_43mvHQiHJXVGwS71SX0GVA_GWxXBVOC"
+        const val PUBLIC_API_KEY = "sb_publishable_bheyh26N5MKpXNEJDQgq8w_oDRhW8Xe"
     }
 }
 
