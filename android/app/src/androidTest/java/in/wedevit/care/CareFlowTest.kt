@@ -89,6 +89,9 @@ class CareFlowTest {
         ui.runOnIdle { vm.role("Doctor") }
         ui.onNodeWithTag("nav-Talk").performClick()
         openTranscriptStep()
+        // A saved transcript opens as numbered lines; Edit shows the text field again.
+        ui.onNodeWithTag("conversation-list").performScrollToNode(hasTestTag("transcript-edit"))
+        ui.onNodeWithTag("transcript-edit").performClick()
         ui.onNodeWithTag("conversation-list").performScrollToNode(hasSetTextAction() and hasText("Conversation transcript"))
         ui.onNode(hasSetTextAction() and hasText("Conversation transcript")).assertTextContains(words)
     }
