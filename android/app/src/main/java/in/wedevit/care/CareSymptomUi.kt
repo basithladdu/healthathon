@@ -199,14 +199,14 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
     LaunchedEffect(initial?.id) { vm.actionError.value = null }
     LaunchedEffect(selected) { if (selected != capturedPerson) onClose() }
     SymptomNoteForm(personId = capturedPerson, personName = people.firstOrNull { it.id == capturedPerson }?.name.orEmpty(), entries = entries,
-        hindi = hindi, initial = initial, followup = followup, busy = busy, canEdit = canEdit && selected == capturedPerson, actionError = actionError,
+        hindi = hindi, initial = initial, followup = followup, busy = busy, canEdit = canEdit && selected == capturedPerson, actionError = actionError, sharedOnline = vm.cloud != null,
         onSave = { id, value -> vm.saveSymptomNote(capturedPerson, id, value, expectedToken, onClose) }, onClose = onClose)
 }
 
 /** The same native form can be checked with isolated callback fixtures, without touching accounts or real records. */
 @Composable fun SymptomNoteForm(personId: String, personName: String, entries: List<CareItem>, hindi: Boolean,
     initial: CareItem? = null, busy: Boolean = false, canEdit: Boolean = true, actionError: String? = null,
-    followup: CareItem? = null, onSave: (String, SymptomNote) -> Unit, onClose: () -> Unit) {
+    followup: CareItem? = null, sharedOnline: Boolean = false, onSave: (String, SymptomNote) -> Unit, onClose: () -> Unit) {
     val original = remember(initial?.id) { initial?.let { SymptomNoteCodec.decode(it.detail) } }
     val largeText = LocalDensity.current.fontScale > 1.15f
     val prior = remember(followup?.id) { followup?.let { SymptomNoteCodec.decode(it.detail) } }
@@ -373,6 +373,7 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
             Column(Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 20.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 (localError.takeIf { it.isNotBlank() } ?: actionError)?.let { Text(if (hindi && it == SymptomDiaryRules.SAVE_CONFLICT) "यह नोट बदल गया है या हटा दिया गया है। आपके जवाब यहीं हैं। सहेजने से पहले यह फ़ॉर्म बंद करके मौजूदा नोट फिर खोलें।" else if (hindi) "नोट सहेजा नहीं गया। जवाब यहीं हैं। तारीख, नाम और चुने हुए जवाब जाँचें।" else it, color = MaterialTheme.colorScheme.error, fontSize = 15.sp, fontWeight = FontWeight.SemiBold) }
                 if (!quick && !stepValid && cur == "how") Text(if (ratingMissing) t("Choose a rating or Not rated.", "अंक चुनें या अंक नहीं बताया चुनें।") else t("Answer the questions above to continue.", "आगे बढ़ने के लिए ऊपर के सवाल भरें।"), color = DoctorCardSub, fontSize = 14.sp)
+                if (sharedOnline && (quick || pos == steps.lastIndex)) Text(t(CarePrivacy.SYMPTOM_NOTICE_EN, CarePrivacy.SYMPTOM_NOTICE_HI), color = DoctorCardSub, fontSize = 13.sp, modifier = Modifier.testTag("symptom-privacy-notice"))
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
                     OutlinedButton(onClick = goBack, shape = RoundedCornerShape(16.dp), contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp), modifier = Modifier.weight(1f).heightIn(min = 56.dp).testTag("symptom-step-back")) { Text(if (quick || pos <= 0) t("Cancel", "रद्द करें") else t("Back", "पीछे"), color = DoctorCardSub, fontSize = 16.sp) }
                     if (quick || pos == steps.lastIndex) Button(onClick = {
