@@ -89,8 +89,10 @@ class CareCloud(context: Context) {
     }
     suspend fun removePerson(id: String) { require(JSONArray(request("DELETE", "/rest/v1/healthathon_people?id=eq.$id")).length() == 1) { "These records changed. Refresh and try again." } }
     suspend fun saveEntry(item: CareItem, expectedAccountId: String? = null): CareItem {
-        val result = save("entry", item.id, item.personId, entryJson(item), item.revision, expectedAccountId)
-        return item.copy(revision = result.getLong("revision"))
+        // The phone keeps what the server holds, so symptom text is redacted for both.
+        val shared = CarePrivacy.entryForUpload(item)
+        val result = save("entry", shared.id, shared.personId, entryJson(shared), shared.revision, expectedAccountId)
+        return shared.copy(revision = result.getLong("revision"))
     }
     suspend fun removeEntry(item: CareItem) {
         val deleted = JSONArray(request("DELETE", "/rest/v1/healthathon_records?kind=eq.entry&id=eq.${item.id}&revision=eq.${item.revision}"))

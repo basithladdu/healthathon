@@ -78,10 +78,13 @@ suspend fun CareCloud.sharedDrafts(person: String, expectedAccountId: String = s
     } while (rows.length() == 500)
     return result
 }
-suspend fun CareCloud.saveSharedDraft(value: Conversation, id: String, revision: Long, submit: Boolean, expectedAccountId: String = session.value?.userId ?: error("Sign in first.")): SharedCareDraft {
+suspend fun CareCloud.saveSharedDraft(original: Conversation, id: String, revision: Long, submit: Boolean, expectedAccountId: String = session.value?.userId ?: error("Sign in first.")): SharedCareDraft {
     val account = expectedAccountId
     requireConversationCapabilities(account)
-    UUID.fromString(value.conversationId); DoctorConversationContext.validate(value.source, value.contextJson)
+    UUID.fromString(original.conversationId); DoctorConversationContext.validate(original.source, original.contextJson)
+    // Only the redacted copy is uploaded; the local draft keeps the original words.
+    val value = CarePrivacy.conversationForUpload(original)
+    DoctorConversationContext.validate(value.source, value.contextJson)
     require(value.source.isNotBlank() && value.source.length <= NoteRules.MAX_SOURCE_CHARS && NoteRules.values(value).all { it.length <= 4000 }) { "Add the original words and review the sections first." }
     val data = JSONObject().put("source", value.source).put("priorities", value.priorities).put("participants", value.participants).put("topics", value.topics).put("questions", value.questions).put("nextSteps", value.nextSteps).put("conversationId", value.conversationId).put("contextVersion", 1).put("contextJson", value.contextJson)
     val saved = decodeSharedCareDraft(JSONObject(request("POST", "/rest/v1/rpc/healthathon_save_draft", JSONObject().put("p_id", id).put("p_person", value.personId).put("p_data", data).put("p_revision", revision).put("p_submit", submit), expectedAccountId = account)))
