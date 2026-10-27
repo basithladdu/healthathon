@@ -18,7 +18,8 @@ One place for the team to understand what we researched, how we reasoned, what w
 | Field-by-field data mapping | CARE fields vs Sahara fields | [`../CARE_FAMILY_SIDE_FIT.md`](../CARE_FAMILY_SIDE_FIT.md) |
 | Short brief + options A–D | — | [`../CARE_BRIEF_2026-10-27.md`](../CARE_BRIEF_2026-10-27.md) |
 | Palliative organisations (Pallium, Niram, Arike, IAPC, Kerala grid) | in progress | `partners/` (added when done) |
-| India palliative landscape (apps, policy, providers, evidence, business models) | in progress | `landscape/` (added when done) |
+| India palliative landscape (apps, policy, providers, evidence, business models) | 1 of 5 done (global comparators + funding) | [`landscape/`](landscape/) |
+| Sahara's own data flow (what goes to the server) | code audit | [`sahara-data-flow-audit.md`](sahara-data-flow-audit.md) |
 
 ## Raw material (everything is in this repo)
 - `care-docs-crawl/raw-page-text.tar.gz`: plain text of every CARE page and file read (docs 473 pages, site 75 pages), plus fetch logs and sitemaps (649 files). Unpack with `tar -xzf`.
