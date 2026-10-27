@@ -110,6 +110,8 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
     val busy by vm.busy.collectAsStateWithLifecycle()
     val refreshing by vm.refreshing.collectAsStateWithLifecycle()
     val refreshError by vm.refreshError.collectAsStateWithLifecycle()
+    val syncWaiting by vm.syncWaiting.collectAsStateWithLifecycle()
+    val syncKept by vm.syncKept.collectAsStateWithLifecycle()
     val canEdit by vm.canEdit.collectAsStateWithLifecycle()
     val language = rememberCareLanguage(vm.accountNamespace)
     val t = { en: String, hi: String -> if (language.hindi) hi else en }
@@ -236,6 +238,7 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
                 } }
             } }
             refreshError?.let { error -> Surface(Modifier.align(Alignment.TopCenter).fillMaxWidth(), color = Peach) { Row(verticalAlignment = Alignment.CenterVertically) { Text(error, Modifier.weight(1f).padding(12.dp), style = MaterialTheme.typography.bodySmall); TextButton(onClick = vm::refresh) { Text(t("Retry", "फिर कोशिश करें")) } } } }
+            if (person != null) CareSyncStatusLine(syncWaiting, syncKept, busy || refreshing, vm::sendPending, Modifier.align(Alignment.BottomCenter))
             SaharaTopProgress(busy || refreshing, Modifier.fillMaxWidth().align(Alignment.TopCenter))
         }
     }

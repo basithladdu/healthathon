@@ -228,7 +228,7 @@ class CareCloud(context: Context) {
                     throw CareHttpException(status, friendly, code.ifBlank { error?.optString("error_code").orEmpty() })
                 }
                 text
-            } catch (e: java.io.IOException) { throw IllegalArgumentException("Couldn't reach your care records. Your entry is still here.", e) }
+            } catch (e: java.io.IOException) { throw CareSyncOffline("Couldn't reach your care records. Your entry is still here.", e) }
             finally { connection.disconnect() }
         }
     }

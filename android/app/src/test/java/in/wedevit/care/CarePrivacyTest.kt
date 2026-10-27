@@ -26,6 +26,15 @@ class CarePrivacyTest {
             "Weight 54.5 kg", "Took 2 tablets of 500 mg", "Ward 12, bed 4", "Score 12345", "Pin pricks in the feet", "Note id 1730000000000")
             .forEach { assertEquals(it, it, r(it)) }
     }
+    @Test fun queuedEntriesAreRedactedOnceAndSendingAgainChangesNothing() {
+        // CareModel redacts before queueing; CareCloud.saveEntry redacts again when the queue sends. The second pass must be a no-op.
+        val item = CareItem("q1", person, "checkin", "Call 9876543210", detail = "Write to sample@example.com, Aadhaar 2345 6789 0123")
+        val queued = CarePrivacy.entryForUpload(item)
+        assertEquals("Call [phone]", queued.title)
+        assertFalse(queued.detail.contains("9876543210") || queued.detail.contains("example.com") || queued.detail.contains("2345 6789 0123"))
+        assertEquals(queued, CarePrivacy.entryForUpload(queued))
+        assertEquals(queued.detail, CareSyncOps.item(CareSyncOps.saveEntry(queued)).detail)
+    }
     @Test fun emails() {
         assertEquals("Write to [email] or [email].", r("Write to sample.family+care@example.com or a_b@mail.example.co.in."))
         assertEquals("Mixed [email] here", r("Mixed 9876543210@example.in here"))
