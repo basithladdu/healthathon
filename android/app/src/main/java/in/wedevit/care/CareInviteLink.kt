@@ -59,46 +59,75 @@ class CarePendingJoinStore(private val kv: CareKeyValue, private val ttlMs: Long
 }
 
 /** Plain messages for a failed join. */
-fun careJoinFailureMessage(raw: String?): String = when {
-    raw.isNullOrBlank() -> "This invitation couldn't be used. Ask for a new one."
-    raw.startsWith("Clinician verification") -> raw
-    raw.startsWith("Couldn't reach") -> "No connection right now. Check your internet and open the link again."
-    raw.startsWith("Sign in again") -> "Please sign in again, then open the invitation link again."
-    else -> "This invitation has expired or was already used. Ask for a new one."
+fun careJoinFailureMessage(raw: String?, hindi: Boolean = false): String {
+    val t = { en: String, hi: String -> if (hindi) hi else en }
+    return when {
+        raw.isNullOrBlank() -> t("This invitation couldn't be used. Ask for a new one.", "यह निमंत्रण काम नहीं आया। नया निमंत्रण माँगें।")
+        raw.startsWith("Clinician verification") -> raw
+        raw.startsWith("Couldn't reach") -> t("No connection right now. Check your internet and open the link again.", "अभी इंटरनेट नहीं मिल रहा। इंटरनेट देखें और लिंक फिर से खोलें।")
+        raw.startsWith("Sign in again") -> t("Please sign in again, then open the invitation link again.", "फिर से साइन इन करें, फिर निमंत्रण का लिंक दोबारा खोलें।")
+        raw.startsWith("Use a separate account") -> t("This invitation was made from this account. The family member must join from their own account.", "यह निमंत्रण इसी खाते से बना है। परिवार के सदस्य को अपने खाते से जुड़ना होगा।")
+        else -> t("This invitation has expired or was already used. Ask for a new one.", "यह निमंत्रण बंद हो चुका है या पहले ही इस्तेमाल हो चुका है। नया निमंत्रण माँगें।")
+    }
 }
 
-/** Local record of invitations the owner sent, so the list can show name, relationship and status. */
-data class CareInviteEntry(val person: String, val name: String, val relation: String, val createdAt: Long, val baseline: Int, val joined: Boolean = false)
+/** Invitations the owner sent from this phone. [inviteId] is the server's id for it; status always comes from the server. */
+data class CareInviteEntry(val person: String, val name: String, val relation: String, val createdAt: Long,
+    val inviteId: String = "", val expiresAt: Long = createdAt + CareInviteLog.TTL_MS, val role: String = "family")
+
+enum class CareInviteState {
+    /** The server still holds it open. */ OPEN,
+    /** A member's access was created by this invitation (server record). */ JOINED,
+    /** The server no longer holds it, before its expiry: someone used it or it was cancelled. */ CLOSED,
+    EXPIRED,
+    /** The server could not be asked (offline or not allowed). */ UNKNOWN,
+    /** Sent by an older app version that didn't keep the server id, so it can't be matched. */ UNTRACKED,
+}
+data class CareInviteStatus(val state: CareInviteState, val memberId: String = "", val at: Long = 0L)
 
 object CareInviteLog {
     const val DAY_MS = 24L * 60 * 60 * 1000
     const val TTL_MS = 3 * DAY_MS
     private const val F = '\u001F'
-    fun encode(list: List<CareInviteEntry>) = list.joinToString("\n") { listOf(it.person, it.name, it.relation, it.createdAt, it.baseline, if (it.joined) 1 else 0).joinToString(F.toString()) }
+    fun encode(list: List<CareInviteEntry>) = list.joinToString("\n") { listOf(it.person, it.name, it.relation, it.createdAt, it.inviteId, it.expiresAt, it.role, "2").joinToString(F.toString()) }
     fun decode(text: String?): List<CareInviteEntry> = text.orEmpty().lines().mapNotNull { line ->
-        val f = line.split(F); if (f.size != 6) return@mapNotNull null
-        val at = f[3].toLongOrNull() ?: return@mapNotNull null; val base = f[4].toIntOrNull() ?: return@mapNotNull null
-        CareInviteEntry(f[0], f[1], f[2], at, base, f[5] == "1")
-    }
-    fun expired(e: CareInviteEntry, now: Long) = now - e.createdAt >= TTL_MS
-    /** Marks the oldest still-open invites as joined when the person has gained members since they were sent; drops old stale ones. This is a local estimate: the server does not say which invite was used. */
-    fun reconcile(all: List<CareInviteEntry>, person: String, membersNow: Int, now: Long): List<CareInviteEntry> {
-        val mine = all.filter { it.person == person }; val others = all.filter { it.person != person }
-        val open = mine.filter { !it.joined }.sortedWith(compareBy({ expired(it, now) }, { it.createdAt }))
-        val budget = if (open.isEmpty()) 0 else (membersNow - open.minOf { it.baseline }).coerceAtLeast(0)
-        val joinedNow = open.take(budget).toSet()
-        val updated = mine.map { when { it.joined -> it; it in joinedNow -> it.copy(joined = true); else -> it.copy(baseline = membersNow) } }
-        val kept = updated.filter { it.joined || now - it.createdAt < TTL_MS + 7 * DAY_MS }.sortedByDescending { it.createdAt }.take(20)
-        return others + kept
-    }
-    fun label(e: CareInviteEntry, now: Long): String {
-        val who = listOf(e.name, e.relation.lowercase()).filter { it.isNotBlank() }.joinToString(" · ")
-        val status = when {
-            e.joined -> "Joined"
-            expired(e, now) -> "Expired · create a new invite"
-            else -> { val left = e.createdAt + TTL_MS - now; val days = ((left + DAY_MS - 1) / DAY_MS).toInt(); "Invited · " + if (left < DAY_MS) "expires today" else "expires in $days ${if (days == 1) "day" else "days"}" }
+        val f = line.split(F); val at = f.getOrNull(3)?.toLongOrNull() ?: return@mapNotNull null
+        when (f.size) {
+            8 -> CareInviteEntry(f[0], f[1], f[2], at, f[4], f[5].toLongOrNull() ?: (at + TTL_MS), f[6].ifBlank { "family" })
+            // Before 27 Oct the app guessed "joined" from member counts; that guess is dropped, never shown as fact.
+            6 -> CareInviteEntry(f[0], f[1], f[2], at)
+            else -> null
         }
-        return "$who · $status".trimStart(' ', '·')
+    }
+    /** The id of the invitation just created: the one open on the server now that wasn't open before. Null when that isn't certain. */
+    fun newInviteId(before: Collection<String>?, after: Collection<String>?): String? =
+        if (before == null || after == null) null else (after.toSet() - before.toSet()).singleOrNull()
+    fun status(e: CareInviteEntry, open: List<CareOpenInvite>?, members: List<CareMemberDetail>?, now: Long): CareInviteStatus {
+        if (e.inviteId.isNotBlank()) members?.firstOrNull { it.inviteId == e.inviteId }?.let { return CareInviteStatus(CareInviteState.JOINED, it.userId, it.joinedAt) }
+        if (now >= e.expiresAt) return CareInviteStatus(CareInviteState.EXPIRED)
+        if (e.inviteId.isBlank()) return CareInviteStatus(CareInviteState.UNTRACKED)
+        if (open == null) return CareInviteStatus(CareInviteState.UNKNOWN)
+        return CareInviteStatus(if (open.any { it.id == e.inviteId }) CareInviteState.OPEN else CareInviteState.CLOSED)
+    }
+    /** Keeps the newest 20 invitations per person from the last 30 days. */
+    fun prune(all: List<CareInviteEntry>, now: Long): List<CareInviteEntry> =
+        all.filter { now - it.createdAt < 30 * DAY_MS }.groupBy { it.person }.values.flatMap { list -> list.sortedByDescending { it.createdAt }.take(20) }
+    fun label(e: CareInviteEntry, status: CareInviteStatus, now: Long, hindi: Boolean = false, memberEmail: String = ""): String {
+        val t = { en: String, hi: String -> if (hindi) hi else en }
+        val relation = CareRelationsHindi[e.relation]?.takeIf { hindi } ?: e.relation.lowercase()
+        val who = listOf(e.name, relation).filter { it.isNotBlank() }.joinToString(" · ").ifBlank { if (e.role == "clinician") t("Doctor invitation", "डॉक्टर का निमंत्रण") else t("Family invitation", "परिवार का निमंत्रण") }
+        val left = e.expiresAt - now; val days = ((left + DAY_MS - 1) / DAY_MS).toInt()
+        val expiry = if (left < DAY_MS) t("expires today", "आज बंद होगा") else t("expires in $days ${if (days == 1) "day" else "days"}", "$days दिन में बंद होगा")
+        val day = if (status.at > 0) java.time.Instant.ofEpochMilli(status.at).atZone(java.time.ZoneId.systemDefault()).format(careDateFormat("d MMM", hindi)) else ""
+        val text = when (status.state) {
+            CareInviteState.JOINED -> listOf(t("Joined", "जुड़ गए"), memberEmail, day).filter { it.isNotBlank() }.joinToString(" · ")
+            CareInviteState.OPEN -> t("Invited · not joined yet · ", "निमंत्रण भेजा · अभी जुड़े नहीं · ") + expiry
+            CareInviteState.CLOSED -> t("Link used or cancelled · see who has access below", "लिंक इस्तेमाल हो गया या रद्द हुआ · नीचे देखें किसे पहुँच है")
+            CareInviteState.EXPIRED -> t("Expired · create a new invite", "बंद हो गया · नया निमंत्रण बनाएँ")
+            CareInviteState.UNKNOWN -> t("Sent · couldn't check with the server just now", "भेजा गया · अभी सर्वर से पता नहीं चल सका")
+            CareInviteState.UNTRACKED -> t("Sent · ", "भेजा गया · ") + expiry
+        }
+        return "$who · $text"
     }
 }
 
@@ -110,3 +139,12 @@ class CareInviteStore(private val kv: CareKeyValue) {
 }
 
 fun careInviteStore(context: android.content.Context) = CareInviteStore(CarePrefsKeyValue(context.getSharedPreferences("care_invite_log", android.content.Context.MODE_PRIVATE)))
+
+/** Records a just-created invitation with the server's id for it (open on the server now, not before), so its status can be read back later. */
+suspend fun CareInviteStore.logCreated(cloud: CareCloud, account: String, person: String, name: String, relation: String, role: String, before: List<CareOpenInvite>?) {
+    val after = cloud.openInvites(person)
+    val id = CareInviteLog.newInviteId(before?.map { it.id }, after?.map { it.id }).orEmpty()
+    val now = System.currentTimeMillis()
+    val expires = after?.firstOrNull { it.id == id }?.expiresAt?.takeIf { it > 0 } ?: (now + CareInviteLog.TTL_MS)
+    save(account, CareInviteLog.prune(all(account) + CareInviteEntry(person, name, relation, now, id, expires, role), now))
+}

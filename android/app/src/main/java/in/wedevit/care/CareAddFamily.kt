@@ -50,12 +50,12 @@ internal fun shareCareInvite(context: Context, text: String, whatsApp: Boolean) 
             try {
                 var invite = code
                 if (invite.isEmpty()) {
-                    val before = runCatching { service.members(person).size }.getOrDefault(-1)
+                    val before = service.openInvites(person)
                     invite = service.invite(person, canAdd, careTeam)
                     require(CareInviteLink.isCode(invite)) { t("The invitation didn't look right. Please try again.", "निमंत्रण ठीक नहीं बना। कृपया फिर कोशिश करें।") }
                     if (vm.selected.value == person && service.session.value?.userId == account && vm.isOwner.value) {
                         code = invite
-                        if (before >= 0) careInviteStore(context).add(account, CareInviteEntry(person, label, relation, System.currentTimeMillis(), before))
+                        careInviteStore(context).logCreated(service, account, person, label, relation, "family", before)
                         onInvited()
                     }
                 }
@@ -81,7 +81,7 @@ internal fun shareCareInvite(context: Context, text: String, whatsApp: Boolean) 
                 ChoiceRow(t("Can view", "सिर्फ़ देख सकें"), Icons.Default.Visibility, Mint, !canAdd) { canAdd = false; code = "" }
                 ChoiceRow(t("Can view and add", "देख सकें और जोड़ सकें"), Icons.Default.Edit, Mint, canAdd) { canAdd = true; code = "" }
                 CheckLine(careTeam, { careTeam = it; code = "" }, t("Share care-team contacts", "देखभाल टीम के नंबर भी साझा करें"))
-                Text(t("They can read care notes and daily entries. Recordings and unfinished conversations aren't shared. The link works once and expires in 3 days. They will need to sign in, and you will see them listed here once they join.", "वे देखभाल नोट और रोज़ की जानकारी पढ़ सकेंगे। रिकॉर्डिंग और अधूरी बातचीत साझा नहीं होती। लिंक एक ही बार चलता है और 3 दिन में बंद हो जाता है। उन्हें साइन इन करना होगा, और जुड़ने के बाद उनका नाम यहाँ दिखेगा।"), style = MaterialTheme.typography.bodySmall)
+                Text(t("They can read care notes and daily entries. Recordings and unfinished conversations aren't shared. The link works once and expires in 3 days. Their access then lasts 30 days; invite them again to renew it. They will need to sign in, and Your account shows when they have joined.", "वे देखभाल नोट और रोज़ की जानकारी पढ़ सकेंगे। रिकॉर्डिंग और अधूरी बातचीत साझा नहीं होती। लिंक एक ही बार चलता है और 3 दिन में बंद हो जाता है। उसके बाद उनकी पहुँच 30 दिन रहती है; आगे के लिए फिर से निमंत्रण भेजें। उन्हें साइन इन करना होगा, और जुड़ने पर “आपका खाता” में दिखेगा।"), style = MaterialTheme.typography.bodySmall)
                 Button(onClick = { send(true) }, enabled = !busy && name.isNotBlank(), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Icon(Icons.Default.PersonAdd, null); Spacer(Modifier.width(8.dp)); Text(if (busy) t("Please wait…", "कृपया रुकें…") else t("Send invite on WhatsApp", "WhatsApp पर निमंत्रण भेजें")) }
                 OutlinedButton(onClick = { send(false) }, enabled = !busy && name.isNotBlank(), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.Share, null); Spacer(Modifier.width(8.dp)); Text(t("Share another way", "किसी और तरीके से भेजें")) }
             }
@@ -94,7 +94,7 @@ internal fun shareCareInvite(context: Context, text: String, whatsApp: Boolean) 
 /** Asks before joining from an invite link. */
 @Composable fun PendingJoinDialog(cloud: CareCloud, vm: CareModel, pending: PendingJoin, email: String, onClear: () -> Unit) {
     val scope = rememberCoroutineScope()
-    var busy by remember { mutableStateOf(false) }; val t = careText()
+    var busy by remember { mutableStateOf(false) }; val t = careText(); val hindi = careHindi()
     AlertDialog(onDismissRequest = { if (!busy) onClear() },
         title = { Text(t("Join ${pending.possessive} care?", "क्या आप इस देखभाल से जुड़ना चाहते हैं?")) },
         text = { Text(t("${pending.who.replaceFirstChar { it.uppercase() }} will see your email ($email).", "बुलाने वाले व्यक्ति को आपका ईमेल ($email) दिखेगा।")) },
@@ -106,8 +106,9 @@ internal fun shareCareInvite(context: Context, text: String, whatsApp: Boolean) 
                     val before = vm.people.value.map { it.id }.toSet()
                     cloud.join(pending.code)
                     val added = vm.joinedRefresh(before)
-                    vm.message.value = added?.name?.let { t("You can now see $it's care", "अब आप $it की देखभाल देख सकते हैं") } ?: t("You can now see ${pending.possessive} care", "अब आप यह देखभाल देख सकते हैं")
-                } catch (e: Exception) { if (e is CancellationException) throw e; vm.message.value = careJoinFailureMessage(e.message) }
+                    val access = if (added != null && vm.canEditPerson(added.id)) t(" · you can read and add", " · आप देख और जोड़ सकते हैं") else t(" · you can read", " · आप देख सकते हैं")
+                    vm.message.value = (added?.name?.let { t("You can now see $it's care", "अब आप $it की देखभाल देख सकते हैं") } ?: t("You can now see ${pending.possessive} care", "अब आप यह देखभाल देख सकते हैं")) + access
+                } catch (e: Exception) { if (e is CancellationException) throw e; vm.message.value = careJoinFailureMessage(e.message, hindi) }
                 finally { busy = false; onClear() }
             }
         }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text(if (busy) t("Joining…", "जुड़ रहे हैं…") else t("Join", "जुड़ें")) } },

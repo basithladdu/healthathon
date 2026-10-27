@@ -103,3 +103,46 @@ suspend fun CareCloud.verifiedReviewIds(): Set<String> {
     return (0 until rows.length()).map { rows.getJSONObject(it).getString("note_id") }.toSet()
 }
 fun sharedCareNoteUrl(note: CareVersion) = "https://sahara.wedevit.in/shared-care?person=${note.personId}&version=${note.version}&note=${note.id}"
+
+/** An invitation the server still holds open (unused, not cancelled, not expired). */
+data class CareOpenInvite(val id: String, val role: String, val canEdit: Boolean, val expiresAt: Long)
+/** Server facts about one person with access: when they joined, which invitation they used, and when access ends. */
+data class CareMemberDetail(val userId: String, val inviteId: String, val joinedAt: Long, val expiresAt: Long)
+/** The result of deleting the signed-in account on the server. */
+data class CareAccountDeletion(val removedPeople: Int, val loginRemoved: Boolean)
+
+private fun careServerTime(value: String): Long = if (value.isBlank() || value == "null") 0L else runCatching { java.time.OffsetDateTime.parse(value).toInstant().toEpochMilli() }.getOrDefault(0L)
+
+/** Open invitations for a person the caller owns; null when the server cannot say (feature missing or offline), never a guess. */
+suspend fun CareCloud.openInvites(person: String): List<CareOpenInvite>? {
+    UUID.fromString(person)
+    val text = try { request("POST", "/rest/v1/rpc/healthathon_open_invites", JSONObject().put("p_person", person)) }
+    catch (e: kotlinx.coroutines.CancellationException) { throw e } catch (_: Exception) { return null }
+    val rows = JSONArray(text)
+    return (0 until rows.length()).map { rows.getJSONObject(it).let { r -> CareOpenInvite(r.getString("id"), r.optString("role", "family"), r.optBoolean("can_edit"), careServerTime(r.optString("expires_at"))) } }
+}
+suspend fun CareCloud.cancelInvite(id: String) {
+    UUID.fromString(id)
+    request("POST", "/rest/v1/rpc/healthathon_cancel_invite", JSONObject().put("p_id", id))
+}
+/** Join details from the server; null until the owner installs 20261027210000_sahara_account_lane.sql (or when offline). */
+suspend fun CareCloud.memberDetails(person: String): List<CareMemberDetail>? {
+    UUID.fromString(person)
+    val text = try { request("POST", "/rest/v1/rpc/healthathon_member_details", JSONObject().put("p_person", person)) }
+    catch (e: kotlinx.coroutines.CancellationException) { throw e } catch (_: Exception) { return null }
+    val rows = JSONArray(text)
+    return (0 until rows.length()).map { rows.getJSONObject(it).let { r -> CareMemberDetail(r.getString("user_id"), r.optString("invite_id").takeUnless { it == "null" }.orEmpty(), careServerTime(r.optString("joined_at")), careServerTime(r.optString("expires_at"))) } }
+}
+/** Owner switches one person between "can read" and "can add and change". */
+suspend fun CareCloud.setMemberEdit(person: String, user: String, edit: Boolean) {
+    UUID.fromString(person); UUID.fromString(user)
+    try { request("POST", "/rest/v1/rpc/healthathon_set_member_edit", JSONObject().put("p_person", person).put("p_user", user).put("p_edit", edit)) }
+    catch (e: Exception) { if (e.isMissingServerFeature()) throw CareServerFeatureMissing(e); throw e }
+}
+/** Deletes the caller's Sahara data and sign-in on the server (DPDP). */
+suspend fun CareCloud.deleteMyAccount(): CareAccountDeletion {
+    val value = try { JSONObject(request("POST", "/rest/v1/rpc/healthathon_delete_my_account", JSONObject())) }
+    catch (e: Exception) { if (e.isMissingServerFeature()) throw CareServerFeatureMissing(e); throw e }
+    return CareAccountDeletion(value.optInt("removed_people"), value.optBoolean("login_removed"))
+}
+class CareServerFeatureMissing(cause: Throwable) : IllegalStateException("This needs a server update that isn't installed yet.", cause)
