@@ -53,4 +53,34 @@ class CareReminderRulesTest {
         assertTrue(CareReminderRules.printedTimes("Times: 1-0-1").isEmpty())
         assertEquals(listOf("08:00", "20:00"), CareReminderRules.printedTimes("Dose: from prescription\nTimes: 20:00, 08:00, 08:00"))
     }
+
+    @Test fun dateOnlyEntryNeverAlertsAtMidnightAndUsesChosenTimeOnThatDay() {
+        val day = java.time.LocalDate.parse("2026-10-21").atStartOfDay(zone).toInstant().toEpochMilli()
+        val plan = CareReminderPlan("visit", "person", "visit", day, emptyList(), "", false, dateOnly = true)
+        val before = epoch("2026-10-19T00:00:00Z")
+        assertTrue(CareReminderRules.next(plan, before, zone).isEmpty())
+        val chosen = CareReminderRules.next(plan.copy(times = listOf("09:30")), before, zone).single()
+        assertEquals(epoch("2026-10-21T04:00:00Z"), chosen.at)
+        assertEquals("visit:09:30", chosen.key)
+        assertTrue(CareReminderRules.next(plan.copy(times = listOf("09:30")), chosen.at, zone).isEmpty())
+        assertTrue(CareReminderRules.next(plan.copy(times = listOf("09:30"), doneOn = "2026-10-20"), before, zone).isEmpty())
+    }
+    @Test fun onlyMedicinesAndTimedCalendarEntriesCarryAClockTime() {
+        fun item(kind: String, detail: String = "") = CareItem(id = "i", personId = "p", kind = kind, title = "t", detail = detail, due = 1)
+        assertFalse(CareReminderRules.dateOnly(item("medicine")))
+        assertTrue(CareReminderRules.dateOnly(item("visit", "Clinic")))
+        assertTrue(CareReminderRules.dateOnly(item("task", CareEntryCodec.encode(CareEntry("task", assignee = "Asha")))))
+        assertTrue(CareReminderRules.dateOnly(item("task", CareEntryCodec.encode(CareEntry("schedule", category = "Test")))))
+        assertFalse(CareReminderRules.dateOnly(item("visit", CareEntryCodec.encode(CareEntry("schedule", category = "Visit", timed = true)))))
+    }
+    @Test fun remindersListHidesPastDatesAndLabResults() {
+        val today = java.time.LocalDate.parse("2026-10-21")
+        val start = today.atStartOfDay(zone).toInstant().toEpochMilli()
+        fun item(kind: String, due: Long, detail: String = "") = CareItem(id = "i", personId = "p", kind = kind, title = "t", detail = detail, due = due)
+        assertTrue(CareReminderRules.listed(item("medicine", 0), today, zone))
+        assertTrue(CareReminderRules.listed(item("visit", start), today, zone))
+        assertFalse(CareReminderRules.listed(item("visit", start - 1), today, zone))
+        assertFalse(CareReminderRules.listed(item("task", 0), today, zone))
+        assertFalse(CareReminderRules.listed(item("task", start + 1, CareEntryCodec.encode(CareEntry("lab", value = "1", unit = "g"))), today, zone))
+    }
 }
