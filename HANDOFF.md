@@ -4,6 +4,8 @@ Last updated 26 Oct 2026 by Shaik Muhammad Awaiz (UI/Android), with Claude Code.
 
 This note lists every change I made to the Android app, what the app is like right now, what was checked, and what is still open. It covers the patient & family app, the doctor walkthrough and the symptom tracker.
 
+**27 October final-deliverables update:** the organiser's new [two original templates and email](source-materials/healthathon-phase-2/2026-10-27-final-deliverables/README.md) are archived. Final submission requires a working MVP, a separate two-page overview, the new final presentation and a narrated demo video. Use [everyday.md](everyday.md) for the final checklist and [TEAM_HANDOFF.md](TEAM_HANDOFF.md) for this archive checkpoint. The new email does not confirm the existing 7 November planning target or specify a cut-off/portal; verify those before submitting. Previous Android evidence below is unchanged by this archive task.
+
 ---
 
 ## 1. Where the code is
@@ -204,12 +206,12 @@ Also read:
 - **Owner:** Basith.
 - **Team:** the clinicians (Sujay, Sharada, Shirin).
 
-### Do first (before the 7 Nov Phase 2 submission)
+### Do first (before submission; existing planning target 7 Nov, exact cut-off to confirm)
 | Item | Next step | Who |
 |---|---|---|
 | A17, H18 | Pick CARE option A, A+B or A+C (CARE brief §4), then write the integration answer in the deck | Owner |
-| H15 | Fill team code, doctor details and costs in the v6 draft, then submit by 7 Nov | Owner + team |
-| H13 | Record a narrated screen demo of the app (walkthrough: conversation → note → family confirms) | Owner + Awaiz |
+| H15 | Fill the new two-page brief and adapt v6 to the 27 October final template; complete team code, doctor details, costs and all placeholders; verify all four deliverables and the submission cut-off | Owner + team |
+| H13 | Record a narrated walkthrough: introduce the team/problem, explain development and doctor/technology collaboration, then show conversation → note → family confirms in the working app | Owner + Awaiz |
 | A20, A21 | Choose 2–3 measurable KPIs and a baseline (documented conversations, retrieval time, family stress/money/time), and put them on the evaluation slide | Team + owner |
 | — | Test 0.6 on a real phone: the full checklist is in `CLAUDE_TRANSCRIPT.md` §3 ("Test on a real phone") | Awaiz |
 | — | ~~Strength-bar swipe~~ done in the polish lane (see lane notes below); still check on a real phone | Awaiz |

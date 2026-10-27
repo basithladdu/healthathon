@@ -1,0 +1,60 @@
+Dear Team Zeros and Ones,
+As we approach the conclusion of the four-week Build Sprint, it is time to
+prepare your final deliverables for the Round 2 evaluation.
+Each team's submission will be evaluated by a panel of evaluators
+comprising doctors and technology experts. The evaluation will consider the
+solution developed, its evolution during the Build Sprint, collaboration
+with your doctor and technology partners, validation, and potential
+applicability to real-world healthcare challenges.
+Based on the evaluation, the Top 10 teams from each track will be
+shortlisted for the Health-a-thon 2026 Grand Finale.
+*Please ensure that your team submits the following four deliverables: *
+*S. No.*
+*Deliverable*
+*Description*
+1
+*Functional Solution MVP*
+A working version of your solution that evaluators can access, explore and
+test. Include the necessary links, credentials and access instructions.
+2
+*Two-page Overview*
+Use the prescribed two-page template
+<https://docs.google.com/presentation/d/1FZOQ882KPhChAG1QyukEiOunA3nufYQj/edit?usp=drive_link&ouid=114654168885650331081&rtpof=true&sd=true>
+and complete the relevant sections.
+3
+*Final Presentation *
+Use the prescribed presentation template
+<https://docs.google.com/presentation/d/1xHKv2CgNONTg9B6zbMt885PkkMH5IVDR/edit?usp=drive_link&ouid=114654168885650331081&rtpof=true&sd=true>
+and complete the placeholders provided across the slides. The presentation
+should cover your solution, Build Sprint progress, team collaboration with
+doctor and technology partners, validation, safety considerations, and
+deployment and sustainability.
+4
+*Demo Walkthrough Video*
+A recorded video walkthrough introducing your team, explaining how you
+approached the problem and developed the solution, and highlighting your
+collaboration with your technology and doctor partners. The video should
+demonstrate your working solution, its key features and how it addresses
+the identified healthcare challenge. It should be a narrated walkthrough of
+the solution, *not merely a screen recording or a sequence of screenshots*
+*Important reminders:*
+
+   - *Use the prescribed templates:* The two-page overview and final
+   presentation must follow their respective templates. Please complete the
+   placeholders provided in the presentation template
+   - Ensure all four deliverables are complete and ready for evaluation
+   - Verify that your MVP and demo video links are functional and
+   accessible to the evaluation panel
+   - Ensure all links are functional and accessible to the evaluation
+   panel. Include any required credentials or access instructions and test all
+   links before submission
+
+We appreciate the time, effort and commitment you have invested throughout
+the Build Sprint and look forward to reviewing your solutions
+
+For any queries or clarifications regarding the final submissions, please
+reach out to the Health-a-thon 2026 team.
+
+Best regards,
+Team Health-a-thon 2026
+

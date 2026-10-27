@@ -2,9 +2,21 @@
 
 Our aim is to build a useful palliative-care companion and make the judges understand exactly what we are trying to do. We want to win through a working product, clear evidence and a presentation we can explain confidently.
 
+## Final package we are working towards — organiser email, 27 October
+
+The latest [email and two original templates](source-materials/healthathon-phase-2/2026-10-27-final-deliverables/README.md) are saved. Our end goal is **all four deliverables**, not only the app or the slides:
+
+- [ ] **Working MVP:** verify the complete evaluator journey and provide working links/access instructions. Share any test credentials privately at submission, not in this repo.
+- [ ] **Two-page overview:** fill the new two-page template with the team/doctor, problem, solution, 3–5 features, technology, progress, validation, safety, sustainability and supporting links.
+- [ ] **Final presentation:** adapt our useful v6 visuals to the new 12-slide source template and fill every placeholder. The solution and evaluation sections each permit up to two slides. Use current evidence; keep incomplete features and proposed CARE integration clear.
+- [ ] **Narrated demo video:** introduce the team, problem, development and doctor/technology collaboration, then show the working solution and saved result. A silent screen recording or screenshots alone do not meet the email's instruction.
+- [ ] **Final submission check:** test all MVP/video/code-access links as an evaluator, confirm the submission destination and exact cut-off, submit the four-part package and retain the receipt.
+
+The archive and requirements are saved; the filled two-page overview, adaptation to the new final template, final video and submission remain pending. The latest email gives no deadline, time zone, portal or video duration. **7 November remains the existing planning target; confirm its source and cut-off before submission.**
+
 ## Work on this every day
 
-- **Slides:** finish or improve one slide each day in the official Phase 2 template. Reuse useful material from our earlier deck. Fill what we know now; add team photos, biographies and answers needing discussion later. The answer to sharing solution information on the Health-a-thon website is **Yes**. Private records and credentials are excluded.
+- **Slides and two-page brief:** finish or improve one section each day using the latest 27 October templates linked above. Reuse useful material from our earlier deck. Fill what we know now; add team photos, biographies and answers needing discussion later. The answer to sharing solution information on the Health-a-thon website is **Yes**. Private records and credentials are excluded.
 - **Survey:** improve and test the hospital survey, review responses and turn useful findings into product decisions. Keep it on the web at `/hospital-survery`.
 - **Features:** choose a meaningful patient, caregiver or doctor task, finish the flow and test its actual result. Keep Hindi/English access and fewer taps in mind. Record what works and what still needs verification.
 - **Palliative-doctor feedback:** identify suitable doctors, prepare a short walkthrough and specific questions, arrange outreach, then record their feedback and the changes it leads to. Send messages only when that outreach is authorised.
@@ -18,9 +30,9 @@ Our aim is to build a useful palliative-care companion and make the judges under
 
 Full list with owners: `HANDOFF.md` → "27 Oct 2026 — open items". The short version:
 
-**Must do before submission (7 Nov)**
-1. Decide CARE option (A / A+B / A+C) in the team meeting; write the slide 11 integration answer. Brief: `docs/presentations/Sahara_CARE_Team_Briefing_2026-10-27.pdf`.
-2. Fill the Phase 2 deck: team code, doctor partner details, costs, 2–3 measures of success with a baseline.
+**Must do before submission (planning target: 7 Nov; exact cut-off to confirm)**
+1. Decide CARE option (A / A+B / A+C) in the team meeting; write the deployment/integration answer (slide 10 in the unexpanded new template). Brief: `docs/presentations/Sahara_CARE_Team_Briefing_2026-10-27.pdf`.
+2. Fill both the new final deck and the two-page overview: team code, doctor partner details, costs, 2–3 measures of success with a baseline.
 3. Record the narrated demo video (conversation → reviewed note → family confirms).
 4. Test the app on a real phone (checklist: `CLAUDE_TRANSCRIPT.md` §3). Nothing from 26–27 Oct has been tried on a device.
 5. Get clinician sign-off (Sujay, Shirin, Sharada): goals-of-care note format, symptom list and scales, and the source of the 8 default goals-of-care questions.
@@ -57,7 +69,7 @@ Make the idea understandable to someone hearing it for the first time—as simpl
 
 Rehearse aloud. Remove jargon and sentences we cannot explain naturally. Practise likely judge questions, transitions between teammates and recovery if the live demo fails. The slides, video and spoken explanation should tell the same story.
 
-**Visual priority after comparing the decks:** keep improving the patient story, large app screens, care map and evidence visuals within the official13-section template. The user rejected the report-like first visual revision. The new v6 draft leads with large patient scenes, product captures and minimal body text. Keep team photos/write-ups for the agreed later discussion.
+**Visual priority after comparing the decks:** keep the patient story, large app screens, care map and evidence visuals when adapting to the latest 27 October template. The earlier v6 draft follows the older 13-section source and is a useful visual reference, not the completed new final deck. The user rejected the report-like first revision; preserve v6's large product scenes and concise copy. Keep team photos/write-ups for the agreed later discussion.
 
 ## End each work session
 
@@ -68,6 +80,7 @@ Rehearse aloud. Remove jargon and sentences we cannot explain naturally. Practis
 
 | Date | Slide | Survey / feature work | Doctor feedback | CARE / Play / video | Next action |
 | --- | --- | --- | --- | --- | --- |
+| 27 Oct 2026, final-deliverables email | Both original templates archived; 2-page brief and new 12-slide source read and checked | No app or survey changes in this archive task | Evidence and collaboration must appear in both documents and video | Four-part final package added above; no submission, release or external message made | Complete the two-page brief, adapt v6, record narrated video and verify evaluator access |
 | 23 Oct 2026 | Official template downloaded; first 13-slide draft filled, including the team table and Yes to public solution information | Review current evidence before choosing the next task | Outreach and feedback to arrange | CARE website reviewed; integration not built. No new Play release submitted in this session | Review the draft with the team, fill the remaining details and rehearse the opening explanation |
 | 23 Oct 2026, follow-up | Product-led v6 revision across13 sections, rendered and checked | Survey changes and manual hospital entry live on Vercel; one actual390px submission/receipt verified and exact synthetic data removed.299 unit checks pass. Personal diary keeps separate ratings, respondent/time frame and real comparisons | Exact WhatsApp feedback saved; S S Sparsh entry received and pending review; clinical symptom report prepared for team discussion | No Android/Play change, patient onboarding or messages sent | Review the visual draft, choose clinical questionnaire with Shirin/Sujay, then rehearse one care-note journey |
 | 27 Oct 2026 | Team briefing deck (9 slides, CARE vs Sahara) | Screen fixes running (doctor conversation, emergency QR, Nearby, Docs/Lab, Hindi, strength bar) | — | CARE docs (all 473 pages) and OHC repos read; mail OHC agreed (draft above, not sent) | Agree the OHC email wording, then send it; decide CARE option A/A+B/A+C in the meeting |

@@ -2,6 +2,16 @@
 
 This is the starting point for another developer or Codex chat. Read the latest dated checkpoint first and the current Android `HANDOFF.md` / `AI_HANDOFF.md`; older verification and release snapshots remain historical.
 
+## 27 October: latest final-deliverables email and both templates archived
+
+- Read the organiser's **Build Sprint Final Deliverables and Submission Guidelines** email dated 27 October, 15:29 IST. Both original PPTX attachments, the email body without its personalised unsubscribe footer, all slide text and SHA256 provenance are saved in [the final-deliverables archive](source-materials/healthathon-phase-2/2026-10-27-final-deliverables/README.md).
+- Verified the two-page template is 49,969 bytes / 2 slides; the final-presentation template is 101,812 bytes / 12 slides. Both parse successfully and pass ZIP integrity checks. Originals are unmodified; the prior template and filled v6 deck remain preserved.
+- Required package: **functional MVP + prescribed two-page overview + prescribed final presentation + narrated demo walkthrough video**. Include tested evaluator access and links. The video must introduce the team and approach, show doctor/technology collaboration and demonstrate the working solution; silent captures alone are insufficient.
+- The new presentation removes the older standalone MVP slide, but MVP access is still required. Solution and evaluation sections each permit two slides, so 12 is the source count, not an explicit absolute limit. Deployment/integration/costs move to source slide 10. The two-page template's `Armman` text is a source placeholder, not Sahara's identity.
+- The latest message does not state a deadline, cut-off/time zone, submission portal, video duration or export format. The existing 7 November planning target needs its source and exact cut-off confirmed. [everyday.md](everyday.md) and [the presentation README](submission/phase-2/README.md) now track the full package. Test credentials and private clinical material must stay out of Git.
+- **Still pending:** filled two-page brief, adaptation of v6 to the new template/current evidence, final narrated video, evaluator-access check and submission receipt. This checkpoint archives and plans the deliverables; it makes no app, Play, deployment, email-send or submission claim.
+- Integrated on top of collaborator commit `aae97cb` in an isolated worktree because the main checkout contains overlapping uncommitted context edits. Those local edits and unrelated files were preserved; do not reset them to this archive checkpoint.
+
 ## 27 October: forgiving hospital survey intake deployed
 
 - The user explicitly asked to accept ordinary mistakes and incomplete responses so people can finish. This supersedes the earlier mandatory registration, Other-detail, address/map, service and accuracy checks. The web survey now requires only a nonblank hospital name and privacy consent. All other details can be skipped; optional Other text boxes remain visible when selected. Registration accepts spacing/punctuation and optional email text is preserved for review without a strict format rejection.
