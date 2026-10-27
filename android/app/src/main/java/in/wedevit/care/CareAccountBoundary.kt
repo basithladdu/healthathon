@@ -4,6 +4,11 @@ package `in`.wedevit.care
 internal fun careCloudAccountMatches(capturedAccount: String, liveAccount: String?): Boolean =
     capturedAccount.isNotBlank() && capturedAccount == liveAccount
 
+/** Date pattern for join and access dates on the account screen. */
+internal const val CARE_SHORT_DATE = "d MMM"
+/** The server's wording for an email that already has an account (also used when the sign-up reply reveals it). */
+internal const val CARE_ALREADY_REGISTERED = "already registered"
+
 /** What a sign-in, sign-up or email request ran into, read from the server's message. */
 internal enum class CareAuthProblem { WRONG_PASSWORD, NOT_CONFIRMED, ALREADY_REGISTERED, WEAK_PASSWORD, MAIL_NOT_SENT, EMAIL_LIMIT, WAIT, NO_CONNECTION, OTHER }
 
