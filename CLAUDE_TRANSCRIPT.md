@@ -524,3 +524,21 @@ Owner: "do more research, dig in more, and probably clone the CARE thing as well
 - A staff-reviewed "family inbox" plugin is about 15–20 developer-days, after 7 Nov.
 - ABDM needs NHA registration and the patient's consent. A file can't simply be pushed to a hospital.
 - **Recommendation:** slide text plus the three form files before 7 Nov. Build the plugin only with a named partner unit.
+
+---
+
+## Owner correction: Sahara is not offline-only (27 Oct)
+
+Owner: "Sahara is NOT an entirely offline app — it will send some data, after blurring or anonymising it, to the doctor so the doctor can do it; it will be saved on a server."
+
+**What the code does today:**
+- Without an account, everything stays on the phone.
+- Signed in, these are saved on Sahara's Supabase server for the invited family and doctor:
+  - names, entries, published notes and confirmations;
+  - the medicine log, prescriptions and care contacts;
+  - conversation words, once they are sent.
+- Recordings and report files never leave the phone.
+- Saving a shared change needs internet. There is no "send later" queue.
+- **Anonymising or blurring before the doctor sees the data is not built.** The server gets the real name and the words as typed. This is now an open item in `HANDOFF.md`.
+
+**Fixed:** the "works offline, data on the phone" lines in the CARE docs and the team briefing deck. Full table: `docs/research/CARE_VS_SAHARA_FOR_TEAM.md`, "Where Sahara's data lives".

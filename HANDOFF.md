@@ -272,6 +272,8 @@ Also read:
 | G3 | ABHA link: later | Owner |
 | G4 | Identity check for the patient confirmation: later | Owner |
 | G5, G6 | DPDP review and who holds the data (company or new entity) before any real patient use | Owner |
+| — | **Anonymise before sharing with the doctor (owner's design, 27 Oct; not built).** Today signed-in records reach Sahara's Supabase server with the real name and the words as typed, and the invited doctor sees them as they are. Build: a pseudonymous patient ID in place of the name on doctor views; strip names, phone numbers and addresses from text before upload; blur faces and ID numbers in any photo before upload. Data map: `docs/research/CARE_VS_SAHARA_FOR_TEAM.md` "Where Sahara's data lives" | Owner decides scope, Awaiz builds |
+| — | **DPDP note:** health data on the server is personal data under the DPDP Act 2023, even with the name replaced (a pseudonymous ID can be linked back). Before real patients: a consent notice that names the server and the doctor, a way to withdraw and delete, and a named data fiduciary (ties to G5, G6) | Owner |
 | — | Family invite links: publish the app-link file and redeploy the website (`CLAUDE_TRANSCRIPT.md` §3) | Owner |
 | — | Supabase security warnings: leaked-password protection, lock `rls_auto_enable()` (`WORK_STATUS.md` §3) | Owner |
 | — | Send the CARE team message in `TEAM_HANDOFF.md` with the corrected line from the CARE brief | Owner |

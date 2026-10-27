@@ -14,6 +14,9 @@ Short version for the team. The detailed version is [`CARE_FAMILY_SIDE_FIT.md`](
 - **Questionnaire**: a form with questions.
 - **Plugin**: an add-on that fits into CARE.
 - **Encounter**: one visit or hospital stay.
+- **Server**: a computer on the internet that stores data. Sahara's is Supabase (project "Saanthvana").
+- **Sync**: the phone and the server keep the same copy.
+- **Anonymise**: remove or hide who the patient is (name, phone, face) before data leaves the phone.
 
 ## Where facts come from
 
@@ -63,7 +66,7 @@ We read code. We did not run CARE. Anything about how CARE behaves when running 
 | Find a palliative centre | 1,631 public listings, map, call. | Partly. CARE lists facilities in its own system ("nearby facilities"). | `care_fe:src/Routers/PatientRouter.tsx:26` | `CareCentreDirectory.kt:5-24`; `android/app/src/main/assets/india-directory-sources.json` |
 | Hospital survey (web) | Doctors tell us which hospitals offer palliative care. | No. | none found | `prototype/app/feedback/HospitalSurvey.tsx`. Based on: Sujay's 23 Oct notes (`source-materials/team-context/2026-10-23/sujay-survey-symptom-followup.txt`) |
 | Hindi / English | Labels in both languages, offline translation. | Partly. CARE has translation files. **[unverified]** which languages are complete. | `care:crowdin.yml` | `CareTranslationRules.kt`; `CareOfflineTranslation.kt:16` |
-| Works offline, data on phone | Recordings and reports stay on the phone. | No. CARE is a server system. | `care:care/emr/models/file_upload.py:33` (S3 storage) | `CareDocumentReader.kt:21`; `CareBilingualOcr.kt:13` |
+| Works without internet, phone keeps a copy | Without an account, everything stays on the phone. Signed in, records are saved on Sahara's server so family and the invited doctor can see them; the phone keeps a copy to read offline. Recordings and report files never leave the phone. Not offline-only. | No. CARE is a server system. | `care:care/emr/models/file_upload.py:33` (S3 storage) | `CareModel.kt:552` (signed-in save goes to the server); `CareModel.kt:568-574`, `CareReports.kt:18` (report files local); `CareModel.kt:709` (recordings local). See "Where Sahara's data lives" below |
 | Advance directive (paper) | We explain it. We don't make one. | Partly. CARE stores "advance directive" and "DNR" consents (staff only). | `care:care/emr/resources/consent/spec.py:43-46` | Based on: `Vidhi_EOLC_Sample-Advance-Medical-Directive.pdf` and `Vidhi-EOLC-Toolkit-FAQ.pdf` (used for copies and plain explanations: `FEATURES_FROM_CONVERSATIONS_2026-09-21.md:26-27,53`). **We chose not to create a legal advance directive (`GOCD_PDF_AUDIT.md` "Critical scope defect"; `ECTPR_SOURCE_AUDIT.md` 2.2 "not a legally executed AMD").** |
 | Emergency card / hospital QR | Card for the emergency doctor. | No. | none found | Placeholder only (`CLAUDE_TRANSCRIPT.md` section 4). Based on: `ECTPR_SOURCE_AUDIT.md` Appendix E, `GOCD_PDF_AUDIT.md` |
 | Feedback form | App feedback. | No. | none found | `prototype/app/feedback/page.tsx` |
@@ -124,7 +127,7 @@ We read code. We did not run CARE. Anything about how CARE behaves when running 
 ## Decisions we made that CARE didn't
 
 - Family is the main user, not staff. (`FAMILY_CAREGIVER_DIRECTION.md`)
-- Data stays on the phone, and works offline. (`CareDocumentReader.kt:21`)
+- Works without internet; recordings and report files stay on the phone. Shared records go to Sahara's server, not a hospital's. (See "Where Sahara's data lives")
 - Each person in a recorded talk gives their own yes. (`CareData.kt:43-50`)
 - The family confirms the exact note version, locked with a hash. (`CareData.kt:38-39`)
 - No official scale is claimed for symptoms. (`CareSymptomData.kt:9`)
@@ -142,6 +145,35 @@ We read code. We did not run CARE. Anything about how CARE behaves when running 
 - DNR and advance directive are consent types. (`care:care/emr/resources/consent/spec.py:43-46`)
 - Patient login is a phone code, for booking only. (`care:care/emr/api/otp_viewsets/slot.py:37-104`)
 - Add-ons come in as plugins. (`care:docs/development/pluggable-apps.md:6`)
+
+---
+
+## Where Sahara's data lives (checked in code, 27 Oct)
+
+**Owner correction (27 Oct):** Sahara is **not** an offline-only app. Some data goes to Sahara's server so the family and the doctor can see it.
+
+In plain words: **Sahara works without internet. Without an account, everything stays on the phone. When you sign in, your care records are saved on Sahara's server (Supabase) so the family members and the doctor you invite can see them. The phone keeps a copy.**
+
+| What | Where | When | Source |
+|---|---|---|---|
+| Person's name, medicines, visits, tasks, lab values, symptom and diary entries | Server table `healthathon_records` (+ `healthathon_people` for the name) | Each save, when signed in | `CareCloud.kt:70-92`; `CareModel.kt:282,552` |
+| Published care notes and family confirmations | Server, `healthathon_records` (kind `note`, `ack`) | When published / confirmed | `CareCloud.kt:82-91`; `CareModel.kt:464` |
+| Conversation draft: the typed or dictated words and the reviewed sections | Server, `healthathon_care_drafts` | Only when you press save or send to the doctor | `CareModel.kt:426-449`; `CareSharedCloud.kt:87` |
+| Medicine taken / missed log, past or current | Server, `healthathon_medicine_courses`, `healthathon_medicine_events` | Each tick, when signed in | `MedicineHistoryRepo.kt:62,84` |
+| Prescription lists | Server, `healthathon_prescriptions` and related tables | Each save, when signed in | `DoctorPrescriptionRepo.kt:55` |
+| Care-team contacts (name, relation, phone) | Server, `healthathon_care_contacts` | Each save, when signed in | `DoctorCareData.kt:73` |
+| Doctor's verification request (name, council, registration number) | Server, `healthathon_clinician_requests` | When a doctor applies | `CareSharedCloud.kt:69` |
+| **Recordings (audio)** | **Phone only** | Never sent. Cloud transcription is switched off | `CareModel.kt:709`; `build.gradle.kts:37,46` |
+| **Report files and photos, and their scanned text** | **Phone only** | Never sent, unless you copy a fact into an entry | `CareReports.kt:18`; `CareDocumentReader.kt:114` |
+| Speech-to-text, scanning, translation | On the phone | Online AI is off | `CareRemoteAssist.kt:28-30`; `MedicineOrganizer.kt:431-436` |
+
+**Who can read the server copy.** Only the owner, and people the owner invited (server rules: `android/supabase/migrations/20261009162933_android_care_accounts.sql:47-77`, `20261019151322_shared_care_clinician_review.sql:117-129`). Family get read or read-and-edit. A doctor sees only the parts the owner ticked (notes, calendar, reports, costs), for 1–365 days (`CareCloud.kt:94-98`), and only after Sahara staff approve the doctor's registration. Sahara's server admins can see everything.
+
+**Offline, exactly.** Without an account, everything works with no internet. Signed in, the phone keeps a copy you can read offline, and reminders still ring. But saving a shared change needs internet today: there is no "send later" queue (`CareModel.kt:552`).
+
+**Anonymising before the doctor sees it: PLANNED, NOT BUILT.** The owner's design is to blur or anonymise data before it is shared with the doctor. Today nothing does that: the server gets the real name and the words exactly as typed, and the code has no anonymise, redact or blur step. To build it: a pseudonymous patient ID instead of the name on what the doctor sees; strip names, phone numbers and addresses from the text before sending; blur faces and ID numbers in any photo before upload (no photos are uploaded today); and a DPDP review of what still counts as personal data.
+
+The doctor test workspace is separate: fictional patients only (`DoctorConnectedStore.kt:28`), and it uploads a test recording or file only after a tick box (`ConnectedDoctorUi.kt:330-340`).
 
 ---
 

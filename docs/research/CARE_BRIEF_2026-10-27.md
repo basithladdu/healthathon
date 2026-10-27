@@ -53,7 +53,7 @@ The [CARE Home Care Grid page](https://ohc.network/solutions/palliative-care) li
   5. **patient/family confirmation of that exact version**.
 
   CARE has the data fields for family/patient verification of a consent (entered by staff) but no screen for them (see section 2). Sahara's confirmation is done by the family themselves on a goals-of-care note, so it is related to that gap, not the same feature.
-- On-phone, offline-first use. Recordings and reports stay on the phone.
+- Works without internet. Without an account, everything stays on the phone. Signed in, care records are saved on Sahara's own server (Supabase) so invited family and the doctor can see them. Recordings and report files stay on the phone. It is **not** offline-only (owner correction, 27 Oct). Anonymising data before the doctor sees it is planned, **not built** (`CARE_VS_SAHARA_FOR_TEAM.md`, "Where Sahara's data lives").
 
 **What is not true yet on Sahara's side** (HANDOFF.md, WORK_STATUS.md):
 - AI drafting is off.

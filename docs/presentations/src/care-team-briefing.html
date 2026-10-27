@@ -165,7 +165,7 @@ tr:last-child td { border-bottom: none; }
     <tr><td class="thing">Goals-of-care questions</td><td><span class="chip no">No</span></td><td class="note">CARE docs say "do it separately" and "coming soon".</td></tr>
     <tr><td class="thing">Record the talk</td><td><span class="chip no">No</span></td><td class="note">Each person in the room says "yes" first.</td></tr>
     <tr><td class="thing">Family confirms the note</td><td><span class="chip no">No</span></td><td class="note">"I read version 3". CARE: staff mark a consent "checked with family".</td></tr>
-    <tr><td class="thing">Works offline</td><td><span class="chip no">No</span></td><td class="note">Recordings and reports stay on the phone. CARE is a server.</td></tr>
+    <tr><td class="thing">Works without internet</td><td><span class="chip no">No</span></td><td class="note">Phone keeps a copy; recordings and report files never leave it.</td></tr>
   </table>
   <div class="src">Both have: medicines list, visits, lab results, documents. Honest: our transcript is pre-written, answers use word matching, AI is off. Full: Table 1 in CARE_VS_SAHARA_FOR_TEAM.md</div>
   <div class="foot"><span>Sahara · internal team briefing · 27 Oct 2026</span><span>4 / 9</span></div>
@@ -204,7 +204,7 @@ tr:last-child td { border-bottom: none; }
     <tr><td class="thing">Recording consent</td><td>A "yes" from each person in the room.</td><td>One consent per patient, per encounter.</td><td class="note">PRODUCT_REQUIREMENTS.md "Source capture".</td></tr>
     <tr><td class="thing">Advance directive</td><td>Explain it, keep copies, never create one.</td><td>Staff record DNR or advance directive consent.</td><td class="note">Vidhi papers; GOCD audit "scope defect".</td></tr>
     <tr><td class="thing">Log in</td><td>Email account, family invites.</td><td>OTP phone code for patients, 1 hour.</td><td class="note">The family is our main user.</td></tr>
-    <tr><td class="thing">Where data lives</td><td>On the phone, works offline.</td><td>On the hospital's server.</td><td class="note">Our decision; CARE is built for hospitals.</td></tr>
+    <tr><td class="thing">Where data lives</td><td>No account: phone only. Signed in: saved on Sahara's server for family and doctor.</td><td>On the hospital's server.</td><td class="note">Recordings and report files stay on the phone. Anonymising for the doctor: planned, not built.</td></tr>
   </table>
   <div class="src">Kerala's own home-visit form: <span class="unv">[unverified]</span> · Source: CARE_VS_SAHARA_FOR_TEAM.md "Same thing, different form or scale" and "Decisions"</div>
   <div class="foot"><span>Sahara · internal team briefing · 27 Oct 2026</span><span>6 / 9</span></div>

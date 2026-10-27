@@ -229,7 +229,7 @@ CARE sources: `care/emr/models/notes.py:6-18`, `care/emr/models/file_upload.py:1
 | (none) | `DoctorGoalContext{key, status, origin, answer, evidence[{start,end,quote}]}` | Sahara-only (answers linked to transcript spans) |
 | `FileUpload{name, file_type, file_category, associating_id}` | `CareReport{name, mime, fileName, bytes, created}` | same idea. CARE files point to a patient, encounter or consent through `associating_id` + `file_type`. Sahara reports point to a person |
 | `FileUpload.is_archived`, `archive_reason`, `archived_by` | (none) | CARE-only |
-| `FileUpload` `file_category=audio` | `DoctorLocalAudioRef{localPath, sha256, consentAt, recorderUid}`; `Conversation.audioPath` | different shape: CARE uploads to its server, Sahara keeps audio on the phone with a hash and consent time |
+| `FileUpload` `file_category=audio` | `DoctorLocalAudioRef{localPath, sha256, consentAt, recorderUid}`; `Conversation.audioPath` | different shape: CARE uploads to its server, Sahara keeps audio on the phone with a hash and consent time (audio is never uploaded; only the typed or dictated words go to Sahara's server, when sent) |
 | (none) | `Conversation.transcriptProvider`, `transcriptModel`, `transcribedAt` | Sahara-only |
 
 ### 4.7 Data CARE has that Sahara doesn't collect
@@ -251,6 +251,8 @@ CARE sources: `care/emr/models/notes.py:6-18`, `care/emr/models/file_upload.py:1
 - **Family-reported dose log:** planned time, taken time, outcome and reporter (`MedicineHistoryData.kt:7-9`).
 - **Family requests** for a conversation (`DoctorWorkflowData.kt:6`), family tasks and journal entries (`CareDailyUi.kt:32`).
 - **Other on-phone data:** transcription provider and model provenance (`CareData.kt:16-18`), the centre directory (`CareModel.kt:17`).
+
+**Where this data lives (owner correction, 27 Oct).** Sahara is not offline-only. Without an account, all of the above stays on the phone. Signed in, the names, entries, notes, confirmations, medicine log, prescriptions and care contacts are saved on Sahara's Supabase server for the invited family and doctor; recordings and report files stay on the phone. Nothing is anonymised before a doctor sees it today; that is planned. Detail: `CARE_VS_SAHARA_FOR_TEAM.md`, "Where Sahara's data lives".
 
 **Bottom line:** medicines and documents line up. Symptoms and goals-of-care answers line up once a CARE questionnaire exists. CARE needs identity, address, facility and coded fields that Sahara never collects, so an import must ask for them. Sahara's family-side data has no CARE home: family membership, family self-confirmation of an exact note, per-participant consent, the 3D pain body and the dose log. In P2 those would live in a plugin's own tables.
 
