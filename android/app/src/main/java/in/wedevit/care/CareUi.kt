@@ -97,7 +97,8 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
     welcomeAccountContent: (@Composable (() -> Unit, (Boolean) -> Unit) -> Unit)? = null,
     welcomeDoctorContent: (@Composable (() -> Unit, (Boolean) -> Unit) -> Unit)? = null,
     onWelcomePanelChanged: (String) -> Unit = {}, onPatientWalkthrough: (String) -> Unit = {},
-    walkthrough: PatientWalkthrough.User? = null, onLeaveWalkthrough: () -> Unit = {}, onSwitchWalkthrough: (String) -> Unit = {}) {
+    walkthrough: PatientWalkthrough.User? = null, onLeaveWalkthrough: () -> Unit = {}, onSwitchWalkthrough: (String) -> Unit = {},
+    openToday: String? = null, onOpenTodayHandled: () -> Unit = {}) {
     val allPeople by vm.people.collectAsStateWithLifecycle()
     val people = if (walkthrough != null) PatientWalkthrough.visiblePeople(allPeople) else allPeople
     val selected by vm.selected.collectAsStateWithLifecycle()
@@ -119,7 +120,9 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
     var tabDirection by remember { mutableStateOf(SaharaMotion.Direction.Switch) }
     val trail = tabTrail.split(',').mapNotNull { it.toIntOrNull() }
     fun go(next: Int) { if (next != tab) { tabTrail = (trail + tab).takeLast(10).joinToString(","); tabDirection = SaharaMotion.Direction.Forward; tab = next } }
-    fun switchTab(next: Int) { tabTrail = ""; tabDirection = SaharaMotion.Direction.Switch; tab = next }
+    // Daily care opens at the section a Today "See all" points to; the bottom tab opens it from the top.
+    var careFilter by rememberSaveable { mutableStateOf("All") }
+    fun switchTab(next: Int) { careFilter = "All"; tabTrail = ""; tabDirection = SaharaMotion.Direction.Switch; tab = next }
     fun back() { tabDirection = SaharaMotion.Direction.Back; if (trail.isNotEmpty()) { tab = trail.last(); tabTrail = trail.dropLast(1).joinToString(",") } else tab = 0 }
     var dialog by rememberSaveable { mutableStateOf("") }
     var inviteFamilyOpen by rememberSaveable { mutableStateOf(false) }
@@ -131,7 +134,8 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
     var remindersOpen by rememberSaveable(feedbackAccountScope) { mutableStateOf(false) }
     var sharedWorkspaceOpen by rememberSaveable(feedbackAccountScope) { mutableStateOf(false) }
     val reminderTapped by CareReminderLaunch.pending.collectAsStateWithLifecycle()
-    LaunchedEffect(reminderTapped, selected) { if (reminderTapped && selected.isNotBlank() && walkthrough == null) { remindersOpen = true; CareReminderLaunch.pending.value = false } }
+    // A tap that also names a person is handled below (select that person first, then open Reminders).
+    LaunchedEffect(reminderTapped, selected, openToday) { if (reminderTapped && openToday == null && selected.isNotBlank() && walkthrough == null) { remindersOpen = true; CareReminderLaunch.pending.value = false } }
     val openDoctorWorkspace = { if (onDoctorWorkspace != null) onDoctorWorkspace() else sharedWorkspaceOpen = true }
     val screens = rememberSaveableStateHolder()
     val snackbar = remember { SnackbarHostState() }
@@ -151,6 +155,18 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
     }
     LaunchedEffect(message) { message?.let { snackbar.showSnackbar(it); vm.message.value = null } }
     val peopleLoaded by vm.peopleLoaded.collectAsStateWithLifecycle()
+    // After the last person is removed (from More), the next person added starts on Today, not on a leftover tab.
+    LaunchedEffect(peopleLoaded, people.isEmpty()) { if (peopleLoaded && people.isEmpty()) { tab = 0; tabTrail = ""; careFilter = "All" } }
+    // A reminder notification selects the person whose saved activity is due, then opens Reminders on top of their Today.
+    LaunchedEffect(openToday, peopleLoaded) {
+        val target = openToday ?: return@LaunchedEffect
+        if (!peopleLoaded) return@LaunchedEffect
+        if (target.isNotBlank() && target != vm.selected.value && vm.people.value.any { it.id == target }) vm.select(target)
+        reading = null; dialog = ""; inviteFamilyOpen = false; medicineScanner = false; feedbackOpen = false; remindersOpen = false; sharedWorkspaceOpen = false
+        switchTab(0)
+        if (CareReminderLaunch.pending.value && walkthrough == null && vm.selected.value.isNotBlank()) { remindersOpen = true; CareReminderLaunch.pending.value = false }
+        onOpenTodayHandled()
+    }
     val overlay = when { !peopleLoaded -> "starting"; dialog == "checkin" -> "checkin"; feedbackOpen -> "feedback"; remindersOpen -> "reminders"; sharedWorkspaceOpen -> "shared"; else -> "" }
     CompositionLocalProvider(LocalCareLanguage provides language) {
     Box(Modifier.fillMaxSize().background(Cream)) {
@@ -200,9 +216,9 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
                 entryBusy = busy || refreshing, addPersonContent = { close -> AddPersonContent(busy = busy || refreshing, error = actionError, onDismiss = close, onSave = { vm.addPerson(it) { close() } }) })
             else SaharaScreenHost(person.id to tab, Modifier.fillMaxSize(), label = "Care tab", direction = { from, _ -> if (from.first == person.id) tabDirection else SaharaMotion.Direction.Switch }) { (shownId, shownTab) -> screens.SaveableStateProvider("$shownId:$shownTab") {
                 Box(Modifier.fillMaxSize()) { when (shownTab) {
-                    0 -> Today(vm, clinician, onTalk = { go(1) }, onCare = { go(2) }, onNearby = { go(3) }, onAdd = { if (canEdit) dialog = it else vm.message.value = askOwner }, onRead = { reading = it }, onCalendar = { go(6) }, onWorkflow = { go(7) }, onLabs = { go(8) }, onSharedWorkspace = if (walkthrough != null) ({ go(7) }) else openDoctorWorkspace, onSymptoms = { go(9) }, onInviteFamily = { inviteFamilyOpen = true })
+                    0 -> Today(vm, clinician, onTalk = { go(1) }, onCare = { careFilter = it; go(2) }, onNearby = { go(3) }, onAdd = { if (canEdit) dialog = it else vm.message.value = askOwner }, onRead = { reading = it }, onCalendar = { go(6) }, onWorkflow = { go(7) }, onLabs = { go(8) }, onSharedWorkspace = { go(7) }, onSymptoms = { go(9) }, onInviteFamily = { inviteFamilyOpen = true })
                     1 -> Talk(vm, clinician && canEdit, onRead = { reading = it }, onRequestConversation = { go(7) })
-                    2 -> CareList(vm, onReadNote = { reading = it }, onCalendar = { go(6) }, onWorkflow = { go(7) }, onLabs = { go(8) }, onSymptoms = { go(9) },
+                    2 -> CareList(vm, initialFilter = careFilter, onReadNote = { reading = it }, onCalendar = { go(6) }, onWorkflow = { go(7) }, onLabs = { go(8) }, onSymptoms = { go(9) },
                         onAdd = { if (canEdit) dialog = it else vm.message.value = askOwner },
                         onScanPrescription = {
                             if (canEdit) {
@@ -313,11 +329,11 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
     }
 }
 
-@Composable fun Today(vm: CareModel, clinician: Boolean, onTalk: () -> Unit, onCare: () -> Unit, onNearby: () -> Unit, onAdd: (String) -> Unit, onRead: (CareVersion) -> Unit, onCalendar: () -> Unit = {}, onWorkflow: () -> Unit = {}, onLabs: () -> Unit = {}, onSharedWorkspace: () -> Unit = {}, onSymptoms: () -> Unit = {}, onInviteFamily: () -> Unit = {}) {
+@Composable fun Today(vm: CareModel, clinician: Boolean, onTalk: () -> Unit, onCare: (String) -> Unit, onNearby: () -> Unit, onAdd: (String) -> Unit, onRead: (CareVersion) -> Unit, onCalendar: () -> Unit = {}, onWorkflow: () -> Unit = {}, onLabs: () -> Unit = {}, onSharedWorkspace: () -> Unit = {}, onSymptoms: () -> Unit = {}, onInviteFamily: () -> Unit = {}) {
     val ownerOfRecords by vm.isOwner.collectAsStateWithLifecycle(); val todayPeople by vm.people.collectAsStateWithLifecycle(); val todaySelected by vm.selected.collectAsStateWithLifecycle()
     val items by vm.items.collectAsStateWithLifecycle(); val versions by vm.versions.collectAsStateWithLifecycle()
     val selectedPerson by vm.selected.collectAsStateWithLifecycle(); val loadedFor by vm.itemsLoadedFor.collectAsStateWithLifecycle()
-    val loaded = loadedFor == selectedPerson
+    val loaded = loadedFor == selectedPerson; val canEdit by vm.canEdit.collectAsStateWithLifecycle()
     val latest = versions.firstOrNull()
     val dayStart = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
     val hindi = careHindi(); val t = careText()
@@ -368,24 +384,24 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
         item { WorkflowSummary(vm, onWorkflow) }
         val scheduledToday = calendarItems(items, LocalDate.now()).filter { CareEntryCodec.decode(it.detail)?.type == "schedule" }
         if (scheduledToday.isNotEmpty()) item { Card(onClick = onCalendar, colors = CardDefaults.cardColors(containerColor = Mint), shape = RoundedCornerShape(18.dp), modifier = Modifier.fillMaxWidth()) { Column(Modifier.padding(16.dp)) { Text(t("${scheduledToday.size} planned today", "आज ${scheduledToday.size} काम तय हैं"), fontWeight = FontWeight.SemiBold); scheduledToday.take(2).forEach { Text("${calendarCategory(it)} · ${it.title}", style = MaterialTheme.typography.bodyMedium) }; Text(t("Open calendar", "कैलेंडर खोलें"), color = RustText, style = MaterialTheme.typography.labelLarge) } } }
-        val checkin = items.firstOrNull { it.kind == "checkin" && it.created >= dayStart }
+        val checkin = CareTodayRules.todayCheckIn(items, dayStart)
         if (checkin != null) item { CareRow(checkin, vm) }
         item { SectionTitle(t("Up next", "आगे क्या है"), t("Add visit", "मुलाक़ात जोड़ें")) { onAdd("visit") } }
-        val visits = items.filter { it.kind == "visit" && (!CareEntryCodec.isStructured(it.detail) || isDoctorStructuredVisit(it)) && CareEntryCodec.decode(it.detail)?.status !in listOf("cancelled", "completed") && (it.due == 0L || it.due >= LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()) }.sortedBy { it.due }
-        if (visits.isEmpty() && loaded) item { SurfaceCard { Row(verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.Event, null, tint = Rust); Spacer(Modifier.width(12.dp)); Text(t("No upcoming visits", "आगे कोई मुलाक़ात नहीं")) } } }
+        val visits = CareTodayRules.upcomingVisits(items, dayStart)
+        if (visits.isEmpty() && loaded) item { SurfaceCard { Row(verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.Event, null, tint = Rust); Spacer(Modifier.width(12.dp)); Text(CareTodayRules.emptyText("visits", canEdit, hindi)) } } }
         items(visits.take(2), key = { it.id }) { if (isDoctorStructuredVisit(it)) DoctorVisitSummary(it, onOpen = onCalendar) else CareRow(it, vm) }
-        item { SectionTitle(t("Medicines", "दवाइयाँ"), t("See all", "सब देखें"), onCare) }
+        item { SectionTitle(t("Medicines", "दवाइयाँ"), t("See all", "सब देखें")) { onCare("Medicines") } }
         val medicines = items.filter { it.kind == "medicine" }
         if (medicines.isEmpty() && loaded) item { OutlinedButton(onClick = { onAdd("medicine") }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Icon(Icons.Default.Add, null); Spacer(Modifier.width(8.dp)); Text(t("Add a medicine", "दवा जोड़ें")) } }
         items(medicines.take(3), key = { it.id }) { CareRow(it, vm) }
         item { SectionTitle(t("To do", "करने के काम"), t("Add task", "काम जोड़ें")) { onAdd("task") } }
         val tasks = items.filter { it.kind == "task" && !CareEntryCodec.isStructured(it.detail) }.sortedBy { it.doneOn.isNotBlank() }
-        if (tasks.isEmpty() && loaded) item { SurfaceCard { Text(t("Nothing to do yet", "अभी कोई काम नहीं"), color = MaterialTheme.colorScheme.onSurfaceVariant) } }
+        if (tasks.isEmpty() && loaded) item { SurfaceCard { Text(CareTodayRules.emptyText("tasks", canEdit, hindi), color = MaterialTheme.colorScheme.onSurfaceVariant) } }
         items(tasks.take(4), key = { it.id }) { CareRow(it, vm) }
-        if (tasks.size > 4) item { TextButton(onClick = onCare) { Text(t("See all ${tasks.size} tasks", "सभी ${tasks.size} काम देखें")) } }
+        if (tasks.size > 4) item { TextButton(onClick = { onCare("To do") }) { Text(t("See all ${tasks.size} tasks", "सभी ${tasks.size} काम देखें")) } }
         item { SectionTitle(t("Journal", "डायरी"), t("Write a note", "नोट लिखें")) { onAdd("journal") } }
         val notes = items.filter { it.kind == "journal" }
-        if (notes.isEmpty() && loaded) item { SurfaceCard { Text(t("No notes yet", "अभी कोई नोट नहीं"), color = MaterialTheme.colorScheme.onSurfaceVariant) } }
+        if (notes.isEmpty() && loaded) item { SurfaceCard { Text(CareTodayRules.emptyText("journal", canEdit, hindi), color = MaterialTheme.colorScheme.onSurfaceVariant) } }
         items(notes.take(2), key = { it.id }) { CareRow(it, vm) }
     }
 }
@@ -929,6 +945,8 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
         item { OutlinedButton(onClick = onDocuments, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("more-documents-entry")) { Icon(Icons.Default.FolderOpen, null); Spacer(Modifier.width(8.dp)); Text(t("Documents", "दस्तावेज़")) } }
         if (!walkthrough) item { OutlinedButton(onClick = onFeedback, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("patient-feedback-entry")) { Icon(Icons.Default.SentimentSatisfiedAlt, null); Spacer(Modifier.width(8.dp)); Text(t("App feedback", "ऐप के बारे में अपनी राय")) } }
         if (doctorEmbedded) item { OutlinedButton(onClick = onSharedWorkspace, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.Groups, null); Spacer(Modifier.width(8.dp)); Text(t("Shared care and clinical review", "साझा देखभाल और डॉक्टर की जाँच")) } }
+        // Today's "Your care team" opens the family's Care team, so the doctor workspace keeps its own entry here.
+        else if (!walkthrough) item { OutlinedButton(onClick = onSharedWorkspace, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("more-doctor-workspace-entry")) { Icon(Icons.Default.MedicalServices, null); Spacer(Modifier.width(8.dp)); Text(t("Doctor workspace", "डॉक्टर वर्कस्पेस")) } }
         item { DailyCareShortcuts(onCalendar, onWorkflow, onLabs) }
         if (!walkthrough) item { OutlinedButton(onClick = onReminders, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.NotificationsNone, null); Spacer(Modifier.width(8.dp)); Text(t("Reminders", "रिमाइंडर")) } }
         if (!doctorEmbedded && !walkthrough) item { OutlinedButton(onClick = onAccount, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Icon(Icons.Default.PersonOutline, null); Spacer(Modifier.width(8.dp)); Text(if (vm.cloud == null) t("Sign in to share care", "देखभाल साझा करने के लिए साइन इन करें") else t("Your account and sharing", "आपका खाता और साझा करना")) } }

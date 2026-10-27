@@ -49,6 +49,8 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
         PendingJoin(invite.code, invite.name, System.currentTimeMillis()).also { pendingStore.save(it); pendingJoin.value = it }
     }
     fun clearPendingJoin() { pendingStore.clear(); pendingJoin.value = null }
+    /** Set by MainActivity when a reminder notification is tapped: the person to open Today for ("" = whoever is selected). */
+    val openToday = kotlinx.coroutines.flow.MutableStateFlow<String?>(null)
 }
 
 @Composable fun CareRoot(activity: MainActivity) {
@@ -61,6 +63,7 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
     var doctorEntryPending by rememberSaveable { mutableStateOf(false) }
     val pending by root.pendingJoin.collectAsStateWithLifecycle()
     val linkNotice by root.linkNotice.collectAsStateWithLifecycle()
+    val openToday by root.openToday.collectAsStateWithLifecycle()
     val session by cloud.session.collectAsStateWithLifecycle()
     // Survives the account switch that follows deleting an account, so the guest screen can say what happened.
     var accountNotice by rememberSaveable { mutableStateOf<String?>(null) }
@@ -104,7 +107,8 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
                     Text(rt("Use your own account. Professional verification and patient access are separate.", "अपना खाता इस्तेमाल करें। डॉक्टर होने की पुष्टि और मरीज़ तक पहुँच अलग-अलग हैं।"))
                     Button(onClick = { doctorOpen = true; doctorEntryPending = false }, modifier = Modifier.fillMaxWidth()) { Text(rt("Open workspace", "कार्यक्षेत्र खोलें")) }
                 }
-            }, onWelcomePanelChanged = { doctorEntryPending = it == "doctor" })
+            }, onWelcomePanelChanged = { doctorEntryPending = it == "doctor" },
+            openToday = openToday, onOpenTodayHandled = { root.openToday.value = null })
         } }
         }
         CompositionLocalProvider(LocalCareLanguage provides rootLanguage) {
