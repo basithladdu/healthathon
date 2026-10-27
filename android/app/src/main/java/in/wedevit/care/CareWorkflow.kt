@@ -155,11 +155,13 @@ object CareLabRules {
 @Composable fun WorkflowSummary(vm: CareModel, onOpen: () -> Unit) {
     val entries by vm.items.collectAsStateWithLifecycle()
     val active = entries.mapNotNull { item -> CareEntryCodec.decode(item.detail)?.takeIf { it.type in setOf("task", "conversation") && it.status in setOf("open", "accepted") } }
+    val t = careText()
     if (active.isNotEmpty()) Card(onClick = onOpen, colors = CardDefaults.cardColors(containerColor = Mint), shape = RoundedCornerShape(18.dp), modifier = Modifier.fillMaxWidth()) {
         Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
             Icon(Icons.Default.Groups, null, tint = Rust); Spacer(Modifier.width(12.dp))
-            Column(Modifier.weight(1f)) { Text("Care team", fontWeight = FontWeight.SemiBold); Text("${active.count { it.type == "conversation" }} conversations · ${active.count { it.type == "task" }} tasks", style = MaterialTheme.typography.bodySmall) }
-            Icon(Icons.Default.ChevronRight, "Open care team")
+            val talks = active.count { it.type == "conversation" }; val jobs = active.count { it.type == "task" }
+            Column(Modifier.weight(1f)) { Text(t("Care team", "देखभाल टीम"), fontWeight = FontWeight.SemiBold); Text(t("$talks conversations · $jobs tasks", "$talks बातचीत · $jobs काम"), style = MaterialTheme.typography.bodySmall) }
+            Icon(Icons.Default.ChevronRight, t("Open care team", "देखभाल टीम खोलें"))
         }
     }
 }
