@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -435,8 +436,10 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
     var prepRows by remember(preparationScope) { mutableStateOf(if (preparationScope.isBlank()) emptyList<DoctorPreparationQuestion>() else runCatching { preparationStore.load(preparationScope) }.getOrDefault(emptyList())) }
     // Bumped when a goal answer is saved from the transcript page; the question and answer cards reload so they never save an older list over it.
     var prepReload by remember(preparationScope) { mutableIntStateOf(0) }
-    val questionMatches = remember(draft.source, prepRows, step == 2 || step == 3) { if ((step == 2 || step == 3) && prepRows.isNotEmpty()) LocalQuestionMatcher.match(draft.source, prepRows.map { CareQuestion(it.id, it.text, it.section) }) else null }
+    val questionMatches = remember(draft.source, prepRows, step in 1..3) { if (step in 1..3 && prepRows.isNotEmpty()) LocalQuestionMatcher.match(draft.source, prepRows.map { CareQuestion(it.id, it.text, it.section) }) else null }
     val previousVersion = versions.firstOrNull { it.personId == draft.personId }
+    // Walkthrough only: the seeded transcript is a labelled sample, never shown as transcribed.
+    val walkthroughSample = remember(draft.personId, vm.demoMode) { if (vm.demoMode) doctorWalkthroughSample(draft.personId) else null }
     val useLine: (Int, CareSourceLine) -> Unit = { section, line ->
         try { val current = vm.draft.value; require(current.personId == draft.personId && vm.selected.value == draft.personId) { "Choose this person's conversation again." }; if (doctorPresentation) assignDoctorSource(vm, draft, section, line) else vm.edit(CareDraftAssist.assign(current, section, line)) }
         catch (e: IllegalArgumentException) { vm.message.value = e.message }
@@ -471,6 +474,15 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
     val doctorCapture = doctorPresentation && clinician && step == 1
     val scroll = rememberLazyListState()
     LaunchedEffect(buildSection) { scroll.scrollToItem(0) }
+    // Tapping an answer jumps to its transcript line and highlights it.
+    var highlightLine by remember { mutableStateOf<Int?>(null) }
+    var editingTranscript by rememberSaveable { mutableStateOf(false) }
+    val lineRequesters = remember { mutableMapOf<Int, BringIntoViewRequester>() }
+    val jumpScope = rememberCoroutineScope()
+    // Items above a step's own content: heading, the optional back link, then the stepper.
+    val stepContentIndex = 2 + if (doctorPresentation && onDoctorBack != null) 1 else 0
+    val showLine: (CareSourceLine) -> Unit = { line -> focus.clearFocus(); editingTranscript = false; highlightLine = line.number
+        jumpScope.launch { scroll.animateScrollToItem(stepContentIndex); withFrameNanos { }; lineRequesters[line.number]?.bringIntoView() } }
     fun androidx.compose.foundation.lazy.LazyListScope.captureItem(content: @Composable () -> Unit) {
         item { Box(Modifier.fillMaxWidth().padding(horizontal = if (doctorCapture) 20.dp else 0.dp)) { content() } }
     }
@@ -481,7 +493,8 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
         demo = vm.demoMode, localRecordingAllowed = vm.localAudioRecordingAllowed && recordingCanEdit && !recordingSaving && recordingSaveError == null, testRecord = vm.demoMode && DoctorTestProfiles.contains(draft.personId),
         menuEnabled = !recording && !dictating && !permissionDialog && !audienceBusy,
         onStartNew = if (draft.source.isNotBlank() && onDoctorStartNew != null) ({ if (!recordingSaving && recordingSaveError == null && !busy && !recording && !dictating && !permissionDialog && !audienceBusy) onDoctorStartNew() }) else null,
-        onBackToWho = { nextStep(0) }, backToWhoEnabled = !recordingSaving && recordingSaveError == null && !recording && !dictating, audioCount = if (recordingSaving || recordingSaveError != null) 0 else recordings.size) {
+        onBackToWho = { nextStep(0) }, backToWhoEnabled = !recordingSaving && recordingSaveError == null && !recording && !dictating, audioCount = if (recordingSaving || recordingSaveError != null) 0 else recordings.size,
+        checklist = { DoctorGoalsChecklist(prepRows, questionMatches, onDark = true, hint = GOALS_CHECKLIST_HINT) }) {
         DoctorSavedAudioPage(rows = audioRows, selected = savedAudioPicked, onSelectedChange = { savedAudioPicked = it }, nowPlaying = playingPath, isPlaying = playingNow, onPlay = playAudio,
             onPause = { runCatching { audioPlayer.pause() }; playingNow = false },
             onSeek = { delta -> runCatching { audioPlayer.seekTo((audioPlayer.currentPosition + delta).coerceAtLeast(0L).toInt()) } },
@@ -532,6 +545,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                         },
                         onConsent = { val current = vm.draft.value; if (current.personId == draft.personId) vm.edit(current.copy(consentAt = System.currentTimeMillis())) },
                         onActiveChanged = { dictating = it }) }
+                    if (doctorPresentation && prepRows.isNotEmpty()) captureItem { DoctorGoalsChecklist(prepRows, questionMatches, hint = GOALS_CHECKLIST_HINT) }
                     if (!doctorPresentation || captureMode == "Record" || recording) captureItem { Surface(shape = RoundedCornerShape(20.dp), color = DoctorCardReport, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) { Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         Text("Conversation audio", fontFamily = SaharaTitleFont, fontSize = 19.sp, lineHeight = 24.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
                         if (recording) {
@@ -577,10 +591,36 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                     captureItem { TextButton(onClick = { nextStep(0) }, enabled = !recordingSaving && recordingSaveError == null && !recording && !dictating, modifier = Modifier.heightIn(min = 48.dp)) { Text("Back to who is here") } }
                 }
                 2 -> {
-                    captureItem { if (dictating) SurfaceCard { Text("Conversation", fontWeight = FontWeight.Bold); SelectionContainerText(draft.source); Text("Finish this turn to edit the conversation.", style = MaterialTheme.typography.bodySmall) }
-                        else CareField(value = draft.source, onValueChange = { if (it.length <= NoteRules.MAX_SOURCE_CHARS) { val current = vm.draft.value; if (current.personId == draft.personId) vm.edit(current.copy(source = it)) } }, label = "Conversation transcript", placeholder = "Speak a turn, transcribe a saved recording, or type in Hindi or English…", minLines = 5, supporting = if (draft.transcribedAt > 0) "Transcript · ${draft.transcriptModel}. Check names, numbers and meaning against the audio." else "") }
-                    item { DoctorTranscriptGoals(prepRows, questionMatches, !busy && !recording && !dictating && !recordingSaving && recordingSaveError == null, onSave = { id, answer -> if (preparationScope.isNotBlank() && !vm.recordingSaving.value && vm.recordingSaveError.value == null && canEditCareContext(vm, draft.personId, preparationAccount) && vm.draft.value.conversationId == draft.conversationId) runCatching { val next = prepRows.map { if (it.id == id) it.copy(answer = answer.take(DOCTOR_PREPARATION_MAX_ANSWER_CHARS)) else it }; preparationStore.save(preparationScope, next); prepRows = next; prepReload++ } }, onBackToWho = { nextStep(0) }) }
-                    captureItem { Button(onClick = { if (preparationScope.isNotBlank() && !vm.recordingSaving.value && vm.recordingSaveError.value == null && canEditCareContext(vm, draft.personId, preparationAccount) && vm.draft.value.conversationId == draft.conversationId) { val filled = transcriptGoalsFill(prepRows, questionMatches); if (filled != prepRows) runCatching { preparationStore.save(preparationScope, filled); prepRows = filled } }; buildSection = 0; buildOpen = false; nextStep(3) }, enabled = !recordingSaving && recordingSaveError == null && draft.source.isNotBlank() && !recording && !dictating, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text("Continue to answers"); Spacer(Modifier.width(8.dp)); Icon(Icons.AutoMirrored.Filled.ArrowForward, null) } }
+                    val isSample = doctorTranscriptIsSample(vm.demoMode, draft.source, walkthroughSample)
+                    val origin = doctorTranscriptOrigin(isSample, draft.transcribedAt, draft.transcriptModel)
+                    item { Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        // The doctor flow's recordings are transcribed here, on this phone, once the language pack is present; otherwise the doctor types.
+                        if (doctorPresentation && !vm.demoMode && draft.source.isBlank() && !recordingSaving && recordingSaveError == null) recordings.filter { it.absolutePath in savedAudioPicked }.ifEmpty { listOfNotNull(recordings.maxByOrNull { it.lastModified() }) }.forEach { file -> key(file.absolutePath) {
+                            OfflineConversationTranscription(file = file, identity = "${vm.accountNamespace}:${draft.personId}", consent = recordingConsents.firstOrNull { it.audioPath == file.absolutePath },
+                                enabled = !busy && !dictating && !recording && draft.source.isBlank(), onUse = { vm.useOfflineTranscript(file.absolutePath, it) })
+                        } }
+                        if (isSample) Surface(shape = RoundedCornerShape(16.dp), color = DoctorStatusWarnBg, modifier = Modifier.fillMaxWidth().testTag("transcript-sample")) { Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            Text("Sample · नमूना", fontWeight = FontWeight.Medium, color = DoctorStatusWarn)
+                            Text("This walkthrough transcript was written in advance. It is not taken from your recording.", fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardInk)
+                            TextButton(onClick = { val current = vm.draft.value; if (current.personId == draft.personId) { vm.edit(current.copy(source = "")); editingTranscript = true; highlightLine = null } }, enabled = !busy && !recording && !dictating, modifier = Modifier.heightIn(min = 48.dp).testTag("transcript-sample-clear")) { Text("Clear the sample and type your own · खुद लिखें", color = DoctorAccent) }
+                        } }
+                        DoctorGoalsChecklist(prepRows, questionMatches)
+                        if (dictating) SurfaceCard { Text("Conversation", fontWeight = FontWeight.Bold); SelectionContainerText(draft.source); Text("Finish this turn to edit the conversation.", style = MaterialTheme.typography.bodySmall) }
+                        else if (draft.source.isNotBlank() && !editingTranscript) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(if (isSample) "Sample transcript · नमूना" else "Transcript · बातचीत", fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.weight(1f))
+                                TextButton(onClick = { highlightLine = null; editingTranscript = true }, enabled = !busy && !recording, modifier = Modifier.heightIn(min = 48.dp).testTag("transcript-edit")) { Text("Edit · बदलें", color = DoctorAccent) }
+                            }
+                            Text(origin, fontSize = 12.sp, lineHeight = 16.sp, color = DoctorCardFaint, modifier = Modifier.testTag("transcript-origin"))
+                            DoctorTranscriptLines(draft.source, highlightLine) { n -> lineRequesters.getOrPut(n) { BringIntoViewRequester() } }
+                        } else {
+                            CareField(value = draft.source, onValueChange = { if (it.length <= NoteRules.MAX_SOURCE_CHARS) { val current = vm.draft.value; if (current.personId == draft.personId) { editingTranscript = true; vm.edit(current.copy(source = it)) } } }, label = if (isSample) "Sample transcript · नमूना" else "Conversation transcript", placeholder = "Speak a turn, transcribe a saved recording, or type in Hindi or English…", minLines = 5, supporting = if (draft.source.isBlank()) "" else origin)
+                            if (draft.source.isNotBlank()) TextButton(onClick = { focus.clearFocus(); editingTranscript = false }, modifier = Modifier.heightIn(min = 48.dp).testTag("transcript-done")) { Text("Done · show numbered lines · पंक्तियाँ देखें", color = DoctorAccent) }
+                        }
+                    } }
+                    item { DoctorTranscriptGoals(prepRows, questionMatches, !busy && !recording && !dictating && !recordingSaving && recordingSaveError == null, onSave = { id, answer -> if (preparationScope.isNotBlank() && !vm.recordingSaving.value && vm.recordingSaveError.value == null && canEditCareContext(vm, draft.personId, preparationAccount) && vm.draft.value.conversationId == draft.conversationId) runCatching { val next = prepRows.map { if (it.id == id) it.copy(answer = answer.take(DOCTOR_PREPARATION_MAX_ANSWER_CHARS)) else it }; preparationStore.save(preparationScope, next); prepRows = next; prepReload++ } }, onBackToWho = { nextStep(0) }, source = draft.source, onShowLine = showLine) }
+                    // Suggestions are never saved silently: only answers the doctor accepted, edited or typed move on.
+                    captureItem { Button(onClick = { buildSection = 0; buildOpen = false; nextStep(3) }, enabled = !recordingSaving && recordingSaveError == null && draft.source.isNotBlank() && !recording && !dictating, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text("Continue to answers"); Spacer(Modifier.width(8.dp)); Icon(Icons.AutoMirrored.Filled.ArrowForward, null) } }
                     item { TextButton(onClick = { nextStep(1) }, modifier = Modifier.heightIn(min = 48.dp)) { Text("Back to recording") } }
                 }
                 3 -> {
@@ -589,7 +629,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                     if (questionMatches != null) item { Text(if (questionMatches.unanswered.isEmpty()) "Every question has at least one suggested line." else "${questionMatches.unanswered.size} of ${prepRows.size} questions have no suggested line.", fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub, modifier = Modifier.testTag("answers-match-status")) }
                     questionMatches?.let { result -> items(result.answered, key = { "match-${it.question.id}" }) { qa -> Surface(shape = RoundedCornerShape(20.dp), color = DoctorCardReport, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) { Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         Text(qa.question.text, fontFamily = SaharaTitleFont, fontSize = 19.sp, lineHeight = 24.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
-                        Text("Suggested lines · check each against the conversation", fontSize = 12.sp, color = DoctorCardFaint)
+                        Text("Suggested from the transcript · check each line · बातचीत से सुझाव", fontSize = 12.sp, color = DoctorCardFaint)
                         qa.matches.forEach { m -> Text(m.quote, fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk); TextButton(onClick = { useLine(qa.question.section, m.line) }, modifier = Modifier.heightIn(min = 48.dp)) { Text("Use this line in ${NoteRules.labels[qa.question.section]}") } }
                     } } } }
                     if (preparationScope.isNotBlank()) item { DoctorPreparationAnswers(preparationStore, preparationScope, !busy && !recording && !dictating && !recordingSaving && recordingSaveError == null, canSave = { !vm.recordingSaving.value && vm.recordingSaveError.value == null && canEditCareContext(vm, draft.personId, preparationAccount) && vm.draft.value.conversationId == draft.conversationId }, onChange = { prepRows = it }, reload = prepReload) }

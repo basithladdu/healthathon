@@ -9,6 +9,8 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -60,7 +62,7 @@ fun doctorStageStatus(recording: Boolean, saving: Boolean, seconds: Long): Strin
  * The caller owns recording, consent and playback; [sheet] is the expanded page body.
  */
 @Composable fun DoctorRecordStage(mode: String, onMode: (String) -> Unit, recording: Boolean, saving: Boolean, saveError: Boolean, onRetry: () -> Unit, level: Float, seconds: Long, recordEnabled: Boolean, onRecord: () -> Unit, onStop: () -> Unit,
-    onBack: (() -> Unit)?, backEnabled: Boolean, demo: Boolean, localRecordingAllowed: Boolean, testRecord: Boolean, menuEnabled: Boolean, onStartNew: (() -> Unit)?, onBackToWho: () -> Unit, backToWhoEnabled: Boolean, audioCount: Int, sheet: @Composable () -> Unit) {
+    onBack: (() -> Unit)?, backEnabled: Boolean, demo: Boolean, localRecordingAllowed: Boolean, testRecord: Boolean, menuEnabled: Boolean, onStartNew: (() -> Unit)?, onBackToWho: () -> Unit, backToWhoEnabled: Boolean, audioCount: Int, checklist: @Composable () -> Unit = {}, sheet: @Composable () -> Unit) {
     var menu by remember { mutableStateOf(false) }
     val white = Color.White
     BoxWithConstraints(Modifier.fillMaxSize().background(DoctorStageTerracotta).testTag("record-stage")) {
@@ -88,7 +90,8 @@ fun doctorStageStatus(recording: Boolean, saving: Boolean, seconds: Long): Strin
                 Text(doctorStageStatus(recording, saving, seconds), fontSize = 16.sp, lineHeight = 22.sp, color = white, modifier = Modifier.testTag("record-stage-status"))
                 Text("Audio stays on this device and is not included when a written note is shared. It is not automatically transcribed.", fontSize = 12.sp, lineHeight = 16.sp, color = white, modifier = Modifier.padding(top = 4.dp).testTag("record-stage-privacy"))
             }
-            Spacer(Modifier.weight(1f))
+            // The goals-of-care checklist sits between the title and the waveform and scrolls if it is long.
+            Column(Modifier.weight(1f).fillMaxWidth().padding(top = 12.dp, end = 12.dp).verticalScroll(rememberScrollState())) { checklist() }
             DoctorWaveform(level, recording, Modifier.padding(end = 12.dp))
             Spacer(Modifier.height(28.dp))
             Surface(onClick = { if (recording) onStop() else onRecord() }, enabled = recordEnabled, shape = CircleShape, color = DoctorStageCream, contentColor = DoctorStageDeep, modifier = Modifier.size(88.dp).testTag("record-stage-button")) { Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Icon(if (recording) Icons.Default.Stop else Icons.Default.Mic, if (recording) "Stop and save" else "Record conversation", Modifier.size(40.dp), tint = DoctorStageDeep.copy(alpha = if (recordEnabled) 1f else .4f)) } }
