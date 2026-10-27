@@ -76,7 +76,9 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
         var accountOpen by rememberSaveable { mutableStateOf(false) }
         LaunchedEffect(pending?.code, session?.userId) { if (pending != null && session == null) accountOpen = true }
         LaunchedEffect(linkNotice) { linkNotice?.let { model.message.value = it; root.linkNotice.value = null } }
-        val joinBanner = pending?.let { "Sign in or create an account to join ${it.possessive} care" }
+        val rootLanguage = rememberCareLanguage(model.accountNamespace)
+        val rt = { en: String, hi: String -> if (rootLanguage.hindi) hi else en }
+        val joinBanner = pending?.let { rt("Sign in or create an account to join ${it.possessive} care", "${it.name.ifBlank { "इस व्यक्ति" }} की देखभाल से जुड़ने के लिए साइन इन करें या खाता बनाएँ") }
         val mode = when { patientWalkthroughUser != null -> "patient-walkthrough"; demoOpen -> "doctor-walkthrough"; doctorOpen && session != null -> "doctor"; else -> "care" }
         // Entering a walkthrough or workspace moves forward; leaving it moves back to the welcome/care app.
         SaharaScreenHost(mode, Modifier.fillMaxSize().background(Cream), label = "Sahara root", direction = { _, to -> if (to == "care") SaharaMotion.Direction.Back else SaharaMotion.Direction.Forward }) { shown -> when (shown) {
@@ -84,22 +86,22 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
         "doctor-walkthrough" -> DoctorDemo(onExit = { demoOpen = false; walkthroughPatient = null }, cloud = cloud, initialPatientId = walkthroughPatient, careModel = model, onCareAccount = { accountOpen = true })
         "doctor" -> ConnectedDoctorWorkspace(cloud, model, onExit = { doctorOpen = false }, onAccount = { accountOpen = true }, onWalkthrough = { walkthroughPatient = it; demoOpen = true })
         else -> CareApp(model, onAccount = { accountOpen = true }, onDoctorDemo = {
-            if (model.recording.value) model.message.value = "Stop the recording before opening the doctor demo."
+            if (model.recording.value) model.message.value = rt("Stop the recording before opening the doctor demo.", "डॉक्टर डेमो खोलने से पहले रिकॉर्डिंग रोकें।")
             else { walkthroughPatient = null; demoOpen = true }
-        }, onPatientWalkthrough = { if (model.recording.value) model.message.value = "Stop the recording before opening the walkthrough." else patientWalkthroughUser = it },
+        }, onPatientWalkthrough = { if (model.recording.value) model.message.value = rt("Stop the recording before opening the walkthrough.", "डेमो खोलने से पहले रिकॉर्डिंग रोकें।") else patientWalkthroughUser = it },
             onDoctorWorkspace = { doctorEntryPending = true; if (session != null) { doctorOpen = true; doctorEntryPending = false } else accountOpen = true },
             welcomeAccountContent = { close, onBusy -> AccountContent(cloud, model, close, onBusyChange = onBusy, banner = joinBanner) },
             welcomeDoctorContent = { close, onBusy ->
-                if (session == null) AccountContent(cloud, model, close, heading = "Doctor sign in", onBusyChange = onBusy)
+                if (session == null) AccountContent(cloud, model, close, heading = rt("Doctor sign in", "डॉक्टर साइन इन"), onBusyChange = onBusy)
                 else Column(Modifier.padding(22.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                    Heading("Your doctor workspace", 26)
+                    Heading(rt("Your doctor workspace", "आपका डॉक्टर कार्यक्षेत्र"), 26)
                     Text(session!!.email)
-                    Text("Use your own account. Professional verification and patient access are separate.")
-                    Button(onClick = { doctorOpen = true; doctorEntryPending = false }, modifier = Modifier.fillMaxWidth()) { Text("Open workspace") }
+                    Text(rt("Use your own account. Professional verification and patient access are separate.", "अपना खाता इस्तेमाल करें। डॉक्टर होने की पुष्टि और मरीज़ तक पहुँच अलग-अलग हैं।"))
+                    Button(onClick = { doctorOpen = true; doctorEntryPending = false }, modifier = Modifier.fillMaxWidth()) { Text(rt("Open workspace", "कार्यक्षेत्र खोलें")) }
                 }
             }, onWelcomePanelChanged = { doctorEntryPending = it == "doctor" })
         } }
-        CompositionLocalProvider(LocalCareLanguage provides rememberCareLanguage(model.accountNamespace)) {
+        CompositionLocalProvider(LocalCareLanguage provides rootLanguage) {
         if (accountOpen) AccountSheet(cloud, model, onDismiss = { accountOpen = false; if (cloud.session.value == null) doctorEntryPending = false }, banner = joinBanner)
         val joinSession = session
         if (joinSession != null && pending != null) PendingJoinDialog(cloud, model, pending!!, joinSession.email, onClear = root::clearPendingJoin)

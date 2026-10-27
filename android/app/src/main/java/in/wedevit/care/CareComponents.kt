@@ -68,10 +68,10 @@ import androidx.compose.ui.unit.sp
 @Composable fun cappedLabelSize(size: Float): TextUnit { val scale = LocalDensity.current.fontScale; return (size * minOf(scale, 1.3f) / scale).sp }
 
 /** Walkthrough only: shows who is being tried and switches between the ready-made users. Real users have no role menu; their role is computed. */
-@Composable fun WalkthroughUserMenu(user: PatientWalkthrough.User, onSwitch: (String) -> Unit, onLeave: () -> Unit) {
+@Composable fun WalkthroughUserMenu(user: PatientWalkthrough.User, onSwitch: (String) -> Unit, onLeave: () -> Unit) { val t = careText();
     var expanded by remember { mutableStateOf(false) }
     Box {
-        TextButton(onClick = { expanded = true }, modifier = Modifier.heightIn(min = 48.dp).testTag("walkthrough-user-menu").semantics { contentDescription = "Walkthrough user, currently ${user.name}, ${user.role}" },
+        TextButton(onClick = { expanded = true }, modifier = Modifier.heightIn(min = 48.dp).testTag("walkthrough-user-menu").semantics { contentDescription = t("Walkthrough user, currently ${user.name}, ${user.role}", "डेमो उपयोगकर्ता, अभी ${user.name}, ${user.role}") },
             shape = RoundedCornerShape(14.dp), contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp), colors = ButtonDefaults.textButtonColors(contentColor = Rust)) {
             Text(user.label, fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1)
             Spacer(Modifier.width(4.dp)); Icon(Icons.Default.ExpandMore, null, Modifier.size(18.dp))
@@ -80,11 +80,11 @@ import androidx.compose.ui.unit.sp
             PatientWalkthrough.users.forEach { option ->
                 DropdownMenuItem(text = { Text("${option.name} — ${option.role}") }, modifier = Modifier.testTag("walkthrough-switch-${option.key}").semantics { selected = option.key == user.key },
                     leadingIcon = { Icon(if (option.role == "Family") Icons.Default.PeopleOutline else Icons.Default.PersonOutline, null) },
-                    trailingIcon = { if (option.key == user.key) Icon(Icons.Default.Check, "Selected", tint = Rust) },
+                    trailingIcon = { if (option.key == user.key) Icon(Icons.Default.Check, t("Selected", "चुना हुआ"), tint = Rust) },
                     onClick = { expanded = false; onSwitch(option.key) })
             }
             HorizontalDivider()
-            DropdownMenuItem(text = { Text("Leave walkthrough") }, modifier = Modifier.testTag("leave-walkthrough"), onClick = { expanded = false; onLeave() })
+            DropdownMenuItem(text = { Text(t("Leave walkthrough", "डेमो से बाहर जाएँ")) }, modifier = Modifier.testTag("leave-walkthrough"), onClick = { expanded = false; onLeave() })
         }
     }
 }

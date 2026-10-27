@@ -22,15 +22,16 @@ import androidx.compose.ui.unit.dp
  * tracker already used, so a choice made there carries over. Screens read it as `val t = careText()` and
  * write every visible string as an inline pair: `t("English", "हिन्दी")`.
  */
-class CareLanguageChoice internal constructor(private val preferences: android.content.SharedPreferences) {
-    var hindi by mutableStateOf(preferences.getBoolean(KEY, false)); private set
-    fun choose(value: Boolean) { hindi = value; preferences.edit().putBoolean(KEY, value).apply() }
+class CareLanguageChoice internal constructor(private val preferences: android.content.SharedPreferences, private val device: android.content.SharedPreferences? = null) {
+    // An account without its own choice starts from the phone's last choice, so picking Hindi before signing in carries over.
+    var hindi by mutableStateOf(preferences.getBoolean(KEY, device?.getBoolean(KEY, false) ?: false)); private set
+    fun choose(value: Boolean) { hindi = value; preferences.edit().putBoolean(KEY, value).apply(); device?.edit()?.putBoolean(KEY, value)?.apply() }
     companion object {
         private const val KEY = "hindi"
         private val shared = mutableMapOf<String, CareLanguageChoice>()
         /** The same object for one account everywhere in the app, so switching on one screen switches them all at once. */
         fun of(context: Context, namespace: String): CareLanguageChoice = synchronized(shared) {
-            shared.getOrPut(namespace) { CareLanguageChoice(context.applicationContext.getSharedPreferences("sahara-symptom-language-$namespace", 0)) }
+            shared.getOrPut(namespace) { CareLanguageChoice(context.applicationContext.getSharedPreferences("sahara-symptom-language-$namespace", 0), context.applicationContext.getSharedPreferences("sahara-language", 0)) }
         }
     }
 }
