@@ -17,8 +17,8 @@ One place for the team to understand what we researched, how we reasoned, what w
 | All 84 public OHC GitHub repos | licence, purpose, reuse, API | [`ohc-repos/`](ohc-repos/) and [`ohc-repos/ALL_84_REPOS.tsv`](ohc-repos/ALL_84_REPOS.tsv) |
 | Field-by-field data mapping | CARE fields vs Sahara fields | [`../CARE_FAMILY_SIDE_FIT.md`](../CARE_FAMILY_SIDE_FIT.md) |
 | Short brief + options A–D | — | [`../CARE_BRIEF_2026-10-27.md`](../CARE_BRIEF_2026-10-27.md) |
-| Palliative organisations (Pallium, Niram, Arike, IAPC, Kerala grid) | Niram, Kerala done; others in progress | [`partners/`](partners/) |
-| India palliative landscape (apps, policy, providers, evidence, business models) | 4 of 5 done (global comparators + funding; Indian providers + pilot partners; evidence + design requirements; apps and products) | [`landscape/`](landscape/) |
+| Palliative organisations (Pallium, Niram, Arike, IAPC, Kerala grid) | Niram, Kerala, Arike done; Pallium and IAPC in progress | [`partners/`](partners/) |
+| India palliative landscape (apps, policy, providers, evidence, business models) | all 5 done (global comparators + funding; Indian providers + pilot partners; evidence + design requirements; apps and products; policy + law) | [`landscape/`](landscape/) |
 | Sahara's own data flow (what goes to the server) | code audit | [`sahara-data-flow-audit.md`](sahara-data-flow-audit.md) |
 
 ## Raw material (everything is in this repo)
