@@ -223,11 +223,11 @@ Also read:
 | Item | Next step | Who |
 |---|---|---|
 | A10, A19, B6 | Turn on real AI note drafting once a provider and consent terms are chosen (`CLAUDE_TRANSCRIPT.md` §3 "Decide"); until then, say "word matching" in the pitch | Owner decides, Awaiz builds |
-| B2 | Show the goals questions as a live checklist during recording (covered / left open) | Awaiz |
-| B3 | Replace the pre-written walkthrough transcript with real on-device transcription on a phone that can run it | Awaiz |
+| B2 | ~~Show the goals questions as a live checklist during recording (covered / left open)~~ done, lane convo 27 Oct | Awaiz |
+| B3 | ~~Replace the pre-written walkthrough transcript with real on-device transcription~~ done in code 27 Oct (lane convo); still try it on a phone that can run it | Awaiz |
 | B4 | Speaker separation (doctor side vs family side): later, needs a model | Awaiz (later) |
 | B5 | Typed capture works; add more languages only after Hindi is complete | Awaiz (later) |
-| B7 | Tap an answer to jump to the transcript line it came from | Awaiz |
+| B7 | ~~Tap an answer to jump to the transcript line it came from~~ done, lane convo 27 Oct | Awaiz |
 | B9 | Real signatures are out of scope for now; keep the "exact-version confirmation" wording | — |
 | B10 | Add one outcome field: "consensus reached among patient and family" yes/no | Awaiz (after team OK) |
 | B11 | Mark each note as a "general discussion" or a "decision recorded" (the doctor picks; AI later) | Awaiz (after team OK) |
@@ -309,3 +309,5 @@ Sources: `docs/research/CARE_DEEP_DIVE_2026-10-27.md`, `CARE_VS_SAHARA_FOR_TEAM.
 
 ### Lane notes (27 Oct)
 - **Polish lane:** an up/down swipe over the pain-strength bar (3D pain body) or the check-in / feedback slider now scrolls the page and never changes the score; only a tap or a deliberate sideways drag sets it (`SaharaSliderTouch.kt`, unit-tested in `SliderTouchPolicyTest`). TalkBack and keyboard still adjust the slider. A second tap on an already-saved check-in no longer adds a second entry, and the "please wait" message now says a change is still saving. In the doctor's embedded Daily care, the "Symptom tracker" button did nothing; it now opens the symptom diary. Not tried on a phone (no device or emulator); the swipe androidTest compiles but has not run.
+- **Convo lane:** the doctor's transcript page now transcribes the saved recording on the phone (existing sherpa-onnx Hindi/English pack, no cloud) or takes typed/dictated words; the walkthrough's pre-written transcript is labelled "Sample · not taken from your recording" and can be cleared. B2: a covered / open goals checklist shows on the record stage, in Dictate and above the transcript (it can't tick during audio-only recording: no words yet). B7: the transcript shows numbered lines; tapping a suggestion or accepted answer jumps to and highlights its line; suggestions are labelled "word matching" and are never saved silently.
+- **Convo lane, server:** signed in, the doctor flow's last step was a dead "Conversation-specific sharing not connected yet" button; it now sends the note to the server as a draft for clinician review (`healthathon_save_draft`); the owner approves the audience, a verified clinician publishes the exact version, and the family confirms that version (existing flow). If the server lacks the 23 Oct conversation migration, the app says so and keeps the local draft. Not tried on a phone (on-device transcription needs a 64-bit phone, ~2.5 GB free memory, 987 MB download).
