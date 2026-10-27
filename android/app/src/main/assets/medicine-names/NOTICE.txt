@@ -1,0 +1,29 @@
+Sahara offline medicine names
+=============================
+
+cdci-names.tsv is derived from the "Common Drug Codes for India (CDCI) Flat File
+Package" produced by the National Resource Centre for EHR Standards (NRCeS) at the
+Centre for Development of Advanced Computing (C-DAC), Pune, as redistributed by
+Open Healthcare Network (OHC) in https://github.com/ohcnetwork/cdci
+(commit c6c800b9f00e3371a1fcac2f918551c7a8a7f383).
+
+  Source data (c) C-DAC / NRCeS.
+  Licensed under the Creative Commons Attribution 4.0 International Public License
+  (CC BY 4.0): https://creativecommons.org/licenses/by/4.0/
+  The original licence text is kept in CDCI-License.txt.
+
+Changes made by Sahara: only substance and ingredient names (with the SNOMED CT
+substance code where CDCI lists one) were kept. All strengths, dose forms, routes,
+brand names, indications, contraindications and other columns were removed.
+Build script: android/scripts/build-cdci-medicine-names.py.
+
+The package contains SNOMED CT content from the SNOMED CT International Release and
+the SNOMED CT India National Extension, governed by the relevant clauses of the
+SNOMED CT Affiliate License. "SNOMED" and "SNOMED CT" are registered trademarks of
+SNOMED International. SNOMED CT was originally created by the College of American
+Pathologists.
+
+The CDCI licence permits redistribution and derivatives within India.
+C-DAC does not warrant the accuracy, completeness, or adequacy of the content.
+The list is a spelling aid for typing medicine names. It is not a clinical
+decision-support tool and Sahara never suggests a medicine or a dose from it.

@@ -217,7 +217,7 @@ private fun chooseMedicineTime(context:Context,current:Long?,onPicked:(Long)->Un
 
 @Composable internal fun MedicineHistoryTabs(tab:String,busy:Boolean,onSelect:(String)->Unit) {
     Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(8.dp)) {
-        listOf("Current" to "Active prescription","Past" to "Replaced prescriptions").forEach {(value,hint)->
+        listOf("Current" to "Active prescription","Past" to "Replaced prescriptions","Intake history" to "Taken / missed · ली / छूटी").forEach {(value,hint)->
             val on=tab==value
             Surface(onClick={if(!busy)onSelect(value)},enabled=!busy,shape=RoundedCornerShape(20.dp),color=if(on)DoctorAccent else DoctorCardReport,border=if(on)null else BorderStroke(1.dp,DoctorHairline),modifier=Modifier.weight(1f).heightIn(min=56.dp).testTag("medicine-tab-$value")) {
                 Column(Modifier.padding(horizontal=14.dp,vertical=10.dp),verticalArrangement=Arrangement.Center) {Text(value,fontSize=16.sp,fontWeight=FontWeight.Medium,color=if(on)DoctorCardReport else DoctorCardInk);Text(hint,fontSize=12.sp,color=if(on)DoctorCardReport else DoctorCardSub)}
