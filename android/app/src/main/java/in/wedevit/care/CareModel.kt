@@ -669,7 +669,10 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
                 pendingRecordingMetadata=consent to ref
                 savePendingRecordingMetadata()
             }
-        } catch (_: Exception) { message.value = "The recording could not be finalized. Its original file was kept on this device; it may have been too short." }
+        } catch (_: Exception) {
+            recordingDraft?.takeIf { pendingRecordingMetadata?.second?.localPath != recordingFile?.absolutePath }?.let { discardUnfinishedDoctorLocalAudio(recordingFile, audioRoot(), it.personId) }
+            message.value = "The recording was too short or could not be saved. Please try again."
+        }
         finally { active.release(); recordingFile = null; recordingDraft = null; activeRecordingConsent = null;activeRecorderUid="" }
     }
     fun retrySavingRecording() { if(!recordingSaving.value)savePendingRecordingMetadata() }

@@ -14,6 +14,14 @@ internal object DoctorLocalAudioRules {
         account == liveAccount && person.isNotBlank() && person == livePerson && conversation == liveConversation
 }
 
+/** Removes a recording that could not be finalized (for example stopped straight after starting), so no unplayable, consent-less clip is left on the phone. Only touches an .m4a inside this person's own recordings folder. */
+internal fun discardUnfinishedDoctorLocalAudio(file: File?, root: File, person: String): Boolean {
+    if (file == null || person.isBlank() || file.extension != "m4a") return false
+    val folder = File(root, person).canonicalFile
+    if (folder.parentFile != root.canonicalFile || file.canonicalFile.parentFile != folder) return false
+    return !file.exists() || file.delete()
+}
+
 internal data class DoctorLocalAudioInfo(val bytes: Long, val durationMicros: Long)
 
 internal suspend fun awaitDoctorLocalAudioSave(job: Job?, failure: () -> String?) {
