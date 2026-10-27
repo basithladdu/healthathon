@@ -240,7 +240,7 @@ Also read:
 | Item | Next step | Who |
 |---|---|---|
 | C1–C4 | Decide on the hospital QR card (3–5 days plus server work). If yes: large QR on Today, single-use browser link, printable, saveable offline, can be replaced if leaked | Owner decides, Awaiz builds |
-| C5 | Password-protect the PDF copy | Awaiz |
+| C5 | ~~Password-protect the PDF copy~~ done, fd208b5 (locked AES-256 ZIP; Android cannot encrypt the PDF itself) | Awaiz |
 
 ### Access to care
 | Item | Next step | Who |
@@ -257,9 +257,9 @@ Also read:
 | Item | Next step | Who |
 |---|---|---|
 | A6, A8 | Short patient-side summary with expandable sections; side-effect notes for the doctor at the next visit | Awaiz (later) |
-| E5 | Fill Lab history from scanned reports, with the original line kept | Awaiz |
-| E6 | Add a "cancer documents" category (PET-CT, biopsy) in Docs | Awaiz |
-| E7 | Mark chemo/radiotherapy days on the Lab history chart | Awaiz |
+| E5 | ~~Fill Lab history from scanned reports, with the original line kept~~ done, docs lane | Awaiz |
+| E6 | ~~Add a "cancer documents" category (PET-CT, biopsy) in Docs~~ done, docs lane | Awaiz |
+| E7 | ~~Mark chemo/radiotherapy days on the Lab history chart~~ done, docs lane | Awaiz |
 | E8, E9 | Clinicians to re-confirm whether patients may type daily medicines, or only scan printed prescriptions | Team |
 | E11 | Timeline summary from documents (last chemo or radiotherapy, with source) | Awaiz (later) |
 | E13 | Voice journal themes: no decision; hold | Team |
@@ -309,3 +309,6 @@ Sources: `docs/research/CARE_DEEP_DIVE_2026-10-27.md`, `CARE_VS_SAHARA_FOR_TEAM.
 
 ### Lane notes (27 Oct)
 - **Polish lane:** an up/down swipe over the pain-strength bar (3D pain body) or the check-in / feedback slider now scrolls the page and never changes the score; only a tap or a deliberate sideways drag sets it (`SaharaSliderTouch.kt`, unit-tested in `SliderTouchPolicyTest`). TalkBack and keyboard still adjust the slider. A second tap on an already-saved check-in no longer adds a second entry, and the "please wait" message now says a change is still saving. In the doctor's embedded Daily care, the "Symptom tracker" button did nothing; it now opens the symptom diary. Not tried on a phone (no device or emulator); the swipe androidTest compiles but has not run.
+- **Docs / Lab history (sa3-docs):** E6 "Cancer documents" filter (PET-CT, biopsy, histopathology, staging; file name suggests, family sets or clears; label kept on the phone). E5 "Lab result" in Read and copy facts fills name/value/unit/range from the OCR line; the saved entry keeps the original line, page and file hash. E7 chemo/radiotherapy days (all-day Calendar entries) drawn as dashed lines on Lab history charts.
+- Report search takes Hindi query words (हीमोग्लोबिन, खून, जांच, बायोप्सी, पेट-सीटी …) for file names and reviewed text. Reports can now be renamed and scanned with the camera; Docs says report files stay on this phone and are not uploaded.
+- C5: optional password on the care-note PDF puts it in an AES-256 ZIP (receiver needs 7-Zip/WinRAR-type app). Not tried on a phone; not compiled by this lane after the build freeze beyond one unit-test run.
