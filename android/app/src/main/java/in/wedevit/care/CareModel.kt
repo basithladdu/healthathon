@@ -37,6 +37,14 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
     val localAudioRecordingAllowed: Boolean get() = DoctorLocalAudioRules.allowed(demoMode,cloud!=null,account,storageNamespace,selected.value)
     private val db = CareDatabase.get(app, storageNamespace)
     private val dao = db.care()
+    /** Signed-in writes go here first and are sent in order; see CareSyncQueue. */
+    private val sync = cloud?.let { CareSyncQueue.get(app, it, account) }
+    val syncWaiting: StateFlow<Int> = sync?.waiting?.stateIn(viewModelScope, SharingStarted.Eagerly, 0) ?: MutableStateFlow(0)
+    val syncKept: StateFlow<Int> = sync?.kept?.stateIn(viewModelScope, SharingStarted.Eagerly, 0) ?: MutableStateFlow(0)
+    private val connectivity = sync?.let { app.getSystemService(android.net.ConnectivityManager::class.java) }
+    private val networkReturned = object : android.net.ConnectivityManager.NetworkCallback() {
+        override fun onAvailable(network: android.net.Network) { sendPending() }
+    }
     private var demoCloseJob: Job? = null
     private val activeConversationIds = mutableMapOf<String,String>()
     /** Only the isolated Doctor example database is exposed to the fixture importer. */
@@ -151,6 +159,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
         viewModelScope.launch { reconcileReminders() }
         viewModelScope.launch { prescriptionExcludedIds.collectLatest { reconcileReminders() } }
         if (cloud != null) refresh()
+        connectivity?.let { runCatching { it.registerDefaultNetworkCallback(networkReturned) } }
         viewModelScope.launch {
             for (write in writes) try { val value=write.value;lock.withLock { if (value.personId !in deletedPeople) withContext(Dispatchers.IO) {
                 val archives=pendingContextArchives.values.filter { it.personId==value.personId }
@@ -193,6 +202,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
             "The signed-in account changed. Reopen your care records."
         }
         requireSameAccount()
+        sync?.flush()
         val records = service.load()
         requireSameAccount()
         lock.withLock {
@@ -203,6 +213,8 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
                 requireSameAccount()
                 dao.clearAcknowledgements(); dao.clearVersions(); dao.clearItems(); dao.clearPeople()
                 dao.addPeople(records.people); dao.addItems(records.entries); dao.addVersions(records.notes); dao.addAcknowledgements(records.confirmations)
+                removed.forEach { sync?.purgePerson(it) }
+                sync?.overlay(records.people.map { it.id }.toSet())
                 dao.clearRemovedDrafts(); dao.clearRemovedRecordingConsents()
                 removed.forEach { dao.deleteReports(it) }
                 removed.forEach { db.prescriptions().purgePerson(it);db.conversations().purgePerson(it) }
@@ -237,7 +249,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
         if (personId.isBlank()) return
         careContactsLoading.value = true; careContactsError.value = null
         try {
-            val snapshot = if (cloud == null) CareContactSnapshot(true, withContext(Dispatchers.IO) { localContacts.list(personId) }) else cloud.careContacts(personId)
+            val snapshot = if (cloud == null) CareContactSnapshot(true, withContext(Dispatchers.IO) { localContacts.list(personId) }) else cloud.careContacts(personId).let { it.copy(contacts = CareSyncOps.overlayContacts(it.contacts, sync!!.pending(personId))) }
             if (selected.value == personId && (cloud?.session?.value?.userId.orEmpty() == account)) { careContacts.value = snapshot.contacts; canReadCareTeam.value = snapshot.readable }
         } catch (e: Exception) {
             if (e is CancellationException) throw e
@@ -247,13 +259,17 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
     fun saveCareContact(contact: CareContact, expectedAccount: String, done: () -> Unit) = action {
         require(sameCareContext(contact.personId, expectedAccount, ownerOnly = true)) { "Only this care profile's owner can manage its contacts." }
         CareContactRules.validate(contact.name, contact.relationship, contact.role, contact.phone)
-        val saved = if (cloud == null) withContext(Dispatchers.IO) { localContacts.save(contact) } else cloud.saveCareContact(contact)
-        if (sameCareContext(contact.personId, expectedAccount, ownerOnly = true)) { careContacts.value = careContacts.value.filterNot { it.id == saved.id } + saved; canReadCareTeam.value = true; done() }
+        val sent = sync == null || sync.submit(CareSyncOps.saveContact(contact)) == CareSyncStatus.SENT
+        val saved = if (cloud == null) withContext(Dispatchers.IO) { localContacts.save(contact) } else contact
+        if (sameCareContext(contact.personId, expectedAccount, ownerOnly = true)) {
+            careContacts.value = careContacts.value.filterNot { it.id == saved.id } + saved; canReadCareTeam.value = true; done()
+            if (cloud != null) { if (sent) refreshCareContacts(contact.personId) else message.value = CareSyncText.SAVED_WAITING }
+        }
     }
     fun removeCareContact(contact: CareContact, expectedAccount: String, done: () -> Unit) = action {
         require(sameCareContext(contact.personId, expectedAccount, ownerOnly = true)) { "Only this care profile's owner can manage its contacts." }
-        if (cloud == null) withContext(Dispatchers.IO) { localContacts.remove(contact) } else cloud.removeCareContact(contact)
-        if (sameCareContext(contact.personId, expectedAccount, ownerOnly = true)) { careContacts.value = careContacts.value.filterNot { it.id == contact.id }; done() }
+        val sent = if (sync == null) { withContext(Dispatchers.IO) { localContacts.remove(contact) }; true } else sync.submit(CareSyncOps.removeContact(contact)) == CareSyncStatus.SENT
+        if (sameCareContext(contact.personId, expectedAccount, ownerOnly = true)) { careContacts.value = careContacts.value.filterNot { it.id == contact.id }; done(); if (!sent) message.value = CareSyncText.REMOVED_WAITING }
     }
     fun saveDoctorVisit(expectedPersonId: String, expectedAccountId: String, doctorName: String, startsAt: Long, location: String, note: String, onSaved: () -> Unit, id: String = newId(), createdAt: Long = System.currentTimeMillis(), initial: CareItem? = null) = action {
         require(sameCareContext(expectedPersonId, expectedAccountId)) { "Care access changed. Reopen the selected profile." }
@@ -265,11 +281,10 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
             val next = CareEntryCodec.decode(item.detail)!!
             item = item.copy(created = initial.created, revision = initial.revision, doneOn = initial.doneOn, detail = CareEntryCodec.encode(next.copy(status = old?.status ?: "open", completedAt = old?.completedAt ?: 0, completedBy = old?.completedBy.orEmpty())))
         }
-        val saved = cloud?.saveEntry(item, expectedAccountId) ?: item
         // Persist only to the account-scoped local database; never switch to a different selected person.
-        require(saved.personId == expectedPersonId)
-        dao.saveItem(saved); reconcileReminders()
-        if (sameCareContext(expectedPersonId, expectedAccountId)) { message.value = if (cloud == null) "Visit saved on this device" else "Visit saved to shared care. The patient can see it after refreshing."; onSaved() }
+        require(item.personId == expectedPersonId)
+        val sent = storeItem(item)
+        if (sameCareContext(expectedPersonId, expectedAccountId)) { message.value = if (cloud == null) "Visit saved on this device" else if (sent) "Visit saved to shared care. The patient can see it after refreshing." else CareSyncText.SAVED_WAITING; onSaved() }
     }
     fun role(value: Boolean) = role(if (value) "Doctor" else CareRoles.forOwner(isOwner.value))
     fun role(value: String) {
@@ -461,7 +476,12 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
         val previousConfirmations = dao.confirmations(version.id).filter { cloud == null || it.id in authenticatedConfirmationIds.value }
         val proposed = NoteRules.acknowledge(version, dao.latest(version.personId), name, relationship, reviewed, previousConfirmations)
         val ack = if (cloud != null && dao.confirmation(proposed.id) != null && proposed.id !in authenticatedConfirmationIds.value) proposed.copy(id = newId()) else proposed
-        val saved = cloud?.confirm(version.personId, ack) ?: ack
+        val write = sync?.let { CareSyncOps.confirm(version.personId, ack) }
+        if (sync != null && write != null) {
+            val status = sync.submit(write, local = { if (dao.confirmation(ack.id) == null) dao.acknowledge(ack) }, rollback = { dao.deleteAcknowledgement(ack.id) })
+            if (status != CareSyncStatus.SENT) { message.value = CareSyncText.CONFIRMED_WAITING; done(); return@action }
+        }
+        val saved = write?.let { sync?.takeConfirmation(it.opId) } ?: ack
         require(saved.versionId == version.id && saved.contentHash == version.contentHash && saved.relationship == relationship && saved.name.trim().equals(name.trim(), ignoreCase = true)) { "The saved confirmation didn't match this version. Refresh the care note before trying again." }
         val previous = dao.confirmation(saved.id)
         if (previous == null) dao.acknowledge(saved)
@@ -483,8 +503,8 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
                     "schedule" -> require(due > 0 && entry.category in setOf("Visit", "Test", "Follow-up", "Procedure")) { "Choose a date and type of care." }
                 }
             }
-            storeItem(CareItem(id = id, personId = person, kind = kind, title = title.trim(), detail = detail.trim(), due = due))
-            message.value = "Saved"; done()
+            val sent = storeItem(CareItem(id = id, personId = person, kind = kind, title = title.trim(), detail = detail.trim(), due = due))
+            message.value = if (sent) "Saved" else CareSyncText.SAVED_WAITING; done()
         }
     }
     fun saveMedicineList(drafts: List<MedicineDraft>, done: () -> Unit = {}) {
@@ -496,6 +516,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
             val names = drafts.map { it.medicine.medicineName.trim() }
             require(names.all { it.isNotBlank() && it.length <= 200 }) { "Add a medicine name to every entry." }
             require(names.map { it.lowercase() }.distinct().size == names.size) { "Each medicine needs a different name." }
+            var allSent = true
             drafts.forEach { draft ->
                 val medicine = draft.medicine
                 require(medicine.strength.isNotBlank() || medicine.quantity.isNotBlank() || medicine.form.isNotBlank()) { "Add the prescribed dose for ${medicine.medicineName}." }
@@ -503,7 +524,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
                 require(detail.isNotBlank() && detail.length <= 4000) { "Review the dose and directions for ${medicine.medicineName}." }
                 val existing = dao.item(draft.id)
                 require(existing == null || (existing.personId == person && existing.kind == "medicine")) { "One medicine could not be matched to this person. Start the scan again." }
-                storeItem(CareItem(
+                allSent = storeItem(CareItem(
                     id = draft.id,
                     personId = person,
                     kind = "medicine",
@@ -512,9 +533,9 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
                     created = existing?.created ?: System.currentTimeMillis(),
                     doneOn = existing?.doneOn.orEmpty(),
                     revision = existing?.revision ?: 0,
-                ))
+                )) && allSent
             }
-            message.value = "${drafts.size} ${if (drafts.size == 1) "medicine" else "medicines"} saved"
+            message.value = if (allSent) "${drafts.size} ${if (drafts.size == 1) "medicine" else "medicines"} saved" else CareSyncText.SAVED_WAITING
             done()
         }
     }
@@ -527,8 +548,8 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
         val candidate = CareItem(id = id, personId = personId, kind = "checkin", title = "${note.symptom} · ${SymptomDiaryRules.ratingLabel(note.rating)}",
             detail = SymptomNoteCodec.encode(note), created = existing?.created ?: System.currentTimeMillis(), revision = existing?.revision ?: 0)
         if (note.selfReportedChange.isNotBlank()) require(SymptomDiaryRules.comparison(dao.allItems(), candidate, note)?.previous?.id == note.comparedWithId) { "The previous note changed. Check the comparison and save again." }
-        storeItem(candidate)
-        message.value = "Symptom note saved"; done()
+        val sent = storeItem(candidate)
+        message.value = if (sent) "Symptom note saved" else CareSyncText.SAVED_WAITING; done()
     }
     fun toggle(item: CareItem) = action {
         val today = LocalDate.now().toString()
@@ -547,9 +568,26 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
     fun updateItem(item: CareItem, done: () -> Unit) = action {
         require(item.personId == selected.value && item.title.isNotBlank()) { "Choose the right person and enter a name." }
         require(item.title.length <= 200 && item.detail.length <= 4000) { "Please shorten this entry." }
-        storeItem(item.copy(title = item.title.trim(), detail = item.detail.trim())); message.value = "Saved"; done()
+        val sent = storeItem(item.copy(title = item.title.trim(), detail = item.detail.trim())); message.value = if (sent) "Saved" else CareSyncText.SAVED_WAITING; done()
     }
-    private suspend fun storeItem(item: CareItem) { requireEdit(item.personId); dao.saveItem(cloud?.saveEntry(item) ?: item); reconcileReminders() }
+    /** Signed in: kept on the phone first, then sent in order. Returns false while it is still waiting to send. */
+    private suspend fun storeItem(item: CareItem): Boolean {
+        requireEdit(item.personId)
+        val queue = sync ?: run { dao.saveItem(item); reconcileReminders(); return true }
+        val before = dao.item(item.id)
+        val status = queue.submit(CareSyncOps.saveEntry(item), local = { dao.saveItem(item) }, rollback = { if (before == null) dao.removeItem(item) else dao.saveItem(before); reconcileReminders() })
+        reconcileReminders()
+        return status == CareSyncStatus.SENT
+    }
+    /** Sends waiting changes now (network back, app opened, or "Send now"), then pulls the server's copy. */
+    fun sendPending() {
+        val queue = sync ?: return
+        viewModelScope.launch {
+            val report = try { queue.flush() } catch (e: Exception) { if (e is CancellationException) throw e; return@launch }
+            report.count(CareSyncStatus.SERVER_KEPT).takeIf { it > 0 }?.let { message.value = CareSyncText.serverKept(it) }
+            if (report.count(CareSyncStatus.SENT) + report.count(CareSyncStatus.SERVER_KEPT) > 0) refresh()
+        }
+    }
     private suspend fun reconcileReminders() {
         if (demoMode) return
         // Alerts are secondary to accepted care records. A platform alert failure
@@ -564,7 +602,15 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
             reminderScheduler?.reconcile(rows.filterNot { it.kind == "medicine" && it.id in past[it.personId].orEmpty() })
         } }
     }
-    fun remove(item: CareItem) = action { requireEdit(item.personId); cloud?.removeEntry(item); dao.removeItem(item); reconcileReminders(); message.value = "Removed" }
+    fun remove(item: CareItem) = action {
+        requireEdit(item.personId)
+        val queue = sync
+        val sent = if (queue == null) { dao.removeItem(item); true } else {
+            val before = dao.item(item.id) ?: item
+            queue.submit(CareSyncOps.removeEntry(item), local = { dao.removeItem(item) }, rollback = { dao.saveItem(before) }) == CareSyncStatus.SENT
+        }
+        reconcileReminders(); message.value = if (sent) "Removed" else CareSyncText.REMOVED_WAITING
+    }
     fun importReport(uri: android.net.Uri, personId: String) = action {
         require(people.value.any { it.id == personId }) { "Choose a person before adding a report." }
         requireEdit(personId)
@@ -596,7 +642,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
                 deletedPeople.add(id)
                 draftCache.remove(id)
                 pendingContextArchives.entries.removeAll { it.value.personId==id }
-                db.withTransaction { dao.deleteAcknowledgements(id); dao.deleteVersions(id); dao.deleteItems(id); dao.deleteReports(id); dao.deleteRecordingConsents(id); db.prescriptions().purgePerson(id);db.conversations().purgePerson(id);dao.deleteDraft(id); dao.deletePersonRow(id) }
+                db.withTransaction { dao.deleteAcknowledgements(id); dao.deleteVersions(id); dao.deleteItems(id); dao.deleteReports(id); dao.deleteRecordingConsents(id); db.prescriptions().purgePerson(id);db.conversations().purgePerson(id);dao.deleteDraft(id); dao.deletePersonRow(id); sync?.purgePerson(id) }
                 withContext(Dispatchers.IO) { File(audioRoot(), id).deleteRecursively(); reportFiles.removePerson(id) }
                 CareDocumentReviewStore(getApplication(), storageNamespace).removePerson(id)
                 withContext(Dispatchers.IO) { EmergencyCardStore(getApplication(), storageNamespace).removePerson(id) }
@@ -802,7 +848,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
             finally { busy.value = false }
         }
     }
-    override fun onCleared() { stopRecording(); meter?.cancel(); super.onCleared() }
+    override fun onCleared() { stopRecording(); meter?.cancel(); connectivity?.let { runCatching { it.unregisterNetworkCallback(networkReturned) } }; super.onCleared() }
 }
 
 /** The patient app's role is derived from the account's relationship to the person, never chosen. Doctors use the Doctor workspace. */

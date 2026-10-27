@@ -19,6 +19,7 @@ internal object MedicineLocalCourseLock {
 /** Real care records only. No access to the independent synthetic doctor-dose tables. */
 class MedicineHistoryRepo(context: Context, private val cloud: CareCloud?, private val accountId: String) {
     private val app = context.applicationContext
+    private val sync get() = cloud?.let { CareSyncQueue.get(app, it, accountId) }
     private fun prefs(person: String): android.content.SharedPreferences {
         require(person.isNotBlank())
         val key = MessageDigest.getInstance("SHA-256").digest("$accountId:$person".toByteArray()).joinToString("") { "%02x".format(it) }
@@ -50,10 +51,12 @@ class MedicineHistoryRepo(context: Context, private val cloud: CareCloud?, priva
         identity()
         if(cloud == null) return@withContext cached(personId)
         val courses = rows("healthathon_medicine_courses",personId,"changed_at.desc,medicine_id.asc")
-        val events = rows("healthathon_medicine_events",personId,"logged_at.desc,id.asc")
+        val serverEvents = rows("healthathon_medicine_events",personId,"logged_at.desc,id.asc")
         readArray(courses) { require(it.getString("person_id")==personId) { "The returned medicine course belongs to a different care profile." } }
-        readArray(events) { require(it.getString("person_id")==personId) { "The returned intake report belongs to a different care profile." } }
+        readArray(serverEvents) { require(it.getString("person_id")==personId) { "The returned intake report belongs to a different care profile." } }
         identity()
+        // Reports still waiting to send stay visible until the server has them.
+        val events = CareSyncOps.overlayEvents(serverEvents, sync!!.pending(personId))
         snapshot(courses,events).also { check(prefs(personId).edit().putString("courses",courses.toString()).putString("events",events.toString()).commit()) { "Could not cache medicine history on this device." } }
     }
     suspend fun setPast(personId: String, item: CareItem, past: Boolean, reason: String, expectedRevision: Long = cached(personId).courses.firstOrNull {it.medicineId==item.id}?.revision ?: 0): MedicineHistorySnapshot = withContext(Dispatchers.IO) {
@@ -81,8 +84,13 @@ class MedicineHistoryRepo(context: Context, private val cloud: CareCloud?, priva
             .put("planned_at",event.plannedAt?.let(::medicineInstant) ?: JSONObject.NULL).put("reported_taken_at",event.reportedTakenAt?.let(::medicineInstant) ?: JSONObject.NULL)
             .put("reported_date",event.reportedDate.ifBlank { null } ?: JSONObject.NULL).put("reporter_label",event.reporter).put("note",event.note).put("source",event.source)
         if(cloud != null) {
-            cloud.request("POST","/rest/v1/rpc/healthathon_report_medicine",JSONObject().put("p_event",row),expectedAccountId=accountId)
-            return@withContext load(personId)
+            // Kept on the phone first and sent in order; the report id makes a repeated send return the first one.
+            val status = sync!!.submit(CareSyncOps.medicineEvent(personId, event.medicineId, row))
+            if(status == CareSyncStatus.SENT) try { return@withContext load(personId) } catch(e: Exception) { if(e is kotlinx.coroutines.CancellationException) throw e }
+            val p=prefs(personId)
+            val events=CareSyncOps.overlayEvents(JSONArray(p.getString("events","[]")), sync!!.pending(personId))
+            check(p.edit().putString("events",events.toString()).commit()) { "Could not save the intake report." }
+            return@withContext cached(personId)
         }
         row.put("logged_at",medicineInstant(event.loggedAt))
         val p=prefs(personId);val events=JSONArray(p.getString("events","[]"))

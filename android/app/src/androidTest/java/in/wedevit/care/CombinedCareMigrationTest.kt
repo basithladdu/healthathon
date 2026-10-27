@@ -96,7 +96,7 @@ class CombinedCareMigrationTest {
                 old.version = version
             }
             fun open() = Room.databaseBuilder(context, CareDatabase::class.java, filename)
-                .addMigrations(RevisionMigration,ReportsMigration, CombinedCareMigration3To6, CombinedCareMigration4To6,CombinedCareMigration5To6,CombinedCareMigration6To7).build()
+                .addMigrations(RevisionMigration,ReportsMigration, CombinedCareMigration3To6, CombinedCareMigration4To6,CombinedCareMigration5To6,CombinedCareMigration6To7,CareSyncMigration7To8).build()
             var db = open()
             try {
                 assertEquals(person, db.care().people().first().single())
