@@ -44,7 +44,7 @@ class DoctorWorkflowStore(context: Context, private val now: () -> Long = { Syst
     @Synchronized fun loadMockDraft(patientId: String): String? {
         if (patientId !in DoctorWorkflowData.patientIds) return "Patient not found."
         val previous = draft(patientId)
-        if (DoctorWorkflowData.hasDraftContent(previous)) return "Save your current work separately before loading an AI draft. Existing work was not replaced."
+        if (DoctorWorkflowData.hasDraftContent(previous)) return "Save your current work separately before loading the sample draft. Existing work was not replaced."
         return saveDraft(DoctorWorkflowData.mockDraft(patientId, now()).copy(checklist = previous.checklist.toList()))
     }
     @Synchronized fun importTranscript(patientId: String, text: String, provider: String, model: String, clipId: String, consentAt: Long, expectedSourceText: String): String? {

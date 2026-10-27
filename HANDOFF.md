@@ -232,7 +232,7 @@ Also read:
 | B10 | Add one outcome field: "consensus reached among patient and family" yes/no | Awaiz (after team OK) |
 | B11 | Mark each note as a "general discussion" or a "decision recorded" (the doctor picks; AI later) | Awaiz (after team OK) |
 | B17 | Run 20 simulated conversations with different people and note the results | Team + owner |
-| B18 | Check that doctor search by patient ID works with real accounts | Awaiz |
+| B18 | ~~Check that doctor search by patient ID works with real accounts~~ done, 33ac1f5 (doctor lane; search runs over the doctor's real connected patients; not tried with live accounts on a phone) | Awaiz |
 | B1 | Screening tool to flag patients: hold, it borders on clinical judgement | Team decides |
 | A22 | Teaching cards on holding the conversation: after the hackathon | Team |
 
@@ -309,3 +309,4 @@ Sources: `docs/research/CARE_DEEP_DIVE_2026-10-27.md`, `CARE_VS_SAHARA_FOR_TEAM.
 
 ### Lane notes (27 Oct)
 - **Polish lane:** an up/down swipe over the pain-strength bar (3D pain body) or the check-in / feedback slider now scrolls the page and never changes the score; only a tap or a deliberate sideways drag sets it (`SaharaSliderTouch.kt`, unit-tested in `SliderTouchPolicyTest`). TalkBack and keyboard still adjust the slider. A second tap on an already-saved check-in no longer adds a second entry, and the "please wait" message now says a change is still saving. In the doctor's embedded Daily care, the "Symptom tracker" button did nothing; it now opens the symptom diary. Not tried on a phone (no device or emulator); the swipe androidTest compiles but has not run.
+- **Doctor lane (33ac1f5):** the signed-in doctor Home now shows real upcoming visits and this week's check-ins across the doctor's connected patients (tap opens that patient's Visits or Progress), with a Refresh; Schedule lists every open real visit; Patients has search by name or patient ID (`SH-` + first 8 characters of the care-profile ID, or the full ID; B18) and a Join box for a doctor invitation code. The family's doctor-invite screen shows the patient ID. A verification card shows pending / approved / not approved with "Check again" (approval stays manual in the database, G1). Sample patients appear only in a card labelled "Walkthrough · sample patients"; the old synthetic server workspace no longer loads on entry. Logic unit-tested in `DoctorConnectedHomeTest`. Not tried on a phone.
