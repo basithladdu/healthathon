@@ -24,7 +24,7 @@ import javax.crypto.spec.GCMParameterSpec
 data class CareSession(val userId: String, val email: String, val access: String, val refresh: String, val expires: Long)
 data class CareMember(val userId: String, val canEdit: Boolean, val email: String, val careTeamRead: Boolean = false, val careTeamPermissionKnown: Boolean = false)
 data class CloudRecords(val people: List<Person>, val entries: List<CareItem>, val notes: List<CareVersion>, val confirmations: List<Acknowledgement>, val editable: Set<String>, val owned: Set<String>, val verifiedReviews: Set<String> = emptySet(), val authenticatedConfirmations: Set<String> = emptySet())
-private class CareHttpException(val status: Int, message: String) : IllegalArgumentException(message)
+internal class CareHttpException(val status: Int, message: String) : IllegalArgumentException(message)
 
 internal fun decodeAcknowledgement(row: JSONObject): Acknowledgement {
     val data = row.getJSONObject("data")
