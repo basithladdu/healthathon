@@ -212,7 +212,7 @@ Also read:
 | H13 | Record a narrated screen demo of the app (walkthrough: conversation → note → family confirms) | Owner + Awaiz |
 | A20, A21 | Choose 2–3 measurable KPIs and a baseline (documented conversations, retrieval time, family stress/money/time), and put them on the evaluation slide | Team + owner |
 | — | Test 0.6 on a real phone: the full checklist is in `CLAUDE_TRANSCRIPT.md` §3 ("Test on a real phone") | Awaiz |
-| — | Strength-bar swipe: check after the polish lane lands | Awaiz |
+| — | ~~Strength-bar swipe~~ done in the polish lane (see lane notes below); still check on a real phone | Awaiz |
 | F5 | Next Play upload must use versionCode 9 or higher; don't touch 0.6.0 (7) while it is in review | Owner |
 | I3 | Clinicians send the approved goals-of-care note format and conversation structure | Team |
 | E2, E3 | Shirin and Sujay choose the symptom list and a scale per symptom (see the symptom brief) | Team |
@@ -289,3 +289,6 @@ Also read:
 | I7 | Write up the 20 Oct mentor-meeting minutes (dummy data, refine the goals algorithm, KPIs) | Owner |
 | I9 | TANUH pitch draft: keep or drop | Owner |
 | I10 | Find or recreate `Technical thoughts and questions.docx` | Team (Sujay) |
+
+### Lane notes (27 Oct)
+- **Polish lane:** an up/down swipe over the pain-strength bar (3D pain body) or the check-in / feedback slider now scrolls the page and never changes the score; only a tap or a deliberate sideways drag sets it (`SaharaSliderTouch.kt`, unit-tested in `SliderTouchPolicyTest`). TalkBack and keyboard still adjust the slider. A second tap on an already-saved check-in no longer adds a second entry, and the "please wait" message now says a change is still saving. In the doctor's embedded Daily care, the "Symptom tracker" button did nothing; it now opens the symptom diary. Not tried on a phone (no device or emulator); the swipe androidTest compiles but has not run.

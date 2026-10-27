@@ -168,7 +168,7 @@ fun EmbeddedPatientCare(
                     if (!canEdit) Text("Read-only access · changes need the patient's permission", style = MaterialTheme.typography.bodySmall, modifier = Modifier.testTag("embedded-read-only"))
                 }
             }
-            if (tool.isNotEmpty() && tool !in listOf("scanner", "feedback", "reminders")) Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+            if (tool.isNotEmpty() && tool !in listOf("scanner", "feedback", "reminders", "symptoms")) Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                 TextButton(onClick = ::leaveTool, enabled = !navigating, modifier = Modifier.heightIn(min = 48.dp).testTag("embedded-care-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null); Spacer(Modifier.width(6.dp)); Text("Back to ${if (section == "Tools") "tools" else "patient care"}") }
             }
             Box(Modifier.weight(1f).fillMaxWidth()) {
@@ -176,7 +176,8 @@ fun EmbeddedPatientCare(
                 else key(account, personId, section, tool) { screens.SaveableStateProvider("$account:$personId:$section:$tool") {
                     when (tool) {
                         "scanner" -> if (canEdit) MedicineScanner(vm, onClose = { tool = "" }, onAccount = onAccount) else Text("Editing access is no longer available.", Modifier.padding(20.dp))
-                        "daily" -> CareList(vm, ::add, { openTool("scanner") }, { openTool("calendar") }, { openTool("workflows") }, { openTool("labs") }, onReadNote = ::read)
+                        "daily" -> CareList(vm, ::add, { openTool("scanner") }, { openTool("calendar") }, { openTool("workflows") }, { openTool("labs") }, onReadNote = ::read, onSymptoms = { openTool("symptoms") })
+                        "symptoms" -> CareSymptomDiary(vm, onBack = ::leaveTool) // has its own back arrow, so no extra "Back to" row
                         "calendar" -> CareCalendar(vm, onWorkflow = { openTool("workflows") }, onAddDoctorVisit = { add("doctor-visit") })
                         "workflows" -> CareWorkflows(vm, onTalk = { changeSection("Conversations") })
                         "labs" -> CareLabs(vm)

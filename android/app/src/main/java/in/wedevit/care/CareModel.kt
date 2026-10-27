@@ -789,7 +789,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
     }
     private fun action(block: suspend () -> Unit) {
         // A background refresh (for example on returning to the app) no longer turns a save away: the save waits for it, then runs.
-        if (busy.value) { message.value = "Please wait for your records to finish loading."; return }
+        if (busy.value) { message.value = "Still working on your last change. Please wait a moment."; return } // busy is only set by another action (a save, delete or import), e.g. after a double tap
         actionError.value = null
         busy.value = true
         viewModelScope.launch {

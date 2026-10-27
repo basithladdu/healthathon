@@ -41,6 +41,16 @@ class FeedbackUiTest {
         ui.runOnIdle { assertTrue(closed) }
     }
 
+    @Test fun upDownSwipeOverTheSliderScrollsWithoutChangingTheScore() = isolated { _, scope ->
+        ui.setContent { CareTheme { FeedbackScreen(scope, "test", onClose = {}) } }
+        ui.onNodeWithTag("feedback-slider").performScrollTo()
+        ui.onNodeWithTag("feedback-state").assertTextEquals("Okay")
+        ui.onNodeWithTag("feedback-slider").performTouchInput { swipeUp(startY = centerY, endY = centerY - 300f) }
+        ui.onNodeWithTag("feedback-state").assertTextEquals("Okay")
+        ui.onNodeWithTag("feedback-slider").performScrollTo().performTouchInput { swipeRight(startX = centerX, endX = right) }
+        ui.onNodeWithTag("feedback-state").assertTextEquals("Good")
+    }
+
     @Test fun unsavedBackOffersKeepEditingOrLeaveWithoutSaving() = isolated { context, scope ->
         var closed = false
         ui.setContent { CareTheme { FeedbackScreen(scope, "test", onClose = { closed = true }) } }
