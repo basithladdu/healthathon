@@ -853,22 +853,49 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
     var search by rememberSaveable { mutableStateOf("") }; var service by rememberSaveable { mutableStateOf("All") }; var morphine by rememberSaveable { mutableStateOf(false) }
     var view by rememberSaveable { mutableStateOf("Map & list") }
     var state by rememberSaveable { mutableStateOf("All India") }
+    var district by rememberSaveable { mutableStateOf("") }
     var chosen by remember { mutableStateOf<Centre?>(null) }
     val focus = LocalFocusManager.current
     val states = remember(centres) { centres.map { it.state }.filter(String::isNotBlank).distinct().sorted() }
     // Build each centre's search text once, not for all 1,600 centres on every typed letter.
     val searchText = remember(centres) { centres.map { c -> "${c.name} ${c.city} ${c.district} ${c.address} ${c.state}" } }
-    val visible = remember(centres, search, service, morphine, state) { centres.filterIndexed { index, c ->
-        searchText[index].contains(search.trim(), true) &&
-            (state == "All India" || c.state == state) && (service == "All" || c.services.contains(service, ignoreCase = true)) && (!morphine || c.sourceListedMorphine == "available")
-    } }
+    val districts = remember(centres, state) { NearbyHelp.districts(centres, state) }
+    val visible = remember(centres, search, service, morphine, state, district) { NearbyHelp.visible(centres, searchText, search, state, district, service, morphine) }
+    val context = LocalContext.current
     LazyColumn(Modifier.fillMaxSize().testTag("nearby-list"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
         item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Column(Modifier.weight(1f)) { Heading("Find care"); Text("$state · ${visible.size} ${if (visible.size == 1) "centre" else "centres"}", color = Rust) }
+            Column(Modifier.weight(1f)) { Heading("Find care"); Text("${listOf(state, district).filter(String::isNotBlank).joinToString(" · ")} · ${visible.size} ${if (visible.size == 1) "centre" else "centres"}", color = Rust) }
         } }
+        item { SurfaceCard(Peach) {
+            Text("Emergency · आपातकाल", fontWeight = FontWeight.SemiBold, fontSize = 19.sp, modifier = Modifier.testTag("nearby-emergency"))
+            Text("Tap a number to open your phone dialler. · नंबर दबाएँ, फ़ोन का डायलर खुलेगा।", style = MaterialTheme.typography.bodySmall)
+            NearbyHelp.emergency.forEach { e ->
+                Spacer(Modifier.height(8.dp))
+                Button(onClick = { open(context, Intent(Intent.ACTION_DIAL, Uri.parse(NearbyHelp.dialUri(e.number)))) }, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = Paper, contentColor = Ink),
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("emergency-${e.number}")) {
+                    Icon(Icons.Default.Call, null, Modifier.size(20.dp), tint = Rust); Spacer(Modifier.width(10.dp))
+                    Text(e.number, fontWeight = FontWeight.Bold, fontSize = 20.sp, modifier = Modifier.widthIn(min = 64.dp)); Spacer(Modifier.width(8.dp))
+                    Column(Modifier.weight(1f)) {
+                        Text(e.label, fontWeight = FontWeight.SemiBold); Text(e.labelHindi, style = MaterialTheme.typography.bodySmall)
+                        if (e.note.isNotBlank()) Text("${e.note} · ${e.noteHindi}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
+            }
+            Spacer(Modifier.height(8.dp))
+            // The maps app searches near the phone using its own location setting; this app does not read location.
+            OutlinedButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse("geo:0,0?q=" + Uri.encode("hospital")))) }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("nearby-hospitals-map")) {
+                Icon(Icons.Default.LocalHospital, null, Modifier.size(20.dp)); Spacer(Modifier.width(8.dp)); Text("Hospitals near you on the map · पास के अस्पताल")
+            }
+            Text("Opens your maps app, which uses its own location setting. · आपका मैप ऐप खुलेगा।", style = MaterialTheme.typography.bodySmall)
+        } }
+        item { Column { Text("Nearest centres · पास के केंद्र", fontWeight = FontWeight.SemiBold, fontSize = 19.sp); Text("Choose your state, then district if listed. · अपना राज्य चुनें, फिर ज़िला।", style = MaterialTheme.typography.bodySmall) } }
         item { OutlinedTextField(value = search, onValueChange = { search = it }, placeholder = { Text("Place or hospital") }, leadingIcon = { Icon(Icons.Default.Search, null) }, trailingIcon = { if (search.isNotEmpty()) IconButton(onClick = { search = "" }) { Icon(Icons.Default.Close, "Clear search") } }, shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth(), singleLine = true,
             keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(imeAction = androidx.compose.ui.text.input.ImeAction.Search), keyboardActions = androidx.compose.foundation.text.KeyboardActions(onSearch = { focus.clearFocus() })) }
-        item { Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) { (listOf("All India") + states).forEach { option -> FilterChip(selected = state == option, onClick = { state = option }, label = { Text(option) }, modifier = Modifier.heightIn(min = 48.dp)) } } }
+        item { Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) { (listOf("All India") + states).forEach { option -> FilterChip(selected = state == option, onClick = { if (state != option) district = ""; state = option }, label = { Text(option) }, modifier = Modifier.heightIn(min = 48.dp)) } } }
+        if (districts.isNotEmpty()) item { Column {
+            Text("District · ज़िला", style = MaterialTheme.typography.labelMedium)
+            Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).testTag("nearby-districts"), horizontalArrangement = Arrangement.spacedBy(8.dp)) { (listOf("") + districts).forEach { option -> FilterChip(selected = district == option, onClick = { district = option }, label = { Text(option.ifBlank { "All districts" }) }, modifier = Modifier.heightIn(min = 48.dp)) } }
+        } }
         item { Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf("All", "Home care", "Clinic visits", "Inpatient care").forEach { s -> FilterChip(selected = service == s, onClick = { service = s }, label = { Text(s) }, modifier = Modifier.heightIn(min = 48.dp)) } } }
         item { FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf("Map & list", "List").forEach { option -> FilterChip(selected = view == option, onClick = { view = option }, label = { Text(option) }, modifier = Modifier.heightIn(min = 48.dp)) }
@@ -880,7 +907,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
             else Text("Use the published addresses and Directions below. This source has no exact map locations for this filter.", style = MaterialTheme.typography.bodySmall)
             if (located < visible.size) Text("$located mapped · ${visible.size - located} addresses in the list", style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 6.dp))
         }
-        if (visible.isEmpty()) item { SurfaceCard { Text("No centres match that search."); TextButton(onClick = { search = ""; service = "All"; state = "All India"; morphine = false }) { Text("Clear filters") } } }
+        if (visible.isEmpty()) item { SurfaceCard { Text("No centres match that search."); TextButton(onClick = { search = ""; service = "All"; state = "All India"; district = ""; morphine = false }) { Text("Clear filters") } } }
         items(visible, key = { it.id }) { c -> CentreCard(c) }
     }
     chosen?.let { centre -> ModalBottomSheet(onDismissRequest = { chosen = null }, containerColor = Cream) {
