@@ -17,7 +17,7 @@ export default function PrivacyPage() {
           <Link href="/delete-account">Delete your account</Link>
         </header>
         <h1>Your care information</h1>
-        <p className={styles.date}>Privacy policy · Updated 24 October 2026</p>
+        <p className={styles.date}>Privacy policy · Updated 27 October 2026</p>
         <p>
           Sahara — A Palliative Care Companion is provided by WEDEVIT PRIVATE LIMITED.
           This policy covers the Sahara Android app, its website workspaces and the
@@ -197,8 +197,10 @@ export default function PrivacyPage() {
           </p>
           <p>
             The voluntary <Link href="/hospital-survery">hospital survey</Link>
-            collects your professional name, role, registering council, registration
-            number and state, plus optional professional email. The current form
+            requires only a hospital name and your consent. You may optionally share
+            your professional name, role, registering council, registration number and
+            state, plus a professional email. Incomplete or imperfectly formatted
+            details are retained for review, rather than treated as verified. The current form
             does not request a mobile number. These
             professional and contact details are stored separately from hospital-service
             information and are not for public display. Optional contacts are used to
@@ -208,9 +210,10 @@ export default function PrivacyPage() {
           </p>
           <p>
             Hospital-service information includes the hospital name and address, institution type,
-            your connection to it, state, city, confirmed hospital map pin, optional names
+            your connection to it, state, city, an optional confirmed hospital map pin, names
             and departments of palliative-care physicians, palliative-care
-            services, morphine availability and any optional note for families. The pin
+            services, morphine availability and any note for families. All details
+            beyond the hospital name are optional. An unchecked map pin is not saved. The pin
             is a place you select, not your current GPS location. Submissions remain
             pending review, including any named doctors; they do not automatically create a public listing or a
             verified professional profile. Reviewed hospital-service information may be

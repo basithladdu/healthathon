@@ -2,7 +2,7 @@
 export const INDIA_STATES = ['Andaman and Nicobar Islands','Andhra Pradesh','Arunachal Pradesh','Assam','Bihar','Chandigarh','Chhattisgarh','Dadra and Nagar Haveli and Daman and Diu','Delhi','Goa','Gujarat','Haryana','Himachal Pradesh','Jammu and Kashmir','Jharkhand','Karnataka','Kerala','Ladakh','Lakshadweep','Madhya Pradesh','Maharashtra','Manipur','Meghalaya','Mizoram','Nagaland','Odisha','Puducherry','Punjab','Rajasthan','Sikkim','Tamil Nadu','Telangana','Tripura','Uttar Pradesh','Uttarakhand','West Bengal'] as const;
 export const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 export const MAX_BODY = 12_000;
-export type FeedbackPayload = Record<string, string | number | boolean | string[]> & { kind: 'app' | 'hospital'; submissionId: string };
+export type FeedbackPayload = Record<string, string | number | boolean | string[] | null> & { kind: 'app' | 'hospital'; submissionId: string };
 export type Validation = { value: FeedbackPayload; error?: never } | { error: string; value?: never };
 const appKeys = ['kind','submissionId','website','rating','role','category','message','consent'];
 const hospitalKeys = ['kind','submissionId','website','role','roleOther','fullName','council','councilOther','registrationState','registrationNumber','hospitalName','institutionType','institutionOther','connection','connectionOther','state','city','latitude','longitude','services','morphine','supply','familyNotes','accuracy','consent'];
@@ -25,16 +25,37 @@ export function normalizeEmail(input: unknown): string | null {
 }
 const choice = (value: unknown, values: readonly string[]) => typeof value === 'string' && values.includes(value);
 const text = (value: unknown, min: number, max: number) => typeof value === 'string' && value.trim().length >= min && value.trim().length <= max && !/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/.test(value);
+function forgivingHospitalError(data: Record<string, unknown>): string | null {
+  if (data.formVersion !== 'hospital-survey-v4' || data.mobile !== '') return 'Reload the hospital survey and try again.';
+  if (!text(data.hospitalName,1,160)) return 'Enter the hospital name.';
+  if (!choice(data.role,['','oncologist','palliative_physician','physician','resident','nurse','pharmacist','other']) || !choice(data.council,['','nmc','state_medical','state_nursing','state_pharmacy','other']) || !choice(data.institutionType,['','government_hospital','government_medical_college','private_hospital','private_medical_college','private_clinic','ngo_hospice','other']) || !choice(data.connection,['','works_here','refers_here','other']) || !choice(data.state,['',...INDIA_STATES]) || !choice(data.registrationState,['',...INDIA_STATES])) return 'Check the selected survey options, or leave them blank.';
+  for (const [selected, extra] of [['role','roleOther'],['council','councilOther'],['institutionType','institutionOther'],['connection','connectionOther']]) {
+    if (!text(data[extra],0,120) || (data[selected] !== 'other' && data[extra] !== '')) return 'Keep Other details within 120 characters and only where selected.';
+  }
+  for (const [key,max] of [['fullName',120],['registrationNumber',120],['email',254],['hospitalAddress',500],['city',80],['palliativePhysicians',1000],['familyNotes',1000]] as const) {
+    if (!text(data[key],0,max)) return `Keep ${key === 'email' ? 'the email' : 'each answer'} within the field limit and use ordinary text.`;
+  }
+  if (typeof data.locationConfirmed !== 'boolean' || (data.locationConfirmed
+    ? typeof data.latitude !== 'number' || !Number.isFinite(data.latitude) || data.latitude < 6 || data.latitude > 38 || typeof data.longitude !== 'number' || !Number.isFinite(data.longitude) || data.longitude < 68 || data.longitude > 98
+    : data.latitude !== null || data.longitude !== null)) return 'Confirm the hospital pin, or leave the map blank.';
+  if (!Array.isArray(data.services) || data.services.length > 3 || new Set(data.services).size !== data.services.length || data.services.some(v => !choice(v,['opd','ipd','home','none','unknown'])) || (data.services.some(v => v === 'none' || v === 'unknown') && data.services.length !== 1)) return 'Choose services; None or Don’t know must stand alone.';
+  if (!choice(data.morphine,['','yes','no','unknown']) || (data.morphine === 'yes' ? !choice(data.supply,['','regular','intermittent','unknown']) : data.supply !== '') || typeof data.accuracy !== 'boolean') return 'Check the selected availability options, or leave them blank.';
+  return null;
+}
 export function validateFeedback(input: unknown): Validation {
   if (!input || typeof input !== 'object' || Array.isArray(input)) return { error: 'Send a valid form.' };
   const data = input as Record<string, unknown>;
   const contacts = data.kind === 'hospital' && ('mobile' in data || 'email' in data);
   const confirmedLocation = data.kind === 'hospital' && hospitalLocationKeys.some(key => key in data);
-  const keys = data.kind === 'app' ? appKeys : data.kind === 'hospital' ? [...hospitalKeys,...(contacts ? ['mobile','email'] : []),...(confirmedLocation ? hospitalLocationKeys : [])] : [];
+  const forgivingHospital = data.kind === 'hospital' && 'formVersion' in data;
+  const keys = data.kind === 'app' ? appKeys : data.kind === 'hospital' ? forgivingHospital ? [...hospitalKeys,'mobile','email',...hospitalLocationKeys,'formVersion'] : [...hospitalKeys,...(contacts ? ['mobile','email'] : []),...(confirmedLocation ? hospitalLocationKeys : [])] : [];
   if (!keys.length || Object.keys(data).length !== keys.length || Object.keys(data).some(key => !keys.includes(key))) return { error: 'Send only the form fields shown.' };
   if (typeof data.submissionId !== 'string' || !UUID.test(data.submissionId) || data.website !== '' || data.consent !== true) return { error: 'Check the consent and reload the form if needed.' };
   if (data.kind === 'app') {
     if (!Number.isInteger(data.rating) || Number(data.rating) < 1 || Number(data.rating) > 5 || !choice(data.role, ['patient','caregiver','clinician','other']) || !choice(data.category, ['navigation','design','bug','idea','other']) || !text(data.message, 0, 1000)) return { error: 'Check your rating, role and feedback.' };
+  } else if (forgivingHospital) {
+    const error = forgivingHospitalError(data);
+    if (error) return { error };
   } else {
     if (confirmedLocation && (!contacts || data.mobile !== '' || !text(data.hospitalAddress,5,500) || !text(data.palliativePhysicians,0,1000) || data.locationConfirmed !== true)) return { error: 'Enter the hospital address and confirm its pin on the map. Doctor names and departments are optional.' };
     if (contacts && (normalizeMobile(data.mobile) === null || normalizeEmail(data.email) === null)) return { error: 'Check your optional mobile number and email, or leave them blank.' };
@@ -52,7 +73,7 @@ export function validateFeedback(input: unknown): Validation {
   for (const key of keys) value[key] = typeof data[key] === 'string' ? (data[key] as string).trim() : key === 'services' ? [...data.services as string[]].sort() : data[key];
   value.submissionId = (value.submissionId as string).toLowerCase();
   // Do not synthesize new keys for old clients: their receipt hashes must not change.
-  if (contacts) { value.mobile = normalizeMobile(data.mobile); value.email = normalizeEmail(data.email); }
+  if (contacts && !forgivingHospital) { value.mobile = normalizeMobile(data.mobile); value.email = normalizeEmail(data.email); }
   return { value: value as FeedbackPayload };
 }
 export async function readFeedbackBody(request: Request): Promise<unknown> {
