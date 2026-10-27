@@ -95,6 +95,8 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
     val authenticatedConfirmationIds = MutableStateFlow<Set<String>>(emptySet())
     private val editable = MutableStateFlow<Set<String>>(emptySet())
     private val owned = MutableStateFlow<Set<String>>(emptySet())
+    /** Server access for a shared person, as loaded at the last refresh. */
+    fun canEditPerson(id: String) = cloud == null || id in editable.value
     val canEdit = combine(selected, editable) { id, ids -> cloud == null || id in ids }.stateIn(viewModelScope, SharingStarted.Eagerly, cloud == null)
     val isOwner = combine(selected, owned) { id, ids -> cloud == null || id in ids }.stateIn(viewModelScope, SharingStarted.Eagerly, cloud == null)
     init { // The role is computed, never chosen from a menu: owner (or on-device profile) = Patient, invited member = Family. Older installs may hold a stored Doctor preference; drop it.
@@ -584,6 +586,14 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
         }
         dao.removeReport(report); message.value = "Report removed"; done()
         CareDocumentReviewStore(getApplication(), storageNamespace).remove(report)
+    }
+    /** After the server account is deleted: removes this account's copy on the phone (records, recordings, report files). */
+    suspend fun forgetLocalAccountData() = withContext(Dispatchers.IO) {
+        check(cloud != null && !demoMode)
+        val ids = dao.people().first().map { it.id }
+        lock.withLock { db.clearAllTables() }
+        audioRoot().deleteRecursively()
+        ids.forEach { reportFiles.removePerson(it) }
     }
     fun removePerson(done: () -> Unit) {
         val id = selected.value

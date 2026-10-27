@@ -62,6 +62,8 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
     val pending by root.pendingJoin.collectAsStateWithLifecycle()
     val linkNotice by root.linkNotice.collectAsStateWithLifecycle()
     val session by cloud.session.collectAsStateWithLifecycle()
+    // Survives the account switch that follows deleting an account, so the guest screen can say what happened.
+    var accountNotice by rememberSaveable { mutableStateOf<String?>(null) }
     LaunchedEffect(session?.userId) {
         if (session != null && doctorEntryPending) { doctorOpen = true; doctorEntryPending = false }
         if (session == null) doctorOpen = false
@@ -78,6 +80,7 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
         LaunchedEffect(linkNotice) { linkNotice?.let { model.message.value = it; root.linkNotice.value = null } }
         val rootLanguage = rememberCareLanguage(model.accountNamespace)
         val rt = { en: String, hi: String -> if (rootLanguage.hindi) hi else en }
+        LaunchedEffect(accountNotice) { if (session == null) accountNotice?.let { model.message.value = it; accountNotice = null } }
         val joinBanner = pending?.let { rt("Sign in or create an account to join ${it.possessive} care", "${it.name.ifBlank { "इस व्यक्ति" }} की देखभाल से जुड़ने के लिए साइन इन करें या खाता बनाएँ") }
         val mode = when { patientWalkthroughUser != null -> "patient-walkthrough"; demoOpen -> "doctor-walkthrough"; doctorOpen && session != null -> "doctor"; else -> "care" }
         // Entering a walkthrough or workspace moves forward; leaving it moves back to the welcome/care app.
@@ -92,9 +95,9 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
             else { walkthroughPatient = null; demoOpen = true }
         }, onPatientWalkthrough = { if (model.recording.value) model.message.value = rt("Stop the recording before opening the walkthrough.", "डेमो खोलने से पहले रिकॉर्डिंग रोकें।") else patientWalkthroughUser = it },
             onDoctorWorkspace = { doctorEntryPending = true; if (session != null) { doctorOpen = true; doctorEntryPending = false } else accountOpen = true },
-            welcomeAccountContent = { close, onBusy -> AccountContent(cloud, model, close, onBusyChange = onBusy, banner = joinBanner) },
+            welcomeAccountContent = { close, onBusy -> AccountContent(cloud, model, close, onBusyChange = onBusy, banner = joinBanner, onInvite = root::offerInviteLink, onDeleted = { accountNotice = it }) },
             welcomeDoctorContent = { close, onBusy ->
-                if (session == null) AccountContent(cloud, model, close, heading = rt("Doctor sign in", "डॉक्टर साइन इन"), onBusyChange = onBusy)
+                if (session == null) AccountContent(cloud, model, close, heading = rt("Doctor sign in", "डॉक्टर साइन इन"), onBusyChange = onBusy, onDeleted = { accountNotice = it })
                 else Column(Modifier.padding(22.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
                     Heading(rt("Your doctor workspace", "आपका डॉक्टर कार्यक्षेत्र"), 26)
                     Text(session!!.email)
@@ -105,7 +108,7 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
         } }
         }
         CompositionLocalProvider(LocalCareLanguage provides rootLanguage) {
-        if (accountOpen) AccountSheet(cloud, model, onDismiss = { accountOpen = false; if (cloud.session.value == null) doctorEntryPending = false }, banner = joinBanner)
+        if (accountOpen) AccountSheet(cloud, model, onDismiss = { accountOpen = false; if (cloud.session.value == null) doctorEntryPending = false }, banner = joinBanner, onInvite = root::offerInviteLink, onDeleted = { accountNotice = it; accountOpen = false })
         val joinSession = session
         if (joinSession != null && pending != null) PendingJoinDialog(cloud, model, pending!!, joinSession.email, onClear = root::clearPendingJoin)
         }
@@ -135,15 +138,18 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
     }
 }
 
-@Composable fun AccountSheet(cloud: CareCloud, vm: CareModel, onDismiss: () -> Unit, banner: String? = null) {
+@Composable fun AccountSheet(cloud: CareCloud, vm: CareModel, onDismiss: () -> Unit, banner: String? = null, onInvite: ((String) -> Unit)? = null, onDeleted: (String) -> Unit = {}) {
     var busy by remember { mutableStateOf(false) }
     ModalBottomSheet(onDismissRequest = { if (!busy) onDismiss() }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
-        AccountContent(cloud, vm, onDismiss, onBusyChange = { busy = it }, banner = banner)
+        AccountContent(cloud, vm, onDismiss, onBusyChange = { busy = it }, banner = banner, onInvite = onInvite, onDeleted = onDeleted)
     }
 }
 
 /** The same genuine account form, reusable inside the welcome panel. */
-@Composable fun AccountContent(cloud: CareCloud, vm: CareModel, onDismiss: () -> Unit, heading: String? = null, onBusyChange: (Boolean) -> Unit = {}, banner: String? = null) {
+private fun clipboardText(context: android.content.Context): String? = (context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as? android.content.ClipboardManager)?.primaryClip?.takeIf { it.itemCount > 0 }?.getItemAt(0)?.coerceToText(context)?.toString()
+
+/** [onInvite] keeps a pasted invitation while signed out (it is offered after sign-in). [onDeleted] receives the message to show once the account is gone. */
+@Composable fun AccountContent(cloud: CareCloud, vm: CareModel, onDismiss: () -> Unit, heading: String? = null, onBusyChange: (Boolean) -> Unit = {}, banner: String? = null, onInvite: ((String) -> Unit)? = null, onDeleted: (String) -> Unit = {}) {
     val session by cloud.session.collectAsStateWithLifecycle()
     val people by vm.people.collectAsStateWithLifecycle()
     val selected by vm.selected.collectAsStateWithLifecycle()
@@ -175,7 +181,14 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
     val inviteStore = remember { careInviteStore(context) }
     var removing by remember { mutableStateOf<CareMember?>(null) }
     var signingOut by remember { mutableStateOf(false) }
-    val t = careText(); val careHindiNow = careHindi()
+    var deleting by remember { mutableStateOf(false) }
+    var deleteUnderstood by remember { mutableStateOf(false) }
+    var deletionByEmail by remember { mutableStateOf(false) }
+    var awaitingConfirmation by rememberSaveable { mutableStateOf("") }
+    var openInvites by remember(selected) { mutableStateOf<List<CareOpenInvite>?>(null) }
+    var memberDetails by remember(selected) { mutableStateOf<List<CareMemberDetail>?>(null) }
+    val canEditShared by vm.canEdit.collectAsStateWithLifecycle()
+    val t = careText(); val hindi = careHindi()
     SideEffect { onBusyChange(busy) }
     fun run(action: suspend () -> Unit) {
         if (busy) return
@@ -185,16 +198,29 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
             finally { busy = false }
         }
     }
-    LaunchedEffect(selected, members, membersLoaded, inviteTick, session?.userId) {
+    // Invitation status and the people list both come from the server; this phone only remembers name and relationship.
+    LaunchedEffect(selected, inviteTick, session?.userId) {
         val acct = session?.userId ?: return@LaunchedEffect; val now = System.currentTimeMillis()
-        val all = inviteStore.all(acct)
-        val next = if (membersLoaded) CareInviteLog.reconcile(all, selected, members.size, now).also { if (it != all) inviteStore.save(acct, it) } else all
-        invites = next.filter { it.person == selected }.sortedByDescending { it.createdAt }
+        val all = inviteStore.all(acct); val kept = CareInviteLog.prune(all, now); if (kept != all) inviteStore.save(acct, kept)
+        invites = kept.filter { it.person == selected }.sortedByDescending { it.createdAt }
     }
-    LaunchedEffect(selected, owner) {
-        if (session != null && owner && selected.isNotBlank()) try { members = cloud.members(selected); membersLoaded = true }
+    suspend fun loadSharing(person: String) {
+        val nextMembers = cloud.members(person); val nextOpen = cloud.openInvites(person); val nextDetails = cloud.memberDetails(person)
+        if (vm.selected.value != person) return
+        members = nextMembers; openInvites = nextOpen; memberDetails = nextDetails; membersLoaded = true
+    }
+    LaunchedEffect(selected, owner, inviteTick) {
+        if (session != null && owner && selected.isNotBlank()) try { loadSharing(selected) }
         catch (e: Exception) { if (e is CancellationException) throw e; error = t("Couldn't load the people you've invited.", "आपके बुलाए लोगों की सूची नहीं खुल सकी।") }
     }
+    fun authRun(action: suspend () -> Unit) = run {
+        try { action() } catch (e: Exception) {
+            if (e is CancellationException) throw e
+            if (careAuthProblem(e.message) == CareAuthProblem.NOT_CONFIRMED) awaitingConfirmation = email.trim()
+            throw IllegalArgumentException(careAuthMessage(e.message, hindi), e)
+        }
+    }
+    fun day(ms: Long) = java.time.Instant.ofEpochMilli(ms).atZone(java.time.ZoneId.systemDefault()).format(careDateFormat("d MMM", hindi))
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(horizontal = 22.dp).padding(bottom = 30.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
             Heading(heading ?: if (session == null) if (create) t("Create an account", "खाता बनाएँ") else t("Sign in", "साइन इन करें") else t("Your account", "आपका खाता"), 28)
             banner?.let { Surface(color = Mint, shape = RoundedCornerShape(14.dp)) { Text(it, Modifier.fillMaxWidth().padding(14.dp), fontWeight = FontWeight.Medium) } }
@@ -203,25 +229,32 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
                 OutlinedTextField(email, { email = it }, label = { Text(t("Email", "ईमेल")) }, singleLine = true, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email), modifier = Modifier.fillMaxWidth())
                 OutlinedTextField(password, { password = it }, label = { Text(t("Password", "पासवर्ड")) }, singleLine = true, visualTransformation = PasswordVisualTransformation(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password), modifier = Modifier.fillMaxWidth())
                 if (create) Text(t("Use at least 10 characters.", "कम से कम 10 अक्षर रखें।"), style = MaterialTheme.typography.bodySmall)
-                Button(onClick = { run {
-                    if (create) { if (!cloud.signUp(email, password)) { notice = t("Check your email to confirm your account, then sign in.", "खाता पक्का करने के लिए अपना ईमेल देखें, फिर साइन इन करें।"); create = false; password = "" } }
-                    else cloud.signIn(email, password)
+                Button(onClick = { authRun {
+                    if (create) when (cloud.signUp(email, password)) {
+                        CareSignUp.SIGNED_IN -> password = ""
+                        CareSignUp.CONFIRMATION_SENT -> { awaitingConfirmation = email.trim(); create = false; password = ""; notice = t("Account created. The server was asked to email a confirmation link to ${email.trim()}. Open that link on this phone, then sign in here. Check spam too. If nothing arrives in 10 minutes, tap Resend confirmation email; if it still doesn't come, Sahara's email setup isn't finished yet. Write to workwithdevit@gmail.com.", "खाता बन गया। सर्वर से ${email.trim()} पर पुष्टि का लिंक भेजने को कहा गया है। वह लिंक इसी फ़ोन पर खोलें, फिर यहाँ साइन इन करें। स्पैम में भी देखें। 10 मिनट में ईमेल न आए तो “पुष्टि ईमेल फिर भेजें” दबाएँ; फिर भी न आए तो Sahara की ईमेल सेवा अभी पूरी चालू नहीं है। workwithdevit@gmail.com पर लिखें।") }
+                        CareSignUp.ALREADY_REGISTERED -> { create = false; password = ""; error = careAuthMessage("already registered", hindi) }
+                    }
+                    else { cloud.signIn(email, password); awaitingConfirmation = "" }
                 } }, enabled = !busy && email.contains('@') && password.isNotEmpty(), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Text(if (busy) t("Please wait…", "कृपया रुकें…") else if (create) t("Create account", "खाता बनाएँ") else t("Sign in", "साइन इन करें")) }
-                if (!create) TextButton(onClick = { run {
+                if (awaitingConfirmation.isNotBlank()) OutlinedButton(onClick = { authRun { cloud.resendConfirmation(awaitingConfirmation); notice = t("Asked the server to send the confirmation email again to $awaitingConfirmation. If it doesn't arrive, write to workwithdevit@gmail.com.", "सर्वर से $awaitingConfirmation पर पुष्टि ईमेल फिर भेजने को कहा गया। न आए तो workwithdevit@gmail.com पर लिखें।") } }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Resend confirmation email", "पुष्टि ईमेल फिर भेजें")) }
+                if (!create) TextButton(onClick = { authRun {
                     cloud.sendPasswordReset(email)
                     notice = t("If that email has an account, you'll receive a reset link.", "अगर इस ईमेल से खाता बना है, तो पासवर्ड बदलने का लिंक आपको मिल जाएगा।")
                 } }, enabled = !busy && email.contains('@') && CareEmailAvailability.ready) { Text(t("Forgot password?", "पासवर्ड भूल गए?")) }
                 TextButton(onClick = { create = !create; error = null; notice = null }, enabled = !busy && (create || CareEmailAvailability.ready)) { Text(if (create) t("Already have an account? Sign in", "पहले से खाता है? साइन इन करें") else t("Create an account", "खाता बनाएँ")) }
                 if (!CareEmailAvailability.ready) Text(t("New accounts and password reset are temporarily unavailable. Existing confirmed accounts can sign in.", "नया खाता बनाना और पासवर्ड बदलना अभी कुछ समय के लिए बंद है। पहले से पक्के खाते साइन इन कर सकते हैं।"), style = MaterialTheme.typography.bodySmall)
+                if (onInvite != null) OutlinedButton(onClick = { val pasted = clipboardText(context); if (CareInviteLink.parse(pasted) != null) { onInvite(pasted.orEmpty()); error = null; notice = t("Invitation kept. Sign in or create an account, and Sahara will ask you to join.", "निमंत्रण रख लिया। साइन इन करें या खाता बनाएँ, फिर Sahara आपसे जुड़ने को पूछेगा।") } else { notice = null; error = t("No Sahara invite found on the clipboard. Copy the WhatsApp message or link first.", "कॉपी किए गए टेक्स्ट में Sahara का निमंत्रण नहीं मिला। पहले WhatsApp संदेश या लिंक कॉपी करें।") } }, enabled = !busy, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.ContentPaste, null); Spacer(Modifier.width(8.dp)); Text(t("Got an invitation? Paste it here", "निमंत्रण मिला है? यहाँ चिपकाएँ")) }
             } else {
                 Text(session!!.email)
+                if (!owner && selected.isNotBlank()) people.firstOrNull { it.id == selected }?.let { p -> Text(if (canEditShared) t("${p.name}'s care is shared with you. You can read it and add to it.", "${p.name} की देखभाल आपके साथ साझा है। आप इसे देख सकते हैं और जोड़ सकते हैं।") else t("${p.name}'s care is shared with you. You can read it; only the person who invited you can allow changes.", "${p.name} की देखभाल आपके साथ साझा है। आप इसे देख सकते हैं; बदलाव की अनुमति सिर्फ़ बुलाने वाले दे सकते हैं।"), style = MaterialTheme.typography.bodyMedium) }
                 OutlinedButton(onClick = { vm.refresh(); onDismiss() }, enabled = !busy) { Icon(Icons.Default.Refresh, null); Spacer(Modifier.width(8.dp)); Text(t("Refresh records", "रिकॉर्ड फिर से लाएँ")) }
                 DetailPanel(t("Join someone's care", "किसी की देखभाल से जुड़ें"), Icons.Default.GroupAdd) {
                     Text(t("The person who invited you will see your email.", "जिसने आपको बुलाया है, उन्हें आपका ईमेल दिखेगा।"), style = MaterialTheme.typography.bodySmall)
                     CareField(code, { code = CareInviteLink.parse(it)?.code ?: it.trim().take(4000) }, t("Invitation code or link", "निमंत्रण कोड या लिंक"), singleLine = true)
-                    OutlinedButton(onClick = { val pasted = (context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as? android.content.ClipboardManager)?.primaryClip?.takeIf { it.itemCount > 0 }?.getItemAt(0)?.coerceToText(context)?.toString(); val invite = CareInviteLink.parse(pasted); if (invite != null) { code = invite.code; error = null; notice = t("Invite pasted. Tap Join.", "निमंत्रण चिपका दिया। अब “जुड़ें” दबाएँ।") } else { notice = null; error = t("No Sahara invite found on the clipboard. Copy the WhatsApp message or link first.", "कॉपी किए गए टेक्स्ट में Sahara का निमंत्रण नहीं मिला। पहले WhatsApp संदेश या लिंक कॉपी करें।") } }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Icon(Icons.Default.ContentPaste, null); Spacer(Modifier.width(8.dp)); Text(t("Paste invite", "निमंत्रण चिपकाएँ")) }
+                    OutlinedButton(onClick = { val pasted = clipboardText(context); val invite = CareInviteLink.parse(pasted); if (invite != null) { code = invite.code; error = null; notice = t("Invite pasted. Tap Join.", "निमंत्रण चिपका दिया। अब “जुड़ें” दबाएँ।") } else { notice = null; error = t("No Sahara invite found on the clipboard. Copy the WhatsApp message or link first.", "कॉपी किए गए टेक्स्ट में Sahara का निमंत्रण नहीं मिला। पहले WhatsApp संदेश या लिंक कॉपी करें।") } }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Icon(Icons.Default.ContentPaste, null); Spacer(Modifier.width(8.dp)); Text(t("Paste invite", "निमंत्रण चिपकाएँ")) }
                     Spacer(Modifier.height(10.dp))
-                    Button(onClick = { run { val before = vm.people.value.map { it.id }.toSet(); try { cloud.join(code) } catch (e: Exception) { if (e is CancellationException) throw e; throw IllegalArgumentException(careJoinFailureMessage(e.message, careHindiNow), e) }; code = ""; val added = vm.joinedRefresh(before); notice = added?.name?.let { t("You can now see $it's care.", "अब आप $it की देखभाल देख सकते हैं।") } ?: t("You can now see their care.", "अब आप उनकी देखभाल देख सकते हैं।") } }, enabled = !busy && code.trim().length == 48) { Text(t("Join", "जुड़ें")) }
+                    Button(onClick = { run { val before = vm.people.value.map { it.id }.toSet(); try { cloud.join(code) } catch (e: Exception) { if (e is CancellationException) throw e; throw IllegalArgumentException(careJoinFailureMessage(e.message, hindi), e) }; code = ""; val added = vm.joinedRefresh(before); notice = (added?.name?.let { t("You can now see $it's care.", "अब आप $it की देखभाल देख सकते हैं।") } ?: t("You can now see their care.", "अब आप उनकी देखभाल देख सकते हैं।")) + if (added != null && vm.canEditPerson(added.id)) t(" You can read and add.", " आप देख और जोड़ सकते हैं।") else t(" You can read.", " आप देख सकते हैं।") } }, enabled = !busy && code.trim().length == 48) { Text(t("Join", "जुड़ें")) }
                 }
                 if (owner && selected.isNotBlank()) DetailPanel(people.firstOrNull { it.id == selected }?.name.orEmpty().let { t("Share $it's care", "$it की देखभाल साझा करें") }, Icons.Default.PersonAdd) {
                     Button(onClick = { addFamily = true }, enabled = !busy, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Icon(Icons.Default.PersonAdd, null); Spacer(Modifier.width(8.dp)); Text(t("Add family", "परिवार जोड़ें")) }
@@ -247,31 +280,59 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
                         Text(t("Access lasts", "कितने दिन खुला रहे"), style = MaterialTheme.typography.bodyMedium)
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf(1, 7, 30, 90).forEach { d -> FilterChip(selected = doctorDays == d, onClick = { doctorDays = d; invite = "" }, modifier = Modifier.heightIn(min = 48.dp), label = { Text(t("$d days", "$d दिन")) }) } }
                     }
-                    Button(onClick = { val person = selected; val account = session!!.userId; val doctor = inviteDoctor; run { val code = if (doctor) cloud.inviteAccess(person, "clinician", doctorEdit, mapOf("careNote" to doctorNotes, "calendar" to doctorCalendar, "reports" to doctorReports, "costs" to doctorCosts), doctorDays, expectedAccountId = account) else cloud.invite(person, allowChanges, allowCareTeam); if (vm.selected.value == person && cloud.session.value?.userId == account && vm.isOwner.value) invite = code } }, enabled = !busy && (!inviteDoctor || doctorNotes || doctorCalendar || doctorReports || doctorCosts), modifier = Modifier.heightIn(min = 48.dp)) { Text(if (inviteDoctor) t("Create doctor invitation", "डॉक्टर के लिए निमंत्रण बनाएँ") else t("Create invitation", "निमंत्रण बनाएँ")) }
+                    Button(onClick = { val person = selected; val account = session!!.userId; val doctor = inviteDoctor; run { val before = cloud.openInvites(person); val code = if (doctor) cloud.inviteAccess(person, "clinician", doctorEdit, mapOf("careNote" to doctorNotes, "calendar" to doctorCalendar, "reports" to doctorReports, "costs" to doctorCosts), doctorDays, expectedAccountId = account) else cloud.invite(person, allowChanges, allowCareTeam); if (vm.selected.value == person && cloud.session.value?.userId == account && vm.isOwner.value) { invite = code; inviteStore.logCreated(cloud, account, person, "", "", if (doctor) "clinician" else "family", before); inviteTick++ } } }, enabled = !busy && (!inviteDoctor || doctorNotes || doctorCalendar || doctorReports || doctorCosts), modifier = Modifier.heightIn(min = 48.dp)) { Text(if (inviteDoctor) t("Create doctor invitation", "डॉक्टर के लिए निमंत्रण बनाएँ") else t("Create invitation", "निमंत्रण बनाएँ")) }
                     if (invite.isNotEmpty()) {
-                        Spacer(Modifier.height(12.dp)); Text(if (inviteDoctor) t("One person · the code expires in 3 days · works only for an approved clinician account", "एक व्यक्ति · कोड 3 दिन में बंद हो जाएगा · सिर्फ़ मंज़ूर डॉक्टर खाते के लिए") else t("One person · expires in 3 days", "एक व्यक्ति · 3 दिन में बंद हो जाएगा"), style = MaterialTheme.typography.bodySmall)
+                        Spacer(Modifier.height(12.dp)); Text(if (inviteDoctor) t("One person · the code expires in 3 days · works only for an approved clinician account", "एक व्यक्ति · कोड 3 दिन में बंद हो जाएगा · सिर्फ़ मंज़ूर डॉक्टर खाते के लिए") else t("One person · the link expires in 3 days · access then lasts 30 days", "एक व्यक्ति · लिंक 3 दिन में बंद होगा · उसके बाद पहुँच 30 दिन रहेगी"), style = MaterialTheme.typography.bodySmall)
                         TextButton(onClick = { open(context, Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, CareInviteLink.shareText(people.firstOrNull { it.id == selected }?.name.orEmpty(), invite)), t("Share invitation", "निमंत्रण भेजें"))) }) { Icon(Icons.Default.Share, null); Spacer(Modifier.width(8.dp)); Text(t("Share invitation", "निमंत्रण भेजें")) }
                         androidx.compose.foundation.text.selection.SelectionContainer { Text(invite, style = MaterialTheme.typography.bodySmall) }
                     }
-                    if (invites.isNotEmpty()) { Text(t("Invitations", "भेजे गए निमंत्रण"), fontWeight = FontWeight.Medium); invites.forEach { Text(CareInviteLog.label(it, System.currentTimeMillis()), Modifier.padding(vertical = 4.dp), style = MaterialTheme.typography.bodyMedium) } }
+                    if (invites.isNotEmpty()) { Text(t("Invitations", "भेजे गए निमंत्रण"), fontWeight = FontWeight.Medium); val now = System.currentTimeMillis(); invites.forEach { e ->
+                        val status = CareInviteLog.status(e, openInvites, memberDetails, now)
+                        Row(Modifier.fillMaxWidth(), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                            Text(CareInviteLog.label(e, status, now, hindi, members.firstOrNull { it.userId == status.memberId }?.email.orEmpty()), Modifier.weight(1f).padding(vertical = 4.dp), style = MaterialTheme.typography.bodyMedium)
+                            if (status.state == CareInviteState.OPEN) TextButton(onClick = { val person = selected; val acct = session!!.userId; run { cloud.cancelInvite(e.inviteId); inviteStore.save(acct, inviteStore.all(acct).filterNot { it.inviteId == e.inviteId }); inviteTick++; if (vm.selected.value == person) notice = t("Invitation cancelled. The link no longer works.", "निमंत्रण रद्द हुआ। अब लिंक काम नहीं करेगा।") } }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Cancel", "रद्द करें")) }
+                        }
+                    } }
+                    if (membersLoaded) Text(if (members.isEmpty()) t("Nobody has joined yet.", "अभी तक कोई नहीं जुड़ा।") else t("People with access", "जिन्हें पहुँच है"), fontWeight = FontWeight.Medium)
                     members.forEach { member ->
+                        val detail = memberDetails?.firstOrNull { it.userId == member.userId }; val now = System.currentTimeMillis()
                         Row(Modifier.fillMaxWidth()) {
-                            Column(Modifier.weight(1f).padding(top = 12.dp)) { Text(member.email); Text(if (member.canEdit) t("Can make changes", "बदलाव कर सकते हैं") else t("Can read", "सिर्फ़ पढ़ सकते हैं"), style = MaterialTheme.typography.bodySmall) }
+                            Column(Modifier.weight(1f).padding(top = 12.dp)) { Text(member.email); Text(listOfNotNull(if (member.canEdit) t("Can make changes", "बदलाव कर सकते हैं") else t("Can read", "सिर्फ़ पढ़ सकते हैं"),
+                                detail?.joinedAt?.takeIf { it > 0 }?.let { t("joined ${day(it)}", "${day(it)} को जुड़े") },
+                                detail?.expiresAt?.takeIf { it > 0 }?.let { if (it > now) t("access until ${day(it)}", "${day(it)} तक पहुँच") else t("access ended ${day(it)} · invite again", "${day(it)} को पहुँच ख़त्म · फिर से बुलाएँ") }).joinToString(" · "), style = MaterialTheme.typography.bodySmall) }
                             TextButton(onClick = { removing = member }, enabled = !busy) { Text(t("Remove", "हटाएँ")) }
                         }
-                        CheckLine(member.careTeamRead, { enabled -> val person = selected; val account = session!!.userId; run { require(vm.selected.value == person && cloud.session.value?.userId == account && vm.isOwner.value); cloud.setCareTeamSharing(person, member.userId, enabled); if (vm.selected.value == person && cloud.session.value?.userId == account) members = cloud.members(person) } }, t("Share care-team contacts with this person", "इस व्यक्ति के साथ देखभाल टीम के नंबर साझा करें"))
+                        OutlinedButton(onClick = { val person = selected; run {
+                            try { cloud.setMemberEdit(person, member.userId, !member.canEdit) } catch (e: CareServerFeatureMissing) { throw IllegalStateException(t("Changing access needs a server update that isn't installed yet. For now, remove them and send a new invite with the access you want.", "पहुँच बदलने के लिए सर्वर अपडेट चाहिए, जो अभी नहीं लगा है। अभी के लिए उन्हें हटाकर, सही पहुँच के साथ नया निमंत्रण भेजें।"), e) }
+                            loadSharing(person); if (vm.selected.value == person) notice = if (member.canEdit) t("${member.email} can now only read.", "${member.email} अब सिर्फ़ देख सकते हैं।") else t("${member.email} can now add and change records.", "${member.email} अब रिकॉर्ड जोड़ और बदल सकते हैं।")
+                        } }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text(if (member.canEdit) t("Change to read only", "सिर्फ़ देखने की पहुँच दें") else t("Allow adding and changes", "जोड़ने-बदलने की पहुँच दें")) }
+                        CheckLine(member.careTeamRead, { enabled -> val person = selected; val account = session!!.userId; run { require(vm.selected.value == person && cloud.session.value?.userId == account && vm.isOwner.value); cloud.setCareTeamSharing(person, member.userId, enabled); if (vm.selected.value == person && cloud.session.value?.userId == account) loadSharing(person) } }, t("Share care-team contacts with this person", "इस व्यक्ति के साथ देखभाल टीम के नंबर साझा करें"))
                         if (!member.careTeamPermissionKnown) Text(t("Care-team sharing is unavailable until the server update is installed.", "सर्वर का अपडेट लगने तक देखभाल टीम के नंबर साझा नहीं हो सकते।"), style = MaterialTheme.typography.bodySmall)
                     }
                     CareContactManager(vm, selected)
                 }
                 TextButton(onClick = { signingOut = true }, enabled = !busy) { Text(t("Sign out", "साइन आउट करें")) }
-                TextButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.delete_account_url)))) }, enabled = !busy) { Text(t("Delete account", "खाता मिटाएँ")) }
+                TextButton(onClick = { deleteUnderstood = false; deleting = true }, enabled = !busy) { Text(t("Delete my account and data", "मेरा खाता और जानकारी मिटाएँ")) }
+                if (deletionByEmail) TextButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.delete_account_url)))) }, enabled = !busy) { Text(t("Request deletion by email", "ईमेल से मिटाने का अनुरोध भेजें")) }
             }
             TextButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.privacy_url)))) }) { Text(t("Privacy policy", "निजता नीति")) }
             notice?.let { Text(it, color = MaterialTheme.colorScheme.secondary) }
             error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
         }
     if (addFamily) AddFamilySheet(vm, onDismiss = { addFamily = false }, onSignIn = {}, onInvited = { inviteTick++ })
-    removing?.let { member -> AlertDialog(onDismissRequest = { removing = null }, title = { Text(t("Stop sharing with this person?", "इस व्यक्ति के साथ साझा करना बंद करें?")) }, text = { Text(t("They won't be able to read or change these records online. Copies they've already saved cannot be recalled.", "वे ये रिकॉर्ड ऑनलाइन न पढ़ सकेंगे, न बदल सकेंगे। जो कॉपी वे पहले सहेज चुके हैं, वह वापस नहीं ली जा सकती।")) }, confirmButton = { TextButton(onClick = { removing = null; run { cloud.removeMember(selected, member.userId); members = cloud.members(selected) } }) { Text(t("Stop sharing", "साझा करना बंद करें")) } }, dismissButton = { TextButton(onClick = { removing = null }) { Text(t("Keep sharing", "साझा करते रहें")) } }) }
+    removing?.let { member -> AlertDialog(onDismissRequest = { removing = null }, title = { Text(t("Stop sharing with this person?", "इस व्यक्ति के साथ साझा करना बंद करें?")) }, text = { Text(t("They won't be able to read or change these records online. Copies they've already saved cannot be recalled.", "वे ये रिकॉर्ड ऑनलाइन न पढ़ सकेंगे, न बदल सकेंगे। जो कॉपी वे पहले सहेज चुके हैं, वह वापस नहीं ली जा सकती।")) }, confirmButton = { TextButton(onClick = { removing = null; val person = selected; run { cloud.removeMember(person, member.userId); loadSharing(person); if (vm.selected.value == person) notice = t("${member.email} no longer has access.", "${member.email} की पहुँच हटा दी गई।") } }) { Text(t("Stop sharing", "साझा करना बंद करें")) } }, dismissButton = { TextButton(onClick = { removing = null }) { Text(t("Keep sharing", "साझा करते रहें")) } }) }
+    if (deleting) AlertDialog(onDismissRequest = { deleting = false }, title = { Text(t("Delete your account and data?", "अपना खाता और जानकारी मिटाएँ?")) },
+        text = { Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Text(t("This deletes from Sahara's server: the care records you set up (also for everyone you shared them with), your invitations, your doctor request, and your access to other people's care. This phone's copy for this account is removed too. It can't be undone. Export care notes from More first if you want to keep them.", "इससे Sahara के सर्वर से मिट जाएगा: आपके बनाए देखभाल रिकॉर्ड (जिनके साथ साझा किए, उनके लिए भी), आपके निमंत्रण, डॉक्टर वाला अनुरोध, और दूसरों की देखभाल तक आपकी पहुँच। इस फ़ोन पर इस खाते की कॉपी भी हटेगी। यह वापस नहीं होगा। रखना हो तो पहले “और” से देखभाल नोट भेज लें।"))
+            CheckLine(deleteUnderstood, { deleteUnderstood = it }, t("I understand this can't be undone", "मैं समझता/समझती हूँ कि यह वापस नहीं होगा"))
+        } },
+        confirmButton = { TextButton(onClick = { deleting = false; run {
+            vm.stopRecording()
+            val result = try { cloud.deleteMyAccount() } catch (e: CareServerFeatureMissing) { deletionByEmail = true; throw IllegalStateException(t("Deleting from the app needs a server update that isn't installed yet. Nothing was deleted. Use Request deletion by email below.", "ऐप से मिटाने के लिए सर्वर अपडेट चाहिए, जो अभी नहीं लगा है। कुछ नहीं मिटा। नीचे “ईमेल से मिटाने का अनुरोध भेजें” दबाएँ।"), e) }
+            runCatching { vm.forgetLocalAccountData() }; inviteStore.save(session!!.userId, emptyList())
+            onDeleted(if (result.loginRemoved) t("Your Sahara account and its data were deleted.", "आपका Sahara खाता और उसकी जानकारी मिटा दी गई।") else t("Your Sahara data was deleted and the account is closed. The Sahara team removes the sign-in email itself; write to workwithdevit@gmail.com if you want that confirmed.", "आपकी Sahara जानकारी मिटा दी गई और खाता बंद हो गया। साइन-इन ईमेल Sahara टीम हटाती है; पक्का करना हो तो workwithdevit@gmail.com पर लिखें।"))
+            cloud.forgetSession()
+        } }, enabled = deleteUnderstood) { Text(t("Delete everything", "सब मिटाएँ")) } },
+        dismissButton = { TextButton(onClick = { deleting = false }) { Text(t("Keep my account", "खाता रहने दें")) } })
     if (signingOut) AlertDialog(onDismissRequest = { signingOut = false }, title = { Text(t("Sign out?", "साइन आउट करें?")) }, confirmButton = { TextButton(onClick = { signingOut = false; run { vm.stopRecording(); cloud.signOut() } }) { Text(t("Sign out", "साइन आउट करें")) } }, dismissButton = { TextButton(onClick = { signingOut = false }) { Text(t("Cancel", "रद्द करें")) } })
 }

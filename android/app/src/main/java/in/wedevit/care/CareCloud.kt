@@ -24,7 +24,11 @@ import javax.crypto.spec.GCMParameterSpec
 data class CareSession(val userId: String, val email: String, val access: String, val refresh: String, val expires: Long)
 data class CareMember(val userId: String, val canEdit: Boolean, val email: String, val careTeamRead: Boolean = false, val careTeamPermissionKnown: Boolean = false)
 data class CloudRecords(val people: List<Person>, val entries: List<CareItem>, val notes: List<CareVersion>, val confirmations: List<Acknowledgement>, val editable: Set<String>, val owned: Set<String>, val verifiedReviews: Set<String> = emptySet(), val authenticatedConfirmations: Set<String> = emptySet())
-private class CareHttpException(val status: Int, message: String) : IllegalArgumentException(message)
+internal class CareHttpException(val status: Int, message: String, val code: String = "") : IllegalArgumentException(message)
+/** A server feature the app asks for is not installed yet (PostgREST: no such function), so the screen can say so instead of guessing. */
+internal fun Throwable.isMissingServerFeature() = this is CareHttpException && (status == 404 || code == "PGRST202" || code == "42883")
+/** What a sign-up actually produced on the server. */
+enum class CareSignUp { SIGNED_IN, CONFIRMATION_SENT, ALREADY_REGISTERED }
 
 internal fun decodeAcknowledgement(row: JSONObject): Acknowledgement {
     val data = row.getJSONObject("data")
@@ -46,11 +50,24 @@ class CareCloud(context: Context) {
         val value = JSONObject(request("POST", "/auth/v1/token?grant_type=password", JSONObject().put("email", email.trim()).put("password", password), authenticated = false))
         rememberSession(value)
     }
-    suspend fun signUp(email: String, password: String): Boolean {
+    /** Confirmation off: a session comes back at once. Confirmation on: a user without a session. An email that is
+     *  already registered comes back with no identities (Supabase hides it), and no mail is sent for it. */
+    suspend fun signUp(email: String, password: String): CareSignUp {
         require(password.length >= 10) { "Use at least 10 characters for your password." }
         val result = JSONObject(request("POST", "/auth/v1/signup?redirect_to=$accountRedirect", JSONObject().put("email", email.trim()).put("password", password), authenticated = false))
-        if (result.has("access_token")) { rememberSession(result); return true }
-        return false
+        if (result.has("access_token")) { rememberSession(result); return CareSignUp.SIGNED_IN }
+        return careSignUpOutcome(result)
+    }
+    suspend fun resendConfirmation(email: String) {
+        request("POST", "/auth/v1/resend?redirect_to=$accountRedirect", JSONObject().put("type", "signup").put("email", email.trim()), authenticated = false)
+    }
+    /** Forgets this phone's sign-in without calling the server (used after the account itself was deleted). */
+    suspend fun forgetSession() {
+        withContext(NonCancellable + Dispatchers.IO) {
+            check(preferences.edit().remove("session").commit()) { "Couldn't finish signing out. Please try again." }
+            session.value = null
+        }
+        CareAddDrafts.clearAll()
     }
     suspend fun sendPasswordReset(email: String) {
         request("POST", "/auth/v1/recover?redirect_to=$accountRedirect", JSONObject().put("email", email.trim()), authenticated = false)
@@ -106,7 +123,7 @@ class CareCloud(context: Context) {
         val enabled = permissions?.let { values -> (0 until values.length()).associate { values.getJSONObject(it).let { row -> row.getString("user_id") to row.getBoolean("care_team") } } }
         return (0 until rows.length()).map { rows.getJSONObject(it).let { row -> CareMember(row.getString("user_id"), row.getBoolean("can_edit"), row.getString("email"), enabled?.get(row.getString("user_id")) == true, enabled != null) } }
     }
-    suspend fun removeMember(personId: String, userId: String) { request("DELETE", "/rest/v1/healthathon_members?person_id=eq.$personId&user_id=eq.$userId") }
+    suspend fun removeMember(personId: String, userId: String) { require(JSONArray(request("DELETE", "/rest/v1/healthathon_members?person_id=eq.$personId&user_id=eq.$userId")).length() == 1) { "This person's access had already changed. Refresh the list." } }
 
     suspend fun load(): CloudRecords {
         val user = session.value?.userId ?: error("Sign in first")
@@ -206,7 +223,7 @@ class CareCloud(context: Context) {
                         path.startsWith("/auth/") -> listOf("msg", "error_description", "message").mapNotNull { error?.optString(it)?.takeIf(String::isNotBlank) }.firstOrNull() ?: "Couldn't sign in. Check your email and password."
                         else -> error?.optString("message")?.takeIf { code == "P0001" } ?: "Couldn't save. Your entry is still here."
                     }
-                    throw CareHttpException(status, friendly)
+                    throw CareHttpException(status, friendly, code.ifBlank { error?.optString("error_code").orEmpty() })
                 }
                 text
             } catch (e: java.io.IOException) { throw IllegalArgumentException("Couldn't reach your care records. Your entry is still here.", e) }
@@ -231,6 +248,12 @@ class CareCloud(context: Context) {
     companion object {
         const val PUBLIC_API_KEY = "sb_publishable_bheyh26N5MKpXNEJDQgq8w_oDRhW8Xe"
     }
+}
+
+internal fun careSignUpOutcome(result: JSONObject): CareSignUp {
+    val user = result.optJSONObject("user") ?: result
+    val identities = user.optJSONArray("identities")
+    return if (identities != null && identities.length() == 0) CareSignUp.ALREADY_REGISTERED else CareSignUp.CONFIRMATION_SENT
 }
 
 private fun entryJson(i: CareItem) = JSONObject().put("kind", i.kind).put("title", i.title).put("detail", i.detail).put("due", i.due).put("doneOn", i.doneOn).put("created", i.created)

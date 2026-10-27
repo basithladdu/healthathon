@@ -48,27 +48,55 @@ class CareInviteLinkTest {
         assertTrue(careJoinFailureMessage(null).isNotBlank())
     }
 
-    @Test fun inviteLogLabelsAndJoinedEstimate() {
-        val t0 = 1_000_000_000L
-        val e = CareInviteEntry("p1", "Arjun", "Brother", t0, baseline = 1)
-        assertEquals("Arjun · brother · Invited · expires in 3 days", CareInviteLog.label(e, t0 + 1000))
-        assertEquals("Arjun · brother · Invited · expires today", CareInviteLog.label(e, t0 + 2 * CareInviteLog.DAY_MS + 1000))
-        assertTrue(CareInviteLog.label(e, t0 + CareInviteLog.TTL_MS).startsWith("Arjun · brother · Expired"))
-        val same = CareInviteLog.reconcile(listOf(e), "p1", 1, t0 + 10)
-        assertFalse(same.single().joined)
-        val joined = CareInviteLog.reconcile(listOf(e), "p1", 2, t0 + 10)
-        assertEquals("Arjun · brother · Joined", CareInviteLog.label(joined.single(), t0 + 20))
-        val back = CareInviteLog.decode(CareInviteLog.encode(joined)); assertEquals(joined, back)
+    @Test fun inviteStatusComesFromTheServerNotACount() {
+        val t0 = 1_000_000_000L; val id = "11111111-1111-1111-1111-111111111111"
+        val e = CareInviteEntry("p1", "Arjun", "Brother", t0, id)
+        val open = listOf(CareOpenInvite(id, "family", false, t0 + CareInviteLog.TTL_MS))
+        assertEquals(CareInviteState.OPEN, CareInviteLog.status(e, open, emptyList(), t0 + 10).state)
+        assertEquals("Arjun · brother · Invited · not joined yet · expires in 3 days", CareInviteLog.label(e, CareInviteLog.status(e, open, emptyList(), t0 + 1000), t0 + 1000))
+        assertEquals("Arjun · brother · Invited · not joined yet · expires today", CareInviteLog.label(e, CareInviteLog.status(e, open, null, t0 + 2 * CareInviteLog.DAY_MS + 1000).copy(state = CareInviteState.OPEN), t0 + 2 * CareInviteLog.DAY_MS + 1000))
+        // More members than before is no longer read as "joined": only a membership created by this invitation is.
+        val member = CareMemberDetail("u1", id, t0 + 50, 0)
+        val joined = CareInviteLog.status(e, emptyList(), listOf(member, CareMemberDetail("u2", "", t0, 0)), t0 + 100)
+        assertEquals(CareInviteStatus(CareInviteState.JOINED, "u1", t0 + 50), joined)
+        assertTrue(CareInviteLog.label(e, joined, t0 + 100, memberEmail = "a@example.com").startsWith("Arjun · brother · Joined · a@example.com · "))
+        assertEquals(CareInviteState.JOINED, CareInviteLog.status(e, emptyList(), listOf(member), t0 + 10 * CareInviteLog.DAY_MS).state)
+        assertEquals(CareInviteState.CLOSED, CareInviteLog.status(e, emptyList(), listOf(CareMemberDetail("u2", "", t0, 0)), t0 + 100).state)
+        assertEquals(CareInviteState.CLOSED, CareInviteLog.status(e, emptyList(), null, t0 + 100).state)
+        assertEquals(CareInviteState.UNKNOWN, CareInviteLog.status(e, null, null, t0 + 100).state)
+        assertEquals(CareInviteState.EXPIRED, CareInviteLog.status(e, open, null, t0 + CareInviteLog.TTL_MS).state)
+        assertEquals(CareInviteState.UNTRACKED, CareInviteLog.status(e.copy(inviteId = ""), open, listOf(member.copy(inviteId = "")), t0 + 100).state)
     }
-    @Test fun oneNewMemberMarksOnlyOneInviteAndOtherPeopleAreUntouched() {
-        val t0 = 5_000L
-        val a = CareInviteEntry("p1", "A", "", t0, 0); val b = CareInviteEntry("p1", "B", "Son", t0 + 10, 0); val other = CareInviteEntry("p2", "C", "", t0, 0)
-        val out = CareInviteLog.reconcile(listOf(a, b, other), "p1", 1, t0 + 100)
-        assertEquals(listOf(true, false), out.filter { it.person == "p1" }.sortedBy { it.createdAt }.map { it.joined })
-        assertEquals(other, out.first { it.person == "p2" })
+    @Test fun labelsInHindiAndForUnnamedDoctorInvites() {
+        val e = CareInviteEntry("p1", "", "", 0L, "x", role = "clinician")
+        assertEquals("Doctor invitation · Expired · create a new invite", CareInviteLog.label(e, CareInviteStatus(CareInviteState.EXPIRED), 0L))
+        val hindi = CareInviteLog.label(CareInviteEntry("p1", "Arjun", "Brother", 0L, "x"), CareInviteStatus(CareInviteState.CLOSED), 0L, hindi = true)
+        assertTrue(hindi, hindi.startsWith("Arjun · भाई · ") && HindiScan.hasHindi(hindi))
+    }
+    @Test fun newInviteIdOnlyWhenCertain() {
+        assertEquals("b", CareInviteLog.newInviteId(listOf("a"), listOf("a", "b")))
+        assertNull(CareInviteLog.newInviteId(listOf("a"), listOf("a", "b", "c")))
+        assertNull(CareInviteLog.newInviteId(null, listOf("b")))
+        assertNull(CareInviteLog.newInviteId(listOf("a"), null))
+    }
+    @Test fun encodeDecodeAndOldGuessedJoinsAreDropped() {
+        val e = CareInviteEntry("p1", "A", "Son", 5L, "id-1", 99L, "clinician")
+        assertEquals(listOf(e), CareInviteLog.decode(CareInviteLog.encode(listOf(e))))
+        val old = listOf("p1", "B", "Son", "7", "1", "1").joinToString("\u001F")
+        assertEquals(listOf(CareInviteEntry("p1", "B", "Son", 7L)), CareInviteLog.decode(old))
+    }
+    @Test fun pruneKeepsRecentInvitesPerPerson() {
+        val now = 100 * CareInviteLog.DAY_MS
+        val list = (0 until 25).map { CareInviteEntry("p1", "n$it", "", now - it * 1000L) } + CareInviteEntry("p1", "old", "", now - 31 * CareInviteLog.DAY_MS) + CareInviteEntry("p2", "other", "", now)
+        val out = CareInviteLog.prune(list, now)
+        assertEquals(20, out.count { it.person == "p1" }); assertTrue(out.none { it.name == "old" }); assertTrue(out.any { it.person == "p2" })
+    }
+    @Test fun joinFailureInHindi() {
+        assertTrue(HindiScan.hasHindi(careJoinFailureMessage("Invitation expired or already used.", hindi = true)))
+        assertTrue(careJoinFailureMessage("Use a separate account to accept an invitation.").contains("their own account"))
     }
     @Test fun inviteStoreIsPerAccount() {
-        val store = CareInviteStore(Memory()); val e = CareInviteEntry("p1", "A", "Son", 1L, 0)
+        val store = CareInviteStore(Memory()); val e = CareInviteEntry("p1", "A", "Son", 1L)
         store.add("acct1", e); assertEquals(listOf(e), store.all("acct1")); assertTrue(store.all("acct2").isEmpty())
     }
 }
