@@ -106,10 +106,11 @@ private class PrepModel(val store: DoctorPreparationStore, val scope: String, va
     } catch (e: Exception) { error = e.message ?: "Questions were not saved. Try again."; false }
 }
 
-@Composable private fun rememberPrepModel(store: DoctorPreparationStore, scope: String, initial: List<DoctorPreparationQuestion>, editable: Boolean, canSave: () -> Boolean, onChange: (List<DoctorPreparationQuestion>) -> Unit): PrepModel {
+@Composable private fun rememberPrepModel(store: DoctorPreparationStore, scope: String, initial: List<DoctorPreparationQuestion>, editable: Boolean, canSave: () -> Boolean, onChange: (List<DoctorPreparationQuestion>) -> Unit, reload: Int = 0): PrepModel {
     val ed by rememberUpdatedState(editable); val cs by rememberUpdatedState(canSave); val ch by rememberUpdatedState(onChange)
     val m = remember(store, scope) { PrepModel(store, scope, initial, { ed && cs() }, { ch }) }
-    LaunchedEffect(store, scope) { m.load() }
+    // [reload] changes when another card saved to the same store (a goal answer kept on leaving the transcript page), so the next save never writes an older list over it.
+    LaunchedEffect(store, scope, reload) { m.load() }
     return m
 }
 
@@ -133,9 +134,9 @@ private class PrepModel(val store: DoctorPreparationStore, val scope: String, va
  */
 @Composable internal fun DoctorPreparationQuestions(
     store: DoctorPreparationStore, scope: String, editable: Boolean, canSave: () -> Boolean,
-    onInteraction: (Boolean) -> Unit, initial: List<DoctorPreparationQuestion> = emptyList(), onChange: (List<DoctorPreparationQuestion>) -> Unit = {},
+    onInteraction: (Boolean) -> Unit, initial: List<DoctorPreparationQuestion> = emptyList(), onChange: (List<DoctorPreparationQuestion>) -> Unit = {}, reload: Int = 0,
 ) {
-    val m = rememberPrepModel(store, scope, initial, editable, canSave, onChange)
+    val m = rememberPrepModel(store, scope, initial, editable, canSave, onChange, reload)
     // Unsaved edits survive this card scrolling out of the list and rotation.
     var drafts by rememberSaveable(scope) { mutableStateOf(emptyMap<String, String>()) }
     var newText by rememberSaveable(scope) { mutableStateOf("") }
@@ -182,9 +183,9 @@ private class PrepModel(val store: DoctorPreparationStore, val scope: String, va
  * Nothing is filled in automatically here. Whatever is typed is the clinician's own note, stored with the question and outside any published note.
  */
 @Composable internal fun DoctorPreparationAnswers(
-    store: DoctorPreparationStore, scope: String, editable: Boolean, canSave: () -> Boolean, onChange: (List<DoctorPreparationQuestion>) -> Unit = {},
+    store: DoctorPreparationStore, scope: String, editable: Boolean, canSave: () -> Boolean, onChange: (List<DoctorPreparationQuestion>) -> Unit = {}, reload: Int = 0,
 ) {
-    val m = rememberPrepModel(store, scope, emptyList(), editable, canSave, onChange)
+    val m = rememberPrepModel(store, scope, emptyList(), editable, canSave, onChange, reload)
     var drafts by rememberSaveable(scope) { mutableStateOf(emptyMap<String, String>()) }
     val unanswered = doctorUnansweredQuestions(m.rows).size
     PrepCard("doctor-preparation-answers", "Answers to your questions", "Typed answers are your own notes, kept on this device and outside any published note. Unanswered questions are listed so you can fill them in.", m) {

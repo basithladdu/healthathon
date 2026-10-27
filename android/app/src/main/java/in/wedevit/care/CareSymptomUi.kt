@@ -269,10 +269,11 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
     val scroll = rememberScrollState()
     LaunchedEffect(cur) { scroll.scrollTo(0) }
     // System back steps back through the form; a swipe down or scrim tap only closes it before anything is chosen, so answers are never dropped by accident (Cancel always closes).
-    BackHandler(onBack = goBack)
     val gestureCloses by rememberUpdatedState(initial == null && prior == null && pos == 0 && symptom.isBlank())
     ModalBottomSheet(onDismissRequest = onClose, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true, confirmValueChange = { it != SheetValue.Hidden || gestureCloses }), containerColor = Cream,
         properties = ModalBottomSheetProperties(shouldDismissOnBackPress = false)) {
+        // Inside the sheet: the sheet is its own window, so a back handler outside it never hears system back.
+        BackHandler(onBack = goBack)
         Column(Modifier.fillMaxWidth().imePadding()) {
             Column(Modifier.padding(horizontal = 20.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Heading(t(if (prior != null && initial == null) "Update rating" else if (initial == null) "How are you feeling?" else "Edit symptom note", if (prior != null && initial == null) "नया अंक लिखें" else if (initial == null) "तबीयत कैसी है?" else "तबीयत का नोट बदलें"), 26)

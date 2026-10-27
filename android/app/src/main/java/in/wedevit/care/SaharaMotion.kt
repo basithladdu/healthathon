@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.EnterExitState
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.SizeTransform
@@ -31,7 +32,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.activity.OnBackPressedDispatcher
+import androidx.activity.OnBackPressedDispatcherOwner
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -81,6 +86,9 @@ object SaharaMotion {
         return ContentTransform(enter, exit, sizeTransform = SizeTransform(clip = false))
     }
 
+    /** Only the screen that is staying (or arriving) answers system back; a screen still fading out must not catch a quick second press. */
+    fun handlesBack(state: EnterExitState): Boolean = state == EnterExitState.Visible
+
     /** For parts of a screen that appear or disappear in place (banners, panels, loaders). */
     val enter: EnterTransition get() = fadeEnter() + slideInVertically(tween(ENTER_MS, easing = FastOutSlowInEasing)) { it / 16 }
     val exit: ExitTransition get() = fadeExit()
@@ -99,8 +107,14 @@ object SaharaMotion {
     content: @Composable AnimatedContentScope.(T) -> Unit,
 ) {
     val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+    val backOwner = LocalOnBackPressedDispatcherOwner.current
+    // A leaving screen stays composed for the exit animation; its back handlers move to a dispatcher nothing presses, so back goes to the new screen.
+    val inertBack = remember(backOwner) { backOwner?.let { owner -> object : OnBackPressedDispatcherOwner { override val lifecycle get() = owner.lifecycle; override val onBackPressedDispatcher = OnBackPressedDispatcher() } } }
     AnimatedContent(target, modifier, transitionSpec = { SaharaMotion.transform(direction(initialState, targetState), rtl) },
-        contentAlignment = Alignment.TopStart, label = label, content = content)
+        contentAlignment = Alignment.TopStart, label = label) { shown ->
+        if (backOwner == null || inertBack == null) content(shown)
+        else CompositionLocalProvider(LocalOnBackPressedDispatcherOwner provides if (SaharaMotion.handlesBack(transition.targetState)) backOwner else inertBack) { content(shown) }
+    }
 }
 
 /** Calm full-screen loading: a small progress ring and one line, shown only if loading lasts long enough to notice. */

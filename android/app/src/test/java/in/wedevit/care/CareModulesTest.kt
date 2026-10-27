@@ -21,4 +21,15 @@ class CareModulesTest {
         CareAddDrafts.keep("a:p:task", CareAddDrafts.Draft(" ", "", 0)); assertNull(CareAddDrafts.get("a:p:task"))
         CareAddDrafts.keep("a:p:visit", CareAddDrafts.Draft("", "", 5)); CareAddDrafts.clear("a:p:visit"); assertNull(CareAddDrafts.get("a:p:visit"))
     }
+    @Test fun aSaveThatFinishesAfterTheSheetWasSwipedAwayDoesNotBringTheTextBack() {
+        // Sheet dismissed while the save waits for a refresh: the dispose keeps the text, then the finished save clears it.
+        CareAddDrafts.keep("a:p:task", CareAddDrafts.Draft("Buy pads", "", 0))
+        CareAddDrafts.clear("a:p:task")
+        assertNull(CareAddDrafts.get("a:p:task"))
+    }
+    @Test fun signingOutDropsEveryUnsavedEntry() {
+        CareAddDrafts.keep("a:p:task", CareAddDrafts.Draft("Buy pads", "", 0)); CareAddDrafts.keep("b:q:journal", CareAddDrafts.Draft("Slept badly", "", 0))
+        CareAddDrafts.clearAll()
+        assertNull(CareAddDrafts.get("a:p:task")); assertNull(CareAddDrafts.get("b:q:journal"))
+    }
 }

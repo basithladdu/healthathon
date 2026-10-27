@@ -67,6 +67,19 @@ class CareSymptomDiaryUiTest {
         }
     }
 
+    @Test fun systemBackStepsBackThroughTheFormAndOnlyClosesFromTheFirstStep() {
+        var closed = false
+        ui.setContent { CareTheme { SymptomNoteForm("fixture-back", "Fictional patient", emptyList(), false, onSave = { _, _ -> }, onClose = { closed = true }) } }
+        ui.onNodeWithTag("symptom-choice-Pain").performScrollTo().performClick()
+        ui.onNodeWithTag("symptom-step-next").performScrollTo().performClick()
+        ui.onNodeWithTag("symptom-step-indicator").assertTextContains("Step 2 of 4")
+        androidx.test.espresso.Espresso.pressBack()
+        ui.onNodeWithTag("symptom-step-indicator").assertTextContains("Step 1 of 4")
+        ui.runOnIdle { assertFalse(closed) }
+        androidx.test.espresso.Espresso.pressBack()
+        ui.runOnIdle { assertTrue(closed) }
+    }
+
     @Test fun personSwitchClosesCapturedDraftAndPreventsSaveToTheNewPerson() {
         val person = mutableStateOf("first-person")
         var closed = false

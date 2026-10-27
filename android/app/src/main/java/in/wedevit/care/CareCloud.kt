@@ -64,6 +64,7 @@ class CareCloud(context: Context) {
                 check(preferences.edit().remove("session").commit()) { "Couldn't finish signing out. Please try again." }
                 session.value = null
             }
+            CareAddDrafts.clearAll()
         }
     }
     suspend fun addPerson(person: Person) {

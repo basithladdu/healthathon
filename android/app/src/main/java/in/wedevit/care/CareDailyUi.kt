@@ -49,6 +49,8 @@ internal object CareAddDrafts {
     fun get(key: String): Draft? = drafts[key]
     fun keep(key: String, draft: Draft) { if (draft.title.isBlank() && draft.detail.isBlank() && draft.due == 0L) drafts.remove(key) else drafts[key] = draft }
     fun clear(key: String) { drafts.remove(key) }
+    /** Signing out drops every unsaved entry so it is not kept in memory for the next person using this phone. */
+    fun clearAll() { drafts.clear() }
 }
 
 /** Pure grouping rules for the Daily care modules. */
