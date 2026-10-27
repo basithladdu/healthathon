@@ -121,6 +121,8 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
     val recordingConsents = selected.flatMapLatest { dao.recordingConsents(it).onStart { emit(emptyList()) } }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
     private val medicineHistory = MedicineHistoryRepo(app, cloud, storageNamespace)
     private val medicinePastIds = MutableStateFlow<Set<String>>(emptySet())
+    /** Intake reports for the selected person (server copy when signed in), newest first. */
+    val medicineEvents = MutableStateFlow<List<MedicineIntakeEvent>>(emptyList())
     private val prescriptionExcludedIds=selected.flatMapLatest { db.prescriptions().excludedIds(it) }.stateIn(viewModelScope,SharingStarted.Eagerly,emptyList())
     /** Person whose care entries have arrived from the database; empty-state cards wait for it so they never flash before the first rows. */
     val itemsLoadedFor = MutableStateFlow("")
@@ -223,7 +225,8 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
         if (recording.value) stopRecording()
         selected.value = id; preferences.edit().putString("person", id).apply()
         careContacts.value = emptyList(); canReadCareTeam.value = cloud == null; careContactsError.value = null; careContactsLoading.value = false
-        medicinePastIds.value = if (id.isBlank()) emptySet() else runCatching { medicineHistory.cached(id).pastIds }.getOrDefault(emptySet())
+        val cachedHistory = if (id.isBlank()) MedicineHistorySnapshot() else runCatching { medicineHistory.cached(id) }.getOrDefault(MedicineHistorySnapshot())
+        medicinePastIds.value = cachedHistory.pastIds; medicineEvents.value = cachedHistory.events
     }
     private fun sameCareContext(personId: String, expectedAccount: String, ownerOnly: Boolean = false): Boolean =
         careContextMatches(expectedAccount, cloud?.session?.value?.userId.orEmpty(), personId, selected.value,
@@ -232,7 +235,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
     fun refreshMedicineHistory() { val person = selected.value; viewModelScope.launch { refreshMedicineHistory(person) } }
     private suspend fun refreshMedicineHistory(person: String) {
         if (person.isBlank()) return
-        try { val snapshot = medicineHistory.load(person); if (selected.value == person && cloud?.session?.value?.userId.orEmpty() == account) { medicinePastIds.value = snapshot.pastIds; reconcileReminders() } }
+        try { val snapshot = medicineHistory.load(person); if (selected.value == person && cloud?.session?.value?.userId.orEmpty() == account) { medicinePastIds.value = snapshot.pastIds; medicineEvents.value = snapshot.events; reconcileReminders() } }
         catch (e: Exception) { if (e is CancellationException) throw e /* Keep last-known scoped regimen; never report cloud success. */ }
     }
     private suspend fun refreshCareContacts(personId: String) {
@@ -545,6 +548,15 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
                 message.value = "Daily check-off saved, but detailed history could not be recorded."
             }
         }
+        if (item.kind == "medicine") refreshMedicineHistory(item.personId)
+    }
+    /** Family/patient report that today's dose was missed. Appended to the intake history (server first when signed in); nothing is overwritten. */
+    fun reportMedicineMissed(item: CareItem) = action {
+        require(item.kind == "medicine" && item.personId == selected.value && people.value.any { it.id == item.personId }) { "Reopen the selected care profile." }
+        requireEdit(item.personId)
+        val snapshot = medicineHistory.append(item.personId, MedicineHistoryRules.missedReport(item, viewRole.value, System.currentTimeMillis()))
+        if (selected.value == item.personId) medicineEvents.value = snapshot.events
+        message.value = "Missed dose recorded · छूटी खुराक दर्ज की गई"
     }
     fun updateItem(item: CareItem, done: () -> Unit) = action {
         require(item.personId == selected.value && item.title.isNotBlank()) { "Choose the right person and enter a name." }

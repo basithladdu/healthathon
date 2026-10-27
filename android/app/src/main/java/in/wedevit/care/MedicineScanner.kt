@@ -261,6 +261,9 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
                 SurfaceCard(Peach) {
                     Text(t("${unmatched.size} medicine ${if (unmatched.size == 1) "photo was" else "photos were"} not matched", "दवा की ${unmatched.size} फ़ोटो नहीं मिलीं"), fontWeight = FontWeight.Bold)
                     Text(t("Review ${unmatched.joinToString { "photo ${it + 1}" }}. Add any missing medicine manually or leave it out only after checking the original prescription.", "${unmatched.joinToString { "फ़ोटो ${it + 1}" }} जाँचें। छूटी दवा ख़ुद लिखें, या असली पर्चा देखने के बाद ही उसे छोड़ें।"))
+                    unmatched.filter { it in medicineUris.indices }.forEach { index -> TextButton(onClick = { runCatching {
+                        context.startActivity(Intent(Intent.ACTION_VIEW).setDataAndType(Uri.parse(medicineUris[index]), "image/*").addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION))
+                    }.onFailure { scanError = t("No image viewer is available. Open this photo in Files to compare it.", "फ़ोटो देखने वाला ऐप नहीं मिला। मिलान के लिए यह फ़ोटो Files में खोलें।") } }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("View medicine photo ${index + 1}", "दवा की फ़ोटो ${index + 1} देखें")) } }
                     Spacer(Modifier.height(8.dp)); CheckLine(unmatchedReviewed, { unmatchedReviewed = it }, t("I reviewed the unmatched medicine photos.", "मैंने बिना मिली दवा की फ़ोटो जाँच ली हैं।"))
                 }
             }
@@ -398,6 +401,7 @@ private fun MedicineReviewCard(draft: MedicineDraft, onChange: (MedicineDraft) -
         medicine.uncertainties.forEach { Text("• $it", color = Rust, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 4.dp)) }
         Spacer(Modifier.height(10.dp))
         CareField(medicine.medicineName, { change(medicine.copy(medicineName = it.take(120))) }, t("Medicine name", "दवा का नाम"), singleLine = true)
+        MedicineNameSuggestions(medicine.medicineName) { change(medicine.copy(medicineName = it.take(120))) }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Box(Modifier.weight(1f)) { CareField(medicine.strength, { change(medicine.copy(strength = it.take(80))) }, t("Strength", "ताक़त (mg)"), singleLine = true) }
             Box(Modifier.weight(1f)) { CareField(medicine.form, { change(medicine.copy(form = it.take(60))) }, t("Form", "रूप (गोली, सिरप)"), singleLine = true) }

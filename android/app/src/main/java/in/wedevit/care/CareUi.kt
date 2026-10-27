@@ -869,6 +869,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
         else Surface(shape = RoundedCornerShape(12.dp), color = if (item.kind == "visit") Mint else Peach, modifier = Modifier.padding(end = 12.dp)) { Icon(careIcon(item.kind), null, tint = Ink, modifier = Modifier.padding(10.dp).size(22.dp)) }
         Column(Modifier.weight(1f)) { Text(if (item.kind == "checkin") checkInMoodLabel(item.title, hindi) else item.title, fontWeight = FontWeight.SemiBold); if (item.due > 0) Text(date(item.due), color = if (done) RustText else Rust, fontSize = 13.sp); if (item.detail.isNotBlank()) Text(item.detail, style = MaterialTheme.typography.bodyMedium); if (item.kind in listOf("checkin", "journal")) Text(date(item.created), style = MaterialTheme.typography.bodySmall) }
     }
+        if (item.kind == "medicine") MedicineDoseActions(item, vm)
         if (canEdit) FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             val actionColors = ButtonDefaults.textButtonColors(contentColor = if (done) RustText else Rust)
             TextButton(onClick = { editing = true }, colors = actionColors, modifier = Modifier.testTag("care-edit-${item.id}")) { Icon(Icons.Default.Edit, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Edit", "बदलें")) }
@@ -968,6 +969,8 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
             Text(androidx.compose.ui.res.stringResource(R.string.app_full_name))
             Spacer(Modifier.height(10.dp)); Text(t("Your doctor guides treatment. Selecting a role does not verify identity. Only independently approved, invited accounts can publish a verified review online.", "इलाज आपके डॉक्टर तय करते हैं। भूमिका चुनने से पहचान पक्की नहीं होती। सिर्फ़ अलग से मंज़ूर और बुलाए गए खाते ही ऑनलाइन जाँची हुई समीक्षा डाल सकते हैं।"))
             Spacer(Modifier.height(10.dp)); Text(t("Dictate a speaker's turn or transcribe a recording with the downloaded Hindi/English pack, then check the words. Hindi/English reading uses Google Translate on-device models. Read aloud uses a downloaded voice.", "डाउनलोड किए गए हिन्दी/अंग्रेज़ी पैक से बोलकर लिखवाएँ या रिकॉर्डिंग को लिखित में बदलें, फिर शब्द जाँच लें। हिन्दी/अंग्रेज़ी पढ़ने के लिए फ़ोन पर ही Google Translate के मॉडल चलते हैं। पढ़कर सुनाने के लिए डाउनलोड की गई आवाज़ इस्तेमाल होती है।"))
+            Spacer(Modifier.height(10.dp)); Text(t(MedicineNames.ATTRIBUTION, "दवा के नाम: CDCI (NRCeS / C-DAC), CC BY 4.0"), style = MaterialTheme.typography.bodySmall)
+            TextButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse("https://creativecommons.org/licenses/by/4.0/"))) }) { Text(t("CC BY 4.0 licence", "CC BY 4.0 लाइसेंस")) }
             Spacer(Modifier.height(12.dp)); Text(t("Version ${BuildConfig.VERSION_NAME}", "संस्करण ${BuildConfig.VERSION_NAME}"), style = MaterialTheme.typography.bodySmall)
         } }
         if (owner && !walkthrough) item { TextButton(onClick = onDelete) { Icon(Icons.Default.DeleteOutline, null); Spacer(Modifier.width(8.dp)); Text(t("Remove this person's records", "इस व्यक्ति के रिकॉर्ड हटाएँ")) } }
@@ -1021,6 +1024,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                 CareField(value = detail, onValueChange = { detail = it.take(4000); title = it.lineSequence().firstOrNull { line -> line.isNotBlank() }.orEmpty().take(80) }, label = t("Your note", "आपका नोट"), minLines = 4)
             } else {
                 CareField(value = title, onValueChange = { title = it.take(200) }, label = when (kind) { "medicine" -> t("Medicine name", "दवा का नाम"); "visit" -> t("Doctor or hospital", "डॉक्टर या अस्पताल"); "task" -> t("What needs doing?", "क्या करना है?"); else -> t("Title", "शीर्षक") }, singleLine = kind != "task")
+                if (kind == "medicine") MedicineNameSuggestions(title, enabled = !busy) { title = it }
                 CareField(value = detail, onValueChange = { detail = it.take(4000) }, label = when (kind) { "medicine" -> t("Dose and times, as prescribed", "खुराक और समय, जैसा पर्चे में लिखा है"); "visit" -> t("Time, place and questions (optional)", "समय, जगह और सवाल (ज़रूरी नहीं)"); "task" -> t("Details (optional)", "और जानकारी (ज़रूरी नहीं)"); else -> t("Your note", "आपका नोट") }, minLines = if (kind == "journal") 4 else 2)
             }
             if (kind == "visit") Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {

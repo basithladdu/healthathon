@@ -44,3 +44,30 @@ class MedicineHistoryRulesTest {
         assertNull(MedicineHistoryRules.legacyDate(item.copy(doneOn="")))
     }
 }
+
+class MedicineMissedReportTest {
+    private val zone = java.time.ZoneId.of("Asia/Kolkata")
+    private val day = java.time.LocalDate.of(2026, 10, 27)
+    private val noon = day.atTime(12, 0).atZone(zone).toInstant().toEpochMilli()
+    private val medicine = CareItem("med-1", "person-1", "medicine", "Synthetic medicine", "As prescribed")
+    private fun report(outcome: String, at: Long, id: String = outcome + at) = MedicineIntakeEvent(id, "med-1", "Synthetic medicine", outcome, loggedAt = at)
+
+    @Test fun missedReportInventsNoTimesAndPassesValidation() {
+        val event = MedicineHistoryRules.missedReport(medicine, "Family", noon, "event-1")
+        assertEquals("skipped", event.outcome); assertNull(event.plannedAt); assertNull(event.reportedTakenAt); assertEquals("", event.reportedDate)
+        assertEquals("Family report", event.reporter); assertEquals("manual", event.source)
+        MedicineHistoryRules.validate(event, noon)
+        assertEquals("Not recorded", MedicineHistoryRules.missedReport(medicine, "Doctor", noon).reporter)
+        assertEquals("Skipped reported", MedicineHistoryRules.status(event, noon))
+    }
+
+    @Test fun todayOutcomeUsesLatestReportOfThatDayAndTheTickedBox() {
+        assertNull(MedicineHistoryRules.todayOutcome(medicine, emptyList(), day, zone))
+        assertEquals("skipped", MedicineHistoryRules.todayOutcome(medicine, listOf(report("skipped", noon)), day, zone))
+        assertEquals("taken", MedicineHistoryRules.todayOutcome(medicine, listOf(report("skipped", noon), report("taken", noon + 60_000)), day, zone))
+        assertNull(MedicineHistoryRules.todayOutcome(medicine, listOf(report("taken", noon), report("unmarked", noon + 1)), day, zone))
+        assertNull(MedicineHistoryRules.todayOutcome(medicine, listOf(report("skipped", noon - 86_400_000)), day, zone))
+        assertNull(MedicineHistoryRules.todayOutcome(medicine, listOf(report("skipped", noon).copy(medicineId = "other")), day, zone))
+        assertEquals("taken", MedicineHistoryRules.todayOutcome(medicine.copy(doneOn = day.toString()), listOf(report("skipped", noon)), day, zone))
+    }
+}

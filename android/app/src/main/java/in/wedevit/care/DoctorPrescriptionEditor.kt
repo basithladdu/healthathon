@@ -31,6 +31,7 @@ import java.util.UUID
                 SurfaceCard {
                     Text(t("Medicine ${index+1}", "दवा ${index+1}"),fontSize=18.sp)
                     OutlinedTextField(row.name,{value->rows=rows.map {if(it.id==row.id)it.copy(name=value.take(200))else it}},label={Text(t("Medicine name", "दवा का नाम"))},enabled=!busy)
+                    MedicineNameSuggestions(row.name,enabled=!busy){value->rows=rows.map {if(it.id==row.id)it.copy(name=value)else it}}
                     OutlinedTextField(row.instructions,{value->rows=rows.map {if(it.id==row.id)it.copy(instructions=value.take(4000))else it}},label={Text(t("Instructions as prescribed", "लिखे गए निर्देश"))},enabled=!busy)
                     TextButton(onClick={rows=rows.filterNot {it.id==row.id}},enabled=!busy&&rows.size>1,modifier=Modifier.heightIn(min=48.dp)){Text(t("Remove from current list", "अभी की सूची से हटाएँ"))}
                 }
