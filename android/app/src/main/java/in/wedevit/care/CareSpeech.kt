@@ -191,7 +191,7 @@ private class CareDictation(private val context: Context, val changed: () -> Uni
             }
             if (dictation.status.isNotBlank()) Text(dictation.status, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 6.dp))
         } else Text(if (Build.VERSION.SDK_INT < 31) "On-device dictation needs Android 12 or later. Type the words or keep an audio recording." else "On-device dictation isn't available on this phone. Type the words or keep an audio recording.", style = MaterialTheme.typography.bodySmall)
-        if (permissionError.isNotBlank()) Text(permissionError, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
+        if (permissionError.isNotBlank()) Text(permissionError, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall, modifier = Modifier.announce())
         if (heldWords.isNotBlank() && !active) {
             Text("Unfinished words · $pendingSpeaker · ${pendingLanguage.label}", style = MaterialTheme.typography.labelMedium)
             CareField(heldWords, { heldWords = it }, "Words to keep", minLines = 2)

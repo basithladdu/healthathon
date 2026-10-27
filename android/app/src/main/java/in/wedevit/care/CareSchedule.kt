@@ -161,7 +161,7 @@ fun calendarItems(entries: List<CareItem>, day: LocalDate): List<CareItem> = ent
                 if (!legacy) OutlinedTextField(location, { location = it }, label = { Text("Place or clinician (optional)") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
                 OutlinedTextField(detail, { detail = it }, label = { Text(if (category == "Medicine") "Prescribed dose and instructions" else "Details (optional)") }, modifier = Modifier.fillMaxWidth(), maxLines = 4)
             }
-            (error.ifBlank { saveError.orEmpty() }).takeIf(String::isNotBlank)?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+            (error.ifBlank { saveError.orEmpty() }).takeIf(String::isNotBlank)?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
             Button(onClick = { runCatching {
                 require(canEditCareContext(vm, capturedPerson, capturedAccount)) { "Choose the right person before saving." }
                 require(title.trim().length in 1..200 && due > 0) { "Add a title and date." }

@@ -64,7 +64,7 @@ import java.time.format.DateTimeFormatter
             Text("Only the active account sends alerts. Medicine times follow the phone’s current time zone; dated visits keep their saved time.", style = MaterialTheme.typography.bodySmall)
             if (!allowed) TextButton(onClick = { runCatching { context.startActivity(Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)) }.onFailure { error = "Open Android Settings → Apps → Sahara → Notifications." } }) { Text("Open notification settings") }
         } }
-        if (error.isNotBlank()) item { Text(error, color = MaterialTheme.colorScheme.error) }
+        if (error.isNotBlank()) item { Text(error, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
         item { Text("Choose times from the existing prescription. Sahara does not calculate or change doses. Marking a medicine done completes that whole entry for the day.", style = MaterialTheme.typography.bodySmall) }
         val eligible = items.filter { it.personId == selected && (it.kind == "medicine" || it.due > 0) }
         if (eligible.isEmpty()) item { SurfaceCard { Text("No dated care activities or medicines yet."); Text("Add a medicine or choose a time in Calendar first.", style = MaterialTheme.typography.bodySmall) } }
@@ -86,7 +86,7 @@ import java.time.format.DateTimeFormatter
                 CareField(times, { times = it; error = "" }, "Times · HH:mm, separated by commas", singleLine = true)
                 CareField(starts, { starts = it; error = "" }, "Start date · YYYY-MM-DD (optional)", singleLine = true)
                 CareField(ends, { ends = it; error = "" }, "Last date · YYYY-MM-DD (optional)", singleLine = true)
-                if (error.isNotBlank()) Text(error, color = MaterialTheme.colorScheme.error)
+                if (error.isNotBlank()) Text(error, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce())
                 Button(onClick = { runCatching {
                     scheduler.configure(item.id, ReminderOption(if (times.isBlank()) emptyList() else times.split(',').map(String::trim), starts.trim(), ends.trim(), option?.muted == true)); changed()
                 }.onFailure { error = it.message ?: "Check the times and dates." } }, modifier = Modifier.fillMaxWidth()) { Text("Save reminder times") }

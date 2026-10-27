@@ -40,8 +40,8 @@ import java.util.UUID
             if(replacing&&currentExists) Row { Checkbox(confirmed,{confirmed=it},enabled=!busy);Text("Replace the entire current prescription after saving this reviewed list. Keep the previous prescription and its history in Past.") }
             if(!replacing) Text("Removing a medicine only ends its current-list membership. Earlier directions, prescriptions and intake reports are retained.")
             Row {Checkbox(reviewed,{reviewed=it},enabled=!busy);Text("I reviewed every medicine name and instruction against the prescription.")}
-            error?.let {Text(it,color=MaterialTheme.colorScheme.error)}
-            saveError?.let {Text(it,color=MaterialTheme.colorScheme.error);Text("Cancel and refresh the current list before reviewing again. After a connection error, check the saved state rather than assuming success or failure.")}
+            error?.let {Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce())}
+            saveError?.let {Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce());Text("Cancel and refresh the current list before reviewing again. After a connection error, check the saved state rather than assuming success or failure.")}
         }
     },confirmButton={TextButton(enabled=!busy&&reviewed&&(!replacing||!currentExists||confirmed),onClick={
         if(title.isBlank()||rows.any {it.name.isBlank()})error="Add a prescription label and each medicine name."

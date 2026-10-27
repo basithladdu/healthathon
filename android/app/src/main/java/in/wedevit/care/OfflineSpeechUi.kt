@@ -105,7 +105,7 @@ import java.io.File
             else LinearProgressIndicator(Modifier.fillMaxWidth())
             TextButton(onClick = { task?.cancel() }, modifier = Modifier.testTag("offline-cancel")) { Text("Stop") }
         }
-        if (error.isNotBlank()) Text(error, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall, modifier = Modifier.testTag("offline-error"))
+        if (error.isNotBlank()) Text(error, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall, modifier = Modifier.testTag("offline-error").announce())
         result?.let { original ->
             Spacer(Modifier.height(8.dp))
             Text("Original recognised words", fontWeight = FontWeight.SemiBold)

@@ -68,7 +68,7 @@ import kotlinx.coroutines.launch
             }, enabled = !busy && source.isNotBlank(), modifier = Modifier.testTag("offline-translation-start")) { Text(if (busy) "Reading line ${progress.first} / ${progress.second}" else if (target == "hi") "Translate with Google · हिन्दी" else "Translate with Google · English") }
             if (busy) TextButton(onClick = { job?.cancel(); busy = false }) { Text("Cancel") }
         }
-        if (error.isNotBlank()) Text(error, color = MaterialTheme.colorScheme.error)
+        if (error.isNotBlank()) Text(error, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce())
         if (result.isNotEmpty()) {
             Text("Original and machine translation · मूल और अनुवाद", fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
             result.forEach { line ->

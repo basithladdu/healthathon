@@ -117,16 +117,16 @@ private class PrepModel(val store: DoctorPreparationStore, val scope: String, va
 @Composable private fun PrepCard(tag: String, title: String, intro: String, m: PrepModel, content: @Composable ColumnScope.() -> Unit) {
     Card(Modifier.fillMaxWidth().testTag(tag), shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = DoctorCardReport), border = BorderStroke(1.dp, DoctorHairline)) {
         Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text(title, fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
+            Text(title, fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading())
             Text(intro, fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub)
-            m.error?.let { Text(it, fontSize = 13.sp, color = DoctorAccent, modifier = Modifier.testTag("$tag-error")) }
+            m.error?.let { Text(it, fontSize = 13.sp, color = DoctorAccent, modifier = Modifier.testTag("$tag-error").announce()) }
             if (!m.loaded) TextButton(onClick = { m.load() }, modifier = Modifier.heightIn(min = 48.dp).testTag("$tag-retry")) { Text("Retry questions", color = DoctorAccent) }
             content()
         }
     }
 }
 
-@Composable private fun SectionHeading(index: Int) = Text(NoteRules.labels[index], fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.testTag("doctor-preparation-section-$index"))
+@Composable private fun SectionHeading(index: Int) = Text(NoteRules.labels[index], fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.testTag("doctor-preparation-section-$index").a11yHeading())
 
 /**
  * Editable numbered list of questions to cover; new questions default to "Still to discuss" for filing downstream. Saved on this device only; never part of a note or its hash.

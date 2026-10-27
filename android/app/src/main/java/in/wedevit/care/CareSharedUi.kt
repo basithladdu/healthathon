@@ -71,8 +71,8 @@ import kotlinx.coroutines.launch
             if (cloud == null) item { SurfaceCard { Heading("Sign in to your records", 25); Text("Use an existing confirmed Sahara account. A selected doctor role does not verify your identity."); Button(onClick = onAccount) { Text("Your account") } } }
             else {
                 item { Text(people.firstOrNull { it.id == selected }?.name.orEmpty(), style = MaterialTheme.typography.titleLarge); OutlinedButton(onClick = { run { refresh(); vm.refresh() } }, enabled = !busy) { Icon(Icons.Default.Refresh, null); Spacer(Modifier.width(8.dp)); Text("Refresh shared records") } }
-                if (error.isNotBlank()) item { SurfaceCard(Peach) { Text(error); TextButton(onClick = { run { refresh() } }, enabled = !busy) { Text("Retry") } } }
-                if (notice.isNotBlank()) item { Text(notice, color = Rust) }
+                if (error.isNotBlank()) item { SurfaceCard(Peach) { Text(error, Modifier.announce()); TextButton(onClick = { run { refresh() } }, enabled = !busy) { Text("Retry", color = RustText) } } }
+                if (notice.isNotBlank()) item { Text(notice, color = Rust, modifier = Modifier.announce()) }
                 item { SurfaceCard(Mint) {
                     Text("Clinician verification", fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
                     Text(when (profile?.status) { "approved" -> "Registration reviewed. Patient invitation is also required before clinical review."; "pending" -> "Request received. An independent verifier must check your council registration."; "rejected", "suspended" -> "${profile?.status}: ${profile?.note}"; else -> "Your account is not verified as a clinician." })
@@ -115,7 +115,7 @@ import kotlinx.coroutines.launch
                     item { CheckLine(confirmed, { confirmed = it }, "I checked this exact source and every section as the patient's invited clinician.") }
                     item { Button(onClick = { run { cloud.reviewSharedDraft(draft); reading = null; refresh(); vm.refresh(); notice = "Reviewed care-note version published. The patient reviews this exact version next." } }, enabled = confirmed && !busy, modifier = Modifier.fillMaxWidth()) { Text("Publish reviewed care note") } }
                 }
-                if (error.isNotBlank()) item { Text(error, color = MaterialTheme.colorScheme.error) }
+                if (error.isNotBlank()) item { Text(error, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
                 item { TextButton(onClick = { reading = null }, enabled = !busy) { Text("Close") } }
             }
         }

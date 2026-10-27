@@ -158,7 +158,7 @@ fun EmbeddedPatientCare(
                 Text(if (person == null && !refreshing) "This care profile is unavailable" else "Opening this person's care…", style = MaterialTheme.typography.titleLarge)
                 Text("Only this selected person's records will appear here. Test patients and other care profiles are kept separate.")
                 OutlinedButton(onClick = onExit) { Text("Back to patients") }
-                refreshError?.let { Text(it, color = MaterialTheme.colorScheme.error); TextButton(onClick = vm::refresh) { Text("Retry") } }
+                refreshError?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()); TextButton(onClick = vm::refresh) { Text("Retry") } }
             }
         } else {
             if ((section != "Conversations" || tool.isNotEmpty() || !conversationCapture) && (!DoctorTestProfiles.contains(personId) || !canEdit)) Surface(color = if (vm.cloud == null) Peach.copy(alpha = .5f) else Paper) {
@@ -203,7 +203,7 @@ fun EmbeddedPatientCare(
                     }
                 } }
             }
-            refreshError?.let { Surface(color = Peach) { Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) { Text(it, Modifier.weight(1f), style = MaterialTheme.typography.bodySmall); TextButton(onClick = vm::refresh, enabled = !busy) { Text("Retry") } } } }
+            refreshError?.let { Surface(color = Peach) { Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) { Text(it, Modifier.weight(1f), style = MaterialTheme.typography.bodySmall); TextButton(onClick = vm::refresh, enabled = !busy) { Text("Retry", color = RustText) } } } }
         }
         SnackbarHost(snackbar)
     }

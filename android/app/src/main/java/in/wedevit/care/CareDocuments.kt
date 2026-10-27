@@ -111,7 +111,7 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
                 finally { searching = false }
             }
         }, enabled = search.isNotBlank() && !searching, modifier = Modifier.fillMaxWidth()) { Text(if (searching) t("Searching your reports…", "रिपोर्टों में खोज रहे हैं…") else t("Find in reviewed report text", "जाँची गई रिपोर्टों में खोजें")) } }
-        if (textError.isNotBlank()) item { Text(textError, color = MaterialTheme.colorScheme.error) }
+        if (textError.isNotBlank()) item { Text(textError, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
         if (searchedText.isNotBlank()) {
             item { SectionTitle(t("From your reports", "आपकी रिपोर्टों से")) }
             if (textMatches.isEmpty()) item { SurfaceCard { Text(t("Not found in your reports", "आपकी रिपोर्टों में नहीं मिला"), fontWeight = FontWeight.SemiBold); Text(t("No answer was generated. Try fewer words, or open a report and review its text first.", "कोई जवाब नहीं बनाया गया। कम शब्दों से खोजें, या पहले रिपोर्ट खोलकर उसका लिखा हिस्सा जाँचें।"), style = MaterialTheme.typography.bodySmall) } }

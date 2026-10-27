@@ -230,7 +230,7 @@ object CareLabRules {
             Text(item.title)
             if (action !in setOf("remove", "cancelled", "open")) OutlinedTextField(actor, { actor = it; error = "" }, label = { Text("Your name") }, singleLine = true)
             if (action == "accepted") Text("Names are self-entered and visible to this care circle.", style = MaterialTheme.typography.bodySmall)
-            (error.ifBlank { savingError.orEmpty() }).takeIf(String::isNotBlank)?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+            (error.ifBlank { savingError.orEmpty() }).takeIf(String::isNotBlank)?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
         } }, confirmButton = { TextButton(enabled = !busy, onClick = {
             if (!canEditCareContext(vm, item.personId, capturedAccount)) { error = "Care access changed. Reopen this person's records." }
             else if (action == "remove") { vm.remove(item); action = "" }
@@ -271,7 +271,7 @@ object CareLabRules {
                 CareDateButton(due, if (type == "conversation") "Preferred date" else "Due date", { due = it }, allowClear = true)
                 OutlinedTextField(detail, { detail = it }, label = { Text("Details (optional)") }, modifier = Modifier.fillMaxWidth(), maxLines = 4)
             }
-            (error.ifBlank { saveError.orEmpty() }).takeIf(String::isNotBlank)?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+            (error.ifBlank { saveError.orEmpty() }).takeIf(String::isNotBlank)?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
             Button(onClick = {
                 runCatching {
                     require(canEditCareContext(vm, capturedPerson, capturedAccount)) { "Choose the right person before saving." }

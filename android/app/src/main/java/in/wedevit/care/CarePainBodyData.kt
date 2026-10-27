@@ -64,6 +64,18 @@ object PainBodyMapRules {
         else -> label(id, hindi)
     }
     fun label(id: String, hindi: Boolean): String = sites[id]?.let { if (hindi) it.second else it.first } ?: id
+    /** A spot's score as TalkBack reads it: "7 of 10, Severe" / "10 में से 7, तेज़", or "not rated". */
+    fun spokenScore(rating: Int?, hindi: Boolean): String = when {
+        rating == null -> if (hindi) "अंक नहीं" else "not rated"
+        hindi -> "10 में से ${rating.coerceIn(0, 10)}, ${strengthWord(rating, true)}"
+        else -> "${rating.coerceIn(0, 10)} of 10, ${strengthWord(rating, false)}"
+    }
+    /** What TalkBack says for the body map: every marked part by name with its score, in body order. */
+    fun spokenSummary(selected: List<String>, ratings: Map<String, Int>, hindi: Boolean): String {
+        val parts = sites.keys.filter { it in selected }
+        if (parts.isEmpty()) return if (hindi) "अभी दर्द की कोई जगह चिह्नित नहीं" else "No pain areas marked yet"
+        return (if (hindi) "चिह्नित दर्द: " else "Pain marked: ") + parts.joinToString("; ") { "${label(it, hindi)}, ${spokenScore(ratings[it], hindi)}" }
+    }
     fun validPoint(point: PainBodyPoint3d): Boolean = point.site in sites && point.x.isFinite() && point.y.isFinite() && point.z.isFinite() && point.x in -1.0..1.0 && point.y in 0.0..1.0 && point.z in -1.0..1.0
     fun pointContext(points: List<PainBodyPoint3d>) = points.sortedBy { it.site }.map { "${it.site}:${(it.x * 1000).roundToLong()}:${(it.y * 1000).roundToLong()}:${(it.z * 1000).roundToLong()}" }
     fun encodePoints(points: List<PainBodyPoint3d>): JSONArray = JSONArray(points.sortedBy { it.site }.map { JSONObject().put("site", it.site).put("x", it.x).put("y", it.y).put("z", it.z) })

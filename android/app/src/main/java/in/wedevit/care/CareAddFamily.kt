@@ -85,7 +85,7 @@ internal fun shareCareInvite(context: Context, text: String, whatsApp: Boolean) 
                 Button(onClick = { send(true) }, enabled = !busy && name.isNotBlank(), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Icon(Icons.Default.PersonAdd, null); Spacer(Modifier.width(8.dp)); Text(if (busy) t("Please wait…", "कृपया रुकें…") else t("Send invite on WhatsApp", "WhatsApp पर निमंत्रण भेजें")) }
                 OutlinedButton(onClick = { send(false) }, enabled = !busy && name.isNotBlank(), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.Share, null); Spacer(Modifier.width(8.dp)); Text(t("Share another way", "किसी और तरीके से भेजें")) }
             }
-            error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+            error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
             TextButton(onClick = onDismiss, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Close", "बंद करें")) }
         }
     }

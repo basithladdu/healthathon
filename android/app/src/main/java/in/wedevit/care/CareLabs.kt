@@ -1,6 +1,8 @@
 @file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 package `in`.wedevit.care
 
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -70,7 +72,8 @@ fun labGroups(items: List<CareItem>): List<List<Pair<CareItem, CareEntry>>> = it
     val max = points.maxOf { it.second }
     val span = (max - min).takeIf { it > 0 } ?: 1.0
     Row(Modifier.fillMaxWidth().padding(top = 12.dp), horizontalArrangement = Arrangement.SpaceBetween) { Text("${min.toBigDecimal().stripTrailingZeros().toPlainString()}–${max.toBigDecimal().stripTrailingZeros().toPlainString()} ${values.first().second.unit}", style = MaterialTheme.typography.labelSmall); Text("Recorded values", style = MaterialTheme.typography.labelSmall) }
-    Canvas(Modifier.fillMaxWidth().height(82.dp).padding(vertical = 10.dp)) {
+    val range = "${min.toBigDecimal().stripTrailingZeros().toPlainString()} to ${max.toBigDecimal().stripTrailingZeros().toPlainString()} ${values.first().second.unit}"
+    Canvas(Modifier.fillMaxWidth().height(82.dp).padding(vertical = 10.dp).semantics { contentDescription = "Chart of ${points.size} recorded values, from $range. Each value is listed below." }) {
         val padding = 8.dp.toPx()
         val plotWidth = size.width - padding * 2
         val plotHeight = size.height - padding * 2
@@ -153,7 +156,7 @@ fun labGroups(items: List<CareItem>): List<List<Pair<CareItem, CareEntry>>> = it
                 if (reports.none { it.personId == captured }) Text("Add report files in Documents to link them here.", style = MaterialTheme.typography.bodySmall)
                 OutlinedTextField(detail, { detail = it }, label = { Text("Report notes (optional)") }, modifier = Modifier.fillMaxWidth(), maxLines = 3)
             }
-            (error.ifBlank { saveError.orEmpty() }).takeIf(String::isNotBlank)?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+            (error.ifBlank { saveError.orEmpty() }).takeIf(String::isNotBlank)?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
             Button(onClick = { runCatching {
                 require(selected == captured && canEdit) { "Choose the right person before saving." }
                 val data = CareEntry(type = "lab", detail = detail.trim(), sender = existing?.sender ?: vm.cloud?.session?.value?.email.orEmpty(), value = value.trim(), unit = unit.trim(), rangeLow = low.trim(), rangeHigh = high.trim(), rangeText = rangeText.trim(), reportId = reportId, reportName = reportName)

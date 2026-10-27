@@ -91,7 +91,7 @@ import kotlinx.coroutines.withContext
                 catch (error: IllegalArgumentException) { message = error.message.orEmpty() }
             }, enabled = checked && words.isNotBlank(), modifier = Modifier.testTag("care-transcript-use")) { Text("Add checked turn") }
         }
-        if (message.isNotBlank()) Text(message, style = MaterialTheme.typography.bodySmall)
+        if (message.isNotBlank()) Text(message, style = MaterialTheme.typography.bodySmall, modifier = Modifier.announce())
     }
 }
 
@@ -157,7 +157,7 @@ import kotlinx.coroutines.withContext
                 else message = "The conversation changed. Prepare a fresh draft."
             }, enabled = checked && !busy, modifier = Modifier.testTag("care-assist-use")) { Text("Use reviewed draft") }
         }
-        if (message.isNotBlank()) Text(message, style = MaterialTheme.typography.bodySmall)
+        if (message.isNotBlank()) Text(message, style = MaterialTheme.typography.bodySmall, modifier = Modifier.announce())
     }
 }
 
@@ -216,6 +216,6 @@ import kotlinx.coroutines.withContext
             if (reviewed) CareReadAloudControl(translated.translation, "translation-${translated.versionId}-${translated.sourceHash}-${translated.targetLanguage}", translated.targetLanguage)
             Text("This does not replace the signed original or acknowledge a new version.", style = MaterialTheme.typography.bodySmall)
         }
-        if (message.isNotBlank()) Text(message, style = MaterialTheme.typography.bodySmall)
+        if (message.isNotBlank()) Text(message, style = MaterialTheme.typography.bodySmall, modifier = Modifier.announce())
     }
 }

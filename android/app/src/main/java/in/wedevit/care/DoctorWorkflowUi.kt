@@ -35,10 +35,10 @@ import androidx.lifecycle.LifecycleEventObserver
 private fun workflowDate(time: Long) = if (time == 0L) "Date not recorded" else DateTimeFormatter.ofPattern("d MMM, h:mm a").withZone(ZoneId.systemDefault()).format(Instant.ofEpochMilli(time))
 private fun ackWords(status: WorkflowAckStatus) = when(status) { WorkflowAckStatus.READ->"they said they read it"; WorkflowAckStatus.CONCERN->"they raised a concern"; else->"they said they are not ready" }
 private fun requestLabel(status: WorkflowRequestStatus) = status.name.lowercase().replaceFirstChar { it.uppercase() }
-@Composable private fun WorkflowTitle(text: String) { Text(text, fontSize = 25.sp, lineHeight = 31.sp, fontWeight = FontWeight.Medium, color = Ink, fontFamily = SaharaTitleFont) }
-@Composable private fun WorkflowSection(text: String) { Text(text, fontSize = 18.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont) }
+@Composable private fun WorkflowTitle(text: String) { Text(text, Modifier.a11yHeading(), fontSize = 25.sp, lineHeight = 31.sp, fontWeight = FontWeight.Medium, color = Ink, fontFamily = SaharaTitleFont) }
+@Composable private fun WorkflowSection(text: String) { Text(text, Modifier.a11yHeading(), fontSize = 18.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont) }
 @Composable private fun WorkflowCard(content: @Composable ColumnScope.() -> Unit) {
-    Surface(color = Paper, shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant), modifier = Modifier.fillMaxWidth()) { Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp), content = content) }
+    Surface(color = Paper, shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant), modifier = Modifier.fillMaxWidth().a11yCard()) { Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp), content = content) }
 }
 
 @Composable fun DoctorRequestQueue(store: DoctorWorkflowStore, patients: List<DoctorDemoPatient>, onBack: () -> Unit, onOpen: (String) -> Unit, onSchedule: (WorkflowRequest) -> Unit, refreshToken: Int = 0) {

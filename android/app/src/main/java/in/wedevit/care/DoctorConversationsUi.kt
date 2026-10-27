@@ -69,7 +69,7 @@ private fun conversationDate(at: Long?) = at?.takeIf { it > 0 }?.let {
 }
 
 @Composable private fun ConversationHeading(text: String) {
-    Text(text, fontSize = 21.sp, lineHeight = 27.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, fontFamily = SaharaTitleFont)
+    Text(text, fontSize = 21.sp, lineHeight = 27.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, fontFamily = SaharaTitleFont, modifier = Modifier.a11yHeading())
 }
 
 @Composable private fun DiscussionReadingCard(discussion: DoctorOverviewDiscussion, highlighted: Boolean) {

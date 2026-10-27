@@ -84,8 +84,8 @@ private val DoctorInk = Ink
 private val DoctorMuted = DoctorCardSub
 private val DoctorMist = Peach
 
-@Composable private fun DoctorTitle(text: String, size: Int = 28) { Text(text, fontFamily = SaharaTitleFont, fontSize = size.sp, lineHeight = (size + 6).sp, fontWeight = FontWeight.Medium, color = DoctorInk) }
-@Composable private fun DoctorSection(text: String) { Text(text, fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorInk) }
+@Composable private fun DoctorTitle(text: String, size: Int = 28) { Text(text, Modifier.a11yHeading(), fontFamily = SaharaTitleFont, fontSize = size.sp, lineHeight = (size + 6).sp, fontWeight = FontWeight.Medium, color = DoctorInk) }
+@Composable private fun DoctorSection(text: String) { Text(text, Modifier.a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorInk) }
 @Composable private fun DoctorAvatar(name: String, size: Int = 46, tint:Color=DoctorMist) {
     Box(Modifier.size(size.dp).background(tint, RoundedCornerShape((size / 3).dp)), contentAlignment = Alignment.Center) {
         Text(name.split(' ').mapNotNull { it.firstOrNull() }.take(2).joinToString(""), color = DoctorForest, fontWeight = FontWeight.SemiBold, fontSize = (size / 3).sp)
@@ -249,7 +249,7 @@ private val DoctorMist = Peach
     }) { padding ->
         Column(Modifier.padding(padding).consumeWindowInsets(padding).fillMaxSize()) {
             notice?.let { message -> Row(Modifier.fillMaxWidth().background(DoctorMist).padding(start = 16.dp), verticalAlignment = Alignment.CenterVertically) {
-                Text(message, Modifier.weight(1f), style = MaterialTheme.typography.bodySmall)
+                Text(message, Modifier.weight(1f).announce(), style = MaterialTheme.typography.bodySmall)
                 IconButton(onClick = { notice = null }) { Icon(Icons.Default.Close, "Dismiss status") }
             } }
             if(earlierWorkspace && !sampleCareOpen && patientId==null && carePersonId==null) Row(Modifier.fillMaxWidth().padding(horizontal=20.dp),verticalAlignment=Alignment.CenterVertically){Text("Earlier practice workspace",Modifier.weight(1f));TextButton(onClick={earlierWorkspace=false;workflowRoute=null;tab=0}){Text("Return to current workspace")}}
@@ -359,7 +359,7 @@ private val DoctorMist = Peach
         OutlinedTextField(email, { email = it; error = null }, singleLine = true, label = { Text("Email") }, leadingIcon = { Icon(Icons.Default.MailOutline, null) }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email), shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().testTag("demo-email"))
         OutlinedTextField(password, { password = it; error = null }, singleLine = true, label = { Text("Password") }, leadingIcon = { Icon(Icons.Default.LockOpen, null) }, trailingIcon = { IconButton(onClick = { passwordVisible = !passwordVisible }) { Icon(if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility, if (passwordVisible) "Hide password" else "Show password") } }, visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password), shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().testTag("demo-password"))
         Text("Credentials are prefilled", style = MaterialTheme.typography.bodySmall, color = DoctorMuted)
-        error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.testTag("demo-login-error")) }
+        error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.testTag("demo-login-error").announce()) }
         Button(onClick = { if (email.trim() == "doctor@demo.sahara.test" && password == "SaharaDemo") onContinue() else error = "Use the prefilled preview account: doctor@demo.sahara.test / SaharaDemo." }, shape = RoundedCornerShape(14.dp),
             modifier = Modifier.fillMaxWidth().heightIn(min = 54.dp).testTag("demo-login")) { Text("Open workspace", fontSize = 16.sp); Spacer(Modifier.width(10.dp)); Icon(Icons.Default.ArrowForward, null, Modifier.size(20.dp)) }
         Text("No account is created and nothing is sent.", color = DoctorMuted, style = MaterialTheme.typography.bodySmall, lineHeight = 19.sp, modifier = Modifier.testTag("demo-preview-disclosure"))
@@ -585,12 +585,12 @@ private val DoctorMist = Peach
             }
             Text("Visit type", fontWeight = FontWeight.SemiBold)
             Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf("In person", "Phone", "Video").forEach { option ->
-                Surface(onClick = { type = option }, color = if(type == option) Peach else Paper, contentColor = if(type == option) Rust else Ink, shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, if(type == option) Rust.copy(alpha = .5f) else MaterialTheme.colorScheme.outlineVariant), modifier = Modifier.weight(1f).fillMaxHeight().heightIn(min = 72.dp).semantics { selected = type == option }.testTag("demo-visit-type-$option")) { Column(Modifier.padding(10.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(5.dp)) { Icon(when(option) { "Phone" -> Icons.Default.Call; "Video" -> Icons.Default.Videocam; else -> Icons.Default.MeetingRoom }, null, Modifier.size(22.dp)); Text(option, style = MaterialTheme.typography.labelLarge) } }
+                Surface(onClick = { type = option }, color = if(type == option) Peach else Paper, contentColor = if(type == option) RustText else Ink, shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, if(type == option) Rust.copy(alpha = .5f) else MaterialTheme.colorScheme.outlineVariant), modifier = Modifier.weight(1f).fillMaxHeight().heightIn(min = 72.dp).semantics { selected = type == option }.testTag("demo-visit-type-$option")) { Column(Modifier.padding(10.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(5.dp)) { Icon(when(option) { "Phone" -> Icons.Default.Call; "Video" -> Icons.Default.Videocam; else -> Icons.Default.MeetingRoom }, null, Modifier.size(22.dp)); Text(option, style = MaterialTheme.typography.labelLarge) } }
             } }
             Text("Duration", fontWeight = FontWeight.SemiBold)
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) { (listOf(15, 30, 45, 60) + duration).distinct().sorted().forEach { minutes -> FilterChip(duration == minutes, onClick = { duration = minutes }, label = { Text("$minutes min") }, modifier = Modifier.heightIn(min = 48.dp)) } }
             OutlinedTextField(note, { note = it.take(500); error = null }, label = { Text("Visit note (optional)") }, modifier = Modifier.fillMaxWidth().testTag("demo-appointment-note"), minLines = 2)
-            error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.testTag("demo-appointment-error")) }
+            error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.testTag("demo-appointment-error").announce()) }
             Button(onClick = { error = onSave(DoctorDemoAppointment(existing?.id ?: newId(), selectedPatient, ZonedDateTime.of(date, clock, demoZone).toInstant().toEpochMilli(), duration, type, existing?.status ?: "Scheduled", note)) }, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("demo-save-appointment")) { Text(if (existing == null) "Save visit" else "Save changes") }
             TextButton(onClick = onDismiss, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text("Close") }
         }

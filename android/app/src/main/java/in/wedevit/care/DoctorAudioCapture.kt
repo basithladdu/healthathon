@@ -63,7 +63,7 @@ import java.time.format.DateTimeFormatter
             Button(onClick={ if(state.recording) controller.stop() else { agreements.clear();purpose=false;storage=false;access=false;cloud=false;consentOpen=true } },enabled=!busy && (signedIn || state.recording),modifier=Modifier.fillMaxWidth().heightIn(min=48.dp).testTag("doctor-record-audio")) { Icon(if(state.recording) Icons.Default.Stop else Icons.Default.Mic,null);Spacer(Modifier.width(8.dp));Text(if(state.recording) "Stop & save" else "Record conversation") }
             if(!signedIn) { Text("Sign in first so the recording stays in your account's private local space.",style=MaterialTheme.typography.bodySmall);OutlinedButton(onClick=onSignIn,enabled=!busy && !state.recording,modifier=Modifier.fillMaxWidth().heightIn(min=48.dp).testTag("doctor-ai-sign-in")) { Text("Sign in for online AI") } }
             else Text("Sahara account connected for AI requests; doctor identity remains unverified.",style=MaterialTheme.typography.bodySmall)
-            state.error?.let { Text(it,color=MaterialTheme.colorScheme.error,modifier=Modifier.testTag("doctor-audio-error")) }
+            state.error?.let { Text(it,color=MaterialTheme.colorScheme.error,modifier=Modifier.testTag("doctor-audio-error").announce()) }
             if(busy) { LinearProgressIndicator(Modifier.fillMaxWidth(),color=Rust);Text("Preparing transcript and draft…",modifier=Modifier.testTag("doctor-ai-busy"),style=MaterialTheme.typography.bodySmall) }
         }
     }

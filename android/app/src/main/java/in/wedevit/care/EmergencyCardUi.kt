@@ -113,7 +113,7 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
 
 @Composable private fun QrImage(qr: QRCode, modifier: Modifier = Modifier) {
     val matrix = qr.matrix
-    Canvas(modifier.aspectRatio(1f).background(Color.White).semantics { contentDescription = "Emergency card QR code" }) {
+    Canvas(modifier.aspectRatio(1f).background(Color.White).semantics { contentDescription = "Emergency card QR code · आपातकालीन कार्ड का QR कोड" }) {
         val quiet = 4; val cell = size.width / (matrix.width + 2 * quiet)
         for (row in 0 until matrix.height) for (col in 0 until matrix.width) if (matrix.get(col, row).toInt() == 1)
             drawRect(Color.Black, Offset((col + quiet) * cell, (row + quiet) * cell), Size(cell + .5f, cell + .5f))
@@ -169,8 +169,8 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
         val stale = ready && runCatching { card.outOfDate(source) }.getOrDefault(false)
         Surface(shape = RoundedCornerShape(22.dp), color = Paper, modifier = Modifier.fillMaxWidth().testTag("emergency-card")) {
             Column(Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("Emergency card · आपातकालीन कार्ड", fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, modifier = Modifier.fillMaxWidth())
-                QrImage(qr, Modifier.fillMaxWidth(.8f).widthIn(max = 300.dp).clickable { fullScreen = true }.testTag("emergency-card-qr"))
+                Text("Emergency card · आपातकालीन कार्ड", fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, modifier = Modifier.fillMaxWidth().a11yHeading())
+                QrImage(qr, Modifier.fillMaxWidth(.8f).widthIn(max = 300.dp).clickable(onClickLabel = "Show full screen · पूरी स्क्रीन पर दिखाएँ") { fullScreen = true }.testTag("emergency-card-qr"))
                 Text("Tap the code to show it full screen · बड़ा दिखाने के लिए छुएँ", fontSize = 13.sp, color = DoctorCardSub, textAlign = TextAlign.Center)
                 Text("Card ${card.number} · ID ${card.id} · made ${cardDay(card.madeAt)}", fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
                 Text("${EmergencyCardRules.OFFLINE_EN}\n${EmergencyCardRules.OFFLINE_HI}", fontSize = 13.sp, color = RustText, textAlign = TextAlign.Center)
@@ -191,7 +191,7 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
         if (fullScreen) Dialog(onDismissRequest = { fullScreen = false }, properties = DialogProperties(usePlatformDefaultWidth = false)) {
             val window = (LocalView.current.parent as? DialogWindowProvider)?.window
             LaunchedEffect(window) { window?.let { w -> w.attributes = w.attributes.apply { screenBrightness = 1f } } }
-            Column(Modifier.fillMaxSize().background(Color.White).clickable { fullScreen = false }.padding(20.dp).testTag("emergency-card-fullscreen"), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+            Column(Modifier.fillMaxSize().background(Color.White).clickable(onClickLabel = "Close · बंद करें") { fullScreen = false }.padding(20.dp).testTag("emergency-card-fullscreen"), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
                 Text("Emergency card · आपातकालीन कार्ड", fontFamily = SaharaTitleFont, fontSize = 24.sp, color = Color.Black)
                 Spacer(Modifier.height(12.dp)); QrImage(qr, Modifier.fillMaxWidth()); Spacer(Modifier.height(12.dp))
                 Text("Card ${card.number} · ID ${card.id} · made ${cardDay(card.madeAt)}", fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = Color.Black)

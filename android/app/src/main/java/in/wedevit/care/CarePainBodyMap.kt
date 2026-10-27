@@ -30,6 +30,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.foundation.selection.selectableGroup
 import kotlin.math.roundToInt
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
@@ -81,12 +84,12 @@ import java.io.ByteArrayInputStream
         Text(if (readOnly) t("Pick a part to zoom in. Saved locations stay unchanged. Left and right mean the patient's sides.", "ज़ूम करने के लिए हिस्सा चुनें। सहेजी हुई जगह नहीं बदलेगी। बायाँ और दायाँ मरीज़ की तरफ़ से हैं।") else t("Pick a part to zoom in, then tap the model exactly where it hurts. Left and right mean the patient's sides.", "ज़ूम करने के लिए हिस्सा चुनें, फिर मॉडल पर ठीक वहाँ छुएँ जहाँ दर्द है। बायाँ और दायाँ मरीज़ की तरफ़ से हैं।"), color = DoctorCardSub, fontSize = 14.sp, lineHeight = 19.sp)
         LocalPainBodyViewer(selected, points, viewerRatings, hindi, back, readOnly, focus, focusNonce, change)
         if (!readOnly && onSpotRating != null && activeSite != null) Surface(shape = RoundedCornerShape(16.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) { Box(Modifier.padding(14.dp)) { PainStrengthSlider(ratings[activeSite], PainBodyMapRules.label(activeSite, hindi), hindi) { onSpotRating(activeSite, it) } } }
-        Text(if (selected.any { spotRating(it) != null }) "${t("Pain by spot", "जगह के अनुसार दर्द")}: ${selected.joinToString(" · ") { id -> "${PainBodyMapRules.label(id, hindi)} ${spotRating(id)?.let { "$it/10" } ?: t("not rated", "अंक नहीं")}" }}" else if (selected.isEmpty() && rating != null) "${t("Pain", "दर्द")}: $rating/10" else t("Not rated — no pain intensity shown", "अंक नहीं बताया — दर्द की तीव्रता नहीं दिखाई गई"), color = DoctorCardSub, fontSize = 13.sp, modifier = Modifier.testTag("pain-spot-summary"))
+        Text(if (selected.any { spotRating(it) != null }) "${t("Pain by spot", "जगह के अनुसार दर्द")}: ${selected.joinToString(" · ") { id -> "${PainBodyMapRules.label(id, hindi)} ${spotRating(id)?.let { "$it/10" } ?: t("not rated", "अंक नहीं")}" }}" else if (selected.isEmpty() && rating != null) "${t("Pain", "दर्द")}: $rating/10" else t("Not rated — no pain intensity shown", "अंक नहीं बताया — दर्द की तीव्रता नहीं दिखाई गई"), color = DoctorCardSub, fontSize = 13.sp, modifier = Modifier.testTag("pain-spot-summary").semantics { liveRegion = LiveRegionMode.Polite; if (selected.isNotEmpty()) contentDescription = PainBodyMapRules.spokenSummary(selected, selected.mapNotNull { id -> spotRating(id)?.let { id to it } }.toMap(), hindi) })
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text(if (readOnly) t("Saved pain areas", "सहेजी गई दर्द की जगह") else t("Where is the pain? (optional)", "दर्द कहाँ है? (वैकल्पिक)"), color = DoctorCardInk, fontSize = 17.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
             if (!readOnly && selected.isNotEmpty()) TextButton(onClick = { active = null; onChange(emptyList(), emptyList()) }, modifier = Modifier.heightIn(min = 48.dp).testTag("pain-body-clear")) { Text(t("Clear", "हटाएँ"), color = Rust, fontWeight = FontWeight.SemiBold) }
         }
-        Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Color(0x14382E29)).padding(4.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Color(0x14382E29)).padding(4.dp).selectableGroup(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
             PainSideOption(!back, t("Front", "सामने"), Icons.Default.AccessibilityNew, "pain-body-front", Modifier.weight(1f)) { if (back) { back = false; focus = null; focusNonce++ } }
             PainSideOption(back, t("Back", "पीछे"), Icons.Default.RotateRight, "pain-body-back", Modifier.weight(1f)) { if (!back) { back = true; focus = null; focusNonce++ } }
         }
@@ -99,7 +102,7 @@ import java.io.ByteArrayInputStream
                         if (id == null) PainPartTile(focus == null, false, t("Full body", "पूरा शरीर"), t("Full body, zoom out", "पूरा शरीर, ज़ूम आउट"), Rust, "pain-body-focus-full", Icons.Default.Person, t("Marked", "चिह्नित"), Modifier.weight(1f).fillMaxHeight()) { focus = null; focusNonce++ }
                         else {
                             val label = PainBodyMapRules.focusLabel(id, back, hindi); val marked = id in selected
-                            PainPartTile(focus == id, marked, label, "${t("Zoom to", "ज़ूम करें:")} $label${if (marked) t(", marked as pain", ", दर्द के रूप में चिह्नित") else ""}", spotColor(id), if (readOnly) "pain-body-focus-$id" else "pain-body-site-$id", null, t("Marked", "चिह्नित"), Modifier.weight(1f).fillMaxHeight()) { focus = id; focusNonce++; if (id in selected) active = id }
+                            PainPartTile(focus == id, marked, label, "${t("Zoom to", "ज़ूम करें:")} $label${if (marked) "${t(", marked as pain", ", दर्द के रूप में चिह्नित")}, ${PainBodyMapRules.spokenScore(spotRating(id), hindi)}" else ""}", spotColor(id), if (readOnly) "pain-body-focus-$id" else "pain-body-site-$id", null, t("Marked", "चिह्नित"), Modifier.weight(1f).fillMaxHeight()) { focus = id; focusNonce++; if (id in selected) active = id }
                         }
                     }
                     repeat(perRow - row.size) { Spacer(Modifier.weight(1f)) }
@@ -355,6 +358,7 @@ private fun createPainViewer(context: android.content.Context): WebView =
         Box(Modifier.fillMaxWidth().height(440.dp).clip(frame).background(Color(0xFF2A2421)).border(1.dp, Color(0xFF4A403A), frame)) {
         AndroidView(modifier = Modifier.fillMaxSize().testTag("pain-body-3d").semantics {
             contentDescription = if (readOnly) { if (hindi) "सहेजी गई दर्द की जगह का घुमाने वाला नक्शा। जगह बदली नहीं जा सकती।" else "Rotatable saved pain map. Saved locations cannot be changed here." } else if (hindi) "घुमाने वाला दर्द की जगह का नक्शा। नीचे जगह के बटन से भी चुन सकते हैं।" else "Rotatable pain location map. Accessible region buttons are below."
+            stateDescription = PainBodyMapRules.spokenSummary(selected, ratings, hindi)
         }, factory = { _ ->
             (webView.parent as? android.view.ViewGroup)?.removeView(webView)
             webView.onResume()
@@ -362,7 +366,7 @@ private fun createPainViewer(context: android.content.Context): WebView =
         })
         // One calm loading cover above the page (the page's own background and status would otherwise flash in), faded out once the model is drawn.
         AnimatedVisibility(!ready, Modifier.matchParentSize(), enter = EnterTransition.None, exit = fadeOut(tween(260))) {
-            Column(Modifier.fillMaxSize().background(Color(0xFF2A2421)), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically)) {
+            Column(Modifier.fillMaxSize().background(Color(0xFF2A2421)).a11yCard().announce(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically)) {
                 CircularProgressIndicator(Modifier.size(28.dp), color = Color(0xFFF4ECE3).copy(alpha = .8f), strokeWidth = 2.5.dp)
                 Text(if (hindi) "शरीर का नक्शा खुल रहा है…" else "Opening body map…", color = Color(0xFFF4ECE3), fontSize = 13.sp)
             }
@@ -377,7 +381,7 @@ private fun createPainViewer(context: android.content.Context): WebView =
     val colors = MaterialTheme.colorScheme
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
         Text(if (back) { if (hindi) "बायाँ" else "Left" } else if (hindi) "दायाँ" else "Right", style = MaterialTheme.typography.labelMedium)
-        Canvas(Modifier.height(300.dp).width(150.dp).testTag("pain-body-map").pointerInput(back, readOnly) {
+        Canvas(Modifier.height(300.dp).width(150.dp).testTag("pain-body-map").semantics { contentDescription = "${if (back) { if (hindi) "शरीर का नक्शा, पीछे से" else "Body diagram, back" } else if (hindi) "शरीर का नक्शा, सामने से" else "Body diagram, front"}. ${PainBodyMapRules.spokenSummary(selected, ratings, hindi)}" }.pointerInput(back, readOnly) {
             if (!readOnly) detectTapGestures { point -> PainBodyMapRules.hit(back, point.x * 100f / size.width, point.y * 200f / size.height)?.let { latestOnChange(PainBodyMapRules.toggled(latestSelected, it)) } }
         }) {
             PainBodyMapRules.regions(back).forEach { region ->

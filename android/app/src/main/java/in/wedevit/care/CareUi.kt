@@ -217,7 +217,7 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
                     else -> More(vm, person, onAccount = onAccount, onDelete = { dialog = "delete" }, onCalendar = { go(6) }, onWorkflow = { go(7) }, onLabs = { go(8) }, walkthrough = walkthrough != null, onFeedback = { if (activeRecording) vm.stopRecording(); feedbackOpen = true }, onReminders = { if (activeRecording) vm.stopRecording(); remindersOpen = true }, onSharedWorkspace = { if (activeRecording) vm.stopRecording(); openDoctorWorkspace() }, onDocuments = { if (activeRecording) vm.stopRecording(); go(5) })
                 } }
             } }
-            refreshError?.let { error -> Surface(Modifier.align(Alignment.TopCenter).fillMaxWidth(), color = Peach) { Row(verticalAlignment = Alignment.CenterVertically) { Text(error, Modifier.weight(1f).padding(12.dp), style = MaterialTheme.typography.bodySmall); TextButton(onClick = vm::refresh) { Text(t("Retry", "फिर कोशिश करें")) } } } }
+            refreshError?.let { error -> Surface(Modifier.align(Alignment.TopCenter).fillMaxWidth(), color = Peach) { Row(verticalAlignment = Alignment.CenterVertically) { Text(error, Modifier.weight(1f).padding(12.dp).announce(), style = MaterialTheme.typography.bodySmall); TextButton(onClick = vm::refresh) { Text(t("Retry", "फिर कोशिश करें"), color = RustText) } } } }
             SaharaTopProgress(busy || refreshing, Modifier.fillMaxWidth().align(Alignment.TopCenter))
         }
     }
@@ -955,7 +955,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
 
 @Composable fun AddPerson(onDismiss: () -> Unit, busy: Boolean, error: String?, onSave: (String) -> Unit) {
     var name by rememberSaveable { mutableStateOf("") }; val t = careText()
-    AlertDialog(onDismissRequest = { if (!busy) onDismiss() }, title = { Text(t("Who is this care for?", "यह देखभाल किसके लिए है?")) }, text = { Column { CareField(value = name, onValueChange = { name = it.take(100) }, label = t("Name", "नाम"), singleLine = true); error?.let { Text(it, color = MaterialTheme.colorScheme.error) } } },
+    AlertDialog(onDismissRequest = { if (!busy) onDismiss() }, title = { Text(t("Who is this care for?", "यह देखभाल किसके लिए है?")) }, text = { Column { CareField(value = name, onValueChange = { name = it.take(100) }, label = t("Name", "नाम"), singleLine = true); error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) } } },
         confirmButton = { TextButton(onClick = { onSave(name.trim()) }, enabled = name.isNotBlank() && !busy) { Text(if (busy) t("Saving…", "सहेज रहे हैं…") else t("Continue", "आगे बढ़ें")) } }, dismissButton = { TextButton(onClick = onDismiss, enabled = !busy) { Text(t("Cancel", "रद्द करें")) } })
 }
 
@@ -965,7 +965,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
         Heading(t("Who is this care for?", "यह देखभाल किसके लिए है?"), 27)
         Text(t("Create a care profile for yourself or someone you support.", "अपने लिए, या जिनकी आप देखभाल करते हैं उनके लिए, देखभाल प्रोफ़ाइल बनाएँ।"))
         CareField(name, { name = it.take(100) }, t("Name", "नाम"), singleLine = true)
-        error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+        error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
         Button(onClick = { onSave(name.trim()) }, enabled = name.isNotBlank() && !busy, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("welcome-save-person")) { Text(if (busy) t("Saving…", "सहेज रहे हैं…") else t("Continue", "आगे बढ़ें")) }
         TextButton(onClick = onDismiss, enabled = !busy) { Text(t("Back", "वापस")) }
     }
@@ -1007,13 +1007,13 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
             }
             if (kind == "visit") OutlinedButton(onClick = { val chosen = if (due > 0) Instant.ofEpochMilli(due).atZone(ZoneId.systemDefault()).toLocalDate() else LocalDate.now(); DatePickerDialog(context, { _, y, m, d -> due = LocalDate.of(y, m + 1, d).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli() }, chosen.year, chosen.monthValue - 1, chosen.dayOfMonth).show() }, shape = RoundedCornerShape(14.dp)) { Icon(Icons.Default.CalendarMonth, null); Spacer(Modifier.width(8.dp)); Text(if (due == 0L) t("Choose date", "तारीख़ चुनें") else date(due)) }
             if (kind == "medicine") Text(t("Use your prescription. Choose reminder times in Reminders. Android may delay alerts.", "पर्चे में जैसा लिखा है वैसा ही लिखें। याद दिलाने का समय “रिमाइंडर” में चुनें। फ़ोन कभी-कभी सूचना देर से दिखा सकता है।"), style = MaterialTheme.typography.bodySmall)
-            error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+            error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
             Button(onClick = { if (!canEditCareContext(vm, capturedPerson, capturedAccount)) { vm.message.value = t("Care access changed. Reopen this person's records before saving.", "देखभाल की अनुमति बदल गई है। सहेजने से पहले इस व्यक्ति के रिकॉर्ड फिर से खोलें।"); onDismiss() } else if (initial == null) vm.saveItem(kind, title, detail, due, savedAndClose, entryId) else vm.updateItem(initial.copy(title = title, detail = detail, due = due), onDismiss) }, enabled = selected == capturedPerson && title.isNotBlank() && !busy && (kind != "visit" || due > 0) && (kind != "medicine" || detail.isNotBlank()), shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 54.dp)) { Text(if (busy) t("Saving…", "सहेज रहे हैं…") else t("Save", "सहेजें"), fontSize = 16.sp) }
         }
     }
 }
 
-@Composable fun SurfaceCard(color: Color = Paper, content: @Composable ColumnScope.() -> Unit) { Surface(shape = RoundedCornerShape(20.dp), color = color, modifier = Modifier.fillMaxWidth()) { Column(Modifier.padding(16.dp), content = content) } }
+@Composable fun SurfaceCard(color: Color = Paper, content: @Composable ColumnScope.() -> Unit) { Surface(shape = RoundedCornerShape(20.dp), color = color, modifier = Modifier.fillMaxWidth().a11yCard()) { Column(Modifier.padding(16.dp), content = content) } }
 @Composable fun Tile(title: String, illustration: Int, color: Color, modifier: Modifier, onClick: () -> Unit) {
     ActionCard(color, modifier, onClick) {
         Column(Modifier.fillMaxWidth().padding(16.dp)) {
@@ -1027,8 +1027,8 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
         }
     }
 }
-@Composable fun Heading(text: String, size: Int = 30) { Text(text, fontFamily = SaharaTitleFont, fontWeight = FontWeight.Normal, fontSize = size.sp, lineHeight = (size + 4).sp, letterSpacing = (-0.7).sp) }
-@Composable fun SectionTitle(title: String, action: String? = null, onAction: () -> Unit = {}) { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { Text(title, fontSize = 20.sp, fontFamily = SaharaTitleFont, fontWeight = FontWeight.Normal, modifier = Modifier.weight(1f)); if (action != null) TextButton(onClick = onAction) { Text(action) } } }
+@Composable fun Heading(text: String, size: Int = 30) { Text(text, Modifier.a11yHeading(), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Normal, fontSize = size.sp, lineHeight = (size + 4).sp, letterSpacing = (-0.7).sp) }
+@Composable fun SectionTitle(title: String, action: String? = null, onAction: () -> Unit = {}) { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { Text(title, fontSize = 20.sp, fontFamily = SaharaTitleFont, fontWeight = FontWeight.Normal, modifier = Modifier.weight(1f).a11yHeading()); if (action != null) TextButton(onClick = onAction) { Text(action) } } }
 @Composable fun CheckLine(checked: Boolean, change: (Boolean) -> Unit, text: String) { Row(Modifier.fillMaxWidth().toggleable(checked, role = Role.Checkbox, onValueChange = change).padding(vertical = 4.dp), verticalAlignment = Alignment.Top) { Checkbox(checked = checked, onCheckedChange = null, modifier = Modifier.minimumInteractiveComponentSize()); Text(text, Modifier.weight(1f).padding(top = 12.dp), style = MaterialTheme.typography.bodyMedium) } }
 @Composable fun SelectionContainerText(text: String) { androidx.compose.foundation.text.selection.SelectionContainer { Text(text) } }
 fun date(epoch: Long): String = Instant.ofEpochMilli(epoch).atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("d MMM yyyy"))
@@ -1071,12 +1071,12 @@ object ConversationPages {
 }
 
 @Composable fun InfoDisclosure(title: String, color: Color = Paper, content: @Composable ColumnScope.() -> Unit) {
-    var open by rememberSaveable(title) { mutableStateOf(false) }
+    var open by rememberSaveable(title) { mutableStateOf(false) }; val t = careText()
     Surface(shape = RoundedCornerShape(20.dp), color = color, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("info-disclosure")) { Column {
-        Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable(onClickLabel = if (open) "Hide details" else "Show details") { open = !open }.padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable(onClickLabel = if (open) t("Hide details", "जानकारी छिपाएँ") else t("Show details", "जानकारी देखें")) { open = !open }.padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
             Icon(Icons.Outlined.Info, null, Modifier.size(20.dp), tint = DoctorAccent); Spacer(Modifier.width(10.dp))
-            Text(title, Modifier.weight(1f), fontFamily = SaharaTitleFont, fontSize = 17.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
-            Icon(if (open) Icons.Default.ExpandLess else Icons.Default.ExpandMore, if (open) "Collapse" else "Expand", tint = DoctorCardSub)
+            Text(title, Modifier.weight(1f).a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 17.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
+            Icon(if (open) Icons.Default.ExpandLess else Icons.Default.ExpandMore, if (open) t("Collapse", "बंद करें") else t("Expand", "खोलें"), tint = DoctorCardSub)
         }
         if (open) Column(Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp), content = content)
     } }

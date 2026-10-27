@@ -88,10 +88,10 @@ private fun medicineTime(at: Long?) = at?.let { DateTimeFormatter.ofPattern("d M
         item {FlowRow(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween,verticalArrangement=Arrangement.spacedBy(8.dp)) {Heading("Prescription",28);TextButton(onClick={openPrescription(true)},enabled=editable&&loaded&&prescriptions!=null&&!busy,modifier=Modifier.heightIn(min=48.dp).testTag("doctor-add-prescription")){Icon(Icons.Default.AddCircle,null,tint=DoctorAccent);Spacer(Modifier.width(6.dp));Text("Add prescription",color=DoctorAccent)}};Text("Current list, past prescriptions and intake reports",fontSize=13.sp,color=DoctorCardSub)}
 
         if(busy)item {LinearProgressIndicator(Modifier.fillMaxWidth())}
-        error?.let {message->item {SurfaceCard(Peach){Text(message);Text("Your existing medicines and original history have not been cleared.");TextButton(onClick=::refresh,enabled=!busy){Text("Retry")}}}}
+        error?.let {message->item {SurfaceCard(Peach){Text(message, Modifier.announce());Text("Your existing medicines and original history have not been cleared.");TextButton(onClick=::refresh,enabled=!busy){Text("Retry", color = RustText)}}}}
         item {MedicineHistoryTabs(tab,busy){tab=it}}
         if(tab!="Intake history") item {Text(if(tab=="Current")"Showing the active prescription and the medicines being taken now." else "Showing superseded prescriptions: when each was prescribed, when it ended and the medicines it held.",fontSize=13.sp,color=DoctorCardSub)}
-        prescriptionError?.let {message->item {Text(message,fontSize=13.sp,color=DoctorCardSub)}}
+        prescriptionError?.let {message->item {Text(message,fontSize=13.sp,color=DoctorCardSub,modifier=Modifier.announce())}}
         if(prescriptions==null&&loaded) item {TextButton(onClick={if(same(true)&&!busy)add=true},enabled=editable&&!busy,modifier=Modifier.heightIn(min=48.dp)){Text("Existing manual entry / scanner")}}
         if(tab=="Current"&&loaded) item {
             FlowRow(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween,verticalArrangement=Arrangement.Center){Column(Modifier.widthIn(max=260.dp)){Text("CURRENT PRESCRIPTION",fontSize=12.sp,color=DoctorCardFaint,fontWeight=FontWeight.Medium);Text(prescriptions?.current?.title?:"Prescription group/date not recorded",fontSize=20.sp,fontWeight=FontWeight.Medium, fontFamily = SaharaTitleFont,color=DoctorCardInk)};TextButton(onClick={openPrescription(false)},enabled=editable&&prescriptions!=null&&!busy,modifier=Modifier.heightIn(min=48.dp)){Text("Edit list",color=DoctorAccent)}}
@@ -211,7 +211,7 @@ private fun chooseMedicineTime(context:Context,current:Long?,onPicked:(Long)->Un
         if(outcome=="taken"){OutlinedButton(onClick={chooseMedicineTime(context,taken){taken=it}},enabled=!busy){Text("Reported taken: ${medicineTime(taken)}")};if(taken!=null)TextButton(onClick={taken=null},enabled=!busy){Text("Clear taken time")}}
         Text("Who supplied this report?");listOf("Patient report","Family report","Doctor report","Not recorded").forEach{value->FilterChip(reporter==value,onClick={reporter=value},enabled=!busy,label={Text(value)})}
         OutlinedTextField(note,{note=it.take(2000)},label={Text("Details / correction (optional)")},enabled=!busy)
-        error?.let {Text(it,color=MaterialTheme.colorScheme.error)}
+        error?.let {Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce())}
     }},confirmButton={TextButton(onClick={val event=MedicineIntakeEvent(id,item.id,item.title,outcome,planned,taken,loggedAt=System.currentTimeMillis(),reporter=reporter,note=note);runCatching{MedicineHistoryRules.validate(event,System.currentTimeMillis())}.onSuccess{onSave(event)}.onFailure{error=it.message?:("Check the report fields.")}},enabled=!busy){Text(if(busy)"Saving…" else "Save report")}},dismissButton={TextButton(onClick=onClose,enabled=!busy){Text("Cancel")}})
 }
 
