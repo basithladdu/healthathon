@@ -54,7 +54,7 @@ class CareReminderScheduler(private val context: Context, private val account: S
             val entry = CareEntryCodec.decode(item.detail)
             val complete = entry?.status in setOf("completed", "cancelled") || (item.kind != "medicine" && item.doneOn.isNotBlank())
             snapshots.put(JSONObject().put("id", item.id).put("person", item.personId).put("kind", item.kind)
-                .put("due", if (entry?.type == "schedule" && !entry.timed) 0 else item.due).put("times", JSONArray(CareReminderRules.printedTimes(item.detail)))
+                .put("due", item.due).put("dateOnly", CareReminderRules.dateOnly(item)).put("times", JSONArray(CareReminderRules.printedTimes(item.detail)))
                 .put("doneOn", item.doneOn).put("finished", complete))
         }
         check(prefs.edit().putString("items", snapshots.toString()).commit())
@@ -66,7 +66,7 @@ class CareReminderScheduler(private val context: Context, private val account: S
         val array = JSONArray(prefs.getString("items", "[]"))
         (0 until array.length()).mapNotNull { index ->
             val j = array.getJSONObject(index); val option = option(j.getString("id"))
-            if (option?.muted == true) null else CareReminderPlan(j.getString("id"), j.getString("person"), j.getString("kind"), j.optLong("due"), option?.times ?: j.getJSONArray("times").let { a -> (0 until a.length()).map(a::getString) }, j.optString("doneOn"), j.optBoolean("finished"), option?.starts.orEmpty(), option?.ends.orEmpty())
+            if (option?.muted == true) null else CareReminderPlan(j.getString("id"), j.getString("person"), j.getString("kind"), j.optLong("due"), option?.times ?: j.getJSONArray("times").let { a -> (0 until a.length()).map(a::getString) }, j.optString("doneOn"), j.optBoolean("finished"), option?.starts.orEmpty(), option?.ends.orEmpty(), j.optBoolean("dateOnly"))
         }
     }.getOrDefault(emptyList())
     private fun pending(key: String, at: Long, create: Boolean): PendingIntent? = PendingIntent.getBroadcast(context, 0,
@@ -92,7 +92,10 @@ class CareReminderScheduler(private val context: Context, private val account: S
         next.forEach { occurrence ->
             try {
                 val intent = requireNotNull(pending(occurrence.key, occurrence.at, true))
-                context.getSystemService(AlarmManager::class.java).setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, occurrence.at, intent)
+                val alarm = context.getSystemService(AlarmManager::class.java)
+                // On time when Android allows exact alarms; otherwise Android may batch the alert later (the 6-hour delivery window still applies).
+                if (exactAllowed()) alarm.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, occurrence.at, intent)
+                else alarm.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, occurrence.at, intent)
                 keys += occurrence.key
                 saved.put(JSONObject().put("key", occurrence.key).put("id", occurrence.itemId).put("at", occurrence.at).put("date", occurrence.localDate).put("time", occurrence.time))
             } catch (_: SecurityException) { prefs.edit().putString("error", "Android blocked reminders. Check notification and battery settings.").commit() }
@@ -108,7 +111,7 @@ class CareReminderScheduler(private val context: Context, private val account: S
         // Always advance this slot before publishing; repeated broadcasts cannot send duplicate alerts.
         reschedule(now)
         if (deliver) {
-            val launch = PendingIntent.getActivity(context, notificationId(account, key), Intent(context, MainActivity::class.java).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP; putExtra("open_reminders", true) }, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+            val launch = PendingIntent.getActivity(context, notificationId(account, key), Intent(context, MainActivity::class.java).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP; putExtra(CareReminderLaunch.EXTRA, true) }, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
             val notification = NotificationCompat.Builder(context, CHANNEL).setSmallIcon(android.R.drawable.ic_popup_reminder)
                 .setContentTitle("Sahara reminder").setContentText("A saved care activity is due. Open Sahara to check the record.")
                 .setVisibility(NotificationCompat.VISIBILITY_PRIVATE).setContentIntent(launch).setAutoCancel(true).setCategory(NotificationCompat.CATEGORY_REMINDER).build()
@@ -118,6 +121,8 @@ class CareReminderScheduler(private val context: Context, private val account: S
             } catch (_: SecurityException) { /* A permission changed after the check. Keep the record and let settings show the denial. */ }
         }
     }
+    /** Android 12+ asks the person to allow exact alarms; earlier versions always allow them. */
+    fun exactAllowed(): Boolean = Build.VERSION.SDK_INT < 31 || context.getSystemService(AlarmManager::class.java).canScheduleExactAlarms()
     fun scheduledCount(): Int = prefs.getStringSet("scheduled", emptySet()).orEmpty().size
     fun error(): String? = prefs.getString("error", null)
     private fun createChannel() { context.getSystemService(NotificationManager::class.java).createNotificationChannel(NotificationChannel(CHANNEL, "Care reminders", NotificationManager.IMPORTANCE_DEFAULT).apply { description = "Reminders for your chosen medicine times and dated care activities. Android may delay alerts."; lockscreenVisibility = android.app.Notification.VISIBILITY_PRIVATE }) }
@@ -126,6 +131,12 @@ class CareReminderScheduler(private val context: Context, private val account: S
         fun active(context: Context): String? = context.getSharedPreferences("care-reminder-active", 0).getString("account", null)
         private fun notificationId(account: String, key: String) = ("$account:$key".hashCode() and Int.MAX_VALUE)
     }
+}
+/** Set when a reminder notification is tapped; the care screen opens Reminders once and clears it. */
+object CareReminderLaunch {
+    const val EXTRA = "open_reminders"
+    val pending = kotlinx.coroutines.flow.MutableStateFlow(false)
+    fun offer(intent: Intent?) { if (intent?.getBooleanExtra(EXTRA, false) == true) { pending.value = true; intent.removeExtra(EXTRA) } }
 }
 data class ReminderOption(val times: List<String>, val starts: String = "", val ends: String = "", val muted: Boolean = false)
 
@@ -138,7 +149,7 @@ class CareReminderReceiver : BroadcastReceiver() {
 }
 class CareReminderRestoreReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        if (intent.action !in setOf(Intent.ACTION_BOOT_COMPLETED, Intent.ACTION_TIME_CHANGED, Intent.ACTION_TIMEZONE_CHANGED, Intent.ACTION_MY_PACKAGE_REPLACED)) return
+        if (intent.action !in setOf(Intent.ACTION_BOOT_COMPLETED, Intent.ACTION_TIME_CHANGED, Intent.ACTION_TIMEZONE_CHANGED, Intent.ACTION_MY_PACKAGE_REPLACED, AlarmManager.ACTION_SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED)) return
         CareReminderScheduler.active(context)?.let { account -> runCatching { CareReminderScheduler(context.applicationContext, account).reschedule() } }
     }
 }

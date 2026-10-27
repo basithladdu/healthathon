@@ -127,6 +127,8 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
     var feedbackOpen by rememberSaveable(feedbackAccountScope) { mutableStateOf(false) }
     var remindersOpen by rememberSaveable(feedbackAccountScope) { mutableStateOf(false) }
     var sharedWorkspaceOpen by rememberSaveable(feedbackAccountScope) { mutableStateOf(false) }
+    val reminderTapped by CareReminderLaunch.pending.collectAsStateWithLifecycle()
+    LaunchedEffect(reminderTapped, selected) { if (reminderTapped && selected.isNotBlank() && walkthrough == null) { remindersOpen = true; CareReminderLaunch.pending.value = false } }
     val openDoctorWorkspace = { if (onDoctorWorkspace != null) onDoctorWorkspace() else sharedWorkspaceOpen = true }
     val screens = rememberSaveableStateHolder()
     val snackbar = remember { SnackbarHostState() }
