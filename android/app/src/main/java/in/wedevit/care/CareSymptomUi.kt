@@ -51,8 +51,9 @@ import java.time.format.DateTimeFormatter
     val people by vm.people.collectAsStateWithLifecycle()
     val canEdit by vm.canEdit.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    val preferences = remember(vm.accountNamespace) { context.getSharedPreferences("sahara-symptom-language-${vm.accountNamespace}", 0) }
-    var hindi by rememberSaveable(vm.accountNamespace) { mutableStateOf(preferences.getBoolean("hindi", false)) }
+    // The app-wide English/Hindi choice; this screen's chips switch every family-side screen.
+    val language = LocalCareLanguage.current ?: rememberCareLanguage(vm.accountNamespace)
+    val hindi = language.hindi
     var adding by rememberSaveable(selected) { mutableStateOf(false) }
     var showingPainHistory by rememberSaveable(selected) { mutableStateOf(false) }
     val person = people.firstOrNull { it.id == selected }
@@ -72,7 +73,7 @@ import java.time.format.DateTimeFormatter
             Text(person?.name.orEmpty(), fontWeight = FontWeight.SemiBold)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 listOf(false to "English", true to "हिन्दी").forEach { (value, label) ->
-                    FilterChip(hindi == value, { hindi = value; preferences.edit().putBoolean("hindi", value).apply() }, label = { Text(label) }, modifier = Modifier.heightIn(min = 48.dp))
+                    FilterChip(hindi == value, { language.choose(value) }, label = { Text(label) }, modifier = Modifier.heightIn(min = 48.dp))
                 }
             }
         }
