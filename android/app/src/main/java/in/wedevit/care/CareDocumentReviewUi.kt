@@ -47,6 +47,14 @@ import java.time.ZoneId
     var dateText by rememberSaveable(report.id) { mutableStateOf(LocalDate.now().toString()) }
     var timeText by rememberSaveable(report.id) { mutableStateOf("") }
     var factChecked by rememberSaveable(report.id) { mutableStateOf(false) }
+    var labValue by rememberSaveable(report.id) { mutableStateOf("") }
+    var labUnit by rememberSaveable(report.id) { mutableStateOf("") }
+    var labLow by rememberSaveable(report.id) { mutableStateOf("") }
+    var labHigh by rememberSaveable(report.id) { mutableStateOf("") }
+    fun suggestLab(line: String) {
+        val found = LabLineParser.parse(line)
+        title = found?.name ?: line.take(160); labValue = found?.value.orEmpty(); labUnit = found?.unit.orEmpty(); labLow = found?.low.orEmpty(); labHigh = found?.high.orEmpty()
+    }
     val currentPage = value?.pages?.firstOrNull { it.page == page }
 
     fun read() {
@@ -92,22 +100,46 @@ import java.time.ZoneId
                     item { SectionTitle("Copy a checked fact") }
                     item { Text("Choose the exact line to keep with a medicine, test or follow-up. A copied record does not confirm treatment happened.", style = MaterialTheme.typography.bodySmall) }
                     shown.reviewedText.split('\n').forEachIndexed { index, line -> if (line.isNotBlank() && line.length <= 2000) item("line-$page-$index") {
-                        FilterChip(selected = factLine == index + 1, onClick = { factLine = index + 1; title = line.take(160); factChecked = false }, label = { Text("${index + 1}. $line") }, modifier = Modifier.fillMaxWidth())
+                        FilterChip(selected = factLine == index + 1, onClick = { factLine = index + 1; if (kind == "Lab result") suggestLab(line) else title = line.take(160); factChecked = false }, label = { Text("${index + 1}. $line") }, modifier = Modifier.fillMaxWidth())
                     } }
                     if (factLine > 0) {
-                        item { CareField(title, { title = it.take(160); factChecked = false }, "Record name", singleLine = true) }
-                        item { Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) { listOf("Record", "Medicine", "Follow-up", "Test").forEach { option -> FilterChip(selected = kind == option, onClick = { kind = option; factChecked = false }, label = { Text(option) }) } } }
+                        item { CareField(title, { title = it.take(160); factChecked = false }, if (kind == "Lab result") "Test name on report" else "Record name", singleLine = true) }
+                        item { Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) { listOf("Record", "Medicine", "Follow-up", "Test", "Lab result").forEach { option -> FilterChip(selected = kind == option, onClick = {
+                            if (option == "Lab result" && kind != option) currentPage?.reviewedText?.split('\n')?.getOrNull(factLine - 1)?.let(::suggestLab)
+                            kind = option; factChecked = false
+                        }, label = { Text(if (option == "Lab result") "Lab result · जाँच का नतीजा" else option) }, modifier = Modifier.testTag("document-kind-$option")) } } }
+                        if (kind == "Lab result") {
+                            item { Text("Filled in from the chosen line. Check each box against the original report. · हर नंबर रिपोर्ट से मिलाएँ।", style = MaterialTheme.typography.bodySmall) }
+                            item { Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                Box(Modifier.weight(1f)) { CareField(labValue, { labValue = it.take(40); factChecked = false }, "Value", singleLine = true) }
+                                Box(Modifier.weight(1f)) { CareField(labUnit, { labUnit = it.take(40); factChecked = false }, "Printed unit", singleLine = true) }
+                            } }
+                            item { Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                Box(Modifier.weight(1f)) { CareField(labLow, { labLow = it.take(40); factChecked = false }, "Printed lower (optional)", singleLine = true) }
+                                Box(Modifier.weight(1f)) { CareField(labHigh, { labHigh = it.take(40); factChecked = false }, "Printed upper (optional)", singleLine = true) }
+                            } }
+                            item { CareField(dateText, { dateText = it; factChecked = false }, "Report date · YYYY-MM-DD", singleLine = true) }
+                        }
                         if (kind in listOf("Follow-up", "Test")) {
                             item { CareField(dateText, { dateText = it; factChecked = false }, "Date · YYYY-MM-DD", singleLine = true) }
                             item { CareField(timeText, { timeText = it; factChecked = false }, "Time · HH:mm", singleLine = true) }
                         }
-                        item { CheckLine(factChecked, { factChecked = it }, if (kind == "Medicine") "I am copying an existing prescription, including its exact dose and directions. I am not changing treatment." else "I checked the chosen line, name and any date against the original.") }
+                        item { CheckLine(factChecked, { factChecked = it }, if (kind == "Medicine") "I am copying an existing prescription, including its exact dose and directions. I am not changing treatment." else if (kind == "Lab result") "I checked the test name, value, unit, range and date against the original. · मैंने मिला लिया" else "I checked the chosen line, name and any date against the original.") }
                         item { Button(onClick = {
                             try {
                                 require(title.trim().isNotBlank()) { "Add a record name." }
                                 val current = requireNotNull(value); val quote = current.pages.single { it.page == page }.reviewedText.split('\n')[factLine - 1]
                                 val source = DocumentEvidenceRules.source(current, page, factLine, quote)
                                 val detail = DocumentEvidenceRules.copiedDetail(source, report.name)
+                                if (kind == "Lab result") {
+                                    require(factChecked) { "Check this result first." }
+                                    require(detail.length <= 800) { "Choose a shorter line so the original line stays with this result." }
+                                    val day = runCatching { LocalDate.parse(dateText.trim()) }.getOrElse { throw IllegalArgumentException("Enter the report date as YYYY-MM-DD.") }
+                                    val lab = CareEntry(type = "lab", detail = detail, sender = vm.cloud?.session?.value?.email.orEmpty(), value = labValue.trim(), unit = labUnit.trim(), rangeLow = labLow.trim(), rangeHigh = labHigh.trim(), reportId = report.id, reportName = report.name)
+                                    CareLabRules.validate(title, lab, careEpoch(day))
+                                    vm.saveItem("task", title.trim(), CareEntryCodec.encode(lab), careEpoch(day), done = { factLine = 0; factChecked = false; vm.message.value = "Added to Lab history" })
+                                    error = ""; return@Button
+                                }
                                 val due = if (kind in listOf("Follow-up", "Test")) LocalDateTime.of(LocalDate.parse(dateText), LocalTime.parse(timeText)).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() else 0
                                 require(factChecked) { "Check this copied record first." }
                                 val targetKind = when(kind) { "Medicine" -> "medicine"; "Follow-up", "Test" -> "visit"; else -> "journal" }
@@ -118,7 +150,7 @@ import java.time.ZoneId
                                 vm.saveItem(targetKind, title, savedDetail, due, done = { factLine = 0; factChecked = false; vm.message.value = if (due > 0) "Copied to Calendar. Check Reminders to enable alerts." else "Checked fact copied" })
                                 error = ""
                             } catch (failure: Exception) { error = failure.message ?: "Check the date and exact time." }
-                        }, enabled = factChecked && !busy, modifier = Modifier.fillMaxWidth().testTag("document-copy-fact")) { Text(if (busy) "Saving…" else if (kind in listOf("Follow-up", "Test")) "Copy to Calendar" else "Copy checked fact") } }
+                        }, enabled = factChecked && !busy, modifier = Modifier.fillMaxWidth().testTag("document-copy-fact")) { Text(if (busy) "Saving…" else if (kind == "Lab result") "Add to Lab history · लैब इतिहास में जोड़ें" else if (kind in listOf("Follow-up", "Test")) "Copy to Calendar" else "Copy checked fact") } }
                     }
                 }
             }

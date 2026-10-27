@@ -480,7 +480,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
                 when (entry.type) {
                     "task", "conversation" -> CareWorkflowRules.validate(title, entry)
                     "lab" -> CareLabRules.validate(title, entry, due)
-                    "schedule" -> require(due > 0 && entry.category in setOf("Visit", "Test", "Follow-up", "Procedure")) { "Choose a date and type of care." }
+                    "schedule" -> require(due > 0 && entry.category in setOf("Visit", "Test", "Follow-up", "Procedure") + TreatmentDayRules.categories) { "Choose a date and type of care." }
                 }
             }
             storeItem(CareItem(id = id, personId = person, kind = kind, title = title.trim(), detail = detail.trim(), due = due))

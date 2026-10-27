@@ -80,7 +80,7 @@ fun calendarItems(entries: List<CareItem>, day: LocalDate): List<CareItem> = ent
         item { Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             (-3L..3L).forEach { offset -> val date = day.plusDays(offset); FilterChip(selected = offset == 0L, onClick = { dayString = date.toString() }, label = { Column(horizontalAlignment = Alignment.CenterHorizontally) { Text(date.format(DateTimeFormatter.ofPattern("EEE")), style = MaterialTheme.typography.labelSmall); Text(date.dayOfMonth.toString(), fontWeight = FontWeight.Bold) } }, modifier = Modifier.widthIn(min = 40.dp)) }
         } }
-        item { Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) { listOf("All", "Medicine", "Visit", "Test", "Follow-up", "Procedure", "Task", "Conversation").forEach { category -> FilterChip(filter == category, { filter = category }, label = { Text(category) }) } } }
+        item { Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) { listOf("All", "Medicine", "Visit", "Test", "Follow-up", "Procedure", "Chemotherapy", "Radiotherapy", "Task", "Conversation").forEach { category -> FilterChip(filter == category, { filter = category }, label = { Text(category) }) } } }
         if (day != LocalDate.now()) item { TextButton(onClick = { dayString = LocalDate.now().toString() }) { Text("Back to today") } }
         if (visible.isEmpty()) item { SurfaceCard { Text("Nothing dated for ${day.format(DateTimeFormatter.ofPattern("d MMM"))}", fontWeight = FontWeight.SemiBold); if (canEdit) TextButton(onClick = { if (onAddDoctorVisit != null) onAddDoctorVisit() else adding = true }) { Text(if (onAddDoctorVisit != null) "Add a visit" else "Add a visit, test or follow-up") } } }
         items(visible, key = { it.id }) { item ->
@@ -145,7 +145,7 @@ fun calendarItems(entries: List<CareItem>, day: LocalDate): List<CareItem> = ent
     ModalBottomSheet(onDismissRequest = { if (!busy) onDismiss() }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(start = 20.dp, end = 20.dp, bottom = 28.dp).testTag("schedule-editor"), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Heading(if (initial == null) "Plan care" else "Edit ${category.lowercase()}", 26)
-            if (!legacy) Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) { listOf("Visit", "Test", "Follow-up", "Procedure").forEach { choice -> FilterChip(category == choice, { category = choice }, label = { Text(choice) }) } }
+            if (!legacy) Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) { (listOf("Visit", "Test", "Follow-up", "Procedure") + TreatmentDayRules.categories).forEach { choice -> FilterChip(category == choice, { category = choice }, label = { Text(choice) }) } }
             OutlinedTextField(title, { title = it; error = "" }, label = { Text(if (category == "Medicine") "Medicine" else "What is planned?") }, modifier = Modifier.fillMaxWidth(), maxLines = 2)
             CareDateButton(due, "Date", { due = it; timed = false })
             if (category != "Medicine") Row(verticalAlignment = Alignment.CenterVertically) {

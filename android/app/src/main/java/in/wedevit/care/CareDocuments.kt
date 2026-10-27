@@ -58,6 +58,10 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
     var importingFor by rememberSaveable { mutableStateOf("") }
     var remove by remember { mutableStateOf<CareReport?>(null) }
     var reviewId by rememberSaveable { mutableStateOf<String?>(null) }
+    val cancerStore = remember(vm.storageNamespace) { CancerDocumentStore(context, vm.storageNamespace) }
+    var cancerChoices by remember(vm.storageNamespace) { mutableStateOf(cancerStore.all()) }
+    var marking by remember { mutableStateOf<CareReport?>(null) }
+    fun cancerType(report: CareReport) = CancerDocumentRules.type(report.name, cancerChoices[report.id])
     val listState = rememberLazyListState()
     val focus = LocalFocusManager.current
     var textMatches by remember(person) { mutableStateOf(emptyList<DocumentSearchExcerpt>()) }
@@ -70,8 +74,8 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
         importingFor = ""
     }
     val addReport = { importingFor = person; picker.launch(arrayOf("application/pdf", "image/jpeg", "image/png", "image/webp")) }
-    val visibleReports = reports.filter { filter != "Care notes" && it.name.contains(search.trim(), true) }
-    val visibleNotes = notes.filter { filter != "Reports" && "Goals of care ${it.personName} ${it.doctor} Version ${it.version}".contains(search.trim(), true) }
+    val visibleReports = reports.filter { report -> filter != "Care notes" && (filter != "Cancer" || cancerType(report) != null) && "${report.name} ${cancerType(report)?.let(CancerDocumentRules::label).orEmpty()}".contains(search.trim(), true) }
+    val visibleNotes = notes.filter { filter !in setOf("Reports", "Cancer") && "Goals of care ${it.personName} ${it.doctor} Version ${it.version}".contains(search.trim(), true) }
 
     fun openReport(report: CareReport, share: Boolean) {
         try {
@@ -94,7 +98,7 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
             modifier = Modifier.fillMaxWidth().testTag("document-search"), shape = RoundedCornerShape(16.dp), singleLine = true,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search), keyboardActions = KeyboardActions(onSearch = { focus.clearFocus() })) }
         item { Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf("All", "Care notes", "Reports").forEach { label -> FilterChip(selected = filter == label, onClick = { filter = label }, label = { Text(label) }) }
+            listOf("All", "Care notes", "Reports", "Cancer").forEach { label -> FilterChip(selected = filter == label, onClick = { filter = label }, label = { Text(if (label == "Cancer") "Cancer documents · कैंसर के कागज़" else label) }, modifier = Modifier.testTag("document-filter-$label")) }
         } }
         item { TextButton(onClick = {
             val query = search.trim(); val capturedPerson = person
@@ -126,8 +130,8 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
         }
         if (visibleNotes.isEmpty() && visibleReports.isEmpty()) item { SurfaceCard {
             Icon(Icons.Default.FolderOpen, null, Modifier.size(36.dp), tint = Rust)
-            Spacer(Modifier.height(12.dp)); Text(if (search.isNotBlank()) "No documents found" else when (filter) { "Reports" -> "No reports yet"; "Care notes" -> "No care notes yet"; else -> "Keep your care together" }, fontSize = 20.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
-            Spacer(Modifier.height(6.dp)); Text(if (search.isNotBlank()) "Try a name or clear your search." else "Your reviewed care notes and reports appear here.", style = MaterialTheme.typography.bodyMedium)
+            Spacer(Modifier.height(12.dp)); Text(if (search.isNotBlank()) "No documents found" else when (filter) { "Reports" -> "No reports yet"; "Care notes" -> "No care notes yet"; "Cancer" -> "No cancer documents yet"; else -> "Keep your care together" }, fontSize = 20.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
+            Spacer(Modifier.height(6.dp)); Text(if (search.isNotBlank()) "Try a name or clear your search." else if (filter == "Cancer") "PET-CT, biopsy, histopathology and staging reports appear here. Add a report, then tap “Cancer document” on it. · कैंसर से जुड़े कागज़ यहाँ दिखेंगे।" else "Your reviewed care notes and reports appear here.", style = MaterialTheme.typography.bodyMedium)
             if (search.isNotBlank()) TextButton(onClick = { search = ""; filter = "All" }) { Text("Clear search") }
             else if (filter != "Care notes" && canEdit) TextButton(onClick = addReport, enabled = !busy) { Icon(Icons.Default.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Add a report") }
         } }
@@ -156,12 +160,14 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
                             Text(report.name, fontWeight = FontWeight.Medium, maxLines = 2, overflow = TextOverflow.Ellipsis, fontFamily = SaharaTitleFont)
                             Text(Formatter.formatShortFileSize(context, report.bytes), style = MaterialTheme.typography.bodySmall)
                             Text(date(report.created), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            cancerType(report)?.let { type -> Text(CancerDocumentRules.label(type) + if (cancerChoices[report.id].isNullOrBlank()) " · from file name" else "", style = MaterialTheme.typography.labelMedium, color = RustText, modifier = Modifier.testTag("report-cancer-${report.id}")) }
                         }
                     }
                     FlowRow(Modifier.fillMaxWidth().padding(horizontal = 8.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                         TextButton(onClick = { openReport(report, false) }, modifier = Modifier.testTag("report-open-${report.id}")) { Icon(Icons.AutoMirrored.Filled.OpenInNew, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Open") }
                         TextButton(onClick = { reviewId = report.id }, modifier = Modifier.testTag("report-review-${report.id}")) { Icon(Icons.Default.DocumentScanner, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Read and copy facts") }
                         TextButton(onClick = { openReport(report, true) }, modifier = Modifier.testTag("report-share-${report.id}")) { Icon(Icons.Default.Share, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Share") }
+                        if (canEdit && prescriptionOriginals.none { it.id == report.id }) TextButton(onClick = { marking = report }, modifier = Modifier.testTag("report-mark-cancer-${report.id}")) { Icon(Icons.Default.LocalHospital, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(if (cancerType(report) == null) "Cancer document?" else "Change type") }
                         if (canEdit && prescriptionOriginals.none { it.id == report.id }) TextButton(enabled = !busy, onClick = { remove = report }, modifier = Modifier.testTag("report-remove-${report.id}")) { Icon(Icons.Default.DeleteOutline, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Remove") }
                     }
                 }
@@ -170,6 +176,19 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
         if (search.isBlank() && filter != "Reports") item { TextButton(onClick = onTalk, modifier = Modifier.fillMaxWidth()) { Icon(Icons.Default.Forum, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(if (clinician) "Start a conversation" else "Talk with your doctor") } }
     }
     remove?.let { report -> AlertDialog(onDismissRequest = { if (!busy) remove = null }, title = { Text("Remove this report?") }, text = { Text("${report.name}\n\nYour original file stays in Files.") },
-        confirmButton = { TextButton(onClick = { vm.removeReport(report) { remove = null } }, enabled = !busy) { Text("Remove report") } },
+        confirmButton = { TextButton(onClick = { vm.removeReport(report) { remove = null; cancerStore.remove(report.id); cancerChoices = cancerStore.all() } }, enabled = !busy) { Text("Remove report") } },
         dismissButton = { TextButton(onClick = { remove = null }, enabled = !busy) { Text("Keep") } }) }
+    marking?.let { report ->
+        val current = cancerType(report)
+        AlertDialog(onDismissRequest = { marking = null }, title = { Text("What kind of document? · यह कौन सा कागज़ है?") }, text = { Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text(report.name, style = MaterialTheme.typography.bodySmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
+            Text("Only this label changes. It stays on this phone, like the report file.", style = MaterialTheme.typography.bodySmall)
+            (CancerDocumentRules.types + CancerDocumentRules.NOT_CANCER).forEach { type ->
+                val chosen = if (type == CancerDocumentRules.NOT_CANCER) current == null else current == type
+                FilterChip(selected = chosen, onClick = { cancerStore.set(report.id, type); cancerChoices = cancerStore.all(); marking = null },
+                    label = { Text(if (type == CancerDocumentRules.NOT_CANCER) "Not a cancer document · कैंसर का कागज़ नहीं" else CancerDocumentRules.label(type)) },
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("cancer-type-$type"))
+            }
+        } }, confirmButton = { TextButton(onClick = { marking = null }) { Text("Close") } })
+    }
 }
