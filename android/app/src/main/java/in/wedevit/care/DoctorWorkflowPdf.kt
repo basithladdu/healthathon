@@ -69,8 +69,18 @@ object DoctorWorkflowPdf {
         } finally { pdf.close() }
         return file
     }
+    /** The PDF inside an AES-256 ZIP; the unlocked PDF is deleted from the app cache. */
+    fun createLocked(context: Context, version: WorkflowVersion, patientName: String, password: String): File {
+        CareLockedZip.passwordError(password)?.let { throw IllegalArgumentException(it) }
+        val pdf = create(context, version, patientName)
+        try {
+            val zip = File(pdf.parentFile, pdf.nameWithoutExtension + "-locked.zip")
+            zip.writeBytes(CareLockedZip.create(pdf.name, pdf.readBytes(), password))
+            return zip
+        } finally { pdf.delete() }
+    }
     fun share(context: Context, file: File) {
         val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
-        context.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).setType("application/pdf").putExtra(Intent.EXTRA_STREAM, uri).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION), "Share local preview PDF"))
+        context.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).setType(if (file.extension == "zip") "application/zip" else "application/pdf").putExtra(Intent.EXTRA_STREAM, uri).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION), "Share local preview PDF"))
     }
 }
