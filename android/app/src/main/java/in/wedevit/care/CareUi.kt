@@ -161,7 +161,7 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
     else -> {
     BackHandler(careTabBackEnabled(person != null, medicineScanner, tab, activeRecording)) { if (activeRecording) vm.stopRecording() else back() }
     BackHandler(walkthrough != null && !medicineScanner && tab == 0 && !activeRecording) { onLeaveWalkthrough() }
-    Scaffold(containerColor = Cream, snackbarHost = { SnackbarHost(snackbar) }, topBar = {
+    Scaffold(containerColor = Cream, snackbarHost = { SaharaSnackbarHost(snackbar) }, topBar = {
         if (!medicineScanner) Column {
         Row(Modifier.statusBarsPadding().fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
             Image(saharaImage(R.drawable.sahara_professional_logo, 44.dp), null, Modifier.size(44.dp), contentScale = ContentScale.Fit)
@@ -231,7 +231,7 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
     reading?.let { note -> NoteReader(vm, note, onDismiss = { reading = null }) }
     }
     } }
-    if (overlay.isNotEmpty() && overlay != "starting") SnackbarHost(snackbar, Modifier.align(Alignment.BottomCenter).navigationBarsPadding().imePadding())
+    if (overlay.isNotEmpty() && overlay != "starting") SaharaSnackbarHost(snackbar, Modifier.align(Alignment.BottomCenter).navigationBarsPadding().imePadding())
     }
     }
 }
@@ -1013,7 +1013,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
     }
 }
 
-@Composable fun SurfaceCard(color: Color = Paper, content: @Composable ColumnScope.() -> Unit) { Surface(shape = RoundedCornerShape(20.dp), color = color, modifier = Modifier.fillMaxWidth()) { Column(Modifier.padding(16.dp), content = content) } }
+@Composable fun SurfaceCard(color: Color = Paper, content: @Composable ColumnScope.() -> Unit) { Surface(shape = RoundedCornerShape(20.dp), color = color, modifier = Modifier.fillMaxWidth().saharaAppear()) { Column(Modifier.saharaContentSize().padding(16.dp), content = content) } }
 @Composable fun Tile(title: String, illustration: Int, color: Color, modifier: Modifier, onClick: () -> Unit) {
     ActionCard(color, modifier, onClick) {
         Column(Modifier.fillMaxWidth().padding(16.dp)) {
@@ -1078,7 +1078,7 @@ object ConversationPages {
             Text(title, Modifier.weight(1f), fontFamily = SaharaTitleFont, fontSize = 17.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
             Icon(if (open) Icons.Default.ExpandLess else Icons.Default.ExpandMore, if (open) "Collapse" else "Expand", tint = DoctorCardSub)
         }
-        if (open) Column(Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp), content = content)
+        AnimatedVisibility(open, enter = SaharaMotion.expand, exit = SaharaMotion.collapse) { Column(Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp), content = content) }
     } }
 }
 
@@ -1090,9 +1090,9 @@ object ConversationPages {
             Text("${source.trim().split(Regex("\\s+")).count { it.isNotEmpty() }} words", fontSize = 12.sp, color = DoctorCardFaint); Spacer(Modifier.width(8.dp))
             Icon(if (open) Icons.Default.ExpandLess else Icons.Default.ExpandMore, null, tint = DoctorCardSub)
         }
-        if (open) Column(Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        AnimatedVisibility(open, enter = SaharaMotion.expand, exit = SaharaMotion.collapse) { Column(Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text("Read-only. Edit the transcript on the transcript step.", fontSize = 12.sp, color = DoctorCardFaint)
             Box(Modifier.fillMaxWidth().heightIn(max = 280.dp).verticalScroll(rememberScrollState())) { androidx.compose.foundation.text.selection.SelectionContainer { Text(source.ifBlank { "No transcript captured yet." }, fontSize = 15.sp, lineHeight = 24.sp, color = DoctorCardInk) } }
-        }
+        } }
     } }
 }
