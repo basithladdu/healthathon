@@ -43,7 +43,7 @@ private enum class MedicineScannerPhase { Select, Scanning, Review }
 
 @Composable
 fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, onReviewedMedicines: ((List<MedicineDraft>) -> Unit)? = null) {
-    val context = LocalContext.current
+    val context = LocalContext.current; val t = careText()
     val scope = rememberCoroutineScope()
     val documentReader = remember(context) { CareDocumentReader(context.applicationContext) }
     val busy by vm.busy.collectAsStateWithLifecycle()
@@ -89,20 +89,20 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
             runCatching { context.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION) }
         }
         val merged = (current + selected.map(Uri::toString)).distinct()
-        if (merged.size > maximum) vm.message.value = "Use up to $maximum $label. The extra photos weren't added."
+        if (merged.size > maximum) vm.message.value = t("Use up to $maximum $label. The extra photos weren't added.", "ज़्यादा से ज़्यादा $maximum $label जोड़ें। बाक़ी फ़ोटो नहीं जोड़ी गईं।")
         return merged.take(maximum)
     }
 
     val prescriptionPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { selected ->
-        prescriptionUris = addSelected(prescriptionUris, selected, 5, "prescription pages")
+        prescriptionUris = addSelected(prescriptionUris, selected, 5, t("prescription pages", "पर्चे के पेज"))
     }
     val medicinePicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { selected ->
-        medicineUris = addSelected(medicineUris, selected, 10, "medicine photos")
+        medicineUris = addSelected(medicineUris, selected, 10, t("medicine photos", "दवा की फ़ोटो"))
     }
     val camera = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { saved ->
         if (saved && pendingUri.isNotBlank()) {
-            if (pendingKind == "prescription") prescriptionUris = addSelected(prescriptionUris, listOf(Uri.parse(pendingUri)), 5, "prescription pages")
-            else medicineUris = addSelected(medicineUris, listOf(Uri.parse(pendingUri)), 10, "medicine photos")
+            if (pendingKind == "prescription") prescriptionUris = addSelected(prescriptionUris, listOf(Uri.parse(pendingUri)), 5, t("prescription pages", "पर्चे के पेज"))
+            else medicineUris = addSelected(medicineUris, listOf(Uri.parse(pendingUri)), 10, t("medicine photos", "दवा की फ़ोटो"))
         } else if (pendingPath.isNotBlank()) File(pendingPath).delete()
         pendingKind = ""; pendingUri = ""; pendingPath = ""
     }
@@ -110,7 +110,7 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
     fun photograph(kind: String) {
         val maximumReached = if (kind == "prescription") prescriptionUris.size >= 5 else medicineUris.size >= 10
         if (maximumReached) {
-            vm.message.value = if (kind == "prescription") "Use up to 5 prescription pages." else "Use up to 10 medicine photos."
+            vm.message.value = if (kind == "prescription") t("Use up to 5 prescription pages.", "पर्चे के ज़्यादा से ज़्यादा 5 पेज जोड़ें।") else t("Use up to 10 medicine photos.", "दवा की ज़्यादा से ज़्यादा 10 फ़ोटो जोड़ें।")
             return
         }
         val directory = File(context.cacheDir, "medicine-scan").apply { mkdirs() }
@@ -122,7 +122,7 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
             camera.launch(uri)
         }.onFailure {
             file.delete(); pendingKind = ""; pendingUri = ""; pendingPath = ""
-            vm.message.value = "No camera app is available. Choose a photo instead."
+            vm.message.value = t("No camera app is available. Choose a photo instead.", "कैमरा ऐप नहीं मिला। फ़ोटो चुनें।")
         }
     }
 
@@ -148,16 +148,16 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
             contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 28.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            item { ScannerHeader("Scan prescription", "1 / 2") { cleanAndClose() } }
-            item { Text("Add a clear prescription. Read and check the words before saving. Medicine packaging is optional for your own comparison.") }
+            item { ScannerHeader(t("Scan prescription", "पर्चा स्कैन करें"), "1 / 2") { cleanAndClose() } }
+            item { Text(t("Add a clear prescription. Read and check the words before saving. Medicine packaging is optional for your own comparison.", "साफ़ पर्चा जोड़ें। सहेजने से पहले शब्द पढ़कर जाँचें। मिलान के लिए दवा के पैकेट की फ़ोटो चाहें तो जोड़ें।")) }
             item {
                 PhotoSelectionCard(
-                    title = "Prescription pages",
-                    subtitle = "Add in page order · up to 5",
+                    title = t("Prescription pages", "पर्चे के पेज"),
+                    subtitle = t("Add in page order · up to 5", "पेज के क्रम से जोड़ें · ज़्यादा से ज़्यादा 5"),
                     tint = Mint,
                     uris = prescriptionUris,
-                    chooseLabel = "Choose pages",
-                    photographLabel = "Take photo",
+                    chooseLabel = t("Choose pages", "पेज चुनें"),
+                    photographLabel = t("Take photo", "फ़ोटो लें"),
                     onChoose = { prescriptionPicker.launch(arrayOf("image/jpeg", "image/png", "image/webp", "image/*")) },
                     onPhotograph = { photograph("prescription") },
                     onRemove = { index ->
@@ -170,12 +170,12 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
             }
             item {
                 PhotoSelectionCard(
-                    title = "Medicine strips or boxes",
-                    subtitle = "One clear photo per medicine · up to 10",
+                    title = t("Medicine strips or boxes", "दवा के पत्ते या डिब्बे"),
+                    subtitle = t("One clear photo per medicine · up to 10", "हर दवा की एक साफ़ फ़ोटो · ज़्यादा से ज़्यादा 10"),
                     tint = Color(0xFFFFEDD3),
                     uris = medicineUris,
-                    chooseLabel = "Choose photos",
-                    photographLabel = "Take photo",
+                    chooseLabel = t("Choose photos", "फ़ोटो चुनें"),
+                    photographLabel = t("Take photo", "फ़ोटो लें"),
                     onChoose = { medicinePicker.launch(arrayOf("image/jpeg", "image/png", "image/webp", "image/*")) },
                     onPhotograph = { photograph("medicine") },
                     onRemove = { index ->
@@ -188,7 +188,7 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
             }
             scanError?.let { error -> item { Text(error, color = MaterialTheme.colorScheme.error) } }
             item {
-                Text("Reading happens on your phone. Printed Latin text is supported; handwriting may need manual entry. No dose or treatment is inferred.", style = MaterialTheme.typography.bodySmall)
+                Text(t("Reading happens on your phone. Printed Latin text is supported; handwriting may need manual entry. No dose or treatment is inferred.", "पढ़ाई आपके फ़ोन पर ही होती है। छपे अंग्रेज़ी अक्षर पढ़े जाते हैं; हाथ की लिखाई ख़ुद लिखनी पड़ सकती है। ऐप ख़ुराक या इलाज ख़ुद तय नहीं करता।"), style = MaterialTheme.typography.bodySmall)
                 Spacer(Modifier.height(12.dp))
                 Button(
                     onClick = {
@@ -196,17 +196,17 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
                         scanJob = scope.launch {
                             try {
                                 val pages = documentReader.prescription(prescriptionUris.map(Uri::parse)) { done, total ->
-                                    progress = MedicineScanProgress(MedicineScanStage.PREPARING, done, total, "Prescription page ${done.coerceAtLeast(1)}")
+                                    progress = MedicineScanProgress(MedicineScanStage.PREPARING, done, total, t("Prescription page ${done.coerceAtLeast(1)}", "पर्चे का पेज ${done.coerceAtLeast(1)}"))
                                 }
                                 val medicines = copiedPrescriptionMedicines(pages)
                                 drafts = medicines.mapIndexed { index, medicine -> MedicineDraft(stableMedicineDraftId(scanId, medicine, index), medicine) }
-                                warnings = listOf("Compare every copied line with the original page. The app has not matched brands, chosen doses or confirmed treatment.") + if (medicines.isEmpty()) listOf("No safe medicine lines were readable. Add medicines manually from the original prescription.") else emptyList()
+                                warnings = listOf(t("Compare every copied line with the original page. The app has not matched brands, chosen doses or confirmed treatment.", "हर कॉपी की गई पंक्ति को असली पेज से मिलाएँ। ऐप ने ब्रांड नहीं मिलाए, ख़ुराक नहीं चुनी और इलाज पक्का नहीं किया।")) + if (medicines.isEmpty()) listOf(t("No safe medicine lines were readable. Add medicines manually from the original prescription.", "दवा की कोई पंक्ति ठीक से नहीं पढ़ी जा सकी। असली पर्चा देखकर दवाएँ ख़ुद लिखें।")) else emptyList()
                                 unmatched = medicineUris.indices.toList()
                                 unmatchedReviewed = unmatched.isEmpty()
                                 phase = MedicineScannerPhase.Review
                             } catch (error: Exception) {
                                 if (error is CancellationException) throw error
-                                scanError = error.message ?: "The medicine organizer couldn't finish. Try again."
+                                scanError = error.message ?: t("The medicine organizer couldn't finish. Try again.", "दवा की सूची पूरी नहीं बन सकी। फिर कोशिश करें।")
                                 phase = MedicineScannerPhase.Select
                             } finally { scanJob = null }
                         }
@@ -214,25 +214,25 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
                     enabled = prescriptionUris.isNotEmpty(),
                     modifier = Modifier.fillMaxWidth().heightIn(min = 54.dp),
                     shape = RoundedCornerShape(16.dp),
-                ) { Icon(Icons.Default.DocumentScanner, null); Spacer(Modifier.width(8.dp)); Text("Read prescription") }
+                ) { Icon(Icons.Default.DocumentScanner, null); Spacer(Modifier.width(8.dp)); Text(t("Read prescription", "पर्चा पढ़ें")) }
                 TextButton(onClick = {
                     drafts = listOf(MedicineDraft(newId(), manualMedicine(), false)); warnings = emptyList(); unmatched = emptyList(); unmatchedReviewed = true; phase = MedicineScannerPhase.Review
-                }, modifier = Modifier.fillMaxWidth()) { Text("Add one manually") }
-                TextButton(onClick = { cleanAndClose() }, modifier = Modifier.fillMaxWidth()) { Text("Cancel") }
+                }, modifier = Modifier.fillMaxWidth()) { Text(t("Add one manually", "एक दवा ख़ुद लिखें")) }
+                TextButton(onClick = { cleanAndClose() }, modifier = Modifier.fillMaxWidth()) { Text(t("Cancel", "रद्द करें")) }
             }
         }
 
         MedicineScannerPhase.Scanning -> Box(Modifier.fillMaxSize().padding(28.dp), contentAlignment = Alignment.Center) {
             Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(14.dp)) {
                 CircularProgressIndicator(color = Rust)
-                Heading("Reading prescription", 26)
+                Heading(t("Reading prescription", "पर्चा पढ़ रहे हैं"), 26)
                 val value = progress
                 if (value?.stage == MedicineScanStage.PREPARING && value.total > 0) {
-                    Text("${value.completed.coerceAtMost(value.total)} of ${value.total}")
+                    Text(t("${value.completed.coerceAtMost(value.total)} of ${value.total}", "${value.completed.coerceAtMost(value.total)} / ${value.total}"))
                     if (value.fileName.isNotBlank()) Text(value.fileName, style = MaterialTheme.typography.bodySmall)
-                } else Text("Reading the selected pages…", style = MaterialTheme.typography.bodyMedium)
-                Text("Keep this screen open until review appears. You can cancel without changing saved medicines.", style = MaterialTheme.typography.bodySmall)
-                OutlinedButton(onClick = { returnToImages() }) { Text("Cancel") }
+                } else Text(t("Reading the selected pages…", "चुने गए पेज पढ़ रहे हैं…"), style = MaterialTheme.typography.bodyMedium)
+                Text(t("Keep this screen open until review appears. You can cancel without changing saved medicines.", "जाँच की सूची आने तक यह स्क्रीन खुली रखें। रोकने से सहेजी दवाएँ नहीं बदलेंगी।"), style = MaterialTheme.typography.bodySmall)
+                OutlinedButton(onClick = { returnToImages() }) { Text(t("Cancel", "रद्द करें")) }
             }
         }
 
@@ -241,13 +241,13 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
             contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 28.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
-            item { ScannerHeader("Review medicine list", "2 / 2") { returnToImages() } }
-            item { SurfaceCard(Sage) { Text("Check before saving", fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont); Text("Text reading can be wrong. Confirm each entry against the prescription and packaging. Sahara does not diagnose, prescribe or recommend treatment.") } }
+            item { ScannerHeader(t("Review medicine list", "दवा की सूची जाँचें"), "2 / 2") { returnToImages() } }
+            item { SurfaceCard(Sage) { Text(t("Check before saving", "सहेजने से पहले जाँचें"), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont); Text(t("Text reading can be wrong. Confirm each entry against the prescription and packaging. Sahara does not diagnose, prescribe or recommend treatment.", "पढ़ाई में ग़लती हो सकती है। हर दवा को पर्चे और पैकेट से मिलाएँ। सहारा बीमारी नहीं बताता, दवा नहीं लिखता और इलाज की सलाह नहीं देता।")) } }
             if (prescriptionUris.isNotEmpty()) item { SurfaceCard {
-                Text("Original pages", fontWeight = FontWeight.SemiBold)
+                Text(t("Original pages", "असली पेज"), fontWeight = FontWeight.SemiBold)
                 prescriptionUris.forEachIndexed { index, uri -> TextButton(onClick = { runCatching {
                     context.startActivity(Intent(Intent.ACTION_VIEW).setDataAndType(Uri.parse(uri), "image/*").addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION))
-                }.onFailure { scanError = "No image viewer is available. Open this photo in Files to compare it." } }) { Text("View prescription page ${index + 1}") } }
+                }.onFailure { scanError = t("No image viewer is available. Open this photo in Files to compare it.", "फ़ोटो देखने का ऐप नहीं मिला। मिलाने के लिए यह फ़ोटो Files में खोलें।") } }) { Text(t("View prescription page ${index + 1}", "पर्चे का पेज ${index + 1} देखें")) } }
             } }
             warnings.forEach { warning -> item(warning) { SurfaceCard(Peach) { Text(warning) } } }
             items(drafts.size, key = { drafts[it].id }) { index ->
@@ -259,14 +259,14 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
             }
             if (unmatched.isNotEmpty()) item {
                 SurfaceCard(Peach) {
-                    Text("${unmatched.size} medicine ${if (unmatched.size == 1) "photo was" else "photos were"} not matched", fontWeight = FontWeight.Bold)
-                    Text("Review ${unmatched.joinToString { "photo ${it + 1}" }}. Add any missing medicine manually or leave it out only after checking the original prescription.")
-                    Spacer(Modifier.height(8.dp)); CheckLine(unmatchedReviewed, { unmatchedReviewed = it }, "I reviewed the unmatched medicine photos.")
+                    Text(t("${unmatched.size} medicine ${if (unmatched.size == 1) "photo was" else "photos were"} not matched", "दवा की ${unmatched.size} फ़ोटो नहीं मिलीं"), fontWeight = FontWeight.Bold)
+                    Text(t("Review ${unmatched.joinToString { "photo ${it + 1}" }}. Add any missing medicine manually or leave it out only after checking the original prescription.", "${unmatched.joinToString { "फ़ोटो ${it + 1}" }} जाँचें। छूटी दवा ख़ुद लिखें, या असली पर्चा देखने के बाद ही उसे छोड़ें।"))
+                    Spacer(Modifier.height(8.dp)); CheckLine(unmatchedReviewed, { unmatchedReviewed = it }, t("I reviewed the unmatched medicine photos.", "मैंने बिना मिली दवा की फ़ोटो जाँच ली हैं।"))
                 }
             }
             item {
                 OutlinedButton(onClick = { drafts = drafts + MedicineDraft(newId(), manualMedicine(), false) }, modifier = Modifier.fillMaxWidth()) {
-                    Icon(Icons.Default.Add, null); Spacer(Modifier.width(6.dp)); Text("Add another manually")
+                    Icon(Icons.Default.Add, null); Spacer(Modifier.width(6.dp)); Text(t("Add another manually", "एक और दवा ख़ुद लिखें"))
                 }
             }
             scanError?.let { error -> item { Text(error, color = MaterialTheme.colorScheme.error) } }
@@ -280,14 +280,14 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
                     savingSources = true
                     scope.launch {
                         try {
-                            if(onReviewedMedicines != null) require(stagingAllowed()) { "This prescription's care profile or edit access changed." }
+                            if(onReviewedMedicines != null) require(stagingAllowed()) { t("This prescription's care profile or edit access changed.", "इस पर्चे की देखभाल प्रोफ़ाइल या बदलाव की अनुमति बदल गई है।") }
                             val sourceStore = MedicineSourceStore(context, vm.accountNamespace)
                             val originals = sourceStore.save(personAtOpen, scanId, prescriptionUris.map(Uri::parse), vm.reportFiles)
                             val references = withContext(Dispatchers.IO) { sourceStore.references(originals, vm.reportFiles) }
                             val linked = drafts.map { draft -> if (references.isBlank()) draft else draft.copy(medicine = draft.medicine.copy(instructions = draft.medicine.instructions + "\nOriginal prescription references:\n" + references)) }
-                            require(vm.selected.value == personAtOpen) { "The selected person changed. Open this prescription for the right person." }
+                            require(vm.selected.value == personAtOpen) { t("The selected person changed. Open this prescription for the right person.", "चुना गया व्यक्ति बदल गया है। सही व्यक्ति के लिए यह पर्चा खोलें।") }
                             if(onReviewedMedicines != null) {
-                                require(stagingAllowed()) { "This prescription's account or edit access changed. Nothing was saved." }
+                                require(stagingAllowed()) { t("This prescription's account or edit access changed. Nothing was saved.", "इस पर्चे का खाता या बदलाव की अनुमति बदल गई है। कुछ सहेजा नहीं गया।") }
                                 onReviewedMedicines(linked)
                                 releaseSelectedPhotos()
                             } else vm.saveMedicineList(linked) {
@@ -295,15 +295,15 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
                                 File(context.cacheDir, "medicine-scan").deleteRecursively()
                                 onClose()
                             }
-                        } catch (failure: Exception) { if (failure is CancellationException) throw failure; scanError = failure.message ?: "Could not keep the original pages. Your medicine list has not been saved." }
+                        } catch (failure: Exception) { if (failure is CancellationException) throw failure; scanError = failure.message ?: t("Could not keep the original pages. Your medicine list has not been saved.", "असली पेज सँभाले नहीं जा सके। आपकी दवा की सूची सहेजी नहीं गई।") }
                         finally { savingSources = false }
                     }
                 }, enabled = valid && !busy && !savingSources, modifier = Modifier.fillMaxWidth().heightIn(min = 54.dp), shape = RoundedCornerShape(16.dp)) {
-                    Text(if (busy || savingSources) "Saving…" else if(onReviewedMedicines != null) "Use ${drafts.size} reviewed medicines" else "Save ${drafts.size} ${if (drafts.size == 1) "medicine" else "medicines"}")
+                    Text(if (busy || savingSources) t("Saving…", "सहेज रहे हैं…") else if(onReviewedMedicines != null) t("Use ${drafts.size} reviewed medicines", "जाँची गई ${drafts.size} दवाएँ लें") else t("Save ${drafts.size} ${if (drafts.size == 1) "medicine" else "medicines"}", "${drafts.size} दवा सहेजें"))
                 }
-                if (!valid) Text("Add a medicine name and dose, resolve unmatched photos, and confirm every entry before saving.", style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 8.dp))
-                TextButton(onClick = { returnToImages() }, enabled = !busy, modifier = Modifier.fillMaxWidth()) { Text("Back to photos") }
-                TextButton(onClick = { cleanAndClose() }, enabled = !busy, modifier = Modifier.fillMaxWidth()) { Text("Cancel") }
+                if (!valid) Text(t("Add a medicine name and dose, resolve unmatched photos, and confirm every entry before saving.", "सहेजने से पहले दवा का नाम और ख़ुराक लिखें, बिना मिली फ़ोटो देखें और हर दवा की पुष्टि करें।"), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 8.dp))
+                TextButton(onClick = { returnToImages() }, enabled = !busy, modifier = Modifier.fillMaxWidth()) { Text(t("Back to photos", "फ़ोटो पर वापस")) }
+                TextButton(onClick = { cleanAndClose() }, enabled = !busy, modifier = Modifier.fillMaxWidth()) { Text(t("Cancel", "रद्द करें")) }
             }
         }
     }
@@ -312,7 +312,7 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
 @Composable
 private fun ScannerHeader(title: String, step: String, onBack: () -> Unit) {
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back") }
+        IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, careText()("Back", "वापस")) }
         Text(
             text = title,
             modifier = Modifier.weight(1f),
@@ -353,7 +353,7 @@ private fun PhotoSelectionCard(
     onRemove: (Int) -> Unit,
     onMove: ((Int, Int) -> Unit)?,
 ) {
-    val context = LocalContext.current
+    val context = LocalContext.current; val t = careText(); val hindi = careHindi()
     SurfaceCard(tint) {
         Row(verticalAlignment = Alignment.Top) {
             Column(Modifier.weight(1f)) { Text(title, fontWeight = FontWeight.Bold, fontSize = 17.sp); Text(subtitle, style = MaterialTheme.typography.bodySmall) }
@@ -362,10 +362,10 @@ private fun PhotoSelectionCard(
         uris.forEachIndexed { index, value ->
             Row(Modifier.fillMaxWidth().padding(top = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.Image, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp))
-                Text(imageName(context, Uri.parse(value), index), Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
-                if (onMove != null && index > 0) IconButton(onClick = { onMove(index, index - 1) }, modifier = Modifier.size(48.dp)) { Icon(Icons.Default.ArrowUpward, "Move earlier") }
-                if (onMove != null && index < uris.lastIndex) IconButton(onClick = { onMove(index, index + 1) }, modifier = Modifier.size(48.dp)) { Icon(Icons.Default.ArrowDownward, "Move later") }
-                IconButton(onClick = { onRemove(index) }, modifier = Modifier.size(48.dp)) { Icon(Icons.Default.Close, "Remove ${index + 1}") }
+                Text(imageName(context, Uri.parse(value), index, hindi), Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                if (onMove != null && index > 0) IconButton(onClick = { onMove(index, index - 1) }, modifier = Modifier.size(48.dp)) { Icon(Icons.Default.ArrowUpward, t("Move earlier", "ऊपर करें")) }
+                if (onMove != null && index < uris.lastIndex) IconButton(onClick = { onMove(index, index + 1) }, modifier = Modifier.size(48.dp)) { Icon(Icons.Default.ArrowDownward, t("Move later", "नीचे करें")) }
+                IconButton(onClick = { onRemove(index) }, modifier = Modifier.size(48.dp)) { Icon(Icons.Default.Close, t("Remove ${index + 1}", "${index + 1} हटाएँ")) }
             }
         }
         Spacer(Modifier.height(12.dp))
@@ -384,49 +384,49 @@ private fun PhotoSelectionCard(
 
 @Composable
 private fun MedicineReviewCard(draft: MedicineDraft, onChange: (MedicineDraft) -> Unit, onRemove: () -> Unit) {
-    val medicine = draft.medicine
+    val medicine = draft.medicine; val t = careText(); val hindi = careHindi()
     fun change(next: OrganizedMedicine) = onChange(draft.copy(medicine = next, confirmed = false))
     SurfaceCard(Paper) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(Icons.Default.Medication, null, tint = Rust); Spacer(Modifier.width(9.dp))
             Column(Modifier.weight(1f)) {
-                Text(if (medicine.medicineName.isBlank()) "Manual medicine" else medicine.medicineName, fontWeight = FontWeight.Bold)
-                Text(matchLabel(medicine), style = MaterialTheme.typography.bodySmall)
+                Text(if (medicine.medicineName.isBlank()) t("Manual medicine", "ख़ुद लिखी दवा") else medicine.medicineName, fontWeight = FontWeight.Bold)
+                Text(matchLabel(medicine, hindi), style = MaterialTheme.typography.bodySmall)
             }
-            IconButton(onClick = onRemove) { Icon(Icons.Default.DeleteOutline, "Remove medicine") }
+            IconButton(onClick = onRemove) { Icon(Icons.Default.DeleteOutline, t("Remove medicine", "दवा हटाएँ")) }
         }
         medicine.uncertainties.forEach { Text("• $it", color = Rust, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 4.dp)) }
         Spacer(Modifier.height(10.dp))
-        CareField(medicine.medicineName, { change(medicine.copy(medicineName = it.take(120))) }, "Medicine name", singleLine = true)
+        CareField(medicine.medicineName, { change(medicine.copy(medicineName = it.take(120))) }, t("Medicine name", "दवा का नाम"), singleLine = true)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Box(Modifier.weight(1f)) { CareField(medicine.strength, { change(medicine.copy(strength = it.take(80))) }, "Strength", singleLine = true) }
-            Box(Modifier.weight(1f)) { CareField(medicine.form, { change(medicine.copy(form = it.take(60))) }, "Form", singleLine = true) }
+            Box(Modifier.weight(1f)) { CareField(medicine.strength, { change(medicine.copy(strength = it.take(80))) }, t("Strength", "ताक़त (mg)"), singleLine = true) }
+            Box(Modifier.weight(1f)) { CareField(medicine.form, { change(medicine.copy(form = it.take(60))) }, t("Form", "रूप (गोली, सिरप)"), singleLine = true) }
         }
-        CareField(medicine.quantity, { change(medicine.copy(quantity = it.take(80))) }, "Dose per administration", singleLine = true)
-        CareField(medicine.frequency, { change(medicine.copy(frequency = it.take(120))) }, "Frequency", singleLine = true)
-        CareField(medicine.instructions, { change(medicine.copy(instructions = it.take(500))) }, "Directions from prescription", minLines = 2)
-        Text("Food timing", fontWeight = FontWeight.SemiBold)
+        CareField(medicine.quantity, { change(medicine.copy(quantity = it.take(80))) }, t("Dose per administration", "एक बार की ख़ुराक"), singleLine = true)
+        CareField(medicine.frequency, { change(medicine.copy(frequency = it.take(120))) }, t("Frequency", "दिन में कितनी बार"), singleLine = true)
+        CareField(medicine.instructions, { change(medicine.copy(instructions = it.take(500))) }, t("Directions from prescription", "पर्चे में लिखा तरीक़ा"), minLines = 2)
+        Text(t("Food timing", "खाने के हिसाब से समय"), fontWeight = FontWeight.SemiBold)
         if (medicine.sourceQuote.isNotBlank()) {
-            Text("Original reading · ${medicine.prescriptionPageIndexes.joinToString { "page ${it + 1}" }}", style = MaterialTheme.typography.labelMedium)
+            Text(t("Original reading · ${medicine.prescriptionPageIndexes.joinToString { "page ${it + 1}" }}", "असली पढ़ाई · ${medicine.prescriptionPageIndexes.joinToString { "पेज ${it + 1}" }}"), style = MaterialTheme.typography.labelMedium)
             Text(medicine.sourceQuote, style = MaterialTheme.typography.bodySmall)
         }
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())) {
             MedicineMealTiming.entries.forEach { timing ->
-                FilterChip(selected = medicine.mealTiming == timing, onClick = { change(medicine.copy(mealTiming = timing)) }, label = { Text(mealTimingLabel(timing), fontSize = 11.sp) })
+                FilterChip(selected = medicine.mealTiming == timing, onClick = { change(medicine.copy(mealTiming = timing)) }, label = { Text(mealTimingLabel(timing, hindi), fontSize = 11.sp) })
             }
         }
         if (medicine.suggestedTimes.isNotEmpty()) {
-            Text("Exact times", fontWeight = FontWeight.SemiBold)
+            Text(t("Exact times", "सही समय"), fontWeight = FontWeight.SemiBold)
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.horizontalScroll(rememberScrollState())) {
-                medicine.suggestedTimes.forEach { time -> InputChip(selected = false, onClick = { change(medicine.copy(suggestedTimes = medicine.suggestedTimes - time)) }, label = { Text(time) }, trailingIcon = { Icon(Icons.Default.Close, "Remove $time", Modifier.size(15.dp)) }) }
+                medicine.suggestedTimes.forEach { time -> InputChip(selected = false, onClick = { change(medicine.copy(suggestedTimes = medicine.suggestedTimes - time)) }, label = { Text(time) }, trailingIcon = { Icon(Icons.Default.Close, t("Remove $time", "$time हटाएँ"), Modifier.size(15.dp)) }) }
             }
         }
         CareField(
             medicine.durationDays?.toString().orEmpty(),
             { value -> if (value.isBlank()) change(medicine.copy(durationDays = null)) else value.toIntOrNull()?.takeIf { it in 1..365 }?.let { change(medicine.copy(durationDays = it)) } },
-            "Course length in days (if written)", singleLine = true,
+            t("Course length in days (if written)", "कितने दिन लेनी है (अगर लिखा हो)"), singleLine = true,
         )
-        CheckLine(draft.confirmed, { onChange(draft.copy(confirmed = it)) }, "I checked this medicine, dose and directions against the original prescription and packaging.")
+        CheckLine(draft.confirmed, { onChange(draft.copy(confirmed = it)) }, t("I checked this medicine, dose and directions against the original prescription and packaging.", "मैंने यह दवा, ख़ुराक और तरीक़ा असली पर्चे और पैकेट से मिला लिया है।"))
     }
 }
 
@@ -437,25 +437,25 @@ private fun manualMedicine() = OrganizedMedicine(
     matchQuality = MedicineMatchQuality.MANUAL,
 )
 
-private fun matchLabel(medicine: OrganizedMedicine): String = when (medicine.matchQuality) {
-    MedicineMatchQuality.MATCHED -> "Matched to prescription and packaging${medicine.confidence?.let { " · ${(it * 100).toInt()}%" }.orEmpty()}"
-    MedicineMatchQuality.POSSIBLE -> "Possible packaging match · check carefully"
-    MedicineMatchQuality.PRESCRIPTION_ONLY -> "Found on prescription · no safe package match"
-    MedicineMatchQuality.MANUAL -> "Entered manually"
+private fun matchLabel(medicine: OrganizedMedicine, hindi: Boolean): String = when (medicine.matchQuality) {
+    MedicineMatchQuality.MATCHED -> (if (hindi) "पर्चे और पैकेट से मिली" else "Matched to prescription and packaging") + medicine.confidence?.let { " · ${(it * 100).toInt()}%" }.orEmpty()
+    MedicineMatchQuality.POSSIBLE -> if (hindi) "पैकेट से शायद मिली · ध्यान से जाँचें" else "Possible packaging match · check carefully"
+    MedicineMatchQuality.PRESCRIPTION_ONLY -> if (hindi) "पर्चे में मिली · पैकेट से पक्का मिलान नहीं" else "Found on prescription · no safe package match"
+    MedicineMatchQuality.MANUAL -> if (hindi) "ख़ुद लिखी गई" else "Entered manually"
 }
 
-private fun mealTimingLabel(value: MedicineMealTiming): String = when (value) {
-    MedicineMealTiming.BEFORE_FOOD -> "Before food"
-    MedicineMealTiming.WITH_FOOD -> "With food"
-    MedicineMealTiming.AFTER_FOOD -> "After food"
-    MedicineMealTiming.NOT_STATED -> "Not stated"
+private fun mealTimingLabel(value: MedicineMealTiming, hindi: Boolean): String = when (value) {
+    MedicineMealTiming.BEFORE_FOOD -> if (hindi) "खाने से पहले" else "Before food"
+    MedicineMealTiming.WITH_FOOD -> if (hindi) "खाने के साथ" else "With food"
+    MedicineMealTiming.AFTER_FOOD -> if (hindi) "खाने के बाद" else "After food"
+    MedicineMealTiming.NOT_STATED -> if (hindi) "लिखा नहीं" else "Not stated"
 }
 
-private fun imageName(context: Context, uri: Uri, index: Int): String = runCatching {
+private fun imageName(context: Context, uri: Uri, index: Int, hindi: Boolean): String = runCatching {
     context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { cursor ->
         if (cursor.moveToFirst()) cursor.getString(0) else null
     }
-}.getOrNull().orEmpty().ifBlank { "Photo ${index + 1}" }
+}.getOrNull().orEmpty().ifBlank { if (hindi) "फ़ोटो ${index + 1}" else "Photo ${index + 1}" }
 
 private fun <T> List<T>.moved(from: Int, to: Int): List<T> = toMutableList().also { values ->
     if (from in values.indices && to in values.indices) values.add(to, values.removeAt(from))
