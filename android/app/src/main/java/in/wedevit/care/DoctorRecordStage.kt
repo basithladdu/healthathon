@@ -15,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
@@ -64,8 +65,11 @@ fun doctorStageStatus(recording: Boolean, saving: Boolean, seconds: Long): Strin
     val white = Color.White
     BoxWithConstraints(Modifier.fillMaxSize().background(DoctorStageTerracotta).testTag("record-stage")) {
         val peek = 80.dp; val density = LocalDensity.current; val rangePx = with(density) { (maxHeight - peek).toPx() }.coerceAtLeast(1f)
-        val frac = remember { Animatable(0f) }; val scope = rememberCoroutineScope()
+        // The Saved Audio sheet stays open or closed across rotation.
+        var keptOpen by rememberSaveable { mutableStateOf(false) }
+        val frac = remember { Animatable(if (keptOpen) 1f else 0f) }; val scope = rememberCoroutineScope()
         val expanded = frac.targetValue > 0.5f
+        SideEffect { keptOpen = expanded }
         BackHandler(expanded) { scope.launch { frac.animateTo(0f) } }
         Column(Modifier.fillMaxSize().padding(start = 20.dp, end = 8.dp, top = 8.dp, bottom = peek), horizontalAlignment = Alignment.CenterHorizontally) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {

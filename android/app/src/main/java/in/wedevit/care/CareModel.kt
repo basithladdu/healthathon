@@ -79,7 +79,9 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
     private val reminderScheduler = if (demoMode) null else CareReminderScheduler(app, account)
     private val preferences = app.getSharedPreferences(if (storageNamespace.isEmpty()) "preferences" else "preferences-$storageNamespace", 0)
     private val conversationTranscriber = ConversationTranscriber()
-    val people = dao.people().stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+    /** True once the first list of people has come from the database, so the first frame never shows the welcome screen to someone who has records. */
+    val peopleLoaded = MutableStateFlow(false)
+    val people = dao.people().onEach { peopleLoaded.value = true }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
     val selected = MutableStateFlow(preferences.getString("person", "") ?: "")
     val viewRole = MutableStateFlow(walkthroughRole ?: preferences.getString("viewRole", null)?.takeIf { it in listOf("Patient", "Family", "Doctor") }
         ?: if (preferences.getBoolean("clinician", false)) "Doctor" else "Family")
@@ -113,7 +115,9 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
     private val medicineHistory = MedicineHistoryRepo(app, cloud, storageNamespace)
     private val medicinePastIds = MutableStateFlow<Set<String>>(emptySet())
     private val prescriptionExcludedIds=selected.flatMapLatest { db.prescriptions().excludedIds(it) }.stateIn(viewModelScope,SharingStarted.Eagerly,emptyList())
-    val allItems = selected.flatMapLatest { dao.items(it).onStart { emit(emptyList()) } }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+    /** Person whose care entries have arrived from the database; empty-state cards wait for it so they never flash before the first rows. */
+    val itemsLoadedFor = MutableStateFlow("")
+    val allItems = selected.flatMapLatest { person -> dao.items(person).onEach { itemsLoadedFor.value = person }.onStart { emit(emptyList()) } }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
     val items = combine(allItems, medicinePastIds,prescriptionExcludedIds) { rows, past,excluded -> rows.filterNot { it.kind == "medicine" && (it.id in past || it.id in excluded) } }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
     val conversationArchives=selected.flatMapLatest { db.conversations().archives(it) }.stateIn(viewModelScope,SharingStarted.Eagerly,emptyList())
     val reports = selected.flatMapLatest { dao.reports(it).onStart { emit(emptyList()) } }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
@@ -550,7 +554,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
         }
     }
     fun remove(item: CareItem) = action { requireEdit(item.personId); cloud?.removeEntry(item); dao.removeItem(item); reconcileReminders(); message.value = "Removed" }
-    fun importReport(uri: android.net.Uri, personId: String) = action(waitForRefresh = true) {
+    fun importReport(uri: android.net.Uri, personId: String) = action {
         require(!demoMode) { "File import is unavailable in Doctor examples." }
         require(people.value.any { it.id == personId }) { "Choose a person before adding a report." }
         requireEdit(personId)
@@ -770,12 +774,13 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
         require(recordingFiles(person).any { it.absolutePath == consent.audioPath }) { "This recording is no longer available." }
         dao.saveRecordingConsent(consent)
     }
-    private fun action(waitForRefresh: Boolean = false, block: suspend () -> Unit) {
-        if (busy.value || (refreshing.value && !waitForRefresh)) { message.value = "Please wait for your records to finish loading."; return }
+    private fun action(block: suspend () -> Unit) {
+        // A background refresh (for example on returning to the app) no longer turns a save away: the save waits for it, then runs.
+        if (busy.value) { message.value = "Please wait for your records to finish loading."; return }
         actionError.value = null
         busy.value = true
         viewModelScope.launch {
-            try { if (waitForRefresh) refreshing.first { !it }; block() } catch (e: Exception) {
+            try { refreshing.first { !it }; block() } catch (e: Exception) {
                 if (e is CancellationException) throw e
                 val error = if (e is IllegalArgumentException || e is ConversationTranscriptionException) e.message else "Couldn't save. Your entry is still here; please try again."
                 actionError.value = error; message.value = error

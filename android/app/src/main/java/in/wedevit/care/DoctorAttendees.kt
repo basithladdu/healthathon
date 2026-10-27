@@ -6,6 +6,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -60,8 +64,9 @@ internal fun doctorAttendeesAllConsented(rows: List<DoctorAttendee>): Boolean = 
     var rows by remember(store, scope) { mutableStateOf(emptyList<DoctorAttendee>()) }
     var loaded by remember(store, scope) { mutableStateOf(false) }
     var error by remember(store, scope) { mutableStateOf<String?>(null) }
-    var name by remember(store, scope) { mutableStateOf("") }
-    var role by remember(store, scope) { mutableStateOf("") }
+    // A half-typed person survives scrolling this card away and rotation.
+    var name by rememberSaveable(scope) { mutableStateOf("") }
+    var role by rememberSaveable(scope) { mutableStateOf("") }
     val callback by rememberUpdatedState(onChange)
     fun persist(next: List<DoctorAttendee>): Boolean = try { check(editable) { "This list can no longer be changed." }; store.save(scope, next); rows = next; error = null; callback(next); true } catch (e: Exception) { error = e.message ?: "People present were not saved. Try again."; false }
     fun load() { try { val saved = store.load(scope); rows = if (saved.isEmpty()) initial else saved; loaded = true; error = null; callback(rows) } catch (_: Exception) { error = "People present could not be loaded. Retry before editing."; loaded = false } }
@@ -85,9 +90,11 @@ internal fun doctorAttendeesAllConsented(rows: List<DoctorAttendee>): Boolean = 
                 }
             } }
             if (editable) {
-                OutlinedTextField(name, { name = it.take(100) }, label = { Text("Name") }, singleLine = true, enabled = loaded, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-attendee-name-input"))
-                OutlinedTextField(role, { role = it.take(40) }, label = { Text("Role, such as Daughter or Nurse") }, singleLine = true, enabled = loaded, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-attendee-role-input"))
-                TextButton(onClick = { if (persist(rows + DoctorAttendee(newId(), name.trim(), role.trim(), false))) { name = ""; role = "" } }, enabled = loaded && rows.size < 12 && name.isNotBlank() && role.isNotBlank(), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-add-attendee")) { Text("Add person", color = DoctorAccent) }
+                val canAdd = loaded && rows.size < 12 && name.isNotBlank() && role.isNotBlank()
+                val add = { if (persist(rows + DoctorAttendee(newId(), name.trim(), role.trim(), false))) { name = ""; role = "" } }
+                OutlinedTextField(name, { name = it.take(100) }, label = { Text("Name") }, singleLine = true, enabled = loaded, keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-attendee-name-input"))
+                OutlinedTextField(role, { role = it.take(40) }, label = { Text("Role, such as Daughter or Nurse") }, singleLine = true, enabled = loaded, keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done), keyboardActions = KeyboardActions(onDone = { if (canAdd) add() }), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-attendee-role-input"))
+                TextButton(onClick = add, enabled = canAdd, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-add-attendee")) { Text("Add person", color = DoctorAccent) }
             }
             Text(if (all) "Everyone listed has agreed to being recorded." else "Recording can start once everyone listed has agreed.", fontSize = 12.sp, color = if (all) DoctorStatusGood else DoctorCardFaint, modifier = Modifier.testTag("doctor-attendees-status"))
         }

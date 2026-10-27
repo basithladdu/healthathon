@@ -32,15 +32,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-@Composable fun ScreenEntrance(content: @Composable () -> Unit) {
-    val entrance = remember { Animatable(if (ValueAnimator.areAnimatorsEnabled()) 0f else 1f) }
-    LaunchedEffect(Unit) { entrance.animateTo(1f, tween(200, easing = FastOutSlowInEasing)) }
-    Box(Modifier.fillMaxSize().graphicsLayer {
-        alpha = 0.65f + entrance.value * 0.35f
-        translationY = (1f - entrance.value) * 8.dp.toPx()
-    }) { content() }
-}
-
 @Composable fun ActionCard(color: Color, modifier: Modifier = Modifier, onClick: () -> Unit, content: @Composable ColumnScope.() -> Unit) {
     val interaction = remember { MutableInteractionSource() }
     val pressed by interaction.collectIsPressedAsState()

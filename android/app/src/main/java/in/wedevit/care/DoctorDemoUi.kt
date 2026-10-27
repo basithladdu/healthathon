@@ -694,10 +694,11 @@ private suspend fun loadHomeVisits(context: android.content.Context): List<HomeV
                 }
             }
         }
+        // Visits and drafts are read from the device just after the first frame; they fade in and the rows below glide down instead of jumping.
         if (visits.isNotEmpty()) {
-            item { DoctorSection("Coming up") }
+            item(key = "home-coming-up") { Box(Modifier.animateItem()) { DoctorSection("Coming up") } }
             items(visits.take(4), key = { "home-visit-${it.key}" }) { v ->
-                Surface(onClick = onSchedule, color = Paper, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().heightIn(min = 72.dp).semantics(mergeDescendants = true) { contentDescription = "${v.profile.name}, ${v.kind}, ${demoDay(demoDate(v.due))} at ${demoTime(v.due)}. Opens the schedule." }) {
+                Surface(onClick = onSchedule, color = Paper, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.animateItem().fillMaxWidth().heightIn(min = 72.dp).semantics(mergeDescendants = true) { contentDescription = "${v.profile.name}, ${v.kind}, ${demoDay(demoDate(v.due))} at ${demoTime(v.due)}. Opens the schedule." }) {
                     Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
                         Column(Modifier.width(76.dp)) { Text(demoTime(v.due), fontSize = 15.sp, fontWeight = FontWeight.Medium, color = DoctorAccent); Text(demoDate(v.due).format(DateTimeFormatter.ofPattern("EEE d MMM")), fontSize = 12.sp, color = DoctorCardSub) }
                         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) { Text(v.profile.name, fontFamily = SaharaTitleFont, fontSize = 18.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk); Text(v.kind, fontSize = 13.sp, color = DoctorCardSub) }
@@ -707,9 +708,9 @@ private suspend fun loadHomeVisits(context: android.content.Context): List<HomeV
             }
         }
         if (pending.isNotEmpty()) {
-            item { DoctorSection("Pick up where you left off") }
+            item(key = "home-pick-up") { Box(Modifier.animateItem()) { DoctorSection("Pick up where you left off") } }
             items(pending, key = { it.key }) { c ->
-                Surface(onClick = { onPending(c) }, color = if (c.section == "Visits") DoctorCardVisit else DoctorCardConversation, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().heightIn(min = 72.dp).testTag("home-conversation-${c.key}").semantics(mergeDescendants = true) { contentDescription = "${c.profile.name}: ${c.title}. ${c.detail}. Opens ${c.section.lowercase()}." }) {
+                Surface(onClick = { onPending(c) }, color = if (c.section == "Visits") DoctorCardVisit else DoctorCardConversation, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.animateItem().fillMaxWidth().heightIn(min = 72.dp).testTag("home-conversation-${c.key}").semantics(mergeDescendants = true) { contentDescription = "${c.profile.name}: ${c.title}. ${c.detail}. Opens ${c.section.lowercase()}." }) {
                     Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
                         Icon(if (c.section == "Visits") Icons.Default.CalendarMonth else Icons.Default.Forum, null, tint = DoctorAccent)
                         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) { Text(c.profile.name, fontFamily = SaharaTitleFont, fontSize = 18.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk); Text(c.title, fontSize = 15.sp, lineHeight = 21.sp, color = DoctorCardInk); Text(c.detail, fontSize = 12.sp, color = DoctorCardSub) }

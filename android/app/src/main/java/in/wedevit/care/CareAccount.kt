@@ -4,6 +4,7 @@ package `in`.wedevit.care
 import android.content.Intent
 import android.net.Uri
 import android.app.Application
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -59,10 +60,13 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
         })[CareModel::class.java] }
         SideEffect { activity.careModel = model }
         var accountOpen by rememberSaveable { mutableStateOf(false) }
-        if (patientWalkthroughUser != null) PatientWalkthroughHost(patientWalkthroughUser!!, onExit = { patientWalkthroughUser = null })
-        else if (demoOpen) DoctorDemo(onExit = { demoOpen = false; walkthroughPatient = null }, cloud = cloud, initialPatientId = walkthroughPatient, careModel = model, onCareAccount = { accountOpen = true })
-        else if (doctorOpen && session != null) ConnectedDoctorWorkspace(cloud, model, onExit = { doctorOpen = false }, onAccount = { accountOpen = true }, onWalkthrough = { walkthroughPatient = it; demoOpen = true })
-        else CareApp(model, onAccount = { accountOpen = true }, onDoctorDemo = {
+        val mode = when { patientWalkthroughUser != null -> "patient-walkthrough"; demoOpen -> "doctor-walkthrough"; doctorOpen && session != null -> "doctor"; else -> "care" }
+        // Entering a walkthrough or workspace moves forward; leaving it moves back to the welcome/care app.
+        SaharaScreenHost(mode, Modifier.fillMaxSize().background(Cream), label = "Sahara root", direction = { _, to -> if (to == "care") SaharaMotion.Direction.Back else SaharaMotion.Direction.Forward }) { shown -> when (shown) {
+        "patient-walkthrough" -> patientWalkthroughUser?.let { PatientWalkthroughHost(it, onExit = { patientWalkthroughUser = null }) }
+        "doctor-walkthrough" -> DoctorDemo(onExit = { demoOpen = false; walkthroughPatient = null }, cloud = cloud, initialPatientId = walkthroughPatient, careModel = model, onCareAccount = { accountOpen = true })
+        "doctor" -> ConnectedDoctorWorkspace(cloud, model, onExit = { doctorOpen = false }, onAccount = { accountOpen = true }, onWalkthrough = { walkthroughPatient = it; demoOpen = true })
+        else -> CareApp(model, onAccount = { accountOpen = true }, onDoctorDemo = {
             if (model.recording.value) model.message.value = "Stop the recording before opening the doctor demo."
             else { walkthroughPatient = null; demoOpen = true }
         }, onPatientWalkthrough = { if (model.recording.value) model.message.value = "Stop the recording before opening the walkthrough." else patientWalkthroughUser = it },
@@ -77,6 +81,7 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
                     Button(onClick = { doctorOpen = true; doctorEntryPending = false }, modifier = Modifier.fillMaxWidth()) { Text("Open workspace") }
                 }
             }, onWelcomePanelChanged = { doctorEntryPending = it == "doctor" })
+        } }
         if (accountOpen) AccountSheet(cloud, model, onDismiss = { accountOpen = false; if (cloud.session.value == null) doctorEntryPending = false })
     }
 }

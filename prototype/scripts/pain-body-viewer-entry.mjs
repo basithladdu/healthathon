@@ -107,7 +107,8 @@ try {
     };
     animation = requestAnimationFrame(step);
   };
-  changeView = (view) => { currentView = view; pendingFocus = null; stopAnimation(); controls.target.set(0, 0, 0); camera.position.set(0, 0.05, view === 'back' ? -3.95 : 3.95); controls.update(); render(); };
+  // Once the model is shown, Front/Back turns the camera smoothly instead of jumping.
+  changeView = (view) => { currentView = view; pendingFocus = null; if (frame) { flyTo(new THREE.Vector3(0, 0, 0), 3.95, view); return; } stopAnimation(); controls.target.set(0, 0, 0); camera.position.set(0, 0.05, view === 'back' ? -3.95 : 3.95); controls.update(); render(); };
   const applyFocus = (id, view) => {
     const region = FOCUS_REGIONS[id];
     currentView = region.face ?? view ?? currentView;

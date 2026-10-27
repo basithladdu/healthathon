@@ -1,5 +1,11 @@
 package `in`.wedevit.care
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -36,6 +42,15 @@ internal val careAddKinds = listOf("medicine" to "Add medicine", "visit" to "Add
     }
 }
 
+/** Unsaved text of a new daily-care entry, kept in memory when its sheet is dismissed so reopening it continues where the person left off. Cleared once saved. */
+internal object CareAddDrafts {
+    data class Draft(val title: String, val detail: String, val due: Long)
+    private val drafts = mutableMapOf<String, Draft>()
+    fun get(key: String): Draft? = drafts[key]
+    fun keep(key: String, draft: Draft) { if (draft.title.isBlank() && draft.detail.isBlank() && draft.due == 0L) drafts.remove(key) else drafts[key] = draft }
+    fun clear(key: String) { drafts.remove(key) }
+}
+
 /** Pure grouping rules for the Daily care modules. */
 internal object CareModules {
     val order = listOf("Conversations", "Medicines", "Visits", "To do", "Check-ins", "Journal")
@@ -55,7 +70,7 @@ internal object CareModules {
             Spacer(Modifier.width(12.dp)); Text(title, fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.weight(1f))
             Text("$count", fontSize = 14.sp, color = DoctorCardSub); Spacer(Modifier.width(6.dp)); Icon(if (open) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown, if (open) "Collapse $title" else "Expand $title", tint = DoctorCardSub)
         }
-        if (open) Column(Modifier.padding(start = 12.dp, end = 12.dp, bottom = 12.dp), verticalArrangement = Arrangement.spacedBy(10.dp), content = content)
+        AnimatedVisibility(open, enter = expandVertically(tween(180)) + fadeIn(tween(180)), exit = shrinkVertically(tween(150)) + fadeOut(tween(120))) { Column(Modifier.padding(start = 12.dp, end = 12.dp, bottom = 12.dp), verticalArrangement = Arrangement.spacedBy(10.dp), content = content) }
     } }
 }
 

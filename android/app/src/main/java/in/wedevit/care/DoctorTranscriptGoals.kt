@@ -8,6 +8,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -35,10 +36,14 @@ internal fun transcriptGoalsFill(rows: List<DoctorPreparationQuestion>, matches:
 }
 
 @Composable private fun GoalCard(row: DoctorPreparationQuestion, matches: QuestionMatchResult?, editable: Boolean, onSave: (String, String) -> Unit) {
-    var open by remember(row.id) { mutableStateOf(false) }
+    var open by rememberSaveable(row.id) { mutableStateOf(false) }
     val span = transcriptGoalSpan(matches, row.id)
     val status = transcriptGoalStatus(row, matches)
-    var draft by remember(row.id) { mutableStateOf<String?>(null) }
+    var draft by rememberSaveable(row.id) { mutableStateOf<String?>(null) }
+    // A typed answer is kept when the page moves on (Continue, Back) without "Save answer"; onSave re-checks access itself.
+    val pending by rememberUpdatedState(draft?.trim()?.takeIf { editable && it != row.answer })
+    val save by rememberUpdatedState(onSave)
+    DisposableEffect(row.id) { onDispose { pending?.let { save(row.id, it) } } }
     val prefilled = row.answer.isBlank() && span.isNotBlank()
     val shown = draft ?: row.answer.ifBlank { span }
     Surface(shape = RoundedCornerShape(20.dp), color = DoctorCardReport, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("transcript-goal-${row.id}")) {

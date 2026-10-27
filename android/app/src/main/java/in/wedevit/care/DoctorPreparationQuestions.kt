@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -135,8 +136,9 @@ private class PrepModel(val store: DoctorPreparationStore, val scope: String, va
     onInteraction: (Boolean) -> Unit, initial: List<DoctorPreparationQuestion> = emptyList(), onChange: (List<DoctorPreparationQuestion>) -> Unit = {},
 ) {
     val m = rememberPrepModel(store, scope, initial, editable, canSave, onChange)
-    var drafts by remember(store, scope) { mutableStateOf(emptyMap<String, String>()) }
-    var newText by remember(store, scope) { mutableStateOf("") }
+    // Unsaved edits survive this card scrolling out of the list and rotation.
+    var drafts by rememberSaveable(scope) { mutableStateOf(emptyMap<String, String>()) }
+    var newText by rememberSaveable(scope) { mutableStateOf("") }
     var confirmRemove by remember(store, scope) { mutableStateOf<String?>(null) }
     confirmRemove?.let { id ->
         AlertDialog(onDismissRequest = { confirmRemove = null },
@@ -183,7 +185,7 @@ private class PrepModel(val store: DoctorPreparationStore, val scope: String, va
     store: DoctorPreparationStore, scope: String, editable: Boolean, canSave: () -> Boolean, onChange: (List<DoctorPreparationQuestion>) -> Unit = {},
 ) {
     val m = rememberPrepModel(store, scope, emptyList(), editable, canSave, onChange)
-    var drafts by remember(store, scope) { mutableStateOf(emptyMap<String, String>()) }
+    var drafts by rememberSaveable(scope) { mutableStateOf(emptyMap<String, String>()) }
     val unanswered = doctorUnansweredQuestions(m.rows).size
     PrepCard("doctor-preparation-answers", "Answers to your questions", "Typed answers are your own notes, kept on this device and outside any published note. Unanswered questions are listed so you can fill them in.", m) {
         Text(if (m.rows.isEmpty()) "No questions were prepared." else if (unanswered == 0) "Every question has an answer." else "$unanswered of ${m.rows.size} still need an answer.", fontSize = 12.sp, color = if (m.rows.isNotEmpty() && unanswered == 0) DoctorStatusGood else DoctorCardFaint, modifier = Modifier.testTag("doctor-preparation-answers-status"))
