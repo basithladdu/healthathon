@@ -136,7 +136,7 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
                 Button(onClick={if(!busy){busy=true;error=null;scope.launch {try {cloud.signIn(email,password);password="";onDismiss()}catch(e:Exception){if(e is CancellationException)throw e;error="Sign-in did not finish. Check your email, password and confirmation status."}finally{busy=false}}}},enabled=!busy && email.contains('@') && password.isNotEmpty(),modifier=Modifier.fillMaxWidth().heightIn(min=52.dp)) { Text(if(busy) "Signing in…" else "Sign in") }
                 Text("The prefilled doctor preview credentials are not a real account. To create an account, return to Sahara → Your account.",style=MaterialTheme.typography.bodySmall)
             }
-            error?.let {Text(it,color=MaterialTheme.colorScheme.error)}
+            error?.let {Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce())}
             TextButton(onClick=onDismiss,enabled=!busy) {Text("Close")}
         }
     }
@@ -322,7 +322,7 @@ private fun clipboardText(context: android.content.Context): String? = (context.
             }
             TextButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.privacy_url)))) }) { Text(t("Privacy policy", "निजता नीति")) }
             notice?.let { Text(it, color = MaterialTheme.colorScheme.secondary) }
-            error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+            error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
         }
     if (addFamily) AddFamilySheet(vm, onDismiss = { addFamily = false }, onSignIn = {}, onInvited = { inviteTick++ })
     removing?.let { member -> AlertDialog(onDismissRequest = { removing = null }, title = { Text(t("Stop sharing with this person?", "इस व्यक्ति के साथ साझा करना बंद करें?")) }, text = { Text(t("They won't be able to read or change these records online. Copies they've already saved cannot be recalled.", "वे ये रिकॉर्ड ऑनलाइन न पढ़ सकेंगे, न बदल सकेंगे। जो कॉपी वे पहले सहेज चुके हैं, वह वापस नहीं ली जा सकती।")) }, confirmButton = { TextButton(onClick = { removing = null; val person = selected; run { cloud.removeMember(person, member.userId); loadSharing(person); if (vm.selected.value == person) notice = t("${member.email} no longer has access.", "${member.email} की पहुँच हटा दी गई।") } }) { Text(t("Stop sharing", "साझा करना बंद करें")) } }, dismissButton = { TextButton(onClick = { removing = null }) { Text(t("Keep sharing", "साझा करते रहें")) } }) }

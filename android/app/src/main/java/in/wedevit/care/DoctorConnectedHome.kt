@@ -96,7 +96,7 @@ private fun doctorWhen(item: CareItem, hindi: Boolean, zone: ZoneId = ZoneId.sys
             Text(DoctorConnectedHome.verificationTitle(state, hindi), style = MaterialTheme.typography.titleLarge, modifier = Modifier.testTag("doctor-verification-status"))
             Text(DoctorConnectedHome.verificationBody(state, hindi))
             if (note.isNotBlank() && state in setOf(DoctorConnectedHome.Verification.REJECTED, DoctorConnectedHome.Verification.SUSPENDED)) Text(t("Reviewer note: ", "जाँचने वाले की टिप्पणी: ") + note, style = MaterialTheme.typography.bodyMedium)
-            error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+            error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
             if (checkedAt > 0) Text(DoctorConnectedHome.checkedAt(checkedAt, hindi), style = MaterialTheme.typography.bodySmall)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedButton(onClick = onCheck, enabled = !checking, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-verification-check")) {

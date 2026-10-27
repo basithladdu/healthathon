@@ -41,8 +41,8 @@ import java.util.UUID
             if(replacing&&currentExists) Row { Checkbox(confirmed,{confirmed=it},enabled=!busy);Text(t("Replace the entire current prescription after saving this reviewed list. Keep the previous prescription and its history in Past.", "यह जाँची सूची सहेजने के बाद पूरा मौजूदा पर्चा बदलें। पिछला पर्चा और उसका इतिहास पुराने में रखें।")) }
             if(!replacing) Text(t("Removing a medicine only ends its current-list membership. Earlier directions, prescriptions and intake reports are retained.", "दवा हटाने से वह सिर्फ़ अभी की सूची से हटती है। पुराने निर्देश, पर्चे और दवा लेने की सूचनाएँ रहती हैं।"))
             Row {Checkbox(reviewed,{reviewed=it},enabled=!busy);Text(t("I reviewed every medicine name and instruction against the prescription.", "मैंने हर दवा का नाम और निर्देश पर्चे से मिला लिया है।"))}
-            error?.let {Text(it,color=MaterialTheme.colorScheme.error)}
-            saveError?.let {Text(it,color=MaterialTheme.colorScheme.error);Text(t("Cancel and refresh the current list before reviewing again. After a connection error, check the saved state rather than assuming success or failure.", "फिर से जाँचने से पहले रद्द करके सूची ताज़ा करें। इंटरनेट की गड़बड़ी के बाद सफल या असफल मानने के बजाय सहेजी स्थिति देखें।"))}
+            error?.let {Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce())}
+            saveError?.let {Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce());Text(t("Cancel and refresh the current list before reviewing again. After a connection error, check the saved state rather than assuming success or failure.", "फिर से जाँचने से पहले रद्द करके सूची ताज़ा करें। इंटरनेट की गड़बड़ी के बाद सफल या असफल मानने के बजाय सहेजी स्थिति देखें।"))}
         }
     },confirmButton={TextButton(enabled=!busy&&reviewed&&(!replacing||!currentExists||confirmed),onClick={
         if(title.isBlank()||rows.any {it.name.isBlank()})error=t("Add a prescription label and each medicine name.", "पर्चे का नाम और हर दवा का नाम लिखें।")

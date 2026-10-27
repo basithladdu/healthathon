@@ -93,7 +93,7 @@ import java.util.Locale
 
 @Composable private fun ProgressDetailCard(title: String, icon: ImageVector, color: Color, content: @Composable ColumnScope.() -> Unit) {
     Surface(color = color, contentColor = Ink, shape = RoundedCornerShape(22.dp), border = BorderStroke(1.dp, Ink.copy(alpha = .08f)), modifier = Modifier.fillMaxWidth()) {
-        Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(9.dp)) { Row(verticalAlignment = Alignment.CenterVertically) { Icon(icon, null, tint = Rust, modifier = Modifier.size(22.dp)); Spacer(Modifier.width(10.dp)); Text(title, fontSize = 18.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont) }; content() }
+        Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(9.dp)) { Row(verticalAlignment = Alignment.CenterVertically) { Icon(icon, null, tint = Rust, modifier = Modifier.size(22.dp)); Spacer(Modifier.width(10.dp)); Text(title, fontSize = 18.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, modifier = Modifier.a11yHeading()) }; content() }
     }
 }
 private fun progressTimestamp(at: Long, zoneId: String): String = DateTimeFormatter.ofPattern("d MMM yyyy, h:mm a", Locale.ENGLISH).withZone(ZoneId.of(zoneId)).format(Instant.ofEpochMilli(at))

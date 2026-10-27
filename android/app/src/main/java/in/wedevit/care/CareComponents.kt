@@ -136,7 +136,7 @@ import androidx.compose.ui.unit.sp
     Surface(color = Paper, shape = RoundedCornerShape(20.dp), modifier = Modifier.saharaAppear()) {
         Column(Modifier.fillMaxWidth().saharaContentSize().padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Icon(icon, null, tint = Rust); Spacer(Modifier.width(12.dp)); Text(title, fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f), fontFamily = SaharaTitleFont)
+                Icon(icon, null, tint = Rust); Spacer(Modifier.width(12.dp)); Text(title, fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f).a11yHeading(), fontFamily = SaharaTitleFont)
             }
             content()
         }

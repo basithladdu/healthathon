@@ -186,7 +186,7 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
                     onMove = null,
                 )
             }
-            scanError?.let { error -> item { Text(error, color = MaterialTheme.colorScheme.error) } }
+            scanError?.let { error -> item { Text(error, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) } }
             item {
                 Text(t("Reading happens on your phone. Printed Latin text is supported; handwriting may need manual entry. No dose or treatment is inferred.", "पढ़ाई आपके फ़ोन पर ही होती है। छपे अंग्रेज़ी अक्षर पढ़े जाते हैं; हाथ की लिखाई ख़ुद लिखनी पड़ सकती है। ऐप ख़ुराक या इलाज ख़ुद तय नहीं करता।"), style = MaterialTheme.typography.bodySmall)
                 Spacer(Modifier.height(12.dp))
@@ -272,7 +272,7 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
                     Icon(Icons.Default.Add, null); Spacer(Modifier.width(6.dp)); Text(t("Add another manually", "एक और दवा ख़ुद लिखें"))
                 }
             }
-            scanError?.let { error -> item { Text(error, color = MaterialTheme.colorScheme.error) } }
+            scanError?.let { error -> item { Text(error, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) } }
             item {
                 val names = drafts.map { it.medicine.medicineName.trim().lowercase() }.filter(String::isNotEmpty)
                 val valid = drafts.isNotEmpty() && unmatchedReviewed && names.size == names.distinct().size && drafts.all {

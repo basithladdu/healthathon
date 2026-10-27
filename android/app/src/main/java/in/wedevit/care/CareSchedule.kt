@@ -161,7 +161,7 @@ fun calendarItems(entries: List<CareItem>, day: LocalDate): List<CareItem> = ent
                 if (!legacy) OutlinedTextField(location, { location = it }, label = { Text(t("Place or clinician (optional)", "जगह या डॉक्टर (चाहें तो)")) }, modifier = Modifier.fillMaxWidth(), singleLine = true)
                 OutlinedTextField(detail, { detail = it }, label = { Text(if (category == "Medicine") t("Prescribed dose and instructions", "लिखी गई ख़ुराक और तरीक़ा") else t("Details (optional)", "जानकारी (चाहें तो)")) }, modifier = Modifier.fillMaxWidth(), maxLines = 4)
             }
-            (error.ifBlank { saveError.orEmpty() }).takeIf(String::isNotBlank)?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+            (error.ifBlank { saveError.orEmpty() }).takeIf(String::isNotBlank)?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
             Button(onClick = { runCatching {
                 require(canEditCareContext(vm, capturedPerson, capturedAccount)) { t("Choose the right person before saving.", "सहेजने से पहले सही व्यक्ति चुनें।") }
                 require(title.trim().length in 1..200 && due > 0) { t("Add a title and date.", "नाम और तारीख़ लिखें।") }

@@ -319,7 +319,7 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
         val link = card.link
         Surface(shape = RoundedCornerShape(22.dp), color = Paper, modifier = Modifier.fillMaxWidth().testTag("emergency-card")) {
             Column(Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(t("Emergency card", "आपातकालीन कार्ड"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, modifier = Modifier.fillMaxWidth())
+                Text(t("Emergency card", "आपातकालीन कार्ड"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, modifier = Modifier.fillMaxWidth().a11yHeading())
                 QrImage(shownQr, if (link != null) t("Emergency web link QR code", "आपातकालीन वेब लिंक QR कोड") else t("Emergency card offline QR code", "आपातकालीन कार्ड ऑफ़लाइन QR कोड"), Modifier.fillMaxWidth(.86f).widthIn(max = 320.dp).clickable(onClickLabel = t("Show full screen", "पूरी स्क्रीन पर दिखाएँ")) { fullScreen = true }.testTag("emergency-card-qr"))
                 Text(t("Tap the code to show it full screen", "बड़ा दिखाने के लिए छुएँ"), fontSize = 13.sp, color = DoctorCardSub, textAlign = TextAlign.Center)
                 Text(t("Card ${card.number} · ID ${card.id} · made ${cardDay(card.madeAt)}", "कार्ड ${card.number} · ID ${card.id} · बना ${cardDay(card.madeAt)}"), fontWeight = FontWeight.SemiBold, fontSize = 14.sp)

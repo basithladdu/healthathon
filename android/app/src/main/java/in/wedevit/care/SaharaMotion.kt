@@ -69,6 +69,10 @@ import kotlinx.coroutines.delay
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -254,7 +258,7 @@ fun Modifier.saharaContentSize(): Modifier = animateContentSize(SaharaMotion.twe
     val shown = remember { MutableTransitionState(false).apply { targetState = true } }
     Box(modifier.fillMaxSize().background(background).safeDrawingPadding().testTag("sahara-loading"), contentAlignment = Alignment.Center) {
         AnimatedVisibility(shown, enter = fadeIn(SaharaMotion.tween(SaharaMotion.ENTER_MS, 150))) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            Column(Modifier.a11yCard().announce(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(14.dp)) {
                 CircularProgressIndicator(Modifier.size(32.dp), color = Rust, strokeWidth = 3.dp)
                 Text(text, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 15.sp, textAlign = TextAlign.Center)
             }
@@ -267,7 +271,8 @@ fun Modifier.saharaContentSize(): Modifier = animateContentSize(SaharaMotion.twe
     var shown by remember { mutableStateOf(false) }
     LaunchedEffect(active) { if (active) { delay(400); shown = true } else shown = false }
     AnimatedVisibility(shown, modifier, enter = fadeIn(SaharaMotion.tween(SaharaMotion.ENTER_MS)), exit = fadeOut(SaharaMotion.tween(SaharaMotion.ENTER_MS))) {
-        LinearProgressIndicator(Modifier.fillMaxWidth().testTag("sahara-top-progress"), color = Rust)
+        val busy = careText()("Working…", "काम चल रहा है…")
+        LinearProgressIndicator(Modifier.fillMaxWidth().testTag("sahara-top-progress").semantics { contentDescription = busy; liveRegion = LiveRegionMode.Polite }, color = Rust)
     }
 }
 

@@ -151,7 +151,7 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
     }) { padding ->
         Column(Modifier.fillMaxSize().padding(padding)) {
             if (busy) LinearProgressIndicator(Modifier.fillMaxWidth(), color = Rust)
-            error?.let { message -> Surface(color = Peach) { Row(Modifier.fillMaxWidth().padding(12.dp)) { Text(message, Modifier.weight(1f)); TextButton(onClick = ::refresh, enabled = !busy) { Text(t("Retry", "फिर कोशिश करें")) } } } }
+            error?.let { message -> Surface(color = Peach) { Row(Modifier.fillMaxWidth().padding(12.dp)) { Text(message, Modifier.weight(1f).announce()); TextButton(onClick = ::refresh, enabled = !busy) { Text(t("Retry", "फिर कोशिश करें"), color = RustText) } } } }
             if (isolatedDemo) DoctorCareDemoHost(onExit = { isolatedDemo = false; nestedBack = null; navigationBlocked = false;testInitialSection="Hub" }, onNavigationBlockedChange = { navigationBlocked = it }, onHeaderBackChange = { nestedBack = it },initialPersonId=testCarePerson,initialSection=testInitialSection)
             else if (shared) EmbeddedSharedCare(vm, onAccount, { shared = false }, onNavigationBlockedChange = { navigationBlocked = it })
             else if (realPatientId != null) {
@@ -208,7 +208,7 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
                     } else {
                         if (verification != DoctorConnectedHome.Verification.APPROVED) item { DoctorVerificationCard(verification, clinician?.note.orEmpty(), clinicianCheckedAt, clinicianChecking, clinicianError, hindi, ::checkClinician, ::openShared) }
                         item { OutlinedButton(onClick = { vm.refresh(); checkClinician() }, enabled = !realRefreshing, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-home-refresh")) { Icon(Icons.Default.Refresh, null); Spacer(Modifier.width(8.dp)); Text(if (realRefreshing) t("Refreshing…", "रिफ़्रेश हो रहा है…") else t("Refresh records", "रिकॉर्ड रिफ़्रेश करें")) } }
-                        realRefreshError?.let { item { Text(it, color = MaterialTheme.colorScheme.error) } }
+                        realRefreshError?.let { item { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) } }
                         doctorConnectedHomeItems(realPeople, allItems, System.currentTimeMillis(), hindi, onVisit = { openReal(it); section = "Visits" }, onProgress = { openReal(it); section = "Progress" }, onPatients = { tab = 1 })
                         item { DoctorWalkthroughCard(hindi) { p -> navigate { testCarePerson = DoctorTestProfiles.personId(p); testInitialSection = "Hub"; isolatedDemo = true } } }
                     }
@@ -267,7 +267,7 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
 }
 
 @Composable private fun ConnectedCard(title: String, content: @Composable ColumnScope.() -> Unit) {
-    Surface(color = Paper, shape = RoundedCornerShape(22.dp), modifier = Modifier.fillMaxWidth()) { Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) { Text(title, style = MaterialTheme.typography.titleLarge); content() } }
+    Surface(color = Paper, shape = RoundedCornerShape(22.dp), modifier = Modifier.fillMaxWidth()) { Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) { Text(title, style = MaterialTheme.typography.titleLarge, modifier = Modifier.a11yHeading()); content() } }
 }
 
 @Composable internal fun DoctorPatientListCard(name: String, description: String, onClick: () -> Unit) {
@@ -447,7 +447,7 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
         }
         error?.let { message ->
             item {
-                Text(message, color = MaterialTheme.colorScheme.error)
+                Text(message, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce())
                 TextButton(onClick = {
                     noteId = java.util.UUID.randomUUID().toString()
                     revision = 0
@@ -460,7 +460,7 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
                 Text(t("Keeps all your current text. Nothing is uploaded until you choose Save draft; existing account notes remain unchanged.", "आपका पूरा लिखा रहता है। ड्राफ़्ट सहेजें चुनने तक कुछ अपलोड नहीं होता; खाते के पुराने नोट नहीं बदलते।"), style = MaterialTheme.typography.bodySmall)
             }
         }
-        if(saved) item { Text(t("Saved to your account's test dataset.", "आपके खाते के टेस्ट डेटा में सहेजा गया।"), color = Rust) }
+        if(saved) item { Text(t("Saved to your account's test dataset.", "आपके खाते के टेस्ट डेटा में सहेजा गया।"), color = Rust, modifier = Modifier.announce()) }
         item { Button(onClick = { run(false) }, enabled = !busy && !audioState.recording, modifier = Modifier.fillMaxWidth().testTag("connected-save-note")) { Text(if(busy) "Saving…" else t("Save draft to account", "ड्राफ़्ट खाते में सहेजें")) } }
         item { CheckLine(checked, { if(!busy) checked = it }, t("I checked this exact text. This is a test note, not verified clinical documentation.", "मैंने यही लिखाई जाँची है। यह टेस्ट नोट है, पुष्ट क्लिनिकल दस्तावेज़ नहीं।")) }
         item { OutlinedButton(onClick = { run(true) }, enabled = !busy && !audioState.recording && checked && draft.sourceText.isNotBlank(), modifier = Modifier.fillMaxWidth().testTag("connected-publish-note")) { Text(t("Publish test version", "टेस्ट संस्करण प्रकाशित करें")) } }
@@ -489,7 +489,7 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
             CheckLine(skipped,{if(!busy)skipped=it},"Skipped")
             if(!skipped) ConnectedDateTime(t("Reported taken", "लेने का समय"),taken,!busy){taken=it}
             Text(t("Logged time is recorded by the server when this report is saved.", "सूचना सहेजने पर दर्ज समय सर्वर लिखता है।"),style=MaterialTheme.typography.bodySmall)
-            error?.let { Text(it,color=MaterialTheme.colorScheme.error) }
+            error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
             Button(onClick = {
                 if(busy)return@Button
                 val label=medicine;val plannedValue=planned;val takenValue=taken;val wasSkipped=skipped

@@ -69,7 +69,7 @@ import java.time.format.DateTimeFormatter
                 TextButton(onClick = { runCatching { context.startActivity(Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, android.net.Uri.parse("package:${context.packageName}"))) }.onFailure { error = t("Open Android Settings → Apps → Sahara → Alarms & reminders.", "Android सेटिंग्स → ऐप्स → Sahara → अलार्म और रिमाइंडर खोलें।") } }) { Text(t("Allow on-time alerts", "समय पर सूचना की अनुमति दें")) }
             }
         } }
-        if (error.isNotBlank()) item { Text(error, color = MaterialTheme.colorScheme.error) }
+        if (error.isNotBlank()) item { Text(error, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
         item { Text(t("Choose times from the existing prescription. Sahara does not calculate or change doses. Marking a medicine done completes that whole entry for the day.", "पर्चे में लिखे समय चुनें। सहारा ख़ुराक तय या नहीं बदलता। दवा को 'हो गया' करने से उस दिन की पूरी दवा पूरी मानी जाती है।"), style = MaterialTheme.typography.bodySmall) }
         val today = java.time.LocalDate.now()
         val eligible = items.filter { it.personId == selected && CareReminderRules.listed(it, today) }
@@ -95,7 +95,7 @@ import java.time.format.DateTimeFormatter
                 CareField(times, { times = it; error = "" }, t("Times · HH:mm, separated by commas", "समय · HH:mm, कॉमा लगाकर"), singleLine = true)
                 CareField(starts, { starts = it; error = "" }, t("Start date · YYYY-MM-DD (optional)", "शुरू की तारीख़ · YYYY-MM-DD (चाहें तो)"), singleLine = true)
                 CareField(ends, { ends = it; error = "" }, t("Last date · YYYY-MM-DD (optional)", "आख़िरी तारीख़ · YYYY-MM-DD (चाहें तो)"), singleLine = true)
-                if (error.isNotBlank()) Text(error, color = MaterialTheme.colorScheme.error)
+                if (error.isNotBlank()) Text(error, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce())
                 Button(onClick = { runCatching {
                     scheduler.configure(item.id, ReminderOption(if (times.isBlank()) emptyList() else times.split(',').map(String::trim), starts.trim(), ends.trim(), option?.muted == true)); changed()
                 }.onFailure { error = it.message ?: t("Check the times and dates.", "समय और तारीख़ें जाँचें।") } }, modifier = Modifier.fillMaxWidth()) { Text(t("Save reminder times", "रिमाइंडर का समय सहेजें")) }
@@ -104,7 +104,7 @@ import java.time.format.DateTimeFormatter
             // Saved with a date only: no alert until a time on that day is chosen here (never a midnight alert).
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 CareField(times, { times = it; error = "" }, t("Alert time on that day (HH:mm)", "उस दिन सूचना का समय (HH:mm)"), singleLine = true)
-                if (error.isNotBlank()) Text(error, color = MaterialTheme.colorScheme.error)
+                if (error.isNotBlank()) Text(error, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce())
                 Button(onClick = { runCatching {
                     scheduler.configure(item.id, ReminderOption(if (times.isBlank()) emptyList() else times.split(',').map(String::trim), muted = option?.muted == true)); changed()
                 }.onFailure { error = it.message ?: t("Use HH:mm, such as 08:30.", "HH:mm लिखें, जैसे 08:30।") } }, modifier = Modifier.fillMaxWidth().testTag("reminder-save-${item.id}")) { Text(t("Save alert time", "समय सहेजें")) }

@@ -158,7 +158,7 @@ fun EmbeddedPatientCare(
                 Text(if (person == null && !refreshing) t("This care profile is unavailable", "यह देखभाल प्रोफ़ाइल उपलब्ध नहीं है") else t("Opening this person's care…", "इस व्यक्ति की देखभाल खुल रही है…"), style = MaterialTheme.typography.titleLarge)
                 Text(t("Only this selected person's records will appear here. Test patients and other care profiles are kept separate.", "यहाँ सिर्फ़ चुने गए व्यक्ति के रिकॉर्ड दिखेंगे। टेस्ट मरीज़ और बाक़ी प्रोफ़ाइल अलग रहती हैं।"))
                 OutlinedButton(onClick = onExit) { Text(t("Back to patients", "मरीज़ों पर वापस")) }
-                refreshError?.let { Text(it, color = MaterialTheme.colorScheme.error); TextButton(onClick = vm::refresh) { Text(t("Retry", "फिर कोशिश करें")) } }
+                refreshError?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()); TextButton(onClick = vm::refresh) { Text(t("Retry", "फिर कोशिश करें")) } }
             }
         } else {
             if ((section != "Conversations" || tool.isNotEmpty() || !conversationCapture) && (!DoctorTestProfiles.contains(personId) || !canEdit)) Surface(color = if (vm.cloud == null) Peach.copy(alpha = .5f) else Paper) {
@@ -203,7 +203,7 @@ fun EmbeddedPatientCare(
                     }
                 } }
             }
-            refreshError?.let { Surface(color = Peach) { Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) { Text(it, Modifier.weight(1f), style = MaterialTheme.typography.bodySmall); TextButton(onClick = vm::refresh, enabled = !busy) { Text(t("Retry", "फिर कोशिश करें")) } } } }
+            refreshError?.let { Surface(color = Peach) { Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) { Text(it, Modifier.weight(1f), style = MaterialTheme.typography.bodySmall); TextButton(onClick = vm::refresh, enabled = !busy) { Text(t("Retry", "फिर कोशिश करें"), color = RustText) } } } }
         }
         SnackbarHost(snackbar)
     }

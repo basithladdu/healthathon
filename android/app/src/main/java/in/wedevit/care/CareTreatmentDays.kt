@@ -59,7 +59,7 @@ object TreatmentDayRules {
             } }
             CareDateButton(due, "Date · तारीख", { due = it })
             OutlinedTextField(note, { note = it.take(400); error = "" }, label = { Text("Note (optional) · टिप्पणी") }, modifier = Modifier.fillMaxWidth(), maxLines = 3)
-            (error.ifBlank { saveError.orEmpty() }).takeIf(String::isNotBlank)?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+            (error.ifBlank { saveError.orEmpty() }).takeIf(String::isNotBlank)?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
             Button(onClick = { runCatching {
                 require(selected == captured && canEdit) { "Choose the right person before saving. · पहले सही व्यक्ति चुनें।" }
                 val detail = TreatmentDayRules.entry(category, note)

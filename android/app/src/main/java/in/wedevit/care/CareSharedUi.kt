@@ -71,8 +71,8 @@ import kotlinx.coroutines.launch
             if (cloud == null) item { SurfaceCard { Heading(t("Sign in to your records", "अपने रिकॉर्ड के लिए साइन इन करें"), 25); Text(t("Use an existing confirmed Sahara account. A selected doctor role does not verify your identity.", "पहले से पुष्ट सहारा खाता इस्तेमाल करें। डॉक्टर की भूमिका चुनने से आपकी पहचान पक्की नहीं होती।")); Button(onClick = onAccount) { Text(t("Your account", "आपका खाता")) } } }
             else {
                 item { Text(people.firstOrNull { it.id == selected }?.name.orEmpty(), style = MaterialTheme.typography.titleLarge); OutlinedButton(onClick = { run { refresh(); vm.refresh() } }, enabled = !busy) { Icon(Icons.Default.Refresh, null); Spacer(Modifier.width(8.dp)); Text(t("Refresh shared records", "साझा रिकॉर्ड ताज़ा करें")) } }
-                if (error.isNotBlank()) item { SurfaceCard(Peach) { Text(error); TextButton(onClick = { run { refresh() } }, enabled = !busy) { Text(t("Retry", "फिर कोशिश करें")) } } }
-                if (notice.isNotBlank()) item { Text(notice, color = Rust) }
+                if (error.isNotBlank()) item { SurfaceCard(Peach) { Text(error, Modifier.announce()); TextButton(onClick = { run { refresh() } }, enabled = !busy) { Text(t("Retry", "फिर कोशिश करें"), color = RustText) } } }
+                if (notice.isNotBlank()) item { Text(notice, color = Rust, modifier = Modifier.announce()) }
                 item { SurfaceCard(Mint) {
                     Text(t("Clinician verification", "डॉक्टर की पुष्टि"), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
                     Text(when (profile?.status) { "approved" -> t("Registration reviewed. Patient invitation is also required before clinical review.", "रजिस्ट्रेशन जाँचा गया। क्लिनिकल समीक्षा से पहले मरीज़ का निमंत्रण भी ज़रूरी है।"); "pending" -> t("Request received. An independent verifier must check your council registration.", "अनुरोध मिल गया। कोई स्वतंत्र जाँचकर्ता आपका काउंसिल रजिस्ट्रेशन जाँचेगा।"); "rejected", "suspended" -> "${profile?.status}: ${profile?.note}"; else -> t("Your account is not verified as a clinician.", "आपका खाता डॉक्टर के रूप में पुष्ट नहीं है।") })
@@ -115,7 +115,7 @@ import kotlinx.coroutines.launch
                     item { CheckLine(confirmed, { confirmed = it }, t("I checked this exact source and every section as the patient's invited clinician.", "मरीज़ के बुलाए डॉक्टर के रूप में मैंने यही मूल और हर हिस्सा जाँचा है।")) }
                     item { Button(onClick = { run { cloud.reviewSharedDraft(draft); reading = null; refresh(); vm.refresh(); notice = t("Reviewed care-note version published. The patient reviews this exact version next.", "समीक्षा किया केयर नोट प्रकाशित हुआ। अब मरीज़ यही संस्करण देखेंगे।") } }, enabled = confirmed && !busy, modifier = Modifier.fillMaxWidth()) { Text(t("Publish reviewed care note", "समीक्षा किया केयर नोट प्रकाशित करें")) } }
                 }
-                if (error.isNotBlank()) item { Text(error, color = MaterialTheme.colorScheme.error) }
+                if (error.isNotBlank()) item { Text(error, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
                 item { TextButton(onClick = { reading = null }, enabled = !busy) { Text(t("Close", "बंद करें")) } }
             }
         }

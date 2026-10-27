@@ -91,7 +91,7 @@ import kotlinx.coroutines.withContext
                 catch (error: IllegalArgumentException) { message = error.message.orEmpty() }
             }, enabled = checked && words.isNotBlank(), modifier = Modifier.testTag("care-transcript-use")) { Text(t("Add checked turn", "जाँची बारी जोड़ें")) }
         }
-        if (message.isNotBlank()) Text(message, style = MaterialTheme.typography.bodySmall)
+        if (message.isNotBlank()) Text(message, style = MaterialTheme.typography.bodySmall, modifier = Modifier.announce())
     }
 }
 
@@ -157,7 +157,7 @@ import kotlinx.coroutines.withContext
                 else message = t("The conversation changed. Prepare a fresh draft.", "बातचीत बदल गई। नया ड्राफ़्ट बनाएँ।")
             }, enabled = checked && !busy, modifier = Modifier.testTag("care-assist-use")) { Text(t("Use reviewed draft", "जाँचा ड्राफ़्ट इस्तेमाल करें")) }
         }
-        if (message.isNotBlank()) Text(message, style = MaterialTheme.typography.bodySmall)
+        if (message.isNotBlank()) Text(message, style = MaterialTheme.typography.bodySmall, modifier = Modifier.announce())
     }
 }
 
@@ -216,7 +216,7 @@ import kotlinx.coroutines.withContext
             if (reviewed) CareReadAloudControl(translated.translation, "translation-${translated.versionId}-${translated.sourceHash}-${translated.targetLanguage}", translated.targetLanguage)
             Text(t("This does not replace the signed original or acknowledge a new version.", "यह हस्ताक्षर वाले मूल की जगह नहीं लेता और नए संस्करण की पुष्टि नहीं करता।"), style = MaterialTheme.typography.bodySmall)
         }
-        if (message.isNotBlank()) Text(message, style = MaterialTheme.typography.bodySmall)
+        if (message.isNotBlank()) Text(message, style = MaterialTheme.typography.bodySmall, modifier = Modifier.announce())
     }
 }
 

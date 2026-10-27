@@ -235,7 +235,7 @@ object CareLabRules {
             Text(item.title)
             if (action !in setOf("remove", "cancelled", "open")) OutlinedTextField(actor, { actor = it; error = "" }, label = { Text(t("Your name", "आपका नाम")) }, singleLine = true)
             if (action == "accepted") Text(t("Names are self-entered and visible to this care circle.", "नाम लोग ख़ुद लिखते हैं और इस देखभाल समूह को दिखते हैं।"), style = MaterialTheme.typography.bodySmall)
-            (error.ifBlank { savingError.orEmpty() }).takeIf(String::isNotBlank)?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+            (error.ifBlank { savingError.orEmpty() }).takeIf(String::isNotBlank)?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
         } }, confirmButton = { TextButton(enabled = !busy, onClick = {
             if (!canEditCareContext(vm, item.personId, capturedAccount)) { error = t("Care access changed. Reopen this person's records.", "देखभाल की अनुमति बदल गई है। इस व्यक्ति के रिकॉर्ड फिर खोलें।") }
             else if (action == "remove") { vm.remove(item); action = "" }
@@ -276,7 +276,7 @@ object CareLabRules {
                 CareDateButton(due, if (type == "conversation") t("Preferred date", "पसंद की तारीख़") else t("Due date", "आख़िरी तारीख़"), { due = it }, allowClear = true)
                 OutlinedTextField(detail, { detail = it }, label = { Text(t("Details (optional)", "जानकारी (चाहें तो)")) }, modifier = Modifier.fillMaxWidth(), maxLines = 4)
             }
-            (error.ifBlank { saveError.orEmpty() }).takeIf(String::isNotBlank)?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+            (error.ifBlank { saveError.orEmpty() }).takeIf(String::isNotBlank)?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
             Button(onClick = {
                 runCatching {
                     require(canEditCareContext(vm, capturedPerson, capturedAccount)) { t("Choose the right person before saving.", "सहेजने से पहले सही व्यक्ति चुनें।") }

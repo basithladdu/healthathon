@@ -85,7 +85,7 @@ fun DoctorVisitEditor(vm: CareModel, personId: String, onDismiss: () -> Unit, in
             CareField(note, onNote, t("Appointment logistics (optional)", "अपॉइंटमेंट का इंतज़ाम (चाहें तो)"), minLines = 2)
             Text(t("Keep health condition and discussion details in the protected records linked below.", "सेहत की हालत और चर्चा की जानकारी नीचे जुड़े सुरक्षित रिकॉर्ड में रखें।"), style = MaterialTheme.typography.bodySmall)
             sourceLinks()
-            error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+            error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
             Button(onClick = onSave, enabled = canSave && !busy && doctor.isNotBlank(), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("doctor-save-real-visit")) { Text(if (busy) "Saving…" else t("Save visit", "विज़िट सहेजें")) }
             TextButton(onClick = onCancel, enabled = !busy, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Cancel", "रद्द करें")) }
         }

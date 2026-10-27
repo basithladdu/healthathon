@@ -40,7 +40,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
         Text(t("Family & care team", "परिवार और देखभाल टीम"), fontFamily = SaharaTitleFont, fontSize = 21.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
         Text(t("Only contacts explicitly added to this care profile appear here. Adding a contact does not invite them or give account access.", "यहाँ सिर्फ़ इस देखभाल प्रोफ़ाइल में जोड़े गए संपर्क दिखते हैं। संपर्क जोड़ने से उन्हें निमंत्रण या खाते की पहुँच नहीं मिलती।"), fontSize = 13.sp, color = DoctorCardSub)
         if (loading) LinearProgressIndicator(Modifier.fillMaxWidth())
-        error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+        error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
         if (!readable && !loading) Text(t("The owner has not shared care-team contacts with this account.", "मालिक ने देखभाल टीम के संपर्क इस खाते से साझा नहीं किए।"), fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk)
         if (readable && contacts.isEmpty() && !loading) Text(t("No contacts have been added yet.", "अभी कोई संपर्क नहीं जोड़ा गया।"), fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk)
         if (readable) contacts.forEach { contact ->
@@ -88,7 +88,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
                 CareField(relationship, { relationship = it }, t("Relationship or care role", "रिश्ता या देखभाल में भूमिका"), singleLine = true)
                 CareContactRules.roles.forEach { value -> Row { RadioButton(role == value, { role = value }); Text(value.replaceFirstChar { it.uppercase() }, Modifier.padding(top = 12.dp)) } }
                 CareField(phone, { phone = it }, "Phone (optional)", singleLine = true)
-                error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+                error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
             }
         }, confirmButton = { TextButton(onClick = { vm.saveCareContact(contact.copy(name = name, relationship = relationship, role = role, phone = phone), account) { editing = null } }, enabled = !busy && name.isNotBlank() && relationship.isNotBlank()) { Text(t("Save contact", "संपर्क सहेजें")) } }, dismissButton = { TextButton(onClick = { editing = null }, enabled = !busy) { Text(t("Cancel", "रद्द करें")) } })
     }

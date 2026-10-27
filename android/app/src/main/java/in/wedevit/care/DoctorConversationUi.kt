@@ -190,7 +190,7 @@ private fun conversationDate(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy
                 }
             }
         }
-        error?.let {Text(it,color=MaterialTheme.colorScheme.error)}
+        error?.let {Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce())}
     } }
 }
 

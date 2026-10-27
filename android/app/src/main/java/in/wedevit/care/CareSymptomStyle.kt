@@ -41,9 +41,9 @@ internal fun ratingColor(n: Int): Color = if (n <= 5) lerp(DoctorStatusGood, Col
     Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                if (number != null) Box(Modifier.size(28.dp).clip(CircleShape).background(DoctorAccent), contentAlignment = Alignment.Center) { Text(number.toString(), color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold) }
+                if (number != null) Box(Modifier.sizeIn(minWidth = 28.dp, minHeight = 28.dp).clip(CircleShape).background(DoctorAccent), contentAlignment = Alignment.Center) { Text(number.toString(), color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold) }
                 Column(Modifier.weight(1f)) {
-                    Text(title, color = DoctorCardInk, fontSize = 17.sp, fontWeight = FontWeight.SemiBold, lineHeight = 22.sp)
+                    Text(title, color = DoctorCardInk, fontSize = 17.sp, fontWeight = FontWeight.SemiBold, lineHeight = 22.sp, modifier = Modifier.a11yHeading())
                     if (helper != null) Text(helper, color = DoctorCardSub, fontSize = 14.sp, lineHeight = 19.sp)
                 }
             }

@@ -61,7 +61,7 @@ private fun readerFallbackGoals(note: CareVersion): List<ReaderGoal> = listOf(no
     }
 }
 
-@Composable private fun ReaderHeading(text: String) { Text(text, fontFamily = SaharaTitleFont, fontSize = 21.sp, lineHeight = 26.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk) }
+@Composable private fun ReaderHeading(text: String) { Text(text, Modifier.a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 21.sp, lineHeight = 26.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk) }
 
 @Composable private fun NoteReaderTranscript(source: String) { val t = careText();
     var all by rememberSaveable(source) { mutableStateOf(false) }
