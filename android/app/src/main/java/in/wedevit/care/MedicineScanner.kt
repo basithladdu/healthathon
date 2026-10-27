@@ -261,6 +261,9 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
                 SurfaceCard(Peach) {
                     Text("${unmatched.size} medicine ${if (unmatched.size == 1) "photo was" else "photos were"} not matched", fontWeight = FontWeight.Bold)
                     Text("Review ${unmatched.joinToString { "photo ${it + 1}" }}. Add any missing medicine manually or leave it out only after checking the original prescription.")
+                    unmatched.filter { it in medicineUris.indices }.forEach { index -> TextButton(onClick = { runCatching {
+                        context.startActivity(Intent(Intent.ACTION_VIEW).setDataAndType(Uri.parse(medicineUris[index]), "image/*").addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION))
+                    }.onFailure { scanError = "No image viewer is available. Open this photo in Files to compare it." } }, modifier = Modifier.heightIn(min = 48.dp)) { Text("View medicine photo ${index + 1} · दवा की फ़ोटो देखें") } }
                     Spacer(Modifier.height(8.dp)); CheckLine(unmatchedReviewed, { unmatchedReviewed = it }, "I reviewed the unmatched medicine photos.")
                 }
             }
@@ -398,6 +401,7 @@ private fun MedicineReviewCard(draft: MedicineDraft, onChange: (MedicineDraft) -
         medicine.uncertainties.forEach { Text("• $it", color = Rust, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 4.dp)) }
         Spacer(Modifier.height(10.dp))
         CareField(medicine.medicineName, { change(medicine.copy(medicineName = it.take(120))) }, "Medicine name", singleLine = true)
+        MedicineNameSuggestions(medicine.medicineName) { change(medicine.copy(medicineName = it.take(120))) }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Box(Modifier.weight(1f)) { CareField(medicine.strength, { change(medicine.copy(strength = it.take(80))) }, "Strength", singleLine = true) }
             Box(Modifier.weight(1f)) { CareField(medicine.form, { change(medicine.copy(form = it.take(60))) }, "Form", singleLine = true) }

@@ -32,6 +32,17 @@ object MedicineHistoryRules {
     fun current(items: List<CareItem>, personId: String, snapshot: MedicineHistorySnapshot) = items.filter { it.personId == personId && it.kind == "medicine" && it.id !in snapshot.pastIds }
     fun status(event: MedicineIntakeEvent, all: List<MedicineIntakeEvent>, now: Long): String =
         if (event.outcome == "planned" && all.any { it.medicineId == event.medicineId && it.plannedAt == event.plannedAt && it.outcome in setOf("taken", "skipped") }) "Plan followed by a report" else status(event, now)
+    /** A "missed" report from the daily list: no planned or taken time is invented, and no date field (the server takes only its own log time). */
+    fun missedReport(item: CareItem, role: String, now: Long, id: String = java.util.UUID.randomUUID().toString()) = MedicineIntakeEvent(id, item.id, item.title, "skipped",
+        loggedAt = now, reporter = when (role) { "Patient" -> "Patient report"; "Family" -> "Family report"; else -> "Not recorded" },
+        note = "Reported missed from the daily list on ${Instant.ofEpochMilli(now).atZone(java.time.ZoneId.systemDefault()).toLocalDate()}.", source = "manual")
+    /** Latest taken/missed/corrected report logged on [day] for one medicine, or null. A ticked box for today always means taken. */
+    fun todayOutcome(item: CareItem, events: List<MedicineIntakeEvent>, day: LocalDate, zone: java.time.ZoneId): String? {
+        if (item.doneOn == day.toString()) return "taken"
+        return events.filter { it.medicineId == item.id && it.outcome in setOf("taken", "skipped", "unmarked") &&
+            (it.reportedDate == day.toString() || Instant.ofEpochMilli(it.loggedAt).atZone(zone).toLocalDate() == day) }
+            .maxByOrNull { it.loggedAt }?.outcome?.takeIf { it != "unmarked" }
+    }
     fun legacyDate(item: CareItem): String? = item.doneOn.takeIf { it.isNotBlank() && runCatching { LocalDate.parse(it) }.isSuccess }
 }
 

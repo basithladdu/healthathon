@@ -839,6 +839,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
         else Surface(shape = RoundedCornerShape(12.dp), color = if (item.kind == "visit") Mint else Peach, modifier = Modifier.padding(end = 12.dp)) { Icon(careIcon(item.kind), null, tint = Ink, modifier = Modifier.padding(10.dp).size(22.dp)) }
         Column(Modifier.weight(1f)) { Text(item.title, fontWeight = FontWeight.SemiBold); if (item.due > 0) Text(date(item.due), color = if (done) RustText else Rust, fontSize = 13.sp); if (item.detail.isNotBlank()) Text(item.detail, style = MaterialTheme.typography.bodyMedium); if (item.kind in listOf("checkin", "journal")) Text(date(item.created), style = MaterialTheme.typography.bodySmall) }
     }
+        if (item.kind == "medicine") MedicineDoseActions(item, vm)
         if (canEdit) FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             val actionColors = ButtonDefaults.textButtonColors(contentColor = if (done) RustText else Rust)
             TextButton(onClick = { editing = true }, colors = actionColors, modifier = Modifier.testTag("care-edit-${item.id}")) { Icon(Icons.Default.Edit, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Edit") }
@@ -932,6 +933,8 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
             Text(androidx.compose.ui.res.stringResource(R.string.app_full_name))
             Spacer(Modifier.height(10.dp)); Text("Your doctor guides treatment. Selecting a role does not verify identity. Only independently approved, invited accounts can publish a verified review online.")
             Spacer(Modifier.height(10.dp)); Text("Dictate a speaker's turn or transcribe a recording with the downloaded Hindi/English pack, then check the words. Hindi/English reading uses Google Translate on-device models. Read aloud uses a downloaded voice.")
+            Spacer(Modifier.height(10.dp)); Text(MedicineNames.ATTRIBUTION + " · दवा के नाम: CDCI (NRCeS / C-DAC), CC BY 4.0", style = MaterialTheme.typography.bodySmall)
+            TextButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse("https://creativecommons.org/licenses/by/4.0/"))) }) { Text("CC BY 4.0 licence · लाइसेंस") }
             Spacer(Modifier.height(12.dp)); Text("Version ${BuildConfig.VERSION_NAME}", style = MaterialTheme.typography.bodySmall)
         } }
         if (owner && !walkthrough) item { TextButton(onClick = onDelete) { Icon(Icons.Default.DeleteOutline, null); Spacer(Modifier.width(8.dp)); Text("Remove this person's records") } }
@@ -984,6 +987,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                 CareField(value = detail, onValueChange = { detail = it.take(4000); title = it.lineSequence().firstOrNull { line -> line.isNotBlank() }.orEmpty().take(80) }, label = "Your note", minLines = 4)
             } else {
                 CareField(value = title, onValueChange = { title = it.take(200) }, label = when (kind) { "medicine" -> "Medicine name"; "visit" -> "Doctor or hospital"; "task" -> "What needs doing?"; else -> "Title" }, singleLine = kind != "task")
+                if (kind == "medicine") MedicineNameSuggestions(title, enabled = !busy) { title = it }
                 CareField(value = detail, onValueChange = { detail = it.take(4000) }, label = when (kind) { "medicine" -> "Dose and times, as prescribed"; "visit" -> "Time, place and questions (optional)"; "task" -> "Details (optional)"; else -> "Your note" }, minLines = if (kind == "journal") 4 else 2)
             }
             if (kind == "visit") Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {

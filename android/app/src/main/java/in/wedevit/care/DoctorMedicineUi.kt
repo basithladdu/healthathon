@@ -42,6 +42,7 @@ fun doctorMedicinePresentation(dose:SampleMedicineDose,asOf:Long,zone:ZoneId):Do
 @Composable fun DoctorMedicineContent(doses:List<SampleMedicineDose>,asOf:Long,zone:ZoneId=ZoneId.systemDefault()) {
     Column(Modifier.fillMaxWidth().testTag("doctor-medicine-content"),verticalArrangement=Arrangement.spacedBy(14.dp)) {
         Text("Medicine reports",fontSize=22.sp,fontWeight=FontWeight.Medium, fontFamily = SaharaTitleFont)
+        Text("Sample practice data, not a real patient's reports · उदाहरण डेटा, असली मरीज़ नहीं",fontSize=14.sp,lineHeight=20.sp,fontWeight=FontWeight.Medium,color=Rust)
         Text("As of ${DateTimeFormatter.ofPattern("dd MMM yyyy · h:mm a",Locale.ENGLISH).withZone(zone).format(Instant.ofEpochMilli(asOf))} · ${zone.id}",fontSize=14.sp,lineHeight=20.sp)
         Text("Reported activity is not proof of ingestion or prescribing advice.",fontSize=14.sp,lineHeight=20.sp,color=Ink.copy(alpha=.75f))
         Text("Planned = schedule · Reported taken = reported intake · Logged = entry time",fontSize=14.sp,lineHeight=20.sp,color=Ink.copy(alpha=.75f))
