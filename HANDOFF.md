@@ -290,5 +290,20 @@ Also read:
 | I9 | TANUH pitch draft: keep or drop | Owner |
 | I10 | Find or recreate `Technical thoughts and questions.docx` | Team (Sujay) |
 
+### From the CARE / OHC research (27 Oct)
+Sources: `docs/research/CARE_DEEP_DIVE_2026-10-27.md`, `CARE_VS_SAHARA_FOR_TEAM.md`, the team deck `docs/presentations/Sahara_CARE_Team_Briefing_2026-10-27.pdf`; raw crawl notes (all 473 docs pages, 75 site pages, 84 repos) were kept outside the repo.
+
+| Item | Next step | Who |
+|---|---|---|
+| — | Email OHC (support@ohc.network, Slack slack.ohc.network; Bodhish Thomas CEO, Vignesh Hari CTO) using the draft in `everyday.md`. Ask for: a family-inbox pilot with a palliative CARE site, licence for care_scaffold / docs / care_spec / care_report_templates (no licence file), review of our 3 Questionnaire drafts | Owner (team agrees wording) |
+| — | Name pilot candidates in the email: Pallium India (CARE live since 5 Dec 2025, 16 home-care teams), Niram Palliative Care (Tumkur), Arike, IAPC Kerala (care.iapckerala.in). Source: ohc.network blog | Owner |
+| — | Tell OHC privately about `ccm_uhi`: its endpoints have no login and a booking ID returns the patient's name, phone, DOB and address (`ccm_uhi/api/appointment.py`). Responsible disclosure, not public | Owner |
+| — | Medicine picker: evaluate bundling OHC's `cdci` drug list (NRCeS CDCI/SNOMED, CC BY 4.0, India-only SNOMED terms; includes morphine, fentanyl, tramadol) for offline medicine search with codes. Keep attribution (`DATA_LICENSE.md`, `NOTICE`) | Awaiz |
+| — | Body map: compare our 12-part 3D body with the MIT front/back SVG maps (40 regions) in `care_pressure_sore_fe`; consider them as a 2D fallback / CARE question-type plugin later | Awaiz (later) |
+| — | Rename the goals-of-care Questionnaire slug to 25 characters or fewer (docs limit 5–25; e.g. `sahara-goc-conversation`). A CARE instance superuser must load our forms; forms freeze once active, so finalise wording first | Awaiz + team |
+| — | Pitch wording: CARE does have citizen-facing tools (health.kerala.care, KARE) and ISO 82304-2 claims; say "CARE has no family app", never "no patient side", and claim no certification | Owner |
+| — | Family video visits: `care_zoom_be/fe` (MIT) is a working pattern (patient OTP + guest passcode links) if teleconsults are wanted after the hackathon | Later |
+| — | Offline queue: signed-in saves fail without internet ("Couldn't save"); add a send-later queue before real field use | Awaiz |
+
 ### Lane notes (27 Oct)
 - **Polish lane:** an up/down swipe over the pain-strength bar (3D pain body) or the check-in / feedback slider now scrolls the page and never changes the score; only a tap or a deliberate sideways drag sets it (`SaharaSliderTouch.kt`, unit-tested in `SliderTouchPolicyTest`). TalkBack and keyboard still adjust the slider. A second tap on an already-saved check-in no longer adds a second entry, and the "please wait" message now says a change is still saving. In the doctor's embedded Daily care, the "Symptom tracker" button did nothing; it now opens the symptom diary. Not tried on a phone (no device or emulator); the swipe androidTest compiles but has not run.

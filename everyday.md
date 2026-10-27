@@ -14,6 +14,36 @@ Our aim is to build a useful palliative-care companion and make the judges under
   > Hello OHC team, we are Team Sahara (Health-a-thon 2026). Sahara is a phone app for palliative patients' families: symptom diary, medicines, and the family confirming the exact goals-of-care note a doctor reviewed. CARE is the staff side and, as your docs note, has no family side. Could we pilot a small family-inbox plugin with one CARE palliative unit, where family entries wait for a nurse to accept them? We have drafted our symptom diary, pain areas and goals-of-care questions as CARE Questionnaires and would value your review. Sources and details: [repo link]. Thank you.
 - **Video:** prepare and record a short demonstration of the actual patient/family/doctor journey. Show the problem, the important actions and the saved result. Keep the video consistent with the build and slides.
 
+## What is genuinely left (27 Oct → 7 Nov)
+
+Full list with owners: `HANDOFF.md` → "27 Oct 2026 — open items". The short version:
+
+**Must do before submission (7 Nov)**
+1. Decide CARE option (A / A+B / A+C) in the team meeting; write the slide 11 integration answer. Brief: `docs/presentations/Sahara_CARE_Team_Briefing_2026-10-27.pdf`.
+2. Fill the Phase 2 deck: team code, doctor partner details, costs, 2–3 measures of success with a baseline.
+3. Record the narrated demo video (conversation → reviewed note → family confirms).
+4. Test the app on a real phone (checklist: `CLAUDE_TRANSCRIPT.md` §3). Nothing from 26–27 Oct has been tried on a device.
+5. Get clinician sign-off (Sujay, Shirin, Sharada): goals-of-care note format, symptom list and scales, and the source of the 8 default goals-of-care questions.
+6. Agree and send the OHC email (draft above). Mention the pilot sites and the ccm_uhi privacy issue privately.
+
+**Decide (owner)**
+- Anonymising before data reaches the doctor: scope (outside reviewers / AI only, or the treating doctor too).
+- Real transcription/AI provider and consent terms, or keep "word matching" and say so.
+- Emergency QR: offline card only, or a server link later.
+- Hindi across the whole app; re-tap behaviour on the pain body.
+- How judges see the code (repo is private).
+
+**Set up (owner)**
+- Real doctor account + Supabase email setting; Supabase security warnings.
+- Website redeploy with the app-link fingerprint so invite links open the app.
+- Next Play upload with a higher versionCode (don't touch the build in review).
+- DPDP: consent notice naming the server and doctor, withdraw/delete, named data fiduciary.
+
+**Team / clinicians**
+- Send the hospital survey to oncology and palliative groups; name a pilot centre and doctor contact.
+- 20 practice conversations (asked twice, none done).
+- Support-group, palliative-doctor and morphine-centre lists (Sujay).
+
 ## Main thing: how we present it
 
 Make the idea understandable to someone hearing it for the first time—as simply as explaining it to a five-year-old—while being precise enough to show we know the clinical problem and our product.
