@@ -30,6 +30,9 @@ internal enum class TranscriptGoalStatus { Answered, Suggested, Open }
 
 /** Best transcript line for [id] found by word matching, or null. A suggestion only: the doctor accepts or edits it. */
 internal fun transcriptGoalSuggestion(matches: QuestionMatchResult?, id: String): QuestionMatch? = matches?.forQuestion(id)?.matches?.firstOrNull()?.takeIf { it.quote.isNotBlank() }
+/** Why this line was suggested, so the doctor can check it before Accept. */
+internal fun transcriptSuggestionNote(match: QuestionMatch): String = match.askedOnLine?.let { "The reply after the question on line $it. Check it against the conversation before you accept. · पंक्ति $it के सवाल के बाद का जवाब। ठीक है दबाने से पहले जाँचें।" }
+    ?: "This line shares words with the question. Check it against the conversation before you accept. · इस पंक्ति के शब्द सवाल से मिलते हैं। ठीक है दबाने से पहले जाँचें।"
 /** Verbatim words of the best suggested line, or blank. */
 internal fun transcriptGoalSpan(matches: QuestionMatchResult?, id: String): String = transcriptGoalSuggestion(matches, id)?.quote?.trim().orEmpty()
 internal fun transcriptGoalStatus(row: DoctorPreparationQuestion, matches: QuestionMatchResult?): TranscriptGoalStatus = if (row.answer.isNotBlank()) TranscriptGoalStatus.Answered else if (transcriptGoalSpan(matches, row.id).isNotBlank()) TranscriptGoalStatus.Suggested else TranscriptGoalStatus.Open
@@ -46,7 +49,7 @@ internal data class TranscriptChecklist(val rows: List<Pair<DoctorPreparationQue
 internal fun transcriptChecklist(rows: List<DoctorPreparationQuestion>, matches: QuestionMatchResult?) = TranscriptChecklist(rows.map { it to transcriptGoalStatus(it, matches) })
 internal fun transcriptChecklistLabel(status: TranscriptGoalStatus): String = when (status) {
     TranscriptGoalStatus.Answered -> "Covered · answer saved · जवाब सहेजा"
-    TranscriptGoalStatus.Suggested -> "Suggested from the transcript · बातचीत से सुझाव"
+    TranscriptGoalStatus.Suggested -> "Suggested from the transcript · found by matching words · बातचीत से सुझाव, शब्द मिलाकर"
     TranscriptGoalStatus.Open -> "Open · अभी बाकी"
 }
 
@@ -142,9 +145,9 @@ internal fun doctorTranscriptIsSample(walkthrough: Boolean, source: String, samp
                 }
                 if (row.answer.isBlank() && draft == null && suggestion != null) Surface(shape = RoundedCornerShape(14.dp), color = DoctorStatusWarnBg, modifier = Modifier.fillMaxWidth().testTag("transcript-goal-suggestion-${row.id}")) {
                     Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text("Suggested from the transcript · line ${suggestion.line.number}", fontSize = 12.sp, fontWeight = FontWeight.Medium, color = DoctorStatusWarn)
+                        Text("Suggested from the transcript · found by matching words · line ${suggestion.line.number} · पंक्ति ${suggestion.line.number}", fontSize = 12.sp, fontWeight = FontWeight.Medium, color = DoctorStatusWarn)
                         Text("“$span”", fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk, modifier = Modifier.clickable(role = Role.Button, onClickLabel = "Show this line in the transcript") { onShowLine(suggestion.line) })
-                        Text("Found by matching words. Check it against the conversation.", fontSize = 12.sp, color = DoctorCardFaint)
+                        Text(transcriptSuggestionNote(suggestion), fontSize = 12.sp, color = DoctorCardFaint, modifier = Modifier.testTag("transcript-goal-note-${row.id}"))
                         Row(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
                             TextButton(onClick = { onShowLine(suggestion.line) }, modifier = Modifier.heightIn(min = 48.dp).testTag("transcript-goal-show-${row.id}")) { Text("Show line", color = DoctorAccent) }
                             if (editable) {

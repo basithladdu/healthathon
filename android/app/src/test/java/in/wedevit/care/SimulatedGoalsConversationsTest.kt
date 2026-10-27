@@ -49,7 +49,14 @@ class SimulatedGoalsConversationsTest {
         // The same question list the doctor screen proposes when there is no earlier note (CareUi -> doctorSuggestQuestions).
         val rows = doctorSuggestQuestions(null, "")
         assertEquals(8, rows.size)
+        val labelled = report(convos, rows, "")
+        // Real on-device transcripts usually have no speaker labels: the same conversations with the "[Doctor · …]" prefix removed.
+        val plain = report(convos.map { c -> Convo(c.id, c.language, c.source.lines().joinToString("\n") { it.replace(Regex("^\\[[^\\]]+\\]\\s*"), "") }, c.truth, c.lineCount) }, rows, " (no speaker labels)")
+        println(labelled); println(plain)
+        File("build/reports").apply { mkdirs() }.resolve("sim-conversations.md").writeText(labelled + "\n\n" + plain)
+    }
 
+    private fun report(convos: List<Convo>, rows: List<DoctorPreparationQuestion>, variant: String): String {
         val report = StringBuilder()
         val cells = mutableMapOf<Pair<String, Int>, Cell>()
         val top3 = mutableMapOf<Pair<String, Int>, Boolean>()
@@ -57,16 +64,14 @@ class SimulatedGoalsConversationsTest {
         convos.forEach { c ->
             assertTrue("${c.id}: ground truth must point at lines", c.truth.values.flatten().all { it in 1..c.lineCount })
             val matches = LocalQuestionMatcher.match(c.source, rows.map { CareQuestion(it.id, it.text, it.section) })
-            val filled = transcriptGoalsFill(rows, matches)
             rows.forEachIndexed { i, row ->
                 val q = i + 1
                 val all = matches.forQuestion(row.id)!!.matches
                 val top = all.firstOrNull()
                 val span = transcriptGoalSpan(matches, row.id)
-                // The pre-filled answer and the status chip must agree with the top match; this is the text the doctor sees.
+                // The suggestion card and the status chip must agree with the top match; this is the text the doctor sees and may Accept.
                 assertEquals(top?.quote?.trim().orEmpty(), span)
-                assertEquals(span.take(DOCTOR_PREPARATION_MAX_ANSWER_CHARS), filled[i].answer)
-                assertEquals(if (span.isBlank()) TranscriptGoalStatus.NotFound else TranscriptGoalStatus.Found, transcriptGoalStatus(row, matches))
+                assertEquals(if (span.isBlank()) TranscriptGoalStatus.Open else TranscriptGoalStatus.Suggested, transcriptGoalStatus(row, matches))
                 val want = c.truth[q].orEmpty()
                 val cell = when {
                     top == null && want.isEmpty() -> Cell.LEFT_OPEN
@@ -81,7 +86,7 @@ class SimulatedGoalsConversationsTest {
             }
         }
 
-        report.append("# Simulated goals-of-care conversations: results\n\n")
+        report.append("# Simulated goals-of-care conversations: results$variant\n\n")
         report.append("Question key: ").append(rows.mapIndexed { i, r -> "Q${i + 1} = ${r.text}" }.joinToString("; ")).append("\n\n")
         report.append("hit = top suggested line is a right answer; miss = answered but nothing found; wrong = a different line was pre-filled; wrong* = pre-filled although the topic was never answered; — = correctly left open.\n\n")
         report.append("| Conversation | Language | ").append((1..8).joinToString(" | ") { "Q$it" }).append(" |\n|---|---|").append("---|".repeat(8)).append("\n")
@@ -104,7 +109,6 @@ class SimulatedGoalsConversationsTest {
         convos.groupBy { it.language.substringAfter("(").removeSuffix(")") }.forEach { (lang, cs) -> stats(lang, cs.flatMap { c -> (1..8).map { c.id to it } }) }
         report.append("\n## Every miss and wrong cell\n\n| Conversation | Question | Result | Right lines | Top suggestion |\n|---|---|---|---|---|\n").append(details)
 
-        println(report)
-        File("build/reports").apply { mkdirs() }.resolve("sim-conversations.md").writeText(report.toString())
+        return report.toString()
     }
 }
