@@ -59,6 +59,11 @@ val LocalCareLanguage = staticCompositionLocalOf<CareLanguageChoice?> { null }
 fun careDateFormat(pattern: String, hindi: Boolean): java.time.format.DateTimeFormatter =
     if (hindi) java.time.format.DateTimeFormatter.ofPattern(pattern, java.util.Locale("hi")) else java.time.format.DateTimeFormatter.ofPattern(pattern)
 
+/** Calendar categories are saved in English; only the label is shown in Hindi. */
+fun careCategoryLabel(category: String, hindi: Boolean): String = if (!hindi) category else when (category) {
+    "All" -> "सभी"; "Medicine" -> "दवा"; "Visit" -> "मुलाक़ात"; "Test" -> "जाँच"; "Follow-up" -> "अगली मुलाक़ात"; "Procedure" -> "प्रक्रिया"; "Task" -> "काम"; "Conversation" -> "बातचीत"; else -> category
+}
+
 /** Check-in moods are saved in English (doctor screens and reports read them); only the label is shown in Hindi. */
 fun checkInMoodLabel(title: String, hindi: Boolean): String = if (!hindi) title else when (title) {
     CheckInMood.GOOD -> "अच्छा दिन"; CheckInMood.OKAY -> "ठीक-ठाक दिन"; CheckInMood.HARD -> "मुश्किल दिन"; else -> title
