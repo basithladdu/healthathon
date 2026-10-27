@@ -34,7 +34,7 @@ class DoctorContextMigrationTest {
                 old.execSQL("INSERT INTO Acknowledgement(versionId,contentHash,name,relationship,at,id) VALUES(?,?,?,?,?,?)",arrayOf(note,"unchanged-historical-hash","Synthetic reader","Patient",5,note))
                 old.version=6
             }
-            val db=Room.databaseBuilder(context,CareDatabase::class.java,name).addMigrations(CombinedCareMigration6To7).build()
+            val db=Room.databaseBuilder(context,CareDatabase::class.java,name).addMigrations(CombinedCareMigration6To7,CareSyncMigration7To8).build()
             try {
                 assertEquals(1,db.care().people().first().size)
                 val draft=db.care().draft(person)!!

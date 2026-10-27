@@ -31,7 +31,7 @@ class CareAcknowledgementMigrationTest {
             old.execSQL("INSERT INTO Acknowledgement(versionId,contentHash,name,relationship,at) VALUES(?,?,?,?,?)", arrayOf(versionId, "a".repeat(64), "Existing family", "Family / carer", 10))
             old.version = 3
         }
-        var db = Room.databaseBuilder(context, CareDatabase::class.java, filename).addMigrations(CombinedCareMigration3To6,CombinedCareMigration6To7).build()
+        var db = Room.databaseBuilder(context, CareDatabase::class.java, filename).addMigrations(CombinedCareMigration3To6,CombinedCareMigration6To7,CareSyncMigration7To8).build()
         try {
             val legacy = db.care().acknowledgements().first().single()
             assertEquals(versionId, legacy.id)
@@ -41,7 +41,7 @@ class CareAcknowledgementMigrationTest {
             val family = Acknowledgement(versionId, "a".repeat(64), "New family", "Family / carer", 30)
             db.care().acknowledge(patient); db.care().acknowledge(family)
             db.close()
-            db = Room.databaseBuilder(context, CareDatabase::class.java, filename).addMigrations(CombinedCareMigration3To6,CombinedCareMigration6To7).build()
+            db = Room.databaseBuilder(context, CareDatabase::class.java, filename).addMigrations(CombinedCareMigration3To6,CombinedCareMigration6To7,CareSyncMigration7To8).build()
             assertEquals(setOf(legacy, patient, family), db.care().confirmations(versionId).toSet())
             assertEquals(3, db.care().acknowledgements().first().size)
         } finally { db.close(); context.deleteDatabase(filename) }

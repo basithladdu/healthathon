@@ -24,7 +24,7 @@ import javax.crypto.spec.GCMParameterSpec
 data class CareSession(val userId: String, val email: String, val access: String, val refresh: String, val expires: Long)
 data class CareMember(val userId: String, val canEdit: Boolean, val email: String, val careTeamRead: Boolean = false, val careTeamPermissionKnown: Boolean = false)
 data class CloudRecords(val people: List<Person>, val entries: List<CareItem>, val notes: List<CareVersion>, val confirmations: List<Acknowledgement>, val editable: Set<String>, val owned: Set<String>, val verifiedReviews: Set<String> = emptySet(), val authenticatedConfirmations: Set<String> = emptySet())
-private class CareHttpException(val status: Int, message: String) : IllegalArgumentException(message)
+internal class CareHttpException(val status: Int, message: String, val code: String = "") : IllegalArgumentException(message)
 
 internal fun decodeAcknowledgement(row: JSONObject): Acknowledgement {
     val data = row.getJSONObject("data")
@@ -206,10 +206,10 @@ class CareCloud(context: Context) {
                         path.startsWith("/auth/") -> listOf("msg", "error_description", "message").mapNotNull { error?.optString(it)?.takeIf(String::isNotBlank) }.firstOrNull() ?: "Couldn't sign in. Check your email and password."
                         else -> error?.optString("message")?.takeIf { code == "P0001" } ?: "Couldn't save. Your entry is still here."
                     }
-                    throw CareHttpException(status, friendly)
+                    throw CareHttpException(status, friendly, code)
                 }
                 text
-            } catch (e: java.io.IOException) { throw IllegalArgumentException("Couldn't reach your care records. Your entry is still here.", e) }
+            } catch (e: java.io.IOException) { throw CareSyncOffline("Couldn't reach your care records. Your entry is still here.", e) }
             finally { connection.disconnect() }
         }
     }

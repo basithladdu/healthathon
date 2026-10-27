@@ -62,12 +62,14 @@ data class CareReport(@PrimaryKey val id: String = newId(), val personId: String
     @Query("SELECT * FROM Acknowledgement WHERE versionId = :versionId ORDER BY at") suspend fun confirmations(versionId: String): List<Acknowledgement>
     @Query("SELECT * FROM Acknowledgement WHERE id = :id") suspend fun confirmation(id: String): Acknowledgement?
     @Insert(onConflict = OnConflictStrategy.ABORT) suspend fun acknowledge(acknowledgement: Acknowledgement)
+    @Query("DELETE FROM Acknowledgement WHERE id = :id") suspend fun deleteAcknowledgement(id: String)
     @Query("SELECT * FROM RecordingConsent WHERE personId = :id ORDER BY recordingConsentAt DESC") fun recordingConsents(id: String): Flow<List<RecordingConsent>>
     @Insert(onConflict = OnConflictStrategy.REPLACE) suspend fun saveRecordingConsent(consent: RecordingConsent)
     @Query("DELETE FROM RecordingConsent WHERE audioPath = :audioPath") suspend fun deleteRecordingConsent(audioPath: String)
     @Query("SELECT * FROM CareItem WHERE personId = :id ORDER BY created DESC") fun items(id: String): Flow<List<CareItem>>
     @Query("SELECT * FROM CareItem WHERE id = :id LIMIT 1") suspend fun item(id: String): CareItem?
     @Query("SELECT * FROM CareItem") suspend fun allItems(): List<CareItem>
+    @Query("UPDATE CareItem SET revision = :revision WHERE id = :id") suspend fun setRevision(id: String, revision: Long)
     @Insert(onConflict = OnConflictStrategy.REPLACE) suspend fun saveItem(item: CareItem)
     @Delete suspend fun removeItem(item: CareItem)
     @Query("SELECT * FROM CareReport WHERE personId = :id ORDER BY created DESC") fun reports(id: String): Flow<List<CareReport>>
@@ -156,18 +158,19 @@ val CombinedCareMigration6To7 = object : androidx.room.migration.Migration(6,7) 
         DoctorConversationSchema.create(db);DoctorPrescriptionSchema.create(db)
     }
 }
-@Database(entities = [Person::class, Conversation::class, CareVersion::class, Acknowledgement::class, CareItem::class, CareReport::class, RecordingConsent::class,DoctorConversationArchive::class,DoctorLocalAudioRef::class,DoctorPrescription::class,DoctorPrescriptionState::class,DoctorPrescriptionMedicine::class,DoctorPrescriptionMutation::class], version = 7, exportSchema = true)
+@Database(entities = [Person::class, Conversation::class, CareVersion::class, Acknowledgement::class, CareItem::class, CareReport::class, RecordingConsent::class,DoctorConversationArchive::class,DoctorLocalAudioRef::class,DoctorPrescription::class,DoctorPrescriptionState::class,DoctorPrescriptionMedicine::class,DoctorPrescriptionMutation::class,CarePendingWrite::class], version = 8, exportSchema = true)
 abstract class CareDatabase : RoomDatabase() {
     abstract fun care(): CareDao
     abstract fun conversations():DoctorConversationDao
     abstract fun prescriptions():DoctorPrescriptionDao
+    abstract fun sync(): CareSyncDao
     companion object {
         private val instances = mutableMapOf<String, CareDatabase>()
         fun get(context: Context, account: String = ""): CareDatabase = synchronized(this) {
             require(account.isEmpty() || runCatching { UUID.fromString(account) }.isSuccess)
             val filename = if (account.isEmpty()) "care.db" else "care-$account.db"
             instances.getOrPut(filename) { Room.databaseBuilder(context.applicationContext, CareDatabase::class.java, filename)
-                .addMigrations(RevisionMigration, ReportsMigration, CombinedCareMigration3To6, CombinedCareMigration4To6, CombinedCareMigration5To6,CombinedCareMigration6To7).build() }
+                .addMigrations(RevisionMigration, ReportsMigration, CombinedCareMigration3To6, CombinedCareMigration4To6, CombinedCareMigration5To6,CombinedCareMigration6To7,CareSyncMigration7To8).build() }
         }
     }
 }
