@@ -2,6 +2,14 @@
 
 This is the starting point for another developer or Codex chat. Read the latest dated checkpoint first and the current Android `HANDOFF.md` / `AI_HANDOFF.md`; older verification and release snapshots remain historical.
 
+## 27 October: native survey menus and validation popups removed
+
+- The user's later request explicitly expanded the survey change to remove native dialogs. Replaced every survey select with visible radio choices; both state/union-territory fields now use always-visible searchable lists containing all 36 choices. No dropdown, datalist or browser form-validation popup remains in the hospital survey. The four Other text boxes remain attached to their choices.
+- Inline validation now checks each step, focuses the first affected field, and rechecks all steps before sending. It preserves the existing server rules for registration, Other details, map confirmation, services and consent. Optional supply can be cleared with Not specified. Search selection clears a resolved address error; Back/Continue and selection changes preserve answers. Backend schema, survey eligibility and receipt/idempotency rules are unchanged.
+- Verification: scoped ESLint, 29 feedback/validation unit tests and the production build passed. Chrome checks on the live survey covered 390px and 375px mobile widths plus 1440px desktop, all choice groups, radio keyboard navigation, all 36 states, search/no-match recovery, selected-state visibility, inline errors/focus, map confirmation, service exclusivity, Other fields, optional supply, consent enforcement and Back/Continue retention. Final choice text was verified at 14px with no horizontal overflow.
+- The complete review/payload and failed-send/retry flow passed using intercepted synthetic search/API responses, with a stable retry ID and zero real database writes. This does not claim a new real survey submission or physical-phone test. Unsent drafts still reset on reload.
+- Final production deployment `dpl_9okmHtG1XsHkHsukaSuBCr3u9WGJ` reached READY and was promoted. The updated https://sahara.wedevit.in/hospital-survey alias and canonical `/hospital-survery` route were checked after promotion. Local browser check scripts/screenshots use `prototype/output/playwright/survey-no-native-*`. Source and this bounded handoff are the web-only checkpoint; Android, Play, CARE, private records and prior unrelated local context edits remain untouched.
+
 ## 27 October: survey Other details clarified and deployed
 
 - The user clarified that respondents need to specify what they mean after choosing Other; the earlier suggestion to replace dropdowns was superseded. Existing Other fields were present in production. The web fix makes all four branches explicit with "Other (please specify)", a directly attached detail box, automatic focus and contextual placeholders.
