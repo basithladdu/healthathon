@@ -1,0 +1,25 @@
+# id: C10
+# title: Kidney failure on dialysis, patient wants to stop, agrees a one-month trial
+# language: en-IN (English)
+# people: patient Lakshmi (70); son Kiran (family); doctor
+# covered: Q1-Q5, Q7, Q8. Not covered: Q6
+D: Lakshmi, you told the nurse you're tired of dialysis. Can we talk about that?
+P: Yes. Three times a week, four hours each time. I am exhausted.
+D: What matters most to you at the moment?
+P: Having some energy for my prayers and my grandson. Dialysis days are lost days. <<Q1>>
+D: What are you hoping for from your care?
+P: I want to stop dialysis. <<Q2>>
+F: Amma, please, let's not decide that now.
+D: That is a big decision and it's yours to make. Let's understand it fully first.
+D: What is your understanding of what happens if dialysis stops?
+P: I know I will not live long. Maybe a few weeks. <<Q4>>
+D: That is broadly correct. It is usually days to weeks.
+D: Who would you like involved in this decision?
+P: Kiran and my daughter Divya. And the priest at our temple. <<Q3>>
+D: What worries you most?
+P: Being a burden. And Kiran blaming himself. <<Q5>>
+D: What would you like to happen next?
+P: Let me try dialysis twice a week for one month, then decide. <<Q7>>
+D: We can do that as a trial and review it on the 30th. <<Q7>>
+D: Who should hear about this?
+P: Divya. And the dialysis unit staff. <<Q8>>

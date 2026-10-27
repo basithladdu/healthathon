@@ -1,0 +1,28 @@
+# id: C15
+# title: Brain tumour, patient has word-finding trouble, answers spread over several lines
+# language: en-IN (English)
+# people: patient Arvind (52); wife Shalini (family); doctor
+# covered: all eight
+D: Arvind, Shalini, today I'd like to talk about what is important as we plan ahead.
+P: Yes. Things are... I lose words now. Shalini helps.
+D: What matters most to you at the moment?
+P: My... the work. The book I was writing. I want to finish it. <<Q1>>
+F: He's been dictating chapters to me in the evenings. It means everything to him. <<Q1>>
+D: What are you hoping for from your care?
+F: We know the tumour won't go away. We're hoping the seizures stay controlled and he stays himself as long as possible. <<Q2>>
+P: Yes. Myself. <<Q2>>
+D: Who would you like involved in decisions about your care?
+P: Shalini. Only Shalini. <<Q3>>
+D: How do you understand what is happening with the tumour?
+F: The surgeon said it has come back and there's no more surgery possible. <<Q4>>
+P: Back. Yes. <<Q4>>
+D: What worries you most about the future?
+P: Not knowing her. Not knowing Shalini. <<Q5>>
+F: He says that every night.
+D: Is there anything else on your mind?
+F: Our son is abroad. When should he come home? <<Q6>>
+D: That's an important question. If he wants to spend good time with his father, sooner is better than later.
+D: What would you like to happen next?
+F: Our son flies in next month. And we'd like a home visit from the palliative team. <<Q7>>
+D: Who should hear about what we have agreed?
+F: His brother and the neurologist. <<Q8>>

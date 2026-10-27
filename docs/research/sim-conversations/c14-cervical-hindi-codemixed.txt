@@ -1,0 +1,18 @@
+# id: C14
+# title: Cervical cancer, Hindi in Devanagari with English words mixed in
+# language: hi-IN (Hindi with English words, Devanagari)
+# people: patient Geeta (50); husband Mahesh (family); doctor
+# covered: Q1-Q5, Q7. Not covered: Q6, Q8
+D: गीता जी, आपके लिए अभी सबसे important क्या है?
+P: मेरे बच्चों की पढ़ाई। और मैं घर पर रहूँ, hospital में नहीं। <<Q1>>
+D: Treatment से आपकी क्या hope है?
+P: खून आना बंद हो जाए। Radiation से थोड़ा आराम मिला था। <<Q2>>
+D: Decisions में आप किसको involve करना चाहेंगी?
+P: मेरे पति और मेरी बड़ी बेटी। <<Q3>>
+D: अपनी health के बारे में आपको क्या समझ आया है?
+P: Cancer फैल गया है, अब सिर्फ दर्द की दवा और आराम। <<Q4>>
+D: Future को लेकर सबसे बड़ी worry क्या है?
+F: पैसे की। Treatment में सब ज़मीन बिक गई। <<Q5>>
+D: Social worker से बात करवा देते हैं, कुछ scheme हैं।
+D: आगे क्या करना है?
+F: अगले हफ्ते social worker से मिलेंगे, और दर्द की दवा लेते रहेंगे। <<Q7>>

@@ -1,0 +1,26 @@
+# id: C08
+# title: Motor neurone disease, patient types answers, clear wishes on breathing support
+# language: en-IN (English)
+# people: patient David (60, uses a speaking tablet); wife Anjali (family); doctor
+# covered: all eight
+D: David, take your time. You can type and the tablet will read it out.
+P: OK.
+D: What matters most to you at the moment?
+P: Still being able to communicate. When I lose that, I lose me. <<Q1>>
+D: What are you hoping for from your care?
+P: Help with breathing at night. The mask is OK. <<Q2>>
+P: But no tube in the throat. No tracheostomy. <<Q2>>
+D: Who would you like involved in decisions about your care?
+P: Anjali. If I cannot type, she speaks for me. <<Q3>>
+F: We've talked about it many times.
+D: What is your understanding of your current health?
+P: It is getting worse every month. My arms are gone. Breathing next. <<Q4>>
+D: What worries you most about the future?
+P: Being trapped. Awake and unable to say anything. <<Q5>>
+D: Is there anything you would like to talk about that we have not covered?
+P: Eye-gaze device. Can we get one before I need it? <<Q6>>
+D: Yes, I'll refer you to the speech therapist this week. <<Q7>>
+D: What would you like to happen next?
+P: The referral, and a written note that says no trach. <<Q7>>
+D: Who should hear about what we have agreed?
+P: My GP, the pulmonologist, and my brother in Chennai. <<Q8>>

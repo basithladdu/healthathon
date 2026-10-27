@@ -1,0 +1,25 @@
+# id: C03
+# title: Recurrent oral cancer, son answers for father, worry question deflected
+# language: hi-IN (Hinglish, Roman script)
+# people: patient Ramesh (58); son Vikas and daughter-in-law Neha (family); doctor
+# covered: Q1-Q4, Q6, Q7. Not covered: Q5 (family stops it), Q8
+D: Namaste Ramesh ji. Aaj hum thoda baat karenge ki aage ka plan kya ho.
+P: Haan doctor sahab.
+D: Abhi aapke liye sabse zaroori kya hai?
+F: Doctor, papa ke liye bas yeh hai ki khaana kha sakein, tube na lage. <<Q1>>
+P: Haan, aur dukaan pe thoda baith sakun. <<Q1>>
+D: Treatment se aap kya umeed rakhte hain?
+F: Hum chahte hain ki operation ho jaaye, phir se. Mumbai mein bhi pucha hai. <<Q2>>
+P: Main thak gaya hoon, beta. <<Q2>>
+D: Decisions mein kaun kaun shamil hona chahiye?
+P: Vikas aur Neha. Aur meri wife. <<Q3>>
+D: Aapko apni bimari ke baare mein kya samajh aaya hai?
+P: Munh ka cancer hai, wapas aa gaya hai. <<Q4>>
+D: Aage ke baare mein sabse zyada kis baat ki chinta hai?
+F: Doctor, woh sab abhi mat poochiye, papa pareshan ho jaate hain.
+D: Theek hai, hum baad mein baat kar sakte hain.
+D: Kuch aur hai jo aap poochna chahte hain?
+F: Haan, Mumbai wale hospital ka opinion lena chahiye kya? <<Q6>>
+D: Second opinion lena bilkul theek hai. Main reports ka summary bana deta hoon.
+D: Aage kya hona chahiye?
+F: Pehle Mumbai ki report aaye, phir aapse milte hain. <<Q7>>

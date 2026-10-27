@@ -1,0 +1,26 @@
+# id: C01
+# title: Advanced ovarian cancer, doctor reads the standard questions word for word
+# language: en-IN (English)
+# people: patient Kamala (62); daughter Priya (family); doctor
+# covered: all eight
+D: Good morning Kamala, Priya. Thank you for making time today. I'd like to understand what is important to you so we can plan your care together.
+P: Good morning doctor. Yes, Priya said you wanted to talk.
+D: What matters most to you at the moment?
+P: Being at home with my grandchildren. I don't want to spend more weeks in the hospital. <<Q1>>
+D: And what are you hoping for from your care?
+P: I am hoping the pain stays under control so I can sit in the garden and cook sometimes. <<Q2>>
+D: Who would you like involved in decisions about your care?
+P: Priya, and my son Arjun in Pune. They should both be part of it. <<Q3>>
+F: Arjun can join on video next time.
+D: What is your understanding of your current health?
+P: The cancer has spread and the chemotherapy is not shrinking it anymore. Dr Menon told me that last month. <<Q4>>
+D: That's right. What worries you most about the future?
+P: That I will be in pain at the end, and that Priya will have to carry everything alone. <<Q5>>
+D: Is there anything you would like to talk about that we have not covered?
+P: Yes. If I get very breathless, I don't want to be put on a machine. <<Q6>>
+D: Thank you for telling me that. We will write it down clearly.
+D: What would you like to happen next?
+P: I'd like the home care nurse to visit every week, and to talk again after the scan. <<Q7>>
+D: Who should hear about what we have agreed?
+F: Arjun, and our family doctor, Dr Kulkarni. <<Q8>>
+D: I will send a copy to Dr Kulkarni and we will meet again in two weeks.

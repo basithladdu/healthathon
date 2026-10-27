@@ -1,0 +1,27 @@
+# id: C20
+# title: Advanced heart failure, standard questions read word for word, vague and deferring answers
+# language: en-IN (English)
+# people: patient Rosamma (76); daughter Jessy (family); doctor
+# covered: Q1-Q4, Q6-Q8. Deflected (not answered): Q5
+D: Rosamma, Jessy, I'd like to go through a few questions with you.
+F: Yes doctor.
+D: What matters most to you at the moment?
+P: Ah, what to say. God knows.
+F: Mummy, tell the doctor.
+P: Just that the children are settled. <<Q1>>
+D: What are you hoping for from your care?
+F: Whatever is best, doctor. You know better.
+D: I'd like to hear what you hope for, even if it's simple.
+P: Sleeping without the extra pillows. <<Q2>>
+D: Who would you like involved in decisions about your care?
+P: Jessy and her brother. <<Q3>>
+D: What is your understanding of your current health?
+P: The heart is old, what else. Like an old engine. <<Q4>>
+D: What worries you most about the future?
+F: We don't think about all that. We take one day at a time.
+D: Is there anything you would like to talk about that we have not covered?
+F: No, no. Everything is fine. <<Q6>>
+D: What would you like to happen next?
+F: Same tablets, and we'll come back if the swelling increases. <<Q7>>
+D: Who should hear about what we have agreed?
+F: My brother in Dubai. I'll message him. <<Q8>>

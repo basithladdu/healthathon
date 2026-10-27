@@ -1,0 +1,23 @@
+# id: C07
+# title: Major stroke, patient cannot speak, children answer for her and ask the team not to tell her
+# language: hi-IN (Hinglish, Roman script)
+# people: patient Savitri (78, cannot speak); daughter Meera and son Anil (family); doctor
+# covered: Q1-Q5, Q7. Not covered: Q6, Q8
+D: Meera ji, Anil ji, mummy abhi baat nahi kar paa rahi, isliye hum aapse samajhna chahte hain ki woh kya chahti.
+F: Ji doctor.
+D: Unke liye sabse important kya tha, aapko kya lagta hai?
+F: Mummy hamesha kehti thi ki machine pe nahi rehna. Ghar mein, apne mandir ke paas. <<Q1>>
+D: Care se aap log kya hope kar rahe hain?
+F: Ki unko takleef na ho. Bas aaram se rahen. <<Q2>>
+F: Mujhe lagta hai physiotherapy se thoda improve ho sakta hai. <<Q2>>
+D: Decisions kaun lega, family mein?
+F: Hum dono milke. Lekin final Anil bhaiya ka. <<Q3>>
+D: Unki health ke baare mein aapki kya understanding hai?
+F: Doctor ne bataya bada stroke tha, dimaag ka bada hissa damage hai. <<Q4>>
+F: Lekin please mummy ko mat batana ki theek nahi hongi.
+D: Hum is baare mein dhyaan se baat karenge.
+D: Future ke baare mein sabse badi chinta kya hai?
+F: Agar khaana nigal nahi payi toh tube lagani padegi kya? Woh nahi chahti thi. <<Q5>>
+D: Yeh hum agli baar detail mein discuss karenge.
+D: Aage kya plan karein?
+F: Ghar le jaana hai, aur ek nurse chahiye. <<Q7>>
