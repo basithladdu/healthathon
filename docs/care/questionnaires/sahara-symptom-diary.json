@@ -1,0 +1,239 @@
+{
+  "slug": "sahara-symptom-diary",
+  "version": "1.0",
+  "status": "draft",
+  "subject_type": "patient",
+  "type": "custom",
+  "title": "Family symptom diary (Sahara personal 0-10)",
+  "description": "Personal 0-10 diary reported by the patient or family between visits. Not ESAS-r or IPOS. 0 = none, 10 = worst imaginable; for overall well-being 0 = best, 10 = worst.",
+  "organizations": [
+    "00000000-0000-4000-8000-000000000000"
+  ],
+  "questions": [
+    {
+      "id": "f3c373c9-9b83-521b-9fc2-78a98b303793",
+      "link_id": "observed-at",
+      "text": "When was this observed?",
+      "type": "dateTime",
+      "required": true
+    },
+    {
+      "id": "0f42d4c6-9be1-5921-a54f-fd2f22d6d046",
+      "link_id": "respondent",
+      "text": "Who is reporting?",
+      "type": "choice",
+      "required": true,
+      "answer_option": [
+        {
+          "value": "Patient"
+        },
+        {
+          "value": "Patient, with help"
+        },
+        {
+          "value": "Seen by family or carer"
+        },
+        {
+          "value": "Seen by care team"
+        }
+      ]
+    },
+    {
+      "id": "05802ea1-587b-5a90-9608-f72f860ae9bf",
+      "link_id": "recall",
+      "text": "Time window",
+      "type": "choice",
+      "required": true,
+      "answer_option": [
+        {
+          "value": "Right now"
+        },
+        {
+          "value": "24-hour average"
+        },
+        {
+          "value": "Worst in 24 hours"
+        }
+      ]
+    },
+    {
+      "id": "0a10ded2-8a76-532f-831e-5eab582486ef",
+      "link_id": "author",
+      "text": "Who wrote or observed this note? (name)",
+      "type": "string",
+      "required": true,
+      "max_length": 120
+    },
+    {
+      "id": "b6eb60b2-95d3-551b-82bb-d8a217721d33",
+      "link_id": "symptoms",
+      "text": "Symptoms (0-10, leave blank if not asked)",
+      "type": "group",
+      "styling_metadata": {
+        "containerClasses": "grid grid-cols-2"
+      },
+      "questions": [
+        {
+          "id": "77d095c5-ef3c-5bfc-a4da-8c887de9bd9f",
+          "link_id": "sym-pain",
+          "text": "Pain (0-10)",
+          "type": "integer",
+          "description": "0 = none, 10 = worst imaginable"
+        },
+        {
+          "id": "547fe4b9-cbf1-5fdb-bd89-614086a2d733",
+          "link_id": "sym-tiredness",
+          "text": "Fatigue / lack of energy (0-10)",
+          "type": "integer",
+          "description": "0 = none, 10 = worst imaginable"
+        },
+        {
+          "id": "23c0cbbd-03d4-52e9-ab85-717c651f4a14",
+          "link_id": "sym-sleepiness",
+          "text": "Drowsiness / excessive sleepiness (0-10)",
+          "type": "integer",
+          "description": "0 = none, 10 = worst imaginable"
+        },
+        {
+          "id": "9ac00aaa-21dd-5e25-b34f-fc6b2e2beddb",
+          "link_id": "sym-poor-appetite",
+          "text": "Poor appetite (0-10)",
+          "type": "integer",
+          "description": "0 = none, 10 = worst imaginable"
+        },
+        {
+          "id": "c74f8cc2-28bd-5835-ab1c-e14026f14046",
+          "link_id": "sym-dry-mouth",
+          "text": "Dry / sore mouth (0-10)",
+          "type": "integer",
+          "description": "0 = none, 10 = worst imaginable"
+        },
+        {
+          "id": "3147481c-8806-5a57-9a22-7fdda17bff8c",
+          "link_id": "sym-breathlessness",
+          "text": "Breathlessness (0-10)",
+          "type": "integer",
+          "description": "0 = none, 10 = worst imaginable"
+        },
+        {
+          "id": "dc45b495-6419-5a4a-a362-ac36a4f500a3",
+          "link_id": "sym-constipation",
+          "text": "Constipation (0-10)",
+          "type": "integer",
+          "description": "0 = none, 10 = worst imaginable"
+        },
+        {
+          "id": "d3e13846-a25e-5350-a0cf-084445fe0f6d",
+          "link_id": "sym-diarrhea",
+          "text": "Diarrhea (0-10)",
+          "type": "integer",
+          "description": "0 = none, 10 = worst imaginable"
+        },
+        {
+          "id": "3882256b-2f76-59b9-bcb7-31b502ccbfa1",
+          "link_id": "sym-nausea",
+          "text": "Nausea (0-10)",
+          "type": "integer",
+          "description": "0 = none, 10 = worst imaginable"
+        },
+        {
+          "id": "2fbd2e35-052b-5373-917f-0821a921f3b1",
+          "link_id": "sym-vomiting",
+          "text": "Vomiting (0-10)",
+          "type": "integer",
+          "description": "0 = none, 10 = worst imaginable"
+        },
+        {
+          "id": "2c31b5d3-608d-517a-a5f0-c6893ff2346c",
+          "link_id": "sym-difficulty-swallowing",
+          "text": "Difficulty swallowing (0-10)",
+          "type": "integer",
+          "description": "0 = none, 10 = worst imaginable"
+        },
+        {
+          "id": "ac047542-9f64-576e-8614-79e4c4b650e2",
+          "link_id": "sym-cough",
+          "text": "Cough (0-10)",
+          "type": "integer",
+          "description": "0 = none, 10 = worst imaginable"
+        },
+        {
+          "id": "5fe718a1-f592-54c2-aee5-581a6f912fed",
+          "link_id": "sym-bowel-bladder-incontinence",
+          "text": "Bowel / bladder incontinence (0-10)",
+          "type": "integer",
+          "description": "0 = none, 10 = worst imaginable"
+        },
+        {
+          "id": "dad291a2-e033-5472-ad1e-c79216b3fe71",
+          "link_id": "sym-sadness",
+          "text": "Sadness (0-10)",
+          "type": "integer",
+          "description": "0 = none, 10 = worst imaginable"
+        },
+        {
+          "id": "9aced75a-ba41-5c46-9d06-722c56459292",
+          "link_id": "sym-worry",
+          "text": "Worry (0-10)",
+          "type": "integer",
+          "description": "0 = none, 10 = worst imaginable"
+        },
+        {
+          "id": "db7efb67-94bf-5908-8add-56a600b68b83",
+          "link_id": "sym-overall-well-being",
+          "text": "Overall well-being (0-10)",
+          "type": "integer",
+          "description": "0 = best possible well-being, 10 = worst possible well-being"
+        },
+        {
+          "id": "824de528-d212-54f1-8d1f-115805db3aa4",
+          "link_id": "sym-other",
+          "text": "Other (0-10)",
+          "type": "integer",
+          "description": "0 = none, 10 = worst imaginable"
+        }
+      ]
+    },
+    {
+      "id": "b4b00140-7f55-560f-bae0-908c77a2ae5f",
+      "link_id": "sym-other-name",
+      "text": "Other symptom: what is it?",
+      "type": "string",
+      "enable_when": [
+        {
+          "question": "sym-other",
+          "operator": "exists",
+          "answer": true
+        }
+      ],
+      "max_length": 80
+    },
+    {
+      "id": "b2d4301b-c619-51b6-a642-e6e588ddf911",
+      "link_id": "change",
+      "text": "Compared with last time",
+      "type": "choice",
+      "answer_option": [
+        {
+          "value": "Better"
+        },
+        {
+          "value": "Same"
+        },
+        {
+          "value": "Worse"
+        },
+        {
+          "value": "Not sure"
+        }
+      ]
+    },
+    {
+      "id": "c2b7da7c-b671-5e84-98e2-dffbfae0cc7f",
+      "link_id": "note",
+      "text": "Anything else the care team should know?",
+      "type": "text",
+      "max_length": 500
+    }
+  ]
+}
