@@ -239,8 +239,8 @@ Also read:
 ### Getting the note in an emergency
 | Item | Next step | Who |
 |---|---|---|
-| C1–C4 | Decide on the hospital QR card (3–5 days plus server work). If yes: large QR on Today, single-use browser link, printable, saveable offline, can be replaced if leaked | Owner decides, Awaiz builds |
-| C5 | Password-protect the PDF copy | Awaiz |
+| C1–C4 | ~~Decide on the hospital QR card (3–5 days plus server work). If yes: large QR on Today, single-use browser link, printable, saveable offline, can be replaced if leaked~~ done in the QR lane (7a1810a, 217dcd2, a93a520; branch `sa3-qr`): revocable link, not single-use. **Owner applies** `android/supabase/migrations/20261027190000_emergency_card_links.sql` and deploys `prototype/app/emergency` before the link goes live | Owner decides, Awaiz builds |
+| C5 | ~~Password-protect the PDF copy~~ done, a93a520 (real PDF password, AES-256) | Awaiz |
 
 ### Access to care
 | Item | Next step | Who |
@@ -263,7 +263,7 @@ Also read:
 | E8, E9 | Clinicians to re-confirm whether patients may type daily medicines, or only scan printed prescriptions | Team |
 | E11 | Timeline summary from documents (last chemo or radiotherapy, with source) | Awaiz (later) |
 | E13 | Voice journal themes: no decision; hold | Team |
-| E16 | Quick access to the note and QR on Today, once C1 is decided | Awaiz |
+| E16 | ~~Quick access to the note and QR on Today, once C1 is decided~~ done, a93a520 | Awaiz |
 
 ### Language, identity, data
 | Item | Next step | Who |
@@ -309,3 +309,8 @@ Sources: `docs/research/CARE_DEEP_DIVE_2026-10-27.md`, `CARE_VS_SAHARA_FOR_TEAM.
 
 ### Lane notes (27 Oct)
 - **Polish lane:** an up/down swipe over the pain-strength bar (3D pain body) or the check-in / feedback slider now scrolls the page and never changes the score; only a tap or a deliberate sideways drag sets it (`SaharaSliderTouch.kt`, unit-tested in `SliderTouchPolicyTest`). TalkBack and keyboard still adjust the slider. A second tap on an already-saved check-in no longer adds a second entry, and the "please wait" message now says a change is still saving. In the doctor's embedded Daily care, the "Symptom tracker" button did nothing; it now opens the symptom diary. Not tried on a phone (no device or emulator); the swipe androidTest compiles but has not run.
+- **QR lane (emergency card):** Today shows a large QR. When the profile owner is signed in it opens a read-only page at `sahara.wedevit.in/emergency#t=…` with the card the family ticked. The page shows the full latest patient-confirmed goals-of-care note, contacts and medicines. Tapping the QR opens a full-screen white view at maximum brightness; it can switch to the offline text code.
+  - Buttons: Update card (same link, so printed cards show the update), Replace the link (old one stops at once), Share, Print (Android print screen), Save PDF, Locked PDF (AES-256 password the reader asks for), and Read the confirmed note. "Done" messages appear only after the write succeeds.
+  - Until the owner applies `20261027190000_emergency_card_links.sql` (Saanthvana project) and deploys `prototype/app/emergency`, Today says "The web link becomes live after setup". The offline QR and the PDF already work.
+  - The link can be revoked and expires after one year; it is not single-use, because a printed card has to scan more than once.
+  - Verified: the SQL test passes on a local Postgres 16, the web unit tests pass, and PDF locking was checked with Poppler and pypdf. Not tried on a phone.
