@@ -25,7 +25,11 @@ object NearbyHelp {
         EmergencyNumber("14567", "Elderline for older people", "बुज़ुर्गों के लिए एल्डरलाइन", "8 am – 8 pm", "सुबह 8 – रात 8 बजे"),
     )
 
-    fun dialUri(number: String): String = "tel:" + number.replace(Regex("[^+0-9]"), "")
+    /** Dialler link for a number. Many listings write Indian numbers as "91 98…" without "+"; those get "+" so the dialler reads a country code. */
+    fun dialUri(number: String): String {
+        val digits = number.replace(Regex("[^+0-9]"), "")
+        return "tel:" + if (digits.length == 12 && digits.startsWith("91")) "+$digits" else digits
+    }
 
     /** Districts the directory lists for a state, as spelled in the source. Most states have none listed. */
     fun districts(centres: List<Centre>, state: String): List<String> =

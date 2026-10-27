@@ -894,7 +894,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
         item { Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) { (listOf("All India") + states).forEach { option -> FilterChip(selected = state == option, onClick = { if (state != option) district = ""; state = option }, label = { Text(option) }, modifier = Modifier.heightIn(min = 48.dp)) } } }
         if (districts.isNotEmpty()) item { Column {
             Text("District · ज़िला", style = MaterialTheme.typography.labelMedium)
-            Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).testTag("nearby-districts"), horizontalArrangement = Arrangement.spacedBy(8.dp)) { (listOf("") + districts).forEach { option -> FilterChip(selected = district == option, onClick = { district = option }, label = { Text(option.ifBlank { "All districts" }) }, modifier = Modifier.heightIn(min = 48.dp)) } }
+            Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).testTag("nearby-districts"), horizontalArrangement = Arrangement.spacedBy(8.dp)) { (listOf("") + districts).forEach { option -> FilterChip(selected = district == option, onClick = { district = option }, label = { Text(option.ifBlank { "All districts · सभी ज़िले" }) }, modifier = Modifier.heightIn(min = 48.dp)) } }
         } }
         item { Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf("All", "Home care", "Clinic visits", "Inpatient care").forEach { s -> FilterChip(selected = service == s, onClick = { service = s }, label = { Text(s) }, modifier = Modifier.heightIn(min = 48.dp)) } } }
         item { FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -923,7 +923,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
             if (c.sourceListedMorphine == "available") Text("Directory lists morphine · call to confirm", fontSize = 12.sp, color = Color(0xFF465E45), modifier = Modifier.padding(top = 8.dp))
             Text(listOf(c.sourceName, c.checkedOn.takeIf { it.isNotBlank() }?.let { "Source retrieved $it" }).filterNotNull().filter(String::isNotBlank).joinToString(" · "), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                if (c.phone.any(Char::isDigit)) TextButton(onClick = { open(context, Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + c.phone.replace(Regex("[^+0-9]"), "")))) }) { Icon(Icons.Default.Call, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Call") }
+                if (c.phone.any(Char::isDigit)) TextButton(onClick = { open(context, Intent(Intent.ACTION_DIAL, Uri.parse(NearbyHelp.dialUri(c.phone)))) }) { Icon(Icons.Default.Call, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Call") }
                 TextButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com/maps/search/?api=1&query=" + Uri.encode(c.name + " " + c.address)))) }) { Text("Directions") }
                 TextButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse(c.url))) }) { Text("Source") }
             }

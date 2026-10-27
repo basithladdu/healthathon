@@ -22,6 +22,12 @@ class NearbyHelpTest {
         assertTrue(NearbyHelp.emergency.all { it.label.isNotBlank() && it.labelHindi.isNotBlank() && (it.note.isBlank() == it.noteHindi.isBlank()) })
         assertEquals("tel:14567", NearbyHelp.dialUri("14 567"))
     }
+    @Test fun centrePhonesWrittenWith91WithoutPlusDialAsIndianNumbers() {
+        assertEquals("tel:+918985855123", NearbyHelp.dialUri("91 8985855123"))
+        assertEquals("tel:+919160767111", NearbyHelp.dialUri("+91 9160767111"))
+        assertEquals("tel:9866072574", NearbyHelp.dialUri("98660 72574"))
+        assertEquals("tel:04772287497", NearbyHelp.dialUri("0477 2287497"))
+    }
     @Test fun districtsComeOnlyFromTheChosenStatesListings() {
         assertEquals(listOf("Ernakulam", "Kollam"), NearbyHelp.districts(centres, "Kerala"))
         assertEquals(emptyList<String>(), NearbyHelp.districts(centres, "Delhi"))
