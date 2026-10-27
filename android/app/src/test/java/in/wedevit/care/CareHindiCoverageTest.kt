@@ -38,7 +38,9 @@ class CareHindiCoverageTest {
         // Saved into records, file names, errors that are caught, and as-printed lab test names.
         "\\nOriginal prescription references:\\n", "Goals-of-care-v{}.txt", "File unavailable", "Recording unavailable", "What matters", "Red blood cells",
         "Sahara root", "microphone level", "feedback expression", "feedback warmth", "d MMM", "d MMM, HH:mm", "h:mm a", "dd MMM yyyy · HH:mm z", "dd MMM yyyy",
-        "https://tiles.openfreemap.org/styles/liberty", "https://www.google.com/maps/search/?api=1&query=")
+        "https://tiles.openfreemap.org/styles/liberty", "https://www.google.com/maps/search/?api=1&query=",
+        // Added by later lanes: a filter key and a kind key (labels paired separately), a licence URL, a map font name and a file-name pattern.
+        "Day care", "Lab result", "https://creativecommons.org/licenses/by/4.0/", "Noto Sans Bold", "Scan {}.jpg", "yyyy-MM-dd HH-mm")
 
     @Test fun everyMainScreenStringHasAHindiPair() {
         val dir = listOf("src/main/java/in/wedevit/care", "app/src/main/java/in/wedevit/care", "android/app/src/main/java/in/wedevit/care").map(::File).first { it.isDirectory }
