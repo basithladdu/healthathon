@@ -1,0 +1,157 @@
+{
+  "slug": "sahara-goc-conversation",
+  "version": "1.0",
+  "status": "draft",
+  "subject_type": "patient",
+  "type": "custom",
+  "title": "Goals-of-care conversation (Sahara prompts)",
+  "description": "Clinician-led prompts; the clinician records the answers. Kept at patient level so it sits apart from acute encounter notes. Prompt wording is Sahara's default set and has no cited clinical source yet.",
+  "organizations": [
+    "00000000-0000-4000-8000-000000000000"
+  ],
+  "questions": [
+    {
+      "id": "72c72c2a-3c56-5b2f-8a10-28a8a0194443",
+      "link_id": "goc-date",
+      "text": "Date of conversation",
+      "type": "date",
+      "required": true
+    },
+    {
+      "id": "d4a825d7-e825-5cdd-9076-15c2822b53ef",
+      "link_id": "goc-present",
+      "text": "People present (name and relationship)",
+      "type": "string",
+      "repeats": true
+    },
+    {
+      "id": "548568b5-7447-5284-b5c7-e50cd13f486d",
+      "link_id": "goc-sec-1",
+      "text": "What matters",
+      "type": "group",
+      "questions": [
+        {
+          "id": "5f27f133-918e-5c07-96c8-e3b6ac35865f",
+          "link_id": "goc-1.1",
+          "text": "What matters most to you at the moment?",
+          "type": "text",
+          "max_length": 2000
+        },
+        {
+          "id": "db326638-5578-5ade-9bec-2c3aade13061",
+          "link_id": "goc-1.2",
+          "text": "What are you hoping for from your care?",
+          "type": "text",
+          "max_length": 2000
+        }
+      ]
+    },
+    {
+      "id": "3d67976d-f605-50f9-a375-e57f91a5a9c2",
+      "link_id": "goc-sec-2",
+      "text": "Who was there",
+      "type": "group",
+      "questions": [
+        {
+          "id": "592d7bfe-24f2-54b4-9a53-9085e9435071",
+          "link_id": "goc-2.1",
+          "text": "Who would you like involved in decisions about your care?",
+          "type": "text",
+          "max_length": 2000
+        }
+      ]
+    },
+    {
+      "id": "e223728f-aed1-5a2d-857f-2622ae6d710a",
+      "link_id": "goc-sec-3",
+      "text": "What we discussed",
+      "type": "group",
+      "questions": [
+        {
+          "id": "201137cf-827a-5778-bffb-afeb4c96b6bb",
+          "link_id": "goc-3.1",
+          "text": "What is your understanding of your current health?",
+          "type": "text",
+          "max_length": 2000
+        },
+        {
+          "id": "7ef7ecbd-f2e6-5bc4-a8d4-b0dc14a7a1d4",
+          "link_id": "goc-3.2",
+          "text": "What worries you most about the future?",
+          "type": "text",
+          "max_length": 2000
+        }
+      ]
+    },
+    {
+      "id": "9e539091-7f9a-5098-ba10-6aecaf365ad2",
+      "link_id": "goc-sec-4",
+      "text": "Still to discuss",
+      "type": "group",
+      "questions": [
+        {
+          "id": "ba118653-f4a2-5a21-812d-7fa5b5da993a",
+          "link_id": "goc-4.1",
+          "text": "Is there anything you would like to talk about that we have not covered?",
+          "type": "text",
+          "max_length": 2000
+        }
+      ]
+    },
+    {
+      "id": "0a741129-a813-58c1-bdd1-8779f8a39344",
+      "link_id": "goc-sec-5",
+      "text": "Next steps",
+      "type": "group",
+      "questions": [
+        {
+          "id": "01dea0cd-668f-5a16-bb2d-d639f1c8fe0e",
+          "link_id": "goc-5.1",
+          "text": "What would you like to happen next?",
+          "type": "text",
+          "max_length": 2000
+        },
+        {
+          "id": "7c4ad18b-529c-5ccd-a6bd-84e4d99c93dd",
+          "link_id": "goc-5.2",
+          "text": "Who should hear about what we have agreed?",
+          "type": "text",
+          "max_length": 2000
+        }
+      ]
+    },
+    {
+      "id": "27ec9b37-2ff8-5bb7-846e-943b6697a248",
+      "link_id": "goc-confirmation",
+      "text": "Who has read and confirmed the written summary?",
+      "type": "group",
+      "repeats": true,
+      "description": "One row per person. In Sahara the patient confirms first, then family. Sahara also ties each confirmation to the exact note version; CARE cannot hold that link.",
+      "questions": [
+        {
+          "id": "36da6e8b-f000-5bf1-80f3-8559047ab220",
+          "link_id": "goc-confirm-name",
+          "text": "Name",
+          "type": "string",
+          "required": true,
+          "max_length": 100
+        },
+        {
+          "id": "45eaaa0b-6350-5901-b93e-43c8d85ac25e",
+          "link_id": "goc-confirm-relationship",
+          "text": "Relationship",
+          "type": "choice",
+          "required": true,
+          "answer_option": [
+            {
+              "value": "Patient"
+            },
+            {
+              "value": "Family / carer"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

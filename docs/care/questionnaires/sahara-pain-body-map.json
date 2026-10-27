@@ -1,0 +1,170 @@
+{
+  "slug": "sahara-pain-body-map",
+  "version": "1.0",
+  "status": "draft",
+  "subject_type": "patient",
+  "type": "custom",
+  "title": "Pain by body area (Sahara)",
+  "description": "One row per painful area, each with its own optional 0-10 strength. The 12 areas match Sahara's body model (sahara-body-v1). Exact 3D points are not carried.",
+  "organizations": [
+    "00000000-0000-4000-8000-000000000000"
+  ],
+  "questions": [
+    {
+      "id": "cd08d20a-de06-5c60-a756-b839f5d3d627",
+      "link_id": "pain-observed-at",
+      "text": "When was this observed?",
+      "type": "dateTime",
+      "required": true
+    },
+    {
+      "id": "5782f2fe-11d2-5c80-b612-18f61038c542",
+      "link_id": "pain-respondent",
+      "text": "Who is reporting?",
+      "type": "choice",
+      "required": true,
+      "answer_option": [
+        {
+          "value": "Patient"
+        },
+        {
+          "value": "Patient, with help"
+        },
+        {
+          "value": "Seen by family or carer"
+        },
+        {
+          "value": "Seen by care team"
+        }
+      ]
+    },
+    {
+      "id": "85fa7165-68e9-5438-a66e-dfa99fc6ee44",
+      "link_id": "pain-recall",
+      "text": "Time window",
+      "type": "choice",
+      "required": true,
+      "answer_option": [
+        {
+          "value": "Right now"
+        },
+        {
+          "value": "24-hour average"
+        },
+        {
+          "value": "Worst in 24 hours"
+        }
+      ]
+    },
+    {
+      "id": "bf6e6a8c-bdf3-5ece-9017-315848c3e4be",
+      "link_id": "pain-author",
+      "text": "Who wrote or observed this note? (name)",
+      "type": "string",
+      "required": true,
+      "max_length": 120
+    },
+    {
+      "id": "b59bd529-af89-56c4-a5b9-48fc509cfd8c",
+      "link_id": "pain-spot",
+      "text": "Painful area",
+      "type": "group",
+      "repeats": true,
+      "questions": [
+        {
+          "id": "a911e09a-407c-53c7-9601-b8a7aa5f1934",
+          "link_id": "pain-site",
+          "text": "Where?",
+          "type": "choice",
+          "required": true,
+          "answer_option": [
+            {
+              "value": "Head"
+            },
+            {
+              "value": "Neck"
+            },
+            {
+              "value": "Chest"
+            },
+            {
+              "value": "Abdomen"
+            },
+            {
+              "value": "Upper back"
+            },
+            {
+              "value": "Lower back"
+            },
+            {
+              "value": "Left shoulder"
+            },
+            {
+              "value": "Right shoulder"
+            },
+            {
+              "value": "Left arm / hand"
+            },
+            {
+              "value": "Right arm / hand"
+            },
+            {
+              "value": "Left leg / foot"
+            },
+            {
+              "value": "Right leg / foot"
+            }
+          ]
+        },
+        {
+          "id": "f9999d6c-20c3-528a-9d82-38881ddfab3f",
+          "link_id": "pain-rating",
+          "text": "How strong is it here? (0-10)",
+          "type": "integer",
+          "description": "0 = none, 10 = worst imaginable. Leave blank if not rated."
+        }
+      ]
+    },
+    {
+      "id": "0f8edcbb-080a-5187-888c-6feecc5ad72a",
+      "link_id": "pain-location",
+      "text": "Where exactly, in a few words?",
+      "type": "string",
+      "max_length": 100
+    },
+    {
+      "id": "0ef85598-c171-5273-a461-b1e4d7153129",
+      "link_id": "pain-triggers",
+      "text": "When is it worse?",
+      "type": "choice",
+      "repeats": true,
+      "answer_option": [
+        {
+          "value": "At rest"
+        },
+        {
+          "value": "Turning in bed"
+        },
+        {
+          "value": "Standing / walking"
+        },
+        {
+          "value": "Coughing"
+        },
+        {
+          "value": "Other"
+        },
+        {
+          "value": "Not sure"
+        }
+      ]
+    },
+    {
+      "id": "8ce60b76-dc7b-5661-b2a8-f0020f349789",
+      "link_id": "pain-note",
+      "text": "Describe the pain in your own words",
+      "type": "text",
+      "max_length": 500
+    }
+  ]
+}
