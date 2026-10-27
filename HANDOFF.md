@@ -268,7 +268,7 @@ Also read:
 ### Language, identity, data
 | Item | Next step | Who |
 |---|---|---|
-| F1 | Hindi across the whole app (2–3 days; `CLAUDE_TRANSCRIPT.md` §3), then Telugu | Owner decides, Awaiz builds |
+| F1 | ~~Hindi across the whole app~~ mostly done on branch `sa3-hindi` (family screens + main doctor screens; see lane notes); Telugu later | Owner decides, Awaiz builds |
 | F2 | iPhone users use the website; no iOS app before the final | Owner |
 | G1, G2 | Doctor approval stays manual for now; real doctor account and Supabase email setting (`CLAUDE_TRANSCRIPT.md` §3 "Set up / do") | Owner |
 | G3 | ABHA link: later | Owner |
@@ -309,3 +309,4 @@ Sources: `docs/research/CARE_DEEP_DIVE_2026-10-27.md`, `CARE_VS_SAHARA_FOR_TEAM.
 
 ### Lane notes (27 Oct)
 - **Polish lane:** an up/down swipe over the pain-strength bar (3D pain body) or the check-in / feedback slider now scrolls the page and never changes the score; only a tap or a deliberate sideways drag sets it (`SaharaSliderTouch.kt`, unit-tested in `SliderTouchPolicyTest`). TalkBack and keyboard still adjust the slider. A second tap on an already-saved check-in no longer adds a second entry, and the "please wait" message now says a change is still saving. In the doctor's embedded Daily care, the "Symptom tracker" button did nothing; it now opens the symptom diary. Not tried on a phone (no device or emulator); the swipe androidTest compiles but has not run.
+- **Hindi lane (F1, branch `sa3-hindi`):** one English/हिन्दी choice (`CareLanguage.kt`, inline `t("English", "हिन्दी")`) now covers every screen: switch on Welcome, More and the doctor Account tab; an account with no saved choice inherits the phone's last choice, so Hindi survives sign-in. Fully Hindi: Welcome, Today, Daily care, Calendar, Care team, Lab history, Reminders, check-in, Medicines/prescription scanner, Docs + report review, Nearby, More/Account/Add family, Talk, note reader, read-aloud/translation, symptom-diary save errors; doctor: signed-in workspace, patient day, medicines, visits, overview, progress, conversations, care team, reports, visit/prescription editors. Saved values (moods, categories, statuses, relations, reporters) stay English. Left in English: doctor walkthrough demo (`DoctorDemoUi`), recording/capture panels (`DoctorRecordingReviewUi`, `DoctorAudioCapture`, `DoctorRecordStage`, `DoctorLocalPreviewCapture`, `DoctorPreparationQuestions`, `DoctorConversationsUi`, `DoctorAttendees`), medicine status-chip labels, AI-organizer warnings, Emergency card (already partly bilingual), Google Translate legal notice. `CareHindiCoverageTest` fails on English-only text in the covered screens. Hindi wording not reviewed by a native clinician; not tried on a phone.

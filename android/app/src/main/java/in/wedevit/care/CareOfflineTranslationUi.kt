@@ -22,7 +22,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 /** A separate reading aid: never modifies or publishes the reviewed care-note version. */
-@Composable fun CareOfflineTranslationPanel(source: String, versionId: String) {
+@Composable fun CareOfflineTranslationPanel(source: String, versionId: String) { val t = careText();
     val service = remember { CareOfflineTranslation() }
     val scope = rememberCoroutineScope()
     val clipboard = LocalClipboardManager.current
@@ -38,35 +38,35 @@ import kotlinx.coroutines.launch
     var error by remember(versionId, source) { mutableStateOf("") }
     var job by remember { mutableStateOf<Job?>(null) }
     var notices by remember { mutableStateOf(false) }
-    LaunchedEffect(Unit) { try { available = service.installed() } catch (failure: Exception) { if (failure is CancellationException) throw failure; error = "Could not check the downloaded language pack." } }
+    LaunchedEffect(Unit) { try { available = service.installed() } catch (failure: Exception) { if (failure is CancellationException) throw failure; error = t("Could not check the downloaded language pack.", "डाउनलोड किया भाषा पैक जाँचा नहीं जा सका।") } }
     DisposableEffect(versionId, source) { onDispose { job?.cancel() } }
     SurfaceCard(Mint) {
         Text("हिन्दी / English", fontWeight = FontWeight.Bold)
-        Text("Read alongside the original", style = MaterialTheme.typography.bodySmall)
+        Text(t("Read alongside the original", "मूल के साथ पढ़ें"), style = MaterialTheme.typography.bodySmall)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf("hi" to "हिन्दी", "en" to "English").forEach { (code, label) ->
                 FilterChip(selected = target == code, onClick = { target = code; result = emptyList(); checked = false }, enabled = !busy, label = { Text(label) })
             }
         }
         if (available != true) {
-            Text("Download the language pack once (about 30 MB). Reading then works offline.", style = MaterialTheme.typography.bodySmall)
-            CheckLine(wifiOnly, { wifiOnly = it }, "Download over Wi-Fi only")
+            Text(t("Download the language pack once (about 30 MB). Reading then works offline.", "भाषा पैक एक बार डाउनलोड करें (लगभग 30 MB)। फिर बिना इंटरनेट पढ़ सकेंगे।"), style = MaterialTheme.typography.bodySmall)
+            CheckLine(wifiOnly, { wifiOnly = it }, t("Download over Wi-Fi only", "सिर्फ़ Wi-Fi पर डाउनलोड करें"))
             OutlinedButton(onClick = {
                 downloadBusy = true; error = ""
                 job = scope.launch { try { service.download(wifiOnly); available = true } catch (failure: Exception) {
                     if (failure is CancellationException) throw failure
-                    error = "Language pack download failed. Check the connection and try again."
+                    error = t("Language pack download failed. Check the connection and try again.", "भाषा पैक डाउनलोड नहीं हुआ। इंटरनेट जाँचकर फिर कोशिश करें।")
                 } finally { downloadBusy = false } }
-            }, enabled = !downloadBusy, modifier = Modifier.testTag("offline-translation-download")) { Text(if (downloadBusy) "Downloading language pack…" else "Download Hindi–English pack") }
-            if (downloadBusy) TextButton(onClick = { job?.cancel(); downloadBusy = false }) { Text("Stop waiting") }
+            }, enabled = !downloadBusy, modifier = Modifier.testTag("offline-translation-download")) { Text(if (downloadBusy) t("Downloading language pack…", "भाषा पैक डाउनलोड हो रहा है…") else t("Download Hindi–English pack", "हिन्दी–अंग्रेज़ी पैक डाउनलोड करें")) }
+            if (downloadBusy) TextButton(onClick = { job?.cancel(); downloadBusy = false }) { Text(t("Stop waiting", "इंतज़ार बंद करें")) }
         } else {
             Button(onClick = {
                 busy = true; error = ""; checked = false; result = emptyList(); progress = 0 to 0
                 job = scope.launch { try { result = service.translate(source, target) { done, total -> progress = done to total } }
-                catch (failure: Exception) { if (failure is CancellationException) throw failure; error = failure.message ?: "Could not translate. The original is unchanged." }
+                catch (failure: Exception) { if (failure is CancellationException) throw failure; error = failure.message ?: t("Could not translate. The original is unchanged.", "अनुवाद नहीं हो सका। मूल वैसा ही है।") }
                 finally { busy = false } }
-            }, enabled = !busy && source.isNotBlank(), modifier = Modifier.testTag("offline-translation-start")) { Text(if (busy) "Reading line ${progress.first} / ${progress.second}" else if (target == "hi") "Translate with Google · हिन्दी" else "Translate with Google · English") }
-            if (busy) TextButton(onClick = { job?.cancel(); busy = false }) { Text("Cancel") }
+            }, enabled = !busy && source.isNotBlank(), modifier = Modifier.testTag("offline-translation-start")) { Text(if (busy) t("Reading line ${progress.first} / ${progress.second}", "पंक्ति ${progress.first} / ${progress.second} पढ़ रहे हैं") else if (target == "hi") "Translate with Google · हिन्दी" else "Translate with Google · English") }
+            if (busy) TextButton(onClick = { job?.cancel(); busy = false }) { Text(t("Cancel", "रद्द करें")) }
         }
         if (error.isNotBlank()) Text(error, color = MaterialTheme.colorScheme.error)
         if (result.isNotEmpty()) {
@@ -77,22 +77,22 @@ import kotlinx.coroutines.launch
                     SelectionContainerText(line.translated)
                 }
             }
-            Text("Check names, medicines, numbers and words such as ‘not’. Mixed or Roman Hindi may need correction by a bilingual person. This reading aid does not change the care note.", style = MaterialTheme.typography.bodySmall)
+            Text(t("Check names, medicines, numbers and words such as ‘not’. Mixed or Roman Hindi may need correction by a bilingual person. This reading aid does not change the care note.", "नाम, दवाएँ, अंक और ‘नहीं’ जैसे शब्द जाँचें। मिली-जुली या रोमन में लिखी हिन्दी को दोनों भाषाएँ जानने वाला व्यक्ति ठीक करे। यह पढ़ने की मदद केयर नोट नहीं बदलती।"), style = MaterialTheme.typography.bodySmall)
             CheckLine(checked, { checked = it }, "A Hindi/English reader checked this translation · अनुवाद जाँच लिया")
             if (checked) {
                 val translated = result.joinToString("\n") { it.translated }
                 CareReadAloudControl(translated, "$versionId-offline-$target", if (target == "hi") "hi-IN" else "en-IN")
-                OutlinedButton(onClick = { clipboard.setText(AnnotatedString("Machine translation · human checked\n${result.joinToString("\n\n") { "${it.original}\n${it.translated}" }}")) }) { Text("Copy both languages") }
+                OutlinedButton(onClick = { clipboard.setText(AnnotatedString("Machine translation · human checked\n${result.joinToString("\n\n") { "${it.original}\n${it.translated}" }}")) }) { Text(t("Copy both languages", "दोनों भाषाएँ कॉपी करें")) }
             }
             Image(painterResource(R.drawable.google_translate_attribution), contentDescription = "Powered by Google Translate", modifier = Modifier.width(150.dp))
-            TextButton(onClick = { notices = true }) { Text("Translation notices") }
+            TextButton(onClick = { notices = true }) { Text(t("Translation notices", "अनुवाद की सूचनाएँ")) }
         }
     }
-    if (notices) AlertDialog(onDismissRequest = { notices = false }, title = { Text("Translation notices") }, text = {
+    if (notices) AlertDialog(onDismissRequest = { notices = false }, title = { Text(t("Translation notices", "अनुवाद की सूचनाएँ")) }, text = {
         Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text("Google Translate powers this optional reading aid through ML Kit on-device models. Text stays on the device; language-pack downloads need a connection. Check translations with a bilingual person before relying on them.")
+            Text(t("Google Translate powers this optional reading aid through ML Kit on-device models. Text stays on the device; language-pack downloads need a connection. Check translations with a bilingual person before relying on them.", "Google Translate यह वैकल्पिक पढ़ने की मदद ML Kit के फ़ोन वाले मॉडल से देता है। लिखाई फ़ोन पर ही रहती है; भाषा पैक डाउनलोड के लिए इंटरनेट चाहिए। भरोसा करने से पहले अनुवाद दोनों भाषाएँ जानने वाले व्यक्ति से जँचवाएँ।"))
             Text("THIS SERVICE MAY CONTAIN TRANSLATIONS POWERED BY GOOGLE. GOOGLE DISCLAIMS ALL WARRANTIES RELATED TO THE TRANSLATIONS, EXPRESS OR IMPLIED, INCLUDING ANY WARRANTIES OF ACCURACY, RELIABILITY, AND ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.", style = MaterialTheme.typography.bodySmall)
-            TextButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse("https://cloud.google.com/translate"))) }) { Text("Google Translate information") }
+            TextButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse("https://cloud.google.com/translate"))) }) { Text(t("Google Translate information", "Google Translate की जानकारी")) }
         }
-    }, confirmButton = { TextButton(onClick = { notices = false }) { Text("Close") } })
+    }, confirmButton = { TextButton(onClick = { notices = false }) { Text(t("Close", "बंद करें")) } })
 }

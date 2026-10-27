@@ -63,20 +63,20 @@ object PatientWalkthrough {
 }
 
 /** Two ready-made users. Choosing one enters the walkthrough as that user. */
-@Composable fun PatientWalkthroughChooser(onPick: (String) -> Unit, onDismiss: () -> Unit) {
-    AlertDialog(onDismissRequest = onDismiss, modifier = Modifier.testTag("patient-walkthrough-chooser"), title = { Text("Try the walkthrough") },
+@Composable fun PatientWalkthroughChooser(onPick: (String) -> Unit, onDismiss: () -> Unit) { val t = careText();
+    AlertDialog(onDismissRequest = onDismiss, modifier = Modifier.testTag("patient-walkthrough-chooser"), title = { Text(t("Try the walkthrough", "डेमो देखें")) },
         text = { Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             PatientWalkthrough.users.forEach { user ->
                 Card(Modifier.fillMaxWidth().testTag("patient-walkthrough-${user.key}").clickable { onPick(user.key) }) {
-                    Column(Modifier.padding(16.dp)) { Text("${user.name} — ${user.role}", fontWeight = FontWeight.SemiBold, fontSize = 17.sp); Text(user.summary, style = MaterialTheme.typography.bodyMedium) }
+                    Column(Modifier.padding(16.dp)) { Text("${user.name} — " + if (user.role == "Patient") t("Patient", "मरीज़") else t("Family", "परिवार"), fontWeight = FontWeight.SemiBold, fontSize = 17.sp); Text(if (user.key == "rahul") t(user.summary, "अपना देखभाल रिकॉर्ड देखते हैं") else t(user.summary, "राहुल के भाई · परिवार को दिखने वाली जानकारी देखते हैं"), style = MaterialTheme.typography.bodyMedium) }
                 }
             }
         } },
-        confirmButton = {}, dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } })
+        confirmButton = {}, dismissButton = { TextButton(onClick = onDismiss) { Text(t("Cancel", "रद्द करें")) } })
 }
 
 /** Hosts the normal patient app on a local model fixed to one walkthrough user. Leaving restores the real app. */
-@Composable fun PatientWalkthroughHost(userKey: String, onExit: () -> Unit, onSwitch: (String) -> Unit = {}) {
+@Composable fun PatientWalkthroughHost(userKey: String, onExit: () -> Unit, onSwitch: (String) -> Unit = {}) { val t = careText();
     val user = PatientWalkthrough.user(userKey)
     if (user == null) { LaunchedEffect(Unit) { onExit() }; return }
     val context = LocalContext.current.applicationContext
@@ -90,7 +90,7 @@ object PatientWalkthrough {
     DisposableEffect(vm) { onDispose { vm.closeDoctorDemo() } }
     LaunchedEffect(vm, attempt) {
         try { PatientWalkthrough.seed(vm, context); vm.select(PatientWalkthrough.personId); vm.refreshCareContacts(); vm.refreshMedicineHistory(); ready = true }
-        catch (e: Exception) { if (e is CancellationException) throw e; android.util.Log.e("SaharaSeed", "patient walkthrough load failed", e); error = "The walkthrough could not load. Your own profiles were not changed." }
+        catch (e: Exception) { if (e is CancellationException) throw e; android.util.Log.e("SaharaSeed", "patient walkthrough load failed", e); error = t("The walkthrough could not load. Your own profiles were not changed.", "डेमो नहीं खुल सका। आपकी अपनी प्रोफ़ाइल नहीं बदलीं।") }
     }
     val person = PatientWalkthrough.visiblePeople(people).firstOrNull()
     val state = when {
@@ -103,10 +103,10 @@ object PatientWalkthrough {
     // Back while the walkthrough is still opening, failed or removed leaves it; back while leaving waits.
     BackHandler(state != "open") { leave() }
     SaharaScreenHost(state, Modifier.fillMaxSize().background(Cream), label = "Patient walkthrough") { shown -> when (shown) {
-        "closing" -> SaharaLoading("Leaving the walkthrough…")
-        "error" -> Box(Modifier.fillMaxSize().safeDrawingPadding(), contentAlignment = Alignment.Center) { SaharaEmpty(error ?: "", actionLabel = "Retry", onAction = { error = null; attempt++ }, secondaryLabel = "Leave walkthrough", onSecondary = ::leave) }
-        "removed" -> Box(Modifier.fillMaxSize().safeDrawingPadding(), contentAlignment = Alignment.Center) { SaharaEmpty("Rahul's walkthrough record was removed. It will not be recreated automatically.", secondaryLabel = "Leave walkthrough", onSecondary = ::leave) }
-        "opening" -> SaharaLoading("Opening care records…")
-        else -> CareApp(vm, onAccount = { vm.message.value = "Account and sharing are unavailable in the walkthrough." }, walkthrough = user, onLeaveWalkthrough = ::leave, onSwitchWalkthrough = ::switchTo)
+        "closing" -> SaharaLoading(t("Leaving the walkthrough…", "डेमो से बाहर जा रहे हैं…"))
+        "error" -> Box(Modifier.fillMaxSize().safeDrawingPadding(), contentAlignment = Alignment.Center) { SaharaEmpty(error ?: "", actionLabel = "Retry", onAction = { error = null; attempt++ }, secondaryLabel = t("Leave walkthrough", "डेमो से बाहर जाएँ"), onSecondary = ::leave) }
+        "removed" -> Box(Modifier.fillMaxSize().safeDrawingPadding(), contentAlignment = Alignment.Center) { SaharaEmpty(t("Rahul's walkthrough record was removed. It will not be recreated automatically.", "राहुल का डेमो रिकॉर्ड हटा दिया गया। यह अपने-आप दोबारा नहीं बनेगा।"), secondaryLabel = t("Leave walkthrough", "डेमो से बाहर जाएँ"), onSecondary = ::leave) }
+        "opening" -> SaharaLoading(t("Opening care records…", "देखभाल रिकॉर्ड खुल रहे हैं…"))
+        else -> CareApp(vm, onAccount = { vm.message.value = t("Account and sharing are unavailable in the walkthrough.", "डेमो में खाता और साझा करना उपलब्ध नहीं है।") }, walkthrough = user, onLeaveWalkthrough = ::leave, onSwitchWalkthrough = ::switchTo)
     } }
 }

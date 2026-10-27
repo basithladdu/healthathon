@@ -31,7 +31,7 @@ fun labGroups(items: List<CareItem>): List<List<Pair<CareItem, CareEntry>>> = it
 }.groupBy { (item, data) -> item.title.trim().lowercase() to data.unit.trim() }.values
     .map { values -> values.sortedByDescending { it.first.due } }.sortedByDescending { it.first().first.due }
 
-@Composable fun CareLabs(vm: CareModel) {
+@Composable fun CareLabs(vm: CareModel) { val t = careText();
     val entries by vm.items.collectAsStateWithLifecycle()
     val selected by vm.selected.collectAsStateWithLifecycle()
     val canEdit by vm.canEdit.collectAsStateWithLifecycle()
@@ -40,11 +40,11 @@ fun labGroups(items: List<CareItem>): List<List<Pair<CareItem, CareEntry>>> = it
     var editing by remember { mutableStateOf<CareItem?>(null) }
     val groups = labGroups(entries.filter { it.personId == selected && it.title.contains(query.trim(), ignoreCase = true) })
     LazyColumn(Modifier.fillMaxSize().testTag("lab-history"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { Heading("Lab history"); Spacer(Modifier.weight(1f)); if (canEdit) FilledTonalIconButton(onClick = { adding = true }, colors = IconButtonDefaults.filledTonalIconButtonColors(containerColor = Gold)) { Icon(Icons.Default.Add, "Add a lab result") } } }
-        item { OutlinedTextField(query, { query = it }, placeholder = { Text("Find a test") }, leadingIcon = { Icon(Icons.Default.Search, null) }, trailingIcon = { if (query.isNotEmpty()) IconButton(onClick = { query = "" }) { Icon(Icons.Default.Close, "Clear search") } }, singleLine = true, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp)) }
-        if (groups.isEmpty()) item { SurfaceCard { Icon(Icons.Default.Science, null, tint = Rust, modifier = Modifier.size(34.dp)); Spacer(Modifier.height(8.dp)); Text(if (query.isBlank()) "Keep results together" else "No matching results", fontSize = 20.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont); if (query.isBlank()) { Text("Copy the value, unit and date from the report.", style = MaterialTheme.typography.bodyMedium); if (canEdit) TextButton(onClick = { adding = true }) { Text("Add a result") } } else TextButton(onClick = { query = "" }) { Text("Clear search") } } }
+        item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { Heading(t("Lab history", "जाँच रिपोर्टें")); Spacer(Modifier.weight(1f)); if (canEdit) FilledTonalIconButton(onClick = { adding = true }, colors = IconButtonDefaults.filledTonalIconButtonColors(containerColor = Gold)) { Icon(Icons.Default.Add, t("Add a lab result", "जाँच का नतीजा जोड़ें")) } } }
+        item { OutlinedTextField(query, { query = it }, placeholder = { Text(t("Find a test", "जाँच खोजें")) }, leadingIcon = { Icon(Icons.Default.Search, null) }, trailingIcon = { if (query.isNotEmpty()) IconButton(onClick = { query = "" }) { Icon(Icons.Default.Close, t("Clear search", "खोज मिटाएँ")) } }, singleLine = true, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp)) }
+        if (groups.isEmpty()) item { SurfaceCard { Icon(Icons.Default.Science, null, tint = Rust, modifier = Modifier.size(34.dp)); Spacer(Modifier.height(8.dp)); Text(if (query.isBlank()) t("Keep results together", "सारे नतीजे एक जगह रखें") else t("No matching results", "कोई नतीजा नहीं मिला"), fontSize = 20.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont); if (query.isBlank()) { Text(t("Copy the value, unit and date from the report.", "रिपोर्ट से मान, इकाई और तारीख़ लिखें।"), style = MaterialTheme.typography.bodyMedium); if (canEdit) TextButton(onClick = { adding = true }) { Text(t("Add a result", "नतीजा जोड़ें")) } } else TextButton(onClick = { query = "" }) { Text(t("Clear search", "खोज मिटाएँ")) } } }
         items(groups, key = { values -> "${values.first().first.title.lowercase()}:${values.first().second.unit}" }) { values -> LabHistoryCard(vm, values, onEdit = { editing = it }) }
-        if (groups.isNotEmpty()) item { Text("Values and reference ranges are copied from reports. Ask your clinician what they mean for your care.", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall) }
+        if (groups.isNotEmpty()) item { Text(t("Values and reference ranges are copied from reports. Ask your clinician what they mean for your care.", "मान और सामान्य सीमा रिपोर्ट से लिखे गए हैं। इनका आपकी देखभाल के लिए क्या मतलब है, डॉक्टर से पूछें।"), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall) }
     }
     if (adding) CareLabEditor(vm) { adding = false }
     editing?.let { item -> CareLabEditor(vm, item) { editing = null } }
@@ -61,7 +61,7 @@ fun labGroups(items: List<CareItem>): List<List<Pair<CareItem, CareEntry>>> = it
     }
 }
 
-@Composable private fun LabHistoryPlot(values: List<Pair<CareItem, CareEntry>>) {
+@Composable private fun LabHistoryPlot(values: List<Pair<CareItem, CareEntry>>) { val t = careText();
     val points = values.mapNotNull { (item, entry) -> entry.value.toDoubleOrNull()?.takeIf { it.isFinite() }?.let { item.due.toDouble() to it } }.sortedBy { it.first }
     if (points.size < 2) return
     val firstTime = points.first().first
@@ -69,7 +69,7 @@ fun labGroups(items: List<CareItem>): List<List<Pair<CareItem, CareEntry>>> = it
     val min = points.minOf { it.second }
     val max = points.maxOf { it.second }
     val span = (max - min).takeIf { it > 0 } ?: 1.0
-    Row(Modifier.fillMaxWidth().padding(top = 12.dp), horizontalArrangement = Arrangement.SpaceBetween) { Text("${min.toBigDecimal().stripTrailingZeros().toPlainString()}–${max.toBigDecimal().stripTrailingZeros().toPlainString()} ${values.first().second.unit}", style = MaterialTheme.typography.labelSmall); Text("Recorded values", style = MaterialTheme.typography.labelSmall) }
+    Row(Modifier.fillMaxWidth().padding(top = 12.dp), horizontalArrangement = Arrangement.SpaceBetween) { Text("${min.toBigDecimal().stripTrailingZeros().toPlainString()}–${max.toBigDecimal().stripTrailingZeros().toPlainString()} ${values.first().second.unit}", style = MaterialTheme.typography.labelSmall); Text(t("Recorded values", "दर्ज मान"), style = MaterialTheme.typography.labelSmall) }
     Canvas(Modifier.fillMaxWidth().height(82.dp).padding(vertical = 10.dp)) {
         val padding = 8.dp.toPx()
         val plotWidth = size.width - padding * 2
@@ -81,7 +81,7 @@ fun labGroups(items: List<CareItem>): List<List<Pair<CareItem, CareEntry>>> = it
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { Text(date(points.first().first.toLong()), style = MaterialTheme.typography.labelSmall); Text(date(points.last().first.toLong()), style = MaterialTheme.typography.labelSmall) }
 }
 
-@Composable private fun LabResultRow(vm: CareModel, item: CareItem, data: CareEntry, showDate: Boolean, onEdit: () -> Unit) {
+@Composable private fun LabResultRow(vm: CareModel, item: CareItem, data: CareEntry, showDate: Boolean, onEdit: () -> Unit) { val t = careText();
     val reports by vm.reports.collectAsStateWithLifecycle()
     val canEdit by vm.canEdit.collectAsStateWithLifecycle()
     val busy by vm.busy.collectAsStateWithLifecycle()
@@ -91,19 +91,19 @@ fun labGroups(items: List<CareItem>): List<List<Pair<CareItem, CareEntry>>> = it
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         Column(Modifier.weight(1f)) {
             if (showDate) { Text(date(item.due), fontWeight = FontWeight.SemiBold); Text("${data.value} ${data.unit}", color = Rust, style = MaterialTheme.typography.titleMedium) }
-            val printedRange = data.rangeText.ifBlank { when { data.rangeLow.isNotBlank() && data.rangeHigh.isNotBlank() -> "${data.rangeLow}–${data.rangeHigh} ${data.unit}"; data.rangeLow.isNotBlank() -> "From ${data.rangeLow} ${data.unit}"; data.rangeHigh.isNotBlank() -> "Up to ${data.rangeHigh} ${data.unit}"; else -> "" } }
-            if (printedRange.isNotBlank()) Text("Printed range: $printedRange", style = MaterialTheme.typography.bodySmall)
-            CareLabRules.printedFlag(data)?.let { flag -> Text(flag, style = MaterialTheme.typography.labelMedium, color = if (flag.startsWith("Within")) MaterialTheme.colorScheme.secondary else Rust) }
+            val printedRange = data.rangeText.ifBlank { when { data.rangeLow.isNotBlank() && data.rangeHigh.isNotBlank() -> "${data.rangeLow}–${data.rangeHigh} ${data.unit}"; data.rangeLow.isNotBlank() -> t("From ${data.rangeLow} ${data.unit}", "कम से कम ${data.rangeLow} ${data.unit}"); data.rangeHigh.isNotBlank() -> t("Up to ${data.rangeHigh} ${data.unit}", "ज़्यादा से ज़्यादा ${data.rangeHigh} ${data.unit}"); else -> "" } }
+            if (printedRange.isNotBlank()) Text(t("Printed range: $printedRange", "छपी सीमा: $printedRange"), style = MaterialTheme.typography.bodySmall)
+            CareLabRules.printedFlag(data)?.let { flag -> Text(t(flag, when { flag.startsWith("Low") -> "कम · छपी सीमा से नीचे"; flag.startsWith("High") -> "ज़्यादा · छपी सीमा से ऊपर"; else -> "छपी सीमा के अंदर" }), style = MaterialTheme.typography.labelMedium, color = if (flag.startsWith("Within")) MaterialTheme.colorScheme.secondary else Rust) }
             if (data.detail.isNotBlank()) Text(data.detail, style = MaterialTheme.typography.bodySmall)
             if (data.reportName.isNotBlank()) Text(data.reportName, style = MaterialTheme.typography.bodySmall)
-            if (data.reportId.isNotBlank() && report == null) Text("Report file unavailable here", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            if (data.reportId.isNotBlank() && report == null) Text(t("Report file unavailable here", "रिपोर्ट की फ़ाइल यहाँ नहीं है"), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
-        if (canEdit) IconButton(onClick = onEdit, enabled = !busy) { Icon(Icons.Default.Edit, "Edit ${item.title} result from ${date(item.due)}") }
+        if (canEdit) IconButton(onClick = onEdit, enabled = !busy) { Icon(Icons.Default.Edit, t("Edit ${item.title} result from ${date(item.due)}", "${date(item.due)} का ${item.title} नतीजा बदलें")) }
     }
-    if (report != null) TextButton(onClick = { runCatching { vm.reportFiles.intent(report, false) }.onSuccess { open(context, it) }.onFailure { vm.message.value = "Couldn't open this report. Add it again from Files." } }) { Icon(Icons.Default.OpenInNew, null, Modifier.size(17.dp)); Spacer(Modifier.width(6.dp)); Text("Open report") }
+    if (report != null) TextButton(onClick = { runCatching { vm.reportFiles.intent(report, false) }.onSuccess { open(context, it) }.onFailure { vm.message.value = t("Couldn't open this report. Add it again from Files.", "यह रिपोर्ट नहीं खुल सकी। Files से इसे फिर जोड़ें।") } }) { Icon(Icons.Default.OpenInNew, null, Modifier.size(17.dp)); Spacer(Modifier.width(6.dp)); Text(t("Open report", "रिपोर्ट खोलें")) }
 }
 
-@Composable private fun CareLabEditor(vm: CareModel, initial: CareItem? = null, onDismiss: () -> Unit) {
+@Composable private fun CareLabEditor(vm: CareModel, initial: CareItem? = null, onDismiss: () -> Unit) { val t = careText();
     val selected by vm.selected.collectAsStateWithLifecycle()
     val reports by vm.reports.collectAsStateWithLifecycle()
     val canEdit by vm.canEdit.collectAsStateWithLifecycle()
@@ -128,42 +128,42 @@ fun labGroups(items: List<CareItem>): List<List<Pair<CareItem, CareEntry>>> = it
     LaunchedEffect(selected) { if (selected != captured) onDismiss() }
     ModalBottomSheet(onDismissRequest = { if (!busy) onDismiss() }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(start = 20.dp, end = 20.dp, bottom = 28.dp).testTag("lab-editor"), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Heading(if (initial == null) "Add a lab result" else "Edit lab result", 26)
-            OutlinedTextField(name, { name = it; error = "" }, label = { Text("Test name on report") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
+            Heading(if (initial == null) t("Add a lab result", "जाँच का नतीजा जोड़ें") else t("Edit lab result", "जाँच का नतीजा बदलें"), 26)
+            OutlinedTextField(name, { name = it; error = "" }, label = { Text(t("Test name on report", "रिपोर्ट पर जाँच का नाम")) }, modifier = Modifier.fillMaxWidth(), singleLine = true)
             if (name.isBlank()) Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) { listOf("Haemoglobin", "Red blood cells", "Platelets", "Creatinine", "Sodium").forEach { suggestion -> SuggestionChip(onClick = { name = suggestion }, label = { Text(suggestion) }) } }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(value, { value = it; error = "" }, label = { Text("Value") }, modifier = Modifier.weight(1f), singleLine = true, keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Decimal))
-                OutlinedTextField(unit, { unit = it; error = "" }, label = { Text("Printed unit") }, modifier = Modifier.weight(1f), singleLine = true)
+                OutlinedTextField(value, { value = it; error = "" }, label = { Text(t("Value", "मान")) }, modifier = Modifier.weight(1f), singleLine = true, keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Decimal))
+                OutlinedTextField(unit, { unit = it; error = "" }, label = { Text(t("Printed unit", "छपी इकाई")) }, modifier = Modifier.weight(1f), singleLine = true)
             }
-            CareDateButton(due, "Report date", { due = it }, latest = LocalDate.now())
+            CareDateButton(due, t("Report date", "रिपोर्ट की तारीख़"), { due = it }, latest = LocalDate.now())
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Text("Printed reference range (optional)", style = MaterialTheme.typography.labelLarge)
+                Text(t("Printed reference range (optional)", "छपी सामान्य सीमा (चाहें तो)"), style = MaterialTheme.typography.labelLarge)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedTextField(low, { low = it }, label = { Text("Lower") }, modifier = Modifier.weight(1f), singleLine = true, keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Decimal))
-                    OutlinedTextField(high, { high = it }, label = { Text("Upper") }, modifier = Modifier.weight(1f), singleLine = true, keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Decimal))
+                    OutlinedTextField(low, { low = it }, label = { Text(t("Lower", "निचली")) }, modifier = Modifier.weight(1f), singleLine = true, keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Decimal))
+                    OutlinedTextField(high, { high = it }, label = { Text(t("Upper", "ऊपरी")) }, modifier = Modifier.weight(1f), singleLine = true, keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Decimal))
                 }
-                OutlinedTextField(rangeText, { rangeText = it }, label = { Text("Or copy the printed range") }, modifier = Modifier.fillMaxWidth(), maxLines = 2)
-                Text("Linked report", style = MaterialTheme.typography.labelLarge)
+                OutlinedTextField(rangeText, { rangeText = it }, label = { Text(t("Or copy the printed range", "या छपी सीमा लिखें")) }, modifier = Modifier.fillMaxWidth(), maxLines = 2)
+                Text(t("Linked report", "जुड़ी रिपोर्ट"), style = MaterialTheme.typography.labelLarge)
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    FilterChip(selected = reportId.isBlank(), onClick = { reportId = ""; reportName = "" }, label = { Text("No report link") }, modifier = Modifier.heightIn(min = 48.dp))
+                    FilterChip(selected = reportId.isBlank(), onClick = { reportId = ""; reportName = "" }, label = { Text(t("No report link", "रिपोर्ट नहीं जोड़ी")) }, modifier = Modifier.heightIn(min = 48.dp))
                     reports.filter { it.personId == captured }.forEach { report ->
                         FilterChip(selected = reportId == report.id, onClick = { reportId = report.id; reportName = report.name }, label = { Text(report.name) }, modifier = Modifier.heightIn(min = 48.dp))
                     }
                 }
-                if (reports.none { it.personId == captured }) Text("Add report files in Documents to link them here.", style = MaterialTheme.typography.bodySmall)
-                OutlinedTextField(detail, { detail = it }, label = { Text("Report notes (optional)") }, modifier = Modifier.fillMaxWidth(), maxLines = 3)
+                if (reports.none { it.personId == captured }) Text(t("Add report files in Documents to link them here.", "यहाँ जोड़ने के लिए कागज़ात में रिपोर्ट की फ़ाइलें डालें।"), style = MaterialTheme.typography.bodySmall)
+                OutlinedTextField(detail, { detail = it }, label = { Text(t("Report notes (optional)", "रिपोर्ट पर नोट (चाहें तो)")) }, modifier = Modifier.fillMaxWidth(), maxLines = 3)
             }
             (error.ifBlank { saveError.orEmpty() }).takeIf(String::isNotBlank)?.let { Text(it, color = MaterialTheme.colorScheme.error) }
             Button(onClick = { runCatching {
-                require(selected == captured && canEdit) { "Choose the right person before saving." }
+                require(selected == captured && canEdit) { t("Choose the right person before saving.", "सहेजने से पहले सही व्यक्ति चुनें।") }
                 val data = CareEntry(type = "lab", detail = detail.trim(), sender = existing?.sender ?: vm.cloud?.session?.value?.email.orEmpty(), value = value.trim(), unit = unit.trim(), rangeLow = low.trim(), rangeHigh = high.trim(), rangeText = rangeText.trim(), reportId = reportId, reportName = reportName)
                 CareLabRules.validate(name, data, due)
                 val encoded = CareEntryCodec.encode(data)
                 if (initial == null) vm.saveItem("task", name, encoded, due, done = onDismiss, id = entryId)
                 else vm.updateItem(initial.copy(title = name, detail = encoded, due = due), onDismiss)
-            }.onFailure { error = it.message.orEmpty() } }, enabled = !busy && canEdit && name.isNotBlank() && value.isNotBlank() && unit.isNotBlank(), modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp), shape = RoundedCornerShape(14.dp)) { Text(if (busy) "Saving…" else "Save result") }
-            if (initial != null && canEdit) TextButton(onClick = { remove = true }, enabled = !busy, modifier = Modifier.fillMaxWidth()) { Text("Remove result") }
+            }.onFailure { error = it.message.orEmpty() } }, enabled = !busy && canEdit && name.isNotBlank() && value.isNotBlank() && unit.isNotBlank(), modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp), shape = RoundedCornerShape(14.dp)) { Text(if (busy) t("Saving…", "सहेज रहे हैं…") else t("Save result", "नतीजा सहेजें")) }
+            if (initial != null && canEdit) TextButton(onClick = { remove = true }, enabled = !busy, modifier = Modifier.fillMaxWidth()) { Text(t("Remove result", "नतीजा हटाएँ")) }
         }
     }
-    if (remove && initial != null) AlertDialog(onDismissRequest = { remove = false }, title = { Text("Remove this result?") }, text = { Text("${initial.title} · ${date(initial.due)}") }, confirmButton = { TextButton(onClick = { vm.remove(initial); remove = false; onDismiss() }, enabled = !busy) { Text("Remove result") } }, dismissButton = { TextButton(onClick = { remove = false }) { Text("Keep") } })
+    if (remove && initial != null) AlertDialog(onDismissRequest = { remove = false }, title = { Text(t("Remove this result?", "यह नतीजा हटाएँ?")) }, text = { Text("${initial.title} · ${date(initial.due)}") }, confirmButton = { TextButton(onClick = { vm.remove(initial); remove = false; onDismiss() }, enabled = !busy) { Text(t("Remove result", "नतीजा हटाएँ")) } }, dismissButton = { TextButton(onClick = { remove = false }) { Text(t("Keep", "रखें")) } })
 }

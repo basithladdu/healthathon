@@ -133,7 +133,7 @@ private class CareDictation(private val context: Context, val changed: () -> Uni
     onWords: (String, String, String) -> Boolean,
     onConsent: () -> Unit,
     onActiveChanged: (Boolean) -> Unit,
-) {
+) { val t = careText();
     val context = LocalContext.current
     val owner = LocalLifecycleOwner.current
     var revision by remember { mutableIntStateOf(0) }
@@ -153,7 +153,7 @@ private class CareDictation(private val context: Context, val changed: () -> Uni
     } }
     val permission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         if (granted && consent && enabled && !recording) { latestConsent(); dictation.start(pendingLanguage.tag) }
-        else if (!granted) permissionError = "Microphone access wasn't granted. You can type the conversation."
+        else if (!granted) permissionError = t("Microphone access wasn't granted. You can type the conversation.", "माइक की अनुमति नहीं मिली। आप बातचीत लिख सकते हैं।")
     }
     DisposableEffect(dictation, owner) {
         val observer = LifecycleEventObserver { _, event -> if (event == Lifecycle.Event.ON_STOP) dictation.cancel() }
@@ -167,13 +167,13 @@ private class CareDictation(private val context: Context, val changed: () -> Uni
     LaunchedEffect(active) { latestActiveChanged(active) }
     DisposableEffect(Unit) { onDispose { latestActiveChanged(false) } }
     SurfaceCard(Mint) {
-        Row(verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.RecordVoiceOver, null, tint = Ink); Spacer(Modifier.width(10.dp)); Text("On-device dictation", fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont) }
+        Row(verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.RecordVoiceOver, null, tint = Ink); Spacer(Modifier.width(10.dp)); Text(t("On-device dictation", "फ़ोन पर बोलकर लिखना"), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont) }
         Spacer(Modifier.height(8.dp))
         Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(7.dp)) {
             listOf("Patient", "Family / carer", "Doctor").forEach { role -> FilterChip(selected = speaker == role, onClick = { speaker = role }, enabled = !active, label = { Text(role) }) }
         }
         CareLanguageMenu(languageTag, enabled = !active, includeMixed = true) { languageTag = it }
-        if (languageTag == "hi-en") Text(if (Build.VERSION.SDK_INT >= 34) "Both phone language packs must be installed. If switching is unavailable, use the saved-recording transcript below." else "This phone uses one language per dictation turn. Hindi + English together is available for saved recordings below.", style = MaterialTheme.typography.bodySmall)
+        if (languageTag == "hi-en") Text(if (Build.VERSION.SDK_INT >= 34) t("Both phone language packs must be installed. If switching is unavailable, use the saved-recording transcript below.", "फ़ोन में दोनों भाषा पैक होने चाहिए। अगर भाषा नहीं बदलती, तो नीचे सहेजी रिकॉर्डिंग से लिखाई बनाएँ।") else t("This phone uses one language per dictation turn. Hindi + English together is available for saved recordings below.", "यह फ़ोन हर बार एक ही भाषा सुनता है। हिन्दी और अंग्रेज़ी साथ में नीचे सहेजी रिकॉर्डिंग के लिए उपलब्ध है।"), style = MaterialTheme.typography.bodySmall)
         if (dictation.available) {
             if (dictation.processing) LinearProgressIndicator(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp), color = Rust)
             else if (dictation.listening) LinearProgressIndicator(progress = { dictation.level }, modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp), color = Rust)
@@ -185,28 +185,28 @@ private class CareDictation(private val context: Context, val changed: () -> Uni
                         permissionError = ""; consent = false; showConsent = true
                     }
                 }, enabled = enabled && !recording && !dictation.processing && (heldWords.isBlank() || dictation.listening), modifier = Modifier.testTag("dictation-toggle")) {
-                    Icon(if (dictation.listening) Icons.Default.Stop else Icons.Default.Mic, null, Modifier.size(18.dp)); Spacer(Modifier.width(7.dp)); Text(if (dictation.listening) "Finish turn" else "Dictate")
+                    Icon(if (dictation.listening) Icons.Default.Stop else Icons.Default.Mic, null, Modifier.size(18.dp)); Spacer(Modifier.width(7.dp)); Text(if (dictation.listening) t("Finish turn", "बोलना पूरा करें") else "Dictate")
                 }
-                if (active) TextButton(onClick = { dictation.cancel(keepWords = false); heldWords = "" }) { Text("Cancel turn") }
+                if (active) TextButton(onClick = { dictation.cancel(keepWords = false); heldWords = "" }) { Text(t("Cancel turn", "यह बारी रद्द करें")) }
             }
             if (dictation.status.isNotBlank()) Text(dictation.status, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 6.dp))
-        } else Text(if (Build.VERSION.SDK_INT < 31) "On-device dictation needs Android 12 or later. Type the words or keep an audio recording." else "On-device dictation isn't available on this phone. Type the words or keep an audio recording.", style = MaterialTheme.typography.bodySmall)
+        } else Text(if (Build.VERSION.SDK_INT < 31) t("On-device dictation needs Android 12 or later. Type the words or keep an audio recording.", "फ़ोन पर बोलकर लिखने के लिए Android 12 या नया चाहिए। शब्द लिखें या ऑडियो रिकॉर्डिंग रखें।") else t("On-device dictation isn't available on this phone. Type the words or keep an audio recording.", "इस फ़ोन पर बोलकर लिखना उपलब्ध नहीं है। शब्द लिखें या ऑडियो रिकॉर्डिंग रखें।"), style = MaterialTheme.typography.bodySmall)
         if (permissionError.isNotBlank()) Text(permissionError, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
         if (heldWords.isNotBlank() && !active) {
-            Text("Unfinished words · $pendingSpeaker · ${pendingLanguage.label}", style = MaterialTheme.typography.labelMedium)
-            CareField(heldWords, { heldWords = it }, "Words to keep", minLines = 2)
-            TextButton(onClick = { if (latestWords(heldWords, pendingSpeaker, pendingLanguage.label)) heldWords = "" }) { Text("Add these words") }
+            Text(t("Unfinished words · $pendingSpeaker · ${pendingLanguage.label}", "अधूरे शब्द · $pendingSpeaker · ${pendingLanguage.label}"), style = MaterialTheme.typography.labelMedium)
+            CareField(heldWords, { heldWords = it }, t("Words to keep", "रखने वाले शब्द"), minLines = 2)
+            TextButton(onClick = { if (latestWords(heldWords, pendingSpeaker, pendingLanguage.label)) heldWords = "" }) { Text(t("Add these words", "ये शब्द जोड़ें")) }
         }
-        if (recording) Text("Stop the audio recording before dictating.", style = MaterialTheme.typography.bodySmall)
+        if (recording) Text(t("Stop the audio recording before dictating.", "बोलकर लिखने से पहले ऑडियो रिकॉर्डिंग रोकें।"), style = MaterialTheme.typography.bodySmall)
     }
-    if (showConsent) AlertDialog(onDismissRequest = { showConsent = false }, title = { Text("Before we listen") },
-        text = { Column { Text("Speak one person's turn, then check the words before using them in the care note."); Spacer(Modifier.height(12.dp)); CheckLine(consent, { consent = it }, "Everyone here agrees to the microphone being used for this turn.") } },
+    if (showConsent) AlertDialog(onDismissRequest = { showConsent = false }, title = { Text(t("Before we listen", "सुनने से पहले")) },
+        text = { Column { Text(t("Speak one person's turn, then check the words before using them in the care note.", "एक व्यक्ति की बात बोलें, फिर केयर नोट में डालने से पहले शब्द जाँचें।")); Spacer(Modifier.height(12.dp)); CheckLine(consent, { consent = it }, t("Everyone here agrees to the microphone being used for this turn.", "यहाँ मौजूद सभी इस बार माइक इस्तेमाल करने के लिए राज़ी हैं।")) } },
         confirmButton = { TextButton(onClick = {
             showConsent = false
             if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) { latestConsent(); dictation.start(pendingLanguage.tag) }
             else permission.launch(Manifest.permission.RECORD_AUDIO)
-        }, enabled = consent && enabled && !recording) { Text("Start listening") } },
-        dismissButton = { TextButton(onClick = { showConsent = false }) { Text("Cancel") } })
+        }, enabled = consent && enabled && !recording) { Text(t("Start listening", "सुनना शुरू करें")) } },
+        dismissButton = { TextButton(onClick = { showConsent = false }) { Text(t("Cancel", "रद्द करें")) } })
 }
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -266,7 +266,7 @@ private class CareReadAloud(context: Context, val changed: () -> Unit) {
     fun close() { closed = true; engine?.stop(); engine?.shutdown(); engine = null }
 }
 
-@Composable fun CareReadAloudControl(text: String, identity: String, initialLanguage: String = "en-IN") {
+@Composable fun CareReadAloudControl(text: String, identity: String, initialLanguage: String = "en-IN") { val t = careText();
     val context = LocalContext.current
     val owner = LocalLifecycleOwner.current
     var revision by remember { mutableIntStateOf(0) }
@@ -282,11 +282,11 @@ private class CareReadAloud(context: Context, val changed: () -> Unit) {
     SurfaceCard(Mint) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             FilledTonalButton(onClick = { if (reader.speaking) reader.stop() else reader.read(text, language) }, modifier = Modifier.testTag("note-read-aloud"), colors = ButtonDefaults.filledTonalButtonColors(containerColor = Sage, contentColor = Ink)) {
-                Icon(if (reader.speaking) Icons.Default.Stop else Icons.Default.VolumeUp, null, Modifier.size(18.dp)); Spacer(Modifier.width(7.dp)); Text(if (reader.speaking) "Stop reading" else "Read aloud")
+                Icon(if (reader.speaking) Icons.Default.Stop else Icons.Default.VolumeUp, null, Modifier.size(18.dp)); Spacer(Modifier.width(7.dp)); Text(if (reader.speaking) t("Stop reading", "पढ़ना रोकें") else t("Read aloud", "पढ़कर सुनाएँ"))
             }
         }
         CareLanguageMenu(language) { language = it }
         if (reader.status.isNotBlank()) Text(reader.status, style = MaterialTheme.typography.bodySmall)
-        Text("Downloaded voice only; the note's words stay unchanged.", style = MaterialTheme.typography.bodySmall)
+        Text(t("Downloaded voice only; the note's words stay unchanged.", "सिर्फ़ डाउनलोड की गई आवाज़; नोट के शब्द नहीं बदलते।"), style = MaterialTheme.typography.bodySmall)
     }
 }
