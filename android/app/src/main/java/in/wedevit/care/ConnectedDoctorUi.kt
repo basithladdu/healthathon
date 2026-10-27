@@ -93,7 +93,47 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
         if (!busy) { busy = true; error = null; scope.launch { try { action() } catch (e: Exception) { if (e is CancellationException) throw e; error = e.message ?: "Could not load your records. Try again." } finally { busy = false } } }
     }
     fun refresh() = run { dataset = cloud.loadDoctorDataset(); loaded = true }
-    LaunchedEffect(userId) { refresh() }
+    // The old synthetic server workspace loads only when its practice screens are opened, never on entry.
+    LaunchedEffect(earlierWorkspace) { if (earlierWorkspace && !loaded) refresh() }
+    val hindi = remember { doctorUiHindi() }
+    val allItems by remember(vm) { vm.allCareItems() }.collectAsStateWithLifecycle(emptyList())
+    var clinician by remember { mutableStateOf<CareClinicianProfile?>(null) }
+    var clinicianLoaded by remember { mutableStateOf(false) }
+    var clinicianChecking by remember { mutableStateOf(false) }
+    var clinicianCheckedAt by remember { mutableLongStateOf(0L) }
+    var clinicianError by remember { mutableStateOf<String?>(null) }
+    fun checkClinician() {
+        if (clinicianChecking) return
+        clinicianChecking = true; clinicianError = null
+        scope.launch {
+            try { clinician = cloud.clinicianProfile(); clinicianLoaded = true; clinicianCheckedAt = System.currentTimeMillis() }
+            catch (e: Exception) { if (e is CancellationException) throw e; clinicianError = if (hindi) "स्थिति नहीं मिल पाई। इंटरनेट देखें और फिर से कोशिश करें।" else "Couldn't check your status. Check your internet and try again." }
+            finally { clinicianChecking = false }
+        }
+    }
+    LaunchedEffect(userId) { vm.refresh(); checkClinician() }
+    LaunchedEffect(shared) { if (!shared && clinicianLoaded) checkClinician() }
+    val verification = DoctorConnectedHome.verification(clinician, clinicianLoaded)
+    var patientQuery by rememberSaveable(userId) { mutableStateOf("") }
+    var joinCode by rememberSaveable(userId) { mutableStateOf("") }
+    var joining by remember { mutableStateOf(false) }
+    var joinMessage by remember { mutableStateOf<String?>(null) }
+    fun joinPatient() {
+        val code = joinCode.trim()
+        if (joining || code.isEmpty()) return
+        joining = true; joinMessage = null
+        scope.launch {
+            try {
+                val before = vm.people.value.map { it.id }.toSet()
+                cloud.join(code)
+                val added = vm.joinedRefresh(before)
+                joinCode = ""
+                joinMessage = added?.let { if (hindi) "${it.name} की देखभाल अब आपकी सूची में है।" else "${it.name}'s care is now in your list." }
+                    ?: if (hindi) "जुड़ गए। अगर मरीज़ नहीं दिखता, तो रिफ़्रेश करें।" else "Joined. If the patient doesn't appear, tap Refresh."
+            } catch (e: Exception) { if (e is CancellationException) throw e; joinMessage = careJoinFailureMessage(e.message); if (e.message?.startsWith("Clinician verification") == true) checkClinician() }
+            finally { joining = false }
+        }
+    }
     val patient = dataset?.patients?.firstOrNull { it.id == patientId }
     val realPatient = realPeople.firstOrNull { it.id == realPatientId }
     val selectedRealId by vm.selected.collectAsStateWithLifecycle()
@@ -106,7 +146,7 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
     fun openShared() = navigate { selection = null; shared = true; tab = 1 }
     fun back() { if (!navigationBlocked && nestedBack != null) nestedBack?.invoke() else navigate { if (isolatedDemo) isolatedDemo = false else if (shared) shared = false else if (selection != null) { if (section == "Hub") selection = null else section = "Hub" } else if (tab != 0) tab = 0 else onExit() } }
     BackHandler { back() }
-    Scaffold(containerColor = Cream, topBar = { TopAppBar(title = { Column { Text(if (isolatedDemo) DoctorTestProfiles.profiles.firstOrNull {DoctorTestProfiles.personId(it)==testCarePerson}?.name ?: "Earlier practice care" else realPatient?.name ?: patient?.name ?: if (selection != null) "Patient record" else if (shared) "Shared care" else "Doctor workspace", fontFamily = SaharaTitleFont, fontSize = 23.sp); Text(when { isolatedDemo && DoctorTestProfiles.contains(testCarePerson) -> "Test record"; isolatedDemo -> "Fictional · isolated on this device"; realPatientId != null -> "Real shared care"; patientId != null -> "Test patient · separate records"; shared -> "Access and clinical review"; else -> email }, style = MaterialTheme.typography.bodySmall) } }, navigationIcon = { IconButton(onClick = ::back, enabled = !navigationBlocked) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back") } }, colors = TopAppBarDefaults.topAppBarColors(containerColor = Cream)) }, bottomBar = {
+    Scaffold(containerColor = Cream, topBar = { TopAppBar(title = { Column { Text(if (isolatedDemo) DoctorTestProfiles.profiles.firstOrNull {DoctorTestProfiles.personId(it)==testCarePerson}?.name ?: "Earlier practice care" else realPatient?.name ?: patient?.name ?: if (selection != null) "Patient record" else if (shared) "Shared care" else "Doctor workspace", fontFamily = SaharaTitleFont, fontSize = 23.sp); Text(when { isolatedDemo -> if (hindi) "वॉकथ्रू · नमूना मरीज़, असली नहीं" else "Walkthrough · sample patient, not real"; realPatientId != null -> "Real shared care"; patientId != null -> "Test patient · separate records"; shared -> "Access and clinical review"; else -> email }, style = MaterialTheme.typography.bodySmall) } }, navigationIcon = { IconButton(onClick = ::back, enabled = !navigationBlocked) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back") } }, colors = TopAppBarDefaults.topAppBarColors(containerColor = Cream)) }, bottomBar = {
         NavigationBar(containerColor = Paper) { listOf("Home" to Icons.Default.Home,"Patients" to Icons.Default.People,"Schedule" to Icons.Default.CalendarMonth,"Account" to Icons.Default.Person).forEachIndexed { index, (label, icon) -> NavigationBarItem(selected = if (selection != null || shared || isolatedDemo) index == 1 else tab == index, enabled = !navigationBlocked, onClick = { navigate { tab = index; selection = null; shared = false; isolatedDemo = false; nestedBack = null } }, icon = { Icon(icon, null) }, label = { Text(label) }) } }
     }) { padding ->
         Column(Modifier.fillMaxSize().padding(padding)) {
@@ -159,46 +199,58 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
                     }
                 }
             } else when(tab) {
-                0 -> LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    item { Text("Your day in care", fontFamily = SaharaTitleFont, fontSize = 30.sp); Text(LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, d MMMM"))) }
-                    item { ConnectedCard("Your records") { Text(if (loaded) "Account connected · database checked" else "Checking your account records…"); Text("This workspace keeps test records separate from real shared care.", style = MaterialTheme.typography.bodyMedium); Button(onClick = ::refresh, enabled = !busy) { Text("Refresh records") } } }
-                    if(earlierWorkspace) item {ConnectedCard("Earlier practice workspace"){TextButton(onClick={earlierWorkspace=false}){Text("Return to current workspace")}}}
-                    if (earlierWorkspace && loaded && dataset == null) item { ConnectedCard("Earlier test dataset") { Text("Existing account test records remain separate."); Text("Creating additional legacy test records is unavailable here.") } }
-                    if(!earlierWorkspace) {
-                        item {ConnectedCard("Patients"){Text("${realPeople.size} shared care profiles available");TextButton(onClick={tab=1}){Text("Open patients")};TextButton(onClick={tab=2}){Text("Open schedule")}}}
-                        item {Text("Test workspace",style=MaterialTheme.typography.titleMedium)}
-                        items(DoctorTestProfiles.profiles,key={it.key}) {p->DoctorPatientListCard(p.name,p.family,{navigate {testCarePerson=DoctorTestProfiles.personId(p);testInitialSection="Hub";isolatedDemo=true}})}
+                0 -> LazyColumn(Modifier.fillMaxSize().testTag("doctor-home"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    item { Text(if (hindi) "आज की देखभाल" else "Your day in care", fontFamily = SaharaTitleFont, fontSize = 30.sp); Text(LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, d MMMM", if (hindi) java.util.Locale("hi", "IN") else java.util.Locale.ENGLISH))) }
+                    if (earlierWorkspace) {
+                        item { ConnectedCard("Earlier practice workspace") { Text(if (hindi) "नमूना रिकॉर्ड · असली मरीज़ नहीं" else "Sample records · not real patients", color = Rust); TextButton(onClick = { earlierWorkspace = false }) { Text("Return to current workspace") } } }
+                        if (loaded && dataset == null) item { ConnectedCard("Earlier test dataset") { Text("Existing account test records remain separate."); Text("Creating additional legacy test records is unavailable here.") } }
+                        item { ConnectedCard("Earlier visits and discussion requests") { Text("Local testing only; no requests are delivered from real accounts."); TextButton(onClick = { requestsOpen = true }) { Text("Open test discussion requests") }; TextButton(onClick = { tab = 2 }) { Text("Open earlier schedule") } } }
+                    } else {
+                        if (verification != DoctorConnectedHome.Verification.APPROVED) item { DoctorVerificationCard(verification, clinician?.note.orEmpty(), clinicianCheckedAt, clinicianChecking, clinicianError, hindi, ::checkClinician, ::openShared) }
+                        item { OutlinedButton(onClick = { vm.refresh(); checkClinician() }, enabled = !realRefreshing, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-home-refresh")) { Icon(Icons.Default.Refresh, null); Spacer(Modifier.width(8.dp)); Text(if (realRefreshing) (if (hindi) "रिफ़्रेश हो रहा है…" else "Refreshing…") else if (hindi) "रिकॉर्ड रिफ़्रेश करें" else "Refresh records") } }
+                        realRefreshError?.let { item { Text(it, color = MaterialTheme.colorScheme.error) } }
+                        doctorConnectedHomeItems(realPeople, allItems, System.currentTimeMillis(), hindi, onVisit = { openReal(it); section = "Visits" }, onProgress = { openReal(it); section = "Progress" }, onPatients = { tab = 1 })
+                        item { DoctorWalkthroughCard(hindi) { p -> navigate { testCarePerson = DoctorTestProfiles.personId(p); testInitialSection = "Hub"; isolatedDemo = true } } }
                     }
-                    item { ConnectedCard("Real shared care") { Text("Open patient-controlled access, clinician verification and submitted conversations without leaving this workspace."); OutlinedButton(onClick = ::openShared) { Text("Open shared clinician records") } } }
-                    if(earlierWorkspace) item { ConnectedCard("Earlier visits and discussion requests") { Text("Local testing only; no requests are delivered from real accounts."); TextButton(onClick = { requestsOpen = true }) { Text("Open test discussion requests") }; TextButton(onClick = { tab = 2 }) { Text("Open earlier schedule") } } }
                 }
                 1 -> {
-                    val patients = dataset?.patients.orEmpty()
+                    val shown = DoctorConnectedHome.search(realPeople, patientQuery)
+                    val t = { en: String, hi: String -> if (hindi) hi else en }
                     LazyColumn(Modifier.fillMaxSize().testTag("doctor-patients-list"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                        item { Text("Patients", fontFamily = SaharaTitleFont, fontSize = 30.sp); Text("Choose a person to see their care in one place.", style = MaterialTheme.typography.bodyLarge) }
-                        item { Text("Shared care profiles", style = MaterialTheme.typography.titleMedium); Text("Only records your account is permitted to access.", style = MaterialTheme.typography.bodyMedium) }
-                        if (realPeople.isEmpty()) item { ConnectedCard("No shared people yet") { Text("Use an invitation to connect. Signing in alone does not grant access."); TextButton(onClick = ::openShared) { Text("Access and invitations") } } }
-                        items(realPeople, key = { "shared:${it.id}" }) { person -> DoctorPatientListCard(person.name, "Shared care · patient-controlled access", { openReal(person.id) }) }
-                        item { TextButton(onClick = ::openShared, modifier = Modifier.heightIn(min = 48.dp)) { Text("Shared care and clinical review") } }
-                        item { HorizontalDivider(); Text("Test workspace", style = MaterialTheme.typography.titleMedium) }
-                        items(DoctorTestProfiles.profiles,key={it.key}) {profile->DoctorPatientListCard(profile.name,profile.family,{if(!navigationBlocked&&!vm.recording.value){testCarePerson=DoctorTestProfiles.personId(profile);testInitialSection="Hub";isolatedDemo=true;tab=1;nestedBack=null}})}
+                        item { Text(t("Patients", "मरीज़"), fontFamily = SaharaTitleFont, fontSize = 30.sp); Text(t("Only patients who have shared their care with you appear here.", "यहाँ सिर्फ़ वे मरीज़ दिखते हैं जिन्होंने अपनी देखभाल आपसे साझा की है।"), style = MaterialTheme.typography.bodyLarge) }
+                        if (realPeople.isNotEmpty()) item { DoctorPatientSearchField(patientQuery, { patientQuery = it }, hindi) }
+                        if (realPeople.isEmpty()) item { ConnectedCard(t("No patients yet", "अभी कोई मरीज़ नहीं")) { Text(t("Signing in alone does not give access. Ask the patient or family to create a doctor invitation in Sahara and share the code with you.", "सिर्फ़ साइन इन करने से पहुँच नहीं मिलती। मरीज़ या परिवार से कहें कि Sahara में डॉक्टर निमंत्रण बनाकर कोड आपको भेजें।")) } }
+                        else if (shown.isEmpty()) item { ConnectedCard(t("No matching patient", "कोई मरीज़ नहीं मिला")) { Text(t("Check the name or patient ID. Patients who have not invited you can't be found.", "नाम या मरीज़ ID जाँचें। जिन मरीज़ों ने आपको निमंत्रण नहीं दिया, वे नहीं मिलेंगे।")); TextButton(onClick = { patientQuery = "" }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Clear search", "खोज साफ़ करें")) } } }
+                        items(shown, key = { "shared:${it.id}" }) { person -> DoctorPatientListCard(person.name, t("Patient ID ", "मरीज़ ID ") + DoctorConnectedHome.patientCode(person.id), { openReal(person.id) }) }
+                        item { ConnectedCard(t("Add a patient", "मरीज़ जोड़ें")) {
+                            Text(t("Enter the doctor invitation code the patient or family shared with you.", "मरीज़ या परिवार से मिला डॉक्टर निमंत्रण कोड लिखें।"))
+                            if (verification != DoctorConnectedHome.Verification.APPROVED) Text(DoctorConnectedHome.verificationTitle(verification, hindi) + t(" · a doctor code works only after approval.", " · डॉक्टर कोड मंज़ूरी के बाद ही काम करता है।"), color = Rust, style = MaterialTheme.typography.bodyMedium)
+                            OutlinedTextField(joinCode, { joinCode = it.take(120); joinMessage = null }, Modifier.fillMaxWidth().testTag("doctor-join-code"), singleLine = true, label = { Text(t("Invitation code", "निमंत्रण कोड")) })
+                            Button(onClick = ::joinPatient, enabled = !joining && joinCode.isNotBlank(), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-join")) { Text(if (joining) t("Joining…", "जुड़ रहे हैं…") else t("Join", "जुड़ें")) }
+                            joinMessage?.let { Text(it, color = Rust) }
+                        } }
+                        item { TextButton(onClick = ::openShared, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Verification and clinical review", "सत्यापन और क्लिनिकल समीक्षा")) } }
+                        item { DoctorWalkthroughCard(hindi) { profile -> if (!navigationBlocked && !vm.recording.value) { testCarePerson = DoctorTestProfiles.personId(profile); testInitialSection = "Hub"; isolatedDemo = true; tab = 1; nestedBack = null } } }
                     }
                 }
                 2 -> {
                     var day by rememberSaveable { mutableStateOf(LocalDate.now().toString()) }
                     val patients = dataset?.patients.orEmpty()
                     Column(Modifier.fillMaxSize()) {
-                        if (realPeople.isNotEmpty()) Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) { Text("Care profile calendars", fontWeight = FontWeight.SemiBold); FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) { realPeople.forEach { person -> AssistChip(onClick = { openReal(person.id); section = "Visits" }, label = { Text(person.name) }, modifier = Modifier.heightIn(min = 48.dp)) } } }
                         if(earlierWorkspace) {
                             TextButton(onClick={earlierWorkspace=false}){Text("Return to current schedule")}
                             if (patients.isNotEmpty()) Box(Modifier.weight(1f)) { DemoSchedule(patients.map { it.card() }, localVisits, LocalDate.parse(day), { day = it.toString() }, ::openTest, { editingVisit = null; schedulePatient = patients.first().id }, { editingVisit = it; schedulePatient = it.patientId }, { visit -> localVisits = localVisits.map { if (it.id == visit.id) it.copy(status = "Cancelled") else it } }, { visit -> localVisits = localVisits.map { if (it.id == visit.id) it.copy(status = "Completed") else it } }) } else Text("No earlier planner records.", Modifier.padding(20.dp))
-                        } else LazyColumn(Modifier.weight(1f),contentPadding=PaddingValues(20.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {item {Text("Schedule",style=MaterialTheme.typography.headlineMedium);Text("Choose a person to view visits.");Text("Test workspace",style=MaterialTheme.typography.titleMedium)};items(DoctorTestProfiles.profiles,key={it.key}) {p->DoctorPatientListCard(p.name,"View visits",{navigate {testCarePerson=DoctorTestProfiles.personId(p);testInitialSection="Visits";isolatedDemo=true}})}}
+                        } else LazyColumn(Modifier.weight(1f).testTag("doctor-schedule"),contentPadding=PaddingValues(20.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {
+                            doctorConnectedScheduleItems(realPeople, allItems, System.currentTimeMillis(), hindi, onVisit = { openReal(it); section = "Visits" })
+                            item { DoctorWalkthroughCard(hindi) { p -> navigate { testCarePerson = DoctorTestProfiles.personId(p); testInitialSection = "Visits"; isolatedDemo = true } } }
+                        }
                     }
                 }
                 else -> LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    item { ConnectedCard("Older practice records") { TextButton(onClick={navigate {earlierWorkspace=true;tab=0}}){Text("Earlier practice workspace")};TextButton(onClick={if(!navigationBlocked){testCarePerson=DoctorCareDemoData.PERSON_ID;testInitialSection="Hub";isolatedDemo=true}}){Text("Earlier care workspace")};dataset?.patients.orEmpty().forEach {p->TextButton(onClick={openTest(p.id)}){Text(p.name)}} } }
+                    item { DoctorVerificationCard(verification, clinician?.note.orEmpty(), clinicianCheckedAt, clinicianChecking, clinicianError, hindi, ::checkClinician, ::openShared) }
+                    item { ConnectedCard(if (hindi) "पुराने अभ्यास रिकॉर्ड · नमूना, असली नहीं" else "Older practice records · sample, not real") { TextButton(onClick={navigate {earlierWorkspace=true;tab=0}}){Text("Earlier practice workspace")};TextButton(onClick={if(!navigationBlocked){testCarePerson=DoctorCareDemoData.PERSON_ID;testInitialSection="Hub";isolatedDemo=true}}){Text("Earlier care workspace")};dataset?.patients.orEmpty().forEach {p->TextButton(onClick={openTest(p.id)}){Text(p.name)}} } }
                     item { ConnectedCard("Your account") { Text(email, style = MaterialTheme.typography.titleLarge); Text("Signed in. Login does not verify professional identity."); Button(onClick = onAccount) { Text("Manage account / sign out") } } }
-                    item { ConnectedCard("Verification and real patient access") { Text("Submit registration details for independent review and use patient-controlled invitations. Test notes never receive a verified-clinician badge."); OutlinedButton(onClick = ::openShared) { Text("Open verification and shared care") } } }
+                    item { ConnectedCard(if (hindi) "सत्यापन और असली मरीज़ों तक पहुँच" else "Verification and real patient access") { Text(if (hindi) "पंजीकरण का विवरण जमा करें या बदलें। मंज़ूरी Sahara टीम खुद देती है; हर मरीज़ अपने निमंत्रण से पहुँच देता है।" else "Submit or change your registration details. Approval is given by hand by the Sahara team; each patient gives access with their own invitation."); OutlinedButton(onClick = ::openShared) { Text(if (hindi) "सत्यापन और साझा देखभाल खोलें" else "Open verification and shared care") } } }
                     item { TextButton(onClick = onExit) { Text("Back to Sahara") } }
                 }
             }
@@ -230,7 +282,7 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
 
 @Composable internal fun DoctorSharedPatientHub(person: Person, onSection: (String) -> Unit, deviceLocal: Boolean = false) {
     LazyColumn(Modifier.fillMaxSize().testTag("doctor-shared-patient-hub"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-        item { Text("${person.name}'s care", fontFamily = SaharaTitleFont, fontSize = 29.sp,lineHeight=36.sp); if(!DoctorTestProfiles.contains(person.id)) Text(if (deviceLocal) "Device-local care · not synced or shared" else "Real shared records · access controlled by the patient", style = MaterialTheme.typography.bodyMedium) }
+        item { Text("${person.name}'s care", fontFamily = SaharaTitleFont, fontSize = 29.sp,lineHeight=36.sp); if(!DoctorTestProfiles.contains(person.id)) Text(if (deviceLocal) "Device-local care · not synced or shared" else "Real shared records · access controlled by the patient", style = MaterialTheme.typography.bodyMedium); if(!deviceLocal && !DoctorTestProfiles.contains(person.id)) Text((if (doctorUiHindi()) "मरीज़ ID " else "Patient ID ") + DoctorConnectedHome.patientCode(person.id), style = MaterialTheme.typography.labelLarge, color = Rust, modifier = Modifier.testTag("doctor-shared-patient-id")) }
         item { DoctorPatientNavigationTiles(onSection) }
         item { OutlinedButton(onClick = { onSection("Tools") }, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("doctor-shared-tools")) { Icon(Icons.Default.Apps, null); Spacer(Modifier.width(10.dp)); Text("Daily care & tools") } }
         item { TextButton(onClick = { onSection("Shared") }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text("Sharing, access & clinical review") } }

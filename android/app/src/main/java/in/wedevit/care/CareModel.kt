@@ -176,6 +176,8 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
             people.collect { list -> if (list.isNotEmpty() && list.none { it.id == selected.value }) select(list.first().id) }
         }
     }
+    /** Every synced entry across this account's people, for the doctor Home and Schedule. */
+    fun allCareItems(): kotlinx.coroutines.flow.Flow<List<CareItem>> = dao.everyItem()
     fun refresh() {
         if (cloud == null || refreshing.value || busy.value || recording.value) return
         refreshing.value = true

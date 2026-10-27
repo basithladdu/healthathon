@@ -230,6 +230,7 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
                     } else {
                         Text("This creates a one-person code that you share yourself. Nothing is sent to the doctor, and creating it does not verify them.", style = MaterialTheme.typography.bodySmall)
                         Text("A doctor can only join with this code after their clinician verification has been approved. Until then, joining with it will fail with a verification message.", style = MaterialTheme.typography.bodySmall)
+                        PatientIdForDoctor(selected)
                         Text("What they can open", style = MaterialTheme.typography.bodyMedium)
                         CheckLine(doctorNotes, { doctorNotes = it; invite = "" }, "Care notes and conversations")
                         CheckLine(doctorCalendar, { doctorCalendar = it; invite = "" }, "Calendar, medicines and tasks")

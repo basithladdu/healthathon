@@ -68,6 +68,7 @@ data class CareReport(@PrimaryKey val id: String = newId(), val personId: String
     @Query("SELECT * FROM CareItem WHERE personId = :id ORDER BY created DESC") fun items(id: String): Flow<List<CareItem>>
     @Query("SELECT * FROM CareItem WHERE id = :id LIMIT 1") suspend fun item(id: String): CareItem?
     @Query("SELECT * FROM CareItem") suspend fun allItems(): List<CareItem>
+    @Query("SELECT * FROM CareItem ORDER BY created DESC") fun everyItem(): Flow<List<CareItem>>
     @Insert(onConflict = OnConflictStrategy.REPLACE) suspend fun saveItem(item: CareItem)
     @Delete suspend fun removeItem(item: CareItem)
     @Query("SELECT * FROM CareReport WHERE personId = :id ORDER BY created DESC") fun reports(id: String): Flow<List<CareReport>>
