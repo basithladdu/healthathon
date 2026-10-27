@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sahara and CARE: team briefing</title>
+<!-- Source for docs/presentations/Sahara_CARE_Team_Briefing_2026-10-27.pdf (9 slides).
+     Build: node docs/presentations/src/build.js
+     Content comes only from docs/research/CARE_VS_SAHARA_FOR_TEAM.md, CARE_FAMILY_SIDE_FIT.md,
+     CARE_BRIEF_2026-10-27.md, CHAT_AUDIT_2026-10-27.md, HANDOFF.md (27 Oct open items)
+     and CLAUDE_TRANSCRIPT.md section 2. Fonts and colours are the Android app's own. -->
+<style>
+@font-face { font-family: "Montserrat"; font-weight: 500; src: url("../../../android/app/src/main/res/font/montserrat_medium.ttf"); }
+@font-face { font-family: "SaharaSerif"; font-weight: 400; src: url("../../../android/app/src/main/res/font/liberation_serif_regular.ttf"); }
+@font-face { font-family: "SaharaSerif"; font-weight: 700; src: url("../../../android/app/src/main/res/font/liberation_serif_bold.ttf"); }
+
+/* Sahara app palette: CareUi.kt:67-76, SaharaPalette.kt */
+:root {
+  --ink: #382E29; --ink-deep: #2B1F19; --sub: #55483F; --faint: #6E6056;
+  --cream: #FFF8EE; --paper: #FFFDF9; --rust: #B9472C; --rust-text: #9E3B23;
+  --gold: #FFCF5C; --sage: #D9EAA8; --mint: #DCEBE4; --peach: #FFD1B3;
+  --apricot: #FFDFC4; --blue: #DCE7F1; --lavender: #E7DEF2;
+  --line: rgba(56,46,41,.16);
+  --good: #2F6B46; --good-bg: #DBEADF;
+  --warn: #8A5A1B; --warn-bg: #FBE8C8;
+  --no: #7A4332;   --no-bg: #F7DDD2;
+}
+@page { size: 1280px 720px; margin: 0; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: var(--cream); color: var(--ink); }
+body { font-family: "Montserrat", "DejaVu Sans", sans-serif; font-weight: 500; font-size: 22px; line-height: 1.35; }
+
+.slide { width: 1280px; height: 720px; position: relative; overflow: hidden; background: var(--cream);
+  padding: 46px 64px 84px; page-break-after: always; break-after: page; display: flex; flex-direction: column; }
+.slide:last-child { page-break-after: auto; break-after: auto; }
+.slide::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 12px; background: var(--rust); }
+
+.foot { position: absolute; left: 64px; right: 64px; bottom: 22px; display: flex; justify-content: space-between;
+  font-size: 16px; color: var(--faint); border-top: 1px solid var(--line); padding-top: 10px; }
+
+.kicker { font-size: 17px; letter-spacing: .08em; text-transform: uppercase; color: var(--rust-text); margin-bottom: 6px; }
+h1 { font-family: "SaharaSerif", serif; font-weight: 700; font-size: 44px; line-height: 1.1; color: var(--ink-deep); margin-bottom: 20px; }
+h2 { font-family: "SaharaSerif", serif; font-weight: 700; font-size: 27px; color: var(--ink-deep); margin-bottom: 10px; }
+.serif { font-family: "SaharaSerif", serif; }
+b, strong { font-family: "SaharaSerif", serif; font-weight: 700; font-size: 1.08em; }
+li b, td b, p b, .note b { font-family: "Montserrat", sans-serif; font-weight: 500; font-size: 1em; color: var(--rust-text); }
+.lead { font-size: 26px; color: var(--ink); }
+.muted { color: var(--sub); }
+.small { font-size: 18px; }
+.src { font-size: 16px; color: var(--faint); margin-top: auto; padding-top: 8px; line-height: 1.35; }
+.src code, code { font-family: "DejaVu Sans Mono", monospace; font-size: .9em; }
+.unv { display: inline-block; font-size: 16px; color: var(--warn); background: var(--warn-bg); border-radius: 6px; padding: 0 7px; margin-left: 4px; vertical-align: 2px; }
+
+ul.plain { list-style: none; }
+ul.plain li { position: relative; padding-left: 26px; margin-bottom: 10px; }
+ul.plain li::before { content: ""; position: absolute; left: 4px; top: .55em; width: 9px; height: 9px; border-radius: 50%; background: var(--rust); }
+
+.cols { display: grid; gap: 28px; }
+.c2 { grid-template-columns: 1fr 1fr; }
+.c3 { grid-template-columns: 1fr 1fr 1fr; }
+.card { background: var(--paper); border: 1px solid var(--line); border-radius: 16px; padding: 22px 26px; }
+.card.peach { background: var(--apricot); border-color: transparent; }
+.card.mint { background: var(--mint); border-color: transparent; }
+.card.blue { background: var(--blue); border-color: transparent; }
+.card.lav { background: var(--lavender); border-color: transparent; }
+.card.gold { background: #FFE7AE; border-color: transparent; }
+
+/* Tables */
+table { width: 100%; border-collapse: collapse; font-size: 18px; line-height: 1.3; }
+th { text-align: left; font-size: 16px; text-transform: uppercase; letter-spacing: .06em; color: var(--sub);
+  padding: 0 12px 8px; border-bottom: 2px solid var(--ink); font-weight: 500; }
+td { padding: 7px 12px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+td.thing { font-family: "SaharaSerif", serif; font-weight: 700; font-size: 20px; color: var(--ink-deep); }
+td.note { color: var(--sub); }
+tr:last-child td { border-bottom: none; }
+.chip { display: inline-block; min-width: 82px; text-align: center; border-radius: 999px; padding: 3px 12px; font-size: 17px; white-space: nowrap; }
+.yes { background: var(--good-bg); color: var(--good); }
+.part { background: var(--warn-bg); color: var(--warn); }
+.no { background: var(--no-bg); color: var(--no); }
+.who { display: inline-block; border-radius: 8px; padding: 2px 10px; font-size: 17px; white-space: nowrap; }
+.w-owner { background: var(--peach); color: var(--ink-deep); }
+.w-awaiz { background: var(--blue); color: var(--ink-deep); }
+.w-team { background: var(--sage); color: var(--ink-deep); }
+
+.legend { display: flex; gap: 16px; align-items: center; font-size: 17px; color: var(--sub); margin: -6px 0 12px; }
+</style>
+</head>
+<body>
+<!-- 1 Title -->
+<section class="slide" style="justify-content:center; background: linear-gradient(120deg, var(--cream) 55%, var(--apricot) 100%);">
+  <div class="kicker">Internal team briefing</div>
+  <h1 style="font-size:72px; margin-bottom:24px;">Sahara and CARE:<br>where we fit</h1>
+  <p class="lead" style="max-width:860px;">CARE is the hospital staff's system. Sahara is the family's phone app. What is different, and what we need to decide.</p>
+  <p class="lead serif" style="margin-top:36px; color:var(--rust-text); font-weight:700;">27 October 2026</p>
+  <div class="foot"><span>Sahara · internal team briefing · 27 Oct 2026</span><span>1 / 9</span></div>
+</section>
+
+<!-- 2 One picture -->
+<section class="slide">
+  <div class="kicker">The one big thing</div>
+  <h1>CARE is the staff side. Sahara is the family side.</h1>
+  <p style="font-size:20px; margin:-6px 0 16px;" class="muted"><b>CARE</b> is a free hospital record system (an EMR) made by <b>OHC</b> in Kochi, Kerala. Kerala says 330,000+ patients use it <span class="unv">[unverified] OHC's own claim</span></p>
+  <div style="display:grid; grid-template-columns: 1fr 120px 1fr; align-items:stretch;">
+    <div class="card blue">
+      <h2>Staff side: CARE</h2>
+      <ul class="plain" style="font-size:20px;">
+        <li>Doctors and nurses type in all medical data.</li>
+        <li>Patient can log in with an <b>OTP</b> (phone code).</li>
+        <li>That login can only <b>register</b> and <b>book or cancel visits</b>. It lasts 1 hour.</li>
+        <li>Family cannot add symptoms, medicines or notes.</li>
+      </ul>
+    </div>
+    <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; font-size:17px; color:var(--sub);">
+      <svg width="90" height="40" viewBox="0 0 90 40" aria-hidden="true"><path d="M84 20H6M14 10L4 20l10 10" fill="none" stroke="#B9472C" stroke-width="3" stroke-linecap="round" stroke-dasharray="7 6"/></svg>
+      <span style="margin-top:6px;">not connected<br>today</span>
+    </div>
+    <div class="card peach">
+      <h2>Family side: Sahara</h2>
+      <ul class="plain" style="font-size:20px;">
+        <li>Family adds the sick person and invites relatives.</li>
+        <li>Symptom diary 0 to 10, 3D pain body, daily check-in.</li>
+        <li>Medicines: list, reminders, "taken" or "missed".</li>
+        <li>Family confirms the exact goals-of-care note.</li>
+      </ul>
+    </div>
+  </div>
+  <p class="lead" style="margin-top:16px; text-align:center;"><b>CARE has no family side, and no door for one yet.</b> That gap is where we fit.</p>
+  <div class="src">Source: CARE_VS_SAHARA_FOR_TEAM.md; CARE_FAMILY_SIDE_FIT.md §1, §3.1; CARE_BRIEF §1–2. CARE code read, not run.</div>
+  <div class="foot"><span>Sahara · internal team briefing · 27 Oct 2026</span><span>2 / 9</span></div>
+</section>
+
+<!-- 3 Words -->
+<section class="slide">
+  <div class="kicker">The words</div>
+  <h1>Real words, simple meaning</h1>
+  <div class="cols c3" style="gap:12px 22px; font-size:18px; line-height:1.3;">
+    <div class="card" style="padding:12px 16px;"><b>CARE</b><br>The hospital's computer notebook for doctors and nurses.</div>
+    <div class="card" style="padding:12px 16px;"><b>EMR</b><br>Electronic Medical Record: the patient's file, on a computer. CARE is one.</div>
+    <div class="card" style="padding:12px 16px;"><b>OHC</b><br>Open Healthcare Network: the Kerala group that builds CARE.</div>
+    <div class="card" style="padding:12px 16px;"><b>Staff side / family side</b><br>Screens for doctors and nurses / screens for the family (us).</div>
+    <div class="card" style="padding:12px 16px;"><b>OTP</b><br>A one-time code sent to your phone, to log in.</div>
+    <div class="card" style="padding:12px 16px;"><b>Consent</b><br>A saved "yes" from the patient.</div>
+    <div class="card" style="padding:12px 16px;"><b>Verification</b><br>A second person checks that "yes".</div>
+    <div class="card" style="padding:12px 16px;"><b>Encounter</b><br>One visit or one hospital stay.</div>
+    <div class="card" style="padding:12px 16px;"><b>Questionnaire</b><br>A form with questions.</div>
+    <div class="card" style="padding:12px 16px;"><b>Plugin</b><br>A Lego piece that clicks into CARE.</div>
+    <div class="card" style="padding:12px 16px;"><b>FHIR</b><br>A shared language for health data. CARE copies its ideas; it does not speak it directly.</div>
+    <div class="card" style="padding:12px 16px;"><b>ABDM</b><br>India's national digital health system. Sahara is not linked to it (ABHA link: later).</div>
+  </div>
+  <div class="src">Source: CARE_VS_SAHARA_FOR_TEAM.md "First, the words"; CARE_FAMILY_SIDE_FIT.md §3.2 (CARE is not a FHIR server); CHAT_AUDIT_2026-10-27.md G3 (ABHA later)</div>
+  <div class="foot"><span>Sahara · internal team briefing · 27 Oct 2026</span><span>3 / 9</span></div>
+</section>
+
+<!-- 4 We have, CARE doesn't -->
+<section class="slide">
+  <div class="kicker">Our side of the difference</div>
+  <h1>What Sahara has that CARE doesn't</h1>
+  <table style="font-size:18px;">
+    <colgroup><col style="width:28%"><col style="width:12%"><col></colgroup>
+    <tr><th>Sahara thing</th><th>CARE?</th><th>In plain words</th></tr>
+    <tr><td class="thing">Invite family by WhatsApp</td><td><span class="chip no">No</span></td><td class="note">Send a link, relative joins. Each can edit or only read.</td></tr>
+    <tr><td class="thing">Medicine taken / missed</td><td><span class="chip no">No</span></td><td class="note">Family ticks each dose. CARE logs only nurse-given doses.</td></tr>
+    <tr><td class="thing">Medicine scan, reminders</td><td><span class="chip no">No</span></td><td class="note">Photo of prescription becomes text; phone alarm per dose.</td></tr>
+    <tr><td class="thing">3D pain body</td><td><span class="chip part">Partly</span></td><td class="note">12 parts, each 0 to 10. CARE: one body-part code, no picture.</td></tr>
+    <tr><td class="thing">Symptom trend</td><td><span class="chip no">No</span></td><td class="note">"4 now, 6 yesterday".</td></tr>
+    <tr><td class="thing">Goals-of-care questions</td><td><span class="chip no">No</span></td><td class="note">CARE docs say "do it separately" and "coming soon".</td></tr>
+    <tr><td class="thing">Record the talk</td><td><span class="chip no">No</span></td><td class="note">Each person in the room says "yes" first.</td></tr>
+    <tr><td class="thing">Family confirms the note</td><td><span class="chip no">No</span></td><td class="note">"I read version 3". CARE: staff mark a consent "checked with family".</td></tr>
+    <tr><td class="thing">Works offline</td><td><span class="chip no">No</span></td><td class="note">Recordings and reports stay on the phone. CARE is a server.</td></tr>
+  </table>
+  <div class="src">Both have: medicines list, visits, lab results, documents. Honest: our transcript is pre-written, answers use word matching, AI is off. Full: Table 1 in CARE_VS_SAHARA_FOR_TEAM.md</div>
+  <div class="foot"><span>Sahara · internal team briefing · 27 Oct 2026</span><span>4 / 9</span></div>
+</section>
+
+<!-- 5 CARE has, we don't -->
+<section class="slide">
+  <div class="kicker">CARE's side of the difference</div>
+  <h1>What CARE has that Sahara doesn't</h1>
+  <table style="font-size:18px;">
+    <colgroup><col style="width:28%"><col style="width:15%"><col></colgroup>
+    <tr><th>CARE thing</th><th>Sahara?</th><th>In plain words</th></tr>
+    <tr><td class="thing">Patient details</td><td><span class="chip no">No</span></td><td class="note">Gender, birth date, phone, address, blood group. We keep only the name.</td></tr>
+    <tr><td class="thing">Booking, appointments</td><td><span class="chip no">No</span></td><td class="note">Slots, booking, queue tokens.</td></tr>
+    <tr><td class="thing">Vitals</td><td><span class="chip no">No</span></td><td class="note">Blood pressure, pulse, with standard codes.</td></tr>
+    <tr><td class="thing">Diagnoses, allergies</td><td><span class="chip no">No</span></td><td class="note">Coded disease list, allergies.</td></tr>
+    <tr><td class="thing">DNR / advance directive</td><td><span class="chip no">No, by choice</span></td><td class="note">Staff record it. We explain it and keep copies only.</td></tr>
+    <tr><td class="thing">Referrals, dashboards</td><td><span class="chip no">No</span></td><td class="note">Send a patient on; counts of overdue visits.</td></tr>
+    <tr><td class="thing">Care team, volunteers</td><td><span class="chip part">Partly</span></td><td class="note">CARE: real staff accounts. Ours: a list of names.</td></tr>
+    <tr><td class="thing">Hospital-built questionnaires</td><td><span class="chip part">Partly</span></td><td class="note">Hospital builds any form. Ours are fixed in the app.</td></tr>
+    <tr><td class="thing">Coded records, plugins</td><td><span class="chip no">No</span></td><td class="note">Medical code lists (SNOMED, LOINC). A plugin could be our way in later.</td></tr>
+  </table>
+  <div class="src">Both have: caregiver details (ours: many relatives), symptoms, medicines taken, files. CARE "care plan": on its web page, not in its code. Full: Table 2</div>
+  <div class="foot"><span>Sahara · internal team briefing · 27 Oct 2026</span><span>5 / 9</span></div>
+</section>
+
+<!-- 6 Same thing different way -->
+<section class="slide">
+  <div class="kicker">Same idea, different way</div>
+  <h1>We both do it. We do it differently.</h1>
+  <table style="font-size:18px;">
+    <colgroup><col style="width:17%"><col style="width:29%"><col style="width:27%"><col></colgroup>
+    <tr><th>Topic</th><th>Sahara</th><th>CARE</th><th>Why we chose ours</th></tr>
+    <tr><td class="thing">Pain, symptoms</td><td>0 to 10 diary: now, 24-hour average, 24-hour worst.</td><td>Mild / moderate / severe, or a hospital form.</td><td class="note">Claim an official scale only with clinicians and permission.</td></tr>
+    <tr><td class="thing">Family "yes"</td><td>Family confirms the exact note version.</td><td>Staff mark a <b>consent</b> "checked with family".</td><td class="note">GOCD step 4: "patient or surrogate authorizes".</td></tr>
+    <tr><td class="thing">Recording consent</td><td>A "yes" from each person in the room.</td><td>One consent per patient, per encounter.</td><td class="note">PRODUCT_REQUIREMENTS.md "Source capture".</td></tr>
+    <tr><td class="thing">Advance directive</td><td>Explain it, keep copies, never create one.</td><td>Staff record DNR or advance directive consent.</td><td class="note">Vidhi papers; GOCD audit "scope defect".</td></tr>
+    <tr><td class="thing">Log in</td><td>Email account, family invites.</td><td>OTP phone code for patients, 1 hour.</td><td class="note">The family is our main user.</td></tr>
+    <tr><td class="thing">Where data lives</td><td>On the phone, works offline.</td><td>On the hospital's server.</td><td class="note">Our decision; CARE is built for hospitals.</td></tr>
+  </table>
+  <div class="src">Kerala's own home-visit form: <span class="unv">[unverified]</span> · Source: CARE_VS_SAHARA_FOR_TEAM.md "Same thing, different form or scale" and "Decisions"</div>
+  <div class="foot"><span>Sahara · internal team briefing · 27 Oct 2026</span><span>6 / 9</span></div>
+</section>
+
+<!-- 7 What to say -->
+<section class="slide">
+  <div class="kicker">Talking to judges</div>
+  <h1>What not to say, and what to say</h1>
+  <div class="cols c2" style="grid-template-columns: 1fr 1.15fr; gap:26px;">
+    <div class="card" style="background:var(--no-bg); border-color:transparent;">
+      <h2>Do not say</h2>
+      <ul class="plain" style="font-size:19px;">
+        <li>"Sahara integrates / syncs with CARE." Nothing connects.</li>
+        <li>"Sahara fills CARE's consent gap." Related, not the same.</li>
+        <li>"CARE has a family app or login."</li>
+        <li>"FHIR-compliant export."</li>
+        <li>"Sahara writes care plans into CARE."</li>
+        <li>"A family yes is a verified clinical record."</li>
+        <li>"Our diary is ESAS-r or IPOS" (official scales).</li>
+      </ul>
+    </div>
+    <div class="card mint">
+      <h2>Say these 3 lines</h2>
+      <ol style="padding-left:28px; font-size:20px;">
+        <li style="margin-bottom:10px;">CARE is the doctors' and nurses' record for palliative home care. Sahara is the family's phone app.</li>
+        <li style="margin-bottom:10px;">We use CARE's record types (patient, home visit, consent checked with family, forms, medicines told by family), so a hospital on CARE can take our export. Nothing is connected live yet.</li>
+        <li>We add what CARE leaves out: family accounts, a 3D pain diary, and the family confirming the exact goals-of-care note themselves.</li>
+      </ol>
+    </div>
+  </div>
+  <div class="src">Source: CARE_FAMILY_SIDE_FIT.md §6; CARE_VS_SAHARA_FOR_TEAM.md "What to say to judges in 3 lines". Line 2 assumes an export exists; today it does not (see next slide).</div>
+  <div class="foot"><span>Sahara · internal team briefing · 27 Oct 2026</span><span>7 / 9</span></div>
+</section>
+
+<!-- 8 To decide -->
+<section class="slide">
+  <div class="kicker">Open decision</div>
+  <h1>CARE + Sahara: to decide in the meeting</h1>
+  <table style="font-size:18px;">
+    <colgroup><col style="width:21%"><col style="width:32%"><col style="width:15%"><col></colgroup>
+    <tr><th>Option</th><th>What it means</th><th>Effort</th><th>Risk, in plain words</th></tr>
+    <tr><td class="thing">A. Describe only <span class="chip yes" style="min-width:0; font-size:16px; margin-left:4px;">suggested</span></td><td>Deck slide 11 says: Sahara is the family side and can feed a hospital's CARE.</td><td>1–2 hours</td><td class="note">Low. Only words; we must say nothing is built.</td></tr>
+    <tr><td class="thing">A + B. Export file</td><td>Phone writes a CARE-shaped file a hospital can import. Not live.</td><td>1–2 days</td><td class="note">Takes time from the demo video. CARE needs fields we don't collect.</td></tr>
+    <tr><td class="thing">A + C. Plugin</td><td>A small Lego piece inside CARE, e.g. a family-confirmation tab.</td><td>1–2 weeks <span class="unv">[unverified]</span></td><td class="note">High before 7 Nov. Needs a local CARE, React and Django; our Kotlin can't be reused.</td></tr>
+    <tr><td class="thing">D. Move onto CARE</td><td>Replace Sahara's backend with CARE.</td><td>Weeks</td><td class="note">Very high. A rewrite that throws away a working app. Not suggested.</td></tr>
+  </table>
+  <div class="cols c2" style="margin-top:16px; gap:20px; font-size:19px;">
+    <div class="card gold" style="padding:14px 20px;"><b>Questions for the team:</b> A, A+B or A+C? Who writes the slide 11 answer? Is there time for B after the video?</div>
+    <div class="card" style="padding:14px 20px;"><b>What we don't know:</b> whether judges reward building on CARE. No known judging rule mentions it. CARE is optional.</div>
+  </div>
+  <div class="src">Source: CARE_BRIEF_2026-10-27.md §4–5; CARE_FAMILY_SIDE_FIT.md §5 (P1 export, P2 plugin, P3 pilot); HANDOFF.md items A17, H18. "Suggested" = the brief's view (moderate confidence), not a decision.</div>
+  <div class="foot"><span>Sahara · internal team briefing · 27 Oct 2026</span><span>8 / 9</span></div>
+</section>
+
+<!-- 9 Sources -->
+<section class="slide">
+  <div class="kicker">Where this comes from</div>
+  <h1>Sources</h1>
+  <div class="cols c2" style="gap:32px; font-size:18px;">
+    <div>
+      <h2>In our repo</h2>
+      <ul class="plain">
+        <li>docs/research/CARE_VS_SAHARA_FOR_TEAM.md (full tables)</li>
+        <li>docs/research/CARE_FAMILY_SIDE_FIT.md (field by field)</li>
+        <li>docs/research/CARE_BRIEF_2026-10-27.md (options, organiser email)</li>
+        <li>HANDOFF.md, "27 Oct 2026 — open items"</li>
+        <li>CLAUDE_TRANSCRIPT.md §2</li>
+        <li>Our app: android/app/src/main/java/in/wedevit/care/ at 7abf52e</li>
+      </ul>
+    </div>
+    <div>
+      <h2>CARE</h2>
+      <ul class="plain">
+        <li>github.com/ohcnetwork/care at 2bae933</li>
+        <li>github.com/ohcnetwork/care_fe at 81e7515</li>
+        <li>ohc.network/solutions/palliative-care</li>
+        <li>docs.ohc.network/concepts/clinical/consent/</li>
+        <li>docs.ohc.network/flows/clinical/consent/verify-a-consent/</li>
+        <li>docs.ohc.network/deployments/palliative/playbooks/patient-enrollment</li>
+      </ul>
+    </div>
+  </div>
+  <div class="card gold" style="margin-top:20px; font-size:19px;">We read CARE's code and docs (27 Oct). We did not run a CARE server. Everything marked <span class="unv">[unverified]</span> still needs checking.</div>
+  <div class="foot"><span>Sahara · internal team briefing · 27 Oct 2026</span><span>9 / 9</span></div>
+</section>
+
+</body>
+</html>
