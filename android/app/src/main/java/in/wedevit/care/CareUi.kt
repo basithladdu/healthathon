@@ -885,7 +885,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
     var view by rememberSaveable { mutableStateOf("Map & list") }
     var state by rememberSaveable { mutableStateOf("All India") }
     var district by rememberSaveable { mutableStateOf("") }
-    var chosen by remember { mutableStateOf<Centre?>(null) }
+    var chosen by remember { mutableStateOf<List<Centre>>(emptyList()) }
     val focus = LocalFocusManager.current; val t = careText()
     // Filter values stay English (they match the directory data); only the labels follow the language choice.
     val optionLabel = { o: String -> when (o) { "All India" -> t("All India", "पूरा भारत"); "All" -> t("All", "सभी"); "Home care" -> t("Home care", "घर पर देखभाल"); "Clinic visits" -> t("Clinic visits", "क्लिनिक में दिखाना"); "Inpatient care" -> t("Inpatient care", "भर्ती करके देखभाल"); "Day care" -> t("Day care", "दिन में देखभाल"); "Physiotherapy" -> t("Physiotherapy", "फ़िज़ियोथेरेपी"); "Hospice" -> t("Hospice", "हॉस्पिस"); "Map & list" -> t("Map & list", "नक्शा और सूची"); "List" -> t("List", "सूची"); else -> o } }
@@ -938,17 +938,27 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
             FilterChip(selected = morphine, onClick = { morphine = !morphine }, label = { Text(t("Morphine listed", "मॉर्फ़ीन सूची में")) }, leadingIcon = { Icon(Icons.Default.Medication, null, Modifier.size(18.dp)) }, modifier = Modifier.heightIn(min = 48.dp))
         }; Text(t("Directory listings. Call to confirm services, availability and cost.", "यह सूची से ली गई जानकारी है। सेवा, उपलब्धता और ख़र्च फ़ोन करके पक्का करें।"), style = MaterialTheme.typography.bodySmall) }
         if (view == "Map & list" && visible.isNotEmpty()) item(key = "nearby-map") { Column(Modifier.animateItem()) {
-            val located = visible.count { it.latitude != null && it.longitude != null }
-            if (located > 0) Column(Modifier.clip(RoundedCornerShape(20.dp))) { CentreMap(visible) { chosen = it } }
+            val coverage = remember(visible) { CentreLocation.coverage(visible) }
+            if (coverage.exact + coverage.approximate > 0) Column(Modifier.clip(RoundedCornerShape(20.dp))) { CentreMap(visible) { chosen = it } }
             else Text(t("Use the published addresses and Directions below. This source has no exact map locations for this filter.", "नीचे दिए पते और रास्ता देखें। इस चुनाव के लिए सूची में नक्शे की सही जगह नहीं है।"), style = MaterialTheme.typography.bodySmall)
-            if (located < visible.size) Text(t("$located mapped · ${visible.size - located} addresses in the list", "$located नक्शे पर · ${visible.size - located} पते सूची में"), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 6.dp))
+            // Honest per-precision count: solid pins are exact, hollow pins mark the PIN, town or district area.
+            if (coverage.approximate + coverage.listOnly > 0) Text(listOfNotNull(
+                coverage.exact.takeIf { it > 0 }?.let { t("$it exact", "$it सही जगह पर") },
+                coverage.approximate.takeIf { it > 0 }?.let { t("$it approximate (hollow pins, area only)", "$it अनुमानित (खाली गोले, सिर्फ़ इलाक़ा)") },
+                coverage.listOnly.takeIf { it > 0 }?.let { t("$it addresses in the list only", "$it पते सिर्फ़ सूची में") }).joinToString(" · "),
+                style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 6.dp).testTag("nearby-map-coverage"))
+            if (coverage.approximate > 0) Text(t("Approximate locations © GeoNames (CC BY 4.0)", "अनुमानित जगहें © GeoNames (CC BY 4.0)"), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         } }
         if (visible.isEmpty()) item { SurfaceCard { Text(t("No centres match that search.", "इस खोज से कोई केंद्र नहीं मिला।")); TextButton(onClick = { search = ""; service = "All"; state = "All India"; district = ""; morphine = false }) { Text(t("Clear filters", "सभी चुनाव हटाएँ")) } } }
         items(visible, key = { it.id }) { c -> Box(Modifier.animateItem()) { CentreCard(c) } }
     }
-    chosen?.let { centre -> ModalBottomSheet(onDismissRequest = { chosen = null }, containerColor = Cream) {
-        Box(Modifier.padding(start = 20.dp, end = 20.dp, bottom = 28.dp)) { CentreCard(centre) }
-    } }
+    if (chosen.isNotEmpty()) ModalBottomSheet(onDismissRequest = { chosen = emptyList() }, containerColor = Cream) {
+        // Several centres can share one approximate area pin; the sheet lists all of them.
+        LazyColumn(Modifier.padding(start = 20.dp, end = 20.dp), contentPadding = PaddingValues(bottom = 28.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            if (chosen.size > 1) item { Text(t("${chosen.size} centres here", "यहाँ ${chosen.size} केंद्र"), fontWeight = FontWeight.SemiBold) }
+            items(chosen, key = { it.id }) { CentreCard(it) }
+        }
+    }
 }
 
 @Composable fun CentreCard(c: Centre) {
@@ -959,6 +969,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
             if (c.sourceListedMorphine == "available") Text(t("Directory lists morphine · call to confirm", "सूची में मॉर्फ़ीन लिखा है · फ़ोन करके पक्का करें"), fontSize = 12.sp, color = Color(0xFF465E45), modifier = Modifier.padding(top = 8.dp))
             Text(listOf(c.sourceName, c.checkedOn.takeIf { it.isNotBlank() }?.let { t("Source retrieved $it", "जानकारी ली गई $it") }).filterNotNull().filter(String::isNotBlank).joinToString(" · "), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             if (c.latitude == null || c.longitude == null) Text(t("No map location · Directions searches the address", "नक्शे पर जगह नहीं · रास्ता पते से खोजा जाएगा"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            CentreLocation.note(c)?.let { (en, hi) -> Text(t(en, hi), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.testTag("centre-approximate-location")) }
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (c.phone.any(Char::isDigit)) TextButton(onClick = { open(context, Intent(Intent.ACTION_DIAL, Uri.parse(NearbyHelp.dialUri(c.phone)))) }) { Icon(Icons.Default.Call, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Call", "फ़ोन करें")) }
                 TextButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse(NearbyHelp.directionsUrl(c)))) }) { Text(t("Directions", "रास्ता")) }
