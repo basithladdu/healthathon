@@ -315,9 +315,22 @@ class CareFlowTest {
         assertTrue(saved.detail.contains("Dose: 10 mg"))
         ui.onNodeWithText("Test medicine").assertIsDisplayed()
     }
+    @Test fun homeSymptomTileOpensDiaryWithoutCreatingACheckin() {
+        ui.runOnIdle { vm.role(false) }
+        val before = vm.items.value.toList()
+        ui.onNodeWithTag("symptom-tracker-entry").performScrollTo().performClick()
+        ui.onNodeWithTag("symptom-diary").assertIsDisplayed()
+        ui.onNodeWithTag("symptom-add").assertExists()
+        ui.onNodeWithTag("feedback-screen").assertDoesNotExist()
+        ui.runOnIdle { assertEquals(before, vm.items.value) }
+        screenshot("home-symptom-diary")
+    }
+
     @Test fun checkinSavesChosenWordsAndKeepsOptionalNote() {
         ui.runOnIdle { vm.role(false) }
-        ui.onNodeWithText("How are you?").performClick()
+        ui.onNodeWithTag("nav-Care").performClick()
+        ui.onAllNodesWithTag("care-add-button").onFirst().performClick()
+        ui.onNodeWithTag("care-add-checkin").performClick()
         // The check-in is now the slider screen: pick the middle mood, which stores "An okay day".
         ui.onNodeWithTag("checkin-mood-0.5").performScrollTo().performClick()
         screenshot("checkin")

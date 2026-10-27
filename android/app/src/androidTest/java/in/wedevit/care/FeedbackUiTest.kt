@@ -17,23 +17,24 @@ import java.util.UUID
 class FeedbackUiTest {
     @get:Rule val ui = createComposeRule()
 
-    @Test fun ratingTilesStartUnselectedAndSaveOptionalNoteLocally() = isolated { context, scope ->
+    @Test fun sliderAndMoodButtonsSaveAppFeedbackLocally() = isolated { context, scope ->
         var closed = false
         ui.setContent { CareTheme { FeedbackScreen(scope, "test", onClose = { closed = true }) } }
-        ui.onNodeWithTag("feedback-save").performScrollTo().assertIsNotEnabled()
-        (1..5).forEach { ui.onNodeWithTag("feedback-rating-$it").performScrollTo().assertIsDisplayed().assertIsNotSelected() }
+        ui.onNodeWithTag("feedback-save").performScrollTo().assertIsEnabled()
+        ui.onNodeWithTag("feedback-slider").performScrollTo().assertIsDisplayed()
         val store = FeedbackStore(context, scope, "test")
         assertNull(store.latest())
-        ui.onNodeWithTag("feedback-rating-5").performScrollTo().performClick()
-        ui.onNodeWithTag("feedback-rating-5").assertIsSelected()
-        screenshot("feedback-rating-5")
+        screenshot("feedback-neutral")
+        ui.onNodeWithTag("feedback-mood-1.0").performScrollTo().performClick()
+        ui.onNodeWithTag("feedback-state").assertTextEquals("Good")
+        screenshot("feedback-mood-1.0")
         ui.onNodeWithTag("feedback-note").performScrollTo().performTextInput("Fictional app-interface feedback")
         androidx.test.espresso.Espresso.closeSoftKeyboard()
         ui.onNodeWithTag("feedback-save").performScrollTo().assertIsEnabled().performClick()
         ui.onNodeWithText("Saved on this device").assertExists()
         assertEquals(1f, store.latest()!!.score, .001f)
         assertEquals("Fictional app-interface feedback", store.latest()!!.note)
-        ui.onNodeWithTag("feedback-rating-1").performScrollTo().performClick()
+        ui.onNodeWithTag("feedback-slider").performScrollTo().performSemanticsAction(SemanticsActions.SetProgress) { it(0f) }
         ui.onNodeWithTag("feedback-save").performScrollTo().performClick()
         assertEquals(0f, store.latest()!!.score, .001f)
         ui.onNodeWithTag("feedback-close").performScrollTo().performClick()

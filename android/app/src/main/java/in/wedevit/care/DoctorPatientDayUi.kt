@@ -294,7 +294,7 @@ private fun doctorPlural(n: Int) = if (n == 1) "1 update" else "$n updates"
             }
         }
     }
-    detail?.let { check -> AlertDialog(onDismissRequest = { detail = null }, title = { Text(check.title) }, text = { Column(Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) { Text(doctorRecordedTime(check.created, zone)); Text(check.detail.ifBlank { "No additional details recorded." }); Text("Self-reported update; clinical assessment and reporter identity are not independently verified.") } }, confirmButton = { TextButton(onClick = { detail = null }) { Text("Close") } }) }
+    detail?.let { check -> AlertDialog(onDismissRequest = { detail = null }, title = { Text(check.title) }, text = { Column(Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) { Text(doctorRecordedTime(check.created, zone)); Text(CareEntryCodec.readable(check.detail).ifBlank { "No additional details recorded." }); Text("Self-reported update; clinical assessment and reporter identity are not independently verified.") } }, confirmButton = { TextButton(onClick = { detail = null }) { Text("Close") } }) }
 }
 
 @Composable internal fun DoctorCheckInCard(check: CareItem, zone: ZoneId, now: Long = System.currentTimeMillis(), onOpen: () -> Unit) {
@@ -305,7 +305,7 @@ private fun doctorPlural(n: Int) = if (n == 1) "1 update" else "$n updates"
                 DoctorMoodChip(doctorMood(check.title), check.title, Modifier.testTag("doctor-checkin-mood-${check.id}"))
             }
             Column(Modifier.fillMaxWidth().testTag("doctor-checkin-body-${check.id}"), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(check.detail.ifBlank { "No additional details recorded." }, fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk)
+                Text(CareEntryCodec.readable(check.detail).ifBlank { "No additional details recorded." }, fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk)
                 Text("View full update", fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = DoctorAccent)
             }
         }

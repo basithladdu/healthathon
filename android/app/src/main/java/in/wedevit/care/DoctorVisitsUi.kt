@@ -134,7 +134,7 @@ internal val DoctorVisitHighlightInk = Color(0xFF201711)
         val sources = doctorVisitSources(item, conditionSources, discussionSources)
         val condition = sources.condition
         val discussion = sources.discussion
-        val conditionText = if (summary.conditionRef.isBlank()) "Not recorded for this visit." else condition?.let { "${visitSourceDate(it.created)} · Patient / family report\n${it.title}\n${it.detail}" } ?: "Linked update is not accessible or no longer available."
+        val conditionText = if (summary.conditionRef.isBlank()) "Not recorded for this visit." else condition?.let { "${visitSourceDate(it.created)} · Patient / family report\n${it.title}\n${CareEntryCodec.readable(it.detail)}" } ?: "Linked update is not accessible or no longer available."
         val discussionText = if (summary.discussionRef.isBlank()) "Not recorded for this visit." else discussion?.let { "${visitSourceDate(it.published)}\n${ReviewWorkflow.label(it)}\n${it.topics.ifBlank { "Discussion not recorded in this note." }}\n${it.nextSteps}" } ?: "Linked care note is not accessible or no longer available."
         listOf("Linked condition report" to conditionText, "Discussion linked to this visit" to discussionText, "Visit notes" to summary.note).forEach { (label, value) -> item { SurfaceCard { Text(label, fontSize = 19.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont); Text(value.ifBlank { "Not recorded for this visit." }, fontSize = 16.sp) } } }
         item { Text("These are this visit's recorded details, not information inferred from other notes or check-ins.") }

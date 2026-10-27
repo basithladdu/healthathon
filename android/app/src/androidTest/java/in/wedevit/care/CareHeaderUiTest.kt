@@ -70,15 +70,15 @@ class CareHeaderUiTest {
     }
 
     @Test fun illustratedFeatureCardsKeepTheirIndependentActions() {
-        var checkins = 0
+        var symptoms = 0
         var nearby = 0
         ui.setContent { CareTheme { Column {
-            Tile("How are you?", R.drawable.wellbeing_checkin_illustration, Peach, Modifier.width(160.dp)) { checkins++ }
+            Tile("Symptom tracker", R.drawable.symptom_tracker_illustration, Peach, Modifier.width(160.dp)) { symptoms++ }
             Tile("Find care", R.drawable.nearby_care_illustration, Sage, Modifier.width(160.dp)) { nearby++ }
         } } }
-        ui.onNodeWithText("How are you?").performClick()
+        ui.onNodeWithText("Symptom tracker").performClick()
         ui.onNodeWithText("Find care").performClick()
-        ui.runOnIdle { assertEquals(1, checkins); assertEquals(1, nearby) }
+        ui.runOnIdle { assertEquals(1, symptoms); assertEquals(1, nearby) }
     }
 
     @Test fun welcomeKeepsEntryActionsWithoutFeatureHintSection() {
@@ -114,7 +114,7 @@ class CareHeaderUiTest {
                     }
                     CarePersonSelector("Asha", listOf("fixture" to "Asha"), "fixture", true, {}, {})
                     Row(Modifier.padding(16.dp).height(IntrinsicSize.Min)) {
-                        Tile("How are you?", R.drawable.wellbeing_checkin_illustration, Peach, Modifier.weight(1f).fillMaxHeight()) {}
+                        Tile("Symptom tracker", R.drawable.symptom_tracker_illustration, Peach, Modifier.weight(1f).fillMaxHeight()) {}
                         Spacer(Modifier.width(12.dp))
                         Tile("Find care", R.drawable.nearby_care_illustration, Sage, Modifier.weight(1f).fillMaxHeight()) {}
                     }

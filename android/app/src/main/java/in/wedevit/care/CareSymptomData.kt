@@ -127,10 +127,10 @@ object SymptomNoteCodec {
         }.getOrNull()
     }
     fun readable(text: String, hindi: Boolean = false): String = decode(text)?.let { n ->
-        listOf("${n.observedDate} ${n.observedTime} · ${SymptomDiaryRules.ratingLabel(n.rating, hindi)}", SymptomDiaryRules.ratingAnchors(n.scale, hindi).takeIf { n.scale == SymptomDiaryRules.WELLBEING_SCALE }.orEmpty(), SymptomDiaryRules.label(SymptomDiaryRules.recalls, n.recall, hindi),
+        listOf("${if (hindi) "देखा गया" else "Observed"}: ${n.observedDate} ${n.observedTime} · ${SymptomDiaryRules.ratingLabel(n.rating, hindi)}", SymptomDiaryRules.ratingAnchors(n.scale, hindi).takeIf { n.scale == SymptomDiaryRules.WELLBEING_SCALE }.orEmpty(), SymptomDiaryRules.label(SymptomDiaryRules.recalls, n.recall, hindi),
             "${SymptomDiaryRules.label(SymptomDiaryRules.respondents, n.respondent, hindi)} · ${n.author}",
             n.startedOn.takeIf { it.isNotBlank() }?.let { "${if (hindi) "शुरू हुआ" else "Started"}: $it" }.orEmpty(),
             n.painLocation, n.painBodySites.takeIf { it.isNotEmpty() }?.joinToString(prefix = if (hindi) "दर्द की जगह: " else "Pain areas: ") { PainBodyMapRules.label(it, hindi) + (n.painBodyRatings[it]?.let { r -> " $r/10" } ?: "") }.orEmpty(), n.painTriggers.joinToString { SymptomDiaryRules.label(SymptomDiaryRules.triggers, it, hindi) },
             n.selfReportedChange.takeIf { it.isNotBlank() }?.let { "${if (hindi) "उनके मुताबिक बदलाव" else "Reported change"}: ${SymptomDiaryRules.label(SymptomDiaryRules.changes, it, hindi)}" }.orEmpty(), n.note).filter(String::isNotBlank).joinToString("\n")
-    } ?: if (hindi) "यह नोट पढ़ा नहीं जा सका। मूल रिकॉर्ड सुरक्षित है।" else "This symptom note could not be read. The original record is retained."
+    } ?: if (!isStructured(text)) text else if (hindi) "यह नोट पढ़ा नहीं जा सका। मूल रिकॉर्ड सुरक्षित है।" else "This symptom note could not be read. The original record is retained."
 }

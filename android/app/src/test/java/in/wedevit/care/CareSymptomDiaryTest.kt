@@ -9,6 +9,36 @@ class CareSymptomDiaryTest {
     private fun note(rating: Int? = 4, date: String = "2026-10-22", time: String = "10:00") = SymptomNote("Pain", rating, date, time, "now", "patient", "Person", painLocation = "Left leg", painTriggers = listOf("rest"))
     private fun row(id: String, value: SymptomNote, person: String = "person-a") = CareItem(id = id, personId = person, kind = "checkin", title = "Pain", detail = SymptomNoteCodec.encode(value))
 
+    @Test fun rahulHistoryUsesObservedDetailsWithoutChangingStoredEvidence() {
+        val value = note(10, "2026-10-26", "16:01").copy(author = "Rahul", note = "After walking")
+        val stored = SymptomNoteCodec.encode(value)
+        val item = row("rahul", value).copy(title = "Pain 10/10", created = 1793001720000L)
+        val text = CareEntryCodec.readable(item.detail)
+        assertTrue(text.contains("Observed: 2026-10-26 16:01"))
+        assertTrue(text.contains("10/10")); assertTrue(text.contains("Rahul"))
+        assertTrue(text.contains("After walking")); assertTrue(text.contains("Left leg"))
+        assertFalse(text.contains(SymptomNoteCodec.PREFIX)); assertFalse(text.contains("\"rating\""))
+        assertFalse(text.contains("Started:")); assertFalse(text.contains("Pain areas:"))
+        assertEquals(stored, item.detail); assertEquals(value, SymptomNoteCodec.decode(item.detail))
+    }
+
+    @Test fun historyFormattingKeepsLegacyTextAndHidesMalformedEncodedData() {
+        assertEquals("Pain after walking", CareEntryCodec.readable("Pain after walking"))
+        assertEquals("Pain after walking", SymptomNoteCodec.readable("Pain after walking"))
+        listOf("bad json", "{\"symptom\":\"Pain\",\"rating\":10}").forEach { payload ->
+            val text = CareEntryCodec.readable(SymptomNoteCodec.PREFIX + payload)
+            assertTrue(text.contains("original record is retained"))
+            assertFalse(text.contains(payload)); assertFalse(text.contains("10/10"))
+        }
+    }
+
+    @Test fun readableHistoryShowsOnlyRecordedLocationsAndNoInventedScore() {
+        val value = note(null).copy(painLocation = "", painTriggers = emptyList(), painBodySites = listOf("left-leg"))
+        val text = CareEntryCodec.readable(SymptomNoteCodec.encode(value))
+        assertTrue(text.contains("Not rated")); assertTrue(text.contains("Pain areas:"))
+        assertFalse(text.contains("0/10")); assertFalse(text.contains("Started:"))
+    }
+
     @Test fun zeroAndUnableToRateRoundTripWithoutConfusingMissingWithNone() {
         assertEquals(0, SymptomNoteCodec.decode(SymptomNoteCodec.encode(note(0)))!!.rating)
         assertNull(SymptomNoteCodec.decode(SymptomNoteCodec.encode(note(null)))!!.rating)

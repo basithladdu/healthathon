@@ -7,7 +7,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -38,8 +37,6 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.selected
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -54,10 +51,14 @@ internal object CheckInMood {
     fun title(score: Float): String = when { score < 1f / 3f -> HARD; score < 2f / 3f -> OKAY; else -> GOOD }
 }
 
-/** A single, continuously morphing app-feedback screen, isolated from care records. */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable fun FeedbackScreen(accountScope: String, surface: String, onClose: () -> Unit, careModel: CareModel? = null, personId: String? = null) {
-    if (careModel == null || personId == null) { AppFeedbackScreen(accountScope, surface, onClose); return }
+    if (careModel == null || personId == null) AppFeedbackScreen(accountScope, surface, onClose)
+    else FeedbackExperienceScreen(accountScope, surface, onClose, careModel, personId)
+}
+
+/** Shared face-and-slider presentation; app feedback and patient check-ins retain distinct save destinations. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable private fun FeedbackExperienceScreen(accountScope: String, surface: String, onClose: () -> Unit, careModel: CareModel? = null, personId: String? = null) {
     val checkIn = careModel != null && personId != null
     val items by (careModel?.items ?: remember { kotlinx.coroutines.flow.MutableStateFlow(emptyList<CareItem>()) }).collectAsStateWithLifecycle()
     val busy by (careModel?.busy ?: remember { kotlinx.coroutines.flow.MutableStateFlow(false) }).collectAsStateWithLifecycle()
@@ -98,18 +99,18 @@ internal object CheckInMood {
             IconButton(onClick = { help = true }, modifier = Modifier.sizeIn(minWidth = 48.dp, minHeight = 48.dp)) { Icon(Icons.Outlined.Info, "About this", tint = DoctorAccent) }
         }
         Spacer(Modifier.height(16.dp))
-        Text("How was your day?", color = Ink, fontFamily = SaharaTitleFont, fontSize = 32.sp, lineHeight = 37.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+        Text(if (checkIn) "How was your day?" else "How was your Sahara experience?", color = Ink, fontFamily = SaharaTitleFont, fontSize = 32.sp, lineHeight = 37.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
         Spacer(Modifier.height(10.dp))
-        Text(if (checkIn) (if (today != null && !saved) "You already checked in today. Saving will update it." else "Slide to say how today is going.") else "Slide to rate how it went.", color = Ink.copy(alpha = .78f), fontSize = 15.sp, lineHeight = 21.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+        Text(if (checkIn) (if (today != null && !saved) "You already checked in today. Saving will update it." else "Slide to say how today is going.") else "Slide to rate your experience with Sahara.", color = Ink.copy(alpha = .78f), fontSize = 15.sp, lineHeight = 21.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
         Spacer(Modifier.height(12.dp))
         FeedbackFace(expression, Modifier.sizeIn(maxWidth = 210.dp, maxHeight = 210.dp).fillMaxWidth().aspectRatio(1f).clearAndSetSemantics { })
         Spacer(Modifier.height(8.dp))
         Text(label, fontSize = 26.sp, fontWeight = FontWeight.Medium, color = Ink, modifier = Modifier.testTag("feedback-state"), fontFamily = SaharaTitleFont)
         Spacer(Modifier.height(12.dp))
-        Slider(value = score, onValueChange = { score = it; saved = false; error = null }, valueRange = 0f..1f, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("feedback-slider").semantics { contentDescription = "Rate how your day went"; stateDescription = label }, thumb = { Box(Modifier.size(30.dp).background(Rust, CircleShape).border(3.dp, Paper, CircleShape)) }, colors = SliderDefaults.colors(thumbColor = Rust, activeTrackColor = Rust, inactiveTrackColor = Ink.copy(alpha = .14f)))
+        Slider(value = score, onValueChange = { score = it; saved = false; error = null }, valueRange = 0f..1f, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("feedback-slider").semantics { contentDescription = if (checkIn) "Rate how your day went" else "Rate your Sahara experience"; stateDescription = label }, thumb = { Box(Modifier.size(30.dp).background(Rust, CircleShape).border(3.dp, Paper, CircleShape)) }, colors = SliderDefaults.colors(thumbColor = Rust, activeTrackColor = Rust, inactiveTrackColor = Ink.copy(alpha = .14f)))
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             (if (checkIn) listOf(CheckInMood.HARD to 0f, CheckInMood.OKAY to .5f, CheckInMood.GOOD to 1f) else listOf("Not great" to 0f, "Okay" to .5f, "Good" to 1f)).forEach { (name, value) ->
-                TextButton(onClick = { score = value; saved = false; error = null }, contentPadding = PaddingValues(horizontal = 8.dp), modifier = Modifier.heightIn(min = 48.dp).then(if (checkIn) Modifier.weight(1f).testTag("checkin-mood-$value") else Modifier)) { Text(name, textAlign = androidx.compose.ui.text.style.TextAlign.Center, fontSize = if (checkIn) 13.sp else 14.sp, color = if (label == name) Rust else Ink.copy(alpha = .75f), fontWeight = if (label == name) FontWeight.Bold else FontWeight.Normal) }
+                TextButton(onClick = { score = value; saved = false; error = null }, contentPadding = PaddingValues(horizontal = 8.dp), modifier = Modifier.heightIn(min = 48.dp).then(if (checkIn) Modifier.weight(1f).testTag("checkin-mood-$value") else Modifier.weight(1f).testTag("feedback-mood-$value"))) { Text(name, textAlign = androidx.compose.ui.text.style.TextAlign.Center, fontSize = if (checkIn) 13.sp else 14.sp, color = if (label == name) Rust else Ink.copy(alpha = .75f), fontWeight = if (label == name) FontWeight.Bold else FontWeight.Normal) }
             }
         }
         OutlinedTextField(value = note, onValueChange = { if (it.length <= limit) { note = it; saved = false; error = null } }, label = { Text("Anything to add? (optional)") }, placeholder = { Text(if (checkIn) "How are you feeling today?" else "What felt easy, or what could be clearer?") }, supportingText = { Text(if (checkIn) "Added to the care record. ${note.length}/$limit" else "Saved on this device. ${note.length}/500", fontSize = 12.sp) }, minLines = 2, maxLines = 5, modifier = Modifier.fillMaxWidth().testTag("feedback-note"), shape = RoundedCornerShape(18.dp), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Rust, focusedLabelColor = Rust, cursorColor = Rust, unfocusedBorderColor = Ink.copy(alpha = .25f), focusedContainerColor = Paper.copy(alpha = .7f), unfocusedContainerColor = Paper.copy(alpha = .55f)))
@@ -137,56 +138,7 @@ internal object CheckInMood {
     }
 }
 
-private val AppRatingLabels = listOf("Very hard", "Hard", "Okay", "Easy", "Very easy")
-
-/** App feedback (not the daily check-in): a five-option ease rating mapped onto the stored 0..1 score, plus an optional note. Saved on this device only. */
+/** Device-local app experience feedback uses the shared animated face and slider. */
 @Composable internal fun AppFeedbackScreen(accountScope: String, surface: String, onClose: () -> Unit) {
-    val context = LocalContext.current; val focus = LocalFocusManager.current
-    val store = remember(accountScope, surface) { FeedbackStore(context, accountScope, surface) }
-    val initial = remember(store) { store.latest() }
-    val initialRating = initial?.score?.takeIf { it.isFinite() }?.let { Math.round(it.coerceIn(0f, 1f) * 4f) + 1 } ?: 0
-    var rating by rememberSaveable(accountScope, surface) { mutableIntStateOf(initialRating) }
-    var note by rememberSaveable(accountScope, surface) { mutableStateOf(initial?.note.orEmpty()) }
-    var savedRating by rememberSaveable(accountScope, surface) { mutableIntStateOf(initialRating) }
-    var savedNote by rememberSaveable(accountScope, surface) { mutableStateOf(initial?.note.orEmpty()) }
-    var saved by rememberSaveable(accountScope, surface) { mutableStateOf(false) }
-    var error by remember { mutableStateOf(store.error()) }
-    var help by remember { mutableStateOf(false) }; var discard by remember { mutableStateOf(false) }
-    val dirty = rating != savedRating || note != savedNote
-    val close = { focus.clearFocus(); if (dirty) discard = true else onClose() }
-    BackHandler { close() }
-    val limit = FeedbackRules.noteLimit
-    Column(Modifier.fillMaxSize().background(Cream).safeDrawingPadding().imePadding().testTag("feedback-screen").verticalScroll(rememberScrollState()).padding(horizontal = 24.dp).padding(top = 12.dp, bottom = 24.dp)) {
-        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = close, modifier = Modifier.sizeIn(minWidth = 48.dp, minHeight = 48.dp).testTag("feedback-close")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Close feedback", tint = DoctorCardInk) }
-            Spacer(Modifier.weight(1f))
-            IconButton(onClick = { help = true }, modifier = Modifier.sizeIn(minWidth = 48.dp, minHeight = 48.dp)) { Icon(Icons.Outlined.Info, "About this", tint = DoctorAccent) }
-        }
-        Spacer(Modifier.height(16.dp))
-        Text("How is Sahara working for you?", color = DoctorCardInk, fontFamily = SaharaTitleFont, fontSize = 30.sp, lineHeight = 36.sp)
-        Spacer(Modifier.height(8.dp))
-        Text("Tell us what's working and what isn't.", color = DoctorCardSub, fontSize = 15.sp, lineHeight = 21.sp)
-        Spacer(Modifier.height(20.dp))
-        Row(Modifier.fillMaxWidth().semantics { contentDescription = "Rate how easy Sahara is to use" }, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            AppRatingLabels.forEachIndexed { i, name ->
-                val n = i + 1; val on = rating == n
-                Column(Modifier.weight(1f).heightIn(min = 72.dp).background(if (on) Rust else Paper, RoundedCornerShape(14.dp)).border(1.dp, if (on) Rust else DoctorHairline, RoundedCornerShape(14.dp)).clickable(role = Role.RadioButton) { rating = n; saved = false; error = null }.padding(horizontal = 2.dp, vertical = 8.dp).testTag("feedback-rating-$n").semantics { contentDescription = "$n of 5, $name"; selected = on }, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-                    Text("$n", fontFamily = SaharaTitleFont, fontSize = 22.sp, color = if (on) Color.White else DoctorCardInk)
-                    Text(name, fontSize = 11.sp, lineHeight = 14.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center, color = if (on) Color.White else DoctorCardSub)
-                }
-            }
-        }
-        Spacer(Modifier.height(20.dp))
-        OutlinedTextField(value = note, onValueChange = { if (it.length <= limit) { note = it; saved = false; error = null } }, label = { Text("What could be better? (optional)") }, supportingText = { Text("${note.length}/$limit", fontSize = 12.sp, color = DoctorCardFaint) }, minLines = 4, maxLines = 8, modifier = Modifier.fillMaxWidth().testTag("feedback-note"), shape = RoundedCornerShape(18.dp), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Rust, focusedLabelColor = Rust, cursorColor = Rust, unfocusedBorderColor = DoctorHairline, focusedContainerColor = Paper, unfocusedContainerColor = Paper))
-        Spacer(Modifier.height(8.dp))
-        error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.fillMaxWidth().semantics { liveRegion = LiveRegionMode.Polite }); Spacer(Modifier.height(8.dp)) }
-        Button(onClick = { focus.clearFocus(); error = store.save((rating.coerceIn(1, 5) - 1) / 4f, note); if (error == null) { saved = true; savedRating = rating; savedNote = note } }, enabled = rating in 1..5, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("feedback-save"), shape = RoundedCornerShape(18.dp), colors = ButtonDefaults.buttonColors(containerColor = Rust, contentColor = Color.White)) {
-            if (saved) { Icon(Icons.Outlined.CheckCircle, null); Spacer(Modifier.width(8.dp)) }
-            Text(if (saved) "Saved on this device" else "Save", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
-        }
-        Spacer(Modifier.height(10.dp))
-        Text(if (saved) "Saved on this device." else "Saved on this device only.", color = DoctorCardSub, fontSize = 12.sp, lineHeight = 17.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center, modifier = Modifier.fillMaxWidth().semantics { liveRegion = LiveRegionMode.Polite })
-    }
-    if (help) AlertDialog(onDismissRequest = { help = false }, containerColor = Paper, title = { Text("About this") }, text = { Text("This stays on this device and is separate from patient records. Please leave out personal or health details.") }, confirmButton = { TextButton(onClick = { help = false }) { Text("Got it", color = Rust) } })
-    if (discard) AlertDialog(onDismissRequest = { discard = false }, containerColor = Paper, title = { Text("Leave without saving?") }, text = { Text("Your latest changes won't be saved. What you saved before stays on this device.") }, confirmButton = { TextButton(onClick = { discard = false; onClose() }) { Text("Leave", color = Rust) } }, dismissButton = { TextButton(onClick = { discard = false }) { Text("Keep editing", color = Rust) } })
+    FeedbackExperienceScreen(accountScope, surface, onClose)
 }

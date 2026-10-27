@@ -346,10 +346,9 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
             Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.Description, null, tint = Rust); Spacer(Modifier.width(12.dp)); Column(Modifier.weight(1f)) { Text("Latest care note", fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium); Text("${date(latest.published)} · ${latest.doctor}", style = MaterialTheme.typography.bodySmall); Text(ReviewWorkflow.label(latest), style = MaterialTheme.typography.labelSmall, color = Rust) }; Icon(Icons.AutoMirrored.Filled.ArrowForward, "Read note", Modifier.size(20.dp)) }
         } }
         item { Row(Modifier.height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            Tile("How are you?", R.drawable.wellbeing_checkin_illustration, Peach, Modifier.weight(1f).fillMaxHeight()) { onAdd("checkin") }
+            Tile("Symptom tracker", R.drawable.symptom_tracker_illustration, Peach, Modifier.weight(1f).fillMaxHeight().testTag("symptom-tracker-entry")) { onSymptoms() }
             Tile("Find care", R.drawable.nearby_care_illustration, Sage, Modifier.weight(1f).fillMaxHeight(), onNearby)
         } }
-        item { FilledTonalButton(onClick = onSymptoms, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("symptom-tracker-entry"), colors = ButtonDefaults.filledTonalButtonColors(containerColor = Mint)) { Icon(Icons.Default.MonitorHeart, null); Spacer(Modifier.width(8.dp)); Text("Symptom tracker · तबीयत के नोट") } }
         item { DailyCareShortcuts(onCalendar, onWorkflow, onLabs) }
         item { WorkflowSummary(vm, onWorkflow) }
         val scheduledToday = calendarItems(items, LocalDate.now()).filter { CareEntryCodec.decode(it.detail)?.type == "schedule" }
