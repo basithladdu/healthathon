@@ -595,7 +595,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                     val origin = doctorTranscriptOrigin(isSample, draft.transcribedAt, draft.transcriptModel)
                     item { Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         // The doctor flow's recordings are transcribed here, on this phone, once the language pack is present; otherwise the doctor types.
-                        if (doctorPresentation && !vm.demoMode && draft.source.isBlank() && !recordingSaving && recordingSaveError == null) recordings.filter { it.absolutePath in savedAudioPicked }.ifEmpty { listOfNotNull(recordings.maxByOrNull { it.lastModified() }) }.forEach { file -> key(file.absolutePath) {
+                        if (doctorPresentation && draft.source.isBlank() && !recordingSaving && recordingSaveError == null) recordings.filter { it.absolutePath in savedAudioPicked }.ifEmpty { listOfNotNull(recordings.maxByOrNull { it.lastModified() }) }.forEach { file -> key(file.absolutePath) {
                             OfflineConversationTranscription(file = file, identity = "${vm.accountNamespace}:${draft.personId}", consent = recordingConsents.firstOrNull { it.audioPath == file.absolutePath },
                                 enabled = !busy && !dictating && !recording && draft.source.isBlank(), onUse = { vm.useOfflineTranscript(file.absolutePath, it) })
                         } }
@@ -625,7 +625,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                 }
                 3 -> {
                     if (!buildOpen) {
-                    item { Text("Your questions are matched to lines in the conversation. A matched line is only a suggestion: read it and decide. Anything you type is your own note.", fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk) }
+                    item { Text("Your questions are matched to lines by word matching, not AI. A matched line is only a suggestion: read it and decide. Anything you type is your own note. · सवाल शब्द मिलान से जोड़े गए हैं, AI से नहीं।", fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk) }
                     if (questionMatches != null) item { Text(if (questionMatches.unanswered.isEmpty()) "Every question has at least one suggested line." else "${questionMatches.unanswered.size} of ${prepRows.size} questions have no suggested line.", fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub, modifier = Modifier.testTag("answers-match-status")) }
                     questionMatches?.let { result -> items(result.answered, key = { "match-${it.question.id}" }) { qa -> Surface(shape = RoundedCornerShape(20.dp), color = DoctorCardReport, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) { Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         Text(qa.question.text, fontFamily = SaharaTitleFont, fontSize = 19.sp, lineHeight = 24.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
@@ -684,7 +684,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                     item { CheckLine(reviewed, { reviewed = it }, "I checked every section against the conversation. This records what was discussed, without adding treatment advice.") }
                                         item { InfoDisclosure(if (vm.cloud == null) "Identity not verified" else "Separate clinician review", Peach) { Text(if (vm.cloud == null) "This records a self-entered reviewer name. It does not claim a verified clinical review." else "Your account draft is sent to the shared workspace. Only an independently verified clinician invited by this patient can publish a reviewed care-note version.", fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk) } }
                     item { TextButton(onClick = { nextStep(4) }, modifier = Modifier.heightIn(min = 48.dp)) { Text("Back to read the note") } }
-                    item { Button(onClick = { vm.publish(doctor, reviewed) { buildOpen = false; nextStep(0); reviewed = false } }, enabled = !recordingSaving && recordingSaveError == null && (!doctorPresentation || vm.cloud == null) && reviewed && (vm.cloud != null || doctor.isNotBlank()) && !busy && draft.source.isNotBlank(), modifier = Modifier.fillMaxWidth()) { Text(if (doctorPresentation && vm.cloud != null) "Conversation-specific sharing not connected yet" else if (vm.cloud == null) "Publish reviewed version" else "Send for clinician review") } }
+                    item { Button(onClick = { vm.publish(doctor, reviewed) { buildOpen = false; nextStep(0); reviewed = false } }, enabled = !recordingSaving && recordingSaveError == null && reviewed && (vm.cloud != null || doctor.isNotBlank()) && !busy && draft.source.isNotBlank(), modifier = Modifier.fillMaxWidth().testTag("conversation-publish")) { Text(if (vm.cloud == null) "Publish reviewed version" else "Send for clinician review · समीक्षा के लिए भेजें") } }
                 }
             }
         } else {
