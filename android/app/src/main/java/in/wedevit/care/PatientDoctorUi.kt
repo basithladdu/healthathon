@@ -77,3 +77,14 @@ enum class PatientDoctorVerification { NOT_VERIFIED, PENDING }
         },
     )
 }
+
+/** Shown to the patient or family when they invite a doctor, so the doctor can find them by ID after joining. */
+@Composable fun PatientIdForDoctor(personId: String) {
+    if (personId.isBlank()) return
+    val hindi = doctorUiHindi()
+    androidx.compose.foundation.text.selection.SelectionContainer {
+        Text((if (hindi) "मरीज़ ID: " else "Patient ID: ") + DoctorConnectedHome.patientCode(personId) +
+            (if (hindi) " · जुड़ने के बाद डॉक्टर इस ID से आपको ढूँढ सकते हैं।" else " · after joining, your doctor can find you by this ID."),
+            style = MaterialTheme.typography.bodySmall, modifier = Modifier.testTag("patient-id-for-doctor"))
+    }
+}
