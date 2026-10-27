@@ -6,9 +6,10 @@ import org.json.JSONArray
 object CareCentreDirectory {
     private val bundledLock = Any()
     @Volatile private var bundled: List<Centre>? = null
-    /** The bundled India directory, parsed on first use and shared by every care model in the process. */
+    /** The bundled India directory with approximate map positions (india-geo.json), parsed on first use and shared by every care model in the process. */
     fun bundled(context: android.content.Context): List<Centre> = bundled ?: synchronized(bundledLock) {
-        bundled ?: decode(context.assets.open("india.json").bufferedReader().use { it.readText() }).also { bundled = it }
+        bundled ?: CentreLocation.withOverlay(decode(context.assets.open("india.json").bufferedReader().use { it.readText() }),
+            CentreLocation.overlay(context.assets.open("india-geo.json").bufferedReader().use { it.readText() })).also { bundled = it }
     }
     fun decode(json: String): List<Centre> = JSONArray(json).let { data ->
         (0 until data.length()).map { index -> data.getJSONObject(index).let { row ->

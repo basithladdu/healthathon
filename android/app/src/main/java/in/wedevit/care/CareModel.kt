@@ -15,7 +15,9 @@ import java.io.File
 import java.time.LocalDate
 
 data class Centre(val name: String, val city: String, val district: String, val address: String, val phone: String, val services: String, val morphine: String, val url: String, val id: String = name, val latitude: Double? = null, val longitude: Double? = null,
-    val state: String = "Karnataka", val sourceName: String = "Pallium India", val checkedOn: String = "2026-10-02", val verification: String = "directory_listed", val sourceListedMorphine: String = "")
+    val state: String = "Karnataka", val sourceName: String = "Pallium India", val checkedOn: String = "2026-10-02", val verification: String = "directory_listed", val sourceListedMorphine: String = "",
+    /** "exact", or "pincode"/"city"/"district" for an approximate area pin; see CentreLocation. */
+    val locationPrecision: String = "")
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Boolean = false, val walkthroughRole: String? = null) : AndroidViewModel(app) {
