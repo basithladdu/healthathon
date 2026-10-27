@@ -33,6 +33,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import kotlinx.coroutines.delay
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -107,6 +113,15 @@ object SaharaMotion {
                 Text(text, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 15.sp, textAlign = TextAlign.Center)
             }
         }
+    }
+}
+
+/** Thin top progress bar for background work; it waits a moment before appearing so quick refreshes and saves never flash it, and fades in and out. */
+@Composable fun SaharaTopProgress(active: Boolean, modifier: Modifier = Modifier) {
+    var shown by remember { mutableStateOf(false) }
+    LaunchedEffect(active) { if (active) { delay(400); shown = true } else shown = false }
+    AnimatedVisibility(shown, modifier, enter = fadeIn(tween(SaharaMotion.ENTER_MS)), exit = fadeOut(tween(SaharaMotion.ENTER_MS))) {
+        LinearProgressIndicator(Modifier.fillMaxWidth().testTag("sahara-top-progress"), color = Rust)
     }
 }
 

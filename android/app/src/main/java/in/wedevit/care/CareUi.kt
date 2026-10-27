@@ -110,6 +110,13 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
     val refreshError by vm.refreshError.collectAsStateWithLifecycle()
     val canEdit by vm.canEdit.collectAsStateWithLifecycle()
     var tab by rememberSaveable { mutableIntStateOf(0) }
+    // Screens opened from inside a tab (Calendar, Care team, Lab history, Symptoms, Docs from More…) remember where they came from.
+    var tabTrail by rememberSaveable { mutableStateOf("") }
+    var tabDirection by remember { mutableStateOf(SaharaMotion.Direction.Switch) }
+    val trail = tabTrail.split(',').mapNotNull { it.toIntOrNull() }
+    fun go(next: Int) { if (next != tab) { tabTrail = (trail + tab).takeLast(10).joinToString(","); tabDirection = SaharaMotion.Direction.Forward; tab = next } }
+    fun switchTab(next: Int) { tabTrail = ""; tabDirection = SaharaMotion.Direction.Switch; tab = next }
+    fun back() { tabDirection = SaharaMotion.Direction.Back; if (trail.isNotEmpty()) { tab = trail.last(); tabTrail = trail.dropLast(1).joinToString(",") } else tab = 0 }
     var dialog by rememberSaveable { mutableStateOf("") }
     var medicineScanner by rememberSaveable { mutableStateOf(false) }
     var medicineScannerPerson by rememberSaveable { mutableStateOf("") }
@@ -136,23 +143,17 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
         owner.lifecycle.addObserver(observer); onDispose { owner.lifecycle.removeObserver(observer) }
     }
     LaunchedEffect(message) { message?.let { snackbar.showSnackbar(it); vm.message.value = null } }
-    if (dialog == "checkin") {
-        FeedbackScreen(accountScope = feedbackAccountScope, surface = "patient-checkin", onClose = { dialog = "" }, careModel = vm, personId = vm.selected.value)
-        return
-    }
-    if (feedbackOpen) {
-        FeedbackScreen(accountScope = feedbackAccountScope, surface = "patient", onClose = { feedbackOpen = false })
-        return
-    }
-    if (remindersOpen) {
-        CareReminderSettings(vm, onClose = { remindersOpen = false })
-        return
-    }
-    if (sharedWorkspaceOpen) {
-        CareSharedWorkspace(vm, onAccount = onAccount, onClose = { sharedWorkspaceOpen = false })
-        return
-    }
-    BackHandler(!medicineScanner && (tab != 0 || activeRecording)) { if (activeRecording) vm.stopRecording() else tab = 0 }
+    val peopleLoaded by vm.peopleLoaded.collectAsStateWithLifecycle()
+    val overlay = when { !peopleLoaded -> "starting"; dialog == "checkin" -> "checkin"; feedbackOpen -> "feedback"; remindersOpen -> "reminders"; sharedWorkspaceOpen -> "shared"; else -> "" }
+    Box(Modifier.fillMaxSize().background(Cream)) {
+    SaharaScreenHost(overlay, label = "Care overlay", direction = { from, to -> if (from == "starting") SaharaMotion.Direction.Switch else if (to.isEmpty()) SaharaMotion.Direction.Back else SaharaMotion.Direction.Forward }) { shown -> when (shown) {
+    "starting" -> Box(Modifier.fillMaxSize().testTag("care-starting"))
+    "checkin" -> FeedbackScreen(accountScope = feedbackAccountScope, surface = "patient-checkin", onClose = { dialog = "" }, careModel = vm, personId = vm.selected.value)
+    "feedback" -> FeedbackScreen(accountScope = feedbackAccountScope, surface = "patient", onClose = { feedbackOpen = false })
+    "reminders" -> CareReminderSettings(vm, onClose = { remindersOpen = false })
+    "shared" -> CareSharedWorkspace(vm, onAccount = onAccount, onClose = { sharedWorkspaceOpen = false })
+    else -> {
+    BackHandler(!medicineScanner && (tab != 0 || activeRecording)) { if (activeRecording) vm.stopRecording() else back() }
     BackHandler(walkthrough != null && !medicineScanner && tab == 0 && !activeRecording) { onLeaveWalkthrough() }
     Scaffold(containerColor = Cream, snackbarHost = { SnackbarHost(snackbar) }, topBar = {
         if (!medicineScanner) Column {
@@ -179,41 +180,41 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
         if (person != null) HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = .15f))
         }
     }, bottomBar = {
-        if (person != null && !medicineScanner) CareNavigation(tab, clinician) { next ->
+        if (person != null && !medicineScanner) CareNavigation(if (tab in 6..9) trail.lastOrNull { it !in 6..9 } ?: tab else tab, clinician) { next ->
             if (activeRecording && next != 1) vm.stopRecording()
-            tab = next
+            switchTab(next)
         }
         else if (person == null) Spacer(Modifier.fillMaxWidth().windowInsetsBottomHeight(WindowInsets.navigationBars).background(WelcomePanelOrange).testTag("welcome-navigation-backdrop"))
     }) { padding ->
-        Box(Modifier.padding(padding).consumeWindowInsets(padding).fillMaxSize()) {
+        Box(Modifier.padding(padding).consumeWindowInsets(padding).imePadding().fillMaxSize()) {
             if (medicineScanner && person != null) MedicineScanner(vm, onClose = { medicineScanner = false }, onAccount = onAccount)
             else if (person == null) Welcome(onAccount = onAccount, onStart = { dialog = "person" }, onSharedWorkspace = onDoctorWorkspace ?: { sharedWorkspaceOpen = true }, onDoctorDemo = onDoctorDemo, onPatientWalkthrough = onPatientWalkthrough,
                 accountContent = welcomeAccountContent, doctorContent = welcomeDoctorContent, onPanelChanged = onWelcomePanelChanged,
                 entryBusy = busy || refreshing, addPersonContent = { close -> AddPersonContent(busy = busy || refreshing, error = actionError, onDismiss = close, onSave = { vm.addPerson(it) { close() } }) })
-            else key(person.id, tab) { screens.SaveableStateProvider("${person.id}:$tab") {
-                ScreenEntrance { when (tab) {
-                    0 -> Today(vm, clinician, onTalk = { tab = 1 }, onCare = { tab = 2 }, onNearby = { tab = 3 }, onAdd = { if (canEdit) dialog = it else vm.message.value = "Ask the person who invited you to allow changes." }, onRead = { reading = it }, onCalendar = { tab = 6 }, onWorkflow = { tab = 7 }, onLabs = { tab = 8 }, onSharedWorkspace = if (walkthrough != null) ({ tab = 7 }) else openDoctorWorkspace, onSymptoms = { tab = 9 })
-                    1 -> Talk(vm, clinician && canEdit, onRead = { reading = it }, onRequestConversation = { tab = 7 })
-                    2 -> CareList(vm, onReadNote = { reading = it }, onCalendar = { tab = 6 }, onWorkflow = { tab = 7 }, onLabs = { tab = 8 }, onSymptoms = { tab = 9 },
+            else SaharaScreenHost(person.id to tab, Modifier.fillMaxSize(), label = "Care tab", direction = { from, _ -> if (from.first == person.id) tabDirection else SaharaMotion.Direction.Switch }) { (shownId, shownTab) -> screens.SaveableStateProvider("$shownId:$shownTab") {
+                Box(Modifier.fillMaxSize()) { when (shownTab) {
+                    0 -> Today(vm, clinician, onTalk = { go(1) }, onCare = { go(2) }, onNearby = { go(3) }, onAdd = { if (canEdit) dialog = it else vm.message.value = "Ask the person who invited you to allow changes." }, onRead = { reading = it }, onCalendar = { go(6) }, onWorkflow = { go(7) }, onLabs = { go(8) }, onSharedWorkspace = if (walkthrough != null) ({ go(7) }) else openDoctorWorkspace, onSymptoms = { go(9) })
+                    1 -> Talk(vm, clinician && canEdit, onRead = { reading = it }, onRequestConversation = { go(7) })
+                    2 -> CareList(vm, onReadNote = { reading = it }, onCalendar = { go(6) }, onWorkflow = { go(7) }, onLabs = { go(8) }, onSymptoms = { go(9) },
                         onAdd = { if (canEdit) dialog = it else vm.message.value = "Ask the person who invited you to allow changes." },
                         onScanPrescription = {
-                            if (walkthrough != null) vm.message.value = "Scanning is unavailable in the walkthrough."
+                            if (walkthrough != null) { if (canEdit) dialog = "medicine" else vm.message.value = "Ask the person who invited you to allow changes." }
                             else if (canEdit) {
                                 medicineScannerPerson = selected
                                 medicineScanner = true
                             } else vm.message.value = "Ask the person who invited you to allow changes."
                         })
                     3 -> Nearby(vm.centres)
-                    5 -> CareDocuments(vm, onRead = { reading = it }, onTalk = { tab = 1 })
-                    6 -> CareCalendar(vm, onWorkflow = { tab = 7 })
-                    7 -> CareWorkflows(vm, onTalk = { tab = 1 })
+                    5 -> CareDocuments(vm, onRead = { reading = it }, onTalk = { go(1) })
+                    6 -> CareCalendar(vm, onWorkflow = { go(7) })
+                    7 -> CareWorkflows(vm, onTalk = { go(1) })
                     8 -> CareLabs(vm)
-                    9 -> CareSymptomDiary(vm, onBack = { tab = 0 })
-                    else -> More(vm, person, onAccount = onAccount, onDelete = { dialog = "delete" }, onCalendar = { tab = 6 }, onWorkflow = { tab = 7 }, onLabs = { tab = 8 }, onDoctorDemo = onDoctorDemo, walkthrough = walkthrough != null, onFeedback = { if (activeRecording) vm.stopRecording(); feedbackOpen = true }, onReminders = { if (activeRecording) vm.stopRecording(); remindersOpen = true }, onSharedWorkspace = { if (activeRecording) vm.stopRecording(); openDoctorWorkspace() }, onDocuments = { if (activeRecording) vm.stopRecording(); tab = 5 })
+                    9 -> CareSymptomDiary(vm, onBack = { back() })
+                    else -> More(vm, person, onAccount = onAccount, onDelete = { dialog = "delete" }, onCalendar = { go(6) }, onWorkflow = { go(7) }, onLabs = { go(8) }, onDoctorDemo = onDoctorDemo, walkthrough = walkthrough != null, onFeedback = { if (activeRecording) vm.stopRecording(); feedbackOpen = true }, onReminders = { if (activeRecording) vm.stopRecording(); remindersOpen = true }, onSharedWorkspace = { if (activeRecording) vm.stopRecording(); openDoctorWorkspace() }, onDocuments = { if (activeRecording) vm.stopRecording(); go(5) })
                 } }
             } }
             refreshError?.let { error -> Surface(Modifier.align(Alignment.TopCenter).fillMaxWidth(), color = Peach) { Row(verticalAlignment = Alignment.CenterVertically) { Text(error, Modifier.weight(1f).padding(12.dp), style = MaterialTheme.typography.bodySmall); TextButton(onClick = vm::refresh) { Text("Retry") } } } }
-            if (busy || refreshing) LinearProgressIndicator(Modifier.fillMaxWidth().align(Alignment.TopCenter), color = Rust)
+            SaharaTopProgress(busy || refreshing, Modifier.fillMaxWidth().align(Alignment.TopCenter))
         }
     }
     if (dialog == "person") AddPerson(onDismiss = { dialog = "" }, busy = busy || refreshing, error = actionError, onSave = { vm.addPerson(it) { dialog = "" } })
@@ -223,6 +224,10 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
         confirmButton = { TextButton(onClick = { val removedId = person?.id; vm.removePerson { (0..9).forEach { screens.removeState("$removedId:$it") }; dialog = "" } }, enabled = !busy) { Text("Remove records") } },
         dismissButton = { TextButton(onClick = { dialog = "" }) { Text("Keep records") } })
     reading?.let { note -> NoteReader(vm, note, onDismiss = { reading = null }) }
+    }
+    } }
+    if (overlay.isNotEmpty() && overlay != "starting") SnackbarHost(snackbar, Modifier.align(Alignment.BottomCenter).navigationBarsPadding().imePadding())
+    }
 }
 
 /** Genuine account access and the walkthrough have separate actions. */

@@ -3,10 +3,12 @@ package `in`.wedevit.care
 import android.app.Application
 import android.content.Context
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -90,12 +92,20 @@ object PatientWalkthrough {
         catch (e: Exception) { if (e is CancellationException) throw e; android.util.Log.e("SaharaSeed", "patient walkthrough load failed", e); error = "The walkthrough could not load. Your own profiles were not changed." }
     }
     val person = PatientWalkthrough.visiblePeople(people).firstOrNull()
-    BackHandler(error != null || (ready && person == null)) { leave() }
-    when {
-        closing -> Column(Modifier.padding(20.dp)) { LinearProgressIndicator(Modifier.fillMaxWidth()); Text("Leaving the walkthrough…") }
-        error != null -> Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { Text(error!!); Button(onClick = { error = null; attempt++ }) { Text("Retry") }; TextButton(onClick = ::leave) { Text("Leave walkthrough") } }
-        ready && person == null -> Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { Text("Rahul's walkthrough record was removed. It will not be recreated automatically."); TextButton(onClick = ::leave) { Text("Leave walkthrough") } }
-        !ready || person == null || selected != person.id || draft.personId != person.id -> Column(Modifier.padding(20.dp)) { LinearProgressIndicator(Modifier.fillMaxWidth()); Text("Opening care records…") }
-        else -> CareApp(vm, onAccount = { vm.message.value = "Account and sharing are unavailable in the walkthrough." }, walkthrough = user, onLeaveWalkthrough = ::leave)
+    val state = when {
+        closing -> "closing"
+        error != null -> "error"
+        ready && person == null -> "removed"
+        !ready || person == null || selected != person.id || draft.personId != person.id -> "opening"
+        else -> "open"
     }
+    // Back while the walkthrough is still opening, failed or removed leaves it; back while leaving waits.
+    BackHandler(state != "open") { leave() }
+    SaharaScreenHost(state, Modifier.fillMaxSize().background(Cream), label = "Patient walkthrough") { shown -> when (shown) {
+        "closing" -> SaharaLoading("Leaving the walkthrough…")
+        "error" -> Box(Modifier.fillMaxSize().safeDrawingPadding(), contentAlignment = Alignment.Center) { SaharaEmpty(error ?: "", actionLabel = "Retry", onAction = { error = null; attempt++ }, secondaryLabel = "Leave walkthrough", onSecondary = ::leave) }
+        "removed" -> Box(Modifier.fillMaxSize().safeDrawingPadding(), contentAlignment = Alignment.Center) { SaharaEmpty("Rahul's walkthrough record was removed. It will not be recreated automatically.", secondaryLabel = "Leave walkthrough", onSecondary = ::leave) }
+        "opening" -> SaharaLoading("Opening care records…")
+        else -> CareApp(vm, onAccount = { vm.message.value = "Account and sharing are unavailable in the walkthrough." }, walkthrough = user, onLeaveWalkthrough = ::leave)
+    } }
 }
