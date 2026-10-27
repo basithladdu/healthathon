@@ -231,7 +231,7 @@ private fun requestLabel(status: WorkflowRequestStatus) = status.name.lowercase(
 }
 
 @Composable private fun WorkflowCheck(value: Boolean,onChange:(Boolean)->Unit,text:String,tag:String) { Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically) { Checkbox(value,onChange,modifier=Modifier.testTag(tag)); Text(text,Modifier.weight(1f)) } }
-@Composable private fun WorkflowDraftSummary(draft: WorkflowDraft) { val t = careText(); WorkflowCard { listOf(t("What matters", "क्या ज़रूरी है") to draft.priorities,t("Participants", "भागीदार") to draft.participants,t("Discussion", "चर्चा") to draft.topics,t("Questions", "सवाल") to draft.questions,t("Undecided", "तय नहीं") to draft.undecided,t("Next steps", "अगले क़दम") to draft.nextSteps).forEach { (label,text) -> Text(label,fontWeight=FontWeight.SemiBold); Text(text.ifBlank { "Not recorded" }) } } }
+@Composable private fun WorkflowDraftSummary(draft: WorkflowDraft) { val t = careText(); WorkflowCard { listOf(t("What matters", "क्या ज़रूरी है") to draft.priorities,t("Participants", "भागीदार") to draft.participants,t("Discussion", "चर्चा") to draft.topics,t("Questions", "सवाल") to draft.questions,t("Undecided", "तय नहीं") to draft.undecided,t("Next steps", "अगले क़दम") to draft.nextSteps).forEach { (label,text) -> Text(label,fontWeight=FontWeight.SemiBold); Text(text.ifBlank { t("Not recorded", "दर्ज नहीं") }) } } }
 
 @Composable private fun DoctorVersionReader(patient:DoctorDemoPatient,version:WorkflowVersion,store:DoctorWorkflowStore,onBack:()->Unit) { val t = careText();
     var revision by remember { mutableIntStateOf(0) }
@@ -247,7 +247,7 @@ private fun requestLabel(status: WorkflowRequestStatus) = status.name.lowercase(
         items(DoctorWorkflowData.members(patient.id),key={it.id}) { member -> WorkflowCard {
             Text(member.name,fontWeight=FontWeight.SemiBold)
             val ack=acknowledgements.firstOrNull { it.memberId==member.id }
-            Text(if(ack==null) t("Nothing recorded for this version", "इस संस्करण के लिए कुछ दर्ज नहीं") else "You noted: ${ackWords(ack.status)} · ${workflowDate(ack.at)}",color=Rust,modifier=Modifier.testTag("workflow-ack-state-${member.id}"))
+            Text(if(ack==null) t("Nothing recorded for this version", "इस संस्करण के लिए कुछ दर्ज नहीं") else t("You noted: ", "आपने लिखा: ") + "${ackWords(ack.status)} · ${workflowDate(ack.at)}",color=Rust,modifier=Modifier.testTag("workflow-ack-state-${member.id}"))
             FlowRow(horizontalArrangement=Arrangement.spacedBy(6.dp)) { WorkflowAckStatus.entries.forEach { status -> OutlinedButton(onClick={message=store.recordToldToClinician(version.id,member.id,status);revision++},modifier=Modifier.heightIn(min=48.dp).testTag("workflow-ack-${member.id}-${status.name}")) { Text(when(status) { WorkflowAckStatus.READ->t("Told me they read it", "बताया कि पढ़ लिया"); WorkflowAckStatus.CONCERN->t("Told me a concern", "कोई चिंता बताई"); else->t("Told me not ready", "बताया कि अभी तैयार नहीं") }) } } }
         } }
         message?.let { item { Text(it,color=Rust,modifier=Modifier.testTag("workflow-status")) } }
