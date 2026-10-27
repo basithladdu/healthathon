@@ -133,7 +133,7 @@ object EmergencyCardRules {
 }
 
 data class ReplacedEmergencyCard(val id: String, val number: Int, val madeAt: Long, val replacedAt: Long)
-data class EmergencyCardRecord(val personId: String, val id: String, val number: Int, val madeAt: Long, val sections: Set<EmergencySection>, val text: String, val body: String, val leftOut: List<String>, val replaced: List<ReplacedEmergencyCard> = emptyList()) {
+data class EmergencyCardRecord(val personId: String, val id: String, val number: Int, val madeAt: Long, val sections: Set<EmergencySection>, val text: String, val body: String, val leftOut: List<String>, val replaced: List<ReplacedEmergencyCard> = emptyList(), val link: EmergencyLink? = null) {
     companion object {
         /** A first card, or a replacement: new id, next number, and the old card listed as outdated. */
         fun make(personId: String, source: EmergencySource, sections: Set<EmergencySection>, previous: EmergencyCardRecord?, now: Long, zone: ZoneId = ZoneId.systemDefault(), id: String = EmergencyCardRules.newCardId()): EmergencyCardRecord {
@@ -142,18 +142,21 @@ data class EmergencyCardRecord(val personId: String, val id: String, val number:
             val number = (previous?.number ?: 0) + 1
             val card = EmergencyCardRules.build(source, sections, number, id, now, zone)
             val replaced = previous?.let { it.replaced + ReplacedEmergencyCard(it.id, it.number, it.madeAt, now) }.orEmpty()
-            return EmergencyCardRecord(personId, id, number, now, sections, card.text, card.body, card.leftOut, replaced)
+            // The web link stays the same across card updates, so printed copies keep opening the latest one.
+            return EmergencyCardRecord(personId, id, number, now, sections, card.text, card.body, card.leftOut, replaced, previous?.link)
         }
         fun decode(json: String): EmergencyCardRecord {
             val j = org.json.JSONObject(json)
             fun strings(name: String) = j.optJSONArray(name)?.let { a -> (0 until a.length()).map(a::getString) }.orEmpty()
             val replaced = j.optJSONArray("replaced")?.let { a -> (0 until a.length()).map { a.getJSONObject(it) }.map { ReplacedEmergencyCard(it.getString("id"), it.getInt("number"), it.getLong("madeAt"), it.getLong("replacedAt")) } }.orEmpty()
-            return EmergencyCardRecord(j.getString("personId"), j.getString("id"), j.getInt("number"), j.getLong("madeAt"), strings("sections").mapNotNull { s -> EmergencySection.entries.firstOrNull { it.name == s } }.toSet(), j.getString("text"), j.getString("body"), strings("leftOut"), replaced)
+            val link = j.optJSONObject("link")?.let { l -> runCatching { EmergencyLink(l.getString("token").also { EmergencyLinkRules.url(it) }, l.getLong("createdAt"), l.getLong("expiresAt")) }.getOrNull() }
+            return EmergencyCardRecord(j.getString("personId"), j.getString("id"), j.getInt("number"), j.getLong("madeAt"), strings("sections").mapNotNull { s -> EmergencySection.entries.firstOrNull { it.name == s } }.toSet(), j.getString("text"), j.getString("body"), strings("leftOut"), replaced, link)
         }
     }
     fun encode(): String = org.json.JSONObject().put("personId", personId).put("id", id).put("number", number).put("madeAt", madeAt)
         .put("sections", org.json.JSONArray(sections.map { it.name })).put("text", text).put("body", body).put("leftOut", org.json.JSONArray(leftOut))
-        .put("replaced", org.json.JSONArray(replaced.map { org.json.JSONObject().put("id", it.id).put("number", it.number).put("madeAt", it.madeAt).put("replacedAt", it.replacedAt) })).toString()
+        .put("replaced", org.json.JSONArray(replaced.map { org.json.JSONObject().put("id", it.id).put("number", it.number).put("madeAt", it.madeAt).put("replacedAt", it.replacedAt) }))
+        .also { j -> link?.let { j.put("link", org.json.JSONObject().put("token", it.token).put("createdAt", it.createdAt).put("expiresAt", it.expiresAt)) } }.toString()
     /** True when today's records would print a different card than the one saved. */
     fun outOfDate(source: EmergencySource, zone: ZoneId = ZoneId.systemDefault()): Boolean = EmergencyCardRules.build(source, sections, number, id, madeAt, zone).body != body
 }

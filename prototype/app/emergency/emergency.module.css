@@ -1,0 +1,17 @@
+.page { min-height: 100svh; padding: 24px 18px 48px; background: #fff8ee; color: #382e29; font-family: var(--font-inter), system-ui, sans-serif; line-height: 1.6; }
+.content { max-width: 680px; margin: 0 auto; }
+.header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px; padding-bottom: 16px; border-bottom: 1px solid #dacfc0; }
+.brand { font-family: Georgia, serif; font-size: 28px; font-weight: 700; letter-spacing: -0.05em; }
+.tag { color: #9e3b23; font-weight: 600; }
+.banner { margin: 18px 0; padding: 12px 14px; border-radius: 14px; background: #fbe8c8; color: #8a5a1b; font-size: 15px; }
+.name { margin: 8px 0 0; font-family: Georgia, serif; font-size: 34px; font-weight: 500; line-height: 1.2; }
+.section { margin-top: 22px; padding: 16px; border-radius: 20px; background: #fffdf8; }
+.section h2 { margin: 0 0 6px; font-size: 19px; }
+.section h3 { margin: 12px 0 2px; font-size: 15px; color: #9e3b23; }
+.section ul { margin: 6px 0 0; padding-left: 20px; }
+.section li { margin: 4px 0; }
+.text { white-space: pre-wrap; margin: 0; font-size: 17px; }
+.muted { color: #55483f; font-size: 14px; }
+.notice { margin-top: 28px; padding: 18px; border-radius: 20px; background: #fbe8c8; color: #382e29; }
+.notice h1 { margin: 0 0 6px; font-size: 22px; }
+.section a { color: #9e3b23; font-weight: 600; }

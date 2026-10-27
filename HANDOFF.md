@@ -239,8 +239,8 @@ Also read:
 ### Getting the note in an emergency
 | Item | Next step | Who |
 |---|---|---|
-| C1–C4 | Decide on the hospital QR card (3–5 days plus server work). If yes: large QR on Today, single-use browser link, printable, saveable offline, can be replaced if leaked | Owner decides, Awaiz builds |
-| C5 | ~~Password-protect the PDF copy~~ done, fd208b5 (locked AES-256 ZIP; Android cannot encrypt the PDF itself) | Awaiz |
+| C1–C4 | ~~Decide on the hospital QR card (3–5 days plus server work). If yes: large QR on Today, single-use browser link, printable, saveable offline, can be replaced if leaked~~ done in the QR lane (7a1810a, 217dcd2, a93a520; branch `sa3-qr`): revocable link, not single-use. **Owner applies** `android/supabase/migrations/20261027190000_emergency_card_links.sql` and deploys `prototype/app/emergency` before the link goes live | Owner decides, Awaiz builds |
+| C5 | ~~Password-protect the PDF copy~~ done: real PDF open-password (AES-256, `PdfPasswordLock.kt`, a93a520) for the emergency card PDF and, since the integration merge, the care-note PDF too (replaces the sa3-docs locked ZIP) | Awaiz |
 
 ### Access to care
 | Item | Next step | Who |
@@ -263,7 +263,7 @@ Also read:
 | E8, E9 | Clinicians to re-confirm whether patients may type daily medicines, or only scan printed prescriptions | Team |
 | E11 | Timeline summary from documents (last chemo or radiotherapy, with source) | Awaiz (later) |
 | E13 | Voice journal themes: no decision; hold | Team |
-| E16 | Quick access to the note and QR on Today, once C1 is decided | Awaiz |
+| E16 | ~~Quick access to the note and QR on Today, once C1 is decided~~ done, a93a520 | Awaiz |
 
 ### Language, identity, data
 | Item | Next step | Who |
@@ -324,4 +324,9 @@ Sources: `docs/research/CARE_DEEP_DIVE_2026-10-27.md`, `CARE_VS_SAHARA_FOR_TEAM.
 - **Doctor lane (33ac1f5):** the signed-in doctor Home now shows real upcoming visits and this week's check-ins across the doctor's connected patients (tap opens that patient's Visits or Progress), with a Refresh; Schedule lists every open real visit; Patients has search by name or patient ID (`SH-` + first 8 characters of the care-profile ID, or the full ID; B18) and a Join box for a doctor invitation code. The family's doctor-invite screen shows the patient ID. A verification card shows pending / approved / not approved with "Check again" (approval stays manual in the database, G1). Sample patients appear only in a card labelled "Walkthrough · sample patients"; the old synthetic server workspace no longer loads on entry. Logic unit-tested in `DoctorConnectedHomeTest`. Not tried on a phone.
 - **Docs / Lab history (sa3-docs):** E6 "Cancer documents" filter (PET-CT, biopsy, histopathology, staging; file name suggests, family sets or clears; label kept on the phone). E5 "Lab result" in Read and copy facts fills name/value/unit/range from the OCR line; the saved entry keeps the original line, page and file hash. E7 chemo/radiotherapy days (all-day Calendar entries) drawn as dashed lines on Lab history charts.
 - Report search takes Hindi query words (हीमोग्लोबिन, खून, जांच, बायोप्सी, पेट-सीटी …) for file names and reviewed text. Reports can now be renamed and scanned with the camera; Docs says report files stay on this phone and are not uploaded.
-- C5: optional password on the care-note PDF puts it in an AES-256 ZIP (receiver needs 7-Zip/WinRAR-type app). Not tried on a phone; not compiled by this lane after the build freeze beyond one unit-test run.
+- C5: optional password on the care-note PDF. sa3-docs first put it in an AES-256 ZIP; at the integration merge it was switched to the QR lane's real PDF password (`PdfPasswordLock`), so any PDF reader asks for the password and no ZIP app is needed. Not tried on a phone.
+- **QR lane (emergency card):** Today shows a large QR. When the profile owner is signed in it opens a read-only page at `sahara.wedevit.in/emergency#t=…` with the card the family ticked. The page shows the full latest patient-confirmed goals-of-care note, contacts and medicines. Tapping the QR opens a full-screen white view at maximum brightness; it can switch to the offline text code.
+  - Buttons: Update card (same link, so printed cards show the update), Replace the link (old one stops at once), Share, Print (Android print screen), Save PDF, Locked PDF (AES-256 password the reader asks for), and Read the confirmed note. "Done" messages appear only after the write succeeds.
+  - Until the owner applies `20261027190000_emergency_card_links.sql` (Saanthvana project) and deploys `prototype/app/emergency`, Today says "The web link becomes live after setup". The offline QR and the PDF already work.
+  - The link can be revoked and expires after one year; it is not single-use, because a printed card has to scan more than once.
+  - Verified: the SQL test passes on a local Postgres 16, the web unit tests pass, and PDF locking was checked with Poppler and pypdf. Not tried on a phone.
