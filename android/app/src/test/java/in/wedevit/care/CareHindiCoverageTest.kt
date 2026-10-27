@@ -13,7 +13,7 @@ import java.time.LocalDate
  */
 class CareHindiCoverageTest {
     private val screens = mapOf(
-        "CareUi.kt" to listOf("CareApp", "Today", "CareList", "CareRow", "More", "AddPerson", "AddPersonContent", "AddCareItem", "Welcome", "NoteReader", "AudioPlayback", "Nearby", "CentreCard", "InfoDisclosure", "RawTranscriptPanel"),
+        "CareUi.kt" to listOf("CareApp", "Today", "CareList", "CareRow", "More", "AddPerson", "AddPersonContent", "AddCareItem", "Welcome", "Talk", "NoteReader", "AudioPlayback", "Nearby", "CentreCard", "InfoDisclosure", "RawTranscriptPanel"),
         "CentreMap.kt" to listOf("CentreMap"),
         "CareDocuments.kt" to listOf("CareDocuments"),
         "CareDocumentReviewUi.kt" to listOf("CareDocumentReview"),
@@ -37,7 +37,7 @@ class CareHindiCoverageTest {
         "All India", "Home care", "Clinic visits", "Inpatient care", "Care notes", "Not great", "Goals of care {} {} Version {}",
         // Saved into records, file names, errors that are caught, and as-printed lab test names.
         "\\nOriginal prescription references:\\n", "Goals-of-care-v{}.txt", "File unavailable", "Recording unavailable", "What matters", "Red blood cells",
-        "Sahara root", "feedback expression", "feedback warmth", "d MMM", "d MMM, HH:mm", "h:mm a", "dd MMM yyyy · HH:mm z",
+        "Sahara root", "microphone level", "feedback expression", "feedback warmth", "d MMM", "d MMM, HH:mm", "h:mm a", "dd MMM yyyy · HH:mm z",
         "https://tiles.openfreemap.org/styles/liberty", "https://www.google.com/maps/search/?api=1&query=")
 
     @Test fun everyMainScreenStringHasAHindiPair() {
