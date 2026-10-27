@@ -52,7 +52,7 @@ The [CARE Home Care Grid page](https://ohc.network/solutions/palliative-care) li
   4. doctor review of the exact note version;
   5. **patient/family confirmation of that exact version**.
 
-  CARE has the data fields for family/patient verification but no screen for them (see section 2). This is the gap Sahara fills best.
+  CARE has the data fields for family/patient verification of a consent (entered by staff) but no screen for them (see section 2). Sahara's confirmation is done by the family themselves on a goals-of-care note, so it is related to that gap, not the same feature.
 - On-phone, offline-first use. Recordings and reports stay on the phone.
 
 **What is not true yet on Sahara's side** (HANDOFF.md, WORK_STATUS.md):
@@ -100,4 +100,4 @@ Resources linked in the email:
 
 ## 6. Message for the team
 
-The prepared team message in `TEAM_HANDOFF.md` ("We reviewed CARE…") is still accurate and has not been sent. Send it as is, adding one line: "CARE's own docs say it has no screen for family/patient confirmation of consent. That is the gap our goals-of-care confirmation fills."
+The prepared team message in `TEAM_HANDOFF.md` ("We reviewed CARE…") is still accurate and has not been sent. Send it as is, adding one line: "CARE's own docs list family/patient verification of a consent as a known gap with no screen (staff would record it). Sahara lets the patient or family confirm the exact goals-of-care note themselves." Note: CARE's verification is entered by staff on a consent record; Sahara's confirmation is done by the family on a goals-of-care note. They are related, not the same feature.
