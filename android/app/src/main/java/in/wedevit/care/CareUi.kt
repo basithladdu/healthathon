@@ -865,7 +865,9 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
     var view by rememberSaveable { mutableStateOf("Map & list") }
     var state by rememberSaveable { mutableStateOf("All India") }
     var chosen by remember { mutableStateOf<Centre?>(null) }
-    val focus = LocalFocusManager.current
+    val focus = LocalFocusManager.current; val t = careText()
+    // Filter values stay English (they match the directory data); only the labels follow the language choice.
+    val optionLabel = { o: String -> when (o) { "All India" -> t("All India", "पूरा भारत"); "All" -> t("All", "सभी"); "Home care" -> t("Home care", "घर पर देखभाल"); "Clinic visits" -> t("Clinic visits", "क्लिनिक में दिखाना"); "Inpatient care" -> t("Inpatient care", "भर्ती करके देखभाल"); "Map & list" -> t("Map & list", "नक्शा और सूची"); "List" -> t("List", "सूची"); else -> o } }
     val states = remember(centres) { centres.map { it.state }.filter(String::isNotBlank).distinct().sorted() }
     // Build each centre's search text once, not for all 1,600 centres on every typed letter.
     val searchText = remember(centres) { centres.map { c -> "${c.name} ${c.city} ${c.district} ${c.address} ${c.state}" } }
@@ -875,23 +877,23 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
     } }
     LazyColumn(Modifier.fillMaxSize().testTag("nearby-list"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
         item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Column(Modifier.weight(1f)) { Heading("Find care"); Text("$state · ${visible.size} ${if (visible.size == 1) "centre" else "centres"}", color = Rust) }
+            Column(Modifier.weight(1f)) { Heading(t("Find care", "देखभाल केंद्र खोजें")); Text("${optionLabel(state)} · " + t("${visible.size} ${if (visible.size == 1) "centre" else "centres"}", "${visible.size} केंद्र"), color = Rust) }
         } }
-        item { OutlinedTextField(value = search, onValueChange = { search = it }, placeholder = { Text("Place or hospital") }, leadingIcon = { Icon(Icons.Default.Search, null) }, trailingIcon = { if (search.isNotEmpty()) IconButton(onClick = { search = "" }) { Icon(Icons.Default.Close, "Clear search") } }, shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth(), singleLine = true,
+        item { OutlinedTextField(value = search, onValueChange = { search = it }, placeholder = { Text(t("Place or hospital", "जगह या अस्पताल")) }, leadingIcon = { Icon(Icons.Default.Search, null) }, trailingIcon = { if (search.isNotEmpty()) IconButton(onClick = { search = "" }) { Icon(Icons.Default.Close, t("Clear search", "खोज मिटाएँ")) } }, shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth(), singleLine = true,
             keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(imeAction = androidx.compose.ui.text.input.ImeAction.Search), keyboardActions = androidx.compose.foundation.text.KeyboardActions(onSearch = { focus.clearFocus() })) }
-        item { Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) { (listOf("All India") + states).forEach { option -> FilterChip(selected = state == option, onClick = { state = option }, label = { Text(option) }, modifier = Modifier.heightIn(min = 48.dp)) } } }
-        item { Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf("All", "Home care", "Clinic visits", "Inpatient care").forEach { s -> FilterChip(selected = service == s, onClick = { service = s }, label = { Text(s) }, modifier = Modifier.heightIn(min = 48.dp)) } } }
+        item { Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) { (listOf("All India") + states).forEach { option -> FilterChip(selected = state == option, onClick = { state = option }, label = { Text(optionLabel(option)) }, modifier = Modifier.heightIn(min = 48.dp)) } } }
+        item { Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf("All", "Home care", "Clinic visits", "Inpatient care").forEach { s -> FilterChip(selected = service == s, onClick = { service = s }, label = { Text(optionLabel(s)) }, modifier = Modifier.heightIn(min = 48.dp)) } } }
         item { FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf("Map & list", "List").forEach { option -> FilterChip(selected = view == option, onClick = { view = option }, label = { Text(option) }, modifier = Modifier.heightIn(min = 48.dp)) }
-            FilterChip(selected = morphine, onClick = { morphine = !morphine }, label = { Text("Morphine listed") }, leadingIcon = { Icon(Icons.Default.Medication, null, Modifier.size(18.dp)) }, modifier = Modifier.heightIn(min = 48.dp))
-        }; Text("Directory listings. Call to confirm services, availability and cost.", style = MaterialTheme.typography.bodySmall) }
+            listOf("Map & list", "List").forEach { option -> FilterChip(selected = view == option, onClick = { view = option }, label = { Text(optionLabel(option)) }, modifier = Modifier.heightIn(min = 48.dp)) }
+            FilterChip(selected = morphine, onClick = { morphine = !morphine }, label = { Text(t("Morphine listed", "मॉर्फ़ीन उपलब्ध")) }, leadingIcon = { Icon(Icons.Default.Medication, null, Modifier.size(18.dp)) }, modifier = Modifier.heightIn(min = 48.dp))
+        }; Text(t("Directory listings. Call to confirm services, availability and cost.", "यह सूची से ली गई जानकारी है। सेवा, उपलब्धता और ख़र्च फ़ोन करके पक्का करें।"), style = MaterialTheme.typography.bodySmall) }
         if (view == "Map & list" && visible.isNotEmpty()) item {
             val located = visible.count { it.latitude != null && it.longitude != null }
             if (located > 0) Column(Modifier.clip(RoundedCornerShape(20.dp))) { CentreMap(visible) { chosen = it } }
-            else Text("Use the published addresses and Directions below. This source has no exact map locations for this filter.", style = MaterialTheme.typography.bodySmall)
-            if (located < visible.size) Text("$located mapped · ${visible.size - located} addresses in the list", style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 6.dp))
+            else Text(t("Use the published addresses and Directions below. This source has no exact map locations for this filter.", "नीचे दिए पते और रास्ता देखें। इस चुनाव के लिए सूची में नक्शे की सही जगह नहीं है।"), style = MaterialTheme.typography.bodySmall)
+            if (located < visible.size) Text(t("$located mapped · ${visible.size - located} addresses in the list", "$located नक्शे पर · ${visible.size - located} पते सूची में"), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 6.dp))
         }
-        if (visible.isEmpty()) item { SurfaceCard { Text("No centres match that search."); TextButton(onClick = { search = ""; service = "All"; state = "All India"; morphine = false }) { Text("Clear filters") } } }
+        if (visible.isEmpty()) item { SurfaceCard { Text(t("No centres match that search.", "इस खोज से कोई केंद्र नहीं मिला।")); TextButton(onClick = { search = ""; service = "All"; state = "All India"; morphine = false }) { Text(t("Clear filters", "सभी चुनाव हटाएँ")) } } }
         items(visible, key = { it.id }) { c -> CentreCard(c) }
     }
     chosen?.let { centre -> ModalBottomSheet(onDismissRequest = { chosen = null }, containerColor = Cream) {
@@ -900,16 +902,16 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
 }
 
 @Composable fun CentreCard(c: Centre) {
-    val context = LocalContext.current
+    val context = LocalContext.current; val t = careText()
     SurfaceCard {
             Text(listOf(c.city, c.state).filter(String::isNotBlank).distinct().joinToString(" · "), color = Rust, style = MaterialTheme.typography.labelMedium); Spacer(Modifier.height(6.dp)); Text(c.name, fontSize = 19.sp, fontWeight = FontWeight.SemiBold)
             Spacer(Modifier.height(8.dp)); Text(c.services, style = MaterialTheme.typography.bodySmall); Text(c.address, style = MaterialTheme.typography.bodyMedium)
-            if (c.sourceListedMorphine == "available") Text("Directory lists morphine · call to confirm", fontSize = 12.sp, color = Color(0xFF465E45), modifier = Modifier.padding(top = 8.dp))
-            Text(listOf(c.sourceName, c.checkedOn.takeIf { it.isNotBlank() }?.let { "Source retrieved $it" }).filterNotNull().filter(String::isNotBlank).joinToString(" · "), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            if (c.sourceListedMorphine == "available") Text(t("Directory lists morphine · call to confirm", "सूची में मॉर्फ़ीन लिखा है · फ़ोन करके पक्का करें"), fontSize = 12.sp, color = Color(0xFF465E45), modifier = Modifier.padding(top = 8.dp))
+            Text(listOf(c.sourceName, c.checkedOn.takeIf { it.isNotBlank() }?.let { t("Source retrieved $it", "जानकारी ली गई $it") }).filterNotNull().filter(String::isNotBlank).joinToString(" · "), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                if (c.phone.any(Char::isDigit)) TextButton(onClick = { open(context, Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + c.phone.replace(Regex("[^+0-9]"), "")))) }) { Icon(Icons.Default.Call, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Call") }
-                TextButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com/maps/search/?api=1&query=" + Uri.encode(c.name + " " + c.address)))) }) { Text("Directions") }
-                TextButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse(c.url))) }) { Text("Source") }
+                if (c.phone.any(Char::isDigit)) TextButton(onClick = { open(context, Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + c.phone.replace(Regex("[^+0-9]"), "")))) }) { Icon(Icons.Default.Call, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Call", "फ़ोन करें")) }
+                TextButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com/maps/search/?api=1&query=" + Uri.encode(c.name + " " + c.address)))) }) { Text(t("Directions", "रास्ता")) }
+                TextButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse(c.url))) }) { Text(t("Source", "स्रोत")) }
             }
     }
 }

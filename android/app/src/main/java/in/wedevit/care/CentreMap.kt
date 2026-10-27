@@ -33,7 +33,7 @@ import org.maplibre.geojson.FeatureCollection
 import org.maplibre.geojson.Point
 
 @Composable fun CentreMap(centres: List<Centre>, onSelect: (Centre) -> Unit) {
-    val context = LocalContext.current
+    val context = LocalContext.current; val t = careText()
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     val currentCentres by rememberUpdatedState(centres)
     val select by rememberUpdatedState(onSelect)
@@ -104,15 +104,15 @@ import org.maplibre.geojson.Point
             }
         }
     }
-    Box(Modifier.fillMaxWidth().height(260.dp).testTag("centre-map").semantics { stateDescription = if (failed) "Map unavailable" else if (loaded) "Map ready" else "Loading map" }) {
+    Box(Modifier.fillMaxWidth().height(260.dp).testTag("centre-map").semantics { stateDescription = if (failed) t("Map unavailable", "नक्शा उपलब्ध नहीं") else if (loaded) t("Map ready", "नक्शा तैयार") else t("Loading map", "नक्शा खुल रहा है") }) {
         key(retry) { AndroidView(factory = { view }, modifier = Modifier.fillMaxSize()) }
         if (!loaded && !failed) CircularProgressIndicator(Modifier.size(28.dp).align(Alignment.Center))
-        if (failed) Surface(Modifier.align(Alignment.Center).padding(8.dp), color = Paper) { Column(Modifier.padding(12.dp)) { Text("Couldn't load the map.", style = MaterialTheme.typography.bodySmall); TextButton(onClick = { failed = false; loaded = false; retry++ }) { Text("Try again") } } }
+        if (failed) Surface(Modifier.align(Alignment.Center).padding(8.dp), color = Paper) { Column(Modifier.padding(12.dp)) { Text(t("Couldn't load the map.", "नक्शा नहीं खुल सका।"), style = MaterialTheme.typography.bodySmall); TextButton(onClick = { failed = false; loaded = false; retry++ }) { Text(t("Try again", "फिर कोशिश करें")) } } }
         val located = centres.filter { it.latitude != null && it.longitude != null }
         if (loaded && located.isNotEmpty()) FilledTonalButton(onClick = {
             val update = bounds(located)
             if (ValueAnimator.areAnimatorsEnabled()) map?.animateCamera(update, 350) else map?.moveCamera(update)
-        }, modifier = Modifier.align(Alignment.TopEnd).padding(8.dp)) { Text("Show all") }
+        }, modifier = Modifier.align(Alignment.TopEnd).padding(8.dp)) { Text(t("Show all", "सभी दिखाएँ")) }
     }
 }
 
