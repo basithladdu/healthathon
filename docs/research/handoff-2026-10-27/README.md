@@ -20,6 +20,11 @@ One place for the team to understand what we researched, how we reasoned, what w
 | Palliative organisations (Pallium, Niram, Arike, IAPC, Kerala grid) | in progress | `partners/` (added when done) |
 | India palliative landscape (apps, policy, providers, evidence, business models) | in progress | `landscape/` (added when done) |
 
+## Raw material (everything is in this repo)
+- `care-docs-crawl/raw-page-text.tar.gz`: plain text of every CARE page and file read (docs 473 pages, site 75 pages), plus fetch logs and sitemaps (649 files). Unpack with `tar -xzf`.
+- `method/`: the exact instructions the research agents followed (CARE crawl, OHC repo audit, partner research, India landscape).
+- Repo source code was read from shallow clones and then deleted; the per-repo notes in `ohc-repos/` cite file paths so anyone can re-check on GitHub.
+
 ## How we reasoned (thought process)
 1. **Question asked:** CARE is the staff side of palliative care. Can Sahara be the family side and "fit the puzzle"?
 2. **First pass (website + docs):** CARE is a free, open-source hospital system for staff (MIT licence, by OHC in Kochi). It covers registries, home visits, care teams, consents. Its own docs list a gap: no screen for family/patient verification of a consent. We first over-stated that gap; the correct version is "staff would record it; the family never confirms anything themselves in CARE".

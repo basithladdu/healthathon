@@ -1,0 +1,11 @@
+# Palliative partner research (owner: "research everything about them and maybe do something that will help them")
+Context: Sahara = family-side palliative care phone app (symptom diary 0–10, 3D pain body, medicines + taken/missed log, visits, documents, family invites, goals-of-care conversation recorded with consent → doctor-reviewed note → family confirms the exact version; Hindi/English; online with Sahara's server). CARE (OHC) = staff EMR these orgs use; it has no family side. Read /home/user/healthathon/docs/research/CARE_VS_SAHARA_FOR_TEAM.md quickly for background.
+Your job for ONE organisation: read EVERYTHING public — every route of their website (crawl internal links fully; curl -sL, 1 s delay), annual reports/PDFs, news articles, research papers they authored or that study them (PubMed/Google Scholar/Indian Journal of Palliative Care), government documents, YouTube/podcast descriptions, Reddit/Quora/forums, LinkedIn/press, job posts, donation appeals. Read-only: no forms, no logins, no messages.
+Answer with citations (URL + exact quote) and mark [unverified] where unsure:
+1. Who they are: model of care, geography, scale (patients, home-care teams, volunteers, beds), funding, leadership/contacts (public only).
+2. How they work day to day: home visits, OPD, helplines, telehealth, volunteers, training (courses), medicine/opioid access (morphine), caregiver support, bereavement.
+3. Tech they use: CARE (when, what for), other apps/EMRs, WhatsApp/helplines, any patient/family app; their stated digital needs.
+4. Pain points & gaps they publicly describe (especially for families/caregivers): what families struggle with, opioid access, follow-up between visits, symptom reporting, documentation, advance care planning/goals-of-care, language, rural reach, staff shortage.
+5. Their published research/data relevant to Sahara (symptom tools they use e.g. ESAS/IPOS/POS, caregiver burden studies, ACP studies).
+6. Concrete ways Sahara could help them (specific feature ↔ specific pain point, with source), what they would likely NOT want, and the best first ask/pilot.
+Return everything as your final message (subagents can't write report files): sections 1–6, then a page log (URL | read? | one line). Be thorough; aim for 40+ sources if they exist.
