@@ -1,0 +1,20 @@
+# id: C16
+# title: Frail elder after hip fracture, grandson translates and relays answers
+# language: hi-IN (Hinglish, Roman script)
+# people: patient Hari Prasad (88); grandson Rohit (family, translating); doctor
+# covered: Q1-Q5, Q7, Q8. Not covered: Q6
+D: Rohit, please aap Dadaji ko translate kar dena. Unke liye abhi sabse important kya hai?
+F: Dadaji keh rahe hain ki unko apne gaon wale ghar jaana hai. Wahin rehna hai. <<Q1>>
+D: Aur care se kya expect karte hain?
+F: Bolte hain bas chal-phir sakein, bathroom khud jaa sakein. <<Q2>>
+D: Health ke baare mein unki kya understanding hai?
+F: Woh samajhte hain haddi jud jaayegi aur sab pehle jaisa ho jaayega. <<Q4>>
+D: Is age mein recovery slow hoti hai, aur shayad poori na ho. Hum yeh dheere se samjhayenge.
+D: Decisions mein kaun involve ho?
+F: Mere papa aur chacha. Dadaji kehte hain bade bete se poocho. <<Q3>>
+D: Unki sabse badi chinta kya hai?
+F: Ki woh bistar pe pade rahenge aur sab ko pareshan karenge. <<Q5>>
+D: Next kya karna chahiye?
+F: Physio ghar pe aaye, aur do hafte baad gaon le jaane ka socha hai. <<Q7>>
+D: Yeh baat kisko batani hai?
+F: Chacha ko phone pe bata dunga. Aur gaon ke doctor ko. <<Q8>>

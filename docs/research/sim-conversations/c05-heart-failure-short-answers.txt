@@ -1,0 +1,27 @@
+# id: C05
+# title: Heart failure, patient alone, one- or two-word answers
+# language: en-IN (English)
+# people: patient Mr Thomas (80); no family present; doctor
+# covered: all eight (Q5 "Nothing" and Q6 "No" count as answers)
+D: Mr Thomas, I'd like to ask you a few questions about your care. Is that alright?
+P: Go ahead.
+D: What matters most to you at the moment?
+P: My dog. <<Q1>>
+D: Your dog?
+P: Bruno. Someone has to feed him. I want to stay at home with him. <<Q1>>
+D: What are you hoping for from your care?
+P: Fewer admissions. <<Q2>>
+D: Who would you like involved in decisions?
+P: Nobody. Me. <<Q3>>
+D: Is there anyone you would want us to call if you could not speak?
+P: My neighbour, Mrs D'Souza. She has a key. <<Q3>>
+D: What is your understanding of your heart condition?
+P: The pump is weak. <<Q4>>
+D: What worries you most about the future?
+P: Nothing. <<Q5>>
+D: Anything else you want to talk about?
+P: No. <<Q6>>
+D: What would you like to happen next?
+P: Go home today. <<Q7>>
+D: Who should hear about this plan?
+P: Mrs D'Souza. <<Q8>>

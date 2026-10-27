@@ -1,0 +1,28 @@
+# id: C06
+# title: Metastatic breast cancer, patient and husband want different things
+# language: en-IN (English)
+# people: patient Farah (45); husband Imran (family); doctor
+# covered: all eight. Q2 and Q5 have two different views; both lines count.
+D: Farah, Imran, I want to make sure we understand what each of you is hoping for.
+P: I've been thinking about it a lot.
+D: What matters most to you at the moment?
+P: Honestly, being present for my daughters' exams. Not being sick from chemo every week. <<Q1>>
+F: But we have to keep fighting. There's a new trial in Bangalore.
+D: What are you hoping for from your care, Farah?
+P: I'm hoping for good days, not more days in a ward. <<Q2>>
+F: I'm hoping for more time. I don't care what it takes. <<Q2>>
+D: It sounds like you are each hoping for different things, and both come from love.
+D: Who would you like involved in decisions about your care?
+P: Imran, of course. But I want the final word to be mine. <<Q3>>
+D: What is your understanding of your current health?
+P: It's in my bones and liver. The last scan was worse. <<Q4>>
+D: What worries you most about the future?
+P: That the girls will remember me as someone in bed. <<Q5>>
+F: I worry I'll regret not trying everything. <<Q5>>
+D: Is there anything you would like to talk about that we have not covered?
+P: Can we talk about the trial without me having to decide today? <<Q6>>
+D: Yes. Nothing has to be decided today.
+D: What would you like to happen next?
+P: I'd like to read about the trial with Imran, and see you again next Thursday. <<Q7>>
+D: Who should hear about what we have agreed?
+P: My sister Zoya. She's a nurse. <<Q8>>

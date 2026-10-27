@@ -1,0 +1,24 @@
+# id: C17
+# title: Multiple myeloma, worries are mostly about money and work
+# language: en-IN (English)
+# people: patient Sunil (59); wife Rekha (family); doctor
+# covered: all eight
+D: Sunil, Rekha, let's spend a few minutes on what's important to you as we plan.
+D: What matters most to you at the moment?
+P: Keeping my job as long as I can. We still have loans. <<Q1>>
+D: What are you hoping for from your care?
+P: To stay well enough to work. Fewer hospital days. <<Q2>>
+D: Who would you like involved in decisions about your care?
+P: Rekha. And my elder brother, he helps with money. <<Q3>>
+D: What is your understanding of your current health?
+P: Myeloma. Treatable but not curable, they said. The kidneys are also affected. <<Q4>>
+D: What worries you most about the future?
+F: Money. If he stops working, how do we pay for the medicines? <<Q5>>
+P: Yes, the costs. Each cycle is very expensive. <<Q5>>
+D: Is there anything you would like to talk about that we have not covered?
+P: Is there any government scheme that covers this drug? <<Q6>>
+D: There may be. Our social worker will check your eligibility for the state scheme. <<Q7>>
+D: What would you like to happen next?
+P: Talk to the social worker, and continue the current cycle. <<Q7>>
+D: Who should hear about what we have agreed?
+P: Just Rekha for now. Not my parents, they're old and they'll worry. <<Q8>>
