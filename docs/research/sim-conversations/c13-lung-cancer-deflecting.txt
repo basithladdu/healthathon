@@ -1,0 +1,20 @@
+# id: C13
+# title: Lung cancer, patient deflects with humour, doctor stops early
+# language: en-IN (English)
+# people: patient Vinod (67); no family present; doctor
+# covered: Q1, Q6, Q7. Deflected (not answered): Q2, Q4. Not covered: Q3, Q5, Q8
+D: Vinod, I wanted to talk about how things are going and what's ahead.
+P: Doctor, you look more worried than me!
+D: Maybe. What matters most to you at the moment?
+P: Cricket on TV and my evening walk. That's it, no big philosophy. <<Q1>>
+D: What are you hoping for from your care?
+P: That you stop asking difficult questions!
+D: Fair. What is your understanding of your current health?
+P: You tell me. You're the doctor.
+D: The scan shows the cancer has grown. Did Dr Shah talk to you about that?
+P: He did. I didn't listen much. Let's leave it.
+D: That's alright. We don't have to talk about it today.
+D: Is there anything you would like to talk about?
+P: When can I go home? <<Q6>>
+D: Tomorrow, if the fever stays down. <<Q7>>
+P: Good. Then we'll talk.

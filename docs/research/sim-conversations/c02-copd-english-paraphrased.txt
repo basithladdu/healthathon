@@ -1,0 +1,23 @@
+# id: C02
+# title: End-stage COPD, doctor paraphrases every question
+# language: en-IN (English)
+# people: patient Joseph (74); wife Mary and son Kevin (family); doctor
+# covered: Q1-Q5, Q7 (plan stated by doctor, patient agrees). Not covered: Q6, Q8
+D: Joseph, Mary, Kevin, thanks for coming in. Your breathing has been harder these last months.
+P: It has. I can't climb the stairs at all now.
+D: Tell me, what is the thing you care about most right now?
+P: Getting to church on Sundays. And sitting with Mary in the evenings without gasping. <<Q1>>
+D: When you think about the treatment we give you, what would you like it to do for you?
+P: Just keep me comfortable. I'm not looking for miracles. <<Q2>>
+F: Dad, the new inhaler could still help.
+P: Maybe, but comfort first. <<Q2>>
+D: How do you see your lungs at this point? What have the other doctors told you?
+P: They said the lungs are worn out. It won't get better, only slower or faster. <<Q4>>
+D: When decisions come up, who should we talk with?
+P: Mary decides with me. Kevin too, he handles the paperwork. <<Q3>>
+D: Is there something that scares you when you think ahead?
+P: Choking. Not being able to get air at night. <<Q5>>
+F: He wakes up in a panic sometimes.
+D: We can give medicine for that breathlessness at night. We will start a low dose and see you in a week. <<Q7>>
+P: Alright. <<Q7>>
+F: Okay. I'll bring him.

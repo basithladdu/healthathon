@@ -1,0 +1,23 @@
+# id: C12
+# title: Advanced dementia, patient cannot take part, siblings disagree on who decides
+# language: en-IN (English)
+# people: patient Mrs Gomes (84, not present); daughter Rita (in the room) and son Peter (on speaker phone) (family); doctor
+# covered: Q1-Q5, Q7. Not covered: Q6, Q8
+D: Rita, Peter, thank you. Your mother can't join this conversation, so we want to understand what she would have wanted.
+F: She was always very clear about not wanting fuss.
+D: What do you think matters most to her right now?
+F: Her routine. Her tea at four, her rosary, her own bed. <<Q1>>
+F: And seeing the grandchildren on Sundays. <<Q1>>
+D: What are you hoping our care can do for her?
+F: Keep her calm. She gets very agitated in hospital. <<Q2>>
+D: Who should be involved in decisions about her care?
+F: I'm here every day, so it should be me. <<Q3>>
+F: We should decide together, Rita. I'm her son too. <<Q3>>
+D: It's common for families to feel differently. We can agree that both of you are called.
+D: What is your understanding of her condition?
+F: The dementia is advanced. She doesn't know us most days. <<Q4>>
+D: What worries you most about the future?
+F: That she'll stop eating and someone will want a feeding tube. <<Q5>>
+D: What would you like to happen next?
+F: Stay at the care home, no more hospital trips unless it's for comfort. <<Q7>>
+F: I agree with that part. <<Q7>>

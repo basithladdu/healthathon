@@ -1,0 +1,24 @@
+# id: C11
+# title: Relapsed childhood leukaemia, parents answer
+# language: hi-IN (Hinglish, Roman script)
+# people: child Aarav (9, not present); parents Pooja and Sandeep (family); doctor
+# covered: all eight
+D: Pooja ji, Sandeep ji, Aarav ke relapse ke baad hum yeh samajhna chahte hain ki aap ke liye kya important hai.
+F: Doctor, hum bas chahte hain woh bacha rahe.
+D: Abhi aapke family ke liye sabse important kya hai?
+F: Ki Aarav school ja sake, apne doston ke saath khele. Hospital mein hi na rahe. <<Q1>>
+D: Aur treatment se aapki kya hope hai?
+F: Ek aur chance. Bone marrow transplant ke baare mein socha hai. <<Q2>>
+D: Decisions mein kaun shaamil ho?
+F: Hum dono. Aur Aarav bhi, woh samajhdaar hai, usse bhi poochna chahiye. <<Q3>>
+D: Aarav ki health ke baare mein aapki kya samajh hai?
+F: Cancer wapas aa gaya hai, aur is baar zyada strong hai. <<Q4>>
+D: Sabse zyada kis baat ka darr hai?
+F: Ki woh dard mein jaaye. Aur hum usse sach na bata paayein. <<Q5>>
+D: Kuch aur discuss karna hai?
+F: Uski choti behen ko kaise samjhayein? <<Q6>>
+D: Hamari counsellor is mein help karengi.
+D: Next step kya ho?
+F: Transplant doctor se milna, aur counsellor se. <<Q7>>
+D: Yeh plan kisko batana chahiye?
+F: Dadi-dada ko, aur school ki teacher ko. <<Q8>>

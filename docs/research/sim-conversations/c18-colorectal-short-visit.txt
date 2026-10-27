@@ -1,0 +1,14 @@
+# id: C18
+# title: Colorectal cancer, rushed visit, only two topics covered
+# language: en-IN (English)
+# people: patient Nisha (39); husband Aman (family); doctor
+# covered: Q1, Q7. Not covered: Q2-Q6, Q8
+D: Nisha, I know we're short on time today. I just want to ask one or two things.
+P: Sure.
+D: What matters most to you at the moment?
+P: My son starts school in June. I want to be well for that. <<Q1>>
+F: We're also moving house next month, so it's a lot.
+D: That's a lot to manage. Let's keep the chemotherapy on track and talk properly next week.
+D: What would you like to happen next?
+P: Finish this cycle, then come back on Monday with Aman. <<Q7>>
+D: Good. We'll book you for Monday at ten. <<Q7>>
