@@ -13,7 +13,7 @@ import java.io.File
 import java.security.MessageDigest
 import java.util.UUID
 
-/** App-experience feedback fixtures only. No health-record, account or external submission. */
+/** App-experience feedback fixtures only. No health-record, account or external submission (no cloud is passed, so nothing is sent). */
 class FeedbackUiTest {
     @get:Rule val ui = createComposeRule()
 
@@ -31,7 +31,7 @@ class FeedbackUiTest {
         ui.onNodeWithTag("feedback-note").performScrollTo().performTextInput("Fictional app-interface feedback")
         androidx.test.espresso.Espresso.closeSoftKeyboard()
         ui.onNodeWithTag("feedback-save").performScrollTo().assertIsEnabled().performClick()
-        ui.onNodeWithText("Saved on this device").assertExists()
+        ui.onNodeWithText("Saved on this phone").assertExists()
         assertEquals(1f, store.latest()!!.score, .001f)
         assertEquals("Fictional app-interface feedback", store.latest()!!.note)
         ui.onNodeWithTag("feedback-slider").performScrollTo().performSemanticsAction(SemanticsActions.SetProgress) { it(0f) }

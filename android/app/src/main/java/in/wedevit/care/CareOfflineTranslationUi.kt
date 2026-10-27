@@ -38,7 +38,7 @@ import kotlinx.coroutines.launch
     var error by remember(versionId, source) { mutableStateOf("") }
     var job by remember { mutableStateOf<Job?>(null) }
     var notices by remember { mutableStateOf(false) }
-    LaunchedEffect(Unit) { try { available = service.installed() } catch (failure: Exception) { if (failure is CancellationException) throw failure; error = t("Could not check the downloaded language pack.", "डाउनलोड किया भाषा पैक जाँचा नहीं जा सका।") } }
+    LaunchedEffect(Unit) { try { available = service.installed() } catch (failure: Exception) { if (failure is CancellationException) throw failure; error = CareOfflineTranslationCopy.unavailable } }
     DisposableEffect(versionId, source) { onDispose { job?.cancel() } }
     SurfaceCard(Mint) {
         Text("हिन्दी / English", fontWeight = FontWeight.Bold)
@@ -55,9 +55,10 @@ import kotlinx.coroutines.launch
                 downloadBusy = true; error = ""
                 job = scope.launch { try { service.download(wifiOnly); available = true } catch (failure: Exception) {
                     if (failure is CancellationException) throw failure
-                    error = t("Language pack download failed. Check the connection and try again.", "भाषा पैक डाउनलोड नहीं हुआ। इंटरनेट जाँचकर फिर कोशिश करें।")
+                    error = CareOfflineTranslationCopy.downloadFailed
                 } finally { downloadBusy = false } }
             }, enabled = !downloadBusy, modifier = Modifier.testTag("offline-translation-download")) { Text(if (downloadBusy) t("Downloading language pack…", "भाषा पैक डाउनलोड हो रहा है…") else t("Download Hindi–English pack", "हिन्दी–अंग्रेज़ी पैक डाउनलोड करें")) }
+            if (downloadBusy && wifiOnly) Text(CareOfflineTranslationCopy.waitingForWifi, style = MaterialTheme.typography.bodySmall)
             if (downloadBusy) TextButton(onClick = { job?.cancel(); downloadBusy = false }) { Text(t("Stop waiting", "इंतज़ार बंद करें")) }
         } else {
             Button(onClick = {
@@ -95,4 +96,11 @@ import kotlinx.coroutines.launch
             TextButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse("https://cloud.google.com/translate"))) }) { Text(t("Google Translate information", "Google Translate की जानकारी")) }
         }
     }, confirmButton = { TextButton(onClick = { notices = false }) { Text(t("Close", "बंद करें")) } })
+}
+
+/** Plain statements for when the on-device translator cannot run. English · Hindi. */
+internal object CareOfflineTranslationCopy {
+    const val unavailable = "Translation is unavailable on this phone: the on-device translator (Google ML Kit) could not start. Read the original note. · इस फ़ोन पर अनुवाद उपलब्ध नहीं है: फ़ोन पर चलने वाला अनुवादक शुरू नहीं हो सका। मूल नोट पढ़ें।"
+    const val downloadFailed = "Translation is unavailable until the Hindi–English pack downloads. Check the internet connection and try again; the original note is unchanged. · हिन्दी–English पैक डाउनलोड होने तक अनुवाद उपलब्ध नहीं है। इंटरनेट जाँचकर फिर कोशिश करें; मूल नोट नहीं बदला।"
+    const val waitingForWifi = "Waiting for Wi-Fi. Untick “Download over Wi-Fi only” to use mobile data. · वाई-फ़ाई का इंतज़ार है। मोबाइल डेटा से डाउनलोड के लिए “Wi-Fi only” हटाएँ।"
 }

@@ -43,6 +43,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.launch
 
 /** Slider-to-mood mapping for the daily check-in. Titles are a fixed vocabulary parsed by DoctorReportedMood and the progress history. */
 internal object CheckInMood {
@@ -55,14 +56,18 @@ internal object CheckInMood {
     }
 }
 
-@Composable fun FeedbackScreen(accountScope: String, surface: String, onClose: () -> Unit, careModel: CareModel? = null, personId: String? = null) {
-    if (careModel == null || personId == null) AppFeedbackScreen(accountScope, surface, onClose)
+/** [cloud] sends app feedback to Sahara's server when signed in; without it, app feedback stays on this phone. */
+@Composable fun FeedbackScreen(accountScope: String, surface: String, onClose: () -> Unit, careModel: CareModel? = null, personId: String? = null, cloud: CareCloud? = null) {
+    if (careModel == null || personId == null) AppFeedbackScreen(accountScope, surface, onClose, cloud)
     else FeedbackExperienceScreen(accountScope, surface, onClose, careModel, personId)
 }
 
+/** Where the latest app feedback is: only "sent" once the server confirmed it. */
+internal enum class FeedbackSendState { NONE, LOCAL, SENDING, SENT, QUEUED }
+
 /** Shared face-and-slider presentation; app feedback and patient check-ins retain distinct save destinations. */
 @OptIn(ExperimentalMaterial3Api::class)
-@Composable private fun FeedbackExperienceScreen(accountScope: String, surface: String, onClose: () -> Unit, careModel: CareModel? = null, personId: String? = null) { val t = careText();
+@Composable private fun FeedbackExperienceScreen(accountScope: String, surface: String, onClose: () -> Unit, careModel: CareModel? = null, personId: String? = null, cloud: CareCloud? = null) { val t = careText();
     val checkIn = careModel != null && personId != null
     val items by (careModel?.items ?: remember { kotlinx.coroutines.flow.MutableStateFlow(emptyList<CareItem>()) }).collectAsStateWithLifecycle()
     val busy by (careModel?.busy ?: remember { kotlinx.coroutines.flow.MutableStateFlow(false) }).collectAsStateWithLifecycle()
@@ -96,6 +101,23 @@ internal object CheckInMood {
     val shownLabel = if (checkIn) checkInMoodLabel(label, careHindi()) else when (label) { "Not great" -> t("Not great", "अच्छा नहीं"); "Okay" -> t("Okay", "ठीक"); else -> t("Good", "अच्छा") }
     val limit = if (checkIn) CheckInMood.noteLimit else FeedbackRules.noteLimit
     val onSaved = { saved = true; savedScore = score; savedNote = note }
+    val signedIn by (cloud?.session ?: remember { kotlinx.coroutines.flow.MutableStateFlow<CareSession?>(null) }).collectAsStateWithLifecycle()
+    val account = signedIn?.userId.takeIf { !checkIn && cloud != null }
+    var sendState by remember(store) { mutableStateOf(if (!checkIn && store.isQueued(store.latestId())) FeedbackSendState.QUEUED else FeedbackSendState.NONE) }
+    var sendError by remember(store) { mutableStateOf<String?>(null) }
+    val sendScope = rememberCoroutineScope()
+    fun send(to: String) {
+        val service = cloud ?: return
+        val latestId = store.latestId(); val wasQueued = store.isQueued(latestId)
+        sendState = FeedbackSendState.SENDING; sendError = null
+        sendScope.launch {
+            val failure = store.flush(to) { service.sendAppFeedback(it) }
+            sendError = failure
+            sendState = when { store.isQueued(latestId) -> FeedbackSendState.QUEUED; wasQueued -> FeedbackSendState.SENT; else -> if (saved) FeedbackSendState.LOCAL else FeedbackSendState.NONE }
+        }
+    }
+    // Retries anything this account queued earlier (offline, or before the server table existed).
+    LaunchedEffect(account) { if (account != null && store.pending().any { it.accountId == account }) send(account) }
 
     Column(Modifier.fillMaxSize().background(wash).safeDrawingPadding().imePadding().testTag("feedback-screen").verticalScroll(rememberScrollState()).padding(horizontal = 24.dp).padding(top = 12.dp, bottom = 24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -121,18 +143,19 @@ internal object CheckInMood {
                 TextButton(onClick = { score = value; saved = false; error = null }, contentPadding = PaddingValues(horizontal = 8.dp), modifier = Modifier.heightIn(min = 48.dp).then(if (checkIn) Modifier.weight(1f).testTag("checkin-mood-$value") else Modifier.weight(1f).testTag("feedback-mood-$value"))) { Text(if (checkIn) checkInMoodLabel(name, careHindi()) else when (name) { "Not great" -> t("Not great", "अच्छा नहीं"); "Okay" -> t("Okay", "ठीक"); else -> t("Good", "अच्छा") }, textAlign = androidx.compose.ui.text.style.TextAlign.Center, fontSize = if (checkIn) 13.sp else 14.sp, color = if (label == name) RustText else Ink.copy(alpha = .75f), fontWeight = if (label == name) FontWeight.Bold else FontWeight.Normal) }
             }
         }
-        OutlinedTextField(value = note, onValueChange = { if (it.length <= limit) { note = it; saved = false; error = null } }, label = { Text(t("Anything to add? (optional)", "कुछ और बताना है? (चाहें तो)")) }, placeholder = { Text(if (checkIn) t("How are you feeling today?", "आज आप कैसा महसूस कर रहे हैं?") else t("What felt easy, or what could be clearer?", "क्या आसान लगा, या क्या और साफ़ हो सकता है?")) }, supportingText = { Text(if (checkIn) t("Added to the care record. ${note.length}/$limit", "देखभाल रिकॉर्ड में जुड़ेगा। ${note.length}/$limit") else t("Saved on this device. ${note.length}/500", "इसी फ़ोन पर सहेजा जाएगा। ${note.length}/500"), fontSize = 12.sp) }, minLines = 2, maxLines = 5, modifier = Modifier.fillMaxWidth().testTag("feedback-note"), shape = RoundedCornerShape(18.dp), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Rust, focusedLabelColor = RustText, cursorColor = Rust, unfocusedBorderColor = Ink.copy(alpha = .25f), focusedContainerColor = Paper.copy(alpha = .7f), unfocusedContainerColor = Paper.copy(alpha = .55f)))
+        OutlinedTextField(value = note, onValueChange = { if (it.length <= limit) { note = it; saved = false; error = null } }, label = { Text(t("Anything to add? (optional)", "कुछ और बताना है? (चाहें तो)")) }, placeholder = { Text(if (checkIn) t("How are you feeling today?", "आज आप कैसा महसूस कर रहे हैं?") else t("What felt easy, or what could be clearer?", "क्या आसान लगा, या क्या और साफ़ हो सकता है?")) }, supportingText = { Text(if (checkIn) t("Added to the care record. ${note.length}/$limit", "देखभाल रिकॉर्ड में जुड़ेगा। ${note.length}/$limit") else "${note.length}/500", fontSize = 12.sp) }, minLines = 2, maxLines = 5, modifier = Modifier.fillMaxWidth().testTag("feedback-note"), shape = RoundedCornerShape(18.dp), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Rust, focusedLabelColor = RustText, cursorColor = Rust, unfocusedBorderColor = Ink.copy(alpha = .25f), focusedContainerColor = Paper.copy(alpha = .7f), unfocusedContainerColor = Paper.copy(alpha = .55f)))
         Spacer(Modifier.height(8.dp))
         (modelError.takeIf { checkIn } ?: error)?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.fillMaxWidth().semantics { liveRegion = LiveRegionMode.Polite }); Spacer(Modifier.height(8.dp)) }
-        Button(onClick = { focus.clearFocus(); if (saved) return@Button /* already saved and unchanged: a second tap must not add a second check-in before the list refreshes */; if (checkIn) { val model = careModel!!; val mood = CheckInMood.title(score); if (!canEditCareContext(model, personId!!, model.accountNamespace)) { model.message.value = t("Care access changed. Reopen this person's records before saving.", "देखभाल की अनुमति बदल गई है। सहेजने से पहले इस व्यक्ति के रिकॉर्ड फिर खोलें।"); onClose() } else if (today != null) model.updateItem(today.copy(title = mood, detail = note), onSaved) else model.saveItem("checkin", mood, note, 0, onSaved) } else { error = store.save(score, note); if (error == null) onSaved() } }, enabled = !busy, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("feedback-save"), shape = RoundedCornerShape(18.dp), colors = ButtonDefaults.buttonColors(containerColor = Rust, contentColor = Color.White)) {
-            if (saved) { Icon(Icons.Outlined.CheckCircle, null); Spacer(Modifier.width(8.dp)) }
-            Text(if (checkIn) (if (saved) t("Check-in saved", "आज का हाल सहेज लिया") else if (today != null) t("Update today's check-in", "आज का हाल बदलें") else t("Save check-in", "आज का हाल सहेजें")) else if (saved) t("Saved on this device", "इसी फ़ोन पर सहेजा") else t("Save", "सहेजें"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+        Button(onClick = { focus.clearFocus(); if (saved) return@Button /* already saved and unchanged: a second tap must not add a second check-in before the list refreshes */; if (checkIn) { val model = careModel!!; val mood = CheckInMood.title(score); if (!canEditCareContext(model, personId!!, model.accountNamespace)) { model.message.value = t("Care access changed. Reopen this person's records before saving.", "देखभाल की अनुमति बदल गई है। सहेजने से पहले इस व्यक्ति के रिकॉर्ड फिर खोलें।"); onClose() } else if (today != null) model.updateItem(today.copy(title = mood, detail = note), onSaved) else model.saveItem("checkin", mood, note, 0, onSaved) } else { val to = account; error = store.save(score, note, to); if (error == null) { onSaved(); if (to != null) send(to) else sendState = FeedbackSendState.LOCAL } } }, enabled = !busy && sendState != FeedbackSendState.SENDING, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("feedback-save"), shape = RoundedCornerShape(18.dp), colors = ButtonDefaults.buttonColors(containerColor = Rust, contentColor = Color.White)) {
+            if (saved && (checkIn || sendState == FeedbackSendState.SENT || sendState == FeedbackSendState.LOCAL)) { Icon(Icons.Outlined.CheckCircle, null); Spacer(Modifier.width(8.dp)) }
+            Text(if (checkIn) (if (saved) t("Check-in saved", "आज का हाल सहेज लिया") else if (today != null) t("Update today's check-in", "आज का हाल बदलें") else t("Save check-in", "आज का हाल सहेजें")) else if (sendState == FeedbackSendState.SENDING) t("Sending…", "भेजा जा रहा है…") else if (saved && sendState == FeedbackSendState.SENT) t("Sent to Sahara", "Sahara को भेजा") else if (saved) t("Saved on this phone", "फ़ोन पर सहेजा") else if (account != null) t("Send", "भेजें") else t("Save", "सहेजें"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
         }
         Spacer(Modifier.height(10.dp))
-        Text(if (checkIn) (if (saved) t("Saved to the care record.", "देखभाल रिकॉर्ड में सहेज लिया।") else t("Saved to this person's care record. It syncs when signed in. It is your own report, not an assessment.", "यह इस व्यक्ति के देखभाल रिकॉर्ड में सहेजा जाता है और साइन इन होने पर सर्वर पर जाता है। यह आपकी अपनी बात है, कोई जाँच नहीं।")) else if (saved) t("Saved on this device.", "इसी फ़ोन पर सहेजा।") else t("Saved on this device only.", "सिर्फ़ इसी फ़ोन पर सहेजा जाता है।"), color = Ink.copy(alpha = .8f), fontSize = 12.sp, lineHeight = 17.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center, modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite })
+        Text(if (checkIn) (if (saved) t("Saved to the care record.", "देखभाल रिकॉर्ड में सहेज लिया।") else t("Saved to this person's care record. It syncs when signed in. It is your own report, not an assessment.", "यह इस व्यक्ति के देखभाल रिकॉर्ड में सहेजा जाता है और साइन इन होने पर सर्वर पर जाता है। यह आपकी अपनी बात है, कोई जाँच नहीं।")) else FeedbackSendCopy.status(sendState, saved, account != null, sendError), color = Ink.copy(alpha = .8f), fontSize = 12.sp, lineHeight = 17.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center, modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite }.testTag("feedback-send-status"))
+        if (account != null && sendState == FeedbackSendState.QUEUED) TextButton(onClick = { send(account) }, modifier = Modifier.heightIn(min = 48.dp).testTag("feedback-retry")) { Text(t("Try sending again", "फिर से भेजें"), color = RustText) }
     }
-    if (help) AlertDialog(onDismissRequest = { help = false }, containerColor = Paper, title = { Text(t("About this", "इसके बारे में")) }, text = { Text(if (checkIn) t("A daily check-in is your own words about how today is. It is added to this person's care record and syncs when signed in. It is not a medical assessment or a score.", "रोज़ का हाल आपके अपने शब्दों में आज का हाल है। यह इस व्यक्ति के देखभाल रिकॉर्ड में जुड़ता है और साइन इन होने पर सर्वर पर जाता है। यह डॉक्टरी जाँच या अंक नहीं है।") else t("This stays on this device and is separate from patient records. Please leave out personal or health details.", "यह इसी फ़ोन पर रहता है और मरीज़ के रिकॉर्ड से अलग है। कृपया निजी या सेहत की जानकारी न लिखें।")) }, confirmButton = { TextButton(onClick = { help = false }) { Text(t("Got it", "ठीक है"), color = Rust) } })
-    if (discard) AlertDialog(onDismissRequest = { discard = false }, containerColor = Paper, title = { Text(t("Leave without saving?", "बिना सहेजे जाएँ?")) }, text = { Text(t("Your latest changes won't be saved. ", "आपके नए बदलाव सहेजे नहीं जाएँगे। ") + "${if (checkIn) t("What you saved before stays in the care record.", "पहले सहेजा हुआ देखभाल रिकॉर्ड में रहेगा।") else t("What you saved before stays on this device.", "पहले सहेजा हुआ इसी फ़ोन पर रहेगा।")}") }, confirmButton = { TextButton(onClick = { discard = false; onClose() }) { Text(t("Leave", "जाएँ"), color = Rust) } }, dismissButton = { TextButton(onClick = { discard = false }) { Text(t("Keep editing", "लिखते रहें"), color = Rust) } })
+    if (help) AlertDialog(onDismissRequest = { help = false }, containerColor = Paper, title = { Text(t("About this", "इसके बारे में")) }, text = { Text(if (checkIn) t("A daily check-in is your own words about how today is. It is added to this person's care record and syncs when signed in. It is not a medical assessment or a score.", "रोज़ का हाल आपके अपने शब्दों में आज का हाल है। यह इस व्यक्ति के देखभाल रिकॉर्ड में जुड़ता है और साइन इन होने पर सर्वर पर जाता है। यह डॉक्टरी जाँच या अंक नहीं है।") else FeedbackSendCopy.about) }, confirmButton = { TextButton(onClick = { help = false }) { Text(t("Got it", "ठीक है"), color = Rust) } })
+    if (discard) AlertDialog(onDismissRequest = { discard = false }, containerColor = Paper, title = { Text(t("Leave without saving?", "बिना सहेजे जाएँ?")) }, text = { Text(t("Your latest changes won't be saved. ", "आपके नए बदलाव सहेजे नहीं जाएँगे। ") + "${if (checkIn) t("What you saved before stays in the care record.", "पहले सहेजा हुआ देखभाल रिकॉर्ड में रहेगा।") else t("What you saved before stays on this phone.", "पहले सहेजा हुआ इस फ़ोन पर रहता है।")}") }, confirmButton = { TextButton(onClick = { discard = false; onClose() }) { Text(t("Leave", "जाएँ"), color = Rust) } }, dismissButton = { TextButton(onClick = { discard = false }) { Text(t("Keep editing", "लिखते रहें"), color = Rust) } })
 }
 
 @Composable fun FeedbackFace(score: Float, modifier: Modifier = Modifier) {
@@ -147,6 +170,20 @@ internal object CheckInMood {
 }
 
 /** Device-local app experience feedback uses the shared animated face and slider. */
-@Composable internal fun AppFeedbackScreen(accountScope: String, surface: String, onClose: () -> Unit) {
-    FeedbackExperienceScreen(accountScope, surface, onClose)
+@Composable internal fun AppFeedbackScreen(accountScope: String, surface: String, onClose: () -> Unit, cloud: CareCloud? = null) {
+    FeedbackExperienceScreen(accountScope, surface, onClose, cloud = cloud)
+}
+
+/** App-feedback wording, English · Hindi. "Sent" appears only after the server confirmed the save. */
+internal object FeedbackSendCopy {
+    const val about = "Signed in, your rating and note are sent to the Sahara team with your account so we can improve the app. Signed out, they stay on this phone. This is separate from patient records; please leave out personal or health details. · साइन इन होने पर आपकी रेटिंग और नोट आपके खाते के साथ Sahara टीम को भेजे जाते हैं। साइन आउट होने पर ये इसी फ़ोन पर रहते हैं। यह मरीज़ के रिकॉर्ड से अलग है; निजी या स्वास्थ्य जानकारी न लिखें।"
+    fun status(state: FeedbackSendState, saved: Boolean, signedIn: Boolean, error: String?): String = when {
+        state == FeedbackSendState.SENDING -> "Sending to the Sahara team… · Sahara टीम को भेजा जा रहा है…"
+        state == FeedbackSendState.QUEUED -> "Saved on this phone, not sent yet${error?.let { ": $it" } ?: "."} It is sent when you open Feedback again while signed in and online. · फ़ोन पर सहेजा, अभी भेजा नहीं गया। साइन इन और इंटरनेट रहते हुए फ़ीडबैक फिर खोलने पर भेजा जाएगा।"
+        saved && state == FeedbackSendState.SENT -> "Sent to the Sahara team. Thank you. · Sahara टीम को भेज दिया गया। धन्यवाद।"
+        saved -> "Saved on this phone only. Sign in to send feedback to the Sahara team. · सिर्फ़ इस फ़ोन पर सहेजा। Sahara टीम को भेजने के लिए साइन इन करें।"
+        state == FeedbackSendState.SENT -> "Your earlier feedback was sent to the Sahara team. · आपका पिछला फ़ीडबैक Sahara टीम को भेज दिया गया।"
+        signedIn -> "Send shares this with the Sahara team, with your account. · भेजें दबाने पर यह आपके खाते के साथ Sahara टीम को जाएगा।"
+        else -> "Saved on this phone only. Sign in to send it to the Sahara team. · सिर्फ़ इस फ़ोन पर सहेजा जाएगा। भेजने के लिए साइन इन करें।"
+    }
 }

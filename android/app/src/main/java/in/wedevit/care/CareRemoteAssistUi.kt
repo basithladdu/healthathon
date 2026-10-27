@@ -103,7 +103,7 @@ import kotlinx.coroutines.withContext
     onUseDraft: (CareAssistedDraft) -> Unit,
     client: CareRemoteAssist = remember { CareRemoteAssist() },
 ) { val t = careText();
-    if (!CareAndroidAssistPolicy.externalAiEnabled) return
+    if (!CareAndroidAssistPolicy.externalAiEnabled) { CareAiOffNotice(); return }
     val scope = rememberCoroutineScope()
     val latestSource by rememberUpdatedState(source)
     val latestToken by rememberUpdatedState(token)
@@ -217,5 +217,18 @@ import kotlinx.coroutines.withContext
             Text(t("This does not replace the signed original or acknowledge a new version.", "यह हस्ताक्षर वाले मूल की जगह नहीं लेता और नए संस्करण की पुष्टि नहीं करता।"), style = MaterialTheme.typography.bodySmall)
         }
         if (message.isNotBlank()) Text(message, style = MaterialTheme.typography.bodySmall)
+    }
+}
+
+/** Shown where an AI draft would be while no AI provider is switched on, so nothing looks automatic. */
+internal object CareAiOffCopy {
+    const val title = "AI drafting is off · AI ड्राफ़्ट बंद है"
+    const val body = "No AI service is switched on in Sahara yet, so these words are not sent anywhere for a draft. Choose lines from the conversation or type each section yourself. · Sahara में अभी कोई AI सेवा चालू नहीं है, इसलिए ये शब्द ड्राफ़्ट के लिए कहीं नहीं भेजे जाते। बातचीत से पंक्तियाँ चुनें या हर हिस्सा खुद लिखें।"
+}
+
+@Composable internal fun CareAiOffNotice() {
+    SurfaceCard(Mint) {
+        Text(CareAiOffCopy.title, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, modifier = Modifier.testTag("care-ai-off"))
+        Text(CareAiOffCopy.body, style = MaterialTheme.typography.bodySmall)
     }
 }

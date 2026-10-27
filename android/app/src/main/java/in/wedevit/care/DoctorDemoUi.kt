@@ -203,7 +203,7 @@ private val DoctorMist = Peach
         notice=if(failures.isEmpty()) { if(linked.isEmpty()) "Visit cancelled" else "Visit cancelled · linked request deferred" } else "Visit cancelled, but request update failed: ${failures.first()}"
     }
     if (feedbackOpen) {
-        FeedbackScreen(accountScope = workflowAccountId ?: "guest-doctor-preview", surface = "doctor-preview", onClose = { feedbackOpen = false })
+        FeedbackScreen(accountScope = workflowAccountId ?: "guest-doctor-preview", surface = "doctor-preview", onClose = { feedbackOpen = false }, cloud = careModel?.cloud)
         return
     }
     BackHandler {

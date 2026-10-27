@@ -187,7 +187,7 @@ fun EmbeddedPatientCare(
                         "checkin-history" -> DoctorCheckInHistory(personId, entries)
                         "care-team" -> DoctorCareTeam(vm, personId)
                         "reminders" -> CareReminderSettings(vm, onClose = { tool = "" })
-                        "feedback" -> FeedbackScreen(account, "doctor-patient", onClose = { tool = "" })
+                        "feedback" -> FeedbackScreen(account, "doctor-patient", onClose = { tool = "" }, cloud = vm.cloud)
                         "shared" -> EmbeddedSharedCare(vm, onAccount, ::leaveTool, onNavigationBlockedChange = { sharedBusy = it })
                         "resources" -> More(vm, person, onAccount, onDelete = { if (samePerson() && vm.isOwner.value) dialog = "delete" }, onCalendar = { openTool("calendar") }, onWorkflow = { openTool("workflows") }, onLabs = { openTool("labs") }, onFeedback = { openTool("feedback") }, onReminders = { openTool("reminders") }, onSharedWorkspace = { openTool("shared") }, onDocuments = { openTool("documents") }, doctorEmbedded = true)
                         else -> when (section) {
