@@ -2,6 +2,7 @@ package `in`.wedevit.care
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.graphics.luminance
 
 // Supporting category colours only; Rust remains the primary action colour.
 val SaharaSoftBlue = Color(0xFFDCE7F1)
@@ -32,3 +33,12 @@ internal val DoctorStatusWarn = Color(0xFF8A5A1B)
 internal val DoctorStatusWarnBg = Color(0xFFFBE8C8)
 internal val DoctorStatusRest = Color(0xFF7A4332)
 internal val DoctorStatusRestBg = Color(0xFFF7DDD2)
+
+/** Rust text on tinted cards (Mint, Peach, Sage, the check-in wash): plain Rust falls under 4.5:1 there; this darker Rust stays above it on every Sahara tint. */
+internal val RustText = Color(0xFF9E3B23)
+
+/** White or dark ink, whichever reads better on a coloured fill such as a pain-strength block. */
+internal fun readableOn(fill: Color): Color {
+    val l = fill.luminance()
+    return if ((1.05f) / (l + .05f) >= (l + .05f) / (WelcomePanelInk.luminance() + .05f)) Color.White else WelcomePanelInk
+}

@@ -93,9 +93,12 @@ internal object CareModules {
 }
 
 @Composable fun MedicineScanAction(onScan: () -> Unit, onManual: () -> Unit) {
-    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Icon(Icons.Default.DocumentScanner, null, tint = DoctorAccent, modifier = Modifier.size(22.dp)); Spacer(Modifier.width(8.dp)); Text("Scan a prescription", fontSize = 14.sp, color = DoctorCardInk, modifier = Modifier.weight(1f))
-        TextButton(onClick = onScan, modifier = Modifier.heightIn(min = 48.dp).testTag("care-module-medicines-scan")) { Text("Scan & organize", color = DoctorAccent) }
-        TextButton(onClick = onManual, modifier = Modifier.heightIn(min = 48.dp)) { Text("Add manually", color = DoctorAccent) }
+    // Wraps instead of squeezing: the two actions move under the label when the screen is narrow or the text is large.
+    FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        Row(Modifier.align(Alignment.CenterVertically).padding(end = 8.dp), verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.DocumentScanner, null, tint = DoctorAccent, modifier = Modifier.size(22.dp)); Spacer(Modifier.width(8.dp)); Text("Scan a prescription", fontSize = 14.sp, color = DoctorCardInk) }
+        FlowRow {
+            TextButton(onClick = onScan, modifier = Modifier.heightIn(min = 48.dp).testTag("care-module-medicines-scan")) { Text("Scan & organize", color = DoctorAccent) }
+            TextButton(onClick = onManual, modifier = Modifier.heightIn(min = 48.dp)) { Text("Add manually", color = DoctorAccent) }
+        }
     }
 }

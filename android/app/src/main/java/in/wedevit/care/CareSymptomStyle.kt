@@ -82,7 +82,7 @@ internal fun ratingColor(n: Int): Color = if (n <= 5) lerp(DoctorStatusGood, Col
     Box(modifier.heightIn(min = 48.dp).testTag("symptom-rating-$number").clip(CircleShape).background(if (selected) c else lerp(c, Paper, .82f), CircleShape)
         .border(if (selected) 3.dp else 1.dp, if (selected) DoctorCardInk else c.copy(alpha = .5f), CircleShape)
         .selectable(selected, role = Role.RadioButton, onClick = onClick), contentAlignment = Alignment.Center) {
-        Text(number.toString(), color = if (selected) Color.White else DoctorCardInk, fontSize = 17.sp, fontWeight = FontWeight.Bold)
+        Text(number.toString(), color = if (selected) readableOn(c) else DoctorCardInk, fontSize = 19.sp, fontWeight = FontWeight.Bold)
     }
 }
 

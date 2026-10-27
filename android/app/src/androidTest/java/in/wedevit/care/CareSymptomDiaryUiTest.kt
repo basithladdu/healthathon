@@ -28,7 +28,7 @@ class CareSymptomDiaryUiTest {
         ui.onNodeWithTag("symptom-step-next").performScrollTo().performClick()
         ui.onNodeWithTag("symptom-rating-4").assertDoesNotExist() // Pain strength is set per spot; step 3 has no number card
         ui.onNodeWithTag("diary-choice-caregiver").performScrollTo().performClick()
-        ui.onNodeWithText("Observer's name").performScrollTo().performTextInput("Fixture observer")
+        ui.onNodeWithText("Name of the person who saw it").performScrollTo().performTextInput("Fixture observer")
         closeSoftKeyboard()
         ui.onNodeWithTag("diary-choice-average-24h").performScrollTo().performClick()
         ui.onNodeWithTag("symptom-step-next").performScrollTo().performClick()

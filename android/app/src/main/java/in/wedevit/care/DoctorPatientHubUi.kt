@@ -69,7 +69,7 @@ internal fun doctorHubSingleColumn(widthDp: Float, fontScale: Float): Boolean = 
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
                 Text(title, fontSize = 18.sp, lineHeight = 23.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, color = DoctorCardInk)
                 Text(description, fontSize=13.sp, color = DoctorCardSub, lineHeight = 18.sp)
-                if(!meta.isNullOrBlank()) Text(meta, fontSize=12.sp, color = DoctorAccent, lineHeight = 16.sp, fontWeight = FontWeight.Medium, modifier = Modifier.testTag("$tagPrefix-$section-meta"))
+                if(!meta.isNullOrBlank()) Text(meta, fontSize=12.sp, color = RustText, lineHeight = 16.sp, fontWeight = FontWeight.Medium, modifier = Modifier.testTag("$tagPrefix-$section-meta"))
             }
             Spacer(Modifier.width(8.dp)); Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = DoctorAccent, modifier = Modifier.size(20.dp))
         } else Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(3.dp)) {
@@ -77,7 +77,7 @@ internal fun doctorHubSingleColumn(widthDp: Float, fontScale: Float): Boolean = 
             Spacer(Modifier.height(4.dp))
             Text(title, fontSize = 18.sp, lineHeight = 23.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, color = DoctorCardInk)
             Text(description, fontSize=13.sp, color = DoctorCardSub, lineHeight = 18.sp)
-            if(!meta.isNullOrBlank()) Text(meta, fontSize=12.sp, color = DoctorAccent, lineHeight = 16.sp, fontWeight = FontWeight.Medium, modifier = Modifier.testTag("$tagPrefix-$section-meta"))
+            if(!meta.isNullOrBlank()) Text(meta, fontSize=12.sp, color = RustText, lineHeight = 16.sp, fontWeight = FontWeight.Medium, modifier = Modifier.testTag("$tagPrefix-$section-meta"))
         }
     }
 }

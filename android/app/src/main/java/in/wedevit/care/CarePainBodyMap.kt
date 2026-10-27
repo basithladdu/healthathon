@@ -44,6 +44,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -90,8 +91,9 @@ import java.io.ByteArrayInputStream
             PainSideOption(back, t("Back", "पीछे"), Icons.Default.RotateRight, "pain-body-back", Modifier.weight(1f)) { if (!back) { back = true; focus = null; focusNonce++ } }
         }
         val tiles = listOf<String?>(null) + PainBodyMapRules.sitesFor(back)
+        val perRow = if (LocalDensity.current.fontScale > 1.15f) 2 else 3
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            tiles.chunked(3).forEach { row ->
+            tiles.chunked(perRow).forEach { row ->
                 Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     row.forEach { id ->
                         if (id == null) PainPartTile(focus == null, false, t("Full body", "पूरा शरीर"), t("Full body, zoom out", "पूरा शरीर, ज़ूम आउट"), Rust, "pain-body-focus-full", Icons.Default.Person, t("Marked", "चिह्नित"), Modifier.weight(1f).fillMaxHeight()) { focus = null; focusNonce++ }
@@ -100,19 +102,19 @@ import java.io.ByteArrayInputStream
                             PainPartTile(focus == id, marked, label, "${t("Zoom to", "ज़ूम करें:")} $label${if (marked) t(", marked as pain", ", दर्द के रूप में चिह्नित") else ""}", spotColor(id), if (readOnly) "pain-body-focus-$id" else "pain-body-site-$id", null, t("Marked", "चिह्नित"), Modifier.weight(1f).fillMaxHeight()) { focus = id; focusNonce++; if (id in selected) active = id }
                         }
                     }
-                    repeat(3 - row.size) { Spacer(Modifier.weight(1f)) }
+                    repeat(perRow - row.size) { Spacer(Modifier.weight(1f)) }
                 }
             }
         }
         val zoomed = focus
         if (!readOnly && zoomed != null && zoomed in PainBodyMapRules.sites) {
             val part = PainBodyMapRules.focusLabel(zoomed, back, hindi)
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 if (zoomed in selected) {
-                    Text("$part · ${t("Marked as pain", "दर्द चिह्नित")}", color = DoctorCardInk, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
+                    Text("$part · ${t("Marked as pain", "दर्द चिह्नित")}", color = DoctorCardInk, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.align(Alignment.CenterVertically))
                     TextButton(onClick = { val next = PainBodyMapRules.unmarked(selected, zoomed); change(next, points.filter { it.site in next }) }, modifier = Modifier.heightIn(min = 48.dp).testTag("pain-body-unmark-$zoomed")) { Icon(Icons.Default.Close, null, Modifier.size(18.dp), tint = Rust); Spacer(Modifier.width(4.dp)); Text(t("Remove", "हटाएँ"), color = Rust, fontWeight = FontWeight.SemiBold) }
                 } else {
-                    Text(t("Tap the model where it hurts, or", "मॉडल पर जहाँ दर्द है वहाँ छुएँ, या"), color = DoctorCardSub, fontSize = 14.sp, lineHeight = 19.sp, modifier = Modifier.weight(1f))
+                    Text(t("Tap the model where it hurts, or", "मॉडल पर जहाँ दर्द है वहाँ छुएँ, या"), color = DoctorCardSub, fontSize = 14.sp, lineHeight = 19.sp, modifier = Modifier.align(Alignment.CenterVertically))
                     TextButton(onClick = { val next = PainBodyMapRules.marked(selected, zoomed); change(next, points.filter { it.site in next }) }, modifier = Modifier.heightIn(min = 48.dp).testTag("pain-body-mark-$zoomed")) { Text(t("Mark whole $part", "पूरा $part चिह्नित करें"), color = Rust, fontWeight = FontWeight.SemiBold) }
                 }
             }
@@ -135,7 +137,7 @@ import java.io.ByteArrayInputStream
         .selectable(zoomed, onClick = onClick, role = Role.RadioButton).semantics(mergeDescendants = true) { contentDescription = description }.testTag(tag).padding(horizontal = 6.dp, vertical = 8.dp), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(2.dp)) {
             if (icon != null) Icon(icon, null, Modifier.size(18.dp), tint = ink)
-            Text(label, color = ink, fontSize = 13.sp, lineHeight = 17.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center, maxLines = 3)
+            Text(label, color = ink, fontSize = 13.sp, lineHeight = 17.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center)
             if (marked) Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) { Box(Modifier.size(10.dp).background(markColor, CircleShape).border(1.5.dp, Color.White, CircleShape)); Text(markedWord, color = ink, fontSize = 11.sp, fontWeight = FontWeight.Medium) }
         }
     }
@@ -147,8 +149,8 @@ import java.io.ByteArrayInputStream
     val t = { en: String, hi: String -> if (hindi) hi else en }
     val stops = listOf(Color(PainBodyMapRules.NEUTRAL).copy(alpha = 0.55f)) + PainBodyMapRules.heatStops.map { Color(it) }; val blockWeights = listOf(0.5f, 1f, 2f, 2f, 2f, 2f, 0.5f) // 0 is a neutral cap (no colour); green starts at 1 // block edges sit between integers so the thumb always lies over its own block
     Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically) { Text(t("How strong is the pain?", "दर्द कितना तेज़ है?"), fontWeight = FontWeight.SemiBold); Text(" · $target", fontWeight = FontWeight.SemiBold, color = Rust, modifier = Modifier.testTag("pain-strength-target")) }
-        Text(if (rating == null) t("Slide to set. Not rated yet.", "अंक चुनने के लिए खिसकाएँ। अभी अंक नहीं बताया।") else "$rating/10 · ${PainBodyMapRules.strengthWord(rating, hindi)}", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold, color = if (rating == null) MaterialTheme.colorScheme.onSurfaceVariant else if (rating == 0) DoctorCardInk else Color(PainBodyMapRules.heatColor(rating)), modifier = Modifier.testTag("pain-strength-value"))
+        FlowRow { Text(t("How strong is the pain?", "दर्द कितना तेज़ है?"), fontWeight = FontWeight.SemiBold); Text(" · $target", fontWeight = FontWeight.SemiBold, color = Rust, modifier = Modifier.testTag("pain-strength-target")) }
+        Text(if (rating == null) t("Slide to set. Not rated yet.", "अंक चुनने के लिए खिसकाएँ। अभी अंक नहीं बताया।") else "$rating/10 · ${PainBodyMapRules.strengthWord(rating, hindi)}", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold, color = if (rating == null) MaterialTheme.colorScheme.onSurfaceVariant else DoctorCardInk, modifier = Modifier.testTag("pain-strength-value"))
         Slider(value = (rating ?: 0).toFloat(), onValueChange = { onRatingChange(it.roundToInt().coerceIn(0, 10)) }, valueRange = 0f..10f, steps = 9,
             modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("pain-strength-slider").semantics { contentDescription = t("Pain strength for $target, from 0 none to 10 red", "$target में दर्द की तीव्रता, 0 कोई नहीं से 10 लाल"); stateDescription = if (rating == null) t("Not rated", "अंक नहीं बताया") else "$rating, ${PainBodyMapRules.strengthWord(rating, hindi)}" },
             track = { Row(Modifier.fillMaxWidth().height(14.dp).clip(CircleShape), horizontalArrangement = Arrangement.spacedBy(2.dp)) { stops.forEachIndexed { i, c -> Box(Modifier.weight(blockWeights[i]).fillMaxHeight().background(c)) } } },

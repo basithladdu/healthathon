@@ -686,7 +686,14 @@ private suspend fun loadHomeVisits(context: android.content.Context): List<HomeV
         }
         item {
             val actions = listOf<Triple<String, ImageVector, () -> Unit>>(Triple("Open patients", Icons.Default.People, onPatients), Triple("Plan visit", Icons.Default.CalendarMonth, onSchedule), Triple("Conversations", Icons.Default.Forum, onRequests))
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            // With large system text the three labels no longer fit side by side, so each action gets its own full-width row.
+            if (LocalDensity.current.fontScale > 1.15f) Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                actions.forEach { (label, icon, click) ->
+                    Surface(onClick = click, color = Paper, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)) {
+                        Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) { Icon(icon, null, tint = DoctorAccent); Text(label, fontSize = 13.sp, color = DoctorCardInk) }
+                    }
+                }
+            } else Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 actions.forEach { (label, icon, click) ->
                     Surface(onClick = click, color = Paper, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.weight(1f).heightIn(min = 72.dp)) {
                         Column(Modifier.fillMaxWidth().padding(vertical = 12.dp, horizontal = 6.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) { Icon(icon, null, tint = DoctorAccent); Text(label, fontSize = 13.sp, color = DoctorCardInk, maxLines = 1) }

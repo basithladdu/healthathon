@@ -28,7 +28,7 @@ class CarePainHistoryUiTest {
         ui.onNodeWithTag("pain-body-selected").performScrollTo().assertTextContains("Left leg / foot")
         ui.onNodeWithTag("pain-history-newer").performScrollTo().performClick()
         ui.onNodeWithTag("pain-history-observation").assertTextEquals("$recentDay 10:00 · Not rated")
-        ui.onNodeWithTag("pain-history-context").assertTextContains("Worst in 24 hours · Caregiver observation · Fixture observer")
+        ui.onNodeWithTag("pain-history-context").assertTextContains("Worst in 24 hours · Seen by family or carer · Fixture observer")
         ui.onNodeWithText("This entry has a written location only; no point is added to the body.").assertExists()
         ui.onNodeWithTag("pain-body-selected").assertDoesNotExist()
         ui.runOnIdle { assertEquals(originalDetails, records.map { it.detail }) }

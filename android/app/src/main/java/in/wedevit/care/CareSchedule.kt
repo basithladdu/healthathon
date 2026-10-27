@@ -86,7 +86,7 @@ fun calendarItems(entries: List<CareItem>, day: LocalDate): List<CareItem> = ent
         items(visible, key = { it.id }) { item ->
             val data = CareEntryCodec.decode(item.detail)
             if (data != null && data.type in setOf("task", "conversation")) Card(onClick = onWorkflow, colors = CardDefaults.cardColors(containerColor = Mint), shape = RoundedCornerShape(18.dp), modifier = Modifier.fillMaxWidth()) {
-                Column(Modifier.padding(16.dp)) { Text(item.title, fontWeight = FontWeight.SemiBold); Text("${calendarCategory(item)} · ${data.statusLabel()} · ${data.assignee}", style = MaterialTheme.typography.bodySmall); Text("Open care team", color = Rust, style = MaterialTheme.typography.labelLarge) }
+                Column(Modifier.padding(16.dp)) { Text(item.title, fontWeight = FontWeight.SemiBold); Text("${calendarCategory(item)} · ${data.statusLabel()} · ${data.assignee}", style = MaterialTheme.typography.bodySmall); Text("Open care team", color = RustText, style = MaterialTheme.typography.labelLarge) }
             } else CalendarEntryCard(vm, item, day, onEdit = { editing = item })
         }
         if (undated.isNotEmpty() && filter in setOf("All", "Medicine")) {

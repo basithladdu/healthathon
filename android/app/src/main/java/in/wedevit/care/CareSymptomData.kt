@@ -37,7 +37,7 @@ object SymptomDiaryRules {
     private val englishLabels = mapOf("Tiredness" to "Fatigue / lack of energy", "Sleepiness" to "Drowsiness / excessive sleepiness", "Dry mouth" to "Dry / sore mouth")
     private val legacyHindiLabels = mapOf("Sleep difficulty" to "सोने में परेशानी", "Weight loss" to "वज़न घटना")
     val recalls = linkedMapOf("now" to ("Right now" to "अभी"), "average-24h" to ("24-hour average" to "24 घंटे का औसत"), "worst-24h" to ("Worst in 24 hours" to "24 घंटे में सबसे ज़्यादा"))
-    val respondents = linkedMapOf("patient" to ("Patient" to "मरीज़"), "assisted-patient" to ("Patient, with help" to "मरीज़ ने मदद से बताया"), "caregiver" to ("Caregiver observation" to "देखभाल करने वाले ने देखा"), "clinician" to ("Care-team observation" to "देखभाल टीम ने देखा"))
+    val respondents = linkedMapOf("patient" to ("Patient" to "मरीज़"), "assisted-patient" to ("Patient, with help" to "मरीज़ ने मदद से बताया"), "caregiver" to ("Seen by family or carer" to "देखभाल करने वाले ने देखा"), "clinician" to ("Seen by care team" to "देखभाल टीम ने देखा"))
     val triggers = linkedMapOf("rest" to ("At rest" to "आराम करते समय"), "turning" to ("Turning in bed" to "करवट लेते समय"), "walking" to ("Standing / walking" to "खड़े होते / चलते समय"), "coughing" to ("Coughing" to "खाँसते समय"), "other" to ("Other" to "अन्य"), "not-sure" to ("Not sure" to "पक्का नहीं"))
     val changes = linkedMapOf("better" to ("Better" to "बेहतर"), "same" to ("Same" to "वैसा ही"), "worse" to ("Worse" to "ज़्यादा खराब"), "not-sure" to ("Not sure" to "पक्का नहीं"))
     fun label(labels: Map<String, Pair<String, String>>, key: String, hindi: Boolean) = labels[key]?.let { if (hindi) it.second else it.first }.orEmpty()

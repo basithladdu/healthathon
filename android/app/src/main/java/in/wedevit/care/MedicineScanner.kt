@@ -362,10 +362,10 @@ private fun PhotoSelectionCard(
         uris.forEachIndexed { index, value ->
             Row(Modifier.fillMaxWidth().padding(top = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.Image, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp))
-                Text(imageName(context, Uri.parse(value), index), Modifier.weight(1f), maxLines = 1)
-                if (onMove != null && index > 0) IconButton(onClick = { onMove(index, index - 1) }, modifier = Modifier.size(36.dp)) { Icon(Icons.Default.ArrowUpward, "Move earlier") }
-                if (onMove != null && index < uris.lastIndex) IconButton(onClick = { onMove(index, index + 1) }, modifier = Modifier.size(36.dp)) { Icon(Icons.Default.ArrowDownward, "Move later") }
-                IconButton(onClick = { onRemove(index) }, modifier = Modifier.size(36.dp)) { Icon(Icons.Default.Close, "Remove ${index + 1}") }
+                Text(imageName(context, Uri.parse(value), index), Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                if (onMove != null && index > 0) IconButton(onClick = { onMove(index, index - 1) }, modifier = Modifier.size(48.dp)) { Icon(Icons.Default.ArrowUpward, "Move earlier") }
+                if (onMove != null && index < uris.lastIndex) IconButton(onClick = { onMove(index, index + 1) }, modifier = Modifier.size(48.dp)) { Icon(Icons.Default.ArrowDownward, "Move later") }
+                IconButton(onClick = { onRemove(index) }, modifier = Modifier.size(48.dp)) { Icon(Icons.Default.Close, "Remove ${index + 1}") }
             }
         }
         Spacer(Modifier.height(12.dp))

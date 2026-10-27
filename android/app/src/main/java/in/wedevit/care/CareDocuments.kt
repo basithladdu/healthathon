@@ -110,17 +110,17 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
                 } catch (_: Exception) { textError = "Couldn't search saved report text. The originals are unchanged. Try again." }
                 finally { searching = false }
             }
-        }, enabled = search.isNotBlank() && !searching, modifier = Modifier.fillMaxWidth()) { Text(if (searching) "Finding source passages…" else "Find in reviewed report text") } }
+        }, enabled = search.isNotBlank() && !searching, modifier = Modifier.fillMaxWidth()) { Text(if (searching) "Searching your reports…" else "Find in reviewed report text") } }
         if (textError.isNotBlank()) item { Text(textError, color = MaterialTheme.colorScheme.error) }
         if (searchedText.isNotBlank()) {
             item { SectionTitle("From your reports") }
-            if (textMatches.isEmpty()) item { SurfaceCard { Text("No supported passage found", fontWeight = FontWeight.SemiBold); Text("No answer was generated. Try fewer words, or open a report and review its text first.", style = MaterialTheme.typography.bodySmall) } }
+            if (textMatches.isEmpty()) item { SurfaceCard { Text("Not found in your reports", fontWeight = FontWeight.SemiBold); Text("No answer was generated. Try fewer words, or open a report and review its text first.", style = MaterialTheme.typography.bodySmall) } }
             items(textMatches, key = { "${it.reportId}:${it.page}:${it.line}" }) { match ->
                 reports.firstOrNull { it.id == match.reportId }?.let { report -> SurfaceCard(Sage) {
                     Text(report.name, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
                     Text("Page ${match.page} · line ${match.line}", style = MaterialTheme.typography.labelMedium)
                     Text(match.quote)
-                    TextButton(onClick = { reviewId = report.id }) { Text("Read source and copy fact") }
+                    TextButton(onClick = { reviewId = report.id }, colors = ButtonDefaults.textButtonColors(contentColor = RustText)) { Text("Read source and copy fact") }
                 } }
             }
         }

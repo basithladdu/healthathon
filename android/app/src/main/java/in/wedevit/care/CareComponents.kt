@@ -29,6 +29,8 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -52,12 +54,15 @@ import androidx.compose.ui.unit.sp
                 Column(Modifier.weight(1f).testTag("nav-$label").clip(RoundedCornerShape(15.dp)).background(color)
                     .selectable(selected = active, role = Role.Tab, onClick = { onSelect(routes[index]) }).heightIn(min = 58.dp).padding(vertical = 7.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
                     Icon(icons[index], null, Modifier.size(22.dp), tint = if (active) Ink else MaterialTheme.colorScheme.onSurfaceVariant)
-                    Spacer(Modifier.height(5.dp)); Text(label, fontSize = 11.sp, fontWeight = if (active) FontWeight.Bold else FontWeight.Medium, color = Ink)
+                    Spacer(Modifier.height(5.dp)); Text(label, fontSize = cappedLabelSize(11f), fontWeight = if (active) FontWeight.Bold else FontWeight.Medium, color = Ink, maxLines = 1)
                 }
             }
         }
     }
 }
+
+/** Short labels in fixed-width slots (bottom tabs, step names) grow with the system font only up to 1.3x, so a word like "Nearby" never breaks mid-word; all other text scales fully. */
+@Composable fun cappedLabelSize(size: Float): TextUnit { val scale = LocalDensity.current.fontScale; return (size * minOf(scale, 1.3f) / scale).sp }
 
 /** Walkthrough only: shows who is being tried and switches between the ready-made users. Real users have no role menu; their role is computed. */
 @Composable fun WalkthroughUserMenu(user: PatientWalkthrough.User, onSwitch: (String) -> Unit, onLeave: () -> Unit) {
