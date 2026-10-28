@@ -193,6 +193,8 @@ Start the emulator with `emulator -avd Sahara_Doctor_Demo -memory 4096 -no-snaps
 
 ---
 
+> **Owner/team-only work (migrations, deploys, keys, decisions, phone tests) for every repo is in [blockers.md](blockers.md).**
+
 ## 27 Oct 2026 — open items from team chats and this session
 
 Added by the owner's session on 27 Oct; nothing above was changed. The full audit of the team chats and meetings (25 Aug–23 Oct) is in [`docs/research/CHAT_AUDIT_2026-10-27.md`](docs/research/CHAT_AUDIT_2026-10-27.md): 126 items, of which 49 are done, 36 partial, 24 not done, 4 dropped and 13 owner-only. Item numbers below match that file.
