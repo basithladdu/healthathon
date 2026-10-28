@@ -1,12 +1,12 @@
 {
   "retrievedOn": "2026-10-20",
-  "totalCentres": 1631,
+  "totalCentres": 1628,
   "stateAndUtCoverage": 36,
   "stateCounts": {
     "Andaman and Nicobar Islands": 1,
     "Andhra Pradesh": 41,
     "Arunachal Pradesh": 2,
-    "Assam": 47,
+    "Assam": 45,
     "Bihar": 13,
     "Chandigarh": 9,
     "Chhattisgarh": 22,
@@ -23,7 +23,7 @@
     "Ladakh": 3,
     "Lakshadweep": 2,
     "Madhya Pradesh": 29,
-    "Maharashtra": 117,
+    "Maharashtra": 116,
     "Manipur": 14,
     "Meghalaya": 7,
     "Mizoram": 15,
@@ -1738,5 +1738,27 @@
       "reason": "same-state-and-name-plus-address-or-phone"
     }
   ],
-  "parserSkippedRows": []
+  "parserSkippedRows": [
+    {
+      "url": "https://palliumindia.org/clinics/assam",
+      "table": 0,
+      "row": 2,
+      "reason": "heading-row",
+      "text": "Referral & Research Institutions:"
+    },
+    {
+      "url": "https://palliumindia.org/clinics/assam",
+      "table": 0,
+      "row": 4,
+      "reason": "heading-row",
+      "text": "Service based Centres:"
+    },
+    {
+      "url": "https://palliumindia.org/clinics/maharashtra",
+      "table": 0,
+      "row": 0,
+      "reason": "heading-row",
+      "text": "District | Name | Address"
+    }
+  ]
 }
