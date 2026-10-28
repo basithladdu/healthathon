@@ -504,7 +504,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
             done()
         }
     }
-    fun confirm(version: CareVersion, name: String, relationship: String, reviewed: Boolean, done: () -> Unit) = action {
+    fun confirm(version: CareVersion, name: String, relationship: String, reviewed: Boolean, onSaved: suspend (Acknowledgement) -> Unit = {}, done: () -> Unit) = action {
         require(selected.value == version.personId) { "Open this person's care note before confirming." }
         val previousConfirmations = dao.confirmations(version.id).filter { cloud == null || it.id in authenticatedConfirmationIds.value }
         val proposed = NoteRules.acknowledge(version, dao.latest(version.personId), name, relationship, reviewed, previousConfirmations)
@@ -512,7 +512,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
         val write = sync?.let { CareSyncOps.confirm(version.personId, ack) }
         if (sync != null && write != null) {
             val status = sync.submit(write, local = { if (dao.confirmation(ack.id) == null) dao.acknowledge(ack) }, rollback = { dao.deleteAcknowledgement(ack.id) })
-            if (status != CareSyncStatus.SENT) { message.value = CareSyncText.CONFIRMED_WAITING; done(); return@action }
+            if (status != CareSyncStatus.SENT) { onSaved(ack); message.value = CareSyncText.CONFIRMED_WAITING; done(); return@action }
         }
         val saved = write?.let { sync?.takeConfirmation(it.opId) } ?: ack
         require(saved.versionId == version.id && saved.contentHash == version.contentHash && saved.relationship == relationship && saved.name.trim().equals(name.trim(), ignoreCase = true)) { "The saved confirmation didn't match this version. Refresh the care note before trying again." }
@@ -520,6 +520,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
         if (previous == null) dao.acknowledge(saved)
         else require(previous == saved) { "This confirmation changed. Refresh the care note before trying again." }
         if (cloud != null) authenticatedConfirmationIds.value += saved.id
+        onSaved(saved)
         message.value = "Your confirmation is saved"; done()
     }
     fun saveItem(kind: String, title: String, detail: String, due: Long = 0, done: () -> Unit = {}, id: String = newId()) {
@@ -704,6 +705,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
                 withContext(Dispatchers.IO) { File(audioRoot(), id).deleteRecursively(); reportFiles.removePerson(id) }
                 CareDocumentReviewStore(getApplication(), storageNamespace).removePerson(id)
                 withContext(Dispatchers.IO) { EmergencyCardStore(getApplication(), storageNamespace).removePerson(id) }
+                withContext(Dispatchers.IO) { NoteSignatureStore.of(getApplication(), storageNamespace).removePerson(id) }
             }
             reconcileReminders()
             select(""); message.value = "Records removed"; done()
