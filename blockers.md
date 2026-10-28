@@ -26,6 +26,19 @@ Collected on 27 Oct from every agent lane across Sahara, ITI, WDCW and AI-FIR. T
 - [ ] Prepare evaluator access privately and verify the actual join/install path; current public `/join` route returns 404 until the 28 Oct preview is promoted, and the app-link signing fingerprint is still a placeholder.
 - [ ] Record and review the narrated real-phone walkthrough with Awaiz and an approved doctor account; do not use screenshots or a silent capture as the video deliverable.
 
+### Sahara team meeting 28 Oct: people-only items
+- [ ] Doctors: share the exact goals-of-care screening tool on WhatsApp (the app has a pluggable helper using the surprise question + ECOG until then).
+- [ ] Doctors + Shirin: finalise the simulated conversation data by the weekend; record mock goals-of-care talks directly in the Sahara app (Android phone needed).
+- [ ] Tomorrow evening 9:15: go through the questionnaire format (additions/deletions); others join 9:30.
+- [ ] Send the palliative care / morphine survey (tomorrow morning).
+- [ ] Legal (tomorrow): are public "morphine available today" votes OK? Diversion/addiction risk. Not built until cleared.
+- [ ] Decide: is a government-ID-based signature wanted at all? A clinician is uncomfortable; the app uses a drawn signature on the phone or a photo of a paper signature.
+- [ ] NCCN Distress Thermometer: confirm permission to use it in the app (non-commercial clinical use).
+- [ ] Doctors: ask medical oncology colleagues for real patient support groups; check docs/research/SUPPORT_GROUPS_INDIA.md before anything goes in the app.
+- [ ] Nearby: decide who on the Sahara team reviews "suggested centres" before they are shown.
+- [ ] Deliverables: PPT, two-page brief, narrated video. Build sprint done by Sun 1 Nov; submission about 5 days after (confirm the exact cut-off). Present as a tag team: doctors explain the problem and clinical features, tech explains the build.
+- [ ] Play Store: upload the new version (versionCode 9+); last update was about 19 Oct.
+
 ### Sahara owner keys and steps (no-mock round, 28 Oct)
 **AI note drafting, recorded-turn transcription and note translation** (works with any OpenAI-compatible service: a hosted one, or an open model you run yourself, e.g. vLLM, Ollama or llama.cpp server for text and faster-whisper-server for audio, behind HTTPS).
 - [ ] Supabase → project Saanthvana (`kjnhtakqzboayqorrlue`) → Edge Functions → Secrets → add:
