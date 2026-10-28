@@ -75,7 +75,7 @@ class DoctorTranscriptGoalsTest {
         assertFalse(doctorTranscriptIsSample(false, sample, sample))
         assertFalse(doctorTranscriptIsSample(true, "My own typed words.", sample))
         assertFalse(doctorTranscriptIsSample(true, "", sample))
-        assertTrue(doctorTranscriptOrigin(true, 0, "").startsWith("Sample"))
-        assertFalse(doctorTranscriptOrigin(false, 0, "").startsWith("Sample"))
+        assertTrue(doctorTranscriptOrigin(true, 0, "").startsWith("Practice"))
+        assertFalse(doctorTranscriptOrigin(false, 0, "").startsWith("Practice"))
     }
 }

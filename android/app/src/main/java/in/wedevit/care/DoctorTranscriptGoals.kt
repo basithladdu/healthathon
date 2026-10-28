@@ -171,7 +171,7 @@ internal fun doctorTranscriptIsSample(walkthrough: Boolean, source: String, samp
 
 /** Where the transcript words came from, shown under the transcript. */
 internal fun doctorTranscriptOrigin(isSample: Boolean, transcribedAt: Long, model: String): String = when {
-    isSample -> "Sample · written for the walkthrough, not taken from your recording · नमूना, आपकी रिकॉर्डिंग से नहीं"
+    isSample -> "Practice · written in advance for the walkthrough, not taken from your recording · अभ्यास, पहले से लिखा, आपकी रिकॉर्डिंग से नहीं"
     transcribedAt > 0 -> "Transcript · $model. Check names, numbers and meaning against the audio."
     else -> "Typed or dictated here · check every word · यहाँ लिखा गया"
 }

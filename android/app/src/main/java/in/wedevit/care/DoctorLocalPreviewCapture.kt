@@ -46,11 +46,11 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
     var coverage by remember(controller,sourceText,clip?.id,state.recording) {mutableStateOf(defaultDoctorCoverage())}
     var reviewing by remember(controller,sourceText,clip?.id,state.recording) {mutableStateOf<Int?>(null)}
     var quote by remember(reviewing) {mutableStateOf("")}
-    Text("Local preview—on this device, not linked to a real patient. Use only non-confidential speech, never real patient information. The recording stays on this device, does not upload audio and does not create a transcript.",style=MaterialTheme.typography.bodySmall)
+    Text("Practice recording—on this device, not linked to a real patient. Use only non-confidential speech, never real patient information. The recording stays on this device, does not upload audio and does not create a transcript.",style=MaterialTheme.typography.bodySmall)
     if(clip!=null && sourceText.isNotBlank()) Text("Existing text below was not generated from this recording. It is kept unchanged.",color=Rust,style=MaterialTheme.typography.bodySmall)
     DoctorRecordingReview(
         state=DoctorRecordingReviewState(recording=state.recording,paused=state.paused,seconds=state.seconds,levels=state.levels,
-            clipLabel=clip?.let {"Local preview recording"},playing=clip!=null && state.playing==clip.id,
+            clipLabel=clip?.let {"Practice recording"},playing=clip!=null && state.playing==clip.id,
             playbackPositionMs=state.playbackPositionMs,durationMs=state.durationMs,sourceText=sourceText,
             sourceKind=sourceKind,coverage=coverage,canRecord=!controller.isClosed(),canTranscribe=false,error=state.error),
         onRecord={agreements.clear();purpose=false;storage=false;access=false;consentOpen=true},
@@ -64,8 +64,8 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
             Text("Every participant must agree before recording. Record only non-confidential content that is not real patient information.")
             OutlinedTextField(participants,{participants=it.take(600)},label={Text("Participant names")},supportingText={Text("Separate names with commas or new lines")},modifier=Modifier.testTag("preview-record-participants"))
             names.forEachIndexed {i,name -> PreviewRecordingCheck(agreements[name]==true,{agreements[name]=it},"$name agrees to recording","preview-record-person-$i")}
-            PreviewRecordingCheck(purpose,{purpose=it},"We understand this recording is for a local care-conversation preview.","preview-record-purpose")
-            PreviewRecordingCheck(storage,{storage=it},"Audio is saved only in this preview's local device storage; no upload or transcription runs.","preview-record-storage")
+            PreviewRecordingCheck(purpose,{purpose=it},"We understand this recording is for care-conversation practice.","preview-record-purpose")
+            PreviewRecordingCheck(storage,{storage=it},"Audio is saved only on this device for practice; no upload or transcription runs.","preview-record-storage")
             PreviewRecordingCheck(access,{access=it},"Anyone with access to this device may access its local recordings.","preview-record-access")
             Text("Maximum 5 minutes, including pauses, or 3 MB. Leaving the app or this conversation stops and saves recording.",style=MaterialTheme.typography.bodySmall)
         }

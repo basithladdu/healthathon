@@ -10,8 +10,8 @@ Collected on 27 Oct from every agent lane across Sahara, ITI, WDCW and AI-FIR. E
 - [ ] Apply the Supabase migrations the lanes add (emergency QR link, account delete, feedback, sync), then re-test.
 - [ ] Redeploy the website with the app-link file, so invite links open the app.
 - [ ] Supabase settings: email sign-up confirmation, leaked-password protection, lock `rls_auto_enable()`.
-- [ ] Approve doctor accounts (manual in the database for now).
-- [ ] Pick the AI provider for note drafting, and the consent terms.
+- [ ] Approve doctor accounts: now done in the app (see "Sahara owner keys and steps (no-mock round, 28 Oct)" below).
+- [ ] AI note drafting: put the AI key on the server (see "Sahara owner keys and steps (no-mock round, 28 Oct)" below). Until then the app keeps word matching and says AI is not set up.
 - [ ] Decide the anonymisation scope: patient name → ID on the doctor's screens; blur faces in photos.
 - [ ] Re-tapping a marked body part: move the spot or add a new one?
 - [ ] Pick the CARE option in the team meeting (A / A+B / A+C).
@@ -20,6 +20,24 @@ Collected on 27 Oct from every agent lane across Sahara, ITI, WDCW and AI-FIR. E
 - [ ] Play: next upload uses versionCode 9 or higher, once 0.6.0 (7) is out of review; fill in Data safety from the draft.
 - [ ] Test on a real phone: checklist in CLAUDE_TRANSCRIPT.md §3.
 - [ ] Final template: team code, doctor details, costs; decide how judges see the code (repo is private).
+
+### Sahara owner keys and steps (no-mock round, 28 Oct)
+**AI note drafting, recorded-turn transcription and note translation** (works with any OpenAI-compatible service: a hosted one, or an open model you run yourself, e.g. vLLM, Ollama or llama.cpp server for text and faster-whisper-server for audio, behind HTTPS).
+- [ ] Supabase → project Saanthvana (`kjnhtakqzboayqorrlue`) → Edge Functions → Secrets → add:
+  - `SAHARA_AI_BASE_URL` = the service's base URL ending in `/v1` (must start with `https://`)
+  - `SAHARA_AI_API_KEY` = your key (leave out for a self-hosted server without a key)
+  - `SAHARA_AI_MODEL` = the chat model name
+  - optional `SAHARA_AI_TRANSCRIBE_MODEL` = the speech-to-text model name (turns on "Transcribe a recorded turn")
+  - optional `SAHARA_AI_PROVIDER_NAME` = the name people see in the consent line (default: the URL's host name)
+- [ ] Deploy the function once, from `android/`: `supabase functions deploy sahara-care-assist --project-ref kjnhtakqzboayqorrlue` (code: `android/supabase/functions/sahara-care-assist/index.ts`).
+- [ ] Check migration `20261019151322_shared_care_clinician_review.sql` is applied (it holds the attempt limit `sahara_reserve_assist`: 1 a minute, 10 a day per account, 100 a day in total).
+- [ ] Check the service's data terms (retention, training use, region) against the DPDP drafts. The app names the service in every consent line and sends nothing until everyone agrees and someone taps the button.
+
+**Doctor approval** (no migration needed; the server function `healthathon_review_clinician` already exists).
+- [ ] Once, in Supabase → SQL editor, make a Sahara team account a verifier:
+  `insert into healthathon_private.staff_roles(user_id, role) select id, 'clinical_verifier' from auth.users where email = 'TEAM_EMAIL';`
+- [ ] Sign in to the app with that account → Doctor workspace → Account → "Open verification and shared care". The "Approve doctors · Sahara team" card lists waiting doctors. Check the number on the NMC or state council register, fill in where you checked and a reason, then tap Approve. The server records who approved, what was checked and why. You cannot approve your own account, so the doctor test account must be a different account.
+- [ ] Only if the app can't be used: `update public.healthathon_clinician_requests set status = 'approved', reviewed_at = now(), review_note = 'Checked on REGISTER', revision = revision + 1 where user_id = (select id from auth.users where email = 'DOCTOR_EMAIL');` (this skips the review log).
 
 ### ITI (devit-iti)
 - [ ] SMS/WhatsApp provider plus `ITI_AUTO_PARENT_ALERTS`, to turn on automatic absence messages to parents.

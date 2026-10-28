@@ -161,14 +161,14 @@ internal fun LazyListScope.doctorConnectedScheduleItems(people: List<Person>, it
 }
 
 
-/** The only place the signed-in workspace offers sample patients. They live on this device, apart from real care. */
+/** The only place the signed-in workspace offers practice patients. They live on this device, apart from real care. */
 @Composable internal fun DoctorWalkthroughCard(hindi: Boolean, onOpen: (DoctorTestProfiles.Profile) -> Unit) {
     Surface(color = Peach.copy(alpha = .45f), shape = RoundedCornerShape(22.dp), modifier = Modifier.fillMaxWidth().testTag("doctor-walkthrough-card")) {
         Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(if (hindi) "वॉकथ्रू · नमूना मरीज़" else "Walkthrough · sample patients", style = MaterialTheme.typography.titleLarge)
+            Text(if (hindi) "अभ्यास वॉकथ्रू · असली मरीज़ नहीं" else "Practice walkthrough · not real patients", style = MaterialTheme.typography.titleLarge)
             Text(if (hindi) "अभ्यास के लिए बनाए गए मरीज़, असली नहीं। ये सिर्फ़ इस फ़ोन पर रहते हैं और किसी असली मरीज़ के रिकॉर्ड में नहीं जाते।" else "Made-up patients for practice, not real people. They stay on this phone and never mix with a real patient's records.", style = MaterialTheme.typography.bodyMedium)
             DoctorTestProfiles.profiles.forEach { profile ->
-                TextButton(onClick = { onOpen(profile) }, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-walkthrough-${profile.key}")) { Text((if (hindi) "नमूना: " else "Sample: ") + profile.name) }
+                TextButton(onClick = { onOpen(profile) }, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-walkthrough-${profile.key}")) { Text((if (hindi) "अभ्यास: " else "Practice: ") + profile.name) }
             }
         }
     }
