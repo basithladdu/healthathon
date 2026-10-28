@@ -38,6 +38,11 @@ Details and the exact values are in [blockers.md](blockers.md). Tick items there
 2. **AI key:** in Supabase → Edge Functions → Secrets, set `SAHARA_AI_BASE_URL`, `SAHARA_AI_API_KEY` and `SAHARA_AI_MODEL`. Then, from `android/`, run `supabase functions deploy sahara-care-assist --project-ref kjnhtakqzboayqorrlue`.
 3. **Website:** redeploy it, so the app-link file and the `/join` page go live. The Play App Signing SHA-256 must go into `prototype/public/.well-known/assetlinks.json` first.
 4. Don't change sign-in or the doctor walkthrough entry. Judges use it.
+5. **Meeting 28 Oct changes (branch `sa-integrate-1028b`):** apply these two new migrations after the ones above, in order:
+   - `20261028150000_note_signature_receipts.sql` (goals-of-care sign-off receipts; signature image stays on the phone, only its SHA-256 is shared)
+   - `20261028160510_centre_suggestions.sql` (Nearby "Suggest a centre that's missing", pending until reviewed)
+   Then give the Sahara team member who reviews suggested centres the reviewer role (replace `TEAM_EMAIL`):
+   `insert into healthathon_private.staff_roles(user_id, role) select id, 'directory_reviewer' from auth.users where email = 'TEAM_EMAIL';`
 
 ---
 

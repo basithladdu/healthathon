@@ -14,7 +14,7 @@ class DoctorTestProfilesTest {
         assertTrue(ids[0].intersect(ids[1]).isEmpty())
         fixtures.forEach {f->
             assertNotEquals(DoctorCareDemoData.PERSON_ID,f.person.id)
-            assertEquals(11,f.items.count {it.kind=="checkin"});assertEquals(6,f.items.count {it.kind=="visit"})
+            assertEquals(11,f.items.count {it.kind=="checkin"&&!SymptomNoteCodec.isStructured(it.detail)&&!DistressCodec.isStructured(it.detail)});assertEquals(6,f.items.count {it.kind=="visit"})
             assertEquals(5,f.items.count {it.kind=="medicine"});assertEquals(4,f.reports.size);assertEquals(3,f.contacts.size)
             assertTrue(f.items.all {it.personId==f.person.id});assertTrue(f.contacts.all {it.personId==f.person.id&&it.phone.isBlank()})
             DoctorConversationContext.validate(f.draft.source,f.draft.contextJson)
@@ -28,6 +28,14 @@ class DoctorTestProfilesTest {
             assertEquals("undecided",goals.getValue("concerns_uncertainty").status)
             goals.values.forEach {assertEquals(it.answer,it.evidence.single().quote)}
             assertTrue(f.intake.any {it.reportedDate.isNotBlank()&&it.reportedTakenAt==null})
+            val diary=f.items.filter {it.kind=="checkin"&&(SymptomNoteCodec.isStructured(it.detail)||DistressCodec.isStructured(it.detail))}
+            if(f.person.name=="Rahul") {
+                assertEquals(listOf(6,4,null),DistressRules.history(f.items,f.person.id).reversed().map {it.second.score})
+                assertEquals(listOf(7,5),SymptomDiaryRules.painPartSeries(f.items,f.person.id,"head").map {it.value})
+                assertEquals(listOf(6,4),SymptomDiaryRules.painPartSeries(f.items,f.person.id,"abdomen").map {it.value})
+                assertEquals(listOf(4),SymptomDiaryRules.moodSeries(f.items,f.person.id,"low-mood").map {it.value})
+                assertTrue(diary.all {d->DistressCodec.decode(d.detail)!=null||SymptomNoteCodec.decode(d.detail)!=null})
+            } else assertTrue(diary.isEmpty())
             f.items.filter {it.kind=="visit"}.forEach {visit->
                 val links=DoctorVisitDetails.decode(CareEntryCodec.decode(visit.detail)!!.detail)
                 if(links.conditionRef.isNotBlank())assertTrue(f.items.single {it.id==links.conditionRef}.created<=visit.due)
