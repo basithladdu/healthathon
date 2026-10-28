@@ -26,7 +26,6 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import java.time.Instant
 import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 
 @Composable fun CareReminderSettings(vm: CareModel, onClose: () -> Unit) { val t = careText();
     val context = LocalContext.current
@@ -87,8 +86,8 @@ import java.time.format.DateTimeFormatter
     val dateOnly = CareReminderRules.dateOnly(item)
     SurfaceCard {
         Row { Column(Modifier.weight(1f)) { Text(item.title, fontWeight = FontWeight.SemiBold); Text(when { option?.muted == true -> t("Paused", "रुका हुआ"); item.kind == "medicine" -> (option?.times ?: CareReminderRules.printedTimes(item.detail)).joinToString(", ").ifBlank { t("No time chosen", "समय नहीं चुना") }
-            dateOnly -> DateTimeFormatter.ofPattern("dd MMM yyyy").withZone(ZoneId.systemDefault()).format(Instant.ofEpochMilli(item.due)) + " · " + option?.times.orEmpty().joinToString(", ").ifBlank { t("No alert time chosen", "सूचना का समय नहीं चुना") }
-            item.due > 0 -> DateTimeFormatter.ofPattern("dd MMM yyyy · HH:mm z").withZone(ZoneId.systemDefault()).format(Instant.ofEpochMilli(item.due)); else -> t("No time chosen", "समय नहीं चुना") }, style = MaterialTheme.typography.bodySmall, modifier = Modifier.testTag("reminder-when-${item.id}")) }
+            dateOnly -> careDateFormat("dd MMM yyyy", careHindi()).withZone(ZoneId.systemDefault()).format(Instant.ofEpochMilli(item.due)) + " · " + option?.times.orEmpty().joinToString(", ").ifBlank { t("No alert time chosen", "सूचना का समय नहीं चुना") }
+            item.due > 0 -> careDateFormat("dd MMM yyyy · HH:mm z", careHindi()).withZone(ZoneId.systemDefault()).format(Instant.ofEpochMilli(item.due)); else -> t("No time chosen", "समय नहीं चुना") }, style = MaterialTheme.typography.bodySmall, modifier = Modifier.testTag("reminder-when-${item.id}")) }
             Switch(checked = option?.muted != true, onCheckedChange = { enabled -> scheduler.configure(item.id, (option ?: ReminderOption(CareReminderRules.printedTimes(item.detail))).copy(muted = !enabled)); changed() }) }
         if (item.kind == "medicine") {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -98,7 +97,7 @@ import java.time.format.DateTimeFormatter
                 if (error.isNotBlank()) Text(error, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce())
                 Button(onClick = { runCatching {
                     scheduler.configure(item.id, ReminderOption(if (times.isBlank()) emptyList() else times.split(',').map(String::trim), starts.trim(), ends.trim(), option?.muted == true)); changed()
-                }.onFailure { error = it.message ?: t("Check the times and dates.", "समय और तारीख़ें जाँचें।") } }, modifier = Modifier.fillMaxWidth()) { Text(t("Save reminder times", "रिमाइंडर का समय सहेजें")) }
+                }.onFailure { error = it.message?.let { m -> t(m, ReminderTextHindi[m] ?: m) } ?: t("Check the times and dates.", "समय और तारीख़ें जाँचें।") } }, modifier = Modifier.fillMaxWidth()) { Text(t("Save reminder times", "रिमाइंडर का समय सहेजें")) }
             }
         } else if (dateOnly) {
             // Saved with a date only: no alert until a time on that day is chosen here (never a midnight alert).
@@ -107,7 +106,7 @@ import java.time.format.DateTimeFormatter
                 if (error.isNotBlank()) Text(error, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce())
                 Button(onClick = { runCatching {
                     scheduler.configure(item.id, ReminderOption(if (times.isBlank()) emptyList() else times.split(',').map(String::trim), muted = option?.muted == true)); changed()
-                }.onFailure { error = it.message ?: t("Use HH:mm, such as 08:30.", "HH:mm लिखें, जैसे 08:30।") } }, modifier = Modifier.fillMaxWidth().testTag("reminder-save-${item.id}")) { Text(t("Save alert time", "समय सहेजें")) }
+                }.onFailure { error = it.message?.let { m -> t(m, ReminderTextHindi[m] ?: m) } ?: t("Use HH:mm, such as 08:30.", "HH:mm लिखें, जैसे 08:30।") } }, modifier = Modifier.fillMaxWidth().testTag("reminder-save-${item.id}")) { Text(t("Save alert time", "समय सहेजें")) }
             }
         }
     }

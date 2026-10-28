@@ -91,10 +91,10 @@ private val DoctorMist = Peach
         Text(name.split(' ').mapNotNull { it.firstOrNull() }.take(2).joinToString(""), color = DoctorForest, fontWeight = FontWeight.SemiBold, fontSize = (size / 3).sp)
     }
 }
-@Composable private fun PreviewLabel() { Surface(color = DoctorMist, shape = RoundedCornerShape(8.dp)) { Text("Walkthrough", Modifier.padding(horizontal = 9.dp, vertical = 4.dp), fontSize = 11.sp, fontWeight = FontWeight.Medium, color = DoctorForest) } }
+@Composable private fun PreviewLabel() { val t = careText(); Surface(color = DoctorMist, shape = RoundedCornerShape(8.dp)) { Text(t("Walkthrough", "परिचय"), Modifier.padding(horizontal = 9.dp, vertical = 4.dp), fontSize = 11.sp, fontWeight = FontWeight.Medium, color = DoctorForest) } }
 @Composable private fun VisitStatus(status: String) {
     val color = if (status == "Completed") Rust else DoctorMuted
-    Surface(color = color.copy(alpha = .09f), shape = RoundedCornerShape(6.dp)) { Text(status, Modifier.padding(horizontal = 8.dp, vertical = 4.dp), color = color, style = MaterialTheme.typography.labelMedium) }
+    Surface(color = color.copy(alpha = .09f), shape = RoundedCornerShape(6.dp)) { Text(if (careHindi()) when (status) { "Scheduled" -> "तय"; "Completed" -> "पूरी हुई"; "Cancelled" -> "रद्द"; else -> status } else status, Modifier.padding(horizontal = 8.dp, vertical = 4.dp), color = color, style = MaterialTheme.typography.labelMedium) }
 }
 
 /** A separate walkthrough workspace: no CareModel, account token, Room or network operations. */
@@ -110,7 +110,7 @@ private val DoctorMist = Peach
     }
 }
 
-@Composable private fun DoctorWorkspace(onExit: () -> Unit, store: DoctorDemoStore?, workflowStore: DoctorWorkflowStore?, cloud:CareCloud?,enableOnlineAi:Boolean,onSignIn:()->Unit,initialPatientId:String?=null, careModel: CareModel? = null, onCareAccount: () -> Unit = {}) {
+@Composable private fun DoctorWorkspace(onExit: () -> Unit, store: DoctorDemoStore?, workflowStore: DoctorWorkflowStore?, cloud:CareCloud?,enableOnlineAi:Boolean,onSignIn:()->Unit,initialPatientId:String?=null, careModel: CareModel? = null, onCareAccount: () -> Unit = {}) { val t = careText();
     val context = LocalContext.current
     val focus=LocalFocusManager.current
     DisposableEffect(context) {
@@ -193,14 +193,14 @@ private val DoctorMist = Peach
             else -> {patientId = null;tab = 1}
         }
     }
-    fun refresh(result: String?) { notice = result ?: "Appointment updated"; appointments = demoStore.appointments() }
+    fun refresh(result: String?) { notice = result ?: t("Appointment updated", "अपॉइंटमेंट बदला गया"); appointments = demoStore.appointments() }
     fun cancelVisit(id: String) {
         val error = demoStore.cancel(id)
         if (error != null) { notice=error; return }
         val linked = workflow.requests().filter { it.appointmentId==id && it.status==WorkflowRequestStatus.SCHEDULED }
         val failures = linked.mapNotNull { workflow.transitionRequest(it.id, WorkflowRequestStatus.DEFERRED) }
         appointments=demoStore.appointments()
-        notice=if(failures.isEmpty()) { if(linked.isEmpty()) "Visit cancelled" else "Visit cancelled · linked request deferred" } else "Visit cancelled, but request update failed: ${failures.first()}"
+        notice=if(failures.isEmpty()) { if(linked.isEmpty()) t("Visit cancelled", "विज़िट रद्द हुई") else t("Visit cancelled · linked request deferred", "विज़िट रद्द हुई · जुड़ा अनुरोध टाला गया") } else t("Visit cancelled, but request update failed: ${failures.first()}", "विज़िट रद्द हुई, पर अनुरोध नहीं बदला जा सका: ${failures.first()}")
     }
     if (feedbackOpen) {
         FeedbackScreen(accountScope = workflowAccountId ?: "guest-doctor-preview", surface = "doctor-preview", onClose = { feedbackOpen = false }, cloud = careModel?.cloud)
@@ -223,16 +223,16 @@ private val DoctorMist = Peach
     Scaffold(containerColor = DoctorBackground, topBar = {
         Column(Modifier.background(Paper).statusBarsPadding()) {
             Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                if(sampleCareOpen) IconButton(onClick={sampleCareBack?.invoke() ?: run {sampleCareOpen=false}},enabled=!careNavigationBlocked){Icon(Icons.AutoMirrored.Filled.ArrowBack,"Back to patient care")}
-                else if (carePersonId != null) IconButton(onClick = { if (careNestedBack != null) careNestedBack?.invoke() else navigateCare { if (careSection == "Hub") carePersonId = null else careSection = "Hub" } }, enabled = !careNavigationBlocked) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back to patient care") }
-                else if (patient != null) IconButton(onClick = ::backPatient,modifier=Modifier.testTag("demo-patient-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, if(reportId!=null) "Back to reports" else if(progressReportId!=null) "Back to progress" else if(recordTab=="Hub") "Back to patients" else "Back to patient profile") }
+                if(sampleCareOpen) IconButton(onClick={sampleCareBack?.invoke() ?: run {sampleCareOpen=false}},enabled=!careNavigationBlocked){Icon(Icons.AutoMirrored.Filled.ArrowBack,t("Back to patient care", "मरीज़ की देखभाल पर वापस"))}
+                else if (carePersonId != null) IconButton(onClick = { if (careNestedBack != null) careNestedBack?.invoke() else navigateCare { if (careSection == "Hub") carePersonId = null else careSection = "Hub" } }, enabled = !careNavigationBlocked) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back to patient care", "मरीज़ की देखभाल पर वापस")) }
+                else if (patient != null) IconButton(onClick = ::backPatient,modifier=Modifier.testTag("demo-patient-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, if(reportId!=null) t("Back to reports", "रिपोर्टों पर वापस") else if(progressReportId!=null) t("Back to progress", "प्रगति पर वापस") else if(recordTab=="Hub") t("Back to patients", "मरीज़ों की सूची पर वापस") else t("Back to patient profile", "मरीज़ की प्रोफ़ाइल पर वापस")) }
                 else { Image(saharaImage(R.drawable.sahara_professional_logo, 34.dp), null, Modifier.size(34.dp)); Spacer(Modifier.width(8.dp)) }
                 Column(Modifier.weight(1f)) {
-                    Text(if(sampleCareOpen) DoctorTestProfiles.profiles.firstOrNull {DoctorTestProfiles.personId(it)==testCarePerson}?.name ?: "Earlier practice care" else if (carePersonId != null) carePerson?.name ?: "Care profile unavailable" else if (patient != null) patient.displayName() else "Sahara", fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 20.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    if(sampleCareOpen && DoctorTestProfiles.contains(testCarePerson)) Text("Care record",color=DoctorMuted,fontSize=12.sp)
-                    else Text(if(sampleCareOpen) "Separate from your records" else if (carePersonId != null) { if (careModel?.cloud == null) "Device-local care · not synced" else "Real shared care" } else if (patient != null) "Patient record" else "Doctor workspace", color = DoctorMuted, fontSize = 12.sp)
+                    Text(if(sampleCareOpen) DoctorTestProfiles.profiles.firstOrNull {DoctorTestProfiles.personId(it)==testCarePerson}?.name ?: t("Earlier practice care", "पहले की अभ्यास देखभाल") else if (carePersonId != null) carePerson?.name ?: t("Care profile unavailable", "देखभाल प्रोफ़ाइल उपलब्ध नहीं") else if (patient != null) patient.displayName() else "Sahara", fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 20.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    if(sampleCareOpen && DoctorTestProfiles.contains(testCarePerson)) Text(t("Care record", "देखभाल रिकॉर्ड"),color=DoctorMuted,fontSize=12.sp)
+                    else Text(if(sampleCareOpen) t("Separate from your records", "आपके रिकॉर्ड से अलग") else if (carePersonId != null) { if (careModel?.cloud == null) t("Device-local care · not synced", "फ़ोन पर रखी देखभाल · सिंक नहीं") else t("Real shared care", "असली साझा देखभाल") } else if (patient != null) t("Patient record", "मरीज़ का रिकॉर्ड") else t("Doctor workspace", "डॉक्टर वर्कस्पेस"), color = DoctorMuted, fontSize = 12.sp)
                 }
-                if(sampleCareOpen && !DoctorTestProfiles.contains(testCarePerson)) Text("Practice",color=Rust) else if (!sampleCareOpen && carePersonId == null) PreviewLabel()
+                if(sampleCareOpen && !DoctorTestProfiles.contains(testCarePerson)) Text(t("Practice", "अभ्यास"),color=Rust) else if (!sampleCareOpen && carePersonId == null) PreviewLabel()
                 Spacer(Modifier.width(10.dp))
                 if (!sampleCareOpen && patient == null && carePersonId == null) DoctorAvatar("Meera", 34)
             }
@@ -243,19 +243,19 @@ private val DoctorMist = Peach
             val labels = listOf("Home", "Patients", "Schedule", "Account")
             val icons = listOf(Icons.Default.Home, Icons.Default.PeopleOutline, Icons.Default.CalendarMonth, Icons.Default.PersonOutline)
             labels.forEachIndexed { i, label -> NavigationBarItem(selected = if (sampleCareOpen || patientId != null || carePersonId != null) i == 1 else tab == i, enabled = !careNavigationBlocked, onClick = { navigateCare { sampleCareOpen=false;tab = i; carePersonId = null; patientId = null; progressReportId=null;reportId=null;workflowRoute=null; notice = null } },
-                icon = { Icon(icons[i], null) }, label = { Text(label) }, modifier = Modifier.testTag("demo-nav-$label"),
+                icon = { Icon(icons[i], null) }, label = { Text(when (label) { "Home" -> t("Home", "होम"); "Patients" -> t("Patients", "मरीज़"); "Schedule" -> t("Schedule", "समय-सूची"); else -> t("Account", "खाता") }) }, modifier = Modifier.testTag("demo-nav-$label"),
                 colors = NavigationBarItemDefaults.colors(indicatorColor = DoctorMist, selectedIconColor = DoctorForest, selectedTextColor = DoctorForest, unselectedIconColor = DoctorMuted, unselectedTextColor = DoctorMuted)) }
         }
     }) { padding ->
         Column(Modifier.padding(padding).consumeWindowInsets(padding).fillMaxSize()) {
             notice?.let { message -> Row(Modifier.fillMaxWidth().background(DoctorMist).padding(start = 16.dp), verticalAlignment = Alignment.CenterVertically) {
                 Text(message, Modifier.weight(1f).announce(), style = MaterialTheme.typography.bodySmall)
-                IconButton(onClick = { notice = null }) { Icon(Icons.Default.Close, "Dismiss status") }
+                IconButton(onClick = { notice = null }) { Icon(Icons.Default.Close, t("Dismiss status", "सूचना हटाएँ")) }
             } }
-            if(earlierWorkspace && !sampleCareOpen && patientId==null && carePersonId==null) Row(Modifier.fillMaxWidth().padding(horizontal=20.dp),verticalAlignment=Alignment.CenterVertically){Text("Earlier practice workspace",Modifier.weight(1f));TextButton(onClick={earlierWorkspace=false;workflowRoute=null;tab=0}){Text("Return to current workspace")}}
+            if(earlierWorkspace && !sampleCareOpen && patientId==null && carePersonId==null) Row(Modifier.fillMaxWidth().padding(horizontal=20.dp),verticalAlignment=Alignment.CenterVertically){Text(t("Earlier practice workspace", "पहले का अभ्यास वर्कस्पेस"),Modifier.weight(1f));TextButton(onClick={earlierWorkspace=false;workflowRoute=null;tab=0}){Text(t("Return to current workspace", "मौजूदा वर्कस्पेस पर लौटें"))}}
             if(sampleCareOpen) DoctorCareDemoHost(onExit={sampleCareOpen=false;tab=1;testInitialSection="Hub"},onNavigationBlockedChange={careNavigationBlocked=it},onHeaderBackChange={sampleCareBack=it},initialPersonId=testCarePerson,initialSection=testInitialSection)
             else if (carePersonId != null && careModel != null) {
-                if (carePerson == null) Column(Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) { Text("This care profile is unavailable", style = MaterialTheme.typography.titleLarge); Text("No other person's records are shown instead."); TextButton(onClick = { carePersonId = null }) { Text("Back to patients") } }
+                if (carePerson == null) Column(Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) { Text(t("This care profile is unavailable", "यह देखभाल प्रोफ़ाइल उपलब्ध नहीं है"), style = MaterialTheme.typography.titleLarge); Text(t("No other person's records are shown instead.", "इसकी जगह किसी और के रिकॉर्ड नहीं दिखाए जाते।")); TextButton(onClick = { carePersonId = null }) { Text(t("Back to patients", "मरीज़ों की सूची पर वापस")) } }
                 else if (careSection == "Hub") DoctorSharedPatientHub(carePerson, { next -> navigateCare { careSection = next } }, deviceLocal = careModel.cloud == null)
                 else key(careSelection!!.stateKey) { embeddedCareStates.SaveableStateProvider("${careSelection.stateKey}:care") { EmbeddedPatientCare(careModel, carePersonId!!, careSection, { next -> careSection = next }, onCareAccount, { carePersonId = null }, onNavigationBlockedChange = { careNavigationBlocked = it }, allowDeviceLocal = careModel.cloud == null, onHeaderBackChange = { careNestedBack = it }) } }
             }
@@ -263,11 +263,11 @@ private val DoctorMist = Peach
             else if(workflowRoute != null) {
                 val target = demoStore.patients.firstOrNull { it.id == workflowRoute }
                 if(target!=null) key(target.id,workflowNamespace) { DoctorConversationWorkspace(target,workflow,onBack={workflowRoute=null},cloud=cloud,onSignIn=onSignIn,enableOnlineAi=enableOnlineAi) }
-            } else Crossfade(targetState = patientId to tab, animationSpec = tween(160), label = "Doctor destination") { destination ->
+            } else Crossfade(targetState = patientId to tab, animationSpec = tween(160), label = t("Doctor destination", "डॉक्टर कहाँ जाएँ")) { destination ->
             val shownPatient = demoStore.patients.firstOrNull { it.id == destination.first }
             when {
                 shownPatient != null && recordTab=="Hub" -> LazyColumn(Modifier.fillMaxSize().testTag("demo-patient-hub"),contentPadding=PaddingValues(20.dp),verticalArrangement=Arrangement.spacedBy(20.dp)) {
-                    item {Row(verticalAlignment=Alignment.CenterVertically) {DoctorAvatar(shownPatient.displayName(),54);Spacer(Modifier.width(12.dp));Column {DoctorTitle(shownPatient.displayName(),24);Text("${shownPatient.age} years",color=DoctorMuted)}};Spacer(Modifier.height(10.dp));Text(shownPatient.careContext,color=DoctorMuted)}
+                    item {Row(verticalAlignment=Alignment.CenterVertically) {DoctorAvatar(shownPatient.displayName(),54);Spacer(Modifier.width(12.dp));Column {DoctorTitle(shownPatient.displayName(),24);Text(t("${shownPatient.age} years", "${shownPatient.age} साल"),color=DoctorMuted)}};Spacer(Modifier.height(10.dp));Text(shownPatient.careContext,color=DoctorMuted)}
                     item {DoctorPatientHub(shownPatient,onSection={progressReportId=null;reportId=null;recordTab=it})}
                 }
                 shownPatient!=null && recordTab=="Progress" && progressReportId!=null -> {
@@ -288,23 +288,23 @@ private val DoctorMist = Peach
                 destination.second == 0 && earlierWorkspace -> DemoHome(demoStore.patients, appointments, ::openPatient, onSchedule = { tab = 2 }, onAdd = { creatingFor = demoStore.patients.first().id }, workflow = workflow, onRequests={workflowRoute="requests"}, onDraft={workflowRoute=it;patientId=it;recordTab="Conversations"})
                 destination.second == 0 -> DoctorHomeWorkday(DoctorTestProfiles.profiles.map { DoctorTestProfiles.personId(it) }.let { ids -> ids.size + carePeople.count { it.id !in ids } }, demoStore.patients, homePending, homeVisits, homeLoaded, workflow, onPatients={tab=1}, onSchedule={tab=2}, onProfile={p->navigateCare {testCarePerson=DoctorTestProfiles.personId(p);testInitialSection="Hub";sampleCareOpen=true}}, onPending={c->navigateCare {testCarePerson=DoctorTestProfiles.personId(c.profile);testInitialSection=c.section;sampleCareOpen=true}}, onConversation={id->workflowRoute=id}, onRequests={workflowRoute="requests"})
                 destination.second == 1 -> LazyColumn(Modifier.fillMaxSize().testTag("walkthrough-patients-list"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                    item { DoctorTitle("Patients"); Text("Choose a person to open their care.", fontSize = 16.sp) }
+                    item { DoctorTitle(t("Patients", "मरीज़")); Text(t("Choose a person to open their care.", "देखभाल खोलने के लिए व्यक्ति चुनें।"), fontSize = 16.sp) }
                     if (careModel != null) {
-                        item { var infoOpen by rememberSaveable { mutableStateOf(false) }; Column { Row(verticalAlignment = Alignment.CenterVertically) { Text(if (careModel.cloud == null) "Care profiles on this device" else "Shared care profiles", Modifier.weight(1f), fontSize = 19.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, color = DoctorCardInk); IconButton(onClick = { infoOpen = !infoOpen }, modifier = Modifier.size(48.dp).testTag("patients-info-toggle")) { Icon(Icons.Outlined.Info, if (infoOpen) "Hide details about these care profiles" else "Show details about these care profiles", tint = DoctorAccent) } }
-                            if (infoOpen) Text((if (careModel.cloud == null) "Only on this device · not synced." else "Records your account may access.") + (if (carePeople.isEmpty()) " No care profiles added yet. Add a profile or open Rahul or Arjun below." else ""), Modifier.semantics { liveRegion = LiveRegionMode.Polite }.testTag("patients-info-text"), fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub) } }
-                        if (careModel.cloud == null) item { OutlinedButton(onClick = { addingCarePerson = true }, enabled = !careBusy && pendingCreatedProfileId == null, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("doctor-add-device-profile")) { Icon(Icons.Default.PersonAdd, null); Spacer(Modifier.width(8.dp)); Text("Add on-device care profile") } }
-                        if (pendingCreatedProfileId != null) item { LinearProgressIndicator(Modifier.fillMaxWidth()); Text("Opening your new care profile…") }
-                        items(carePeople, key = { "care:${careAccount}:${it.id}" }) { person -> DoctorPatientListCard(person.name, if (careModel.cloud == null) "Device-local care" else "Shared care", { openCare(person.id) }) }
+                        item { var infoOpen by rememberSaveable { mutableStateOf(false) }; Column { Row(verticalAlignment = Alignment.CenterVertically) { Text(if (careModel.cloud == null) t("Care profiles on this device", "इस फ़ोन पर देखभाल प्रोफ़ाइल") else t("Shared care profiles", "साझा देखभाल प्रोफ़ाइल"), Modifier.weight(1f), fontSize = 19.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, color = DoctorCardInk); IconButton(onClick = { infoOpen = !infoOpen }, modifier = Modifier.size(48.dp).testTag("patients-info-toggle")) { Icon(Icons.Outlined.Info, if (infoOpen) t("Hide details about these care profiles", "इन देखभाल प्रोफ़ाइलों की जानकारी छिपाएँ") else t("Show details about these care profiles", "इन देखभाल प्रोफ़ाइलों की जानकारी दिखाएँ"), tint = DoctorAccent) } }
+                            if (infoOpen) Text((if (careModel.cloud == null) t("Only on this device · not synced.", "सिर्फ़ इस फ़ोन पर · सिंक नहीं।") else t("Records your account may access.", "वे रिकॉर्ड जो आपका खाता देख सकता है।")) + (if (carePeople.isEmpty()) t(" No care profiles added yet. Add a profile or open Rahul or Arjun below.", " अभी कोई देखभाल प्रोफ़ाइल नहीं जोड़ी गई। प्रोफ़ाइल जोड़ें या नीचे राहुल या अर्जुन को खोलें।") else ""), Modifier.semantics { liveRegion = LiveRegionMode.Polite }.testTag("patients-info-text"), fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub) } }
+                        if (careModel.cloud == null) item { OutlinedButton(onClick = { addingCarePerson = true }, enabled = !careBusy && pendingCreatedProfileId == null, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("doctor-add-device-profile")) { Icon(Icons.Default.PersonAdd, null); Spacer(Modifier.width(8.dp)); Text(t("Add on-device care profile", "फ़ोन पर देखभाल प्रोफ़ाइल जोड़ें")) } }
+                        if (pendingCreatedProfileId != null) item { LinearProgressIndicator(Modifier.fillMaxWidth()); Text(t("Opening your new care profile…", "आपकी नई देखभाल प्रोफ़ाइल खुल रही है…")) }
+                        items(carePeople, key = { "care:${careAccount}:${it.id}" }) { person -> DoctorPatientListCard(person.name, if (careModel.cloud == null) t("Device-local care", "फ़ोन पर रखी देखभाल") else t("Shared care", "साझा देखभाल"), { openCare(person.id) }) }
                     }
-                    item { HorizontalDivider(); DoctorSection("People in your care") }
+                    item { HorizontalDivider(); DoctorSection(t("People in your care", "आपकी देखभाल में लोग")) }
                     items(DoctorTestProfiles.profiles,key={it.key}) {profile->DoctorPatientListCard(profile.name,profile.family,{navigateCare {testCarePerson=DoctorTestProfiles.personId(profile);testInitialSection="Hub";sampleCareOpen=true}})}
                 }
                 destination.second == 2 -> Column(Modifier.fillMaxSize()) {
-                    if (carePeople.isNotEmpty()) Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp)) { Text("Care profile calendars", fontSize = 18.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont); FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) { carePeople.forEach { person -> AssistChip(onClick = { openCare(person.id); careSection = "Visits" }, label = { Text(person.name) }, modifier = Modifier.heightIn(min = 48.dp)) } } }
+                    if (carePeople.isNotEmpty()) Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp)) { Text(t("Care profile calendars", "देखभाल प्रोफ़ाइल के कैलेंडर"), fontSize = 18.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont); FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) { carePeople.forEach { person -> AssistChip(onClick = { openCare(person.id); careSection = "Visits" }, label = { Text(person.name) }, modifier = Modifier.heightIn(min = 48.dp)) } } }
                     if(earlierWorkspace) Box(Modifier.weight(1f)) { DemoSchedule(demoStore.patients, appointments, LocalDate.parse(selectedDay), { selectedDay = it.toString() }, ::openPatient,
                     onAdd = { creatingFor = demoStore.patients.first().id }, onReschedule = { editingId = it.id },
                     onCancel = { cancellingId = it.id }, onComplete = { refresh(demoStore.complete(it.id)) }) }
-                    else LazyColumn(Modifier.weight(1f),contentPadding=PaddingValues(20.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {item {DoctorTitle("Schedule");Text("Choose a person to view visits and plan a review.");DoctorSection("People in your care")};items(DoctorTestProfiles.profiles,key={it.key}) {p->DoctorPatientListCard(p.name,"View visits",{navigateCare {testCarePerson=DoctorTestProfiles.personId(p);testInitialSection="Visits";sampleCareOpen=true}})}}
+                    else LazyColumn(Modifier.weight(1f),contentPadding=PaddingValues(20.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {item {DoctorTitle(t("Schedule", "समय-सूची"));Text(t("Choose a person to view visits and plan a review.", "विज़िट देखने और समीक्षा तय करने के लिए व्यक्ति चुनें।"));DoctorSection(t("People in your care", "आपकी देखभाल में लोग"))};items(DoctorTestProfiles.profiles,key={it.key}) {p->DoctorPatientListCard(p.name,t("View visits", "विज़िट देखें"),{navigateCare {testCarePerson=DoctorTestProfiles.personId(p);testInitialSection="Visits";sampleCareOpen=true}})}}
                 }
                 else -> Column(Modifier.fillMaxSize()) {
                     Box(Modifier.weight(1f)){DemoAccount(onExit,onFeedback={feedbackOpen=true})}
@@ -325,96 +325,96 @@ private val DoctorMist = Peach
         DemoAppointmentEditor(demoStore.patients, creatingFor ?: editing?.patientId ?: demoStore.patients.first().id, editing,
             LocalDate.parse(selectedDay), patientLocked = schedulingRequestId!=null, onDismiss = { creatingFor = null; editingId = null; schedulingRequestId=null }, onSave = { appointment ->
                 val linkedRequest=schedulingRequestId?.let { id -> workflow.requests().firstOrNull { it.id==id } }
-                val error = if(linkedRequest!=null && linkedRequest.patientId!=appointment.patientId) "Choose the patient linked to this request." else demoStore.save(appointment)
+                val error = if(linkedRequest!=null && linkedRequest.patientId!=appointment.patientId) t("Choose the patient linked to this request.", "इस अनुरोध से जुड़ा मरीज़ चुनें।") else demoStore.save(appointment)
                 if (error == null) {
-                    appointments = demoStore.appointments(); notice = if (editing == null) "Visit scheduled" else "Visit rescheduled"
+                    appointments = demoStore.appointments(); notice = if (editing == null) t("Visit scheduled", "विज़िट तय हुई") else t("Visit rescheduled", "विज़िट का समय बदला")
                     selectedDay = demoDate(appointment.startMillis).toString(); creatingFor = null; editingId = null
                     schedulingRequestId?.let { request ->
-                        notice = workflow.transitionRequest(request, WorkflowRequestStatus.SCHEDULED, appointment.id) { id -> demoStore.appointments().firstOrNull { it.id==id } } ?: "Visit scheduled · request updated locally"
+                        notice = workflow.transitionRequest(request, WorkflowRequestStatus.SCHEDULED, appointment.id) { id -> demoStore.appointments().firstOrNull { it.id==id } } ?: t("Visit scheduled · request updated locally", "विज़िट तय हुई · अनुरोध फ़ोन पर बदला गया")
                         schedulingRequestId=null
                     }
                 }
                 error
             })
     }
-    cancellingId?.let { id -> AlertDialog(onDismissRequest = { cancellingId = null }, title = { Text("Cancel this visit?") },
-        text = { Text("The visit will stay in the schedule with a Cancelled status.") },
-        confirmButton = { TextButton(onClick = { cancelVisit(id); cancellingId = null }, modifier = Modifier.testTag("demo-confirm-cancel")) { Text("Cancel visit") } },
-        dismissButton = { TextButton(onClick = { cancellingId = null }) { Text("Keep visit") } }) }
+    cancellingId?.let { id -> AlertDialog(onDismissRequest = { cancellingId = null }, title = { Text(t("Cancel this visit?", "यह विज़िट रद्द करें?")) },
+        text = { Text(t("The visit will stay in the schedule with a Cancelled status.", "विज़िट समय-सूची में “रद्द” स्थिति के साथ रहेगी।")) },
+        confirmButton = { TextButton(onClick = { cancelVisit(id); cancellingId = null }, modifier = Modifier.testTag("demo-confirm-cancel")) { Text(t("Cancel visit", "विज़िट रद्द करें")) } },
+        dismissButton = { TextButton(onClick = { cancellingId = null }) { Text(t("Keep visit", "विज़िट रहने दें")) } }) }
 }
 
-@Composable private fun DemoLogin(onContinue: () -> Unit, onExit: () -> Unit) {
+@Composable private fun DemoLogin(onContinue: () -> Unit, onExit: () -> Unit) { val t = careText();
     var email by rememberSaveable { mutableStateOf("doctor@demo.sahara.test") }
     var password by rememberSaveable { mutableStateOf("SaharaDemo") }
     var error by rememberSaveable { mutableStateOf<String?>(null) }
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
     Column(Modifier.fillMaxSize().background(DoctorBackground).safeDrawingPadding().imePadding().verticalScroll(rememberScrollState()).padding(horizontal = 24.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(18.dp)) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = onExit) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back to Sahara") }
-            Spacer(Modifier.weight(1f)); Image(saharaImage(R.drawable.sahara_professional_logo, 30.dp), null, Modifier.size(30.dp)); Spacer(Modifier.width(6.dp)); Text("Sahara", fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
+            IconButton(onClick = onExit) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back to Sahara", "सहारा पर वापस")) }
+            Spacer(Modifier.weight(1f)); Image(saharaImage(R.drawable.sahara_professional_logo, 30.dp), null, Modifier.size(30.dp)); Spacer(Modifier.width(6.dp)); Text(t("Sahara", "सहारा"), fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
         }
-        Image(saharaImage(R.drawable.doctor_login_mascot, 180.dp), "A caring companion holding a notepad", Modifier.fillMaxWidth().height(180.dp), contentScale=androidx.compose.ui.layout.ContentScale.Fit)
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) { DoctorTitle("Welcome back", 30); Text("Manage patient records and appointments.", color = DoctorMuted, fontSize = 16.sp, lineHeight = 23.sp) }
-        Text("Doctor login", fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 18.sp)
-        OutlinedTextField(email, { email = it; error = null }, singleLine = true, label = { Text("Email") }, leadingIcon = { Icon(Icons.Default.MailOutline, null) }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email), shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().testTag("demo-email"))
-        OutlinedTextField(password, { password = it; error = null }, singleLine = true, label = { Text("Password") }, leadingIcon = { Icon(Icons.Default.LockOpen, null) }, trailingIcon = { IconButton(onClick = { passwordVisible = !passwordVisible }) { Icon(if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility, if (passwordVisible) "Hide password" else "Show password") } }, visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password), shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().testTag("demo-password"))
-        Text("Credentials are prefilled", style = MaterialTheme.typography.bodySmall, color = DoctorMuted)
+        Image(saharaImage(R.drawable.doctor_login_mascot, 180.dp), t("A caring companion holding a notepad", "नोटपैड लिए एक देखभाल करने वाला साथी"), Modifier.fillMaxWidth().height(180.dp), contentScale=androidx.compose.ui.layout.ContentScale.Fit)
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) { DoctorTitle(t("Welcome back", "फिर से स्वागत है"), 30); Text(t("Manage patient records and appointments.", "मरीज़ों के रिकॉर्ड और अपॉइंटमेंट सँभालें।"), color = DoctorMuted, fontSize = 16.sp, lineHeight = 23.sp) }
+        Text(t("Doctor login", "डॉक्टर लॉगिन"), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 18.sp)
+        OutlinedTextField(email, { email = it; error = null }, singleLine = true, label = { Text(t("Email", "ईमेल")) }, leadingIcon = { Icon(Icons.Default.MailOutline, null) }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email), shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().testTag("demo-email"))
+        OutlinedTextField(password, { password = it; error = null }, singleLine = true, label = { Text(t("Password", "पासवर्ड")) }, leadingIcon = { Icon(Icons.Default.LockOpen, null) }, trailingIcon = { IconButton(onClick = { passwordVisible = !passwordVisible }) { Icon(if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility, if (passwordVisible) t("Hide password", "पासवर्ड छिपाएँ") else t("Show password", "पासवर्ड दिखाएँ")) } }, visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password), shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().testTag("demo-password"))
+        Text(t("Credentials are prefilled", "लॉगिन जानकारी पहले से भरी है"), style = MaterialTheme.typography.bodySmall, color = DoctorMuted)
         error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.testTag("demo-login-error").announce()) }
         Button(onClick = { if (email.trim() == "doctor@demo.sahara.test" && password == "SaharaDemo") onContinue() else error = "Use the prefilled preview account: doctor@demo.sahara.test / SaharaDemo." }, shape = RoundedCornerShape(14.dp),
-            modifier = Modifier.fillMaxWidth().heightIn(min = 54.dp).testTag("demo-login")) { Text("Open workspace", fontSize = 16.sp); Spacer(Modifier.width(10.dp)); Icon(Icons.Default.ArrowForward, null, Modifier.size(20.dp)) }
-        Text("No account is created and nothing is sent.", color = DoctorMuted, style = MaterialTheme.typography.bodySmall, lineHeight = 19.sp, modifier = Modifier.testTag("demo-preview-disclosure"))
+            modifier = Modifier.fillMaxWidth().heightIn(min = 54.dp).testTag("demo-login")) { Text(t("Open workspace", "वर्कस्पेस खोलें"), fontSize = 16.sp); Spacer(Modifier.width(10.dp)); Icon(Icons.Default.ArrowForward, null, Modifier.size(20.dp)) }
+        Text(t("No account is created and nothing is sent.", "कोई खाता नहीं बनता और कुछ नहीं भेजा जाता।"), color = DoctorMuted, style = MaterialTheme.typography.bodySmall, lineHeight = 19.sp, modifier = Modifier.testTag("demo-preview-disclosure"))
         Spacer(Modifier.height(8.dp))
     }
 }
 
-@Composable private fun DemoHome(patients: List<DoctorDemoPatient>, appointments: List<DoctorDemoAppointment>, onPatient: (String) -> Unit, onSchedule: () -> Unit, onAdd: () -> Unit, workflow:DoctorWorkflowStore, onRequests:()->Unit, onDraft:(String)->Unit) {
+@Composable private fun DemoHome(patients: List<DoctorDemoPatient>, appointments: List<DoctorDemoAppointment>, onPatient: (String) -> Unit, onSchedule: () -> Unit, onAdd: () -> Unit, workflow:DoctorWorkflowStore, onRequests:()->Unit, onDraft:(String)->Unit) { val t = careText();
     val today = LocalDate.now()
     val agenda = appointments.filter { demoDate(it.startMillis) == today }.sortedBy { it.startMillis }
     val next = appointments.firstOrNull { it.status == "Scheduled" && it.startMillis > System.currentTimeMillis() }
     LazyColumn(Modifier.fillMaxSize().testTag("demo-home-list"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(18.dp)) {
-        item { Text(demoDay(today), color = DoctorMuted, style = MaterialTheme.typography.bodyMedium); Spacer(Modifier.height(7.dp)); DoctorTitle("Good day, Dr Meera"); Spacer(Modifier.height(6.dp)); Text("A clear view of the care ahead.", color = DoctorMuted) }
+        item { Text(demoDay(today), color = DoctorMuted, style = MaterialTheme.typography.bodyMedium); Spacer(Modifier.height(7.dp)); DoctorTitle(t("Good day, Dr Meera", "नमस्ते, डॉ. मीरा")); Spacer(Modifier.height(6.dp)); Text(t("A clear view of the care ahead.", "आगे की देखभाल की साफ़ तस्वीर।"), color = DoctorMuted) }
         item { Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            DemoStat("Patients", patients.size.toString(), DoctorCardProgress, Modifier.weight(1f).testTag("demo-stat-patients"))
-            DemoStat("Visits today", agenda.size.toString(), DoctorCardVisit, Modifier.weight(1f).testTag("demo-stat-today"))
-            DemoStat("Requests", workflow.requests().count { it.status == WorkflowRequestStatus.NEW }.toString(), DoctorCardMedicine, Modifier.weight(1f).testTag("demo-stat-requests"))
+            DemoStat(t("Patients", "मरीज़"), patients.size.toString(), DoctorCardProgress, Modifier.weight(1f).testTag("demo-stat-patients"))
+            DemoStat(t("Visits today", "आज की विज़िट"), agenda.size.toString(), DoctorCardVisit, Modifier.weight(1f).testTag("demo-stat-today"))
+            DemoStat(t("Requests", "अनुरोध"), workflow.requests().count { it.status == WorkflowRequestStatus.NEW }.toString(), DoctorCardMedicine, Modifier.weight(1f).testTag("demo-stat-requests"))
         } }
-        item { Surface(color=Paper,shape=RoundedCornerShape(16.dp),border=BorderStroke(1.dp,MaterialTheme.colorScheme.outlineVariant)) { Column(Modifier.padding(16.dp),verticalArrangement=Arrangement.spacedBy(8.dp)) { Row(verticalAlignment=Alignment.CenterVertically) { Icon(Icons.Default.Forum,null,tint=Rust);Spacer(Modifier.width(10.dp));Text("Conversation requests",fontWeight=FontWeight.Medium,modifier=Modifier.weight(1f), fontFamily = SaharaTitleFont);Text(workflow.requests().count { it.status==WorkflowRequestStatus.NEW }.toString(),color=Rust,fontWeight=FontWeight.SemiBold) }; Text("Review requests and pick up unfinished discussions.",style=MaterialTheme.typography.bodySmall,color=DoctorMuted); TextButton(onClick=onRequests,modifier=Modifier.heightIn(min=48.dp).testTag("workflow-open-requests")) { Text("Open requests");Icon(Icons.Default.ChevronRight,null) } } } }
-        items(workflow.snapshot().drafts.filter { it.updatedAt>0 }.take(2),key={"draft-${it.patientId}"}) { draft -> OutlinedButton(onClick={onDraft(draft.patientId)},modifier=Modifier.fillMaxWidth().heightIn(min=48.dp).testTag("workflow-resume-${draft.patientId}")) { Text("Resume ${patients.first { it.id==draft.patientId }.displayName()}'s draft") } }
+        item { Surface(color=Paper,shape=RoundedCornerShape(16.dp),border=BorderStroke(1.dp,MaterialTheme.colorScheme.outlineVariant)) { Column(Modifier.padding(16.dp),verticalArrangement=Arrangement.spacedBy(8.dp)) { Row(verticalAlignment=Alignment.CenterVertically) { Icon(Icons.Default.Forum,null,tint=Rust);Spacer(Modifier.width(10.dp));Text(t("Conversation requests", "बातचीत के अनुरोध"),fontWeight=FontWeight.Medium,modifier=Modifier.weight(1f), fontFamily = SaharaTitleFont);Text(workflow.requests().count { it.status==WorkflowRequestStatus.NEW }.toString(),color=Rust,fontWeight=FontWeight.SemiBold) }; Text(t("Review requests and pick up unfinished discussions.", "अनुरोध देखें और अधूरी चर्चाएँ आगे बढ़ाएँ।"),style=MaterialTheme.typography.bodySmall,color=DoctorMuted); TextButton(onClick=onRequests,modifier=Modifier.heightIn(min=48.dp).testTag("workflow-open-requests")) { Text(t("Open requests", "अनुरोध खोलें"));Icon(Icons.Default.ChevronRight,null) } } } }
+        items(workflow.snapshot().drafts.filter { it.updatedAt>0 }.take(2),key={"draft-${it.patientId}"}) { draft -> OutlinedButton(onClick={onDraft(draft.patientId)},modifier=Modifier.fillMaxWidth().heightIn(min=48.dp).testTag("workflow-resume-${draft.patientId}")) { Text(t("Resume ${patients.first { it.id==draft.patientId }.displayName()}'s draft", "${patients.first { it.id==draft.patientId }.displayName()} का ड्राफ़्ट जारी रखें")) } }
         next?.let { visit -> item { Surface(color = DoctorForest, shape = RoundedCornerShape(22.dp), modifier = Modifier.fillMaxWidth().clickable { onPatient(visit.patientId) }) { Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.Schedule, null, tint = Color.White.copy(alpha = .8f), modifier = Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text("Next visit", color = Color.White.copy(alpha = .8f), style = MaterialTheme.typography.labelLarge) }
+            Row(verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.Schedule, null, tint = Color.White.copy(alpha = .8f), modifier = Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Next visit", "अगली विज़िट"), color = Color.White.copy(alpha = .8f), style = MaterialTheme.typography.labelLarge) }
             Text(patients.first { it.id == visit.patientId }.displayName(), color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.SemiBold)
             Text("${demoDay(demoDate(visit.startMillis))} • ${demoTime(visit.startMillis)}", color = Color.White, fontSize = 14.sp)
-            Text("${visit.type} · ${visit.durationMinutes} minutes", color = Color.White.copy(alpha = .8f), fontSize = 13.sp)
+            Text(t("${visit.type} · ${visit.durationMinutes} minutes", "${visit.type} · ${visit.durationMinutes} मिनट"), color = Color.White.copy(alpha = .8f), fontSize = 13.sp)
         } } } }
-        item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { Text("Today's agenda", fontSize = 19.sp, fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f), fontFamily = SaharaTitleFont); TextButton(onClick = onSchedule) { Text("View all") } } }
-        if (agenda.isEmpty()) item { DemoEmpty("Your day is open", "Add a visit to start planning your day.", "Schedule visit", onAdd) }
+        item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { Text(t("Today's agenda", "आज की सूची"), fontSize = 19.sp, fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f), fontFamily = SaharaTitleFont); TextButton(onClick = onSchedule) { Text(t("View all", "सब देखें")) } } }
+        if (agenda.isEmpty()) item { DemoEmpty(t("Your day is open", "आपका दिन खाली है"), t("Add a visit to start planning your day.", "दिन की योजना शुरू करने के लिए विज़िट जोड़ें।"), t("Schedule visit", "विज़िट तय करें"), onAdd) }
         items(agenda, key = { it.id }) { visit -> DemoAgendaRow(visit, patients.first { it.id == visit.patientId }, { onPatient(visit.patientId) }) }
-        item { OutlinedButton(onClick = onAdd, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp)) { Icon(Icons.Default.Add, null); Spacer(Modifier.width(8.dp)); Text("Schedule visit") } }
-        item { DoctorSection("Patient records") }
+        item { OutlinedButton(onClick = onAdd, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp)) { Icon(Icons.Default.Add, null); Spacer(Modifier.width(8.dp)); Text(t("Schedule visit", "विज़िट तय करें")) } }
+        item { DoctorSection(t("Patient records", "मरीज़ों के रिकॉर्ड")) }
         items(patients.take(3), key = { it.id }) { DemoPatientRow(it) { onPatient(it.id) } }
     }
 }
 
-@Composable internal fun DemoPatients(patients: List<DoctorDemoPatient>, onPatient: (String) -> Unit) {
+@Composable internal fun DemoPatients(patients: List<DoctorDemoPatient>, onPatient: (String) -> Unit) { val t = careText();
     var query by rememberSaveable { mutableStateOf("") }
     val filtered = patients.filter { "${it.name} ${it.careContext}".contains(query.trim(), ignoreCase = true) }
     val fontScale=LocalDensity.current.fontScale
     BoxWithConstraints(Modifier.fillMaxSize()) {
     val columns=if(maxWidth < 340.dp || fontScale >= 1.3f) 1 else 2
     LazyVerticalGrid(columns=GridCells.Fixed(columns),modifier=Modifier.fillMaxSize().testTag("demo-patients-list"), contentPadding = PaddingValues(20.dp), horizontalArrangement=Arrangement.spacedBy(12.dp),verticalArrangement = Arrangement.spacedBy(14.dp)) {
-        item(span={GridItemSpan(maxLineSpan)}) { Column { DoctorTitle("Your patients"); Spacer(Modifier.height(6.dp)); Text("Find a patient and pick up their care story.", color = DoctorMuted) } }
-        item(span={GridItemSpan(maxLineSpan)}) { OutlinedTextField(query, { query = it }, placeholder = { Text("Search name or care context") }, leadingIcon = { Icon(Icons.Default.Search, null) }, trailingIcon = { if(query.isNotBlank()) IconButton(onClick = { query = "" }) { Icon(Icons.Default.Close, "Clear search") } }, singleLine = true, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().testTag("demo-patient-search")) }
-        item(span={GridItemSpan(maxLineSpan)}) { Text("${filtered.size} patient records", style = MaterialTheme.typography.labelLarge, color = DoctorMuted) }
-        if (filtered.isEmpty()) item(span={GridItemSpan(maxLineSpan)}) { DemoEmpty("No matching patients", "Try a name or care context.", "Clear search", { query = "" }) }
+        item(span={GridItemSpan(maxLineSpan)}) { Column { DoctorTitle(t("Your patients", "आपके मरीज़")); Spacer(Modifier.height(6.dp)); Text(t("Find a patient and pick up their care story.", "मरीज़ ढूँढें और उनकी देखभाल की कहानी आगे बढ़ाएँ।"), color = DoctorMuted) } }
+        item(span={GridItemSpan(maxLineSpan)}) { OutlinedTextField(query, { query = it }, placeholder = { Text(t("Search name or care context", "नाम या देखभाल की जानकारी खोजें")) }, leadingIcon = { Icon(Icons.Default.Search, null) }, trailingIcon = { if(query.isNotBlank()) IconButton(onClick = { query = "" }) { Icon(Icons.Default.Close, t("Clear search", "खोज मिटाएँ")) } }, singleLine = true, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().testTag("demo-patient-search")) }
+        item(span={GridItemSpan(maxLineSpan)}) { Text(t("${filtered.size} patient records", "${filtered.size} मरीज़ों के रिकॉर्ड"), style = MaterialTheme.typography.labelLarge, color = DoctorMuted) }
+        if (filtered.isEmpty()) item(span={GridItemSpan(maxLineSpan)}) { DemoEmpty(t("No matching patients", "कोई मिलता मरीज़ नहीं"), t("Try a name or care context.", "कोई नाम या देखभाल की जानकारी आज़माएँ।"), t("Clear search", "खोज मिटाएँ"), { query = "" }) }
         items(filtered, key = { it.id }) { patient ->
             Surface(color=Paper,shape=RoundedCornerShape(22.dp),border=BorderStroke(1.dp,MaterialTheme.colorScheme.outlineVariant),modifier=Modifier.fillMaxWidth().heightIn(min=198.dp)
                 .testTag("demo-patient-${patient.id}")
-                .clickable(role=Role.Button,onClickLabel="Open patient record") {onPatient(patient.id)}
+                .clickable(role=Role.Button,onClickLabel=t("Open patient record", "मरीज़ का रिकॉर्ड खोलें")) {onPatient(patient.id)}
                 .semantics(mergeDescendants=true) {contentDescription="${patient.displayName()}, ${patient.age} years, ${patient.careContext}"}) {
                 Column(Modifier.padding(16.dp),verticalArrangement=Arrangement.spacedBy(10.dp)) {
                     Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically) {DoctorAvatar(patient.displayName(),42,tint=SaharaSoftBlue);Spacer(Modifier.weight(1f));Icon(Icons.Default.ChevronRight,null,tint=DoctorForest,modifier=Modifier.size(20.dp))}
                     Text(patient.displayName(),fontWeight=FontWeight.SemiBold,fontSize=19.sp,color=DoctorInk)
-                    Text("${patient.age} years",style=MaterialTheme.typography.bodySmall,color=DoctorMuted)
+                    Text(t("${patient.age} years", "${patient.age} साल"),style=MaterialTheme.typography.bodySmall,color=DoctorMuted)
                     Text(patient.careContext,modifier=Modifier.fillMaxWidth(),style=MaterialTheme.typography.bodySmall,color=DoctorMuted,lineHeight=18.sp)
                 }
             }
@@ -423,37 +423,37 @@ private val DoctorMist = Peach
     }
 }
 
-@Composable private fun DemoPatientRow(patient: DoctorDemoPatient, onOpen: () -> Unit) {
+@Composable private fun DemoPatientRow(patient: DoctorDemoPatient, onOpen: () -> Unit) { val t = careText();
     Column(Modifier.fillMaxWidth().clickable(onClick = onOpen).heightIn(min = 78.dp).testTag("demo-patient-${patient.id}").padding(vertical = 8.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             DoctorAvatar(patient.displayName())
-            Spacer(Modifier.width(12.dp)); Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) { Text(patient.displayName(), fontSize = 17.sp, fontWeight = FontWeight.SemiBold); Text("${patient.age} years · ${patient.careContext}", color = DoctorMuted, style = MaterialTheme.typography.bodySmall, lineHeight = 18.sp) }
-            Icon(Icons.Default.ChevronRight, "Open ${patient.displayName()}'s record", tint = DoctorMuted)
+            Spacer(Modifier.width(12.dp)); Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) { Text(patient.displayName(), fontSize = 17.sp, fontWeight = FontWeight.SemiBold); Text(t("${patient.age} years · ${patient.careContext}", "${patient.age} साल · ${patient.careContext}"), color = DoctorMuted, style = MaterialTheme.typography.bodySmall, lineHeight = 18.sp) }
+            Icon(Icons.Default.ChevronRight, t("Open ${patient.displayName()}'s record", "${patient.displayName()} का रिकॉर्ड खोलें"), tint = DoctorMuted)
         }
         Spacer(Modifier.height(14.dp)); HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
     }
 }
 
-@Composable private fun DemoAgendaRow(visit: DoctorDemoAppointment, patient: DoctorDemoPatient, onOpen: () -> Unit) {
+@Composable private fun DemoAgendaRow(visit: DoctorDemoAppointment, patient: DoctorDemoPatient, onOpen: () -> Unit) { val t = careText();
     Row(Modifier.fillMaxWidth().clickable(onClick = onOpen).heightIn(min = 76.dp).padding(vertical = 8.dp), verticalAlignment = Alignment.Top) {
-        Column(Modifier.widthIn(min = 68.dp, max = 90.dp)) { Text(demoTime(visit.startMillis), fontWeight = FontWeight.SemiBold, fontSize = 15.sp); Text("${visit.durationMinutes} min", style = MaterialTheme.typography.bodySmall, color = DoctorMuted) }
+        Column(Modifier.widthIn(min = 68.dp, max = 90.dp)) { Text(demoTime(visit.startMillis), fontWeight = FontWeight.SemiBold, fontSize = 15.sp); Text(t("${visit.durationMinutes} min", "${visit.durationMinutes} मिनट"), style = MaterialTheme.typography.bodySmall, color = DoctorMuted) }
         Box(Modifier.padding(top = 5.dp).size(7.dp).background(DoctorTeal, CircleShape))
         Column(Modifier.weight(1f).padding(start = 12.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) { Text(patient.displayName(), fontWeight = FontWeight.SemiBold, fontSize = 17.sp); Text(visit.type, style = MaterialTheme.typography.bodyMedium, color = DoctorMuted); VisitStatus(visit.status) }
-        Icon(Icons.Default.ChevronRight, "Open ${patient.displayName()}'s record", tint = DoctorMuted)
+        Icon(Icons.Default.ChevronRight, t("Open ${patient.displayName()}'s record", "${patient.displayName()} का रिकॉर्ड खोलें"), tint = DoctorMuted)
     }
 }
 
-@Composable internal fun DemoPatientDetail(patient: DoctorDemoPatient, selected: String, onSection: (String) -> Unit, appointments: List<DoctorDemoAppointment>, onSchedule: () -> Unit, onReschedule: (DoctorDemoAppointment) -> Unit, onCancel: (DoctorDemoAppointment) -> Unit, onComplete: (DoctorDemoAppointment) -> Unit, onConversation:()->Unit,showNavigation:Boolean=true,overview:DoctorPatientOverview?=null,progressReports:List<DoctorProgressReport>?=null,onOpenReport:(String)->Unit={},listState:LazyListState?=null,reports:List<DoctorReportSummary>?=null,reportQuery:String="",reportCategory:DoctorReportCategory?=null,onReportQuery:(String)->Unit={},onReportCategory:(DoctorReportCategory?)->Unit={},onReportOpen:(String)->Unit={},conversations:DoctorConversationsModel?=null) {
+@Composable internal fun DemoPatientDetail(patient: DoctorDemoPatient, selected: String, onSection: (String) -> Unit, appointments: List<DoctorDemoAppointment>, onSchedule: () -> Unit, onReschedule: (DoctorDemoAppointment) -> Unit, onCancel: (DoctorDemoAppointment) -> Unit, onComplete: (DoctorDemoAppointment) -> Unit, onConversation:()->Unit,showNavigation:Boolean=true,overview:DoctorPatientOverview?=null,progressReports:List<DoctorProgressReport>?=null,onOpenReport:(String)->Unit={},listState:LazyListState?=null,reports:List<DoctorReportSummary>?=null,reportQuery:String="",reportCategory:DoctorReportCategory?=null,onReportQuery:(String)->Unit={},onReportCategory:(DoctorReportCategory?)->Unit={},onReportOpen:(String)->Unit={},conversations:DoctorConversationsModel?=null) { val t = careText();
     val defaultListState=rememberLazyListState()
     LazyColumn(Modifier.fillMaxSize().testTag("demo-patient-detail"),state=listState ?: defaultListState, contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        item { Row(verticalAlignment = Alignment.CenterVertically) { DoctorAvatar(patient.displayName(), 58); Spacer(Modifier.width(14.dp)); Column(verticalArrangement = Arrangement.spacedBy(4.dp)) { DoctorTitle(patient.displayName(), 24); Text("${patient.age} years", color = DoctorMuted); } }
+        item { Row(verticalAlignment = Alignment.CenterVertically) { DoctorAvatar(patient.displayName(), 58); Spacer(Modifier.width(14.dp)); Column(verticalArrangement = Arrangement.spacedBy(4.dp)) { DoctorTitle(patient.displayName(), 24); Text(t("${patient.age} years", "${patient.age} साल"), color = DoctorMuted); } }
             Spacer(Modifier.height(8.dp)); Text(patient.careContext, color = DoctorMuted) }
         if(showNavigation) item { FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
             listOf("Summary" to Icons.Default.GridView, "Progress" to Icons.Default.Insights, "Medicines" to Icons.Default.Medication, "Conversations" to Icons.Default.Forum, "Visits" to Icons.Default.CalendarMonth, "Reports" to Icons.Default.FolderOpen).forEach { (section, icon) ->
                 FilterChip(selected == section, onClick = { onSection(section) }, label = { Text(if (section == "Summary") "Overview" else section) }, leadingIcon = { Icon(icon, null, Modifier.size(18.dp)) }, shape = RoundedCornerShape(12.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("demo-record-$section"))
             }
         } }
-        if(selected!="Reports") item { DoctorSection(if (selected == "Summary") "Care overview" else selected) }
+        if(selected!="Reports") item { DoctorSection(if (selected == "Summary") t("Care overview", "देखभाल का सार") else selected) }
         when (selected) {
             "Summary" -> {
                 val summary=overview ?: DoctorOverviewData.build(patient.id,emptyList(),appointments,System.currentTimeMillis())
@@ -462,7 +462,7 @@ private val DoctorMist = Peach
             "Progress", "Observations" -> {
                 item {DoctorProgressTimeline(progressReports ?: DoctorProgressData.reports(patient.id,System.currentTimeMillis()),onOpenReport=onOpenReport)}
             }
-            "Conversations", "Care notes" -> {
+            "Conversations", t("Care notes", "देखभाल नोट") -> {
                 val history=conversations ?: DoctorConversationsData.build(patient.id,emptyList(),null,System.currentTimeMillis())
                 if(history!=null) item {DoctorConversationsContent(history,onConversation)}
             }
@@ -470,8 +470,8 @@ private val DoctorMist = Peach
                 item {DoctorMedicineContent(DoctorPatientTracking.doses(patient.id),DoctorPatientTracking.asOf,demoZone)}
             }
             "Visits" -> {
-                item { Button(onClick=onSchedule,modifier=Modifier.fillMaxWidth().heightIn(min=48.dp).testTag("demo-schedule-visit")) { Text("Schedule visit") } }
-                if(appointments.isEmpty()) item { Text("No visits yet.",color=DoctorMuted) }
+                item { Button(onClick=onSchedule,modifier=Modifier.fillMaxWidth().heightIn(min=48.dp).testTag("demo-schedule-visit")) { Text(t("Schedule visit", "विज़िट तय करें")) } }
+                if(appointments.isEmpty()) item { Text(t("No visits yet.", "अभी कोई विज़िट नहीं।"),color=DoctorMuted) }
                 items(appointments.sortedBy {it.startMillis},key={it.id}) {DemoVisitCard(it,patient,onReschedule,onCancel,onComplete)}
             }
             "Reports" -> {item {DoctorReportsBrowser(patient.displayName(),reports ?: DoctorReportsData.reports(patient.id),reportQuery,reportCategory,onReportQuery,onReportCategory,onReportOpen)}}
@@ -482,15 +482,15 @@ private val DoctorMist = Peach
 
 @Composable private fun DemoRecordText(text: String) { Surface(color = DoctorCardReport, shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, DoctorHairline)) { Text(text, Modifier.fillMaxWidth().padding(18.dp), fontSize = 15.sp, color = DoctorCardInk, lineHeight = 23.sp) } }
 
-@Composable internal fun DemoSchedule(patients: List<DoctorDemoPatient>, appointments: List<DoctorDemoAppointment>, day: LocalDate, onDay: (LocalDate) -> Unit, onPatient: (String) -> Unit, onAdd: () -> Unit, onReschedule: (DoctorDemoAppointment) -> Unit, onCancel: (DoctorDemoAppointment) -> Unit, onComplete: (DoctorDemoAppointment) -> Unit) {
+@Composable internal fun DemoSchedule(patients: List<DoctorDemoPatient>, appointments: List<DoctorDemoAppointment>, day: LocalDate, onDay: (LocalDate) -> Unit, onPatient: (String) -> Unit, onAdd: () -> Unit, onReschedule: (DoctorDemoAppointment) -> Unit, onCancel: (DoctorDemoAppointment) -> Unit, onComplete: (DoctorDemoAppointment) -> Unit) { val t = careText();
     val context = LocalContext.current
     val visits = appointments.filter { demoDate(it.startMillis) == day }.sortedBy { it.startMillis }
     LazyColumn(Modifier.fillMaxSize().testTag("demo-schedule-list"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        item { DoctorTitle("Your schedule"); Spacer(Modifier.height(6.dp)); Text("Make room for each conversation.", color = DoctorMuted) }
+        item { DoctorTitle(t("Your schedule", "आपकी समय-सूची")); Spacer(Modifier.height(6.dp)); Text(t("Make room for each conversation.", "हर बातचीत के लिए समय रखें।"), color = DoctorMuted) }
         item { Column { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = { onDay(day.minusDays(1)) }) { Icon(Icons.Default.ChevronLeft, "Previous day") }
+            IconButton(onClick = { onDay(day.minusDays(1)) }) { Icon(Icons.Default.ChevronLeft, t("Previous day", "पिछला दिन")) }
             TextButton(onClick = { DatePickerDialog(context, { _, y, m, d -> onDay(LocalDate.of(y, m + 1, d)) }, day.year, day.monthValue - 1, day.dayOfMonth).show() }, modifier = Modifier.weight(1f).heightIn(min=48.dp).testTag("demo-schedule-date")) { Text(demoDay(day),fontSize=13.sp) }
-            IconButton(onClick = { onDay(day.plusDays(1)) }) { Icon(Icons.Default.ChevronRight, "Next day") }
+            IconButton(onClick = { onDay(day.plusDays(1)) }) { Icon(Icons.Default.ChevronRight, t("Next day", "अगला दिन")) }
         }
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(5.dp)) { (-2L..2L).forEach { offset ->
             val date = day.plusDays(offset)
@@ -498,34 +498,34 @@ private val DoctorMist = Peach
                 Column(Modifier.padding(vertical = 5.dp), horizontalAlignment = Alignment.CenterHorizontally,verticalArrangement=Arrangement.Center) { Text(date.format(DateTimeFormatter.ofPattern("EEE")), color = if(offset == 0L) Color.White.copy(alpha=.8f) else DoctorMuted, fontSize = 10.sp); Spacer(Modifier.height(2.dp)); Text(date.dayOfMonth.toString(), color = if(offset == 0L) Color.White else DoctorInk, fontWeight = FontWeight.SemiBold, fontSize = 16.sp) }
             }
         } } } }
-        item { Button(onClick = onAdd, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("demo-add-visit")) { Icon(Icons.Default.Add, null); Spacer(Modifier.width(8.dp)); Text("Schedule visit") } }
+        item { Button(onClick = onAdd, shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("demo-add-visit")) { Icon(Icons.Default.Add, null); Spacer(Modifier.width(8.dp)); Text(t("Schedule visit", "विज़िट तय करें")) } }
         item { DoctorSection(if (visits.size == 1) "1 visit" else "${visits.size} visits") }
-        if (visits.isEmpty()) item { DemoEmpty("No visits on this day", "Choose another day or schedule a visit.", "Go to today", { onDay(LocalDate.now()) }) }
+        if (visits.isEmpty()) item { DemoEmpty(t("No visits on this day", "इस दिन कोई विज़िट नहीं"), t("Choose another day or schedule a visit.", "दूसरा दिन चुनें या विज़िट तय करें।"), t("Go to today", "आज पर जाएँ"), { onDay(LocalDate.now()) }) }
         items(visits, key = { it.id }) { visit ->
             val patient = patients.first { it.id == visit.patientId }
-            Column { DemoVisitCard(visit, patient, onReschedule, onCancel, onComplete); TextButton(onClick = { onPatient(patient.id) }, modifier = Modifier.heightIn(min=48.dp)) { Text("Open ${patient.displayName()}'s record"); Spacer(Modifier.width(4.dp)); Icon(Icons.Default.ChevronRight, null, Modifier.size(18.dp)) } }
+            Column { DemoVisitCard(visit, patient, onReschedule, onCancel, onComplete); TextButton(onClick = { onPatient(patient.id) }, modifier = Modifier.heightIn(min=48.dp)) { Text(t("Open ${patient.displayName()}'s record", "${patient.displayName()} का रिकॉर्ड खोलें")); Spacer(Modifier.width(4.dp)); Icon(Icons.Default.ChevronRight, null, Modifier.size(18.dp)) } }
         }
     }
 }
 
-@Composable private fun DemoVisitCard(visit: DoctorDemoAppointment, patient: DoctorDemoPatient, onReschedule: (DoctorDemoAppointment) -> Unit, onCancel: (DoctorDemoAppointment) -> Unit, onComplete: (DoctorDemoAppointment) -> Unit) {
+@Composable private fun DemoVisitCard(visit: DoctorDemoAppointment, patient: DoctorDemoPatient, onReschedule: (DoctorDemoAppointment) -> Unit, onCancel: (DoctorDemoAppointment) -> Unit, onComplete: (DoctorDemoAppointment) -> Unit) { val t = careText();
     Surface(color = Paper, shape = RoundedCornerShape(18.dp), border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant), modifier = Modifier.fillMaxWidth().testTag("demo-appointment-${visit.id}")) {
         Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { Text(demoTime(visit.startMillis), Modifier.weight(1f), fontSize=22.sp, fontWeight = FontWeight.SemiBold); VisitStatus(visit.status) }
             Text(demoDay(demoDate(visit.startMillis)), color = DoctorMuted, style = MaterialTheme.typography.bodySmall)
             Text(patient.displayName(), fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
-            Row(verticalAlignment = Alignment.CenterVertically) { Icon(when(visit.type) { "Phone" -> Icons.Default.Call; "Video" -> Icons.Default.Videocam; else -> Icons.Default.MeetingRoom }, null, Modifier.size(18.dp), tint=DoctorMuted); Spacer(Modifier.width(8.dp)); Text("${visit.type} · ${visit.durationMinutes} minutes", color=DoctorMuted) }
+            Row(verticalAlignment = Alignment.CenterVertically) { Icon(when(visit.type) { "Phone" -> Icons.Default.Call; "Video" -> Icons.Default.Videocam; else -> Icons.Default.MeetingRoom }, null, Modifier.size(18.dp), tint=DoctorMuted); Spacer(Modifier.width(8.dp)); Text(t("${visit.type} · ${visit.durationMinutes} minutes", "${visit.type} · ${visit.durationMinutes} मिनट"), color=DoctorMuted) }
             if (visit.note.isNotBlank()) Text(visit.note, color=DoctorMuted, style=MaterialTheme.typography.bodyMedium)
             if (visit.status == "Scheduled") {
                 HorizontalDivider(color=MaterialTheme.colorScheme.outlineVariant)
-                OutlinedButton(onClick = { onReschedule(visit) }, shape=RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.EditCalendar,null,Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text("Reschedule") }
-                FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) { TextButton(onClick = { onComplete(visit) }, modifier = Modifier.heightIn(min = 48.dp)) { Text("Mark complete") }; TextButton(onClick = { onCancel(visit) }, modifier = Modifier.heightIn(min = 48.dp)) { Text("Cancel visit", color=DoctorMuted) } }
+                OutlinedButton(onClick = { onReschedule(visit) }, shape=RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.EditCalendar,null,Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Reschedule", "समय बदलें")) }
+                FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) { TextButton(onClick = { onComplete(visit) }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Mark complete", "पूरा हुआ चिह्नित करें")) }; TextButton(onClick = { onCancel(visit) }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Cancel visit", "विज़िट रद्द करें"), color=DoctorMuted) } }
             }
         }
     }
 }
 
-@Composable internal fun DemoAppointmentEditor(patients: List<DoctorDemoPatient>, patientId: String, existing: DoctorDemoAppointment?, preferredDay: LocalDate, patientLocked:Boolean=false, onDismiss: () -> Unit, onSave: (DoctorDemoAppointment) -> String?) {
+@Composable internal fun DemoAppointmentEditor(patients: List<DoctorDemoPatient>, patientId: String, existing: DoctorDemoAppointment?, preferredDay: LocalDate, patientLocked:Boolean=false, onDismiss: () -> Unit, onSave: (DoctorDemoAppointment) -> String?) { val t = careText();
     val context = LocalContext.current
     val initial = remember {
         existing?.let { Instant.ofEpochMilli(it.startMillis).atZone(demoZone) }
@@ -535,7 +535,7 @@ private val DoctorMist = Peach
     var day by rememberSaveable { mutableStateOf(initial.toLocalDate().toString()) }
     var time by rememberSaveable { mutableStateOf(initial.toLocalTime().toString()) }
     var duration by rememberSaveable { mutableIntStateOf(existing?.durationMinutes ?: 30) }
-    var type by rememberSaveable { mutableStateOf(existing?.type ?: "In person") }
+    var type by rememberSaveable { mutableStateOf(existing?.type ?: t("In person", "आमने-सामने")) }
     var note by rememberSaveable { mutableStateOf(existing?.note.orEmpty()) }
     var error by rememberSaveable { mutableStateOf<String?>(null) }
     var patientMenuOpen by remember { mutableStateOf(false) }
@@ -543,29 +543,29 @@ private val DoctorMist = Peach
         Column(Modifier.fillMaxWidth().imePadding().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp).padding(bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 Box(Modifier.size(48.dp).background(Peach, RoundedCornerShape(16.dp)), contentAlignment = Alignment.Center) { Icon(Icons.Default.EventAvailable, null, tint = Rust) }
-                DoctorTitle(if (existing == null) "Schedule a visit" else "Reschedule visit", 24)
+                DoctorTitle(if (existing == null) t("Schedule a visit", "विज़िट तय करें") else t("Reschedule visit", "विज़िट का समय बदलें"), 24)
             }
-            Text("Local schedule only. No invitations or reminders are sent.", color=DoctorMuted, style = MaterialTheme.typography.bodySmall)
+            Text(t("Local schedule only. No invitations or reminders are sent.", "सिर्फ़ फ़ोन पर समय-सूची। कोई निमंत्रण या रिमाइंडर नहीं भेजा जाता।"), color=DoctorMuted, style = MaterialTheme.typography.bodySmall)
             Surface(color = Paper, shape = RoundedCornerShape(20.dp), modifier = Modifier.fillMaxWidth().testTag("demo-visit-patient")) {
                 Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     val patient = patients.firstOrNull { it.id == selectedPatient }
                     DoctorAvatar(patient?.displayName().orEmpty())
-                    Column(Modifier.weight(1f)) { Text("Patient", color = DoctorMuted, style = MaterialTheme.typography.labelMedium); Text(patient?.displayName().orEmpty(), fontSize = 20.sp, fontWeight = FontWeight.SemiBold); patient?.let { Text("${it.age} years", color = DoctorMuted, style = MaterialTheme.typography.bodySmall) } }
+                    Column(Modifier.weight(1f)) { Text(t("Patient", "मरीज़"), color = DoctorMuted, style = MaterialTheme.typography.labelMedium); Text(patient?.displayName().orEmpty(), fontSize = 20.sp, fontWeight = FontWeight.SemiBold); patient?.let { Text(t("${it.age} years", "${it.age} साल"), color = DoctorMuted, style = MaterialTheme.typography.bodySmall) } }
                     if (!patientLocked) Box {
-                        TextButton(onClick = { patientMenuOpen = true }, modifier = Modifier.heightIn(min = 48.dp).testTag("demo-change-patient")) { Text("Change"); Icon(Icons.Default.ExpandMore, null, Modifier.size(18.dp)) }
+                        TextButton(onClick = { patientMenuOpen = true }, modifier = Modifier.heightIn(min = 48.dp).testTag("demo-change-patient")) { Text(t("Change", "बदलें")); Icon(Icons.Default.ExpandMore, null, Modifier.size(18.dp)) }
                         DropdownMenu(expanded = patientMenuOpen, onDismissRequest = { patientMenuOpen = false }) {
                             patients.forEach { person -> DropdownMenuItem(text = { Text(person.displayName()) }, onClick = { selectedPatient = person.id; error = null; patientMenuOpen = false }, leadingIcon = { Icon(if(person.id == selectedPatient) Icons.Default.CheckCircle else Icons.Default.PersonOutline, null) }, modifier = Modifier.heightIn(min = 48.dp).testTag("demo-visit-patient-${person.id}")) }
                         }
                     }
                 }
             }
-            if(patientLocked) Text("Patient linked to the conversation request",style=MaterialTheme.typography.bodySmall,color=DoctorMuted)
+            if(patientLocked) Text(t("Patient linked to the conversation request", "बातचीत के अनुरोध से जुड़ा मरीज़"),style=MaterialTheme.typography.bodySmall,color=DoctorMuted)
             val date = LocalDate.parse(day); val clock = LocalTime.parse(time)
             Surface(color = Paper, shape = RoundedCornerShape(20.dp), modifier = Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                        Column(Modifier.weight(1f)) { Text("Date & time", fontWeight = FontWeight.SemiBold, fontSize = 18.sp); Text(date.format(DateTimeFormatter.ofPattern("MMMM yyyy")), color = DoctorMuted, style = MaterialTheme.typography.bodyMedium) }
-                        IconButton(onClick = { DatePickerDialog(context, { _, y, m, d -> day = LocalDate.of(y, m + 1, d).toString(); error = null }, date.year, date.monthValue - 1, date.dayOfMonth).show() }, modifier = Modifier.testTag("demo-visit-date")) { Icon(Icons.Default.CalendarMonth, "Choose another date", tint = Rust) }
+                        Column(Modifier.weight(1f)) { Text(t("Date & time", "तारीख़ और समय"), fontWeight = FontWeight.SemiBold, fontSize = 18.sp); Text(date.format(DateTimeFormatter.ofPattern("MMMM yyyy")), color = DoctorMuted, style = MaterialTheme.typography.bodyMedium) }
+                        IconButton(onClick = { DatePickerDialog(context, { _, y, m, d -> day = LocalDate.of(y, m + 1, d).toString(); error = null }, date.year, date.monthValue - 1, date.dayOfMonth).show() }, modifier = Modifier.testTag("demo-visit-date")) { Icon(Icons.Default.CalendarMonth, t("Choose another date", "दूसरी तारीख़ चुनें"), tint = Rust) }
                     }
                     Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                         (-2L..2L).forEach { offset ->
@@ -579,36 +579,36 @@ private val DoctorMist = Peach
                     Text(demoDay(date), color = DoctorMuted, style = MaterialTheme.typography.bodySmall)
                     HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                     Surface(onClick = { TimePickerDialog(context, { _, h, m -> time = LocalTime.of(h, m).toString(); error = null }, clock.hour, clock.minute, false).show() }, color = Cream, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("demo-visit-time")) {
-                        Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) { Icon(Icons.Default.Schedule, null, tint = Rust); Column(Modifier.weight(1f)) { Text("Starts at", color = DoctorMuted, style = MaterialTheme.typography.labelSmall); Text(clock.format(DateTimeFormatter.ofPattern("h:mm a")), fontSize = 19.sp, fontWeight = FontWeight.SemiBold) }; Text("Change", color = Rust, style = MaterialTheme.typography.labelLarge) }
+                        Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) { Icon(Icons.Default.Schedule, null, tint = Rust); Column(Modifier.weight(1f)) { Text(t("Starts at", "शुरू होने का समय"), color = DoctorMuted, style = MaterialTheme.typography.labelSmall); Text(clock.format(DateTimeFormatter.ofPattern("h:mm a")), fontSize = 19.sp, fontWeight = FontWeight.SemiBold) }; Text(t("Change", "बदलें"), color = Rust, style = MaterialTheme.typography.labelLarge) }
                     }
                 }
             }
-            Text("Visit type", fontWeight = FontWeight.SemiBold)
-            Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf("In person", "Phone", "Video").forEach { option ->
+            Text(t("Visit type", "विज़िट का प्रकार"), fontWeight = FontWeight.SemiBold)
+            Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf(t("In person", "आमने-सामने"), "Phone", "Video").forEach { option ->
                 Surface(onClick = { type = option }, color = if(type == option) Peach else Paper, contentColor = if(type == option) RustText else Ink, shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, if(type == option) Rust.copy(alpha = .5f) else MaterialTheme.colorScheme.outlineVariant), modifier = Modifier.weight(1f).fillMaxHeight().heightIn(min = 72.dp).semantics { selected = type == option }.testTag("demo-visit-type-$option")) { Column(Modifier.padding(10.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(5.dp)) { Icon(when(option) { "Phone" -> Icons.Default.Call; "Video" -> Icons.Default.Videocam; else -> Icons.Default.MeetingRoom }, null, Modifier.size(22.dp)); Text(option, style = MaterialTheme.typography.labelLarge) } }
             } }
-            Text("Duration", fontWeight = FontWeight.SemiBold)
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) { (listOf(15, 30, 45, 60) + duration).distinct().sorted().forEach { minutes -> FilterChip(duration == minutes, onClick = { duration = minutes }, label = { Text("$minutes min") }, modifier = Modifier.heightIn(min = 48.dp)) } }
-            OutlinedTextField(note, { note = it.take(500); error = null }, label = { Text("Visit note (optional)") }, modifier = Modifier.fillMaxWidth().testTag("demo-appointment-note"), minLines = 2)
+            Text(t("Duration", "अवधि"), fontWeight = FontWeight.SemiBold)
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) { (listOf(15, 30, 45, 60) + duration).distinct().sorted().forEach { minutes -> FilterChip(duration == minutes, onClick = { duration = minutes }, label = { Text(t("$minutes min", "$minutes मिनट")) }, modifier = Modifier.heightIn(min = 48.dp)) } }
+            OutlinedTextField(note, { note = it.take(500); error = null }, label = { Text(t("Visit note (optional)", "विज़िट नोट (चाहें तो)")) }, modifier = Modifier.fillMaxWidth().testTag("demo-appointment-note"), minLines = 2)
             error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.testTag("demo-appointment-error").announce()) }
-            Button(onClick = { error = onSave(DoctorDemoAppointment(existing?.id ?: newId(), selectedPatient, ZonedDateTime.of(date, clock, demoZone).toInstant().toEpochMilli(), duration, type, existing?.status ?: "Scheduled", note)) }, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("demo-save-appointment")) { Text(if (existing == null) "Save visit" else "Save changes") }
-            TextButton(onClick = onDismiss, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text("Close") }
+            Button(onClick = { error = onSave(DoctorDemoAppointment(existing?.id ?: newId(), selectedPatient, ZonedDateTime.of(date, clock, demoZone).toInstant().toEpochMilli(), duration, type, existing?.status ?: "Scheduled", note)) }, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("demo-save-appointment")) { Text(if (existing == null) t("Save visit", "विज़िट सहेजें") else t("Save changes", "बदलाव सहेजें")) }
+            TextButton(onClick = onDismiss, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Close", "बंद करें")) }
         }
     }
 }
 
-@Composable private fun DemoAccount(onExit: () -> Unit, onFeedback:()->Unit) {
+@Composable private fun DemoAccount(onExit: () -> Unit, onFeedback:()->Unit) { val t = careText();
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp), verticalArrangement = Arrangement.spacedBy(18.dp)) {
-        DoctorTitle("Account")
-        Surface(color=Paper, shape=RoundedCornerShape(20.dp), modifier=Modifier.fillMaxWidth()) { Row(Modifier.padding(20.dp), verticalAlignment=Alignment.CenterVertically) { DoctorAvatar("Meera", 60); Spacer(Modifier.width(16.dp)); Column(verticalArrangement=Arrangement.spacedBy(5.dp)) { DoctorTitle("Dr Meera", 22); Text("Doctor workspace", color=DoctorMuted); PreviewLabel() } } }
-        DoctorSection("About this workspace")
-        Text("A guided walkthrough of the doctor workspace.", fontWeight=FontWeight.Medium, modifier=Modifier.testTag("demo-account-disclosure"))
-        Text("Records here are saved on this device, separately from your Sahara account.", color=DoctorMuted, lineHeight=23.sp)
+        DoctorTitle(t("Account", "खाता"))
+        Surface(color=Paper, shape=RoundedCornerShape(20.dp), modifier=Modifier.fillMaxWidth()) { Row(Modifier.padding(20.dp), verticalAlignment=Alignment.CenterVertically) { DoctorAvatar("Meera", 60); Spacer(Modifier.width(16.dp)); Column(verticalArrangement=Arrangement.spacedBy(5.dp)) { DoctorTitle(t("Dr Meera", "डॉ. मीरा"), 22); Text(t("Doctor workspace", "डॉक्टर वर्कस्पेस"), color=DoctorMuted); PreviewLabel() } } }
+        DoctorSection(t("About this workspace", "इस वर्कस्पेस के बारे में"))
+        Text(t("A guided walkthrough of the doctor workspace.", "डॉक्टर वर्कस्पेस का निर्देशित परिचय।"), fontWeight=FontWeight.Medium, modifier=Modifier.testTag("demo-account-disclosure"))
+        Text(t("Records here are saved on this device, separately from your Sahara account.", "यहाँ के रिकॉर्ड इसी फ़ोन पर, आपके सहारा खाते से अलग सहेजे जाते हैं।"), color=DoctorMuted, lineHeight=23.sp)
         HorizontalDivider(color=MaterialTheme.colorScheme.outlineVariant)
-        Row(verticalAlignment=Alignment.Top) { Icon(Icons.Default.EventNote,null,tint=DoctorTeal); Spacer(Modifier.width(12.dp)); Column { Text("Local scheduling", fontWeight=FontWeight.Medium, fontFamily = SaharaTitleFont); Text("No invitations, calls or reminders are sent.", color=DoctorMuted, style=MaterialTheme.typography.bodyMedium) } }
-        Row(verticalAlignment=Alignment.Top) { Icon(Icons.Default.FolderOpen,null,tint=DoctorTeal); Spacer(Modifier.width(12.dp)); Column { Text("Stays on this device", fontWeight=FontWeight.Medium, fontFamily = SaharaTitleFont); Text("Audio is not uploaded, no online AI is used, and no prescription is issued.", color=DoctorMuted, style=MaterialTheme.typography.bodyMedium) } }
-        OutlinedButton(onClick = onFeedback, shape=RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-feedback-entry")) { Icon(Icons.Default.SentimentSatisfiedAlt,null); Spacer(Modifier.width(8.dp)); Text("App feedback") }
-        OutlinedButton(onClick = onExit, shape=RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("demo-exit")) { Icon(Icons.AutoMirrored.Filled.ArrowBack,null,Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text("Back to Sahara") }
+        Row(verticalAlignment=Alignment.Top) { Icon(Icons.Default.EventNote,null,tint=DoctorTeal); Spacer(Modifier.width(12.dp)); Column { Text(t("Local scheduling", "फ़ोन पर समय तय करना"), fontWeight=FontWeight.Medium, fontFamily = SaharaTitleFont); Text(t("No invitations, calls or reminders are sent.", "कोई निमंत्रण, कॉल या रिमाइंडर नहीं भेजा जाता।"), color=DoctorMuted, style=MaterialTheme.typography.bodyMedium) } }
+        Row(verticalAlignment=Alignment.Top) { Icon(Icons.Default.FolderOpen,null,tint=DoctorTeal); Spacer(Modifier.width(12.dp)); Column { Text(t("Stays on this device", "इसी फ़ोन पर रहता है"), fontWeight=FontWeight.Medium, fontFamily = SaharaTitleFont); Text(t("Audio is not uploaded, no online AI is used, and no prescription is issued.", "ऑडियो अपलोड नहीं होता, कोई ऑनलाइन AI इस्तेमाल नहीं होता, और कोई पर्चा जारी नहीं होता।"), color=DoctorMuted, style=MaterialTheme.typography.bodyMedium) } }
+        OutlinedButton(onClick = onFeedback, shape=RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-feedback-entry")) { Icon(Icons.Default.SentimentSatisfiedAlt,null); Spacer(Modifier.width(8.dp)); Text(t("App feedback", "ऐप के बारे में राय")) }
+        OutlinedButton(onClick = onExit, shape=RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("demo-exit")) { Icon(Icons.AutoMirrored.Filled.ArrowBack,null,Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Back to Sahara", "सहारा पर वापस")) }
     }
 }
 
@@ -656,36 +656,36 @@ private suspend fun loadHomeVisits(context: android.content.Context): List<HomeV
 }
 
 /** Home for the doctor walkthrough. Conversation and request rows come only from this device's workflow store and visit list, and always open the person they belong to. */
-@Composable private fun DoctorHomeWorkday(careCount: Int, patients: List<DoctorDemoPatient>, pending: List<HomeCarePending>, visits: List<HomeVisit>, loaded: Boolean, workflow: DoctorWorkflowStore, onPatients: () -> Unit, onSchedule: () -> Unit, onProfile: (DoctorTestProfiles.Profile) -> Unit, onPending: (HomeCarePending) -> Unit, onConversation: (String) -> Unit, onRequests: () -> Unit) {
+@Composable private fun DoctorHomeWorkday(careCount: Int, patients: List<DoctorDemoPatient>, pending: List<HomeCarePending>, visits: List<HomeVisit>, loaded: Boolean, workflow: DoctorWorkflowStore, onPatients: () -> Unit, onSchedule: () -> Unit, onProfile: (DoctorTestProfiles.Profile) -> Unit, onPending: (HomeCarePending) -> Unit, onConversation: (String) -> Unit, onRequests: () -> Unit) { val t = careText();
     val byId = patients.associateBy { it.id }
     val state = workflow.snapshot()
     val newRequests = state.requests.filter { it.status == WorkflowRequestStatus.NEW && it.patientId in byId }.sortedByDescending { it.createdAt }
     LazyColumn(Modifier.fillMaxSize().testTag("demo-home-list"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
         item {
-            val now = java.time.LocalDateTime.now(); val greet = when { now.hour < 12 -> "Good morning"; now.hour < 17 -> "Good afternoon"; else -> "Good evening" }
+            val now = java.time.LocalDateTime.now(); val greet = when { now.hour < 12 -> t("Good morning", "सुप्रभात"); now.hour < 17 -> t("Good afternoon", "नमस्ते"); else -> t("Good evening", "शुभ संध्या") }
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(now.format(DateTimeFormatter.ofPattern("EEEE, d MMMM")), fontSize = 13.sp, color = DoctorCardSub)
                 DoctorTitle("$greet, ${DoctorDemoData.doctorName}", 26)
-                Text("Your day in care", fontSize = 15.sp, color = DoctorCardSub)
+                Text(t("Your day in care", "देखभाल में आपका दिन"), fontSize = 15.sp, color = DoctorCardSub)
             }
         }
         item {
             val drafts = pending.filter { it.section == "Conversations" }
             val tiles = listOf<Triple<String, String, Color>>(
-                Triple("Patients in your care", careCount.toString(), DoctorCardOverview),
-                Triple("Visits, next 7 days", if (loaded) visits.size.toString() else "—", DoctorCardProgress),
-                Triple("Unfinished drafts", if (loaded) drafts.size.toString() else "—", DoctorCardConversation),
-                Triple("Conversations to plan", newRequests.size.toString(), DoctorCardMedicine))
+                Triple(t("Patients in your care", "आपकी देखभाल में मरीज़"), careCount.toString(), DoctorCardOverview),
+                Triple(t("Visits, next 7 days", "अगले 7 दिनों की विज़िट"), if (loaded) visits.size.toString() else "—", DoctorCardProgress),
+                Triple(t("Unfinished drafts", "अधूरे ड्राफ़्ट"), if (loaded) drafts.size.toString() else "—", DoctorCardConversation),
+                Triple(t("Conversations to plan", "तय करने वाली बातचीत"), newRequests.size.toString(), DoctorCardMedicine))
             val clicks = listOf<() -> Unit>(onPatients, onSchedule, { drafts.firstOrNull()?.let(onPending) ?: onPatients() }, onRequests)
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                for (r in 0..1) Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) { for (c in 0..1) { val i = r * 2 + c; val t = tiles[i]
-                    Surface(onClick = clicks[i], color = t.third, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.weight(1f).heightIn(min = 88.dp).semantics(mergeDescendants = true) { contentDescription = if (t.second == "—") "${t.first}, loading. Opens it." else "${t.second} ${t.first}. Opens it." }) {
-                        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) { Crossfade(t.second, animationSpec = tween(SaharaMotion.ENTER_MS), label = "home-tile-count") { value -> Text(value, fontFamily = SaharaTitleFont, fontSize = 30.sp, fontWeight = FontWeight.Medium, color = if (value == "—") DoctorCardSub else DoctorCardInk) }; Text(t.first, fontSize = 13.sp, lineHeight = 17.sp, color = DoctorCardSub) }
+                for (r in 0..1) Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) { for (c in 0..1) { val i = r * 2 + c; val tile = tiles[i]
+                    Surface(onClick = clicks[i], color = tile.third, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.weight(1f).heightIn(min = 88.dp).semantics(mergeDescendants = true) { contentDescription = if (tile.second == "—") t("${tile.first}, loading. Opens it.", "${tile.first}, लोड हो रहा है। इसे खोलता है।") else t("${tile.second} ${tile.first}. Opens it.", "${tile.second} ${tile.first}. इसे खोलता है।") }) {
+                        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) { Crossfade(tile.second, animationSpec = tween(SaharaMotion.ENTER_MS), label = "home-tile-count") { value -> Text(value, fontFamily = SaharaTitleFont, fontSize = 30.sp, fontWeight = FontWeight.Medium, color = if (value == "—") DoctorCardSub else DoctorCardInk) }; Text(tile.first, fontSize = 13.sp, lineHeight = 17.sp, color = DoctorCardSub) }
                     } } }
             }
         }
         item {
-            val actions = listOf<Triple<String, ImageVector, () -> Unit>>(Triple("Open patients", Icons.Default.People, onPatients), Triple("Plan visit", Icons.Default.CalendarMonth, onSchedule), Triple("Conversations", Icons.Default.Forum, onRequests))
+            val actions = listOf<Triple<String, ImageVector, () -> Unit>>(Triple(t("Open patients", "मरीज़ खोलें"), Icons.Default.People, onPatients), Triple(t("Plan visit", "विज़िट तय करें"), Icons.Default.CalendarMonth, onSchedule), Triple("Conversations", Icons.Default.Forum, onRequests))
             // With large system text the three labels no longer fit side by side, so each action gets its own full-width row.
             if (LocalDensity.current.fontScale > 1.15f) Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 actions.forEach { (label, icon, click) ->
@@ -703,9 +703,9 @@ private suspend fun loadHomeVisits(context: android.content.Context): List<HomeV
         }
         // Visits and drafts are read from the device just after the first frame; they fade in and the rows below glide down instead of jumping.
         if (visits.isNotEmpty()) {
-            item(key = "home-coming-up") { Box(Modifier.animateItem()) { DoctorSection("Coming up") } }
+            item(key = "home-coming-up") { Box(Modifier.animateItem()) { DoctorSection(t("Coming up", "आने वाला")) } }
             items(visits.take(4), key = { "home-visit-${it.key}" }) { v ->
-                Surface(onClick = onSchedule, color = Paper, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.animateItem().fillMaxWidth().heightIn(min = 72.dp).semantics(mergeDescendants = true) { contentDescription = "${v.profile.name}, ${v.kind}, ${demoDay(demoDate(v.due))} at ${demoTime(v.due)}. Opens the schedule." }) {
+                Surface(onClick = onSchedule, color = Paper, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.animateItem().fillMaxWidth().heightIn(min = 72.dp).semantics(mergeDescendants = true) { contentDescription = t("${v.profile.name}, ${v.kind}, ${demoDay(demoDate(v.due))} at ${demoTime(v.due)}. Opens the schedule.", "${v.profile.name}, ${v.kind}, ${demoDay(demoDate(v.due))} को ${demoTime(v.due)}. समय-सूची खोलता है।") }) {
                     Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
                         Column(Modifier.width(76.dp)) { Text(demoTime(v.due), fontSize = 15.sp, fontWeight = FontWeight.Medium, color = DoctorAccent); Text(demoDate(v.due).format(DateTimeFormatter.ofPattern("EEE d MMM")), fontSize = 12.sp, color = DoctorCardSub) }
                         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) { Text(v.profile.name, fontFamily = SaharaTitleFont, fontSize = 18.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk); Text(v.kind, fontSize = 13.sp, color = DoctorCardSub) }
@@ -715,7 +715,7 @@ private suspend fun loadHomeVisits(context: android.content.Context): List<HomeV
             }
         }
         if (pending.isNotEmpty()) {
-            item(key = "home-pick-up") { Box(Modifier.animateItem()) { DoctorSection("Pick up where you left off") } }
+            item(key = "home-pick-up") { Box(Modifier.animateItem()) { DoctorSection(t("Pick up where you left off", "जहाँ छोड़ा था वहीं से शुरू करें")) } }
             items(pending, key = { it.key }) { c ->
                 Surface(onClick = { onPending(c) }, color = if (c.section == "Visits") DoctorCardVisit else DoctorCardConversation, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.animateItem().fillMaxWidth().heightIn(min = 72.dp).testTag("home-conversation-${c.key}").semantics(mergeDescendants = true) { contentDescription = "${c.profile.name}: ${c.title}. ${c.detail}. Opens ${c.section.lowercase()}." }) {
                     Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
@@ -726,20 +726,20 @@ private suspend fun loadHomeVisits(context: android.content.Context): List<HomeV
                 }
             }
         }
-        item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { Column(Modifier.weight(1f)) { DoctorSection("Conversations to plan"); Text("Your own list. Nothing here was sent to you by a patient or family member.", fontSize = 12.sp, color = DoctorCardFaint) }; if (newRequests.isNotEmpty()) Surface(color = DoctorStatusWarnBg, shape = RoundedCornerShape(10.dp)) { Text("${newRequests.size} to plan", Modifier.padding(horizontal = 10.dp, vertical = 5.dp), fontSize = 12.sp, fontWeight = FontWeight.Medium, color = DoctorStatusWarn) } } }
-        if (newRequests.isEmpty()) item { Text("Nothing on your list yet.", fontSize = 13.sp, color = DoctorCardSub) }
+        item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { Column(Modifier.weight(1f)) { DoctorSection(t("Conversations to plan", "तय करने वाली बातचीत")); Text(t("Your own list. Nothing here was sent to you by a patient or family member.", "आपकी अपनी सूची। यहाँ कुछ भी किसी मरीज़ या परिवार ने नहीं भेजा।"), fontSize = 12.sp, color = DoctorCardFaint) }; if (newRequests.isNotEmpty()) Surface(color = DoctorStatusWarnBg, shape = RoundedCornerShape(10.dp)) { Text(t("${newRequests.size} to plan", "${newRequests.size} तय करने हैं"), Modifier.padding(horizontal = 10.dp, vertical = 5.dp), fontSize = 12.sp, fontWeight = FontWeight.Medium, color = DoctorStatusWarn) } } }
+        if (newRequests.isEmpty()) item { Text(t("Nothing on your list yet.", "आपकी सूची में अभी कुछ नहीं।"), fontSize = 13.sp, color = DoctorCardSub) }
         items(newRequests.take(3), key = { "home-request-${it.id}" }) { r ->
             val name = byId.getValue(r.patientId).displayName()
-            Surface(onClick = { onConversation(r.patientId) }, color = Paper, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().heightIn(min = 72.dp).testTag("home-request-${r.id}").semantics(mergeDescendants = true) { contentDescription = "Conversation to plan, listed under $name: ${r.reason}. Opens the conversation." }) {
+            Surface(onClick = { onConversation(r.patientId) }, color = Paper, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().heightIn(min = 72.dp).testTag("home-request-${r.id}").semantics(mergeDescendants = true) { contentDescription = t("Conversation to plan, listed under $name: ${r.reason}. Opens the conversation.", "तय करने वाली बातचीत, $name के नाम: ${r.reason}. बातचीत खोलता है।") }) {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(name, fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
                     Text(r.reason, fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk)
-                    Text("Listed ${demoDay(demoDate(r.createdAt))}, ${demoTime(r.createdAt)}", fontSize = 12.sp, color = DoctorCardFaint)
+                    Text(t("Listed ${demoDay(demoDate(r.createdAt))}, ${demoTime(r.createdAt)}", "दर्ज ${demoDay(demoDate(r.createdAt))}, ${demoTime(r.createdAt)}"), fontSize = 12.sp, color = DoctorCardFaint)
                 }
             }
         }
-        item { TextButton(onClick = onRequests, modifier = Modifier.heightIn(min = 48.dp).testTag("workflow-open-requests")) { Text(if (newRequests.size > 3) "View all ${newRequests.size}" else "Open list"); Icon(Icons.Default.ChevronRight, null) } }
-        item { DoctorSection("People in your care") }
+        item { TextButton(onClick = onRequests, modifier = Modifier.heightIn(min = 48.dp).testTag("workflow-open-requests")) { Text(if (newRequests.size > 3) t("View all ${newRequests.size}", "सभी ${newRequests.size} देखें") else t("Open list", "सूची खोलें")); Icon(Icons.Default.ChevronRight, null) } }
+        item { DoctorSection(t("People in your care", "आपकी देखभाल में लोग")) }
         items(DoctorTestProfiles.profiles, key = { it.key }) { p -> DoctorPatientListCard(p.name, p.family, { onProfile(p) }) }
     }
 }

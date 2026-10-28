@@ -30,6 +30,8 @@ import java.time.format.DateTimeFormatter
 
 fun careDay(epoch: Long): LocalDate = Instant.ofEpochMilli(epoch).atZone(ZoneId.systemDefault()).toLocalDate()
 fun careEpoch(day: LocalDate): Long = day.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+/** The Calendar opens on a visit's own day when a visit card opened it, otherwise on today. */
+internal fun calendarStartDay(initialDay: Long, today: LocalDate = LocalDate.now()): LocalDate = if (initialDay > 0) careDay(initialDay) else today
 fun calendarCategory(item: CareItem): String = CareEntryCodec.decode(item.detail)?.let {
     when (it.type) { "schedule" -> it.category; "conversation" -> "Conversation"; "task" -> "Task"; else -> "" }
 } ?: when (item.kind) { "medicine" -> "Medicine"; "visit" -> "Visit"; "task" -> "Task"; else -> "" }
@@ -59,11 +61,11 @@ fun calendarItems(entries: List<CareItem>, day: LocalDate): List<CareItem> = ent
     }
 }
 
-@Composable fun CareCalendar(vm: CareModel, onWorkflow: () -> Unit = {}, onAddDoctorVisit: (() -> Unit)? = null) {
+@Composable fun CareCalendar(vm: CareModel, onWorkflow: () -> Unit = {}, onAddDoctorVisit: (() -> Unit)? = null, initialDay: Long = 0L) {
     val entries by vm.items.collectAsStateWithLifecycle()
     val person by vm.selected.collectAsStateWithLifecycle()
     val canEdit by vm.canEdit.collectAsStateWithLifecycle()
-    var dayString by rememberSaveable(person) { mutableStateOf(LocalDate.now().toString()) }
+    var dayString by rememberSaveable(person, initialDay) { mutableStateOf(calendarStartDay(initialDay).toString()) }
     var filter by rememberSaveable(person) { mutableStateOf("All") }
     var adding by rememberSaveable(person) { mutableStateOf(false) }
     var editing by remember { mutableStateOf<CareItem?>(null) }; val t = careText(); val hindi = careHindi()

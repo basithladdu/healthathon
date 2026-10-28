@@ -114,7 +114,7 @@ class CareReminderScheduler(private val context: Context, private val account: S
             // Tap: select the person whose activity is due (CareTodayRules), then open Reminders (CareReminderLaunch).
             val launch = PendingIntent.getActivity(context, notificationId(account, key), Intent(context, MainActivity::class.java).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP; putExtra(CareReminderLaunch.EXTRA, true); putExtra(CareTodayRules.OPEN_PERSON_EXTRA, CareTodayRules.personForItem(prefs.getString("items", null), expected?.itemId.orEmpty())) }, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
             val notification = NotificationCompat.Builder(context, CHANNEL).setSmallIcon(android.R.drawable.ic_popup_reminder)
-                .setContentTitle("Sahara reminder").setContentText("A saved care activity is due. Open Sahara to check the record.")
+                .setContentTitle(reminderText("Sahara reminder")).setContentText(reminderText("A saved care activity is due. Open Sahara to check the record."))
                 .setVisibility(NotificationCompat.VISIBILITY_PRIVATE).setContentIntent(launch).setAutoCancel(true).setCategory(NotificationCompat.CATEGORY_REMINDER).build()
             try {
                 NotificationManagerCompat.from(context).notify(notificationId(account, key), notification)
@@ -123,10 +123,12 @@ class CareReminderScheduler(private val context: Context, private val account: S
         }
     }
     /** Android 12+ asks the person to allow exact alarms; earlier versions always allow them. */
+    /** Notification text follows the phone's last English/Hindi choice. */
+    private fun reminderText(english: String): String = if (careDeviceHindi(context)) ReminderTextHindi[english] ?: english else english
     fun exactAllowed(): Boolean = Build.VERSION.SDK_INT < 31 || context.getSystemService(AlarmManager::class.java).canScheduleExactAlarms()
     fun scheduledCount(): Int = prefs.getStringSet("scheduled", emptySet()).orEmpty().size
     fun error(): String? = prefs.getString("error", null)
-    private fun createChannel() { context.getSystemService(NotificationManager::class.java).createNotificationChannel(NotificationChannel(CHANNEL, "Care reminders", NotificationManager.IMPORTANCE_DEFAULT).apply { description = "Reminders for your chosen medicine times and dated care activities. Android may delay alerts."; lockscreenVisibility = android.app.Notification.VISIBILITY_PRIVATE }) }
+    private fun createChannel() { context.getSystemService(NotificationManager::class.java).createNotificationChannel(NotificationChannel(CHANNEL, reminderText("Care reminders"), NotificationManager.IMPORTANCE_DEFAULT).apply { description = reminderText("Reminders for your chosen medicine times and dated care activities. Android may delay alerts."); lockscreenVisibility = android.app.Notification.VISIBILITY_PRIVATE }) }
     companion object {
         const val CHANNEL = "sahara-care-reminders"
         fun active(context: Context): String? = context.getSharedPreferences("care-reminder-active", 0).getString("account", null)

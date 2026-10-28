@@ -16,55 +16,54 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import java.time.Instant
 import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 
-private fun conversationDate(at: Long?) = at?.takeIf { it > 0 }?.let {
-    Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("d MMM yyyy · h:mm a"))
-} ?: "Date not recorded"
+private fun conversationDate(at: Long?, hindi: Boolean) = at?.takeIf { it > 0 }?.let {
+    Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).format(careDateFormat("d MMM yyyy · h:mm a", hindi))
+} ?: if (hindi) "तारीख़ दर्ज नहीं" else "Date not recorded"
 
 /** Read-only history. Continuing opens the existing patient draft without replacing it. */
-@Composable fun DoctorConversationsContent(model: DoctorConversationsModel, onContinue: () -> Unit, modifier: Modifier = Modifier) {
+@Composable fun DoctorConversationsContent(model: DoctorConversationsModel, onContinue: () -> Unit, modifier: Modifier = Modifier) { val t = careText();
     Column(modifier.fillMaxWidth().testTag("doctor-conversations"), verticalArrangement = Arrangement.spacedBy(24.dp)) {
         Surface(color = DoctorCardConversation, shape = RoundedCornerShape(20.dp)) {
             Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
                     Icon(Icons.Default.Forum, null, tint = DoctorAccent, modifier = Modifier.size(24.dp))
-                    Text("Conversation workspace", fontFamily = SaharaTitleFont, fontSize = 21.sp, lineHeight = 27.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
+                    Text(t("Conversation workspace", "बातचीत की जगह"), fontFamily = SaharaTitleFont, fontSize = 21.sp, lineHeight = 27.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
                 }
-                Text("Prepare the next discussion, or continue your saved words.", fontSize = 15.sp, lineHeight = 23.sp, color = DoctorCardInk)
+                Text(t("Prepare the next discussion, or continue your saved words.", "अगली चर्चा की तैयारी करें, या सहेजे शब्दों से आगे बढ़ें।"), fontSize = 15.sp, lineHeight = 23.sp, color = DoctorCardInk)
                 if (model.currentDraft != null) {
                     Column(Modifier.testTag("conversation-draft"), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text("Saved draft · not a published Care Note", fontWeight = FontWeight.Medium, fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub)
+                        Text(t("Saved draft · not a published Care Note", "सहेजा ड्राफ़्ट · प्रकाशित केयर नोट नहीं"), fontWeight = FontWeight.Medium, fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub)
                     }
                 }
                 Button(onClick = onContinue, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("workflow-open-conversation"), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent, contentColor = Paper), shape = RoundedCornerShape(14.dp)) {
-                    Text(if (model.currentDraft != null) "Continue discussion draft" else "Open conversation workspace", fontSize = 16.sp)
+                    Text(if (model.currentDraft != null) t("Continue discussion draft", "चर्चा का ड्राफ़्ट जारी रखें") else t("Open conversation workspace", "बातचीत की जगह खोलें"), fontSize = 16.sp)
                 }
             }
         }
         model.latestPublished?.let { discussion ->
             Column(Modifier.testTag("conversation-latest"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                ConversationHeading("Most recent published discussion")
+                ConversationHeading(t("Most recent published discussion", "सबसे नई प्रकाशित चर्चा"))
                 DiscussionReadingCard(discussion, highlighted = true)
             }
         }
         if (model.earlierPublished.isNotEmpty()) {
             Column(Modifier.testTag("conversation-earlier"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                ConversationHeading("Earlier published discussions")
+                ConversationHeading(t("Earlier published discussions", "पहले प्रकाशित चर्चाएँ"))
                 model.earlierPublished.forEach { discussion -> key(model.patientId, discussion.id) { DiscussionReadingCard(discussion, highlighted = false) } }
             }
         }
         model.priorSample?.let { discussion ->
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                ConversationHeading("Previous discussion on record")
-                Text("An undated discussion from this patient's earlier record. It is separate from the versions saved here.", fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub)
+                ConversationHeading(t("Previous discussion on record", "रिकॉर्ड में पिछली चर्चा"))
+                Text(t("An undated discussion from this patient's earlier record. It is separate from the versions saved here.", "इस मरीज़ के पुराने रिकॉर्ड से बिना तारीख़ की चर्चा। यह यहाँ सहेजे संस्करणों से अलग है।"), fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub)
                 DiscussionReadingCard(discussion, highlighted = false)
             }
         }
         if (model.latestPublished == null && model.priorSample == null) {
-            Text("No saved discussion is recorded yet. You can prepare one in the workspace.", fontSize = 15.sp, lineHeight = 23.sp, color = DoctorCardInk)
+            Text(t("No saved discussion is recorded yet. You can prepare one in the workspace.", "अभी कोई सहेजी चर्चा दर्ज नहीं है। आप बातचीत की जगह में एक तैयार कर सकते हैं।"), fontSize = 15.sp, lineHeight = 23.sp, color = DoctorCardInk)
         }
-        DoctorFootnote("The reviewer's identity is not verified. Audio is not automatically transcribed, so the words must be checked by a person. Audio stays on this device and is not included when a written note is shared.")
+        DoctorFootnote(t("The reviewer's identity is not verified. Audio is not automatically transcribed, so the words must be checked by a person. Audio stays on this device and is not included when a written note is shared.", "समीक्षक की पहचान की जाँच नहीं हुई है। ऑडियो अपने-आप लिखाई में नहीं बदलता, इसलिए शब्द किसी व्यक्ति को जाँचने होंगे। ऑडियो इसी फ़ोन पर रहता है और लिखा नोट साझा करने पर साथ नहीं जाता।"))
     }
 }
 
@@ -72,15 +71,15 @@ private fun conversationDate(at: Long?) = at?.takeIf { it > 0 }?.let {
     Text(text, fontSize = 21.sp, lineHeight = 27.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, fontFamily = SaharaTitleFont, modifier = Modifier.a11yHeading())
 }
 
-@Composable private fun DiscussionReadingCard(discussion: DoctorOverviewDiscussion, highlighted: Boolean) {
-    val fields = listOf("What matters to the patient" to discussion.priorities, "Who participated" to discussion.participants, "What was discussed" to discussion.topics, "Questions and concerns" to discussion.questions, "Still undecided" to discussion.undecided, "Next steps" to discussion.nextSteps)
-    val author = discussion.reviewerName?.takeIf { it.isNotBlank() } ?: "Author not recorded"
-    val brief = discussion.topics.ifBlank { discussion.priorities }.ifBlank { "No summary recorded" }
+@Composable private fun DiscussionReadingCard(discussion: DoctorOverviewDiscussion, highlighted: Boolean) { val t = careText();
+    val fields = listOf(t("What matters to the patient", "मरीज़ के लिए क्या ज़रूरी है") to discussion.priorities, t("Who participated", "कौन शामिल था") to discussion.participants, t("What was discussed", "किस पर बात हुई") to discussion.topics, t("Questions and concerns", "सवाल और चिंताएँ") to discussion.questions, t("Still undecided", "अभी तय नहीं") to discussion.undecided, t("Next steps", "आगे के कदम") to discussion.nextSteps)
+    val author = discussion.reviewerName?.takeIf { it.isNotBlank() } ?: t("Author not recorded", "लेखक दर्ज नहीं")
+    val brief = discussion.topics.ifBlank { discussion.priorities }.ifBlank { t("No summary recorded", "कोई सार दर्ज नहीं") }
     Surface(color = if (highlighted) DoctorCardConversation else DoctorCardReport, shape = RoundedCornerShape(20.dp), border = if (highlighted) null else BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("conversation-card-${discussion.id}")) {
         Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text(if (discussion.isPublishedPreview) "Version ${discussion.versionNumber}" else "Earlier discussion", fontSize = 21.sp, lineHeight = 26.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, fontFamily = SaharaTitleFont)
-                Text(conversationDate(discussion.publishedAt), fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub)
+                Text(if (discussion.isPublishedPreview) t("Version ${discussion.versionNumber}", "संस्करण ${discussion.versionNumber}") else t("Earlier discussion", "पहले की चर्चा"), fontSize = 21.sp, lineHeight = 26.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, fontFamily = SaharaTitleFont)
+                Text(conversationDate(discussion.publishedAt, careHindi()), fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub)
                 Text(author, fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub)
             }
             Text(brief, fontSize = 15.sp, lineHeight = 23.sp, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -93,10 +92,10 @@ private fun conversationDate(at: Long?) = at?.takeIf { it > 0 }?.let {
                             SelectionContainer { Text(value, fontSize = 15.sp, lineHeight = 23.sp, color = DoctorCardInk) }
                         }
                     }
-                    if (fields.any { it.second.isBlank() }) Text("Other headings were not recorded in this version.", fontSize = 12.sp, lineHeight = 16.sp, color = DoctorCardFaint)
+                    if (fields.any { it.second.isBlank() }) Text(t("Other headings were not recorded in this version.", "इस संस्करण में बाक़ी शीर्षक दर्ज नहीं हुए।"), fontSize = 12.sp, lineHeight = 16.sp, color = DoctorCardFaint)
                     HorizontalDivider(color = DoctorHairline)
                 }
-                Text("Original words", fontSize = 19.sp, lineHeight = 24.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, fontFamily = SaharaTitleFont)
+                Text(t("Original words", "मूल शब्द"), fontSize = 19.sp, lineHeight = 24.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, fontFamily = SaharaTitleFont)
                 Text(discussion.sourceLabel, fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub)
                 SelectionContainer { Text(discussion.sourceText, fontSize = 15.sp, lineHeight = 24.sp, color = DoctorCardInk, modifier = Modifier.testTag("conversation-source-${discussion.id}")) }
             }

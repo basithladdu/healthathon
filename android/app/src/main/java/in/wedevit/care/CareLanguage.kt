@@ -70,6 +70,27 @@ fun checkInMoodLabel(title: String, hindi: Boolean): String = if (!hindi) title 
     CheckInMood.GOOD -> "अच्छा दिन"; CheckInMood.OKAY -> "ठीक-ठाक दिन"; CheckInMood.HARD -> "मुश्किल दिन"; else -> title
 }
 
+/** Care-note section headings are saved and hashed in English (NoteRules.labels); only the shown heading is Hindi. */
+fun noteSectionLabel(label: String, hindi: Boolean): String = if (!hindi) label else when (label) {
+    "What matters" -> "क्या ज़रूरी है"; "Who was there" -> "कौन मौजूद था"; "What we discussed" -> "किस पर बात हुई"; "Still to discuss" -> "अभी बात करनी है"; "Next steps" -> "आगे के कदम"; else -> label
+}
+
+/** Hindi for reminder checks and alerts (the English stays in CareReminderRules and CareReminders, which tests rely on). */
+internal val ReminderTextHindi = mapOf(
+    "Use up to six reminder times." to "ज़्यादा से ज़्यादा छह रिमाइंडर समय रखें।",
+    "Use HH:mm, such as 08:30." to "HH:mm लिखें, जैसे 08:30।",
+    "Use a start date as YYYY-MM-DD." to "शुरू की तारीख़ YYYY-MM-DD में लिखें।",
+    "Use an end date as YYYY-MM-DD." to "आख़िरी तारीख़ YYYY-MM-DD में लिखें।",
+    "The end date must follow the start date." to "आख़िरी तारीख़ शुरू की तारीख़ के बाद की होनी चाहिए।",
+    "Sahara reminder" to "सहारा रिमाइंडर",
+    "A saved care activity is due. Open Sahara to check the record." to "सहेजा हुआ देखभाल का काम अब है। रिकॉर्ड देखने के लिए सहारा खोलें।",
+    "Care reminders" to "देखभाल रिमाइंडर",
+    "Reminders for your chosen medicine times and dated care activities. Android may delay alerts." to "चुने हुए दवा के समय और तारीख़ वाले देखभाल के कामों के रिमाइंडर। Android सूचनाएँ देर से भेज सकता है।",
+)
+
+/** The phone's last language choice, for text shown outside the app's screens (notifications). */
+fun careDeviceHindi(context: Context): Boolean = context.applicationContext.getSharedPreferences("sahara-language", 0).getBoolean("hindi", false)
+
 /** Hindi for the symptom diary's save checks (SymptomDiaryRules.error returns the English text, which tests rely on). */
 internal val SymptomErrorsHindi = mapOf(
     "Choose a symptom or add a short name." to "लक्षण चुनें या छोटा नाम लिखें।",

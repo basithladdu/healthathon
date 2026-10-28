@@ -2,7 +2,7 @@
 
 **Status: DRAFT, 27 Oct 2026.** No pilot has started, so no real numbers exist yet. The queries were tested only on made-up rows in a local test database, never on Sahara's real Supabase.
 
-File: [`kpi-queries.sql`](kpi-queries.sql). It counts the 3 KPIs in `docs/pitch/KPI_EVALUATION_DRAFT.md` (on branch `sa5-pitchkit`). The app has no KPI report screen or export, so the owner runs these by hand.
+File: [`kpi-queries.sql`](kpi-queries.sql). It counts KPI 1 and KPI 2 in [`KPI_EVALUATION_DRAFT.md`](KPI_EVALUATION_DRAFT.md), plus diary days. The draft's KPI 3 (caregiver burden, Brief AMC-CBI) is asked on paper or by phone and is not in the app, so no query counts it. The app has no KPI report screen or export, so the owner runs these by hand.
 
 | Query | What it counts |
 |---|---|
@@ -10,7 +10,7 @@ File: [`kpi-queries.sql`](kpi-queries.sql). It counts the 3 KPIs in `docs/pitch/
 | KPI 2a | Per patient, per pilot week: pain scores (0–10), split by who answered (patient, patient with help, family or carer, care team). |
 | KPI 2b | One line: the share of patient-weeks with at least one pain score from home (not the care team). |
 | KPI 2c | Per patient: visits, and visits with a home pain score in the 7 days before. |
-| KPI 3 | Per patient: diary days (days with at least one check-in or journal note) out of days in the pilot. |
+| KPI 3 (diary days) | Per patient: diary days (days with at least one check-in, symptom note or journal note) out of days in the pilot. A supporting count, not the draft's caregiver-burden KPI 3. |
 
 ## What it shows and what it never shows
 - It shows only a `patient_ref` code, week numbers, dates and counts.

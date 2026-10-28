@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.sp
     val section = sectionIndex.coerceIn(0, NoteRules.labels.lastIndex)
     val lines = remember(draft.source) { CareDraftAssist.lines(draft.source) }
     Surface(shape = RoundedCornerShape(20.dp), color = DoctorCardReport, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) { Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text(NoteRules.labels[section], fontFamily = SaharaTitleFont, fontSize = 21.sp, lineHeight = 26.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.testTag("build-section-heading"))
+        Text(noteSectionLabel(NoteRules.labels[section], careHindi()), fontFamily = SaharaTitleFont, fontSize = 21.sp, lineHeight = 26.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.testTag("build-section-heading"))
         Text(NoteRules.values(draft)[section].ifBlank { t("Nothing added yet. Leave blank if it was not discussed.", "अभी कुछ नहीं जोड़ा। अगर इस पर बात नहीं हुई तो ख़ाली छोड़ें।") }, fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk)
         Text(t("Add the words from the conversation that belong in this section.", "बातचीत से वे शब्द जोड़ें जो इस हिस्से के हैं।"), fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub)
         if (lines.isEmpty()) Text(t("Add the conversation first.", "पहले बातचीत जोड़ें।"), fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk)
@@ -53,7 +53,7 @@ import androidx.compose.ui.unit.sp
                     SelectionContainerText(line.text)
                     if (added) Row(Modifier.heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) { Icon(Icons.Default.Check, null, Modifier.size(18.dp), tint = DoctorStatusGood); Text(t("Added to ${NoteRules.labels[section]}", "${NoteRules.labels[section]} में जोड़ा"), fontSize = 13.sp, color = DoctorStatusGood, fontWeight = FontWeight.Medium) }
                     if (!added) TextButton(onClick = { onAssign(section, line) }, colors = ButtonDefaults.textButtonColors(contentColor = DoctorAccent), modifier = Modifier.heightIn(min = 48.dp).testTag("source-add-${line.number}-$section")) {
-                        Icon(Icons.Default.Add, null, Modifier.size(16.dp)); Spacer(Modifier.width(4.dp)); Text(t("Add to ${NoteRules.labels[section]}", "${NoteRules.labels[section]} में जोड़ें"), fontSize = 14.sp)
+                        Icon(Icons.Default.Add, null, Modifier.size(16.dp)); Spacer(Modifier.width(4.dp)); Text(t("Add to ${NoteRules.labels[section]}", "${noteSectionLabel(NoteRules.labels[section], true)} में जोड़ें"), fontSize = 14.sp)
                     }
                 }
             }

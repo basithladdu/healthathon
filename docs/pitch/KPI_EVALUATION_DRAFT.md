@@ -16,7 +16,7 @@ This draft keeps the 25 Sep measures and adds evidence-based baselines. It propo
   - confirmations are `kind='ack'`, with `relationship` (Patient or Family / carer) and `at` time;
   - daily entries and symptom notes are `kind='entry'`.
   Source: `android/supabase/migrations/20261009162933_android_care_accounts.sql` and `20261016065132_patient_first_version_confirmations.sql`.
-- Symptom notes record the score, the date and time seen, and **who answered** (patient, helped, or carer) (`CareSymptomUi.kt`, `SymptomDiaryRules`).
+- Symptom notes record the score, the date and time seen, and **who answered** (patient, patient with help, family or carer, or care team) (`CareSymptomUi.kt`, `SymptomDiaryRules`). The counting queries put each score on the day it was **saved** on the phone, not the day "seen".
 - A family's "Ask to talk" request is saved as a care task entry whose hidden workflow type is `conversation` (`CareWorkflow.kt`); older builds saved a task titled "Ask for a goals-of-care conversation" (`CareUi.kt`). `docs/pitch/kpi-queries.sql` counts both. Note: `public.healthathon_clinician_requests` is for doctor sign-up approval, not patient requests.
 - **Not built:** there is no KPI report screen and no export. Counting means a read-only database query that the owner runs. Records of people who are **not signed in** stay on the phone and cannot be counted. So every pilot family must use a signed-in account.
 - **Not built:** a "the doctor saw this" receipt. The app cannot show whether a clinician opened a diary entry.
@@ -35,8 +35,8 @@ This draft keeps the 25 Sep measures and adds evidence-based baselines. It propo
 
 | | |
 |---|---|
-| **Definition** | Share of **patient-weeks** with at least one pain score (0–10) entered in the symptom tracker, plus the share of clinic or home **visits** where a pain score from the previous 7 days was there for the clinician to see. |
-| **How the app measures it** | Symptom notes (`kind='entry'`) have the symptom, score, date seen and who answered. Visits are entries of kind `visit` with a date. Count per patient per week. Report "who answered" (patient, helped, carer) next to the number. |
+| **Definition** | Share of **patient-weeks** with at least one pain score (0–10) entered in the symptom tracker by the patient or family (care-team entries are counted but kept out of this share), plus the share of clinic or home **visits** where a patient or family pain score from the previous 7 days was there for the clinician to see. |
+| **How the app measures it** | Symptom notes (`kind='entry'`) have the symptom, score, date seen and who answered. Visits are entries of kind `visit` with a date. Count per patient per week (week 1 starts on the pilot start day). A body-map strength counts as a pain score; "Not rated" does not. Report "who answered" (patient, patient with help, family or carer, care team) next to the number. |
 | **Baseline** | Patient-reported pain was routinely documented at only **21%** of Kerala government palliative sites (65% of NGO sites) (Lijimol, IJPC 2020, PMID 33623312; `partners/iapc.md`, `partners/kerala-government-grid.md`). Kerala PHC nurses visit bed-bound patients about **once a month** (IAPC status report, `partners/iapc.md`). Pallium India visits about twice a month (`partners/pallium-india.md`). Reference for completion: an Indian phone symptom form (SMART-ESAS, AIIMS) was completed by about **51%** (PMID 38386957). A US weekly survey reached 91.5% (PMID 39920394); that is a rich-country figure, not a target for India. |
 | **8-week target (illustrative)** | At least 60% of patient-weeks have a pain score, and at least 60% of visits have one from the last 7 days. |
 | **Data source** | Sahara server symptom entries (read-only query); visit dates from the app or the site's visit register. |
@@ -48,12 +48,15 @@ This draft keeps the 25 Sep measures and adds evidence-based baselines. It propo
 | | |
 |---|---|
 | **Definition** | Caregiver burden score at week 0 and week 8, using the 3-item **Brief AMC-CBI** ("lost hope", "feel sad", "financial burden"; cut-off 3 or more). Report the share at or above the cut-off at each time, and how many caregivers completed both. |
-| **How the app measures it** | **It does not.** There is no burden check in the app. The pilot coordinator asks the 3 questions by phone or on paper at week 0 and week 8. (Adding it to the app is a later build.) |
+| **How the app measures it** | **It does not.** There is no burden check in the app, and `kpi-queries.sql` cannot count it (its "KPI 3" query counts diary days instead; see below). The pilot coordinator asks the 3 questions by phone or on paper at week 0 and week 8. (Adding it to the app is a later build.) |
 | **Baseline** | Kerala: **32.1%** of caregivers had moderate-to-severe burden (Ernakulam, n=115, PMID 39537204; `partners/arike.md`). Pallium India: **54.8%** moderate burden (n=270, PMID 41239314; `partners/pallium-india.md`). Tata Memorial geriatric clinic: 76.4% little or no burden (PMID 35750629), so it varies by setting. Brief AMC-CBI: IJPC 2026, PMID 42694816, tested by phone on 60 rural Kollam caregivers (`partners/iapc.md`). |
 | **8-week target (illustrative)** | At least 80% of caregivers complete both checks. Report the change as it is. **Set no reduction target**: 8 weeks and a small group cannot show an effect, and the evidence file says not to claim Sahara lowers burden (`landscape/india-palliative-evidence.md`, "Do not claim"). |
 | **Data source** | Coordinator's paper or phone form. Permission to use the Brief AMC-CBI is **[unverified]**: ask the authors first. |
 
 **Money and hospital time (rest of A20):** no simple, honest measure fits 8 weeks. If the team wants one, add two questions at week 0 and week 8: "trips to hospital in the last month" and "money spent on travel in the last month". Baseline: median ₹4,240 a month out of pocket, mostly travel and lost wages (Hyderabad, n=400, PMID 41164715). Report it only, with no target.
+
+## Supporting count the queries add: diary days
+`kpi-queries.sql` "KPI 3" counts, per patient, the days with at least one check-in, symptom note or journal note, out of the days in the pilot. It is not the caregiver burden KPI above; use it only as a supporting number for KPI 2.
 
 ## Option the team may prefer: emergency retrieval time (agreed 25 Sep)
 - **Definition:** seconds from "show me the latest goals-of-care note" to the correct latest version on screen, in a timed practice drill.

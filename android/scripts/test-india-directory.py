@@ -70,6 +70,21 @@ class DirectoryContracts(unittest.TestCase):
         self.assertEqual(["99999 11111"], records[0]["phoneNumbers"])
         self.assertEqual("unknown", records[0]["morphine"])
 
+    def test_heading_rows_inside_tables_are_not_centres(self):
+        html = """<table><tr><td>Sl No</td><td>Name and Address</td><td>Services</td><td>Contact Details</td></tr>
+        <tr><td></td><td>Referral &amp; Research Institutions:</td><td></td><td></td></tr>
+        <tr><td></td><td>District | Name | Address</td><td>Services</td><td></td></tr>
+        <tr><td>1</td><td><strong>Example Hospital</strong><br>Guwahati</td><td>OP</td><td>Phone: 99999 11111</td></tr></table>"""
+        records, rejected = scraper.parse_page(html, "Assam", "https://palliumindia.org/clinics/assam", "Pallium India", "2026-10-20")
+        self.assertEqual(["Example Hospital"], [r["name"] for r in records])
+        self.assertEqual(["heading-row", "heading-row"], [r["reason"] for r in rejected])
+        self.assertFalse(any(r["name"].endswith(":") or "|" in r["name"] for r in self.records))
+
+    def test_vasai_listings_sit_in_palghar_district(self):
+        vasai = [r for r in self.records if r["state"] == "Maharashtra" and "vasai" in r["address"].lower() and r["district"]]
+        self.assertTrue(vasai)
+        self.assertEqual({"Palghar"}, {r["district"] for r in vasai})
+
     def test_map_viewport_is_not_a_place_coordinate(self):
         html = """<table><tr><th>Name &amp; Address</th><th>Contact Details</th><th>Other Details</th></tr>
         <tr><td>Example Hospital<br>Shillong</td><td>Phone: 99999 11111</td>

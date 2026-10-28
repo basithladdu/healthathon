@@ -299,7 +299,7 @@ object NoteRules {
         appendLine("GOALS OF CARE • ${v.personName} • Version ${v.version}")
         appendLine("Reviewer: ${v.doctor} • ${java.time.Instant.ofEpochMilli(v.published)}")
         appendLine("Review status: ${ReviewWorkflow.label(v)}")
-        if (v.draftOrigin == ReviewWorkflow.TRANSCRIBED_DRAFT) appendLine("Transcript: AI-generated with ${v.transcriptionModel}; human review required")
+        if (v.draftOrigin == ReviewWorkflow.TRANSCRIBED_DRAFT) appendLine(if (v.transcriptionModel == OfflineSpeechModel.id) "Transcript: made on the phone by on-device speech-to-text (${v.transcriptionModel}); human review required" else "Transcript: AI-generated with ${v.transcriptionModel}; human review required")
         labels.zip(values(v)).forEach { (label, value) -> appendLine("\n$label\n${value.ifBlank { "Not recorded" }}") }
         DoctorConversationContext.readable(v).takeIf(String::isNotBlank)?.let { appendLine("\n$it") }
         appendLine("\nOriginal conversation\n${v.source}")

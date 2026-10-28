@@ -23,6 +23,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.style.TextAlign
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import java.time.LocalDate
+import java.time.ZoneId
 
 internal val careAddKinds = listOf("medicine" to ("Add medicine" to "दवा जोड़ें"), "visit" to ("Add visit" to "मुलाक़ात जोड़ें"), "task" to ("Add task" to "काम जोड़ें"), "checkin" to ("Add check-in" to "आज का हाल लिखें"), "journal" to ("Add note" to "नोट जोड़ें"))
 
@@ -33,6 +37,40 @@ internal val careAddKinds = listOf("medicine" to ("Add medicine" to "दवा �
         Button(onClick = { open = true }, shape = RoundedCornerShape(24.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent, contentColor = androidx.compose.ui.graphics.Color.White), contentPadding = PaddingValues(start = 14.dp, end = 18.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("care-add-button")) { Icon(Icons.Default.Add, null, Modifier.size(20.dp)); Spacer(Modifier.width(6.dp)); Text(t("Add", "जोड़ें"), fontSize = 15.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold) }
         DropdownMenu(expanded = open, onDismissRequest = { open = false }, modifier = Modifier.testTag("care-add-menu")) {
             careAddKinds.forEach { (kind, label) -> DropdownMenuItem(text = { Text(t(label.first, label.second), fontSize = 15.sp, color = DoctorCardInk) }, leadingIcon = { Icon(careIcon(kind), null, tint = DoctorAccent, modifier = Modifier.size(22.dp)) }, onClick = { open = false; if (kind == "medicine") onScanPrescription() else onAdd(kind) }, modifier = Modifier.heightIn(min = 48.dp).testTag("care-add-$kind")) }
+        }
+    }
+}
+
+/**
+ * Today's check-in in one tap: a mood button saves today's check-in (or changes the one already saved) through the same
+ * save as the full check-in screen. Words and a symptom note are one more tap away. Shown only to people who may edit.
+ */
+@Composable fun QuickCheckInCard(vm: CareModel, onAddWords: () -> Unit, onSymptom: () -> Unit) {
+    val t = careText(); val hindi = careHindi()
+    val items by vm.items.collectAsStateWithLifecycle(); val person by vm.selected.collectAsStateWithLifecycle(); val busy by vm.busy.collectAsStateWithLifecycle()
+    val dayStart = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+    val today = CheckInMood.today(items, person, dayStart)
+    val capturedAccount = remember(person) { vm.accountNamespace }
+    Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("today-checkin")) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Text(t("How was today?", "आज का दिन कैसा रहा?"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading())
+            Text(if (today != null) t("Saved for today. Tap another to change it.", "आज के लिए सहेजा। बदलना हो तो दूसरा चुनें।") else t("One tap saves today's check-in.", "एक बार छूने से आज का हाल सहेज जाता है।"), fontSize = 13.sp, color = DoctorCardSub)
+            Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                CareDailyFlow.moods.forEach { mood ->
+                    FilterChip(selected = today?.title == mood, enabled = !busy, onClick = {
+                        val change = CareDailyFlow.checkInChange(today, mood)
+                        if (change != null && canEditCareContext(vm, person, capturedAccount)) { if (today != null) vm.updateItem(change) {} else vm.saveItem("checkin", mood, "") }
+                    }, label = { Text(checkInMoodLabel(mood, hindi), textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth()) },
+                        modifier = Modifier.weight(1f).fillMaxHeight().heightIn(min = 56.dp).testTag("today-checkin-${CareDailyFlow.moods.indexOf(mood)}"))
+                }
+            }
+            today?.detail?.takeIf { it.isNotBlank() }?.let { Text(it, fontSize = 14.sp, color = DoctorCardInk, maxLines = 2) }
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                TextButton(onClick = onAddWords, modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("today-checkin-words")) { Text(if (today?.detail.isNullOrBlank()) t("Add a few words", "कुछ शब्द लिखें") else t("Change the words", "शब्द बदलें"), color = RustText) }
+                TextButton(onClick = onSymptom, modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("today-symptom-note")) { Text(t("Note a symptom", "तबीयत का नोट लिखें"), color = RustText) }
+            }
+            Text(if (vm.cloud != null) t("Signed in: check-ins and symptom notes reach the family and doctor you invited.", "साइन इन है: आज का हाल और तबीयत के नोट आपके जोड़े परिवार और डॉक्टर तक पहुँचते हैं।")
+                else t("Saved on this phone only. Sign in to share it with your doctor.", "सिर्फ़ इस फ़ोन पर सहेजा। डॉक्टर के साथ साझा करने के लिए साइन इन करें।"), fontSize = 12.sp, color = DoctorCardFaint)
         }
     }
 }

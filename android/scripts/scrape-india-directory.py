@@ -36,6 +36,10 @@ STATES = ["Andaman and Nicobar Islands", "Andhra Pradesh", "Arunachal Pradesh", 
           "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal"]
 
 
+# Vasai is in Palghar district. Dr. Rucha's address says "Vasai (West), Mumbai 401202" and Stella's says only "Vasai".
+DISTRICT_FIXES = {"india-0b140de8a0ef8b6a": "Palghar", "india-5268d43c837f7081": "Palghar"}
+
+
 def clean(value):
     return re.sub(r"\s+", " ", value.replace("\ufeff", "").replace("\xa0", " ")).strip()
 
@@ -126,6 +130,11 @@ def parse_page(html, state, url, publisher, as_of):
             if publisher == "Pallium India" and bold_text and clean(address_cell.get_text(" ", strip=True)).startswith(bold_text) and len(bold_text) < 190:
                 title = re.sub(r"^\s*\d+[.)]\s*", "", bold_text).strip(" ,")
             if title.lower().startswith(("name", "contact", "sl no", "s. no")):
+                continue
+            # Section and column headings typed into table rows ("Referral & Research Institutions:",
+            # "District | Name | Address") are not centres.
+            if title.endswith(":") or "|" in title:
+                rejected.append({"table": table_idx, "row": row_idx, "reason": "heading-row", "text": title})
                 continue
             # Pallium often embeds district headings inside table rows, with the
             # address cell populated and both service/contact cells empty.
@@ -327,6 +336,11 @@ def run():
     for r in unique:
         if ids[r["id"]] > 1:
             r["id"] += "-" + hashlib.sha256(r["address"].encode()).hexdigest()[:6]
+    # The source lists no district for these; their PIN and town place them (checked by hand, 28 Oct 2026).
+    for r in unique:
+        if r["id"] in DISTRICT_FIXES:
+            r["district"] = DISTRICT_FIXES[r["id"]]
+    unique.sort(key=lambda r: (r["state"], r["district"], r["name"]))
     counts = dict(sorted(Counter(r["state"] for r in unique).items()))
     result = {
         "retrievedOn": args.date, "totalCentres": len(unique), "stateAndUtCoverage": len(counts),

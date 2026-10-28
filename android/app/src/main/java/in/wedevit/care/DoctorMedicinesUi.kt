@@ -190,7 +190,11 @@ private fun medicineDay(at: Long) = DateTimeFormatter.ofPattern("EEE, d MMM yyyy
 
 @Composable private fun MedicineSurface(current: Boolean, content: @Composable ColumnScope.() -> Unit) { Surface(shape = RoundedCornerShape(20.dp), color = if(current) DoctorCardMedicine else DoctorCardReport, border = if(current) null else BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) { Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp), content = content) } }
 
-@Composable private fun MedicineChip(label: String, fg: androidx.compose.ui.graphics.Color, bg: androidx.compose.ui.graphics.Color) { Surface(color = bg, shape = RoundedCornerShape(50)) { Text(label, Modifier.padding(horizontal = 12.dp, vertical = 6.dp), fontSize = 13.sp, fontWeight = FontWeight.Medium, color = fg) } }
+/** Intake statuses stay English (the chip colour reads them); only the shown label is Hindi. */
+internal val MedicineStatusHindi = mapOf("Late reported" to "देर से लेने की सूचना", "Taken reported" to "लेने की सूचना", "Skipped reported" to "छोड़ने की सूचना", "Check-off corrected" to "टिक ठीक किया गया",
+    "Moved to past medicines" to "पुरानी दवाओं में डाली गई", "Returned to current medicines" to "अभी की दवाओं में वापस", "Upcoming" to "आने वाली", "Not logged" to "दर्ज नहीं", "Plan followed by a report" to "योजना के बाद सूचना मिली")
+
+@Composable private fun MedicineChip(label: String, fg: androidx.compose.ui.graphics.Color, bg: androidx.compose.ui.graphics.Color) { val t = careText(); Surface(color = bg, shape = RoundedCornerShape(50)) { Text(t(label, MedicineStatusHindi[label] ?: label), Modifier.padding(horizontal = 12.dp, vertical = 6.dp), fontSize = 13.sp, fontWeight = FontWeight.Medium, color = fg) } }
 
 @Composable private fun MedicineStatusChip(label: String, outcome: String) { when { label.startsWith("Late") || outcome == "planned" && !label.startsWith("Plan followed") -> MedicineChip(label, DoctorStatusWarn, DoctorStatusWarnBg); outcome == "skipped" || outcome == "unmarked" || outcome.startsWith("course") -> MedicineChip(label, DoctorStatusRest, DoctorStatusRestBg); else -> MedicineChip(label, DoctorStatusGood, DoctorStatusGoodBg) } }
 
@@ -204,7 +208,7 @@ private fun chooseMedicineTime(context:Context,current:Long?,onPicked:(Long)->Un
     var reporter by rememberSaveable(item.id){mutableStateOf("Not recorded")};var note by rememberSaveable(item.id){mutableStateOf("")};val id=rememberSaveable(item.id){UUID.randomUUID().toString()};var error by remember {mutableStateOf<String?>(null)}
     AlertDialog(onDismissRequest={if(!busy)onClose()},title={Text(t("Record medicine report", "दवा की सूचना दर्ज करें"))},text={Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),verticalArrangement=Arrangement.spacedBy(10.dp)) {
         Text(item.title,fontWeight=FontWeight.Medium, fontFamily = SaharaTitleFont);Text(t("Record what was reported. Leave a time blank if it is unknown. New reports do not erase earlier reports.", "जो बताया गया वही दर्ज करें। समय न पता हो तो ख़ाली छोड़ें। नई सूचना से पुरानी नहीं मिटती।"))
-        FlowRow(horizontalArrangement=Arrangement.spacedBy(5.dp)){listOf("taken" to "Taken","skipped" to "Skipped","planned" to "Planned").forEach{(value,label)->FilterChip(outcome==value,onClick={outcome=value;if(value!="taken")taken=null},enabled=!busy,label={Text(label)})}}
+        FlowRow(horizontalArrangement=Arrangement.spacedBy(5.dp)){listOf("taken" to t("Taken", "ली"),"skipped" to t("Skipped", "छोड़ी"),"planned" to t("Planned", "तय")).forEach{(value,label)->FilterChip(outcome==value,onClick={outcome=value;if(value!="taken")taken=null},enabled=!busy,label={Text(label)})}}
         plans.distinctBy {it.plannedAt}.take(6).forEach {plan->FilterChip(selected=planned==plan.plannedAt,onClick={planned=plan.plannedAt},enabled=!busy,label={Text(t("For planned dose: ${medicineTime(plan.plannedAt)}", "तय ख़ुराक के लिए: ${medicineTime(plan.plannedAt)}"))})}
         OutlinedButton(onClick={chooseMedicineTime(context,planned){planned=it}},enabled=!busy){Text(t("Planned: ", "तय: ") + medicineTime(planned))}
         if(planned!=null)TextButton(onClick={planned=null},enabled=!busy){Text(t("Clear planned time", "तय समय हटाएँ"))}
@@ -217,10 +221,10 @@ private fun chooseMedicineTime(context:Context,current:Long?,onPicked:(Long)->Un
 
 @Composable internal fun MedicineHistoryTabs(tab:String,busy:Boolean,onSelect:(String)->Unit) { val t = careText()
     Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(8.dp)) {
-        listOf("Current" to "Active prescription","Past" to "Replaced prescriptions","Intake history" to "Taken / missed · ली / छूटी").forEach {(value,hint)->
+        listOf("Current" to "Active prescription","Past" to "Replaced prescriptions","Intake history" to "Taken / missed").forEach {(value,hint)->
             val on=tab==value
             Surface(onClick={if(!busy)onSelect(value)},enabled=!busy,shape=RoundedCornerShape(20.dp),color=if(on)DoctorAccent else DoctorCardReport,border=if(on)null else BorderStroke(1.dp,DoctorHairline),modifier=Modifier.weight(1f).heightIn(min=56.dp).testTag("medicine-tab-$value")) {
-                Column(Modifier.padding(horizontal=14.dp,vertical=10.dp),verticalArrangement=Arrangement.Center) {Text(if(value=="Current")t("Current", "अभी") else t("Past", "पुराने"),fontSize=16.sp,fontWeight=FontWeight.Medium,color=if(on)DoctorCardReport else DoctorCardInk);Text(if(value=="Current")t(hint, "चालू पर्चा") else t(hint, "बदले गए पर्चे"),fontSize=12.sp,color=if(on)DoctorCardReport else DoctorCardSub)}
+                Column(Modifier.padding(horizontal=14.dp,vertical=10.dp),verticalArrangement=Arrangement.Center) {Text(when(value){"Current"->t("Current", "अभी");"Past"->t("Past", "पुराने");else->t("Intake history", "ली गई दवा")},fontSize=16.sp,fontWeight=FontWeight.Medium,color=if(on)DoctorCardReport else DoctorCardInk);Text(when(value){"Current"->t(hint, "चालू पर्चा");"Past"->t(hint, "बदले गए पर्चे");else->t(hint, "ली / छूटी")},fontSize=12.sp,color=if(on)DoctorCardReport else DoctorCardSub)}
             }
         }
     }

@@ -31,7 +31,29 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import java.text.DateFormat
 import java.util.Date
 
-private data class ReaderGoal(val id: String, val title: String, val body: String)
+private data class ReaderGoal(val id: String, val title: String, val body: String, val answer: String = body)
+
+/** B7: the transcript lines an answer in the note came from, so a reader can see what was said. Word matching only. */
+internal object NoteSourceLines {
+    private fun words(text: String) = Regex("[\\p{L}\\p{M}\\p{N}]{3,}").findAll(text.lowercase()).map { it.value }.toSet()
+    private fun plain(text: String) = text.lowercase().replace(Regex("^\\s*(?:\\d+[.)]\\s*)?(?:[\\p{L} ]{1,24}:\\s*)?"), "").replace(Regex("\\s+"), " ").trim()
+
+    fun find(answer: String, source: String, max: Int = 2): List<String> {
+        val wanted = words(answer); val exact = plain(answer)
+        if (wanted.size < 2 && exact.length < 12) return emptyList()
+        val lines = source.lines().map(String::trim).filter(String::isNotBlank)
+        val scored = lines.mapIndexedNotNull { i, line ->
+            val said = plain(line)
+            val score = when {
+                said.length >= 12 && (exact.contains(said) || said.contains(exact)) -> 2.0
+                wanted.isEmpty() -> 0.0
+                else -> (words(line) intersect wanted).size.toDouble() / wanted.size
+            }
+            if (score >= 0.6 && (words(line) intersect wanted).size >= 2 || score >= 2.0) Triple(i, line, score) else null
+        }
+        return scored.sortedByDescending { it.third }.take(max).sortedBy { it.first }.map { it.second }
+    }
+}
 
 private fun readerFallbackGoals(note: CareVersion): List<ReaderGoal> = listOf(note.priorities, note.participants, note.topics, note.questions, note.nextSteps).mapIndexedNotNull { i, raw ->
     val text = raw.trim(); if (text.isBlank()) return@mapIndexedNotNull null
@@ -45,18 +67,18 @@ private fun readerFallbackGoals(note: CareVersion): List<ReaderGoal> = listOf(no
     val context = LocalContext.current
     val goals = remember(vm, note.id, note.personId, note.conversationId, note.priorities, note.participants, note.topics, note.questions, note.nextSteps) {
         val stored = runCatching { DoctorPreparationStore(context, vm.storageNamespace).load(DoctorPreparationStore.scope(vm.accountNamespace, note.personId, note.conversationId)) }.getOrDefault(emptyList())
-        if (stored.isNotEmpty()) stored.map { ReaderGoal(it.id, it.text.trim(), it.answer.trim().ifBlank { t("Not answered in this conversation", "इस बातचीत में जवाब नहीं मिला") }) } else readerFallbackGoals(note)
+        if (stored.isNotEmpty()) stored.map { ReaderGoal(it.id, it.text.trim(), it.answer.trim().ifBlank { t("Not answered in this conversation", "इस बातचीत में जवाब नहीं मिला") }, it.answer.trim()) } else readerFallbackGoals(note)
     }
     // The audio card is looked up after the first frame; the body grows smoothly instead of pushing the transcript down in one jump.
     Column(Modifier.animateContentSize(), verticalArrangement = Arrangement.spacedBy(20.dp)) {
         NoteReaderAudio(vm, note)
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            ReaderHeading("Transcription")
+            ReaderHeading(t("Transcription", "बातचीत की लिखाई"))
             NoteReaderTranscript(note.source)
         }
         if (goals.isNotEmpty()) Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             ReaderHeading(t("Goals of care", "देखभाल के लक्ष्य"))
-            goals.forEach { NoteReaderGoalCard(it) }
+            goals.forEach { NoteReaderGoalCard(it, note.source) }
         }
     }
 }
@@ -77,17 +99,22 @@ private fun readerFallbackGoals(note: CareVersion): List<ReaderGoal> = listOf(no
     }
 }
 
-@Composable private fun NoteReaderGoalCard(goal: ReaderGoal) {
+@Composable private fun NoteReaderGoalCard(goal: ReaderGoal, source: String) { val t = careText()
     var open by rememberSaveable(goal.id) { mutableStateOf(false) }
+    val said = remember(goal.answer, source) { NoteSourceLines.find(goal.answer, source) }
     val expandable = goal.body.isNotBlank()
     Surface(color = DoctorCardReport, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("note-reader-goal-${goal.id}")) {
         Column(Modifier.then(if (expandable) Modifier.clickable { open = !open } else Modifier).padding(horizontal = 18.dp, vertical = 6.dp)) {
             Row(Modifier.fillMaxWidth().heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(goal.title, fontFamily = SaharaTitleFont, fontSize = 19.sp, lineHeight = 25.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.weight(1f).padding(vertical = 8.dp))
-                if (expandable) Icon(if (open) Icons.Default.ExpandLess else Icons.Default.ExpandMore, if (open) "Collapse" else "Expand", tint = DoctorCardSub)
+                if (expandable) Icon(if (open) Icons.Default.ExpandLess else Icons.Default.ExpandMore, if (open) t("Collapse", "बंद करें") else t("Expand", "खोलें"), tint = DoctorCardSub)
             }
             if (open && expandable) Surface(color = DoctorCardConversation, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp)) {
                 SelectionContainer { Text(goal.body, fontSize = 15.sp, lineHeight = 23.sp, color = DoctorCardInk, modifier = Modifier.padding(14.dp)) }
+            }
+            if (open && said.isNotEmpty()) Column(Modifier.fillMaxWidth().padding(bottom = 12.dp).testTag("note-reader-said-${goal.id}"), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(t("Said in the conversation (found by matching words)", "बातचीत में कहा गया (शब्द मिलाकर ढूँढा)"), fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardSub)
+                said.forEach { line -> SelectionContainer { Text("“$line”", fontSize = 15.sp, lineHeight = 23.sp, color = DoctorCardInk) } }
             }
         }
     }

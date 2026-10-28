@@ -94,6 +94,18 @@ internal class DoctorPreparationStore(private val read: (String) -> String?, pri
     }
 }
 
+/** Hindi for the preparation store's checks and load/save errors; the English stays in the code, which tests rely on. */
+internal val DoctorPreparationErrorsHindi = mapOf(
+    "Questions were not saved. Keep this editor open and try again." to "सवाल सहेजे नहीं गए। यह खुला रखें और फिर कोशिश करें।",
+    "Keep up to 20 questions." to "ज़्यादा से ज़्यादा 20 सवाल रखें।",
+    "Enter a question of 1–1000 characters." to "1–1000 अक्षरों का सवाल लिखें।",
+    "Choose a note section for each question." to "हर सवाल के लिए नोट का हिस्सा चुनें।",
+    "Keep each answer within 2000 characters." to "हर जवाब 2000 अक्षरों के अंदर रखें।",
+    "Questions could not be loaded. Retry before editing." to "सवाल नहीं खुले। बदलने से पहले फिर कोशिश करें।",
+    "The discussion or access changed. Reopen these questions." to "बातचीत या पहुँच बदल गई। ये सवाल फिर से खोलें।",
+    "Questions were not saved. Try again." to "सवाल सहेजे नहीं गए। फिर कोशिश करें।",
+)
+
 /** Shared loading and saving for both composables. Reads [canEdit] at save time so it never goes stale. */
 private class PrepModel(val store: DoctorPreparationStore, val scope: String, val initial: List<DoctorPreparationQuestion>, val canEdit: () -> Boolean, val changed: () -> (List<DoctorPreparationQuestion>) -> Unit) {
     var rows by mutableStateOf(emptyList<DoctorPreparationQuestion>())
@@ -114,19 +126,19 @@ private class PrepModel(val store: DoctorPreparationStore, val scope: String, va
     return m
 }
 
-@Composable private fun PrepCard(tag: String, title: String, intro: String, m: PrepModel, content: @Composable ColumnScope.() -> Unit) {
+@Composable private fun PrepCard(tag: String, title: String, intro: String, m: PrepModel, content: @Composable ColumnScope.() -> Unit) { val t = careText();
     Card(Modifier.fillMaxWidth().testTag(tag), shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = DoctorCardReport), border = BorderStroke(1.dp, DoctorHairline)) {
         Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Text(title, fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading())
             Text(intro, fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub)
-            m.error?.let { Text(it, fontSize = 13.sp, color = DoctorAccent, modifier = Modifier.testTag("$tag-error").announce()) }
-            if (!m.loaded) TextButton(onClick = { m.load() }, modifier = Modifier.heightIn(min = 48.dp).testTag("$tag-retry")) { Text("Retry questions", color = DoctorAccent) }
+            m.error?.let { Text(t(it, DoctorPreparationErrorsHindi[it] ?: it), fontSize = 13.sp, color = DoctorAccent, modifier = Modifier.testTag("$tag-error").announce()) }
+            if (!m.loaded) TextButton(onClick = { m.load() }, modifier = Modifier.heightIn(min = 48.dp).testTag("$tag-retry")) { Text(t("Retry questions", "सवाल फिर से लाएँ"), color = DoctorAccent) }
             content()
         }
     }
 }
 
-@Composable private fun SectionHeading(index: Int) = Text(NoteRules.labels[index], fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.testTag("doctor-preparation-section-$index").a11yHeading())
+@Composable private fun SectionHeading(index: Int) = Text(noteSectionLabel(NoteRules.labels[index], careHindi()), fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.testTag("doctor-preparation-section-$index").a11yHeading())
 
 /**
  * Editable numbered list of questions to cover; new questions default to "Still to discuss" for filing downstream. Saved on this device only; never part of a note or its hash.
@@ -135,7 +147,7 @@ private class PrepModel(val store: DoctorPreparationStore, val scope: String, va
 @Composable internal fun DoctorPreparationQuestions(
     store: DoctorPreparationStore, scope: String, editable: Boolean, canSave: () -> Boolean,
     onInteraction: (Boolean) -> Unit, initial: List<DoctorPreparationQuestion> = emptyList(), onChange: (List<DoctorPreparationQuestion>) -> Unit = {}, reload: Int = 0,
-) {
+) { val t = careText();
     val m = rememberPrepModel(store, scope, initial, editable, canSave, onChange, reload)
     // Unsaved edits survive this card scrolling out of the list and rotation.
     var drafts by rememberSaveable(scope) { mutableStateOf(emptyMap<String, String>()) }
@@ -143,37 +155,37 @@ private class PrepModel(val store: DoctorPreparationStore, val scope: String, va
     var confirmRemove by remember(store, scope) { mutableStateOf<String?>(null) }
     confirmRemove?.let { id ->
         AlertDialog(onDismissRequest = { confirmRemove = null },
-            title = { Text("Remove this question?") },
-            text = { Text("It is only your own preparation note. Removing it does not change any saved conversation or published note.") },
-            confirmButton = { TextButton(onClick = { if (m.persist(m.rows.filterNot { it.id == id })) drafts = drafts - id; confirmRemove = null }, modifier = Modifier.heightIn(min = 48.dp)) { Text("Remove question", color = DoctorAccent) } },
-            dismissButton = { TextButton(onClick = { confirmRemove = null }, modifier = Modifier.heightIn(min = 48.dp)) { Text("Keep it") } })
+            title = { Text(t("Remove this question?", "यह सवाल हटाएँ?")) },
+            text = { Text(t("It is only your own preparation note. Removing it does not change any saved conversation or published note.", "यह सिर्फ़ आपकी अपनी तैयारी का नोट है। इसे हटाने से कोई सहेजी बातचीत या प्रकाशित नोट नहीं बदलता।")) },
+            confirmButton = { TextButton(onClick = { if (m.persist(m.rows.filterNot { it.id == id })) drafts = drafts - id; confirmRemove = null }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Remove question", "सवाल हटाएँ"), color = DoctorAccent) } },
+            dismissButton = { TextButton(onClick = { confirmRemove = null }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Keep it", "रहने दें")) } })
     }
     val callback by rememberUpdatedState(onInteraction)
     val busy = drafts.isNotEmpty() || newText.isNotEmpty()
     DisposableEffect(busy) { callback(busy); onDispose { callback(false) } }
-    PrepCard("doctor-preparation-questions", "Goals of care discussion", "Your own questions to cover, saved on this device. Preparation only: not transcript evidence, not from the patient, and not part of a published note.", m) {
-        if (m.rows.isEmpty()) Text("No questions yet. Add as many as you need.", fontSize = 13.sp, color = DoctorCardSub, modifier = Modifier.testTag("doctor-preparation-empty"))
-        else Text("${m.rows.size} of $DOCTOR_PREPARATION_MAX_QUESTIONS questions", fontSize = 12.sp, color = DoctorCardFaint, modifier = Modifier.testTag("doctor-preparation-count"))
+    PrepCard("doctor-preparation-questions", t("Goals of care discussion", "देखभाल के लक्ष्यों पर बातचीत"), t("Your own questions to cover, saved on this device. Preparation only: not transcript evidence, not from the patient, and not part of a published note.", "आपके अपने सवाल, जिन पर बात करनी है, इसी फ़ोन पर सहेजे। सिर्फ़ तैयारी: न बातचीत का सबूत, न मरीज़ की ओर से, और न किसी प्रकाशित नोट का हिस्सा।"), m) {
+        if (m.rows.isEmpty()) Text(t("No questions yet. Add as many as you need.", "अभी कोई सवाल नहीं। जितने चाहें जोड़ें।"), fontSize = 13.sp, color = DoctorCardSub, modifier = Modifier.testTag("doctor-preparation-empty"))
+        else Text(t("${m.rows.size} of $DOCTOR_PREPARATION_MAX_QUESTIONS questions", "$DOCTOR_PREPARATION_MAX_QUESTIONS में से ${m.rows.size} सवाल"), fontSize = 12.sp, color = DoctorCardFaint, modifier = Modifier.testTag("doctor-preparation-count"))
         m.rows.forEachIndexed { index, row ->
             val shown = drafts[row.id] ?: row.text
             Card(Modifier.fillMaxWidth().testTag("doctor-preparation-row-${row.id}"), shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = DoctorCardConversation)) {
                 Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text("Question ${index + 1}", fontSize = 12.sp, color = DoctorCardFaint, modifier = Modifier.testTag("doctor-preparation-number-${row.id}"))
+                    Text(t("Question ${index + 1}", "सवाल ${index + 1}"), fontSize = 12.sp, color = DoctorCardFaint, modifier = Modifier.testTag("doctor-preparation-number-${row.id}"))
                     if (editable) {
-                        OutlinedTextField(shown, { drafts = drafts + (row.id to it.take(DOCTOR_PREPARATION_MAX_QUESTION_CHARS)) }, label = { Text("Question") }, minLines = 2, enabled = m.loaded, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-preparation-question-input-${row.id}"))
+                        OutlinedTextField(shown, { drafts = drafts + (row.id to it.take(DOCTOR_PREPARATION_MAX_QUESTION_CHARS)) }, label = { Text(t("Question", "सवाल")) }, minLines = 2, enabled = m.loaded, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-preparation-question-input-${row.id}"))
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text("${shown.length}/$DOCTOR_PREPARATION_MAX_QUESTION_CHARS", fontSize = 12.sp, color = DoctorCardFaint, modifier = Modifier.weight(1f))
-                            if (drafts.containsKey(row.id)) TextButton(onClick = { if (m.persist(m.rows.map { if (it.id == row.id) it.copy(text = shown.trim()) else it })) drafts = drafts - row.id }, enabled = m.loaded && shown.isNotBlank(), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-preparation-save-${row.id}")) { Text("Save question", color = DoctorAccent) }
-                            TextButton(onClick = { confirmRemove = row.id }, enabled = m.loaded, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-preparation-remove-${row.id}")) { Text("Remove", color = DoctorAccent) }
+                            if (drafts.containsKey(row.id)) TextButton(onClick = { if (m.persist(m.rows.map { if (it.id == row.id) it.copy(text = shown.trim()) else it })) drafts = drafts - row.id }, enabled = m.loaded && shown.isNotBlank(), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-preparation-save-${row.id}")) { Text(t("Save question", "सवाल सहेजें"), color = DoctorAccent) }
+                            TextButton(onClick = { confirmRemove = row.id }, enabled = m.loaded, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-preparation-remove-${row.id}")) { Text(t("Remove", "हटाएँ"), color = DoctorAccent) }
                         }
                     } else Text(row.text, fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk)
                 }
             }
         }
         if (editable) {
-            Text("Add question", fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
-            OutlinedTextField(newText, { newText = it.take(DOCTOR_PREPARATION_MAX_QUESTION_CHARS) }, label = { Text("New question") }, minLines = 2, enabled = m.loaded, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-preparation-question-input"))
-            TextButton(onClick = { if (m.persist(m.rows + DoctorPreparationQuestion(newId(), newText.trim(), DOCTOR_PREPARATION_DEFAULT_SECTION))) newText = "" }, enabled = m.loaded && m.rows.size < DOCTOR_PREPARATION_MAX_QUESTIONS && newText.isNotBlank(), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-add-preparation-question")) { Text("+ Add question", color = DoctorAccent) }
+            Text(t("Add question", "सवाल जोड़ें"), fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
+            OutlinedTextField(newText, { newText = it.take(DOCTOR_PREPARATION_MAX_QUESTION_CHARS) }, label = { Text(t("New question", "नया सवाल")) }, minLines = 2, enabled = m.loaded, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-preparation-question-input"))
+            TextButton(onClick = { if (m.persist(m.rows + DoctorPreparationQuestion(newId(), newText.trim(), DOCTOR_PREPARATION_DEFAULT_SECTION))) newText = "" }, enabled = m.loaded && m.rows.size < DOCTOR_PREPARATION_MAX_QUESTIONS && newText.isNotBlank(), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-add-preparation-question")) { Text(t("+ Add question", "+ सवाल जोड़ें"), color = DoctorAccent) }
         }
     }
 }
@@ -184,12 +196,12 @@ private class PrepModel(val store: DoctorPreparationStore, val scope: String, va
  */
 @Composable internal fun DoctorPreparationAnswers(
     store: DoctorPreparationStore, scope: String, editable: Boolean, canSave: () -> Boolean, onChange: (List<DoctorPreparationQuestion>) -> Unit = {}, reload: Int = 0,
-) {
+) { val t = careText();
     val m = rememberPrepModel(store, scope, emptyList(), editable, canSave, onChange, reload)
     var drafts by rememberSaveable(scope) { mutableStateOf(emptyMap<String, String>()) }
     val unanswered = doctorUnansweredQuestions(m.rows).size
-    PrepCard("doctor-preparation-answers", "Answers to your questions", "Typed answers are your own notes, kept on this device and outside any published note. Unanswered questions are listed so you can fill them in.", m) {
-        Text(if (m.rows.isEmpty()) "No questions were prepared." else if (unanswered == 0) "Every question has an answer." else "$unanswered of ${m.rows.size} still need an answer.", fontSize = 12.sp, color = if (m.rows.isNotEmpty() && unanswered == 0) DoctorStatusGood else DoctorCardFaint, modifier = Modifier.testTag("doctor-preparation-answers-status"))
+    PrepCard("doctor-preparation-answers", t("Answers to your questions", "आपके सवालों के जवाब"), t("Typed answers are your own notes, kept on this device and outside any published note. Unanswered questions are listed so you can fill them in.", "लिखे गए जवाब आपके अपने नोट हैं, इसी फ़ोन पर रहते हैं और किसी प्रकाशित नोट में नहीं जाते। बिना जवाब वाले सवाल यहाँ दिखते हैं ताकि आप उन्हें भर सकें।"), m) {
+        Text(if (m.rows.isEmpty()) t("No questions were prepared.", "कोई सवाल तैयार नहीं किया गया।") else if (unanswered == 0) t("Every question has an answer.", "हर सवाल का जवाब है।") else t("$unanswered of ${m.rows.size} still need an answer.", "${m.rows.size} में से $unanswered का जवाब अभी बाक़ी है।"), fontSize = 12.sp, color = if (m.rows.isNotEmpty() && unanswered == 0) DoctorStatusGood else DoctorCardFaint, modifier = Modifier.testTag("doctor-preparation-answers-status"))
         NoteRules.labels.indices.forEach { s ->
             val group = m.rows.filter { it.section == s }
             if (group.isNotEmpty()) {
@@ -200,15 +212,15 @@ private class PrepModel(val store: DoctorPreparationStore, val scope: String, va
                             Text(row.text, fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk)
                             if (row.answer.isNotBlank()) {
                                 Text(row.answer, fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk, modifier = Modifier.testTag("doctor-preparation-answer-${row.id}"))
-                                Text("Answered", fontSize = 12.sp, color = DoctorStatusGood, modifier = Modifier.testTag("doctor-preparation-answered-${row.id}"))
+                                Text(t("Answered", "जवाब मिला"), fontSize = 12.sp, color = DoctorStatusGood, modifier = Modifier.testTag("doctor-preparation-answered-${row.id}"))
                             } else {
                                 val shown = drafts[row.id].orEmpty()
-                                Text("Unanswered", fontSize = 12.sp, color = DoctorStatusWarn, modifier = Modifier.testTag("doctor-preparation-unanswered-${row.id}"))
+                                Text(t("Unanswered", "जवाब बाक़ी"), fontSize = 12.sp, color = DoctorStatusWarn, modifier = Modifier.testTag("doctor-preparation-unanswered-${row.id}"))
                                 if (editable) {
-                                    OutlinedTextField(shown, { drafts = drafts + (row.id to it.take(DOCTOR_PREPARATION_MAX_ANSWER_CHARS)) }, label = { Text("Your answer") }, minLines = 2, enabled = m.loaded, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-preparation-answer-input-${row.id}"))
+                                    OutlinedTextField(shown, { drafts = drafts + (row.id to it.take(DOCTOR_PREPARATION_MAX_ANSWER_CHARS)) }, label = { Text(t("Your answer", "आपका जवाब")) }, minLines = 2, enabled = m.loaded, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-preparation-answer-input-${row.id}"))
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         Text("${shown.length}/$DOCTOR_PREPARATION_MAX_ANSWER_CHARS", fontSize = 12.sp, color = DoctorCardFaint, modifier = Modifier.weight(1f))
-                                        TextButton(onClick = { if (m.persist(m.rows.map { if (it.id == row.id) it.copy(answer = shown.trim()) else it })) drafts = drafts - row.id }, enabled = m.loaded && shown.isNotBlank(), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-preparation-answer-save-${row.id}")) { Text("Save answer", color = DoctorAccent) }
+                                        TextButton(onClick = { if (m.persist(m.rows.map { if (it.id == row.id) it.copy(answer = shown.trim()) else it })) drafts = drafts - row.id }, enabled = m.loaded && shown.isNotBlank(), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-preparation-answer-save-${row.id}")) { Text(t("Save answer", "जवाब सहेजें"), color = DoctorAccent) }
                                     }
                                 }
                             }

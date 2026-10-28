@@ -45,7 +45,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
-@Composable fun CareSymptomDiary(vm: CareModel, onBack: () -> Unit) {
+@Composable fun CareSymptomDiary(vm: CareModel, onBack: () -> Unit, startAdding: Boolean = false, onStartAddingHandled: () -> Unit = {}) {
     val entries by vm.items.collectAsStateWithLifecycle()
     val selected by vm.selected.collectAsStateWithLifecycle()
     val people by vm.people.collectAsStateWithLifecycle()
@@ -55,6 +55,8 @@ import java.time.format.DateTimeFormatter
     val language = LocalCareLanguage.current ?: rememberCareLanguage(vm.accountNamespace)
     val hindi = language.hindi
     var adding by rememberSaveable(selected) { mutableStateOf(false) }
+    // "Note a symptom" on Today opens the form once; coming back to this screen later does not reopen it.
+    LaunchedEffect(startAdding) { if (startAdding) { if (canEdit) adding = true; onStartAddingHandled() } }
     var showingPainHistory by rememberSaveable(selected) { mutableStateOf(false) }
     val person = people.firstOrNull { it.id == selected }
     // Decode each note once for sorting; a decode inside the comparator ran on every comparison.
@@ -223,8 +225,10 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
     var observedDate by rememberSaveable(id) { mutableStateOf(seed?.observedDate ?: LocalDate.now().toString()) }
     var observedTime by rememberSaveable(id) { mutableStateOf(seed?.observedTime ?: LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"))) }
     var recall by rememberSaveable(id) { mutableStateOf(seed?.recall ?: "now") }
-    var respondent by rememberSaveable(id) { mutableStateOf(seed?.respondent.orEmpty()) }
-    var author by rememberSaveable(id) { mutableStateOf(seed?.author.orEmpty()) }
+    // A brand-new note starts with who answered last time for this person (shown on the "About this note" step, changeable).
+    val lastWho = remember(id) { if (initial == null && prior == null) CareDailyFlow.lastReporter(entries, capturedPerson) else null }
+    var respondent by rememberSaveable(id) { mutableStateOf(seed?.respondent ?: lastWho?.first.orEmpty()) }
+    var author by rememberSaveable(id) { mutableStateOf(seed?.author ?: lastWho?.second.orEmpty()) }
     var startedOn by rememberSaveable(id) { mutableStateOf(seed?.startedOn.orEmpty()) }
     var note by rememberSaveable(id) { mutableStateOf(original?.note.orEmpty()) }
     var location by rememberSaveable(id) { mutableStateOf(seed?.painLocation.orEmpty()) }
@@ -371,18 +375,21 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
               }
             }
             Column(Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 20.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                val saveNow: () -> Unit = {
+                    val saved = value.copy(selfReportedChange = change.takeIf { comparison != null }.orEmpty(), comparedWithId = if (change.isNotBlank()) comparison?.previous?.id.orEmpty() else "")
+                    localError = if (ratingNow == -2) t("Choose a rating or Not rated.", "अंक चुनें या अंक नहीं बताया चुनें।") else SymptomDiaryRules.error(saved)?.let { e -> t(e, SymptomErrorsHindi[e] ?: e) }.orEmpty()
+                    if (localError.isBlank()) onSave(id, saved)
+                }
                 (localError.takeIf { it.isNotBlank() } ?: actionError)?.let { Text(if (hindi && it == SymptomDiaryRules.SAVE_CONFLICT) "यह नोट बदल गया है या हटा दिया गया है। आपके जवाब यहीं हैं। सहेजने से पहले यह फ़ॉर्म बंद करके मौजूदा नोट फिर खोलें।" else if (hindi) "नोट सहेजा नहीं गया। जवाब यहीं हैं। तारीख, नाम और चुने हुए जवाब जाँचें।" else it, color = MaterialTheme.colorScheme.error, fontSize = 15.sp, fontWeight = FontWeight.SemiBold) }
                 if (!quick && !stepValid && cur == "how") Text(if (ratingMissing) t("Choose a rating or Not rated.", "अंक चुनें या अंक नहीं बताया चुनें।") else t("Answer the questions above to continue.", "आगे बढ़ने के लिए ऊपर के सवाल भरें।"), color = DoctorCardSub, fontSize = 14.sp)
-                if (sharedOnline && (quick || pos == steps.lastIndex)) Text(t(CarePrivacy.SYMPTOM_NOTICE_EN, CarePrivacy.SYMPTOM_NOTICE_HI), color = DoctorCardSub, fontSize = 13.sp, modifier = Modifier.testTag("symptom-privacy-notice"))
+                if (sharedOnline && (quick || pos == steps.lastIndex || (cur == "how" && stepValid))) Text(t(CarePrivacy.SYMPTOM_NOTICE_EN, CarePrivacy.SYMPTOM_NOTICE_HI), color = DoctorCardSub, fontSize = 13.sp, modifier = Modifier.testTag("symptom-privacy-notice"))
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
                     OutlinedButton(onClick = goBack, shape = RoundedCornerShape(16.dp), contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp), modifier = Modifier.weight(1f).heightIn(min = 56.dp).testTag("symptom-step-back")) { Text(if (quick || pos <= 0) t("Cancel", "रद्द करें") else t("Back", "पीछे"), color = DoctorCardSub, fontSize = 16.sp) }
-                    if (quick || pos == steps.lastIndex) Button(onClick = {
-                        val saved = value.copy(selfReportedChange = change.takeIf { comparison != null }.orEmpty(), comparedWithId = if (change.isNotBlank()) comparison?.previous?.id.orEmpty() else "")
-                        localError = if (ratingNow == -2) t("Choose a rating or Not rated.", "अंक चुनें या अंक नहीं बताया चुनें।") else SymptomDiaryRules.error(saved)?.let { e -> t(e, SymptomErrorsHindi[e] ?: e) }.orEmpty()
-                        if (localError.isBlank()) onSave(id, saved)
-                    }, enabled = !busy && canEdit && personId == capturedPerson, shape = RoundedCornerShape(16.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent, contentColor = Color.White), modifier = Modifier.weight(if (largeText) 1f else 2f).heightIn(min = 56.dp).testTag("symptom-save")) { Text(if (busy) t("Saving…", "सहेज रहे हैं…") else t("Save note", "नोट सहेजें"), fontSize = 17.sp, fontWeight = FontWeight.SemiBold) }
+                    if (quick || pos == steps.lastIndex) Button(onClick = saveNow, enabled = !busy && canEdit && personId == capturedPerson, shape = RoundedCornerShape(16.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent, contentColor = Color.White), modifier = Modifier.weight(if (largeText) 1f else 2f).heightIn(min = 56.dp).testTag("symptom-save")) { Text(if (busy) t("Saving…", "सहेज रहे हैं…") else t("Save note", "नोट सहेजें"), fontSize = 17.sp, fontWeight = FontWeight.SemiBold) }
                     else Button(onClick = { stepKey = steps[pos + 1] }, enabled = stepValid, shape = RoundedCornerShape(16.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent, contentColor = Color.White), modifier = Modifier.weight(if (largeText) 1f else 2f).heightIn(min = 56.dp).testTag("symptom-step-next")) { Text(t("Next", "आगे"), fontSize = 17.sp, fontWeight = FontWeight.SemiBold) }
                 }
+                // The rest of the form is optional: once this step is answered, the note can be saved without opening "Anything else?".
+                if (!quick && cur == "how" && stepValid && pos < steps.lastIndex) OutlinedButton(onClick = saveNow, enabled = !busy && canEdit && personId == capturedPerson, shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("symptom-save-now")) { Text(if (busy) t("Saving…", "सहेज रहे हैं…") else t("Save now · extra details are optional", "अभी सहेजें · बाक़ी जानकारी वैकल्पिक है"), color = DoctorAccent, fontSize = 16.sp, fontWeight = FontWeight.SemiBold) }
             }
         }
     }

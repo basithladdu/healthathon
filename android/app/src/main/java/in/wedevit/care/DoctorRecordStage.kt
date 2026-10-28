@@ -40,7 +40,11 @@ internal val DoctorStageTerracotta = Color(0xFFC9785A)
 internal val DoctorStageDeep = Color(0xFF7A3B24)
 internal val DoctorStageCream = Color(0xFFFFF8EE)
 
-fun doctorStageStatus(recording: Boolean, saving: Boolean, seconds: Long): String = if (recording) "Recording ${seconds / 60}:${(seconds % 60).toString().padStart(2, '0')}" else if (saving) "Saving…" else "Ready to record"
+fun doctorStageStatus(recording: Boolean, saving: Boolean, seconds: Long, hindi: Boolean = false): String { val clock = "${seconds / 60}:${(seconds % 60).toString().padStart(2, '0')}"
+    return if (recording) (if (hindi) "रिकॉर्ड हो रहा है $clock" else "Recording $clock") else if (saving) (if (hindi) "सहेज रहे हैं…" else "Saving…") else if (hindi) "रिकॉर्ड के लिए तैयार" else "Ready to record" }
+
+/** Record / Dictate / Type are saved mode keys; only the label is shown in Hindi. */
+internal fun doctorCaptureModeLabel(mode: String, hindi: Boolean): String = if (!hindi) mode else when (mode) { "Record" -> "रिकॉर्ड"; "Dictate" -> "बोलकर लिखें"; "Type" -> "टाइप करें"; else -> mode }
 
 /** Horizontal waveform of white rounded bars with a dot at each end. Moves with the microphone [level] while [active]; low and still otherwise. */
 @Composable fun DoctorWaveform(level: Float, active: Boolean, modifier: Modifier = Modifier) {
@@ -62,7 +66,7 @@ fun doctorStageStatus(recording: Boolean, saving: Boolean, seconds: Long): Strin
  * The caller owns recording, consent and playback; [sheet] is the expanded page body.
  */
 @Composable fun DoctorRecordStage(mode: String, onMode: (String) -> Unit, recording: Boolean, saving: Boolean, saveError: Boolean, onRetry: () -> Unit, level: Float, seconds: Long, recordEnabled: Boolean, onRecord: () -> Unit, onStop: () -> Unit,
-    onBack: (() -> Unit)?, backEnabled: Boolean, demo: Boolean, localRecordingAllowed: Boolean, testRecord: Boolean, menuEnabled: Boolean, onStartNew: (() -> Unit)?, onBackToWho: () -> Unit, backToWhoEnabled: Boolean, audioCount: Int, checklist: @Composable () -> Unit = {}, sheet: @Composable () -> Unit) {
+    onBack: (() -> Unit)?, backEnabled: Boolean, demo: Boolean, localRecordingAllowed: Boolean, testRecord: Boolean, menuEnabled: Boolean, onStartNew: (() -> Unit)?, onBackToWho: () -> Unit, backToWhoEnabled: Boolean, audioCount: Int, checklist: @Composable () -> Unit = {}, sheet: @Composable () -> Unit) { val t = careText();
     var menu by remember { mutableStateOf(false) }
     val white = Color.White
     BoxWithConstraints(Modifier.fillMaxSize().background(DoctorStageTerracotta).testTag("record-stage")) {
@@ -75,29 +79,29 @@ fun doctorStageStatus(recording: Boolean, saving: Boolean, seconds: Long): Strin
         BackHandler(expanded) { scope.launch { frac.animateTo(0f) } }
         Column(Modifier.fillMaxSize().padding(start = 20.dp, end = 8.dp, top = 8.dp, bottom = peek), horizontalAlignment = Alignment.CenterHorizontally) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                if (onBack != null) TextButton(onClick = onBack, enabled = backEnabled, colors = ButtonDefaults.textButtonColors(contentColor = white, disabledContentColor = white.copy(alpha = .5f)), contentPadding = PaddingValues(0.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-capture-back")) { Text("Back to conversations", fontSize = 14.sp) }
+                if (onBack != null) TextButton(onClick = onBack, enabled = backEnabled, colors = ButtonDefaults.textButtonColors(contentColor = white, disabledContentColor = white.copy(alpha = .5f)), contentPadding = PaddingValues(0.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-capture-back")) { Text(t("Back to conversations", "बातचीत की सूची पर वापस"), fontSize = 14.sp) }
                 Spacer(Modifier.weight(1f))
-                Box { IconButton(onClick = { menu = true }, enabled = menuEnabled, modifier = Modifier.size(48.dp).testTag("doctor-capture-mode")) { Icon(Icons.Default.MoreVert, "Choose Record, Dictate or Type, start new, or go back to who is here", tint = white.copy(alpha = if (menuEnabled) 1f else .5f)) }
+                Box { IconButton(onClick = { menu = true }, enabled = menuEnabled, modifier = Modifier.size(48.dp).testTag("doctor-capture-mode")) { Icon(Icons.Default.MoreVert, t("Choose Record, Dictate or Type, start new, or go back to who is here", "रिकॉर्ड, बोलकर लिखें या टाइप चुनें, नया शुरू करें, या कौन मौजूद है पर लौटें"), tint = white.copy(alpha = if (menuEnabled) 1f else .5f)) }
                     DropdownMenu(menu, { menu = false }) {
-                        listOf("Record", "Dictate", "Type").forEach { value -> val available = when (value) { "Record" -> localRecordingAllowed; "Dictate" -> !demo; else -> true }; DropdownMenuItem(text = { Text(value + if (!available) " · unavailable" else if (value == mode) " · current" else "") }, enabled = available, onClick = { onMode(value); menu = false }) }
+                        listOf("Record", "Dictate", "Type").forEach { value -> val available = when (value) { "Record" -> localRecordingAllowed; "Dictate" -> !demo; else -> true }; DropdownMenuItem(text = { Text(doctorCaptureModeLabel(value, careHindi()) + if (!available) t(" · unavailable", " · उपलब्ध नहीं") else if (value == mode) t(" · current", " · अभी यही") else "") }, enabled = available, onClick = { onMode(value); menu = false }) }
                         HorizontalDivider()
-                        if (onStartNew != null) DropdownMenuItem(text = { Text("Start new · archive this draft") }, enabled = menuEnabled, onClick = { menu = false; onStartNew() }, modifier = Modifier.testTag("record-stage-start-new"))
-                        DropdownMenuItem(text = { Text("Back to who is here") }, enabled = backToWhoEnabled, onClick = { menu = false; onBackToWho() }, modifier = Modifier.testTag("record-stage-who"))
+                        if (onStartNew != null) DropdownMenuItem(text = { Text(t("Start new · archive this draft", "नया शुरू करें · यह ड्राफ़्ट संग्रह में रखें")) }, enabled = menuEnabled, onClick = { menu = false; onStartNew() }, modifier = Modifier.testTag("record-stage-start-new"))
+                        DropdownMenuItem(text = { Text(t("Back to who is here", "कौन मौजूद है पर वापस")) }, enabled = backToWhoEnabled, onClick = { menu = false; onBackToWho() }, modifier = Modifier.testTag("record-stage-who"))
                     } }
             }
             Column(Modifier.fillMaxWidth().padding(end = 12.dp)) {
-                Text("Conversation", fontFamily = SaharaTitleFont, fontSize = 36.sp, lineHeight = 42.sp, fontWeight = FontWeight.Medium, color = white)
-                Text(doctorStageStatus(recording, saving, seconds), fontSize = 16.sp, lineHeight = 22.sp, color = white, modifier = Modifier.testTag("record-stage-status"))
-                Text("Audio stays on this device and is not included when a written note is shared. It is not automatically transcribed.", fontSize = 12.sp, lineHeight = 16.sp, color = white, modifier = Modifier.padding(top = 4.dp).testTag("record-stage-privacy"))
+                Text(t("Conversation", "बातचीत"), fontFamily = SaharaTitleFont, fontSize = 36.sp, lineHeight = 42.sp, fontWeight = FontWeight.Medium, color = white)
+                Text(doctorStageStatus(recording, saving, seconds, careHindi()), fontSize = 16.sp, lineHeight = 22.sp, color = white, modifier = Modifier.testTag("record-stage-status"))
+                Text(t("Audio stays on this device and is not included when a written note is shared. It is not automatically transcribed.", "ऑडियो इसी फ़ोन पर रहता है और लिखा नोट साझा करने पर साथ नहीं जाता। यह अपने-आप लिखाई में नहीं बदलता।"), fontSize = 12.sp, lineHeight = 16.sp, color = white, modifier = Modifier.padding(top = 4.dp).testTag("record-stage-privacy"))
             }
             // The goals-of-care checklist sits between the title and the waveform and scrolls if it is long.
             Column(Modifier.weight(1f).fillMaxWidth().padding(top = 12.dp, end = 12.dp).verticalScroll(rememberScrollState())) { checklist() }
             DoctorWaveform(level, recording, Modifier.padding(end = 12.dp))
             Spacer(Modifier.height(28.dp))
-            Surface(onClick = { if (recording) onStop() else onRecord() }, enabled = recordEnabled, shape = CircleShape, color = DoctorStageCream, contentColor = DoctorStageDeep, modifier = Modifier.size(88.dp).testTag("record-stage-button")) { Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Icon(if (recording) Icons.Default.Stop else Icons.Default.Mic, if (recording) "Stop and save" else "Record conversation", Modifier.size(40.dp), tint = DoctorStageDeep.copy(alpha = if (recordEnabled) 1f else .4f)) } }
+            Surface(onClick = { if (recording) onStop() else onRecord() }, enabled = recordEnabled, shape = CircleShape, color = DoctorStageCream, contentColor = DoctorStageDeep, modifier = Modifier.size(88.dp).testTag("record-stage-button")) { Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Icon(if (recording) Icons.Default.Stop else Icons.Default.Mic, if (recording) t("Stop and save", "रोकें और सहेजें") else t("Record conversation", "बातचीत रिकॉर्ड करें"), Modifier.size(40.dp), tint = DoctorStageDeep.copy(alpha = if (recordEnabled) 1f else .4f)) } }
             if (saving || saveError) Column(Modifier.padding(top = 12.dp, end = 12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(if (saving) "Saving local audio and its consent record…" else "The audio file was retained, but its recording details could not be saved. Retry before continuing.", fontSize = 13.sp, lineHeight = 18.sp, color = white, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
-                if (saveError) OutlinedButton(onClick = onRetry, enabled = !saving, colors = ButtonDefaults.outlinedButtonColors(contentColor = white), modifier = Modifier.heightIn(min = 48.dp).testTag("retry-saving-audio")) { Text("Retry saving audio") }
+                Text(if (saving) t("Saving local audio and its consent record…", "फ़ोन पर ऑडियो और उसकी सहमति सहेज रहे हैं…") else t("The audio file was retained, but its recording details could not be saved. Retry before continuing.", "ऑडियो फ़ाइल रखी गई, पर रिकॉर्डिंग की जानकारी सहेजी नहीं जा सकी। आगे बढ़ने से पहले फिर कोशिश करें।"), fontSize = 13.sp, lineHeight = 18.sp, color = white, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+                if (saveError) OutlinedButton(onClick = onRetry, enabled = !saving, colors = ButtonDefaults.outlinedButtonColors(contentColor = white), modifier = Modifier.heightIn(min = 48.dp).testTag("retry-saving-audio")) { Text(t("Retry saving audio", "ऑडियो फिर से सहेजें")) }
             }
             Spacer(Modifier.weight(1f))
         }
@@ -106,9 +110,9 @@ fun doctorStageStatus(recording: Boolean, saving: Boolean, seconds: Long): Strin
             Column(Modifier.fillMaxSize()) {
                 Column(Modifier.fillMaxWidth().height(peek)
                     .draggable(rememberDraggableState { d -> scope.launch { frac.snapTo((frac.value - d / rangePx).coerceIn(0f, 1f)) } }, Orientation.Vertical, onDragStopped = { v -> scope.launch { frac.animateTo(if (abs(v) > 900f) (if (v < 0) 1f else 0f) else if (frac.value > 0.5f) 1f else 0f) } })
-                    .clickable(role = Role.Button, onClickLabel = if (expanded) "Collapse saved audio" else "Expand saved audio") { scope.launch { frac.animateTo(if (expanded) 0f else 1f) } }.testTag("saved-audio-peek"), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+                    .clickable(role = Role.Button, onClickLabel = if (expanded) t("Collapse saved audio", "सहेजा ऑडियो बंद करें") else t("Expand saved audio", "सहेजा ऑडियो खोलें")) { scope.launch { frac.animateTo(if (expanded) 0f else 1f) } }.testTag("saved-audio-peek"), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
                     Box(Modifier.width(40.dp).height(5.dp).background(DoctorStageTerracotta, RoundedCornerShape(3.dp)))
-                    Text(if (audioCount > 0) "Saved Audio · $audioCount" else "Saved Audio", fontFamily = SaharaTitleFont, fontSize = 22.sp, lineHeight = 28.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.padding(top = 8.dp).testTag("saved_audio_title"))
+                    Text(if (audioCount > 0) t("Saved Audio · $audioCount", "सहेजा ऑडियो · $audioCount") else t("Saved Audio", "सहेजा ऑडियो"), fontFamily = SaharaTitleFont, fontSize = 22.sp, lineHeight = 28.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.padding(top = 8.dp).testTag("saved_audio_title"))
                 }
                 if (frac.value > 0.02f) sheet()
             }
