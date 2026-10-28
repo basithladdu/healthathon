@@ -275,3 +275,6 @@ Collected on 27 Oct from every agent lane across Sahara, ITI, WDCW and AI-FIR. E
 - [ ] Grievance officer (Indian IT Rules): pick a name + email + phone; put it in android/store/contact-details.md and the privacy policy. Not published anywhere yet.
 - [ ] Privacy policy [OWNER] blanks: effective date, hosting providers, log retention, SMS provider, response time, target age, public repo URL.
 - [ ] Confirm support email workwithdevit@gmail.com and phone +91 95533 21211 go public on Play listing.
+- [ ] Missed check-in texts (built, opt-in per trip): set `ALERTS_BASE_URL` + `ALERTS_SERVICE_TOKEN` on the trip server and the same `ALERTS_SERVICE_TOKEN` + `MSG91_CHECKIN_TEMPLATE_ID` on the SOS service; then one test with your own number. Until then the app says "nobody is alerted automatically".
+- [ ] Decide: may the devit. logo (company trademark) be in the public open-source repo? It is not covered by the code licence.
+- [ ] Phone check for disguise: long-press the Calculator icon on Pixel/Samsung/Xiaomi (no SOS shortcuts should show); widget and tile words after switching.
