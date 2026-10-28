@@ -20,7 +20,8 @@ import kotlin.math.roundToInt
 
 /** Bundled OCR: neither file bytes nor recognised text are sent to a server. */
 class CareDocumentReader(private val context: Context) {
-    suspend fun read(file: File, report: CareReport, progress: (Int, Int) -> Unit = { _, _ -> }): ReviewedDocumentText = withContext(Dispatchers.IO) {
+    /** [maxPages] below 12 is for sorting only; a shorter reading is never saved as the document's text. */
+    suspend fun read(file: File, report: CareReport, maxPages: Int = 12, progress: (Int, Int) -> Unit = { _, _ -> }): ReviewedDocumentText = withContext(Dispatchers.IO) {
         require(file.isFile && file.length() in 1..ReportFiles.MAX_BYTES) { "The original report is missing or too large. Add it again from Files." }
         val hash = file.inputStream().use { input ->
             val digest = java.security.MessageDigest.getInstance("SHA-256")
@@ -39,7 +40,7 @@ class CareDocumentReader(private val context: Context) {
                     PdfRenderer(descriptor).use { pdf ->
                         pageCount = pdf.pageCount
                         require(pageCount > 0) { "This PDF has no pages." }
-                        val count = minOf(12, pageCount)
+                        val count = minOf(maxPages.coerceIn(1, 12), pageCount)
                         progress(0, count)
                         for (index in 0 until count) {
                             coroutineContext.ensureActive()

@@ -17,6 +17,7 @@ class CareHindiCoverageTest {
         "CentreMap.kt" to listOf("CentreMap"),
         "CareDocuments.kt" to listOf("CareDocuments"),
         "CareDocumentReviewUi.kt" to listOf("CareDocumentReview"),
+        "CareDocumentAskUi.kt" to listOf("CareDocumentAsk"),
         "MedicineScanner.kt" to listOf("MedicineScanner", "ScannerHeader", "PhotoSelectionCard", "MedicineReviewCard"),
         "CareLabs.kt" to listOf("CareLabs", "LabHistoryCard", "LabHistoryPlot", "LabResultRow", "CareLabEditor"),
         "CareReminderUi.kt" to listOf("CareReminderSettings", "ReminderItemSettings"),
