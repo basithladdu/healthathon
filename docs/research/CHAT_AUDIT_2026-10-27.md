@@ -1,5 +1,7 @@
 # Team chat and meeting audit (27 Oct 2026)
 
+**Later 27 October excerpt update:** the user subsequently supplied [19 messages and two survey screenshots](../../source-materials/team-context/2026-10-27/manifest.json). D16, D17 and I3 below now include that evidence. The other rows and counts remain the original `936eab2` audit snapshot, not a fresh verification of every feature. [everyday.md](../../everyday.md) records the additional tool-review, meeting, mock-conversation and support-group actions. Shirin's approval is explicit; SVK's dummy fill is not a saved receipt or an explicit distribution approval.
+
 The owner asked: "we have saved WhatsApp transcripts right — did we do everything?" This file answers that. It lists every ask, decision, bug report, feature idea and promise in the saved team chats and meetings, and checks each against `main` as of commit `936eab2` (27 Oct).
 
 **Sources read in full:**
@@ -114,8 +116,8 @@ Most DONE items are decisions and Round 1 deck edits. The biggest gaps are the e
 | D13 | 26 Sep, 10 Oct | Sujay, Basith | Short hospital survey (about 4 questions) on our website for palliative care and morphine | DONE | https://sahara.wedevit.in/hospital-survery (web only, by decision; `TEAM_HANDOFF.md`) |
 | D14 | 23 Oct | Sujay | Survey fixes: palliative wording, "hospitals you work with", no mobile field, name **and** address, state-aware search, map pin required, field for palliative doctors in other departments | DONE | Deployed 23 Oct (`TEAM_HANDOFF.md` "23 October follow-up") |
 | D15 | 23 Oct | Sujay | Check that his test entry shows correctly | DONE | Stored, pending review (`TEAM_HANDOFF.md`) |
-| D16 | 10 Oct, 23 Oct | Sujay, SVK | Send the survey to oncology and palliative groups once fixed | OWNER-ONLY | Not recorded as sent |
-| D17 | 23 Oct | Sujay → SVK, Shirin | Try the survey and give feedback | OWNER-ONLY | No reply in the saved chat |
+| D16 | 10 Oct, 23 Oct, 27 Oct | Sujay, SVK | Send the survey to oncology and palliative groups once fixed | OWNER-ONLY | 27 Oct: Sujay says it can be sent if SVK and Shirin are happy. Distribution is still not recorded as sent; do not infer send authorization from this quoted exchange. |
+| D17 | 23 Oct, 27 Oct | Sujay → SVK, Shirin | Try the survey and give feedback | OWNER-ONLY | 27 Oct: Shirin says "Yes im good"; SVK reports a dummy fill. Two supplied selection-screen screenshots are saved. SVK's explicit approval, requested changes and actual submission receipt are not established by the excerpt. |
 | D18 | 23 Oct | Shirin | Ask her hospital about morphine and fill in the survey | OWNER-ONLY | Promise, not recorded as done |
 | D19 | 12 Sep | Sujay | Deliver lists: support groups, palliative doctors, morphine institutes | PARTIAL | The directory came from Pallium/IAPC; the other two lists were not supplied |
 | D20 | 14 Sep | Basith | Pull the directory data with an agent or scraper | DONE | 81 Pallium/IAPC pages (`output/research/india-directory-20261020/`) |
@@ -195,7 +197,7 @@ Most DONE items are decisions and Round 1 deck edits. The biggest gaps are the e
 |---|---|---|---|---|---|
 | I1 | 24 Aug | Sujay, Sharada | Pilot at a few centres we know, then show the numbers | OWNER-ONLY | No pilot or ethics step yet (`TEAM_HANDOFF.md` "What is still incomplete" 4) |
 | I2 | 9 Oct | Sujay | Talk to a hospital or palliative physician about using it on the doctor side | OWNER-ONLY | Not recorded |
-| I3 | 24 Aug, 10 Oct | Sujay, Sharada, Shirin | Final goals-of-care note format and conversation structure from the clinicians | OWNER-ONLY | No clinician-approved template recorded |
+| I3 | 24 Aug, 10 Oct, 27 Oct | Sujay, Sharada, Shirin | Final goals-of-care note format and conversation structure from the clinicians | OWNER-ONLY | 27 Oct: Sujay and Dr. Sharada plan to consult Vidhi on the GOCD format. Contact obtained and consultation planned; no completed review, approved template or legal clearance established. |
 | I4 | 24 Aug | Sujay | Outreach later through the palliative-medicine community or scale-up programmes | OWNER-ONLY | After the hackathon |
 | I5 | 6 Sep | Sujay, Basith | Someone watches the organiser webinar and posts a summary | DONE | Awaiz posted it on 8 Sep |
 | I6 | 21 Sep | Sharada | Share the meeting minutes | DONE | `docs/meetings/2026-09-21-minutes-draft.md` |

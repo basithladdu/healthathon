@@ -1,5 +1,7 @@
 # Claude transcript: Sahara (24–27 Oct 2026)
 
+**Later source links, added separately from this original Claude conversation:** the user supplied WhatsApp continuations for [26 October CARE positioning](source-materials/team-context/2026-10-26/sujay-care-positioning.txt) and [27 October team next steps](source-materials/team-context/2026-10-27/sujay-team-next-steps.txt). The latter has [two original survey screenshots and a provenance manifest](source-materials/team-context/2026-10-27/manifest.json). These are teammate messages, not Claude statements. Current interpretation and work planning are in [everyday.md](everyday.md) and [TEAM_HANDOFF.md](TEAM_HANDOFF.md); original text below is preserved.
+
 Everything the owner and Claude discussed about Sahara (the Healthathon Android app) in this Claude Code session, kept close to the original wording.
 
 What's in it:

@@ -1,5 +1,9 @@
 # Shared team context — 23 October 2026
 
+The **27 October evening** continuation is preserved separately: [19 messages](../2026-10-27/sujay-team-next-steps.txt), [two original screenshots and manifest](../2026-10-27/manifest.json). The images show survey selection menus, not submission receipts. Keep the supplied words separate from the current action/status interpretation in `everyday.md` and `TEAM_HANDOFF.md`.
+
+Later continuation: the five supplied messages from **26 October, 05:08–05:18** are saved separately in [`../2026-10-26/sujay-care-positioning.txt`](../2026-10-26/sujay-care-positioning.txt), with a hash/provenance manifest. They propose Sahara as a patient-facing extension to CARE; they do not establish an existing connection. The full export coverage and counts below are unchanged. The 24 October excerpt/attachment package removed by the later upstream tree is retained byte-for-byte from commit `6ab303e` in the ignored local archive `source-materials/private-context/2026-10-27-history-preservation/team-context-2026-10-24-git-blobs-from-6ab303e.zip` and remains recoverable from Git history.
+
 The user explicitly requested sharing the continued chat and DOCX/PDF/PPT attachments in this **private GitHub repository**, and selected cleaned copies after the privacy review. This is repository reference material, not website/app content or an instruction to implement every chat proposal.
 
 ## Contents

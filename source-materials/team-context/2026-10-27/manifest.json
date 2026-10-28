@@ -1,0 +1,92 @@
+{
+  "sourceType": "User-pasted WhatsApp continuation plus two original image attachments",
+  "sourceDate": "2026-10-27",
+  "savedDate": "2026-10-27",
+  "transcript": {
+    "path": "sujay-team-next-steps.txt",
+    "sha256": "0541aee1f03d30f469063ace086d557f9ca862fa090c31c28e25164905716678",
+    "bytes": 1990,
+    "messageCount": 19,
+    "firstDisplayedTime": "6:01:46 PM",
+    "lastDisplayedTime": "9:01:32 PM",
+    "encoding": "UTF-8",
+    "preservation": "Supplied wording, punctuation, timestamps, multiline message and Unicode directional marks retained, with a final newline. Not a complete WhatsApp export."
+  },
+  "timezone": "Not supplied in excerpt; displayed times are preserved without assigning an offset.",
+  "screenshots": [
+    {
+      "originalAttachmentName": "1-Pasted-Image-1.jpg",
+      "savedPath": "survey-role-options-original.jpg",
+      "bytes": 81952,
+      "sha256": "423e30502292c96d4f541e628524cc993e248e4da1d433a1aab8ed7d8ca5bb53",
+      "dimensions": [
+        572,
+        1280
+      ],
+      "format": "JPEG",
+      "originalBytesPreserved": true,
+      "observed": "Mobile professional-role native selection menu. Does not show a submitted response or receipt."
+    },
+    {
+      "originalAttachmentName": "2-Pasted-Image-1.jpg",
+      "savedPath": "survey-hospital-connection-original.jpg",
+      "bytes": 79538,
+      "sha256": "b35997ce8483666ddebec277e96f41f6a2fc9155804ab1035891e7f9b3246ce2",
+      "dimensions": [
+        572,
+        1280
+      ],
+      "format": "JPEG",
+      "originalBytesPreserved": true,
+      "observed": "Mobile hospital-connection native selection menu with I work here selected and a typed hospital name. Does not show submission or map confirmation."
+    }
+  ],
+  "privacy": "Team reference material. Screenshots contain survey UI and a typed hospital name; no visible patient record, contact number, email address, registration number or invitation token. Original images are not cropped, edited or redrawn; not placed in application public assets.",
+  "coverage": "Does not change the older full-export chronology or 658-representation count. Prior 26 October excerpt remains separate and unchanged.",
+  "interpretation": {
+    "internalTarget": "Review tools and finish agreed modifications by this weekend; following week for mock conversations. Exact cutoff and owners not yet fixed; not an official submission-deadline claim.",
+    "meetings": "Daily 9:30 pm proposed by Sujay; Basith and SVK assent. No meeting event/recurrence created, attendance or timezone not fully confirmed.",
+    "care": "The shared official page documents stored consent verification but missing UI. The chat shorthand that CARE has no consent verification is preserved in raw text and corrected only in the synthesis.",
+    "vidhi": "Sujay and Dr. Sharada plan to consult Vidhi on GOCD format; completion and clearance unknown.",
+    "supportGroups": "Explicit discovery/verification gap; no group partnership or outreach claimed.",
+    "survey": "Shirin explicitly approves. SVK reports a dummy fill; screenshots do not establish saved receipt, requested option changes or final approval. No dummy submission was created or queried by this archive task."
+  },
+  "pull": {
+    "before": "268132ae906311d82ad760bda1413abde5ef04e8",
+    "after": "303a6ed4d1ea9d1eb9f5cacdf6091864e6a0134a",
+    "method": "fetch all configured remotes; pull --ff-only origin main",
+    "preserved": "Prior local documentation edits, four pre-existing presentation-generator deletions and unrelated untracked work."
+  },
+  "sourceInspection": {
+    "commit": "303a6ed",
+    "paths": [
+      "prototype/app/feedback/HospitalSurvey.tsx",
+      "prototype/app/feedback/HospitalMap.tsx",
+      "prototype/supabase/functions/sahara-feedback/schema.ts",
+      "prototype/app/hospital-survery/page.tsx",
+      "prototype/app/hospital-survey/page.tsx"
+    ],
+    "finding": "Screenshots match native select fields; Other still requires council/registration in both frontend and server. Eligibility is a team decision, not a proven mismatch. Manual hospital entry and map confirmation exist in source.",
+    "testBoundary": "Relevant source/tests inspected, not rerun. No browser submission/device/database test performed."
+  },
+  "liveReadOnlyCheck": {
+    "home": {
+      "url": "https://sahara.wedevit.in/",
+      "httpStatus": 200,
+      "expectedSaharaText": true
+    },
+    "surveyAlias": {
+      "url": "https://sahara.wedevit.in/hospital-survey",
+      "httpStatus": 200,
+      "expectedSurveyText": true
+    },
+    "canonicalSurveyRoute": "/hospital-survery",
+    "boundary": "HTTP/content check only, not rendered visual review, form submission or proof a dummy entry was saved."
+  },
+  "verificationSource": {
+    "url": "https://docs.ohc.network/flows/clinical/consent/verify-a-consent/",
+    "checkedDate": "2026-10-27",
+    "reading": "Web document version3.1: stored Family/Validation records, no add/view/remove screen; staff clinical permission required."
+  },
+  "delivery": "Saved locally with existing handoff/daily plan/source index/chat-audit updates. No commit, push, app implementation, build, deployment, external message or schedule created."
+}

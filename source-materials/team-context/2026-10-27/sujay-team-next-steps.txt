@@ -1,0 +1,20 @@
+[10/27/26, 6:01:46 PM] Sujay H S IISC: Yes. Got it
+[10/27/26, 6:02:08 PM] Sujay H S IISC: What’s the next step guys?
+[10/27/26, 6:02:37 PM] Sujay H S IISC: We need to go through each app and modify right?
+[10/27/26, 6:02:47 PM] Sujay H S IISC: I’m back in India
+[10/27/26, 6:02:51 PM] Sujay H S IISC: When can we start doing this?
+[10/27/26, 6:03:21 PM] Sujay H S IISC: We need to be done by this weekend. Then we will have a week for mock conversations and things like that
+[10/27/26, 6:19:28 PM] Shaik Abdul Basith: https://docs.ohc.network/flows/clinical/consent/verify-a-consent/
+[10/27/26, 6:19:45 PM] Shaik Abdul Basith: they dont havea  consent vertification.  We need to do this
+[10/27/26, 6:51:55 PM] Sujay H S IISC: Okay
+[10/27/26, 6:52:15 PM] Sujay H S IISC: Should we do daily meetings this week? Maybe at 9.30pm every day?
+[10/27/26, 7:04:15 PM] Shaik Abdul Basith: yes i think.  and im looking into the CARE thing.  it’s mostly staff side.   im preparing a doc to compare what we have built vs what care has so as to see what can be added or removed and what fits what
+[10/27/26, 7:12:30 PM] Sujay H S IISC: Perfect. Others?
+[10/27/26, 7:15:27 PM] ~ SVK: Ok
+[10/27/26, 7:16:41 PM] Sujay H S IISC: Got this contact for Vidhi centre for legal policy. Dr. Sharada and I will connect to run our GOCD format with them to make sure we aren’t touching any legal aspects
+[10/27/26, 7:18:41 PM] Sujay H S IISC: I think the other major thing is identifying patient support groups. Even that is very thin and difficult to find databases. Not sure how to go about it. Any ideas will be helpful
+[10/27/26, 7:19:22 PM] Sujay H S IISC: @⁨~SVK⁩ @⁨Shirin Ayub⁩ 
+If you both are okay with the survey, we can send it out. Otherwise we won’t have much time
+[10/27/26, 8:46:05 PM] Shirin Ayub: Yes im good
+[10/27/26, 8:52:46 PM] Sujay H S IISC: Can you share the latest Sahara link?
+[10/27/26, 9:01:32 PM] ~ SVK: I just did a dummy fill

@@ -1,0 +1,5 @@
+[10/26/26, 5:08:04 AM] Sujay H S IISC: I went through this. I think this is perfect. So Sahara can act as a patient facing extension of CARE. The GOCD discussion acts as bridge between physician side and patient facing side. So the symptom tracking on CARE is done during a home visit and we give the patient autonomy to do that. I think we can position ourselves this way and it strengthens Sahara that way
+[10/26/26, 5:08:08 AM] Sujay H S IISC: What do you all think?
+[10/26/26, 5:08:40 AM] Sujay H S IISC: CARE is the hospital side of it. It is mainly to deal with patient workflows and home visits from the hospital side
+[10/26/26, 5:13:53 AM] Shaik Abdul Basith: sounds good, will look into how we can build on CARE
+[10/26/26, 5:18:38 AM] Sujay H S IISC: Cool

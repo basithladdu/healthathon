@@ -612,5 +612,116 @@
       "requirement": "All teams must use the template and substantiate actual MVP/AI progress, evaluation, limitations and deployment assumptions. Submission process, deadline and assessment details will follow separately; no deadline is invented here.",
       "userDirection": "Fill verified fields now, carry previous slide information forward, leave team discussion/biographies/photos for later. User explicitly selected Yes for sharing solution information on the programme website; this does not authorise disclosure of private records or credentials."
     }
+  },
+  "currentReview20261027": {
+    "checkedDate": "2026-10-27",
+    "scope": "User asked to pull all latest work first, preserve the 26 October WhatsApp continuation and explain whether/how the CARE direction is feasible. Read-only official-source and current-code inspection; no implementation or live service changes.",
+    "sourceCommit": "268132ae906311d82ad760bda1413abde5ef04e8",
+    "teamSource": {
+      "path": "source-materials/team-context/2026-10-26/sujay-care-positioning.txt",
+      "messages": 5,
+      "sourceDate": "2026-10-26",
+      "status": "Pasted continuation, not a full later export; proposed direction, not existing integration."
+    },
+    "assessment": {
+      "supported": "CARE serves care teams and home-visit programmes; Sahara can provide a focused patient-facing workflow between visits through supported integrations/plugins.",
+      "correction": "CARE is not hospital-only and already has patient phone login. Patient access and goals-of-care concepts are not absent from CARE.",
+      "proposedValue": "Accessible patient-reported symptom/pain continuity plus source-linked clinician review and exact-version patient acknowledgement. Clinical benefit and uniqueness remain to validate.",
+      "currentIntegration": "No OHC CARE connection found in inspected Android/web runtime source. No live CARE exchange was tested."
+    },
+    "primaryEvidence": [
+      {
+        "url": "https://ohc.network/solutions/palliative-care",
+        "finding": "Official product page describes team assignments, home visits, symptoms, medicine needs, caregiver concerns, follow-ups and referrals. Provider claims were read, not independently field-validated."
+      },
+      {
+        "url": "https://ohc.network/build-on-care",
+        "finding": "Supports external API integrations, Django backend plugins and federated React frontend extensions. Reuse the existing app and add a focused connector; check the target version. Synthetic-data development is the stated starting point."
+      },
+      {
+        "url": "https://github.com/ohcnetwork/care_fe/blob/81e7515fdf4d8a7e5d53dad26885105d48239e20/README.md",
+        "finding": "Patient phone-login documentation exists. No login was attempted and this is not proof a chosen hospital has enabled it."
+      },
+      {
+        "url": "https://github.com/ohcnetwork/care/blob/2bae933466a0bdc2f49504e298b87cca537a1407/care/emr/api/otp_viewsets/patient.py",
+        "finding": "Static source filters patient rows by authenticated phone. One phone may map to multiple people; use explicit authorized instance plus CARE patient binding rather than automatic phone/name matching."
+      },
+      {
+        "url": "https://github.com/ohcnetwork/care/blob/2bae933466a0bdc2f49504e298b87cca537a1407/care/emr/api/viewsets/form_submission.py",
+        "finding": "Writes check patient/encounter questionnaire permissions. Existing OTP login is not evidence the proposed patient symptom submission is authorized."
+      },
+      {
+        "url": "https://docs.ohc.network/concepts/clinical/consent/",
+        "finding": "CARE has consent categories including advance directives; documentation flags missing comfort-care selection and verification UI. A goals discussion or acknowledgement must not silently become treatment consent."
+      },
+      {
+        "url": "https://docs.ohc.network/flows/clinical/consent/verify-a-consent/",
+        "finding": "Documentation describes stored Family/Validation confirmations but no current UI, with staff clinical permissions. Need actual target-version/auth testing rather than assuming patient-owned verification."
+      },
+      {
+        "url": "https://ohc.network/blog/patient-accounts-care-hmis",
+        "finding": "The Patient Accounts article is about billing/invoices/balances; it is not the evidence for patient portal login."
+      }
+    ],
+    "sourceReadingLimits": {
+      "method": "Official public pages and pinned public source read; targeted local code inspected.",
+      "unavailableViaWebTool": [
+        "https://docs.ohc.network/deployments/palliative/playbooks/patient-enrollment/",
+        "https://docs.ohc.network/developers/"
+      ],
+      "fallback": "Two pinned raw GitHub files had web-tool cache misses; direct HTTPS fetch succeeded and relevant authentication/filtering/authorization source was inspected.",
+      "notDone": [
+        "No exhaustive current-site crawl",
+        "No CARE login/runtime/API write",
+        "No live Sahara backend or SMTP verification",
+        "No new app build or device test",
+        "No patient enrollment, deployment or outreach"
+      ]
+    },
+    "currentSaharaSeams": [
+      {
+        "path": "android/app/src/main/java/in/wedevit/care/CareCloud.kt:41",
+        "finding": "Android uses Saanthvana Supabase and existing healthathon REST/RPC endpoints, not OHC CARE."
+      },
+      {
+        "path": "prototype/app/care-shared-client.ts:2",
+        "finding": "Web shared-care still targets the prior different backend. Reconcile the intended target and verify account/person-sharing identity before connecting CARE."
+      },
+      {
+        "path": "android/app/src/main/java/in/wedevit/care/CareEmailAvailability.kt",
+        "finding": "Signup/reset are enabled in UI. Its comment explicitly says email delivery setup remains necessary; ready=true is not a delivery receipt."
+      },
+      {
+        "path": "android/app/src/main/java/in/wedevit/care/CareSymptomData.kt",
+        "finding": "Reusable symptom, nullable score, observation/recall/reporter and 3D pain-point data. Preserve the exact scale/meaning; not validated ESAS-r/IPOS."
+      },
+      {
+        "path": "android/app/src/main/java/in/wedevit/care/CareSharedCloud.kt:81",
+        "finding": "Source-linked drafts and clinician review check source/context/revision and return matching review receipts. Suitable seam for an explicit CARE adapter."
+      },
+      {
+        "path": "android/supabase/migrations/20261023070323_conversation_scope_context.sql",
+        "finding": "Current source defines review/audience/version-bound acknowledgement rules. Deployment and behaviour of the newly selected backend not verified this turn."
+      },
+      {
+        "path": "prototype/app/fhir-export-modal.tsx",
+        "finding": "Local downloadable FHIR-shaped JSON does not prove schema conformance or acceptance by CARE/ABDM."
+      }
+    ],
+    "firstSlice": [
+      "Align and verify Sahara Android/web account and record backend first; preserve existing data during any later approved migration.",
+      "Use an isolated CARE sandbox and one synthetic patient; pin version and enroll an explicit Sahara-person to CARE-instance/patient-ID binding.",
+      "Use a limited server connector or Django plugin. Add a React clinical view only where existing CARE surfaces are insufficient. Keep privileged credentials server-side and enforce record/representative permissions.",
+      "Share one patient-reported symptom with reporter, time, recall, scale and pain-point details. Map to verified Observation/QuestionnaireResponse contracts plus a supported extension for custom points. Do not mark shared until CARE accepts it.",
+      "Clinician reviews a source-linked GOCD note; patient sees and acknowledges that exact version; CARE shows the response. Maintain authorship, revisions and the distinction from treatment consent.",
+      "Verify wrong-person isolation, family permission, revoked access, retries after offline use, duplicate prevention, update conflicts and acknowledgements of outdated notes."
+    ],
+    "prerequisites": [
+      "Chosen CARE sandbox/target version and operator authorization for integration",
+      "Patient and representative linking/consent approach",
+      "Clinician review ownership and workflow agreement",
+      "Verified data contracts and authentication for the actual instance"
+    ],
+    "deliveryBoundary": "Feasibility and local source preservation only. No rebuild, account creation, live configuration, patient transfer, CARE installation, commit/push, new Play release or external message."
   }
 }
