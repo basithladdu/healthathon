@@ -38,6 +38,7 @@ Collected on 27 Oct from every agent lane across Sahara, ITI, WDCW and AI-FIR. T
 - [ ] Nearby: decide who on the Sahara team reviews "suggested centres" before they are shown.
 - [ ] Deliverables: PPT, two-page brief, narrated video. Build sprint done by Sun 1 Nov; submission about 5 days after (confirm the exact cut-off). Present as a tag team: doctors explain the problem and clinical features, tech explains the build.
 - [ ] Play Store: upload the new version (versionCode 9+); last update was about 19 Oct.
+- [ ] NCCN Distress Thermometer (decision 7, 28 Oct): the NCCN PDF says it "may not be reproduced in any form without the express written permission of NCCN". Ask NCCN for permission for the in-app version (English wording from Version 1.2026), and get the official NCCN Hindi translation (free NCCN login at nccn.org/distress-thermometer) so a clinician can compare it with Sahara's own Hindi labels in `CareDistress.kt`.
 
 ### Sahara owner keys and steps (no-mock round, 28 Oct)
 **AI note drafting, recorded-turn transcription and note translation** (works with any OpenAI-compatible service: a hosted one, or an open model you run yourself, e.g. vLLM, Ollama or llama.cpp server for text and faster-whisper-server for audio, behind HTTPS).

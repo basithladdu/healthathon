@@ -52,7 +52,7 @@ internal object CheckInMood {
     fun title(score: Float): String = when { score < 1f / 3f -> HARD; score < 2f / 3f -> OKAY; else -> GOOD }
     /** Symptom notes also use checkin storage; only an ordinary mood entry may be updated here. */
     fun today(items: List<CareItem>, personId: String, dayStart: Long): CareItem? = items.firstOrNull {
-        it.kind == "checkin" && it.personId == personId && it.created >= dayStart && !SymptomNoteCodec.isStructured(it.detail)
+        it.kind == "checkin" && it.personId == personId && it.created >= dayStart && !SymptomNoteCodec.isStructured(it.detail) && !DistressCodec.isStructured(it.detail)
     }
 }
 

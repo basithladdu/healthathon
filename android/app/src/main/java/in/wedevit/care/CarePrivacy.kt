@@ -75,6 +75,7 @@ object CarePrivacy {
     /** Symptom check-ins keep their structure; only the typed text is redacted. Other entry kinds go unchanged. */
     fun entryForUpload(item: CareItem): CareItem {
         if (item.kind != "checkin") return item
+        if (DistressCodec.isStructured(item.detail)) return DistressCodec.decode(item.detail)?.let { d -> d.copy(other = redact(d.other)).takeIf { it != d }?.let { item.copy(detail = DistressCodec.encode(it)) } } ?: item
         val note = SymptomNoteCodec.decode(item.detail)
         val safeNote = note?.let { it.copy(symptom = redact(it.symptom), note = redact(it.note), painLocation = redact(it.painLocation), author = redact(it.author)) }
         val detail = when { note == null -> if (SymptomNoteCodec.isStructured(item.detail)) item.detail else redact(item.detail); safeNote == note -> item.detail; else -> SymptomNoteCodec.encode(safeNote!!) }

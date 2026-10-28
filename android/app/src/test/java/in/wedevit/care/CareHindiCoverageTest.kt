@@ -29,6 +29,7 @@ class CareHindiCoverageTest {
         "CareAddFamily.kt" to listOf("AddFamilySheet", "PendingJoinDialog"),
         "CareAccount.kt" to listOf("AccountContent", "CareRoot"),
         "CareSymptomUi.kt" to listOf("CareSymptomDiary", "SymptomNoteCard", "SymptomNoteForm"),
+        "CareDistress.kt" to listOf("DistressQuestion", "DistressScreen", "DistressSource", "DistressEntryCard", "DistressHistoryCard"),
         // Doctor recording panels, conversation history and note reader (28 Oct). Store checks are shown through Hindi maps.
         "DoctorRecordStage.kt" to listOf("DoctorRecordStage"),
         "DoctorAttendees.kt" to listOf("DoctorAttendeesList"),
