@@ -87,6 +87,12 @@ class NoteRulesTest {
         assertEquals(456L, note.transcribedAt)
         assertTrue(NoteRules.text(note).contains("AI-generated"))
     }
+    @Test fun onDeviceTranscriptIsNotCalledAiInTheExport() {
+        val onPhone = NoteRules.organise(draft.copy(transcriptProvider = OfflineSpeechModel.provider, transcriptModel = OfflineSpeechModel.id, transcribedAt = 789L))
+        val text = NoteRules.text(NoteRules.publish(person, onPhone, "Doctor", true, 1))
+        assertTrue(text.contains("on-device speech-to-text"))
+        assertFalse(text.contains("AI-generated"))
+    }
     @Test fun transcriptResponseMustCarryTrustedProvenance() {
         val transcript = sanitizeConversationTranscript("""{"transcript":"[00:01] spk_1: Hello","provider":"google-gemini","model":"gemini-3.5-transcribe","languages":["en-IN"]}""")
         assertEquals("[00:01] spk_1: Hello", transcript.text)
