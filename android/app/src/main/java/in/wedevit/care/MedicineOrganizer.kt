@@ -428,7 +428,8 @@ class MedicineOrganizer(
     }
 
     private suspend fun post(body: ByteArray, token: String): String = withContext(Dispatchers.IO) {
-        if (!CareAndroidAssistPolicy.externalAiEnabled) {
+        // Online photo processing has no server or screen yet; prescriptions are read on the phone (MedicineScanner).
+        if (!ONLINE_PHOTO_PROCESSING) {
             throw MedicineOrganizerException(
                 MedicineOrganizerError.CONFIGURATION,
                 "Use on-device prescription reading. Online photo processing is off in this Android app.",
@@ -587,6 +588,7 @@ class MedicineOrganizer(
 
     companion object {
         const val DEFAULT_ENDPOINT = "https://sahara.wedevit.in/api/medicine-organizer"
+        private const val ONLINE_PHOTO_PROCESSING = false
         const val MAX_PRESCRIPTION_PAGES = 5
         const val MAX_MEDICINE_IMAGES = 10
         const val MAX_IMAGE_BYTES = 500 * 1024

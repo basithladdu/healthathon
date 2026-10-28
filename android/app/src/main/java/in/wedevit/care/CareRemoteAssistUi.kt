@@ -26,7 +26,6 @@ import kotlinx.coroutines.withContext
     onAppend: (String) -> Unit,
     client: CareRemoteAssist = remember { CareRemoteAssist() },
 ) { val t = careText();
-    if (!CareAndroidAssistPolicy.externalAiEnabled) return
     val scope = rememberCoroutineScope()
     val latestSource by rememberUpdatedState(source)
     val latestToken by rememberUpdatedState(token)
@@ -42,15 +41,16 @@ import kotlinx.coroutines.withContext
     var message by remember(identity, recording.path) { mutableStateOf("") }
     var busy by remember(identity) { mutableStateOf(false) }
     var job by remember(identity) { mutableStateOf<Job?>(null) }
-    LaunchedEffect(identity, client) { capabilities = try { client.capabilities() } catch (cancel: CancellationException) { throw cancel } catch (_: Exception) { null } }
+    LaunchedEffect(identity, client) { capabilities = try { client.capabilities(latestToken()) } catch (cancel: CancellationException) { throw cancel } catch (_: Exception) { null } }
     DisposableEffect(identity, recording.path, source) { onDispose { job?.cancel() } }
+    // Nothing is offered until the server says online transcription is set up; on-device transcription stays above.
+    val ready = capabilities?.takeIf { it.audioReady } ?: return
     SurfaceCard(Mint) {
         Text(t("Transcribe a recorded turn", "रिकॉर्ड की गई बारी की लिखाई बनाएँ"), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
         Text(t("One person at a time, up to 30 seconds and 2 MB. Listen to the original recording and check who spoke.", "एक बार में एक व्यक्ति, 30 सेकंड और 2 MB तक। मूल रिकॉर्डिंग सुनें और जाँचें कि कौन बोला।"), style = MaterialTheme.typography.bodySmall)
-        if (capabilities?.audioReady != true) Text(t("Online audio processing is unavailable in this release. Your recording and manual conversation remain available.", "इस संस्करण में ऑनलाइन ऑडियो प्रोसेसिंग उपलब्ध नहीं है। आपकी रिकॉर्डिंग और लिखी बातचीत बनी रहेगी।"), style = MaterialTheme.typography.bodySmall)
-        else {
+        run {
             CareLanguageMenu(language, enabled = !busy) { language = it }
-            CheckLine(consent, { consent = it }, t("Everyone separately agrees to sending this recording to Sarvam for transcription. The words and speaker will be checked before use.", "सभी अलग-अलग इस रिकॉर्डिंग को लिखाई के लिए Sarvam को भेजने पर राज़ी हैं। इस्तेमाल से पहले शब्द और बोलने वाले की जाँच होगी।"))
+            CheckLine(consent, { consent = it }, t("Everyone here separately agrees to sending this recording off the phone to ${ready.provider} for transcription. Nothing is sent until you tap the button. The words and speaker will be checked before use.", "यहाँ मौजूद सभी अलग-अलग इस रिकॉर्डिंग को लिखाई के लिए फ़ोन से ${ready.provider} को भेजने पर राज़ी हैं। बटन दबाने तक कुछ नहीं भेजा जाता। इस्तेमाल से पहले शब्द और बोलने वाले की जाँच होगी।"))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(onClick = {
                     val originalSource = source
@@ -73,7 +73,7 @@ import kotlinx.coroutines.withContext
                         catch (error: Exception) { message = error.message ?: t("Transcription could not finish. Your recording is unchanged.", "लिखाई पूरी नहीं हो सकी। आपकी रिकॉर्डिंग वैसी ही है।") }
                         finally { busy = false }
                     }
-                }, enabled = consent && recordingConsent != null && !busy, modifier = Modifier.testTag("care-transcribe-turn")) { Text(if (busy) "Transcribing…" else t("Transcribe turn", "बारी की लिखाई बनाएँ")) }
+                }, enabled = consent && recordingConsent != null && !busy, modifier = Modifier.testTag("care-transcribe-turn")) { Text(if (busy) t("Transcribing…", "लिखाई बन रही है…") else t("Transcribe turn", "बारी की लिखाई बनाएँ")) }
                 if (busy) TextButton(onClick = { job?.cancel() }) { Text(t("Stop", "रोकें")) }
             }
         }
@@ -103,7 +103,6 @@ import kotlinx.coroutines.withContext
     onUseDraft: (CareAssistedDraft) -> Unit,
     client: CareRemoteAssist = remember { CareRemoteAssist() },
 ) { val t = careText();
-    if (!CareAndroidAssistPolicy.externalAiEnabled) { CareAiOffNotice(); return }
     val scope = rememberCoroutineScope()
     val latestSource by rememberUpdatedState(source)
     val latestToken by rememberUpdatedState(token)
@@ -115,16 +114,20 @@ import kotlinx.coroutines.withContext
     var message by remember(identity, source) { mutableStateOf("") }
     var busy by remember(identity) { mutableStateOf(false) }
     var job by remember(identity) { mutableStateOf<Job?>(null) }
+    var asked by remember(identity) { mutableStateOf(false) }
     LaunchedEffect(identity, client) {
-        capabilities = try { client.capabilities() } catch (cancel: CancellationException) { throw cancel } catch (_: Exception) { null }
+        capabilities = try { client.capabilities(latestToken()) } catch (cancel: CancellationException) { throw cancel } catch (_: Exception) { null }
+        asked = true
     }
     DisposableEffect(identity, source) { onDispose { job?.cancel() } }
+    if (!asked) return
+    val service = capabilities?.takeIf { it.ready }
+    if (service == null) { CareAiOffNotice(); return }
     SurfaceCard(Mint) {
         Text(t("Prepare a source-linked draft", "स्रोत से जुड़ा ड्राफ़्ट बनाएँ"), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
-        val ready = capabilities?.ready == true
-        if (!ready) Text(t("Online assistance is unavailable. You can keep building the note from the original words below.", "ऑनलाइन मदद उपलब्ध नहीं है। आप नीचे मूल शब्दों से नोट बनाते रह सकते हैं।"), style = MaterialTheme.typography.bodySmall)
-        else {
-            CheckLine(consent, { consent = it }, t("Everyone agrees to sending these words to Sarvam for an AI draft. A person will review it before use.", "सभी इन शब्दों को AI ड्राफ़्ट के लिए Sarvam को भेजने पर राज़ी हैं। इस्तेमाल से पहले कोई व्यक्ति इसे जाँचेगा।"))
+        Text(t("${service.provider} picks whole lines from this conversation for each section. It cannot add words: every line shown is copied from the original.", "${service.provider} हर हिस्से के लिए इस बातचीत की पूरी पंक्तियाँ चुनता है। यह नए शब्द नहीं जोड़ सकता: दिखाई गई हर पंक्ति मूल से ली गई है।"), style = MaterialTheme.typography.bodySmall)
+        run {
+            CheckLine(consent, { consent = it }, t("Everyone here agrees to sending these words off the phone to ${service.provider} for an AI draft. Nothing is sent until you tap the button. A person will review it before use.", "यहाँ मौजूद सभी इन शब्दों को AI ड्राफ़्ट के लिए फ़ोन से ${service.provider} को भेजने पर राज़ी हैं। बटन दबाने तक कुछ नहीं भेजा जाता। इस्तेमाल से पहले कोई व्यक्ति इसे जाँचेगा।"))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(onClick = {
                     val snapshot = source
@@ -168,7 +171,6 @@ import kotlinx.coroutines.withContext
     token: suspend () -> String,
     client: CareRemoteAssist = remember { CareRemoteAssist() },
 ) { val t = careText();
-    if (!CareAndroidAssistPolicy.externalAiEnabled) return
     val scope = rememberCoroutineScope()
     val latestSource by rememberUpdatedState(source)
     val latestVersion by rememberUpdatedState(versionId)
@@ -182,17 +184,17 @@ import kotlinx.coroutines.withContext
     var busy by remember { mutableStateOf(false) }
     var job by remember { mutableStateOf<Job?>(null) }
     var message by remember(versionId, source) { mutableStateOf("") }
-    LaunchedEffect(versionId, client) { capabilities = try { client.capabilities() } catch (cancel: CancellationException) { throw cancel } catch (_: Exception) { null } }
+    LaunchedEffect(versionId, client) { capabilities = try { client.capabilities(latestToken()) } catch (cancel: CancellationException) { throw cancel } catch (_: Exception) { null } }
     DisposableEffect(versionId, source, from, to) { onDispose { job?.cancel() } }
+    val service = capabilities?.takeIf { it.translationReady } ?: return
     SurfaceCard(Mint) {
         Text(t("Read in another language", "दूसरी भाषा में पढ़ें"), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
-        if (capabilities?.translationReady != true) Text(t("Translation is unavailable. The original note and downloaded-language read aloud remain available.", "अनुवाद उपलब्ध नहीं है। मूल नोट और डाउनलोड की गई भाषा में पढ़कर सुनाना बना रहेगा।"), style = MaterialTheme.typography.bodySmall)
-        else {
+        run {
             Text(t("Original language", "मूल भाषा"), style = MaterialTheme.typography.labelLarge)
             CareLanguageMenu(from, enabled = !busy) { from = it }
             Text(t("Translate to", "किस भाषा में"), style = MaterialTheme.typography.labelLarge)
             CareLanguageMenu(to, enabled = !busy) { to = it }
-            CheckLine(consent, { consent = it }, t("I agree to sending this note to Sarvam for translation. The original stays unchanged.", "मैं यह नोट अनुवाद के लिए Sarvam को भेजने पर राज़ी हूँ। मूल नहीं बदलेगा।"))
+            CheckLine(consent, { consent = it }, t("I agree to sending this note off the phone to ${service.provider} for translation. Nothing is sent until you tap the button. The original stays unchanged.", "मैं यह नोट अनुवाद के लिए फ़ोन से ${service.provider} को भेजने पर राज़ी हूँ। बटन दबाने तक कुछ नहीं भेजा जाता। मूल नहीं बदलेगा।"))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(onClick = {
                     val original = source; val selectedVersion = versionId
@@ -205,7 +207,7 @@ import kotlinx.coroutines.withContext
                         catch (error: Exception) { message = error.message ?: t("Translation could not finish. Use the original note.", "अनुवाद पूरा नहीं हो सका। मूल नोट इस्तेमाल करें।") }
                         finally { busy = false }
                     }
-                }, enabled = consent && !busy && from != to && source.isNotBlank(), modifier = Modifier.testTag("care-translate")) { Text(if (busy) "Translating…" else t("Translate note", "नोट का अनुवाद करें")) }
+                }, enabled = consent && !busy && from != to && source.isNotBlank(), modifier = Modifier.testTag("care-translate")) { Text(if (busy) t("Translating…", "अनुवाद हो रहा है…") else t("Translate note", "नोट का अनुवाद करें")) }
                 if (busy) TextButton(onClick = { job?.cancel() }) { Text(t("Stop", "रोकें")) }
             }
         }
@@ -220,10 +222,10 @@ import kotlinx.coroutines.withContext
     }
 }
 
-/** Shown where an AI draft would be while no AI provider is switched on, so nothing looks automatic. */
+/** Shown where an AI draft would be while the server has no AI service set up (or can't be reached), so nothing looks automatic. */
 internal object CareAiOffCopy {
-    const val title = "AI drafting is off · AI ड्राफ़्ट बंद है"
-    const val body = "No AI service is switched on in Sahara yet, so these words are not sent anywhere for a draft. Choose lines from the conversation or type each section yourself. · Sahara में अभी कोई AI सेवा चालू नहीं है, इसलिए ये शब्द ड्राफ़्ट के लिए कहीं नहीं भेजे जाते। बातचीत से पंक्तियाँ चुनें या हर हिस्सा खुद लिखें।"
+    const val title = "AI drafting is not set up · AI ड्राफ़्ट चालू नहीं है"
+    const val body = "Online AI drafting is not set up on Sahara's server yet (or the server can't be reached right now), so these words are not sent anywhere for a draft. Use the word-matching suggestions above, choose lines from the conversation or type each section yourself. · Sahara के सर्वर पर अभी ऑनलाइन AI ड्राफ़्ट चालू नहीं है (या अभी सर्वर से जुड़ नहीं पा रहे), इसलिए ये शब्द ड्राफ़्ट के लिए कहीं नहीं भेजे जाते। ऊपर शब्द-मिलान वाले सुझाव इस्तेमाल करें, बातचीत से पंक्तियाँ चुनें या हर हिस्सा खुद लिखें।"
 }
 
 @Composable internal fun CareAiOffNotice() {

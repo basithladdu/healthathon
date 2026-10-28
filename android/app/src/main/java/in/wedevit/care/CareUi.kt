@@ -604,7 +604,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                         if (!vm.demoMode) OfflineConversationTranscription(file = file, identity = "${vm.accountNamespace}:${draft.personId}", consent = consent,
                             enabled = !busy && !dictating && !recording && draft.source.isBlank(),
                             onUse = { vm.useOfflineTranscript(file.absolutePath, it) })
-                        if (!vm.demoMode && vm.cloud != null && BuildConfig.CLOUD_AUDIO_ENABLED) CareRemoteTranscriptPanel(
+                        if (!vm.demoMode && vm.cloud != null) CareRemoteTranscriptPanel(
                             source = draft.source, identity = draft.personId, recording = file, recordingConsent = consent,
                             token = { vm.cloud.transcriptionToken() }, onSaveConsent = vm::rememberTranscriptionConsent,
                             onAppend = { source ->
@@ -630,21 +630,21 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                                 enabled = !busy && !dictating && !recording && draft.source.isBlank(), onUse = { vm.useOfflineTranscript(file.absolutePath, it) })
                         } }
                         if (isSample) Surface(shape = RoundedCornerShape(16.dp), color = DoctorStatusWarnBg, modifier = Modifier.fillMaxWidth().testTag("transcript-sample")) { Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            Text(t("Sample", "नमूना"), fontWeight = FontWeight.Medium, color = DoctorStatusWarn)
+                            Text(t("Practice", "अभ्यास"), fontWeight = FontWeight.Medium, color = DoctorStatusWarn)
                             Text(t("This walkthrough transcript was written in advance. It is not taken from your recording.", "यह वॉकथ्रू की लिखाई पहले से लिखी गई है। यह आपकी रिकॉर्डिंग से नहीं ली गई।"), fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardInk)
-                            TextButton(onClick = { val current = vm.draft.value; if (current.personId == draft.personId) { vm.edit(current.copy(source = "")); editingTranscript = true; highlightLine = null } }, enabled = !busy && !recording && !dictating, modifier = Modifier.heightIn(min = 48.dp).testTag("transcript-sample-clear")) { Text(t("Clear the sample and type your own", "नमूना हटाकर ख़ुद लिखें"), color = DoctorAccent) }
+                            TextButton(onClick = { val current = vm.draft.value; if (current.personId == draft.personId) { vm.edit(current.copy(source = "")); editingTranscript = true; highlightLine = null } }, enabled = !busy && !recording && !dictating, modifier = Modifier.heightIn(min = 48.dp).testTag("transcript-sample-clear")) { Text(t("Clear the practice text and type your own", "अभ्यास वाला लिखा हटाकर ख़ुद लिखें"), color = DoctorAccent) }
                         } }
                         DoctorGoalsChecklist(prepRows, questionMatches)
                         if (dictating) SurfaceCard { Text(t("Conversation", "बातचीत"), fontWeight = FontWeight.Bold); SelectionContainerText(draft.source); Text(t("Finish this turn to edit the conversation.", "बातचीत बदलने के लिए यह बारी पूरी करें।"), style = MaterialTheme.typography.bodySmall) }
                         else if (draft.source.isNotBlank() && !editingTranscript) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text(if (isSample) t("Sample transcript", "नमूना लिखाई") else t("Transcript", "बातचीत की लिखाई"), fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.weight(1f))
+                                Text(if (isSample) t("Practice transcript", "अभ्यास लिखाई") else t("Transcript", "बातचीत की लिखाई"), fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.weight(1f))
                                 TextButton(onClick = { highlightLine = null; editingTranscript = true }, enabled = !busy && !recording, modifier = Modifier.heightIn(min = 48.dp).testTag("transcript-edit")) { Text(t("Edit", "बदलें"), color = DoctorAccent) }
                             }
                             Text(origin, fontSize = 12.sp, lineHeight = 16.sp, color = DoctorCardFaint, modifier = Modifier.testTag("transcript-origin"))
                             DoctorTranscriptLines(draft.source, highlightLine) { n -> lineRequesters.getOrPut(n) { BringIntoViewRequester() } }
                         } else {
-                            CareField(value = draft.source, onValueChange = { if (it.length <= NoteRules.MAX_SOURCE_CHARS) { val current = vm.draft.value; if (current.personId == draft.personId) { editingTranscript = true; vm.edit(current.copy(source = it)) } } }, label = if (isSample) t("Sample transcript", "नमूना लिखाई") else t("Conversation transcript", "बातचीत की लिखाई"), placeholder = t("Speak a turn, transcribe a saved recording, or type in Hindi or English…", "बोलें, सहेजी रिकॉर्डिंग की लिखाई बनाएँ, या हिन्दी या अंग्रेज़ी में लिखें…"), minLines = 5, supporting = if (draft.source.isBlank()) "" else origin)
+                            CareField(value = draft.source, onValueChange = { if (it.length <= NoteRules.MAX_SOURCE_CHARS) { val current = vm.draft.value; if (current.personId == draft.personId) { editingTranscript = true; vm.edit(current.copy(source = it)) } } }, label = if (isSample) t("Practice transcript", "अभ्यास लिखाई") else t("Conversation transcript", "बातचीत की लिखाई"), placeholder = t("Speak a turn, transcribe a saved recording, or type in Hindi or English…", "बोलें, सहेजी रिकॉर्डिंग की लिखाई बनाएँ, या हिन्दी या अंग्रेज़ी में लिखें…"), minLines = 5, supporting = if (draft.source.isBlank()) "" else origin)
                             if (draft.source.isNotBlank()) TextButton(onClick = { focus.clearFocus(); editingTranscript = false }, modifier = Modifier.heightIn(min = 48.dp).testTag("transcript-done")) { Text(t("Done · show numbered lines", "हो गया · क्रम वाली पंक्तियाँ देखें"), color = DoctorAccent) }
                         }
                     } }

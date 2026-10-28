@@ -6,6 +6,7 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import org.json.JSONArray
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -17,20 +18,21 @@ import java.util.Base64
 import java.util.UUID
 import java.util.concurrent.atomic.AtomicReference
 
-data class CareAssistCapabilities(val ready: Boolean, val audioReady: Boolean, val translationReady: Boolean)
+/** What the configured server says it can do. [provider] is the service name the owner set; every consent line names it. */
+data class CareAssistCapabilities(val ready: Boolean, val audioReady: Boolean, val translationReady: Boolean, val provider: String = "", val model: String = "")
 data class CareAssistEvidence(val field: String, val line: Int, val start: Int, val end: Int, val text: String, val speaker: String)
 data class CareAssistedDraft(val sourceHash: String, val fields: Map<String, String>, val evidence: List<CareAssistEvidence>, val provider: String, val model: String)
 data class CareAssistedTranscript(val original: String, val sourceHash: String, val language: String, val provider: String, val model: String)
 data class CareAssistedTranslation(val original: String, val translation: String, val versionId: String, val sourceHash: String, val sourceLanguage: String, val targetLanguage: String)
 class CareAssistException(val code: String, message: String) : IOException(message)
 
-/** Android currently uses on-device dictation, downloaded voices and manual source review. */
-internal object CareAndroidAssistPolicy {
-    const val externalAiEnabled = false
-    fun requireExternalAi() {
-        if (!externalAiEnabled) throw CareAssistException("on_device_only", "Use on-device dictation or type the words. Online AI is off in this Android app.")
-    }
-}
+/**
+ * Online help goes through the Sahara server function `sahara-care-assist` (android/supabase/functions).
+ * That function holds the owner's OpenAI-compatible base URL, key and model; no key is ever in the app.
+ * Until the owner sets them, capabilities() reports not ready and the screens keep the word-matching flow.
+ */
+internal const val CARE_ASSIST_PROVIDER = "openai-compatible"
+internal const val CARE_ASSIST_ENDPOINT = "https://kjnhtakqzboayqorrlue.supabase.co/functions/v1/sahara-care-assist"
 
 internal val careAssistFieldKeys = listOf("priorities", "participants", "topics", "openQuestions", "followUp")
 internal val careAssistLanguageCodes = setOf("en-IN", "hi-IN", "kn-IN", "te-IN", "ta-IN", "ml-IN", "mr-IN", "bn-IN", "gu-IN", "pa-IN", "od-IN", "ur-IN")
@@ -41,17 +43,16 @@ fun interface CareAssistTransport {
     suspend fun request(path: String, body: String?, accessToken: String): String
 }
 
-class CareAssistHttpTransport(private val base: String = "https://sahara.wedevit.in/api/care-assist") : CareAssistTransport {
-    init { require(base == "https://sahara.wedevit.in/api/care-assist") }
+class CareAssistHttpTransport(private val base: String = CARE_ASSIST_ENDPOINT) : CareAssistTransport {
+    init { require(base == CARE_ASSIST_ENDPOINT) }
     override suspend fun request(path: String, body: String?, accessToken: String): String {
-        CareAndroidAssistPolicy.requireExternalAi()
         return suspendCancellableCoroutine { continuation ->
         val active = AtomicReference<HttpURLConnection?>()
         val worker = CoroutineScope(Dispatchers.IO).launch {
             var connection: HttpURLConnection? = null
             try {
                 require(path in setOf("", "/transcribe", "/translate"))
-                if (body != null && (!accessToken.matches(Regex("[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+")) || accessToken.length > 16384)) throw CareAssistException("sign_in_required", "Sign in to Sahara first.")
+                if ((!accessToken.matches(Regex("[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+")) || accessToken.length > 16384)) throw CareAssistException("sign_in_required", "Sign in to Sahara first.")
                 connection = URL(base + path).openConnection() as HttpURLConnection
                 active.set(connection)
                 if (!continuation.isActive) { connection.disconnect(); return@launch }
@@ -61,9 +62,10 @@ class CareAssistHttpTransport(private val base: String = "https://sahara.wedevit
                 connection.setRequestProperty("Accept", "application/json")
                 connection.setRequestProperty("Cache-Control", "no-store")
                 connection.setRequestProperty("X-Sahara-Client", "android")
+                // The Supabase gateway only runs the function for a signed-in Sahara account.
+                connection.setRequestProperty("Authorization", "Bearer $accessToken")
                 if (body != null) {
                     val bytes = body.toByteArray(Charsets.UTF_8)
-                    connection.setRequestProperty("Authorization", "Bearer $accessToken")
                     connection.setRequestProperty("Content-Type", "application/json")
                     connection.doOutput = true; connection.setFixedLengthStreamingMode(bytes.size)
                     connection.outputStream.use { output ->
@@ -99,40 +101,36 @@ class CareAssistHttpTransport(private val base: String = "https://sahara.wedevit
 
 class CareRemoteAssist(private val transport: CareAssistTransport = CareAssistHttpTransport()) {
     private val adapter = CareAssistProviderAdapter(transport)
-    suspend fun capabilities(): CareAssistCapabilities {
-        if (!CareAndroidAssistPolicy.externalAiEnabled) return CareAssistCapabilities(false, false, false)
-        return adapter.capabilities()
-    }
-    suspend fun draft(source: String, token: String, consent: Boolean): CareAssistedDraft {
-        CareAndroidAssistPolicy.requireExternalAi()
-        return adapter.draft(source, token, consent)
-    }
-    suspend fun transcribe(file: File, consent: RecordingConsent, durationMs: Long, language: String, token: String): CareAssistedTranscript {
-        CareAndroidAssistPolicy.requireExternalAi()
-        return adapter.transcribe(file, consent, durationMs, language, token)
-    }
-    suspend fun translate(source: String, versionId: String, sourceLanguage: String, targetLanguage: String, token: String, consent: Boolean): CareAssistedTranslation {
-        CareAndroidAssistPolicy.requireExternalAi()
-        return adapter.translate(source, versionId, sourceLanguage, targetLanguage, token, consent)
-    }
+    suspend fun capabilities(token: String): CareAssistCapabilities = adapter.capabilities(token)
+    suspend fun draft(source: String, token: String, consent: Boolean): CareAssistedDraft = adapter.draft(source, token, consent)
+    suspend fun transcribe(file: File, consent: RecordingConsent, durationMs: Long, language: String, token: String): CareAssistedTranscript = adapter.transcribe(file, consent, durationMs, language, token)
+    suspend fun translate(source: String, versionId: String, sourceLanguage: String, targetLanguage: String, token: String, consent: Boolean): CareAssistedTranslation =
+        adapter.translate(source, versionId, sourceLanguage, targetLanguage, token, consent)
 }
 
-/** Retained for provider contract checks; the Android entry points above stay disabled. */
+/** The speaker label already written at the start of a conversation line, or "Unknown". */
+internal fun careAssistSpeaker(text: String): String =
+    Regex("^(?:\\[(Patient|Family / carer|Doctor) · [^\\]\\r\\n]+\\]|(Patient|Family / carer|Doctor):)").find(text)?.let { it.groupValues[1].ifBlank { it.groupValues[2] } } ?: "Unknown"
+
+/** Each request carries consent and a fresh request ID. Only the numbered lines (draft), one short turn (audio) or one note (translation) leave the phone. */
 internal class CareAssistProviderAdapter(private val transport: CareAssistTransport) {
-    suspend fun capabilities(): CareAssistCapabilities {
-        val value = JSONObject(transport.request("", null, ""))
-        require(value.getString("provider") == "sarvam")
-        return CareAssistCapabilities(value.getBoolean("ready"), value.getBoolean("audioReady") && BuildConfig.CLOUD_AUDIO_ENABLED, value.getBoolean("translationReady"))
+    suspend fun capabilities(token: String): CareAssistCapabilities {
+        val value = JSONObject(transport.request("", null, token))
+        require(value.getString("provider") == CARE_ASSIST_PROVIDER)
+        val ready = value.getBoolean("ready")
+        return CareAssistCapabilities(ready, ready && value.optBoolean("audioReady"), ready && value.optBoolean("translationReady"),
+            value.optString("label").take(60).ifBlank { "the AI service" }, value.optString("model").take(100))
     }
 
     suspend fun draft(source: String, token: String, consent: Boolean): CareAssistedDraft {
         require(consent) { "Agree to online processing first." }; require(source.isNotBlank() && source.length <= 12000)
-        val raw = transport.request("", request().put("source", source).toString(), token)
+        val lines = JSONArray()
+        CareDraftAssist.lines(source).forEach { lines.put(JSONObject().put("line", it.number).put("text", it.text).put("speaker", careAssistSpeaker(it.text))) }
+        val raw = transport.request("", request().put("sourceHash", careAssistSourceHash(source)).put("lines", lines).toString(), token)
         return checkedRemote { parseCareAssistedDraft(raw, source) }
     }
 
     suspend fun transcribe(file: File, consent: RecordingConsent, durationMs: Long, language: String, token: String): CareAssistedTranscript {
-        require(BuildConfig.CLOUD_AUDIO_ENABLED) { "Online audio processing is not available in this release." }
         require(file.isFile && file.absolutePath == File(consent.audioPath).absolutePath && file.extension.lowercase() == "m4a") { "Choose this conversation’s saved recording." }
         require(consent.recordingConsentAt > 0 && consent.transcriptionConsentAt >= consent.recordingConsentAt && consent.transcriptionConsentAt > 0) { "Everyone must separately agree to recording and online transcription." }
         require(durationMs in 1..30000 && file.length() in 16..2L * 1024 * 1024) { "Use one speaker’s turn, up to 30 seconds and 2 MB. Keep longer recordings and add a reviewed transcript." }
@@ -158,48 +156,42 @@ internal class CareAssistProviderAdapter(private val transport: CareAssistTransp
     }
 }
 
+/** The server returns line numbers only. Every word in the draft is copied from this phone's own copy of the conversation. */
 fun parseCareAssistedDraft(json: String, source: String): CareAssistedDraft {
     val value = JSONObject(json)
-    require(value.get("requiresReview") == true && value.getString("provider") == "sarvam" && value.getString("model") == "sarvam-105b")
+    require(value.get("requiresReview") == true && value.getString("provider") == CARE_ASSIST_PROVIDER)
+    val model = value.getString("model"); require(model.length in 1..100)
     val hash = careAssistSourceHash(source); require(value.getString("sourceHash") == hash) { "The conversation changed. Try again." }
-    val rawFields = value.getJSONObject("fields"); val rawExcerpts = value.getJSONObject("excerpts")
-    require(rawFields.length() == 5 && rawExcerpts.length() == 5)
-    val fields = careAssistFieldKeys.associateWith { rawFields.getString(it).also { words -> require(words.length <= 4000) } }
-    val lines = CareDraftAssist.lines(source); val rawEvidence = value.getJSONArray("evidence"); require(rawEvidence.length() <= 60)
-    val evidence = (0 until rawEvidence.length()).map { index ->
-        val item = rawEvidence.getJSONObject(index)
-        require(item.length() == 6)
-        val field = item.getString("field"); require(field in careAssistFieldKeys)
-        require(listOf("line", "start", "end").all { (item.get(it) is Int || item.get(it) is Long) && item.getLong(it) in 0L..12000L })
-        val line = item.getInt("line"); val start = item.getInt("start"); val end = item.getInt("end"); val text = item.getString("text"); val speaker = item.getString("speaker")
-        val original = lines.singleOrNull { it.number == line && it.start == start && it.end == end && it.text == text }
-        require(original != null) { "The draft did not match a complete source line." }
-        val role = Regex("^(?:\\[(Patient|Family / carer|Doctor) · [^\\]\\r\\n]+\\]|(Patient|Family / carer|Doctor):)").find(text)?.let { it.groupValues[1].ifBlank { it.groupValues[2] } } ?: "Unknown"
-        require(speaker == role && (field != "priorities" || role == "Patient")) { "The patient speaker was not established." }
-        CareAssistEvidence(field, line, start, end, text, speaker)
+    val selections = value.getJSONObject("selections")
+    val lines = CareDraftAssist.lines(source).associateBy { it.number }
+    val evidence = careAssistFieldKeys.flatMap { field ->
+        val raw = selections.optJSONArray(field) ?: JSONArray()
+        require(raw.length() <= 12)
+        (0 until raw.length()).map { index ->
+            val number = raw.get(index); require(number is Int) { "The draft did not point at whole lines." }
+            lines[number] ?: throw IllegalArgumentException("The draft pointed at a line that is not in this conversation.")
+        }.distinctBy { it.number }.sortedBy { it.start }
+            .map { CareAssistEvidence(field, it.number, it.start, it.end, it.text, careAssistSpeaker(it.text)) }
+            // Only the patient's own words can be the patient's priorities.
+            .filter { field != "priorities" || it.speaker == "Patient" }
     }
-    require(evidence.distinctBy { "${it.field}:${it.line}" }.size == evidence.size)
-    careAssistFieldKeys.forEach { field ->
-        val selected = evidence.filter { it.field == field }.sortedBy { it.start }
-        require(selected.size <= 12 && fields[field] == selected.joinToString("\n") { it.text }) { "The draft contains unsupported wording." }
-        val excerpt = if (selected.isEmpty()) "" else source.substring(selected.first().start, selected.last().end)
-        require(rawExcerpts.getString(field) == excerpt)
-    }
-    return CareAssistedDraft(hash, fields, evidence, "sarvam", "sarvam-105b")
+    val fields = careAssistFieldKeys.associateWith { field -> evidence.filter { it.field == field }.joinToString("\n") { it.text } }
+    return CareAssistedDraft(hash, fields, evidence, CARE_ASSIST_PROVIDER, model)
 }
 
 fun parseCareAssistedTranscript(json: String): CareAssistedTranscript {
     val value = JSONObject(json); val text = value.getString("transcript"); val language = value.getString("language")
-    require(value.get("requiresReview") == true && value.getString("provider") == "sarvam" && value.getString("model") == "saaras:v3")
+    val model = value.getString("model")
+    require(value.get("requiresReview") == true && value.getString("provider") == CARE_ASSIST_PROVIDER && model.length in 1..100)
     require(text.isNotBlank() && text.length <= 12000 && value.getString("originalTranscript") == text && value.getString("sourceHash") == careAssistSourceHash(text))
     require(value.getString("speaker") == "Unknown" && value.get("speakerConfirmed") == false) { "Speaker identity must be checked by a person." }
     require(language == "unknown" || language in careAssistLanguageCodes)
-    return CareAssistedTranscript(text, careAssistSourceHash(text), language, "sarvam", "saaras:v3")
+    return CareAssistedTranscript(text, careAssistSourceHash(text), language, CARE_ASSIST_PROVIDER, model)
 }
 
 fun parseCareAssistedTranslation(json: String, source: String, versionId: String, from: String, to: String): CareAssistedTranslation {
     val value = JSONObject(json)
-    require(value.get("requiresReview") == true && value.getString("provider") == "sarvam" && value.getString("model") == "sarvam-translate:v1")
+    require(value.get("requiresReview") == true && value.getString("provider") == CARE_ASSIST_PROVIDER && value.getString("model").length in 1..100)
     val hash = careAssistSourceHash(source)
     require(value.getString("original") == source && value.getString("sourceHash") == hash && value.getString("versionId") == versionId
         && value.getString("sourceLanguage") == from && value.getString("targetLanguage") == to) { "The translation belongs to a different note version." }
