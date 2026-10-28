@@ -8,7 +8,7 @@ Collected on 27 Oct from every agent lane across Sahara, ITI, WDCW and AI-FIR. T
 
 ### Sahara (healthathon)
 - [ ] Apply the Supabase migrations the lanes add (emergency QR link, account delete, feedback, sync), then re-test.
-- [ ] Redeploy the website with the app-link file, so invite links open the app.
+- [ ] Redeploy the website with the app-link file, so invite links open the app. 28 Oct: main (`2425f6d`+) built and passed 320 web tests; a **preview** deployment is ready at https://continuity-loop-healthathon-cgkt6n88o.vercel.app (its `/join` responds; production still 404s). The production deploy was not run from the agent. To publish it, run `vercel deploy --prod` from `prototype/`, or promote that preview in Vercel. The live `assetlinks.json` already has the same placeholder, so this deploy does not make app links worse. Add the Play App Signing SHA-256 afterwards and redeploy again.
 - [ ] Supabase settings: email sign-up confirmation, leaked-password protection, lock `rls_auto_enable()`.
 - [ ] Approve doctor accounts: now done in the app (see "Sahara owner keys and steps (no-mock round, 28 Oct)" below).
 - [ ] AI note drafting: put the AI key on the server (see "Sahara owner keys and steps (no-mock round, 28 Oct)" below). Until then the app keeps word matching and says AI is not set up.
@@ -17,13 +17,13 @@ Collected on 27 Oct from every agent lane across Sahara, ITI, WDCW and AI-FIR. T
 - [ ] Pick the CARE option in the team meeting (A / A+B / A+C).
 - [ ] Send the OHC email and the private security disclosures (drafts in docs/outreach/).
 - [ ] DPDP: name the data fiduciary (company or new entity); approve the privacy policy and consent text (drafts in docs/compliance/).
-- [ ] Play: next upload uses versionCode 9 or higher, once 0.6.0 (7) is out of review; fill in Data safety from the draft.
+- [ ] Play: next upload uses versionCode 9 or higher, once 0.6.0 (7) is out of review; fill in Data safety from the draft. 28 Oct: source is 0.6.2 (9). The debug build (`in.wedevit.sahara.development`) built and is for the phone test. The signed release APK/AAB did **not** build: R8 (`minifyReleaseWithR8`) ran out of native memory three times with under 3 GB free. Close other apps and rerun `gradlew.bat --no-daemon bundleRelease` from `android/`; no v9 AAB exists yet.
 - [ ] Test on a real phone: checklist in CLAUDE_TRANSCRIPT.md §3.
 - [ ] Final template: team code, doctor details, costs; decide how judges see the code (repo is private).
 - [x] Working drafts filled in the 27 Oct two-page and 12-slide organiser templates on 28 Oct; see `submission/phase-2/final-deliverables-2026-10-28/`.
 - [ ] Approve the draft's team/doctor descriptions, Shirin's role, CARE scope, candidate measures, costs and pilot wording; confirm team code.
 - [ ] Ask organiser for the confirmed submission deadline, portal, video duration and evaluator-access method; the 27 Oct email does not specify them.
-- [ ] Prepare evaluator access privately and verify the actual join/install path; current public `/join` route returns 404 and the app-link signing fingerprint is still a placeholder.
+- [ ] Prepare evaluator access privately and verify the actual join/install path; current public `/join` route returns 404 until the 28 Oct preview is promoted, and the app-link signing fingerprint is still a placeholder.
 - [ ] Record and review the narrated real-phone walkthrough with Awaiz and an approved doctor account; do not use screenshots or a silent capture as the video deliverable.
 
 ### Sahara owner keys and steps (no-mock round, 28 Oct)
