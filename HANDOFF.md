@@ -6,6 +6,24 @@ This note lists every change I made to the Android app, what the app is like rig
 
 **27 October final-deliverables update:** the organiser's new [two original templates and email](source-materials/healthathon-phase-2/2026-10-27-final-deliverables/README.md) are archived. Final submission requires a working MVP, a separate two-page overview, the new final presentation and a narrated demo video. Use [everyday.md](everyday.md) for the final checklist and [TEAM_HANDOFF.md](TEAM_HANDOFF.md) for this archive checkpoint. The new email does not confirm the existing 7 November planning target or specify a cut-off/portal; verify those before submitting. Previous Android evidence below is unchanged by this archive task.
 
+## Awaiz: do this (28 Oct 2026, from Basith)
+
+Details and the exact values are in [blockers.md](blockers.md). Tick items there when done.
+
+1. **Supabase migrations:** open Supabase and apply these from `android/supabase/migrations/`, in order. First check that the 19–23 Oct ones are already applied.
+   - `20261019151322_shared_care_clinician_review.sql`
+   - `20261023053251_care_team_contacts.sql`
+   - `20261023053321_doctor_medicine_history.sql`
+   - `20261023070323_conversation_scope_context.sql`
+   - `20261023071214_doctor_prescription_groups.sql`
+   - New:
+     - `20261027190000_emergency_card_links.sql`, then run `android/supabase/tests/emergency_links.sql`
+     - `20261027190500_sahara_app_feedback.sql`
+     - `20261027210000_sahara_account_lane.sql`
+2. **AI key:** in Supabase → Edge Functions → Secrets, set `SAHARA_AI_BASE_URL`, `SAHARA_AI_API_KEY` and `SAHARA_AI_MODEL`. Then, from `android/`, run `supabase functions deploy sahara-care-assist --project-ref kjnhtakqzboayqorrlue`.
+3. **Website:** redeploy it, so the app-link file and the `/join` page go live. The Play App Signing SHA-256 must go into `prototype/public/.well-known/assetlinks.json` first.
+4. Don't change sign-in or the doctor walkthrough entry. Judges use it.
+
 ---
 
 ## 1. Where the code is
