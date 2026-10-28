@@ -26,6 +26,8 @@ Collected on 27 Oct from every agent lane across Sahara, ITI, WDCW and AI-FIR. T
 - [ ] Prepare evaluator access privately and verify the actual join/install path; current public `/join` route returns 404 until the 28 Oct preview is promoted, and the app-link signing fingerprint is still a placeholder.
 - [ ] Record and review the narrated real-phone walkthrough with Awaiz and an approved doctor account; do not use screenshots or a silent capture as the video deliverable.
 
+- [ ] NCCN Distress Thermometer (decision 7, 28 Oct): the NCCN PDF says it "may not be reproduced in any form without the express written permission of NCCN". Ask NCCN for permission for the in-app version (English wording from Version 1.2026), and get the official NCCN Hindi translation (free NCCN login at nccn.org/distress-thermometer) so a clinician can compare it with Sahara's own Hindi labels in `CareDistress.kt`.
+
 ### Sahara owner keys and steps (no-mock round, 28 Oct)
 **AI note drafting, recorded-turn transcription and note translation** (works with any OpenAI-compatible service: a hosted one, or an open model you run yourself, e.g. vLLM, Ollama or llama.cpp server for text and faster-whisper-server for audio, behind HTTPS).
 - [ ] Supabase → project Saanthvana (`kjnhtakqzboayqorrlue`) → Edge Functions → Secrets → add:

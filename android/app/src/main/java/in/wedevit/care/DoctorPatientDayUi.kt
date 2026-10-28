@@ -43,7 +43,7 @@ import java.time.format.DateTimeFormatter
 internal enum class DoctorReportedMood(val title: String) { GOOD("A good day"), OKAY("An okay day"), HARD("A hard day") }
 internal fun doctorMood(title: String) = DoctorReportedMood.entries.firstOrNull { it.title == title }
 internal fun doctorCheckIns(entries: List<CareItem>, personId: String, now: Long) = entries.filter {
-    it.personId == personId && it.kind == "checkin" && it.created in 1..now && !CareEntryCodec.isStructured(it.detail)
+    it.personId == personId && it.kind == "checkin" && it.created in 1..now && !CareEntryCodec.isStructured(it.detail) && !DistressCodec.isStructured(it.detail)
 }.sortedWith(compareByDescending<CareItem> { it.created }.thenBy { it.id })
 internal data class DoctorMedicineCounts(val total: Int, val markedToday: Int) { val notMarked get() = total - markedToday }
 internal fun doctorMedicineCounts(entries: List<CareItem>, personId: String, today: LocalDate): DoctorMedicineCounts {
@@ -78,6 +78,7 @@ private fun doctorRecordedTime(at: Long, zone: ZoneId) = if (at <= 0) "Date not 
         item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { Column(Modifier.weight(1f)) { Heading(t("Care today", "आज की देखभाल"), 29); Text(person.name, fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk) }; Text(today.format(DateTimeFormatter.ofPattern("EEE, d MMM")), fontSize = 13.sp, color = DoctorCardSub) } }
         item { DoctorGlanceRow(visits.firstOrNull(), zone, medicines, questions, onCalendar, onMedicines) { latestNote?.let(onReadNote) } }
         item { DoctorDayTopCards(todayCheck, checks.firstOrNull(), zone, onOverview, onCheckIns, onCalendar, onCareTeam, onLabs) }
+        item { DistressHistoryCard(entries, person.id) }
         careTeamSummary?.let { summary -> item { summary() } }
         latestNote?.let { note -> item { Card(onClick = { onReadNote(note) }, colors = CardDefaults.cardColors(containerColor = DoctorCardReport), border = BorderStroke(1.dp, DoctorHairline), shape = RoundedCornerShape(20.dp), modifier = Modifier.fillMaxWidth().testTag("doctor-latest-note")) { Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) { Text(t("Latest care note", "नया केयर नोट"), fontSize = 19.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, color = DoctorCardInk); Text(doctorRecordedTime(note.published, zone), fontSize = 13.sp, color = DoctorCardSub); Text(ReviewWorkflow.label(note), fontSize = 13.sp, color = DoctorCardSub); Text(note.topics.ifBlank { t("Read the recorded discussion.", "दर्ज चर्चा पढ़ें।") }, fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk, maxLines = 3); Text(t("Read exact version ${note.version}", "संस्करण ${note.version} पढ़ें"), fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = DoctorAccent, modifier = Modifier.heightIn(min = 32.dp)) } } } }
         item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { Text(t("Up next", "आगे क्या है"), fontSize = 21.sp, fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f), fontFamily = SaharaTitleFont, color = DoctorCardInk); TextButton(onClick = onAddVisit, enabled = canEdit, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-add-visit")) { Icon(Icons.Default.Add, null); Text(t("Add visit", "विज़िट जोड़ें")) } }; if (!canEdit) Text(t("Read-only access. A permitted editor must add a visit.", "सिर्फ़ पढ़ने की पहुँच। विज़िट अनुमति वाला व्यक्ति ही जोड़ सकता है।"), fontSize = 13.sp, color = DoctorCardSub) }
@@ -256,6 +257,7 @@ private fun doctorToolLabel(label: String, hindi: Boolean) = if (!hindi) label e
     val grouped = shown.groupBy { java.time.YearMonth.from(Instant.ofEpochMilli(it.created).atZone(zone)) }
     LazyColumn(Modifier.fillMaxSize().imePadding().testTag("doctor-checkin-history"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { Heading(t("Reported condition history", "बताई गई हालत का इतिहास"), 27); Text(t("Dated self-reports, not a clinical score.", "तारीख़ वाली अपनी सूचनाएँ, क्लिनिकल स्कोर नहीं।"), Modifier.padding(top = 4.dp), fontSize = 12.sp, lineHeight = 16.sp, color = DoctorCardFaint) }
+        item { DistressHistoryCard(entries, personId) }
         if (checks.isEmpty()) item { SurfaceCard { Text(t("No check-ins recorded yet", "अभी कोई हाल दर्ज नहीं"), fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk); Text(t("Updates will appear here when recorded.", "दर्ज होने पर अपडेट यहाँ दिखेंगे।"), fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk) } } else {
             item {
                 Surface(color = DoctorCardProgress, shape = RoundedCornerShape(20.dp), modifier = Modifier.fillMaxWidth().testTag("doctor-checkin-summary")) {

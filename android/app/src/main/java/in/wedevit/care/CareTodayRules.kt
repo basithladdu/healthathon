@@ -15,7 +15,7 @@ internal object CareTodayRules {
 
     /** Today's daily check-in only; symptom-diary and pain-map notes share the kind but are not the check-in. */
     fun todayCheckIn(items: List<CareItem>, dayStart: Long): CareItem? =
-        items.firstOrNull { it.kind == "checkin" && it.created >= dayStart && !SymptomNoteCodec.isStructured(it.detail) }
+        items.firstOrNull { it.kind == "checkin" && it.created >= dayStart && !SymptomNoteCodec.isStructured(it.detail) && !DistressCodec.isStructured(it.detail) }
 
     /** Empty Today sections say what to do next; read-only family members are not told to tap an add button. */
     fun emptyText(section: String, canEdit: Boolean): String = when (section) {
