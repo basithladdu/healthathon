@@ -1,5 +1,13 @@
 # Sahara Android: Awaiz's handoff
 
+## 28 Oct: Play upload gap and candidate 0.6.2 (9)
+
+- The latest saved live Console evidence is from 24 Oct: Production 0.6.0 (7), submission 7, showed **Changes in review**. No later live Console result is recorded, so refresh that status before any upload.
+- Prepared the source version for 0.6.2 (versionCode 9), satisfying the next-upload minimum. It is not built, signed, tested or uploaded. This worktree has no AAB. The previous 0.6.1 (8) artifact is not eligible for upload because the required next version is 9 or higher.
+- The upload keystore and its config are stored privately under `F:\BuildKeys\sahara`; neither is in Git. This worktree has no `android/keystore.properties`. Use a temporary ignored config only for the build, then remove it; never stage it.
+- Build is held until there is safe memory headroom. Earlier native Gradle builds failed under memory pressure; do not terminate unrelated processes to make room.
+- The live browser check was not completed: the Computer Use bridge failed to initialize, and the available secure browser profile has no Google sign-in saved. A separate secure sign-in session has been requested; no credentials or codes were requested in chat.
+
 ## 28 Oct owner checkpoint: Health-a-thon hand-in dependencies
 
 The new two-page and 12-slide organiser-template drafts are at `submission/phase-2/final-deliverables-2026-10-28/` and linked from `everyday.md`. They state current code/product facts, not a new app release. The end-to-end judge login is not ready: live `/join` returns 404, and `prototype/public/.well-known/assetlinks.json` still has the Play signing certificate placeholder. Do not redeploy that placeholder. The exact Play App Signing SHA-256 is needed before making invite links open the app.

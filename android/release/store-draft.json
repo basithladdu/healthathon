@@ -213,14 +213,14 @@
   },
   "applicationId": "in.wedevit.sahara",
   "nextBuild": {
-    "version": "0.6.0",
-    "versionCode": 7,
+    "version": "0.6.2",
+    "versionCode": 9,
     "built": false,
     "ready": false,
     "uploaded": false,
     "submitted": false,
     "installed": false,
-    "status": "Authorised production update in preparation; native personal symptom diary is being added. A signed release bundle has not yet been verified.",
+    "status": "Source version 0.6.2 (versionCode 9) is prepared on 28 Oct. No signed bundle has been built for this candidate. Do not upload until the current Play Console release status is refreshed and the signed AAB is verified.",
     "playDraft": {
       "trackId": "4697314269892725425",
       "releaseId": 3,
@@ -228,6 +228,8 @@
       "created": true
     },
     "releasePrerequisites": [
+      "Refresh Play Console status before uploading. The latest saved production evidence in release-followup-status.json is 0.6.0 (7), submission 7 in review on 24 Oct 2026; this is not a live 28 Oct check.",
+      "Build and verify a signed 0.6.2 (9) APK/AAB from the exact source commit; no versionCode 9 AAB is currently present in this checkout.",
       "Finish and check native symptom diary.",
       "Build and verify actual signed release APK/AAB with existing upload key.",
       "Update accurate0.6 listing, review instructions, privacy and Data safety before submission.",
@@ -266,7 +268,9 @@
       "deviceInteractionVerified": false,
       "reason": "Device connected but locked; user asked to unlock. No authentication bypass."
     },
-    "browserBlocker": "After recovery the browser control tool was unavailable; official Windows Computer Use fallback stopped because it could not determine the browser URL confidently enough to enforce policy. No more UI actions were taken. Production draft3 and saved Data safety remain; signed bundle upload, listing/reviewer/health updates and review submission are still pending."
+    "browserBlocker": "After recovery the browser control tool was unavailable; official Windows Computer Use fallback stopped because it could not determine the browser URL confidently enough to enforce policy. No more UI actions were taken. Production draft3 and saved Data safety remain; signed bundle upload, listing/reviewer/health updates and review submission are still pending.",
+    "sourcePreparedAt": "2026-10-28",
+    "buildStatus": "Not built: 0.6.2 (9) source version prepared; build deferred while system had about 0.5 GB free physical memory after earlier native-memory failures."
   },
   "productionRelease": {
     "version": "0.5.0",
