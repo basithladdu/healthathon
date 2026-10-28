@@ -1,5 +1,12 @@
 # Sahara Android: Awaiz's handoff
 
+## 28 Oct owner checkpoint: Health-a-thon hand-in dependencies
+
+The new two-page and 12-slide organiser-template drafts are at `submission/phase-2/final-deliverables-2026-10-28/` and linked from `everyday.md`. They state current code/product facts, not a new app release. The end-to-end judge login is not ready: live `/join` returns 404, and `prototype/public/.well-known/assetlinks.json` still has the Play signing certificate placeholder. Do not redeploy that placeholder. The exact Play App Signing SHA-256 is needed before making invite links open the app.
+
+No new AAB was built or uploaded in this checkpoint. The existing handoff says 0.6.0 (7) is in Play review and next versionCode must be at least 9; check live Play status before a later upload. Real-phone doctor/family journey and narrated video still need Awaiz and an approved doctor test account.
+
+
 Last updated 26 Oct 2026 by Shaik Muhammad Awaiz (UI/Android), with Claude Code.
 
 This note lists every change I made to the Android app, what the app is like right now, what was checked, and what is still open. It covers the patient & family app, the doctor walkthrough and the symptom tracker.

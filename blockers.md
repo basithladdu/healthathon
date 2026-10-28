@@ -4,7 +4,7 @@ Agents cannot do these: server migrations, deployments, provider accounts and ke
 
 **Who:** Basith = owner; Awaiz = Sahara app; team = the clinicians (Sujay, Sharada, Shirin).
 
-Collected on 27 Oct from every agent lane across Sahara, ITI, WDCW and AI-FIR. Everything else in those lanes is merged to each repo's main. Tick an item when done.
+Collected on 27 Oct from every agent lane across Sahara, ITI, WDCW and AI-FIR. The web survey and Android feature work have separate handoffs; these are the remaining owner/team actions. Tick an item only after the external step is verified.
 
 ### Sahara (healthathon)
 - [ ] Apply the Supabase migrations the lanes add (emergency QR link, account delete, feedback, sync), then re-test.
@@ -20,6 +20,11 @@ Collected on 27 Oct from every agent lane across Sahara, ITI, WDCW and AI-FIR. E
 - [ ] Play: next upload uses versionCode 9 or higher, once 0.6.0 (7) is out of review; fill in Data safety from the draft.
 - [ ] Test on a real phone: checklist in CLAUDE_TRANSCRIPT.md §3.
 - [ ] Final template: team code, doctor details, costs; decide how judges see the code (repo is private).
+- [x] Working drafts filled in the 27 Oct two-page and 12-slide organiser templates on 28 Oct; see `submission/phase-2/final-deliverables-2026-10-28/`.
+- [ ] Approve the draft's team/doctor descriptions, Shirin's role, CARE scope, candidate measures, costs and pilot wording; confirm team code.
+- [ ] Ask organiser for the confirmed submission deadline, portal, video duration and evaluator-access method; the 27 Oct email does not specify them.
+- [ ] Prepare evaluator access privately and verify the actual join/install path; current public `/join` route returns 404 and the app-link signing fingerprint is still a placeholder.
+- [ ] Record and review the narrated real-phone walkthrough with Awaiz and an approved doctor account; do not use screenshots or a silent capture as the video deliverable.
 
 ### Sahara owner keys and steps (no-mock round, 28 Oct)
 **AI note drafting, recorded-turn transcription and note translation** (works with any OpenAI-compatible service: a hosted one, or an open model you run yourself, e.g. vLLM, Ollama or llama.cpp server for text and faster-whisper-server for audio, behind HTTPS).

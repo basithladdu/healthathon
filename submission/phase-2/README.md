@@ -1,5 +1,16 @@
 # Phase 2 final deliverables and preserved drafts
 
+## 28 October working drafts in the new templates
+
+- [Two-page solution brief](final-deliverables-2026-10-28/Sahara-Two-Page-Solution-Brief-working-draft.pptx)
+- [12-slide final presentation](final-deliverables-2026-10-28/Sahara-Healthathon-Final-Presentation-working-draft.pptx)
+- [Content review and unresolved fields](final-deliverables-2026-10-28/content-review.txt)
+
+These use the original 27 October organiser templates, retain their slide dimensions and artwork, and were rendered for visual review. The two-page brief has 2 slides; the final presentation has 12. Unknown team/clinical details, CARE scope, approved measures/baselines, costs and pilot information remain explicitly pending. The narrated video and evaluator access are not ready. The organizer email gives no confirmed deadline or submission portal. These files are review drafts, not submitted deliverables.
+
+On 28 October, GET checks returned 200 for the Sahara home, both survey routes and the Play listing; `/join` returned 404. The website's Android app-link fingerprint is still a placeholder. No deployment, AAB upload or submission was made.
+
+
 ## Latest organiser requirements — 27 October 2026
 
 The organiser's **Build Sprint Final Deliverables and Submission Guidelines** email, dated **27 October 2026, 15:29 IST**, supplies two new prescribed templates. The originals, source email and provenance are indexed in the [27 October final-deliverables archive](../../source-materials/healthathon-phase-2/2026-10-27-final-deliverables/README.md).
