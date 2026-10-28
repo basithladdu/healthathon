@@ -103,12 +103,12 @@ internal fun doctorTranscriptIsSample(walkthrough: Boolean, source: String, samp
 }
 
 /** Collapsible goals-of-care cards for the transcript page. [onSave] receives (question id, answer); [onShowLine] jumps to a transcript line. */
-@Composable internal fun DoctorTranscriptGoals(rows: List<DoctorPreparationQuestion>, matches: QuestionMatchResult?, editable: Boolean, onSave: (String, String) -> Unit, onBackToWho: () -> Unit = {}, source: String = "", onShowLine: (CareSourceLine) -> Unit = {}) {
+@Composable internal fun DoctorTranscriptGoals(rows: List<DoctorPreparationQuestion>, matches: QuestionMatchResult?, editable: Boolean, onSave: (String, String) -> Unit, onBackToWho: () -> Unit = {}, source: String = "", onShowLine: (CareSourceLine) -> Unit = {}) { val t = careText();
     Column(Modifier.fillMaxWidth().testTag("transcript-goals"), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        Text("Goals of care", fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
+        Text(t("Goals of care", "देखभाल के लक्ष्य"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
         if (rows.isEmpty()) {
-            Text("No goals-of-care questions were added before recording. Add them on the Who's here page.", fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub)
-            TextButton(onClick = onBackToWho, modifier = Modifier.heightIn(min = 48.dp).testTag("transcript-goals-back")) { Text("Back to who is here", color = DoctorAccent) }
+            Text(t("No goals-of-care questions were added before recording. Add them on the Who's here page.", "रिकॉर्डिंग से पहले देखभाल के लक्ष्यों के सवाल नहीं जोड़े गए। उन्हें “कौन मौजूद है” पेज पर जोड़ें।"), fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub)
+            TextButton(onClick = onBackToWho, modifier = Modifier.heightIn(min = 48.dp).testTag("transcript-goals-back")) { Text(t("Back to who is here", "कौन मौजूद है पर वापस"), color = DoctorAccent) }
         } else {
             Text("Suggestions come from matching words in the transcript. Accept or edit each answer before the note is saved. · सुझाव बातचीत के शब्दों से हैं; हर जवाब जाँचें।", fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub)
             rows.forEach { row -> key(row.id) { GoalCard(row, matches, editable, onSave, source, onShowLine) } }
@@ -116,7 +116,7 @@ internal fun doctorTranscriptIsSample(walkthrough: Boolean, source: String, samp
     }
 }
 
-@Composable private fun GoalCard(row: DoctorPreparationQuestion, matches: QuestionMatchResult?, editable: Boolean, onSave: (String, String) -> Unit, source: String, onShowLine: (CareSourceLine) -> Unit) {
+@Composable private fun GoalCard(row: DoctorPreparationQuestion, matches: QuestionMatchResult?, editable: Boolean, onSave: (String, String) -> Unit, source: String, onShowLine: (CareSourceLine) -> Unit) { val t = careText();
     var open by rememberSaveable(row.id) { mutableStateOf(false) }
     val suggestion = transcriptGoalSuggestion(matches, row.id)
     val span = suggestion?.quote?.trim().orEmpty()
@@ -130,7 +130,7 @@ internal fun doctorTranscriptIsSample(walkthrough: Boolean, source: String, samp
     val answerLine = remember(source, row.answer) { transcriptAnswerLine(source, row.answer) }
     Surface(shape = RoundedCornerShape(20.dp), color = DoctorCardReport, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("transcript-goal-${row.id}")) {
         Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable(role = Role.Button, onClickLabel = if (open) "Collapse" else "Expand") { open = !open }, verticalAlignment = Alignment.CenterVertically) {
+            Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable(role = Role.Button, onClickLabel = if (open) t("Collapse", "बंद करें") else t("Expand", "खोलें")) { open = !open }, verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(row.text, fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk)
                     val (fg, bg) = when (status) { TranscriptGoalStatus.Answered -> DoctorStatusGood to DoctorStatusGoodBg; TranscriptGoalStatus.Suggested -> DoctorStatusWarn to DoctorStatusWarnBg; TranscriptGoalStatus.Open -> DoctorStatusRest to DoctorStatusRestBg }
@@ -141,15 +141,15 @@ internal fun doctorTranscriptIsSample(walkthrough: Boolean, source: String, samp
             if (open) {
                 if (row.answer.isNotBlank() && draft == null) {
                     if (answerLine != null) TextButton(onClick = { onShowLine(answerLine) }, modifier = Modifier.heightIn(min = 48.dp).testTag("transcript-goal-line-${row.id}")) { Text("From line ${answerLine.number} · show in transcript · पंक्ति देखें", color = DoctorAccent) }
-                    else Text("Your own words · not linked to a transcript line", fontSize = 12.sp, color = DoctorCardFaint)
+                    else Text(t("Your own words · not linked to a transcript line", "आपके अपने शब्द · लिखाई की किसी पंक्ति से जुड़े नहीं"), fontSize = 12.sp, color = DoctorCardFaint)
                 }
                 if (row.answer.isBlank() && draft == null && suggestion != null) Surface(shape = RoundedCornerShape(14.dp), color = DoctorStatusWarnBg, modifier = Modifier.fillMaxWidth().testTag("transcript-goal-suggestion-${row.id}")) {
                     Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         Text("Suggested from the transcript · found by matching words · line ${suggestion.line.number} · पंक्ति ${suggestion.line.number}", fontSize = 12.sp, fontWeight = FontWeight.Medium, color = DoctorStatusWarn)
-                        Text("“$span”", fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk, modifier = Modifier.clickable(role = Role.Button, onClickLabel = "Show this line in the transcript") { onShowLine(suggestion.line) })
+                        Text("“$span”", fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk, modifier = Modifier.clickable(role = Role.Button, onClickLabel = t("Show this line in the transcript", "यह पंक्ति लिखाई में दिखाएँ")) { onShowLine(suggestion.line) })
                         Text(transcriptSuggestionNote(suggestion), fontSize = 12.sp, color = DoctorCardFaint, modifier = Modifier.testTag("transcript-goal-note-${row.id}"))
                         Row(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
-                            TextButton(onClick = { onShowLine(suggestion.line) }, modifier = Modifier.heightIn(min = 48.dp).testTag("transcript-goal-show-${row.id}")) { Text("Show line", color = DoctorAccent) }
+                            TextButton(onClick = { onShowLine(suggestion.line) }, modifier = Modifier.heightIn(min = 48.dp).testTag("transcript-goal-show-${row.id}")) { Text(t("Show line", "पंक्ति दिखाएँ"), color = DoctorAccent) }
                             if (editable) {
                                 TextButton(onClick = { draft = span.take(DOCTOR_PREPARATION_MAX_ANSWER_CHARS) }, modifier = Modifier.heightIn(min = 48.dp).testTag("transcript-goal-edit-${row.id}")) { Text("Edit · बदलें", color = DoctorAccent) }
                                 Button(onClick = { onSave(row.id, span.take(DOCTOR_PREPARATION_MAX_ANSWER_CHARS)) }, modifier = Modifier.heightIn(min = 48.dp).testTag("transcript-goal-accept-${row.id}")) { Text("Accept · ठीक है") }
@@ -161,9 +161,9 @@ internal fun doctorTranscriptIsSample(walkthrough: Boolean, source: String, samp
                     OutlinedTextField(shown, { draft = it.take(DOCTOR_PREPARATION_MAX_ANSWER_CHARS) }, placeholder = { Text("Write the answer · जवाब लिखें") }, minLines = 3, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("transcript-goal-answer-${row.id}"))
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text("${shown.length}/$DOCTOR_PREPARATION_MAX_ANSWER_CHARS", fontSize = 12.sp, color = DoctorCardFaint, modifier = Modifier.weight(1f))
-                        TextButton(onClick = { onSave(row.id, shown.trim()); draft = null }, enabled = draft != null && shown.trim() != row.answer, modifier = Modifier.heightIn(min = 48.dp).testTag("transcript-goal-save-${row.id}")) { Text("Save answer", color = DoctorAccent) }
+                        TextButton(onClick = { onSave(row.id, shown.trim()); draft = null }, enabled = draft != null && shown.trim() != row.answer, modifier = Modifier.heightIn(min = 48.dp).testTag("transcript-goal-save-${row.id}")) { Text(t("Save answer", "जवाब सहेजें"), color = DoctorAccent) }
                     }
-                } else Text(shown.ifBlank { "No answer yet." }, fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk, modifier = Modifier.testTag("transcript-goal-answer-${row.id}"))
+                } else Text(shown.ifBlank { t("No answer yet.", "अभी कोई जवाब नहीं।") }, fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk, modifier = Modifier.testTag("transcript-goal-answer-${row.id}"))
             }
         }
     }
@@ -172,7 +172,7 @@ internal fun doctorTranscriptIsSample(walkthrough: Boolean, source: String, samp
 /** Where the transcript words came from, shown under the transcript. */
 internal fun doctorTranscriptOrigin(isSample: Boolean, transcribedAt: Long, model: String): String = when {
     isSample -> "Sample · written for the walkthrough, not taken from your recording · नमूना, आपकी रिकॉर्डिंग से नहीं"
-    transcribedAt > 0 -> "Transcript · $model. Check names, numbers and meaning against the audio."
+    transcribedAt > 0 -> "Transcript · $model. Check names, numbers and meaning against the audio. · ऑडियो से नाम, अंक और मतलब जाँचें"
     else -> "Typed or dictated here · check every word · यहाँ लिखा गया"
 }
 

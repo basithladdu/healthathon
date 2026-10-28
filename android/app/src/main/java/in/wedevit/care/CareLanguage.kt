@@ -70,6 +70,11 @@ fun checkInMoodLabel(title: String, hindi: Boolean): String = if (!hindi) title 
     CheckInMood.GOOD -> "अच्छा दिन"; CheckInMood.OKAY -> "ठीक-ठाक दिन"; CheckInMood.HARD -> "मुश्किल दिन"; else -> title
 }
 
+/** Care-note section headings are saved and hashed in English (NoteRules.labels); only the shown heading is Hindi. */
+fun noteSectionLabel(label: String, hindi: Boolean): String = if (!hindi) label else when (label) {
+    "What matters" -> "क्या ज़रूरी है"; "Who was there" -> "कौन मौजूद था"; "What we discussed" -> "किस पर बात हुई"; "Still to discuss" -> "अभी बात करनी है"; "Next steps" -> "आगे के कदम"; else -> label
+}
+
 /** Hindi for reminder checks and alerts (the English stays in CareReminderRules and CareReminders, which tests rely on). */
 internal val ReminderTextHindi = mapOf(
     "Use up to six reminder times." to "ज़्यादा से ज़्यादा छह रिमाइंडर समय रखें।",
