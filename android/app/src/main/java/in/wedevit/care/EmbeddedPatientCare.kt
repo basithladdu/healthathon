@@ -181,7 +181,7 @@ fun EmbeddedPatientCare(
                         "calendar" -> CareCalendar(vm, onWorkflow = { openTool("workflows") }, onAddDoctorVisit = { add("doctor-visit") })
                         "workflows" -> CareWorkflows(vm, onTalk = { changeSection("Conversations") })
                         "labs" -> CareLabs(vm)
-                        "nearby" -> Nearby(vm.centres)
+                        "nearby" -> Nearby(vm.centres, vm)
                         "documents" -> CareDocuments(vm, onRead = ::read, onTalk = { changeSection("Conversations") })
                         "care-story" -> DoctorCareStory(person, versions, ::read)
                         "checkin-history" -> DoctorCheckInHistory(personId, entries)

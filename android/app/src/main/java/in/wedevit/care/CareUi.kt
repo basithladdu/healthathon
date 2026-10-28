@@ -235,7 +235,7 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
                                 medicineScanner = true
                             } else vm.message.value = askOwner
                         })
-                    3 -> Nearby(vm.centres)
+                    3 -> Nearby(vm.centres, vm)
                     5 -> CareDocuments(vm, onRead = { reading = it }, onTalk = { go(1) })
                     6 -> CareCalendar(vm, onWorkflow = { go(7) }, initialDay = calendarDay)
                     7 -> CareWorkflows(vm, onTalk = { go(1) })
@@ -933,8 +933,13 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
     if (editing) AddCareItem(item.kind, vm, onDismiss = { editing = false }, initial = item)
 }
 
-@Composable fun Nearby(centres: List<Centre>) {
-    var search by rememberSaveable { mutableStateOf("") }; var service by rememberSaveable { mutableStateOf("All") }; var morphine by rememberSaveable { mutableStateOf(false) }
+@Composable fun Nearby(centres: List<Centre>, vm: CareModel? = null) {
+    var search by rememberSaveable { mutableStateOf("") }; var service by rememberSaveable { mutableStateOf("All") }
+    val allLayers = NearbyHelp.layerOptions.joinToString(",")
+    var layerKey by rememberSaveable { mutableStateOf(allLayers) }; val layers = layerKey.split(",").toSet()
+    var suggesting by rememberSaveable { mutableStateOf(false) }
+    val suggestions = vm?.centreSuggestions?.collectAsStateWithLifecycle()?.value.orEmpty()
+    LaunchedEffect(vm) { vm?.loadCentreSuggestions() }
     var view by rememberSaveable { mutableStateOf("Map & list") }
     var state by rememberSaveable { mutableStateOf("All India") }
     var district by rememberSaveable { mutableStateOf("") }
@@ -946,13 +951,13 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
     // Build each centre's search text once, not for all 1,600 centres on every typed letter.
     val searchText = remember(centres) { centres.map(NearbyHelp::searchKey) }
     val districts = remember(centres, state) { NearbyHelp.districts(centres, state) }
-    val visible = remember(centres, search, service, morphine, state, district) { NearbyHelp.visible(centres, searchText, search, state, district, service, morphine) }
+    val visible = remember(centres, search, service, layerKey, state, district) { NearbyHelp.visible(centres, searchText, search, state, district, service, layers) }
     val context = LocalContext.current
     LazyColumn(Modifier.fillMaxSize().testTag("nearby-list"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
         item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) { Heading(t("Find care", "देखभाल केंद्र खोजें")); Text(listOf(optionLabel(state), district).filter(String::isNotBlank).joinToString(" · ") + " · " + t("${visible.size} ${if (visible.size == 1) "centre" else "centres"}", "${visible.size} केंद्र"), color = Rust) }
-            AnimatedVisibility(search.isNotBlank() || service != "All" || state != "All India" || district.isNotBlank() || morphine, enter = fadeIn(tween(160)), exit = fadeOut(tween(120))) {
-                TextButton(onClick = { search = ""; service = "All"; state = "All India"; district = ""; morphine = false }, modifier = Modifier.heightIn(min = 48.dp).testTag("nearby-clear-filters")) { Text(t("Clear filters", "सभी चुनाव हटाएँ")) }
+            AnimatedVisibility(search.isNotBlank() || service != "All" || state != "All India" || district.isNotBlank() || layerKey != allLayers, enter = fadeIn(tween(160)), exit = fadeOut(tween(120))) {
+                TextButton(onClick = { search = ""; service = "All"; state = "All India"; district = ""; layerKey = allLayers }, modifier = Modifier.heightIn(min = 48.dp).testTag("nearby-clear-filters")) { Text(t("Clear filters", "सभी चुनाव हटाएँ")) }
             }
         } }
         item { SurfaceCard(Peach) {
@@ -988,8 +993,20 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
         item { Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) { NearbyHelp.serviceOptions.forEach { s -> FilterChip(selected = service == s, onClick = { service = s }, label = { Text(optionLabel(s)) }, modifier = Modifier.heightIn(min = 48.dp)) } } }
         item { FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf("Map & list", "List").forEach { option -> FilterChip(selected = view == option, onClick = { view = option }, label = { Text(optionLabel(option)) }, modifier = Modifier.heightIn(min = 48.dp)) }
-            FilterChip(selected = morphine, onClick = { morphine = !morphine }, label = { Text(t("Morphine listed", "मॉर्फ़ीन सूची में")) }, leadingIcon = { Icon(Icons.Default.Medication, null, Modifier.size(18.dp)) }, modifier = Modifier.heightIn(min = 48.dp))
-        }; Text(t("Directory listings. Call to confirm services, availability and cost.", "यह सूची से ली गई जानकारी है। सेवा, उपलब्धता और ख़र्च फ़ोन करके पक्का करें।"), style = MaterialTheme.typography.bodySmall) }
+        }
+            // Layer chips double as the legend: each chip's dot is that layer's pin colour on the map and badge colour in the list.
+            Text(t("Show on map and list", "नक्शे और सूची में दिखाएँ"), style = MaterialTheme.typography.labelMedium, modifier = Modifier.padding(top = 6.dp))
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.testTag("nearby-layers")) {
+                NearbyHelp.layerOptions.forEach { layer -> FilterChip(selected = layer in layers, onClick = { layerKey = NearbyHelp.layerOptions.filter { it in NearbyHelp.toggleLayer(layers, layer) }.joinToString(",") },
+                    label = { Text(if (layer == NearbyHelp.LAYER_MORPHINE) t("Morphine listed", "मॉर्फ़ीन सूची में") else t("Palliative care", "पैलिएटिव देखभाल")) },
+                    leadingIcon = { Box(Modifier.size(14.dp).clip(CircleShape).background(Color(NearbyHelp.layerColor(layer)))) }, modifier = Modifier.heightIn(min = 48.dp).testTag("nearby-layer-$layer")) }
+            }
+            Text(t("Terracotta pins: palliative care centres. Blue pins: the directory also lists morphine (call to confirm). Dark numbered circles: a group of centres, tap to zoom.",
+                "लाल-भूरे निशान: पैलिएटिव देखभाल केंद्र। नीले निशान: सूची में मॉर्फ़ीन भी लिखा है (फ़ोन करके पक्का करें)। गहरे गोले में संख्या: कई केंद्र, ज़ूम के लिए दबाएँ।"), style = MaterialTheme.typography.bodySmall, modifier = Modifier.testTag("nearby-legend"))
+            Text(t("Directory listings. Call to confirm services, availability and cost.", "यह सूची से ली गई जानकारी है। सेवा, उपलब्धता और ख़र्च फ़ोन करके पक्का करें।"), style = MaterialTheme.typography.bodySmall) }
+        if (vm != null) item { OutlinedButton(onClick = { suggesting = true }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("nearby-suggest-centre")) {
+            Icon(Icons.Default.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Suggest a centre that's missing", "छूटा हुआ केंद्र सुझाएँ")) } }
+        if (suggestions.isNotEmpty()) item { CentreSuggestionList(suggestions) }
         if (view == "Map & list" && visible.isNotEmpty()) item(key = "nearby-map") { Column(Modifier.animateItem()) {
             val coverage = remember(visible) { CentreLocation.coverage(visible) }
             if (coverage.exact + coverage.approximate > 0) Column(Modifier.clip(RoundedCornerShape(20.dp))) { CentreMap(visible) { chosen = it } }
@@ -1002,7 +1019,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                 style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 6.dp).testTag("nearby-map-coverage"))
             if (coverage.approximate > 0) Text(t("Approximate locations © GeoNames (CC BY 4.0)", "अनुमानित जगहें © GeoNames (CC BY 4.0)"), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         } }
-        if (visible.isEmpty()) item { SurfaceCard { Text(t("No centres match that search.", "इस खोज से कोई केंद्र नहीं मिला।")); TextButton(onClick = { search = ""; service = "All"; state = "All India"; district = ""; morphine = false }) { Text(t("Clear filters", "सभी चुनाव हटाएँ")) } } }
+        if (visible.isEmpty()) item { SurfaceCard { Text(t("No centres match that search.", "इस खोज से कोई केंद्र नहीं मिला।")); TextButton(onClick = { search = ""; service = "All"; state = "All India"; district = ""; layerKey = allLayers }) { Text(t("Clear filters", "सभी चुनाव हटाएँ")) } } }
         items(visible, key = { it.id }) { c -> Box(Modifier.animateItem()) { CentreCard(c) } }
     }
     if (chosen.isNotEmpty()) ModalBottomSheet(onDismissRequest = { chosen = emptyList() }, containerColor = Cream) {
@@ -1012,14 +1029,20 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
             items(chosen, key = { it.id }) { CentreCard(it) }
         }
     }
+    if (suggesting && vm != null) CentreSuggestionSheet(vm, if (state == "All India") "" else state) { suggesting = false }
 }
 
 @Composable fun CentreCard(c: Centre) {
     val context = LocalContext.current; val t = careText()
     SurfaceCard {
+            val layer = NearbyHelp.layerOf(c)
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.testTag("centre-layer-$layer")) {
+                Box(Modifier.size(10.dp).clip(CircleShape).background(Color(NearbyHelp.layerColor(layer)))); Spacer(Modifier.width(6.dp))
+                Text(if (layer == NearbyHelp.LAYER_MORPHINE) t("Palliative care · morphine listed", "पैलिएटिव देखभाल · मॉर्फ़ीन सूची में") else t("Palliative care", "पैलिएटिव देखभाल"), color = Color(NearbyHelp.layerColor(layer)), style = MaterialTheme.typography.labelMedium)
+            }
             Text(listOf(c.city, c.state).filter(String::isNotBlank).distinct().joinToString(" · "), color = Rust, style = MaterialTheme.typography.labelMedium); Spacer(Modifier.height(6.dp)); Text(c.name, fontSize = 19.sp, fontWeight = FontWeight.SemiBold)
             Spacer(Modifier.height(8.dp)); Text(c.services, style = MaterialTheme.typography.bodySmall); Text(c.address, style = MaterialTheme.typography.bodyMedium)
-            if (c.sourceListedMorphine == "available") Text(t("Directory lists morphine · call to confirm", "सूची में मॉर्फ़ीन लिखा है · फ़ोन करके पक्का करें"), fontSize = 12.sp, color = Color(0xFF465E45), modifier = Modifier.padding(top = 8.dp))
+            if (c.sourceListedMorphine == "available") Text(t("Directory lists morphine · call to confirm", "सूची में मॉर्फ़ीन लिखा है · फ़ोन करके पक्का करें"), fontSize = 12.sp, color = Color(NearbyHelp.layerColor(NearbyHelp.LAYER_MORPHINE)), modifier = Modifier.padding(top = 8.dp))
             Text(listOf(c.sourceName, c.checkedOn.takeIf { it.isNotBlank() }?.let { t("Source retrieved $it", "जानकारी ली गई $it") }).filterNotNull().filter(String::isNotBlank).joinToString(" · "), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             if (c.latitude == null || c.longitude == null) Text(t("No map location · Directions searches the address", "नक्शे पर जगह नहीं · रास्ता पते से खोजा जाएगा"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             CentreLocation.note(c)?.let { (en, hi) -> Text(t(en, hi), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.testTag("centre-approximate-location")) }

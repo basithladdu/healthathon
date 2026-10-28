@@ -228,6 +228,15 @@ class CareSyncQueue private constructor(private val db: CareDatabase, @Volatile 
         }
     }
 
+    /**
+     * Stores [write] and tries to send the queue, without the [submit] rule that drops a turned-down write: it stays queued
+     * (SENT, WAITING, or KEPT and retried on the next send). Used for centre suggestions, which belong to no care record.
+     */
+    suspend fun enqueue(write: CarePendingWrite): CareSyncStatus {
+        db.withTransaction { dao.insert(write) }
+        return flush().outcomes[write.opId] ?: CareSyncStatus.WAITING
+    }
+
     suspend fun flush(immediate: String? = null): CareSyncReport = sending.withLock {
         if (cloud.session.value?.userId != account) return@withLock CareSyncReport(emptyMap(), emptyMap(), stopped = true)
         CareSyncEngine.flush(dao, immediate, ::send)
@@ -266,6 +275,7 @@ class CareSyncQueue private constructor(private val db: CareDatabase, @Volatile 
             CareSyncOps.MEDICINE_EVENT -> { service.request("POST", "/rest/v1/rpc/healthathon_report_medicine", JSONObject().put("p_event", JSONObject(op.payload).apply { remove("logged_at") }), expectedAccountId = account); null }
             CareSyncOps.CONTACT_SAVE -> service.saveCareContactOnce(CareSyncOps.contact(op)).revision
             CareSyncOps.CONTACT_REMOVE -> { service.removeCareContactOnce(CareSyncOps.contact(op)); null }
+            CentreSuggestionOps.KIND -> { service.sendCentreSuggestion(op, account); null }
             else -> throw IllegalArgumentException("This change needs an updated app.")
         }
     }
