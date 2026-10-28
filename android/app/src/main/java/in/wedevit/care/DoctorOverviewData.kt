@@ -82,7 +82,7 @@ object DoctorOverviewData {
 
     private fun discussion(version: WorkflowVersion): DoctorOverviewDiscussion = version.draft.let { draft ->
         DoctorOverviewDiscussion(version.id, version.patientId, version.number, version.publishedAt, version.reviewerName,
-            version.id, "Published local preview v${version.number} · unverified self-entered review", draft.sourceText,
+            version.id, "Practice version v${version.number} · unverified self-entered review", draft.sourceText,
             draft.priorities, draft.participants, draft.topics, draft.questions, draft.undecided, draft.nextSteps,
             isPublishedPreview = true)
     }

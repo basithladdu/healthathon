@@ -94,9 +94,9 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
         "doctor-walkthrough" -> DoctorDemo(onExit = { demoOpen = false; walkthroughPatient = null }, cloud = cloud, initialPatientId = walkthroughPatient, careModel = model, onCareAccount = { accountOpen = true })
         "doctor" -> ConnectedDoctorWorkspace(cloud, model, onExit = { doctorOpen = false }, onAccount = { accountOpen = true }, onWalkthrough = { walkthroughPatient = it; demoOpen = true })
         else -> CareApp(model, onAccount = { accountOpen = true }, onDoctorDemo = {
-            if (model.recording.value) model.message.value = rt("Stop the recording before opening the doctor demo.", "डॉक्टर डेमो खोलने से पहले रिकॉर्डिंग रोकें।")
+            if (model.recording.value) model.message.value = rt("Stop the recording before opening the doctor practice walkthrough.", "डॉक्टर अभ्यास वॉकथ्रू खोलने से पहले रिकॉर्डिंग रोकें।")
             else { walkthroughPatient = null; demoOpen = true }
-        }, onPatientWalkthrough = { if (model.recording.value) model.message.value = rt("Stop the recording before opening the walkthrough.", "डेमो खोलने से पहले रिकॉर्डिंग रोकें।") else patientWalkthroughUser = it },
+        }, onPatientWalkthrough = { if (model.recording.value) model.message.value = rt("Stop the recording before opening the walkthrough.", "वॉकथ्रू खोलने से पहले रिकॉर्डिंग रोकें।") else patientWalkthroughUser = it },
             onDoctorWorkspace = { doctorEntryPending = true; if (session != null) { doctorOpen = true; doctorEntryPending = false } else accountOpen = true },
             welcomeAccountContent = { close, onBusy -> AccountContent(cloud, model, close, onBusyChange = onBusy, banner = joinBanner, onInvite = root::offerInviteLink, onDeleted = { accountNotice = it }) },
             welcomeDoctorContent = { close, onBusy ->

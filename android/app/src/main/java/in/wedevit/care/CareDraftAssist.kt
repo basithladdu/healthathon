@@ -16,7 +16,7 @@ object CareDraftAssist {
     /** Apply only to the exact source the user reviewed; publishing remains a separate action. */
     fun applyAssisted(draft: Conversation, selected: CareAssistedDraft): Conversation {
         require(selected.sourceHash == careAssistSourceHash(draft.source)) { "The conversation changed. Prepare a fresh draft." }
-        require(selected.provider == "sarvam" && selected.model == "sarvam-105b")
+        require(selected.provider == CARE_ASSIST_PROVIDER && selected.model.isNotBlank())
         return careAssistFieldKeys.foldIndexed(draft) { index, current, key ->
             withSection(current, index, selected.fields.getValue(key))
         }

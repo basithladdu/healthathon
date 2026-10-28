@@ -232,7 +232,7 @@ private val DoctorMist = Peach
                     if(sampleCareOpen && DoctorTestProfiles.contains(testCarePerson)) Text("Care record",color=DoctorMuted,fontSize=12.sp)
                     else Text(if(sampleCareOpen) "Separate from your records" else if (carePersonId != null) { if (careModel?.cloud == null) "Device-local care · not synced" else "Real shared care" } else if (patient != null) "Patient record" else "Doctor workspace", color = DoctorMuted, fontSize = 12.sp)
                 }
-                if(sampleCareOpen && !DoctorTestProfiles.contains(testCarePerson)) Text("Demo",color=Rust) else if (!sampleCareOpen && carePersonId == null) PreviewLabel()
+                if(sampleCareOpen && !DoctorTestProfiles.contains(testCarePerson)) Text("Practice",color=Rust) else if (!sampleCareOpen && carePersonId == null) PreviewLabel()
                 Spacer(Modifier.width(10.dp))
                 if (!sampleCareOpen && patient == null && carePersonId == null) DoctorAvatar("Meera", 34)
             }

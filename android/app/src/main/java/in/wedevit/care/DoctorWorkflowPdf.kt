@@ -26,12 +26,12 @@ object DoctorWorkflowPdf {
         fun start() {
             number++
             page = pdf.startPage(PdfDocument.PageInfo.Builder(595, 842, number).create())
-            page!!.canvas.drawText("Sahara | Care Note preview", 42f, 44f, heading)
-            page!!.canvas.drawText("UNVERIFIED LOCAL PREVIEW - NOT A CLINICAL RECORD", 42f, 63f, footer)
+            page!!.canvas.drawText("Sahara | Practice care note", 42f, 44f, heading)
+            page!!.canvas.drawText("PRACTICE WALKTHROUGH - NOT A CLINICAL RECORD", 42f, 63f, footer)
             y = 94f
         }
         fun finish() {
-            page!!.canvas.drawText("Local preview only | Page $number", 42f, 812f, footer)
+            page!!.canvas.drawText("Practice walkthrough only | Page $number", 42f, 812f, footer)
             pdf.finishPage(page!!)
         }
         fun line(value: String) {
@@ -63,7 +63,7 @@ object DoctorWorkflowPdf {
             paragraph("Source references\n" + if(d.transcribedAt>0) "Consented conversation recording and exact transcript below" else DoctorWorkflowData.sources(version.patientId).filter { it.id in d.sourceIds }.joinToString("\n") { it.label }.ifBlank { "Manually entered source" })
             if(d.evidence.isNotEmpty()) paragraph("Source evidence\n"+d.evidence.joinToString("\n") { "${it.section}: ${it.quote}" })
             paragraph("Original source text\n${d.sourceText}")
-            paragraph("This is a local workflow preview. No professional identity was verified. This document is not a prescription, treatment order, consent form, advance directive or verified signature. No external patient/family delivery has occurred.")
+            paragraph("This is a practice walkthrough document. No professional identity was verified. This document is not a prescription, treatment order, consent form, advance directive or verified signature. No external patient/family delivery has occurred.")
             finish()
             file.outputStream().use { pdf.writeTo(it) }
         } finally { pdf.close() }
@@ -81,6 +81,6 @@ object DoctorWorkflowPdf {
     }
     fun share(context: Context, file: File) {
         val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
-        context.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).setType("application/pdf").putExtra(Intent.EXTRA_STREAM, uri).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION), "Share local preview PDF"))
+        context.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).setType("application/pdf").putExtra(Intent.EXTRA_STREAM, uri).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION), "Share practice PDF"))
     }
 }

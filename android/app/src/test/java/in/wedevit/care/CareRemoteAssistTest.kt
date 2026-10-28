@@ -8,44 +8,44 @@ import org.junit.Test
 
 class CareRemoteAssistTest {
     private val source = "Patient: I do not want to decide yet.\r\n\r\nDoctor: We can discuss this again."
-    private fun draftJson(): JSONObject {
-        val lines = CareDraftAssist.lines(source)
-        val fields = JSONObject(); val excerpts = JSONObject(); val evidence = JSONArray()
-        careAssistFieldKeys.forEach { field -> fields.put(field, ""); excerpts.put(field, "") }
-        listOf("priorities" to lines[0], "topics" to lines[1]).forEach { (field, line) ->
-            fields.put(field, line.text); excerpts.put(field, line.text)
-            evidence.put(JSONObject().put("field", field).put("line", line.number).put("start", line.start).put("end", line.end).put("text", line.text).put("speaker", if (field == "priorities") "Patient" else "Doctor"))
-        }
-        return JSONObject().put("provider", "sarvam").put("model", "sarvam-105b").put("sourceHash", careAssistSourceHash(source)).put("requiresReview", true).put("fields", fields).put("excerpts", excerpts).put("evidence", evidence)
+    private fun draftJson(priorities: List<Int> = listOf(1), topics: List<Int> = listOf(3)): JSONObject {
+        val selections = JSONObject()
+        careAssistFieldKeys.forEach { selections.put(it, JSONArray()) }
+        selections.put("priorities", JSONArray(priorities)); selections.put("topics", JSONArray(topics))
+        return JSONObject().put("provider", CARE_ASSIST_PROVIDER).put("model", "qwen2.5-7b-instruct").put("sourceHash", careAssistSourceHash(source)).put("requiresReview", true).put("selections", selections)
     }
 
     @Test fun exactTurnsRetainNegationAndApplyOnlyToTheirSource() {
         val selected = parseCareAssistedDraft(draftJson().toString(), source)
         assertEquals("Patient: I do not want to decide yet.", selected.fields["priorities"])
+        assertEquals("Doctor: We can discuss this again.", selected.fields["topics"])
+        assertEquals("qwen2.5-7b-instruct", selected.model)
         val applied = CareDraftAssist.applyAssisted(Conversation("person", source = source), selected)
         assertEquals(source, applied.source); assertEquals(selected.fields["priorities"], applied.priorities)
         assertThrows(IllegalArgumentException::class.java) { CareDraftAssist.applyAssisted(applied.copy(source = source + " Changed."), selected) }
     }
 
-    @Test fun changedHashQuotesAndOffsetsFailClosed() {
+    @Test fun changedHashAndUnknownLinesFailClosed() {
         val wrongHash = draftJson().put("sourceHash", "0".repeat(64))
         assertThrows(IllegalArgumentException::class.java) { parseCareAssistedDraft(wrongHash.toString(), source) }
-        val edited = draftJson(); edited.getJSONObject("fields").put("priorities", "Patient: I want to decide now.")
-        assertThrows(IllegalArgumentException::class.java) { parseCareAssistedDraft(edited.toString(), source) }
-        val offset = draftJson(); offset.getJSONArray("evidence").getJSONObject(0).put("start", 1)
-        assertThrows(IllegalArgumentException::class.java) { parseCareAssistedDraft(offset.toString(), source) }
+        // Line 2 is the blank line and line 9 does not exist: the model cannot point at words that are not there.
+        assertThrows(IllegalArgumentException::class.java) { parseCareAssistedDraft(draftJson(topics = listOf(2)).toString(), source) }
+        assertThrows(IllegalArgumentException::class.java) { parseCareAssistedDraft(draftJson(topics = listOf(9)).toString(), source) }
+        val text = draftJson(); text.getJSONObject("selections").put("topics", JSONArray().put("Patient: I want to decide now."))
+        assertThrows(IllegalArgumentException::class.java) { parseCareAssistedDraft(text.toString(), source) }
+        assertThrows(IllegalArgumentException::class.java) { parseCareAssistedDraft(draftJson().put("provider", "other").toString(), source) }
     }
 
-    @Test fun doctorOrUnknownSpeakerCannotBecomePatientPriorities() {
-        val forged = draftJson(); forged.getJSONArray("evidence").getJSONObject(0).put("speaker", "Doctor")
-        assertThrows(IllegalArgumentException::class.java) { parseCareAssistedDraft(forged.toString(), source) }
-        val duplicate = draftJson(); duplicate.getJSONArray("evidence").put(duplicate.getJSONArray("evidence").getJSONObject(0))
-        assertThrows(IllegalArgumentException::class.java) { parseCareAssistedDraft(duplicate.toString(), source) }
+    @Test fun doctorLinesNeverBecomePatientPrioritiesAndDuplicatesCollapse() {
+        val selected = parseCareAssistedDraft(draftJson(priorities = listOf(3, 1, 1)).toString(), source)
+        assertEquals("Patient: I do not want to decide yet.", selected.fields["priorities"])
+        assertEquals(1, selected.evidence.count { it.field == "priorities" })
+        assertEquals("Patient", careAssistSpeaker("[Patient · hi-IN · human-reviewed] Words")); assertEquals("Unknown", careAssistSpeaker("Words"))
     }
 
     @Test fun transcriptIsUnattributedUntilAHumanChecksIt() {
         val text = "मैं अभी निर्णय नहीं लेना चाहता।"
-        val raw = JSONObject().put("provider", "sarvam").put("model", "saaras:v3").put("requiresReview", true).put("transcript", text).put("originalTranscript", text)
+        val raw = JSONObject().put("provider", CARE_ASSIST_PROVIDER).put("model", "whisper-large-v3").put("requiresReview", true).put("transcript", text).put("originalTranscript", text)
             .put("sourceHash", careAssistSourceHash(text)).put("speaker", "Unknown").put("speakerConfirmed", false).put("language", "hi-IN")
         assertEquals(text, parseCareAssistedTranscript(raw.toString()).original)
         assertThrows(IllegalArgumentException::class.java) { parseCareAssistedTranscript(raw.put("speaker", "Patient").toString()) }
@@ -60,7 +60,7 @@ class CareRemoteAssistTest {
 
     @Test fun translationIsBoundToOriginalVersionAndCompleteCoverage() {
         val original = "Review in 2 days."; val translated = "2 दिनों में जाँच।"
-        val raw = JSONObject().put("provider", "sarvam").put("model", "sarvam-translate:v1").put("requiresReview", true).put("original", original).put("translation", translated)
+        val raw = JSONObject().put("provider", CARE_ASSIST_PROVIDER).put("model", "qwen2.5-7b-instruct").put("requiresReview", true).put("original", original).put("translation", translated)
             .put("versionId", "version-2").put("sourceHash", careAssistSourceHash(original)).put("sourceLanguage", "en-IN").put("targetLanguage", "hi-IN")
             .put("segments", JSONArray().put(JSONObject().put("start", 0).put("end", original.length).put("original", original).put("translation", translated)))
         assertEquals(original, parseCareAssistedTranslation(raw.toString(), original, "version-2", "en-IN", "hi-IN").original)
@@ -72,14 +72,17 @@ class CareRemoteAssistTest {
         assertThrows(IllegalArgumentException::class.java) { parseCareAssistedTranslation(raw.toString(), original, "version-2", "en-IN", "hi-IN") }
     }
 
-    @Test fun realClientUsesOneExplicitConsentedAttemptAndNoFixtureFallback() = runBlocking {
+    @Test fun realClientSendsOnlyNumberedLinesAfterConsentInOneAttempt() = runBlocking {
         val calls = mutableListOf<JSONObject>()
         val client = CareAssistProviderAdapter(CareAssistTransport { path, body, token ->
             assertEquals("", path); assertEquals("actual-account-token", token)
             calls += JSONObject(body!!); draftJson().toString()
         })
         val result = client.draft(source, "actual-account-token", true)
-        assertEquals("sarvam", result.provider); assertEquals(1, calls.size); assertTrue(calls[0].getBoolean("consent")); assertEquals(source, calls[0].getString("source"))
+        assertEquals(CARE_ASSIST_PROVIDER, result.provider); assertEquals(1, calls.size); assertTrue(calls[0].getBoolean("consent"))
+        val lines = calls[0].getJSONArray("lines")
+        assertEquals(2, lines.length()); assertEquals(3, lines.getJSONObject(1).getInt("line")); assertEquals("Doctor", lines.getJSONObject(1).getString("speaker"))
+        assertEquals(careAssistSourceHash(source), calls[0].getString("sourceHash")); assertFalse(calls[0].has("source"))
         assertTrue(calls[0].getString("requestId").matches(Regex("[0-9a-f-]{36}")))
         try { client.draft(source, "actual-account-token", false); fail("Expected consent check") } catch (_: IllegalArgumentException) { }
         assertEquals(1, calls.size)
@@ -92,20 +95,20 @@ class CareRemoteAssistTest {
         assertEquals(1, calls); assertTrue(source.contains("do not want"))
     }
 
-    @Test fun androidEntryPointsNeverContactTheProviderInOnDeviceMode() = runBlocking {
-        var calls = 0
-        val client = CareRemoteAssist(CareAssistTransport { _, _, _ -> calls++; error("Unexpected network request") })
-        assertEquals(CareAssistCapabilities(false, false, false), client.capabilities())
-        val operations: List<suspend () -> Unit> = listOf(
-            { client.draft(source, "account", true); Unit },
-            { client.translate(source, "version-1", "en-IN", "hi-IN", "account", true); Unit },
-            { client.transcribe(java.io.File("unopened.m4a"), RecordingConsent("unopened.m4a", "person", "Patient", 1, 2), 1000, "en-IN", "account"); Unit },
-            { CareAssistHttpTransport().request("", null, ""); Unit },
-        )
-        operations.forEach { operation ->
-            try { operation(); fail("Expected on-device guard") }
-            catch (error: CareAssistException) { assertEquals("on_device_only", error.code) }
-        }
-        assertEquals(0, calls)
+    @Test fun capabilitiesFollowTheServerConfigurationAndNameTheService() = runBlocking {
+        val off = CareRemoteAssist(CareAssistTransport { path, body, token -> assertEquals("", path); assertNull(body); assertEquals("account", token)
+            JSONObject().put("provider", CARE_ASSIST_PROVIDER).put("ready", false).put("audioReady", true).put("translationReady", true).put("label", "").put("model", "").toString() })
+        val notReady = off.capabilities("account")
+        assertFalse(notReady.ready || notReady.audioReady || notReady.translationReady)
+        val on = CareRemoteAssist(CareAssistTransport { _, _, _ ->
+            JSONObject().put("provider", CARE_ASSIST_PROVIDER).put("ready", true).put("audioReady", false).put("translationReady", true).put("label", "Groq").put("model", "llama-3.3-70b").toString() })
+        assertEquals(CareAssistCapabilities(true, false, true, "Groq", "llama-3.3-70b"), on.capabilities("account"))
+        val other = CareRemoteAssist(CareAssistTransport { _, _, _ -> JSONObject().put("provider", "sarvam").put("ready", true).toString() })
+        try { other.capabilities("account"); fail("Expected provider check") } catch (_: IllegalArgumentException) { }
+    }
+
+    @Test fun httpTransportRefusesWithoutASignedInToken() = runBlocking {
+        try { CareAssistHttpTransport().request("", null, ""); fail("Expected sign-in check") }
+        catch (error: CareAssistException) { assertEquals("sign_in_required", error.code) }
     }
 }

@@ -65,6 +65,9 @@ import kotlinx.coroutines.launch
         if (cloud != null) run { refresh() }
     }
     DisposableEffect(cloud) { onDispose { actionJob?.cancel() } }
+    // Doctor approval is offered only to accounts the owner made Sahara-team verifiers on the server.
+    var verifier by remember { mutableStateOf(false) }
+    LaunchedEffect(cloud, cloud?.session?.value?.userId) { verifier = try { cloud?.session?.value != null && cloud.isClinicalVerifier() } catch (cancel: CancellationException) { throw cancel } catch (_: Exception) { false } }
     BackHandler { if (!busy) onClose() }
     val content: @Composable (PaddingValues) -> Unit = { padding ->
         LazyColumn(Modifier.fillMaxSize().padding(padding).imePadding(), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
@@ -84,6 +87,7 @@ import kotlinx.coroutines.launch
                         Button(onClick = { run { cloud.requestClinician(name, council, registration); refresh(); notice = t("Request received. Verification is pending.", "अनुरोध मिल गया। पुष्टि बाक़ी है।") } }, enabled = !busy && name.isNotBlank() && council.length >= 2 && registration.length >= 2) { Text(t("Submit for verification", "पुष्टि के लिए भेजें")) }
                     }
                 } }
+                if (verifier) item { CareClinicianReviewPanel(cloud) }
                 item { SurfaceCard(Gold) {
                     Text(t("Patient-controlled access", "मरीज़ के हाथ में पहुँच"), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
                     Text(if (owner) t("Invite a separately verified clinician or chosen family account, choose access and expiry, and cancel or revoke access online.", "अलग से पुष्ट डॉक्टर या चुने परिवार वाले खाते को बुलाएँ, पहुँच और समय-सीमा चुनें, और ऑनलाइन पहुँच रद्द या वापस लें।") else t("The patient record owner controls your access. A display-role change cannot increase your permissions.", "मरीज़ के रिकॉर्ड का मालिक आपकी पहुँच तय करता है। भूमिका बदलने से अनुमति नहीं बढ़ती।"))

@@ -44,7 +44,7 @@ class DoctorWorkflowStore(context: Context, private val now: () -> Long = { Syst
     @Synchronized fun loadMockDraft(patientId: String): String? {
         if (patientId !in DoctorWorkflowData.patientIds) return "Patient not found."
         val previous = draft(patientId)
-        if (DoctorWorkflowData.hasDraftContent(previous)) return "Save your current work separately before loading the sample draft. Existing work was not replaced."
+        if (DoctorWorkflowData.hasDraftContent(previous)) return "Save your current work separately before loading the practice draft. Existing work was not replaced."
         return saveDraft(DoctorWorkflowData.mockDraft(patientId, now()).copy(checklist = previous.checklist.toList()))
     }
     @Synchronized fun importTranscript(patientId: String, text: String, provider: String, model: String, clipId: String, consentAt: Long, expectedSourceText: String): String? {
@@ -71,7 +71,7 @@ class DoctorWorkflowStore(context: Context, private val now: () -> Long = { Syst
         val draft = state.drafts.firstOrNull { it.patientId == patientId } ?: return@change "Save a draft first." to state
         DoctorWorkflowData.publishError(draft, reviewerName, checked, sourceConfirmed)?.let { return@change it to state }
         val version = WorkflowVersion(newId(), patientId, (state.versions.filter { it.patientId == patientId }.maxOfOrNull { it.number } ?: 0) + 1, draft.copy(checklist = draft.checklist.toList(), sourceIds = draft.sourceIds.toList()), reviewerName.trim(), now())
-        null to logged(state.copy(versions = state.versions + version), patientId, "Published unverified local preview v${version.number}; not externally delivered")
+        null to logged(state.copy(versions = state.versions + version), patientId, "Saved practice version v${version.number}; unverified, not sent to anyone")
     }
     @Synchronized fun recordToldToClinician(versionId: String, memberId: String, status: WorkflowAckStatus): String? = change { state ->
         val version = state.versions.firstOrNull { it.id == versionId } ?: return@change "Version not found." to state
