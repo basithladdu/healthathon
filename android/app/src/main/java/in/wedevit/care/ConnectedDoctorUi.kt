@@ -164,7 +164,7 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
                         TextButton(onClick = { navigate { selection = null } }) { Text(t("Back to patients", "मरीज़ों पर वापस")) }
                     }
                 } else if (section == "Hub") {
-                    DoctorSharedPatientHub(realPatient!!, onSection = { next -> navigate { section = next } })
+                    DoctorSharedPatientHub(realPatient!!, onSection = { next -> navigate { section = next } }, items = vm.items)
                 } else key(selection!!.stateKey) {
                     editorStates.SaveableStateProvider("${selection!!.stateKey}:care") {
                         EmbeddedPatientCare(vm, realPatientId, section, { next -> section = next }, onAccount, { selection = null }, onNavigationBlockedChange = { navigationBlocked = it }, onHeaderBackChange = { nestedBack = it })
@@ -280,10 +280,12 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
     }
 }
 
-@Composable internal fun DoctorSharedPatientHub(person: Person, onSection: (String) -> Unit, deviceLocal: Boolean = false) { val t = careText();
+@Composable internal fun DoctorSharedPatientHub(person: Person, onSection: (String) -> Unit, deviceLocal: Boolean = false, items: kotlinx.coroutines.flow.StateFlow<List<CareItem>>? = null) { val t = careText();
+    val entries = items?.collectAsStateWithLifecycle()?.value
     LazyColumn(Modifier.fillMaxSize().testTag("doctor-shared-patient-hub"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
         item { Text(t("${person.name}'s care", "${person.name} की देखभाल"), fontFamily = SaharaTitleFont, fontSize = 29.sp,lineHeight=36.sp); if(!DoctorTestProfiles.contains(person.id)) Text(if (deviceLocal) t("Device-local care · not synced or shared", "सिर्फ़ इस फ़ोन पर · सिंक या साझा नहीं") else t("Real shared records · access controlled by the patient", "असली साझा रिकॉर्ड · पहुँच मरीज़ के हाथ में"), style = MaterialTheme.typography.bodyMedium); if(!deviceLocal && !DoctorTestProfiles.contains(person.id)) Text(t("Patient ID ", "मरीज़ ID ") + DoctorConnectedHome.patientCode(person.id), style = MaterialTheme.typography.labelLarge, color = Rust, modifier = Modifier.testTag("doctor-shared-patient-id")) }
         item { DoctorPatientNavigationTiles(onSection) }
+        if (entries != null) item { DoctorSymptomSummary(entries, person.id) }
         item { OutlinedButton(onClick = { onSection("Tools") }, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("doctor-shared-tools")) { Icon(Icons.Default.Apps, null); Spacer(Modifier.width(10.dp)); Text(t("Daily care & tools", "रोज़ की देखभाल और टूल")) } }
         item { TextButton(onClick = { onSection("Shared") }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Sharing, access & clinical review", "साझा करना, पहुँच और क्लिनिकल समीक्षा")) } }
     }

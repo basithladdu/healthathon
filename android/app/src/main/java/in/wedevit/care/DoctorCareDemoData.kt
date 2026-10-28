@@ -185,7 +185,7 @@ internal object DoctorCareDemoData {
     else if(!ready || person==null || selected!=person.id || draft.personId!=person.id) Column(Modifier.padding(20.dp)) {LinearProgressIndicator(Modifier.fillMaxWidth());Text(if(DoctorTestProfiles.contains(initialPersonId)) "Opening care records…" else "Opening care records…")}
     else if(section=="Hub") Column(Modifier.fillMaxSize().testTag("doctor-care-demo-hub")) {
         if(!DoctorTestProfiles.contains(initialPersonId)) Column(Modifier.fillMaxWidth().padding(horizontal=20.dp,vertical=12.dp)){Text("Practice record · not a live patient",color=Rust);Text("These records are separate from your own patients and are not synced.")}
-        Box(Modifier.weight(1f)){DoctorSharedPatientHub(person,{section=it},deviceLocal=true)}
+        Box(Modifier.weight(1f)){DoctorSharedPatientHub(person,{section=it},deviceLocal=true,items=vm.items)}
     } else EmbeddedPatientCare(vm,person.id,section,{section=it},{vm.message.value="Account and sharing are unavailable in this offline practice walkthrough."},::leave,
         onNavigationBlockedChange={childBlocked=it;onNavigationBlockedChange(it||closing)},allowDeviceLocal=true,onHeaderBackChange={nested->onHeaderBackChange(nested ?: back)})
 }

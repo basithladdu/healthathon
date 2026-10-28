@@ -43,6 +43,8 @@ object PainHistoryRules {
     var preferred by rememberSaveable(personId, initialId) { mutableStateOf(initialId) }
     val selected = PainHistoryRules.selectedId(history, preferred)
     val index = history.indexOfFirst { it.first.id == selected }
+    // Tapping a body-part tile zooms the model and shows that part's own dated trend below it.
+    var part by rememberSaveable(personId) { mutableStateOf<String?>(null) }
     Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(20.dp).testTag("pain-history"), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Heading(t("Pain history", "दर्द का इतिहास"), 27)
         if (index < 0) Text(t("No saved pain entries yet", "अभी दर्द का कोई नोट नहीं है")) else {
@@ -67,7 +69,8 @@ object PainHistoryRules {
                 else -> Text(t("No body location was recorded for this entry.", "इस नोट में शरीर पर दर्द की जगह नहीं लिखी थी।"), style = MaterialTheme.typography.bodySmall)
             }
             if (note.painLocation.isNotBlank()) Text(note.painLocation, modifier = Modifier.testTag("pain-history-location"))
-            if (PainHistoryRules.locationKind(note) != "unsupported-model") CarePainBodyMap(note.painBodySites, note.painBodyPoints, note.rating, hindi, readOnly = true, ratings = note.painBodyRatings) { _, _ -> }
+            if (PainHistoryRules.locationKind(note) != "unsupported-model") CarePainBodyMap(note.painBodySites, note.painBodyPoints, note.rating, hindi, readOnly = true, ratings = note.painBodyRatings, onFocus = { part = it }) { _, _ -> }
+            part?.let { PainPartTrend(entries, personId, it, hindi) } ?: Text(t("Tap a body part to see its own pain over time.", "किसी हिस्से को छुएँ, उसका समय के साथ दर्द दिखेगा।"), style = MaterialTheme.typography.bodySmall, modifier = Modifier.testTag("pain-part-trend-hint"))
             if (note.startedOn.isNotBlank()) Text("${t("Started", "शुरू हुआ")}: ${note.startedOn}", style = MaterialTheme.typography.bodySmall)
             if (note.painTriggers.isNotEmpty()) Text(note.painTriggers.joinToString { SymptomDiaryRules.label(SymptomDiaryRules.triggers, it, hindi) }, style = MaterialTheme.typography.bodySmall)
             if (note.note.isNotBlank()) Text(note.note)

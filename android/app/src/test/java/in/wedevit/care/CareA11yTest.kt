@@ -18,7 +18,7 @@ class CareA11yTest {
         assertEquals("चिह्नित दर्द: सिर, 10 में से 7, तेज़; छाती, अंक नहीं; बायाँ पैर, 10 में से 0, कोई नहीं", PainBodyMapRules.spokenSummary(sites, ratings, true))
         assertEquals("No pain areas marked yet", PainBodyMapRules.spokenSummary(listOf("not-an-area"), emptyMap(), false))
         assertEquals("अभी दर्द की कोई जगह चिह्नित नहीं", PainBodyMapRules.spokenSummary(emptyList(), emptyMap(), true))
-        assertEquals("10 of 10, Worst", PainBodyMapRules.spokenScore(12, false))
+        assertEquals("10 of 10, Severe", PainBodyMapRules.spokenScore(12, false))
     }
 
     @Test fun painBodyViewsCarryTheSpokenSummary() {

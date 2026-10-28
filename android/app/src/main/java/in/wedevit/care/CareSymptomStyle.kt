@@ -27,11 +27,14 @@ import androidx.compose.ui.unit.sp
 
 private val SymSelectedBg get() = lerp(Cream, DoctorAccent, .2f)
 
+/** One icon per symptom tile, all from Material Icons (Apache 2.0, already bundled via material-icons-extended). */
 internal fun symptomIcon(key: String): ImageVector = when (key) {
     "Pain" -> Icons.Default.Healing; "Tiredness" -> Icons.Default.BatteryAlert; "Sleepiness" -> Icons.Default.Bedtime
-    "Nausea" -> Icons.Default.SentimentVeryDissatisfied; "Poor appetite" -> Icons.Default.Restaurant; "Breathlessness" -> Icons.Default.Air
-    "Sadness" -> Icons.Default.SentimentDissatisfied; "Worry" -> Icons.Default.Psychology; "Constipation" -> Icons.Default.Wc
-    "Sleep difficulty" -> Icons.Default.NightsStay; else -> Icons.Default.MoreHoriz
+    "Poor appetite" -> Icons.Default.NoMeals; "Dry mouth" -> Icons.Default.WaterDrop; "Breathlessness" -> Icons.Default.Air
+    "Constipation" -> Icons.Default.Wc; "Diarrhea" -> Icons.Default.Water; "Nausea" -> Icons.Default.SentimentVeryDissatisfied
+    "Vomiting" -> Icons.Default.Sick; "Difficulty swallowing" -> Icons.Default.LocalDrink; "Cough" -> Icons.Default.RecordVoiceOver
+    "Bowel / bladder incontinence" -> Icons.Default.Opacity; "Mood", "Sadness", "Worry" -> Icons.Default.Mood
+    "Overall well-being" -> Icons.Default.SelfImprovement; "Sleep difficulty" -> Icons.Default.NightsStay; else -> Icons.Default.EditNote
 }
 
 internal fun ratingColor(n: Int): Color = if (n <= 5) lerp(DoctorStatusGood, Color(0xFFB8860B), n / 5f) else lerp(Color(0xFFB8860B), Color(0xFF8E2F1C), (n - 5) / 5f)
@@ -77,9 +80,9 @@ internal fun ratingColor(n: Int): Color = if (n <= 5) lerp(DoctorStatusGood, Col
     }
 }
 
-@Composable internal fun RatingButton(number: Int, selected: Boolean, modifier: Modifier = Modifier, onClick: () -> Unit) {
+@Composable internal fun RatingButton(number: Int, selected: Boolean, modifier: Modifier = Modifier, tag: String = "symptom-rating-$number", onClick: () -> Unit) {
     val c = ratingColor(number)
-    Box(modifier.heightIn(min = 48.dp).testTag("symptom-rating-$number").clip(CircleShape).background(if (selected) c else lerp(c, Paper, .82f), CircleShape)
+    Box(modifier.heightIn(min = 48.dp).testTag(tag).clip(CircleShape).background(if (selected) c else lerp(c, Paper, .82f), CircleShape)
         .border(if (selected) 3.dp else 1.dp, if (selected) DoctorCardInk else c.copy(alpha = .5f), CircleShape)
         .selectable(selected, role = Role.RadioButton, onClick = onClick), contentAlignment = Alignment.Center) {
         Text(number.toString(), color = if (selected) readableOn(c) else DoctorCardInk, fontSize = 19.sp, fontWeight = FontWeight.Bold)
