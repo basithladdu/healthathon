@@ -42,10 +42,18 @@ Collected on 27 Oct from every agent lane across Sahara, ITI, WDCW and AI-FIR. E
 ### ITI (devit-iti)
 - [ ] SMS/WhatsApp provider plus `ITI_AUTO_PARENT_ALERTS`, to turn on automatic absence messages to parents.
 - [ ] Decide whether the send log should appear outside the archived Messages screen.
+- [ ] Free SMS, recommended: install "SMS Gateway for Android" (sms-gate.app) on an ITI phone with a SIM, turn on Cloud server, then Vercel → Project → Settings → Environment Variables → add `SMSGATE_USERNAME` and `SMSGATE_PASSWORD` → Redeploy. Or use MSG91 (`MSG91_AUTH_KEY`, `MSG91_SMS_TEMPLATE_ID`) or Twilio. WhatsApp is optional (`WHATSAPP_ACCESS_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_TEMPLATE_NAME`). Until then staff use "SMS from my phone".
+- [ ] Parents only get messages when "Parent mobile" is saved for the student.
 
 ### WDCW (devit-wdcw / -android)
 - [ ] Deploy the current web main before testing Android evidence recovery.
 - [ ] Play signing key and Console setup (`WDCW_UPLOAD_*`).
+- [ ] Pick one and add it in Vercel → devit-wdcw → Environment Variables (Production), then Redeploy:
+  - MSG91: `MSG91_AUTH_KEY`, `MSG91_TEMPLATE_ID`, `MESSAGING_SEND_ENABLED=true` (the DLT template text is in HANDOFF);
+  - your own Android phone: `SMS_PROVIDER=android`, `SMS_GATEWAY_USERNAME`, `SMS_GATEWAY_PASSWORD`, `MESSAGING_SEND_ENABLED=true`;
+  - or Twilio.
+  Until then staff use "Send from my phone".
+- [ ] Decide whether to keep the 51-centre sample mode that judges reach from the demo logins. It still shows "Prototype data" on its sample nutrition page.
 
 ### All repos
 - [ ] Delete the old `quick/*` and `checkpoint/*` branches on GitHub once happy (agents may not delete them).
@@ -231,3 +239,39 @@ Collected on 27 Oct from every agent lane across Sahara, ITI, WDCW and AI-FIR. E
 - [ ] Publish a FRESH public repo from `node scripts/public-source.mjs export`. Never make this repo public.
 - [ ] Crowdfunding: choose the platform; re-check prices in your own accounts; film only the real build with fictional contacts; never call 112 on camera; get written releases from everyone on camera.
 - [ ] Recipient web pages: open an alert link and a trip link on real Android Chrome and iOS Safari (light, dark, large text, Hindi), and check the Call 112 button opens the dialler. Should Call 112 show on alert pages? It is new there.
+- [ ] Deploy the SOS service and set `SOS_API_BASE_URL` in the Play build. Deploy the trip/report server, or don't advertise trip links.
+- [ ] Phone check: the Android 12+ splash, first launch on a Hindi phone, the welcome card at large font, masthead/dock in light/dark/high contrast, TalkBack on the headings.
+- [ ] Decide: add Vosk (offline speech that works on every phone; the library adds about 13 MB to the app, and Hindi/English models download on Wi-Fi, 38–45 MB each)? Today speech uses the phone's own recognizer, offline where the phone supports it.
+- [ ] Phone checks for speech: Hindi and English offline packs present and missing, airplane mode, whether discreet mode really silences the beep, TalkBack reading live words, and a group SMS to several people in Google Messages and Samsung Messages.
+- [ ] Phone checks for SOS reliability: an airplane-mode SOS with the screen locked (the 1-minute and 10-minute notices should appear and vibrate); reboot during a check-in and during a trip (each reminder fires once); Doze (`adb shell dumpsys deviceidle force-idle`).
+- [ ] Decide: if storage gets corrupted, an alert the server already accepted can't be cancelled from that phone (rare).
+- [ ] Phone checks for motion and sound: how the cues sound on the speaker and that they are silent in silent, vibrate and DND; haptic feel on several brands (especially Android 8–10); the glow, ring and flash in every theme and at large text; everything stops with the screen off and in Battery Saver; the SOS tap goes through instantly while the button glows.
+- [ ] Confirm: evidence audio now SAVES the clip (it used to discard it) when you leave the screen, lock the phone or hit the 55-second cap.
+- [ ] Phone checks for the private tools: hands-free evidence recording start/stop on lock and playback; sending several files to WhatsApp/Gmail; trim slider with TalkBack; screenshot blocking on safety plan / templates / checklist; the decoy journal looks identical; erase-journal flow; Hindi at large text.
+- [ ] Play Console: declare the microphone foreground service (voice phrase trigger) and describe the volume-key media session.
+- [ ] Phone checks for triggers: volume pattern and shake with the screen off (Pixel, Samsung, Xiaomi); voice phrase in Hindi/English and its battery use per hour; the SOS tile on a locked phone; the widget at 200% font; behaviour with notifications denied.
+- [ ] SOS service deploy (exact steps in product/alerts/README.md "Owner steps"): `npx wrangler secret put` for OPERATOR_TOKEN, DATA_KEY, CAPABILITY_KEY; set PUBLIC_ORIGIN; `npm run check && npm run deploy`. SMS through MSG91 (MSG91_AUTHKEY, MSG91_WEBHOOK_TOKEN, DLT template IDs, then MSG91_TEMPLATES_APPROVED=true), or through SMSGate (an Android phone; SMS_PROVIDER=smsgate plus 3 secrets). Then run the authorized test script against your own number before setting DISPATCH_ENABLED=true for real users. Optional: SELF_ENROLL_ENABLED=true for public sign-up.
+- [ ] Decide the Quick access tile default: "Start SOS at once" (current) or "Open Help only". In online mode one deliberate tap queues a real alert; cancel is one tap on Home.
+- [ ] Phone checks for Home: the SMS app opening straight after the SOS tap, the tile on a locked phone, TalkBack on the new rows, 200% font, dark and high-contrast on the active SOS card.
+- [ ] Decide: should "End ride" also cancel a running check-in timer? It does today. Should ride details be filled from a photo of the ride app? That needs ML Kit, a new dependency.
+- [ ] Approve the change: a missed check-in will now message your chosen contacts (before, nobody was told). Choose the grace period (default 10 minutes). Set `ALERTS_BASE_URL` (https) and `ALERTS_SERVICE_TOKEN` (32+ characters, same value on the SOS service) on the trip server. Register a DLT template for "missed check-in". Use full-disk encryption on the trip server host.
+- [ ] After hosting the privacy policy: put its https URL in `PRIVACY_POLICY_HOSTED_URL` (PrivacyPolicyUi.kt / build config). Once the public repo exists, give us its URL for the About page.
+- [ ] Automatic SMS from the phone itself (no internet, no server): built but switched off in Play builds. Google Play only allows it after you file a special "SEND_SMS" declaration with a demo video, and approval takes weeks. Decide: file it, or ship automatic SMS only in a direct-download/F-Droid APK (build flag `SAATHI_CELLULAR_SMS=true`).
+- [ ] Decide: if the phone is switched off above 15% battery (could be snatched), should it text your people? Today it only updates the trip link, to avoid a text every normal power-off.
+- [ ] Telegram (free extra channel, optional): create a bot with @BotFather, then `wrangler secret put TELEGRAM_BOT_TOKEN` and `TELEGRAM_WEBHOOK_SECRET`, set TELEGRAM_BOT_USERNAME, and register the webhook (the curl command is in product/alerts/README.md §2c).
+- [ ] Missed check-in: DLT template ID as `MSG91_CHECKIN_TEMPLATE_ID`; the same `ALERTS_SERVICE_TOKEN` on both servers.
+- [ ] Phone checks for tools: siren loudness and that the volume is restored afterwards; torch strength; pretend-call ringtone in each ringer mode; dialler hand-offs (use a dummy number). The NCW helpline 7827170170 is not on the NCW pages we could read, so it was not added; confirm it if you know an official source.
+- [ ] An Indian lawyer reviews the two new guides: "Harassment at work" (POSH timelines, committees) and "Photos or videos misused" (IT Rules, legal sections). Open shebox.wcd.gov.in on an Indian connection and confirm the link (it was unreachable from here).
+- [ ] Optional: let the app read the SMS code automatically. It needs Google's `play-services-auth-api-phone` (a new dependency, no new permission). Without it, people tap the keyboard's code suggestion or paste the code.
+- [ ] Play Console: fill in the SCHEDULE_EXACT_ALARM permission declaration (Codex at upload). Recheck Google's exact-alarm policy page before release.
+- [ ] Phone test on a spare phone: Doze reminders, reboot re-arm, notifications denied banner (see CLOUD_HANDOFF "UI round 28 Oct").
+- [ ] Self-setup by phone number: to switch on, set SELF_ENROLL_ENABLED=true on the SOS server and add an SMS provider (MSG91 approved OTP template + MSG91_OTP_TEMPLATE_ID, or SMSGate). Then do one test with your own number.
+- [ ] (Decision, default = no) Auto-read the OTP SMS needs Google Play services library; left out to keep the app fully open-source/F-Droid friendly. Keyboard suggestion + paste already works.
+- [ ] Maps (OpenFreeMap, free): before launch, email/sponsor openfreemap.org (no service guarantee). App size grows ~5 MB download per phone.
+- [ ] Before going public: one licence read of MapLibre bundled notices (RapidJSON "Good not Evil" clause) and OSM ODbL share-alike (script is included).
+- [ ] Re-run scripts/osm-help-places/extract.py before each release (police/hospital list refresh).
+- [ ] Buy 2–3 NTAG213 NFC stickers (~Rs 30 each) to test the "tap sticker for SOS" feature on a Pixel and a Samsung.
+- [ ] A native Hindi speaker reads values-hi/phone_powers.xml once.
+- [ ] Grievance officer (Indian IT Rules): pick a name + email + phone; put it in android/store/contact-details.md and the privacy policy. Not published anywhere yet.
+- [ ] Privacy policy [OWNER] blanks: effective date, hosting providers, log retention, SMS provider, response time, target age, public repo URL.
+- [ ] Confirm support email workwithdevit@gmail.com and phone +91 95533 21211 go public on Play listing.
