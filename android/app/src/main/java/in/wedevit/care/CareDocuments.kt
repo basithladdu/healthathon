@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.DriveFileMove
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -67,13 +68,38 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
     var newName by remember { mutableStateOf("") }
     var scanPath by rememberSaveable { mutableStateOf("") }
     fun cancerType(report: CareReport) = CancerDocumentRules.type(report.name, cancerChoices[report.id])
+    val folderStore = remember(vm.storageNamespace) { DocumentFolderStore(context, vm.storageNamespace) }
+    var folders by remember(vm.storageNamespace) { mutableStateOf(folderStore.all()) }
+    var folderFilter by rememberSaveable { mutableStateOf("") }
+    var moving by remember { mutableStateOf<CareReport?>(null) }
+    var asking by rememberSaveable { mutableStateOf(false) }
+    var sorting by remember { mutableStateOf(false) }
+    fun folderOf(report: CareReport) = folders[report.id]?.folder ?: DocumentFolderRules.OTHER
     val listState = rememberLazyListState()
     val focus = LocalFocusManager.current; val t = careText()
     var textMatches by remember(person) { mutableStateOf(emptyList<DocumentSearchExcerpt>()) }
     var searchedText by remember(person) { mutableStateOf("") }
     var searching by remember(person) { mutableStateOf(false) }
     var textError by remember(person) { mutableStateOf("") }
+    /** Sorting reads the first two pages on this phone, unless the person already checked the text. Nothing is uploaded. */
+    LaunchedEffect(reports.map { it.id }) {
+        val unsorted = reports.filter { it.id !in folders }
+        if (unsorted.isEmpty()) return@LaunchedEffect
+        sorting = true
+        try { unsorted.forEach { report ->
+            val folder = if (prescriptionOriginals.any { it.id == report.id }) DocumentFolderRules.PRESCRIPTIONS else withContext(Dispatchers.IO) {
+                val text = try {
+                    val file = vm.reportFiles.file(report)
+                    val reviewed = CareDocumentReviewStore(context.applicationContext, vm.storageNamespace).loadVerified(report, file)
+                    reviewed?.pages?.joinToString("\n") { it.reviewedText } ?: CareDocumentReader(context).read(file, report, maxPages = 2).pages.joinToString("\n") { it.originalText }
+                } catch (cancel: kotlinx.coroutines.CancellationException) { throw cancel } catch (_: Exception) { "" }
+                DocumentFolderRules.sort(report.name, text)
+            }
+            folderStore.sorted(report.id, folder); folders = folderStore.all()
+        } } finally { sorting = false }
+    }
     reports.firstOrNull { it.id == reviewId }?.let { report -> CareDocumentReview(vm, report) { reviewId = null }; return }
+    if (asking) { CareDocumentAsk(vm, reports, folders, onOpen = { report -> asking = false; reviewId = report.id }) { asking = false }; return }
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null && importingFor.isNotEmpty()) vm.importReport(uri, importingFor)
         importingFor = ""
@@ -94,8 +120,8 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
         Unit
     }
     val bothLanguages: (String, String) -> String = { en, hi -> "$en $hi" }
-    val visibleReports = reports.filter { report -> filter != "Care notes" && (filter != "Cancer" || cancerType(report) != null) && DocumentSearchWords.matchesName(search, "${report.name} ${cancerType(report)?.let { CancerDocumentRules.label(it, bothLanguages) }.orEmpty()}") }
-    val visibleNotes = notes.filter { filter !in setOf("Reports", "Cancer") && DocumentSearchWords.matchesName(search, "Goals of care देखभाल के लक्ष्य ${it.personName} ${it.doctor} Version ${it.version}") }
+    val visibleReports = reports.filter { report -> filter != "Care notes" && (folderFilter.isEmpty() || folderOf(report) == folderFilter) && (filter != "Cancer" || cancerType(report) != null) && DocumentSearchWords.matchesName(search, "${report.name} ${cancerType(report)?.let { CancerDocumentRules.label(it, bothLanguages) }.orEmpty()}") }
+    val visibleNotes = notes.filter { filter !in setOf("Reports", "Cancer") && folderFilter.isEmpty() && DocumentSearchWords.matchesName(search, "Goals of care देखभाल के लक्ष्य ${it.personName} ${it.doctor} Version ${it.version}") }
 
     fun openReport(report: CareReport, share: Boolean) {
         try {
@@ -122,6 +148,15 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
         item { Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf("All", "Care notes", "Reports", "Cancer").forEach { label -> FilterChip(selected = filter == label, onClick = { filter = label }, label = { Text(when (label) { "Care notes" -> t("Care notes", "देखभाल नोट"); "Reports" -> t("Reports", "रिपोर्टें"); "Cancer" -> t("Cancer documents", "कैंसर के कागज़"); else -> t("All", "सभी") }) }, modifier = Modifier.testTag("document-filter-$label")) }
         } }
+        if (reports.isNotEmpty()) item { Column {
+            val counts = DocumentFolderRules.counts(reports.map(::folderOf))
+            Text(if (sorting) t("Folders · sorting on this phone…", "फ़ोल्डर · इसी फ़ोन पर छाँट रहे हैं…") else t("Folders", "फ़ोल्डर"), style = MaterialTheme.typography.labelLarge)
+            Row(Modifier.horizontalScroll(rememberScrollState()).padding(top = 6.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                DocumentFolderRules.folders.forEach { folder -> FilterChip(selected = folderFilter == folder, onClick = { folderFilter = if (folderFilter == folder) "" else folder },
+                    label = { Text("${DocumentFolderRules.label(folder, t)} · ${counts[folder] ?: 0}") }, modifier = Modifier.testTag("document-folder-$folder")) }
+            }
+        } }
+        if (reports.isNotEmpty()) item { OutlinedButton(onClick = { asking = true }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("document-ask-open")) { Icon(Icons.Default.QuestionAnswer, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Ask your documents", "अपने कागज़ों से पूछें")) } }
         item { TextButton(onClick = {
             val query = search.trim(); val capturedPerson = person
             searching = true; textError = ""
@@ -182,6 +217,7 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
                             Text(report.name, fontWeight = FontWeight.Medium, maxLines = 2, overflow = TextOverflow.Ellipsis, fontFamily = SaharaTitleFont)
                             Text(Formatter.formatShortFileSize(context, report.bytes), style = MaterialTheme.typography.bodySmall)
                             Text(date(report.created), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(DocumentFolderRules.label(folderOf(report), t) + if (folders[report.id]?.chosen == true) "" else t(" · sorted on this phone", " · फ़ोन ने छाँटा"), style = MaterialTheme.typography.labelMedium, modifier = Modifier.testTag("report-folder-${report.id}"))
                             cancerType(report)?.let { type -> Text(CancerDocumentRules.label(type, t) + if (cancerChoices[report.id].isNullOrBlank()) t(" · from file name", " · नाम से अंदाज़ा") else "", style = MaterialTheme.typography.labelMedium, color = RustText, modifier = Modifier.testTag("report-cancer-${report.id}")) }
                         }
                     }
@@ -190,6 +226,7 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
                         TextButton(onClick = { reviewId = report.id }, modifier = Modifier.testTag("report-review-${report.id}")) { Icon(Icons.Default.DocumentScanner, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Read and copy facts", "पढ़ें और बातें कॉपी करें")) }
                         TextButton(onClick = { openReport(report, true) }, modifier = Modifier.testTag("report-share-${report.id}")) { Icon(Icons.Default.Share, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Share", "भेजें")) }
                         if (canEdit && prescriptionOriginals.none { it.id == report.id }) TextButton(enabled = !busy, onClick = { newName = report.name; renaming = report }, modifier = Modifier.testTag("report-rename-${report.id}")) { Icon(Icons.Default.Edit, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Rename", "नाम बदलें")) }
+                        if (canEdit) TextButton(onClick = { moving = report }, modifier = Modifier.testTag("report-move-${report.id}")) { Icon(Icons.AutoMirrored.Filled.DriveFileMove, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Move", "फ़ोल्डर बदलें")) }
                         if (canEdit && prescriptionOriginals.none { it.id == report.id }) TextButton(onClick = { marking = report }, modifier = Modifier.testTag("report-mark-cancer-${report.id}")) { Icon(Icons.Default.LocalHospital, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(if (cancerType(report) == null) t("Cancer document?", "कैंसर का कागज़?") else t("Change type", "प्रकार बदलें")) }
                         if (canEdit && prescriptionOriginals.none { it.id == report.id }) TextButton(enabled = !busy, onClick = { remove = report }, modifier = Modifier.testTag("report-remove-${report.id}")) { Icon(Icons.Default.DeleteOutline, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Remove", "हटाएँ")) }
                     }
@@ -199,7 +236,7 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
         if (search.isBlank() && filter != "Reports") item { TextButton(onClick = onTalk, modifier = Modifier.fillMaxWidth()) { Icon(Icons.Default.Forum, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(if (clinician) t("Start a conversation", "बातचीत शुरू करें") else t("Talk with your doctor", "अपने डॉक्टर से बात करें")) } }
     }
     remove?.let { report -> AlertDialog(onDismissRequest = { if (!busy) remove = null }, title = { Text(t("Remove this report?", "यह रिपोर्ट हटाएँ?")) }, text = { Text(report.name + t("\n\nSahara's copy on this phone is deleted. A file you picked from Files stays there; a camera scan is gone for good.", "\n\nइस फ़ोन से Sahara की कॉपी मिट जाएगी। Files से चुनी गई असली फ़ाइल वहीं रहेगी; कैमरे से किया स्कैन हमेशा के लिए हट जाएगा।")) },
-        confirmButton = { TextButton(onClick = { vm.removeReport(report) { remove = null; cancerStore.remove(report.id); cancerChoices = cancerStore.all() } }, enabled = !busy) { Text(t("Remove report", "रिपोर्ट हटाएँ")) } },
+        confirmButton = { TextButton(onClick = { vm.removeReport(report) { remove = null; cancerStore.remove(report.id); cancerChoices = cancerStore.all(); folderStore.remove(report.id); folders = folderStore.all() } }, enabled = !busy) { Text(t("Remove report", "रिपोर्ट हटाएँ")) } },
         dismissButton = { TextButton(onClick = { remove = null }, enabled = !busy) { Text(t("Keep", "रखें")) } }) }
     marking?.let { report ->
         val current = cancerType(report)
@@ -213,6 +250,16 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
                     modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("cancer-type-$type"))
             }
         } }, confirmButton = { TextButton(onClick = { marking = null }) { Text(t("Close", "बंद करें")) } })
+    }
+    moving?.let { report ->
+        AlertDialog(onDismissRequest = { moving = null }, title = { Text(t("Move to folder", "किस फ़ोल्डर में रखें?")) }, text = { Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text(report.name, style = MaterialTheme.typography.bodySmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
+            Text(t("Only the folder changes. It stays on this phone, like the report file.", "सिर्फ़ फ़ोल्डर बदलेगा। यह रिपोर्ट फ़ाइल की तरह इसी फ़ोन पर रहता है।"), style = MaterialTheme.typography.bodySmall)
+            DocumentFolderRules.folders.forEach { folder ->
+                FilterChip(selected = folderOf(report) == folder, onClick = { folderStore.choose(report.id, folder); folders = folderStore.all(); moving = null },
+                    label = { Text(DocumentFolderRules.label(folder, t)) }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("folder-choice-$folder"))
+            }
+        } }, confirmButton = { TextButton(onClick = { moving = null }) { Text(t("Close", "बंद करें")) } })
     }
     renaming?.let { report ->
         val nameError = ReportNameRules.error(newName)

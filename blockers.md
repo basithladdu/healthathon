@@ -50,6 +50,7 @@ Collected on 27 Oct from every agent lane across Sahara, ITI, WDCW and AI-FIR. T
   - optional `SAHARA_AI_PROVIDER_NAME` = the name people see in the consent line (default: the URL's host name)
 - [ ] Deploy the function once, from `android/`: `supabase functions deploy sahara-care-assist --project-ref kjnhtakqzboayqorrlue` (code: `android/supabase/functions/sahara-care-assist/index.ts`).
 - [ ] Check migration `20261019151322_shared_care_clinician_review.sql` is applied (it holds the attempt limit `sahara_reserve_assist`: 1 a minute, 10 a day per account, 100 a day in total).
+- [ ] "Ask your documents" (Docs tab, sa-docs lane, 28 Oct): apply migration `20261028120000_assist_document_questions.sql` (lets the same attempt limit count `ask`), then redeploy `sahara-care-assist`. Until both are done and the AI key is set, the app shows "AI is not set up yet". Only the question and the text read on the phone are sent, never photos or files.
 - [ ] Check the service's data terms (retention, training use, region) against the DPDP drafts. The app names the service in every consent line and sends nothing until everyone agrees and someone taps the button.
 
 **Doctor approval** (no migration needed; the server function `healthathon_review_clinician` already exists).

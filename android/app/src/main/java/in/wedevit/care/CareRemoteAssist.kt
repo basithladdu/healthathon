@@ -19,7 +19,7 @@ import java.util.UUID
 import java.util.concurrent.atomic.AtomicReference
 
 /** What the configured server says it can do. [provider] is the service name the owner set; every consent line names it. */
-data class CareAssistCapabilities(val ready: Boolean, val audioReady: Boolean, val translationReady: Boolean, val provider: String = "", val model: String = "")
+data class CareAssistCapabilities(val ready: Boolean, val audioReady: Boolean, val translationReady: Boolean, val provider: String = "", val model: String = "", val askReady: Boolean = false)
 data class CareAssistEvidence(val field: String, val line: Int, val start: Int, val end: Int, val text: String, val speaker: String)
 data class CareAssistedDraft(val sourceHash: String, val fields: Map<String, String>, val evidence: List<CareAssistEvidence>, val provider: String, val model: String)
 data class CareAssistedTranscript(val original: String, val sourceHash: String, val language: String, val provider: String, val model: String)
@@ -51,7 +51,7 @@ class CareAssistHttpTransport(private val base: String = CARE_ASSIST_ENDPOINT) :
         val worker = CoroutineScope(Dispatchers.IO).launch {
             var connection: HttpURLConnection? = null
             try {
-                require(path in setOf("", "/transcribe", "/translate"))
+                require(path in setOf("", "/transcribe", "/translate", "/ask"))
                 if ((!accessToken.matches(Regex("[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+")) || accessToken.length > 16384)) throw CareAssistException("sign_in_required", "Sign in to Sahara first.")
                 connection = URL(base + path).openConnection() as HttpURLConnection
                 active.set(connection)
@@ -106,6 +106,7 @@ class CareRemoteAssist(private val transport: CareAssistTransport = CareAssistHt
     suspend fun transcribe(file: File, consent: RecordingConsent, durationMs: Long, language: String, token: String): CareAssistedTranscript = adapter.transcribe(file, consent, durationMs, language, token)
     suspend fun translate(source: String, versionId: String, sourceLanguage: String, targetLanguage: String, token: String, consent: Boolean): CareAssistedTranslation =
         adapter.translate(source, versionId, sourceLanguage, targetLanguage, token, consent)
+    suspend fun ask(request: DocumentQuestionRequest, token: String, consent: Boolean): DocumentAnswer = adapter.ask(request, token, consent)
 }
 
 /** The speaker label already written at the start of a conversation line, or "Unknown". */
@@ -119,7 +120,7 @@ internal class CareAssistProviderAdapter(private val transport: CareAssistTransp
         require(value.getString("provider") == CARE_ASSIST_PROVIDER)
         val ready = value.getBoolean("ready")
         return CareAssistCapabilities(ready, ready && value.optBoolean("audioReady"), ready && value.optBoolean("translationReady"),
-            value.optString("label").take(60).ifBlank { "the AI service" }, value.optString("model").take(100))
+            value.optString("label").take(60).ifBlank { "the AI service" }, value.optString("model").take(100), ready && value.optBoolean("askReady"))
     }
 
     suspend fun draft(source: String, token: String, consent: Boolean): CareAssistedDraft {
@@ -148,6 +149,15 @@ internal class CareAssistProviderAdapter(private val transport: CareAssistTransp
         val payload = request().put("source", source).put("sourceHash", careAssistSourceHash(source)).put("versionId", versionId).put("sourceLanguage", sourceLanguage).put("targetLanguage", targetLanguage)
         val raw = transport.request("/translate", payload.toString(), token)
         return checkedRemote { parseCareAssistedTranslation(raw, source, versionId, sourceLanguage, targetLanguage) }
+    }
+
+    /** Only the question and the chosen documents' text lines leave the phone: no images, file names or person details. */
+    suspend fun ask(request: DocumentQuestionRequest, token: String, consent: Boolean): DocumentAnswer {
+        require(consent) { "Agree to online processing first." }
+        val raw = transport.request("/ask", DocumentQuestionRules.payload(request, request()).toString(), token)
+        return try { DocumentQuestionRules.parse(raw, request) } catch (_: RuntimeException) {
+            throw CareAssistException("invalid_response", "The answer could not be checked against your documents. Nothing is shown.")
+        }
     }
 
     private fun request() = JSONObject().put("requestId", UUID.randomUUID().toString()).put("consent", true)
