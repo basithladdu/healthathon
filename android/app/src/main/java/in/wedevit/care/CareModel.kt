@@ -158,6 +158,30 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
     private var pendingRecordingMetadata: Pair<RecordingConsent,DoctorLocalAudioRef>? = null
     /** The 1.5 MB bundled directory is parsed once per process, off the start-up path (warmed below on a background thread). */
     val centres: List<Centre> get() = CareCentreDirectory.bundled(getApplication())
+    /** This account's "Suggest a centre that's missing" entries: unsent ones from the send-later queue, then the server's. */
+    val centreSuggestions = MutableStateFlow<List<CentreSuggestion>>(emptyList())
+    val centreSuggestionSending = MutableStateFlow(false)
+    fun loadCentreSuggestions() {
+        val service = cloud ?: return; val queue = sync ?: return
+        viewModelScope.launch {
+            // Before the table exists, or with no signal, the list shows only what is still on this phone.
+            val server = try { service.myCentreSuggestions(account) } catch (e: Exception) { if (e is CancellationException) throw e; null }
+            centreSuggestions.value = CentreSuggestionOps.merge(server ?: centreSuggestions.value.filter { it.status !in setOf("waiting", "kept") }, queue.pending(CentreSuggestionOps.PERSON))
+        }
+    }
+    /** Queues the suggestion, tries to send it, and reports "pending" (sent, not checked yet), "waiting" or "kept" (still on this phone). */
+    fun suggestCentre(draft: CentreSuggestionDraft, done: (String) -> Unit) {
+        val queue = sync ?: return
+        if (centreSuggestionSending.value || CentreSuggestionRules.error(draft) != null) return
+        centreSuggestionSending.value = true
+        viewModelScope.launch {
+            try {
+                val status = when (queue.enqueue(CentreSuggestionOps.write(draft))) { CareSyncStatus.SENT -> "pending"; CareSyncStatus.KEPT -> "kept"; else -> "waiting" }
+                done(status); loadCentreSuggestions()
+            } catch (e: Exception) { if (e is CancellationException) throw e; message.value = "Couldn't save the suggestion. Your words are still here. · सुझाव सहेजा नहीं जा सका। आपके शब्द यहीं हैं।" }
+            finally { centreSuggestionSending.value = false }
+        }
+    }
     /** Activating reminders commits preferences and re-sets every alarm; it runs in the background, before any reminder reconcile. */
     private val reminderActivation = viewModelScope.async(Dispatchers.IO) { runCatching { reminderScheduler?.activate() } }
     init {

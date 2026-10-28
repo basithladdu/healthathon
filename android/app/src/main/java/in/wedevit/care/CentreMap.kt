@@ -98,16 +98,18 @@ import org.maplibre.geojson.Point
                     style.addSource(GeoJsonSource("care-centres", points(currentCentres), GeoJsonOptions().withCluster(true)
                         .withClusterRadius(CentreLocation.CLUSTER_RADIUS).withClusterMaxZoom(CentreLocation.CLUSTER_MAX_ZOOM)))
                     val single = not(has("point_count"))
-                    style.addLayer(CircleLayer("care-clusters", "care-centres").withFilter(has("point_count")).withProperties(circleColor("#B9472C"),
+                    val layerColour = switchCase(eq(get("layer"), literal(NearbyHelp.LAYER_MORPHINE)), literal(NearbyHelp.layerColorHex(NearbyHelp.LAYER_MORPHINE)), literal(NearbyHelp.layerColorHex(NearbyHelp.LAYER_PALLIATIVE)))
+                    // Groups mix both layers, so they use the neutral ink colour; single pins take their layer's colour (see the legend on Nearby).
+                    style.addLayer(CircleLayer("care-clusters", "care-centres").withFilter(has("point_count")).withProperties(circleColor("#382E29"),
                         circleRadius(step(get("point_count"), literal(15f), stop(10, 19f), stop(100, 24f))), circleStrokeColor("#FFFFFF"), circleStrokeWidth(3f)))
                     style.addLayer(SymbolLayer("care-cluster-count", "care-centres").withFilter(has("point_count")).withProperties(
                         textField(Expression.toString(get("point_count_abbreviated"))), textFont(arrayOf("Noto Sans Bold")), textSize(13f), textColor("#FFFFFF"),
                         textAllowOverlap(true), textIgnorePlacement(true)))
                     // Approximate pins (PIN, town or district area) are hollow; exact ones stay solid.
                     style.addLayer(CircleLayer("care-pins-approx", "care-centres").withFilter(all(single, eq(get("approx"), literal(true))))
-                        .withProperties(circleColor("#FFFFFF"), circleRadius(7f), circleStrokeColor("#B9472C"), circleStrokeWidth(3f)))
+                        .withProperties(circleColor("#FFFFFF"), circleRadius(7f), circleStrokeColor(layerColour), circleStrokeWidth(3f)))
                     style.addLayer(CircleLayer("care-pins", "care-centres").withFilter(all(single, eq(get("approx"), literal(false))))
-                        .withProperties(circleColor("#B9472C"), circleRadius(8f), circleStrokeColor("#FFFFFF"), circleStrokeWidth(3f)))
+                        .withProperties(circleColor(layerColour), circleRadius(8f), circleStrokeColor("#FFFFFF"), circleStrokeWidth(3f)))
                     loaded = true; failed = false
                 }
             }
@@ -152,6 +154,9 @@ import org.maplibre.geojson.Point
 private fun bounds(centres: List<Centre>) = if (centres.size == 1) CameraUpdateFactory.newLatLngZoom(LatLng(centres[0].latitude!!, centres[0].longitude!!), 13.0)
 else CameraUpdateFactory.newLatLngBounds(LatLngBounds.Builder().includes(centres.map { LatLng(it.latitude!!, it.longitude!!) }).build(), 48)
 
-private fun points(centres: List<Centre>) = FeatureCollection.fromFeatures(CentreLocation.pins(centres).map { pin ->
-    Feature.fromGeometry(Point.fromLngLat(pin.longitude, pin.latitude)).apply { addStringProperty("id", pin.id); addBooleanProperty("approx", pin.approximate) }
-})
+private fun points(centres: List<Centre>): FeatureCollection {
+    val layers = centres.associate { it.id to NearbyHelp.layerOf(it) }
+    return FeatureCollection.fromFeatures(CentreLocation.pins(centres).map { pin ->
+        Feature.fromGeometry(Point.fromLngLat(pin.longitude, pin.latitude)).apply { addStringProperty("id", pin.id); addBooleanProperty("approx", pin.approximate); addStringProperty("layer", layers[pin.id] ?: NearbyHelp.LAYER_PALLIATIVE) }
+    })
+}

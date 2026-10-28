@@ -40,16 +40,33 @@ object NearbyHelp {
      * published address names it (many listings have no district field); listed-district matches come first.
      */
     fun visible(centres: List<Centre>, searchText: List<String>, search: String, state: String, district: String,
-                service: String, morphine: Boolean): List<Centre> {
+                service: String, layers: Set<String> = layerOptions.toSet()): List<Centre> {
         val words = queryWords(search)
         val matches = centres.filterIndexed { index, c ->
             matches(searchText[index], words) &&
                 (state == ALL_INDIA || c.state == state) && servesAs(c, service) &&
-                (!morphine || c.sourceListedMorphine == "available") &&
+                layerOf(c) in layers &&
                 (district.isBlank() || c.district.equals(district, true) || c.address.contains(district, true))
         }
         return if (district.isBlank()) matches else matches.sortedBy { !it.district.equals(district, true) }
     }
+
+    /**
+     * Map and list layers. Every centre in the directory is a palliative care centre; the ones whose source listing says
+     * morphine is available form the second layer, in their own colour. "Listed" only: the app never says morphine is in stock.
+     */
+    fun layerOf(c: Centre): String = if (c.sourceListedMorphine == "available") LAYER_MORPHINE else LAYER_PALLIATIVE
+    val layerOptions = listOf(LAYER_PALLIATIVE, LAYER_MORPHINE)
+    /** Turns a layer chip on or off. The last layer that is on stays on, so the map is never empty because of the chips alone. */
+    fun toggleLayer(layers: Set<String>, layer: String): Set<String> = when {
+        layer !in layerOptions -> layers
+        layer !in layers -> layers + layer
+        layers.size > 1 -> layers - layer
+        else -> layers
+    }
+    /** Pin, chip and badge colour per layer: Sahara terracotta and a blue that differ for red-green colour blindness too. */
+    fun layerColor(layer: String): Long = if (layer == LAYER_MORPHINE) 0xFF2B5C9E else 0xFFB9472C
+    fun layerColorHex(layer: String): String = "#%06X".format(layerColor(layer) and 0xFFFFFFL)
 
     /** Service chips, in the order shown. Each one is in the bundled directory; "Hospice" means the listing's name or address says hospice. */
     val serviceOptions = listOf(ALL_SERVICES, "Home care", "Clinic visits", "Inpatient care", "Day care", "Physiotherapy", HOSPICE)
@@ -97,4 +114,6 @@ object NearbyHelp {
     const val ALL_INDIA = "All India"
     const val ALL_SERVICES = "All"
     const val HOSPICE = "Hospice"
+    const val LAYER_PALLIATIVE = "palliative"
+    const val LAYER_MORPHINE = "morphine"
 }

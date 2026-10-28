@@ -14,8 +14,8 @@ class NearbyHelpTest {
         centre("d", "Delhi", "", "Saket, New Delhi"),
     )
     private val text = centres.map { "${it.name} ${it.city} ${it.district} ${it.address} ${it.state}" }
-    private fun ids(search: String = "", state: String = NearbyHelp.ALL_INDIA, district: String = "", service: String = NearbyHelp.ALL_SERVICES, morphine: Boolean = false) =
-        NearbyHelp.visible(centres, text, search, state, district, service, morphine).map { it.id }
+    private fun ids(search: String = "", state: String = NearbyHelp.ALL_INDIA, district: String = "", service: String = NearbyHelp.ALL_SERVICES, layers: Set<String> = NearbyHelp.layerOptions.toSet()) =
+        NearbyHelp.visible(centres, text, search, state, district, service, layers).map { it.id }
 
     @Test fun emergencyNumbersAreTheCitedNationalOnesAndOnlyOpenTheDialler() {
         assertEquals(listOf("112", "108", "102", "14567"), NearbyHelp.emergency.map { it.number })
@@ -40,13 +40,40 @@ class NearbyHelpTest {
     @Test fun districtMatchesListedDistrictFirstThenAddressesNamingIt() {
         assertEquals(listOf("a", "b"), ids(state = "Kerala", district = "Kollam"))
         val reversed = centres.reversed()
-        assertEquals(listOf("a", "b"), NearbyHelp.visible(reversed, text.reversed(), "", "Kerala", "Kollam", NearbyHelp.ALL_SERVICES, false).map { it.id })
+        assertEquals(listOf("a", "b"), NearbyHelp.visible(reversed, text.reversed(), "", "Kerala", "Kollam", NearbyHelp.ALL_SERVICES).map { it.id })
     }
     @Test fun searchServiceAndMorphineCombineWithLocation() {
         assertEquals(listOf("c"), ids(state = "Kerala", service = "Home care"))
-        assertEquals(listOf("c"), ids(morphine = true))
+        assertEquals(listOf("c"), ids(layers = setOf(NearbyHelp.LAYER_MORPHINE)))
         assertEquals(listOf("d"), ids(search = "  saket "))
         assertEquals(emptyList<String>(), ids(state = "Delhi", district = "Kollam"))
+    }
+
+    @Test fun eachCentreIsInExactlyOneLayerByItsSourceMorphineListing() {
+        assertEquals(listOf("palliative", "palliative", "morphine", "palliative"), centres.map(NearbyHelp::layerOf))
+        // Only the source's "available" counts; the free-text morphine field and other values never move a centre to the morphine layer.
+        assertEquals(NearbyHelp.LAYER_PALLIATIVE, NearbyHelp.layerOf(centre("x", "Kerala", morphine = "unknown")))
+        assertEquals(NearbyHelp.LAYER_PALLIATIVE, NearbyHelp.layerOf(centre("y", "Kerala", morphine = "")))
+    }
+    @Test fun layerFilterShowsOnlyTheChosenLayersAndCombinesWithOtherFilters() {
+        assertEquals(listOf("a", "b", "c", "d"), ids())
+        assertEquals(listOf("a", "b", "d"), ids(layers = setOf(NearbyHelp.LAYER_PALLIATIVE)))
+        assertEquals(listOf("c"), ids(layers = setOf(NearbyHelp.LAYER_MORPHINE)))
+        assertEquals(emptyList<String>(), ids(state = "Delhi", layers = setOf(NearbyHelp.LAYER_MORPHINE)))
+        assertEquals(listOf("a", "b"), ids(state = "Kerala", district = "Kollam", layers = setOf(NearbyHelp.LAYER_PALLIATIVE)))
+        assertEquals(emptyList<String>(), ids(layers = emptySet()))
+    }
+    @Test fun layerChipsToggleButTheLastLayerStaysOn() {
+        val all = NearbyHelp.layerOptions.toSet()
+        assertEquals(setOf(NearbyHelp.LAYER_MORPHINE), NearbyHelp.toggleLayer(all, NearbyHelp.LAYER_PALLIATIVE))
+        assertEquals(setOf(NearbyHelp.LAYER_MORPHINE), NearbyHelp.toggleLayer(setOf(NearbyHelp.LAYER_MORPHINE), NearbyHelp.LAYER_MORPHINE))
+        assertEquals(all, NearbyHelp.toggleLayer(setOf(NearbyHelp.LAYER_MORPHINE), NearbyHelp.LAYER_PALLIATIVE))
+        assertEquals(all, NearbyHelp.toggleLayer(all, "votes"))
+    }
+    @Test fun layersHaveDistinctPinColours() {
+        assertEquals("#B9472C", NearbyHelp.layerColorHex(NearbyHelp.LAYER_PALLIATIVE))
+        assertEquals("#2B5C9E", NearbyHelp.layerColorHex(NearbyHelp.LAYER_MORPHINE))
+        assertEquals(NearbyHelp.layerOptions.size, NearbyHelp.layerOptions.map(NearbyHelp::layerColor).distinct().size)
     }
 
     private val towns = listOf(
@@ -59,7 +86,7 @@ class NearbyHelpTest {
     )
     private val keys = towns.map(NearbyHelp::searchKey)
     private fun found(search: String, service: String = NearbyHelp.ALL_SERVICES) =
-        NearbyHelp.visible(towns, keys, search, NearbyHelp.ALL_INDIA, "", service, false).map { it.id }
+        NearbyHelp.visible(towns, keys, search, NearbyHelp.ALL_INDIA, "", service).map { it.id }
 
     @Test fun searchIgnoresCaseMatchesPartWordsAndNeedsEveryWord() {
         assertEquals(listOf("k"), found("KARUN"))
