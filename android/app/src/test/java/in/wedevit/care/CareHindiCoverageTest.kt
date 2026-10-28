@@ -22,12 +22,22 @@ class CareHindiCoverageTest {
         "CareReminderUi.kt" to listOf("CareReminderSettings", "ReminderItemSettings"),
         "FeedbackUi.kt" to listOf("FeedbackExperienceScreen"),
         "CareComponents.kt" to listOf("CareNavigation", "CarePersonSelector", "WalkthroughUserMenu"),
-        "CareDailyUi.kt" to listOf("CareAddMenuButton", "CareModuleCard", "CareModuleList", "ConversationRow", "MedicineScanAction"),
+        "CareDailyUi.kt" to listOf("CareAddMenuButton", "CareModuleCard", "CareModuleList", "ConversationRow", "MedicineScanAction", "QuickCheckInCard"),
         "CareSchedule.kt" to listOf("DailyCareShortcuts", "CareDateButton", "CareCalendar", "CalendarEntryCard", "CareScheduleEditor"),
         "CareWorkflow.kt" to listOf("WorkflowSummary", "CareWorkflows", "WorkflowCard", "CareWorkflowEditor"),
         "CareAddFamily.kt" to listOf("AddFamilySheet", "PendingJoinDialog"),
         "CareAccount.kt" to listOf("AccountContent", "CareRoot"),
         "CareSymptomUi.kt" to listOf("CareSymptomDiary", "SymptomNoteCard", "SymptomNoteForm"),
+        // Doctor recording panels, conversation history and note reader (28 Oct). Store checks are shown through Hindi maps.
+        "DoctorRecordStage.kt" to listOf("DoctorRecordStage"),
+        "DoctorAttendees.kt" to listOf("DoctorAttendeesList"),
+        "DoctorConversationsUi.kt" to listOf("DoctorConversationsContent", "DiscussionReadingCard"),
+        "DoctorPreparationQuestions.kt" to listOf("PrepCard", "DoctorPreparationQuestions", "DoctorPreparationAnswers"),
+        "DoctorSavedAudioSheet.kt" to listOf("DoctorSavedAudioPage"),
+        "DoctorTranscriptGoals.kt" to listOf("DoctorTranscriptGoals", "GoalCard"),
+        "DoctorRecordingReviewUi.kt" to listOf("DoctorRecordingReview"),
+        "DoctorNoteReaderUi.kt" to listOf("DoctorNoteReaderBody", "NoteReaderTranscript", "NoteReaderGoalCard"),
+        "DoctorMedicinesUi.kt" to listOf("MedicineChip"),
     )
 
     /** Literals that are keys, animation labels or format patterns, never shown as text. */
