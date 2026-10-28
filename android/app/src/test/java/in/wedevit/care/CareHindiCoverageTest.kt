@@ -38,6 +38,9 @@ class CareHindiCoverageTest {
         "DoctorRecordingReviewUi.kt" to listOf("DoctorRecordingReview"),
         "DoctorNoteReaderUi.kt" to listOf("DoctorNoteReaderBody", "NoteReaderTranscript", "NoteReaderGoalCard"),
         "DoctorMedicinesUi.kt" to listOf("MedicineChip"),
+        // Goals-of-care sign-off and the optional screening helper (28 Oct).
+        "GoalsSignatureUi.kt" to listOf("NoteSignatureCapture", "NoteSignedBy"),
+        "GoalsScreening.kt" to listOf("GoalsScreeningHelper"),
     )
 
     /** Literals that are keys, animation labels or format patterns, never shown as text. */

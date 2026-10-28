@@ -550,6 +550,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
             if (!doctorCapture) item { Column { ConversationStepper(topStep); val subLabel = ConversationPages.subLabel(topStep, subPage, careHindi()); if (subLabel.isNotBlank()) Text(subLabel, fontSize = 12.sp, lineHeight = 16.sp, color = DoctorCardFaint, textAlign = androidx.compose.ui.text.style.TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(top = 4.dp).testTag("conversation-substep")) } }
             when (step) {
                 0 -> {
+                    item { GoalsScreeningHelper(draft.personId) }
                     item { Text(t("Write down everyone in the room, then the questions this conversation should cover. Each person must agree before anything is recorded.", "कमरे में मौजूद सभी के नाम लिखें, फिर वे सवाल जिन पर बात होनी है। कुछ भी रिकॉर्ड करने से पहले हर व्यक्ति की सहमति ज़रूरी है।"), fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk) }
                     if (attendeeScope.isBlank()) item { Text(t("Choose a person first to list who is here.", "कौन मौजूद है, यह लिखने के लिए पहले व्यक्ति चुनें।"), fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub) }
                     else item {
@@ -816,6 +817,9 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
     val scope = rememberCoroutineScope()
     var exporting by rememberSaveable { mutableStateOf<String?>(null) }
     val familyOnly = vm.cloud == null && vm.walkthroughRole == "Family"
+    val signatureStore = remember(vm.storageNamespace) { NoteSignatureStore.of(context, vm.storageNamespace) }; val signatureDraft = remember(note.id) { SignatureDraft() }
+    var signaturesRead by remember { mutableIntStateOf(0) }
+    val signatures by produceState(emptyList<NoteSignature>(), note.id, signaturesRead, confirmations) { value = withContext(Dispatchers.IO) { NoteSignatureRules.forVersion(runCatching { signatureStore.list(note.personId) }.getOrDefault(emptyList()), note, confirmations) } }
     LaunchedEffect(patientConfirmation?.id, owner) { relationship = if (familyOnly) "Family / carer" else if (vm.cloud != null) if (owner) "Patient" else "Family / carer" else if (patientConfirmation == null) "Patient" else "Family / carer"; reviewed = false }
     val saveNote = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/plain")) { uri ->
         val text = exporting; exporting = null
@@ -842,6 +846,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
             items(confirmations, key = { it.id }) { confirmation -> SurfaceCard(if (confirmation.relationship == "Patient") Sage else Mint) {
                 Text(if (confirmation.relationship == "Patient") t("Patient confirmed this version", "मरीज़ ने इस संस्करण की पुष्टि की") else t("Family / carer confirmation", "परिवार / देखभाल करने वाले की पुष्टि"), fontWeight = FontWeight.Bold)
                 Text("${confirmation.name} · ${date(confirmation.at)}")
+                signatures.filter { it.ackId == confirmation.id }.forEach { NoteSignedBy(it, signatureStore) }
             } }
             if (versions.firstOrNull()?.id == note.id) {
                 item { HorizontalDivider(); Spacer(Modifier.height(12.dp)); Heading(if (patientConfirmation == null) t("Patient's review", "मरीज़ की जाँच") else t("Family's review", "परिवार की जाँच"), 26)
@@ -849,8 +854,15 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                 item { CareField(value = name, onValueChange = { name = it.take(100) }, label = t("Your name", "आपका नाम"), singleLine = true) }
                 item { Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf("Patient", "Family / carer").forEach { role -> FilterChip(selected = relationship == role, onClick = { relationship = role }, enabled = (vm.cloud == null || (role == "Patient") == owner) && !(familyOnly && role == "Patient") && if (role == "Patient") patientConfirmation == null else patientConfirmation != null, label = { Text(if (role == "Patient") t("Patient", "मरीज़") else t("Family / carer", "परिवार / देखभाल करने वाले")) }) } } }
                 item { CheckLine(reviewed, { reviewed = it }, t("I have read this exact version. This acknowledgement is not a legal signature, medical consent or treatment decision. I can ask my doctor to update it later.", "मैंने यही संस्करण पढ़ा है। यह पुष्टि क़ानूनी हस्ताक्षर, इलाज की सहमति या इलाज का फ़ैसला नहीं है। मैं बाद में डॉक्टर से इसे बदलवा सकता/सकती हूँ।")) }
+                item { NoteSignatureCapture(signatureDraft, enabled = !busy) { vm.message.value = it } }
                 val alreadyConfirmed = confirmations.any { it.relationship == relationship && it.name.equals(name.trim(), ignoreCase = true) && (vm.cloud == null || it.id in authenticatedAcks) }
-                item { Button(onClick = { vm.confirm(note, name, relationship, reviewed) { reviewed = false; name = "" } }, enabled = reviewed && name.isNotBlank() && !busy && !alreadyConfirmed && (relationship == "Patient" || patientConfirmation != null), modifier = Modifier.fillMaxWidth()) { Text(if (alreadyConfirmed) t("Confirmation already saved", "पुष्टि पहले से सहेजी है") else t("Confirm this version", "इस संस्करण की पुष्टि करें")) } }
+                item { Button(onClick = {
+                    val signed = signatureDraft.image(); var signatureFailed = false
+                    if (signed != null) vm.confirm(note, name, relationship, reviewed, onSaved = { ack -> if (!saveNoteSignature(context, vm.storageNamespace, note, ack, signed.first, signed.second)) signatureFailed = true }) {
+                        reviewed = false; name = ""; signatureDraft.clear(); signaturesRead++
+                        if (signatureFailed) vm.message.value = t("Your confirmation is saved, but the signature could not be saved on this phone.", "आपकी पुष्टि सहेजी गई, पर हस्ताक्षर इस फ़ोन पर सहेजा नहीं जा सका।")
+                    }
+                }, enabled = reviewed && name.isNotBlank() && signatureDraft.ready && !busy && !alreadyConfirmed && (relationship == "Patient" || patientConfirmation != null), modifier = Modifier.fillMaxWidth()) { Text(if (alreadyConfirmed) t("Confirmation already saved", "पुष्टि पहले से सहेजी है") else t("Sign and confirm this version", "हस्ताक्षर करके इस संस्करण की पुष्टि करें")) } }
             }
             item { Text(t("This records a conversation. It is not a treatment order or legal directive. Names are self-entered unless this version explicitly shows verified clinician review.", "यह एक बातचीत का रिकॉर्ड है। यह इलाज का आदेश या क़ानूनी निर्देश नहीं है। जब तक डॉक्टर की पक्की जाँच न दिखे, नाम लोगों ने ख़ुद लिखे हैं।"), style = MaterialTheme.typography.bodySmall) }
         }
