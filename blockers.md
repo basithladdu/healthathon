@@ -190,9 +190,26 @@ Collected on 27 Oct from every agent lane across Sahara, ITI, WDCW and AI-FIR. E
 - [ ] Test on a phone with real on-device speech-to-text, which may drop question marks and mis-hear Hindi.
 
 ### Raasta Saathi (devit-womens-safety): women's safety app
+
+**Plan (28 Oct):** Basith has a Play organisation account and will buy Cloudflare later (free tier for now). When ready, Basith will hand over the accounts and Claude will do the uploads and console setup through computer use. Until then these stay here.
+
 - [ ] **SMS provider account** for SOS dispatch: choose a provider, give the server its credentials, then run an authorized test with consenting recipients (delivery, no reply, refusal, backup escalation). The app code is ready; dispatch only works once a provider is set up.
 - [ ] **Deploy the SOS service and trip-link service** (Cloudflare / chosen host) with their own secrets (encryption, capability, operator, webhook keys). Do not regenerate keys against the existing pilot.
 - [ ] **Play Store:** create the Play Console app, upload signing key, store listing, Data safety, privacy policy URL, content rating, then the internal-testing release.
 - [ ] **Open-source release:** decide the public licence review: the AI-FIR UI ports (yours to grant), Zip4j's LGPL provenance, and keeping the research folder and X-thread paraphrases private. Then run the public source export into a new public repo.
 - [ ] **Crowdfunding:** pick a platform, set the goal from real costs (SMS, hosting, Play fee), write the campaign, record the videos.
 - [ ] **Real phones:** camera/mic, Bluetooth handoff between two phones, battery/Doze, TalkBack, screen-off SOS, dual SIM.
+
+### Raasta Saathi: Play Store and open source (from the release lane; details in android/store/release-checklist.md)
+- [ ] Play developer account (US$25) and app record; turn on Play App Signing. You have an organisation account, so the 12-tester closed-test rule for new personal accounts does not apply.
+- [ ] Create the upload keystore outside the repo (keep backups); build with the four `SAATHI_UPLOAD_*` environment variables. Next version: 10 / 0.10.0.
+- [ ] SMS: a funded MSG91 account, DLT registration and approved templates, the webhook secret, a test with consenting recipients, then turn on `DISPATCH_ENABLED` and `MSG91_TEMPLATES_APPROVED`. Until then the app uses the phone's own SMS and call.
+- [ ] Deploy the SOS service on Cloudflare (free tier is fine to start; you will buy a plan later) and set `SOS_API_BASE_URL` in the Play build. Deploy the trip/report server, or don't advertise trip links.
+- [ ] Privacy policy: fill the `[OWNER: …]` fields in `android/store/privacy-policy.html` (legal name, address, support email, retention, providers), host it, and give us the URL for the in-app link.
+- [ ] Play Console forms: Data safety, content rating, target audience (18+ recommended), foreground-service declaration with a demo video, health question (medical card).
+- [ ] Capture the store screenshots from the merged build (list in `android/store/screenshots.md`); make the feature graphic.
+- [ ] A native speaker reviews the Hindi listing and policy.
+- [ ] Licensing: a written grant for the AI-FIR UI ports (you own AI-FIR; it has no LICENSE file); choose a Zip4j LGPL option; trademark search for "Raasta Saathi"; decide on a DCO / Code of Conduct.
+- [ ] Publish a FRESH public repo from `node scripts/public-source.mjs export`. Never make this repo public.
+- [ ] Crowdfunding: choose the platform; re-check prices in your own accounts; film only the real build with fictional contacts; never call 112 on camera; get written releases from everyone on camera.
+- [ ] Recipient web pages: open an alert link and a trip link on real Android Chrome and iOS Safari (light, dark, large text, Hindi), and check the Call 112 button opens the dialler. Should Call 112 show on alert pages? It is new there.
