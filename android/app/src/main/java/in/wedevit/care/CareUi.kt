@@ -404,6 +404,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
         if (visits.isEmpty() && loaded) item { SurfaceCard { Row(verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.Event, null, tint = Rust); Spacer(Modifier.width(12.dp)); Text(CareTodayRules.emptyText("visits", canEdit, hindi)) } } }
         items(visits.take(2), key = { it.id }) { if (isDoctorStructuredVisit(it)) DoctorVisitSummary(it, onOpen = { onCalendarAt(it.due) }) else CareRow(it, vm) }
         item { SectionTitle(t("Medicines", "दवाइयाँ"), t("See all", "सब देखें")) { onCare("Medicines") } }
+        item(key = "today-doses") { TodayDosesCard(vm) }
         val medicines = CareDailyFlow.medicinesForToday(items, LocalDate.now())
         val takenToday = CareDailyFlow.takenToday(items, LocalDate.now())
         if (medicines.isNotEmpty()) item { Text(t("$takenToday of ${medicines.size} ticked today · not yet ticked are shown first", "आज ${medicines.size} में से $takenToday पर टिक · बाक़ी पहले दिखती हैं"), fontSize = 13.sp, color = DoctorCardSub) }
@@ -1154,12 +1155,15 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                 val moods = listOf(Triple(CheckInMood.GOOD, Icons.Default.SentimentSatisfiedAlt, Sage), Triple(CheckInMood.OKAY, Icons.Default.SentimentNeutral, Gold), Triple(CheckInMood.HARD, Icons.Default.SentimentDissatisfied, Peach))
                 moods.forEach { (mood, icon, tint) -> ChoiceRow(checkInMoodLabel(mood, hindi), icon, tint, title == mood) { title = mood } }
                 CareField(value = detail, onValueChange = { detail = it.take(4000) }, label = t("Anything to add? (optional)", "कुछ और बताना है? (ज़रूरी नहीं)"), minLines = 2)
+            } else if (kind == "medicine" && MedicineEntryText.parse(detail) != null) {
+                MedicineEntryForm(title, { title = it.take(200) }, detail, { detail = it.take(4000) }, vm.storageNamespace, capturedPerson, entryId, busy)
             } else if (kind == "journal" && initial == null) {
                 CareField(value = detail, onValueChange = { detail = it.take(4000); title = it.lineSequence().firstOrNull { line -> line.isNotBlank() }.orEmpty().take(80) }, label = t("Your note", "आपका नोट"), minLines = 4)
             } else {
                 CareField(value = title, onValueChange = { title = it.take(200) }, label = when (kind) { "medicine" -> t("Medicine name", "दवा का नाम"); "visit" -> t("Doctor or hospital", "डॉक्टर या अस्पताल"); "task" -> t("What needs doing?", "क्या करना है?"); else -> t("Title", "शीर्षक") }, singleLine = kind != "task")
                 if (kind == "medicine") MedicineNameSuggestions(title, enabled = !busy) { title = it }
                 CareField(value = detail, onValueChange = { detail = it.take(4000) }, label = when (kind) { "medicine" -> t("Dose and times, as prescribed", "खुराक और समय, जैसा पर्चे में लिखा है"); "visit" -> t("Time, place and questions (optional)", "समय, जगह और सवाल (ज़रूरी नहीं)"); "task" -> t("Details (optional)", "और जानकारी (ज़रूरी नहीं)"); else -> t("Your note", "आपका नोट") }, minLines = if (kind == "journal") 4 else 2)
+                if (kind == "medicine") StripPhotoRow(vm.storageNamespace, capturedPerson, entryId, enabled = !busy)
             }
             if (kind == "visit") Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 listOf(t("Today", "आज") to 0L, t("Tomorrow", "कल") to 1L).forEach { (label, days) -> val day = LocalDate.now().plusDays(days).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli(); FilterChip(selected = due == day, onClick = { due = day }, label = { Text(label) }, modifier = Modifier.heightIn(min = 48.dp)) }

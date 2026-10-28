@@ -253,6 +253,8 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
             items(drafts.size, key = { drafts[it].id }) { index ->
                 MedicineReviewCard(
                     draft = drafts[index],
+                    storage = vm.storageNamespace,
+                    personId = personAtOpen,
                     onChange = { changed -> drafts = drafts.toMutableList().also { it[index] = changed } },
                     onRemove = { drafts = drafts.toMutableList().also { it.removeAt(index) } },
                 )
@@ -386,7 +388,7 @@ private fun PhotoSelectionCard(
 }
 
 @Composable
-private fun MedicineReviewCard(draft: MedicineDraft, onChange: (MedicineDraft) -> Unit, onRemove: () -> Unit) {
+private fun MedicineReviewCard(draft: MedicineDraft, storage: String, personId: String, onChange: (MedicineDraft) -> Unit, onRemove: () -> Unit) {
     val medicine = draft.medicine; val t = careText(); val hindi = careHindi()
     fun change(next: OrganizedMedicine) = onChange(draft.copy(medicine = next, confirmed = false))
     SurfaceCard(Paper) {
@@ -400,15 +402,15 @@ private fun MedicineReviewCard(draft: MedicineDraft, onChange: (MedicineDraft) -
         }
         medicine.uncertainties.forEach { Text("• $it", color = Rust, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 4.dp)) }
         Spacer(Modifier.height(10.dp))
-        CareField(medicine.medicineName, { change(medicine.copy(medicineName = it.take(120))) }, t("Medicine name", "दवा का नाम"), singleLine = true)
+        CareField(medicine.medicineName, { change(medicine.copy(medicineName = it.take(120))) }, t("Medicine name", "दवा का नाम"), singleLine = true,
+            supporting = t("Strip cut or name missing? Type it, or pick from the list as you type.", "पत्ता कटा है या नाम नहीं दिखता? नाम लिखें, या लिखते समय सूची से चुनें।"))
         MedicineNameSuggestions(medicine.medicineName) { change(medicine.copy(medicineName = it.take(120))) }
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Box(Modifier.weight(1f)) { CareField(medicine.strength, { change(medicine.copy(strength = it.take(80))) }, t("Strength", "ताक़त (mg)"), singleLine = true) }
-            Box(Modifier.weight(1f)) { CareField(medicine.form, { change(medicine.copy(form = it.take(60))) }, t("Form", "रूप (गोली, सिरप)"), singleLine = true) }
-        }
-        CareField(medicine.quantity, { change(medicine.copy(quantity = it.take(80))) }, t("Dose per administration", "एक बार की ख़ुराक"), singleLine = true)
-        CareField(medicine.frequency, { change(medicine.copy(frequency = it.take(120))) }, t("Frequency", "दिन में कितनी बार"), singleLine = true)
-        CareField(medicine.instructions, { change(medicine.copy(instructions = it.take(500))) }, t("Directions from prescription", "पर्चे में लिखा तरीक़ा"), minLines = 2)
+        CareField(medicine.strength, { change(medicine.copy(strength = it.take(80))) }, t("Strength", "ताक़त"), singleLine = true, placeholder = t("e.g. 500 mg, 5 mg/5 ml", "जैसे 500 mg, 5 mg/5 ml"))
+        CareField(medicine.form, { change(medicine.copy(form = it.take(60))) }, t("Form", "रूप"), singleLine = true, placeholder = t("e.g. tablet, capsule, syrup, injection, patch", "जैसे गोली, कैप्सूल, सिरप, इंजेक्शन, पैच"))
+        Text(t("Type the rest by hand from the prescription. A photo never fills these.", "बाक़ी पर्चे से देखकर ख़ुद लिखें। फ़ोटो से ये कभी नहीं भरे जाते।"), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 6.dp))
+        CareField(medicine.quantity, { change(medicine.copy(quantity = it.take(80))) }, t("How much each time", "हर बार कितनी"), singleLine = true, placeholder = t("e.g. 1 tablet, 1½ tablets, 5 ml", "जैसे 1 गोली, 1½ गोली, 5 ml"))
+        CareField(medicine.frequency, { change(medicine.copy(frequency = it.take(120))) }, t("How often", "कितनी बार"), singleLine = true, placeholder = t("e.g. twice a day, only when needed", "जैसे दिन में दो बार, ज़रूरत होने पर ही"))
+        CareField(medicine.instructions, { change(medicine.copy(instructions = it.take(500))) }, t("Directions", "तरीक़ा"), minLines = 2, placeholder = t("e.g. as written: dissolve in water", "जैसे पर्चे में लिखा: पानी में घोलकर"))
         Text(t("Food timing", "खाने के हिसाब से समय"), fontWeight = FontWeight.SemiBold)
         if (medicine.sourceQuote.isNotBlank()) {
             Text(t("Original reading · ${medicine.prescriptionPageIndexes.joinToString { "page ${it + 1}" }}", "असली पढ़ाई · ${medicine.prescriptionPageIndexes.joinToString { "पेज ${it + 1}" }}"), style = MaterialTheme.typography.labelMedium)
@@ -419,17 +421,13 @@ private fun MedicineReviewCard(draft: MedicineDraft, onChange: (MedicineDraft) -
                 FilterChip(selected = medicine.mealTiming == timing, onClick = { change(medicine.copy(mealTiming = timing)) }, label = { Text(mealTimingLabel(timing, hindi), fontSize = 11.sp) })
             }
         }
-        if (medicine.suggestedTimes.isNotEmpty()) {
-            Text(t("Exact times", "सही समय"), fontWeight = FontWeight.SemiBold)
-            Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.horizontalScroll(rememberScrollState())) {
-                medicine.suggestedTimes.forEach { time -> InputChip(selected = false, onClick = { change(medicine.copy(suggestedTimes = medicine.suggestedTimes - time)) }, label = { Text(time) }, trailingIcon = { Icon(Icons.Default.Close, t("Remove $time", "$time हटाएँ"), Modifier.size(15.dp)) }) }
-            }
-        }
+        DoseTimesField(medicine.suggestedTimes, { change(medicine.copy(suggestedTimes = it)) })
         CareField(
             medicine.durationDays?.toString().orEmpty(),
             { value -> if (value.isBlank()) change(medicine.copy(durationDays = null)) else value.toIntOrNull()?.takeIf { it in 1..365 }?.let { change(medicine.copy(durationDays = it)) } },
-            t("Course length in days (if written)", "कितने दिन लेनी है (अगर लिखा हो)"), singleLine = true,
+            t("For how many days", "कितने दिन"), singleLine = true, placeholder = t("e.g. 5 · leave empty if ongoing", "जैसे 5 · चलती रहे तो ख़ाली छोड़ें"),
         )
+        StripPhotoRow(storage, personId, draft.id) { reading -> change(MedicinePhotoFields.fillBlanks(medicine, reading)) }
         CheckLine(draft.confirmed, { onChange(draft.copy(confirmed = it)) }, t("I checked this medicine, dose and directions against the original prescription and packaging.", "मैंने यह दवा, ख़ुराक और तरीक़ा असली पर्चे और पैकेट से मिला लिया है।"))
     }
 }
