@@ -49,6 +49,7 @@ import java.time.ZoneId
     val allowed = remember(revision) { scheduler.allowed() }
     val count = remember(revision) { scheduler.scheduledCount() }
     val exact = remember(revision) { scheduler.exactAllowed() }
+    val canEdit by vm.canEdit.collectAsStateWithLifecycle()
     LazyColumn(Modifier.fillMaxSize().imePadding().testTag("care-reminder-settings"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { Row { IconButton(onClick = onClose) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस")) }; Heading(t("Reminders", "रिमाइंडर"), 28) } }
         item { SurfaceCard(Sage) {
@@ -73,11 +74,16 @@ import java.time.ZoneId
         val today = java.time.LocalDate.now()
         val eligible = items.filter { it.personId == selected && CareReminderRules.listed(it, today) }
         if (eligible.isEmpty()) item { SurfaceCard { Text(t("No dated care activities or medicines yet.", "अभी कोई तारीख़ वाली देखभाल या दवा नहीं है।")); Text(t("Add a medicine or choose a time in Calendar first.", "पहले दवा जोड़ें या कैलेंडर में समय चुनें।"), style = MaterialTheme.typography.bodySmall) } }
-        items(eligible, key = { it.id }) { item -> ReminderItemSettings(item, scheduler, revision) { revision++ } }
+        if (eligible.any { it.kind == "medicine" }) item { Text(if (canEdit) t("Medicine times you save here are also saved with the medicine. Family members who share this care get the same dose reminders once they turn on Reminders on their own phone. Strip photos stay on the phone they were taken on.", "यहाँ सहेजे दवा के समय दवा के साथ भी सहेजे जाते हैं। इस देखभाल से जुड़े परिवार वाले अपने फ़ोन पर रिमाइंडर चालू करके वही दवा रिमाइंडर पाते हैं। पत्ते की फ़ोटो उसी फ़ोन पर रहती है जिस पर ली गई।")
+            else t("Medicine times saved with the medicine by the family reach this phone. Times you change here apply only to this phone.", "परिवार ने दवा के साथ जो समय सहेजे, वे इस फ़ोन पर आते हैं। यहाँ बदले समय सिर्फ़ इसी फ़ोन पर लागू होते हैं।"), style = MaterialTheme.typography.bodySmall, modifier = Modifier.testTag("reminder-shared-times")) }
+        items(eligible, key = { it.id }) { item -> ReminderItemSettings(item, scheduler, revision, share = if (canEdit && item.kind == "medicine") { times ->
+            val detail = runCatching { MedicineEntryText.withTimes(item.detail, times) }.getOrDefault(item.detail)
+            if (detail != item.detail && detail.length <= 4000) vm.updateItem(item.copy(detail = detail)) {}
+        } else null) { revision++ } }
     }
 }
 
-@Composable private fun ReminderItemSettings(item: CareItem, scheduler: CareReminderScheduler, revision: Int, changed: () -> Unit) { val t = careText();
+@Composable private fun ReminderItemSettings(item: CareItem, scheduler: CareReminderScheduler, revision: Int, share: ((List<String>) -> Unit)? = null, changed: () -> Unit) { val t = careText();
     val option = remember(item.id, revision) { scheduler.option(item.id) }
     var times by rememberSaveable(item.id) { mutableStateOf((option?.times ?: CareReminderRules.printedTimes(item.detail)).joinToString(", ")) }
     var starts by rememberSaveable(item.id) { mutableStateOf(option?.starts.orEmpty()) }
@@ -96,7 +102,8 @@ import java.time.ZoneId
                 CareField(ends, { ends = it; error = "" }, t("Last date · YYYY-MM-DD (optional)", "आख़िरी तारीख़ · YYYY-MM-DD (चाहें तो)"), singleLine = true)
                 if (error.isNotBlank()) Text(error, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce())
                 Button(onClick = { runCatching {
-                    scheduler.configure(item.id, ReminderOption(if (times.isBlank()) emptyList() else times.split(',').map(String::trim), starts.trim(), ends.trim(), option?.muted == true)); changed()
+                    val chosen = if (times.isBlank()) emptyList() else times.split(',').map(String::trim)
+                    scheduler.configure(item.id, ReminderOption(chosen, starts.trim(), ends.trim(), option?.muted == true)); share?.invoke(chosen); changed()
                 }.onFailure { error = it.message?.let { m -> t(m, ReminderTextHindi[m] ?: m) } ?: t("Check the times and dates.", "समय और तारीख़ें जाँचें।") } }, modifier = Modifier.fillMaxWidth()) { Text(t("Save reminder times", "रिमाइंडर का समय सहेजें")) }
             }
         } else if (dateOnly) {

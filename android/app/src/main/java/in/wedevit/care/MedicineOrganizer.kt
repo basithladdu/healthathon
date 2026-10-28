@@ -171,6 +171,7 @@ class MedicineOrganizer(
         val response = post(body, token)
         val organization = try {
             sanitizeMedicineOrganization(response, prepared.prescriptionPages.size, prepared.medicineImages.size)
+                .let { it.copy(medicines = it.medicines.map(MedicinePhotoFields::limit)) } // Decision 8: only name, strength and form from photos.
         } catch (error: CancellationException) {
             throw error
         } catch (error: MedicineOrganizerException) {

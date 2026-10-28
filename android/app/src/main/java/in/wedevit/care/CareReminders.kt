@@ -53,7 +53,7 @@ class CareReminderScheduler(private val context: Context, private val account: S
             if (item.kind != "medicine" && item.due <= 0) return@forEach
             val entry = CareEntryCodec.decode(item.detail)
             val complete = entry?.status in setOf("completed", "cancelled") || (item.kind != "medicine" && item.doneOn.isNotBlank())
-            snapshots.put(JSONObject().put("id", item.id).put("person", item.personId).put("kind", item.kind)
+            snapshots.put(JSONObject().put("id", item.id).put("person", item.personId).put("kind", item.kind).put("title", if (item.kind == "medicine") item.title else "")
                 .put("due", item.due).put("dateOnly", CareReminderRules.dateOnly(item)).put("times", JSONArray(CareReminderRules.printedTimes(item.detail)))
                 .put("doneOn", item.doneOn).put("finished", complete))
         }
@@ -104,13 +104,17 @@ class CareReminderScheduler(private val context: Context, private val account: S
     }
     @Synchronized fun fire(key: String, at: Long, now: Long = System.currentTimeMillis()) {
         val array = runCatching { JSONArray(prefs.getString("occurrences", "[]")) }.getOrElse { JSONArray() }
-        val expected = (0 until array.length()).map { array.getJSONObject(it) }.firstOrNull { it.optString("key") == key }?.let { CareReminderOccurrence(key, it.getString("id"), it.getLong("at"), it.getString("date"), it.getString("time")) }
+        val rows = (0 until array.length()).map { array.getJSONObject(it) }
+        val expected = rows.firstOrNull { it.optString("key") == key }?.let { CareReminderOccurrence(key, it.getString("id"), it.getLong("at"), it.getString("date"), it.getString("time")) }
         val permitted = enabled() && allowed() && active.getString("account", null) == account
         val deliver = expected != null && CareReminderRules.shouldDeliver(expected, at, now, prefs.getLong("sent:$key", 0), permitted)
         if (deliver) prefs.edit().putLong("sent:$key", at).commit()
+        // Medicines due at this same moment share one reminder per person (read before rescheduling moves their slots on).
+        val doses = if (deliver && expected != null) MedicineDoseRules.dueTogether(rows.map { DoseOccurrence(it.optString("id"), it.optLong("at"), it.optString("time")) }, snapshotMedicines(), expected.at) else emptyList()
         // Always advance this slot before publishing; repeated broadcasts cannot send duplicate alerts.
         reschedule(now)
-        if (deliver) {
+        doses.forEach { group -> notifyDoses(group, expected!!.at) }
+        if (deliver && doses.none { group -> group.medicines.any { it.itemId == expected?.itemId } }) {
             // Tap: select the person whose activity is due (CareTodayRules), then open Reminders (CareReminderLaunch).
             val launch = PendingIntent.getActivity(context, notificationId(account, key), Intent(context, MainActivity::class.java).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP; putExtra(CareReminderLaunch.EXTRA, true); putExtra(CareTodayRules.OPEN_PERSON_EXTRA, CareTodayRules.personForItem(prefs.getString("items", null), expected?.itemId.orEmpty())) }, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
             val notification = NotificationCompat.Builder(context, CHANNEL).setSmallIcon(android.R.drawable.ic_popup_reminder)
@@ -121,6 +125,29 @@ class CareReminderScheduler(private val context: Context, private val account: S
                 prefs.edit().putStringSet("notificationKeys", prefs.getStringSet("notificationKeys", emptySet()).orEmpty() + key).commit()
             } catch (_: SecurityException) { /* A permission changed after the check. Keep the record and let settings show the denial. */ }
         }
+    }
+    private fun snapshotMedicines(): List<DoseMedicine> = runCatching {
+        val array = JSONArray(prefs.getString("items", "[]"))
+        (0 until array.length()).map(array::getJSONObject).filter { it.optString("kind") == "medicine" }.map { DoseMedicine(it.getString("id"), it.getString("person"), it.optString("title"), emptyList()) }
+    }.getOrDefault(emptyList())
+    /** "Morning · 08:00 · 3 medicines" with the strip photos kept on this phone. The lock screen shows only the generic public text. */
+    private fun notifyDoses(group: DoseGroup, at: Long) {
+        val groupKey = "dose:${group.personId}:$at"
+        if (prefs.getLong("sent:$groupKey", 0) == at) return
+        prefs.edit().putLong("sent:$groupKey", at).commit()
+        val content = MedicineDoseRules.reminder(group, careDeviceHindi(context))
+        val photos = runCatching { MedicineStripPhotos(context, account).collage(group.personId, content.itemIds) }.getOrNull()
+        val launch = PendingIntent.getActivity(context, notificationId(account, groupKey), Intent(context, MainActivity::class.java).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP; putExtra(CareReminderLaunch.EXTRA, true); putExtra(CareTodayRules.OPEN_PERSON_EXTRA, group.personId) }, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        val hidden = NotificationCompat.Builder(context, CHANNEL).setSmallIcon(android.R.drawable.ic_popup_reminder).setContentTitle(content.publicTitle).setContentText(content.publicText).build()
+        val builder = NotificationCompat.Builder(context, CHANNEL).setSmallIcon(android.R.drawable.ic_popup_reminder)
+            .setContentTitle(content.title).setContentText(content.text.lineSequence().first())
+            .setVisibility(NotificationCompat.VISIBILITY_PRIVATE).setPublicVersion(hidden).setContentIntent(launch).setAutoCancel(true).setCategory(NotificationCompat.CATEGORY_REMINDER)
+        if (photos != null) builder.setLargeIcon(photos).setStyle(NotificationCompat.BigPictureStyle().bigPicture(photos).setSummaryText(content.text.replace('\n', ' ')))
+        else builder.setStyle(NotificationCompat.BigTextStyle().bigText(content.text))
+        try {
+            NotificationManagerCompat.from(context).notify(notificationId(account, groupKey), builder.build())
+            prefs.edit().putStringSet("notificationKeys", prefs.getStringSet("notificationKeys", emptySet()).orEmpty() + groupKey).commit()
+        } catch (_: SecurityException) { /* A permission changed after the check. */ }
     }
     /** Android 12+ asks the person to allow exact alarms; earlier versions always allow them. */
     /** Notification text follows the phone's last English/Hindi choice. */
