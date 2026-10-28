@@ -146,7 +146,7 @@ Collected on 27 Oct from every agent lane across Sahara, ITI, WDCW and AI-FIR. E
 ### Sahara doctor side (from the doctor lane)
 - [ ] Create a real doctor account and approve it by hand in the database, then test on a phone: Home, Schedule, patient search by ID (`SH-…`), and joining with a family's code.
 - [ ] Should the doctor workspace follow the family's language choice, or the phone's language as it does today?
-- [ ] A doctor with read-only access can't plan visits, and the greyed-out button gives no reason. Add an explanation, or allow it?
+- [ ] A doctor with read-only access can't plan visits. The greyed-out button now says why (sahara-complete lane); still decide: should read-only doctors be allowed to plan visits?
 
 ### Sahara Nearby (from the nearby lane)
 - [ ] "Distance from me" needs a location permission (the manifest removes it today). Add it?
@@ -179,11 +179,11 @@ Collected on 27 Oct from every agent lane across Sahara, ITI, WDCW and AI-FIR. E
 ### Sahara Hindi (from the Hindi lane)
 - [ ] A native Hindi speaker (ideally a palliative clinician) reviews the wording. None of it has been reviewed yet.
 - [ ] Test on a phone: Hindi fonts, whether text fits in buttons and the bottom bar, and Hindi dates.
-- [ ] Do the doctor walkthrough demo and the doctor recording panels need Hindi before 7 Nov? They are still English.
+- [ ] Doctor walkthrough and recording panels now have Hindi (sahara-complete lane), except the online-audio and local-preview panels the real-sahara lane is replacing. A native speaker still checks it.
 - [ ] Sahara accessibility: on a real phone, try TalkBack on the pain body (3D and fallback), Today, the care list and the emergency card; check the app at the largest font and display size.
 - [ ] Sahara map: approximate locations come from GeoNames (CC BY 4.0, credited under the map) because data.gov.in couldn't be reached. Accept that, or download the Government PIN directory yourself so the script can be rerun on it?
 - [ ] Sahara map: on a phone, check the cluster numbers show and the hollow (approximate) pins are easy to tell from the solid (exact) ones.
-- [ ] Directory data: remove 3 junk header rows (2 Assam, 1 Maharashtra); one Vasai centre is listed under Mumbai district.
+- [x] Directory data: remove 3 junk header rows (2 Assam, 1 Maharashtra); one Vasai centre is listed under Mumbai district. Done (sahara-complete lane): 1,628 listings; both Vasai listings are in Palghar.
 - [ ] Goals matcher (after the fix): 110 of 130 answers found, 1 wrong, on our own 20 test conversations. That is optimistic, since the rules were written after reading some of them. Don't quote 85% as real-world accuracy; wording is in the report.
 - [ ] A clinician or native speaker reviews the Hindi/Hinglish question wording and the "put-off" list in `GoalsQuestionVocabulary.kt`.
 - [ ] Should a patient's own question count as an answer to "anything else to discuss" (Q6)?
