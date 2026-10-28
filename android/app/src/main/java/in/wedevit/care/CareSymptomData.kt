@@ -17,7 +17,25 @@ data class SymptomNote(
     val painBodyModel: String = "",
     /** Optional per-spot strength, site id to 0-10 (one spot per site, with or without an exact point). Empty on older notes, which fall back to [rating]. */
     val painBodyRatings: Map<String, Int> = emptyMap(),
+    /** Mood only: its two separate 0-10 scales, key ("low-mood", "anxiety") to rating. A missing key means that scale was not rated. */
+    val moodRatings: Map<String, Int> = emptyMap(),
 )
+
+/** One dated rating for a trend: a whole note, one body part of a pain note, or one mood scale. */
+data class DatedRating(val itemId: String, val date: String, val time: String, val value: Int, val respondent: String, val recall: String)
+
+/**
+ * Verbal pain bands shown beside the 0-10 number (team decision, 28 Oct 2026). The cut-offs are the NCCN adult cancer pain
+ * guideline's: 0 none, 1-3 mild, 4-6 moderate, 7-10 severe (Swarm et al., J Natl Compr Canc Netw 2010;8(9):1046-86).
+ * The band key is saved next to the number; the number stays the record.
+ */
+object PainBands {
+    val labels = linkedMapOf("none" to ("None" to "कोई नहीं"), "mild" to ("Mild" to "हल्का"), "moderate" to ("Moderate" to "मध्यम"), "severe" to ("Severe" to "तेज़"))
+    fun key(rating: Int): String = when (rating.coerceIn(0, 10)) { 0 -> "none"; in 1..3 -> "mild"; in 4..6 -> "moderate"; else -> "severe" }
+    fun label(rating: Int, hindi: Boolean): String = labels.getValue(key(rating)).let { if (hindi) it.second else it.first }
+    const val SOURCE_EN = "Source: bands from the NCCN Adult Cancer Pain guideline (Swarm et al., JNCCN 2010): 0 none, 1–3 mild, 4–6 moderate, 7–10 severe."
+    const val SOURCE_HI = "स्रोत: NCCN Adult Cancer Pain गाइडलाइन (Swarm et al., JNCCN 2010) के समूह: 0 कोई नहीं, 1–3 हल्का, 4–6 मध्यम, 7–10 तेज़।"
+}
 
 data class SymptomComparison(val baseline: CareItem, val previous: CareItem, val difference: Int)
 
@@ -31,11 +49,21 @@ object SymptomDiaryRules {
         "Poor appetite" to "भूख कम लगना", "Dry mouth" to "मुँह सूखना / मुँह में दर्द",
         "Breathlessness" to "साँस फूलना", "Constipation" to "कब्ज़", "Diarrhea" to "दस्त", "Nausea" to "मतली",
         "Vomiting" to "उल्टी", "Difficulty swallowing" to "निगलने में परेशानी", "Cough" to "खाँसी",
-        "Bowel / bladder incontinence" to "मल / पेशाब पर नियंत्रण न रहना", "Sadness" to "उदासी", "Worry" to "चिंता",
+        "Bowel / bladder incontinence" to "मल / पेशाब पर नियंत्रण न रहना", "Mood" to "मन की हालत (उदासी, घबराहट)",
         "Overall well-being" to "कुल मिलाकर तबीयत", "Other" to "अन्य",
     )
-    private val englishLabels = mapOf("Tiredness" to "Fatigue / lack of energy", "Sleepiness" to "Drowsiness / excessive sleepiness", "Dry mouth" to "Dry / sore mouth")
-    private val legacyHindiLabels = mapOf("Sleep difficulty" to "सोने में परेशानी", "Weight loss" to "वज़न घटना")
+    private val englishLabels = mapOf("Tiredness" to "Fatigue / lack of energy", "Sleepiness" to "Drowsiness / excessive sleepiness", "Dry mouth" to "Dry / sore mouth", "Mood" to "Mood (low mood, anxiety)")
+    private val legacyHindiLabels = mapOf("Sleep difficulty" to "सोने में परेशानी", "Weight loss" to "वज़न घटना", "Sadness" to "उदासी", "Worry" to "चिंता")
+    const val MOOD = "Mood"
+    /** Mood's two separate scales (28 Oct meeting): low mood / depression and anxiety. Keys are stored. */
+    val moodScales = linkedMapOf("low-mood" to ("Low mood / depression (feeling sad)" to "उदासी / मन उदास रहना"), "anxiety" to ("Anxiety (feeling worried or nervous)" to "घबराहट / चिंता"))
+    val moodShort = mapOf("low-mood" to ("Low mood" to "उदासी"), "anxiety" to ("Anxiety" to "घबराहट"))
+    /** Older notes saved "Sadness" and "Worry" as separate symptoms; they read as the matching Mood scale. */
+    val legacyMood = mapOf("Sadness" to "low-mood", "Worry" to "anxiety")
+    /** Read-time migration: the stored record is unchanged, so history from older app versions and other phones still shows. */
+    fun migrated(value: SymptomNote): SymptomNote = legacyMood[value.symptom.trim()]?.let { key ->
+        value.copy(symptom = MOOD, rating = null, moodRatings = value.rating?.let { mapOf(key to it) }.orEmpty())
+    } ?: value
     val recalls = linkedMapOf("now" to ("Right now" to "अभी"), "average-24h" to ("24-hour average" to "24 घंटे का औसत"), "worst-24h" to ("Worst in 24 hours" to "24 घंटे में सबसे ज़्यादा"))
     val respondents = linkedMapOf("patient" to ("Patient" to "मरीज़"), "assisted-patient" to ("Patient, with help" to "मरीज़ ने मदद से बताया"), "caregiver" to ("Seen by family or carer" to "देखभाल करने वाले ने देखा"), "clinician" to ("Seen by care team" to "देखभाल टीम ने देखा"))
     val triggers = linkedMapOf("rest" to ("At rest" to "आराम करते समय"), "turning" to ("Turning in bed" to "करवट लेते समय"), "walking" to ("Standing / walking" to "खड़े होते / चलते समय"), "coughing" to ("Coughing" to "खाँसते समय"), "other" to ("Other" to "अन्य"), "not-sure" to ("Not sure" to "पक्का नहीं"))
@@ -50,6 +78,8 @@ object SymptomDiaryRules {
         if (hindi) "0 = सबसे अच्छी तबीयत · 10 = सबसे खराब तबीयत" else "0 = best possible well-being · 10 = worst possible well-being"
     } else if (hindi) "0 = बिलकुल नहीं · 10 = सबसे ज़्यादा" else "0 = none · 10 = worst imaginable"
     fun ratingLabel(value: Int?, hindi: Boolean = false) = value?.let { "$it/10" } ?: if (hindi) "अंक नहीं बताया" else "Not rated"
+    /** "Low mood 4/10 · Anxiety Not rated" for a Mood note. */
+    fun moodSummary(ratings: Map<String, Int>, hindi: Boolean) = moodShort.entries.joinToString(" · ") { (k, l) -> "${if (hindi) l.second else l.first} ${ratingLabel(ratings[k], hindi)}" }
     fun editToken(item: CareItem): String = JSONObject().put("id", item.id).put("personId", item.personId).put("kind", item.kind)
         .put("title", item.title).put("detail", item.detail).put("due", item.due).put("doneOn", item.doneOn)
         .put("created", item.created).put("revision", item.revision).toString()
@@ -74,6 +104,8 @@ object SymptomDiaryRules {
         if (value.painBodyPoints.isNotEmpty() && value.painBodyModel != PainBodyMapRules.MODEL) return "This body map version cannot be edited here."
         if (value.painBodyModel.isNotEmpty() && value.painBodyModel != PainBodyMapRules.MODEL) return "This body map version cannot be edited here."
         if (value.symptom != "Pain" && (value.painLocation.isNotBlank() || value.painTriggers.isNotEmpty() || value.painBodySites.isNotEmpty() || value.painBodyPoints.isNotEmpty() || value.painBodyRatings.isNotEmpty())) return "Pain details belong to a pain entry."
+        if (value.moodRatings.isNotEmpty() && (value.symptom != MOOD || value.moodRatings.any { (k, r) -> k !in moodScales || r !in 0..10 })) return "Choose a number from 0 to 10, or Not rated."
+        if (value.symptom == MOOD && value.rating != null) return "Choose a number from 0 to 10, or Not rated."
         if (value.selfReportedChange.isNotEmpty() && value.selfReportedChange !in changes) return "Choose a comparison."
         if (value.selfReportedChange.isEmpty() != value.comparedWithId.isEmpty()) return "Choose the previous entry for this comparison."
         return null
@@ -90,8 +122,25 @@ object SymptomDiaryRules {
             .sortedWith(compareBy<Pair<CareItem, SymptomNote>> { "${it.second.observedDate}T${it.second.observedTime}" }.thenBy { it.first.id })
     fun followUp(value: SymptomNote, now: LocalDateTime = LocalDateTime.now()): SymptomNote = value.copy(
         rating = null, observedDate = now.toLocalDate().toString(), observedTime = now.toLocalTime().withSecond(0).withNano(0).toString(),
-        note = "", selfReportedChange = "", comparedWithId = "", painBodyRatings = emptyMap(),
+        note = "", selfReportedChange = "", comparedWithId = "", painBodyRatings = emptyMap(), moodRatings = emptyMap(),
     )
+    private fun observed(items: List<CareItem>, personId: String) = items.filter { it.personId == personId && it.kind == "checkin" }
+        .mapNotNull { item -> SymptomNoteCodec.decode(item.detail)?.let { item to it } }
+        .sortedWith(compareBy<Pair<CareItem, SymptomNote>> { "${it.second.observedDate}T${it.second.observedTime}" }.thenBy { it.first.id })
+    private fun dated(item: CareItem, note: SymptomNote, value: Int) = DatedRating(item.id, note.observedDate, note.observedTime, value, note.respondent, note.recall)
+    /** One Mood scale over time, oldest first, including migrated Sadness/Worry notes. Unrated answers are left out. */
+    fun moodSeries(items: List<CareItem>, personId: String, scale: String): List<DatedRating> = observed(items, personId)
+        .filter { it.second.symptom == MOOD }.mapNotNull { (item, note) -> note.moodRatings[scale]?.let { dated(item, note, it) } }
+    /** Every rated note of one symptom for a person, oldest first (any reporter or time frame; each point keeps both). */
+    fun symptomSeries(items: List<CareItem>, personId: String, symptom: String): List<DatedRating> = observed(items, personId)
+        .filter { it.second.symptom.trim().equals(symptom.trim(), true) }
+        .mapNotNull { (item, note) -> (PainBodyMapRules.overall(note.painBodyRatings) ?: note.rating)?.let { dated(item, note, it) } }
+    /** One body part's pain over time, oldest first: its own spot rating, or for older notes without spot ratings the note's rating for its marked parts. */
+    fun painPartSeries(items: List<CareItem>, personId: String, site: String): List<DatedRating> = observed(items, personId)
+        .filter { it.second.symptom.trim().equals("Pain", true) }
+        .mapNotNull { (item, note) -> (note.painBodyRatings[site] ?: note.rating?.takeIf { note.painBodyRatings.isEmpty() && site in note.painBodySites })?.let { dated(item, note, it) } }
+    /** Body parts with at least one dated rating, in body order. */
+    fun painPartsWithHistory(items: List<CareItem>, personId: String): List<String> = PainBodyMapRules.sites.keys.filter { painPartSeries(items, personId, it).isNotEmpty() }
     fun comparison(entries: List<CareItem>, current: CareItem, value: SymptomNote): SymptomComparison? {
         val rating = value.rating ?: return null
         val key = "${value.observedDate}T${value.observedTime}"
@@ -114,6 +163,12 @@ object SymptomNoteCodec {
         .put("painBodyPoints", PainBodyMapRules.encodePoints(value.painBodyPoints))
         .put("painBodyModel", value.painBodyModel)
         .also { if (value.painBodyRatings.isNotEmpty()) it.put("painBodyRatings", PainBodyMapRules.encodeRatings(value.painBodyRatings)) }
+        .also { if (value.moodRatings.isNotEmpty()) it.put("moodRatings", JSONObject().also { o -> SymptomDiaryRules.moodScales.keys.filter { k -> k in value.moodRatings }.forEach { k -> o.put(k, value.moodRatings.getValue(k)) } }) }
+        // Pain keeps the verbal band beside the number (both saved); it is derived from the number, so decode does not read it back.
+        .also { if (value.symptom.trim() == "Pain") {
+            value.rating?.let { r -> it.put("ratingBand", PainBands.key(r)) }
+            if (value.painBodyRatings.isNotEmpty()) it.put("painBodyBands", JSONObject().also { o -> PainBodyMapRules.sites.keys.filter { k -> k in value.painBodyRatings }.forEach { k -> o.put(k, PainBands.key(value.painBodyRatings.getValue(k))) } })
+        } }
         .put("selfReportedChange", value.selfReportedChange).put("comparedWithId", value.comparedWithId).toString()
     fun decode(text: String): SymptomNote? {
         if (!isStructured(text)) return null
@@ -122,12 +177,14 @@ object SymptomNoteCodec {
             SymptomNote(j.getString("symptom"), if (j.isNull("rating")) null else j.getInt("rating"), j.getString("observedDate"), j.getString("observedTime"),
                 j.getString("recall"), j.getString("respondent"), j.getString("author"), j.optString("startedOn"), j.optString("note"), j.optString("painLocation"),
                 (0 until triggers.length()).map { triggers.getString(it) }, j.optString("selfReportedChange"), j.optString("comparedWithId"), j.getString("scale"),
-                sites?.let { list -> (0 until list.length()).map { list.getString(it) } }.orEmpty(), PainBodyMapRules.decodePoints(j.optJSONArray("painBodyPoints")), j.optString("painBodyModel"), PainBodyMapRules.decodeRatings(j.optJSONObject("painBodyRatings")))
+                sites?.let { list -> (0 until list.length()).map { list.getString(it) } }.orEmpty(), PainBodyMapRules.decodePoints(j.optJSONArray("painBodyPoints")), j.optString("painBodyModel"), PainBodyMapRules.decodeRatings(j.optJSONObject("painBodyRatings")),
+                PainBodyMapRules.decodeRatings(j.optJSONObject("moodRatings")))
                 .also { require(SymptomDiaryRules.error(it) == null) }
+                .let(SymptomDiaryRules::migrated).also { require(SymptomDiaryRules.error(it) == null) }
         }.getOrNull()
     }
     fun readable(text: String, hindi: Boolean = false): String = decode(text)?.let { n ->
-        listOf("${if (hindi) "देखा गया" else "Observed"}: ${n.observedDate} ${n.observedTime} · ${SymptomDiaryRules.ratingLabel(n.rating, hindi)}", SymptomDiaryRules.ratingAnchors(n.scale, hindi).takeIf { n.scale == SymptomDiaryRules.WELLBEING_SCALE }.orEmpty(), SymptomDiaryRules.label(SymptomDiaryRules.recalls, n.recall, hindi),
+        listOf("${if (hindi) "देखा गया" else "Observed"}: ${n.observedDate} ${n.observedTime} · ${if (n.symptom == SymptomDiaryRules.MOOD) SymptomDiaryRules.moodSummary(n.moodRatings, hindi) else SymptomDiaryRules.ratingLabel(n.rating, hindi) + (n.rating?.takeIf { n.symptom.trim() == "Pain" }?.let { " · ${PainBands.label(it, hindi)}" } ?: "")}", SymptomDiaryRules.ratingAnchors(n.scale, hindi).takeIf { n.scale == SymptomDiaryRules.WELLBEING_SCALE }.orEmpty(), SymptomDiaryRules.label(SymptomDiaryRules.recalls, n.recall, hindi),
             "${SymptomDiaryRules.label(SymptomDiaryRules.respondents, n.respondent, hindi)} · ${n.author}",
             n.startedOn.takeIf { it.isNotBlank() }?.let { "${if (hindi) "शुरू हुआ" else "Started"}: $it" }.orEmpty(),
             n.painLocation, n.painBodySites.takeIf { it.isNotEmpty() }?.joinToString(prefix = if (hindi) "दर्द की जगह: " else "Pain areas: ") { PainBodyMapRules.label(it, hindi) + (n.painBodyRatings[it]?.let { r -> " $r/10" } ?: "") }.orEmpty(), n.painTriggers.joinToString { SymptomDiaryRules.label(SymptomDiaryRules.triggers, it, hindi) },

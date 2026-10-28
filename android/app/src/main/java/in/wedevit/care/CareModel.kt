@@ -554,7 +554,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
         SymptomDiaryRules.error(note)?.let { throw IllegalArgumentException(it) }
         val existing = dao.item(id)
         SymptomDiaryRules.saveConflict(existing, personId, expectedToken)?.let { throw IllegalArgumentException(it) }
-        val candidate = CareItem(id = id, personId = personId, kind = "checkin", title = "${note.symptom} · ${SymptomDiaryRules.ratingLabel(note.rating)}",
+        val candidate = CareItem(id = id, personId = personId, kind = "checkin", title = "${note.symptom} · ${if (note.symptom == SymptomDiaryRules.MOOD) SymptomDiaryRules.moodSummary(note.moodRatings, false) else SymptomDiaryRules.ratingLabel(note.rating)}",
             detail = SymptomNoteCodec.encode(note), created = existing?.created ?: System.currentTimeMillis(), revision = existing?.revision ?: 0)
         if (note.selfReportedChange.isNotBlank()) require(SymptomDiaryRules.comparison(dao.allItems(), candidate, note)?.previous?.id == note.comparedWithId) { "The previous note changed. Check the comparison and save again." }
         val sent = storeItem(candidate)

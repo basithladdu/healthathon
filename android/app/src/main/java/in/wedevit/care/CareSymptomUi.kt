@@ -86,6 +86,7 @@ import java.time.format.DateTimeFormatter
         }
         if (person != null && hasPainHistory) item {
             OutlinedButton(onClick = { showingPainHistory = true }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("symptom-pain-history")) { Text(t("Pain history on body", "शरीर पर दर्द का इतिहास")) }
+            Text(t(PainBands.SOURCE_EN, PainBands.SOURCE_HI), style = MaterialTheme.typography.bodySmall, color = DoctorCardSub, modifier = Modifier.padding(top = 6.dp))
         }
         if (notes.isEmpty()) item { SurfaceCard(Mint) { Text(t("No symptom notes yet", "अभी तबीयत का कोई नोट नहीं है"), fontWeight = FontWeight.SemiBold) } }
         if (notes.isNotEmpty()) item {
@@ -109,12 +110,12 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
     "$day, $clock"
 }.getOrDefault("$date $time")
 
-/** Strength badge: Wong-Baker block colour for 1-10, neutral grey for 0 (no heat colour), outlined "Not rated" when absent. */
-@Composable internal fun StrengthBadge(rating: Int?, hindi: Boolean, wellbeing: Boolean = false) {
+/** Strength badge: Wong-Baker block colour for 1-10, neutral grey for 0 (no heat colour), outlined "Not rated" when absent. Pain adds its verbal band ("7 · Severe"); other symptoms show the number only. */
+@Composable internal fun StrengthBadge(rating: Int?, hindi: Boolean, band: Boolean = false) {
     val shape = RoundedCornerShape(50)
     if (rating == null) { Text(if (hindi) "अंक नहीं बताया" else "Not rated", color = DoctorCardSub, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.testTag("symptom-card-badge").border(1.dp, DoctorHairline, shape).padding(horizontal = 12.dp, vertical = 6.dp)); return }
     val bg = Color(PainBodyMapRules.heatColor(rating)); val ink = if (rating == 0) DoctorCardInk else readableOn(bg)
-    Text(if (wellbeing) "$rating/10" else "$rating · ${PainBodyMapRules.strengthWord(rating, hindi)}", color = ink, fontSize = 13.sp, fontWeight = FontWeight.Bold, modifier = Modifier.testTag("symptom-card-badge").background(bg, shape).padding(horizontal = 12.dp, vertical = 6.dp))
+    Text(if (band) "$rating · ${PainBands.label(rating, hindi)}" else "$rating/10", color = ink, fontSize = 13.sp, fontWeight = FontWeight.Bold, modifier = Modifier.testTag("symptom-card-badge").background(bg, shape).padding(horizontal = 12.dp, vertical = 6.dp))
 }
 
 @Composable private fun SymptomTag(text: String) = Text(text, color = DoctorCardInk, fontSize = 12.sp, fontWeight = FontWeight.Medium, modifier = Modifier.background(Cream, RoundedCornerShape(50)).border(1.dp, DoctorHairline, RoundedCornerShape(50)).padding(horizontal = 10.dp, vertical = 4.dp))
@@ -132,12 +133,13 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
     val t = { en: String, hi: String -> if (hindi) hi else en }
     val note = remember(item.detail) { SymptomNoteCodec.decode(item.detail) }
     val isPain = note?.symptom?.trim()?.equals("Pain", true) == true
+    val isMood = note?.symptom == SymptomDiaryRules.MOOD
     val largeText = LocalDensity.current.fontScale > 1.15f
     Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) { Column(Modifier.padding(start = 16.dp, top = 12.dp, end = 8.dp, bottom = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             Box(Modifier.size(40.dp).clip(CircleShape).background(lerp(Cream, DoctorAccent, .15f)), contentAlignment = Alignment.Center) { Icon(symptomIcon(note?.symptom ?: item.title), null, Modifier.size(22.dp), tint = DoctorAccent) }
             Text(note?.let { SymptomDiaryRules.symptomLabel(it.symptom, hindi) } ?: item.title, color = DoctorCardInk, fontFamily = SaharaTitleFont, fontSize = 18.sp, lineHeight = 22.sp, maxLines = if (largeText) Int.MAX_VALUE else 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
-            if (note != null && !largeText) StrengthBadge(PainBodyMapRules.overall(note.painBodyRatings) ?: note.rating, hindi, note.scale == SymptomDiaryRules.WELLBEING_SCALE)
+            if (note != null && !largeText && !isMood) StrengthBadge(PainBodyMapRules.overall(note.painBodyRatings) ?: note.rating, hindi, band = isPain)
             if (canEdit && note != null) Box {
                 IconButton(onClick = { menuOpen = true }, modifier = Modifier.size(48.dp).testTag("symptom-card-menu-${item.id}")) { Icon(Icons.Default.MoreVert, t("More actions", "और विकल्प"), tint = DoctorCardSub) }
                 DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
@@ -148,11 +150,14 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
             } else Spacer(Modifier.width(8.dp))
         }
         if (note != null) {
-            if (largeText) StrengthBadge(PainBodyMapRules.overall(note.painBodyRatings) ?: note.rating, hindi, note.scale == SymptomDiaryRules.WELLBEING_SCALE)
+            if (largeText && !isMood) StrengthBadge(PainBodyMapRules.overall(note.painBodyRatings) ?: note.rating, hindi, band = isPain)
+            if (isMood) FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.testTag("symptom-card-mood")) {
+                SymptomDiaryRules.moodShort.forEach { (key, label) -> SymptomTag("${if (hindi) label.second else label.first} ${SymptomDiaryRules.ratingLabel(note.moodRatings[key], hindi)}") }
+            }
             if (note.painBodyRatings.isNotEmpty()) FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 note.painBodySites.filter { it in note.painBodyRatings }.forEach { site -> val r = note.painBodyRatings.getValue(site)
                     Row(Modifier.background(Cream, RoundedCornerShape(50)).border(1.dp, DoctorHairline, RoundedCornerShape(50)).padding(horizontal = 10.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        Box(Modifier.size(10.dp).background(Color(PainBodyMapRules.heatColor(r)), CircleShape).border(1.dp, DoctorHairline, CircleShape)); Text("${PainBodyMapRules.label(site, hindi)} $r", color = DoctorCardInk, fontSize = 12.sp, fontWeight = FontWeight.Medium) }
+                        Box(Modifier.size(10.dp).background(Color(PainBodyMapRules.heatColor(r)), CircleShape).border(1.dp, DoctorHairline, CircleShape)); Text("${PainBodyMapRules.label(site, hindi)} $r · ${PainBands.label(r, hindi)}", color = DoctorCardInk, fontSize = 12.sp, fontWeight = FontWeight.Medium) }
                 }
             }
             Text(friendlyWhen(note.observedDate, note.observedTime, hindi), color = DoctorCardSub, fontSize = 14.sp, modifier = Modifier.testTag("symptom-card-when"))
@@ -222,6 +227,9 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
     var otherSymptom by rememberSaveable(id) { mutableStateOf(seed?.symptom?.let { it !in SymptomDiaryRules.symptoms } ?: false) }
     var scale by rememberSaveable(id) { mutableStateOf(seed?.scale ?: SymptomDiaryRules.PERSONAL_SCALE) }
     var rating by rememberSaveable(id) { mutableIntStateOf(if (original == null) -2 else original.rating ?: -1) }
+    // Mood: two separate scales; -2 = not answered yet, -1 = Not rated. Answering either one is enough to go on.
+    var moodLow by rememberSaveable(id) { mutableIntStateOf(if (original == null) -2 else original.moodRatings["low-mood"] ?: -1) }
+    var moodAnxiety by rememberSaveable(id) { mutableIntStateOf(if (original == null) -2 else original.moodRatings["anxiety"] ?: -1) }
     var observedDate by rememberSaveable(id) { mutableStateOf(seed?.observedDate ?: LocalDate.now().toString()) }
     var observedTime by rememberSaveable(id) { mutableStateOf(seed?.observedTime ?: LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"))) }
     var recall by rememberSaveable(id) { mutableStateOf(seed?.recall ?: "now") }
@@ -241,11 +249,13 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
     // Pain: each spot keeps its own rating; the note's overall rating is the highest rated spot (the quick follow-up keeps the single rating card).
     val spotRatings = if (symptom == "Pain") PainBodyMapRules.parseRatingsKey(bodyRatings).filterKeys { it in bodySites.split('|') } else emptyMap()
     val spotsDrive = symptom == "Pain" && spotRatings.isNotEmpty() && !(prior != null && initial == null && !fullDetails)
-    val ratingNow = if (spotsDrive) PainBodyMapRules.overall(spotRatings)!! else rating
+    val isMood = symptom == SymptomDiaryRules.MOOD
+    val ratingNow = if (spotsDrive) PainBodyMapRules.overall(spotRatings)!! else if (isMood) { if (moodLow == -2 && moodAnxiety == -2) -2 else -1 } else rating
     val value = SymptomNote(symptom, ratingNow.takeIf { it >= 0 }, observedDate, observedTime, recall, respondent,
         if (respondent == "patient") personName else author, startedOn, note, location, triggerValues.split('|').filter(String::isNotBlank), scale = scale,
         painBodySites = bodySites.split('|').filter(String::isNotBlank), painBodyPoints = PainBodyMapRules.decodePoints(org.json.JSONArray(bodyPoints)),
-        painBodyModel = if (bodyPoints != "[]") PainBodyMapRules.MODEL else "", painBodyRatings = spotRatings)
+        painBodyModel = if (bodyPoints != "[]") PainBodyMapRules.MODEL else "", painBodyRatings = spotRatings,
+        moodRatings = if (isMood) listOf("low-mood" to moodLow, "anxiety" to moodAnxiety).filter { it.second >= 0 }.toMap() else emptyMap())
     val current = initial ?: CareItem(id = id, personId = capturedPerson, kind = "checkin", title = symptom)
     val comparison = if (ratingNow >= 0 && respondent.isNotBlank() && value.author.isNotBlank()) SymptomDiaryRules.comparison(entries, current, value) else null
     // A changed question/reference cannot retain a prior subjective comparison.
@@ -308,7 +318,7 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
                     SymptomDiaryRules.symptoms.entries.chunked(if (largeText) 1 else 2).forEach { pair ->
                         Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             pair.forEach { (en, _) -> SymptomTile(if (en == "Other") otherSymptom else !otherSymptom && symptom == en, SymptomDiaryRules.symptomLabel(en, hindi), symptomIcon(en), "symptom-choice-$en", Modifier.weight(1f).fillMaxHeight()) {
-                                otherSymptom = en == "Other"; symptom = if (otherSymptom) "" else en; scale = SymptomDiaryRules.scaleForSymptom(en); if (en != "Pain") { location = ""; triggerValues = ""; bodySites = ""; bodyPoints = "[]"; bodyRatings = "" }; rating = -2
+                                otherSymptom = en == "Other"; symptom = if (otherSymptom) "" else en; scale = SymptomDiaryRules.scaleForSymptom(en); if (en != "Pain") { location = ""; triggerValues = ""; bodySites = ""; bodyPoints = "[]"; bodyRatings = "" }; rating = -2; moodLow = -2; moodAnxiety = -2
                                 if (en != "Other") stepKey = if (en == "Pain") "where" else "how"
                             } }
                             if (pair.size == 1 && !largeText) Spacer(Modifier.weight(1f))
@@ -338,7 +348,21 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
                         SymptomPill(rating == -1, t("Not rated", "अंक नहीं बताया"), "symptom-unrated") { rating = -1; change = "" }
                     }
                 }
-                if ((quick || cur == "how") && !(symptom == "Pain" && !quick)) SymptomSection(null, SymptomDiaryRules.ratingQuestion(scale, hindi)) {
+                if ((quick || cur == "how") && isMood) SymptomDiaryRules.moodScales.forEach { (key, label) ->
+                    val chosen = if (key == "low-mood") moodLow else moodAnxiety
+                    val set: (Int) -> Unit = { n -> if (key == "low-mood") { moodLow = n } else { moodAnxiety = n } }
+                    SymptomSection(null, if (hindi) label.second else label.first, SymptomDiaryRules.ratingAnchors(scale, hindi)) {
+                        RatingReadout(chosen, hindi, scale)
+                        listOf(0..5, 6..10).forEach { range ->
+                            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                                range.forEach { number -> RatingButton(number, chosen == number, Modifier.weight(1f).aspectRatio(1f), tag = "symptom-mood-$key-$number") { set(number) } }
+                                if (range.count() < 6) Spacer(Modifier.weight(1f))
+                            }
+                        }
+                        SymptomPill(chosen == -1, t("Not rated / unable to rate", "अंक नहीं बताया / बता नहीं सकते"), "symptom-mood-$key-unrated", Modifier.fillMaxWidth()) { set(-1) }
+                    }
+                }
+                if ((quick || cur == "how") && !(symptom == "Pain" && !quick) && !isMood) SymptomSection(null, SymptomDiaryRules.ratingQuestion(scale, hindi)) {
                     Text(SymptomDiaryRules.ratingAnchors(scale, hindi), style = MaterialTheme.typography.bodySmall, modifier = Modifier.testTag("symptom-rating-anchors"))
                     RatingReadout(rating, hindi, scale)
                     listOf(0..5, 6..10).forEach { range ->

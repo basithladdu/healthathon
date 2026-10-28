@@ -98,8 +98,8 @@ class CarePainBodyMapTest {
         assertEquals(0xFFE8693AL, PainBodyMapRules.heatColor(9)); assertEquals(PainBodyMapRules.heatColor(10), PainBodyMapRules.heatColor(99)); assertEquals(PainBodyMapRules.heatColor(0), PainBodyMapRules.heatColor(-3))
         assertEquals(PainBodyMapRules.NEUTRAL, PainBodyMapRules.heatColor(0)); assertFalse(PainBodyMapRules.heatStops.contains(PainBodyMapRules.heatColor(0))); assertNotEquals(PainBodyMapRules.heatColor(0), PainBodyMapRules.heatColor(1)) // zero carries no heat colour
         assertEquals(7, (0..10).map { PainBodyMapRules.heatColor(it) }.toSet().size)
-        assertEquals(listOf("None", "Mild", "Mild", "Moderate", "Severe", "Worst"), listOf(0, 3, 1, 5, 8, 10).map { PainBodyMapRules.strengthWord(it, false) })
-        assertEquals("हल्का", PainBodyMapRules.strengthWord(2, true)); assertEquals("सबसे ज़्यादा", PainBodyMapRules.strengthWord(10, true))
+        assertEquals(listOf("None", "Mild", "Mild", "Moderate", "Severe", "Severe"), listOf(0, 3, 1, 5, 8, 10).map { PainBodyMapRules.strengthWord(it, false) })
+        assertEquals("हल्का", PainBodyMapRules.strengthWord(2, true)); assertEquals("तेज़", PainBodyMapRules.strengthWord(10, true))
     }
     @Test fun perSpotRatingsRoundTripValidateAndOldNotesStillLoad() {
         val spots = note().copy(painBodySites = listOf("head", "left-leg"), painBodyRatings = mapOf("head" to 10, "left-leg" to 0))

@@ -63,7 +63,7 @@ import org.json.JSONObject
 import java.io.ByteArrayInputStream
 
 /** A bundled 3D model plus visible region buttons, with a 2D fallback if this WebView cannot render it. Part buttons only zoom; a tap on the model (or "Mark whole part") records the pain. */
-@Composable fun CarePainBodyMap(selected: List<String>, points: List<PainBodyPoint3d>, rating: Int?, hindi: Boolean, readOnly: Boolean = false, ratings: Map<String, Int> = emptyMap(), onSpotRating: ((String, Int) -> Unit)? = null, onChange: (List<String>, List<PainBodyPoint3d>) -> Unit) {
+@Composable fun CarePainBodyMap(selected: List<String>, points: List<PainBodyPoint3d>, rating: Int?, hindi: Boolean, readOnly: Boolean = false, ratings: Map<String, Int> = emptyMap(), onSpotRating: ((String, Int) -> Unit)? = null, onFocus: ((String?) -> Unit)? = null, onChange: (List<String>, List<PainBodyPoint3d>) -> Unit) {
     var back by rememberSaveable { mutableStateOf(false) }
     var focus by rememberSaveable { mutableStateOf<String?>(null) }
     var focusNonce by rememberSaveable { mutableIntStateOf(0) }
@@ -99,10 +99,10 @@ import java.io.ByteArrayInputStream
             tiles.chunked(perRow).forEach { row ->
                 Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     row.forEach { id ->
-                        if (id == null) PainPartTile(focus == null, false, t("Full body", "पूरा शरीर"), t("Full body, zoom out", "पूरा शरीर, ज़ूम आउट"), Rust, "pain-body-focus-full", Icons.Default.Person, t("Marked", "चिह्नित"), Modifier.weight(1f).fillMaxHeight()) { focus = null; focusNonce++ }
+                        if (id == null) PainPartTile(focus == null, false, t("Full body", "पूरा शरीर"), t("Full body, zoom out", "पूरा शरीर, ज़ूम आउट"), Rust, "pain-body-focus-full", Icons.Default.Person, t("Marked", "चिह्नित"), Modifier.weight(1f).fillMaxHeight()) { focus = null; focusNonce++; onFocus?.invoke(null) }
                         else {
                             val label = PainBodyMapRules.focusLabel(id, back, hindi); val marked = id in selected
-                            PainPartTile(focus == id, marked, label, "${t("Zoom to", "ज़ूम करें:")} $label${if (marked) "${t(", marked as pain", ", दर्द के रूप में चिह्नित")}, ${PainBodyMapRules.spokenScore(spotRating(id), hindi)}" else ""}", spotColor(id), if (readOnly) "pain-body-focus-$id" else "pain-body-site-$id", null, t("Marked", "चिह्नित"), Modifier.weight(1f).fillMaxHeight()) { focus = id; focusNonce++; if (id in selected) active = id }
+                            PainPartTile(focus == id, marked, label, "${t("Zoom to", "ज़ूम करें:")} $label${if (marked) "${t(", marked as pain", ", दर्द के रूप में चिह्नित")}, ${PainBodyMapRules.spokenScore(spotRating(id), hindi)}" else ""}", spotColor(id), if (readOnly) "pain-body-focus-$id" else "pain-body-site-$id", null, t("Marked", "चिह्नित"), Modifier.weight(1f).fillMaxHeight()) { focus = id; focusNonce++; if (id in selected) active = id; onFocus?.invoke(id) }
                         }
                     }
                     repeat(perRow - row.size) { Spacer(Modifier.weight(1f)) }
@@ -162,6 +162,7 @@ import java.io.ByteArrayInputStream
             Box(Modifier.matchParentSize().sliderTouchOverlay(28.dp) { f -> val next = (f * 10).roundToInt(); if (next != rating) onRatingChange(next) })
         }
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { Text("0 ${PainBodyMapRules.strengthWord(0, hindi)}", style = MaterialTheme.typography.labelSmall); Text("10 ${PainBodyMapRules.strengthWord(10, hindi)}", style = MaterialTheme.typography.labelSmall) }
+        Text(t(PainBands.SOURCE_EN, PainBands.SOURCE_HI), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.testTag("pain-band-source"))
     }
 }
 

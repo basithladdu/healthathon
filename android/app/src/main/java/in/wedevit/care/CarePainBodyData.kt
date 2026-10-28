@@ -39,11 +39,8 @@ object PainBodyMapRules {
     fun parseRatingsKey(text: String): Map<String, Int> = text.split('|').mapNotNull { part -> part.split(':').takeIf { it.size == 2 && it[0] in sites }?.let { p -> p[1].toIntOrNull()?.takeIf { it in 0..10 }?.let { p[0] to it } } }.toMap()
     fun encodeRatings(ratings: Map<String, Int>): JSONObject = JSONObject().also { o -> sites.keys.filter { it in ratings }.forEach { o.put(it, ratings.getValue(it)) } }
     fun decodeRatings(value: JSONObject?): Map<String, Int> = value?.let { o -> o.keys().asSequence().associateWith { o.getInt(it) } }.orEmpty()
-    /** Plain-word band for the pain strength slider; 0 None, 1-3 Mild, 4-6 Moderate, 7-9 Severe, 10 Worst. */
-    fun strengthWord(rating: Int, hindi: Boolean): String = when (rating.coerceIn(0, 10)) {
-        0 -> if (hindi) "कोई नहीं" else "None"; in 1..3 -> if (hindi) "हल्का" else "Mild"; in 4..6 -> if (hindi) "मध्यम" else "Moderate"
-        in 7..9 -> if (hindi) "तेज़" else "Severe"; else -> if (hindi) "सबसे ज़्यादा" else "Worst"
-    }
+    /** Plain-word band beside the pain number: 0 None, 1-3 Mild, 4-6 Moderate, 7-10 Severe (see [PainBands]). */
+    fun strengthWord(rating: Int, hindi: Boolean): String = PainBands.label(rating, hindi)
     val sites = linkedMapOf(
         "head" to ("Head" to "सिर"), "neck" to ("Neck" to "गर्दन"), "chest" to ("Chest" to "छाती"),
         "abdomen" to ("Abdomen" to "पेट"), "upper-back" to ("Upper back" to "पीठ का ऊपरी हिस्सा"),

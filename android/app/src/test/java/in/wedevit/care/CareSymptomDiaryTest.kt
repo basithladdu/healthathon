@@ -91,10 +91,12 @@ class CareSymptomDiaryTest {
         val text = CareEntryCodec.readable(SymptomNoteCodec.encode(note()))
         assertTrue(text.contains("4/10")); assertTrue(text.contains("Left leg")); assertFalse(text.contains("\"rating\""))
     }
-    @Test fun symptomDetailsNeverBecomeAnAutomaticClinicalTotalOrSeverityBand() {
+    @Test fun symptomDetailsNeverBecomeAnAutomaticClinicalTotalAndOnlyPainShowsItsBand() {
         val text = SymptomNoteCodec.readable(SymptomNoteCodec.encode(note(9)))
-        assertTrue(text.contains("9/10"))
-        assertFalse(text.contains("Severe")); assertFalse(text.contains("distress", true)); assertFalse(text.contains("/90"))
+        assertTrue(text.contains("9/10 · Severe"))
+        assertFalse(text.contains("distress", true)); assertFalse(text.contains("/90"))
+        val nausea = SymptomNoteCodec.readable(SymptomNoteCodec.encode(note(9).copy(symptom = "Nausea", painLocation = "", painTriggers = emptyList())))
+        assertTrue(nausea.contains("9/10")); assertFalse(nausea.contains("Severe"))
     }
     @Test fun staleEditorCannotOverwriteCloudOrRevisionZeroLocalChanges() {
         val opened = row("edit", note())
@@ -116,9 +118,10 @@ class CareSymptomDiaryTest {
     }
     @Test fun clinicalReviewChoicesUseStableStoredIdentifiersAndRetainLegacyRecords() {
         listOf("Pain", "Tiredness", "Poor appetite", "Dry mouth", "Breathlessness", "Constipation", "Nausea", "Vomiting",
-            "Difficulty swallowing", "Sleepiness", "Cough", "Bowel / bladder incontinence", "Sadness", "Worry", "Diarrhea", "Overall well-being", "Other").forEach {
+            "Difficulty swallowing", "Sleepiness", "Cough", "Bowel / bladder incontinence", "Mood", "Diarrhea", "Overall well-being", "Other").forEach {
             assertTrue(it, it in SymptomDiaryRules.symptoms)
         }
+        assertFalse("Sadness" in SymptomDiaryRules.symptoms); assertFalse("Worry" in SymptomDiaryRules.symptoms)
         assertFalse("Sleep difficulty" in SymptomDiaryRules.symptoms)
         assertFalse("Weight loss" in SymptomDiaryRules.symptoms)
         assertFalse("Dizziness" in SymptomDiaryRules.symptoms)
