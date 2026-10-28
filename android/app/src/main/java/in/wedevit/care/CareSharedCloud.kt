@@ -68,6 +68,35 @@ suspend fun CareCloud.clinicianProfile(): CareClinicianProfile? {
 suspend fun CareCloud.requestClinician(name: String, council: String, registration: String) {
     request("POST", "/rest/v1/rpc/healthathon_request_clinician", JSONObject().put("p_name", name.trim()).put("p_council", council.trim()).put("p_registration", registration.trim()))
 }
+/** A doctor's registration waiting for a Sahara team verifier (table healthathon_clinician_requests). */
+data class CareClinicianRequest(val userId: String, val name: String, val council: String, val registration: String, val status: String, val revision: Long, val submittedAt: String)
+internal fun decodeClinicianRequest(row: JSONObject) = CareClinicianRequest(UUID.fromString(row.getString("user_id")).toString(), row.getString("name"), row.getString("council"),
+    row.getString("registration"), row.getString("status"), row.getLong("revision"), row.optString("submitted_at"))
+/** Same limits as healthathon_private.review_clinician, checked before anything is sent. */
+internal object ClinicianReviewRules {
+    val decisions = setOf("approved", "rejected")
+    fun check(decision: String, evidence: String, note: String) {
+        require(decision in decisions) { "Choose approve or reject." }
+        require(evidence.trim().length in 8..1200) { "Say where you checked the registration (at least 8 characters)." }
+        require(note.trim().length in 8..2000) { "Add a short reason (at least 8 characters)." }
+    }
+}
+/** True only for accounts the owner gave the clinical_verifier (or admin) staff role on the server. */
+suspend fun CareCloud.isClinicalVerifier(): Boolean =
+    request("POST", "/rest/v1/rpc/healthathon_staff_role", JSONObject().put("p_role", "clinical_verifier")).trim() == "true"
+/** Pending requests; row security returns other people's requests only to a verifier. The verifier's own request is never offered. */
+suspend fun CareCloud.pendingClinicianRequests(): List<CareClinicianRequest> {
+    val me = session.value?.userId ?: error("Sign in first.")
+    val rows = JSONArray(request("GET", "/rest/v1/healthathon_clinician_requests?status=eq.pending&order=submitted_at.asc&limit=200"))
+    return (0 until rows.length()).map { decodeClinicianRequest(rows.getJSONObject(it)) }.filter { it.userId != me }
+}
+suspend fun CareCloud.reviewClinician(target: CareClinicianRequest, decision: String, evidence: String, note: String): CareClinicianRequest {
+    ClinicianReviewRules.check(decision, evidence, note)
+    val saved = decodeClinicianRequest(JSONObject(request("POST", "/rest/v1/rpc/healthathon_review_clinician", JSONObject().put("p_user", target.userId).put("p_revision", target.revision)
+        .put("p_decision", decision).put("p_evidence", evidence.trim()).put("p_note", note.trim()))))
+    require(saved.userId == target.userId && saved.status == decision && saved.revision == target.revision + 1) { "The server did not confirm this decision. Refresh and check the request." }
+    return saved
+}
 suspend fun CareCloud.sharedDrafts(person: String, expectedAccountId: String = session.value?.userId ?: error("Sign in first.")): List<SharedCareDraft> {
     require(runCatching { UUID.fromString(person) }.isSuccess)
     val result = mutableListOf<SharedCareDraft>(); var offset = 0
