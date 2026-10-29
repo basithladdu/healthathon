@@ -110,3 +110,4 @@
   .sort span[aria-hidden]{display:none}
   .table,.stat,.table tbody tr{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
+.table a{color:#b9472c;text-underline-offset:3px;font-weight:600}

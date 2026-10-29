@@ -27,7 +27,7 @@ const pretty = (iso: string) => { const t = Date.parse(iso); return Number.isFin
 
 function registration(r: Row) { return [label(COUNCIL, r.council), str(r.registration_state), str(r.registration_number)].filter(Boolean).join(' · '); }
 
-type Column = { key: string; label: string; get: (r: Row) => string; wide?: boolean; nowrap?: boolean };
+type Column = { key: string; label: string; get: (r: Row) => string; wide?: boolean; nowrap?: boolean; csvOnly?: boolean; link?: (r: Row) => string };
 /* "Submitted by" is shown as one combined cell in the table but split into separate CSV columns. */
 const SUBMITTER_COLUMNS: Column[] = [
   { key: 'full_name', label: 'Name', get: r => str(r.full_name) },
@@ -45,9 +45,10 @@ const FACILITY_COLUMNS: Column[] = [
   { key: 'state', label: 'State / UT', get: r => str(r.facility.state) },
   { key: 'city', label: 'City / district', get: r => str(r.facility.city) },
   { key: 'hospitalAddress', label: 'Address', get: r => str(r.facility.hospitalAddress), wide: true },
-  { key: 'latitude', label: 'Latitude', get: r => str(r.facility.latitude), nowrap: true },
-  { key: 'longitude', label: 'Longitude', get: r => str(r.facility.longitude), nowrap: true },
-  { key: 'locationConfirmed', label: 'Pin confirmed', get: r => (r.facility.locationConfirmed === true ? 'Yes' : r.facility.locationConfirmed === false ? 'No' : '') },
+  { key: 'map', label: 'Map', get: r => (str(r.facility.latitude) && str(r.facility.longitude) ? 'Open map' : ''), link: r => `https://www.google.com/maps?q=${encodeURIComponent(`${str(r.facility.latitude)},${str(r.facility.longitude)}`)}`, nowrap: true },
+  { csvOnly: true, key: 'latitude', label: 'Latitude', get: r => str(r.facility.latitude), nowrap: true },
+  { csvOnly: true, key: 'longitude', label: 'Longitude', get: r => str(r.facility.longitude), nowrap: true },
+  { csvOnly: true, key: 'locationConfirmed', label: 'Pin confirmed', get: r => (r.facility.locationConfirmed === true ? 'Yes' : r.facility.locationConfirmed === false ? 'No' : '') },
   { key: 'services', label: 'Palliative services', get: services },
   { key: 'morphine', label: 'Oral morphine (last 3 months)', get: r => label(MORPHINE, r.facility.morphine) },
   { key: 'supply', label: 'Morphine supply', get: r => label(SUPPLY, r.facility.supply) },
@@ -55,10 +56,11 @@ const FACILITY_COLUMNS: Column[] = [
   { key: 'familyNotes', label: 'Notes for families', get: r => str(r.facility.familyNotes), wide: true },
 ];
 const META_COLUMNS: Column[] = [
-  { key: 'decision', label: 'Review status', get: r => label(DECISION, r.decision) },
-  { key: 'revision', label: 'Review revision', get: r => str(r.revision) },
-  { key: 'formVersion', label: 'Form version', get: r => str(r.facility.formVersion), nowrap: true },
-  { key: 'id', label: 'Submission ID', get: r => str(r.id), nowrap: true },
+  // Kept in the CSV; too technical for the table.
+  { csvOnly: true, key: 'decision', label: 'Review status', get: r => label(DECISION, r.decision) },
+  { csvOnly: true, key: 'revision', label: 'Review revision', get: r => str(r.revision) },
+  { csvOnly: true, key: 'formVersion', label: 'Form version', get: r => str(r.facility.formVersion), nowrap: true },
+  { csvOnly: true, key: 'id', label: 'Submission ID', get: r => str(r.id), nowrap: true },
 ];
 /* Keys already shown, or internal/anti-spam fields not worth a column. */
 const KNOWN = new Set(['hospitalName', 'institutionType', 'institutionOther', 'connection', 'connectionOther', 'state', 'city', 'hospitalAddress', 'latitude', 'longitude', 'locationConfirmed', 'services', 'morphine', 'supply', 'palliativePhysicians', 'familyNotes', 'formVersion', 'roleOther', 'kind', 'website', 'submissionId', 'consent', 'accuracy', 'mobile']);
@@ -114,7 +116,9 @@ export function SurveyAdmin() {
     rows.forEach(r => Object.keys(r.facility ?? {}).forEach(k => { if (!KNOWN.has(k)) keys.add(k); }));
     return [...keys].sort().map(k => ({ key: `x:${k}`, label: humanise(k), get: (r: Row) => str(r.facility[k]) }));
   }, [rows]);
-  const columns = useMemo(() => [...FACILITY_COLUMNS, ...extraColumns, ...META_COLUMNS], [extraColumns]);
+  const columns = useMemo(() => [...FACILITY_COLUMNS, ...extraColumns, ...META_COLUMNS].filter(c => c.key !== 'map'), [extraColumns]);
+  // The table hides technical columns and any column nobody has filled in yet; the CSV keeps everything.
+  const tableColumns = useMemo(() => [...FACILITY_COLUMNS, ...extraColumns].filter(c => !c.csvOnly && rows.some(r => c.get(r))), [rows, extraColumns]);
 
   const shown = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -183,14 +187,14 @@ export function SurveyAdmin() {
         <thead><tr>
           <th scope="col" aria-sort={newestFirst ? 'descending' : 'ascending'} className={s.nowrap}><button type="button" className={s.sort} onClick={() => setNewestFirst(v => !v)}>Submitted <span aria-hidden="true">{newestFirst ? '↓' : '↑'}</span><span className={s.visuallyHidden}>, sorted {newestFirst ? 'newest first' : 'oldest first'}. Activate to reverse.</span></button></th>
           <th scope="col">Submitted by</th>
-          {columns.map(c => <th scope="col" key={c.key}>{c.label}</th>)}
+          {tableColumns.map(c => <th scope="col" key={c.key}>{c.label}</th>)}
         </tr></thead>
         <tbody>{shown.map(r => {
           const role = SUBMITTER_COLUMNS[1].get(r), reg = registration(r), contact = [str(r.email), str(r.mobile)].filter(Boolean);
           return <tr key={r.id}>
             <th scope="row" className={s.nowrap}><time dateTime={r.created_at}>{pretty(r.created_at)}</time></th>
-            <td className={s.who}><strong>{str(r.full_name) || 'Name not given'}</strong>{role && <span>{role}</span>}{reg && <span>{reg}</span>}{contact.length ? contact.map(c => <span key={c} className={s.contact}>{c}</span>) : <span className={s.muted}>No contact given</span>}</td>
-            {columns.map(c => { const v = c.get(r); return <td key={c.key} className={c.wide ? s.wide : c.nowrap ? s.nowrap : undefined}>{v || <span className={s.muted}>—</span>}</td>; })}
+            <td className={s.who}><strong>{str(r.full_name) || 'No name given'}</strong>{role && <span>{role}</span>}{reg && <span>{reg}</span>}{contact.length ? contact.map(c => <span key={c} className={s.contact}>{c}</span>) : <span className={s.muted}>No contact given</span>}</td>
+            {tableColumns.map(c => { const v = c.get(r); return <td key={c.key} className={c.wide ? s.wide : c.nowrap ? s.nowrap : undefined}>{v ? c.link ? <a href={c.link(r)} target="_blank" rel="noreferrer">{v}</a> : v : <span className={s.muted}>—</span>}</td>; })}
           </tr>;
         })}</tbody>
       </table>
