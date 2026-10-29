@@ -116,22 +116,6 @@ export function CareSignIn({ patients, hindi, onLanguage, onSignIn }: CareSignIn
         <div className="care-sign-in-form">
           <h1 id={`${id}-title`}>{t('Your care starts here', 'देखभाल की शुरुआत यहीं से')}</h1>
           <Link href="/shared-care" className="care-sign-in-submit care-sign-in-account"><span>{t('Open shared care records', 'साझा देखभाल रिकॉर्ड खोलें')}</span><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg></Link>
-          <details className="care-sign-in-tools">
-            <summary id={`${id}-tools-title`}>{t('Explore care tools', 'देखभाल की सुविधाएँ देखें')}</summary>
-            <form className="care-sign-in-tools-form" onSubmit={submit} aria-labelledby={`${id}-tools-title`} aria-describedby={`${id}-tools-note`} noValidate>
-          <p className="care-sign-in-tools-note" id={`${id}-tools-note`}>{t('These tools do not verify ABHA or clinician identity.', 'ये सुविधाएँ ABHA या डॉक्टर की पहचान सत्यापित नहीं करतीं।')}</p>
-          <fieldset className="care-sign-in-roles"><legend>{t('View as', 'किसके रूप में देखें')}</legend><div>{([
-            ['patient', 'Patient', 'मरीज़'], ['family', 'Family', 'परिवार'], ['doctor', 'Doctor', 'डॉक्टर'],
-          ] as const).map(([value, en, hi]) => <button key={value} type="button" className={`care-sign-in-role care-sign-in-role-${value}`} aria-pressed={role === value} onClick={() => { if (role !== value) { setRole(value); setIdentifier(''); setCouncil(''); setAutofilling(true); setError(null); } }}><CareArt kind={roleArt[value]} /><span>{t(en, hi)}</span></button>)}</div></fieldset>
-          {role === 'doctor' && <label className="care-sign-in-label" htmlFor={`${id}-council`}>{t('Medical council', 'मेडिकल काउंसिल')}<input id={`${id}-council`} list={`${id}-councils`} value={council} onFocus={() => { autofillStopped.current.council = true; }} onChange={(event) => { autofillStopped.current.council = true; setCouncil(event.target.value); setError(null); }} placeholder={t('Select or enter your council', 'अपनी काउंसिल चुनें या लिखें')} maxLength={120} autoComplete="off" required aria-invalid={error === 'council'} /><datalist id={`${id}-councils`}><option value="Delhi Medical Council" /><option value="Karnataka Medical Council" /><option value="Telangana Medical Council" /><option value="Andhra Pradesh Medical Council" /><option value="Maharashtra Medical Council" /></datalist></label>}
-          <label className="care-sign-in-label" htmlFor={`${id}-identifier`}>
-            {role === 'doctor' ? t('Medical registration number', 'मेडिकल रजिस्ट्रेशन नंबर') : t('Patient’s ABHA number', 'मरीज़ का ABHA नंबर')}
-            <input ref={identifierInput} id={`${id}-identifier`} type="text" inputMode={role === 'doctor' ? 'text' : 'numeric'} enterKeyHint="go" value={identifier} onFocus={() => { autofillStopped.current.identifier = true; }} onChange={(event) => { autofillStopped.current.identifier = true; setIdentifier(event.target.value); setError(null); }} placeholder={role === 'doctor' ? t('Registration number', 'रजिस्ट्रेशन नंबर') : t('14 digits', '14 अंक')} maxLength={role === 'doctor' ? 40 : 24} autoComplete="off" autoCapitalize="none" spellCheck={false} aria-invalid={Boolean(error)} aria-describedby={error ? `${id}-error` : undefined} required />
-          </label>
-          {error && <p id={`${id}-error`} className="care-sign-in-error" role="alert">{error === 'abha' ? t('Enter a 14-digit ABHA number.', '14 अंकों का ABHA नंबर डालें।') : error === 'council' ? t('Enter your medical council.', 'अपनी मेडिकल काउंसिल लिखें।') : t('Enter the number shown on your registration.', 'अपने रजिस्ट्रेशन पर दिया नंबर लिखें।')}</p>}
-          <button type="submit" className="care-sign-in-submit care-sign-in-tools-submit" disabled={autofilling || !patient || !name.trim() || !identifierValid || (role === 'doctor' && !council.trim())}><span>{t('Open care tools', 'देखभाल की सुविधाएँ खोलें')}</span><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg></button>
-            </form>
-          </details>
         </div>
       </div>
     </main>
