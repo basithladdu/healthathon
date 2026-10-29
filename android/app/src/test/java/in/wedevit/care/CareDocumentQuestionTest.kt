@@ -149,4 +149,36 @@ class CareDocumentQuestionTest {
         assertFalse(request.sources.values.any { it.reportId == "blank" })
         assertThrows(IllegalArgumentException::class.java) { DocumentQuestionRules.retrieve("anything", listOf(empty)) }
     }
+
+    private fun report(id: String, vararg lines: String, added: Long = 0L) = DocumentQuestionSource(id, "$id.jpg", listOf(DocumentPageText(1, lines.joinToString("\n"))), reviewed = false, added = added)
+
+    @Test fun searchFindsSynonymsSpellingsHindiAndMisreadWords() {
+        val kidney = report("kidney", "Patient: R. Devi", "Serum Creatin1ne 1.4 mg/dL", "Blood Pressure 130/80 mmHg")
+        val sugar = report("sugar", "Fasting Blood Sugar 110 mg/dL")
+        val documents = (1..6).map(::filler) + listOf(lab, kidney, sugar)
+        fun found(question: String) = DocumentQuestionRules.retrieve(question, documents).sources.values.map { it.reportId }.toSet()
+        assertEquals(setOf("report-2"), found("What is my Hb?"))               // hb = haemoglobin, British spelling in the report
+        assertEquals(setOf("report-2"), found("hemoglobin"))                   // American spelling
+        assertEquals(setOf("kidney"), found("latest creatinine"))              // the phone read Creatin1ne
+        assertEquals(setOf("kidney"), found("my BP"))                          // bp = blood pressure
+        assertEquals(setOf("sugar"), found("मेरी शुगर कितनी है?"))              // Hindi word for sugar; fasting sugar counts as sugar
+        assertEquals(setOf("sugar"), found("FBS"))
+    }
+
+    @Test fun onPhoneAnswerPullsTheNewestValueAndMarksTheMatchedWords() {
+        val older = report("old", "Report date: 01/08/2026", "Haemoglobin 9.8 g/dL", "Date of birth: 02/03/1960")
+        val newer = report("new", "Sample collected 10/10/2026", "HGB", "11.2 g/dL")
+        val answer = DocumentQuestionRules.matchLines("What is my haemoglobin?", listOf(newer, older, discharge) + (1..3).map(::filler))
+        assertTrue(answer.found)
+        assertEquals(listOf("new", "old"), answer.values.map { it.match.reportId })
+        assertEquals(listOf(20261010, 20260801), answer.values.map { it.date })
+        val latest = answer.values.first().match
+        assertEquals(listOf("HGB", "11.2 g/dL"), listOf(latest.text, latest.next)); assertEquals(2, latest.line)
+        assertEquals(listOf(0 until 3), latest.marks)
+        assertEquals(listOf(0 until 11), answer.values[1].match.marks)
+        assertEquals(setOf("new", "old"), answer.groups.map { it.reportId }.toSet())
+        // Not a test result question: lines only, no value pulled out. No match: nothing found, nothing made up.
+        assertTrue(DocumentQuestionRules.matchLines("When is the OPD review?", listOf(discharge)).let { it.found && it.values.isEmpty() })
+        assertFalse(DocumentQuestionRules.matchLines("मेरी अगली जाँच कब है?", listOf(discharge, lab)).found)
+    }
 }
