@@ -1,4 +1,4 @@
-// Survey admin data. The page sends the admin password (ADMIN_PASSWORD in Vercel); rows are read on the
+// Survey admin data. The page sends the admin password (hard-coded "0"); rows are read on the
 // server with the Supabase secret key (SUPABASE_SERVICE_ROLE_KEY in Vercel), so nobody has to sign in.
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -9,7 +9,7 @@ const json = (body: unknown, status = 200) => Response.json(body, { status, head
 type Raw = { id: string; facility: Record<string, unknown>; created_at: string; c: Record<string, unknown> | Record<string, unknown>[] | null };
 
 export async function POST(request: Request) {
-  const password = process.env.ADMIN_PASSWORD || '0';
+  const password = '0';
   const sent = await request.json().catch(() => null) as { password?: unknown } | null;
   if (sent?.password !== password) return json({ error: 'Wrong password.' }, 401);
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
