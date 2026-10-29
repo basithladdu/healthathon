@@ -5,7 +5,6 @@ import { CareArt, type CareArtKind } from './care-art';
 import { CareLoading } from './care-loading';
 import './care-sign-in.css';
 import { SaharaLogo } from './sahara-logo';
-import Link from 'next/link';
 
 export type CareSignInInput = { role: 'family' | 'patient' | 'doctor'; patientId: string; name: string };
 export type CareSignInProps = {
@@ -101,7 +100,7 @@ export function CareSignIn({ patients, hindi, onLanguage, onSignIn }: CareSignIn
   return <div className="care-sign-in" lang={hindi ? 'hi' : 'en'}>
     <header className="care-sign-in-header">
       <span className="care-sign-in-brand"><SaharaLogo className="care-sign-in-logo" priority /><span><strong>{t('Sahara', 'सहारा')}</strong><small>{t('- A Palliative Care Companion', '- पैलिएटिव केयर साथी')}</small></span></span>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}><Link href="/feedback" style={{ color: '#b9472c', minHeight: 44, display: 'inline-flex', alignItems: 'center', textUnderlineOffset: 4 }}>App feedback</Link><button type="button" className="care-sign-in-language" onClick={onLanguage} lang={hindi ? 'en' : 'hi'}>{hindi ? 'English' : 'हिन्दी'}</button></div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}><button type="button" className="care-sign-in-language" onClick={onLanguage} lang={hindi ? 'en' : 'hi'}>{hindi ? 'English' : 'हिन्दी'}</button></div>
     </header>
     <main className="care-sign-in-main">
       <div className="care-sign-in-card">
@@ -115,7 +114,18 @@ export function CareSignIn({ patients, hindi, onLanguage, onSignIn }: CareSignIn
         </div>
         <div className="care-sign-in-form">
           <h1 id={`${id}-title`}>{t('Your care starts here', 'देखभाल की शुरुआत यहीं से')}</h1>
-          <Link href="/shared-care" className="care-sign-in-submit care-sign-in-account"><span>{t('Open shared care records', 'साझा देखभाल रिकॉर्ड खोलें')}</span><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg></Link>
+            <form className="care-sign-in-tools-form" onSubmit={submit} aria-labelledby={`${id}-title`} noValidate>
+          <fieldset className="care-sign-in-roles"><legend>{t('Sign in as', 'किस रूप में साइन इन करें')}</legend><div>{([
+            ['patient', 'Patient', 'मरीज़'], ['family', 'Family', 'परिवार'], ['doctor', 'Doctor', 'डॉक्टर'],
+          ] as const).map(([value, en, hi]) => <button key={value} type="button" className={`care-sign-in-role care-sign-in-role-${value}`} aria-pressed={role === value} onClick={() => { if (role !== value) { setRole(value); setIdentifier(''); setCouncil(''); setAutofilling(true); setError(null); } }}><CareArt kind={roleArt[value]} /><span>{t(en, hi)}</span></button>)}</div></fieldset>
+          {role === 'doctor' && <label className="care-sign-in-label" htmlFor={`${id}-council`}>{t('Medical council', 'मेडिकल काउंसिल')}<input id={`${id}-council`} list={`${id}-councils`} value={council} onFocus={() => { autofillStopped.current.council = true; }} onChange={(event) => { autofillStopped.current.council = true; setCouncil(event.target.value); setError(null); }} placeholder={t('Select or enter your council', 'अपनी काउंसिल चुनें या लिखें')} maxLength={120} autoComplete="off" required aria-invalid={error === 'council'} /><datalist id={`${id}-councils`}><option value="Delhi Medical Council" /><option value="Karnataka Medical Council" /><option value="Telangana Medical Council" /><option value="Andhra Pradesh Medical Council" /><option value="Maharashtra Medical Council" /></datalist></label>}
+          <label className="care-sign-in-label" htmlFor={`${id}-identifier`}>
+            {role === 'doctor' ? t('Medical registration number', 'मेडिकल रजिस्ट्रेशन नंबर') : t('Patient’s ABHA number', 'मरीज़ का ABHA नंबर')}
+            <input ref={identifierInput} id={`${id}-identifier`} type="text" inputMode={role === 'doctor' ? 'text' : 'numeric'} enterKeyHint="go" value={identifier} onFocus={() => { autofillStopped.current.identifier = true; }} onChange={(event) => { autofillStopped.current.identifier = true; setIdentifier(event.target.value); setError(null); }} placeholder={role === 'doctor' ? t('Registration number', 'रजिस्ट्रेशन नंबर') : t('14 digits', '14 अंक')} maxLength={role === 'doctor' ? 40 : 24} autoComplete="off" autoCapitalize="none" spellCheck={false} aria-invalid={Boolean(error)} aria-describedby={error ? `${id}-error` : undefined} required />
+          </label>
+          {error && <p id={`${id}-error`} className="care-sign-in-error" role="alert">{error === 'abha' ? t('Enter a 14-digit ABHA number.', '14 अंकों का ABHA नंबर डालें।') : error === 'council' ? t('Enter your medical council.', 'अपनी मेडिकल काउंसिल लिखें।') : t('Enter the number shown on your registration.', 'अपने रजिस्ट्रेशन पर दिया नंबर लिखें।')}</p>}
+          <button type="submit" className="care-sign-in-submit care-sign-in-tools-submit" disabled={autofilling || !patient || !name.trim() || !identifierValid || (role === 'doctor' && !council.trim())}><span>{t('Sign in', 'साइन इन करें')}</span><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg></button>
+            </form>
         </div>
       </div>
     </main>
