@@ -1,13 +1,6 @@
 'use client';
-import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type FormEvent, type ReactNode } from 'react';
-import { CareSharedClient } from '../care-shared-client';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import s from './admin.module.css';
-
-/* Owner's explicit decision: a simple hardcoded gate. The real protection is the
-   Supabase sign-in plus the directory_reviewer staff role checked server-side. */
-const GATE_PASSWORD = '0';
-const GATE_KEY = 'sahara-admin-unlocked';
-const PAGE_SIZE = 50;
 
 type Row = { id: string; facility: Record<string, unknown>; created_at: string; full_name: string; respondent_role: string; council: string; registration_state: string; registration_number: string; mobile: string | null; email: string | null; revision: number; decision: string };
 
@@ -89,72 +82,28 @@ function downloadCsv(rows: Row[], columns: Column[]) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-/* ---------- password gate (sessionStorage, guarded) ---------- */
-const gateListeners = new Set<() => void>();
-function readGate() { try { return window.sessionStorage.getItem(GATE_KEY) === '1'; } catch { return false; } }
-function writeGate(on: boolean) { try { if (on) window.sessionStorage.setItem(GATE_KEY, '1'); else window.sessionStorage.removeItem(GATE_KEY); } catch { /* memory-only unlock still works for this page view */ } gateListeners.forEach(fn => fn()); }
-const subscribeGate = (fn: () => void) => { gateListeners.add(fn); return () => { gateListeners.delete(fn); }; };
+type Phase = 'loading' | 'failed' | 'ready';
 
 export function SurveyAdmin() {
-  const stored = useSyncExternalStore(subscribeGate, readGate, () => false);
-  const [memoryUnlock, setMemoryUnlock] = useState(false);
-  const [code, setCode] = useState(''); const [error, setError] = useState('');
-  const unlocked = stored || memoryUnlock;
-  if (!unlocked) return <section className={s.card} aria-labelledby="admin-gate-title">
-    <h1 id="admin-gate-title" className={s.title}>Survey admin</h1>
-    <p className={s.lead}>Enter the admin password to continue.</p>
-    <form className={s.form} onSubmit={(e: FormEvent) => { e.preventDefault(); if (code === GATE_PASSWORD) { setMemoryUnlock(true); writeGate(true); setCode(''); setError(''); } else setError('That password is not correct.'); }}>
-      <label className={s.field} htmlFor="admin-gate">Admin password<input id="admin-gate" type="password" autoComplete="off" value={code} onChange={e => { setCode(e.target.value); setError(''); }} aria-invalid={error ? true : undefined} aria-describedby={error ? 'admin-gate-error' : undefined} required /></label>
-      {error && <p id="admin-gate-error" className={s.error} role="alert">{error}</p>}
-      <button className={s.primary} type="submit">Continue</button>
-    </form>
-  </section>;
-  return <SurveyData onLock={() => { setMemoryUnlock(false); writeGate(false); }} />;
-}
-
-type Phase = 'init' | 'signed-out' | 'loading' | 'denied' | 'ready';
-
-function SurveyData({ onLock }: { onLock: () => void }) {
-  const client = useRef<CareSharedClient | null>(null), epoch = useRef(0), locked = useRef(false);
-  const [phase, setPhase] = useState<Phase>('init');
-  const [email, setEmail] = useState(''); const [password, setPassword] = useState('');
+  const [phase, setPhase] = useState<Phase>('loading');
   const [rows, setRows] = useState<Row[]>([]); const [busy, setBusy] = useState(false); const [message, setMessage] = useState('');
-  const [account, setAccount] = useState(''); const [loadedAt, setLoadedAt] = useState('');
+  const [loadedAt, setLoadedAt] = useState('');
   const [query, setQuery] = useState(''); const [newestFirst, setNewestFirst] = useState(true);
+  const live = useRef(true);
 
   async function load() {
-    const c = client.current!, user = c.currentSession()?.userId, stamp = ++epoch.current;
-    const current = () => client.current === c && epoch.current === stamp && c.currentSession()?.userId === user;
-    setPhase('loading');
-    await c.verifyAccount(); if (!current()) return;
-    setAccount(c.currentSession()?.email ?? '');
-    const role = await c.rpc<boolean>('healthathon_staff_role', { p_role: 'directory_reviewer' }); if (!current()) return;
-    if (role !== true) { setRows([]); setPhase('denied'); setMessage('This account is signed in but does not have the directory reviewer role, so survey submissions cannot be read. Ask the Sahara team to assign “directory_reviewer”, or sign out and use a reviewer account.'); return; }
-    const all = new Map<string, Row>();
-    for (let offset = 0; offset <= 100000; offset += PAGE_SIZE) {
-      const page = await c.rpc<Row[]>('sahara_directory_queue', { p_offset: offset }); if (!current()) return;
-      if (!Array.isArray(page)) throw Error('The survey submissions could not be read.');
-      page.forEach(r => all.set(r.id, r));
-      if (page.length < PAGE_SIZE) break;
-    }
-    setRows([...all.values()]); setLoadedAt(new Date().toISOString()); setPhase('ready');
-    setMessage(all.size ? '' : 'No survey submissions yet.');
+    if (busy) return; setBusy(true); setMessage('');
+    try {
+      const response = await fetch('/api/admin-survey', { cache: 'no-store' });
+      const value = await response.json().catch(() => ({})) as { rows?: Row[]; error?: string };
+      if (!live.current) return;
+      if (!response.ok || !Array.isArray(value.rows)) throw new Error(value.error ?? 'Could not load the survey submissions.');
+      setRows(value.rows); setLoadedAt(new Date().toISOString()); setPhase('ready');
+      setMessage(value.rows.length ? '' : 'No survey submissions yet.');
+    } catch (e) { if (live.current) { setMessage(e instanceof Error ? e.message : 'Could not load the survey submissions.'); setPhase(p => (p === 'ready' ? p : 'failed')); } }
+    finally { if (live.current) setBusy(false); }
   }
-  async function action(fn: () => Promise<void>) {
-    if (locked.current) return; locked.current = true; setBusy(true); setMessage('');
-    try { await fn(); }
-    catch (e) { if (client.current) { setMessage(e instanceof Error ? e.message : 'Could not load the survey submissions.'); setPhase(client.current.currentSession() ? 'ready' : 'signed-out'); } }
-    finally { locked.current = false; if (client.current) setBusy(false); }
-  }
-  useEffect(() => {
-    client.current = new CareSharedClient(window.sessionStorage);
-    if (client.current.currentSession()) void action(load);
-    else setPhase('signed-out');
-    const generation = epoch, current = client;
-    return () => { generation.current++; current.current = null; };
-  }, []);
-
-  const signOut = () => void action(async () => { const c = client.current!; epoch.current++; setRows([]); setPhase('signed-out'); setPassword(''); setAccount(''); await c.signOut(); });
+  useEffect(() => { live.current = true; void load(); return () => { live.current = false; }; }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const extraColumns = useMemo<Column[]>(() => {
     const keys = new Set<string>();
@@ -182,27 +131,11 @@ function SurveyData({ onLock }: { onLock: () => void }) {
   }, [shown]);
 
   const header = <div className={s.toolbarTop}>
-    <div><h1 className={s.title}>Hospital survey responses</h1><p className={s.lead}>Every submission from the hospital survey. Professional and contact details are private: do not share this export outside the review team.</p></div>
-    <div className={`${s.accountBar} ${s.noPrint}`}>
-      {account && <span className={s.account}>Signed in as <strong>{account}</strong></span>}
-      {phase !== 'signed-out' && phase !== 'init' && <button type="button" className={s.secondary} disabled={busy} onClick={signOut}>Sign out</button>}
-      <button type="button" className={s.ghost} onClick={onLock}>Lock page</button>
-    </div>
+    <div><h1 className={s.title}>Hospital survey responses</h1><p className={s.lead}>Every submission from the hospital survey. Contact details are private: keep this export inside the team.</p></div>
   </div>;
 
-  if (phase === 'signed-out') return <>{header}<section className={s.card} aria-labelledby="admin-signin-title">
-    <h2 id="admin-signin-title" className={s.subtitle}>Sign in with a reviewer account</h2>
-    <p className={s.lead}>Survey answers can only be read by a Sahara account with the directory reviewer role.</p>
-    <form className={s.form} onSubmit={e => { e.preventDefault(); void action(async () => { await client.current!.signIn(email, password); setPassword(''); await load(); }); }}>
-      <label className={s.field} htmlFor="admin-email">Email<input id="admin-email" type="email" autoComplete="username" value={email} onChange={e => setEmail(e.target.value)} required /></label>
-      <label className={s.field} htmlFor="admin-password">Password<input id="admin-password" type="password" autoComplete="current-password" value={password} onChange={e => setPassword(e.target.value)} required /></label>
-      <button className={s.primary} type="submit" disabled={busy}>{busy ? 'Signing in…' : 'Sign in'}</button>
-    </form>
-    {message && <p className={s.error} role="alert">{message}</p>}
-  </section></>;
-
-  if (phase === 'init' || phase === 'loading') return <>{header}<p className={s.status} role="status">{phase === 'init' ? 'Checking your account…' : 'Loading all survey submissions…'}</p></>;
-  if (phase === 'denied') return <>{header}<p className={s.notice} role="alert">{message}</p></>;
+  if (phase === 'loading') return <>{header}<p className={s.status} role="status">Loading survey submissions…</p></>;
+  if (phase === 'failed') return <>{header}<p className={s.notice} role="alert">{message}</p><button type="button" className={s.secondary} disabled={busy} onClick={() => void load()}>Try again</button></>;
 
   const stat = (n: number, text: ReactNode) => <div className={s.stat}><strong>{n}</strong><span>{text}</span></div>;
   return <>
@@ -228,7 +161,7 @@ function SurveyData({ onLock }: { onLock: () => void }) {
     <div className={`${s.controls} ${s.noPrint}`}>
       <label className={s.search} htmlFor="admin-search">Search responses<input id="admin-search" type="search" value={query} placeholder="Hospital, state, name, email…" onChange={e => setQuery(e.target.value)} /></label>
       <div className={s.actions}>
-        <button type="button" className={s.secondary} disabled={busy} onClick={() => void action(load)}>Refresh</button>
+        <button type="button" className={s.secondary} disabled={busy} onClick={() => void load()}>Refresh</button>
         <button type="button" className={s.secondary} disabled={!shown.length} onClick={() => downloadCsv(shown, columns)}>Download CSV</button>
         <button type="button" className={s.primary} disabled={!shown.length} onClick={() => window.print()}>PDF report</button>
       </div>
