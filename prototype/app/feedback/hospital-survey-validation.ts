@@ -2,7 +2,7 @@ import { INDIA_STATES } from './feedback-schema.ts';
 
 export type HospitalSurveyErrors = Record<string, string>;
 
-// Only the hospital name and consent are required for the v4 intake.
+// Only the contributor's name (initials are fine), the hospital name and consent are required for the v4 intake.
 // Keep basic bounds for malformed input; incomplete answers are reviewed later.
 export function validateHospitalSurveyStep(
   step: number,
@@ -30,7 +30,7 @@ export function validateHospitalSurveyStep(
   if (step === 0) {
     choice('role', ['oncologist','palliative_physician','physician','resident','nurse','pharmacist','other'], 'Choose a listed role, or leave it unanswered.');
     other('role', 'roleOther', 'your professional role');
-    text('fullName', 0, 120, 'your name');
+    text('fullName', 2, 120, 'your name or initials');
     choice('council', ['nmc','state_medical','state_nursing','state_pharmacy','other'], 'Choose a listed council, or leave it unanswered.');
     other('council', 'councilOther', 'the registering council name');
     if (value('council') !== 'nmc') choice('registrationState', INDIA_STATES, 'Choose a listed state, or leave it unanswered.');

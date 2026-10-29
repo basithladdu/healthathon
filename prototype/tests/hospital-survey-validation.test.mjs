@@ -9,15 +9,17 @@ const fields = {
 };
 const check = (step, changes = {}, services = ['opd'], confirmed = true, accuracy = true, consent = true) => validateHospitalSurveyStep(step, {...fields,...changes}, services, confirmed, accuracy, consent);
 
-test('a hospital name and consent can complete the entire survey', () => {
+test('a name or initials, a hospital name and consent can complete the entire survey', () => {
   for (let step=0;step<4;step++) {
     assert.deepEqual(check(step), {});
-    assert.deepEqual(validateHospitalSurveyStep(step,{hospitalName:'A'},[],false,false,true), {});
+    assert.deepEqual(validateHospitalSurveyStep(step,{fullName:'SK',hospitalName:'A'},[],false,false,true), {});
   }
 });
 
-test('only the hospital name and consent are required', () => {
-  assert.deepEqual(validateHospitalSurveyStep(0, {}, [], false, false, false), {});
+test('only the name (initials are fine), hospital name and consent are required', () => {
+  assert.deepEqual(Object.keys(validateHospitalSurveyStep(0, {}, [], false, false, false)), ['fullName']);
+  assert.ok(validateHospitalSurveyStep(0, {fullName:'S'}, [], false, false, false).fullName);
+  assert.deepEqual(validateHospitalSurveyStep(0, {fullName:'S. K.'}, [], false, false, false), {});
   assert.deepEqual(Object.keys(validateHospitalSurveyStep(1, {}, [], false, false, false)), ['hospitalName']);
   assert.deepEqual(validateHospitalSurveyStep(2, {}, [], false, false, false), {});
   assert.deepEqual(Object.keys(validateHospitalSurveyStep(3, {}, [], false, false, false)), ['consent']);
@@ -35,9 +37,9 @@ test('text length and unsafe character bounds remain enforced without formatting
   for (const [step,key,max] of [[0,'fullName',120],[0,'registrationNumber',120],[0,'email',254],[1,'hospitalName',160],[1,'city',80],[1,'hospitalAddress',500],[2,'palliativePhysicians',1000],[2,'familyNotes',1000]]) {
     assert.ok(check(step, {[key]:'x'.repeat(max+1)})[key]);
     assert.ok(check(step, {[key]:'Allowed\u007f'})[key]);
-    assert.deepEqual(check(step, {[key]:' x '}), {});
+    if(key!=='fullName') assert.deepEqual(check(step, {[key]:' x '}), {});
     assert.deepEqual(check(step, {[key]:'x'.repeat(max)}), {});
-    if(key!=='hospitalName') assert.deepEqual(check(step, {[key]:''}), {});
+    if(key!=='hospitalName'&&key!=='fullName') assert.deepEqual(check(step, {[key]:''}), {});
   }
   assert.ok(check(1,{hospitalName:'   '}).hospitalName);
   assert.deepEqual(check(2, {familyNotes:'Line one\nLine two\tallowed'}), {});

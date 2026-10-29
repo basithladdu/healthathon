@@ -17,3 +17,11 @@
 .group[aria-invalid=true] .options{border-color:#9b2e19}
 .error{color:#9b2e19;font-size:13px;line-height:1.5;margin:8px 0 0}
 .noResults{font-size:13px;line-height:1.6;margin:0;padding:12px;color:#67584f}
+.searchRow input{border-color:#cbbcb0;background:#fff;transition:border-color .15s,box-shadow .15s}
+.searchRow input:focus{outline:none;border-color:var(--rust,#b9472c);box-shadow:0 0 0 3px #b9472c24}
+.options{border-color:#e2d6cb;border-radius:14px;padding:6px;gap:6px}
+.options .option{border-color:#e2d6cb;border-radius:10px;transition:border-color .15s,background-color .15s}
+.options .option:hover{border-color:#c48e7c;background:#fffaf5}
+.option input{transition:border-width .15s}
+.option input:focus-visible{outline:none}
+@media(prefers-reduced-motion:reduce){.options .option,.option input,.searchRow input{transition:none}}
