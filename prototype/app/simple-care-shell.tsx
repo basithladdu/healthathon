@@ -1,12 +1,11 @@
 'use client';
 
-import { useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import type { SummaryRelease } from './summary-state';
 import { CareRouteLink } from './care-route-link';
 import type { CareView } from './care-routes';
 import { careSectionFor } from './care-section-pages';
 import { SaharaLogo } from './sahara-logo';
-import Link from 'next/link';
 
 type CareNavIconName = 'home' | 'documents' | 'support' | 'space' | 'visit' | 'record' | 'review' | 'history' | 'care';
 
@@ -27,79 +26,6 @@ function CareNavIcon({ name }: { name: CareNavIconName }) {
 }
 
 type CareRole = 'family' | 'patient' | 'doctor';
-
-function CareRoleSwitcher({ role, hindi, onRole }: { role: CareRole; hindi: boolean; onRole: (role: CareRole) => void }) {
-  const [open, setOpen] = useState(false);
-  const root = useRef<HTMLDivElement>(null);
-  const trigger = useRef<HTMLButtonElement>(null);
-  const menu = useRef<HTMLDivElement>(null);
-  const menuId = useId();
-  const t = (en: string, hi: string) => hindi ? hi : en;
-  const roles = [
-    { value: 'patient', label: t('Patient', 'मरीज़') },
-    { value: 'family', label: t('Family', 'परिवार') },
-    { value: 'doctor', label: t('Doctor', 'डॉक्टर') },
-  ] as const;
-  const current = roles.find(({ value }) => value === role)?.label ?? roles[0].label;
-
-  useEffect(() => {
-    if (!open) return;
-    const closeOutside = (event: PointerEvent) => { if (!root.current?.contains(event.target as Node)) setOpen(false); };
-    const closeOnEscape = (event: globalThis.KeyboardEvent) => {
-      if (event.key !== 'Escape') return;
-      setOpen(false);
-      trigger.current?.focus();
-    };
-    document.addEventListener('pointerdown', closeOutside);
-    document.addEventListener('keydown', closeOnEscape);
-    return () => {
-      document.removeEventListener('pointerdown', closeOutside);
-      document.removeEventListener('keydown', closeOnEscape);
-    };
-  }, [open]);
-
-  function focusOption(position: 'first' | 'last') {
-    window.requestAnimationFrame(() => {
-      const options = menu.current?.querySelectorAll<HTMLButtonElement>('[role="option"]');
-      options?.[position === 'first' ? 0 : options.length - 1]?.focus();
-    });
-  }
-
-  function openWithKeyboard(event: KeyboardEvent<HTMLButtonElement>) {
-    if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
-    event.preventDefault();
-    setOpen(true);
-    focusOption(event.key === 'ArrowDown' ? 'first' : 'last');
-  }
-
-  function moveWithinMenu(event: KeyboardEvent<HTMLDivElement>) {
-    if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
-    const options = Array.from(menu.current?.querySelectorAll<HTMLButtonElement>('[role="option"]') ?? []);
-    if (!options.length) return;
-    event.preventDefault();
-    const currentIndex = options.indexOf(document.activeElement as HTMLButtonElement);
-    const nextIndex = event.key === 'Home' ? 0 : event.key === 'End' ? options.length - 1
-      : event.key === 'ArrowDown' ? (currentIndex + 1 + options.length) % options.length
-        : (currentIndex - 1 + options.length) % options.length;
-    options[nextIndex].focus();
-  }
-
-  function choose(nextRole: CareRole) {
-    onRole(nextRole);
-    setOpen(false);
-    window.requestAnimationFrame(() => trigger.current?.focus());
-  }
-
-  return <div className={`simple-care-role-switcher${open ? ' is-open' : ''}`} ref={root}>
-    <button ref={trigger} type="button" className="simple-care-role-trigger" aria-label={t(`View as ${current}`, `${current} का पेज`)} aria-haspopup="listbox" aria-expanded={open} aria-controls={menuId} onClick={() => setOpen((value) => !value)} onKeyDown={openWithKeyboard}>
-      <span>{current}</span>
-      <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5.5 7.5 4.5 4.5 4.5-4.5" /></svg>
-    </button>
-    {open ? <div id={menuId} ref={menu} className="simple-care-role-menu" role="listbox" aria-label={t('View as', 'किसका पेज')} onKeyDown={moveWithinMenu}>
-      {roles.map(({ value, label }) => <button type="button" role="option" aria-selected={role === value} key={value} onClick={() => choose(value)}><span>{label}</span>{role === value ? <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m4.5 10 3.5 3.5 7.5-7.5" /></svg> : null}</button>)}
-    </div> : null}
-  </div>;
-}
 
 export function SimpleCareShell({ children, view, role, hindi, saveStatus, onNavigate, onRole, onLanguage, onSignOut }: {
   children: ReactNode; view: string; role: CareRole; hindi: boolean;
@@ -129,8 +55,6 @@ export function SimpleCareShell({ children, view, role, hindi, saveStatus, onNav
         <span className="simple-care-brand-copy"><span className="simple-care-brand-name">{t('Sahara', 'सहारा')}</span><span className="simple-care-brand-tagline">{t('- A Palliative Care Companion', '- पैलिएटिव केयर साथी')}</span></span>
       </CareRouteLink>
       <div className="simple-care-switches"><button type="button" onClick={onLanguage} lang={hindi ? 'en' : 'hi'}>{hindi ? 'English' : 'हिन्दी'}</button>
-        <CareRoleSwitcher role={role} hindi={hindi} onRole={onRole} />
-        <Link href="/feedback" style={{ color: '#b9472c', minHeight: 44, display: 'inline-flex', alignItems: 'center', paddingInline: 8, textUnderlineOffset: 4 }}>App feedback</Link>
         <button type="button" onClick={onSignOut}>{t('Sign out', 'साइन आउट')}</button>
       </div>
     </header>
