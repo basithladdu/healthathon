@@ -103,7 +103,7 @@ export function SurveyAdmin() {
     } catch (e) { if (live.current) { setMessage(e instanceof Error ? e.message : 'Could not load the survey submissions.'); setPhase(p => (p === 'ready' ? p : 'failed')); } }
     finally { if (live.current) setBusy(false); }
   }
-  useEffect(() => { live.current = true; void load(); return () => { live.current = false; }; }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { live.current = true; const start = setTimeout(() => void load(), 0); return () => { live.current = false; clearTimeout(start); }; }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const extraColumns = useMemo<Column[]>(() => {
     const keys = new Set<string>();
