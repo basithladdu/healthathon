@@ -1,5 +1,5 @@
 // Survey admin data, read on the server with one reviewer account so the admin page needs no sign-in.
-// Set SAHARA_ADMIN_EMAIL and SAHARA_ADMIN_PASSWORD in Vercel; that account needs the directory_reviewer role.
+// Password comes from ADMIN_PASSWORD in Vercel (account workwithdevit@gmail.com unless SAHARA_ADMIN_EMAIL is set); that account needs the directory_reviewer role.
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 const SUPABASE = 'https://cghlkqeqiokjqdionrkc.supabase.co';
@@ -10,14 +10,14 @@ const json = (body: unknown, status = 200) => Response.json(body, { status, head
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function call(path: string, body: unknown, token?: string): Promise<any> {
   const response = await fetch(SUPABASE + path, { method: 'POST', headers: { apikey: KEY, 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) }, body: JSON.stringify(body), cache: 'no-store', signal: AbortSignal.timeout(20000) });
-  const value = await response.json().catch(() => null) as { message?: string; error_description?: string } | null;
-  if (!response.ok) throw new Error(value?.message ?? value?.error_description ?? `Supabase returned ${response.status}.`);
+  const value = await response.json().catch(() => null) as { msg?: string; message?: string; error_description?: string } | null;
+  if (!response.ok) throw new Error(value?.msg ?? value?.message ?? value?.error_description ?? `Supabase returned ${response.status}.`);
   return value;
 }
 
 export async function GET() {
-  const email = process.env.SAHARA_ADMIN_EMAIL, password = process.env.SAHARA_ADMIN_PASSWORD;
-  if (!email || !password) return json({ error: 'Not set up yet: add SAHARA_ADMIN_EMAIL and SAHARA_ADMIN_PASSWORD in Vercel, then redeploy.' }, 503);
+  const email = process.env.SAHARA_ADMIN_EMAIL || 'workwithdevit@gmail.com', password = process.env.SAHARA_ADMIN_PASSWORD || process.env.ADMIN_PASSWORD;
+  if (!email || !password) return json({ error: 'Not set up yet: add ADMIN_PASSWORD in Vercel, then redeploy.' }, 503);
   try {
     const { access_token: token } = await call('/auth/v1/token?grant_type=password', { email, password });
     if (await call('/rest/v1/rpc/healthathon_staff_role', { p_role: 'directory_reviewer' }, token) !== true) return json({ error: `${email} does not have the directory_reviewer role yet.` }, 503);
