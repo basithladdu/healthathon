@@ -115,4 +115,38 @@ class CareDocumentQuestionTest {
         // A server deployed before this feature has no /ask path: show "AI is not set up yet".
         assertFalse(server(true, null).capabilities("t").askReady)
     }
+
+    private fun filler(index: Int) = DocumentQuestionSource("bill-$index", "Bill $index.pdf", listOf(DocumentPageText(1, listOf("Pharmacy bill $index", "Paracetamol 500 mg strip", "Total amount 2${index}0").joinToString("\n"))), reviewed = true)
+
+    @Test fun searchAllSendsOnlyTheMatchingLinesAndTheirNeighbours() {
+        val documents = (1..12).map(::filler) + listOf(discharge, lab)
+        val request = DocumentQuestionRules.retrieve("What was my haemoglobin?", documents)
+        // Only the lab report contributed, so it becomes D1; bills and the discharge summary stay on the phone.
+        assertEquals(listOf("report-2"), request.sources.values.map { it.reportId })
+        assertEquals(listOf(DocumentQuestionLine("D1", 1, 1, "Haemoglobin 9.8 g/dL"), DocumentQuestionLine("D1", 1, 2, "Repeat CBC after 2 weeks")), request.lines)
+        val payload = DocumentQuestionRules.payload(request).toString()
+        assertFalse(payload.contains("CBC.jpg")); assertFalse(payload.contains("Pharmacy"))
+    }
+
+    @Test fun searchAllRanksAcrossDocumentsAndKeepsOriginalLineNumbers() {
+        val request = DocumentQuestionRules.retrieve("When is the OPD review?", (1..5).map(::filler) + listOf(lab, discharge))
+        assertTrue(request.lines.contains(DocumentQuestionLine("D1", 2, 2, "Review in OPD on 12/11/2026")))
+        val answer = DocumentQuestionRules.parse(reply(request), request)
+        assertEquals("report-1", answer.citations.single().reportId)
+        assertEquals("Review in OPD on 12/11/2026", answer.citations.single().quote)
+    }
+
+    @Test fun searchAllFallsBackToTheStartOfEachDocumentWhenNoWordMatches() {
+        val request = DocumentQuestionRules.retrieve("मेरी अगली जाँच कब है?", listOf(discharge, lab))
+        assertEquals(setOf("D1", "D2"), request.lines.map { it.document }.toSet())
+        assertEquals(DocumentQuestionLine("D1", 1, 1, "DISCHARGE SUMMARY"), request.lines.first())
+    }
+
+    @Test fun searchAllStaysWithinItsBudgetAndSkipsUnreadDocuments() {
+        val empty = DocumentQuestionSource("blank", "Blank.jpg", listOf(DocumentPageText(1, "  ")), reviewed = false)
+        val request = DocumentQuestionRules.retrieve("bill total amount", (1..12).map(::filler) + empty, maxLines = 5)
+        assertTrue(request.lines.size <= 5)
+        assertFalse(request.sources.values.any { it.reportId == "blank" })
+        assertThrows(IllegalArgumentException::class.java) { DocumentQuestionRules.retrieve("anything", listOf(empty)) }
+    }
 }

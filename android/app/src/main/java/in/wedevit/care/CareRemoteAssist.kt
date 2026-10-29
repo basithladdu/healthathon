@@ -32,7 +32,7 @@ class CareAssistException(val code: String, message: String) : IOException(messa
  * Until the owner sets them, capabilities() reports not ready and the screens keep the word-matching flow.
  */
 internal const val CARE_ASSIST_PROVIDER = "openai-compatible"
-internal const val CARE_ASSIST_ENDPOINT = "https://kjnhtakqzboayqorrlue.supabase.co/functions/v1/sahara-care-assist"
+internal const val CARE_ASSIST_ENDPOINT = "https://sahara.wedevit.in/api/sahara-assist"
 
 internal val careAssistFieldKeys = listOf("priorities", "participants", "topics", "openQuestions", "followUp")
 internal val careAssistLanguageCodes = setOf("en-IN", "hi-IN", "kn-IN", "te-IN", "ta-IN", "ml-IN", "mr-IN", "bn-IN", "gu-IN", "pa-IN", "od-IN", "ur-IN")
@@ -62,7 +62,7 @@ class CareAssistHttpTransport(private val base: String = CARE_ASSIST_ENDPOINT) :
                 connection.setRequestProperty("Accept", "application/json")
                 connection.setRequestProperty("Cache-Control", "no-store")
                 connection.setRequestProperty("X-Sahara-Client", "android")
-                // The Supabase gateway only runs the function for a signed-in Sahara account.
+                // The Sahara server (sahara.wedevit.in) only answers for a signed-in, confirmed Sahara account.
                 connection.setRequestProperty("Authorization", "Bearer $accessToken")
                 if (body != null) {
                     val bytes = body.toByteArray(Charsets.UTF_8)

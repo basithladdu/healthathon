@@ -166,10 +166,10 @@ async function ask(payload: Json, reserveNow: () => Promise<void>) {
   if (!question || question.length > 300) fail(400, 'question_required', 'Type a question of up to 300 characters.');
   if (typeof payload.sourceHash !== 'string' || !/^[a-f0-9]{64}$/u.test(payload.sourceHash)) fail(400, 'source_required', 'Choose documents first.');
   const documents = payload.documents;
-  if (!Array.isArray(documents) || documents.length === 0 || documents.length > 5) fail(400, 'source_required', 'Choose up to five documents.');
+  if (!Array.isArray(documents) || documents.length === 0 || documents.length > 20) fail(400, 'source_required', 'Choose up to 20 documents.');
   let total = 0; const known = new Map<string, string>();
   const sent = (documents as unknown[]).map((item) => {
-    if (!isObject(item) || typeof item.ref !== 'string' || !/^D[1-5]$/u.test(item.ref) || !Array.isArray(item.lines) || item.lines.length === 0 || item.lines.length > 3000) fail(400, 'invalid_body', 'The documents could not be read.');
+    if (!isObject(item) || typeof item.ref !== 'string' || !/^D(?:[1-9]|1[0-9]|20)$/u.test(item.ref) || !Array.isArray(item.lines) || item.lines.length === 0 || item.lines.length > 3000) fail(400, 'invalid_body', 'The documents could not be read.');
     const ref = (item as { ref: string }).ref;
     const lines = ((item as { lines: unknown[] }).lines).map((line) => {
       if (!isObject(line) || !Number.isInteger(line.page) || !Number.isInteger(line.line) || typeof line.text !== 'string' || (line.text as string).length > 2000) fail(400, 'invalid_body', 'The documents could not be read.');

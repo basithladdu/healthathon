@@ -39,7 +39,8 @@ import kotlinx.coroutines.withContext
     var checked by remember { mutableStateOf(false) }
     var chosen by rememberSaveable(selected) { mutableStateOf(emptyList<String>()) }
     var question by rememberSaveable(selected) { mutableStateOf("") }
-    var consent by remember(chosen, question) { mutableStateOf(false) }
+    var searchAll by rememberSaveable(selected) { mutableStateOf(true) }
+    var consent by remember(chosen, question, searchAll) { mutableStateOf(false) }
     var answer by remember(selected) { mutableStateOf<DocumentAnswer?>(null) }
     var message by remember(selected) { mutableStateOf("") }
     var progress by remember { mutableStateOf("") }
@@ -56,19 +57,21 @@ import kotlinx.coroutines.withContext
     val service = capabilities?.takeIf { it.askReady }
 
     fun ask() {
-        val picked = reports.filter { it.id in chosen }; val asked = question
+        val picked = if (searchAll) reports.take(DocumentQuestionRules.MAX_SEARCH_DOCUMENTS) else reports.filter { it.id in chosen }; val asked = question
         job = scope.launch {
             message = ""; answer = null
             try {
-                val sources = picked.mapIndexed { index, report ->
+                val sources = picked.mapIndexedNotNull { index, report ->
+                    try {
                     progress = t("Reading ${report.name} on this phone (${index + 1} of ${picked.size})", "इस फ़ोन पर ${report.name} पढ़ रहे हैं (${picked.size} में से ${index + 1})")
                     val text = withContext(Dispatchers.IO) {
                         store.loadVerified(report, vm.reportFiles.file(report)) ?: CareDocumentReader(context).read(vm.reportFiles.file(report), report).also(store::save)
                     }
                     DocumentQuestionSource(report.id, report.name, text.pages, text.reviewedAt > 0)
+                    } catch (cancel: CancellationException) { throw cancel } catch (error: Exception) { if (searchAll) null else throw error }
                 }
                 progress = t("Asking ${service?.provider.orEmpty()}…", "${service?.provider.orEmpty()} से पूछ रहे हैं…")
-                val request = DocumentQuestionRules.build(asked, sources)
+                val request = if (searchAll) DocumentQuestionRules.retrieve(asked, sources) else DocumentQuestionRules.build(asked, sources)
                 answer = client.ask(request, requireNotNull(cloud).transcriptionToken(), consent)
             } catch (cancel: CancellationException) { message = t("Stopped. Nothing else was sent.", "रोक दिया। और कुछ नहीं भेजा गया।"); throw cancel }
             catch (error: Exception) { message = error.message ?: t("The question could not be answered. Your documents are unchanged.", "सवाल का जवाब नहीं मिल सका। आपके कागज़ वैसे ही हैं।") }
@@ -87,9 +90,10 @@ import kotlinx.coroutines.withContext
             Text(t("Sahara's server has no AI service yet (or can't be reached right now), so nothing is sent. You can still search the text of your reviewed reports in Documents.", "Sahara के सर्वर पर अभी कोई AI सेवा नहीं है (या अभी सर्वर से जुड़ नहीं पा रहे), इसलिए कुछ नहीं भेजा जाता। आप कागज़ात में जाँची गई रिपोर्टों की लिखाई में अब भी खोज सकते हैं।"), style = MaterialTheme.typography.bodySmall)
         } }
         else {
-            item { SectionTitle(t("Choose documents (up to ${DocumentQuestionRules.MAX_DOCUMENTS})", "कागज़ चुनें (${DocumentQuestionRules.MAX_DOCUMENTS} तक)")) }
+            item { CheckLine(searchAll, { searchAll = it; answer = null }, t("Search all my documents. The phone finds the lines that match your question and sends only those.", "मेरे सारे कागज़ों में खोजें। फ़ोन सवाल से मिलती पंक्तियाँ ढूँढता है और सिर्फ़ वही भेजता है।")) }
+            if (!searchAll) item { SectionTitle(t("Choose documents (up to ${DocumentQuestionRules.MAX_DOCUMENTS})", "कागज़ चुनें (${DocumentQuestionRules.MAX_DOCUMENTS} तक)")) }
             if (reports.isEmpty()) item { Text(t("Add a report first.", "पहले कोई रिपोर्ट जोड़ें।")) }
-            items(reports, key = { it.id }) { report ->
+            if (!searchAll) items(reports, key = { it.id }) { report ->
                 val on = report.id in chosen
                 Row(Modifier.fillMaxWidth().toggleable(on, enabled = job == null && (on || chosen.size < DocumentQuestionRules.MAX_DOCUMENTS), role = Role.Checkbox) { chosen = if (it) chosen + report.id else chosen - report.id; answer = null }
                     .padding(vertical = 4.dp).testTag("document-ask-pick-${report.id}"), verticalAlignment = Alignment.CenterVertically) {
@@ -101,9 +105,9 @@ import kotlinx.coroutines.withContext
                 }
             }
             item { OutlinedTextField(question, { question = it.take(DocumentQuestionRules.MAX_QUESTION); answer = null }, label = { Text(t("Your question", "आपका सवाल")) }, minLines = 2, enabled = job == null, modifier = Modifier.fillMaxWidth().testTag("document-ask-question")) }
-            item { CheckLine(consent, { consent = it }, t("I agree to sending my question and the text read from these ${chosen.size} documents off the phone to ${service.provider}. Photos and files are not sent. Nothing is sent until I tap Ask, and I will be asked again next time.", "मैं अपना सवाल और इन ${chosen.size} कागज़ों से पढ़ी गई लिखाई फ़ोन से ${service.provider} को भेजने पर राज़ी हूँ। फ़ोटो और फ़ाइलें नहीं भेजी जातीं। ‘पूछें’ दबाने तक कुछ नहीं भेजा जाता, और अगली बार फिर पूछा जाएगा।")) }
+            item { CheckLine(consent, { consent = it }, t("I agree to sending my question and ${if (searchAll) "the matching lines read from my documents" else "the text read from these ${chosen.size} documents"} off the phone to ${service.provider}. Photos and files are not sent. Nothing is sent until I tap Ask, and I will be asked again next time.", "मैं अपना सवाल और ${if (searchAll) "मेरे कागज़ों से पढ़ी गई मिलती पंक्तियाँ" else "इन ${chosen.size} कागज़ों से पढ़ी गई लिखाई"} फ़ोन से ${service.provider} को भेजने पर राज़ी हूँ। फ़ोटो और फ़ाइलें नहीं भेजी जातीं। ‘पूछें’ दबाने तक कुछ नहीं भेजा जाता, और अगली बार फिर पूछा जाएगा।")) }
             item { Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                Button(onClick = ::ask, enabled = consent && chosen.isNotEmpty() && question.isNotBlank() && job == null, modifier = Modifier.testTag("document-ask-send")) { Text(t("Ask", "पूछें")) }
+                Button(onClick = ::ask, enabled = consent && (if (searchAll) reports.isNotEmpty() else chosen.isNotEmpty()) && question.isNotBlank() && job == null, modifier = Modifier.testTag("document-ask-send")) { Text(t("Ask", "पूछें")) }
                 if (job != null) TextButton(onClick = { job?.cancel() }) { Text(t("Stop", "रोकें")) }
             } }
             if (progress.isNotBlank()) item { Text(progress, style = MaterialTheme.typography.bodySmall, modifier = Modifier.announce()) }

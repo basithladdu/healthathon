@@ -18,6 +18,10 @@ object DocumentQuestionRules {
     const val MAX_CHARACTERS = 24_000
     const val MAX_ANSWER = 600
     const val MAX_CITATIONS = 6
+    /** Search-all mode: how many documents are read, and how much retrieved text leaves the phone. */
+    const val MAX_SEARCH_DOCUMENTS = 20
+    const val MAX_RETRIEVED_LINES = 80
+    const val MAX_RETRIEVED_CHARACTERS = 8_000
 
     fun build(question: String, documents: List<DocumentQuestionSource>): DocumentQuestionRequest {
         val asked = question.trim()
@@ -33,6 +37,64 @@ object DocumentQuestionRules {
         val canonical = buildString { append(asked).append('\n'); lines.forEach { append(it.document).append('|').append(it.page).append('|').append(it.line).append('|').append(it.text).append('\n') } }
         return DocumentQuestionRequest(asked, careAssistSourceHash(canonical), sources, lines)
     }
+
+    /**
+     * Retrieval step (RAG) over all of the person's documents, entirely on this phone: every line is ranked with BM25
+     * against the question, the best lines and their neighbours are kept, and only those leave the phone.
+     * Line numbers stay those of the original page, so citations still point at the same line in the review screen.
+     * When nothing matches (for example a Hindi question about English reports) the start of each document is sent instead.
+     */
+    fun retrieve(question: String, documents: List<DocumentQuestionSource>, maxLines: Int = MAX_RETRIEVED_LINES, maxCharacters: Int = MAX_RETRIEVED_CHARACTERS): DocumentQuestionRequest {
+        val asked = question.trim()
+        require(asked.isNotEmpty() && asked.length <= MAX_QUESTION) { "Type a question of up to 300 characters. · 300 अक्षरों तक का सवाल लिखें।" }
+        val readable = documents.distinctBy { it.reportId }.filter { document -> document.pages.any { it.reviewedText.isNotBlank() } }
+        require(readable.isNotEmpty()) { "Your documents have no readable text yet. Open one with “Read and copy facts” first. · आपके कागज़ों में अभी पढ़ने लायक लिखाई नहीं है। पहले किसी को “पढ़ें और बातें कॉपी करें” से खोलें।" }
+        data class Candidate(val source: Int, val page: Int, val line: Int, val text: String, val order: Int)
+        val all = mutableListOf<Candidate>()
+        readable.forEachIndexed { index, document -> document.pages.sortedBy { it.page }.forEach { page ->
+            page.reviewedText.split('\n').forEachIndexed { number, text -> text.trim().takeIf { it.isNotEmpty() }?.let { all += Candidate(index, page.page, number + 1, it.take(2000), all.size) } }
+        } }
+        val docs = all.map { tokens(it.text) }
+        val average = docs.sumOf { it.size }.toDouble() / docs.size.coerceAtLeast(1)
+        val frequency = HashMap<String, Int>(); docs.forEach { words -> words.toSet().forEach { frequency[it] = (frequency[it] ?: 0) + 1 } }
+        val terms = tokens(asked).toSet()
+        val scores = docs.map { words ->
+            if (words.isEmpty()) 0.0 else terms.sumOf { term ->
+                val count = words.count { it == term }; if (count == 0) return@sumOf 0.0
+                val n = frequency[term] ?: 0
+                val idf = kotlin.math.ln(1 + (docs.size - n + 0.5) / (n + 0.5))
+                idf * count * 2.2 / (count + 1.2 * (0.25 + 0.75 * words.size / average.coerceAtLeast(1.0)))
+            }
+        }
+        val keep = LinkedHashSet<Int>()
+        val ranked = scores.indices.filter { scores[it] > 0.0 }.sortedByDescending { scores[it] }
+        var used = 0
+        fun take(index: Int): Boolean { if (index !in all.indices || index in keep) return true
+            val size = all[index].text.length; if (keep.size >= maxLines || used + size > maxCharacters) return false
+            keep += index; used += size; return true }
+        if (ranked.isNotEmpty()) {
+            // A hit and the line on each side, so a value printed under its label still comes along.
+            for (index in ranked) { if (!take(index)) break; val hit = all[index]
+                listOf(index - 1, index + 1).filter { it in all.indices && all[it].source == hit.source && all[it].page == hit.page }.forEach { take(it) } }
+        } else {
+            val starts = readable.indices.map { source -> all.filter { it.source == source }.map { it.order } }
+            var row = 0; var added = true
+            while (added) { added = false; for (lines in starts) if (row < lines.size && take(lines[row])) added = true; row++; if (keep.size >= maxLines) break }
+        }
+        val chosen = keep.map { all[it] }.sortedBy { it.order }
+        val usedSources = chosen.map { it.source }.distinct().take(MAX_SEARCH_DOCUMENTS)
+        val refs = usedSources.mapIndexed { index, source -> source to "D${index + 1}" }.toMap()
+        val sources = usedSources.associate { refs.getValue(it) to readable[it] }
+        val lines = chosen.filter { it.source in refs }.map { DocumentQuestionLine(refs.getValue(it.source), it.page, it.line, it.text) }
+        val canonical = buildString { append(asked).append('\n'); lines.forEach { append(it.document).append('|').append(it.page).append('|').append(it.line).append('|').append(it.text).append('\n') } }
+        return DocumentQuestionRequest(asked, careAssistSourceHash(canonical), sources, lines)
+    }
+
+    private val STOP = setOf("the", "a", "an", "of", "and", "or", "to", "in", "on", "for", "is", "are", "was", "my", "me", "i", "what", "when", "which", "how", "do", "does", "did", "it", "this", "that", "with", "at", "by", "be", "from", "as", "your", "you", "क्या", "है", "कब", "का", "की", "के", "में", "मेरा", "मेरी", "मेरे", "और", "को", "से")
+    /** Lower-case words and numbers in any script; very common words are dropped; English plurals are folded. */
+    internal fun tokens(text: String): List<String> = Regex("[\\p{L}\\p{M}\\p{N}]+").findAll(text.lowercase()).map { it.value }
+        .filter { it !in STOP && (it.length > 1 || it[0].isDigit()) }
+        .map { if (it.length > 3 && it.endsWith("s") && !it.endsWith("ss") && it.all { c -> c in 'a'..'z' }) it.dropLast(1) else it }.toList()
 
     /** [base] carries the request ID and consent flag, as for every other assist request. */
     fun payload(request: DocumentQuestionRequest, base: JSONObject = JSONObject()): JSONObject {

@@ -6,9 +6,30 @@ Agents cannot do these: server migrations, deployments, provider accounts and ke
 
 Collected on 27 Oct from every agent lane across Sahara, ITI, WDCW and AI-FIR. The web survey and Android feature work have separate handoffs; these are the remaining owner/team actions. Tick an item only after the external step is verified.
 
+### Sahara: do these now (29 Oct)
+**AI with Gemini (one key, on Vercel).** The Android app now calls `https://sahara.wedevit.in/api/sahara-assist` for note drafting, speech-to-text, translation and "Ask your documents". It replaces the Supabase function, so the Supabase function deploy below is no longer needed.
+- [ ] Google AI Studio (aistudio.google.com) → Get API key → create a key.
+- [ ] **Before real patient data:** turn on billing for that Google project (paid tier). On the free tier Google may use what is sent to improve its products and humans may review it; the paid tier does not. Also check the data region. For the demo with fake patients the free tier is fine.
+- [ ] Vercel → project `continuity-loop-healthathon` → Settings → Environment Variables → add `GEMINI_API_KEY` (Production) = the key. Then redeploy: run `vercel deploy --prod` in `prototype/`. Nothing else is needed: model defaults to `gemini-2.5-flash` (override with `SAHARA_AI_MODEL`).
+- [ ] Optional but better: apply migration `android/supabase/migrations/20261019151322_shared_care_clinician_review.sql` (holds `sahara_reserve_assist`, the durable 1-a-minute / 10-a-day limit per account). Until then the server uses a per-instance limit that is only a speed bump.
+- [ ] Optional: apply `20261028120000_assist_document_questions.sql` so the database limit also counts "ask".
+- [ ] Check on a phone after the key is in: sign in with a confirmed account → Docs → "Ask your documents" → "Search all my documents" on → ask "When is my next review?". The answer must show the cited lines.
+
+**Speech-to-text.** Gemini hears the recording directly (same key). The app also keeps on-device transcription (sherpa-onnx) for offline. Whisper is not free through OpenAI's API (paid per minute); it is free only if you run it yourself on a GPU server. For Indian languages Sarvam's Saarika/Saaras (paid; the website already has Sarvam code) or AI4Bharat IndicConformer (open source, self-hosted) are stronger than Whisper. Decide after trying Gemini on Hindi and Kannada.
+- [ ] Try one 20-second Hindi and one Kannada turn on a phone; if the transcript is poor, decide Sarvam (key into Vercel) or self-hosted.
+
+**Survey admin dashboard** (`https://sahara.wedevit.in/admin`, password `0`, owner's choice). The database only lets an account with the `directory_reviewer` role read submissions, so the page also asks for that account's email and password once per browser session.
+- [ ] Create or pick the team reviewer account (sign up on the website if needed), then in the website's Supabase project (`cghlkqeqiokjqdionrkc`) → SQL editor:
+  `insert into healthathon_private.staff_roles(user_id, role) select id, 'directory_reviewer' from auth.users where email = 'REVIEWER_EMAIL';`
+- [ ] Note: password `0` is effectively public. Respondents were told their name, registration and email are not for public display; the reviewer sign-in is what actually protects them. Do not share the reviewer password.
+
+**Phone and Play**
+- [ ] Plug the Samsung back in and unlock it; the waiting command installs and opens Sahara 0.6.2 (9) development build. If that command has ended, run from `android/`: `adb install -r app/build/outputs/apk/debug/app-debug.apk`.
+- [ ] Release bundle: close other apps (R8 needs about 4 GB free) and run `gradlew.bat --no-daemon bundleRelease` from `android/`. Upload to Play only after the current review finishes.
+
 ### Sahara (healthathon)
 - [ ] Apply the Supabase migrations the lanes add (emergency QR link, account delete, feedback, sync), then re-test.
-- [ ] Redeploy the website with the app-link file, so invite links open the app. 28 Oct: main (`2425f6d`+) built and passed 320 web tests; a **preview** deployment is ready at https://continuity-loop-healthathon-cgkt6n88o.vercel.app (its `/join` responds; production still 404s). The production deploy was not run from the agent. To publish it, run `vercel deploy --prod` from `prototype/`, or promote that preview in Vercel. The live `assetlinks.json` already has the same placeholder, so this deploy does not make app links worse. Add the Play App Signing SHA-256 afterwards and redeploy again.
+- [ ] Add the Play App Signing SHA-256 to `prototype/public/.well-known/assetlinks.json` and redeploy, so invite links open the app. 29 Oct: the website itself is deployed to production and `/join` is live (200).
 - [ ] Supabase settings: email sign-up confirmation, leaked-password protection, lock `rls_auto_enable()`.
 - [ ] Approve doctor accounts: now done in the app (see "Sahara owner keys and steps (no-mock round, 28 Oct)" below).
 - [ ] AI note drafting: put the AI key on the server (see "Sahara owner keys and steps (no-mock round, 28 Oct)" below). Until then the app keeps word matching and says AI is not set up.
@@ -23,7 +44,7 @@ Collected on 27 Oct from every agent lane across Sahara, ITI, WDCW and AI-FIR. T
 - [x] Working drafts filled in the 27 Oct two-page and 12-slide organiser templates on 28 Oct; see `submission/phase-2/final-deliverables-2026-10-28/`.
 - [ ] Approve the draft's team/doctor descriptions, Shirin's role, CARE scope, candidate measures, costs and pilot wording; confirm team code.
 - [ ] Ask organiser for the confirmed submission deadline, portal, video duration and evaluator-access method; the 27 Oct email does not specify them.
-- [ ] Prepare evaluator access privately and verify the actual join/install path; current public `/join` route returns 404 until the 28 Oct preview is promoted, and the app-link signing fingerprint is still a placeholder.
+- [ ] Prepare evaluator access privately and verify the actual join/install path; `/join` is live since 29 Oct; the app-link signing fingerprint is still a placeholder.
 - [ ] Record and review the narrated real-phone walkthrough with Awaiz and an approved doctor account; do not use screenshots or a silent capture as the video deliverable.
 
 ### Sahara team meeting 28 Oct: people-only items
