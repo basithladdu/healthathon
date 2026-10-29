@@ -1,0 +1,261 @@
+
+Sahaara – Clinical Specification
+Clinical companion to the tech spec. It states the clinical content, logic and safeguards the build must encode, cross-referenced to tech-spec rule IDs (L1–L10 legal, V1–V9 validation) and to Sahaara v1.0 section numbers. A bare § means Sahaara; "this doc §" means a section here. Items marked [Sign-off] need the medical lead's decision before build freeze.
+1. Scope, population and setting
+Eligible patients (Sahaara §2.1): adults with advanced, life-limiting illness where the surprise question ("Would I be surprised if this patient died in the next 12 months?") is answered no, plus at least one of:
+No remaining disease-modifying options, or options declined.
+Progressive decline: poor performance status, largely bed-bound, minimal oral intake, withdrawn.
+Repeated unplanned admissions for the same problem.
+Patient or family has asked about end of life or avoiding hospital.
+When to complete (Appendix D.2): OPD visit when disease-modifying options end; discharge after an unplanned admission; ICU step-down; enrolment in home palliative care. Not for the first time in the resuscitation bay — that records panic, not preference. The app should not offer "new ECTPR" from an ED encounter without a warning.
+Who completes: a clinician who has completed observed training (Appendix D.1); the treating consultant signs (V7). Palliative clinician and nurse co-sign where involved. [Sign-off] Can a palliative-care consultant who is not the primary oncologist sign as "treating consultant"?
+Out of scope: paediatrics (<18 y), mental-health advance directives (Mental Healthcare Act 2017), and any act intended to end life.
+2. Healthathon form vs full Sahaara — what the MVP must add
+The Healthathon form is a subset of Sahaara v1.0. The rows below are the omissions that change emergency behaviour or safety; I recommend they enter the MVP. Everything else can wait.
+Sahaara §
+Content
+In Healthathon form
+Recommendation
+§1 box
+"If in doubt, resuscitate" conditions
+No
+MVP — hard-coded on every ED view and print (tech §6)
+§3
+Allergies, implanted devices (ICD/pacemaker), key medicines
+No
+MVP — ED needs allergies; ICD shocks in a dying patient need a deactivation plan
+§4.3
+Surrogate's substituted-judgement declaration
+No
+MVP (V5)
+§5.1
+Prognostic understanding confirmed
+No
+MVP gate (V4)
+§7 + 7.1
+Numbers to call before an ambulance; what the crew should do
+No
+MVP — crews resuscitate by default unless instructed
+§8
+DNACPR decided by (name, reg. no., date/time)
+Reason + discussed-with only
+MVP — add decision-maker fields
+§9.1
+Ceiling conditions: reversible-cause exception, NIV hours, SpO₂ floor
+Ceiling table only
+MVP — the reversible-cause exception alters ED interpretation
+§10.1
+Time-limited trial: duration, review date/time, reviewers
+Hours/days blanks only
+MVP minimum; markers (§10.2–10.4) later
+§12.2
+Hydration (oral sips / limited / full)
+No
+MVP — common ward and ED decision
+§16
+Care that always continues
+No
+MVP — printed, not editable (V9)
+§18.4
+Mandatory review triggers
+No
+MVP — drives review-due date
+§5.2, 6.3, 9.2, 10.2–10.5, 11 (rest), 12.1 TPN, 13, 14, 15, 17
+Prognostic basis, psychosocial, tracheostomy/re-intubation, TLT markers, ECMO/lines, TPN, blood, surgery, medicines, place of death
+No
+Phase 2
+[Sign-off] Confirm this MVP list.
+3. Clinical definition of each decision field
+These definitions fix what each stored value means clinically; the app prints them as written. Field names match tech spec §5.
+Field
+Values
+Clinical meaning and interpretation
+goal_of_care
+A Prioritise life · B Balanced / ceiling of care · C Prioritise comfort
+A: all medically effective treatment incl. ICU and ventilation. B: treat reversible problems within the ceilings recorded, as time-limited trials. C: symptom control is the goal; transfer only if comfort cannot be achieved where the patient is.
+hospital_transfer
+Yes, any significant deterioration · Only for listed reasons · No
+Listed reasons (§7): uncontrolled pain; uncontrolled breathlessness; significant bleeding; seizures; fall with suspected fracture; blocked/displaced catheter, tube or stent; suspected infection needing IV treatment; acute confusion/agitation not settling; caregiver unable to cope (respite). "No" = care where they are; call the listed numbers before an ambulance.
+Cpr
+Attempt · DNACPR
+Applies only to cardiopulmonary arrest. Says nothing about any other treatment. DNACPR reason: clinical futility / patient refusal / burden outweighs benefit; record who it was discussed with.
+resp_ceiling
+Level 0–5
+0 comfort measures only (opioid, anxiolytic, fan, positioning, suction; O₂ only if it relieves); 1 nasal prongs/simple mask (record max L/min); 2 non-rebreather/venturi; 3 HFNC; 4 NIV (CPAP/BiPAP); 5 intubation + invasive ventilation. The ticked level is the highest acceptable; all lower levels remain available; nothing above it starts without a fresh discussion with the surrogate and treating consultant.
+Icu
+Yes · Time-limited trial (days) · No
+"No" = ward-level or comfort care only. A trial needs duration, formal review date/time and named reviewers (§10.1).
+Vasopressors / inotropes
+No · Trial ≤ n h · Yes, no limit · Yes, max n agents
+—
+Dialysis / CRRT
+No · Trial of n sessions/days · Yes · Only if renal failure judged reversible
+—
+Feeding
+Comfort oral feeding · NG: no / ≤ n days then review / yes · PEG: no / only after palliative-care discussion / yes
+Clinically assisted nutrition is medical treatment (Harish Rana, 2026). Declining to start a tube is withholding; removing an existing tube is withdrawal and follows the board pathway (this doc §7). Mouth care and hand feeding always continue.
+Hydration
+Oral sips only · Limited · Full maintenance
+Limited = ≤ 500–1000 mL normal saline/24 h, IV or SC, matched to urine output, reviewed daily (NCG). Reduce or stop if oedema, wet secretions, distension or worsening breathlessness.
+Unanswered field = no preference recorded = standard care (V1). This must never be read as refusal.
+4. Clinical rationale for the code rules
+Rules already in the tech spec
+ID
+Rule
+Clinical rationale (source)
+V1
+Blank = no preference = standard care
+An incomplete section creates no presumption of refusal (POLST; Saanthvana §1)
+V2
+Goal C, or ceiling below 5, with "attempt CPR" → reason required
+CPR cannot be delivered without invasive escalation; DNACPR is the indicated recommendation (Saanthvana §8 consistency check, after POLST)
+V3
+Goal A with ceiling below 5 or ICU = No → confirm
+Internally inconsistent plan; usually a recording error
+V4
+Treatment fields locked until prognostic understanding recorded
+A choice made without prognostic awareness is not informed (Saanthvana §5)
+V5
+Surrogate declaration before surrogate entries
+Guards against surrogates substituting their own preference (Appendix D.4)
+V6
+Two witnesses for thumb impression / limited literacy
+Saanthvana §19.3
+V7
+Active only after treating consultant signs
+"An unsigned form is a conversation note, not a plan" (§19)
+V8
+Version, form version and print date on every page
+Two versions in circulation is the commonest route to a serious incident (Appendix E note)
+V9
+§16 always-provided care printed on every record
+Prevents the record becoming shorthand for "DNR = no care" (Appendix D.4)
+Proposed additional rules — derived from the same logic, not in the tech spec yet [Sign-off]
+ID
+Condition
+Action
+C1
+Transfer = No, but ICU = Yes/trial, or ceiling ≥ 3
+Conflict warning: HFNC, NIV and ICU usually need admission (home NIV is a valid exception — allow with reason)
+C2
+Goal C with ICU, vasopressors or dialysis = Yes
+Conflict warning; save only with a recorded reason
+C3
+Ceiling 5 or vasopressors = Yes, but ICU = No
+Conflict warning: invasive ventilation and pressors need ICU/HDU
+C4
+Any trial selected (ICU, NIV, vasopressors, dialysis)
+Block save until duration, review date/time and reviewers are entered (§10.1)
+C5
+ICD present and (DNACPR or Goal C)
+Prompt: deactivation decision and date (§11)
+C6
+Existing feeding tube marked "remove"
+Flag as withdrawal → board pathway (this doc §7); not actionable from the ECTPR alone
+C7
+Capacity = fluctuates
+Reassessment date required; ED view shows "capacity fluctuates — reassess"
+C8
+Family asked patient not be told, and patient has capacity
+Require the documented plan for direct questions (§5.3 note)
+5. Capacity, disclosure and surrogate decision-making
+Capacity (Saanthvana §4.1) is decision-specific and assessed at the time, not taken from old notes. Record the basis against the four abilities: understand, retain, weigh, communicate. A patient with capacity can change or cancel any part of the record verbally at any time, and their current wish overrides the document (§18.1). Fluctuating capacity requires re-assessment before acting on any section (C7).
+Disclosure (§5.3): withholding prognosis at family request is common in Indian practice and is not itself a reason to refuse completing the record. A patient with capacity who asks directly must be answered honestly; the handling plan is recorded (C8).
+Who decides when the patient cannot — tech spec authority_basis:
+Basis
+Clinical/legal standing
+Named in an executed AMD
+Recognised by the 2023 Supreme Court order; their consent is the one the medical boards take
+Named by the patient, no AMD
+Strong evidence of the patient's wish; not a legal nomination
+Next of kin / next friend / guardian
+The 2023 order's route where no AMD exists
+Court-appointed guardian
+Authority from the court order
+"Family consensus" is recorded as a note, not as a basis of authority. The order sets no ranking among relatives; disagreement follows §18.2 — one family meeting with surrogate, dissenters, consultant and palliative care; return to what the patient would have wanted; if unresolved, the institutional ethics committee, with current treatment continued meanwhile.
+Surrogate standard: substituted judgement first (what the patient would have chosen); best interests with the team where that is unknown (§4.3 declaration).
+Non-beneficial treatment (§18.3): the team is not obliged to provide it; explain why, offer a second opinion and transfer, and document.
+Financial coercion: in self-pay families a limit may reflect money, not values. Ask directly and offer social-work and scheme-eligibility review before finalising (Appendix D.4). The Supreme Court in Harish Rana flagged the same risk.
+6. Emergency use — ED and ambulance
+ED Quick View content, in this order: hospital transfer · CPR · respiratory ceiling · ICU · goal of care · allergies · implanted device · named decision-maker (24 h phone) · treating consultant and palliative contact · capacity flag · AMD status · version, signed date, review-due date.
+"If in doubt, resuscitate" (Sahaara §1) — full standard emergency care when:
+the record is unsigned, out of date or cannot be found;
+the deterioration is new, reversible and unrelated to the underlying illness — injury, choking, drug reaction, hypoglycaemia;
+the patient has capacity and says something different now;
+the record is ambiguous.
+Clarify with the treating team afterwards.
+Clarification for the tech team: the tech spec shows an out-of-date record with an "OUT OF DATE" banner. Clinically, condition 1 means an out-of-date record is information, not instruction: the banner must say standard care applies. [Sign-off] Show the content beneath that banner, or hide it?
+Ambulance crews (§7, §7.1) resuscitate by default; the record has effect only if a signed copy is physically handed over. Options recorded: full pre-hospital resuscitation and transport · transport with symptom relief only (O₂ for breathlessness, analgesia, positioning; no CPR, no intubation) · transport home for last days with nurse escort. The wallet card (Appendix E) carries: patient, UHID, diagnosis, CPR, ceiling, transfer, number to call first, surrogate, where the full record is held, signing doctor and date, and the line "if unclear or the problem is new and reversible — treat fully and call".
+Recognising the dying phase (Appendix B) triggers urgent review of the record: falling BP, cold mottled peripheries, jaw breathing, Cheyne–Stokes respiration, reduced urine output. Where signs are ambiguous, take a second opinion — a wrongly declared dying phase is self-fulfilling.
+Mandatory review triggers (§18.4), which reset review_due: any new admission · transfer between settings · significant change in condition either way · request by patient or family · start of a new line of treatment · routine interval [Sign-off: weeks].
+7. Withholding vs withdrawing — the board pathway (tech L8)
+Most of the ECTPR is about withholding (not starting) treatment, which the plan itself directs. Withdrawing treatment already running — ventilation, pressors, dialysis, or an existing feeding tube (C6) — follows the Supreme Court procedure below. The app records the wish and may display this pathway; it never triggers withdrawal.
+
+withdrawal of life-sustaining treatment · SC 2018 as modified 2023
+The same boards apply without an AMD; consent then comes from next of kin, next friend or guardian. In Harish Rana (11 Mar 2026) the Court applied this process, held that clinically assisted nutrition is medical treatment, required withdrawal to be a planned palliative process rather than abandonment, and directed that JMFCs receive hospital intimations and that district CMOs keep panels for Secondary Boards. Tell families plainly: agreeing now not to start a ventilator is a smaller step than stopping one later (Sahaara Appendix C.1).
+8. Clinical risks, safeguards and audit data
+Known risks of this design (Sahaara Appendix D.4) and the safeguard the app provides
+Risk
+Safeguard in the app
+Ceiling creep — limits recorded without reasons
+V4 gate; audit flag when §5/§6 are blank but treatment fields are filled
+Financial coercion
+New field: "financial concern discussed / social-work or scheme referral made" [Sign-off]
+Surrogate substitutes own preference
+V5 declaration
+Record read as "DNR = no care"
+V9; ED view lists what always continues
+Applied to a new reversible illness
+"If in doubt" condition 2 on every view and print
+Record outlives its accuracy
+Review triggers reset review_due; out-of-date = standard care (this doc §6)
+Two versions in circulation
+V8; one active version; superseded QR tokens revoked
+Dying phase wrongly declared
+Second-opinion prompt when the dying phase is recorded
+Audit data the app must capture for the pilot (Appendix D.3). Several indicators cannot be computed from the tech spec's current entities; the tech team needs an Episode log, an Outcome record and an Incident report.
+Indicator
+Data needed
+Source in app
+Reach
+Eligibility date; signed date
+ECTPR (add eligibility date)
+Retrieval within 10 min of ED arrival
+ED arrival time; first record access time
+Episode log + access log
+Concordance with recorded ceiling
+Highest support delivered; CPR given; reason if discordant
+Episode log
+Values section completed
+§5/§6 filled vs treatment fields filled
+Computed
+Time-limited trials
+Review held on agreed date; markers present; wish followed
+ECTPR + Episode log
+Outcomes
+Place of death vs preference; ICU and ventilator days in last 30 days; admission to first symptom-control prescription; out-of-pocket spend, last admission
+Outcome record
+Safety
+Applied to reversible illness; family felt pushed
+Incident report
+Bereaved-family interviews (6–8 weeks) and clinician surveys sit outside the app.
+9. Clinical sign-off before build freeze
+☐ Palliative-care consultant may sign as treating consultant (this doc §1)
+☐ MVP additions from full Sahaara (this doc §2)
+☐ Proposed consistency rules C1–C8 (this doc §4)
+☐ Out-of-date record: show content under the "standard care applies" banner, or hide it (this doc §6)
+☐ Routine review interval, in weeks (this doc §6)
+☐ Default time-limited-trial prompt: Sahaara suggests about 3 days, usual range 3–7 (§10)
+☐ Financial-concern field (this doc §8)
+☐ Episode log, outcome record and incident report included for the pilot (this doc §8)
+☐ Pilot languages and back-translation by a clinician (Appendix D.1 names Telugu, Hindi, Urdu)
+☐ Observed-practice training before a clinician can create records (Appendix D.1)
+☐ Institutional Ethics Committee approval and hospital legal review before any real patient data
+☐ Andhra Pradesh custodian status for living wills (tech L4)
+Sources
+Saanthvana v1.0 (ECTPR), including Appendix C (legal position) and Appendix F (NCG End-of-Life Care algorithm; ISCCM–IAPC position statements, Indian J Crit Care Med 2024;28(3):200–250; MoHFW/DGHS draft withdrawal guidelines 2024; POLST; ReSPECT v3; ATS time-limited-trial workshop report 2024)
+Healthathon form; Vidhi Centre / ACP India model AMD
+Supreme Court order of 24 Jan 2023, paragraph-by-paragraph changes (SCC Times)
+Harish Rana v. Union of India, 11 Mar 2026 (Drishti IAS summary)
+Companion: Saanthvana – Tech Spec for the Healthathon Build
+

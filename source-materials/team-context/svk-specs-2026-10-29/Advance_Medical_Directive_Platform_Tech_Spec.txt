@@ -1,0 +1,83 @@
+Saanthvana – Tech Spec for the Healthathon Build
+Oct 29, 2026 · @S
+Build one mobile-first app with two linked records — a clinical emergency plan (ECTPR) and a legal living will (AMD) — and get the plan in front of an emergency doctor in 20 seconds.
+1. What we are building
+Ambulances and EDs resuscitate by default, so a wish counts only if the record is found and trusted at 2 a.m.; retrieval is the core feature.
+ECTPR (Saanthvana v1.0; the Healthathon form is its MVP subset): clinical plan for CPR, breathing ceiling, transfer, ICU, organ support and feeding. Not an AMD; valid once the treating clinician signs.
+AMD / living will (Vidhi–ACP India template): the patient's own refusal of life-prolonging treatment plus named representatives (DHRs). Valid only as signed paper attested by a notary or gazetted officer; if both exist, the AMD governs.
+The app never decides to withhold or withdraw treatment, never validates an AMD by e-signature, and never offers active euthanasia (illegal).
+2. Legal rules the code must enforce
+From Common Cause (2018) as modified on 24 Jan 2023, applied in Harish Rana (11 Mar 2026). Rule → code:
+L1 Adult of sound mind → block DOB under 18; capacity declaration.
+L2 Names guardian(s) or close relative(s) → ≥ 1 DHR required, warn below 2; store preference order.
+L3 Signed before two (preferably independent) witnesses, attested by a notary or gazetted officer → app only generates the PDF; Executed only once the signed scan, witnesses and attestor are recorded; warn if a witness is a DHR.
+L4 Copies to DHRs, family physician and local-body custodian; may join digital health records → per-recipient checklist, optional ABHA link.
+L5 Doctor verifies via digital records or custodian → view scan, SHA-256 hash, custodian acknowledgement.
+L6 Revoke or change anytime in writing, same procedure → edits are new versions needing re-execution; latest executed version is current.
+L7 Ambiguous or unanticipated situation → not applied; show the caveat, never auto-apply.
+L8 Stopping running treatment needs Primary + Secondary Medical Boards (each preferably within 48 h) and JMFC intimation → no "withdraw" action in the app.
+L9 Tube feeding is medical treatment (Harish Rana) → a treatment choice; comfort feeding by mouth always continues.
+L10 DPDP Act 2023 + Rules 2025 (duties from May 2027) → Section 7.
+Decided: allow "custodian pending" (few states have appointed custodians). The Healthathon "basis for authority" becomes NAMED_IN_AMD · NAMED_BY_PATIENT · NEXT_OF_KIN · COURT_APPOINTED; "family consensus" is a note, not a legal basis. Store ID type + last 4 digits, never a full Aadhaar. Mental Healthcare Act directives are out of scope.
+3. Users and roles
+Patients and surrogates/DHRs (mobile OTP) create, sign or revoke their own records and request reviews. Treating clinicians (hospital login + registration no.) create, sign and review ECTPRs. ED staff and ambulance crews read the ED Quick View by QR; the full record needs break-glass. Custodians (officer login) acknowledge AMDs; admins (2FA) manage form versions, translations and the audit log. A signed ECTPR is never edited; a review creates a new version.
+4. Core flows
+ECTPR: patient → decision-makers → capacity and existing AMD → understanding gate (V4) → values → treatment choices → review date → signatures → ED Quick View generated.
+AMD: guided Vidhi-template questions → preview → PDF with blank signature, witness and notary blocks → upload signed scan → log copies.
+Emergency: QR → ED Quick View (wallet-card data plus validity and version); full record by break-glass.
+Review or cancel: any trigger (admission, transfer, condition change, request, interval) opens a prefilled draft; a signed cancellation revokes card tokens.
+5. Data model and validation
+Entities: Patient, Person, Clinician, ECTPR and AMD (versioned), Signature, Distribution, ReviewLog, AccessLog (append-only), CardToken. Store choices as enums, not translated text, so one record prints in any language.
+ECTPR field
+Values / rule
+Patient
+Name, DOB, sex, address, phone, UHID, language_pref (22 scheduled languages + English + other)
+Care team
+Oncologist, palliative physician (24 h phone), extra team[], local doctor
+Decision-makers
+Primary + alternate: name, relation, 24 h phone, ID type + last 4, authority_basis; family_to_inform[]
+Clinical
+Diagnosis, stage, ECOG 0–4
+capacity
+HAS · HAS_DELEGATED · FLUCTUATES · LACKS (last two need assessor, date, basis)
+existing_directive
+VALID_AMD (date, location, attestor) · PRIOR_WISHES · NONE
+Values
+patient_knows, own words (verbatim), unacceptable_outcomes[]
+goal_of_care / cpr
+A_LIFE · B_CEILING · C_COMFORT / ATTEMPT · DNACPR (reason); both nullable
+hospital_transfer / icu
+ANY · ONLY_FOR[reasons] · NO / YES · TRIAL(days) · NO; both nullable
+resp_ceiling
+0 comfort … 5 intubation, nullable; highest acceptable level
+Organ support, feeding, review_due
+Per form options; trials need a duration > 0; review date required
+Validation rules:
+V1 null = "No preference recorded", never refusal; nothing pre-selected.
+V2 Goal C, or a set ceiling below 5, with CPR = ATTEMPT → reason required.
+V3 Goal A with ceiling below 5 or ICU = NO → conflict warning to confirm.
+V4 Treatment sections locked until "illness explained as incurable; family can repeat it back" is ticked (Saanthvana 5.1; add to the Healthathon form).
+V5 Surrogate answering → substituted-judgement declaration confirmed first.
+V6 Thumb impression or limited literacy → two witnesses.
+V7 Active only with the consultant's signature + registration no.; one Active version per patient.
+V8 Every PDF page: name, UHID, version, form version, print date, page x of y.
+V9 Saanthvana Section 16 ("always provided" care) prints on every ECTPR.
+6. Record lifecycle and the ED view
+
+record lifecycles · ECTPR and AMD
+Nothing reaches the ED screen until a clinician signs (ECTPR) or a signed, attested scan is uploaded (AMD). The ED Quick View always shows the "IF IN DOUBT, RESUSCITATE" box (record unsigned, out of date or missing; problem new and reversible; patient now disagrees; or record ambiguous → standard care). It leads with transfer, CPR, breathing ceiling and ICU, shows unticked items as "No preference recorded", and shows AMD status with the L7 caveat, version and review-due date.
+7. Security, privacy and performance
+Data and consent: synthetic patients only for the hackathon. DPDP notice in the user's language; separate consent per copy recipient; handle access, correction and withdrawal requests.
+Access: role-based; break-glass logged with a reason and SMS to the primary decision-maker; append-only audit of every view, edit, print and share.
+Protection: TLS 1.2+, AES-256 at rest, Indian cloud region; SHA-256 on every PDF; random ≥ 128-bit revocable QR tokens with no personal data in the URL.
+Reach: ED view < 2 s on 3G, one printed page, works offline; Class 8 reading level, read-aloud audio, thumb path; Telugu, Hindi, Urdu (right-to-left) and English first. Stretch: FHIR R4 export (Consent scope adr) and ABHA link.
+8. Hackathon scope and acceptance
+Must: ECTPR wizard with V1–V9 · ED Quick View · ECTPR PDF + QR wallet card · AMD form → Vidhi-format PDF · status lifecycles · English + Telugu · audit log. Should: scan upload with hash, copy checklist, review SMS, break-glass. Won't: e-signed AMDs, automated withdraw decisions, AI treatment advice.
+☐ All boxes unticked → "No preference recorded" everywhere; ED view says standard care.
+☐ Goal C + Attempt CPR cannot save without a reason.
+☐ Unsigned ECTPRs never reach the ED view; past review dates show OUT OF DATE.
+☐ DOB under 18 blocks an AMD; an AMD stays Generated until scan, witnesses and attestor are recorded.
+☐ Revoked QRs show "card withdrawn"; English and Telugu PDFs of one record match.
+Open questions: Has Andhra Pradesh named living-will custodians? Will the hospital accept in-app clinician signatures? What default review interval?
+Sources: SC order of 24 Jan 2023 (SCC Times) · Harish Rana, 11 Mar 2026 (Drishti IAS) · DPDP commencement (AZB & Partners) · State implementation (South First) · your files: Saanthvana v1.0, Healthathon form, Vidhi / ACP India model AMD.
+
