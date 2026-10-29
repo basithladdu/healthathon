@@ -15,4 +15,4 @@ Not built yet (spec "Must"):
 
 Differs from the spec:
 - Our QR carries the plan text so it works offline. The spec wants a random, revocable token with no personal data. Decide: token + cached offline copy.
-- The doc uses both "Sahaara" and "Saanthvana" for the same form.
+- The app is called **Sahara**. "Saanthvana" (our old name) and "Sahaara" in these docs both mean Sahara; the files are left as SVK sent them.
