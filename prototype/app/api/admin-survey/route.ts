@@ -17,7 +17,7 @@ export async function POST(request: Request) {
   try {
     const rows: Record<string, unknown>[] = [];
     for (let from = 0; from < 100000; from += 1000) {
-      const response = await fetch(`${SUPABASE}/rest/v1/sahara_hospital_submissions?select=${SELECT}&order=created_at.desc`, { headers: { apikey: key, Authorization: `Bearer ${key}`, Range: `${from}-${from + 999}` }, cache: 'no-store', signal: AbortSignal.timeout(20000) });
+      const response = await fetch(`${SUPABASE}/rest/v1/sahara_hospital_submissions?select=${SELECT}&order=created_at.desc`, { headers: { apikey: key, ...(key.startsWith("sb_") ? {} : { Authorization: `Bearer ${key}` }), Range: `${from}-${from + 999}` }, cache: 'no-store', signal: AbortSignal.timeout(20000) });
       const page = await response.json().catch(() => null) as Raw[] | { message?: string } | null;
       if (!response.ok || !Array.isArray(page)) throw new Error((page as { message?: string } | null)?.message ?? `Supabase returned ${response.status}.`);
       page.forEach(r => { const c = (Array.isArray(r.c) ? r.c[0] : r.c) ?? {}; rows.push({ id: r.id, facility: r.facility ?? {}, created_at: r.created_at, ...c, revision: 0, decision: 'pending_review' }); });
