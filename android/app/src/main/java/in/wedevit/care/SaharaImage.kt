@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import kotlin.math.max
 
@@ -24,7 +25,8 @@ import kotlin.math.max
     val resources = LocalContext.current.resources
     val pixels = with(LocalDensity.current) { largest.roundToPx() }.coerceAtLeast(1)
     val bitmap = remember(id, pixels) { SaharaImageCache.load(resources, id, pixels) }
-    return remember(bitmap) { BitmapPainter(bitmap) }
+    // A vector drawable (such as symptom_tracker_illustration.xml) is not a bitmap, so it is drawn as before.
+    return if (bitmap == null) painterResource(id) else remember(bitmap) { BitmapPainter(bitmap) }
 }
 
 private object SaharaImageCache {
@@ -32,15 +34,16 @@ private object SaharaImageCache {
         override fun sizeOf(key: String, value: ImageBitmap) = value.width * value.height * 4
     }
 
-    fun load(resources: Resources, id: Int, pixels: Int): ImageBitmap {
+    fun load(resources: Resources, id: Int, pixels: Int): ImageBitmap? {
         val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true; inScaled = false }
         BitmapFactory.decodeResource(resources, id, bounds)
+        if (bounds.outWidth <= 0 || bounds.outHeight <= 0) return null
         var sample = 1
         // Never go below the drawn size, so the picture looks exactly as before.
         while (max(bounds.outWidth, bounds.outHeight) / (sample * 2) >= pixels) sample *= 2
         val key = "$id/$sample"
         cache.get(key)?.let { return it }
         val options = BitmapFactory.Options().apply { inSampleSize = sample; inScaled = false }
-        return BitmapFactory.decodeResource(resources, id, options).asImageBitmap().also { cache.put(key, it) }
+        return BitmapFactory.decodeResource(resources, id, options)?.asImageBitmap()?.also { cache.put(key, it) }
     }
 }
