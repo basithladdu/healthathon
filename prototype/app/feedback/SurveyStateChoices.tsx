@@ -20,7 +20,7 @@ export default function SurveyStateChoices({ name, label, value, onChange, error
   const matches = INDIA_STATES.filter(state => words.every(word => state.toLocaleLowerCase().includes(word)));
 
   return <fieldset id={id} tabIndex={-1} className={styles.group} aria-invalid={error ? true : undefined} aria-describedby={`${id}-selected${error ? ` ${id}-error` : ''}`}>
-    <legend>{label} (optional)</legend>
+    <legend>{label}</legend>
     <label htmlFor={`${id}-search`} className={styles.searchLabel}>Find a state or union territory</label>
     <div className={styles.searchRow}>
       <input ref={search} id={`${id}-search`} type="text" autoComplete="off" value={query} placeholder="Type to filter the list" onChange={event => setQuery(event.target.value)} onKeyDown={event => { if (event.key === 'Enter') event.preventDefault(); }} />

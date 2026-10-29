@@ -1,0 +1,24 @@
+[9:53 am, 29/10/2026] Sujay H S IISC: Dear colleagues,
+
+We're building Sahara, a free tool to help patients find palliative care and oral morphine near them. The data available online for India has gaps, so we need your help.
+
+If you work at or refer to a hospital, please take 1 minute to tell us:
+* Whether palliative care is available (OPD / IPD / home care)
+* Whether oral morphine was dispensed there in the last 3 months
+
+👉 https://sahara.wedevit.in/hospital-survey
+
+Your details are used only for verification and are not shown publicly.
+
+Please forward this to oncology and palliative care colleagues!
+[9:54 am, 29/10/2026] Sujay H S IISC: Is this message fine? We can disseminate if everyone agrees
+[9:54 am, 29/10/2026] [participant phone number redacted]: Looks good.
+[9:55 am, 29/10/2026] Sujay H S IISC: (optional)
+
+@Shaik Abdul Basith - This word shows up against every question in the survey. Can we remove it?
+[9:56 am, 29/10/2026] Sujay H S IISC: Palliative-care physicians and departments (optional)
+14. Anything useful for families? (optional)
+
+Only for these questions and email address it should be there
+[9:56 am, 29/10/2026] Sujay H S IISC: Maybe also remove all the serial numbers from the questions
+[9:58 am, 29/10/2026] Sujay H S IISC: Once @Shaik Abdul Basith and @Awaiz okay it from their side, we can disseminate
