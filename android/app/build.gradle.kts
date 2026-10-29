@@ -147,3 +147,10 @@ dependencies {
         testImplementation("androidx.compose.ui:ui-test-junit4")
     }
 }
+
+// Play bundle size (sa-bundle-size): drop resources that R8 finds unreferenced from the release
+// build. Native libs already stay uncompressed and page-aligned (AGP default for minSdk >= 23),
+// and the bundle keeps Play's default ABI, density and language splits.
+android {
+    buildTypes.getByName("release") { isShrinkResources = true }
+}
