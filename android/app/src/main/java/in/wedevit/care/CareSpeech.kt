@@ -167,13 +167,13 @@ private class CareDictation(private val context: Context, val changed: () -> Uni
     LaunchedEffect(active) { latestActiveChanged(active) }
     DisposableEffect(Unit) { onDispose { latestActiveChanged(false) } }
     SurfaceCard(Mint) {
-        Row(verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.RecordVoiceOver, null, tint = Ink); Spacer(Modifier.width(10.dp)); Text(t("On-device dictation", "फ़ोन पर बोलकर लिखना"), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont) }
+        Row(verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.RecordVoiceOver, null, tint = Ink); Spacer(Modifier.width(10.dp)); Text(t("Speak to type", "फ़ोन पर बोलकर लिखना"), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont) }
         Spacer(Modifier.height(8.dp))
         Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(7.dp)) {
             listOf("Patient", "Family / carer", "Doctor").forEach { role -> FilterChip(selected = speaker == role, onClick = { speaker = role }, enabled = !active, label = { Text(role) }) }
         }
         CareLanguageMenu(languageTag, enabled = !active, includeMixed = true) { languageTag = it }
-        if (languageTag == "hi-en") Text(if (Build.VERSION.SDK_INT >= 34) t("Both phone language packs must be installed. If switching is unavailable, use the saved-recording transcript below.", "फ़ोन में दोनों भाषा पैक होने चाहिए। अगर भाषा नहीं बदलती, तो नीचे सहेजी रिकॉर्डिंग से लिखाई बनाएँ।") else t("This phone uses one language per dictation turn. Hindi + English together is available for saved recordings below.", "यह फ़ोन हर बार एक ही भाषा सुनता है। हिन्दी और अंग्रेज़ी साथ में नीचे सहेजी रिकॉर्डिंग के लिए उपलब्ध है।"), style = MaterialTheme.typography.bodySmall)
+        if (languageTag == "hi-en") Text(if (Build.VERSION.SDK_INT >= 34) t("Both phone language packs must be installed. If the language does not switch, turn a saved recording into text below.", "फ़ोन में दोनों भाषा पैक होने चाहिए। अगर भाषा नहीं बदलती, तो नीचे सहेजी रिकॉर्डिंग से लिखाई बनाएँ।") else t("This phone listens to one language at a time. For Hindi and English together, use a saved recording below.", "यह फ़ोन हर बार एक ही भाषा सुनता है। हिन्दी और अंग्रेज़ी साथ में नीचे सहेजी रिकॉर्डिंग के लिए उपलब्ध है।"), style = MaterialTheme.typography.bodySmall)
         if (dictation.available) {
             if (dictation.processing) LinearProgressIndicator(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp), color = Rust)
             else if (dictation.listening) LinearProgressIndicator(progress = { dictation.level }, modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp), color = Rust)
@@ -190,7 +190,7 @@ private class CareDictation(private val context: Context, val changed: () -> Uni
                 if (active) TextButton(onClick = { dictation.cancel(keepWords = false); heldWords = "" }) { Text(t("Cancel turn", "यह बारी रद्द करें")) }
             }
             if (dictation.status.isNotBlank()) Text(dictation.status, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 6.dp))
-        } else Text(if (Build.VERSION.SDK_INT < 31) t("On-device dictation needs Android 12 or later. Type the words or keep an audio recording.", "फ़ोन पर बोलकर लिखने के लिए Android 12 या नया चाहिए। शब्द लिखें या ऑडियो रिकॉर्डिंग रखें।") else t("On-device dictation isn't available on this phone. Type the words or keep an audio recording.", "इस फ़ोन पर बोलकर लिखना उपलब्ध नहीं है। शब्द लिखें या ऑडियो रिकॉर्डिंग रखें।"), style = MaterialTheme.typography.bodySmall)
+        } else Text(if (Build.VERSION.SDK_INT < 31) t("Speaking to type needs Android 12 or newer. Type the words or keep an audio recording.", "फ़ोन पर बोलकर लिखने के लिए Android 12 या नया चाहिए। शब्द लिखें या ऑडियो रिकॉर्डिंग रखें।") else t("Speaking to type does not work on this phone. Type the words or keep an audio recording.", "इस फ़ोन पर बोलकर लिखना उपलब्ध नहीं है। शब्द लिखें या ऑडियो रिकॉर्डिंग रखें।"), style = MaterialTheme.typography.bodySmall)
         if (permissionError.isNotBlank()) Text(permissionError, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall, modifier = Modifier.announce())
         if (heldWords.isNotBlank() && !active) {
             Text(t("Unfinished words · $pendingSpeaker · ${pendingLanguage.label}", "अधूरे शब्द · $pendingSpeaker · ${pendingLanguage.label}"), style = MaterialTheme.typography.labelMedium)

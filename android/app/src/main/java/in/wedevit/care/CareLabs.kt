@@ -60,7 +60,7 @@ fun labGroups(items: List<CareItem>): List<List<Pair<CareItem, CareEntry>>> = it
             if (canEdit) TextButton(onClick = { addingDay = true }, modifier = Modifier.testTag("add-treatment-day")) { Icon(Icons.Default.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Add a treatment day", "इलाज का दिन जोड़ें")) }
         } }
         items(groups, key = { values -> "${values.first().first.title.lowercase()}:${values.first().second.unit}" }) { values -> LabHistoryCard(vm, values, treatmentDays, onEdit = { editing = it }) }
-        if (groups.isNotEmpty()) item { Text(t("Values and reference ranges are copied from reports. Ask your clinician what they mean for your care.", "मान और सामान्य सीमा रिपोर्ट से लिखे गए हैं। इनका आपकी देखभाल के लिए क्या मतलब है, डॉक्टर से पूछें।"), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall) }
+        if (groups.isNotEmpty()) item { Text(t("Results and normal ranges are copied from reports. Ask your doctor what they mean for you.", "मान और सामान्य सीमा रिपोर्ट से लिखे गए हैं। इनका आपकी देखभाल के लिए क्या मतलब है, डॉक्टर से पूछें।"), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall) }
     }
     if (adding) CareLabEditor(vm) { adding = false }
     editing?.let { item -> CareLabEditor(vm, item) { editing = null } }

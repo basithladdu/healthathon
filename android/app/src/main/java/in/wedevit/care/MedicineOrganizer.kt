@@ -179,7 +179,7 @@ class MedicineOrganizer(
         } catch (error: RuntimeException) {
             throw MedicineOrganizerException(
                 MedicineOrganizerError.INVALID_RESPONSE,
-                "Sahara AI returned an unreadable medicine list. Try clearer photos.",
+                "Sahara could not read the medicine list. Try clearer photos.",
                 error,
             )
         }
@@ -433,7 +433,7 @@ class MedicineOrganizer(
         if (!ONLINE_PHOTO_PROCESSING) {
             throw MedicineOrganizerException(
                 MedicineOrganizerError.CONFIGURATION,
-                "Use on-device prescription reading. Online photo processing is off in this Android app.",
+                "Read the prescription on this phone instead. Sending photos online is turned off in this app.",
             )
         }
         val connection = try {
@@ -444,7 +444,7 @@ class MedicineOrganizer(
         } catch (error: IOException) {
             throw MedicineOrganizerException(
                 MedicineOrganizerError.UNAVAILABLE,
-                "The medicine organizer could not connect. Check the connection and try again.",
+                "Could not connect. Check the internet and try again.",
                 error,
             )
         }
@@ -474,7 +474,7 @@ class MedicineOrganizer(
             if (!type.contains("application/json")) {
                 throw MedicineOrganizerException(
                     MedicineOrganizerError.INVALID_RESPONSE,
-                    "Sahara AI returned an unreadable medicine list. Try again.",
+                    "Sahara could not read the medicine list. Try again.",
                 )
             }
             response
@@ -483,14 +483,14 @@ class MedicineOrganizer(
         } catch (error: SocketTimeoutException) {
             throw MedicineOrganizerException(
                 MedicineOrganizerError.TIMEOUT,
-                "The medicine organizer took too long. Try fewer photos.",
+                "This took too long. Try fewer photos.",
                 error,
             )
         } catch (error: IOException) {
             currentCoroutineContext().ensureActive()
             throw MedicineOrganizerException(
                 MedicineOrganizerError.UNAVAILABLE,
-                "The medicine organizer could not connect. Check the connection and try again.",
+                "Could not connect. Check the internet and try again.",
                 error,
             )
         } finally {
@@ -512,13 +512,13 @@ class MedicineOrganizer(
             else -> MedicineOrganizerError.UNAVAILABLE
         }
         val fallback = when (code) {
-            MedicineOrganizerError.INVALID_IMAGES -> "The organizer could not read those images. Try clearer photos."
+            MedicineOrganizerError.INVALID_IMAGES -> "Could not read those photos. Try clearer photos."
             MedicineOrganizerError.AUTH_REQUIRED -> "Sign in again before organizing prescription photos."
             MedicineOrganizerError.TOO_LARGE -> "The selected images are too large together. Use fewer or tighter photos."
-            MedicineOrganizerError.CONFIGURATION -> "Sahara AI is still being connected. Try again later."
+            MedicineOrganizerError.CONFIGURATION -> "Medicine reading is not ready yet. Try again later."
             MedicineOrganizerError.RATE_LIMITED -> "Please wait before organizing another prescription."
-            MedicineOrganizerError.TIMEOUT -> "The medicine organizer took too long. Try fewer photos."
-            else -> "The medicine organizer is temporarily unavailable. Try again."
+            MedicineOrganizerError.TIMEOUT -> "This took too long. Try fewer photos."
+            else -> "Medicine reading is not working right now. Try again."
         }
         return MedicineOrganizerException(code, serverMessage.ifBlank { fallback })
     }
@@ -535,7 +535,7 @@ class MedicineOrganizer(
             if (size > maximum) {
                 throw MedicineOrganizerException(
                     MedicineOrganizerError.INVALID_RESPONSE,
-                    "Sahara AI returned too much data. Try again.",
+                    "The reply was too long. Try again.",
                 )
             }
             output.write(buffer, 0, count)
@@ -621,7 +621,7 @@ fun sanitizeMedicineOrganization(json: String, prescriptionCount: Int, medicineI
     } catch (error: JSONException) {
         throw MedicineOrganizerException(
             MedicineOrganizerError.INVALID_RESPONSE,
-            "The AI response was not valid. Try the photos again.",
+            "The reply could not be read. Try the photos again.",
             error,
         )
     }
@@ -661,14 +661,14 @@ fun sanitizeMedicineOrganization(json: String, prescriptionCount: Int, medicineI
         }
         if (medicineIndex >= 0 && medicineIndex in claimedImages) {
             uncertainties = uncertainties.withUncertainty(
-                "Strip photo ${medicineIndex + 1} was also matched to another medicine. Review this entry manually.",
+                "Strip photo ${medicineIndex + 1} was also matched to another medicine. Check this entry yourself.",
             )
             medicineIndex = -1
             confidence = minOf(confidence, 0.49)
         }
         if (numericImageIndex >= medicineImageCount) {
             uncertainties = uncertainties.withUncertainty(
-                "The AI returned an invalid strip-photo match. Review this entry manually.",
+                "Sahara gave an invalid strip-photo match. Check this entry yourself.",
             )
         }
         if (pageIndexes.isEmpty()) {

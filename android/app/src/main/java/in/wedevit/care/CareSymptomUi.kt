@@ -137,7 +137,7 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
     val largeText = LocalDensity.current.fontScale > 1.15f
     Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) { Column(Modifier.padding(start = 16.dp, top = 12.dp, end = 8.dp, bottom = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            Box(Modifier.size(40.dp).clip(CircleShape).background(lerp(Cream, DoctorAccent, .15f)), contentAlignment = Alignment.Center) { Icon(symptomIcon(note?.symptom ?: item.title), null, Modifier.size(22.dp), tint = DoctorAccent) }
+            SymptomIconBadge(note?.symptom ?: item.title)
             Text(note?.let { SymptomDiaryRules.symptomLabel(it.symptom, hindi) } ?: item.title, color = DoctorCardInk, fontFamily = SaharaTitleFont, fontSize = 18.sp, lineHeight = 22.sp, maxLines = if (largeText) Int.MAX_VALUE else 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
             if (note != null && !largeText && !isMood) StrengthBadge(PainBodyMapRules.overall(note.painBodyRatings) ?: note.rating, hindi, band = isPain)
             if (canEdit && note != null) Box {
@@ -173,16 +173,15 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
         } else Text(SymptomNoteCodec.readable(item.detail, hindi), style = MaterialTheme.typography.bodyMedium)
         val comparison = remember(entries, item, note) { note?.let { SymptomDiaryRules.comparison(entries, item, it) } }
         if (comparison != null) {
-            val baseline = SymptomNoteCodec.decode(comparison.baseline.detail)!!
+            // One plain line against the last comparable note: "Last time 6/10 (Yesterday, 4:01 PM) · Now 4/10 ↓ lower".
             val previous = SymptomNoteCodec.decode(comparison.previous.detail)!!
+            val change = when { comparison.difference > 0 -> t("↑ higher", "↑ ज़्यादा"); comparison.difference < 0 -> t("↓ lower", "↓ कम"); else -> t("→ same", "→ उतना ही") }
             HorizontalDivider(Modifier.padding(vertical = 4.dp))
-            Text("${t("First matching entry", "पहला समान नोट")}: ${baseline.observedDate} ${baseline.observedTime} · ${SymptomDiaryRules.ratingLabel(baseline.rating, hindi)}", style = MaterialTheme.typography.bodySmall)
-            Text("${t("Previous matching entry", "पिछला समान नोट")}: ${previous.observedDate} ${previous.observedTime} · ${SymptomDiaryRules.ratingLabel(previous.rating, hindi)}", style = MaterialTheme.typography.bodySmall)
-            Text("${t("Number difference", "अंकों का अंतर")}: ${if (comparison.difference > 0) "+" else ""}${comparison.difference}", style = MaterialTheme.typography.bodySmall)
+            Text("${t("Last time", "पिछली बार")} ${SymptomDiaryRules.ratingLabel(previous.rating, hindi)} (${friendlyWhen(previous.observedDate, previous.observedTime, hindi)}) · ${t("Now", "अब")} ${SymptomDiaryRules.ratingLabel(note?.rating, hindi)} $change", style = MaterialTheme.typography.bodyMedium, color = DoctorCardInk, modifier = Modifier.testTag("symptom-card-change"))
         }
         if (note != null) Row(Modifier.padding(end = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             if (isPain) FilledTonalButton(onClick = { showingPainHistory = true }, modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("symptom-pain-history-${item.id}")) { Icon(Icons.Default.AccessibilityNew, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("View on body", "शरीर पर देखें")) }
-            OutlinedButton(onClick = { showingTrend = true }, modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("symptom-trend-${item.id}")) { Icon(Icons.Default.Timeline, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Trend", "बदलाव")) }
+            OutlinedButton(onClick = { showingTrend = true }, modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("symptom-trend-${item.id}")) { Icon(Icons.Default.Timeline, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("See graph", "ग्राफ़ देखें")) }
         }
     } }
     if (editing) SymptomNoteEditor(vm, hindi, initial = item, onClose = { editing = false })

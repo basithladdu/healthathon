@@ -188,7 +188,7 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
             }
             scanError?.let { error -> item { Text(error, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) } }
             item {
-                Text(t("Reading happens on your phone. Printed Latin text is supported; handwriting may need manual entry. No dose or treatment is inferred.", "पढ़ाई आपके फ़ोन पर ही होती है। छपे अंग्रेज़ी अक्षर पढ़े जाते हैं; हाथ की लिखाई ख़ुद लिखनी पड़ सकती है। ऐप ख़ुराक या इलाज ख़ुद तय नहीं करता।"), style = MaterialTheme.typography.bodySmall)
+                Text(t("Your phone reads the page. It can read printed English letters. You may need to type handwriting yourself. The app does not decide any dose or treatment.", "पढ़ाई आपके फ़ोन पर ही होती है। छपे अंग्रेज़ी अक्षर पढ़े जाते हैं। हाथ की लिखाई आपको ख़ुद लिखनी पड़ सकती है। ऐप ख़ुराक या इलाज तय नहीं करता।"), style = MaterialTheme.typography.bodySmall)
                 Spacer(Modifier.height(12.dp))
                 Button(
                     onClick = {
@@ -200,13 +200,13 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
                                 }
                                 val medicines = copiedPrescriptionMedicines(pages)
                                 drafts = medicines.mapIndexed { index, medicine -> MedicineDraft(stableMedicineDraftId(scanId, medicine, index), medicine) }
-                                warnings = listOf(t("Compare every copied line with the original page. The app has not matched brands, chosen doses or confirmed treatment.", "हर कॉपी की गई पंक्ति को असली पेज से मिलाएँ। ऐप ने ब्रांड नहीं मिलाए, ख़ुराक नहीं चुनी और इलाज पक्का नहीं किया।")) + if (medicines.isEmpty()) listOf(t("No safe medicine lines were readable. Add medicines manually from the original prescription.", "दवा की कोई पंक्ति ठीक से नहीं पढ़ी जा सकी। असली पर्चा देखकर दवाएँ ख़ुद लिखें।")) else emptyList()
+                                warnings = listOf(t("Compare every copied line with the paper. The app has not matched brands, chosen doses or confirmed treatment.", "हर कॉपी की गई पंक्ति को असली पेज से मिलाएँ। ऐप ने ब्रांड नहीं मिलाए, ख़ुराक नहीं चुनी और इलाज पक्का नहीं किया।")) + if (medicines.isEmpty()) listOf(t("No medicine lines could be read clearly. Look at the prescription and type the medicines yourself.", "दवा की कोई पंक्ति ठीक से नहीं पढ़ी जा सकी। असली पर्चा देखकर दवाएँ ख़ुद लिखें।")) else emptyList()
                                 unmatched = medicineUris.indices.toList()
                                 unmatchedReviewed = unmatched.isEmpty()
                                 phase = MedicineScannerPhase.Review
                             } catch (error: Exception) {
                                 if (error is CancellationException) throw error
-                                scanError = error.message ?: t("The medicine organizer couldn't finish. Try again.", "दवा की सूची पूरी नहीं बन सकी। फिर कोशिश करें।")
+                                scanError = error.message ?: t("Could not make the medicine list. Try again.", "दवा की सूची पूरी नहीं बन सकी। फिर कोशिश करें।")
                                 phase = MedicineScannerPhase.Select
                             } finally { scanJob = null }
                         }
@@ -242,7 +242,7 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
             item { ScannerHeader(t("Review medicine list", "दवा की सूची जाँचें"), "2 / 2") { returnToImages() } }
-            item { SurfaceCard(Sage) { Text(t("Check before saving", "सहेजने से पहले जाँचें"), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont); Text(t("Text reading can be wrong. Confirm each entry against the prescription and packaging. Sahara does not diagnose, prescribe or recommend treatment.", "पढ़ाई में ग़लती हो सकती है। हर दवा को पर्चे और पैकेट से मिलाएँ। सहारा बीमारी नहीं बताता, दवा नहीं लिखता और इलाज की सलाह नहीं देता।")) } }
+            item { SurfaceCard(Sage) { Text(t("Check before saving", "सहेजने से पहले जाँचें"), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont); Text(t("The phone can read words wrongly. Check each medicine with the prescription and the packet. Sahara does not diagnose, prescribe or suggest treatment.", "पढ़ाई में ग़लती हो सकती है। हर दवा को पर्चे और पैकेट से मिलाएँ। सहारा बीमारी नहीं बताता, दवा नहीं लिखता और इलाज की सलाह नहीं देता।")) } }
             if (prescriptionUris.isNotEmpty()) item { SurfaceCard {
                 Text(t("Original pages", "असली पेज"), fontWeight = FontWeight.SemiBold)
                 prescriptionUris.forEachIndexed { index, uri -> TextButton(onClick = { runCatching {
@@ -306,7 +306,7 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
                 }, enabled = valid && !busy && !savingSources, modifier = Modifier.fillMaxWidth().heightIn(min = 54.dp), shape = RoundedCornerShape(16.dp)) {
                     Text(if (busy || savingSources) t("Saving…", "सहेज रहे हैं…") else if(onReviewedMedicines != null) t("Use ${drafts.size} reviewed medicines", "जाँची गई ${drafts.size} दवाएँ लें") else t("Save ${drafts.size} ${if (drafts.size == 1) "medicine" else "medicines"}", "${drafts.size} दवा सहेजें"))
                 }
-                if (!valid) Text(t("Add a medicine name and dose, resolve unmatched photos, and confirm every entry before saving.", "सहेजने से पहले दवा का नाम और ख़ुराक लिखें, बिना मिली फ़ोटो देखें और हर दवा की पुष्टि करें।"), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 8.dp))
+                if (!valid) Text(t("Before saving, add a medicine name and dose, check photos that did not match, and confirm every medicine.", "सहेजने से पहले दवा का नाम और ख़ुराक लिखें, बिना मिली फ़ोटो देखें और हर दवा की पुष्टि करें।"), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 8.dp))
                 TextButton(onClick = { returnToImages() }, enabled = !busy, modifier = Modifier.fillMaxWidth()) { Text(t("Back to photos", "फ़ोटो पर वापस")) }
                 TextButton(onClick = { cleanAndClose() }, enabled = !busy, modifier = Modifier.fillMaxWidth()) { Text(t("Cancel", "रद्द करें")) }
             }

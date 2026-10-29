@@ -74,7 +74,7 @@ import kotlinx.coroutines.withContext
                 val request = if (searchAll) DocumentQuestionRules.retrieve(asked, sources) else DocumentQuestionRules.build(asked, sources)
                 answer = client.ask(request, requireNotNull(cloud).transcriptionToken(), consent)
             } catch (cancel: CancellationException) { message = t("Stopped. Nothing else was sent.", "रोक दिया। और कुछ नहीं भेजा गया।"); throw cancel }
-            catch (error: Exception) { message = error.message ?: t("The question could not be answered. Your documents are unchanged.", "सवाल का जवाब नहीं मिल सका। आपके कागज़ वैसे ही हैं।") }
+            catch (error: Exception) { message = error.message ?: t("Could not get an answer. Your documents are safe.", "जवाब नहीं मिल सका। आपके कागज़ सुरक्षित हैं।") }
             finally { progress = ""; consent = false; job = null }
         }
     }
@@ -84,13 +84,13 @@ import kotlinx.coroutines.withContext
             IconButton(onClick = { job?.cancel(); onClose() }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back to documents", "कागज़ात पर वापस")) }
             Column(Modifier.weight(1f)) { Heading(t("Ask your documents", "अपने कागज़ों से पूछें"), 26); Text(t("For example: When is my next follow-up? Which lab test is due?", "जैसे: अगली जाँच के लिए कब आना है? कौन सी लैब जाँच बाकी है?"), style = MaterialTheme.typography.bodySmall) }
         } }
-        if (!checked) item { SurfaceCard { LinearProgressIndicator(Modifier.fillMaxWidth()); Text(t("Checking whether AI is set up…", "देख रहे हैं कि AI चालू है या नहीं…")) } }
+        if (!checked) item { SurfaceCard { LinearProgressIndicator(Modifier.fillMaxWidth()); Text(t("Checking if this is ready…", "देख रहे हैं कि यह तैयार है या नहीं…")) } }
         else if (service == null) item { SurfaceCard(Mint) {
-            Text(t("AI is not set up yet", "AI अभी चालू नहीं है"), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, modifier = Modifier.testTag("document-ask-off"))
-            Text(t("Sahara's server has no AI service yet (or can't be reached right now), so nothing is sent. You can still search the text of your reviewed reports in Documents.", "Sahara के सर्वर पर अभी कोई AI सेवा नहीं है (या अभी सर्वर से जुड़ नहीं पा रहे), इसलिए कुछ नहीं भेजा जाता। आप कागज़ात में जाँची गई रिपोर्टों की लिखाई में अब भी खोज सकते हैं।"), style = MaterialTheme.typography.bodySmall)
+            Text(t("Asking is not available right now", "पूछने की सुविधा अभी नहीं है"), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, modifier = Modifier.testTag("document-ask-off"))
+            Text(t("Nothing is sent. You can still search your checked reports in Documents.", "कुछ नहीं भेजा जाता। आप कागज़ात में अपनी जाँची हुई रिपोर्टों में अब भी खोज सकते हैं।"), style = MaterialTheme.typography.bodySmall)
         } }
         else {
-            item { CheckLine(searchAll, { searchAll = it; answer = null }, t("Search all my documents. The phone finds the lines that match your question and sends only those.", "मेरे सारे कागज़ों में खोजें। फ़ोन सवाल से मिलती पंक्तियाँ ढूँढता है और सिर्फ़ वही भेजता है।")) }
+            item { CheckLine(searchAll, { searchAll = it; answer = null }, t("Search all my documents. Only the lines that match my question are sent.", "मेरे सारे कागज़ों में खोजें। सिर्फ़ सवाल से मिलती पंक्तियाँ भेजी जाती हैं।")) }
             if (!searchAll) item { SectionTitle(t("Choose documents (up to ${DocumentQuestionRules.MAX_DOCUMENTS})", "कागज़ चुनें (${DocumentQuestionRules.MAX_DOCUMENTS} तक)")) }
             if (reports.isEmpty()) item { Text(t("Add a report first.", "पहले कोई रिपोर्ट जोड़ें।")) }
             if (!searchAll) items(reports, key = { it.id }) { report ->
@@ -105,7 +105,7 @@ import kotlinx.coroutines.withContext
                 }
             }
             item { OutlinedTextField(question, { question = it.take(DocumentQuestionRules.MAX_QUESTION); answer = null }, label = { Text(t("Your question", "आपका सवाल")) }, minLines = 2, enabled = job == null, modifier = Modifier.fillMaxWidth().testTag("document-ask-question")) }
-            item { CheckLine(consent, { consent = it }, t("I agree to sending my question and ${if (searchAll) "the matching lines read from my documents" else "the text read from these ${chosen.size} documents"} off the phone to ${service.provider}. Photos and files are not sent. Nothing is sent until I tap Ask, and I will be asked again next time.", "मैं अपना सवाल और ${if (searchAll) "मेरे कागज़ों से पढ़ी गई मिलती पंक्तियाँ" else "इन ${chosen.size} कागज़ों से पढ़ी गई लिखाई"} फ़ोन से ${service.provider} को भेजने पर राज़ी हूँ। फ़ोटो और फ़ाइलें नहीं भेजी जातीं। ‘पूछें’ दबाने तक कुछ नहीं भेजा जाता, और अगली बार फिर पूछा जाएगा।")) }
+            item { CheckLine(consent, { consent = it }, t("I agree to send my question and ${if (searchAll) "the matching lines from my documents" else "the text of these ${chosen.size} documents"} to ${service.provider}. Photos and files are not sent. Nothing is sent until I tap Ask. I will be asked again next time.", "मैं अपना सवाल और ${if (searchAll) "मेरे कागज़ों की मिलती पंक्तियाँ" else "इन ${chosen.size} कागज़ों की लिखाई"} ${service.provider} को भेजने के लिए राज़ी हूँ। फ़ोटो और फ़ाइलें नहीं भेजी जातीं। ‘पूछें’ दबाने तक कुछ नहीं भेजा जाता। अगली बार फिर पूछा जाएगा।")) }
             item { Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                 Button(onClick = ::ask, enabled = consent && (if (searchAll) reports.isNotEmpty() else chosen.isNotEmpty()) && question.isNotBlank() && job == null, modifier = Modifier.testTag("document-ask-send")) { Text(t("Ask", "पूछें")) }
                 if (job != null) TextButton(onClick = { job?.cancel() }) { Text(t("Stop", "रोकें")) }
@@ -114,10 +114,10 @@ import kotlinx.coroutines.withContext
         }
         if (message.isNotBlank()) item { Text(message, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
         answer?.let { result ->
-            if (!result.found) item { SurfaceCard { Text(t("Not found in the chosen documents", "चुने गए कागज़ों में नहीं मिला"), fontWeight = FontWeight.SemiBold, modifier = Modifier.testTag("document-ask-not-found")); Text(t("No answer was made up. Try other documents or other words.", "कोई जवाब गढ़ा नहीं गया। दूसरे कागज़ या दूसरे शब्द आज़माएँ।"), style = MaterialTheme.typography.bodySmall) } }
+            if (!result.found) item { SurfaceCard { Text(t("Not found in the chosen documents", "चुने गए कागज़ों में नहीं मिला"), fontWeight = FontWeight.SemiBold, modifier = Modifier.testTag("document-ask-not-found")); Text(t("Try other documents or other words.", "दूसरे कागज़ या दूसरे शब्द आज़माएँ।"), style = MaterialTheme.typography.bodySmall) } }
             else {
                 item { SurfaceCard(Sage) {
-                    Text(t("AI answer · check it against the lines below", "AI जवाब · नीचे की पंक्तियों से मिलाएँ"), style = MaterialTheme.typography.labelLarge)
+                    Text(t("Answer · check it with the lines below", "जवाब · नीचे की पंक्तियों से मिलाएँ"), style = MaterialTheme.typography.labelLarge)
                     SelectionContainerText(result.answer)
                 } }
                 item { SectionTitle(t("Where this came from", "यह कहाँ से आया")) }
@@ -126,12 +126,12 @@ import kotlinx.coroutines.withContext
                         Text(citation.reportName, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
                         Text(t("Page ${citation.page} · line ${citation.line}", "पेज ${citation.page} · पंक्ति ${citation.line}"), style = MaterialTheme.typography.labelMedium)
                         Text(citation.quote)
-                        if (!citation.reviewed) Text(t("This text was read by the phone and not checked yet. Compare it with the original.", "यह लिखाई फ़ोन ने पढ़ी है और अभी जाँची नहीं गई। असली कागज़ से मिलाएँ।"), style = MaterialTheme.typography.bodySmall, color = RustText)
+                        if (!citation.reviewed) Text(t("The phone read this text. No one has checked it yet. Compare it with the paper.", "यह लिखाई फ़ोन ने पढ़ी है। अभी किसी ने जाँची नहीं। असली कागज़ से मिलाएँ।"), style = MaterialTheme.typography.bodySmall, color = RustText)
                         reports.firstOrNull { it.id == citation.reportId }?.let { report -> TextButton(onClick = { onOpen(report) }, colors = ButtonDefaults.textButtonColors(contentColor = RustText)) { Text(t("Open this document", "यह कागज़ खोलें")) } }
                     }
                 }
             }
         }
-        item { Text(t("Answers come only from the text of your documents. They are not medical advice: ask your care team about results and medicines.", "जवाब सिर्फ़ आपके कागज़ों की लिखाई से आते हैं। ये डॉक्टरी सलाह नहीं हैं: नतीजों और दवाओं के बारे में अपनी देखभाल टीम से पूछें।"), style = MaterialTheme.typography.bodySmall) }
+        item { Text(t("Answers come only from your documents. Not medical advice. Ask your care team.", "जवाब सिर्फ़ आपके कागज़ों से आते हैं। यह डॉक्टरी सलाह नहीं है। अपनी देखभाल टीम से पूछें।"), style = MaterialTheme.typography.bodySmall) }
     }
 }

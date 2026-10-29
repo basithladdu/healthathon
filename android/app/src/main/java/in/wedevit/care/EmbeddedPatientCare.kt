@@ -163,7 +163,7 @@ fun EmbeddedPatientCare(
         } else {
             if ((section != "Conversations" || tool.isNotEmpty() || !conversationCapture) && (!DoctorTestProfiles.contains(personId) || !canEdit)) Surface(color = if (vm.cloud == null) Peach.copy(alpha = .5f) else Paper) {
                 Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 10.dp)) {
-                    if(!DoctorTestProfiles.contains(personId)) Text(if(vm.demoMode) t("Walkthrough care record · not synced", "डेमो देखभाल रिकॉर्ड · सिंक नहीं") else if (vm.cloud == null) t("Device-local care profile", "सिर्फ़ इस फ़ोन की देखभाल प्रोफ़ाइल") else t("Shared care profile", "साझा देखभाल प्रोफ़ाइल"), style = MaterialTheme.typography.labelLarge, color = Rust, modifier = Modifier.testTag("embedded-care-source"))
+                    if(!DoctorTestProfiles.contains(personId)) Text(if(vm.demoMode) t("Demo care record · not saved to an account", "डेमो देखभाल रिकॉर्ड · किसी खाते में सेव नहीं") else if (vm.cloud == null) t("Care profile on this phone only", "सिर्फ़ इस फ़ोन की देखभाल प्रोफ़ाइल") else t("Shared care profile", "साझा देखभाल प्रोफ़ाइल"), style = MaterialTheme.typography.labelLarge, color = Rust, modifier = Modifier.testTag("embedded-care-source"))
                     if(vm.demoMode && !DoctorTestProfiles.contains(personId)) Text(t("No prescription is issued and no appointment is booked.", "न कोई पर्चा जारी होता है, न कोई अपॉइंटमेंट बुक होती है।"),style=MaterialTheme.typography.bodySmall)
                     if (!canEdit) Text(t("Read-only access · changes need the patient's permission", "सिर्फ़ पढ़ने की पहुँच · बदलाव के लिए मरीज़ की अनुमति चाहिए"), style = MaterialTheme.typography.bodySmall, modifier = Modifier.testTag("embedded-read-only"))
                 }
@@ -228,7 +228,7 @@ internal fun EmbeddedCareTools(onOpen: (String) -> Unit) { val t = careText();
         Triple("labs", t("Lab history", "जाँच रिपोर्टें"), t("Reported results and earlier entries", "बताए गए नतीजे और पुरानी एंट्री")),
         Triple("nearby", t("Find care", "देखभाल केंद्र खोजें"), t("Nearby services and contact information", "आसपास की सेवाएँ और संपर्क")),
         Triple("documents", t("Documents & care notes", "कागज़ात और देखभाल नोट"), t("Local reports, saved versions and sharing", "फ़ोन की रिपोर्टें, सहेजे संस्करण और साझा करना")),
-        Triple("reminders", t("Reminders", "रिमाइंडर"), t("Medicine and dated-care notifications on this device", "इस फ़ोन पर दवा और तय देखभाल की सूचनाएँ")),
+        Triple("reminders", t("Reminders", "रिमाइंडर"), t("Reminders for medicines and planned care on this phone", "इस फ़ोन पर दवा और तय देखभाल की सूचनाएँ")),
         Triple("shared", t("Shared care & clinical review", "साझा देखभाल और क्लिनिकल समीक्षा"), t("Patient access, verification and submitted conversations", "मरीज़ की पहुँच, पुष्टि और भेजी गई बातचीत")),
         Triple("resources", t("Privacy, exports & more", "निजता, एक्सपोर्ट और बाक़ी"), t("Export care notes and manage this care profile", "देखभाल नोट एक्सपोर्ट करें और यह प्रोफ़ाइल सँभालें")),
         Triple("feedback", t("App feedback", "ऐप पर राय"), t("Tell us about your experience", "अपना अनुभव बताएँ")),

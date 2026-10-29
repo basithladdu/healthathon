@@ -46,50 +46,50 @@ import kotlinx.coroutines.withContext
     // Nothing is offered until the server says online transcription is set up; on-device transcription stays above.
     val ready = capabilities?.takeIf { it.audioReady } ?: return
     SurfaceCard(Mint) {
-        Text(t("Transcribe a recorded turn", "रिकॉर्ड की गई बारी की लिखाई बनाएँ"), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
-        Text(t("One person at a time, up to 30 seconds and 2 MB. Listen to the original recording and check who spoke.", "एक बार में एक व्यक्ति, 30 सेकंड और 2 MB तक। मूल रिकॉर्डिंग सुनें और जाँचें कि कौन बोला।"), style = MaterialTheme.typography.bodySmall)
+        Text(t("Turn one person's speech into text", "एक व्यक्ति की बात को लिखाई में बदलें"), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
+        Text(t("One person at a time. Up to 30 seconds and 2 MB. Listen to the recording and check who spoke.", "एक बार में एक व्यक्ति। 30 सेकंड और 2 MB तक। रिकॉर्डिंग सुनें और जाँचें कि कौन बोला।"), style = MaterialTheme.typography.bodySmall)
         run {
             CareLanguageMenu(language, enabled = !busy) { language = it }
-            CheckLine(consent, { consent = it }, t("Everyone here separately agrees to sending this recording off the phone to ${ready.provider} for transcription. Nothing is sent until you tap the button. The words and speaker will be checked before use.", "यहाँ मौजूद सभी अलग-अलग इस रिकॉर्डिंग को लिखाई के लिए फ़ोन से ${ready.provider} को भेजने पर राज़ी हैं। बटन दबाने तक कुछ नहीं भेजा जाता। इस्तेमाल से पहले शब्द और बोलने वाले की जाँच होगी।"))
+            CheckLine(consent, { consent = it }, t("Everyone here separately agrees to send this recording to ${ready.provider} to turn speech into text. Nothing is sent until you tap the button. The words and who spoke will be checked before use.", "यहाँ मौजूद सभी इस रिकॉर्डिंग को ${ready.provider} को भेजने के लिए अलग से राज़ी हैं, ताकि बात लिखाई में बदले। बटन दबाने तक कुछ नहीं भेजा जाता। इस्तेमाल से पहले शब्द और बोलने वाले की जाँच होगी।"))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(onClick = {
                     val originalSource = source
                     job = scope.launch {
                         busy = true; message = ""; result = null; checked = false
                         try {
-                            val previous = requireNotNull(recordingConsent) { t("This recording has no saved participant consent. Make a new consented recording.", "इस रिकॉर्डिंग पर भागीदारों की सहमति सहेजी नहीं है। सहमति के साथ नई रिकॉर्डिंग बनाएँ।") }
+                            val previous = requireNotNull(recordingConsent) { t("This recording has no saved agreement from the people in it. Make a new recording after everyone agrees.", "इस रिकॉर्डिंग पर लोगों की सहमति सेव नहीं है। सबकी सहमति लेकर नई रिकॉर्डिंग बनाएँ।") }
                             require(previous.personId == identity && File(previous.audioPath).absolutePath == recording.absolutePath) { t("Choose this person’s recording again.", "इस व्यक्ति की रिकॉर्डिंग फिर चुनें।") }
                             val duration = withContext(Dispatchers.IO) {
                                 val reader = MediaMetadataRetriever()
                                 try { reader.setDataSource(recording.absolutePath); reader.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLongOrNull() ?: 0L }
                                 finally { reader.release() }
                             }
-                            require(duration in 1..30000 && recording.length() in 16..2L * 1024 * 1024) { t("Choose a turn up to 30 seconds and 2 MB. Longer recordings stay available for manual review.", "30 सेकंड और 2 MB तक की बारी चुनें। लंबी रिकॉर्डिंग ख़ुद जाँचने के लिए बनी रहती हैं।") }
+                            require(duration in 1..30000 && recording.length() in 16..2L * 1024 * 1024) { t("Choose a part up to 30 seconds and 2 MB. Longer recordings stay saved so you can check them yourself.", "30 सेकंड और 2 MB तक का हिस्सा चुनें। लंबी रिकॉर्डिंग सेव रहती हैं, ताकि आप ख़ुद जाँच सकें।") }
                             val approved = previous.copy(transcriptionConsentAt = System.currentTimeMillis(), noticeVersion = maxOf(previous.noticeVersion, 3))
                             latestSaveConsent(approved)
                             val next = client.transcribe(recording, approved, duration, language, latestToken())
                             if (originalSource == latestSource) { result = next; words = next.original }
                         } catch (cancel: CancellationException) { message = t("Stopped. Your recording is unchanged.", "रोक दिया। आपकी रिकॉर्डिंग वैसी ही है।"); throw cancel }
-                        catch (error: Exception) { message = error.message ?: t("Transcription could not finish. Your recording is unchanged.", "लिखाई पूरी नहीं हो सकी। आपकी रिकॉर्डिंग वैसी ही है।") }
+                        catch (error: Exception) { message = error.message ?: t("Could not turn the speech into text. Your recording is safe.", "बात लिखाई में नहीं बदल सकी। आपकी रिकॉर्डिंग सुरक्षित है।") }
                         finally { busy = false }
                     }
-                }, enabled = consent && recordingConsent != null && !busy, modifier = Modifier.testTag("care-transcribe-turn")) { Text(if (busy) t("Transcribing…", "लिखाई बन रही है…") else t("Transcribe turn", "बारी की लिखाई बनाएँ")) }
+                }, enabled = consent && recordingConsent != null && !busy, modifier = Modifier.testTag("care-transcribe-turn")) { Text(if (busy) t("Turning speech into text…", "बात लिखाई में बदल रही है…") else t("Turn speech into text", "बात को लिखाई में बदलें")) }
                 if (busy) TextButton(onClick = { job?.cancel() }) { Text(t("Stop", "रोकें")) }
             }
         }
         result?.let { transcript ->
-            Text(t("Machine transcript · original", "मशीन की लिखाई · मूल"), style = MaterialTheme.typography.labelLarge)
+            Text(t("Text from the recording · not checked yet", "रिकॉर्डिंग से बनी लिखाई · अभी जाँची नहीं"), style = MaterialTheme.typography.labelLarge)
             SelectionContainerText(transcript.original)
             CareField(words, { words = it; checked = false }, t("Checked words", "जाँचे गए शब्द"), minLines = 3)
             Text(t("Speaker", "बोलने वाले"), style = MaterialTheme.typography.labelLarge)
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf("Unknown", "Patient", "Family / carer", "Doctor").forEach { role ->
                 FilterChip(selected = speaker == role, onClick = { speaker = role; checked = false }, label = { Text(role) }, modifier = Modifier.heightIn(min = 48.dp))
             } }
-            CheckLine(checked, { checked = it }, t("I checked the audio, these words and who spoke, including negation and uncertainty.", "मैंने ऑडियो, ये शब्द और कौन बोला, यह जाँच लिया है, ‘नहीं’ और अनिश्चितता वाली बातें भी।"))
+            CheckLine(checked, { checked = it }, t("I listened and checked these words and who spoke, including any “no” or “not sure”.", "मैंने सुनकर ये शब्द और कौन बोला, जाँच लिया है। ‘नहीं’ और ‘पक्का नहीं’ वाली बातें भी।"))
             Button(onClick = {
                 try { latestAppend(CareDraftAssist.appendReviewedTranscript(latestSource, transcript.original, words, speaker, transcript.language, checked)); result = null; checked = false }
                 catch (error: IllegalArgumentException) { message = error.message.orEmpty() }
-            }, enabled = checked && words.isNotBlank(), modifier = Modifier.testTag("care-transcript-use")) { Text(t("Add checked turn", "जाँची बारी जोड़ें")) }
+            }, enabled = checked && words.isNotBlank(), modifier = Modifier.testTag("care-transcript-use")) { Text(t("Add checked text", "जाँची लिखाई जोड़ें")) }
         }
         if (message.isNotBlank()) Text(message, style = MaterialTheme.typography.bodySmall, modifier = Modifier.announce())
     }
@@ -124,10 +124,10 @@ import kotlinx.coroutines.withContext
     val service = capabilities?.takeIf { it.ready }
     if (service == null) { CareAiOffNotice(); return }
     SurfaceCard(Mint) {
-        Text(t("Prepare a source-linked draft", "स्रोत से जुड़ा ड्राफ़्ट बनाएँ"), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
-        Text(t("${service.provider} picks whole lines from this conversation for each section. It cannot add words: every line shown is copied from the original.", "${service.provider} हर हिस्से के लिए इस बातचीत की पूरी पंक्तियाँ चुनता है। यह नए शब्द नहीं जोड़ सकता: दिखाई गई हर पंक्ति मूल से ली गई है।"), style = MaterialTheme.typography.bodySmall)
+        Text(t("Make a draft note from this talk", "इस बातचीत से नोट का ड्राफ़्ट बनाएँ"), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
+        Text(t("${service.provider} picks lines from this talk for each section. It cannot add new words. Every line is copied as it was said.", "${service.provider} हर हिस्से के लिए इस बातचीत से पंक्तियाँ चुनता है। यह नए शब्द नहीं जोड़ सकता। हर पंक्ति वैसी ही ली जाती है जैसी कही गई।"), style = MaterialTheme.typography.bodySmall)
         run {
-            CheckLine(consent, { consent = it }, t("Everyone here agrees to sending these words off the phone to ${service.provider} for an AI draft. Nothing is sent until you tap the button. A person will review it before use.", "यहाँ मौजूद सभी इन शब्दों को AI ड्राफ़्ट के लिए फ़ोन से ${service.provider} को भेजने पर राज़ी हैं। बटन दबाने तक कुछ नहीं भेजा जाता। इस्तेमाल से पहले कोई व्यक्ति इसे जाँचेगा।"))
+            CheckLine(consent, { consent = it }, t("Everyone here agrees to send these words to ${service.provider} to make a draft. Nothing is sent until you tap the button. A person will check it before use.", "यहाँ मौजूद सभी इन शब्दों को ड्राफ़्ट बनाने के लिए ${service.provider} को भेजने पर राज़ी हैं। बटन दबाने तक कुछ नहीं भेजा जाता। इस्तेमाल से पहले कोई व्यक्ति इसे जाँचेगा।"))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(onClick = {
                     val snapshot = source
@@ -136,17 +136,17 @@ import kotlinx.coroutines.withContext
                         try {
                             val next = client.draft(snapshot, latestToken(), consent)
                             if (snapshot == latestSource) result = next
-                        } catch (cancel: CancellationException) { message = t("Stopped. Your original words are unchanged.", "रोक दिया। आपके मूल शब्द वैसे ही हैं।"); throw cancel }
-                        catch (error: Exception) { message = error.message ?: t("The draft could not finish. Your original words are unchanged.", "ड्राफ़्ट पूरा नहीं हो सका। आपके मूल शब्द वैसे ही हैं।") }
+                        } catch (cancel: CancellationException) { message = t("Stopped. Your words are safe.", "रोक दिया। आपके शब्द सुरक्षित हैं।"); throw cancel }
+                        catch (error: Exception) { message = error.message ?: t("The draft could not be made. Your words are safe.", "ड्राफ़्ट नहीं बन सका। आपके शब्द सुरक्षित हैं।") }
                         finally { busy = false }
                     }
-                }, enabled = consent && source.isNotBlank() && source.length <= 12000 && !busy, modifier = Modifier.testTag("care-assist-draft")) { Text(if (busy) t("Preparing draft…", "ड्राफ़्ट बन रहा है…") else t("Prepare AI draft", "AI ड्राफ़्ट बनाएँ")) }
+                }, enabled = consent && source.isNotBlank() && source.length <= 12000 && !busy, modifier = Modifier.testTag("care-assist-draft")) { Text(if (busy) t("Preparing draft…", "ड्राफ़्ट बन रहा है…") else t("Make draft", "ड्राफ़्ट बनाएँ")) }
                 if (busy) TextButton(onClick = { job?.cancel() }) { Text(t("Stop", "रोकें")) }
             }
         }
         result?.let { draft ->
             Spacer(Modifier.height(8.dp))
-            Text(t("AI draft · review the exact source", "AI ड्राफ़्ट · मूल स्रोत से जाँचें"), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
+            Text(t("Draft · check each line with the talk", "ड्राफ़्ट · हर पंक्ति बातचीत से मिलाएँ"), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
             careAssistFieldKeys.forEachIndexed { index, key ->
                 val words = draft.fields[key].orEmpty()
                 Text(NoteRules.labels[index], style = MaterialTheme.typography.labelLarge)
@@ -154,11 +154,11 @@ import kotlinx.coroutines.withContext
                 CareSourceLinks(source, words)
                 Spacer(Modifier.height(6.dp))
             }
-            CheckLine(checked, { checked = it }, t("I checked the selected words, speakers, negation and uncertainty against the original conversation.", "मैंने चुने शब्द, बोलने वाले, ‘नहीं’ और अनिश्चितता वाली बातें मूल बातचीत से मिला ली हैं।"))
+            CheckLine(checked, { checked = it }, t("I checked the chosen words and who said them against the talk, including any “no” or “not sure”.", "मैंने चुने शब्द और किसने कहे, बातचीत से मिला लिए हैं। ‘नहीं’ और ‘पक्का नहीं’ वाली बातें भी।"))
             Button(onClick = {
                 if (draft.sourceHash == careAssistSourceHash(latestSource)) { latestUse(draft); result = null; checked = false }
                 else message = t("The conversation changed. Prepare a fresh draft.", "बातचीत बदल गई। नया ड्राफ़्ट बनाएँ।")
-            }, enabled = checked && !busy, modifier = Modifier.testTag("care-assist-use")) { Text(t("Use reviewed draft", "जाँचा ड्राफ़्ट इस्तेमाल करें")) }
+            }, enabled = checked && !busy, modifier = Modifier.testTag("care-assist-use")) { Text(t("Use checked draft", "जाँचा ड्राफ़्ट इस्तेमाल करें")) }
         }
         if (message.isNotBlank()) Text(message, style = MaterialTheme.typography.bodySmall, modifier = Modifier.announce())
     }
@@ -194,7 +194,7 @@ import kotlinx.coroutines.withContext
             CareLanguageMenu(from, enabled = !busy) { from = it }
             Text(t("Translate to", "किस भाषा में"), style = MaterialTheme.typography.labelLarge)
             CareLanguageMenu(to, enabled = !busy) { to = it }
-            CheckLine(consent, { consent = it }, t("I agree to sending this note off the phone to ${service.provider} for translation. Nothing is sent until you tap the button. The original stays unchanged.", "मैं यह नोट अनुवाद के लिए फ़ोन से ${service.provider} को भेजने पर राज़ी हूँ। बटन दबाने तक कुछ नहीं भेजा जाता। मूल नहीं बदलेगा।"))
+            CheckLine(consent, { consent = it }, t("I agree to send this note to ${service.provider} to translate it. Nothing is sent until you tap the button. The original stays the same.", "मैं यह नोट अनुवाद के लिए ${service.provider} को भेजने पर राज़ी हूँ। बटन दबाने तक कुछ नहीं भेजा जाता। मूल नोट नहीं बदलेगा।"))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(onClick = {
                     val original = source; val selectedVersion = versionId
@@ -204,7 +204,7 @@ import kotlinx.coroutines.withContext
                             val translated = client.translate(original, selectedVersion, from, to, latestToken(), consent)
                             if (original == latestSource && selectedVersion == latestVersion) result = translated
                         } catch (cancel: CancellationException) { message = t("Stopped. The original note is unchanged.", "रोक दिया। मूल नोट वैसा ही है।"); throw cancel }
-                        catch (error: Exception) { message = error.message ?: t("Translation could not finish. Use the original note.", "अनुवाद पूरा नहीं हो सका। मूल नोट इस्तेमाल करें।") }
+                        catch (error: Exception) { message = error.message ?: t("Could not translate. Use the original note.", "अनुवाद नहीं हो सका। मूल नोट इस्तेमाल करें।") }
                         finally { busy = false }
                     }
                 }, enabled = consent && !busy && from != to && source.isNotBlank(), modifier = Modifier.testTag("care-translate")) { Text(if (busy) t("Translating…", "अनुवाद हो रहा है…") else t("Translate note", "नोट का अनुवाद करें")) }
@@ -212,11 +212,11 @@ import kotlinx.coroutines.withContext
             }
         }
         result?.let { translated ->
-            Text(t("AI translation · check against the original", "AI अनुवाद · मूल से मिलाएँ"), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
+            Text(t("Translation · check it with the original", "अनुवाद · मूल से मिलाएँ"), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
             SelectionContainerText(translated.translation)
-            CheckLine(reviewed, { reviewed = it }, t("A person who understands both languages checked this translation, including names, numbers, negation and uncertainty.", "दोनों भाषाएँ समझने वाले व्यक्ति ने यह अनुवाद जाँचा है, नाम, अंक, ‘नहीं’ और अनिश्चितता वाली बातें भी।"))
+            CheckLine(reviewed, { reviewed = it }, t("Someone who knows both languages checked this translation, including names, numbers and any “no” or “not sure”.", "दोनों भाषाएँ जानने वाले किसी व्यक्ति ने यह अनुवाद जाँचा है, नाम, अंक, ‘नहीं’ और ‘पक्का नहीं’ वाली बातें भी।"))
             if (reviewed) CareReadAloudControl(translated.translation, "translation-${translated.versionId}-${translated.sourceHash}-${translated.targetLanguage}", translated.targetLanguage)
-            Text(t("This does not replace the signed original or acknowledge a new version.", "यह हस्ताक्षर वाले मूल की जगह नहीं लेता और नए संस्करण की पुष्टि नहीं करता।"), style = MaterialTheme.typography.bodySmall)
+            Text(t("This does not replace the signed note. It does not confirm a new version.", "यह हस्ताक्षर वाले नोट की जगह नहीं लेता। यह नए संस्करण की पुष्टि नहीं करता।"), style = MaterialTheme.typography.bodySmall)
         }
         if (message.isNotBlank()) Text(message, style = MaterialTheme.typography.bodySmall, modifier = Modifier.announce())
     }
@@ -224,8 +224,8 @@ import kotlinx.coroutines.withContext
 
 /** Shown where an AI draft would be while the server has no AI service set up (or can't be reached), so nothing looks automatic. */
 internal object CareAiOffCopy {
-    const val title = "AI drafting is not set up · AI ड्राफ़्ट चालू नहीं है"
-    const val body = "Online AI drafting is not set up on Sahara's server yet (or the server can't be reached right now), so these words are not sent anywhere for a draft. Use the word-matching suggestions above, choose lines from the conversation or type each section yourself. · Sahara के सर्वर पर अभी ऑनलाइन AI ड्राफ़्ट चालू नहीं है (या अभी सर्वर से जुड़ नहीं पा रहे), इसलिए ये शब्द ड्राफ़्ट के लिए कहीं नहीं भेजे जाते। ऊपर शब्द-मिलान वाले सुझाव इस्तेमाल करें, बातचीत से पंक्तियाँ चुनें या हर हिस्सा खुद लिखें।"
+    const val title = "Draft help is off right now · ड्राफ़्ट मदद अभी बंद है"
+    const val body = "These words are not sent anywhere. Use the suggestions above, pick lines from the talk, or type each part yourself. · ये शब्द कहीं नहीं भेजे जाते। ऊपर के सुझाव इस्तेमाल करें, बातचीत से पंक्तियाँ चुनें, या हर हिस्सा ख़ुद लिखें।"
 }
 
 @Composable internal fun CareAiOffNotice() {

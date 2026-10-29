@@ -52,7 +52,7 @@ import java.time.ZoneId
             item { Text("Taken and missed reports, newest first. A report is what someone recorded, not proof a dose was swallowed. · लेने और छूटने की जानकारी, नई सबसे ऊपर।", fontSize = 13.sp, color = DoctorCardSub) }
             if (mine.isEmpty()) item { Text("No reports yet. Tick the box when the dose is taken, or tap Missed today. · अभी कोई जानकारी नहीं।", fontSize = 15.sp) }
             items(mine, key = { it.id }) { MedicineReportCard(it, mine, now) }
-            item { Text(if (vm.cloud != null) "Shared history from Sahara's server. · सर्वर पर साझा इतिहास।" else "Saved only on this phone. Sign in to share it with family and the doctor. · सिर्फ़ इस फ़ोन पर।", fontSize = 12.sp, color = DoctorCardFaint) }
+            item { Text(if (vm.cloud != null) "Saved in your account. Family and doctors you share with can see it. · आपके खाते में सेव। जिनके साथ आपने साझा किया, वे देख सकते हैं।" else "Saved only on this phone. Sign in to share it with family and the doctor. · सिर्फ़ इस फ़ोन पर।", fontSize = 12.sp, color = DoctorCardFaint) }
             if (vm.cloud != null) item { TextButton(onClick = vm::refreshMedicineHistory, modifier = Modifier.heightIn(min = 48.dp)) { Text("Refresh history · इतिहास ताज़ा करें") } }
         }
     }

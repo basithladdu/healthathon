@@ -91,7 +91,7 @@ import kotlinx.coroutines.launch
     }
     if (notices) AlertDialog(onDismissRequest = { notices = false }, title = { Text(t("Translation notices", "अनुवाद की सूचनाएँ")) }, text = {
         Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text(t("Google Translate powers this optional reading aid through ML Kit on-device models. Text stays on the device; language-pack downloads need a connection. Check translations with a bilingual person before relying on them.", "Google Translate यह वैकल्पिक पढ़ने की मदद ML Kit के फ़ोन वाले मॉडल से देता है। लिखाई फ़ोन पर ही रहती है; भाषा पैक डाउनलोड के लिए इंटरनेट चाहिए। भरोसा करने से पहले अनुवाद दोनों भाषाएँ जानने वाले व्यक्ति से जँचवाएँ।"))
+            Text(t("This reading help uses Google Translate on this phone. Your text stays on the phone. Downloading the language pack needs internet. Ask someone who knows both languages to check before you rely on it.", "पढ़ने की यह मदद इसी फ़ोन पर Google Translate से चलती है। आपकी लिखाई फ़ोन पर ही रहती है। भाषा पैक डाउनलोड करने के लिए इंटरनेट चाहिए। भरोसा करने से पहले दोनों भाषाएँ जानने वाले किसी व्यक्ति से जँचवाएँ।"))
             Text("THIS SERVICE MAY CONTAIN TRANSLATIONS POWERED BY GOOGLE. GOOGLE DISCLAIMS ALL WARRANTIES RELATED TO THE TRANSLATIONS, EXPRESS OR IMPLIED, INCLUDING ANY WARRANTIES OF ACCURACY, RELIABILITY, AND ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.", style = MaterialTheme.typography.bodySmall)
             TextButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse("https://cloud.google.com/translate"))) }) { Text(t("Google Translate information", "Google Translate की जानकारी")) }
         }
@@ -100,7 +100,7 @@ import kotlinx.coroutines.launch
 
 /** Plain statements for when the on-device translator cannot run. English · Hindi. */
 internal object CareOfflineTranslationCopy {
-    const val unavailable = "Translation is unavailable on this phone: the on-device translator (Google ML Kit) could not start. Read the original note. · इस फ़ोन पर अनुवाद उपलब्ध नहीं है: फ़ोन पर चलने वाला अनुवादक शुरू नहीं हो सका। मूल नोट पढ़ें।"
+    const val unavailable = "Translation is unavailable on this phone right now. Please read the original note. · इस फ़ोन पर अभी अनुवाद नहीं हो सकता। मूल नोट पढ़ें।"
     const val downloadFailed = "Translation is unavailable until the Hindi–English pack downloads. Check the internet connection and try again; the original note is unchanged. · हिन्दी–English पैक डाउनलोड होने तक अनुवाद उपलब्ध नहीं है। इंटरनेट जाँचकर फिर कोशिश करें; मूल नोट नहीं बदला।"
     const val waitingForWifi = "Waiting for Wi-Fi. Untick “Download over Wi-Fi only” to use mobile data. · वाई-फ़ाई का इंतज़ार है। मोबाइल डेटा से डाउनलोड के लिए “Wi-Fi only” हटाएँ।"
 }

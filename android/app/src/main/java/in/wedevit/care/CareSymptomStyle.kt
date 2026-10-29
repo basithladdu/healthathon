@@ -1,6 +1,8 @@
 package `in`.wedevit.care
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -17,24 +19,54 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 private val SymSelectedBg get() = lerp(Cream, DoctorAccent, .2f)
 
-/** One icon per symptom tile, all from Material Icons (Apache 2.0, already bundled via material-icons-extended). */
-internal fun symptomIcon(key: String): ImageVector = when (key) {
-    "Pain" -> Icons.Default.Healing; "Tiredness" -> Icons.Default.BatteryAlert; "Sleepiness" -> Icons.Default.Bedtime
-    "Poor appetite" -> Icons.Default.NoMeals; "Dry mouth" -> Icons.Default.WaterDrop; "Breathlessness" -> Icons.Default.Air
-    "Constipation" -> Icons.Default.Wc; "Diarrhea" -> Icons.Default.Water; "Nausea" -> Icons.Default.SentimentVeryDissatisfied
-    "Vomiting" -> Icons.Default.Sick; "Difficulty swallowing" -> Icons.Default.LocalDrink; "Cough" -> Icons.Default.RecordVoiceOver
-    "Bowel / bladder incontinence" -> Icons.Default.Opacity; "Mood", "Sadness", "Worry" -> Icons.Default.Mood
-    "Overall well-being" -> Icons.Default.SelfImprovement; "Sleep difficulty" -> Icons.Default.NightsStay; else -> Icons.Default.EditNote
+/** One colour picture per symptom (res/drawable/ic_symptom_*.xml). Keys are the stored symptom names; older keys keep their own picture. */
+@DrawableRes internal fun symptomIconRes(key: String): Int = when (key.trim()) {
+    "Pain" -> R.drawable.ic_symptom_pain; "Tiredness" -> R.drawable.ic_symptom_tiredness; "Sleepiness" -> R.drawable.ic_symptom_sleepiness
+    "Poor appetite" -> R.drawable.ic_symptom_appetite; "Dry mouth" -> R.drawable.ic_symptom_dry_mouth; "Breathlessness" -> R.drawable.ic_symptom_breathlessness
+    "Constipation" -> R.drawable.ic_symptom_constipation; "Diarrhea" -> R.drawable.ic_symptom_diarrhea; "Nausea" -> R.drawable.ic_symptom_nausea
+    "Vomiting" -> R.drawable.ic_symptom_vomiting; "Difficulty swallowing" -> R.drawable.ic_symptom_swallowing; "Cough" -> R.drawable.ic_symptom_cough
+    "Bowel / bladder incontinence" -> R.drawable.ic_symptom_incontinence; "Mood" -> R.drawable.ic_symptom_mood
+    "Sadness" -> R.drawable.ic_symptom_sadness; "Worry" -> R.drawable.ic_symptom_worry; "Weight loss" -> R.drawable.ic_symptom_weight_loss
+    "Overall well-being" -> R.drawable.ic_symptom_wellbeing; "Sleep difficulty" -> R.drawable.ic_symptom_sleep_difficulty
+    else -> R.drawable.ic_symptom_other
+}
+
+/** The main colour of each symptom picture, so tints and accents next to the icon match it. */
+internal fun symptomColor(key: String): Color = when (key.trim()) {
+    "Pain" -> Color(0xFFDC2626); "Tiredness" -> Color(0xFFEA580C); "Sleepiness" -> Color(0xFF7C3AED)
+    "Poor appetite" -> Color(0xFF0F766E); "Dry mouth" -> Color(0xFFE11D48); "Breathlessness" -> Color(0xFF0891B2)
+    "Constipation" -> Color(0xFF8B5A35); "Diarrhea" -> Color(0xFFCA8A04); "Nausea" -> Color(0xFF65A30D)
+    "Vomiting" -> Color(0xFF4D7C0F); "Difficulty swallowing" -> Color(0xFF9333EA); "Cough" -> Color(0xFF64748B)
+    "Bowel / bladder incontinence" -> Color(0xFF0284C7); "Mood", "Sadness" -> Color(0xFF3B82F6); "Worry" -> Color(0xFFD97706)
+    "Weight loss" -> Color(0xFFBE185D); "Overall well-being" -> Color(0xFFEAB308); "Sleep difficulty" -> Color(0xFF312E81)
+    else -> Color(0xFF78716C)
+}
+
+/** The symptom picture as a painter. Draw it with [Image] (or Icon with tint = Color.Unspecified) so its colours stay. */
+@Composable internal fun symptomIcon(key: String): Painter = painterResource(symptomIconRes(key))
+
+/** The symptom picture in full colour. Pass [contentDescription] only when no label sits next to it. */
+@Composable internal fun SymptomIcon(key: String, modifier: Modifier = Modifier, contentDescription: String? = null) {
+    Image(symptomIcon(key), contentDescription, modifier)
+}
+
+/** Round badge: a soft wash of the symptom colour behind its picture. */
+@Composable internal fun SymptomIconBadge(key: String, modifier: Modifier = Modifier, size: Dp = 40.dp, contentDescription: String? = null) {
+    Box(modifier.size(size).clip(CircleShape).background(lerp(Paper, symptomColor(key), .14f)), contentAlignment = Alignment.Center) {
+        SymptomIcon(key, Modifier.size(size * .72f), contentDescription)
+    }
 }
 
 internal fun ratingColor(n: Int): Color = if (n <= 5) lerp(DoctorStatusGood, Color(0xFFB8860B), n / 5f) else lerp(Color(0xFFB8860B), Color(0xFF8E2F1C), (n - 5) / 5f)
@@ -56,13 +88,13 @@ internal fun ratingColor(n: Int): Color = if (n <= 5) lerp(DoctorStatusGood, Col
 }
 
 /** Symptom tile: icon + label, warm fill and check when selected (single choice, so RadioButton). */
-@Composable internal fun SymptomTile(selected: Boolean, label: String, icon: ImageVector, tag: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
+@Composable internal fun SymptomTile(selected: Boolean, label: String, icon: Painter, tag: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
     val shape = RoundedCornerShape(16.dp)
     Row(modifier.heightIn(min = 56.dp).testTag(tag).clip(shape).background(if (selected) SymSelectedBg else Cream, shape)
         .border(if (selected) 2.dp else 1.dp, if (selected) DoctorAccent else DoctorHairline, shape)
         .selectable(selected, role = Role.RadioButton, onClick = onClick).padding(horizontal = 10.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        Icon(icon, null, Modifier.size(22.dp), tint = if (selected) DoctorAccent else DoctorCardSub)
+        Image(icon, null, Modifier.size(30.dp))
         Text(label, Modifier.weight(1f), color = DoctorCardInk, fontSize = 15.sp, lineHeight = 19.sp, fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal)
         if (selected) Icon(Icons.Default.Check, null, Modifier.size(18.dp), tint = DoctorAccent)
     }

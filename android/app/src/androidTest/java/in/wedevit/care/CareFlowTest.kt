@@ -64,7 +64,7 @@ class CareFlowTest {
     /** Step 0 to Step 3 "Transcript". */
     private fun openTranscriptStep() {
         consentEveryoneAndContinue()
-        clickContinue("Continue to transcript")
+        clickContinue("Continue to written text")
     }
     private fun screenshot(name: String) {
         ui.waitForIdle()
@@ -92,8 +92,8 @@ class CareFlowTest {
         // A saved transcript opens as numbered lines; Edit shows the text field again.
         ui.onNodeWithTag("conversation-list").performScrollToNode(hasTestTag("transcript-edit"))
         ui.onNodeWithTag("transcript-edit").performClick()
-        ui.onNodeWithTag("conversation-list").performScrollToNode(hasSetTextAction() and hasText("Conversation transcript"))
-        ui.onNode(hasSetTextAction() and hasText("Conversation transcript")).assertTextContains(words)
+        ui.onNodeWithTag("conversation-list").performScrollToNode(hasSetTextAction() and hasText("Conversation in writing"))
+        ui.onNode(hasSetTextAction() and hasText("Conversation in writing")).assertTextContains(words)
     }
     @Test fun reportPickerPersistsSearchesSharesAndRemovesOnlyItsCopy() {
         val source = CareReport(personId = personId, name = "Clinic report.pdf", mime = "application/pdf", fileName = "source.pdf", bytes = 0)
@@ -170,8 +170,8 @@ class CareFlowTest {
         ui.onNodeWithText("Talk", useUnmergedTree = true).performClick()
         val original = "What matters: I want to spend time with family.\nStill to discuss: I have not decided about hospital care.\nNext steps: Bring my questions to the next visit."
         openTranscriptStep()
-        ui.onNodeWithTag("conversation-list").performScrollToNode(hasSetTextAction() and hasText("Conversation transcript"))
-        ui.onNode(hasSetTextAction() and hasText("Conversation transcript")).performTextInput(original)
+        ui.onNodeWithTag("conversation-list").performScrollToNode(hasSetTextAction() and hasText("Conversation in writing"))
+        ui.onNode(hasSetTextAction() and hasText("Conversation in writing")).performTextInput(original)
         clickContinue("Continue to answers")
         // The five note sections are off the main path now; open them from the Answers step.
         ui.onNodeWithTag("conversation-list").performScrollToNode(hasText("Edit the five note sections"))

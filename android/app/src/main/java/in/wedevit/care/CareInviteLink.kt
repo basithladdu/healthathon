@@ -124,7 +124,7 @@ object CareInviteLog {
             CareInviteState.OPEN -> t("Invited · not joined yet · ", "निमंत्रण भेजा · अभी जुड़े नहीं · ") + expiry
             CareInviteState.CLOSED -> t("Link used or cancelled · see who has access below", "लिंक इस्तेमाल हो गया या रद्द हुआ · नीचे देखें किसे पहुँच है")
             CareInviteState.EXPIRED -> t("Expired · create a new invite", "बंद हो गया · नया निमंत्रण बनाएँ")
-            CareInviteState.UNKNOWN -> t("Sent · couldn't check with the server just now", "भेजा गया · अभी सर्वर से पता नहीं चल सका")
+            CareInviteState.UNKNOWN -> t("Sent · could not check if it arrived", "भेजा गया · अभी पता नहीं चल सका कि पहुँचा या नहीं")
             CareInviteState.UNTRACKED -> t("Sent · ", "भेजा गया · ") + expiry
         }
         return "$who · $text"

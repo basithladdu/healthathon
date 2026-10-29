@@ -138,8 +138,8 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
             }
             if (canEdit) FilledTonalIconButton(onClick = addReport, enabled = !busy, shape = RoundedCornerShape(14.dp), modifier = Modifier.size(48.dp), colors = IconButtonDefaults.filledTonalIconButtonColors(containerColor = Gold, contentColor = Ink)) { Icon(Icons.Default.UploadFile, t("Add a report", "रिपोर्ट जोड़ें")) }
         } }
-        if (vm.demoMode) item { Text(t("Reports you add stay on this phone in the walkthrough and are removed with it. Opening or sharing a file uses your phone's normal share sheet.", "डेमो में जोड़ी गई रिपोर्टें इसी फ़ोन पर रहती हैं और डेमो के साथ हट जाती हैं। फ़ाइल खोलने या भेजने के लिए फ़ोन का सामान्य तरीका इस्तेमाल होता है।"), style = MaterialTheme.typography.bodySmall) }
-        else item { Text(t("Report files stay on this phone. They are not uploaded, and your care team sees them only if you share them. Lab results you copy out of a report are saved with your care record.", "रिपोर्ट की फ़ाइलें इसी फ़ोन पर रहती हैं। ये अपलोड नहीं होतीं; देखभाल टीम इन्हें तभी देखती है जब आप भेजें। रिपोर्ट से कॉपी किए गए लैब नतीजे देखभाल रिकॉर्ड में सेव होते हैं।"), style = MaterialTheme.typography.bodySmall, modifier = Modifier.testTag("documents-on-phone")) }
+        if (vm.demoMode) item { Text(t("In the demo, reports you add stay on this phone. They are removed when the demo ends.", "डेमो में जोड़ी गई रिपोर्टें इसी फ़ोन पर रहती हैं। डेमो ख़त्म होने पर ये हट जाती हैं।"), style = MaterialTheme.typography.bodySmall) }
+        else item { Text(t("Report files stay on this phone. Your care team sees them only if you share them. Lab results you copy from a report are saved in your care record.", "रिपोर्ट की फ़ाइलें इसी फ़ोन पर रहती हैं। देखभाल टीम इन्हें तभी देखती है जब आप भेजें। रिपोर्ट से कॉपी किए लैब नतीजे आपके देखभाल रिकॉर्ड में सेव होते हैं।"), style = MaterialTheme.typography.bodySmall, modifier = Modifier.testTag("documents-on-phone")) }
         if (canEdit) item { OutlinedButton(onClick = scanReport, enabled = !busy, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("document-scan")) { Icon(Icons.Default.PhotoCamera, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Scan a report with the camera", "कैमरे से रिपोर्ट स्कैन करें")) } }
         item { OutlinedTextField(value = search, onValueChange = { search = it }, placeholder = { Text(t("Search documents", "कागज़ात खोजें")) }, leadingIcon = { Icon(Icons.Default.Search, null) },
             trailingIcon = { if (search.isNotEmpty()) IconButton(onClick = { search = "" }) { Icon(Icons.Default.Close, t("Clear document search", "खोज मिटाएँ")) } },
@@ -168,20 +168,20 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
                         DocumentEvidenceRules.find(query, saved)
                     }
                     if (vm.selected.value == capturedPerson) { textMatches = found; searchedText = query }
-                } catch (_: Exception) { textError = t("Couldn't search saved report text. The originals are unchanged. Try again.", "रिपोर्ट के लिखे हिस्से में खोज नहीं हो सकी। असली फ़ाइलें वैसी ही हैं। फिर कोशिश करें।") }
+                } catch (_: Exception) { textError = t("Search did not work. Your reports are safe. Try again.", "खोज नहीं हो सकी। आपकी रिपोर्टें सुरक्षित हैं। फिर कोशिश करें।") }
                 finally { searching = false }
             }
-        }, enabled = search.isNotBlank() && !searching, modifier = Modifier.fillMaxWidth()) { Text(if (searching) t("Searching your reports…", "रिपोर्टों में खोज रहे हैं…") else t("Find in reviewed report text", "जाँची गई रिपोर्टों में खोजें")) } }
+        }, enabled = search.isNotBlank() && !searching, modifier = Modifier.fillMaxWidth()) { Text(if (searching) t("Searching your reports…", "रिपोर्टों में खोज रहे हैं…") else t("Search checked reports", "जाँची गई रिपोर्टों में खोजें")) } }
         if (textError.isNotBlank()) item { Text(textError, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
         if (searchedText.isNotBlank()) {
             item { SectionTitle(t("From your reports", "आपकी रिपोर्टों से")) }
-            if (textMatches.isEmpty()) item { SurfaceCard { Text(t("Not found in your reports", "आपकी रिपोर्टों में नहीं मिला"), fontWeight = FontWeight.SemiBold); Text(t("No answer was generated. Try fewer words, or open a report and review its text first.", "कोई जवाब नहीं बनाया गया। कम शब्दों से खोजें, या पहले रिपोर्ट खोलकर उसका लिखा हिस्सा जाँचें।"), style = MaterialTheme.typography.bodySmall) } }
+            if (textMatches.isEmpty()) item { SurfaceCard { Text(t("Not found in your reports", "आपकी रिपोर्टों में नहीं मिला"), fontWeight = FontWeight.SemiBold); Text(t("Try fewer words. Or open a report and check its text first.", "कम शब्दों से खोजें। या पहले रिपोर्ट खोलकर उसकी लिखाई जाँचें।"), style = MaterialTheme.typography.bodySmall) } }
             items(textMatches, key = { "${it.reportId}:${it.page}:${it.line}" }) { match ->
                 reports.firstOrNull { it.id == match.reportId }?.let { report -> SurfaceCard(Sage) {
                     Text(report.name, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
                     Text(t("Page ${match.page} · line ${match.line}", "पेज ${match.page} · पंक्ति ${match.line}"), style = MaterialTheme.typography.labelMedium)
                     Text(match.quote)
-                    TextButton(onClick = { reviewId = report.id }, colors = ButtonDefaults.textButtonColors(contentColor = RustText)) { Text(t("Read source and copy fact", "मूल पढ़ें और बात कॉपी करें")) }
+                    TextButton(onClick = { reviewId = report.id }, colors = ButtonDefaults.textButtonColors(contentColor = RustText)) { Text(t("Open report and copy this", "रिपोर्ट खोलें और यह कॉपी करें")) }
                 } }
             }
         }
