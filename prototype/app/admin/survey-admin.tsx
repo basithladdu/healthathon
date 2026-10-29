@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import s from './admin.module.css';
 
 type Row = { id: string; facility: Record<string, unknown>; created_at: string; full_name: string; respondent_role: string; council: string; registration_state: string; registration_number: string; mobile: string | null; email: string | null; revision: number; decision: string };
@@ -82,28 +82,32 @@ function downloadCsv(rows: Row[], columns: Column[]) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-type Phase = 'loading' | 'failed' | 'ready';
+type Phase = 'locked' | 'loading' | 'failed' | 'ready';
+const SAVED = 'sahara-admin-password';
+const saved = () => { try { return window.localStorage.getItem(SAVED) ?? ''; } catch { return ''; } };
 
 export function SurveyAdmin() {
-  const [phase, setPhase] = useState<Phase>('loading');
+  const [phase, setPhase] = useState<Phase>('locked'); const [password, setPassword] = useState('');
   const [rows, setRows] = useState<Row[]>([]); const [busy, setBusy] = useState(false); const [message, setMessage] = useState('');
   const [loadedAt, setLoadedAt] = useState('');
   const [query, setQuery] = useState(''); const [newestFirst, setNewestFirst] = useState(true);
   const live = useRef(true);
 
-  async function load() {
-    if (busy) return; setBusy(true); setMessage('');
+  async function load(code = password) {
+    if (busy || !code) return; setBusy(true); setMessage(''); setPhase(p => (p === 'ready' ? p : 'loading'));
     try {
-      const response = await fetch('/api/admin-survey', { cache: 'no-store' });
+      const response = await fetch('/api/admin-survey', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: code }), cache: 'no-store' });
       const value = await response.json().catch(() => ({})) as { rows?: Row[]; error?: string };
       if (!live.current) return;
+      if (response.status === 401) { try { window.localStorage.removeItem(SAVED); } catch { /* ignore */ } setPassword(''); setPhase('locked'); setMessage('Wrong password.'); return; }
+      try { window.localStorage.setItem(SAVED, code); } catch { /* ignore */ } setPassword(code);
       if (!response.ok || !Array.isArray(value.rows)) throw new Error(value.error ?? 'Could not load the survey submissions.');
       setRows(value.rows); setLoadedAt(new Date().toISOString()); setPhase('ready');
       setMessage(value.rows.length ? '' : 'No survey submissions yet.');
     } catch (e) { if (live.current) { setMessage(e instanceof Error ? e.message : 'Could not load the survey submissions.'); setPhase(p => (p === 'ready' ? p : 'failed')); } }
     finally { if (live.current) setBusy(false); }
   }
-  useEffect(() => { live.current = true; const start = setTimeout(() => void load(), 0); return () => { live.current = false; clearTimeout(start); }; }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { live.current = true; const start = setTimeout(() => { const code = saved(); if (code) void load(code); }, 0); return () => { live.current = false; clearTimeout(start); }; }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const extraColumns = useMemo<Column[]>(() => {
     const keys = new Set<string>();
@@ -131,9 +135,14 @@ export function SurveyAdmin() {
   }, [shown]);
 
   const header = <div className={s.toolbarTop}>
-    <div><h1 className={s.title}>Hospital survey responses</h1><p className={s.lead}>Every submission from the hospital survey. Contact details are private: keep this export inside the team.</p></div>
+    <div><h1 className={s.title}>Hospital survey responses</h1><p className={s.lead}>Every submission from the hospital survey.</p></div>
   </div>;
 
+  if (phase === 'locked') return <>{header}<form className={s.form} onSubmit={(e: FormEvent) => { e.preventDefault(); void load(password); }}>
+    <label className={s.field} htmlFor="admin-password">Password<input id="admin-password" type="password" autoComplete="off" value={password} onChange={e => { setPassword(e.target.value); setMessage(''); }} required /></label>
+    {message && <p className={s.error} role="alert">{message}</p>}
+    <button className={s.primary} type="submit" disabled={busy}>Open</button>
+  </form></>;
   if (phase === 'loading') return <>{header}<p className={s.status} role="status">Loading survey submissions…</p></>;
   if (phase === 'failed') return <>{header}<p className={s.notice} role="alert">{message}</p><button type="button" className={s.secondary} disabled={busy} onClick={() => void load()}>Try again</button></>;
 
