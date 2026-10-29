@@ -58,6 +58,9 @@ import type { ConfirmedDocumentTreatment } from './care-document-treatment-state
 import type { HandoverContact } from './family-handover-state';
 import { INITIAL_FAMILY_TASKS, addFamilyTask, editFamilyTask, removeFamilyTask, restoreFamilyTask, setFamilyTaskCompleted, type FamilyTask } from './family-care-state';
 import { ectprQuickViews, EdQuickView, EmergencyCard } from './ectpr';
+import { EctprPlanScreen } from './ectpr-plan-screen';
+import { AmdScreen } from './amd-screen';
+import type { CareLang } from './care-i18n';
 import {
   MyCarePlan,
   MyTimeline,
@@ -846,6 +849,8 @@ export function ContinuityPrototype() {
   const simpleMode = true;
   const [accessReady, setAccessReady] = useState(false);
   const [hindi, setHindi] = useState(false);
+  // Language work replaces this with the header dropdown state.
+  const careLang: CareLang = hindi ? 'hi' : 'en';
   const [currentRole, setCurrentRole] = useState<UserRole>('Dr Sujay · Clinical lead');
   const [authScreen, setAuthScreen] = useState<'login' | null>('login');
   const [sessionType, setSessionType] = useState<'care-team' | 'family' | 'patient'>('family');
@@ -5733,6 +5738,11 @@ export function ContinuityPrototype() {
             onRequestReview={() => requestReview(portalPatientId)}
           />
         );
+      case 'care-plan':
+      case 'doctor-care-plan':
+        return <EctprPlanScreen key={portalPatientId} patientId={portalPatientId} patientName={portalPatientName} role={isPatientSession ? 'patient' : isFamilySession ? 'family' : 'doctor'} clinician={currentRole} lang={careLang} />;
+      case 'living-will':
+        return <AmdScreen key={portalPatientId} patientId={portalPatientId} patientName={portalPatientName} role={isPatientSession ? 'patient' : isFamilySession ? 'family' : 'doctor'} lang={careLang} />;
       case 'consent':
         return (
           <ConsentSignature
