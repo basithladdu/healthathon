@@ -261,8 +261,8 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
             }
             if (unmatched.isNotEmpty()) item {
                 SurfaceCard(Peach) {
-                    Text(t("${unmatched.size} medicine ${if (unmatched.size == 1) "photo was" else "photos were"} not matched", "दवा की ${unmatched.size} फ़ोटो नहीं मिलीं"), fontWeight = FontWeight.Bold)
-                    Text(t("Review ${unmatched.joinToString { "photo ${it + 1}" }}. Add any missing medicine manually or leave it out only after checking the original prescription.", "${unmatched.joinToString { "फ़ोटो ${it + 1}" }} जाँचें। छूटी दवा ख़ुद लिखें, या असली पर्चा देखने के बाद ही उसे छोड़ें।"))
+                    Text(run { val n = unmatched.size; if (n == 1) t("1 medicine photo was not matched", "दवा की 1 फ़ोटो नहीं मिली") else t("$n medicine photos were not matched", "दवा की $n फ़ोटो नहीं मिलीं") }, fontWeight = FontWeight.Bold)
+                    Text(run { val photos = unmatched.joinToString { val k = it + 1; t("photo $k", "फ़ोटो $k") }; t("Review $photos. Add any missing medicine manually or leave it out only after checking the original prescription.", "$photos जाँचें। छूटी दवा ख़ुद लिखें, या असली पर्चा देखने के बाद ही उसे छोड़ें।") })
                     unmatched.filter { it in medicineUris.indices }.forEach { index -> TextButton(onClick = { runCatching {
                         context.startActivity(Intent(Intent.ACTION_VIEW).setDataAndType(Uri.parse(medicineUris[index]), "image/*").addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION))
                     }.onFailure { scanError = t("No image viewer is available. Open this photo in Files to compare it.", "फ़ोटो देखने वाला ऐप नहीं मिला। मिलान के लिए यह फ़ोटो Files में खोलें।") } }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("View medicine photo ${index + 1}", "दवा की फ़ोटो ${index + 1} देखें")) } }
@@ -304,7 +304,7 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
                         finally { savingSources = false }
                     }
                 }, enabled = valid && !busy && !savingSources, modifier = Modifier.fillMaxWidth().heightIn(min = 54.dp), shape = RoundedCornerShape(16.dp)) {
-                    Text(if (busy || savingSources) t("Saving…", "सहेज रहे हैं…") else if(onReviewedMedicines != null) t("Use ${drafts.size} reviewed medicines", "जाँची गई ${drafts.size} दवाएँ लें") else t("Save ${drafts.size} ${if (drafts.size == 1) "medicine" else "medicines"}", "${drafts.size} दवा सहेजें"))
+                    Text(if (busy || savingSources) t("Saving…", "सहेज रहे हैं…") else if(onReviewedMedicines != null) t("Use ${drafts.size} reviewed medicines", "जाँची गई ${drafts.size} दवाएँ लें") else run { val n = drafts.size; if (n == 1) t("Save 1 medicine", "1 दवा सहेजें") else t("Save $n medicines", "$n दवा सहेजें") })
                 }
                 if (!valid) Text(t("Before saving, add a medicine name and dose, check photos that did not match, and confirm every medicine.", "सहेजने से पहले दवा का नाम और ख़ुराक लिखें, बिना मिली फ़ोटो देखें और हर दवा की पुष्टि करें।"), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 8.dp))
                 TextButton(onClick = { returnToImages() }, enabled = !busy, modifier = Modifier.fillMaxWidth()) { Text(t("Back to photos", "फ़ोटो पर वापस")) }
@@ -414,7 +414,7 @@ private fun MedicineReviewCard(draft: MedicineDraft, storage: String, personId: 
         CareField(medicine.instructions, { change(medicine.copy(instructions = it.take(500))) }, t("Directions", "तरीक़ा"), minLines = 2, placeholder = t("e.g. as written: dissolve in water", "जैसे पर्चे में लिखा: पानी में घोलकर"))
         Text(t("Food timing", "खाने के हिसाब से समय"), fontWeight = FontWeight.SemiBold)
         if (medicine.sourceQuote.isNotBlank()) {
-            Text(t("Original reading · ${medicine.prescriptionPageIndexes.joinToString { "page ${it + 1}" }}", "असली पढ़ाई · ${medicine.prescriptionPageIndexes.joinToString { "पेज ${it + 1}" }}"), style = MaterialTheme.typography.labelMedium)
+            Text(run { val pages = medicine.prescriptionPageIndexes.joinToString { val k = it + 1; t("page $k", "पेज $k") }; t("Original reading · $pages", "असली पढ़ाई · $pages") }, style = MaterialTheme.typography.labelMedium)
             Text(medicine.sourceQuote, style = MaterialTheme.typography.bodySmall)
         }
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())) {

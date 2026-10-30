@@ -117,7 +117,7 @@ object CareInviteLog {
         val relation = CareRelationsHindi[e.relation]?.takeIf { hindi } ?: careTr(false, e.relation, e.relation).let { if (it == e.relation) it.lowercase() else it }
         val who = listOf(e.name, relation).filter { it.isNotBlank() }.joinToString(" · ").ifBlank { if (e.role == "clinician") t("Doctor invitation", "डॉक्टर का निमंत्रण") else t("Family invitation", "परिवार का निमंत्रण") }
         val left = e.expiresAt - now; val days = ((left + DAY_MS - 1) / DAY_MS).toInt()
-        val expiry = if (left < DAY_MS) t("expires today", "आज बंद होगा") else t("expires in $days ${if (days == 1) "day" else "days"}", "$days दिन में बंद होगा")
+        val expiry = if (left < DAY_MS) t("expires today", "आज बंद होगा") else if (days == 1) t("expires in 1 day", "1 दिन में बंद होगा") else t("expires in $days days", "$days दिन में बंद होगा")
         val day = if (status.at > 0) java.time.Instant.ofEpochMilli(status.at).atZone(java.time.ZoneId.systemDefault()).format(careDateFormat("d MMM", hindi)) else ""
         val text = when (status.state) {
             CareInviteState.JOINED -> listOf(t("Joined", "जुड़ गए"), memberEmail, day).filter { it.isNotBlank() }.joinToString(" · ")

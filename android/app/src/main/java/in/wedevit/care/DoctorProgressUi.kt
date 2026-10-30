@@ -83,7 +83,7 @@ import java.util.Locale
             Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(t("Other information", "और जानकारी"), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
                 val unknowns = buildList { if (report.questions.isEmpty()) add(t("specific questions", "ख़ास सवाल")); if (report.familySupport.isEmpty()) add(t("family arrangements", "परिवार के इंतज़ाम")); if (report.linkedDiscussion == null) add(t("a linked discussion", "जुड़ी चर्चा")); add(t("a linked visit", "जुड़ी विज़िट")) }
-                Text(t("This update does not record ${unknowns.joinToString(", ")}. Visit history is separate.", "इस अपडेट में ${unknowns.joinToString(", ")} दर्ज नहीं। विज़िट का इतिहास अलग है।"), color = DoctorCardSub, style = MaterialTheme.typography.bodySmall, lineHeight = 19.sp)
+                Text(run { val missing = unknowns.joinToString(", "); t("This update does not record $missing. Visit history is separate.", "इस अपडेट में $missing दर्ज नहीं। विज़िट का इतिहास अलग है।") }, color = DoctorCardSub, style = MaterialTheme.typography.bodySmall, lineHeight = 19.sp)
                 if (report.medicineActivity.isEmpty()) Text(t("No related medicine activity was scheduled on this report date.", "इस सूचना की तारीख़ पर कोई जुड़ी दवा गतिविधि तय नहीं थी।"), color = DoctorCardSub, style = MaterialTheme.typography.bodySmall, lineHeight = 19.sp)
                 TextButton(onClick = onOpenVisits, modifier = Modifier.heightIn(min = 48.dp).testTag("progress-open-visits")) { Icon(Icons.Outlined.CalendarMonth, null, tint = Rust, modifier = Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Open patient visits", "मरीज़ की विज़िट खोलें"), color = Rust) }
             }

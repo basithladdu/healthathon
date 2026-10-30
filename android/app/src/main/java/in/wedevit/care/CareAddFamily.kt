@@ -68,7 +68,7 @@ internal fun shareCareInvite(context: Context, text: String, whatsApp: Boolean) 
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(horizontal = 22.dp).padding(bottom = 30.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
             Heading(t("Add family", "परिवार जोड़ें"), 28)
             if (cloud == null) {
-                Text(t("To let family see ${patient.ifBlank { "this person" }}'s care on their own phone, you first need to sign in. It takes a minute.", "परिवार अपने फ़ोन पर ${patient.ifBlank { "इस व्यक्ति" }} की देखभाल देख सके, इसके लिए पहले साइन इन करें। इसमें बस एक मिनट लगता है।"))
+                run { val who = patient.ifBlank { t("this person", "इस व्यक्ति") }; Text(t("To let family see $who's care on their own phone, you first need to sign in. It takes a minute.", "परिवार अपने फ़ोन पर $who की देखभाल देख सके, इसके लिए पहले साइन इन करें। इसमें बस एक मिनट लगता है।")) }
                 Button(onClick = { onDismiss(); onSignIn() }, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Icon(Icons.Default.AccountCircle, null); Spacer(Modifier.width(8.dp)); Text(t("Sign in or create an account", "साइन इन करें या खाता बनाएँ")) }
             } else if (!owner || selected.isBlank()) {
                 Text(t("Only the person who set up these records can invite family.", "परिवार को सिर्फ़ वही बुला सकते हैं जिन्होंने ये रिकॉर्ड बनाए हैं।"))

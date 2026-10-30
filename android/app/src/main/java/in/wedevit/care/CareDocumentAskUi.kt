@@ -87,7 +87,7 @@ import kotlinx.coroutines.withContext
                     answer = client.ask(request, cloud.transcriptionToken(), true)
                 } catch (cancel: CancellationException) { throw cancel }
                 catch (error: Exception) {
-                    notice = t("The online answer did not work this time${error.message?.let { " (${it.trimEnd('.')})" }.orEmpty()}. Below are the matching lines found on this phone instead.", "ऑनलाइन जवाब इस बार नहीं मिला। इसकी जगह इस फ़ोन पर मिली पंक्तियाँ नीचे हैं।")
+                    notice = run { val detail = error.message?.let { " (${it.trimEnd('.')})" }.orEmpty(); t("The online answer did not work this time$detail. Below are the matching lines found on this phone instead.", "ऑनलाइन जवाब इस बार नहीं मिला$detail। इसकी जगह इस फ़ोन पर मिली पंक्तियाँ नीचे हैं।") }
                 }
                 local = found
             } catch (cancel: CancellationException) { message = t("Stopped. Nothing else was sent.", "रोक दिया। और कुछ नहीं भेजा गया।"); throw cancel }
@@ -122,7 +122,7 @@ import kotlinx.coroutines.withContext
                 }
             }
             item { OutlinedTextField(question, { question = it.take(DocumentQuestionRules.MAX_QUESTION); answer = null; local = null }, label = { Text(t("Your question", "आपका सवाल")) }, minLines = 2, enabled = job == null, modifier = Modifier.fillMaxWidth().testTag("document-ask-question")) }
-            if (service != null) item { CheckLine(consent, { consent = it }, t("I agree to send my question and ${if (searchAll) "the matching lines from my documents" else "the text of these ${chosen.size} documents"} to ${service.provider}. Photos and files are not sent. Nothing is sent until I tap Ask. I will be asked again next time.", "मैं अपना सवाल और ${if (searchAll) "मेरे कागज़ों की मिलती पंक्तियाँ" else "इन ${chosen.size} कागज़ों की लिखाई"} ${service.provider} को भेजने के लिए राज़ी हूँ। फ़ोटो और फ़ाइलें नहीं भेजी जातीं। ‘पूछें’ दबाने तक कुछ नहीं भेजा जाता। अगली बार फिर पूछा जाएगा।")) }
+            if (service != null) item { val count = chosen.size; val sendWhat = if (searchAll) t("the matching lines from my documents", "मेरे कागज़ों की मिलती पंक्तियाँ") else t("the text of these $count documents", "इन $count कागज़ों की लिखाई"); val sendTo = service.provider; CheckLine(consent, { consent = it }, t("I agree to send my question and $sendWhat to $sendTo. Photos and files are not sent. Nothing is sent until I tap Ask. I will be asked again next time.", "मैं अपना सवाल और $sendWhat $sendTo को भेजने के लिए राज़ी हूँ। फ़ोटो और फ़ाइलें नहीं भेजी जातीं। ‘पूछें’ दबाने तक कुछ नहीं भेजा जाता। अगली बार फिर पूछा जाएगा।")) }
             item { val ready = (if (searchAll) reports.isNotEmpty() else chosen.isNotEmpty()) && question.isNotBlank() && job == null
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (service != null) Button(onClick = { ask(true) }, enabled = consent && ready, modifier = Modifier.testTag("document-ask-send")) { Text(t("Ask", "पूछें")) }

@@ -68,7 +68,7 @@ import androidx.compose.ui.unit.sp
     if (references.isNotEmpty()) Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
         references.distinctBy { it.line.id }.forEach { reference -> AssistChip(onClick = { chosen = reference }, label = { Text(t("Source line ${reference.line.number}", "स्रोत पंक्ति ${reference.line.number}")) }, leadingIcon = { Icon(Icons.Default.Link, null, Modifier.size(16.dp)) }) }
     }
-    if (unlinked.isNotEmpty()) Text(t("${unlinked.size} ${if (unlinked.size == 1) "line uses" else "lines use"} edited wording. Check against the original conversation.", "${unlinked.size} पंक्तियों में बदले हुए शब्द हैं। मूल बातचीत से मिलाएँ।"), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+    if (unlinked.isNotEmpty()) Text(run { val n = unlinked.size; if (n == 1) t("1 line uses edited wording. Check against the original conversation.", "1 पंक्ति में बदले हुए शब्द हैं। मूल बातचीत से मिलाएँ।") else t("$n lines use edited wording. Check against the original conversation.", "$n पंक्तियों में बदले हुए शब्द हैं। मूल बातचीत से मिलाएँ।") }, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
     chosen?.let { reference -> AlertDialog(onDismissRequest = { chosen = null }, title = { Text(t("Original words · line ${reference.line.number}", "मूल शब्द · पंक्ति ${reference.line.number}")) }, text = { SelectionContainerText(reference.line.text) }, confirmButton = { TextButton(onClick = { chosen = null }) { Text(t("Close", "बंद करें")) } }) }
 }
 
