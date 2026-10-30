@@ -38,7 +38,7 @@ This covers the build of SVK's two specs: the emergency care plan (ECTPR) and th
 
 Pages: `/care-plan`, `/doctor/care-plan`, `/living-will`, `/emergency-card`, and the public `/ed/<token>`.
 
-**Android** (`android/app/src/main/java/in/wedevit/care/`): `CarePlanModel.kt`, `CarePlanStore.kt`, `CarePlanUi.kt`, `CarePlanPdf.kt`, `CareLivingWill.kt`, plus languages in `CareLanguage.kt` and `src/main/resources/i18n/{te,ur,kn}.tsv`.
+**Android** (`android/app/src/main/java/in/wedevit/care/`): `CarePlanModel.kt`, `CarePlanStore.kt`, `CarePlanUi.kt`, `CarePlanExtrasUi.kt`, `CarePlanPilot.kt`, `CarePlanPdf.kt`, `CareEdCard.kt` (QR card upload, offline queue), `CareLivingWill.kt`, plus languages in `CareLanguage.kt` and `src/main/resources/i18n/{te,ur,kn}.tsv`. Tests: `src/test/.../CareEdCardTest.kt` checks the snapshot field names against `ectpr-model.ts`; `CarePlanFlowRenderTest` draws the screens when run with `-PSAHARA_RENDER_UI=true`.
 
 **Database:** `prototype/supabase/migrations/20261029230000_sahara_ed_cards.sql`, applied by Basith on 30 Oct. Tables `sahara_ed_cards` and `sahara_ed_access_log`. Rows cannot be deleted by design.
 
@@ -77,12 +77,22 @@ New text: every `t("en","hi")` on Android must also go in the three `.tsv` files
 - Issue a card, open the QR link with no sign-in, emergency override with a typed reason, withdraw: all worked for sample patient Meera. The public view strips date of birth, address, phone and the patient's own words.
 - The QR page loaded in about 1.3 s on a desktop connection. **Not measured on a phone or 3G**, which is the spec's target.
 - Urdu right-to-left on a phone-sized screen.
-- Web tests: 425 of 425 before the last small fixes. Production build passed earlier on 30 Oct.
-- A team test left one withdrawn card and two access log rows in Supabase. They cannot be deleted.
+- Web tests: 425 of 425, re-run on the final code. Production build passed earlier on 30 Oct.
+- A team test left one withdrawn card and two access log rows in Supabase. The Android work's curl test added one more withdrawn synthetic card. They cannot be deleted.
+
+## What was checked on Android (30 Oct)
+
+- Unit tests: 670, 0 failed, 1 skipped (`PdfPasswordLockTest` needs poppler). None touch the network.
+- Debug APK builds. `CarePlanFlowRenderTest` passes, and 4 of its screenshots were looked at.
+- The server accepted a hand-written issue, view and revoke by curl, in the shape Android sends. That JSON did not come from the Kotlin code.
 
 ## Not verified
 
 - Anything on a real phone. No device was connected.
+- Android: a real card upload from the app, a Kotlin-made snapshot on the web `/ed/<token>` page, and scanning either QR with a camera.
+- Android: the plan and living will PDFs have never been opened. `CarePlanPdfTest` (androidTest) was updated but not compiled or run.
+- Android: translated screens were not looked at, including Urdu right-to-left in the PDF.
+- Android: `CareLanguageState` crashed in the render test when created during composition, so it now starts in `MainActivity`. Whether the old crash happened on a device is unknown.
 - Read-aloud sound: the test browser has no voices. Only the text and language sent to the speech engine were checked.
 - A real SMS: no provider is set up.
 - A real AI answer: no keys are set; all AI tests use fake services.
@@ -110,6 +120,11 @@ New text: every `t("en","hi")` on Android must also go in the three `.tsv` files
 - Translations are machine drafts. A clinician must back-translate before the pilot, starting with ED banners, the board pathway and the "cannot end life" message. Known oddities: "Home" is translated in the navigation sense but also used as a place of care; Kannada "Review" is an imperative used as a label; Telugu "No preference recorded" contains "ఇష్టం".
 - Android "Ask your documents" only understands English and Hindi.
 - Android emergency PDF: English and Hindi only, by the language agent's choice. SVK should decide, since the spec asks for matching Telugu PDFs.
+- Android has no ECTPR "Distribution" (signed-plan scan and copy list); the checklist and SHA-256 exist for the living will only.
+- Android: read-aloud status messages in `CareSpeech.kt` are English. No custodian suggestion chips or revocation scan upload.
+- Android keeps `nivTrial` in the snapshot. The server stores it, but the web emergency view does not show it, so a card opened by QR does not display an NIV trial. Fix or remove this before the pilot.
+- Android old-format living wills come back as drafts to sign again, including ones marked executed. No real ones should exist.
+- Native review for Android translations: Sahara in both Latin and local script; Kannada "ಪಾಲಕರು" means both custodian and guardian; transliterated case names; "resuscitation bay" in Telugu.
 
 ## Before any real patient
 
@@ -117,4 +132,4 @@ Ethics committee approval, hospital legal review, real login, clinician back-tra
 
 ## Restore points
 
-Git tags: `checkpoint-2026-10-29-before-svk-build`, `checkpoint-2026-10-30-web-svk`.
+Git tags: `checkpoint-2026-10-29-before-svk-build`, `checkpoint-2026-10-30-web-svk`, `checkpoint-2026-10-30-android-svk`.
