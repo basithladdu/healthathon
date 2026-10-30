@@ -6,11 +6,20 @@ Agents cannot do these: server migrations, deployments, provider accounts and ke
 
 Collected on 27 Oct from every agent lane across Sahara, ITI, WDCW and AI-FIR. The web survey and Android feature work have separate handoffs; these are the remaining owner/team actions. Tick an item only after the external step is verified.
 
+### Sahara: API keys, Awaiz to do (added 30 Oct)
+**Owner: Awaiz.** Add these in Vercel → project `continuity-loop-healthathon` → Settings → Environment Variables (Production), then redeploy with `vercel deploy --prod` from `prototype/`. Sign-up links, free limits and optional overrides are in [docs/FREE_MODELS.md](docs/FREE_MODELS.md). The care plan, living will, emergency page and QR do not need any of them.
+- [ ] `GEMINI_API_KEY`: AI answers, note drafting, speech-to-text and translation. Free tier is for fake patients only; see the billing note below.
+- [ ] `GROQ_API_KEY`: backup when Gemini fails or hits its limit, and backup speech-to-text.
+- [ ] Optional more backups: `OPENROUTER_API_KEY`, `HF_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` + `CLOUDFLARE_API_TOKEN`.
+- [ ] Optional translation of typed text: `BHASHINI_USER_ID` + `BHASHINI_API_KEY`.
+- [ ] SMS for the emergency override, which otherwise says "SMS not configured": see `prototype/app/api/ed-card/sms.ts` for the provider variable names.
+- [ ] After adding, check on the live site that an AI answer works and shows which service answered.
+
 ### Sahara: do these now (29 Oct)
 **AI with Gemini (one key, on Vercel).** The Android app now calls `https://sahara.wedevit.in/api/sahara-assist` for note drafting, speech-to-text, translation and "Ask your documents". It replaces the Supabase function, so the Supabase function deploy below is no longer needed.
 - [ ] Google AI Studio (aistudio.google.com) → Get API key → create a key.
 - [ ] **Before real patient data:** turn on billing for that Google project (paid tier). On the free tier Google may use what is sent to improve its products and humans may review it; the paid tier does not. Also check the data region. For the demo with fake patients the free tier is fine.
-- [ ] Vercel → project `continuity-loop-healthathon` → Settings → Environment Variables → add `GEMINI_API_KEY` (Production) = the key. Then redeploy: run `vercel deploy --prod` in `prototype/`. Nothing else is needed: model defaults to `gemini-2.5-flash` (override with `SAHARA_AI_MODEL`).
+- [ ] Vercel → project `continuity-loop-healthathon` → Settings → Environment Variables → add `GEMINI_API_KEY` (Production) = the key. Then redeploy: run `vercel deploy --prod` in `prototype/`. Nothing else is needed: model defaults to `gemini-3.5-flash-lite` (override with `GEMINI_MODEL`).
 - [ ] Optional but better: apply migration `android/supabase/migrations/20261019151322_shared_care_clinician_review.sql` (holds `sahara_reserve_assist`, the durable 1-a-minute / 10-a-day limit per account). Until then the server uses a per-instance limit that is only a speed bump.
 - [ ] Optional: apply `20261028120000_assist_document_questions.sql` so the database limit also counts "ask".
 - [ ] Check on a phone after the key is in: sign in with a confirmed account → Docs → "Ask your documents" → "Search all my documents" on → ask "When is my next review?". The answer must show the cited lines.
