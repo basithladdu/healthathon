@@ -705,6 +705,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
                 withContext(Dispatchers.IO) { File(audioRoot(), id).deleteRecursively(); reportFiles.removePerson(id) }
                 CareDocumentReviewStore(getApplication(), storageNamespace).removePerson(id)
                 withContext(Dispatchers.IO) { EmergencyCardStore(getApplication(), storageNamespace).removePerson(id) }
+                withContext(Dispatchers.IO) { CarePlanStore(getApplication(), storageNamespace).removePerson(id) }
                 withContext(Dispatchers.IO) { NoteSignatureStore.of(getApplication(), storageNamespace).removePerson(id) }
             }
             reconcileReminders()

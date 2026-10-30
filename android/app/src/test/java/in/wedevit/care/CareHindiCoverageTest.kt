@@ -44,6 +44,10 @@ class CareHindiCoverageTest {
         // Goals-of-care sign-off and the optional screening helper (28 Oct).
         "GoalsSignatureUi.kt" to listOf("NoteSignatureCapture", "NoteSignedBy"),
         "GoalsScreening.kt" to listOf("GoalsScreeningHelper"),
+        // Emergency plan (ECTPR) wizard, ED Quick View, wallet card and living will (SVK specs, 29 Oct).
+        "CarePlanUi.kt" to listOf("CarePlanScreen", "PlanHeader", "IfInDoubtBox", "CareContinuesBox", "CarePlanHome", "WithdrawPlanForm", "EctprWizard", "PatientFields", "FamilyFields", "DecisionMakerFields",
+            "CapacityFields", "UnderstandingFields", "ValuesFields", "LockedTreatment", "TreatmentIntro", "GoalAndTransfer", "CprFields", "TrialEditor", "BreathingFields", "OrganSupportFields",
+            "FeedingFields", "ConflictFields", "ReviewFields", "SignatureFields", "EdQuickViewPage", "EdRowView", "WalletCardPage", "LivingWillPage", "RevokeAmd", "AmdEditor", "DhrFields", "ExecuteAmd", "CarePlanEntryCard"),
     )
 
     /** Literals that are keys, animation labels or format patterns, never shown as text. */

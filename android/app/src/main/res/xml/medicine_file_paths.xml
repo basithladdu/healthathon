@@ -6,4 +6,5 @@
     <cache-path name="signature_photo" path="signature-photo/" />
     <files-path name="reports" path="reports/" />
     <files-path name="emergency_cards" path="emergency-cards/" />
+    <files-path name="care_plans" path="care-plans/" />
 </paths>

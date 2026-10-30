@@ -181,6 +181,7 @@ fun EmbeddedPatientCare(
                         "calendar" -> CareCalendar(vm, onWorkflow = { openTool("workflows") }, onAddDoctorVisit = { add("doctor-visit") })
                         "workflows" -> CareWorkflows(vm, onTalk = { changeSection("Conversations") })
                         "labs" -> CareLabs(vm)
+                        "care-plan" -> CarePlanScreen(vm, clinician = true, onBack = ::leaveTool)
                         "nearby" -> Nearby(vm.centres, vm)
                         "documents" -> CareDocuments(vm, onRead = ::read, onTalk = { changeSection("Conversations") })
                         "care-story" -> DoctorCareStory(person, versions, ::read)
@@ -223,6 +224,7 @@ fun EmbeddedSharedCare(vm: CareModel, onAccount: () -> Unit, onClose: () -> Unit
 internal fun EmbeddedCareTools(onOpen: (String) -> Unit) { val t = careText();
     val tools = listOf(
         Triple("daily", t("Daily care", "रोज़ की देखभाल"), t("Medicines, tasks, check-ins and journal", "दवाएँ, काम, रोज़ का हाल और डायरी")),
+        Triple("care-plan", t("Emergency plan & living will", "आपातकालीन योजना और लिविंग विल"), t("ECTPR wizard, ED Quick View, wallet card QR, living will", "ECTPR फ़ॉर्म, ED क्विक व्यू, वॉलेट कार्ड QR, लिविंग विल")),
         Triple("calendar", t("Calendar", "कैलेंडर"), t("Planned care activities and visits", "तय देखभाल और विज़िट")),
         Triple("workflows", t("Care team & requests", "देखभाल टीम और अनुरोध"), t("Existing shared-care tasks and discussion requests", "साझा देखभाल के काम और चर्चा के अनुरोध")),
         Triple("labs", t("Lab history", "जाँच रिपोर्टें"), t("Reported results and earlier entries", "बताए गए नतीजे और पुरानी एंट्री")),
