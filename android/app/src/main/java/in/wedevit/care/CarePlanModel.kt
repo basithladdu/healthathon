@@ -18,7 +18,16 @@ import java.time.Period
 const val ECTPR_FORM_VERSION = "Sahara ECTPR v1.0"
 
 /** An English/Hindi pair for text that is shown but never stored. */
-data class Bi(val en: String, val hi: String) { fun pick(hindi: Boolean) = if (hindi) hi else en }
+data class Bi(val en: String, val hi: String, val local: String? = null) {
+    /** Telugu, Urdu and Kannada come from the dictionaries; [local] is set when a line is built from smaller translated parts. */
+    fun pick(hindi: Boolean) = if (hindi) hi else local ?: careTr(false, en, hi)
+    companion object {
+        /** Parts joined in every language, so a composed line still reads in the chosen language. */
+        fun join(separator: String, parts: List<Bi>) = Bi(parts.joinToString(separator) { it.en }, parts.joinToString(separator) { it.hi }, parts.joinToString(separator) { it.pick(false) })
+        fun labeled(label: Bi, value: Bi) = join(": ", listOf(label, value))
+        fun plain(value: String) = Bi(value, value, value)
+    }
+}
 
 enum class GoalOfCare { A_LIFE, B_CEILING, C_COMFORT }
 enum class Cpr { ATTEMPT, DNACPR }
@@ -129,9 +138,9 @@ data class EctprRecord(
 }
 
 enum class IssueSeverity { BLOCK, CONFIRM, WARN }
-/** [severity]: BLOCK stops saving, CONFIRM stops saving until a reason or confirmation is recorded, WARN is shown only. */
+/** Same as the web: BLOCK stops saving (or, for [EctprRules.ACTIVATION_ONLY], signing), CONFIRM stops signing until a reason or confirmation is recorded, WARN is shown only. */
 data class RuleIssue(val id: String, val severity: IssueSeverity, val field: String, val message: String, val messageHi: String) {
-    fun text(hindi: Boolean) = if (hindi) messageHi else message
+    fun text(hindi: Boolean) = careTr(hindi, message, messageHi)
 }
 
 internal object PlanDates {
@@ -149,7 +158,7 @@ object PlanIds {
 /** Rules V1–V9 (tech spec §5) and C1–C8 (clinical spec §4), plus L1 and the trial and capacity completeness checks. */
 object EctprRules {
     /** Checks that only stop a plan becoming Active; a draft may be saved without them. */
-    val ACTIVATION_ONLY = setOf("V6", "V7", "REVIEW_DUE")
+    val ACTIVATION_ONLY = setOf("V6", "V7", "V8", "REVIEW_DUE")
 
     private fun issue(id: String, severity: IssueSeverity, field: String, en: String, hi: String) = RuleIssue(id, severity, field, en, hi)
 
@@ -193,7 +202,9 @@ object EctprRules {
         if (c.hospitalTransfer?.kind == TransferKind.ONLY_FOR && c.hospitalTransfer.reasons.isEmpty())
             add(issue("TRANSFER_REASONS", IssueSeverity.BLOCK, "choices.hospitalTransfer", "Tick at least one reason for going to hospital.", "अस्पताल जाने का कम से कम एक कारण चुनें।"))
         // C1: no transfer, but ICU or a ceiling of HFNC or above. Home NIV is a valid exception: allow with reason.
-        if (c.hospitalTransfer?.kind == TransferKind.NO && (c.icu?.kind == IcuKind.YES || c.icu?.kind == IcuKind.TRIAL || (ceiling != null && ceiling >= 3)) && c.conflictReasons["C1"].isNullOrBlank())
+        val icuWanted = c.icu?.kind == IcuKind.YES || c.icu?.kind == IcuKind.TRIAL
+        val homeNivOk = !icuWanted && c.ceilingConditions.homeNivReason.isNotBlank()
+        if (c.hospitalTransfer?.kind == TransferKind.NO && (icuWanted || (ceiling != null && ceiling >= 3)) && !homeNivOk && c.conflictReasons["C1"].isNullOrBlank())
             add(issue("C1", IssueSeverity.CONFIRM, "choices.conflictReasons.C1", "Hospital transfer is \"No\", but HFNC, NIV or ICU usually need admission. Record a reason (for example, home NIV).", "अस्पताल ले जाना \"नहीं\" है, पर HFNC, NIV या ICU के लिए आमतौर पर भर्ती ज़रूरी है। कारण लिखें (जैसे घर पर NIV)।"))
         // C2: comfort goal with ICU, vasopressors or dialysis = Yes.
         if (c.goalOfCare == GoalOfCare.C_COMFORT && (c.icu?.kind == IcuKind.YES || c.vasopressors?.kind == VasopressorKind.YES_NO_LIMIT || c.vasopressors?.kind == VasopressorKind.YES_MAX_AGENTS || c.dialysis?.kind == DialysisKind.YES) && c.conflictReasons["C2"].isNullOrBlank())
@@ -224,13 +235,15 @@ object EctprRules {
         // Activation-only checks.
         if (PlanDates.day(r.reviewDue)?.isBefore(today) != false) add(issue("REVIEW_DUE", IssueSeverity.BLOCK, "reviewDue", "Set a review date that is not in the past.", "समीक्षा की ऐसी तारीख़ चुनें जो बीत न चुकी हो।"))
         if (r.consultantSignature == null) add(issue("V7", IssueSeverity.BLOCK, "signatures", "The plan becomes active only when the treating consultant signs with their registration number.", "योजना तभी लागू होगी जब इलाज करने वाले कंसल्टेंट अपने रजिस्ट्रेशन नंबर के साथ हस्ताक्षर करें।"))
+        // V8: every printed page and the emergency card need the name and hospital number (the card server refuses a plan without a UHID).
+        if (r.patient.name.isBlank() || r.patient.uhid.isBlank()) add(issue("V8", IssueSeverity.BLOCK, "patient", "Every printed page shows the name and hospital number (UHID). Enter both.", "हर छपे पन्ने पर नाम और अस्पताल नंबर (UHID) होता है। दोनों लिखें।"))
         if ((r.limitedLiteracy || r.signatures.any { it.thumbImpression == true }) && r.witnesses.size < 2)
             add(issue("V6", IssueSeverity.BLOCK, "signatures", "A thumb impression or limited literacy needs two witnesses.", "अँगूठे के निशान या कम पढ़े-लिखे होने पर दो गवाह ज़रूरी हैं।"))
     }
 
     private fun stops(i: RuleIssue) = i.severity != IssueSeverity.WARN
-    /** What stops a draft being saved. "Goal C + attempt CPR cannot save without a reason." */
-    fun saveBlockers(r: EctprRecord, today: LocalDate) = check(r, today).filter { stops(it) && it.id !in ACTIVATION_ONLY }
+    /** What stops a draft being saved. "Goal C + attempt CPR cannot save without a reason." A CONFIRM (C1, C3, V3) waits until signing, as on the web. */
+    fun saveBlockers(r: EctprRecord, today: LocalDate) = check(r, today).filter { it.severity == IssueSeverity.BLOCK && it.id !in ACTIVATION_ONLY }
     /** What stops a draft becoming the Active plan (V7 and the rest). */
     fun activationBlockers(r: EctprRecord, today: LocalDate) = check(r, today).filter(::stops)
     fun warnings(r: EctprRecord, today: LocalDate) = check(r, today).filter { it.severity == IssueSeverity.WARN }
@@ -256,14 +269,16 @@ object IfInDoubt {
 /** V9: Sahaara §16 "always provided" care, printed on every ECTPR, so the record is never read as "DNR = no care". */
 object CareThatContinues {
     val TITLE = Bi("Care that always continues", "देखभाल जो हमेशा जारी रहती है")
+    /** Exactly ALWAYS_PROVIDED_CARE in prototype/app/ectpr-rules.ts, with the Hindi of ectpr-labels.ts. */
     val ITEMS = listOf(
-        Bi("Relief of pain, breathlessness and other symptoms", "दर्द, साँस फूलने और दूसरी तकलीफ़ों से राहत"),
-        Bi("Mouth care, and food and drink by mouth if wanted (hand feeding)", "मुँह की सफ़ाई, और चाहें तो मुँह से खाना-पीना (हाथ से खिलाना)"),
-        Bi("Washing, skin care, turning and comfortable positioning", "नहलाना, त्वचा की देखभाल, करवट बदलना और आरामदायक स्थिति"),
-        Bi("Oxygen, suction and medicines when they bring comfort", "आराम देने पर ऑक्सीजन, बलगम निकालना और दवाएँ"),
-        Bi("Dignity, privacy, and family at the bedside", "सम्मान, निजता और परिवार का साथ"),
-        Bi("Emotional, spiritual and religious support", "भावनात्मक, आध्यात्मिक और धार्मिक सहारा"),
-        Bi("Honest information, and review by the care team at any time", "सच्ची जानकारी, और किसी भी समय देखभाल टीम से समीक्षा"),
+        Bi("Mouth care and lip care, to keep the mouth moist and clean.", "मुँह और होंठों की देखभाल, ताकि मुँह नम और साफ़ रहे।"),
+        Bi("Food and drink by mouth, given by hand for comfort, as much as the person wants and can safely swallow.", "आराम के लिए हाथ से मुँह द्वारा खाना-पानी, जितना व्यक्ति चाहे और सुरक्षित रूप से निगल सके।"),
+        Bi("Relief of pain, breathlessness and other distressing symptoms, at any time of day or night.", "दर्द, साँस फूलने और अन्य परेशान करने वाले लक्षणों से राहत, दिन या रात किसी भी समय।"),
+        Bi("Washing, hygiene, skin care and pressure-area care.", "नहलाना, साफ़-सफ़ाई, त्वचा और दबाव वाली जगहों की देखभाल।"),
+        Bi("Turning and positioning for comfort.", "आराम के लिए करवट बदलना और सही स्थिति में रखना।"),
+        Bi("Family and loved ones may stay with the person.", "परिवार और प्रियजन व्यक्ति के साथ रह सकते हैं।"),
+        Bi("Spiritual, emotional and psychological support for the person and family.", "व्यक्ति और परिवार के लिए आध्यात्मिक, भावनात्मक और मानसिक सहारा।"),
+        Bi("Dignity, privacy and kindness in all care.", "हर देखभाल में गरिमा, निजता और दया।"),
     )
     val NOTE = Bi("A limit on treatment never means no care.", "इलाज पर सीमा का मतलब कभी 'देखभाल नहीं' नहीं होता।")
 }
@@ -369,7 +384,13 @@ object PlanText {
     }
     fun status(s: EctprStatus) = when (s) { EctprStatus.DRAFT -> Bi("Draft — not signed", "मसौदा — हस्ताक्षर नहीं"); EctprStatus.ACTIVE -> Bi("Active", "लागू"); EctprStatus.SUPERSEDED -> Bi("Replaced by a newer version", "नए संस्करण से बदली गई"); EctprStatus.REVOKED -> Bi("Withdrawn", "वापस ली गई") }
     fun unit(u: DurationUnit) = when (u) { DurationUnit.HOURS -> Bi("hours", "घंटे"); DurationUnit.DAYS -> Bi("days", "दिन"); DurationUnit.SESSIONS -> Bi("sessions", "सत्र") }
-    fun trial(t: TrialPlan?) = if (t == null) Bi("", "") else Bi(" · ${t.durationValue} ${unit(t.durationUnit).en}, review ${t.reviewAt} by ${t.reviewers.filter(String::isNotBlank).joinToString(", ")}", " · ${t.durationValue} ${unit(t.durationUnit).hi}, समीक्षा ${t.reviewAt}, ${t.reviewers.filter(String::isNotBlank).joinToString(", ")}")
+    /** " · 3 days, review 2026-11-01 10:00 by Dr Iyer" in the chosen language. */
+    fun trial(t: TrialPlan?): Bi {
+        if (t == null) return Bi("", "", "")
+        val at = t.reviewAt; val who = t.reviewers.filter(String::isNotBlank).joinToString(", ")
+        val review = Bi("review $at by $who", "समीक्षा $at, $who")
+        return Bi.join("", listOf(Bi.plain(" · ${t.durationValue} "), unit(t.durationUnit), Bi.plain(", "), review))
+    }
     fun trigger(t: ReviewTrigger) = when (t) {
         ReviewTrigger.NEW_ADMISSION -> Bi("New admission", "नई भर्ती"); ReviewTrigger.TRANSFER_BETWEEN_SETTINGS -> Bi("Moved between home, hospital or hospice", "घर, अस्पताल या हॉस्पिस के बीच बदलाव")
         ReviewTrigger.CONDITION_CHANGE -> Bi("Significant change in condition (either way)", "हालत में बड़ा बदलाव (बेहतर या बदतर)"); ReviewTrigger.PATIENT_OR_FAMILY_REQUEST -> Bi("Patient or family asked for a review", "मरीज़ या परिवार ने समीक्षा माँगी")
@@ -446,26 +467,45 @@ object EctprLifecycle {
     fun draft(records: List<EctprRecord>, patientId: String): EctprRecord? = records.filter { it.patientId == patientId && it.status == EctprStatus.DRAFT }.maxByOrNull { it.version }
 }
 
-/** Random, revocable ≥128-bit QR tokens with no personal data (tech spec §7). */
-data class CardToken(val token: String, val ectprId: String, val patientId: String, val createdAt: String, val revokedAt: String? = null) {
+/** Where a card stands on the server, same names as the web: issued, local-only (not reached yet), revoked, revoke-pending (withdrawn here, server not told yet). */
+enum class CardServerState { ISSUED, LOCAL_ONLY, REVOKED, REVOKE_PENDING }
+
+/**
+ * Random, revocable 256-bit QR token with no personal data (tech spec §7). [manageKey] proves this phone issued the card and goes only to
+ * /api/ed-card. [snapshot] is the JSON the server stores, frozen when the card was made so a retry sends exactly the same thing.
+ */
+data class CardToken(val token: String, val ectprId: String, val patientId: String, val createdAt: String, val revokedAt: String? = null,
+    val manageKey: String = "", val version: Int = 1, val snapshot: String = "", val server: CardServerState = CardServerState.LOCAL_ONLY, val serverMessage: String? = null, val revokedReason: String? = null) {
     val url: String get() = CardTokens.url(token)
     val live: Boolean get() = revokedAt == null
+    /** Still needs the server: an upload for a live card, or telling it about a withdrawal. */
+    val pending: Boolean get() = if (live) server != CardServerState.ISSUED else server != CardServerState.REVOKED
 }
 
 object CardTokens {
     const val BASE = "https://sahara.wedevit.in/ed/"
-    private val TOKEN = Regex("^[a-f0-9]{32}$")
+    /** ED_TOKEN_PATTERN and MANAGE_KEY_PATTERN in prototype/app/ed-card-snapshot.ts. */
+    val PATTERN = Regex("^[A-Za-z0-9_-]{22,64}$")
     private val random = SecureRandom()
     fun random(bytes: Int): String = ByteArray(bytes).also(random::nextBytes).joinToString("") { "%02x".format(it.toInt() and 255) }
-    fun newToken(): String = random(16) // 128 bits
-    fun url(token: String): String { require(TOKEN.matches(token)) { "Not a card token." }; return BASE + token }
+    /** randomUrlToken(32): 32 random bytes as base64url = 43 characters. */
+    fun newToken(): String = java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(ByteArray(32).also(random::nextBytes))
+    fun url(token: String): String { require(PATTERN.matches(token)) { "Not a card token." }; return BASE + token }
 
-    /** One live token for the Active plan; every token of a superseded, revoked or missing plan is revoked. */
-    fun sync(tokens: List<CardToken>, records: List<EctprRecord>, patientId: String, now: String, newToken: () -> String = ::newToken): List<CardToken> {
+    /** One live token for the Active plan; every token of a superseded, revoked or missing plan is withdrawn and queued to tell the server. */
+    fun sync(tokens: List<CardToken>, records: List<EctprRecord>, patientId: String, now: String, amd: AmdStatusSummary? = null, newToken: () -> String = ::newToken): List<CardToken> {
         val active = EctprLifecycle.active(records, patientId)
-        val kept = tokens.map { if (it.patientId == patientId && it.live && it.ectprId != active?.id) it.copy(revokedAt = now) else it }
-        return if (active != null && kept.none { it.ectprId == active.id && it.live }) kept + CardToken(newToken(), active.id, patientId, now) else kept
+        val kept = tokens.map { t ->
+            if (t.patientId != patientId || !t.live || t.ectprId == active?.id) t
+            else t.copy(revokedAt = now, revokedReason = if (records.firstOrNull { it.id == t.ectprId }?.status == EctprStatus.REVOKED) "Plan cancelled" else "Plan superseded by a newer version", server = CardServerState.REVOKE_PENDING, serverMessage = null)
+        }
+        return if (active != null && kept.none { it.ectprId == active.id && it.live }) kept + issue(active, now, amd, newToken) else kept
     }
+    fun issue(active: EctprRecord, now: String, amd: AmdStatusSummary?, newToken: () -> String = ::newToken) =
+        CardToken(newToken(), active.id, active.patientId, now, manageKey = newToken(), version = active.version, snapshot = EdCardSnapshot.json(active, amd).toString())
+    /** A new card for the same plan, for example after the living will changed: the old link stops working. */
+    fun reissue(tokens: List<CardToken>, active: EctprRecord, now: String, amd: AmdStatusSummary?): List<CardToken> =
+        tokens.map { if (it.patientId == active.patientId && it.live) it.copy(revokedAt = now, revokedReason = "Replaced by a new card for version ${active.version}", server = CardServerState.REVOKE_PENDING, serverMessage = null) else it } + issue(active, now, amd)
     fun live(tokens: List<CardToken>, ectprId: String): CardToken? = tokens.lastOrNull { it.ectprId == ectprId && it.live }
 }
 
@@ -508,15 +548,15 @@ object EdView {
             listOf(it.name, "(${it.relation})".takeIf { _ -> it.relation.isNotBlank() }, "24 घंटे: ${it.phone24h}".takeIf { _ -> it.phone24h.isNotBlank() }, basis?.hi).filterNotNull().joinToString(" "))
     }
 
-    private fun join(vararg parts: Bi?): Bi = parts.filterNotNull().filter { it.en.isNotBlank() }.let { p -> Bi(p.joinToString(" · ") { it.en }, p.joinToString(" · ") { it.hi }) }
-    private fun text(value: String) = Bi(value, value)
+    private fun join(vararg parts: Bi?): Bi = Bi.join(" · ", parts.filterNotNull().filter { it.en.isNotBlank() })
+    private fun text(value: String) = Bi.plain(value)
 
     /** Rows in exactly the clinical spec §6 order. Unticked choices read "No preference recorded — standard care" (V1). */
-    fun rows(r: EctprRecord, amd: Bi, reviewRequest: ReviewRequest? = null): List<EdRow> {
+    fun rows(r: EctprRecord, amd: Bi, reviewRequest: ReviewRequest? = null, amdGoverns: Boolean = false): List<EdRow> {
         val c = r.choices
         val transfer = c.hospitalTransfer?.let { t ->
-            val reasons = if (t.kind == TransferKind.ONLY_FOR) Bi(t.reasons.joinToString(", ") { PlanText.transferReason(it).en }, t.reasons.joinToString(", ") { PlanText.transferReason(it).hi }) else null
-            val call = c.callBeforeAmbulance.filter(String::isNotBlank).takeIf { it.isNotEmpty() }?.let { Bi("Call first: " + it.joinToString(", "), "पहले फ़ोन करें: " + it.joinToString(", ")) }
+            val reasons = if (t.kind == TransferKind.ONLY_FOR) Bi.join(", ", t.reasons.map(PlanText::transferReason)) else null
+            val call = c.callBeforeAmbulance.filter(String::isNotBlank).takeIf { it.isNotEmpty() }?.let { Bi.labeled(Bi("Call first", "पहले फ़ोन करें"), Bi.plain(it.joinToString(", "))) }
             join(PlanText.transfer(t.kind), reasons, call, c.ambulance?.let(PlanText::ambulance))
         }
         val cpr = c.cpr?.let { v -> join(PlanText.cpr(v), c.dnacprReason?.takeIf { v == Cpr.DNACPR }?.let(PlanText::dnacprReason),
@@ -526,21 +566,22 @@ object EdView {
             c.maxOxygenLpm?.let { Bi("max O₂ $it L/min", "अधिकतम O₂ $it L/min") }, c.ceilingConditions.spo2Floor?.let { Bi("SpO₂ floor $it%", "SpO₂ न्यूनतम $it%") },
             c.ceilingConditions.nivMaxHours?.let { Bi("NIV up to $it h", "NIV $it घंटे तक") },
             c.ceilingConditions.reversibleCauseException?.takeIf { it }?.let { Bi("treat a reversible cause fully", "ठीक हो सकने वाले कारण का पूरा इलाज") },
-            c.nivTrial?.let { Bi("NIV trial" + PlanText.trial(it).en, "NIV ट्रायल" + PlanText.trial(it).hi) }) }
+            c.nivTrial?.let { Bi.join("", listOf(Bi("NIV trial", "NIV ट्रायल"), PlanText.trial(it))) }) }
         val icu = c.icu?.let { join(PlanText.icu(it.kind), PlanText.trial(it.trial).takeIf { _ -> it.kind == IcuKind.TRIAL }) }
-        val organ = listOfNotNull(c.vasopressors?.let { Bi("Vasopressors: " + PlanText.vaso(it.kind).en + (it.maxAgents?.let { n -> " ($n)" } ?: "") + PlanText.trial(it.trial).en, "BP की दवा: " + PlanText.vaso(it.kind).hi + (it.maxAgents?.let { n -> " ($n)" } ?: "") + PlanText.trial(it.trial).hi) },
-            c.dialysis?.let { Bi("Dialysis: " + PlanText.dialysis(it.kind).en + PlanText.trial(it.trial).en, "डायलिसिस: " + PlanText.dialysis(it.kind).hi + PlanText.trial(it.trial).hi) })
-        val goal = c.goalOfCare?.let { join(PlanText.goal(it), *organ.toTypedArray(), c.hydration?.let { h -> Bi("Fluids: " + PlanText.hydration(h).en, "तरल: " + PlanText.hydration(h).hi) },
-            c.feeding.ng?.let { n -> Bi("NG: " + PlanText.ng(n.kind).en + (n.days?.let { d -> " ($d days)" } ?: ""), "NG: " + PlanText.ng(n.kind).hi + (n.days?.let { d -> " ($d दिन)" } ?: "")) },
-            c.feeding.peg?.let { p -> Bi("PEG: " + PlanText.peg(p).en, "PEG: " + PlanText.peg(p).hi) }) }
-        val device = r.clinical.implantedDevice?.let { d -> join(PlanText.device(d), r.clinical.icdDeactivation.decision?.let { Bi("deactivation: ${it.name.lowercase()} ${r.clinical.icdDeactivation.date}", "बंद करना: ${if (it == IcdDecision.DEACTIVATE) "हाँ" else "नहीं"} ${r.clinical.icdDeactivation.date}") }) }
+        val organ = listOfNotNull(c.vasopressors?.let { Bi.labeled(Bi("Vasopressors", "BP की दवा"), Bi.join("", listOf(PlanText.vaso(it.kind), Bi.plain(it.maxAgents?.let { n -> " ($n)" } ?: ""), PlanText.trial(it.trial)))) },
+            c.dialysis?.let { Bi.labeled(Bi("Dialysis", "डायलिसिस"), Bi.join("", listOf(PlanText.dialysis(it.kind), PlanText.trial(it.trial)))) })
+        val goal = c.goalOfCare?.let { join(PlanText.goal(it), *organ.toTypedArray(), c.hydration?.let { h -> Bi.labeled(Bi("Fluids", "तरल"), PlanText.hydration(h)) },
+            c.feeding.ng?.let { n -> Bi.labeled(Bi.plain("NG"), Bi.join("", listOf(PlanText.ng(n.kind), n.days?.let { d -> Bi(" ($d days)", " ($d दिन)") } ?: Bi("", "", "")))) },
+            c.feeding.peg?.let { p -> Bi.labeled(Bi.plain("PEG"), PlanText.peg(p)) }) }
+        val device = r.clinical.implantedDevice?.let { d -> join(PlanText.device(d), r.clinical.icdDeactivation.decision?.let { Bi.labeled(Bi("ICD decision", "ICD का फ़ैसला"), Bi.join(" ", listOf(if (it == IcdDecision.DEACTIVATE) Bi("Switch off shocks", "झटके बंद करें") else Bi("Keep shocks on", "झटके चालू रखें"), Bi.plain(r.clinical.icdDeactivation.date)))) }) }
         val consultant = r.consultantSignature
         val team = join(consultant?.let { Bi("Consultant: ${it.name} (reg. ${it.registrationNo})", "कंसल्टेंट: ${it.name} (रजि. ${it.registrationNo})") }
             ?: r.careTeam.oncologist.takeIf { it.isNotBlank() }?.let { Bi("Oncologist: $it", "ऑन्कोलॉजिस्ट: $it") },
             r.careTeam.palliativePhysician.takeIf { it.isNotBlank() }?.let { Bi("Palliative: $it ${r.careTeam.palliativePhone24h}".trim(), "पैलिएटिव: $it ${r.careTeam.palliativePhone24h}".trim()) })
         val capacity = r.capacity.status?.let { s -> join(PlanText.capacity(s), Bi("reassess by ${r.capacity.reassessOn}", "${r.capacity.reassessOn} तक दोबारा जाँचें").takeIf { s == Capacity.FLUCTUATES && r.capacity.reassessOn.isNotBlank() }) }
-        val version = Bi("v${r.version} · ${r.formVersion} · signed ${consultant?.signedAt?.take(10) ?: "—"} · review due ${r.reviewDue.ifBlank { "—" }}" + (reviewRequest?.let { " · review requested: ${PlanText.trigger(it.trigger).en} (${it.at.take(10)})" } ?: ""),
-            "v${r.version} · ${r.formVersion} · हस्ताक्षर ${consultant?.signedAt?.take(10) ?: "—"} · समीक्षा ${r.reviewDue.ifBlank { "—" }}" + (reviewRequest?.let { " · समीक्षा माँगी: ${PlanText.trigger(it.trigger).hi} (${it.at.take(10)})" } ?: ""))
+        val signedDay = consultant?.signedAt?.take(10) ?: "—"; val dueDay = r.reviewDue.ifBlank { "—" }; val form = r.formVersion; val number = r.version
+        val version = Bi.join(" · ", listOfNotNull(Bi("v$number · $form · signed $signedDay · review due $dueDay", "v$number · $form · हस्ताक्षर $signedDay · समीक्षा $dueDay"),
+            reviewRequest?.let { Bi.labeled(Bi("Review requested", "समीक्षा माँगी"), Bi.join(" ", listOf(PlanText.trigger(it.trigger), Bi.plain("(${it.at.take(10)})")))) }))
         return listOf(
             EdRow("TRANSFER", Bi("Hospital transfer", "अस्पताल ले जाना"), transfer ?: NO_PREFERENCE),
             EdRow("CPR", Bi("CPR", "CPR"), cpr ?: NO_PREFERENCE, flag = c.cpr == Cpr.DNACPR),
@@ -552,7 +593,7 @@ object EdView {
             EdRow("DECISION_MAKER", Bi("Decision-maker (24 h phone)", "फ़ैसला लेने वाले (24 घंटे फ़ोन)"), dm(r.decisionMakers.primary) ?: NOT_RECORDED),
             EdRow("TEAM", Bi("Treating consultant and palliative contact", "इलाज करने वाले कंसल्टेंट और पैलिएटिव संपर्क"), team.takeIf { it.en.isNotBlank() } ?: NOT_RECORDED),
             EdRow("CAPACITY", Bi("Capacity", "निर्णय-क्षमता"), capacity ?: NOT_RECORDED, flag = r.capacity.status == Capacity.FLUCTUATES),
-            EdRow("AMD", Bi("Living will (AMD)", "लिविंग विल (AMD)"), amd),
+            EdRow("AMD", Bi("Living will (AMD)", "लिविंग विल (AMD)"), amd, flag = amdGoverns),
             EdRow("VERSION", Bi("Version, signed, review due", "संस्करण, हस्ताक्षर, समीक्षा"), version),
         )
     }
@@ -565,7 +606,7 @@ object WalletCard {
         val c = r.choices
         val callFirst = c.callBeforeAmbulance.firstOrNull { it.isNotBlank() } ?: r.careTeam.palliativePhone24h.ifBlank { r.decisionMakers.primary?.phone24h.orEmpty() }
         val sign = r.consultantSignature
-        fun t(v: String) = Bi(v.ifBlank { NOT_RECORDED.en }, v.ifBlank { NOT_RECORDED.hi })
+        fun t(v: String) = if (v.isBlank()) NOT_RECORDED else Bi.plain(v)
         return listOf(
             Bi("Patient", "मरीज़") to t(r.patient.name), Bi("UHID", "UHID") to t(r.patient.uhid), Bi("Diagnosis", "बीमारी") to t(r.clinical.diagnosis),
             Bi("CPR", "CPR") to (c.cpr?.let(PlanText::cpr) ?: NO_PREFERENCE),
@@ -579,7 +620,7 @@ object WalletCard {
     }
 }
 
-enum class AuditAction { VIEW, CREATE, EDIT, SIGN, PRINT, SHARE, REVOKE, BREAK_GLASS, REVIEW, UPLOAD }
+enum class AuditAction { VIEW, CREATE, EDIT, SIGN, PRINT, SHARE, REVOKE, BREAK_GLASS, REVIEW, UPLOAD, DELETE }
 enum class AuditRecordType { ECTPR, AMD, CARD }
 /** [prevHash]/[hash] chain the events, so a removed or changed entry shows up in [AuditLog.verify]. */
 data class AuditEvent(val id: String, val at: String, val actor: String, val action: AuditAction, val recordType: AuditRecordType, val recordId: String, val detail: String? = null, val prevHash: String = "", val hash: String = "")
@@ -697,7 +738,10 @@ object PlanJson {
     }
 
     fun encode(t: CardToken) = JSONObject().put("token", t.token).put("ectprId", t.ectprId).put("patientId", t.patientId).put("createdAt", t.createdAt).n("revokedAt", t.revokedAt)
-    fun token(j: JSONObject) = CardToken(j.getString("token"), j.s("ectprId"), j.s("patientId"), j.s("createdAt"), j.ns("revokedAt"))
+        .put("manageKey", t.manageKey).put("version", t.version).put("snapshot", t.snapshot).put("server", t.server.name).n("serverMessage", t.serverMessage).n("revokedReason", t.revokedReason)
+    /** A card made before the server link has no manage key yet: it gets one now, and is uploaded like any new card. */
+    fun token(j: JSONObject) = CardToken(j.getString("token"), j.s("ectprId"), j.s("patientId"), j.s("createdAt"), j.ns("revokedAt"),
+        j.s("manageKey").ifBlank { CardTokens.newToken() }, j.optInt("version", 1), j.s("snapshot"), j.e<CardServerState>("server") ?: if (j.isNull("revokedAt")) CardServerState.LOCAL_ONLY else CardServerState.REVOKE_PENDING, j.ns("serverMessage"), j.ns("revokedReason"))
     fun encode(e: AuditEvent) = JSONObject().put("id", e.id).put("at", e.at).put("actor", e.actor).put("action", e.action.name).put("recordType", e.recordType.name).put("recordId", e.recordId).n("detail", e.detail).put("prevHash", e.prevHash).put("hash", e.hash)
     fun audit(j: JSONObject) = AuditEvent(j.s("id"), j.s("at"), j.s("actor"), j.e<AuditAction>("action") ?: AuditAction.VIEW, j.e<AuditRecordType>("recordType") ?: AuditRecordType.ECTPR, j.s("recordId"), j.ns("detail"), j.s("prevHash"), j.s("hash"))
     fun encode(r: ReviewRequest) = JSONObject().put("id", r.id).put("ectprId", r.ectprId).put("trigger", r.trigger.name).put("at", r.at).put("by", r.by).put("note", r.note)

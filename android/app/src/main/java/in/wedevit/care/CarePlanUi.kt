@@ -51,13 +51,12 @@ import java.time.Instant
 import java.time.LocalDate
 
 private val PlanAlert = Color(0xFF9E3B23)
-private const val ED_VIEW_DETAIL = "ED Quick View"
+internal const val ED_VIEW_DETAIL = "ED Quick View"
 private const val CARD_VIEW_DETAIL = "wallet card"
 private fun planPdfName(version: Int) = "sahara-plan-v$version.pdf"
-private fun livingWillPdfName(version: Int) = "sahara-living-will-v$version.pdf"
 /** Same content, ignoring when it was last saved. */
 private fun samePlan(a: EctprRecord, b: EctprRecord) = a.copy(updatedAt = "") == b.copy(updatedAt = "")
-private fun planNow(): String = Instant.now().toString()
+internal fun planNow(): String = Instant.now().toString()
 
 /** Which wizard step a rule's field belongs to, so "Next" checks only what has been asked so far. */
 internal fun planStepOf(field: String): Int = when {
@@ -86,9 +85,17 @@ internal fun planStepOf(field: String): Int = when {
     var page by rememberSaveable(selected) { mutableStateOf("home") }
     val actor = remember(clinician) { if (clinician) "Doctor" else vm.viewRole.value }
     val today = LocalDate.now()
+    // The practice walkthrough never reaches the card server.
+    val online = !vm.demoMode
+    val transport = remember { EdCardHttpTransport() }
+    fun pushCards() { if (online && selected.isNotBlank()) scope.launch { runCatching { CarePlanCardSync.person(store, selected, transport) } } }
     fun commit(change: (CarePlanState) -> CarePlanState): Boolean = try {
-        val next = change(state); store.save(selected, next); state = next; true
+        val next = change(state); store.save(selected, next); state = next
+        if (next.tokens.any { it.pending }) pushCards()
+        true
     } catch (e: Exception) { vm.message.value = t("Not saved: ", "सहेजा नहीं गया: ") + (e.message ?: ""); false }
+    // The queue runs on open and whenever the stored plan changes behind this screen.
+    LaunchedEffect(selected) { pushCards(); CarePlanCardSync.changes.collect { if (it == selected) runCatching { store.load(selected) }.onSuccess { fresh -> state = fresh } } }
     fun share(file: File, title: String, type: AuditRecordType, id: String) {
         runCatching {
             val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
@@ -99,13 +106,16 @@ internal fun planStepOf(field: String): Int = when {
     fun sharePlanPdf() {
         val interp = EdView.forPatient(state.ectprs, selected, today); val r = interp.record ?: return
         scope.launch {
-            val file = runCatching { withContext(Dispatchers.IO) { File(store.folder(selected), planPdfName(r.version)).also { CarePlanPdf.plan(it, r, interp, AmdLifecycle.edSummary(state.amds, selected), CardTokens.live(state.tokens, r.id)?.url, hindi, today) } } }.getOrNull()
+            val amdSummary = AmdLifecycle.statusSummary(state.amds, selected); val card = CardTokens.live(state.tokens, r.id)
+            val offline = EdCardOffline.forQr(r, amdSummary, hindi, today)
+            val file = runCatching { withContext(Dispatchers.IO) { File(store.folder(selected), planPdfName(r.version)).also { CarePlanPdf.plan(it, r, interp, AmdLifecycle.edSummary(r.existingDirective, amdSummary), card?.url, offline, card?.server == CardServerState.ISSUED, hindi, today) } } }.getOrNull()
             if (file == null) vm.message.value = t("Couldn't make the PDF. Try again.", "PDF नहीं बना। फिर कोशिश करें।")
             else { commit { CarePlanBook.printed(it, AuditRecordType.ECTPR, r.id, actor, planNow()) }; share(file, t("Share the emergency plan", "आपातकालीन योजना साझा करें"), AuditRecordType.ECTPR, r.id) }
         }
     }
     BackHandler(page != "home") { page = "home" }
     if (person == null) { Box(Modifier.fillMaxSize()); return }
+    val canManageData = clinician || actor != "Family"
     when (page) {
         "wizard" -> {
             val draft = EctprLifecycle.draft(state.ectprs, selected)
@@ -115,12 +125,13 @@ internal fun planStepOf(field: String): Int = when {
                 onSign = { r -> commit { CarePlanBook.sign(CarePlanBook.saveDraft(it, r, actor, planNow(), today), r.id, actor, planNow(), today) }.also { ok -> if (ok) page = "ed" } },
                 onClose = { page = "home" })
         }
+        "pilot" -> PilotLogPage(state, selected, actor, ED_VIEW_DETAIL, onBack = { page = "home" }, commit = ::commit)
         "ed" -> EdQuickViewPage(state, selected, onBack = { page = "home" }, onCard = { page = "card" }, onShare = ::sharePlanPdf,
             onViewed = { id -> commit { CarePlanBook.viewed(it, AuditRecordType.ECTPR, id, actor, planNow(), ED_VIEW_DETAIL) } })
-        "card" -> WalletCardPage(state, selected, onBack = { page = "home" }, onShare = ::sharePlanPdf,
+        "card" -> WalletCardPage(state, selected, online, canEdit, onRetry = ::pushCards, onReissue = { commit { CarePlanBook.reissueCard(it, selected, actor, planNow()) } }, onBack = { page = "home" }, onShare = ::sharePlanPdf,
             onViewed = { id -> commit { CarePlanBook.viewed(it, AuditRecordType.CARD, id, actor, planNow(), CARD_VIEW_DETAIL) } })
-        "amd" -> LivingWillPage(state, person, store, canEdit, onBack = { page = "home" }, commit = ::commit, actor = actor, onShare = { file, id -> share(file, t("Share the living will", "लिविंग विल साझा करें"), AuditRecordType.AMD, id) })
-        else -> CarePlanHome(state, person, clinician, canEdit, loadProblem, onBack = onBack, onPage = { page = it },
+        "amd" -> LivingWillPage(state, person, store, canEdit, clinician, canManageData, actor, onBack = { page = "home" }, commit = ::commit, onShare = { file, id -> share(file, t("Share the living will", "लिविंग विल साझा करें"), AuditRecordType.AMD, id) })
+        else -> CarePlanHome(state, person, clinician, canEdit, loadProblem, store, canManageData, actor, ::commit, transport.takeIf { online }, onBack = onBack, onPage = { page = it },
             onStart = { inEd -> if (commit { CarePlanBook.startPlan(it, selected, actor, planNow(), EctprPatient(name = person.name), inEd).first }) page = "wizard" },
             onReview = { trigger -> if (commit { CarePlanBook.requestReview(it, selected, trigger, actor, planNow(), today).first }) page = "wizard" },
             onWithdraw = { id, reason, by -> if (commit { CarePlanBook.withdraw(it, id, reason, by, actor, planNow()) }) vm.message.value = t("Plan withdrawn. Its wallet card link is switched off.", "योजना वापस ली गई। इसके वॉलेट कार्ड का लिंक बंद हो गया।") },
@@ -128,7 +139,7 @@ internal fun planStepOf(field: String): Int = when {
     }
 }
 
-@Composable private fun PlanHeader(title: String, onBack: () -> Unit, tag: String) { val t = careText()
+@Composable internal fun PlanHeader(title: String, onBack: () -> Unit, tag: String) { val t = careText()
     Row(Modifier.fillMaxWidth().testTag(tag), verticalAlignment = Alignment.CenterVertically) {
         IconButton(onClick = onBack, modifier = Modifier.testTag("$tag-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस")) }
         Spacer(Modifier.width(4.dp)); Heading(title, 26)
@@ -160,7 +171,7 @@ internal fun planStepOf(field: String): Int = when {
     }
 }
 
-@Composable private fun IssueList(issues: List<RuleIssue>) { val hindi = careHindi()
+@Composable internal fun IssueList(issues: List<RuleIssue>) { val hindi = careHindi()
     if (issues.isEmpty()) return
     Column(Modifier.fillMaxWidth().testTag("plan-issues"), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         issues.forEach { i ->
@@ -175,7 +186,7 @@ internal fun planStepOf(field: String): Int = when {
     }
 }
 
-@Composable private fun PlanOption(label: String, meaning: String?, selected: Boolean, tag: String, onClick: () -> Unit) {
+@Composable internal fun PlanOption(label: String, meaning: String?, selected: Boolean, tag: String, onClick: () -> Unit) {
     Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(if (selected) Sage else Paper).border(if (selected) 2.dp else 1.dp, if (selected) Ink else MaterialTheme.colorScheme.outline.copy(alpha = .5f), RoundedCornerShape(16.dp))
         .selectable(selected, role = Role.RadioButton, onClick = onClick).heightIn(min = 48.dp).padding(horizontal = 14.dp, vertical = 10.dp).testTag(tag)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -186,36 +197,31 @@ internal fun planStepOf(field: String): Int = when {
     }
 }
 
-/** V1: every choice can be left (or put back) to "No preference recorded". */
-@Composable private fun NoPreference(selected: Boolean, tag: String, onClick: () -> Unit) { val hindi = careHindi()
-    PlanOption(NO_PREFERENCE.pick(hindi), null, selected, "$tag-none", onClick)
-}
-
-@Composable private fun <T> OptionGroup(title: String, value: T?, options: List<T>, label: (T) -> Bi, meaning: ((T) -> Bi)? = null, tag: String, onChange: (T?) -> Unit) { val hindi = careHindi()
+@Composable internal fun <T> OptionGroup(title: String, value: T?, options: List<T>, label: (T) -> Bi, meaning: ((T) -> Bi)? = null, tag: String, noneLabel: Bi = NO_PREFERENCE, onChange: (T?) -> Unit) { val hindi = careHindi()
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(title, fontFamily = SaharaTitleFont, fontSize = 19.sp, modifier = Modifier.a11yHeading())
-        NoPreference(value == null, tag) { onChange(null) }
+        PlanOption(noneLabel.pick(hindi), null, value == null, "$tag-none") { onChange(null) }
         options.forEach { o -> PlanOption(label(o).pick(hindi), meaning?.invoke(o)?.pick(hindi), value == o, "$tag-${o.toString().lowercase()}") { onChange(o) } }
     }
 }
 
-@Composable private fun <T> ChipGroup(value: T?, options: List<T>, label: (T) -> Bi, tag: String, onChange: (T?) -> Unit) { val hindi = careHindi()
+@Composable internal fun <T> ChipGroup(value: T?, options: List<T>, label: (T) -> Bi, tag: String, onChange: (T?) -> Unit) { val hindi = careHindi()
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
         options.forEach { o -> FilterChip(value == o, { onChange(if (value == o) null else o) }, label = { Text(label(o).pick(hindi)) }, modifier = Modifier.heightIn(min = 48.dp).testTag("$tag-${o.toString().lowercase()}")) }
     }
 }
 
-@Composable private fun PlanNumberField(value: Int?, label: String, tag: String, onChange: (Int?) -> Unit) {
+@Composable internal fun PlanNumberField(value: Int?, label: String, tag: String, onChange: (Int?) -> Unit) {
     OutlinedTextField(value?.toString().orEmpty(), { s -> onChange(s.filter(Char::isDigit).take(4).toIntOrNull()) }, label = { Text(label) }, singleLine = true,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth().testTag(tag),
         colors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = Paper, focusedContainerColor = Paper))
 }
 
-@Composable private fun PlanDateField(value: String, label: String, onChange: (String) -> Unit, latest: LocalDate? = null) {
+@Composable internal fun PlanDateField(value: String, label: String, onChange: (String) -> Unit, latest: LocalDate? = null) {
     CareDateButton(PlanDates.day(value)?.let(::careEpoch) ?: 0L, label, { onChange(if (it == 0L) "" else careDay(it).toString()) }, allowClear = true, latest = latest)
 }
 
-@Composable private fun PlanCard(content: @Composable ColumnScope.() -> Unit) {
+@Composable internal fun PlanCard(content: @Composable ColumnScope.() -> Unit) {
     Surface(color = Paper, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp), content = content)
     }
@@ -223,7 +229,7 @@ internal fun planStepOf(field: String): Int = when {
 
 // ───────────────────────────── Home ─────────────────────────────
 
-@Composable private fun CarePlanHome(state: CarePlanState, person: Person, clinician: Boolean, canEdit: Boolean, loadProblem: Boolean, onBack: () -> Unit, onPage: (String) -> Unit,
+@Composable private fun CarePlanHome(state: CarePlanState, person: Person, clinician: Boolean, canEdit: Boolean, loadProblem: Boolean, store: CarePlanStore, canManage: Boolean, actor: String, commit: ((CarePlanState) -> CarePlanState) -> Boolean, transport: EdCardTransport?, onBack: () -> Unit, onPage: (String) -> Unit,
     onStart: (Boolean) -> Unit, onReview: (ReviewTrigger) -> Unit, onWithdraw: (String, String, String) -> Unit, onDiscard: (String) -> Unit) {
     val t = careText(); val hindi = careHindi(); val today = LocalDate.now()
     val active = EctprLifecycle.active(state.ectprs, person.id); val draft = EctprLifecycle.draft(state.ectprs, person.id)
@@ -231,9 +237,10 @@ internal fun planStepOf(field: String): Int = when {
     var dialog by rememberSaveable { mutableStateOf("") }
     LazyColumn(Modifier.fillMaxSize().testTag("care-plan-home"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
         item { PlanHeader(t("Emergency plan & living will", "आपातकालीन योजना और लिविंग विल"), onBack, "care-plan-header") }
-        item { Text(t("Ambulances and emergency doctors resuscitate by default. A wish counts only if this plan is found and signed. Everything here stays on this phone.", "एम्बुलेंस और इमरजेंसी डॉक्टर अपने-आप पूरा इलाज करते हैं। इच्छा तभी मानी जाती है जब यह योजना मिले और उस पर हस्ताक्षर हों। यहाँ की हर चीज़ इसी फ़ोन पर रहती है।"), style = MaterialTheme.typography.bodyMedium) }
+        item { Text(t("Ambulances and emergency doctors resuscitate by default. A wish counts only if this plan is found and signed. It stays on this phone; only a signed plan's wallet card copy goes to the Sahara server.", "एम्बुलेंस और इमरजेंसी डॉक्टर अपने-आप पूरा इलाज करते हैं। इच्छा तभी मानी जाती है जब यह योजना मिले और उस पर हस्ताक्षर हों। यह इसी फ़ोन पर रहती है; सिर्फ़ हस्ताक्षरित योजना के वॉलेट कार्ड की कॉपी Sahara सर्वर पर जाती है।"), style = MaterialTheme.typography.bodyMedium) }
         if (loadProblem) item { Surface(color = Peach, shape = RoundedCornerShape(14.dp)) { Text(t("The saved plan on this phone could not be read. Standard care applies until a new plan is signed.", "इस फ़ोन पर सहेजी योजना पढ़ी नहीं जा सकी। नई योजना पर हस्ताक्षर होने तक सामान्य इलाज लागू है।"), Modifier.padding(12.dp)) } }
         item { IfInDoubtBox(compact = true) }
+        item { DpdpNoticeCard(DpdpScope.CARE_PLAN, state, person.id, store, canManage, commit, actor) }
         item { ActionCard(if (interp.kind == EdKind.ACTIVE) Mint else Peach, Modifier.fillMaxWidth().testTag("care-plan-ed-entry"), onClick = { onPage("ed") }) {
             Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.LocalHospital, null, tint = Rust); Spacer(Modifier.width(12.dp))
@@ -264,13 +271,15 @@ internal fun planStepOf(field: String): Int = when {
             }
             OutlinedButton(onClick = { onPage("card") }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("care-plan-card-entry")) { Icon(Icons.Default.QrCode, null); Spacer(Modifier.width(8.dp)); Text(t("Wallet card with QR", "QR वाला वॉलेट कार्ड")) }
         } }
+        if (active != null && transport != null && ReviewReminder.due(active, today)) item { ReviewReminderCard(active, canEdit, transport) { status -> commit { CarePlanBook.reminded(it, active.id, actor, planNow(), status) } } }
         item { PlanCard {
             SectionTitle(t("Living will", "लिविंग विल"))
             val current = AmdLifecycle.current(state.amds, person.id); val working = AmdLifecycle.working(state.amds, person.id)
-            Text(listOfNotNull(current?.let { t("Executed v${it.version}", "लागू v${it.version}") }, working?.let { AmdText.status(it.status).pick(hindi) + " v${it.version}" }).ifEmpty { listOf(t("Not started", "शुरू नहीं हुई")) }.joinToString(" · "), fontWeight = FontWeight.SemiBold)
+            Text(listOfNotNull(current?.let { val v = it.version; t("Signed and recorded v$v", "हस्ताक्षरित और दर्ज v$v") }, working?.let { AmdText.status(it.status).pick(hindi) + " v${it.version}" }).ifEmpty { listOf(t("Not started", "शुरू नहीं हुई")) }.joinToString(" · "), fontWeight = FontWeight.SemiBold)
             Text(AmdText.PAPER.pick(hindi), style = MaterialTheme.typography.bodySmall)
             Button(onClick = { onPage("amd") }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("care-plan-amd-entry")) { Icon(Icons.Default.Gavel, null); Spacer(Modifier.width(8.dp)); Text(t("Open living will", "लिविंग विल खोलें")) }
         } }
+        if (clinician) item { OutlinedButton(onClick = { onPage("pilot") }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("care-plan-pilot-entry")) { Icon(Icons.Default.Assessment, null); Spacer(Modifier.width(8.dp)); Text(t("Pilot audit log", "पायलट ऑडिट लॉग")) } }
         if (state.ectprs.any { it.patientId == person.id }) item { InfoDisclosure(t("Plan versions", "योजना के संस्करण")) {
             state.ectprs.filter { it.patientId == person.id }.sortedByDescending { it.version }.forEach { r ->
                 Text("v${r.version} · ${PlanText.status(r.status).pick(hindi)} · ${r.updatedAt.take(10)}" + (r.revokedReason?.let { " · $it" } ?: ""), style = MaterialTheme.typography.bodyMedium)
@@ -346,6 +355,7 @@ internal fun planStepOf(field: String): Int = when {
         }
         LinearProgressIndicator(progress = { (step + 1f) / steps.size }, modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp), color = Rust)
         LazyColumn(Modifier.weight(1f).fillMaxWidth(), state = listState, contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            item(key = "read-aloud") { PlanReadAloud({ steps[step] + ".\n" + PlanSpeech.wizardStep(d, step, hindi) }, "wizard-${record.id}-$step") }
             when (step) {
                 0 -> patientStep(d, ::update)
                 1 -> decisionMakerStep(d, ::update)
@@ -490,8 +500,9 @@ private fun LazyListScope.understandingStep(d: EctprRecord, update: ((EctprRecor
             SectionTitle(t("Who is answering?", "जवाब कौन दे रहा है?"))
             PlanOption(t("The patient", "मरीज़ ख़ुद"), null, !d.surrogateDeclaration.answeringAsSurrogate, "answering-patient") { update { it.copy(surrogateDeclaration = SurrogateDeclaration()) } }
             PlanOption(t("A decision-maker, for the patient", "मरीज़ की ओर से फ़ैसला लेने वाले"), null, d.surrogateDeclaration.answeringAsSurrogate, "answering-surrogate") { update { it.copy(surrogateDeclaration = it.surrogateDeclaration.copy(answeringAsSurrogate = true)) } }
+            val who = d.patient.name.ifBlank { t("the patient", "मरीज़") }
             if (d.surrogateDeclaration.answeringAsSurrogate) CheckLine(d.surrogateDeclaration.confirmed, { v -> update { it.copy(surrogateDeclaration = it.surrogateDeclaration.copy(confirmed = v, confirmedOn = if (v) today else "")) } },
-                t("I will say what ${d.patient.name.ifBlank { "the patient" }} would have chosen, not what I want for them. Where I do not know, I will decide with the team in their best interests.", "मैं वही बताऊँगा/बताऊँगी जो ${d.patient.name.ifBlank { "मरीज़" }} ख़ुद चुनते, न कि जो मैं उनके लिए चाहता/चाहती हूँ। जहाँ मुझे नहीं पता, वहाँ टीम के साथ उनकी भलाई के लिए फ़ैसला करूँगा/करूँगी।"))
+                t("I will say what $who would have chosen, not what I want for them. Where I do not know, I will decide with the team in their best interests.", "मैं वही बताऊँगा/बताऊँगी जो $who ख़ुद चुनते, न कि जो मैं उनके लिए चाहता/चाहती हूँ। जहाँ मुझे नहीं पता, वहाँ टीम के साथ उनकी भलाई के लिए फ़ैसला करूँगा/करूँगी।"))
         }
     }
 }
@@ -521,6 +532,7 @@ private fun LazyListScope.treatmentStep(d: EctprRecord, today: LocalDate, update
     item { BreathingFields(d, today, choices) }
     item { OrganSupportFields(d, today, choices) }
     item { FeedingFields(d, choices) }
+    item { LegalPendingBox() }
     item { ConflictFields(d, today, choices) }
 }
 
@@ -722,8 +734,10 @@ private fun LazyListScope.signatureStep(d: EctprRecord, clinician: Boolean, upda
     val interp = EdView.forPatient(state.ectprs, patientId, today)
     val r = interp.record
     LaunchedEffect(r?.id) { onViewed(r?.id ?: "none") }
+    val amdLine = AmdLifecycle.edSummary(state.amds, patientId, r?.existingDirective)
     LazyColumn(Modifier.fillMaxSize().testTag("ed-quick-view"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { PlanHeader(t("ED Quick View", "ED क्विक व्यू"), onBack, "ed-header") }
+        item { PlanReadAloud({ PlanSpeech.edView(interp, amdLine, hindi) }, "ed-$patientId") }
         if (r != null) item { Text(listOfNotNull(r.patient.name.ifBlank { null }, r.patient.uhid.takeIf { it.isNotBlank() }?.let { "UHID $it" }, PlanDates.age(r.patient.dob, today)?.let { t("$it years", "$it साल") }).joinToString(" · "), fontWeight = FontWeight.SemiBold, fontSize = 18.sp) }
         item { Surface(color = if (interp.kind == EdKind.ACTIVE) DoctorStatusGoodBg else DoctorStatusRestBg, shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth().testTag("ed-banner-${interp.kind.name.lowercase()}")) {
             Text(interp.banner.pick(hindi), Modifier.padding(14.dp).announce(), fontWeight = FontWeight.Bold, color = if (interp.kind == EdKind.ACTIVE) DoctorStatusGood else DoctorStatusRest)
@@ -731,10 +745,15 @@ private fun LazyListScope.signatureStep(d: EctprRecord, clinician: Boolean, upda
         // An active plan leads with its decisions (tech spec §6), so the always-on box is the short form there; every condition stays on screen.
         item { IfInDoubtBox(compact = interp.kind == EdKind.ACTIVE) }
         if (r != null && interp.showContent) {
-            val rows = EdView.rows(r, AmdLifecycle.edSummary(state.amds, patientId), CarePlanBook.openReview(state, r.id))
+            val rows = EdView.rows(r, amdLine, CarePlanBook.openReview(state, r.id), AmdLifecycle.governs(state.amds, patientId, r.existingDirective))
             items(rows, key = { it.key }) { row -> EdRowView(row) }
             if (r.choices.feeding.removeExistingTube) item { Surface(color = DoctorStatusWarnBg, shape = RoundedCornerShape(14.dp)) { Text(t("Wish recorded to remove an existing feeding tube: that is withdrawal and follows the medical board pathway. Not actionable from this plan.", "लगी हुई खाने की नली हटाने की इच्छा दर्ज है: यह इलाज वापस लेना है और मेडिकल बोर्ड की प्रक्रिया से होता है। इस योजना से नहीं किया जा सकता।"), Modifier.padding(12.dp)) } }
-        } else item { Text(t("No plan content is shown: give full standard emergency care.", "योजना की जानकारी नहीं दिखाई जाती: पूरा सामान्य आपातकालीन इलाज दें।"), style = MaterialTheme.typography.bodyMedium) }
+        } else {
+            item { Text(t("No plan content is shown: give full standard emergency care.", "योजना की जानकारी नहीं दिखाई जाती: पूरा सामान्य आपातकालीन इलाज दें।"), style = MaterialTheme.typography.bodyMedium) }
+            // A living will stands on its own: it is shown whatever state the plan is in.
+            item { EdRowView(EdRow("AMD", Bi("Living will (AMD)", "लिविंग विल (AMD)"), amdLine, flag = AmdLifecycle.governs(state.amds, patientId, r?.existingDirective))) }
+        }
+        item { LegalPendingBox() }
         item { CareContinuesBox() }
         if (r != null) item { Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             OutlinedButton(onClick = onCard, modifier = Modifier.weight(1f).heightIn(min = 48.dp)) { Icon(Icons.Default.QrCode, null); Spacer(Modifier.width(6.dp)); Text(t("Wallet card", "वॉलेट कार्ड")) }
@@ -754,8 +773,8 @@ private fun LazyListScope.signatureStep(d: EctprRecord, clinician: Boolean, upda
 
 // ───────────────────────────── Wallet card ─────────────────────────────
 
-@Composable private fun PlanQr(url: String, description: String, modifier: Modifier = Modifier) {
-    val matrix = remember(url) { Encoder.encode(url, ErrorCorrectionLevel.Q, mapOf(EncodeHintType.CHARACTER_SET to "UTF-8")).matrix }
+@Composable internal fun PlanQr(url: String, description: String, modifier: Modifier = Modifier, level: ErrorCorrectionLevel = ErrorCorrectionLevel.Q) {
+    val matrix = remember(url, level) { Encoder.encode(url, level, mapOf(EncodeHintType.CHARACTER_SET to "UTF-8")).matrix }
     Canvas(modifier.aspectRatio(1f).background(Color.White).semantics { contentDescription = description }) {
         val quiet = 4; val cell = size.width / (matrix.width + 2 * quiet)
         for (row in 0 until matrix.height) for (col in 0 until matrix.width) if (matrix.get(col, row).toInt() == 1)
@@ -763,179 +782,54 @@ private fun LazyListScope.signatureStep(d: EctprRecord, clinician: Boolean, upda
     }
 }
 
-@Composable private fun WalletCardPage(state: CarePlanState, patientId: String, onBack: () -> Unit, onShare: () -> Unit, onViewed: (String) -> Unit) {
-    val t = careText(); val hindi = careHindi()
+/** Honest about where the card stands: on the server, or on this phone only. */
+@Composable private fun CardStatus(card: CardToken, online: Boolean, onRetry: () -> Unit) { val t = careText()
+    val issued = card.server == CardServerState.ISSUED
+    Surface(color = if (issued) DoctorStatusGoodBg else DoctorStatusWarnBg, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().testTag(if (issued) "card-issued" else "card-local-only")) { Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Text(if (issued) t("Issued on the server", "सर्वर पर जारी") else t("Saved on this phone only", "सिर्फ़ इसी फ़ोन पर सहेजा गया"), fontWeight = FontWeight.Bold)
+        Text(if (issued) t("A doctor who scans the link QR sees the ED Quick View. A copy is also saved on this phone.", "लिंक QR स्कैन करने वाले डॉक्टर को ED क्विक व्यू दिखता है। एक कॉपी इस फ़ोन पर भी है।")
+            else t("The link QR will not open for a doctor until it is uploaded. It uploads by itself when the phone is online. Until then use the offline QR and the printed lines.", "अपलोड होने तक लिंक QR डॉक्टर के लिए नहीं खुलेगा। फ़ोन ऑनलाइन होते ही यह अपने-आप अपलोड होगा। तब तक ऑफ़लाइन QR और छपी लाइनों का इस्तेमाल करें।"), style = MaterialTheme.typography.bodyMedium)
+        if (!issued) {
+            card.serverMessage?.let { Text(if (it == EdCardApi.NETWORK) t("No internet right now.", "अभी इंटरनेट नहीं है।") else it, style = MaterialTheme.typography.bodySmall, modifier = Modifier.testTag("card-server-message")) }
+            if (online) TextButton(onClick = onRetry, modifier = Modifier.testTag("card-retry")) { Text(t("Try again now", "अभी फिर कोशिश करें")) }
+            else Text(t("Practice mode: nothing is sent to the server.", "अभ्यास मोड: सर्वर पर कुछ नहीं भेजा जाता।"), style = MaterialTheme.typography.bodySmall)
+        }
+    } }
+}
+
+@Composable private fun WalletCardPage(state: CarePlanState, patientId: String, online: Boolean, canEdit: Boolean, onRetry: () -> Unit, onReissue: () -> Unit, onBack: () -> Unit, onShare: () -> Unit, onViewed: (String) -> Unit) {
+    val t = careText(); val hindi = careHindi(); val today = LocalDate.now()
     val active = EctprLifecycle.active(state.ectprs, patientId)
     val token = active?.let { CardTokens.live(state.tokens, it.id) }
+    val amdNow = AmdLifecycle.statusSummary(state.amds, patientId)
+    val withdrawnPending = state.tokens.count { it.patientId == patientId && !it.live && it.pending }
     LaunchedEffect(active?.id) { active?.let { onViewed(it.id) } }
     LazyColumn(Modifier.fillMaxSize().testTag("wallet-card"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
         item { PlanHeader(t("Wallet card", "वॉलेट कार्ड"), onBack, "wallet-header") }
+        if (withdrawnPending > 0) item { Surface(color = DoctorStatusWarnBg, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().testTag("card-revoke-pending")) { Text(t("Withdrawn on this phone. The server has not been told yet, so an old QR may still open. It will be told when the phone is online.", "इस फ़ोन पर वापस ली गई। सर्वर को अभी नहीं बताया गया, इसलिए पुराना QR अभी खुल सकता है। फ़ोन ऑनलाइन होने पर उसे बता दिया जाएगा।"), Modifier.padding(12.dp)) } }
         if (active == null || token == null) item { Surface(color = Peach, shape = RoundedCornerShape(16.dp)) { Text(t("A wallet card is made when a signed plan is active. A withdrawn or replaced plan's card is switched off.", "वॉलेट कार्ड तब बनता है जब हस्ताक्षरित योजना लागू हो। वापस ली गई या बदली गई योजना का कार्ड बंद हो जाता है।"), Modifier.padding(14.dp)) } }
         else {
+            item { CardStatus(token, online, onRetry) }
             item { Surface(color = Paper, shape = RoundedCornerShape(20.dp), border = BorderStroke(2.dp, Ink), modifier = Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text(t("SAHARA EMERGENCY CARE PLAN", "सहारा आपातकालीन देखभाल योजना"), fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
                     WalletCard.lines(active).forEach { (label, value) -> Row { Text(label.pick(hindi) + ": ", style = MaterialTheme.typography.bodySmall, color = DoctorCardSub); Text(value.pick(hindi), style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.SemiBold) } }
                     Surface(color = PlanAlert, shape = RoundedCornerShape(10.dp)) { Text(WalletCard.TREAT_LINE.pick(hindi), Modifier.padding(8.dp), color = Color.White, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.bodySmall) }
+                    Text(t("Link QR: full card, needs internet", "लिंक QR: पूरा कार्ड, इंटरनेट चाहिए"), fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodySmall)
                     PlanQr(token.url, t("QR code with a link to this plan", "इस योजना के लिंक वाला QR कोड"), Modifier.fillMaxWidth(.7f).align(Alignment.CenterHorizontally).testTag("wallet-qr"))
-                    Text(t("Plan v${active.version} · review due ${active.reviewDue}", "योजना v${active.version} · समीक्षा ${active.reviewDue}"), style = MaterialTheme.typography.labelSmall)
+                    Text(t("Offline QR: this summary as text, no internet needed", "ऑफ़लाइन QR: यह सारांश लिखित रूप में, इंटरनेट नहीं चाहिए"), fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodySmall)
+                    PlanQr(EdCardOffline.forQr(active, amdNow, hindi, today), t("QR code: offline text summary of this card", "QR कोड: इस कार्ड का ऑफ़लाइन सारांश"), Modifier.fillMaxWidth(.8f).align(Alignment.CenterHorizontally).testTag("wallet-offline-qr"), ErrorCorrectionLevel.L)
+                    run { val v = active.version; val due = active.reviewDue; Text(t("Plan v$v · review due $due", "योजना v$v · समीक्षा $due"), style = MaterialTheme.typography.labelSmall) }
                 }
             } }
-            item { Text(t("The QR holds only a random link (${token.url.substringAfterLast('/').take(6)}…) with no name or medical details. Opening the link needs internet; the printed lines work offline. When the plan is replaced or withdrawn the link is switched off — tear up old cards.", "QR में सिर्फ़ एक रैंडम लिंक (${token.url.substringAfterLast('/').take(6)}…) है, नाम या इलाज की जानकारी नहीं। लिंक खोलने के लिए इंटरनेट चाहिए; छपी लाइनें बिना इंटरनेट काम करती हैं। योजना बदलने या वापस लेने पर लिंक बंद हो जाता है — पुराने कार्ड फाड़ दें।"), style = MaterialTheme.typography.bodySmall, color = DoctorCardSub) }
+            val issuedAmd = runCatching { org.json.JSONObject(token.snapshot).optJSONObject("amdAtIssue") }.getOrNull()
+            if (issuedAmd?.optString("status").orEmpty() != amdNow?.status?.name.orEmpty() || (amdNow != null && issuedAmd?.optInt("version") != amdNow.version)) item { Surface(color = DoctorStatusWarnBg, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().testTag("card-amd-changed")) { Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(t("The living will changed after this card was issued, so the link shows the old status. Issue a new card and tear up the old one.", "यह कार्ड जारी होने के बाद लिविंग विल बदली है, इसलिए लिंक पुरानी स्थिति दिखाता है। नया कार्ड जारी करें और पुराना फाड़ दें।"), style = MaterialTheme.typography.bodyMedium)
+                OutlinedButton(onClick = onReissue, enabled = canEdit, modifier = Modifier.heightIn(min = 48.dp).testTag("card-reissue")) { Text(t("Issue a new card", "नया कार्ड जारी करें")) }
+            } } }
+            item { Text(t("The link QR holds only a random link with no name or medical details. The offline QR holds the summary above as plain text, so anyone who scans it can read it; keep the card with the patient. When the plan is replaced or withdrawn the link is switched off, but the offline QR on old paper still reads — tear up old cards.", "लिंक QR में सिर्फ़ एक रैंडम लिंक है, नाम या इलाज की जानकारी नहीं। ऑफ़लाइन QR में ऊपर का सारांश सादे अक्षरों में है, इसलिए जो भी स्कैन करे वह पढ़ सकता है; कार्ड मरीज़ के पास रखें। योजना बदलने या वापस लेने पर लिंक बंद हो जाता है, पर पुराने काग़ज़ का ऑफ़लाइन QR फिर भी पढ़ा जा सकता है — पुराने कार्ड फाड़ दें।"), style = MaterialTheme.typography.bodySmall, color = DoctorCardSub) }
             item { Button(onClick = onShare, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.Print, null); Spacer(Modifier.width(8.dp)); Text(t("Print or share the plan and card (PDF)", "योजना और कार्ड प्रिंट या साझा करें (PDF)")) } }
         }
-    }
-}
-
-// ───────────────────────────── Living will ─────────────────────────────
-
-@Composable private fun LivingWillPage(state: CarePlanState, person: Person, store: CarePlanStore, canEdit: Boolean, onBack: () -> Unit, commit: ((CarePlanState) -> CarePlanState) -> Boolean, actor: String, onShare: (File, String) -> Unit) {
-    val t = careText(); val hindi = careHindi(); val context = LocalContext.current; val scope = rememberCoroutineScope(); val today = LocalDate.now()
-    val current = AmdLifecycle.current(state.amds, person.id); val working = AmdLifecycle.working(state.amds, person.id)
-    LazyColumn(Modifier.fillMaxSize().testTag("living-will"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-        item { PlanHeader(t("Living will", "लिविंग विल"), onBack, "amd-header") }
-        item { Text(t("Your own written refusal of life-prolonging treatment, and the people who speak for you, in the Vidhi Centre model format. If both a living will and an emergency plan exist, the living will governs.", "जीवन लंबा करने वाले इलाज से आपका अपना लिखित इनकार, और आपकी ओर से बोलने वाले लोग, विधि सेंटर के नमूना फ़ॉर्मेट में। अगर लिविंग विल और आपातकालीन योजना दोनों हों, तो लिविंग विल मानी जाती है।"), style = MaterialTheme.typography.bodyMedium) }
-        item { Surface(color = DoctorStatusWarnBg, shape = RoundedCornerShape(14.dp)) { Text(AmdText.PAPER.pick(hindi), Modifier.padding(12.dp), style = MaterialTheme.typography.bodyMedium) } }
-        current?.let { c -> item { PlanCard {
-            SectionTitle(t("Executed living will v${c.version}", "लागू लिविंग विल v${c.version}"))
-            Text(t("Executed ${c.executedAt?.take(10)} · attested by ${c.attestor?.name}", "${c.executedAt?.take(10)} को लागू · ${c.attestor?.name} द्वारा सत्यापित"), style = MaterialTheme.typography.bodyMedium)
-            Text(t("Signed copy fingerprint (SHA-256): ", "हस्ताक्षरित कॉपी का फ़िंगरप्रिंट (SHA-256): ") + c.scan?.sha256?.chunked(8)?.joinToString(" "), style = MaterialTheme.typography.bodySmall, color = DoctorCardSub)
-            var copyProblem by remember(c.id) { mutableStateOf(false) }
-            OutlinedButton(onClick = {
-                val file = c.scan?.let { File(store.folder(person.id), it.fileName) }
-                copyProblem = file == null || !file.isFile || AmdLifecycle.sha256(file.readBytes()) != c.scan?.sha256
-                if (!copyProblem && file != null) open(context, Intent(Intent.ACTION_VIEW).setDataAndType(FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file), "image/*").addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION))
-            }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("amd-view-scan")) { Text(t("View the signed copy", "हस्ताक्षरित कॉपी देखें")) }
-            if (copyProblem) Text(t("This copy is missing or does not match its fingerprint. Do not rely on it; ask for the signed paper.", "यह कॉपी नहीं मिली या फ़िंगरप्रिंट से मेल नहीं खाती। इस पर भरोसा न करें; हस्ताक्षरित काग़ज़ माँगें।"), color = RustText, style = MaterialTheme.typography.bodySmall)
-            Text(t("Custodian: pending (few states have appointed one). Give copies to each representative and the family doctor.", "कस्टोडियन: लंबित (कुछ ही राज्यों ने नियुक्त किया है)। हर प्रतिनिधि और फ़ैमिली डॉक्टर को कॉपी दें।"), style = MaterialTheme.typography.bodySmall)
-            if (working == null) {
-                OutlinedButton(onClick = { commit { CarePlanBook.startAmd(it, person.id, actor, planNow(), c.maker).first } }, enabled = canEdit, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Change it (new version, signed again)", "बदलें (नया संस्करण, फिर से हस्ताक्षर)")) }
-                RevokeAmd(c, canEdit) { reason -> commit { CarePlanBook.revokeAmd(it, c.id, reason, actor, planNow()) } }
-            }
-        } } }
-        if (working == null && current == null) item { Button(onClick = { commit { CarePlanBook.startAmd(it, person.id, actor, planNow(), AmdMaker(name = person.name)).first } }, enabled = canEdit, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("amd-start")) { Text(t("Start a living will", "लिविंग विल शुरू करें")) } }
-        working?.let { w -> item(key = w.id + w.updatedAt) { AmdEditor(w, canEdit, today,
-            onSave = { a -> commit { CarePlanBook.saveAmd(it, a, actor, planNow()) } },
-            onGenerate = { a ->
-                if (commit { s -> CarePlanBook.generateAmd(if (a != w) CarePlanBook.saveAmd(s, a, actor, planNow()) else s, a.id, actor, planNow(), today) }) scope.launch {
-                    val file = runCatching { withContext(Dispatchers.IO) { File(store.folder(person.id), livingWillPdfName(a.version)).also { CarePlanPdf.livingWill(it, a, hindi, today) } } }.getOrNull()
-                    if (file != null) onShare(file, a.id)
-                }
-            },
-            onReprint = { a -> scope.launch { val file = runCatching { withContext(Dispatchers.IO) { File(store.folder(person.id), livingWillPdfName(a.version)).also { CarePlanPdf.livingWill(it, a, hindi, today) } } }.getOrNull(); if (file != null) onShare(file, a.id) } },
-            onExecute = { scan, witnesses, attestor -> commit { CarePlanBook.executeAmd(it, w.id, scan, witnesses, attestor, actor, planNow()) } },
-            storeScan = { uri -> withContext(Dispatchers.IO) { val bytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() } ?: error("unreadable"); val name = "amd-scan-${w.id}.jpg"; File(store.folder(person.id), name).writeBytes(bytes); AmdScan(name, AmdLifecycle.sha256(bytes), planNow()) } }) } }
-    }
-}
-
-@Composable private fun RevokeAmd(c: AmdRecord, canEdit: Boolean, onRevoke: (String) -> Unit) { val t = careText()
-    var open by rememberSaveable { mutableStateOf(false) }; var reason by rememberSaveable { mutableStateOf("") }
-    if (!open) TextButton(onClick = { open = true }, enabled = canEdit) { Text(t("Revoke this living will", "यह लिविंग विल रद्द करें"), color = RustText) }
-    else Surface(color = DoctorStatusRestBg, shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth()) { Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(t("Revoke living will v${c.version}?", "लिविंग विल v${c.version} रद्द करें?"), fontWeight = FontWeight.SemiBold)
-        Text(t("Revoke it in writing too, the same way it was made, and tell everyone who has a copy.", "इसे उसी तरह लिखकर भी रद्द करें जैसे बनाया था, और जिनके पास कॉपी है उन्हें बताएँ।"), style = MaterialTheme.typography.bodySmall)
-        CareField(reason, { reason = it }, t("Reason", "कारण"))
-        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            OutlinedButton(onClick = { open = false }, modifier = Modifier.weight(1f).heightIn(min = 48.dp)) { Text(t("Keep", "रखें")) }
-            Button(onClick = { open = false; onRevoke(reason.trim()) }, enabled = reason.isNotBlank(), modifier = Modifier.weight(1f).heightIn(min = 48.dp)) { Text(t("Revoke", "रद्द करें")) }
-        }
-    } }
-}
-
-@Composable private fun AmdEditor(record: AmdRecord, canEdit: Boolean, today: LocalDate, onSave: (AmdRecord) -> Boolean, onGenerate: (AmdRecord) -> Unit, onReprint: (AmdRecord) -> Unit,
-    onExecute: (AmdScan, List<AmdWitness>, AmdAttestor) -> Unit, storeScan: suspend (android.net.Uri) -> AmdScan) {
-    val t = careText(); val hindi = careHindi()
-    var a by remember(record.id, record.updatedAt) { mutableStateOf(record) }
-    fun maker(change: (AmdMaker) -> AmdMaker) { a = a.copy(maker = change(a.maker)) }
-    fun answers(change: (AmdAnswers) -> AmdAnswers) { a = a.copy(answers = change(a.answers)) }
-    val issues = AmdRules.generateIssues(a, today)
-    val editable = canEdit && (a.status == AmdStatus.DRAFT || a.status == AmdStatus.GENERATED)
-    Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-        Text(t("Living will v${a.version} · ${AmdText.status(a.status).en}", "लिविंग विल v${a.version} · ${AmdText.status(a.status).hi}"), fontWeight = FontWeight.SemiBold, modifier = Modifier.testTag("amd-status-${a.status.name.lowercase()}"))
-        PlanCard {
-            SectionTitle(t("About you", "आपके बारे में"))
-            CareField(a.maker.name, { v -> maker { it.copy(name = v) } }, t("Full name", "पूरा नाम"), singleLine = true)
-            PlanDateField(a.maker.dob, t("Date of birth", "जन्मतिथि"), { v -> maker { it.copy(dob = v) } }, latest = today)
-            CareField(a.maker.address, { v -> maker { it.copy(address = v) } }, t("Address", "पता"))
-            CareField(a.maker.phone, { v -> maker { it.copy(phone = v) } }, t("Phone", "फ़ोन"), singleLine = true)
-            Text(t("ID type", "पहचान-पत्र का प्रकार"), fontWeight = FontWeight.Medium)
-            ChipGroup(a.maker.idType, IdType.entries, PlanText::idType, "amd-maker-id") { v -> maker { it.copy(idType = v) } }
-            CareField(a.maker.idLast4.orEmpty(), { v -> maker { it.copy(idLast4 = PlanIds.last4(v).ifBlank { null }) } }, t("Last 4 digits of the ID", "पहचान-पत्र के आख़िरी 4 अंक"), singleLine = true, supporting = t("Never the full Aadhaar number.", "पूरा आधार नंबर कभी नहीं।"))
-            CheckLine(a.soundMindDeclaration, { v -> a = a.copy(soundMindDeclaration = v) }, t("I am an adult of sound mind. I make this directive of my own free will, understanding what it means.", "मैं पूरे होश वाला/वाली वयस्क हूँ। मैं यह निर्देश अपनी मर्ज़ी से, इसका मतलब समझकर दे रहा/रही हूँ।"))
-        }
-        PlanCard {
-            SectionTitle(t("When this applies", "यह कब लागू होगा"))
-            AmdSituation.entries.forEach { s -> CheckLine(s in a.answers.situations, { on -> answers { it.copy(situations = if (on) it.situations + s else it.situations - s) } }, AmdText.situation(s).pick(hindi)) }
-        }
-        PlanCard {
-            SectionTitle(t("Treatments I do not want then", "तब मैं ये इलाज नहीं चाहता/चाहती"))
-            AmdTreatment.entries.forEach { tr -> CheckLine(tr in a.answers.refusedTreatments, { on -> answers { it.copy(refusedTreatments = if (on) it.refusedTreatments + tr else it.refusedTreatments - tr) } }, AmdText.treatment(tr).pick(hindi)) }
-            if (AmdTreatment.TUBE_FEEDING in a.answers.refusedTreatments) Text(AmdText.TUBE_NOTE.pick(hindi), style = MaterialTheme.typography.bodySmall, color = DoctorCardSub)
-            Surface(color = Mint, shape = RoundedCornerShape(12.dp)) { Text(AmdText.COMFORT.pick(hindi), Modifier.padding(10.dp), style = MaterialTheme.typography.bodyMedium) }
-        }
-        PlanCard {
-            SectionTitle(t("Other wishes", "दूसरी इच्छाएँ"))
-            OptionGroup(t("Where I would like to be cared for at the end", "आख़िर में मेरी देखभाल कहाँ हो"), a.answers.placeOfCare, PlaceOfCare.entries, AmdText::place, tag = "amd-place") { v -> answers { it.copy(placeOfCare = v) } }
-            CareField(a.answers.religiousWishes, { v -> answers { it.copy(religiousWishes = v) } }, t("Religious or spiritual wishes", "धार्मिक या आध्यात्मिक इच्छाएँ"), minLines = 2)
-            CareField(a.answers.otherWishes, { v -> answers { it.copy(otherWishes = v) } }, t("Anything else", "और कुछ"), minLines = 2)
-            CheckLine(a.answers.organDonation == true, { v -> answers { it.copy(organDonation = v) } }, t("I wish to donate my organs or body if possible", "हो सके तो मैं अपने अंग या शरीर दान करना चाहता/चाहती हूँ"))
-        }
-        PlanCard {
-            SectionTitle(t("People who decide for me", "मेरे लिए फ़ैसला लेने वाले"))
-            Text(t("Name at least one, ideally two, in order of preference.", "कम से कम एक, बेहतर हो दो, पसंद के क्रम में।"), style = MaterialTheme.typography.bodySmall)
-            a.dhrs.forEachIndexed { i, dhr -> DhrFields(i, dhr, onChange = { v -> a = a.copy(dhrs = a.dhrs.mapIndexed { j, x -> if (j == i) v else x }) }, onRemove = { a = a.copy(dhrs = a.dhrs.filterIndexed { j, _ -> j != i }) }) }
-            OutlinedButton(onClick = { a = a.copy(dhrs = a.dhrs + Dhr()) }, enabled = a.dhrs.size < 4, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("amd-add-dhr")) { Icon(Icons.Default.PersonAdd, null); Spacer(Modifier.width(8.dp)); Text(t("Add a person", "व्यक्ति जोड़ें")) }
-        }
-        IssueList(issues)
-        if (editable) Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            OutlinedButton(onClick = { onSave(a) }, enabled = a != record, modifier = Modifier.weight(1f).heightIn(min = 48.dp)) { Text(t("Save", "सहेजें")) }
-            Button(onClick = { if (a.status == AmdStatus.GENERATED && a == record) onReprint(a) else onGenerate(a.copy(status = AmdStatus.DRAFT)) }, enabled = issues.none { it.severity != IssueSeverity.WARN }, modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("amd-generate")) {
-                Text(if (a.status == AmdStatus.GENERATED && a == record) t("Print again", "फिर प्रिंट करें") else t("Make the document", "दस्तावेज़ बनाएँ"))
-            }
-        }
-        if (record.status == AmdStatus.GENERATED && a == record) ExecuteAmd(record, canEdit, onExecute, storeScan)
-    }
-}
-
-@Composable private fun DhrFields(index: Int, dhr: Dhr, onChange: (Dhr) -> Unit, onRemove: () -> Unit) { val t = careText()
-    Surface(color = Cream, shape = RoundedCornerShape(14.dp)) { Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically) { Text(t("Person ${index + 1}", "व्यक्ति ${index + 1}"), fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f)); IconButton(onClick = onRemove) { Icon(Icons.Default.Close, t("Remove person", "व्यक्ति हटाएँ")) } }
-        CareField(dhr.name, { onChange(dhr.copy(name = it)) }, t("Name", "नाम"), singleLine = true)
-        CareField(dhr.relation, { onChange(dhr.copy(relation = it)) }, t("Relation", "रिश्ता"), singleLine = true)
-        CareField(dhr.phone, { onChange(dhr.copy(phone = it)) }, t("Phone", "फ़ोन"), singleLine = true)
-        CareField(dhr.address, { onChange(dhr.copy(address = it)) }, t("Address", "पता"))
-        ChipGroup(dhr.idType, IdType.entries, PlanText::idType, "dhr-$index-id") { onChange(dhr.copy(idType = it)) }
-        CareField(dhr.idLast4.orEmpty(), { onChange(dhr.copy(idLast4 = PlanIds.last4(it).ifBlank { null })) }, t("Last 4 digits of the ID", "पहचान-पत्र के आख़िरी 4 अंक"), singleLine = true)
-    } }
-}
-
-@Composable private fun ExecuteAmd(record: AmdRecord, canEdit: Boolean, onExecute: (AmdScan, List<AmdWitness>, AmdAttestor) -> Unit, storeScan: suspend (android.net.Uri) -> AmdScan) {
-    val t = careText(); val scope = rememberCoroutineScope()
-    var scan by remember(record.id) { mutableStateOf<AmdScan?>(null) }; var scanError by remember { mutableStateOf(false) }
-    var w1 by remember(record.id) { mutableStateOf(AmdWitness()) }; var w2 by remember(record.id) { mutableStateOf(AmdWitness()) }
-    var attestor by remember(record.id) { mutableStateOf(AmdAttestor()) }
-    val pick = androidx.activity.compose.rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.GetContent()) { uri ->
-        if (uri != null) scope.launch { scan = runCatching { storeScan(uri) }.getOrNull(); scanError = scan == null }
-    }
-    val issues = AmdRules.executeIssues(record, scan, listOf(w1, w2), attestor)
-    PlanCard {
-        SectionTitle(t("After signing on paper", "काग़ज़ पर हस्ताक्षर के बाद"))
-        Text(t("Print the document, sign it before two witnesses (preferably not the people you named), and have a notary or gazetted officer attest it. Then record it here. Until then it stays \"Generated\" and is not valid.", "दस्तावेज़ प्रिंट करें, दो गवाहों के सामने हस्ताक्षर करें (बेहतर हो वे नामित लोग न हों), और नोटरी या राजपत्रित अधिकारी से सत्यापित कराएँ। फिर यहाँ दर्ज करें। तब तक यह \"बन गया\" रहेगा और मान्य नहीं होगा।"), style = MaterialTheme.typography.bodySmall)
-        OutlinedButton(onClick = { pick.launch("image/*") }, enabled = canEdit, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("amd-scan")) { Icon(Icons.Default.PhotoCamera, null); Spacer(Modifier.width(8.dp)); Text(if (scan == null) t("Add photo of the signed paper", "हस्ताक्षर किए काग़ज़ की फ़ोटो जोड़ें") else t("Photo added · change", "फ़ोटो जुड़ गई · बदलें")) }
-        scan?.let { Text(t("Fingerprint ", "फ़िंगरप्रिंट ") + it.sha256.take(16) + "…", style = MaterialTheme.typography.bodySmall, color = DoctorCardSub) }
-        if (scanError) Text(t("That photo could not be read. Try another.", "वह फ़ोटो पढ़ी नहीं जा सकी। दूसरी आज़माएँ।"), color = RustText, style = MaterialTheme.typography.bodySmall)
-        CareField(w1.name, { w1 = w1.copy(name = it) }, t("Witness 1 name", "गवाह 1 का नाम"), singleLine = true)
-        CareField(w1.address, { w1 = w1.copy(address = it) }, t("Witness 1 address", "गवाह 1 का पता"), singleLine = true)
-        CareField(w2.name, { w2 = w2.copy(name = it) }, t("Witness 2 name", "गवाह 2 का नाम"), singleLine = true)
-        CareField(w2.address, { w2 = w2.copy(address = it) }, t("Witness 2 address", "गवाह 2 का पता"), singleLine = true)
-        Text(t("Attested by", "किसने सत्यापित किया"), fontWeight = FontWeight.Medium)
-        ChipGroup(attestor.kind, AttestorKind.entries, AmdText::attestor, "amd-attestor") { attestor = attestor.copy(kind = it) }
-        CareField(attestor.name, { attestor = attestor.copy(name = it) }, t("Name", "नाम"), singleLine = true)
-        CareField(attestor.registrationOrDesignation, { attestor = attestor.copy(registrationOrDesignation = it) }, t("Registration number or designation", "रजिस्ट्रेशन नंबर या पद"), singleLine = true)
-        CareField(attestor.place, { attestor = attestor.copy(place = it) }, t("Place", "स्थान"), singleLine = true)
-        PlanDateField(attestor.attestedOn, t("Date attested", "सत्यापन की तारीख़"), { v -> attestor = attestor.copy(attestedOn = v); w1 = w1.copy(signedOn = v); w2 = w2.copy(signedOn = v) }, latest = LocalDate.now())
-        IssueList(issues)
-        Button(onClick = { scan?.let { onExecute(it, listOf(w1, w2), attestor) } }, enabled = canEdit && issues.none { it.severity != IssueSeverity.WARN }, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("amd-execute")) { Text(t("Record as executed", "लागू के रूप में दर्ज करें")) }
     }
 }
 

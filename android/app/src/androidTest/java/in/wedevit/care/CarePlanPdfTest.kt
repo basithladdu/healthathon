@@ -21,12 +21,12 @@ class CarePlanPdfTest {
             status = EctprStatus.ACTIVE, reviewDue = "2027-01-20", prognosticUnderstanding = PrognosticUnderstanding(true, "Dr Iyer", "2026-10-30"),
             signatures = listOf(Signature(SignatureRole.TREATING_CONSULTANT, "Dr Iyer", "KMC-1", now)),
             choices = PlanChoices(goalOfCare = GoalOfCare.C_COMFORT, cpr = Cpr.DNACPR, dnacprReason = DnacprReason.FUTILITY, respCeiling = 1, hospitalTransfer = HospitalTransfer(TransferKind.NO)))
-        val will = AmdLifecycle.newDraft("p1", now, AmdMaker("Asha Rao", "1950-01-01", idType = IdType.AADHAAR, idLast4 = "9012"), id = "a1").copy(soundMindDeclaration = true,
-            answers = AmdAnswers(listOf(AmdSituation.TERMINAL_ILLNESS), listOf(AmdTreatment.TUBE_FEEDING, AmdTreatment.CPR), PlaceOfCare.HOME), dhrs = listOf(Dhr("Ravi Rao", "Son", "98450 00000")))
+        val will = AmdLifecycle.newDraft("p1", now, AmdContent(executant = AmdExecutant("Asha Rao", "Female", "1950-01-01", IdType.AADHAAR, "9012", "12 MG Road"), conditions = listOf(AmdCondition.TERMINAL, AmdCondition.END_STAGE),
+            treatments = mapOf(AmdTreatment.TUBE_FEEDING to AmdChoice.REFUSE, AmdTreatment.CPR to AmdChoice.ACCEPT), wishes = AmdWishes(placeOfCare = AmdPlaceOfCare.HOME), dhrs = listOf(AmdDhr(name = "Ravi Rao", relation = "Son", phone = "98450 00000"))), id = "a1")
         listOf(false, true).forEach { hindi ->
             val suffix = if (hindi) "hi" else "en"
-            out("plan-$suffix.pdf").also { CarePlanPdf.plan(it, plan, EdView.interpret(plan, today), AmdLifecycle.edSummary(emptyList(), "p1"), CardTokens.url("a".repeat(32)), hindi, today); assertPdf(it) }
-            out("will-$suffix.pdf").also { CarePlanPdf.livingWill(it, will, hindi, today); assertPdf(it) }
+            out("plan-$suffix.pdf").also { CarePlanPdf.plan(it, plan, EdView.interpret(plan, today), AmdLifecycle.edSummary(emptyList(), "p1"), CardTokens.url("a".repeat(43)), EdCardOffline.text(plan, null, hindi, today), false, hindi, today); assertPdf(it) }
+            out("will-$suffix.pdf").also { CarePlanPdf.livingWill(it, will, if (hindi) CareLang.HI else CareLang.EN, today); assertPdf(it) }
         }
     }
 }

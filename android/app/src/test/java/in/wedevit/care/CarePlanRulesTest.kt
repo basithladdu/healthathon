@@ -13,6 +13,7 @@ class CarePlanRulesTest {
     private fun choose(r: EctprRecord = understood(), change: (PlanChoices) -> PlanChoices) = r.copy(choices = change(r.choices))
     private fun ids(r: EctprRecord) = EctprRules.check(r, today).map { it.id }
     private fun saveIds(r: EctprRecord) = EctprRules.saveBlockers(r, today).map { it.id }
+    private fun signIds(r: EctprRecord) = EctprRules.activationBlockers(r, today).map { it.id }
     private val consultant = Signature(SignatureRole.TREATING_CONSULTANT, "Dr Meera Iyer", "KMC-12345", now)
     private fun signable(r: EctprRecord = understood()) = r.copy(reviewDue = "2027-01-20", signatures = listOf(consultant))
     private val trial = TrialPlan(3, DurationUnit.DAYS, "2026-11-01 10:00", listOf("Dr Iyer"))
@@ -48,10 +49,12 @@ class CarePlanRulesTest {
     @Test fun v3_goalAWithLimitNeedsConfirmation() {
         val r = choose { it.copy(goalOfCare = GoalOfCare.A_LIFE, icu = Icu(IcuKind.NO)) }
         assertEquals(IssueSeverity.CONFIRM, EctprRules.check(r, today).first { it.id == "V3" }.severity)
-        assertTrue("V3" in saveIds(r))
-        assertTrue("V3" in saveIds(choose { it.copy(goalOfCare = GoalOfCare.A_LIFE, respCeiling = 3) }))
-        assertFalse("V3" in saveIds(choose(r) { it.copy(goalAConfirmed = true) }))
-        assertFalse("V3" in saveIds(choose { it.copy(goalOfCare = GoalOfCare.A_LIFE, respCeiling = 5, icu = Icu(IcuKind.YES)) }))
+        assertTrue("V3" in signIds(r))
+        assertTrue("V3" in signIds(choose { it.copy(goalOfCare = GoalOfCare.A_LIFE, respCeiling = 3) }))
+        assertFalse("V3" in signIds(choose(r) { it.copy(goalAConfirmed = true) }))
+        assertFalse("V3" in signIds(choose { it.copy(goalOfCare = GoalOfCare.A_LIFE, respCeiling = 5, icu = Icu(IcuKind.YES)) }))
+        // As on the web, a confirm stops signing, not saving.
+        assertFalse("V3" in saveIds(r))
     }
 
     @Test fun v4_treatmentLockedUntilUnderstandingRecorded() {
@@ -93,17 +96,19 @@ class CarePlanRulesTest {
     }
 
     @Test fun v9_careThatAlwaysContinuesIsFixedAndBilingual() {
-        assertTrue(CareThatContinues.ITEMS.size >= 5)
+        assertEquals(8, CareThatContinues.ITEMS.size)
         assertTrue(CareThatContinues.ITEMS.any { it.en.contains("Mouth care") })
         (CareThatContinues.ITEMS + CareThatContinues.TITLE).forEach { assertTrue(it.en, HindiScan.hasHindi(it.hi)) }
     }
 
     @Test fun c1_noTransferWithIcuOrHighCeilingNeedsReason() {
         val r = choose { it.copy(hospitalTransfer = HospitalTransfer(TransferKind.NO), respCeiling = 4) }
-        assertTrue("C1" in saveIds(r))
-        assertTrue("C1" in saveIds(choose { it.copy(hospitalTransfer = HospitalTransfer(TransferKind.NO), icu = Icu(IcuKind.TRIAL, trial)) }))
-        assertFalse("C1" in saveIds(choose(r) { it.copy(conflictReasons = mapOf("C1" to "Home NIV")) }))
-        assertFalse("C1" in saveIds(choose { it.copy(hospitalTransfer = HospitalTransfer(TransferKind.NO), respCeiling = 2) }))
+        assertTrue("C1" in signIds(r))
+        assertTrue("C1" in signIds(choose { it.copy(hospitalTransfer = HospitalTransfer(TransferKind.NO), icu = Icu(IcuKind.TRIAL, trial)) }))
+        assertFalse("C1" in signIds(choose(r) { it.copy(conflictReasons = mapOf("C1" to "Home NIV")) }))
+        assertFalse("C1" in signIds(choose { it.copy(hospitalTransfer = HospitalTransfer(TransferKind.NO), respCeiling = 2) }))
+        // As on the web, a confirm stops signing, not saving.
+        assertFalse("C1" in saveIds(r))
     }
 
     @Test fun c2_comfortWithOrganSupportSavesOnlyWithReason() {
@@ -115,9 +120,11 @@ class CarePlanRulesTest {
     }
 
     @Test fun c3_intubationOrPressorsWithoutIcuNeedsReason() {
-        assertTrue("C3" in saveIds(choose { it.copy(respCeiling = 5, icu = Icu(IcuKind.NO)) }))
-        assertTrue("C3" in saveIds(choose { it.copy(vasopressors = Vasopressors(VasopressorKind.YES_MAX_AGENTS, maxAgents = 2), icu = Icu(IcuKind.NO)) }))
-        assertFalse("C3" in saveIds(choose { it.copy(respCeiling = 5, icu = Icu(IcuKind.NO), conflictReasons = mapOf("C3" to "HDU available")) }))
+        assertTrue("C3" in signIds(choose { it.copy(respCeiling = 5, icu = Icu(IcuKind.NO)) }))
+        assertTrue("C3" in signIds(choose { it.copy(vasopressors = Vasopressors(VasopressorKind.YES_MAX_AGENTS, maxAgents = 2), icu = Icu(IcuKind.NO)) }))
+        assertFalse("C3" in signIds(choose { it.copy(respCeiling = 5, icu = Icu(IcuKind.NO), conflictReasons = mapOf("C3" to "HDU available")) }))
+        // As on the web, a confirm stops signing, not saving.
+        assertFalse("C3" in saveIds(choose { it.copy(respCeiling = 5, icu = Icu(IcuKind.NO)) }))
     }
 
     @Test fun c4_everyTrialNeedsDurationReviewTimeAndReviewers() {
@@ -209,7 +216,7 @@ class CarePlanRulesTest {
         val old = s.tokens.first { it.ectprId == "r1" }
         assertEquals(EdKind.REVOKED, EdView.forToken(old.token, s.tokens, s.ectprs, today).kind)
         assertTrue(s.audit.verify())
-        assertEquals(listOf(AuditAction.SIGN, AuditAction.REVIEW, AuditAction.EDIT, AuditAction.SIGN, AuditAction.REVOKE), s.audit.events.map { it.action })
+        assertEquals(listOf(AuditAction.SIGN, AuditAction.SHARE, AuditAction.REVIEW, AuditAction.EDIT, AuditAction.SIGN, AuditAction.REVOKE, AuditAction.SHARE), s.audit.events.map { it.action })
     }
 
     @Test fun onlyOneDraftAtATime() {
@@ -245,13 +252,13 @@ class CarePlanRulesTest {
         assertEquals(EdKind.NONE, EdView.forToken("0".repeat(32), s.tokens, s.ectprs, today).kind)
     }
 
-    @Test fun cardTokenIsRandom128BitUrlWithNoPersonalData() {
+    @Test fun cardTokenIsARandomUrlWithNoPersonalData() {
         val s = CarePlanBook.sign(CarePlanState(ectprs = listOf(signable())), "r1", "dr", now, today)
         val url = s.tokens.single().url
-        assertTrue(url.matches(Regex("^https://sahara\\.wedevit\\.in/ed/[a-f0-9]{32}$")))
-        listOf("Asha", "UH-1", "p1", "r1").forEach { assertFalse(url.substringAfterLast('/').contains(it)) }
+        assertTrue(url.matches(Regex("^https://sahara\\.wedevit\\.in/ed/[A-Za-z0-9_-]{43}$")))
+        listOf("Asha", "UH-1").forEach { assertFalse(url.substringAfterLast('/').contains(it)) }
         assertNotEquals(CardTokens.newToken(), CardTokens.newToken())
-        assertEquals(32, CardTokens.newToken().length)
+        assertEquals(43, CardTokens.newToken().length)
     }
 
     // ED view order (clinical spec §6)
@@ -349,7 +356,7 @@ class CarePlanRulesTest {
 
     @Test fun stateRoundTripsThroughStorageJson() {
         var s = CarePlanBook.sign(CarePlanState(ectprs = listOf(signable())), "r1", "dr", now, today)
-        s = CarePlanBook.startAmd(s, "p1", "fam", now, AmdMaker("Asha Rao", "1950-01-01")).first
+        s = CarePlanBook.startAmd(s, "p1", "fam", now, "Asha Rao").first
         val back = CarePlanState.decode(s.encode())
         assertEquals(s.ectprs, back.ectprs); assertEquals(s.amds, back.amds); assertEquals(s.tokens, back.tokens); assertEquals(s.audit.events, back.audit.events)
         assertTrue(back.audit.verify())

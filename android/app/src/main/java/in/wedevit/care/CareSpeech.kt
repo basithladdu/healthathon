@@ -219,7 +219,7 @@ private class CareDictation(private val context: Context, val changed: () -> Uni
     }
 }
 
-private class CareReadAloud(context: Context, val changed: () -> Unit) {
+internal class CareReadAloud(context: Context, val changed: () -> Unit) {
     private val handler = Handler(Looper.getMainLooper())
     private var engine: TextToSpeech? = null
     private var closed = false

@@ -47,6 +47,11 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
     private val networkReturned = object : android.net.ConnectivityManager.NetworkCallback() {
         override fun onAvailable(network: android.net.Network) { sendPending() }
     }
+    /** Wallet cards waiting for the Sahara server go when the network returns. Separate from the record sync, which needs a cloud account; the practice walkthrough never sends. */
+    private val cardConnectivity = if (demoMode) null else app.getSystemService(android.net.ConnectivityManager::class.java)
+    private val cardNetworkReturned = object : android.net.ConnectivityManager.NetworkCallback() {
+        override fun onAvailable(network: android.net.Network) { viewModelScope.launch { runCatching { CarePlanCardSync.everyone(CarePlanStore(getApplication(), storageNamespace)) } } }
+    }
     private var demoCloseJob: Job? = null
     private val activeConversationIds = mutableMapOf<String,String>()
     /** Only the isolated Doctor example database is exposed to the fixture importer. */
@@ -185,6 +190,8 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
     /** Activating reminders commits preferences and re-sets every alarm; it runs in the background, before any reminder reconcile. */
     private val reminderActivation = viewModelScope.async(Dispatchers.IO) { runCatching { reminderScheduler?.activate() } }
     init {
+        // Registering also fires at once when a network is up, so anything still queued from last time goes now.
+        runCatching { cardConnectivity?.registerDefaultNetworkCallback(cardNetworkReturned) }
         viewModelScope.launch(Dispatchers.Default) { centres }
         viewModelScope.launch { reconcileReminders() }
         viewModelScope.launch { prescriptionExcludedIds.collectLatest { reconcileReminders() } }
@@ -909,7 +916,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
             finally { busy.value = false }
         }
     }
-    override fun onCleared() { stopRecording(); meter?.cancel(); connectivity?.let { runCatching { it.unregisterNetworkCallback(networkReturned) } }; super.onCleared() }
+    override fun onCleared() { stopRecording(); meter?.cancel(); connectivity?.let { runCatching { it.unregisterNetworkCallback(networkReturned) } }; cardConnectivity?.let { runCatching { it.unregisterNetworkCallback(cardNetworkReturned) } }; super.onCleared() }
 }
 
 /** The patient app's role is derived from the account's relationship to the person, never chosen. Doctors use the Doctor workspace. */
