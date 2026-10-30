@@ -2636,3 +2636,799 @@ Use at least $MIN_PASSWORD characters.	کم از کم $MIN_PASSWORD حروف ر�
 Use $MAX_PASSWORD characters or fewer.	زیادہ سے زیادہ $MAX_PASSWORD حروف رکھیں۔
 Use letters, numbers and symbols only.	صرف حروف، نمبر اور نشان استعمال کریں۔
 Working…	کام چل رہا ہے…
+this person	اس شخص
+To let family see $who's care on their own phone, you first need to sign in. It takes a minute.	گھر والے اپنے فون پر $who کی دیکھ بھال دیکھ سکیں، اس کے لیے پہلے سائن ان کریں۔ اس میں بس ایک منٹ لگتا ہے۔
+The online answer did not work this time$detail. Below are the matching lines found on this phone instead.	آن لائن جواب اس بار نہیں ملا$detail۔ اس کی جگہ اس فون پر ملی ہوئی متعلقہ سطریں نیچے ہیں۔
+the matching lines from my documents	میرے کاغذات کی ملتی جلتی سطریں
+the text of these $count documents	ان $count کاغذات کی تحریر
+I agree to send my question and $sendWhat to $sendTo. Photos and files are not sent. Nothing is sent until I tap Ask. I will be asked again next time.	میں اپنا سوال اور $sendWhat $sendTo کو بھیجنے پر راضی ہوں۔ تصویریں اور فائلیں نہیں بھیجی جاتیں۔ “پوچھیں” دبانے تک کچھ نہیں بھیجا جاتا۔ اگلی بار پھر پوچھا جائے گا۔
+1 care note	1 دیکھ بھال کا نوٹ
+$n care notes	$n دیکھ بھال کے نوٹ
+1 report	1 رپورٹ
+$m reports	$m رپورٹیں
+1 line uses edited wording. Check against the original conversation.	1 سطر میں بدلے ہوئے الفاظ ہیں۔ اصل بات چیت سے ملا کر دیکھیں۔
+$n lines use edited wording. Check against the original conversation.	$n سطروں میں بدلے ہوئے الفاظ ہیں۔ اصل بات چیت سے ملا کر دیکھیں۔
+Signed emergency care plan	دستخط شدہ ہنگامی دیکھ بھال کا منصوبہ
+Diagnosis	بیماری
+Transfer	اسپتال لے جانا
+Breathing ceiling	سانس کی حد
+Call first	پہلے فون کریں
+Decision-maker	فیصلہ لینے والے
+Signed	دستخط
+NOT SIGNED	دستخط نہیں
+Review due	جائزہ
+expires in 1 day	1 دن میں ختم ہوگا
+expires in $days days	$days دن میں ختم ہوگا
+A terminal illness (an illness that will end my life)	آخری مرحلے کی بیماری (ایسی بیماری جو میری زندگی ختم کر دے گی)
+An end-stage condition (lasting damage that keeps getting worse, where treatment will not work)	آخری مرحلے کی حالت (مستقل نقصان جو بڑھتا جائے، جہاں علاج کام نہ کرے)
+A vegetative state (awake but not aware, for many months)	ویجیٹیٹو حالت (جاگے ہوئے مگر کئی مہینوں تک ہوش نہیں)
+CPR (pressing the chest, electric shocks to restart the heart)	CPR (سینہ دبانا، دل دوبارہ چلانے کے لیے بجلی کا جھٹکا)
+Breathing machine (ventilator) or other life support	سانس کی مشین (وینٹی لیٹر) یا دوسری زندگی بچانے والی مشین
+Dialysis (machine that cleans the blood when kidneys fail)	ڈائیلاسس (گردے فیل ہونے پر خون صاف کرنے والی مشین)
+Feeding through a tube or drip	نلی یا ڈرپ سے کھانا دینا
+Drips and medicines such as antibiotics (comfort medicines always continue)	ڈرپ اور اینٹی بایوٹک جیسی دوائیں (آرام کی دوائیں ہمیشہ جاری رہتی ہیں)
+Chemotherapy	کیموتھراپی
+Surgery (operations), except for comfort	سرجری (آپریشن)، سوائے آرام کے لیے
+Used when the heart stops. In very serious illness it rarely works and can break ribs.	دل رکنے پر کیا جاتا ہے۔ بہت سنگین بیماری میں یہ کم ہی کام کرتا ہے اور پسلیاں ٹوٹ سکتی ہیں۔
+A tube in the throat connected to a machine that breathes for you, usually in the ICU.	گلے میں ایک نلی جو مشین سے جڑی ہوتی ہے اور آپ کے لیے سانس لیتی ہے، عام طور پر ICU میں۔
+Usually several hours, a few times a week.	عام طور پر ہفتے میں چند بار، کئی گھنٹے۔
+A tube in the nose or stomach, or a drip. The Supreme Court treats this as medical treatment (Harish Rana, 2026). Food and drink by mouth for comfort, mouth care and hand feeding always continue.	ناک یا پیٹ میں نلی، یا ڈرپ۔ سپریم کورٹ اسے طبی علاج مانتی ہے (ہریش رانا، 2026)۔ آرام کے لیے منہ سے کھانا پینا، منہ کی دیکھ بھال اور ہاتھ سے کھلانا ہمیشہ جاری رہتے ہیں۔
+Pain and comfort medicines are never stopped by this choice.	اس انتخاب سے درد اور آرام کی دوائیں کبھی بند نہیں ہوتیں۔
+Medicines that treat cancer.	کینسر کا علاج کرنے والی دوائیں۔
+Radiation treatment for cancer.	کینسر کے لیے شعاعی علاج۔
+Operations to relieve symptoms or improve quality of life are still allowed.	علامات سے راحت یا زندگی کے معیار کے لیے آپریشن پھر بھی ہو سکتے ہیں۔
+I do not want	مجھے نہیں چاہیے
+I want	مجھے چاہیے
+Not decided	طے نہیں
+In a hospital or medical facility	اسپتال یا طبی مرکز میں
+In a hospice or similar place	ہاسپس یا ایسی جگہ میں
+At home	گھر پر
+In a place I name	میری بتائی ہوئی جگہ پر
+Notary	نوٹری
+Gazetted officer	گزٹڈ افسر
+Draft	ڈرافٹ
+Printed, not yet signed	پرنٹ ہوا، ابھی دستخط نہیں
+Signed and recorded	دستخط شدہ اور درج
+Replaced by a newer version	نئے ورژن سے بدلا گیا
+Cancelled in writing	تحریری طور پر منسوخ
+Representative	نمائندہ
+Family doctor	خاندانی ڈاکٹر
+Custodian	نگران
+By post	ڈاک سے
+Digital copy	ڈیجیٹل کاپی
+Comfort care, pain relief, mouth care and feeding by mouth always continue. This cannot be changed.	آرام کی دیکھ بھال، درد سے راحت، منہ کی دیکھ بھال اور منہ سے کھلانا ہمیشہ جاری رہتے ہیں۔ اسے بدلا نہیں جا سکتا۔
+Tube feeding is a medical treatment. Comfort feeding by mouth always continues.	نلی سے کھانا ایک طبی علاج ہے۔ آرام کے لیے منہ سے کھلانا ہمیشہ جاری رہتا ہے۔
+If the situation is ambiguous or not anticipated by the AMD, it is not applied.	اگر صورتحال واضح نہ ہو یا AMD میں اس کا اندازہ نہیں لگایا گیا تھا تو AMD لاگو نہیں ہوتا۔
+The AMD governs over this plan.	AMD اس منصوبے سے بالاتر مانا جائے گا۔
+Sahara prints the paper. It becomes valid only when you sign it by hand in front of two witnesses and a notary or gazetted officer attests it. Then you add a photo or scan here.	سہارا کاغذ پرنٹ کرتا ہے۔ یہ تبھی معتبر ہوتا ہے جب آپ دو گواہوں کے سامنے ہاتھ سے دستخط کریں اور نوٹری یا گزٹڈ افسر اس کی تصدیق کرے۔ پھر آپ یہاں تصویر یا اسکین شامل کریں۔
+Legal review pending	قانونی جائزہ باقی
+For a patient who cannot decide, withholding or withdrawing life-sustaining treatment may need the Medical Board process (Common Cause 2023; Harish Rana 2026). This plan records wishes and clinical limits; it does not by itself legally authorise withholding treatment.	جو مریض خود فیصلہ نہیں لے سکتا، اس کے لیے جان بچانے والا علاج شروع نہ کرنے یا روکنے کے لیے میڈیکل بورڈ کا عمل ضروری ہو سکتا ہے (کامن کاز 2023؛ ہریش رانا 2026)۔ یہ منصوبہ خواہشات اور علاج کی حدیں درج کرتا ہے؛ یہ بذاتِ خود علاج روکنے کی قانونی اجازت نہیں دیتا۔
+After both boards agree, nothing is done for 30 days. In this reconsideration period, anyone affected may go to court (Harish Rana, 2026 INSC 222, para 322(vi)).	دونوں بورڈ کے متفق ہونے کے بعد 30 دن تک کچھ نہیں کیا جاتا۔ اس نظرثانی کی مدت میں کوئی بھی متاثرہ شخص عدالت جا سکتا ہے (ہریش رانا، 2026 INSC 222، پیرا 322(vi))۔
+Withholding or withdrawing life-sustaining treatment for a patient who cannot decide follows the board process below. This app only shows it as information. It never starts, stops or decides any treatment. (Legal review pending.)	جو مریض خود فیصلہ نہیں لے سکتا، اس کے لیے جان بچانے والا علاج شروع نہ کرنا یا روکنا نیچے دیے گئے بورڈ کے عمل سے ہوتا ہے۔ یہ ایپ اسے صرف معلومات کے طور پر دکھاتی ہے۔ یہ کبھی کوئی علاج شروع، بند یا طے نہیں کرتی۔ (قانونی جائزہ باقی۔)
+1. Primary Medical Board (hospital): the treating doctor and at least two experts with 5+ years of experience. It meets the patient with the named representatives and gives its opinion, preferably within 48 hours.	1. پرائمری میڈیکل بورڈ (اسپتال): علاج کرنے والا ڈاکٹر اور کم از کم دو ماہرین جنہیں 5+ سال کا تجربہ ہو۔ یہ نامزد نمائندوں کے ساتھ مریض سے ملتا ہے اور ہو سکے تو 48 گھنٹے میں رائے دیتا ہے۔
+2. Secondary Medical Board: a doctor nominated by the district Chief Medical Officer (from a panel reviewed at least every 12 months; nomination preferably within 48 hours of the hospital’s request) and at least two other experts, none from the first board. Opinion preferably within 48 hours.	2. سیکنڈری میڈیکل بورڈ: ضلع کے چیف میڈیکل آفیسر کا نامزد کردہ ڈاکٹر (ایسے پینل سے جس کا جائزہ کم از کم ہر 12 مہینے میں ہو؛ نامزدگی ہو سکے تو اسپتال کی درخواست کے 48 گھنٹے میں) اور کم از کم دو دوسرے ماہرین، جو پہلے بورڈ میں نہ ہوں۔ رائے ہو سکے تو 48 گھنٹے میں۔
+3. Consent: the named representatives (DHRs) consent in writing; without an AMD, the next of kin’s written consent, reflecting the patient’s own wishes. The hospital then informs the Judicial Magistrate First Class (JMFC).	3. رضامندی: نامزد نمائندے (DHR) تحریری رضامندی دیتے ہیں؛ AMD نہ ہو تو قریبی رشتہ دار کی تحریری رضامندی، جو مریض کی اپنی خواہش ظاہر کرے۔ پھر اسپتال جوڈیشل مجسٹریٹ فرسٹ کلاس (JMFC) کو مطلع کرتا ہے۔
+4. After both boards agree there is a 30-day reconsideration period, when anyone affected may go to court (Harish Rana, 2026). Only then is there a planned palliative process, never abandonment.	4. دونوں بورڈ کے متفق ہونے کے بعد 30 دن کی نظرثانی کی مدت ہوتی ہے، جس میں کوئی بھی متاثرہ شخص عدالت جا سکتا ہے (ہریش رانا، 2026)۔ اس کے بعد ہی منصوبے کے ساتھ فکرِ راحت (پیلیٹیو) دیکھ بھال کا عمل ہوتا ہے، کبھی چھوڑ دینا نہیں۔
+5. If a board refuses, or the hospital will not start the process, the representatives, family or doctors may approach the High Court (Article 226).	5. اگر بورڈ انکار کرے، یا اسپتال عمل شروع نہ کرے، تو نمائندے، خاندان یا ڈاکٹر ہائی کورٹ (آرٹیکل 226) جا سکتے ہیں۔
+Enter your full name.	اپنا پورا نام لکھیں۔
+Enter your date of birth.	اپنی تاریخِ پیدائش لکھیں۔
+Enter a real date of birth.	صحیح تاریخِ پیدائش لکھیں۔
+Only an adult (18 years or older) can make a living will.	صرف بالغ (18 سال یا اس سے زیادہ) ہی لیونگ ول بنا سکتے ہیں۔
+Enter only the last 4 digits of the ID.	شناختی کارڈ کے صرف آخری 4 ہندسے لکھیں۔
+Your address is empty. You will need to write it by hand on the paper.	آپ کا پتہ خالی ہے۔ آپ کو اسے کاغذ پر ہاتھ سے لکھنا ہوگا۔
+Confirm that you understand what this document means.	تصدیق کریں کہ آپ سمجھتے ہیں کہ اس دستاویز کا کیا مطلب ہے۔
+Confirm that nobody is forcing or pressuring you.	تصدیق کریں کہ کوئی آپ پر زبردستی یا دباؤ نہیں ڈال رہا۔
+Confirm that you have thought about this carefully.	تصدیق کریں کہ آپ نے اس پر غور سے سوچا ہے۔
+Confirm that you understand it will not be used if the situation is unclear or was not foreseen.	تصدیق کریں کہ آپ سمجھتے ہیں کہ صورتحال واضح نہ ہو یا پہلے سے سوچی نہ گئی ہو تو اسے استعمال نہیں کیا جائے گا۔
+Choose at least one situation when this living will applies.	کم از کم ایک صورت چنیں جب یہ لیونگ ول لاگو ہو۔
+You have not chosen any specific treatment. The general direction in Section 2 will still apply.	آپ نے کوئی خاص علاج نہیں چنا ہے۔ حصہ 2 کی عمومی ہدایت پھر بھی لاگو ہوگی۔
+A living will cannot ask for anything meant to end life. That is against the law in India. Please change these words.	لیونگ ول میں زندگی ختم کرنے کے لیے کچھ بھی نہیں مانگا جا سکتا۔ یہ بھارت میں قانون کے خلاف ہے۔ براہ کرم یہ الفاظ بدلیں۔
+Name at least one person who can speak for you (a representative).	کم از کم ایک ایسے شخص کا نام لکھیں جو آپ کی طرف سے بول سکے (نمائندہ)۔
+It is better to name two representatives, in order of preference, in case the first cannot be reached.	دو نمائندوں کے نام، پسند کی ترتیب میں، لکھنا بہتر ہے، تاکہ پہلے سے رابطہ نہ ہو سکے تو دوسرا ہو۔
+Representative $n: enter the full name.	نمائندہ $n: پورا نام لکھیں۔
+Representative $n: say how they are related to you.	نمائندہ $n: بتائیں کہ وہ آپ کے کیا لگتے ہیں۔
+Representative $n: enter a mobile number.	نمائندہ $n: موبائل نمبر لکھیں۔
+Representative $n: enter only the last 4 digits of the ID.	نمائندہ $n: شناختی کارڈ کے صرف آخری 4 ہندسے لکھیں۔
+Representative $n must be an adult (18 or older).	نمائندہ $n بالغ (18 یا اس سے زیادہ) ہونا چاہیے۔
+You cannot name yourself as your representative.	آپ خود کو اپنا نمائندہ نہیں بنا سکتے۔
+Representative $n: talk to them and tick that they agreed before you sign.	نمائندہ $n: ان سے بات کریں اور دستخط سے پہلے ٹک کریں کہ وہ متفق ہیں۔
+The same person is listed twice as a representative.	ایک ہی شخص نمائندے کے طور پر دو بار لکھا ہے۔
+Write your panchayat or municipality so a copy can go to its custodian.	اپنی پنچایت یا میونسپلٹی لکھیں تاکہ ایک کاپی اس کے نگران کو جا سکے۔
+Print the PDF first. Only a printed and signed version can be recorded.	پہلے PDF پرنٹ کریں۔ صرف پرنٹ اور دستخط شدہ ورژن درج ہو سکتا ہے۔
+Enter the date it was signed.	دستخط کی تاریخ لکھیں۔
+The signing date cannot be in the future.	دستخط کی تاریخ مستقبل کی نہیں ہو سکتی۔
+The signing date is before this version was printed. Check you uploaded the right version.	دستخط کی تاریخ اس ورژن کے پرنٹ سے پہلے کی ہے۔ دیکھیں کہ صحیح ورژن اپ لوڈ کیا ہے۔
+Upload a photo or scan of the signed and attested paper.	دستخط شدہ اور تصدیق شدہ کاغذ کی تصویر یا اسکین اپ لوڈ کریں۔
+Enter the name of witness $n.	گواہ $n کا نام لکھیں۔
+The person making the living will cannot be their own witness.	لیونگ ول بنانے والا شخص خود اپنا گواہ نہیں ہو سکتا۔
+Witness $n is also a named representative. Witnesses should preferably be independent.	گواہ $n ایک نامزد نمائندہ بھی ہے۔ گواہ ہو سکے تو آزاد ہونے چاہییں۔
+Witness $n: enter only the last 4 digits of the ID.	گواہ $n: شناختی کارڈ کے صرف آخری 4 ہندسے لکھیں۔
+The two witnesses must be two different people.	دونوں گواہ الگ الگ شخص ہونے چاہییں۔
+Choose who attested it: a notary or a gazetted officer.	چنیں کہ تصدیق کس نے کی: نوٹری یا گزٹڈ افسر۔
+Enter the name of the notary or gazetted officer.	نوٹری یا گزٹڈ افسر کا نام لکھیں۔
+The notary or gazetted officer must be a different person from you, your representatives and the witnesses.	نوٹری یا گزٹڈ افسر آپ سے، آپ کے نمائندوں سے اور گواہوں سے الگ شخص ہونا چاہیے۔
+Record the custodian: acknowledged, or \"custodian pending\".	نگران درج کریں: رسید مل گئی، یا \"نگران باقی\"۔
+Enter the custodian officer’s name and the date they acknowledged it.	نگران افسر کا نام اور رسید کی تاریخ لکھیں۔
+Tick consent before linking to ABHA.	ABHA سے جوڑنے سے پہلے رضامندی پر ٹک کریں۔
+Enter an ABHA address like name@abdm, or the 14-digit ABHA number.	name@abdm جیسا ABHA پتہ، یا 14 ہندسوں کا ABHA نمبر لکھیں۔
+A living will is cancelled in writing. Tick that the person signed a written cancellation.	لیونگ ول تحریری طور پر منسوخ ہوتی ہے۔ ٹک کریں کہ شخص نے تحریری منسوخی پر دستخط کیے ہیں۔
+Enter the date of the written cancellation.	تحریری منسوخی کی تاریخ لکھیں۔
+The date cannot be in the future.	تاریخ مستقبل کی نہیں ہو سکتی۔
+No living will (AMD)	کوئی لیونگ ول (AMD) نہیں
+No AMD; earlier wishes noted	AMD نہیں؛ پہلے کی خواہشات درج
+Valid living will (AMD)	معتبر لیونگ ول (AMD)
+held at	رکھی ہے
+attested by	تصدیق کنندہ
+Living will (AMD) executed in Sahara	Sahara میں تیار کی گئی لیونگ ول (AMD)
+version $version	ورژن $version
+signed $signed	دستخط $signed
+Also on this plan	اس منصوبے میں یہ بھی
+Living will cancelled in writing	لیونگ ول تحریری طور پر منسوخ
+This plan still lists one. Check with the decision-maker	یہ منصوبہ اب بھی ایک دکھاتا ہے۔ فیصلہ لینے والے سے پوچھیں
+Living will in Sahara is not signed and attested, so it is not valid	Sahara کی لیونگ ول پر دستخط اور تصدیق نہیں، اس لیے معتبر نہیں
+Section 1: Personal details	حصہ 1: ذاتی تفصیل
+Section 2: Directions relating to life-sustaining treatment	حصہ 2: زندگی بچانے والے علاج سے متعلق ہدایات
+Section 3 (Optional): Wishes or desires during end-of-life care	حصہ 3 (اختیاری): زندگی کے آخری وقت کی دیکھ بھال میں خواہشات
+Section 4: Authorisation of the Designated Healthcare Representative (DHR)	حصہ 4: نامزد صحت نگہداشت نمائندے (DHR) کا اختیار
+Section 5 (Optional): Directions to be followed upon my death	حصہ 5 (اختیاری): میری موت کے بعد عمل کرنے کی ہدایات
+Declaration	اعلان
+Validity of directive	ہدایت کی صحت
+Signature of the executor	ہدایت بنانے والے کے دستخط
+Signature of witnesses	گواہوں کے دستخط
+Notarisation / Attestation	نوٹری / گزٹڈ افسر کی تصدیق
+ADVANCE MEDICAL DIRECTIVE	پیشگی طبی ہدایت (لیونگ ول)
+The English text is the valid text. The headings in this language are only to help reading.	انگریزی متن ہی معتبر ہے۔ اس زبان کے عنوان صرف سمجھنے کے لیے ہیں۔
+See every step of the board process (information only)	بورڈ کے عمل کے تمام مراحل دیکھیں (صرف معلومات)
+Your data and your rights	آپ کا ڈیٹا اور آپ کے حقوق
+Hide	چھپائیں
+Show	دکھائیں
+Only the patient or the care team can download or delete this data. Please ask them.	یہ ڈیٹا صرف مریض یا دیکھ بھال کی ٹیم ڈاؤن لوڈ کر سکتی ہے یا مٹا سکتی ہے۔ براہ کرم ان سے کہیں۔
+The download could not be made. Try again.	ڈاؤن لوڈ نہیں بن سکا۔ دوبارہ کوشش کریں۔
+Download my data	میرا ڈیٹا ڈاؤن لوڈ کریں
+Your data is ready. It holds private health details, so keep the file safe.	آپ کا ڈیٹا تیار ہے۔ اس میں نجی صحت کی معلومات ہیں، اس لیے فائل سنبھال کر رکھیں۔
+Delete my local draft	میرا لوکل ڈرافٹ مٹائیں
+This deletes the unsigned draft from this phone. It cannot be undone. Signed versions and the log stay.	اس سے بغیر دستخط کا ڈرافٹ اس فون سے مٹ جائے گا۔ اسے واپس نہیں لایا جا سکتا۔ دستخط شدہ ورژن اور ریکارڈ رہیں گے۔
+Keep the draft	ڈرافٹ رکھیں
+The unsigned draft is deleted from this phone. Signed versions and the log were kept.	بغیر دستخط کا ڈرافٹ اس فون سے مٹ گیا۔ دستخط شدہ ورژن اور ریکارڈ رکھے گئے ہیں۔
+There is no unsigned draft to delete. A plan someone has already signed is kept.	مٹانے کے لیے کوئی بغیر دستخط کا ڈرافٹ نہیں ہے۔ جس منصوبے پر کسی نے دستخط کر دیے ہیں، وہ رکھا جاتا ہے۔
+Yes, delete the draft	ہاں، ڈرافٹ مٹائیں
+I have read this	میں نے یہ پڑھ لیا
+Review is $late days late	جائزہ $late دن دیر سے ہے
+Review is due today	جائزہ آج ہے
+Review is due in $days days	جائزہ $days دن میں ہے
+SMS not configured on this server, so reminders cannot be sent. Please phone them.	اس سرور پر SMS سیٹ نہیں ہے، اس لیے پیغام نہیں بھیجے جا سکتے۔ براہ کرم فون کریں۔
+The server could not be reached. Check the internet, or phone them.	سرور سے رابطہ نہیں ہو سکا۔ انٹرنیٹ دیکھیں، یا فون کریں۔
+No valid mobile number for the patient or the primary decision-maker.	مریض یا مرکزی فیصلہ لینے والے کا کوئی صحیح موبائل نمبر نہیں ہے۔
+The reminder goes to $name. The number goes to the SMS company.	پیغام $name کو جائے گا۔ نمبر SMS کمپنی کے پاس جاتا ہے۔
+Send review reminder	جائزے کا پیغام بھیجیں
+Reminder sent.	پیغام بھیج دیا گیا۔
+SMS not configured on this server. No message was sent. Please phone them.	اس سرور پر SMS سیٹ نہیں ہے۔ کوئی پیغام نہیں گیا۔ براہ کرم فون کریں۔
+Too many reminders to this number in the last hour. No message was sent.	پچھلے ایک گھنٹے میں اس نمبر پر بہت سارے پیغام گئے۔ کوئی پیغام نہیں گیا۔
+The SMS could not be sent. Please phone them.	SMS نہیں بھیجا جا سکا۔ براہ کرم فون کریں۔
+Time (24-hour)	وقت (24 گھنٹے)
+Pilot audit log	پائلٹ آڈٹ لاگ
+For the care team only. Made-up patients only during the pilot. Saved on this phone.	صرف دیکھ بھال کی ٹیم کے لیے۔ پائلٹ میں صرف فرضی مریض۔ اسی فون پر محفوظ۔
+Reach: found eligible to signed	پہنچ: اہل پائے جانے سے دستخط تک
+Not known yet: needs the date found eligible and a signature	ابھی پتہ نہیں: اہل پائے جانے کی تاریخ اور دستخط چاہییں
+$reach days	$reach دن
+Values section completed	اقدار والا حصہ مکمل
+No plan yet	ابھی کوئی منصوبہ نہیں
+treatment fields filled: $filled of $total	بھرے گئے علاج کے حصے: $total میں سے $filled
+Record found within $target minutes of ED arrival	ED پہنچنے کے $target منٹ میں ریکارڈ ملا
+$within of $all episodes	$all میں سے $within معاملے
+Care matched the recorded plan	علاج درج منصوبے کے مطابق ہوا
+$ok of $compared that could be compared	جن کا موازنہ ہو سکا، ان $compared میں سے $ok
+Log an ED episode	ED کا معاملہ درج کریں
+Record an outcome	نتیجہ درج کریں
+Report an incident	واقعے کی رپورٹ کریں
+ED episode saved.	ED کا معاملہ محفوظ ہوا۔
+Outcome saved.	نتیجہ محفوظ ہوا۔
+Incident saved.	واقعہ محفوظ ہوا۔
+ED episodes	ED کے معاملے
+None recorded yet.	ابھی کچھ درج نہیں۔
+Nothing to compare	موازنے کے لیے کچھ نہیں
+Matched the plan	منصوبے کے مطابق
+Differed from the plan	منصوبے سے مختلف
+The record was not opened	ریکارڈ نہیں کھولا گیا
+Record opened after $minutes minutes	$minutes منٹ بعد ریکارڈ کھلا
+over the $target-minute target	$target منٹ کے ہدف سے زیادہ
+Highest support	سب سے زیادہ مدد
+Why care differed	علاج مختلف کیوں ہوا
+Recorded by	درج کرنے والا
+Outcomes	نتائج
+Preference not known	پسند معلوم نہیں
+Where they preferred	جہاں وہ چاہتے تھے
+Not where they preferred	وہاں نہیں جہاں وہ چاہتے تھے
+Preferred place	پسند کی جگہ
+ICU days	ICU کے دن
+ventilator days	وینٹی لیٹر کے دن
+Admission to first symptom-control prescription	داخلے سے علامات کی پہلی دوا تک
+$h hours	$h گھنٹے
+Out-of-pocket spend, last admission	آخری داخلے کا اپنی جیب سے خرچ
+Incidents	واقعات
+None reported yet.	ابھی کوئی رپورٹ نہیں۔
+Plan applied to a reversible illness	ٹھیک ہونے والی بیماری پر منصوبہ لاگو ہوا
+Family felt pushed	خاندان کو دباؤ محسوس ہوا
+Reported by	رپورٹ کرنے والا
+ED arrival time	ED پہنچنے کا وقت
+First time the record was opened	ریکارڈ پہلی بار کب کھلا
+$m minutes after arrival	پہنچنے کے $m منٹ بعد
+The access log has no ED access after this arrival time.	ایکسیس لاگ میں اس وقت کے بعد ED کا کوئی ایکسیس نہیں ہے۔
+Fill from the access log	ایکسیس لاگ سے بھریں
+Highest breathing support actually given	حقیقت میں دی گئی سانس کی سب سے زیادہ مدد
+CPR given?	CPR دیا گیا؟
+Admitted to ICU?	ICU میں داخل؟
+If care differed from the plan, why?	اگر علاج منصوبے سے مختلف ہوا، تو کیوں؟
+No signed plan was in force at this time, so there is nothing to compare.	اس وقت کوئی دستخط شدہ منصوبہ نافذ نہیں تھا، اس لیے موازنہ نہیں ہو سکتا۔
+Compared with version $v: nothing to compare yet.	ورژن $v سے موازنہ: ابھی موازنے کے لیے کچھ نہیں۔
+Compared with version $v: matches the plan.	ورژن $v سے موازنہ: منصوبے کے مطابق۔
+Compared with version $v: differs from the plan.	ورژن $v سے موازنہ: منصوبے سے مختلف۔
+Enter the ED arrival time.	ED پہنچنے کا وقت لکھیں۔
+The first access time cannot be before arrival.	ریکارڈ کھولنے کا وقت پہنچنے سے پہلے کا نہیں ہو سکتا۔
+Care differed from the plan. Write why.	علاج منصوبے سے مختلف ہوا۔ وجہ لکھیں۔
+Save the episode	معاملہ محفوظ کریں
+Place of death	موت کی جگہ
+ICU days in the last 30 days	آخری 30 دنوں میں ICU کے دن
+Ventilator days in the last 30 days	آخری 30 دنوں میں وینٹی لیٹر کے دن
+Last admission time	آخری داخلے کا وقت
+First symptom-control prescription	علامات کی پہلی دوا
+Out-of-pocket spend, last admission (₹)	آخری داخلے کا اپنی جیب سے خرچ (₹)
+Enter at least one item.	کم از کم ایک چیز بھریں۔
+Days must be between 0 and 30.	دن 0 سے 30 کے درمیان ہونے چاہییں۔
+The first prescription cannot be before admission.	پہلی دوا داخلے سے پہلے کی نہیں ہو سکتی۔
+Spend cannot be below zero.	خرچ صفر سے کم نہیں ہو سکتا۔
+Save the outcome	نتیجہ محفوظ کریں
+The plan was applied to a reversible illness	منصوبہ ٹھیک ہونے والی بیماری پر لاگو کیا گیا
+The family felt pushed	خاندان کو دباؤ محسوس ہوا
+Notes	نوٹ
+Tick a box or write what happened.	کوئی باکس چنیں یا لکھیں کہ کیا ہوا۔
+Save the incident	واقعہ محفوظ کریں
+The PDF could not be made. Try again.	PDF نہیں بن سکا۔ دوبارہ کوشش کریں۔
+Living will	لیونگ ول
+This follows the model living will by the Vidhi Centre for Legal Policy and ACP India, and the Supreme Court’s rules (2018, changed on 24 January 2023). If both a living will and an emergency plan exist, the living will governs.	یہ ودھی سینٹر فار لیگل پالیسی اور ACP انڈیا کی ماڈل لیونگ ول، اور سپریم کورٹ کے قواعد (2018، 24 جنوری 2023 کو بدلے گئے) پر مبنی ہے۔ اگر لیونگ ول اور ہنگامی منصوبہ دونوں ہوں، تو لیونگ ول مانی جاتی ہے۔
+What happens if treatment is to be held back or stopped (information only)	اگر علاج روکنا یا شروع نہ کرنا ہو تو کیا ہوتا ہے (صرف معلومات)
+The living will was cancelled in writing on $on. It no longer applies.	لیونگ ول $on کو تحریری طور پر منسوخ کی گئی۔ یہ اب لاگو نہیں ہے۔
+A living will has been started or printed but is not signed and recorded. It is not valid.	لیونگ ول شروع یا پرنٹ ہوئی ہے مگر دستخط شدہ اور درج نہیں ہے۔ یہ معتبر نہیں ہے۔
+No living will is recorded in Sahara. Ask the family if a signed paper exists.	سہارا میں کوئی لیونگ ول درج نہیں ہے۔ خاندان سے پوچھیں کہ کیا کوئی دستخط شدہ کاغذ ہے۔
+Make a new living will	نئی لیونگ ول بنائیں
+Start a living will	لیونگ ول شروع کریں
+ID document	شناختی کارڈ
+Last 4 digits only	صرف آخری 4 ہندسے
+Never type the full number here. Write it by hand on the paper.	پورا نمبر یہاں کبھی نہ لکھیں۔ اسے کاغذ پر ہاتھ سے لکھیں۔
+Living will v$version · $status	لیونگ ول v$version · $status
+Full name	پورا نام
+Gender	جنس
+Date of birth	تاریخِ پیدائش
+Permanent address	مستقل پتہ
+Current address (if different)	موجودہ پتہ (اگر مختلف ہو)
+Municipality or panchayat	میونسپلٹی یا پنچایت
+Why you are making this, and what matters to you (optional)	آپ یہ کیوں بنا رہے ہیں، اور آپ کے لیے کیا اہم ہے (اختیاری)
+Please confirm	براہ کرم تصدیق کریں
+I understand what this document means and what can happen because of it.	میں سمجھتا/سمجھتی ہوں کہ اس دستاویز کا کیا مطلب ہے اور اس سے کیا ہو سکتا ہے۔
+I have thought about it carefully.	میں نے اس پر غور سے سوچا ہے۔
+I am doing this by my own free will. Nobody is forcing or pressuring me.	میں یہ اپنی مرضی سے کر رہا/رہی ہوں۔ کوئی مجھ پر زبردستی یا دباؤ نہیں ڈال رہا۔
+I understand doctors will not use it if the situation is unclear or one I did not think of.	میں سمجھتا/سمجھتی ہوں کہ صورتحال واضح نہ ہو یا میں نے اس کے بارے میں نہ سوچا ہو تو ڈاکٹر اسے استعمال نہیں کریں گے۔
+I cannot read or write. Someone wrote this as I said and read it out to me.	میں پڑھ لکھ نہیں سکتا/سکتی۔ کسی نے اسے میرے کہنے کے مطابق لکھا اور مجھے پڑھ کر سنایا۔
+A doctor’s certificate that I can decide is attached (optional; not required).	ڈاکٹر کا سرٹیفکیٹ کہ میں فیصلہ لے سکتا/سکتی ہوں، ساتھ لگا ہے (اختیاری؛ ضروری نہیں)۔
+It applies only when your doctors decide there is no reasonable chance you will recover, and more treatment would only make dying longer. Choose the situations:	یہ تبھی لاگو ہوگا جب آپ کے ڈاکٹر طے کریں کہ ٹھیک ہونے کا کوئی معقول امکان نہیں ہے، اور مزید علاج صرف موت کے عمل کو لمبا کرے گا۔ صورتیں چنیں:
+Any illness you expect, and what you want for it (optional)	کوئی بیماری جس کی آپ توقع کرتے ہیں، اور اس کے لیے آپ کیا چاہتے ہیں (اختیاری)
+For each treatment, choose what you want in those situations. You can leave any as “Not decided”.	ہر علاج کے لیے چنیں کہ ان صورتوں میں آپ کیا چاہتے ہیں۔ کسی کو بھی “طے نہیں” چھوڑ سکتے ہیں۔
+Where would you like to be cared for at the end?	آخر میں آپ کہاں دیکھ بھال چاہیں گے؟
+Name of the place	جگہ کا نام
+Doctor you would like to look after you (name, place)	ڈاکٹر جن سے آپ دیکھ بھال چاہیں گے (نام، جگہ)
+Anything doctors should pay special attention to	کوئی بات جس پر ڈاکٹر خاص دھیان دیں
+For example: easing worry and confusion so I can spend time with family	مثال کے طور پر: فکر اور الجھن کم کرنا تاکہ میں خاندان کے ساتھ وقت گزار سکوں
+Name you want to be called	جس نام سے آپ کو پکارا جانا پسند ہے
+Gender or pronouns to respect	احترام کیا جانے والا جنس یا ضمیر
+Partner’s name	ساتھی کا نام
+How staff should refer to them	عملہ انہیں کس طرح مخاطب کرے
+my partner	میرا ساتھی
+Representatives (DHRs) speak for you when you cannot. Put them in order: the first is asked first. Talk to them before you name them.	نمائندے (DHR) تب آپ کی طرف سے بولتے ہیں جب آپ نہیں بول سکتے۔ انہیں ترتیب میں رکھیں: پہلے والے سے پہلے پوچھا جائے گا۔ نام لکھنے سے پہلے ان سے بات کریں۔
+Add another representative	ایک اور نمائندہ شامل کریں
+They must decide together (instead of in order).	انہیں مل کر فیصلہ کرنا ہوگا (ترتیب کے بجائے)۔
+Family doctor (optional)	خاندانی ڈاکٹر (اختیاری)
+Phone	فون
+Local body that keeps living wills (custodian)	مقامی ادارہ جو لیونگ ول رکھتا ہے (نگران)
+For example your municipal corporation or gram panchayat. Maharashtra and Karnataka (rural) have named custodians; Andhra Pradesh has not confirmed one yet. You can still sign and record “custodian pending”.	مثلاً آپ کی میونسپل کارپوریشن یا گرام پنچایت۔ مہاراشٹر اور کرناٹک (دیہی) نے نگران طے کیے ہیں؛ آندھرا پردیش نے ابھی تصدیق نہیں کی۔ آپ پھر بھی دستخط کر کے “نگران باقی” درج کر سکتے ہیں۔
+I am a registered organ donor (Form 7, THOTA 1994).	میں رجسٹرڈ اعضا عطیہ کرنے والا/والی ہوں (فارم 7، THOTA 1994)۔
+I want to donate my body for medical study.	میں طبی مطالعے کے لیے اپنا جسم عطیہ کرنا چاہتا/چاہتی ہوں۔
+Medical college or organisation	میڈیکل کالج یا ادارہ
+Wishes about last rites	آخری رسومات کے بارے میں خواہشات
+Once printed, this version cannot be changed in the app. To change anything, start a new version and print again.	پرنٹ ہونے کے بعد یہ ورژن ایپ میں بدلا نہیں جا سکتا۔ کچھ بھی بدلنے کے لیے نیا ورژن شروع کریں اور دوبارہ پرنٹ کریں۔
+Make the PDF to print and sign	پرنٹ اور دستخط کے لیے PDF بنائیں
+1. First representative	1. پہلا نمائندہ
+$n. If the one before cannot be reached	$n. اگر پچھلے سے رابطہ نہ ہو
+Move up	اوپر کریں
+How they are related to you	وہ آپ کے کیا لگتے ہیں
+Mobile number	موبائل نمبر
+Other number (optional)	دوسرا نمبر (اختیاری)
+Date of birth (optional)	تاریخِ پیدائش (اختیاری)
+Email (optional)	ای میل (اختیاری)
+Address	پتہ
+I have talked to them and they agreed to be my representative.	میں نے ان سے بات کی ہے اور وہ میرے نمائندے بننے پر متفق ہیں۔
+Custodian (local body)	نگران (مقامی ادارہ)
+The custodian received a copy and acknowledged it	نگران کو کاپی ملی اور انہوں نے رسید دی
+Custodian pending (none appointed yet, or no reply)	نگران باقی (ابھی مقرر نہیں، یا جواب نہیں)
+Officer’s name and office	افسر کا نام اور دفتر
+Date acknowledged	رسید کی تاریخ
+Tip from the Vidhi toolkit: write to the head of your local body (Commissioner, Sarpanch or President), citing para 198.3.6 of the Supreme Court order of 24 January 2023, and ask them to name a custodian. Attach a copy.	ودھی ٹول کٹ کا مشورہ: اپنے مقامی ادارے کے سربراہ (کمشنر، سرپنچ یا صدر) کو خط لکھیں، 24 جنوری 2023 کے سپریم کورٹ کے حکم کے پیرا 198.3.6 کا حوالہ دیں، اور نگران مقرر کرنے کو کہیں۔ ایک کاپی ساتھ لگائیں۔
+Version $version is printed. It is not valid until signed and attested.	ورژن $version پرنٹ ہو گیا ہے۔ دستخط اور تصدیق تک یہ معتبر نہیں ہے۔
+Print the PDF. Read it once more.	PDF پرنٹ کریں۔ ایک بار پھر پڑھیں۔
+Sign (or give a thumb impression) in front of two adult witnesses. Better if they are not your representatives.	دو بالغ گواہوں کے سامنے دستخط کریں (یا انگوٹھا لگائیں)۔ بہتر ہے کہ وہ آپ کے نمائندے نہ ہوں۔
+Take it to a notary or a gazetted officer to attest and stamp.	اسے نوٹری یا گزٹڈ افسر کے پاس تصدیق اور مہر کے لیے لے جائیں۔
+Take a clear photo or scan of every page and add it here.	ہر صفحے کی صاف تصویر یا اسکین لیں اور یہاں شامل کریں۔
+Share the PDF again	PDF دوبارہ شیئر کریں
+Printed PDF SHA-256:	پرنٹ شدہ PDF کا SHA-256:
+Date signed	دستخط کی تاریخ
+Place	جگہ
+Thumb impression instead of signature	دستخط کی جگہ انگوٹھے کا نشان
+Witness $n	گواہ $n
+Mobile	موبائل
+Attested by	تصدیق کرنے والے
+Registration no. or designation	رجسٹریشن نمبر یا عہدہ
+Photo or scan of the signed, attested paper	دستخط شدہ، تصدیق شدہ کاغذ کی تصویر یا اسکین
+Added · change	شامل ہو گیا · بدلیں
+Kept on this phone only. A SHA-256 fingerprint is recorded so a doctor can check the copy is the same.	صرف اسی فون پر رہتا ہے۔ SHA-256 فنگر پرنٹ درج ہوتا ہے تاکہ ڈاکٹر جانچ سکیں کہ کاپی وہی ہے۔
+That file could not be read. Try another.	وہ فائل پڑھی نہیں جا سکی۔ دوسری آزمائیں۔
+Record as signed and attested	دستخط شدہ اور تصدیق شدہ کے طور پر درج کریں
+Need to change something? Start a new version. This printed copy must then not be signed.	کچھ بدلنا ہے؟ نیا ورژن شروع کریں۔ تب اس پرنٹ کی گئی کاپی پر دستخط نہیں کرنے چاہییں۔
+Start a new version	نیا ورژن شروع کریں
+Signed living will · version $version	دستخط شدہ لیونگ ول · ورژن $version
+Check the paper copy against the scan and its SHA-256, or with the custodian. Doctors only read this here; nothing in the app starts or stops treatment.	کاغذی کاپی کو اسکین اور اس کے SHA-256 سے، یا نگران سے ملائیں۔ ڈاکٹر اسے یہاں صرف پڑھتے ہیں؛ ایپ میں کچھ بھی علاج شروع یا بند نہیں کرتا۔
+This is the current living will. Doctors can see that it is signed, witnessed and attested.	یہ موجودہ لیونگ ول ہے۔ ڈاکٹر دیکھ سکتے ہیں کہ یہ دستخط شدہ، گواہوں کے سامنے اور تصدیق شدہ ہے۔
+thumb impression	انگوٹھے کا نشان
+Witnesses	گواہ
+Acknowledged by $officer on $on	$officer کی طرف سے $on کو رسید
+Custodian pending	نگران باقی
+Scan SHA-256	اسکین SHA-256
+Printed PDF SHA-256	پرنٹ شدہ PDF SHA-256
+View the signed scan	دستخط شدہ اسکین دیکھیں
+This copy is missing or does not match its fingerprint. Do not rely on it; ask for the signed paper.	یہ کاپی نہیں ملی یا فنگر پرنٹ سے میل نہیں کھاتی۔ اس پر بھروسہ نہ کریں؛ دستخط شدہ کاغذ مانگیں۔
+Does not want	نہیں چاہتے
+Wants	چاہتے ہیں
+Representatives, in order	نمائندے، ترتیب سے
+Copies	کاپیاں
+Give a copy to each person below. Ask each one first: their consent to receive it is recorded separately.	نیچے ہر شخص کو ایک کاپی دیں۔ پہلے ہر ایک سے پوچھیں: کاپی لینے کی ان کی رضامندی الگ سے درج ہوتی ہے۔
+The patient agrees to send a copy to the custodian.	مریض نگران کو کاپی بھیجنے پر متفق ہے۔
+The patient agrees to share it, and this person agrees to receive and keep it.	مریض اسے شیئر کرنے پر، اور یہ شخص اسے لینے اور رکھنے پر متفق ہے۔
+Copy given on $on	کاپی $on کو دی گئی
+Copy given	کاپی دی گئی
+Consent is needed before this copy can be marked as given.	کاپی دی گئی کا نشان لگانے سے پہلے رضامندی ضروری ہے۔
+Save custodian	نگران محفوظ کریں
+Link to ABHA health records (optional)	ABHA صحت ریکارڈ سے جوڑیں (اختیاری)
+The Supreme Court allows adding the living will to digital health records. Sahara only notes the ABHA address here; upload the scan in your ABHA app yourself.	سپریم کورٹ لیونگ ول کو ڈیجیٹل صحت ریکارڈ میں شامل کرنے کی اجازت دیتی ہے۔ سہارا یہاں صرف ABHA پتہ نوٹ کرتا ہے؛ اسکین اپنے ABHA ایپ میں خود اپ لوڈ کریں۔
+ABHA address or number	ABHA پتہ یا نمبر
+The patient agrees to link the living will with their ABHA records.	مریض لیونگ ول کو اپنے ABHA ریکارڈ سے جوڑنے پر متفق ہے۔
+Save ABHA link	ABHA لنک محفوظ کریں
+Linked on $on	$on کو جوڑا گیا
+Change it	اسے بدلیں
+Changes make a new version that must be printed, signed and attested again. Version $version stays current until then.	تبدیلی سے نیا ورژن بنتا ہے جسے دوبارہ پرنٹ، دستخط اور تصدیق کرنا ہوگا۔ تب تک ورژن $version موجودہ رہے گا۔
+A new version is already in progress below.	ایک نیا ورژن نیچے پہلے سے چل رہا ہے۔
+Cancel it	اسے منسوخ کریں
+A living will is cancelled in writing: the person signs a short note saying they cancel it, the same way it was made. Then give the note to everyone who has a copy.	لیونگ ول تحریری طور پر منسوخ ہوتی ہے: شخص ایک چھوٹے نوٹ پر دستخط کرتا ہے کہ وہ اسے منسوخ کر رہا ہے، اسی طرح جیسے یہ بنائی گئی تھی۔ پھر وہ نوٹ ان سب کو دیں جن کے پاس کاپی ہے۔
+Record a written cancellation	تحریری منسوخی درج کریں
+Date of the written cancellation	تحریری منسوخی کی تاریخ
+The person signed a written cancellation.	شخص نے تحریری منسوخی پر دستخط کیے ہیں۔
+Cancel the living will	لیونگ ول منسوخ کریں
+Sahara plans are for adults. This date of birth is under 18.	سہارا کے منصوبے بالغوں کے لیے ہیں۔ یہ تاریخِ پیدائش 18 سال سے کم کی ہے۔
+Started in the emergency department. A plan made for the first time in the resuscitation bay records panic, not preference; review it when the patient is stable.	یہ ہنگامی شعبے میں شروع ہوا۔ پہلی بار ایمرجنسی میں بنایا گیا منصوبہ گھبراہٹ درج کرتا ہے، پسند نہیں؛ مریض کی حالت مستحکم ہونے پر اسے دوبارہ دیکھیں۔
+Keep only the last 4 characters of an ID, never the full number.	شناختی کارڈ کے صرف آخری 4 حروف/ہندسے رکھیں، پورا نمبر کبھی نہیں۔
+Record who assessed capacity, when, and the basis (understand, retain, weigh, communicate).	لکھیں کہ فیصلہ کرنے کی صلاحیت کس نے، کب اور کس بنیاد پر جانچی (سمجھنا، یاد رکھنا، تولنا، بتانا)۔
+Capacity fluctuates: add a reassessment date.	فیصلہ کرنے کی صلاحیت گھٹتی بڑھتی رہتی ہے: دوبارہ جانچ کی تاریخ شامل کریں۔
+The family asked that the patient not be told, and the patient has capacity. Record the plan for answering direct questions honestly.	خاندان نے کہا ہے کہ مریض کو نہ بتایا جائے، اور مریض فیصلہ کر سکتا ہے۔ سیدھے سوالوں کا ایمانداری سے جواب دینے کا منصوبہ لکھیں۔
+Treatment choices are locked until the illness has been explained as incurable and the family can repeat it back.	علاج کے فیصلے اس وقت تک بند ہیں جب تک یہ نہ سمجھا دیا جائے کہ بیماری ٹھیک نہیں ہوگی اور خاندان اسے دہرا نہ سکے۔
+A decision-maker answering for the patient must first confirm they will say what the patient would have chosen.	مریض کی طرف سے جواب دینے والے کو پہلے تصدیق کرنی ہے کہ وہ وہی بتائیں گے جو مریض خود چنتا۔
+CPR cannot be given without intubation. With this goal or breathing ceiling, \"attempt CPR\" needs a recorded reason.	سانس کی نلی کے بغیر CPR نہیں دیا جا سکتا۔ اس ہدف یا سانس کی حد کے ساتھ \"CPR کریں\" کے لیے وجہ لکھنا ضروری ہے۔
+Goal A (prioritise life) with a breathing ceiling below intubation or no ICU is unusual. Confirm this is intended.	ہدف A (زندگی کو ترجیح) کے ساتھ سانس کی نلی سے کم حد یا ICU نہیں، یہ غیر معمولی ہے۔ تصدیق کریں کہ یہی مقصد ہے۔
+Choose the reason for DNACPR.	DNACPR کی وجہ چنیں۔
+Record who decided DNACPR: name, registration number, date and time.	DNACPR کا فیصلہ کس نے کیا: نام، رجسٹریشن نمبر، تاریخ اور وقت لکھیں۔
+Tick at least one reason for going to hospital.	اسپتال جانے کی کم از کم ایک وجہ چنیں۔
+Hospital transfer is \"No\", but HFNC, NIV or ICU usually need admission. Record a reason (for example, home NIV).	اسپتال لے جانا \"نہیں\" ہے، مگر HFNC، NIV یا ICU کے لیے عام طور پر داخلہ ضروری ہے۔ وجہ لکھیں (جیسے گھر پر NIV)۔
+Goal C (comfort) with ICU, vasopressors or dialysis is a conflict. It can be saved only with a recorded reason.	ہدف C (آرام) کے ساتھ ICU، BP کی دوا یا ڈائیلاسس آپس میں ٹکراتے ہیں۔ وجہ لکھے بغیر محفوظ نہیں ہو سکتا۔
+Invasive ventilation and vasopressors need ICU or HDU, but ICU is \"No\". Record a reason.	سانس کی مشین اور BP کی دوا کے لیے ICU/HDU چاہیے، مگر ICU \"نہیں\" ہے۔ وجہ لکھیں۔
+$name trial: enter the duration, the review date and time, and who will review.	$name ٹرائل: مدت، جائزے کی تاریخ و وقت اور جائزہ لینے والوں کے نام لکھیں۔
+Enter the maximum number of vasopressor agents.	BP کی دواؤں کی زیادہ سے زیادہ تعداد لکھیں۔
+Enter how many days of nasogastric feeding before review.	جائزے سے پہلے کتنے دن ناک کی نلی سے کھانا، لکھیں۔
+The patient has an ICD. Record the deactivation decision and date, so a dying patient is not shocked.	مریض میں ICD ہے۔ اسے بند کرنے کا فیصلہ اور تاریخ لکھیں، تاکہ آخری وقت میں جھٹکے نہ لگیں۔
+Removing an existing feeding tube is withdrawal of treatment. It follows the medical board pathway and cannot be acted on from this plan alone.	لگی ہوئی کھانے کی نلی ہٹانا علاج واپس لینا ہے۔ اس کے لیے میڈیکل بورڈ کا عمل ہے؛ صرف اس منصوبے سے ایسا نہیں کیا جا سکتا۔
+Treatment choices are filled but the values section is blank. Record what matters to the patient in their own words.	علاج کے فیصلے بھرے ہیں مگر اقدار والا حصہ خالی ہے۔ مریض کے لیے کیا اہم ہے، ان کے اپنے الفاظ میں لکھیں۔
+Set a review date that is not in the past.	جائزے کی ایسی تاریخ چنیں جو گزر نہ چکی ہو۔
+The plan becomes active only when the treating consultant signs with their registration number.	منصوبہ تبھی لاگو ہوگا جب علاج کرنے والے کنسلٹنٹ اپنے رجسٹریشن نمبر کے ساتھ دستخط کریں۔
+Every printed page shows the name and hospital number (UHID). Enter both.	ہر چھپے صفحے پر نام اور اسپتال نمبر (UHID) ہوتا ہے۔ دونوں لکھیں۔
+A thumb impression or limited literacy needs two witnesses.	انگوٹھے کے نشان یا کم پڑھے لکھے ہونے پر دو گواہ ضروری ہیں۔
+IF IN DOUBT, RESUSCITATE	شک ہو تو جان بچانے کا پورا علاج کریں
+Give full standard emergency care when:	پورا معیاری ہنگامی علاج دیں جب:
+the record is unsigned, out of date or cannot be found;	ریکارڈ پر دستخط نہیں ہیں، وہ پرانا ہو گیا ہے یا مل نہیں رہا؛
+the problem is new, reversible and unrelated to the illness — injury, choking, drug reaction, low sugar;	مسئلہ نیا ہے، ٹھیک ہو سکتا ہے اور بیماری سے جڑا نہیں — چوٹ، گلے میں کچھ اٹکنا، دوا کا ری ایکشن، شوگر کم ہونا؛
+the patient has capacity and says something different now;	مریض فیصلہ کرنے کی صلاحیت رکھتے ہیں اور اب کچھ اور کہہ رہے ہیں؛
+the record is ambiguous.	ریکارڈ واضح نہیں ہے۔
+Clarify with the treating team afterwards.	بعد میں علاج کرنے والی ٹیم سے بات کریں۔
+Care that always continues	دیکھ بھال جو ہمیشہ جاری رہتی ہے
+Mouth care and lip care, to keep the mouth moist and clean.	منہ اور ہونٹوں کی دیکھ بھال، تاکہ منہ نم اور صاف رہے۔
+Food and drink by mouth, given by hand for comfort, as much as the person wants and can safely swallow.	آرام کے لیے ہاتھ سے منہ کے ذریعے کھانا پینا، جتنا شخص چاہے اور محفوظ طریقے سے نگل سکے۔
+Relief of pain, breathlessness and other distressing symptoms, at any time of day or night.	درد، سانس پھولنے اور دوسری تکلیف دہ علامات سے راحت، دن یا رات کسی بھی وقت۔
+Washing, hygiene, skin care and pressure-area care.	نہلانا، صفائی ستھرائی، جلد اور دباؤ والی جگہوں کی دیکھ بھال۔
+Turning and positioning for comfort.	آرام کے لیے کروٹ بدلنا اور صحیح پوزیشن میں رکھنا۔
+Family and loved ones may stay with the person.	خاندان اور پیارے شخص کے ساتھ رہ سکتے ہیں۔
+Spiritual, emotional and psychological support for the person and family.	شخص اور خاندان کے لیے روحانی، جذباتی اور ذہنی سہارا۔
+Dignity, privacy and kindness in all care.	ہر دیکھ بھال میں عزت، رازداری اور مہربانی۔
+A limit on treatment never means no care.	علاج پر حد کا مطلب کبھی “دیکھ بھال نہیں” نہیں ہوتا۔
+No preference recorded — standard care	کوئی پسند درج نہیں — معیاری علاج
+A · Prioritise life	A · زندگی کو ترجیح
+B · Balanced, within limits	B · متوازن، طے شدہ حد میں
+C · Prioritise comfort	C · آرام کو ترجیح
+All medically effective treatment, including ICU and a breathing machine.	ہر مؤثر علاج، ICU اور سانس کی مشین سمیت۔
+Treat problems that can be reversed, within the limits below, as time-limited trials.	جو ٹھیک ہو سکتا ہے اس کا علاج، نیچے دی حدوں میں، طے شدہ وقت کے ٹرائل کی طرح۔
+Comfort is the goal. Go to hospital only if comfort cannot be achieved where the patient is.	آرام ہی مقصد ہے۔ اسپتال تبھی، جب مریض جہاں ہیں وہاں آرام نہ مل سکے۔
+Attempt CPR	CPR کریں
+Do not attempt CPR (DNACPR)	CPR نہ کریں (DNACPR)
+If the heart and breathing stop, try to restart them. Applies only to cardiac arrest.	اگر دل اور سانس رک جائیں تو انہیں دوبارہ شروع کرنے کی کوشش کریں۔ صرف دل رکنے پر لاگو۔
+If the heart stops, allow a natural death. It says nothing about any other treatment.	اگر دل رک جائے تو قدرتی موت ہونے دیں۔ یہ کسی اور علاج کے بارے میں کچھ نہیں کہتا۔
+CPR would not work (clinical futility)	CPR کام نہیں کرے گا (طبی طور پر بے فائدہ)
+The patient does not want CPR	مریض CPR نہیں چاہتے
+The burden outweighs the benefit	فائدے سے زیادہ تکلیف ہے
+Yes, for any serious worsening	ہاں، حالت بگڑنے پر کبھی بھی
+Only for the reasons ticked	صرف چنی ہوئی وجوہات پر
+No — care where they are	نہیں — جہاں ہیں وہیں دیکھ بھال
+Take to hospital for any significant deterioration.	حالت زیادہ بگڑنے پر اسپتال لے جائیں۔
+Go to hospital only for the problems ticked below.	صرف نیچے چنے ہوئے مسائل کے لیے اسپتال جائیں۔
+Care continues at home or where they are. Call the numbers listed before an ambulance.	دیکھ بھال گھر پر یا جہاں ہیں وہیں جاری رہتی ہے۔ ایمبولینس سے پہلے دیے گئے نمبروں پر فون کریں۔
+Uncontrolled pain	درد جو قابو میں نہ آئے
+Uncontrolled breathlessness	سانس پھولنا جو قابو میں نہ آئے
+Significant bleeding	زیادہ خون بہنا
+Seizures	دورے
+Fall with suspected fracture	گرنا اور ہڈی ٹوٹنے کا شبہ
+Blocked or displaced catheter, tube or stent	کیتھیٹر، نلی یا اسٹنٹ بند ہو جانا یا کھسک جانا
+Suspected infection needing IV treatment	انفیکشن کا شبہ جس میں نس سے دوا چاہیے
+Acute confusion or agitation not settling	اچانک الجھن یا بے چینی جو پرسکون نہ ہو
+Caregiver unable to cope (respite)	دیکھ بھال کرنے والا تھک گیا ہو (آرام کے لیے)
+0 · Comfort measures only	0 · صرف آرام کے اقدامات
+1 · Nasal prongs or simple mask	1 · ناک کی نلی یا سادہ ماسک
+2 · Non-rebreather or venturi mask	2 · نان ری بریدر یا وینچوری ماسک
+3 · High-flow nasal oxygen (HFNC)	3 · ہائی فلو ناک آکسیجن (HFNC)
+4 · Mask ventilation (NIV: CPAP/BiPAP)	4 · ماسک سے سانس کی مشین (NIV: CPAP/BiPAP)
+5 · Intubation and a breathing machine	5 · گلے میں نلی اور سانس کی مشین
+Morphine-type medicine, anxiety relief, a fan, positioning, suction; oxygen only if it relieves.	مارفین جیسی دوا، گھبراہٹ کی دوا، پنکھا، کروٹ، بلغم نکالنا؛ آکسیجن تبھی جب آرام دے۔
+The highest level: everything below is also allowed.	سب سے اونچی سطح: اس سے نیچے کا سب کچھ بھی جائز ہے۔
+The highest level allowed. Every lower level stays available; nothing higher starts without a new discussion.	یہ سب سے اونچی جائز سطح ہے۔ نیچے کی تمام سطحیں ملتی رہیں گی؛ اس سے اوپر نئی بات چیت کے بغیر کچھ شروع نہیں ہوگا۔
+Yes, ICU if needed	ہاں، ضرورت ہو تو ICU
+Time-limited ICU trial	طے شدہ وقت کا ICU ٹرائل
+No ICU — ward or comfort care	ICU نہیں — وارڈ یا آرام کی دیکھ بھال
+No blood-pressure support drugs	BP بڑھانے کی دوا نہیں
+Time-limited trial	طے شدہ وقت کا ٹرائل
+Yes, no limit	ہاں، بغیر حد کے
+Yes, up to a number of drugs	ہاں، طے شدہ تعداد تک دوائیں
+No dialysis	ڈائیلاسس نہیں
+Yes, dialysis	ہاں، ڈائیلاسس
+Only if kidney failure can be reversed	صرف تب، جب گردے ٹھیک ہو سکتے ہوں
+No nose tube (NG)	ناک کی نلی (NG) نہیں
+NG for a set number of days, then review	کچھ طے دن NG، پھر جائزہ
+Yes, NG feeding	ہاں، NG سے کھانا
+No stomach tube (PEG)	پیٹ کی نلی (PEG) نہیں
+PEG only after a palliative-care discussion	پیلیٹیو کیئر سے بات کے بعد ہی PEG
+Yes, PEG	ہاں، PEG
+Sips by mouth only	صرف منہ سے گھونٹ
+Limited drip fluids	محدود ڈرپ
+Full maintenance fluids	پوری ڈرپ
+Mouth care and sips for comfort; no drip.	آرام کے لیے منہ کی صفائی اور گھونٹ؛ ڈرپ نہیں۔
+Up to 500–1000 mL saline a day, by vein or under the skin, matched to urine, reviewed daily. Reduce or stop if swelling, wet breathing or worse breathlessness.	دن میں 500–1000 mL تک سیلائن، نس یا جلد کے نیچے سے، پیشاب کے حساب سے، روز جائزہ۔ سوجن، گیلی سانس یا زیادہ سانس پھولنے پر کم یا بند کریں۔
+Full daily fluid needs by drip.	دن بھر کی پوری ضرورت ڈرپ سے۔
+Full pre-hospital resuscitation and transport	راستے میں پورا علاج اور اسپتال لے جانا
+Transport with symptom relief only (no CPR, no intubation)	صرف تکلیف میں راحت کے ساتھ لے جانا (CPR نہیں، نلی نہیں)
+Take home for the last days, with a nurse	آخری دنوں کے لیے نرس کے ساتھ گھر لے جانا
+Has capacity	فیصلہ کر سکتے ہیں
+Has capacity, has asked family to decide	فیصلہ کر سکتے ہیں، خاندان کو سونپا ہے
+Capacity fluctuates — reassess	فیصلہ کرنے کی صلاحیت گھٹتی بڑھتی ہے — دوبارہ جانچیں
+Lacks capacity	فیصلہ نہیں کر سکتے
+Named in a signed living will	دستخط شدہ لیونگ ول میں نامزد
+Named by the patient (no living will)	مریض نے نام دیا (لیونگ ول نہیں)
+Next of kin / next friend / guardian	قریبی رشتہ دار / دوست / سرپرست
+Court-appointed guardian	عدالت کا مقرر کردہ سرپرست
+Aadhaar	آدھار
+Voter ID	ووٹر آئی ڈی
+PAN	پین
+Passport	پاسپورٹ
+Driving licence	ڈرائیونگ لائسنس
+Ration card	راشن کارڈ
+Pacemaker	پیس میکر
+ICD (shock device)	ICD (جھٹکا دینے والا آلہ)
+CRT-D (shock device)	CRT-D (جھٹکا دینے والا آلہ)
+Other device	دوسرا آلہ
+Draft — not signed	مسودہ — دستخط نہیں
+Active	لاگو
+Withdrawn	واپس لی گئی
+hours	گھنٹے
+days	دن
+sessions	سیشن
+review $at by $who	جائزہ $at، $who
+New admission	نیا داخلہ
+Moved between home, hospital or hospice	گھر، اسپتال یا ہاسپس کے درمیان تبدیلی
+Significant change in condition (either way)	حالت میں بڑی تبدیلی (بہتر یا بدتر)
+Patient or family asked for a review	مریض یا خاندان نے جائزہ مانگا
+A new line of treatment started	علاج کا نیا دور شروع ہوا
+Routine review date reached	معمول کے جائزے کی تاریخ آ گئی
+NO PLAN FOUND — standard care applies	کوئی منصوبہ نہیں ملا — معیاری علاج لاگو
+CARD WITHDRAWN — this plan is no longer valid. Standard care applies.	کارڈ واپس لیا گیا — یہ منصوبہ اب معتبر نہیں۔ معیاری علاج لاگو۔
+UNSIGNED — a conversation note, not a plan. Standard care applies.	بغیر دستخط — یہ بات چیت کا نوٹ ہے، منصوبہ نہیں۔ معیاری علاج لاگو۔
+OUT OF DATE (review was due ${r.reviewDue}) — standard care applies. The content below is information, not instruction.	پرانا منصوبہ (جائزہ ${r.reviewDue} کو ہونا تھا) — معیاری علاج لاگو۔ نیچے کی معلومات صرف معلومات ہیں، ہدایت نہیں۔
+ACTIVE PLAN — signed ${r.consultantSignature!!.signedAt.take(10)}, review due ${r.reviewDue}	لاگو منصوبہ — دستخط ${r.consultantSignature!!.signedAt.take(10)}، جائزہ ${r.reviewDue}
+CARD WITHDRAWN — this card is no longer valid. Standard care applies.	کارڈ واپس لیا گیا — یہ کارڈ اب معتبر نہیں۔ معیاری علاج لاگو۔
+decided by ${it.name} (reg. ${it.registrationNo}) ${it.decidedAt}	${it.name} (رجسٹریشن ${it.registrationNo}) نے ${it.decidedAt} کو طے کیا
+reason: $it	وجہ: $it
+all lower levels allowed	نیچے کی تمام سطحیں جائز
+max O₂ $it L/min	زیادہ سے زیادہ O₂ $it L/min
+SpO₂ floor $it%	SpO₂ کم از کم $it%
+NIV up to $it h	NIV $it گھنٹے تک
+treat a reversible cause fully	ٹھیک ہو سکنے والی وجہ کا پورا علاج
+NIV trial	NIV ٹرائل
+Vasopressors	BP کی دوا
+Dialysis	ڈائیلاسس
+Fluids	سیال
+ ($d days)	 ($d دن)
+Consultant: ${it.name} (reg. ${it.registrationNo})	کنسلٹنٹ: ${it.name} (رجسٹریشن ${it.registrationNo})
+Oncologist: $it	آنکولوجسٹ: $it
+reassess by ${r.capacity.reassessOn}	${r.capacity.reassessOn} تک دوبارہ جانچیں
+v$number · $form · signed $signedDay · review due $dueDay	v$number · $form · دستخط $signedDay · جائزہ $dueDay
+Review requested	جائزہ مانگا گیا
+Hospital transfer	اسپتال لے جانا
+Breathing support ceiling	سانس کی مدد کی حد
+Goal of care	دیکھ بھال کا مقصد
+Allergies	الرجی
+Implanted device	جسم میں لگا آلہ
+Decision-maker (24 h phone)	فیصلہ لینے والے (24 گھنٹے فون)
+Treating consultant and palliative contact	علاج کرنے والے کنسلٹنٹ اور پیلیٹیو رابطہ
+Capacity	فیصلہ کرنے کی صلاحیت
+Living will (AMD)	لیونگ ول (AMD)
+Version, signed, review due	ورژن، دستخط، جائزہ
+If unclear, or the problem is new and reversible — treat fully and call.	اگر واضح نہ ہو، یا مسئلہ نیا ہے اور ٹھیک ہو سکتا ہے — پورا علاج کریں اور فون کریں۔
+Full record	پورا ریکارڈ
+Family's Sahara app; signed copy with the family	خاندان کے فون میں سہارا ایپ؛ دستخط شدہ کاپی خاندان کے پاس
+Signed by	دستخط
+Sahara emergency care plan (ECTPR) — ED Quick View	سہارا ہنگامی دیکھ بھال کا منصوبہ (ECTPR) — ED کوئیک ویو
+No plan content is shown: give full standard emergency care.	منصوبے کی تفصیل نہیں دکھائی جاتی: پورا معیاری ہنگامی علاج دیں۔
+Key medicines	اہم دوائیں
+Alternate decision-maker	دوسرے فیصلہ لینے والے
+Family to inform	خاندان جنہیں بتانا ہے
+What matters, in the patient's words	کیا اہم ہے، مریض کے الفاظ میں
+Not acceptable to the patient	مریض کو منظور نہیں
+Understanding confirmed	سمجھ کی تصدیق
+Signatures	دستخط
+Wallet card — cut out and keep with the patient	والٹ کارڈ — کاٹ کر مریض کے پاس رکھیں
+Link QR: full card, needs internet	لنک QR: پورا کارڈ، انٹرنیٹ چاہیے
+The QR is a random link with no personal details; it is switched off if the plan is replaced or withdrawn.	QR ایک رینڈم لنک ہے جس میں کوئی ذاتی معلومات نہیں؛ منصوبہ بدلنے یا واپس لینے پر یہ بند ہو جاتا ہے۔
+When this was printed the card was saved on the phone only: the link QR may not open yet. Use the offline QR.	چھپتے وقت کارڈ صرف فون پر محفوظ تھا: لنک QR شاید ابھی نہ کھلے۔ آف لائن QR استعمال کریں۔
+Offline QR: this summary as text, no internet needed	آف لائن QR: یہ خلاصہ تحریری شکل میں، انٹرنیٹ نہیں چاہیے
+Hospital ward	اسپتال کا وارڈ
+Emergency department	ایمرجنسی شعبہ
+Somewhere else	کہیں اور
+What we keep	ہم کیا رکھتے ہیں
+Why	کیوں
+Where it is	یہ کہاں رہتا ہے
+Your rights	آپ کے حقوق
+Name, hospital number, date of birth, address and phone. The people who decide for the patient. Illness details, treatment choices, the patient’s own words and signatures. A log of who opened or changed the plan.	نام، اسپتال نمبر، تاریخِ پیدائش، پتہ اور فون۔ مریض کی طرف سے فیصلہ لینے والے لوگ۔ بیماری کی تفصیل، علاج کے فیصلے، مریض کے اپنے الفاظ اور دستخط۔ یہ ریکارڈ کہ کس نے منصوبہ کھولا یا بدلا۔
+Your name, date of birth, address and the last 4 digits of your ID. Your representatives and witnesses. Your treatment wishes. The signed scan and its fingerprint (SHA-256). A log of each change, print and share.	آپ کا نام، تاریخِ پیدائش، پتہ اور شناختی کارڈ کے آخری 4 ہندسے۔ آپ کے نمائندے اور گواہ۔ علاج کے بارے میں آپ کی خواہشات۔ دستخط والا اسکین اور اس کی پہچان (SHA-256)۔ ہر تبدیلی، پرنٹ اور شیئر کرنے کا ریکارڈ۔
+So that an emergency doctor can find and follow the patient’s wishes, and the care team can review them.	تاکہ ایمرجنسی ڈاکٹر مریض کی خواہشات دیکھ اور مان سکے، اور دیکھ بھال کی ٹیم ان کا جائزہ لے سکے۔
+To make your living will paper, keep track of its versions, and show doctors that it exists.	آپ کی لیونگ ول کا کاغذ بنانے، اس کے ورژن سنبھالنے اور ڈاکٹروں کو یہ دکھانے کے لیے کہ وہ موجود ہے۔
+On this phone. It leaves this phone only in two cases. When a plan is signed, an emergency card is issued and a copy of the signed plan goes to the Sahara server so the QR code works. If an SMS is sent, the phone number goes to the SMS company.	اسی فون پر۔ یہ صرف دو صورتوں میں باہر جاتا ہے۔ منصوبے پر دستخط ہونے پر ایمرجنسی کارڈ جاری ہوتا ہے اور دستخط شدہ منصوبے کی کاپی Sahara سرور پر جاتی ہے، تاکہ QR کوڈ کام کرے۔ SMS بھیجنے پر فون نمبر SMS کمپنی کے پاس جاتا ہے۔
+On this phone. It is not sent to any server. If an emergency card is issued, the card carries only the living will’s status, date, version and attesting officer. You decide who gets a paper copy.	اسی فون پر۔ یہ کسی سرور کو نہیں بھیجا جاتا۔ ایمرجنسی کارڈ جاری ہونے پر کارڈ میں صرف لیونگ ول کی حالت، تاریخ، ورژن اور تصدیق کرنے والا افسر ہوتے ہیں۔ کاغذی کاپی کس کو دینی ہے، یہ آپ طے کرتے ہیں۔
+See it: download your data below. Correct it: ask for a review, and a new version is made. Withdraw: cancel the plan at any time, and the card stops working. Delete: remove an unsigned draft below. Signed versions and the log cannot be deleted, because they show what was decided and who saw it.	دیکھنا: نیچے اپنا ڈیٹا ڈاؤن لوڈ کریں۔ درست کرنا: جائزہ مانگیں، نیا ورژن بنے گا۔ واپس لینا: منصوبہ کبھی بھی منسوخ کریں، کارڈ کام کرنا بند کر دے گا۔ مٹانا: بغیر دستخط کا ڈرافٹ نیچے سے ہٹائیں۔ دستخط شدہ ورژن اور ریکارڈ نہیں مٹتے، کیونکہ ان سے پتہ چلتا ہے کہ کیا طے ہوا اور کس نے دیکھا۔
+See it: download your data below. Correct it: make a new version. Withdraw: cancel it in writing at any time. Delete: remove an unsigned draft below. Signed versions and the log cannot be deleted. Deleting here does not touch any paper you printed, so destroy that yourself.	دیکھنا: نیچے اپنا ڈیٹا ڈاؤن لوڈ کریں۔ درست کرنا: نیا ورژن بنائیں۔ واپس لینا: کبھی بھی تحریری طور پر منسوخ کریں۔ مٹانا: بغیر دستخط کا ڈرافٹ نیچے سے ہٹائیں۔ دستخط شدہ ورژن اور ریکارڈ نہیں مٹتے۔ یہاں مٹانے سے چھپا ہوا کاغذ نہیں مٹتا، اسے آپ خود تلف کریں۔
+How to ask	کیسے کہیں
+Use the buttons below, or tell your doctor or palliative care team. Ask them too if you want a copy on the Sahara server erased. During this pilot only made-up patients are used.	نیچے کے بٹن استعمال کریں، یا اپنے ڈاکٹر یا پیلیٹیو کیئر ٹیم کو بتائیں۔ Sahara سرور سے کاپی مٹوانی ہو تو بھی انہی سے کہیں۔ اس پائلٹ میں صرف فرضی مریضوں کا ڈیٹا ہے۔
+Patient's name	مریض کا نام
+Main decision-maker	مرکزی فیصلہ لینے والے
+Capacity is decided for this decision, now — not taken from old notes. Record the basis: can the patient understand, remember, weigh and communicate the choice?	فیصلہ کرنے کی صلاحیت اسی فیصلے کے لیے، ابھی جانچی جاتی ہے — پرانے نوٹ سے نہیں۔ بنیاد لکھیں: کیا مریض فیصلہ سمجھ، یاد رکھ، تول اور بتا سکتے ہیں؟
+Treatment choices stay locked until this is ticked. A choice made without knowing the illness cannot be cured is not an informed choice.	جب تک اس پر ٹک نہ ہو، علاج کے فیصلے بند رہیں گے۔ بیماری ٹھیک نہ ہونے کی جانکاری کے بغیر لیا گیا فیصلہ سوچ سمجھ کر لیا گیا فیصلہ نہیں ہے۔
+The illness has been explained as incurable, and the patient or family can say it back in their own words.	سمجھا دیا گیا ہے کہ بیماری ٹھیک نہیں ہوگی، اور مریض یا خاندان اسے اپنے الفاظ میں دہرا سکتے ہیں۔
+What matters most, in the patient's own words	سب سے اہم کیا ہے، مریض کے اپنے الفاظ میں
+Outcomes the patient would not accept (one per line)	وہ حالات جو مریض کو منظور نہیں (ہر لائن میں ایک)
+Leave anything not discussed as \"No preference recorded\": that means standard care, never refusal. Each level allowed includes everything below it.	جس پر بات نہیں ہوئی اسے \"کوئی پسند درج نہیں\" پر چھوڑ دیں: اس کا مطلب معیاری علاج ہے، انکار نہیں۔ ہر جائز سطح میں اس سے نیچے کا سب کچھ شامل ہے۔
+Going to hospital	اسپتال جانا
+CPR if the heart stops	دل رکنے پر CPR
+Highest breathing support	سانس کی سب سے اونچی مدد
+Intensive care (ICU)	انٹینسیو کیئر (ICU)
+After this date the ED view shows the plan as OUT OF DATE and standard care applies.	اس تاریخ کے بعد ED ویو منصوبے کو پرانا دکھائے گا اور معیاری علاج لاگو ہوگا۔
+An unsigned form is a conversation note, not a plan. It becomes active only when the treating consultant signs with their registration number. Keep the signed paper copy with the family.	بغیر دستخط کا فارم بات چیت کا نوٹ ہے، منصوبہ نہیں۔ یہ تبھی لاگو ہوتا ہے جب علاج کرنے والے کنسلٹنٹ اپنے رجسٹریشن نمبر کے ساتھ دستخط کریں۔ دستخط شدہ کاغذی کاپی خاندان کے پاس رکھیں۔
+Made by	بنانے والے
+Not filled	نہیں بھرا
+Applies to	لاگو ہوگا
+Not saved: 	محفوظ نہیں ہوا: 
+Couldn't make the PDF. Try again.	PDF نہیں بنا۔ دوبارہ کوشش کریں۔
+Share the emergency plan	ہنگامی منصوبہ شیئر کریں
+Share the living will	لیونگ ول شیئر کریں
+Plan withdrawn. Its wallet card link is switched off.	منصوبہ واپس لیا گیا۔ اس کے والٹ کارڈ کا لنک بند ہو گیا۔
+Emergency plan & living will	ہنگامی منصوبہ اور لیونگ ول
+Ambulances and emergency doctors resuscitate by default. A wish counts only if this plan is found and signed. It stays on this phone; only a signed plan's wallet card copy goes to the Sahara server.	ایمبولینس اور ایمرجنسی ڈاکٹر خود بخود پورا علاج کرتے ہیں۔ خواہش تبھی مانی جاتی ہے جب یہ منصوبہ ملے اور اس پر دستخط ہوں۔ یہ اسی فون پر رہتا ہے؛ صرف دستخط شدہ منصوبے کے والٹ کارڈ کی کاپی Sahara سرور پر جاتی ہے۔
+The saved plan on this phone could not be read. Standard care applies until a new plan is signed.	اس فون پر محفوظ منصوبہ پڑھا نہیں جا سکا۔ نئے منصوبے پر دستخط ہونے تک معیاری علاج لاگو ہے۔
+ED Quick View	ED کوئیک ویو
+Emergency care plan	ہنگامی دیکھ بھال کا منصوبہ
+Active plan v${active.version}, review due ${active.reviewDue}	لاگو منصوبہ v${active.version}، جائزہ ${active.reviewDue}
+No signed plan yet	ابھی کوئی دستخط شدہ منصوبہ نہیں
+Draft v${draft.version} in progress — not signed, so it never reaches the ED view.	مسودہ v${draft.version} تیار ہو رہا ہے — دستخط نہیں، اس لیے ED ویو میں نہیں دکھے گا۔
+Fill it in together with your doctor. It becomes valid only when the treating consultant signs.	اسے اپنے ڈاکٹر کے ساتھ بھریں۔ یہ تبھی معتبر ہوگا جب علاج کرنے والے کنسلٹنٹ دستخط کریں۔
+Continue draft	مسودہ جاری رکھیں
+Discard unsigned draft	بغیر دستخط کا مسودہ ہٹائیں
+Review or change the plan	منصوبے کا جائزہ یا تبدیلی
+Withdraw the plan	منصوبہ واپس لیں
+Start a plan	منصوبہ شروع کریں
+Wallet card with QR	QR والا والٹ کارڈ
+Signed and recorded v$v	دستخط شدہ اور درج v$v
+Open living will	لیونگ ول کھولیں
+Plan versions	منصوبے کے ورژن
+Audit log (cannot be changed)	آڈٹ لاگ (بدلا نہیں جا سکتا)
+Chain checked: no entry has been changed or removed.	جانچ ہو گئی: کوئی اندراج بدلا یا ہٹایا نہیں گیا۔
+Warning: the log has been changed.	انتباہ: لاگ بدلا گیا ہے۔
+Where is this plan being made?	یہ منصوبہ کہاں بن رہا ہے؟
+Plans are best made at a clinic visit, at discharge, at ICU step-down or when home palliative care starts. A plan made for the first time in the emergency department records panic, not preference.	منصوبہ کلینک، ڈسچارج کے وقت، ICU سے باہر آنے پر یا گھر پر پیلیٹیو کیئر شروع ہونے پر بنانا بہتر ہے۔ پہلی بار ایمرجنسی میں بنا منصوبہ گھبراہٹ درج کرتا ہے، پسند نہیں۔
+Clinic, ward or home	کلینک، وارڈ یا گھر
+Why is the plan being reviewed?	منصوبے کا جائزہ کیوں ہو رہا ہے؟
+A review opens a new draft filled in from the current plan. The current plan stays active until the new one is signed.	جائزہ موجودہ منصوبے سے بھرا نیا مسودہ کھولتا ہے۔ نئے منصوبے پر دستخط ہونے تک موجودہ منصوبہ لاگو رہتا ہے۔
+Discard draft v${d.version}?	مسودہ v${d.version} ہٹائیں؟
+The unsigned answers are removed. The audit log keeps a note that a draft was discarded.	بغیر دستخط کے جواب ہٹ جائیں گے۔ آڈٹ لاگ میں درج رہے گا کہ مسودہ ہٹایا گیا۔
+Discard	ہٹائیں
+Keep draft	مسودہ رکھیں
+Withdraw plan v${plan.version}?	منصوبہ v${plan.version} واپس لیں؟
+A signed cancellation withdraws the plan and switches off its wallet card QR. Standard care then applies.	دستخط شدہ منسوخی سے منصوبہ واپس ہوتا ہے اور والٹ کارڈ کا QR بند ہو جاتا ہے۔ اس کے بعد معیاری علاج لاگو ہوتا ہے۔
+Reason	وجہ
+Signed by (name)	دستخط کرنے والے (نام)
+Keep plan	منصوبہ رکھیں
+Withdraw	واپس لیں
+Patient and illness	مریض اور بیماری
+Decision-makers	فیصلہ لینے والے
+Capacity and existing directive	فیصلہ کرنے کی صلاحیت اور پہلے کی ہدایت
+Understanding	سمجھ
+Treatment choices	علاج کے فیصلے
+Review date	جائزے کی تاریخ
+Check and sign	جانچیں اور دستخط کریں
+Emergency plan v${d.version} · step ${step + 1} of ${steps.size}	ہنگامی منصوبہ v${d.version} · مرحلہ ${step + 1} / ${steps.size}
+Ready to sign. Signing makes this the one active plan; any earlier version is replaced and its card link switched off.	دستخط کے لیے تیار۔ دستخط سے یہی ایک لاگو منصوبہ ہوگا؛ پرانا ورژن بدل جائے گا اور اس کے کارڈ کا لنک بند ہوگا۔
+Still needed before the plan can be active:	منصوبہ لاگو ہونے سے پہلے ابھی چاہیے:
+Sign and make active	دستخط کریں اور لاگو کریں
+Save draft and close	مسودہ محفوظ کریں اور بند کریں
+Save and next	محفوظ کریں اور آگے
+Some answers can't be saved yet	کچھ جواب ابھی محفوظ نہیں ہو سکتے
+Fix them	ٹھیک کریں
+Leave without the latest changes	تازہ تبدیلیاں چھوڑ کر جائیں
+Sahara plans are for adults (18 and over).	سہارا کے منصوبے بالغوں (18 اور اوپر) کے لیے ہیں۔
+Sex	جنس
+Hospital number (UHID)	اسپتال نمبر (UHID)
+Stage	مرحلہ
+Performance status (ECOG)	روزمرہ کام کرنے کی صلاحیت (ECOG)
+For example: penicillin	مثلاً: پینسلین
+Eligible for this plan since	اس منصوبے کے لیے اہل کب سے
+Oncologist	آنکولوجسٹ
+Palliative doctor	پیلیٹیو ڈاکٹر
+Palliative 24-hour phone	پیلیٹیو 24 گھنٹے کا فون
+Local doctor	مقامی ڈاکٹر
+Family to inform (one per line)	کن گھر والوں کو بتانا ہے (ہر لائن میں ایک)
+Family discussion note	خاندان سے بات چیت کا نوٹ
+Family agreement is a note, not legal authority.	خاندان کی رضامندی ایک نوٹ ہے، قانونی اختیار نہیں۔
+Relation to the patient	مریض سے رشتہ
+24-hour phone	24 گھنٹے کا فون
+ID type	شناختی کارڈ کی قسم
+Last 4 digits of the ID	شناختی کارڈ کے آخری 4 ہندسے
+Only the last 4 are kept, never the full number.	صرف آخری 4 ہندسے رکھے جاتے ہیں، پورا نمبر کبھی نہیں۔
+Basis of authority	اختیار کی بنیاد
+Assessed by	کس نے جانچا
+Assessed on	جانچ کی تاریخ
+Basis of the assessment	جانچ کی بنیاد
+Reassess on	دوبارہ جانچ کی تاریخ
+A patient with capacity can change or cancel any part of this plan by saying so; their wish now overrides the paper.	فیصلہ کر سکنے والا مریض بول کر منصوبے کا کوئی بھی حصہ بدل یا منسوخ کر سکتا ہے؛ اس کی ابھی کی خواہش کاغذ سے بالاتر ہے۔
+Existing living will or wishes	پہلے کی لیونگ ول یا خواہشات
+A signed, attested living will	دستخط شدہ، تصدیق شدہ لیونگ ول
+Wishes said or written before	پہلے کہی یا لکھی خواہشات
+Date of the living will	لیونگ ول کی تاریخ
+Where the original is kept	اصل کہاں رکھی ہے
+Attested by (notary or gazetted officer)	کس نے تصدیق کی (نوٹری یا گزٹڈ افسر)
+What was said or written	کیا کہا یا لکھا گیا تھا
+Understanding the illness	بیماری کی سمجھ
+Explained by	کس نے سمجھایا
+Who is answering?	جواب کون دے رہا ہے؟
+The patient	مریض خود
+A decision-maker, for the patient	مریض کی طرف سے فیصلہ لینے والے
+the patient	مریض
+I will say what $who would have chosen, not what I want for them. Where I do not know, I will decide with the team in their best interests.	میں وہی بتاؤں گا/گی جو $who خود چنتے، نہ کہ جو میں ان کے لیے چاہتا/چاہتی ہوں۔ جہاں مجھے نہیں پتہ، وہاں ٹیم کے ساتھ ان کی بھلائی کے لیے فیصلہ کروں گا/گی۔
+Does the patient know about the illness?	کیا مریض کو بیماری کے بارے میں پتہ ہے؟
+The family asked that the patient not be told	خاندان نے کہا ہے کہ مریض کو نہ بتایا جائے
+Plan if the patient asks directly	اگر مریض سیدھا پوچھیں تو کیا کریں گے
+A patient with capacity who asks must be answered honestly.	فیصلہ کر سکنے والا مریض پوچھے، تو سچ بتانا ضروری ہے۔
+Money worries were asked about directly	پیسوں کی فکر کے بارے میں سیدھا پوچھا گیا
+Social-work or scheme referral made	سوشل ورک یا سرکاری اسکیم کے لیے بھیجا گیا
+Locked: go back to Understanding and record that the illness has been explained and understood (V4).	بند ہے: ‘سمجھ’ پر واپس جائیں اور درج کریں کہ بیماری سمجھا دی گئی اور سمجھ لی گئی ہے (V4)۔
+Locked: the decision-maker must first confirm they will say what the patient would have chosen (V5).	بند ہے: فیصلہ لینے والے پہلے تصدیق کریں کہ وہ وہی بتائیں گے جو مریض چنتا (V5)۔
+Numbers to call before an ambulance (one per line)	ایمبولینس سے پہلے کن نمبروں پر فون کریں (ہر لائن میں ایک)
+If an ambulance comes	اگر ایمبولینس آئے
+Crews resuscitate by default; this counts only if a signed copy is handed over.	ایمبولینس والے خود بخود پورا علاج کرتے ہیں؛ یہ تبھی مانا جاتا ہے جب دستخط شدہ کاپی دی جائے۔
+Reason for DNACPR	DNACPR کی وجہ
+Discussed with	کس سے بات ہوئی
+Decided by (doctor's name)	کس نے طے کیا (ڈاکٹر کا نام)
+Date and time decided	طے کرنے کی تاریخ اور وقت
+Reason for attempting CPR with this goal or ceiling (V2)	اس ہدف یا حد کے ساتھ CPR کی وجہ (V2)
+Shock device (ICD)	جھٹکا دینے والا آلہ (ICD)
+Switch off shocks	جھٹکے بند کریں
+Keep shocks on	جھٹکے چالو رکھیں
+Decision date	فیصلے کی تاریخ
+A trial needs a length, a formal review date and time, and who will review. About 3 days is usual (3–7).	ٹرائل کے لیے مدت، جائزے کی تاریخ و وقت اور جائزہ لینے والے چاہییں۔ عام طور پر تقریباً 3 دن (3–7)۔
+Length	مدت
+Review time	جائزے کا وقت
+Reviewers (names, comma-separated)	جائزہ لینے والے (نام، کوما سے الگ)
+Maximum oxygen (L/min)	زیادہ سے زیادہ آکسیجن (L/min)
+A new, reversible cause (such as choking or a drug reaction) is treated fully, above this ceiling	نئی اور ٹھیک ہو سکنے والی وجہ (جیسے گلے میں اٹکنا یا دوا کا ری ایکشن) اس حد سے اوپر بھی پورا علاج پائے گی
+Oxygen level to aim for, at least (SpO₂ %)	کم از کم آکسیجن لیول (SpO₂ %)
+NIV for at most (hours)	NIV زیادہ سے زیادہ (گھنٹے)
+NIV as a time-limited trial	NIV طے شدہ وقت کے ٹرائل کے طور پر
+Home NIV or other reason this works without hospital	گھر پر NIV یا کوئی اور وجہ کہ یہ اسپتال کے بغیر چلے گا
+ICU trial	ICU ٹرائل
+Drugs to support blood pressure	BP سنبھالنے کی دوائیں
+Vasopressor trial	BP دوا ٹرائل
+Maximum number of drugs	دواؤں کی زیادہ سے زیادہ تعداد
+Dialysis trial	ڈائیلاسس ٹرائل
+Nose tube feeding (NG)	ناک کی نلی سے کھانا (NG)
+Days before review	جائزے سے پہلے دن
+Stomach tube (PEG)	پیٹ کی نلی (PEG)
+The patient or family wish an existing feeding tube to be removed	مریض یا خاندان چاہتے ہیں کہ لگی ہوئی کھانے کی نلی ہٹائی جائے
+Checks	جانچ
+Reason for $id	$id کی وجہ
+Confirmed: this combination is what was decided (V3)	تصدیق: یہی امتزاج طے ہوا تھا (V3)
+The app records this wish but never triggers withdrawal.	ایپ یہ خواہش درج کرتی ہے، مگر علاج ہٹانے کا کام کبھی شروع نہیں کرتی۔
+In $w weeks	$w ہفتے میں
+Review sooner if	پہلے جائزہ لیں اگر
+Signs of the last days (falling blood pressure, cold mottled skin, changed breathing, little urine) also call for an urgent review. Where unsure, take a second opinion.	آخری دنوں کی علامات (BP گرنا، ٹھنڈی دھبے دار جلد، سانس کا بدلنا، کم پیشاب) پر بھی فوراً جائزہ لیں۔ شک ہو تو دوسری رائے لیں۔
+Treating consultant	علاج کرنے والے کنسلٹنٹ
+Palliative clinician	پیلیٹیو ڈاکٹر
+Nurse	نرس
+Witness	گواہ
+Signed so far	اب تک دستخط
+ · thumb impression	 · انگوٹھے کا نشان
+Remove signature	دستخط ہٹائیں
+To be signed by the doctor on their own phone or here in their presence.	ڈاکٹر اپنے فون پر یا یہاں اپنی موجودگی میں دستخط کریں۔
+Consultant's name	کنسلٹنٹ کا نام
+Medical registration number	میڈیکل رجسٹریشن نمبر
+Sign as treating consultant	علاج کرنے والے کنسلٹنٹ کے طور پر دستخط کریں
+Co-signature (optional)	شریک دستخط (اختیاری)
+Add co-signature	شریک دستخط شامل کریں
+Patient or decision-maker	مریض یا فیصلہ لینے والے
+Signed with a thumb impression	انگوٹھے کے نشان سے دستخط
+Add signature	دستخط شامل کریں
+Limited reading or writing	پڑھنا لکھنا کم آتا ہے
+Witnesses (two needed)	گواہ (دو چاہییں)
+${d.witnesses.size} of 2 recorded	2 میں سے ${d.witnesses.size} درج
+Witness name	گواہ کا نام
+Add witness	گواہ شامل کریں
+$it years	$it سال
+Wish recorded to remove an existing feeding tube: that is withdrawal and follows the medical board pathway. Not actionable from this plan.	لگی ہوئی کھانے کی نلی ہٹانے کی خواہش درج ہے: یہ علاج واپس لینا ہے اور میڈیکل بورڈ کے عمل سے ہوتا ہے۔ اس منصوبے سے نہیں کیا جا سکتا۔
+Wallet card	والٹ کارڈ
+Share PDF	PDF شیئر کریں
+Issued on the server	سرور پر جاری
+Saved on this phone only	صرف اسی فون پر محفوظ
+A doctor who scans the link QR sees the ED Quick View. A copy is also saved on this phone.	لنک QR اسکین کرنے والے ڈاکٹر کو ED کوئیک ویو دکھتا ہے۔ ایک کاپی اس فون پر بھی ہے۔
+The link QR will not open for a doctor until it is uploaded. It uploads by itself when the phone is online. Until then use the offline QR and the printed lines.	اپ لوڈ ہونے تک لنک QR ڈاکٹر کے لیے نہیں کھلے گا۔ فون آن لائن ہوتے ہی یہ خود بخود اپ لوڈ ہوگا۔ تب تک آف لائن QR اور چھپی سطروں کا استعمال کریں۔
+No internet right now.	ابھی انٹرنیٹ نہیں ہے۔
+Try again now	ابھی دوبارہ کوشش کریں
+Practice mode: nothing is sent to the server.	مشقی موڈ: سرور پر کچھ نہیں بھیجا جاتا۔
+Withdrawn on this phone. The server has not been told yet, so an old QR may still open. It will be told when the phone is online.	اس فون پر واپس لیا گیا۔ سرور کو ابھی نہیں بتایا گیا، اس لیے پرانا QR ابھی کھل سکتا ہے۔ فون آن لائن ہونے پر اسے بتا دیا جائے گا۔
+A wallet card is made when a signed plan is active. A withdrawn or replaced plan's card is switched off.	والٹ کارڈ تب بنتا ہے جب دستخط شدہ منصوبہ لاگو ہو۔ واپس لیے گئے یا بدلے گئے منصوبے کا کارڈ بند ہو جاتا ہے۔
+SAHARA EMERGENCY CARE PLAN	سہارا ہنگامی دیکھ بھال کا منصوبہ
+QR code with a link to this plan	اس منصوبے کے لنک والا QR کوڈ
+QR code: offline text summary of this card	QR کوڈ: اس کارڈ کا آف لائن خلاصہ
+Plan v$v · review due $due	منصوبہ v$v · جائزہ $due
+The living will changed after this card was issued, so the link shows the old status. Issue a new card and tear up the old one.	یہ کارڈ جاری ہونے کے بعد لیونگ ول بدلی ہے، اس لیے لنک پرانی حالت دکھاتا ہے۔ نیا کارڈ جاری کریں اور پرانا پھاڑ دیں۔
+Issue a new card	نیا کارڈ جاری کریں
+The link QR holds only a random link with no name or medical details. The offline QR holds the summary above as plain text, so anyone who scans it can read it; keep the card with the patient. When the plan is replaced or withdrawn the link is switched off, but the offline QR on old paper still reads — tear up old cards.	لنک QR میں صرف ایک رینڈم لنک ہے، نام یا علاج کی تفصیل نہیں۔ آف لائن QR میں اوپر کا خلاصہ سادہ تحریر میں ہے، اس لیے جو بھی اسکین کرے وہ پڑھ سکتا ہے؛ کارڈ مریض کے پاس رکھیں۔ منصوبہ بدلنے یا واپس لینے پر لنک بند ہو جاتا ہے، مگر پرانے کاغذ کا آف لائن QR پھر بھی پڑھا جا سکتا ہے — پرانے کارڈ پھاڑ دیں۔
+Print or share the plan and card (PDF)	منصوبہ اور کارڈ پرنٹ یا شیئر کریں (PDF)
+ED Quick View, wallet card QR and living will	ED کوئیک ویو، والٹ کارڈ QR اور لیونگ ول
+This update does not record $missing. Visit history is separate.	اس اپ ڈیٹ میں $missing درج نہیں۔ وزٹ کی تاریخ الگ ہے۔
+ECTPR wizard, ED Quick View, wallet card QR, living will	ECTPR فارم، ED کوئیک ویو، والٹ کارڈ QR، لیونگ ول
+, last on $day	, آخری بار $day
+Opened once$last	ایک بار کھولا گیا$last
+Opened $views times$last	$views بار کھولا گیا$last
+Saved on this phone, not sent yet$detail It is sent when you open Feedback again while signed in and online.	فون پر محفوظ، ابھی بھیجا نہیں گیا$detail سائن ان اور انٹرنیٹ کے ساتھ فیڈ بیک دوبارہ کھولنے پر بھیجا جائے گا۔
+1 medicine photo was not matched	دوا کی 1 تصویر نہیں ملی
+$n medicine photos were not matched	دوا کی $n تصویریں نہیں ملیں
+photo $k	تصویر $k
+Review $photos. Add any missing medicine manually or leave it out only after checking the original prescription.	$photos جانچیں۔ چھوٹی ہوئی دوا خود لکھیں، یا اصل پرچہ دیکھنے کے بعد ہی اسے چھوڑیں۔
+Save 1 medicine	1 دوا محفوظ کریں
+Save $n medicines	$n دوائیں محفوظ کریں
+page $k	صفحہ $k
+Original reading · $pages	اصل پڑھائی · $pages
+ICD decision	ICD کا فیصلہ

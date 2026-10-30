@@ -2636,3 +2636,799 @@ Use at least $MIN_PASSWORD characters.	ಕನಿಷ್ಠ $MIN_PASSWORD ಅಕ�
 Use $MAX_PASSWORD characters or fewer.	ಹೆಚ್ಚೆಂದರೆ $MAX_PASSWORD ಅಕ್ಷರಗಳನ್ನು ಬಳಸಿ.
 Use letters, numbers and symbols only.	ಅಕ್ಷರಗಳು, ಅಂಕಿಗಳು ಮತ್ತು ಚಿಹ್ನೆಗಳನ್ನು ಮಾತ್ರ ಬಳಸಿ.
 Working…	ಕೆಲಸ ನಡೆಯುತ್ತಿದೆ…
+this person	ಈ ವ್ಯಕ್ತಿ
+To let family see $who's care on their own phone, you first need to sign in. It takes a minute.	ಕುಟುಂಬದವರು $who ಅವರ ಆರೈಕೆಯನ್ನು ತಮ್ಮ ಫೋನ್‌ನಲ್ಲಿ ನೋಡಲು, ಮೊದಲು ಸೈನ್ ಇನ್ ಮಾಡಬೇಕು. ಇದಕ್ಕೆ ಒಂದು ನಿಮಿಷ ಸಾಕು.
+The online answer did not work this time$detail. Below are the matching lines found on this phone instead.	ಆನ್‌ಲೈನ್ ಉತ್ತರ ಈ ಬಾರಿ ಸಿಗಲಿಲ್ಲ$detail. ಅದರ ಬದಲು ಈ ಫೋನ್‌ನಲ್ಲಿ ಸಿಕ್ಕ ಹೊಂದಾಣಿಕೆಯ ಸಾಲುಗಳು ಕೆಳಗಿವೆ.
+the matching lines from my documents	ನನ್ನ ದಾಖಲೆಗಳಲ್ಲಿ ಹೊಂದುವ ಸಾಲುಗಳು
+the text of these $count documents	ಈ $count ದಾಖಲೆಗಳ ಬರಹ
+I agree to send my question and $sendWhat to $sendTo. Photos and files are not sent. Nothing is sent until I tap Ask. I will be asked again next time.	ನನ್ನ ಪ್ರಶ್ನೆ ಮತ್ತು $sendWhat ಅನ್ನು $sendTo ಗೆ ಕಳುಹಿಸಲು ನಾನು ಒಪ್ಪುತ್ತೇನೆ. ಫೋಟೋಗಳು ಮತ್ತು ಫೈಲ್‌ಗಳನ್ನು ಕಳುಹಿಸುವುದಿಲ್ಲ. ನಾನು ‘ಕೇಳಿ’ ಒತ್ತುವವರೆಗೆ ಏನನ್ನೂ ಕಳುಹಿಸುವುದಿಲ್ಲ. ಮುಂದಿನ ಬಾರಿ ಮತ್ತೆ ಕೇಳಲಾಗುತ್ತದೆ.
+1 care note	1 ಆರೈಕೆ ಟಿಪ್ಪಣಿ
+$n care notes	$n ಆರೈಕೆ ಟಿಪ್ಪಣಿಗಳು
+1 report	1 ವರದಿ
+$m reports	$m ವರದಿಗಳು
+1 line uses edited wording. Check against the original conversation.	1 ಸಾಲಿನಲ್ಲಿ ಬದಲಾದ ಪದಗಳಿವೆ. ಮೂಲ ಮಾತುಕತೆಯೊಂದಿಗೆ ತಾಳೆ ನೋಡಿ.
+$n lines use edited wording. Check against the original conversation.	$n ಸಾಲುಗಳಲ್ಲಿ ಬದಲಾದ ಪದಗಳಿವೆ. ಮೂಲ ಮಾತುಕತೆಯೊಂದಿಗೆ ತಾಳೆ ನೋಡಿ.
+Signed emergency care plan	ಸಹಿ ಮಾಡಿದ ತುರ್ತು ಆರೈಕೆ ಯೋಜನೆ
+Diagnosis	ಕಾಯಿಲೆ
+Transfer	ಆಸ್ಪತ್ರೆಗೆ ಕರೆದೊಯ್ಯುವುದು
+Breathing ceiling	ಉಸಿರಾಟದ ಮಿತಿ
+Call first	ಮೊದಲು ಫೋನ್ ಮಾಡಿ
+Decision-maker	ನಿರ್ಧಾರ ಕೈಗೊಳ್ಳುವವರು
+Signed	ಸಹಿ ಮಾಡಲಾಗಿದೆ
+NOT SIGNED	ಸಹಿ ಮಾಡಿಲ್ಲ
+Review due	ಪರಿಶೀಲನೆ ಬಾಕಿ
+expires in 1 day	1 ದಿನದಲ್ಲಿ ಮುಗಿಯುತ್ತದೆ
+expires in $days days	$days ದಿನಗಳಲ್ಲಿ ಮುಗಿಯುತ್ತದೆ
+A terminal illness (an illness that will end my life)	ಮಾರಣಾಂತಿಕ ಕಾಯಿಲೆ (ನನ್ನ ಜೀವವನ್ನು ಕೊನೆಗೊಳಿಸುವ ಕಾಯಿಲೆ)
+An end-stage condition (lasting damage that keeps getting worse, where treatment will not work)	ಕೊನೆಯ ಹಂತದ ಸ್ಥಿತಿ (ಹೆಚ್ಚುತ್ತಲೇ ಹೋಗುವ ಶಾಶ್ವತ ಹಾನಿ, ಚಿಕಿತ್ಸೆ ಫಲಿಸದ ಸ್ಥಿತಿ)
+A vegetative state (awake but not aware, for many months)	ವೆಜಿಟೇಟಿವ್ ಸ್ಥಿತಿ (ಎಚ್ಚರವಿದ್ದರೂ ಅರಿವಿಲ್ಲದ ಸ್ಥಿತಿ, ಹಲವು ತಿಂಗಳು)
+CPR (pressing the chest, electric shocks to restart the heart)	CPR (ಎದೆಯನ್ನು ಒತ್ತುವುದು, ಹೃದಯವನ್ನು ಮತ್ತೆ ಚಾಲನೆ ಮಾಡಲು ವಿದ್ಯುತ್ ಆಘಾತ)
+Breathing machine (ventilator) or other life support	ಉಸಿರಾಟದ ಯಂತ್ರ (ವೆಂಟಿಲೇಟರ್) ಅಥವಾ ಇತರ ಜೀವರಕ್ಷಕ ಯಂತ್ರ
+Dialysis (machine that cleans the blood when kidneys fail)	ಡಯಾಲಿಸಿಸ್ (ಕಿಡ್ನಿ ವಿಫಲವಾದಾಗ ರಕ್ತವನ್ನು ಶುದ್ಧಮಾಡುವ ಯಂತ್ರ)
+Feeding through a tube or drip	ನಳಿಕೆ ಅಥವಾ ಡ್ರಿಪ್ ಮೂಲಕ ಆಹಾರ ನೀಡುವುದು
+Drips and medicines such as antibiotics (comfort medicines always continue)	ಡ್ರಿಪ್‌ಗಳು ಮತ್ತು ಆಂಟಿಬಯಾಟಿಕ್‌ನಂಥ ಔಷಧಿಗಳು (ಆರಾಮ ನೀಡುವ ಔಷಧಿಗಳು ಯಾವಾಗಲೂ ಮುಂದುವರಿಯುತ್ತವೆ)
+Chemotherapy	ಕೀಮೋಥೆರಪಿ
+Surgery (operations), except for comfort	ಶಸ್ತ್ರಚಿಕಿತ್ಸೆ (ಆಪರೇಷನ್‌ಗಳು), ಆರಾಮಕ್ಕಾಗಿ ಮಾಡುವುದನ್ನು ಬಿಟ್ಟು
+Used when the heart stops. In very serious illness it rarely works and can break ribs.	ಹೃದಯ ನಿಂತಾಗ ಮಾಡಲಾಗುತ್ತದೆ. ಬಹಳ ಗಂಭೀರ ಕಾಯಿಲೆಯಲ್ಲಿ ಇದು ಅಪರೂಪವಾಗಿ ಮಾತ್ರ ಫಲಿಸುತ್ತದೆ ಮತ್ತು ಪಕ್ಕೆಲುಬುಗಳು ಮುರಿಯಬಹುದು.
+A tube in the throat connected to a machine that breathes for you, usually in the ICU.	ಗಂಟಲಿನಲ್ಲಿ ಹಾಕುವ ನಳಿಕೆ, ಅದು ನಿಮ್ಮ ಬದಲಿಗೆ ಉಸಿರಾಡುವ ಯಂತ್ರಕ್ಕೆ ಜೋಡಿಸಿರುತ್ತದೆ, ಸಾಮಾನ್ಯವಾಗಿ ICU ನಲ್ಲಿ.
+Usually several hours, a few times a week.	ಸಾಮಾನ್ಯವಾಗಿ ವಾರಕ್ಕೆ ಕೆಲವು ಬಾರಿ, ಹಲವು ಗಂಟೆಗಳ ಕಾಲ.
+A tube in the nose or stomach, or a drip. The Supreme Court treats this as medical treatment (Harish Rana, 2026). Food and drink by mouth for comfort, mouth care and hand feeding always continue.	ಮೂಗು ಅಥವಾ ಹೊಟ್ಟೆಯಲ್ಲಿ ನಳಿಕೆ, ಅಥವಾ ಡ್ರಿಪ್. ಸುಪ್ರೀಂ ಕೋರ್ಟ್ ಇದನ್ನು ವೈದ್ಯಕೀಯ ಚಿಕಿತ್ಸೆ ಎಂದು ಪರಿಗಣಿಸುತ್ತದೆ (ಹರೀಶ್ ರಾಣಾ, 2026). ಆರಾಮಕ್ಕಾಗಿ ಬಾಯಿಯಿಂದ ಆಹಾರ-ಪಾನೀಯ, ಬಾಯಿಯ ಆರೈಕೆ ಮತ್ತು ಕೈಯಿಂದ ತಿನ್ನಿಸುವುದು ಯಾವಾಗಲೂ ಮುಂದುವರಿಯುತ್ತವೆ.
+Pain and comfort medicines are never stopped by this choice.	ಈ ಆಯ್ಕೆಯಿಂದ ನೋವು ಮತ್ತು ಆರಾಮದ ಔಷಧಿಗಳನ್ನು ಎಂದಿಗೂ ನಿಲ್ಲಿಸುವುದಿಲ್ಲ.
+Medicines that treat cancer.	ಕ್ಯಾನ್ಸರ್‌ಗೆ ಚಿಕಿತ್ಸೆ ನೀಡುವ ಔಷಧಿಗಳು.
+Radiation treatment for cancer.	ಕ್ಯಾನ್ಸರ್‌ಗೆ ವಿಕಿರಣ ಚಿಕಿತ್ಸೆ.
+Operations to relieve symptoms or improve quality of life are still allowed.	ಲಕ್ಷಣಗಳಿಂದ ಉಪಶಮನ ಅಥವಾ ಬದುಕಿನ ಗುಣಮಟ್ಟ ಸುಧಾರಿಸಲು ಮಾಡುವ ಆಪರೇಷನ್‌ಗಳಿಗೆ ಈಗಲೂ ಅವಕಾಶವಿದೆ.
+I do not want	ನನಗೆ ಬೇಡ
+I want	ನನಗೆ ಬೇಕು
+Not decided	ನಿರ್ಧರಿಸಿಲ್ಲ
+In a hospital or medical facility	ಆಸ್ಪತ್ರೆ ಅಥವಾ ವೈದ್ಯಕೀಯ ಕೇಂದ್ರದಲ್ಲಿ
+In a hospice or similar place	ಹಾಸ್ಪಿಸ್ ಅಥವಾ ಅಂಥ ಸ್ಥಳದಲ್ಲಿ
+At home	ಮನೆಯಲ್ಲಿ
+In a place I name	ನಾನು ಹೆಸರಿಸುವ ಸ್ಥಳದಲ್ಲಿ
+Notary	ನೋಟರಿ
+Gazetted officer	ಗೆಜೆಟೆಡ್ ಅಧಿಕಾರಿ
+Draft	ಡ್ರಾಫ್ಟ್
+Printed, not yet signed	ಪ್ರಿಂಟ್ ಆಗಿದೆ, ಇನ್ನೂ ಸಹಿ ಆಗಿಲ್ಲ
+Signed and recorded	ಸಹಿ ಮಾಡಿ ದಾಖಲಿಸಲಾಗಿದೆ
+Replaced by a newer version	ಹೊಸ ಆವೃತ್ತಿಯಿಂದ ಬದಲಾಯಿಸಲಾಗಿದೆ
+Cancelled in writing	ಲಿಖಿತವಾಗಿ ರದ್ದುಪಡಿಸಲಾಗಿದೆ
+Representative	ಪ್ರತಿನಿಧಿ
+Family doctor	ಕುಟುಂಬದ ಡಾಕ್ಟರ್
+Custodian	ಪಾಲಕರು
+By post	ಅಂಚೆ ಮೂಲಕ
+Digital copy	ಡಿಜಿಟಲ್ ಪ್ರತಿ
+Comfort care, pain relief, mouth care and feeding by mouth always continue. This cannot be changed.	ಆರಾಮದ ಆರೈಕೆ, ನೋವು ಉಪಶಮನ, ಬಾಯಿಯ ಆರೈಕೆ ಮತ್ತು ಬಾಯಿಯಿಂದ ತಿನ್ನಿಸುವುದು ಯಾವಾಗಲೂ ಮುಂದುವರಿಯುತ್ತವೆ. ಇದನ್ನು ಬದಲಾಯಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ.
+Tube feeding is a medical treatment. Comfort feeding by mouth always continues.	ನಳಿಕೆಯ ಮೂಲಕ ಆಹಾರ ನೀಡುವುದು ವೈದ್ಯಕೀಯ ಚಿಕಿತ್ಸೆ. ಆರಾಮಕ್ಕಾಗಿ ಬಾಯಿಯಿಂದ ತಿನ್ನಿಸುವುದು ಯಾವಾಗಲೂ ಮುಂದುವರಿಯುತ್ತದೆ.
+If the situation is ambiguous or not anticipated by the AMD, it is not applied.	ಸ್ಥಿತಿ ಸ್ಪಷ್ಟವಿಲ್ಲದಿದ್ದರೆ ಅಥವಾ AMD ಯಲ್ಲಿ ಅದರ ಬಗ್ಗೆ ಮೊದಲೇ ಯೋಚಿಸಿಲ್ಲದಿದ್ದರೆ, AMD ಅನ್ವಯಿಸುವುದಿಲ್ಲ.
+The AMD governs over this plan.	ಈ ಯೋಜನೆಗಿಂತ AMD ಮೇಲುಗೈ ಹೊಂದಿದೆ.
+Sahara prints the paper. It becomes valid only when you sign it by hand in front of two witnesses and a notary or gazetted officer attests it. Then you add a photo or scan here.	Sahara ಕಾಗದವನ್ನು ಪ್ರಿಂಟ್ ಮಾಡುತ್ತದೆ. ನೀವು ಇಬ್ಬರು ಸಾಕ್ಷಿಗಳ ಮುಂದೆ ಕೈಯಿಂದ ಸಹಿ ಮಾಡಿ, ನೋಟರಿ ಅಥವಾ ಗೆಜೆಟೆಡ್ ಅಧಿಕಾರಿ ಅದನ್ನು ದೃಢೀಕರಿಸಿದಾಗ ಮಾತ್ರ ಇದು ಮಾನ್ಯವಾಗುತ್ತದೆ. ನಂತರ ನೀವು ಇಲ್ಲಿ ಫೋಟೋ ಅಥವಾ ಸ್ಕ್ಯಾನ್ ಸೇರಿಸಿ.
+Legal review pending	ಕಾನೂನು ಪರಿಶೀಲನೆ ಬಾಕಿ
+For a patient who cannot decide, withholding or withdrawing life-sustaining treatment may need the Medical Board process (Common Cause 2023; Harish Rana 2026). This plan records wishes and clinical limits; it does not by itself legally authorise withholding treatment.	ತೀರ್ಮಾನ ತೆಗೆದುಕೊಳ್ಳಲಾಗದ ರೋಗಿಗೆ, ಜೀವರಕ್ಷಕ ಚಿಕಿತ್ಸೆಯನ್ನು ಆರಂಭಿಸದಿರಲು ಅಥವಾ ನಿಲ್ಲಿಸಲು ವೈದ್ಯಕೀಯ ಮಂಡಳಿಯ ಪ್ರಕ್ರಿಯೆ ಬೇಕಾಗಬಹುದು (ಕಾಮನ್ ಕಾಸ್ 2023; ಹರೀಶ್ ರಾಣಾ 2026). ಈ ಯೋಜನೆ ಇಚ್ಛೆಗಳನ್ನು ಮತ್ತು ಚಿಕಿತ್ಸೆಯ ಮಿತಿಗಳನ್ನು ದಾಖಲಿಸುತ್ತದೆ; ಇದು ತನ್ನಷ್ಟಕ್ಕೆ ತಾನೇ ಚಿಕಿತ್ಸೆಯನ್ನು ತಡೆಹಿಡಿಯಲು ಕಾನೂನು ಅನುಮತಿ ನೀಡುವುದಿಲ್ಲ.
+After both boards agree, nothing is done for 30 days. In this reconsideration period, anyone affected may go to court (Harish Rana, 2026 INSC 222, para 322(vi)).	ಎರಡೂ ಮಂಡಳಿಗಳು ಒಪ್ಪಿದ ನಂತರ 30 ದಿನ ಏನನ್ನೂ ಮಾಡುವುದಿಲ್ಲ. ಈ ಮರುಪರಿಶೀಲನೆಯ ಅವಧಿಯಲ್ಲಿ ಪ್ರಭಾವಿತರಾದ ಯಾರಾದರೂ ನ್ಯಾಯಾಲಯಕ್ಕೆ ಹೋಗಬಹುದು (ಹರೀಶ್ ರಾಣಾ, 2026 INSC 222, ಪ್ಯಾರಾ 322(vi)).
+Withholding or withdrawing life-sustaining treatment for a patient who cannot decide follows the board process below. This app only shows it as information. It never starts, stops or decides any treatment. (Legal review pending.)	ತೀರ್ಮಾನ ತೆಗೆದುಕೊಳ್ಳಲಾಗದ ರೋಗಿಗೆ ಜೀವರಕ್ಷಕ ಚಿಕಿತ್ಸೆಯನ್ನು ಆರಂಭಿಸದಿರುವುದು ಅಥವಾ ನಿಲ್ಲಿಸುವುದು ಕೆಳಗಿನ ಮಂಡಳಿ ಪ್ರಕ್ರಿಯೆಯನ್ನು ಅನುಸರಿಸುತ್ತದೆ. ಈ ಆ್ಯಪ್ ಇದನ್ನು ಮಾಹಿತಿಯಾಗಿ ಮಾತ್ರ ತೋರಿಸುತ್ತದೆ. ಇದು ಯಾವ ಚಿಕಿತ್ಸೆಯನ್ನೂ ಎಂದಿಗೂ ಆರಂಭಿಸುವುದಿಲ್ಲ, ನಿಲ್ಲಿಸುವುದಿಲ್ಲ, ತೀರ್ಮಾನಿಸುವುದಿಲ್ಲ. (ಕಾನೂನು ಪರಿಶೀಲನೆ ಬಾಕಿ.)
+1. Primary Medical Board (hospital): the treating doctor and at least two experts with 5+ years of experience. It meets the patient with the named representatives and gives its opinion, preferably within 48 hours.	1. ಪ್ರಾಥಮಿಕ ವೈದ್ಯಕೀಯ ಮಂಡಳಿ (ಆಸ್ಪತ್ರೆ): ಚಿಕಿತ್ಸೆ ನೀಡುವ ಡಾಕ್ಟರ್ ಮತ್ತು 5+ ವರ್ಷಗಳ ಅನುಭವವಿರುವ ಕನಿಷ್ಠ ಇಬ್ಬರು ತಜ್ಞರು. ಇದು ಹೆಸರಿಸಿದ ಪ್ರತಿನಿಧಿಗಳ ಜೊತೆ ರೋಗಿಯನ್ನು ಭೇಟಿಯಾಗಿ, ಸಾಧ್ಯವಾದರೆ 48 ಗಂಟೆಗಳೊಳಗೆ ತನ್ನ ಅಭಿಪ್ರಾಯ ನೀಡುತ್ತದೆ.
+2. Secondary Medical Board: a doctor nominated by the district Chief Medical Officer (from a panel reviewed at least every 12 months; nomination preferably within 48 hours of the hospital’s request) and at least two other experts, none from the first board. Opinion preferably within 48 hours.	2. ದ್ವಿತೀಯ ವೈದ್ಯಕೀಯ ಮಂಡಳಿ: ಜಿಲ್ಲಾ ಮುಖ್ಯ ವೈದ್ಯಕೀಯ ಅಧಿಕಾರಿ ನಾಮನಿರ್ದೇಶಿಸಿದ ಡಾಕ್ಟರ್ (ಕನಿಷ್ಠ ಪ್ರತಿ 12 ತಿಂಗಳಿಗೊಮ್ಮೆ ಪರಿಶೀಲಿಸುವ ಪಟ್ಟಿಯಿಂದ; ನಾಮನಿರ್ದೇಶನ ಸಾಧ್ಯವಾದರೆ ಆಸ್ಪತ್ರೆಯ ಕೋರಿಕೆಯ 48 ಗಂಟೆಗಳೊಳಗೆ) ಮತ್ತು ಮೊದಲ ಮಂಡಳಿಯಲ್ಲಿ ಇಲ್ಲದ ಕನಿಷ್ಠ ಇಬ್ಬರು ಇತರ ತಜ್ಞರು. ಅಭಿಪ್ರಾಯ ಸಾಧ್ಯವಾದರೆ 48 ಗಂಟೆಗಳೊಳಗೆ.
+3. Consent: the named representatives (DHRs) consent in writing; without an AMD, the next of kin’s written consent, reflecting the patient’s own wishes. The hospital then informs the Judicial Magistrate First Class (JMFC).	3. ಒಪ್ಪಿಗೆ: ಹೆಸರಿಸಿದ ಪ್ರತಿನಿಧಿಗಳು (DHR) ಲಿಖಿತ ಒಪ್ಪಿಗೆ ನೀಡುತ್ತಾರೆ; AMD ಇಲ್ಲದಿದ್ದರೆ, ರೋಗಿಯ ಸ್ವಂತ ಇಚ್ಛೆಯನ್ನು ಪ್ರತಿಬಿಂಬಿಸುವ ಹತ್ತಿರದ ಸಂಬಂಧಿಕರ ಲಿಖಿತ ಒಪ್ಪಿಗೆ. ನಂತರ ಆಸ್ಪತ್ರೆ ಪ್ರಥಮ ದರ್ಜೆ ನ್ಯಾಯಿಕ ದಂಡಾಧಿಕಾರಿಗೆ (JMFC) ತಿಳಿಸುತ್ತದೆ.
+4. After both boards agree there is a 30-day reconsideration period, when anyone affected may go to court (Harish Rana, 2026). Only then is there a planned palliative process, never abandonment.	4. ಎರಡೂ ಮಂಡಳಿಗಳು ಒಪ್ಪಿದ ನಂತರ 30 ದಿನಗಳ ಮರುಪರಿಶೀಲನೆಯ ಅವಧಿ ಇರುತ್ತದೆ, ಆಗ ಪ್ರಭಾವಿತರಾದ ಯಾರಾದರೂ ನ್ಯಾಯಾಲಯಕ್ಕೆ ಹೋಗಬಹುದು (ಹರೀಶ್ ರಾಣಾ, 2026). ಅದರ ನಂತರ ಮಾತ್ರ ಯೋಜಿತ ಪ್ಯಾಲಿಯೇಟಿವ್ ಆರೈಕೆಯ ಪ್ರಕ್ರಿಯೆ ನಡೆಯುತ್ತದೆ, ಎಂದಿಗೂ ಕೈಬಿಡುವುದಲ್ಲ.
+5. If a board refuses, or the hospital will not start the process, the representatives, family or doctors may approach the High Court (Article 226).	5. ಮಂಡಳಿ ನಿರಾಕರಿಸಿದರೆ, ಅಥವಾ ಆಸ್ಪತ್ರೆ ಪ್ರಕ್ರಿಯೆ ಆರಂಭಿಸದಿದ್ದರೆ, ಪ್ರತಿನಿಧಿಗಳು, ಕುಟುಂಬ ಅಥವಾ ಡಾಕ್ಟರ್‌ಗಳು ಹೈಕೋರ್ಟ್‌ಗೆ (ವಿಧಿ 226) ಹೋಗಬಹುದು.
+Enter your full name.	ನಿಮ್ಮ ಪೂರ್ಣ ಹೆಸರು ಬರೆಯಿರಿ.
+Enter your date of birth.	ನಿಮ್ಮ ಹುಟ್ಟಿದ ದಿನಾಂಕ ಬರೆಯಿರಿ.
+Enter a real date of birth.	ಸರಿಯಾದ ಹುಟ್ಟಿದ ದಿನಾಂಕ ಬರೆಯಿರಿ.
+Only an adult (18 years or older) can make a living will.	ವಯಸ್ಕರು (18 ವರ್ಷ ಅಥವಾ ಹೆಚ್ಚು) ಮಾತ್ರ ಲಿವಿಂಗ್ ವಿಲ್ ಮಾಡಬಹುದು.
+Enter only the last 4 digits of the ID.	ಗುರುತಿನ ಚೀಟಿಯ ಕೊನೆಯ 4 ಅಂಕೆಗಳನ್ನು ಮಾತ್ರ ಬರೆಯಿರಿ.
+Your address is empty. You will need to write it by hand on the paper.	ನಿಮ್ಮ ವಿಳಾಸ ಖಾಲಿ ಇದೆ. ನೀವು ಅದನ್ನು ಕಾಗದದ ಮೇಲೆ ಕೈಯಿಂದ ಬರೆಯಬೇಕಾಗುತ್ತದೆ.
+Confirm that you understand what this document means.	ಈ ದಾಖಲೆಯ ಅರ್ಥ ನಿಮಗೆ ತಿಳಿದಿದೆ ಎಂದು ದೃಢೀಕರಿಸಿ.
+Confirm that nobody is forcing or pressuring you.	ಯಾರೂ ನಿಮ್ಮ ಮೇಲೆ ಒತ್ತಾಯ ಅಥವಾ ಒತ್ತಡ ಹಾಕುತ್ತಿಲ್ಲ ಎಂದು ದೃಢೀಕರಿಸಿ.
+Confirm that you have thought about this carefully.	ನೀವು ಇದರ ಬಗ್ಗೆ ಎಚ್ಚರಿಕೆಯಿಂದ ಯೋಚಿಸಿದ್ದೀರಿ ಎಂದು ದೃಢೀಕರಿಸಿ.
+Confirm that you understand it will not be used if the situation is unclear or was not foreseen.	ಸ್ಥಿತಿ ಸ್ಪಷ್ಟವಿಲ್ಲದಿದ್ದರೆ ಅಥವಾ ಮೊದಲೇ ಊಹಿಸಿರದಿದ್ದರೆ ಇದನ್ನು ಬಳಸುವುದಿಲ್ಲ ಎಂದು ನಿಮಗೆ ತಿಳಿದಿದೆ ಎಂದು ದೃಢೀಕರಿಸಿ.
+Choose at least one situation when this living will applies.	ಈ ಲಿವಿಂಗ್ ವಿಲ್ ಅನ್ವಯಿಸುವ ಕನಿಷ್ಠ ಒಂದು ಸ್ಥಿತಿಯನ್ನು ಆರಿಸಿ.
+You have not chosen any specific treatment. The general direction in Section 2 will still apply.	ನೀವು ಯಾವುದೇ ನಿರ್ದಿಷ್ಟ ಚಿಕಿತ್ಸೆಯನ್ನು ಆರಿಸಿಲ್ಲ. ವಿಭಾಗ 2 ರಲ್ಲಿರುವ ಸಾಮಾನ್ಯ ನಿರ್ದೇಶನ ಆಗಲೂ ಅನ್ವಯಿಸುತ್ತದೆ.
+A living will cannot ask for anything meant to end life. That is against the law in India. Please change these words.	ಲಿವಿಂಗ್ ವಿಲ್‌ನಲ್ಲಿ ಜೀವವನ್ನು ಕೊನೆಗೊಳಿಸುವ ಉದ್ದೇಶದ ಯಾವುದನ್ನೂ ಕೇಳಲು ಸಾಧ್ಯವಿಲ್ಲ. ಅದು ಭಾರತದಲ್ಲಿ ಕಾನೂನಿಗೆ ವಿರುದ್ಧ. ದಯವಿಟ್ಟು ಈ ಪದಗಳನ್ನು ಬದಲಾಯಿಸಿ.
+Name at least one person who can speak for you (a representative).	ನಿಮ್ಮ ಪರವಾಗಿ ಮಾತನಾಡಬಲ್ಲ ಕನಿಷ್ಠ ಒಬ್ಬ ವ್ಯಕ್ತಿಯ (ಪ್ರತಿನಿಧಿ) ಹೆಸರು ಬರೆಯಿರಿ.
+It is better to name two representatives, in order of preference, in case the first cannot be reached.	ಮೊದಲನೆಯವರನ್ನು ಸಂಪರ್ಕಿಸಲಾಗದಿದ್ದರೆ ಎಂದು, ಇಬ್ಬರು ಪ್ರತಿನಿಧಿಗಳ ಹೆಸರುಗಳನ್ನು ಆದ್ಯತೆಯ ಕ್ರಮದಲ್ಲಿ ಬರೆಯುವುದು ಉತ್ತಮ.
+Representative $n: enter the full name.	ಪ್ರತಿನಿಧಿ $n: ಪೂರ್ಣ ಹೆಸರು ಬರೆಯಿರಿ.
+Representative $n: say how they are related to you.	ಪ್ರತಿನಿಧಿ $n: ಅವರು ನಿಮಗೆ ಯಾವ ಸಂಬಂಧ ಎಂದು ಬರೆಯಿರಿ.
+Representative $n: enter a mobile number.	ಪ್ರತಿನಿಧಿ $n: ಮೊಬೈಲ್ ನಂಬರ್ ಬರೆಯಿರಿ.
+Representative $n: enter only the last 4 digits of the ID.	ಪ್ರತಿನಿಧಿ $n: ಗುರುತಿನ ಚೀಟಿಯ ಕೊನೆಯ 4 ಅಂಕೆಗಳನ್ನು ಮಾತ್ರ ಬರೆಯಿರಿ.
+Representative $n must be an adult (18 or older).	ಪ್ರತಿನಿಧಿ $n ವಯಸ್ಕರಾಗಿರಬೇಕು (18 ಅಥವಾ ಹೆಚ್ಚು).
+You cannot name yourself as your representative.	ನಿಮ್ಮನ್ನೇ ನಿಮ್ಮ ಪ್ರತಿನಿಧಿಯನ್ನಾಗಿ ಹೆಸರಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ.
+Representative $n: talk to them and tick that they agreed before you sign.	ಪ್ರತಿನಿಧಿ $n: ಅವರೊಂದಿಗೆ ಮಾತನಾಡಿ, ಸಹಿ ಮಾಡುವ ಮೊದಲು ಅವರು ಒಪ್ಪಿದ್ದಾರೆ ಎಂದು ಟಿಕ್ ಮಾಡಿ.
+The same person is listed twice as a representative.	ಅದೇ ವ್ಯಕ್ತಿಯನ್ನು ಪ್ರತಿನಿಧಿಯಾಗಿ ಎರಡು ಬಾರಿ ಬರೆಯಲಾಗಿದೆ.
+Write your panchayat or municipality so a copy can go to its custodian.	ನಿಮ್ಮ ಪಂಚಾಯಿತಿ ಅಥವಾ ನಗರಸಭೆಯ ಹೆಸರು ಬರೆಯಿರಿ, ಆಗ ಒಂದು ಪ್ರತಿಯನ್ನು ಅದರ ಪಾಲಕರಿಗೆ ಕಳುಹಿಸಬಹುದು.
+Print the PDF first. Only a printed and signed version can be recorded.	ಮೊದಲು PDF ಪ್ರಿಂಟ್ ಮಾಡಿ. ಪ್ರಿಂಟ್ ಮಾಡಿ ಸಹಿ ಮಾಡಿದ ಪ್ರತಿಯನ್ನು ಮಾತ್ರ ದಾಖಲಿಸಬಹುದು.
+Enter the date it was signed.	ಸಹಿ ಮಾಡಿದ ದಿನಾಂಕ ಬರೆಯಿರಿ.
+The signing date cannot be in the future.	ಸಹಿ ಮಾಡಿದ ದಿನಾಂಕ ಭವಿಷ್ಯದ್ದಾಗಿರಲು ಸಾಧ್ಯವಿಲ್ಲ.
+The signing date is before this version was printed. Check you uploaded the right version.	ಸಹಿ ಮಾಡಿದ ದಿನಾಂಕ ಈ ಆವೃತ್ತಿ ಪ್ರಿಂಟ್ ಆದ ದಿನಕ್ಕಿಂತ ಮೊದಲಿನದು. ನೀವು ಸರಿಯಾದ ಆವೃತ್ತಿಯನ್ನು ಅಪ್‌ಲೋಡ್ ಮಾಡಿದ್ದೀರಾ ಎಂದು ನೋಡಿ.
+Upload a photo or scan of the signed and attested paper.	ಸಹಿ ಮಾಡಿ ದೃಢೀಕರಿಸಿದ ಕಾಗದದ ಫೋಟೋ ಅಥವಾ ಸ್ಕ್ಯಾನ್ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ.
+Enter the name of witness $n.	ಸಾಕ್ಷಿ $n ಅವರ ಹೆಸರು ಬರೆಯಿರಿ.
+The person making the living will cannot be their own witness.	ಲಿವಿಂಗ್ ವಿಲ್ ಮಾಡುವ ವ್ಯಕ್ತಿ ತಮ್ಮದೇ ಸಾಕ್ಷಿಯಾಗಲು ಸಾಧ್ಯವಿಲ್ಲ.
+Witness $n is also a named representative. Witnesses should preferably be independent.	ಸಾಕ್ಷಿ $n ಹೆಸರಿಸಿದ ಪ್ರತಿನಿಧಿಯೂ ಆಗಿದ್ದಾರೆ. ಸಾಕ್ಷಿಗಳು ಸಾಧ್ಯವಾದರೆ ಸ್ವತಂತ್ರರಾಗಿರಬೇಕು.
+Witness $n: enter only the last 4 digits of the ID.	ಸಾಕ್ಷಿ $n: ಗುರುತಿನ ಚೀಟಿಯ ಕೊನೆಯ 4 ಅಂಕೆಗಳನ್ನು ಮಾತ್ರ ಬರೆಯಿರಿ.
+The two witnesses must be two different people.	ಇಬ್ಬರು ಸಾಕ್ಷಿಗಳು ಬೇರೆ ಬೇರೆ ವ್ಯಕ್ತಿಗಳಾಗಿರಬೇಕು.
+Choose who attested it: a notary or a gazetted officer.	ಯಾರು ದೃಢೀಕರಿಸಿದರು ಎಂದು ಆರಿಸಿ: ನೋಟರಿ ಅಥವಾ ಗೆಜೆಟೆಡ್ ಅಧಿಕಾರಿ.
+Enter the name of the notary or gazetted officer.	ನೋಟರಿ ಅಥವಾ ಗೆಜೆಟೆಡ್ ಅಧಿಕಾರಿಯ ಹೆಸರು ಬರೆಯಿರಿ.
+The notary or gazetted officer must be a different person from you, your representatives and the witnesses.	ನೋಟರಿ ಅಥವಾ ಗೆಜೆಟೆಡ್ ಅಧಿಕಾರಿ ನಿಮಗಿಂತ, ನಿಮ್ಮ ಪ್ರತಿನಿಧಿಗಳಿಗಿಂತ ಮತ್ತು ಸಾಕ್ಷಿಗಳಿಗಿಂತ ಬೇರೆ ವ್ಯಕ್ತಿಯಾಗಿರಬೇಕು.
+Record the custodian: acknowledged, or \"custodian pending\".	ಪಾಲಕರನ್ನು ದಾಖಲಿಸಿ: ಸ್ವೀಕೃತಿ ಸಿಕ್ಕಿದೆ, ಅಥವಾ \"ಪಾಲಕರು ಬಾಕಿ\".
+Enter the custodian officer’s name and the date they acknowledged it.	ಪಾಲಕ ಅಧಿಕಾರಿಯ ಹೆಸರು ಮತ್ತು ಅವರು ಸ್ವೀಕೃತಿ ನೀಡಿದ ದಿನಾಂಕ ಬರೆಯಿರಿ.
+Tick consent before linking to ABHA.	ABHA ಗೆ ಜೋಡಿಸುವ ಮೊದಲು ಒಪ್ಪಿಗೆಗೆ ಟಿಕ್ ಮಾಡಿ.
+Enter an ABHA address like name@abdm, or the 14-digit ABHA number.	name@abdm ಹಾಗೆ ABHA ವಿಳಾಸ, ಅಥವಾ 14 ಅಂಕೆಗಳ ABHA ನಂಬರ್ ಬರೆಯಿರಿ.
+A living will is cancelled in writing. Tick that the person signed a written cancellation.	ಲಿವಿಂಗ್ ವಿಲ್ ಅನ್ನು ಲಿಖಿತವಾಗಿ ರದ್ದುಪಡಿಸಲಾಗುತ್ತದೆ. ವ್ಯಕ್ತಿ ಲಿಖಿತ ರದ್ದತಿಗೆ ಸಹಿ ಮಾಡಿದ್ದಾರೆ ಎಂದು ಟಿಕ್ ಮಾಡಿ.
+Enter the date of the written cancellation.	ಲಿಖಿತ ರದ್ದತಿಯ ದಿನಾಂಕ ಬರೆಯಿರಿ.
+The date cannot be in the future.	ದಿನಾಂಕ ಭವಿಷ್ಯದ್ದಾಗಿರಲು ಸಾಧ್ಯವಿಲ್ಲ.
+No living will (AMD)	ಲಿವಿಂಗ್ ವಿಲ್ (AMD) ಇಲ್ಲ
+No AMD; earlier wishes noted	AMD ಇಲ್ಲ; ಮೊದಲಿನ ಇಚ್ಛೆಗಳನ್ನು ದಾಖಲಿಸಲಾಗಿದೆ
+Valid living will (AMD)	ಮಾನ್ಯ ಲಿವಿಂಗ್ ವಿಲ್ (AMD)
+held at	ಇರಿಸಿರುವವರು
+attested by	ದೃಢೀಕರಿಸಿದವರು
+Living will (AMD) executed in Sahara	Sahara ದಲ್ಲಿ ಜಾರಿಗೊಳಿಸಿದ ಲಿವಿಂಗ್ ವಿಲ್ (AMD)
+version $version	ಆವೃತ್ತಿ $version
+signed $signed	ಸಹಿ $signed
+Also on this plan	ಈ ಯೋಜನೆಯಲ್ಲಿಯೂ ಇದೆ
+Living will cancelled in writing	ಲಿವಿಂಗ್ ವಿಲ್ ಅನ್ನು ಲಿಖಿತವಾಗಿ ರದ್ದುಪಡಿಸಲಾಗಿದೆ
+This plan still lists one. Check with the decision-maker	ಈ ಯೋಜನೆ ಈಗಲೂ ಒಂದನ್ನು ತೋರಿಸುತ್ತದೆ. ನಿರ್ಧಾರ ಕೈಗೊಳ್ಳುವವರನ್ನು ಕೇಳಿ
+Living will in Sahara is not signed and attested, so it is not valid	Sahara ದಲ್ಲಿನ ಲಿವಿಂಗ್ ವಿಲ್‌ಗೆ ಸಹಿ ಮತ್ತು ದೃಢೀಕರಣ ಆಗಿಲ್ಲ, ಆದ್ದರಿಂದ ಅದು ಮಾನ್ಯವಲ್ಲ
+Section 1: Personal details	ವಿಭಾಗ 1: ವೈಯಕ್ತಿಕ ವಿವರಗಳು
+Section 2: Directions relating to life-sustaining treatment	ವಿಭಾಗ 2: ಜೀವರಕ್ಷಕ ಚಿಕಿತ್ಸೆಗೆ ಸಂಬಂಧಿಸಿದ ನಿರ್ದೇಶನಗಳು
+Section 3 (Optional): Wishes or desires during end-of-life care	ವಿಭಾಗ 3 (ಐಚ್ಛಿಕ): ಜೀವನದ ಕೊನೆಯ ಆರೈಕೆಯಲ್ಲಿನ ಇಚ್ಛೆಗಳು
+Section 4: Authorisation of the Designated Healthcare Representative (DHR)	ವಿಭಾಗ 4: ನಾಮನಿರ್ದೇಶಿತ ಆರೋಗ್ಯ ಆರೈಕೆ ಪ್ರತಿನಿಧಿಯ (DHR) ಅಧಿಕಾರ
+Section 5 (Optional): Directions to be followed upon my death	ವಿಭಾಗ 5 (ಐಚ್ಛಿಕ): ನನ್ನ ಮರಣದ ನಂತರ ಪಾಲಿಸಬೇಕಾದ ನಿರ್ದೇಶನಗಳು
+Declaration	ಘೋಷಣೆ
+Validity of directive	ನಿರ್ದೇಶನದ ಮಾನ್ಯತೆ
+Signature of the executor	ನಿರ್ದೇಶನ ಮಾಡಿದವರ ಸಹಿ
+Signature of witnesses	ಸಾಕ್ಷಿಗಳ ಸಹಿ
+Notarisation / Attestation	ನೋಟರಿ / ಗೆಜೆಟೆಡ್ ಅಧಿಕಾರಿಯಿಂದ ದೃಢೀಕರಣ
+ADVANCE MEDICAL DIRECTIVE	ಮುಂಗಡ ವೈದ್ಯಕೀಯ ನಿರ್ದೇಶನ (ಲಿವಿಂಗ್ ವಿಲ್)
+The English text is the valid text. The headings in this language are only to help reading.	ಇಂಗ್ಲಿಷ್ ಪಠ್ಯವೇ ಮಾನ್ಯ ಪಠ್ಯ. ಈ ಭಾಷೆಯ ಶೀರ್ಷಿಕೆಗಳು ಓದಲು ಸಹಾಯ ಮಾಡಲು ಮಾತ್ರ.
+See every step of the board process (information only)	ಮಂಡಳಿ ಪ್ರಕ್ರಿಯೆಯ ಎಲ್ಲಾ ಹಂತಗಳನ್ನು ನೋಡಿ (ಮಾಹಿತಿಗಾಗಿ ಮಾತ್ರ)
+Your data and your rights	ನಿಮ್ಮ ಡೇಟಾ ಮತ್ತು ನಿಮ್ಮ ಹಕ್ಕುಗಳು
+Hide	ಮರೆಮಾಡಿ
+Show	ತೋರಿಸಿ
+Only the patient or the care team can download or delete this data. Please ask them.	ರೋಗಿ ಅಥವಾ ಆರೈಕೆ ತಂಡ ಮಾತ್ರ ಈ ಡೇಟಾವನ್ನು ಡೌನ್‌ಲೋಡ್ ಮಾಡಬಹುದು ಅಥವಾ ಅಳಿಸಬಹುದು. ದಯವಿಟ್ಟು ಅವರನ್ನು ಕೇಳಿ.
+The download could not be made. Try again.	ಡೌನ್‌ಲೋಡ್ ಮಾಡಲು ಆಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.
+Download my data	ನನ್ನ ಡೇಟಾ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ
+Your data is ready. It holds private health details, so keep the file safe.	ನಿಮ್ಮ ಡೇಟಾ ಸಿದ್ಧವಾಗಿದೆ. ಇದರಲ್ಲಿ ಖಾಸಗಿ ಆರೋಗ್ಯ ವಿವರಗಳಿವೆ, ಆದ್ದರಿಂದ ಫೈಲ್ ಅನ್ನು ಜೋಪಾನವಾಗಿ ಇಡಿ.
+Delete my local draft	ನನ್ನ ಲೋಕಲ್ ಡ್ರಾಫ್ಟ್ ಅಳಿಸಿ
+This deletes the unsigned draft from this phone. It cannot be undone. Signed versions and the log stay.	ಇದು ಸಹಿ ಆಗದ ಡ್ರಾಫ್ಟ್ ಅನ್ನು ಈ ಫೋನ್‌ನಿಂದ ಅಳಿಸುತ್ತದೆ. ಇದನ್ನು ಹಿಂದಕ್ಕೆ ತರಲು ಸಾಧ್ಯವಿಲ್ಲ. ಸಹಿ ಮಾಡಿದ ಆವೃತ್ತಿಗಳು ಮತ್ತು ಲಾಗ್ ಉಳಿಯುತ್ತವೆ.
+Keep the draft	ಡ್ರಾಫ್ಟ್ ಇರಿಸಿಕೊಳ್ಳಿ
+The unsigned draft is deleted from this phone. Signed versions and the log were kept.	ಸಹಿ ಆಗದ ಡ್ರಾಫ್ಟ್ ಅನ್ನು ಈ ಫೋನ್‌ನಿಂದ ಅಳಿಸಲಾಗಿದೆ. ಸಹಿ ಮಾಡಿದ ಆವೃತ್ತಿಗಳು ಮತ್ತು ಲಾಗ್ ಉಳಿಸಲಾಗಿದೆ.
+There is no unsigned draft to delete. A plan someone has already signed is kept.	ಅಳಿಸಲು ಸಹಿ ಆಗದ ಡ್ರಾಫ್ಟ್ ಇಲ್ಲ. ಈಗಾಗಲೇ ಯಾರಾದರೂ ಸಹಿ ಮಾಡಿದ ಯೋಜನೆಯನ್ನು ಉಳಿಸಲಾಗುತ್ತದೆ.
+Yes, delete the draft	ಹೌದು, ಡ್ರಾಫ್ಟ್ ಅಳಿಸಿ
+I have read this	ನಾನು ಇದನ್ನು ಓದಿದ್ದೇನೆ
+Review is $late days late	ಪರಿಶೀಲನೆ $late ದಿನ ತಡವಾಗಿದೆ
+Review is due today	ಪರಿಶೀಲನೆ ಇಂದು ಬಾಕಿ ಇದೆ
+Review is due in $days days	ಪರಿಶೀಲನೆ $days ದಿನಗಳಲ್ಲಿ ಬಾಕಿ ಇದೆ
+SMS not configured on this server, so reminders cannot be sent. Please phone them.	ಈ ಸರ್ವರ್‌ನಲ್ಲಿ SMS ಸೆಟ್ ಆಗಿಲ್ಲ, ಆದ್ದರಿಂದ ಜ್ಞಾಪನೆಗಳನ್ನು ಕಳುಹಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ. ದಯವಿಟ್ಟು ಅವರಿಗೆ ಫೋನ್ ಮಾಡಿ.
+The server could not be reached. Check the internet, or phone them.	ಸರ್ವರ್ ಸಂಪರ್ಕ ಸಿಗಲಿಲ್ಲ. ಇಂಟರ್ನೆಟ್ ನೋಡಿ, ಅಥವಾ ಅವರಿಗೆ ಫೋನ್ ಮಾಡಿ.
+No valid mobile number for the patient or the primary decision-maker.	ರೋಗಿ ಅಥವಾ ಮುಖ್ಯ ನಿರ್ಧಾರ ಕೈಗೊಳ್ಳುವವರ ಸರಿಯಾದ ಮೊಬೈಲ್ ನಂಬರ್ ಇಲ್ಲ.
+The reminder goes to $name. The number goes to the SMS company.	ಜ್ಞಾಪನೆ $name ಅವರಿಗೆ ಹೋಗುತ್ತದೆ. ನಂಬರ್ SMS ಕಂಪನಿಗೆ ಹೋಗುತ್ತದೆ.
+Send review reminder	ಪರಿಶೀಲನೆಯ ಜ್ಞಾಪನೆ ಕಳುಹಿಸಿ
+Reminder sent.	ಜ್ಞಾಪನೆ ಕಳುಹಿಸಲಾಗಿದೆ.
+SMS not configured on this server. No message was sent. Please phone them.	ಈ ಸರ್ವರ್‌ನಲ್ಲಿ SMS ಸೆಟ್ ಆಗಿಲ್ಲ. ಯಾವುದೇ ಸಂದೇಶ ಕಳುಹಿಸಿಲ್ಲ. ದಯವಿಟ್ಟು ಅವರಿಗೆ ಫೋನ್ ಮಾಡಿ.
+Too many reminders to this number in the last hour. No message was sent.	ಕಳೆದ ಒಂದು ಗಂಟೆಯಲ್ಲಿ ಈ ನಂಬರ್‌ಗೆ ಬಹಳ ಜ್ಞಾಪನೆಗಳು ಹೋಗಿವೆ. ಯಾವುದೇ ಸಂದೇಶ ಕಳುಹಿಸಿಲ್ಲ.
+The SMS could not be sent. Please phone them.	SMS ಕಳುಹಿಸಲು ಆಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಅವರಿಗೆ ಫೋನ್ ಮಾಡಿ.
+Time (24-hour)	ಸಮಯ (24 ಗಂಟೆ)
+Pilot audit log	ಪೈಲಟ್ ಆಡಿಟ್ ಲಾಗ್
+For the care team only. Made-up patients only during the pilot. Saved on this phone.	ಆರೈಕೆ ತಂಡಕ್ಕೆ ಮಾತ್ರ. ಪೈಲಟ್ ಸಮಯದಲ್ಲಿ ಕಾಲ್ಪನಿಕ ರೋಗಿಗಳು ಮಾತ್ರ. ಈ ಫೋನ್‌ನಲ್ಲಿ ಉಳಿಸಲಾಗಿದೆ.
+Reach: found eligible to signed	ಅವಧಿ: ಅರ್ಹ ಎಂದು ಕಂಡುಬಂದಾಗಿನಿಂದ ಸಹಿ ಆಗುವವರೆಗೆ
+Not known yet: needs the date found eligible and a signature	ಇನ್ನೂ ತಿಳಿದಿಲ್ಲ: ಅರ್ಹ ಎಂದು ಕಂಡುಬಂದ ದಿನಾಂಕ ಮತ್ತು ಸಹಿ ಬೇಕು
+$reach days	$reach ದಿನಗಳು
+Values section completed	ಮೌಲ್ಯಗಳ ವಿಭಾಗ ಪೂರ್ಣಗೊಂಡಿದೆ
+No plan yet	ಇನ್ನೂ ಯೋಜನೆ ಇಲ್ಲ
+treatment fields filled: $filled of $total	ಭರ್ತಿ ಮಾಡಿದ ಚಿಕಿತ್ಸೆಯ ವಿಭಾಗಗಳು: $total ರಲ್ಲಿ $filled
+Record found within $target minutes of ED arrival	ED ತಲುಪಿದ $target ನಿಮಿಷಗಳೊಳಗೆ ದಾಖಲೆ ಸಿಕ್ಕಿತು
+$within of $all episodes	$all ಪ್ರಕರಣಗಳಲ್ಲಿ $within
+Care matched the recorded plan	ಆರೈಕೆ ದಾಖಲಿತ ಯೋಜನೆಗೆ ಹೊಂದಿತ್ತು
+$ok of $compared that could be compared	ಹೋಲಿಸಲು ಸಾಧ್ಯವಾದ $compared ರಲ್ಲಿ $ok
+Log an ED episode	ED ಪ್ರಕರಣ ದಾಖಲಿಸಿ
+Record an outcome	ಫಲಿತಾಂಶ ದಾಖಲಿಸಿ
+Report an incident	ಘಟನೆಯ ವರದಿ ಮಾಡಿ
+ED episode saved.	ED ಪ್ರಕರಣ ಉಳಿಸಲಾಗಿದೆ.
+Outcome saved.	ಫಲಿತಾಂಶ ಉಳಿಸಲಾಗಿದೆ.
+Incident saved.	ಘಟನೆ ಉಳಿಸಲಾಗಿದೆ.
+ED episodes	ED ಪ್ರಕರಣಗಳು
+None recorded yet.	ಇನ್ನೂ ಏನನ್ನೂ ದಾಖಲಿಸಿಲ್ಲ.
+Nothing to compare	ಹೋಲಿಸಲು ಏನೂ ಇಲ್ಲ
+Matched the plan	ಯೋಜನೆಗೆ ಹೊಂದಿತ್ತು
+Differed from the plan	ಯೋಜನೆಗಿಂತ ಬೇರೆಯಾಗಿತ್ತು
+The record was not opened	ದಾಖಲೆ ತೆರೆಯಲಿಲ್ಲ
+Record opened after $minutes minutes	$minutes ನಿಮಿಷಗಳ ನಂತರ ದಾಖಲೆ ತೆರೆಯಿತು
+over the $target-minute target	$target ನಿಮಿಷಗಳ ಗುರಿಗಿಂತ ಹೆಚ್ಚು
+Highest support	ಅತ್ಯಧಿಕ ಬೆಂಬಲ
+Why care differed	ಆರೈಕೆ ಏಕೆ ಬೇರೆಯಾಯಿತು
+Recorded by	ದಾಖಲಿಸಿದವರು
+Outcomes	ಫಲಿತಾಂಶಗಳು
+Preference not known	ಆದ್ಯತೆ ತಿಳಿದಿಲ್ಲ
+Where they preferred	ಅವರು ಬಯಸಿದ ಸ್ಥಳದಲ್ಲಿ
+Not where they preferred	ಅವರು ಬಯಸಿದ ಸ್ಥಳದಲ್ಲಿ ಅಲ್ಲ
+Preferred place	ಆದ್ಯತೆಯ ಸ್ಥಳ
+ICU days	ICU ದಿನಗಳು
+ventilator days	ವೆಂಟಿಲೇಟರ್ ದಿನಗಳು
+Admission to first symptom-control prescription	ದಾಖಲಾತಿಯಿಂದ ಲಕ್ಷಣ ನಿಯಂತ್ರಣದ ಮೊದಲ ಔಷಧಿಯವರೆಗೆ
+$h hours	$h ಗಂಟೆಗಳು
+Out-of-pocket spend, last admission	ಕೊನೆಯ ದಾಖಲಾತಿಯ ಸ್ವಂತ ಜೇಬಿನ ಖರ್ಚು
+Incidents	ಘಟನೆಗಳು
+None reported yet.	ಇನ್ನೂ ಯಾವುದೇ ವರದಿ ಇಲ್ಲ.
+Plan applied to a reversible illness	ಗುಣವಾಗಬಹುದಾದ ಕಾಯಿಲೆಗೆ ಯೋಜನೆ ಅನ್ವಯಿಸಲಾಯಿತು
+Family felt pushed	ಕುಟುಂಬಕ್ಕೆ ಒತ್ತಡ ಅನಿಸಿತು
+Reported by	ವರದಿ ಮಾಡಿದವರು
+ED arrival time	ED ತಲುಪಿದ ಸಮಯ
+First time the record was opened	ದಾಖಲೆ ಮೊದಲ ಬಾರಿ ತೆರೆದ ಸಮಯ
+$m minutes after arrival	ತಲುಪಿದ $m ನಿಮಿಷಗಳ ನಂತರ
+The access log has no ED access after this arrival time.	ಈ ತಲುಪಿದ ಸಮಯದ ನಂತರ ಆಕ್ಸೆಸ್ ಲಾಗ್‌ನಲ್ಲಿ ED ಯ ಯಾವುದೇ ಆಕ್ಸೆಸ್ ಇಲ್ಲ.
+Fill from the access log	ಆಕ್ಸೆಸ್ ಲಾಗ್‌ನಿಂದ ಭರ್ತಿ ಮಾಡಿ
+Highest breathing support actually given	ನಿಜವಾಗಿ ನೀಡಿದ ಅತ್ಯಧಿಕ ಉಸಿರಾಟದ ಬೆಂಬಲ
+CPR given?	CPR ನೀಡಲಾಯಿತೇ?
+Admitted to ICU?	ICU ಗೆ ದಾಖಲಿಸಲಾಯಿತೇ?
+If care differed from the plan, why?	ಆರೈಕೆ ಯೋಜನೆಗಿಂತ ಬೇರೆಯಾಗಿದ್ದರೆ, ಏಕೆ?
+No signed plan was in force at this time, so there is nothing to compare.	ಈ ಸಮಯದಲ್ಲಿ ಸಹಿ ಮಾಡಿದ ಯಾವ ಯೋಜನೆಯೂ ಜಾರಿಯಲ್ಲಿರಲಿಲ್ಲ, ಆದ್ದರಿಂದ ಹೋಲಿಸಲು ಏನೂ ಇಲ್ಲ.
+Compared with version $v: nothing to compare yet.	ಆವೃತ್ತಿ $v ರೊಂದಿಗೆ ಹೋಲಿಕೆ: ಇನ್ನೂ ಹೋಲಿಸಲು ಏನೂ ಇಲ್ಲ.
+Compared with version $v: matches the plan.	ಆವೃತ್ತಿ $v ರೊಂದಿಗೆ ಹೋಲಿಕೆ: ಯೋಜನೆಗೆ ಹೊಂದುತ್ತದೆ.
+Compared with version $v: differs from the plan.	ಆವೃತ್ತಿ $v ರೊಂದಿಗೆ ಹೋಲಿಕೆ: ಯೋಜನೆಗಿಂತ ಬೇರೆಯಾಗಿದೆ.
+Enter the ED arrival time.	ED ತಲುಪಿದ ಸಮಯ ಬರೆಯಿರಿ.
+The first access time cannot be before arrival.	ಮೊದಲ ಆಕ್ಸೆಸ್ ಸಮಯ ತಲುಪುವ ಮೊದಲಿನದಾಗಿರಲು ಸಾಧ್ಯವಿಲ್ಲ.
+Care differed from the plan. Write why.	ಆರೈಕೆ ಯೋಜನೆಗಿಂತ ಬೇರೆಯಾಗಿತ್ತು. ಕಾರಣ ಬರೆಯಿರಿ.
+Save the episode	ಪ್ರಕರಣ ಉಳಿಸಿ
+Place of death	ಮರಣದ ಸ್ಥಳ
+ICU days in the last 30 days	ಕೊನೆಯ 30 ದಿನಗಳಲ್ಲಿ ICU ದಿನಗಳು
+Ventilator days in the last 30 days	ಕೊನೆಯ 30 ದಿನಗಳಲ್ಲಿ ವೆಂಟಿಲೇಟರ್ ದಿನಗಳು
+Last admission time	ಕೊನೆಯ ದಾಖಲಾತಿಯ ಸಮಯ
+First symptom-control prescription	ಲಕ್ಷಣ ನಿಯಂತ್ರಣದ ಮೊದಲ ಔಷಧಿ
+Out-of-pocket spend, last admission (₹)	ಕೊನೆಯ ದಾಖಲಾತಿಯ ಸ್ವಂತ ಜೇಬಿನ ಖರ್ಚು (₹)
+Enter at least one item.	ಕನಿಷ್ಠ ಒಂದು ಅಂಶವನ್ನು ಭರ್ತಿ ಮಾಡಿ.
+Days must be between 0 and 30.	ದಿನಗಳು 0 ರಿಂದ 30 ರ ನಡುವೆ ಇರಬೇಕು.
+The first prescription cannot be before admission.	ಮೊದಲ ಔಷಧಿ ದಾಖಲಾತಿಗಿಂತ ಮೊದಲಿನದಾಗಿರಲು ಸಾಧ್ಯವಿಲ್ಲ.
+Spend cannot be below zero.	ಖರ್ಚು ಸೊನ್ನೆಗಿಂತ ಕಡಿಮೆ ಇರಲು ಸಾಧ್ಯವಿಲ್ಲ.
+Save the outcome	ಫಲಿತಾಂಶ ಉಳಿಸಿ
+The plan was applied to a reversible illness	ಗುಣವಾಗಬಹುದಾದ ಕಾಯಿಲೆಗೆ ಯೋಜನೆಯನ್ನು ಅನ್ವಯಿಸಲಾಯಿತು
+The family felt pushed	ಕುಟುಂಬಕ್ಕೆ ಒತ್ತಡ ಅನಿಸಿತು
+Notes	ಟಿಪ್ಪಣಿಗಳು
+Tick a box or write what happened.	ಒಂದು ಬಾಕ್ಸ್ ಆರಿಸಿ ಅಥವಾ ಏನಾಯಿತು ಎಂದು ಬರೆಯಿರಿ.
+Save the incident	ಘಟನೆ ಉಳಿಸಿ
+The PDF could not be made. Try again.	PDF ಮಾಡಲು ಆಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.
+Living will	ಲಿವಿಂಗ್ ವಿಲ್
+This follows the model living will by the Vidhi Centre for Legal Policy and ACP India, and the Supreme Court’s rules (2018, changed on 24 January 2023). If both a living will and an emergency plan exist, the living will governs.	ಇದು ವಿಧಿ ಸೆಂಟರ್ ಫಾರ್ ಲೀಗಲ್ ಪಾಲಿಸಿ ಮತ್ತು ACP ಇಂಡಿಯಾದ ಮಾದರಿ ಲಿವಿಂಗ್ ವಿಲ್, ಮತ್ತು ಸುಪ್ರೀಂ ಕೋರ್ಟ್‌ನ ನಿಯಮಗಳನ್ನು (2018, 24 ಜನವರಿ 2023 ರಂದು ಬದಲಾಯಿಸಲಾಗಿದೆ) ಆಧರಿಸಿದೆ. ಲಿವಿಂಗ್ ವಿಲ್ ಮತ್ತು ತುರ್ತು ಯೋಜನೆ ಎರಡೂ ಇದ್ದರೆ, ಲಿವಿಂಗ್ ವಿಲ್ ಮೇಲುಗೈ ಪಡೆಯುತ್ತದೆ.
+What happens if treatment is to be held back or stopped (information only)	ಚಿಕಿತ್ಸೆಯನ್ನು ತಡೆಹಿಡಿಯಬೇಕಾದರೆ ಅಥವಾ ನಿಲ್ಲಿಸಬೇಕಾದರೆ ಏನಾಗುತ್ತದೆ (ಮಾಹಿತಿಗಾಗಿ ಮಾತ್ರ)
+The living will was cancelled in writing on $on. It no longer applies.	ಲಿವಿಂಗ್ ವಿಲ್ ಅನ್ನು $on ರಂದು ಲಿಖಿತವಾಗಿ ರದ್ದುಪಡಿಸಲಾಗಿದೆ. ಇದು ಇನ್ನು ಅನ್ವಯಿಸುವುದಿಲ್ಲ.
+A living will has been started or printed but is not signed and recorded. It is not valid.	ಲಿವಿಂಗ್ ವಿಲ್ ಆರಂಭಿಸಲಾಗಿದೆ ಅಥವಾ ಪ್ರಿಂಟ್ ಮಾಡಲಾಗಿದೆ, ಆದರೆ ಸಹಿ ಮಾಡಿ ದಾಖಲಿಸಿಲ್ಲ. ಇದು ಮಾನ್ಯವಲ್ಲ.
+No living will is recorded in Sahara. Ask the family if a signed paper exists.	Sahara ದಲ್ಲಿ ಯಾವ ಲಿವಿಂಗ್ ವಿಲ್ ಕೂಡ ದಾಖಲಾಗಿಲ್ಲ. ಸಹಿ ಮಾಡಿದ ಕಾಗದ ಇದೆಯೇ ಎಂದು ಕುಟುಂಬವನ್ನು ಕೇಳಿ.
+Make a new living will	ಹೊಸ ಲಿವಿಂಗ್ ವಿಲ್ ಮಾಡಿ
+Start a living will	ಲಿವಿಂಗ್ ವಿಲ್ ಆರಂಭಿಸಿ
+ID document	ಗುರುತಿನ ದಾಖಲೆ
+Last 4 digits only	ಕೊನೆಯ 4 ಅಂಕೆಗಳು ಮಾತ್ರ
+Never type the full number here. Write it by hand on the paper.	ಪೂರ್ಣ ನಂಬರ್ ಅನ್ನು ಇಲ್ಲಿ ಎಂದಿಗೂ ಬರೆಯಬೇಡಿ. ಅದನ್ನು ಕಾಗದದ ಮೇಲೆ ಕೈಯಿಂದ ಬರೆಯಿರಿ.
+Living will v$version · $status	ಲಿವಿಂಗ್ ವಿಲ್ v$version · $status
+Full name	ಪೂರ್ಣ ಹೆಸರು
+Gender	ಲಿಂಗ
+Date of birth	ಹುಟ್ಟಿದ ದಿನಾಂಕ
+Permanent address	ಶಾಶ್ವತ ವಿಳಾಸ
+Current address (if different)	ಈಗಿನ ವಿಳಾಸ (ಬೇರೆಯಾಗಿದ್ದರೆ)
+Municipality or panchayat	ನಗರಸಭೆ ಅಥವಾ ಪಂಚಾಯಿತಿ
+Why you are making this, and what matters to you (optional)	ನೀವು ಇದನ್ನು ಏಕೆ ಮಾಡುತ್ತಿದ್ದೀರಿ, ಮತ್ತು ನಿಮಗೆ ಯಾವುದು ಮುಖ್ಯ (ಐಚ್ಛಿಕ)
+Please confirm	ದಯವಿಟ್ಟು ದೃಢೀಕರಿಸಿ
+I understand what this document means and what can happen because of it.	ಈ ದಾಖಲೆಯ ಅರ್ಥ ಮತ್ತು ಇದರಿಂದ ಏನಾಗಬಹುದು ಎಂಬುದು ನನಗೆ ತಿಳಿದಿದೆ.
+I have thought about it carefully.	ನಾನು ಇದರ ಬಗ್ಗೆ ಎಚ್ಚರಿಕೆಯಿಂದ ಯೋಚಿಸಿದ್ದೇನೆ.
+I am doing this by my own free will. Nobody is forcing or pressuring me.	ನಾನು ಇದನ್ನು ನನ್ನ ಸ್ವಂತ ಇಚ್ಛೆಯಿಂದ ಮಾಡುತ್ತಿದ್ದೇನೆ. ಯಾರೂ ನನ್ನ ಮೇಲೆ ಒತ್ತಾಯ ಅಥವಾ ಒತ್ತಡ ಹಾಕುತ್ತಿಲ್ಲ.
+I understand doctors will not use it if the situation is unclear or one I did not think of.	ಸ್ಥಿತಿ ಸ್ಪಷ್ಟವಿಲ್ಲದಿದ್ದರೆ ಅಥವಾ ನಾನು ಯೋಚಿಸಿರದ ಸ್ಥಿತಿಯಾಗಿದ್ದರೆ ಡಾಕ್ಟರ್‌ಗಳು ಇದನ್ನು ಬಳಸುವುದಿಲ್ಲ ಎಂದು ನನಗೆ ತಿಳಿದಿದೆ.
+I cannot read or write. Someone wrote this as I said and read it out to me.	ನನಗೆ ಓದಲು-ಬರೆಯಲು ಬರುವುದಿಲ್ಲ. ನಾನು ಹೇಳಿದಂತೆ ಯಾರೋ ಇದನ್ನು ಬರೆದು ನನಗೆ ಓದಿ ಹೇಳಿದರು.
+A doctor’s certificate that I can decide is attached (optional; not required).	ನಾನು ನಿರ್ಧಾರ ತೆಗೆದುಕೊಳ್ಳಬಲ್ಲೆ ಎಂದು ತಿಳಿಸುವ ಡಾಕ್ಟರ್ ಪ್ರಮಾಣಪತ್ರ ಲಗತ್ತಿಸಲಾಗಿದೆ (ಐಚ್ಛಿಕ; ಕಡ್ಡಾಯವಲ್ಲ).
+It applies only when your doctors decide there is no reasonable chance you will recover, and more treatment would only make dying longer. Choose the situations:	ನಿಮ್ಮ ಡಾಕ್ಟರ್‌ಗಳು ನೀವು ಗುಣವಾಗುವ ಯಾವುದೇ ಸಮಂಜಸ ಸಾಧ್ಯತೆ ಇಲ್ಲ ಎಂದು ತೀರ್ಮಾನಿಸಿದಾಗ, ಮತ್ತು ಇನ್ನಷ್ಟು ಚಿಕಿತ್ಸೆ ಸಾವಿನ ಪ್ರಕ್ರಿಯೆಯನ್ನು ಉದ್ದ ಮಾಡುವುದಷ್ಟೇ ಆದಾಗ ಮಾತ್ರ ಇದು ಅನ್ವಯಿಸುತ್ತದೆ. ಸ್ಥಿತಿಗಳನ್ನು ಆರಿಸಿ:
+Any illness you expect, and what you want for it (optional)	ನೀವು ನಿರೀಕ್ಷಿಸುವ ಯಾವುದೇ ಕಾಯಿಲೆ, ಮತ್ತು ಅದಕ್ಕೆ ನೀವು ಏನು ಬಯಸುತ್ತೀರಿ (ಐಚ್ಛಿಕ)
+For each treatment, choose what you want in those situations. You can leave any as “Not decided”.	ಪ್ರತಿ ಚಿಕಿತ್ಸೆಗೂ, ಆ ಸ್ಥಿತಿಗಳಲ್ಲಿ ನೀವು ಏನು ಬಯಸುತ್ತೀರಿ ಎಂದು ಆರಿಸಿ. ಯಾವುದನ್ನಾದರೂ “ನಿರ್ಧರಿಸಿಲ್ಲ” ಎಂದು ಬಿಡಬಹುದು.
+Where would you like to be cared for at the end?	ಕೊನೆಯಲ್ಲಿ ನಿಮಗೆ ಎಲ್ಲಿ ಆರೈಕೆ ಸಿಗಬೇಕು ಎಂದು ಬಯಸುತ್ತೀರಿ?
+Name of the place	ಸ್ಥಳದ ಹೆಸರು
+Doctor you would like to look after you (name, place)	ನಿಮ್ಮನ್ನು ನೋಡಿಕೊಳ್ಳಬೇಕು ಎಂದು ನೀವು ಬಯಸುವ ಡಾಕ್ಟರ್ (ಹೆಸರು, ಸ್ಥಳ)
+Anything doctors should pay special attention to	ಡಾಕ್ಟರ್‌ಗಳು ವಿಶೇಷ ಗಮನ ನೀಡಬೇಕಾದ ಯಾವುದೇ ವಿಷಯ
+For example: easing worry and confusion so I can spend time with family	ಉದಾಹರಣೆಗೆ: ನಾನು ಕುಟುಂಬದ ಜೊತೆ ಸಮಯ ಕಳೆಯಲು ಚಿಂತೆ ಮತ್ತು ಗೊಂದಲವನ್ನು ಕಡಿಮೆ ಮಾಡುವುದು
+Name you want to be called	ನಿಮ್ಮನ್ನು ಕರೆಯಬೇಕಾದ ಹೆಸರು
+Gender or pronouns to respect	ಗೌರವಿಸಬೇಕಾದ ಲಿಂಗ ಅಥವಾ ಸರ್ವನಾಮ
+Partner’s name	ಸಂಗಾತಿಯ ಹೆಸರು
+How staff should refer to them	ಸಿಬ್ಬಂದಿ ಅವರನ್ನು ಹೇಗೆ ಸಂಬೋಧಿಸಬೇಕು
+my partner	ನನ್ನ ಸಂಗಾತಿ
+Representatives (DHRs) speak for you when you cannot. Put them in order: the first is asked first. Talk to them before you name them.	ನೀವು ಮಾತನಾಡಲಾಗದಾಗ ಪ್ರತಿನಿಧಿಗಳು (DHR) ನಿಮ್ಮ ಪರವಾಗಿ ಮಾತನಾಡುತ್ತಾರೆ. ಅವರನ್ನು ಕ್ರಮದಲ್ಲಿ ಇಡಿ: ಮೊದಲನೆಯವರನ್ನು ಮೊದಲು ಕೇಳಲಾಗುತ್ತದೆ. ಹೆಸರು ಬರೆಯುವ ಮೊದಲು ಅವರೊಂದಿಗೆ ಮಾತನಾಡಿ.
+Add another representative	ಇನ್ನೊಬ್ಬ ಪ್ರತಿನಿಧಿಯನ್ನು ಸೇರಿಸಿ
+They must decide together (instead of in order).	ಅವರು (ಕ್ರಮದ ಬದಲು) ಒಟ್ಟಾಗಿ ನಿರ್ಧರಿಸಬೇಕು.
+Family doctor (optional)	ಕುಟುಂಬದ ಡಾಕ್ಟರ್ (ಐಚ್ಛಿಕ)
+Phone	ಫೋನ್
+Local body that keeps living wills (custodian)	ಲಿವಿಂಗ್ ವಿಲ್‌ಗಳನ್ನು ಇಟ್ಟುಕೊಳ್ಳುವ ಸ್ಥಳೀಯ ಸಂಸ್ಥೆ (ಪಾಲಕರು)
+For example your municipal corporation or gram panchayat. Maharashtra and Karnataka (rural) have named custodians; Andhra Pradesh has not confirmed one yet. You can still sign and record “custodian pending”.	ಉದಾಹರಣೆಗೆ ನಿಮ್ಮ ನಗರ ಪಾಲಿಕೆ ಅಥವಾ ಗ್ರಾಮ ಪಂಚಾಯಿತಿ. ಮಹಾರಾಷ್ಟ್ರ ಮತ್ತು ಕರ್ನಾಟಕ (ಗ್ರಾಮೀಣ) ಪಾಲಕರನ್ನು ಹೆಸರಿಸಿವೆ; ಆಂಧ್ರ ಪ್ರದೇಶ ಇನ್ನೂ ದೃಢಪಡಿಸಿಲ್ಲ. ನೀವು ಆಗಲೂ ಸಹಿ ಮಾಡಿ “ಪಾಲಕರು ಬಾಕಿ” ಎಂದು ದಾಖಲಿಸಬಹುದು.
+I am a registered organ donor (Form 7, THOTA 1994).	ನಾನು ನೋಂದಾಯಿತ ಅಂಗದಾನಿ (ಫಾರ್ಮ್ 7, THOTA 1994).
+I want to donate my body for medical study.	ನಾನು ವೈದ್ಯಕೀಯ ಅಧ್ಯಯನಕ್ಕಾಗಿ ನನ್ನ ದೇಹವನ್ನು ದಾನ ಮಾಡಲು ಬಯಸುತ್ತೇನೆ.
+Medical college or organisation	ವೈದ್ಯಕೀಯ ಕಾಲೇಜು ಅಥವಾ ಸಂಸ್ಥೆ
+Wishes about last rites	ಅಂತ್ಯಸಂಸ್ಕಾರದ ಬಗ್ಗೆ ಇಚ್ಛೆಗಳು
+Once printed, this version cannot be changed in the app. To change anything, start a new version and print again.	ಪ್ರಿಂಟ್ ಆದ ನಂತರ ಈ ಆವೃತ್ತಿಯನ್ನು ಆ್ಯಪ್‌ನಲ್ಲಿ ಬದಲಾಯಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ. ಏನನ್ನಾದರೂ ಬದಲಾಯಿಸಲು ಹೊಸ ಆವೃತ್ತಿ ಆರಂಭಿಸಿ ಮತ್ತೆ ಪ್ರಿಂಟ್ ಮಾಡಿ.
+Make the PDF to print and sign	ಪ್ರಿಂಟ್ ಮಾಡಿ ಸಹಿ ಮಾಡಲು PDF ಮಾಡಿ
+1. First representative	1. ಮೊದಲ ಪ್ರತಿನಿಧಿ
+$n. If the one before cannot be reached	$n. ಹಿಂದಿನವರನ್ನು ಸಂಪರ್ಕಿಸಲಾಗದಿದ್ದರೆ
+Move up	ಮೇಲಕ್ಕೆ ಸರಿಸಿ
+How they are related to you	ಅವರು ನಿಮಗೆ ಯಾವ ಸಂಬಂಧ
+Mobile number	ಮೊಬೈಲ್ ನಂಬರ್
+Other number (optional)	ಇನ್ನೊಂದು ನಂಬರ್ (ಐಚ್ಛಿಕ)
+Date of birth (optional)	ಹುಟ್ಟಿದ ದಿನಾಂಕ (ಐಚ್ಛಿಕ)
+Email (optional)	ಇಮೇಲ್ (ಐಚ್ಛಿಕ)
+Address	ವಿಳಾಸ
+I have talked to them and they agreed to be my representative.	ನಾನು ಅವರೊಂದಿಗೆ ಮಾತನಾಡಿದ್ದೇನೆ ಮತ್ತು ಅವರು ನನ್ನ ಪ್ರತಿನಿಧಿಯಾಗಲು ಒಪ್ಪಿದ್ದಾರೆ.
+Custodian (local body)	ಪಾಲಕರು (ಸ್ಥಳೀಯ ಸಂಸ್ಥೆ)
+The custodian received a copy and acknowledged it	ಪಾಲಕರಿಗೆ ಪ್ರತಿ ಸಿಕ್ಕಿದೆ ಮತ್ತು ಅವರು ಸ್ವೀಕೃತಿ ನೀಡಿದ್ದಾರೆ
+Custodian pending (none appointed yet, or no reply)	ಪಾಲಕರು ಬಾಕಿ (ಇನ್ನೂ ಯಾರನ್ನೂ ನೇಮಿಸಿಲ್ಲ, ಅಥವಾ ಉತ್ತರ ಬಂದಿಲ್ಲ)
+Officer’s name and office	ಅಧಿಕಾರಿಯ ಹೆಸರು ಮತ್ತು ಕಚೇರಿ
+Date acknowledged	ಸ್ವೀಕೃತಿಯ ದಿನಾಂಕ
+Tip from the Vidhi toolkit: write to the head of your local body (Commissioner, Sarpanch or President), citing para 198.3.6 of the Supreme Court order of 24 January 2023, and ask them to name a custodian. Attach a copy.	ವಿಧಿ ಟೂಲ್‌ಕಿಟ್‌ನ ಸಲಹೆ: ನಿಮ್ಮ ಸ್ಥಳೀಯ ಸಂಸ್ಥೆಯ ಮುಖ್ಯಸ್ಥರಿಗೆ (ಆಯುಕ್ತರು, ಸರಪಂಚ ಅಥವಾ ಅಧ್ಯಕ್ಷರು) ಪತ್ರ ಬರೆಯಿರಿ, 24 ಜನವರಿ 2023 ರ ಸುಪ್ರೀಂ ಕೋರ್ಟ್ ಆದೇಶದ ಪ್ಯಾರಾ 198.3.6 ಅನ್ನು ಉಲ್ಲೇಖಿಸಿ, ಮತ್ತು ಪಾಲಕರನ್ನು ಹೆಸರಿಸುವಂತೆ ಕೇಳಿ. ಒಂದು ಪ್ರತಿಯನ್ನು ಲಗತ್ತಿಸಿ.
+Version $version is printed. It is not valid until signed and attested.	ಆವೃತ್ತಿ $version ಪ್ರಿಂಟ್ ಆಗಿದೆ. ಸಹಿ ಮತ್ತು ದೃಢೀಕರಣ ಆಗುವವರೆಗೆ ಇದು ಮಾನ್ಯವಲ್ಲ.
+Print the PDF. Read it once more.	PDF ಪ್ರಿಂಟ್ ಮಾಡಿ. ಇನ್ನೊಮ್ಮೆ ಓದಿ.
+Sign (or give a thumb impression) in front of two adult witnesses. Better if they are not your representatives.	ಇಬ್ಬರು ವಯಸ್ಕ ಸಾಕ್ಷಿಗಳ ಮುಂದೆ ಸಹಿ ಮಾಡಿ (ಅಥವಾ ಹೆಬ್ಬೆರಳಿನ ಗುರುತು ಹಾಕಿ). ಅವರು ನಿಮ್ಮ ಪ್ರತಿನಿಧಿಗಳಲ್ಲದಿದ್ದರೆ ಉತ್ತಮ.
+Take it to a notary or a gazetted officer to attest and stamp.	ದೃಢೀಕರಣ ಮತ್ತು ಮುದ್ರೆಗಾಗಿ ಇದನ್ನು ನೋಟರಿ ಅಥವಾ ಗೆಜೆಟೆಡ್ ಅಧಿಕಾರಿಯ ಬಳಿ ತೆಗೆದುಕೊಂಡು ಹೋಗಿ.
+Take a clear photo or scan of every page and add it here.	ಪ್ರತಿ ಪುಟದ ಸ್ಪಷ್ಟ ಫೋಟೋ ಅಥವಾ ಸ್ಕ್ಯಾನ್ ತೆಗೆದು ಇಲ್ಲಿ ಸೇರಿಸಿ.
+Share the PDF again	PDF ಅನ್ನು ಮತ್ತೆ ಹಂಚಿಕೊಳ್ಳಿ
+Printed PDF SHA-256:	ಪ್ರಿಂಟ್ ಮಾಡಿದ PDF ನ SHA-256:
+Date signed	ಸಹಿ ಮಾಡಿದ ದಿನಾಂಕ
+Place	ಸ್ಥಳ
+Thumb impression instead of signature	ಸಹಿಯ ಬದಲು ಹೆಬ್ಬೆರಳಿನ ಗುರುತು
+Witness $n	ಸಾಕ್ಷಿ $n
+Mobile	ಮೊಬೈಲ್
+Attested by	ದೃಢೀಕರಿಸಿದವರು
+Registration no. or designation	ನೋಂದಣಿ ನಂಬರ್ ಅಥವಾ ಹುದ್ದೆ
+Photo or scan of the signed, attested paper	ಸಹಿ ಮಾಡಿದ, ದೃಢೀಕರಿಸಿದ ಕಾಗದದ ಫೋಟೋ ಅಥವಾ ಸ್ಕ್ಯಾನ್
+Added · change	ಸೇರಿಸಲಾಗಿದೆ · ಬದಲಾಯಿಸಿ
+Kept on this phone only. A SHA-256 fingerprint is recorded so a doctor can check the copy is the same.	ಈ ಫೋನ್‌ನಲ್ಲಿ ಮಾತ್ರ ಇರುತ್ತದೆ. ಪ್ರತಿ ಅದೇ ಎಂದು ಡಾಕ್ಟರ್ ಪರಿಶೀಲಿಸಲು SHA-256 ಫಿಂಗರ್‌ಪ್ರಿಂಟ್ ದಾಖಲಿಸಲಾಗುತ್ತದೆ.
+That file could not be read. Try another.	ಆ ಫೈಲ್ ಓದಲು ಆಗಲಿಲ್ಲ. ಇನ್ನೊಂದನ್ನು ಪ್ರಯತ್ನಿಸಿ.
+Record as signed and attested	ಸಹಿ ಮಾಡಿ ದೃಢೀಕರಿಸಿದ್ದು ಎಂದು ದಾಖಲಿಸಿ
+Need to change something? Start a new version. This printed copy must then not be signed.	ಏನಾದರೂ ಬದಲಾಯಿಸಬೇಕೇ? ಹೊಸ ಆವೃತ್ತಿ ಆರಂಭಿಸಿ. ಆಗ ಪ್ರಿಂಟ್ ಮಾಡಿದ ಈ ಪ್ರತಿಗೆ ಸಹಿ ಮಾಡಬಾರದು.
+Start a new version	ಹೊಸ ಆವೃತ್ತಿ ಆರಂಭಿಸಿ
+Signed living will · version $version	ಸಹಿ ಮಾಡಿದ ಲಿವಿಂಗ್ ವಿಲ್ · ಆವೃತ್ತಿ $version
+Check the paper copy against the scan and its SHA-256, or with the custodian. Doctors only read this here; nothing in the app starts or stops treatment.	ಕಾಗದದ ಪ್ರತಿಯನ್ನು ಸ್ಕ್ಯಾನ್ ಮತ್ತು ಅದರ SHA-256 ಜೊತೆ, ಅಥವಾ ಪಾಲಕರ ಜೊತೆ ತಾಳೆ ನೋಡಿ. ಡಾಕ್ಟರ್‌ಗಳು ಇದನ್ನು ಇಲ್ಲಿ ಓದುವುದು ಮಾತ್ರ; ಆ್ಯಪ್‌ನಲ್ಲಿ ಯಾವುದೂ ಚಿಕಿತ್ಸೆಯನ್ನು ಆರಂಭಿಸುವುದಿಲ್ಲ ಅಥವಾ ನಿಲ್ಲಿಸುವುದಿಲ್ಲ.
+This is the current living will. Doctors can see that it is signed, witnessed and attested.	ಇದು ಈಗಿನ ಲಿವಿಂಗ್ ವಿಲ್. ಇದು ಸಹಿ ಮಾಡಲ್ಪಟ್ಟಿದೆ, ಸಾಕ್ಷಿಗಳ ಮುಂದೆ ಆಗಿದೆ ಮತ್ತು ದೃಢೀಕರಿಸಲ್ಪಟ್ಟಿದೆ ಎಂದು ಡಾಕ್ಟರ್‌ಗಳು ನೋಡಬಹುದು.
+thumb impression	ಹೆಬ್ಬೆರಳಿನ ಗುರುತು
+Witnesses	ಸಾಕ್ಷಿಗಳು
+Acknowledged by $officer on $on	$officer ಅವರು $on ರಂದು ಸ್ವೀಕೃತಿ ನೀಡಿದ್ದಾರೆ
+Custodian pending	ಪಾಲಕರು ಬಾಕಿ
+Scan SHA-256	ಸ್ಕ್ಯಾನ್ SHA-256
+Printed PDF SHA-256	ಪ್ರಿಂಟ್ ಮಾಡಿದ PDF SHA-256
+View the signed scan	ಸಹಿ ಮಾಡಿದ ಸ್ಕ್ಯಾನ್ ನೋಡಿ
+This copy is missing or does not match its fingerprint. Do not rely on it; ask for the signed paper.	ಈ ಪ್ರತಿ ಕಾಣೆಯಾಗಿದೆ ಅಥವಾ ಅದರ ಫಿಂಗರ್‌ಪ್ರಿಂಟ್‌ಗೆ ಹೊಂದುವುದಿಲ್ಲ. ಇದನ್ನು ನಂಬಬೇಡಿ; ಸಹಿ ಮಾಡಿದ ಕಾಗದವನ್ನು ಕೇಳಿ.
+Does not want	ಬೇಡ
+Wants	ಬೇಕು
+Representatives, in order	ಪ್ರತಿನಿಧಿಗಳು, ಕ್ರಮದಲ್ಲಿ
+Copies	ಪ್ರತಿಗಳು
+Give a copy to each person below. Ask each one first: their consent to receive it is recorded separately.	ಕೆಳಗಿನ ಪ್ರತಿ ವ್ಯಕ್ತಿಗೂ ಒಂದು ಪ್ರತಿ ನೀಡಿ. ಮೊದಲು ಪ್ರತಿಯೊಬ್ಬರನ್ನು ಕೇಳಿ: ಪ್ರತಿ ಪಡೆಯಲು ಅವರ ಒಪ್ಪಿಗೆಯನ್ನು ಪ್ರತ್ಯೇಕವಾಗಿ ದಾಖಲಿಸಲಾಗುತ್ತದೆ.
+The patient agrees to send a copy to the custodian.	ಪಾಲಕರಿಗೆ ಪ್ರತಿ ಕಳುಹಿಸಲು ರೋಗಿ ಒಪ್ಪಿದ್ದಾರೆ.
+The patient agrees to share it, and this person agrees to receive and keep it.	ರೋಗಿ ಇದನ್ನು ಹಂಚಿಕೊಳ್ಳಲು ಒಪ್ಪಿದ್ದಾರೆ, ಮತ್ತು ಈ ವ್ಯಕ್ತಿ ಇದನ್ನು ಪಡೆದು ಇಟ್ಟುಕೊಳ್ಳಲು ಒಪ್ಪಿದ್ದಾರೆ.
+Copy given on $on	ಪ್ರತಿ $on ರಂದು ನೀಡಲಾಗಿದೆ
+Copy given	ಪ್ರತಿ ನೀಡಲಾಗಿದೆ
+Consent is needed before this copy can be marked as given.	ಈ ಪ್ರತಿಯನ್ನು ನೀಡಲಾಗಿದೆ ಎಂದು ಗುರುತಿಸುವ ಮೊದಲು ಒಪ್ಪಿಗೆ ಬೇಕು.
+Save custodian	ಪಾಲಕರನ್ನು ಉಳಿಸಿ
+Link to ABHA health records (optional)	ABHA ಆರೋಗ್ಯ ದಾಖಲೆಗಳಿಗೆ ಜೋಡಿಸಿ (ಐಚ್ಛಿಕ)
+The Supreme Court allows adding the living will to digital health records. Sahara only notes the ABHA address here; upload the scan in your ABHA app yourself.	ಲಿವಿಂಗ್ ವಿಲ್ ಅನ್ನು ಡಿಜಿಟಲ್ ಆರೋಗ್ಯ ದಾಖಲೆಗಳಿಗೆ ಸೇರಿಸಲು ಸುಪ್ರೀಂ ಕೋರ್ಟ್ ಅನುಮತಿ ನೀಡುತ್ತದೆ. ಸಹಾರಾ ಇಲ್ಲಿ ABHA ವಿಳಾಸವನ್ನು ಮಾತ್ರ ಗುರುತಿಸಿಕೊಳ್ಳುತ್ತದೆ; ಸ್ಕ್ಯಾನ್ ಅನ್ನು ನಿಮ್ಮ ABHA ಆ್ಯಪ್‌ನಲ್ಲಿ ನೀವೇ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ.
+ABHA address or number	ABHA ವಿಳಾಸ ಅಥವಾ ನಂಬರ್
+The patient agrees to link the living will with their ABHA records.	ಲಿವಿಂಗ್ ವಿಲ್ ಅನ್ನು ತಮ್ಮ ABHA ದಾಖಲೆಗಳಿಗೆ ಜೋಡಿಸಲು ರೋಗಿ ಒಪ್ಪಿದ್ದಾರೆ.
+Save ABHA link	ABHA ಲಿಂಕ್ ಉಳಿಸಿ
+Linked on $on	$on ರಂದು ಜೋಡಿಸಲಾಗಿದೆ
+Change it	ಇದನ್ನು ಬದಲಾಯಿಸಿ
+Changes make a new version that must be printed, signed and attested again. Version $version stays current until then.	ಬದಲಾವಣೆಗಳಿಂದ ಹೊಸ ಆವೃತ್ತಿ ಆಗುತ್ತದೆ, ಅದನ್ನು ಮತ್ತೆ ಪ್ರಿಂಟ್ ಮಾಡಿ, ಸಹಿ ಮಾಡಿ, ದೃಢೀಕರಿಸಬೇಕು. ಅಲ್ಲಿಯವರೆಗೆ ಆವೃತ್ತಿ $version ಈಗಿನದಾಗಿ ಉಳಿಯುತ್ತದೆ.
+A new version is already in progress below.	ಹೊಸ ಆವೃತ್ತಿ ಕೆಳಗೆ ಈಗಾಗಲೇ ನಡೆಯುತ್ತಿದೆ.
+Cancel it	ಇದನ್ನು ರದ್ದುಪಡಿಸಿ
+A living will is cancelled in writing: the person signs a short note saying they cancel it, the same way it was made. Then give the note to everyone who has a copy.	ಲಿವಿಂಗ್ ವಿಲ್ ಅನ್ನು ಲಿಖಿತವಾಗಿ ರದ್ದುಪಡಿಸಲಾಗುತ್ತದೆ: ಅದನ್ನು ಮಾಡಿದ ರೀತಿಯಲ್ಲೇ, ವ್ಯಕ್ತಿ ತಾನು ಇದನ್ನು ರದ್ದುಪಡಿಸುತ್ತಿದ್ದೇನೆ ಎಂದು ಹೇಳುವ ಚಿಕ್ಕ ಟಿಪ್ಪಣಿಗೆ ಸಹಿ ಮಾಡುತ್ತಾರೆ. ನಂತರ ಆ ಟಿಪ್ಪಣಿಯನ್ನು ಪ್ರತಿ ಹೊಂದಿರುವ ಎಲ್ಲರಿಗೂ ನೀಡಿ.
+Record a written cancellation	ಲಿಖಿತ ರದ್ದತಿಯನ್ನು ದಾಖಲಿಸಿ
+Date of the written cancellation	ಲಿಖಿತ ರದ್ದತಿಯ ದಿನಾಂಕ
+The person signed a written cancellation.	ವ್ಯಕ್ತಿ ಲಿಖಿತ ರದ್ದತಿಗೆ ಸಹಿ ಮಾಡಿದ್ದಾರೆ.
+Cancel the living will	ಲಿವಿಂಗ್ ವಿಲ್ ರದ್ದುಪಡಿಸಿ
+Sahara plans are for adults. This date of birth is under 18.	ಸಹಾರಾ ಯೋಜನೆಗಳು ವಯಸ್ಕರಿಗಾಗಿ. ಈ ಹುಟ್ಟಿದ ದಿನಾಂಕ 18 ವರ್ಷಕ್ಕಿಂತ ಕಡಿಮೆ.
+Started in the emergency department. A plan made for the first time in the resuscitation bay records panic, not preference; review it when the patient is stable.	ತುರ್ತು ವಿಭಾಗದಲ್ಲಿ ಆರಂಭವಾಯಿತು. ಪುನರುಜ್ಜೀವನ ಕೊಠಡಿಯಲ್ಲಿ ಮೊದಲ ಬಾರಿ ಮಾಡಿದ ಯೋಜನೆ ಭಯವನ್ನು ದಾಖಲಿಸುತ್ತದೆ, ಇಚ್ಛೆಯನ್ನಲ್ಲ; ರೋಗಿಯ ಸ್ಥಿತಿ ಸ್ಥಿರವಾದಾಗ ಇದನ್ನು ಮತ್ತೆ ಪರಿಶೀಲಿಸಿ.
+Keep only the last 4 characters of an ID, never the full number.	ಗುರುತಿನ ಚೀಟಿಯ ಕೊನೆಯ 4 ಅಕ್ಷರ ಅಥವಾ ಅಂಕೆಗಳನ್ನು ಮಾತ್ರ ಇಟ್ಟುಕೊಳ್ಳಿ, ಪೂರ್ಣ ನಂಬರ್ ಎಂದಿಗೂ ಬೇಡ.
+Record who assessed capacity, when, and the basis (understand, retain, weigh, communicate).	ನಿರ್ಧಾರ ತೆಗೆದುಕೊಳ್ಳುವ ಸಾಮರ್ಥ್ಯವನ್ನು ಯಾರು, ಯಾವಾಗ, ಯಾವ ಆಧಾರದ ಮೇಲೆ ಪರಿಶೀಲಿಸಿದರು ಎಂದು ದಾಖಲಿಸಿ (ಅರ್ಥಮಾಡಿಕೊಳ್ಳುವುದು, ನೆನಪಿಡುವುದು, ತೂಗಿ ನೋಡುವುದು, ತಿಳಿಸುವುದು).
+Capacity fluctuates: add a reassessment date.	ನಿರ್ಧಾರ ತೆಗೆದುಕೊಳ್ಳುವ ಸಾಮರ್ಥ್ಯ ಏರಿಳಿಯುತ್ತದೆ: ಮರುಪರಿಶೀಲನೆಯ ದಿನಾಂಕ ಸೇರಿಸಿ.
+The family asked that the patient not be told, and the patient has capacity. Record the plan for answering direct questions honestly.	ರೋಗಿಗೆ ತಿಳಿಸಬಾರದು ಎಂದು ಕುಟುಂಬ ಕೇಳಿದೆ, ಮತ್ತು ರೋಗಿಗೆ ನಿರ್ಧಾರ ತೆಗೆದುಕೊಳ್ಳುವ ಸಾಮರ್ಥ್ಯ ಇದೆ. ನೇರ ಪ್ರಶ್ನೆಗಳಿಗೆ ಪ್ರಾಮಾಣಿಕವಾಗಿ ಉತ್ತರಿಸುವ ಯೋಜನೆಯನ್ನು ದಾಖಲಿಸಿ.
+Treatment choices are locked until the illness has been explained as incurable and the family can repeat it back.	ಕಾಯಿಲೆ ಗುಣವಾಗದು ಎಂದು ವಿವರಿಸುವವರೆಗೆ ಮತ್ತು ಕುಟುಂಬ ಅದನ್ನು ಮರಳಿ ಹೇಳಲು ಸಾಧ್ಯವಾಗುವವರೆಗೆ ಚಿಕಿತ್ಸೆಯ ಆಯ್ಕೆಗಳನ್ನು ಲಾಕ್ ಮಾಡಲಾಗಿದೆ.
+A decision-maker answering for the patient must first confirm they will say what the patient would have chosen.	ರೋಗಿಯ ಪರವಾಗಿ ಉತ್ತರಿಸುವ ನಿರ್ಧಾರ ಕೈಗೊಳ್ಳುವವರು, ರೋಗಿಯೇ ಆರಿಸುತ್ತಿದ್ದುದನ್ನು ಮಾತ್ರ ಹೇಳುತ್ತೇನೆ ಎಂದು ಮೊದಲು ದೃಢೀಕರಿಸಬೇಕು.
+CPR cannot be given without intubation. With this goal or breathing ceiling, \"attempt CPR\" needs a recorded reason.	ಇಂಟ್ಯುಬೇಷನ್ ಇಲ್ಲದೆ CPR ನೀಡಲು ಸಾಧ್ಯವಿಲ್ಲ. ಈ ಗುರಿ ಅಥವಾ ಉಸಿರಾಟದ ಮಿತಿಯೊಂದಿಗೆ, \"CPR ಮಾಡಿ\" ಎನ್ನಲು ದಾಖಲಿತ ಕಾರಣ ಬೇಕು.
+Goal A (prioritise life) with a breathing ceiling below intubation or no ICU is unusual. Confirm this is intended.	ಗುರಿ A (ಜೀವಕ್ಕೆ ಆದ್ಯತೆ) ಜೊತೆಗೆ ಇಂಟ್ಯುಬೇಷನ್‌ಗಿಂತ ಕಡಿಮೆ ಉಸಿರಾಟದ ಮಿತಿ ಅಥವಾ ICU ಇಲ್ಲ ಎನ್ನುವುದು ಅಸಾಮಾನ್ಯ. ಇದೇ ಉದ್ದೇಶ ಎಂದು ದೃಢೀಕರಿಸಿ.
+Choose the reason for DNACPR.	DNACPR ಗೆ ಕಾರಣ ಆರಿಸಿ.
+Record who decided DNACPR: name, registration number, date and time.	DNACPR ಅನ್ನು ಯಾರು ನಿರ್ಧರಿಸಿದರು ಎಂದು ದಾಖಲಿಸಿ: ಹೆಸರು, ನೋಂದಣಿ ನಂಬರ್, ದಿನಾಂಕ ಮತ್ತು ಸಮಯ.
+Tick at least one reason for going to hospital.	ಆಸ್ಪತ್ರೆಗೆ ಹೋಗಲು ಕನಿಷ್ಠ ಒಂದು ಕಾರಣವನ್ನು ಟಿಕ್ ಮಾಡಿ.
+Hospital transfer is \"No\", but HFNC, NIV or ICU usually need admission. Record a reason (for example, home NIV).	ಆಸ್ಪತ್ರೆಗೆ ಕರೆದೊಯ್ಯುವುದು \"ಇಲ್ಲ\" ಎಂದಿದೆ, ಆದರೆ HFNC, NIV ಅಥವಾ ICU ಗೆ ಸಾಮಾನ್ಯವಾಗಿ ದಾಖಲಾತಿ ಬೇಕು. ಕಾರಣ ದಾಖಲಿಸಿ (ಉದಾಹರಣೆಗೆ, ಮನೆಯಲ್ಲಿ NIV).
+Goal C (comfort) with ICU, vasopressors or dialysis is a conflict. It can be saved only with a recorded reason.	ಗುರಿ C (ಆರಾಮ) ಜೊತೆಗೆ ICU, ವ್ಯಾಸೋಪ್ರೆಸರ್ ಅಥವಾ ಡಯಾಲಿಸಿಸ್ ಇದ್ದರೆ ಅದು ವಿರೋಧಾಭಾಸ. ದಾಖಲಿತ ಕಾರಣದೊಂದಿಗೆ ಮಾತ್ರ ಉಳಿಸಬಹುದು.
+Invasive ventilation and vasopressors need ICU or HDU, but ICU is \"No\". Record a reason.	ಆಕ್ರಮಣಕಾರಿ ವೆಂಟಿಲೇಷನ್ ಮತ್ತು ವ್ಯಾಸೋಪ್ರೆಸರ್‌ಗಳಿಗೆ ICU ಅಥವಾ HDU ಬೇಕು, ಆದರೆ ICU \"ಇಲ್ಲ\" ಎಂದಿದೆ. ಕಾರಣ ದಾಖಲಿಸಿ.
+$name trial: enter the duration, the review date and time, and who will review.	$name ಪ್ರಯೋಗ: ಅವಧಿ, ಪರಿಶೀಲನೆಯ ದಿನಾಂಕ ಮತ್ತು ಸಮಯ, ಹಾಗೂ ಯಾರು ಪರಿಶೀಲಿಸುತ್ತಾರೆ ಎಂದು ಬರೆಯಿರಿ.
+Enter the maximum number of vasopressor agents.	ವ್ಯಾಸೋಪ್ರೆಸರ್ ಔಷಧಿಗಳ ಗರಿಷ್ಠ ಸಂಖ್ಯೆ ಬರೆಯಿರಿ.
+Enter how many days of nasogastric feeding before review.	ಪರಿಶೀಲನೆಗೆ ಮುನ್ನ ಮೂಗಿನ ನಳಿಕೆಯ ಮೂಲಕ ಎಷ್ಟು ದಿನ ಆಹಾರ ನೀಡಬೇಕು ಎಂದು ಬರೆಯಿರಿ.
+The patient has an ICD. Record the deactivation decision and date, so a dying patient is not shocked.	ರೋಗಿಗೆ ICD ಇದೆ. ಅಂತಿಮ ಸಮಯದಲ್ಲಿ ಆಘಾತ ಆಗದಂತೆ, ಅದನ್ನು ಸ್ಥಗಿತಗೊಳಿಸುವ ನಿರ್ಧಾರ ಮತ್ತು ದಿನಾಂಕ ದಾಖಲಿಸಿ.
+Removing an existing feeding tube is withdrawal of treatment. It follows the medical board pathway and cannot be acted on from this plan alone.	ಈಗಾಗಲೇ ಹಾಕಿರುವ ಆಹಾರದ ನಳಿಕೆಯನ್ನು ತೆಗೆಯುವುದು ಚಿಕಿತ್ಸೆಯನ್ನು ಹಿಂತೆಗೆದುಕೊಳ್ಳುವುದು. ಇದು ವೈದ್ಯಕೀಯ ಮಂಡಳಿಯ ಪ್ರಕ್ರಿಯೆಯನ್ನು ಅನುಸರಿಸುತ್ತದೆ, ಮತ್ತು ಈ ಯೋಜನೆಯೊಂದರಿಂದಲೇ ಇದನ್ನು ಮಾಡಲು ಸಾಧ್ಯವಿಲ್ಲ.
+Treatment choices are filled but the values section is blank. Record what matters to the patient in their own words.	ಚಿಕಿತ್ಸೆಯ ಆಯ್ಕೆಗಳನ್ನು ತುಂಬಲಾಗಿದೆ ಆದರೆ ಮೌಲ್ಯಗಳ ವಿಭಾಗ ಖಾಲಿ ಇದೆ. ರೋಗಿಗೆ ಯಾವುದು ಮುಖ್ಯ ಎಂಬುದನ್ನು ಅವರ ಸ್ವಂತ ಮಾತುಗಳಲ್ಲಿ ದಾಖಲಿಸಿ.
+Set a review date that is not in the past.	ಹಿಂದಿನದಲ್ಲದ ಪರಿಶೀಲನೆಯ ದಿನಾಂಕವನ್ನು ಹೊಂದಿಸಿ.
+The plan becomes active only when the treating consultant signs with their registration number.	ಚಿಕಿತ್ಸೆ ನೀಡುವ ಕನ್ಸಲ್ಟೆಂಟ್ ತಮ್ಮ ನೋಂದಣಿ ನಂಬರ್‌ನೊಂದಿಗೆ ಸಹಿ ಮಾಡಿದಾಗ ಮಾತ್ರ ಯೋಜನೆ ಜಾರಿಗೆ ಬರುತ್ತದೆ.
+Every printed page shows the name and hospital number (UHID). Enter both.	ಪ್ರಿಂಟ್ ಆದ ಪ್ರತಿ ಪುಟದಲ್ಲೂ ಹೆಸರು ಮತ್ತು ಆಸ್ಪತ್ರೆ ನಂಬರ್ (UHID) ಇರುತ್ತದೆ. ಎರಡನ್ನೂ ಬರೆಯಿರಿ.
+A thumb impression or limited literacy needs two witnesses.	ಹೆಬ್ಬೆರಳಿನ ಗುರುತು ಅಥವಾ ಸೀಮಿತ ಅಕ್ಷರಜ್ಞಾನ ಇದ್ದರೆ ಇಬ್ಬರು ಸಾಕ್ಷಿಗಳು ಬೇಕು.
+IF IN DOUBT, RESUSCITATE	ಸಂದೇಹ ಇದ್ದರೆ, ಪುನರುಜ್ಜೀವನ ಮಾಡಿ
+Give full standard emergency care when:	ಇವುಗಳಲ್ಲಿ ಯಾವುದಾದರೂ ಇದ್ದಾಗ ಪೂರ್ಣ ಸಾಮಾನ್ಯ ತುರ್ತು ಚಿಕಿತ್ಸೆ ನೀಡಿ:
+the record is unsigned, out of date or cannot be found;	ದಾಖಲೆಗೆ ಸಹಿ ಇಲ್ಲ, ಅದು ಹಳೆಯದಾಗಿದೆ ಅಥವಾ ಸಿಗುತ್ತಿಲ್ಲ;
+the problem is new, reversible and unrelated to the illness — injury, choking, drug reaction, low sugar;	ಸಮಸ್ಯೆ ಹೊಸದು, ಗುಣವಾಗಬಹುದಾದದ್ದು ಮತ್ತು ಕಾಯಿಲೆಗೆ ಸಂಬಂಧವಿಲ್ಲದ್ದು — ಗಾಯ, ಗಂಟಲಲ್ಲಿ ಸಿಕ್ಕಿಕೊಳ್ಳುವುದು, ಔಷಧಿಯ ಪ್ರತಿಕ್ರಿಯೆ, ಸಕ್ಕರೆ ಕಡಿಮೆಯಾಗುವುದು;
+the patient has capacity and says something different now;	ರೋಗಿಗೆ ನಿರ್ಧಾರ ತೆಗೆದುಕೊಳ್ಳುವ ಸಾಮರ್ಥ್ಯ ಇದೆ ಮತ್ತು ಈಗ ಬೇರೆ ಏನೋ ಹೇಳುತ್ತಿದ್ದಾರೆ;
+the record is ambiguous.	ದಾಖಲೆ ಸ್ಪಷ್ಟವಿಲ್ಲ.
+Clarify with the treating team afterwards.	ನಂತರ ಚಿಕಿತ್ಸೆ ನೀಡುವ ತಂಡದೊಂದಿಗೆ ಸ್ಪಷ್ಟಪಡಿಸಿಕೊಳ್ಳಿ.
+Care that always continues	ಯಾವಾಗಲೂ ಮುಂದುವರಿಯುವ ಆರೈಕೆ
+Mouth care and lip care, to keep the mouth moist and clean.	ಬಾಯಿ ಮತ್ತು ತುಟಿಗಳ ಆರೈಕೆ, ಬಾಯಿ ತೇವ ಮತ್ತು ಶುಚಿಯಾಗಿರಲು.
+Food and drink by mouth, given by hand for comfort, as much as the person wants and can safely swallow.	ಆರಾಮಕ್ಕಾಗಿ ಬಾಯಿಯ ಮೂಲಕ ಆಹಾರ ಮತ್ತು ಪಾನೀಯ, ಕೈಯಿಂದ ನೀಡಲಾಗುತ್ತದೆ, ವ್ಯಕ್ತಿ ಬಯಸಿದಷ್ಟು ಮತ್ತು ಸುರಕ್ಷಿತವಾಗಿ ನುಂಗಬಲ್ಲಷ್ಟು.
+Relief of pain, breathlessness and other distressing symptoms, at any time of day or night.	ನೋವು, ಉಸಿರುಗಟ್ಟುವಿಕೆ ಮತ್ತು ಇತರ ತೊಂದರೆ ಕೊಡುವ ಲಕ್ಷಣಗಳಿಂದ ಉಪಶಮನ, ಹಗಲು ಅಥವಾ ರಾತ್ರಿ ಯಾವ ಸಮಯದಲ್ಲಾದರೂ.
+Washing, hygiene, skin care and pressure-area care.	ಸ್ನಾನ, ಶುಚಿತ್ವ, ಚರ್ಮದ ಆರೈಕೆ ಮತ್ತು ಒತ್ತಡ ಬೀಳುವ ಜಾಗಗಳ ಆರೈಕೆ.
+Turning and positioning for comfort.	ಆರಾಮಕ್ಕಾಗಿ ಮಗ್ಗುಲು ಬದಲಿಸುವುದು ಮತ್ತು ಸರಿಯಾದ ಸ್ಥಿತಿಯಲ್ಲಿ ಇಡುವುದು.
+Family and loved ones may stay with the person.	ಕುಟುಂಬ ಮತ್ತು ಪ್ರೀತಿಪಾತ್ರರು ವ್ಯಕ್ತಿಯ ಜೊತೆ ಇರಬಹುದು.
+Spiritual, emotional and psychological support for the person and family.	ವ್ಯಕ್ತಿ ಮತ್ತು ಕುಟುಂಬಕ್ಕೆ ಆಧ್ಯಾತ್ಮಿಕ, ಭಾವನಾತ್ಮಕ ಮತ್ತು ಮಾನಸಿಕ ಬೆಂಬಲ.
+Dignity, privacy and kindness in all care.	ಎಲ್ಲ ಆರೈಕೆಯಲ್ಲೂ ಗೌರವ, ಖಾಸಗಿತನ ಮತ್ತು ದಯೆ.
+A limit on treatment never means no care.	ಚಿಕಿತ್ಸೆಯ ಮೇಲಿನ ಮಿತಿ ಎಂದರೆ ಎಂದಿಗೂ ಆರೈಕೆ ಇಲ್ಲ ಎಂದಲ್ಲ.
+No preference recorded — standard care	ಯಾವುದೇ ಆಯ್ಕೆ ದಾಖಲಾಗಿಲ್ಲ — ಸಾಮಾನ್ಯ ಚಿಕಿತ್ಸೆ ನೀಡಲಾಗುತ್ತದೆ
+A · Prioritise life	A · ಜೀವಕ್ಕೆ ಆದ್ಯತೆ
+B · Balanced, within limits	B · ಸಮತೋಲನ, ಮಿತಿಯೊಳಗೆ
+C · Prioritise comfort	C · ಆರಾಮಕ್ಕೆ ಆದ್ಯತೆ
+All medically effective treatment, including ICU and a breathing machine.	ICU ಮತ್ತು ಉಸಿರಾಟದ ಯಂತ್ರ ಸೇರಿದಂತೆ ವೈದ್ಯಕೀಯವಾಗಿ ಪರಿಣಾಮಕಾರಿಯಾದ ಎಲ್ಲಾ ಚಿಕಿತ್ಸೆ.
+Treat problems that can be reversed, within the limits below, as time-limited trials.	ಗುಣವಾಗಬಹುದಾದ ಸಮಸ್ಯೆಗಳಿಗೆ, ಕೆಳಗಿನ ಮಿತಿಗಳೊಳಗೆ, ನಿಗದಿತ ಅವಧಿಯ ಪ್ರಯೋಗಗಳಂತೆ ಚಿಕಿತ್ಸೆ ನೀಡಿ.
+Comfort is the goal. Go to hospital only if comfort cannot be achieved where the patient is.	ಆರಾಮವೇ ಗುರಿ. ರೋಗಿ ಇರುವ ಜಾಗದಲ್ಲಿ ಆರಾಮ ಸಿಗದಿದ್ದರೆ ಮಾತ್ರ ಆಸ್ಪತ್ರೆಗೆ ಹೋಗಿ.
+Attempt CPR	CPR ಮಾಡಿ
+Do not attempt CPR (DNACPR)	CPR ಮಾಡಬೇಡಿ (DNACPR)
+If the heart and breathing stop, try to restart them. Applies only to cardiac arrest.	ಹೃದಯ ಮತ್ತು ಉಸಿರು ನಿಂತರೆ, ಅವನ್ನು ಮತ್ತೆ ಆರಂಭಿಸಲು ಪ್ರಯತ್ನಿಸಿ. ಹೃದಯ ಸ್ತಂಭನಕ್ಕೆ ಮಾತ್ರ ಅನ್ವಯಿಸುತ್ತದೆ.
+If the heart stops, allow a natural death. It says nothing about any other treatment.	ಹೃದಯ ನಿಂತರೆ, ಸ್ವಾಭಾವಿಕ ಮರಣಕ್ಕೆ ಅವಕಾಶ ನೀಡಿ. ಇತರ ಯಾವುದೇ ಚಿಕಿತ್ಸೆಯ ಬಗ್ಗೆ ಇದು ಏನನ್ನೂ ಹೇಳುವುದಿಲ್ಲ.
+CPR would not work (clinical futility)	CPR ಫಲಿಸುವುದಿಲ್ಲ (ವೈದ್ಯಕೀಯವಾಗಿ ನಿರರ್ಥಕ)
+The patient does not want CPR	ರೋಗಿ CPR ಬಯಸುವುದಿಲ್ಲ
+The burden outweighs the benefit	ಲಾಭಕ್ಕಿಂತ ಹೊರೆ ಹೆಚ್ಚು
+Yes, for any serious worsening	ಹೌದು, ಯಾವುದೇ ಗಂಭೀರ ಹದಗೆಡುವಿಕೆಗೆ
+Only for the reasons ticked	ಟಿಕ್ ಮಾಡಿದ ಕಾರಣಗಳಿಗೆ ಮಾತ್ರ
+No — care where they are	ಇಲ್ಲ — ಇರುವ ಜಾಗದಲ್ಲೇ ಆರೈಕೆ
+Take to hospital for any significant deterioration.	ಯಾವುದೇ ಗಮನಾರ್ಹ ಹದಗೆಡುವಿಕೆಗೆ ಆಸ್ಪತ್ರೆಗೆ ಕರೆದೊಯ್ಯಿರಿ.
+Go to hospital only for the problems ticked below.	ಕೆಳಗೆ ಟಿಕ್ ಮಾಡಿದ ಸಮಸ್ಯೆಗಳಿಗೆ ಮಾತ್ರ ಆಸ್ಪತ್ರೆಗೆ ಹೋಗಿ.
+Care continues at home or where they are. Call the numbers listed before an ambulance.	ಆರೈಕೆ ಮನೆಯಲ್ಲಿ ಅಥವಾ ಇರುವ ಜಾಗದಲ್ಲೇ ಮುಂದುವರಿಯುತ್ತದೆ. ಆಂಬುಲೆನ್ಸ್‌ಗೆ ಮೊದಲು ಪಟ್ಟಿ ಮಾಡಿದ ನಂಬರ್‌ಗಳಿಗೆ ಫೋನ್ ಮಾಡಿ.
+Uncontrolled pain	ನಿಯಂತ್ರಣಕ್ಕೆ ಬಾರದ ನೋವು
+Uncontrolled breathlessness	ನಿಯಂತ್ರಣಕ್ಕೆ ಬಾರದ ಉಸಿರಾಟದ ತೊಂದರೆ
+Significant bleeding	ಗಮನಾರ್ಹ ರಕ್ತಸ್ರಾವ
+Seizures	ಫಿಟ್ಸ್
+Fall with suspected fracture	ಬಿದ್ದು ಮೂಳೆ ಮುರಿದಿರುವ ಶಂಕೆ
+Blocked or displaced catheter, tube or stent	ಕ್ಯಾಥೆಟರ್, ನಳಿಕೆ ಅಥವಾ ಸ್ಟೆಂಟ್ ಕಟ್ಟಿಕೊಳ್ಳುವುದು ಅಥವಾ ಜಾರುವುದು
+Suspected infection needing IV treatment	ರಕ್ತನಾಳದ ಮೂಲಕ ಚಿಕಿತ್ಸೆ ಬೇಕಾಗುವ ಸೋಂಕಿನ ಶಂಕೆ
+Acute confusion or agitation not settling	ಇದ್ದಕ್ಕಿದ್ದಂತೆ ಗೊಂದಲ ಅಥವಾ ಚಡಪಡಿಕೆ, ಶಾಂತವಾಗುತ್ತಿಲ್ಲ
+Caregiver unable to cope (respite)	ಆರೈಕೆ ಮಾಡುವವರಿಗೆ ನಿಭಾಯಿಸಲಾಗುತ್ತಿಲ್ಲ (ವಿಶ್ರಾಂತಿಗಾಗಿ)
+0 · Comfort measures only	0 · ಆರಾಮದ ಕ್ರಮಗಳು ಮಾತ್ರ
+1 · Nasal prongs or simple mask	1 · ಮೂಗಿನ ಪ್ರಾಂಗ್ಸ್ ಅಥವಾ ಸಾಮಾನ್ಯ ಮಾಸ್ಕ್
+2 · Non-rebreather or venturi mask	2 · ನಾನ್-ರೀಬ್ರೀದರ್ ಅಥವಾ ವೆಂಚುರಿ ಮಾಸ್ಕ್
+3 · High-flow nasal oxygen (HFNC)	3 · ಹೈ-ಫ್ಲೋ ಮೂಗಿನ ಆಕ್ಸಿಜನ್ (HFNC)
+4 · Mask ventilation (NIV: CPAP/BiPAP)	4 · ಮಾಸ್ಕ್ ವೆಂಟಿಲೇಷನ್ (NIV: CPAP/BiPAP)
+5 · Intubation and a breathing machine	5 · ಇಂಟ್ಯುಬೇಷನ್ ಮತ್ತು ಉಸಿರಾಟದ ಯಂತ್ರ
+Morphine-type medicine, anxiety relief, a fan, positioning, suction; oxygen only if it relieves.	ಮಾರ್ಫಿನ್ ಮಾದರಿಯ ಔಷಧಿ, ಆತಂಕ ಶಮನ, ಫ್ಯಾನ್, ಸರಿಯಾದ ಸ್ಥಿತಿಯಲ್ಲಿ ಇಡುವುದು, ಕಫ ತೆಗೆಯುವುದು; ಆಕ್ಸಿಜನ್ ಆರಾಮ ನೀಡಿದರೆ ಮಾತ್ರ.
+The highest level: everything below is also allowed.	ಅತ್ಯುನ್ನತ ಮಟ್ಟ: ಇದರ ಕೆಳಗಿನ ಎಲ್ಲವೂ ಸಹ ಅನುಮತಿಸಲಾಗಿದೆ.
+The highest level allowed. Every lower level stays available; nothing higher starts without a new discussion.	ಅನುಮತಿಸಿದ ಅತ್ಯುನ್ನತ ಮಟ್ಟ. ಕೆಳಗಿನ ಎಲ್ಲಾ ಮಟ್ಟಗಳು ಲಭ್ಯವಾಗಿರುತ್ತವೆ; ಹೊಸ ಚರ್ಚೆ ಇಲ್ಲದೆ ಇದಕ್ಕಿಂತ ಮೇಲಿನದು ಏನೂ ಆರಂಭವಾಗುವುದಿಲ್ಲ.
+Yes, ICU if needed	ಹೌದು, ಅಗತ್ಯವಿದ್ದರೆ ICU
+Time-limited ICU trial	ನಿಗದಿತ ಅವಧಿಯ ICU ಪ್ರಯೋಗ
+No ICU — ward or comfort care	ICU ಬೇಡ — ವಾರ್ಡ್ ಅಥವಾ ಆರಾಮದ ಆರೈಕೆ
+No blood-pressure support drugs	ರಕ್ತದೊತ್ತಡ ಹೆಚ್ಚಿಸುವ ಔಷಧಿ ಬೇಡ
+Time-limited trial	ನಿಗದಿತ ಅವಧಿಯ ಪ್ರಯೋಗ
+Yes, no limit	ಹೌದು, ಮಿತಿ ಇಲ್ಲ
+Yes, up to a number of drugs	ಹೌದು, ನಿಗದಿತ ಸಂಖ್ಯೆಯ ಔಷಧಿಗಳವರೆಗೆ
+No dialysis	ಡಯಾಲಿಸಿಸ್ ಬೇಡ
+Yes, dialysis	ಹೌದು, ಡಯಾಲಿಸಿಸ್
+Only if kidney failure can be reversed	ಕಿಡ್ನಿ ವೈಫಲ್ಯ ಗುಣವಾಗಬಹುದಾದರೆ ಮಾತ್ರ
+No nose tube (NG)	ಮೂಗಿನ ನಳಿಕೆ (NG) ಬೇಡ
+NG for a set number of days, then review	ನಿಗದಿತ ದಿನಗಳ ಕಾಲ NG, ನಂತರ ಪರಿಶೀಲನೆ
+Yes, NG feeding	ಹೌದು, NG ಮೂಲಕ ಆಹಾರ
+No stomach tube (PEG)	ಹೊಟ್ಟೆಯ ನಳಿಕೆ (PEG) ಬೇಡ
+PEG only after a palliative-care discussion	ಪ್ಯಾಲಿಯೇಟಿವ್ ಕೇರ್ ಜೊತೆ ಚರ್ಚಿಸಿದ ನಂತರವೇ PEG
+Yes, PEG	ಹೌದು, PEG
+Sips by mouth only	ಬಾಯಿಯ ಮೂಲಕ ಕೆಲವು ಗುಟುಕುಗಳು ಮಾತ್ರ
+Limited drip fluids	ಸೀಮಿತ ಡ್ರಿಪ್ ದ್ರವಗಳು
+Full maintenance fluids	ಪೂರ್ಣ ನಿರ್ವಹಣಾ ದ್ರವಗಳು
+Mouth care and sips for comfort; no drip.	ಆರಾಮಕ್ಕಾಗಿ ಬಾಯಿಯ ಆರೈಕೆ ಮತ್ತು ಗುಟುಕುಗಳು; ಡ್ರಿಪ್ ಇಲ್ಲ.
+Up to 500–1000 mL saline a day, by vein or under the skin, matched to urine, reviewed daily. Reduce or stop if swelling, wet breathing or worse breathlessness.	ದಿನಕ್ಕೆ 500–1000 mL ವರೆಗೆ ಸಲೈನ್, ರಕ್ತನಾಳದ ಮೂಲಕ ಅಥವಾ ಚರ್ಮದ ಕೆಳಗೆ, ಮೂತ್ರಕ್ಕೆ ಹೊಂದಿಸಿ, ಪ್ರತಿದಿನ ಪರಿಶೀಲಿಸಿ. ಊತ, ಒದ್ದೆ ಉಸಿರಾಟ ಅಥವಾ ಹೆಚ್ಚಿದ ಉಸಿರಾಟದ ತೊಂದರೆ ಇದ್ದರೆ ಕಡಿಮೆ ಮಾಡಿ ಅಥವಾ ನಿಲ್ಲಿಸಿ.
+Full daily fluid needs by drip.	ದಿನದ ಪೂರ್ಣ ದ್ರವದ ಅಗತ್ಯವನ್ನು ಡ್ರಿಪ್ ಮೂಲಕ.
+Full pre-hospital resuscitation and transport	ಆಸ್ಪತ್ರೆಗೆ ಮುನ್ನ ಪೂರ್ಣ ಪುನರುಜ್ಜೀವನ ಮತ್ತು ಸಾಗಣೆ
+Transport with symptom relief only (no CPR, no intubation)	ಲಕ್ಷಣ ಉಪಶಮನದೊಂದಿಗೆ ಮಾತ್ರ ಸಾಗಣೆ (CPR ಇಲ್ಲ, ಇಂಟ್ಯುಬೇಷನ್ ಇಲ್ಲ)
+Take home for the last days, with a nurse	ಕೊನೆಯ ದಿನಗಳಿಗಾಗಿ ನರ್ಸ್ ಜೊತೆ ಮನೆಗೆ ಕರೆದೊಯ್ಯುವುದು
+Has capacity	ನಿರ್ಧಾರ ತೆಗೆದುಕೊಳ್ಳುವ ಸಾಮರ್ಥ್ಯ ಇದೆ
+Has capacity, has asked family to decide	ನಿರ್ಧಾರ ತೆಗೆದುಕೊಳ್ಳುವ ಸಾಮರ್ಥ್ಯ ಇದೆ, ಕುಟುಂಬ ನಿರ್ಧರಿಸಲಿ ಎಂದು ಕೇಳಿದ್ದಾರೆ
+Capacity fluctuates — reassess	ನಿರ್ಧಾರ ತೆಗೆದುಕೊಳ್ಳುವ ಸಾಮರ್ಥ್ಯ ಏರಿಳಿಯುತ್ತದೆ — ಮರುಪರಿಶೀಲಿಸಿ
+Lacks capacity	ನಿರ್ಧಾರ ತೆಗೆದುಕೊಳ್ಳುವ ಸಾಮರ್ಥ್ಯ ಇಲ್ಲ
+Named in a signed living will	ಸಹಿ ಮಾಡಿದ ಲಿವಿಂಗ್ ವಿಲ್‌ನಲ್ಲಿ ಹೆಸರಿಸಲಾಗಿದೆ
+Named by the patient (no living will)	ರೋಗಿ ಹೆಸರಿಸಿದ್ದಾರೆ (ಲಿವಿಂಗ್ ವಿಲ್ ಇಲ್ಲ)
+Next of kin / next friend / guardian	ಹತ್ತಿರದ ಸಂಬಂಧಿ / ಹತ್ತಿರದ ಸ್ನೇಹಿತ / ಪಾಲಕ
+Court-appointed guardian	ನ್ಯಾಯಾಲಯ ನೇಮಿಸಿದ ಪಾಲಕ
+Aadhaar	ಆಧಾರ್
+Voter ID	ವೋಟರ್ ಐಡಿ
+PAN	ಪ್ಯಾನ್
+Passport	ಪಾಸ್‌ಪೋರ್ಟ್
+Driving licence	ಡ್ರೈವಿಂಗ್ ಲೈಸೆನ್ಸ್
+Ration card	ರೇಷನ್ ಕಾರ್ಡ್
+Pacemaker	ಪೇಸ್‌ಮೇಕರ್
+ICD (shock device)	ICD (ಆಘಾತ ನೀಡುವ ಸಾಧನ)
+CRT-D (shock device)	CRT-D (ಆಘಾತ ನೀಡುವ ಸಾಧನ)
+Other device	ಇತರ ಸಾಧನ
+Draft — not signed	ಕರಡು — ಸಹಿ ಆಗಿಲ್ಲ
+Active	ಜಾರಿಯಲ್ಲಿದೆ
+Withdrawn	ಹಿಂಪಡೆಯಲಾಗಿದೆ
+hours	ಗಂಟೆಗಳು
+days	ದಿನಗಳು
+sessions	ಅವಧಿಗಳು
+review $at by $who	ಪರಿಶೀಲನೆ $at, $who
+New admission	ಹೊಸ ದಾಖಲಾತಿ
+Moved between home, hospital or hospice	ಮನೆ, ಆಸ್ಪತ್ರೆ ಅಥವಾ ಹಾಸ್ಪಿಸ್ ನಡುವೆ ಸ್ಥಳಾಂತರ
+Significant change in condition (either way)	ಸ್ಥಿತಿಯಲ್ಲಿ ಗಮನಾರ್ಹ ಬದಲಾವಣೆ (ಯಾವ ಕಡೆಗಾದರೂ)
+Patient or family asked for a review	ರೋಗಿ ಅಥವಾ ಕುಟುಂಬ ಪರಿಶೀಲನೆ ಕೇಳಿದರು
+A new line of treatment started	ಹೊಸ ಚಿಕಿತ್ಸಾ ಕ್ರಮ ಆರಂಭವಾಯಿತು
+Routine review date reached	ನಿಯಮಿತ ಪರಿಶೀಲನೆಯ ದಿನಾಂಕ ಬಂದಿದೆ
+NO PLAN FOUND — standard care applies	ಯಾವ ಯೋಜನೆಯೂ ಸಿಕ್ಕಿಲ್ಲ — ಸಾಮಾನ್ಯ ಚಿಕಿತ್ಸೆ ಅನ್ವಯಿಸುತ್ತದೆ
+CARD WITHDRAWN — this plan is no longer valid. Standard care applies.	ಕಾರ್ಡ್ ಹಿಂಪಡೆಯಲಾಗಿದೆ — ಈ ಯೋಜನೆ ಇನ್ನು ಮಾನ್ಯವಲ್ಲ. ಸಾಮಾನ್ಯ ಚಿಕಿತ್ಸೆ ಅನ್ವಯಿಸುತ್ತದೆ.
+UNSIGNED — a conversation note, not a plan. Standard care applies.	ಸಹಿ ಇಲ್ಲ — ಇದು ಮಾತುಕತೆಯ ಟಿಪ್ಪಣಿ, ಯೋಜನೆಯಲ್ಲ. ಸಾಮಾನ್ಯ ಚಿಕಿತ್ಸೆ ಅನ್ವಯಿಸುತ್ತದೆ.
+OUT OF DATE (review was due ${r.reviewDue}) — standard care applies. The content below is information, not instruction.	ಅವಧಿ ಮೀರಿದೆ (ಪರಿಶೀಲನೆ ${r.reviewDue} ರಂದು ಆಗಬೇಕಿತ್ತು) — ಸಾಮಾನ್ಯ ಚಿಕಿತ್ಸೆ ಅನ್ವಯಿಸುತ್ತದೆ. ಕೆಳಗಿನ ವಿಷಯ ಮಾಹಿತಿ ಮಾತ್ರ, ಸೂಚನೆಯಲ್ಲ.
+ACTIVE PLAN — signed ${r.consultantSignature!!.signedAt.take(10)}, review due ${r.reviewDue}	ಜಾರಿಯಲ್ಲಿರುವ ಯೋಜನೆ — ಸಹಿ ${r.consultantSignature!!.signedAt.take(10)}, ಪರಿಶೀಲನೆ ${r.reviewDue}
+CARD WITHDRAWN — this card is no longer valid. Standard care applies.	ಕಾರ್ಡ್ ಹಿಂಪಡೆಯಲಾಗಿದೆ — ಈ ಕಾರ್ಡ್ ಇನ್ನು ಮಾನ್ಯವಲ್ಲ. ಸಾಮಾನ್ಯ ಚಿಕಿತ್ಸೆ ಅನ್ವಯಿಸುತ್ತದೆ.
+decided by ${it.name} (reg. ${it.registrationNo}) ${it.decidedAt}	${it.name} (ನೋಂ. ${it.registrationNo}) ಅವರು ${it.decidedAt} ರಂದು ನಿರ್ಧರಿಸಿದರು
+reason: $it	ಕಾರಣ: $it
+all lower levels allowed	ಕೆಳಗಿನ ಎಲ್ಲಾ ಮಟ್ಟಗಳಿಗೆ ಅನುಮತಿ
+max O₂ $it L/min	ಗರಿಷ್ಠ O₂ $it L/min
+SpO₂ floor $it%	SpO₂ ಕನಿಷ್ಠ $it%
+NIV up to $it h	NIV $it ಗಂಟೆಯವರೆಗೆ
+treat a reversible cause fully	ಗುಣವಾಗಬಹುದಾದ ಕಾರಣಕ್ಕೆ ಪೂರ್ಣ ಚಿಕಿತ್ಸೆ
+NIV trial	NIV ಪ್ರಯೋಗ
+Vasopressors	ವ್ಯಾಸೋಪ್ರೆಸರ್‌ಗಳು
+Dialysis	ಡಯಾಲಿಸಿಸ್
+Fluids	ದ್ರವಗಳು
+ ($d days)	 ($d ದಿನ)
+Consultant: ${it.name} (reg. ${it.registrationNo})	ಕನ್ಸಲ್ಟೆಂಟ್: ${it.name} (ನೋಂ. ${it.registrationNo})
+Oncologist: $it	ಆಂಕಾಲಜಿಸ್ಟ್: $it
+reassess by ${r.capacity.reassessOn}	${r.capacity.reassessOn} ರೊಳಗೆ ಮರುಪರಿಶೀಲಿಸಿ
+v$number · $form · signed $signedDay · review due $dueDay	v$number · $form · ಸಹಿ $signedDay · ಪರಿಶೀಲನೆ $dueDay
+Review requested	ಪರಿಶೀಲನೆ ಕೇಳಲಾಗಿದೆ
+Hospital transfer	ಆಸ್ಪತ್ರೆಗೆ ಕರೆದೊಯ್ಯುವುದು
+Breathing support ceiling	ಉಸಿರಾಟದ ಬೆಂಬಲದ ಮಿತಿ
+Goal of care	ಆರೈಕೆಯ ಗುರಿ
+Allergies	ಅಲರ್ಜಿಗಳು
+Implanted device	ದೇಹದಲ್ಲಿ ಅಳವಡಿಸಿದ ಸಾಧನ
+Decision-maker (24 h phone)	ನಿರ್ಧಾರ ಕೈಗೊಳ್ಳುವವರು (24 ಗಂಟೆ ಫೋನ್)
+Treating consultant and palliative contact	ಚಿಕಿತ್ಸೆ ನೀಡುವ ಕನ್ಸಲ್ಟೆಂಟ್ ಮತ್ತು ಪ್ಯಾಲಿಯೇಟಿವ್ ಸಂಪರ್ಕ
+Capacity	ನಿರ್ಧಾರ ತೆಗೆದುಕೊಳ್ಳುವ ಸಾಮರ್ಥ್ಯ
+Living will (AMD)	ಲಿವಿಂಗ್ ವಿಲ್ (AMD)
+Version, signed, review due	ಆವೃತ್ತಿ, ಸಹಿ, ಪರಿಶೀಲನೆ ಬಾಕಿ
+If unclear, or the problem is new and reversible — treat fully and call.	ಸ್ಪಷ್ಟವಿಲ್ಲದಿದ್ದರೆ, ಅಥವಾ ಸಮಸ್ಯೆ ಹೊಸದು ಮತ್ತು ಗುಣವಾಗಬಹುದಾದದ್ದಾದರೆ — ಪೂರ್ಣ ಚಿಕಿತ್ಸೆ ನೀಡಿ ಮತ್ತು ಫೋನ್ ಮಾಡಿ.
+Full record	ಪೂರ್ಣ ದಾಖಲೆ
+Family's Sahara app; signed copy with the family	ಕುಟುಂಬದ ಫೋನ್‌ನಲ್ಲಿ ಸಹಾರಾ ಆ್ಯಪ್; ಸಹಿ ಮಾಡಿದ ಪ್ರತಿ ಕುಟುಂಬದ ಬಳಿ
+Signed by	ಸಹಿ ಮಾಡಿದವರು
+Sahara emergency care plan (ECTPR) — ED Quick View	ಸಹಾರಾ ತುರ್ತು ಆರೈಕೆ ಯೋಜನೆ (ECTPR) — ED ಕ್ವಿಕ್ ವ್ಯೂ
+No plan content is shown: give full standard emergency care.	ಯಾವುದೇ ಯೋಜನೆಯ ವಿಷಯ ತೋರಿಸಲಾಗುವುದಿಲ್ಲ: ಪೂರ್ಣ ಸಾಮಾನ್ಯ ತುರ್ತು ಚಿಕಿತ್ಸೆ ನೀಡಿ.
+Key medicines	ಮುಖ್ಯ ಔಷಧಿಗಳು
+Alternate decision-maker	ಪರ್ಯಾಯ ನಿರ್ಧಾರ ಕೈಗೊಳ್ಳುವವರು
+Family to inform	ತಿಳಿಸಬೇಕಾದ ಕುಟುಂಬದವರು
+What matters, in the patient's words	ಯಾವುದು ಮುಖ್ಯ, ರೋಗಿಯ ಮಾತುಗಳಲ್ಲಿ
+Not acceptable to the patient	ರೋಗಿಗೆ ಒಪ್ಪಿಗೆಯಲ್ಲದ್ದು
+Understanding confirmed	ಅರ್ಥಮಾಡಿಕೊಂಡಿರುವುದು ದೃಢಪಟ್ಟಿದೆ
+Signatures	ಸಹಿಗಳು
+Wallet card — cut out and keep with the patient	ವಾಲೆಟ್ ಕಾರ್ಡ್ — ಕತ್ತರಿಸಿ ರೋಗಿಯ ಬಳಿ ಇಡಿ
+Link QR: full card, needs internet	ಲಿಂಕ್ QR: ಪೂರ್ಣ ಕಾರ್ಡ್, ಇಂಟರ್ನೆಟ್ ಬೇಕು
+The QR is a random link with no personal details; it is switched off if the plan is replaced or withdrawn.	QR ಒಂದು ಯಾದೃಚ್ಛಿಕ ಲಿಂಕ್ ಆಗಿದ್ದು ಅದರಲ್ಲಿ ಯಾವುದೇ ವೈಯಕ್ತಿಕ ವಿವರಗಳಿಲ್ಲ; ಯೋಜನೆಯನ್ನು ಬದಲಾಯಿಸಿದರೆ ಅಥವಾ ಹಿಂಪಡೆದರೆ ಅದು ಸ್ಥಗಿತಗೊಳ್ಳುತ್ತದೆ.
+When this was printed the card was saved on the phone only: the link QR may not open yet. Use the offline QR.	ಇದನ್ನು ಪ್ರಿಂಟ್ ಮಾಡುವಾಗ ಕಾರ್ಡ್ ಫೋನ್‌ನಲ್ಲಿ ಮಾತ್ರ ಉಳಿದಿತ್ತು: ಲಿಂಕ್ QR ಇನ್ನೂ ತೆರೆಯದೇ ಇರಬಹುದು. ಆಫ್‌ಲೈನ್ QR ಬಳಸಿ.
+Offline QR: this summary as text, no internet needed	ಆಫ್‌ಲೈನ್ QR: ಈ ಸಾರಾಂಶ ಪಠ್ಯರೂಪದಲ್ಲಿ, ಇಂಟರ್ನೆಟ್ ಬೇಡ
+Hospital ward	ಆಸ್ಪತ್ರೆಯ ವಾರ್ಡ್
+Emergency department	ತುರ್ತು ವಿಭಾಗ
+Somewhere else	ಬೇರೆ ಎಲ್ಲಾದರೂ
+What we keep	ನಾವು ಏನನ್ನು ಇಟ್ಟುಕೊಳ್ಳುತ್ತೇವೆ
+Why	ಏಕೆ
+Where it is	ಅದು ಎಲ್ಲಿದೆ
+Your rights	ನಿಮ್ಮ ಹಕ್ಕುಗಳು
+Name, hospital number, date of birth, address and phone. The people who decide for the patient. Illness details, treatment choices, the patient’s own words and signatures. A log of who opened or changed the plan.	ಹೆಸರು, ಆಸ್ಪತ್ರೆ ನಂಬರ್, ಹುಟ್ಟಿದ ದಿನಾಂಕ, ವಿಳಾಸ ಮತ್ತು ಫೋನ್. ರೋಗಿಯ ಪರವಾಗಿ ನಿರ್ಧರಿಸುವ ಜನರು. ಕಾಯಿಲೆಯ ವಿವರಗಳು, ಚಿಕಿತ್ಸೆಯ ಆಯ್ಕೆಗಳು, ರೋಗಿಯ ಸ್ವಂತ ಮಾತುಗಳು ಮತ್ತು ಸಹಿಗಳು. ಯೋಜನೆಯನ್ನು ಯಾರು ತೆರೆದರು ಅಥವಾ ಬದಲಾಯಿಸಿದರು ಎಂಬ ದಾಖಲೆ.
+Your name, date of birth, address and the last 4 digits of your ID. Your representatives and witnesses. Your treatment wishes. The signed scan and its fingerprint (SHA-256). A log of each change, print and share.	ನಿಮ್ಮ ಹೆಸರು, ಹುಟ್ಟಿದ ದಿನಾಂಕ, ವಿಳಾಸ ಮತ್ತು ಗುರುತಿನ ಚೀಟಿಯ ಕೊನೆಯ 4 ಅಂಕೆಗಳು. ನಿಮ್ಮ ಪ್ರತಿನಿಧಿಗಳು ಮತ್ತು ಸಾಕ್ಷಿಗಳು. ನಿಮ್ಮ ಚಿಕಿತ್ಸೆಯ ಇಚ್ಛೆಗಳು. ಸಹಿ ಮಾಡಿದ ಸ್ಕ್ಯಾನ್ ಮತ್ತು ಅದರ ಫಿಂಗರ್‌ಪ್ರಿಂಟ್ (SHA-256). ಪ್ರತಿ ಬದಲಾವಣೆ, ಪ್ರಿಂಟ್ ಮತ್ತು ಹಂಚಿಕೆಯ ದಾಖಲೆ.
+So that an emergency doctor can find and follow the patient’s wishes, and the care team can review them.	ತುರ್ತು ಡಾಕ್ಟರ್ ರೋಗಿಯ ಇಚ್ಛೆಗಳನ್ನು ಕಂಡು ಅನುಸರಿಸಲು, ಮತ್ತು ಆರೈಕೆ ತಂಡ ಅವನ್ನು ಪರಿಶೀಲಿಸಲು.
+To make your living will paper, keep track of its versions, and show doctors that it exists.	ನಿಮ್ಮ ಲಿವಿಂಗ್ ವಿಲ್ ಕಾಗದವನ್ನು ಮಾಡಲು, ಅದರ ಆವೃತ್ತಿಗಳ ಲೆಕ್ಕ ಇಡಲು, ಮತ್ತು ಅದು ಇದೆ ಎಂದು ಡಾಕ್ಟರ್‌ಗಳಿಗೆ ತೋರಿಸಲು.
+On this phone. It leaves this phone only in two cases. When a plan is signed, an emergency card is issued and a copy of the signed plan goes to the Sahara server so the QR code works. If an SMS is sent, the phone number goes to the SMS company.	ಈ ಫೋನ್‌ನಲ್ಲಿ. ಇದು ಎರಡು ಸಂದರ್ಭಗಳಲ್ಲಿ ಮಾತ್ರ ಈ ಫೋನ್ ಬಿಟ್ಟು ಹೋಗುತ್ತದೆ. ಯೋಜನೆಗೆ ಸಹಿ ಮಾಡಿದಾಗ, ತುರ್ತು ಕಾರ್ಡ್ ನೀಡಲಾಗುತ್ತದೆ ಮತ್ತು ಸಹಿ ಮಾಡಿದ ಯೋಜನೆಯ ಪ್ರತಿ Sahara ಸರ್ವರ್‌ಗೆ ಹೋಗುತ್ತದೆ, ಆಗ QR ಕೋಡ್ ಕೆಲಸ ಮಾಡುತ್ತದೆ. SMS ಕಳುಹಿಸಿದರೆ, ಫೋನ್ ನಂಬರ್ SMS ಕಂಪನಿಗೆ ಹೋಗುತ್ತದೆ.
+On this phone. It is not sent to any server. If an emergency card is issued, the card carries only the living will’s status, date, version and attesting officer. You decide who gets a paper copy.	ಈ ಫೋನ್‌ನಲ್ಲಿ. ಇದನ್ನು ಯಾವುದೇ ಸರ್ವರ್‌ಗೆ ಕಳುಹಿಸುವುದಿಲ್ಲ. ತುರ್ತು ಕಾರ್ಡ್ ನೀಡಿದರೆ, ಕಾರ್ಡ್‌ನಲ್ಲಿ ಲಿವಿಂಗ್ ವಿಲ್‌ನ ಸ್ಥಿತಿ, ದಿನಾಂಕ, ಆವೃತ್ತಿ ಮತ್ತು ದೃಢೀಕರಿಸಿದ ಅಧಿಕಾರಿ ಮಾತ್ರ ಇರುತ್ತಾರೆ. ಕಾಗದದ ಪ್ರತಿ ಯಾರಿಗೆ ಸಿಗಬೇಕು ಎಂದು ನೀವೇ ನಿರ್ಧರಿಸುತ್ತೀರಿ.
+See it: download your data below. Correct it: ask for a review, and a new version is made. Withdraw: cancel the plan at any time, and the card stops working. Delete: remove an unsigned draft below. Signed versions and the log cannot be deleted, because they show what was decided and who saw it.	ನೋಡುವುದು: ಕೆಳಗೆ ನಿಮ್ಮ ಡೇಟಾ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ. ಸರಿಪಡಿಸುವುದು: ಪರಿಶೀಲನೆ ಕೇಳಿ, ಹೊಸ ಆವೃತ್ತಿ ಆಗುತ್ತದೆ. ಹಿಂಪಡೆಯುವುದು: ಯೋಜನೆಯನ್ನು ಯಾವಾಗ ಬೇಕಾದರೂ ರದ್ದುಪಡಿಸಿ, ಕಾರ್ಡ್ ಕೆಲಸ ಮಾಡುವುದು ನಿಲ್ಲುತ್ತದೆ. ಅಳಿಸುವುದು: ಸಹಿ ಆಗದ ಡ್ರಾಫ್ಟ್ ಅನ್ನು ಕೆಳಗೆ ತೆಗೆದುಹಾಕಿ. ಸಹಿ ಮಾಡಿದ ಆವೃತ್ತಿಗಳು ಮತ್ತು ಲಾಗ್ ಅನ್ನು ಅಳಿಸಲಾಗುವುದಿಲ್ಲ, ಏಕೆಂದರೆ ಏನು ನಿರ್ಧರಿಸಲಾಯಿತು ಮತ್ತು ಯಾರು ನೋಡಿದರು ಎಂದು ಅವು ತೋರಿಸುತ್ತವೆ.
+See it: download your data below. Correct it: make a new version. Withdraw: cancel it in writing at any time. Delete: remove an unsigned draft below. Signed versions and the log cannot be deleted. Deleting here does not touch any paper you printed, so destroy that yourself.	ನೋಡುವುದು: ಕೆಳಗೆ ನಿಮ್ಮ ಡೇಟಾ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ. ಸರಿಪಡಿಸುವುದು: ಹೊಸ ಆವೃತ್ತಿ ಮಾಡಿ. ಹಿಂಪಡೆಯುವುದು: ಯಾವಾಗ ಬೇಕಾದರೂ ಲಿಖಿತವಾಗಿ ರದ್ದುಪಡಿಸಿ. ಅಳಿಸುವುದು: ಸಹಿ ಆಗದ ಡ್ರಾಫ್ಟ್ ಅನ್ನು ಕೆಳಗೆ ತೆಗೆದುಹಾಕಿ. ಸಹಿ ಮಾಡಿದ ಆವೃತ್ತಿಗಳು ಮತ್ತು ಲಾಗ್ ಅನ್ನು ಅಳಿಸಲಾಗುವುದಿಲ್ಲ. ಇಲ್ಲಿ ಅಳಿಸಿದರೆ ನೀವು ಪ್ರಿಂಟ್ ಮಾಡಿದ ಯಾವ ಕಾಗದಕ್ಕೂ ಏನೂ ಆಗುವುದಿಲ್ಲ, ಅದನ್ನು ನೀವೇ ನಾಶಮಾಡಿ.
+How to ask	ಹೇಗೆ ಕೇಳುವುದು
+Use the buttons below, or tell your doctor or palliative care team. Ask them too if you want a copy on the Sahara server erased. During this pilot only made-up patients are used.	ಕೆಳಗಿನ ಬಟನ್‌ಗಳನ್ನು ಬಳಸಿ, ಅಥವಾ ನಿಮ್ಮ ಡಾಕ್ಟರ್ ಅಥವಾ ಪ್ಯಾಲಿಯೇಟಿವ್ ಕೇರ್ ತಂಡಕ್ಕೆ ಹೇಳಿ. Sahara ಸರ್ವರ್‌ನಲ್ಲಿರುವ ಪ್ರತಿಯನ್ನು ಅಳಿಸಬೇಕಾದರೆ ಸಹ ಅವರನ್ನೇ ಕೇಳಿ. ಈ ಪೈಲಟ್‌ನಲ್ಲಿ ಕಾಲ್ಪನಿಕ ರೋಗಿಗಳನ್ನು ಮಾತ್ರ ಬಳಸಲಾಗುತ್ತದೆ.
+Patient's name	ರೋಗಿಯ ಹೆಸರು
+Main decision-maker	ಮುಖ್ಯ ನಿರ್ಧಾರ ಕೈಗೊಳ್ಳುವವರು
+Capacity is decided for this decision, now — not taken from old notes. Record the basis: can the patient understand, remember, weigh and communicate the choice?	ನಿರ್ಧಾರ ತೆಗೆದುಕೊಳ್ಳುವ ಸಾಮರ್ಥ್ಯವನ್ನು ಈ ನಿರ್ಧಾರಕ್ಕಾಗಿ, ಈಗಲೇ ನಿರ್ಧರಿಸಲಾಗುತ್ತದೆ — ಹಳೆಯ ಟಿಪ್ಪಣಿಗಳಿಂದ ಅಲ್ಲ. ಆಧಾರ ದಾಖಲಿಸಿ: ರೋಗಿ ಆಯ್ಕೆಯನ್ನು ಅರ್ಥಮಾಡಿಕೊಳ್ಳಬಲ್ಲರೇ, ನೆನಪಿಡಬಲ್ಲರೇ, ತೂಗಿ ನೋಡಬಲ್ಲರೇ ಮತ್ತು ತಿಳಿಸಬಲ್ಲರೇ?
+Treatment choices stay locked until this is ticked. A choice made without knowing the illness cannot be cured is not an informed choice.	ಇದಕ್ಕೆ ಟಿಕ್ ಮಾಡುವವರೆಗೆ ಚಿಕಿತ್ಸೆಯ ಆಯ್ಕೆಗಳು ಲಾಕ್ ಆಗಿರುತ್ತವೆ. ಕಾಯಿಲೆ ಗುಣವಾಗುವುದಿಲ್ಲ ಎಂದು ತಿಳಿಯದೆ ಮಾಡಿದ ಆಯ್ಕೆ ತಿಳಿದು ಮಾಡಿದ ಆಯ್ಕೆ ಅಲ್ಲ.
+The illness has been explained as incurable, and the patient or family can say it back in their own words.	ಕಾಯಿಲೆ ಗುಣವಾಗುವುದಿಲ್ಲ ಎಂದು ವಿವರಿಸಲಾಗಿದೆ, ಮತ್ತು ರೋಗಿ ಅಥವಾ ಕುಟುಂಬ ಅದನ್ನು ತಮ್ಮ ಸ್ವಂತ ಮಾತುಗಳಲ್ಲಿ ಮರಳಿ ಹೇಳಬಲ್ಲರು.
+What matters most, in the patient's own words	ಅತ್ಯಂತ ಮುಖ್ಯವಾದದ್ದು ಯಾವುದು, ರೋಗಿಯ ಸ್ವಂತ ಮಾತುಗಳಲ್ಲಿ
+Outcomes the patient would not accept (one per line)	ರೋಗಿಗೆ ಒಪ್ಪಿಗೆಯಲ್ಲದ ಪರಿಣಾಮಗಳು (ಪ್ರತಿ ಸಾಲಿಗೆ ಒಂದು)
+Leave anything not discussed as \"No preference recorded\": that means standard care, never refusal. Each level allowed includes everything below it.	ಚರ್ಚಿಸದ ಯಾವುದನ್ನಾದರೂ \"ಯಾವುದೇ ಆಯ್ಕೆ ದಾಖಲಾಗಿಲ್ಲ\" ಎಂದು ಬಿಡಿ: ಅದರ ಅರ್ಥ ಸಾಮಾನ್ಯ ಚಿಕಿತ್ಸೆ, ಎಂದಿಗೂ ನಿರಾಕರಣೆ ಅಲ್ಲ. ಅನುಮತಿಸಿದ ಪ್ರತಿ ಮಟ್ಟದಲ್ಲಿ ಅದರ ಕೆಳಗಿನ ಎಲ್ಲವೂ ಸೇರಿರುತ್ತದೆ.
+Going to hospital	ಆಸ್ಪತ್ರೆಗೆ ಹೋಗುವುದು
+CPR if the heart stops	ಹೃದಯ ನಿಂತರೆ CPR
+Highest breathing support	ಅತ್ಯುನ್ನತ ಉಸಿರಾಟದ ಬೆಂಬಲ
+Intensive care (ICU)	ತೀವ್ರ ನಿಗಾ ಘಟಕ (ICU)
+After this date the ED view shows the plan as OUT OF DATE and standard care applies.	ಈ ದಿನಾಂಕದ ನಂತರ ED ವ್ಯೂ ಯೋಜನೆಯನ್ನು ಅವಧಿ ಮೀರಿದ್ದು ಎಂದು ತೋರಿಸುತ್ತದೆ ಮತ್ತು ಸಾಮಾನ್ಯ ಚಿಕಿತ್ಸೆ ಅನ್ವಯಿಸುತ್ತದೆ.
+An unsigned form is a conversation note, not a plan. It becomes active only when the treating consultant signs with their registration number. Keep the signed paper copy with the family.	ಸಹಿ ಇಲ್ಲದ ಫಾರ್ಮ್ ಮಾತುಕತೆಯ ಟಿಪ್ಪಣಿ, ಯೋಜನೆಯಲ್ಲ. ಚಿಕಿತ್ಸೆ ನೀಡುವ ಕನ್ಸಲ್ಟೆಂಟ್ ತಮ್ಮ ನೋಂದಣಿ ನಂಬರ್‌ನೊಂದಿಗೆ ಸಹಿ ಮಾಡಿದಾಗ ಮಾತ್ರ ಅದು ಜಾರಿಗೆ ಬರುತ್ತದೆ. ಸಹಿ ಮಾಡಿದ ಕಾಗದದ ಪ್ರತಿಯನ್ನು ಕುಟುಂಬದ ಬಳಿ ಇಡಿ.
+Made by	ಮಾಡಿದವರು
+Not filled	ಭರ್ತಿ ಮಾಡಿಲ್ಲ
+Applies to	ಯಾರಿಗೆ ಅನ್ವಯ
+Not saved: 	ಉಳಿಸಲಾಗಿಲ್ಲ:
+Couldn't make the PDF. Try again.	PDF ಮಾಡಲು ಆಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.
+Share the emergency plan	ತುರ್ತು ಯೋಜನೆಯನ್ನು ಹಂಚಿಕೊಳ್ಳಿ
+Share the living will	ಲಿವಿಂಗ್ ವಿಲ್ ಹಂಚಿಕೊಳ್ಳಿ
+Plan withdrawn. Its wallet card link is switched off.	ಯೋಜನೆಯನ್ನು ಹಿಂಪಡೆಯಲಾಗಿದೆ. ಅದರ ವಾಲೆಟ್ ಕಾರ್ಡ್ ಲಿಂಕ್ ಸ್ಥಗಿತಗೊಂಡಿದೆ.
+Emergency plan & living will	ತುರ್ತು ಯೋಜನೆ ಮತ್ತು ಲಿವಿಂಗ್ ವಿಲ್
+Ambulances and emergency doctors resuscitate by default. A wish counts only if this plan is found and signed. It stays on this phone; only a signed plan's wallet card copy goes to the Sahara server.	ಆಂಬುಲೆನ್ಸ್ ಮತ್ತು ತುರ್ತು ಡಾಕ್ಟರ್‌ಗಳು ಸಾಮಾನ್ಯವಾಗಿ ಪುನರುಜ್ಜೀವನ ಮಾಡುತ್ತಾರೆ. ಈ ಯೋಜನೆ ಸಿಕ್ಕಿ ಅದಕ್ಕೆ ಸಹಿ ಇದ್ದರೆ ಮಾತ್ರ ಇಚ್ಛೆ ಪರಿಗಣನೆಗೆ ಬರುತ್ತದೆ. ಇದು ಈ ಫೋನ್‌ನಲ್ಲಿ ಇರುತ್ತದೆ; ಸಹಿ ಮಾಡಿದ ಯೋಜನೆಯ ವಾಲೆಟ್ ಕಾರ್ಡ್ ಪ್ರತಿ ಮಾತ್ರ Sahara ಸರ್ವರ್‌ಗೆ ಹೋಗುತ್ತದೆ.
+The saved plan on this phone could not be read. Standard care applies until a new plan is signed.	ಈ ಫೋನ್‌ನಲ್ಲಿ ಉಳಿಸಿದ ಯೋಜನೆಯನ್ನು ಓದಲು ಆಗಲಿಲ್ಲ. ಹೊಸ ಯೋಜನೆಗೆ ಸಹಿ ಮಾಡುವವರೆಗೆ ಸಾಮಾನ್ಯ ಚಿಕಿತ್ಸೆ ಅನ್ವಯಿಸುತ್ತದೆ.
+ED Quick View	ED ಕ್ವಿಕ್ ವ್ಯೂ
+Emergency care plan	ತುರ್ತು ಆರೈಕೆ ಯೋಜನೆ
+Active plan v${active.version}, review due ${active.reviewDue}	ಜಾರಿಯಲ್ಲಿರುವ ಯೋಜನೆ v${active.version}, ಪರಿಶೀಲನೆ ${active.reviewDue}
+No signed plan yet	ಇನ್ನೂ ಸಹಿ ಮಾಡಿದ ಯೋಜನೆ ಇಲ್ಲ
+Draft v${draft.version} in progress — not signed, so it never reaches the ED view.	ಡ್ರಾಫ್ಟ್ v${draft.version} ನಡೆಯುತ್ತಿದೆ — ಸಹಿ ಆಗಿಲ್ಲ, ಆದ್ದರಿಂದ ಇದು ED ವ್ಯೂ ತಲುಪುವುದಿಲ್ಲ.
+Fill it in together with your doctor. It becomes valid only when the treating consultant signs.	ಇದನ್ನು ನಿಮ್ಮ ಡಾಕ್ಟರ್ ಜೊತೆ ಸೇರಿ ಭರ್ತಿ ಮಾಡಿ. ಚಿಕಿತ್ಸೆ ನೀಡುವ ಕನ್ಸಲ್ಟೆಂಟ್ ಸಹಿ ಮಾಡಿದಾಗ ಮಾತ್ರ ಇದು ಮಾನ್ಯವಾಗುತ್ತದೆ.
+Continue draft	ಡ್ರಾಫ್ಟ್ ಮುಂದುವರಿಸಿ
+Discard unsigned draft	ಸಹಿ ಆಗದ ಡ್ರಾಫ್ಟ್ ತೆಗೆದುಹಾಕಿ
+Review or change the plan	ಯೋಜನೆಯನ್ನು ಪರಿಶೀಲಿಸಿ ಅಥವಾ ಬದಲಾಯಿಸಿ
+Withdraw the plan	ಯೋಜನೆಯನ್ನು ಹಿಂಪಡೆಯಿರಿ
+Start a plan	ಯೋಜನೆ ಆರಂಭಿಸಿ
+Wallet card with QR	QR ಇರುವ ವಾಲೆಟ್ ಕಾರ್ಡ್
+Signed and recorded v$v	ಸಹಿ ಮಾಡಿ ದಾಖಲಿಸಲಾಗಿದೆ v$v
+Open living will	ಲಿವಿಂಗ್ ವಿಲ್ ತೆರೆಯಿರಿ
+Plan versions	ಯೋಜನೆಯ ಆವೃತ್ತಿಗಳು
+Audit log (cannot be changed)	ಆಡಿಟ್ ಲಾಗ್ (ಬದಲಾಯಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ)
+Chain checked: no entry has been changed or removed.	ಸರಣಿ ಪರಿಶೀಲಿಸಲಾಗಿದೆ: ಯಾವುದೇ ನಮೂದನ್ನು ಬದಲಾಯಿಸಿಲ್ಲ ಅಥವಾ ತೆಗೆದಿಲ್ಲ.
+Warning: the log has been changed.	ಎಚ್ಚರಿಕೆ: ಲಾಗ್ ಬದಲಾಗಿದೆ.
+Where is this plan being made?	ಈ ಯೋಜನೆಯನ್ನು ಎಲ್ಲಿ ಮಾಡಲಾಗುತ್ತಿದೆ?
+Plans are best made at a clinic visit, at discharge, at ICU step-down or when home palliative care starts. A plan made for the first time in the emergency department records panic, not preference.	ಕ್ಲಿನಿಕ್ ಭೇಟಿ, ಡಿಸ್ಚಾರ್ಜ್, ICU ನಿಂದ ಹೊರಬರುವಾಗ ಅಥವಾ ಮನೆಯಲ್ಲಿ ಪ್ಯಾಲಿಯೇಟಿವ್ ಕೇರ್ ಆರಂಭವಾದಾಗ ಯೋಜನೆ ಮಾಡುವುದು ಉತ್ತಮ. ತುರ್ತು ವಿಭಾಗದಲ್ಲಿ ಮೊದಲ ಬಾರಿ ಮಾಡಿದ ಯೋಜನೆ ಭಯವನ್ನು ದಾಖಲಿಸುತ್ತದೆ, ಇಚ್ಛೆಯನ್ನಲ್ಲ.
+Clinic, ward or home	ಕ್ಲಿನಿಕ್, ವಾರ್ಡ್ ಅಥವಾ ಮನೆ
+Why is the plan being reviewed?	ಯೋಜನೆಯನ್ನು ಏಕೆ ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ?
+A review opens a new draft filled in from the current plan. The current plan stays active until the new one is signed.	ಪರಿಶೀಲನೆಯು ಈಗಿನ ಯೋಜನೆಯಿಂದ ಭರ್ತಿಯಾದ ಹೊಸ ಡ್ರಾಫ್ಟ್ ಅನ್ನು ತೆರೆಯುತ್ತದೆ. ಹೊಸದಕ್ಕೆ ಸಹಿ ಮಾಡುವವರೆಗೆ ಈಗಿನ ಯೋಜನೆ ಜಾರಿಯಲ್ಲಿರುತ್ತದೆ.
+Discard draft v${d.version}?	ಡ್ರಾಫ್ಟ್ v${d.version} ತೆಗೆದುಹಾಕಬೇಕೇ?
+The unsigned answers are removed. The audit log keeps a note that a draft was discarded.	ಸಹಿ ಆಗದ ಉತ್ತರಗಳನ್ನು ತೆಗೆಯಲಾಗುತ್ತದೆ. ಡ್ರಾಫ್ಟ್ ಅನ್ನು ತೆಗೆದುಹಾಕಲಾಗಿದೆ ಎಂಬ ಟಿಪ್ಪಣಿಯನ್ನು ಆಡಿಟ್ ಲಾಗ್ ಇಟ್ಟುಕೊಳ್ಳುತ್ತದೆ.
+Discard	ತೆಗೆದುಹಾಕಿ
+Keep draft	ಡ್ರಾಫ್ಟ್ ಇರಿಸಿಕೊಳ್ಳಿ
+Withdraw plan v${plan.version}?	ಯೋಜನೆ v${plan.version} ಹಿಂಪಡೆಯಬೇಕೇ?
+A signed cancellation withdraws the plan and switches off its wallet card QR. Standard care then applies.	ಸಹಿ ಮಾಡಿದ ರದ್ದತಿ ಯೋಜನೆಯನ್ನು ಹಿಂಪಡೆಯುತ್ತದೆ ಮತ್ತು ಅದರ ವಾಲೆಟ್ ಕಾರ್ಡ್ QR ಅನ್ನು ಸ್ಥಗಿತಗೊಳಿಸುತ್ತದೆ. ಆಗ ಸಾಮಾನ್ಯ ಚಿಕಿತ್ಸೆ ಅನ್ವಯಿಸುತ್ತದೆ.
+Reason	ಕಾರಣ
+Signed by (name)	ಸಹಿ ಮಾಡಿದವರು (ಹೆಸರು)
+Keep plan	ಯೋಜನೆ ಇರಿಸಿಕೊಳ್ಳಿ
+Withdraw	ಹಿಂಪಡೆಯಿರಿ
+Patient and illness	ರೋಗಿ ಮತ್ತು ಕಾಯಿಲೆ
+Decision-makers	ನಿರ್ಧಾರ ಕೈಗೊಳ್ಳುವವರು
+Capacity and existing directive	ನಿರ್ಧಾರ ತೆಗೆದುಕೊಳ್ಳುವ ಸಾಮರ್ಥ್ಯ ಮತ್ತು ಈಗಿರುವ ನಿರ್ದೇಶನ
+Understanding	ಅರ್ಥಮಾಡಿಕೊಳ್ಳುವಿಕೆ
+Treatment choices	ಚಿಕಿತ್ಸೆಯ ಆಯ್ಕೆಗಳು
+Review date	ಪರಿಶೀಲನೆಯ ದಿನಾಂಕ
+Check and sign	ಪರಿಶೀಲಿಸಿ ಮತ್ತು ಸಹಿ ಮಾಡಿ
+Emergency plan v${d.version} · step ${step + 1} of ${steps.size}	ತುರ್ತು ಯೋಜನೆ v${d.version} · ಹಂತ ${step + 1} / ${steps.size}
+Ready to sign. Signing makes this the one active plan; any earlier version is replaced and its card link switched off.	ಸಹಿ ಮಾಡಲು ಸಿದ್ಧ. ಸಹಿ ಮಾಡಿದರೆ ಇದೇ ಒಂದು ಜಾರಿಯಲ್ಲಿರುವ ಯೋಜನೆ ಆಗುತ್ತದೆ; ಹಿಂದಿನ ಆವೃತ್ತಿ ಬದಲಾಗುತ್ತದೆ ಮತ್ತು ಅದರ ಕಾರ್ಡ್ ಲಿಂಕ್ ಸ್ಥಗಿತಗೊಳ್ಳುತ್ತದೆ.
+Still needed before the plan can be active:	ಯೋಜನೆ ಜಾರಿಗೆ ಬರುವ ಮೊದಲು ಇನ್ನೂ ಬೇಕಾಗಿರುವುದು:
+Sign and make active	ಸಹಿ ಮಾಡಿ ಜಾರಿಗೊಳಿಸಿ
+Save draft and close	ಡ್ರಾಫ್ಟ್ ಉಳಿಸಿ ಮುಚ್ಚಿ
+Save and next	ಉಳಿಸಿ ಮತ್ತು ಮುಂದೆ
+Some answers can't be saved yet	ಕೆಲವು ಉತ್ತರಗಳನ್ನು ಇನ್ನೂ ಉಳಿಸಲು ಆಗುವುದಿಲ್ಲ
+Fix them	ಸರಿಪಡಿಸಿ
+Leave without the latest changes	ಇತ್ತೀಚಿನ ಬದಲಾವಣೆಗಳಿಲ್ಲದೆ ಹೊರಡಿ
+Sahara plans are for adults (18 and over).	ಸಹಾರಾ ಯೋಜನೆಗಳು ವಯಸ್ಕರಿಗಾಗಿ (18 ಮತ್ತು ಮೇಲ್ಪಟ್ಟವರು).
+Sex	ಲಿಂಗ
+Hospital number (UHID)	ಆಸ್ಪತ್ರೆ ನಂಬರ್ (UHID)
+Stage	ಹಂತ
+Performance status (ECOG)	ದೈನಂದಿನ ಕೆಲಸ ಮಾಡುವ ಸಾಮರ್ಥ್ಯ (ECOG)
+For example: penicillin	ಉದಾಹರಣೆಗೆ: ಪೆನ್ಸಿಲಿನ್
+Eligible for this plan since	ಈ ಯೋಜನೆಗೆ ಅರ್ಹರಾದ ದಿನದಿಂದ
+Oncologist	ಆಂಕಾಲಜಿಸ್ಟ್
+Palliative doctor	ಪ್ಯಾಲಿಯೇಟಿವ್ ಡಾಕ್ಟರ್
+Palliative 24-hour phone	ಪ್ಯಾಲಿಯೇಟಿವ್ 24 ಗಂಟೆ ಫೋನ್
+Local doctor	ಸ್ಥಳೀಯ ಡಾಕ್ಟರ್
+Family to inform (one per line)	ತಿಳಿಸಬೇಕಾದ ಕುಟುಂಬದವರು (ಪ್ರತಿ ಸಾಲಿಗೆ ಒಬ್ಬರು)
+Family discussion note	ಕುಟುಂಬದ ಜೊತೆ ಮಾತುಕತೆಯ ಟಿಪ್ಪಣಿ
+Family agreement is a note, not legal authority.	ಕುಟುಂಬದ ಒಪ್ಪಿಗೆ ಒಂದು ಟಿಪ್ಪಣಿ ಮಾತ್ರ, ಕಾನೂನು ಅಧಿಕಾರ ಅಲ್ಲ.
+Relation to the patient	ರೋಗಿಯೊಂದಿಗಿನ ಸಂಬಂಧ
+24-hour phone	24 ಗಂಟೆ ಫೋನ್
+ID type	ಗುರುತಿನ ಚೀಟಿಯ ವಿಧ
+Last 4 digits of the ID	ಗುರುತಿನ ಚೀಟಿಯ ಕೊನೆಯ 4 ಅಂಕೆಗಳು
+Only the last 4 are kept, never the full number.	ಕೊನೆಯ 4 ಮಾತ್ರ ಇಡಲಾಗುತ್ತದೆ, ಪೂರ್ಣ ನಂಬರ್ ಎಂದಿಗೂ ಇಲ್ಲ.
+Basis of authority	ಅಧಿಕಾರದ ಆಧಾರ
+Assessed by	ಪರಿಶೀಲಿಸಿದವರು
+Assessed on	ಪರಿಶೀಲಿಸಿದ ದಿನಾಂಕ
+Basis of the assessment	ಪರಿಶೀಲನೆಯ ಆಧಾರ
+Reassess on	ಮರುಪರಿಶೀಲನೆಯ ದಿನಾಂಕ
+A patient with capacity can change or cancel any part of this plan by saying so; their wish now overrides the paper.	ನಿರ್ಧಾರ ತೆಗೆದುಕೊಳ್ಳುವ ಸಾಮರ್ಥ್ಯ ಇರುವ ರೋಗಿ ಹೇಳುವ ಮೂಲಕ ಈ ಯೋಜನೆಯ ಯಾವುದೇ ಭಾಗವನ್ನು ಬದಲಾಯಿಸಬಹುದು ಅಥವಾ ರದ್ದುಪಡಿಸಬಹುದು; ಅವರ ಈಗಿನ ಇಚ್ಛೆ ಕಾಗದಕ್ಕಿಂತ ಮೇಲುಗೈ ಹೊಂದಿದೆ.
+Existing living will or wishes	ಈಗಿರುವ ಲಿವಿಂಗ್ ವಿಲ್ ಅಥವಾ ಇಚ್ಛೆಗಳು
+A signed, attested living will	ಸಹಿ ಮಾಡಿದ, ದೃಢೀಕರಿಸಿದ ಲಿವಿಂಗ್ ವಿಲ್
+Wishes said or written before	ಮೊದಲು ಹೇಳಿದ ಅಥವಾ ಬರೆದ ಇಚ್ಛೆಗಳು
+Date of the living will	ಲಿವಿಂಗ್ ವಿಲ್‌ನ ದಿನಾಂಕ
+Where the original is kept	ಮೂಲ ಪ್ರತಿ ಎಲ್ಲಿ ಇದೆ
+Attested by (notary or gazetted officer)	ದೃಢೀಕರಿಸಿದವರು (ನೋಟರಿ ಅಥವಾ ಗೆಜೆಟೆಡ್ ಅಧಿಕಾರಿ)
+What was said or written	ಏನು ಹೇಳಲಾಯಿತು ಅಥವಾ ಬರೆಯಲಾಯಿತು
+Understanding the illness	ಕಾಯಿಲೆಯ ತಿಳುವಳಿಕೆ
+Explained by	ವಿವರಿಸಿದವರು
+Who is answering?	ಯಾರು ಉತ್ತರಿಸುತ್ತಿದ್ದಾರೆ?
+The patient	ರೋಗಿ
+A decision-maker, for the patient	ರೋಗಿಯ ಪರವಾಗಿ ನಿರ್ಧಾರ ಕೈಗೊಳ್ಳುವವರು
+the patient	ರೋಗಿ
+I will say what $who would have chosen, not what I want for them. Where I do not know, I will decide with the team in their best interests.	$who ಅವರೇ ಏನು ಆರಿಸುತ್ತಿದ್ದರೋ ಅದನ್ನು ಮಾತ್ರ ನಾನು ಹೇಳುತ್ತೇನೆ, ಅವರಿಗಾಗಿ ನಾನು ಬಯಸುವುದನ್ನಲ್ಲ. ನನಗೆ ತಿಳಿಯದ ಕಡೆ, ಅವರ ಹಿತದೃಷ್ಟಿಯಿಂದ ತಂಡದೊಂದಿಗೆ ಸೇರಿ ನಿರ್ಧರಿಸುತ್ತೇನೆ.
+Does the patient know about the illness?	ರೋಗಿಗೆ ಕಾಯಿಲೆಯ ಬಗ್ಗೆ ತಿಳಿದಿದೆಯೇ?
+The family asked that the patient not be told	ರೋಗಿಗೆ ತಿಳಿಸಬಾರದು ಎಂದು ಕುಟುಂಬ ಕೇಳಿದೆ
+Plan if the patient asks directly	ರೋಗಿ ನೇರವಾಗಿ ಕೇಳಿದರೆ ಯೋಜನೆ
+A patient with capacity who asks must be answered honestly.	ನಿರ್ಧಾರ ತೆಗೆದುಕೊಳ್ಳುವ ಸಾಮರ್ಥ್ಯ ಇರುವ ರೋಗಿ ಕೇಳಿದರೆ, ಪ್ರಾಮಾಣಿಕವಾಗಿ ಉತ್ತರಿಸಬೇಕು.
+Money worries were asked about directly	ಹಣದ ಚಿಂತೆಗಳ ಬಗ್ಗೆ ನೇರವಾಗಿ ಕೇಳಲಾಯಿತು
+Social-work or scheme referral made	ಸಮಾಜ ಕಾರ್ಯ ಅಥವಾ ಸರ್ಕಾರಿ ಯೋಜನೆಗೆ ಶಿಫಾರಸು ಮಾಡಲಾಗಿದೆ
+Locked: go back to Understanding and record that the illness has been explained and understood (V4).	ಲಾಕ್ ಆಗಿದೆ: 'ಅರ್ಥಮಾಡಿಕೊಳ್ಳುವಿಕೆ'ಗೆ ಹಿಂದೆ ಹೋಗಿ, ಕಾಯಿಲೆಯನ್ನು ವಿವರಿಸಲಾಗಿದೆ ಮತ್ತು ಅರ್ಥಮಾಡಿಕೊಳ್ಳಲಾಗಿದೆ ಎಂದು ದಾಖಲಿಸಿ (V4).
+Locked: the decision-maker must first confirm they will say what the patient would have chosen (V5).	ಲಾಕ್ ಆಗಿದೆ: ರೋಗಿಯೇ ಏನು ಆರಿಸುತ್ತಿದ್ದರೋ ಅದನ್ನು ಮಾತ್ರ ಹೇಳುತ್ತೇನೆ ಎಂದು ನಿರ್ಧಾರ ಕೈಗೊಳ್ಳುವವರು ಮೊದಲು ದೃಢೀಕರಿಸಬೇಕು (V5).
+Numbers to call before an ambulance (one per line)	ಆಂಬುಲೆನ್ಸ್‌ಗೆ ಮೊದಲು ಫೋನ್ ಮಾಡಬೇಕಾದ ನಂಬರ್‌ಗಳು (ಪ್ರತಿ ಸಾಲಿಗೆ ಒಂದು)
+If an ambulance comes	ಆಂಬುಲೆನ್ಸ್ ಬಂದರೆ
+Crews resuscitate by default; this counts only if a signed copy is handed over.	ಸಿಬ್ಬಂದಿ ಸಾಮಾನ್ಯವಾಗಿ ಪುನರುಜ್ಜೀವನ ಮಾಡುತ್ತಾರೆ; ಸಹಿ ಮಾಡಿದ ಪ್ರತಿಯನ್ನು ನೀಡಿದರೆ ಮಾತ್ರ ಇದು ಪರಿಗಣನೆಗೆ ಬರುತ್ತದೆ.
+Reason for DNACPR	DNACPR ಗೆ ಕಾರಣ
+Discussed with	ಯಾರೊಂದಿಗೆ ಚರ್ಚಿಸಲಾಯಿತು
+Decided by (doctor's name)	ನಿರ್ಧರಿಸಿದವರು (ಡಾಕ್ಟರ್‌ನ ಹೆಸರು)
+Date and time decided	ನಿರ್ಧರಿಸಿದ ದಿನಾಂಕ ಮತ್ತು ಸಮಯ
+Reason for attempting CPR with this goal or ceiling (V2)	ಈ ಗುರಿ ಅಥವಾ ಮಿತಿಯೊಂದಿಗೆ CPR ಮಾಡಲು ಕಾರಣ (V2)
+Shock device (ICD)	ಆಘಾತ ನೀಡುವ ಸಾಧನ (ICD)
+Switch off shocks	ಆಘಾತಗಳನ್ನು ಆಫ್ ಮಾಡಿ
+Keep shocks on	ಆಘಾತಗಳನ್ನು ಆನ್ ಆಗಿಯೇ ಇಡಿ
+Decision date	ನಿರ್ಧಾರದ ದಿನಾಂಕ
+A trial needs a length, a formal review date and time, and who will review. About 3 days is usual (3–7).	ಪ್ರಯೋಗಕ್ಕೆ ಅವಧಿ, ಔಪಚಾರಿಕ ಪರಿಶೀಲನೆಯ ದಿನಾಂಕ ಮತ್ತು ಸಮಯ, ಹಾಗೂ ಪರಿಶೀಲಿಸುವವರು ಬೇಕು. ಸಾಮಾನ್ಯವಾಗಿ ಸುಮಾರು 3 ದಿನ (3–7).
+Length	ಅವಧಿ
+Review time	ಪರಿಶೀಲನೆಯ ಸಮಯ
+Reviewers (names, comma-separated)	ಪರಿಶೀಲಿಸುವವರು (ಹೆಸರುಗಳು, ಕಾಮಾದಿಂದ ಬೇರ್ಪಡಿಸಿ)
+Maximum oxygen (L/min)	ಗರಿಷ್ಠ ಆಕ್ಸಿಜನ್ (L/min)
+A new, reversible cause (such as choking or a drug reaction) is treated fully, above this ceiling	ಹೊಸ, ಗುಣವಾಗಬಹುದಾದ ಕಾರಣಕ್ಕೆ (ಉದಾಹರಣೆಗೆ ಗಂಟಲಲ್ಲಿ ಸಿಕ್ಕಿಕೊಳ್ಳುವುದು ಅಥವಾ ಔಷಧಿಯ ಪ್ರತಿಕ್ರಿಯೆ) ಈ ಮಿತಿಗಿಂತ ಮೇಲೆಯೂ ಪೂರ್ಣ ಚಿಕಿತ್ಸೆ ನೀಡಲಾಗುತ್ತದೆ
+Oxygen level to aim for, at least (SpO₂ %)	ಗುರಿಯಾಗಿಸಬೇಕಾದ ಕನಿಷ್ಠ ಆಕ್ಸಿಜನ್ ಮಟ್ಟ (SpO₂ %)
+NIV for at most (hours)	NIV ಗರಿಷ್ಠ (ಗಂಟೆಗಳು)
+NIV as a time-limited trial	ನಿಗದಿತ ಅವಧಿಯ ಪ್ರಯೋಗವಾಗಿ NIV
+Home NIV or other reason this works without hospital	ಮನೆಯಲ್ಲಿ NIV ಅಥವಾ ಆಸ್ಪತ್ರೆ ಇಲ್ಲದೆ ಇದು ನಡೆಯಲು ಬೇರೆ ಕಾರಣ
+ICU trial	ICU ಪ್ರಯೋಗ
+Drugs to support blood pressure	ರಕ್ತದೊತ್ತಡ ಕಾಪಾಡುವ ಔಷಧಿಗಳು
+Vasopressor trial	ವ್ಯಾಸೋಪ್ರೆಸರ್ ಪ್ರಯೋಗ
+Maximum number of drugs	ಔಷಧಿಗಳ ಗರಿಷ್ಠ ಸಂಖ್ಯೆ
+Dialysis trial	ಡಯಾಲಿಸಿಸ್ ಪ್ರಯೋಗ
+Nose tube feeding (NG)	ಮೂಗಿನ ನಳಿಕೆಯ ಮೂಲಕ ಆಹಾರ (NG)
+Days before review	ಪರಿಶೀಲನೆಗೆ ಮುನ್ನ ದಿನಗಳು
+Stomach tube (PEG)	ಹೊಟ್ಟೆಯ ನಳಿಕೆ (PEG)
+The patient or family wish an existing feeding tube to be removed	ಈಗಾಗಲೇ ಹಾಕಿರುವ ಆಹಾರದ ನಳಿಕೆಯನ್ನು ತೆಗೆಯಬೇಕೆಂದು ರೋಗಿ ಅಥವಾ ಕುಟುಂಬ ಬಯಸುತ್ತಾರೆ
+Checks	ಪರಿಶೀಲನೆಗಳು
+Reason for $id	$id ಗೆ ಕಾರಣ
+Confirmed: this combination is what was decided (V3)	ದೃಢೀಕರಿಸಲಾಗಿದೆ: ಈ ಸಂಯೋಜನೆಯೇ ನಿರ್ಧರಿಸಲಾಗಿತ್ತು (V3)
+The app records this wish but never triggers withdrawal.	ಆ್ಯಪ್ ಈ ಇಚ್ಛೆಯನ್ನು ದಾಖಲಿಸುತ್ತದೆ, ಆದರೆ ಚಿಕಿತ್ಸೆ ಹಿಂತೆಗೆಯುವುದನ್ನು ಎಂದಿಗೂ ಆರಂಭಿಸುವುದಿಲ್ಲ.
+In $w weeks	$w ವಾರಗಳಲ್ಲಿ
+Review sooner if	ಇವು ಇದ್ದರೆ ಬೇಗನೆ ಪರಿಶೀಲಿಸಿ
+Signs of the last days (falling blood pressure, cold mottled skin, changed breathing, little urine) also call for an urgent review. Where unsure, take a second opinion.	ಕೊನೆಯ ದಿನಗಳ ಲಕ್ಷಣಗಳು (ರಕ್ತದೊತ್ತಡ ಇಳಿಯುವುದು, ತಣ್ಣಗಿನ ಮಚ್ಚೆಮಚ್ಚೆ ಚರ್ಮ, ಉಸಿರಾಟದಲ್ಲಿ ಬದಲಾವಣೆ, ಕಡಿಮೆ ಮೂತ್ರ) ಇದ್ದಾಗಲೂ ತುರ್ತು ಪರಿಶೀಲನೆ ಬೇಕು. ಖಚಿತವಿಲ್ಲದಿದ್ದರೆ ಎರಡನೇ ಅಭಿಪ್ರಾಯ ಪಡೆಯಿರಿ.
+Treating consultant	ಚಿಕಿತ್ಸೆ ನೀಡುವ ಕನ್ಸಲ್ಟೆಂಟ್
+Palliative clinician	ಪ್ಯಾಲಿಯೇಟಿವ್ ವೈದ್ಯರು
+Nurse	ನರ್ಸ್
+Witness	ಸಾಕ್ಷಿ
+Signed so far	ಇಲ್ಲಿಯವರೆಗೆ ಸಹಿ ಮಾಡಿದವರು
+ · thumb impression	 · ಹೆಬ್ಬೆರಳಿನ ಗುರುತು
+Remove signature	ಸಹಿ ತೆಗೆಯಿರಿ
+To be signed by the doctor on their own phone or here in their presence.	ಡಾಕ್ಟರ್ ತಮ್ಮ ಫೋನ್‌ನಲ್ಲಿ ಅಥವಾ ಇಲ್ಲಿ ತಮ್ಮ ಸಮ್ಮುಖದಲ್ಲಿ ಸಹಿ ಮಾಡಬೇಕು.
+Consultant's name	ಕನ್ಸಲ್ಟೆಂಟ್‌ನ ಹೆಸರು
+Medical registration number	ವೈದ್ಯಕೀಯ ನೋಂದಣಿ ನಂಬರ್
+Sign as treating consultant	ಚಿಕಿತ್ಸೆ ನೀಡುವ ಕನ್ಸಲ್ಟೆಂಟ್ ಆಗಿ ಸಹಿ ಮಾಡಿ
+Co-signature (optional)	ಜಂಟಿ ಸಹಿ (ಐಚ್ಛಿಕ)
+Add co-signature	ಜಂಟಿ ಸಹಿ ಸೇರಿಸಿ
+Patient or decision-maker	ರೋಗಿ ಅಥವಾ ನಿರ್ಧಾರ ಕೈಗೊಳ್ಳುವವರು
+Signed with a thumb impression	ಹೆಬ್ಬೆರಳಿನ ಗುರುತಿನಿಂದ ಸಹಿ ಮಾಡಲಾಗಿದೆ
+Add signature	ಸಹಿ ಸೇರಿಸಿ
+Limited reading or writing	ಓದು-ಬರಹ ಸೀಮಿತ
+Witnesses (two needed)	ಸಾಕ್ಷಿಗಳು (ಇಬ್ಬರು ಬೇಕು)
+${d.witnesses.size} of 2 recorded	2 ರಲ್ಲಿ ${d.witnesses.size} ದಾಖಲಾಗಿದೆ
+Witness name	ಸಾಕ್ಷಿಯ ಹೆಸರು
+Add witness	ಸಾಕ್ಷಿ ಸೇರಿಸಿ
+$it years	$it ವರ್ಷ
+Wish recorded to remove an existing feeding tube: that is withdrawal and follows the medical board pathway. Not actionable from this plan.	ಈಗಾಗಲೇ ಹಾಕಿರುವ ಆಹಾರದ ನಳಿಕೆಯನ್ನು ತೆಗೆಯುವ ಇಚ್ಛೆ ದಾಖಲಾಗಿದೆ: ಅದು ಚಿಕಿತ್ಸೆ ಹಿಂತೆಗೆಯುವುದು ಮತ್ತು ವೈದ್ಯಕೀಯ ಮಂಡಳಿಯ ಪ್ರಕ್ರಿಯೆಯನ್ನು ಅನುಸರಿಸುತ್ತದೆ. ಈ ಯೋಜನೆಯಿಂದ ಜಾರಿಗೊಳಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ.
+Wallet card	ವಾಲೆಟ್ ಕಾರ್ಡ್
+Share PDF	PDF ಹಂಚಿಕೊಳ್ಳಿ
+Issued on the server	ಸರ್ವರ್‌ನಲ್ಲಿ ನೀಡಲಾಗಿದೆ
+Saved on this phone only	ಈ ಫೋನ್‌ನಲ್ಲಿ ಮಾತ್ರ ಉಳಿಸಲಾಗಿದೆ
+A doctor who scans the link QR sees the ED Quick View. A copy is also saved on this phone.	ಲಿಂಕ್ QR ಸ್ಕ್ಯಾನ್ ಮಾಡುವ ಡಾಕ್ಟರ್‌ಗೆ ED ಕ್ವಿಕ್ ವ್ಯೂ ಕಾಣುತ್ತದೆ. ಒಂದು ಪ್ರತಿ ಈ ಫೋನ್‌ನಲ್ಲೂ ಉಳಿದಿದೆ.
+The link QR will not open for a doctor until it is uploaded. It uploads by itself when the phone is online. Until then use the offline QR and the printed lines.	ಅಪ್‌ಲೋಡ್ ಆಗುವವರೆಗೆ ಲಿಂಕ್ QR ಡಾಕ್ಟರ್‌ಗೆ ತೆರೆಯುವುದಿಲ್ಲ. ಫೋನ್ ಆನ್‌ಲೈನ್ ಆದಾಗ ಅದು ತನ್ನಷ್ಟಕ್ಕೆ ಅಪ್‌ಲೋಡ್ ಆಗುತ್ತದೆ. ಅಲ್ಲಿಯವರೆಗೆ ಆಫ್‌ಲೈನ್ QR ಮತ್ತು ಪ್ರಿಂಟ್ ಆದ ಸಾಲುಗಳನ್ನು ಬಳಸಿ.
+No internet right now.	ಈಗ ಇಂಟರ್ನೆಟ್ ಇಲ್ಲ.
+Try again now	ಈಗ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ
+Practice mode: nothing is sent to the server.	ಅಭ್ಯಾಸ ಮೋಡ್: ಸರ್ವರ್‌ಗೆ ಏನನ್ನೂ ಕಳುಹಿಸಲಾಗುವುದಿಲ್ಲ.
+Withdrawn on this phone. The server has not been told yet, so an old QR may still open. It will be told when the phone is online.	ಈ ಫೋನ್‌ನಲ್ಲಿ ಹಿಂಪಡೆಯಲಾಗಿದೆ. ಸರ್ವರ್‌ಗೆ ಇನ್ನೂ ತಿಳಿಸಿಲ್ಲ, ಆದ್ದರಿಂದ ಹಳೆಯ QR ಇನ್ನೂ ತೆರೆಯಬಹುದು. ಫೋನ್ ಆನ್‌ಲೈನ್ ಆದಾಗ ತಿಳಿಸಲಾಗುತ್ತದೆ.
+A wallet card is made when a signed plan is active. A withdrawn or replaced plan's card is switched off.	ಸಹಿ ಮಾಡಿದ ಯೋಜನೆ ಜಾರಿಯಲ್ಲಿದ್ದಾಗ ವಾಲೆಟ್ ಕಾರ್ಡ್ ಮಾಡಲಾಗುತ್ತದೆ. ಹಿಂಪಡೆದ ಅಥವಾ ಬದಲಾಯಿಸಿದ ಯೋಜನೆಯ ಕಾರ್ಡ್ ಸ್ಥಗಿತಗೊಳ್ಳುತ್ತದೆ.
+SAHARA EMERGENCY CARE PLAN	ಸಹಾರಾ ತುರ್ತು ಆರೈಕೆ ಯೋಜನೆ
+QR code with a link to this plan	ಈ ಯೋಜನೆಯ ಲಿಂಕ್ ಇರುವ QR ಕೋಡ್
+QR code: offline text summary of this card	QR ಕೋಡ್: ಈ ಕಾರ್ಡ್‌ನ ಆಫ್‌ಲೈನ್ ಪಠ್ಯ ಸಾರಾಂಶ
+Plan v$v · review due $due	ಯೋಜನೆ v$v · ಪರಿಶೀಲನೆ $due
+The living will changed after this card was issued, so the link shows the old status. Issue a new card and tear up the old one.	ಈ ಕಾರ್ಡ್ ನೀಡಿದ ನಂತರ ಲಿವಿಂಗ್ ವಿಲ್ ಬದಲಾಗಿದೆ, ಆದ್ದರಿಂದ ಲಿಂಕ್ ಹಳೆಯ ಸ್ಥಿತಿಯನ್ನು ತೋರಿಸುತ್ತದೆ. ಹೊಸ ಕಾರ್ಡ್ ನೀಡಿ ಮತ್ತು ಹಳೆಯದನ್ನು ಹರಿದುಹಾಕಿ.
+Issue a new card	ಹೊಸ ಕಾರ್ಡ್ ನೀಡಿ
+The link QR holds only a random link with no name or medical details. The offline QR holds the summary above as plain text, so anyone who scans it can read it; keep the card with the patient. When the plan is replaced or withdrawn the link is switched off, but the offline QR on old paper still reads — tear up old cards.	ಲಿಂಕ್ QR ನಲ್ಲಿ ಯಾದೃಚ್ಛಿಕ ಲಿಂಕ್ ಮಾತ್ರ ಇದೆ, ಹೆಸರು ಅಥವಾ ವೈದ್ಯಕೀಯ ವಿವರಗಳಿಲ್ಲ. ಆಫ್‌ಲೈನ್ QR ನಲ್ಲಿ ಮೇಲಿನ ಸಾರಾಂಶ ಸರಳ ಪಠ್ಯದಲ್ಲಿದೆ, ಆದ್ದರಿಂದ ಸ್ಕ್ಯಾನ್ ಮಾಡುವ ಯಾರಾದರೂ ಓದಬಹುದು; ಕಾರ್ಡ್ ಅನ್ನು ರೋಗಿಯ ಬಳಿ ಇಡಿ. ಯೋಜನೆಯನ್ನು ಬದಲಾಯಿಸಿದಾಗ ಅಥವಾ ಹಿಂಪಡೆದಾಗ ಲಿಂಕ್ ಸ್ಥಗಿತಗೊಳ್ಳುತ್ತದೆ, ಆದರೆ ಹಳೆಯ ಕಾಗದದ ಮೇಲಿರುವ ಆಫ್‌ಲೈನ್ QR ಈಗಲೂ ಓದಲು ಸಿಗುತ್ತದೆ — ಹಳೆಯ ಕಾರ್ಡ್‌ಗಳನ್ನು ಹರಿದುಹಾಕಿ.
+Print or share the plan and card (PDF)	ಯೋಜನೆ ಮತ್ತು ಕಾರ್ಡ್ ಅನ್ನು ಪ್ರಿಂಟ್ ಮಾಡಿ ಅಥವಾ ಹಂಚಿಕೊಳ್ಳಿ (PDF)
+ED Quick View, wallet card QR and living will	ED ಕ್ವಿಕ್ ವ್ಯೂ, ವಾಲೆಟ್ ಕಾರ್ಡ್ QR ಮತ್ತು ಲಿವಿಂಗ್ ವಿಲ್
+This update does not record $missing. Visit history is separate.	ಈ ಅಪ್‌ಡೇಟ್ $missing ಅನ್ನು ದಾಖಲಿಸುವುದಿಲ್ಲ. ಭೇಟಿಗಳ ಇತಿಹಾಸ ಬೇರೆ.
+ECTPR wizard, ED Quick View, wallet card QR, living will	ECTPR ವಿಝಾರ್ಡ್, ED ಕ್ವಿಕ್ ವ್ಯೂ, ವಾಲೆಟ್ ಕಾರ್ಡ್ QR, ಲಿವಿಂಗ್ ವಿಲ್
+, last on $day	, ಕೊನೆಯ ಬಾರಿ $day
+Opened once$last	ಒಮ್ಮೆ ತೆರೆಯಲಾಗಿದೆ$last
+Opened $views times$last	$views ಬಾರಿ ತೆರೆಯಲಾಗಿದೆ$last
+Saved on this phone, not sent yet$detail It is sent when you open Feedback again while signed in and online.	ಫೋನ್‌ನಲ್ಲಿ ಉಳಿಸಲಾಗಿದೆ, ಇನ್ನೂ ಕಳುಹಿಸಿಲ್ಲ$detail ಸೈನ್ ಇನ್ ಆಗಿ ಆನ್‌ಲೈನ್ ಇರುವಾಗ ಫೀಡ್‌ಬ್ಯಾಕ್ ಅನ್ನು ಮತ್ತೆ ತೆರೆದರೆ ಕಳುಹಿಸಲಾಗುತ್ತದೆ.
+1 medicine photo was not matched	1 ಔಷಧಿಯ ಫೋಟೋ ಹೊಂದಾಣಿಕೆಯಾಗಲಿಲ್ಲ
+$n medicine photos were not matched	$n ಔಷಧಿಯ ಫೋಟೋಗಳು ಹೊಂದಾಣಿಕೆಯಾಗಲಿಲ್ಲ
+photo $k	ಫೋಟೋ $k
+Review $photos. Add any missing medicine manually or leave it out only after checking the original prescription.	$photos ಪರಿಶೀಲಿಸಿ. ಬಿಟ್ಟುಹೋದ ಔಷಧಿಯನ್ನು ಕೈಯಾರೆ ಸೇರಿಸಿ, ಅಥವಾ ಮೂಲ ಚೀಟಿಯನ್ನು ನೋಡಿದ ನಂತರವೇ ಅದನ್ನು ಬಿಡಿ.
+Save 1 medicine	1 ಔಷಧಿ ಉಳಿಸಿ
+Save $n medicines	$n ಔಷಧಿಗಳನ್ನು ಉಳಿಸಿ
+page $k	ಪುಟ $k
+Original reading · $pages	ಮೂಲ ಓದು · $pages
+ICD decision	ICD ನಿರ್ಧಾರ

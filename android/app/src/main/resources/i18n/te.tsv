@@ -2636,3 +2636,799 @@ Use at least $MIN_PASSWORD characters.	కనీసం $MIN_PASSWORD అక్�
 Use $MAX_PASSWORD characters or fewer.	$MAX_PASSWORD లేదా అంతకంటే తక్కువ అక్షరాలు వాడండి.
 Use letters, numbers and symbols only.	అక్షరాలు, అంకెలు, గుర్తులు మాత్రమే వాడండి.
 Working…	పని జరుగుతోంది…
+this person	ఈ వ్యక్తి
+To let family see $who's care on their own phone, you first need to sign in. It takes a minute.	కుటుంబ సభ్యులు తమ ఫోన్‌లో $who సంరక్షణను చూడాలంటే, ముందు మీరు సైన్ ఇన్ చేయాలి. దీనికి ఒక్క నిమిషం పడుతుంది.
+The online answer did not work this time$detail. Below are the matching lines found on this phone instead.	ఈసారి ఆన్‌లైన్ జవాబు రాలేదు$detail. దానికి బదులు, ఈ ఫోన్‌లో దొరికిన సరిపోలే లైన్లు కింద ఉన్నాయి.
+the matching lines from my documents	నా పత్రాల్లో సరిపోలే లైన్లు
+the text of these $count documents	ఈ $count పత్రాల్లోని రాత
+I agree to send my question and $sendWhat to $sendTo. Photos and files are not sent. Nothing is sent until I tap Ask. I will be asked again next time.	నా ప్రశ్నను, $sendWhat ను $sendTo కు పంపడానికి నేను అంగీకరిస్తున్నాను. ఫోటోలు, ఫైళ్లు పంపబడవు. నేను అడగండి నొక్కే వరకు ఏదీ పంపబడదు. తర్వాతిసారి మళ్లీ అడుగుతాం.
+1 care note	1 సంరక్షణ నోట్
+$n care notes	$n సంరక్షణ నోట్లు
+1 report	1 రిపోర్ట్
+$m reports	$m రిపోర్ట్‌లు
+1 line uses edited wording. Check against the original conversation.	1 లైన్‌లో మార్చిన పదాలు ఉన్నాయి. అసలు సంభాషణతో సరిచూడండి.
+$n lines use edited wording. Check against the original conversation.	$n లైన్లలో మార్చిన పదాలు ఉన్నాయి. అసలు సంభాషణతో సరిచూడండి.
+Signed emergency care plan	సంతకం చేసిన అత్యవసర సంరక్షణ ప్రణాళిక
+Diagnosis	వ్యాధి
+Transfer	ఆసుపత్రికి తీసుకెళ్లడం
+Breathing ceiling	శ్వాస పరిమితి
+Call first	ముందు ఫోన్ చేయండి
+Decision-maker	నిర్ణయం తీసుకునేవారు
+Signed	సంతకం చేశారు
+NOT SIGNED	సంతకం లేదు
+Review due	సమీక్ష తేదీ
+expires in 1 day	1 రోజులో ముగుస్తుంది
+expires in $days days	$days రోజుల్లో ముగుస్తుంది
+A terminal illness (an illness that will end my life)	అంతిమ దశ వ్యాధి (నా జీవితాన్ని ముగించే వ్యాధి)
+An end-stage condition (lasting damage that keeps getting worse, where treatment will not work)	చివరి దశ స్థితి (పెరుగుతూనే ఉండే శాశ్వత నష్టం, చికిత్స పనిచేయని స్థితి)
+A vegetative state (awake but not aware, for many months)	వెజిటేటివ్ స్థితి (మేల్కొని ఉన్నా, చాలా నెలలు స్పృహ లేని స్థితి)
+CPR (pressing the chest, electric shocks to restart the heart)	CPR (ఛాతీపై నొక్కడం, గుండెను మళ్లీ కొట్టుకునేలా చేయడానికి విద్యుత్ షాక్‌లు)
+Breathing machine (ventilator) or other life support	శ్వాస యంత్రం (వెంటిలేటర్) లేదా ఇతర ప్రాణ రక్షక యంత్రం
+Dialysis (machine that cleans the blood when kidneys fail)	డయాలసిస్ (కిడ్నీలు విఫలమైనప్పుడు రక్తాన్ని శుభ్రం చేసే యంత్రం)
+Feeding through a tube or drip	నాళం ద్వారా లేదా డ్రిప్ ద్వారా ఆహారం ఇవ్వడం
+Drips and medicines such as antibiotics (comfort medicines always continue)	డ్రిప్‌లు, యాంటీబయాటిక్స్ వంటి మందులు (ఉపశమన మందులు ఎల్లప్పుడూ కొనసాగుతాయి)
+Chemotherapy	కీమోథెరపీ
+Surgery (operations), except for comfort	శస్త్రచికిత్స (ఆపరేషన్లు), ఉపశమనం కోసం చేసేవి తప్ప
+Used when the heart stops. In very serious illness it rarely works and can break ribs.	గుండె ఆగినప్పుడు ఇది చేస్తారు. చాలా తీవ్రమైన వ్యాధిలో ఇది అరుదుగా పనిచేస్తుంది, పక్కటెముకలు విరగవచ్చు.
+A tube in the throat connected to a machine that breathes for you, usually in the ICU.	గొంతులో ఒక నాళం, అది మీ తరఫున శ్వాస తీసే యంత్రానికి అనుసంధానమై ఉంటుంది, సాధారణంగా ICU లో.
+Usually several hours, a few times a week.	సాధారణంగా వారానికి కొన్నిసార్లు, చాలా గంటలు.
+A tube in the nose or stomach, or a drip. The Supreme Court treats this as medical treatment (Harish Rana, 2026). Food and drink by mouth for comfort, mouth care and hand feeding always continue.	ముక్కు లేదా కడుపులో నాళం, లేదా డ్రిప్. సుప్రీం కోర్టు దీన్ని వైద్య చికిత్సగా పరిగణిస్తుంది (హరీష్ రాణా, 2026). ఉపశమనం కోసం నోటి ద్వారా ఆహారం, నీరు, నోటి సంరక్షణ, చేత్తో తినిపించడం ఎల్లప్పుడూ కొనసాగుతాయి.
+Pain and comfort medicines are never stopped by this choice.	ఈ ఎంపిక వల్ల నొప్పి, ఉపశమన మందులు ఎప్పుడూ ఆపబడవు.
+Medicines that treat cancer.	క్యాన్సర్‌కు చికిత్స చేసే మందులు.
+Radiation treatment for cancer.	క్యాన్సర్‌కు రేడియేషన్ చికిత్స.
+Operations to relieve symptoms or improve quality of life are still allowed.	లక్షణాల నుండి ఉపశమనం కోసం లేదా జీవన నాణ్యత మెరుగుపరచడానికి చేసే ఆపరేషన్లు ఇప్పటికీ చేయవచ్చు.
+I do not want	నాకు వద్దు
+I want	నాకు కావాలి
+Not decided	ఇంకా నిర్ణయించలేదు
+In a hospital or medical facility	ఆసుపత్రిలో లేదా వైద్య కేంద్రంలో
+In a hospice or similar place	హాస్పిస్‌లో లేదా అలాంటి చోట
+At home	ఇంట్లో
+In a place I name	నేను పేరు చెప్పిన చోట
+Notary	నోటరీ
+Gazetted officer	గెజిటెడ్ అధికారి
+Draft	డ్రాఫ్ట్
+Printed, not yet signed	ప్రింట్ అయింది, ఇంకా సంతకం కాలేదు
+Signed and recorded	సంతకం చేసి నమోదు చేశారు
+Replaced by a newer version	కొత్త వెర్షన్‌తో భర్తీ చేశారు
+Cancelled in writing	లిఖితపూర్వకంగా రద్దు చేశారు
+Representative	ప్రతినిధి
+Family doctor	కుటుంబ డాక్టర్
+Custodian	సంరక్షకుడు
+By post	పోస్ట్ ద్వారా
+Digital copy	డిజిటల్ కాపీ
+Comfort care, pain relief, mouth care and feeding by mouth always continue. This cannot be changed.	ఉపశమన సంరక్షణ, నొప్పి నివారణ, నోటి సంరక్షణ, నోటి ద్వారా తినిపించడం ఎల్లప్పుడూ కొనసాగుతాయి. దీన్ని మార్చలేరు.
+Tube feeding is a medical treatment. Comfort feeding by mouth always continues.	నాళం ద్వారా ఆహారం ఇవ్వడం ఒక వైద్య చికిత్స. ఉపశమనం కోసం నోటి ద్వారా తినిపించడం ఎల్లప్పుడూ కొనసాగుతుంది.
+If the situation is ambiguous or not anticipated by the AMD, it is not applied.	పరిస్థితి స్పష్టంగా లేకపోతే, లేదా AMD లో ఊహించని పరిస్థితి అయితే, AMD వర్తించదు.
+The AMD governs over this plan.	ఈ ప్రణాళిక కంటే AMD కే ప్రాధాన్యం ఉంటుంది.
+Sahara prints the paper. It becomes valid only when you sign it by hand in front of two witnesses and a notary or gazetted officer attests it. Then you add a photo or scan here.	Sahara కాగితాన్ని ప్రింట్ చేస్తుంది. మీరు ఇద్దరు సాక్షుల ముందు చేత్తో సంతకం చేసి, నోటరీ లేదా గెజిటెడ్ అధికారి ధృవీకరించినప్పుడు మాత్రమే ఇది చెల్లుతుంది. ఆ తర్వాత ఇక్కడ ఫోటో లేదా స్కాన్ జోడించండి.
+Legal review pending	న్యాయ సమీక్ష మిగిలి ఉంది
+For a patient who cannot decide, withholding or withdrawing life-sustaining treatment may need the Medical Board process (Common Cause 2023; Harish Rana 2026). This plan records wishes and clinical limits; it does not by itself legally authorise withholding treatment.	నిర్ణయం తీసుకోలేని రోగి విషయంలో, ప్రాణాధార చికిత్సను ప్రారంభించకపోవడం లేదా ఆపడం కోసం మెడికల్ బోర్డ్ ప్రక్రియ అవసరం కావచ్చు (కామన్ కాజ్ 2023; హరీష్ రాణా 2026). ఈ ప్రణాళిక కోరికలను, వైద్య పరిమితులను నమోదు చేస్తుంది; చికిత్సను నిలిపివేయడానికి ఇది స్వయంగా చట్టపరమైన అనుమతి ఇవ్వదు.
+After both boards agree, nothing is done for 30 days. In this reconsideration period, anyone affected may go to court (Harish Rana, 2026 INSC 222, para 322(vi)).	రెండు బోర్డులు అంగీకరించిన తర్వాత, 30 రోజులు ఏమీ చేయరు. ఈ పునఃపరిశీలన కాలంలో ప్రభావితులైన ఎవరైనా కోర్టుకు వెళ్లవచ్చు (హరీష్ రాణా, 2026 INSC 222, పేరా 322(vi)).
+Withholding or withdrawing life-sustaining treatment for a patient who cannot decide follows the board process below. This app only shows it as information. It never starts, stops or decides any treatment. (Legal review pending.)	నిర్ణయం తీసుకోలేని రోగి విషయంలో ప్రాణాధార చికిత్సను ప్రారంభించకపోవడం లేదా ఆపడం కింద ఇచ్చిన బోర్డ్ ప్రక్రియ ప్రకారం జరుగుతుంది. ఈ యాప్ దీన్ని కేవలం సమాచారంగా మాత్రమే చూపుతుంది. ఇది ఏ చికిత్సనూ ఎప్పుడూ ప్రారంభించదు, ఆపదు, నిర్ణయించదు. (న్యాయ సమీక్ష మిగిలి ఉంది.)
+1. Primary Medical Board (hospital): the treating doctor and at least two experts with 5+ years of experience. It meets the patient with the named representatives and gives its opinion, preferably within 48 hours.	1. ప్రాథమిక మెడికల్ బోర్డ్ (ఆసుపత్రి): చికిత్స చేస్తున్న డాక్టర్, కనీసం 5+ సంవత్సరాల అనుభవం ఉన్న ఇద్దరు నిపుణులు. ఇది పేరు పెట్టిన ప్రతినిధులతో కలిసి రోగిని కలిసి, వీలైతే 48 గంటల్లో తన అభిప్రాయం ఇస్తుంది.
+2. Secondary Medical Board: a doctor nominated by the district Chief Medical Officer (from a panel reviewed at least every 12 months; nomination preferably within 48 hours of the hospital’s request) and at least two other experts, none from the first board. Opinion preferably within 48 hours.	2. ద్వితీయ మెడికల్ బోర్డ్: జిల్లా ముఖ్య వైద్యాధికారి నామినేట్ చేసిన డాక్టర్ (కనీసం ప్రతి 12 నెలలకు సమీక్షించే ప్యానెల్ నుండి; ఆసుపత్రి అభ్యర్థన చేసిన 48 గంటల్లో నామినేషన్ ఉంటే మంచిది) మరియు కనీసం ఇద్దరు ఇతర నిపుణులు, వీరిలో ఎవరూ మొదటి బోర్డులో ఉండకూడదు. అభిప్రాయం వీలైతే 48 గంటల్లో.
+3. Consent: the named representatives (DHRs) consent in writing; without an AMD, the next of kin’s written consent, reflecting the patient’s own wishes. The hospital then informs the Judicial Magistrate First Class (JMFC).	3. అంగీకారం: పేరు పెట్టిన ప్రతినిధులు (DHR) లిఖితపూర్వకంగా అంగీకరిస్తారు; AMD లేకపోతే, రోగి స్వంత కోరికలను ప్రతిబింబించే దగ్గరి బంధువు లిఖిత అంగీకారం. ఆ తర్వాత ఆసుపత్రి జ్యుడీషియల్ మేజిస్ట్రేట్ ఫస్ట్ క్లాస్ (JMFC) కు తెలియజేస్తుంది.
+4. After both boards agree there is a 30-day reconsideration period, when anyone affected may go to court (Harish Rana, 2026). Only then is there a planned palliative process, never abandonment.	4. రెండు బోర్డులు అంగీకరించిన తర్వాత 30 రోజుల పునఃపరిశీలన కాలం ఉంటుంది, ఆ సమయంలో ప్రభావితులైన ఎవరైనా కోర్టుకు వెళ్లవచ్చు (హరీష్ రాణా, 2026). ఆ తర్వాతే ప్రణాళికాబద్ధమైన పాలియేటివ్ ప్రక్రియ ఉంటుంది, ఎప్పుడూ విడిచిపెట్టడం కాదు.
+5. If a board refuses, or the hospital will not start the process, the representatives, family or doctors may approach the High Court (Article 226).	5. బోర్డ్ నిరాకరించినా, లేదా ఆసుపత్రి ప్రక్రియను ప్రారంభించకపోయినా, ప్రతినిధులు, కుటుంబం లేదా డాక్టర్లు హైకోర్టును (ఆర్టికల్ 226) ఆశ్రయించవచ్చు.
+Enter your full name.	మీ పూర్తి పేరు రాయండి.
+Enter your date of birth.	మీ పుట్టిన తేదీ రాయండి.
+Enter a real date of birth.	సరైన పుట్టిన తేదీ రాయండి.
+Only an adult (18 years or older) can make a living will.	పెద్దవారు (18 సంవత్సరాలు లేదా అంతకంటే ఎక్కువ) మాత్రమే లివింగ్ విల్ చేయవచ్చు.
+Enter only the last 4 digits of the ID.	ID చివరి 4 అంకెలు మాత్రమే రాయండి.
+Your address is empty. You will need to write it by hand on the paper.	మీ చిరునామా ఖాళీగా ఉంది. మీరు కాగితంపై చేత్తో రాయాల్సి ఉంటుంది.
+Confirm that you understand what this document means.	ఈ పత్రం అర్థం ఏమిటో మీకు అర్థమైందని నిర్ధారించండి.
+Confirm that nobody is forcing or pressuring you.	ఎవరూ మిమ్మల్ని బలవంతం చేయడం లేదా ఒత్తిడి చేయడం లేదని నిర్ధారించండి.
+Confirm that you have thought about this carefully.	మీరు దీని గురించి జాగ్రత్తగా ఆలోచించారని నిర్ధారించండి.
+Confirm that you understand it will not be used if the situation is unclear or was not foreseen.	పరిస్థితి స్పష్టంగా లేకపోతే లేదా ముందుగా ఊహించకపోతే దీన్ని ఉపయోగించరని మీకు అర్థమైందని నిర్ధారించండి.
+Choose at least one situation when this living will applies.	ఈ లివింగ్ విల్ వర్తించే కనీసం ఒక పరిస్థితిని ఎంచుకోండి.
+You have not chosen any specific treatment. The general direction in Section 2 will still apply.	మీరు ఏ నిర్దిష్ట చికిత్సనూ ఎంచుకోలేదు. 2వ విభాగంలోని సాధారణ నిర్దేశం ఇప్పటికీ వర్తిస్తుంది.
+A living will cannot ask for anything meant to end life. That is against the law in India. Please change these words.	లివింగ్ విల్‌లో ప్రాణం తీయడానికి ఉద్దేశించిన దేన్నీ కోరకూడదు. భారతదేశంలో అది చట్ట విరుద్ధం. దయచేసి ఈ మాటలను మార్చండి.
+Name at least one person who can speak for you (a representative).	మీ తరఫున మాట్లాడగల కనీసం ఒక వ్యక్తి (ప్రతినిధి) పేరు రాయండి.
+It is better to name two representatives, in order of preference, in case the first cannot be reached.	మొదటివారిని సంప్రదించలేకపోతే అనే ఉద్దేశంతో, ఇద్దరు ప్రతినిధుల పేర్లను ప్రాధాన్యతా క్రమంలో రాయడం మంచిది.
+Representative $n: enter the full name.	ప్రతినిధి $n: పూర్తి పేరు రాయండి.
+Representative $n: say how they are related to you.	ప్రతినిధి $n: వారు మీకు ఏమవుతారో చెప్పండి.
+Representative $n: enter a mobile number.	ప్రతినిధి $n: మొబైల్ నంబర్ రాయండి.
+Representative $n: enter only the last 4 digits of the ID.	ప్రతినిధి $n: ID చివరి 4 అంకెలు మాత్రమే రాయండి.
+Representative $n must be an adult (18 or older).	ప్రతినిధి $n పెద్దవారై (18 లేదా అంతకంటే ఎక్కువ) ఉండాలి.
+You cannot name yourself as your representative.	మిమ్మల్ని మీరే మీ ప్రతినిధిగా పేర్కొనలేరు.
+Representative $n: talk to them and tick that they agreed before you sign.	ప్రతినిధి $n: వారితో మాట్లాడి, మీరు సంతకం చేయడానికి ముందు వారు అంగీకరించారని టిక్ చేయండి.
+The same person is listed twice as a representative.	ఒకే వ్యక్తి ప్రతినిధిగా రెండుసార్లు రాసి ఉన్నారు.
+Write your panchayat or municipality so a copy can go to its custodian.	మీ పంచాయతీ లేదా మునిసిపాలిటీ రాయండి, తద్వారా ఒక కాపీ దాని సంరక్షకుడికి వెళ్లగలదు.
+Print the PDF first. Only a printed and signed version can be recorded.	ముందు PDF ప్రింట్ చేయండి. ప్రింట్ చేసి సంతకం చేసిన వెర్షన్ మాత్రమే నమోదు కాగలదు.
+Enter the date it was signed.	సంతకం చేసిన తేదీ రాయండి.
+The signing date cannot be in the future.	సంతకం తేదీ భవిష్యత్తులో ఉండకూడదు.
+The signing date is before this version was printed. Check you uploaded the right version.	సంతకం తేదీ ఈ వెర్షన్ ప్రింట్ అయిన తేదీ కంటే ముందు ఉంది. సరైన వెర్షన్ అప్‌లోడ్ చేశారో చూడండి.
+Upload a photo or scan of the signed and attested paper.	సంతకం చేసి ధృవీకరించిన కాగితం ఫోటో లేదా స్కాన్ అప్‌లోడ్ చేయండి.
+Enter the name of witness $n.	సాక్షి $n పేరు రాయండి.
+The person making the living will cannot be their own witness.	లివింగ్ విల్ చేసే వ్యక్తి తనకు తానే సాక్షి కాకూడదు.
+Witness $n is also a named representative. Witnesses should preferably be independent.	సాక్షి $n కూడా పేరు పెట్టిన ప్రతినిధి. సాక్షులు వీలైతే స్వతంత్రులై ఉండాలి.
+Witness $n: enter only the last 4 digits of the ID.	సాక్షి $n: ID చివరి 4 అంకెలు మాత్రమే రాయండి.
+The two witnesses must be two different people.	ఇద్దరు సాక్షులు వేర్వేరు వ్యక్తులై ఉండాలి.
+Choose who attested it: a notary or a gazetted officer.	ఎవరు ధృవీకరించారో ఎంచుకోండి: నోటరీ లేదా గెజిటెడ్ అధికారి.
+Enter the name of the notary or gazetted officer.	నోటరీ లేదా గెజిటెడ్ అధికారి పేరు రాయండి.
+The notary or gazetted officer must be a different person from you, your representatives and the witnesses.	నోటరీ లేదా గెజిటెడ్ అధికారి మీరు, మీ ప్రతినిధులు, సాక్షులు కాకుండా వేరే వ్యక్తి అయి ఉండాలి.
+Record the custodian: acknowledged, or \"custodian pending\".	సంరక్షకుడిని నమోదు చేయండి: రసీదు ఇచ్చారు, లేదా \"సంరక్షకుడు మిగిలి ఉంది\".
+Enter the custodian officer’s name and the date they acknowledged it.	సంరక్షక అధికారి పేరు, వారు రసీదు ఇచ్చిన తేదీ రాయండి.
+Tick consent before linking to ABHA.	ABHA కు లింక్ చేయడానికి ముందు అంగీకారంపై టిక్ చేయండి.
+Enter an ABHA address like name@abdm, or the 14-digit ABHA number.	name@abdm వంటి ABHA చిరునామా, లేదా 14 అంకెల ABHA నంబర్ రాయండి.
+A living will is cancelled in writing. Tick that the person signed a written cancellation.	లివింగ్ విల్ లిఖితపూర్వకంగా రద్దవుతుంది. ఆ వ్యక్తి లిఖిత రద్దుపై సంతకం చేశారని టిక్ చేయండి.
+Enter the date of the written cancellation.	లిఖిత రద్దు తేదీ రాయండి.
+The date cannot be in the future.	తేదీ భవిష్యత్తులో ఉండకూడదు.
+No living will (AMD)	లివింగ్ విల్ (AMD) లేదు
+No AMD; earlier wishes noted	AMD లేదు; మునుపటి కోరికలు నమోదయ్యాయి
+Valid living will (AMD)	చెల్లుబాటయ్యే లివింగ్ విల్ (AMD)
+held at	ఉన్న చోటు
+attested by	ధృవీకరించినవారు
+Living will (AMD) executed in Sahara	Sahara లో అమలు చేసిన లివింగ్ విల్ (AMD)
+version $version	వెర్షన్ $version
+signed $signed	సంతకం $signed
+Also on this plan	ఈ ప్రణాళికలో కూడా
+Living will cancelled in writing	లివింగ్ విల్ లిఖితపూర్వకంగా రద్దయింది
+This plan still lists one. Check with the decision-maker	ఈ ప్రణాళిక ఇప్పటికీ ఒకదాన్ని చూపిస్తోంది. నిర్ణయం తీసుకునేవారిని అడగండి
+Living will in Sahara is not signed and attested, so it is not valid	Sahara లోని లివింగ్ విల్‌పై సంతకం, ధృవీకరణ లేవు, కాబట్టి అది చెల్లదు
+Section 1: Personal details	విభాగం 1: వ్యక్తిగత వివరాలు
+Section 2: Directions relating to life-sustaining treatment	విభాగం 2: ప్రాణాధార చికిత్సకు సంబంధించిన నిర్దేశాలు
+Section 3 (Optional): Wishes or desires during end-of-life care	విభాగం 3 (ఐచ్ఛికం): జీవిత చివరి సంరక్షణలో కోరికలు
+Section 4: Authorisation of the Designated Healthcare Representative (DHR)	విభాగం 4: నియమించిన ఆరోగ్య సంరక్షణ ప్రతినిధి (DHR) అధికారం
+Section 5 (Optional): Directions to be followed upon my death	విభాగం 5 (ఐచ్ఛికం): నా మరణం తర్వాత పాటించాల్సిన నిర్దేశాలు
+Declaration	ప్రకటన
+Validity of directive	నిర్దేశం చెల్లుబాటు
+Signature of the executor	నిర్దేశం చేసినవారి సంతకం
+Signature of witnesses	సాక్షుల సంతకాలు
+Notarisation / Attestation	నోటరీ / గెజిటెడ్ అధికారి ధృవీకరణ
+ADVANCE MEDICAL DIRECTIVE	ముందస్తు వైద్య నిర్దేశం (లివింగ్ విల్)
+The English text is the valid text. The headings in this language are only to help reading.	ఇంగ్లీష్ పాఠమే చెల్లుతుంది. ఈ భాషలోని శీర్షికలు చదవడానికి సహాయం కోసం మాత్రమే.
+See every step of the board process (information only)	బోర్డ్ ప్రక్రియలోని అన్ని దశలను చూడండి (సమాచారం కోసం మాత్రమే)
+Your data and your rights	మీ డేటా, మీ హక్కులు
+Hide	దాచండి
+Show	చూపించండి
+Only the patient or the care team can download or delete this data. Please ask them.	ఈ డేటాను రోగి లేదా సంరక్షణ బృందం మాత్రమే డౌన్‌లోడ్ చేయగలరు లేదా తొలగించగలరు. దయచేసి వారిని అడగండి.
+The download could not be made. Try again.	డౌన్‌లోడ్ తయారు కాలేదు. మళ్లీ ప్రయత్నించండి.
+Download my data	నా డేటా డౌన్‌లోడ్ చేయండి
+Your data is ready. It holds private health details, so keep the file safe.	మీ డేటా సిద్ధంగా ఉంది. ఇందులో ప్రైవేట్ ఆరోగ్య వివరాలు ఉన్నాయి, కాబట్టి ఫైల్‌ను భద్రంగా ఉంచండి.
+Delete my local draft	నా లోకల్ డ్రాఫ్ట్ తొలగించండి
+This deletes the unsigned draft from this phone. It cannot be undone. Signed versions and the log stay.	ఇది సంతకం లేని డ్రాఫ్ట్‌ను ఈ ఫోన్ నుండి తొలగిస్తుంది. దీన్ని వెనక్కి తీసుకురాలేరు. సంతకం చేసిన వెర్షన్లు, లాగ్ అలాగే ఉంటాయి.
+Keep the draft	డ్రాఫ్ట్ ఉంచండి
+The unsigned draft is deleted from this phone. Signed versions and the log were kept.	సంతకం లేని డ్రాఫ్ట్ ఈ ఫోన్ నుండి తొలగించబడింది. సంతకం చేసిన వెర్షన్లు, లాగ్ ఉంచబడ్డాయి.
+There is no unsigned draft to delete. A plan someone has already signed is kept.	తొలగించడానికి సంతకం లేని డ్రాఫ్ట్ ఏదీ లేదు. ఎవరైనా ఇప్పటికే సంతకం చేసిన ప్రణాళిక ఉంచబడుతుంది.
+Yes, delete the draft	అవును, డ్రాఫ్ట్ తొలగించండి
+I have read this	నేను ఇది చదివాను
+Review is $late days late	సమీక్ష $late రోజులు ఆలస్యమైంది
+Review is due today	సమీక్ష ఈరోజే
+Review is due in $days days	సమీక్ష $days రోజుల్లో ఉంది
+SMS not configured on this server, so reminders cannot be sent. Please phone them.	ఈ సర్వర్‌లో SMS సెట్ కాలేదు, కాబట్టి రిమైండర్లు పంపలేము. దయచేసి వారికి ఫోన్ చేయండి.
+The server could not be reached. Check the internet, or phone them.	సర్వర్‌ను చేరుకోలేకపోయాం. ఇంటర్నెట్ చూడండి, లేదా వారికి ఫోన్ చేయండి.
+No valid mobile number for the patient or the primary decision-maker.	రోగికి లేదా ప్రధాన నిర్ణయం తీసుకునేవారికి సరైన మొబైల్ నంబర్ లేదు.
+The reminder goes to $name. The number goes to the SMS company.	రిమైండర్ $name కు వెళ్తుంది. నంబర్ SMS కంపెనీకి వెళ్తుంది.
+Send review reminder	సమీక్ష రిమైండర్ పంపండి
+Reminder sent.	రిమైండర్ పంపబడింది.
+SMS not configured on this server. No message was sent. Please phone them.	ఈ సర్వర్‌లో SMS సెట్ కాలేదు. ఏ సందేశమూ పంపబడలేదు. దయచేసి వారికి ఫోన్ చేయండి.
+Too many reminders to this number in the last hour. No message was sent.	గత ఒక గంటలో ఈ నంబర్‌కు చాలా రిమైండర్లు వెళ్లాయి. ఏ సందేశమూ పంపబడలేదు.
+The SMS could not be sent. Please phone them.	SMS పంపలేకపోయాం. దయచేసి వారికి ఫోన్ చేయండి.
+Time (24-hour)	సమయం (24 గంటలు)
+Pilot audit log	పైలట్ ఆడిట్ లాగ్
+For the care team only. Made-up patients only during the pilot. Saved on this phone.	సంరక్షణ బృందం కోసం మాత్రమే. పైలట్ సమయంలో కల్పిత రోగులు మాత్రమే. ఈ ఫోన్‌లో సేవ్ అవుతుంది.
+Reach: found eligible to signed	చేరుకోవడం: అర్హులుగా గుర్తించినప్పటి నుండి సంతకం వరకు
+Not known yet: needs the date found eligible and a signature	ఇంకా తెలియదు: అర్హులుగా గుర్తించిన తేదీ, సంతకం కావాలి
+$reach days	$reach రోజులు
+Values section completed	విలువల విభాగం పూర్తయింది
+No plan yet	ఇంకా ప్రణాళిక లేదు
+treatment fields filled: $filled of $total	నింపిన చికిత్స విభాగాలు: $total లో $filled
+Record found within $target minutes of ED arrival	ED కి వచ్చిన $target నిమిషాల్లో రికార్డ్ దొరికింది
+$within of $all episodes	$all ఘటనల్లో $within
+Care matched the recorded plan	చికిత్స నమోదైన ప్రణాళికకు అనుగుణంగా జరిగింది
+$ok of $compared that could be compared	పోల్చగలిగిన $compared లో $ok
+Log an ED episode	ED ఘటనను నమోదు చేయండి
+Record an outcome	ఫలితాన్ని నమోదు చేయండి
+Report an incident	సంఘటనను రిపోర్ట్ చేయండి
+ED episode saved.	ED ఘటన సేవ్ అయింది.
+Outcome saved.	ఫలితం సేవ్ అయింది.
+Incident saved.	సంఘటన సేవ్ అయింది.
+ED episodes	ED ఘటనలు
+None recorded yet.	ఇంకా ఏదీ నమోదు కాలేదు.
+Nothing to compare	పోల్చడానికి ఏదీ లేదు
+Matched the plan	ప్రణాళికకు అనుగుణంగా ఉంది
+Differed from the plan	ప్రణాళికకు భిన్నంగా ఉంది
+The record was not opened	రికార్డ్ తెరవలేదు
+Record opened after $minutes minutes	$minutes నిమిషాల తర్వాత రికార్డ్ తెరిచారు
+over the $target-minute target	$target నిమిషాల లక్ష్యం కంటే ఎక్కువ
+Highest support	అత్యధిక సహాయం
+Why care differed	చికిత్స ఎందుకు భిన్నంగా జరిగింది
+Recorded by	నమోదు చేసినవారు
+Outcomes	ఫలితాలు
+Preference not known	ఇష్టం తెలియదు
+Where they preferred	వారు కోరుకున్న చోట
+Not where they preferred	వారు కోరుకున్న చోట కాదు
+Preferred place	ఇష్టమైన చోటు
+ICU days	ICU రోజులు
+ventilator days	వెంటిలేటర్ రోజులు
+Admission to first symptom-control prescription	చేరిక నుండి మొదటి లక్షణ నియంత్రణ మందు వరకు
+$h hours	$h గంటలు
+Out-of-pocket spend, last admission	చివరి చేరికకు సొంత జేబు నుండి ఖర్చు
+Incidents	సంఘటనలు
+None reported yet.	ఇంకా ఏదీ రిపోర్ట్ కాలేదు.
+Plan applied to a reversible illness	నయమయ్యే వ్యాధికి ప్రణాళిక వర్తింపజేశారు
+Family felt pushed	కుటుంబానికి ఒత్తిడి అనిపించింది
+Reported by	రిపోర్ట్ చేసినవారు
+ED arrival time	ED కి చేరిన సమయం
+First time the record was opened	రికార్డ్ మొదటిసారి తెరిచిన సమయం
+$m minutes after arrival	చేరిన $m నిమిషాల తర్వాత
+The access log has no ED access after this arrival time.	యాక్సెస్ లాగ్‌లో ఈ చేరిక సమయం తర్వాత ED యాక్సెస్ ఏదీ లేదు.
+Fill from the access log	యాక్సెస్ లాగ్ నుండి నింపండి
+Highest breathing support actually given	వాస్తవంగా ఇచ్చిన అత్యధిక శ్వాస సహాయం
+CPR given?	CPR ఇచ్చారా?
+Admitted to ICU?	ICU లో చేర్చారా?
+If care differed from the plan, why?	చికిత్స ప్రణాళికకు భిన్నంగా జరిగితే, ఎందుకు?
+No signed plan was in force at this time, so there is nothing to compare.	ఈ సమయంలో సంతకం చేసిన ప్రణాళిక అమలులో లేదు, కాబట్టి పోల్చడానికి ఏదీ లేదు.
+Compared with version $v: nothing to compare yet.	వెర్షన్ $v తో పోలిక: ఇంకా పోల్చడానికి ఏదీ లేదు.
+Compared with version $v: matches the plan.	వెర్షన్ $v తో పోలిక: ప్రణాళికకు అనుగుణంగా ఉంది.
+Compared with version $v: differs from the plan.	వెర్షన్ $v తో పోలిక: ప్రణాళికకు భిన్నంగా ఉంది.
+Enter the ED arrival time.	ED కి చేరిన సమయం రాయండి.
+The first access time cannot be before arrival.	మొదటి యాక్సెస్ సమయం చేరిక సమయం కంటే ముందు ఉండకూడదు.
+Care differed from the plan. Write why.	చికిత్స ప్రణాళికకు భిన్నంగా జరిగింది. కారణం రాయండి.
+Save the episode	ఘటనను సేవ్ చేయండి
+Place of death	మరణించిన చోటు
+ICU days in the last 30 days	చివరి 30 రోజుల్లో ICU రోజులు
+Ventilator days in the last 30 days	చివరి 30 రోజుల్లో వెంటిలేటర్ రోజులు
+Last admission time	చివరి చేరిక సమయం
+First symptom-control prescription	మొదటి లక్షణ నియంత్రణ మందు
+Out-of-pocket spend, last admission (₹)	చివరి చేరికకు సొంత జేబు నుండి ఖర్చు (₹)
+Enter at least one item.	కనీసం ఒక అంశం నింపండి.
+Days must be between 0 and 30.	రోజులు 0 నుండి 30 మధ్య ఉండాలి.
+The first prescription cannot be before admission.	మొదటి మందు చేరిక కంటే ముందు ఉండకూడదు.
+Spend cannot be below zero.	ఖర్చు సున్నా కంటే తక్కువ ఉండకూడదు.
+Save the outcome	ఫలితాన్ని సేవ్ చేయండి
+The plan was applied to a reversible illness	ప్రణాళికను నయమయ్యే వ్యాధికి వర్తింపజేశారు
+The family felt pushed	కుటుంబానికి ఒత్తిడి అనిపించింది
+Notes	నోట్లు
+Tick a box or write what happened.	ఒక బాక్స్ టిక్ చేయండి లేదా ఏం జరిగిందో రాయండి.
+Save the incident	సంఘటనను సేవ్ చేయండి
+The PDF could not be made. Try again.	PDF తయారు కాలేదు. మళ్లీ ప్రయత్నించండి.
+Living will	లివింగ్ విల్
+This follows the model living will by the Vidhi Centre for Legal Policy and ACP India, and the Supreme Court’s rules (2018, changed on 24 January 2023). If both a living will and an emergency plan exist, the living will governs.	ఇది విధి సెంటర్ ఫర్ లీగల్ పాలసీ, ACP ఇండియా రూపొందించిన నమూనా లివింగ్ విల్‌ను, సుప్రీం కోర్టు నియమాలను (2018, 2023 జనవరి 24న మార్చినవి) అనుసరిస్తుంది. లివింగ్ విల్, అత్యవసర ప్రణాళిక రెండూ ఉంటే, లివింగ్ విల్‌కే ప్రాధాన్యం.
+What happens if treatment is to be held back or stopped (information only)	చికిత్సను ప్రారంభించకపోతే లేదా ఆపితే ఏమవుతుంది (సమాచారం కోసం మాత్రమే)
+The living will was cancelled in writing on $on. It no longer applies.	లివింగ్ విల్‌ను $on న లిఖితపూర్వకంగా రద్దు చేశారు. ఇది ఇకపై వర్తించదు.
+A living will has been started or printed but is not signed and recorded. It is not valid.	లివింగ్ విల్ ప్రారంభించారు లేదా ప్రింట్ చేశారు కానీ సంతకం చేసి నమోదు చేయలేదు. ఇది చెల్లదు.
+No living will is recorded in Sahara. Ask the family if a signed paper exists.	Sahara లో ఏ లివింగ్ విల్ నమోదు కాలేదు. సంతకం చేసిన కాగితం ఉందేమో కుటుంబాన్ని అడగండి.
+Make a new living will	కొత్త లివింగ్ విల్ చేయండి
+Start a living will	లివింగ్ విల్ ప్రారంభించండి
+ID document	గుర్తింపు పత్రం
+Last 4 digits only	చివరి 4 అంకెలు మాత్రమే
+Never type the full number here. Write it by hand on the paper.	పూర్తి నంబర్‌ను ఇక్కడ ఎప్పుడూ టైప్ చేయకండి. కాగితంపై చేత్తో రాయండి.
+Living will v$version · $status	లివింగ్ విల్ v$version · $status
+Full name	పూర్తి పేరు
+Gender	లింగం
+Date of birth	పుట్టిన తేదీ
+Permanent address	శాశ్వత చిరునామా
+Current address (if different)	ప్రస్తుత చిరునామా (వేరుగా ఉంటే)
+Municipality or panchayat	మునిసిపాలిటీ లేదా పంచాయతీ
+Why you are making this, and what matters to you (optional)	మీరు దీన్ని ఎందుకు చేస్తున్నారు, మీకు ఏది ముఖ్యం (ఐచ్ఛికం)
+Please confirm	దయచేసి నిర్ధారించండి
+I understand what this document means and what can happen because of it.	ఈ పత్రం అర్థం ఏమిటో, దీని వల్ల ఏం జరగవచ్చో నాకు అర్థమైంది.
+I have thought about it carefully.	నేను దీని గురించి జాగ్రత్తగా ఆలోచించాను.
+I am doing this by my own free will. Nobody is forcing or pressuring me.	నేను ఇది నా స్వంత ఇష్టంతో చేస్తున్నాను. ఎవరూ నన్ను బలవంతం చేయడం లేదా ఒత్తిడి చేయడం లేదు.
+I understand doctors will not use it if the situation is unclear or one I did not think of.	పరిస్థితి స్పష్టంగా లేకపోయినా, లేదా నేను ఊహించని పరిస్థితి అయినా, డాక్టర్లు దీన్ని ఉపయోగించరని నాకు అర్థమైంది.
+I cannot read or write. Someone wrote this as I said and read it out to me.	నేను చదవలేను, రాయలేను. నేను చెప్పినట్లు ఎవరో దీన్ని రాసి, నాకు చదివి వినిపించారు.
+A doctor’s certificate that I can decide is attached (optional; not required).	నేను నిర్ణయం తీసుకోగలనని చెప్పే డాక్టర్ సర్టిఫికెట్ జతచేయబడింది (ఐచ్ఛికం; తప్పనిసరి కాదు).
+It applies only when your doctors decide there is no reasonable chance you will recover, and more treatment would only make dying longer. Choose the situations:	మీరు కోలుకునే సహేతుకమైన అవకాశం లేదని, మరింత చికిత్స మరణాన్ని మాత్రమే పొడిగిస్తుందని మీ డాక్టర్లు నిర్ణయించినప్పుడు మాత్రమే ఇది వర్తిస్తుంది. పరిస్థితులను ఎంచుకోండి:
+Any illness you expect, and what you want for it (optional)	మీరు ఊహించే ఏదైనా వ్యాధి, దానికి మీరు ఏం కోరుకుంటున్నారు (ఐచ్ఛికం)
+For each treatment, choose what you want in those situations. You can leave any as “Not decided”.	ప్రతి చికిత్సకు, ఆ పరిస్థితుల్లో మీరు ఏం కోరుకుంటున్నారో ఎంచుకోండి. ఏదైనా “ఇంకా నిర్ణయించలేదు” గా వదిలేయవచ్చు.
+Where would you like to be cared for at the end?	చివర్లో మీకు ఎక్కడ సంరక్షణ కావాలి?
+Name of the place	స్థలం పేరు
+Doctor you would like to look after you (name, place)	మిమ్మల్ని చూసుకోవాలని మీరు కోరుకునే డాక్టర్ (పేరు, స్థలం)
+Anything doctors should pay special attention to	డాక్టర్లు ప్రత్యేక శ్రద్ధ పెట్టాల్సిన విషయాలు
+For example: easing worry and confusion so I can spend time with family	ఉదాహరణకు: నేను కుటుంబంతో సమయం గడపగలిగేలా ఆందోళన, గందరగోళం తగ్గించడం
+Name you want to be called	మిమ్మల్ని పిలవాలని మీరు కోరుకునే పేరు
+Gender or pronouns to respect	గౌరవించాల్సిన లింగం లేదా సర్వనామాలు
+Partner’s name	భాగస్వామి పేరు
+How staff should refer to them	సిబ్బంది వారిని ఎలా సంబోధించాలి
+my partner	నా భాగస్వామి
+Representatives (DHRs) speak for you when you cannot. Put them in order: the first is asked first. Talk to them before you name them.	మీరు మాట్లాడలేనప్పుడు ప్రతినిధులు (DHR) మీ తరఫున మాట్లాడతారు. వారిని క్రమంలో ఉంచండి: మొదటివారిని ముందుగా అడుగుతారు. పేరు రాసే ముందు వారితో మాట్లాడండి.
+Add another representative	మరో ప్రతినిధిని జోడించండి
+They must decide together (instead of in order).	వారు కలిసి నిర్ణయించాలి (క్రమంలో కాకుండా).
+Family doctor (optional)	కుటుంబ డాక్టర్ (ఐచ్ఛికం)
+Phone	ఫోన్
+Local body that keeps living wills (custodian)	లివింగ్ విల్‌లను ఉంచే స్థానిక సంస్థ (సంరక్షకుడు)
+For example your municipal corporation or gram panchayat. Maharashtra and Karnataka (rural) have named custodians; Andhra Pradesh has not confirmed one yet. You can still sign and record “custodian pending”.	ఉదాహరణకు మీ మున్సిపల్ కార్పొరేషన్ లేదా గ్రామ పంచాయతీ. మహారాష్ట్ర, కర్ణాటక (గ్రామీణ) సంరక్షకులను పేర్కొన్నాయి; ఆంధ్రప్రదేశ్ ఇంకా నిర్ధారించలేదు. మీరు ఇప్పటికీ సంతకం చేసి “సంరక్షకుడు మిగిలి ఉంది” అని నమోదు చేయవచ్చు.
+I am a registered organ donor (Form 7, THOTA 1994).	నేను నమోదైన అవయవ దాతను (ఫారం 7, THOTA 1994).
+I want to donate my body for medical study.	వైద్య అధ్యయనం కోసం నా శరీరాన్ని దానం చేయాలని కోరుకుంటున్నాను.
+Medical college or organisation	మెడికల్ కాలేజీ లేదా సంస్థ
+Wishes about last rites	అంత్యక్రియల గురించి కోరికలు
+Once printed, this version cannot be changed in the app. To change anything, start a new version and print again.	ప్రింట్ చేసిన తర్వాత ఈ వెర్షన్‌ను యాప్‌లో మార్చలేరు. ఏదైనా మార్చాలంటే, కొత్త వెర్షన్ ప్రారంభించి మళ్లీ ప్రింట్ చేయండి.
+Make the PDF to print and sign	ప్రింట్ చేసి సంతకం చేయడానికి PDF తయారు చేయండి
+1. First representative	1. మొదటి ప్రతినిధి
+$n. If the one before cannot be reached	$n. ముందున్నవారిని సంప్రదించలేకపోతే
+Move up	పైకి జరపండి
+How they are related to you	వారు మీకు ఏమవుతారు
+Mobile number	మొబైల్ నంబర్
+Other number (optional)	మరో నంబర్ (ఐచ్ఛికం)
+Date of birth (optional)	పుట్టిన తేదీ (ఐచ్ఛికం)
+Email (optional)	ఇమెయిల్ (ఐచ్ఛికం)
+Address	చిరునామా
+I have talked to them and they agreed to be my representative.	నేను వారితో మాట్లాడాను, వారు నా ప్రతినిధిగా ఉండటానికి అంగీకరించారు.
+Custodian (local body)	సంరక్షకుడు (స్థానిక సంస్థ)
+The custodian received a copy and acknowledged it	సంరక్షకుడికి కాపీ అందింది, వారు రసీదు ఇచ్చారు
+Custodian pending (none appointed yet, or no reply)	సంరక్షకుడు మిగిలి ఉంది (ఇంకా నియమించలేదు, లేదా జవాబు లేదు)
+Officer’s name and office	అధికారి పేరు, కార్యాలయం
+Date acknowledged	రసీదు ఇచ్చిన తేదీ
+Tip from the Vidhi toolkit: write to the head of your local body (Commissioner, Sarpanch or President), citing para 198.3.6 of the Supreme Court order of 24 January 2023, and ask them to name a custodian. Attach a copy.	విధి టూల్‌కిట్ సలహా: మీ స్థానిక సంస్థ అధిపతికి (కమిషనర్, సర్పంచ్ లేదా అధ్యక్షుడు) లేఖ రాసి, 2023 జనవరి 24 నాటి సుప్రీం కోర్టు ఆదేశంలోని పేరా 198.3.6 ను ప్రస్తావిస్తూ, సంరక్షకుడిని నియమించమని అడగండి. ఒక కాపీ జత చేయండి.
+Version $version is printed. It is not valid until signed and attested.	వెర్షన్ $version ప్రింట్ అయింది. సంతకం చేసి ధృవీకరించే వరకు ఇది చెల్లదు.
+Print the PDF. Read it once more.	PDF ప్రింట్ చేయండి. ఒకసారి మళ్లీ చదవండి.
+Sign (or give a thumb impression) in front of two adult witnesses. Better if they are not your representatives.	ఇద్దరు పెద్దవారైన సాక్షుల ముందు సంతకం చేయండి (లేదా వేలిముద్ర వేయండి). వారు మీ ప్రతినిధులు కాకపోతే మంచిది.
+Take it to a notary or a gazetted officer to attest and stamp.	ధృవీకరణ, ముద్ర కోసం నోటరీ లేదా గెజిటెడ్ అధికారి దగ్గరికి తీసుకెళ్లండి.
+Take a clear photo or scan of every page and add it here.	ప్రతి పేజీ స్పష్టమైన ఫోటో లేదా స్కాన్ తీసి ఇక్కడ జోడించండి.
+Share the PDF again	PDF ను మళ్లీ షేర్ చేయండి
+Printed PDF SHA-256:	ప్రింట్ చేసిన PDF SHA-256:
+Date signed	సంతకం తేదీ
+Place	స్థలం
+Thumb impression instead of signature	సంతకానికి బదులు వేలిముద్ర
+Witness $n	సాక్షి $n
+Mobile	మొబైల్
+Attested by	ధృవీకరించినవారు
+Registration no. or designation	రిజిస్ట్రేషన్ నంబర్ లేదా హోదా
+Photo or scan of the signed, attested paper	సంతకం చేసి ధృవీకరించిన కాగితం ఫోటో లేదా స్కాన్
+Added · change	జోడించారు · మార్చండి
+Kept on this phone only. A SHA-256 fingerprint is recorded so a doctor can check the copy is the same.	ఈ ఫోన్‌లో మాత్రమే ఉంటుంది. కాపీ అదేనని డాక్టర్ తనిఖీ చేయడానికి SHA-256 వేలిముద్ర నమోదు చేయబడుతుంది.
+That file could not be read. Try another.	ఆ ఫైల్ చదవడం సాధ్యం కాలేదు. మరొకటి ప్రయత్నించండి.
+Record as signed and attested	సంతకం చేసి ధృవీకరించినట్లు నమోదు చేయండి
+Need to change something? Start a new version. This printed copy must then not be signed.	ఏదైనా మార్చాలా? కొత్త వెర్షన్ ప్రారంభించండి. అప్పుడు ఈ ప్రింట్ చేసిన కాపీపై సంతకం చేయకూడదు.
+Start a new version	కొత్త వెర్షన్ ప్రారంభించండి
+Signed living will · version $version	సంతకం చేసిన లివింగ్ విల్ · వెర్షన్ $version
+Check the paper copy against the scan and its SHA-256, or with the custodian. Doctors only read this here; nothing in the app starts or stops treatment.	కాగితం కాపీని స్కాన్, దాని SHA-256 తో లేదా సంరక్షకుడితో సరిచూడండి. డాక్టర్లు దీన్ని ఇక్కడ చదవడం మాత్రమే చేస్తారు; యాప్‌లో ఏదీ చికిత్సను ప్రారంభించదు, ఆపదు.
+This is the current living will. Doctors can see that it is signed, witnessed and attested.	ఇది ప్రస్తుత లివింగ్ విల్. ఇది సంతకం చేయబడి, సాక్షుల ముందు చేసి, ధృవీకరించబడిందని డాక్టర్లు చూడవచ్చు.
+thumb impression	వేలిముద్ర
+Witnesses	సాక్షులు
+Acknowledged by $officer on $on	$on న $officer రసీదు ఇచ్చారు
+Custodian pending	సంరక్షకుడు మిగిలి ఉంది
+Scan SHA-256	స్కాన్ SHA-256
+Printed PDF SHA-256	ప్రింట్ చేసిన PDF SHA-256
+View the signed scan	సంతకం చేసిన స్కాన్ చూడండి
+This copy is missing or does not match its fingerprint. Do not rely on it; ask for the signed paper.	ఈ కాపీ లేదు లేదా దాని వేలిముద్రతో సరిపోలడం లేదు. దీనిపై ఆధారపడకండి; సంతకం చేసిన కాగితం అడగండి.
+Does not want	కోరుకోవడం లేదు
+Wants	కోరుకుంటున్నారు
+Representatives, in order	ప్రతినిధులు, క్రమంలో
+Copies	కాపీలు
+Give a copy to each person below. Ask each one first: their consent to receive it is recorded separately.	కింద ఉన్న ప్రతి వ్యక్తికి ఒక కాపీ ఇవ్వండి. ముందు ప్రతి ఒక్కరినీ అడగండి: కాపీ తీసుకోవడానికి వారి అంగీకారం విడిగా నమోదవుతుంది.
+The patient agrees to send a copy to the custodian.	సంరక్షకుడికి కాపీ పంపడానికి రోగి అంగీకరిస్తున్నారు.
+The patient agrees to share it, and this person agrees to receive and keep it.	రోగి దీన్ని పంచుకోవడానికి అంగీకరిస్తున్నారు, ఈ వ్యక్తి దీన్ని తీసుకుని ఉంచుకోవడానికి అంగీకరిస్తున్నారు.
+Copy given on $on	కాపీ $on న ఇచ్చారు
+Copy given	కాపీ ఇచ్చారు
+Consent is needed before this copy can be marked as given.	ఈ కాపీని ఇచ్చినట్లు గుర్తించే ముందు అంగీకారం అవసరం.
+Save custodian	సంరక్షకుడిని సేవ్ చేయండి
+Link to ABHA health records (optional)	ABHA ఆరోగ్య రికార్డులకు లింక్ చేయండి (ఐచ్ఛికం)
+The Supreme Court allows adding the living will to digital health records. Sahara only notes the ABHA address here; upload the scan in your ABHA app yourself.	లివింగ్ విల్‌ను డిజిటల్ ఆరోగ్య రికార్డులకు జోడించడానికి సుప్రీం కోర్టు అనుమతిస్తుంది. సహారా ఇక్కడ ABHA చిరునామాను మాత్రమే నోట్ చేస్తుంది; స్కాన్‌ను మీ ABHA యాప్‌లో మీరే అప్‌లోడ్ చేయండి.
+ABHA address or number	ABHA చిరునామా లేదా నంబర్
+The patient agrees to link the living will with their ABHA records.	లివింగ్ విల్‌ను తన ABHA రికార్డులకు లింక్ చేయడానికి రోగి అంగీకరిస్తున్నారు.
+Save ABHA link	ABHA లింక్ సేవ్ చేయండి
+Linked on $on	$on న లింక్ చేశారు
+Change it	మార్చండి
+Changes make a new version that must be printed, signed and attested again. Version $version stays current until then.	మార్పులు చేస్తే కొత్త వెర్షన్ తయారవుతుంది, దాన్ని మళ్లీ ప్రింట్ చేసి, సంతకం చేసి, ధృవీకరించాలి. అప్పటి వరకు వెర్షన్ $version ప్రస్తుతంగా ఉంటుంది.
+A new version is already in progress below.	కొత్త వెర్షన్ ఇప్పటికే కింద కొనసాగుతోంది.
+Cancel it	రద్దు చేయండి
+A living will is cancelled in writing: the person signs a short note saying they cancel it, the same way it was made. Then give the note to everyone who has a copy.	లివింగ్ విల్ లిఖితపూర్వకంగా రద్దవుతుంది: ఆ వ్యక్తి దాన్ని ఎలా చేశారో అలాగే, దాన్ని రద్దు చేస్తున్నట్లు ఒక చిన్న నోట్‌పై సంతకం చేస్తారు. ఆ తర్వాత ఆ నోట్‌ను కాపీ ఉన్న అందరికీ ఇవ్వండి.
+Record a written cancellation	లిఖిత రద్దును నమోదు చేయండి
+Date of the written cancellation	లిఖిత రద్దు తేదీ
+The person signed a written cancellation.	ఆ వ్యక్తి లిఖిత రద్దుపై సంతకం చేశారు.
+Cancel the living will	లివింగ్ విల్ రద్దు చేయండి
+Sahara plans are for adults. This date of birth is under 18.	సహారా ప్రణాళికలు పెద్దవారి కోసం. ఈ పుట్టిన తేదీ 18 ఏళ్ల కంటే తక్కువ.
+Started in the emergency department. A plan made for the first time in the resuscitation bay records panic, not preference; review it when the patient is stable.	అత్యవసర విభాగంలో ప్రారంభించారు. రీసస్సిటేషన్ బేలో మొదటిసారి చేసిన ప్రణాళిక కంగారును నమోదు చేస్తుంది, ఇష్టాన్ని కాదు; రోగి స్థిరపడిన తర్వాత దీన్ని మళ్లీ చూడండి.
+Keep only the last 4 characters of an ID, never the full number.	ID యొక్క చివరి 4 అక్షరాలు మాత్రమే ఉంచండి, పూర్తి నంబర్‌ను ఎప్పుడూ కాదు.
+Record who assessed capacity, when, and the basis (understand, retain, weigh, communicate).	నిర్ణయించే సామర్థ్యాన్ని ఎవరు, ఎప్పుడు, ఏ ఆధారంగా పరీక్షించారో నమోదు చేయండి (అర్థం చేసుకోవడం, గుర్తుంచుకోవడం, తూకం వేయడం, తెలియజేయడం).
+Capacity fluctuates: add a reassessment date.	నిర్ణయించే సామర్థ్యం మారుతూ ఉంటుంది: మళ్లీ పరీక్షించే తేదీని జోడించండి.
+The family asked that the patient not be told, and the patient has capacity. Record the plan for answering direct questions honestly.	రోగికి చెప్పవద్దని కుటుంబం కోరింది, రోగికి నిర్ణయించే సామర్థ్యం ఉంది. ప్రత్యక్ష ప్రశ్నలకు నిజాయితీగా సమాధానం చెప్పే ప్రణాళికను నమోదు చేయండి.
+Treatment choices are locked until the illness has been explained as incurable and the family can repeat it back.	వ్యాధి నయం కాదని వివరించి, కుటుంబం దాన్ని తిరిగి చెప్పగలిగే వరకు చికిత్స ఎంపికలు లాక్ చేయబడ్డాయి.
+A decision-maker answering for the patient must first confirm they will say what the patient would have chosen.	రోగి తరఫున సమాధానం చెప్పే నిర్ణయం తీసుకునేవారు, రోగి ఏం ఎంచుకునేవారో అదే చెబుతామని ముందుగా నిర్ధారించాలి.
+CPR cannot be given without intubation. With this goal or breathing ceiling, \"attempt CPR\" needs a recorded reason.	ఇంట్యూబేషన్ లేకుండా CPR ఇవ్వలేము. ఈ లక్ష్యంతో లేదా ఈ శ్వాస పరిమితితో, \"CPR ప్రయత్నించండి\" కు నమోదు చేసిన కారణం అవసరం.
+Goal A (prioritise life) with a breathing ceiling below intubation or no ICU is unusual. Confirm this is intended.	శ్వాస పరిమితి ఇంట్యూబేషన్ కంటే తక్కువగా ఉన్న లేదా ICU లేని లక్ష్యం A (ప్రాణానికి ప్రాధాన్యం) అసాధారణం. ఇదే ఉద్దేశమని నిర్ధారించండి.
+Choose the reason for DNACPR.	DNACPR కు కారణాన్ని ఎంచుకోండి.
+Record who decided DNACPR: name, registration number, date and time.	DNACPR ను ఎవరు నిర్ణయించారో నమోదు చేయండి: పేరు, రిజిస్ట్రేషన్ నంబర్, తేదీ, సమయం.
+Tick at least one reason for going to hospital.	ఆసుపత్రికి వెళ్లడానికి కనీసం ఒక కారణాన్ని టిక్ చేయండి.
+Hospital transfer is \"No\", but HFNC, NIV or ICU usually need admission. Record a reason (for example, home NIV).	ఆసుపత్రికి తరలింపు \"వద్దు\" అని ఉంది, కానీ HFNC, NIV లేదా ICU కు సాధారణంగా చేరిక అవసరం. కారణం నమోదు చేయండి (ఉదాహరణకు, ఇంట్లో NIV).
+Goal C (comfort) with ICU, vasopressors or dialysis is a conflict. It can be saved only with a recorded reason.	లక్ష్యం C (ఉపశమనం) తో పాటు ICU, BP పెంచే మందులు లేదా డయాలసిస్ ఉంటే అది విరుద్ధం. నమోదు చేసిన కారణంతో మాత్రమే దీన్ని సేవ్ చేయవచ్చు.
+Invasive ventilation and vasopressors need ICU or HDU, but ICU is \"No\". Record a reason.	శ్వాస యంత్రం, BP పెంచే మందులకు ICU లేదా HDU అవసరం, కానీ ICU \"వద్దు\" అని ఉంది. కారణం నమోదు చేయండి.
+$name trial: enter the duration, the review date and time, and who will review.	$name ట్రయల్: వ్యవధి, సమీక్ష తేదీ, సమయం, ఎవరు సమీక్షిస్తారో రాయండి.
+Enter the maximum number of vasopressor agents.	BP పెంచే మందుల గరిష్ఠ సంఖ్య రాయండి.
+Enter how many days of nasogastric feeding before review.	సమీక్షకు ముందు ముక్కు ద్వారా నాళంతో ఎన్ని రోజులు ఆహారం ఇవ్వాలో రాయండి.
+The patient has an ICD. Record the deactivation decision and date, so a dying patient is not shocked.	రోగికి ICD ఉంది. చనిపోతున్న రోగికి షాక్ తగలకుండా, దాన్ని ఆపే నిర్ణయం, తేదీ నమోదు చేయండి.
+Removing an existing feeding tube is withdrawal of treatment. It follows the medical board pathway and cannot be acted on from this plan alone.	ఇప్పటికే ఉన్న ఆహార నాళాన్ని తీసివేయడం చికిత్సను ఉపసంహరించడం. ఇది మెడికల్ బోర్డ్ మార్గాన్ని అనుసరిస్తుంది, ఈ ప్రణాళిక ఒక్కదాని ఆధారంగా చేయలేరు.
+Treatment choices are filled but the values section is blank. Record what matters to the patient in their own words.	చికిత్స ఎంపికలు నింపారు కానీ విలువల విభాగం ఖాళీగా ఉంది. రోగికి ఏది ముఖ్యమో వారి స్వంత మాటల్లో నమోదు చేయండి.
+Set a review date that is not in the past.	గడిచిపోని సమీక్ష తేదీని పెట్టండి.
+The plan becomes active only when the treating consultant signs with their registration number.	చికిత్స చేస్తున్న కన్సల్టెంట్ తన రిజిస్ట్రేషన్ నంబర్‌తో సంతకం చేసినప్పుడు మాత్రమే ప్రణాళిక అమలులోకి వస్తుంది.
+Every printed page shows the name and hospital number (UHID). Enter both.	ప్రింట్ చేసిన ప్రతి పేజీలో పేరు, ఆసుపత్రి నంబర్ (UHID) ఉంటాయి. రెండూ రాయండి.
+A thumb impression or limited literacy needs two witnesses.	వేలిముద్ర వేసినా, లేదా చదువు తక్కువగా ఉన్నా, ఇద్దరు సాక్షులు అవసరం.
+IF IN DOUBT, RESUSCITATE	సందేహం ఉంటే, ప్రాణం కాపాడే పూర్తి చికిత్స చేయండి
+Give full standard emergency care when:	ఈ సందర్భాల్లో పూర్తి సాధారణ అత్యవసర చికిత్స ఇవ్వండి:
+the record is unsigned, out of date or cannot be found;	రికార్డ్‌పై సంతకం లేకపోతే, పాతబడితే లేదా కనిపించకపోతే;
+the problem is new, reversible and unrelated to the illness — injury, choking, drug reaction, low sugar;	సమస్య కొత్తది, నయం కాగలది, వ్యాధికి సంబంధం లేనిది అయితే — గాయం, గొంతులో ఇరుక్కోవడం, మందు రియాక్షన్, షుగర్ తగ్గడం;
+the patient has capacity and says something different now;	రోగికి నిర్ణయించే సామర్థ్యం ఉండి, ఇప్పుడు వేరే విధంగా చెబితే;
+the record is ambiguous.	రికార్డ్ స్పష్టంగా లేకపోతే.
+Clarify with the treating team afterwards.	తర్వాత చికిత్స చేసే బృందంతో స్పష్టం చేసుకోండి.
+Care that always continues	ఎల్లప్పుడూ కొనసాగే సంరక్షణ
+Mouth care and lip care, to keep the mouth moist and clean.	నోరు తేమగా, శుభ్రంగా ఉండేలా నోటి, పెదవుల సంరక్షణ.
+Food and drink by mouth, given by hand for comfort, as much as the person wants and can safely swallow.	ఉపశమనం కోసం చేత్తో నోటి ద్వారా ఆహారం, నీరు, వ్యక్తి కోరినంత, సురక్షితంగా మింగగలిగినంత.
+Relief of pain, breathlessness and other distressing symptoms, at any time of day or night.	నొప్పి, ఊపిరి ఆడకపోవడం, ఇతర బాధాకరమైన లక్షణాల నుండి ఉపశమనం, పగలైనా రాత్రైనా ఎప్పుడైనా.
+Washing, hygiene, skin care and pressure-area care.	స్నానం, పరిశుభ్రత, చర్మ సంరక్షణ, ఒత్తిడి పడే చోట్ల సంరక్షణ.
+Turning and positioning for comfort.	సౌకర్యం కోసం ఒత్తిగిల్లడం, సరైన భంగిమలో ఉంచడం.
+Family and loved ones may stay with the person.	కుటుంబ సభ్యులు, ఆత్మీయులు వ్యక్తి దగ్గర ఉండవచ్చు.
+Spiritual, emotional and psychological support for the person and family.	వ్యక్తికి, కుటుంబానికి ఆధ్యాత్మిక, భావోద్వేగ, మానసిక తోడ్పాటు.
+Dignity, privacy and kindness in all care.	ప్రతి సంరక్షణలో గౌరవం, గోప్యత, దయ.
+A limit on treatment never means no care.	చికిత్సపై పరిమితి అంటే సంరక్షణ లేదని ఎప్పుడూ అర్థం కాదు.
+No preference recorded — standard care	ఎంపిక నమోదు కాలేదు — సాధారణ చికిత్స
+A · Prioritise life	A · ప్రాణానికి ప్రాధాన్యం
+B · Balanced, within limits	B · సమతుల్యం, పరిమితుల్లో
+C · Prioritise comfort	C · ఉపశమనానికి ప్రాధాన్యం
+All medically effective treatment, including ICU and a breathing machine.	ICU, శ్వాస యంత్రంతో సహా వైద్యపరంగా ప్రభావవంతమైన ప్రతి చికిత్స.
+Treat problems that can be reversed, within the limits below, as time-limited trials.	నయం కాగల సమస్యలకు, కింద ఇచ్చిన పరిమితుల్లో, నిర్ణీత కాల ట్రయల్‌గా చికిత్స చేయండి.
+Comfort is the goal. Go to hospital only if comfort cannot be achieved where the patient is.	ఉపశమనమే లక్ష్యం. రోగి ఉన్న చోట ఉపశమనం సాధ్యం కాకపోతేనే ఆసుపత్రికి వెళ్లండి.
+Attempt CPR	CPR ప్రయత్నించండి
+Do not attempt CPR (DNACPR)	CPR ప్రయత్నించవద్దు (DNACPR)
+If the heart and breathing stop, try to restart them. Applies only to cardiac arrest.	గుండె, శ్వాస ఆగిపోతే, వాటిని మళ్లీ ప్రారంభించడానికి ప్రయత్నించండి. గుండె ఆగినప్పుడు మాత్రమే వర్తిస్తుంది.
+If the heart stops, allow a natural death. It says nothing about any other treatment.	గుండె ఆగిపోతే సహజ మరణానికి అనుమతించండి. ఇది ఇతర ఏ చికిత్స గురించీ ఏమీ చెప్పదు.
+CPR would not work (clinical futility)	CPR పనిచేయదు (వైద్యపరంగా నిష్ఫలం)
+The patient does not want CPR	రోగి CPR కోరడం లేదు
+The burden outweighs the benefit	ప్రయోజనం కంటే బాధ ఎక్కువ
+Yes, for any serious worsening	అవును, ఏ తీవ్ర క్షీణతకైనా
+Only for the reasons ticked	టిక్ చేసిన కారణాలకు మాత్రమే
+No — care where they are	వద్దు — ఉన్న చోటే సంరక్షణ
+Take to hospital for any significant deterioration.	ఏ గణనీయమైన క్షీణతకైనా ఆసుపత్రికి తీసుకెళ్లండి.
+Go to hospital only for the problems ticked below.	కింద టిక్ చేసిన సమస్యలకు మాత్రమే ఆసుపత్రికి వెళ్లండి.
+Care continues at home or where they are. Call the numbers listed before an ambulance.	సంరక్షణ ఇంట్లో లేదా ఉన్న చోటే కొనసాగుతుంది. అంబులెన్స్‌కు ముందు ఇచ్చిన నంబర్లకు ఫోన్ చేయండి.
+Uncontrolled pain	అదుపులోకి రాని నొప్పి
+Uncontrolled breathlessness	అదుపులోకి రాని ఊపిరి ఆడకపోవడం
+Significant bleeding	గణనీయమైన రక్తస్రావం
+Seizures	మూర్ఛలు
+Fall with suspected fracture	పడిపోయి ఎముక విరిగిందేమోనన్న అనుమానం
+Blocked or displaced catheter, tube or stent	కాథెటర్, నాళం లేదా స్టెంట్ మూసుకుపోవడం లేదా చోటు తప్పడం
+Suspected infection needing IV treatment	నరం ద్వారా చికిత్స అవసరమయ్యే ఇన్ఫెక్షన్ అనుమానం
+Acute confusion or agitation not settling	అకస్మాత్తుగా గందరగోళం లేదా చంచలత్వం తగ్గకపోవడం
+Caregiver unable to cope (respite)	సంరక్షకుడు తట్టుకోలేకపోవడం (విశ్రాంతి కోసం)
+0 · Comfort measures only	0 · ఉపశమన చర్యలు మాత్రమే
+1 · Nasal prongs or simple mask	1 · ముక్కు ప్రాంగ్స్ లేదా సాధారణ మాస్క్
+2 · Non-rebreather or venturi mask	2 · నాన్-రీబ్రీదర్ లేదా వెంచురి మాస్క్
+3 · High-flow nasal oxygen (HFNC)	3 · హై-ఫ్లో నాసల్ ఆక్సిజన్ (HFNC)
+4 · Mask ventilation (NIV: CPAP/BiPAP)	4 · మాస్క్ వెంటిలేషన్ (NIV: CPAP/BiPAP)
+5 · Intubation and a breathing machine	5 · ఇంట్యూబేషన్, శ్వాస యంత్రం
+Morphine-type medicine, anxiety relief, a fan, positioning, suction; oxygen only if it relieves.	మార్ఫిన్ రకం మందు, ఆందోళన తగ్గించే మందు, ఫ్యాన్, భంగిమ, కఫం తీయడం; ఆక్సిజన్ ఉపశమనం ఇస్తేనే.
+The highest level: everything below is also allowed.	అత్యున్నత స్థాయి: కింద ఉన్నవన్నీ కూడా అనుమతించబడతాయి.
+The highest level allowed. Every lower level stays available; nothing higher starts without a new discussion.	అనుమతించిన అత్యున్నత స్థాయి. కింది ప్రతి స్థాయి అందుబాటులో ఉంటుంది; కొత్త చర్చ లేకుండా దీనికంటే పైది ఏదీ ప్రారంభం కాదు.
+Yes, ICU if needed	అవును, అవసరమైతే ICU
+Time-limited ICU trial	నిర్ణీత కాల ICU ట్రయల్
+No ICU — ward or comfort care	ICU వద్దు — వార్డు లేదా ఉపశమన సంరక్షణ
+No blood-pressure support drugs	BP పెంచే మందులు వద్దు
+Time-limited trial	నిర్ణీత కాల ట్రయల్
+Yes, no limit	అవును, పరిమితి లేదు
+Yes, up to a number of drugs	అవును, నిర్ణీత సంఖ్య వరకు మందులు
+No dialysis	డయాలసిస్ వద్దు
+Yes, dialysis	అవును, డయాలసిస్
+Only if kidney failure can be reversed	కిడ్నీ వైఫల్యం నయం కాగలిగితేనే
+No nose tube (NG)	ముక్కు నాళం (NG) వద్దు
+NG for a set number of days, then review	నిర్ణీత రోజులు NG, ఆ తర్వాత సమీక్ష
+Yes, NG feeding	అవును, NG ద్వారా ఆహారం
+No stomach tube (PEG)	కడుపు నాళం (PEG) వద్దు
+PEG only after a palliative-care discussion	పాలియేటివ్ కేర్ చర్చ తర్వాత మాత్రమే PEG
+Yes, PEG	అవును, PEG
+Sips by mouth only	నోటి ద్వారా గుటకలు మాత్రమే
+Limited drip fluids	పరిమిత డ్రిప్ ద్రవాలు
+Full maintenance fluids	పూర్తి నిర్వహణ ద్రవాలు
+Mouth care and sips for comfort; no drip.	ఉపశమనం కోసం నోటి సంరక్షణ, గుటకలు; డ్రిప్ వద్దు.
+Up to 500–1000 mL saline a day, by vein or under the skin, matched to urine, reviewed daily. Reduce or stop if swelling, wet breathing or worse breathlessness.	రోజుకు 500–1000 mL వరకు సెలైన్, నరం ద్వారా లేదా చర్మం కింద, మూత్రానికి తగినట్లు, రోజూ సమీక్ష. వాపు, తడి శ్వాస లేదా ఊపిరి ఆడకపోవడం పెరిగితే తగ్గించండి లేదా ఆపండి.
+Full daily fluid needs by drip.	రోజువారీ పూర్తి ద్రవ అవసరాలు డ్రిప్ ద్వారా.
+Full pre-hospital resuscitation and transport	మార్గమధ్యంలో పూర్తి చికిత్స, ఆసుపత్రికి తరలింపు
+Transport with symptom relief only (no CPR, no intubation)	లక్షణాల ఉపశమనం మాత్రమే ఇస్తూ తరలింపు (CPR లేదు, ఇంట్యూబేషన్ లేదు)
+Take home for the last days, with a nurse	చివరి రోజుల కోసం నర్సుతో పాటు ఇంటికి తీసుకెళ్లండి
+Has capacity	నిర్ణయించే సామర్థ్యం ఉంది
+Has capacity, has asked family to decide	నిర్ణయించే సామర్థ్యం ఉంది, నిర్ణయించమని కుటుంబాన్ని కోరారు
+Capacity fluctuates — reassess	నిర్ణయించే సామర్థ్యం మారుతూ ఉంటుంది — మళ్లీ పరీక్షించండి
+Lacks capacity	నిర్ణయించే సామర్థ్యం లేదు
+Named in a signed living will	సంతకం చేసిన లివింగ్ విల్‌లో పేర్కొన్నవారు
+Named by the patient (no living will)	రోగి పేర్కొన్నవారు (లివింగ్ విల్ లేదు)
+Next of kin / next friend / guardian	దగ్గరి బంధువు / సన్నిహిత మిత్రుడు / సంరక్షకుడు
+Court-appointed guardian	కోర్టు నియమించిన సంరక్షకుడు
+Aadhaar	ఆధార్
+Voter ID	ఓటర్ ID
+PAN	పాన్
+Passport	పాస్‌పోర్ట్
+Driving licence	డ్రైవింగ్ లైసెన్స్
+Ration card	రేషన్ కార్డ్
+Pacemaker	పేస్‌మేకర్
+ICD (shock device)	ICD (షాక్ ఇచ్చే పరికరం)
+CRT-D (shock device)	CRT-D (షాక్ ఇచ్చే పరికరం)
+Other device	ఇతర పరికరం
+Draft — not signed	డ్రాఫ్ట్ — సంతకం లేదు
+Active	అమలులో ఉంది
+Withdrawn	ఉపసంహరించారు
+hours	గంటలు
+days	రోజులు
+sessions	సెషన్లు
+review $at by $who	సమీక్ష $at, $who
+New admission	కొత్త చేరిక
+Moved between home, hospital or hospice	ఇల్లు, ఆసుపత్రి లేదా హాస్పిస్ మధ్య మార్పు
+Significant change in condition (either way)	పరిస్థితిలో గణనీయమైన మార్పు (మెరుగైనా, క్షీణించినా)
+Patient or family asked for a review	రోగి లేదా కుటుంబం సమీక్ష కోరారు
+A new line of treatment started	కొత్త చికిత్స మార్గం ప్రారంభమైంది
+Routine review date reached	సాధారణ సమీక్ష తేదీ వచ్చింది
+NO PLAN FOUND — standard care applies	ప్రణాళిక కనిపించలేదు — సాధారణ చికిత్స వర్తిస్తుంది
+CARD WITHDRAWN — this plan is no longer valid. Standard care applies.	కార్డ్ ఉపసంహరించారు — ఈ ప్రణాళిక ఇకపై చెల్లదు. సాధారణ చికిత్స వర్తిస్తుంది.
+UNSIGNED — a conversation note, not a plan. Standard care applies.	సంతకం లేదు — ఇది సంభాషణ నోట్, ప్రణాళిక కాదు. సాధారణ చికిత్స వర్తిస్తుంది.
+OUT OF DATE (review was due ${r.reviewDue}) — standard care applies. The content below is information, not instruction.	పాతబడింది (సమీక్ష ${r.reviewDue} నాడు జరగాలి) — సాధారణ చికిత్స వర్తిస్తుంది. కింది విషయం సమాచారం మాత్రమే, ఆదేశం కాదు.
+ACTIVE PLAN — signed ${r.consultantSignature!!.signedAt.take(10)}, review due ${r.reviewDue}	అమలులో ఉన్న ప్రణాళిక — సంతకం ${r.consultantSignature!!.signedAt.take(10)}, సమీక్ష ${r.reviewDue}
+CARD WITHDRAWN — this card is no longer valid. Standard care applies.	కార్డ్ ఉపసంహరించారు — ఈ కార్డ్ ఇకపై చెల్లదు. సాధారణ చికిత్స వర్తిస్తుంది.
+decided by ${it.name} (reg. ${it.registrationNo}) ${it.decidedAt}	${it.name} (రిజి. ${it.registrationNo}) ${it.decidedAt} న నిర్ణయించారు
+reason: $it	కారణం: $it
+all lower levels allowed	కింది అన్ని స్థాయిలు అనుమతించబడతాయి
+max O₂ $it L/min	గరిష్ఠ O₂ $it L/min
+SpO₂ floor $it%	SpO₂ కనిష్ఠం $it%
+NIV up to $it h	NIV $it గంటల వరకు
+treat a reversible cause fully	నయం కాగల కారణానికి పూర్తి చికిత్స చేయండి
+NIV trial	NIV ట్రయల్
+Vasopressors	BP పెంచే మందులు
+Dialysis	డయాలసిస్
+Fluids	ద్రవాలు
+ ($d days)	 ($d రోజులు)
+Consultant: ${it.name} (reg. ${it.registrationNo})	కన్సల్టెంట్: ${it.name} (రిజి. ${it.registrationNo})
+Oncologist: $it	ఆంకాలజిస్ట్: $it
+reassess by ${r.capacity.reassessOn}	${r.capacity.reassessOn} నాటికి మళ్లీ పరీక్షించండి
+v$number · $form · signed $signedDay · review due $dueDay	v$number · $form · సంతకం $signedDay · సమీక్ష $dueDay
+Review requested	సమీక్ష కోరారు
+Hospital transfer	ఆసుపత్రికి తరలింపు
+Breathing support ceiling	శ్వాస సహాయ పరిమితి
+Goal of care	సంరక్షణ లక్ష్యం
+Allergies	అలర్జీలు
+Implanted device	శరీరంలో అమర్చిన పరికరం
+Decision-maker (24 h phone)	నిర్ణయం తీసుకునేవారు (24 గంటల ఫోన్)
+Treating consultant and palliative contact	చికిత్స చేస్తున్న కన్సల్టెంట్, పాలియేటివ్ సంప్రదింపు
+Capacity	నిర్ణయించే సామర్థ్యం
+Living will (AMD)	లివింగ్ విల్ (AMD)
+Version, signed, review due	వెర్షన్, సంతకం, సమీక్ష తేదీ
+If unclear, or the problem is new and reversible — treat fully and call.	స్పష్టత లేకపోతే, లేదా సమస్య కొత్తది, నయం కాగలది అయితే — పూర్తి చికిత్స చేసి ఫోన్ చేయండి.
+Full record	పూర్తి రికార్డ్
+Family's Sahara app; signed copy with the family	కుటుంబం యొక్క Sahara యాప్; సంతకం చేసిన కాపీ కుటుంబం వద్ద
+Signed by	సంతకం చేసినవారు
+Sahara emergency care plan (ECTPR) — ED Quick View	Sahara అత్యవసర సంరక్షణ ప్రణాళిక (ECTPR) — ED క్విక్ వ్యూ
+No plan content is shown: give full standard emergency care.	ప్రణాళిక వివరాలేవీ చూపబడవు: పూర్తి సాధారణ అత్యవసర చికిత్స ఇవ్వండి.
+Key medicines	ముఖ్య మందులు
+Alternate decision-maker	ప్రత్యామ్నాయ నిర్ణయం తీసుకునేవారు
+Family to inform	తెలియజేయాల్సిన కుటుంబ సభ్యులు
+What matters, in the patient's words	రోగి మాటల్లో, ఏది ముఖ్యం
+Not acceptable to the patient	రోగికి ఆమోదయోగ్యం కానివి
+Understanding confirmed	అవగాహన నిర్ధారణ
+Signatures	సంతకాలు
+Wallet card — cut out and keep with the patient	వాలెట్ కార్డ్ — కత్తిరించి రోగి వద్ద ఉంచండి
+Link QR: full card, needs internet	లింక్ QR: పూర్తి కార్డ్, ఇంటర్నెట్ అవసరం
+The QR is a random link with no personal details; it is switched off if the plan is replaced or withdrawn.	QR ఒక యాదృచ్ఛిక లింక్, దానిలో వ్యక్తిగత వివరాలు ఉండవు; ప్రణాళికను మార్చినా లేదా ఉపసంహరించినా ఇది ఆగిపోతుంది.
+When this was printed the card was saved on the phone only: the link QR may not open yet. Use the offline QR.	ప్రింట్ చేసినప్పుడు కార్డ్ ఫోన్‌లో మాత్రమే సేవ్ అయింది: లింక్ QR ఇంకా తెరుచుకోకపోవచ్చు. ఆఫ్‌లైన్ QR వాడండి.
+Offline QR: this summary as text, no internet needed	ఆఫ్‌లైన్ QR: ఈ సారాంశం టెక్స్ట్ రూపంలో, ఇంటర్నెట్ అవసరం లేదు
+Hospital ward	ఆసుపత్రి వార్డు
+Emergency department	అత్యవసర విభాగం
+Somewhere else	మరెక్కడైనా
+What we keep	మేము ఏమి ఉంచుతాము
+Why	ఎందుకు
+Where it is	ఇది ఎక్కడ ఉంటుంది
+Your rights	మీ హక్కులు
+Name, hospital number, date of birth, address and phone. The people who decide for the patient. Illness details, treatment choices, the patient’s own words and signatures. A log of who opened or changed the plan.	పేరు, ఆసుపత్రి నంబర్, పుట్టిన తేదీ, చిరునామా, ఫోన్. రోగి తరఫున నిర్ణయించేవారు. వ్యాధి వివరాలు, చికిత్స ఎంపికలు, రోగి స్వంత మాటలు, సంతకాలు. ప్రణాళికను ఎవరు తెరిచారో లేదా మార్చారో తెలిపే లాగ్.
+Your name, date of birth, address and the last 4 digits of your ID. Your representatives and witnesses. Your treatment wishes. The signed scan and its fingerprint (SHA-256). A log of each change, print and share.	మీ పేరు, పుట్టిన తేదీ, చిరునామా, ID చివరి 4 అంకెలు. మీ ప్రతినిధులు, సాక్షులు. మీ చికిత్స కోరికలు. సంతకం చేసిన స్కాన్, దాని వేలిముద్ర (SHA-256). ప్రతి మార్పు, ప్రింట్, షేర్ యొక్క లాగ్.
+So that an emergency doctor can find and follow the patient’s wishes, and the care team can review them.	అత్యవసర డాక్టర్ రోగి కోరికలను కనుగొని పాటించడానికి, సంరక్షణ బృందం వాటిని సమీక్షించడానికి.
+To make your living will paper, keep track of its versions, and show doctors that it exists.	మీ లివింగ్ విల్ కాగితం తయారు చేయడానికి, దాని వెర్షన్లను ట్రాక్ చేయడానికి, అది ఉందని డాక్టర్లకు చూపించడానికి.
+On this phone. It leaves this phone only in two cases. When a plan is signed, an emergency card is issued and a copy of the signed plan goes to the Sahara server so the QR code works. If an SMS is sent, the phone number goes to the SMS company.	ఈ ఫోన్‌లో. ఇది రెండు సందర్భాల్లో మాత్రమే ఈ ఫోన్ దాటి వెళ్తుంది. ప్రణాళికపై సంతకం చేసినప్పుడు, అత్యవసర కార్డ్ జారీ అవుతుంది, QR కోడ్ పనిచేయడానికి సంతకం చేసిన ప్రణాళిక కాపీ Sahara సర్వర్‌కు వెళ్తుంది. SMS పంపితే, ఫోన్ నంబర్ SMS కంపెనీకి వెళ్తుంది.
+On this phone. It is not sent to any server. If an emergency card is issued, the card carries only the living will’s status, date, version and attesting officer. You decide who gets a paper copy.	ఈ ఫోన్‌లో. ఇది ఏ సర్వర్‌కూ పంపబడదు. అత్యవసర కార్డ్ జారీ చేస్తే, కార్డ్‌లో లివింగ్ విల్ స్థితి, తేదీ, వెర్షన్, ధృవీకరించిన అధికారి మాత్రమే ఉంటాయి. కాగితం కాపీ ఎవరికి ఇవ్వాలో మీరే నిర్ణయిస్తారు.
+See it: download your data below. Correct it: ask for a review, and a new version is made. Withdraw: cancel the plan at any time, and the card stops working. Delete: remove an unsigned draft below. Signed versions and the log cannot be deleted, because they show what was decided and who saw it.	చూడటం: కింద మీ డేటా డౌన్‌లోడ్ చేయండి. సరిదిద్దడం: సమీక్ష కోరండి, కొత్త వెర్షన్ తయారవుతుంది. ఉపసంహరణ: ఎప్పుడైనా ప్రణాళికను రద్దు చేయండి, కార్డ్ పనిచేయడం ఆగిపోతుంది. తొలగింపు: సంతకం లేని డ్రాఫ్ట్‌ను కింద నుండి తొలగించండి. సంతకం చేసిన వెర్షన్లు, లాగ్ తొలగించలేరు, ఎందుకంటే అవి ఏం నిర్ణయించారో, ఎవరు చూశారో చూపిస్తాయి.
+See it: download your data below. Correct it: make a new version. Withdraw: cancel it in writing at any time. Delete: remove an unsigned draft below. Signed versions and the log cannot be deleted. Deleting here does not touch any paper you printed, so destroy that yourself.	చూడటం: కింద మీ డేటా డౌన్‌లోడ్ చేయండి. సరిదిద్దడం: కొత్త వెర్షన్ చేయండి. ఉపసంహరణ: ఎప్పుడైనా లిఖితపూర్వకంగా రద్దు చేయండి. తొలగింపు: సంతకం లేని డ్రాఫ్ట్‌ను కింద నుండి తొలగించండి. సంతకం చేసిన వెర్షన్లు, లాగ్ తొలగించలేరు. ఇక్కడ తొలగిస్తే మీరు ప్రింట్ చేసిన కాగితం పోదు, దాన్ని మీరే నాశనం చేయండి.
+How to ask	ఎలా అడగాలి
+Use the buttons below, or tell your doctor or palliative care team. Ask them too if you want a copy on the Sahara server erased. During this pilot only made-up patients are used.	కింది బటన్లు వాడండి, లేదా మీ డాక్టర్‌కు లేదా పాలియేటివ్ కేర్ బృందానికి చెప్పండి. Sahara సర్వర్‌లోని కాపీని తొలగించాలన్నా వారినే అడగండి. ఈ పైలట్‌లో కల్పిత రోగులు మాత్రమే ఉపయోగించబడతారు.
+Patient's name	రోగి పేరు
+Main decision-maker	ప్రధాన నిర్ణయం తీసుకునేవారు
+Capacity is decided for this decision, now — not taken from old notes. Record the basis: can the patient understand, remember, weigh and communicate the choice?	నిర్ణయించే సామర్థ్యాన్ని ఈ నిర్ణయానికి, ఇప్పుడే నిర్ధారిస్తారు — పాత నోట్ల నుండి తీసుకోరు. ఆధారం నమోదు చేయండి: రోగి ఎంపికను అర్థం చేసుకోగలరా, గుర్తుంచుకోగలరా, తూకం వేయగలరా, తెలియజేయగలరా?
+Treatment choices stay locked until this is ticked. A choice made without knowing the illness cannot be cured is not an informed choice.	ఇది టిక్ చేసే వరకు చికిత్స ఎంపికలు లాక్ చేయబడి ఉంటాయి. వ్యాధి నయం కాదని తెలియకుండా చేసిన ఎంపిక, తెలుసుకుని చేసిన ఎంపిక కాదు.
+The illness has been explained as incurable, and the patient or family can say it back in their own words.	వ్యాధి నయం కాదని వివరించారు, రోగి లేదా కుటుంబం దాన్ని తమ స్వంత మాటల్లో తిరిగి చెప్పగలరు.
+What matters most, in the patient's own words	రోగి స్వంత మాటల్లో, అన్నింటికంటే ముఖ్యమైనది ఏమిటి
+Outcomes the patient would not accept (one per line)	రోగికి ఆమోదయోగ్యం కాని పరిణామాలు (ఒక్కో లైన్‌కు ఒకటి)
+Leave anything not discussed as \"No preference recorded\": that means standard care, never refusal. Each level allowed includes everything below it.	చర్చించని వాటిని \"ఎంపిక నమోదు కాలేదు\" గా వదిలేయండి: దాని అర్థం సాధారణ చికిత్స, ఎప్పుడూ నిరాకరణ కాదు. అనుమతించిన ప్రతి స్థాయిలో దాని కింద ఉన్నవన్నీ ఉంటాయి.
+Going to hospital	ఆసుపత్రికి వెళ్లడం
+CPR if the heart stops	గుండె ఆగితే CPR
+Highest breathing support	అత్యున్నత శ్వాస సహాయం
+Intensive care (ICU)	ఇంటెన్సివ్ కేర్ (ICU)
+After this date the ED view shows the plan as OUT OF DATE and standard care applies.	ఈ తేదీ తర్వాత ED వ్యూ ప్రణాళికను పాతబడినదిగా చూపుతుంది, సాధారణ చికిత్స వర్తిస్తుంది.
+An unsigned form is a conversation note, not a plan. It becomes active only when the treating consultant signs with their registration number. Keep the signed paper copy with the family.	సంతకం లేని ఫారం సంభాషణ నోట్, ప్రణాళిక కాదు. చికిత్స చేస్తున్న కన్సల్టెంట్ తన రిజిస్ట్రేషన్ నంబర్‌తో సంతకం చేసినప్పుడు మాత్రమే ఇది అమలులోకి వస్తుంది. సంతకం చేసిన కాగితం కాపీని కుటుంబం వద్ద ఉంచండి.
+Made by	తయారు చేసినవారు
+Not filled	నింపలేదు
+Applies to	వర్తించేది
+Not saved: 	సేవ్ కాలేదు:
+Couldn't make the PDF. Try again.	PDF తయారు చేయలేకపోయాం. మళ్లీ ప్రయత్నించండి.
+Share the emergency plan	అత్యవసర ప్రణాళికను షేర్ చేయండి
+Share the living will	లివింగ్ విల్‌ను షేర్ చేయండి
+Plan withdrawn. Its wallet card link is switched off.	ప్రణాళిక ఉపసంహరించారు. దాని వాలెట్ కార్డ్ లింక్ ఆపివేయబడింది.
+Emergency plan & living will	అత్యవసర ప్రణాళిక, లివింగ్ విల్
+Ambulances and emergency doctors resuscitate by default. A wish counts only if this plan is found and signed. It stays on this phone; only a signed plan's wallet card copy goes to the Sahara server.	అంబులెన్స్‌లు, అత్యవసర డాక్టర్లు డిఫాల్ట్‌గా పూర్తి చికిత్స చేస్తారు. ఈ ప్రణాళిక దొరికి, సంతకం చేసి ఉంటేనే కోరిక పరిగణనలోకి వస్తుంది. ఇది ఈ ఫోన్‌లోనే ఉంటుంది; సంతకం చేసిన ప్రణాళిక వాలెట్ కార్డ్ కాపీ మాత్రమే Sahara సర్వర్‌కు వెళ్తుంది.
+The saved plan on this phone could not be read. Standard care applies until a new plan is signed.	ఈ ఫోన్‌లో సేవ్ చేసిన ప్రణాళికను చదవలేకపోయాం. కొత్త ప్రణాళికపై సంతకం చేసే వరకు సాధారణ చికిత్స వర్తిస్తుంది.
+ED Quick View	ED క్విక్ వ్యూ
+Emergency care plan	అత్యవసర సంరక్షణ ప్రణాళిక
+Active plan v${active.version}, review due ${active.reviewDue}	అమలులో ఉన్న ప్రణాళిక v${active.version}, సమీక్ష ${active.reviewDue}
+No signed plan yet	ఇంకా సంతకం చేసిన ప్రణాళిక లేదు
+Draft v${draft.version} in progress — not signed, so it never reaches the ED view.	డ్రాఫ్ట్ v${draft.version} కొనసాగుతోంది — సంతకం లేదు, కాబట్టి ఇది ED వ్యూకు ఎప్పటికీ చేరదు.
+Fill it in together with your doctor. It becomes valid only when the treating consultant signs.	మీ డాక్టర్‌తో కలిసి దీన్ని నింపండి. చికిత్స చేస్తున్న కన్సల్టెంట్ సంతకం చేసినప్పుడు మాత్రమే ఇది చెల్లుతుంది.
+Continue draft	డ్రాఫ్ట్ కొనసాగించండి
+Discard unsigned draft	సంతకం లేని డ్రాఫ్ట్ తొలగించండి
+Review or change the plan	ప్రణాళికను సమీక్షించండి లేదా మార్చండి
+Withdraw the plan	ప్రణాళికను ఉపసంహరించండి
+Start a plan	ప్రణాళిక ప్రారంభించండి
+Wallet card with QR	QR తో వాలెట్ కార్డ్
+Signed and recorded v$v	సంతకం చేసి నమోదు చేశారు v$v
+Open living will	లివింగ్ విల్ తెరవండి
+Plan versions	ప్రణాళిక వెర్షన్లు
+Audit log (cannot be changed)	ఆడిట్ లాగ్ (మార్చలేరు)
+Chain checked: no entry has been changed or removed.	తనిఖీ పూర్తయింది: ఏ ఎంట్రీ మార్చబడలేదు లేదా తొలగించబడలేదు.
+Warning: the log has been changed.	హెచ్చరిక: లాగ్ మార్చబడింది.
+Where is this plan being made?	ఈ ప్రణాళిక ఎక్కడ తయారవుతోంది?
+Plans are best made at a clinic visit, at discharge, at ICU step-down or when home palliative care starts. A plan made for the first time in the emergency department records panic, not preference.	ప్రణాళికలను క్లినిక్ సందర్శనలో, డిశ్చార్జ్ సమయంలో, ICU నుండి బయటకు వచ్చినప్పుడు లేదా ఇంట్లో పాలియేటివ్ కేర్ మొదలైనప్పుడు చేయడం మంచిది. అత్యవసర విభాగంలో మొదటిసారి చేసిన ప్రణాళిక కంగారును నమోదు చేస్తుంది, ఇష్టాన్ని కాదు.
+Clinic, ward or home	క్లినిక్, వార్డు లేదా ఇల్లు
+Why is the plan being reviewed?	ప్రణాళికను ఎందుకు సమీక్షిస్తున్నారు?
+A review opens a new draft filled in from the current plan. The current plan stays active until the new one is signed.	సమీక్ష ప్రస్తుత ప్రణాళిక నుండి నింపిన కొత్త డ్రాఫ్ట్‌ను తెరుస్తుంది. కొత్తదానిపై సంతకం చేసే వరకు ప్రస్తుత ప్రణాళిక అమలులో ఉంటుంది.
+Discard draft v${d.version}?	డ్రాఫ్ట్ v${d.version} తొలగించాలా?
+The unsigned answers are removed. The audit log keeps a note that a draft was discarded.	సంతకం లేని జవాబులు తొలగించబడతాయి. డ్రాఫ్ట్ తొలగించినట్లు ఆడిట్ లాగ్‌లో నమోదు ఉంటుంది.
+Discard	తొలగించండి
+Keep draft	డ్రాఫ్ట్ ఉంచండి
+Withdraw plan v${plan.version}?	ప్రణాళిక v${plan.version} ఉపసంహరించాలా?
+A signed cancellation withdraws the plan and switches off its wallet card QR. Standard care then applies.	సంతకం చేసిన రద్దు ప్రణాళికను ఉపసంహరిస్తుంది, దాని వాలెట్ కార్డ్ QR ను ఆపివేస్తుంది. ఆ తర్వాత సాధారణ చికిత్స వర్తిస్తుంది.
+Reason	కారణం
+Signed by (name)	సంతకం చేసినవారు (పేరు)
+Keep plan	ప్రణాళిక ఉంచండి
+Withdraw	ఉపసంహరించండి
+Patient and illness	రోగి, వ్యాధి
+Decision-makers	నిర్ణయం తీసుకునేవారు
+Capacity and existing directive	నిర్ణయించే సామర్థ్యం, ఇప్పటికే ఉన్న నిర్దేశం
+Understanding	అవగాహన
+Treatment choices	చికిత్స ఎంపికలు
+Review date	సమీక్ష తేదీ
+Check and sign	తనిఖీ చేసి సంతకం చేయండి
+Emergency plan v${d.version} · step ${step + 1} of ${steps.size}	అత్యవసర ప్రణాళిక v${d.version} · దశ ${step + 1} / ${steps.size}
+Ready to sign. Signing makes this the one active plan; any earlier version is replaced and its card link switched off.	సంతకానికి సిద్ధం. సంతకంతో ఇదే ఒక్క అమలులో ఉన్న ప్రణాళిక అవుతుంది; ముందున్న వెర్షన్ భర్తీ అవుతుంది, దాని కార్డ్ లింక్ ఆపివేయబడుతుంది.
+Still needed before the plan can be active:	ప్రణాళిక అమలులోకి రావడానికి ముందు ఇంకా అవసరమైనవి:
+Sign and make active	సంతకం చేసి అమలు చేయండి
+Save draft and close	డ్రాఫ్ట్ సేవ్ చేసి మూసివేయండి
+Save and next	సేవ్ చేసి తర్వాతి దానికి వెళ్లండి
+Some answers can't be saved yet	కొన్ని జవాబులు ఇంకా సేవ్ చేయలేము
+Fix them	సరిచేయండి
+Leave without the latest changes	తాజా మార్పులు లేకుండా వెళ్లండి
+Sahara plans are for adults (18 and over).	Sahara ప్రణాళికలు పెద్దవారి కోసం (18, అంతకంటే ఎక్కువ).
+Sex	లింగం
+Hospital number (UHID)	ఆసుపత్రి నంబర్ (UHID)
+Stage	దశ
+Performance status (ECOG)	రోజువారీ పనులు చేసే సామర్థ్యం (ECOG)
+For example: penicillin	ఉదాహరణకు: పెనిసిలిన్
+Eligible for this plan since	ఈ ప్రణాళికకు అర్హులైన తేదీ
+Oncologist	ఆంకాలజిస్ట్
+Palliative doctor	పాలియేటివ్ డాక్టర్
+Palliative 24-hour phone	పాలియేటివ్ 24 గంటల ఫోన్
+Local doctor	స్థానిక డాక్టర్
+Family to inform (one per line)	తెలియజేయాల్సిన కుటుంబ సభ్యులు (ఒక్కో లైన్‌కు ఒకరు)
+Family discussion note	కుటుంబ చర్చ నోట్
+Family agreement is a note, not legal authority.	కుటుంబ అంగీకారం ఒక నోట్ మాత్రమే, చట్టపరమైన అధికారం కాదు.
+Relation to the patient	రోగితో సంబంధం
+24-hour phone	24 గంటల ఫోన్
+ID type	ID రకం
+Last 4 digits of the ID	ID చివరి 4 అంకెలు
+Only the last 4 are kept, never the full number.	చివరి 4 అంకెలు మాత్రమే ఉంచబడతాయి, పూర్తి నంబర్ ఎప్పుడూ కాదు.
+Basis of authority	అధికారానికి ఆధారం
+Assessed by	పరీక్షించినవారు
+Assessed on	పరీక్షించిన తేదీ
+Basis of the assessment	పరీక్షకు ఆధారం
+Reassess on	మళ్లీ పరీక్షించే తేదీ
+A patient with capacity can change or cancel any part of this plan by saying so; their wish now overrides the paper.	నిర్ణయించే సామర్థ్యం ఉన్న రోగి, చెప్పడం ద్వారా ఈ ప్రణాళికలోని ఏ భాగాన్నైనా మార్చవచ్చు లేదా రద్దు చేయవచ్చు; వారి ప్రస్తుత కోరిక కాగితం కంటే ఎక్కువ.
+Existing living will or wishes	ఇప్పటికే ఉన్న లివింగ్ విల్ లేదా కోరికలు
+A signed, attested living will	సంతకం చేసి, ధృవీకరించిన లివింగ్ విల్
+Wishes said or written before	ముందు చెప్పిన లేదా రాసిన కోరికలు
+Date of the living will	లివింగ్ విల్ తేదీ
+Where the original is kept	అసలు ఎక్కడ ఉంచారు
+Attested by (notary or gazetted officer)	ధృవీకరించినవారు (నోటరీ లేదా గెజిటెడ్ అధికారి)
+What was said or written	ఏం చెప్పారు లేదా రాశారు
+Understanding the illness	వ్యాధి గురించి అవగాహన
+Explained by	వివరించినవారు
+Who is answering?	ఎవరు జవాబు ఇస్తున్నారు?
+The patient	రోగి
+A decision-maker, for the patient	రోగి తరఫున నిర్ణయం తీసుకునేవారు
+the patient	రోగి
+I will say what $who would have chosen, not what I want for them. Where I do not know, I will decide with the team in their best interests.	$who ఏం ఎంచుకునేవారో అదే నేను చెబుతాను, వారి కోసం నేను కోరుకునేది కాదు. నాకు తెలియని చోట, వారి మేలు కోసం బృందంతో కలిసి నిర్ణయిస్తాను.
+Does the patient know about the illness?	రోగికి వ్యాధి గురించి తెలుసా?
+The family asked that the patient not be told	రోగికి చెప్పవద్దని కుటుంబం కోరింది
+Plan if the patient asks directly	రోగి నేరుగా అడిగితే ప్రణాళిక
+A patient with capacity who asks must be answered honestly.	నిర్ణయించే సామర్థ్యం ఉన్న రోగి అడిగితే నిజాయితీగా సమాధానం చెప్పాలి.
+Money worries were asked about directly	డబ్బు గురించిన ఆందోళనల గురించి నేరుగా అడిగారు
+Social-work or scheme referral made	సోషల్ వర్క్ లేదా పథకానికి సిఫార్సు చేశారు
+Locked: go back to Understanding and record that the illness has been explained and understood (V4).	లాక్ చేయబడింది: 'అవగాహన' కు వెనక్కి వెళ్లి, వ్యాధిని వివరించి, అర్థం చేసుకున్నారని నమోదు చేయండి (V4).
+Locked: the decision-maker must first confirm they will say what the patient would have chosen (V5).	లాక్ చేయబడింది: రోగి ఏం ఎంచుకునేవారో అదే చెబుతానని నిర్ణయం తీసుకునేవారు ముందుగా నిర్ధారించాలి (V5).
+Numbers to call before an ambulance (one per line)	అంబులెన్స్‌కు ముందు ఫోన్ చేయాల్సిన నంబర్లు (ఒక్కో లైన్‌కు ఒకటి)
+If an ambulance comes	అంబులెన్స్ వస్తే
+Crews resuscitate by default; this counts only if a signed copy is handed over.	సిబ్బంది డిఫాల్ట్‌గా పూర్తి చికిత్స చేస్తారు; సంతకం చేసిన కాపీ అందజేస్తేనే ఇది పరిగణనలోకి వస్తుంది.
+Reason for DNACPR	DNACPR కు కారణం
+Discussed with	ఎవరితో చర్చించారు
+Decided by (doctor's name)	ఎవరు నిర్ణయించారు (డాక్టర్ పేరు)
+Date and time decided	నిర్ణయించిన తేదీ, సమయం
+Reason for attempting CPR with this goal or ceiling (V2)	ఈ లక్ష్యం లేదా పరిమితితో CPR ప్రయత్నించడానికి కారణం (V2)
+Shock device (ICD)	షాక్ ఇచ్చే పరికరం (ICD)
+Switch off shocks	షాక్‌లు ఆపండి
+Keep shocks on	షాక్‌లు ఆన్‌లో ఉంచండి
+Decision date	నిర్ణయ తేదీ
+A trial needs a length, a formal review date and time, and who will review. About 3 days is usual (3–7).	ట్రయల్‌కు కాల వ్యవధి, అధికారిక సమీక్ష తేదీ, సమయం, ఎవరు సమీక్షిస్తారో అవసరం. సాధారణంగా సుమారు 3 రోజులు (3–7).
+Length	వ్యవధి
+Review time	సమీక్ష సమయం
+Reviewers (names, comma-separated)	సమీక్షించేవారు (పేర్లు, కామాతో వేరు చేసి)
+Maximum oxygen (L/min)	గరిష్ఠ ఆక్సిజన్ (L/min)
+A new, reversible cause (such as choking or a drug reaction) is treated fully, above this ceiling	కొత్త, నయం కాగల కారణానికి (గొంతులో ఇరుక్కోవడం లేదా మందు రియాక్షన్ వంటివి) ఈ పరిమితి కంటే పైన కూడా పూర్తి చికిత్స చేస్తారు
+Oxygen level to aim for, at least (SpO₂ %)	లక్ష్యంగా పెట్టుకునే కనీస ఆక్సిజన్ స్థాయి (SpO₂ %)
+NIV for at most (hours)	NIV గరిష్ఠంగా (గంటలు)
+NIV as a time-limited trial	NIV నిర్ణీత కాల ట్రయల్‌గా
+Home NIV or other reason this works without hospital	ఇంట్లో NIV లేదా ఆసుపత్రి లేకుండా ఇది పనిచేయడానికి వేరే కారణం
+ICU trial	ICU ట్రయల్
+Drugs to support blood pressure	రక్తపోటును నిలబెట్టే మందులు
+Vasopressor trial	BP మందుల ట్రయల్
+Maximum number of drugs	గరిష్ఠ మందుల సంఖ్య
+Dialysis trial	డయాలసిస్ ట్రయల్
+Nose tube feeding (NG)	ముక్కు నాళం ద్వారా ఆహారం (NG)
+Days before review	సమీక్షకు ముందు రోజులు
+Stomach tube (PEG)	కడుపు నాళం (PEG)
+The patient or family wish an existing feeding tube to be removed	ఇప్పటికే ఉన్న ఆహార నాళాన్ని తీసివేయాలని రోగి లేదా కుటుంబం కోరుతున్నారు
+Checks	తనిఖీలు
+Reason for $id	$id కు కారణం
+Confirmed: this combination is what was decided (V3)	నిర్ధారణ: నిర్ణయించింది ఈ కలయికే (V3)
+The app records this wish but never triggers withdrawal.	యాప్ ఈ కోరికను నమోదు చేస్తుంది, కానీ చికిత్స ఉపసంహరణను ఎప్పుడూ ప్రారంభించదు.
+In $w weeks	$w వారాల్లో
+Review sooner if	ముందే సమీక్షించండి, ఒకవేళ
+Signs of the last days (falling blood pressure, cold mottled skin, changed breathing, little urine) also call for an urgent review. Where unsure, take a second opinion.	చివరి రోజుల సంకేతాలు (రక్తపోటు పడిపోవడం, చల్లని మచ్చల చర్మం, శ్వాసలో మార్పు, తక్కువ మూత్రం) కూడా వెంటనే సమీక్ష కోరతాయి. సందేహం ఉంటే రెండో అభిప్రాయం తీసుకోండి.
+Treating consultant	చికిత్స చేస్తున్న కన్సల్టెంట్
+Palliative clinician	పాలియేటివ్ డాక్టర్
+Nurse	నర్సు
+Witness	సాక్షి
+Signed so far	ఇప్పటి వరకు సంతకం చేసినవారు
+ · thumb impression	 · వేలిముద్ర
+Remove signature	సంతకం తొలగించండి
+To be signed by the doctor on their own phone or here in their presence.	డాక్టర్ తన ఫోన్‌లో లేదా ఇక్కడ తన సమక్షంలో సంతకం చేయాలి.
+Consultant's name	కన్సల్టెంట్ పేరు
+Medical registration number	వైద్య రిజిస్ట్రేషన్ నంబర్
+Sign as treating consultant	చికిత్స చేస్తున్న కన్సల్టెంట్‌గా సంతకం చేయండి
+Co-signature (optional)	సహ-సంతకం (ఐచ్ఛికం)
+Add co-signature	సహ-సంతకం జోడించండి
+Patient or decision-maker	రోగి లేదా నిర్ణయం తీసుకునేవారు
+Signed with a thumb impression	వేలిముద్రతో సంతకం చేశారు
+Add signature	సంతకం జోడించండి
+Limited reading or writing	చదవడం, రాయడం పరిమితం
+Witnesses (two needed)	సాక్షులు (ఇద్దరు అవసరం)
+${d.witnesses.size} of 2 recorded	2 లో ${d.witnesses.size} నమోదయ్యారు
+Witness name	సాక్షి పేరు
+Add witness	సాక్షిని జోడించండి
+$it years	$it సంవత్సరాలు
+Wish recorded to remove an existing feeding tube: that is withdrawal and follows the medical board pathway. Not actionable from this plan.	ఇప్పటికే ఉన్న ఆహార నాళాన్ని తీసివేయాలనే కోరిక నమోదైంది: అది చికిత్స ఉపసంహరణ, మెడికల్ బోర్డ్ మార్గాన్ని అనుసరిస్తుంది. ఈ ప్రణాళిక నుండి అమలు చేయలేరు.
+Wallet card	వాలెట్ కార్డ్
+Share PDF	PDF షేర్ చేయండి
+Issued on the server	సర్వర్‌లో జారీ చేశారు
+Saved on this phone only	ఈ ఫోన్‌లో మాత్రమే సేవ్ అయింది
+A doctor who scans the link QR sees the ED Quick View. A copy is also saved on this phone.	లింక్ QR ను స్కాన్ చేసే డాక్టర్‌కు ED క్విక్ వ్యూ కనిపిస్తుంది. ఒక కాపీ ఈ ఫోన్‌లో కూడా సేవ్ అవుతుంది.
+The link QR will not open for a doctor until it is uploaded. It uploads by itself when the phone is online. Until then use the offline QR and the printed lines.	అప్‌లోడ్ అయ్యే వరకు లింక్ QR డాక్టర్‌కు తెరుచుకోదు. ఫోన్ ఆన్‌లైన్‌లో ఉన్నప్పుడు ఇది దానంతట అదే అప్‌లోడ్ అవుతుంది. అప్పటి వరకు ఆఫ్‌లైన్ QR, ప్రింట్ చేసిన లైన్లు వాడండి.
+No internet right now.	ప్రస్తుతం ఇంటర్నెట్ లేదు.
+Try again now	ఇప్పుడు మళ్లీ ప్రయత్నించండి
+Practice mode: nothing is sent to the server.	ప్రాక్టీస్ మోడ్: సర్వర్‌కు ఏదీ పంపబడదు.
+Withdrawn on this phone. The server has not been told yet, so an old QR may still open. It will be told when the phone is online.	ఈ ఫోన్‌లో ఉపసంహరించారు. సర్వర్‌కు ఇంకా తెలియజేయలేదు, కాబట్టి పాత QR ఇంకా తెరుచుకోవచ్చు. ఫోన్ ఆన్‌లైన్‌లో ఉన్నప్పుడు తెలియజేయబడుతుంది.
+A wallet card is made when a signed plan is active. A withdrawn or replaced plan's card is switched off.	సంతకం చేసిన ప్రణాళిక అమలులో ఉన్నప్పుడు వాలెట్ కార్డ్ తయారవుతుంది. ఉపసంహరించిన లేదా భర్తీ చేసిన ప్రణాళిక కార్డ్ ఆపివేయబడుతుంది.
+SAHARA EMERGENCY CARE PLAN	సహారా అత్యవసర సంరక్షణ ప్రణాళిక
+QR code with a link to this plan	ఈ ప్రణాళిక లింక్ ఉన్న QR కోడ్
+QR code: offline text summary of this card	QR కోడ్: ఈ కార్డ్ ఆఫ్‌లైన్ సారాంశం
+Plan v$v · review due $due	ప్రణాళిక v$v · సమీక్ష $due
+The living will changed after this card was issued, so the link shows the old status. Issue a new card and tear up the old one.	ఈ కార్డ్ జారీ అయిన తర్వాత లివింగ్ విల్ మారింది, కాబట్టి లింక్ పాత స్థితిని చూపిస్తుంది. కొత్త కార్డ్ జారీ చేసి, పాతదాన్ని చింపేయండి.
+Issue a new card	కొత్త కార్డ్ జారీ చేయండి
+The link QR holds only a random link with no name or medical details. The offline QR holds the summary above as plain text, so anyone who scans it can read it; keep the card with the patient. When the plan is replaced or withdrawn the link is switched off, but the offline QR on old paper still reads — tear up old cards.	లింక్ QR లో పేరు, వైద్య వివరాలు లేని యాదృచ్ఛిక లింక్ మాత్రమే ఉంటుంది. ఆఫ్‌లైన్ QR లో పై సారాంశం సాదా టెక్స్ట్‌గా ఉంటుంది, కాబట్టి స్కాన్ చేసిన ఎవరైనా చదవగలరు; కార్డ్‌ను రోగి వద్దే ఉంచండి. ప్రణాళికను భర్తీ చేసినా లేదా ఉపసంహరించినా లింక్ ఆగిపోతుంది, కానీ పాత కాగితంపై ఉన్న ఆఫ్‌లైన్ QR ఇంకా చదవబడుతుంది — పాత కార్డ్‌లను చింపేయండి.
+Print or share the plan and card (PDF)	ప్రణాళిక, కార్డ్‌ను ప్రింట్ చేయండి లేదా షేర్ చేయండి (PDF)
+ED Quick View, wallet card QR and living will	ED క్విక్ వ్యూ, వాలెట్ కార్డ్ QR, లివింగ్ విల్
+This update does not record $missing. Visit history is separate.	ఈ అప్‌డేట్ $missing ను నమోదు చేయదు. సందర్శనల చరిత్ర వేరుగా ఉంటుంది.
+ECTPR wizard, ED Quick View, wallet card QR, living will	ECTPR విజార్డ్, ED క్విక్ వ్యూ, వాలెట్ కార్డ్ QR, లివింగ్ విల్
+, last on $day	, చివరిసారి $day
+Opened once$last	ఒకసారి తెరిచారు$last
+Opened $views times$last	$views సార్లు తెరిచారు$last
+Saved on this phone, not sent yet$detail It is sent when you open Feedback again while signed in and online.	ఈ ఫోన్‌లో సేవ్ చేశాం, ఇంకా పంపలేదు$detail మీరు సైన్ ఇన్ చేసి, ఆన్‌లైన్‌లో ఉండి ఫీడ్‌బ్యాక్ మళ్లీ తెరిచినప్పుడు ఇది పంపబడుతుంది.
+1 medicine photo was not matched	1 మందు ఫోటో సరిపోలలేదు
+$n medicine photos were not matched	$n మందు ఫోటోలు సరిపోలలేదు
+photo $k	ఫోటో $k
+Review $photos. Add any missing medicine manually or leave it out only after checking the original prescription.	$photos సరిచూడండి. లేని మందును మీరే జోడించండి, లేదా అసలు ప్రిస్క్రిప్షన్ చూసిన తర్వాత మాత్రమే దాన్ని వదిలేయండి.
+Save 1 medicine	1 మందు సేవ్ చేయండి
+Save $n medicines	$n మందులు సేవ్ చేయండి
+page $k	పేజీ $k
+Original reading · $pages	అసలు పఠనం · $pages
+ICD decision	ICD నిర్ణయం
