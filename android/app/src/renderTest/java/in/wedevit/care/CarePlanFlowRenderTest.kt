@@ -51,11 +51,12 @@ class CarePlanFlowRenderTest {
         settle()
         exists("care-plan-entry"); shot("0-today-entry")
         click("nav-More"); click("more-care-plan-entry")
-        exists("care-plan-home"); shot("1-home")
+        exists("care-plan-home"); exists("dpdp-title"); exists("dpdp-download"); shot("1-home")
         // No plan: the ED view says standard care.
-        click("care-plan-ed-entry"); exists("ed-banner-none"); exists("if-in-doubt"); exists("care-continues"); shot("2-ed-none"); click("ed-header-back")
+        click("care-plan-ed-entry"); exists("ed-banner-none"); exists("if-in-doubt"); exists("care-continues"); exists("legal-pending"); exists("plan-read-aloud"); shot("2-ed-none"); click("ed-header-back")
 
         click("care-plan-start"); exists("ectpr-wizard")
+        exists("plan-read-aloud"); type("Hospital number", "UH-1")
         shot("3-wizard-patient"); next(); next(); next()
         // V4: treatment stays locked until understanding is ticked.
         next(); next(); exists("treatment-locked"); shot("4-treatment-locked")
@@ -75,9 +76,10 @@ class CarePlanFlowRenderTest {
         exists("ed-banner-active"); shot("10-ed-active")
         EdView.ORDER.forEach { exists("ed-row-${it.lowercase()}") }
         exists("care-continues"); shot("11-ed-bottom"); click("ed-header-back")
-        click("care-plan-card-entry"); exists("wallet-qr"); shot("12-wallet"); click("wallet-header-back")
+        // The practice walkthrough never reaches the server, and the screen says the card is on this phone only.
+        click("care-plan-card-entry"); exists("card-local-only"); exists("wallet-qr"); shot("12-wallet"); exists("wallet-offline-qr"); shot("12b-wallet-offline"); click("wallet-header-back")
 
-        click("care-plan-amd-entry"); click("amd-start"); exists("amd-status-draft"); shot("13-amd"); click("amd-header-back")
+        click("care-plan-amd-entry"); click("amd-start"); exists("amd-status-draft"); shot("13-amd"); exists("amd-treatment-cpr-refuse"); shot("13a-amd-treatments"); exists("amd-generate"); shot("13c-amd-end"); click("amd-header-back")
 
         click("care-plan-withdraw")
         type("Reason", "Test"); type("Signed by", "Tester"); shot("13b-withdraw-form"); click("care-plan-withdraw-confirm")

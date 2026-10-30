@@ -20,6 +20,7 @@ class MainActivity : ComponentActivity() {
         if (android.os.Build.VERSION.SDK_INT >= 29) window.isNavigationBarContrastEnforced = false
         if (!BuildConfig.DEBUG) window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         if (savedInstanceState == null) { handleInviteIntent(intent); handleReminderIntent(intent) }
+        CareLanguageState.current // Created here, outside any Compose snapshot, or reading it during composition can throw.
         setContent { CareTheme { CareRoot(this) } }
     }
     override fun onNewIntent(intent: Intent) { super.onNewIntent(intent); setIntent(intent); handleInviteIntent(intent); handleReminderIntent(intent) }

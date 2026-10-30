@@ -37,11 +37,12 @@ private fun livingWillPdfName(version: Int) = "sahara-living-will-v$version.pdf"
     val reader = remember(identity) { CareReadAloud(context) { revision++ } }
     DisposableEffect(reader) { onDispose { reader.close() } }
     @Suppress("UNUSED_VARIABLE") val changed = revision
+    var pressed by remember(identity) { mutableStateOf(false) }
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        OutlinedButton(onClick = { if (reader.speaking) reader.stop() else reader.read(text(), lang.code + "-IN") }, modifier = Modifier.heightIn(min = 48.dp).testTag("plan-read-aloud")) {
+        OutlinedButton(onClick = { pressed = true; if (reader.speaking) reader.stop() else reader.read(text(), lang.code + "-IN") }, modifier = Modifier.heightIn(min = 48.dp).testTag("plan-read-aloud")) {
             Icon(if (reader.speaking) Icons.Default.Stop else Icons.Default.VolumeUp, null, Modifier.size(18.dp)); Spacer(Modifier.width(7.dp)); Text(if (reader.speaking) t("Stop reading", "पढ़ना रोकें") else t("Read aloud", "पढ़कर सुनाएँ"))
         }
-        if (reader.status.isNotBlank()) Text(reader.status, style = Small, color = DoctorCardSub)
+        if (pressed && reader.status.isNotBlank()) Text(reader.status, style = Small, color = DoctorCardSub)
     }
 }
 
