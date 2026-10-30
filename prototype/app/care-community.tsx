@@ -4,8 +4,9 @@ import { useId } from 'react';
 import { useCareLocalState } from './care-local-store';
 import { IconArrowRight, IconMapPin, IconUsers } from './icons';
 import './care-community.css';
+import { careText, type CareLang } from './care-i18n';
 
-export type CareCommunityProps = { hindi: boolean };
+export type CareCommunityProps = { lang: CareLang };
 
 const conditions = [
   ['all', 'All groups', 'सभी समूह'],
@@ -98,9 +99,9 @@ const groups: {
   },
 ];
 
-export function CareCommunity({ hindi }: CareCommunityProps) {
+export function CareCommunity({ lang }: CareCommunityProps) {
   const id = useId();
-  const t = (en: string, hi: string) => hindi ? hi : en;
+  const t = (en: string, hi: string) => careText(lang, en, hi);
   const [preferences, setPreferences, saveStatus] = useCareLocalState<Preferences>('community-preferences-v1', initialPreferences);
   const { audience, region, condition } = preferences;
   const visible = groups.filter((group) => group.audiences.includes(audience) && group.regions.includes(region)

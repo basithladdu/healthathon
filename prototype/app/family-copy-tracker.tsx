@@ -10,10 +10,11 @@ import {
 } from './family-copy-state';
 import './family-copy-tracker.css';
 import type { CareNoteAcknowledgement } from './care-note-signing-state';
+import { careLocale, careText, type CareLang } from './care-i18n';
 
 export type { CareCopyEntry } from './family-copy-state';
 type Props = {
-  patientId: string; patientName: string; author: string; today: string; hindi: boolean;
+  patientId: string; patientName: string; author: string; today: string; lang: CareLang;
   releases: readonly SummaryRelease[]; entries: CareCopyEntry[]; onChange: (entries: CareCopyEntry[]) => void;
   acknowledgements?: readonly CareNoteAcknowledgement[];
 };
@@ -22,9 +23,9 @@ export function FamilyCopyTracker(props: Props) {
   return <CopyTrackerForPatient key={`${props.patientId}:${props.author}`} {...props} />;
 }
 
-function CopyTrackerForPatient({ patientId, patientName, author, today, hindi, releases, entries, onChange, acknowledgements = [] }: Props) {
+function CopyTrackerForPatient({ patientId, patientName, author, today, lang, releases, entries, onChange, acknowledgements = [] }: Props) {
   const id = useId();
-  const t = (en: string, hi: string) => hindi ? hi : en;
+  const t = (en: string, hi: string) => careText(lang, en, hi);
   const copies = approvedPatientCopies(releases, patientId);
   const latest = copies[0];
   const recipients = groupCareCopyEntries(entries, releases, patientId);
@@ -37,7 +38,7 @@ function CopyTrackerForPatient({ patientId, patientName, author, today, hindi, r
   const [downloading, setDownloading] = useState(false);
   const nameInput = useRef<HTMLInputElement>(null);
   const selectedCopy = copies.find((copy) => copy.number === draft.version);
-  const dateLabel = (value: string) => new Date(`${value.slice(0, 10)}T12:00:00`).toLocaleDateString(hindi ? 'hi-IN' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  const dateLabel = (value: string) => new Date(`${value.slice(0, 10)}T12:00:00`).toLocaleDateString(careLocale(lang), { day: 'numeric', month: 'short', year: 'numeric' });
   const statusLabel = (status: CareCopyStatus) => status === 'latest' ? t('Latest version recorded', 'नया संस्करण दर्ज है') : status === 'older' ? t('Older version recorded', 'पुराना संस्करण दर्ज है') : t('Version not available here', 'यह संस्करण यहाँ नहीं है');
 
   useEffect(() => { if (formOpen) nameInput.current?.focus(); }, [formOpen, editingId]);

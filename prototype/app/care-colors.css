@@ -402,7 +402,7 @@
   .simple-care-app { padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
   .simple-care-app .simple-care-header { min-height: 76px; flex-wrap: wrap; gap: 6px 12px; padding-block: 10px; border-bottom: 1px solid var(--care-line); }
   .simple-care-app .simple-care-brand { font-size: 27px; }
-  .simple-care-app .simple-care-switches { gap: 6px; margin-left: auto; }
+  .simple-care-app .simple-care-switches { gap: 6px; margin-inline-start: auto; }
   .simple-care-app .simple-care-switches > button, .simple-care-app .simple-care-role-trigger { padding: 8px 10px; font-size: 13px; }
   .simple-care-app .simple-care-nav { position: fixed; z-index: 50; inset: auto 0 0; display: grid; width: 100%; max-width: none; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 5px; padding: 7px max(12px, env(safe-area-inset-right)) calc(7px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left)); border-top: 1px solid var(--care-line); border-bottom: 0; background: #fff8ee; box-shadow: 0 -8px 28px #5b3d2514; transform: translate3d(0, 0, 0); backface-visibility: hidden; }
   .simple-care-app .simple-care-nav :is(a, button) { min-width: 0; min-height: 58px; padding: 6px 2px; border-radius: 14px; flex-direction: column; gap: 4px; font-size: 10px; line-height: 1; text-align: center; }

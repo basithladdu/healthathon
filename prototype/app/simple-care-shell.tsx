@@ -6,6 +6,8 @@ import { CareRouteLink } from './care-route-link';
 import type { CareView } from './care-routes';
 import { careSectionFor } from './care-section-pages';
 import { SaharaLogo } from './sahara-logo';
+import { careDir, careLocale, careText, type CareLang } from './care-i18n';
+import { CareLanguageSelect } from './care-language-select';
 
 type CareNavIconName = 'home' | 'documents' | 'support' | 'space' | 'visit' | 'record' | 'review' | 'history' | 'care';
 
@@ -27,19 +29,20 @@ function CareNavIcon({ name }: { name: CareNavIconName }) {
 
 type CareRole = 'family' | 'patient' | 'doctor';
 
-export function SimpleCareShell({ children, view, role, hindi, saveStatus, onNavigate, onRole, onLanguage, onSignOut }: {
-  children: ReactNode; view: string; role: CareRole; hindi: boolean;
+export function SimpleCareShell({ children, view, role, lang, saveStatus, onNavigate, onRole, onLanguage, onSignOut }: {
+  children: ReactNode; view: string; role: CareRole; lang: CareLang;
   saveStatus: 'saving' | 'saved' | 'unavailable';
   onNavigate: (view: CareView) => void;
-  onRole: (role: CareRole) => void; onLanguage: () => void;
+  onRole: (role: CareRole) => void; onLanguage: (lang: CareLang) => void;
   onSignOut: () => void;
 }) {
-  const t = (en: string, hi: string) => hindi ? hi : en;
+  const t = (en: string, hi: string) => careText(lang, en, hi);
   const links = role === 'doctor' ? [
     { key: 'home', label: t('Overview', 'एक नज़र'), shortLabel: t('Home', 'होम'), icon: 'home' },
     { key: 'doctor-record', label: t('Record', 'बातचीत'), shortLabel: t('Record', 'नोट'), icon: 'record' },
     { key: 'doctor-review', label: t('Review & sign', 'जाँचें और साइन करें'), shortLabel: t('Review', 'जाँच'), icon: 'review' },
     { key: 'doctor-history', label: t('History', 'पुराने नोट'), shortLabel: t('History', 'इतिहास'), icon: 'history' },
+    { key: 'doctor-care-plan', label: t('Care plan', 'देखभाल योजना'), shortLabel: t('Plan', 'योजना'), icon: 'review' },
     { key: 'care-near-me', label: t('Find care', 'देखभाल ढूँढें'), shortLabel: t('Care', 'देखभाल'), icon: 'care' },
   ] as const : [
     { key: 'daily-care', label: t('Home', 'होम'), shortLabel: t('Home', 'होम'), icon: 'home' },
@@ -48,26 +51,26 @@ export function SimpleCareShell({ children, view, role, hindi, saveStatus, onNav
     { key: 'my-space', label: t('My space', 'मेरी जगह'), shortLabel: t('My space', 'मेरी जगह'), icon: 'space' },
     { key: 'doctor-pack', label: t('Visit pack', 'मुलाक़ात की फ़ाइल'), shortLabel: t('Visit', 'मुलाक़ात'), icon: 'visit' },
   ] as const;
-  return <div className="simple-care-app">
+  return <div className="simple-care-app" lang={lang} dir={careDir(lang)}>
     <header className="simple-care-header">
       <CareRouteLink className="simple-care-brand" view={role === 'doctor' ? 'home' : 'daily-care'} onOpen={() => onNavigate(role === 'doctor' ? 'home' : 'daily-care')} aria-label={t('Sahara - A Palliative Care Companion', 'सहारा - पैलिएटिव केयर साथी')}>
         <SaharaLogo className="simple-care-brand-logo" priority />
         <span className="simple-care-brand-copy"><span className="simple-care-brand-name">{t('Sahara', 'सहारा')}</span><span className="simple-care-brand-tagline">{t('- A Palliative Care Companion', '- पैलिएटिव केयर साथी')}</span></span>
       </CareRouteLink>
-      <div className="simple-care-switches"><button type="button" onClick={onLanguage} lang={hindi ? 'en' : 'hi'}>{hindi ? 'English' : 'हिन्दी'}</button>
+      <div className="simple-care-switches"><CareLanguageSelect lang={lang} onChange={onLanguage} />
         <button type="button" onClick={onSignOut}>{t('Sign out', 'साइन आउट')}</button>
       </div>
     </header>
     <nav className="simple-care-nav" aria-label={t('Main navigation', 'मुख्य मेन्यू')}>{links.map(({ key, label, shortLabel, icon }) => <CareRouteLink className="simple-care-nav-link" key={key} view={key} aria-label={label} aria-current={(role === 'doctor' ? view : careSectionFor(view)) === key ? 'page' : undefined} onOpen={() => onNavigate(key)}><CareNavIcon name={icon} /><span className="simple-care-nav-label">{label}</span><span className="simple-care-nav-short-label">{shortLabel}</span></CareRouteLink>)}</nav>
-    <main key={view} className="simple-care-content" lang={hindi ? 'hi' : 'en'}>{children}</main>
+    <main key={view} className="simple-care-content" lang={lang} dir={careDir(lang)}>{children}</main>
     {saveStatus === 'unavailable' && <p className="care-save-error" role="alert">{t('Could not save your latest changes. Download a copy before closing.', 'नए बदलाव सेव नहीं हुए। बंद करने से पहले कॉपी डाउनलोड करें।')}</p>}
   </div>;
 }
 
-export function FamilyCareNote({ patientName, release, fields, onPrepare, hindi }: {
-  patientName: string; release: SummaryRelease | null | undefined; fields: Array<{ label: string; value: string }>; onPrepare: () => void; hindi: boolean;
+export function FamilyCareNote({ patientName, release, fields, onPrepare, lang }: {
+  patientName: string; release: SummaryRelease | null | undefined; fields: Array<{ label: string; value: string }>; onPrepare: () => void; lang: CareLang;
 }) {
-  const t = (en: string, hi: string) => hindi ? hi : en;
+  const t = (en: string, hi: string) => careText(lang, en, hi);
   const labels: Record<string, string> = { 'What matters to you': 'आपके लिए क्या ज़रूरी है', 'Who was there': 'कौन साथ था', 'What you discussed': 'क्या बात हुई', 'Still to discuss': 'क्या बात करना बाकी है', 'Next steps': 'आगे क्या करना है', Summary: 'नोट' };
   function download() {
     const text = [`Sahara — A Palliative Care Companion`, `Care Note for ${patientName}`, `Version ${release?.number} · ${release?.physician}`, ...fields.map(({ label, value }) => `${label}\n${value}`), 'A conversation note, not a prescription or legal directive.'].join('\n\n');
@@ -75,8 +78,8 @@ export function FamilyCareNote({ patientName, release, fields, onPrepare, hindi 
     const link = document.createElement('a'); link.href = url; link.download = 'sahara-care-note.txt'; link.click(); URL.revokeObjectURL(url);
   }
   return <section className="simple-care-note"><div className="family-workspace-heading"><h1>{patientName.split(' ')[0]}{t('’s Care Note', ' का नोट')}</h1>{release && <button type="button" className="secondary-button" onClick={download}>{t('Save a copy', 'कॉपी डाउनलोड करें')}</button>}</div>
-    {release ? <><p className="care-note-meta">{release.physician} · {new Date(release.releasedAt).toLocaleDateString(hindi ? 'hi-IN' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric' })} · {t('Version', 'संस्करण')} {release.number}</p>
-      <dl className="care-note-fields">{fields.filter(({ value }) => value !== 'Not stated in this conversation.').map(({ label, value }) => <div key={label}><dt>{hindi ? labels[label] ?? label : label}</dt><dd>{value}</dd></div>)}</dl></> : <p>{t('There is no approved note here yet.', 'यहाँ अभी डॉक्टर का मंज़ूर किया हुआ नोट नहीं है।')}</p>}
+    {release ? <><p className="care-note-meta">{release.physician} · {new Date(release.releasedAt).toLocaleDateString(careLocale(lang), { day: 'numeric', month: 'short', year: 'numeric' })} · {t('Version', 'संस्करण')} {release.number}</p>
+      <dl className="care-note-fields">{fields.filter(({ value }) => value !== 'Not stated in this conversation.').map(({ label, value }) => <div key={label}><dt>{careText(lang, label, labels[label] ?? label)}</dt><dd>{value}</dd></div>)}</dl></> : <p>{t('There is no approved note here yet.', 'यहाँ अभी डॉक्टर का मंज़ूर किया हुआ नोट नहीं है।')}</p>}
     <button type="button" className="care-text-button" onClick={onPrepare}>{t('What would you like to talk about?', 'आप किस बारे में बात करना चाहते हैं?')} →</button>
   </section>;
 }

@@ -5,12 +5,13 @@ import type { PatientDetails } from './patient-portal';
 import { isValidBirthDate } from './patient-date';
 import { CareRouteLink } from './care-route-link';
 import './care-profile.css';
+import { careText, type CareLang } from './care-i18n';
 
-export function CareProfile({ details, hindi, onSave }: { details: PatientDetails; hindi: boolean; onSave: (details: PatientDetails) => void }) {
+export function CareProfile({ details, lang, onSave }: { details: PatientDetails; lang: CareLang; onSave: (details: PatientDetails) => void }) {
   const id = useId();
   const [form, setForm] = useState(details);
   const [status, setStatus] = useState('');
-  const t = (en: string, hi: string) => hindi ? hi : en;
+  const t = (en: string, hi: string) => careText(lang, en, hi);
   function update(key: keyof PatientDetails, value: string) { setForm((current) => ({...current, [key]:value})); setStatus(''); }
   function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();

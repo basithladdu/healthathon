@@ -1,16 +1,25 @@
-import { useEffect, useState, useMemo } from 'react';
+'use client';
+// ED Quick View, emergency wallet card, and ECTPR PDF actions — all drawn from the real signed EctprRecord in
+// ectpr-store (tech spec §6–8, clinical spec §6). The old EctprQuickView samples stay exported because the store
+// seeds its demo patients from them and continuity-prototype still passes them in; the screens below look the
+// patient up in the store by `patientId` (or the sample's hospitalId) and never render the sample itself.
+import { useEffect, useMemo, useRef, useState } from 'react';
 import QRCode from 'qrcode';
+import type { CareLang } from './care-i18n';
+import { careText } from './care-i18n';
+import type { EctprRecord } from './ectpr-model';
+import { edInterpretation } from './ectpr-rules';
+import { getActiveEctpr, listEctprVersions, logAudit, subscribeEctpr } from './ectpr-store';
+import { EctprEdView, edSpokenText, type EdAudience } from './ectpr-ed-view';
+import {
+  ceilingShort, cprShort, edBanner, formatDay, notRecorded, textFor, transferShort, treatingConsultant, walletCardLine,
+} from './ectpr-labels';
+import { edCardUrl, issueEdCard, localCardFor, revokeEdCard, startEdCardSync, subscribeEdCards, syncEdCards, type LocalEdCard } from './ed-card-client';
 import { AudioTtsPlayer } from './tts-speech';
 import { OfflineQrScannerModal } from './offline-qr-scanner-modal';
-import {
-  IconHeartPulse,
-  IconLungs,
-  IconHospital,
-  IconShieldAlert,
-  IconShieldCheck,
-  IconUsers,
-  IconStethoscope,
-} from './icons';
+
+// ---------------------------------------------------------------------------
+// Legacy sample shape (seed for ectpr-store's demo patients). Synthetic data.
 
 export type BreathingCeiling =
   | 'comfort-only'
@@ -56,8 +65,9 @@ export const ectprQuickViews: Record<string, EctprQuickView> = {
     treatingConsultant: 'Dr Sujay',
     palliativeContact: 'Palliative care team',
     signedBy: 'Dr Sujay',
-    signedOn: '21 Aug 2026',
-    reviewDueBy: '28 Aug 2026',
+    // Signed plan with every choice left blank: demo of "No preference recorded" = standard care everywhere.
+    signedOn: '24 Oct 2026',
+    reviewDueBy: '16 Jan 2027',
     formVersion: 'ECTPR Beta v0.1',
     recordVersion: 'Version 1',
   },
@@ -75,445 +85,343 @@ export const ectprQuickViews: Record<string, EctprQuickView> = {
     treatingConsultant: 'Dr Sujay',
     palliativeContact: 'Palliative care team',
     signedBy: 'Dr Sujay',
-    signedOn: '21 Aug 2026',
-    reviewDueBy: '04 Sep 2026',
+    signedOn: '21 Oct 2026',
+    reviewDueBy: '13 Jan 2027',
     formVersion: 'ECTPR Beta v0.1',
     recordVersion: 'Version 1',
   },
 };
 
-const GOAL_LABELS: Record<string, string> = {
-  'prioritise-life': 'A · Prioritise life',
-  balanced: 'B · Balanced / ceiling of care',
-  'prioritise-comfort': 'C · Prioritise comfort',
-};
+// ---------------------------------------------------------------------------
+// Store hooks
 
-const TRANSFER_LABELS: Record<string, string> = {
-  'any-deterioration': 'Yes, for any deterioration',
-  'listed-reasons-only': 'Only for the specific reasons listed in the full record',
-  no: 'No — manage at home or hospice; call the team first',
-};
-
-const TRANSFER_SHORT_LABELS: Record<string, string> = {
-  'any-deterioration': 'Yes',
-  'listed-reasons-only': 'Only for listed reasons',
-  no: 'No — call the team first',
-};
-
-const CPR_LABELS: Record<string, string> = {
-  attempt: 'Attempt CPR',
-  dnacpr: 'Do not attempt CPR (DNACPR)',
-};
-
-const BREATHING_LABELS: Record<BreathingCeiling, string> = {
-  'comfort-only': 'Comfort measures / oxygen for breathlessness only',
-  mask: 'Nasal prongs or face mask',
-  'non-rebreather': 'Non-rebreather mask',
-  hfnc: 'High-flow nasal cannula (HFNC)',
-  niv: 'Non-invasive ventilation (CPAP / BiPAP)',
-  'intubation-trial': 'Intubation and invasive ventilation, as a time-limited trial',
-  'intubation-no-limit': 'Intubation and invasive ventilation, without a pre-set limit',
-};
-
-const BREATHING_PLAIN_LANGUAGE: Record<BreathingCeiling, string> = {
-  'comfort-only': 'Medicine and comfort measures for breathlessness, without chasing an oxygen number.',
-  mask: 'A light tube or mask giving low-flow oxygen. Comfortable, does not stop talking or eating.',
-  'non-rebreather': 'A tight-fitting mask giving strong oxygen. Tolerable, but can feel confining and makes talking harder.',
-  hfnc: 'Warmed, humidified oxygen through a nasal tube, given faster and stronger than usual. Usually needs a higher-level bed.',
-  niv: 'A tight mask that pushes air in. It can help, but it is often uncomfortable and makes talking and eating hard.',
-  'intubation-trial': 'A breathing tube and machine in intensive care, tried for a set period to see if it helps.',
-  'intubation-no-limit': 'A breathing tube and machine in intensive care, continued for as long as it is needed.',
-};
-
-const ICU_TRIAL_DAYS_FALLBACK = 0;
-
-function icuLabel(record: EctprQuickView): string {
-  if (record.icu === 'yes') return 'Yes';
-  if (record.icu === 'time-limited-trial') {
-    return `Yes, as a time-limited trial of ${record.icuTrialDays ?? ICU_TRIAL_DAYS_FALLBACK} days`;
-  }
-  if (record.icu === 'no') return 'No — ward-level or comfort care only';
-  return '';
+/** The record the ED should see: the Active version, else the newest version (so revoked/unsigned states show). */
+export function useEdRecord(patientId: string | null | undefined): { record: EctprRecord | null; loading: boolean } {
+  const [state, setState] = useState<{ id: string | null; record: EctprRecord | null; loaded: boolean }>({ id: null, record: null, loaded: false });
+  useEffect(() => {
+    if (!patientId) return;
+    let live = true;
+    const load = async () => {
+      const active = await getActiveEctpr(patientId).catch(() => null);
+      const record = active ?? (await listEctprVersions(patientId).catch(() => []))[0] ?? null;
+      // Audit entries also notify the store; skip re-renders when the record itself did not change.
+      if (live) setState((prev) => (prev.id === patientId && prev.loaded && JSON.stringify(prev.record) === JSON.stringify(record) ? prev : { id: patientId, record, loaded: true }));
+    };
+    void load();
+    const off = subscribeEctpr(() => { void load(); });
+    return () => { live = false; off(); };
+  }, [patientId]);
+  if (!patientId) return { record: null, loading: false };
+  return state.id === patientId ? { record: state.record, loading: !state.loaded } : { record: null, loading: true };
 }
 
-function unrecordedLabel(audience: 'clinician' | 'patient' | 'family'): string {
-  return audience === 'clinician' ? 'No preference recorded — provide standard care' : 'Not decided yet';
+function useLocalCard(patientId: string | null | undefined): LocalEdCard | null {
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    startEdCardSync();
+    return subscribeEdCards(() => setTick((n) => n + 1));
+  }, []);
+  return patientId ? localCardFor(patientId) : null;
 }
 
-function isBelowIntubation(ceiling: BreathingCeiling | null): boolean {
-  return (
-    ceiling === 'comfort-only' ||
-    ceiling === 'mask' ||
-    ceiling === 'non-rebreather' ||
-    ceiling === 'hfnc' ||
-    ceiling === 'niv'
-  );
+function actorFor(audience: EdAudience | 'patient' | 'family', actor?: string): string {
+  if (actor) return actor;
+  return audience === 'clinician' ? 'Clinician (Sahara app)' : audience === 'patient' ? 'Patient (Sahara app)' : 'Family (Sahara app)';
 }
 
-function AnswerCell(props: {
-  overline: string;
-  recorded: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className={`ectpr-answer ${props.recorded ? 'ectpr-answer--recorded' : 'ectpr-answer--unrecorded'}`}>
-      <div className="ectpr-answer-overline">{props.overline}</div>
-      <div className="ectpr-answer-value">{props.children}</div>
-    </div>
-  );
+/** Log one VIEW per record version per mounted screen. */
+function useViewAudit(record: EctprRecord | null, actor: string, detail: string) {
+  const logged = useRef<string | null>(null);
+  useEffect(() => {
+    const key = record ? `${record.id}:${record.version}:${record.status}` : null;
+    if (!record || logged.current === key) return;
+    logged.current = key;
+    void logAudit({ actor, action: 'VIEW', recordType: 'ECTPR', recordId: record.id, patientId: record.patientId, detail }).catch(() => undefined);
+  }, [record, actor, detail]);
 }
+
+// ---------------------------------------------------------------------------
+// ED Quick View (in-app)
 
 export function EdQuickView(props: {
-  record: EctprQuickView | null;
-  audience: 'clinician' | 'patient' | 'family';
+  /** Legacy: the sample card; only its hospitalId is used to find the patient in the store. */
+  record?: EctprQuickView | null;
+  patientId?: string;
+  /** Pass a record directly (e.g. a draft being reviewed). undefined = look it up in the store. */
+  ectpr?: EctprRecord | null;
+  audience: EdAudience;
+  lang?: CareLang;
+  actor?: string;
 }): React.JSX.Element {
-  const { record, audience } = props;
+  const lang = props.lang ?? 'en';
+  const id = props.patientId ?? props.record?.hospitalId ?? null;
+  const looked = useEdRecord(props.ectpr === undefined ? id : null);
+  const record = props.ectpr !== undefined ? props.ectpr : looked.record;
+  const loading = props.ectpr === undefined && looked.loading && !!id;
+  const actor = actorFor(props.audience, props.actor);
+  useViewAudit(record, actor, 'ED Quick View opened in the app');
+  const spoken = useMemo(() => edSpokenText(record, edInterpretation(record), lang), [record, lang]);
 
-  if (!record) {
-    return (
-      <div className="ectpr-container">
-        <div className="ectpr-card ectpr-quickview">
-          <div className="ectpr-eyebrow">Emergency care &amp; treatment preferences</div>
-          <h2 className="ectpr-heading">ED Quick View</h2>
-          {audience === 'clinician' ? (
-            <p className="ectpr-empty">
-              No emergency care preference record has been saved for this patient. Provide full standard emergency
-              care and contact the treating team.
-            </p>
-          ) : (
-            <p className="ectpr-empty">
-              No emergency care preference record has been saved yet.{' '}
-              {audience === 'family'
-                ? 'Your care team will talk this through with the patient and family.'
-                : 'Your care team will talk this through with you.'}
-            </p>
-          )}
-        </div>
-      </div>
-    );
+  if (loading) return <div className="ectpr-container"><div className="ectpr-card ectpr-quickview"><p className="ectpr-muted">{careText(lang, 'Loading the emergency care plan…', 'आपातकालीन योजना लोड हो रही है…')}</p></div></div>;
+  return (
+    <>
+      <AudioTtsPlayer title={careText(lang, 'Read the emergency plan aloud', 'आपातकालीन योजना पढ़कर सुनाएँ')} subtitle={careText(lang, 'Plays on this device', 'इसी डिवाइस पर')} text={spoken} variant="emergency" className="mb-3" />
+      <EctprEdView record={record} lang={lang} audience={props.audience} />
+      {record && props.audience === 'clinician' && <EctprPdfActions record={record} lang={lang} actor={actor} liveUrl={null} />}
+    </>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// PDF actions
+
+export function EctprPdfActions(props: { record: EctprRecord; lang?: CareLang; actor: string; liveUrl: string | null; showCard?: boolean }) {
+  const lang = props.lang ?? 'en';
+  const t = textFor(lang);
+  const [busy, setBusy] = useState<'plan' | 'card' | null>(null);
+  const [done, setDone] = useState<{ kind: 'plan' | 'card'; sha256: string; fileName: string } | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  async function make(kind: 'plan' | 'card') {
+    setBusy(kind); setError(null);
+    try {
+      const mod = await import('./ectpr-pdf');
+      const result = kind === 'plan'
+        ? await mod.makeEctprPdf(props.record, { lang, liveUrl: props.liveUrl })
+        : await mod.makeWalletCardPdf(props.record, { lang, liveUrl: props.liveUrl });
+      mod.downloadPdf(result);
+      setDone({ kind, sha256: result.sha256, fileName: result.fileName });
+      await logAudit({ actor: props.actor, action: 'PRINT', recordType: kind === 'plan' ? 'ECTPR' : 'CARD', recordId: props.record.id, patientId: props.record.patientId, detail: `${kind === 'plan' ? 'ECTPR PDF' : 'Wallet card PDF'} v${props.record.version} (${lang}) ${result.fileName} SHA-256 ${result.sha256}` });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : t('The PDF could not be made.', 'PDF नहीं बन सकी।'));
+    } finally { setBusy(null); }
   }
 
-  const cprLabel = record.cpr ? CPR_LABELS[record.cpr] : unrecordedLabel(audience);
-  const breathingLabel = record.breathingCeiling
-    ? BREATHING_LABELS[record.breathingCeiling]
-    : unrecordedLabel(audience);
-  const transferLabel = record.hospitalTransfer ? TRANSFER_LABELS[record.hospitalTransfer] : unrecordedLabel(audience);
-  const icuText = record.icu ? icuLabel(record) : unrecordedLabel(audience);
-  const goalLabel = record.goal ? GOAL_LABELS[record.goal] : unrecordedLabel(audience);
-
-  const showEscalationNote =
-    audience === 'clinician' && record.cpr === 'attempt' && isBelowIntubation(record.breathingCeiling);
-
-  const plainLanguageLine =
-    audience !== 'clinician' && record.breathingCeiling ? BREATHING_PLAIN_LANGUAGE[record.breathingCeiling] : null;
-
-  const emergencySpokenText = useMemo(() => {
-    return `Recorded care preferences for ${record.patientName}, hospital ID ${record.hospitalId}. This is not a signed medical order. Primary diagnosis: ${record.diagnosis}. Overall care goal: ${goalLabel}. Cardiopulmonary resuscitation preference: ${cprLabel}. Highest breathing support preference: ${breathingLabel}. Hospital transfer: ${transferLabel}. Intensive care unit admission: ${icuText}. Named proxy decision maker: ${record.decisionMaker ? `${record.decisionMaker.name}, ${record.decisionMaker.relationship}` : 'Not recorded'}. Review recorded by ${record.signedBy || 'Not recorded'} on ${record.signedOn || 'Not recorded'}.`;
-  }, [record, goalLabel, cprLabel, breathingLabel, transferLabel, icuText]);
-
   return (
-    <div className="ectpr-container">
-      <div className="ectpr-card ectpr-quickview">
-        <div className="ectpr-eyebrow">
-          <IconShieldAlert className="w-3.5 h-3.5 text-emerald-700" />
-          <span>Emergency care &amp; treatment preferences</span>
-        </div>
-        <h2 className="ectpr-heading">ED Quick View</h2>
-        <div className="ectpr-subline">
-          {record.recordVersion} · review recorded by {record.signedBy ?? 'Not recorded'} on {record.signedOn ?? 'Not recorded'}{' '}
-          · {record.formVersion}
-        </div>
-
-        <AudioTtsPlayer
-          title="Read care preferences aloud"
-          subtitle="Plays on this device"
-          text={emergencySpokenText}
-          variant="emergency"
-          className="mb-3"
-        />
-
-        <div className="ectpr-rule-banner">
-          {audience === 'clinician' ? (
-            <p>
-              <strong>If in doubt, resuscitate.</strong> Give full standard emergency care if this record is
-              unsigned, out of date or ambiguous; if the problem is new, reversible and unrelated to the illness (for
-              example an injury, choking, a drug reaction or low blood sugar); or if the patient has capacity and now
-              says something different, which always overrides this record. An unrecorded answer means no preference
-              has been recorded — it does not mean refusal.
-            </p>
-          ) : (
-            <p>
-              In an emergency, doctors give full standard care if this plan is unclear or out of date, or if the
-              problem is new and could be reversed. What {audience === 'patient' ? 'you say' : 'the patient says'} at
-              the time always comes first.
-            </p>
-          )}
-        </div>
-
-        <div className="ectpr-goal-row">
-          <div className="ectpr-goal-label">
-            <IconStethoscope className="w-4 h-4 text-emerald-700 inline mr-1" />
-            <span>Overall goal</span>
-          </div>
-          <div className="ectpr-goal-value">{goalLabel}</div>
-        </div>
-
-        <div className="ectpr-answers-grid">
-          <AnswerCell overline="Bring to hospital?" recorded={!!record.hospitalTransfer}>
-            <span className="flex items-center gap-1.5">
-              <IconHospital className="w-4 h-4 text-amber-600 inline" />
-              <span>{transferLabel}</span>
-            </span>
-          </AnswerCell>
-          <AnswerCell overline="CPR if the heart stops?" recorded={!!record.cpr}>
-            <span className="flex items-center gap-1.5">
-              <IconHeartPulse className="w-4 h-4 text-rose-600 inline" />
-              <span>{cprLabel}</span>
-            </span>
-          </AnswerCell>
-          <AnswerCell overline="Highest breathing support" recorded={!!record.breathingCeiling}>
-            <span className="flex items-center gap-1.5">
-              <IconLungs className="w-4 h-4 text-sky-600 inline" />
-              <span>{breathingLabel}</span>
-            </span>
-            {plainLanguageLine && <div className="ectpr-plain-language">{plainLanguageLine}</div>}
-          </AnswerCell>
-          <AnswerCell overline="ICU admission?" recorded={!!record.icu}>
-            <span className="flex items-center gap-1.5">
-              <IconShieldCheck className="w-4 h-4 text-teal-600 inline" />
-              <span>{icuText}</span>
-            </span>
-          </AnswerCell>
-        </div>
-
-        <div className="ectpr-contacts">
-          <div className="ectpr-contacts-title">People to call:</div>
-          <div>
-            Named decision-maker:{' '}
-            {record.decisionMaker
-              ? `${record.decisionMaker.name} · ${record.decisionMaker.relationship}`
-              : 'Not recorded'}
-          </div>
-          <div>Treating consultant: {record.treatingConsultant ?? 'Not recorded'}</div>
-          <div>Palliative care: {record.palliativeContact ?? 'Not recorded'}</div>
-          <div className="ectpr-muted">Ask your care team for their phone number.</div>
-        </div>
-
-        <div className="ectpr-review-due">Review due by {record.reviewDueBy ?? 'Not recorded'}</div>
-
-        {showEscalationNote && (
-          <div className="ectpr-note">
-            The full record asks for a written reason when CPR is chosen with a breathing-support ceiling below
-            intubation (Section 8).
-          </div>
+    <div className="ectpr-pdf-actions">
+      <div className="ectpr-actions-row">
+        <button type="button" className="ectpr-button ectpr-button--primary" onClick={() => make('plan')} disabled={busy !== null}>
+          {busy === 'plan' ? t('Making PDF…', 'PDF बन रही है…') : t('Download ED plan (A4 PDF)', 'ED योजना डाउनलोड (A4 PDF)')}
+        </button>
+        {props.showCard !== false && (
+          <button type="button" className="ectpr-button ectpr-button--secondary" onClick={() => make('card')} disabled={busy !== null}>
+            {busy === 'card' ? t('Making PDF…', 'PDF बन रही है…') : t('Download wallet card (PDF)', 'वॉलेट कार्ड डाउनलोड (PDF)')}
+          </button>
         )}
-
-        <div className="ectpr-footer">
-          Recorded care preferences. Not a signed medical order or legal directive.
-        </div>
       </div>
+      {done && <p className="ectpr-sha" role="status">{t('Saved', 'सहेजा')} {done.fileName} · SHA-256 <code>{done.sha256}</code> · {t('logged in the audit log', 'ऑडिट लॉग में दर्ज')}</p>}
+      {error && <p className="ectpr-error" role="alert">{error}</p>}
     </div>
   );
 }
 
-async function sha256HexUpper(text: string): Promise<string> {
-  const data = new TextEncoder().encode(text);
-  const digest = await crypto.subtle.digest('SHA-256', data);
-  const bytes = Array.from(new Uint8Array(digest));
-  return bytes.map((b) => b.toString(16).padStart(2, '0').toUpperCase()).join('');
-}
+// ---------------------------------------------------------------------------
+// Wallet card (Appendix E)
 
-function buildQrPayload(record: EctprQuickView): string {
-  const lines = [
-    'RECORDED CARE PREFERENCES',
-    'Not a signed medical order or legal directive.',
-    `Patient: ${record.patientName}`,
-    `UHID: ${record.hospitalId}`,
-    `Goal: ${record.goal ? GOAL_LABELS[record.goal] : 'Not recorded'}`,
-    `CPR: ${record.cpr ? CPR_LABELS[record.cpr] : 'Not recorded'}`,
-    `Breathing ceiling: ${record.breathingCeiling ? BREATHING_LABELS[record.breathingCeiling] : 'Not recorded'}`,
-    `Hospital transfer: ${record.hospitalTransfer ? TRANSFER_LABELS[record.hospitalTransfer] : 'Not recorded'}`,
-    `ICU: ${record.icu ? icuLabel(record) : 'Not recorded'}`,
-    `Decision-maker: ${
-      record.decisionMaker ? `${record.decisionMaker.name} (${record.decisionMaker.relationship})` : 'Not recorded'
-    }`,
-    `Review recorded by: ${record.signedBy ?? 'Not recorded'}, ${record.signedOn ?? 'Not recorded'}`,
-    `Record: ${record.formVersion} · ${record.recordVersion}`,
-    'If unclear, or the problem is new and reversible: treat fully.',
-  ];
-  return lines.join('\n');
-}
-
-function CardFace(props: { record: EctprQuickView; watermark?: boolean; qrDataUrl?: string | null; issuedOn?: string | null }) {
-  const { record, watermark, qrDataUrl, issuedOn } = props;
+function CardFace(props: { record: EctprRecord; lang: CareLang; watermark?: boolean; liveQr?: string | null; offlineQr?: string | null; issuedOn?: string | null }) {
+  const { record, lang } = props;
+  const t = textFor(lang);
+  const interp = edInterpretation(record);
+  const consultant = treatingConsultant(record);
+  const dm = record.decisionMakers.primary;
   return (
     <div className="ectpr-card ectpr-emergency-card">
-      {watermark && <div className="ectpr-watermark">PREVIEW — NOT ISSUED</div>}
-      <div className="ectpr-card-band">RECORDED CARE PREFERENCES</div>
-      <div className="ectpr-card-body">
-        <div>Patient: {record.patientName}</div>
-        <div>UHID: {record.hospitalId}</div>
-        <div>Diagnosis: {record.diagnosis}</div>
-        <div>CPR: {record.cpr ? CPR_LABELS[record.cpr] : 'Not recorded'}</div>
-        <div>
-          Breathing support ceiling: {record.breathingCeiling ? BREATHING_LABELS[record.breathingCeiling] : 'Not recorded'}
-        </div>
-        <div>
-          Hospital transfer:{' '}
-          {record.hospitalTransfer ? TRANSFER_SHORT_LABELS[record.hospitalTransfer] : 'Not recorded'}
-        </div>
-        <div>ICU: {record.icu ? icuLabel(record) : 'Not recorded'}</div>
-        <div>Call first: {record.palliativeContact ?? 'Not recorded'}</div>
-        <div>
-          Decision-maker:{' '}
-          {record.decisionMaker ? `${record.decisionMaker.name} (${record.decisionMaker.relationship})` : 'Not recorded'}
-        </div>
-        <div>Full record: ask the care team</div>
-        <div>
-          Review recorded by {record.signedBy ?? 'Not recorded'} · {record.signedOn ?? 'Not recorded'}
-        </div>
+      {props.watermark && <div className="ectpr-watermark">{t('PREVIEW — NOT ISSUED', 'पूर्वावलोकन — जारी नहीं')}</div>}
+      <div className={`ectpr-card-band${interp.state === 'ACTIVE' ? '' : ' ectpr-card-band--invalid'}`}>
+        {interp.state === 'ACTIVE' ? t('Emergency care plan', 'आपातकालीन देखभाल योजना') : t('Not a valid plan — give standard care', 'मान्य योजना नहीं — सामान्य इलाज दें')}
       </div>
-      {qrDataUrl && (
-        <div className="ectpr-card-qr">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={qrDataUrl} alt="QR code containing this emergency card as text" width={120} height={120} />
+      <dl className="ectpr-card-body ectpr-card-fields">
+        <div><dt>{t('Patient', 'मरीज़')}</dt><dd>{record.patient.name} · UHID {record.patient.uhid}</dd></div>
+        <div><dt>{t('Diagnosis', 'निदान')}</dt><dd>{record.clinical.diagnosis || notRecorded(lang)}</dd></div>
+        <div><dt>CPR</dt><dd>{cprShort(record, lang)}</dd></div>
+        <div><dt>{t('Breathing ceiling', 'साँस सीमा')}</dt><dd>{ceilingShort(record.choices.respCeiling, lang)}</dd></div>
+        <div><dt>{t('Hospital transfer', 'अस्पताल ले जाना')}</dt><dd>{transferShort(record.choices.hospitalTransfer, lang)}</dd></div>
+        <div><dt>{t('Call first', 'पहले फ़ोन करें')}</dt><dd>{record.careTeam.palliativePhysician || notRecorded(lang)}{record.careTeam.palliativePhone24h ? ` · ${record.careTeam.palliativePhone24h}` : ''}</dd></div>
+        <div><dt>{t('Decision-maker', 'निर्णयकर्ता')}</dt><dd>{dm ? `${dm.name} (${dm.relation})${dm.phone24h ? ` · ${dm.phone24h}` : ''}` : notRecorded(lang)}</dd></div>
+        <div><dt>{t('Full record', 'पूरा रिकॉर्ड')}</dt><dd>{t('Sahara — scan the QR; full record by break-glass', 'Sahara — QR स्कैन करें; पूरा रिकॉर्ड ब्रेक-ग्लास से')}</dd></div>
+        <div><dt>{t('Signed', 'हस्ताक्षर')}</dt><dd>{consultant ? `${consultant.name} · ${formatDay(consultant.signedAt, lang)}` : t('Not signed', 'हस्ताक्षर नहीं')} · {t('version', 'संस्करण')} {record.version}</dd></div>
+      </dl>
+      {(props.liveQr || props.offlineQr) && (
+        <div className="ectpr-card-qr ectpr-card-qr--pair">
+          {props.liveQr && (
+            <figure>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={props.liveQr} alt={t('QR code: link to the live emergency card', 'QR कोड: लाइव आपातकालीन कार्ड का लिंक')} width={120} height={120} />
+              <figcaption>{t('Live card (internet)', 'लाइव कार्ड (इंटरनेट)')}</figcaption>
+            </figure>
+          )}
+          {props.offlineQr && (
+            <figure>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={props.offlineQr} alt={t('QR code: offline text summary of this card', 'QR कोड: इस कार्ड का ऑफ़लाइन सारांश')} width={120} height={120} />
+              <figcaption>{t('Offline summary (any camera)', 'ऑफ़लाइन सारांश (कोई भी कैमरा)')}</figcaption>
+            </figure>
+          )}
         </div>
       )}
-      {issuedOn && <div className="ectpr-card-issued">Issued {issuedOn}</div>}
+      {props.issuedOn && <div className="ectpr-card-issued">{t('Issued', 'जारी')} {formatDay(props.issuedOn, lang)} · {t('review due', 'समीक्षा')} {formatDay(record.reviewDue, lang)}</div>}
       <div className="ectpr-card-footer">
-        <div>If this card is unclear, or the problem is new and reversible — treat fully and call the number above.</div>
-        <div className="ectpr-muted">Not a signed medical order or legal directive.</div>
+        <div className="ectpr-card-rule">{walletCardLine(lang)}</div>
+        <div className="ectpr-muted">{t('IF IN DOUBT, RESUSCITATE. What the patient says now overrides this card.', 'संदेह हो तो CPR दें। मरीज़ की अभी की बात इस कार्ड से ऊपर है।')}</div>
       </div>
     </div>
   );
+}
+
+function useQr(text: string | null): string | null {
+  const [state, setState] = useState<{ text: string; url: string | null } | null>(null);
+  useEffect(() => {
+    if (!text) return;
+    let live = true;
+    QRCode.toDataURL(text, { errorCorrectionLevel: 'M', margin: 1, width: 240 })
+      .then((url) => { if (live) setState({ text, url }); })
+      .catch(() => { if (live) setState({ text, url: null }); });
+    return () => { live = false; };
+  }, [text]);
+  return state && state.text === text ? state.url : null;
 }
 
 export function EmergencyCard(props: {
-  record: EctprQuickView | null;
+  /** Legacy sample; only its hospitalId is used to find the patient in the store. */
+  record?: EctprQuickView | null;
+  patientId?: string;
   audience: 'patient' | 'family';
-  issuedOn: string | null;
+  /** Legacy issued flag from the parent; the card's own token on this device is the source of truth. */
+  issuedOn?: string | null;
   onIssue?: () => void;
+  lang?: CareLang;
+  actor?: string;
 }): React.JSX.Element {
-  const { record, audience, issuedOn, onIssue } = props;
-  const [qrResult, setQrResult] = useState<{
-    payload: string;
-    dataUrl: string | null;
-    checksum: string | null;
-  } | null>(null);
+  const lang = props.lang ?? 'en';
+  const t = textFor(lang);
+  const id = props.patientId ?? props.record?.hospitalId ?? null;
+  const { record, loading } = useEdRecord(id);
+  const card = useLocalCard(id);
+  const actor = actorFor(props.audience, props.actor);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
   const [scannerOpen, setScannerOpen] = useState(false);
-  const payload = record && issuedOn ? buildQrPayload(record) : null;
-  const currentQr = qrResult?.payload === payload ? qrResult : null;
-  const qrDataUrl = currentQr?.dataUrl ?? null;
-  const checksum = currentQr?.checksum ?? null;
+  const [offlineText, setOfflineText] = useState<string | null>(null);
+  const interp = edInterpretation(record);
+  const current = card && record && !card.revokedAt && card.recordId === record.id && record.status === 'ACTIVE' ? card : null;
+  const liveUrl = current ? edCardUrl(current.token) : null;
+  const liveQr = useQr(liveUrl);
+  const offlineQr = useQr(current ? offlineText : null);
+  useViewAudit(current ? record : null, actor, 'Emergency wallet card opened in the app');
 
   useEffect(() => {
-    let cancelled = false;
-    if (!payload) return;
-    (async () => {
-      try {
-        const hash = await sha256HexUpper(payload);
-        const checksumShort = hash.slice(0, 16);
-        const fullPayload = `${payload}\nChecksum: ${checksumShort}`;
-        const dataUrl = await QRCode.toDataURL(fullPayload, { errorCorrectionLevel: 'M', margin: 1, width: 240 });
-        if (!cancelled) {
-          setQrResult({ payload, dataUrl, checksum: checksumShort });
-        }
-      } catch {
-        if (!cancelled) {
-          setQrResult({ payload, dataUrl: null, checksum: null });
-        }
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [payload]);
+    if (!current) return;
+    let live = true;
+    import('./ectpr-pdf').then((m) => { if (live) setOfflineText(m.offlineCardText(current.snapshot, lang)); }).catch(() => undefined);
+    return () => { live = false; };
+  }, [current, lang]);
 
+  if (!id) return <div className="ectpr-container"><div className="ectpr-card ectpr-empty-card">{t('Choose a patient first.', 'पहले मरीज़ चुनें।')}</div></div>;
+  if (loading) return <div className="ectpr-container"><div className="ectpr-card ectpr-empty-card">{t('Loading…', 'लोड हो रहा है…')}</div></div>;
   if (!record) {
     return (
       <div className="ectpr-container">
-        <div className="ectpr-card ectpr-empty-card">
-          Save a care preference record before creating a card.
-        </div>
+        <div className="ectpr-card ectpr-empty-card">{t('No emergency care plan yet. A card can be made once the treating consultant signs the plan.', 'अभी कोई आपातकालीन योजना नहीं। मुख्य डॉक्टर के हस्ताक्षर के बाद कार्ड बन सकता है।')}</div>
       </div>
     );
   }
 
-  if (!issuedOn) {
-    if (audience === 'family') {
-      const firstName = record.patientName.split(' ')[0];
-      return (
-        <div className="ectpr-container">
-          <div className="ectpr-card ectpr-empty-card">{firstName} has not issued an emergency card yet.</div>
-        </div>
-      );
-    }
-    return (
-      <div className="ectpr-container">
-        <CardFace record={record} watermark />
-        <button type="button" className="ectpr-button ectpr-button--primary" onClick={() => onIssue?.()}>
-          Issue my emergency card
-        </button>
-        <p className="ectpr-issue-help">
-          Issuing records that you have a card. Keep one copy at home, one with the family member who travels with
-          you, and one inside the front door for the ambulance crew.
-        </p>
-      </div>
-    );
+  async function issue() {
+    if (!record) return;
+    setBusy('issue'); setMessage(null);
+    try {
+      const made = await issueEdCard(record, actor);
+      props.onIssue?.();
+      setMessage(made.server === 'issued' ? t('Card issued. Older cards for this patient were withdrawn.', 'कार्ड जारी हुआ। पुराने कार्ड वापस ले लिए गए।') : made.serverMessage ?? null);
+    } finally { setBusy(null); }
   }
-
+  async function withdraw() {
+    if (!current) return;
+    const reason = window.prompt(t('Why are you withdrawing this card?', 'यह कार्ड क्यों वापस ले रहे हैं?'), t('Card lost or replaced', 'कार्ड खो गया या बदला गया'));
+    if (!reason?.trim()) return;
+    setBusy('withdraw');
+    try {
+      const after = await revokeEdCard(current.token, reason.trim(), actor);
+      setMessage(after?.server === 'revoked' ? t('Card withdrawn. Its QR now shows "card withdrawn".', 'कार्ड वापस लिया गया। अब इसका QR "कार्ड वापस लिया गया" दिखाएगा।') : t('Withdrawn on this device. The server will be told when you are online.', 'इस डिवाइस पर वापस लिया गया। ऑनलाइन होने पर सर्वर को बताया जाएगा।'));
+    } finally { setBusy(null); }
+  }
+  async function retry() {
+    setBusy('retry');
+    try { await syncEdCards(actor); } finally { setBusy(null); }
+  }
+  async function share() {
+    if (!current || !liveUrl) return;
+    const text = t('Sahara emergency card. Scan or open in an emergency.', 'Sahara आपातकालीन कार्ड। आपात स्थिति में खोलें।');
+    try {
+      if (navigator.share) await navigator.share({ title: 'Sahara emergency card', text, url: liveUrl });
+      else { await navigator.clipboard.writeText(liveUrl); setMessage(t('Link copied.', 'लिंक कॉपी हुआ।')); }
+      await logAudit({ actor, action: 'SHARE', recordType: 'CARD', recordId: current.recordId, patientId: current.patientId, detail: 'ED card link shared' });
+    } catch { /* share sheet closed */ }
+  }
   function handlePrint() {
+    if (!current) return;
     document.body.classList.add('ectpr-printing');
     const cleanup = () => document.body.classList.remove('ectpr-printing');
     window.addEventListener('afterprint', cleanup, { once: true });
     setTimeout(cleanup, 3000);
+    void logAudit({ actor, action: 'PRINT', recordType: 'CARD', recordId: current.recordId, patientId: current.patientId, detail: `Wallet card printed from the browser, version ${current.version}` }).catch(() => undefined);
     window.print();
+  }
+
+  if (interp.state !== 'ACTIVE') {
+    return (
+      <div className="ectpr-container">
+        <div className="ectpr-card ectpr-empty-card">
+          {card?.revokedAt && <p className="ectpr-ed-withdrawn">{t('CARD WITHDRAWN', 'कार्ड वापस लिया गया')} · {formatDay(card.revokedAt, lang)}</p>}
+          <p>{edBanner(interp, record, lang)}</p>
+          <p className="ectpr-muted">{interp.state === 'OUT_OF_DATE'
+            ? t('The plan must be reviewed and signed again before a new card can be issued.', 'नया कार्ड जारी करने से पहले योजना की समीक्षा और दोबारा हस्ताक्षर ज़रूरी है।')
+            : t('A card can be issued only for a signed, in-date plan.', 'कार्ड केवल हस्ताक्षरित, वैध योजना के लिए जारी होता है।')}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!current) {
+    if (props.audience === 'family') {
+      return <div className="ectpr-container"><div className="ectpr-card ectpr-empty-card">{t(`${record.patient.name.split(' ')[0] || 'The patient'} has not issued an emergency card on this device yet.`, `${record.patient.name.split(' ')[0] || 'मरीज़'} ने इस डिवाइस पर अभी आपातकालीन कार्ड जारी नहीं किया है।`)}</div></div>;
+    }
+    return (
+      <div className="ectpr-container">
+        <CardFace record={record} lang={lang} watermark />
+        <button type="button" className="ectpr-button ectpr-button--primary" onClick={issue} disabled={busy !== null}>
+          {busy === 'issue' ? t('Issuing…', 'जारी हो रहा है…') : t('Issue my emergency card', 'मेरा आपातकालीन कार्ड जारी करें')}
+        </button>
+        <p className="ectpr-issue-help">
+          {t('Issuing makes a new private link for the QR code (no name or number in the link) and withdraws any older card. Keep one copy at home, one with the family member who travels with you, and one inside the front door for the ambulance crew.', 'जारी करने पर QR के लिए नया निजी लिंक बनता है (लिंक में नाम या नंबर नहीं) और पुराना कार्ड वापस हो जाता है। एक कॉपी घर पर, एक साथ जाने वाले परिजन के पास, और एक दरवाज़े के अंदर एम्बुलेंस टीम के लिए रखें।')}
+        </p>
+        {message && <p className="ectpr-muted" role="status">{message}</p>}
+      </div>
+    );
   }
 
   return (
     <div className="ectpr-container">
-      <CardFace record={record} qrDataUrl={qrDataUrl} issuedOn={issuedOn} />
-      {checksum && (
-        <div className="ectpr-checksum-block">
-          <div className="ectpr-checksum">
-            Checksum {checksum.slice(0, 4)}…{checksum.slice(-4)}
-          </div>
-          <p className="ectpr-muted">
-            The checksum identifies this exact version of the card. It is not a digital signature and does not prove
-            who made it. Anyone who scans the code can read it — keep the card with the patient.
-          </p>
-        </div>
-      )}
-      {!qrDataUrl && <p role="status">{currentQr ? 'The QR code could not be created. Reopen the card to try again.' : 'Preparing the QR code…'}</p>}
-      <div className="ectpr-actions-row" style={{ display: 'flex', gap: '10px', marginTop: '16px', flexWrap: 'wrap' }}>
-        <button type="button" className="ectpr-button ectpr-button--primary" onClick={handlePrint} disabled={!qrDataUrl}>
-          🖨️ Print card
-        </button>
-        <button
-          type="button"
-          className="ectpr-button secondary-button"
-          style={{
-            background: '#e6f5ec',
-            borderColor: '#b4e0c6',
-            color: '#146b3e',
-            fontWeight: 700,
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-          }}
-          onClick={() => setScannerOpen(true)}
-          disabled={!qrDataUrl}
-        >
-          <span>🚑 Paramedic Offline QR Scanner</span>
-        </button>
+      <CardFace record={current.snapshot} lang={lang} liveQr={liveQr} offlineQr={offlineQr} issuedOn={current.issuedAt} />
+      <div className={`ectpr-card-server ectpr-card-server--${current.server}`} role="status">
+        {current.server === 'issued'
+          ? t('Live link is on the Sahara server. A copy is also saved on this device for offline use.', 'लाइव लिंक Sahara सर्वर पर है। ऑफ़लाइन के लिए एक कॉपी इस डिवाइस पर भी है।')
+          : <>{t('Saved on this device only:', 'केवल इस डिवाइस पर सहेजा:')} {current.serverMessage ?? ''} <button type="button" className="ectpr-link-button" onClick={retry} disabled={busy !== null}>{t('Try again', 'फिर कोशिश करें')}</button></>}
       </div>
-
+      {!liveQr && <p className="ectpr-muted" role="status">{t('Preparing the QR code…', 'QR कोड तैयार हो रहा है…')}</p>}
+      <div className="ectpr-actions-row">
+        <button type="button" className="ectpr-button ectpr-button--primary" onClick={handlePrint} disabled={!liveQr}>{t('Print card', 'कार्ड प्रिंट करें')}</button>
+        <button type="button" className="ectpr-button ectpr-button--secondary" onClick={share}>{t('Share link', 'लिंक भेजें')}</button>
+        <button type="button" className="ectpr-button ectpr-button--secondary" onClick={() => setScannerOpen(true)}>{t('Paramedic offline view', 'पैरामेडिक ऑफ़लाइन दृश्य')}</button>
+        <button type="button" className="ectpr-button ectpr-button--danger" onClick={withdraw} disabled={busy !== null}>{t('Withdraw card', 'कार्ड वापस लें')}</button>
+      </div>
+      <EctprPdfActions record={current.snapshot} lang={lang} actor={actor} liveUrl={liveUrl} />
+      {message && <p className="ectpr-muted" role="status">{message}</p>}
+      <p className="ectpr-issue-help">
+        {t('The QR holds only a random code, not the patient’s details. Anyone with the card can open the emergency view; the full record needs a typed reason (break-glass), is logged, and the decision-maker is told by SMS where SMS is set up.', 'QR में केवल एक बेतरतीब कोड है, मरीज़ की जानकारी नहीं। कार्ड वाला कोई भी आपातकालीन दृश्य खोल सकता है; पूरा रिकॉर्ड कारण लिखने (ब्रेक-ग्लास) पर ही खुलता है, दर्ज होता है, और SMS सेट हो तो निर्णयकर्ता को बताया जाता है।')}
+      </p>
       {scannerOpen && (
-        <OfflineQrScannerModal
-          record={record}
-          checksum={checksum}
-          onClose={() => setScannerOpen(false)}
-        />
+        <OfflineQrScannerModal record={current.snapshot} offlineText={offlineText} lang={lang} actor={actor} onClose={() => setScannerOpen(false)} />
       )}
     </div>
   );

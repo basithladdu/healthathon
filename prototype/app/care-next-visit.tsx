@@ -6,9 +6,10 @@ import type { CareEvent, CareReport } from './care-calendar-state';
 import { addFamilyTask, type CareTaskAssignee, type FamilyTask, type FamilyTaskKind } from './family-care-state';
 import { downloadCarePdf } from './care-pdf';
 import './care-next-visit.css';
+import { careLocale, careText, type CareLang } from './care-i18n';
 
 export type CareNextVisitProps = {
-  patientId: string; patientName: string; author: string; today: string; hindi: boolean;
+  patientId: string; patientName: string; author: string; today: string; lang: CareLang;
   viewer?: CareTaskAssignee; assignees?: CareTaskAssignee[];
   appointments: Appointment[]; events: CareEvent[]; tasks: FamilyTask[]; reports: CareReport[];
   onAddTask: (task: FamilyTask) => void;
@@ -28,23 +29,23 @@ function VisitIcon({ kind = 'calendar' }: { kind?: 'calendar' | 'file' | 'questi
   </svg>;
 }
 
-function VisitReportLink({ report, hindi }: { report: CareReport; hindi: boolean }) {
+function VisitReportLink({ report, lang }: { report: CareReport; lang: CareLang }) {
   const link = useRef<HTMLAnchorElement>(null);
   useEffect(() => {
     const url = URL.createObjectURL(report.file);
     if (link.current) link.current.href = url;
     return () => URL.revokeObjectURL(url);
   }, [report.file]);
-  return <a ref={link} target="_blank" rel="noreferrer"><span className="visit-report-icon"><VisitIcon kind="file" /></span><span><strong>{report.file.name}</strong><time dateTime={report.date}>{new Date(`${report.date}T12:00:00`).toLocaleDateString(hindi ? 'hi-IN' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</time></span><span aria-hidden="true">↗</span></a>;
+  return <a ref={link} target="_blank" rel="noreferrer"><span className="visit-report-icon"><VisitIcon kind="file" /></span><span><strong>{report.file.name}</strong><time dateTime={report.date}>{new Date(`${report.date}T12:00:00`).toLocaleDateString(careLocale(lang), { day: 'numeric', month: 'short', year: 'numeric' })}</time></span><span aria-hidden="true">↗</span></a>;
 }
 
 export function CareNextVisit(props: CareNextVisitProps) {
   return <NextVisitForPatient key={`${props.patientId}:${props.author}`} {...props} />;
 }
 
-function NextVisitForPatient({ patientId, patientName, author, today, hindi, viewer, assignees = [], appointments, events, tasks, reports, onAddTask, onEditTask, onCompleteTask, onOpen }: CareNextVisitProps) {
+function NextVisitForPatient({ patientId, patientName, author, today, lang, viewer, assignees = [], appointments, events, tasks, reports, onAddTask, onEditTask, onCompleteTask, onOpen }: CareNextVisitProps) {
   const id = useId();
-  const t = (en: string, hi: string) => hindi ? hi : en;
+  const t = (en: string, hi: string) => careText(lang, en, hi);
   const [actionText, setActionText] = useState('');
   const [actionKind, setActionKind] = useState<'Question' | Exclude<FamilyTaskKind, 'Question'>>('Question');
   const [assigneeId, setAssigneeId] = useState(viewer?.id ?? '');
@@ -70,7 +71,7 @@ function NextVisitForPatient({ patientId, patientName, author, today, hindi, vie
   const files = reports.filter((report) => report.patientId === patientId).sort((a, b) => b.date.localeCompare(a.date));
   const recipients = [...(viewer ? [viewer] : []), ...assignees].filter((person, index, people) => people.findIndex((candidate) => candidate.id === person.id) === index);
   const selectedRecipient = recipients.find((person) => person.id === assigneeId) ?? viewer;
-  const dateLabel = (value: string) => new Date(`${value}T12:00:00`).toLocaleDateString(hindi ? 'hi-IN' : 'en-GB', { weekday: 'short', day: 'numeric', month: 'long' });
+  const dateLabel = (value: string) => new Date(`${value}T12:00:00`).toLocaleDateString(careLocale(lang), { weekday: 'short', day: 'numeric', month: 'long' });
 
   function addAction(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -130,7 +131,7 @@ function NextVisitForPatient({ patientId, patientName, author, today, hindi, vie
       </form></details>
       {message && <p className="next-visit-message" role="status">{message}</p>}
       {openTasks.length > 0 && <details className="next-visit-task-list"><summary>{t('Questions and tasks', 'सवाल और काम')} · {openTasks.length}</summary><button type="button" className="next-visit-all-tasks" onClick={() => onOpen('family-tasks')}>{t('All tasks', 'सभी काम')} ↗</button><ul>{openTasks.slice(0, 4).map((task) => <li key={task.id}><span><strong>{task.title}</strong><small>{task.owner}{task.due ? ` · ${dateLabel(task.due)}` : ''}{task.acceptedBy ? ` · ${t('Accepted by', 'स्वीकार किया')} ${task.acceptedBy}` : ''}</small></span>{taskAction(task)}</li>)}</ul></details>}
-      <section className="next-visit-panel next-visit-reports"><div className="next-visit-section-heading"><h2><VisitIcon kind="file" />{t('Reports to bring', 'साथ लाने की रिपोर्ट')}</h2><button type="button" onClick={() => onOpen('reports')}>{t('All reports', 'सभी रिपोर्ट')} ↗</button></div>{files.length ? <><ul className="next-visit-report-list">{files.slice(0, 3).map((report) => <li key={report.id}><VisitReportLink report={report} hindi={hindi} /></li>)}</ul>{files.length > 3 && <details className="next-visit-more-reports"><summary>{t('More reports', 'और रिपोर्ट')} · {files.length - 3}</summary><ul className="next-visit-report-list">{files.slice(3).map((report) => <li key={report.id}><VisitReportLink report={report} hindi={hindi} /></li>)}</ul></details>}</> : <button type="button" className="next-visit-add-report" onClick={() => onOpen('reports')}>{t('Add a report', 'रिपोर्ट जोड़ें')}</button>}</section>
+      <section className="next-visit-panel next-visit-reports"><div className="next-visit-section-heading"><h2><VisitIcon kind="file" />{t('Reports to bring', 'साथ लाने की रिपोर्ट')}</h2><button type="button" onClick={() => onOpen('reports')}>{t('All reports', 'सभी रिपोर्ट')} ↗</button></div>{files.length ? <><ul className="next-visit-report-list">{files.slice(0, 3).map((report) => <li key={report.id}><VisitReportLink report={report} lang={lang} /></li>)}</ul>{files.length > 3 && <details className="next-visit-more-reports"><summary>{t('More reports', 'और रिपोर्ट')} · {files.length - 3}</summary><ul className="next-visit-report-list">{files.slice(3).map((report) => <li key={report.id}><VisitReportLink report={report} lang={lang} /></li>)}</ul></details>}</> : <button type="button" className="next-visit-add-report" onClick={() => onOpen('reports')}>{t('Add a report', 'रिपोर्ट जोड़ें')}</button>}</section>
     </div>
   </section>;
 }

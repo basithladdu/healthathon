@@ -5,6 +5,7 @@ import { IconFileText, IconClock } from './icons';
 import { CARE_NOTE_LABELS, organiseConversation, type AssistedNote, type DoctorConversationEntry } from './doctor-conversation-state';
 import type { DraftFieldKey } from './summary-state';
 import { CarePdfReadError, extractCareDocumentPdf } from './care-document-extract';
+import { careLocale, careText, type CareLang } from './care-i18n';
 
 export function ConversationAudio({ file }: { file: File }) {
   const audio = useRef<HTMLAudioElement | null>(null);
@@ -12,9 +13,9 @@ export function ConversationAudio({ file }: { file: File }) {
   return <audio ref={audio} controls preload="metadata" aria-label="Conversation recording" />;
 }
 
-export function DoctorConversation({ patientId, patientName, patients, physician, initialNote, referenceNote, previousContext, requestContext, hindi, onPatient, onSave, onHistory }: {
+export function DoctorConversation({ patientId, patientName, patients, physician, initialNote, referenceNote, previousContext, requestContext, lang, onPatient, onSave, onHistory }: {
   patientId: string; patientName: string; patients: Array<{ id: string; name: string }>; physician: string;
-  initialNote: string; referenceNote?: string; hindi: boolean; onPatient: (id: string) => void;
+  initialNote: string; referenceNote?: string; lang: CareLang; onPatient: (id: string) => void;
   previousContext?: { version: number; releasedAt: string; fields: Readonly<Record<DraftFieldKey, string>> | null };
   requestContext?: { requestedBy: string; topics: string[]; note: string };
   onSave: (entry: DoctorConversationEntry, draft?: AssistedNote) => void; onHistory: () => void;
@@ -27,13 +28,13 @@ export function DoctorConversation({ patientId, patientName, patients, physician
   const [seconds, setSeconds] = useState(0);
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
-  const [language, setLanguage] = useState(hindi ? 'hi-IN' : 'en-IN');
+  const [language, setLanguage] = useState(careLocale(lang, 'en-IN'));
   const recorder = useRef<MediaRecorder | null>(null);
   const sourceFileInput = useRef<HTMLInputElement | null>(null);
   const stream = useRef<MediaStream | null>(null);
   const mounted = useRef(true);
   const preparing = useRef(false);
-  const t = (en: string, hi: string) => hindi ? hi : en;
+  const t = (en: string, hi: string) => careText(lang, en, hi);
 
   useEffect(() => {
     mounted.current = true;

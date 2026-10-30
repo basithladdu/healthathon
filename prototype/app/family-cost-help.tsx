@@ -7,9 +7,10 @@ import {
   removeFamilyCostItem, restoreFamilyCostItem, setFamilyExpensePaid, setFamilyPaperworkDone,
   type FamilyCostState, type FamilyExpense, type FamilyExpenseCategory, type RemovedFamilyCostItem,
 } from './family-cost-state';
+import { careLocale, careText, type CareLang } from './care-i18n';
 
 export type { FamilyCostState } from './family-cost-state';
-type FamilyCostHelpProps = { patientId: string; author: string; today: string; hindi: boolean; state: FamilyCostState; onChange: (state: FamilyCostState) => void };
+type FamilyCostHelpProps = { patientId: string; author: string; today: string; lang: CareLang; state: FamilyCostState; onChange: (state: FamilyCostState) => void };
 type ExpenseDraft = { title: string; category: FamilyExpenseCategory; date: string; amount: string; paid: boolean };
 const HINDI_CATEGORIES: Record<FamilyExpenseCategory, string> = { Medicines: 'दवाइयाँ', Travel: 'आना-जाना', Tests: 'जाँच', Hospital: 'अस्पताल', 'Home care': 'घर पर देखभाल', Other: 'अन्य' };
 const PAPERWORK_SUGGESTIONS = [
@@ -23,7 +24,7 @@ export function FamilyCostHelp(props: FamilyCostHelpProps) {
   return <CostHelpContent key={`${props.patientId}:${props.author}`} {...props} />;
 }
 
-function CostHelpContent({ patientId, author, today, hindi, state, onChange }: FamilyCostHelpProps) {
+function CostHelpContent({ patientId, author, today, lang, state, onChange }: FamilyCostHelpProps) {
   const id = useId();
   const [expense, setExpense] = useState<ExpenseDraft | null>(null);
   const [expenseId, setExpenseId] = useState<string | null>(null);
@@ -35,10 +36,10 @@ function CostHelpContent({ patientId, author, today, hindi, state, onChange }: F
   const paperwork = state.paperwork.filter((item) => item.patientId === patientId);
   const totals = familyExpenseTotals(state, patientId);
   const lastRemoved = removed.at(-1);
-  const t = (english: string, translated: string) => hindi ? translated : english;
+  const t = (english: string, translated: string) => careText(lang, english, translated);
   const supportQuestion = t('Could I speak with the hospital social worker about help with treatment costs? Which assistance options can we apply for, what documents do you need, and what should we do next?', 'क्या मैं इलाज के खर्च में मदद के बारे में अस्पताल के सामाजिक कार्यकर्ता से बात कर सकता/सकती हूँ? हम किन सहायता विकल्पों के लिए आवेदन कर सकते हैं, कौन से दस्तावेज़ चाहिए और अगला कदम क्या है?');
-  const money = (value: number) => value.toLocaleString(hindi ? 'hi-IN' : 'en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  const dateLabel = (date: string) => new Date(`${date}T00:00:00`).toLocaleDateString(hindi ? 'hi-IN' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  const money = (value: number) => value.toLocaleString(careLocale(lang, 'en-IN'), { style: 'currency', currency: 'INR', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const dateLabel = (date: string) => new Date(`${date}T00:00:00`).toLocaleDateString(careLocale(lang), { day: 'numeric', month: 'short', year: 'numeric' });
 
   function editExpense(item?: FamilyExpense) {
     setExpenseId(item?.id ?? null);
@@ -120,11 +121,11 @@ function CostHelpContent({ patientId, author, today, hindi, state, onChange }: F
           <label className="family-cost-wide" htmlFor={`${id}-expense-title`}>{t('What was it for?', 'किस चीज़ का खर्च?')}<input id={`${id}-expense-title`} value={expense.title} onChange={(event) => setExpense({ ...expense, title: event.target.value })} required maxLength={160} /></label>
           <label htmlFor={`${id}-amount`}>{t('Amount (₹)', 'रकम (₹)')}<input id={`${id}-amount`} inputMode="decimal" value={expense.amount} onChange={(event) => setExpense({ ...expense, amount: event.target.value })} required /></label>
           <label htmlFor={`${id}-expense-date`}>{t('Date', 'तारीख')}<input id={`${id}-expense-date`} type="date" value={expense.date} onChange={(event) => setExpense({ ...expense, date: event.target.value })} required /></label>
-          <label htmlFor={`${id}-category`}>{t('Type', 'किस तरह का खर्च')}<select id={`${id}-category`} value={expense.category} onChange={(event) => setExpense({ ...expense, category: event.target.value as FamilyExpenseCategory })}>{FAMILY_EXPENSE_CATEGORIES.map((category) => <option key={category} value={category}>{hindi ? HINDI_CATEGORIES[category] : category}</option>)}</select></label>
+          <label htmlFor={`${id}-category`}>{t('Type', 'किस तरह का खर्च')}<select id={`${id}-category`} value={expense.category} onChange={(event) => setExpense({ ...expense, category: event.target.value as FamilyExpenseCategory })}>{FAMILY_EXPENSE_CATEGORIES.map((category) => <option key={category} value={category}>{careText(lang, category, HINDI_CATEGORIES[category])}</option>)}</select></label>
           <label className="family-cost-checkbox"><input type="checkbox" checked={expense.paid} onChange={(event) => setExpense({ ...expense, paid: event.target.checked })} />{t('Already paid', 'भुगतान हो गया')}</label>
           <div className="family-cost-wide family-cost-actions"><button type="submit" className="family-cost-primary" disabled={!expense.title.trim() || !expense.date || !expense.amount.trim()}>{t('Save expense', 'खर्च सेव करें')}</button><button type="button" className="family-cost-link" onClick={() => { setExpense(null); setExpenseId(null); }}>{t('Cancel', 'रहने दें')}</button></div>
         </form>}
-        <ul className="family-expense-list">{expenses.map((item) => <li key={item.id}><div className="family-expense-title"><strong>{item.title}</strong><span>{money(item.amountRupees)}</span></div><p>{hindi ? HINDI_CATEGORIES[item.category] : item.category} · {dateLabel(item.date)}</p><div className="family-cost-actions"><label className="family-cost-checkbox"><input type="checkbox" checked={item.paid} onChange={(event) => onChange(setFamilyExpensePaid(state, patientId, item.id, author, event.target.checked))} />{t('Paid', 'भुगतान किया')}</label><button type="button" className="family-cost-link" onClick={() => editExpense(item)} aria-label={`${t('Edit expense', 'खर्च बदलें')}: ${item.title}`}>{t('Edit', 'बदलें')}</button><button type="button" className="family-cost-link" onClick={() => remove({ kind: 'expense', item })} aria-label={`${t('Remove expense', 'खर्च हटाएँ')}: ${item.title}`}>{t('Remove', 'हटाएँ')}</button></div></li>)}</ul>
+        <ul className="family-expense-list">{expenses.map((item) => <li key={item.id}><div className="family-expense-title"><strong>{item.title}</strong><span>{money(item.amountRupees)}</span></div><p>{careText(lang, item.category, HINDI_CATEGORIES[item.category])} · {dateLabel(item.date)}</p><div className="family-cost-actions"><label className="family-cost-checkbox"><input type="checkbox" checked={item.paid} onChange={(event) => onChange(setFamilyExpensePaid(state, patientId, item.id, author, event.target.checked))} />{t('Paid', 'भुगतान किया')}</label><button type="button" className="family-cost-link" onClick={() => editExpense(item)} aria-label={`${t('Edit expense', 'खर्च बदलें')}: ${item.title}`}>{t('Edit', 'बदलें')}</button><button type="button" className="family-cost-link" onClick={() => remove({ kind: 'expense', item })} aria-label={`${t('Remove expense', 'खर्च हटाएँ')}: ${item.title}`}>{t('Remove', 'हटाएँ')}</button></div></li>)}</ul>
         {expenses.length === 0 && !expense && <p className="family-cost-empty">{t('No expenses yet.', 'अभी कोई खर्च नहीं जोड़ा है।')}</p>}
       </section>
       <div className="family-cost-side">

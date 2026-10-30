@@ -8,9 +8,10 @@ import {
   type CareCirclePermission, type CareCircleUpdate, type CareCircleAudit,
 } from './care-circle-state';
 import './care-circle.css';
+import { careLocale, careText, type CareLang } from './care-i18n';
 
 export type CareCircleProps = {
-  patientId: string; patientName: string; author: string; role: CareCircleRole; hindi: boolean;
+  patientId: string; patientName: string; author: string; role: CareCircleRole; lang: CareLang;
   state: CareCircleState; onChange: (state: CareCircleState) => void;
 };
 
@@ -26,11 +27,11 @@ function CircleIcon({ kind }: { kind: 'people' | 'check' | 'copy' | 'plus' | 'no
 }
 function initials(name: string) { return name.trim().split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join('').toLocaleUpperCase(); }
 function sameName(a: string, b: string) { return a.trim().replace(/\s+/g, ' ').toLocaleLowerCase() === b.trim().replace(/\s+/g, ' ').toLocaleLowerCase(); }
-function dateTime(value: string, hindi: boolean) {
-  return new Date(value).toLocaleString(hindi ? 'hi-IN' : 'en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit', second: '2-digit' });
+function dateTime(value: string, lang: CareLang) {
+  return new Date(value).toLocaleString(careLocale(lang, 'en-IN'), { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit', second: '2-digit' });
 }
 
-function CopyUpdateDialog({ text, hindi, onClose }: { text: string; hindi: boolean; onClose: () => void }) {
+function CopyUpdateDialog({ text, lang, onClose }: { text: string; lang: CareLang; onClose: () => void }) {
   const id = useId();
   const dialog = useRef<HTMLDialogElement>(null);
   useEffect(() => {
@@ -39,7 +40,7 @@ function CopyUpdateDialog({ text, hindi, onClose }: { text: string; hindi: boole
     return () => element?.close();
   }, []);
   return <dialog ref={dialog} className="care-circle-copy-fallback" aria-labelledby={`${id}-heading`} onCancel={(event) => { event.preventDefault(); onClose(); }}>
-    <h3 id={`${id}-heading`}>{hindi ? 'यह अपडेट कॉपी करें' : 'Copy this update'}</h3><textarea readOnly value={text} rows={6} autoFocus onFocus={(event) => event.currentTarget.select()} aria-label={hindi ? 'अपडेट का टेक्स्ट' : 'Update text'} /><button type="button" onClick={onClose}>{hindi ? 'पूरा हुआ' : 'Done'}</button>
+    <h3 id={`${id}-heading`}>{careText(lang, 'Copy this update', 'यह अपडेट कॉपी करें')}</h3><textarea readOnly value={text} rows={6} autoFocus onFocus={(event) => event.currentTarget.select()} aria-label={careText(lang, 'Update text', 'अपडेट का टेक्स्ट')} /><button type="button" onClick={onClose}>{careText(lang, 'Done', 'पूरा हुआ')}</button>
   </dialog>;
 }
 
@@ -47,9 +48,9 @@ export function CareCircle(props: CareCircleProps) {
   return <CareCircleForPerson key={`${props.patientId}:${props.role}:${props.author}`} {...props} />;
 }
 
-function CareCircleForPerson({ patientId, patientName, author, role, hindi, state, onChange }: CareCircleProps) {
+function CareCircleForPerson({ patientId, patientName, author, role, lang, state, onChange }: CareCircleProps) {
   const id = useId();
-  const t = (en: string, hi: string) => hindi ? hi : en;
+  const t = (en: string, hi: string) => careText(lang, en, hi);
   const patientCanEdit = role === 'patient';
   const members = state.members.filter((member) => member.patientId === patientId);
   const activeMembers = members.filter((member) => member.status === 'active');
@@ -140,9 +141,9 @@ function CareCircleForPerson({ patientId, patientName, author, role, hindi, stat
       {updates.length ? <div className="care-circle-feed">{updates.map((update) => {
         const isOwn = update.authorRole === role && sameName(update.author, author);
         const ownRead = update.reads.find((read) => read.role === role && sameName(read.actor, author));
-        return <article className="care-circle-update" key={update.id}><header><span className="care-circle-avatar" data-role={update.authorRole}>{initials(update.author)}</span><div><h4>{update.author}</h4><time dateTime={update.createdAt} title={update.createdAt}>{dateTime(update.createdAt, hindi)}</time></div></header><p className="care-circle-update-text">{update.text}</p><div className="care-circle-shared"><CircleIcon kind="people" /><span>{recipients(update)}</span></div>
+        return <article className="care-circle-update" key={update.id}><header><span className="care-circle-avatar" data-role={update.authorRole}>{initials(update.author)}</span><div><h4>{update.author}</h4><time dateTime={update.createdAt} title={update.createdAt}>{dateTime(update.createdAt, lang)}</time></div></header><p className="care-circle-update-text">{update.text}</p><div className="care-circle-shared"><CircleIcon kind="people" /><span>{recipients(update)}</span></div>
           <footer><button type="button" onClick={() => copyUpdate(update)}><CircleIcon kind="copy" />{copiedId === update.id ? t('Copied', 'कॉपी हो गया') : t('Copy update', 'अपडेट कॉपी करें')}</button>{!isOwn && <button type="button" disabled={Boolean(ownRead)} onClick={() => markRead(update.id)} className={ownRead ? 'is-read' : ''}><CircleIcon kind="check" />{ownRead ? t('Read', 'पढ़ लिया') : t('I’ve read this', 'मैंने पढ़ लिया')}</button>}</footer>
-          {update.reads.length > 0 && <details className="care-circle-reads"><summary><CircleIcon kind="check" />{t(`Read by ${update.reads.length}`, `${update.reads.length} ने पढ़ा`)}</summary><ul>{update.reads.map((read) => <li key={`${read.role}:${read.actor}`}><span>{read.actor}</span><time dateTime={read.at} title={read.at}>{dateTime(read.at, hindi)}</time></li>)}</ul></details>}
+          {update.reads.length > 0 && <details className="care-circle-reads"><summary><CircleIcon kind="check" />{t(`Read by ${update.reads.length}`, `${update.reads.length} ने पढ़ा`)}</summary><ul>{update.reads.map((read) => <li key={`${read.role}:${read.actor}`}><span>{read.actor}</span><time dateTime={read.at} title={read.at}>{dateTime(read.at, lang)}</time></li>)}</ul></details>}
         </article>;
       })}</div> : <div className="care-circle-empty"><span><CircleIcon kind="note" /></span><h3>{t('Your updates will be here', 'आपके अपडेट यहाँ दिखेंगे')}</h3></div>}
     </div>
@@ -153,8 +154,8 @@ function CareCircleForPerson({ patientId, patientName, author, role, hindi, stat
         {member.status === 'active' ? <div className="care-circle-permissions" role="group" aria-label={`${member.name}: ${t('access', 'पहुँच')}`}>{CARE_CIRCLE_PERMISSIONS.map((permission) => patientCanEdit ? <button key={permission} type="button" role="switch" aria-checked={member.permissions[permission]} onClick={() => changePermission(member.id, permission, !member.permissions[permission])}><span className="care-circle-toggle" /><span>{labels[permission]}</span></button> : <span key={permission} className={member.permissions[permission] ? 'is-allowed' : ''}>{member.permissions[permission] ? <CircleIcon kind="check" /> : <CircleIcon kind="lock" />}{labels[permission]}</span>)}</div> : <p className="care-circle-revoked-label">{t('Access removed', 'पहुँच हटाई गई')}</p>}
         {patientCanEdit && <button type="button" className="care-circle-revoke" onClick={() => changeAccess(member.id, member.status !== 'active')}>{member.status === 'active' ? t('Remove access', 'पहुँच हटाएँ') : t('Restore access', 'पहुँच लौटाएँ')}</button>}
       </div>)}
-      {patientCanEdit && audit.length > 0 && <details className="care-circle-audit"><summary>{t('Activity', 'गतिविधि')} <span>{audit.length}</span></summary><ol>{audit.map((entry) => <li key={entry.id}><strong>{auditLabel(entry)}</strong><span>{entry.actor}</span><time dateTime={entry.at} title={entry.at}>{dateTime(entry.at, hindi)}</time></li>)}</ol></details>}
+      {patientCanEdit && audit.length > 0 && <details className="care-circle-audit"><summary>{t('Activity', 'गतिविधि')} <span>{audit.length}</span></summary><ol>{audit.map((entry) => <li key={entry.id}><strong>{auditLabel(entry)}</strong><span>{entry.actor}</span><time dateTime={entry.at} title={entry.at}>{dateTime(entry.at, lang)}</time></li>)}</ol></details>}
     </aside></div>
-    {copyFallback && <CopyUpdateDialog text={copyFallback} hindi={hindi} onClose={() => setCopyFallback('')} />}
+    {copyFallback && <CopyUpdateDialog text={copyFallback} lang={lang} onClose={() => setCopyFallback('')} />}
   </section>;
 }

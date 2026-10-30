@@ -9,10 +9,11 @@ import {
   type RemovedSupportNote, type SupportContactNote, type SupportPlace,
 } from './family-support-state';
 import './family-support-places.css';
+import { careLocale, careText, type CareLang } from './care-i18n';
 
 export type { SupportPlace } from './family-support-state';
 
-type Props = { patientId: string; author: string; today: string; hindi: boolean; entries: SupportPlace[]; onChange: (entries: SupportPlace[]) => void };
+type Props = { patientId: string; author: string; today: string; lang: CareLang; entries: SupportPlace[]; onChange: (entries: SupportPlace[]) => void };
 type Editor = { placeId: string; noteId: string | null; mode: 'note' | 'follow-up'; date: string; person: string; reply: string; nextStep: string; followUpOn: string };
 type Undo = { kind: 'place'; place: SupportPlace; index: number } | { kind: 'note'; removed: RemovedSupportNote };
 
@@ -20,9 +21,9 @@ export function FamilySupportPlaces(props: Props) {
   return <SupportPlacesForPatient key={`${props.patientId}:${props.author}`} {...props} />;
 }
 
-function SupportPlacesForPatient({ patientId, author, today, hindi, entries, onChange }: Props) {
+function SupportPlacesForPatient({ patientId, author, today, lang, entries, onChange }: Props) {
   const id = useId();
-  const t = (en: string, hi: string) => hindi ? hi : en;
+  const t = (en: string, hi: string) => careText(lang, en, hi);
   const places = entries.filter((entry) => entry.patientId === patientId);
   const [choosing, setChoosing] = useState(places.length === 0);
   const [query, setQuery] = useState('');
@@ -32,7 +33,7 @@ function SupportPlacesForPatient({ patientId, author, today, hindi, entries, onC
   const [error, setError] = useState('');
   const formRef = useRef<HTMLFormElement>(null);
   const matches = filterCareCentres(query, 'Karnataka', '');
-  const dateLabel = (value: string) => new Date(`${value}T12:00:00`).toLocaleDateString(hindi ? 'hi-IN' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  const dateLabel = (value: string) => new Date(`${value}T12:00:00`).toLocaleDateString(careLocale(lang), { day: 'numeric', month: 'short', year: 'numeric' });
   const editingPlaceId = editor?.placeId;
   const editingNoteId = editor?.noteId;
   const editingMode = editor?.mode;

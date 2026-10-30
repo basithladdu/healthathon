@@ -322,3 +322,241 @@
   min-width: 0;
 }
 
+/* ---------------------------------------------------------------------------
+   ED Quick View from the signed ECTPR (ectpr-ed-view.tsx) and the public /ed/<token> page.
+   Plain CSS, no images or extra web fonts, so the ED page stays light on 3G. */
+
+.ectpr-ed-uhid {
+  font-family: var(--font-body, 'Inter', system-ui, sans-serif);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--bp-muted, #4d6259);
+  margin-left: 6px;
+}
+
+.ectpr-ed-audience {
+  font-size: 13px;
+  color: var(--bp-muted, #4d6259);
+  margin: 0 0 12px;
+}
+
+.ectpr-ed-banner {
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 14px;
+  line-height: 1.45;
+  margin-bottom: 12px;
+  border: 1px solid transparent;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.ectpr-ed-banner--active { background: #e8f4ec; color: #134b2f; border-color: #b4dcc2; }
+.ectpr-ed-banner--active.is-standard,
+.ectpr-ed-banner--out_of_date,
+.ectpr-ed-banner--unsigned,
+.ectpr-ed-banner--none { background: var(--medium-bg, #fff6e0); color: var(--medium-ink, #6b4e00); border-color: var(--medium-line, rgb(107 78 0 / .25)); font-weight: 600; }
+.ectpr-ed-banner--revoked { background: var(--critical-bg, #fdeceb); color: var(--critical-ink, #7a1f16); border-color: var(--critical-line, rgb(122 31 22 / .3)); font-weight: 600; }
+
+.ectpr-ed-withdrawn {
+  font-family: var(--font-display, 'Sora', system-ui, sans-serif);
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: .03em;
+  color: var(--critical-ink, #7a1f16);
+}
+
+.ectpr-ed-flags {
+  margin: 0 0 12px;
+  padding: 8px 12px 8px 28px;
+  border-radius: 10px;
+  background: var(--critical-bg, #fdeceb);
+  color: var(--critical-ink, #7a1f16);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.ectpr-ed-doubt {
+  border: 2px solid #a61b1b;
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  background: #fffafa;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.ectpr-ed-doubt h3 {
+  margin: 0 0 4px;
+  color: #a61b1b;
+  font-family: var(--font-display, 'Sora', system-ui, sans-serif);
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: .02em;
+}
+.ectpr-ed-doubt p { margin: 0 0 4px; }
+.ectpr-ed-doubt ol { margin: 0 0 4px; padding-left: 20px; }
+.ectpr-ed-doubt-after { color: var(--bp-muted, #4d6259); }
+
+.ectpr-ed-plan { margin-bottom: 12px; }
+.ectpr-ed-plan.is-information { opacity: .62; filter: grayscale(1); }
+.ectpr-ed-pending {
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--medium-ink, #6b4e00);
+  margin-bottom: 8px;
+}
+
+.ectpr-ed-lead {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+@container ectpr (min-width: 560px) {
+  .ectpr-ed-lead { grid-template-columns: 1fr 1fr; }
+}
+
+.ectpr-ed-row {
+  display: grid;
+  grid-template-columns: minmax(110px, 34%) 1fr;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--bp-border, rgb(10 33 24 / .10));
+  font-size: 14px;
+  line-height: 1.45;
+}
+.ectpr-ed-row--lead {
+  display: block;
+  border: 0;
+  border-radius: 10px;
+  background: var(--bp-mist, #f3f7f5);
+  padding: 10px 12px;
+}
+.ectpr-ed-row--lead .ectpr-ed-value { font-weight: 700; font-size: 15px; }
+.ectpr-ed-row--none .ectpr-ed-value { font-style: italic; font-weight: 500; color: var(--bp-muted, #4d6259); }
+.ectpr-ed-row--lead.ectpr-ed-row--none { background: transparent; border: 1px dashed var(--bp-border, rgb(10 33 24 / .18)); }
+.ectpr-ed-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+  color: var(--bp-muted, #4d6259);
+  margin-bottom: 2px;
+}
+.ectpr-ed-sub { font-size: 12px; font-weight: 400; font-style: normal; color: var(--bp-muted, #4d6259); margin-top: 3px; }
+.ectpr-ed-caveat { font-size: 12px; margin-top: 4px; padding: 6px 8px; border-radius: 8px; background: var(--medium-bg, #fff6e0); color: var(--medium-ink, #6b4e00); font-style: normal; }
+.ectpr-ed-alert { color: var(--critical-ink, #7a1f16); font-weight: 800; }
+.ectpr-ed-missing { color: var(--bp-muted, #4d6259); font-style: italic; }
+.ectpr-ed-tel { color: var(--bp-primary, #0c5c3f); font-weight: 700; white-space: nowrap; }
+.ectpr-ed-note { font-size: 14px; margin: 0 0 12px; }
+
+.ectpr-ed-always {
+  border-radius: 12px;
+  background: #f3f7ec;
+  border: 1px solid #c9dbb4;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+.ectpr-ed-always h3 { margin: 0 0 4px; font-size: 14px; color: #3f5a33; }
+.ectpr-ed-always ul { margin: 0; padding-left: 18px; line-height: 1.5; }
+
+.ectpr-ed-dying {
+  font-size: 12px;
+  color: var(--bp-muted, #4d6259);
+  border-left: 3px solid var(--medium-line, #d8b44a);
+  padding: 4px 0 4px 10px;
+  margin: 0 0 12px;
+}
+
+.ectpr-ed-full { margin: 4px 0 12px; }
+.ectpr-ed-full h3 { font-size: 15px; margin: 8px 0 2px; color: var(--critical-ink, #7a1f16); }
+
+.ectpr-ed-glass {
+  border: 1px solid var(--bp-border, rgb(10 33 24 / .14));
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.ectpr-ed-glass h3 { margin: 0; font-size: 15px; }
+.ectpr-ed-glass label { font-size: 12px; font-weight: 700; }
+.ectpr-ed-glass textarea {
+  font: inherit;
+  font-size: 14px;
+  border: 1px solid var(--bp-border, rgb(10 33 24 / .2));
+  border-radius: 8px;
+  padding: 8px 10px;
+  width: 100%;
+}
+.ectpr-ed-glass .ectpr-button { align-self: flex-start; margin-top: 2px; }
+
+.ectpr-ed-sms {
+  font-size: 13px;
+  font-weight: 700;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--medium-bg, #fff6e0);
+  color: var(--medium-ink, #6b4e00);
+}
+.ectpr-ed-sms.is-sent { background: #e8f4ec; color: #134b2f; }
+
+/* Buttons and status lines */
+.ectpr-actions-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+.ectpr-actions-row .ectpr-button { margin-top: 0; }
+.ectpr-button--secondary { background: #e6f5ec; color: #146b3e; border: 1px solid #b4e0c6; }
+.ectpr-button--danger { background: #fff; color: #9b1c1c; border: 1px solid #e3b3ad; }
+.ectpr-button:disabled { opacity: .55; cursor: not-allowed; }
+.ectpr-link-button { background: none; border: 0; padding: 0; color: var(--bp-primary, #0c5c3f); font: inherit; font-weight: 700; text-decoration: underline; cursor: pointer; }
+.ectpr-pdf-actions { margin-top: 12px; }
+.ectpr-sha { font-size: 12px; color: var(--bp-muted, #4d6259); word-break: break-all; margin: 8px 0 0; }
+.ectpr-sha code { font-size: 11px; }
+.ectpr-error { color: #9b1c1c; font-size: 13px; margin: 8px 0 0; }
+.ectpr-card-server { font-size: 12px; margin: 10px 0 0; padding: 8px 10px; border-radius: 8px; max-width: 420px; line-height: 1.45; }
+.ectpr-card-server--issued, .ectpr-card-server--revoked { background: #e8f4ec; color: #134b2f; }
+.ectpr-card-server--local-only, .ectpr-card-server--revoke-pending { background: var(--medium-bg, #fff6e0); color: var(--medium-ink, #6b4e00); }
+
+/* Wallet card fields (Appendix E) */
+.ectpr-card-band--invalid { background: #a61b1b; color: #fff; }
+.ectpr-card-fields { margin: 0; line-height: 1.35; }
+.ectpr-card-fields > div { display: grid; grid-template-columns: 112px 1fr; gap: 6px; padding: 2px 0; }
+.ectpr-card-fields dt { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .02em; color: var(--bp-muted, #4d6259); }
+.ectpr-card-fields dd { margin: 0; font-weight: 600; }
+.ectpr-card-qr--pair { gap: 16px; flex-wrap: wrap; }
+.ectpr-card-qr--pair figure { margin: 0; text-align: center; }
+.ectpr-card-qr--pair figcaption { font-size: 11px; color: var(--bp-muted, #4d6259); }
+.ectpr-card-rule { font-weight: 800; color: #9b1c1c; margin-bottom: 2px; }
+
+/* Offline scanner extras */
+.scanner-tabs { display: flex; gap: 6px; padding: 0 16px 8px; }
+.scanner-tabs button { border: 1px solid var(--bp-border, rgb(10 33 24 / .14)); background: #fff; border-radius: 999px; padding: 6px 12px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.scanner-tabs button.is-active { background: var(--bp-primary, #0c5c3f); color: #fff; border-color: transparent; }
+.scanner-video { width: 100%; max-height: 50vh; object-fit: cover; border-radius: 10px; background: #000; }
+.scanner-offline-text { white-space: pre-wrap; font-size: 13px; line-height: 1.5; background: var(--bp-mist, #f3f7f5); padding: 10px 12px; border-radius: 8px; }
+.scanner-offline-details summary { cursor: pointer; font-size: 13px; font-weight: 600; margin: 10px 0 6px; }
+
+/* Public ED page */
+.ed-page {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 12px 16px 40px;
+  background: #fff;
+  min-height: 100vh;
+  color: var(--bp-ink, #0a2118);
+  font-family: var(--font-inter, system-ui), sans-serif;
+}
+.ed-page-header { display: flex; align-items: center; gap: 10px; padding: 6px 0 12px; border-bottom: 1px solid var(--bp-border, rgb(10 33 24 / .10)); margin-bottom: 12px; }
+.ed-page-brand { font-family: Georgia, 'Times New Roman', serif; font-size: 24px; font-weight: 600; color: #382e29; }
+.ed-page-tag { font-size: 13px; color: var(--bp-muted, #4d6259); flex: 1; }
+.ed-page-lang { border: 1px solid var(--bp-border, rgb(10 33 24 / .18)); background: #fff; border-radius: 999px; padding: 5px 12px; font-size: 13px; cursor: pointer; }
+.ed-page .ectpr-card { margin-bottom: 12px; }
+.ed-page-foot { margin-top: 8px; }
+
+@media print {
+  .ectpr-actions-row, .ectpr-pdf-actions, .ectpr-ed-glass, .ed-page-lang { display: none !important; }
+}
+

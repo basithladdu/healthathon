@@ -1,7 +1,8 @@
 import './care-loading.css';
+import { careText, type CareLang } from './care-i18n';
 
-export function CareLoading({ hindi = false, className = '' }: { hindi?: boolean; className?: string }) {
-  return <div className={`care-loading ${className}`.trim()} lang={hindi ? 'hi' : 'en'} role="status" aria-live="polite" aria-busy="true">
+export function CareLoading({ lang = 'en', className = '' }: { lang?: CareLang; className?: string }) {
+  return <div className={`care-loading ${className}`.trim()} lang={lang} role="status" aria-live="polite" aria-busy="true">
     <div className="care-loading-content">
       <div className="care-loading-art" aria-hidden="true">
         <span className="care-loading-halo" />
@@ -15,9 +16,9 @@ export function CareLoading({ hindi = false, className = '' }: { hindi?: boolean
         </svg>
         <span className="care-loading-petal" />
       </div>
-      <p className="care-loading-name">{hindi ? 'सहारा' : 'Sahara'}</p>
+      <p className="care-loading-name">{careText(lang, 'Sahara', 'सहारा')}</p>
       <div className="care-loading-dots" aria-hidden="true"><span /><span /><span /></div>
-      <span className="care-loading-status">{hindi ? 'आपकी देखभाल खुल रही है' : 'Opening your care'}</span>
+      <span className="care-loading-status">{careText(lang, 'Opening your care', 'आपकी देखभाल खुल रही है')}</span>
     </div>
   </div>;
 }

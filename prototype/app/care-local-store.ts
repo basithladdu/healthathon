@@ -132,3 +132,7 @@ export function useCareLocalState<T>(key: string, initial: T): [T, Dispatch<SetS
 
   return [value, setValue, status];
 }
+
+// Shared low-level access for other local-first stores (e.g. ectpr-store.ts).
+export const readCareValue = readValue;
+export const writeCareValue = writeValue;

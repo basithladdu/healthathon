@@ -6,16 +6,17 @@ import {
   removeOpenQuestion, restoreOpenQuestion, selectOpenQuestions, setOpenQuestionClosed, setOpenQuestionNextStep,
   type OpenQuestion, type OpenQuestionStatus,
 } from './family-open-question-state';
+import { careLocale, careText, type CareLang } from './care-i18n';
 
 export type { OpenQuestion, OpenQuestionReply } from './family-open-question-state';
-type FamilyOpenQuestionsProps = { patientId: string; author: string; today: string; hindi: boolean; entries: OpenQuestion[]; onChange: (entries: OpenQuestion[]) => void };
+type FamilyOpenQuestionsProps = { patientId: string; author: string; today: string; lang: CareLang; entries: OpenQuestion[]; onChange: (entries: OpenQuestion[]) => void };
 
 export function FamilyOpenQuestions(props: FamilyOpenQuestionsProps) {
   return <QuestionsContent key={`${props.patientId}:${props.author}`} {...props} />;
 }
 
 function QuestionsContent(props: FamilyOpenQuestionsProps) {
-  const { patientId, author, today, hindi, entries, onChange } = props;
+  const { patientId, author, today, lang, entries, onChange } = props;
   const id = useId();
   const [topic, setTopic] = useState('');
   const [owner, setOwner] = useState('');
@@ -25,7 +26,7 @@ function QuestionsContent(props: FamilyOpenQuestionsProps) {
   const open = selectOpenQuestions(entries, patientId);
   const closed = selectOpenQuestions(entries, patientId, true);
   const lastRemoved = removed.at(-1);
-  const t = (english: string, translated: string) => hindi ? translated : english;
+  const t = (english: string, translated: string) => careText(lang, english, translated);
 
   function add(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -67,16 +68,16 @@ function QuestionsContent(props: FamilyOpenQuestionsProps) {
   </section>;
 }
 
-function QuestionCard({ patientId, author, today, hindi, entries, onChange, question, onRemove }: FamilyOpenQuestionsProps & { question: OpenQuestion; onRemove: () => void }) {
+function QuestionCard({ patientId, author, today, lang, entries, onChange, question, onRemove }: FamilyOpenQuestionsProps & { question: OpenQuestion; onRemove: () => void }) {
   const id = useId();
   const [panel, setPanel] = useState<'reply' | 'next' | 'later' | 'edit' | null>(null);
   const [text, setText] = useState('');
   const [person, setPerson] = useState('');
   const [date, setDate] = useState('');
   const [message, setMessage] = useState('');
-  const t = (english: string, translated: string) => hindi ? translated : english;
+  const t = (english: string, translated: string) => careText(lang, english, translated);
   const statuses: Record<OpenQuestionStatus, string> = { 'to-ask': t('To ask', 'अभी पूछना है'), waiting: t('Asked · no reply saved yet', 'पूछ लिया · जवाब अभी सेव नहीं हुआ'), replied: t('Reply saved by family', 'परिवार ने जवाब सेव किया'), closed: t('Closed', 'बंद किया') };
-  const dateLabel = (value: string) => new Date(`${value}T00:00:00`).toLocaleDateString(hindi ? 'hi-IN' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  const dateLabel = (value: string) => new Date(`${value}T00:00:00`).toLocaleDateString(careLocale(lang), { day: 'numeric', month: 'short', year: 'numeric' });
 
   function openPanel(next: typeof panel) {
     setPanel(next); setMessage('');

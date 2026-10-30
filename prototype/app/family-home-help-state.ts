@@ -1,3 +1,4 @@
+import { careLangOf, careText, type CareLang } from './care-i18n.ts';
 import { isValidAppointmentDate } from './appointment-state.ts';
 
 export const HOME_HELP_CATEGORIES = ['Transport', 'Home nursing', 'Medicines or equipment delivery'] as const;
@@ -52,15 +53,15 @@ export function selectHomeHelpEntries(entries: HomeHelpEntry[], patientId: strin
     .sort((a, b) => HOME_HELP_STATUSES.indexOf(a.status) - HOME_HELP_STATUSES.indexOf(b.status) || (a.date || '9999').localeCompare(b.date || '9999'));
 }
 
-export function homeHelpText(entries: HomeHelpEntry[], patientId: string, today: string, hindi = false): string {
-  const t = (en: string, hi: string) => hindi ? hi : en;
+export function homeHelpText(entries: HomeHelpEntry[], patientId: string, today: string, hindi: boolean | CareLang = false): string {
+  const t = (en: string, hi: string) => careText(careLangOf(hindi), en, hi);
   const statuses = { 'To arrange': 'इंतज़ाम बाकी है', Arranged: 'इंतज़ाम हो गया', Done: 'पूरा हो गया' };
   return [
     t('Sahara — Help at home', 'सहारा — घर पर मदद'),
     `${t('Saved on', 'कॉपी की तारीख')}: ${today}`,
     t('Arrangements recorded by the family. No bookings or messages are sent by this list.', 'परिवार ने ये इंतज़ाम दर्ज किए हैं। यह सूची कोई बुकिंग या संदेश नहीं भेजती।'),
     ...selectHomeHelpEntries(entries, patientId).map((entry) => [
-      `${hindi ? statuses[entry.status] : entry.status} — ${entry.title}`,
+      `${t(entry.status, statuses[entry.status])} — ${entry.title}`,
       entry.date ? `${t('Day', 'दिन')}: ${entry.date}` : '',
       entry.helper ? `${t('Helping', 'मदद करने वाले')}: ${entry.helper}` : t('No helper added yet.', 'मदद करने वाले का नाम अभी नहीं जोड़ा है।'),
       entry.phone ? `${t('Phone', 'फ़ोन')}: ${entry.phone}` : '',

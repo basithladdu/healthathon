@@ -6,10 +6,11 @@ import {
   selectVoiceJournalEntries, validVoiceJournalDraft, voiceJournalEntryText, type VoiceJournalEntry,
 } from './family-voice-state';
 import './family-voice-journal.css';
+import { careLocale, careText, type CareLang } from './care-i18n';
 
 export type { VoiceJournalEntry } from './family-voice-state';
 type Props = {
-  patientId: string; author: string; today: string; hindi: boolean; entries: VoiceJournalEntry[]; onChange: (entries: VoiceJournalEntry[]) => void;
+  patientId: string; author: string; today: string; lang: CareLang; entries: VoiceJournalEntry[]; onChange: (entries: VoiceJournalEntry[]) => void;
   saveStatus?: 'loading' | 'saving' | 'saved' | 'unavailable';
 };
 type RecordingPhase = 'idle' | 'requesting' | 'recording' | 'stopping';
@@ -18,7 +19,7 @@ function clipDuration(seconds: number): string {
   return `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, '0')}`;
 }
 
-function AudioClip({ file, hindi, label }: { file: File; hindi: boolean; label: string }) {
+function AudioClip({ file, lang, label }: { file: File; lang: CareLang; label: string }) {
   const audio = useRef<HTMLAudioElement>(null);
   const download = useRef<HTMLAnchorElement>(null);
   useEffect(() => {
@@ -29,11 +30,11 @@ function AudioClip({ file, hindi, label }: { file: File; hindi: boolean; label: 
     if (link) link.href = url;
     return () => { if (player) { player.pause(); player.removeAttribute('src'); player.load(); } URL.revokeObjectURL(url); };
   }, [file]);
-  return <div className="voice-journal-audio"><audio ref={audio} controls preload="metadata" aria-label={label} /><a ref={download} download={file.name}>{hindi ? 'आवाज़ डाउनलोड करें' : 'Download audio'}</a></div>;
+  return <div className="voice-journal-audio"><audio ref={audio} controls preload="metadata" aria-label={label} /><a ref={download} download={file.name}>{careText(lang, 'Download audio', 'आवाज़ डाउनलोड करें')}</a></div>;
 }
 
-function JournalRecorder({ patientId, hindi, onRecorded, onBusy, onTextFallback }: { patientId: string; hindi: boolean; onRecorded: (file: File, duration: number) => void; onBusy: (busy: boolean) => void; onTextFallback: () => void }) {
-  const t = (en: string, hi: string) => hindi ? hi : en;
+function JournalRecorder({ patientId, lang, onRecorded, onBusy, onTextFallback }: { patientId: string; lang: CareLang; onRecorded: (file: File, duration: number) => void; onBusy: (busy: boolean) => void; onTextFallback: () => void }) {
+  const t = (en: string, hi: string) => careText(lang, en, hi);
   const [phase, setPhase] = useState<RecordingPhase>('idle');
   const [elapsed, setElapsed] = useState(0);
   const [message, setMessage] = useState('');
@@ -147,9 +148,9 @@ export function FamilyVoiceJournal(props: Props) {
   return <VoiceJournalForPatient key={`${props.patientId}:${props.author}`} {...props} />;
 }
 
-function VoiceJournalForPatient({ patientId, author, today, hindi, entries, onChange, saveStatus }: Props) {
+function VoiceJournalForPatient({ patientId, author, today, lang, entries, onChange, saveStatus }: Props) {
   const id = useId();
-  const t = (en: string, hi: string) => hindi ? hi : en;
+  const t = (en: string, hi: string) => careText(lang, en, hi);
   const [title, setTitle] = useState('');
   const [thought, setThought] = useState('');
   const [audio, setAudio] = useState<File | null>(null);
@@ -162,7 +163,7 @@ function VoiceJournalForPatient({ patientId, author, today, hindi, entries, onCh
   const [message, setMessage] = useState('');
   const titleInput = useRef<HTMLInputElement>(null);
   const journal = selectVoiceJournalEntries(entries, patientId);
-  const dateLabel = (value: string) => new Date(`${value}T12:00:00`).toLocaleDateString(hindi ? 'hi-IN' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  const dateLabel = (value: string) => new Date(`${value}T12:00:00`).toLocaleDateString(careLocale(lang), { day: 'numeric', month: 'short', year: 'numeric' });
   const ready = !busy && validVoiceJournalDraft({ title, thought, audio, durationSeconds });
 
   useEffect(() => { if (editingId) titleInput.current?.focus(); }, [editingId]);
@@ -209,8 +210,8 @@ function VoiceJournalForPatient({ patientId, author, today, hindi, entries, onCh
     <h1 id={`${id}-heading`}>{t('Your voice journal', 'अपनी बात कहें')}</h1>
     <div className="voice-journal-layout">
       <section className="voice-journal-compose" aria-label={t('Add to your journal', 'अपनी डायरी में जोड़ें')}>
-        {editingId ? <h2>{t('Edit your words', 'अपनी बात बदलें')}</h2> : <JournalRecorder key={recordingReset} patientId={patientId} hindi={hindi} onBusy={setBusy} onTextFallback={() => setWriting(true)} onRecorded={(file, duration) => { setAudio(file); setDurationSeconds(duration); setMessage(''); }} />}
-        {audio && !busy && <div className="voice-draft-clip"><AudioClip file={audio} hindi={hindi} label={t('Listen to your voice note', 'अपना वॉइस नोट सुनें')} />{!editingId && <button type="button" className="voice-text-button" onClick={() => { setAudio(null); setDurationSeconds(null); setRecordingReset((value) => value + 1); }}>{t('Remove this recording', 'यह रिकॉर्डिंग हटाएँ')}</button>}</div>}
+        {editingId ? <h2>{t('Edit your words', 'अपनी बात बदलें')}</h2> : <JournalRecorder key={recordingReset} patientId={patientId} lang={lang} onBusy={setBusy} onTextFallback={() => setWriting(true)} onRecorded={(file, duration) => { setAudio(file); setDurationSeconds(duration); setMessage(''); }} />}
+        {audio && !busy && <div className="voice-draft-clip"><AudioClip file={audio} lang={lang} label={t('Listen to your voice note', 'अपना वॉइस नोट सुनें')} />{!editingId && <button type="button" className="voice-text-button" onClick={() => { setAudio(null); setDurationSeconds(null); setRecordingReset((value) => value + 1); }}>{t('Remove this recording', 'यह रिकॉर्डिंग हटाएँ')}</button>}</div>}
         <form className="voice-journal-form" onSubmit={save}>
           <details className="voice-writing-options" open={writing} onToggle={(event) => setWriting(event.currentTarget.open)}><summary>{t('Add words, if you like', 'चाहें तो कुछ लिखें')}</summary>
             {!editingId && <div className="voice-journal-prompts" aria-label={t('Optional thought starters', 'चाहें तो इनमें से चुनें')}>{[['A favourite memory', 'एक प्यारी याद'], ['A person I love', 'मेरा कोई अपना'], ['A song I like', 'मेरा पसंदीदा गाना']].map(([en, hi]) => <button type="button" key={en} onClick={() => setTitle(t(en, hi))}>{t(en, hi)}</button>)}</div>}
@@ -230,7 +231,7 @@ function VoiceJournalForPatient({ patientId, author, today, hindi, entries, onCh
         {!journal.length && <p className="voice-journal-empty">{t('Your first thought can be spoken or written.', 'पहली बात बोलकर या लिखकर रख सकते हैं।')}</p>}
         {journal.map((entry) => <article className="voice-journal-entry" key={entry.id}>
           <div className="voice-entry-heading"><h3>{entry.title || (entry.audio ? t('A voice note', 'एक वॉइस नोट') : t('A thought', 'एक बात'))}</h3><time dateTime={entry.date}>{dateLabel(entry.date)}</time></div>
-          {entry.audio && !busy && <AudioClip file={entry.audio} hindi={hindi} label={entry.title || t('Play voice note', 'वॉइस नोट सुनें')} />}
+          {entry.audio && !busy && <AudioClip file={entry.audio} lang={lang} label={entry.title || t('Play voice note', 'वॉइस नोट सुनें')} />}
           {entry.thought && <p className="voice-entry-thought">{entry.thought}</p>}
           <div className="voice-entry-footer"><span>{t('Added by', 'जोड़ा')} {entry.createdBy}{entry.updatedBy !== entry.createdBy && <> · {t('edited by', 'बदला')} {entry.updatedBy}</>}</span><div><button type="button" className="voice-text-button" disabled={busy} onClick={() => edit(entry)}>{t('Edit words', 'बात बदलें')}</button><button type="button" className="voice-text-button" onClick={() => downloadText(entry)}>{t('Save text', 'लिखी बात डाउनलोड करें')}</button><button type="button" className="voice-text-button" onClick={() => remove(entry)}>{t('Remove', 'हटाएँ')}</button></div></div>
         </article>)}

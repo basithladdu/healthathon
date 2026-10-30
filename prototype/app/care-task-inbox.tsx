@@ -4,6 +4,7 @@ import { useId, useState, type FormEvent } from 'react';
 import type { Appointment } from './appointments-page';
 import { FAMILY_TASK_KINDS, type CareTaskAssignee, type FamilyTask, type FamilyTaskKind } from './family-care-state';
 import './care-task-inbox.css';
+import { careLocale, careText, type CareLang } from './care-i18n';
 
 export type CareTaskInboxProps = {
   patientId: string;
@@ -13,7 +14,7 @@ export type CareTaskInboxProps = {
   tasks: FamilyTask[];
   appointments?: Appointment[];
   today?: string;
-  hindi?: boolean;
+  lang?: CareLang;
   onAdd: (task: FamilyTask) => void;
   onEdit: (task: FamilyTask) => void;
   onComplete: (taskId: string, complete: boolean) => void;
@@ -21,9 +22,9 @@ export type CareTaskInboxProps = {
 
 const KIND_HI: Record<FamilyTaskKind, string> = { Appointment: 'मुलाकात', Transport: 'आना-जाना', Medicines: 'दवाएँ', 'Home care': 'घर पर देखभाल', Paperwork: 'कागज़ी काम', 'Family support': 'परिवार की मदद', Question: 'सवाल' };
 
-export function CareTaskInbox({ patientId, patientName, viewer, assignees, tasks, appointments = [], today = '', hindi = false, onAdd, onEdit, onComplete }: CareTaskInboxProps) {
+export function CareTaskInbox({ patientId, patientName, viewer, assignees, tasks, appointments = [], today = '', lang = 'en', onAdd, onEdit, onComplete }: CareTaskInboxProps) {
   const id = useId();
-  const t = (en: string, hi: string) => hindi ? hi : en;
+  const t = (en: string, hi: string) => careText(lang, en, hi);
   const recipients = [...assignees, viewer].filter((person, index, people) => people.findIndex((candidate) => candidate.id === person.id) === index);
   const selectableRecipients = recipients.filter((person) => person.id !== viewer.id);
   const defaultRecipient = selectableRecipients.find((person) => person.role === 'patient') ?? selectableRecipients[0] ?? viewer;
@@ -64,7 +65,7 @@ export function CareTaskInbox({ patientId, patientName, viewer, assignees, tasks
           : outgoing ? `${t('Assigned to', 'काम सौंपा')} ${task.owner}`
             : task.owner;
     return <li key={task.id} className={task.completedBy ? 'is-complete' : ''}>
-      <div className="task-inbox-copy"><strong>{task.title}</strong>{incoming && <span>{t('From', 'की ओर से')}: {task.createdBy}</span>}<span>{status}{task.due ? ` · ${new Date(`${task.due}T12:00:00`).toLocaleDateString(hindi ? 'hi-IN' : 'en-GB', { day: 'numeric', month: 'short' })}` : ''} · {hindi ? KIND_HI[task.kind] : task.kind}</span></div>
+      <div className="task-inbox-copy"><strong>{task.title}</strong>{incoming && <span>{t('From', 'की ओर से')}: {task.createdBy}</span>}<span>{status}{task.due ? ` · ${new Date(`${task.due}T12:00:00`).toLocaleDateString(careLocale(lang), { day: 'numeric', month: 'short' })}` : ''} · {careText(lang, task.kind, KIND_HI[task.kind])}</span></div>
       {waiting && <button type="button" className="task-inbox-accept" onClick={() => accept(task)}>{t('Accept', 'स्वीकार करें')}</button>}
       {canComplete && !waiting && <button type="button" className="task-inbox-done" onClick={() => onComplete(task.id, true)}>{t('Done', 'हो गया')}</button>}
     </li>;
@@ -76,7 +77,7 @@ export function CareTaskInbox({ patientId, patientName, viewer, assignees, tasks
       <label htmlFor={`${id}-task`}>{t('What needs doing?', 'क्या करना है?')}<input id={`${id}-task`} value={title} required maxLength={240} onChange={(event) => setTitle(event.target.value)} /></label>
       <div className="task-inbox-fields">
         <label htmlFor={`${id}-recipient`}>{t('Assign to', 'काम सौंपें')}<select id={`${id}-recipient`} value={assignedToId} onChange={(event) => setAssignedToId(event.target.value)}>{recipients.map((person) => <option key={person.id} value={person.id}>{person.id === viewer.id ? t('Me', 'मैं') : person.name}</option>)}</select></label>
-        <label htmlFor={`${id}-kind`}>{t('Type', 'किस तरह का काम')}<select id={`${id}-kind`} value={kind} onChange={(event) => setKind(event.target.value as FamilyTaskKind)}>{FAMILY_TASK_KINDS.filter((value) => value !== 'Question').map((value) => <option key={value} value={value}>{hindi ? KIND_HI[value] : value}</option>)}</select></label>
+        <label htmlFor={`${id}-kind`}>{t('Type', 'किस तरह का काम')}<select id={`${id}-kind`} value={kind} onChange={(event) => setKind(event.target.value as FamilyTaskKind)}>{FAMILY_TASK_KINDS.filter((value) => value !== 'Question').map((value) => <option key={value} value={value}>{careText(lang, value, KIND_HI[value])}</option>)}</select></label>
         <label htmlFor={`${id}-due`}>{t('When? Optional', 'कब? वैकल्पिक')}<input id={`${id}-due`} type="date" value={due} onChange={(event) => setDue(event.target.value)} /></label>
       </div>
       {viewer.role === 'doctor' && scheduled.length > 0 && <p>{t('For the selected patient’s next visit:', 'चुने हुए मरीज़ की अगली मुलाकात:')} {scheduled[0].date} · {scheduled[0].type}</p>}

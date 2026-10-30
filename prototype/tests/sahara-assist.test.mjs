@@ -23,8 +23,8 @@ const docs = Array.from({ length: 12 }, (_, index) => ({ ref: `D${index + 1}`, l
 test('a Gemini key alone sets up drafting, asking, translation and transcription', () => {
   const config = configuration({ GEMINI_API_KEY: 'test-key' });
   assert.equal(config.ready, true); assert.equal(config.audioReady, true);
-  assert.equal(config.base, 'https://generativelanguage.googleapis.com/v1beta/openai');
-  assert.equal(config.model, 'gemini-2.5-flash'); assert.equal(config.label, 'Google Gemini');
+  assert.equal(config.chain[0].base, 'https://generativelanguage.googleapis.com/v1beta/openai');
+  assert.equal(config.model, 'gemini-3.5-flash-lite'); assert.equal(config.label, 'Google Gemini');
   assert.equal(configuration({}).ready, false);
 });
 

@@ -1,3 +1,4 @@
+import { careLangOf, careText, type CareLang } from './care-i18n.ts';
 import { isValidAppointmentDate } from './appointment-state.ts';
 import type { CareReport } from './care-calendar-state.ts';
 
@@ -117,8 +118,8 @@ export function labNumericSeries(entries: LabResultEntry[], patientId: string, t
     .sort((a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id));
 }
 
-export function labHistoryText(entries: LabResultEntry[], patientId: string, hindi = false, treatmentEvents: readonly LabTreatmentEvent[] = []): string {
-  const t = (en: string, hi: string) => hindi ? hi : en;
+export function labHistoryText(entries: LabResultEntry[], patientId: string, hindi: boolean | CareLang = false, treatmentEvents: readonly LabTreatmentEvent[] = []): string {
+  const t = (en: string, hi: string) => careText(careLangOf(hindi), en, hi);
   return [
     t('SAHARA — LAB RESULTS', 'सहारा — जाँच के नतीजे'),
     t('Values, units, ranges and flags copied from reports. No interpretation is added.', 'नतीजे, इकाइयाँ, रेंज और फ़्लैग रिपोर्ट से लिखे गए हैं। इनकी व्याख्या नहीं की गई है।'),

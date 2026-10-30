@@ -5,16 +5,18 @@ import { CareArt, type CareArtKind } from './care-art';
 import { CareLoading } from './care-loading';
 import './care-sign-in.css';
 import { SaharaLogo } from './sahara-logo';
+import { careDir, careText, type CareLang } from './care-i18n';
+import { CareLanguageSelect } from './care-language-select';
 
 export type CareSignInInput = { role: 'family' | 'patient' | 'doctor'; patientId: string; name: string };
 export type CareSignInProps = {
   patients: Array<{ id: string; name: string }>;
-  hindi: boolean;
-  onLanguage: () => void;
+  lang: CareLang;
+  onLanguage: (lang: CareLang) => void;
   onSignIn: (input: CareSignInInput) => void;
 };
 
-export function CareSignIn({ patients, hindi, onLanguage, onSignIn }: CareSignInProps) {
+export function CareSignIn({ patients, lang, onLanguage, onSignIn }: CareSignInProps) {
   const id = useId();
   const [role, setRole] = useState<CareSignInInput['role']>('patient');
   const [council, setCouncil] = useState('');
@@ -30,7 +32,7 @@ export function CareSignIn({ patients, hindi, onLanguage, onSignIn }: CareSignIn
   const autofillStopped = useRef({ identifier: false, council: false });
   const patient = patients.find((item) => item.id === selectedId) ?? patients[0];
   const name = role === 'doctor' ? 'Dr Sujay' : role === 'family' ? (patient?.id === 'CANCER-20418' ? 'Kavya Raghavan' : 'Family member') : patient?.name ?? '';
-  const t = (en: string, hi: string) => hindi ? hi : en;
+  const t = (en: string, hi: string) => careText(lang, en, hi);
   const roleArt: Record<CareSignInInput['role'], CareArtKind> = {
     family: 'home-help', patient: 'cancer-overview', doctor: 'doctor-pack',
   };
@@ -95,12 +97,12 @@ export function CareSignIn({ patients, hindi, onLanguage, onSignIn }: CareSignIn
     }, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 180 : 850);
   }
 
-  if (signingIn) return <CareLoading hindi={hindi} />;
+  if (signingIn) return <CareLoading lang={lang} />;
 
-  return <div className="care-sign-in" lang={hindi ? 'hi' : 'en'}>
+  return <div className="care-sign-in" lang={lang} dir={careDir(lang)}>
     <header className="care-sign-in-header">
       <span className="care-sign-in-brand"><SaharaLogo className="care-sign-in-logo" priority /><span><strong>{t('Sahara', 'सहारा')}</strong><small>{t('- A Palliative Care Companion', '- पैलिएटिव केयर साथी')}</small></span></span>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}><button type="button" className="care-sign-in-language" onClick={onLanguage} lang={hindi ? 'en' : 'hi'}>{hindi ? 'English' : 'हिन्दी'}</button></div>
+      <CareLanguageSelect className="care-sign-in-language-select" lang={lang} onChange={onLanguage} />
     </header>
     <main className="care-sign-in-main">
       <div className="care-sign-in-card">

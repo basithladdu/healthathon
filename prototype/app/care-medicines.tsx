@@ -24,9 +24,10 @@ import {
 import { literalPrescriptionTime, makeMedicineEvent, medicinePrescription, prescriptionLines, type MedicineDraft } from './care-medicines-state';
 import { formatMedicineTime, medicineTimeGroups } from './care-medicine-schedule';
 import './care-medicines.css';
+import { careLocale, careText, type CareLang } from './care-i18n';
 
 export type CareMedicinesProps = {
-  patientId: string; author: string; today: string; hindi: boolean;
+  patientId: string; author: string; today: string; lang: CareLang;
   events: CareEvent[]; checks: CareCheck[]; reports: CareReport[]; documents: CareDocumentText[];
   onAdd: (event: CareEvent) => void; onUpdate: (event: CareEvent) => void;
   onCheck: (eventId: string, date: string, complete: boolean) => void; onRemove: (eventId: string) => void;
@@ -40,14 +41,14 @@ function MedicineIcon({ kind = 'medicine' }: { kind?: 'medicine' | 'file' | 'che
   </svg>;
 }
 
-function PrescriptionLink({ report, hindi }: { report: CareReport; hindi: boolean }) {
+function PrescriptionLink({ report, lang }: { report: CareReport; lang: CareLang }) {
   const link = useRef<HTMLAnchorElement>(null);
   useEffect(() => {
     const url = URL.createObjectURL(report.file);
     if (link.current) link.current.href = url;
     return () => URL.revokeObjectURL(url);
   }, [report.file]);
-  return <a ref={link} target="_blank" rel="noreferrer"><MedicineIcon kind="file" />{hindi ? 'पर्चा खोलें' : 'Open prescription'} <span aria-hidden="true">↗</span></a>;
+  return <a ref={link} target="_blank" rel="noreferrer"><MedicineIcon kind="file" />{careText(lang, 'Open prescription', 'पर्चा खोलें')} <span aria-hidden="true">↗</span></a>;
 }
 
 function SavedFileLink({ file, label }: { file: File; label: string }) {
@@ -60,21 +61,21 @@ function SavedFileLink({ file, label }: { file: File; label: string }) {
   return <a ref={link} target="_blank" rel="noreferrer"><MedicineIcon kind="file" />{label} <span aria-hidden="true">↗</span></a>;
 }
 
-function regimenMealLabel(value: MedicineRegimenMealTiming, hindi: boolean): string {
+function regimenMealLabel(value: MedicineRegimenMealTiming, lang: CareLang): string {
   const timing: MedicineMealTiming = value === 'beforeFood' ? 'before-food'
     : value === 'withFood' ? 'with-food'
       : value === 'afterFood' ? 'after-food'
         : 'not-stated';
-  return medicineMealTimingLabel(timing, hindi);
+  return medicineMealTimingLabel(timing, lang);
 }
 
 export function CareMedicines(props: CareMedicinesProps) {
   return <MedicinesForPatient key={`${props.patientId}:${props.author}`} {...props} />;
 }
 
-function MedicinesForPatient({ patientId, author, today, hindi, events, checks, reports, documents, onAdd, onUpdate, onCheck, onRemove }: CareMedicinesProps) {
+function MedicinesForPatient({ patientId, author, today, lang, events, checks, reports, documents, onAdd, onUpdate, onCheck, onRemove }: CareMedicinesProps) {
   const id = useId();
-  const t = (en: string, hi: string) => hindi ? hi : en;
+  const t = (en: string, hi: string) => careText(lang, en, hi);
   const [date, setDate] = useState(today);
   const [view, setView] = useState<'day' | 'all'>('day');
   const [selectedTime, setSelectedTime] = useState('all');
@@ -106,7 +107,7 @@ function MedicinesForPatient({ patientId, author, today, hindi, events, checks, 
   const selectedReport = available.find((report) => report.id === draft?.reportId);
   const sourceLines = prescriptionLines(draft?.sourceText ?? '');
   const isEditing = draft !== null;
-  const dateLabel = (value: string) => new Date(`${value}T12:00:00`).toLocaleDateString(hindi ? 'hi-IN' : 'en-GB', { day: 'numeric', month: 'short' });
+  const dateLabel = (value: string) => new Date(`${value}T12:00:00`).toLocaleDateString(careLocale(lang), { day: 'numeric', month: 'short' });
 
   useEffect(() => { heading.current?.focus(); }, [editingId, isEditing]);
   useEffect(() => {
@@ -259,7 +260,7 @@ function MedicinesForPatient({ patientId, author, today, hindi, events, checks, 
 
   if (importing) return <section className="care-medicines" aria-labelledby={`${id}-scan-heading`}>
     <header className="medicine-heading"><div className="medicine-heading-title"><span className="medicine-heading-icon"><MedicineIcon kind="file" /></span><h1 id={`${id}-scan-heading`} ref={heading} tabIndex={-1}>{t('Scan prescription', 'पर्चा स्कैन करें')}</h1></div><button type="button" onClick={() => setImporting(false)}>{t('Back', 'वापस')}</button></header>
-    <CareMedicineImport patientId={patientId} author={author} today={today} hindi={hindi} onAdd={onAdd} onCancel={() => setImporting(false)} onComplete={(count) => { setRegimens(patientMedicineRegimens(loadMedicineRegimens(), patientId)); setImporting(false); setView('all'); setDate(today); setMessage(t(`${count} medicine${count === 1 ? '' : 's'} saved.`, `${count} दवाएँ सेव हुईं।`)); }} />
+    <CareMedicineImport patientId={patientId} author={author} today={today} lang={lang} onAdd={onAdd} onCancel={() => setImporting(false)} onComplete={(count) => { setRegimens(patientMedicineRegimens(loadMedicineRegimens(), patientId)); setImporting(false); setView('all'); setDate(today); setMessage(t(`${count} medicine${count === 1 ? '' : 's'} saved.`, `${count} दवाएँ सेव हुईं।`)); }} />
   </section>;
 
   if (draft) return <section className="care-medicines" aria-labelledby={`${id}-edit-heading`}>
@@ -268,7 +269,7 @@ function MedicinesForPatient({ patientId, author, today, hindi, events, checks, 
       <section className="medicine-source-panel">
         <Link href="/reports?upload=1&next=medicines" className="medicine-upload"><MedicineIcon kind="file" />{t('Upload prescription', 'पर्चा अपलोड करें')}</Link>
         <details className="medicine-source-choice" open={!selectedReport}><summary>{t('Choose prescription', 'पर्चा चुनें')}</summary><label htmlFor={`${id}-source`}>{t('Prescription', 'पर्चा')}<select id={`${id}-source`} value={draft.reportId} onChange={(event) => chooseSource(event.target.value)}><option value="">{t('Paste prescription text', 'पर्चे का टेक्स्ट जोड़ें')}</option>{available.map((report) => <option key={report.id} value={report.id}>{report.file.name} · {dateLabel(report.date)}</option>)}</select></label></details>
-        {selectedReport ? <div className="medicine-source-heading"><strong>{selectedReport.file.name}</strong><PrescriptionLink report={selectedReport} hindi={hindi} /></div> : <label htmlFor={`${id}-source-name`}>{t('Prescription name or date', 'पर्चे का नाम या तारीख')}<input id={`${id}-source-name`} value={draft.sourceName} maxLength={240} required onChange={(event) => updateDraft({ sourceName: event.target.value })} /></label>}
+        {selectedReport ? <div className="medicine-source-heading"><strong>{selectedReport.file.name}</strong><PrescriptionLink report={selectedReport} lang={lang} /></div> : <label htmlFor={`${id}-source-name`}>{t('Prescription name or date', 'पर्चे का नाम या तारीख')}<input id={`${id}-source-name`} value={draft.sourceName} maxLength={240} required onChange={(event) => updateDraft({ sourceName: event.target.value })} /></label>}
         {selectedReport && <button type="button" className="medicine-source-toggle" aria-expanded={showSource} onClick={() => setShowSource(!showSource)}>{showSource ? t('Hide text', 'टेक्स्ट छिपाएँ') : t('Read prescription text', 'पर्चे का टेक्स्ट पढ़ें')}</button>}
         {(!selectedReport || showSource) && <label htmlFor={`${id}-source-text`}>{selectedReport ? t('Text from this prescription', 'इस पर्चे का टेक्स्ट') : t('Prescription text', 'पर्चे का टेक्स्ट')}<textarea id={`${id}-source-text`} rows={3} value={draft.sourceText} maxLength={200000} required={!selectedReport} onChange={(event) => updateDraft({ sourceText: event.target.value })} /></label>}
         {sourceLines.length > 0 && <details className="medicine-source-lines"><summary>{t('Use a line for the instructions', 'निर्देश के लिए एक पंक्ति चुनें')}</summary><ul>{sourceLines.map((line, index) => <li key={`${index}-${line.slice(0, 40)}`}><button type="button" onClick={() => copyLine(line)}>{line}</button></li>)}</ul></details>}
@@ -278,8 +279,8 @@ function MedicinesForPatient({ patientId, author, today, hindi, events, checks, 
           <div className="medicine-editor-photo-heading"><div><strong id={`${id}-medicine-photo-heading`}>{t('Medicine photo', 'दवा की तस्वीर')}</strong><span>{t('Use the strip or box so you can identify the medicine later.', 'स्ट्रिप या डिब्बे की तस्वीर रखें ताकि बाद में दवा पहचान सकें।')}</span></div>{(draft.medicineImage || draft.medicineImageId) && <button type="button" className="medicine-text-button" onClick={removeMedicinePhoto}>{t('Remove', 'हटाएँ')}</button>}</div>
           <div className="medicine-editor-photo-body">
             <div className={`medicine-editor-photo-preview${draft.medicineImage || draft.medicineImageId ? '' : ' is-empty'}`}>
-              {draft.medicineImage ? <MedicinePhoto file={draft.medicineImage} alt={draft.title || t('Medicine', 'दवा')} hindi={hindi} />
-                : draft.medicineImageId ? <StoredMedicinePhoto imageId={draft.medicineImageId} alt={draft.title || t('Medicine', 'दवा')} hindi={hindi} />
+              {draft.medicineImage ? <MedicinePhoto file={draft.medicineImage} alt={draft.title || t('Medicine', 'दवा')} lang={lang} />
+                : draft.medicineImageId ? <StoredMedicinePhoto imageId={draft.medicineImageId} alt={draft.title || t('Medicine', 'दवा')} lang={lang} />
                   : <><MedicineIcon kind="camera" /><span>{t('No photo yet', 'अभी तस्वीर नहीं है')}</span></>}
             </div>
             <div className="medicine-editor-photo-actions">
@@ -322,11 +323,11 @@ function MedicinesForPatient({ patientId, author, today, hindi, events, checks, 
       </div>
     </section>}
     {view === 'all' && regimens.length > 0 && <div className="medicine-regimen-list">{regimens.map((item, index) => <article className={`medicine-regimen-card medicine-color-${index % 3}`} key={item.id}>
-      <div className="medicine-regimen-head">{item.medicineImageId ? <StoredMedicinePhoto imageId={item.medicineImageId} alt={item.medicineName} hindi={hindi} /> : <span className="medicine-regimen-placeholder"><MedicineIcon /></span>}<div><h2>{item.medicineName}</h2><p>{item.quantity}</p></div>{item.confidence !== null && <span className="medicine-confidence">{t('AI', 'AI')} {Math.round(item.confidence * 100)}%</span>}</div>
+      <div className="medicine-regimen-head">{item.medicineImageId ? <StoredMedicinePhoto imageId={item.medicineImageId} alt={item.medicineName} lang={lang} /> : <span className="medicine-regimen-placeholder"><MedicineIcon /></span>}<div><h2>{item.medicineName}</h2><p>{item.quantity}</p></div>{item.confidence !== null && <span className="medicine-confidence">{t('AI', 'AI')} {Math.round(item.confidence * 100)}%</span>}</div>
       {item.instructions && <p className="medicine-directions">{item.instructions}</p>}
-      <div className="medicine-regimen-meta"><span className="medicine-meal-chip">{regimenMealLabel(item.mealTiming, hindi)}</span>{item.prescriptionItemNumber !== null && <span>{t(`Prescription item ${item.prescriptionItemNumber}`, `पर्चे की दवा ${item.prescriptionItemNumber}`)}</span>}{item.durationDays !== null && <span>{t(`${item.durationDays}-day course`, `${item.durationDays} दिन का कोर्स`)}</span>}<span>{item.endDate ? `${dateLabel(item.startDate)} – ${dateLabel(item.endDate)}` : t(`Ongoing from ${dateLabel(item.startDate)}`, `${dateLabel(item.startDate)} से जारी`)}</span>{item.prescriptionPageIndexes.length > 0 && <span>{t(`${item.prescriptionPageIndexes.length} prescription page${item.prescriptionPageIndexes.length === 1 ? '' : 's'} linked`, `${item.prescriptionPageIndexes.length} पर्चे के पेज जुड़े हैं`)}</span>}</div>
+      <div className="medicine-regimen-meta"><span className="medicine-meal-chip">{regimenMealLabel(item.mealTiming, lang)}</span>{item.prescriptionItemNumber !== null && <span>{t(`Prescription item ${item.prescriptionItemNumber}`, `पर्चे की दवा ${item.prescriptionItemNumber}`)}</span>}{item.durationDays !== null && <span>{t(`${item.durationDays}-day course`, `${item.durationDays} दिन का कोर्स`)}</span>}<span>{item.endDate ? `${dateLabel(item.startDate)} – ${dateLabel(item.endDate)}` : t(`Ongoing from ${dateLabel(item.startDate)}`, `${dateLabel(item.startDate)} से जारी`)}</span>{item.prescriptionPageIndexes.length > 0 && <span>{t(`${item.prescriptionPageIndexes.length} prescription page${item.prescriptionPageIndexes.length === 1 ? '' : 's'} linked`, `${item.prescriptionPageIndexes.length} पर्चे के पेज जुड़े हैं`)}</span>}</div>
       <div className="medicine-regimen-times">{item.times.length ? item.times.map((time) => <time key={time}>{time}</time>) : <span>{t('No reminder scheduled', 'कोई रिमाइंडर तय नहीं')}</span>}</div>
-      <StoredPrescriptionPages importId={item.sourceImportId} pages={item.prescriptionPageIndexes} hindi={hindi} />
+      <StoredPrescriptionPages importId={item.sourceImportId} pages={item.prescriptionPageIndexes} lang={lang} />
       {item.uncertainties.length > 0 && <details className="medicine-saved-source"><summary>{t('Review notes', 'जाँच की टिप्पणियाँ')}</summary><ul>{item.uncertainties.map((uncertainty) => <li key={uncertainty}>{uncertainty}</li>)}</ul></details>}
       <div className="medicine-card-actions">{confirmRemove === item.id ? <div className="medicine-remove-confirm"><span>{t('Remove this medicine and all reminders?', 'यह दवा और सभी रिमाइंडर हटाएँ?')}</span><button type="button" onClick={() => removeRegimen(item)}>{t('Remove', 'हटाएँ')}</button><button type="button" onClick={() => setConfirmRemove(null)}>{t('Keep', 'रहने दें')}</button></div> : <button type="button" className="medicine-text-button" onClick={() => setConfirmRemove(item.id)}>{t('Remove medicine', 'दवा हटाएँ')}</button>}</div>
     </article>)}</div>}
@@ -337,7 +338,7 @@ function MedicinesForPatient({ patientId, author, today, hindi, events, checks, 
       const linkedRegimen = regimens.find((regimen) => regimen.id === prescription?.regimenId);
       return <article className={`medicine-card medicine-color-${index % 3}${check ? ' is-taken' : ''}`} key={item.id}>
         <div className="medicine-time"><MedicineIcon /><time>{item.time}</time></div>
-        <div className="medicine-card-body"><div className="medicine-card-title">{linkedRegimen?.medicineImageId ? <StoredMedicinePhoto imageId={linkedRegimen.medicineImageId} alt={item.title} hindi={hindi} /> : prescription?.medicineImageId ? <StoredMedicinePhoto imageId={prescription.medicineImageId} alt={item.title} hindi={hindi} /> : prescription?.medicineImage ? <MedicinePhoto file={prescription.medicineImage} alt={item.title} hindi={hindi} /> : null}<h2>{item.title}</h2></div><p className="medicine-directions">{item.instructions}</p><div className="medicine-card-meta"><span>{dateLabel(item.date)}{item.repeatUntil && ` – ${dateLabel(item.repeatUntil)}`}</span>{prescription?.mealTiming && <span className="medicine-meal-chip">{medicineMealTimingLabel(prescription.mealTiming)}</span>}{prescription && <span>{prescription.sourceName}</span>}</div>{report && <PrescriptionLink report={report} hindi={hindi} />}{!report && prescription?.prescriptionImage && <SavedFileLink file={prescription.prescriptionImage} label={t('Open prescription image', 'पर्चे की तस्वीर खोलें')} />}{!report && prescription?.sourceText && <details className="medicine-saved-source"><summary>{t('Read prescription text', 'पर्चे का टेक्स्ट पढ़ें')}</summary><p>{prescription.sourceText}</p></details>}</div>
+        <div className="medicine-card-body"><div className="medicine-card-title">{linkedRegimen?.medicineImageId ? <StoredMedicinePhoto imageId={linkedRegimen.medicineImageId} alt={item.title} lang={lang} /> : prescription?.medicineImageId ? <StoredMedicinePhoto imageId={prescription.medicineImageId} alt={item.title} lang={lang} /> : prescription?.medicineImage ? <MedicinePhoto file={prescription.medicineImage} alt={item.title} lang={lang} /> : null}<h2>{item.title}</h2></div><p className="medicine-directions">{item.instructions}</p><div className="medicine-card-meta"><span>{dateLabel(item.date)}{item.repeatUntil && ` – ${dateLabel(item.repeatUntil)}`}</span>{prescription?.mealTiming && <span className="medicine-meal-chip">{medicineMealTimingLabel(prescription.mealTiming)}</span>}{prescription && <span>{prescription.sourceName}</span>}</div>{report && <PrescriptionLink report={report} lang={lang} />}{!report && prescription?.prescriptionImage && <SavedFileLink file={prescription.prescriptionImage} label={t('Open prescription image', 'पर्चे की तस्वीर खोलें')} />}{!report && prescription?.sourceText && <details className="medicine-saved-source"><summary>{t('Read prescription text', 'पर्चे का टेक्स्ट पढ़ें')}</summary><p>{prescription.sourceText}</p></details>}</div>
         <div className="medicine-card-actions">{view === 'day' && <button type="button" className="medicine-taken" aria-pressed={Boolean(check)} disabled={date > today} onClick={() => { onCheck(item.id, date, !check); setMessage(check ? t('Taken mark removed.', 'लेने का निशान हटा दिया।') : t('Marked taken.', 'लेना दर्ज हो गया।')); }}><MedicineIcon kind="check" />{check ? t('Undo', 'वापस करें') : t('Taken', 'ले ली')}</button>}{check && <span className="medicine-taken-by">{t('Marked by', 'दर्ज किया')}: {check.actor}</span>}<button type="button" className="medicine-text-button" onClick={() => openEditor(item)}>{prescription ? t('Edit', 'बदलें') : t('Add prescription', 'पर्चा जोड़ें')}</button>{confirmRemove === item.id ? <div className="medicine-remove-confirm"><span>{t('Remove this schedule?', 'यह समय हटाएँ?')}</span><button type="button" onClick={() => { onRemove(item.id); setConfirmRemove(null); setMessage(t('Schedule removed.', 'समय हटा दिया।')); }}>{t('Remove', 'हटाएँ')}</button><button type="button" onClick={() => setConfirmRemove(null)}>{t('Keep', 'रहने दें')}</button></div> : <button type="button" className="medicine-text-button" onClick={() => setConfirmRemove(item.id)} aria-label={`${t('Remove schedule', 'समय हटाएँ')}: ${item.title}`}>{t('Remove', 'हटाएँ')}</button>}</div>
       </article>;
     })}</div>

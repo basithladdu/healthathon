@@ -6,6 +6,7 @@ import { CareRouteLink } from './care-route-link';
 import type { CareView } from './care-routes';
 import { IconArrowRight, IconUpload } from './icons';
 import './care-section-pages.css';
+import { careText, type CareLang } from './care-i18n';
 
 export const CARE_SECTIONS: Array<{ view: CareView; en: string; hi: string; art: CareArtKind; color: string; items: Array<{ view: CareView; en: string; hi: string; art: CareArtKind }> }> = [
   { view: 'clinical-documents', en: 'My documents', hi: 'मेरे दस्तावेज़', art: 'care-story', color: 'peach', items: [
@@ -34,16 +35,18 @@ export const CARE_SECTIONS: Array<{ view: CareView; en: string; hi: string; art:
     { view: 'comfort', en: 'A moment for me', hi: 'मेरे लिए थोड़ा समय', art: 'voice-journal' },
     { view: 'visit-questions', en: 'Questions for my doctor', hi: 'डॉक्टर के लिए सवाल', art: 'open-questions' },
     { view: 'prepare-conversation', en: 'What matters to me', hi: 'मेरे लिए क्या ज़रूरी है', art: 'cancer-overview' },
+    { view: 'care-plan', en: 'My emergency care plan', hi: 'मेरी इमरजेंसी देखभाल योजना', art: 'doctor-pack' },
+    { view: 'living-will', en: 'My living will', hi: 'मेरी लिविंग विल', art: 'care-story' },
   ] },
 ];
 
-export function CareSectionPage({ view, hindi }: { view: CareView; hindi: boolean }) {
+export function CareSectionPage({ view, lang }: { view: CareView; lang: CareLang }) {
   const section = CARE_SECTIONS.find((item) => item.view === view);
   if (!section) return null;
   return <section className={`care-section-page tone-${section.color}`}>
-    <header><CareArt kind={section.art} /><h1>{hindi ? section.hi : section.en}</h1>{view === 'clinical-documents' && <Link href="/reports?upload=1" className="primary-button care-section-upload" aria-label={hindi ? 'रिपोर्ट अपलोड करें' : 'Upload report'} title={hindi ? 'रिपोर्ट अपलोड करें' : 'Upload report'}><IconUpload /><span className="care-section-upload-label">{hindi ? 'रिपोर्ट अपलोड करें' : 'Upload report'}</span></Link>}</header>
+    <header><CareArt kind={section.art} /><h1>{careText(lang, section.en, section.hi)}</h1>{view === 'clinical-documents' && <Link href="/reports?upload=1" className="primary-button care-section-upload" aria-label={careText(lang, 'Upload report', 'रिपोर्ट अपलोड करें')} title={careText(lang, 'Upload report', 'रिपोर्ट अपलोड करें')}><IconUpload /><span className="care-section-upload-label">{careText(lang, 'Upload report', 'रिपोर्ट अपलोड करें')}</span></Link>}</header>
     <div className="care-section-links">{section.items.map((item) => <CareRouteLink key={item.view} view={item.view}>
-      <CareArt kind={item.art} /><strong>{hindi ? item.hi : item.en}</strong><IconArrowRight />
+      <CareArt kind={item.art} /><strong>{careText(lang, item.en, item.hi)}</strong><IconArrowRight />
     </CareRouteLink>)}</div>
   </section>;
 }

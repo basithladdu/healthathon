@@ -4,7 +4,7 @@ import type { FormEvent } from 'react';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { CARE_ROUTES, careViewFromPath, canOpenCareView, type CareView as View } from './care-routes';
-import React, { useMemo, useState, useEffect, useRef } from 'react';
+import React, { useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import type { FamilyMember, PatientAccount } from './auth-screens';
 import { SimpleCareShell } from './simple-care-shell';
 import { SaharaLogo } from './sahara-logo';
@@ -60,7 +60,7 @@ import { INITIAL_FAMILY_TASKS, addFamilyTask, editFamilyTask, removeFamilyTask, 
 import { ectprQuickViews, EdQuickView, EmergencyCard } from './ectpr';
 import { EctprPlanScreen } from './ectpr-plan-screen';
 import { AmdScreen } from './amd-screen';
-import type { CareLang } from './care-i18n';
+import { applyCareLangToDocument, careText, loadCareDictionary, readSavedCareLang, saveCareLang, type CareLang } from './care-i18n';
 import {
   MyCarePlan,
   MyTimeline,
@@ -848,9 +848,23 @@ export function ContinuityPrototype() {
   const router = useRouter();
   const simpleMode = true;
   const [accessReady, setAccessReady] = useState(false);
-  const [hindi, setHindi] = useState(false);
-  // Language work replaces this with the header dropdown state.
-  const careLang: CareLang = hindi ? 'hi' : 'en';
+  const [lang, setLangState] = useState<CareLang>('en');
+  // Bumps when a language dictionary finishes loading so text re-renders in that language.
+  const [, setDictionaryVersion] = useState(0);
+  const setLang = useCallback((next: CareLang) => {
+    setLangState(next);
+    saveCareLang(next);
+  }, []);
+  useEffect(() => {
+    const saved = readSavedCareLang();
+    if (saved) setLangState(saved);
+  }, []);
+  useEffect(() => {
+    applyCareLangToDocument(lang);
+    let active = true;
+    loadCareDictionary(lang).then(() => { if (active) setDictionaryVersion((value) => value + 1); });
+    return () => { active = false; };
+  }, [lang]);
   const [currentRole, setCurrentRole] = useState<UserRole>('Dr Sujay · Clinical lead');
   const [authScreen, setAuthScreen] = useState<'login' | null>('login');
   const [sessionType, setSessionType] = useState<'care-team' | 'family' | 'patient'>('family');
@@ -991,7 +1005,6 @@ export function ContinuityPrototype() {
         if (saved.sessionType === 'family') setFamilyMember({ patientId: saved.selectedId, name: saved.name || 'Family member', relationship: 'Family member', verifiedSummaryOnly: true });
         else if (saved.sessionType === 'patient') setPatientAccount({ hospitalId: saved.selectedId, name: saved.name || 'Patient' });
         if (['Dr Sujay · Clinical lead', 'Dr Isha Menon · Emergency physician', 'Anitha Rao · Care Coordinator'].includes(saved.currentRole)) setCurrentRole(saved.currentRole);
-        setHindi(saved.hindi === true);
         setAuthScreen(null);
       }
     } catch { /* Opening a care space still works when browser storage is unavailable. */ }
@@ -1003,11 +1016,11 @@ export function ContinuityPrototype() {
     try {
       if (authScreen !== null) sessionStorage.removeItem('saanthvana-care-viewer');
       else sessionStorage.setItem('saanthvana-care-viewer', JSON.stringify({
-        sessionType, selectedId, currentRole, hindi,
+        sessionType, selectedId, currentRole, lang, hindi: lang === 'hi',
         name: sessionType === 'family' ? familyMember?.name : patientAccount?.name,
       }));
     } catch { /* The current care space remains available without remembering this tab. */ }
-  }, [accessReady, authScreen, sessionType, selectedId, currentRole, hindi, familyMember, patientAccount]);
+  }, [accessReady, authScreen, sessionType, selectedId, currentRole, lang, familyMember, patientAccount]);
 
   useEffect(() => {
     if (!accessReady || authScreen !== null) return;
@@ -4820,7 +4833,7 @@ export function ContinuityPrototype() {
                 <strong>Confidential Clinical Record:</strong> This document summarizes a documented goals-of-care conversation. Re-confirm clinical status with the patient and surrogate before making acute clinical orders.
               </span>
             </div>
-            <EdQuickView record={ectprQuickViews[selectedId] ?? null} audience="clinician" />
+            <EdQuickView record={ectprQuickViews[selectedId] ?? null} patientId={selectedId} audience="clinician" lang={lang} />
             <p className="print-only print-notice">
               This page is not a treatment order, resuscitation order, or legal
               directive, and it does not replace confirming the patient&rsquo;s current clinical
@@ -5348,7 +5361,7 @@ export function ContinuityPrototype() {
   }
 
   function renderAccessRequired() {
-    return <section className="simple-care-note"><h1>{hindi ? 'अनुमति चाहिए' : 'Ask for access'}</h1><p>{hindi ? 'मरीज़ तय करते हैं कि परिवार के साथ क्या साझा करना है।' : `${portalPatientName.split(' ')[0]} chooses what to share with the family.`}</p><button type="button" className="primary-button" onClick={() => navigate('care-circle')}>{hindi ? 'मेरे अपने' : 'Open care circle'}</button></section>;
+    return <section className="simple-care-note"><h1>{careText(lang, 'Ask for access', 'अनुमति चाहिए')}</h1><p>{careText(lang, `${portalPatientName.split(' ')[0]} chooses what to share with the family.`, 'मरीज़ तय करते हैं कि परिवार के साथ क्या साझा करना है।')}</p><button type="button" className="primary-button" onClick={() => navigate('care-circle')}>{careText(lang, 'Open care circle', 'मेरे अपने')}</button></section>;
   }
 
   function startConversationRequest(requestId: string) {
@@ -5394,9 +5407,9 @@ export function ContinuityPrototype() {
     if (!canReadPortalView(view)) return renderAccessRequired();
     switch (view) {
       case 'care-circle':
-        return <CareCircle patientId={portalPatientId} patientName={portalPatientName} author={portalAuthor} role={isPatientSession ? 'patient' : isFamilySession ? 'family' : 'doctor'} hindi={hindi} state={careCircle} onChange={setCareCircle} />;
+        return <CareCircle patientId={portalPatientId} patientName={portalPatientName} author={portalAuthor} role={isPatientSession ? 'patient' : isFamilySession ? 'family' : 'doctor'} lang={lang} state={careCircle} onChange={setCareCircle} />;
       case 'next-visit':
-        return <CareNextVisit patientId={portalPatientId} patientName={portalPatientName} author={portalAuthor} today={careToday} hindi={hindi}
+        return <CareNextVisit patientId={portalPatientId} patientName={portalPatientName} author={portalAuthor} today={careToday} lang={lang}
           viewer={taskViewerFor(portalPatientId)} assignees={taskPeopleFor(portalPatientId)}
           appointments={appointments} events={careEvents} tasks={familyTasks} reports={canReadReports ? careReports : []}
           onAddTask={(task) => setFamilyTasks((current) => task.patientId === portalPatientId ? addFamilyTask(current, task) : current)}
@@ -5404,7 +5417,7 @@ export function ContinuityPrototype() {
           onCompleteTask={(taskId, complete) => setFamilyTasks((current) => setFamilyTaskCompleted(current, portalPatientId, taskId, portalAuthor, complete))}
           onOpen={navigate} />;
       case 'medicines':
-        return <CareMedicines patientId={portalPatientId} author={portalAuthor} today={careToday} hindi={hindi} events={careEvents} checks={careChecks} reports={careReports} documents={documentText}
+        return <CareMedicines patientId={portalPatientId} author={portalAuthor} today={careToday} lang={lang} events={careEvents} checks={careChecks} reports={careReports} documents={documentText}
           onAdd={(event) => setCareEvents((current) => event.patientId === portalPatientId ? addCareEvent(current, event) : current)}
           onUpdate={(event) => {
             const previous = careEvents.find((item) => item.patientId === portalPatientId && item.id === event.id);
@@ -5438,7 +5451,7 @@ export function ContinuityPrototype() {
             fields={planFieldsFor(portalPatientId)}
             summaryAvailable={hasLoadedReleasedSummary(portalPatientId)}
             hasReleasedVersion={patientHasApprovedSummary(portalPatientId)}
-            quickView={<EdQuickView record={ectprQuickViews[portalPatientId] ?? null} audience="patient" />}
+            quickView={<EdQuickView record={ectprQuickViews[portalPatientId] ?? null} patientId={portalPatientId} audience="patient" lang={lang} />}
             consent={consentFor(portalPatientId)}
             onGoToConsent={() => navigate('consent')}
             onOpenSymptomTracker={() => setEsasOpen(true)}
@@ -5479,14 +5492,14 @@ export function ContinuityPrototype() {
       case 'clinical-documents':
       case 'access-care':
       case 'my-space':
-        return <CareSectionPage view={view} hindi={hindi} />;
+        return <CareSectionPage view={view} lang={lang} />;
       case 'community':
-        return <CareCommunity hindi={hindi} />;
+        return <CareCommunity lang={lang} />;
       case 'request-conversation': {
         const request = conversationRequests.filter((entry) => entry.patientId === portalPatientId && entry.requestedBy === portalAuthor && entry.role === sessionType)
           .sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0];
         return <CareConversationRequestForm key={`${portalPatientId}:${portalAuthor}:${request?.id ?? 'new'}`} patientId={portalPatientId} patientName={portalPatientName}
-          requester={portalAuthor} requesterRole={isFamilySession ? 'family' : 'patient'} request={request} hindi={hindi}
+          requester={portalAuthor} requesterRole={isFamilySession ? 'family' : 'patient'} request={request} lang={lang}
           onSave={(next) => {
             if (next.patientId !== portalPatientId || next.requestedBy !== portalAuthor || next.role !== sessionType) return;
             setConversationRequests((entries) => entries.some((entry) => entry.id === next.id) ? entries.map((entry) => entry.id === next.id ? next : entry) : [...entries, next]);
@@ -5503,20 +5516,20 @@ export function ContinuityPrototype() {
       }
       case 'medicine-access': {
         const key = `${portalPatientId}:${sessionType}:${portalAuthor}`;
-        return <CareMedicineAccess hindi={hindi} entry={medicineAccess[key] ?? { location: '', contactName: '', contactPhone: '', enquiry: '', status: 'to-call', updatedAt: '' }}
+        return <CareMedicineAccess lang={lang} entry={medicineAccess[key] ?? { location: '', contactName: '', contactPhone: '', enquiry: '', status: 'to-call', updatedAt: '' }}
           onChange={(entry) => setMedicineAccess((current) => ({ ...current, [key]: entry }))}
           careTeam={canReadCareNote ? detailsFor(portalPatientId).localPhysician : undefined} />;
       }
       case 'reports':
       case 'document-search':
-        return <CareDocumentSearch key={portalPatientId} patientId={portalPatientId} author={portalAuthor} hindi={hindi} reports={careReports} documents={documentText} onChange={setDocumentText} onReportsChange={setCareReports} editReportId={editReportId} onEditClose={() => setEditReportId(null)} onAddTreatment={canReadCareNote ? saveDocumentTreatment : undefined} onOpenCareStory={() => navigate('care-story')} />;
+        return <CareDocumentSearch key={portalPatientId} patientId={portalPatientId} author={portalAuthor} lang={lang} reports={careReports} documents={documentText} onChange={setDocumentText} onReportsChange={setCareReports} editReportId={editReportId} onEditClose={() => setEditReportId(null)} onAddTreatment={canReadCareNote ? saveDocumentTreatment : undefined} onOpenCareStory={() => navigate('care-story')} />;
       case 'support-resources':
         return <SupportResources />;
       case 'prepare-conversation': {
         const noteKey = `${sessionType}:${portalPatientId}:${portalAuthor}`;
         return <ConversationPreparation
           patientName={portalPatientName}
-          hindi={hindi}
+          lang={lang}
           author={`${portalAuthor} (${sessionType})`}
           notes={preparationNotes[noteKey] ?? {}}
           onChange={(notes) => setPreparationNotes((current) => ({ ...current, [noteKey]: notes }))}
@@ -5528,7 +5541,7 @@ export function ContinuityPrototype() {
         const signedHomeNote = [...(recordStates[portalPatientId]?.releases ?? [])]
           .filter((release) => release.patientId === portalPatientId && hasTypedCareNoteDoctorSignature(release))
           .sort((first, second) => second.number - first.number)[0];
-        return <FamilyCareHome patientName={portalPatientName} hindi={hindi}
+        return <FamilyCareHome patientName={portalPatientName} lang={lang}
           signedCareNote={canReadCareNote && hasTypedCareNoteDoctorSignature(signedHomeNote) ? { version: signedHomeNote.number, releasedAt: signedHomeNote.releasedAt, physician: signedHomeNote.signature!.name } : undefined}
           nextVisit={canReadCalendar ? nextVisit : undefined}
           patientId={portalPatientId} today={careToday} currentTime={currentDate.toTimeString().slice(0, 5)} author={portalAuthor} role={isFamilySession ? 'family' : 'patient'}
@@ -5542,12 +5555,12 @@ export function ContinuityPrototype() {
       }
       case 'comfort': {
         const author = portalAuthor;
-        return <FamilyComfortSpace patientId={portalPatientId} author={author} today={careToday} hindi={hindi}
+        return <FamilyComfortSpace patientId={portalPatientId} author={author} today={careToday} lang={lang}
           entries={comfortEntries} onChange={setComfortEntries} onOpenJournal={() => navigate('voice-journal')} onOpenSymptoms={() => navigate('symptom-diary')} />;
       }
       case 'family-tasks':
         return <CareTaskInbox key={`${portalPatientId}:${portalAuthor}`} patientId={portalPatientId} patientName={portalPatientName}
-          viewer={taskViewerFor(portalPatientId)} assignees={taskPeopleFor(portalPatientId)} tasks={familyTasks} appointments={appointments} today={careToday} hindi={hindi}
+          viewer={taskViewerFor(portalPatientId)} assignees={taskPeopleFor(portalPatientId)} tasks={familyTasks} appointments={appointments} today={careToday} lang={lang}
           onAdd={(task) => setFamilyTasks((current) => task.patientId === portalPatientId ? addFamilyTask(current, task) : current)}
           onEdit={(task) => setFamilyTasks((current) => editFamilyTask(current, portalPatientId, task))}
           onComplete={(taskId, complete) => setFamilyTasks((current) => setFamilyTaskCompleted(current, portalPatientId, taskId, portalAuthor, complete))} />;
@@ -5578,12 +5591,12 @@ export function ContinuityPrototype() {
           onRemove={(taskId) => setFamilyTasks((current) => removeFamilyTask(current, portalPatientId, taskId))}
           onRestore={(task) => setFamilyTasks((current) => restoreFamilyTask(current, portalPatientId, task))}
           onComplete={(taskId, complete) => setFamilyTasks((current) => setFamilyTaskCompleted(current, portalPatientId, taskId, author, complete))}
-          onPrepare={() => navigate('prepare-conversation')} onCareTeam={() => navigate('my-doctors')} onPlan={() => navigate('my-plan')} hindi={hindi} />;
+          onPrepare={() => navigate('prepare-conversation')} onCareTeam={() => navigate('my-doctors')} onPlan={() => navigate('my-plan')} lang={lang} />;
       }
       case 'calendar': {
         const author = portalAuthor;
-        return <>{view === 'calendar' && <div className="family-workspace-heading"><h1>{hindi ? 'कैलेंडर' : 'Calendar'}</h1></div>}
-          <CareCalendar patientId={portalPatientId} author={author} today={careToday} hindi={hindi}
+        return <>{view === 'calendar' && <div className="family-workspace-heading"><h1>{careText(lang, 'Calendar', 'कैलेंडर')}</h1></div>}
+          <CareCalendar patientId={portalPatientId} author={author} today={careToday} lang={lang}
             onAppointmentInstructions={saveAppointmentInstructions} onTestResults={() => navigate('lab-history')} onMedicines={() => navigate('medicines')}
             appointments={appointments} tasks={familyTasks} events={careEvents} checks={careChecks} reports={canReadReports ? careReports : []} reportSave={reportSave}
             documentText={canReadReports ? documentText : []} onReadReport={canReadReports ? (id) => { setEditReportId(id); navigate('document-search'); } : undefined}
@@ -5627,7 +5640,7 @@ export function ContinuityPrototype() {
       case 'lab-history': {
         const release = latestReleaseFor(portalPatientId);
         const author = portalAuthor;
-        return <FamilyCareTools tool={view} patientId={portalPatientId} patientName={portalPatientName} author={author} today={careToday} hindi={hindi}
+        return <FamilyCareTools tool={view} patientId={portalPatientId} patientName={portalPatientName} author={author} today={careToday} lang={lang}
           recordedStory={recordedStoryFor(portalPatientId)} knownContacts={knownContactsFor(portalPatientId)}
           symptoms={canReadCareNote ? symptoms : []} story={canReadCareNote ? careStory : []} contacts={handoverContacts} onSymptoms={setSymptoms} onStory={setCareStory} onContacts={setHandoverContacts}
           homeHelp={homeHelp} supportPlaces={supportPlaces} onHomeHelp={setHomeHelp} onSupportPlaces={setSupportPlaces}
@@ -5722,6 +5735,8 @@ export function ContinuityPrototype() {
             {renderPageHeading('Emergency card', 'Keep this with the patient')}
             <EmergencyCard
               record={ectprQuickViews[portalPatientId] ?? null}
+              patientId={portalPatientId}
+              lang={lang}
               audience={isPatientSession ? 'patient' : 'family'}
               issuedOn={cardIssuedById[portalPatientId] ?? null}
               {...(isPatientSession ? { onIssue: () => issueCard(portalPatientId) } : {})}
@@ -5729,7 +5744,7 @@ export function ContinuityPrototype() {
           </>
         );
       case 'my-details':
-        return simpleMode ? <CareProfile key={portalPatientId} details={detailsFor(portalPatientId)} hindi={hindi} onSave={(next) => saveDetails(portalPatientId, next)} /> : (
+        return simpleMode ? <CareProfile key={portalPatientId} details={detailsFor(portalPatientId)} lang={lang} onSave={(next) => saveDetails(portalPatientId, next)} /> : (
           <MyDetails
             details={detailsFor(portalPatientId)}
             onSave={(next) => saveDetails(portalPatientId, next)}
@@ -5740,9 +5755,9 @@ export function ContinuityPrototype() {
         );
       case 'care-plan':
       case 'doctor-care-plan':
-        return <EctprPlanScreen key={portalPatientId} patientId={portalPatientId} patientName={portalPatientName} role={isPatientSession ? 'patient' : isFamilySession ? 'family' : 'doctor'} clinician={currentRole} lang={careLang} />;
+        return <EctprPlanScreen key={portalPatientId} patientId={portalPatientId} patientName={portalPatientName} role={isPatientSession ? 'patient' : isFamilySession ? 'family' : 'doctor'} clinician={currentRole} lang={lang} />;
       case 'living-will':
-        return <AmdScreen key={portalPatientId} patientId={portalPatientId} patientName={portalPatientName} role={isPatientSession ? 'patient' : isFamilySession ? 'family' : 'doctor'} lang={careLang} />;
+        return <AmdScreen key={portalPatientId} patientId={portalPatientId} patientName={portalPatientName} role={isPatientSession ? 'patient' : isFamilySession ? 'family' : 'doctor'} lang={lang} />;
       case 'consent':
         return (
           <ConsentSignature
@@ -5791,7 +5806,7 @@ export function ContinuityPrototype() {
       : navItems.filter((item) => item.view !== 'caregiver');
 
   if (authScreen !== null) {
-    return <CareSignIn patients={workItems.map((item) => ({ id: item.hospitalId, name: item.patient }))} hindi={hindi} onLanguage={() => setHindi((value) => !value)}
+    return <CareSignIn patients={workItems.map((item) => ({ id: item.hospitalId, name: item.patient }))} lang={lang} onLanguage={setLang}
       onSignIn={({ role, patientId, name }) => {
         if (!workItems.some((item) => item.hospitalId === patientId)) return;
         const nextView = requestedView && canOpenCareView(requestedView, role === 'doctor' ? 'care-team' : role, 'Dr Sujay · Clinical lead')
@@ -5804,12 +5819,12 @@ export function ContinuityPrototype() {
 
   if (simpleMode && authScreen === null) {
     const saves = [preparationSave, taskSave, eventSave, checkSave, reportSave, appointmentSave, noteSave, symptomSave, storySave, contactSave, helpSave, placesSave, questionSave, copySave, comfortSave, voiceSave, costSave, labSave, conversationSave, profileSave, documentSave, acknowledgementSave, librarySave, circleSave, requestSave, requestLinkSave, medicineAccessSave];
-    if (saves.includes('loading')) return <CareLoading hindi={hindi} />;
+    if (saves.includes('loading')) return <CareLoading lang={lang} />;
     const saveStatus = saves.includes('unavailable') ? 'unavailable' : saves.includes('saving') ? 'saving' : 'saved';
     const role = isFamilySession ? 'family' : isPatientSession ? 'patient' : 'doctor';
-    return <SimpleCareShell view={view} role={role} hindi={hindi} saveStatus={saveStatus}
+    return <SimpleCareShell view={view} role={role} lang={lang} saveStatus={saveStatus}
       onSignOut={signOut}
-      onLanguage={() => setHindi((value) => !value)} onNavigate={navigate}
+      onLanguage={setLang} onNavigate={navigate}
       onRole={(next) => {
         if (next === 'doctor') enterCareTeam('Dr Sujay · Clinical lead');
         else if (next === 'patient') enterPatient({ hospitalId: selectedId, name: selectedItem.patient, dob: patientProfiles[selectedId]?.dob ?? '' });
@@ -5818,7 +5833,7 @@ export function ContinuityPrototype() {
       {!canReadPortalView(view) ? renderAccessRequired()
         : role === 'doctor' && view === 'home' ? <DoctorCareHome
         patients={workItems.map((item) => ({ id: item.hospitalId, name: item.patient, diagnosis: patientProfiles[item.hospitalId]?.diagnosis ?? patientProfiles[item.hospitalId]?.stage.split(' · ')[0] ?? '' }))}
-        records={recordStates} appointments={appointments} physician={currentRole.split(' · ')[0]} today={careToday} hindi={hindi}
+        records={recordStates} appointments={appointments} physician={currentRole.split(' · ')[0]} today={careToday} lang={lang}
         conversationRequests={conversationRequests} conversationImpactEpisodes={conversationImpactEpisodes} conversationImpactLoading={impactSave === 'loading' || requestSave === 'loading'} onStartConversationRequest={startConversationRequest} onOpenConversationVersion={openConversationVersion}
         onReview={(id) => { selectPatient(id); setView('doctor-review'); }}
         onRecord={(id) => { const patientId = id ?? selectedId; if (id) selectPatient(id); startDoctorImpactEpisode(patientId); setNewDoctorConversation(true); setView('doctor-record'); }}
@@ -5826,7 +5841,7 @@ export function ContinuityPrototype() {
         onTasks={(id) => { selectPatient(id); setView('family-tasks'); }} />
         : role === 'doctor' && view === 'doctor-record' ? <DoctorConversation key={`${selectedId}:${newDoctorConversation}`}
           patientId={selectedId} patientName={selectedItem.patient} patients={workItems.map((item) => ({ id: item.hospitalId, name: item.patient }))}
-          physician={currentRole.split(' · ')[0]} initialNote={newDoctorConversation || recordState.versionPublished ? '' : recordState.draftSource} hindi={hindi}
+          physician={currentRole.split(' · ')[0]} initialNote={newDoctorConversation || recordState.versionPublished ? '' : recordState.draftSource} lang={lang}
           referenceNote={currentRelease?.source || recordState.draftSource}
           previousContext={currentRelease?.signature ? { version: currentRelease.number, releasedAt: currentRelease.releasedAt, fields: currentRelease.fields } : undefined}
           requestContext={conversationRequests.find((request) => request.patientId === selectedId && request.id === activeConversationRequests[selectedId] && request.status === 'in-progress')}
@@ -5876,7 +5891,7 @@ export function ContinuityPrototype() {
           }}
           onFinishLater={() => navigate('home')} onFamily={(version) => { if (version) openConversationVersion(selectedId, version); }} />
         : view === 'my-plan' || view === 'note-history' || view === 'doctor-history' ? <CareNoteReader key={`${portalPatientId}:${noteSelection?.patientId === portalPatientId ? noteSelection.version : 'latest'}`}
-          patientId={portalPatientId} patientName={portalPatientName} releases={recordStates[portalPatientId]?.releases ?? []} hindi={hindi}
+          patientId={portalPatientId} patientName={portalPatientName} releases={recordStates[portalPatientId]?.releases ?? []} lang={lang}
           initialVersion={noteSelection?.patientId === portalPatientId ? noteSelection.version : undefined}
           doctor={role === 'doctor'} conversations={doctorConversations} acknowledgements={noteAcknowledgements}
           signerName={role === 'family' ? portalAuthor : portalPatientName} signerRole={role === 'family' ? 'family' : 'patient'}
@@ -6266,7 +6281,7 @@ export function ContinuityPrototype() {
               patientId={selectedItem.hospitalId}
               patientName={selectedItem.patient}
               author={portalAuthor}
-              hindi={hindi}
+              lang={lang}
               entries={symptoms}
               onEntriesChange={setSymptoms}
               saveStatus={symptomSave}

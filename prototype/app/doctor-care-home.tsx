@@ -8,10 +8,11 @@ import { IconUsers, IconFileText, IconClock, IconCheckCircle, IconArrowRight } f
 import type { CareConversationRequest } from './care-conversation-request-state';
 import { CareConversationImpact } from './care-conversation-impact.tsx';
 import type { CareConversationImpactEpisode } from './care-conversation-impact.ts';
+import { careLocale, careText, type CareLang } from './care-i18n';
 
-export function DoctorCareHome({ patients, records, appointments, physician, today, hindi, conversationRequests = [], conversationImpactEpisodes = [], conversationImpactLoading = false, onReview, onRecord, onHistory, onInstructions, onStartConversationRequest, onOpenConversationVersion, onTasks }: {
+export function DoctorCareHome({ patients, records, appointments, physician, today, lang, conversationRequests = [], conversationImpactEpisodes = [], conversationImpactLoading = false, onReview, onRecord, onHistory, onInstructions, onStartConversationRequest, onOpenConversationVersion, onTasks }: {
   patients: Array<{ id: string; name: string; diagnosis: string }>; records: Record<string, SummaryState>;
-  appointments: Appointment[]; physician: string; today: string; hindi: boolean;
+  appointments: Appointment[]; physician: string; today: string; lang: CareLang;
   conversationRequests?: CareConversationRequest[];
   conversationImpactEpisodes?: CareConversationImpactEpisode[];
   conversationImpactLoading?: boolean;
@@ -25,7 +26,7 @@ export function DoctorCareHome({ patients, records, appointments, physician, tod
   const [query, setQuery] = useState('');
   const [onlyPending, setOnlyPending] = useState(false);
   const [schedule, setSchedule] = useState<'today' | 'upcoming'>('upcoming');
-  const t = (en: string, hi: string) => hindi ? hi : en;
+  const t = (en: string, hi: string) => careText(lang, en, hi);
   const patientIds = new Set(patients.map((patient) => patient.id));
   const pending = patients.filter((patient) => !records[patient.id]?.versionPublished);
   const approved = patients.filter((patient) => records[patient.id] && latestSummaryRelease(records[patient.id]));
@@ -41,7 +42,7 @@ export function DoctorCareHome({ patients, records, appointments, physician, tod
       <div className="doctor-conversation-status">{completed ? <><span>{t('Recorded', 'दर्ज')}</span><button type="button" disabled={!onOpenConversationVersion} onClick={() => onOpenConversationVersion?.(request.patientId, request.signedVersion!)}>{t('Open signed note', 'हस्ताक्षरित नोट खोलें')} <IconArrowRight /></button></> : <><span>{request.status === 'in-progress' ? t('In progress', 'जारी है') : t('Requested', 'अनुरोध')}</span><button type="button" disabled={!onStartConversationRequest} className="care-text-button" onClick={() => onStartConversationRequest?.(request.id)}>{request.status === 'in-progress' ? t('Continue', 'जारी रखें') : t('Start conversation', 'बातचीत शुरू करें')} <IconArrowRight /></button></>}</div>
     </li>;
   };
-  const dateLabel = (date: string) => new Date(`${date}T12:00:00`).toLocaleDateString(hindi ? 'hi-IN' : 'en-GB', { day: 'numeric', month: 'short' });
+  const dateLabel = (date: string) => new Date(`${date}T12:00:00`).toLocaleDateString(careLocale(lang), { day: 'numeric', month: 'short' });
   return <section className="doctor-care-home">
     <header className="doctor-care-heading"><div><h1>{t('Care team', 'देखभाल टीम')}</h1><span>{physician}</span></div><label className="doctor-patient-search"><span className="sr-only">{t('Find a patient', 'मरीज़ ढूँढें')}</span><input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t('Find a patient', 'मरीज़ ढूँढें')} /></label></header>
     <div className="doctor-home-actions"><button type="button" className="primary-button" onClick={() => onRecord()}><IconFileText />{t('Record conversation', 'बातचीत दर्ज करें')}</button><button type="button" className="secondary-button" onClick={() => onHistory()}><IconClock />{t('Note history', 'पुराने नोट')}</button></div>
@@ -65,7 +66,7 @@ export function DoctorCareHome({ patients, records, appointments, physician, tod
         {!visiblePatients.length && <p>{t('No matching people here.', 'कोई मेल नहीं मिला।')}</p>}
       </section>
       <section id="doctor-visit-list" className="doctor-home-panel doctor-visit-panel" aria-labelledby="doctor-visits-title"><div className="family-section-heading"><h2 id="doctor-visits-title">{t('Appointments', 'मुलाकातें')}</h2><div className="doctor-schedule-toggle"><button type="button" aria-pressed={schedule === 'today'} onClick={() => setSchedule('today')}>{t('Today', 'आज')}</button><button type="button" aria-pressed={schedule === 'upcoming'} onClick={() => setSchedule('upcoming')}>{t('Upcoming', 'आगे की')}</button></div></div>
-        <ol className="doctor-visit-list">{visibleVisits.map((visit) => <li key={visit.id}><div className="doctor-visit-date"><time dateTime={`${visit.date}T${visit.time}`}>{dateLabel(visit.date)}<strong>{visit.time}</strong></time></div><div><strong>{patients.find((patient) => patient.id === visit.hospitalId)?.name}</strong><span>{visit.type}</span><small>{visit.clinician} · {visit.mode}</small></div><VisitInstructions key={`${visit.hospitalId}:${visit.id}`} value={visit.preparationInstructions} author={physician} clinician={visit.clinician} hindi={hindi} onChange={(value) => onInstructions(visit.hospitalId, visit.id, value)} /></li>)}</ol>
+        <ol className="doctor-visit-list">{visibleVisits.map((visit) => <li key={visit.id}><div className="doctor-visit-date"><time dateTime={`${visit.date}T${visit.time}`}>{dateLabel(visit.date)}<strong>{visit.time}</strong></time></div><div><strong>{patients.find((patient) => patient.id === visit.hospitalId)?.name}</strong><span>{visit.type}</span><small>{visit.clinician} · {visit.mode}</small></div><VisitInstructions key={`${visit.hospitalId}:${visit.id}`} value={visit.preparationInstructions} author={physician} clinician={visit.clinician} lang={lang} onChange={(value) => onInstructions(visit.hospitalId, visit.id, value)} /></li>)}</ol>
         {!visibleVisits.length && <p>{t('No appointments recorded for this view.', 'इस सूची में कोई मुलाकात दर्ज नहीं है।')}</p>}
       </section>
     </div>

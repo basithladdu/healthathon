@@ -2,6 +2,7 @@
 
 import { useId, useState } from 'react';
 import { downloadCarePdf } from './care-pdf';
+import { careText, type CareLang } from './care-i18n';
 
 const QUESTIONS = [
   ['understanding', 'What do you understand about the illness?', 'बीमारी के बारे में आप क्या समझते हैं?'],
@@ -14,15 +15,15 @@ const QUESTIONS = [
 
 export type PreparationNotes = Partial<Record<(typeof QUESTIONS)[number][0], string>> & { checkIn?: 'no-change' | 'nothing-to-add' };
 
-export function ConversationPreparation({ patientName, author, notes, onChange, hindi = false }: {
-  patientName: string; author: string; notes: PreparationNotes; onChange: (notes: PreparationNotes) => void; hindi?: boolean;
+export function ConversationPreparation({ patientName, author, notes, onChange, lang = 'en' }: {
+  patientName: string; author: string; notes: PreparationNotes; onChange: (notes: PreparationNotes) => void; lang?: CareLang;
 }) {
   const id = useId();
   const [editing, setEditing] = useState(false);
   const [prompts, setPrompts] = useState(false);
   const [error, setError] = useState('');
   const hasNotes = QUESTIONS.some(([key]) => notes[key]?.trim());
-  const t = (en: string, hi: string) => hindi ? hi : en;
+  const t = (en: string, hi: string) => careText(lang, en, hi);
   async function downloadNotes() {
     try { await downloadCarePdf({ fileName: 'sahara-next-visit-notes.pdf', title: patientName + ' — Next visit', subtitle: 'Written by ' + author,
       sections: QUESTIONS.filter(([key]) => notes[key]?.trim()).map(([key, en, hi]) => ({ heading: t(en, hi), lines: [notes[key]!.trim()] })) }); }

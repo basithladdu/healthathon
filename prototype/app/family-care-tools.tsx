@@ -28,10 +28,11 @@ import type { CareNoteAcknowledgement } from './care-note-signing-state';
 import { IconArrowRight } from './icons';
 import { CareArt } from './care-art';
 import { CareRouteLink } from './care-route-link';
+import { careText, type CareLang } from './care-i18n';
 
 export type FamilyTool = 'symptom-diary' | 'care-story' | 'doctor-pack' | 'home-help' | 'support-places' | 'open-questions' | 'copy-tracker' | 'voice-journal' | 'cancer-overview' | 'cost-help' | 'lab-history';
-export function FamilyCareTools({ tool, patientId, patientName, author, today, hindi, symptoms, story, recordedStory, contacts, knownContacts, homeHelp, supportPlaces, questions, copies, releases, voiceJournal, onVoiceJournal, voiceSave, costs, onCosts, labResults, onLabResults, treatmentEvents, acknowledgements = [], signedRelease, diagnosis, team, reports, onOpen, onCareNote, onReports, onReadReport, onSymptoms, onStory, onContacts, onHomeHelp, onSupportPlaces, onQuestions, onCopies, note, calendarText, reportNames }: {
-  tool: FamilyTool; patientId: string; patientName: string; author: string; today: string; hindi: boolean;
+export function FamilyCareTools({ tool, patientId, patientName, author, today, lang, symptoms, story, recordedStory, contacts, knownContacts, homeHelp, supportPlaces, questions, copies, releases, voiceJournal, onVoiceJournal, voiceSave, costs, onCosts, labResults, onLabResults, treatmentEvents, acknowledgements = [], signedRelease, diagnosis, team, reports, onOpen, onCareNote, onReports, onReadReport, onSymptoms, onStory, onContacts, onHomeHelp, onSupportPlaces, onQuestions, onCopies, note, calendarText, reportNames }: {
+  tool: FamilyTool; patientId: string; patientName: string; author: string; today: string; lang: CareLang;
   symptoms: SymptomEntry[]; story: CareStoryEntry[]; contacts: HandoverContact[];
   recordedStory?: readonly CareStoryEntry[];
   knownContacts?: readonly HandoverContact[];
@@ -50,21 +51,21 @@ export function FamilyCareTools({ tool, patientId, patientName, author, today, h
   calendarText: string; reportNames: string[];
 }) {
   return <div className="family-care-tools">
-    {tool === 'symptom-diary' && <FamilySymptomDiary key={patientId} patientId={patientId} author={author} today={today} hindi={hindi} entries={symptoms} onChange={onSymptoms} />}
-    {tool === 'care-story' && <FamilyCareStory key={patientId} patientId={patientId} author={author} today={today} hindi={hindi} entries={story} recordedEntries={recordedStory} reports={reports} onReadReport={onReadReport} onChange={onStory} />}
-    {tool === 'doctor-pack' && <FamilyHandoverPack key={patientId} patientId={patientId} patientName={patientName} author={author} hindi={hindi} note={note} signedRelease={signedRelease} acknowledgements={acknowledgements} calendarText={calendarText} reportNames={reportNames} contacts={contacts} knownContacts={knownContacts} onContactsChange={onContacts} />}
-    {tool === 'home-help' && <FamilyHomeHelp key={patientId} patientId={patientId} author={author} today={today} hindi={hindi} entries={homeHelp} onChange={onHomeHelp} />}
-    {tool === 'support-places' && <FamilySupportPlaces key={patientId} patientId={patientId} author={author} today={today} hindi={hindi} entries={supportPlaces} onChange={onSupportPlaces} />}
-    {tool === 'open-questions' && <FamilyOpenQuestions key={patientId} patientId={patientId} author={author} today={today} hindi={hindi} entries={questions} onChange={onQuestions} />}
-    {tool === 'copy-tracker' && <FamilyCopyTracker key={patientId} patientId={patientId} patientName={patientName} author={author} today={today} hindi={hindi} releases={releases} acknowledgements={acknowledgements} entries={copies} onChange={onCopies} />}
-    {tool === 'voice-journal' && <FamilyVoiceJournal key={patientId} patientId={patientId} author={author} today={today} hindi={hindi} entries={voiceJournal} onChange={onVoiceJournal} saveStatus={voiceSave} />}
-    {tool === 'cost-help' && <FamilyCostHelp key={patientId} patientId={patientId} author={author} today={today} hindi={hindi} state={costs} onChange={onCosts} />}
-    {tool === 'lab-history' && <FamilyLabHistory key={patientId} patientId={patientId} author={author} today={today} hindi={hindi} reports={reports} entries={labResults} onChange={onLabResults} treatmentEvents={treatmentEvents} />}
-    {tool === 'cancer-overview' && <FamilyCancerOverview key={patientId} patientId={patientId} patientName={patientName} diagnosis={diagnosis} team={team} hindi={hindi} symptoms={symptoms} story={story} reports={reports} onCareStory={() => onOpen('care-story')} onSymptoms={() => onOpen('symptom-diary')} onCareNote={onCareNote} onReports={onReports} />}
+    {tool === 'symptom-diary' && <FamilySymptomDiary key={patientId} patientId={patientId} author={author} today={today} lang={lang} entries={symptoms} onChange={onSymptoms} />}
+    {tool === 'care-story' && <FamilyCareStory key={patientId} patientId={patientId} author={author} today={today} lang={lang} entries={story} recordedEntries={recordedStory} reports={reports} onReadReport={onReadReport} onChange={onStory} />}
+    {tool === 'doctor-pack' && <FamilyHandoverPack key={patientId} patientId={patientId} patientName={patientName} author={author} lang={lang} note={note} signedRelease={signedRelease} acknowledgements={acknowledgements} calendarText={calendarText} reportNames={reportNames} contacts={contacts} knownContacts={knownContacts} onContactsChange={onContacts} />}
+    {tool === 'home-help' && <FamilyHomeHelp key={patientId} patientId={patientId} author={author} today={today} lang={lang} entries={homeHelp} onChange={onHomeHelp} />}
+    {tool === 'support-places' && <FamilySupportPlaces key={patientId} patientId={patientId} author={author} today={today} lang={lang} entries={supportPlaces} onChange={onSupportPlaces} />}
+    {tool === 'open-questions' && <FamilyOpenQuestions key={patientId} patientId={patientId} author={author} today={today} lang={lang} entries={questions} onChange={onQuestions} />}
+    {tool === 'copy-tracker' && <FamilyCopyTracker key={patientId} patientId={patientId} patientName={patientName} author={author} today={today} lang={lang} releases={releases} acknowledgements={acknowledgements} entries={copies} onChange={onCopies} />}
+    {tool === 'voice-journal' && <FamilyVoiceJournal key={patientId} patientId={patientId} author={author} today={today} lang={lang} entries={voiceJournal} onChange={onVoiceJournal} saveStatus={voiceSave} />}
+    {tool === 'cost-help' && <FamilyCostHelp key={patientId} patientId={patientId} author={author} today={today} lang={lang} state={costs} onChange={onCosts} />}
+    {tool === 'lab-history' && <FamilyLabHistory key={patientId} patientId={patientId} author={author} today={today} lang={lang} reports={reports} entries={labResults} onChange={onLabResults} treatmentEvents={treatmentEvents} />}
+    {tool === 'cancer-overview' && <FamilyCancerOverview key={patientId} patientId={patientId} patientName={patientName} diagnosis={diagnosis} team={team} lang={lang} symptoms={symptoms} story={story} reports={reports} onCareStory={() => onOpen('care-story')} onSymptoms={() => onOpen('symptom-diary')} onCareNote={onCareNote} onReports={onReports} />}
   </div>;
 }
 
-export function FamilyToolButtons({ hindi, onOpen }: { hindi: boolean; onOpen: (tool: FamilyTool) => void }) {
+export function FamilyToolButtons({ lang, onOpen }: { lang: CareLang; onOpen: (tool: FamilyTool) => void }) {
   const tools = [
     { key: 'cancer-overview', en: 'My cancer care', hi: 'मेरी कैंसर देखभाल' },
     { key: 'symptom-diary', en: 'How are you feeling?', hi: 'आज कैसा लग रहा है?' },
@@ -76,6 +77,6 @@ export function FamilyToolButtons({ hindi, onOpen }: { hindi: boolean; onOpen: (
     { key: 'copy-tracker', en: 'Who has the latest copy?', hi: 'नई कॉपी किसके पास है?' },
   ] as const;
   return <div className="family-tool-buttons">{tools.map(({ key, en, hi }) => <CareRouteLink key={key} view={key} data-tool={key} onOpen={() => onOpen(key)}>
-    <span className="family-tool-icon" aria-hidden="true"><CareArt kind={key} /></span><span className="family-tool-label">{hindi ? hi : en}</span><span className="family-tool-arrow" aria-hidden="true"><IconArrowRight /></span>
+    <span className="family-tool-icon" aria-hidden="true"><CareArt kind={key} /></span><span className="family-tool-label">{careText(lang, en, hi)}</span><span className="family-tool-arrow" aria-hidden="true"><IconArrowRight /></span>
   </CareRouteLink>)}</div>;
 }

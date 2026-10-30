@@ -3,13 +3,14 @@
 import { useId, useState } from 'react';
 import { createCareConversationRequest, type CareConversationRequest } from './care-conversation-request-state';
 import './care-conversation-request.css';
+import { careText, type CareLang } from './care-i18n';
 
 export type CareConversationRequestFormProps = {
   patientId: string;
   patientName: string;
   requester: string;
   requesterRole: CareConversationRequest['role'];
-  hindi?: boolean;
+  lang?: CareLang;
   request?: CareConversationRequest;
   onSave: (request: CareConversationRequest) => void;
   onCancel: (id: string) => void;
@@ -23,13 +24,13 @@ const TOPICS = [
   ['Questions for my care team', 'देखभाल टीम से सवाल'],
 ] as const;
 
-export function CareConversationRequestForm({ patientId, patientName, requester, requesterRole, hindi = false, request, onSave, onCancel, onOpenSignedVersion }: CareConversationRequestFormProps) {
+export function CareConversationRequestForm({ patientId, patientName, requester, requesterRole, lang = 'en', request, onSave, onCancel, onOpenSignedVersion }: CareConversationRequestFormProps) {
   const id = useId();
   const [topics, setTopics] = useState<string[]>(request?.topics ?? []);
   const [note, setNote] = useState(request?.note ?? '');
   const [editing, setEditing] = useState(!request || request.status === 'cancelled');
   const [requestAnother, setRequestAnother] = useState(false);
-  const t = (en: string, hi: string) => hindi ? hi : en;
+  const t = (en: string, hi: string) => careText(lang, en, hi);
   const statusLabel: Record<CareConversationRequest['status'], string> = {
     requested: t('Requested', 'अनुरोध किया'),
     'in-progress': t('Conversation in progress', 'बातचीत जारी है'),

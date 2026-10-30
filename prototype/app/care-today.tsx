@@ -9,6 +9,7 @@ import { medicinePrescription } from './care-medicines-state';
 import { CareRouteLink } from './care-route-link';
 import { IconArrowRight } from './icons';
 import './care-today.css';
+import { careLocale, careText, type CareLang } from './care-i18n';
 
 export type CareTodayProps = {
   patientId: string;
@@ -19,7 +20,7 @@ export type CareTodayProps = {
   events: CareEvent[];
   checks: CareCheck[];
   onMedicineTaken: (eventId: string, date: string, complete: boolean) => void;
-  hindi?: boolean;
+  lang?: CareLang;
 };
 
 function localClock(): string {
@@ -27,10 +28,10 @@ function localClock(): string {
   return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 }
 
-export function CareToday({ patientId, today, currentTime, author, role, events, checks, onMedicineTaken, hindi = false }: CareTodayProps) {
+export function CareToday({ patientId, today, currentTime, author, role, events, checks, onMedicineTaken, lang = 'en' }: CareTodayProps) {
   const [clock, setClock] = useState(currentTime);
   const [regimens, setRegimens] = useState<MedicineRegimen[]>([]);
-  const t = (en: string, hi: string) => hindi ? hi : en;
+  const t = (en: string, hi: string) => careText(lang, en, hi);
   useEffect(() => {
     const timer = window.setInterval(() => setClock(localClock()), 30_000);
     return () => window.clearInterval(timer);
@@ -44,7 +45,7 @@ export function CareToday({ patientId, today, currentTime, author, role, events,
   const regimenById = new Map(regimens.map((item) => [item.id, item]));
   const dateLabel = next?.date === today
     ? t('Today', 'आज')
-    : next ? new Date(`${next.date}T12:00:00Z`).toLocaleDateString(hindi ? 'hi-IN' : 'en-IN', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }) : '';
+    : next ? new Date(`${next.date}T12:00:00Z`).toLocaleDateString(careLocale(lang, 'en-IN'), { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }) : '';
 
   return <section className="care-today" data-role={role} aria-labelledby="care-today-title">
     <header className="care-today-heading">
@@ -59,8 +60,8 @@ export function CareToday({ patientId, today, currentTime, author, role, events,
           const linkedRegimen = prescription?.regimenId ? regimenById.get(prescription.regimenId) : undefined;
           const imageId = linkedRegimen?.medicineImageId ?? prescription?.medicineImageId;
           return <article className="care-next-dose-medicine" role="listitem" key={medicine.id}>
-            {imageId ? <StoredMedicinePhoto imageId={imageId} alt={medicine.title} hindi={hindi} />
-              : prescription?.medicineImage ? <MedicinePhoto file={prescription.medicineImage} alt={medicine.title} hindi={hindi} /> : null}
+            {imageId ? <StoredMedicinePhoto imageId={imageId} alt={medicine.title} lang={lang} />
+              : prescription?.medicineImage ? <MedicinePhoto file={prescription.medicineImage} alt={medicine.title} lang={lang} /> : null}
             <div className="care-next-dose-copy"><strong>{medicine.title}</strong><p>{medicine.instructions}</p></div>
             {next.date === today && <button type="button" className="care-today-check" aria-label={`${author}: ${t(`record ${medicine.title} as taken`, `${medicine.title} ली हुई दर्ज करें`)}`} onClick={() => onMedicineTaken(medicine.id, next.date, true)}>{t('Taken', 'ले ली')}</button>}
           </article>;

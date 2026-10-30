@@ -7,13 +7,14 @@ import type { CareReport } from './care-calendar-state';
 import { IconArrowRight, IconFileText } from './icons';
 import { CareArt } from './care-art';
 import './family-cancer-overview.css';
+import { careLocale, careText, type CareLang } from './care-i18n';
 
 export type FamilyCancerOverviewProps = {
   patientId: string;
   patientName: string;
   diagnosis: string;
   team: string;
-  hindi: boolean;
+  lang: CareLang;
   symptoms: SymptomEntry[];
   story: CareStoryEntry[];
   reports: CareReport[];
@@ -28,17 +29,17 @@ const symptomHindi: Record<string, string> = {
   'Sleep trouble': 'नींद की परेशानी', Breathlessness: 'साँस फूलना', 'Low mood': 'मन उदास होना',
 };
 
-export function FamilyCancerOverview({ patientId, patientName, diagnosis, team, hindi, symptoms, story, reports, onCareStory, onCareNote, onSymptoms, onReports }: FamilyCancerOverviewProps) {
+export function FamilyCancerOverview({ patientId, patientName, diagnosis, team, lang, symptoms, story, reports, onCareStory, onCareNote, onSymptoms, onReports }: FamilyCancerOverviewProps) {
   const id = useId();
-  const t = (en: string, hi: string) => hindi ? hi : en;
-  const dateLabel = (value: string) => new Date(`${value}T12:00:00Z`).toLocaleDateString(hindi ? 'hi-IN' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+  const t = (en: string, hi: string) => careText(lang, en, hi);
+  const dateLabel = (value: string) => new Date(`${value}T12:00:00Z`).toLocaleDateString(careLocale(lang), { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
   const patientStory = story.filter((entry) => entry.patientId === patientId).sort((a, b) => b.date.localeCompare(a.date));
   const patientSymptoms = symptoms.filter((entry) => entry.patientId === patientId).sort((a, b) => b.date.localeCompare(a.date));
   const patientReports = reports.filter((entry) => entry.patientId === patientId).sort((a, b) => b.date.localeCompare(a.date));
   const latestStory = patientStory[0];
   const latestSymptom = patientSymptoms[0];
   const latestReport = patientReports[0];
-  const symptomLabel = (value: string) => hindi ? symptomHindi[value] ?? value : value;
+  const symptomLabel = (value: string) => careText(lang, value, symptomHindi[value] ?? value);
   const timeline = [
     ...patientStory.map((entry) => ({
       key: `story:${entry.id}`, date: entry.date, title: entry.title,
@@ -47,7 +48,7 @@ export function FamilyCancerOverview({ patientId, patientName, diagnosis, team, 
     })),
     ...patientSymptoms.map((entry) => ({
       key: `symptom:${entry.id}`, date: entry.date,
-      title: `${symptomLabel(entry.symptom)} · ${symptomSeverityText(entry.severity, hindi)}`,
+      title: `${symptomLabel(entry.symptom)} · ${symptomSeverityText(entry.severity, lang)}`,
       source: t('Feeling note', 'तबीयत का नोट'), author: entry.editedBy || entry.author,
       kind: 'symptom', open: onSymptoms,
     })),

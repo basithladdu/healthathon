@@ -1,3 +1,4 @@
+import { careLangOf, careText, type CareLang } from './care-i18n.ts';
 export const PAIN_BODY_SITES = [
   { id: 'head', en: 'Head', hi: 'सिर' },
   { id: 'neck', en: 'Neck', hi: 'गर्दन' },
@@ -39,9 +40,9 @@ export function isPainBodySite(value: unknown): value is PainBodySite {
   return typeof value === 'string' && PAIN_BODY_SITES.some((site) => site.id === value);
 }
 
-export function painBodySiteName(value: PainBodySite, hindi = false): string {
+export function painBodySiteName(value: PainBodySite, hindi: boolean | CareLang = false): string {
   const site = PAIN_BODY_SITES.find((item) => item.id === value);
-  return site ? site[hindi ? 'hi' : 'en'] : value;
+  return site ? careText(careLangOf(hindi), site.en, site.hi) : value;
 }
 
 export function togglePainBodySite(selected: readonly PainBodySite[], site: PainBodySite): PainBodySite[] {

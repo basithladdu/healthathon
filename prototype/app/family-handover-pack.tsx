@@ -9,12 +9,13 @@ import {
   removeHandoverContact, restoreHandoverContact, updateHandoverContact,
   type HandoverContact, type HandoverNote, type HandoverSelection,
 } from './family-handover-state';
+import { careLocale, careText, type CareLang } from './care-i18n';
 
 type FamilyHandoverPackProps = {
   patientId: string;
   patientName: string;
   author: string;
-  hindi: boolean;
+  lang: CareLang;
   note: HandoverNote | null;
   signedRelease?: SummaryRelease;
   acknowledgements?: readonly CareNoteAcknowledgement[];
@@ -29,9 +30,9 @@ export function FamilyHandoverPack(props: FamilyHandoverPackProps) {
   return <PatientHandoverPack key={props.patientId} {...props} />;
 }
 
-function PatientHandoverPack({ patientId, patientName, author, hindi, note, signedRelease, acknowledgements = [], calendarText, reportNames, contacts, knownContacts = [], onContactsChange }: FamilyHandoverPackProps) {
+function PatientHandoverPack({ patientId, patientName, author, lang, note, signedRelease, acknowledgements = [], calendarText, reportNames, contacts, knownContacts = [], onContactsChange }: FamilyHandoverPackProps) {
   const id = useId();
-  const t = (en: string, hi: string) => hindi ? hi : en;
+  const t = (en: string, hi: string) => careText(lang, en, hi);
   const [selection, setSelection] = useState<HandoverSelection>({ ...DEFAULT_HANDOVER_SELECTION });
   const [contactFormOpen, setContactFormOpen] = useState(false);
   const [editing, setEditing] = useState<HandoverContact | null>(null);
@@ -48,7 +49,7 @@ function PatientHandoverPack({ patientId, patientName, author, hindi, note, sign
   const files = reportNames.filter((value) => value.trim());
   const hasFamilyExtras = (selection.checklist && Boolean(calendarText.trim())) || (selection.reports && files.length > 0) || (selection.contacts && patientContacts.length > 0);
   const hasPack = (selection.note && Boolean(note)) || hasFamilyExtras;
-  const reviewedDate = note && Number.isFinite(Date.parse(note.releasedAt)) ? new Date(note.releasedAt).toLocaleDateString(hindi ? 'hi-IN' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : note?.releasedAt;
+  const reviewedDate = note && Number.isFinite(Date.parse(note.releasedAt)) ? new Date(note.releasedAt).toLocaleDateString(careLocale(lang), { day: 'numeric', month: 'short', year: 'numeric' }) : note?.releasedAt;
 
   useEffect(() => () => { printFrame.current?.remove(); }, []);
   useEffect(() => { if (contactFormOpen) nameInput.current?.focus(); }, [contactFormOpen, editing]);

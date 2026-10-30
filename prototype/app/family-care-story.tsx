@@ -6,6 +6,7 @@ import {
   CARE_STORY_KINDS, addCareStoryEntry, removeCareStoryEntry, restoreCareStoryEntry,
   selectCareStoryEntries, updateCareStoryEntry, type CareStoryDraft, type CareStoryEntry, type CareStoryFilter, type CareStoryKind,
 } from './family-care-story-state';
+import { careLocale, careText, type CareLang } from './care-i18n';
 
 export type { CareStoryEntry } from './family-care-story-state';
 
@@ -13,7 +14,7 @@ type FamilyCareStoryProps = {
   patientId: string;
   author: string;
   today: string;
-  hindi: boolean;
+  lang: CareLang;
   entries: CareStoryEntry[];
   recordedEntries?: readonly CareStoryEntry[];
   reports?: readonly CareReport[];
@@ -33,7 +34,7 @@ export function FamilyCareStory(props: FamilyCareStoryProps) {
   return <CareStoryContent key={`${props.patientId}:${props.author}`} {...props} />;
 }
 
-function CareStoryContent({ patientId, author, today, hindi, entries, recordedEntries = [], reports = [], onReadReport, onChange }: FamilyCareStoryProps) {
+function CareStoryContent({ patientId, author, today, lang, entries, recordedEntries = [], reports = [], onReadReport, onChange }: FamilyCareStoryProps) {
   const id = useId();
   const titleInput = useRef<HTMLInputElement>(null);
   const [filter, setFilter] = useState<CareStoryFilter>('All');
@@ -42,8 +43,8 @@ function CareStoryContent({ patientId, author, today, hindi, entries, recordedEn
   const [draft, setDraft] = useState(() => emptyDraft(today));
   const [removed, setRemoved] = useState<CareStoryEntry[]>([]);
   const [message, setMessage] = useState('');
-  const t = (english: string, translated: string) => hindi ? translated : english;
-  const kindLabel = (kind: CareStoryKind) => hindi ? HINDI_KINDS[kind] : kind;
+  const t = (english: string, translated: string) => careText(lang, english, translated);
+  const kindLabel = (kind: CareStoryKind) => careText(lang, kind, HINDI_KINDS[kind]);
   const allEntries = [
     ...selectCareStoryEntries([...recordedEntries], patientId).map((entry) => ({ ...entry, fromRecord: true })),
     ...selectCareStoryEntries(entries, patientId).map((entry) => ({ ...entry, fromRecord: false })),
@@ -159,7 +160,7 @@ function CareStoryContent({ patientId, author, today, hindi, entries, recordedEn
     <p className="care-story-message" role="status">{message}</p>
 
     {visible.length > 0 ? <ol className="care-story-timeline" aria-label={t('Care timeline', 'देखभाल का क्रम')} tabIndex={0}>{visible.map((entry) => <li key={`${entry.fromRecord ? 'record' : 'family'}-${entry.id}`} data-kind={entry.kind}>
-      <div className="care-story-date"><time dateTime={entry.date}>{new Date(`${entry.date}T00:00:00`).toLocaleDateString(hindi ? 'hi-IN' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</time></div>
+      <div className="care-story-date"><time dateTime={entry.date}>{new Date(`${entry.date}T00:00:00`).toLocaleDateString(careLocale(lang), { day: 'numeric', month: 'short', year: 'numeric' })}</time></div>
       <article className="care-story-card">
         <div className="care-story-card-heading"><span>{kindLabel(entry.kind)}{entry.date > today && <> · {t('Planned', 'तय किया गया')}</>}</span>{!entry.fromRecord && <div><button type="button" onClick={() => edit(entry)} aria-label={`${t('Edit', 'बदलें')}: ${entry.title}`}>{t('Edit', 'बदलें')}</button><button type="button" onClick={() => remove(entry)} aria-label={`${t('Remove', 'हटाएँ')}: ${entry.title}`}>{t('Remove', 'हटाएँ')}</button></div>}</div>
         <h2>{entry.title}</h2>

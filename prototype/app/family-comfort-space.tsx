@@ -5,13 +5,14 @@ import {
   COMFORT_FEELINGS, addComfortEntry, exportComfortEntries, latestComfortEntryToday, removeComfortEntry,
   restoreComfortEntry, selectComfortEntries, type ComfortEntry, type ComfortFeeling,
 } from './family-comfort-state';
+import { careLocale, careText, type CareLang } from './care-i18n';
 
 export type { ComfortEntry } from './family-comfort-state';
 type FamilyComfortSpaceProps = {
   patientId: string;
   author: string;
   today: string;
-  hindi: boolean;
+  lang: CareLang;
   entries: ComfortEntry[];
   onChange: (entries: ComfortEntry[]) => void;
   onOpenJournal: () => void;
@@ -24,17 +25,17 @@ export function FamilyComfortSpace(props: FamilyComfortSpaceProps) {
   return <ComfortSpaceContent key={`${props.patientId}:${props.author}`} {...props} />;
 }
 
-function ComfortSpaceContent({ patientId, author, today, hindi, entries, onChange, onOpenJournal, onOpenSymptoms }: FamilyComfortSpaceProps) {
+function ComfortSpaceContent({ patientId, author, today, lang, entries, onChange, onOpenJournal, onOpenSymptoms }: FamilyComfortSpaceProps) {
   const id = useId();
   const [removed, setRemoved] = useState<ComfortEntry[]>([]);
   const [message, setMessage] = useState('');
   const history = selectComfortEntries(entries, patientId, author);
   const current = latestComfortEntryToday(entries, patientId, author, today);
   const lastRemoved = removed.at(-1);
-  const t = (english: string, translated: string) => hindi ? translated : english;
-  const feelingLabel = (feeling: ComfortFeeling) => hindi ? FEELING_HINDI[feeling] : feeling;
-  const dateLabel = (date: string) => new Date(`${date}T00:00:00`).toLocaleDateString(hindi ? 'hi-IN' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-  const timeLabel = (createdAt: string) => new Date(createdAt).toLocaleTimeString(hindi ? 'hi-IN' : 'en-GB', { hour: '2-digit', minute: '2-digit' });
+  const t = (english: string, translated: string) => careText(lang, english, translated);
+  const feelingLabel = (feeling: ComfortFeeling) => careText(lang, feeling, FEELING_HINDI[feeling]);
+  const dateLabel = (date: string) => new Date(`${date}T00:00:00`).toLocaleDateString(careLocale(lang), { day: 'numeric', month: 'short', year: 'numeric' });
+  const timeLabel = (createdAt: string) => new Date(createdAt).toLocaleTimeString(careLocale(lang), { hour: '2-digit', minute: '2-digit' });
 
   function record(feeling: ComfortFeeling) {
     const next = addComfortEntry(entries, { id: crypto.randomUUID(), patientId, author, date: today, feeling, createdAt: new Date().toISOString() });

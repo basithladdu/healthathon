@@ -6,14 +6,15 @@ import {
   FAMILY_NOTE_FIELDS, compareFamilyNoteVersions, exportFamilyNoteComparison, exportFamilyNoteVersion,
   familyNoteHasText, selectFamilyNoteVersions,
 } from './family-note-history-state';
+import { careLocale, careText, type CareLang } from './care-i18n';
 
-type FamilyNoteHistoryProps = { patientId: string; patientName: string; hindi: boolean; releases: readonly SummaryRelease[] };
+type FamilyNoteHistoryProps = { patientId: string; patientName: string; lang: CareLang; releases: readonly SummaryRelease[] };
 
 export function FamilyNoteHistory(props: FamilyNoteHistoryProps) {
   return <NoteHistoryContent key={props.patientId} {...props} />;
 }
 
-function NoteHistoryContent({ patientId, patientName, hindi, releases }: FamilyNoteHistoryProps) {
+function NoteHistoryContent({ patientId, patientName, lang, releases }: FamilyNoteHistoryProps) {
   const id = useId();
   const [selectedNumber, setSelectedNumber] = useState<number | null>(null);
   const [compareNumber, setCompareNumber] = useState<number | null>(null);
@@ -24,8 +25,8 @@ function NoteHistoryContent({ patientId, patientName, hindi, releases }: FamilyN
   const others = versions.filter((version) => version.number !== selected?.number);
   const compareWith = others.find((version) => version.number === compareNumber) ?? others[0];
   const comparison = selected && compareWith ? compareFamilyNoteVersions(releases, patientId, selected.number, compareWith.number) : null;
-  const t = (english: string, translated: string) => hindi ? translated : english;
-  const dateLabel = (value: string) => new Date(value).toLocaleString(hindi ? 'hi-IN' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  const t = (english: string, translated: string) => careText(lang, english, translated);
+  const dateLabel = (value: string) => new Date(value).toLocaleString(careLocale(lang), { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 
   function download(compare = false) {
     if (!selected) return;
@@ -62,7 +63,7 @@ function NoteHistoryContent({ patientId, patientName, hindi, releases }: FamilyN
         </div>
         <article className="family-note-selected" aria-label={`${t('Care Note version', 'डॉक्टर का नोट संस्करण')} ${selected.number}`}>
           {metadata(selected)}
-          {selected.fields ? <dl>{FAMILY_NOTE_FIELDS.map(({ key, label, hindi: translated }) => <div key={key}><dt>{hindi ? translated : label}</dt><dd>{storedText(selected.fields![key])}</dd></div>)}</dl> : storedText(selected.source)}
+          {selected.fields ? <dl>{FAMILY_NOTE_FIELDS.map(({ key, label, hindi: translated }) => <div key={key}><dt>{careText(lang, label, translated)}</dt><dd>{storedText(selected.fields![key])}</dd></div>)}</dl> : storedText(selected.source)}
         </article>
         {compareWith ? <>
           <div className="family-note-compare-controls">
@@ -74,7 +75,7 @@ function NoteHistoryContent({ patientId, patientName, hindi, releases }: FamilyN
             <p className="family-note-comparison-rule">{t('Changed means the saved words differ. The notes do not tell us why unless the doctor wrote a reason.', 'बदलाव का मतलब सेव किए गए शब्द अलग हैं। वजह तभी पता चलेगी जब डॉक्टर ने लिखी हो।')}</p>
             <div className="family-note-comparison-meta">{metadata(comparison.earlier)}{metadata(comparison.later)}</div>
             {comparison.rows.map((row) => <section className="family-note-comparison-row" key={row.key}>
-              <div className="family-note-comparison-label"><h4>{hindi ? row.hindi : row.label}</h4><span>{row.change === 'changed' ? t('Changed', 'बदला है') : row.change === 'unchanged' ? t('Unchanged', 'वही है') : t('Cannot compare', 'तुलना नहीं हो सकती')}</span></div>
+              <div className="family-note-comparison-label"><h4>{careText(lang, row.label, row.hindi)}</h4><span>{row.change === 'changed' ? t('Changed', 'बदला है') : row.change === 'unchanged' ? t('Unchanged', 'वही है') : t('Cannot compare', 'तुलना नहीं हो सकती')}</span></div>
               <div className="family-note-comparison-values"><div><span>{t('Version', 'संस्करण')} {comparison.earlier.number}</span>{storedText(row.earlier)}</div><div><span>{t('Version', 'संस्करण')} {comparison.later.number}</span>{storedText(row.later)}</div></div>
             </section>)}
           </div>}

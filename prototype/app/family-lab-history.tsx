@@ -8,12 +8,13 @@ import {
   type LabResultDraft, type LabResultEntry, type LabReportFlag, type LabNumericPoint, type LabTreatmentEvent,
 } from './family-lab-state';
 import './family-lab-history.css';
+import { careLocale, careText, type CareLang } from './care-i18n';
 
 export type FamilyLabHistoryProps = {
   patientId: string;
   author: string;
   today: string;
-  hindi: boolean;
+  lang: CareLang;
   reports: CareReport[];
   entries: LabResultEntry[];
   onChange: (entries: LabResultEntry[]) => void;
@@ -32,7 +33,7 @@ function blankDraft(today: string, testName = ''): LabResultDraft {
   return { testName, value: '', unit: '', date: today, printedRange: '', reportFlag: 'Not stated', reportId: null, sourceName: '' };
 }
 
-function LabReportLinks({ report, hindi, compact = false }: { report: CareReport; hindi: boolean; compact?: boolean }) {
+function LabReportLinks({ report, lang, compact = false }: { report: CareReport; lang: CareLang; compact?: boolean }) {
   const open = useRef<HTMLAnchorElement>(null);
   const download = useRef<HTMLAnchorElement>(null);
   useEffect(() => {
@@ -42,14 +43,14 @@ function LabReportLinks({ report, hindi, compact = false }: { report: CareReport
     return () => URL.revokeObjectURL(url);
   }, [report.file]);
   return <span className="lab-report-links">
-    <a ref={open} target="_blank" rel="noreferrer">{compact ? (hindi ? 'मूल रिपोर्ट खोलें' : 'Open original') : report.file.name}</a>
-    <a ref={download} download={report.file.name}>{hindi ? 'डाउनलोड' : 'Download'}</a>
+    <a ref={open} target="_blank" rel="noreferrer">{compact ? (careText(lang, 'Open original', 'मूल रिपोर्ट खोलें')) : report.file.name}</a>
+    <a ref={download} download={report.file.name}>{careText(lang, 'Download', 'डाउनलोड')}</a>
   </span>;
 }
 
-function LabPlot({ points, testName, unit, hindi }: { points: LabNumericPoint[]; testName: string; unit: string; hindi: boolean }) {
+function LabPlot({ points, testName, unit, lang }: { points: LabNumericPoint[]; testName: string; unit: string; lang: CareLang }) {
   const labelId = useId();
-  const dateLabel = (date: string) => new Date(`${date}T12:00:00Z`).toLocaleDateString(hindi ? 'hi-IN' : 'en-GB', { day: 'numeric', month: 'short', year: '2-digit', timeZone: 'UTC' });
+  const dateLabel = (date: string) => new Date(`${date}T12:00:00Z`).toLocaleDateString(careLocale(lang), { day: 'numeric', month: 'short', year: '2-digit', timeZone: 'UTC' });
   const dates = points.map((point) => Date.parse(`${point.date}T12:00:00Z`));
   const values = points.map((point) => point.numericValue);
   const first = Math.min(...dates);
@@ -62,7 +63,7 @@ function LabPlot({ points, testName, unit, hindi }: { points: LabNumericPoint[];
   const canConnect = new Set(dates).size === dates.length;
   return <figure className="lab-result-plot" aria-labelledby={labelId}>
     <figcaption id={labelId}>{testName} <span>· {unit}</span></figcaption>
-    <svg viewBox="0 0 540 184" role="img" aria-label={hindi ? `${points.length} नतीजे, तारीख के हिसाब से, ${unit}` : `${points.length} recorded values by date, ${unit}`}>
+    <svg viewBox="0 0 540 184" role="img" aria-label={careText(lang, `${points.length} recorded values by date, ${unit}`, `${points.length} नतीजे, तारीख के हिसाब से, ${unit}`)}>
       <line x1="58" x2="510" y1="140" y2="140" className="lab-plot-axis" />
       {low !== high && <line x1="58" x2="510" y1="26" y2="26" className="lab-plot-guide" />}
       <text x="48" y={y(low) + 4} textAnchor="end">{low}</text>
@@ -72,22 +73,22 @@ function LabPlot({ points, testName, unit, hindi }: { points: LabNumericPoint[];
       <text x={first === last ? 286 : 58} y="168" textAnchor={first === last ? 'middle' : 'start'}>{dateLabel(points[0].date)}</text>
       {first !== last && <text x="510" y="168" textAnchor="end">{dateLabel(points[points.length - 1].date)}</text>}
     </svg>
-    <p>{hindi ? `सिर्फ़ ${unit} में लिखे संख्यात्मक नतीजे दिखाए हैं।` : `Only numeric results using ${unit} are plotted.`}</p>
+    <p>{careText(lang, `Only numeric results using ${unit} are plotted.`, `सिर्फ़ ${unit} में लिखे संख्यात्मक नतीजे दिखाए हैं।`)}</p>
   </figure>;
 }
 
-function LabTrendOverview({ patientId, entries, reports, treatmentEvents, hindi, onEdit }: {
+function LabTrendOverview({ patientId, entries, reports, treatmentEvents, lang, onEdit }: {
   patientId: string; entries: LabResultEntry[]; reports: CareReport[]; treatmentEvents: readonly LabTreatmentEvent[];
-  hindi: boolean; onEdit: (entry: LabResultEntry) => void;
+  lang: CareLang; onEdit: (entry: LabResultEntry) => void;
 }) {
   const id = useId();
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const t = (en: string, hi: string) => hindi ? hi : en;
+  const t = (en: string, hi: string) => careText(lang, en, hi);
   const table = labTrendTable(entries, patientId, treatmentEvents);
   const selected = entries.find((entry) => entry.patientId === patientId && entry.id === selectedId);
   const source = reports.find((report) => report.patientId === patientId && report.id === selected?.reportId);
-  const name = (testName: string) => hindi ? hindiTests[testName] ?? testName : LAB_TEST_CATALOG.find((test) => test.name === testName)?.label ?? testName;
-  const dateLabel = (date: string) => new Date(`${date}T12:00:00Z`).toLocaleDateString(hindi ? 'hi-IN' : 'en-GB', { day: 'numeric', month: 'short', year: '2-digit', timeZone: 'UTC' });
+  const name = (testName: string) => careText(lang, LAB_TEST_CATALOG.find((test) => test.name === testName)?.label ?? testName, hindiTests[testName] ?? testName);
+  const dateLabel = (date: string) => new Date(`${date}T12:00:00Z`).toLocaleDateString(careLocale(lang), { day: 'numeric', month: 'short', year: '2-digit', timeZone: 'UTC' });
   if (!table.dates.length) return <p className="lab-trend-empty">{t('Add results from a report to see them side by side.', 'रिपोर्ट के नतीजे जोड़ें, फिर सभी तारीखें साथ देखें।')}</p>;
   return <div className="lab-trend-overview">
     <div className="lab-trend-scroll" role="region" tabIndex={0} aria-label={t('Results by date. Scroll sideways for more dates.', 'तारीख के हिसाब से नतीजे। और तारीखों के लिए दाएँ-बाएँ स्क्रॉल करें।')}>
@@ -96,12 +97,12 @@ function LabTrendOverview({ patientId, entries, reports, treatmentEvents, hindi,
         <tbody>{table.rows.map((row) => <tr key={JSON.stringify([row.testName, row.unit])}>
           <th scope="row">{name(row.testName)}<span>{row.unit}</span></th>
           {table.dates.map((date) => <td key={date}>{row.entries.filter((entry) => entry.date === date).map((entry) => <button type="button" key={entry.id} className="lab-trend-value" aria-pressed={selectedId === entry.id} aria-controls={`${id}-source`} aria-label={`${name(entry.testName)}: ${entry.value} ${entry.unit}, ${dateLabel(entry.date)}. ${t('Open source', 'रिपोर्ट देखें')}`} onClick={() => setSelectedId(selectedId === entry.id ? null : entry.id)}>
-            <strong>{entry.value}</strong>{entry.reportFlag !== 'Not stated' && <span data-flag={entry.reportFlag}>{hindi ? hindiFlags[entry.reportFlag] : entry.reportFlag}</span>}
+            <strong>{entry.value}</strong>{entry.reportFlag !== 'Not stated' && <span data-flag={entry.reportFlag}>{careText(lang, entry.reportFlag, hindiFlags[entry.reportFlag])}</span>}
           </button>)}{!row.entries.some((entry) => entry.date === date) && <span className="lab-trend-missing" aria-label={t('No result recorded', 'नतीजा दर्ज नहीं है')}>—</span>}</td>)}
         </tr>)}
         {table.events.length > 0 && <tr className="lab-trend-treatment"><th scope="row">{t('Treatment events', 'इलाज की घटनाएँ')}</th>{table.dates.map((date) => <td key={date}>{table.events.filter((event) => event.date === date).map((event) => {
           const report = reports.find((item) => item.patientId === patientId && item.id === event.reportId);
-          return <div className="lab-trend-event" key={event.id}><strong>{event.title}</strong><span>{event.status === 'planned' ? t('Planned', 'तय किया गया') : t('Recorded', 'दर्ज किया गया')}</span><small>{event.sourceName}</small>{report && <LabReportLinks report={report} hindi={hindi} compact />}</div>;
+          return <div className="lab-trend-event" key={event.id}><strong>{event.title}</strong><span>{event.status === 'planned' ? t('Planned', 'तय किया गया') : t('Recorded', 'दर्ज किया गया')}</span><small>{event.sourceName}</small>{report && <LabReportLinks report={report} lang={lang} compact />}</div>;
         })}{!table.events.some((event) => event.date === date) && <span className="lab-trend-missing">—</span>}</td>)}</tr>}
         </tbody>
       </table>
@@ -110,8 +111,8 @@ function LabTrendOverview({ patientId, entries, reports, treatmentEvents, hindi,
     <div id={`${id}-source`}>{selected && <section className="lab-trend-source">
       <header><h3>{name(selected.testName)} · {selected.value} {selected.unit}</h3><button type="button" onClick={() => setSelectedId(null)}>{t('Close', 'बंद करें')}</button></header>
       <time dateTime={selected.date}>{dateLabel(selected.date)}</time>
-      <dl><div><dt>{t('Range as printed', 'रिपोर्ट की रेंज')}</dt><dd>{selected.printedRange || t('Not entered', 'दर्ज नहीं है')}</dd></div><div><dt>{t('Flag as printed', 'रिपोर्ट का फ़्लैग')}</dt><dd>{hindi ? hindiFlags[selected.reportFlag] : selected.reportFlag}</dd></div></dl>
-      {source ? <LabReportLinks report={source} hindi={hindi} /> : <p>{selected.sourceName}{selected.reportId ? ` · ${t('File no longer here', 'फ़ाइल अब यहाँ नहीं है')}` : ''}</p>}
+      <dl><div><dt>{t('Range as printed', 'रिपोर्ट की रेंज')}</dt><dd>{selected.printedRange || t('Not entered', 'दर्ज नहीं है')}</dd></div><div><dt>{t('Flag as printed', 'रिपोर्ट का फ़्लैग')}</dt><dd>{careText(lang, selected.reportFlag, hindiFlags[selected.reportFlag])}</dd></div></dl>
+      {source ? <LabReportLinks report={source} lang={lang} /> : <p>{selected.sourceName}{selected.reportId ? ` · ${t('File no longer here', 'फ़ाइल अब यहाँ नहीं है')}` : ''}</p>}
       <footer><span>{t('Copied by', 'लिखने वाले')} {selected.recordedBy}</span><button type="button" onClick={() => onEdit(selected)}>{t('Edit result', 'नतीजा बदलें')}</button></footer>
     </section>}</div>
   </div>;
@@ -121,13 +122,13 @@ export function FamilyLabHistory(props: FamilyLabHistoryProps) {
   return <LabHistoryForPatient key={props.patientId} {...props} />;
 }
 
-function LabHistoryForPatient({ patientId, author, today, hindi, reports, entries, onChange, treatmentEvents = [] }: FamilyLabHistoryProps) {
+function LabHistoryForPatient({ patientId, author, today, lang, reports, entries, onChange, treatmentEvents = [] }: FamilyLabHistoryProps) {
   const id = useId();
   const inputRef = useRef<HTMLInputElement>(null);
-  const t = (en: string, hi: string) => hindi ? hi : en;
-  const testLabel = (name: string) => hindi ? hindiTests[name] ?? name : LAB_TEST_CATALOG.find((test) => test.name === name)?.label ?? name;
-  const flagLabel = (flag: LabReportFlag) => hindi ? hindiFlags[flag] : flag;
-  const dateLabel = (date: string) => new Date(`${date}T12:00:00Z`).toLocaleDateString(hindi ? 'hi-IN' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+  const t = (en: string, hi: string) => careText(lang, en, hi);
+  const testLabel = (name: string) => careText(lang, LAB_TEST_CATALOG.find((test) => test.name === name)?.label ?? name, hindiTests[name] ?? name);
+  const flagLabel = (flag: LabReportFlag) => careText(lang, flag, hindiFlags[flag]);
+  const dateLabel = (date: string) => new Date(`${date}T12:00:00Z`).toLocaleDateString(careLocale(lang), { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
   const patientEntries = selectLabResults(entries, patientId);
   const patientReports = reports.filter((report) => report.patientId === patientId);
   const tests = [...new Set(patientEntries.map((entry) => entry.testName))];
@@ -212,7 +213,7 @@ function LabHistoryForPatient({ patientId, author, today, hindi, reports, entrie
   }
 
   function download() {
-    const url = URL.createObjectURL(new Blob([labHistoryText(entries, patientId, hindi, treatmentEvents)], { type: 'text/plain;charset=utf-8' }));
+    const url = URL.createObjectURL(new Blob([labHistoryText(entries, patientId, lang, treatmentEvents)], { type: 'text/plain;charset=utf-8' }));
     const link = document.createElement('a'); link.href = url; link.download = 'sahara-lab-results.txt'; link.click();
     setTimeout(() => URL.revokeObjectURL(url), 0);
     setMessage(t('Download started.', 'डाउनलोड शुरू हो गया।'));
@@ -251,7 +252,7 @@ function LabHistoryForPatient({ patientId, author, today, hindi, reports, entrie
           <option value="manual">{t('Use a report name', 'रिपोर्ट का नाम लिखें')}</option>
         </select></label>}
         {(sourceChoice === 'manual' || (!patientReports.length && !draft.reportId)) && <label className={patientReports.length > 0 || draft.reportId ? 'lab-field-wide' : undefined}>{t('Lab or report name', 'लैब या रिपोर्ट का नाम')}<input value={draft.sourceName} required maxLength={300} onChange={(event) => setDraft({ ...draft, sourceName: event.target.value })} /></label>}
-        {linkedReport && <div className="lab-field-wide"><LabReportLinks report={linkedReport} hindi={hindi} compact /></div>}
+        {linkedReport && <div className="lab-field-wide"><LabReportLinks report={linkedReport} lang={lang} compact /></div>}
       </div>
       <details className="lab-printed-options" open={showPrinted} onToggle={(event) => setShowPrinted(event.currentTarget.open)}><summary>{t('Printed range & flag (optional)', 'रिपोर्ट की रेंज और फ़्लैग (वैकल्पिक)')}</summary><div className="lab-result-fields">
         <label>{t('Range as printed', 'रिपोर्ट में लिखी रेंज')}<input value={draft.printedRange} maxLength={160} onChange={(event) => setDraft({ ...draft, printedRange: event.target.value })} /></label>
@@ -263,7 +264,7 @@ function LabHistoryForPatient({ patientId, author, today, hindi, reports, entrie
 
     {!formOpen && <>
     <nav className="lab-history-views" aria-label={t('View results', 'नतीजे देखें')}><button type="button" aria-pressed={view === 'table'} onClick={() => setView('table')}>{t('All dates together', 'सभी तारीखें साथ')}</button><button type="button" aria-pressed={view === 'test'} onClick={() => setView('test')}>{t('One test at a time', 'एक-एक जाँच')}</button></nav>
-    {view === 'table' && <LabTrendOverview patientId={patientId} entries={entries} reports={patientReports} treatmentEvents={treatmentEvents} hindi={hindi} onEdit={edit} />}
+    {view === 'table' && <LabTrendOverview patientId={patientId} entries={entries} reports={patientReports} treatmentEvents={treatmentEvents} lang={lang} onEdit={edit} />}
     {view === 'test' && <>
     <nav className="lab-test-catalog" aria-label={t('Choose a test', 'जाँच चुनें')}>
       {cardTests.map((name) => {
@@ -285,7 +286,7 @@ function LabHistoryForPatient({ patientId, author, today, hindi, reports, entrie
     </div>
     <div className="lab-results-section-heading"><h2>{filter ? testLabel(filter) : t('All results', 'सभी नतीजे')}</h2>{visible.length > 0 && <span>{visible.length} {t(visible.length === 1 ? 'result' : 'results', 'नतीजे')}</span>}</div>
     {filter && units.length > 1 && <label className="lab-chart-unit">{t('Chart unit', 'चार्ट की इकाई')}<select value={plotUnit} onChange={(event) => setUnitChoice(event.target.value)}>{units.map((unit) => <option key={unit}>{unit}</option>)}</select></label>}
-    {points.length > 1 && <LabPlot points={points} testName={testLabel(filter)} unit={plotUnit} hindi={hindi} />}
+    {points.length > 1 && <LabPlot points={points} testName={testLabel(filter)} unit={plotUnit} lang={lang} />}
     </>}
 
     {lastRemoved && <div className="lab-result-undo" role="status"><span>{t('Removed', 'हटा दिया')}: {testLabel(lastRemoved.testName)} · {lastRemoved.value} {lastRemoved.unit}</span><button type="button" onClick={undo}>{t('Undo', 'वापस लाएँ')}</button></div>}
@@ -296,7 +297,7 @@ function LabHistoryForPatient({ patientId, author, today, hindi, reports, entrie
         <div className="lab-result-card-heading"><h2>{testLabel(entry.testName)}</h2><time dateTime={entry.date}>{dateLabel(entry.date)}</time></div>
         <p className="lab-result-value"><strong>{entry.value}</strong> <span>{entry.unit}</span></p>
         <dl className="lab-result-reference"><div><dt>{t('Range as printed', 'रिपोर्ट में लिखी रेंज')}</dt><dd>{entry.printedRange || t('Not entered', 'दर्ज नहीं है')}</dd></div><div><dt>{t('Flag as printed', 'रिपोर्ट में लिखा फ़्लैग')}</dt><dd>{flagLabel(entry.reportFlag)}</dd></div></dl>
-        <div className="lab-result-source"><span>{t('Source', 'रिपोर्ट')}</span>{report ? <LabReportLinks report={report} hindi={hindi} /> : <p>{entry.sourceName}{entry.reportId && <span>{t('File no longer here', 'फ़ाइल अब यहाँ नहीं है')}</span>}</p>}</div>
+        <div className="lab-result-source"><span>{t('Source', 'रिपोर्ट')}</span>{report ? <LabReportLinks report={report} lang={lang} /> : <p>{entry.sourceName}{entry.reportId && <span>{t('File no longer here', 'फ़ाइल अब यहाँ नहीं है')}</span>}</p>}</div>
         <div className="lab-result-card-footer"><span>{t('Copied by', 'लिखने वाले')} {entry.recordedBy}{entry.updatedBy !== entry.recordedBy ? ` · ${t('edited by', 'बदला')} ${entry.updatedBy}` : ''}</span><div><button type="button" onClick={() => edit(entry)}>{t('Edit', 'बदलें')}</button><button type="button" onClick={() => remove(entry)}>{t('Remove', 'हटाएँ')}</button></div></div>
       </li>;
     })}</ol> : <div className="lab-history-empty"><p>{filter ? t(`No ${testLabel(filter)} results added yet.`, `अभी ${testLabel(filter)} का कोई नतीजा नहीं जोड़ा है।`) : t('No results added yet.', 'अभी कोई नतीजा नहीं जोड़ा है।')}</p><button type="button" className="primary-button" onClick={() => openNew()}>{t('Add from a report', 'रिपोर्ट से जोड़ें')}</button></div>)}

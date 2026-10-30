@@ -1,3 +1,4 @@
+import { careLangOf, careText, type CareLang } from './care-i18n.ts';
 import { isValidAppointmentDate } from './appointment-state.ts';
 
 export const SYMPTOM_SEVERITIES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as const;
@@ -135,15 +136,16 @@ export function selectSymptomEntries(entries: SymptomEntry[], patientId: string,
     .sort((a, b) => observationKey(b).localeCompare(observationKey(a)) || b.id.localeCompare(a.id));
 }
 
-export function symptomSeverityText(value: SymptomSeverity, hindi = false): string {
-  if (value === null) return hindi ? 'अंक नहीं बताया' : 'Not rated';
+export function symptomSeverityText(value: SymptomSeverity, hindi: boolean | CareLang = false): string {
+  const lang = careLangOf(hindi);
+  if (value === null) return careText(lang, 'Not rated', 'अंक नहीं बताया');
   if (typeof value === 'number') return `${value}/10`;
   const labels = { Mild: 'हल्का', Moderate: 'मध्यम', Severe: 'बहुत ज़्यादा' };
-  return hindi ? labels[value] : value;
+  return careText(lang, value, labels[value]);
 }
 
-export function symptomDiaryText(entries: SymptomEntry[], patientId: string, today: string, hindi = false): string {
-  const t = (en: string, hi: string) => hindi ? hi : en;
+export function symptomDiaryText(entries: SymptomEntry[], patientId: string, today: string, hindi: boolean | CareLang = false): string {
+  const t = (en: string, hi: string) => careText(careLangOf(hindi), en, hi);
   return [
     t('Sahara — How I have been feeling', 'सहारा — मेरी तबीयत के नोट'),
     `${t('Saved on', 'कॉपी की तारीख')}: ${today}`,
@@ -162,22 +164,22 @@ export function symptomDiaryText(entries: SymptomEntry[], patientId: string, tod
   ].join('\n\n');
 }
 
-export function symptomRecallText(value: SymptomRecall, hindi = false): string {
+export function symptomRecallText(value: SymptomRecall, hindi: boolean | CareLang = false): string {
   const labels = { now: ['At this time', 'इस समय'], 'average-24h': ['Average over the previous 24 hours', 'पिछले 24 घंटे का औसत'], 'worst-24h': ['Worst in the previous 24 hours', 'पिछले 24 घंटे में सबसे ज़्यादा'] };
-  return labels[value][hindi ? 1 : 0];
+  return careText(careLangOf(hindi), labels[value][0], labels[value][1]);
 }
 
-export function symptomRespondentText(value: SymptomRespondent, hindi = false): string {
+export function symptomRespondentText(value: SymptomRespondent, hindi: boolean | CareLang = false): string {
   const labels = { patient: ['Patient', 'मरीज़'], 'assisted-patient': ['Patient, with help', 'मरीज़ ने मदद से बताया'], caregiver: ["Caregiver's observation", 'देखभाल करने वाले ने देखा'], clinician: ["Care team's observation", 'देखभाल टीम ने देखा'] };
-  return labels[value][hindi ? 1 : 0];
+  return careText(careLangOf(hindi), labels[value][0], labels[value][1]);
 }
 
-export function symptomChangeText(value: SymptomChange, hindi = false): string {
+export function symptomChangeText(value: SymptomChange, hindi: boolean | CareLang = false): string {
   const labels = { better: ['Better', 'बेहतर'], same: ['Same', 'वैसा ही'], worse: ['Worse', 'ज़्यादा खराब'], 'not-sure': ['Not sure', 'पक्का नहीं'] };
-  return labels[value][hindi ? 1 : 0];
+  return careText(careLangOf(hindi), labels[value][0], labels[value][1]);
 }
 
-export function painTriggerText(value: PainTrigger, hindi = false): string {
+export function painTriggerText(value: PainTrigger, hindi: boolean | CareLang = false): string {
   const labels = { rest: ['At rest', 'आराम करते समय'], turning: ['Turning in bed', 'बिस्तर में करवट लेते समय'], walking: ['Standing or walking', 'खड़े होते या चलते समय'], coughing: ['Coughing', 'खाँसते समय'], other: ['Other situation', 'किसी और समय'], 'not-sure': ['Not sure', 'पक्का नहीं'] };
-  return labels[value][hindi ? 1 : 0];
+  return careText(careLangOf(hindi), labels[value][0], labels[value][1]);
 }

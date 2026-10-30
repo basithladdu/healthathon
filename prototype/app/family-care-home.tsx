@@ -12,10 +12,11 @@ import type { CareCheck, CareEvent } from './care-calendar-state';
 import type { Appointment } from './appointments-page';
 import type { FamilyTask } from './family-care-state';
 import './family-care-home.css';
+import { careLocale, careText, type CareLang } from './care-i18n';
 
 export type FamilyCareHomeProps = {
   patientName: string;
-  hindi: boolean;
+  lang: CareLang;
   signedCareNote?: { version: number; releasedAt: string; physician: string };
   nextVisit?: { date: string; time: string; clinician: string };
   patientId: string;
@@ -31,8 +32,8 @@ export type FamilyCareHomeProps = {
   viewerId?: string;
 };
 
-export function FamilyCareHome({ patientName, hindi, signedCareNote, patientId, today, currentTime, author, role, events, checks, onMedicineTaken }: FamilyCareHomeProps) {
-  const t = (en: string, hi: string) => hindi ? hi : en;
+export function FamilyCareHome({ patientName, lang, signedCareNote, patientId, today, currentTime, author, role, events, checks, onMedicineTaken }: FamilyCareHomeProps) {
+  const t = (en: string, hi: string) => careText(lang, en, hi);
   const id = useId();
   const [qr, setQr] = useState<{ patientId: string; version: number; dataUrl: string }>();
   const signedVersion = signedCareNote?.version;
@@ -69,7 +70,7 @@ export function FamilyCareHome({ patientName, hindi, signedCareNote, patientId, 
         <div className="care-home-note-copy">
           <span className="care-home-note-status">{t('Latest signed version', 'नवीनतम हस्ताक्षरित संस्करण')} · V{signedCareNote.version}</span>
           <h2 id={`${id}-note-title`}>{t('Care Note', 'देखभाल का नोट')}</h2>
-          <p>{t(`Signed by ${signedCareNote.physician} · ${new Date(signedCareNote.releasedAt).toLocaleDateString(hindi ? 'hi-IN' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`, `${signedCareNote.physician} द्वारा हस्ताक्षरित · ${new Date(signedCareNote.releasedAt).toLocaleDateString('hi-IN', { day: 'numeric', month: 'short', year: 'numeric' })}`)}</p>
+          <p>{t(`Signed by ${signedCareNote.physician} · ${new Date(signedCareNote.releasedAt).toLocaleDateString(careLocale(lang), { day: 'numeric', month: 'short', year: 'numeric' })}`, `${signedCareNote.physician} द्वारा हस्ताक्षरित · ${new Date(signedCareNote.releasedAt).toLocaleDateString('hi-IN', { day: 'numeric', month: 'short', year: 'numeric' })}`)}</p>
           <CareRouteLink view="my-plan" className="care-home-note-open">{t('Open Care Note', 'देखभाल का नोट खोलें')} <IconArrowRight /></CareRouteLink>
         </div>
         <figure className="care-home-note-qr">
@@ -84,15 +85,15 @@ export function FamilyCareHome({ patientName, hindi, signedCareNote, patientId, 
     </section>
     <nav className="care-home-category-nav" aria-label={t('Care sections', 'देखभाल के विभाग')}>
       {categoryCards.map((section) => <CareRouteLink key={section.view} view={section.view} className={`care-home-category tone-${section.color}`}>
-        <CareArt kind={section.art} /><strong>{hindi ? section.hi : section.en}</strong><IconArrowRight />
+        <CareArt kind={section.art} /><strong>{careText(lang, section.en, section.hi)}</strong><IconArrowRight />
       </CareRouteLink>)}
     </nav>
-    <CareToday patientId={patientId} today={today} currentTime={currentTime} author={author} role={role} events={events} checks={checks} onMedicineTaken={onMedicineTaken} hindi={hindi} />
+    <CareToday patientId={patientId} today={today} currentTime={currentTime} author={author} role={role} events={events} checks={checks} onMedicineTaken={onMedicineTaken} lang={lang} />
     <section className="care-home-quick-section" aria-labelledby={`${id}-quick-title`}>
       <h2 id={`${id}-quick-title`}>{t('Quick access', 'जल्दी खोलें')}</h2>
       <div className="care-home-quick-grid">
         {quickAccess.map((item) => <CareRouteLink key={item.view} view={item.view} className={`care-home-quick-card quick-${item.view}`}>
-          <CareArt kind={item.art} /><strong>{hindi ? item.hi : item.en}</strong><IconArrowRight />
+          <CareArt kind={item.art} /><strong>{careText(lang, item.en, item.hi)}</strong><IconArrowRight />
         </CareRouteLink>)}
       </div>
     </section>

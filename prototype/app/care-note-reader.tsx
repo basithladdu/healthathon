@@ -9,12 +9,13 @@ import { useSpeechSynthesis } from './tts-speech';
 import { IconFileText, IconClock, IconCheckCircle, IconVolume2 } from './icons';
 import { downloadCarePdf } from './care-pdf';
 import { CARE_NOTE_KIND_LABELS, careNoteReleaseId, createCareNoteAcknowledgement, matchingCareNoteAcknowledgements, hasChangedSignedCareNote, hasTypedCareNoteDoctorSignature, type CareNoteAcknowledgement, type CareNoteSignerRole } from './care-note-signing-state';
+import { careLocale, careText, type CareLang } from './care-i18n';
 
 const KEYS: DraftFieldKey[] = ['followUp', 'priorities', 'topics', 'participants', 'openQuestions'];
 const NOT_STATED = 'Not stated in this conversation.';
 
-export function CareNoteReader({ patientId, patientName, releases, hindi, conversations = [], doctor = false, patients, onPatient, onRecord, onPrepare, acknowledgements = [], signerName, signerRole, onAcknowledge, onFinishLater, initialVersion }: {
-  patientId: string; patientName: string; releases: readonly SummaryRelease[]; hindi: boolean;
+export function CareNoteReader({ patientId, patientName, releases, lang, conversations = [], doctor = false, patients, onPatient, onRecord, onPrepare, acknowledgements = [], signerName, signerRole, onAcknowledge, onFinishLater, initialVersion }: {
+  patientId: string; patientName: string; releases: readonly SummaryRelease[]; lang: CareLang;
   conversations?: readonly DoctorConversationEntry[]; doctor?: boolean;
   patients?: Array<{ id: string; name: string }>; onPatient?: (id: string) => void; onRecord?: () => void; onPrepare?: () => void;
   acknowledgements?: readonly CareNoteAcknowledgement[]; signerName?: string; signerRole?: CareNoteSignerRole;
@@ -47,8 +48,8 @@ export function CareNoteReader({ patientId, patientName, releases, hindi, conver
   const previous = selected ? versions.find((release) => release.number < selected.number) : undefined;
   const comparison = selected && previous ? compareFamilyNoteVersions(releases, patientId, selected.number, previous.number) : null;
   const recordings = conversations.filter((entry) => entry.patientId === patientId).slice().sort((a, b) => b.recordedAt.localeCompare(a.recordedAt));
-  const t = (en: string, hi: string) => hindi ? hi : en;
-  const date = (value: string) => new Date(value).toLocaleDateString(hindi ? 'hi-IN' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  const t = (en: string, hi: string) => careText(lang, en, hi);
+  const date = (value: string) => new Date(value).toLocaleDateString(careLocale(lang), { day: 'numeric', month: 'short', year: 'numeric' });
   const sections = selected?.fields ? KEYS.filter((key) => selected.fields?.[key]?.trim() && selected.fields[key] !== NOT_STATED).map((key) => ({ key, heading: CARE_NOTE_LABELS[key], lines: [selected.fields![key]] }))
     : selected?.source ? [{ key: 'topics' as const, heading: 'Conversation note', lines: [selected.source] }] : [];
 
@@ -73,10 +74,10 @@ export function CareNoteReader({ patientId, patientName, releases, hindi, conver
         <article className="care-note-paper"><header className="care-note-paper-heading"><div><span className="care-note-approved"><IconCheckCircle />{patientSigned ? t('Patient-signed version', 'मरीज़ द्वारा हस्ताक्षरित संस्करण') : selected.signature ? t('Doctor signed', 'डॉक्टर ने हस्ताक्षर किए') : t('Approved Care Note', 'मंज़ूर देखभाल नोट')}</span><h2>{date(selected.releasedAt)}</h2><span>{selected.physician} · V{selected.number}{selected.noteKind ? ` · ${CARE_NOTE_KIND_LABELS[selected.noteKind]}` : ''}</span></div><div className="care-note-tools"><button className="primary-button" type="button" disabled={downloading || !sections.length || changedSignedNote} onClick={download}><IconFileText />{downloading ? 'Preparing…' : 'PDF'}</button>{speech.isSupported && sections.length > 0 && <button type="button" className="secondary-button" onClick={() => speech.isPlaying ? speech.cancel() : speech.speak(sections.map((section) => `${section.heading}. ${section.lines.join(' ')}`).join('. '))}><IconVolume2 />{speech.isPlaying ? 'Stop' : 'Listen'}</button>}</div></header>
           <div className="care-note-story-cards">{sections.map((section, index) => <section className={`care-note-story-card is-${section.key}`} key={section.key}><span aria-hidden="true" className="care-note-section-number">{String(index + 1).padStart(2, '0')}</span><div><h3>{section.heading}</h3>{section.lines.map((line, item) => line.length > 650 ? <details key={item}><summary>{line.slice(0, 260)}…</summary><p>{line}</p></details> : <p key={item}>{line}</p>)}</div></section>)}</div>
           {!sections.length && <p>The text for this earlier note is unavailable.</p>}
-          {selected.signature && <div className="care-note-signature"><span>{t('Doctor signature · typed name', 'डॉक्टर के हस्ताक्षर · टाइप किया हुआ नाम')}</span><strong>{selected.signature.name}</strong><time dateTime={selected.signature.signedAt}>{new Date(selected.signature.signedAt).toLocaleString(hindi ? 'hi-IN' : 'en-GB')}</time></div>}
+          {selected.signature && <div className="care-note-signature"><span>{t('Doctor signature · typed name', 'डॉक्टर के हस्ताक्षर · टाइप किया हुआ नाम')}</span><strong>{selected.signature.name}</strong><time dateTime={selected.signature.signedAt}>{new Date(selected.signature.signedAt).toLocaleString(careLocale(lang))}</time></div>}
           {previous && <button className="care-text-button" type="button" aria-expanded={comparing} onClick={() => setComparing(!comparing)}>{comparing ? 'Close changes' : 'What changed since the last note?'} →</button>}
           {comparing && comparison && <div className="care-note-changes">{comparison.rows.filter((row) => row.change === 'changed').map((row) => <section key={row.key}><h3>{row.label}</h3><del>{row.earlier}</del><p>{row.later}</p></section>)}{!comparison.rows.some((row) => row.change === 'changed') && <p>{comparison.rows.some((row) => row.change === 'unavailable') ? 'The earlier text is unavailable for comparison.' : 'No wording changes between these notes.'}</p>}</div>}
-          <CareNoteReviewSignature key={`${careNoteReleaseId(selected)}:${signerRole ?? ''}:${signerName ?? ''}`} release={selected} patientName={patientName} acknowledgements={acknowledgements} hindi={hindi} doctor={doctor} isLatest={selected.number === latestSignedVersion?.number} signerName={signerName} signerRole={signerRole} onAcknowledge={onAcknowledge} onFinishLater={onFinishLater} />
+          <CareNoteReviewSignature key={`${careNoteReleaseId(selected)}:${signerRole ?? ''}:${signerName ?? ''}`} release={selected} patientName={patientName} acknowledgements={acknowledgements} lang={lang} doctor={doctor} isLatest={selected.number === latestSignedVersion?.number} signerName={signerName} signerRole={signerRole} onAcknowledge={onAcknowledge} onFinishLater={onFinishLater} />
         </article>
       </div> : <div className="care-note-empty"><IconFileText /><h2>{routePatientMismatch ? t('This QR belongs to a different patient profile', 'यह QR किसी दूसरे मरीज़ की प्रोफ़ाइल के लिए है') : hasRouteVersion ? t('This Care Note version is not available here', 'यह देखभाल नोट संस्करण यहाँ उपलब्ध नहीं है') : t('No approved Care Note yet', 'अभी कोई मंज़ूर देखभाल नोट नहीं है')}</h2>{onRecord && !routePatientMismatch && !hasRouteVersion && <button className="primary-button" type="button" onClick={onRecord}>Record a conversation</button>}</div>}
     {onPrepare && <button className="care-text-button" type="button" onClick={onPrepare}>{t('Something to ask at the next visit?', 'अगली मुलाकात में कुछ पूछना है?')} →</button>}
@@ -84,8 +85,8 @@ export function CareNoteReader({ patientId, patientName, releases, hindi, conver
   </section>;
 }
 
-function CareNoteReviewSignature({ release, patientName, acknowledgements, hindi, doctor, isLatest, signerName, signerRole, onAcknowledge, onFinishLater }: {
-  release: SummaryRelease; patientName: string; acknowledgements: readonly CareNoteAcknowledgement[]; hindi: boolean; doctor: boolean; isLatest: boolean;
+function CareNoteReviewSignature({ release, patientName, acknowledgements, lang, doctor, isLatest, signerName, signerRole, onAcknowledge, onFinishLater }: {
+  release: SummaryRelease; patientName: string; acknowledgements: readonly CareNoteAcknowledgement[]; lang: CareLang; doctor: boolean; isLatest: boolean;
   signerName?: string; signerRole?: CareNoteSignerRole; onAcknowledge?: (acknowledgement: CareNoteAcknowledgement) => void; onFinishLater?: () => void;
 }) {
   const [open, setOpen] = useState(false);
@@ -93,7 +94,7 @@ function CareNoteReviewSignature({ release, patientName, acknowledgements, hindi
   const [signature, setSignature] = useState('');
   const [reviewed, setReviewed] = useState(false);
   const [message, setMessage] = useState('');
-  const t = (en: string, hi: string) => hindi ? hi : en;
+  const t = (en: string, hi: string) => careText(lang, en, hi);
   const signed = matchingCareNoteAcknowledgements(acknowledgements, release);
   const changed = hasChangedSignedCareNote(acknowledgements, release);
   const patientHasSigned = signed.some((entry) => entry.signerRole === 'patient');
@@ -113,7 +114,7 @@ function CareNoteReviewSignature({ release, patientName, acknowledgements, hindi
   if (!release.signature && !signed.length && !changed) return null;
   return <section className="care-note-family-signing">
     {changed ? <p className="care-note-signing-error" role="alert">{t('This note no longer matches its signed version. Its signature cannot be applied to changed text.', 'यह नोट अपने हस्ताक्षर किए हुए संस्करण से अलग है। पुराने हस्ताक्षर बदले हुए नोट पर लागू नहीं होते।')}</p> : <>
-      {signed.map((entry) => <div key={entry.id} className="care-note-signature is-family"><span>{entry.signerRole === 'patient' ? t('Patient signature · typed name', 'मरीज़ के हस्ताक्षर · टाइप किया हुआ नाम') : t('Family signature · typed name', 'परिवार के हस्ताक्षर · टाइप किया हुआ नाम')}</span><strong>{entry.signerName}</strong><time dateTime={entry.signedAt}>{new Date(entry.signedAt).toLocaleString(hindi ? 'hi-IN' : 'en-GB')} · V{entry.version}</time></div>)}
+      {signed.map((entry) => <div key={entry.id} className="care-note-signature is-family"><span>{entry.signerRole === 'patient' ? t('Patient signature · typed name', 'मरीज़ के हस्ताक्षर · टाइप किया हुआ नाम') : t('Family signature · typed name', 'परिवार के हस्ताक्षर · टाइप किया हुआ नाम')}</span><strong>{entry.signerName}</strong><time dateTime={entry.signedAt}>{new Date(entry.signedAt).toLocaleString(careLocale(lang))} · V{entry.version}</time></div>)}
       {signed.length > 0 && <p className="care-note-final-version"><IconCheckCircle />{patientHasSigned ? t(`The patient reviewed version ${release.number}. Changes need a new version.`, `मरीज़ ने संस्करण ${release.number} की समीक्षा की। बदलाव के लिए नया संस्करण बनाएँ।`) : t('Family acknowledgement recorded; patient review is still required.', 'परिवार की स्वीकृति दर्ज है; मरीज़ की समीक्षा अभी बाकी है।')}</p>}
       {doctor && !signed.length && release.noteKind && <p className="care-note-review-pending">{t('Awaiting patient review', 'मरीज़ की समीक्षा बाकी है')}</p>}
       {!doctor && signerRole === 'family' && !patientHasSigned && release.signature && <p className="care-note-review-pending">{t('The patient must review and sign this version before a family member can acknowledge it.', 'परिवार के सदस्य की स्वीकृति से पहले मरीज़ को इस संस्करण की समीक्षा और हस्ताक्षर करना होगा।')}</p>}

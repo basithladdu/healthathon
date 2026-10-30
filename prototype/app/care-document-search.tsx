@@ -9,12 +9,13 @@ import { careDocumentFileError, careReportCategory, findCareDocumentText, remove
 import { CareDocumentTreatmentReview } from './care-document-treatment';
 import type { ConfirmedDocumentTreatment } from './care-document-treatment-state';
 import './care-document-search.css';
+import { careLocale, careText, type CareLang } from './care-i18n';
 
 export { careReportCategory, findCareDocumentText } from './care-document-state';
 export type { CareDocumentCategory, CareDocumentText } from './care-document-state';
 
 export type CareDocumentSearchProps = {
-  patientId: string; author: string; hindi: boolean;
+  patientId: string; author: string; lang: CareLang;
   reports: CareReport[]; documents: CareDocumentText[];
   onChange: (documents: CareDocumentText[]) => void;
   onReportsChange?: (reports: CareReport[]) => void;
@@ -33,17 +34,17 @@ function DocumentIcon({ kind = 'file' }: { kind?: 'file' | 'search' | 'upload' |
   </svg>;
 }
 
-function OriginalLink({ report, hindi }: { report: CareReport; hindi: boolean }) {
+function OriginalLink({ report, lang }: { report: CareReport; lang: CareLang }) {
   const link = useRef<HTMLAnchorElement>(null);
   useEffect(() => {
     const url = URL.createObjectURL(report.file);
     if (link.current) link.current.href = url;
     return () => URL.revokeObjectURL(url);
   }, [report.file]);
-  return <a ref={link} target="_blank" rel="noreferrer">{hindi ? 'मूल फ़ाइल खोलें' : 'View original'} <span aria-hidden="true">↗</span></a>;
+  return <a ref={link} target="_blank" rel="noreferrer">{careText(lang, 'View original', 'मूल फ़ाइल खोलें')} <span aria-hidden="true">↗</span></a>;
 }
 
-function DocumentPreview({ report, hindi }: { report: CareReport; hindi: boolean }) {
+function DocumentPreview({ report, lang }: { report: CareReport; lang: CareLang }) {
   const picture = useRef<HTMLImageElement>(null);
   const pdf = useRef<HTMLObjectElement>(null);
   const isImage = report.file.type.startsWith('image/') || /\.(png|jpe?g|webp)$/i.test(report.file.name);
@@ -59,8 +60,8 @@ function DocumentPreview({ report, hindi }: { report: CareReport; hindi: boolean
       // User images must stay in the browser; do not proxy them through an image service.
       // eslint-disable-next-line @next/next/no-img-element
       ? <img ref={picture} alt={report.file.name} />
-      : isPdf ? <object ref={pdf} type="application/pdf" aria-label={report.file.name}><div className="care-document-preview-fallback"><DocumentIcon /><OriginalLink report={report} hindi={hindi} /></div></object>
-        : <div className="care-document-preview-fallback"><DocumentIcon /><strong>{report.file.name}</strong><OriginalLink report={report} hindi={hindi} /></div>}
+      : isPdf ? <object ref={pdf} type="application/pdf" aria-label={report.file.name}><div className="care-document-preview-fallback"><DocumentIcon /><OriginalLink report={report} lang={lang} /></div></object>
+        : <div className="care-document-preview-fallback"><DocumentIcon /><strong>{report.file.name}</strong><OriginalLink report={report} lang={lang} /></div>}
   </div>;
 }
 
@@ -68,21 +69,21 @@ function localDate() {
   const now = new Date();
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 }
-function displayDate(date: string, hindi: boolean) {
+function displayDate(date: string, lang: CareLang) {
   const parsed = new Date(`${date}T12:00:00`);
-  return Number.isNaN(parsed.getTime()) ? date : parsed.toLocaleDateString(hindi ? 'hi-IN' : 'en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+  return Number.isNaN(parsed.getTime()) ? date : parsed.toLocaleDateString(careLocale(lang, 'en-IN'), { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 export function CareDocumentSearch(props: CareDocumentSearchProps) {
   return <DocumentSearchForPatient key={props.patientId} {...props} />;
 }
 
-function DocumentSearchForPatient({ patientId, author, hindi, reports, documents, onChange, onReportsChange, onAddTreatment, onOpenCareStory, editReportId, onEditClose }: CareDocumentSearchProps) {
+function DocumentSearchForPatient({ patientId, author, lang, reports, documents, onChange, onReportsChange, onAddTreatment, onOpenCareStory, editReportId, onEditClose }: CareDocumentSearchProps) {
   const router = useRouter();
   const uploadRequested = useRef(false);
   const returnToMedicines = useRef(false);
   const id = useId();
-  const t = (en: string, hi: string) => hindi ? hi : en;
+  const t = (en: string, hi: string) => careText(lang, en, hi);
   const available = reports.filter((report) => report.patientId === patientId).sort((a, b) => b.date.localeCompare(a.date));
   const availableText = documents.filter((document) => document.patientId === patientId && document.text.trim() && available.some((report) => report.id === document.reportId));
   const [query, setQuery] = useState('');
@@ -242,14 +243,14 @@ function DocumentSearchForPatient({ patientId, author, hindi, reports, documents
   function sourcePassage(report: CareReport, excerpt: CareDocumentMatch['excerpts'][number]) {
     const document = documents.find((item) => item.patientId === patientId && item.reportId === report.id);
     return <div key={`${excerpt.line}:${excerpt.text}`}><blockquote><p>{excerpt.text}</p><cite>{excerpt.page ? `${t('Page', 'पृष्ठ')} ${excerpt.page} · ` : ''}{t('Text line', 'टेक्स्ट पंक्ति')} {excerpt.line}</cite></blockquote>
-      {document && onAddTreatment && <CareDocumentTreatmentReview patientId={patientId} author={author} today={localDate()} hindi={hindi} report={report} document={document} excerpt={excerpt} onSave={onAddTreatment} onOpenHistory={onOpenCareStory} />}
+      {document && onAddTreatment && <CareDocumentTreatmentReview patientId={patientId} author={author} today={localDate()} lang={lang} report={report} document={document} excerpt={excerpt} onSave={onAddTreatment} onOpenHistory={onOpenCareStory} />}
     </div>;
   }
 
   if (editing) return <section className="care-document-search care-document-review" aria-labelledby={`${id}-review-heading`}>
     <header className="care-document-heading"><div><span className="care-document-eyebrow">{t('Check & save', 'जाँचें और सेव करें')}</span><h2 id={`${id}-review-heading`} tabIndex={-1} ref={reviewHeading}>{t('Your document', 'आपका दस्तावेज़')}</h2></div><button type="button" onClick={closeEditor}>{t('Cancel', 'रद्द करें')}</button></header>
     <form className="care-document-editor" onSubmit={saveText}><div className="care-document-review-grid">
-      <div className="care-document-original"><DocumentPreview report={editing} hindi={hindi} /><div className="care-document-original-caption"><strong>{editing.file.name}</strong><OriginalLink report={editing} hindi={hindi} /></div></div>
+      <div className="care-document-original"><DocumentPreview report={editing} lang={lang} /><div className="care-document-original-caption"><strong>{editing.file.name}</strong><OriginalLink report={editing} lang={lang} /></div></div>
       <div className="care-document-review-fields"><div className="care-document-fields-row"><label>{t('Keep under', 'कहाँ रखें')}<select value={category} onChange={(event) => setCategory(event.target.value as CareDocumentCategory)}><option value="cancer">{t('Cancer care', 'कैंसर की देखभाल')}</option><option value="monitoring">{t('Blood & lab tests', 'खून और लैब जाँच')}</option><option value="other">{t('Other', 'अन्य')}</option></select></label><label>{t('Document date', 'दस्तावेज़ की तारीख')}<input type="date" required max={localDate()} value={reportDate} disabled={!onReportsChange} onChange={(event) => setReportDate(event.target.value)} /></label></div>
         {reading && <div className="care-document-reading" role="status"><progress max={progress.total || 12} value={progress.page} /><span>{progress.total ? t(`Reading ${progress.page} of ${progress.total} pages`, `${progress.total} में से ${progress.page} पृष्ठ पढ़े`) : t('Opening your document…', 'दस्तावेज़ खोल रहे हैं…')}</span><button type="button" onClick={cancelRead}>{t('Stop', 'रोकें')}</button></div>}
         {readMessage && <p className="care-document-read-message" role="status">{readMessage}</p>}
@@ -275,17 +276,17 @@ function DocumentSearchForPatient({ patientId, author, hindi, reports, documents
     {removed.length > 0 && <div className="care-document-undo" role="status"><span>{t('Removed', 'हटाया')}: <strong>{removed[removed.length - 1].report.file.name}</strong></span><button type="button" onClick={undoRemoval}>{t('Undo', 'वापस लाएँ')}</button></div>}
     {submitted ? <div className="care-document-results" aria-live="polite"><div className="care-document-results-heading"><h3>{t('From your documents', 'आपके दस्तावेज़ों से')}</h3><button type="button" onClick={() => { setSubmitted(''); setQuery(''); }}>{t('Back to files', 'फ़ाइलों पर वापस')}</button></div>
       {matches.length > 0 ? <><p className="care-document-source-count">{matches.length} {t(matches.length === 1 ? 'source' : 'sources', 'स्रोत')} · {t('Quoted from saved text', 'सेव किए गए टेक्स्ट से लिए गए अंश')}</p>{matches.map(({ report, excerpts }) => <article className="care-document-match" key={report.id}>
-        <header><span className="care-document-file-icon" data-folder={careReportCategory(report, documents)}><DocumentIcon /></span><div><h4>{report.file.name}</h4><time dateTime={report.date}>{displayDate(report.date, hindi)}</time></div></header>
+        <header><span className="care-document-file-icon" data-folder={careReportCategory(report, documents)}><DocumentIcon /></span><div><h4>{report.file.name}</h4><time dateTime={report.date}>{displayDate(report.date, lang)}</time></div></header>
         {excerpts.slice(0, 2).map((excerpt) => sourcePassage(report, excerpt))}
         {excerpts.length > 2 && <details className="care-document-more"><summary>{t(`${excerpts.length - 2} more passages`, `${excerpts.length - 2} और अंश`)}</summary>{excerpts.slice(2).map((excerpt) => sourcePassage(report, excerpt))}</details>}
-        <footer><button type="button" onClick={() => openText(report)}>{t('Read document', 'दस्तावेज़ पढ़ें')}</button><OriginalLink report={report} hindi={hindi} /></footer>
+        <footer><button type="button" onClick={() => openText(report)}>{t('Read document', 'दस्तावेज़ पढ़ें')}</button><OriginalLink report={report} lang={lang} /></footer>
       </article>)}<button type="button" className="care-document-download" onClick={download}>{t('Download these passages', 'ये अंश डाउनलोड करें')}</button></>
         : <div className="care-document-empty"><DocumentIcon kind="search" /><h3>{t('Not found in these documents', 'इन दस्तावेज़ों में नहीं मिला')}</h3><p>{t('Try a report name, a medicine name, or fewer words.', 'जाँच का नाम, दवा का नाम या कम शब्द लिखकर खोजें।')}</p>{folder !== 'all' && <button type="button" onClick={() => setFolder('all')}>{t('Search all files', 'सभी फ़ाइलों में खोजें')}</button>}</div>}
       {availableText.length < available.length && <p className="care-document-limit">{t(`${available.length - availableText.length} files need text before they can be searched.`, `${available.length - availableText.length} फ़ाइलों में खोजने के लिए टेक्स्ट जोड़ना होगा।`)}</p>}
       {availableText.some((document) => (document.pageCount ?? 0) > (document.pagesRead ?? 0) || Boolean(document.pagesWithoutText?.length)) && <p className="care-document-limit">{t('Some pages have no saved text. View the original for the full document.', 'कुछ पृष्ठों का टेक्स्ट सेव नहीं है। पूरा दस्तावेज़ मूल फ़ाइल में देखें।')}</p>}
     </div> : filtered.length > 0 ? <ul className="care-document-library">{filtered.map((report) => {
       const document = availableText.find((item) => item.reportId === report.id);
-      return <li key={report.id} data-folder={careReportCategory(report, documents)}><span className="care-document-file-icon" data-folder={careReportCategory(report, documents)}><DocumentIcon /></span><div><button type="button" className="care-document-file-title" onClick={() => openText(report)}>{report.file.name.replace(/[_]/g, ' ')}</button><span className="care-document-file-meta"><time dateTime={report.date}>{displayDate(report.date, hindi)}</time><span>{categoryLabel(careReportCategory(report, documents))}</span></span></div><div className="care-document-file-actions"><button type="button" className="care-document-file-action" onClick={() => openText(report)}>{document ? t('Read', 'पढ़ें') : t('Add text', 'टेक्स्ट जोड़ें')} <span aria-hidden="true">↗</span></button>{onReportsChange && <button type="button" className="care-document-remove" onClick={() => removeReport(report.id)} aria-label={`${t('Remove', 'हटाएँ')} ${report.file.name}`}><DocumentIcon kind="remove" /></button>}</div></li>;
+      return <li key={report.id} data-folder={careReportCategory(report, documents)}><span className="care-document-file-icon" data-folder={careReportCategory(report, documents)}><DocumentIcon /></span><div><button type="button" className="care-document-file-title" onClick={() => openText(report)}>{report.file.name.replace(/[_]/g, ' ')}</button><span className="care-document-file-meta"><time dateTime={report.date}>{displayDate(report.date, lang)}</time><span>{categoryLabel(careReportCategory(report, documents))}</span></span></div><div className="care-document-file-actions"><button type="button" className="care-document-file-action" onClick={() => openText(report)}>{document ? t('Read', 'पढ़ें') : t('Add text', 'टेक्स्ट जोड़ें')} <span aria-hidden="true">↗</span></button>{onReportsChange && <button type="button" className="care-document-remove" onClick={() => removeReport(report.id)} aria-label={`${t('Remove', 'हटाएँ')} ${report.file.name}`}><DocumentIcon kind="remove" /></button>}</div></li>;
     })}</ul> : <div className="care-document-empty"><DocumentIcon kind="upload" /><h3>{t(available.length ? 'No files in this folder' : 'Keep your reports together', available.length ? 'इस फ़ोल्डर में कोई फ़ाइल नहीं है' : 'अपनी रिपोर्ट एक जगह रखें')}</h3>{onReportsChange && <button type="button" onClick={() => input.current?.click()}>{t('Add a PDF, photo or text file', 'PDF, फ़ोटो या टेक्स्ट फ़ाइल जोड़ें')}</button>}</div>}
   </section>;
 }

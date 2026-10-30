@@ -31,6 +31,7 @@ import {
   saveMedicineImageImport,
 } from './care-medicine-image-store';
 import { makeMedicineEvent } from './care-medicines-state';
+import { careText, type CareLang } from './care-i18n';
 
 type ReviewMedicine = OrganizedMedicine & {
   id: string;
@@ -46,7 +47,7 @@ export type CareMedicineImportProps = {
   patientId: string;
   author: string;
   today: string;
-  hindi: boolean;
+  lang: CareLang;
   onAdd: (event: CareEvent) => void;
   onCancel: () => void;
   onComplete: (medicineCount: number) => void;
@@ -70,11 +71,11 @@ function sourceName(files: readonly File[]): string {
   return `${files[0].name} + ${files.length - 1} more page${files.length === 2 ? '' : 's'}`.slice(0, 240);
 }
 
-function matchLabel(value: OrganizedMedicine['matchQuality'], hindi: boolean): string {
-  if (value === 'matched') return hindi ? 'पर्चे से मिलान हुआ' : 'Matched to prescription';
-  if (value === 'possible') return hindi ? 'संभावित मिलान — जाँचें' : 'Possible match — check it';
-  if (value === 'manual') return hindi ? 'मैन्युअल एंट्री' : 'Manual entry';
-  return hindi ? 'पर्चे से मिला, स्ट्रिप नहीं मिली' : 'From prescription · no strip match';
+function matchLabel(value: OrganizedMedicine['matchQuality'], lang: CareLang): string {
+  if (value === 'matched') return careText(lang, 'Matched to prescription', 'पर्चे से मिलान हुआ');
+  if (value === 'possible') return careText(lang, 'Possible match — check it', 'संभावित मिलान — जाँचें');
+  if (value === 'manual') return careText(lang, 'Manual entry', 'मैन्युअल एंट्री');
+  return careText(lang, 'From prescription · no strip match', 'पर्चे से मिला, स्ट्रिप नहीं मिली');
 }
 
 function doseFromMedicine(medicine: OrganizedMedicine): string {
@@ -119,9 +120,9 @@ function nextDefaultTime(times: readonly string[]): string {
   return '';
 }
 
-export function CareMedicineImport({ patientId, author, today, hindi, onAdd, onCancel, onComplete }: CareMedicineImportProps) {
+export function CareMedicineImport({ patientId, author, today, lang, onAdd, onCancel, onComplete }: CareMedicineImportProps) {
   const id = useId();
-  const t = (en: string, hi: string) => hindi ? hi : en;
+  const t = (en: string, hi: string) => careText(lang, en, hi);
   const [prescriptions, setPrescriptions] = useState<File[]>([]);
   const [medicineImages, setMedicineImages] = useState<File[]>([]);
   const [preparedPrescriptions, setPreparedPrescriptions] = useState<File[]>([]);
@@ -393,15 +394,15 @@ export function CareMedicineImport({ patientId, author, today, hindi, onAdd, onC
   return <div className="medicine-import-flow">
     <div className="medicine-import-intro"><div><p className="medicine-eyebrow">{t('Review before saving', 'सेव करने से पहले जाँचें')}</p><h2>{t(`${drafts.length} medicine${drafts.length === 1 ? '' : 's'} organized`, `${drafts.length} दवाओं की सूची तैयार है`)}</h2><p>{t('Correct anything that does not match the prescription. Unknown or uncertain details are called out below.', 'जो जानकारी पर्चे से मेल न खाए उसे ठीक करें। अनजान या संदिग्ध जानकारी नीचे दिखाई गई है।')}</p></div><span className="medicine-import-step">2 / 2</span></div>
     {warnings.length > 0 && <div className="medicine-import-warnings"><strong>{t('Reading notes', 'पढ़ने की जानकारी')}</strong><ul>{warnings.map((warning) => <li key={warning}>{warning}</li>)}</ul></div>}
-    {prescriptions.length > 0 && <details className="medicine-saved-source"><summary>{t('View original prescription pages', 'मूल पर्चे के पेज देखें')}</summary><div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>{prescriptions.map((file, page) => <MedicinePhoto key={`${page}:${file.name}`} file={file} alt={t(`Prescription page ${page + 1}`, `पर्चे का पेज ${page + 1}`)} hindi={hindi} prescription />)}</div></details>}
+    {prescriptions.length > 0 && <details className="medicine-saved-source"><summary>{t('View original prescription pages', 'मूल पर्चे के पेज देखें')}</summary><div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>{prescriptions.map((file, page) => <MedicinePhoto key={`${page}:${file.name}`} file={file} alt={t(`Prescription page ${page + 1}`, `पर्चे का पेज ${page + 1}`)} lang={lang} prescription />)}</div></details>}
     <div className="medicine-review-list">{drafts.map((draft, index) => <article id={`${id}-draft-${draft.id}`} className={`medicine-review-card${draft.confirmed ? ' is-checked' : ''}${invalidDraftId === draft.id ? ' has-error' : ''}`} key={draft.id}>
-      <div className="medicine-review-card-head">{draft.medicineImageIndex >= 0 && medicineImages[draft.medicineImageIndex] ? <div className="medicine-review-photo"><FileThumbnail file={medicineImages[draft.medicineImageIndex]} alt={t(`Photo matched to medicine ${index + 1}`, `दवा ${index + 1} से मिली तस्वीर`)} /></div> : <div className="medicine-review-photo is-empty" aria-hidden="true">Rx</div>}<div><span>{draft.prescriptionItemNumber === null ? t(`Medicine ${index + 1}`, `दवा ${index + 1}`) : t(`Prescription item ${draft.prescriptionItemNumber}`, `पर्चे की दवा ${draft.prescriptionItemNumber}`)}</span><strong>{matchLabel(draft.matchQuality, hindi)}</strong>{draft.confidence !== null && <small>{t(`AI confidence ${Math.round(draft.confidence * 100)}%`, `AI भरोसा ${Math.round(draft.confidence * 100)}%`)}</small>}</div><button type="button" className="medicine-text-button" onClick={() => setDrafts((items) => items.filter((_, itemIndex) => itemIndex !== index))}>{t('Remove', 'हटाएँ')}</button></div>
+      <div className="medicine-review-card-head">{draft.medicineImageIndex >= 0 && medicineImages[draft.medicineImageIndex] ? <div className="medicine-review-photo"><FileThumbnail file={medicineImages[draft.medicineImageIndex]} alt={t(`Photo matched to medicine ${index + 1}`, `दवा ${index + 1} से मिली तस्वीर`)} /></div> : <div className="medicine-review-photo is-empty" aria-hidden="true">Rx</div>}<div><span>{draft.prescriptionItemNumber === null ? t(`Medicine ${index + 1}`, `दवा ${index + 1}`) : t(`Prescription item ${draft.prescriptionItemNumber}`, `पर्चे की दवा ${draft.prescriptionItemNumber}`)}</span><strong>{matchLabel(draft.matchQuality, lang)}</strong>{draft.confidence !== null && <small>{t(`AI confidence ${Math.round(draft.confidence * 100)}%`, `AI भरोसा ${Math.round(draft.confidence * 100)}%`)}</small>}</div><button type="button" className="medicine-text-button" onClick={() => setDrafts((items) => items.filter((_, itemIndex) => itemIndex !== index))}>{t('Remove', 'हटाएँ')}</button></div>
       {draft.uncertainties.length > 0 && <div className="medicine-ai-uncertainties"><strong>{t('Check carefully', 'ध्यान से जाँचें')}</strong><ul>{draft.uncertainties.map((uncertainty) => <li key={uncertainty}>{uncertainty}</li>)}</ul></div>}
       <div className="medicine-review-fields">
         <label>{t('Medicine name', 'दवा का नाम')}<input value={draft.title} maxLength={120} onChange={(event) => patchDraft(index, { title: event.target.value })} /></label>
         <label>{t('Dose & quantity exactly as prescribed', 'पर्चे के अनुसार खुराक और मात्रा')}<input value={draft.dose} maxLength={160} onChange={(event) => patchDraft(index, { dose: event.target.value })} /></label>
         <label>{t('Frequency & instructions', 'कितनी बार और निर्देश')}<textarea rows={2} value={draft.instructions} maxLength={500} onChange={(event) => patchDraft(index, { instructions: event.target.value })} /></label>
-        <fieldset className="medicine-meal-timing"><legend>{t('When to take it with food', 'खाने के हिसाब से कब लें')}</legend>{MEDICINE_MEAL_TIMINGS.map((value) => <button type="button" key={value} aria-pressed={draft.mealTiming === value} onClick={() => patchDraft(index, { mealTiming: value as MedicineMealTiming })}>{medicineMealTimingLabel(value, hindi)}</button>)}</fieldset>
+        <fieldset className="medicine-meal-timing"><legend>{t('When to take it with food', 'खाने के हिसाब से कब लें')}</legend>{MEDICINE_MEAL_TIMINGS.map((value) => <button type="button" key={value} aria-pressed={draft.mealTiming === value} onClick={() => patchDraft(index, { mealTiming: value as MedicineMealTiming })}>{medicineMealTimingLabel(value, lang)}</button>)}</fieldset>
         <div className="medicine-review-times"><div className="medicine-review-times-heading"><div><strong>{t('Optional reminder times', 'वैकल्पिक रिमाइंडर समय')}</strong><span>{t('These times organise your calendar. This website cannot alert you after the page closes; use Android reminders or export to your calendar.', 'ये समय कैलेंडर को व्यवस्थित करते हैं। पेज बंद होने के बाद वेबसाइट सूचना नहीं भेज सकती; Android रिमाइंडर या कैलेंडर में एक्सपोर्ट का उपयोग करें।')}</span></div><button type="button" disabled={draft.times.length >= 6} onClick={() => addTime(index)}>+ {t('Add time', 'समय जोड़ें')}</button></div>{draft.times.length === 0 ? <p className="medicine-no-reminders">{t('No reminder will be scheduled. You can add one later.', 'कोई रिमाइंडर तय नहीं होगा। आप बाद में जोड़ सकते हैं।')}</p> : draft.times.map((time, timeIndex) => <div className="medicine-review-time" key={`${draft.id}-${time}`}><input type="time" value={time} aria-label={t(`Time ${timeIndex + 1} for ${draft.title || `medicine ${index + 1}`}`, `${draft.title || `दवा ${index + 1}`} का समय ${timeIndex + 1}`)} onChange={(event) => patchTime(index, timeIndex, event.target.value)} /><button type="button" onClick={() => removeTime(index, timeIndex)} aria-label={t('Remove this time', 'यह समय हटाएँ')}>×</button></div>)}</div>
         <div className="medicine-course-dates"><label>{t('First day', 'पहला दिन')}<input type="date" value={draft.startDate} onChange={(event) => patchCourseStart(index, event.target.value)} /></label><label>{t('Course length (days)', 'कोर्स की अवधि (दिन)')}<input type="number" min="1" step="1" inputMode="numeric" value={draft.durationDays ?? ''} placeholder={t('Not stated', 'नहीं बताया')} onChange={(event) => patchCourseDuration(index, event.target.value)} /></label><label className="medicine-ongoing"><input type="checkbox" checked={draft.ongoing} onChange={(event) => patchOngoing(index, event.target.checked)} /><span>{t('Ongoing until I stop it', 'जब तक मैं रोकूँ तब तक जारी')}</span></label>{!draft.ongoing && <label>{t('Last day', 'आखिरी दिन')}<input type="date" min={draft.startDate} value={draft.endDate} onChange={(event) => patchCourseEnd(index, event.target.value)} /></label>}</div>
       </div>

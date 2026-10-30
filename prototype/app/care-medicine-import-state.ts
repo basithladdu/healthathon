@@ -1,3 +1,4 @@
+import { careLangOf, careText, type CareLang } from './care-i18n.ts';
 export const MEDICINE_MEAL_TIMINGS = ['not-stated', 'before-food', 'with-food', 'after-food'] as const;
 export type MedicineMealTiming = (typeof MEDICINE_MEAL_TIMINGS)[number];
 
@@ -69,15 +70,12 @@ export function sortOrganizedMedicinesByPrescriptionOrder<T extends Pick<Organiz
   }).map(({ medicine }) => medicine);
 }
 
-export function medicineMealTimingLabel(value: MedicineMealTiming, hindi = false): string {
-  if (hindi) return value === 'before-food' ? 'खाने से पहले'
-    : value === 'with-food' ? 'खाने के साथ'
-      : value === 'after-food' ? 'खाने के बाद'
-        : 'कभी भी / नहीं बताया';
-  return value === 'before-food' ? 'Before food'
-    : value === 'with-food' ? 'With food'
-      : value === 'after-food' ? 'After food'
-        : 'Anytime / not stated';
+export function medicineMealTimingLabel(value: MedicineMealTiming, hindi: boolean | CareLang = false): string {
+  const t = (en: string, hi: string) => careText(careLangOf(hindi), en, hi);
+  return value === 'before-food' ? t('Before food', 'खाने से पहले')
+    : value === 'with-food' ? t('With food', 'खाने के साथ')
+      : value === 'after-food' ? t('After food', 'खाने के बाद')
+        : t('Anytime / not stated', 'कभी भी / नहीं बताया');
 }
 
 const MEDICINE_MARKER = /\b(?:tab(?:let)?s?|cap(?:sule)?s?|syr(?:up)?|inj(?:ection)?|cream|ointment|drops?|mg|mcg|µg|ml|units?|iu)\b/iu;

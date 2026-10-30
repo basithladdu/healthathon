@@ -7,9 +7,10 @@ import {
   validateHomeHelpInput, homeHelpText, type HomeHelpCategory, type HomeHelpEntry, type HomeHelpStatus,
 } from './family-home-help-state';
 import './family-home-help.css';
+import { careLocale, careText, type CareLang } from './care-i18n';
 
 export type FamilyHomeHelpProps = {
-  patientId: string; author: string; today: string; hindi: boolean;
+  patientId: string; author: string; today: string; lang: CareLang;
   entries: HomeHelpEntry[]; onChange: (entries: HomeHelpEntry[]) => void;
 };
 
@@ -29,10 +30,10 @@ export function FamilyHomeHelp(props: FamilyHomeHelpProps) {
   return <HomeHelpForPatient key={`${props.patientId}:${props.author}`} {...props} />;
 }
 
-function HomeHelpForPatient({ patientId, author, today, hindi, entries, onChange }: FamilyHomeHelpProps) {
+function HomeHelpForPatient({ patientId, author, today, lang, entries, onChange }: FamilyHomeHelpProps) {
   const id = useId();
   const form = useRef<HTMLFormElement>(null);
-  const t = (en: string, hi: string) => hindi ? hi : en;
+  const t = (en: string, hi: string) => careText(lang, en, hi);
   const [category, setCategory] = useState<HomeHelpCategory | ''>('');
   const [title, setTitle] = useState('');
   const [helper, setHelper] = useState('');
@@ -47,7 +48,7 @@ function HomeHelpForPatient({ patientId, author, today, hindi, entries, onChange
   const [error, setError] = useState('');
   const patientEntries = selectHomeHelpEntries(entries, patientId);
   const visible = selectHomeHelpEntries(entries, patientId, filter);
-  const dateLabel = (value: string) => new Date(`${value}T12:00:00`).toLocaleDateString(hindi ? 'hi-IN' : 'en-GB', { day: 'numeric', month: 'short' });
+  const dateLabel = (value: string) => new Date(`${value}T12:00:00`).toLocaleDateString(careLocale(lang), { day: 'numeric', month: 'short' });
 
   function chooseCategory(next: HomeHelpCategory) {
     const wasDefault = category && (title === labels[category].title || title === labels[category].hindiTitle);
@@ -104,7 +105,7 @@ function HomeHelpForPatient({ patientId, author, today, hindi, entries, onChange
   }
 
   function download() {
-    const url = URL.createObjectURL(new Blob([homeHelpText(entries, patientId, today, hindi)], { type: 'text/plain;charset=utf-8' }));
+    const url = URL.createObjectURL(new Blob([homeHelpText(entries, patientId, today, lang)], { type: 'text/plain;charset=utf-8' }));
     const link = document.createElement('a'); link.href = url; link.download = `sahara-help-at-home-${today}.txt`; link.click(); window.setTimeout(() => URL.revokeObjectURL(url), 1000);
     setMessage(t('Your list is ready to download.', 'आपकी सूची डाउनलोड के लिए तैयार है।'));
   }

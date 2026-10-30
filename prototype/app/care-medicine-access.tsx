@@ -10,9 +10,10 @@ import { IconArrowRight } from './icons';
 import { EMPTY_MEDICINE_ACCESS_ENTRY, type MedicineAccessEntry, type MedicineAccessSnapshot, type MedicineAccessStatus } from './care-medicine-access-state';
 import './care-medicine-access.css';
 import './care-directory.css';
+import { careLocale, careText, type CareLang } from './care-i18n';
 
-export function CareMedicineAccess({ hindi, entry = EMPTY_MEDICINE_ACCESS_ENTRY, onChange, careTeam }: {
-  hindi: boolean;
+export function CareMedicineAccess({ lang, entry = EMPTY_MEDICINE_ACCESS_ENTRY, onChange, careTeam }: {
+  lang: CareLang;
   entry?: MedicineAccessEntry;
   onChange: (entry: MedicineAccessEntry) => void;
   careTeam?: { name?: string; phone?: string };
@@ -20,7 +21,7 @@ export function CareMedicineAccess({ hindi, entry = EMPTY_MEDICINE_ACCESS_ENTRY,
   const [copyStatus, setCopyStatus] = useState('');
   const [showCentres, setShowCentres] = useState(false);
   const centres = filterCareCentres(entry.location, 'Karnataka', '', 'available');
-  const t = (en: string, hi: string) => hindi ? hi : en;
+  const t = (en: string, hi: string) => careText(lang, en, hi);
   const snapshot = (value: MedicineAccessEntry): MedicineAccessSnapshot => ({
     location: value.location,
     contactName: value.contactName,
@@ -98,7 +99,7 @@ export function CareMedicineAccess({ hindi, entry = EMPTY_MEDICINE_ACCESS_ENTRY,
         {entry.previous && <button type="button" className="cma-undo" onClick={undo}>{t('Undo last change', 'पिछला बदलाव वापस लें')}</button>}
         {copyStatus && <span role="status">{copyStatus}</span>}
       </div>
-      {entry.updatedAt && <p className="cma-saved">{t('Updated', 'अपडेट किया गया')} · {new Date(entry.updatedAt).toLocaleString(hindi ? 'hi-IN' : 'en-IN')}</p>}
+      {entry.updatedAt && <p className="cma-saved">{t('Updated', 'अपडेट किया गया')} · {new Date(entry.updatedAt).toLocaleString(careLocale(lang, 'en-IN'))}</p>}
     </section>
     </details>
   </main>;

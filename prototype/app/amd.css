@@ -1,0 +1,137 @@
+/* Living will (AMD) screen. Uses the care palette (care-colors.css) with fallbacks outside the care shell. */
+.amd-screen {
+  --amd-ink: var(--care-ink, #382e29);
+  --amd-muted: var(--care-muted, #76675d);
+  --amd-surface: var(--care-surface, #fffdf9);
+  --amd-line: var(--care-line, #e6ddd1);
+  --amd-primary: var(--care-primary, #b9472c);
+  --amd-primary-hover: var(--care-primary-hover, #923522);
+  --amd-honey: var(--care-honey, #ffe69f);
+  --amd-sage: var(--care-sage, #d9eaa8);
+  --amd-sage-ink: var(--care-sage-ink, #465e45);
+  --amd-peach: var(--care-peach, #ffd1b3);
+  --amd-lavender: var(--care-lavender, #ddc8ff);
+  --amd-lavender-ink: var(--care-lavender-ink, #655278);
+  display: grid;
+  gap: 18px;
+  max-width: 880px;
+  color: var(--amd-ink);
+  font-size: 16px;
+  line-height: 1.5;
+}
+.amd-screen * { box-sizing: border-box; }
+.amd-head h1 { margin: 2px 0 8px; font-family: Georgia, 'Times New Roman', serif; font-weight: 500; }
+.amd-eyebrow { margin: 0; color: var(--amd-muted); font-size: 13px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.amd-lede { margin: 0; max-width: 62ch; color: var(--amd-muted); }
+.amd-card {
+  display: grid;
+  gap: 14px;
+  padding: 20px 22px;
+  background: var(--amd-surface);
+  border: 1px solid var(--amd-line);
+  border-radius: 18px;
+  box-shadow: var(--care-shadow, 0 5px 20px #664b3010);
+  min-width: 0;
+}
+.amd-card h2 { margin: 0; font-family: Georgia, 'Times New Roman', serif; font-size: 23px; font-weight: 500; }
+.amd-card h3 { margin: 8px 0 0; font-size: 17px; }
+.amd-prose p, .amd-prose ul { margin: 0 0 10px; }
+.amd-prose li, .amd-numbered li { margin-bottom: 6px; }
+.amd-numbered { margin: 0; padding-left: 22px; }
+
+/* Status and lifecycle */
+.amd-status-line { display: flex; flex-wrap: wrap; gap: 8px; }
+.amd-chip { display: inline-block; padding: 4px 10px; border-radius: 999px; background: var(--amd-honey); color: #5b391f; font-size: 13px; font-weight: 600; }
+.amd-chip-ok { background: var(--amd-sage); color: var(--amd-sage-ink); }
+.amd-chip-none { background: #efe7dc; color: var(--amd-muted); }
+.amd-chip-work { background: var(--amd-lavender); color: var(--amd-lavender-ink); }
+.amd-life { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; counter-reset: amd-life; }
+.amd-life li { counter-increment: amd-life; padding: 6px 12px; border-radius: 12px; border: 1px solid var(--amd-line); color: var(--amd-muted); font-size: 14px; }
+.amd-life li::before { content: counter(amd-life) '. '; font-weight: 700; }
+.amd-life li[data-state='current'] { border-color: var(--amd-primary); color: var(--amd-ink); font-weight: 600; }
+.amd-life li[data-state='done'] { background: var(--amd-sage); border-color: transparent; color: var(--amd-sage-ink); }
+.amd-life li[data-state='done']::before { content: '✓ '; }
+.amd-history { margin: 8px 0 0; padding-left: 18px; font-size: 14px; }
+.amd-history code, .amd-hash { font-size: 12px; overflow-wrap: anywhere; word-break: break-all; }
+
+/* Steps (same pattern as the hospital survey) */
+.amd-steps { display: flex; gap: 6px; margin: 0; padding: 0; list-style: none; overflow-x: auto; scrollbar-width: thin; }
+.amd-steps li { flex: 0 0 auto; }
+.amd-steps button {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 6px 12px;
+  border: 1px solid var(--amd-line); border-radius: 12px; background: transparent; color: var(--amd-muted); font: inherit; font-size: 14px; cursor: pointer;
+}
+.amd-steps button:disabled { cursor: default; opacity: .7; }
+.amd-steps button span { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: #efe7dc; font-size: 12px; font-weight: 700; }
+.amd-steps li[data-state='current'] button { border-color: var(--amd-primary); color: var(--amd-ink); font-weight: 600; }
+.amd-steps li[data-state='current'] button span { background: var(--amd-primary); color: #fffaf5; }
+.amd-steps li[data-state='done'] button span { background: var(--amd-sage); color: var(--amd-sage-ink); }
+.amd-step-title { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px; }
+.amd-step-title h2:focus { outline: none; }
+.amd-step-title span { color: var(--amd-muted); font-size: 14px; }
+
+/* Fields */
+.amd-field { display: grid; gap: 5px; min-width: 0; }
+.amd-field > label { font-weight: 600; }
+.amd-field :is(input:not([type='checkbox']):not([type='radio']):not([type='file']), select, textarea) {
+  width: 100%; min-height: 44px; padding: 10px 12px; font: inherit; color: var(--amd-ink);
+  background: var(--amd-surface); border: 1px solid #cfc1b3; border-radius: 11px;
+}
+.amd-field textarea { resize: vertical; }
+.amd-field [aria-invalid='true'] { border-color: #b3261e; }
+.amd-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.amd-hint { margin: 0; color: var(--amd-muted); font-size: 14px; }
+.amd-fieldset, .amd-dhr, .amd-treatment { display: grid; gap: 10px; margin: 0; padding: 14px 16px; border: 1px solid var(--amd-line); border-radius: 14px; min-width: 0; }
+.amd-fieldset legend, .amd-dhr legend, .amd-treatment legend { padding: 0 6px; font-weight: 700; }
+.amd-dhr-tools { display: flex; gap: 6px; justify-content: flex-end; }
+.amd-dhr-tools button { min-width: 44px; }
+.amd-check { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; }
+.amd-check input { width: 20px; height: 20px; margin-top: 2px; flex: 0 0 auto; accent-color: var(--amd-primary); }
+.amd-check:has(input:disabled) { cursor: default; color: var(--amd-muted); }
+.amd-segment { display: flex; flex-wrap: wrap; gap: 8px; }
+.amd-segment label { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 8px 14px; border: 1px solid #cfc1b3; border-radius: 12px; cursor: pointer; }
+.amd-segment label[data-on] { border-color: var(--amd-primary); background: #fff1e8; font-weight: 600; }
+.amd-segment input { accent-color: var(--amd-primary); }
+
+/* Messages */
+.amd-issue { margin: 0; padding: 8px 12px; border-radius: 10px; font-size: 14px; }
+.amd-issue-block { background: #fde8e5; color: #8c1d13; }
+.amd-issue-warn, .amd-issue-confirm { background: #fff4d6; color: #6b4a0e; }
+.amd-issue-list { display: grid; gap: 6px; }
+.amd-callout { display: grid; gap: 4px; padding: 12px 14px; border-radius: 14px; background: #f3ede4; border-left: 4px solid var(--amd-muted); }
+.amd-callout p { margin: 0; }
+.amd-callout-warn { background: #fff4d6; border-color: #c48a1a; }
+.amd-callout-ok { background: #eef6dc; border-color: var(--amd-sage-ink); }
+.amd-callout-danger { background: #fde8e5; border-color: #b3261e; }
+
+/* Summary, copies */
+.amd-summary { display: grid; gap: 0; margin: 0; border: 1px solid var(--amd-line); border-radius: 14px; overflow: hidden; }
+.amd-summary > div { display: grid; grid-template-columns: minmax(130px, 30%) 1fr; gap: 12px; padding: 10px 14px; border-top: 1px solid var(--amd-line); }
+.amd-summary > div:first-child { border-top: 0; }
+.amd-summary dt { color: var(--amd-muted); font-weight: 600; }
+.amd-summary dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.amd-copies { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.amd-copies li { display: grid; gap: 8px; padding: 12px 14px; border: 1px solid var(--amd-line); border-radius: 14px; }
+.amd-copies select { min-height: 44px; padding: 8px 10px; border-radius: 11px; border: 1px solid #cfc1b3; background: var(--amd-surface); font: inherit; }
+.amd-details summary { cursor: pointer; font-weight: 600; min-height: 44px; display: flex; align-items: center; }
+.amd-pathway { margin: 6px 0 0; padding-left: 18px; display: grid; gap: 6px; }
+.amd-split { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; border-top: 1px solid var(--amd-line); padding-top: 12px; }
+.amd-revoke { display: grid; gap: 10px; }
+
+/* Actions */
+.amd-actions { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; }
+.amd-screen .amd-primary { min-height: 48px; padding: 10px 20px; color: #fffaf5; background: var(--amd-primary); border: 1px solid var(--amd-primary); border-radius: 12px; font: inherit; font-weight: 600; cursor: pointer; }
+.amd-screen .amd-primary:hover:not(:disabled) { background: var(--amd-primary-hover); }
+.amd-screen .amd-primary:disabled { opacity: .6; cursor: progress; }
+.amd-screen .secondary-button { min-height: 44px; padding: 8px 16px; color: var(--amd-ink); background: var(--amd-surface); border: 1px solid var(--amd-line); border-radius: 12px; font: inherit; cursor: pointer; }
+.amd-screen .secondary-button:disabled { opacity: .5; cursor: default; }
+.amd-screen .amd-danger { color: #8c1d13; border-color: #e3b4ad; }
+.amd-screen .amd-primary.amd-danger { color: #fff; background: #a3271b; border-color: #a3271b; }
+.amd-screen .care-text-button { background: none; border: 0; padding: 0 4px; color: var(--amd-primary); font: inherit; text-decoration: underline; cursor: pointer; }
+.amd-screen :is(button, input, select, textarea, summary):focus-visible { outline: 3px solid #a7653d; outline-offset: 2px; }
+
+@media (max-width: 560px) {
+  .amd-card { padding: 16px 14px; border-radius: 14px; }
+  .amd-summary > div { grid-template-columns: 1fr; gap: 2px; }
+  .amd-actions > * { flex: 1 1 auto; }
+}

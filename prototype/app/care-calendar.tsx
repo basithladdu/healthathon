@@ -9,9 +9,10 @@ import type { CareDocumentText } from './care-document-search';
 import type { CareSaveStatus } from './care-local-store';
 import { VisitInstructions } from './visit-instructions';
 import { CareRouteLink } from './care-route-link';
+import { careLocale, careText, type CareLang } from './care-i18n';
 
 type Props = {
-  patientId: string; author: string; today: string; hindi: boolean;
+  patientId: string; author: string; today: string; lang: CareLang;
   appointments: Appointment[]; tasks: FamilyTask[]; events: CareEvent[]; checks: CareCheck[]; reports: CareReport[];
   reportSave: CareSaveStatus;
   focusReports?: boolean;
@@ -31,10 +32,10 @@ export function CareCalendar(props: Props) {
   return <CareCalendarContent key={`${props.patientId}:${props.author}`} {...props} />;
 }
 
-function CareCalendarContent({ patientId, author, today, hindi, appointments, tasks, events, checks, reports, reportSave, focusReports = false, documentText = [], onReadReport, onTestResults, onAppointmentInstructions, onAdd, onUpdate, onMedicines, onCheck, onTaskCheck, onRemove: removeEvent, onRestore, onReports, onRemoveReport: removeReport, onCareTeam }: Props) {
+function CareCalendarContent({ patientId, author, today, lang, appointments, tasks, events, checks, reports, reportSave, focusReports = false, documentText = [], onReadReport, onTestResults, onAppointmentInstructions, onAdd, onUpdate, onMedicines, onCheck, onTaskCheck, onRemove: removeEvent, onRestore, onReports, onRemoveReport: removeReport, onCareTeam }: Props) {
   const id = useId();
   const eventForm = useRef<HTMLFormElement>(null);
-  const t = (en: string, hi: string) => hindi ? hi : en;
+  const t = (en: string, hi: string) => careText(lang, en, hi);
   const [selected, setSelected] = useState(today);
   const [month, setMonth] = useState(today.slice(0, 7));
   const [expanded, setExpanded] = useState(false);
@@ -51,8 +52,8 @@ function CareCalendarContent({ patientId, author, today, hindi, appointments, ta
   const localReports = reports.filter((item) => item.patientId === patientId).sort((a, b) => b.date.localeCompare(a.date));
   const days = calendarDays(month);
   const week = calendarWeekDays(selected);
-  const displayDate = (date: string, options: Intl.DateTimeFormatOptions) => new Date(`${date}T12:00:00`).toLocaleDateString(hindi ? 'hi-IN' : 'en-GB', options);
-  const kindName = (value: string) => hindi ? ({ Chemotherapy: 'कीमोथेरेपी', Radiotherapy: 'रेडियोथेरेपी', Medicine: 'दवा', Appointment: 'मुलाकात', Test: 'जाँच', Procedure: 'प्रक्रिया', 'Follow-up': 'फॉलो-अप', Task: 'काम' }[value] ?? value) : value;
+  const displayDate = (date: string, options: Intl.DateTimeFormatOptions) => new Date(`${date}T12:00:00`).toLocaleDateString(careLocale(lang), options);
+  const kindName = (value: string) => careText(lang, value, ({ Chemotherapy: 'कीमोथेरेपी', Radiotherapy: 'रेडियोथेरेपी', Medicine: 'दवा', Appointment: 'मुलाकात', Test: 'जाँच', Procedure: 'प्रक्रिया', 'Follow-up': 'फॉलो-अप', Task: 'काम' }[value] ?? value));
   const eventClass = (value: CareEventKind) => value === 'Medicine' ? 'care-agenda-medicine' : value === 'Chemotherapy' ? 'care-agenda-chemo' : value === 'Radiotherapy' ? 'care-agenda-radiotherapy' : 'care-agenda-visit';
   const agendaDates = agendaMode === 'week' ? week : [selected];
 
@@ -128,7 +129,7 @@ function CareCalendarContent({ patientId, author, today, hindi, appointments, ta
     return <section key={date} className={agendaMode === 'week' ? 'care-week-agenda-day' : undefined} aria-label={displayDate(date, { weekday: 'long', day: 'numeric', month: 'long' })}>
       {agendaMode === 'week' && <h3><time dateTime={date}>{displayDate(date, { weekday: 'short', day: 'numeric', month: 'short' })}</time>{date === today && <span>{t('Today', 'आज')}</span>}</h3>}
       <ul className="care-agenda-list">
-        {[...dueVisits.map((visit) => ({ time: visit.time, node: <li className="care-agenda-visit" key={visit.id}><time>{visit.time}</time><div><span className="care-agenda-kind">{t('Appointment', 'मुलाकात')} · {visit.status}</span><strong>{visit.type}</strong><span>{visit.clinician} · {visit.mode}</span></div><button type="button" className="care-text-button" onClick={onCareTeam}>{t('Care team', 'देखभाल टीम')} →</button><VisitInstructions key={visit.id} value={visit.preparationInstructions} author={author} clinician={visit.clinician} hindi={hindi} onChange={(value) => onAppointmentInstructions(patientId, visit.id, value)} /></li> })),
+        {[...dueVisits.map((visit) => ({ time: visit.time, node: <li className="care-agenda-visit" key={visit.id}><time>{visit.time}</time><div><span className="care-agenda-kind">{t('Appointment', 'मुलाकात')} · {visit.status}</span><strong>{visit.type}</strong><span>{visit.clinician} · {visit.mode}</span></div><button type="button" className="care-text-button" onClick={onCareTeam}>{t('Care team', 'देखभाल टीम')} →</button><VisitInstructions key={visit.id} value={visit.preparationInstructions} author={author} clinician={visit.clinician} lang={lang} onChange={(value) => onAppointmentInstructions(patientId, visit.id, value)} /></li> })),
         ...dueEvents.map((item) => {
           const checked = checks.find((check) => check.patientId === patientId && check.eventId === item.id && check.date === date);
           return { time: item.time || '99', node: <li key={item.id} className={`${eventClass(item.kind)}${checked ? ' is-done' : ''}`}><time>{item.time || '—'}</time><div><span className="care-agenda-kind">{kindName(item.kind)}</span><strong>{item.title}</strong>{item.instructions && <span>{item.instructions}</span>}<span className="care-entry-author">{checked ? `${t('Marked by', 'दर्ज किया')} ${checked.actor}` : `${t('Added by', 'जोड़ने वाले')} ${item.addedBy}`}</span></div><div className="care-agenda-actions"><button type="button" className="care-check-button" aria-pressed={Boolean(checked)} disabled={date > today} aria-label={`${checked ? t('Undo', 'वापस करें') : item.kind === 'Medicine' ? t('Mark taken', 'दवा ले ली') : t('Mark done', 'हो गया')}: ${item.title}${dateContext}`} onClick={() => { onCheck(item.id, date, !checked); setMessage(checked ? t('Undone.', 'वापस कर दिया।') : t('Marked for this day.', 'इस दिन के लिए दर्ज किया।')); }}>{checked ? '✓' : t(item.kind === 'Medicine' ? 'Taken' : 'Done', 'हो गया')}</button>{onUpdate && <button type="button" className="care-edit-event" aria-label={`${t('Edit', 'बदलें')} ${item.title}${item.repeatUntil ? t(' on all days', ' सभी दिनों के लिए') : ''}`} onClick={() => editEvent(item)}>{t('Edit', 'बदलें')}</button>}<button type="button" className="care-remove-event" aria-label={`${t('Remove', 'हटाएँ')} ${item.title}`} onClick={() => onRemove(item.id)}>{t('Remove', 'हटाएँ')}</button></div></li> };
@@ -144,7 +145,7 @@ function CareCalendarContent({ patientId, author, today, hindi, appointments, ta
     {!focusReports && <div className="care-calendar-grid">
       <div className="care-calendar-month">
         <div className="care-month-heading"><button type="button" aria-label={t('Previous month', 'पिछला महीना')} onClick={() => changeMonth(-1)}>‹</button><h2>{displayDate(`${month}-01`, { month: 'long', year: 'numeric' })}</h2><button type="button" aria-label={t('Next month', 'अगला महीना')} onClick={() => changeMonth(1)}>›</button></div>
-        <div className="care-calendar-weekdays" aria-hidden="true">{(hindi ? ['सो', 'मं', 'बु', 'गु', 'शु', 'श', 'र'] : ['M', 'T', 'W', 'T', 'F', 'S', 'S']).map((day, index) => <span key={index}>{day}</span>)}</div>
+        <div className="care-calendar-weekdays" aria-hidden="true">{(lang === 'hi' ? ['सो', 'मं', 'बु', 'गु', 'शु', 'श', 'र'] : ['M', 'T', 'W', 'T', 'F', 'S', 'S']).map((day, index) => <span key={index}>{day}</span>)}</div>
         <div className={`care-calendar-dates ${expanded ? 'is-expanded' : ''}`}>{days.map(dayButton)}</div>
         {!expanded && <div className="care-calendar-week">{week.map(dayButton)}</div>}
         <div className="care-calendar-key"><span><i className="chemo" />{t('Chemotherapy', 'कीमोथेरेपी')}</span><span><i className="radiotherapy" />{t('Radiotherapy', 'रेडियोथेरेपी')}</span><span><i className="visit" />{t('Visits & tests', 'मुलाकात और जाँच')}</span>{localEvents.some((item) => item.kind === 'Medicine') && <span><i className="medicine" />{t('Medicines', 'दवाएँ')}</span>}{localTasks.length > 0 && <span><i className="task" />{t('Tasks', 'काम')}</span>}</div>
@@ -178,9 +179,9 @@ function CareCalendarContent({ patientId, author, today, hindi, appointments, ta
       }} /></label></div>
       <label className="care-report-date">{t('Report date', 'रिपोर्ट की तारीख')}<input type="date" value={selected} required onChange={(event) => { if (event.target.value) setSelected(event.target.value); }} /></label>
       {localReports.length > 0 && reportSave === 'unavailable' && <p className="care-calendar-note" role="alert">{t('Could not save these files. Download the originals before closing.', 'फ़ाइलें सेव नहीं हुईं। बंद करने से पहले मूल फ़ाइलें डाउनलोड करें।')}</p>}
-      <FamilyReportLibrary key={patientId} patientId={patientId} hindi={hindi} reports={reports} documents={documentText} onRemove={onRemoveReport} onEditText={onReadReport} />
+      <FamilyReportLibrary key={patientId} patientId={patientId} lang={lang} reports={reports} documents={documentText} onRemove={onRemoveReport} onEditText={onReadReport} />
       {removedReport && <button type="button" className="care-text-button" onClick={() => { onReports([removedReport]); setRemovedReport(null); }}>{t('Undo last report removal', 'आखिरी हटाई रिपोर्ट वापस लाएँ')}</button>}
-      <FamilyReportComparison key={patientId} patientId={patientId} reports={reports} hindi={hindi} />
+      <FamilyReportComparison key={patientId} patientId={patientId} reports={reports} lang={lang} />
       <button type="button" className="care-text-button" onClick={onTestResults}>{t('See results by test', 'जाँच के नाम से नतीजे देखें')} →</button>
     </section>}
     <p className="care-calendar-status" role="status">{message}</p>

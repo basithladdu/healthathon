@@ -4,10 +4,11 @@ import { useId, useRef, useState, type FormEvent } from 'react';
 import type { CareReport } from './care-calendar-state';
 import type { CareDocumentText } from './care-document-state';
 import { confirmCareDocumentTreatment, type CareDocumentTreatmentError, type CareDocumentTreatmentExcerpt, type ConfirmedDocumentTreatment } from './care-document-treatment-state';
+import { careText, type CareLang } from './care-i18n';
 
 export type { CareDocumentTreatmentSource, ConfirmedDocumentTreatment } from './care-document-treatment-state';
 export type CareDocumentTreatmentReviewProps = {
-  patientId: string; author: string; today: string; hindi: boolean;
+  patientId: string; author: string; today: string; lang: CareLang;
   report: CareReport; document: CareDocumentText; excerpt: CareDocumentTreatmentExcerpt;
   onSave: (treatment: ConfirmedDocumentTreatment) => void;
   onOpenHistory?: () => void;
@@ -32,7 +33,7 @@ export function CareDocumentTreatmentReview(props: CareDocumentTreatmentReviewPr
   return <TreatmentReviewForPassage key={passage} {...props} />;
 }
 
-function TreatmentReviewForPassage({ patientId, author, today, hindi, report, document, excerpt, onSave, onOpenHistory }: CareDocumentTreatmentReviewProps) {
+function TreatmentReviewForPassage({ patientId, author, today, lang, report, document, excerpt, onSave, onOpenHistory }: CareDocumentTreatmentReviewProps) {
   const id = useId();
   const savedOnce = useRef(false);
   const [open, setOpen] = useState(false);
@@ -41,7 +42,7 @@ function TreatmentReviewForPassage({ patientId, author, today, hindi, report, do
   const [confirmed, setConfirmed] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<CareDocumentTreatmentError | null>(null);
-  const t = (en: string, hi: string) => hindi ? hi : en;
+  const t = (en: string, hi: string) => careText(lang, en, hi);
 
   function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -62,7 +63,7 @@ function TreatmentReviewForPassage({ patientId, author, today, hindi, report, do
         <label htmlFor={`${id}-date`}>{t('Date treatment happened', 'इलाज होने की तारीख')}<input id={`${id}-date`} type="date" value={date} max={today} required onChange={(event) => { setDate(event.target.value); setConfirmed(false); setError(null); }} /></label>
       </div>
       <label className="care-document-confirm" htmlFor={`${id}-confirmed`}><input id={`${id}-confirmed`} type="checkbox" checked={confirmed} required onChange={(event) => { setConfirmed(event.target.checked); setError(null); }} />{t('The document confirms this treatment happened on this date.', 'दस्तावेज़ पुष्टि करता है कि यह इलाज इस तारीख को हुआ था।')}</label>
-      {error && <p className="care-document-error" role="alert">{errors[error][hindi ? 1 : 0]}</p>}
+      {error && <p className="care-document-error" role="alert">{careText(lang, errors[error][0], errors[error][1])}</p>}
       <div className="care-document-review-footer"><button className="care-document-save" type="submit" disabled={!title.trim() || !date || !confirmed}>{t('Add to care story', 'इलाज की कहानी में जोड़ें')}</button><button type="button" onClick={() => { setOpen(false); setTitle(''); setDate(''); setConfirmed(false); setError(null); }}>{t('Cancel', 'रद्द करें')}</button></div>
     </div>
   </form>;

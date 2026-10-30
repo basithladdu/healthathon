@@ -1,0 +1,26 @@
+.care-language-select { position: relative; display: inline-flex; align-items: center; flex: none; color: var(--care-ink, #382e29); }
+.care-language-select > select {
+  min-height: 44px;
+  max-width: 11rem;
+  appearance: none;
+  -webkit-appearance: none;
+  border: 1px solid var(--care-line, #e6ddd1);
+  border-radius: 12px;
+  padding-block: 8px;
+  padding-inline: 34px 30px;
+  color: inherit;
+  background: var(--care-surface, #fffdf9);
+  font: 600 14px/1.2 var(--font-inter), 'Noto Sans', 'Noto Nastaliq Urdu', sans-serif;
+  cursor: pointer;
+  text-overflow: ellipsis;
+}
+.care-language-select > select:hover { background: #f7efe4; }
+.care-language-select > select:focus-visible { outline: 3px solid #397e69; outline-offset: 3px; }
+.care-language-select > svg { position: absolute; width: 18px; height: 18px; pointer-events: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.care-language-select > .care-language-select-globe { inset-inline-start: 11px; }
+.care-language-select > .care-language-select-chevron { inset-inline-end: 9px; width: 15px; height: 15px; }
+.care-language-select-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (max-width: 420px) {
+  .care-language-select > select { max-width: 8.5rem; padding-inline: 30px 26px; font-size: 13px; }
+  .care-language-select > .care-language-select-globe { inset-inline-start: 9px; width: 16px; height: 16px; }
+}

@@ -2,13 +2,14 @@
 
 import { useId, useState } from 'react';
 import type { Appointment } from './appointments-page';
+import { careText, type CareLang } from './care-i18n';
 
-export function VisitInstructions({ value, author, clinician, hindi, onChange }: {
-  value: Appointment['preparationInstructions']; author: string; clinician: string; hindi: boolean;
+export function VisitInstructions({ value, author, clinician, lang, onChange }: {
+  value: Appointment['preparationInstructions']; author: string; clinician: string; lang: CareLang;
   onChange: (value: Appointment['preparationInstructions']) => void;
 }) {
   const id = useId();
-  const t = (en: string, hi: string) => hindi ? hi : en;
+  const t = (en: string, hi: string) => careText(lang, en, hi);
   const [editing, setEditing] = useState(false);
   const [text, setText] = useState('');
   const [givenBy, setGivenBy] = useState('');

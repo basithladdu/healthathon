@@ -4,6 +4,7 @@ import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { loadMedicineImageFile } from './care-medicine-image-store';
 import { medicineStoredImageId } from './care-medicine-image-store';
 import './care-medicine-photo.css';
+import { careText, type CareLang } from './care-i18n';
 
 function ObjectUrlImage({ file, alt, className }: { file: File; alt: string; className: string }) {
   const objectUrl = useRef('');
@@ -17,10 +18,10 @@ function ObjectUrlImage({ file, alt, className }: { file: File; alt: string; cla
   return <img ref={attachImage} className={className} alt={alt} />;
 }
 
-export function MedicinePhoto({ file, alt, hindi, prescription = false }: { file: File; alt: string; hindi: boolean; prescription?: boolean }) {
+export function MedicinePhoto({ file, alt, lang, prescription = false }: { file: File; alt: string; lang: CareLang; prescription?: boolean }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const titleId = useId();
-  const t = (en: string, hi: string) => hindi ? hi : en;
+  const t = (en: string, hi: string) => careText(lang, en, hi);
   return <>
     <button type="button" className="medicine-photo-trigger" aria-label={t(`View photo of ${alt}`, `${alt} की तस्वीर देखें`)} onClick={() => dialog.current?.showModal()}>
       <ObjectUrlImage file={file} className="medicine-card-photo" alt="" />
@@ -36,7 +37,7 @@ export function MedicinePhoto({ file, alt, hindi, prescription = false }: { file
   </>;
 }
 
-export function StoredPrescriptionPages({ importId, pages, hindi }: { importId: string; pages: readonly number[]; hindi: boolean }) {
+export function StoredPrescriptionPages({ importId, pages, lang }: { importId: string; pages: readonly number[]; lang: CareLang }) {
   const [files, setFiles] = useState<Array<{ page: number; file: File }>>([]);
   const [missing, setMissing] = useState(false);
   const positions = [...new Set(pages)].filter((page) => Number.isInteger(page) && page >= 0 && page < 5).sort((a, b) => a - b).join(',');
@@ -51,14 +52,14 @@ export function StoredPrescriptionPages({ importId, pages, hindi }: { importId: 
     return () => { active = false; };
   }, [importId, positions]);
   if (!positions) return null;
-  return <details className="medicine-saved-source"><summary>{hindi ? 'मूल पर्चे के पेज देखें' : 'View original prescription pages'}</summary><div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>{files.map(({ page, file }) => <div key={page}><span>{hindi ? 'पेज' : 'Page'} {page + 1}</span><MedicinePhoto file={file} alt={`${hindi ? 'पर्चा · पेज' : 'Prescription · page'} ${page + 1}`} hindi={hindi} prescription /></div>)}</div>{missing && <p role="status">{hindi ? 'मूल तस्वीर अब इस डिवाइस पर उपलब्ध नहीं है। अपनी मूल फ़ाइल से जाँचें।' : 'An original photo is no longer available on this device. Check your original file.'}</p>}</details>;
+  return <details className="medicine-saved-source"><summary>{careText(lang, 'View original prescription pages', 'मूल पर्चे के पेज देखें')}</summary><div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>{files.map(({ page, file }) => <div key={page}><span>{careText(lang, 'Page', 'पेज')} {page + 1}</span><MedicinePhoto file={file} alt={`${careText(lang, 'Prescription · page', 'पर्चा · पेज')} ${page + 1}`} lang={lang} prescription /></div>)}</div>{missing && <p role="status">{careText(lang, 'An original photo is no longer available on this device. Check your original file.', 'मूल तस्वीर अब इस डिवाइस पर उपलब्ध नहीं है। अपनी मूल फ़ाइल से जाँचें।')}</p>}</details>;
 }
 
 function MedicinePhotoFallback() {
   return <span className="medicine-photo-fallback" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="m8 4-4 4a5.66 5.66 0 0 0 8 8l4-4a5.66 5.66 0 0 0-8-8Z" /><path d="m6 6 8 8" /></svg></span>;
 }
 
-export function StoredMedicinePhoto({ imageId, alt, hindi }: { imageId: string; alt: string; hindi: boolean }) {
+export function StoredMedicinePhoto({ imageId, alt, lang }: { imageId: string; alt: string; lang: CareLang }) {
   const [file, setFile] = useState<File | null>(null);
   useEffect(() => {
     let active = true;
@@ -67,5 +68,5 @@ export function StoredMedicinePhoto({ imageId, alt, hindi }: { imageId: string; 
     }).catch(() => { if (active) setFile(null); });
     return () => { active = false; };
   }, [imageId]);
-  return file ? <MedicinePhoto file={file} alt={alt} hindi={hindi} /> : <MedicinePhotoFallback />;
+  return file ? <MedicinePhoto file={file} alt={alt} lang={lang} /> : <MedicinePhotoFallback />;
 }

@@ -11,6 +11,8 @@ import './care-near-me.css';
 import './care-directory.css';
 import './family-care.css';
 import './ectpr.css';
+import './amd.css';
+import './ectpr-plan.css';
 import './patient-portal.css';
 import './patient-history.css';
 import './care-workspace.css';
