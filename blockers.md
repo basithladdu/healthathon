@@ -15,6 +15,16 @@ Collected on 27 Oct from every agent lane across Sahara, ITI, WDCW and AI-FIR. T
 - [ ] SMS for the emergency override, which otherwise says "SMS not configured": see `prototype/app/api/ed-card/sms.ts` for the provider variable names.
 - [ ] After adding, check on the live site that an AI answer works and shows which service answered.
 
+### Sahara: SVK spec, team to decide (added 30 Oct)
+Details in [docs/SAHARA_SVK_BUILD_HANDOFF.md](docs/SAHARA_SVK_BUILD_HANDOFF.md). The care plan table migration is applied.
+- [ ] SVK + medical lead: the sign-off list in clinical spec §9 (temporary defaults: 12-week review, 3-day trial, content shown under the out-of-date banner).
+- [ ] SVK + legal: does not starting a treatment also need the medical boards for a patient who cannot decide? And the 30-day reconsideration period missing from the spec. See `docs/SAHARA_ECTPR_AMD_REFERENCES.md`.
+- [ ] SVK: check "care that always continues" against Saanthvana v1.0 §16.
+- [ ] SVK: should the emergency PDF be English and Hindi only for staff, or also Telugu and Urdu for families?
+- [ ] Clinician: back-translate Telugu, Urdu and Kannada before the pilot.
+- [ ] Before real patients: real login, ethics committee approval, hospital legal review.
+- [ ] Basith: free up disk F: (nearly full; Android builds fail without about 2 GB free).
+
 ### Sahara: do these now (29 Oct)
 **AI with Gemini (one key, on Vercel).** The Android app now calls `https://sahara.wedevit.in/api/sahara-assist` for note drafting, speech-to-text, translation and "Ask your documents". It replaces the Supabase function, so the Supabase function deploy below is no longer needed.
 - [ ] Google AI Studio (aistudio.google.com) → Get API key → create a key.
@@ -27,10 +37,9 @@ Collected on 27 Oct from every agent lane across Sahara, ITI, WDCW and AI-FIR. T
 **Speech-to-text.** Gemini hears the recording directly (same key). The app also keeps on-device transcription (sherpa-onnx) for offline. Whisper is not free through OpenAI's API (paid per minute); it is free only if you run it yourself on a GPU server. For Indian languages Sarvam's Saarika/Saaras (paid; the website already has Sarvam code) or AI4Bharat IndicConformer (open source, self-hosted) are stronger than Whisper. Decide after trying Gemini on Hindi and Kannada.
 - [ ] Try one 20-second Hindi and one Kannada turn on a phone; if the transcript is poor, decide Sarvam (key into Vercel) or self-hosted.
 
-**Survey admin dashboard** (`https://sahara.wedevit.in/admin`, password `0`, owner's choice). The database only lets an account with the `directory_reviewer` role read submissions, so the page also asks for that account's email and password once per browser session.
-- [ ] Create or pick the team reviewer account (sign up on the website if needed), then in the website's Supabase project (`cghlkqeqiokjqdionrkc`) → SQL editor:
-  `insert into healthathon_private.staff_roles(user_id, role) select id, 'directory_reviewer' from auth.users where email = 'REVIEWER_EMAIL';`
-- [ ] Note: password `0` is effectively public. Respondents were told their name, registration and email are not for public display; the reviewer sign-in is what actually protects them. Do not share the reviewer password.
+**Survey admin dashboard** (`https://sahara.wedevit.in/admin`, password `0`, owner's choice). No reviewer account is needed any more; the page reads responses on the server with `SUPABASE_SERVICE_ROLE_KEY`, which is set in Vercel.
+- [ ] Note: password `0` is effectively public, and it shows respondents' names, registration details and email. Replace it before sharing the link more widely.
+- [ ] Optional: permanently remove the two hidden test rows (SVK, QA TEST) with the SQL editor; the API only hides them.
 
 **Phone and Play**
 - [ ] Plug the Samsung back in and unlock it; the waiting command installs and opens Sahara 0.6.2 (9) development build. If that command has ended, run from `android/`: `adb install -r app/build/outputs/apk/debug/app-debug.apk`.

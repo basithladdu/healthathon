@@ -1,5 +1,7 @@
 # Sahara Android: Awaiz's handoff
 
+> **30 Oct 2026:** SVK spec build (emergency care plan, living will, QR card, languages): see [docs/SAHARA_SVK_BUILD_HANDOFF.md](docs/SAHARA_SVK_BUILD_HANDOFF.md).
+
 ## 28 Oct: Play upload gap and candidate 0.6.2 (9)
 
 - The latest saved live Console evidence is from 24 Oct: Production 0.6.0 (7), submission 7, showed **Changes in review**. No later live Console result is recorded, so refresh that status before any upload.
