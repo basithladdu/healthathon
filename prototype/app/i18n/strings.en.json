@@ -103,6 +103,12 @@
    "care-medicines.tsx"
   ]
  },
+ "{0} minutes after arrival": {
+  "hi": "पहुँचने के {0} मिनट बाद",
+  "files": [
+   "ectpr-pilot-log.tsx"
+  ]
+ },
  "{0} more passages": {
   "hi": "{0} और अंश",
   "files": [
@@ -113,6 +119,18 @@
   "hi": "{0} और जाँचने हैं",
   "files": [
    "care-document-search.tsx"
+  ]
+ },
+ "{0} of {1} episodes": {
+  "hi": "{1} में से {0} मामले",
+  "files": [
+   "ectpr-pilot-log.tsx"
+  ]
+ },
+ "{0} of {1} that could be compared": {
+  "hi": "जिनकी तुलना हो सकी, उन {1} में से {0}",
+  "files": [
+   "ectpr-pilot-log.tsx"
   ]
  },
  "{0} prescription page{1} linked": {
@@ -211,6 +229,12 @@
    "family-symptom-diary.tsx"
   ]
  },
+ "0.85x Gentle": {
+  "hi": "0.85x धीरे",
+  "files": [
+   "tts-speech.tsx"
+  ]
+ },
  "1 · Hospital transfer": {
   "hi": "1 · अस्पताल ले जाना",
   "files": [
@@ -227,6 +251,18 @@
   "hi": "1. पहले प्रतिनिधि",
   "files": [
    "amd-screen.tsx"
+  ]
+ },
+ "1.0x Normal": {
+  "hi": "1.0x सामान्य",
+  "files": [
+   "tts-speech.tsx"
+  ]
+ },
+ "1.25x Fast": {
+  "hi": "1.25x तेज़",
+  "files": [
+   "tts-speech.tsx"
   ]
  },
  "10 · Capacity": {
@@ -946,6 +982,12 @@
    "family-open-questions.tsx"
   ]
  },
+ "Add the signed paper": {
+  "hi": "साइन किया काग़ज़ जोड़ें",
+  "files": [
+   "ectpr-plan-extras.tsx"
+  ]
+ },
  "Add this person": {
   "hi": "इन्हें जोड़ें",
   "files": [
@@ -1071,6 +1113,24 @@
    "ectpr-plan-screen.tsx"
   ]
  },
+ "Adjust reading speed": {
+  "hi": "पढ़ने की गति बदलें",
+  "files": [
+   "tts-speech.tsx"
+  ]
+ },
+ "Admission to first symptom-control prescription": {
+  "hi": "भर्ती से लक्षण की पहली दवा तक",
+  "files": [
+   "ectpr-pilot-log.tsx"
+  ]
+ },
+ "Admitted to ICU?": {
+  "hi": "ICU में भर्ती?",
+  "files": [
+   "ectpr-pilot-log.tsx"
+  ]
+ },
  "Advance medical directive": {
   "hi": "अग्रिम चिकित्सा निर्देश",
   "files": [
@@ -1081,6 +1141,12 @@
   "hi": "बढ़े हुए कैंसर में",
   "files": [
    "care-community.tsx"
+  ]
+ },
+ "After both boards agree, nothing is done for 30 days. In this reconsideration period, anyone affected may go to court (Harish Rana, 2026 INSC 222, para 322(vi)).": {
+  "hi": "दोनों बोर्ड सहमत होने के बाद 30 दिन तक कुछ नहीं किया जाता। इस पुनर्विचार अवधि में कोई भी प्रभावित व्यक्ति अदालत जा सकता है (हरीश राणा, 2026 INSC 222, पैरा 322(vi))।",
+  "files": [
+   "ectpr-labels.ts"
   ]
  },
  "After childhood cancer": {
@@ -1270,6 +1336,12 @@
   "hi": "पहले से मौजूद है, या उस जगह को हटा दिया गया है।",
   "files": [
    "family-support-places.tsx"
+  ]
+ },
+ "Also on this plan": {
+  "hi": "इस योजना में भी",
+  "files": [
+   "ectpr-labels.ts"
   ]
  },
  "Alternate": {
@@ -2182,6 +2254,18 @@
    "family-handover-pack.tsx"
   ]
  },
+ "Care differed from the plan. Write why.": {
+  "hi": "इलाज योजना से अलग हुआ। कारण लिखें।",
+  "files": [
+   "ectpr-pilot-log.tsx"
+  ]
+ },
+ "Care matched the recorded plan": {
+  "hi": "इलाज दर्ज योजना के अनुसार हुआ",
+  "files": [
+   "ectpr-pilot-log.tsx"
+  ]
+ },
  "Care Note": {
   "hi": "देखभाल का नोट",
   "files": [
@@ -2756,6 +2840,7 @@
   "hi": "बंद करें",
   "files": [
    "care-medicine-photo.tsx",
+   "ectpr-plan-extras.tsx",
    "ectpr-plan-screen.tsx",
    "esas-symptom-tracker.tsx",
    "family-lab-history.tsx",
@@ -2896,6 +2981,24 @@
    "family-symptom-diary.tsx"
   ]
  },
+ "Compared with version {0}: differs from the plan.": {
+  "hi": "संस्करण {0} से तुलना: योजना से अलग।",
+  "files": [
+   "ectpr-pilot-log.tsx"
+  ]
+ },
+ "Compared with version {0}: matches the plan.": {
+  "hi": "संस्करण {0} से तुलना: योजना के अनुसार।",
+  "files": [
+   "ectpr-pilot-log.tsx"
+  ]
+ },
+ "Compared with version {0}: nothing to compare yet.": {
+  "hi": "संस्करण {0} से तुलना: अभी तुलना के लिए कुछ नहीं।",
+  "files": [
+   "ectpr-pilot-log.tsx"
+  ]
+ },
  "Completed": {
   "hi": "पूरे हुए",
   "files": [
@@ -2924,6 +3027,12 @@
   "hi": "कब पुष्टि की",
   "files": [
    "ectpr-plan-screen.tsx"
+  ]
+ },
+ "Consent resource (scope adr)": {
+  "hi": "Consent रिसोर्स (scope adr)",
+  "files": [
+   "ectpr-plan-extras.tsx"
   ]
  },
  "Consultant": {
@@ -2997,7 +3106,8 @@
  "Copied": {
   "hi": "कॉपी हो गया",
   "files": [
-   "care-circle.tsx"
+   "care-circle.tsx",
+   "ectpr-plan-extras.tsx"
   ]
  },
  "Copied by": {
@@ -3041,6 +3151,12 @@
   "hi": "इस ब्राउज़र में कॉपी उपलब्ध नहीं है",
   "files": [
    "care-medicine-access.tsx"
+  ]
+ },
+ "Copy JSON": {
+  "hi": "JSON कॉपी करें",
+  "files": [
+   "ectpr-plan-extras.tsx"
   ]
  },
  "Copy question": {
@@ -3158,6 +3274,12 @@
    "simple-care-shell.tsx"
   ]
  },
+ "Could not start.": {
+  "hi": "शुरू नहीं हो सका।",
+  "files": [
+   "amd-screen.tsx"
+  ]
+ },
  "Course length (days)": {
   "hi": "कोर्स की अवधि (दिन)",
   "files": [
@@ -3186,6 +3308,12 @@
   "hi": "CPR (छाती दबाना, दिल दोबारा चलाने के लिए बिजली का झटका)",
   "files": [
    "amd-screen.tsx"
+  ]
+ },
+ "CPR given?": {
+  "hi": "CPR दिया गया?",
+  "files": [
+   "ectpr-pilot-log.tsx"
   ]
  },
  "CPR if the heart and breathing stop": {
@@ -3350,7 +3478,14 @@
   "hi": "दिन",
   "files": [
    "ectpr-labels.ts",
+   "ectpr-pilot-log.tsx",
    "ectpr-plan-screen.tsx"
+  ]
+ },
+ "Days must be between 0 and 30.": {
+  "hi": "दिन 0 से 30 के बीच होने चाहिए।",
+  "files": [
+   "ectpr-pilot-log.tsx"
   ]
  },
  "days, then review": {
@@ -3405,6 +3540,18 @@
    "ectpr-plan-screen.tsx"
   ]
  },
+ "Delete my local draft": {
+  "hi": "मेरा लोकल ड्राफ़्ट मिटाएँ",
+  "files": [
+   "dpdp-notice.tsx"
+  ]
+ },
+ "Deleted": {
+  "hi": "मिटाया",
+  "files": [
+   "ectpr-plan-screen.tsx"
+  ]
+ },
  "Details": {
   "hi": "जानकारी",
   "files": [
@@ -3438,6 +3585,12 @@
   "hi": "डायलिसिस (गुर्दे फेल होने पर ख़ून साफ़ करने वाली मशीन)",
   "files": [
    "amd-screen.tsx"
+  ]
+ },
+ "Differed from the plan": {
+  "hi": "योजना से अलग",
+  "files": [
+   "ectpr-pilot-log.tsx"
   ]
  },
  "Digital copy": {
@@ -3682,6 +3835,12 @@
    "family-report-comparison.tsx"
   ]
  },
+ "Download (.json)": {
+  "hi": "डाउनलोड (.json)",
+  "files": [
+   "ectpr-plan-extras.tsx"
+  ]
+ },
  "Download audio": {
   "hi": "आवाज़ डाउनलोड करें",
   "files": [
@@ -3698,6 +3857,12 @@
   "hi": "नए नोट की PDF लें",
   "files": [
    "family-copy-tracker.tsx"
+  ]
+ },
+ "Download my data": {
+  "hi": "मेरा डेटा डाउनलोड करें",
+  "files": [
+   "dpdp-notice.tsx"
   ]
  },
  "Download PDF": {
@@ -3801,6 +3966,24 @@
   "hi": "ECOG (0 सक्रिय से 4 पूरा दिन बिस्तर पर)",
   "files": [
    "ectpr-plan-screen.tsx"
+  ]
+ },
+ "ED arrival time": {
+  "hi": "ED पहुँचने का समय",
+  "files": [
+   "ectpr-pilot-log.tsx"
+  ]
+ },
+ "ED episode saved.": {
+  "hi": "ED का मामला सेव हुआ।",
+  "files": [
+   "ectpr-pilot-log.tsx"
+  ]
+ },
+ "ED episodes": {
+  "hi": "ED के मामले",
+  "files": [
+   "ectpr-pilot-log.tsx"
   ]
  },
  "ED-new": {
@@ -4073,10 +4256,22 @@
    "care-document-treatment.tsx"
   ]
  },
+ "Enter at least one item.": {
+  "hi": "कम से कम एक चीज़ भरें।",
+  "files": [
+   "ectpr-pilot-log.tsx"
+  ]
+ },
  "Enter manually": {
   "hi": "खुद भरें",
   "files": [
    "care-medicine-import.tsx"
+  ]
+ },
+ "Enter the ED arrival time.": {
+  "hi": "ED पहुँचने का समय लिखें।",
+  "files": [
+   "ectpr-pilot-log.tsx"
   ]
  },
  "Enter the number shown on your registration.": {
@@ -4169,6 +4364,12 @@
    "family-cost-help.tsx"
   ]
  },
+ "Export FHIR (R4)": {
+  "hi": "FHIR (R4) निर्यात करें",
+  "files": [
+   "ectpr-plan-extras.tsx"
+  ]
+ },
  "Family": {
   "hi": "परिवार",
   "files": [
@@ -4212,6 +4413,12 @@
   "hi": "परिवार की जानकारी",
   "files": [
    "family-handover-pack.tsx"
+  ]
+ },
+ "Family felt pushed": {
+  "hi": "परिवार को दबाव महसूस हुआ",
+  "files": [
+   "ectpr-pilot-log.tsx"
   ]
  },
  "Family note": {
@@ -4296,6 +4503,12 @@
    "ectpr-plan-screen.tsx"
   ]
  },
+ "FHIR R4 · draft format": {
+  "hi": "FHIR R4 · ड्राफ़्ट फ़ॉर्मैट",
+  "files": [
+   "ectpr-plan-extras.tsx"
+  ]
+ },
  "File names only. Bring the original reports.": {
   "hi": "यहाँ केवल फ़ाइल के नाम हैं। मूल रिपोर्ट साथ लाएँ।",
   "files": [
@@ -4312,6 +4525,12 @@
   "hi": "फ़ाइल मौजूद नहीं है",
   "files": [
    "family-lab-history.tsx"
+  ]
+ },
+ "Fill from the access log": {
+  "hi": "ऐक्सेस लॉग से भरें",
+  "files": [
+   "ectpr-pilot-log.tsx"
   ]
  },
  "Filter arrangements": {
@@ -4434,6 +4653,18 @@
   "hi": "पहली रिपोर्ट",
   "files": [
    "family-report-comparison.tsx"
+  ]
+ },
+ "First symptom-control prescription": {
+  "hi": "लक्षण की पहली दवा",
+  "files": [
+   "ectpr-pilot-log.tsx"
+  ]
+ },
+ "First time the record was opened": {
+  "hi": "रिकॉर्ड पहली बार कब खुला",
+  "files": [
+   "ectpr-pilot-log.tsx"
   ]
  },
  "Fix the items marked “Must fix” before saving.": {
@@ -4576,6 +4807,12 @@
    "care-task-inbox.tsx"
   ]
  },
+ "For the care team only. Made-up patients only during the pilot. Saved on this device.": {
+  "hi": "केवल देखभाल टीम के लिए। पायलट में सिर्फ़ काल्पनिक मरीज़। इसी डिवाइस पर सेव।",
+  "files": [
+   "ectpr-pilot-log.tsx"
+  ]
+ },
  "For the emergency doctor": {
   "hi": "आपातकालीन डॉक्टर के लिए",
   "files": [
@@ -4681,7 +4918,8 @@
  "Gazetted officer": {
   "hi": "राजपत्रित अधिकारी",
   "files": [
-   "amd-screen.tsx"
+   "amd-screen.tsx",
+   "ectpr-labels.ts"
   ]
  },
  "Gender": {
@@ -4725,6 +4963,12 @@
   "hi": "देखभाल करने वाले को आराम",
   "files": [
    "family-home-help.tsx"
+  ]
+ },
+ "Given on": {
+  "hi": "दी गई",
+  "files": [
+   "ectpr-plan-extras.tsx"
   ]
  },
  "Go to hospital if things get worse?": {
@@ -4877,6 +5121,12 @@
    "ectpr-plan-screen.tsx"
   ]
  },
+ "Highest breathing support actually given": {
+  "hi": "असल में दी गई साँस की सबसे ज़्यादा मदद",
+  "files": [
+   "ectpr-pilot-log.tsx"
+  ]
+ },
  "Highest breathing support allowed": {
   "hi": "साँस की सबसे ज़्यादा मदद जिसकी अनुमति है",
   "files": [
@@ -4893,6 +5143,12 @@
   "hi": "ऑक्सीजन का सबसे ज़्यादा बहाव (लीटर प्रति मिनट)",
   "files": [
    "ectpr-plan-screen.tsx"
+  ]
+ },
+ "Highest support": {
+  "hi": "सबसे ज़्यादा मदद",
+  "files": [
+   "ectpr-pilot-log.tsx"
   ]
  },
  "Hindi": {
@@ -4970,6 +5226,7 @@
   "hi": "घंटे",
   "files": [
    "ectpr-labels.ts",
+   "ectpr-pilot-log.tsx",
    "ectpr-plan-screen.tsx"
   ]
  },
@@ -5119,6 +5376,12 @@
    "ectpr-plan-screen.tsx"
   ]
  },
+ "I have read this": {
+  "hi": "मैंने यह पढ़ लिया",
+  "files": [
+   "dpdp-notice.tsx"
+  ]
+ },
  "I have talked to them and they agreed to be my representative.": {
   "hi": "मैंने उनसे बात की है और वे मेरे प्रतिनिधि बनने के लिए सहमत हैं।",
   "files": [
@@ -5191,6 +5454,18 @@
    "ectpr-plan-screen.tsx"
   ]
  },
+ "ICU days": {
+  "hi": "ICU के दिन",
+  "files": [
+   "ectpr-pilot-log.tsx"
+  ]
+ },
+ "ICU days in the last 30 days": {
+  "hi": "आख़िरी 30 दिनों में ICU के दिन",
+  "files": [
+   "ectpr-pilot-log.tsx"
+  ]
+ },
  "ID document": {
   "hi": "पहचान पत्र",
   "files": [
@@ -5208,6 +5483,12 @@
   "hi": "अगर नई, ठीक होने वाली समस्या हो (जैसे दम घुटना या दवा का असर), तो क्या इस स्तर से ऊपर भी पूरा इलाज करें?",
   "files": [
    "ectpr-plan-screen.tsx"
+  ]
+ },
+ "If care differed from the plan, why?": {
+  "hi": "अगर इलाज योजना से अलग हुआ, तो क्यों?",
+  "files": [
+   "ectpr-pilot-log.tsx"
   ]
  },
  "IF IN DOUBT, RESUSCITATE": {
@@ -5320,6 +5601,18 @@
    "ectpr-plan-screen.tsx"
   ]
  },
+ "Incident saved.": {
+  "hi": "घटना सेव हुई।",
+  "files": [
+   "ectpr-pilot-log.tsx"
+  ]
+ },
+ "Incidents": {
+  "hi": "घटनाएँ",
+  "files": [
+   "ectpr-pilot-log.tsx"
+  ]
+ },
  "Include": {
   "hi": "शामिल करें",
   "files": [
@@ -5360,6 +5653,12 @@
   "hi": "क्या कोई मरीज़ की ओर से जवाब दे रहे हैं?",
   "files": [
    "ectpr-plan-screen.tsx"
+  ]
+ },
+ "Issue a new card": {
+  "hi": "नया कार्ड जारी करें",
+  "files": [
+   "ectpr.tsx"
   ]
  },
  "Issue my emergency card": {
@@ -5474,6 +5773,12 @@
   "hi": "झटके चालू रखें",
   "files": [
    "ectpr-plan-screen.tsx"
+  ]
+ },
+ "Keep the draft": {
+  "hi": "ड्राफ़्ट रखें",
+  "files": [
+   "dpdp-notice.tsx"
   ]
  },
  "Keep the helper name within 80 characters.": {
@@ -5593,6 +5898,12 @@
    "care-language-select.tsx"
   ]
  },
+ "Last 30 days": {
+  "hi": "आख़िरी 30 दिन",
+  "files": [
+   "ectpr-pilot-log.tsx"
+  ]
+ },
  "Last 4 digits of the ID only": {
   "hi": "पहचान पत्र के सिर्फ़ आख़िरी 4 अंक",
   "files": [
@@ -5603,6 +5914,12 @@
   "hi": "केवल आख़िरी 4 अंक",
   "files": [
    "amd-screen.tsx"
+  ]
+ },
+ "Last admission time": {
+  "hi": "आख़िरी भर्ती का समय",
+  "files": [
+   "ectpr-pilot-log.tsx"
   ]
  },
  "Last changed": {
@@ -5770,10 +6087,28 @@
    "ectpr-pdf.ts"
   ]
  },
+ "Living will (AMD) executed in Sahara": {
+  "hi": "Sahara में निष्पादित लिविंग विल (AMD)",
+  "files": [
+   "ectpr-labels.ts"
+  ]
+ },
+ "Living will cancelled in writing": {
+  "hi": "लिविंग विल लिखित रूप में रद्द",
+  "files": [
+   "ectpr-labels.ts"
+  ]
+ },
  "Living will for this patient": {
   "hi": "इस मरीज़ की लिविंग विल",
   "files": [
    "amd-screen.tsx"
+  ]
+ },
+ "Living will in Sahara is not signed and attested, so it is not valid": {
+  "hi": "Sahara की लिविंग विल पर हस्ताक्षर और सत्यापन नहीं, इसलिए मान्य नहीं",
+  "files": [
+   "ectpr-labels.ts"
   ]
  },
  "Living will status": {
@@ -6005,6 +6340,12 @@
   "hi": "लेना दर्ज हो गया।",
   "files": [
    "care-medicines.tsx"
+  ]
+ },
+ "Matched the plan": {
+  "hi": "योजना के अनुसार",
+  "files": [
+   "ectpr-pilot-log.tsx"
   ]
  },
  "Matched to prescription": {
@@ -6583,6 +6924,7 @@
   "hi": "नहीं",
   "files": [
    "ectpr-labels.ts",
+   "ectpr-pilot-log.tsx",
    "ectpr-plan-screen.tsx"
   ]
  },
@@ -6829,6 +7171,7 @@
  "No plan yet": {
   "hi": "अभी कोई योजना नहीं",
   "files": [
+   "ectpr-pilot-log.tsx",
    "ectpr-plan-screen.tsx"
   ]
  },
@@ -6917,6 +7260,12 @@
    "care-medicine-import.tsx"
   ]
  },
+ "No scan yet. Add a photo or scan of the signed paper. It stays on this device, and its fingerprint (SHA-256) goes in the log.": {
+  "hi": "अभी कोई स्कैन नहीं। साइन किए काग़ज़ की फ़ोटो या स्कैन जोड़ें। यह इसी डिवाइस पर रहेगा, और इसकी पहचान (SHA-256) रिकॉर्ड में जाएगी।",
+  "files": [
+   "ectpr-plan-extras.tsx"
+  ]
+ },
  "No signed Care Note yet": {
   "hi": "अभी हस्ताक्षरित देखभाल का नोट नहीं है",
   "files": [
@@ -6927,6 +7276,12 @@
   "hi": "अभी कोई हस्ताक्षरित लिविंग विल दर्ज नहीं",
   "files": [
    "amd-screen.tsx"
+  ]
+ },
+ "No signed plan was in force at this time, so there is nothing to compare.": {
+  "hi": "उस समय कोई साइन की गई योजना लागू नहीं थी, इसलिए तुलना नहीं हो सकती।",
+  "files": [
+   "ectpr-pilot-log.tsx"
   ]
  },
  "No tasks assigned to you.": {
@@ -6965,6 +7320,12 @@
    "family-voice-journal.tsx"
   ]
  },
+ "No valid mobile number for the patient or the primary decision-maker.": {
+  "hi": "मरीज़ या मुख्य निर्णयकर्ता का कोई सही मोबाइल नंबर नहीं है।",
+  "files": [
+   "ectpr-plan-extras.tsx"
+  ]
+ },
  "No versions yet.": {
   "hi": "अभी कोई संस्करण नहीं।",
   "files": [
@@ -6994,6 +7355,18 @@
   "files": [
    "ectpr-labels.ts",
    "ectpr-plan-screen.tsx"
+  ]
+ },
+ "None recorded yet.": {
+  "hi": "अभी कुछ दर्ज नहीं।",
+  "files": [
+   "ectpr-pilot-log.tsx"
+  ]
+ },
+ "None reported yet.": {
+  "hi": "अभी कोई रिपोर्ट नहीं।",
+  "files": [
+   "ectpr-pilot-log.tsx"
   ]
  },
  "Nose tube (NG)": {
@@ -7087,6 +7460,12 @@
    "care-document-search.tsx"
   ]
  },
+ "Not known yet: needs the date found eligible and a signature": {
+  "hi": "अभी पता नहीं: योग्य पाए जाने की तारीख़ और साइन चाहिए",
+  "files": [
+   "ectpr-pilot-log.tsx"
+  ]
+ },
  "Not marked taken": {
   "hi": "लेना दर्ज नहीं किया",
   "files": [
@@ -7102,6 +7481,7 @@
  "Not now": {
   "hi": "अभी नहीं",
   "files": [
+   "ectpr-pilot-log.tsx",
    "ectpr-plan-screen.tsx"
   ]
  },
@@ -7115,12 +7495,25 @@
   "hi": "दर्ज नहीं",
   "files": [
    "ectpr-labels.ts",
+   "ectpr-pilot-log.tsx",
    "ectpr-plan-screen.tsx",
    "family-cancer-overview.tsx"
   ]
  },
  "Not recorded yet.": {
   "hi": "अभी दर्ज नहीं।",
+  "files": [
+   "ectpr-plan-screen.tsx"
+  ]
+ },
+ "Not saved.": {
+  "hi": "सेव नहीं हुआ।",
+  "files": [
+   "amd-screen.tsx"
+  ]
+ },
+ "not set": {
+  "hi": "तय नहीं",
   "files": [
    "ectpr-plan-screen.tsx"
   ]
@@ -7168,10 +7561,17 @@
    "family-symptom-state.ts"
   ]
  },
+ "Not where they preferred": {
+  "hi": "जहाँ वे चाहते थे, वहाँ नहीं",
+  "files": [
+   "ectpr-pilot-log.tsx"
+  ]
+ },
  "Notary": {
   "hi": "नोटरी",
   "files": [
-   "amd-screen.tsx"
+   "amd-screen.tsx",
+   "ectpr-labels.ts"
   ]
  },
  "Note": {
@@ -7203,6 +7603,7 @@
  "Notes": {
   "hi": "नोट",
   "files": [
+   "ectpr-pilot-log.tsx",
    "ectpr-plan-screen.tsx"
   ]
  },
@@ -7254,6 +7655,12 @@
    "conversation-preparation.tsx"
   ]
  },
+ "Nothing to compare": {
+  "hi": "तुलना के लिए कुछ नहीं",
+  "files": [
+   "ectpr-pilot-log.tsx"
+  ]
+ },
  "Number of days before review": {
   "hi": "समीक्षा से पहले कितने दिन",
   "files": [
@@ -7283,12 +7690,6 @@
   "hi": "पुराना संस्करण दर्ज है",
   "files": [
    "family-copy-tracker.tsx"
-  ]
- },
- "on": {
-  "hi": "",
-  "files": [
-   "ed/[token]/ed-card-page.tsx"
   ]
  },
  "On today’s list": {
@@ -7415,6 +7816,12 @@
   "hi": "सिर्फ़ {0} में लिखे संख्यात्मक नतीजे दिखाए हैं।",
   "files": [
    "family-lab-history.tsx"
+  ]
+ },
+ "Only the patient or the care team can download or delete this data. Please ask them.": {
+  "hi": "यह डेटा सिर्फ़ मरीज़ या देखभाल टीम डाउनलोड कर या मिटा सकती है। कृपया उनसे कहें।",
+  "files": [
+   "dpdp-notice.tsx"
   ]
  },
  "Only you": {
@@ -7736,10 +8143,40 @@
    "family-home-help.tsx"
   ]
  },
+ "Out-of-pocket spend, last admission": {
+  "hi": "आख़िरी भर्ती का अपनी जेब से ख़र्च",
+  "files": [
+   "ectpr-pilot-log.tsx"
+  ]
+ },
+ "Out-of-pocket spend, last admission (₹)": {
+  "hi": "आख़िरी भर्ती का अपनी जेब से ख़र्च (₹)",
+  "files": [
+   "ectpr-pilot-log.tsx"
+  ]
+ },
+ "Outcome saved.": {
+  "hi": "नतीजा सेव हुआ।",
+  "files": [
+   "ectpr-pilot-log.tsx"
+  ]
+ },
+ "Outcomes": {
+  "hi": "नतीजे",
+  "files": [
+   "ectpr-pilot-log.tsx"
+  ]
+ },
  "Outcomes the patient would not accept (one per line)": {
   "hi": "जो हालत मरीज़ को मंज़ूर नहीं (हर लाइन में एक)",
   "files": [
    "ectpr-plan-screen.tsx"
+  ]
+ },
+ "over the {0}-minute target": {
+  "hi": "{0} मिनट के लक्ष्य से ज़्यादा",
+  "files": [
+   "ectpr-pilot-log.tsx"
   ]
  },
  "Overall discomfort": {
@@ -7968,6 +8405,18 @@
    "family-symptom-state.ts"
   ]
  },
+ "Pause": {
+  "hi": "रोकें",
+  "files": [
+   "tts-speech.tsx"
+  ]
+ },
+ "Pause reading": {
+  "hi": "रोकें",
+  "files": [
+   "tts-speech.tsx"
+  ]
+ },
  "PDF headings": {
   "hi": "PDF शीर्षक",
   "files": [
@@ -8128,10 +8577,22 @@
    "care-medicine-import.tsx"
   ]
  },
+ "Pilot audit log": {
+  "hi": "पायलट ऑडिट लॉग",
+  "files": [
+   "ectpr-pilot-log.tsx"
+  ]
+ },
  "Place": {
   "hi": "जगह",
   "files": [
    "amd-screen.tsx"
+  ]
+ },
+ "Place of death": {
+  "hi": "मृत्यु की जगह",
+  "files": [
+   "ectpr-pilot-log.tsx"
   ]
  },
  "Place removed.": {
@@ -8156,6 +8617,12 @@
   "hi": "योजना",
   "files": [
    "simple-care-shell.tsx"
+  ]
+ },
+ "Plan applied to a reversible illness": {
+  "hi": "ठीक होने वाली बीमारी पर योजना लागू हुई",
+  "files": [
+   "ectpr-pilot-log.tsx"
   ]
  },
  "Plan not found.": {
@@ -8238,11 +8705,23 @@
    "ectpr-plan-screen.tsx"
   ]
  },
+ "Preference not known": {
+  "hi": "पसंद पता नहीं",
+  "files": [
+   "ectpr-pilot-log.tsx"
+  ]
+ },
  "Preferred language": {
   "hi": "पसंदीदा भाषा",
   "files": [
    "care-profile.tsx",
    "ectpr-plan-screen.tsx"
+  ]
+ },
+ "Preferred place": {
+  "hi": "पसंद की जगह",
+  "files": [
+   "ectpr-pilot-log.tsx"
   ]
  },
  "Preparation notes": {
@@ -8572,6 +9051,12 @@
    "family-lab-history.tsx"
   ]
  },
+ "Reach: found eligible to signed": {
+  "hi": "पहुँच: योग्य पाए जाने से साइन तक",
+  "files": [
+   "ectpr-pilot-log.tsx"
+  ]
+ },
  "Read": {
   "hi": "पढ़ लिया",
   "files": [
@@ -8588,7 +9073,8 @@
  "Read aloud": {
   "hi": "पढ़कर सुनाएँ",
   "files": [
-   "offline-qr-scanner-modal.tsx"
+   "offline-qr-scanner-modal.tsx",
+   "tts-speech.tsx"
   ]
  },
  "Read by {0}": {
@@ -8642,13 +9128,20 @@
  "Read the emergency plan aloud": {
   "hi": "आपातकालीन योजना पढ़कर सुनाएँ",
   "files": [
-   "ectpr.tsx"
+   "ectpr.tsx",
+   "ed/[token]/ed-card-page.tsx"
   ]
  },
  "Read the first {0} of {1} pages. ": {
   "hi": "{1} में से पहले {0} पृष्ठ पढ़े। ",
   "files": [
    "care-document-search.tsx"
+  ]
+ },
+ "Read the plan aloud": {
+  "hi": "योजना पढ़कर सुनाएँ",
+  "files": [
+   "ectpr-plan-screen.tsx"
   ]
  },
  "Read your prescription": {
@@ -8663,10 +9156,22 @@
    "care-document-search.tsx"
   ]
  },
+ "Reading aloud now…": {
+  "hi": "पढ़कर सुना रहे हैं…",
+  "files": [
+   "tts-speech.tsx"
+  ]
+ },
  "Reading notes": {
   "hi": "पढ़ने की जानकारी",
   "files": [
    "care-medicine-import.tsx"
+  ]
+ },
+ "Reading paused": {
+  "hi": "पढ़ना रुका है",
+  "files": [
+   "tts-speech.tsx"
   ]
  },
  "Reading prescription pages": {
@@ -8765,10 +9270,22 @@
    "doctor-care-home.tsx"
   ]
  },
+ "Record found within {0} minutes of ED arrival": {
+  "hi": "ED पहुँचने के {0} मिनट में रिकॉर्ड मिला",
+  "files": [
+   "ectpr-pilot-log.tsx"
+  ]
+ },
  "Record how you feel": {
   "hi": "अपनी तबीयत लिखें",
   "files": [
    "family-cancer-overview.tsx"
+  ]
+ },
+ "Record opened after {0} minutes": {
+  "hi": "{0} मिनट बाद रिकॉर्ड खुला",
+  "files": [
+   "ectpr-pilot-log.tsx"
   ]
  },
  "Record the copy you gave": {
@@ -8794,6 +9311,7 @@
  "Recorded by": {
   "hi": "दर्ज किया",
   "files": [
+   "ectpr-pilot-log.tsx",
    "family-copy-tracker.tsx"
   ]
  },
@@ -8891,6 +9409,12 @@
   "hi": "उसे काफ़ी देर याद रखते हैं",
   "files": [
    "ectpr-plan-screen.tsx"
+  ]
+ },
+ "Reminder sent to {0}.": {
+  "hi": "{0} को याद दिलाने वाला SMS भेजा गया।",
+  "files": [
+   "ectpr-plan-extras.tsx"
   ]
  },
  "Remove": {
@@ -9072,6 +9596,12 @@
    "care-medicines.tsx"
   ]
  },
+ "Replace the scan": {
+  "hi": "स्कैन बदलें",
+  "files": [
+   "ectpr-plan-extras.tsx"
+  ]
+ },
  "Replaced by a newer version": {
   "hi": "नए संस्करण से बदला गया",
   "files": [
@@ -9116,8 +9646,9 @@
   ]
  },
  "Reported by": {
-  "hi": "किसने बताया",
+  "hi": "रिपोर्ट की",
   "files": [
+   "ectpr-pilot-log.tsx",
    "family-symptom-state.ts"
   ]
  },
@@ -9259,6 +9790,18 @@
    "family-lab-history.tsx"
   ]
  },
+ "Resume": {
+  "hi": "फिर चलाएँ",
+  "files": [
+   "tts-speech.tsx"
+  ]
+ },
+ "Resume reading": {
+  "hi": "फिर पढ़ें",
+  "files": [
+   "tts-speech.tsx"
+  ]
+ },
  "Reversible-cause exception: a new, reversible cause may be treated above this ceiling.": {
   "hi": "ठीक होने वाले कारण की छूट: नए, ठीक होने वाले कारण का इलाज इस सीमा से ऊपर हो सकता है।",
   "files": [
@@ -9336,6 +9879,18 @@
    "ectpr-plan-screen.tsx"
   ]
  },
+ "Review due in {0} days, by {1}": {
+  "hi": "समीक्षा {0} दिन में, {1} तक",
+  "files": [
+   "ectpr-plan-extras.tsx"
+  ]
+ },
+ "Review is due today": {
+  "hi": "समीक्षा आज है",
+  "files": [
+   "ectpr-plan-extras.tsx"
+  ]
+ },
  "Review notes": {
   "hi": "जाँच की टिप्पणियाँ",
   "files": [
@@ -9360,6 +9915,12 @@
    "ectpr-plan-screen.tsx"
   ]
  },
+ "Review overdue since {0}": {
+  "hi": "समीक्षा {0} से बाक़ी है",
+  "files": [
+   "ectpr-plan-extras.tsx"
+  ]
+ },
  "Review requested": {
   "hi": "समीक्षा का अनुरोध",
   "files": [
@@ -9380,6 +9941,12 @@
  },
  "REVIEW-past": {
   "hi": "समीक्षा की तारीख़ निकल चुकी है। आगे की तारीख़ चुनें।",
+  "files": [
+   "ectpr-plan-screen.tsx"
+  ]
+ },
+ "Reviewed by": {
+  "hi": "समीक्षा करेंगे",
   "files": [
    "ectpr-plan-screen.tsx"
   ]
@@ -9635,6 +10202,24 @@
    "family-voice-journal.tsx"
   ]
  },
+ "Save the episode": {
+  "hi": "मामला सेव करें",
+  "files": [
+   "ectpr-pilot-log.tsx"
+  ]
+ },
+ "Save the incident": {
+  "hi": "घटना सेव करें",
+  "files": [
+   "ectpr-pilot-log.tsx"
+  ]
+ },
+ "Save the outcome": {
+  "hi": "नतीजा सेव करें",
+  "files": [
+   "ectpr-pilot-log.tsx"
+  ]
+ },
  "Save this list": {
   "hi": "यह सूची डाउनलोड करें",
   "files": [
@@ -9823,6 +10408,12 @@
    "care-today.tsx"
   ]
  },
+ "See every step of the board process (information only)": {
+  "hi": "बोर्ड प्रक्रिया के सभी चरण देखें (केवल जानकारी)",
+  "files": [
+   "ectpr-plan-screen.tsx"
+  ]
+ },
  "See more groups": {
   "hi": "और समूह देखें",
   "files": [
@@ -9859,16 +10450,34 @@
    "family-cost-help.tsx"
   ]
  },
+ "selected": {
+  "hi": "चुना गया",
+  "files": [
+   "tts-speech.tsx"
+  ]
+ },
  "Selected Pallium India listings · checked {0}.": {
   "hi": "Pallium India की चुनी सूची · जाँची गई: {0}।",
   "files": [
    "family-support-places.tsx"
   ]
  },
+ "Send review reminder": {
+  "hi": "समीक्षा का संदेश भेजें",
+  "files": [
+   "ectpr-plan-extras.tsx"
+  ]
+ },
  "Send the request": {
   "hi": "अनुरोध भेजें",
   "files": [
    "ectpr-plan-screen.tsx"
+  ]
+ },
+ "Sending…": {
+  "hi": "भेज रहे हैं…",
+  "files": [
+   "ectpr-plan-extras.tsx"
   ]
  },
  "Separate from the doctor-reviewed note.": {
@@ -10081,7 +10690,8 @@
  "signed": {
   "hi": "हस्ताक्षर",
   "files": [
-   "ectpr-ed-view.tsx"
+   "ectpr-ed-view.tsx",
+   "ectpr-labels.ts"
   ]
  },
  "Signed": {
@@ -10135,6 +10745,12 @@
    "family-copy-tracker.tsx"
   ]
  },
+ "Signed paper and copies": {
+  "hi": "साइन किया काग़ज़ और कॉपियाँ",
+  "files": [
+   "ectpr-plan-extras.tsx"
+  ]
+ },
  "Signed with a thumb impression": {
   "hi": "अँगूठे के निशान से साइन",
   "files": [
@@ -10158,6 +10774,18 @@
   "files": [
    "family-cancer-overview.tsx",
    "family-symptom-diary.tsx"
+  ]
+ },
+ "SMS not configured on this server, so reminders cannot be sent. Please phone them.": {
+  "hi": "इस सर्वर पर SMS सेट नहीं है, इसलिए संदेश नहीं भेजे जा सकते। कृपया फ़ोन करें।",
+  "files": [
+   "ectpr-plan-extras.tsx"
+  ]
+ },
+ "SMS not configured on this server. No message was sent. Please phone them.": {
+  "hi": "इस सर्वर पर SMS सेट नहीं है। कोई संदेश नहीं गया। कृपया फ़ोन करें।",
+  "files": [
+   "ectpr-plan-extras.tsx"
   ]
  },
  "Sodium": {
@@ -10201,6 +10829,12 @@
   "hi": "किस रिपोर्ट से",
   "files": [
    "family-lab-history.tsx"
+  ]
+ },
+ "Spend cannot be below zero.": {
+  "hi": "ख़र्च शून्य से कम नहीं हो सकता।",
+  "files": [
+   "ectpr-pilot-log.tsx"
   ]
  },
  "Spend some time together": {
@@ -10373,13 +11007,15 @@
  "Stop": {
   "hi": "रोकें",
   "files": [
-   "care-document-search.tsx"
+   "care-document-search.tsx",
+   "tts-speech.tsx"
   ]
  },
  "Stop reading": {
   "hi": "पढ़ना रोकें",
   "files": [
-   "offline-qr-scanner-modal.tsx"
+   "offline-qr-scanner-modal.tsx",
+   "tts-speech.tsx"
   ]
  },
  "Stop recording": {
@@ -10634,6 +11270,18 @@
    "family-symptom-diary.tsx"
   ]
  },
+ "The access log has no ED access after this arrival time.": {
+  "hi": "ऐक्सेस लॉग में इस समय के बाद ED का कोई ऐक्सेस नहीं है।",
+  "files": [
+   "ectpr-pilot-log.tsx"
+  ]
+ },
+ "The AMD governs over this plan.": {
+  "hi": "AMD इस योजना से ऊपर मान्य है।",
+  "files": [
+   "ectpr-labels.ts"
+  ]
+ },
  "The app does not make it valid": {
   "hi": "ऐप इसे वैध नहीं बनाता",
   "files": [
@@ -10664,10 +11312,46 @@
    "care-document-treatment.tsx"
   ]
  },
+ "The download could not be made. Try again.": {
+  "hi": "डाउनलोड नहीं बन सका। फिर कोशिश करें।",
+  "files": [
+   "dpdp-notice.tsx"
+  ]
+ },
+ "The draft could not be deleted. Try again.": {
+  "hi": "ड्राफ़्ट नहीं मिट सका। फिर कोशिश करें।",
+  "files": [
+   "dpdp-notice.tsx"
+  ]
+ },
  "The family asked that the patient not be told": {
   "hi": "परिवार ने कहा कि मरीज़ को न बताया जाए",
   "files": [
    "ectpr-plan-screen.tsx"
+  ]
+ },
+ "The family felt pushed": {
+  "hi": "परिवार को दबाव महसूस हुआ",
+  "files": [
+   "ectpr-pilot-log.tsx"
+  ]
+ },
+ "The file could not be saved on this device.": {
+  "hi": "फ़ाइल इस डिवाइस पर सेव नहीं हो सकी।",
+  "files": [
+   "ectpr-plan-extras.tsx"
+  ]
+ },
+ "The first access time cannot be before arrival.": {
+  "hi": "रिकॉर्ड खोलने का समय पहुँचने से पहले का नहीं हो सकता।",
+  "files": [
+   "ectpr-pilot-log.tsx"
+  ]
+ },
+ "The first prescription cannot be before admission.": {
+  "hi": "पहली दवा भर्ती से पहले की नहीं हो सकती।",
+  "files": [
+   "ectpr-pilot-log.tsx"
   ]
  },
  "The harm of CPR would be more than the benefit": {
@@ -10710,6 +11394,12 @@
   "hi": "लाइव कार्ड नहीं खुल सका।",
   "files": [
    "ed/[token]/ed-card-page.tsx"
+  ]
+ },
+ "The living will has changed since this card was issued, so the card shows an old status. Issue a new card.": {
+  "hi": "यह कार्ड जारी होने के बाद लिविंग विल बदली है, इसलिए कार्ड पुरानी स्थिति दिखाता है। नया कार्ड जारी करें।",
+  "files": [
+   "ectpr.tsx"
   ]
  },
  "The living will was cancelled in writing on {0}. It does not apply.": {
@@ -10874,6 +11564,12 @@
    "ectpr.tsx"
   ]
  },
+ "The plan was applied to a reversible illness": {
+  "hi": "ठीक होने वाली बीमारी पर योजना लागू की गई",
+  "files": [
+   "ectpr-pilot-log.tsx"
+  ]
+ },
  "The problem is new, reversible and not caused by the main illness — for example injury, choking, a drug reaction or low blood sugar.": {
   "hi": "समस्या नई है, ठीक हो सकती है और मुख्य बीमारी से नहीं है — जैसे चोट, गले में अटकना, दवा का असर या कम शुगर।",
   "files": [
@@ -10898,6 +11594,18 @@
    "ectpr-labels.ts"
   ]
  },
+ "The record was not opened": {
+  "hi": "रिकॉर्ड नहीं खोला गया",
+  "files": [
+   "ectpr-pilot-log.tsx"
+  ]
+ },
+ "The reminder goes to {0}.": {
+  "hi": "संदेश {0} को जाएगा।",
+  "files": [
+   "ectpr-plan-extras.tsx"
+  ]
+ },
  "The review date has passed. Until it is reviewed, this plan is information only and emergency teams give standard care.": {
   "hi": "समीक्षा की तारीख़ निकल गई है। समीक्षा होने तक यह योजना सिर्फ़ जानकारी है और इमरजेंसी टीम सामान्य इलाज देगी।",
   "files": [
@@ -10907,13 +11615,20 @@
  "The scan is not on this device.": {
   "hi": "स्कैन इस डिवाइस पर नहीं है।",
   "files": [
-   "amd-screen.tsx"
+   "amd-screen.tsx",
+   "ectpr-plan-extras.tsx"
   ]
  },
  "The signer cannot read well, or the plan was read aloud to them": {
   "hi": "साइन करने वाले ठीक से पढ़ नहीं सकते, या योजना उन्हें पढ़कर सुनाई गई",
   "files": [
    "ectpr-plan-screen.tsx"
+  ]
+ },
+ "The SMS could not be sent. Please phone them.": {
+  "hi": "SMS नहीं भेजा जा सका। कृपया फ़ोन करें।",
+  "files": [
+   "ectpr-plan-extras.tsx"
   ]
  },
  "The start date must be on or before the day of this note.": {
@@ -10940,6 +11655,12 @@
    "ectpr-plan-screen.tsx"
   ]
  },
+ "The unsigned draft is deleted from this device. Signed versions and the log were kept.": {
+  "hi": "बिना साइन का ड्राफ़्ट इस डिवाइस से मिट गया। साइन किए गए संस्करण और रिकॉर्ड रखे गए हैं।",
+  "files": [
+   "dpdp-notice.tsx"
+  ]
+ },
  "Their comparison": {
   "hi": "उनके मुताबिक बदलाव",
   "files": [
@@ -10963,6 +11684,12 @@
   "hi": "अभी कोई साइन की गई योजना नहीं है",
   "files": [
    "ectpr-plan-screen.tsx"
+  ]
+ },
+ "There is no unsigned draft to delete. A draft that someone has already signed is kept.": {
+  "hi": "मिटाने के लिए कोई बिना साइन का ड्राफ़्ट नहीं है। जिस ड्राफ़्ट पर किसी ने साइन कर दिया है, वह रखा जाता है।",
+  "files": [
+   "dpdp-notice.tsx"
   ]
  },
  "These symptoms could not be saved. Try again.": {
@@ -11019,8 +11746,14 @@
    "offline-qr-scanner-modal.tsx"
   ]
  },
- "This card was withdrawn": {
-  "hi": "यह कार्ड वापस लिया गया",
+ "This card was withdrawn on {0}.": {
+  "hi": "यह कार्ड {0} को वापस लिया गया।",
+  "files": [
+   "ed/[token]/ed-card-page.tsx"
+  ]
+ },
+ "This card was withdrawn.": {
+  "hi": "यह कार्ड वापस लिया गया।",
   "files": [
    "ed/[token]/ed-card-page.tsx"
   ]
@@ -11043,6 +11776,18 @@
    "family-home-help.tsx"
   ]
  },
+ "This deletes the unsigned draft from this device. It cannot be undone. Signed versions and the log stay.": {
+  "hi": "इससे बिना साइन का ड्राफ़्ट इस डिवाइस से मिट जाएगा। इसे वापस नहीं लाया जा सकता। साइन किए गए संस्करण और रिकॉर्ड रहेंगे।",
+  "files": [
+   "dpdp-notice.tsx"
+  ]
+ },
+ "This device has no voice for this language, so it may not read clearly. You can add one in the phone’s language settings.": {
+  "hi": "इस डिवाइस पर इस भाषा की आवाज़ नहीं है, इसलिए शायद साफ़ न पढ़ पाए। फ़ोन की भाषा सेटिंग में आवाज़ जोड़ सकते हैं।",
+  "files": [
+   "tts-speech.tsx"
+  ]
+ },
  "This draft cannot be saved until every “Must fix” item is fixed. You can still move between steps.": {
   "hi": "जब तक हर “ठीक करें” बिंदु न सुधरे, यह ड्राफ़्ट सेव नहीं होगा। आप फिर भी चरणों के बीच जा सकते हैं।",
   "files": [
@@ -11059,6 +11804,12 @@
   "hi": "इस फ़ाइल में पढ़ने लायक टेक्स्ट नहीं मिला। मूल फ़ाइल से टेक्स्ट जोड़ सकते हैं।",
   "files": [
    "care-document-search.tsx"
+  ]
+ },
+ "This file is too large. Use one under 15 MB.": {
+  "hi": "यह फ़ाइल बहुत बड़ी है। 15 MB से छोटी फ़ाइल चुनें।",
+  "files": [
+   "ectpr-plan-extras.tsx"
   ]
  },
  "This follows the model living will by the Vidhi Centre for Legal Policy and ACP India, and the Supreme Court’s rules (2018, changed on 24 January 2023).": {
@@ -11205,6 +11956,12 @@
    "ectpr-plan-screen.tsx"
   ]
  },
+ "This plan still lists one. Check with the decision-maker": {
+  "hi": "यह योजना अब भी एक दिखाती है। निर्णयकर्ता से पूछें",
+  "files": [
+   "ectpr-labels.ts"
+  ]
+ },
  "This plan was started in the emergency department.": {
   "hi": "यह योजना इमरजेंसी विभाग में शुरू हुई।",
   "files": [
@@ -11296,6 +12053,12 @@
   "hi": "हस्ताक्षर की जगह अँगूठे का निशान",
   "files": [
    "amd-screen.tsx"
+  ]
+ },
+ "Tick a box or write what happened.": {
+  "hi": "कोई बॉक्स चुनें या लिखें कि क्या हुआ।",
+  "files": [
+   "ectpr-pilot-log.tsx"
   ]
  },
  "Time": {
@@ -11400,6 +12163,12 @@
    "care-today.tsx",
    "doctor-care-home.tsx",
    "family-symptom-diary.tsx"
+  ]
+ },
+ "Too many reminders to this number in the last hour. No message was sent.": {
+  "hi": "पिछले एक घंटे में इस नंबर पर बहुत सारे संदेश गए। कोई संदेश नहीं गया।",
+  "files": [
+   "ectpr-plan-extras.tsx"
   ]
  },
  "Total": {
@@ -11512,6 +12281,12 @@
    "family-lab-history.tsx"
   ]
  },
+ "treatment fields filled: {0} of {1}": {
+  "hi": "भरे गए इलाज के हिस्से: {1} में से {0}",
+  "files": [
+   "ectpr-pilot-log.tsx"
+  ]
+ },
  "Treatment name": {
   "hi": "इलाज का नाम",
   "files": [
@@ -11540,12 +12315,6 @@
   "hi": "ट्रायल",
   "files": [
    "ectpr-labels.ts"
-  ]
- },
- "Trial for {0} {1}, review {2}{3}": {
-  "hi": "{0} {?unit?.hi ?? ''} का ट्रायल, समीक्षा {?plan.reviewAt ? new Date(plan.reviewAt).toLocaleString('hi-IN') : 'तय नहीं'}{?plan.reviewers.length ? `, ${plan.reviewers.join(', ')} द्वारा` : ''}",
-  "files": [
-   "ectpr-plan-screen.tsx"
   ]
  },
  "Trial of a set number of sessions or days": {
@@ -11861,6 +12630,12 @@
    "ectpr-plan-screen.tsx"
   ]
  },
+ "uploaded by": {
+  "hi": "अपलोड किया",
+  "files": [
+   "ectpr-plan-extras.tsx"
+  ]
+ },
  "Upper back": {
   "hi": "पीठ का ऊपरी हिस्सा",
   "files": [
@@ -11945,6 +12720,12 @@
    "ectpr-plan-screen.tsx"
   ]
  },
+ "Values section completed": {
+  "hi": "मूल्य वाला हिस्सा पूरा",
+  "files": [
+   "ectpr-pilot-log.tsx"
+  ]
+ },
  "Values, units, ranges and flags copied from reports. No interpretation is added.": {
   "hi": "नतीजे, इकाइयाँ, रेंज और फ़्लैग रिपोर्ट से लिखे गए हैं। इनकी व्याख्या नहीं की गई है।",
   "files": [
@@ -11976,9 +12757,22 @@
    "amd-screen.tsx"
   ]
  },
+ "ventilator days": {
+  "hi": "वेंटिलेटर के दिन",
+  "files": [
+   "ectpr-pilot-log.tsx"
+  ]
+ },
+ "Ventilator days in the last 30 days": {
+  "hi": "आख़िरी 30 दिनों में वेंटिलेटर के दिन",
+  "files": [
+   "ectpr-pilot-log.tsx"
+  ]
+ },
  "version": {
   "hi": "संस्करण",
   "files": [
+   "ectpr-labels.ts",
    "ectpr.tsx",
    "family-copy-tracker.tsx"
   ]
@@ -12018,12 +12812,6 @@
   "hi": "संस्करण {0} आख़िरी बार {1} को सेव हुआ। इलाज करने वाले कंसल्टेंट के साइन तक यह लागू नहीं है।",
   "files": [
    "ectpr-plan-screen.tsx"
-  ]
- },
- "Version {0}: {1}": {
-  "hi": "संस्करण {0}: {?STATUS_TEXT[working.status][1]}",
-  "files": [
-   "amd-screen.tsx"
   ]
  },
  "Version not available here": {
@@ -12075,6 +12863,12 @@
    "care-calendar.tsx"
   ]
  },
+ "View the scan": {
+  "hi": "स्कैन देखें",
+  "files": [
+   "ectpr-plan-extras.tsx"
+  ]
+ },
  "View the signed scan": {
   "hi": "हस्ताक्षरित स्कैन देखें",
   "files": [
@@ -12114,6 +12908,12 @@
   "hi": "मुलाकात और जाँच",
   "files": [
    "care-calendar.tsx"
+  ]
+ },
+ "Voice audio": {
+  "hi": "आवाज़ में सुनें",
+  "files": [
+   "tts-speech.tsx"
   ]
  },
  "Voice note": {
@@ -12454,6 +13254,12 @@
    "ectpr-plan-screen.tsx"
   ]
  },
+ "Where they preferred": {
+  "hi": "जहाँ वे चाहते थे",
+  "files": [
+   "ectpr-pilot-log.tsx"
+  ]
+ },
  "Where would you like to be cared for at the end?": {
   "hi": "अंत में आप कहाँ देखभाल चाहेंगे?",
   "files": [
@@ -12525,6 +13331,12 @@
   "hi": "ये निर्देश किसने दिए?",
   "files": [
    "visit-instructions.tsx"
+  ]
+ },
+ "Who has a copy?": {
+  "hi": "कॉपी किसके पास है?",
+  "files": [
+   "ectpr-plan-extras.tsx"
   ]
  },
  "Who has the latest copy?": {
@@ -12624,6 +13436,12 @@
   "hi": "घर पर साँस की मदद क्यों तय है (जैसे घर पर NIV)",
   "files": [
    "ectpr-plan-screen.tsx"
+  ]
+ },
+ "Why care differed": {
+  "hi": "इलाज अलग क्यों हुआ",
+  "files": [
+   "ectpr-pilot-log.tsx"
   ]
  },
  "Why CPR is still to be attempted": {
@@ -12800,6 +13618,7 @@
   "hi": "हाँ",
   "files": [
    "ectpr-labels.ts",
+   "ectpr-pilot-log.tsx",
    "ectpr-plan-screen.tsx"
   ]
  },
@@ -12825,6 +13644,12 @@
   "hi": "हाँ, अधिकतम",
   "files": [
    "ectpr-labels.ts"
+  ]
+ },
+ "Yes, delete the draft": {
+  "hi": "हाँ, ड्राफ़्ट मिटाएँ",
+  "files": [
+   "dpdp-notice.tsx"
   ]
  },
  "Yes, for any serious change": {
@@ -12954,6 +13779,18 @@
   "hi": "खर्च की सूची डाउनलोड हो गई।",
   "files": [
    "family-cost-help.tsx"
+  ]
+ },
+ "Your data and your rights": {
+  "hi": "आपका डेटा और आपके अधिकार",
+  "files": [
+   "dpdp-notice.tsx"
+  ]
+ },
+ "Your data is downloading. It holds private health details, so keep the file safe.": {
+  "hi": "आपका डेटा डाउनलोड हो रहा है। इसमें निजी सेहत की जानकारी है, इसलिए फ़ाइल सँभालकर रखें।",
+  "files": [
+   "dpdp-notice.tsx"
   ]
  },
  "Your document": {
