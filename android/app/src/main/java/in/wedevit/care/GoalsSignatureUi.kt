@@ -104,7 +104,7 @@ internal suspend fun saveNoteSignature(context: android.content.Context, namespa
             TextButton(onClick = { draft.photo = null }, enabled = enabled, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Remove photo and draw instead", "फ़ोटो हटाएँ और स्क्रीन पर हस्ताक्षर करें"), color = DoctorAccent) }
         } else {
             val ink = DoctorCardInk
-            Canvas(Modifier.fillMaxWidth().aspectRatio(PAD_W / PAD_H.toFloat()).clip(RoundedCornerShape(12.dp)).background(Color.White).semantics { contentDescription = "Signature pad · हस्ताक्षर की जगह" }.testTag("note-signature-pad")
+            Canvas(Modifier.fillMaxWidth().aspectRatio(PAD_W / PAD_H.toFloat()).clip(RoundedCornerShape(12.dp)).background(Color.White).semantics { contentDescription = careBilingual("Signature pad", "हस्ताक्षर की जगह") }.testTag("note-signature-pad")
                 .pointerInput(enabled) {
                     if (!enabled) return@pointerInput
                     fun norm(o: Offset) = (o.x / size.width).coerceIn(0f, 1f) to (o.y / size.height).coerceIn(0f, 1f)

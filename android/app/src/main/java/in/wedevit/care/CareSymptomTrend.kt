@@ -31,9 +31,9 @@ object ChartBands {
     val Severe = Color(0xFFC0392B)
     fun color(value: Int): Color = when { value <= 3 -> Mild; value <= 6 -> Moderate; else -> Severe }
     fun word(value: Int, hindi: Boolean): String = when {
-        value <= 3 -> if (hindi) "हल्का" else "Mild"
-        value <= 6 -> if (hindi) "मध्यम" else "Moderate"
-        else -> if (hindi) "तेज़" else "Severe"
+        value <= 3 -> careTr(hindi, "Mild", "हल्का")
+        value <= 6 -> careTr(hindi, "Moderate", "मध्यम")
+        else -> careTr(hindi, "Severe", "तेज़")
     }
 }
 
@@ -54,10 +54,10 @@ object TrendChartRules {
     }
 
     fun dayLabel(date: LocalDate, hindi: Boolean, today: LocalDate = LocalDate.now()): String =
-        if (date == today) (if (hindi) "आज" else "Today") else date.format(careDateFormat("EEE d", hindi))
+        if (date == today) (careTr(hindi, "Today", "आज")) else date.format(careDateFormat("EEE d", hindi))
 
     fun title(name: String, window: TrendWindow, hindi: Boolean): String = when {
-        window.lastWeek -> if (hindi) "पिछले 7 दिन में $name" else "$name over the last 7 days"
+        window.lastWeek -> careTr(hindi, "$name over the last 7 days", "पिछले 7 दिन में $name")
         hindi -> "$name: आख़िरी ${window.days.size} दिन जब नोट लिखा"
         else -> "$name on the last ${window.days.size} days noted"
     }
@@ -69,20 +69,20 @@ object TrendChartRules {
         val latest = points.last()
         val latestDate = runCatching { LocalDate.parse(latest.date) }.getOrNull()
         val latestPart = when {
-            latestDate == today -> if (hindi) "आज का आख़िरी नोट: ${latest.value}।" else "Latest today: ${latest.value}."
-            latestDate != null -> if (hindi) "आख़िरी नोट: ${latest.value} (${dayLabel(latestDate, true, today)})।" else "Latest: ${latest.value} on ${dayLabel(latestDate, false, today)}."
-            else -> if (hindi) "आख़िरी नोट: ${latest.value}।" else "Latest: ${latest.value}."
+            latestDate == today -> careTr(hindi, "Latest today: ${latest.value}.", "आज का आख़िरी नोट: ${latest.value}।")
+            latestDate != null -> careTr(hindi, "Latest: ${latest.value} on ${dayLabel(latestDate, false, today)}.", "आख़िरी नोट: ${latest.value} (${dayLabel(latestDate, true, today)})।")
+            else -> careTr(hindi, "Latest: ${latest.value}.", "आख़िरी नोट: ${latest.value}।")
         }
-        if (noted.size == 1) return if (hindi) "सिर्फ़ एक दिन का नोट। $latestPart" else "Only one day noted. $latestPart"
+        if (noted.size == 1) return careTr(hindi, "Only one day noted. $latestPart", "सिर्फ़ एक दिन का नोट। $latestPart")
         val high = noted.first { it.value == noted.maxOf { d -> d.value!! } }
-        val highPart = if (hindi) "सबसे ज़्यादा: ${dayLabel(high.date, true, today)} (${high.value})।" else "Highest on ${dayLabel(high.date, false, today)} (${high.value})."
+        val highPart = careTr(hindi, "Highest on ${dayLabel(high.date, false, today)} (${high.value}).", "सबसे ज़्यादा: ${dayLabel(high.date, true, today)} (${high.value})।")
         return "$highPart $latestPart"
     }
 
     /** What a screen reader says for the whole chart: title, summary and every day's number. */
     fun description(title: String, summary: String, window: TrendWindow, hindi: Boolean, today: LocalDate = LocalDate.now()): String =
         "$title. $summary " + window.days.joinToString("; ") { d ->
-            "${dayLabel(d.date, hindi, today)}: ${d.value?.let { "$it ${ChartBands.word(it, hindi)}" } ?: if (hindi) "कोई नोट नहीं" else "no entry"}"
+            "${dayLabel(d.date, hindi, today)}: ${d.value?.let { "$it ${ChartBands.word(it, hindi)}" } ?: careTr(hindi, "no entry", "कोई नोट नहीं")}"
         }
 }
 
@@ -99,14 +99,14 @@ object TrendChartRules {
 }
 
 @Composable internal fun ChartEmpty(hindi: Boolean, tag: String) =
-    Text(if (hindi) "अभी कोई नोट नहीं। ‘आज’ पेज से एक जोड़ें।" else "No entries yet. Add one from Today.", color = DoctorCardSub, fontSize = 15.sp, modifier = Modifier.testTag("$tag-empty"))
+    Text(careTr(hindi, "No entries yet. Add one from Today.", "अभी कोई नोट नहीं। ‘आज’ पेज से एक जोड़ें।"), color = DoctorCardSub, fontSize = 15.sp, modifier = Modifier.testTag("$tag-empty"))
 
 /**
  * One question per chart: "How strong was it each day?". Simple bars (highest number each day) on a 0–10 scale with only
  * 0, 5 and 10 marked, coloured by band, a one-line summary above and every entry listed on request below.
  */
 @Composable internal fun DayBarChart(name: String, points: List<DatedRating>, hindi: Boolean, tag: String) {
-    val t = { en: String, hi: String -> if (hindi) hi else en }
+    val t = { en: String, hi: String -> careTr(hindi, en, hi) }
     val today = LocalDate.now()
     val window = remember(points, today) { TrendChartRules.window(points, today) }
     var showAll by rememberSaveable(tag) { mutableStateOf(false) }
@@ -162,7 +162,7 @@ object TrendChartRules {
 
 /** "See graph" from a symptom card: one simple chart per question (Mood shows its two scales as two small charts). */
 @Composable fun SymptomTrendSheet(entries: List<CareItem>, current: CareItem, value: SymptomNote, hindi: Boolean, onClose: () -> Unit) {
-    val t = { en: String, hi: String -> if (hindi) hi else en }
+    val t = { en: String, hi: String -> careTr(hindi, en, hi) }
     val name = SymptomDiaryRules.symptomLabel(value.symptom, hindi)
     ModalBottomSheet(onDismissRequest = onClose, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -170,7 +170,7 @@ object TrendChartRules {
             ChartLegend(hindi)
             if (value.symptom == SymptomDiaryRules.MOOD) SymptomDiaryRules.moodShort.forEach { (key, label) ->
                 val points = remember(entries, current.personId, key) { SymptomDiaryRules.moodSeries(entries, current.personId, key) }
-                DayBarChart(if (hindi) label.second else label.first, points, hindi, "mood-trend-$key")
+                DayBarChart(careTr(hindi, label.first, label.second), points, hindi, "mood-trend-$key")
             } else {
                 val points = remember(entries, current.personId, value.symptom) { SymptomDiaryRules.symptomSeries(entries, current.personId, value.symptom) }
                 DayBarChart(name, points, hindi, "symptom-trend")
@@ -183,7 +183,7 @@ object TrendChartRules {
 
 /** Pick one body part; only that part's chart is shown, so parts never overlap on one chart. */
 @Composable internal fun PainPartTrendPicker(entries: List<CareItem>, personId: String, hindi: Boolean, preferred: String? = null) {
-    val t = { en: String, hi: String -> if (hindi) hi else en }
+    val t = { en: String, hi: String -> careTr(hindi, en, hi) }
     val parts = remember(entries, personId) { SymptomDiaryRules.painPartsWithHistory(entries, personId) }
     if (parts.size < 2) return
     var chosen by rememberSaveable(personId) { mutableStateOf(preferred?.takeIf { it in parts } ?: parts.first()) }
@@ -202,5 +202,5 @@ object TrendChartRules {
 @Composable internal fun PainPartTrend(entries: List<CareItem>, personId: String, site: String, hindi: Boolean) {
     val points = remember(entries, personId, site) { SymptomDiaryRules.painPartSeries(entries, personId, site) }
     val part = PainBodyMapRules.label(site, hindi)
-    DayBarChart(if (hindi) "$part में दर्द" else "$part pain", points, hindi, "pain-part-trend-$site")
+    DayBarChart(careTr(hindi, "$part pain", "$part में दर्द"), points, hindi, "pain-part-trend-$site")
 }

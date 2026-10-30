@@ -76,7 +76,7 @@ internal fun shareCareInvite(context: Context, text: String, whatsApp: Boolean) 
                 Text(t("Let family see $patient's care on their own phone.", "परिवार अपने फ़ोन पर $patient की देखभाल देख सके।"))
                 CareField(name, { name = it.take(40); code = "" }, t("Name", "नाम"), singleLine = true, placeholder = t("For example, Arjun", "जैसे, अर्जुन"))
                 Text(t("How are they related?", "उनसे क्या रिश्ता है?"), style = MaterialTheme.typography.bodyMedium)
-                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) { CareRelations.forEach { r -> FilterChip(selected = relation == r, onClick = { relation = if (relation == r) "" else r }, modifier = Modifier.heightIn(min = 48.dp), label = { Text(if (hindi) CareRelationsHindi[r] ?: r else r) }) } }
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) { CareRelations.forEach { r -> FilterChip(selected = relation == r, onClick = { relation = if (relation == r) "" else r }, modifier = Modifier.heightIn(min = 48.dp), label = { Text(careTr(hindi, r, CareRelationsHindi[r] ?: r)) }) } }
                 Text(t("What can they do?", "वे क्या कर सकेंगे?"), style = MaterialTheme.typography.bodyMedium)
                 ChoiceRow(t("Can view", "सिर्फ़ देख सकें"), Icons.Default.Visibility, Mint, !canAdd) { canAdd = false; code = "" }
                 ChoiceRow(t("Can view and add", "देख सकें और जोड़ सकें"), Icons.Default.Edit, Mint, canAdd) { canAdd = true; code = "" }

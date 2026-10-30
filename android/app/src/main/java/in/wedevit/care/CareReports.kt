@@ -16,9 +16,9 @@ import kotlin.coroutines.coroutineContext
 /** A report's name is only a label in Sahara; the stored file name never changes. */
 object ReportNameRules {
     fun error(name: String): String? = when {
-        name.isBlank() -> "Add a name. · नाम लिखें।"
-        name.trim().length > 160 -> "Use 160 characters or fewer. · 160 अक्षर तक।"
-        name.any { it.isISOControl() } || name.contains('/') || name.contains('\\') -> "Don't use / or \\ in the name. · / या \\ न लिखें।"
+        name.isBlank() -> careBilingual("Add a name.", "नाम लिखें।")
+        name.trim().length > 160 -> careBilingual("Use 160 characters or fewer.", "160 अक्षर तक।")
+        name.any { it.isISOControl() } || name.contains('/') || name.contains('\\') -> careBilingual("Don't use / or \\ in the name.", "/ या \\ न लिखें।")
         else -> null
     }
     fun clean(name: String): String { error(name)?.let { throw IllegalArgumentException(it) }; return name.trim() }

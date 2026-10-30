@@ -1,0 +1,2638 @@
+# Urdu for Sahara. Machine-drafted; clinician back-translation required before pilot.
+# english<TAB>translation. The English is the Kotlin source text; keep $name and ${expr} placeholders exactly.
+Sign in or create an account to join ${it.possessive} care	${it.possessive} دیکھ بھال سے جڑنے کے لیے سائن ان کریں یا اکاؤنٹ بنائیں
+Stop the recording before opening the doctor practice walkthrough.	ڈاکٹر کی مشق والا ڈیمو کھولنے سے پہلے ریکارڈنگ روکیں۔
+Stop the recording before opening the walkthrough.	ڈیمو کھولنے سے پہلے ریکارڈنگ روکیں۔
+Doctor sign in	ڈاکٹر سائن ان
+Your doctor workspace	آپ کا ڈاکٹر ورک اسپیس
+Use your own account. Professional verification and patient access are separate.	اپنا اکاؤنٹ استعمال کریں۔ ڈاکٹر ہونے کی تصدیق اور مریض تک رسائی الگ الگ ہیں۔
+Open workspace	ورک اسپیس کھولیں
+Couldn't finish. Please try again.	کام پورا نہیں ہو سکا۔ براہ کرم دوبارہ کوشش کریں۔
+Couldn't load the people you've invited.	آپ کے بلائے ہوئے لوگوں کی فہرست نہیں کھل سکی۔
+Create an account	اکاؤنٹ بنائیں
+Sign in	سائن ان کریں
+Your account	آپ کا اکاؤنٹ
+Sign in to share care notes and daily care with people you invite.	جنہیں آپ بلائیں، ان کے ساتھ دیکھ بھال کے نوٹ اور روز کی دیکھ بھال شیئر کرنے کے لیے سائن ان کریں۔
+Email	ای میل
+Password	پاس ورڈ
+Use at least 10 characters.	کم از کم 10 حروف رکھیں۔
+Account created. We are sending a link to ${email.trim()}. Open that link on this phone, then sign in here. Check spam too. If nothing comes in 10 minutes, tap Resend confirmation email. If it still does not come, write to workwithdevit@gmail.com.	اکاؤنٹ بن گیا۔ ہم ${email.trim()} پر ایک لنک بھیج رہے ہیں۔ وہ لنک اسی فون پر کھولیں، پھر یہاں سائن ان کریں۔ اسپیم میں بھی دیکھیں۔ 10 منٹ میں کچھ نہ آئے تو “تصدیقی ای میل دوبارہ بھیجیں” دبائیں۔ پھر بھی نہ آئے تو workwithdevit@gmail.com پر لکھیں۔
+Please wait…	براہ کرم رکیں…
+Create account	اکاؤنٹ بنائیں
+Sending the email again to $awaitingConfirmation. If it does not come, write to workwithdevit@gmail.com.	$awaitingConfirmation پر ای میل دوبارہ بھیج رہے ہیں۔ نہ آئے تو workwithdevit@gmail.com پر لکھیں۔
+Resend confirmation email	تصدیقی ای میل دوبارہ بھیجیں
+If that email has an account, you'll receive a reset link.	اگر اس ای میل سے اکاؤنٹ بنا ہے تو آپ کو پاس ورڈ بدلنے کا لنک مل جائے گا۔
+Forgot password?	پاس ورڈ بھول گئے؟
+Already have an account? Sign in	پہلے سے اکاؤنٹ ہے؟ سائن ان کریں
+New accounts and password reset are temporarily unavailable. Existing confirmed accounts can sign in.	نیا اکاؤنٹ بنانا اور پاس ورڈ بدلنا ابھی کچھ وقت کے لیے بند ہے۔ پہلے سے تصدیق شدہ اکاؤنٹ سائن ان کر سکتے ہیں۔
+Invitation kept. Sign in or create an account, and Sahara will ask you to join.	دعوت رکھ لی گئی۔ سائن ان کریں یا اکاؤنٹ بنائیں، پھر سہارا آپ سے جڑنے کو پوچھے گا۔
+No Sahara invite found on the clipboard. Copy the WhatsApp message or link first.	کاپی کیے گئے متن میں سہارا کی دعوت نہیں ملی۔ پہلے WhatsApp پیغام یا لنک کاپی کریں۔
+Got an invitation? Paste it here	دعوت ملی ہے؟ یہاں پیسٹ کریں
+${p.name}'s care is shared with you. You can read it and add to it.	${p.name} کی دیکھ بھال آپ کے ساتھ شیئر کی گئی ہے۔ آپ اسے دیکھ سکتے ہیں اور اس میں جوڑ سکتے ہیں۔
+${p.name}'s care is shared with you. You can read it; only the person who invited you can allow changes.	${p.name} کی دیکھ بھال آپ کے ساتھ شیئر کی گئی ہے۔ آپ اسے دیکھ سکتے ہیں؛ تبدیلی کی اجازت صرف بلانے والے ہی دے سکتے ہیں۔
+Refresh records	ریکارڈ دوبارہ لائیں
+Join someone's care	کسی کی دیکھ بھال سے جڑیں
+The person who invited you will see your email.	جنہوں نے آپ کو بلایا ہے، انہیں آپ کا ای میل نظر آئے گا۔
+Invitation code or link	دعوت کا کوڈ یا لنک
+Invite pasted. Tap Join.	دعوت پیسٹ ہو گئی۔ اب “جڑیں” دبائیں۔
+Paste invite	دعوت پیسٹ کریں
+You can now see $it's care.	اب آپ $it کی دیکھ بھال دیکھ سکتے ہیں۔
+You can now see their care.	اب آپ ان کی دیکھ بھال دیکھ سکتے ہیں۔
+ You can read and add.	 آپ دیکھ اور جوڑ سکتے ہیں۔
+ You can read.	 آپ دیکھ سکتے ہیں۔
+Join	جڑیں
+Share $it's care	$it کی دیکھ بھال شیئر کریں
+Add family	گھر والے جوڑیں
+Let family see $it's care on their own phone	گھر والے اپنے فون پر $it کی دیکھ بھال دیکھ سکیں
+Who are you inviting?	آپ کسے بلا رہے ہیں؟
+Family	گھر والے
+Doctor	ڈاکٹر
+Invited people can read the care notes and daily entries. Recordings and unfinished conversations aren't shared.	بلائے گئے لوگ دیکھ بھال کے نوٹ اور روز کی باتیں پڑھ سکتے ہیں۔ ریکارڈنگ اور ادھوری بات چیت شیئر نہیں ہوتی۔
+Allow them to add and change records	انہیں ریکارڈ جوڑنے اور بدلنے دیں
+Share family and care-team contacts	گھر والوں اور دیکھ بھال ٹیم کے نمبر شیئر کریں
+This creates a one-person code that you share yourself. Nothing is sent to the doctor, and creating it does not verify them.	اس سے ایک شخص کے لیے کوڈ بنتا ہے جو آپ خود بھیجتے ہیں۔ ڈاکٹر کو اپنے آپ کچھ نہیں جاتا، اور کوڈ بنانے سے ڈاکٹر کی تصدیق نہیں ہوتی۔
+A doctor can only join with this code after their clinician verification has been approved. Until then, joining with it will fail with a verification message.	ڈاکٹر اس کوڈ سے تبھی جڑ سکتے ہیں جب ان کی ڈاکٹر والی تصدیق منظور ہو چکی ہو۔ تب تک جڑنے کی کوشش پر تصدیق کا پیغام آئے گا اور جڑنا نہیں ہوگا۔
+What they can open	وہ کیا کھول سکیں گے
+Care notes and conversations	دیکھ بھال کے نوٹ اور بات چیت
+Calendar, medicines and tasks	کیلنڈر، دوائیں اور کام
+Report-derived records	رپورٹ سے بنے ریکارڈ
+Costs	خرچ
+Allow them to add and change records (otherwise read-only)	انہیں ریکارڈ جوڑنے اور بدلنے دیں (ورنہ صرف دیکھ سکیں گے)
+Access lasts	رسائی کتنے دن رہے
+$d days	$d دن
+Create doctor invitation	ڈاکٹر کے لیے دعوت بنائیں
+Create invitation	دعوت بنائیں
+One person · the code expires in 3 days · works only for an approved clinician account	ایک شخص · کوڈ 3 دن میں ختم ہو جائے گا · صرف منظور شدہ ڈاکٹر اکاؤنٹ کے لیے
+One person · the link expires in 3 days · access then lasts 30 days	ایک شخص · لنک 3 دن میں ختم ہوگا · اس کے بعد رسائی 30 دن رہے گی
+Share invitation	دعوت بھیجیں
+Invitations	بھیجی گئی دعوتیں
+Invitation cancelled. The link no longer works.	دعوت منسوخ ہو گئی۔ اب لنک کام نہیں کرے گا۔
+Cancel	منسوخ کریں
+Nobody has joined yet.	ابھی تک کوئی نہیں جڑا۔
+People with access	جنہیں رسائی ہے
+Can make changes	تبدیلی کر سکتے ہیں
+Can read	صرف دیکھ سکتے ہیں
+joined ${day(it)}	${day(it)} کو جڑے
+access until ${day(it)}	${day(it)} تک رسائی
+access ended ${day(it)} · invite again	${day(it)} کو رسائی ختم · دوبارہ بلائیں
+Remove	ہٹائیں
+You cannot change access yet. For now, remove them and send a new invite with the access you want.	ابھی رسائی نہیں بدل سکتے۔ فی الحال انہیں ہٹا کر، جیسی رسائی چاہیے اس کے ساتھ نئی دعوت بھیجیں۔
+${member.email} can now only read.	${member.email} اب صرف دیکھ سکتے ہیں۔
+${member.email} can now add and change records.	${member.email} اب ریکارڈ جوڑ اور بدل سکتے ہیں۔
+Change to read only	صرف دیکھنے کی رسائی دیں
+Allow adding and changes	جوڑنے اور بدلنے کی رسائی دیں
+Share care-team contacts with this person	اس شخص کے ساتھ دیکھ بھال ٹیم کے نمبر شیئر کریں
+Sharing care-team contacts is not available yet.	دیکھ بھال ٹیم کے نمبر ابھی شیئر نہیں ہو سکتے۔
+Sign out	سائن آؤٹ کریں
+Delete my account and data	میرا اکاؤنٹ اور معلومات مٹائیں
+Request deletion by email	ای میل سے مٹانے کی درخواست بھیجیں
+Privacy policy	پرائیویسی پالیسی
+Stop sharing with this person?	اس شخص کے ساتھ شیئر کرنا بند کریں؟
+They won't be able to read or change these records online. Copies they've already saved cannot be recalled.	وہ یہ ریکارڈ آن لائن نہ پڑھ سکیں گے، نہ بدل سکیں گے۔ جو کاپی وہ پہلے محفوظ کر چکے ہیں، وہ واپس نہیں لی جا سکتی۔
+${member.email} no longer has access.	${member.email} کی رسائی ہٹا دی گئی۔
+Stop sharing	شیئر کرنا بند کریں
+Keep sharing	شیئر کرتے رہیں
+Delete your account and data?	اپنا اکاؤنٹ اور معلومات مٹائیں؟
+This deletes your Sahara account and: the care records you set up (also for everyone you shared them with), your invitations, your doctor request, and your access to other people's care. This phone's copy is removed too. It cannot be undone. To keep care notes, send them from More first.	اس سے آپ کا سہارا اکاؤنٹ اور یہ چیزیں مٹ جائیں گی: آپ کے بنائے دیکھ بھال کے ریکارڈ (جن کے ساتھ شیئر کیے، ان کے لیے بھی)، آپ کی دعوتیں، ڈاکٹر والی درخواست، اور دوسروں کی دیکھ بھال تک آپ کی رسائی۔ اس فون کی کاپی بھی ہٹ جائے گی۔ یہ واپس نہیں ہو سکتا۔ دیکھ بھال کے نوٹ رکھنے ہوں تو پہلے “مزید” سے بھیج لیں۔
+I understand this can't be undone	میں سمجھتا/سمجھتی ہوں کہ یہ واپس نہیں ہو سکتا
+You cannot delete from the app yet. Nothing was deleted. Use Request deletion by email below.	ابھی ایپ سے نہیں مٹا سکتے۔ کچھ نہیں مٹا۔ نیچے “ای میل سے مٹانے کی درخواست بھیجیں” استعمال کریں۔
+Your Sahara account and its data were deleted.	آپ کا سہارا اکاؤنٹ اور اس کی معلومات مٹا دی گئیں۔
+Your Sahara data was deleted and the account is closed. The Sahara team removes the sign-in email itself; write to workwithdevit@gmail.com if you want that confirmed.	آپ کی سہارا معلومات مٹا دی گئیں اور اکاؤنٹ بند ہو گیا۔ سائن ان والا ای میل سہارا ٹیم خود ہٹاتی ہے؛ تصدیق چاہیے تو workwithdevit@gmail.com پر لکھیں۔
+Delete everything	سب مٹائیں
+Keep my account	اکاؤنٹ رہنے دیں
+Sign out?	سائن آؤٹ کریں؟
+That email and password don't match an account. Check them, or use Forgot password.	یہ ای میل اور پاس ورڈ کسی اکاؤنٹ سے میل نہیں کھاتے۔ دوبارہ دیکھیں، یا “پاس ورڈ بھول گئے؟” دبائیں۔
+This email isn't confirmed yet. Open the link in the confirmation email on this phone, then sign in. No email? Tap Resend confirmation email.	اس ای میل کی ابھی تصدیق نہیں ہوئی۔ تصدیقی ای میل کا لنک اسی فون پر کھولیں، پھر سائن ان کریں۔ ای میل نہیں آیا؟ “تصدیقی ای میل دوبارہ بھیجیں” دبائیں۔
+This email already has a Sahara account. Sign in instead, or use Forgot password.	اس ای میل سے سہارا اکاؤنٹ پہلے سے بنا ہے۔ سائن ان کریں، یا “پاس ورڈ بھول گئے؟” دبائیں۔
+Choose a longer password: at least 10 characters.	لمبا پاس ورڈ چنیں: کم از کم 10 حروف۔
+The email could not be sent. This is not your mistake. Write to workwithdevit@gmail.com and the team will help.	ای میل نہیں بھیجا جا سکا۔ اس میں آپ کی غلطی نہیں ہے۔ workwithdevit@gmail.com پر لکھیں، ٹیم مدد کرے گی۔
+Too many emails were sent for now. Try again in an hour.	ابھی بہت زیادہ ای میل بھیجے جا چکے ہیں۔ ایک گھنٹے بعد دوبارہ کوشش کریں۔
+Please wait a minute and try again.	ایک منٹ رک کر دوبارہ کوشش کریں۔
+No connection right now. Check your internet and try again.	ابھی انٹرنیٹ نہیں مل رہا۔ انٹرنیٹ دیکھ کر دوبارہ کوشش کریں۔
+Son	بیٹا
+Daughter	بیٹی
+Spouse	شوہر/بیوی
+Brother	بھائی
+Sister	بہن
+Parent	ماں/باپ
+Other	کوئی اور
+The invitation didn't look right. Please try again.	دعوت ٹھیک نہیں بنی۔ براہ کرم دوبارہ کوشش کریں۔
+Couldn't create the invitation. Please try again.	دعوت نہیں بن سکی۔ براہ کرم دوبارہ کوشش کریں۔
+To let family see ${patient.ifBlank { "this person" }}'s care on their own phone, you first need to sign in. It takes a minute.	گھر والے اپنے فون پر ${patient.ifBlank { "this person" }} کی دیکھ بھال دیکھ سکیں، اس کے لیے پہلے سائن ان کریں۔ اس میں بس ایک منٹ لگتا ہے۔
+Sign in or create an account	سائن ان کریں یا اکاؤنٹ بنائیں
+Only the person who set up these records can invite family.	گھر والوں کو صرف وہی بلا سکتے ہیں جنہوں نے یہ ریکارڈ بنائے ہیں۔
+Let family see $patient's care on their own phone.	گھر والے اپنے فون پر $patient کی دیکھ بھال دیکھ سکیں۔
+Name	نام
+For example, Arjun	جیسے، ارجن
+How are they related?	ان سے کیا رشتہ ہے؟
+What can they do?	وہ کیا کر سکیں گے؟
+Can view	صرف دیکھ سکیں
+Can view and add	دیکھ سکیں اور جوڑ سکیں
+Share care-team contacts	دیکھ بھال ٹیم کے نمبر بھی شیئر کریں
+They can read care notes and daily entries. Recordings and unfinished conversations aren't shared. The link works once and expires in 3 days. Their access then lasts 30 days; invite them again to renew it. They will need to sign in, and Your account shows when they have joined.	وہ دیکھ بھال کے نوٹ اور روز کی باتیں پڑھ سکیں گے۔ ریکارڈنگ اور ادھوری بات چیت شیئر نہیں ہوتی۔ لنک ایک ہی بار چلتا ہے اور 3 دن میں ختم ہو جاتا ہے۔ اس کے بعد ان کی رسائی 30 دن رہتی ہے؛ آگے کے لیے دوبارہ دعوت بھیجیں۔ انہیں سائن ان کرنا ہوگا، اور جڑنے پر “آپ کا اکاؤنٹ” میں نظر آئے گا۔
+Send invite on WhatsApp	WhatsApp پر دعوت بھیجیں
+Share another way	کسی اور طریقے سے بھیجیں
+Close	بند کریں
+Join ${pending.possessive} care?	${pending.possessive} دیکھ بھال سے جڑنا چاہتے ہیں؟
+${pending.who.replaceFirstChar { it.uppercase() }} will see your email ($email).	${pending.who.replaceFirstChar { it.uppercase() }} کو آپ کا ای میل ($email) نظر آئے گا۔
+ · you can read and add	 · آپ دیکھ اور جوڑ سکتے ہیں
+ · you can read	 · آپ دیکھ سکتے ہیں
+You can now see $it's care	اب آپ $it کی دیکھ بھال دیکھ سکتے ہیں
+You can now see ${pending.possessive} care	اب آپ ${pending.possessive} دیکھ بھال دیکھ سکتے ہیں
+Joining…	جڑ رہے ہیں…
+Not now	ابھی نہیں
+PET-CT scan	PET-CT اسکین
+Biopsy	بایوپسی
+Histopathology	ہسٹوپیتھولوجی
+Staging report	اسٹیجنگ رپورٹ
+Cancer document	کینسر کا کاغذ
+Couldn't load requests.	درخواستیں نہیں کھل سکیں۔
+Approve doctors · Sahara team	ڈاکٹر منظور کریں · سہارا ٹیم
+Check each registration on the medical council's register before deciding. You cannot approve your own account.	فیصلے سے پہلے ہر رجسٹریشن میڈیکل کونسل کے رجسٹر میں جانچیں۔ آپ اپنا اکاؤنٹ منظور نہیں کر سکتے۔
+Refresh requests	درخواستیں تازہ کریں
+No doctor is waiting for approval.	کوئی ڈاکٹر منظوری کا انتظار نہیں کر رہا۔
+${request.name} is approved. Their doctor invitation codes now work.	${request.name} منظور ہو گئے۔ اب ان کے ڈاکٹر دعوت کوڈ کام کریں گے۔
+${request.name} was not approved. They see your reason and can correct their details.	${request.name} منظور نہیں ہوئے۔ وہ آپ کی وجہ دیکھ کر اپنی تفصیل ٹھیک کر سکتے ہیں۔
+The decision was not saved.	فیصلہ محفوظ نہیں ہوا۔
+Council: 	کونسل: 
+Registration number: 	رجسٹریشن نمبر: 
+Where you checked it (register name or link)	کہاں جانچا (رجسٹر کا نام یا لنک)
+Reason, shown to the doctor	وجہ، ڈاکٹر کو نظر آئے گی
+Approve	منظور کریں
+Don't approve	منظور نہ کریں
+Today	آج
+Talk	بات چیت
+Docs	کاغذات
+Care	دیکھ بھال
+Nearby	آس پاس
+More	مزید
+Walkthrough user, currently ${user.name}, ${user.role}	ڈیمو یوزر، ابھی ${user.name}، ${user.role}
+Selected	چنا ہوا
+Leave walkthrough	ڈیمو سے باہر جائیں
+Switch care profile, $name	دیکھ بھال پروفائل بدلیں، $name
+Add person	شخص جوڑیں
+Add medicine	دوا جوڑیں
+Add visit	ملاقات جوڑیں
+Add task	کام جوڑیں
+Add check-in	آج کا حال لکھیں
+Add note	نوٹ جوڑیں
+Add	جوڑیں
+How was today?	آج کا دن کیسا رہا؟
+Saved for today. Tap another to change it.	آج کے لیے محفوظ ہو گیا۔ بدلنا ہو تو دوسرا چنیں۔
+One tap saves today's check-in.	ایک بار دبانے سے آج کا حال محفوظ ہو جاتا ہے۔
+Add a few words	کچھ الفاظ لکھیں
+Change the words	الفاظ بدلیں
+Note a symptom	طبیعت کا نوٹ لکھیں
+Signed in: check-ins and symptom notes reach the family and doctor you invited.	سائن ان ہے: آج کا حال اور طبیعت کے نوٹ آپ کے بلائے ہوئے گھر والوں اور ڈاکٹر تک پہنچتے ہیں۔
+Saved on this phone only. Sign in to share it with your doctor.	صرف اس فون پر محفوظ ہوا۔ ڈاکٹر کے ساتھ شیئر کرنے کے لیے سائن ان کریں۔
+Collapse $title	$title بند کریں
+Expand $title	$title کھولیں
+Show fewer	کم دکھائیں
+Show all (${items.size})	سب دکھائیں (${items.size})
+Version ${note.version}	ورژن ${note.version}
+Scan a prescription	پرچہ اسکین کریں
+Scan & organize	اسکین کر کے جوڑیں
+Add manually	خود لکھیں
+Physical Concerns	جسمانی پریشانیاں
+Pain	درد
+Sleep	نیند
+Fatigue	تھکان
+Tobacco use	تمباکو کا استعمال
+Substance use	نشے کا استعمال
+Memory or concentration	یادداشت یا دھیان لگانا
+Sexual health	جنسی صحت
+Changes in eating	کھانے پینے میں تبدیلی
+Loss or change of physical abilities	جسمانی طاقت میں کمی یا تبدیلی
+Emotional Concerns	جذباتی پریشانیاں
+Worry or anxiety	فکر یا گھبراہٹ
+Sadness or depression	اداسی یا ڈپریشن
+Loss of interest or enjoyment	دلچسپی یا خوشی ختم ہونا
+Grief or loss	غم یا کسی کو کھونا
+Fear	ڈر
+Loneliness	اکیلاپن
+Anger	غصہ
+Changes in appearance	شکل و صورت میں تبدیلی
+Feelings of worthlessness or being a burden	بے کار ہونے یا بوجھ بننے کا احساس
+Social Concerns	سماجی پریشانیاں
+Relationship with spouse or partner	شوہر/بیوی یا ساتھی سے رشتہ
+Relationship with children	بچوں سے رشتہ
+Relationship with family members	گھر والوں سے رشتہ
+Relationship with friends or coworkers	دوستوں یا ساتھ کام کرنے والوں سے رشتہ
+Communication with health care team	علاج کرنے والی ٹیم سے بات چیت
+Ability to have children	اولاد پیدا کرنے کی صلاحیت
+Prejudice or discrimination	تعصب یا بھید بھاؤ
+Practical Concerns	روزمرہ کی پریشانیاں
+Taking care of myself	اپنی دیکھ بھال
+Taking care of others	دوسروں کی دیکھ بھال
+Safety	حفاظت
+Work	کام
+School	اسکول
+Housing/Utilities	گھر/بجلی پانی
+Finances	پیسے
+Insurance	انشورنس
+Transportation	آنے جانے کا انتظام
+Child care	بچوں کی دیکھ بھال
+Having enough food	پیٹ بھر کھانا ملنا
+Access to medicine	دوا ملنا
+Treatment decisions	علاج کے فیصلے
+Spiritual or Religious Concerns	روحانی یا مذہبی پریشانیاں
+Sense of meaning or purpose	زندگی کا مطلب یا مقصد
+Changes in faith or beliefs	ایمان یا عقیدے میں تبدیلی
+Death, dying, or afterlife	موت، مرنا، یا مرنے کے بعد کی زندگی
+Conflict between beliefs and cancer treatments	عقیدے اور کینسر کے علاج کے بیچ ٹکراؤ
+Relationship with the sacred	خدا یا مقدس سے رشتہ
+Ritual or dietary needs	مذہبی رسم یا کھانے پینے کی ضرورتیں
+Are you in any distress today?	کیا آج آپ کسی پریشانی میں ہیں؟
+Yes	ہاں
+No	نہیں
+Saved today: ${answer.score}/10. Tap Yes to change it.	آج محفوظ ہوا: ${answer.score}/10۔ بدلنے کے لیے “ہاں” دبائیں۔
+Distress Thermometer	پریشانی تھرمامیٹر
+How much distress have you felt in the past week, including today? Tap a number.	پچھلے ایک ہفتے میں، آج سمیت، آپ کو کتنی پریشانی رہی ہے؟ ایک نمبر دبائیں۔
+Tick anything that has been a problem.	جو بھی بات پریشانی رہی ہو، اس پر نشان لگائیں۔
+This part is optional.	یہ حصہ بھرنا ضروری نہیں ہے۔
+Any other concern (optional)	کوئی اور فکر (چاہیں تو)
+Save	محفوظ کریں
+Choose a number to save	محفوظ کرنے کے لیے نمبر چنیں
+Source: NCCN Distress Thermometer and Problem List, NCCN Guidelines Version 1.2026 (Distress Management).	ماخذ: NCCN Distress Thermometer and Problem List، NCCN Guidelines ورژن 1.2026 (Distress Management)۔ اردو ترجمہ سہارا کا ہے، NCCN کا نہیں۔
+Your number: $score out of 10	آپ کا نمبر: 10 میں سے $score
+No number chosen yet	ابھی کوئی نمبر نہیں چنا
+0 = No distress, 10 = Extreme distress	0 = کوئی پریشانی نہیں، 10 = بہت زیادہ پریشانی
+No distress	کوئی پریشانی نہیں
+Extreme distress	بہت زیادہ پریشانی
+Your number	آپ کا نمبر
+$count ticked	$count چنے گئے
+This distress answer could not be read.	یہ پریشانی والا جواب پڑھا نہیں جا سکا۔
+Distress score history	پریشانی کے نمبروں کی تاریخ
+Self-reported. Not a diagnosis.	خود بتایا ہوا۔ یہ تشخیص نہیں ہے۔
+Reading ${report.name} on this phone (${index + 1} of ${picked.size})	اس فون پر ${report.name} پڑھ رہے ہیں (${picked.size} میں سے ${index + 1})
+Finding matching lines on this phone…	اس فون پر ملتی جلتی سطریں ڈھونڈ رہے ہیں…
+Asking ${remote.provider}…	${remote.provider} سے پوچھ رہے ہیں…
+The online answer did not work this time${error.message?.let { " (${it.trimEnd('.')})" }.orEmpty()}. Below are the matching lines found on this phone instead.	آن لائن جواب اس بار نہیں ملا${error.message?.let { " (${it.trimEnd('.')})" }.orEmpty()}۔ اس کی جگہ اس فون پر ملی ملتی جلتی سطریں نیچے ہیں۔
+Stopped. Nothing else was sent.	روک دیا۔ اور کچھ نہیں بھیجا گیا۔
+Could not get an answer. Your documents are safe.	جواب نہیں مل سکا۔ آپ کے کاغذات محفوظ ہیں۔
+Back to documents	کاغذات پر واپس
+Ask your documents	اپنے کاغذات سے پوچھیں
+For example: When is my next follow-up? Which lab test is due?	جیسے: اگلی بار ڈاکٹر کے پاس کب جانا ہے؟ کون سا لیب ٹیسٹ باقی ہے؟
+Checking if this is ready…	دیکھ رہے ہیں کہ یہ تیار ہے یا نہیں…
+Online answers are not set up right now	آن لائن جواب ابھی چالو نہیں ہے
+You can still find the lines in your documents that match your question. This works on this phone, without internet. Nothing is sent.	آپ پھر بھی اپنے کاغذات میں سوال سے ملتی جلتی سطریں ڈھونڈ سکتے ہیں۔ یہ اسی فون پر، بغیر انٹرنیٹ کے چلتا ہے۔ کچھ نہیں بھیجا جاتا۔
+Search all my documents	میرے سارے کاغذات میں ڈھونڈیں
+Search all my documents. Only the lines that match my question are sent.	میرے سارے کاغذات میں ڈھونڈیں۔ صرف سوال سے ملتی جلتی سطریں بھیجی جاتی ہیں۔
+Choose documents (up to ${DocumentQuestionRules.MAX_DOCUMENTS})	کاغذات چنیں (${DocumentQuestionRules.MAX_DOCUMENTS} تک)
+Add a report first.	پہلے کوئی رپورٹ جوڑیں۔
+Your question	آپ کا سوال
+I agree to send my question and ${if (searchAll) "the matching lines from my documents" else "the text of these ${chosen.size} documents"} to ${service.provider}. Photos and files are not sent. Nothing is sent until I tap Ask. I will be asked again next time.	میں اپنا سوال اور ${if (searchAll) "the matching lines from my documents" else "the text of these ${chosen.size} documents"} ${service.provider} کو بھیجنے کے لیے راضی ہوں۔ تصویریں اور فائلیں نہیں بھیجی جاتیں۔ “پوچھیں” دبانے تک کچھ نہیں بھیجا جاتا۔ اگلی بار پھر پوچھا جائے گا۔
+Ask	پوچھیں
+Find in my documents	میرے کاغذات میں ڈھونڈیں
+Find on this phone only	صرف اس فون پر ڈھونڈیں
+Stop	روکیں
+Not found in the chosen documents	چنے گئے کاغذات میں نہیں ملا
+Try other documents or other words.	دوسرے کاغذات یا دوسرے الفاظ آزمائیں۔
+Answer · check it with the lines below	جواب · نیچے کی سطروں سے ملا لیں
+Where this came from	یہ کہاں سے آیا
+Page ${citation.page} · line ${citation.line}	صفحہ ${citation.page} · سطر ${citation.line}
+The phone read this text. No one has checked it yet. Compare it with the paper.	یہ تحریر فون نے پڑھی ہے۔ ابھی کسی نے جانچی نہیں۔ اصل کاغذ سے ملا لیں۔
+Open this document	یہ کاغذ کھولیں
+No matching lines on this phone	اس فون پر ملتی جلتی سطریں نہیں ملیں
+Try other words, for example the test name as it is printed on the report.	دوسرے الفاظ آزمائیں، جیسے رپورٹ پر چھپا ٹیسٹ کا نام۔
+Answer from your documents	آپ کے کاغذات سے جواب
+These are the lines in your documents that match your question, best match first. The phone only finds them; it does not explain them. Nothing left this phone.	یہ آپ کے کاغذات کی وہ سطریں ہیں جو آپ کے سوال سے ملتی ہیں، سب سے زیادہ ملتی پہلے۔ فون صرف انہیں ڈھونڈتا ہے، ان کا مطلب نہیں بتاتا۔ کچھ بھی اس فون سے باہر نہیں گیا۔
+Value found · newest document first	ملی ہوئی قیمت · سب سے نیا کاغذ پہلے
+page ${hit.page} · line ${hit.line}	صفحہ ${hit.page} · سطر ${hit.line}
+Lines this is based on	جن سطروں پر یہ مبنی ہے
+Matching lines	ملتی جلتی سطریں
+Page ${hit.page} · line ${hit.line}	صفحہ ${hit.page} · سطر ${hit.line}
+Answers come only from your documents. Not medical advice. Ask your care team.	جواب صرف آپ کے کاغذات سے آتے ہیں۔ یہ ڈاکٹری مشورہ نہیں ہے۔ اپنی دیکھ بھال ٹیم سے پوچھیں۔
+Bills	بل
+Lab reports	لیب رپورٹ
+Prescriptions	پرچے
+Discharge summaries	ڈسچارج سمری
+Type a question of up to 300 characters.	300 حروف تک کا سوال لکھیں۔
+Choose one to five documents.	ایک سے پانچ کاغذات چنیں۔
+“${document.name}” has no readable text yet. Open it with “Read and copy facts” first.	“${document.name}” میں ابھی پڑھنے لائق تحریر نہیں ہے۔ پہلے اسے “پڑھیں اور باتیں کاپی کریں” سے کھولیں۔
+These documents have too much text. Choose fewer documents.	ان کاغذات میں بہت زیادہ تحریر ہے۔ کم کاغذات چنیں۔
+Your documents have no readable text yet. Open one with “Read and copy facts” first.	آپ کے کاغذات میں ابھی پڑھنے لائق تحریر نہیں ہے۔ پہلے کسی ایک کو “پڑھیں اور باتیں کاپی کریں” سے کھولیں۔
+No readable text found. Open the original and copy the words you can read.	پڑھنے لائق تحریر نہیں ملی۔ اصل فائل کھولیں اور جو الفاظ پڑھ سکیں، انہیں لکھ لیں۔
+Could not read this document. The original is unchanged.	یہ کاغذ پڑھا نہیں جا سکا۔ اصل فائل ویسی ہی ہے۔
+Review report	رپورٹ جانچیں
+No app could open this original. Your file is unchanged.	کوئی ایپ یہ فائل نہیں کھول سکی۔ آپ کی فائل ویسی ہی ہے۔
+View original	اصل فائل دیکھیں
+Read text, correct any mistakes, then copy only the facts you checked. Handwriting and small print may not be readable.	تحریر پڑھیں، غلطیاں ٹھیک کریں، پھر صرف جانچی ہوئی باتیں کاپی کریں۔ ہاتھ کی لکھائی اور باریک چھپائی شاید نہ پڑھی جا سکے۔
+Reading page ${progress.first} of ${progress.second.coerceAtLeast(1)}	صفحہ ${progress.first} / ${progress.second.coerceAtLeast(1)} پڑھ رہے ہیں
+Cancel reading	پڑھنا روکیں
+Read again	دوبارہ پڑھیں
+First ${document.pages.size} of ${document.pageCount} pages read. Open the original for the remaining pages.	${document.pageCount} میں سے پہلے ${document.pages.size} صفحے پڑھے گئے۔ باقی صفحوں کے لیے اصل فائل کھولیں۔
+Page ${candidate.page}	صفحہ ${candidate.page}
+Text to check	جانچنے کے لیے تحریر
+Corrections are separate from the original reading. The original file is kept.	درستیاں الگ رکھی جاتی ہیں۔ اصل فائل ویسی ہی رہتی ہے۔
+I compared these pages and any corrections with the original.	میں نے یہ صفحے اور درستیاں اصل فائل سے ملا لی ہیں۔
+Reviewed text saved	جانچی ہوئی تحریر محفوظ ہو گئی
+Could not save the reviewed text. Keep this page open and try again.	جانچی ہوئی تحریر محفوظ نہیں ہو سکی۔ یہ صفحہ کھلا رکھیں اور دوبارہ کوشش کریں۔
+Save review again	جانچ دوبارہ محفوظ کریں
+Save reviewed text	جانچی ہوئی تحریر محفوظ کریں
+Copy a checked fact	جانچی ہوئی بات کاپی کریں
+Choose the exact line to keep with a medicine, test or follow-up. A copied record does not confirm treatment happened.	دوا، ٹیسٹ یا اگلی ملاقات کے لیے صحیح سطر چنیں۔ کاپی کرنے سے یہ پکا نہیں ہوتا کہ علاج ہوا۔
+Test name on report	رپورٹ پر ٹیسٹ کا نام
+Record name	ریکارڈ کا نام
+Medicine	دوا
+Follow-up	اگلی ملاقات
+Test	ٹیسٹ
+Lab result	لیب کا نتیجہ
+Record	ریکارڈ
+Filled in from the chosen line. Check each box against the original report. The result and this line are saved with the care record; the report file stays on this phone.	چنی ہوئی سطر سے بھرا گیا ہے۔ ہر خانہ اصل رپورٹ سے ملا لیں۔ نتیجہ اور یہ سطر دیکھ بھال کے ریکارڈ میں محفوظ ہوں گے؛ رپورٹ فائل اسی فون پر رہے گی۔
+Value	نتیجہ
+Printed unit	چھپی ہوئی اکائی
+Printed lower (optional)	چھپی ہوئی نچلی حد (ضروری نہیں)
+Printed upper (optional)	چھپی ہوئی اوپری حد (ضروری نہیں)
+Report date · YYYY-MM-DD	رپورٹ کی تاریخ · YYYY-MM-DD
+Date · YYYY-MM-DD	تاریخ · YYYY-MM-DD
+Time · HH:mm	وقت · HH:mm
+I checked the test name, value, unit, range and date against the original.	میں نے ٹیسٹ کا نام، نتیجہ، اکائی، حد اور تاریخ اصل رپورٹ سے ملا لی ہے۔
+I am copying an existing prescription, including its exact dose and directions. I am not changing treatment.	میں پہلے سے لکھا پرچہ، اس کی صحیح خوراک اور طریقے کے ساتھ، کاپی کر رہا/رہی ہوں۔ میں علاج نہیں بدل رہا/رہی۔
+I checked the chosen line, name and any date against the original.	میں نے چنی ہوئی سطر، نام اور تاریخ اصل فائل سے ملا لی ہے۔
+Add a record name.	ریکارڈ کا نام لکھیں۔
+Check this result first.	پہلے یہ نتیجہ جانچیں۔
+Choose a shorter line so the original line stays with this result.	چھوٹی سطر چنیں تاکہ اصل سطر اس نتیجے کے ساتھ رہے۔
+Enter the report date as YYYY-MM-DD.	رپورٹ کی تاریخ YYYY-MM-DD میں لکھیں۔
+Added to Lab history	لیب کی تاریخ میں جڑ گیا
+Check this copied record first.	پہلے یہ کاپی کیا ہوا ریکارڈ جانچیں۔
+Choose a shorter line so the complete source stays with this calendar entry.	چھوٹی سطر چنیں تاکہ پورا ماخذ اس کیلنڈر اندراج کے ساتھ رہے۔
+Copied to Calendar. Check Reminders to enable alerts.	کیلنڈر میں کاپی ہو گیا۔ الرٹ کے لیے ریمائنڈر دیکھیں۔
+Checked fact copied	جانچی ہوئی بات کاپی ہو گئی
+Check the date and exact time.	تاریخ اور صحیح وقت جانچیں۔
+Saving…	محفوظ کر رہے ہیں…
+Add to Lab history	لیب کی تاریخ میں جوڑیں
+Copy to Calendar	کیلنڈر میں کاپی کریں
+Copy checked fact	جانچی ہوئی بات کاپی کریں
+No camera app is available. Choose a file instead.	کیمرا ایپ نہیں ملی۔ اس کی جگہ فائل چنیں۔
+Share report	رپورٹ بھیجیں
+Couldn't open this report. Add it again from Files.	یہ رپورٹ نہیں کھل سکی۔ Files سے اسے دوبارہ جوڑیں۔
+Documents	کاغذات
+${notes.size} care ${if (notes.size == 1) "note" else "notes"} · ${reports.size} ${if (reports.size == 1) "report" else "reports"}	${notes.size} دیکھ بھال ${if (notes.size == 1) "note" else "notes"} · ${reports.size} ${if (reports.size == 1) "report" else "reports"}
+Add a report	رپورٹ جوڑیں
+In the demo, reports you add stay on this phone. They are removed when the demo ends.	ڈیمو میں جوڑی گئی رپورٹیں اسی فون پر رہتی ہیں۔ ڈیمو ختم ہونے پر ہٹا دی جاتی ہیں۔
+Report files stay on this phone. Your care team sees them only if you share them. Lab results you copy from a report are saved in your care record.	رپورٹ فائلیں اسی فون پر رہتی ہیں۔ آپ کی دیکھ بھال ٹیم انہیں تبھی دیکھتی ہے جب آپ شیئر کریں۔ رپورٹ سے کاپی کیے لیب نتیجے آپ کے دیکھ بھال ریکارڈ میں محفوظ ہوتے ہیں۔
+Scan a report with the camera	کیمرے سے رپورٹ اسکین کریں
+Search documents	کاغذات میں ڈھونڈیں
+Clear document search	کاغذات کی تلاش صاف کریں
+Care notes	دیکھ بھال کے نوٹ
+Reports	رپورٹیں
+Cancer documents	کینسر کے کاغذات
+All	سب
+Folders · sorting on this phone…	فولڈر · اس فون پر ترتیب دے رہے ہیں…
+Folders	فولڈر
+Search did not work. Your reports are safe. Try again.	تلاش نہیں چلی۔ آپ کی رپورٹیں محفوظ ہیں۔ دوبارہ کوشش کریں۔
+Searching your reports…	آپ کی رپورٹوں میں ڈھونڈ رہے ہیں…
+Search checked reports	جانچی ہوئی رپورٹوں میں ڈھونڈیں
+From your reports	آپ کی رپورٹوں سے
+Not found in your reports	آپ کی رپورٹوں میں نہیں ملا
+Try fewer words. Or open a report and check its text first.	کم الفاظ آزمائیں۔ یا پہلے رپورٹ کھول کر اس کی تحریر جانچیں۔
+Page ${match.page} · line ${match.line}	صفحہ ${match.page} · سطر ${match.line}
+Open report and copy this	رپورٹ کھول کر یہ کاپی کریں
+No documents found	کوئی کاغذ نہیں ملا
+No reports yet	ابھی کوئی رپورٹ نہیں
+No care notes yet	ابھی دیکھ بھال کا کوئی نوٹ نہیں
+No cancer documents yet	ابھی کینسر کا کوئی کاغذ نہیں
+Keep your care together	اپنی دیکھ بھال ایک جگہ رکھیں
+Try a name or clear your search.	کوئی نام آزمائیں یا تلاش صاف کریں۔
+PET-CT, biopsy, histopathology and staging reports appear here. Add a report, then tap “Cancer document?” on it.	PET-CT، بایوپسی، ہسٹوپیتھولوجی اور اسٹیجنگ رپورٹیں یہاں نظر آتی ہیں۔ رپورٹ جوڑیں، پھر اس پر “کینسر کا کاغذ؟” دبائیں۔
+Your reviewed care notes and reports appear here.	آپ کے جانچے ہوئے دیکھ بھال کے نوٹ اور رپورٹیں یہاں نظر آتی ہیں۔
+Clear search	تلاش صاف کریں
+Goals of care	علاج اور دیکھ بھال کے مقصد
+ · Latest	 · تازہ ترین
+ · Earlier	 · پہلے والے
+Read version ${note.version}	ورژن ${note.version} پڑھیں
+ · sorted on this phone	 · اس فون پر ترتیب دیا گیا
+ · from file name	 · فائل کے نام سے
+Open	کھولیں
+Read and copy facts	پڑھیں اور باتیں کاپی کریں
+Share	شیئر کریں
+Rename	نام بدلیں
+Move	منتقل کریں
+Cancer document?	کینسر کا کاغذ؟
+Change type	قسم بدلیں
+Start a conversation	بات چیت شروع کریں
+Talk with your doctor	اپنے ڈاکٹر سے بات کریں
+Remove this report?	یہ رپورٹ ہٹائیں؟
+\n\nSahara's copy on this phone is deleted. A file you picked from Files stays there; a camera scan is gone for good.	\n\nاس فون سے سہارا کی کاپی مٹ جائے گی۔ Files سے چنی گئی فائل وہیں رہے گی؛ کیمرے سے کیا گیا اسکین ہمیشہ کے لیے ہٹ جائے گا۔
+Remove report	رپورٹ ہٹائیں
+Keep	رہنے دیں
+What kind of document?	کس قسم کا کاغذ ہے؟
+Only this label changes. It stays on this phone, like the report file.	صرف یہ لیبل بدلتا ہے۔ یہ رپورٹ فائل کی طرح اسی فون پر رہتا ہے۔
+Not a cancer document	کینسر کا کاغذ نہیں
+Move to folder	فولڈر میں منتقل کریں
+Only the folder changes. It stays on this phone, like the report file.	صرف فولڈر بدلتا ہے۔ یہ رپورٹ فائل کی طرح اسی فون پر رہتا ہے۔
+Rename report	رپورٹ کا نام بدلیں
+Report name	رپورٹ کا نام
+Only the name in Sahara changes. The file and the facts copied from it stay the same.	صرف سہارا میں نام بدلتا ہے۔ فائل اور اس سے کاپی کی گئی باتیں ویسی ہی رہتی ہیں۔
+Nothing added yet. Leave blank if it was not discussed.	ابھی کچھ نہیں جوڑا۔ اگر اس پر بات نہیں ہوئی تو خالی چھوڑ دیں۔
+Add the words from the conversation that belong in this section.	بات چیت کے وہ الفاظ جوڑیں جو اس حصے میں آتے ہیں۔
+Add the conversation first.	پہلے بات چیت جوڑیں۔
+Suggested for this section · same words found	اس حصے کے لیے تجویز · وہی الفاظ ملے
+These lines are copied from the written conversation. Nothing new is written. Check each one before you add it.	یہ سطریں لکھی ہوئی بات چیت سے کاپی کی گئی ہیں۔ کچھ نیا نہیں لکھا گیا۔ جوڑنے سے پہلے ہر ایک جانچ لیں۔
+Line ${s.line.number}	سطر ${s.line.number}
+Add this	یہ جوڑیں
+Line ${line.number}	سطر ${line.number}
+Added to ${NoteRules.labels[section]}	${NoteRules.labels[section]} میں جڑ گیا
+Add to ${NoteRules.labels[section]}	${NoteRules.labels[section]} میں جوڑیں
+Source line ${reference.line.number}	ماخذ سطر ${reference.line.number}
+${unlinked.size} ${if (unlinked.size == 1) "line uses" else "lines use"} edited wording. Check against the original conversation.	${unlinked.size} ${if (unlinked.size == 1) "line uses" else "lines use"} بدلے ہوئے الفاظ۔ اصل بات چیت سے ملا لیں۔
+Original words · line ${reference.line.number}	اصل الفاظ · سطر ${reference.line.number}
+Back	واپس
+Review note	نوٹ جانچیں
+This invitation couldn't be used. Ask for a new one.	یہ دعوت استعمال نہیں ہو سکی۔ نئی دعوت مانگیں۔
+No connection right now. Check your internet and open the link again.	ابھی انٹرنیٹ نہیں مل رہا۔ انٹرنیٹ دیکھ کر لنک دوبارہ کھولیں۔
+Please sign in again, then open the invitation link again.	براہ کرم دوبارہ سائن ان کریں، پھر دعوت کا لنک دوبارہ کھولیں۔
+This invitation was made from this account. The family member must join from their own account.	یہ دعوت اسی اکاؤنٹ سے بنائی گئی تھی۔ گھر والے کو اپنے اکاؤنٹ سے جڑنا ہوگا۔
+This invitation has expired or was already used. Ask for a new one.	یہ دعوت ختم ہو چکی ہے یا پہلے ہی استعمال ہو چکی ہے۔ نئی دعوت مانگیں۔
+Doctor invitation	ڈاکٹر کی دعوت
+Family invitation	گھر والوں کی دعوت
+expires today	آج ختم ہوگی
+expires in $days ${if (days == 1) "day" else "days"}	$days ${if (days == 1) "day" else "days"} میں ختم ہوگی
+Joined	جڑ گئے
+Invited · not joined yet · 	بلایا · ابھی نہیں جڑے · 
+Link used or cancelled · see who has access below	لنک استعمال یا منسوخ ہو گیا · نیچے دیکھیں کسے رسائی ہے
+Expired · create a new invite	ختم ہو گئی · نئی دعوت بنائیں
+Sent · could not check if it arrived	بھیج دی · پہنچی یا نہیں، پتہ نہیں چل سکا
+Sent · 	بھیج دی · 
+Lab history	لیب کی تاریخ
+Add a lab result	لیب کا نتیجہ جوڑیں
+Find a test	ٹیسٹ ڈھونڈیں
+Keep results together	نتیجے ایک جگہ رکھیں
+No matching results	کوئی ملتا نتیجہ نہیں
+Copy the value, unit and date from the report.	رپورٹ سے نتیجہ، اکائی اور تاریخ کاپی کریں۔
+Add a result	نتیجہ جوڑیں
+Treatment days	علاج کے دن
+Add chemo or radiotherapy days to see them marked on the charts.	کیمو یا ریڈیوتھراپی کے دن جوڑیں تاکہ وہ چارٹ پر نشان زد نظر آئیں۔
+Marked on the charts below with dashed lines.	نیچے کے چارٹ پر ٹوٹی لکیروں سے نشان لگا ہے۔
+Edit ${day.category} day ${date(day.item.due)}	${day.category} کا دن ${date(day.item.due)} بدلیں
+${treatmentDays.size - 6} earlier days are in Calendar.	${treatmentDays.size - 6} پچھلے دن کیلنڈر میں ہیں۔
+Add a treatment day	علاج کا دن جوڑیں
+Results and normal ranges are copied from reports. Ask your doctor what they mean for you.	نتیجے اور نارمل حدیں رپورٹوں سے کاپی کی گئی ہیں۔ آپ کے لیے ان کا کیا مطلب ہے، اپنے ڈاکٹر سے پوچھیں۔
+Recorded values	لکھے گئے نتیجے
+Chart of ${points.size} recorded values, from $range. Each value is listed below.	${points.size} لکھے گئے نتیجوں کا چارٹ، مدت: $range۔ ہر نتیجہ نیچے لکھا ہے۔
+From ${data.rangeLow} ${data.unit}	${data.rangeLow} ${data.unit} سے
+Up to ${data.rangeHigh} ${data.unit}	${data.rangeHigh} ${data.unit} تک
+Printed range: $printedRange	چھپی ہوئی حد: $printedRange
+Report file unavailable here	رپورٹ فائل یہاں موجود نہیں
+Edit ${item.title} result from ${date(item.due)}	${date(item.due)} کا ${item.title} نتیجہ بدلیں
+Open report	رپورٹ کھولیں
+Edit lab result	لیب کا نتیجہ بدلیں
+Report date	رپورٹ کی تاریخ
+Printed reference range (optional)	چھپی ہوئی نارمل حد (ضروری نہیں)
+Lower	نچلی
+Upper	اوپری
+Or copy the printed range	یا چھپی ہوئی حد کاپی کریں
+Linked report	جڑی ہوئی رپورٹ
+No report link	کوئی رپورٹ نہیں جڑی
+Add report files in Documents to link them here.	یہاں جوڑنے کے لیے کاغذات میں رپورٹ فائلیں جوڑیں۔
+Report notes (optional)	رپورٹ کے نوٹ (ضروری نہیں)
+Choose the right person before saving.	محفوظ کرنے سے پہلے صحیح شخص چنیں۔
+Save result	نتیجہ محفوظ کریں
+Remove result	نتیجہ ہٹائیں
+Remove this result?	یہ نتیجہ ہٹائیں؟
+Language	زبان
+Visit	ملاقات
+Procedure	پروسیجر
+Task	کام
+Conversation	بات چیت
+What matters	کیا اہم ہے
+Who was there	کون موجود تھا
+What we discussed	ہم نے کیا بات کی
+Still to discuss	ابھی بات کرنی ہے
+Next steps	آگے کیا کرنا ہے
+Use up to six reminder times.	زیادہ سے زیادہ چھ ریمائنڈر وقت رکھیں۔
+Use HH:mm, such as 08:30.	HH:mm لکھیں، جیسے 08:30۔
+Use a start date as YYYY-MM-DD.	شروع کی تاریخ YYYY-MM-DD میں لکھیں۔
+Use an end date as YYYY-MM-DD.	آخری تاریخ YYYY-MM-DD میں لکھیں۔
+The end date must follow the start date.	آخری تاریخ شروع کی تاریخ کے بعد ہونی چاہیے۔
+Sahara reminder	سہارا ریمائنڈر
+A saved care activity is due. Open Sahara to check the record.	دیکھ بھال کا ایک محفوظ کام کرنے کا وقت ہو گیا ہے۔ ریکارڈ دیکھنے کے لیے سہارا کھولیں۔
+Care reminders	دیکھ بھال کے ریمائنڈر
+Reminders for your chosen medicine times and dated care activities. Android may delay alerts.	آپ کے چنے ہوئے دوا کے وقت اور تاریخ والے دیکھ بھال کے کاموں کے ریمائنڈر۔ Android الرٹ میں دیر کر سکتا ہے۔
+Choose a symptom or add a short name.	کوئی تکلیف چنیں یا چھوٹا سا نام لکھیں۔
+Choose a number from 0 to 10, or Not rated.	0 سے 10 تک کوئی نمبر چنیں، یا “نمبر نہیں دیا”۔
+Choose a valid date and time.	صحیح تاریخ اور وقت چنیں۔
+The observation cannot be in the future.	یہ اندراج آنے والے وقت کا نہیں ہو سکتا۔
+The start date must be on or before this observation.	شروع کی تاریخ اس اندراج کے دن یا اس سے پہلے کی ہونی چاہیے۔
+Choose who reported this and the time frame.	چنیں کہ یہ کس نے بتایا اور کتنے وقت کی بات ہے۔
+Add who wrote or observed this note.	لکھیں کہ یہ نوٹ کس نے لکھا یا دیکھا۔
+Shorten the note or review the pain details.	نوٹ چھوٹا کریں یا درد کی تفصیل دوبارہ دیکھیں۔
+Choose a listed pain area.	فہرست میں سے درد کی جگہ چنیں۔
+Choose a valid point on a selected pain area.	چنی ہوئی درد کی جگہ پر صحیح نقطہ چنیں۔
+Choose a number from 0 to 10 for a selected pain area.	چنی ہوئی درد کی جگہ کے لیے 0 سے 10 تک نمبر چنیں۔
+This body map version cannot be edited here.	جسم کے نقشے کا یہ ورژن یہاں بدلا نہیں جا سکتا۔
+Pain details belong to a pain entry.	درد کی تفصیل درد والے اندراج میں ہی آتی ہے۔
+Choose a comparison.	موازنہ چنیں۔
+Choose the previous entry for this comparison.	اس موازنے کے لیے پچھلا اندراج چنیں۔
+This note changed or was removed. Your answers are still here. Close this form and reopen the current note before saving.	یہ نوٹ بدل گیا ہے یا ہٹا دیا گیا ہے۔ آپ کے جواب یہیں ہیں۔ محفوظ کرنے سے پہلے یہ فارم بند کر کے موجودہ نوٹ دوبارہ کھولیں۔
+Couldn't save the suggestion. Your words are still here.	مشورہ محفوظ نہیں ہو سکا۔ آپ کے الفاظ یہیں ہیں۔
+Missed dose recorded	چھوٹی خوراک درج ہو گئی
+Report renamed	رپورٹ کا نام بدل گیا
+Read alongside the original	اصل کے ساتھ ساتھ پڑھیں
+Download the language pack once (about 30 MB). Reading then works offline.	زبان کا پیک ایک بار ڈاؤن لوڈ کریں (تقریباً 30 MB)۔ پھر پڑھنا بغیر انٹرنیٹ کے چلے گا۔
+Download over Wi-Fi only	صرف Wi-Fi پر ڈاؤن لوڈ کریں
+Downloading language pack…	زبان کا پیک ڈاؤن لوڈ ہو رہا ہے…
+Download Hindi–English pack	ہندی–انگریزی پیک ڈاؤن لوڈ کریں
+Stop waiting	انتظار بند کریں
+Could not translate. The original is unchanged.	ترجمہ نہیں ہو سکا۔ اصل ویسا ہی ہے۔
+Reading line ${progress.first} / ${progress.second}	سطر ${progress.first} / ${progress.second} پڑھ رہے ہیں
+Translate with Google	گوگل سے ترجمہ کریں
+Original and machine translation	اصل اور مشین کا ترجمہ
+Check names, medicines, numbers and words such as ‘not’. Mixed or Roman Hindi may need correction by a bilingual person. This reading aid does not change the care note.	نام، دوائیں، نمبر اور ‘نہیں’ جیسے الفاظ جانچیں۔ ملی جلی یا رومن میں لکھی ہندی کو دونوں زبانیں جاننے والا شخص ٹھیک کرے۔ پڑھنے کی یہ مدد دیکھ بھال کا نوٹ نہیں بدلتی۔
+A Hindi/English reader checked this translation	ہندی اور انگریزی جاننے والے نے یہ ترجمہ جانچ لیا
+Copy both languages	دونوں زبانیں کاپی کریں
+Translation notices	ترجمے کی معلومات
+This reading help uses Google Translate on this phone. Your text stays on the phone. Downloading the language pack needs internet. Ask someone who knows both languages to check before you rely on it.	پڑھنے کی یہ مدد اسی فون پر Google Translate استعمال کرتی ہے۔ آپ کی تحریر فون پر ہی رہتی ہے۔ زبان کا پیک ڈاؤن لوڈ کرنے کے لیے انٹرنیٹ چاہیے۔ اس پر بھروسہ کرنے سے پہلے دونوں زبانیں جاننے والے کسی شخص سے جانچ کروا لیں۔
+Google Translate information	Google Translate کی معلومات
+Translation is unavailable on this phone right now. Please read the original note.	اس فون پر ابھی ترجمہ نہیں ہو سکتا۔ براہ کرم اصل نوٹ پڑھیں۔
+Translation is unavailable until the Hindi–English pack downloads. Check the internet connection and try again; the original note is unchanged.	ہندی–انگریزی پیک ڈاؤن لوڈ ہونے تک ترجمہ نہیں ہو سکتا۔ انٹرنیٹ دیکھ کر دوبارہ کوشش کریں؛ اصل نوٹ نہیں بدلا۔
+Waiting for Wi-Fi. Untick “Download over Wi-Fi only” to use mobile data.	Wi-Fi کا انتظار ہے۔ موبائل ڈیٹا استعمال کرنے کے لیے “صرف Wi-Fi پر ڈاؤن لوڈ کریں” سے ٹِک ہٹائیں۔
+Head	سر
+Neck	گردن
+Chest	سینہ
+Abdomen	پیٹ
+Upper back	کمر کا اوپری حصہ
+Lower back	کمر کا نچلا حصہ
+Left shoulder	بایاں کندھا
+Right shoulder	دایاں کندھا
+Left arm / hand	بایاں بازو / ہاتھ
+Right arm / hand	دایاں بازو / ہاتھ
+Left leg / foot	بائیں ٹانگ / پیر
+Right leg / foot	دائیں ٹانگ / پیر
+Back of head	سر کا پچھلا حصہ
+Neck (back)	گردن (پیچھے)
+not rated	نمبر نہیں دیا
+No pain areas marked yet	ابھی درد کی کوئی جگہ نشان زد نہیں
+Pain marked: 	درد کا نشان: 
+Pick a part to zoom in. Saved locations stay unchanged. Left and right mean the patient's sides.	بڑا کر کے دیکھنے کے لیے کوئی حصہ چنیں۔ محفوظ جگہیں ویسی ہی رہیں گی۔ بایاں اور دایاں مریض کے حساب سے ہے۔
+Pick a part to zoom in, then tap the model exactly where it hurts. Left and right mean the patient's sides.	بڑا کر کے دیکھنے کے لیے کوئی حصہ چنیں، پھر ماڈل پر ٹھیک وہاں دبائیں جہاں درد ہے۔ بایاں اور دایاں مریض کے حساب سے ہے۔
+Pain by spot	جگہ کے حساب سے درد
+Not rated — no pain intensity shown	نمبر نہیں دیا — درد کی شدت نہیں دکھائی گئی
+Saved pain areas	محفوظ درد کی جگہیں
+Where is the pain? (optional)	درد کہاں ہے؟ (ضروری نہیں)
+Clear	صاف کریں
+Front	سامنے
+Full body	پورا جسم
+Full body, zoom out	پورا جسم، چھوٹا کر کے دیکھیں
+Marked	نشان لگا
+Zoom to	بڑا کر کے دیکھیں
+, marked as pain	، درد کا نشان لگا
+Marked as pain	درد کا نشان لگا
+Tap the model where it hurts, or	ماڈل پر وہاں دبائیں جہاں درد ہے، یا
+Mark whole $part	پورے $part پر نشان لگائیں
+How strong is the pain?	درد کتنا تیز ہے؟
+Slide to set. Not rated yet.	سرکا کر طے کریں۔ ابھی نمبر نہیں دیا۔
+Pain strength for $target, from 0 none to 10 red	$target کے لیے درد کی شدت، 0 بالکل نہیں سے 10 سرخ تک
+Not rated	نمبر نہیں دیا
+3D could not open on this phone. Saved areas are shown on the diagram.	اس فون پر 3D نہیں کھل سکا۔ محفوظ جگہیں تصویر پر دکھائی گئی ہیں۔
+3D could not open on this phone. Choose on the map or the buttons below.	اس فون پر 3D نہیں کھل سکا۔ نقشے پر یا نیچے کے بٹنوں سے چنیں۔
+Rotatable saved pain map. Saved locations cannot be changed here.	گھمایا جا سکنے والا محفوظ درد کا نقشہ۔ محفوظ جگہیں یہاں نہیں بدلی جا سکتیں۔
+Rotatable pain location map. Accessible region buttons are below.	گھمایا جا سکنے والا درد کی جگہ کا نقشہ۔ آسانی سے چننے کے بٹن نیچے ہیں۔
+Opening body map…	جسم کا نقشہ کھل رہا ہے…
+Left	بایاں
+Right	دایاں
+Body diagram, back	جسم کی تصویر، پیچھے
+Body diagram, front	جسم کی تصویر، سامنے
+Pain history	درد کی تاریخ
+Which entry?	کون سا اندراج؟
+Older	پرانا
+Newer	نیا
+Dots show where it hurt. Each colour shows how strong.	نقطے دکھاتے ہیں کہ درد کہاں تھا۔ ہر رنگ بتاتا ہے کہ کتنا تیز تھا۔
+Dots show where it hurt. Colour shows how strong.	نقطے دکھاتے ہیں کہ درد کہاں تھا۔ رنگ بتاتا ہے کہ کتنا تیز تھا۔
+Shaded parts show where it hurt.	رنگے ہوئے حصے دکھاتے ہیں کہ درد کہاں تھا۔
+The place was written in words, not marked on the body.	جگہ لفظوں میں لکھی گئی تھی، جسم پر نشان نہیں لگایا گیا۔
+This body picture can't be shown here. The note is still saved.	جسم کی یہ تصویر یہاں نہیں دکھائی جا سکتی۔ نوٹ پھر بھی محفوظ ہے۔
+No place on the body was marked for this entry.	اس اندراج کے لیے جسم پر کوئی جگہ نشان زد نہیں کی گئی۔
+Tap a body part to see its pain day by day.	جسم کے کسی حصے کو دبائیں تاکہ اس کا درد دن بہ دن دیکھ سکیں۔
+Started	شروع ہوا
+Notifications are off. Your care records are still saved. You can allow them in Android Settings.	نوٹیفکیشن بند ہیں۔ آپ کے دیکھ بھال کے ریکارڈ پھر بھی محفوظ ہیں۔ آپ انہیں Android Settings میں چالو کر سکتے ہیں۔
+Reminders	ریمائنڈر
+$count next alerts scheduled	اگلے $count الرٹ طے ہیں
+Off	بند
+Allow Sahara notifications in Android Settings, then return here.	Android Settings میں سہارا کے نوٹیفکیشن چالو کریں، پھر یہاں واپس آئیں۔
+Alerts can be delayed by Android, battery settings or a switched-off phone. They are a reminder to check the record, not an urgent-care service.	Android، بیٹری کی سیٹنگ یا بند فون کی وجہ سے الرٹ میں دیر ہو سکتی ہے۔ یہ ریکارڈ دیکھنے کی یاد دہانی ہیں، ایمرجنسی سروس نہیں۔
+Only the active account sends alerts. Medicine times follow the phone’s current time zone; dated visits keep their saved time.	صرف چالو اکاؤنٹ ہی الرٹ بھیجتا ہے۔ دوا کے وقت فون کے موجودہ ٹائم زون کے حساب سے چلتے ہیں؛ تاریخ والی ملاقاتیں اپنا محفوظ وقت رکھتی ہیں۔
+Open Android Settings → Apps → Sahara → Notifications.	Android Settings → Apps → Sahara → Notifications کھولیں۔
+Open notification settings	نوٹیفکیشن کی سیٹنگ کھولیں
+Android may send these alerts late. Allow on-time alerts so they arrive at the set time.	Android یہ الرٹ دیر سے بھیج سکتا ہے۔ وقت پر الرٹ کی اجازت دیں تاکہ وہ طے وقت پر آئیں۔
+Open Android Settings → Apps → Sahara → Alarms & reminders.	Android Settings → Apps → Sahara → Alarms & reminders کھولیں۔
+Allow on-time alerts	وقت پر الرٹ کی اجازت دیں
+Choose times from the existing prescription. Sahara does not calculate or change doses. Marking a medicine done completes that whole entry for the day.	پہلے سے لکھے پرچے کے حساب سے وقت چنیں۔ سہارا خوراک نہ گنتا ہے نہ بدلتا ہے۔ دوا کو “ہو گیا” کرنے سے اس دن کا پورا اندراج مکمل ہو جاتا ہے۔
+No dated care activities or medicines yet.	ابھی تاریخ والے دیکھ بھال کے کام یا دوائیں نہیں ہیں۔
+Add a medicine or choose a time in Calendar first.	پہلے دوا جوڑیں یا کیلنڈر میں وقت چنیں۔
+Medicine times you save here are also saved with the medicine. Family members who share this care get the same dose reminders once they turn on Reminders on their own phone. Strip photos stay on the phone they were taken on.	یہاں محفوظ کیے دوا کے وقت دوا کے ساتھ بھی محفوظ ہو جاتے ہیں۔ اس دیکھ بھال میں شامل گھر والے اپنے فون پر ریمائنڈر چالو کریں تو انہیں بھی وہی خوراک کے ریمائنڈر ملیں گے۔ پتّے کی تصویریں اسی فون پر رہتی ہیں جس پر لی گئیں۔
+Medicine times saved with the medicine by the family reach this phone. Times you change here apply only to this phone.	گھر والوں کے دوا کے ساتھ محفوظ کیے وقت اس فون تک پہنچتے ہیں۔ یہاں بدلے گئے وقت صرف اسی فون پر لاگو ہوں گے۔
+Paused	رکا ہوا
+No time chosen	کوئی وقت نہیں چنا
+No alert time chosen	الرٹ کا کوئی وقت نہیں چنا
+Times · HH:mm, separated by commas	وقت · HH:mm، کوما لگا کر الگ کریں
+Start date · YYYY-MM-DD (optional)	شروع کی تاریخ · YYYY-MM-DD (ضروری نہیں)
+Last date · YYYY-MM-DD (optional)	آخری تاریخ · YYYY-MM-DD (ضروری نہیں)
+Check the times and dates.	وقت اور تاریخیں جانچیں۔
+Save reminder times	ریمائنڈر کے وقت محفوظ کریں
+Alert time on that day (HH:mm)	اس دن الرٹ کا وقت (HH:mm)
+Save alert time	الرٹ کا وقت محفوظ کریں
+Turn one person's speech into text	ایک شخص کی بات کو تحریر میں بدلیں
+One person at a time. Up to 30 seconds and 2 MB. Listen to the recording and check who spoke.	ایک وقت میں ایک شخص۔ 30 سیکنڈ اور 2 MB تک۔ ریکارڈنگ سنیں اور دیکھیں کہ کون بولا۔
+Everyone here separately agrees to send this recording to ${ready.provider} to turn speech into text. Nothing is sent until you tap the button. The words and who spoke will be checked before use.	یہاں موجود سب لوگ الگ الگ راضی ہیں کہ بات کو تحریر میں بدلنے کے لیے یہ ریکارڈنگ ${ready.provider} کو بھیجی جائے۔ بٹن دبانے تک کچھ نہیں بھیجا جاتا۔ استعمال سے پہلے الفاظ اور بولنے والے کو جانچا جائے گا۔
+This recording has no saved agreement from the people in it. Make a new recording after everyone agrees.	اس ریکارڈنگ میں شامل لوگوں کی رضامندی محفوظ نہیں ہے۔ سب کی رضامندی کے بعد نئی ریکارڈنگ بنائیں۔
+Choose this person’s recording again.	اس شخص کی ریکارڈنگ دوبارہ چنیں۔
+Choose a part up to 30 seconds and 2 MB. Longer recordings stay saved so you can check them yourself.	30 سیکنڈ اور 2 MB تک کا حصہ چنیں۔ لمبی ریکارڈنگ محفوظ رہتی ہیں تاکہ آپ خود جانچ سکیں۔
+Stopped. Your recording is unchanged.	روک دیا۔ آپ کی ریکارڈنگ ویسی ہی ہے۔
+Could not turn the speech into text. Your recording is safe.	بات تحریر میں نہیں بدل سکی۔ آپ کی ریکارڈنگ محفوظ ہے۔
+Turning speech into text…	بات تحریر میں بدل رہی ہے…
+Turn speech into text	بات کو تحریر میں بدلیں
+Text from the recording · not checked yet	ریکارڈنگ سے بنی تحریر · ابھی جانچی نہیں گئی
+Checked words	جانچے ہوئے الفاظ
+Speaker	بولنے والا
+I listened and checked these words and who spoke, including any “no” or “not sure”.	میں نے سن کر یہ الفاظ اور بولنے والے کو جانچ لیا ہے، ہر “نہیں” اور “پکا نہیں” سمیت۔
+Add checked text	جانچی ہوئی تحریر جوڑیں
+Make a draft note from this talk	اس بات چیت سے نوٹ کا ڈرافٹ بنائیں
+${service.provider} picks lines from this talk for each section. It cannot add new words. Every line is copied as it was said.	${service.provider} ہر حصے کے لیے اس بات چیت سے سطریں چنتا ہے۔ یہ نئے الفاظ نہیں جوڑ سکتا۔ ہر سطر ویسی ہی لی جاتی ہے جیسی کہی گئی۔
+Everyone here agrees to send these words to ${service.provider} to make a draft. Nothing is sent until you tap the button. A person will check it before use.	یہاں موجود سب لوگ راضی ہیں کہ ڈرافٹ بنانے کے لیے یہ الفاظ ${service.provider} کو بھیجے جائیں۔ بٹن دبانے تک کچھ نہیں بھیجا جاتا۔ استعمال سے پہلے کوئی شخص اسے جانچے گا۔
+Stopped. Your words are safe.	روک دیا۔ آپ کے الفاظ محفوظ ہیں۔
+The draft could not be made. Your words are safe.	ڈرافٹ نہیں بن سکا۔ آپ کے الفاظ محفوظ ہیں۔
+Preparing draft…	ڈرافٹ بن رہا ہے…
+Make draft	ڈرافٹ بنائیں
+Draft · check each line with the talk	ڈرافٹ · ہر سطر بات چیت سے ملائیں
+Not stated in this conversation.	اس بات چیت میں نہیں کہا گیا۔
+I checked the chosen words and who said them against the talk, including any “no” or “not sure”.	میں نے چنے ہوئے الفاظ اور کہنے والے کو بات چیت سے ملا لیا ہے، ہر “نہیں” اور “پکا نہیں” سمیت۔
+The conversation changed. Prepare a fresh draft.	بات چیت بدل گئی ہے۔ نیا ڈرافٹ بنائیں۔
+Use checked draft	جانچا ہوا ڈرافٹ استعمال کریں
+Read in another language	دوسری زبان میں پڑھیں
+Original language	اصل زبان
+Translate to	کس زبان میں ترجمہ
+I agree to send this note to ${service.provider} to translate it. Nothing is sent until you tap the button. The original stays the same.	میں راضی ہوں کہ ترجمے کے لیے یہ نوٹ ${service.provider} کو بھیجا جائے۔ بٹن دبانے تک کچھ نہیں بھیجا جاتا۔ اصل نوٹ ویسا ہی رہے گا۔
+Stopped. The original note is unchanged.	روک دیا۔ اصل نوٹ ویسا ہی ہے۔
+Could not translate. Use the original note.	ترجمہ نہیں ہو سکا۔ اصل نوٹ استعمال کریں۔
+Translating…	ترجمہ ہو رہا ہے…
+Translate note	نوٹ کا ترجمہ کریں
+Translation · check it with the original	ترجمہ · اصل سے ملائیں
+Someone who knows both languages checked this translation, including names, numbers and any “no” or “not sure”.	دونوں زبانیں جاننے والے کسی شخص نے یہ ترجمہ جانچ لیا ہے، نام، نمبر اور ہر “نہیں” اور “پکا نہیں” سمیت۔
+This does not replace the signed note. It does not confirm a new version.	یہ دستخط والے نوٹ کی جگہ نہیں لیتا۔ اس سے نئے ورژن کی تصدیق نہیں ہوتی۔
+Draft help is off right now	ڈرافٹ کی مدد ابھی بند ہے
+These words are not sent anywhere. Use the suggestions above, pick lines from the talk, or type each part yourself.	یہ الفاظ کہیں نہیں بھیجے جاتے۔ اوپر کے مشورے استعمال کریں، بات چیت سے سطریں چنیں، یا ہر حصہ خود لکھیں۔
+Add a name.	نام لکھیں۔
+Use 160 characters or fewer.	160 حروف تک رکھیں۔
+Don't use / or \\ in the name.	نام میں / یا \\ استعمال نہ کریں۔
+Calendar	کیلنڈر
+Care team	دیکھ بھال ٹیم
+Dates and reminders	تاریخیں اور یاد دہانیاں
+Tasks and chats	کام اور بات چیت
+Past test results	پرانے ٹیسٹ کے نتیجے
+Remove $label	$label ہٹائیں
+Add a test or other calendar entry	ٹیسٹ یا کیلنڈر میں کوئی اور چیز جوڑیں
+Add to calendar	کیلنڈر میں جوڑیں
+Previous day	پچھلا دن
+Next day	اگلا دن
+Back to today	آج پر واپس
+Nothing dated for $it	$it کے لیے کچھ طے نہیں
+Add a visit	ملاقات جوڑیں
+Add a visit, test or follow-up	ملاقات، ٹیسٹ یا اگلی ملاقات جوڑیں
+Open care team	دیکھ بھال ٹیم کھولیں
+Medicines without a date	بغیر تاریخ کی دوائیں
+Follow the prescription. Add a date to place a medicine in this calendar.	نسخے کے مطابق دیں۔ دوا کو اس کیلنڈر میں رکھنے کے لیے تاریخ جوڑیں۔
+Done	ہو گیا
+Edit ${item.title}	${item.title} بدلیں
+Undo done	ہو گیا واپس لیں
+Taken today	آج لے لی
+Mark done	ہو گیا پر نشان لگائیں
+Plan care	دیکھ بھال کا منصوبہ
+Edit ${category.lowercase()}	${category.lowercase()} بدلیں
+What is planned?	کیا طے ہے؟
+Date	تاریخ
+Add a time	وقت جوڑیں
+No time	وقت نہیں
+Add place or details	جگہ یا تفصیل جوڑیں
+Place or clinician (optional)	جگہ یا ڈاکٹر (چاہیں تو)
+Prescribed dose and instructions	لکھی ہوئی خوراک اور طریقہ
+Details (optional)	تفصیل (چاہیں تو)
+Add a title and date.	نام اور تاریخ لکھیں۔
+Shorten the details before saving.	محفوظ کرنے سے پہلے تفصیل چھوٹی کریں۔
+Save to calendar	کیلنڈر میں محفوظ کریں
+Remove entry	اندراج ہٹائیں
+Remove this entry?	یہ اندراج ہٹائیں؟
+Couldn't finish. Your source is unchanged.	پورا نہیں ہو سکا۔ آپ کا اصل ریکارڈ ویسا ہی ہے۔
+Sign in to your records	اپنے ریکارڈ کے لیے سائن اِن کریں
+Use an existing confirmed Sahara account. A selected doctor role does not verify your identity.	پہلے سے تصدیق شدہ سہارا اکاؤنٹ استعمال کریں۔ ڈاکٹر کا رول چننے سے آپ کی پہچان کی تصدیق نہیں ہوتی۔
+Refresh shared records	شیئر کیے گئے ریکارڈ تازہ کریں
+Retry	دوبارہ کوشش کریں
+Clinician verification	ڈاکٹر کی تصدیق
+Registration reviewed. Patient invitation is also required before clinical review.	رجسٹریشن جانچ لی گئی۔ طبی جانچ سے پہلے مریض کا دعوت نامہ بھی ضروری ہے۔
+Request received. An independent verifier must check your council registration.	درخواست مل گئی۔ کوئی آزاد جانچنے والا آپ کا کونسل رجسٹریشن جانچے گا۔
+Your account is not verified as a clinician.	آپ کے اکاؤنٹ کی ڈاکٹر کے طور پر تصدیق نہیں ہوئی۔
+Registered name	رجسٹرڈ نام
+Medical council	میڈیکل کونسل
+Registration number	رجسٹریشن نمبر
+Changing these details suspends verified status until a new independent review.	یہ تفصیل بدلنے پر نئی آزاد جانچ تک تصدیق رک جاتی ہے۔
+Request received. Verification is pending.	درخواست مل گئی۔ تصدیق باقی ہے۔
+Submit for verification	تصدیق کے لیے بھیجیں
+Patient-controlled access	رسائی مریض کے ہاتھ میں
+Invite a separately verified clinician or chosen family account, choose access and expiry, and cancel or revoke access online.	الگ سے تصدیق شدہ ڈاکٹر یا چنے ہوئے گھر والے کے اکاؤنٹ کو بلائیں، رسائی اور آخری تاریخ چنیں، اور آن لائن رسائی منسوخ کریں یا واپس لیں۔
+The patient record owner controls your access. A display-role change cannot increase your permissions.	مریض کے ریکارڈ کا مالک آپ کی رسائی طے کرتا ہے۔ دکھائی دینے والا رول بدلنے سے آپ کی اجازت نہیں بڑھتی۔
+Open shared care, tasks and progress	شیئر کی گئی دیکھ بھال، کام اور پیش رفت کھولیں
+Sign in with the same Sahara account on the website. Links never grant public access.	ویب سائٹ پر اسی سہارا اکاؤنٹ سے سائن اِن کریں۔ لنک سے کبھی بھی سب کو رسائی نہیں ملتی۔
+Shared conversations	شیئر کی گئی بات چیت
+No shared conversation yet	ابھی کوئی بات چیت شیئر نہیں ہوئی
+Capture the original words in Conversation, review the sections and send them for clinician review.	بات چیت میں اصل الفاظ لکھیں، حصے جانچیں اور ڈاکٹر کی جانچ کے لیے بھیجیں۔
+Waiting for clinician review	ڈاکٹر کی جانچ کا انتظار
+Reviewed conversation	جانچی ہوئی بات چیت
+Account draft	اکاؤنٹ کا ڈرافٹ
+Revision ${draft.revision}	نظرثانی ${draft.revision}
+Open conversation	بات چیت کھولیں
+Clinical review is a separate step by a verified, invited account. It records a discussion; it does not execute a legal advance directive or authorise treatment.	طبی جانچ تصدیق شدہ اور بلائے گئے اکاؤنٹ کا الگ قدم ہے۔ یہ بات چیت کو درج کرتی ہے؛ اس سے نہ کوئی قانونی ایڈوانس ڈائریکٹو بنتا ہے، نہ علاج کی اجازت ملتی ہے۔
+Shared clinician workspace	ڈاکٹر کا شیئر کیا ہوا ورک اسپیس
+Review conversation	بات چیت جانچیں
+Original words	اصل الفاظ
+Not recorded	درج نہیں
+I checked this exact source and every section as the patient's invited clinician.	مریض کے بلائے ہوئے ڈاکٹر کے طور پر میں نے یہی اصل ریکارڈ اور ہر حصہ جانچ لیا ہے۔
+Reviewed care-note version published. The patient reviews this exact version next.	جانچا ہوا دیکھ بھال نوٹ شائع ہو گیا۔ اب مریض یہی ورژن دیکھیں گے۔
+Publish reviewed care note	جانچا ہوا دیکھ بھال نوٹ شائع کریں
+hi-IN	ہندی
+hi-en	ہندی + English
+Microphone access wasn't granted. You can type the conversation.	مائیک کی اجازت نہیں ملی۔ آپ بات چیت لکھ سکتے ہیں۔
+Speak to type	بول کر لکھیں
+Both phone language packs must be installed. If the language does not switch, turn a saved recording into text below.	فون میں دونوں زبانوں کے پیک ہونے چاہئیں۔ اگر زبان نہ بدلے تو نیچے محفوظ ریکارڈنگ کو تحریر میں بدلیں۔
+This phone listens to one language at a time. For Hindi and English together, use a saved recording below.	یہ فون ایک وقت میں ایک ہی زبان سنتا ہے۔ ہندی اور انگریزی ایک ساتھ ہوں تو نیچے محفوظ ریکارڈنگ استعمال کریں۔
+Finish turn	بولنا پورا کریں
+Cancel turn	یہ باری منسوخ کریں
+Speaking to type needs Android 12 or newer. Type the words or keep an audio recording.	بول کر لکھنے کے لیے Android 12 یا اس سے نیا چاہیے۔ الفاظ لکھیں یا آڈیو ریکارڈنگ رکھیں۔
+Speaking to type does not work on this phone. Type the words or keep an audio recording.	اس فون پر بول کر لکھنا کام نہیں کرتا۔ الفاظ لکھیں یا آڈیو ریکارڈنگ رکھیں۔
+Unfinished words · $pendingSpeaker · ${pendingLanguage.label}	ادھورے الفاظ · $pendingSpeaker · ${pendingLanguage.label}
+Words to keep	رکھنے والے الفاظ
+Add these words	یہ الفاظ جوڑیں
+Stop the audio recording before dictating.	بول کر لکھنے سے پہلے آڈیو ریکارڈنگ روکیں۔
+Before we listen	سننے سے پہلے
+Speak one person's turn, then check the words before using them in the care note.	ایک شخص کی بات بولیں، پھر دیکھ بھال نوٹ میں ڈالنے سے پہلے الفاظ جانچیں۔
+Everyone here agrees to the microphone being used for this turn.	یہاں موجود سب لوگ راضی ہیں کہ اس باری کے لیے مائیک استعمال ہو۔
+Start listening	سننا شروع کریں
+Stop reading	پڑھنا روکیں
+Read aloud	پڑھ کر سنائیں
+Downloaded voice only; the note's words stay unchanged.	صرف ڈاؤن لوڈ کی ہوئی آواز؛ نوٹ کے الفاظ نہیں بدلتے۔
+None	کوئی نہیں
+Mild	ہلکا
+Moderate	درمیانہ
+Severe	شدید
+Tiredness	تھکن
+Sleepiness	بہت نیند آنا
+Poor appetite	بھوک کم لگنا
+Dry mouth	منہ سوکھنا
+Breathlessness	سانس پھولنا
+Constipation	قبض
+Diarrhea	دست
+Nausea	متلی
+Vomiting	الٹی
+Difficulty swallowing	نگلنے میں پریشانی
+Cough	کھانسی
+Bowel / bladder incontinence	پاخانے / پیشاب پر قابو نہ رہنا
+Mood	مزاج (اداسی، گھبراہٹ)
+Overall well-being	مجموعی طور پر طبیعت
+Sleep difficulty	سونے میں پریشانی
+Weight loss	وزن کم ہونا
+Sadness	اداسی
+Worry	فکر
+Low mood / depression (feeling sad)	اداسی / ڈپریشن (دل اداس رہنا)
+Anxiety (feeling worried or nervous)	گھبراہٹ (فکر یا بے چینی رہنا)
+Low mood	اداسی
+Anxiety	گھبراہٹ
+Right now	ابھی
+24-hour average	24 گھنٹے کا اوسط
+Worst in 24 hours	24 گھنٹے میں سب سے زیادہ
+Patient	مریض
+Patient, with help	مریض نے مدد سے بتایا
+Seen by family or carer	گھر والے یا دیکھ بھال کرنے والے نے دیکھا
+Seen by care team	دیکھ بھال ٹیم نے دیکھا
+At rest	آرام کرتے وقت
+Turning in bed	کروٹ لیتے وقت
+Standing / walking	کھڑے ہوتے / چلتے وقت
+Coughing	کھانستے وقت
+Not sure	پکا نہیں
+Better	بہتر
+Same	ویسا ہی
+Worse	زیادہ خراب
+How is the overall well-being?	مجموعی طور پر طبیعت کیسی ہے؟
+How strong is it?	کتنی زیادہ ہے؟
+0 = best possible well-being · 10 = worst possible well-being	0 = سب سے اچھی طبیعت · 10 = سب سے خراب طبیعت
+0 = none · 10 = worst imaginable	0 = بالکل نہیں · 10 = سب سے زیادہ
+Observed	دیکھا گیا
+Pain areas: 	درد کی جگہیں: 
+Reported change	بتائی گئی تبدیلی
+This symptom note could not be read. The original record is retained.	یہ علامت کا نوٹ پڑھا نہیں جا سکا۔ اصل ریکارڈ محفوظ ہے۔
+Best possible well-being	سب سے اچھی طبیعت
+Worst possible well-being	سب سے خراب طبیعت
+Tap a number below	نیچے کوئی نمبر چنیں
+$name over the last 7 days	پچھلے 7 دن میں $name
+Latest today: ${latest.value}.	آج کا تازہ نوٹ: ${latest.value}۔
+Latest: ${latest.value} on ${dayLabel(latestDate, false, today)}.	تازہ نوٹ: ${latest.value} (${dayLabel(latestDate, false, today)})۔
+Latest: ${latest.value}.	تازہ نوٹ: ${latest.value}۔
+Only one day noted. $latestPart	صرف ایک دن کا نوٹ ہے۔ $latestPart
+Highest on ${dayLabel(high.date, false, today)} (${high.value}).	سب سے زیادہ: ${dayLabel(high.date, false, today)} (${high.value})۔
+no entry	کوئی نوٹ نہیں
+No entries yet. Add one from Today.	ابھی کوئی نوٹ نہیں۔ “آج” سے ایک جوڑیں۔
+Each bar is the highest number noted that day. 0 = none, 10 = worst.	ہر پٹی اس دن کا سب سے بڑا نمبر ہے۔ 0 = بالکل نہیں، 10 = سب سے زیادہ۔
+Hide entries	نوٹ چھپائیں
+See all ${points.size} entries	سبھی ${points.size} نوٹ دیکھیں
+Pain in one body part	جسم کے ایک حصے میں درد
+$part pain	$part میں درد
+Symptom tracker	طبیعت کے نوٹ
+How are you feeling?	طبیعت کیسی ہے؟
+Pain history on body	جسم پر درد کی ہسٹری
+No symptom notes yet	ابھی طبیعت کا کوئی نوٹ نہیں
+Personal symptom notes	طبیعت کے ذاتی نوٹ
+Share symptom notes	طبیعت کے نوٹ شیئر کریں
+Share notes	نوٹ شیئر کریں
+Yesterday	کل
+More actions	مزید اختیارات
+Update rating	نیا نمبر لکھیں
+Edit	بدلیں
+↑ higher	↑ زیادہ
+↓ lower	↓ کم
+→ same	→ اتنا ہی
+Last time	پچھلی بار
+Now	اب
+View on body	جسم پر دیکھیں
+See graph	گراف دیکھیں
+Remove this note?	یہ نوٹ ہٹائیں؟
+What would you like to note?	کس بارے میں نوٹ لکھنا ہے؟
+Where does it hurt?	کہاں درد ہے؟
+About this note	اس نوٹ کے بارے میں
+Anything else? (optional)	کچھ اور؟ (چاہیں تو)
+Step	مرحلہ
+Quick rating	صرف نیا نمبر
+Full details	پوری تفصیل
+Check the same context; open Full details if anything changed.	دیکھ لیں کہ باقی باتیں وہی ہیں؛ کچھ بدلا ہو تو پوری تفصیل کھولیں۔
+Tap one to continue.	آگے بڑھنے کے لیے ایک چنیں۔
+Symptom name	پریشانی کا نام
+Pain location (optional)	درد کی جگہ (چاہیں تو)
+When does it happen? (optional)	کب ہوتا ہے؟ (چاہیں تو)
+Who reported this?	کس نے بتایا؟
+Time frame	وقت کی مدت
+No pain strength set yet.	درد کی شدت ابھی نہیں بتائی گئی۔
+Back to rate a spot	جگہ کا نمبر چننے پر واپس
+Not rated / unable to rate	نمبر نہیں دیا / نمبر نہیں دے سکتے
+When was this?	یہ کب ہوا؟
+Change the date or time if it was earlier.	پہلے ہوا ہو تو تاریخ یا وقت بدلیں۔
+Compared with that note (optional)	اس نوٹ کے مقابلے میں (چاہیں تو)
+Previous matching note	پچھلا ملتا جلتا نوٹ
+No earlier matching rating	پہلے کا ملتا جلتا نمبر نہیں ہے
+Started on… (optional)	کب شروع ہوا… (چاہیں تو)
+Clear start date	شروع ہونے کی تاریخ ہٹائیں
+Note (optional)	نوٹ (چاہیں تو)
+Choose a rating or Not rated.	کوئی نمبر چنیں یا “نمبر نہیں دیا” چنیں۔
+Answer the questions above to continue.	آگے بڑھنے کے لیے اوپر کے سوالوں کے جواب دیں۔
+Save note	نوٹ محفوظ کریں
+Next	آگے
+Save now · extra details are optional	ابھی محفوظ کریں · باقی تفصیل چاہیں تو لکھیں
+1 change waiting to send	1 تبدیلی بھیجنا باقی ہے
+$n changes waiting to send	$n تبدیلیاں بھیجنا باقی ہیں
+1 change couldn't be sent. It is kept on this phone.	1 تبدیلی نہیں بھیجی جا سکی۔ یہ اسی فون پر رکھی ہے۔
+$n changes couldn't be sent. They are kept on this phone.	$n تبدیلیاں نہیں بھیجی جا سکیں۔ یہ اسی فون پر رکھی ہیں۔
+1 change wasn't sent: the record was changed by someone else, so their version was kept.	1 تبدیلی نہیں بھیجی گئی: ریکارڈ کسی اور نے بدل دیا تھا، اس لیے ان کا ورژن رکھا گیا۔
+$n changes weren't sent: the records were changed by someone else, so their versions were kept.	$n تبدیلیاں نہیں بھیجی گئیں: ریکارڈ کسی اور نے بدل دیے تھے، اس لیے ان کے ورژن رکھے گئے۔
+Removed on this phone. The server will be updated when you're online.	اس فون سے ہٹا دیا گیا۔ انٹرنیٹ ملنے پر سرور پر بھی بدل جائے گا۔
+Your confirmation is saved on this phone. It will be sent when you're online.	آپ کی تصدیق اس فون پر محفوظ ہو گئی۔ انٹرنیٹ ملنے پر بھیج دی جائے گی۔
+Saved on this phone. It will be sent when you're online.	اس فون پر محفوظ ہو گیا۔ انٹرنیٹ ملنے پر بھیج دیا جائے گا۔
+Send now	ابھی بھیجیں
+No upcoming visits. Tap Add visit to plan the next one.	آنے والی کوئی ملاقات نہیں۔ اگلی ملاقات طے کرنے کے لیے “ملاقات جوڑیں” دبائیں۔
+No upcoming visits yet.	ابھی آنے والی کوئی ملاقات نہیں۔
+Nothing to do yet. Tap Add task for anything to remember.	ابھی کوئی کام نہیں۔ جو یاد رکھنا ہو اس کے لیے “کام جوڑیں” دبائیں۔
+Nothing to do yet.	ابھی کوئی کام نہیں۔
+No notes yet. Tap Write a note to record how the day went.	ابھی کوئی نوٹ نہیں۔ دن کیسا گزرا، یہ لکھنے کے لیے “نوٹ لکھیں” دبائیں۔
+No notes yet.	ابھی کوئی نوٹ نہیں۔
+Chemo	کیمو
+Radiotherapy	ریڈیو تھراپی
+Choose chemotherapy or radiotherapy.	کیمو تھراپی یا ریڈیو تھراپی چنیں۔
+Shorten the note.	نوٹ چھوٹا کریں۔
+Edit treatment day	علاج کا دن بدلیں
+Save day	دن محفوظ کریں
+Remove day	دن ہٹائیں
+Remove this treatment day?	علاج کا یہ دن ہٹائیں؟
+Ask the person who invited you to allow changes.	تبدیلی کی اجازت کے لیے اس شخص سے کہیں جس نے آپ کو بلایا ہے۔
+Doctor workspace	ڈاکٹر کا ورک اسپیس
+Remove ${person?.name}'s records?	${person?.name} کے ریکارڈ ہٹائیں؟
+This removes their notes, reports, recordings and care entries. Export anything you want to keep first.	اس سے ان کے نوٹ، رپورٹیں، ریکارڈنگ اور دیکھ بھال کے اندراج ہٹ جائیں گے۔ جو رکھنا ہو اسے پہلے ایکسپورٹ کر لیں۔
+Remove records	ریکارڈ ہٹائیں
+Keep records	ریکارڈ رکھیں
+Palliative care,\ntogether.	پیلی ایٹو کیئر،\nمل جل کر۔
+Care notes, medicines and visits.	دیکھ بھال کے نوٹ، دوائیں اور ملاقاتیں۔
+Welcome to Sahara	سہارا میں آپ کا خیر مقدم ہے
+Choose where you would like to begin.	چنیں کہ کہاں سے شروع کرنا ہے۔
+Patient & family	مریض اور گھر والے
+Back to patient and family	مریض اور گھر والوں پر واپس
+Back to welcome	شروع پر واپس
+Add a person	کسی شخص کو جوڑیں
+Care, together	مل جل کر دیکھ بھال
+Start a care profile, or sign in to the records you already use.	نئی دیکھ بھال پروفائل بنائیں، یا اپنے پرانے ریکارڈ کے لیے سائن اِن کریں۔
+Sign in to your account	اپنے اکاؤنٹ میں سائن اِن کریں
+Try the walkthrough	ڈیمو دیکھیں
+Open the records linked to your account.	اپنے اکاؤنٹ سے جڑے ریکارڈ کھولیں۔
+Open doctor workspace	ڈاکٹر کا ورک اسپیس کھولیں
+Your care team	آپ کی دیکھ بھال ٹیم
+Invite family	گھر والوں کو بلائیں
+Let family see $name's care on their own phone	گھر والے اپنے فون پر $name کی دیکھ بھال دیکھ سکیں
+Let's talk	بات کریں
+Your care notes	آپ کے دیکھ بھال کے نوٹ
+Start talking	بات شروع کریں
+Read notes	نوٹ پڑھیں
+Latest care note	سب سے نیا دیکھ بھال نوٹ
+Read note	نوٹ پڑھیں
+Find care	پاس میں دیکھ بھال
+${scheduledToday.size} planned today	آج ${scheduledToday.size} کام طے ہیں
+Open calendar	کیلنڈر کھولیں
+Up next	آگے کیا ہے
+Medicines	دوائیں
+See all	سب دیکھیں
+$takenToday of ${medicines.size} ticked today · not yet ticked are shown first	آج ${medicines.size} میں سے $takenToday پر ٹِک · جن پر ٹِک نہیں، وہ پہلے دکھتی ہیں
+Add a medicine	دوا جوڑیں
+To do	کرنے کے کام
+See all ${tasks.size} tasks	سبھی ${tasks.size} کام دیکھیں
+Journal	ڈائری
+Write a note	نوٹ لکھیں
+Recording is available once everyone listed has agreed.	فہرست کے سب لوگوں کی رضامندی کے بعد ریکارڈنگ شروع ہو سکتی ہے۔
+Choose this person's conversation again.	اس شخص کی بات چیت دوبارہ چنیں۔
+Recording is not available. Check that you can make changes, or let the last audio finish saving.	ریکارڈنگ ابھی نہیں ہو سکتی۔ دیکھیں کہ آپ تبدیلی کر سکتے ہیں، یا پچھلا آڈیو محفوظ ہونے دیں۔
+Microphone permission wasn't granted. You can still type the conversation.	مائیک کی اجازت نہیں ملی۔ آپ پھر بھی بات چیت لکھ سکتے ہیں۔
+That recording could not be played.	وہ ریکارڈنگ نہیں چل سکی۔
+Back to conversations	بات چیت پر واپس
+Write down everyone in the room, then the questions this conversation should cover. Each person must agree before anything is recorded.	کمرے میں موجود سب کے نام لکھیں، پھر وہ سوال جن پر بات ہونی ہے۔ کچھ بھی ریکارڈ کرنے سے پہلے ہر شخص کی رضامندی ضروری ہے۔
+Choose a person first to list who is here.	کون موجود ہے، یہ لکھنے کے لیے پہلے شخص چنیں۔
+Choose a person first to prepare questions.	سوال تیار کرنے کے لیے پہلے شخص چنیں۔
+Continue to recording	ریکارڈنگ کی طرف آگے بڑھیں
+Add at least one person before continuing.	آگے بڑھنے سے پہلے کم از کم ایک شخص جوڑیں۔
+Continue unlocks once everyone listed has agreed to being recorded.	فہرست کے سب لوگ ریکارڈنگ کے لیے راضی ہوں، تبھی آگے بڑھ سکتے ہیں۔
+Audio stays on this phone. It is not sent when you share a written note. It is not turned into text by itself. Speaking to type, online speech-to-text and downloads are not available here.	آڈیو اسی فون پر رہتا ہے۔ لکھا نوٹ بھیجنے پر یہ ساتھ نہیں جاتا۔ اس کی تحریر اپنے آپ نہیں بنتی۔ بول کر لکھنا، آن لائن تحریر اور ڈاؤن لوڈ یہاں دستیاب نہیں ہیں۔
+Type and edit below. Speaking to type, recording, speech-to-text and downloads are not available here.	نیچے لکھیں اور بدلیں۔ بول کر لکھنا، ریکارڈنگ، تحریر اور ڈاؤن لوڈ یہاں دستیاب نہیں ہیں۔
+Saving the audio and everyone's agreement on this phone…	آڈیو اور سب کی رضامندی اس فون پر محفوظ کر رہے ہیں…
+The audio was kept, but its details could not be saved. Try again before you continue.	آڈیو فائل رکھ لی گئی، لیکن اس کی تفصیل محفوظ نہیں ہو سکی۔ آگے بڑھنے سے پہلے دوبارہ کوشش کریں۔
+Retry saving audio	آڈیو دوبارہ محفوظ کریں
+Conversation audio	بات چیت کا آڈیو
+Recording · ${seconds / 60}:${(seconds % 60).toString().padStart(2, '0')}	ریکارڈنگ · ${seconds / 60}:${(seconds % 60).toString().padStart(2, '0')}
+Ready to record	ریکارڈ کرنے کے لیے تیار
+Saving recording on this phone…	فون پر ریکارڈنگ محفوظ کر رہے ہیں…
+Recording unavailable	ریکارڈنگ دستیاب نہیں
+Stop and save	روکیں اور محفوظ کریں
+Record conversation	بات چیت ریکارڈ کریں
+Link this recording to this conversation	یہ ریکارڈنگ اس بات چیت سے جوڑیں
+The conversation changed. Check the saved recording and try again.	بات چیت بدل گئی۔ محفوظ کی گئی ریکارڈنگ جانچیں اور دوبارہ کوشش کریں۔
+Continue to written text	تحریر کی طرف آگے بڑھیں
+Start new · archive this draft	نیا شروع کریں · یہ ڈرافٹ سنبھال کر رکھیں
+Back to who is here	"کون موجود ہے" پر واپس
+Practice	مشق
+This demo text was written in advance. It is not from your recording.	یہ ڈیمو تحریر پہلے سے لکھی گئی ہے۔ یہ آپ کی ریکارڈنگ سے نہیں ہے۔
+Clear the practice text and type your own	مشق والی تحریر ہٹا کر خود لکھیں
+Finish this turn to edit the conversation.	بات چیت بدلنے کے لیے یہ باری پوری کریں۔
+Practice text	مشق کی تحریر
+Written text	لکھی ہوئی تحریر
+Conversation in writing	بات چیت کی تحریر
+Speak, turn a saved recording into text, or type in Hindi or English…	بولیں، محفوظ ریکارڈنگ کو تحریر میں بدلیں، یا ہندی یا انگریزی میں لکھیں…
+Done · show numbered lines	ہو گیا · نمبر والی لائنیں دیکھیں
+Continue to answers	جوابات کی طرف آگے بڑھیں
+Back to recording	ریکارڈنگ پر واپس
+Sahara matched your questions to lines that use the same words. A matched line is only a suggestion. Read it and decide. Anything you type is your own note.	سہارا نے ایک جیسے الفاظ دیکھ کر آپ کے سوالوں کو لائنوں سے ملایا ہے۔ ملی ہوئی لائن صرف مشورہ ہے۔ پڑھ کر خود فیصلہ کریں۔ جو آپ لکھیں، وہ آپ کا اپنا نوٹ ہے۔
+Every question has at least one suggested line.	ہر سوال کے لیے کم از کم ایک تجویز کردہ لائن ہے۔
+${questionMatches.unanswered.size} of ${prepRows.size} questions have no suggested line.	${prepRows.size} میں سے ${questionMatches.unanswered.size} سوالوں کے لیے کوئی تجویز کردہ لائن نہیں ہے۔
+Suggested from the talk · check each line	بات چیت سے تجویز · ہر لائن جانچیں
+Use this line in ${NoteRules.labels[qa.question.section]}	یہ لائن ${NoteRules.labels[qa.question.section]} میں ڈالیں
+Add my typed answers to the note sections	میرے لکھے جواب نوٹ کے حصوں میں جوڑیں
+Edit the five note sections	نوٹ کے پانچوں حصے بدلیں
+Continue to review	جانچ کی طرف آگے بڑھیں
+Back to written text	تحریر پر واپس
+Text made on this phone · not checked by a doctor	فون پر بنی تحریر · ڈاکٹر نے نہیں جانچی
+Text made online · not checked by a doctor	آن لائن بنی تحریر · ڈاکٹر نے نہیں جانچی
+Draft · not checked by a doctor	ڈرافٹ · ڈاکٹر نے نہیں جانچا
+${draft.transcriptModel} turned this recording into text. Who spoke and the words can be wrong. Check them with the audio before you publish.	${draft.transcriptModel} نے یہ ریکارڈنگ تحریر میں بدلی۔ بولنے والوں کے نام اور الفاظ غلط ہو سکتے ہیں۔ شائع کرنے سے پہلے آڈیو سے ملائیں۔
+Pick the exact words for each section, or add clear headings. Nothing here was made from the audio by itself.	ہر حصے کے لیے اصل الفاظ چنیں، یا صاف سرخیاں لگائیں۔ یہاں کچھ بھی آڈیو سے اپنے آپ نہیں بنا۔
+Check every word against the conversation. Leave anything not discussed blank.	ہر لفظ بات چیت سے ملائیں۔ جس پر بات نہیں ہوئی، اسے خالی چھوڑیں۔
+Organise using section headings	سرخیوں سے ترتیب دیں
+Read the whole note before you publish. Nothing here can be changed on this screen.	شائع کرنے سے پہلے پورا نوٹ پڑھیں۔ اس اسکرین پر کچھ بدلا نہیں جا سکتا۔
+Edit $label	$label بدلیں
+Exact source text	اصل تحریر
+Continue to publish	شائع کرنے کی طرف آگے بڑھیں
+Back to build the note	نوٹ بنانے پر واپس
+Check the exact conversation	اصل بات چیت جانچیں
+Audio stays on this phone. Only the recording linked above can be played with this version, and only on the phone that recorded it.	آڈیو اسی فون پر رہتا ہے۔ اوپر جوڑی گئی ریکارڈنگ ہی اس ورژن کے ساتھ، اسی فون پر چل سکتی ہے جس پر ریکارڈ ہوئی۔
+To let family see only this conversation, Sahara needs an update and the owner's approval. It is never shared more widely instead.	صرف یہ بات چیت گھر والوں کو دکھانے کے لیے سہارا کا اپڈیٹ اور مالک کی منظوری چاہیے۔ اس کی جگہ اسے کبھی سب کے ساتھ شیئر نہیں کیا جاتا۔
+Doctor's check	ڈاکٹر کی جانچ
+Publishing saves this as a fixed version. Earlier versions are kept.	شائع کرنے پر یہ ایک پکا ورژن بن جاتا ہے۔ پرانے ورژن رکھے رہتے ہیں۔
+Doctor's name	ڈاکٹر کا نام
+I checked every section against the conversation. This records what was discussed, without adding treatment advice.	میں نے ہر حصہ بات چیت سے ملایا ہے۔ اس میں وہی درج ہے جس پر بات ہوئی، علاج کا کوئی مشورہ نہیں جوڑا گیا۔
+Identity not checked	شناخت کی جانچ نہیں ہوئی
+Separate doctor's check	ڈاکٹر کی الگ جانچ
+This saves the name the reviewer typed. It does not mean a checked doctor reviewed it.	اس میں جانچنے والے کا خود لکھا نام محفوظ ہوتا ہے۔ اس کا مطلب یہ نہیں کہ کسی تصدیق شدہ ڈاکٹر نے جانچا۔
+Your draft is sent to the shared care space. Only a doctor this patient invited, whose identity is checked, can publish the checked care note.	آپ کا ڈرافٹ مشترکہ دیکھ بھال کی جگہ میں بھیجا جاتا ہے۔ صرف اس مریض کے بلائے ہوئے، شناخت جانچے ڈاکٹر ہی جانچا ہوا دیکھ بھال نوٹ شائع کر سکتے ہیں۔
+Back to read the note	نوٹ پڑھنے پر واپس
+Publish reviewed version	جانچا ہوا ورژن شائع کریں
+Send to a doctor to check	ڈاکٹر کو جانچنے کے لیے بھیجیں
+Read together. Ask your doctor if anything needs changing.	ساتھ بیٹھ کر پڑھیں۔ کچھ بدلنا ہو تو ڈاکٹر سے کہیں۔
+Ask for a goals-of-care conversation	دیکھ بھال کے مقاصد پر بات چیت مانگیں
+Discuss what matters and questions for the care team.	جو ضروری ہے اور دیکھ بھال ٹیم سے سوال، ان پر بات کریں۔
+Add a reminder to talk	بات کرنے کا ریمائنڈر جوڑیں
+Ask for a conversation	بات چیت کے لیے کہیں
+Saved notes	محفوظ نوٹ
+Your first care note will appear here after a doctor reviews and saves it.	ڈاکٹر کے جانچ کر محفوظ کرنے کے بعد آپ کا پہلا دیکھ بھال نوٹ یہاں دکھے گا۔
+Before we record	ریکارڈ کرنے سے پہلے
+Go back to “Who's here” and name everyone present before recording.	ریکارڈ کرنے سے پہلے “کون موجود ہے” پر لوٹیں اور سب کے نام لکھیں۔
+Everyone named in “Who's here” has agreed: ${consentNames.joinToString(", ")}.	“کون موجود ہے” میں لکھے سب لوگ راضی ہیں: ${consentNames.joinToString(", ")}۔
+By starting, everyone listed agrees: this recording is to write and check a note of this talk. It stays private on this phone. People who can open this phone or the shared records may read the written note.	شروع کرنے پر فہرست کے سب لوگ مانتے ہیں: یہ ریکارڈنگ اس بات چیت کا نوٹ لکھنے اور جانچنے کے لیے ہے۔ یہ اسی فون پر نجی رہتی ہے۔ جو لوگ یہ فون یا مشترکہ ریکارڈ کھول سکتے ہیں، وہ لکھا نوٹ پڑھ سکتے ہیں۔
+We understand this recording is to write and check a note of this talk.	ہم سمجھتے ہیں کہ یہ ریکارڈنگ اس بات چیت کا نوٹ لکھنے اور جانچنے کے لیے ہے۔
+We understand the audio stays private on this phone, unless someone shares it or separately agrees below to send it online to turn speech into text.	ہم سمجھتے ہیں کہ آڈیو اسی فون پر نجی رہتا ہے، جب تک کوئی اسے شیئر نہ کرے یا نیچے اسے تحریر بنانے کے لیے آن لائن بھیجنے پر الگ سے راضی نہ ہو۔
+We understand the recording stays private on this phone.	ہم سمجھتے ہیں کہ ریکارڈنگ اسی فون پر نجی رہتی ہے۔
+We understand people with access to this person's phone or shared records may be able to read the written note.	ہم سمجھتے ہیں کہ اس شخص کے فون یا مشترکہ ریکارڈ تک رسائی والے لوگ لکھا نوٹ پڑھ سکتے ہیں۔
+Optional: turn this demo recording into text online	چاہیں تو: اس ڈیمو ریکارڈنگ کو آن لائن تحریر میں بدلیں
+Everyone agrees to send this made-up demo recording to Supabase and Google Gemini. It has no real patient, personal or private information.	سب اس بناوٹی ڈیمو ریکارڈنگ کو Supabase اور Google Gemini کو بھیجنے پر راضی ہیں۔ اس میں کسی اصلی مریض کی، ذاتی یا نجی معلومات نہیں ہیں۔
+Use test conversations only. Google may use free audio and text to improve its products, and people there may read them. Deleting the file later does not undo this. Limit: 5 minutes or 3 MB, up to 5 tries per account each day. Check the words with the audio.	صرف ٹیسٹ بات چیت استعمال کریں۔ Google مفت سروس کا آڈیو اور تحریر اپنی چیزیں بہتر بنانے میں استعمال کر سکتا ہے، اور وہاں کے لوگ انہیں پڑھ سکتے ہیں۔ بعد میں فائل مٹانے سے یہ واپس نہیں ہوتا۔ حد: 5 منٹ یا 3 MB، ہر اکاؤنٹ کے لیے دن میں 5 بار تک۔ الفاظ آڈیو سے ملائیں۔
+Everyone listed agreed · Start recording	فہرست کے سب راضی · ریکارڈنگ شروع کریں
+Start recording	ریکارڈنگ شروع کریں
+Couldn't play this recording.	یہ ریکارڈنگ نہیں چل سکی۔
+Stop playback	روکیں
+Play recording	ریکارڈنگ چلائیں
+Conversation · 	بات چیت · 
+Consent details unavailable	رضامندی کی تفصیل نہیں ملی
+Consent recorded · ${RecordingConsentRules.names(consent.participants).joinToString()}	رضامندی درج · ${RecordingConsentRules.names(consent.participants).joinToString()}
+Not agreed to online speech-to-text	آن لائن تحریر کی رضامندی نہیں
+Old agreement: record a new demo	پرانی رضامندی: نیا ڈیمو ریکارڈ کریں
+Agreed to online speech-to-text (demo)	آن لائن تحریر کی رضامندی دی (ڈیمو)
+Delete recording	ریکارڈنگ مٹائیں
+Delete this recording?	یہ ریکارڈنگ مٹائیں؟
+Your written care notes stay available.	آپ کے لکھے دیکھ بھال کے نوٹ باقی رہیں گے۔
+Keep recording	ریکارڈنگ رکھیں
+Care note saved	دیکھ بھال نوٹ محفوظ ہو گیا
+Couldn't save the copy. Your care note is still here. Try again.	کاپی محفوظ نہیں ہو سکی۔ آپ کا دیکھ بھال نوٹ یہیں ہے۔ دوبارہ کوشش کریں۔
+Conversation notes	بات چیت کے نوٹ
+Reviewer: ${note.doctor} · ${date(note.published)}	جانچنے والے: ${note.doctor} · ${date(note.published)}
+Share exact care-note link	اسی دیکھ بھال نوٹ کا لنک بھیجیں
+Share exact-version link	اسی ورژن کا لنک بھیجیں
+The person you send this to must sign in with an allowed account. The link does not open for anyone else.	جسے بھیجیں، اسے اجازت والے اکاؤنٹ سے سائن اِن کرنا ہوگا۔ یہ لنک کسی اور کے لیے نہیں کھلتا۔
+Save copy	کاپی محفوظ کریں
+Share care note	دیکھ بھال نوٹ بھیجیں
+Original conversation	اصل بات چیت
+Patient confirmed this version	مریض نے اس ورژن کی تصدیق کی
+Family / carer confirmation	گھر والوں / دیکھ بھال کرنے والے کی تصدیق
+Patient's review	مریض کی جانچ
+Family's review	گھر والوں کی جانچ
+The patient confirms first. Family can then add their own confirmation to this same version.	پہلے مریض تصدیق کریں۔ پھر گھر والے اسی ورژن پر اپنی تصدیق جوڑ سکتے ہیں۔
+The patient's confirmation stays saved. Add your own after reading this version.	مریض کی تصدیق محفوظ رہے گی۔ یہ ورژن پڑھ کر اپنی تصدیق جوڑیں۔
+Your name	آپ کا نام
+Family / carer	گھر والے / دیکھ بھال کرنے والے
+I have read this version. This is not a legal signature, consent for treatment or a treatment decision. I can ask my doctor to change it later.	میں نے یہی ورژن پڑھا ہے۔ یہ قانونی دستخط، علاج کی رضامندی یا علاج کا فیصلہ نہیں ہے۔ میں بعد میں ڈاکٹر سے اسے بدلوا سکتا/سکتی ہوں۔
+Your confirmation is saved, but the signature could not be saved on this phone.	آپ کی تصدیق محفوظ ہو گئی، لیکن دستخط اس فون پر محفوظ نہیں ہو سکے۔
+Confirmation already saved	تصدیق پہلے سے محفوظ ہے
+Sign and confirm this version	دستخط کر کے اس ورژن کی تصدیق کریں
+This is a record of a conversation. It is not a treatment order or a legal instruction. People typed their own names, unless this version shows a checked doctor review.	یہ ایک بات چیت کا ریکارڈ ہے۔ یہ علاج کا حکم یا قانونی ہدایت نہیں ہے۔ جب تک ڈاکٹر کی پکی جانچ نہ دکھے، نام لوگوں نے خود لکھے ہیں۔
+Daily care	روز کی دیکھ بھال
+Nothing added yet	ابھی کچھ نہیں جوڑا گیا
+Use Add to record a medicine, visit, task, check-in or note.	دوا، ملاقات، کام، آج کا حال یا نوٹ لکھنے کے لیے “جوڑیں” دبائیں۔
+Conversations	بات چیت
+No saved conversations yet.	ابھی کوئی محفوظ بات چیت نہیں۔
+No medicines yet.	ابھی کوئی دوا نہیں۔
+No current medicines.	ابھی کوئی دوا نہیں چل رہی۔
+Current	ابھی چل رہی
+No past medicines yet.	پہلے کی کوئی دوا نہیں۔
+Past	پہلے کی
+Visits	ملاقاتیں
+No visits yet.	ابھی کوئی ملاقات نہیں۔
+No upcoming visits.	آگے کوئی ملاقات نہیں۔
+Upcoming	آگے کی
+No past visits yet.	پہلے کی کوئی ملاقات نہیں۔
+No tasks yet.	ابھی کوئی کام نہیں۔
+Check-ins	روز کا حال
+No check-ins yet.	ابھی کوئی حال نہیں لکھا۔
+No journal notes yet.	ڈائری میں ابھی کوئی نوٹ نہیں۔
+All India	پورا بھارت
+Home care	گھر پر دیکھ بھال
+Clinic visits	کلینک میں دکھانا
+Inpatient care	بھرتی کر کے دیکھ بھال
+Day care	دن میں دیکھ بھال
+Physiotherapy	فزیوتھراپی
+Hospice	ہاسپِس
+Map & list	نقشہ اور فہرست
+List	فہرست
+Clear filters	سارے انتخاب ہٹائیں
+Emergency	ایمرجنسی
+Tap a number to open your phone dialler.	نمبر دبائیں، فون کا ڈائلر کھلے گا۔
+Hospitals near you on the map	نقشے پر پاس کے اسپتال
+Opens your maps app, which uses its own location setting.	آپ کی میپس ایپ کھلتی ہے، جو اپنی لوکیشن سیٹنگ استعمال کرتی ہے۔
+Nearest centres	سب سے قریب کے سینٹر
+Choose your state, then district if listed.	اپنی ریاست چنیں، پھر ضلع اگر فہرست میں ہو۔
+Name, place, state or PIN	نام، جگہ، ریاست یا PIN
+District	ضلع
+All districts	سبھی ضلعے
+Show on map and list	نقشے اور فہرست میں دکھائیں
+Morphine listed	مارفین درج ہے
+Palliative care	پیلی ایٹو کیئر
+Terracotta pins: palliative care centres. Blue pins: the directory also lists morphine (call to confirm). Dark numbered circles: a group of centres, tap to zoom.	مٹی رنگ کے نشان: پیلی ایٹو کیئر سینٹر۔ نیلے نشان: ڈائریکٹری میں مارفین بھی درج ہے (فون کر کے پکا کریں)۔ گہرے نمبر والے گول: سینٹروں کا گروپ، زوم کرنے کے لیے دبائیں۔
+Directory listings. Call to confirm services, availability and cost.	ڈائریکٹری کی فہرست۔ سہولتیں، دستیابی اور خرچ فون کر کے پکا کریں۔
+Suggest a centre that's missing	کوئی سینٹر چھوٹ گیا ہو تو بتائیں
+Use the addresses and Directions below. This list has no exact map spots for this choice.	نیچے دیے پتے اور راستہ استعمال کریں۔ اس انتخاب کے لیے اس فہرست میں نقشے کی ٹھیک جگہیں نہیں ہیں۔
+$it exact	$it ٹھیک جگہ
+$it approximate (hollow pins, area only)	$it اندازاً (کھوکھلے نشان، صرف علاقہ)
+$it addresses in the list only	$it صرف فہرست میں پتے
+Approximate locations © GeoNames (CC BY 4.0)	اندازاً جگہیں © GeoNames (CC BY 4.0)
+No centres match that search.	اس تلاش سے کوئی سینٹر نہیں ملا۔
+${chosen.size} centres here	یہاں ${chosen.size} سینٹر
+Palliative care · morphine listed	پیلی ایٹو کیئر · مارفین درج ہے
+Directory lists morphine · call to confirm	ڈائریکٹری میں مارفین درج ہے · فون کر کے پکا کریں
+Source retrieved $it	ذریعہ حاصل کیا گیا $it
+No map location · Directions searches the address	نقشے پر جگہ نہیں · راستہ پتے سے ڈھونڈتا ہے
+Call	فون کریں
+Directions	راستہ
+Source	ذریعہ
+Share centre	سینٹر شیئر کریں
+Daily care & tools	روز کی دیکھ بھال اور ٹولز
+App feedback	ایپ کے بارے میں رائے
+Shared care and doctor's check	مشترکہ دیکھ بھال اور ڈاکٹر کی جانچ
+Sign in to share care	دیکھ بھال شیئر کرنے کے لیے سائن اِن کریں
+Your account and sharing	آپ کا اکاؤنٹ اور شیئرنگ
+${person.name}'s care notes	${person.name} کے دیکھ بھال کے نوٹ
+${versions.size} saved	${versions.size} محفوظ
+Export care notes	دیکھ بھال کے نوٹ ایکسپورٹ کریں
+Export notes	نوٹ ایکسپورٹ کریں
+Privacy	پرائیویسی
+You choose which notes to share and with whom.	آپ چنتے ہیں کہ کون سے نوٹ کس کے ساتھ شیئر کرنے ہیں۔
+You can delete a recording or remove a person's records here.	آپ یہاں کوئی ریکارڈنگ مٹا سکتے ہیں یا کسی شخص کے ریکارڈ ہٹا سکتے ہیں۔
+Reports in Documents stay on this phone. Your care team does not get them by itself. Tap Share to send a copy. Keep your own copies before you remove the app.	دستاویزات میں رکھی رپورٹیں اسی فون پر رہتی ہیں۔ آپ کی دیکھ بھال ٹیم کو یہ اپنے آپ نہیں ملتیں۔ کاپی بھیجنے کے لیے شیئر دبائیں۔ ایپ ہٹانے سے پہلے اپنی کاپیاں رکھ لیں۔
+Read prescription photos on this phone, then check the original and every medicine before saving it.	نسخے کی تصویریں اسی فون پر پڑھیں، پھر محفوظ کرنے سے پہلے اصل نسخہ اور ہر دوا جانچیں۔
+About	ہمارے بارے میں
+Your doctor decides on treatment. Choosing a role does not prove who you are. Only invited accounts that are checked separately can publish a checked review online.	علاج کا فیصلہ آپ کے ڈاکٹر کرتے ہیں۔ کردار چننے سے آپ کی پہچان ثابت نہیں ہوتی۔ صرف بلائے گئے اور الگ سے جانچے گئے اکاؤنٹ ہی آن لائن جانچا ہوا ریویو شائع کر سکتے ہیں۔
+Speak to type, or turn a recording into text, with the downloaded Hindi/English pack. Then check the words. Hindi/English reading uses Google Translate on this phone. Read aloud uses a downloaded voice.	ڈاؤن لوڈ کیے ہندی/انگریزی پیک سے بول کر لکھیں، یا ریکارڈنگ کو تحریر میں بدلیں۔ پھر الفاظ جانچیں۔ ہندی/انگریزی پڑھنے کے لیے اس فون پر Google Translate استعمال ہوتا ہے۔ بلند آواز میں پڑھنے کے لیے ڈاؤن لوڈ کی گئی آواز استعمال ہوتی ہے۔
+CC BY 4.0 licence	CC BY 4.0 لائسنس
+Version ${BuildConfig.VERSION_NAME}	ورژن ${BuildConfig.VERSION_NAME}
+Remove this person's records	اس شخص کے ریکارڈ ہٹائیں
+Who is this care for?	یہ دیکھ بھال کس کے لیے ہے؟
+Continue	آگے بڑھیں
+Create a care profile for yourself or someone you support.	اپنے لیے یا جس کی آپ مدد کرتے ہیں اس کے لیے دیکھ بھال پروفائل بنائیں۔
+Add a task	کام جوڑیں
+How is today?	آج کیسا ہے؟
+Edit medicine	دوا بدلیں
+Edit visit	ملاقات بدلیں
+Edit task	کام بدلیں
+Edit note	نوٹ بدلیں
+Add an entry	اندراج جوڑیں
+Anything to add? (optional)	کچھ اور لکھنا ہے؟ (اختیاری)
+Your note	آپ کا نوٹ
+Medicine name	دوا کا نام
+Doctor or hospital	ڈاکٹر یا اسپتال
+What needs doing?	کیا کرنا ہے؟
+Title	عنوان
+Dose and times, as prescribed	خوراک اور وقت، جیسا نسخے میں لکھا ہے
+Time, place and questions (optional)	وقت، جگہ اور سوال (اختیاری)
+Tomorrow	کل
+Choose date	تاریخ چنیں
+Use your prescription. Choose reminder times in Reminders. Android may delay alerts.	اپنا نسخہ دیکھیں۔ ریمائنڈر کا وقت ریمائنڈرز میں چنیں۔ Android الرٹ میں دیر کر سکتا ہے۔
+Care access changed. Reopen this person's records before saving.	دیکھ بھال کی رسائی بدل گئی۔ محفوظ کرنے سے پہلے اس شخص کے ریکارڈ دوبارہ کھولیں۔
+${l[i]} · ${i + 1} of ${l.size}	${l[i]} · ${l.size} میں سے ${i + 1}
+Before	پہلے
+Note	نوٹ
+Who's here	کون موجود ہے
+Transcript	تحریر
+Answers	جوابات
+Review	جانچ
+Publish	شائع کریں
+Current step	موجودہ مرحلہ
+Not started	شروع نہیں ہوا
+Step ${step + 1} of ${names.size} · ${names[step.coerceIn(0, names.lastIndex)]}	مرحلہ ${step + 1} از ${names.size} · ${names[step.coerceIn(0, names.lastIndex)]}
+Hide details	تفصیل چھپائیں
+Show details	تفصیل دیکھیں
+Collapse	سمیٹیں
+Expand	پھیلائیں
+Hide full text	پوری تحریر چھپائیں
+Show full text	پوری تحریر دیکھیں
+Full written text	پوری لکھی ہوئی تحریر
+words	الفاظ
+Read only. To change it, go back to the written text step.	صرف پڑھنے کے لیے۔ بدلنے کے لیے تحریر والے مرحلے پر واپس جائیں۔
+No written text yet.	ابھی کوئی تحریر نہیں۔
+Picked up	اٹھا لیا
+Accepted	قبول کیا
+Completed	مکمل
+Cancelled	منسوخ
+Requested	درخواست کی گئی
+$talks conversations · $jobs tasks	$talks بات چیت · $jobs کام
+Care queue	دیکھ بھال کی قطار
+Refresh care team	دیکھ بھال ٹیم تازہ کریں
+Ask to talk	بات کرنے کو کہیں
+Tasks	کام
+Include finished	مکمل شدہ بھی دکھائیں
+No matching requests or tasks	کوئی ملتی درخواست یا کام نہیں
+Nothing waiting here	یہاں کچھ انتظار میں نہیں
+For ${data.assignee}	${data.assignee} کے لیے
+From ${data.sender}	${data.sender} کی طرف سے
+Preferred ${date(item.due)}	پسندیدہ ${date(item.due)}
+Due ${date(item.due)}	آخری تاریخ ${date(item.due)}
+Picked up by ${data.acceptedBy} · ${date(data.acceptedAt)}	${data.acceptedBy} نے اٹھایا · ${date(data.acceptedAt)}
+Completed by ${data.completedBy} · ${date(data.completedAt)}	${data.completedBy} نے مکمل کیا · ${date(data.completedAt)}
+Reopen	دوبارہ کھولیں
+Pick up	اٹھائیں
+Conversation done	بات چیت ہو گئی
+Pick up this conversation?	یہ بات چیت اٹھائیں؟
+Pick up this task?	یہ کام اٹھائیں؟
+Mark completed?	مکمل کا نشان لگائیں؟
+Cancel this entry?	یہ اندراج منسوخ کریں؟
+Reopen this entry?	یہ اندراج دوبارہ کھولیں؟
+Names are self-entered and visible to this care circle.	نام خود لکھے گئے ہیں اور اس دیکھ بھال حلقے کو دکھتے ہیں۔
+Care access changed. Reopen this person's records.	دیکھ بھال کی رسائی بدل گئی۔ اس شخص کے ریکارڈ دوبارہ کھولیں۔
+Cancel entry	اندراج منسوخ کریں
+Edit request	درخواست بدلیں
+Ask for help	مدد مانگیں
+What would you like to discuss?	آپ کس بارے میں بات کرنا چاہیں گے؟
+Comfort and symptoms	آرام اور تکلیفیں
+Care at home	گھر پر دیکھ بھال
+Collect medicines	دوائیں لانا
+Arrange transport	آنے جانے کا انتظام
+Bring reports	رپورٹیں لانا
+Doctor or care team	ڈاکٹر یا دیکھ بھال ٹیم
+Who is this for?	یہ کس کے لیے ہے؟
+Preferred date	پسندیدہ تاریخ
+Due date	آخری تاریخ
+Save changes	تبدیلیاں محفوظ کریں
+Send request	درخواست بھیجیں
+Approximate location (PIN area) · call to confirm	اندازاً جگہ (PIN علاقہ) · فون کر کے پکا کریں
+Approximate location (town area) · call to confirm	اندازاً جگہ (قصبے کا علاقہ) · فون کر کے پکا کریں
+Approximate location (district area) · call to confirm	اندازاً جگہ (ضلع کا علاقہ) · فون کر کے پکا کریں
+Map unavailable	نقشہ دستیاب نہیں
+Map ready	نقشہ تیار ہے
+Loading map	نقشہ لوڈ ہو رہا ہے
+Couldn't load the map.	نقشہ لوڈ نہیں ہو سکا۔
+Try again	دوبارہ کوشش کریں
+Show all	سب دکھائیں
+Add the centre's name.	سینٹر کا نام لکھیں۔
+The name is too long (up to $NAME_MAX letters).	نام بہت لمبا ہے ($NAME_MAX حروف تک)۔
+Add the town or city.	قصبہ یا شہر لکھیں۔
+The town name is too long.	قصبے کا نام بہت لمبا ہے۔
+Add the state.	ریاست لکھیں۔
+The state name is too long.	ریاست کا نام بہت لمبا ہے۔
+The address is too long (up to $ADDRESS_MAX letters).	پتہ بہت لمبا ہے ($ADDRESS_MAX حروف تک)۔
+Check the phone number (6 to 15 digits).	فون نمبر جانچیں (6 سے 15 ہندسے)۔
+The note is too long (up to $NOTE_MAX letters).	نوٹ بہت لمبا ہے ($NOTE_MAX حروف تک)۔
+Saved on this phone. It will be sent when you're online. Not checked yet.	اس فون پر محفوظ ہو گیا۔ آن لائن ہونے پر بھیج دیا جائے گا۔ ابھی جانچا نہیں گیا۔
+Not sent yet. It is kept on this phone and will be tried again. Not checked yet.	ابھی بھیجا نہیں گیا۔ یہ اس فون پر رکھا ہے اور دوبارہ کوشش کی جائے گی۔ ابھی جانچا نہیں گیا۔
+Approved by the Sahara team.	سہارا ٹیم نے منظور کیا۔
+Checked by the Sahara team and not added.	سہارا ٹیم نے جانچا اور شامل نہیں کیا۔
+Sent for review, not checked yet.	جانچ کے لیے بھیجا گیا، ابھی جانچا نہیں گیا۔
+Sign in to send a suggestion. The Sahara team checks every suggestion before anyone else sees it.	مشورہ بھیجنے کے لیے سائن اِن کریں۔ کسی اور کو دکھنے سے پہلے سہارا ٹیم ہر مشورہ جانچتی ہے۔
+It is not shown to anyone else until the Sahara team checks it.	جب تک سہارا ٹیم اسے نہ جانچ لے، یہ کسی اور کو نہیں دکھایا جاتا۔
+The Sahara team checks it before anyone else sees it. Please don't add patient details.	کسی اور کو دکھنے سے پہلے سہارا ٹیم اسے جانچتی ہے۔ براہ کرم مریض کی تفصیل نہ لکھیں۔
+Centre name	سینٹر کا نام
+Town or city	قصبہ یا شہر
+State	ریاست
+Address (optional)	پتہ (اختیاری)
+Centre phone (optional)	سینٹر کا فون (اختیاری)
+What care do they offer? (optional)	وہ کیا دیکھ بھال دیتے ہیں؟ (اختیاری)
+Send for review	جانچ کے لیے بھیجیں
+Your suggestions	آپ کے مشورے
+The saved local planner could not be read. It has not been replaced.	محفوظ کیا ہوا مقامی پلانر پڑھا نہیں جا سکا۔ اسے بدلا نہیں گیا۔
+Could not load your records. Try again.	آپ کے ریکارڈ لوڈ نہیں ہو سکے۔ دوبارہ کوشش کریں۔
+Couldn't check your status. Check your internet and try again.	آپ کی حالت جانچی نہیں جا سکی۔ انٹرنیٹ دیکھیں اور دوبارہ کوشش کریں۔
+${it.name}'s care is now in your list.	${it.name} کی دیکھ بھال اب آپ کی فہرست میں ہے۔
+Joined. If the patient doesn't appear, tap Refresh.	جڑ گئے۔ اگر مریض نہ دکھے تو تازہ کریں دبائیں۔
+Earlier practice care	پہلے کی مشق والی دیکھ بھال
+Patient record	مریض کا ریکارڈ
+Shared care	مشترکہ دیکھ بھال
+Practice walkthrough · not a real patient	مشق کا ڈیمو · اصلی مریض نہیں
+Real shared care	اصلی مشترکہ دیکھ بھال
+Test patient · separate records	ٹیسٹ مریض · الگ ریکارڈ
+Access and clinical review	رسائی اور طبی جانچ
+Home	ہوم
+Patients	مریض
+Schedule	شیڈول
+Account	اکاؤنٹ
+This person's records are unavailable	اس شخص کے ریکارڈ دستیاب نہیں
+Opening this person's care…	اس شخص کی دیکھ بھال کھل رہی ہے…
+Access may have changed. No other patient's information is shown here.	رسائی بدل گئی ہو سکتی ہے۔ یہاں کسی اور مریض کی معلومات نہیں دکھائی جاتی۔
+Waiting for the correct profile and saved conversation.	صحیح پروفائل اور محفوظ بات چیت کا انتظار ہے۔
+Refresh access	رسائی تازہ کریں
+Back to patients	مریضوں پر واپس
+Test record unavailable	ٹیسٹ ریکارڈ دستیاب نہیں
+Loading test records…	ٹیسٹ ریکارڈ لوڈ ہو رہے ہیں…
+No real patient's record has been substituted.	کسی اصلی مریض کا ریکارڈ اس کی جگہ نہیں رکھا گیا۔
+Test data · not a real patient account	ٹیسٹ ڈیٹا · اصلی مریض کا اکاؤنٹ نہیں
+Preserved local walkthrough	محفوظ رکھا مقامی ڈیمو
+Open this practice patient's history and earlier screens. Walkthrough changes remain local, separate from this database test record.	اس مشق والے مریض کی ہسٹری اور پہلے کی اسکرینیں کھولیں۔ ڈیمو کی تبدیلیاں مقامی رہتی ہیں، اس ڈیٹابیس ٹیسٹ ریکارڈ سے الگ۔
+Open preserved walkthrough	محفوظ رکھا ڈیمو کھولیں
+Care overview	دیکھ بھال کا خلاصہ
+Previous doctor	پچھلے ڈاکٹر
+Last conversation	آخری بات چیت
+No discussion recorded	کوئی بات چیت درج نہیں
+Open conversations	بات چیت کھولیں
+Next review	اگلی جانچ
+Read reported updates and medicine history, then prepare questions for the next discussion.	بتائی گئی تازہ معلومات اور دواؤں کی ہسٹری پڑھیں، پھر اگلی بات چیت کے لیے سوال تیار کریں۔
+View progress	پیش رفت دیکھیں
+Progress	پیش رفت
+Reported test updates, not a clinical assessment.	بتائی گئی ٹیسٹ معلومات، طبی جائزہ نہیں۔
+No reported updates saved.	کوئی بتائی گئی معلومات محفوظ نہیں۔
+Reported update	بتائی گئی معلومات
+Open medicine history	دواؤں کی ہسٹری کھولیں
+Your day in care	دیکھ بھال میں آپ کا دن
+Earlier practice workspace	پہلے کا مشق والا ورک اسپیس
+Practice records · not real patients	مشق کے ریکارڈ · اصلی مریض نہیں
+Return to current workspace	موجودہ ورک اسپیس پر لوٹیں
+Earlier test dataset	پہلے کا ٹیسٹ ڈیٹا
+Existing account test records remain separate.	موجودہ اکاؤنٹ کے ٹیسٹ ریکارڈ الگ رہتے ہیں۔
+Creating additional legacy test records is unavailable here.	یہاں مزید پرانے ٹیسٹ ریکارڈ بنانا دستیاب نہیں۔
+Earlier visits and discussion requests	پہلے کی ملاقاتیں اور بات چیت کی درخواستیں
+Local testing only; no requests are delivered from real accounts.	صرف مقامی ٹیسٹنگ؛ اصلی اکاؤنٹس سے کوئی درخواست نہیں پہنچائی جاتی۔
+Open test discussion requests	ٹیسٹ والی بات چیت کی درخواستیں کھولیں
+Open earlier schedule	پہلے کا شیڈول کھولیں
+Refreshing…	تازہ ہو رہا ہے…
+Only patients who have shared their care with you appear here.	یہاں صرف وہی مریض دکھتے ہیں جنہوں نے اپنی دیکھ بھال آپ کے ساتھ شیئر کی ہے۔
+No patients yet	ابھی کوئی مریض نہیں
+Signing in alone does not give access. Ask the patient or family to create a doctor invitation in Sahara and share the code with you.	صرف سائن اِن کرنے سے رسائی نہیں ملتی۔ مریض یا گھر والوں سے کہیں کہ سہارا میں ڈاکٹر کا دعوت نامہ بنائیں اور کوڈ آپ کو بھیجیں۔
+No matching patient	کوئی ملتا مریض نہیں
+Check the name or patient ID. Patients who have not invited you can't be found.	نام یا مریض ID جانچیں۔ جن مریضوں نے آپ کو نہیں بلایا، وہ نہیں ملتے۔
+Patient ID 	مریض ID 
+Add a patient	مریض جوڑیں
+Enter the doctor invitation code the patient or family shared with you.	مریض یا گھر والوں کا بھیجا ہوا ڈاکٹر دعوت کوڈ لکھیں۔
+ · a doctor code works only after approval.	 · ڈاکٹر کوڈ منظوری کے بعد ہی کام کرتا ہے۔
+Invitation code	دعوت کوڈ
+Verification and clinical review	تصدیق اور طبی جانچ
+Return to current schedule	موجودہ شیڈول پر لوٹیں
+No earlier planner records.	پہلے کے کوئی پلانر ریکارڈ نہیں۔
+Older practice records · not real patients	پرانے مشق کے ریکارڈ · اصلی مریض نہیں
+Earlier care workspace	پہلے کا دیکھ بھال ورک اسپیس
+Signed in. Login does not verify professional identity.	سائن اِن ہو گیا۔ لاگ اِن سے پیشہ ورانہ پہچان کی تصدیق نہیں ہوتی۔
+Manage account / sign out	اکاؤنٹ سنبھالیں / سائن آؤٹ
+Verification and real patient access	تصدیق اور اصلی مریض تک رسائی
+Submit or change your registration details. Approval is given by hand by the Sahara team; each patient gives access with their own invitation.	اپنی رجسٹریشن کی تفصیل بھیجیں یا بدلیں۔ منظوری سہارا ٹیم ہاتھ سے دیتی ہے؛ ہر مریض اپنے دعوت نامے سے رسائی دیتا ہے۔
+Open verification and shared care	تصدیق اور مشترکہ دیکھ بھال کھولیں
+Back to Sahara	سہارا پر واپس
+Test discussion requests	ٹیسٹ والی بات چیت کی درخواستیں
+Practice only, on this phone. These requests did not come from real accounts.	صرف مشق، اسی فون پر۔ یہ درخواستیں اصلی اکاؤنٹس سے نہیں آئیں۔
+Prepare questions about ${p.careContext.lowercase()}.	${p.careContext.lowercase()} کے بارے میں سوال تیار کریں۔
+Open discussion	بات چیت کھولیں
+${person.name}'s care	${person.name} کی دیکھ بھال
+Device-local care · not synced or shared	فون پر مقامی دیکھ بھال · سنک یا شیئر نہیں
+Real shared records · access controlled by the patient	اصلی مشترکہ ریکارڈ · رسائی مریض کے ہاتھ میں
+Sharing, access & clinical review	شیئرنگ، رسائی اور طبی جانچ
+Local test planner. No invitations or reminders are sent.	مقامی ٹیسٹ پلانر۔ کوئی دعوت یا ریمائنڈر نہیں بھیجا جاتا۔
+Schedule visit	ملاقات طے کریں
+Mark complete	مکمل کا نشان لگائیں
+Cancel visit	ملاقات منسوخ کریں
+The local test draft could not be read. It has not been replaced.	مقامی ٹیسٹ ڈرافٹ پڑھا نہیں جا سکا۔ اسے بدلا نہیں گیا۔
+Draft saved, but publication did not finish. 	ڈرافٹ محفوظ ہو گیا، لیکن شائع کرنا پورا نہیں ہوا۔ 
+Your text is unchanged. 	آپ کی تحریر نہیں بدلی۔ 
+Try again.	دوبارہ کوشش کریں۔
+Care conversation	دیکھ بھال کی بات چیت
+Test data · save to your private dataset. Publishing is not verified clinical review.	ٹیسٹ ڈیٹا · اپنے نجی ڈیٹا میں محفوظ کریں۔ شائع کرنا تصدیق شدہ طبی جانچ نہیں ہے۔
+Saving the checked draft. Audio and text controls are temporarily paused.	جانچا ہوا ڈرافٹ محفوظ ہو رہا ہے۔ آڈیو اور تحریر کے بٹن کچھ دیر کے لیے رکے ہیں۔
+Recording does not upload or generate an AI note. Save the draft to keep its associated recording ID in your account; the audio remains local unless you choose upload below.	ریکارڈنگ اپ لوڈ نہیں ہوتی اور نہ AI نوٹ بناتی ہے۔ ریکارڈنگ ID اپنے اکاؤنٹ میں رکھنے کے لیے ڈرافٹ محفوظ کریں؛ آڈیو مقامی رہتا ہے جب تک آپ نیچے اپ لوڈ نہ چنیں۔
+Upload this test recording	یہ ٹیسٹ ریکارڈنگ اپ لوڈ کریں
+Upload only this selected recording (${clip.file.length()/1024} KB) to private Supabase storage for ${patient.name}. This does not transcribe it.	صرف یہ چنی ہوئی ریکارڈنگ (${clip.file.length()/1024} KB) ${patient.name} کے لیے نجی Supabase اسٹوریج میں اپ لوڈ کریں۔ اس سے تحریر نہیں بنتی۔
+Every participant separately permits uploading this fictional test recording. It contains no real patient or confidential information.	ہر شریک الگ سے اس بناوٹی ٹیسٹ ریکارڈنگ کو اپ لوڈ کرنے کی اجازت دیتا ہے۔ اس میں کسی اصلی مریض کی یا نجی معلومات نہیں ہیں۔
+The recording changed. Choose it again.	ریکارڈنگ بدل گئی۔ اسے دوبارہ چنیں۔
+Recording was not uploaded. Your local audio is unchanged.	ریکارڈنگ اپ لوڈ نہیں ہوئی۔ آپ کا مقامی آڈیو نہیں بدلا۔
+Upload this recording	یہ ریکارڈنگ اپ لوڈ کریں
+Conversation text	بات چیت کی تحریر
+Organise the Care Note	دیکھ بھال نوٹ ترتیب دیں
+What matters most	سب سے اہم کیا ہے
+Who participated	کون شامل ہوا
+What was discussed	کس بات پر بات ہوئی
+Questions and concerns	سوال اور فکریں
+What remains undecided	کیا ابھی طے نہیں ہوا
+Agreed next steps	طے شدہ اگلے قدم
+Discussion checklist	بات چیت کی چیک لسٹ
+Prepare a separate draft copy	الگ ڈرافٹ کاپی تیار کریں
+Keeps all your current text. Nothing is uploaded until you choose Save draft; existing account notes remain unchanged.	آپ کی ساری موجودہ تحریر رہتی ہے۔ جب تک آپ ڈرافٹ محفوظ نہ چنیں، کچھ اپ لوڈ نہیں ہوتا؛ اکاؤنٹ کے موجودہ نوٹ نہیں بدلتے۔
+Saved to your account's test dataset.	آپ کے اکاؤنٹ کے ٹیسٹ ڈیٹا میں محفوظ ہو گیا۔
+Save draft to account	ڈرافٹ اکاؤنٹ میں محفوظ کریں
+I checked this exact text. This is a test note, not verified clinical documentation.	میں نے یہی تحریر جانچی ہے۔ یہ ٹیسٹ نوٹ ہے، تصدیق شدہ طبی دستاویز نہیں۔
+Publish test version	ٹیسٹ ورژن شائع کریں
+Reported test history, not a prescription or proof of ingestion.	بتائی گئی ٹیسٹ ہسٹری، نسخہ یا دوا لینے کا ثبوت نہیں۔
+Skipped reported	چھوڑنا بتایا گیا
+Taken reported	لینا بتایا گیا
+Planned: ${connectedTime(dose.plannedAt)}	طے وقت: ${connectedTime(dose.plannedAt)}
+Reported taken: 	لینے کا بتایا گیا: 
+Not reported	نہیں بتایا گیا
+Logged: 	درج: 
+Reported by you	آپ نے بتایا
+Reported by another authorised account	کسی دوسرے مجاز اکاؤنٹ نے بتایا
+Add a test dose report	ٹیسٹ خوراک کی اطلاع جوڑیں
+Medicine label	دوا کا لیبل
+Reported taken	لینا بتایا گیا
+Logged time is recorded by the server when this report is saved.	اطلاع محفوظ ہونے پر درج وقت سرور لکھتا ہے۔
+The report was not saved. Check the times and try again.	اطلاع محفوظ نہیں ہوئی۔ وقت جانچیں اور دوبارہ کوشش کریں۔
+Save reported dose	بتائی گئی خوراک محفوظ کریں
+Published test version	شائع شدہ ٹیسٹ ورژن
+Priorities not recorded	ترجیحات درج نہیں
+Discussion not recorded	بات چیت درج نہیں
+Unverified test record	غیر تصدیق شدہ ٹیسٹ ریکارڈ
+Show less	کم دکھائیں
+Read full discussion	پوری بات چیت پڑھیں
+Participants	شریک لوگ
+Questions	سوال
+Undecided	طے نہیں ہوا
+Revision ${note.revision}	نظرثانی ${note.revision}
+Associated local audio: 	جڑا ہوا مقامی آڈیو: 
+Transcript source: 	تحریر کا ذریعہ: 
+Practice draft, written in advance, not from your recording	مشق کا ڈرافٹ، پہلے سے لکھا ہوا، آپ کی ریکارڈنگ سے نہیں
+The file action did not finish.	فائل کا کام پورا نہیں ہوا۔
+Reports and recordings	رپورٹیں اور ریکارڈنگز
+Test files only. Uploads go to private Supabase storage for this account's test patient.	صرف ٹیسٹ فائلیں۔ اپ لوڈ اس اکاؤنٹ کے ٹیسٹ مریض کی نجی Supabase اسٹوریج میں جاتے ہیں۔
+Opening passes this test file to the viewer app you choose.	کھولنے پر یہ ٹیسٹ فائل آپ کی چنی ہوئی ویور ایپ کو دی جاتی ہے۔
+Open private test file	نجی ٹیسٹ فائل کھولیں
+Download and open	ڈاؤن لوڈ کر کے کھولیں
+Upload incomplete · choose the file again to retry	اپ لوڈ ادھورا · دوبارہ کوشش کے لیے فائل پھر سے چنیں
+Attach a test file	ٹیسٹ فائل جوڑیں
+File title	فائل کا عنوان
+Choose file	فائل چنیں
+Change selected file	چنی ہوئی فائل بدلیں
+A file is selected	ایک فائل چنی گئی ہے
+I have permission to upload this fictional test file to private Supabase storage. It contains no real patient or confidential information.	مجھے یہ بناوٹی ٹیسٹ فائل نجی Supabase اسٹوریج میں اپ لوڈ کرنے کی اجازت ہے۔ اس میں کسی اصلی مریض کی یا نجی معلومات نہیں ہیں۔
+File uploaded to your private test dataset.	فائل آپ کے نجی ٹیسٹ ڈیٹا میں اپ لوڈ ہو گئی۔
+Upload selected test file	چنی ہوئی ٹیسٹ فائل اپ لوڈ کریں
+People present were not saved. Keep this list open and try again.	موجود لوگ محفوظ نہیں ہوئے۔ یہ فہرست کھلی رکھیں اور دوبارہ کوشش کریں۔
+Keep up to 12 people.	زیادہ سے زیادہ 12 لوگ رکھیں۔
+Enter a name of 1–100 characters.	1–100 حروف کا نام لکھیں۔
+Enter a role of 1–40 characters, such as Daughter or Nurse.	1–40 حروف کا کردار لکھیں، جیسے بیٹی یا نرس۔
+This list can no longer be changed.	یہ فہرست اب بدلی نہیں جا سکتی۔
+People present were not saved. Try again.	موجود لوگ محفوظ نہیں ہوئے۔ دوبارہ کوشش کریں۔
+People present could not be loaded. Retry before editing.	موجود لوگ لوڈ نہیں ہو سکے۔ بدلنے سے پہلے دوبارہ کوشش کریں۔
+Who is in the room	کمرے میں کون ہے
+Write down everyone physically present. Each person ticks to agree to being recorded. Nobody listed here is contacted or notified, and names are not checked.	جو بھی یہاں موجود ہے، سب کے نام لکھیں۔ ہر شخص ریکارڈنگ پر رضامندی کے لیے ٹِک کرے۔ یہاں لکھے کسی شخص سے رابطہ نہیں کیا جاتا نہ اطلاع دی جاتی ہے، اور نام جانچے نہیں جاتے۔
+Agrees to being recorded	ریکارڈنگ پر راضی ہے
+Has not agreed yet	ابھی راضی نہیں
+Role, such as Daughter or Nurse	کردار، جیسے بیٹی یا نرس
+Everyone listed has agreed to being recorded.	فہرست کے سب لوگ ریکارڈنگ پر راضی ہیں۔
+Recording can start once everyone listed has agreed.	فہرست کے سب لوگ راضی ہوں تو ریکارڈنگ شروع ہو سکتی ہے۔
+Family & care team	گھر والے اور دیکھ بھال ٹیم
+${contacts.count { it.personId == personId }} linked contacts	${contacts.count { it.personId == personId }} جڑے رابطے
+Contacts aren't shared with this account.	رابطے اس اکاؤنٹ کے ساتھ شیئر نہیں ہیں۔
+View care team	دیکھ بھال ٹیم دیکھیں
+Only contacts explicitly added to this care profile appear here. Adding a contact does not invite them or give account access.	یہاں صرف وہی رابطے دکھتے ہیں جو اس دیکھ بھال پروفائل میں خاص طور پر جوڑے گئے۔ رابطہ جوڑنے سے انہیں دعوت یا اکاؤنٹ کی رسائی نہیں ملتی۔
+The owner has not shared care-team contacts with this account.	مالک نے دیکھ بھال ٹیم کے رابطے اس اکاؤنٹ کے ساتھ شیئر نہیں کیے۔
+No contacts have been added yet.	ابھی کوئی رابطہ نہیں جوڑا گیا۔
+Refresh contacts	رابطے تازہ کریں
+Family & care-team contacts	گھر والوں اور دیکھ بھال ٹیم کے رابطے
+These contacts stay private unless you explicitly share them below. Contacts do not receive an invitation automatically.	یہ رابطے نجی رہتے ہیں جب تک آپ نیچے خود شیئر نہ کریں۔ رابطوں کو اپنے آپ دعوت نہیں جاتی۔
+Add contact	رابطہ جوڑیں
+Care-team contact	دیکھ بھال ٹیم کا رابطہ
+Relationship or care role	رشتہ یا دیکھ بھال میں کردار
+Save contact	رابطہ محفوظ کریں
+Remove ${contact.name}?	${contact.name} کو ہٹائیں؟
+This removes the contact from this care profile. It does not change anyone's account access or sharing permissions.	اس سے رابطہ اس دیکھ بھال پروفائل سے ہٹ جاتا ہے۔ کسی کے اکاؤنٹ کی رسائی یا شیئرنگ کی اجازت نہیں بدلتی۔
+Remove contact	رابطہ ہٹائیں
+Keep contact	رابطہ رکھیں
+Checking verification	تصدیق جانچ رہے ہیں
+Registration not submitted	رجسٹریشن نہیں بھیجی گئی
+Waiting for approval	منظوری کا انتظار ہے
+Approved as a doctor	ڈاکٹر کے طور پر منظور
+Registration not approved	رجسٹریشن منظور نہیں ہوئی
+Approval on hold	منظوری روکی گئی ہے
+Asking the server for your status.	سرور سے آپ کی حالت پوچھ رہے ہیں۔
+Submit your registered name, medical council and registration number. Patients can add you as their doctor only after approval.	اپنا رجسٹرڈ نام، میڈیکل کونسل اور رجسٹریشن نمبر بھیجیں۔ منظوری کے بعد ہی مریض آپ کو اپنا ڈاکٹر بنا سکتے ہیں۔
+The Sahara team checks every registration by hand. Nothing is approved automatically, so this can take a while. Until then, a doctor invitation code will not work. Tap \"Check again\" later.	سہارا ٹیم ہر رجسٹریشن ہاتھ سے جانچتی ہے۔ کچھ بھی اپنے آپ منظور نہیں ہوتا، اس لیے اس میں وقت لگ سکتا ہے۔ تب تک ڈاکٹر دعوت کوڈ کام نہیں کرے گا۔ بعد میں \"دوبارہ جانچیں\" دبائیں۔
+Doctor invitation codes from a patient or family will now work. Each patient decides what you can see.	مریض یا گھر والوں کے ڈاکٹر دعوت کوڈ اب کام کریں گے۔ ہر مریض طے کرتا ہے کہ آپ کیا دیکھ سکتے ہیں۔
+Doctor invitation codes will not work for now. Correct your details and submit them again.	ڈاکٹر دعوت کوڈ ابھی کام نہیں کریں گے۔ اپنی تفصیل درست کریں اور دوبارہ بھیجیں۔
+Last checked 	آخری جانچ 
+Date not recorded	تاریخ درج نہیں
+Reviewer note: 	جانچنے والے کا نوٹ: 
+Checking…	جانچ رہے ہیں…
+Check again	دوبارہ جانچیں
+View details	تفصیل دیکھیں
+Submit details	تفصیل بھیجیں
+Name or patient ID (e.g. SH-1A2B3C4D)	نام یا مریض ID (جیسے SH-1A2B3C4D)
+Your patients	آپ کے مریض
+No patient has shared their care with you yet.	ابھی کسی مریض نے اپنی دیکھ بھال آپ کے ساتھ شیئر نہیں کی۔
+${people.size} connected · shared by the patient or family	${people.size} جڑے · مریض یا گھر والوں نے شیئر کیا
+Join with an invitation code	دعوت کوڈ سے جڑیں
+Open patients	مریض کھولیں
+Upcoming visits	آنے والی ملاقاتیں
+No open visits are planned for your patients.	آپ کے مریضوں کی کوئی کھلی ملاقات طے نہیں۔
+Check-ins this week	اس ہفتے کا حال
+No check-ins reported in the last 7 days.	پچھلے 7 دن میں کوئی حال نہیں بتایا گیا۔
+Open visits for the patients who share their care with you. Tap one to add or change a visit.	جو مریض اپنی دیکھ بھال آپ سے شیئر کرتے ہیں، ان کی کھلی ملاقاتیں۔ ملاقات جوڑنے یا بدلنے کے لیے کسی ایک پر دبائیں۔
+No connected patients yet.	ابھی کوئی جڑا مریض نہیں۔
+No open visits. Open a patient's Visits to plan one.	کوئی کھلی ملاقات نہیں۔ ملاقات طے کرنے کے لیے مریض کی ملاقاتیں کھولیں۔
+Plan a visit for	ملاقات طے کریں برائے
+Practice walkthrough · not real patients	مشق کا ڈیمو · اصلی مریض نہیں
+Made-up patients for practice, not real people. They stay on this phone and never mix with a real patient's records.	مشق کے لیے بنائے گئے مریض، اصلی لوگ نہیں۔ یہ اسی فون پر رہتے ہیں اور کبھی کسی اصلی مریض کے ریکارڈ میں نہیں ملتے۔
+Practice: 	مشق: 
+Version ${it.version}	ورژن ${it.version}
+Archived draft · not published	سنبھالا ہوا ڈرافٹ · شائع نہیں
+Recent conversation	حالیہ بات چیت
+No published conversation yet. Your unfinished draft stays in Record conversation.	ابھی کوئی شائع شدہ بات چیت نہیں۔ آپ کا ادھورا ڈرافٹ بات چیت ریکارڈ کریں میں رہتا ہے۔
+The draft is not clinically reviewed, and every word must be checked against the conversation. The reviewer's identity is not verified.	ڈرافٹ کی طبی جانچ نہیں ہوئی، اور ہر لفظ بات چیت سے جانچنا ضروری ہے۔ جانچنے والے کی پہچان کی تصدیق نہیں ہوئی۔
+Conversation history	بات چیت کی ہسٹری
+All saved conversation versions.	بات چیت کے سب محفوظ ورژن۔
+All recorded doctors	سبھی درج ڈاکٹر
+Choose a day	دن چنیں
+Clear date	تاریخ ہٹائیں
+No conversation matches these filters.	ان فلٹرز سے کوئی بات چیت نہیں ملتی۔
+Archived drafts · not published	سنبھالے ہوئے ڈرافٹ · شائع نہیں
+Device-local unfinished drafts. These are separate from the published-version filters.	فون پر مقامی ادھورے ڈرافٹ۔ یہ شائع شدہ ورژن والے فلٹرز سے الگ ہیں۔
+No archived drafts.	کوئی سنبھالا ہوا ڈرافٹ نہیں۔
+Unfinished conversation draft	ادھورا بات چیت ڈرافٹ
+Read retained source and context	رکھی ہوئی اصل تحریر اور سیاق پڑھیں
+Archived ${conversationDate(saved.archivedAt)}	سنبھالا گیا ${conversationDate(saved.archivedAt)}
+This retained draft needs a newer app to read its context. Nothing has been replaced or published.	اس رکھے ہوئے ڈرافٹ کا سیاق پڑھنے کے لیے ایپ کا نیا ورژن چاہیے۔ کچھ بدلا یا شائع نہیں کیا گیا۔
+Saved goals · read-only	محفوظ مقاصد · صرف پڑھنے کے لیے
+No answer recorded	کوئی جواب درج نہیں
+Original excerpt: ${it.quote}	اصل حصہ: ${it.quote}
+Original source	اصل ذریعہ
+No source text recorded	کوئی اصل تحریر درج نہیں
+Family access to this conversation	اس بات چیت تک گھر والوں کی رسائی
+Choose who can see this, if anyone.	چنیں کہ اسے کون دیکھ سکتا ہے، اگر کوئی۔
+The owner chooses existing invited family accounts. No one is added automatically, and this does not grant access to another conversation.	مالک پہلے سے بلائے گئے گھر والوں کے اکاؤنٹ چنتا ہے۔ کوئی اپنے آپ نہیں جڑتا، اور اس سے کسی اور بات چیت کی رسائی نہیں ملتی۔
+Online family access is unavailable.	گھر والوں کی آن لائن رسائی دستیاب نہیں۔
+Online family access is unavailable for device-local or demo conversations.	فون پر مقامی یا ڈیمو بات چیت کے لیے گھر والوں کی آن لائن رسائی دستیاب نہیں۔
+Only the owner can approve family access.	صرف مالک گھر والوں کی رسائی منظور کر سکتا ہے۔
+Only this care profile's owner can approve the audience. This account cannot grant family access.	صرف اس دیکھ بھال پروفائل کا مالک دیکھنے والوں کو منظور کر سکتا ہے۔ یہ اکاؤنٹ گھر والوں کو رسائی نہیں دے سکتا۔
+The conversation or account changed.	بات چیت یا اکاؤنٹ بدل گیا۔
+Sharing could not be loaded. No access changed.	شیئرنگ لوڈ نہیں ہو سکی۔ کوئی رسائی نہیں بدلی۔
+Save draft and choose family access	ڈرافٹ محفوظ کریں اور گھر والوں کی رسائی چنیں
+No eligible invited family accounts. You can approve an owner-only conversation.	کوئی اہل بلایا ہوا گھر والوں کا اکاؤنٹ نہیں۔ آپ صرف مالک والی بات چیت منظور کر سکتے ہیں۔
+Access was not changed. Refresh before trying again.	رسائی نہیں بدلی۔ دوبارہ کوشش سے پہلے تازہ کریں۔
+Approve only these accounts	صرف یہ اکاؤنٹ منظور کریں
+Audience approval saved. Publication still requires the separate clinician review.	دیکھنے والوں کی منظوری محفوظ ہو گئی۔ شائع کرنے کے لیے ابھی بھی ڈاکٹر کی الگ جانچ ضروری ہے۔
+Discussed	بات ہوئی
+Deferred	بعد کے لیے رکھا
+Needs review	جانچ چاہیے
+This saved context needs an updated app. The original note has been retained.	اس محفوظ سیاق کے لیے نئی ایپ چاہیے۔ اصل نوٹ رکھ لیا گیا ہے۔
+No saved goals were recorded for this version.	اس ورژن کے لیے کوئی محفوظ مقاصد درج نہیں ہوئے۔
+Nothing was recorded for this section.	اس حصے کے لیے کچھ درج نہیں ہوا۔
+Taken from the conversation words	بات چیت کے الفاظ سے لیا گیا
+Written by hand	ہاتھ سے لکھا گیا
+Drafted with assistance, then edited	مدد سے ڈرافٹ کیا، پھر بدلا گیا
+Carried forward from version ${CarriedForward.version(goal.origin)}, not discussed in this conversation	ورژن ${CarriedForward.version(goal.origin)} سے آگے لایا گیا، اس بات چیت میں اس پر بات نہیں ہوئی
+Carried over from an earlier note	پہلے کے نوٹ سے آگے لایا گیا
+Recorded by (self-entered name)	درج کرنے والا (خود لکھا نام)
+Your name is only a label.	آپ کا نام صرف ایک لیبل ہے۔
+This name is a label, not verified professional identity. An account identifier is recorded only when known at capture.	یہ نام ایک لیبل ہے، پیشہ ورانہ پہچان کی تصدیق نہیں۔ اکاؤنٹ کی پہچان صرف تب درج ہوتی ہے جب درج کرتے وقت معلوم ہو۔
+Hide details: $summary	تفصیل چھپائیں: $summary
+Show details: $summary	تفصیل دیکھیں: $summary
+No exact linked recording is available on this device. Audio is not downloaded or inferred from other conversations.	اس ڈیوائس پر کوئی ٹھیک جڑی ہوئی ریکارڈنگ دستیاب نہیں۔ آڈیو ڈاؤن لوڈ نہیں ہوتا اور نہ دوسری بات چیت سے اندازہ لگایا جاتا ہے۔
+Checking exact audio access…	اصل آڈیو کی رسائی جانچ رہے ہیں…
+Pause device-local audio	ڈیوائس پر مقامی آڈیو روکیں
+Play exact device-local audio	ڈیوائس پر مقامی اصل آڈیو چلائیں
+Care conversations	دیکھ بھال کی بات چیت
+Revisit the latest saved discussion, care priorities and questions.	پچھلی محفوظ بات چیت، دیکھ بھال کی ترجیحات اور سوال دوبارہ دیکھیں۔
+Capture a discussion, then review the draft before saving the note.	بات چیت ریکارڈ کریں، پھر نوٹ محفوظ کرنے سے پہلے ڈرافٹ جانچیں۔
+Browse earlier conversations by date or doctor, and read archived drafts.	پہلے کی بات چیت تاریخ یا ڈاکٹر کے حساب سے دیکھیں، اور سنبھالے ہوئے ڈرافٹ پڑھیں۔
+Nothing saved yet	ابھی کچھ محفوظ نہیں
+Needs everyone's agreement first	پہلے سب کی رضامندی چاہیے
+Recording is not available to you	ریکارڈنگ آپ کے لیے دستیاب نہیں
+No earlier conversations	پہلے کی کوئی بات چیت نہیں
+1 saved conversation	1 محفوظ بات چیت
+$archivedCount saved conversations	$archivedCount محفوظ بات چیت
+Carried forward from version ${CarriedForward.version(goal.origin)} · confirmed by you	ورژن ${CarriedForward.version(goal.origin)} سے آگے لایا گیا · آپ نے تصدیق کی
+Carried forward from version ${CarriedForward.version(goal.origin)} · confirm this still applies	ورژن ${CarriedForward.version(goal.origin)} سے آگے لایا گیا · تصدیق کریں کہ یہ اب بھی لاگو ہے
+Not discussed in this conversation. Edit the text if anything changed.	اس بات چیت میں اس پر بات نہیں ہوئی۔ اگر کچھ بدلا ہو تو تحریر بدلیں۔
+Still applies	اب بھی لاگو ہے
+Patient priorities	مریض کی ترجیحات
+Understanding and questions	سمجھ اور سوال
+Who should participate	کس کو شامل ہونا چاہیے
+Concerns and uncertainty	فکریں اور غیر یقینی
+Next steps and follow-up	اگلے قدم اور فالو اپ
+Choose each status yourself. An answer or AI draft does not prove the topic was discussed.	ہر حالت خود چنیں۔ کوئی جواب یا AI ڈرافٹ یہ ثابت نہیں کرتا کہ اس موضوع پر بات ہوئی۔
+This review context is unavailable or needs a newer app. Its original text has been retained; nothing was replaced.	یہ جانچ کا سیاق دستیاب نہیں یا اس کے لیے نئی ایپ چاہیے۔ اس کی اصل تحریر رکھ لی گئی ہے؛ کچھ بدلا نہیں گیا۔
+Origin: 	ماخذ: 
+carried forward from version ${CarriedForward.version(goal.origin)}	ورژن ${CarriedForward.version(goal.origin)} سے آگے لایا گیا
+No exact source excerpt attached.	کوئی اصل حصہ ساتھ نہیں لگا۔
+${goal.evidence.size} exact source excerpts attached.	${goal.evidence.size} اصل حصے ساتھ لگے ہیں۔
+Doctor name not recorded	ڈاکٹر کا نام درج نہیں
+Read the saved conversation	محفوظ بات چیت پڑھیں
+Read full note and original words	پورا نوٹ اور اصل الفاظ پڑھیں
+Audio reference retained \u00B7 playback is device-local only	آڈیو کا حوالہ رکھا گیا · صرف اسی ڈیوائس پر چلتا ہے
+No audio is linked to this saved version.	اس محفوظ ورژن سے کوئی آڈیو نہیں جڑا۔
+Dictation in progress	بول کر لکھوانا جاری ہے
+$mode mode \u00B7 ready when you are	$mode موڈ · جب آپ تیار ہوں
+Dictate	بول کر لکھوائیں
+Type	ٹائپ کریں
+Choose Record, Dictate or Type	ریکارڈ، بول کر لکھوانا یا ٹائپ چنیں
+Audio stays on this device and is not included when a written note is shared. It is not automatically transcribed.	آڈیو اسی ڈیوائس پر رہتا ہے اور لکھا نوٹ شیئر کرنے پر ساتھ نہیں جاتا۔ اس کی تحریر اپنے آپ نہیں بنتی۔
+Exact words found in the source · check context	اصل تحریر میں یہی الفاظ ملے · سیاق جانچیں
+Manually entered · verify against the source	ہاتھ سے لکھا · اصل تحریر سے ملائیں
+No answer has been recorded for this section.	اس حصے کے لیے کوئی جواب درج نہیں ہوا۔
+Conversation workspace	بات چیت کا ورک اسپیس
+Prepare the next discussion, or continue your saved words.	اگلی بات چیت کی تیاری کریں، یا اپنے محفوظ الفاظ جاری رکھیں۔
+Saved draft · not a published Care Note	محفوظ ڈرافٹ · شائع شدہ دیکھ بھال نوٹ نہیں
+Continue discussion draft	بات چیت کا ڈرافٹ جاری رکھیں
+Open conversation workspace	بات چیت کا ورک اسپیس کھولیں
+Most recent published discussion	سب سے حالیہ شائع شدہ بات چیت
+Earlier published discussions	پہلے کی شائع شدہ بات چیت
+Previous discussion on record	ریکارڈ میں پچھلی بات چیت
+An undated discussion from this patient's earlier record. It is separate from the versions saved here.	اس مریض کے پہلے کے ریکارڈ سے ایک بغیر تاریخ کی بات چیت۔ یہ یہاں محفوظ ورژنز سے الگ ہے۔
+No saved discussion is recorded yet. You can prepare one in the workspace.	ابھی کوئی محفوظ بات چیت درج نہیں۔ آپ ورک اسپیس میں ایک تیار کر سکتے ہیں۔
+The reviewer's identity is not verified. Audio is not automatically transcribed, so the words must be checked by a person. Audio stays on this device and is not included when a written note is shared.	جانچنے والے کی پہچان کی تصدیق نہیں ہوئی۔ آڈیو کی تحریر اپنے آپ نہیں بنتی، اس لیے الفاظ کسی شخص کو جانچنے ہوں گے۔ آڈیو اسی ڈیوائس پر رہتا ہے اور لکھا نوٹ شیئر کرنے پر ساتھ نہیں جاتا۔
+What matters to the patient	مریض کے لیے کیا اہم ہے
+Still undecided	ابھی طے نہیں ہوا
+Author not recorded	لکھنے والا درج نہیں
+No summary recorded	کوئی خلاصہ درج نہیں
+Version ${discussion.versionNumber}	ورژن ${discussion.versionNumber}
+Earlier discussion	پہلے کی بات چیت
+Other headings were not recorded in this version.	اس ورژن میں دوسری سرخیاں درج نہیں ہوئیں۔
+Walkthrough	ڈیمو
+Scheduled	طے شدہ
+Appointment updated	ملاقات اپڈیٹ ہو گئی
+Visit cancelled	ملاقات منسوخ
+Visit cancelled · linked request deferred	ملاقات منسوخ · جڑی درخواست بعد کے لیے رکھی گئی
+Visit cancelled, but request update failed: ${failures.first()}	ملاقات منسوخ، لیکن درخواست اپڈیٹ نہیں ہو سکی: ${failures.first()}
+Back to patient care	مریض کی دیکھ بھال پر واپس
+Back to reports	رپورٹوں پر واپس
+Back to progress	پیش رفت پر واپس
+Back to patient profile	مریض کی پروفائل پر واپس
+Care profile unavailable	دیکھ بھال پروفائل دستیاب نہیں
+Care record	دیکھ بھال کا ریکارڈ
+Separate from your records	آپ کے ریکارڈ سے الگ
+Device-local care · not synced	ڈیوائس پر مقامی دیکھ بھال · سنک نہیں
+Dismiss status	پیغام ہٹائیں
+This care profile is unavailable	یہ دیکھ بھال پروفائل دستیاب نہیں
+No other person's records are shown instead.	اس کی جگہ کسی اور شخص کے ریکارڈ نہیں دکھائے جاتے۔
+Doctor destination	ڈاکٹر والا حصہ
+${shownPatient.age} years	${shownPatient.age} سال
+Choose a person to open their care.	دیکھ بھال کھولنے کے لیے کوئی شخص چنیں۔
+Care profiles on this device	اس ڈیوائس پر دیکھ بھال پروفائلیں
+Shared care profiles	مشترکہ دیکھ بھال پروفائلیں
+Hide details about these care profiles	ان دیکھ بھال پروفائلوں کی تفصیل چھپائیں
+Show details about these care profiles	ان دیکھ بھال پروفائلوں کی تفصیل دیکھیں
+Only on this device · not synced.	صرف اسی ڈیوائس پر · سنک نہیں۔
+Records your account may access.	وہ ریکارڈ جن تک آپ کا اکاؤنٹ پہنچ سکتا ہے۔
+ No care profiles added yet. Add a profile or open Rahul or Arjun below.	 ابھی کوئی دیکھ بھال پروفائل نہیں جوڑی گئی۔ پروفائل جوڑیں یا نیچے راہل یا ارجن کو کھولیں۔
+Add on-device care profile	ڈیوائس پر دیکھ بھال پروفائل جوڑیں
+Opening your new care profile…	آپ کی نئی دیکھ بھال پروفائل کھل رہی ہے…
+Device-local care	ڈیوائس پر مقامی دیکھ بھال
+People in your care	آپ کی دیکھ بھال میں لوگ
+Care profile calendars	دیکھ بھال پروفائل کے کیلنڈر
+Choose a person to view visits and plan a review.	ملاقاتیں دیکھنے اور جانچ طے کرنے کے لیے کوئی شخص چنیں۔
+View visits	ملاقاتیں دیکھیں
+Choose the patient linked to this request.	اس درخواست سے جڑا مریض چنیں۔
+Visit scheduled	ملاقات طے ہو گئی
+Visit rescheduled	ملاقات کا وقت بدل گیا
+Visit scheduled · request updated locally	ملاقات طے ہو گئی · درخواست مقامی طور پر اپڈیٹ ہوئی
+Cancel this visit?	یہ ملاقات منسوخ کریں؟
+The visit will stay in the schedule with a Cancelled status.	ملاقات منسوخ کی حالت کے ساتھ شیڈول میں رہے گی۔
+Keep visit	ملاقات رکھیں
+Sahara	سہارا
+A caring companion holding a notepad	نوٹ پیڈ تھامے ایک ہمدرد ساتھی
+Welcome back	خوش آمدید، پھر سے
+Manage patient records and appointments.	مریضوں کے ریکارڈ اور اپوائنٹمنٹ سنبھالیں۔
+Doctor login	ڈاکٹر لاگ اِن
+Hide password	پاس ورڈ چھپائیں
+Show password	پاس ورڈ دکھائیں
+Credentials are prefilled	لاگ اِن کی تفصیل پہلے سے بھری ہے
+No account is created and nothing is sent.	کوئی اکاؤنٹ نہیں بنتا اور کچھ نہیں بھیجا جاتا۔
+Good day, Dr Meera	آداب، ڈاکٹر میرا
+A clear view of the care ahead.	آگے کی دیکھ بھال کا صاف منظر۔
+Visits today	آج کی ملاقاتیں
+Requests	درخواستیں
+Conversation requests	بات چیت کی درخواستیں
+Review requests and pick up unfinished discussions.	درخواستیں دیکھیں اور ادھوری بات چیت آگے بڑھائیں۔
+Open requests	درخواستیں کھولیں
+Resume ${patients.first { it.id==draft.patientId }.displayName()}'s draft	${patients.first { it.id==draft.patientId }.displayName()} کا ڈرافٹ جاری رکھیں
+Next visit	اگلی ملاقات
+${visit.type} · ${visit.durationMinutes} minutes	${visit.type} · ${visit.durationMinutes} منٹ
+Today's agenda	آج کا ایجنڈا
+View all	سب دیکھیں
+Your day is open	آپ کا دن خالی ہے
+Add a visit to start planning your day.	دن کی منصوبہ بندی شروع کرنے کے لیے ملاقات جوڑیں۔
+Patient records	مریضوں کے ریکارڈ
+Find a patient and pick up their care story.	کوئی مریض ڈھونڈیں اور ان کی دیکھ بھال کی کہانی آگے بڑھائیں۔
+Search name or care context	نام یا دیکھ بھال کا حال تلاش کریں
+${filtered.size} patient records	${filtered.size} مریضوں کے ریکارڈ
+No matching patients	کوئی ملتا مریض نہیں
+Try a name or care context.	کوئی نام یا دیکھ بھال کا حال آزمائیں۔
+Open patient record	مریض کا ریکارڈ کھولیں
+${patient.age} years	${patient.age} سال
+${patient.age} years · ${patient.careContext}	${patient.age} سال · ${patient.careContext}
+Open ${patient.displayName()}'s record	${patient.displayName()} کا ریکارڈ کھولیں
+${visit.durationMinutes} min	${visit.durationMinutes} منٹ
+Your schedule	آپ کا شیڈول
+Make room for each conversation.	ہر بات چیت کے لیے وقت نکالیں۔
+No visits on this day	اس دن کوئی ملاقات نہیں
+Choose another day or schedule a visit.	کوئی اور دن چنیں یا ملاقات طے کریں۔
+Go to today	آج پر جائیں
+Reschedule	وقت بدلیں
+In person	آمنے سامنے
+Schedule a visit	ملاقات طے کریں
+Reschedule visit	ملاقات کا وقت بدلیں
+Local schedule only. No invitations or reminders are sent.	صرف مقامی شیڈول۔ کوئی دعوت یا ریمائنڈر نہیں بھیجا جاتا۔
+${it.age} years	${it.age} سال
+Change	بدلیں
+Patient linked to the conversation request	بات چیت کی درخواست سے جڑا مریض
+Date & time	تاریخ اور وقت
+Choose another date	کوئی اور تاریخ چنیں
+Starts at	شروع کا وقت
+Visit type	ملاقات کی قسم
+Duration	دورانیہ
+$minutes min	$minutes منٹ
+Visit note (optional)	ملاقات کا نوٹ (اختیاری)
+Save visit	ملاقات محفوظ کریں
+Dr Meera	ڈاکٹر میرا
+About this workspace	اس ورک اسپیس کے بارے میں
+A guided walkthrough of the doctor workspace.	ڈاکٹر ورک اسپیس کا رہنمائی والا ڈیمو۔
+Records here are saved on this device, separately from your Sahara account.	یہاں کے ریکارڈ اسی ڈیوائس پر محفوظ ہوتے ہیں، آپ کے سہارا اکاؤنٹ سے الگ۔
+Local scheduling	مقامی شیڈولنگ
+No invitations, calls or reminders are sent.	کوئی دعوت، کال یا ریمائنڈر نہیں بھیجا جاتا۔
+Stays on this device	اسی ڈیوائس پر رہتا ہے
+Audio is not uploaded, no online AI is used, and no prescription is issued.	آڈیو اپ لوڈ نہیں ہوتا، کوئی آن لائن AI استعمال نہیں ہوتا، اور کوئی نسخہ جاری نہیں ہوتا۔
+Good morning	صبح بخیر
+Good afternoon	دوپہر بخیر
+Good evening	شام بخیر
+Patients in your care	آپ کی دیکھ بھال میں مریض
+Visits, next 7 days	ملاقاتیں، اگلے 7 دن
+Unfinished drafts	ادھورے ڈرافٹ
+Conversations to plan	طے کرنے والی بات چیت
+${tile.first}, loading. Opens it.	${tile.first}، لوڈ ہو رہا ہے۔ اسے کھولتا ہے۔
+${tile.second} ${tile.first}. Opens it.	${tile.second} ${tile.first}۔ اسے کھولتا ہے۔
+Plan visit	ملاقات طے کریں
+Coming up	آنے والا
+${v.profile.name}, ${v.kind}, ${demoDay(demoDate(v.due))} at ${demoTime(v.due)}. Opens the schedule.	${v.profile.name}، ${v.kind}، ${demoDay(demoDate(v.due))} کو ${demoTime(v.due)} بجے۔ شیڈول کھولتا ہے۔
+Pick up where you left off	جہاں چھوڑا تھا وہیں سے شروع کریں
+Your own list. Nothing here was sent to you by a patient or family member.	آپ کی اپنی فہرست۔ یہاں کچھ بھی کسی مریض یا گھر والوں نے آپ کو نہیں بھیجا۔
+${newRequests.size} to plan	${newRequests.size} طے کرنے ہیں
+Nothing on your list yet.	ابھی آپ کی فہرست میں کچھ نہیں۔
+Conversation to plan, listed under $name: ${r.reason}. Opens the conversation.	طے کرنے والی بات چیت، $name کے تحت درج: ${r.reason}۔ بات چیت کھولتا ہے۔
+Listed ${demoDay(demoDate(r.createdAt))}, ${demoTime(r.createdAt)}	درج ${demoDay(demoDate(r.createdAt))}، ${demoTime(r.createdAt)}
+View all ${newRequests.size}	سبھی ${newRequests.size} دیکھیں
+Open list	فہرست کھولیں
+Medicine reports	دوا کی اطلاعات
+Practice data, not a real patient's reports	مثالی ڈیٹا، کسی اصل مریض کی اطلاعات نہیں
+Reported activity is not proof of ingestion or prescribing advice.	بتائی گئی سرگرمی دوا لینے کا ثبوت یا دوا لکھنے کا مشورہ نہیں ہے۔
+Planned = schedule · Reported taken = reported intake · Logged = entry time	طے = نظام الاوقات · لینے کا بتایا وقت = بتائی گئی خوراک · درج = اندراج کا وقت
+No medicine reports recorded.	دوا کی کوئی اطلاع درج نہیں۔
+Reporter: ${view.reporter}	بتانے والے: ${view.reporter}
+Could not load medicine history. No success has been assumed.	دواؤں کی تاریخچہ نہیں کھل سکی۔ کچھ بھی کامیاب نہیں مانا گیا۔
+This person's medicine record is unavailable. Return to Patients.	اس شخص کا دوا ریکارڈ دستیاب نہیں ہے۔ مریضوں پر واپس جائیں۔
+Prescription	نسخہ
+Add prescription	نسخہ شامل کریں
+Current list, past prescriptions and intake reports	موجودہ فہرست، پرانے نسخے اور دوا لینے کی اطلاعات
+Your existing medicines and original history have not been cleared.	آپ کی موجودہ دوائیں اور پرانی تاریخچہ مٹائی نہیں گئی۔
+Showing the active prescription and the medicines being taken now.	چالو نسخہ اور ابھی لی جا رہی دوائیں دکھائی جا رہی ہیں۔
+Showing superseded prescriptions: when each was prescribed, when it ended and the medicines it held.	بدلے گئے نسخے دکھائے جا رہے ہیں: ہر ایک کب لکھا گیا، کب ختم ہوا اور اس میں کون سی دوائیں تھیں۔
+Existing manual entry / scanner	موجودہ ہاتھ سے لکھا اندراج / اسکینر
+CURRENT PRESCRIPTION	موجودہ نسخہ
+Prescription group/date not recorded	نسخے کا گروپ/تاریخ درج نہیں
+Edit list	فہرست بدلیں
+Start date not recorded	شروع کی تاریخ درج نہیں
+Medicine history has not loaded. Course changes and intake reports stay unavailable until it does.	دواؤں کی تاریخچہ نہیں کھلی۔ اس کے کھلنے تک کورس کی تبدیلیاں اور دوا لینے کی اطلاعات دستیاب نہیں ہیں۔
+Load history	تاریخچہ کھولیں
+Intake history	دوا لینے کی تاریخچہ
+No detailed intake reports yet	ابھی دوا لینے کی کوئی تفصیلی اطلاع نہیں
+Older daily checkboxes do not tell us the taken time, reporter or when they were logged.	پرانے روزانہ چیک باکس سے دوا لینے کا وقت، بتانے والا یا درج ہونے کا وقت پتہ نہیں چلتا۔
+Removed from the current list	موجودہ فہرست سے ہٹائی گئی
+Removed ${medicineTime(row.removedAt)}	${medicineTime(row.removedAt)} کو ہٹائی گئی
+View intake history	دوا لینے کی تاریخچہ دیکھیں
+end date not recorded	ختم ہونے کی تاریخ درج نہیں
+Ended: replaced by a newer prescription	ختم: نئے نسخے سے بدلا گیا
+Ended: reason not recorded	ختم: وجہ درج نہیں
+View saved medicine list	محفوظ دوا فہرست دیکھیں
+No current medicines recorded	ابھی کی کوئی دوا درج نہیں
+No past medicines recorded	کوئی پرانی دوا درج نہیں
+Add a prescription or enter medicines manually. Nothing is inferred from a report image.	نسخہ شامل کریں یا دوائیں ہاتھ سے لکھیں۔ رپورٹ کی تصویر سے کوئی اندازہ نہیں لگایا جاتا۔
+Moving a medicine here preserves its directions and intake reports.	دوا یہاں لانے پر اس کی ہدایات اور دوا لینے کی اطلاعات باقی رہتی ہیں۔
+Medicine actions	دوا کے اختیارات
+Record report	اطلاع درج کریں
+Directions not recorded	ہدایات درج نہیں
+Moved to past ${medicineTime(course.changedAt)}	${medicineTime(course.changedAt)} کو پرانی میں ڈالی گئی
+Check-off on $date; exact time and reporter not recorded.	$date کو ٹک کیا؛ صحیح وقت اور بتانے والا درج نہیں۔
+Report not recorded	اطلاع درج نہیں
+Return to current medicines	موجودہ دواؤں میں واپس ڈالیں
+Move to past medicines	پرانی دواؤں میں ڈالیں
+Earlier medicine entry is no longer available. Its course snapshot and reports are retained.	پرانی دوا کا اندراج اب دستیاب نہیں ہے۔ اس کے کورس کی معلومات اور اطلاعات رکھی گئی ہیں۔
+Saved only on this device.	صرف اسی فون پر محفوظ کیا گیا۔
+Shared medicine history, access controlled by the patient.	شیئر کی گئی دوا تاریخچہ، رسائی مریض کے ہاتھ میں۔
+Reports are not proof a medicine was swallowed. Follow the prescriber's instructions.	اطلاع اس بات کا ثبوت نہیں کہ دوا سچ میں لی گئی۔ دوا لکھنے والے کی ہدایات مانیں۔
+Prescription date not recorded	نسخے کی تاریخ درج نہیں
+Saved past prescription · names and instructions below retain the reviewed last-active list at replacement. Earlier removed medicines and intake reports remain in history.	محفوظ پرانا نسخہ · نیچے کے نام اور ہدایات بدلتے وقت کی آخری جانچی ہوئی فہرست کے ہیں۔ پہلے ہٹائی گئی دوائیں اور دوا لینے کی اطلاعات تاریخچہ میں رہتی ہیں۔
+Instructions not recorded	ہدایات درج نہیں
+Removed earlier ${medicineTime(row.removedAt)}	پہلے ${medicineTime(row.removedAt)} کو ہٹائی گئی
+Add a prescription	نسخہ شامل کریں
+Add reviewed medicines to the current list. Existing medicines are not stopped or replaced automatically.	جانچی ہوئی دوائیں موجودہ فہرست میں شامل کریں۔ موجودہ دوائیں اپنے آپ بند یا تبدیل نہیں ہوتیں۔
+Enter medicine manually	دوا ہاتھ سے لکھیں
+Scan prescription and review	نسخہ اسکین کر کے جانچیں
+If this replaces an earlier course, move only the relevant older medicines to Past after confirming the change. Their reports remain available.	اگر یہ پرانے کورس کی جگہ لے رہا ہے، تو تبدیلی پکی کرنے کے بعد صرف وہی پرانی دوائیں پرانی فہرست میں ڈالیں۔ ان کی اطلاعات باقی رہیں گی۔
+Move to past medicines?	پرانی دواؤں میں ڈالیں؟
+Return to current medicines?	موجودہ دواؤں میں واپس ڈالیں؟
+${item.title}: only make this change when the prescription or care plan calls for it. This does not delete directions or intake history.	${item.title}: یہ تبدیلی تبھی کریں جب نسخے یا دیکھ بھال کے منصوبے میں ایسا ہو۔ اس سے ہدایات یا دوا لینے کی تاریخچہ نہیں مٹتی۔
+Reason (optional)	وجہ (اختیاری)
+Confirm change	تبدیلی پکی کریں
+Keep unchanged	جیسا ہے رکھیں
+Planned: ${medicineTime(event.plannedAt)}	طے: ${medicineTime(event.plannedAt)}
+$it · exact time not recorded	$it · صحیح وقت درج نہیں
+Exact time not recorded	صحیح وقت درج نہیں
+Logged: ${medicineTime(event.loggedAt)}	درج: ${medicineTime(event.loggedAt)}
+Reporter: 	بتانے والے: 
+Late reported	دیر سے لینے کی اطلاع
+Check-off corrected	ٹک درست کیا گیا
+Moved to past medicines	پرانی دواؤں میں ڈالی گئی
+Returned to current medicines	موجودہ دواؤں میں واپس
+Not logged	درج نہیں
+Plan followed by a report	منصوبے کے بعد اطلاع ملی
+Record medicine report	دوا کی اطلاع درج کریں
+Record what was reported. Leave a time blank if it is unknown. New reports do not erase earlier reports.	جو بتایا گیا وہی درج کریں۔ وقت معلوم نہ ہو تو خالی چھوڑیں۔ نئی اطلاع سے پرانی نہیں مٹتی۔
+Taken	لی
+Skipped	چھوڑی
+Planned	طے
+For planned dose: ${medicineTime(plan.plannedAt)}	طے شدہ خوراک کے لیے: ${medicineTime(plan.plannedAt)}
+Planned: 	طے: 
+Clear planned time	طے شدہ وقت ہٹائیں
+Reported taken: ${medicineTime(taken)}	لینے کا بتایا وقت: ${medicineTime(taken)}
+Clear taken time	لینے کا وقت ہٹائیں
+Who supplied this report?	یہ اطلاع کس نے دی؟
+Patient report	مریض نے بتایا
+Family report	گھر والوں نے بتایا
+Doctor report	ڈاکٹر نے بتایا
+Details / correction (optional)	تفصیل / درستی (اختیاری)
+Check the report fields.	اطلاع کے خانے جانچیں۔
+Save report	اطلاع محفوظ کریں
+Not answered in this conversation	اس بات چیت میں جواب نہیں ملا
+Transcription	بات چیت کی تحریر
+No transcript was saved with this note.	اس نوٹ کے ساتھ کوئی تحریر محفوظ نہیں کی گئی۔
+Said in the conversation (found by matching words)	بات چیت میں کہا گیا (الفاظ ملا کر ڈھونڈا)
+No audio saved on this device for this conversation.	اس بات چیت کا کوئی آڈیو اس فون پر محفوظ نہیں۔
+Audio 1	آڈیو 1
+Recorded $recorded	ریکارڈ ہوا $recorded
+Back 10 seconds	10 سیکنڈ پیچھے
+Pause audio	آڈیو روکیں
+Play audio	آڈیو چلائیں
+Forward 10 seconds	10 سیکنڈ آگے
+This recording could not be opened.	یہ ریکارڈنگ نہیں کھل سکی۔
+Handover at a glance	ایک نظر میں ہینڈ اوور
+Previous care professional	پچھلے دیکھ بھال پیشہ ور
+Name not recorded	نام درج نہیں
+Not a verified note author or an assigned doctor	تصدیق شدہ نوٹ لکھنے والے یا مقرر ڈاکٹر نہیں
+Clinical assessment: ${overview.clinicalAssessment}	کلینیکل جائزہ: ${overview.clinicalAssessment}
+Professional role not recorded	پیشہ ورانہ کردار درج نہیں
+No previous professional is documented.	کوئی پچھلا پیشہ ور درج نہیں۔
+Background summary	پس منظر کا خلاصہ
+Background recorded earlier; not a current clinical assessment.	پہلے درج پس منظر؛ موجودہ کلینیکل جائزہ نہیں۔
+Care handover	دیکھ بھال ہینڈ اوور
+Last reported update	پچھلا بتایا اپڈیٹ
+No patient or family update recorded.	مریض یا گھر والوں کا کوئی اپڈیٹ درج نہیں۔
+View reported updates	بتائے گئے اپڈیٹ دیکھیں
+No published conversation recorded.	کوئی شائع بات چیت درج نہیں۔
+Discussion brief	گفتگو کا خلاصہ
+Questions to carry forward	آگے لے جانے والے سوال
+Open conversations & Care Notes	بات چیت اور کیئر نوٹ کھولیں
+Next visit & actions	اگلی وزٹ اور کام
+No upcoming visit recorded.	آگے کی کوئی وزٹ درج نہیں۔
+Recorded next steps	درج اگلے قدم
+Next steps are copied from the selected discussion, not generated treatment advice.	اگلے قدم چنی گئی گفتگو سے لیے گئے ہیں، بنایا گیا علاج کا مشورہ نہیں۔
+View report summaries	اطلاعات کا خلاصہ دیکھیں
+Earlier discussions (${earlierDiscussions.size})	پرانی گفتگو (${earlierDiscussions.size})
+Original discussion source	گفتگو کا اصل ذریعہ
+Original source not recorded.	اصل ذریعہ درج نہیں۔
+Version ${discussion.versionNumber} · not a verified clinical note	ورژن ${discussion.versionNumber} · تصدیق شدہ کلینیکل نوٹ نہیں
+Earlier discussion · not a verified clinical note	پرانی گفتگو · تصدیق شدہ کلینیکل نوٹ نہیں
+Self-entered reviewer: 	خود لکھے جائزہ کار: 
+ · identity not verified	 · شناخت کی تصدیق نہیں
+Discussion author: 	گفتگو لکھنے والے: 
+Source: ${discussion.sourceLabel}	ذریعہ: ${discussion.sourceLabel}
+Care today	آج کی دیکھ بھال
+Read the recorded discussion.	درج گفتگو پڑھیں۔
+Read exact version ${note.version}	ورژن ${note.version} پڑھیں
+Read-only access. A permitted editor must add a visit.	صرف پڑھنے کی رسائی۔ وزٹ اجازت والا شخص ہی شامل کر سکتا ہے۔
+No upcoming visits recorded	آگے کی کوئی وزٹ درج نہیں
+Add a visit to plan the next conversation.	اگلی بات چیت طے کرنے کے لیے وزٹ شامل کریں۔
+None recorded	کچھ درج نہیں
+No upcoming visit	آگے کوئی وزٹ نہیں
+Medicines today	آج کی دوائیں
+No medicines listed	کوئی دوا درج نہیں
+marked as taken	لی گئی بتائی
+Open questions	کھلے سوال
+in the latest care note	تازہ کیئر نوٹ میں
+Care story and next steps	دیکھ بھال کی کہانی اور اگلے قدم
+Read overview	خلاصہ پڑھیں
+Reported condition	بتائی گئی حالت
+Today's reported condition	آج کی بتائی گئی حالت
+No update today	آج کوئی اپڈیٹ نہیں
+No update reported today	آج کوئی اپڈیٹ نہیں بتایا گیا
+Last report: ${doctorRecordedTime(it.created, zone)}	پچھلی اطلاع: ${doctorRecordedTime(it.created, zone)}
+No check-ins yet	ابھی کوئی حال نہیں بتایا
+Patient / family report	مریض / گھر والوں کی اطلاع
+Reported by the patient or family.	مریض یا گھر والوں نے بتایا۔
+View dated history	تاریخ وار تاریخچہ دیکھیں
+Doctor: 	ڈاکٹر: 
+ · saved plan, not a confirmed booking	 · محفوظ منصوبہ، پکی بکنگ نہیں
+Last recorded reviewer	پچھلے درج جائزہ کار
+No saved care note	کوئی محفوظ کیئر نوٹ نہیں
+From latest saved care note	تازہ محفوظ کیئر نوٹ سے
+Clinical assessment	کلینیکل جائزہ
+Priorities from the saved discussion, not a current clinical assessment.	محفوظ گفتگو کی ترجیحات، موجودہ کلینیکل جائزہ نہیں۔
+No care discussion recorded yet	ابھی دیکھ بھال کی کوئی گفتگو درج نہیں
+Saved discussions will appear here without replacing earlier versions.	محفوظ گفتگو یہاں دکھائی دے گی، پرانے ورژن باقی رہیں گے۔
+Care note · version ${note.version}	کیئر نوٹ · ورژن ${note.version}
+Recorded reviewer: 	درج جائزہ کار: 
+Who attended	کون موجود تھا
+Discussion	گفتگو
+Read exact note and source	اصل نوٹ اور ذریعہ پڑھیں
+Reported condition history	بتائی گئی حالت کی تاریخچہ
+Dated self-reports, not a clinical score.	تاریخ والی اپنی اطلاعات، کلینیکل اسکور نہیں۔
+No check-ins recorded yet	ابھی کوئی حال درج نہیں
+Updates will appear here when recorded.	درج ہونے پر اپڈیٹ یہاں دکھائی دیں گے۔
+Last 30 days	پچھلے 30 دن
+No reports in the last 30 days.	پچھلے 30 دنوں میں کوئی اطلاع نہیں۔
+A count of recorded self-reports, ${doctorPlural(recent.size)}.	درج اپنی اطلاعات کی گنتی: ${doctorPlural(recent.size)}۔
+Search updates	اپڈیٹ تلاش کریں
+Showing all ${doctorPlural(checks.size)}	سبھی ${doctorPlural(checks.size)} دکھائے جا رہے ہیں
+Showing ${shown.size} of ${doctorPlural(checks.size)}	${doctorPlural(checks.size)} میں سے ${shown.size} دکھائے جا رہے ہیں
+No updates match	کوئی اپڈیٹ نہیں ملا
+Try different words or remove a filter.	دوسرے الفاظ آزمائیں یا کوئی فلٹر ہٹائیں۔
+Clear search and filters	تلاش اور فلٹر ہٹائیں
+No additional details recorded.	اور کوئی تفصیل درج نہیں۔
+Self-reported update; clinical assessment and reporter identity are not independently verified.	خود بتائی گئی اطلاع؛ کلینیکل جائزہ اور بتانے والے کی شناخت کی الگ سے تصدیق نہیں ہوئی۔
+View full update	پورا اپڈیٹ دیکھیں
+Questions were not saved. Keep this editor open and try again.	سوال محفوظ نہیں ہوئے۔ اسے کھلا رکھیں اور پھر کوشش کریں۔
+Keep up to 20 questions.	زیادہ سے زیادہ 20 سوال رکھیں۔
+Enter a question of 1–1000 characters.	1–1000 حروف کا سوال لکھیں۔
+Choose a note section for each question.	ہر سوال کے لیے نوٹ کا حصہ چنیں۔
+Keep each answer within 2000 characters.	ہر جواب 2000 حروف کے اندر رکھیں۔
+Questions could not be loaded. Retry before editing.	سوال نہیں کھلے۔ بدلنے سے پہلے پھر کوشش کریں۔
+The discussion or access changed. Reopen these questions.	گفتگو یا رسائی بدل گئی۔ یہ سوال پھر سے کھولیں۔
+Questions were not saved. Try again.	سوال محفوظ نہیں ہوئے۔ پھر کوشش کریں۔
+Retry questions	سوال پھر سے لائیں
+Remove this question?	یہ سوال ہٹائیں؟
+It is only your own preparation note. Removing it does not change any saved conversation or published note.	یہ صرف آپ کی اپنی تیاری کا نوٹ ہے۔ اسے ہٹانے سے کوئی محفوظ بات چیت یا شائع نوٹ نہیں بدلتا۔
+Remove question	سوال ہٹائیں
+Keep it	رہنے دیں
+Goals of care discussion	دیکھ بھال کے مقاصد پر گفتگو
+Your own questions to cover, saved on this device. Preparation only: not transcript evidence, not from the patient, and not part of a published note.	آپ کے اپنے سوال، جن پر بات کرنی ہے، اسی فون پر محفوظ۔ صرف تیاری: نہ بات چیت کا ثبوت، نہ مریض کی طرف سے، اور نہ کسی شائع نوٹ کا حصہ۔
+No questions yet. Add as many as you need.	ابھی کوئی سوال نہیں۔ جتنے چاہیں شامل کریں۔
+${m.rows.size} of $DOCTOR_PREPARATION_MAX_QUESTIONS questions	$DOCTOR_PREPARATION_MAX_QUESTIONS میں سے ${m.rows.size} سوال
+Question ${index + 1}	سوال ${index + 1}
+Question	سوال
+Save question	سوال محفوظ کریں
+Add question	سوال شامل کریں
+New question	نیا سوال
++ Add question	+ سوال شامل کریں
+Answers to your questions	آپ کے سوالوں کے جواب
+Typed answers are your own notes, kept on this device and outside any published note. Unanswered questions are listed so you can fill them in.	لکھے گئے جواب آپ کے اپنے نوٹ ہیں، اسی فون پر رہتے ہیں اور کسی شائع نوٹ میں نہیں جاتے۔ بغیر جواب والے سوال یہاں دکھائے جاتے ہیں تاکہ آپ انہیں بھر سکیں۔
+No questions were prepared.	کوئی سوال تیار نہیں کیا گیا۔
+Every question has an answer.	ہر سوال کا جواب موجود ہے۔
+$unanswered of ${m.rows.size} still need an answer.	${m.rows.size} میں سے $unanswered کا جواب ابھی باقی ہے۔
+Answered	جواب ملا
+Unanswered	جواب باقی
+Your answer	آپ کا جواب
+Save answer	جواب محفوظ کریں
+New prescription	نیا نسخہ
+Edit current list	موجودہ فہرست بدلیں
+Copy the prescriber's instructions exactly. This form does not recommend drugs or doses.	دوا لکھنے والے کی ہدایات ویسے ہی لکھیں۔ یہ فارم دوا یا خوراک تجویز نہیں کرتا۔
+Prescription label	نسخے کا نام
+Prescription date (YYYY-MM-DD, optional)	نسخے کی تاریخ (YYYY-MM-DD، اختیاری)
+Medicine ${index+1}	دوا ${index+1}
+Instructions as prescribed	لکھی گئی ہدایات
+Remove from current list	موجودہ فہرست سے ہٹائیں
+Add another medicine	ایک اور دوا شامل کریں
+Replace the entire current prescription after saving this reviewed list. Keep the previous prescription and its history in Past.	یہ جانچی ہوئی فہرست محفوظ کرنے کے بعد پورا موجودہ نسخہ بدلیں۔ پچھلا نسخہ اور اس کی تاریخچہ پرانے میں رکھیں۔
+Removing a medicine only ends its current-list membership. Earlier directions, prescriptions and intake reports are retained.	دوا ہٹانے سے وہ صرف موجودہ فہرست سے ہٹتی ہے۔ پرانی ہدایات، نسخے اور دوا لینے کی اطلاعات باقی رہتی ہیں۔
+I reviewed every medicine name and instruction against the prescription.	میں نے ہر دوا کا نام اور ہدایت نسخے سے ملا لی ہے۔
+Cancel and refresh the current list before reviewing again. After a connection error, check the saved state rather than assuming success or failure.	پھر سے جانچنے سے پہلے منسوخ کر کے فہرست تازہ کریں۔ انٹرنیٹ کی خرابی کے بعد کامیاب یا ناکام ماننے کے بجائے محفوظ حالت دیکھیں۔
+Add a prescription label and each medicine name.	نسخے کا نام اور ہر دوا کا نام لکھیں۔
+Save reviewed prescription	جانچا ہوا نسخہ محفوظ کریں
+Save list	فہرست محفوظ کریں
+Reported updates	بتائے گئے اپڈیٹ
+A history of patient and family reports, not a clinical assessment.	مریض اور گھر والوں کی اطلاعات کی تاریخچہ، کلینیکل جائزہ نہیں۔
+Times shown in ${it.zoneId}	وقت ${it.zoneId} کے مطابق
+No reported updates recorded.	کوئی بتایا گیا اپڈیٹ درج نہیں۔
+Patient reported	مریض نے بتایا
+Family reported	گھر والوں نے بتایا
+Latest update	تازہ اپڈیٹ
+Earlier update	پرانا اپڈیٹ
+More details	مزید تفصیل
+Dates reflect when each update was recorded.	تاریخیں بتاتی ہیں کہ ہر اپڈیٹ کب درج ہوا۔
+At this update	اس اپڈیٹ میں
+Times shown in ${report.zoneId}	وقت ${report.zoneId} کے مطابق
+Symptoms and condition	علامات اور حالت
+No symptom update or clinical assessment was recorded in this report. This does not mean there were no symptoms.	اس اطلاع میں علامات یا کلینیکل جائزہ درج نہیں۔ اس کا مطلب یہ نہیں کہ کوئی علامت نہیں تھی۔
+Reported symptoms: $it	بتائی گئی علامات: $it
+Recorded clinical assessment: $it	درج کلینیکل جائزہ: $it
+Specific questions were not recorded.	کوئی خاص سوال درج نہیں۔
+Family coordination	گھر والوں کا تال میل
+No transport arrangement or booking was recorded.	آنے جانے کا انتظام یا بکنگ درج نہیں۔
+Medicine activity for this day	اس دن کی دوا سرگرمی
+As known at this update. Separate activity scheduled on the same day—not information supplied by this update. Later logs are excluded. Not verified ingestion or prescribing instructions.	اس اپڈیٹ کے وقت کی معلومات۔ اسی دن طے الگ سرگرمی—یہ اس اپڈیٹ نے نہیں بتائی۔ بعد کے اندراج شامل نہیں۔ دوا لینے یا لکھنے کی ہدایات کی تصدیق نہیں۔
+Planned: ${progressTimestamp(dose.scheduledAt, report.zoneId)}	طے: ${progressTimestamp(dose.scheduledAt, report.zoneId)}
+Linked discussion	جڑی گفتگو
+Report linked to this discussion. Author and date are not recorded.	اطلاع اس گفتگو سے جڑی ہے۔ لکھنے والا اور تاریخ درج نہیں۔
+Other information	دیگر معلومات
+specific questions	خاص سوال
+family arrangements	گھر والوں کے انتظامات
+a linked discussion	جڑی گفتگو
+a linked visit	جڑی وزٹ
+This update does not record ${unknowns.joinToString(", ")}. Visit history is separate.	اس اپڈیٹ میں ${unknowns.joinToString(", ")} درج نہیں۔ وزٹ کی تاریخچہ الگ ہے۔
+No related medicine activity was scheduled on this report date.	اس اطلاع کی تاریخ پر کوئی متعلقہ دوا سرگرمی طے نہیں تھی۔
+Open patient visits	مریض کی وزٹ کھولیں
+Recording $clock	ریکارڈ ہو رہا ہے $clock
+Choose Record, Dictate or Type, start new, or go back to who is here	ریکارڈ، بول کر لکھیں یا ٹائپ چنیں، نیا شروع کریں، یا کون موجود ہے پر واپس جائیں
+ · unavailable	 · دستیاب نہیں
+ · current	 · موجودہ
+Saving local audio and its consent record…	فون پر آڈیو اور اس کی رضامندی محفوظ کی جا رہی ہے…
+The audio file was retained, but its recording details could not be saved. Retry before continuing.	آڈیو فائل رکھی گئی، لیکن ریکارڈنگ کی تفصیل محفوظ نہیں ہو سکی۔ آگے بڑھنے سے پہلے پھر کوشش کریں۔
+Collapse saved audio	محفوظ آڈیو بند کریں
+Expand saved audio	محفوظ آڈیو کھولیں
+Saved Audio · $audioCount	محفوظ آڈیو · $audioCount
+Saved Audio	محفوظ آڈیو
+What matters most to the patient?	مریض کے لیے سب سے اہم کیا ہے؟
+Who would the patient like involved?	مریض کسے شامل کرنا چاہتے ہیں؟
+What questions or concerns remain?	کون سے سوال یا فکریں باقی ہیں؟
+What is still undecided?	ابھی کیا طے نہیں ہوا؟
+What are the agreed next steps?	آگے کے کون سے قدم طے ہوئے؟
+Recording paused	ریکارڈنگ رکی ہوئی ہے
+Recording audio	آڈیو ریکارڈ ہو رہا ہے
+Record audio	آڈیو ریکارڈ کریں
+Saved locally	فون پر محفوظ
+Ready when everyone agrees	سب کی رضامندی کے بعد تیار
+Audio capture is paused.	آڈیو ریکارڈنگ رکی ہوئی ہے۔
+Waiting for a measured microphone level.	مائیکروفون کی آواز کی سطح آنے کا انتظار۔
+Live microphone levels	مائیکروفون کی ابھی کی آواز
+Resume	پھر شروع کریں
+Pause	روکیں
+Stop & save	روکیں اور محفوظ کریں
+Capture a conversation on this device. Recording starts only after consent and microphone permission.	اسی فون پر بات چیت ریکارڈ کریں۔ ریکارڈنگ رضامندی اور مائیکروفون کی اجازت کے بعد ہی شروع ہوتی ہے۔
+Pause recording playback	ریکارڈنگ چلانا روکیں
+Saved on this device	اسی فون پر محفوظ
+Record another conversation	ایک اور بات چیت ریکارڈ کریں
+Recording playback position	ریکارڈنگ میں ابھی کی جگہ
+Preparing transcript…	تحریر تیار ہو رہی ہے…
+Transcribe & draft Care Note	تحریر بنائیں اور کیئر نوٹ کا ڈرافٹ تیار کریں
+Conversation transcript	بات چیت کی تحریر
+Written from the conversation audio above. Play it back while you read.	اوپر کے بات چیت والے آڈیو سے لکھا گیا۔ پڑھتے وقت اسے چلا کر سنیں۔
+Not linked to a recording yet.	ابھی کسی ریکارڈنگ سے جڑا نہیں۔
+Prepared transcript · not taken from this recording	پہلے سے لکھی تحریر · اس ریکارڈنگ سے نہیں
+Online transcript · check every word against the audio	آن لائن تحریر · ہر لفظ آڈیو سے جانچیں
+Manually entered · check wording and speakers	ہاتھ سے لکھا · الفاظ اور بولنے والے جانچیں
+No transcript yet	ابھی کوئی تحریر نہیں
+Transcript · tap to edit	تحریر · بدلنے کے لیے چھوئیں
+Type or paste what was said, then correct any words that are wrong.	جو کہا گیا وہ لکھیں یا پیسٹ کریں، پھر غلط الفاظ ٹھیک کریں۔
+Goals of Care review	دیکھ بھال کے مقاصد کی جانچ
+Check what was covered. Missing text does not mean a topic was not discussed or that anyone agreed.	دیکھیں کس پر بات ہوئی۔ تحریر میں کچھ نہ ہونے کا مطلب یہ نہیں کہ اس پر بات نہیں ہوئی یا کوئی راضی ہوا۔
+Not assessed	جانچا نہیں
+Discussed · manually reviewed	بات ہوئی · ہاتھ سے جانچا
+Discussed · source linked	بات ہوئی · ذریعہ جڑا
+Not found in transcript	تحریر میں نہیں ملا
+Source: ${item.quote}	ذریعہ: ${item.quote}
+Audio is not automatically transcribed, so the words must be checked by a person. Audio stays on this device and is not included when a written note is shared.	آڈیو اپنے آپ تحریر میں نہیں بدلتا، اس لیے الفاظ کسی شخص کو جانچنے ہوں گے۔ آڈیو اسی فون پر رہتا ہے اور لکھا نوٹ شیئر کرنے پر ساتھ نہیں جاتا۔
+$patientName's records	$patientName کے ریکارڈ
+Search report summaries	رپورٹ کے خلاصے تلاش کریں
+Browse categories	زمرے دیکھیں
+All summaries	سبھی خلاصے
+Report summaries	رپورٹ کے خلاصے
+No matching summaries	کوئی خلاصہ نہیں ملا
+No summaries in this category	اس زمرے میں کوئی خلاصہ نہیں
+Try another category or clear your search. This patient has text summaries only, not attached files.	دوسرا زمرہ چنیں یا تلاش مٹائیں۔ اس مریض کے صرف لکھے خلاصے ہیں، فائلیں نہیں۔
+Show all summaries	سبھی خلاصے دکھائیں
+Open report summary	رپورٹ کا خلاصہ کھولیں
+Summary only · No file attached	صرف خلاصہ · کوئی فائل نہیں
+Original documents, dates and authors have not been supplied.	اصل کاغذات، تاریخیں اور لکھنے والے نہیں دیے گئے۔
+Text summary · No original file attached	لکھا خلاصہ · کوئی اصل فائل نہیں
+Summary	خلاصہ
+Source: ${report.sourceLabel}	ذریعہ: ${report.sourceLabel}
+Document date: Not recorded	کاغذ کی تاریخ: درج نہیں
+This is a text summary, not a verified medical report. There is no original document to download, share or interpret.	یہ لکھا خلاصہ ہے، تصدیق شدہ میڈیکل رپورٹ نہیں۔ ڈاؤن لوڈ، شیئر یا سمجھنے کے لیے کوئی اصل کاغذ نہیں ہے۔
+No audio recorded yet. Drag this down and record to add one.	ابھی کوئی آڈیو ریکارڈ نہیں ہوا۔ اسے نیچے کھینچیں اور ریکارڈ کر کے شامل کریں۔
+Play	چلائیں
+Continue to transcript →	تحریر پر آگے بڑھیں →
+part	حصہ
+Symptoms and pain	علامات اور درد
+From the patient's and family's own notes. 0 = none, 10 = worst.	مریض اور گھر والوں کے اپنے نوٹ سے۔ 0 = بالکل نہیں، 10 = سب سے زیادہ۔
+No symptom notes yet.	ابھی علامات کا کوئی نوٹ نہیں۔
+Symptom	علامت
+Latest	تازہ
+Highest\n7 days	7 دن میں\nسب سے زیادہ
+up from $before	$before سے بڑھا
+down from $before	$before سے گھٹا
+same as before	پہلے جیسا
+only one entry	صرف ایک اندراج
+Highest in 7 days	7 دن میں سب سے زیادہ
+none	کوئی نہیں
+Tap to hide chart.	چارٹ چھپانے کے لیے چھوئیں۔
+Tap to see chart.	چارٹ دیکھنے کے لیے چھوئیں۔
+$arrow from $before	$arrow $before سے
+View pain on body	جسم پر درد دیکھیں
+The reply after the question on line $it. Check it against the conversation before you accept.	سطر $it کے سوال کے بعد کا جواب۔ قبول کرنے سے پہلے بات چیت سے ملا لیں۔
+This line shares words with the question. Check it against the conversation before you accept.	اس سطر کے کچھ الفاظ سوال سے ملتے ہیں۔ قبول کرنے سے پہلے بات چیت سے ملا لیں۔
+$covered of ${rows.size} covered	${rows.size} میں سے $covered پر بات ہو گئی
+Covered · answer saved	بات ہو گئی · جواب محفوظ
+Suggested from the transcript · found by matching words	تحریر سے مشورہ · الفاظ ملا کر ڈھونڈا
+Goals-of-care checklist	دیکھ بھال کے مقاصد کی فہرست
+No goals-of-care questions were added before recording. Add them on the Who's here page.	ریکارڈنگ سے پہلے دیکھ بھال کے مقاصد کے سوال شامل نہیں کیے گئے۔ انہیں "کون موجود ہے" صفحے پر شامل کریں۔
+Suggestions come from matching words in the transcript. Accept or edit each answer before the note is saved.	مشورے تحریر کے الفاظ ملا کر آتے ہیں۔ نوٹ محفوظ ہونے سے پہلے ہر جواب قبول کریں یا بدلیں۔
+From line ${answerLine.number} · show in transcript	سطر ${answerLine.number} سے · تحریر میں دکھائیں
+Your own words · not linked to a transcript line	آپ کے اپنے الفاظ · تحریر کی کسی سطر سے جڑے نہیں
+Suggested from the transcript · found by matching words · line ${suggestion.line.number}	تحریر سے مشورہ · الفاظ ملا کر ڈھونڈا · سطر ${suggestion.line.number}
+Show this line in the transcript	یہ سطر تحریر میں دکھائیں
+Show line	سطر دکھائیں
+Accept	قبول کریں
+Write the answer	جواب لکھیں
+No answer yet.	ابھی کوئی جواب نہیں۔
+Practice · written in advance for the walkthrough, not taken from your recording	مشق · ڈیمو کے لیے پہلے سے لکھا ہوا، آپ کی ریکارڈنگ سے نہیں لیا گیا
+Transcript · $model. Check names, numbers and meaning against the audio.	تحریر · $model۔ نام، نمبر اور مطلب آڈیو سے ملا لیں۔
+Typed or dictated here · check every word	یہاں لکھا یا بول کر لکھوایا گیا · ہر لفظ جانچیں
+Ticks update as the words are typed, dictated or transcribed	الفاظ لکھنے، بول کر لکھوانے یا تحریر بننے کے ساتھ ٹِک بدلتے ہیں
+Check the linked records and shorten the note.	جڑے ریکارڈ جانچیں اور نوٹ چھوٹا کریں۔
+Link exact records (optional)	ریکارڈ جوڑیں (اختیاری)
+Linked health details remain protected by their own sharing permissions.	جڑی صحت کی معلومات اپنی شیئر کرنے کی اجازت سے محفوظ رہتی ہیں۔
+Condition update	حالت کا اپڈیٹ
+Care discussion	دیکھ بھال کی گفتگو
+Plan a visit	وزٹ طے کریں
+This visit stays with this care profile on this device.	یہ وزٹ اسی فون پر اس دیکھ بھال پروفائل کے ساتھ رہتی ہے۔
+Save to this patient's shared care record. They can see the visit after refreshing their app.	اس مریض کے شیئر کیے گئے دیکھ بھال ریکارڈ میں محفوظ کریں۔ ایپ تازہ کرنے پر انہیں وزٹ دکھائی دے گی۔
+This is the appointment's doctor label, not proof of professional verification.	یہ اپائنٹمنٹ کے ڈاکٹر کا نام ہے، پیشہ ورانہ تصدیق کا ثبوت نہیں۔
+Time zone: $zoneLabel	ٹائم زون: $zoneLabel
+Place or visit type (optional)	جگہ یا وزٹ کی قسم (اختیاری)
+Appointment logistics (optional)	اپائنٹمنٹ کا انتظام (اختیاری)
+Keep health condition and discussion details in the protected records linked below.	صحت کی حالت اور گفتگو کی تفصیل نیچے جڑے محفوظ ریکارڈ میں رکھیں۔
+Opening this person's visits…	اس شخص کی وزٹ کھل رہی ہیں…
+Read-only access. A permitted editor must plan a visit.	صرف پڑھنے کی رسائی۔ وزٹ اجازت والا شخص ہی طے کر سکتا ہے۔
+Appointments and recorded visit summaries	اپائنٹمنٹ اور درج وزٹ کے خلاصے
+All appointments	سبھی اپائنٹمنٹ
+A past date alone does not mean the visit happened.	صرف پرانی تاریخ سے یہ نہیں مانا جاتا کہ وزٹ ہوئی۔
+No visits recorded yet	ابھی کوئی وزٹ درج نہیں
+Plan a visit to keep its time and later discussion together.	وزٹ طے کریں تاکہ اس کا وقت اور بعد کی گفتگو ساتھ رہیں۔
+Doctor not recorded	ڈاکٹر درج نہیں
+Planned: ${visitDate(item)}	طے: ${visitDate(item)}
+Planned\n${visitDate(item)}	طے\n${visitDate(item)}
+Care review visit	دیکھ بھال جائزہ وزٹ
+Open visit details	وزٹ کی تفصیل کھولیں
+Back to visits	وزٹ پر واپس
+Visit details	وزٹ کی تفصیل
+Completion recorded: ${visitSourceDate(it)}	مکمل ہونا درج: ${visitSourceDate(it)}
+Completion time not recorded.	مکمل ہونے کا وقت درج نہیں۔
+Place / visit type	جگہ / وزٹ کی قسم
+Not recorded for this visit.	اس وزٹ کے لیے درج نہیں۔
+Linked update is not accessible or no longer available.	جڑا اپڈیٹ کھل نہیں سکتا یا اب دستیاب نہیں۔
+Discussion not recorded in this note.	اس نوٹ میں گفتگو درج نہیں۔
+Linked care note is not accessible or no longer available.	جڑا کیئر نوٹ کھل نہیں سکتا یا اب دستیاب نہیں۔
+Linked condition report	جڑی حالت کی اطلاع
+Discussion linked to this visit	اس وزٹ سے جڑی گفتگو
+Visit notes	وزٹ کے نوٹ
+These are this visit's recorded details, not information inferred from other notes or check-ins.	یہ اسی وزٹ کی درج تفصیل ہے، دوسرے نوٹ یا حال سے اندازہ نہیں۔
+Plan another visit	ایک اور وزٹ طے کریں
+Edit or reschedule	بدلیں یا وقت بدلیں
+Mark completed	مکمل ہوئی
+No requests in this group.	اس گروپ میں کوئی درخواست نہیں۔
+Listed under ${request.requestedBy.lowercase()} · ${workflowDate(request.createdAt)}	${request.requestedBy.lowercase()} میں درج · ${workflowDate(request.createdAt)}
+Marked as planned on this device	اس فون پر طے شدہ درج
+Plan this	اسے طے کریں
+Deferred on this device	اس فون پر ٹالا گیا
+Defer	ٹالیں
+Marked complete on this device	اس فون پر مکمل درج
+Complete discussion	گفتگو مکمل کریں
+This is your own list. Status changes stay on this device: nobody is notified, invited or called, and no hospital appointment is reserved.	یہ آپ کی اپنی فہرست ہے۔ حالت کی تبدیلیاں اسی فون پر رہتی ہیں: کسی کو اطلاع، دعوت یا کال نہیں جاتی، اور اسپتال کی کوئی اپائنٹمنٹ بک نہیں ہوتی۔
+Workspace	ورک اسپیس
+Document the care discussion	دیکھ بھال کی گفتگو درج کریں
+Your existing source was kept. Use an empty draft for a new transcript.	آپ کا موجودہ ذریعہ رکھا گیا۔ نئی تحریر کے لیے خالی ڈرافٹ لیں۔
+The account or recording changed. No result was inserted.	اکاؤنٹ یا ریکارڈنگ بدل گئی۔ کوئی نتیجہ نہیں ڈالا گیا۔
+ The returned transcript is preserved below for review.	 واپس آئی تحریر جانچ کے لیے نیچے رکھی ہے۔
+Transcript saved. AI drafting did not finish: ${result.draftError}	تحریر محفوظ ہو گئی۔ AI ڈرافٹ مکمل نہیں ہوا: ${result.draftError}
+Transcript saved; existing note fields kept. $draftingError	تحریر محفوظ ہو گئی؛ نوٹ کے موجودہ خانے رکھے گئے۔ $draftingError
+Transcript saved. No AI draft was returned.	تحریر محفوظ ہو گئی۔ کوئی AI ڈرافٹ واپس نہیں آیا۔
+Transcript and AI draft ready. Check every word against the recording.	تحریر اور AI ڈرافٹ تیار۔ ہر لفظ ریکارڈنگ سے ملائیں۔
+Online processing could not finish. The local audio is kept.	آن لائن پروسیسنگ مکمل نہیں ہوئی۔ فون کا آڈیو رکھا گیا ہے۔
+Previous discussion	پچھلی گفتگو
+Practice care note v${previous.number}	مشق کیئر نوٹ v${previous.number}
+No next steps recorded.	کوئی اگلا قدم درج نہیں۔
+Read exact version	اصل ورژن پڑھیں
+No previous discussion	کوئی پچھلی گفتگو نہیں
+Start a conversation below.	نیچے بات چیت شروع کریں۔
+Source text as entered, not a verified clinical note.	جیسا لکھا گیا ویسا ذریعہ، تصدیق شدہ کلینیکل نوٹ نہیں۔
+Guided discussion checklist	گفتگو کی فہرست
+Record what was covered. Leaving a topic open does not imply agreement.	جس پر بات ہوئی وہ درج کریں۔ کسی موضوع کو کھلا چھوڑنے کا مطلب رضامندی نہیں۔
+Not discussed	بات نہیں ہوئی
+Participant permissions	شرکاء کی اجازت
+See each person's separate selections. This screen does not record or upload audio.	ہر شخص کے الگ انتخاب دیکھیں۔ یہ اسکرین آڈیو ریکارڈ یا اپلوڈ نہیں کرتی۔
+Participant name	شریک کا نام
+Purpose	مقصد
+Agrees to recording	ریکارڈنگ کے لیے راضی
+Separately agrees to cloud processing	کلاؤڈ پروسیسنگ کے لیے الگ سے راضی
+Participant selections saved locally	شرکاء کے انتخاب اسی فون پر محفوظ
+Save participant selections	شرکاء کے انتخاب محفوظ کریں
+Continue to document	درج کرنے پر آگے بڑھیں
+Use non-confidential, non-patient content only. Online processing is explicit; nothing is uploaded while recording. You can also type source text below.	صرف غیر خفیہ، اصل مریض سے الگ مواد استعمال کریں۔ آن لائن پروسیسنگ آپ خود چنتے ہیں؛ ریکارڈ کرتے وقت کچھ اپلوڈ نہیں ہوتا۔ آپ نیچے ذریعہ لکھ بھی سکتے ہیں۔
+Checked transcript added. Review the original words before publishing.	جانچی ہوئی تحریر شامل ہو گئی۔ شائع کرنے سے پہلے اصل الفاظ دیکھیں۔
+Couldn't add this transcript. Your original recording is unchanged.	یہ تحریر شامل نہیں ہو سکی۔ آپ کی اصل ریکارڈنگ ویسی ہی ہے۔
+Transcript: ${draft.transcriptProvider} / ${draft.transcriptModel} · ${workflowDate(draft.transcribedAt)}	تحریر: ${draft.transcriptProvider} / ${draft.transcriptModel} · ${workflowDate(draft.transcribedAt)}
+Online AI draft: ${draft.aiProvider} / ${draft.aiModel} · not clinically reviewed	آن لائن AI ڈرافٹ: ${draft.aiProvider} / ${draft.aiModel} · ڈاکٹر نے نہیں جانچا
+Returned transcript	واپس آئی تحریر
+Your existing work was not silently replaced.	آپ کا موجودہ کام چپکے سے نہیں بدلا گیا۔
+Practice draft loaded (written in advance, not AI)	مشق ڈرافٹ لوڈ ہوا (پہلے سے لکھا، AI نہیں)
+Load practice draft (written in advance, not AI)	مشق ڈرافٹ لوڈ کریں (پہلے سے لکھا، AI نہیں)
+Practice draft, written in advance · not AI · not clinically reviewed	مشق ڈرافٹ، پہلے سے لکھا · AI نہیں · ڈاکٹر نے نہیں جانچا
+Original source text	اصل ذریعہ
+Source references	ذریعے کے حوالے
+Consented conversation recording	رضامندی والی بات چیت کی ریکارڈنگ
+Transcript created ${workflowDate(draft.transcribedAt)} · ${draft.transcriptModel}	تحریر بنی ${workflowDate(draft.transcribedAt)} · ${draft.transcriptModel}
+Check the transcript against its original audio before review.	جانچ سے پہلے تحریر کو اصل آڈیو سے ملائیں۔
+Uncertainty stays visible	غیر یقینی بات دکھائی دیتی رہتی ہے
+AI may miss or misattribute words. Verify source evidence, leave unsupported fields blank and keep unresolved questions visible.	AI الفاظ چھوڑ سکتا ہے یا غلط شخص کے نام کر سکتا ہے۔ ذریعہ جانچیں، بغیر بنیاد والے خانے خالی چھوڑیں اور حل نہ ہوئے سوال دکھائی دیتے رہنے دیں۔
+The source does not state patient priorities or a treatment choice. Do not infer agreement.	ذریعے میں مریض کی ترجیحات یا علاج کا انتخاب نہیں لکھا۔ رضامندی کا اندازہ نہ لگائیں۔
+Source evidence · ${evidence.section}	ذریعے کا ثبوت · ${evidence.section}
+Questions & concerns	سوال اور فکریں
+Check the exact draft	اصل ڈرافٹ جانچیں
+Practice walkthrough · unverified	مشق واک تھرو · غیر تصدیق شدہ
+Professional verification is not connected. Publishing here creates an unverified version, not a verified clinical record.	ڈاکٹر کی تصدیق جڑی نہیں ہے۔ یہاں شائع کرنے سے غیر تصدیق شدہ ورژن بنتا ہے، تصدیق شدہ کلینیکل ریکارڈ نہیں۔
+Reviewer name (self-entered)	جائزہ کار کا نام (خود لکھا)
+I checked the original source text	میں نے اصل ذریعہ جانچا
+I reviewed every section and unresolved point	میں نے ہر حصہ اور حل نہ ہوئی بات جانچی
+Practice version saved on this phone	مشق ورژن اس فون پر محفوظ
+Save practice version	مشق ورژن محفوظ کریں
+Save & finish later	محفوظ کریں اور بعد میں مکمل کریں
+Draft changes are saved on this device.	ڈرافٹ کی تبدیلیاں اسی فون پر محفوظ ہوتی ہیں۔
+Version history	ورژن کی تاریخچہ
+Version ${item.number} · ${workflowDate(item.publishedAt)}	ورژن ${item.number} · ${workflowDate(item.publishedAt)}
+Text source; no uploaded original file.	لکھا ہوا ذریعہ؛ کوئی اصل فائل اپلوڈ نہیں۔
+In-app history only; no SMS, push or external delivery.	صرف ایپ کے اندر کی تاریخچہ؛ کوئی SMS، نوٹیفکیشن یا باہر بھیجنا نہیں۔
+Care Note · Version ${version.number}	کیئر نوٹ · ورژن ${version.number}
+Reviewer: ${version.reviewerName} (self-entered)	جائزہ کار: ${version.reviewerName} (خود لکھا)
+Exact source	اصل ذریعہ
+Recorded conversation · ${workflowDate(version.draft.transcribedAt)} · ${version.draft.transcriptModel}	ریکارڈ کی گئی بات چیت · ${workflowDate(version.draft.transcribedAt)} · ${version.draft.transcriptModel}
+Manually entered source	ہاتھ سے لکھا ذریعہ
+AI draft: ${version.draft.aiProvider} / ${version.draft.aiModel}	AI ڈرافٹ: ${version.draft.aiProvider} / ${version.draft.aiModel}
+Record what they told you	انہوں نے جو بتایا وہ درج کریں
+This version has not been shared with anyone, so no one has responded in the app. If the patient or a family member told you something about it in person, note it here as your own record. It is not their acknowledgement, consent or agreement.	یہ ورژن کسی کے ساتھ شیئر نہیں ہوا، اس لیے ایپ میں کسی نے جواب نہیں دیا۔ اگر مریض یا گھر والوں نے آپ کو آمنے سامنے کچھ بتایا، تو اسے اپنے ریکارڈ کے طور پر یہاں لکھیں۔ یہ ان کی تصدیق، رضامندی یا اتفاق نہیں ہے۔
+Nothing recorded for this version	اس ورژن کے لیے کچھ درج نہیں
+You noted: 	آپ نے لکھا: 
+Told me they read it	بتایا کہ پڑھ لیا
+Told me a concern	کوئی فکر بتائی
+Told me not ready	بتایا کہ ابھی تیار نہیں
+Password (optional)	پاس ورڈ (اختیاری)
+With a password, the PDF itself is locked (AES-256): any PDF reader asks for the password before showing the note. Tell the other person the password by phone, not in the same message.	پاس ورڈ دینے پر PDF خود لاک ہو جاتی ہے (AES-256): کوئی بھی PDF ایپ نوٹ دکھانے سے پہلے پاس ورڈ مانگے گی۔ پاس ورڈ فون پر بتائیں، اسی میسج میں نہیں۔
+Leave empty for a normal PDF	خالی چھوڑیں تو عام PDF
+Practice PDF created on this device	مشق PDF اسی فون پر بنی
+Locked PDF created on this device	لاک PDF اسی فون پر بنی
+Could not create the practice PDF. Try again.	مشق PDF نہیں بن سکی۔ پھر کوشش کریں۔
+Create practice PDF	مشق PDF بنائیں
+Create locked PDF	لاک PDF بنائیں
+No sharing app is available.	بھیجنے کے لیے کوئی ایپ نہیں ہے۔
+Share locked PDF	لاک PDF بھیجیں
+Share practice PDF	مشق PDF بھیجیں
+Emergency QR retrieval	ایمرجنسی QR سے دیکھنا
+Secure hospital retrieval is not connected. No QR code or public patient link is created in this practice walkthrough.	اسپتال کے لیے محفوظ طریقے سے دیکھنا ابھی جڑا نہیں ہے۔ اس مشق واک تھرو میں کوئی QR کوڈ یا عوامی لنک نہیں بنتا۔
+This online, account or device action is unavailable in the walkthrough. Your own care profiles are unchanged.	یہ آن لائن، اکاؤنٹ یا فون کا کام ڈیمو میں دستیاب نہیں ہے۔ آپ کی اپنی دیکھ بھال پروفائل نہیں بدلیں۔
+Only this selected person's records will appear here. Test patients and other care profiles are kept separate.	یہاں صرف چنے گئے شخص کے ریکارڈ دکھائی دیں گے۔ ٹیسٹ مریض اور باقی پروفائل الگ رہتی ہیں۔
+Demo care record · not saved to an account	ڈیمو دیکھ بھال ریکارڈ · کسی اکاؤنٹ میں محفوظ نہیں
+Care profile on this phone only	صرف اس فون کی دیکھ بھال پروفائل
+Shared care profile	شیئر کی گئی دیکھ بھال پروفائل
+No prescription is issued and no appointment is booked.	نہ کوئی نسخہ جاری ہوتا ہے، نہ کوئی اپائنٹمنٹ بک ہوتی ہے۔
+Read-only access · changes need the patient's permission	صرف پڑھنے کی رسائی · تبدیلی کے لیے مریض کی اجازت چاہیے
+Back to tools	ٹولز پر واپس
+Refreshing this person's access and records…	اس شخص کی رسائی اور ریکارڈ تازہ ہو رہے ہیں…
+Editing access is no longer available.	تبدیلی کی رسائی اب نہیں ہے۔
+Medicines, tasks, check-ins and journal	دوائیں، کام، روز کا حال اور ڈائری
+Planned care activities and visits	طے شدہ دیکھ بھال اور وزٹ
+Care team & requests	دیکھ بھال ٹیم اور درخواستیں
+Existing shared-care tasks and discussion requests	شیئر کی گئی دیکھ بھال کے کام اور گفتگو کی درخواستیں
+Reported results and earlier entries	بتائے گئے نتائج اور پرانے اندراج
+Nearby services and contact information	آس پاس کی سہولیات اور رابطہ
+Documents & care notes	کاغذات اور کیئر نوٹ
+Local reports, saved versions and sharing	فون کی رپورٹیں، محفوظ ورژن اور شیئر کرنا
+Reminders for medicines and planned care on this phone	اس فون پر دوا اور طے شدہ دیکھ بھال کی یاد دہانی
+Shared care & clinical review	شیئر کی گئی دیکھ بھال اور کلینیکل جائزہ
+Patient access, verification and submitted conversations	مریض کی رسائی، تصدیق اور بھیجی گئی بات چیت
+Privacy, exports & more	پرائیویسی، ایکسپورٹ اور مزید
+Export care notes and manage this care profile	کیئر نوٹ ایکسپورٹ کریں اور یہ پروفائل سنبھالیں
+Tell us about your experience	اپنا تجربہ بتائیں
+Everything for this person, without leaving the doctor workspace.	اس شخص کی ہر چیز، ڈاکٹر ورک اسپیس چھوڑے بغیر۔
+Goals of care (latest confirmed note)	دیکھ بھال کے مقاصد (تازہ تصدیق شدہ نوٹ)
+Emergency contacts	ایمرجنسی رابطے
+Current medicines	موجودہ دوائیں
+Card PDF saved	کارڈ PDF محفوظ ہو گئی
+Couldn't save the PDF. Try again.	PDF محفوظ نہیں ہو سکی۔ پھر کوشش کریں۔
+Locked PDF saved. It opens only with your password.	لاک PDF محفوظ ہو گئی۔ یہ صرف آپ کے پاس ورڈ سے کھلے گی۔
+Couldn't save the locked PDF. Try again.	لاک PDF محفوظ نہیں ہو سکی۔ پھر کوشش کریں۔
+Share the emergency card	ایمرجنسی کارڈ شیئر کریں
+Share screen opened	شیئر کرنے کی اسکرین کھل گئی
+No app is available to share the PDF.	PDF شیئر کرنے کے لیے کوئی ایپ نہیں ہے۔
+Print screen opened: pick a printer or Save as PDF	پرنٹ اسکرین کھل گئی: پرنٹر چنیں یا PDF کے طور پر محفوظ کریں
+Printing isn't available on this phone. Use Save PDF.	اس فون پر پرنٹ دستیاب نہیں ہے۔ PDF محفوظ کریں استعمال کریں۔
+Card ready and saved on this phone	کارڈ تیار ہے اور اس فون پر محفوظ ہو گیا
+Card ${made.number} saved. Old card ${previous.number} is outdated	کارڈ ${made.number} محفوظ ہو گیا۔ پرانا کارڈ ${previous.number} اب پرانا ہو چکا ہے
+Web link is up to date.	ویب لنک تازہ ہے۔
+Couldn't make the card. Try again.	کارڈ نہیں بن سکا۔ پھر کوشش کریں۔
+Emergency card	ایمرجنسی کارڈ
+Make a QR card the hospital can scan. You choose what goes on it.	ایسا QR کارڈ بنائیں جسے اسپتال اسکین کر سکے۔ اس پر کیا ہو، یہ آپ چنیں۔
+Web link plus an offline copy	ویب لنک اور ایک آف لائن کاپی
+Emergency web link QR code	ایمرجنسی ویب لنک QR کوڈ
+Emergency card offline QR code	ایمرجنسی کارڈ آف لائن QR کوڈ
+Show full screen	پوری اسکرین پر دکھائیں
+Tap the code to show it full screen	پوری اسکرین پر دکھانے کے لیے کوڈ کو چھوئیں
+Card ${card.number} · ID ${card.id} · made ${cardDay(card.madeAt)}	کارڈ ${card.number} · ID ${card.id} · بنا ${cardDay(card.madeAt)}
+Opens a read-only web page with this card. Works until ${cardDay(link.expiresAt)}.	اس کارڈ کے ساتھ صرف پڑھنے والا ویب پیج کھلتا ہے۔ ${cardDay(link.expiresAt)} تک کام کرے گا۔
+Not opened yet	ابھی تک نہیں کھولا گیا
+Opened ${s.views} time${if (s.views == 1) "" else "s"}${s.lastViewedAt?.let { ", last on ${cardDay(it)}" }.orEmpty()}	${s.views} بار کھولا گیا${if (s.views == 1) "" else "s"}${s.lastViewedAt?.let { ", last on ${cardDay(it)}" }.orEmpty()}
+Checking the web link…	ویب لنک جانچا جا رہا ہے…
+Web link is live	ویب لنک چالو ہے
+Make a new link	نیا لنک بنائیں
+Your records changed after this card was made. Update it so the code and the web page match.	یہ کارڈ بننے کے بعد آپ کے ریکارڈ بدل گئے۔ اسے اپڈیٹ کریں تاکہ کوڈ اور ویب پیج ایک جیسے رہیں۔
+Update card	کارڈ اپڈیٹ کریں
+Not on the offline code: 	آف لائن کوڈ میں نہیں: 
+Read the confirmed note (v${note.version})	تصدیق شدہ نوٹ پڑھیں (v${note.version})
+Print	پرنٹ
+Save PDF	PDF محفوظ کریں
+Locked PDF	لاک PDF
+Change what's on the card	کارڈ پر کیا ہے، بدلیں
+Link shared by mistake? Replace the link	لنک غلطی سے شیئر ہو گیا؟ لنک بدلیں
+Outdated offline codes (do not use): 	پرانے آف لائن کوڈ (استعمال نہ کریں): 
+card	کارڈ
+Replace the web link?	ویب لنک بدلیں؟
+The old link stops working at once, on every printed card and every message it was sent in. Print or share the new card afterwards.	پرانا لنک فوراً بند ہو جائے گا، ہر چھپے کارڈ پر اور ہر اس میسج میں جس میں بھیجا گیا تھا۔ اس کے بعد نیا کارڈ پرنٹ یا شیئر کریں۔
+New link is live. The old link no longer opens. Print or share the new card.	نیا لنک چالو ہے۔ پرانا لنک اب نہیں کھلتا۔ نیا کارڈ پرنٹ یا شیئر کریں۔
+The link was not replaced. ${e.problem.en}	لنک نہیں بدلا گیا۔ ${e.problem.en}
+The link was not replaced. ${EmergencyLinkProblem.OFFLINE.en}	لنک نہیں بدلا گیا۔ ${EmergencyLinkProblem.OFFLINE.en}
+Replace link	لنک بدلیں
+Lock the PDF with a password	PDF کو پاس ورڈ سے لاک کریں
+Any PDF reader will ask for this password before showing the card. Sahara does not keep it: tell it to the person you send the file to, separately.	کوئی بھی PDF ایپ کارڈ دکھانے سے پہلے یہ پاس ورڈ مانگے گی۔ سہارا اسے نہیں رکھتا: جسے فائل بھیجیں، اسے الگ سے بتائیں۔
+Scan to open the read-only emergency page (needs internet).	صرف پڑھنے والا ایمرجنسی پیج کھولنے کے لیے اسکین کریں (انٹرنیٹ چاہیے)۔
+Show the web link code	ویب لنک کوڈ دکھائیں
+No internet? Show the offline code	انٹرنیٹ نہیں؟ آف لائن کوڈ دکھائیں
+Tap anywhere to close	بند کرنے کے لیے کہیں بھی چھوئیں
+Change the card	کارڈ بدلیں
+The QR opens a read-only web page with what you tick below. You can replace the link if it is shared by mistake. The PDF also carries an offline code.	QR ایک صرف پڑھنے والا ویب پیج کھولتا ہے جس میں وہی ہوتا ہے جو آپ نیچے ٹک کریں۔ غلطی سے شیئر ہو جائے تو لنک بدل سکتے ہیں۔ PDF میں ایک آف لائن کوڈ بھی ہوتا ہے۔
+Anyone who scans the code can read what you put on it. Tick only what you are happy to share.	کوڈ اسکین کرنے والا کوئی بھی اس پر لکھا پڑھ سکتا ہے۔ صرف وہی ٹک کریں جو شیئر کرنا آپ کو ٹھیک لگے۔
+No name saved	کوئی نام محفوظ نہیں
+Note v${it.version}, confirmed ${cardDay(it.confirmedAt)}	نوٹ v${it.version}، تصدیق ${cardDay(it.confirmedAt)}
+ (newer note v$v not confirmed yet)	 (نیا نوٹ v$v ابھی تصدیق شدہ نہیں)
+No confirmed note yet. The patient confirms a note in Read notes first.	ابھی کوئی تصدیق شدہ نوٹ نہیں۔ مریض پہلے نوٹ پڑھیں میں نوٹ کی تصدیق کرتے ہیں۔
+No contacts saved. Add them in Your care team.	کوئی رابطہ محفوظ نہیں۔ انہیں اپنی دیکھ بھال ٹیم میں شامل کریں۔
+${source.contacts.size} saved	${source.contacts.size} محفوظ
+No current medicines listed	کوئی موجودہ دوا درج نہیں
+${source.medicines.size} current	${source.medicines.size} موجودہ
+Age, conditions and allergies are not recorded in Sahara, so they are not on the card. The card says so.	عمر، بیماریاں اور الرجی سہارا میں درج نہیں ہیں، اس لیے کارڈ پر نہیں ہیں۔ کارڈ پر یہ لکھا ہوتا ہے۔
+The web link stays the same and shows the new card. The old offline code (card ${previous.number}, ID ${previous.id}) is marked outdated; a printed copy cannot be switched off, so tear up old copies.	ویب لنک وہی رہتا ہے اور نیا کارڈ دکھاتا ہے۔ پرانا آف لائن کوڈ (کارڈ ${previous.number}، ID ${previous.id}) پرانا مانا گیا ہے؛ چھپی ہوئی کاپی بند نہیں کی جا سکتی، اس لیے پرانی کاپیاں پھاڑ دیں۔
+What the offline code will contain	آف لائن کوڈ میں کیا ہوگا
+${EmergencyCardRules.bytes(preview.text)} of ${EmergencyCardRules.MAX_BYTES} bytes used	${EmergencyCardRules.MAX_BYTES} میں سے ${EmergencyCardRules.bytes(preview.text)} بائٹ استعمال ہوئے
+Left out: 	چھوڑا گیا: 
+Loading records…	ریکارڈ لوڈ ہو رہے ہیں…
+Choose what to include	کیا شامل کریں، چنیں
+Make card	کارڈ بنائیں
+Save new card	نیا کارڈ محفوظ کریں
+The web link becomes live after setup: the Sahara server needs a one-time update by the owner. Until then, the offline code and the PDF work.	ویب لنک سیٹ اپ کے بعد چالو ہوگا: سہارا سرور کو مالک کی طرف سے ایک بار اپڈیٹ چاہیے۔ تب تک آف لائن کوڈ اور PDF کام کرتے ہیں۔
+Sign in to add a web link. The offline code and the PDF work now.	ویب لنک کے لیے سائن ان کریں۔ آف لائن کوڈ اور PDF ابھی کام کرتے ہیں۔
+Only the person who added this profile can make its web link. The offline code and the PDF work.	یہ پروفائل شامل کرنے والا ہی اس کا ویب لنک بنا سکتا ہے۔ آف لائن کوڈ اور PDF کام کرتے ہیں۔
+Web links are off in the walkthrough. The offline code and the PDF work.	واک تھرو میں ویب لنک بند ہیں۔ آف لائن کوڈ اور PDF کام کرتے ہیں۔
+This web link was turned off or has expired. Make a new link.	یہ ویب لنک بند کر دیا گیا یا اس کی مدت ختم ہو گئی۔ نیا لنک بنائیں۔
+Couldn't reach the Sahara server. The offline code and the PDF still work. Try again when online.	سہارا سرور سے رابطہ نہیں ہو سکا۔ آف لائن کوڈ اور PDF اب بھی کام کرتے ہیں۔ آن لائن ہونے پر پھر کوشش کریں۔
+$limit feedback notes are waiting to be sent. Connect to the internet and open Feedback while signed in.	$limit فیڈبیک نوٹ بھیجنا باقی ہیں۔ انٹرنیٹ سے جڑیں اور سائن اِن رہتے ہوئے فیڈبیک کھولیں۔
+Not great	اچھا نہیں
+Okay	ٹھیک
+Good	اچھا
+Close check-in	آج کا حال بند کریں
+Close feedback	رائے بند کریں
+About this	اس کے بارے میں
+How was your day?	آج کا دن کیسا رہا؟
+How was your Sahara experience?	سہارا کا تجربہ کیسا رہا؟
+You already checked in today. Saving will update it.	آج کا حال پہلے لکھا جا چکا ہے۔ محفوظ کرنے پر وہی بدل جائے گا۔
+Slide to say how today is going.	آج کا دن کیسا ہے، کھسکا کر بتائیں۔
+Slide to rate your experience with Sahara.	سہارا کا تجربہ کھسکا کر بتائیں۔
+Rate how your day went	آج کا دن کیسا رہا، بتائیں
+Rate your Sahara experience	سہارا کا تجربہ بتائیں
+How are you feeling today?	آج آپ کیسا محسوس کر رہے ہیں؟
+What felt easy, or what could be clearer?	کیا آسان لگا، یا کیا اور صاف ہو سکتا ہے؟
+Added to the care record. ${note.length}/$limit	دیکھ بھال ریکارڈ میں شامل ہوگا۔ ${note.length}/$limit
+Check-in saved	آج کا حال محفوظ ہو گیا
+Update today's check-in	آج کا حال بدلیں
+Save check-in	آج کا حال محفوظ کریں
+Sending…	بھیجا جا رہا ہے…
+Sent to Sahara	سہارا کو بھیج دیا
+Saved on this phone	اس فون پر محفوظ
+Send	بھیجیں
+Saved to the care record.	دیکھ بھال ریکارڈ میں محفوظ ہو گیا۔
+Saved to this person's care record. When you are signed in, it is saved to your account too. It is your own report, not a medical check.	یہ اس شخص کے دیکھ بھال ریکارڈ میں محفوظ ہوتا ہے۔ سائن ان ہونے پر آپ کے اکاؤنٹ میں بھی محفوظ ہوتا ہے۔ یہ آپ کی اپنی بات ہے، ڈاکٹری جانچ نہیں۔
+Try sending again	پھر سے بھیجیں
+A daily check-in is how today is, in your own words. It is added to this person's care record. When you are signed in, it is saved to your account too. It is not a medical check or a score.	روز کا حال آپ کے اپنے الفاظ میں آج کا حال ہے۔ یہ اس شخص کے دیکھ بھال ریکارڈ میں شامل ہوتا ہے۔ سائن ان ہونے پر آپ کے اکاؤنٹ میں بھی محفوظ ہوتا ہے۔ یہ ڈاکٹری جانچ یا اسکور نہیں ہے۔
+Got it	ٹھیک ہے
+Leave without saving?	بغیر محفوظ کیے جائیں؟
+Your latest changes won't be saved. 	آپ کی تازہ تبدیلیاں محفوظ نہیں ہوں گی۔ 
+What you saved before stays in the care record.	پہلے محفوظ کیا ہوا دیکھ بھال ریکارڈ میں رہے گا۔
+What you saved before stays on this phone.	پہلے محفوظ کیا ہوا اس فون پر رہتا ہے۔
+Leave	جائیں
+Keep editing	لکھتے رہیں
+Signed in, your rating and note are sent to the Sahara team with your account so we can improve the app. Signed out, they stay on this phone. This is separate from patient records; please leave out personal or health details.	سائن اِن ہونے پر آپ کی ریٹنگ اور نوٹ آپ کے اکاؤنٹ کے ساتھ سہارا ٹیم کو جاتے ہیں تاکہ ہم ایپ بہتر بنا سکیں۔ سائن آؤٹ ہونے پر یہ اسی فون پر رہتے ہیں۔ یہ مریض کے ریکارڈ سے الگ ہے؛ براہ کرم ذاتی یا صحت کی باتیں نہ لکھیں۔
+Sending to the Sahara team…	سہارا ٹیم کو بھیج رہے ہیں…
+Saved on this phone, not sent yet${error?.let { ": $it" } ?: "."} It is sent when you open Feedback again while signed in and online.	اس فون پر محفوظ ہے، ابھی بھیجا نہیں گیا${error?.let { ": $it" } ?: "."} سائن اِن اور انٹرنیٹ کے ساتھ فیڈبیک دوبارہ کھولنے پر بھیج دیا جائے گا۔
+Sent to the Sahara team. Thank you.	سہارا ٹیم کو بھیج دیا گیا۔ شکریہ۔
+Saved on this phone only. Sign in to send feedback to the Sahara team.	صرف اس فون پر محفوظ ہے۔ سہارا ٹیم کو فیڈبیک بھیجنے کے لیے سائن اِن کریں۔
+Your earlier feedback was sent to the Sahara team.	آپ کا پچھلا فیڈبیک سہارا ٹیم کو بھیج دیا گیا۔
+Send shares this with the Sahara team, with your account.	“بھیجیں” دبانے پر یہ آپ کے اکاؤنٹ کے ساتھ سہارا ٹیم کو جائے گا۔
+Saved on this phone only. Sign in to send it to the Sahara team.	صرف اس فون پر محفوظ ہے۔ سہارا ٹیم کو بھیجنے کے لیے سائن اِن کریں۔
+Would you be surprised if this patient died in the next 12 months?	اگر یہ مریض اگلے 12 مہینوں میں گزر جائیں، تو کیا آپ کو حیرانی ہوگی؟
+Yes, I would be surprised	ہاں، مجھے حیرانی ہوگی
+No, I would not be surprised	نہیں، مجھے حیرانی نہیں ہوگی
+ECOG performance status	ECOG کام کرنے کی صلاحیت (پرفارمنس اسٹیٹس)
+0 · Fully active, able to carry on all pre-disease performance without restriction	0 · پوری طرح سرگرم؛ بیماری سے پہلے کے سارے کام بغیر روک ٹوک کر لیتے ہیں
+1 · Restricted in physically strenuous activity but ambulatory and able to carry out work of a light or sedentary nature, e.g., light house work, office work	1 · بھاری محنت کے کام میں رکاوٹ، لیکن چلتے پھرتے ہیں اور ہلکا یا بیٹھ کر ہونے والا کام کر لیتے ہیں، جیسے ہلکا گھریلو کام، دفتر کا کام
+2 · Ambulatory and capable of all selfcare but unable to carry out any work activities; up and about more than 50% of waking hours	2 · چلتے پھرتے ہیں اور اپنی پوری دیکھ بھال کر لیتے ہیں، لیکن کوئی کام نہیں کر پاتے؛ جاگنے کے 50% سے زیادہ وقت اٹھتے بیٹھتے رہتے ہیں
+3 · Capable of only limited selfcare; confined to bed or chair more than 50% of waking hours	3 · اپنی تھوڑی ہی دیکھ بھال کر پاتے ہیں؛ جاگنے کے 50% سے زیادہ وقت بستر یا کرسی پر رہتے ہیں
+4 · Completely disabled; cannot carry on any selfcare; totally confined to bed or chair	4 · پوری طرح معذور؛ اپنی کوئی دیکھ بھال نہیں کر پاتے؛ پوری طرح بستر یا کرسی پر
+5 · Dead	5 · انتقال
+Suggestion: you would be surprised, but ECOG $ecog means the patient is in bed or a chair more than half the day. Poor or declining function is a general indicator in SPICT; consider asking again if things change.	مشورہ: آپ کو حیرانی ہوگی، لیکن ECOG $ecog کا مطلب ہے کہ مریض آدھے سے زیادہ دن بستر یا کرسی پر رہتے ہیں۔ SPICT میں کمزور یا گھٹتی صلاحیت ایک عام نشانی ہے؛ حالت بدلے تو پھر سے پوچھیں۔
+No prompt from these answers. You can still offer the conversation at any time.	ان جوابوں سے کوئی اشارہ نہیں۔ آپ پھر بھی کبھی بھی بات چیت کی پیشکش کر سکتے ہیں۔
+Optional · Does this patient need a goals-of-care discussion?	اختیاری · کیا اس مریض سے دیکھ بھال کے مقاصد پر بات کرنی چاہیے؟
+A suggestion, not a decision. Your clinical judgement decides. Answers are not saved.	یہ صرف مشورہ ہے، فیصلہ نہیں۔ فیصلہ آپ کی ڈاکٹری سمجھ سے ہوگا۔ جواب محفوظ نہیں ہوتے۔
+Source: 	ذریعہ: 
+The photo could not be read. Try again or draw instead.	تصویر پڑھی نہیں جا سکی۔ پھر کوشش کریں یا اسکرین پر دستخط کریں۔
+Sign here	یہاں دستخط کریں
+Photo of the signature	دستخط کی تصویر
+Remove photo and draw instead	تصویر ہٹائیں اور اسکرین پر دستخط کریں
+Signature pad	دستخط کی جگہ
+No camera app is available. Draw the signature instead.	کیمرہ ایپ نہیں ملی۔ اسکرین پر دستخط کریں۔
+Photo of a paper signature	کاغذ پر کیے دستخط کی تصویر
+The signature stays on this phone with a SHA-256 fingerprint tied to this exact version.	دستخط اسی فون پر رہتے ہیں، اس ورژن سے جڑے SHA-256 فنگرپرنٹ کے ساتھ۔
+Signed by 	دستخط: 
+Signature of 	دستخط: 
+The signature image is not on this phone or has changed.	دستخط کی تصویر اس فون پر نہیں ہے یا بدل گئی ہے۔
+Drawn on this phone	اسی فون پر کیے گئے
+tied to version fingerprint	ورژن فنگرپرنٹ سے جڑا
+Tablet	ٹیبلیٹ
+Capsule	کیپسول
+Syrup	سیرپ
+Injection	انجکشن
+Patch	پیچ
+Drops	ڈراپس
+Oral solution	پینے کا محلول
+Ointment	مرہم
+Inhaler	انہیلر
+Morning	صبح
+Afternoon	دوپہر
+Evening	شام
+Night	رات
+medicine	دوا
+medicines	دوائیں
+\nMatch each strip with its photo.	\nہر پتے کو اس کی تصویر سے ملائیں۔
+Medicine time	دوا کا وقت
+Open Sahara to see which medicines.	کون سی دوائیں ہیں، دیکھنے کے لیے سہارا کھولیں۔
+Reported missed today	آج چھوٹنے کی اطلاع دی
+Missed today	آج چھوٹ گئی
+History	ہسٹری
+Record a missed dose?	چھوٹی خوراک درج کریں؟
+${item.title}: this adds a \"missed today\" report to the medicine history, shared with the people and doctor you invited. Earlier reports stay. Ask the doctor or nurse what to do about a missed dose.	${item.title}: اس سے دوا کی ہسٹری میں \"آج چھوٹ گئی\" کی رپورٹ جڑ جائے گی، جو آپ کے بلائے ہوئے لوگوں اور ڈاکٹر کے ساتھ شیئر ہوگی۔ پہلے کی رپورٹیں رہیں گی۔ چھوٹی خوراک کے بارے میں ڈاکٹر یا نرس سے پوچھیں۔
+${item.title}: this adds a \"missed today\" report to the medicine history on this phone. Earlier reports stay. Ask the doctor or nurse what to do about a missed dose.	${item.title}: اس سے اس فون پر دوا کی ہسٹری میں \"آج چھوٹ گئی\" کی رپورٹ جڑ جائے گی۔ پہلے کی رپورٹیں رہیں گی۔ چھوٹی خوراک کے بارے میں ڈاکٹر یا نرس سے پوچھیں۔
+Record missed	چھوٹی درج کریں
+Taken and missed reports, newest first. A report is what someone recorded, not proof a dose was swallowed.	لینے اور چھوٹنے کی رپورٹیں، نئی سب سے پہلے۔ رپورٹ وہ ہے جو کسی نے درج کی، یہ ثبوت نہیں کہ خوراک نگلی گئی۔
+No reports yet. Tick the box when the dose is taken, or tap Missed today.	ابھی کوئی رپورٹ نہیں۔ خوراک لینے پر خانے میں ٹِک لگائیں، یا “آج چھوٹ گئی” دبائیں۔
+Saved in your account. Family and doctors you share with can see it.	آپ کے اکاؤنٹ میں محفوظ ہے۔ جن گھر والوں اور ڈاکٹروں کے ساتھ آپ شیئر کرتے ہیں، وہ دیکھ سکتے ہیں۔
+Saved only on this phone. Sign in to share it with family and the doctor.	صرف اس فون پر محفوظ ہے۔ گھر والوں اور ڈاکٹر کے ساتھ شیئر کرنے کے لیے سائن اِن کریں۔
+Refresh history	ہسٹری تازہ کریں
+Spelling from the India drug list	ہندوستان کی دواؤں کی فہرست سے نام کے ہجے
+Names only. Copy the dose from the prescription	صرف نام۔ خوراک نسخے سے لکھیں
+Use up to $maximum $label. The extra photos weren't added.	زیادہ سے زیادہ $maximum $label استعمال کریں۔ باقی تصویریں شامل نہیں کی گئیں۔
+prescription pages	نسخے کے صفحے
+medicine photos	دوا کی تصویریں
+Use up to 5 prescription pages.	نسخے کے زیادہ سے زیادہ 5 صفحے شامل کریں۔
+Use up to 10 medicine photos.	دوا کی زیادہ سے زیادہ 10 تصویریں شامل کریں۔
+No camera app is available. Choose a photo instead.	کیمرہ ایپ نہیں ملی۔ تصویر چنیں۔
+Scan prescription	نسخہ اسکین کریں
+Add a clear prescription. Read and check the words before saving. Medicine packaging is optional for your own comparison.	صاف نسخہ شامل کریں۔ محفوظ کرنے سے پہلے الفاظ پڑھ کر جانچیں۔ ملانے کے لیے دوا کے پیکٹ کی تصویر چاہیں تو شامل کریں۔
+Prescription pages	نسخے کے صفحے
+Add in page order · up to 5	صفحوں کی ترتیب سے شامل کریں · زیادہ سے زیادہ 5
+Choose pages	صفحے چنیں
+Take photo	تصویر لیں
+Medicine strips or boxes	دوا کے پتے یا ڈبے
+One clear photo per medicine · up to 10	ہر دوا کی ایک صاف تصویر · زیادہ سے زیادہ 10
+Choose photos	تصویریں چنیں
+Your phone reads the page. It can read printed English letters. You may need to type handwriting yourself. The app does not decide any dose or treatment.	صفحہ آپ کا فون ہی پڑھتا ہے۔ یہ چھپے ہوئے انگریزی حروف پڑھ سکتا ہے۔ ہاتھ کی لکھائی آپ کو خود لکھنی پڑ سکتی ہے۔ ایپ کوئی خوراک یا علاج طے نہیں کرتی۔
+Prescription page ${done.coerceAtLeast(1)}	نسخے کا صفحہ ${done.coerceAtLeast(1)}
+Compare every copied line with the paper. The app has not matched brands, chosen doses or confirmed treatment.	ہر کاپی کی گئی سطر کو اصل کاغذ سے ملائیں۔ ایپ نے برانڈ نہیں ملائے، خوراک نہیں چنی اور علاج پکا نہیں کیا۔
+No medicine lines could be read clearly. Look at the prescription and type the medicines yourself.	دوا کی کوئی سطر صاف نہیں پڑھی جا سکی۔ نسخہ دیکھ کر دوائیں خود لکھیں۔
+Could not make the medicine list. Try again.	دوا کی فہرست نہیں بن سکی۔ پھر کوشش کریں۔
+Read prescription	نسخہ پڑھیں
+Add one manually	ایک دوا خود لکھیں
+Reading prescription	نسخہ پڑھا جا رہا ہے
+Reading the selected pages…	چنے گئے صفحے پڑھے جا رہے ہیں…
+Keep this screen open until review appears. You can cancel without changing saved medicines.	جانچ کی فہرست آنے تک یہ اسکرین کھلی رکھیں۔ منسوخ کرنے سے محفوظ دوائیں نہیں بدلیں گی۔
+Review medicine list	دوا کی فہرست جانچیں
+Check before saving	محفوظ کرنے سے پہلے جانچیں
+The phone can read words wrongly. Check each medicine with the prescription and the packet. Sahara does not diagnose, prescribe or suggest treatment.	فون الفاظ غلط پڑھ سکتا ہے۔ ہر دوا کو نسخے اور پیکٹ سے ملائیں۔ سہارا بیماری نہیں بتاتا، دوا نہیں لکھتا اور علاج کا مشورہ نہیں دیتا۔
+Original pages	اصل صفحے
+No image viewer is available. Open this photo in Files to compare it.	تصویر دیکھنے کی ایپ نہیں ملی۔ ملانے کے لیے یہ تصویر Files میں کھولیں۔
+View prescription page ${index + 1}	نسخے کا صفحہ ${index + 1} دیکھیں
+${unmatched.size} medicine ${if (unmatched.size == 1) "photo was" else "photos were"} not matched	دوا کی ${unmatched.size} ${if (unmatched.size == 1) "photo was" else "photos were"} نہیں ملیں
+Review ${unmatched.joinToString { "photo ${it + 1}" }}. Add any missing medicine manually or leave it out only after checking the original prescription.	${unmatched.joinToString { "photo ${it + 1}" }} جانچیں۔ چھوٹی دوا خود لکھیں، یا اصل نسخہ دیکھنے کے بعد ہی اسے چھوڑیں۔
+View medicine photo ${index + 1}	دوا کی تصویر ${index + 1} دیکھیں
+I reviewed the unmatched medicine photos.	میں نے نہ ملنے والی دوا کی تصویریں جانچ لی ہیں۔
+Add another manually	ایک اور دوا خود لکھیں
+This prescription's care profile or edit access changed.	اس نسخے کی دیکھ بھال پروفائل یا تبدیلی کی اجازت بدل گئی ہے۔
+The selected person changed. Open this prescription for the right person.	چنا گیا شخص بدل گیا ہے۔ صحیح شخص کے لیے یہ نسخہ کھولیں۔
+This prescription's account or edit access changed. Nothing was saved.	اس نسخے کا اکاؤنٹ یا تبدیلی کی اجازت بدل گئی ہے۔ کچھ محفوظ نہیں ہوا۔
+Could not keep the original pages. Your medicine list has not been saved.	اصل صفحے نہیں رکھے جا سکے۔ آپ کی دوا کی فہرست محفوظ نہیں ہوئی۔
+Use ${drafts.size} reviewed medicines	جانچی ہوئی ${drafts.size} دوائیں لیں
+Save ${drafts.size} ${if (drafts.size == 1) "medicine" else "medicines"}	${drafts.size} ${if (drafts.size == 1) "medicine" else "medicines"} محفوظ کریں
+Before saving, add a medicine name and dose, check photos that did not match, and confirm every medicine.	محفوظ کرنے سے پہلے دوا کا نام اور خوراک لکھیں، نہ ملنے والی تصویریں دیکھیں اور ہر دوا کی تصدیق کریں۔
+Back to photos	تصویروں پر واپس
+Move earlier	اوپر کریں
+Move later	نیچے کریں
+Remove ${index + 1}	${index + 1} ہٹائیں
+Manual medicine	خود لکھی دوا
+Remove medicine	دوا ہٹائیں
+Strip cut or name missing? Type it, or pick from the list as you type.	پتا کٹا ہے یا نام نہیں دکھتا؟ نام لکھیں، یا لکھتے وقت فہرست سے چنیں۔
+Strength	طاقت
+e.g. 500 mg, 5 mg/5 ml	جیسے 500 mg، 5 mg/5 ml
+Form	شکل
+e.g. tablet, capsule, syrup, injection, patch	جیسے ٹیبلیٹ، کیپسول، سیرپ، انجکشن، پیچ
+Type the rest by hand from the prescription. A photo never fills these.	باقی نسخے سے دیکھ کر خود لکھیں۔ تصویر سے یہ کبھی نہیں بھرے جاتے۔
+How much each time	ہر بار کتنی
+e.g. 1 tablet, 1½ tablets, 5 ml	جیسے 1 ٹیبلیٹ، 1½ ٹیبلیٹ، 5 ml
+How often	کتنی بار
+e.g. twice a day, only when needed	جیسے دن میں دو بار، صرف ضرورت پر
+e.g. as written: dissolve in water	جیسے نسخے میں لکھا: پانی میں گھول کر
+Food timing	کھانے کے حساب سے وقت
+Original reading · ${medicine.prescriptionPageIndexes.joinToString { "page ${it + 1}" }}	اصل پڑھائی · ${medicine.prescriptionPageIndexes.joinToString { "page ${it + 1}" }}
+For how many days	کتنے دن
+e.g. 5 · leave empty if ongoing	جیسے 5 · چلتی رہے تو خالی چھوڑیں
+I checked this medicine, dose and directions against the original prescription and packaging.	میں نے یہ دوا، خوراک اور ہدایات اصل نسخے اور پیکٹ سے ملا لی ہیں۔
+Matched to prescription and packaging	نسخے اور پیکٹ سے ملی
+Possible packaging match · check carefully	پیکٹ سے شاید ملی · دھیان سے جانچیں
+Found on prescription · no safe package match	نسخے میں ملی · پیکٹ سے پکا میل نہیں
+Entered manually	خود لکھی گئی
+Before food	کھانے سے پہلے
+With food	کھانے کے ساتھ
+After food	کھانے کے بعد
+Not stated	لکھا نہیں
+Photo ${index + 1}	تصویر ${index + 1}
+No name read from this photo (a cut strip often has none). Type the name, or pick it from the list as you type.	اس تصویر سے نام نہیں پڑھا گیا (کٹے پتے پر اکثر نام نہیں ہوتا)۔ نام لکھیں، یا لکھتے وقت فہرست سے چنیں۔
+Name, strength and form were read from the photo where empty. Check them.	خالی جگہوں میں نام، طاقت اور شکل تصویر سے بھرے گئے۔ انہیں جانچیں۔
+This photo couldn't be kept. Try another photo.	یہ تصویر نہیں رکھی جا سکی۔ دوسری تصویر لیں۔
+Strip photos (optional)	پتے کی تصویریں (اختیاری)
+Shown with the dose reminder so anyone giving the medicine can match the strip. Kept only on this phone.	دوا کی یاد دہانی کے ساتھ دکھائی دیتی ہیں، تاکہ دوا دینے والا پتا ملا سکے۔ صرف اسی فون پر رہتی ہیں۔
+Remove strip photo ${index + 1}	پتے کی تصویر ${index + 1} ہٹائیں
+Choose photo	تصویر چنیں
+Dose times (optional)	دوا کے اوقات (اختیاری)
+Other times	دوسرے اوقات
+e.g. Paracetamol	جیسے Paracetamol
+Food	کھانا
+Type these from the prescription. Sahara never reads how much, how often, times or directions from a photo.	یہ نسخے سے دیکھ کر لکھیں۔ سہارا کتنی، کتنی بار، اوقات یا ہدایات تصویر سے کبھی نہیں پڑھتا۔
+Add at least the strength, form or how much each time.	کم سے کم طاقت، شکل یا ہر بار کتنی لکھیں۔
+Today's doses	آج کی خوراکیں
+Ticked today	آج ٹک کیا
+Times come from Reminders or the medicine's saved times. Strip photos stay on the phone they were taken on.	اوقات یاد دہانی یا دوا کے محفوظ اوقات سے آتے ہیں۔ پتے کی تصویریں اسی فون پر رہتی ہیں جس پر لی گئیں۔
+Emergency: police, fire, ambulance	ایمرجنسی: پولیس، آگ، ایمبولینس
+Ambulance	ایمبولینس
+Run by your state	آپ کی ریاستی سرکار کی سروس
+Ambulance for pregnant women and babies	حاملہ خواتین اور بچوں کے لیے ایمبولینس
+Elderline for older people	بزرگوں کے لیے ایلڈرلائن
+8 am – 8 pm	صبح 8 – رات 8 بجے
+kerala	کیرالا
+karnataka	کرناٹک
+tamil nadu	تمل ناڈو
+andhra pradesh	آندھرا پردیش
+telangana	تلنگانہ
+maharashtra	مہاراشٹر
+delhi	دہلی
+uttar pradesh	اتر پردیش
+bihar	بہار
+west bengal	مغربی بنگال
+gujarat	گجرات
+rajasthan	راجستھان
+madhya pradesh	مدھیہ پردیش
+punjab	پنجاب
+haryana	ہریانہ
+odisha	اوڈیشہ
+assam	آسام
+jharkhand	جھارکھنڈ
+chhattisgarh	چھتیس گڑھ
+uttarakhand	اتراکھنڈ
+himachal pradesh	ہماچل پردیش
+goa	گوا
+puducherry	پڈوچیری
+chandigarh	چنڈی گڑھ
+mumbai	ممبئی
+bengaluru	بنگلورو
+bangalore	بنگلور
+chennai	چنئی
+kolkata	کولکاتا
+hyderabad	حیدرآباد
+pune	پونے
+jaipur	جے پور
+lucknow	لکھنؤ
+ahmedabad	احمد آباد
+kochi	کوچی
+thiruvananthapuram	ترواننت پورم
+patna	پٹنہ
+bhopal	بھوپال
+nagpur	ناگپور
+coimbatore	کوئمبٹور
+hospice	ہاسپس
+home care	ہوم کیئر
+Directory listing, call to confirm services.	ڈائریکٹری کی معلومات ہے، سہولتیں فون کر کے پکی کریں۔
+The saved text could not be opened. Your recording is safe.	محفوظ تحریر نہیں کھل سکی۔ آپ کی ریکارڈنگ محفوظ ہے۔
+Stopped. Your recording and earlier words are safe.	روک دیا۔ آپ کی ریکارڈنگ اور پہلے کے الفاظ محفوظ ہیں۔
+Could not turn the speech into text. Your recording is safe. Try again.	بات تحریر میں نہیں بدل سکی۔ آپ کی ریکارڈنگ محفوظ ہے۔ پھر کوشش کریں۔
+Recording → words	ریکارڈنگ → الفاظ
+Hindi / English language pack · 987 MB	ہندی / انگریزی زبان پیک · 987 MB
+Download once. Then turn speech into text without internet.	ایک بار ڈاؤن لوڈ کریں۔ پھر بغیر انٹرنیٹ بات کو تحریر میں بدلیں۔
+Needs a 64-bit phone and at least 2.5 GB free memory. Check the words against the recording.	64-bit فون اور کم سے کم 2.5 GB خالی میموری چاہیے۔ الفاظ کو ریکارڈنگ سے ملائیں۔
+Downloading language pack	زبان پیک ڈاؤن لوڈ ہو رہا ہے
+Checking language pack…	زبان پیک جانچا جا رہا ہے…
+Download language pack	زبان پیک ڈاؤن لوڈ کریں
+Turning the recording into text	ریکارڈنگ تحریر میں بدل رہی ہے
+Turn recording into text	ریکارڈنگ کو تحریر میں بدلیں
+Turn into text again	پھر سے تحریر میں بدلیں
+Preparing audio…	آڈیو تیار ہو رہا ہے…
+Words the phone heard	فون نے جو الفاظ سنے
+Check names, medicine names, numbers and speakers against the audio. Mixed-language words may be missed.	نام، دواؤں کے نام، نمبر اور بولنے والوں کو آڈیو سے ملائیں۔ ملی جلی زبان کے الفاظ چھوٹ سکتے ہیں۔
+Corrected text	درست کی گئی تحریر
+The full text is kept. Choose up to ${NoteRules.MAX_SOURCE_CHARS} letters for this care note. ${words.length} are chosen now.	پوری تحریر رکھی جاتی ہے۔ اس کیئر نوٹ کے لیے زیادہ سے زیادہ ${NoteRules.MAX_SOURCE_CHARS} حروف چنیں۔ ابھی ${words.length} چنے گئے ہیں۔
+I checked these words against the recording.	میں نے یہ الفاظ ریکارڈنگ سے ملا لیے ہیں۔
+Saving checked words	جانچے گئے الفاظ محفوظ کیے جا رہے ہیں
+The conversation changed. Your checked text is kept here. Open this person's conversation again.	بات چیت بدل گئی۔ آپ کی جانچی ہوئی تحریر یہیں رکھی ہے۔ اس شخص کی بات چیت پھر کھولیں۔
+Use checked words	جانچے گئے الفاظ استعمال کریں
+Patient ID: 	مریض ID: 
+ · after joining, your doctor can find you by this ID.	 · جڑنے کے بعد آپ کے ڈاکٹر اس ID سے آپ کو ڈھونڈ سکتے ہیں۔
+The walkthrough could not load. Your own profiles were not changed.	ڈیمو نہیں کھل سکا۔ آپ کی اپنی پروفائل نہیں بدلیں۔
+Leaving the walkthrough…	ڈیمو سے باہر جا رہے ہیں…
+Rahul's walkthrough record was removed. It will not be recreated automatically.	راہل کا ڈیمو ریکارڈ ہٹا دیا گیا۔ یہ اپنے آپ دوبارہ نہیں بنے گا۔
+Opening care records…	دیکھ بھال ریکارڈ کھل رہے ہیں…
+Account and sharing are unavailable in the walkthrough.	ڈیمو میں اکاؤنٹ اور شیئر کرنا دستیاب نہیں ہے۔
+Use at least $MIN_PASSWORD characters.	کم از کم $MIN_PASSWORD حروف رکھیں۔
+Use $MAX_PASSWORD characters or fewer.	زیادہ سے زیادہ $MAX_PASSWORD حروف رکھیں۔
+Use letters, numbers and symbols only.	صرف حروف، نمبر اور نشان استعمال کریں۔
+Working…	کام چل رہا ہے…

@@ -180,15 +180,15 @@ internal object CareSyncOps {
 }
 
 object CareSyncText {
-    fun waiting(n: Int) = if (n == 1) "1 change waiting to send · 1 बदलाव भेजना बाकी है" else "$n changes waiting to send · $n बदलाव भेजने बाकी हैं"
-    fun kept(n: Int) = if (n == 1) "1 change couldn't be sent. It is kept on this phone. · 1 बदलाव नहीं भेजा जा सका। यह फ़ोन पर रखा है।"
-        else "$n changes couldn't be sent. They are kept on this phone. · $n बदलाव नहीं भेजे जा सके। ये फ़ोन पर रखे हैं।"
-    fun serverKept(n: Int) = if (n == 1) "1 change wasn't sent: the record was changed by someone else, so their version was kept. · 1 बदलाव नहीं भेजा गया: रिकॉर्ड किसी और ने बदला था, इसलिए उनका संस्करण रखा गया।"
-        else "$n changes weren't sent: the records were changed by someone else, so their versions were kept. · $n बदलाव नहीं भेजे गए: रिकॉर्ड किसी और ने बदले थे, इसलिए उनके संस्करण रखे गए।"
-    const val REMOVED_WAITING = "Removed on this phone. The server will be updated when you're online. · फ़ोन से हटाया गया। इंटरनेट मिलने पर सर्वर पर भी हटेगा।"
-    const val CONFIRMED_WAITING = "Your confirmation is saved on this phone. It will be sent when you're online. · आपकी पुष्टि फ़ोन पर सहेजी गई। इंटरनेट मिलने पर भेजी जाएगी।"
-    const val SAVED_WAITING = "Saved on this phone. It will be sent when you're online. · फ़ोन पर सहेजा गया। इंटरनेट मिलने पर भेजा जाएगा।"
-    const val SEND_NOW = "Send now · अभी भेजें"
+    fun waiting(n: Int) = if (n == 1) careBilingual("1 change waiting to send", "1 बदलाव भेजना बाकी है") else careBilingual("$n changes waiting to send", "$n बदलाव भेजने बाकी हैं")
+    fun kept(n: Int) = if (n == 1) careBilingual("1 change couldn't be sent. It is kept on this phone.", "1 बदलाव नहीं भेजा जा सका। यह फ़ोन पर रखा है।")
+        else careBilingual("$n changes couldn't be sent. They are kept on this phone.", "$n बदलाव नहीं भेजे जा सके। ये फ़ोन पर रखे हैं।")
+    fun serverKept(n: Int) = if (n == 1) careBilingual("1 change wasn't sent: the record was changed by someone else, so their version was kept.", "1 बदलाव नहीं भेजा गया: रिकॉर्ड किसी और ने बदला था, इसलिए उनका संस्करण रखा गया।")
+        else careBilingual("$n changes weren't sent: the records were changed by someone else, so their versions were kept.", "$n बदलाव नहीं भेजे गए: रिकॉर्ड किसी और ने बदले थे, इसलिए उनके संस्करण रखे गए।")
+    val REMOVED_WAITING: String get() = careBilingual("Removed on this phone. The server will be updated when you're online.", "फ़ोन से हटाया गया। इंटरनेट मिलने पर सर्वर पर भी हटेगा।")
+    val CONFIRMED_WAITING: String get() = careBilingual("Your confirmation is saved on this phone. It will be sent when you're online.", "आपकी पुष्टि फ़ोन पर सहेजी गई। इंटरनेट मिलने पर भेजी जाएगी।")
+    val SAVED_WAITING: String get() = careBilingual("Saved on this phone. It will be sent when you're online.", "फ़ोन पर सहेजा गया। इंटरनेट मिलने पर भेजा जाएगा।")
+    val SEND_NOW: String get() = careBilingual("Send now", "अभी भेजें")
 }
 
 /** One queue per signed-in account. Only that account's session ever sends its writes. */

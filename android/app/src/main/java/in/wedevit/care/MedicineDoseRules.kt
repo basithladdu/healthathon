@@ -148,16 +148,17 @@ object MedicineDoseRules {
 
     fun title(group: DoseGroup, hindi: Boolean): String {
         val count = group.medicines.size
-        return if (hindi) "${group.slot.hindi} · ${group.time} · $count ${if (count == 1) "दवा" else "दवाएँ"}"
-        else "${group.slot.english} · ${group.time} · $count ${if (count == 1) "medicine" else "medicines"}"
+        val slot = careTr(hindi, group.slot.english, group.slot.hindi)
+        val noun = if (count == 1) careTr(hindi, "medicine", "दवा") else careTr(hindi, "medicines", "दवाएँ")
+        return "$slot · ${group.time} · $count $noun"
     }
 
     /** Names and strip photos appear only on an unlocked phone; the lock screen gets the generic public text. */
     fun reminder(group: DoseGroup, hindi: Boolean): DoseReminder = DoseReminder(
         title = title(group, hindi),
-        text = group.medicines.joinToString(", ") { it.name } + if (hindi) "\nपत्ते को फ़ोटो से मिलाकर दें।" else "\nMatch each strip with its photo.",
-        publicTitle = if (hindi) "दवा का समय" else "Medicine time",
-        publicText = if (hindi) "देखने के लिए सहारा खोलें।" else "Open Sahara to see which medicines.",
+        text = group.medicines.joinToString(", ") { it.name } + careTr(hindi, "\nMatch each strip with its photo.", "\nपत्ते को फ़ोटो से मिलाकर दें।"),
+        publicTitle = careTr(hindi, "Medicine time", "दवा का समय"),
+        publicText = careTr(hindi, "Open Sahara to see which medicines.", "देखने के लिए सहारा खोलें।"),
         itemIds = group.medicines.map { it.itemId },
     )
 }

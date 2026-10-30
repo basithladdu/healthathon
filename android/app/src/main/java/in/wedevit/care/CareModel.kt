@@ -178,7 +178,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
             try {
                 val status = when (queue.enqueue(CentreSuggestionOps.write(draft))) { CareSyncStatus.SENT -> "pending"; CareSyncStatus.KEPT -> "kept"; else -> "waiting" }
                 done(status); loadCentreSuggestions()
-            } catch (e: Exception) { if (e is CancellationException) throw e; message.value = "Couldn't save the suggestion. Your words are still here. · सुझाव सहेजा नहीं जा सका। आपके शब्द यहीं हैं।" }
+            } catch (e: Exception) { if (e is CancellationException) throw e; message.value = careBilingual("Couldn't save the suggestion. Your words are still here.", "सुझाव सहेजा नहीं जा सका। आपके शब्द यहीं हैं।") }
             finally { centreSuggestionSending.value = false }
         }
     }
@@ -579,7 +579,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
         SymptomDiaryRules.error(note)?.let { throw IllegalArgumentException(it) }
         val existing = dao.item(id)
         SymptomDiaryRules.saveConflict(existing, personId, expectedToken)?.let { throw IllegalArgumentException(it) }
-        val candidate = CareItem(id = id, personId = personId, kind = "checkin", title = "${note.symptom} · ${if (note.symptom == SymptomDiaryRules.MOOD) SymptomDiaryRules.moodSummary(note.moodRatings, false) else SymptomDiaryRules.ratingLabel(note.rating)}",
+        val candidate = CareItem(id = id, personId = personId, kind = "checkin", title = careInEnglish { "${note.symptom} · ${if (note.symptom == SymptomDiaryRules.MOOD) SymptomDiaryRules.moodSummary(note.moodRatings, false) else SymptomDiaryRules.ratingLabel(note.rating)}" },
             detail = SymptomNoteCodec.encode(note), created = existing?.created ?: System.currentTimeMillis(), revision = existing?.revision ?: 0)
         if (note.selfReportedChange.isNotBlank()) require(SymptomDiaryRules.comparison(dao.allItems(), candidate, note)?.previous?.id == note.comparedWithId) { "The previous note changed. Check the comparison and save again." }
         val sent = storeItem(candidate)
@@ -606,7 +606,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
         requireEdit(item.personId)
         val snapshot = medicineHistory.append(item.personId, MedicineHistoryRules.missedReport(item, viewRole.value, System.currentTimeMillis()))
         if (selected.value == item.personId) medicineEvents.value = snapshot.events
-        message.value = "Missed dose recorded · छूटी खुराक दर्ज की गई"
+        message.value = careBilingual("Missed dose recorded", "छूटी खुराक दर्ज की गई")
     }
     fun updateItem(item: CareItem, done: () -> Unit) = action {
         require(item.personId == selected.value && item.title.isNotBlank()) { "Choose the right person and enter a name." }
@@ -670,7 +670,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
         require(report.personId == selected.value && reports.value.any { it.id == report.id }) { "Choose a report for this person." }
         requireEdit(report.personId)
         require(dao.renameReport(report.id, report.personId, ReportNameRules.clean(name)) == 1) { "Couldn't rename this report. Try again." }
-        message.value = "Report renamed · नाम बदल गया"; done()
+        message.value = careBilingual("Report renamed", "नाम बदल गया"); done()
     }
     fun removeReport(report: CareReport, done: () -> Unit) = action {
         require(report.personId == selected.value && reports.value.any { it.id == report.id }) { "Choose a report for this person." }

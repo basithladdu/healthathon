@@ -67,7 +67,7 @@ import java.io.ByteArrayInputStream
     var back by rememberSaveable { mutableStateOf(false) }
     var focus by rememberSaveable { mutableStateOf<String?>(null) }
     var focusNonce by rememberSaveable { mutableIntStateOf(0) }
-    val t = { en: String, hi: String -> if (hindi) hi else en }
+    val t = { en: String, hi: String -> careTr(hindi, en, hi) }
     // Each marked spot keeps its own rating. Old notes without per-spot ratings fall back to the note rating (read-only history only).
     var active by rememberSaveable { mutableStateOf<String?>(null) }
     val activeSite = active?.takeIf { it in selected } ?: selected.lastOrNull()
@@ -149,7 +149,7 @@ import java.io.ByteArrayInputStream
 /** Wong-Baker style pain strength slider: six solid green-to-red blocks. Untouched means no rating: the model stays grey and nothing is stored until the user moves it. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable private fun PainStrengthSlider(rating: Int?, target: String, hindi: Boolean, onRatingChange: (Int) -> Unit) {
-    val t = { en: String, hi: String -> if (hindi) hi else en }
+    val t = { en: String, hi: String -> careTr(hindi, en, hi) }
     val stops = listOf(Color(PainBodyMapRules.NEUTRAL).copy(alpha = 0.55f)) + PainBodyMapRules.heatStops.map { Color(it) }; val blockWeights = listOf(0.5f, 1f, 2f, 2f, 2f, 2f, 0.5f) // 0 is a neutral cap (no colour); green starts at 1 // block edges sit between integers so the thumb always lies over its own block
     Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(2.dp)) {
         FlowRow { Text(t("How strong is the pain?", "दर्द कितना तेज़ है?"), fontWeight = FontWeight.SemiBold); Text(" · $target", fontWeight = FontWeight.SemiBold, color = Rust, modifier = Modifier.testTag("pain-strength-target")) }
@@ -352,13 +352,13 @@ private fun createPainViewer(context: android.content.Context): WebView =
         else if (focusNonce > 0 || host.reused) webView.evaluateJavascript("window.SaharaPainViewer?.focusFull();", null)
     }
     if (failed) {
-        Text(if (readOnly) { if (hindi) "इस फ़ोन पर 3D नहीं खुला। सहेजे हुए हिस्से नीचे नक्शे पर हैं।" else "3D could not open on this phone. Saved areas are shown on the diagram." } else if (hindi) "इस फ़ोन पर 3D नहीं खुला। नीचे नक्शे या बटन से जगह चुनें।" else "3D could not open on this phone. Choose on the map or the buttons below.", style = MaterialTheme.typography.bodySmall)
+        Text(if (readOnly) { careTr(hindi, "3D could not open on this phone. Saved areas are shown on the diagram.", "इस फ़ोन पर 3D नहीं खुला। सहेजे हुए हिस्से नीचे नक्शे पर हैं।") } else careTr(hindi, "3D could not open on this phone. Choose on the map or the buttons below.", "इस फ़ोन पर 3D नहीं खुला। नीचे नक्शे या बटन से जगह चुनें।"), style = MaterialTheme.typography.bodySmall)
         PainBodyFallback(selected, ratings, back, hindi, readOnly) { next -> if (!readOnly) onChange(next, points.filter { it.site in next }) }
     } else {
         val frame = RoundedCornerShape(20.dp)
         Box(Modifier.fillMaxWidth().height(440.dp).clip(frame).background(Color(0xFF2A2421)).border(1.dp, Color(0xFF4A403A), frame)) {
         AndroidView(modifier = Modifier.fillMaxSize().testTag("pain-body-3d").semantics {
-            contentDescription = if (readOnly) { if (hindi) "सहेजी गई दर्द की जगह का घुमाने वाला नक्शा। जगह बदली नहीं जा सकती।" else "Rotatable saved pain map. Saved locations cannot be changed here." } else if (hindi) "घुमाने वाला दर्द की जगह का नक्शा। नीचे जगह के बटन से भी चुन सकते हैं।" else "Rotatable pain location map. Accessible region buttons are below."
+            contentDescription = if (readOnly) { careTr(hindi, "Rotatable saved pain map. Saved locations cannot be changed here.", "सहेजी गई दर्द की जगह का घुमाने वाला नक्शा। जगह बदली नहीं जा सकती।") } else careTr(hindi, "Rotatable pain location map. Accessible region buttons are below.", "घुमाने वाला दर्द की जगह का नक्शा। नीचे जगह के बटन से भी चुन सकते हैं।")
             stateDescription = PainBodyMapRules.spokenSummary(selected, ratings, hindi)
         }, factory = { _ ->
             (webView.parent as? android.view.ViewGroup)?.removeView(webView)
@@ -369,7 +369,7 @@ private fun createPainViewer(context: android.content.Context): WebView =
         AnimatedVisibility(!ready, Modifier.matchParentSize(), enter = EnterTransition.None, exit = fadeOut(tween(260))) {
             Column(Modifier.fillMaxSize().background(Color(0xFF2A2421)).a11yCard().announce(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically)) {
                 CircularProgressIndicator(Modifier.size(28.dp), color = Color(0xFFF4ECE3).copy(alpha = .8f), strokeWidth = 2.5.dp)
-                Text(if (hindi) "शरीर का नक्शा खुल रहा है…" else "Opening body map…", color = Color(0xFFF4ECE3), fontSize = 13.sp)
+                Text(careTr(hindi, "Opening body map…", "शरीर का नक्शा खुल रहा है…"), color = Color(0xFFF4ECE3), fontSize = 13.sp)
             }
         }
         }
@@ -381,8 +381,8 @@ private fun createPainViewer(context: android.content.Context): WebView =
     val latestOnChange by rememberUpdatedState(onChange)
     val colors = MaterialTheme.colorScheme
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-        Text(if (back) { if (hindi) "बायाँ" else "Left" } else if (hindi) "दायाँ" else "Right", style = MaterialTheme.typography.labelMedium)
-        Canvas(Modifier.height(300.dp).width(150.dp).testTag("pain-body-map").semantics { contentDescription = "${if (back) { if (hindi) "शरीर का नक्शा, पीछे से" else "Body diagram, back" } else if (hindi) "शरीर का नक्शा, सामने से" else "Body diagram, front"}. ${PainBodyMapRules.spokenSummary(selected, ratings, hindi)}" }.pointerInput(back, readOnly) {
+        Text(if (back) { careTr(hindi, "Left", "बायाँ") } else careTr(hindi, "Right", "दायाँ"), style = MaterialTheme.typography.labelMedium)
+        Canvas(Modifier.height(300.dp).width(150.dp).testTag("pain-body-map").semantics { contentDescription = "${if (back) { careTr(hindi, "Body diagram, back", "शरीर का नक्शा, पीछे से") } else careTr(hindi, "Body diagram, front", "शरीर का नक्शा, सामने से")}. ${PainBodyMapRules.spokenSummary(selected, ratings, hindi)}" }.pointerInput(back, readOnly) {
             if (!readOnly) detectTapGestures { point -> PainBodyMapRules.hit(back, point.x * 100f / size.width, point.y * 200f / size.height)?.let { latestOnChange(PainBodyMapRules.toggled(latestSelected, it)) } }
         }) {
             PainBodyMapRules.regions(back).forEach { region ->
@@ -394,6 +394,6 @@ private fun createPainViewer(context: android.content.Context): WebView =
                 drawPath(path, if (region.id in selected) colors.primary else colors.outline, style = Stroke(width = if (region.id in selected) 2.dp.toPx() else 1.dp.toPx()))
             }
         }
-        Text(if (back) { if (hindi) "दायाँ" else "Right" } else if (hindi) "बायाँ" else "Left", style = MaterialTheme.typography.labelMedium)
+        Text(if (back) { careTr(hindi, "Right", "दायाँ") } else careTr(hindi, "Left", "बायाँ"), style = MaterialTheme.typography.labelMedium)
     }
 }

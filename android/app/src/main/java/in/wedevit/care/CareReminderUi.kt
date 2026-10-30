@@ -15,6 +15,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -51,7 +52,7 @@ import java.time.ZoneId
     val exact = remember(revision) { scheduler.exactAllowed() }
     val canEdit by vm.canEdit.collectAsStateWithLifecycle()
     LazyColumn(Modifier.fillMaxSize().imePadding().testTag("care-reminder-settings"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { Row { IconButton(onClick = onClose) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस")) }; Heading(t("Reminders", "रिमाइंडर"), 28) } }
+        item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { IconButton(onClick = onClose) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस")) }; Box(Modifier.weight(1f)) { Heading(t("Reminders", "रिमाइंडर"), 28) }; CareLanguageMenu(compact = true) } }
         item { SurfaceCard(Sage) {
             Row { Column(Modifier.weight(1f)) { Text(t("Care reminders", "देखभाल रिमाइंडर"), fontWeight = FontWeight.SemiBold); Text(if (enabled && allowed) t("$count next alerts scheduled", "अगले $count अलर्ट तय हैं") else t("Off", "बंद"), style = MaterialTheme.typography.bodySmall) }; Switch(checked = enabled && allowed, onCheckedChange = { turnOn ->
                 error = ""

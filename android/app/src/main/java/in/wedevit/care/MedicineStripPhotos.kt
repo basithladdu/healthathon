@@ -209,7 +209,7 @@ class MedicineStripPhotos(context: Context, storage: String) {
         MedicineDoseRules.commonTimes.forEach { time ->
             val slot = MedicineDoseRules.slot(time)
             FilterChip(selected = time in times, enabled = enabled, onClick = { onChange(if (time in times) times - time else (times + time).sorted()) },
-                label = { Text("${if (hindi) slot.hindi else slot.english} $time") }, modifier = Modifier.heightIn(min = 48.dp).testTag("dose-time-$time"))
+                label = { Text("${careTr(hindi, slot.english, slot.hindi)} $time") }, modifier = Modifier.heightIn(min = 48.dp).testTag("dose-time-$time"))
         }
     }
     CareField(other, { value ->
@@ -235,7 +235,7 @@ class MedicineStripPhotos(context: Context, storage: String) {
     FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
         MedicinePhotoFields.forms.forEach { (english, hindiName) ->
             FilterChip(selected = entry.form.equals(english, true), enabled = !busy, onClick = { change(entry.copy(form = if (entry.form.equals(english, true)) "" else english)) },
-                label = { Text(if (hindi) hindiName else english) }, modifier = Modifier.heightIn(min = 48.dp))
+                label = { Text(careTr(hindi, english, hindiName)) }, modifier = Modifier.heightIn(min = 48.dp))
         }
     }
     CareField(entry.howMuch, { change(entry.copy(howMuch = it.take(80))) }, t("How much each time", "हर बार कितनी"), singleLine = true, placeholder = t("e.g. 1 tablet, 1½ tablets, 5 ml", "जैसे 1 गोली, 1½ गोली, 5 ml"))

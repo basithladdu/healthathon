@@ -21,6 +21,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.Alignment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -82,13 +83,13 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
         LaunchedEffect(pending?.code, session?.userId) { if (pending != null && session == null) accountOpen = true }
         LaunchedEffect(linkNotice) { linkNotice?.let { model.message.value = it; root.linkNotice.value = null } }
         val rootLanguage = rememberCareLanguage(model.accountNamespace)
-        val rt = { en: String, hi: String -> if (rootLanguage.hindi) hi else en }
+        val rt = { en: String, hi: String -> careTr(rootLanguage.hindi, en, hi) }
         LaunchedEffect(accountNotice) { if (session == null) accountNotice?.let { model.message.value = it; accountNotice = null } }
         val joinBanner = pending?.let { rt("Sign in or create an account to join ${it.possessive} care", "${it.name.ifBlank { "इस व्यक्ति" }} की देखभाल से जुड़ने के लिए साइन इन करें या खाता बनाएँ") }
         val mode = when { patientWalkthroughUser != null -> "patient-walkthrough"; demoOpen -> "doctor-walkthrough"; doctorOpen && session != null -> "doctor"; else -> "care" }
         // Entering a walkthrough or workspace moves forward; leaving it moves back to the welcome/care app.
         // One language choice for every screen, the doctor workspace and walkthroughs included.
-        CompositionLocalProvider(LocalCareLanguage provides rootLanguage) {
+        CompositionLocalProvider(LocalCareLanguage provides rootLanguage) { CareLanguageDirection(rootLanguage) {
         SaharaScreenHost(mode, Modifier.fillMaxSize().background(Cream), label = "Sahara root", direction = { _, to -> if (to == "care") SaharaMotion.Direction.Back else SaharaMotion.Direction.Forward }) { shown -> when (shown) {
         "patient-walkthrough" -> patientWalkthroughUser?.let { PatientWalkthroughHost(it, onExit = { patientWalkthroughUser = null }, onSwitch = { patientWalkthroughUser = it }) }
         "doctor-walkthrough" -> DoctorDemo(onExit = { demoOpen = false; walkthroughPatient = null }, cloud = cloud, initialPatientId = walkthroughPatient, careModel = model, onCareAccount = { accountOpen = true })
@@ -110,12 +111,12 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
             }, onWelcomePanelChanged = { doctorEntryPending = it == "doctor" },
             openToday = openToday, onOpenTodayHandled = { root.openToday.value = null })
         } }
-        }
-        CompositionLocalProvider(LocalCareLanguage provides rootLanguage) {
+        } }
+        CompositionLocalProvider(LocalCareLanguage provides rootLanguage) { CareLanguageDirection(rootLanguage) {
         if (accountOpen) AccountSheet(cloud, model, onDismiss = { accountOpen = false; if (cloud.session.value == null) doctorEntryPending = false }, banner = joinBanner, onInvite = root::offerInviteLink, onDeleted = { accountNotice = it; accountOpen = false })
         val joinSession = session
         if (joinSession != null && pending != null) PendingJoinDialog(cloud, model, pending!!, joinSession.email, onClear = root::clearPendingJoin)
-        }
+        } }
     }
 }
 
@@ -127,6 +128,7 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
     var busy by remember { mutableStateOf(false) };var error by remember { mutableStateOf<String?>(null) }
     ModalBottomSheet(onDismissRequest={if(!busy)onDismiss()},sheetState=rememberModalBottomSheetState(skipPartiallyExpanded=true),containerColor=Cream) {
         Column(Modifier.fillMaxWidth().imePadding().verticalScroll(rememberScrollState()).padding(22.dp),verticalArrangement=Arrangement.spacedBy(16.dp)) {
+            Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) { CareLanguageMenu() }
             Heading("Sahara AI sign-in",26)
             Text("Use your real Sahara account for authenticated online requests. This does not verify you as a doctor or grant access to any patient.")
             if(session!=null) { Text("Account connected",color=Rust);TextButton(onClick=onDismiss) { Text("Return to conversation") } }
@@ -145,6 +147,8 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
 @Composable fun AccountSheet(cloud: CareCloud, vm: CareModel, onDismiss: () -> Unit, banner: String? = null, onInvite: ((String) -> Unit)? = null, onDeleted: (String) -> Unit = {}) {
     var busy by remember { mutableStateOf(false) }
     ModalBottomSheet(onDismissRequest = { if (!busy) onDismiss() }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
+        // The sheet covers the app header, so the language dropdown comes along to the sign-in form.
+        Box(Modifier.fillMaxWidth().padding(horizontal = 12.dp), contentAlignment = Alignment.CenterEnd) { CareLanguageMenu() }
         AccountContent(cloud, vm, onDismiss, onBusyChange = { busy = it }, banner = banner, onInvite = onInvite, onDeleted = onDeleted)
     }
 }

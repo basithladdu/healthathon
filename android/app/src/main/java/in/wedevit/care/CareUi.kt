@@ -115,7 +115,7 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
     val syncKept by vm.syncKept.collectAsStateWithLifecycle()
     val canEdit by vm.canEdit.collectAsStateWithLifecycle()
     val language = rememberCareLanguage(vm.accountNamespace)
-    val t = { en: String, hi: String -> if (language.hindi) hi else en }
+    val t = { en: String, hi: String -> careTr(language.hindi, en, hi) }
     val askOwner = t("Ask the person who invited you to allow changes.", "बदलाव करने की अनुमति के लिए उस व्यक्ति से कहें जिसने आपको जोड़ा है।")
     var tab by rememberSaveable { mutableIntStateOf(0) }
     // Screens opened from inside a tab (Calendar, Care team, Lab history, Symptoms, Docs from More…) remember where they came from.
@@ -196,6 +196,8 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
             Column(Modifier.weight(1f).padding(vertical = 8.dp, horizontal = 2.dp)) {
                     Text(androidx.compose.ui.res.stringResource(R.string.app_name), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 22.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
+            // The one language choice, on the header of every family-side screen (welcome and sign-in included).
+            CareLanguageMenu(compact = compactWelcomeHeader || person != null)
             if (person != null && walkthrough != null) WalkthroughUserMenu(walkthrough, onSwitch = { if (activeRecording) vm.stopRecording(); onSwitchWalkthrough(it) }, onLeave = { if (activeRecording) vm.stopRecording(); onLeaveWalkthrough() })
             if (person == null && onDoctorWorkspace == null) OutlinedButton(onClick = { sharedWorkspaceOpen = true }, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-workspace-entry").semantics { contentDescription = t("Doctor workspace", "डॉक्टर के लिए") }, contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)) {
                 if (compactWelcomeHeader) { Icon(Icons.Default.MedicalServices, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)) }
@@ -302,7 +304,6 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                 if (panel.isEmpty()) Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(start = 22.dp, end = 22.dp, top = 22.dp, bottom = 14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     Text(t("Welcome to Sahara", "सहारा में आपका स्वागत है"), modifier = Modifier.fillMaxWidth().testTag("welcome-panel-heading"), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 26.sp, textAlign = TextAlign.Center)
                     Text(t("Choose where you would like to begin.", "चुनें कि कहाँ से शुरू करना है।"), modifier = Modifier.fillMaxWidth().testTag("welcome-panel-description"), style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Center)
-                    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { CareLanguageSwitch() }
                     Button(onClick = { select("family") }, enabled = !entryBusy, colors = ButtonDefaults.buttonColors(containerColor = Paper, contentColor = Rust), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("welcome-patient-family")) { Icon(Icons.Default.People, null); Spacer(Modifier.width(10.dp)); Text(t("Patient & family", "मरीज़ और परिवार")) }
                     TextButton(onClick = { select("doctor") }, enabled = !entryBusy, colors = ButtonDefaults.textButtonColors(contentColor = WelcomePanelInk), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-workspace-entry")) { Text(t("Doctor workspace", "डॉक्टर के लिए"), textDecoration = TextDecoration.Underline) }
                 } else {
@@ -891,7 +892,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
             Column(Modifier.weight(1f)) { Heading(t("Daily care", "रोज़ की देखभाल"), 30); Text(LocalDate.now().format(careDateFormat("EEEE, d MMMM", hindi)), fontSize = 13.sp, color = DoctorCardSub) }
             CareAddMenuButton(onAdd, onScanPrescription)
         } }
-        item { FilledTonalButton(onClick = onSymptoms, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("daily-symptom-tracker-entry"), colors = ButtonDefaults.filledTonalButtonColors(containerColor = Mint)) { Icon(Icons.Default.MonitorHeart, null); Spacer(Modifier.width(8.dp)); Text("Symptom tracker · तबीयत के नोट") } }
+        item { FilledTonalButton(onClick = onSymptoms, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("daily-symptom-tracker-entry"), colors = ButtonDefaults.filledTonalButtonColors(containerColor = Mint)) { Icon(Icons.Default.MonitorHeart, null); Spacer(Modifier.width(8.dp)); Text(careBilingual("Symptom tracker", "तबीयत के नोट")) } }
         item { DailyCareShortcuts(onCalendar, onWorkflow, onLabs) }
         if (loadedFor != selectedPerson) Unit else if (empty) item { SurfaceCard(Paper) {
             Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -1074,10 +1075,9 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
 @Composable fun More(vm: CareModel, person: Person, onAccount: () -> Unit, onDelete: () -> Unit, onCalendar: () -> Unit = {}, onWorkflow: () -> Unit = {}, onLabs: () -> Unit = {}, onFeedback: () -> Unit = {}, onReminders: () -> Unit = {}, onSharedWorkspace: () -> Unit = {}, onDocuments: () -> Unit = {}, doctorEmbedded: Boolean = false, walkthrough: Boolean = false) {
     val owner by vm.isOwner.collectAsStateWithLifecycle()
     val context = LocalContext.current; val versions by vm.versions.collectAsStateWithLifecycle(); val acks by vm.acknowledgements.collectAsStateWithLifecycle()
-    val t = careText(); val languageChoice = LocalCareLanguage.current != null
+    val t = careText()
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(18.dp)) {
         item { Heading(if (doctorEmbedded) t("Daily care & tools", "रोज़ की देखभाल और साधन") else t("More", "और")) }
-        if (languageChoice) item { Column(verticalArrangement = Arrangement.spacedBy(6.dp)) { Text("Language · भाषा", fontWeight = FontWeight.Medium); CareLanguageSwitch() } }
         item { OutlinedButton(onClick = onDocuments, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("more-documents-entry")) { Icon(Icons.Default.FolderOpen, null); Spacer(Modifier.width(8.dp)); Text(t("Documents", "दस्तावेज़")) } }
         if (!walkthrough) item { OutlinedButton(onClick = onFeedback, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("patient-feedback-entry")) { Icon(Icons.Default.SentimentSatisfiedAlt, null); Spacer(Modifier.width(8.dp)); Text(t("App feedback", "ऐप के बारे में अपनी राय")) } }
         if (doctorEmbedded) item { OutlinedButton(onClick = onSharedWorkspace, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.Groups, null); Spacer(Modifier.width(8.dp)); Text(t("Shared care and doctor's check", "साझा देखभाल और डॉक्टर की जाँच")) } }
@@ -1206,12 +1206,12 @@ object ConversationPages {
     fun top(flat: Int): Int { var n = flat.coerceIn(0, last); subs.forEachIndexed { i, l -> if (n < l.size) return i else n -= l.size }; return 2 }
     fun sub(flat: Int): Int { var n = flat.coerceIn(0, last); subs.forEach { l -> if (n < l.size) return n else n -= l.size }; return 0 }
     /** Blank for a step that is a single page, where "1 of 1" would say nothing. */
-    fun subLabel(top: Int, sub: Int, hindi: Boolean = false): String { val l = subs[top.coerceIn(0, 2)]; val i = sub.coerceIn(0, l.lastIndex); return if (l.size < 2) "" else if (hindi) "${label(l[i], true)} · ${l.size} में से ${i + 1}" else "${l[i]} · ${i + 1} of ${l.size}" }
+    fun subLabel(top: Int, sub: Int, hindi: Boolean = false): String { val l = subs[top.coerceIn(0, 2)]; val i = sub.coerceIn(0, l.lastIndex); return if (l.size < 2) "" else careTr(hindi, "${l[i]} · ${i + 1} of ${l.size}", "${label(l[i], true)} · ${l.size} में से ${i + 1}") }
     /** Step and page names stay English as keys; only the shown name is Hindi. */
-    fun label(name: String, hindi: Boolean): String = if (!hindi) name else when (name) {
+    fun label(name: String, hindi: Boolean): String = careTr(hindi, name, when (name) {
         "Before" -> "पहले"; "Conversation" -> "बातचीत"; "Note" -> "नोट"; "Who's here" -> "कौन मौजूद है"; "Record" -> "रिकॉर्ड"; "Transcript" -> "लिखाई"
         "Answers" -> "जवाब"; "Review" -> "जाँच"; "Publish" -> "प्रकाशित करें"; else -> name
-    }
+    })
 }
 
 /** Progress indicator for the three conversation steps. Navigation is by each page's own Back/Continue button. */

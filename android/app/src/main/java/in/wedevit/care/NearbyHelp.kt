@@ -107,7 +107,7 @@ object NearbyHelp {
     /** Text to send with Share: the listing as published, a directions link, and the reminder to call first. */
     fun shareText(c: Centre): String = listOf(c.name, c.address, listOf(c.city, c.district, c.state).filter(String::isNotBlank).distinct().joinToString(", "),
         c.phone.takeIf { it.any(Char::isDigit) }?.let { "Phone / फ़ोन: $it" }, "Directions / रास्ता: " + directionsUrl(c),
-        "Directory listing, call to confirm services. · सूची की जानकारी है, सेवाएँ फ़ोन करके पक्की करें।").filterNotNull().filter(String::isNotBlank).joinToString("\n")
+        careBilingual("Directory listing, call to confirm services.", "सूची की जानकारी है, सेवाएँ फ़ोन करके पक्की करें।")).filterNotNull().filter(String::isNotBlank).joinToString("\n")
 
     fun directionsUrl(c: Centre): String = "https://www.google.com/maps/search/?api=1&query=" + java.net.URLEncoder.encode(c.name + " " + c.address, "UTF-8")
 

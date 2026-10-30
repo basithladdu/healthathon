@@ -30,30 +30,31 @@ import java.time.ZoneId
     val capturedAccount = remember(item.id) { vm.accountNamespace }
     val today = LocalDate.now()
     val outcome = MedicineHistoryRules.todayOutcome(item, events, today, ZoneId.systemDefault())
-    if (outcome == "skipped") Text("Reported missed today · आज छूटी बताई गई", fontSize = 13.sp, fontWeight = FontWeight.Medium, color = Rust, modifier = Modifier.padding(top = 6.dp))
+    if (outcome == "skipped") Text(careBilingual("Reported missed today", "आज छूटी बताई गई"), fontSize = 13.sp, fontWeight = FontWeight.Medium, color = Rust, modifier = Modifier.padding(top = 6.dp))
     FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         if (canEdit && outcome == null && current.any { it.id == item.id }) TextButton(onClick = { confirmMissed = true }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp).testTag("care-missed-${item.id}")) {
-            Icon(Icons.Default.RemoveCircleOutline, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("Missed today · आज छूटी")
+            Icon(Icons.Default.RemoveCircleOutline, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(careBilingual("Missed today", "आज छूटी"))
         }
         TextButton(onClick = { history = true }, modifier = Modifier.heightIn(min = 48.dp).testTag("care-medicine-history-${item.id}")) {
-            Icon(Icons.Default.History, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text("History · इतिहास")
+            Icon(Icons.Default.History, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(careBilingual("History", "इतिहास"))
         }
     }
     if (confirmMissed) AlertDialog(onDismissRequest = { confirmMissed = false },
-        title = { Text("Record a missed dose? · छूटी खुराक दर्ज करें?") },
-        text = { Text("${item.title}: this adds a \"missed today\" report to the medicine history${if (vm.cloud != null) ", shared with the people and doctor you invited" else " on this phone"}. Earlier reports stay. Ask the doctor or nurse what to do about a missed dose. · पहले की जानकारी नहीं मिटेगी। छूटी खुराक के बारे में डॉक्टर या नर्स से पूछें।") },
-        confirmButton = { TextButton(onClick = { if (canEditCareContext(vm, item.personId, capturedAccount)) vm.reportMedicineMissed(item); confirmMissed = false }, enabled = !busy && canEdit) { Text("Record missed · दर्ज करें") } },
-        dismissButton = { TextButton(onClick = { confirmMissed = false }) { Text("Cancel · रद्द करें") } })
+        title = { Text(careBilingual("Record a missed dose?", "छूटी खुराक दर्ज करें?")) },
+        text = { Text(if (vm.cloud != null) careBilingual("${item.title}: this adds a \"missed today\" report to the medicine history, shared with the people and doctor you invited. Earlier reports stay. Ask the doctor or nurse what to do about a missed dose.", "पहले की जानकारी नहीं मिटेगी। छूटी खुराक के बारे में डॉक्टर या नर्स से पूछें।")
+            else careBilingual("${item.title}: this adds a \"missed today\" report to the medicine history on this phone. Earlier reports stay. Ask the doctor or nurse what to do about a missed dose.", "पहले की जानकारी नहीं मिटेगी। छूटी खुराक के बारे में डॉक्टर या नर्स से पूछें।")) },
+        confirmButton = { TextButton(onClick = { if (canEditCareContext(vm, item.personId, capturedAccount)) vm.reportMedicineMissed(item); confirmMissed = false }, enabled = !busy && canEdit) { Text(careBilingual("Record missed", "दर्ज करें")) } },
+        dismissButton = { TextButton(onClick = { confirmMissed = false }) { Text(careBilingual("Cancel", "रद्द करें")) } })
     if (history) ModalBottomSheet(onDismissRequest = { history = false }, containerColor = Cream) {
         val mine = events.filter { it.medicineId == item.id }
         val now = System.currentTimeMillis()
         LazyColumn(Modifier.fillMaxWidth().testTag("care-medicine-history-sheet"), contentPadding = PaddingValues(start = 20.dp, end = 20.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            item { Heading("${item.title} · इतिहास", 24) }
-            item { Text("Taken and missed reports, newest first. A report is what someone recorded, not proof a dose was swallowed. · लेने और छूटने की जानकारी, नई सबसे ऊपर।", fontSize = 13.sp, color = DoctorCardSub) }
-            if (mine.isEmpty()) item { Text("No reports yet. Tick the box when the dose is taken, or tap Missed today. · अभी कोई जानकारी नहीं।", fontSize = 15.sp) }
+            item { Heading("${item.title} · ${careTr(careHindi(), "History", "इतिहास")}", 24) }
+            item { Text(careBilingual("Taken and missed reports, newest first. A report is what someone recorded, not proof a dose was swallowed.", "लेने और छूटने की जानकारी, नई सबसे ऊपर।"), fontSize = 13.sp, color = DoctorCardSub) }
+            if (mine.isEmpty()) item { Text(careBilingual("No reports yet. Tick the box when the dose is taken, or tap Missed today.", "अभी कोई जानकारी नहीं।"), fontSize = 15.sp) }
             items(mine, key = { it.id }) { MedicineReportCard(it, mine, now) }
-            item { Text(if (vm.cloud != null) "Saved in your account. Family and doctors you share with can see it. · आपके खाते में सेव। जिनके साथ आपने साझा किया, वे देख सकते हैं।" else "Saved only on this phone. Sign in to share it with family and the doctor. · सिर्फ़ इस फ़ोन पर।", fontSize = 12.sp, color = DoctorCardFaint) }
-            if (vm.cloud != null) item { TextButton(onClick = vm::refreshMedicineHistory, modifier = Modifier.heightIn(min = 48.dp)) { Text("Refresh history · इतिहास ताज़ा करें") } }
+            item { Text(if (vm.cloud != null) careBilingual("Saved in your account. Family and doctors you share with can see it.", "आपके खाते में सेव। जिनके साथ आपने साझा किया, वे देख सकते हैं।") else careBilingual("Saved only on this phone. Sign in to share it with family and the doctor.", "सिर्फ़ इस फ़ोन पर।"), fontSize = 12.sp, color = DoctorCardFaint) }
+            if (vm.cloud != null) item { TextButton(onClick = vm::refreshMedicineHistory, modifier = Modifier.heightIn(min = 48.dp)) { Text(careBilingual("Refresh history", "इतिहास ताज़ा करें")) } }
         }
     }
 }

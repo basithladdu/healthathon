@@ -38,7 +38,7 @@ object PainHistoryRules {
 
 /** Read-only fixture surface: no save/remove callback, account, database or patient identity lookup. */
 @Composable fun PainBodyHistoryContent(entries: List<CareItem>, personId: String, hindi: Boolean, initialId: String = "", onClose: () -> Unit) {
-    val t = { en: String, hi: String -> if (hindi) hi else en }
+    val t = { en: String, hi: String -> careTr(hindi, en, hi) }
     val history = remember(entries, personId) { PainHistoryRules.entries(entries, personId) }
     var preferred by rememberSaveable(personId, initialId) { mutableStateOf(initialId) }
     val selected = PainHistoryRules.selectedId(history, preferred)

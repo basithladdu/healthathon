@@ -20,9 +20,9 @@ object PdfPasswordLock {
     const val MAX_PASSWORD = 64
 
     fun passwordError(password: String): String? = when {
-        password.length < MIN_PASSWORD -> "Use at least $MIN_PASSWORD characters. · कम से कम $MIN_PASSWORD अक्षर रखें।"
-        password.length > MAX_PASSWORD -> "Use $MAX_PASSWORD characters or fewer. · $MAX_PASSWORD से कम अक्षर रखें।"
-        password.any { it.isISOControl() } -> "Use letters, numbers and symbols only. · केवल अक्षर, अंक और चिह्न।"
+        password.length < MIN_PASSWORD -> careBilingual("Use at least $MIN_PASSWORD characters.", "कम से कम $MIN_PASSWORD अक्षर रखें।")
+        password.length > MAX_PASSWORD -> careBilingual("Use $MAX_PASSWORD characters or fewer.", "$MAX_PASSWORD से कम अक्षर रखें।")
+        password.any { it.isISOControl() } -> careBilingual("Use letters, numbers and symbols only.", "केवल अक्षर, अंक और चिह्न।")
         else -> null
     }
 

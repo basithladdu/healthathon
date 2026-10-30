@@ -84,16 +84,11 @@ object CareEntryCodec {
     } ?: if (SymptomNoteCodec.isStructured(detail)) SymptomNoteCodec.readable(detail) else if (isStructured(detail)) "This entry needs a newer app to open." else detail
 }
 
-fun CareEntry.statusLabel(hindi: Boolean = false) = if (hindi) when (status) {
-    "accepted" -> if (type == "conversation") "लिया गया" else "स्वीकार"
-    "completed" -> "पूरा हुआ"
-    "cancelled" -> "रद्द"
-    else -> if (type == "conversation") "अनुरोध भेजा" else "करना है"
-} else when (status) {
-    "accepted" -> if (type == "conversation") "Picked up" else "Accepted"
-    "completed" -> "Completed"
-    "cancelled" -> "Cancelled"
-    else -> if (type == "conversation") "Requested" else "To do"
+fun CareEntry.statusLabel(hindi: Boolean = false) = when (status) {
+    "accepted" -> if (type == "conversation") careTr(hindi, "Picked up", "लिया गया") else careTr(hindi, "Accepted", "स्वीकार")
+    "completed" -> careTr(hindi, "Completed", "पूरा हुआ")
+    "cancelled" -> careTr(hindi, "Cancelled", "रद्द")
+    else -> if (type == "conversation") careTr(hindi, "Requested", "अनुरोध भेजा") else careTr(hindi, "To do", "करना है")
 }
 
 object CareWorkflowRules {
