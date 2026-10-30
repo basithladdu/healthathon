@@ -21,7 +21,7 @@
 .care-language-select > .care-language-select-chevron { inset-inline-end: 9px; width: 15px; height: 15px; }
 .care-language-select-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 @media (max-width: 420px) {
-  .care-language-select > select { max-width: 9.75rem; padding-inline: 28px 22px; font-size: 13px; }
+  .care-language-select > select { max-width: 8.5rem; padding-inline: 28px 22px; font-size: 13px; }
   .care-language-select > .care-language-select-globe { inset-inline-start: 8px; width: 16px; height: 16px; }
   .care-language-select > .care-language-select-chevron { inset-inline-end: 6px; }
 }

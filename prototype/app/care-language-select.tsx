@@ -12,7 +12,7 @@ export function CareLanguageSelect({ lang, onChange, className = '' }: { lang: C
     <label className="care-language-select-label" htmlFor={id}>{label}</label>
     <svg className="care-language-select-globe" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c2.5 2.6 3.75 5.6 3.75 9S14.5 18.4 12 21c-2.5-2.6-3.75-5.6-3.75-9S9.5 5.6 12 3Z" /></svg>
     <select id={id} value={lang} title={label} onChange={(event) => onChange(event.target.value as CareLang)}>
-      {CARE_LANGS.map((item) => <option key={item.code} value={item.code} lang={item.code} dir={item.dir}>{item.code === 'en' ? item.label : `${item.label} (${item.english})`}</option>)}
+      {CARE_LANGS.map((item) => <option key={item.code} value={item.code} lang={item.code} dir={item.dir} aria-label={item.english}>{item.label}</option>)}
     </select>
     <svg className="care-language-select-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
   </span>;
