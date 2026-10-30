@@ -94,7 +94,7 @@ private val DoctorMist = Peach
 @Composable private fun PreviewLabel() { val t = careText(); Surface(color = DoctorMist, shape = RoundedCornerShape(8.dp)) { Text(t("Walkthrough", "परिचय"), Modifier.padding(horizontal = 9.dp, vertical = 4.dp), fontSize = 11.sp, fontWeight = FontWeight.Medium, color = DoctorForest) } }
 @Composable private fun VisitStatus(status: String) {
     val color = if (status == "Completed") Rust else DoctorMuted
-    Surface(color = color.copy(alpha = .09f), shape = RoundedCornerShape(6.dp)) { Text(if (careHindi()) when (status) { "Scheduled" -> "तय"; "Completed" -> "पूरी हुई"; "Cancelled" -> "रद्द"; else -> status } else status, Modifier.padding(horizontal = 8.dp, vertical = 4.dp), color = color, style = MaterialTheme.typography.labelMedium) }
+    Surface(color = color.copy(alpha = .09f), shape = RoundedCornerShape(6.dp)) { Text(careTr(careHindi(), status, when (status) { "Scheduled" -> "तय"; "Completed" -> "पूरी हुई"; "Cancelled" -> "रद्द"; else -> status }), Modifier.padding(horizontal = 8.dp, vertical = 4.dp), color = color, style = MaterialTheme.typography.labelMedium) }
 }
 
 /** A separate walkthrough workspace: no CareModel, account token, Room or network operations. */
@@ -233,6 +233,7 @@ private val DoctorMist = Peach
                     else Text(if(sampleCareOpen) t("Separate from your records", "आपके रिकॉर्ड से अलग") else if (carePersonId != null) { if (careModel?.cloud == null) t("Device-local care · not synced", "फ़ोन पर रखी देखभाल · सिंक नहीं") else t("Real shared care", "असली साझा देखभाल") } else if (patient != null) t("Patient record", "मरीज़ का रिकॉर्ड") else t("Doctor workspace", "डॉक्टर वर्कस्पेस"), color = DoctorMuted, fontSize = 12.sp)
                 }
                 if(sampleCareOpen && !DoctorTestProfiles.contains(testCarePerson)) Text(t("Practice", "अभ्यास"),color=Rust) else if (!sampleCareOpen && carePersonId == null) PreviewLabel()
+                CareLanguageMenu(compact = true)
                 Spacer(Modifier.width(10.dp))
                 if (!sampleCareOpen && patient == null && carePersonId == null) DoctorAvatar("Meera", 34)
             }

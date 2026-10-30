@@ -90,7 +90,7 @@ internal object DistressRules {
     private val hindiLabels = categories.flatMap { it.items }.toMap()
     val problems: List<String> = categories.flatMap { c -> c.items.map { it.first } }
 
-    fun problemLabel(id: String, hindi: Boolean) = if (hindi) hindiLabels[id] ?: id else id
+    fun problemLabel(id: String, hindi: Boolean) = careTr(hindi, id, hindiLabels[id] ?: id)
     fun title(check: DistressCheck) = if (!check.distress) NO_TITLE else "Distress ${check.score}/10"
     fun shownTitle(check: DistressCheck, hindi: Boolean) = when { !hindi -> title(check); !check.distress -> "आज कोई परेशानी नहीं"; else -> "परेशानी ${check.score}/10" }
 
@@ -184,9 +184,10 @@ internal object DistressCodec {
     LaunchedEffect(Unit) { vm.actionError.value = null }
     BackHandler { onClose() }
     Column(Modifier.fillMaxSize().background(Cream).safeDrawingPadding().imePadding().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp).padding(bottom = 24.dp).testTag("distress-screen"), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onClose, modifier = Modifier.sizeIn(minWidth = 48.dp, minHeight = 48.dp).testTag("distress-close")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Close", "बंद करें"), tint = Ink) }
-            Heading(t("Distress Thermometer", "परेशानी थर्मामीटर"), 26)
+            Box(Modifier.weight(1f)) { Heading(t("Distress Thermometer", "परेशानी थर्मामीटर"), 26) }
+            CareLanguageMenu(compact = true)
         }
         Text(t("How much distress have you felt in the past week, including today? Tap a number.", "पिछले एक हफ़्ते में, आज समेत, आपको कितनी परेशानी रही है? एक अंक दबाएँ।"), fontSize = 17.sp, lineHeight = 24.sp, color = DoctorCardInk)
         DistressScoreBadge(score)

@@ -328,6 +328,7 @@ private fun ScannerHeader(title: String, step: String, onBack: () -> Unit) {
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
         )
+        CareLanguageMenu(compact = true)
         Spacer(Modifier.width(8.dp))
         Surface(
             color = Mint,
@@ -440,24 +441,24 @@ private fun manualMedicine() = OrganizedMedicine(
 )
 
 private fun matchLabel(medicine: OrganizedMedicine, hindi: Boolean): String = when (medicine.matchQuality) {
-    MedicineMatchQuality.MATCHED -> (if (hindi) "पर्चे और पैकेट से मिली" else "Matched to prescription and packaging") + medicine.confidence?.let { " · ${(it * 100).toInt()}%" }.orEmpty()
-    MedicineMatchQuality.POSSIBLE -> if (hindi) "पैकेट से शायद मिली · ध्यान से जाँचें" else "Possible packaging match · check carefully"
-    MedicineMatchQuality.PRESCRIPTION_ONLY -> if (hindi) "पर्चे में मिली · पैकेट से पक्का मिलान नहीं" else "Found on prescription · no safe package match"
-    MedicineMatchQuality.MANUAL -> if (hindi) "ख़ुद लिखी गई" else "Entered manually"
+    MedicineMatchQuality.MATCHED -> (careTr(hindi, "Matched to prescription and packaging", "पर्चे और पैकेट से मिली")) + medicine.confidence?.let { " · ${(it * 100).toInt()}%" }.orEmpty()
+    MedicineMatchQuality.POSSIBLE -> careTr(hindi, "Possible packaging match · check carefully", "पैकेट से शायद मिली · ध्यान से जाँचें")
+    MedicineMatchQuality.PRESCRIPTION_ONLY -> careTr(hindi, "Found on prescription · no safe package match", "पर्चे में मिली · पैकेट से पक्का मिलान नहीं")
+    MedicineMatchQuality.MANUAL -> careTr(hindi, "Entered manually", "ख़ुद लिखी गई")
 }
 
 private fun mealTimingLabel(value: MedicineMealTiming, hindi: Boolean): String = when (value) {
-    MedicineMealTiming.BEFORE_FOOD -> if (hindi) "खाने से पहले" else "Before food"
-    MedicineMealTiming.WITH_FOOD -> if (hindi) "खाने के साथ" else "With food"
-    MedicineMealTiming.AFTER_FOOD -> if (hindi) "खाने के बाद" else "After food"
-    MedicineMealTiming.NOT_STATED -> if (hindi) "लिखा नहीं" else "Not stated"
+    MedicineMealTiming.BEFORE_FOOD -> careTr(hindi, "Before food", "खाने से पहले")
+    MedicineMealTiming.WITH_FOOD -> careTr(hindi, "With food", "खाने के साथ")
+    MedicineMealTiming.AFTER_FOOD -> careTr(hindi, "After food", "खाने के बाद")
+    MedicineMealTiming.NOT_STATED -> careTr(hindi, "Not stated", "लिखा नहीं")
 }
 
 private fun imageName(context: Context, uri: Uri, index: Int, hindi: Boolean): String = runCatching {
     context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { cursor ->
         if (cursor.moveToFirst()) cursor.getString(0) else null
     }
-}.getOrNull().orEmpty().ifBlank { if (hindi) "फ़ोटो ${index + 1}" else "Photo ${index + 1}" }
+}.getOrNull().orEmpty().ifBlank { careTr(hindi, "Photo ${index + 1}", "फ़ोटो ${index + 1}") }
 
 private fun <T> List<T>.moved(from: Int, to: Int): List<T> = toMutableList().also { values ->
     if (from in values.indices && to in values.indices) values.add(to, values.removeAt(from))

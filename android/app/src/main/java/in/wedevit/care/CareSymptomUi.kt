@@ -51,7 +51,7 @@ import java.time.format.DateTimeFormatter
     val people by vm.people.collectAsStateWithLifecycle()
     val canEdit by vm.canEdit.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    // The app-wide English/Hindi choice; this screen's chips switch every family-side screen.
+    // The app-wide language choice (header dropdown).
     val language = LocalCareLanguage.current ?: rememberCareLanguage(vm.accountNamespace)
     val hindi = language.hindi
     var adding by rememberSaveable(selected) { mutableStateOf(false) }
@@ -64,7 +64,7 @@ import java.time.format.DateTimeFormatter
         .map { it to SymptomNoteCodec.decode(it.detail)?.let { n -> "${n.observedDate}T${n.observedTime}" }.orEmpty() }
         .sortedByDescending { it.second }.map { it.first } }
     val hasPainHistory = remember(entries, person?.id) { person != null && PainHistoryRules.entries(entries, person.id).isNotEmpty() }
-    val t = { en: String, hi: String -> if (hindi) hi else en }
+    val t = { en: String, hi: String -> careTr(hindi, en, hi) }
     BackHandler(onBack = onBack)
     LazyColumn(Modifier.fillMaxSize().testTag("symptom-diary"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item {
@@ -73,11 +73,6 @@ import java.time.format.DateTimeFormatter
                 Heading(t("Symptom tracker", "तबीयत के नोट"), 27)
             }
             Text(person?.name.orEmpty(), fontWeight = FontWeight.SemiBold)
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                listOf(false to "English", true to "हिन्दी").forEach { (value, label) ->
-                    FilterChip(hindi == value, { language.choose(value) }, label = { Text(label) }, modifier = Modifier.heightIn(min = 48.dp))
-                }
-            }
         }
         if (canEdit && person != null) item {
             Button(onClick = { adding = true }, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("symptom-add")) {
@@ -104,16 +99,16 @@ import java.time.format.DateTimeFormatter
 
 /** Friendly "Today, 4:01 PM" / "Yesterday, ..." / "26 Oct, 4:01 PM" (Hindi too); falls back to the stored text. */
 internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: LocalDate = LocalDate.now()): String = runCatching {
-    val d = LocalDate.parse(date); val locale = java.util.Locale(if (hindi) "hi" else "en")
+    val d = LocalDate.parse(date); val locale = careLocale(hindi)
     val clock = LocalTime.parse(time).format(DateTimeFormatter.ofPattern("h:mm a", locale))
-    val day = when (d) { today -> if (hindi) "आज" else "Today"; today.minusDays(1) -> if (hindi) "कल" else "Yesterday"; else -> d.format(DateTimeFormatter.ofPattern(if (d.year == today.year) "d MMM" else "d MMM yyyy", locale)) }
+    val day = when (d) { today -> careTr(hindi, "Today", "आज"); today.minusDays(1) -> careTr(hindi, "Yesterday", "कल"); else -> d.format(DateTimeFormatter.ofPattern(if (d.year == today.year) "d MMM" else "d MMM yyyy", locale)) }
     "$day, $clock"
 }.getOrDefault("$date $time")
 
 /** Strength badge: Wong-Baker block colour for 1-10, neutral grey for 0 (no heat colour), outlined "Not rated" when absent. Pain adds its verbal band ("7 · Severe"); other symptoms show the number only. */
 @Composable internal fun StrengthBadge(rating: Int?, hindi: Boolean, band: Boolean = false) {
     val shape = RoundedCornerShape(50)
-    if (rating == null) { Text(if (hindi) "अंक नहीं बताया" else "Not rated", color = DoctorCardSub, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.testTag("symptom-card-badge").border(1.dp, DoctorHairline, shape).padding(horizontal = 12.dp, vertical = 6.dp)); return }
+    if (rating == null) { Text(careTr(hindi, "Not rated", "अंक नहीं बताया"), color = DoctorCardSub, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.testTag("symptom-card-badge").border(1.dp, DoctorHairline, shape).padding(horizontal = 12.dp, vertical = 6.dp)); return }
     val bg = Color(PainBodyMapRules.heatColor(rating)); val ink = if (rating == 0) DoctorCardInk else readableOn(bg)
     Text(if (band) "$rating · ${PainBands.label(rating, hindi)}" else "$rating/10", color = ink, fontSize = 13.sp, fontWeight = FontWeight.Bold, modifier = Modifier.testTag("symptom-card-badge").background(bg, shape).padding(horizontal = 12.dp, vertical = 6.dp))
 }
@@ -130,7 +125,7 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
     var showingPainHistory by rememberSaveable(item.id) { mutableStateOf(false) }
     var removing by rememberSaveable(item.id) { mutableStateOf(false) }
     var menuOpen by remember(item.id) { mutableStateOf(false) }
-    val t = { en: String, hi: String -> if (hindi) hi else en }
+    val t = { en: String, hi: String -> careTr(hindi, en, hi) }
     val note = remember(item.detail) { SymptomNoteCodec.decode(item.detail) }
     val isPain = note?.symptom?.trim()?.equals("Pain", true) == true
     val isMood = note?.symptom == SymptomDiaryRules.MOOD
@@ -152,7 +147,7 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
         if (note != null) {
             if (largeText && !isMood) StrengthBadge(PainBodyMapRules.overall(note.painBodyRatings) ?: note.rating, hindi, band = isPain)
             if (isMood) FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.testTag("symptom-card-mood")) {
-                SymptomDiaryRules.moodShort.forEach { (key, label) -> SymptomTag("${if (hindi) label.second else label.first} ${SymptomDiaryRules.ratingLabel(note.moodRatings[key], hindi)}") }
+                SymptomDiaryRules.moodShort.forEach { (key, label) -> SymptomTag("${careTr(hindi, label.first, label.second)} ${SymptomDiaryRules.ratingLabel(note.moodRatings[key], hindi)}") }
             }
             if (note.painBodyRatings.isNotEmpty()) FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 note.painBodySites.filter { it in note.painBodyRatings }.forEach { site -> val r = note.painBodyRatings.getValue(site)
@@ -220,7 +215,7 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
     val id = rememberSaveable { initial?.id ?: newId() }
     val capturedPerson = rememberSaveable(id) { initial?.personId ?: personId }
     val context = LocalContext.current
-    val t = { en: String, hi: String -> if (hindi) hi else en }
+    val t = { en: String, hi: String -> careTr(hindi, en, hi) }
     var fullDetails by rememberSaveable(id) { mutableStateOf(prior == null || original != null) }
     var symptom by rememberSaveable(id) { mutableStateOf(seed?.symptom.orEmpty()) }
     var otherSymptom by rememberSaveable(id) { mutableStateOf(seed?.symptom?.let { it !in SymptomDiaryRules.symptoms } ?: false) }
@@ -330,7 +325,7 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
                     CareField(location, { location = it.take(100) }, t("Pain location (optional)", "दर्द की जगह (वैकल्पिक)"), singleLine = true)
                     Text(t("When does it happen? (optional)", "कब होता है? (वैकल्पिक)"), color = DoctorCardInk, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { SymptomDiaryRules.triggers.forEach { (key, labels) ->
-                        SymptomPill(key in value.painTriggers, if (hindi) labels.second else labels.first, null, multi = true) { val next = value.painTriggers.toMutableSet(); if (!next.add(key)) next.remove(key); triggerValues = next.sorted().joinToString("|") }
+                        SymptomPill(key in value.painTriggers, careTr(hindi, labels.first, labels.second), null, multi = true) { val next = value.painTriggers.toMutableSet(); if (!next.add(key)) next.remove(key); triggerValues = next.sorted().joinToString("|") }
                     } }
                 }
                 if (!quick && cur == "how") SymptomSection(null, t("Who reported this?", "किसने बताया?")) {
@@ -350,7 +345,7 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
                 if ((quick || cur == "how") && isMood) SymptomDiaryRules.moodScales.forEach { (key, label) ->
                     val chosen = if (key == "low-mood") moodLow else moodAnxiety
                     val set: (Int) -> Unit = { n -> if (key == "low-mood") { moodLow = n } else { moodAnxiety = n } }
-                    SymptomSection(null, if (hindi) label.second else label.first, SymptomDiaryRules.ratingAnchors(scale, hindi)) {
+                    SymptomSection(null, careTr(hindi, label.first, label.second), SymptomDiaryRules.ratingAnchors(scale, hindi)) {
                         RatingReadout(chosen, hindi, scale)
                         listOf(0..5, 6..10).forEach { range ->
                             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -403,7 +398,7 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
                     localError = if (ratingNow == -2) t("Choose a rating or Not rated.", "अंक चुनें या अंक नहीं बताया चुनें।") else SymptomDiaryRules.error(saved)?.let { e -> t(e, SymptomErrorsHindi[e] ?: e) }.orEmpty()
                     if (localError.isBlank()) onSave(id, saved)
                 }
-                (localError.takeIf { it.isNotBlank() } ?: actionError)?.let { Text(if (hindi && it == SymptomDiaryRules.SAVE_CONFLICT) "यह नोट बदल गया है या हटा दिया गया है। आपके जवाब यहीं हैं। सहेजने से पहले यह फ़ॉर्म बंद करके मौजूदा नोट फिर खोलें।" else if (hindi) "नोट सहेजा नहीं गया। जवाब यहीं हैं। तारीख, नाम और चुने हुए जवाब जाँचें।" else it, color = MaterialTheme.colorScheme.error, fontSize = 15.sp, fontWeight = FontWeight.SemiBold) }
+                (localError.takeIf { it.isNotBlank() } ?: actionError)?.let { Text(if (hindi && it == SymptomDiaryRules.SAVE_CONFLICT) "यह नोट बदल गया है या हटा दिया गया है। आपके जवाब यहीं हैं। सहेजने से पहले यह फ़ॉर्म बंद करके मौजूदा नोट फिर खोलें।" else if (hindi) "नोट सहेजा नहीं गया। जवाब यहीं हैं। तारीख, नाम और चुने हुए जवाब जाँचें।" else careTr(false, it, it), color = MaterialTheme.colorScheme.error, fontSize = 15.sp, fontWeight = FontWeight.SemiBold) }
                 if (!quick && !stepValid && cur == "how") Text(if (ratingMissing) t("Choose a rating or Not rated.", "अंक चुनें या अंक नहीं बताया चुनें।") else t("Answer the questions above to continue.", "आगे बढ़ने के लिए ऊपर के सवाल भरें।"), color = DoctorCardSub, fontSize = 14.sp)
                 if (sharedOnline && (quick || pos == steps.lastIndex || (cur == "how" && stepValid))) Text(t(CarePrivacy.SYMPTOM_NOTICE_EN, CarePrivacy.SYMPTOM_NOTICE_HI), color = DoctorCardSub, fontSize = 13.sp, modifier = Modifier.testTag("symptom-privacy-notice"))
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -419,5 +414,5 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
 }
 
 @Composable private fun DiaryChoices(options: Map<String, Pair<String, String>>, selected: String, hindi: Boolean, onSelect: (String) -> Unit) {
-    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { options.forEach { (key, label) -> SymptomPill(selected == key, if (hindi) label.second else label.first, "diary-choice-$key", onClick = { onSelect(key) }) } }
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { options.forEach { (key, label) -> SymptomPill(selected == key, careTr(hindi, label.first, label.second), "diary-choice-$key", onClick = { onSelect(key) }) } }
 }

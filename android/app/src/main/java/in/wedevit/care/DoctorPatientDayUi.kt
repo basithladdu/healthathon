@@ -243,7 +243,7 @@ private fun doctorDayLabel(at: Long, now: Long, zone: ZoneId): String {
     Surface(color = bg, contentColor = fg, shape = RoundedCornerShape(50), modifier = modifier) { Text(mood?.title ?: fallback, Modifier.padding(horizontal = 12.dp, vertical = 5.dp), fontSize = 13.sp, lineHeight = 16.sp, fontWeight = FontWeight.SemiBold, color = fg) }
 }
 private fun doctorPlural(n: Int) = if (n == 1) "1 update" else "$n updates"
-private fun doctorToolLabel(label: String, hindi: Boolean) = if (!hindi) label else when (label) { "Calendar" -> "कैलेंडर"; "Care team" -> "देखभाल टीम"; "Lab history" -> "जाँच रिपोर्टें"; else -> label }
+private fun doctorToolLabel(label: String, hindi: Boolean) = careTr(hindi, label, when (label) { "Calendar" -> "कैलेंडर"; "Care team" -> "देखभाल टीम"; "Lab history" -> "जाँच रिपोर्टें"; else -> label })
 
 @Composable internal fun DoctorCheckInHistory(personId: String, entries: List<CareItem>, now: Long = System.currentTimeMillis(), zone: ZoneId = ZoneId.systemDefault()) { val t = careText();
     val checks = doctorCheckIns(entries, personId, now)

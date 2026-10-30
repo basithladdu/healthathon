@@ -66,12 +66,12 @@ import kotlinx.coroutines.launch
                 job = scope.launch { try { result = service.translate(source, target) { done, total -> progress = done to total } }
                 catch (failure: Exception) { if (failure is CancellationException) throw failure; error = failure.message ?: t("Could not translate. The original is unchanged.", "अनुवाद नहीं हो सका। मूल वैसा ही है।") }
                 finally { busy = false } }
-            }, enabled = !busy && source.isNotBlank(), modifier = Modifier.testTag("offline-translation-start")) { Text(if (busy) t("Reading line ${progress.first} / ${progress.second}", "पंक्ति ${progress.first} / ${progress.second} पढ़ रहे हैं") else if (target == "hi") "Translate with Google · हिन्दी" else "Translate with Google · English") }
+            }, enabled = !busy && source.isNotBlank(), modifier = Modifier.testTag("offline-translation-start")) { Text(if (busy) t("Reading line ${progress.first} / ${progress.second}", "पंक्ति ${progress.first} / ${progress.second} पढ़ रहे हैं") else if (target == "hi") careBilingual("Translate with Google", "हिन्दी") else "Translate with Google · English") }
             if (busy) TextButton(onClick = { job?.cancel(); busy = false }) { Text(t("Cancel", "रद्द करें")) }
         }
         if (error.isNotBlank()) Text(error, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce())
         if (result.isNotEmpty()) {
-            Text("Original and machine translation · मूल और अनुवाद", fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
+            Text(careBilingual("Original and machine translation", "मूल और अनुवाद"), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
             result.forEach { line ->
                 Column(Modifier.padding(vertical = 6.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     SelectionContainerText(line.original)
@@ -79,7 +79,7 @@ import kotlinx.coroutines.launch
                 }
             }
             Text(t("Check names, medicines, numbers and words such as ‘not’. Mixed or Roman Hindi may need correction by a bilingual person. This reading aid does not change the care note.", "नाम, दवाएँ, अंक और ‘नहीं’ जैसे शब्द जाँचें। मिली-जुली या रोमन में लिखी हिन्दी को दोनों भाषाएँ जानने वाला व्यक्ति ठीक करे। यह पढ़ने की मदद केयर नोट नहीं बदलती।"), style = MaterialTheme.typography.bodySmall)
-            CheckLine(checked, { checked = it }, "A Hindi/English reader checked this translation · अनुवाद जाँच लिया")
+            CheckLine(checked, { checked = it }, careBilingual("A Hindi/English reader checked this translation", "अनुवाद जाँच लिया"))
             if (checked) {
                 val translated = result.joinToString("\n") { it.translated }
                 CareReadAloudControl(translated, "$versionId-offline-$target", if (target == "hi") "hi-IN" else "en-IN")
@@ -100,7 +100,7 @@ import kotlinx.coroutines.launch
 
 /** Plain statements for when the on-device translator cannot run. English · Hindi. */
 internal object CareOfflineTranslationCopy {
-    const val unavailable = "Translation is unavailable on this phone right now. Please read the original note. · इस फ़ोन पर अभी अनुवाद नहीं हो सकता। मूल नोट पढ़ें।"
-    const val downloadFailed = "Translation is unavailable until the Hindi–English pack downloads. Check the internet connection and try again; the original note is unchanged. · हिन्दी–English पैक डाउनलोड होने तक अनुवाद उपलब्ध नहीं है। इंटरनेट जाँचकर फिर कोशिश करें; मूल नोट नहीं बदला।"
-    const val waitingForWifi = "Waiting for Wi-Fi. Untick “Download over Wi-Fi only” to use mobile data. · वाई-फ़ाई का इंतज़ार है। मोबाइल डेटा से डाउनलोड के लिए “Wi-Fi only” हटाएँ।"
+    val unavailable: String get() = careBilingual("Translation is unavailable on this phone right now. Please read the original note.", "इस फ़ोन पर अभी अनुवाद नहीं हो सकता। मूल नोट पढ़ें।")
+    val downloadFailed: String get() = careBilingual("Translation is unavailable until the Hindi–English pack downloads. Check the internet connection and try again; the original note is unchanged.", "हिन्दी–English पैक डाउनलोड होने तक अनुवाद उपलब्ध नहीं है। इंटरनेट जाँचकर फिर कोशिश करें; मूल नोट नहीं बदला।")
+    val waitingForWifi: String get() = careBilingual("Waiting for Wi-Fi. Untick “Download over Wi-Fi only” to use mobile data.", "वाई-फ़ाई का इंतज़ार है। मोबाइल डेटा से डाउनलोड के लिए “Wi-Fi only” हटाएँ।")
 }

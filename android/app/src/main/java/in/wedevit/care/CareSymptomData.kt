@@ -32,7 +32,7 @@ data class DatedRating(val itemId: String, val date: String, val time: String, v
 object PainBands {
     val labels = linkedMapOf("none" to ("None" to "कोई नहीं"), "mild" to ("Mild" to "हल्का"), "moderate" to ("Moderate" to "मध्यम"), "severe" to ("Severe" to "तेज़"))
     fun key(rating: Int): String = when (rating.coerceIn(0, 10)) { 0 -> "none"; in 1..3 -> "mild"; in 4..6 -> "moderate"; else -> "severe" }
-    fun label(rating: Int, hindi: Boolean): String = labels.getValue(key(rating)).let { if (hindi) it.second else it.first }
+    fun label(rating: Int, hindi: Boolean): String = labels.getValue(key(rating)).let { careTr(hindi, it.first, it.second) }
     const val SOURCE_EN = "Source: bands from the NCCN Adult Cancer Pain guideline (Swarm et al., JNCCN 2010): 0 none, 1–3 mild, 4–6 moderate, 7–10 severe."
     const val SOURCE_HI = "स्रोत: NCCN Adult Cancer Pain गाइडलाइन (Swarm et al., JNCCN 2010) के समूह: 0 कोई नहीं, 1–3 हल्का, 4–6 मध्यम, 7–10 तेज़।"
 }
@@ -68,18 +68,18 @@ object SymptomDiaryRules {
     val respondents = linkedMapOf("patient" to ("Patient" to "मरीज़"), "assisted-patient" to ("Patient, with help" to "मरीज़ ने मदद से बताया"), "caregiver" to ("Seen by family or carer" to "देखभाल करने वाले ने देखा"), "clinician" to ("Seen by care team" to "देखभाल टीम ने देखा"))
     val triggers = linkedMapOf("rest" to ("At rest" to "आराम करते समय"), "turning" to ("Turning in bed" to "करवट लेते समय"), "walking" to ("Standing / walking" to "खड़े होते / चलते समय"), "coughing" to ("Coughing" to "खाँसते समय"), "other" to ("Other" to "अन्य"), "not-sure" to ("Not sure" to "पक्का नहीं"))
     val changes = linkedMapOf("better" to ("Better" to "बेहतर"), "same" to ("Same" to "वैसा ही"), "worse" to ("Worse" to "ज़्यादा खराब"), "not-sure" to ("Not sure" to "पक्का नहीं"))
-    fun label(labels: Map<String, Pair<String, String>>, key: String, hindi: Boolean) = labels[key]?.let { if (hindi) it.second else it.first }.orEmpty()
-    fun symptomLabel(value: String, hindi: Boolean) = if (hindi) symptoms[value] ?: legacyHindiLabels[value] ?: value else englishLabels[value] ?: value
+    fun label(labels: Map<String, Pair<String, String>>, key: String, hindi: Boolean) = labels[key]?.let { careTr(hindi, it.first, it.second) }.orEmpty()
+    fun symptomLabel(value: String, hindi: Boolean) = if (hindi) symptoms[value] ?: legacyHindiLabels[value] ?: value else if (CareLanguageState.shown.dictionary) careTr(false, value, value) else englishLabels[value] ?: value
     fun scaleForSymptom(value: String) = if (value == "Overall well-being") WELLBEING_SCALE else PERSONAL_SCALE
     fun ratingQuestion(scale: String, hindi: Boolean) = if (scale == WELLBEING_SCALE) {
-        if (hindi) "कुल मिलाकर तबीयत कैसी है?" else "How is the overall well-being?"
-    } else if (hindi) "कितनी परेशानी है?" else "How strong is it?"
+        careTr(hindi, "How is the overall well-being?", "कुल मिलाकर तबीयत कैसी है?")
+    } else careTr(hindi, "How strong is it?", "कितनी परेशानी है?")
     fun ratingAnchors(scale: String, hindi: Boolean) = if (scale == WELLBEING_SCALE) {
-        if (hindi) "0 = सबसे अच्छी तबीयत · 10 = सबसे खराब तबीयत" else "0 = best possible well-being · 10 = worst possible well-being"
-    } else if (hindi) "0 = बिलकुल नहीं · 10 = सबसे ज़्यादा" else "0 = none · 10 = worst imaginable"
-    fun ratingLabel(value: Int?, hindi: Boolean = false) = value?.let { "$it/10" } ?: if (hindi) "अंक नहीं बताया" else "Not rated"
+        careTr(hindi, "0 = best possible well-being · 10 = worst possible well-being", "0 = सबसे अच्छी तबीयत · 10 = सबसे खराब तबीयत")
+    } else careTr(hindi, "0 = none · 10 = worst imaginable", "0 = बिलकुल नहीं · 10 = सबसे ज़्यादा")
+    fun ratingLabel(value: Int?, hindi: Boolean = false) = value?.let { "$it/10" } ?: careTr(hindi, "Not rated", "अंक नहीं बताया")
     /** "Low mood 4/10 · Anxiety Not rated" for a Mood note. */
-    fun moodSummary(ratings: Map<String, Int>, hindi: Boolean) = moodShort.entries.joinToString(" · ") { (k, l) -> "${if (hindi) l.second else l.first} ${ratingLabel(ratings[k], hindi)}" }
+    fun moodSummary(ratings: Map<String, Int>, hindi: Boolean) = moodShort.entries.joinToString(" · ") { (k, l) -> "${careTr(hindi, l.first, l.second)} ${ratingLabel(ratings[k], hindi)}" }
     fun editToken(item: CareItem): String = JSONObject().put("id", item.id).put("personId", item.personId).put("kind", item.kind)
         .put("title", item.title).put("detail", item.detail).put("due", item.due).put("doneOn", item.doneOn)
         .put("created", item.created).put("revision", item.revision).toString()
@@ -184,10 +184,10 @@ object SymptomNoteCodec {
         }.getOrNull()
     }
     fun readable(text: String, hindi: Boolean = false): String = decode(text)?.let { n ->
-        listOf("${if (hindi) "देखा गया" else "Observed"}: ${n.observedDate} ${n.observedTime} · ${if (n.symptom == SymptomDiaryRules.MOOD) SymptomDiaryRules.moodSummary(n.moodRatings, hindi) else SymptomDiaryRules.ratingLabel(n.rating, hindi) + (n.rating?.takeIf { n.symptom.trim() == "Pain" }?.let { " · ${PainBands.label(it, hindi)}" } ?: "")}", SymptomDiaryRules.ratingAnchors(n.scale, hindi).takeIf { n.scale == SymptomDiaryRules.WELLBEING_SCALE }.orEmpty(), SymptomDiaryRules.label(SymptomDiaryRules.recalls, n.recall, hindi),
+        listOf("${careTr(hindi, "Observed", "देखा गया")}: ${n.observedDate} ${n.observedTime} · ${if (n.symptom == SymptomDiaryRules.MOOD) SymptomDiaryRules.moodSummary(n.moodRatings, hindi) else SymptomDiaryRules.ratingLabel(n.rating, hindi) + (n.rating?.takeIf { n.symptom.trim() == "Pain" }?.let { " · ${PainBands.label(it, hindi)}" } ?: "")}", SymptomDiaryRules.ratingAnchors(n.scale, hindi).takeIf { n.scale == SymptomDiaryRules.WELLBEING_SCALE }.orEmpty(), SymptomDiaryRules.label(SymptomDiaryRules.recalls, n.recall, hindi),
             "${SymptomDiaryRules.label(SymptomDiaryRules.respondents, n.respondent, hindi)} · ${n.author}",
-            n.startedOn.takeIf { it.isNotBlank() }?.let { "${if (hindi) "शुरू हुआ" else "Started"}: $it" }.orEmpty(),
-            n.painLocation, n.painBodySites.takeIf { it.isNotEmpty() }?.joinToString(prefix = if (hindi) "दर्द की जगह: " else "Pain areas: ") { PainBodyMapRules.label(it, hindi) + (n.painBodyRatings[it]?.let { r -> " $r/10" } ?: "") }.orEmpty(), n.painTriggers.joinToString { SymptomDiaryRules.label(SymptomDiaryRules.triggers, it, hindi) },
-            n.selfReportedChange.takeIf { it.isNotBlank() }?.let { "${if (hindi) "उनके मुताबिक बदलाव" else "Reported change"}: ${SymptomDiaryRules.label(SymptomDiaryRules.changes, it, hindi)}" }.orEmpty(), n.note).filter(String::isNotBlank).joinToString("\n")
-    } ?: if (!isStructured(text)) text else if (hindi) "यह नोट पढ़ा नहीं जा सका। मूल रिकॉर्ड सुरक्षित है।" else "This symptom note could not be read. The original record is retained."
+            n.startedOn.takeIf { it.isNotBlank() }?.let { "${careTr(hindi, "Started", "शुरू हुआ")}: $it" }.orEmpty(),
+            n.painLocation, n.painBodySites.takeIf { it.isNotEmpty() }?.joinToString(prefix = careTr(hindi, "Pain areas: ", "दर्द की जगह: ")) { PainBodyMapRules.label(it, hindi) + (n.painBodyRatings[it]?.let { r -> " $r/10" } ?: "") }.orEmpty(), n.painTriggers.joinToString { SymptomDiaryRules.label(SymptomDiaryRules.triggers, it, hindi) },
+            n.selfReportedChange.takeIf { it.isNotBlank() }?.let { "${careTr(hindi, "Reported change", "उनके मुताबिक बदलाव")}: ${SymptomDiaryRules.label(SymptomDiaryRules.changes, it, hindi)}" }.orEmpty(), n.note).filter(String::isNotBlank).joinToString("\n")
+    } ?: if (!isStructured(text)) text else careTr(hindi, "This symptom note could not be read. The original record is retained.", "यह नोट पढ़ा नहीं जा सका। मूल रिकॉर्ड सुरक्षित है।")
 }

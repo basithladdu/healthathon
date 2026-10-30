@@ -59,37 +59,37 @@ internal object DoctorConnectedHome {
     }
 
     fun verificationTitle(state: Verification, hindi: Boolean): String = when (state) {
-        Verification.UNKNOWN -> if (hindi) "सत्यापन की स्थिति देखी जा रही है" else "Checking verification"
-        Verification.NOT_SUBMITTED -> if (hindi) "पंजीकरण अभी जमा नहीं हुआ" else "Registration not submitted"
-        Verification.PENDING -> if (hindi) "मंज़ूरी का इंतज़ार" else "Waiting for approval"
-        Verification.APPROVED -> if (hindi) "डॉक्टर के रूप में मंज़ूर" else "Approved as a doctor"
-        Verification.REJECTED -> if (hindi) "पंजीकरण मंज़ूर नहीं हुआ" else "Registration not approved"
-        Verification.SUSPENDED -> if (hindi) "मंज़ूरी रोकी गई है" else "Approval on hold"
+        Verification.UNKNOWN -> careTr(hindi, "Checking verification", "सत्यापन की स्थिति देखी जा रही है")
+        Verification.NOT_SUBMITTED -> careTr(hindi, "Registration not submitted", "पंजीकरण अभी जमा नहीं हुआ")
+        Verification.PENDING -> careTr(hindi, "Waiting for approval", "मंज़ूरी का इंतज़ार")
+        Verification.APPROVED -> careTr(hindi, "Approved as a doctor", "डॉक्टर के रूप में मंज़ूर")
+        Verification.REJECTED -> careTr(hindi, "Registration not approved", "पंजीकरण मंज़ूर नहीं हुआ")
+        Verification.SUSPENDED -> careTr(hindi, "Approval on hold", "मंज़ूरी रोकी गई है")
     }
 
     fun verificationBody(state: Verification, hindi: Boolean): String = when (state) {
-        Verification.UNKNOWN -> if (hindi) "सर्वर से आपकी स्थिति ली जा रही है।" else "Asking the server for your status."
-        Verification.NOT_SUBMITTED -> if (hindi) "अपना पंजीकृत नाम, मेडिकल काउंसिल और पंजीकरण नंबर जमा करें। मंज़ूरी के बाद ही मरीज़ आपको अपने डॉक्टर के रूप में जोड़ सकते हैं।" else "Submit your registered name, medical council and registration number. Patients can add you as their doctor only after approval."
-        Verification.PENDING -> if (hindi) "Sahara टीम हर पंजीकरण खुद जाँचती है। यह अपने आप मंज़ूर नहीं होता, इसलिए इसमें समय लग सकता है। तब तक डॉक्टर वाला निमंत्रण कोड काम नहीं करेगा। बाद में \"फिर से देखें\" दबाएँ।" else "The Sahara team checks every registration by hand. Nothing is approved automatically, so this can take a while. Until then, a doctor invitation code will not work. Tap \"Check again\" later."
-        Verification.APPROVED -> if (hindi) "मरीज़ या परिवार से मिला डॉक्टर निमंत्रण कोड अब काम करेगा। हर मरीज़ खुद तय करता है कि आप क्या देख सकते हैं।" else "Doctor invitation codes from a patient or family will now work. Each patient decides what you can see."
-        Verification.REJECTED, Verification.SUSPENDED -> if (hindi) "डॉक्टर निमंत्रण कोड अभी काम नहीं करेंगे। विवरण ठीक करके फिर से जमा करें।" else "Doctor invitation codes will not work for now. Correct your details and submit them again."
+        Verification.UNKNOWN -> careTr(hindi, "Asking the server for your status.", "सर्वर से आपकी स्थिति ली जा रही है।")
+        Verification.NOT_SUBMITTED -> careTr(hindi, "Submit your registered name, medical council and registration number. Patients can add you as their doctor only after approval.", "अपना पंजीकृत नाम, मेडिकल काउंसिल और पंजीकरण नंबर जमा करें। मंज़ूरी के बाद ही मरीज़ आपको अपने डॉक्टर के रूप में जोड़ सकते हैं।")
+        Verification.PENDING -> careTr(hindi, "The Sahara team checks every registration by hand. Nothing is approved automatically, so this can take a while. Until then, a doctor invitation code will not work. Tap \"Check again\" later.", "Sahara टीम हर पंजीकरण खुद जाँचती है। यह अपने आप मंज़ूर नहीं होता, इसलिए इसमें समय लग सकता है। तब तक डॉक्टर वाला निमंत्रण कोड काम नहीं करेगा। बाद में \"फिर से देखें\" दबाएँ।")
+        Verification.APPROVED -> careTr(hindi, "Doctor invitation codes from a patient or family will now work. Each patient decides what you can see.", "मरीज़ या परिवार से मिला डॉक्टर निमंत्रण कोड अब काम करेगा। हर मरीज़ खुद तय करता है कि आप क्या देख सकते हैं।")
+        Verification.REJECTED, Verification.SUSPENDED -> careTr(hindi, "Doctor invitation codes will not work for now. Correct your details and submit them again.", "डॉक्टर निमंत्रण कोड अभी काम नहीं करेंगे। विवरण ठीक करके फिर से जमा करें।")
     }
 
     fun checkedAt(at: Long, hindi: Boolean, zone: ZoneId = ZoneId.systemDefault()): String =
-        (if (hindi) "आख़िरी बार देखा: " else "Last checked ") + DateTimeFormatter.ofPattern("h:mm a", if (hindi) Locale("hi", "IN") else Locale.ENGLISH).withZone(zone).format(Instant.ofEpochMilli(at))
+        (careTr(hindi, "Last checked ", "आख़िरी बार देखा: ")) + DateTimeFormatter.ofPattern("h:mm a", careLocale(hindi)).withZone(zone).format(Instant.ofEpochMilli(at))
 }
 
 /** The app's shared English/Hindi choice, or a phone set to Hindi. */
 @Composable internal fun doctorUiHindi(): Boolean = careHindi() || Locale.getDefault().language == "hi"
 
 private fun doctorWhen(item: CareItem, hindi: Boolean, zone: ZoneId = ZoneId.systemDefault()): String {
-    if (item.due <= 0) return if (hindi) "तारीख़ दर्ज नहीं" else "Date not recorded"
+    if (item.due <= 0) return careTr(hindi, "Date not recorded", "तारीख़ दर्ज नहीं")
     val timed = CareEntryCodec.decode(item.detail)?.timed == true
-    return DateTimeFormatter.ofPattern(if (timed) "EEE, d MMM · h:mm a" else "EEE, d MMM", if (hindi) Locale("hi", "IN") else Locale.ENGLISH).withZone(zone).format(Instant.ofEpochMilli(item.due))
+    return DateTimeFormatter.ofPattern(if (timed) "EEE, d MMM · h:mm a" else "EEE, d MMM", careLocale(hindi)).withZone(zone).format(Instant.ofEpochMilli(item.due))
 }
 
 @Composable internal fun DoctorVerificationCard(state: DoctorConnectedHome.Verification, note: String, checkedAt: Long, checking: Boolean, error: String?, hindi: Boolean, onCheck: () -> Unit, onOpenForm: () -> Unit) {
-    val t = { en: String, hi: String -> if (hindi) hi else en }
+    val t = { en: String, hi: String -> careTr(hindi, en, hi) }
     val color = when (state) { DoctorConnectedHome.Verification.APPROVED -> Mint; DoctorConnectedHome.Verification.PENDING, DoctorConnectedHome.Verification.UNKNOWN -> Gold.copy(alpha = .35f); else -> Peach }
     Surface(color = color, shape = RoundedCornerShape(22.dp), modifier = Modifier.fillMaxWidth().testTag("doctor-verification-card")) {
         Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -114,15 +114,15 @@ private fun doctorWhen(item: CareItem, hindi: Boolean, zone: ZoneId = ZoneId.sys
 @Composable internal fun DoctorPatientSearchField(query: String, onQuery: (String) -> Unit, hindi: Boolean) {
     val focus = LocalFocusManager.current
     OutlinedTextField(query, { onQuery(it.take(80)) }, Modifier.fillMaxWidth().testTag("doctor-patient-search"), singleLine = true,
-        placeholder = { Text(if (hindi) "नाम या मरीज़ ID (जैसे SH-1A2B3C4D)" else "Name or patient ID (e.g. SH-1A2B3C4D)") },
+        placeholder = { Text(careTr(hindi, "Name or patient ID (e.g. SH-1A2B3C4D)", "नाम या मरीज़ ID (जैसे SH-1A2B3C4D)")) },
         leadingIcon = { Icon(Icons.Default.Search, null) },
-        trailingIcon = { if (query.isNotEmpty()) IconButton(onClick = { onQuery("") }, Modifier.size(48.dp)) { Icon(Icons.Default.Clear, if (hindi) "खोज साफ़ करें" else "Clear search") } },
+        trailingIcon = { if (query.isNotEmpty()) IconButton(onClick = { onQuery("") }, Modifier.size(48.dp)) { Icon(Icons.Default.Clear, careTr(hindi, "Clear search", "खोज साफ़ करें")) } },
         shape = RoundedCornerShape(16.dp), keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search), keyboardActions = KeyboardActions(onSearch = { focus.clearFocus() }))
 }
 
 /** Doctor Home: real visits and check-ins across this account's connected patients. */
 internal fun LazyListScope.doctorConnectedHomeItems(people: List<Person>, items: List<CareItem>, now: Long, hindi: Boolean, onVisit: (String) -> Unit, onProgress: (String) -> Unit, onPatients: () -> Unit) {
-    val t = { en: String, hi: String -> if (hindi) hi else en }
+    val t = { en: String, hi: String -> careTr(hindi, en, hi) }
     val visits = DoctorConnectedHome.upcomingVisits(people, items, now)
     val checks = DoctorConnectedHome.recentCheckIns(people, items, now)
     item(key = "home-patients") {
@@ -142,13 +142,13 @@ internal fun LazyListScope.doctorConnectedHomeItems(people: List<Person>, items:
     item(key = "home-checks-title") { Text(t("Check-ins this week", "इस हफ़्ते के हालचाल"), style = MaterialTheme.typography.titleMedium) }
     if (checks.isEmpty()) item(key = "home-checks-empty") { Text(t("No check-ins reported in the last 7 days.", "पिछले 7 दिनों में कोई हालचाल दर्ज नहीं हुआ।"), style = MaterialTheme.typography.bodyMedium) }
     items(checks, key = { "home-check-${it.second.id}" }) { (person, check) ->
-        DoctorPatientListCard(person.name, "${checkInMoodLabel(check.title, hindi)} · ${DateTimeFormatter.ofPattern("d MMM, h:mm a", if (hindi) Locale("hi", "IN") else Locale.ENGLISH).withZone(ZoneId.systemDefault()).format(Instant.ofEpochMilli(check.created))}", { onProgress(person.id) })
+        DoctorPatientListCard(person.name, "${checkInMoodLabel(check.title, hindi)} · ${DateTimeFormatter.ofPattern("d MMM, h:mm a", careLocale(hindi)).withZone(ZoneId.systemDefault()).format(Instant.ofEpochMilli(check.created))}", { onProgress(person.id) })
     }
 }
 
 /** Doctor Schedule: every open visit across connected patients, grouped by day. */
 internal fun LazyListScope.doctorConnectedScheduleItems(people: List<Person>, items: List<CareItem>, now: Long, hindi: Boolean, onVisit: (String) -> Unit) {
-    val t = { en: String, hi: String -> if (hindi) hi else en }
+    val t = { en: String, hi: String -> careTr(hindi, en, hi) }
     val visits = DoctorConnectedHome.upcomingVisits(people, items, now)
     item(key = "schedule-title") { Text(t("Schedule", "समय-सारणी"), style = MaterialTheme.typography.headlineMedium); Text(t("Open visits for the patients who share their care with you. Tap one to add or change a visit.", "जो मरीज़ आपसे देखभाल साझा करते हैं, उनकी खुली मुलाक़ातें। मुलाक़ात जोड़ने या बदलने के लिए छुएँ।")) }
     if (people.isEmpty()) item(key = "schedule-no-people") { Text(t("No connected patients yet.", "अभी कोई जुड़ा हुआ मरीज़ नहीं है।"), fontWeight = FontWeight.Medium) }
@@ -165,10 +165,10 @@ internal fun LazyListScope.doctorConnectedScheduleItems(people: List<Person>, it
 @Composable internal fun DoctorWalkthroughCard(hindi: Boolean, onOpen: (DoctorTestProfiles.Profile) -> Unit) {
     Surface(color = Peach.copy(alpha = .45f), shape = RoundedCornerShape(22.dp), modifier = Modifier.fillMaxWidth().testTag("doctor-walkthrough-card")) {
         Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(if (hindi) "अभ्यास वॉकथ्रू · असली मरीज़ नहीं" else "Practice walkthrough · not real patients", style = MaterialTheme.typography.titleLarge)
-            Text(if (hindi) "अभ्यास के लिए बनाए गए मरीज़, असली नहीं। ये सिर्फ़ इस फ़ोन पर रहते हैं और किसी असली मरीज़ के रिकॉर्ड में नहीं जाते।" else "Made-up patients for practice, not real people. They stay on this phone and never mix with a real patient's records.", style = MaterialTheme.typography.bodyMedium)
+            Text(careTr(hindi, "Practice walkthrough · not real patients", "अभ्यास वॉकथ्रू · असली मरीज़ नहीं"), style = MaterialTheme.typography.titleLarge)
+            Text(careTr(hindi, "Made-up patients for practice, not real people. They stay on this phone and never mix with a real patient's records.", "अभ्यास के लिए बनाए गए मरीज़, असली नहीं। ये सिर्फ़ इस फ़ोन पर रहते हैं और किसी असली मरीज़ के रिकॉर्ड में नहीं जाते।"), style = MaterialTheme.typography.bodyMedium)
             DoctorTestProfiles.profiles.forEach { profile ->
-                TextButton(onClick = { onOpen(profile) }, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-walkthrough-${profile.key}")) { Text((if (hindi) "अभ्यास: " else "Practice: ") + profile.name) }
+                TextButton(onClick = { onOpen(profile) }, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-walkthrough-${profile.key}")) { Text((careTr(hindi, "Practice: ", "अभ्यास: ")) + profile.name) }
             }
         }
     }

@@ -109,6 +109,18 @@ class CareHindiCoverageTest {
         assertEquals(false, CareLanguageChoice(own, device).hindi)
     }
 
+    @Test fun languageChoiceIsKeptForAccountAndPhone() {
+        val own = MemoryPreferences(); val device = MemoryPreferences()
+        CareLanguageChoice(own, device).choose(CareLang.UR)
+        CareLanguageState.current = CareLang.EN
+        assertEquals(CareLang.UR, CareLanguageChoice(own, device).lang)
+        assertEquals(CareLang.UR, CareLanguageChoice(MemoryPreferences(), device).lang)
+        assertEquals(CareLang.UR, CareLanguageChoice.deviceLanguage(device))
+        // A phone that chose Hindi before languages were added stays on Hindi.
+        val older = MemoryPreferences().also { it.edit().putBoolean("hindi", true).apply() }
+        assertEquals(CareLang.HI, CareLanguageChoice(older, null).lang)
+    }
+
     @Test fun hindiDatesUseHindiNames() {
         assertEquals("सोमवार, 26 अक्तूबर", LocalDate.of(2026, 10, 26).format(careDateFormat("EEEE, d MMMM", true)).replace("अक्टूबर", "अक्तूबर"))
     }

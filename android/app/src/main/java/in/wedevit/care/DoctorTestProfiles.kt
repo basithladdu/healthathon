@@ -59,7 +59,7 @@ internal object DoctorTestProfiles {
         fun symptom(n:Int,ageHours:Long,note:SymptomNote):CareItem {
             val at=Instant.ofEpochMilli(now-ageHours*3_600_000).atZone(zone).toLocalDateTime().withSecond(0).withNano(0)
             val value=note.copy(observedDate=at.toLocalDate().toString(),observedTime=at.toLocalTime().toString(),respondent="patient",author="Rahul")
-            return CareItem(key("symptom-$n"),person.id,"checkin","${value.symptom} · ${if(value.symptom==SymptomDiaryRules.MOOD)SymptomDiaryRules.moodSummary(value.moodRatings,false) else SymptomDiaryRules.ratingLabel(value.rating)}",SymptomNoteCodec.encode(value),created=now-ageHours*3_600_000)
+            return CareItem(key("symptom-$n"),person.id,"checkin",careInEnglish { "${value.symptom} · ${if(value.symptom==SymptomDiaryRules.MOOD)SymptomDiaryRules.moodSummary(value.moodRatings,false) else SymptomDiaryRules.ratingLabel(value.rating)}" },SymptomNoteCodec.encode(value),created=now-ageHours*3_600_000)
         }
         val diary=if(rahul) listOf(
             distress(1,5*24+4,DistressCheck(true,6,listOf("Pain","Worry or anxiety"),"Worried about the drive to the oncology review.")),

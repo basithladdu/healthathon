@@ -129,11 +129,11 @@ internal fun ratingColor(n: Int): Color = if (n <= 5) lerp(DoctorStatusGood, Col
                 Text(rating.toString(), color = ratingColor(rating), fontFamily = SaharaTitleFont, fontSize = 44.sp, lineHeight = 48.sp)
                 Text("/ 10", color = DoctorCardInk, fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
                 if (scale == SymptomDiaryRules.WELLBEING_SCALE && rating in setOf(0, 10)) Text(if (rating == 0) {
-                    if (hindi) "सबसे अच्छी तबीयत" else "Best possible well-being"
-                } else if (hindi) "सबसे खराब तबीयत" else "Worst possible well-being", color = DoctorCardInk, fontSize = 15.sp, modifier = Modifier.weight(1f))
+                    careTr(hindi, "Best possible well-being", "सबसे अच्छी तबीयत")
+                } else careTr(hindi, "Worst possible well-being", "सबसे खराब तबीयत"), color = DoctorCardInk, fontSize = 15.sp, modifier = Modifier.weight(1f))
             }
-            rating == -1 -> Text(if (hindi) "अंक नहीं बताया" else "Not rated", color = DoctorCardInk, fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
-            else -> Text(if (hindi) "नीचे से एक अंक चुनें" else "Tap a number below", color = DoctorCardSub, fontSize = 15.sp)
+            rating == -1 -> Text(careTr(hindi, "Not rated", "अंक नहीं बताया"), color = DoctorCardInk, fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
+            else -> Text(careTr(hindi, "Tap a number below", "नीचे से एक अंक चुनें"), color = DoctorCardSub, fontSize = 15.sp)
         }
     }
 }

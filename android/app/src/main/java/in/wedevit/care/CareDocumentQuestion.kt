@@ -32,15 +32,15 @@ object DocumentQuestionRules {
 
     fun build(question: String, documents: List<DocumentQuestionSource>): DocumentQuestionRequest {
         val asked = question.trim()
-        require(asked.isNotEmpty() && asked.length <= MAX_QUESTION) { "Type a question of up to 300 characters. · 300 अक्षरों तक का सवाल लिखें।" }
-        require(documents.size in 1..MAX_DOCUMENTS && documents.map { it.reportId }.distinct().size == documents.size) { "Choose one to five documents. · एक से पाँच कागज़ चुनें।" }
+        require(asked.isNotEmpty() && asked.length <= MAX_QUESTION) { careBilingual("Type a question of up to 300 characters.", "300 अक्षरों तक का सवाल लिखें।") }
+        require(documents.size in 1..MAX_DOCUMENTS && documents.map { it.reportId }.distinct().size == documents.size) { careBilingual("Choose one to five documents.", "एक से पाँच कागज़ चुनें।") }
         val sources = documents.mapIndexed { index, document -> "D${index + 1}" to document }.toMap()
         val lines = sources.flatMap { (ref, document) -> document.pages.sortedBy { it.page }.flatMap { page ->
             // Line numbers match the review screen and the report search, so a citation points at the same line there.
             page.reviewedText.split('\n').mapIndexedNotNull { index, text -> text.trim().takeIf { it.isNotEmpty() }?.let { DocumentQuestionLine(ref, page.page, index + 1, it.take(2000)) } }
         } }
-        sources.forEach { (ref, document) -> require(lines.any { it.document == ref }) { "“${document.name}” has no readable text yet. Open it with “Read and copy facts” first. · “${document.name}” में अभी पढ़ने लायक लिखाई नहीं है। पहले “पढ़ें और बातें कॉपी करें” से खोलें।" } }
-        require(lines.sumOf { it.text.length } <= MAX_CHARACTERS) { "These documents have too much text. Choose fewer documents. · इन कागज़ों में बहुत ज़्यादा लिखाई है। कम कागज़ चुनें।" }
+        sources.forEach { (ref, document) -> require(lines.any { it.document == ref }) { careBilingual("“${document.name}” has no readable text yet. Open it with “Read and copy facts” first.", "“${document.name}” में अभी पढ़ने लायक लिखाई नहीं है। पहले “पढ़ें और बातें कॉपी करें” से खोलें।") } }
+        require(lines.sumOf { it.text.length } <= MAX_CHARACTERS) { careBilingual("These documents have too much text. Choose fewer documents.", "इन कागज़ों में बहुत ज़्यादा लिखाई है। कम कागज़ चुनें।") }
         val canonical = buildString { append(asked).append('\n'); lines.forEach { append(it.document).append('|').append(it.page).append('|').append(it.line).append('|').append(it.text).append('\n') } }
         return DocumentQuestionRequest(asked, careAssistSourceHash(canonical), sources, lines)
     }
@@ -50,9 +50,9 @@ object DocumentQuestionRules {
     private class Ranking(val all: List<Candidate>, val terms: List<List<Term>>, val scores: List<Double>, val query: Map<String, Double>)
 
     private fun readable(asked: String, documents: List<DocumentQuestionSource>): List<DocumentQuestionSource> {
-        require(asked.isNotEmpty() && asked.length <= MAX_QUESTION) { "Type a question of up to 300 characters. · 300 अक्षरों तक का सवाल लिखें।" }
+        require(asked.isNotEmpty() && asked.length <= MAX_QUESTION) { careBilingual("Type a question of up to 300 characters.", "300 अक्षरों तक का सवाल लिखें।") }
         return documents.distinctBy { it.reportId }.filter { document -> document.pages.any { it.reviewedText.isNotBlank() } }
-            .also { require(it.isNotEmpty()) { "Your documents have no readable text yet. Open one with “Read and copy facts” first. · आपके कागज़ों में अभी पढ़ने लायक लिखाई नहीं है। पहले किसी को “पढ़ें और बातें कॉपी करें” से खोलें।" } }
+            .also { require(it.isNotEmpty()) { careBilingual("Your documents have no readable text yet. Open one with “Read and copy facts” first.", "आपके कागज़ों में अभी पढ़ने लायक लिखाई नहीं है। पहले किसी को “पढ़ें और बातें कॉपी करें” से खोलें।") } }
     }
 
     /**

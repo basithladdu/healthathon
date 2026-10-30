@@ -39,8 +39,8 @@ object DoctorSymptomSummaryRules {
         return rows.filter { it.series.isNotEmpty() }.sortedByDescending { "${it.latest.date}T${it.latest.time}" }
     }
     fun label(row: DoctorSymptomRow, hindi: Boolean): String = when (row.kind) {
-        "mood" -> SymptomDiaryRules.moodShort[row.key]?.let { if (hindi) it.second else it.first }.orEmpty()
-        "part" -> "${if (hindi) "दर्द" else "Pain"} · ${PainBodyMapRules.label(row.key, hindi)}"
+        "mood" -> SymptomDiaryRules.moodShort[row.key]?.let { careTr(hindi, it.first, it.second) }.orEmpty()
+        "part" -> "${careTr(hindi, "Pain", "दर्द")} · ${PainBodyMapRules.label(row.key, hindi)}"
         else -> SymptomDiaryRules.symptomLabel(row.key, hindi)
     }
     /** Highest number noted in the 7 days ending today, or null when nothing was noted in that time. */

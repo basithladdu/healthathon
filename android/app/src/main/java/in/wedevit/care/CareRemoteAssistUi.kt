@@ -224,8 +224,8 @@ import kotlinx.coroutines.withContext
 
 /** Shown where an AI draft would be while the server has no AI service set up (or can't be reached), so nothing looks automatic. */
 internal object CareAiOffCopy {
-    const val title = "Draft help is off right now · ड्राफ़्ट मदद अभी बंद है"
-    const val body = "These words are not sent anywhere. Use the suggestions above, pick lines from the talk, or type each part yourself. · ये शब्द कहीं नहीं भेजे जाते। ऊपर के सुझाव इस्तेमाल करें, बातचीत से पंक्तियाँ चुनें, या हर हिस्सा ख़ुद लिखें।"
+    val title: String get() = careBilingual("Draft help is off right now", "ड्राफ़्ट मदद अभी बंद है")
+    val body: String get() = careBilingual("These words are not sent anywhere. Use the suggestions above, pick lines from the talk, or type each part yourself.", "ये शब्द कहीं नहीं भेजे जाते। ऊपर के सुझाव इस्तेमाल करें, बातचीत से पंक्तियाँ चुनें, या हर हिस्सा ख़ुद लिखें।")
 }
 
 @Composable internal fun CareAiOffNotice() {

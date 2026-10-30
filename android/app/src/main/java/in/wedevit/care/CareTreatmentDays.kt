@@ -19,7 +19,7 @@ data class TreatmentDay(val item: CareItem, val category: String)
 
 object TreatmentDayRules {
     val categories = listOf("Chemotherapy", "Radiotherapy")
-    fun label(category: String) = if (category == "Chemotherapy") "Chemo · कीमो" else "Radiotherapy · रेडियोथेरेपी"
+    fun label(category: String) = if (category == "Chemotherapy") careBilingual("Chemo", "कीमो") else careBilingual("Radiotherapy", "रेडियोथेरेपी")
     fun days(items: List<CareItem>, personId: String): List<TreatmentDay> = items.mapNotNull { item ->
         CareEntryCodec.decode(item.detail)?.takeIf { item.personId == personId && item.due > 0 && it.type == "schedule" && it.category in categories && it.status != "cancelled" }
             ?.let { TreatmentDay(item, it.category) }
@@ -30,8 +30,8 @@ object TreatmentDayRules {
         return days.filter { careDay(it.item.due) in from..to }.sortedBy { it.item.due }
     }
     fun entry(category: String, note: String): String {
-        require(category in categories) { "Choose chemotherapy or radiotherapy. · कीमो या रेडियोथेरेपी चुनें।" }
-        require(note.length <= 400) { "Shorten the note. · टिप्पणी छोटी करें।" }
+        require(category in categories) { careBilingual("Choose chemotherapy or radiotherapy.", "कीमो या रेडियोथेरेपी चुनें।") }
+        require(note.length <= 400) { careBilingual("Shorten the note.", "टिप्पणी छोटी करें।") }
         return CareEntryCodec.encode(CareEntry(type = "schedule", category = category, detail = note.trim(), timed = false))
     }
 }
@@ -52,23 +52,23 @@ object TreatmentDayRules {
     LaunchedEffect(selected) { if (selected != captured) onDismiss() }
     ModalBottomSheet(onDismissRequest = { if (!busy) onDismiss() }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(start = 20.dp, end = 20.dp, bottom = 28.dp).testTag("treatment-day-editor"), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Heading(if (initial == null) "Add a treatment day · इलाज का दिन" else "Edit treatment day · दिन बदलें", 26)
+            Heading(if (initial == null) careBilingual("Add a treatment day", "इलाज का दिन") else careBilingual("Edit treatment day", "दिन बदलें"), 26)
             Text("इलाज का दिन · Marks the day on the Lab history charts and in Calendar. It does not record a dose.", style = MaterialTheme.typography.bodySmall)
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) { TreatmentDayRules.categories.forEach { choice ->
                 FilterChip(category == choice, { category = choice }, label = { Text(TreatmentDayRules.label(choice)) }, modifier = Modifier.heightIn(min = 48.dp).testTag("treatment-$choice"))
             } }
-            CareDateButton(due, "Date · तारीख", { due = it })
-            OutlinedTextField(note, { note = it.take(400); error = "" }, label = { Text("Note (optional) · टिप्पणी") }, modifier = Modifier.fillMaxWidth(), maxLines = 3)
+            CareDateButton(due, careBilingual("Date", "तारीख"), { due = it })
+            OutlinedTextField(note, { note = it.take(400); error = "" }, label = { Text(careBilingual("Note (optional)", "टिप्पणी")) }, modifier = Modifier.fillMaxWidth(), maxLines = 3)
             (error.ifBlank { saveError.orEmpty() }).takeIf(String::isNotBlank)?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
             Button(onClick = { runCatching {
-                require(selected == captured && canEdit) { "Choose the right person before saving. · पहले सही व्यक्ति चुनें।" }
+                require(selected == captured && canEdit) { careBilingual("Choose the right person before saving.", "पहले सही व्यक्ति चुनें।") }
                 val detail = TreatmentDayRules.entry(category, note)
                 if (initial == null) vm.saveItem("task", category, detail, due, done = onDismiss, id = entryId)
                 else vm.updateItem(initial.item.copy(title = category, detail = detail, due = due), onDismiss)
-            }.onFailure { error = it.message.orEmpty() } }, enabled = !busy && canEdit, modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp).testTag("treatment-day-save"), shape = RoundedCornerShape(14.dp)) { Text(if (busy) "Saving…" else "Save day · सेव करें") }
-            if (initial != null && canEdit) TextButton(onClick = { remove = true }, enabled = !busy, modifier = Modifier.fillMaxWidth()) { Text("Remove day · दिन हटाएँ") }
+            }.onFailure { error = it.message.orEmpty() } }, enabled = !busy && canEdit, modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp).testTag("treatment-day-save"), shape = RoundedCornerShape(14.dp)) { Text(if (busy) "Saving…" else careBilingual("Save day", "सेव करें")) }
+            if (initial != null && canEdit) TextButton(onClick = { remove = true }, enabled = !busy, modifier = Modifier.fillMaxWidth()) { Text(careBilingual("Remove day", "दिन हटाएँ")) }
         }
     }
-    if (remove && initial != null) AlertDialog(onDismissRequest = { remove = false }, title = { Text("Remove this treatment day? · यह दिन हटाएँ?") }, text = { Text("${TreatmentDayRules.label(initial.category)} · ${date(initial.item.due)}") },
-        confirmButton = { TextButton(onClick = { vm.remove(initial.item); remove = false; onDismiss() }, enabled = !busy) { Text("Remove · हटाएँ") } }, dismissButton = { TextButton(onClick = { remove = false }) { Text("Keep · रखें") } })
+    if (remove && initial != null) AlertDialog(onDismissRequest = { remove = false }, title = { Text(careBilingual("Remove this treatment day?", "यह दिन हटाएँ?")) }, text = { Text("${TreatmentDayRules.label(initial.category)} · ${date(initial.item.due)}") },
+        confirmButton = { TextButton(onClick = { vm.remove(initial.item); remove = false; onDismiss() }, enabled = !busy) { Text(careBilingual("Remove", "हटाएँ")) } }, dismissButton = { TextButton(onClick = { remove = false }) { Text(careBilingual("Keep", "रखें")) } })
 }

@@ -58,10 +58,10 @@ object MedicineNames {
     val matches = remember(names, query) { MedicineNames.search(names.orEmpty(), query) }
     if (matches.isEmpty() || !enabled) return
     Column(Modifier.fillMaxWidth().testTag("medicine-name-suggestions"), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-        Text("Spelling from the India drug list · भारत की दवा सूची से नाम", fontSize = 12.sp, color = Ink.copy(alpha = .7f))
+        Text(careBilingual("Spelling from the India drug list", "भारत की दवा सूची से नाम"), fontSize = 12.sp, color = Ink.copy(alpha = .7f))
         FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             matches.forEach { match -> SuggestionChip(onClick = { onPick(match.name) }, label = { Text(match.name, fontSize = 13.sp) }, modifier = Modifier.heightIn(min = 48.dp)) }
         }
-        Text("Names only. Copy the dose from the prescription · खुराक पर्चे से ही लिखें", fontSize = 12.sp, color = Ink.copy(alpha = .7f))
+        Text(careBilingual("Names only. Copy the dose from the prescription", "खुराक पर्चे से ही लिखें"), fontSize = 12.sp, color = Ink.copy(alpha = .7f))
     }
 }

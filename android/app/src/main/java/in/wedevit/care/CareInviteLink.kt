@@ -60,7 +60,7 @@ class CarePendingJoinStore(private val kv: CareKeyValue, private val ttlMs: Long
 
 /** Plain messages for a failed join. */
 fun careJoinFailureMessage(raw: String?, hindi: Boolean = false): String {
-    val t = { en: String, hi: String -> if (hindi) hi else en }
+    val t = { en: String, hi: String -> careTr(hindi, en, hi) }
     return when {
         raw.isNullOrBlank() -> t("This invitation couldn't be used. Ask for a new one.", "यह निमंत्रण काम नहीं आया। नया निमंत्रण माँगें।")
         raw.startsWith("Clinician verification") -> raw
@@ -113,8 +113,8 @@ object CareInviteLog {
     fun prune(all: List<CareInviteEntry>, now: Long): List<CareInviteEntry> =
         all.filter { now - it.createdAt < 30 * DAY_MS }.groupBy { it.person }.values.flatMap { list -> list.sortedByDescending { it.createdAt }.take(20) }
     fun label(e: CareInviteEntry, status: CareInviteStatus, now: Long, hindi: Boolean = false, memberEmail: String = ""): String {
-        val t = { en: String, hi: String -> if (hindi) hi else en }
-        val relation = CareRelationsHindi[e.relation]?.takeIf { hindi } ?: e.relation.lowercase()
+        val t = { en: String, hi: String -> careTr(hindi, en, hi) }
+        val relation = CareRelationsHindi[e.relation]?.takeIf { hindi } ?: careTr(false, e.relation, e.relation).let { if (it == e.relation) it.lowercase() else it }
         val who = listOf(e.name, relation).filter { it.isNotBlank() }.joinToString(" · ").ifBlank { if (e.role == "clinician") t("Doctor invitation", "डॉक्टर का निमंत्रण") else t("Family invitation", "परिवार का निमंत्रण") }
         val left = e.expiresAt - now; val days = ((left + DAY_MS - 1) / DAY_MS).toInt()
         val expiry = if (left < DAY_MS) t("expires today", "आज बंद होगा") else t("expires in $days ${if (days == 1) "day" else "days"}", "$days दिन में बंद होगा")

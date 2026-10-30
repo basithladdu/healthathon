@@ -19,7 +19,7 @@ import java.time.ZoneId
 
 private fun conversationDate(at: Long?, hindi: Boolean) = at?.takeIf { it > 0 }?.let {
     Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).format(careDateFormat("d MMM yyyy · h:mm a", hindi))
-} ?: if (hindi) "तारीख़ दर्ज नहीं" else "Date not recorded"
+} ?: careTr(hindi, "Date not recorded", "तारीख़ दर्ज नहीं")
 
 /** Read-only history. Continuing opens the existing patient draft without replacing it. */
 @Composable fun DoctorConversationsContent(model: DoctorConversationsModel, onContinue: () -> Unit, modifier: Modifier = Modifier) { val t = careText();

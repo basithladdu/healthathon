@@ -107,7 +107,7 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
         clinicianChecking = true; clinicianError = null
         scope.launch {
             try { clinician = cloud.clinicianProfile(); clinicianLoaded = true; clinicianCheckedAt = System.currentTimeMillis() }
-            catch (e: Exception) { if (e is CancellationException) throw e; clinicianError = if (hindi) "स्थिति नहीं मिल पाई। इंटरनेट देखें और फिर से कोशिश करें।" else "Couldn't check your status. Check your internet and try again." }
+            catch (e: Exception) { if (e is CancellationException) throw e; clinicianError = careTr(hindi, "Couldn't check your status. Check your internet and try again.", "स्थिति नहीं मिल पाई। इंटरनेट देखें और फिर से कोशिश करें।") }
             finally { clinicianChecking = false }
         }
     }
@@ -128,8 +128,8 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
                 cloud.join(code)
                 val added = vm.joinedRefresh(before)
                 joinCode = ""
-                joinMessage = added?.let { if (hindi) "${it.name} की देखभाल अब आपकी सूची में है।" else "${it.name}'s care is now in your list." }
-                    ?: if (hindi) "जुड़ गए। अगर मरीज़ नहीं दिखता, तो रिफ़्रेश करें।" else "Joined. If the patient doesn't appear, tap Refresh."
+                joinMessage = added?.let { careTr(hindi, "${it.name}'s care is now in your list.", "${it.name} की देखभाल अब आपकी सूची में है।") }
+                    ?: careTr(hindi, "Joined. If the patient doesn't appear, tap Refresh.", "जुड़ गए। अगर मरीज़ नहीं दिखता, तो रिफ़्रेश करें।")
             } catch (e: Exception) { if (e is CancellationException) throw e; joinMessage = careJoinFailureMessage(e.message); if (e.message?.startsWith("Clinician verification") == true) checkClinician() }
             finally { joining = false }
         }
@@ -146,7 +146,7 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
     fun openShared() = navigate { selection = null; shared = true; tab = 1 }
     fun back() { if (!navigationBlocked && nestedBack != null) nestedBack?.invoke() else navigate { if (isolatedDemo) isolatedDemo = false else if (shared) shared = false else if (selection != null) { if (section == "Hub") selection = null else section = "Hub" } else if (tab != 0) tab = 0 else onExit() } }
     BackHandler { back() }
-    Scaffold(containerColor = Cream, topBar = { TopAppBar(title = { Column { Text(if (isolatedDemo) DoctorTestProfiles.profiles.firstOrNull {DoctorTestProfiles.personId(it)==testCarePerson}?.name ?: t("Earlier practice care", "पहले की प्रैक्टिस देखभाल") else realPatient?.name ?: patient?.name ?: if (selection != null) t("Patient record", "मरीज़ का रिकॉर्ड") else if (shared) t("Shared care", "साझा देखभाल") else t("Doctor workspace", "डॉक्टर कार्यक्षेत्र"), fontFamily = SaharaTitleFont, fontSize = 23.sp); Text(when { isolatedDemo -> t("Practice walkthrough · not a real patient", "वॉकथ्रू · नमूना मरीज़, असली नहीं"); realPatientId != null -> t("Real shared care", "असली साझा देखभाल"); patientId != null -> t("Test patient · separate records", "टेस्ट मरीज़ · अलग रिकॉर्ड"); shared -> t("Access and clinical review", "पहुँच और क्लिनिकल समीक्षा"); else -> email }, style = MaterialTheme.typography.bodySmall) } }, navigationIcon = { IconButton(onClick = ::back, enabled = !navigationBlocked) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस")) } }, colors = TopAppBarDefaults.topAppBarColors(containerColor = Cream)) }, bottomBar = {
+    Scaffold(containerColor = Cream, topBar = { TopAppBar(title = { Column { Text(if (isolatedDemo) DoctorTestProfiles.profiles.firstOrNull {DoctorTestProfiles.personId(it)==testCarePerson}?.name ?: t("Earlier practice care", "पहले की प्रैक्टिस देखभाल") else realPatient?.name ?: patient?.name ?: if (selection != null) t("Patient record", "मरीज़ का रिकॉर्ड") else if (shared) t("Shared care", "साझा देखभाल") else t("Doctor workspace", "डॉक्टर कार्यक्षेत्र"), fontFamily = SaharaTitleFont, fontSize = 23.sp); Text(when { isolatedDemo -> t("Practice walkthrough · not a real patient", "वॉकथ्रू · नमूना मरीज़, असली नहीं"); realPatientId != null -> t("Real shared care", "असली साझा देखभाल"); patientId != null -> t("Test patient · separate records", "टेस्ट मरीज़ · अलग रिकॉर्ड"); shared -> t("Access and clinical review", "पहुँच और क्लिनिकल समीक्षा"); else -> email }, style = MaterialTheme.typography.bodySmall) } }, navigationIcon = { IconButton(onClick = ::back, enabled = !navigationBlocked) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस")) } }, actions = { CareLanguageMenu(compact = true) }, colors = TopAppBarDefaults.topAppBarColors(containerColor = Cream)) }, bottomBar = {
         NavigationBar(containerColor = Paper) { listOf(t("Home", "होम") to Icons.Default.Home,t("Patients", "मरीज़") to Icons.Default.People,t("Schedule", "शेड्यूल") to Icons.Default.CalendarMonth,t("Account", "खाता") to Icons.Default.Person).forEachIndexed { index, (label, icon) -> NavigationBarItem(selected = if (selection != null || shared || isolatedDemo) index == 1 else tab == index, enabled = !navigationBlocked, onClick = { navigate { tab = index; selection = null; shared = false; isolatedDemo = false; nestedBack = null } }, icon = { Icon(icon, null) }, label = { Text(label) }) } }
     }) { padding ->
         Column(Modifier.fillMaxSize().padding(padding)) {
@@ -200,7 +200,7 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
                 }
             } else when(tab) {
                 0 -> LazyColumn(Modifier.fillMaxSize().testTag("doctor-home"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    item { Text(t("Your day in care", "आज की देखभाल"), fontFamily = SaharaTitleFont, fontSize = 30.sp); Text(LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, d MMMM", if (hindi) java.util.Locale("hi", "IN") else java.util.Locale.ENGLISH))) }
+                    item { Text(t("Your day in care", "आज की देखभाल"), fontFamily = SaharaTitleFont, fontSize = 30.sp); Text(LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, d MMMM", careLocale(hindi)))) }
                     if (earlierWorkspace) {
                         item { ConnectedCard(t("Earlier practice workspace", "पहले का प्रैक्टिस कार्यक्षेत्र")) { Text(t("Practice records · not real patients", "अभ्यास रिकॉर्ड · असली मरीज़ नहीं"), color = Rust); TextButton(onClick = { earlierWorkspace = false }) { Text(t("Return to current workspace", "अभी के कार्यक्षेत्र पर लौटें")) } } }
                         if (loaded && dataset == null) item { ConnectedCard(t("Earlier test dataset", "पहले का टेस्ट डेटा")) { Text(t("Existing account test records remain separate.", "खाते के मौजूदा टेस्ट रिकॉर्ड अलग रहते हैं।")); Text(t("Creating additional legacy test records is unavailable here.", "यहाँ और पुराने टेस्ट रिकॉर्ड नहीं बनाए जा सकते।")) } }
@@ -215,7 +215,7 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
                 }
                 1 -> {
                     val shown = DoctorConnectedHome.search(realPeople, patientQuery)
-                    val t = { en: String, hi: String -> if (hindi) hi else en }
+                    val t = { en: String, hi: String -> careTr(hindi, en, hi) }
                     LazyColumn(Modifier.fillMaxSize().testTag("doctor-patients-list"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
                         item { Text(t("Patients", "मरीज़"), fontFamily = SaharaTitleFont, fontSize = 30.sp); Text(t("Only patients who have shared their care with you appear here.", "यहाँ सिर्फ़ वे मरीज़ दिखते हैं जिन्होंने अपनी देखभाल आपसे साझा की है।"), style = MaterialTheme.typography.bodyLarge) }
                         if (realPeople.isNotEmpty()) item { DoctorPatientSearchField(patientQuery, { patientQuery = it }, hindi) }
@@ -249,7 +249,7 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
                 else -> LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                     item { DoctorVerificationCard(verification, clinician?.note.orEmpty(), clinicianCheckedAt, clinicianChecking, clinicianError, hindi, ::checkClinician, ::openShared) }
                     item { ConnectedCard(t("Older practice records · not real patients", "पुराने अभ्यास रिकॉर्ड · असली मरीज़ नहीं")) { TextButton(onClick={navigate {earlierWorkspace=true;tab=0}}){Text(t("Earlier practice workspace", "पहले का प्रैक्टिस कार्यक्षेत्र"))};TextButton(onClick={if(!navigationBlocked){testCarePerson=DoctorCareDemoData.PERSON_ID;testInitialSection="Hub";isolatedDemo=true}}){Text(t("Earlier care workspace", "पहले का देखभाल कार्यक्षेत्र"))};dataset?.patients.orEmpty().forEach {p->TextButton(onClick={openTest(p.id)}){Text(p.name)}} } }
-                    item { ConnectedCard(t("Your account", "आपका खाता")) { Text(email, style = MaterialTheme.typography.titleLarge); Text("Language · भाषा", fontWeight = FontWeight.Medium); CareLanguageSwitch(); Text(t("Signed in. Login does not verify professional identity.", "साइन इन हो गया। लॉगिन से डॉक्टर होने की पुष्टि नहीं होती।")); Button(onClick = onAccount) { Text(t("Manage account / sign out", "खाता देखें / साइन आउट")) } } }
+                    item { ConnectedCard(t("Your account", "आपका खाता")) { Text(email, style = MaterialTheme.typography.titleLarge); Text(t("Signed in. Login does not verify professional identity.", "साइन इन हो गया। लॉगिन से डॉक्टर होने की पुष्टि नहीं होती।")); Button(onClick = onAccount) { Text(t("Manage account / sign out", "खाता देखें / साइन आउट")) } } }
                     item { ConnectedCard(t("Verification and real patient access", "सत्यापन और असली मरीज़ों तक पहुँच")) { Text(t("Submit or change your registration details. Approval is given by hand by the Sahara team; each patient gives access with their own invitation.", "पंजीकरण का विवरण जमा करें या बदलें। मंज़ूरी Sahara टीम खुद देती है; हर मरीज़ अपने निमंत्रण से पहुँच देता है।")); OutlinedButton(onClick = ::openShared) { Text(t("Open verification and shared care", "सत्यापन और साझा देखभाल खोलें")) } } }
                     item { TextButton(onClick = onExit) { Text(t("Back to Sahara", "सहारा पर वापस")) } }
                 }

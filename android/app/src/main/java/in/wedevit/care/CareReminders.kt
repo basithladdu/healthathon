@@ -135,7 +135,7 @@ class CareReminderScheduler(private val context: Context, private val account: S
         val groupKey = "dose:${group.personId}:$at"
         if (prefs.getLong("sent:$groupKey", 0) == at) return
         prefs.edit().putLong("sent:$groupKey", at).commit()
-        val content = MedicineDoseRules.reminder(group, careDeviceHindi(context))
+        val content = careWithDeviceLanguage(context) { MedicineDoseRules.reminder(group, careDeviceHindi(context)) }
         val photos = runCatching { MedicineStripPhotos(context, account).collage(group.personId, content.itemIds) }.getOrNull()
         val launch = PendingIntent.getActivity(context, notificationId(account, groupKey), Intent(context, MainActivity::class.java).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP; putExtra(CareReminderLaunch.EXTRA, true); putExtra(CareTodayRules.OPEN_PERSON_EXTRA, group.personId) }, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         val hidden = NotificationCompat.Builder(context, CHANNEL).setSmallIcon(android.R.drawable.ic_popup_reminder).setContentTitle(content.publicTitle).setContentText(content.publicText).build()
@@ -151,7 +151,7 @@ class CareReminderScheduler(private val context: Context, private val account: S
     }
     /** Android 12+ asks the person to allow exact alarms; earlier versions always allow them. */
     /** Notification text follows the phone's last English/Hindi choice. */
-    private fun reminderText(english: String): String = if (careDeviceHindi(context)) ReminderTextHindi[english] ?: english else english
+    private fun reminderText(english: String): String = careWithDeviceLanguage(context) { careTr(careDeviceHindi(context), english, ReminderTextHindi[english] ?: english) }
     fun exactAllowed(): Boolean = Build.VERSION.SDK_INT < 31 || context.getSystemService(AlarmManager::class.java).canScheduleExactAlarms()
     fun scheduledCount(): Int = prefs.getStringSet("scheduled", emptySet()).orEmpty().size
     fun error(): String? = prefs.getString("error", null)

@@ -41,10 +41,10 @@ internal val DoctorStageDeep = Color(0xFF7A3B24)
 internal val DoctorStageCream = Color(0xFFFFF8EE)
 
 fun doctorStageStatus(recording: Boolean, saving: Boolean, seconds: Long, hindi: Boolean = false): String { val clock = "${seconds / 60}:${(seconds % 60).toString().padStart(2, '0')}"
-    return if (recording) (if (hindi) "रिकॉर्ड हो रहा है $clock" else "Recording $clock") else if (saving) (if (hindi) "सहेज रहे हैं…" else "Saving…") else if (hindi) "रिकॉर्ड के लिए तैयार" else "Ready to record" }
+    return if (recording) (careTr(hindi, "Recording $clock", "रिकॉर्ड हो रहा है $clock")) else if (saving) (careTr(hindi, "Saving…", "सहेज रहे हैं…")) else careTr(hindi, "Ready to record", "रिकॉर्ड के लिए तैयार") }
 
 /** Record / Dictate / Type are saved mode keys; only the label is shown in Hindi. */
-internal fun doctorCaptureModeLabel(mode: String, hindi: Boolean): String = if (!hindi) mode else when (mode) { "Record" -> "रिकॉर्ड"; "Dictate" -> "बोलकर लिखें"; "Type" -> "टाइप करें"; else -> mode }
+internal fun doctorCaptureModeLabel(mode: String, hindi: Boolean): String = careTr(hindi, mode, when (mode) { "Record" -> "रिकॉर्ड"; "Dictate" -> "बोलकर लिखें"; "Type" -> "टाइप करें"; else -> mode })
 
 /** Horizontal waveform of white rounded bars with a dot at each end. Moves with the microphone [level] while [active]; low and still otherwise. */
 @Composable fun DoctorWaveform(level: Float, active: Boolean, modifier: Modifier = Modifier) {

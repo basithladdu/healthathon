@@ -26,7 +26,7 @@ internal fun careAuthProblem(raw: String?): CareAuthProblem = raw.orEmpty().lowe
 
 /** Plain English/Hindi for account problems. Mail problems say plainly that the server's email setup is the cause. */
 internal fun careAuthMessage(raw: String?, hindi: Boolean): String {
-    val t = { en: String, hi: String -> if (hindi) hi else en }
+    val t = { en: String, hi: String -> careTr(hindi, en, hi) }
     return when (careAuthProblem(raw)) {
         CareAuthProblem.WRONG_PASSWORD -> t("That email and password don't match an account. Check them, or use Forgot password.", "यह ईमेल और पासवर्ड किसी खाते से मेल नहीं खाते। दोबारा देखें, या “पासवर्ड भूल गए?” दबाएँ।")
         CareAuthProblem.NOT_CONFIRMED -> t("This email isn't confirmed yet. Open the link in the confirmation email on this phone, then sign in. No email? Tap Resend confirmation email.", "यह ईमेल अभी पक्का नहीं हुआ है। पुष्टि वाले ईमेल का लिंक इसी फ़ोन पर खोलें, फिर साइन इन करें। ईमेल नहीं आया? “पुष्टि ईमेल फिर भेजें” दबाएँ।")

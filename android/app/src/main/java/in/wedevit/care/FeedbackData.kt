@@ -44,7 +44,7 @@ object FeedbackQueue {
         org.json.JSONObject().put("id", it.id).put("accountId", it.accountId).put("surface", it.surface).put("score", it.score.toDouble()).put("note", it.note).put("savedAt", it.savedAt)
     }).toString()
     fun add(items: List<FeedbackSubmission>, item: FeedbackSubmission): List<FeedbackSubmission> {
-        require(items.size < limit) { "$limit feedback notes are waiting to be sent. Connect to the internet and open Feedback while signed in. · $limit फ़ीडबैक भेजे जाने बाकी हैं। इंटरनेट से जुड़कर, साइन इन रहते हुए फ़ीडबैक खोलें।" }
+        require(items.size < limit) { careBilingual("$limit feedback notes are waiting to be sent. Connect to the internet and open Feedback while signed in.", "$limit फ़ीडबैक भेजे जाने बाकी हैं। इंटरनेट से जुड़कर, साइन इन रहते हुए फ़ीडबैक खोलें।") }
         return items + item
     }
 
