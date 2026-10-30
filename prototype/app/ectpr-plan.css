@@ -197,3 +197,40 @@
 @media print {
   .ep-nav, .ep-actions, .ep-steps, .ep-progress { display: none !important; }
 }
+
+/* Read aloud (tech spec §7), used on the care plan, living will and ED pages */
+.read-aloud { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.read-aloud-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 8px 14px; border: 1px solid #d6c8b9; border-radius: 999px; background: #fffdf9; color: #382e29; font: inherit; font-size: 14px; font-weight: 650; cursor: pointer; }
+.read-aloud-btn:hover { background: #fbf2e7; border-color: #b9472c; }
+.read-aloud-btn[aria-pressed='true'] { background: #fdf1ea; border-color: #b9472c; color: #8a2f1b; }
+.read-aloud-btn svg { flex: 0 0 auto; }
+.read-aloud-note { flex-basis: 100%; margin: 0; color: #76675d; font-size: 13px; line-height: 1.4; }
+.ep-summary-group:first-of-type { margin-top: 12px; }
+.ed-page > .read-aloud { margin-bottom: 12px; }
+
+/* DPDP notice (tech spec §7, L10) */
+.dpdp-summary { min-height: 44px; display: flex; align-items: center; font-size: 18px; font-weight: 700; cursor: pointer; }
+.dpdp-list { display: grid; gap: 0; margin: 10px 0 0; }
+.dpdp-list > div { padding: 10px 0; border-bottom: 1px solid #f0e7dc; }
+.dpdp-list > div:last-child { border-bottom: 0; }
+.dpdp-list dt { font-weight: 700; }
+.dpdp-list dd { margin: 2px 0 0; overflow-wrap: anywhere; }
+.dpdp-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 12px; }
+.dpdp-confirm { margin-top: 12px; padding: 14px; border: 1px solid #e0a594; border-radius: 14px; background: #fdece6; color: #6e2414; }
+.dpdp-confirm p { margin: 0; }
+.dpdp-hint { margin: 10px 0 0; color: #76675d; font-size: 14px; }
+.dpdp-message { margin: 12px 0 0; padding: 10px 14px; border-radius: 12px; background: #f3f8e6; color: #3c4f36; font-weight: 600; }
+.dpdp-link { min-height: 44px; padding: 8px 4px; border: 0; background: none; color: #8a3a22; font: inherit; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+
+/* Pilot audit log */
+.ep-indicators { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin: 14px 0; }
+.ep-indicator { padding: 12px 14px; border: 1px solid var(--ep-line); border-radius: 14px; background: #fffaf4; }
+.ep-indicator dt { color: var(--ep-muted); font-size: 13px; font-weight: 600; }
+.ep-indicator dd { margin: 4px 0 0; font-weight: 650; overflow-wrap: anywhere; }
+.ep-indicator[data-tone='good'] { border-color: #b9cf8a; background: #f3f8e6; }
+.ep-indicator[data-tone='bad'] { border-color: #e0a594; background: #fdece6; }
+.ep-pilot-heading { margin-top: 20px !important; }
+.ep-hash { overflow-wrap: anywhere; font-size: 13px; }
+.ep-board-steps { margin-top: 8px; }
+.ep-board-steps summary { min-height: 44px; display: flex; align-items: center; font-weight: 600; cursor: pointer; }
+.ep-board-steps ul { display: grid; gap: 6px; margin: 4px 0 0; padding-inline-start: 20px; }

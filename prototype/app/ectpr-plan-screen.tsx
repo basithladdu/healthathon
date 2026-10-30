@@ -3,7 +3,13 @@
 // versions (Draft / Active / Superseded / Revoked), review, cancellation, signatures and the audit log.
 // Doctors create, edit and sign. Patients view, sign their part, request a review or cancel. Family view and request a review.
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react';
-import { careText, type CareLang } from './care-i18n';
+import { careLocale, careText, type CareLang } from './care-i18n';
+import { AMD_BOARD_PATHWAY } from './amd-rules';
+import { DpdpNotice } from './dpdp-notice';
+import { boardReconsiderationNotice } from './ectpr-labels';
+import { EctprPilotLog } from './ectpr-pilot-log';
+import { FhirExportButton, PaperAndCopies, ReviewReminder } from './ectpr-plan-extras';
+import { ReadAloudButton } from './tts-speech';
 import type {
   AmbulanceOption, AuditEvent, AuthorityBasis, Capacity, Cpr, DecisionMaker, Dialysis, DnacprReason, EctprRecord, EctprStatus,
   GoalOfCare, HospitalTransfer, Hydration, Icu, IdType, ImplantedDevice, NgFeeding, PegFeeding, RespCeiling, RuleIssue, Signature,
@@ -11,7 +17,7 @@ import type {
 } from './ectpr-model';
 import {
   ALWAYS_PROVIDED_CARE, DECISION_FIELDS, ROUTINE_REVIEW_WEEKS, TLT_DEFAULT_DAYS, TRANSFER_REASON_LABELS, blocksActivation, blocksSave, defaultTrialPlan,
-  emptyEctpr, isOutOfDate, nextReviewDue, reviewTriggers, surrogateEntriesLocked, treatmentLocked, unrecordedDecisions, validateEctpr,
+  emptyEctpr, isOutOfDate, nextReviewDue, reviewReminderDue, reviewTriggers, surrogateEntriesLocked, treatmentLocked, unrecordedDecisions, validateEctpr,
   type ReviewTrigger,
 } from './ectpr-rules';
 import { listAudit, listEctprVersions, logAudit, revokeEctpr, saveEctprDraft, signEctpr, startReview, subscribeEctpr } from './ectpr-store';
@@ -214,17 +220,17 @@ function issueText(lang: CareLang, item: RuleIssue, record: EctprRecord): string
     V7: 'इलाज करने वाले कंसल्टेंट को अपने रजिस्ट्रेशन नंबर के साथ साइन करना होगा। तब तक यह सिर्फ़ बातचीत का नोट है, योजना नहीं।',
     V8: 'हर छपे पन्ने पर नाम और अस्पताल नंबर (UHID) होता है। दोनों भरें।',
   };
-  if (item.id === 'V1') {
+  if (lang === 'hi' && item.id === 'V1') {
     const missing = unrecordedDecisions(record).length;
     return missing === DECISION_FIELDS.length ? 'अभी कुछ नहीं चुना गया है। हर हिस्से में "कोई पसंद दर्ज नहीं" दिखेगा और सामान्य इलाज दिया जाएगा।'
       : `${missing} हिस्सों में कोई पसंद दर्ज नहीं है। इनके लिए सामान्य इलाज दिया जाएगा। इसे कभी मना करना नहीं माना जाता।`;
   }
-  if (item.id === 'V2') {
+  if (lang === 'hi' && item.id === 'V2') {
     return record.choices.goalOfCare === 'C_COMFORT'
       ? 'लक्ष्य आराम है, पर CPR "कोशिश करें" पर है। CPR के लिए साँस की नली और ICU चाहिए। कारण लिखें, या DNACPR पर सोचें।'
       : 'साँस की सीमा नली से नीचे है, पर CPR "कोशिश करें" पर है। CPR के लिए साँस की नली चाहिए। कारण लिखें, या DNACPR पर सोचें।';
   }
-  const trial = /^C4-(icu|vasopressors|dialysis)-(duration|review|reviewers)$/.exec(item.id);
+  const trial = lang === 'hi' ? /^C4-(icu|vasopressors|dialysis)-(duration|review|reviewers)$/.exec(item.id) : null;
   if (trial) {
     const label = trial[1] === 'icu' ? 'ICU' : trial[1] === 'vasopressors' ? 'ब्लड-प्रेशर दवा' : 'डायलिसिस';
     return trial[2] === 'duration' ? `${label} ट्रायल की अवधि 0 से ज़्यादा होनी चाहिए।`
@@ -441,7 +447,7 @@ function DecisionMakerForm({ t, id, title, person, onChange, disabled }: { t: T;
 // ---------------------------------------------------------------------------
 // Read-only summary (used for the active plan, drafts, and the finished screen)
 
-function describe(t: T, record: EctprRecord) {
+function describe(t: T, lang: CareLang, record: EctprRecord) {
   const c = record.choices;
   const none = null;
   const opt = <V extends string>(list: Opt<V>[], value: V | null | undefined) => {
@@ -450,8 +456,12 @@ function describe(t: T, record: EctprRecord) {
   };
   const trial = (plan: TrialPlan) => {
     const unit = UNIT_OPTS.find((item) => item.value === plan.durationUnit);
-    return t(`Trial for ${plan.durationValue} ${unit?.en ?? ''}, review ${plan.reviewAt ? new Date(plan.reviewAt).toLocaleString('en-IN') : 'not set'}${plan.reviewers.length ? ` by ${plan.reviewers.join(', ')}` : ''}`,
-      `${plan.durationValue} ${unit?.hi ?? ''} का ट्रायल, समीक्षा ${plan.reviewAt ? new Date(plan.reviewAt).toLocaleString('hi-IN') : 'तय नहीं'}${plan.reviewers.length ? `, ${plan.reviewers.join(', ')} द्वारा` : ''}`);
+    const pieces = [
+      `${t('Time-limited trial', 'समय-सीमित ट्रायल')}: ${plan.durationValue} ${unit ? t(unit.en, unit.hi) : ''}`.trim(),
+      `${t('Review', 'समीक्षा')}: ${plan.reviewAt ? new Date(plan.reviewAt).toLocaleString(careLocale(lang, 'en-IN')) : t('not set', 'तय नहीं')}`,
+      ...(plan.reviewers.length ? [`${t('Reviewed by', 'समीक्षा करेंगे')}: ${plan.reviewers.join(', ')}`] : []),
+    ];
+    return pieces.join(' · ');
   };
   const transfer = !c.hospitalTransfer ? none : c.hospitalTransfer.kind === 'ONLY_FOR'
     ? `${opt(TRANSFER_OPTS, 'ONLY_FOR')}: ${c.hospitalTransfer.reasons.map((reason) => t(TRANSFER_REASON_LABELS[reason], TRANSFER_REASON_HI[reason])).join('; ')}`
@@ -507,9 +517,11 @@ function describe(t: T, record: EctprRecord) {
 }
 
 function PlanSummary({ t, lang, record }: { t: T; lang: CareLang; record: EctprRecord }) {
-  const groups = describe(t, record);
+  const groups = describe(t, lang, record);
+  const body = useRef<HTMLDivElement>(null);
   const rows = (items: Array<[string, string | null]>) => <dl className="ep-summary">{items.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value ?? <span className="ep-np">{t('No preference recorded — standard care', 'कोई पसंद दर्ज नहीं — सामान्य इलाज')}</span>}</dd></div>)}</dl>;
-  return <>
+  return <div ref={body}>
+    <ReadAloudButton lang={lang} target={body} label={t('Read the plan aloud', 'योजना पढ़कर सुनाएँ')} />
     <section className="ep-summary-group" aria-label={t('Emergency choices', 'इमरजेंसी के फ़ैसले')}><h3>{t('In an emergency', 'इमरजेंसी में')}</h3>{rows(groups.emergency)}</section>
     <section className="ep-summary-group" aria-label={t('Other treatment', 'दूसरे इलाज')}><h3>{t('Other treatment', 'दूसरे इलाज')}</h3>{rows(groups.other)}</section>
     <section className="ep-summary-group" aria-label={t('People and wishes', 'लोग और इच्छाएँ')}><h3>{t('People and wishes', 'लोग और इच्छाएँ')}</h3>{rows(groups.people)}</section>
@@ -517,13 +529,18 @@ function PlanSummary({ t, lang, record }: { t: T; lang: CareLang; record: EctprR
       <div><dt>{t('Review due', 'समीक्षा की तारीख़')}</dt><dd>{record.reviewDue ? formatDay(lang, record.reviewDue) : <span className="ep-np">{t('Not set', 'तय नहीं')}</span>}</dd></div>
       <div><dt>{t('Version', 'संस्करण')}</dt><dd>{record.version} · {record.formVersion}</dd></div>
     </dl>
-  </>;
+  </div>;
 }
 
 /** Informational only. The plan never authorises withholding or withdrawing on its own (research note: Common Cause 2023; Harish Rana 2026). */
-function LegalPending({ t }: { t: T }) {
+function LegalPending({ t, lang }: { t: T; lang: CareLang }) {
   return <div className="ep-notice ep-warn" role="note">
     <p><strong>{t('Legal review pending', 'क़ानूनी समीक्षा बाक़ी')}</strong> — {t('for a patient who cannot decide, withholding or withdrawing life-sustaining treatment may need the Medical Board process (Common Cause 2023; Harish Rana 2026). This plan records wishes and clinical limits; it does not by itself legally authorise withholding treatment.', 'जो मरीज़ फ़ैसला नहीं ले सकते, उनके लिए जीवन-रक्षक इलाज शुरू न करने या रोकने के लिए मेडिकल बोर्ड की प्रक्रिया ज़रूरी हो सकती है (कॉमन कॉज़ 2023; हरीश राणा 2026)। यह योजना इच्छाएँ और इलाज की सीमाएँ दर्ज करती है; यह अपने आप में इलाज रोकने की क़ानूनी अनुमति नहीं देती।')}</p>
+    <p>{boardReconsiderationNotice(lang)}</p>
+    <details className="ep-board-steps">
+      <summary>{t('See every step of the board process (information only)', 'बोर्ड प्रक्रिया के सभी चरण देखें (केवल जानकारी)')}</summary>
+      <ul>{AMD_BOARD_PATHWAY.map((item) => <li key={item.en}>{t(item.en, item.hi)}</li>)}</ul>
+    </details>
   </div>;
 }
 
@@ -705,7 +722,7 @@ export function EctprPlanScreen(props: { patientId: string; patientName: string;
         <p>{t('Give a signed copy to the family. Ambulance crews follow it only when they are handed a copy.', 'परिवार को साइन की हुई कॉपी दें। एम्बुलेंस टीम तभी मानती है जब उन्हें कॉपी दी जाए।')}</p>
         <div className="ep-actions"><button type="button" className="ep-btn" onClick={() => { jump.current = true; setMode({ kind: 'overview' }); }}>{t('See the plan and versions', 'योजना और संस्करण देखें')}</button></div>
       </div>
-      <div className="ep-card"><h2>{t('What the plan says', 'योजना में क्या लिखा है')}</h2><PlanSummary t={t} lang={lang} record={mode.record} /><LegalPending t={t} /></div>
+      <div className="ep-card"><h2>{t('What the plan says', 'योजना में क्या लिखा है')}</h2><PlanSummary t={t} lang={lang} record={mode.record} /><LegalPending t={t} lang={lang} /></div>
       <AlwaysContinues t={t} />
     </section>;
   }
@@ -786,8 +803,12 @@ function Overview({ anchor, t, lang, role, patientId, patientName, actorName, ve
         : openDraft ? <span className="ep-chip" data-status="DRAFT">{statusLabel(t, 'DRAFT')}</span> : null}
     </header>
 
+    <DpdpNotice scope="care-plan" lang={lang} patientId={patientId} actor={actorName} role={role} cardClass="ep-card" buttonClass="ep-btn ep-quiet" dangerClass="ep-btn ep-danger" />
+
     {notice ? <p className="ep-toast" role="status">{notice}</p> : null}
     {error ? <p className="ep-notice ep-alert" role="alert">{error}</p> : null}
+
+    {role === 'doctor' && active && reviewReminderDue(active) ? <ReviewReminder t={t} lang={lang} record={active} actorName={actorName} /> : null}
 
     {role === 'doctor' && pendingRequests.length ? <div className="ep-notice ep-warn" role="status">
       <p><strong>{t('Review requested', 'समीक्षा का अनुरोध')}</strong></p>
@@ -864,7 +885,9 @@ function Overview({ anchor, t, lang, role, patientId, patientName, actorName, ve
 
     {active ? <div className="ep-card"><h2>{t('What the plan says', 'योजना में क्या लिखा है')}</h2>
       <p className="ep-hint">{t('“No preference recorded” means standard care. It is never a refusal.', '“कोई पसंद दर्ज नहीं” का मतलब है सामान्य इलाज। यह कभी मना करना नहीं है।')}</p>
-      <PlanSummary t={t} lang={lang} record={active} /><LegalPending t={t} /></div> : null}
+      <PlanSummary t={t} lang={lang} record={active} /><LegalPending t={t} lang={lang} />
+      {role !== 'family' ? <div className="ep-actions"><FhirExportButton t={t} record={active} actorName={actorName} /></div> : null}</div> : null}
+    {active && role !== 'family' ? <PaperAndCopies t={t} lang={lang} record={active} actorName={actorName} /> : null}
     {role !== 'doctor' && openDraft ? <div className="ep-card"><h2>{t(`Draft version ${openDraft.version} (not in use yet)`, `ड्राफ़्ट संस्करण ${openDraft.version} (अभी लागू नहीं)`)}</h2><PlanSummary t={t} lang={lang} record={openDraft} /></div> : null}
 
     <AlwaysContinues t={t} />
@@ -896,13 +919,15 @@ function Overview({ anchor, t, lang, role, patientId, patientName, actorName, ve
         </li>)}
       </ol>}
     </section>
+
+    {role === 'doctor' ? <EctprPilotLog t={t} lang={lang} patientId={patientId} actorName={actorName} versions={versions} audit={audit} /> : null}
   </section>;
 }
 
 function auditAction(t: T, action: AuditEvent['action']): string {
   const map: Record<AuditEvent['action'], [string, string]> = {
     VIEW: ['Opened', 'खोला'], CREATE: ['Created', 'बनाया'], EDIT: ['Edited', 'बदला'], SIGN: ['Signed', 'साइन किया'], PRINT: ['Printed', 'प्रिंट किया'],
-    SHARE: ['Shared', 'साझा किया'], REVOKE: ['Cancelled', 'रद्द किया'], BREAK_GLASS: ['Emergency access', 'आपात पहुँच'], REVIEW: ['Review', 'समीक्षा'], UPLOAD: ['Uploaded', 'अपलोड किया'],
+    SHARE: ['Shared', 'साझा किया'], REVOKE: ['Cancelled', 'रद्द किया'], BREAK_GLASS: ['Emergency access', 'आपात पहुँच'], REVIEW: ['Review', 'समीक्षा'], UPLOAD: ['Uploaded', 'अपलोड किया'], DELETE: ['Deleted', 'मिटाया'],
   };
   return t(map[action][0], map[action][1]);
 }
@@ -924,6 +949,7 @@ function Wizard({ t, lang, draft, issues, step, busy, error, toast, dirty, saveB
   const c = draft.choices;
   const progress = (step + 1) / STEPS.length;
   const stepTitle = t(STEPS[step].en, STEPS[step].hi);
+  const stepBody = useRef<HTMLDivElement>(null);
 
   const lockNotice = (locked || surrogateLocked) ? <div className="ep-notice ep-warn ep-lock" role="status">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2" /><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" /></svg>
@@ -974,8 +1000,8 @@ function Wizard({ t, lang, draft, issues, step, busy, error, toast, dirty, saveB
     {error ? <p className="ep-notice ep-alert" role="alert">{error}</p> : null}
 
     <form className="ep-card" noValidate onSubmit={(event) => { event.preventDefault(); goTo(step + 1); }}>
-      <div key={step} className="ep-step">
-        <div className="ep-step-title"><h2 ref={heading} tabIndex={-1}>{stepTitle}</h2><span>{t(`Step ${step + 1} of ${STEPS.length}`, `चरण ${step + 1} / ${STEPS.length}`)}</span></div>
+      <div key={step} className="ep-step" ref={stepBody}>
+        <div className="ep-step-title"><h2 ref={heading} tabIndex={-1}>{stepTitle}</h2><span>{t(`Step ${step + 1} of ${STEPS.length}`, `चरण ${step + 1} / ${STEPS.length}`)}</span><ReadAloudButton lang={lang} target={stepBody} /></div>
         <IssueList t={t} lang={lang} issues={stepIssues} record={draft} />
 
         {step === 0 ? <>
@@ -1121,7 +1147,7 @@ function Wizard({ t, lang, draft, issues, step, busy, error, toast, dirty, saveB
 
         {step === 5 ? <>
           {lockNotice}
-          <LegalPending t={t} />
+          <LegalPending t={t} lang={lang} />
           <Choices t={t} name="ep-goal" legend={t('Goal of care', 'देखभाल का लक्ष्य')} value={c.goalOfCare} options={GOALS} disabled={locked || surrogateLocked} onChange={(value) => edit((r) => { r.choices.goalOfCare = value; })} />
           <Choices t={t} name="ep-cpr" legend={t('CPR if the heart and breathing stop', 'दिल और साँस रुकने पर CPR')} hint={t('This is only about cardiac arrest. It says nothing about any other treatment.', 'यह सिर्फ़ दिल रुकने के बारे में है। यह किसी दूसरे इलाज के बारे में कुछ नहीं कहता।')}
             value={c.cpr} options={CPR_OPTS} cols disabled={locked || surrogateLocked} onChange={(value) => edit((r) => { r.choices.cpr = value; if (value !== 'DNACPR') { r.choices.dnacprReason = null; } })}>
@@ -1186,7 +1212,7 @@ function Wizard({ t, lang, draft, issues, step, busy, error, toast, dirty, saveB
 
         {step === 6 ? <>
           {lockNotice}
-          <LegalPending t={t} />
+          <LegalPending t={t} lang={lang} />
           <Choices t={t} name="ep-icu" legend={t('Intensive care (ICU)', 'गहन चिकित्सा (ICU)')} value={c.icu?.kind ?? null} options={ICU_OPTS} disabled={locked || surrogateLocked}
             onChange={(kind) => edit((r) => { r.choices.icu = kind === null ? null : kind === 'TRIAL' ? { kind, trial: trialOf(r.choices.icu) ?? defaultTrialPlan() } : { kind }; })}>
             {c.icu?.kind === 'TRIAL' ? <TrialEditor t={t} id="ep-icu-trial" trial={c.icu.trial} onChange={(trial) => edit((r) => { r.choices.icu = { kind: 'TRIAL', trial }; })} /> : null}
@@ -1219,6 +1245,7 @@ function Wizard({ t, lang, draft, issues, step, busy, error, toast, dirty, saveB
             {c.feeding.removeExistingTube ? <div className="ep-notice ep-alert" role="note" style={{ marginTop: 10 }}>
               <p><strong>{t('This needs the medical board process', 'इसके लिए मेडिकल बोर्ड की प्रक्रिया ज़रूरी है')}</strong></p>
               <p>{t('Removing a tube that is already in place is stopping treatment. It needs a Primary and a Secondary Medical Board (each usually within 48 hours) and a message to the local magistrate (JMFC). This plan records the wish only. It cannot be used to remove the tube, and the app never starts a withdrawal.', 'पहले से लगी नली निकालना इलाज रोकना है। इसके लिए प्राथमिक और द्वितीय मेडिकल बोर्ड (हर एक आमतौर पर 48 घंटे में) और स्थानीय मजिस्ट्रेट (JMFC) को सूचना ज़रूरी है। यह योजना सिर्फ़ इच्छा दर्ज करती है। इससे नली नहीं निकाली जा सकती, और ऐप कभी भी इलाज रोकना शुरू नहीं करता।')}</p>
+              <p>{boardReconsiderationNotice(lang)}</p>
               <p>{t('Legal review pending — for a patient who cannot decide, withholding or withdrawing life-sustaining treatment may need the Medical Board process (Common Cause 2023; Harish Rana 2026).', 'क़ानूनी समीक्षा बाक़ी — जो मरीज़ फ़ैसला नहीं ले सकते, उनके लिए जीवन-रक्षक इलाज शुरू न करने या रोकने के लिए मेडिकल बोर्ड की प्रक्रिया ज़रूरी हो सकती है (कॉमन कॉज़ 2023; हरीश राणा 2026)।')}</p>
             </div> : null}
           </fieldset>

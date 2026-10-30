@@ -5,7 +5,9 @@ import type { CareLang } from '../../care-i18n';
 import { careText } from '../../care-i18n';
 import type { EctprRecord } from '../../ectpr-model';
 import { logAudit } from '../../ectpr-store';
-import { EctprEdView, IfInDoubtBox } from '../../ectpr-ed-view';
+import { EctprEdView, IfInDoubtBox, edSpokenText } from '../../ectpr-ed-view';
+import { edInterpretation } from '../../ectpr-rules';
+import { ReadAloudButton } from '../../tts-speech';
 import { edCardUrl, openEdCard } from '../../ed-card-client';
 import { BREAK_GLASS_MIN_REASON, ED_TOKEN_PATTERN, type EdCardViewResult } from '../../ed-card-snapshot';
 import { formatDay } from '../../ectpr-labels';
@@ -66,7 +68,7 @@ export function EdCardPage(props: { token: string }) {
         <section className="ectpr-card ectpr-ed ectpr-ed--revoked">
           <div className="ectpr-ed-banner ectpr-ed-banner--revoked" role="status">
             <strong className="ectpr-ed-withdrawn">{t('CARD WITHDRAWN', 'कार्ड वापस लिया गया')}</strong>
-            <span>{t('This card was withdrawn', 'यह कार्ड वापस लिया गया')}{result.revokedAt ? ` ${t('on', '')} ${formatDay(result.revokedAt, lang)}` : ''}. {t('Do not use it. Give standard emergency care and contact the family or treating team for the current plan.', 'इसका उपयोग न करें। सामान्य आपातकालीन इलाज दें और मौजूदा योजना के लिए परिवार या इलाज करने वाली टीम से संपर्क करें।')}</span>
+            <span>{result.revokedAt ? t(`This card was withdrawn on ${formatDay(result.revokedAt, lang)}.`, `यह कार्ड ${formatDay(result.revokedAt, lang)} को वापस लिया गया।`) : t('This card was withdrawn.', 'यह कार्ड वापस लिया गया।')} {t('Do not use it. Give standard emergency care and contact the family or treating team for the current plan.', 'इसका उपयोग न करें। सामान्य आपातकालीन इलाज दें और मौजूदा योजना के लिए परिवार या इलाज करने वाली टीम से संपर्क करें।')}</span>
           </div>
           <IfInDoubtBox lang={lang} />
         </section>
@@ -96,6 +98,7 @@ export function EdCardPage(props: { token: string }) {
       {result?.status === 'live' && record && (
         <>
           {result.offline && <p className="ectpr-card-server ectpr-card-server--local-only" role="status">{t('No connection to the Sahara server — showing the copy saved on this phone when the card was issued.', 'Sahara सर्वर से संपर्क नहीं — कार्ड जारी होते समय इस फ़ोन पर सहेजी कॉपी दिखा रहे हैं।')} {formatDay(result.issuedAt, lang)}</p>}
+          <ReadAloudButton lang={lang} text={() => edSpokenText(record, edInterpretation(record), lang)} label={t('Read the emergency plan aloud', 'आपातकालीन योजना पढ़कर सुनाएँ')} />
           <EctprEdView record={record} lang={lang} audience="clinician" full={result.full}>
             {result.full && result.sms && <p className={`ectpr-ed-sms${result.sms.sent ? ' is-sent' : ''}`} role="status">{result.sms.message}</p>}
             {!result.full && (

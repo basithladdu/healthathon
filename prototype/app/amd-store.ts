@@ -7,7 +7,7 @@ import { logAudit } from './ectpr-store.ts';
 import type { AmdContent, AmdCopy, AmdCustodian, AmdExecution, AmdStatusSummary, AmdVersion, AuditEvent } from './ectpr-model.ts';
 import {
   amdId, amdStatusSummary, markExecuted, markGenerated, revokeAmd, sha256Hex, startAmdVersion, updateAbha, updateAmdDraft,
-  updateCopy, updateCustodian, type AmdResult,
+  updateCopy, updateCustodian, withoutUnsignedAmdVersions, type AmdResult,
 } from './amd-rules.ts';
 
 export type AmdStorage = { read<T>(key: string): Promise<T | undefined>; write<T>(key: string, value: T): Promise<void> };
@@ -149,6 +149,19 @@ export function updateAmdAbha(patientId: string, versionId: string, abha: { addr
 
 export function revokeAmdRecord(patientId: string, revocation: { revokedOn: string; writtenRevocationSigned: boolean; reason: string; scanKey?: string; scanSha256?: string }, actor: string, now = new Date()): Promise<AmdResult> {
   return mutate(patientId, (versions) => revokeAmd(versions, revocation, now), () => ['REVOKE', `Written cancellation dated ${revocation.revokedOn}${revocation.reason.trim() ? `: ${revocation.reason.trim()}` : ''}`], actor);
+}
+
+/** "Delete my local draft": removes unsigned versions from this device and logs that it happened. Signed versions and the audit log stay. */
+export function deleteAmdDrafts(patientId: string, actor: string): Promise<{ deleted: number; kept: number }> {
+  return serial(async () => {
+    const { kept, removed } = withoutUnsignedAmdVersions(await load(patientId));
+    if (removed.length) {
+      await save(patientId, kept);
+      for (const v of removed) await audit(patientId, actor, 'DELETE', v.id, `Unsigned living will version ${v.version} deleted from this device at the person's request`);
+      notify();
+    }
+    return { deleted: removed.length, kept: kept.length };
+  });
 }
 
 /**

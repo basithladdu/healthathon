@@ -59,6 +59,10 @@ export function localCardFor(patientId: string): LocalEdCard | null {
   const cards = readAll().filter((c) => c.patientId === patientId).sort((a, b) => b.issuedAt.localeCompare(a.issuedAt));
   return cards[0] ?? null;
 }
+/** What the "download my data" file may say about this patient's cards. The token and the manage key stay out: they are credentials. */
+export function localCardsFor(patientId: string): Array<{ issuedAt: string; version: number; server: string; revokedAt?: string }> {
+  return readAll().filter((c) => c.patientId === patientId).map(({ issuedAt, version, server, revokedAt }) => ({ issuedAt, version, server, ...(revokedAt ? { revokedAt } : {}) }));
+}
 export function localCardByToken(token: string): LocalEdCard | null {
   return readAll().find((c) => c.token === token) ?? null;
 }

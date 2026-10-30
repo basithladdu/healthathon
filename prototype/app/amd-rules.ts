@@ -398,6 +398,15 @@ export function revokeAmd(versions: AmdVersion[], revocation: { revokedOn: strin
  * Summary for the ED Quick View. EXECUTED (current) wins; otherwise the latest state so the ED can show
  * "revoked" or "not executed — not valid". null = no AMD recorded in Sahara.
  */
+/**
+ * "Delete my local draft" (DPDP notice). Removes versions nobody has signed (DRAFT, GENERATED).
+ * EXECUTED, SUPERSEDED and REVOKED versions stay; a printed paper is not affected.
+ */
+export function withoutUnsignedAmdVersions(versions: AmdVersion[]): { kept: AmdVersion[]; removed: AmdVersion[] } {
+  const unsigned = (v: AmdVersion) => v.status === 'DRAFT' || v.status === 'GENERATED';
+  return { kept: versions.filter((v) => !unsigned(v)), removed: versions.filter(unsigned) };
+}
+
 export function amdStatusSummary(versions: AmdVersion[]): AmdStatusSummary | null {
   const current = currentExecuted(versions);
   const pick = current ?? latestVersion(versions);

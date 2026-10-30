@@ -83,7 +83,7 @@ export function OfflineQrScannerModal(props: {
   const actor = props.actor ?? 'Paramedic (offline view)';
   const [mode, setMode] = useState<'saved' | 'scan'>(record ? 'saved' : 'scan');
   const [scanned, setScanned] = useState<string | null>(null);
-  const { speak, isPlaying, cancel } = useSpeechSynthesis();
+  const { speak, isPlaying, cancel } = useSpeechSynthesis(lang);
   const quick = record ? quickViewSnapshot(record) : null;
 
   const loggedSaved = useRef<string | null>(null);

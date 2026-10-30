@@ -3,8 +3,9 @@
 // Persists through care-local-store (IndexedDB, localStorage fallback). Falls back to memory where neither exists (tests, SSR).
 
 import { readCareValue, writeCareValue } from './care-local-store.ts';
-import type { AuditEvent, EctprRecord, EpisodeLog, IncidentReport, OutcomeRecord, RespCeiling, RuleIssue, Signature } from './ectpr-model.ts';
+import type { AuditEvent, EctprCopyKind, EctprDistribution, EctprRecord, EpisodeLog, IncidentReport, OutcomeRecord, RespCeiling, RuleIssue, Signature } from './ectpr-model.ts';
 import type { EctprQuickView } from './ectpr';
+import { sha256Hex } from './ed-card-snapshot.ts';
 import { blocksActivation, blocksSave, consultantSignature, isoDay, newId, nextReviewDue, validateEctpr, emptyEctpr, TRANSFER_REASON_LABELS, type ReviewTrigger } from './ectpr-rules.ts';
 
 // ---------------------------------------------------------------------------
@@ -45,7 +46,9 @@ const KEYS = {
   episodes: 'sahara-ectpr:episodes',
   outcomes: 'sahara-ectpr:outcomes',
   incidents: 'sahara-ectpr:incidents',
+  distribution: 'sahara-ectpr:distribution',
 } as const;
+const scanPath = (scanKey: string) => `sahara-ectpr:scan:${scanKey}`;
 
 /** Run read-modify-write steps one at a time so two saves in one tab never overwrite each other. */
 function serial<T>(task: () => Promise<T>): Promise<T> {
@@ -294,6 +297,76 @@ export function revokeEctpr(recordId: string, reason: string, actor: string, now
     notify();
     return { ok: true, record: clone(revoked), issues: [] };
   });
+}
+
+/**
+ * "Delete my local draft" (DPDP notice). Removes unsigned drafts only. A draft that already carries a signature, every
+ * signed version and the audit log stay. The deletion itself is logged, without the deleted content.
+ */
+export function deleteEctprDrafts(patientId: string, actor: string, now: Date = new Date()): Promise<{ deleted: number; kept: number }> {
+  return serial(async () => {
+    const records = await readRecords();
+    const mine = records.filter((r) => r.patientId === patientId);
+    const removable = mine.filter((r) => r.status === 'DRAFT' && r.signatures.length === 0);
+    if (removable.length) {
+      const gone = new Set(removable.map((r) => r.id));
+      await activeStorage().write(KEYS.records, records.filter((r) => !gone.has(r.id)));
+      for (const r of removable) await appendAudit({ actor, action: 'DELETE', recordType: 'ECTPR', recordId: r.id, patientId, detail: `Unsigned draft version ${r.version} deleted from this device at the person's request` }, now);
+      notify();
+    }
+    return { deleted: removable.length, kept: mine.length - removable.length };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Signed paper scan and copy checklist for a signed plan (tech spec §8 "Should")
+
+async function readDistribution(): Promise<EctprDistribution[]> {
+  return (await activeStorage().read<EctprDistribution[]>(KEYS.distribution)) ?? [];
+}
+
+const emptyDistribution = (record: EctprRecord): EctprDistribution => ({ recordId: record.id, patientId: record.patientId, scan: null, copies: [] });
+
+export async function getEctprDistribution(record: EctprRecord): Promise<EctprDistribution> {
+  const list = await serial(readDistribution);
+  return clone(list.find((d) => d.recordId === record.id) ?? emptyDistribution(record));
+}
+
+export async function listEctprDistribution(patientId: string): Promise<EctprDistribution[]> {
+  return (await serial(readDistribution)).filter((d) => d.patientId === patientId).map(clone);
+}
+
+function writeDistribution(record: EctprRecord, change: (current: EctprDistribution) => EctprDistribution): Promise<EctprDistribution> {
+  return serial(async () => {
+    const list = await readDistribution();
+    const index = list.findIndex((d) => d.recordId === record.id);
+    const next = change(index >= 0 ? list[index] : emptyDistribution(record));
+    if (index >= 0) list[index] = next; else list.push(next);
+    await activeStorage().write(KEYS.distribution, list);
+    return next;
+  });
+}
+
+/** Keep the signed paper's scan on this device with its SHA-256. Only for a signed version; each upload is logged. */
+export async function saveEctprScan(record: EctprRecord, file: { name: string; type: string; arrayBuffer(): Promise<ArrayBuffer> }, actor: string, now: Date = new Date()): Promise<EctprDistribution> {
+  if (record.status === 'DRAFT') throw new Error('A scan can only be added to a signed plan.');
+  const scanSha256 = await sha256Hex(new Uint8Array(await file.arrayBuffer()));
+  const scanKey = newId('scan');
+  await serial(() => activeStorage().write(scanPath(scanKey), file));
+  const saved = await writeDistribution(record, (current) => ({ ...current, scan: { scanKey, scanName: file.name, scanType: file.type, scanSha256, scanUploadedAt: now.toISOString(), uploadedBy: actor } }));
+  await logAudit({ actor, action: 'UPLOAD', recordType: 'ECTPR', recordId: record.id, patientId: record.patientId, detail: `Signed paper scan "${file.name}" for version ${record.version} SHA-256 ${scanSha256}` });
+  return clone(saved);
+}
+
+export function readEctprScan(scanKey: string): Promise<File | undefined> {
+  return serial(() => activeStorage().read<File>(scanPath(scanKey)));
+}
+
+export async function setEctprCopy(record: EctprRecord, kind: EctprCopyKind, given: boolean, actor: string, now: Date = new Date()): Promise<EctprDistribution> {
+  const givenOn = given ? isoDay(now) : '';
+  const saved = await writeDistribution(record, (current) => ({ ...current, copies: [...current.copies.filter((c) => c.kind !== kind), { kind, given, givenOn }] }));
+  await logAudit({ actor, action: 'SHARE', recordType: 'CARD', recordId: record.id, patientId: record.patientId, detail: `Copy of version ${record.version} ${given ? 'given' : 'unmarked'}: ${kind.toLowerCase().replace(/_/g, ' ')}` });
+  return clone(saved);
 }
 
 // ---------------------------------------------------------------------------

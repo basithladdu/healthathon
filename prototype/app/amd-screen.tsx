@@ -3,7 +3,9 @@
 // witnessed and attested paper → copies log. Lifecycle DRAFT → GENERATED → EXECUTED (tech spec §6, rules L1–L9).
 // The app never signs or validates an AMD, never offers any act to end life, and has no "withdraw" action.
 
-import { useCallback, useEffect, useId, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useId, useRef, useState, type ReactNode } from 'react';
+import { DpdpNotice } from './dpdp-notice';
+import { ReadAloudButton } from './tts-speech';
 import { careText, type CareLang } from './care-i18n';
 import type { AmdAttestorKind, AmdContent, AmdCopy, AmdCustodian, AmdDhr, AmdExecution, AmdPlaceOfCare, AmdTreatment, AmdTreatmentChoice, AmdVersion, AmdWitness, IdType } from './ectpr-model';
 import {
@@ -62,12 +64,16 @@ const formatDay = (iso?: string | null) => {
 // ---------------------------------------------------------------------------
 // Form pieces
 
+/** Field is used in many places without `t`; rule messages inside it still follow the reader's language. */
+const TextContext = createContext<T>((en) => en);
+
 function Field({ label, hint, issue, children, id }: { label: string; hint?: string; issue?: AmdIssue[]; children: ReactNode; id: string }) {
+  const t = useContext(TextContext);
   return <div className="amd-field">
     <label htmlFor={id}>{label}</label>
     {children}
     {hint ? <p className="amd-hint" id={`${id}-hint`}>{hint}</p> : null}
-    {issue?.map((item) => <p key={item.id + item.field} className={`amd-issue amd-issue-${item.severity}`} role={item.severity === 'block' ? 'alert' : undefined}>{item.message}</p>)}
+    {issue?.map((item) => <p key={item.id + item.field} className={`amd-issue amd-issue-${item.severity}`} role={item.severity === 'block' ? 'alert' : undefined}>{t(item.message, item.messageHi)}</p>)}
   </div>;
 }
 
@@ -136,10 +142,10 @@ export function AmdScreen(props: Props) {
   async function start() {
     setError('');
     const result = await startAmdDraft(patientId, actor, patientName);
-    if (!result.ok) setError(result.issues[0]?.message ?? 'Could not start.');
+    if (!result.ok) setError(result.issues[0] ? t(result.issues[0].message, result.issues[0].messageHi) : t('Could not start.', 'शुरू नहीं हो सका।'));
   }
 
-  return <section className="amd-screen" aria-labelledby="amd-title">
+  return <TextContext.Provider value={t}><section className="amd-screen" aria-labelledby="amd-title">
     <header className="amd-head">
       <p className="amd-eyebrow">{t('Advance medical directive', 'अग्रिम चिकित्सा निर्देश')}</p>
       <h1 id="amd-title">{t('Living will', 'लिविंग विल')}</h1>
@@ -147,6 +153,7 @@ export function AmdScreen(props: Props) {
     </header>
     {error ? <p className="amd-issue amd-issue-block" role="alert">{error}</p> : null}
     {versions === null ? <p role="status">{t('Loading…', 'लोड हो रहा है…')}</p> : <>
+      <DpdpNotice scope="living-will" lang={lang} patientId={patientId} actor={actor} role={role} cardClass="amd-card" buttonClass="secondary-button" dangerClass="secondary-button" />
       <StatusCard t={t} versions={versions} current={current} working={working} />
       {role === 'doctor'
         ? <DoctorView t={t} current={current} latest={latest} />
@@ -168,7 +175,7 @@ export function AmdScreen(props: Props) {
         <BoardPathway t={t} />
       </section>
     </>}
-  </section>;
+  </section></TextContext.Provider>;
 }
 
 function StatusCard({ t, versions, current, working }: { t: T; versions: AmdVersion[]; current: AmdVersion | null; working: AmdVersion | null }) {
@@ -179,7 +186,7 @@ function StatusCard({ t, versions, current, working }: { t: T; versions: AmdVers
   return <section className="amd-card amd-status" aria-label={t('Living will status', 'लिविंग विल की स्थिति')}>
     <div className="amd-status-line">
       <span className={`amd-chip amd-chip-${current ? 'ok' : 'none'}`}>{current ? t(`Current: version ${current.version}, signed ${formatDay(current.execution?.signedOn)}`, `मौजूदा: संस्करण ${current.version}, हस्ताक्षर ${formatDay(current.execution?.signedOn)}`) : t('No signed living will recorded yet', 'अभी कोई हस्ताक्षरित लिविंग विल दर्ज नहीं')}</span>
-      {working ? <span className="amd-chip amd-chip-work">{t(`Version ${working.version}: ${STATUS_TEXT[working.status][0]}`, `संस्करण ${working.version}: ${STATUS_TEXT[working.status][1]}`)}</span> : null}
+      {working ? <span className="amd-chip amd-chip-work">{`${t(`Version ${working.version}`, `संस्करण ${working.version}`)}: ${t(...STATUS_TEXT[working.status])}`}</span> : null}
     </div>
     {focus.status !== 'REVOKED' && focus.status !== 'SUPERSEDED' ? <ol className="amd-life">{steps.map(([status, en, hi], index) => <li key={status} data-state={index < reached || (index === reached && focus.status === 'EXECUTED') ? 'done' : index === reached ? 'current' : 'next'}>{t(en, hi)}</li>)}</ol> : null}
     <details className="amd-details"><summary>{t('All versions', 'सभी संस्करण')}</summary>
@@ -193,6 +200,7 @@ function StatusCard({ t, versions, current, working }: { t: T; versions: AmdVers
 
 function AmdWizard({ t, lang, version, patientId, actor }: { t: T; lang: CareLang; version: AmdVersion; patientId: string; actor: string }) {
   const uid = useId();
+  const wizard = useRef<HTMLElement>(null);
   const [content, setContent] = useState<AmdContent>(version.content);
   const [step, setStep] = useState(0);
   const [today] = useState(() => new Date());
@@ -218,7 +226,7 @@ function AmdWizard({ t, lang, version, patientId, actor }: { t: T; lang: CareLan
 
   async function persist(note: string) {
     const result = await saveAmdDraft(patientId, version.id, content, actor, note);
-    if (!result.ok) throw new Error(result.issues[0]?.message ?? 'Not saved');
+    if (!result.ok) throw new Error(result.issues[0] ? t(result.issues[0].message, result.issues[0].messageHi) : t('Not saved.', 'सेव नहीं हुआ।'));
   }
 
   async function go(target: number) {
@@ -242,7 +250,7 @@ function AmdWizard({ t, lang, version, patientId, actor }: { t: T; lang: CareLan
       const printable: AmdVersion = { ...version, content, status: 'GENERATED', generatedAt: now.toISOString() };
       const { sha256 } = await downloadAmdPdf({ version: printable, lang: pdfLang, contentSha256, printedAt: now });
       const result = await recordAmdGenerated(patientId, version.id, { pdfSha256: sha256, contentSha256, lang: pdfLang }, actor, now);
-      if (!result.ok) setMessage(result.issues.map((item) => item.message).join(' '));
+      if (!result.ok) setMessage(result.issues.map((item) => t(item.message, item.messageHi)).join(' '));
     } catch (cause) {
       setMessage(cause instanceof Error ? cause.message : t('The PDF could not be made. Try again.', 'PDF नहीं बन सका। फिर कोशिश करें।'));
     } finally { setBusy(false); }
@@ -252,11 +260,11 @@ function AmdWizard({ t, lang, version, patientId, actor }: { t: T; lang: CareLan
   const age = ageOn(content.executant.dob, today);
   const fieldIssues = (field: string) => (shown.includes(step) || step === 6 ? issues.filter((item) => item.field === field) : field === 'executant.dob' ? issues.filter((item) => item.id === 'L1_ADULT' && item.field === field) : []);
 
-  return <section className="amd-card amd-wizard" aria-labelledby={id('step')}>
+  return <section ref={wizard} className="amd-card amd-wizard" aria-labelledby={id('step')}>
     <ol className="amd-steps" aria-label={t('Progress', 'प्रगति')}>{STEPS.map(([en, hi], index) => <li key={en} aria-current={index === step ? 'step' : undefined} data-state={index < step ? 'done' : index === step ? 'current' : 'next'}>
       <button type="button" onClick={() => go(index)} disabled={index > step}><span aria-hidden="true">{index < step ? '✓' : index + 1}</span>{t(en, hi)}</button>
     </li>)}</ol>
-    <div className="amd-step-title"><h2 id={id('step')} tabIndex={-1}>{t(...STEPS[step])}</h2><span>{t(`Step ${step + 1} of ${STEPS.length} · Version ${version.version}`, `चरण ${step + 1} / ${STEPS.length} · संस्करण ${version.version}`)}</span></div>
+    <div className="amd-step-title"><h2 id={id('step')} tabIndex={-1}>{t(...STEPS[step])}</h2><span>{t(`Step ${step + 1} of ${STEPS.length} · Version ${version.version}`, `चरण ${step + 1} / ${STEPS.length} · संस्करण ${version.version}`)}</span><ReadAloudButton key={step} lang={lang} target={wizard} /></div>
 
     {step === 0 ? <div className="amd-prose">
       <p>{t('This follows the model living will by the Vidhi Centre for Legal Policy and ACP India, and the Supreme Court’s rules (2018, changed on 24 January 2023).', 'यह विधि सेंटर फ़ॉर लीगल पॉलिसी और ACP इंडिया की मॉडल लिविंग विल, और सुप्रीम कोर्ट के नियमों (2018, 24 जनवरी 2023 को बदले गए) पर आधारित है।')}</p>
@@ -288,7 +296,7 @@ function AmdWizard({ t, lang, version, patientId, actor }: { t: T; lang: CareLan
         <Check checked={content.declarations.understandsNotAppliedIfUnclear} onChange={(understandsNotAppliedIfUnclear) => setDecl({ understandsNotAppliedIfUnclear })}>{t('I understand doctors will not use it if the situation is unclear or one I did not think of.', 'मैं समझता/समझती हूँ कि स्थिति साफ़ न हो या मैंने उसके बारे में न सोचा हो, तो डॉक्टर इसका उपयोग नहीं करेंगे।')}</Check>
         <Check checked={content.executant.readOutToMe} onChange={(readOutToMe) => setEx({ readOutToMe })}>{t('I cannot read or write. Someone wrote this as I said and read it out to me.', 'मैं पढ़-लिख नहीं सकता/सकती। किसी ने इसे मेरे कहे अनुसार लिखा और मुझे पढ़कर सुनाया।')}</Check>
         <Check checked={content.declarations.capacityCertificateAttached} onChange={(capacityCertificateAttached) => setDecl({ capacityCertificateAttached })}>{t('A doctor’s certificate that I can decide is attached (optional; not required).', 'डॉक्टर का प्रमाणपत्र कि मैं निर्णय ले सकता/सकती हूँ, साथ लगा है (वैकल्पिक; ज़रूरी नहीं)।')}</Check>
-        {['declarations.capacity', 'declarations.consideredCarefully', 'declarations.voluntary', 'declarations.understandsNotAppliedIfUnclear'].flatMap(fieldIssues).map((item) => <p key={item.id} className="amd-issue amd-issue-block" role="alert">{item.message}</p>)}
+        {['declarations.capacity', 'declarations.consideredCarefully', 'declarations.voluntary', 'declarations.understandsNotAppliedIfUnclear'].flatMap(fieldIssues).map((item) => <p key={item.id} className="amd-issue amd-issue-block" role="alert">{t(item.message, item.messageHi)}</p>)}
       </fieldset>
     </> : null}
 
@@ -296,7 +304,7 @@ function AmdWizard({ t, lang, version, patientId, actor }: { t: T; lang: CareLan
       <p className="amd-prose">{t('It applies only when your doctors decide there is no reasonable chance you will recover, and more treatment would only make dying longer. Choose the situations:', 'यह तभी लागू होगा जब आपके डॉक्टर तय करें कि ठीक होने की कोई उचित संभावना नहीं है, और आगे का इलाज बस मृत्यु को लंबा करेगा। स्थितियाँ चुनें:')}</p>
       <fieldset className="amd-fieldset"><legend>{t('When should it apply?', 'यह कब लागू हो?')}</legend>
         {([['TERMINAL', 'A terminal illness (an illness that will end my life)', 'अंतिम अवस्था की बीमारी (जो मेरा जीवन ख़त्म करेगी)'], ['END_STAGE', 'An end-stage condition (lasting damage that keeps getting worse, where treatment will not work)', 'अंतिम चरण की स्थिति (स्थायी नुक़सान जो बढ़ता जाए, जहाँ इलाज काम न करे)'], ['VEGETATIVE', 'A vegetative state (awake but not aware, for many months)', 'वेजिटेटिव अवस्था (जागे हुए पर कई महीनों तक होश नहीं)']] as const).map(([value, en, hi]) => <Check key={value} checked={content.conditions.includes(value)} onChange={(on) => set('conditions', on ? [...content.conditions, value] : content.conditions.filter((c) => c !== value))}>{t(en, hi)}</Check>)}
-        {fieldIssues('conditions').map((item) => <p key={item.id} className="amd-issue amd-issue-block" role="alert">{item.message}</p>)}
+        {fieldIssues('conditions').map((item) => <p key={item.id} className="amd-issue amd-issue-block" role="alert">{t(item.message, item.messageHi)}</p>)}
       </fieldset>
       <Field id={id('anticipated')} label={t('Any illness you expect, and what you want for it (optional)', 'कोई बीमारी जिसकी आप उम्मीद करते हैं, और उसके लिए आप क्या चाहते हैं (वैकल्पिक)')} issue={fieldIssues('anticipatedConditions')}><TextInput id={id('anticipated')} multiline maxLength={1000} value={content.anticipatedConditions} onChange={(value) => set('anticipatedConditions', value)} /></Field>
     </> : null}
@@ -313,7 +321,7 @@ function AmdWizard({ t, lang, version, patientId, actor }: { t: T; lang: CareLan
         </fieldset>;
       })}
       <Check checked disabled>{t('Comfort care, pain relief, mouth care and feeding by mouth always continue. This cannot be changed.', 'आराम की देखभाल, दर्द से राहत, मुँह की देखभाल और मुँह से खिलाना हमेशा जारी रहते हैं। इसे बदला नहीं जा सकता।')}</Check>
-      {fieldIssues('treatments').map((item) => <p key={item.id} className={`amd-issue amd-issue-${item.severity}`}>{item.message}</p>)}
+      {fieldIssues('treatments').map((item) => <p key={item.id} className={`amd-issue amd-issue-${item.severity}`}>{t(item.message, item.messageHi)}</p>)}
     </> : null}
 
     {step === 4 ? <>
@@ -342,7 +350,7 @@ function AmdWizard({ t, lang, version, patientId, actor }: { t: T; lang: CareLan
 
     {step === 5 ? <>
       <p className="amd-prose">{t('Representatives (DHRs) speak for you when you cannot. Put them in order: the first is asked first. Talk to them before you name them.', 'प्रतिनिधि (DHR) तब आपकी ओर से बोलते हैं जब आप नहीं बोल सकते। उन्हें क्रम में रखें: पहले वाले से पहले पूछा जाता है। नाम लिखने से पहले उनसे बात करें।')}</p>
-      {[...fieldIssues('dhrs')].map((item) => <p key={item.id} className={`amd-issue amd-issue-${item.severity}`} role={item.severity === 'block' ? 'alert' : undefined}>{item.message}</p>)}
+      {[...fieldIssues('dhrs')].map((item) => <p key={item.id} className={`amd-issue amd-issue-${item.severity}`} role={item.severity === 'block' ? 'alert' : undefined}>{t(item.message, item.messageHi)}</p>)}
       {content.dhrs.map((dhr, index) => {
         const dhrIssues = (name: string) => fieldIssues(`dhrs.${index}.${name}`);
         return <fieldset key={dhr.id} className="amd-dhr"><legend>{index === 0 ? t('1. First representative', '1. पहले प्रतिनिधि') : t(`${index + 1}. If the one before cannot be reached`, `${index + 1}. अगर पिछले से संपर्क न हो`)}</legend>
@@ -366,7 +374,7 @@ function AmdWizard({ t, lang, version, patientId, actor }: { t: T; lang: CareLan
           <IdFields idPrefix={id(`d${index}`)} t={t} idType={dhr.idType} idLast4={dhr.idLast4} onType={(idType) => setDhr(index, { idType })} onLast4={(idLast4) => setDhr(index, { idLast4 })} issues={dhrIssues('idLast4')} />
           <Field id={id(`d${index}addr`)} label={t('Address', 'पता')}><TextInput id={id(`d${index}addr`)} multiline maxLength={300} value={dhr.permanentAddress} onChange={(permanentAddress) => setDhr(index, { permanentAddress })} /></Field>
           <Check checked={dhr.agreed} onChange={(agreed) => setDhr(index, { agreed })}>{t('I have talked to them and they agreed to be my representative.', 'मैंने उनसे बात की है और वे मेरे प्रतिनिधि बनने के लिए सहमत हैं।')}</Check>
-          {dhrIssues('agreed').map((item) => <p key={item.id} className="amd-issue amd-issue-warn">{item.message}</p>)}
+          {dhrIssues('agreed').map((item) => <p key={item.id} className="amd-issue amd-issue-warn">{t(item.message, item.messageHi)}</p>)}
         </fieldset>;
       })}
       {content.dhrs.length < 4 ? <button type="button" className="secondary-button" onClick={() => set('dhrs', [...content.dhrs, emptyDhr()])}>{t('+ Add another representative', '+ एक और प्रतिनिधि जोड़ें')}</button> : null}
@@ -404,7 +412,7 @@ function Preview({ t, content, issues, pdfLang, setPdfLang }: { t: T; content: A
   const conditions = { TERMINAL: t('terminal illness', 'अंतिम अवस्था की बीमारी'), END_STAGE: t('end-stage condition', 'अंतिम चरण की स्थिति'), VEGETATIVE: t('vegetative state', 'वेजिटेटिव अवस्था') };
   const none = t('Not filled', 'नहीं भरा');
   return <>
-    {issues.length ? <div className="amd-issue-list">{issues.map((item) => <p key={item.id + item.field} className={`amd-issue amd-issue-${item.severity}`}>{item.message}</p>)}</div> : <Callout tone="ok"><p>{t('Everything needed is filled in.', 'सभी ज़रूरी बातें भरी हैं।')}</p></Callout>}
+    {issues.length ? <div className="amd-issue-list">{issues.map((item) => <p key={item.id + item.field} className={`amd-issue amd-issue-${item.severity}`}>{t(item.message, item.messageHi)}</p>)}</div> : <Callout tone="ok"><p>{t('Everything needed is filled in.', 'सभी ज़रूरी बातें भरी हैं।')}</p></Callout>}
     <dl className="amd-summary">
       <div><dt>{t('Made by', 'बनाने वाले')}</dt><dd>{content.executant.name || none}{content.executant.dob ? ` · ${formatDay(content.executant.dob)}` : ''}</dd></div>
       <div><dt>{t('Applies to', 'लागू होगा')}</dt><dd>{content.conditions.map((c) => conditions[c]).join(', ') || none}</dd></div>
@@ -491,7 +499,7 @@ function SignAndRecord({ t, version, patientId, actor, onError }: { t: T; versio
     setBusy('record');
     const result = await executeAmd(patientId, version.id, execution, custodian, actor);
     setBusy('');
-    if (!result.ok) onError(result.issues.map((item) => item.message).join(' '));
+    if (!result.ok) onError(result.issues.map((item) => t(item.message, item.messageHi)).join(' '));
   }
 
   const blockFor = (field: string) => show.filter((item) => item.field === field || item.field.startsWith(field));
@@ -513,7 +521,7 @@ function SignAndRecord({ t, version, patientId, actor, onError }: { t: T; versio
     <WitnessFields t={t} index={1} uid={uid} value={execution.witnesses[1]} dhrNames={dhrNames} issues={show} onChange={(value) => setWitness(1, value)} />
     <fieldset className="amd-fieldset"><legend>{t('Attested by', 'सत्यापित करने वाले')}</legend>
       {([['NOTARY', 'Notary', 'नोटरी'], ['GAZETTED_OFFICER', 'Gazetted officer', 'राजपत्रित अधिकारी']] as Array<[AmdAttestorKind, string, string]>).map(([kind, en, hi]) => <label key={kind} className="amd-check"><input type="radio" name={`${uid}-att`} checked={execution.attestor.kind === kind} onChange={() => setAttestor({ kind })} /><span>{t(en, hi)}</span></label>)}
-      {blockFor('execution.attestor.kind').map((item) => <p key={item.id} className="amd-issue amd-issue-block">{item.message}</p>)}
+      {blockFor('execution.attestor.kind').map((item) => <p key={item.id} className="amd-issue amd-issue-block">{t(item.message, item.messageHi)}</p>)}
       <div className="amd-row">
         <Field id={`${uid}-att-name`} label={t('Full name', 'पूरा नाम')} issue={blockFor('execution.attestor.name')}><TextInput id={`${uid}-att-name`} value={execution.attestor.name} onChange={(name) => setAttestor({ name })} /></Field>
         <Field id={`${uid}-att-reg`} label={t('Registration no. or designation', 'पंजीकरण नंबर या पद')}><TextInput id={`${uid}-att-reg`} value={execution.attestor.registrationNo} onChange={(registrationNo) => setAttestor({ registrationNo })} /></Field>
@@ -524,7 +532,7 @@ function SignAndRecord({ t, version, patientId, actor, onError }: { t: T; versio
     </Field>
     {execution.scanSha256 ? <p className="amd-hint">✓ {execution.scanName} · SHA-256 <code className="amd-hash">{execution.scanSha256}</code></p> : null}
     <CustodianFields t={t} uid={uid} value={custodian} defaultBody={version.content.custodianBody} onChange={setCustodian} />
-    {blockFor('custodian').map((item) => <p key={item.id} className="amd-issue amd-issue-block">{item.message}</p>)}
+    {blockFor('custodian').map((item) => <p key={item.id} className="amd-issue amd-issue-block">{t(item.message, item.messageHi)}</p>)}
     {tried && blocking(issues).length ? <p className="amd-issue amd-issue-block" role="alert">{t('It stays “printed, not signed” until all of this is recorded.', 'जब तक यह सब दर्ज न हो, यह “प्रिंट हुआ, हस्ताक्षर नहीं” रहेगा।')}</p> : null}
     <div className="amd-actions"><span /><button type="button" className="primary-button amd-primary" disabled={busy !== ''} onClick={record}>{t('Record as signed and attested', 'हस्ताक्षरित और सत्यापित के रूप में दर्ज करें')}</button></div>
     <p className="amd-hint">{t('Need to change something? Start a new version from the signed one below, or ask for help. This printed copy must then not be signed.', 'कुछ बदलना है? नीचे से नया संस्करण शुरू करें। तब इस प्रिंट की गई प्रति पर हस्ताक्षर नहीं करने चाहिए।')}</p>
@@ -566,7 +574,7 @@ function ExecutedPanel({ t, version, patientId, actor, hasWorking, onNewVersion 
   const [abha, setAbha] = useState({ address: version.abha?.address ?? '', consent: Boolean(version.abha?.consent) });
   const [revoke, setRevoke] = useState({ revokedOn: '', writtenRevocationSigned: false, reason: '', scanKey: '', scanSha256: '' });
   const [confirmRevoke, setConfirmRevoke] = useState(false);
-  const done = (result: { ok: boolean; issues?: AmdIssue[] }) => setError(result.ok ? '' : (result.issues ?? []).map((item) => item.message).join(' '));
+  const done = (result: { ok: boolean; issues?: AmdIssue[] }) => setError(result.ok ? '' : (result.issues ?? []).map((item) => t(item.message, item.messageHi)).join(' '));
   const copyKind = (copy: AmdCopy) => copy.kind === 'DHR' ? t('Representative', 'प्रतिनिधि') : copy.kind === 'FAMILY_PHYSICIAN' ? t('Family doctor', 'पारिवारिक डॉक्टर') : t('Custodian', 'संरक्षक');
 
   async function revokeNow() {

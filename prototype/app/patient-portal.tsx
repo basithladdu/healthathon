@@ -312,6 +312,7 @@ export function MyCarePlan(props: {
           subtitle="Open-source browser voice synthesis — speaks your verified treatment goals and comfort priorities aloud"
           text={spokenPlanText}
           variant="patient"
+          lang={lang}
           className="mb-4"
         />
       )}

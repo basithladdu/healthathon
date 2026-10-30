@@ -4,7 +4,7 @@
 import { careText, type CareLang } from './care-i18n.ts';
 import { ALWAYS_PROVIDED_CARE, IF_IN_DOUBT_RESUSCITATE, TRANSFER_REASON_LABELS, consultantSignature, type EdInterpretation } from './ectpr-rules.ts';
 import type {
-  AmbulanceOption, AuthorityBasis, Dialysis, EctprRecord, ExistingDirective, GoalOfCare, HospitalTransfer, Hydration,
+  AmbulanceOption, AmdStatusSummary, AuthorityBasis, Dialysis, EctprRecord, ExistingDirective, GoalOfCare, HospitalTransfer, Hydration,
   Icu, ImplantedDevice, NgFeeding, PegFeeding, RespCeiling, TransferReason, TrialPlan, Vasopressors,
 } from './ectpr-model.ts';
 
@@ -306,6 +306,59 @@ export function amdStatusLabel(directive: ExistingDirective | null, lang: CareLa
   if (directive.kind === 'NONE') return t('No living will (AMD)', 'कोई लिविंग विल (AMD) नहीं');
   if (directive.kind === 'PRIOR_WISHES') return `${t('No AMD; earlier wishes noted', 'AMD नहीं; पहले की इच्छाएँ दर्ज')}${directive.note ? `: ${directive.note}` : ''}`;
   return `${t('Valid living will (AMD)', 'वैध लिविंग विल (AMD)')} · ${formatDay(directive.date, lang)} · ${t('held at', 'रखी है')} ${directive.location || notRecorded(lang)} · ${t('attested by', 'सत्यापित')} ${directive.attestor || notRecorded(lang)}`;
+}
+
+/**
+ * Living will lines for the ED view, spoken summary and PDF (tech spec §1, §6). A living will executed in Sahara outranks what
+ * the plan's own form says. Only EXECUTED counts as valid; "if both exist, the AMD governs". `amd` is the patient's status from
+ * amd-store, or the card's amdAtIssue. amdCaveat (L7) always goes beside these lines.
+ */
+export function edAmdLines(directive: ExistingDirective | null, amd: AmdStatusSummary | null | undefined, lang: CareLang): { lines: string[]; governs: boolean } {
+  const t = textFor(lang);
+  const fromForm = amdStatusLabel(directive, lang);
+  const formValid = directive?.kind === 'VALID_AMD';
+  const governs = t('The AMD governs over this plan.', 'AMD इस योजना से ऊपर मान्य है।');
+  if (amd?.status === 'EXECUTED') {
+    const [kind, name] = (amd.attestor ?? '').split(/:\s*/, 2);
+    const attestor = amd.attestor ? `${kind === 'Notary' ? t('Notary', 'नोटरी') : t('Gazetted officer', 'राजपत्रित अधिकारी')}: ${name ?? ''}` : notRecorded(lang);
+    return {
+      governs: true,
+      lines: [
+        `${t('Living will (AMD) executed in Sahara', 'Sahara में निष्पादित लिविंग विल (AMD)')} · ${t('version', 'संस्करण')} ${amd.version} · ${t('signed', 'हस्ताक्षर')} ${amd.executedOn ? formatDay(amd.executedOn, lang) : notRecorded(lang)} · ${attestor}`,
+        ...(formValid ? [`${t('Also on this plan', 'इस योजना में भी')}: ${fromForm}`] : []),
+        governs,
+      ],
+    };
+  }
+  if (amd?.status === 'REVOKED') {
+    return {
+      governs: false,
+      lines: [
+        `${t('Living will cancelled in writing', 'लिविंग विल लिखित रूप में रद्द')} · ${t('version', 'संस्करण')} ${amd.version}`,
+        formValid ? `${t('This plan still lists one. Check with the decision-maker', 'यह योजना अब भी एक दिखाती है। निर्णयकर्ता से पूछें')}: ${fromForm}` : fromForm,
+      ],
+    };
+  }
+  if (amd) {
+    return {
+      governs: formValid,
+      lines: [
+        `${t('Living will in Sahara is not signed and attested, so it is not valid', 'Sahara की लिविंग विल पर हस्ताक्षर और सत्यापन नहीं, इसलिए मान्य नहीं')} · ${t('version', 'संस्करण')} ${amd.version}`,
+        fromForm,
+        ...(formValid ? [governs] : []),
+      ],
+    };
+  }
+  return { governs: formValid, lines: [fromForm, ...(formValid ? [governs] : [])] };
+}
+
+/** Harish Rana, 2026 INSC 222, para 322(vi). Same period as AMD_BOARD_PATHWAY step 4 (amd-rules.ts). */
+export function boardReconsiderationNotice(lang: CareLang): string {
+  return careText(
+    lang,
+    'After both boards agree, nothing is done for 30 days. In this reconsideration period, anyone affected may go to court (Harish Rana, 2026 INSC 222, para 322(vi)).',
+    'दोनों बोर्ड सहमत होने के बाद 30 दिन तक कुछ नहीं किया जाता। इस पुनर्विचार अवधि में कोई भी प्रभावित व्यक्ति अदालत जा सकता है (हरीश राणा, 2026 INSC 222, पैरा 322(vi))।',
+  );
 }
 
 export function treatingConsultant(record: EctprRecord): { name: string; registrationNo: string; signedAt: string } | null {

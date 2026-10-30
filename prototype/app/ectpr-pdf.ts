@@ -6,11 +6,12 @@
 // Both return the SHA-256 of the finished file so the caller can show it and write it to the audit log.
 // pdf-lib, fontkit, qrcode and the fonts load only when a PDF is made, so the ED view itself stays light.
 import type { PDFDocument, PDFFont, PDFPage, PDFName, RGB } from 'pdf-lib';
-import type { CareLang } from './care-i18n';
+import { careText, type CareLang } from './care-i18n';
+import { AMD_ED_CAVEAT, AMD_ED_CAVEAT_HI } from './amd-rules';
 import type { EctprRecord } from './ectpr-model';
 import { edInterpretation, pageFooter } from './ectpr-rules';
 import {
-  alwaysProvidedCare, amdCaveat, amdStatusLabel, ambulanceLabel, authorityLabel, ceilingDetails, ceilingLabel, ceilingShort, cprDecidedBy, cprLabel,
+  alwaysProvidedCare, amdCaveat, ambulanceLabel, edAmdLines, authorityLabel, ceilingDetails, ceilingLabel, ceilingShort, cprDecidedBy, cprLabel,
   cprShort, deviceLabel, dialysisLabel, dyingPhasePrompt, edBanner, edFlag, formatDay, goalLabel, hydrationLabel, icuLabel, ifInDoubtAfter,
   ifInDoubtConditions, ifInDoubtLead, ifInDoubtTitle, ngLabel, notRecorded, pegLabel, textFor, transferLabel, transferShort,
   treatingConsultant, vasopressorLabel, walletCardLine,
@@ -174,6 +175,7 @@ export function offlineCardText(record: EctprRecord, lang: CareLang = 'en', now:
     `${t('Call first', 'पहले फ़ोन')}: ${record.careTeam.palliativePhysician || notRecorded(lang)} ${record.careTeam.palliativePhone24h}`.trim(),
     `${t('Decision-maker', 'निर्णयकर्ता')}: ${dm ? `${dm.name} (${dm.relation}) ${dm.phone24h}`.trim() : notRecorded(lang)}`,
     `${t('Signed', 'हस्ताक्षर')}: ${consultant ? `${consultant.name} ${formatDay(consultant.signedAt, lang)}` : t('NOT SIGNED', 'हस्ताक्षर नहीं')} · ${t('Review due', 'समीक्षा')} ${formatDay(record.reviewDue, lang)}`,
+    ...(record.amdAtIssue ? [edAmdLines(record.existingDirective, record.amdAtIssue, lang).lines.join(' '), careText(lang, AMD_ED_CAVEAT, AMD_ED_CAVEAT_HI)] : []),
     walletCardLine(lang),
   ];
   return lines.join('\n');
@@ -227,7 +229,7 @@ export async function makeEctprPdf(record: EctprRecord, opts: { lang?: CareLang;
         : record.capacity.status === 'LACKS' ? t('Lacks capacity for these decisions', 'इन निर्णयों की क्षमता नहीं') : notRecorded(lang),
       t('A patient with capacity can change any part of this plan at any time; what they say now overrides it.', 'क्षमता वाला मरीज़ कभी भी योजना बदल सकता है; उसकी अभी की बात ही मान्य है।'),
     ]],
-    [t('Living will (AMD)', 'लिविंग विल (AMD)'), [amdStatusLabel(record.existingDirective, lang), amdCaveat(lang)]],
+    [t('Living will (AMD)', 'लिविंग विल (AMD)'), [...edAmdLines(record.existingDirective, record.amdAtIssue, lang).lines, amdCaveat(lang)]],
   ];
 
   const allTexts = [record.patient.name, record.clinical.diagnosis, ...rows.flatMap(([a, b]) => [a, ...b]), ...alwaysProvidedCare(lang), ...ifInDoubtConditions(lang), edBanner(interp, record, lang)];

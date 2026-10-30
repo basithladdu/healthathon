@@ -80,6 +80,8 @@ export type EctprRecord = {
   /** Who signed the cancellation (added by ectpr-store). */
   revokedBy?: string;
   supersedes?: string;
+  /** Only on an issued card's snapshot, never on the stored record: the living will status when the card was issued (the AMD itself stays on the issuing device). */
+  amdAtIssue?: AmdStatusSummary | null;
 };
 
 /** stage (optional, added by ectpr-rules): 'save' issues stop a draft being saved; 'activate' issues only stop signing/activation. */
@@ -87,7 +89,7 @@ export type RuleIssue = { id: string; severity: 'block' | 'confirm' | 'warn'; fi
 
 export type AmdStatus = 'DRAFT' | 'GENERATED' | 'EXECUTED' | 'SUPERSEDED' | 'REVOKED';
 
-export type AuditEvent = { id: string; at: string; actor: string; action: 'VIEW' | 'CREATE' | 'EDIT' | 'SIGN' | 'PRINT' | 'SHARE' | 'REVOKE' | 'BREAK_GLASS' | 'REVIEW' | 'UPLOAD'; recordType: 'ECTPR' | 'AMD' | 'CARD'; recordId: string; detail?: string; patientId?: string };
+export type AuditEvent = { id: string; at: string; actor: string; action: 'VIEW' | 'CREATE' | 'EDIT' | 'SIGN' | 'PRINT' | 'SHARE' | 'REVOKE' | 'BREAK_GLASS' | 'REVIEW' | 'UPLOAD' | 'DELETE'; recordType: 'ECTPR' | 'AMD' | 'CARD'; recordId: string; detail?: string; patientId?: string };
 
 // Pilot audit entities (clinical spec §8, Appendix D.3). Synthetic data only during the hackathon.
 
@@ -125,6 +127,15 @@ export type IncidentReport = {
   appliedToReversibleIllness: boolean; familyFeltPushed: boolean;
   details: string;
   reportedBy: string; reportedAt: string;
+};
+
+/** Tech spec §5 "Distribution" for a signed ECTPR: the signed paper scan and who has a copy. Kept apart from the record, because a signed record is never edited. */
+export type EctprCopyKind = 'HOME' | 'FAMILY_TRAVEL' | 'FRONT_DOOR' | 'LOCAL_DOCTOR' | 'PALLIATIVE_TEAM';
+export type EctprCopy = { kind: EctprCopyKind; given: boolean; givenOn: string };
+export type EctprDistribution = {
+  recordId: string; patientId: string;
+  scan: { scanKey: string; scanName: string; scanType: string; scanSha256: string; scanUploadedAt: string; uploadedBy: string } | null;
+  copies: EctprCopy[];
 };
 
 // ════════════════════════════════════════════════════════════════════════════

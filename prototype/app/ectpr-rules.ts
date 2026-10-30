@@ -178,6 +178,23 @@ export function ageInYears(dob: string, now: Date = new Date()): number | null {
 }
 
 /** True when the review-due date is before today (a review due today is still in date). */
+/** Tech spec §8 "review SMS": the reminder is offered once a signed plan's review is due within this many days. */
+export const REVIEW_REMINDER_DAYS = 14;
+
+/** Whole days until the review date (negative = overdue), or null when the plan has no valid review date. */
+export function daysUntilReview(record: EctprRecord, now: Date = new Date()): number | null {
+  const due = parseDate(record.reviewDue);
+  if (!due) return null;
+  const startOfDay = (d: Date) => Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
+  return Math.round((startOfDay(due) - startOfDay(now)) / 86_400_000);
+}
+
+/** The reminder is for the plan in use only, and only inside the window (an overdue plan still counts). */
+export function reviewReminderDue(record: EctprRecord, now: Date = new Date()): boolean {
+  const days = daysUntilReview(record, now);
+  return record.status === 'ACTIVE' && days !== null && days <= REVIEW_REMINDER_DAYS;
+}
+
 export function isOutOfDate(record: EctprRecord, now: Date = new Date()): boolean {
   const due = parseDate(record.reviewDue);
   if (!due) return false;

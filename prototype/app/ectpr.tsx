@@ -7,7 +7,8 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import QRCode from 'qrcode';
 import type { CareLang } from './care-i18n';
 import { careText } from './care-i18n';
-import type { EctprRecord } from './ectpr-model';
+import { getCurrentAmdStatus, subscribeAmd } from './amd-store';
+import type { AmdStatusSummary, EctprRecord } from './ectpr-model';
 import { edInterpretation } from './ectpr-rules';
 import { getActiveEctpr, listEctprVersions, logAudit, subscribeEctpr } from './ectpr-store';
 import { EctprEdView, edSpokenText, type EdAudience } from './ectpr-ed-view';
@@ -115,6 +116,20 @@ export function useEdRecord(patientId: string | null | undefined): { record: Ect
   return state.id === patientId ? { record: state.record, loading: !state.loaded } : { record: null, loading: true };
 }
 
+/** The patient's living will status on this device; undefined until it has loaded. */
+function useAmdStatus(patientId: string | null | undefined): AmdStatusSummary | null | undefined {
+  const [state, setState] = useState<{ id: string; status: AmdStatusSummary | null } | null>(null);
+  useEffect(() => {
+    if (!patientId) return;
+    let live = true;
+    const load = () => { void getCurrentAmdStatus(patientId).then((status) => { if (live) setState({ id: patientId, status }); }).catch(() => undefined); };
+    load();
+    const off = subscribeAmd(load);
+    return () => { live = false; off(); };
+  }, [patientId]);
+  return state && state.id === patientId ? state.status : undefined;
+}
+
 function useLocalCard(patientId: string | null | undefined): LocalEdCard | null {
   const [, setTick] = useState(0);
   useEffect(() => {
@@ -160,13 +175,14 @@ export function EdQuickView(props: {
   const loading = props.ectpr === undefined && looked.loading && !!id;
   const actor = actorFor(props.audience, props.actor);
   useViewAudit(record, actor, 'ED Quick View opened in the app');
-  const spoken = useMemo(() => edSpokenText(record, edInterpretation(record), lang), [record, lang]);
+  const amd = useAmdStatus(record?.patientId ?? id);
+  const spoken = useMemo(() => edSpokenText(record, edInterpretation(record), lang, amd), [record, lang, amd]);
 
   if (loading) return <div className="ectpr-container"><div className="ectpr-card ectpr-quickview"><p className="ectpr-muted">{careText(lang, 'Loading the emergency care plan…', 'आपातकालीन योजना लोड हो रही है…')}</p></div></div>;
   return (
     <>
-      <AudioTtsPlayer title={careText(lang, 'Read the emergency plan aloud', 'आपातकालीन योजना पढ़कर सुनाएँ')} subtitle={careText(lang, 'Plays on this device', 'इसी डिवाइस पर')} text={spoken} variant="emergency" className="mb-3" />
-      <EctprEdView record={record} lang={lang} audience={props.audience} />
+      <AudioTtsPlayer title={careText(lang, 'Read the emergency plan aloud', 'आपातकालीन योजना पढ़कर सुनाएँ')} subtitle={careText(lang, 'Plays on this device', 'इसी डिवाइस पर')} text={spoken} variant="emergency" lang={lang} className="mb-3" />
+      <EctprEdView record={record} lang={lang} audience={props.audience} amd={amd} />
       {record && props.audience === 'clinician' && <EctprPdfActions record={record} lang={lang} actor={actor} liveUrl={null} />}
     </>
   );
@@ -186,9 +202,12 @@ export function EctprPdfActions(props: { record: EctprRecord; lang?: CareLang; a
     setBusy(kind); setError(null);
     try {
       const mod = await import('./ectpr-pdf');
+      // The printed plan carries the living will status as it is now on this device (date, version, attestor, L7 caveat).
+      const amd = await getCurrentAmdStatus(props.record.patientId).catch(() => props.record.amdAtIssue ?? null);
+      const printed: EctprRecord = { ...props.record, amdAtIssue: amd };
       const result = kind === 'plan'
-        ? await mod.makeEctprPdf(props.record, { lang, liveUrl: props.liveUrl })
-        : await mod.makeWalletCardPdf(props.record, { lang, liveUrl: props.liveUrl });
+        ? await mod.makeEctprPdf(printed, { lang, liveUrl: props.liveUrl })
+        : await mod.makeWalletCardPdf(printed, { lang, liveUrl: props.liveUrl });
       mod.downloadPdf(result);
       setDone({ kind, sha256: result.sha256, fileName: result.fileName });
       await logAudit({ actor: props.actor, action: 'PRINT', recordType: kind === 'plan' ? 'ECTPR' : 'CARD', recordId: props.record.id, patientId: props.record.patientId, detail: `${kind === 'plan' ? 'ECTPR PDF' : 'Wallet card PDF'} v${props.record.version} (${lang}) ${result.fileName} SHA-256 ${result.sha256}` });
@@ -297,6 +316,7 @@ export function EmergencyCard(props: {
   const id = props.patientId ?? props.record?.hospitalId ?? null;
   const { record, loading } = useEdRecord(id);
   const card = useLocalCard(id);
+  const amdNow = useAmdStatus(id);
   const actor = actorFor(props.audience, props.actor);
   const [busy, setBusy] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -330,7 +350,9 @@ export function EmergencyCard(props: {
     if (!record) return;
     setBusy('issue'); setMessage(null);
     try {
-      const made = await issueEdCard(record, actor);
+      // The AMD itself stays on this device; the card carries its status so a scanning ED doctor can see it.
+      const amd = await getCurrentAmdStatus(record.patientId).catch(() => null);
+      const made = await issueEdCard({ ...record, amdAtIssue: amd }, actor);
       props.onIssue?.();
       setMessage(made.server === 'issued' ? t('Card issued. Older cards for this patient were withdrawn.', 'कार्ड जारी हुआ। पुराने कार्ड वापस ले लिए गए।') : made.serverMessage ?? null);
     } finally { setBusy(null); }
@@ -408,6 +430,12 @@ export function EmergencyCard(props: {
           ? t('Live link is on the Sahara server. A copy is also saved on this device for offline use.', 'लाइव लिंक Sahara सर्वर पर है। ऑफ़लाइन के लिए एक कॉपी इस डिवाइस पर भी है।')
           : <>{t('Saved on this device only:', 'केवल इस डिवाइस पर सहेजा:')} {current.serverMessage ?? ''} <button type="button" className="ectpr-link-button" onClick={retry} disabled={busy !== null}>{t('Try again', 'फिर कोशिश करें')}</button></>}
       </div>
+      {amdNow !== undefined && (amdNow?.status ?? null) !== (current.snapshot.amdAtIssue?.status ?? null) || amdNow !== undefined && (amdNow?.version ?? null) !== (current.snapshot.amdAtIssue?.version ?? null) ? (
+        <div className="ectpr-card-server ectpr-card-server--local-only" role="status">
+          {t('The living will has changed since this card was issued, so the card shows an old status. Issue a new card.', 'यह कार्ड जारी होने के बाद लिविंग विल बदली है, इसलिए कार्ड पुरानी स्थिति दिखाता है। नया कार्ड जारी करें।')}{' '}
+          <button type="button" className="ectpr-link-button" onClick={issue} disabled={busy !== null}>{t('Issue a new card', 'नया कार्ड जारी करें')}</button>
+        </div>
+      ) : null}
       {!liveQr && <p className="ectpr-muted" role="status">{t('Preparing the QR code…', 'QR कोड तैयार हो रहा है…')}</p>}
       <div className="ectpr-actions-row">
         <button type="button" className="ectpr-button ectpr-button--primary" onClick={handlePrint} disabled={!liveQr}>{t('Print card', 'कार्ड प्रिंट करें')}</button>

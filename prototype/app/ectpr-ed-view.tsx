@@ -6,11 +6,11 @@
 import type React from 'react';
 import type { CareLang } from './care-i18n';
 import { careDir, careText } from './care-i18n';
-import type { EctprRecord } from './ectpr-model';
+import type { AmdStatusSummary, EctprRecord } from './ectpr-model';
 import { edInterpretation, type EdInterpretation } from './ectpr-rules';
 import {
-  alwaysProvidedCare, amdCaveat, amdStatusLabel, ambulanceLabel, authorityLabel, ceilingDetails, ceilingLabel, cprDecidedBy, cprLabel, deviceLabel,
-  dialysisLabel, dyingPhasePrompt, edBanner, edFlag, formatDay, goalLabel, hydrationLabel, icuLabel, ifInDoubtAfter, ifInDoubtConditions, ifInDoubtLead, ifInDoubtTitle,
+  alwaysProvidedCare, amdCaveat, ambulanceLabel, authorityLabel, ceilingDetails, ceilingLabel, cprDecidedBy, cprLabel, deviceLabel,
+  dialysisLabel, dyingPhasePrompt, edAmdLines, edBanner, edFlag, formatDay, goalLabel, hydrationLabel, icuLabel, ifInDoubtAfter, ifInDoubtConditions, ifInDoubtLead, ifInDoubtTitle,
   ngLabel, notRecorded, pegLabel, telHref, textFor, transferLabel, treatingConsultant, vasopressorLabel,
 } from './ectpr-labels';
 
@@ -52,7 +52,7 @@ export function AlwaysContinues(props: { lang: CareLang }) {
 }
 
 /** Spoken summary for read-aloud (same order as the screen). */
-export function edSpokenText(record: EctprRecord | null, interp: EdInterpretation, lang: CareLang): string {
+export function edSpokenText(record: EctprRecord | null, interp: EdInterpretation, lang: CareLang, amd?: AmdStatusSummary | null): string {
   const t = textFor(lang);
   if (!record || interp.state === 'NONE' || interp.state === 'REVOKED' || interp.state === 'UNSIGNED') return `${edBanner(interp, record, lang)} ${ifInDoubtTitle(lang)}.`;
   const c = record.choices;
@@ -67,6 +67,8 @@ export function edSpokenText(record: EctprRecord | null, interp: EdInterpretatio
     `${t('Goal of care', 'देखभाल का लक्ष्य')}: ${goalLabel(c.goalOfCare, lang)}.`,
     `${t('Allergies', 'एलर्जी')}: ${record.clinical.allergies || notRecorded(lang)}.`,
     `${t('Decision-maker', 'निर्णयकर्ता')}: ${dm ? `${dm.name}, ${dm.relation}` : notRecorded(lang)}.`,
+    ...edAmdLines(record.existingDirective, amd === undefined ? record.amdAtIssue : amd, lang).lines.map((line) => `${line}.`),
+    amdCaveat(lang),
     `${ifInDoubtTitle(lang)}.`,
   ].join(' ');
 }
@@ -74,9 +76,10 @@ export function edSpokenText(record: EctprRecord | null, interp: EdInterpretatio
 /**
  * The ED Quick View for one record. `record` null = nothing found. `full` adds the break-glass sections.
  * Unsigned plans never show their choices; out-of-date plans show them greyed as information [Sign-off pending];
- * revoked plans show only "card withdrawn".
+ * revoked plans show only "card withdrawn". `amd`: the patient's living will status from amd-store; left out on the public
+ * /ed page, where the card's own amdAtIssue is used (the AMD itself stays on the issuing device).
  */
-export function EctprEdView(props: { record: EctprRecord | null; lang?: CareLang; audience?: EdAudience; full?: boolean; now?: Date; children?: React.ReactNode }) {
+export function EctprEdView(props: { record: EctprRecord | null; lang?: CareLang; audience?: EdAudience; full?: boolean; now?: Date; amd?: AmdStatusSummary | null; children?: React.ReactNode }) {
   const lang = props.lang ?? 'en';
   const audience = props.audience ?? 'clinician';
   const t = textFor(lang);
@@ -121,6 +124,8 @@ export function EctprEdView(props: { record: EctprRecord | null; lang?: CareLang
           const dm = record.decisionMakers.primary;
           const alt = record.decisionMakers.alternate;
           const decided = cprDecidedBy(record, lang);
+          const amdStatus = props.amd === undefined ? record.amdAtIssue : props.amd;
+          const amdView = edAmdLines(record.existingDirective, amdStatus, lang);
           return (
             <div className={`ectpr-ed-plan${informationOnly ? ' is-information' : ''}`}>
               {informationOnly && <div className="ectpr-ed-pending">{pending} {t('Shown as information, not instruction.', 'जानकारी के रूप में, निर्देश नहीं।')}</div>}
@@ -158,8 +163,8 @@ export function EctprEdView(props: { record: EctprRecord | null; lang?: CareLang
                   : record.capacity.status ? t('Has capacity — ask the patient; what they say now comes first', 'क्षमता है — मरीज़ से पूछें; उनकी अभी की बात सबसे पहले')
                   : notRecorded(lang)}
               </Row>
-              <Row label={t('11 · Living will (AMD)', '11 · लिविंग विल (AMD)')} recorded={!!record.existingDirective}>
-                {amdStatusLabel(record.existingDirective, lang)}
+              <Row label={t('11 · Living will (AMD)', '11 · लिविंग विल (AMD)')} recorded={!!record.existingDirective || !!amdStatus}>
+                {amdView.lines.map((line, index) => <div key={line} className={amdView.governs && index === amdView.lines.length - 1 ? 'ectpr-ed-alert' : undefined}>{line}</div>)}
                 <div className="ectpr-ed-caveat">{amdCaveat(lang)}</div>
               </Row>
               <Row label={t('12 · Version · signed · review due', '12 · संस्करण · हस्ताक्षर · समीक्षा')} recorded>
