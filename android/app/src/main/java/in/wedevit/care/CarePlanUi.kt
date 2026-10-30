@@ -112,7 +112,7 @@ internal fun planStepOf(field: String): Int = when {
             if (draft == null) { LaunchedEffect(Unit) { page = "home" }; return }
             EctprWizard(draft, clinician, canEdit,
                 onSave = { r -> commit { CarePlanBook.saveDraft(it, r, actor, planNow(), today) } },
-                onSign = { r -> commit { CarePlanBook.sign(CarePlanBook.saveDraft(it, r, actor, planNow(), today), r.id, actor, planNow(), today) }.also { ok -> if (ok) { vm.message.value = t("Plan signed and active. The ED Quick View is ready.", "योजना पर हस्ताक्षर हो गए और लागू है। ED क्विक व्यू तैयार है।"); page = "ed" } } },
+                onSign = { r -> commit { CarePlanBook.sign(CarePlanBook.saveDraft(it, r, actor, planNow(), today), r.id, actor, planNow(), today) }.also { ok -> if (ok) page = "ed" } },
                 onClose = { page = "home" })
         }
         "ed" -> EdQuickViewPage(state, selected, onBack = { page = "home" }, onCard = { page = "card" }, onShare = ::sharePlanPdf,
@@ -257,7 +257,8 @@ internal fun planStepOf(field: String): Int = when {
                 }
                 active != null -> {
                     Button(onClick = { dialog = "review" }, enabled = canEdit, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("care-plan-review")) { Text(t("Review or change the plan", "योजना की समीक्षा या बदलाव")) }
-                    TextButton(onClick = { dialog = "withdraw" }, enabled = canEdit, modifier = Modifier.testTag("care-plan-withdraw")) { Text(t("Withdraw the plan", "योजना वापस लें"), color = RustText) }
+                    if (dialog == "withdraw") WithdrawPlanForm(active, onCancel = { dialog = "" }, onWithdraw = { reason, by -> dialog = ""; onWithdraw(active.id, reason, by) })
+                    else TextButton(onClick = { dialog = "withdraw" }, enabled = canEdit, modifier = Modifier.testTag("care-plan-withdraw")) { Text(t("Withdraw the plan", "योजना वापस लें"), color = RustText) }
                 }
                 else -> Button(onClick = { if (clinician) dialog = "start" else onStart(false) }, enabled = canEdit, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("care-plan-start")) { Text(t("Start a plan", "योजना शुरू करें")) }
             }
@@ -290,21 +291,24 @@ internal fun planStepOf(field: String): Int = when {
                 Text(t("A review opens a new draft filled in from the current plan. The current plan stays active until the new one is signed.", "समीक्षा मौजूदा योजना से भरा नया मसौदा खोलती है। नई योजना पर हस्ताक्षर होने तक मौजूदा योजना लागू रहती है।"), style = MaterialTheme.typography.bodySmall)
                 ReviewTrigger.entries.forEach { tr -> OutlinedButton(onClick = { dialog = ""; onReview(tr) }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("review-${tr.name.lowercase()}")) { Text(PlanText.trigger(tr).pick(hindi)) } }
             } }, confirmButton = {}, dismissButton = { TextButton(onClick = { dialog = "" }) { Text(t("Cancel", "रद्द करें")) } })
-        "withdraw" -> active?.let { a ->
-            var reason by remember { mutableStateOf("") }; var by by remember { mutableStateOf("") }
-            AlertDialog(onDismissRequest = { dialog = "" }, title = { Text(t("Withdraw plan v${a.version}?", "योजना v${a.version} वापस लें?")) },
-                text = { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(t("A signed cancellation withdraws the plan and switches off its wallet card QR. Standard care then applies.", "हस्ताक्षरित रद्दीकरण से योजना वापस होती है और वॉलेट कार्ड का QR बंद हो जाता है। उसके बाद सामान्य इलाज लागू होता है।"), style = MaterialTheme.typography.bodySmall)
-                    CareField(reason, { reason = it }, t("Reason", "कारण")); CareField(by, { by = it }, t("Signed by (name)", "हस्ताक्षर करने वाले (नाम)"))
-                } },
-                confirmButton = { TextButton(onClick = { dialog = ""; onWithdraw(a.id, reason.trim(), by.trim()) }, enabled = reason.isNotBlank() && by.isNotBlank()) { Text(t("Withdraw", "वापस लें"), color = RustText) } },
-                dismissButton = { TextButton(onClick = { dialog = "" }) { Text(t("Keep plan", "योजना रखें")) } })
-        }
         "discard" -> draft?.let { d -> AlertDialog(onDismissRequest = { dialog = "" }, title = { Text(t("Discard draft v${d.version}?", "मसौदा v${d.version} हटाएँ?")) },
             text = { Text(t("The unsigned answers are removed. The audit log keeps a note that a draft was discarded.", "बिना हस्ताक्षर के जवाब हट जाएँगे। ऑडिट लॉग में दर्ज रहेगा कि मसौदा हटाया गया।")) },
             confirmButton = { TextButton(onClick = { dialog = ""; onDiscard(d.id) }) { Text(t("Discard", "हटाएँ"), color = RustText) } },
             dismissButton = { TextButton(onClick = { dialog = "" }) { Text(t("Keep draft", "मसौदा रखें")) } }) }
     }
+}
+
+@Composable private fun WithdrawPlanForm(plan: EctprRecord, onCancel: () -> Unit, onWithdraw: (String, String) -> Unit) { val t = careText()
+    var reason by rememberSaveable { mutableStateOf("") }; var by by rememberSaveable { mutableStateOf("") }
+    Surface(color = DoctorStatusRestBg, shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth().testTag("care-plan-withdraw-form")) { Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(t("Withdraw plan v${plan.version}?", "योजना v${plan.version} वापस लें?"), fontWeight = FontWeight.SemiBold)
+        Text(t("A signed cancellation withdraws the plan and switches off its wallet card QR. Standard care then applies.", "हस्ताक्षरित रद्दीकरण से योजना वापस होती है और वॉलेट कार्ड का QR बंद हो जाता है। उसके बाद सामान्य इलाज लागू होता है।"), style = MaterialTheme.typography.bodySmall)
+        CareField(reason, { reason = it }, t("Reason", "कारण")); CareField(by, { by = it }, t("Signed by (name)", "हस्ताक्षर करने वाले (नाम)"))
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            OutlinedButton(onClick = onCancel, modifier = Modifier.weight(1f).heightIn(min = 48.dp)) { Text(t("Keep plan", "योजना रखें")) }
+            Button(onClick = { onWithdraw(reason.trim(), by.trim()) }, enabled = reason.isNotBlank() && by.isNotBlank(), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("care-plan-withdraw-confirm")) { Text(t("Withdraw", "वापस लें")) }
+        }
+    } }
 }
 
 // ───────────────────────────── Wizard ─────────────────────────────
@@ -315,6 +319,10 @@ internal fun planStepOf(field: String): Int = when {
     var step by rememberSaveable(record.id) { mutableIntStateOf(0) }
     var shown by remember { mutableStateOf<List<RuleIssue>>(emptyList()) }
     var leaving by remember { mutableStateOf(false) }
+    val listState = androidx.compose.foundation.lazy.rememberLazyListState()
+    // Each step opens at its top; a refused "Next" brings its reasons into view, since the step can be long.
+    LaunchedEffect(step) { listState.scrollToItem(0) }
+    LaunchedEffect(shown) { if (shown.isNotEmpty()) listState.animateScrollToItem((listState.layoutInfo.totalItemsCount - 1).coerceAtLeast(0)) }
     val steps = listOf(t("Patient and illness", "मरीज़ और बीमारी"), t("Decision-makers", "फ़ैसला लेने वाले"), t("Capacity and existing directive", "निर्णय-क्षमता और पहले का निर्देश"),
         t("Understanding", "समझ"), t("What matters", "क्या ज़रूरी है"), t("Treatment choices", "इलाज के फ़ैसले"), t("Review date", "समीक्षा की तारीख़"), t("Signatures", "हस्ताक्षर"), t("Check and sign", "जाँचें और हस्ताक्षर करें"))
     val blockers = EctprRules.saveBlockers(d, today)
@@ -337,7 +345,7 @@ internal fun planStepOf(field: String): Int = when {
             }
         }
         LinearProgressIndicator(progress = { (step + 1f) / steps.size }, modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp), color = Rust)
-        LazyColumn(Modifier.weight(1f).fillMaxWidth(), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+        LazyColumn(Modifier.weight(1f).fillMaxWidth(), state = listState, contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
             when (step) {
                 0 -> patientStep(d, ::update)
                 1 -> decisionMakerStep(d, ::update)
@@ -357,7 +365,9 @@ internal fun planStepOf(field: String): Int = when {
                     OutlinedButton(onClick = { if (blockers.isEmpty() && onSave(d)) onClose() else shown = blockers }, enabled = canEdit, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Save draft and close", "मसौदा सहेजें और बंद करें")) }
                 } }
             }
-            if (shown.isNotEmpty()) item { IssueList(shown) }
+            // The treatment step already lists its own checks; only show what is not on screen there.
+            val refused = if (step == 5) shown.filter { planStepOf(it.field) != 5 } else shown
+            if (shown.isNotEmpty()) item { IssueList(refused) }
         }
         Surface(color = Paper, shadowElevation = 2.dp) {
             Row(Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 16.dp, vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -718,7 +728,8 @@ private fun LazyListScope.signatureStep(d: EctprRecord, clinician: Boolean, upda
         item { Surface(color = if (interp.kind == EdKind.ACTIVE) DoctorStatusGoodBg else DoctorStatusRestBg, shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth().testTag("ed-banner-${interp.kind.name.lowercase()}")) {
             Text(interp.banner.pick(hindi), Modifier.padding(14.dp).announce(), fontWeight = FontWeight.Bold, color = if (interp.kind == EdKind.ACTIVE) DoctorStatusGood else DoctorStatusRest)
         } }
-        item { IfInDoubtBox() }
+        // An active plan leads with its decisions (tech spec §6), so the always-on box is the short form there; every condition stays on screen.
+        item { IfInDoubtBox(compact = interp.kind == EdKind.ACTIVE) }
         if (r != null && interp.showContent) {
             val rows = EdView.rows(r, AmdLifecycle.edSummary(state.amds, patientId), CarePlanBook.openReview(state, r.id))
             items(rows, key = { it.key }) { row -> EdRowView(row) }
@@ -818,12 +829,17 @@ private fun LazyListScope.signatureStep(d: EctprRecord, clinician: Boolean, upda
 }
 
 @Composable private fun RevokeAmd(c: AmdRecord, canEdit: Boolean, onRevoke: (String) -> Unit) { val t = careText()
-    var open by remember { mutableStateOf(false) }; var reason by remember { mutableStateOf("") }
-    TextButton(onClick = { open = true }, enabled = canEdit) { Text(t("Revoke this living will", "यह लिविंग विल रद्द करें"), color = RustText) }
-    if (open) AlertDialog(onDismissRequest = { open = false }, title = { Text(t("Revoke living will v${c.version}?", "लिविंग विल v${c.version} रद्द करें?")) },
-        text = { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) { Text(t("Revoke it in writing too, the same way it was made, and tell everyone who has a copy.", "इसे उसी तरह लिखकर भी रद्द करें जैसे बनाया था, और जिनके पास कॉपी है उन्हें बताएँ।"), style = MaterialTheme.typography.bodySmall); CareField(reason, { reason = it }, t("Reason", "कारण")) } },
-        confirmButton = { TextButton(onClick = { open = false; onRevoke(reason.trim()) }, enabled = reason.isNotBlank()) { Text(t("Revoke", "रद्द करें"), color = RustText) } },
-        dismissButton = { TextButton(onClick = { open = false }) { Text(t("Keep", "रखें")) } })
+    var open by rememberSaveable { mutableStateOf(false) }; var reason by rememberSaveable { mutableStateOf("") }
+    if (!open) TextButton(onClick = { open = true }, enabled = canEdit) { Text(t("Revoke this living will", "यह लिविंग विल रद्द करें"), color = RustText) }
+    else Surface(color = DoctorStatusRestBg, shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth()) { Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(t("Revoke living will v${c.version}?", "लिविंग विल v${c.version} रद्द करें?"), fontWeight = FontWeight.SemiBold)
+        Text(t("Revoke it in writing too, the same way it was made, and tell everyone who has a copy.", "इसे उसी तरह लिखकर भी रद्द करें जैसे बनाया था, और जिनके पास कॉपी है उन्हें बताएँ।"), style = MaterialTheme.typography.bodySmall)
+        CareField(reason, { reason = it }, t("Reason", "कारण"))
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            OutlinedButton(onClick = { open = false }, modifier = Modifier.weight(1f).heightIn(min = 48.dp)) { Text(t("Keep", "रखें")) }
+            Button(onClick = { open = false; onRevoke(reason.trim()) }, enabled = reason.isNotBlank(), modifier = Modifier.weight(1f).heightIn(min = 48.dp)) { Text(t("Revoke", "रद्द करें")) }
+        }
+    } }
 }
 
 @Composable private fun AmdEditor(record: AmdRecord, canEdit: Boolean, today: LocalDate, onSave: (AmdRecord) -> Boolean, onGenerate: (AmdRecord) -> Unit, onReprint: (AmdRecord) -> Unit,
