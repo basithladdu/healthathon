@@ -87,8 +87,9 @@ export async function POST(request: Request) {
       if (problem) return json({ status: 'error', message: problem }, 422);
       const patientRef = str(input.patientRef, 120);
       if (!patientRef) return json({ status: 'error', message: 'Missing patient reference.' }, 400);
-      await rest(key, 'sahara_ed_cards', {
-        method: 'POST', prefer: 'return=minimal',
+      // Issuing and the background sync can send the same token together, so a repeat is not an error.
+      await rest(key, 'sahara_ed_cards?on_conflict=token', {
+        method: 'POST', prefer: 'resolution=ignore-duplicates,return=minimal',
         body: { token, patient_ref: patientRef, record_id: str(record.id, 120), version: Math.max(1, Math.floor(Number(record.version) || 1)), snapshot: record, manage_key_hash: await sha256Hex(manageKey) },
       });
       return json({ status: 'issued', token }, 201);
