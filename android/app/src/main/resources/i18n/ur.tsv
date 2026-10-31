@@ -3432,3 +3432,96 @@ Save $n medicines	$n دوائیں محفوظ کریں
 page $k	صفحہ $k
 Original reading · $pages	اصل پڑھائی · $pages
 ICD decision	ICD کا فیصلہ
+$name at a glance	$name ایک نظر میں
+Expanded	کھلا ہوا
+Collapsed	بند
+Pain and symptoms	درد اور علامات
+No symptoms logged this week	اس ہفتے کوئی علامت درج نہیں ہوئی
+See symptom notes	صحت کے نوٹس دیکھیں
+See medicines	دوائیں دیکھیں
+See calendar	کیلنڈر دیکھیں
+Latest note from the doctor	ڈاکٹر کا تازہ ترین نوٹ
+Read	پڑھیں
+See emergency plan	ہنگامی منصوبہ دیکھیں
+$v/10, up from $p	$v/10، پہلے $p تھا، اب بڑھ گیا
+$v/10, down from $p	$v/10، پہلے $p تھا، اب کم ہو گیا
+$v/10, same as before	$v/10، پہلے جیسا
+$v/10, first note	$v/10، پہلا نوٹ
+No medicines yet	ابھی کوئی دوا نہیں
+1 medicine	1 دوا
+$n medicines	$n دوائیں
+$taken of $total ticked today, $left not yet	آج $total میں سے $taken پر نشان لگا، $left باقی
+date to be set	تاریخ طے ہونی ہے
+Next visit $day	اگلی ملاقات $day
+No visit planned	کوئی ملاقات طے نہیں
+No care note yet	ابھی کوئی نگہداشت نوٹ نہیں
+Version $n, $dateText	ورژن $n، $dateText
+Version $n, $dateText, $doctor	ورژن $n، $dateText، $doctor
+No emergency plan yet	ابھی کوئی ہنگامی منصوبہ نہیں
+Draft, not signed yet	مسودہ، ابھی دستخط نہیں ہوئے
+Out of date, review was due $due	پرانا، جائزہ $due کو ہونا تھا
+Withdrawn, no longer valid	واپس لیا گیا، اب درست نہیں
+Active, review due $due	نافذ، جائزے کی تاریخ $due
+Drowsiness	غنودگی
+Dizziness	چکر آنا
+Itching	خارش
+Confusion	الجھن
+Just now	ابھی
+Earlier today	آج پہلے
+2 days ago or more	2 دن پہلے یا اس سے پہلے
+Side effect?	کوئی مضر اثر؟
+Write down what happened so the doctor can talk about it at the next visit. This only records it; it is not advice.	جو ہوا اسے لکھ لیں تاکہ اگلی ملاقات میں ڈاکٹر اس پر بات کر سکیں۔ یہ صرف درج کرتا ہے، مشورہ نہیں ہے۔
+What happened?	کیا ہوا؟
+In your own words (optional)	اپنے الفاظ میں (اختیاری)
+How bad was it?	کتنا زیادہ تھا؟
+When?	کب؟
+I stopped taking it	میں نے اسے لینا بند کر دیا
+You can read these records but not change them.	آپ یہ ریکارڈ پڑھ سکتے ہیں لیکن بدل نہیں سکتے۔
+Save side effect	مضر اثر محفوظ کریں
+How bad: 	کتنا زیادہ: 
+When: 	کب: 
+Reported by 	بتانے والا: 
+They stopped taking it.	انہوں نے اسے لینا بند کر دیا۔
+Discussed 	بات ہو چکی 
+Not discussed yet	ابھی بات نہیں ہوئی
+Mark as discussed	بات ہو گئی، نشان لگائیں
+Side effects noted	درج مضر اثرات
+Side effects to raise at the next visit	اگلی ملاقات میں بتانے کے مضر اثرات
+Noted since the last doctor visit on 	پچھلی ڈاکٹر ملاقات کے بعد درج، 
+Noted so far. No doctor visit is recorded yet.	اب تک درج۔ ابھی کوئی ڈاکٹر ملاقات درج نہیں۔
+This side-effect note could not be read. The original record is retained.	یہ نوٹ پڑھا نہیں جا سکا۔ اصل ریکارڈ محفوظ ہے۔
+Side effect	مضر اثر
+Side effects reported since last visit	پچھلی ملاقات کے بعد بتائے گئے مضر اثرات
+Since the last recorded visit on 	آخری درج ملاقات کے بعد، 
+No visit is recorded yet, so everything reported is shown.	ابھی کوئی ملاقات درج نہیں، اس لیے بتائی گئی ہر بات دکھائی جا رہی ہے۔
+Nothing reported since the last visit.	پچھلی ملاقات کے بعد کچھ نہیں بتایا گیا۔
+These are the patient's or family's own notes, not a clinical assessment.	یہ مریض یا خاندان کے اپنے نوٹ ہیں، طبی جانچ نہیں۔
+Care timeline	نگہداشت کی ٹائم لائن
+Key events from your documents	آپ کے دستاویزات سے اہم واقعات
+Chemotherapy day	کیموتھراپی کا دن
+Radiotherapy day	ریڈیوتھراپی کا دن
+Scan	اسکین
+Lab report	لیب رپورٹ
+Care note	نگہداشت کا نوٹ
+Document	دستاویز
+a report	ایک رپورٹ
+, page 	، صفحہ 
+Version 	ورژن 
+Treatment	علاج
+Scans	اسکین
+Lab	لیب
+Visits & notes	ملاقاتیں اور نوٹس
+Practice record: these dates are sample data, not a real person's treatment.	مشقی ریکارڈ: یہ تاریخیں نمونے کی ہیں، کسی حقیقی شخص کا علاج نہیں۔
+At a glance	ایک نظر میں
+Last chemotherapy	آخری کیموتھراپی
+Last radiotherapy	آخری ریڈیوتھراپی
+Last scan	آخری اسکین
+Last biopsy or histopathology	آخری بائیوپسی یا ہسٹوپیتھالوجی
+ (date added)	 (شامل کرنے کی تاریخ)
+From: 	ماخذ: 
+Nothing on the timeline yet	ٹائم لائن میں ابھی کچھ نہیں
+Nothing here	یہاں کچھ نہیں
+Add reports, lab results and chemo or radiotherapy days. They appear here with where they came from.	رپورٹیں، لیب کے نتائج اور کیمو یا ریڈیوتھراپی کے دن شامل کریں۔ وہ اپنے ماخذ کے ساتھ یہاں نظر آئیں گے۔
+Try another filter.	کوئی اور فلٹر آزمائیں۔
+Report date not recorded. This is the day the file was added.	رپورٹ کی تاریخ درج نہیں۔ یہ فائل شامل کرنے کا دن ہے۔
+Dates come from reports you added, Calendar days and results you copied. A Calendar day marks a day you noted; it does not confirm a treatment was given. Everything stays on this phone.	تاریخیں آپ کی شامل کی ہوئی رپورٹوں، کیلنڈر کے دنوں اور کاپی کیے گئے نتائج سے لی گئی ہیں۔ کیلنڈر کا دن آپ کا نوٹ کیا ہوا دن ہے؛ اس سے علاج دیے جانے کی تصدیق نہیں ہوتی۔ سب کچھ اسی فون پر رہتا ہے۔

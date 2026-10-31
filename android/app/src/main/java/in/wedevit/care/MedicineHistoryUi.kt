@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.RemoveCircleOutline
 import androidx.compose.material3.*
@@ -27,6 +28,8 @@ import java.time.ZoneId
     val current by vm.items.collectAsStateWithLifecycle()
     var history by rememberSaveable(item.id) { mutableStateOf(false) }
     var confirmMissed by rememberSaveable(item.id) { mutableStateOf(false) }
+    var sideEffect by rememberSaveable(item.id) { mutableStateOf(false) }
+    val allItems by vm.allItems.collectAsStateWithLifecycle()
     val capturedAccount = remember(item.id) { vm.accountNamespace }
     val today = LocalDate.now()
     val outcome = MedicineHistoryRules.todayOutcome(item, events, today, ZoneId.systemDefault())
@@ -34,6 +37,9 @@ import java.time.ZoneId
     FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         if (canEdit && outcome == null && current.any { it.id == item.id }) TextButton(onClick = { confirmMissed = true }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp).testTag("care-missed-${item.id}")) {
             Icon(Icons.Default.RemoveCircleOutline, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(careBilingual("Missed today", "आज छूटी"))
+        }
+        if (canEdit) TextButton(onClick = { sideEffect = true }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp).testTag("care-side-effect-${item.id}")) {
+            Icon(Icons.Default.ErrorOutline, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(careBilingual("Side effect?", "कोई दुष्प्रभाव?"))
         }
         TextButton(onClick = { history = true }, modifier = Modifier.heightIn(min = 48.dp).testTag("care-medicine-history-${item.id}")) {
             Icon(Icons.Default.History, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(careBilingual("History", "इतिहास"))
@@ -45,6 +51,7 @@ import java.time.ZoneId
             else careBilingual("${item.title}: this adds a \"missed today\" report to the medicine history on this phone. Earlier reports stay. Ask the doctor or nurse what to do about a missed dose.", "पहले की जानकारी नहीं मिटेगी। छूटी खुराक के बारे में डॉक्टर या नर्स से पूछें।")) },
         confirmButton = { TextButton(onClick = { if (canEditCareContext(vm, item.personId, capturedAccount)) vm.reportMedicineMissed(item); confirmMissed = false }, enabled = !busy && canEdit) { Text(careBilingual("Record missed", "दर्ज करें")) } },
         dismissButton = { TextButton(onClick = { confirmMissed = false }) { Text(careBilingual("Cancel", "रद्द करें")) } })
+    if (sideEffect) SideEffectSheet(item, vm, onDismiss = { sideEffect = false })
     if (history) ModalBottomSheet(onDismissRequest = { history = false }, containerColor = Cream) {
         val mine = events.filter { it.medicineId == item.id }
         val now = System.currentTimeMillis()
@@ -53,6 +60,7 @@ import java.time.ZoneId
             item { Text(careBilingual("Taken and missed reports, newest first. A report is what someone recorded, not proof a dose was swallowed.", "लेने और छूटने की जानकारी, नई सबसे ऊपर।"), fontSize = 13.sp, color = DoctorCardSub) }
             if (mine.isEmpty()) item { Text(careBilingual("No reports yet. Tick the box when the dose is taken, or tap Missed today.", "अभी कोई जानकारी नहीं।"), fontSize = 15.sp) }
             items(mine, key = { it.id }) { MedicineReportCard(it, mine, now) }
+            medicineSideEffectItems(SideEffectLog.forMedicine(SideEffectLog.entries(allItems, item.personId), item.id), vm)
             item { Text(if (vm.cloud != null) careBilingual("Saved in your account. Family and doctors you share with can see it.", "आपके खाते में सेव। जिनके साथ आपने साझा किया, वे देख सकते हैं।") else careBilingual("Saved only on this phone. Sign in to share it with family and the doctor.", "सिर्फ़ इस फ़ोन पर।"), fontSize = 12.sp, color = DoctorCardFaint) }
             if (vm.cloud != null) item { TextButton(onClick = vm::refreshMedicineHistory, modifier = Modifier.heightIn(min = 48.dp)) { Text(careBilingual("Refresh history", "इतिहास ताज़ा करें")) } }
         }

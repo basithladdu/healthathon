@@ -40,7 +40,7 @@ import java.io.File
 /** Last listed prescription originals per account and person, so Documents opens with them instead of popping them in after a file read. */
 private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<String, List<CareReport>>()
 
-@Composable fun CareDocuments(vm: CareModel, onRead: (CareVersion) -> Unit, onTalk: () -> Unit) {
+@Composable fun CareDocuments(vm: CareModel, onRead: (CareVersion) -> Unit, onTalk: () -> Unit, onCalendarAt: ((Long) -> Unit)? = null, onLabs: (() -> Unit)? = null, onCare: (() -> Unit)? = null) {
     val savedReports by vm.reports.collectAsStateWithLifecycle()
     val savedNotes by vm.versions.collectAsStateWithLifecycle()
     val person by vm.selected.collectAsStateWithLifecycle()
@@ -73,6 +73,8 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
     var folderFilter by rememberSaveable { mutableStateOf("") }
     var moving by remember { mutableStateOf<CareReport?>(null) }
     var asking by rememberSaveable { mutableStateOf(false) }
+    var timeline by rememberSaveable { mutableStateOf(false) }
+    var reviewPage by rememberSaveable { mutableIntStateOf(1) }
     var sorting by remember { mutableStateOf(false) }
     fun folderOf(report: CareReport) = folders[report.id]?.folder ?: DocumentFolderRules.OTHER
     val listState = rememberLazyListState()
@@ -98,8 +100,9 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
             folderStore.sorted(report.id, folder); folders = folderStore.all()
         } } finally { sorting = false }
     }
-    reports.firstOrNull { it.id == reviewId }?.let { report -> CareDocumentReview(vm, report) { reviewId = null }; return }
+    reports.firstOrNull { it.id == reviewId }?.let { report -> CareDocumentReview(vm, report, startPage = reviewPage) { reviewId = null; reviewPage = 1 }; return }
     if (asking) { CareDocumentAsk(vm, reports, folders, onOpen = { report -> asking = false; reviewId = report.id }) { asking = false }; return }
+    if (timeline) { CareTimeline(vm, reports, ::cancerType, ::folderOf, onOpenReport = { report, page -> reviewPage = page; reviewId = report.id }, onReadNote = onRead, onCalendarAt = onCalendarAt, onLabs = onLabs, onCare = onCare, onClose = { timeline = false }); return }
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null && importingFor.isNotEmpty()) vm.importReport(uri, importingFor)
         importingFor = ""
@@ -137,6 +140,13 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
                 Text(run { val n = notes.size; val m = reports.size; (if (n == 1) t("1 care note", "1 देखभाल नोट") else t("$n care notes", "$n देखभाल नोट")) + " · " + (if (m == 1) t("1 report", "1 रिपोर्ट") else t("$m reports", "$m रिपोर्ट")) }, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             if (canEdit) FilledTonalIconButton(onClick = addReport, enabled = !busy, shape = RoundedCornerShape(14.dp), modifier = Modifier.size(48.dp), colors = IconButtonDefaults.filledTonalIconButtonColors(containerColor = Gold, contentColor = Ink)) { Icon(Icons.Default.UploadFile, t("Add a report", "रिपोर्ट जोड़ें")) }
+        } }
+        item { Card(onClick = { timeline = true }, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("care-timeline-open"), shape = RoundedCornerShape(18.dp), colors = CardDefaults.cardColors(containerColor = Peach)) {
+            Row(Modifier.fillMaxWidth().padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.Timeline, null, Modifier.size(26.dp)); Spacer(Modifier.width(12.dp))
+                Column(Modifier.weight(1f)) { Text(t("Care timeline", "देखभाल की समय-रेखा"), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont); Text(t("Key events from your documents", "आपके कागज़ों की मुख्य बातें"), style = MaterialTheme.typography.bodySmall) }
+                Icon(Icons.AutoMirrored.Filled.ArrowForward, null, Modifier.size(20.dp))
+            }
         } }
         if (vm.demoMode) item { Text(t("In the demo, reports you add stay on this phone. They are removed when the demo ends.", "डेमो में जोड़ी गई रिपोर्टें इसी फ़ोन पर रहती हैं। डेमो ख़त्म होने पर ये हट जाती हैं।"), style = MaterialTheme.typography.bodySmall) }
         else item { Text(t("Report files stay on this phone. Your care team sees them only if you share them. Lab results you copy from a report are saved in your care record.", "रिपोर्ट की फ़ाइलें इसी फ़ोन पर रहती हैं। देखभाल टीम इन्हें तभी देखती है जब आप भेजें। रिपोर्ट से कॉपी किए लैब नतीजे आपके देखभाल रिकॉर्ड में सेव होते हैं।"), style = MaterialTheme.typography.bodySmall, modifier = Modifier.testTag("documents-on-phone")) }

@@ -3432,3 +3432,96 @@ Save $n medicines	$n ಔಷಧಿಗಳನ್ನು ಉಳಿಸಿ
 page $k	ಪುಟ $k
 Original reading · $pages	ಮೂಲ ಓದು · $pages
 ICD decision	ICD ನಿರ್ಧಾರ
+$name at a glance	$name ಒಂದು ನೋಟದಲ್ಲಿ
+Expanded	ತೆರೆದಿದೆ
+Collapsed	ಮುಚ್ಚಿದೆ
+Pain and symptoms	ನೋವು ಮತ್ತು ಲಕ್ಷಣಗಳು
+No symptoms logged this week	ಈ ವಾರ ಯಾವುದೇ ಲಕ್ಷಣ ದಾಖಲಾಗಿಲ್ಲ
+See symptom notes	ಆರೋಗ್ಯ ಟಿಪ್ಪಣಿಗಳನ್ನು ನೋಡಿ
+See medicines	ಔಷಧಿಗಳನ್ನು ನೋಡಿ
+See calendar	ಕ್ಯಾಲೆಂಡರ್ ನೋಡಿ
+Latest note from the doctor	ವೈದ್ಯರ ಇತ್ತೀಚಿನ ಟಿಪ್ಪಣಿ
+Read	ಓದಿ
+See emergency plan	ತುರ್ತು ಯೋಜನೆ ನೋಡಿ
+$v/10, up from $p	$v/10, ಹಿಂದೆ $p ಇತ್ತು, ಈಗ ಹೆಚ್ಚಾಗಿದೆ
+$v/10, down from $p	$v/10, ಹಿಂದೆ $p ಇತ್ತು, ಈಗ ಕಡಿಮೆಯಾಗಿದೆ
+$v/10, same as before	$v/10, ಮೊದಲಿನಂತೆಯೇ
+$v/10, first note	$v/10, ಮೊದಲ ಟಿಪ್ಪಣಿ
+No medicines yet	ಇನ್ನೂ ಔಷಧಿಗಳಿಲ್ಲ
+1 medicine	1 ಔಷಧಿ
+$n medicines	$n ಔಷಧಿಗಳು
+$taken of $total ticked today, $left not yet	ಇಂದು $total ರಲ್ಲಿ $taken ಟಿಕ್ ಮಾಡಲಾಗಿದೆ, $left ಬಾಕಿ
+date to be set	ದಿನಾಂಕ ನಿಗದಿಯಾಗಬೇಕು
+Next visit $day	ಮುಂದಿನ ಭೇಟಿ $day
+No visit planned	ಯಾವುದೇ ಭೇಟಿ ಯೋಜಿಸಿಲ್ಲ
+No care note yet	ಇನ್ನೂ ಆರೈಕೆ ಟಿಪ್ಪಣಿ ಇಲ್ಲ
+Version $n, $dateText	ಆವೃತ್ತಿ $n, $dateText
+Version $n, $dateText, $doctor	ಆವೃತ್ತಿ $n, $dateText, $doctor
+No emergency plan yet	ಇನ್ನೂ ತುರ್ತು ಯೋಜನೆ ಇಲ್ಲ
+Draft, not signed yet	ಕರಡು, ಇನ್ನೂ ಸಹಿ ಆಗಿಲ್ಲ
+Out of date, review was due $due	ಹಳೆಯದಾಗಿದೆ, ಪರಿಶೀಲನೆ $due ರಂದು ಆಗಬೇಕಿತ್ತು
+Withdrawn, no longer valid	ಹಿಂಪಡೆಯಲಾಗಿದೆ, ಇನ್ನು ಮಾನ್ಯವಲ್ಲ
+Active, review due $due	ಜಾರಿಯಲ್ಲಿದೆ, ಪರಿಶೀಲನೆ ದಿನಾಂಕ $due
+Drowsiness	ತೂಕಡಿಕೆ
+Dizziness	ತಲೆ ಸುತ್ತುವಿಕೆ
+Itching	ತುರಿಕೆ
+Confusion	ಗೊಂದಲ
+Just now	ಈಗಷ್ಟೇ
+Earlier today	ಇಂದು ಮುಂಚೆ
+2 days ago or more	2 ದಿನಗಳ ಹಿಂದೆ ಅಥವಾ ಅದಕ್ಕಿಂತ ಮೊದಲು
+Side effect?	ಯಾವುದಾದರೂ ಅಡ್ಡ ಪರಿಣಾಮ?
+Write down what happened so the doctor can talk about it at the next visit. This only records it; it is not advice.	ಏನಾಯಿತು ಎಂದು ಬರೆದಿಡಿ, ಮುಂದಿನ ಭೇಟಿಯಲ್ಲಿ ವೈದ್ಯರು ಅದರ ಬಗ್ಗೆ ಮಾತನಾಡಬಹುದು. ಇದು ಕೇವಲ ದಾಖಲಿಸುತ್ತದೆ; ಸಲಹೆ ಅಲ್ಲ.
+What happened?	ಏನಾಯಿತು?
+In your own words (optional)	ನಿಮ್ಮ ಸ್ವಂತ ಮಾತುಗಳಲ್ಲಿ (ಐಚ್ಛಿಕ)
+How bad was it?	ಎಷ್ಟು ತೀವ್ರವಾಗಿತ್ತು?
+When?	ಯಾವಾಗ?
+I stopped taking it	ನಾನು ಇದನ್ನು ತೆಗೆದುಕೊಳ್ಳುವುದನ್ನು ನಿಲ್ಲಿಸಿದ್ದೇನೆ
+You can read these records but not change them.	ನೀವು ಈ ದಾಖಲೆಗಳನ್ನು ಓದಬಹುದು ಆದರೆ ಬದಲಾಯಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ.
+Save side effect	ಅಡ್ಡ ಪರಿಣಾಮವನ್ನು ಉಳಿಸಿ
+How bad: 	ಎಷ್ಟು ತೀವ್ರ:
+When: 	ಯಾವಾಗ:
+Reported by 	ತಿಳಿಸಿದವರು:
+They stopped taking it.	ಅವರು ಇದನ್ನು ತೆಗೆದುಕೊಳ್ಳುವುದನ್ನು ನಿಲ್ಲಿಸಿದರು.
+Discussed 	ಚರ್ಚಿಸಲಾಗಿದೆ
+Not discussed yet	ಇನ್ನೂ ಚರ್ಚಿಸಿಲ್ಲ
+Mark as discussed	ಚರ್ಚಿಸಲಾಗಿದೆ ಎಂದು ಗುರುತಿಸಿ
+Side effects noted	ದಾಖಲಾದ ಅಡ್ಡ ಪರಿಣಾಮಗಳು
+Side effects to raise at the next visit	ಮುಂದಿನ ಭೇಟಿಯಲ್ಲಿ ತಿಳಿಸಬೇಕಾದ ಅಡ್ಡ ಪರಿಣಾಮಗಳು
+Noted since the last doctor visit on 	ಕೊನೆಯ ವೈದ್ಯರ ಭೇಟಿಯ ನಂತರ ದಾಖಲು,
+Noted so far. No doctor visit is recorded yet.	ಇಲ್ಲಿಯವರೆಗೆ ದಾಖಲಾದವು. ಇನ್ನೂ ಯಾವುದೇ ವೈದ್ಯರ ಭೇಟಿ ದಾಖಲಾಗಿಲ್ಲ.
+This side-effect note could not be read. The original record is retained.	ಈ ಅಡ್ಡ ಪರಿಣಾಮದ ಟಿಪ್ಪಣಿಯನ್ನು ಓದಲಾಗಲಿಲ್ಲ. ಮೂಲ ದಾಖಲೆ ಸುರಕ್ಷಿತವಾಗಿದೆ.
+Side effect	ಅಡ್ಡ ಪರಿಣಾಮ
+Side effects reported since last visit	ಕೊನೆಯ ಭೇಟಿಯ ನಂತರ ತಿಳಿಸಿದ ಅಡ್ಡ ಪರಿಣಾಮಗಳು
+Since the last recorded visit on 	ಕೊನೆಯ ದಾಖಲಾದ ಭೇಟಿಯ ನಂತರ,
+No visit is recorded yet, so everything reported is shown.	ಇನ್ನೂ ಯಾವುದೇ ಭೇಟಿ ದಾಖಲಾಗಿಲ್ಲ, ಆದ್ದರಿಂದ ತಿಳಿಸಿದ ಎಲ್ಲವನ್ನೂ ತೋರಿಸಲಾಗುತ್ತಿದೆ.
+Nothing reported since the last visit.	ಕೊನೆಯ ಭೇಟಿಯ ನಂತರ ಏನನ್ನೂ ತಿಳಿಸಿಲ್ಲ.
+These are the patient's or family's own notes, not a clinical assessment.	ಇವು ರೋಗಿ ಅಥವಾ ಕುಟುಂಬದ ಸ್ವಂತ ಟಿಪ್ಪಣಿಗಳು, ವೈದ್ಯಕೀಯ ಮೌಲ್ಯಮಾಪನವಲ್ಲ.
+Care timeline	ಆರೈಕೆ ಕಾಲರೇಖೆ
+Key events from your documents	ನಿಮ್ಮ ದಾಖಲೆಗಳಿಂದ ಮುಖ್ಯ ಘಟನೆಗಳು
+Chemotherapy day	ಕೀಮೋಥೆರಪಿ ದಿನ
+Radiotherapy day	ರೇಡಿಯೋಥೆರಪಿ ದಿನ
+Scan	ಸ್ಕ್ಯಾನ್
+Lab report	ಲ್ಯಾಬ್ ವರದಿ
+Care note	ಆರೈಕೆ ಟಿಪ್ಪಣಿ
+Document	ದಾಖಲೆ
+a report	ಒಂದು ವರದಿ
+, page 	, ಪುಟ 
+Version 	ಆವೃತ್ತಿ 
+Treatment	ಚಿಕಿತ್ಸೆ
+Scans	ಸ್ಕ್ಯಾನ್ಗಳು
+Lab	ಲ್ಯಾಬ್
+Visits & notes	ಭೇಟಿಗಳು ಮತ್ತು ಟಿಪ್ಪಣಿಗಳು
+Practice record: these dates are sample data, not a real person's treatment.	ಅಭ್ಯಾಸ ದಾಖಲೆ: ಈ ದಿನಾಂಕಗಳು ಮಾದರಿ ಮಾಹಿತಿ, ನಿಜವಾದ ವ್ಯಕ್ತಿಯ ಚಿಕಿತ್ಸೆ ಅಲ್ಲ.
+At a glance	ಒಂದು ನೋಟದಲ್ಲಿ
+Last chemotherapy	ಕೊನೆಯ ಕೀಮೋಥೆರಪಿ
+Last radiotherapy	ಕೊನೆಯ ರೇಡಿಯೋಥೆರಪಿ
+Last scan	ಕೊನೆಯ ಸ್ಕ್ಯಾನ್
+Last biopsy or histopathology	ಕೊನೆಯ ಬಯಾಪ್ಸಿ ಅಥವಾ ಹಿಸ್ಟೋಪಾಥಾಲಜಿ
+ (date added)	 (ಸೇರಿಸಿದ ದಿನಾಂಕ)
+From: 	ಮೂಲ: 
+Nothing on the timeline yet	ಕಾಲರೇಖೆಯಲ್ಲಿ ಇನ್ನೂ ಏನೂ ಇಲ್ಲ
+Nothing here	ಇಲ್ಲಿ ಏನೂ ಇಲ್ಲ
+Add reports, lab results and chemo or radiotherapy days. They appear here with where they came from.	ವರದಿಗಳು, ಲ್ಯಾಬ್ ಫಲಿತಾಂಶಗಳು ಮತ್ತು ಕೀಮೋ ಅಥವಾ ರೇಡಿಯೋಥೆರಪಿ ದಿನಗಳನ್ನು ಸೇರಿಸಿ. ಅವು ಎಲ್ಲಿಂದ ಬಂದಿವೆ ಎಂಬುದರೊಂದಿಗೆ ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತವೆ.
+Try another filter.	ಇನ್ನೊಂದು ಫಿಲ್ಟರ್ ಪ್ರಯತ್ನಿಸಿ.
+Report date not recorded. This is the day the file was added.	ವರದಿಯ ದಿನಾಂಕ ದಾಖಲಾಗಿಲ್ಲ. ಇದು ಫೈಲ್ ಸೇರಿಸಿದ ದಿನ.
+Dates come from reports you added, Calendar days and results you copied. A Calendar day marks a day you noted; it does not confirm a treatment was given. Everything stays on this phone.	ದಿನಾಂಕಗಳು ನೀವು ಸೇರಿಸಿದ ವರದಿಗಳು, ಕ್ಯಾಲೆಂಡರ್ ದಿನಗಳು ಮತ್ತು ನಕಲಿಸಿದ ಫಲಿತಾಂಶಗಳಿಂದ ಬಂದಿವೆ. ಕ್ಯಾಲೆಂಡರ್ ದಿನವು ನೀವು ಗುರುತಿಸಿದ ದಿನ; ಚಿಕಿತ್ಸೆ ನೀಡಲಾಗಿದೆ ಎಂದು ಅದು ದೃಢೀಕರಿಸುವುದಿಲ್ಲ. ಎಲ್ಲವೂ ಈ ಫೋನ್ನಲ್ಲಿಯೇ ಇರುತ್ತದೆ.

@@ -239,7 +239,7 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
                             } else vm.message.value = askOwner
                         })
                     3 -> Nearby(vm.centres, vm)
-                    5 -> CareDocuments(vm, onRead = { reading = it }, onTalk = { go(1) })
+                    5 -> CareDocuments(vm, onRead = { reading = it }, onTalk = { go(1) }, onCalendarAt = ::openCalendar, onLabs = { go(8) }, onCare = { go(2) })
                     6 -> CareCalendar(vm, onWorkflow = { go(7) }, initialDay = calendarDay)
                     7 -> CareWorkflows(vm, onTalk = { go(1) })
                     8 -> CareLabs(vm)
@@ -355,6 +355,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
             Heading(t("Today", "आज"), 30); Spacer(Modifier.weight(1f)); Text(LocalDate.now().format(careDateFormat("EEE, d MMM", hindi)), color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp)
             if (vm.cloud != null) IconButton(onClick = vm::refresh) { Icon(Icons.Default.Refresh, t("Refresh records", "रिकॉर्ड फिर से लाएँ")) }
         } }
+        if (!clinician && selectedPerson.isNotBlank()) item(key = "patient-summary") { PatientSummaryCard(vm, onSymptoms = onSymptoms, onMedicines = { onCare("Medicines") }, onVisit = { if (it.due == 0L) onCalendar() else onCalendarAt(it.due) }, onRead = onRead, onCarePlan = onCarePlan) }
         if (!clinician) item {
             // Do not infer a current relationship from a note's typed reviewer.
             // The account workspace loads actual patient-controlled membership.
@@ -906,6 +907,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
         } } else {
             item { module("Conversations", t("Conversations", "बातचीत"), Icons.Default.Description, SaharaLavender, versions.size) { CareModuleList("conversations", versions, t("No saved conversations yet.", "अभी कोई सहेजी हुई बातचीत नहीं।"), keyOf = { it.id }) { ConversationRow(it, onReadNote) } } }
             item { module("Medicines", t("Medicines", "दवाइयाँ"), careIcon("medicine"), SaharaSoftBlue, currentMeds.size + pastMeds.size) {
+                SideEffectsToRaiseCard(vm)
                 MedicineScanAction(onScanPrescription) { onAdd("medicine") }
                 if (currentMeds.isEmpty() && pastMeds.isEmpty()) QuietLine(t("No medicines yet.", "अभी कोई दवा नहीं।")) else {
                     CareModuleList("medicines-current", currentMeds, t("No current medicines.", "अभी कोई दवा नहीं चल रही।"), t("Current", "अभी चल रही"), { it.id }) { CareRow(it, vm) }
@@ -929,6 +931,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
     val hindi = careHindi(); val t = careText()
     if (SymptomNoteCodec.isStructured(item.detail)) { SymptomNoteCard(item, vm, hindi); return }
     if (DistressCodec.isStructured(item.detail)) { DistressEntryCard(item); return }
+    if (SideEffectCodec.isStructured(item.detail)) { SideEffectEntryCard(item, vm); return }
     val canEdit by vm.canEdit.collectAsStateWithLifecycle()
     val busy by vm.busy.collectAsStateWithLifecycle()
     var delete by rememberSaveable(item.id) { mutableStateOf(false) }

@@ -183,7 +183,7 @@ fun EmbeddedPatientCare(
                         "labs" -> CareLabs(vm)
                         "care-plan" -> CarePlanScreen(vm, clinician = true, onBack = ::leaveTool)
                         "nearby" -> Nearby(vm.centres, vm)
-                        "documents" -> CareDocuments(vm, onRead = ::read, onTalk = { changeSection("Conversations") })
+                        "documents" -> CareDocuments(vm, onRead = ::read, onTalk = { changeSection("Conversations") }, onCalendarAt = { openTool("calendar") }, onLabs = { openTool("labs") })
                         "care-story" -> DoctorCareStory(person, versions, ::read)
                         "checkin-history" -> DoctorCheckInHistory(personId, entries)
                         "care-team" -> DoctorCareTeam(vm, personId)
@@ -197,7 +197,7 @@ fun EmbeddedPatientCare(
                             "Medicines" -> DoctorMedicines(vm, personId, onAddManual = { add("medicine") }, onScanPrescription = { openTool("scanner") }, onNavigationBlockedChange = { medicineBusy = it })
                             "Conversations" -> DoctorConversations(vm, canEdit = canEdit, onRead = ::read, onRequestConversation = { openTool("workflows") }, onInteractionActiveChange = { talkInteraction = it }, onHeaderBackChange = { conversationBack = it }, onCaptureHeroChange = { conversationCapture = it })
                             "Visits" -> DoctorVisits(vm,personId,onCalendar={openTool("calendar")},onAddVisit={add("doctor-visit")},onNavigationBlockedChange={visitBusy=it},onHeaderBackChange={visitBack=it})
-                            "Reports" -> CareDocuments(vm, onRead = ::read, onTalk = { changeSection("Conversations") })
+                            "Reports" -> CareDocuments(vm, onRead = ::read, onTalk = { changeSection("Conversations") }, onCalendarAt = { openTool("calendar") }, onLabs = { openTool("labs") })
                             "Shared" -> EmbeddedSharedCare(vm, onAccount, { changeSection("Summary") }, onNavigationBlockedChange = { sharedBusy = it })
                             else -> EmbeddedCareTools(::openTool)
                         }

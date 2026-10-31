@@ -89,6 +89,7 @@ private fun medicineTime(at: Long?) = at?.let { DateTimeFormatter.ofPattern("d M
 
         if(busy)item {LinearProgressIndicator(Modifier.fillMaxWidth())}
         error?.let {message->item {SurfaceCard(Peach){Text(message, Modifier.announce());Text(t("Your existing medicines and original history have not been cleared.", "आपकी मौजूदा दवाएँ और पुराना इतिहास मिटाया नहीं गया।"));TextButton(onClick=::refresh,enabled=!busy){Text(t("Retry", "फिर कोशिश करें"), color = RustText)}}}}
+        item {DoctorSideEffectsSection(vm,personId)}
         item {MedicineHistoryTabs(tab,busy){tab=it}}
         if(tab!="Intake history") item {Text(if(tab=="Current")t("Showing the active prescription and the medicines being taken now.", "चालू पर्चा और अभी ली जा रही दवाइयाँ दिख रही हैं।") else t("Showing superseded prescriptions: when each was prescribed, when it ended and the medicines it held.", "बदले गए पर्चे दिख रहे हैं: हर एक कब लिखा गया, कब ख़त्म हुआ और उसमें कौन-सी दवाइयाँ थीं।"),fontSize=13.sp,color=DoctorCardSub)}
         prescriptionError?.let {message->item {Text(message,fontSize=13.sp,color=DoctorCardSub,modifier=Modifier.announce())}}

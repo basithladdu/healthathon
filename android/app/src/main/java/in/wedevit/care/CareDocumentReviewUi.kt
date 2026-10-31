@@ -27,7 +27,7 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
 
-@Composable fun CareDocumentReview(vm: CareModel, report: CareReport, onClose: () -> Unit) {
+@Composable fun CareDocumentReview(vm: CareModel, report: CareReport, startPage: Int = 1, onClose: () -> Unit) {
     val context = LocalContext.current; val t = careText()
     val scope = rememberCoroutineScope()
     val store = remember(context, vm.storageNamespace) { CareDocumentReviewStore(context.applicationContext, vm.storageNamespace) }
@@ -38,7 +38,7 @@ import java.time.ZoneId
     var loading by remember { mutableStateOf(false) }
     var progress by remember { mutableStateOf(0 to 0) }
     var error by rememberSaveable(report.id) { mutableStateOf("") }
-    var page by rememberSaveable(report.id) { mutableIntStateOf(1) }
+    var page by rememberSaveable(report.id) { mutableIntStateOf(startPage.coerceAtLeast(1)) }
     var checked by rememberSaveable(report.id) { mutableStateOf(false) }
     var job by remember { mutableStateOf<Job?>(null) }
     var factLine by rememberSaveable(report.id) { mutableIntStateOf(0) }
@@ -70,6 +70,7 @@ import java.time.ZoneId
     }
     LaunchedEffect(report.id) {
         value = withContext(Dispatchers.IO) { runCatching { store.loadVerified(report, vm.reportFiles.file(report)) }.getOrNull() }
+        value?.let { v -> if (v.pages.none { it.page == page }) page = 1 }
         if (value == null) read()
     }
     LaunchedEffect(selected) { if (selected != report.personId) { job?.cancel(); onClose() } }

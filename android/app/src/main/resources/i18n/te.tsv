@@ -3432,3 +3432,96 @@ Save $n medicines	$n మందులు సేవ్ చేయండి
 page $k	పేజీ $k
 Original reading · $pages	అసలు పఠనం · $pages
 ICD decision	ICD నిర్ణయం
+$name at a glance	$name ఒక చూపులో
+Expanded	తెరిచి ఉంది
+Collapsed	మూసి ఉంది
+Pain and symptoms	నొప్పి మరియు లక్షణాలు
+No symptoms logged this week	ఈ వారం ఏ లక్షణాలూ నమోదు కాలేదు
+See symptom notes	ఆరోగ్య నోట్స్ చూడండి
+See medicines	మందులు చూడండి
+See calendar	క్యాలెండర్ చూడండి
+Latest note from the doctor	డాక్టర్ నుండి తాజా నోట్
+Read	చదవండి
+See emergency plan	అత్యవసర ప్రణాళిక చూడండి
+$v/10, up from $p	$v/10, ఇంతకు ముందు $p, ఇప్పుడు పెరిగింది
+$v/10, down from $p	$v/10, ఇంతకు ముందు $p, ఇప్పుడు తగ్గింది
+$v/10, same as before	$v/10, ఇంతకు ముందు లాగే
+$v/10, first note	$v/10, మొదటి నోట్
+No medicines yet	ఇంకా మందులు లేవు
+1 medicine	1 మందు
+$n medicines	$n మందులు
+$taken of $total ticked today, $left not yet	ఈ రోజు $total లో $taken టిక్ చేశారు, $left మిగిలాయి
+date to be set	తేదీ ఇంకా నిర్ణయించాలి
+Next visit $day	తదుపరి సందర్శన $day
+No visit planned	సందర్శన ఏదీ ప్లాన్ చేయలేదు
+No care note yet	ఇంకా సంరక్షణ నోట్ లేదు
+Version $n, $dateText	వెర్షన్ $n, $dateText
+Version $n, $dateText, $doctor	వెర్షన్ $n, $dateText, $doctor
+No emergency plan yet	ఇంకా అత్యవసర ప్రణాళిక లేదు
+Draft, not signed yet	ముసాయిదా, ఇంకా సంతకం కాలేదు
+Out of date, review was due $due	పాతబడింది, సమీక్ష $due నాడు ఉండాలి
+Withdrawn, no longer valid	ఉపసంహరించబడింది, ఇక చెల్లదు
+Active, review due $due	అమలులో ఉంది, సమీక్ష తేదీ $due
+Drowsiness	మగత
+Dizziness	తల తిరగడం
+Itching	దురద
+Confusion	గందరగోళం
+Just now	ఇప్పుడే
+Earlier today	ఈ రోజు ముందుగా
+2 days ago or more	2 రోజుల క్రితం లేదా అంతకంటే ముందు
+Side effect?	ఏదైనా దుష్ప్రభావం?
+Write down what happened so the doctor can talk about it at the next visit. This only records it; it is not advice.	ఏమి జరిగిందో రాసుకోండి, తద్వారా తదుపరి సందర్శనలో డాక్టర్ దాని గురించి మాట్లాడగలరు. ఇది కేవలం నమోదు చేస్తుంది; సలహా కాదు.
+What happened?	ఏమి జరిగింది?
+In your own words (optional)	మీ స్వంత మాటల్లో (ఐచ్ఛికం)
+How bad was it?	ఎంత తీవ్రంగా ఉంది?
+When?	ఎప్పుడు?
+I stopped taking it	నేను దీన్ని తీసుకోవడం ఆపేశాను
+You can read these records but not change them.	మీరు ఈ రికార్డులను చదవగలరు కానీ మార్చలేరు.
+Save side effect	దుష్ప్రభావాన్ని సేవ్ చేయండి
+How bad: 	ఎంత తీవ్రత: 
+When: 	ఎప్పుడు: 
+Reported by 	తెలిపినవారు: 
+They stopped taking it.	వారు దీన్ని తీసుకోవడం ఆపేశారు.
+Discussed 	చర్చించారు 
+Not discussed yet	ఇంకా చర్చించలేదు
+Mark as discussed	చర్చించినట్లు గుర్తించండి
+Side effects noted	నమోదైన దుష్ప్రభావాలు
+Side effects to raise at the next visit	తదుపరి సందర్శనలో చెప్పాల్సిన దుష్ప్రభావాలు
+Noted since the last doctor visit on 	చివరి డాక్టర్ సందర్శన తర్వాత నమోదు, 
+Noted so far. No doctor visit is recorded yet.	ఇప్పటివరకు నమోదైనవి. ఇంకా డాక్టర్ సందర్శన నమోదు కాలేదు.
+This side-effect note could not be read. The original record is retained.	ఈ దుష్ప్రభావ నోట్ చదవడం సాధ్యం కాలేదు. అసలు రికార్డు భద్రంగా ఉంది.
+Side effect	దుష్ప్రభావం
+Side effects reported since last visit	చివరి సందర్శన తర్వాత తెలిపిన దుష్ప్రభావాలు
+Since the last recorded visit on 	చివరిగా నమోదైన సందర్శన తర్వాత, 
+No visit is recorded yet, so everything reported is shown.	ఇంకా సందర్శన నమోదు కాలేదు, అందుకే తెలిపినవన్నీ చూపిస్తున్నాం.
+Nothing reported since the last visit.	చివరి సందర్శన తర్వాత ఏమీ తెలపలేదు.
+These are the patient's or family's own notes, not a clinical assessment.	ఇవి రోగి లేదా కుటుంబం స్వయంగా రాసిన నోట్లు, వైద్య పరిశీలన కాదు.
+Care timeline	సంరక్షణ కాలక్రమం
+Key events from your documents	మీ పత్రాల నుండి ముఖ్య సంఘటనలు
+Chemotherapy day	కీమోథెరపీ రోజు
+Radiotherapy day	రేడియోథెరపీ రోజు
+Scan	స్కాన్
+Lab report	ల్యాబ్ రిపోర్ట్
+Care note	సంరక్షణ నోట్
+Document	పత్రం
+a report	ఒక రిపోర్ట్
+, page 	, పేజీ 
+Version 	వెర్షన్ 
+Treatment	చికిత్స
+Scans	స్కాన్లు
+Lab	ల్యాబ్
+Visits & notes	సందర్శనలు & నోట్లు
+Practice record: these dates are sample data, not a real person's treatment.	సాధన రికార్డు: ఈ తేదీలు నమూనా సమాచారం, నిజమైన వ్యక్తి చికిత్స కాదు.
+At a glance	ఒక చూపులో
+Last chemotherapy	చివరి కీమోథెరపీ
+Last radiotherapy	చివరి రేడియోథెరపీ
+Last scan	చివరి స్కాన్
+Last biopsy or histopathology	చివరి బయాప్సీ లేదా హిస్టోపాథాలజీ
+ (date added)	 (జోడించిన తేదీ)
+From: 	మూలం: 
+Nothing on the timeline yet	కాలక్రమంలో ఇంకా ఏమీ లేదు
+Nothing here	ఇక్కడ ఏమీ లేదు
+Add reports, lab results and chemo or radiotherapy days. They appear here with where they came from.	రిపోర్టులు, ల్యాబ్ ఫలితాలు, కీమో లేదా రేడియోథెరపీ రోజులను జోడించండి. అవి ఎక్కడి నుండి వచ్చాయో చూపిస్తూ ఇక్కడ కనిపిస్తాయి.
+Try another filter.	మరొక ఫిల్టర్ ప్రయత్నించండి.
+Report date not recorded. This is the day the file was added.	రిపోర్ట్ తేదీ నమోదు కాలేదు. ఇది ఫైల్ జోడించిన రోజు.
+Dates come from reports you added, Calendar days and results you copied. A Calendar day marks a day you noted; it does not confirm a treatment was given. Everything stays on this phone.	తేదీలు మీరు జోడించిన రిపోర్టులు, క్యాలెండర్ రోజులు, కాపీ చేసిన ఫలితాల నుండి వచ్చాయి. క్యాలెండర్ రోజు మీరు నోట్ చేసిన రోజును సూచిస్తుంది; చికిత్స ఇచ్చినట్లు అది నిర్ధారించదు. అంతా ఈ ఫోన్లోనే ఉంటుంది.

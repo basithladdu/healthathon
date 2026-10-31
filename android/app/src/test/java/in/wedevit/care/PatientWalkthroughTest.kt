@@ -34,7 +34,7 @@ class PatientWalkthroughTest {
         assertEquals(listOf("Arjun","Dr Meera Nair"),extra.contacts.map {it.name})
         assertEquals(listOf("Dr Meera Nair"),extra.versions.map {it.doctor});extra.versions.forEach {DoctorConversationContext.validateVersion(it);assertFalse(it.reviewerVerification=="verified")}
         assertTrue(extra.items.all {it.personId==full.person.id})
-        assertEquals(3,extra.items.count {it.kind=="task"});assertEquals(2,extra.items.count {it.kind=="journal"});assertEquals(1,extra.items.count {it.kind=="visit"})
+        assertEquals(3,extra.items.count {it.kind=="task" && CareEntryCodec.decode(it.detail)?.type!="schedule"});assertEquals(5,extra.items.count {CareEntryCodec.decode(it.detail)?.type=="schedule" && it.due>0 && it.kind=="task"});assertEquals(2,extra.items.count {it.kind=="journal"});assertEquals(1,extra.items.count {it.kind=="visit"})
         assertTrue(extra.items.filter {it.kind=="journal"}.all {it.detail.contains("Arjun (brother)")})
         assertTrue(CareEntryCodec.decode(extra.items.first {it.kind=="visit"}.detail)!!.sender.isNotBlank())
         assertEquals(extra,PatientWalkthrough.extras(now,utc))
