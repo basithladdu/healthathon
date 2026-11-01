@@ -30,6 +30,14 @@ export function issuableProblem(record: EctprRecord | null | undefined): string 
   return null;
 }
 
+/** The goals-of-care transcript and note stay on the issuing device: they never go on a card, even behind break-glass. */
+export function withoutGocTranscript(record: EctprRecord): EctprRecord {
+  if (!record || typeof record !== 'object') return record;
+  const rest = { ...record };
+  delete rest.gocTranscript;
+  return rest;
+}
+
 /**
  * What the QR view shows without break-glass: the ED Quick View fields (clinical spec §6) and nothing more.
  * Address, date of birth, ID digits, the patient's own words and family notes stay behind break-glass.
@@ -39,7 +47,7 @@ export function quickViewSnapshot(record: EctprRecord): EctprRecord {
   const alt = record.decisionMakers?.alternate ?? null;
   const strip = (d: typeof dm) => (d ? { ...d, idType: null, idLast4: null } : null);
   return {
-    ...record,
+    ...withoutGocTranscript(record),
     patient: { ...record.patient, dob: '', address: '', phone: '', gender: '' },
     decisionMakers: { primary: strip(dm), alternate: strip(alt), familyToInform: [], familyConsensusNote: '' },
     values: { patientKnows: null, ownWords: '', unacceptableOutcomes: [], familyAskedNotToTell: false, directQuestionPlan: '', financialConcernDiscussed: null, socialWorkReferral: null },

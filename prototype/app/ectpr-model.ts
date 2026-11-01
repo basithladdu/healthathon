@@ -33,6 +33,30 @@ export type EctprHomeCare = { assessmentFrequency: string; coordinator: string; 
 export type WithdrawalFinal = 'TO_BE_PERFORMED' | 'FAMILY_REFUSED' | 'BOARD_REFUSED' | 'PHYSICIAN_REVOKED';
 export type EctprWithdrawal = { applicable: boolean; primaryBoardDate: string; secondaryBoardDate: string; primaryBoardMembers: string; secondaryBoardMembers: string; boardDecision: string; finalDecision: WithdrawalFinal | null; protocol: string };
 
+/** A goals-of-care conversation the doctor reviewed (goc-transcribe.tsx). Stays on this device: never on the emergency card. */
+export type GocTranscriptSpeaker = 'DOCTOR' | 'PATIENT_PARTY' | null;
+export type GocTopicMark = { status: 'DISCUSSED' | 'NOT_DISCUSSED'; verifiedBy: string; verifiedAt: string };
+export type GocTranscript = {
+  /** The verbatim words, one line each, with the side the doctor marked. */
+  lines: Array<{ text: string; speaker: GocTranscriptSpeaker }>;
+  language: 'en' | 'hi' | 'te' | 'ur' | 'kn' | 'auto';
+  source: 'RECORDED' | 'UPLOADED' | 'TYPED';
+  /** True when a speech model drafted it. */
+  machineDraft: boolean;
+  /** The speech model used, when machineDraft is true. */
+  model?: string;
+  consentAt: string;
+  reviewedBy: string; reviewedAt: string;
+  /** True only when the doctor chose to keep a copy of the audio. Sahara itself never stores the audio. */
+  audioKept: boolean;
+  /** What the doctor confirmed into the plan from this conversation, with the words that prompted it. */
+  accepted: Array<{ field: string; value: string | null; quote: string; at: string }>;
+  /** Topics the doctor verified on the checklist. A topic verified as not discussed stays "No preference recorded". */
+  topics: Partial<Record<string, GocTopicMark>>;
+  /** The draft note the doctor edited: what was said and decided, kept apart from the verbatim lines. */
+  note: string;
+};
+
 export type DecisionMaker = {
   name: string; relation: string; phone24h: string;
   /** Never a full Aadhaar: ID type + last 4 digits only (tech spec §2). */
@@ -82,6 +106,8 @@ export type EctprRecord = {
   };
   homeCare?: EctprHomeCare;
   withdrawal?: EctprWithdrawal;
+  /** Optional, so older saved records still read. */
+  gocTranscript?: GocTranscript;
   reviewDue: string;
   signatures: Signature[];
   limitedLiteracy: boolean;

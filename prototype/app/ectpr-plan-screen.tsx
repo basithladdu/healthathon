@@ -4,7 +4,7 @@
 // Doctors create, edit and sign. Patients view, sign their part, request a review or cancel. Family view and request a review.
 import { emptyHomeCare, emptyWithdrawal } from './ectpr-rules.ts';
 import type { EctprHomeCare, EctprWithdrawal, WithdrawalFinal } from './ectpr-model.ts';
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react';
+import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react';
 import { careLocale, careText, type CareLang } from './care-i18n';
 import { AMD_BOARD_PATHWAY } from './amd-rules';
 import { DpdpNotice } from './dpdp-notice';
@@ -12,6 +12,7 @@ import { capacityGuide, homeCareLines, withdrawalFinalLabel, withdrawalLines, bo
 import { EctprPilotLog } from './ectpr-pilot-log';
 import { FhirExportButton, PaperAndCopies, ReviewReminder } from './ectpr-plan-extras';
 import { ReadAloudButton } from './tts-speech';
+import type { GocOptionSets } from './goc-transcribe';
 import type {
   AmbulanceOption, AuditEvent, AuthorityBasis, Capacity, Cpr, DecisionMaker, Dialysis, DnacprReason, EctprRecord, EctprStatus,
   GoalOfCare, HospitalTransfer, Hydration, Icu, IdType, ImplantedDevice, NgFeeding, PegFeeding, RespCeiling, RuleIssue, Signature,
@@ -23,6 +24,9 @@ import {
   type ReviewTrigger,
 } from './ectpr-rules';
 import { listAudit, listEctprVersions, logAudit, revokeEctpr, saveEctprDraft, signEctpr, startReview, subscribeEctpr } from './ectpr-store';
+
+// Loaded only when the doctor opens the conversation panel. The speech engine loads later still, on Transcribe.
+const GocTranscribe = lazy(() => import('./goc-transcribe').then((module) => ({ default: module.GocTranscribe })));
 
 type Role = 'doctor' | 'patient' | 'family';
 type T = (en: string, hi: string) => string;
@@ -146,6 +150,15 @@ const DIRECTIVE_OPTS: Opt<DirectiveKind>[] = [
 const UNIT_OPTS: Array<{ value: TrialPlan['durationUnit']; en: string; hi: string }> = [
   { value: 'DAYS', en: 'days', hi: 'दिन' }, { value: 'HOURS', en: 'hours', hi: 'घंटे' }, { value: 'SESSIONS', en: 'sessions', hi: 'सत्र' },
 ];
+// The conversation panel shows these same lists, so its options can never differ from the plan's.
+const GOC_OPTIONS: GocOptionSets = {
+  goalOfCare: GOALS, cpr: CPR_OPTS, hospitalTransfer: TRANSFER_OPTS, ambulance: AMBULANCE_OPTS,
+  respCeiling: CEILINGS.map((level) => ({ ...level, value: String(level.value) })),
+  icu: ICU_OPTS, vasopressors: VASO_OPTS, dialysis: DIALYSIS_OPTS, ng: NG_OPTS, peg: PEG_OPTS, hydration: HYDRATION_OPTS,
+  patientKnows: [{ value: 'yes', en: 'Yes', hi: 'हाँ' }, { value: 'no', en: 'No', hi: 'नहीं' }],
+  familyAskedNotToTell: [{ value: 'yes', en: 'The family asked that the patient not be told', hi: 'परिवार ने कहा कि मरीज़ को न बताया जाए' }],
+};
+
 const LANGUAGE_OPTS = [
   ['en', 'English', 'अंग्रेज़ी'], ['hi', 'Hindi', 'हिन्दी'], ['te', 'Telugu', 'तेलुगु'], ['ur', 'Urdu', 'उर्दू'], ['kn', 'Kannada', 'कन्नड़'],
   ['ta', 'Tamil', 'तमिल'], ['ml', 'Malayalam', 'मलयालम'], ['mr', 'Marathi', 'मराठी'], ['bn', 'Bengali', 'बांग्ला'], ['other', 'Other', 'दूसरी'],
@@ -527,6 +540,19 @@ function describe(t: T, lang: CareLang, record: EctprRecord) {
   };
 }
 
+/** The reviewed conversation note, read-only. On a signed version it is locked with the rest of the record. */
+function GocSavedNote({ t, record, showLines }: { t: T; record: EctprRecord; showLines: boolean }) {
+  const saved = record.gocTranscript;
+  if (!saved) return null;
+  return <details className="ep-group ep-goc-saved-note">
+    <summary>{t('Conversation note', 'बातचीत का नोट')} · {t(`reviewed by ${saved.reviewedBy}`, `समीक्षा: ${saved.reviewedBy}`)} · {saved.reviewedAt.slice(0, 10)}</summary>
+    <p className="ep-goc-note-text" dir="auto">{saved.note || t('No note was written.', 'कोई नोट नहीं लिखा गया।')}</p>
+    {showLines && saved.lines.length ? <details><summary>{t('Word-for-word transcript', 'शब्दशः लिखावट')}{saved.machineDraft ? ` · ${t('machine draft, corrected by the doctor', 'मशीन का ड्राफ़्ट, डॉक्टर ने ठीक किया')}` : ''}</summary>
+      <ol className="ep-goc-verbatim">{saved.lines.map((line, index) => <li key={index} dir="auto">{line.speaker === 'DOCTOR' ? `${t('Doctor side', 'डॉक्टर की तरफ़')}: ` : line.speaker === 'PATIENT_PARTY' ? `${t('Patient side', 'मरीज़ की तरफ़')}: ` : ''}{line.text}</li>)}</ol>
+    </details> : null}
+  </details>;
+}
+
 function PlanSummary({ t, lang, record }: { t: T; lang: CareLang; record: EctprRecord }) {
   const groups = describe(t, lang, record);
   const body = useRef<HTMLDivElement>(null);
@@ -739,7 +765,7 @@ export function EctprPlanScreen(props: { patientId: string; patientName: string;
   }
 
   if (mode.kind === 'wizard' && draft && role === 'doctor') {
-    return <Wizard t={t} lang={lang} draft={draft} issues={issues} step={step} busy={busy} error={error} toast={toast} dirty={dirty}
+    return <Wizard t={t} lang={lang} draft={draft} previous={versions?.find((record) => record.id === draft.supersedes) ?? null} issues={issues} step={step} busy={busy} error={error} toast={toast} dirty={dirty}
       saveBlocked={saveBlocked} actorName={actorName} patientName={patientName} edit={edit} goTo={goTo} top={top} heading={heading}
       onSave={() => void persist(false)} onClose={closeWizard} onSign={addSignature} />;
   }
@@ -897,6 +923,7 @@ function Overview({ anchor, t, lang, role, patientId, patientName, actorName, ve
     {active ? <div className="ep-card"><h2>{t('What the plan says', 'योजना में क्या लिखा है')}</h2>
       <p className="ep-hint">{t('“No preference recorded” means standard care. It is never a refusal.', '“कोई पसंद दर्ज नहीं” का मतलब है सामान्य इलाज। यह कभी मना करना नहीं है।')}</p>
       <PlanSummary t={t} lang={lang} record={active} /><LegalPending t={t} lang={lang} />
+      <GocSavedNote t={t} record={active} showLines={role === 'doctor'} />
       {role !== 'family' ? <div className="ep-actions"><FhirExportButton t={t} record={active} actorName={actorName} /></div> : null}</div> : null}
     {active && role !== 'family' ? <PaperAndCopies t={t} lang={lang} record={active} actorName={actorName} /> : null}
     {role !== 'doctor' && openDraft ? <div className="ep-card"><h2>{t(`Draft version ${openDraft.version} (not in use yet)`, `ड्राफ़्ट संस्करण ${openDraft.version} (अभी लागू नहीं)`)}</h2><PlanSummary t={t} lang={lang} record={openDraft} /></div> : null}
@@ -946,8 +973,8 @@ function auditAction(t: T, action: AuditEvent['action']): string {
 // ---------------------------------------------------------------------------
 // Wizard (doctor)
 
-function Wizard({ t, lang, draft, issues, step, busy, error, toast, dirty, saveBlocked, actorName, patientName, edit, goTo, top, heading, onSave, onClose, onSign }: {
-  t: T; lang: CareLang; draft: EctprRecord; issues: RuleIssue[]; step: number; busy: boolean; error: string; toast: string; dirty: boolean; saveBlocked: boolean;
+function Wizard({ t, lang, draft, previous, issues, step, busy, error, toast, dirty, saveBlocked, actorName, patientName, edit, goTo, top, heading, onSave, onClose, onSign }: {
+  t: T; lang: CareLang; draft: EctprRecord; previous: EctprRecord | null; issues: RuleIssue[]; step: number; busy: boolean; error: string; toast: string; dirty: boolean; saveBlocked: boolean;
   actorName: string; patientName: string; edit: (change: (record: EctprRecord) => void) => void; goTo: (step: number) => void;
   top: RefObject<HTMLDivElement | null>; heading: RefObject<HTMLHeadingElement | null>;
   onSave: () => void; onClose: () => void; onSign: (signature: Signature) => Promise<boolean>;
@@ -961,6 +988,11 @@ function Wizard({ t, lang, draft, issues, step, busy, error, toast, dirty, saveB
   const progress = (step + 1) / STEPS.length;
   const stepTitle = t(STEPS[step].en, STEPS[step].hi);
   const stepBody = useRef<HTMLDivElement>(null);
+  const [gocOpen, setGocOpen] = useState(false);
+  const gocEntry = <div className="ep-notice ep-info ep-goc-entry">
+    <p>{t('Talked this through with the patient or family? Record it, or paste your notes, to see every choice next to what was said.', 'मरीज़ या परिवार से इस पर बात की? इसे रिकॉर्ड करें, या नोट पेस्ट करें, ताकि हर फ़ैसला कही गई बात के साथ दिखे।')}</p>
+    <button type="button" className="ep-btn ep-quiet" onClick={() => setGocOpen(true)}>{t('Transcribe the conversation', 'बातचीत लिखें')}</button>
+  </div>;
 
   const lockNotice = (locked || surrogateLocked) ? <div className="ep-notice ep-warn ep-lock" role="status">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2" /><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" /></svg>
@@ -1009,6 +1041,10 @@ function Wizard({ t, lang, draft, issues, step, busy, error, toast, dirty, saveB
 
     {toast ? <p className="ep-toast" role="status">{toast}</p> : null}
     {error ? <p className="ep-notice ep-alert" role="alert">{error}</p> : null}
+
+    {gocOpen ? <Suspense fallback={<p className="ep-hint" role="status">{t('Loading…', 'लोड हो रहा है…')}</p>}>
+      <GocTranscribe t={t} lang={lang} draft={draft} previous={previous} actorName={actorName} patientId={draft.patientId} edit={edit} options={GOC_OPTIONS} onClose={() => setGocOpen(false)} onGoToSign={() => { setGocOpen(false); goTo(STEPS.length - 1); }} />
+    </Suspense> : null}
 
     <form className="ep-card" noValidate onSubmit={(event) => { event.preventDefault(); goTo(step + 1); }}>
       <div key={step} className="ep-step" ref={stepBody}>
@@ -1132,6 +1168,7 @@ function Wizard({ t, lang, draft, issues, step, busy, error, toast, dirty, saveB
         </> : null}
 
         {step === 4 ? <>
+          {gocOpen ? null : gocEntry}
           {surrogateLocked ? lockNotice : null}
           <fieldset className="ep-group" disabled={surrogateLocked}><legend>{t('What matters to the patient', 'मरीज़ के लिए क्या ज़रूरी है')}</legend>
             <YesNo t={t} name="ep-knows" legend={t('Does the patient know about their illness?', 'क्या मरीज़ अपनी बीमारी के बारे में जानते हैं?')} value={draft.values.patientKnows} onChange={(value) => edit((r) => { r.values.patientKnows = value; })} />
@@ -1166,6 +1203,7 @@ function Wizard({ t, lang, draft, issues, step, busy, error, toast, dirty, saveB
         </> : null}
 
         {step === 5 ? <>
+          {gocOpen ? null : gocEntry}
           {lockNotice}
           <LegalPending t={t} lang={lang} />
           <Choices t={t} name="ep-goal" legend={t('Goal of care', 'देखभाल का लक्ष्य')} value={c.goalOfCare} options={GOALS} disabled={locked || surrogateLocked} onChange={(value) => edit((r) => { r.choices.goalOfCare = value; })} />
@@ -1308,6 +1346,7 @@ function Wizard({ t, lang, draft, issues, step, busy, error, toast, dirty, saveB
           <AlwaysContinues t={t} />
         </> : null}
 
+        {step === 9 && draft.gocTranscript ? <GocSavedNote t={t} record={draft} showLines /> : null}
         {step === 9 ? <SignStep t={t} lang={lang} draft={draft} actorName={actorName} busy={busy} dirty={dirty} saveBlocked={saveBlocked} edit={edit} onSign={onSign} />
           : null}
       </div>

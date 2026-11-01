@@ -121,3 +121,97 @@ advice. Tests: `prototype/tests/ai-treatment-guard.test.mjs`.
 - Cloudflare: https://developers.cloudflare.com/workers-ai/platform/pricing/, https://developers.cloudflare.com/workers-ai/configuration/open-ai-compatibility/
 - Bhashini: https://bhashini.gitbook.io/bhashini-apis/pipeline-config-call (and `/request-payload.md`, `/response-payload.md`), https://bhashini.gitbook.io/bhashini-apis/pipeline-compute-call (and `/request-payload.md`, `/response-payload.md`), https://bhashini.gitbook.io/bhashini-apis/pipeline-search-call (MeitY pipeline id)
 - On-device: https://developers.googleblog.com/introducing-embeddinggemma/, https://huggingface.co/litert-community/Gemma3-1B-IT, https://huggingface.co/google/gemma-3n-E2B-it-litert-lm, https://developers.google.com/ml-kit/language/translation/android
+
+## Android: on-device speech for goals-of-care conversations
+
+Checked **2026-11-01**. Nothing has been run on a phone yet: size, hash and licence are checked, speed and accuracy are not.
+
+The app's existing offline pack, Qwen3-ASR-0.6B, does not cover the five languages. Its model card lists 30 languages, including English and Hindi, but not Telugu, Urdu or Kannada. It stays in the doctor conversation flow. The goals-of-care flow uses Whisper small on the same runtime (sherpa-onnx 1.13.8, already in the app).
+
+| | |
+|---|---|
+| Model | OpenAI Whisper small, multilingual, int8 ONNX export for sherpa-onnx |
+| Source, pinned | https://huggingface.co/csukuangfj/sherpa-onnx-whisper-small at revision `8f3c18b358db4d1f2fc1eae49d75cd20989e4309` |
+| `small-encoder.int8.onnx` | 112,442,483 bytes, sha256 `4cbe7b22fa9026b843b60a68640c747de05bafb1a11b57edc0e66c232d9f33a9` |
+| `small-decoder.int8.onnx` | 262,226,114 bytes, sha256 `acad50b5c782696e91b55914cc5ab4f756f1532f76e22aa6fc615f39fb69a8ee` |
+| `small-tokens.txt` | 816,730 bytes, sha256 `b34b360dbb493e781e479794586d661700670d65564001f23024971d1f2fa126` |
+| Total download | 375,485,327 bytes (about 375 MB), on the phone, on demand. Not in the APK or the repo. |
+| Languages | `en`, `hi`, `te`, `ur`, `kn` are all in Whisper's language table (`whisper/tokenizer.py`). Empty means detect. |
+| Licence | Whisper code and weights: MIT (https://github.com/openai/whisper, README and LICENSE). The sherpa-onnx export repo has no licence tag of its own. The `openai/whisper-small` Hugging Face card is tagged apache-2.0. Both are permissive, and the notice asset carries the MIT text. |
+| Where it is listed | `OfflineWhisperModel` in `CareGocTranscribe.kt`; `assets/offline-speech-NOTICE.txt` |
+
+**How a long talk is handled**
+
+- One recording can run up to 90 minutes: about 43 MB of audio at 64 kbps, and about 350 MB of temporary space while it is read. A longer talk, or one interrupted by leaving the app, becomes several parts.
+- `DoctorAudioController` is not used here, because it stops at 299 s for the cloud route.
+- Audio is read in pieces of 15 to 28 seconds, cut at pauses. sherpa-onnx truncates a piece at about 29.5 seconds.
+- Each finished piece is saved straight away, so a stop or a crash resumes from the last piece.
+- Typing or pasting always works without the pack.
+
+**Not measured:** reading speed (a phone may take longer than the talk), peak memory (the 1.2 GiB free-memory check is an estimate from the file sizes), and accuracy in Telugu, Urdu and Kannada. The screen says every line must be checked against the audio.
+
+The web uses a smaller model (`onnx-community/whisper-base`, about 95 MB); see the web section of this file and `prototype/app/goc-transcribe-model.ts`.
+
+URLs: https://huggingface.co/Qwen/Qwen3-ASR-0.6B, https://huggingface.co/api/models/csukuangfj/sherpa-onnx-whisper-small?blobs=true, https://github.com/openai/whisper/blob/main/whisper/tokenizer.py, https://github.com/k2-fsa/sherpa-onnx/blob/v1.13.8/sherpa-onnx/kotlin-api/OfflineRecognizer.kt
+
+## On-device speech to text (goals-of-care conversation)
+
+This is the one exception to "we do not bundle on-device models", and it keeps to the reason: **nothing is bundled.** The care plan's conversation panel (`prototype/app/goc-transcribe.tsx`) fetches the engine and the model only when the doctor taps **Transcribe on this device**. Normal pages load none of it, and the audio is never sent anywhere. Typing or pasting always works with no download.
+
+Checked **2026-11-01** in the app's browser pane (Chromium), on a Ryzen 5 6600H laptop with 15 GB of memory, one CPU core in use.
+
+### Options compared
+
+| Option | Download | Licence | Languages | Result | Source |
+|---|---|---|---|---|---|
+| `onnx-community/whisper-tiny` q8 | 41 MB model | OpenAI Whisper: Apache-2.0 on its Hugging Face card, MIT in OpenAI's repo | 99, including en, hi, te, ur, kn | Not tested: smaller than base, which is already weak on Indian languages | https://huggingface.co/onnx-community/whisper-tiny |
+| **`onnx-community/whisper-base` q8 (default)** | **94.5 MB measured**, engine included | OpenAI Whisper: Apache-2.0 on its Hugging Face card, MIT in OpenAI's repo | same | English and Urdu usable as a draft. About real time | https://huggingface.co/onnx-community/whisper-base |
+| `onnx-community/whisper-base`, full encoder | about 155 MB | Apache-2.0 | same | Tested: no better than q8 (Urdu 0.277, Telugu 0.963, Kannada 1.121, Hindi 1.029), so not worth 59 MB more | same |
+| **`onnx-community/whisper-small` q8 (offered, default for Hindi)** | **266.7 MB measured**, engine included | OpenAI Whisper: Apache-2.0 on its Hugging Face card, MIT in OpenAI's repo | same | Hindi becomes usable. About 3 to 4 times slower than real time, worse when it loops | https://huggingface.co/onnx-community/whisper-small |
+| `onnx-community/whisper-large-v3-turbo` q8 | about 1.1 GB | MIT per OpenAI's release; check before use | same | Rejected on size. Not tested | https://huggingface.co/onnx-community/whisper-large-v3-turbo |
+| `vasista22/whisper-telugu-base`, `whisper-kannada-base` (IIT Madras fine-tunes) | 290 MB PyTorch, no ONNX | Apache-2.0 | One language each | Not usable as they are: no ONNX export, so not tested. **Best next step for Telugu and Kannada**: convert to quantised ONNX, then host and pin them | https://huggingface.co/vasista22/whisper-telugu-base, https://huggingface.co/vasista22/whisper-kannada-base |
+| Browser `SpeechRecognition` | none | n/a | Depends on the browser | Rejected: it may send audio to a remote service, as `doctor-conversation.tsx` already notes | n/a |
+
+### Quality, measured
+
+Character error rate (CER): 0 is perfect, and above 1 means more errors than characters. Measured against the reference text on Google FLEURS validation clips, with the language forced (https://huggingface.co/datasets/google/fleurs). There are only 3 to 4 clips per language, of about 10 to 25 seconds each, and it is clean read speech, so treat these as a rough guide. A ward conversation with several people will be worse.
+
+| Language | base q8 CER | base output | small q8 CER | small output | Speed, base / small (audio time multiple) |
+|---|---|---|---|---|---|
+| English | 0.081 | Good | not run | | 0.94 / not run |
+| Urdu | 0.277 | Urdu script, readable | 0.220 | Urdu script, readable | 0.87 / 2.67 |
+| Hindi | 1.091 | **Latin letters**, phonetically close, so the score overstates the error | **0.238** | **Devanagari, readable** | 0.73 / 2.89 |
+| Telugu | 0.917 | Latin letters, mostly wrong. **Not usable** | 0.937 | Devanagari letters. **Not usable** | 1.11 / 3.83 |
+| Kannada | 1.643 | Other scripts, repeats. **Not usable** | 1.755 | Kannada letters in a repeating loop. **Not usable** | 1.65 / 5.55 |
+
+Blocking every token outside the expected script was also tried on base. It did not help (Hindi 1.039, Telugu 1.0, Kannada 1.04), so it is not used.
+
+So the screen says so. A machine transcript is always labelled a draft, Telugu, Urdu and Kannada are flagged for checking against the audio, and choosing Telugu or Kannada warns that typing is more reliable. The model list defaults to small for Hindi and base otherwise, and the doctor can change it. The phrase matcher also reads romanised Hindi, Telugu and Kannada ("nahi chahiye", "vaddu", "beda") because base writes those.
+
+### How it runs
+
+- **Engine:** Transformers.js, `@huggingface/transformers` **4.3.1** (published 2026-10-06, Apache-2.0), file `dist/transformers.min.js`, self-contained at 586 KB. 4.3.2 is excluded: it was only 5 days old on the check date.
+- **Runtime:** ONNX Runtime Web `1.31.0-dev.20260914-8d85527a0`, the version that release pins. It uses the plain `ort-wasm-simd-threaded.wasm` (14.3 MB, CPU only) rather than the 26.9 MB WebGPU build, so no WebGPU is needed.
+- **No npm dependency, on purpose.** `npm install @huggingface/transformers` also pulls `onnxruntime-node` (301 MB unpacked), `onnxruntime-web` (145 MB) and `sharp`. That is too much for a disk with 1.2 GB free and for every Vercel install. Instead a 5 KB static worker, `public/vendor/goc-whisper/worker.mjs`, loads exact URLs from jsDelivr, and bundlers never see the library.
+- **Integrity:** the worker checks the SHA-384 of the library, wasm and loader before running them (`GOC_ENGINE` in `goc-transcribe-model.ts`), and refuses a mismatch. The weights come from Hugging Face at a pinned commit and are cached by the browser, so the download happens once.
+- **Headers:** the care plan pages have no script or connect CSP, and the WASM ran under the headers as they are. Sahara does not send COOP/COEP, so WebAssembly threads are off and it runs on one core. If a CSP is added later, it needs `connect-src cdn.jsdelivr.net huggingface.co *.hf.co`, `script-src 'wasm-unsafe-eval' blob:` and `worker-src 'self'`.
+- **Mixed languages:** "auto" asks the model which of the five languages each piece is in, because this library otherwise writes English when no language is given. Each piece is detected on its own. Urdu is usually detected as Hindi.
+- **Speakers:** no diarisation. The doctor marks each line as doctor side or patient side, or types "Doctor:" and "Family:". Doctor-side lines tick topics but never become suggested choices.
+
+### Long talks
+
+Audio is cut at the quietest moment before each 30 seconds and handled one piece at a time. Silent pieces are skipped, because Whisper invents words for silence. Finished pieces stay if the run stops, and the screen shows pieces done and time left.
+
+Measured with base on "auto", on this laptop, on a one-hour WAV built from the FLEURS clips:
+
+- Decoding the 115 MB file took 1.4 seconds and holds about 230 MB while it runs. No failure.
+- 56 pieces, 27 minutes of audio, took 29 minutes at a steady 31 seconds per 29 second piece, with browser memory flat at about 500 MB. **The run was stopped there**, so a full hour was not completed. At that speed an hour takes about 65 minutes.
+- Small was not run for long: at its measured speed an hour would take 3 to 4 hours or more, so the screen says so and defaults to it only for Hindi.
+- Not measured on a phone or an older computer. Expect them to be much slower, and the screen says typing or pasting may be quicker for a full hour.
+- One short clip failed once with the out-of-memory message while two other models were loaded in other tabs, then worked on retry. The screen's message and the kept lines behaved as intended.
+
+### Choices from the transcript
+
+`prototype/app/goc-extract.ts` is a deterministic phrase matcher with no model and no keys, tested in `prototype/tests/goc-extract.test.mjs`, including the sentences the Android matcher pins. A bare mention ticks a topic and suggests nothing, and when unsure it gives no mark. Every suggestion carries the exact quote. The doctor confirms each item, and the record stays a draft until the normal signing step.
+
+`POST /api/goc-extract` is an optional second reading on the existing free chain, after separate consent naming the services. It returns only known options with word-for-word quotes, and it is off with no keys, which is the state today.

@@ -7,7 +7,7 @@
 // Owner must apply supabase/migrations/20261029230000_sahara_ed_cards.sql first; until then every action
 // answers 503 { status: 'not-set-up' } with a clear message.
 import type { EctprRecord } from '../../ectpr-model.ts';
-import { BREAK_GLASS_MIN_REASON, ED_TOKEN_PATTERN, MANAGE_KEY_PATTERN, issuableProblem, quickViewSnapshot, sha256Hex } from '../../ed-card-snapshot.ts';
+import { BREAK_GLASS_MIN_REASON, ED_TOKEN_PATTERN, MANAGE_KEY_PATTERN, issuableProblem, quickViewSnapshot, sha256Hex, withoutGocTranscript } from '../../ed-card-snapshot.ts';
 import { sendBreakGlassSms } from './sms.ts';
 
 export const runtime = 'nodejs';
@@ -82,7 +82,7 @@ export async function POST(request: Request) {
     if (action === 'issue') {
       const manageKey = str(input.manageKey, 80);
       if (!MANAGE_KEY_PATTERN.test(manageKey)) return json({ status: 'error', message: 'Missing card management key.' }, 400);
-      const record = input.snapshot as EctprRecord;
+      const record = withoutGocTranscript(input.snapshot as EctprRecord);
       const problem = issuableProblem(record);
       if (problem) return json({ status: 'error', message: problem }, 422);
       const patientRef = str(input.patientRef, 120);

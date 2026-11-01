@@ -181,7 +181,7 @@ test('a sentence not translated yet is read in English, not by the language voic
 test('the notice covers what, why, where, rights and how to ask, in Hindi too, for both screens', () => {
   for (const scope of ['care-plan', 'living-will']) {
     const blocks = dpdpNotice(scope);
-    assert.deepEqual(blocks.map((b) => b.titleEn), ['What we keep', 'Why', 'Where it is', 'Your rights', 'How to ask']);
+    assert.deepEqual(blocks.map((b) => b.titleEn), scope === 'care-plan' ? ['What we keep', 'Why', 'Where it is', 'A recorded conversation', 'Your rights', 'How to ask'] : ['What we keep', 'Why', 'Where it is', 'Your rights', 'How to ask']);
     assert.ok(blocks.every((b) => b.hi && b.titleHi && b.en));
     const text = blocks.map((b) => b.en).join(' ');
     for (const word of ['device', 'download', 'Correct', 'Withdraw', 'cannot be deleted']) assert.ok(text.includes(word), `${scope}: ${word}`);

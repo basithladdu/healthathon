@@ -1,11 +1,14 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { Suspense, lazy, useEffect, useRef, useState } from 'react';
 import { IconFileText, IconClock } from './icons';
 import { CARE_NOTE_LABELS, organiseConversation, type AssistedNote, type DoctorConversationEntry } from './doctor-conversation-state';
 import type { DraftFieldKey } from './summary-state';
 import { CarePdfReadError, extractCareDocumentPdf } from './care-document-extract';
 import { careLocale, careText, type CareLang } from './care-i18n';
+
+// Loaded only once a recording exists. The speech engine loads later still, on Transcribe.
+const GocTranscribeButton = lazy(() => import('./goc-transcribe').then((module) => ({ default: module.GocTranscribeButton })));
 
 export function ConversationAudio({ file }: { file: File }) {
   const audio = useRef<HTMLAudioElement | null>(null);
@@ -128,7 +131,7 @@ export function DoctorConversation({ patientId, patientName, patients, physician
         <button type="button" className="primary-button doctor-record-button" disabled={!agreed || starting || busy || Boolean(audio)} onClick={recording ? stopRecording : startRecording}>{starting ? 'Opening microphone…' : recording ? t('Stop recording', 'रिकॉर्डिंग रोकें') : t('Start recording', 'रिकॉर्डिंग शुरू करें')}</button>
         <select aria-label="Recording language" value={language} disabled={recording || starting} onChange={(event) => setLanguage(event.target.value)}><option value="en-IN">English</option><option value="hi-IN">हिन्दी</option></select>
         <label className={`doctor-audio-upload ${!agreed || audio || busy ? 'is-disabled' : ''}`}>{t('Upload audio', 'ऑडियो जोड़ें')}<input type="file" accept="audio/*" disabled={!agreed || recording || starting || busy || Boolean(audio)} onChange={(event) => { const file = event.target.files?.[0]; if (!file || audio) return; if (file.size > 30 * 1024 * 1024) { setMessage('Choose an audio file under 30 MB.'); return; } setAudio(file); event.target.value = ''; }} /></label>
-        {audio && <div className="doctor-audio-review"><ConversationAudio file={audio} /><button type="button" className="care-text-button" disabled={busy} onClick={() => setAudio(undefined)}>Remove recording</button></div>}
+        {audio && <div className="doctor-audio-review"><ConversationAudio file={audio} /><button type="button" className="care-text-button" disabled={busy} onClick={() => setAudio(undefined)}>Remove recording</button><Suspense fallback={null}><GocTranscribeButton file={audio} lang={lang} onText={(text) => setNote((current) => `${current.trim()}${current.trim() ? '\n' : ''}${text}`.slice(0, 12000))} /></Suspense></div>}
       </section>
       <section className="doctor-transcript-card"><div className="family-section-heading"><h2><IconFileText /> {t('Conversation note', 'बातचीत का नोट')}</h2><span>{patientName.split(' ')[0]}</span></div>
         {!previousContext && referenceNote?.trim() && !note.trim() && !audio && !recording && !starting && <button className="care-text-button" type="button" disabled={busy} onClick={() => { setNote(referenceNote); setMessage(''); }}>{t('Use latest conversation', 'पिछली बातचीत लें')}</button>}
