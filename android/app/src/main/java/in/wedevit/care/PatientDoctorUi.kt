@@ -34,9 +34,10 @@ enum class PatientDoctorVerification { NOT_VERIFIED, PENDING }
 
 // Call within the patient/account composition scope when an actual relationship source is added.
 @Composable fun PatientDoctorRow(doctor: LinkedDoctorSummary?) {
+    val t = careText()
     var detailsOpen by remember(doctor) { mutableStateOf(false) }
     if (doctor == null) {
-        Text("No doctor linked", color = MaterialTheme.colorScheme.onSurfaceVariant,
+        Text(t("No doctor linked", "कोई डॉक्टर जुड़ा नहीं है"), color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp).testTag("patient-doctor-empty"))
         return
@@ -45,7 +46,7 @@ enum class PatientDoctorVerification { NOT_VERIFIED, PENDING }
     Text(doctor.name, color = Rust, style = MaterialTheme.typography.titleMedium,
         fontWeight = FontWeight.Medium,
         modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
-            .clickable(role = Role.Button, onClickLabel = "View doctor's details") { detailsOpen = true }
+            .clickable(role = Role.Button, onClickLabel = t("View doctor's details", "डॉक्टर की जानकारी देखें")) { detailsOpen = true }
             .wrapContentHeight(Alignment.CenterVertically).testTag("patient-doctor-name"))
     if (detailsOpen) AlertDialog(
         modifier = Modifier.testTag("patient-doctor-details"),
@@ -55,25 +56,25 @@ enum class PatientDoctorVerification { NOT_VERIFIED, PENDING }
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 doctor.speciality?.trim()?.takeIf(String::isNotEmpty)?.let {
-                    Column { Text("Speciality", style = MaterialTheme.typography.labelMedium); Text(it) }
+                    Column { Text(t("Speciality", "विशेषज्ञता"), style = MaterialTheme.typography.labelMedium); Text(it) }
                 }
                 doctor.clinic?.trim()?.takeIf(String::isNotEmpty)?.let {
-                    Column { Text("Clinic", style = MaterialTheme.typography.labelMedium); Text(it) }
+                    Column { Text(t("Clinic", "क्लिनिक"), style = MaterialTheme.typography.labelMedium); Text(it) }
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.Top) {
                     Icon(if (doctor.verification == PatientDoctorVerification.PENDING) Icons.Default.Schedule else Icons.Default.Info,
                         null, tint = Rust, modifier = Modifier.size(22.dp))
                     Column {
-                        Text(if (doctor.verification == PatientDoctorVerification.PENDING) "Verification pending" else "Not verified",
+                        Text(if (doctor.verification == PatientDoctorVerification.PENDING) t("Verification pending", "पुष्टि बाकी है") else t("Not verified", "पुष्टि नहीं हुई"),
                             fontWeight = FontWeight.Medium, modifier = Modifier.testTag("patient-doctor-status"))
-                        Text("Sahara has not confirmed this doctor's professional identity.",
+                        Text(t("Sahara has not confirmed this doctor's professional identity.", "Sahara ने इस डॉक्टर की पेशेवर पहचान की पुष्टि नहीं की है।"),
                             style = MaterialTheme.typography.bodySmall)
                     }
                 }
             }
         },
         confirmButton = {
-            TextButton(onClick = { detailsOpen = false }, modifier = Modifier.heightIn(min = 48.dp).testTag("patient-doctor-close")) { Text("Close") }
+            TextButton(onClick = { detailsOpen = false }, modifier = Modifier.heightIn(min = 48.dp).testTag("patient-doctor-close")) { Text(t("Close", "बंद करें")) }
         },
     )
 }

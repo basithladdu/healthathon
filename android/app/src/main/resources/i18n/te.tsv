@@ -3714,3 +3714,185 @@ Confirm this item	ఈ అంశాన్ని నిర్ధారించం
 Confirmed by you	మీరు నిర్ధారించారు
 Not discussed in this talk. I checked this.	ఈ సంభాషణలో చర్చించలేదు. నేను పరిశీలించాను.
 It stays	ఇది అలాగే ఉంటుంది
+Month	నెల
+Week	వారం
+Previous week	గత వారం
+Previous month	గత నెల
+Next week	తదుపరి వారం
+Next month	తదుపరి నెల
+1 entry	1 నమోదు
+$n entries	$n నమోదులు
+Distress number	బాధ సంఖ్య
+Distress: $score	బాధ: $score
+Required: choose 0 to 10	తప్పనిసరి: 0 నుండి 10 ఎంచుకోండి
+None selected	ఏదీ ఎంచుకోలేదు
+Optional	ఐచ్ఛికం
+Any other concern	ఇంకేదైనా ఆందోళన
+${date(item.created)} (date added)	${date(item.created)} (చేర్చిన తేదీ)
+ Printed range ${labNum(refLow ?: yMin)} to ${labNum(refHigh ?: yMax)} $unit.	 ముద్రిత పరిధి ${labNum(refLow ?: yMin)} నుండి ${labNum(refHigh ?: yMax)} $unit.
+Recorded values ($unit)	నమోదైన విలువలు ($unit)
+Line chart of ${points.size} recorded values. $summary.$rangeText	${points.size} నమోదైన విలువల రేఖా చార్ట్. $summary.$rangeText
+Shaded band: printed range	షేడ్ పట్టీ: ముద్రిత పరిధి
+Edit ${item.title} result from ${labDateText(item, t)}	${labDateText(item, t)} నాటి ${item.title} ఫలితాన్ని మార్చండి
+Each point is the highest number noted that day. 0 = none, 10 = worst.	ప్రతి బిందువు ఆ రోజు నమోదైన అత్యధిక సంఖ్య. 0 = ఏమీ లేదు, 10 = అత్యంత తీవ్రం.
+Most severe	అత్యంత తీవ్రమైనవి
+Newest	కొత్తవి
+Hide this month	ఈ నెలను దాచండి
+Show this month	ఈ నెలను చూపండి
+(date added)	(చేర్చిన తేదీ)
+Show all ${events.size}	మొత్తం ${events.size} చూపండి
+(date added): Report date not recorded. This is the day the file was added.	(చేర్చిన తేదీ): రిపోర్ట్ తేదీ నమోదు కాలేదు. ఇది ఫైల్ చేర్చిన రోజు.
+Family report only. Not confirmed as taken or checked by anyone else.	కుటుంబం ఇచ్చిన సమాచారం మాత్రమే. వేరెవరూ తీసుకున్నట్లు నిర్ధారించలేదు లేదా తనిఖీ చేయలేదు.
+Missed	మిస్ అయింది
+Late	ఆలస్యం
+Read the medicines from a photo, then check each one.	ఫోటో నుండి మందులను చదవండి, తర్వాత ప్రతిదీ తనిఖీ చేయండి.
+View	చూడండి
+Printed range ${labNum(refLow ?: yMin)}–${labNum(refHigh ?: yMax)} $unit	ముద్రిత పరిధి ${labNum(refLow ?: yMin)}–${labNum(refHigh ?: yMax)} $unit
+Treatment day	చికిత్స రోజు
+$arrow ${labNum(kotlin.math.abs(change))} $unit since $since · ${points.size} results	$arrow ${labNum(kotlin.math.abs(change))} $unit, $since నుండి · ${points.size} ఫలితాలు
+Add main illness	ప్రధాన అనారోగ్యం చేర్చండి
+Add address	చిరునామా చేర్చండి
+Edit profile	ప్రొఫైల్ మార్చండి
+Age	వయసు
+$it yrs	$it సంవత్సరాలు
+Weight	బరువు
+kg	కిలో
+Height	ఎత్తు
+cm	సెం.మీ
+Blood group	రక్త గ్రూప్
+Female	స్త్రీ
+Male	పురుషుడు
+Not known	తెలియదు
+Age (years)	వయసు (సంవత్సరాలు)
+Weight (kg)	బరువు (కిలో)
+Height (cm)	ఎత్తు (సెం.మీ)
+Main illness / diagnosis	ప్రధాన అనారోగ్యం / నిర్ధారణ
+City / address	నగరం / చిరునామా
+Saved on this phone only.	ఈ ఫోన్‌లో మాత్రమే సేవ్ అవుతుంది.
+Age should be between 0 and 120 years.	వయసు 0 నుండి 120 సంవత్సరాల మధ్య ఉండాలి.
+Weight should be between 1 and 300 kg.	బరువు 1 నుండి 300 కిలోల మధ్య ఉండాలి.
+Height should be between 30 and 250 cm.	ఎత్తు 30 నుండి 250 సెం.మీ మధ్య ఉండాలి.
+That invitation link isn't complete. Ask for a new one, or paste the code under Join someone's care.	ఆ ఆహ్వాన లింక్ పూర్తిగా లేదు. కొత్తది అడగండి, లేదా 'ఎవరి సంరక్షణలోనైనా చేరండి' కింద కోడ్ అతికించండి.
+Sign in again before opening cloud care records.	క్లౌడ్ సంరక్షణ రికార్డులు తెరవడానికి ముందు మళ్లీ సైన్ ఇన్ చేయండి.
+Couldn't refresh. Try again.	రిఫ్రెష్ కాలేదు. మళ్లీ ప్రయత్నించండి.
+The signed-in account changed. Reopen your care records.	సైన్ ఇన్ చేసిన ఖాతా మారింది. మీ సంరక్షణ రికార్డులను మళ్లీ తెరవండి.
+You can read these records. Ask the person who invited you to allow changes.	మీరు ఈ రికార్డులు చదవగలరు. మార్పులకు అనుమతి కోసం మిమ్మల్ని ఆహ్వానించిన వ్యక్తిని అడగండి.
+Care-team contacts couldn't be loaded. Nothing was uploaded or changed.	సంరక్షణ బృందం నంబర్లు లోడ్ కాలేదు. ఏదీ అప్‌లోడ్ కాలేదు లేదా మారలేదు.
+Only this care profile's owner can manage its contacts.	ఈ సంరక్షణ ప్రొఫైల్ యజమాని మాత్రమే దాని నంబర్లను నిర్వహించగలరు.
+Care access changed. Reopen the selected profile.	సంరక్షణ యాక్సెస్ మారింది. ఎంచుకున్న ప్రొఫైల్‌ను మళ్లీ తెరవండి.
+This visit changed. Reopen it before editing.	ఈ సందర్శన మారింది. మార్చే ముందు దీనిని మళ్లీ తెరవండి.
+Visit saved on this device	సందర్శన ఈ ఫోన్‌లో సేవ్ అయింది
+Visit saved to shared care. The patient can see it after refreshing.	సందర్శన పంచుకున్న సంరక్షణలో సేవ్ అయింది. రిఫ్రెష్ చేసిన తర్వాత రోగి చూడగలరు.
+Enter a name, up to 100 characters.	పేరు రాయండి, 100 అక్షరాల వరకు.
+Open this person's care note before confirming.	నిర్ధారించే ముందు ఈ వ్యక్తి సంరక్షణ నోట్ తెరవండి.
+The saved confirmation didn't match this version. Refresh the care note before trying again.	సేవ్ చేసిన నిర్ధారణ ఈ వెర్షన్‌తో సరిపోలలేదు. మళ్లీ ప్రయత్నించే ముందు సంరక్షణ నోట్ రిఫ్రెష్ చేయండి.
+This confirmation changed. Refresh the care note before trying again.	ఈ నిర్ధారణ మారింది. మళ్లీ ప్రయత్నించే ముందు సంరక్షణ నోట్ రిఫ్రెష్ చేయండి.
+Your confirmation is saved	మీ నిర్ధారణ సేవ్ అయింది
+Choose the right person and add a name or a short note.	సరైన వ్యక్తిని ఎంచుకుని పేరు లేదా చిన్న నోట్ జోడించండి.
+This person's records are no longer available.	ఈ వ్యక్తి రికార్డులు ఇక అందుబాటులో లేవు.
+Please shorten this entry.	దయచేసి ఈ నమోదును కుదించండి.
+This entry couldn't be read. Open it again.	ఈ నమోదు చదవలేకపోయాం. మళ్లీ తెరవండి.
+Choose a date and type of care.	తేదీ మరియు సంరక్షణ రకాన్ని ఎంచుకోండి.
+Saved	సేవ్ అయింది
+Choose who these medicines are for.	ఈ మందులు ఎవరికో ఎంచుకోండి.
+Add at least one medicine.	కనీసం ఒక మందు జోడించండి.
+Check and confirm every medicine before saving.	సేవ్ చేసే ముందు ప్రతి మందును తనిఖీ చేసి నిర్ధారించండి.
+Add a medicine name to every entry.	ప్రతి నమోదుకు మందు పేరు జోడించండి.
+Each medicine needs a different name.	ప్రతి మందుకు వేరే పేరు ఉండాలి.
+Add the prescribed dose for ${medicine.medicineName}.	${medicine.medicineName} కోసం సూచించిన మోతాదు జోడించండి.
+Review the dose and directions for ${medicine.medicineName}.	${medicine.medicineName} మోతాదు మరియు సూచనలను సమీక్షించండి.
+One medicine could not be matched to this person. Start the scan again.	ఒక మందు ఈ వ్యక్తికి సరిపోలలేదు. స్కాన్‌ను మళ్లీ ప్రారంభించండి.
+Medicines saved: ${drafts.size}	మందులు సేవ్ అయ్యాయి: ${drafts.size}
+Choose the right person before saving this note.	ఈ నోట్ సేవ్ చేసే ముందు సరైన వ్యక్తిని ఎంచుకోండి.
+The previous note changed. Check the comparison and save again.	మునుపటి నోట్ మారింది. పోలిక చూసి మళ్లీ సేవ్ చేయండి.
+Symptom note saved	లక్షణాల నోట్ సేవ్ అయింది
+Reopen the selected care profile.	ఎంచుకున్న సంరక్షణ ప్రొఫైల్‌ను మళ్లీ తెరవండి.
+Daily check-off saved, but detailed history could not be recorded.	రోజువారీ టిక్ సేవ్ అయింది, కానీ వివరమైన చరిత్ర నమోదు కాలేదు.
+Choose the right person and enter a name.	సరైన వ్యక్తిని ఎంచుకుని పేరు రాయండి.
+Removed	తీసివేయబడింది
+Choose a person before adding a report.	రిపోర్ట్ జోడించే ముందు వ్యక్తిని ఎంచుకోండి.
+Couldn't read this file. Choose it again from Files.	ఈ ఫైల్ చదవలేకపోయాం. ఫైల్స్ నుండి మళ్లీ ఎంచుకోండి.
+Couldn't add the report. Your original file is unchanged. Try again.	రిపోర్ట్ జోడించలేకపోయాం. మీ అసలు ఫైల్ మారలేదు. మళ్లీ ప్రయత్నించండి.
+Report added	రిపోర్ట్ జోడించబడింది
+Choose a report for this person.	ఈ వ్యక్తి కోసం రిపోర్ట్ ఎంచుకోండి.
+Couldn't rename this report. Try again.	ఈ రిపోర్ట్ పేరు మార్చలేకపోయాం. మళ్లీ ప్రయత్నించండి.
+Couldn't remove this report. Try again.	ఈ రిపోర్ట్‌ను తీసివేయలేకపోయాం. మళ్లీ ప్రయత్నించండి.
+Report removed	రిపోర్ట్ తీసివేయబడింది
+Stop the recording first.	ముందు రికార్డింగ్ ఆపండి.
+Only the person who added these records can remove them.	ఈ రికార్డులు జోడించిన వ్యక్తి మాత్రమే వాటిని తీసివేయగలరు.
+Records removed	రికార్డులు తీసివేయబడ్డాయి
+Still working on your last change. Please wait a moment.	మీ చివరి మార్పు ఇంకా జరుగుతోంది. దయచేసి కొద్దిసేపు ఆగండి.
+Couldn't save. Your entry is still here; please try again.	సేవ్ కాలేదు. మీ నమోదు ఇక్కడే ఉంది; దయచేసి మళ్లీ ప్రయత్నించండి.
+No profile details yet	ఇంకా ప్రొఫైల్ వివరాలు లేవు
+No allergies recorded	అలెర్జీలు నమోదు కాలేదు
+Shared with the family and doctors you share this care with.	మీరు ఈ సంరక్షణను పంచుకునే కుటుంబం మరియు వైద్యులతో పంచుకోబడింది.
+Android blocked reminders. Check notification and battery settings.	Android రిమైండర్‌లను ఆపింది. నోటిఫికేషన్ మరియు బ్యాటరీ సెట్టింగ్‌లు తనిఖీ చేయండి.
+Listening…	వింటున్నాం…
+Checking the words…	పదాలను తనిఖీ చేస్తున్నాం…
+This language isn't installed for dictation. Choose another language or type the words.	ఈ భాష డిక్టేషన్ కోసం ఇన్‌స్టాల్ కాలేదు. వేరే భాష ఎంచుకోండి లేదా పదాలు టైప్ చేయండి.
+Allow microphone access to dictate, or type the words.	డిక్టేట్ చేయడానికి మైక్రోఫోన్ అనుమతి ఇవ్వండి, లేదా పదాలు టైప్ చేయండి.
+No words were recognised. Tap Dictate to try again.	పదాలు గుర్తించబడలేదు. మళ్లీ ప్రయత్నించడానికి డిక్టేట్ నొక్కండి.
+The microphone is busy. Stop other recording and try again.	మైక్రోఫోన్ బిజీగా ఉంది. ఇతర రికార్డింగ్ ఆపి మళ్లీ ప్రయత్నించండి.
+Dictation couldn't finish. Your earlier words are safe. Try again or type.	డిక్టేషన్ పూర్తి కాలేదు. మీ మునుపటి పదాలు సురక్షితం. మళ్లీ ప్రయత్నించండి లేదా టైప్ చేయండి.
+No words were recognised. Try again or type.	పదాలు గుర్తించబడలేదు. మళ్లీ ప్రయత్నించండి లేదా టైప్ చేయండి.
+Words added. Check them below.	పదాలు జోడించబడ్డాయి. కింద తనిఖీ చేయండి.
+These words need attention before they can be added.	జోడించే ముందు ఈ పదాలను సరిచూడాలి.
+For Hindi + English together, transcribe a saved recording below. This phone's dictation supports one language per turn.	హిందీ + ఇంగ్లీష్ కలిపి అయితే, కింద సేవ్ చేసిన రికార్డింగ్‌ను ట్రాన్స్‌క్రైబ్ చేయండి. ఈ ఫోన్ డిక్టేషన్ ఒక్కో వంతుకు ఒక భాషకే మద్దతిస్తుంది.
+Starting microphone…	మైక్రోఫోన్ ప్రారంభమవుతోంది…
+Couldn't start dictation. Check microphone access or type the words.	డిక్టేషన్ ప్రారంభం కాలేదు. మైక్రోఫోన్ అనుమతి తనిఖీ చేయండి లేదా పదాలు టైప్ చేయండి.
+Finishing this turn…	ఈ వంతు పూర్తి చేస్తున్నాం…
+Listening stopped. Check the unfinished words.	వినడం ఆగింది. పూర్తికాని పదాలను తనిఖీ చేయండి.
+Listening stopped	వినడం ఆగింది
+Preparing voice…	స్వరం సిద్ధమవుతోంది…
+Read aloud isn't available on this phone.	ఈ ఫోన్‌లో చదివి వినిపించడం అందుబాటులో లేదు.
+Finished reading	చదవడం పూర్తయింది
+Couldn't read this note. Try another installed language voice.	ఈ నోట్ చదవలేకపోయాం. వేరే ఇన్‌స్టాల్ చేసిన భాష స్వరాన్ని ప్రయత్నించండి.
+Downloading the Hindi language pack (about 30 MB)…	హిందీ భాషా ప్యాక్ డౌన్‌లోడ్ అవుతోంది (సుమారు 30 MB)…
+Downloading the Telugu language pack (about 30 MB)…	తెలుగు భాషా ప్యాక్ డౌన్‌లోడ్ అవుతోంది (సుమారు 30 MB)…
+Downloading the Kannada language pack (about 30 MB)…	కన్నడ భాషా ప్యాక్ డౌన్‌లోడ్ అవుతోంది (సుమారు 30 MB)…
+Downloading the Tamil language pack (about 30 MB)…	తమిళ భాషా ప్యాక్ డౌన్‌లోడ్ అవుతోంది (సుమారు 30 MB)…
+Downloading the Urdu language pack (about 30 MB)…	ఉర్దూ భాషా ప్యాక్ డౌన్‌లోడ్ అవుతోంది (సుమారు 30 MB)…
+Downloading a language pack (about 30 MB)…	భాషా ప్యాక్ డౌన్‌లోడ్ అవుతోంది (సుమారు 30 MB)…
+The voice is still preparing. Try Read aloud again in a moment.	స్వరం ఇంకా సిద్ధమవుతోంది. కొద్దిసేపటి తర్వాత మళ్లీ చదివి వినిపించు నొక్కండి.
+No downloaded voice for this language. Choose another language or install its voice in phone settings.	ఈ భాషకు డౌన్‌లోడ్ చేసిన స్వరం లేదు. వేరే భాష ఎంచుకోండి లేదా ఫోన్ సెట్టింగ్‌లలో దాని స్వరాన్ని ఇన్‌స్టాల్ చేయండి.
+Malayalam translation isn't available on this phone; reading the original words.	ఈ ఫోన్‌లో మలయాళం అనువాదం అందుబాటులో లేదు; అసలు పదాలను చదువుతున్నాం.
+Uses any network, including mobile data.	మొబైల్ డేటాతో సహా ఏ నెట్‌వర్క్ అయినా ఉపయోగిస్తుంది.
+Some lines could not be checked, so they are read in the original words.	కొన్ని పంక్తులు తనిఖీ చేయలేకపోయాం, కాబట్టి అవి అసలు పదాలలో చదవబడతాయి.
+Couldn't translate this note on this phone. Check the internet connection for the language pack and try again.	ఈ ఫోన్‌లో ఈ నోట్‌ను అనువదించలేకపోయాం. భాషా ప్యాక్ కోసం ఇంటర్నెట్ తనిఖీ చేసి మళ్లీ ప్రయత్నించండి.
+Reading aloud	చదివి వినిపిస్తున్నాం
+Couldn't start reading. Try again.	చదవడం ప్రారంభం కాలేదు. మళ్లీ ప్రయత్నించండి.
+The words are translated on this phone for listening only. The saved note is not changed. Check anything important with the care team.	పదాలు వినడానికి మాత్రమే ఈ ఫోన్‌లో అనువదించబడతాయి. సేవ్ చేసిన నోట్ మారదు. ముఖ్యమైన విషయాలను సంరక్షణ బృందంతో సరిచూసుకోండి.
+No doctor linked	వైద్యుడు ఎవరూ అనుసంధానం కాలేదు
+View doctor's details	వైద్యుని వివరాలు చూడండి
+Speciality	ప్రత్యేకత
+Clinic	క్లినిక్
+Verification pending	నిర్ధారణ పెండింగ్‌లో ఉంది
+Not verified	నిర్ధారించబడలేదు
+Sahara has not confirmed this doctor's professional identity.	ఈ వైద్యుని వృత్తిపరమైన గుర్తింపును Sahara నిర్ధారించలేదు.
+Body	శరీరం
+Health	ఆరోగ్యం
+Contact	సంప్రదింపు
+Allergies (optional)	అలెర్జీలు (ఐచ్ఛికం)
+All patients	అందరు రోగులు
+No visits on $label	$label న సందర్శనలు లేవు
+Visit with ${patient.name}	${patient.name}తో సందర్శన
+Time not set	సమయం నిర్ణయించలేదు
+Doctor: $doctor	డాక్టర్: $doctor
+Appointment logistics: $note	అపాయింట్‌మెంట్ ఏర్పాట్లు: $note
+Choose a patient	రోగిని ఎంచుకోండి
+Search patients by name	పేరుతో రోగులను వెతకండి
+Add document	పత్రం జోడించండి
+Find dates, results and doses	తేదీలు, ఫలితాలు మరియు మోతాదులను కనుగొనండి
+Scan with camera	కెమెరాతో స్కాన్ చేయండి
+Take a photo of a paper report or prescription.	కాగితపు రిపోర్ట్ లేదా ప్రిస్క్రిప్షన్ ఫోటో తీయండి.
+Upload a file	ఫైల్ అప్‌లోడ్ చేయండి
+Choose a PDF or photo already on this phone.	ఈ ఫోన్‌లో ఇప్పటికే ఉన్న PDF లేదా ఫోటోను ఎంచుకోండి.
+Verified clinician	ధృవీకరించబడిన వైద్యుడు
+Palliative medicine	పాలియేటివ్ మెడిసిన్
+Sahara Practice Hospital	సహారా ప్రాక్టీస్ ఆసుపత్రి
+Palliative care unit · Hyderabad	పాలియేటివ్ కేర్ విభాగం · హైదరాబాద్
+Experience	అనుభవం
+12 yrs	12 సం.
+Languages	భాషలు
+Registration: practice sample, not a real number	నమోదు: ప్రాక్టీస్ నమూనా, నిజమైన నంబర్ కాదు
+Sample profile for the walkthrough. Real doctors are verified by the Sahara team against the medical council register.	ఇది వాక్‌త్రూ కోసం నమూనా ప్రొఫైల్. నిజమైన వైద్యులను సహారా బృందం మెడికల్ కౌన్సిల్ రిజిస్టర్‌తో ధృవీకరిస్తుంది.

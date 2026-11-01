@@ -41,9 +41,9 @@ import androidx.compose.ui.unit.sp
     // [keys] stay English for test tags; [labels] follow the family's English/Hindi choice.
     val t = careText()
     val keys = listOf("Today", if (clinician) "Talk" else "Docs", "Care", "Nearby", "More")
-    val labels = listOf(t("Today", "आज"), if (clinician) t("Talk", "बातचीत") else t("Docs", "कागज़ात"), t("Care", "देखभाल"), t("Nearby", "आसपास"), t("More", "और"))
+    val labels = listOf(t("Today", "आज"), if (clinician) t("Talk", "बातचीत") else t("Docs", "कागज़ात"), t("Care", "देखभाल"), t("Nearby", "आसपास"), if (clinician) t("More", "और") else t("Account", "खाता"))
     val routes = listOf(0, if (clinician) 1 else 5, 2, 3, 4)
-    val icons = listOf(Icons.Default.WbSunny, if (clinician) Icons.Default.Forum else Icons.Default.FolderOpen, Icons.Default.FavoriteBorder, Icons.Default.Place, Icons.Default.MoreHoriz)
+    val icons = listOf(Icons.Default.WbSunny, if (clinician) Icons.Default.Forum else Icons.Default.FolderOpen, Icons.Default.FavoriteBorder, Icons.Default.Place, if (clinician) Icons.Default.MoreHoriz else Icons.Default.AccountCircle)
     Surface(color = Paper, shadowElevation = 2.dp) {
         Row(Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 12.dp, vertical = 6.dp).selectableGroup(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
             labels.forEachIndexed { index, label ->
@@ -68,12 +68,12 @@ import androidx.compose.ui.unit.sp
     Box {
         TextButton(onClick = { expanded = true }, modifier = Modifier.heightIn(min = 48.dp).testTag("walkthrough-user-menu").semantics { contentDescription = t("Walkthrough user, currently ${user.name}, ${user.role}", "डेमो उपयोगकर्ता, अभी ${user.name}, ${user.role}") },
             shape = RoundedCornerShape(14.dp), contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp), colors = ButtonDefaults.textButtonColors(contentColor = Rust)) {
-            Text(user.label, fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1)
+            Text("${user.name} · " + (if (user.role == "Family") t("Family", "परिवार") else t("Patient", "मरीज़")), fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1)
             Spacer(Modifier.width(4.dp)); Icon(Icons.Default.ExpandMore, null, Modifier.size(18.dp))
         }
         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             PatientWalkthrough.users.forEach { option ->
-                DropdownMenuItem(text = { Text("${option.name} — ${option.role}") }, modifier = Modifier.testTag("walkthrough-switch-${option.key}").semantics { selected = option.key == user.key },
+                DropdownMenuItem(text = { Text("${option.name} — " + (if (option.role == "Family") t("Family", "परिवार") else t("Patient", "मरीज़"))) }, modifier = Modifier.testTag("walkthrough-switch-${option.key}").semantics { selected = option.key == user.key },
                     leadingIcon = { Icon(if (option.role == "Family") Icons.Default.PeopleOutline else Icons.Default.PersonOutline, null) },
                     trailingIcon = { if (option.key == user.key) Icon(Icons.Default.Check, t("Selected", "चुना हुआ"), tint = Rust) },
                     onClick = { expanded = false; onSwitch(option.key) })

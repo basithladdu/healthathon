@@ -80,6 +80,12 @@ object CarePrivacy {
             val safe = n.copy(other = redact(n.other)); val title = redact(item.title)
             return if (safe == n && title == item.title) item else item.copy(title = title, detail = SideEffectCodec.encode(safe))
         }
+        // The patient profile keeps its structure and phone field; only the free-text fields are redacted.
+        if (item.kind == "journal" && PatientProfileCodec.isStructured(item.detail)) {
+            val p = PatientProfileCodec.decode(item.detail) ?: return item
+            val safe = p.copy(illness = redact(p.illness), allergies = redact(p.allergies), address = redact(p.address))
+            return if (safe == p) item else item.copy(detail = PatientProfileCodec.encode(safe))
+        }
         if (item.kind != "checkin") return item
         if (DistressCodec.isStructured(item.detail)) return DistressCodec.decode(item.detail)?.let { d -> d.copy(other = redact(d.other)).takeIf { it != d }?.let { item.copy(detail = DistressCodec.encode(it)) } } ?: item
         val note = SymptomNoteCodec.decode(item.detail)

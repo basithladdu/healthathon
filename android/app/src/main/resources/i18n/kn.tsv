@@ -3714,3 +3714,185 @@ Confirm this item	ಈ ಅಂಶವನ್ನು ದೃಢೀಕರಿಸಿ
 Confirmed by you	ನೀವು ದೃಢೀಕರಿಸಿದ್ದೀರಿ
 Not discussed in this talk. I checked this.	ಈ ಸಂಭಾಷಣೆಯಲ್ಲಿ ಚರ್ಚಿಸಿಲ್ಲ. ನಾನು ಪರಿಶೀಲಿಸಿದ್ದೇನೆ.
 It stays	ಇದು ಹಾಗೆಯೇ ಉಳಿಯುತ್ತದೆ
+Month	ತಿಂಗಳು
+Week	ವಾರ
+Previous week	ಹಿಂದಿನ ವಾರ
+Previous month	ಹಿಂದಿನ ತಿಂಗಳು
+Next week	ಮುಂದಿನ ವಾರ
+Next month	ಮುಂದಿನ ತಿಂಗಳು
+1 entry	1 ನಮೂದು
+$n entries	$n ನಮೂದುಗಳು
+Distress number	ಸಂಕಟದ ಸಂಖ್ಯೆ
+Distress: $score	ಸಂಕಟ: $score
+Required: choose 0 to 10	ಕಡ್ಡಾಯ: 0 ರಿಂದ 10 ಆಯ್ಕೆಮಾಡಿ
+None selected	ಏನನ್ನೂ ಆಯ್ಕೆ ಮಾಡಿಲ್ಲ
+Optional	ಐಚ್ಛಿಕ
+Any other concern	ಬೇರೆ ಯಾವುದೇ ಚಿಂತೆ
+${date(item.created)} (date added)	${date(item.created)} (ಸೇರಿಸಿದ ದಿನಾಂಕ)
+ Printed range ${labNum(refLow ?: yMin)} to ${labNum(refHigh ?: yMax)} $unit.	 ಮುದ್ರಿತ ವ್ಯಾಪ್ತಿ ${labNum(refLow ?: yMin)} ರಿಂದ ${labNum(refHigh ?: yMax)} $unit.
+Recorded values ($unit)	ದಾಖಲಾದ ಮೌಲ್ಯಗಳು ($unit)
+Line chart of ${points.size} recorded values. $summary.$rangeText	${points.size} ದಾಖಲಾದ ಮೌಲ್ಯಗಳ ರೇಖಾ ಚಾರ್ಟ್. $summary.$rangeText
+Shaded band: printed range	ಛಾಯೆಯ ಪಟ್ಟಿ: ಮುದ್ರಿತ ವ್ಯಾಪ್ತಿ
+Edit ${item.title} result from ${labDateText(item, t)}	${labDateText(item, t)} ರ ${item.title} ಫಲಿತಾಂಶವನ್ನು ಬದಲಿಸಿ
+Each point is the highest number noted that day. 0 = none, 10 = worst.	ಪ್ರತಿ ಬಿಂದು ಆ ದಿನ ದಾಖಲಾದ ಅತಿ ಹೆಚ್ಚಿನ ಸಂಖ್ಯೆ. 0 = ಏನೂ ಇಲ್ಲ, 10 = ಅತಿ ತೀವ್ರ.
+Most severe	ಅತಿ ತೀವ್ರ
+Newest	ಹೊಸದು
+Hide this month	ಈ ತಿಂಗಳನ್ನು ಮರೆಮಾಡಿ
+Show this month	ಈ ತಿಂಗಳನ್ನು ತೋರಿಸಿ
+(date added)	(ಸೇರಿಸಿದ ದಿನಾಂಕ)
+Show all ${events.size}	ಎಲ್ಲಾ ${events.size} ತೋರಿಸಿ
+(date added): Report date not recorded. This is the day the file was added.	(ಸೇರಿಸಿದ ದಿನಾಂಕ): ವರದಿಯ ದಿನಾಂಕ ದಾಖಲಾಗಿಲ್ಲ. ಇದು ಫೈಲ್ ಸೇರಿಸಿದ ದಿನ.
+Family report only. Not confirmed as taken or checked by anyone else.	ಕುಟುಂಬದ ವರದಿ ಮಾತ್ರ. ಬೇರೆ ಯಾರೂ ತೆಗೆದುಕೊಂಡಿದ್ದನ್ನು ದೃಢಪಡಿಸಿಲ್ಲ ಅಥವಾ ಪರಿಶೀಲಿಸಿಲ್ಲ.
+Missed	ತಪ್ಪಿತು
+Late	ತಡವಾಗಿ
+Read the medicines from a photo, then check each one.	ಫೋಟೋದಿಂದ ಔಷಧಿಗಳನ್ನು ಓದಿ, ನಂತರ ಪ್ರತಿಯೊಂದನ್ನೂ ಪರಿಶೀಲಿಸಿ.
+View	ನೋಡಿ
+Printed range ${labNum(refLow ?: yMin)}–${labNum(refHigh ?: yMax)} $unit	ಮುದ್ರಿತ ವ್ಯಾಪ್ತಿ ${labNum(refLow ?: yMin)}–${labNum(refHigh ?: yMax)} $unit
+Treatment day	ಚಿಕಿತ್ಸೆಯ ದಿನ
+$arrow ${labNum(kotlin.math.abs(change))} $unit since $since · ${points.size} results	$arrow ${labNum(kotlin.math.abs(change))} $unit, $since ರಿಂದ · ${points.size} ಫಲಿತಾಂಶಗಳು
+Add main illness	ಮುಖ್ಯ ಕಾಯಿಲೆ ಸೇರಿಸಿ
+Add address	ವಿಳಾಸ ಸೇರಿಸಿ
+Edit profile	ಪ್ರೊಫೈಲ್ ಬದಲಿಸಿ
+Age	ವಯಸ್ಸು
+$it yrs	$it ವರ್ಷ
+Weight	ತೂಕ
+kg	ಕೆಜಿ
+Height	ಎತ್ತರ
+cm	ಸೆಂ.ಮೀ
+Blood group	ರಕ್ತದ ಗುಂಪು
+Female	ಮಹಿಳೆ
+Male	ಪುರುಷ
+Not known	ಗೊತ್ತಿಲ್ಲ
+Age (years)	ವಯಸ್ಸು (ವರ್ಷ)
+Weight (kg)	ತೂಕ (ಕೆಜಿ)
+Height (cm)	ಎತ್ತರ (ಸೆಂ.ಮೀ)
+Main illness / diagnosis	ಮುಖ್ಯ ಕಾಯಿಲೆ / ರೋಗನಿರ್ಣಯ
+City / address	ನಗರ / ವಿಳಾಸ
+Saved on this phone only.	ಈ ಫೋನ್‌ನಲ್ಲಿ ಮಾತ್ರ ಉಳಿಸಲಾಗುತ್ತದೆ.
+Age should be between 0 and 120 years.	ವಯಸ್ಸು 0 ರಿಂದ 120 ವರ್ಷಗಳ ನಡುವೆ ಇರಬೇಕು.
+Weight should be between 1 and 300 kg.	ತೂಕ 1 ರಿಂದ 300 ಕೆಜಿ ನಡುವೆ ಇರಬೇಕು.
+Height should be between 30 and 250 cm.	ಎತ್ತರ 30 ರಿಂದ 250 ಸೆಂ.ಮೀ ನಡುವೆ ಇರಬೇಕು.
+That invitation link isn't complete. Ask for a new one, or paste the code under Join someone's care.	ಆ ಆಹ್ವಾನ ಲಿಂಕ್ ಪೂರ್ಣವಾಗಿಲ್ಲ. ಹೊಸದನ್ನು ಕೇಳಿ, ಅಥವಾ 'ಯಾರದೋ ಆರೈಕೆಗೆ ಸೇರಿ' ಅಡಿಯಲ್ಲಿ ಕೋಡ್ ಅಂಟಿಸಿ.
+Sign in again before opening cloud care records.	ಕ್ಲೌಡ್ ಆರೈಕೆ ದಾಖಲೆಗಳನ್ನು ತೆರೆಯುವ ಮೊದಲು ಮತ್ತೆ ಸೈನ್ ಇನ್ ಮಾಡಿ.
+Couldn't refresh. Try again.	ರಿಫ್ರೆಶ್ ಆಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.
+The signed-in account changed. Reopen your care records.	ಸೈನ್ ಇನ್ ಮಾಡಿದ ಖಾತೆ ಬದಲಾಗಿದೆ. ನಿಮ್ಮ ಆರೈಕೆ ದಾಖಲೆಗಳನ್ನು ಮತ್ತೆ ತೆರೆಯಿರಿ.
+You can read these records. Ask the person who invited you to allow changes.	ನೀವು ಈ ದಾಖಲೆಗಳನ್ನು ಓದಬಹುದು. ಬದಲಾವಣೆಗೆ ಅನುಮತಿಗಾಗಿ ನಿಮ್ಮನ್ನು ಆಹ್ವಾನಿಸಿದವರನ್ನು ಕೇಳಿ.
+Care-team contacts couldn't be loaded. Nothing was uploaded or changed.	ಆರೈಕೆ ತಂಡದ ಸಂಖ್ಯೆಗಳು ಲೋಡ್ ಆಗಲಿಲ್ಲ. ಏನೂ ಅಪ್‌ಲೋಡ್ ಅಥವಾ ಬದಲಾಗಿಲ್ಲ.
+Only this care profile's owner can manage its contacts.	ಈ ಆರೈಕೆ ಪ್ರೊಫೈಲ್‌ನ ಮಾಲೀಕರು ಮಾತ್ರ ಅದರ ಸಂಖ್ಯೆಗಳನ್ನು ನಿರ್ವಹಿಸಬಹುದು.
+Care access changed. Reopen the selected profile.	ಆರೈಕೆ ಪ್ರವೇಶ ಬದಲಾಗಿದೆ. ಆಯ್ಕೆ ಮಾಡಿದ ಪ್ರೊಫೈಲ್ ಅನ್ನು ಮತ್ತೆ ತೆರೆಯಿರಿ.
+This visit changed. Reopen it before editing.	ಈ ಭೇಟಿ ಬದಲಾಗಿದೆ. ಬದಲಿಸುವ ಮೊದಲು ಇದನ್ನು ಮತ್ತೆ ತೆರೆಯಿರಿ.
+Visit saved on this device	ಭೇಟಿ ಈ ಫೋನ್‌ನಲ್ಲಿ ಉಳಿಸಲಾಗಿದೆ
+Visit saved to shared care. The patient can see it after refreshing.	ಭೇಟಿ ಹಂಚಿಕೊಂಡ ಆರೈಕೆಯಲ್ಲಿ ಉಳಿಸಲಾಗಿದೆ. ರಿಫ್ರೆಶ್ ಮಾಡಿದ ನಂತರ ರೋಗಿ ನೋಡಬಹುದು.
+Enter a name, up to 100 characters.	ಹೆಸರನ್ನು ಬರೆಯಿರಿ, 100 ಅಕ್ಷರಗಳವರೆಗೆ.
+Open this person's care note before confirming.	ದೃಢೀಕರಿಸುವ ಮೊದಲು ಈ ವ್ಯಕ್ತಿಯ ಆರೈಕೆ ಟಿಪ್ಪಣಿ ತೆರೆಯಿರಿ.
+The saved confirmation didn't match this version. Refresh the care note before trying again.	ಉಳಿಸಿದ ದೃಢೀಕರಣ ಈ ಆವೃತ್ತಿಗೆ ಹೊಂದಿಕೆಯಾಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸುವ ಮೊದಲು ಆರೈಕೆ ಟಿಪ್ಪಣಿಯನ್ನು ರಿಫ್ರೆಶ್ ಮಾಡಿ.
+This confirmation changed. Refresh the care note before trying again.	ಈ ದೃಢೀಕರಣ ಬದಲಾಗಿದೆ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸುವ ಮೊದಲು ಆರೈಕೆ ಟಿಪ್ಪಣಿಯನ್ನು ರಿಫ್ರೆಶ್ ಮಾಡಿ.
+Your confirmation is saved	ನಿಮ್ಮ ದೃಢೀಕರಣ ಉಳಿಸಲಾಗಿದೆ
+Choose the right person and add a name or a short note.	ಸರಿಯಾದ ವ್ಯಕ್ತಿಯನ್ನು ಆಯ್ಕೆಮಾಡಿ ಹೆಸರು ಅಥವಾ ಚಿಕ್ಕ ಟಿಪ್ಪಣಿ ಸೇರಿಸಿ.
+This person's records are no longer available.	ಈ ವ್ಯಕ್ತಿಯ ದಾಖಲೆಗಳು ಇನ್ನು ಲಭ್ಯವಿಲ್ಲ.
+Please shorten this entry.	ದಯವಿಟ್ಟು ಈ ನಮೂದನ್ನು ಚಿಕ್ಕದಾಗಿಸಿ.
+This entry couldn't be read. Open it again.	ಈ ನಮೂದನ್ನು ಓದಲಾಗಲಿಲ್ಲ. ಮತ್ತೆ ತೆರೆಯಿರಿ.
+Choose a date and type of care.	ದಿನಾಂಕ ಮತ್ತು ಆರೈಕೆಯ ಪ್ರಕಾರವನ್ನು ಆಯ್ಕೆಮಾಡಿ.
+Saved	ಉಳಿಸಲಾಗಿದೆ
+Choose who these medicines are for.	ಈ ಔಷಧಿಗಳು ಯಾರಿಗೆ ಎಂದು ಆಯ್ಕೆಮಾಡಿ.
+Add at least one medicine.	ಕನಿಷ್ಠ ಒಂದು ಔಷಧಿ ಸೇರಿಸಿ.
+Check and confirm every medicine before saving.	ಉಳಿಸುವ ಮೊದಲು ಪ್ರತಿ ಔಷಧಿಯನ್ನು ಪರಿಶೀಲಿಸಿ ದೃಢೀಕರಿಸಿ.
+Add a medicine name to every entry.	ಪ್ರತಿ ನಮೂದಿಗೆ ಔಷಧಿಯ ಹೆಸರು ಸೇರಿಸಿ.
+Each medicine needs a different name.	ಪ್ರತಿ ಔಷಧಿಗೆ ಬೇರೆ ಹೆಸರು ಇರಬೇಕು.
+Add the prescribed dose for ${medicine.medicineName}.	${medicine.medicineName} ಗೆ ಸೂಚಿಸಿದ ಡೋಸ್ ಸೇರಿಸಿ.
+Review the dose and directions for ${medicine.medicineName}.	${medicine.medicineName} ನ ಡೋಸ್ ಮತ್ತು ಸೂಚನೆಗಳನ್ನು ಪರಿಶೀಲಿಸಿ.
+One medicine could not be matched to this person. Start the scan again.	ಒಂದು ಔಷಧಿ ಈ ವ್ಯಕ್ತಿಗೆ ಹೊಂದಿಕೆಯಾಗಲಿಲ್ಲ. ಸ್ಕ್ಯಾನ್ ಅನ್ನು ಮತ್ತೆ ಪ್ರಾರಂಭಿಸಿ.
+Medicines saved: ${drafts.size}	ಔಷಧಿಗಳನ್ನು ಉಳಿಸಲಾಗಿದೆ: ${drafts.size}
+Choose the right person before saving this note.	ಈ ಟಿಪ್ಪಣಿ ಉಳಿಸುವ ಮೊದಲು ಸರಿಯಾದ ವ್ಯಕ್ತಿಯನ್ನು ಆಯ್ಕೆಮಾಡಿ.
+The previous note changed. Check the comparison and save again.	ಹಿಂದಿನ ಟಿಪ್ಪಣಿ ಬದಲಾಗಿದೆ. ಹೋಲಿಕೆ ನೋಡಿ ಮತ್ತೆ ಉಳಿಸಿ.
+Symptom note saved	ಲಕ್ಷಣದ ಟಿಪ್ಪಣಿ ಉಳಿಸಲಾಗಿದೆ
+Reopen the selected care profile.	ಆಯ್ಕೆ ಮಾಡಿದ ಆರೈಕೆ ಪ್ರೊಫೈಲ್ ಅನ್ನು ಮತ್ತೆ ತೆರೆಯಿರಿ.
+Daily check-off saved, but detailed history could not be recorded.	ದೈನಂದಿನ ಟಿಕ್ ಉಳಿಸಲಾಗಿದೆ, ಆದರೆ ವಿವರವಾದ ಇತಿಹಾಸ ದಾಖಲಾಗಲಿಲ್ಲ.
+Choose the right person and enter a name.	ಸರಿಯಾದ ವ್ಯಕ್ತಿಯನ್ನು ಆಯ್ಕೆಮಾಡಿ ಹೆಸರು ಬರೆಯಿರಿ.
+Removed	ತೆಗೆದುಹಾಕಲಾಗಿದೆ
+Choose a person before adding a report.	ವರದಿ ಸೇರಿಸುವ ಮೊದಲು ವ್ಯಕ್ತಿಯನ್ನು ಆಯ್ಕೆಮಾಡಿ.
+Couldn't read this file. Choose it again from Files.	ಈ ಫೈಲ್ ಓದಲಾಗಲಿಲ್ಲ. ಫೈಲ್‌ಗಳಿಂದ ಮತ್ತೆ ಆಯ್ಕೆಮಾಡಿ.
+Couldn't add the report. Your original file is unchanged. Try again.	ವರದಿ ಸೇರಿಸಲಾಗಲಿಲ್ಲ. ನಿಮ್ಮ ಮೂಲ ಫೈಲ್ ಬದಲಾಗಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.
+Report added	ವರದಿ ಸೇರಿಸಲಾಗಿದೆ
+Choose a report for this person.	ಈ ವ್ಯಕ್ತಿಗೆ ವರದಿ ಆಯ್ಕೆಮಾಡಿ.
+Couldn't rename this report. Try again.	ಈ ವರದಿಯ ಹೆಸರು ಬದಲಿಸಲಾಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.
+Couldn't remove this report. Try again.	ಈ ವರದಿಯನ್ನು ತೆಗೆದುಹಾಕಲಾಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.
+Report removed	ವರದಿ ತೆಗೆದುಹಾಕಲಾಗಿದೆ
+Stop the recording first.	ಮೊದಲು ರೆಕಾರ್ಡಿಂಗ್ ನಿಲ್ಲಿಸಿ.
+Only the person who added these records can remove them.	ಈ ದಾಖಲೆಗಳನ್ನು ಸೇರಿಸಿದವರು ಮಾತ್ರ ಅವುಗಳನ್ನು ತೆಗೆದುಹಾಕಬಹುದು.
+Records removed	ದಾಖಲೆಗಳನ್ನು ತೆಗೆದುಹಾಕಲಾಗಿದೆ
+Still working on your last change. Please wait a moment.	ನಿಮ್ಮ ಕೊನೆಯ ಬದಲಾವಣೆ ಇನ್ನೂ ನಡೆಯುತ್ತಿದೆ. ದಯವಿಟ್ಟು ಸ್ವಲ್ಪ ಕಾಯಿರಿ.
+Couldn't save. Your entry is still here; please try again.	ಉಳಿಸಲಾಗಲಿಲ್ಲ. ನಿಮ್ಮ ನಮೂದು ಇಲ್ಲೇ ಇದೆ; ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.
+No profile details yet	ಇನ್ನೂ ಪ್ರೊಫೈಲ್ ವಿವರಗಳಿಲ್ಲ
+No allergies recorded	ಯಾವುದೇ ಅಲರ್ಜಿ ದಾಖಲಾಗಿಲ್ಲ
+Shared with the family and doctors you share this care with.	ನೀವು ಈ ಆರೈಕೆಯನ್ನು ಹಂಚಿಕೊಳ್ಳುವ ಕುಟುಂಬ ಮತ್ತು ವೈದ್ಯರೊಂದಿಗೆ ಹಂಚಿಕೊಳ್ಳಲಾಗಿದೆ.
+Android blocked reminders. Check notification and battery settings.	Android ಜ್ಞಾಪನೆಗಳನ್ನು ತಡೆದಿದೆ. ಅಧಿಸೂಚನೆ ಮತ್ತು ಬ್ಯಾಟರಿ ಸೆಟ್ಟಿಂಗ್‌ಗಳನ್ನು ಪರಿಶೀಲಿಸಿ.
+Listening…	ಕೇಳುತ್ತಿದ್ದೇವೆ…
+Checking the words…	ಪದಗಳನ್ನು ಪರಿಶೀಲಿಸುತ್ತಿದ್ದೇವೆ…
+This language isn't installed for dictation. Choose another language or type the words.	ಈ ಭಾಷೆ ಡಿಕ್ಟೇಶನ್‌ಗೆ ಇನ್‌ಸ್ಟಾಲ್ ಆಗಿಲ್ಲ. ಬೇರೆ ಭಾಷೆ ಆಯ್ಕೆಮಾಡಿ ಅಥವಾ ಪದಗಳನ್ನು ಟೈಪ್ ಮಾಡಿ.
+Allow microphone access to dictate, or type the words.	ಡಿಕ್ಟೇಟ್ ಮಾಡಲು ಮೈಕ್ರೊಫೋನ್ ಅನುಮತಿ ನೀಡಿ, ಅಥವಾ ಪದಗಳನ್ನು ಟೈಪ್ ಮಾಡಿ.
+No words were recognised. Tap Dictate to try again.	ಯಾವುದೇ ಪದಗಳು ಗುರುತಿಸಲ್ಪಡಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಲು ಡಿಕ್ಟೇಟ್ ಒತ್ತಿ.
+The microphone is busy. Stop other recording and try again.	ಮೈಕ್ರೊಫೋನ್ ಕಾರ್ಯನಿರತವಾಗಿದೆ. ಇತರ ರೆಕಾರ್ಡಿಂಗ್ ನಿಲ್ಲಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.
+Dictation couldn't finish. Your earlier words are safe. Try again or type.	ಡಿಕ್ಟೇಶನ್ ಪೂರ್ಣಗೊಳ್ಳಲಿಲ್ಲ. ನಿಮ್ಮ ಹಿಂದಿನ ಪದಗಳು ಸುರಕ್ಷಿತ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ ಅಥವಾ ಟೈಪ್ ಮಾಡಿ.
+No words were recognised. Try again or type.	ಯಾವುದೇ ಪದಗಳು ಗುರುತಿಸಲ್ಪಡಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ ಅಥವಾ ಟೈಪ್ ಮಾಡಿ.
+Words added. Check them below.	ಪದಗಳನ್ನು ಸೇರಿಸಲಾಗಿದೆ. ಕೆಳಗೆ ಪರಿಶೀಲಿಸಿ.
+These words need attention before they can be added.	ಸೇರಿಸುವ ಮೊದಲು ಈ ಪದಗಳನ್ನು ಸರಿಪಡಿಸಬೇಕು.
+For Hindi + English together, transcribe a saved recording below. This phone's dictation supports one language per turn.	ಹಿಂದಿ + ಇಂಗ್ಲಿಷ್ ಒಟ್ಟಿಗೆ ಇದ್ದರೆ, ಕೆಳಗೆ ಉಳಿಸಿದ ರೆಕಾರ್ಡಿಂಗ್ ಅನ್ನು ಪಠ್ಯಕ್ಕೆ ಬದಲಿಸಿ. ಈ ಫೋನ್‌ನ ಡಿಕ್ಟೇಶನ್ ಪ್ರತಿ ಸರದಿಗೆ ಒಂದೇ ಭಾಷೆಯನ್ನು ಬೆಂಬಲಿಸುತ್ತದೆ.
+Starting microphone…	ಮೈಕ್ರೊಫೋನ್ ಪ್ರಾರಂಭವಾಗುತ್ತಿದೆ…
+Couldn't start dictation. Check microphone access or type the words.	ಡಿಕ್ಟೇಶನ್ ಪ್ರಾರಂಭವಾಗಲಿಲ್ಲ. ಮೈಕ್ರೊಫೋನ್ ಅನುಮತಿ ಪರಿಶೀಲಿಸಿ ಅಥವಾ ಪದಗಳನ್ನು ಟೈಪ್ ಮಾಡಿ.
+Finishing this turn…	ಈ ಸರದಿ ಮುಗಿಸುತ್ತಿದ್ದೇವೆ…
+Listening stopped. Check the unfinished words.	ಕೇಳುವುದು ನಿಂತಿದೆ. ಅಪೂರ್ಣ ಪದಗಳನ್ನು ಪರಿಶೀಲಿಸಿ.
+Listening stopped	ಕೇಳುವುದು ನಿಂತಿದೆ
+Preparing voice…	ಧ್ವನಿ ಸಿದ್ಧವಾಗುತ್ತಿದೆ…
+Read aloud isn't available on this phone.	ಈ ಫೋನ್‌ನಲ್ಲಿ ಓದಿ ಹೇಳುವುದು ಲಭ್ಯವಿಲ್ಲ.
+Finished reading	ಓದುವುದು ಮುಗಿದಿದೆ
+Couldn't read this note. Try another installed language voice.	ಈ ಟಿಪ್ಪಣಿಯನ್ನು ಓದಲಾಗಲಿಲ್ಲ. ಬೇರೆ ಇನ್‌ಸ್ಟಾಲ್ ಮಾಡಿದ ಭಾಷೆಯ ಧ್ವನಿಯನ್ನು ಪ್ರಯತ್ನಿಸಿ.
+Downloading the Hindi language pack (about 30 MB)…	ಹಿಂದಿ ಭಾಷಾ ಪ್ಯಾಕ್ ಡೌನ್‌ಲೋಡ್ ಆಗುತ್ತಿದೆ (ಸುಮಾರು 30 MB)…
+Downloading the Telugu language pack (about 30 MB)…	ತೆಲುಗು ಭಾಷಾ ಪ್ಯಾಕ್ ಡೌನ್‌ಲೋಡ್ ಆಗುತ್ತಿದೆ (ಸುಮಾರು 30 MB)…
+Downloading the Kannada language pack (about 30 MB)…	ಕನ್ನಡ ಭಾಷಾ ಪ್ಯಾಕ್ ಡೌನ್‌ಲೋಡ್ ಆಗುತ್ತಿದೆ (ಸುಮಾರು 30 MB)…
+Downloading the Tamil language pack (about 30 MB)…	ತಮಿಳು ಭಾಷಾ ಪ್ಯಾಕ್ ಡೌನ್‌ಲೋಡ್ ಆಗುತ್ತಿದೆ (ಸುಮಾರು 30 MB)…
+Downloading the Urdu language pack (about 30 MB)…	ಉರ್ದು ಭಾಷಾ ಪ್ಯಾಕ್ ಡೌನ್‌ಲೋಡ್ ಆಗುತ್ತಿದೆ (ಸುಮಾರು 30 MB)…
+Downloading a language pack (about 30 MB)…	ಭಾಷಾ ಪ್ಯಾಕ್ ಡೌನ್‌ಲೋಡ್ ಆಗುತ್ತಿದೆ (ಸುಮಾರು 30 MB)…
+The voice is still preparing. Try Read aloud again in a moment.	ಧ್ವನಿ ಇನ್ನೂ ಸಿದ್ಧವಾಗುತ್ತಿದೆ. ಸ್ವಲ್ಪ ಸಮಯದ ನಂತರ ಮತ್ತೆ ಓದಿ ಹೇಳು ಒತ್ತಿ.
+No downloaded voice for this language. Choose another language or install its voice in phone settings.	ಈ ಭಾಷೆಗೆ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿದ ಧ್ವನಿ ಇಲ್ಲ. ಬೇರೆ ಭಾಷೆ ಆಯ್ಕೆಮಾಡಿ ಅಥವಾ ಫೋನ್ ಸೆಟ್ಟಿಂಗ್‌ಗಳಲ್ಲಿ ಅದರ ಧ್ವನಿಯನ್ನು ಇನ್‌ಸ್ಟಾಲ್ ಮಾಡಿ.
+Malayalam translation isn't available on this phone; reading the original words.	ಈ ಫೋನ್‌ನಲ್ಲಿ ಮಲಯಾಳಂ ಅನುವಾದ ಲಭ್ಯವಿಲ್ಲ; ಮೂಲ ಪದಗಳನ್ನು ಓದುತ್ತಿದ್ದೇವೆ.
+Uses any network, including mobile data.	ಮೊಬೈಲ್ ಡೇಟಾ ಸೇರಿದಂತೆ ಯಾವುದೇ ನೆಟ್‌ವರ್ಕ್ ಬಳಸುತ್ತದೆ.
+Some lines could not be checked, so they are read in the original words.	ಕೆಲವು ಸಾಲುಗಳನ್ನು ಪರಿಶೀಲಿಸಲಾಗಲಿಲ್ಲ, ಆದ್ದರಿಂದ ಅವುಗಳನ್ನು ಮೂಲ ಪದಗಳಲ್ಲಿ ಓದಲಾಗುತ್ತಿದೆ.
+Couldn't translate this note on this phone. Check the internet connection for the language pack and try again.	ಈ ಫೋನ್‌ನಲ್ಲಿ ಈ ಟಿಪ್ಪಣಿಯನ್ನು ಅನುವಾದಿಸಲಾಗಲಿಲ್ಲ. ಭಾಷಾ ಪ್ಯಾಕ್‌ಗಾಗಿ ಇಂಟರ್ನೆಟ್ ಪರಿಶೀಲಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.
+Reading aloud	ಓದಿ ಹೇಳುತ್ತಿದ್ದೇವೆ
+Couldn't start reading. Try again.	ಓದುವುದು ಪ್ರಾರಂಭವಾಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.
+The words are translated on this phone for listening only. The saved note is not changed. Check anything important with the care team.	ಪದಗಳನ್ನು ಕೇಳಲು ಮಾತ್ರ ಈ ಫೋನ್‌ನಲ್ಲಿ ಅನುವಾದಿಸಲಾಗುತ್ತದೆ. ಉಳಿಸಿದ ಟಿಪ್ಪಣಿ ಬದಲಾಗುವುದಿಲ್ಲ. ಮುಖ್ಯ ವಿಷಯಗಳನ್ನು ಆರೈಕೆ ತಂಡದೊಂದಿಗೆ ಪರಿಶೀಲಿಸಿ.
+No doctor linked	ಯಾವ ವೈದ್ಯರೂ ಸಂಪರ್ಕಗೊಂಡಿಲ್ಲ
+View doctor's details	ವೈದ್ಯರ ವಿವರಗಳನ್ನು ನೋಡಿ
+Speciality	ವಿಶೇಷತೆ
+Clinic	ಕ್ಲಿನಿಕ್
+Verification pending	ದೃಢೀಕರಣ ಬಾಕಿ ಇದೆ
+Not verified	ದೃಢೀಕರಿಸಲಾಗಿಲ್ಲ
+Sahara has not confirmed this doctor's professional identity.	ಈ ವೈದ್ಯರ ವೃತ್ತಿಪರ ಗುರುತನ್ನು Sahara ದೃಢೀಕರಿಸಿಲ್ಲ.
+Body	ದೇಹ
+Health	ಆರೋಗ್ಯ
+Contact	ಸಂಪರ್ಕ
+Allergies (optional)	ಅಲರ್ಜಿಗಳು (ಐಚ್ಛಿಕ)
+All patients	ಎಲ್ಲ ರೋಗಿಗಳು
+No visits on $label	$label ರಂದು ಯಾವುದೇ ಭೇಟಿಗಳಿಲ್ಲ
+Visit with ${patient.name}	${patient.name} ಜೊತೆ ಭೇಟಿ
+Time not set	ಸಮಯ ನಿಗದಿಯಾಗಿಲ್ಲ
+Doctor: $doctor	ವೈದ್ಯರು: $doctor
+Appointment logistics: $note	ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ವ್ಯವಸ್ಥೆ: $note
+Choose a patient	ರೋಗಿಯನ್ನು ಆಯ್ಕೆಮಾಡಿ
+Search patients by name	ಹೆಸರಿನಿಂದ ರೋಗಿಗಳನ್ನು ಹುಡುಕಿ
+Add document	ದಾಖಲೆ ಸೇರಿಸಿ
+Find dates, results and doses	ದಿನಾಂಕಗಳು, ಫಲಿತಾಂಶಗಳು ಮತ್ತು ಡೋಸ್‌ಗಳನ್ನು ಹುಡುಕಿ
+Scan with camera	ಕ್ಯಾಮೆರಾದಿಂದ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ
+Take a photo of a paper report or prescription.	ಕಾಗದದ ವರದಿ ಅಥವಾ ಪ್ರಿಸ್ಕ್ರಿಪ್ಷನ್‌ನ ಫೋಟೋ ತೆಗೆಯಿರಿ.
+Upload a file	ಫೈಲ್ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ
+Choose a PDF or photo already on this phone.	ಈ ಫೋನ್‌ನಲ್ಲಿ ಈಗಾಗಲೇ ಇರುವ PDF ಅಥವಾ ಫೋಟೋ ಆಯ್ಕೆಮಾಡಿ.
+Verified clinician	ದೃಢೀಕೃತ ವೈದ್ಯರು
+Palliative medicine	ಪ್ಯಾಲಿಯೇಟಿವ್ ಮೆಡಿಸಿನ್
+Sahara Practice Hospital	ಸಹಾರಾ ಅಭ್ಯಾಸ ಆಸ್ಪತ್ರೆ
+Palliative care unit · Hyderabad	ಪ್ಯಾಲಿಯೇಟಿವ್ ಕೇರ್ ವಿಭಾಗ · ಹೈದರಾಬಾದ್
+Experience	ಅನುಭವ
+12 yrs	12 ವರ್ಷ
+Languages	ಭಾಷೆಗಳು
+Registration: practice sample, not a real number	ನೋಂದಣಿ: ಅಭ್ಯಾಸ ಮಾದರಿ, ನಿಜವಾದ ಸಂಖ್ಯೆ ಅಲ್ಲ
+Sample profile for the walkthrough. Real doctors are verified by the Sahara team against the medical council register.	ಇದು ವಾಕ್‌ಥ್ರೂಗಾಗಿ ಮಾದರಿ ಪ್ರೊಫೈಲ್. ನಿಜವಾದ ವೈದ್ಯರನ್ನು ಸಹಾರಾ ತಂಡ ಮೆಡಿಕಲ್ ಕೌನ್ಸಿಲ್ ರಿಜಿಸ್ಟರ್‌ನೊಂದಿಗೆ ದೃಢೀಕರಿಸುತ್ತದೆ.

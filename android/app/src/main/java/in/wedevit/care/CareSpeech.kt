@@ -33,6 +33,13 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import java.util.Locale
 
 data class CareSpeechLanguage(val tag: String, val label: String)
@@ -62,20 +69,20 @@ private class CareDictation(private val context: Context, val changed: () -> Uni
         check(available)
         return SpeechRecognizer.createOnDeviceSpeechRecognizer(context).also { next ->
                 next.setRecognitionListener(object : RecognitionListener {
-                    override fun onReadyForSpeech(params: Bundle?) { if (accepts(turn)) { status = "Listening…"; changed() } }
+                    override fun onReadyForSpeech(params: Bundle?) { if (accepts(turn)) { status = speechTr("Listening…", "सुन रहे हैं…"); changed() } }
                     override fun onBeginningOfSpeech() = Unit
                     override fun onRmsChanged(rmsdB: Float) { if (accepts(turn)) { level = ((rmsdB + 2f) / 12f).coerceIn(0f, 1f); changed() } }
                     override fun onBufferReceived(buffer: ByteArray?) = Unit
-                    override fun onEndOfSpeech() { if (accepts(turn)) { listening = false; processing = true; level = 0f; status = "Checking the words…"; changed() } }
+                    override fun onEndOfSpeech() { if (accepts(turn)) { listening = false; processing = true; level = 0f; status = speechTr("Checking the words…", "शब्द जाँच रहे हैं…"); changed() } }
                     override fun onError(error: Int) {
                         if (!accepts(turn)) return
                         accepting = false; listening = false; processing = false; partial = ""; level = 0f
                         status = when (error) {
-                            SpeechRecognizer.ERROR_LANGUAGE_NOT_SUPPORTED, SpeechRecognizer.ERROR_LANGUAGE_UNAVAILABLE -> "This language isn't installed for dictation. Choose another language or type the words."
-                            SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS -> "Allow microphone access to dictate, or type the words."
-                            SpeechRecognizer.ERROR_NO_MATCH, SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> "No words were recognised. Tap Dictate to try again."
-                            SpeechRecognizer.ERROR_RECOGNIZER_BUSY -> "The microphone is busy. Stop other recording and try again."
-                            else -> "Dictation couldn't finish. Your earlier words are safe. Try again or type."
+                            SpeechRecognizer.ERROR_LANGUAGE_NOT_SUPPORTED, SpeechRecognizer.ERROR_LANGUAGE_UNAVAILABLE -> speechTr("This language isn't installed for dictation. Choose another language or type the words.", "इस भाषा के लिए बोलकर लिखना इंस्टॉल नहीं है। दूसरी भाषा चुनें या शब्द लिखें।")
+                            SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS -> speechTr("Allow microphone access to dictate, or type the words.", "बोलकर लिखने के लिए माइक की अनुमति दें, या शब्द लिखें।")
+                            SpeechRecognizer.ERROR_NO_MATCH, SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> speechTr("No words were recognised. Tap Dictate to try again.", "कोई शब्द पहचाने नहीं गए। फिर कोशिश के लिए Dictate दबाएँ।")
+                            SpeechRecognizer.ERROR_RECOGNIZER_BUSY -> speechTr("The microphone is busy. Stop other recording and try again.", "माइक व्यस्त है। दूसरी रिकॉर्डिंग रोककर फिर कोशिश करें।")
+                            else -> speechTr("Dictation couldn't finish. Your earlier words are safe. Try again or type.", "बोलकर लिखना पूरा नहीं हो सका। पहले के शब्द सुरक्षित हैं। फिर कोशिश करें या लिखें।")
                         }
                         changed()
                     }
@@ -84,9 +91,9 @@ private class CareDictation(private val context: Context, val changed: () -> Uni
                         accepting = false; listening = false; processing = false; level = 0f
                         val words = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.firstOrNull().orEmpty()
                         partial = ""; status = when {
-                            words.isBlank() -> "No words were recognised. Try again or type."
-                            result(words) -> "Words added. Check them below."
-                            else -> "These words need attention before they can be added."
+                            words.isBlank() -> speechTr("No words were recognised. Try again or type.", "कोई शब्द पहचाने नहीं गए। फिर कोशिश करें या लिखें।")
+                            result(words) -> speechTr("Words added. Check them below.", "शब्द जुड़ गए। नीचे जाँचें।")
+                            else -> speechTr("These words need attention before they can be added.", "इन शब्दों को जोड़ने से पहले ध्यान चाहिए।")
                         }
                         changed()
                     }
@@ -99,9 +106,9 @@ private class CareDictation(private val context: Context, val changed: () -> Uni
     fun start(language: String) {
         if (disposed || accepting) return
         if (!available) return
-        if (language == "hi-en" && Build.VERSION.SDK_INT < 34) { status = "For Hindi + English together, transcribe a saved recording below. This phone's dictation supports one language per turn."; changed(); return }
+        if (language == "hi-en" && Build.VERSION.SDK_INT < 34) { status = speechTr("For Hindi + English together, transcribe a saved recording below. This phone's dictation supports one language per turn.", "हिन्दी + English साथ में लिखने के लिए नीचे सहेजी रिकॉर्डिंग से लिखाई बनाएँ। इस फ़ोन पर हर बारी एक ही भाषा चलती है।"); changed(); return }
         val turn = ++generation
-        accepting = true; listening = true; processing = false; partial = ""; level = 0f; status = "Starting microphone…"; changed()
+        accepting = true; listening = true; processing = false; partial = ""; level = 0f; status = speechTr("Starting microphone…", "माइक शुरू हो रहा है…"); changed()
         try {
             runCatching { recognizer?.destroy() }
             val next = recognizerFor(turn).also { recognizer = it }
@@ -118,11 +125,11 @@ private class CareDictation(private val context: Context, val changed: () -> Uni
                 putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
                 putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true)
             })
-        } catch (_: Exception) { accepting = false; listening = false; processing = false; status = "Couldn't start dictation. Check microphone access or type the words."; changed() }
+        } catch (_: Exception) { accepting = false; listening = false; processing = false; status = speechTr("Couldn't start dictation. Check microphone access or type the words.", "बोलकर लिखना शुरू नहीं हो सका। माइक की अनुमति जाँचें या शब्द लिखें।"); changed() }
     }
 
-    fun stop() { if (accepting && listening) { listening = false; processing = true; status = "Finishing this turn…"; runCatching { recognizer?.stopListening() }.onFailure { cancel() }; changed() } }
-    fun cancel(keepWords: Boolean = true) { generation++; accepting = false; runCatching { recognizer?.cancel(); recognizer?.destroy() }; recognizer = null; listening = false; processing = false; status = if (keepWords && partial.isNotBlank()) "Listening stopped. Check the unfinished words." else "Listening stopped"; partial = ""; level = 0f; changed() }
+    fun stop() { if (accepting && listening) { listening = false; processing = true; status = speechTr("Finishing this turn…", "यह बारी पूरी हो रही है…"); runCatching { recognizer?.stopListening() }.onFailure { cancel() }; changed() } }
+    fun cancel(keepWords: Boolean = true) { generation++; accepting = false; runCatching { recognizer?.cancel(); recognizer?.destroy() }; recognizer = null; listening = false; processing = false; status = if (keepWords && partial.isNotBlank()) speechTr("Listening stopped. Check the unfinished words.", "सुनना रुक गया। अधूरे शब्द जाँचें।") else speechTr("Listening stopped", "सुनना रुक गया"); partial = ""; level = 0f; changed() }
     fun close() { disposed = true; generation++; accepting = false; runCatching { recognizer?.cancel(); recognizer?.destroy() }; recognizer = null }
 }
 
@@ -219,51 +226,113 @@ private class CareDictation(private val context: Context, val changed: () -> Uni
     }
 }
 
+/** Status text for classes that are not composables; follows the header language. */
+private fun speechTr(en: String, hi: String) = careTr(CareLanguageState.shown, en, hi)
+
 internal class CareReadAloud(context: Context, val changed: () -> Unit) {
     private val handler = Handler(Looper.getMainLooper())
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+    private val translation by lazy { CareOfflineTranslation() }
+    private var job: Job? = null
     private var engine: TextToSpeech? = null
     private var closed = false
     private var ready = false
     private var generation = 0
     private var lastUtterance = ""
     var speaking = false; private set
-    var status = "Preparing voice…"; private set
+    /** True while a language pack downloads or the note is being translated, before any speech starts. */
+    var working = false; private set
+    val busy: Boolean get() = speaking || working
+    var status = speechTr("Preparing voice…", "आवाज़ तैयार हो रही है…"); private set
     init {
         engine = TextToSpeech(context.applicationContext) { result -> handler.post {
-            if (!closed) { ready = result == TextToSpeech.SUCCESS; status = if (ready) "" else "Read aloud isn't available on this phone."; changed() }
+            if (!closed) { ready = result == TextToSpeech.SUCCESS; status = if (ready) "" else speechTr("Read aloud isn't available on this phone.", "इस फ़ोन पर पढ़कर सुनाना उपलब्ध नहीं है।"); changed() }
         } }.also { tts ->
             tts.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
                 override fun onStart(utteranceId: String?) = Unit
-                override fun onDone(utteranceId: String?) { handler.post { if (!closed && utteranceId == lastUtterance) { speaking = false; status = "Finished reading"; changed() } } }
+                override fun onDone(utteranceId: String?) { handler.post { if (!closed && utteranceId == lastUtterance) { speaking = false; status = speechTr("Finished reading", "पढ़ना पूरा हुआ"); changed() } } }
                 @Deprecated("Required by Android TTS")
                 override fun onError(utteranceId: String?) { fail(utteranceId) }
                 override fun onError(utteranceId: String?, errorCode: Int) { fail(utteranceId) }
             })
         }
     }
-    private fun fail(id: String?) { handler.post { if (!closed && id?.startsWith("care-$generation-") == true) { engine?.stop(); speaking = false; status = "Couldn't read this note. Try another installed language voice."; changed() } } }
+    private fun fail(id: String?) { handler.post { if (!closed && id?.startsWith("care-$generation-") == true) { engine?.stop(); speaking = false; status = speechTr("Couldn't read this note. Try another installed language voice.", "यह नोट पढ़ा नहीं जा सका। किसी दूसरी इंस्टॉल की हुई भाषा की आवाज़ आज़माएँ।"); changed() } } }
+
+    // Each string is a full literal so the dictionary lookup in careTr can match it.
+    private fun packDownloadStatus(code: String) = when (code) {
+        "hi" -> speechTr("Downloading the Hindi language pack (about 30 MB)…", "हिन्दी भाषा पैक डाउनलोड हो रहा है (लगभग 30 MB)…")
+        "te" -> speechTr("Downloading the Telugu language pack (about 30 MB)…", "तेलुगु भाषा पैक डाउनलोड हो रहा है (लगभग 30 MB)…")
+        "kn" -> speechTr("Downloading the Kannada language pack (about 30 MB)…", "कन्नड़ भाषा पैक डाउनलोड हो रहा है (लगभग 30 MB)…")
+        "ta" -> speechTr("Downloading the Tamil language pack (about 30 MB)…", "तमिल भाषा पैक डाउनलोड हो रहा है (लगभग 30 MB)…")
+        "ur" -> speechTr("Downloading the Urdu language pack (about 30 MB)…", "उर्दू भाषा पैक डाउनलोड हो रहा है (लगभग 30 MB)…")
+        else -> speechTr("Downloading a language pack (about 30 MB)…", "भाषा पैक डाउनलोड हो रहा है (लगभग 30 MB)…")
+    }
+
     fun read(text: String, languageTag: String) {
         val tts = engine ?: return
         if (closed) return
-        if (!ready) { status = "The voice is still preparing. Try Read aloud again in a moment."; changed(); return }
+        if (!ready) { status = speechTr("The voice is still preparing. Try Read aloud again in a moment.", "आवाज़ अभी तैयार हो रही है। थोड़ी देर बाद फिर पढ़कर सुनाएँ दबाएँ।"); changed(); return }
         stop()
-        val language = Locale.forLanguageTag(languageTag)
+        // Hindi + English reads the original words with the Hindi voice; nothing is translated.
+        val voiceTag = if (languageTag == "hi-en") "hi-IN" else languageTag
+        val language = Locale.forLanguageTag(voiceTag)
         val voices = runCatching { tts.voices.orEmpty() }.getOrDefault(emptySet())
         val voice = voices.filter { !it.isNetworkConnectionRequired && it.locale.language == language.language && TextToSpeech.Engine.KEY_FEATURE_NOT_INSTALLED !in it.features.orEmpty() }
             .sortedWith(compareByDescending<android.speech.tts.Voice> { it.locale.country == language.country }.thenByDescending { it.quality }).firstOrNull()
-        if (voice == null || tts.setVoice(voice) != TextToSpeech.SUCCESS) { status = "No downloaded voice for this language. Choose another language or install its voice in phone settings."; changed(); return }
-        val chunks = CareDraftAssist.speechChunks(text, TextToSpeech.getMaxSpeechInputLength().coerceAtLeast(1))
-        if (chunks.isEmpty()) return
-        generation++; lastUtterance = "care-$generation-${chunks.lastIndex}"
-        speaking = true; status = "Reading in ${careSpeechLanguages.firstOrNull { it.tag == languageTag }?.label ?: language.displayLanguage}"; changed()
-        chunks.forEachIndexed { index, chunk ->
-            if (tts.speak(chunk, if (index == 0) TextToSpeech.QUEUE_FLUSH else TextToSpeech.QUEUE_ADD, null, "care-$generation-$index") != TextToSpeech.SUCCESS) {
-                tts.stop(); speaking = false; status = "Couldn't start reading. Try again."; changed(); return
+        if (voice == null) { status = speechTr("No downloaded voice for this language. Choose another language or install its voice in phone settings.", "इस भाषा की डाउनलोड की हुई आवाज़ नहीं है। दूसरी भाषा चुनें या फ़ोन की सेटिंग में उसकी आवाज़ इंस्टॉल करें।"); changed(); return }
+        val label = careSpeechLanguages.firstOrNull { it.tag == languageTag }?.label ?: language.displayLanguage
+        val lines = text.lines().filter(String::isNotBlank)
+        if (lines.isEmpty()) return
+        val base = language.language
+        val needsTranslation = languageTag != "hi-en" && lines.any { line -> CareOfflineTranslation.scriptLanguage(line).let { it != null && it != base } }
+        if (!needsTranslation) { speak(tts, voice, text, label, ""); return }
+        val target = CareOfflineTranslation.mlKitCode(base)
+        if (target == null) {
+            speak(tts, voice, text, label, speechTr("Malayalam translation isn't available on this phone; reading the original words.", "इस फ़ोन पर मलयालम अनुवाद उपलब्ध नहीं है; मूल शब्द पढ़ रहे हैं।"))
+            return
+        }
+        val turn = generation
+        working = true; status = speechTr("Translating…", "अनुवाद हो रहा है…"); changed()
+        job = scope.launch {
+            try {
+                val needed = (lines.mapNotNull { CareOfflineTranslation.scriptLanguage(it)?.let(CareOfflineTranslation::mlKitCode) } + target).toSet()
+                // No Wi-Fi-only preference exists for read aloud, so say plainly that mobile data may be used.
+                for (pack in needed - translation.installedLanguages()) {
+                    status = packDownloadStatus(pack) + " " + speechTr("Uses any network, including mobile data.", "किसी भी नेटवर्क, यहाँ तक कि मोबाइल डेटा, का उपयोग होता है।"); changed()
+                    translation.downloadPack(pack, wifiOnly = false)
+                }
+                status = speechTr("Translating…", "अनुवाद हो रहा है…"); changed()
+                val result = translation.translateForSpeech(lines, base) { _, _ -> }
+                if (closed || turn != generation) return@launch
+                working = false
+                val note = if (result.keptOriginal > 0) speechTr("Some lines could not be checked, so they are read in the original words.", "कुछ पंक्तियाँ जाँची नहीं जा सकीं, इसलिए उन्हें मूल शब्दों में पढ़ रहे हैं।") else ""
+                speak(tts, voice, result.lines.joinToString("\n"), label, note)
+            } catch (failure: Exception) {
+                if (failure is CancellationException) throw failure
+                if (closed || turn != generation) return@launch
+                working = false
+                status = speechTr("Couldn't translate this note on this phone. Check the internet connection for the language pack and try again.", "इस फ़ोन पर यह नोट अनुवाद नहीं हो सका। भाषा पैक के लिए इंटरनेट जाँचें और फिर कोशिश करें।"); changed()
             }
         }
     }
-    fun stop() { generation++; lastUtterance = ""; engine?.stop(); speaking = false; status = ""; changed() }
-    fun close() { closed = true; engine?.stop(); engine?.shutdown(); engine = null }
+
+    private fun speak(tts: TextToSpeech, voice: android.speech.tts.Voice, text: String, label: String, note: String) {
+        if (tts.setVoice(voice) != TextToSpeech.SUCCESS) { working = false; status = speechTr("No downloaded voice for this language. Choose another language or install its voice in phone settings.", "इस भाषा की डाउनलोड की हुई आवाज़ नहीं है। दूसरी भाषा चुनें या फ़ोन की सेटिंग में उसकी आवाज़ इंस्टॉल करें।"); changed(); return }
+        val chunks = CareDraftAssist.speechChunks(text, TextToSpeech.getMaxSpeechInputLength().coerceAtLeast(1))
+        if (chunks.isEmpty()) { working = false; changed(); return }
+        generation++; lastUtterance = "care-$generation-${chunks.lastIndex}"
+        speaking = true
+        status = if (note.isBlank()) "$label · ${speechTr("Reading aloud", "पढ़कर सुना रहे हैं")}" else note
+        changed()
+        chunks.forEachIndexed { index, chunk ->
+            if (tts.speak(chunk, if (index == 0) TextToSpeech.QUEUE_FLUSH else TextToSpeech.QUEUE_ADD, null, "care-$generation-$index") != TextToSpeech.SUCCESS) {
+                tts.stop(); speaking = false; status = speechTr("Couldn't start reading. Try again.", "पढ़ना शुरू नहीं हो सका। फिर कोशिश करें।"); changed(); return
+            }
+        }
+    }
+    fun stop() { generation++; lastUtterance = ""; job?.cancel(); job = null; working = false; engine?.stop(); speaking = false; status = ""; changed() }
+    fun close() { closed = true; scope.cancel(); engine?.stop(); engine?.shutdown(); engine = null }
 }
 
 @Composable fun CareReadAloudControl(text: String, identity: String, initialLanguage: String = "en-IN") { val t = careText();
@@ -281,12 +350,12 @@ internal class CareReadAloud(context: Context, val changed: () -> Unit) {
     @Suppress("UNUSED_VARIABLE") val callbackRevision = revision
     SurfaceCard(Mint) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            FilledTonalButton(onClick = { if (reader.speaking) reader.stop() else reader.read(text, language) }, modifier = Modifier.testTag("note-read-aloud"), colors = ButtonDefaults.filledTonalButtonColors(containerColor = Sage, contentColor = Ink)) {
-                Icon(if (reader.speaking) Icons.Default.Stop else Icons.Default.VolumeUp, null, Modifier.size(18.dp)); Spacer(Modifier.width(7.dp)); Text(if (reader.speaking) t("Stop reading", "पढ़ना रोकें") else t("Read aloud", "पढ़कर सुनाएँ"))
+            FilledTonalButton(onClick = { if (reader.busy) reader.stop() else reader.read(text, language) }, modifier = Modifier.testTag("note-read-aloud"), colors = ButtonDefaults.filledTonalButtonColors(containerColor = Sage, contentColor = Ink)) {
+                Icon(if (reader.busy) Icons.Default.Stop else Icons.Default.VolumeUp, null, Modifier.size(18.dp)); Spacer(Modifier.width(7.dp)); Text(if (reader.busy) t("Stop reading", "पढ़ना रोकें") else t("Read aloud", "पढ़कर सुनाएँ"))
             }
         }
         CareLanguageMenu(language) { language = it }
         if (reader.status.isNotBlank()) Text(reader.status, style = MaterialTheme.typography.bodySmall)
-        Text(t("Downloaded voice only; the note's words stay unchanged.", "सिर्फ़ डाउनलोड की गई आवाज़; नोट के शब्द नहीं बदलते।"), style = MaterialTheme.typography.bodySmall)
+        Text(t("The words are translated on this phone for listening only. The saved note is not changed. Check anything important with the care team.", "शब्द सिर्फ़ सुनने के लिए इसी फ़ोन पर अनुवाद होते हैं। सहेजा हुआ नोट नहीं बदलता। कोई भी ज़रूरी बात केयर टीम से जाँच लें।"), style = MaterialTheme.typography.bodySmall)
     }
 }

@@ -6,6 +6,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -29,10 +30,16 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import java.time.LocalDate
 
+/** The day a result belongs to: its report date, or the day it was added when no date was recorded (never 1970). */
+internal fun labEpoch(item: CareItem): Long = if (item.due > 86_400_000L) item.due else item.created
+
+internal fun labDateText(item: CareItem, t: (String, String) -> String): String =
+    if (item.due > 86_400_000L) date(item.due) else if (item.created > 86_400_000L) t("${date(item.created)} (date added)", "${date(item.created)} (जोड़ने की तारीख़)") else t("Date not recorded", "तारीख़ दर्ज नहीं")
+
 fun labGroups(items: List<CareItem>): List<List<Pair<CareItem, CareEntry>>> = items.mapNotNull { item ->
     CareEntryCodec.decode(item.detail)?.takeIf { it.type == "lab" }?.let { item to it }
 }.groupBy { (item, data) -> item.title.trim().lowercase() to data.unit.trim() }.values
-    .map { values -> values.sortedByDescending { it.first.due } }.sortedByDescending { it.first().first.due }
+    .map { values -> values.sortedByDescending { labEpoch(it.first) } }.sortedByDescending { labEpoch(it.first().first) }
 
 @Composable fun CareLabs(vm: CareModel) { val t = careText();
     val entries by vm.items.collectAsStateWithLifecycle()
@@ -68,41 +75,77 @@ fun labGroups(items: List<CareItem>): List<List<Pair<CareItem, CareEntry>>> = it
     editingDay?.let { day -> TreatmentDayEditor(vm, day) { editingDay = null } }
 }
 
-@Composable private fun LabHistoryCard(vm: CareModel, values: List<Pair<CareItem, CareEntry>>, treatmentDays: List<TreatmentDay>, onEdit: (CareItem) -> Unit) {
+@Composable private fun LabHistoryCard(vm: CareModel, values: List<Pair<CareItem, CareEntry>>, treatmentDays: List<TreatmentDay>, onEdit: (CareItem) -> Unit) { val t = careText();
     val latest = values.first()
     SurfaceCard {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Column(Modifier.weight(1f)) { Text(latest.first.title, fontWeight = FontWeight.Medium, fontSize = 18.sp, fontFamily = SaharaTitleFont); Text("${latest.second.value} ${latest.second.unit}", color = Rust, fontSize = 24.sp, fontWeight = FontWeight.SemiBold); Text("${date(latest.first.due)} · ${values.size} ${if (values.size == 1) "result" else "results"}", style = MaterialTheme.typography.bodySmall) }
+            Column(Modifier.weight(1f)) { Text(latest.first.title, fontWeight = FontWeight.Medium, fontSize = 18.sp, fontFamily = SaharaTitleFont); Text("${latest.second.value} ${latest.second.unit}", color = Rust, fontSize = 24.sp, fontWeight = FontWeight.SemiBold); Text("${labDateText(latest.first, t)} · ${values.size} ${if (values.size == 1) "result" else "results"}", style = MaterialTheme.typography.bodySmall) }
         }
         if (values.size > 1) LabHistoryPlot(values, treatmentDays)
         values.forEach { (item, data) -> LabResultRow(vm, item, data, showDate = true, onEdit = { onEdit(item) }) }
     }
 }
 
+private fun labNum(v: Double): String = v.toBigDecimal().setScale(2, java.math.RoundingMode.HALF_UP).stripTrailingZeros().toPlainString()
+
+/** Printed low/high from the newest result's range fields or text such as "13.0–17.0 g/dL". */
+private fun labRange(data: CareEntry): Pair<Double?, Double?> {
+    val low = data.rangeLow.toDoubleOrNull(); val high = data.rangeHigh.toDoubleOrNull()
+    if (low != null || high != null) return low to high
+    val nums = Regex("""\d+(?:\.\d+)?""").findAll(data.rangeText).mapNotNull { it.value.toDoubleOrNull() }.toList()
+    return if (nums.size == 2 && nums[0] <= nums[1]) nums[0] to nums[1] else null to null
+}
+
 @Composable private fun LabHistoryPlot(values: List<Pair<CareItem, CareEntry>>, treatmentDays: List<TreatmentDay>) { val t = careText();
-    val points = values.mapNotNull { (item, entry) -> entry.value.toDoubleOrNull()?.takeIf { it.isFinite() }?.let { item.due.toDouble() to it } }.sortedBy { it.first }
+    // oldest first; sortedBy is stable so results sharing a day stay in recorded order
+    val points = values.reversed().mapNotNull { (item, entry) -> entry.value.toDoubleOrNull()?.takeIf { it.isFinite() }?.let { labEpoch(item).toDouble() to it } }.sortedBy { it.first }
     if (points.size < 2) return
+    val unit = values.first().second.unit
+    val (refLow, refHigh) = labRange(values.first().second)
     val firstTime = points.first().first
-    val timeSpan = (points.last().first - firstTime).coerceAtLeast(1.0)
-    val min = points.minOf { it.second }
-    val max = points.maxOf { it.second }
-    val span = (max - min).takeIf { it > 0 } ?: 1.0
-    val markers = TreatmentDayRules.within(treatmentDays, firstTime.toLong(), points.last().first.toLong())
-    Row(Modifier.fillMaxWidth().padding(top = 12.dp), horizontalArrangement = Arrangement.SpaceBetween) { Text("${min.toBigDecimal().stripTrailingZeros().toPlainString()}–${max.toBigDecimal().stripTrailingZeros().toPlainString()} ${values.first().second.unit}", style = MaterialTheme.typography.labelSmall); Text(t("Recorded values", "दर्ज मान"), style = MaterialTheme.typography.labelSmall) }
-    val range = "${min.toBigDecimal().stripTrailingZeros().toPlainString()} to ${max.toBigDecimal().stripTrailingZeros().toPlainString()} ${values.first().second.unit}"
-    Canvas(Modifier.fillMaxWidth().height(82.dp).padding(vertical = 10.dp).semantics { contentDescription = t("Chart of ${points.size} recorded values, from $range. Each value is listed below.", "${points.size} दर्ज मानों का चार्ट, $range तक। हर मान नीचे लिखा है।") }) {
-        val padding = 8.dp.toPx()
-        val plotWidth = size.width - padding * 2
-        val plotHeight = size.height - padding * 2
-        val offsets = points.map { (time, value) -> Offset(padding + ((time - firstTime) / timeSpan * plotWidth).toFloat(), if (max == min) size.height / 2 else padding + ((max - value) / span * plotHeight).toFloat()) }
-        markers.forEach { day ->
-            val x = padding + ((careEpoch(careDay(day.item.due)) - firstTime) / timeSpan * plotWidth).toFloat().coerceIn(0f, plotWidth)
-            drawLine(if (day.category == "Chemotherapy") DoctorStatusWarn else Ink, Offset(x, 0f), Offset(x, size.height), 1.5.dp.toPx(), pathEffect = PathEffect.dashPathEffect(floatArrayOf(5.dp.toPx(), 4.dp.toPx())))
-        }
-        offsets.zipWithNext().forEach { (from, to) -> drawLine(Rust, from, to, 2.dp.toPx()) }
-        offsets.forEach { drawCircle(Rust, 4.dp.toPx(), it) }
+    val lastTime = points.last().first
+    val markers = TreatmentDayRules.within(treatmentDays, firstTime.toLong(), lastTime.toLong())
+    val dataMin = points.minOf { it.second }; val dataMax = points.maxOf { it.second }
+    val lowEdge = listOfNotNull(dataMin, refLow, refHigh).min(); val highEdge = listOfNotNull(dataMax, refLow, refHigh).max()
+    val pad = ((highEdge - lowEdge).takeIf { it > 0 } ?: kotlin.math.abs(highEdge).coerceAtLeast(1.0)) * 0.12
+    // Round the axis to a tidy step (1, 2, 2.5, 5 × 10ⁿ) so gridlines read 8, 10, 12… rather than 8.94, 11.91.
+    val rawStep = ((highEdge + pad) - (lowEdge - pad)) / 3.0
+    val magnitude = Math.pow(10.0, kotlin.math.floor(kotlin.math.log10(rawStep.coerceAtLeast(1e-9))))
+    val step = listOf(1.0, 2.0, 2.5, 5.0, 10.0).map { it * magnitude }.first { it >= rawStep }
+    val yMin = kotlin.math.floor((lowEdge - pad) / step) * step; val yMax = kotlin.math.ceil((highEdge + pad) / step) * step
+    val ticks = generateSequence(yMin) { it + step }.takeWhile { it <= yMax + step / 2 }.toList()
+    val bands = if (refLow != null || refHigh != null) listOf(ChartBand(refLow ?: yMin, refHigh ?: yMax, Mint, 0.7f)) else emptyList()
+    // A date under every result (the newest bold); labels that would overlap are dropped by the chart.
+    val xLabels = buildList {
+        add(ChartXLabel(lastTime, shortLabDate(lastTime.toLong()), strong = true))
+        points.dropLast(1).asReversed().forEach { add(ChartXLabel(it.first, shortLabDate(it.first.toLong()))) }
     }
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { Text(date(points.first().first.toLong()), style = MaterialTheme.typography.labelSmall); Text(date(points.last().first.toLong()), style = MaterialTheme.typography.labelSmall) }
+    val summary = points.joinToString("; ") { (time, v) -> "${date(time.toLong())}: ${labNum(v)} $unit" }
+    val rangeText = if (bands.isEmpty()) "" else t(" Printed range ${labNum(refLow ?: yMin)} to ${labNum(refHigh ?: yMax)} $unit.", " छपी सीमा ${labNum(refLow ?: yMin)} से ${labNum(refHigh ?: yMax)} $unit।")
+    Text(t("Recorded values ($unit)", "दर्ज मान ($unit)"), style = MaterialTheme.typography.labelSmall, modifier = Modifier.padding(top = 12.dp))
+    CareLineChart(
+        points = points.map { ChartPoint(it.first, it.second) }, yMin = yMin, yMax = yMax, yTicks = ticks, yText = { labNum(it) },
+        xLabels = xLabels, latestText = labNum(points.last().second), tag = "lab-trend", height = 200.dp, bands = bands, pointText = { labNum(it) },
+        markers = markers.map { ChartMarker(careEpoch(careDay(it.item.due)).toDouble(), if (it.category == "Chemotherapy") DoctorStatusWarn else Ink) },
+        description = t("Line chart of ${points.size} recorded values. $summary.$rangeText", "${points.size} दर्ज मानों का रेखा चार्ट। $summary।$rangeText"),
+    )
+    // Legend and change: what the band and dashed lines mean, and how far the value has moved since the first result.
+    Row(Modifier.fillMaxWidth().padding(top = 4.dp), horizontalArrangement = Arrangement.spacedBy(14.dp), verticalAlignment = Alignment.CenterVertically) {
+        if (bands.isNotEmpty()) Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.size(width = 14.dp, height = 10.dp).background(Mint, RoundedCornerShape(3.dp))); Spacer(Modifier.width(5.dp))
+            Text(t("Printed range ${labNum(refLow ?: yMin)}–${labNum(refHigh ?: yMax)} $unit", "छपी सीमा ${labNum(refLow ?: yMin)}–${labNum(refHigh ?: yMax)} $unit"), style = MaterialTheme.typography.labelSmall, color = DoctorCardInk)
+        }
+        if (markers.isNotEmpty()) Row(verticalAlignment = Alignment.CenterVertically) {
+            Text("┆", color = DoctorStatusWarn, fontWeight = FontWeight.Bold); Spacer(Modifier.width(4.dp))
+            Text(t("Treatment day", "इलाज का दिन"), style = MaterialTheme.typography.labelSmall, color = DoctorCardInk)
+        }
+    }
+    if (points.size > 1) {
+        val change = points.last().second - points.first().second
+        val arrow = if (change > 0) "↑" else if (change < 0) "↓" else "→"
+        val since = shortLabDate(firstTime.toLong())
+        Text(t("$arrow ${labNum(kotlin.math.abs(change))} $unit since $since · ${points.size} results", "$arrow ${labNum(kotlin.math.abs(change))} $unit, $since से · ${points.size} नतीजे"), style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, modifier = Modifier.padding(top = 2.dp))
+    }
     TreatmentDayRules.categories.forEach { category -> markers.filter { it.category == category }.takeIf { it.isNotEmpty() }?.let { shown ->
         Text("┆ ${TreatmentDayRules.label(category)}: " + shown.joinToString(", ") { date(it.item.due) }, style = MaterialTheme.typography.labelSmall, color = if (category == "Chemotherapy") DoctorStatusWarn else Ink)
     } }
@@ -117,7 +160,7 @@ fun labGroups(items: List<CareItem>): List<List<Pair<CareItem, CareEntry>>> = it
     HorizontalDivider(Modifier.padding(top = 12.dp, bottom = 8.dp), color = MaterialTheme.colorScheme.outline.copy(alpha = .15f))
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         Column(Modifier.weight(1f)) {
-            if (showDate) { Text(date(item.due), fontWeight = FontWeight.SemiBold); Text("${data.value} ${data.unit}", color = Rust, style = MaterialTheme.typography.titleMedium) }
+            if (showDate) { Text(labDateText(item, t), fontWeight = FontWeight.SemiBold); Text("${data.value} ${data.unit}", color = Rust, style = MaterialTheme.typography.titleMedium) }
             val printedRange = data.rangeText.ifBlank { when { data.rangeLow.isNotBlank() && data.rangeHigh.isNotBlank() -> "${data.rangeLow}–${data.rangeHigh} ${data.unit}"; data.rangeLow.isNotBlank() -> t("From ${data.rangeLow} ${data.unit}", "कम से कम ${data.rangeLow} ${data.unit}"); data.rangeHigh.isNotBlank() -> t("Up to ${data.rangeHigh} ${data.unit}", "ज़्यादा से ज़्यादा ${data.rangeHigh} ${data.unit}"); else -> "" } }
             if (printedRange.isNotBlank()) Text(t("Printed range: $printedRange", "छपी सीमा: $printedRange"), style = MaterialTheme.typography.bodySmall)
             CareLabRules.printedFlag(data)?.let { flag -> Text(t(flag, when { flag.startsWith("Low") -> "कम · छपी सीमा से नीचे"; flag.startsWith("High") -> "ज़्यादा · छपी सीमा से ऊपर"; else -> "छपी सीमा के अंदर" }), style = MaterialTheme.typography.labelMedium, color = if (flag.startsWith("Within")) MaterialTheme.colorScheme.secondary else Rust) }
@@ -125,7 +168,7 @@ fun labGroups(items: List<CareItem>): List<List<Pair<CareItem, CareEntry>>> = it
             if (data.reportName.isNotBlank()) Text(data.reportName, style = MaterialTheme.typography.bodySmall)
             if (data.reportId.isNotBlank() && report == null) Text(t("Report file unavailable here", "रिपोर्ट की फ़ाइल यहाँ नहीं है"), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
-        if (canEdit) IconButton(onClick = onEdit, enabled = !busy) { Icon(Icons.Default.Edit, t("Edit ${item.title} result from ${date(item.due)}", "${date(item.due)} का ${item.title} नतीजा बदलें")) }
+        if (canEdit) IconButton(onClick = onEdit, enabled = !busy) { Icon(Icons.Default.Edit, t("Edit ${item.title} result from ${labDateText(item, t)}", "${labDateText(item, t)} का ${item.title} नतीजा बदलें")) }
     }
     if (report != null) TextButton(onClick = { runCatching { vm.reportFiles.intent(report, false) }.onSuccess { open(context, it) }.onFailure { vm.message.value = t("Couldn't open this report. Add it again from Files.", "यह रिपोर्ट नहीं खुल सकी। Files से इसे फिर जोड़ें।") } }) { Icon(Icons.Default.OpenInNew, null, Modifier.size(17.dp)); Spacer(Modifier.width(6.dp)); Text(t("Open report", "रिपोर्ट खोलें")) }
 }
@@ -142,7 +185,7 @@ fun labGroups(items: List<CareItem>): List<List<Pair<CareItem, CareEntry>>> = it
     var name by rememberSaveable { mutableStateOf(initial?.title.orEmpty()) }
     var value by rememberSaveable { mutableStateOf(existing?.value.orEmpty()) }
     var unit by rememberSaveable { mutableStateOf(existing?.unit.orEmpty()) }
-    var due by rememberSaveable { mutableLongStateOf(initial?.due ?: careEpoch(LocalDate.now())) }
+    var due by rememberSaveable { mutableLongStateOf(initial?.let { labEpoch(it) } ?: careEpoch(LocalDate.now())) }
     var low by rememberSaveable { mutableStateOf(existing?.rangeLow.orEmpty()) }
     var high by rememberSaveable { mutableStateOf(existing?.rangeHigh.orEmpty()) }
     var rangeText by rememberSaveable { mutableStateOf(existing?.rangeText.orEmpty()) }
@@ -192,5 +235,8 @@ fun labGroups(items: List<CareItem>): List<List<Pair<CareItem, CareEntry>>> = it
             if (initial != null && canEdit) TextButton(onClick = { remove = true }, enabled = !busy, modifier = Modifier.fillMaxWidth()) { Text(t("Remove result", "नतीजा हटाएँ")) }
         }
     }
-    if (remove && initial != null) AlertDialog(onDismissRequest = { remove = false }, title = { Text(t("Remove this result?", "यह नतीजा हटाएँ?")) }, text = { Text("${initial.title} · ${date(initial.due)}") }, confirmButton = { TextButton(onClick = { vm.remove(initial); remove = false; onDismiss() }, enabled = !busy) { Text(t("Remove result", "नतीजा हटाएँ")) } }, dismissButton = { TextButton(onClick = { remove = false }) { Text(t("Keep", "रखें")) } })
+    if (remove && initial != null) AlertDialog(onDismissRequest = { remove = false }, title = { Text(t("Remove this result?", "यह नतीजा हटाएँ?")) }, text = { Text("${initial.title} · ${labDateText(initial, t)}") }, confirmButton = { TextButton(onClick = { vm.remove(initial); remove = false; onDismiss() }, enabled = !busy) { Text(t("Remove result", "नतीजा हटाएँ")) } }, dismissButton = { TextButton(onClick = { remove = false }) { Text(t("Keep", "रखें")) } })
 }
+
+/** "28 Oct": short enough to fit under every point of a lab chart. */
+private fun shortLabDate(epoch: Long): String = java.time.Instant.ofEpochMilli(epoch).atZone(java.time.ZoneId.systemDefault()).toLocalDate().format(careDateFormat("d MMM", CareLanguageState.shown == CareLang.HI))

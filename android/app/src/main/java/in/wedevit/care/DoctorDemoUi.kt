@@ -288,24 +288,31 @@ private val DoctorMist = Peach
                     conversations=DoctorConversationsData.build(shownPatient.id,workflow.versions(shownPatient.id),workflow.draft(shownPatient.id),System.currentTimeMillis()))
                 destination.second == 0 && earlierWorkspace -> DemoHome(demoStore.patients, appointments, ::openPatient, onSchedule = { tab = 2 }, onAdd = { creatingFor = demoStore.patients.first().id }, workflow = workflow, onRequests={workflowRoute="requests"}, onDraft={workflowRoute=it;patientId=it;recordTab="Conversations"})
                 destination.second == 0 -> DoctorHomeWorkday(DoctorTestProfiles.profiles.map { DoctorTestProfiles.personId(it) }.let { ids -> ids.size + carePeople.count { it.id !in ids } }, demoStore.patients, homePending, homeVisits, homeLoaded, workflow, onPatients={tab=1}, onSchedule={tab=2}, onProfile={p->navigateCare {testCarePerson=DoctorTestProfiles.personId(p);testInitialSection="Hub";sampleCareOpen=true}}, onPending={c->navigateCare {testCarePerson=DoctorTestProfiles.personId(c.profile);testInitialSection=c.section;sampleCareOpen=true}}, onConversation={id->workflowRoute=id}, onRequests={workflowRoute="requests"})
-                destination.second == 1 -> LazyColumn(Modifier.fillMaxSize().testTag("walkthrough-patients-list"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                destination.second == 1 -> { var patientQuery by rememberSaveable { mutableStateOf("") }
+                // Search matches the patient's name and the family names shown under it.
+                val q = patientQuery.trim().lowercase()
+                val shownCare = if (q.isEmpty()) carePeople else carePeople.filter { it.name.lowercase().contains(q) }
+                val shownTest = if (q.isEmpty()) DoctorTestProfiles.profiles else DoctorTestProfiles.profiles.filter { it.name.lowercase().contains(q) || it.family.lowercase().contains(q) }
+                LazyColumn(Modifier.fillMaxSize().testTag("walkthrough-patients-list"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
                     item { DoctorTitle(t("Patients", "मरीज़")); Text(t("Choose a person to open their care.", "देखभाल खोलने के लिए व्यक्ति चुनें।"), fontSize = 16.sp) }
+                    item { DoctorPatientSearchField(patientQuery, { patientQuery = it }, careHindi()) }
+                    if (q.isNotEmpty() && shownCare.isEmpty() && shownTest.isEmpty()) item { Text(t("No matching patient", "कोई मरीज़ नहीं मिला"), color = DoctorCardSub) }
                     if (careModel != null) {
                         item { var infoOpen by rememberSaveable { mutableStateOf(false) }; Column { Row(verticalAlignment = Alignment.CenterVertically) { Text(if (careModel.cloud == null) t("Care profiles on this device", "इस फ़ोन पर देखभाल प्रोफ़ाइल") else t("Shared care profiles", "साझा देखभाल प्रोफ़ाइल"), Modifier.weight(1f), fontSize = 19.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, color = DoctorCardInk); IconButton(onClick = { infoOpen = !infoOpen }, modifier = Modifier.size(48.dp).testTag("patients-info-toggle")) { Icon(Icons.Outlined.Info, if (infoOpen) t("Hide details about these care profiles", "इन देखभाल प्रोफ़ाइलों की जानकारी छिपाएँ") else t("Show details about these care profiles", "इन देखभाल प्रोफ़ाइलों की जानकारी दिखाएँ"), tint = DoctorAccent) } }
                             if (infoOpen) Text((if (careModel.cloud == null) t("Only on this device · not synced.", "सिर्फ़ इस फ़ोन पर · सिंक नहीं।") else t("Records your account may access.", "वे रिकॉर्ड जो आपका खाता देख सकता है।")) + (if (carePeople.isEmpty()) t(" No care profiles added yet. Add a profile or open Rahul or Arjun below.", " अभी कोई देखभाल प्रोफ़ाइल नहीं जोड़ी गई। प्रोफ़ाइल जोड़ें या नीचे राहुल या अर्जुन को खोलें।") else ""), Modifier.semantics { liveRegion = LiveRegionMode.Polite }.testTag("patients-info-text"), fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub) } }
                         if (careModel.cloud == null) item { OutlinedButton(onClick = { addingCarePerson = true }, enabled = !careBusy && pendingCreatedProfileId == null, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("doctor-add-device-profile")) { Icon(Icons.Default.PersonAdd, null); Spacer(Modifier.width(8.dp)); Text(t("Add on-device care profile", "फ़ोन पर देखभाल प्रोफ़ाइल जोड़ें")) } }
                         if (pendingCreatedProfileId != null) item { LinearProgressIndicator(Modifier.fillMaxWidth()); Text(t("Opening your new care profile…", "आपकी नई देखभाल प्रोफ़ाइल खुल रही है…")) }
-                        items(carePeople, key = { "care:${careAccount}:${it.id}" }) { person -> DoctorPatientListCard(person.name, if (careModel.cloud == null) t("Device-local care", "फ़ोन पर रखी देखभाल") else t("Shared care", "साझा देखभाल"), { openCare(person.id) }) }
+                        items(shownCare, key = { "care:${careAccount}:${it.id}" }) { person -> DoctorPatientListCard(person.name, if (careModel.cloud == null) t("Device-local care", "फ़ोन पर रखी देखभाल") else t("Shared care", "साझा देखभाल"), { openCare(person.id) }) }
                     }
-                    item { HorizontalDivider(); DoctorSection(t("People in your care", "आपकी देखभाल में लोग")) }
-                    items(DoctorTestProfiles.profiles,key={it.key}) {profile->DoctorPatientListCard(profile.name,profile.family,{navigateCare {testCarePerson=DoctorTestProfiles.personId(profile);testInitialSection="Hub";sampleCareOpen=true}})}
-                }
+                    if (shownTest.isNotEmpty()) item { HorizontalDivider(); DoctorSection(t("People in your care", "आपकी देखभाल में लोग")) }
+                    items(shownTest,key={it.key}) {profile->DoctorPatientListCard(profile.name,profile.family,{navigateCare {testCarePerson=DoctorTestProfiles.personId(profile);testInitialSection="Hub";sampleCareOpen=true}})}
+                } }
                 destination.second == 2 -> Column(Modifier.fillMaxSize()) {
                     if (carePeople.isNotEmpty()) Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp)) { Text(t("Care profile calendars", "देखभाल प्रोफ़ाइल के कैलेंडर"), fontSize = 18.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont); FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) { carePeople.forEach { person -> AssistChip(onClick = { openCare(person.id); careSection = "Visits" }, label = { Text(person.name) }, modifier = Modifier.heightIn(min = 48.dp)) } } }
                     if(earlierWorkspace) Box(Modifier.weight(1f)) { DemoSchedule(demoStore.patients, appointments, LocalDate.parse(selectedDay), { selectedDay = it.toString() }, ::openPatient,
                     onAdd = { creatingFor = demoStore.patients.first().id }, onReschedule = { editingId = it.id },
                     onCancel = { cancellingId = it.id }, onComplete = { refresh(demoStore.complete(it.id)) }) }
-                    else LazyColumn(Modifier.weight(1f),contentPadding=PaddingValues(20.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {item {DoctorTitle(t("Schedule", "समय-सूची"));Text(t("Choose a person to view visits and plan a review.", "विज़िट देखने और समीक्षा तय करने के लिए व्यक्ति चुनें।"));DoctorSection(t("People in your care", "आपकी देखभाल में लोग"))};items(DoctorTestProfiles.profiles,key={it.key}) {p->DoctorPatientListCard(p.name,t("View visits", "विज़िट देखें"),{navigateCare {testCarePerson=DoctorTestProfiles.personId(p);testInitialSection="Visits";sampleCareOpen=true}})}}
+                    else DoctorPracticeSchedule(careModel, carePeople, onOpenTest = { profile -> navigateCare { testCarePerson = DoctorTestProfiles.personId(profile); testInitialSection = "Visits"; sampleCareOpen = true } }, onOpenCare = { id -> openCare(id); careSection = "Visits" }, onAllPatients = { tab = 1 }, modifier = Modifier.weight(1f))
                 }
                 else -> Column(Modifier.fillMaxSize()) {
                     Box(Modifier.weight(1f)){DemoAccount(onExit,onFeedback={feedbackOpen=true})}
@@ -601,7 +608,7 @@ private val DoctorMist = Peach
 @Composable private fun DemoAccount(onExit: () -> Unit, onFeedback:()->Unit) { val t = careText();
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp), verticalArrangement = Arrangement.spacedBy(18.dp)) {
         DoctorTitle(t("Account", "खाता"))
-        Surface(color=Paper, shape=RoundedCornerShape(20.dp), modifier=Modifier.fillMaxWidth()) { Row(Modifier.padding(20.dp), verticalAlignment=Alignment.CenterVertically) { DoctorAvatar("Meera", 60); Spacer(Modifier.width(16.dp)); Column(verticalArrangement=Arrangement.spacedBy(5.dp)) { DoctorTitle(t("Dr Meera", "डॉ. मीरा"), 22); Text(t("Doctor workspace", "डॉक्टर वर्कस्पेस"), color=DoctorMuted); PreviewLabel() } } }
+        DemoDoctorProfileCard()
         DoctorSection(t("About this workspace", "इस वर्कस्पेस के बारे में"))
         Text(t("A guided walkthrough of the doctor workspace.", "डॉक्टर वर्कस्पेस का निर्देशित परिचय।"), fontWeight=FontWeight.Medium, modifier=Modifier.testTag("demo-account-disclosure"))
         Text(t("Records here are saved on this device, separately from your Sahara account.", "यहाँ के रिकॉर्ड इसी फ़ोन पर, आपके सहारा खाते से अलग सहेजे जाते हैं।"), color=DoctorMuted, lineHeight=23.sp)
@@ -610,6 +617,55 @@ private val DoctorMist = Peach
         Row(verticalAlignment=Alignment.Top) { Icon(Icons.Default.FolderOpen,null,tint=DoctorTeal); Spacer(Modifier.width(12.dp)); Column { Text(t("Stays on this device", "इसी फ़ोन पर रहता है"), fontWeight=FontWeight.Medium, fontFamily = SaharaTitleFont); Text(t("Audio is not uploaded, no online AI is used, and no prescription is issued.", "ऑडियो अपलोड नहीं होता, कोई ऑनलाइन AI इस्तेमाल नहीं होता, और कोई पर्चा जारी नहीं होता।"), color=DoctorMuted, style=MaterialTheme.typography.bodyMedium) } }
         OutlinedButton(onClick = onFeedback, shape=RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-feedback-entry")) { Icon(Icons.Default.SentimentSatisfiedAlt,null); Spacer(Modifier.width(8.dp)); Text(t("App feedback", "ऐप के बारे में राय")) }
         OutlinedButton(onClick = onExit, shape=RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("demo-exit")) { Icon(Icons.AutoMirrored.Filled.ArrowBack,null,Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Back to Sahara", "सहारा पर वापस")) }
+    }
+}
+
+
+/** The walkthrough doctor's profile: name, verified badge, speciality, hospital and a few facts. Sample data only. */
+@Composable private fun DemoDoctorProfileCard() { val t = careText()
+    Surface(color = Paper, shape = RoundedCornerShape(24.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("demo-doctor-profile")) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Surface(shape = RoundedCornerShape(22.dp), color = SaharaSoftBlue, modifier = Modifier.size(92.dp)) { Box(contentAlignment = Alignment.Center) { Text("M", fontFamily = SaharaTitleFont, fontSize = 40.sp, color = DoctorAccent) } }
+                Spacer(Modifier.width(14.dp))
+                Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                    Surface(shape = RoundedCornerShape(50), color = Mint) {
+                        Row(Modifier.padding(horizontal = 10.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Default.Verified, null, Modifier.size(16.dp), tint = Color(0xFF2E7D4F)); Spacer(Modifier.width(4.dp))
+                            Text(t("Verified clinician", "सत्यापित डॉक्टर"), fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Color(0xFF2E7D4F))
+                        }
+                    }
+                    Text(DoctorDemoData.doctorName, fontFamily = SaharaTitleFont, fontSize = 22.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
+                    Text(t("Palliative medicine", "पैलिएटिव मेडिसिन"), fontSize = 14.sp, color = DoctorCardSub)
+                }
+            }
+            Surface(shape = RoundedCornerShape(14.dp), color = Cream, modifier = Modifier.fillMaxWidth()) {
+                Row(Modifier.padding(horizontal = 12.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.LocalHospital, null, Modifier.size(20.dp), tint = DoctorAccent); Spacer(Modifier.width(10.dp))
+                    Column { Text(t("Sahara Practice Hospital", "सहारा अभ्यास अस्पताल"), fontWeight = FontWeight.SemiBold, fontSize = 15.sp, color = DoctorCardInk); Text(t("Palliative care unit · Hyderabad", "पैलिएटिव केयर यूनिट · हैदराबाद"), fontSize = 12.sp, color = DoctorCardSub) }
+                }
+            }
+            Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                DemoDoctorFact(t("Experience", "अनुभव"), t("12 yrs", "12 साल"), Modifier.weight(1f).fillMaxHeight())
+                DemoDoctorFact(t("Patients", "मरीज़"), "${DoctorTestProfiles.profiles.size}", Modifier.weight(1f).fillMaxHeight())
+                DemoDoctorFact(t("Languages", "भाषाएँ"), "EN · HI · TE", Modifier.weight(1f).fillMaxHeight())
+            }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.Badge, null, Modifier.size(18.dp), tint = DoctorCardSub); Spacer(Modifier.width(8.dp))
+                Text(t("Registration: practice sample, not a real number", "पंजीकरण: अभ्यास नमूना, असली नंबर नहीं"), fontSize = 13.sp, color = DoctorCardSub)
+            }
+            // The badge here is part of the walkthrough; real doctors get it only after the Sahara team checks the medical council register.
+            Text(t("Sample profile for the walkthrough. Real doctors are verified by the Sahara team against the medical council register.", "यह वॉकथ्रू की नमूना प्रोफ़ाइल है। असली डॉक्टरों की पुष्टि सहारा टीम मेडिकल काउंसिल रजिस्टर से करती है।"), fontSize = 12.sp, color = DoctorCardFaint)
+        }
+    }
+}
+
+@Composable private fun DemoDoctorFact(label: String, value: String, modifier: Modifier) {
+    Surface(shape = RoundedCornerShape(16.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = modifier) {
+        Column(Modifier.padding(vertical = 10.dp, horizontal = 6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(label, fontSize = 12.sp, color = DoctorCardSub, maxLines = 1)
+            Text(value, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = DoctorCardInk, maxLines = 1)
+        }
     }
 }
 

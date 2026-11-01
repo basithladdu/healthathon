@@ -136,7 +136,8 @@ class CareFlowTest {
         val sharedBytes = ui.activity.contentResolver.openInputStream(share.clipData!!.getItemAt(0).uri)!!.use { it.readBytes() }
         assertArrayEquals(original.readBytes(), sharedBytes)
         ui.onNodeWithTag("report-share-${report.id}").performScrollTo().assertIsDisplayed()
-        ui.onNodeWithTag("report-remove-${report.id}").performScrollTo().performClick()
+        ui.onNodeWithTag("report-menu-${report.id}").performScrollTo().performClick()
+        ui.onNodeWithTag("report-remove-${report.id}").performClick()
         ui.onNodeWithText("Remove report", useUnmergedTree = true).performClick()
         ui.waitUntil(15000) { vm.reports.value.isEmpty() && !vm.busy.value }
         assertFalse(vm.reportFiles.file(report).exists())
@@ -269,7 +270,8 @@ class CareFlowTest {
         ui.onNodeWithTag("today-list").performScrollToNode(hasText("Bring questions"))
         ui.onNodeWithText("Bring questions").assertIsDisplayed()
         val entryId = vm.items.value.single { it.title == "Bring questions" }.id
-        ui.onNodeWithTag("today-list").performScrollToNode(hasTestTag("care-edit-$entryId"))
+        ui.onNodeWithTag("today-list").performScrollToNode(hasTestTag("care-menu-$entryId"))
+        ui.onNodeWithTag("care-menu-$entryId").performClick()
         ui.onNodeWithTag("care-edit-$entryId").performClick()
         ui.onNode(hasSetTextAction() and hasText("What needs doing?")).performTextReplacement("Bring the prescription")
         ui.onNodeWithText("Save", useUnmergedTree = true).performScrollTo().performClick()
@@ -281,7 +283,8 @@ class CareFlowTest {
         ui.onNodeWithTag("care-list").performScrollToNode(hasText("Bring the prescription"))
         ui.onNodeWithText("Bring the prescription").assertIsDisplayed()
         screenshot("care")
-        ui.onNodeWithTag("care-list").performScrollToNode(hasTestTag("care-remove-$entryId"))
+        ui.onNodeWithTag("care-list").performScrollToNode(hasTestTag("care-menu-$entryId"))
+        ui.onNodeWithTag("care-menu-$entryId").performClick()
         ui.onNodeWithTag("care-remove-$entryId").performClick()
         ui.onNodeWithText("Remove", useUnmergedTree = true).performClick()
         ui.waitUntil(15000) { vm.items.value.none { it.title == "Bring the prescription" } }

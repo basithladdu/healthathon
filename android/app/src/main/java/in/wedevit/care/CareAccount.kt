@@ -46,7 +46,7 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
     /** Called by MainActivity for https://sahara.wedevit.in/join and sahara://join links. */
     fun offerInviteLink(link: String) {
         val invite = CareInviteLink.parse(link)
-        if (invite == null) { linkNotice.value = "That invitation link isn't complete. Ask for a new one, or paste the code under Join someone's care."; return }
+        if (invite == null) { linkNotice.value = careTr(CareLanguageState.shown, "That invitation link isn't complete. Ask for a new one, or paste the code under Join someone's care.", "वह निमंत्रण लिंक अधूरा है। नया लिंक माँगें, या “किसी की देखभाल से जुड़ें” में कोड चिपकाएँ।"); return }
         PendingJoin(invite.code, invite.name, System.currentTimeMillis()).also { pendingStore.save(it); pendingJoin.value = it }
     }
     fun clearPendingJoin() { pendingStore.clear(); pendingJoin.value = null }

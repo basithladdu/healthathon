@@ -164,12 +164,25 @@ internal object CareModules {
 
 @Composable fun MedicineScanAction(onScan: () -> Unit, onManual: () -> Unit) {
     val t = careText()
-    // Wraps instead of squeezing: the two actions move under the label when the screen is narrow or the text is large.
-    FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-        Row(Modifier.align(Alignment.CenterVertically).padding(end = 8.dp), verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.DocumentScanner, null, tint = DoctorAccent, modifier = Modifier.size(22.dp)); Spacer(Modifier.width(8.dp)); Text(t("Scan a prescription", "पर्चा स्कैन करें"), fontSize = 14.sp, color = DoctorCardInk) }
-        FlowRow {
-            TextButton(onClick = onScan, modifier = Modifier.heightIn(min = 48.dp).testTag("care-module-medicines-scan")) { Text(t("Scan & organize", "स्कैन करके जोड़ें"), color = DoctorAccent) }
-            TextButton(onClick = onManual, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Add manually", "ख़ुद लिखें"), color = DoctorAccent) }
+    Surface(shape = RoundedCornerShape(20.dp), color = SaharaSoftBlue, modifier = Modifier.fillMaxWidth().testTag("medicine-scan-card")) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Surface(shape = androidx.compose.foundation.shape.CircleShape, color = Paper) { Icon(Icons.Default.DocumentScanner, null, tint = DoctorAccent, modifier = Modifier.padding(10.dp).size(24.dp)) }
+                Spacer(Modifier.width(12.dp))
+                Column(Modifier.weight(1f)) {
+                    Text(t("Scan a prescription", "पर्चा स्कैन करें"), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk)
+                    Text(t("Read the medicines from a photo, then check each one.", "फ़ोटो से दवाइयाँ पढ़ें, फिर हर एक जाँचें।"), fontSize = 13.sp, color = DoctorCardSub)
+                }
+            }
+            // Wraps instead of squeezing when the screen is narrow or the text is large.
+            FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Button(onClick = onScan, shape = RoundedCornerShape(50), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent), modifier = Modifier.heightIn(min = 48.dp).testTag("care-module-medicines-scan")) {
+                    Icon(Icons.Default.DocumentScanner, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Scan & organize", "स्कैन करके जोड़ें"))
+                }
+                OutlinedButton(onClick = onManual, shape = RoundedCornerShape(50), modifier = Modifier.heightIn(min = 48.dp)) {
+                    Icon(Icons.Default.Add, null, Modifier.size(18.dp), tint = DoctorAccent); Spacer(Modifier.width(6.dp)); Text(t("Add manually", "ख़ुद लिखें"), color = DoctorAccent)
+                }
+            }
         }
     }
 }

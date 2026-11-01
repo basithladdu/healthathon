@@ -102,7 +102,7 @@ object TrendChartRules {
     Text(careTr(hindi, "No entries yet. Add one from Today.", "अभी कोई नोट नहीं। ‘आज’ पेज से एक जोड़ें।"), color = DoctorCardSub, fontSize = 15.sp, modifier = Modifier.testTag("$tag-empty"))
 
 /**
- * One question per chart: "How strong was it each day?". Simple bars (highest number each day) on a 0–10 scale with only
+ * One question per chart: "How strong was it each day?". A connected line (highest number each day) on a 0–10 scale with only
  * 0, 5 and 10 marked, coloured by band, a one-line summary above and every entry listed on request below.
  */
 @Composable internal fun DayBarChart(name: String, points: List<DatedRating>, hindi: Boolean, tag: String) {
@@ -119,34 +119,19 @@ object TrendChartRules {
             val summary = TrendChartRules.summary(window, points, hindi, today)
             Text(title, fontWeight = FontWeight.SemiBold, fontSize = 17.sp, color = DoctorCardInk)
             Text(summary, fontSize = 16.sp, color = DoctorCardInk, modifier = Modifier.testTag("$tag-summary"))
-            val plot = 120.dp
-            val axis = 26.dp
-            Column(Modifier.fillMaxWidth().clearAndSetSemantics { contentDescription = TrendChartRules.description(title, summary, window, hindi, today) }.testTag("$tag-chart")) {
-                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Bottom) {
-                    Column(Modifier.width(axis).height(plot), verticalArrangement = Arrangement.SpaceBetween) {
-                        listOf("10", "5", "0").forEach { Text(it, fontSize = 12.sp, lineHeight = 12.sp, color = DoctorCardSub) }
-                    }
-                    window.days.forEach { day ->
-                        Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(day.value?.toString() ?: "–", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = if (day.value == null) DoctorCardSub else DoctorCardInk)
-                            Spacer(Modifier.height(2.dp))
-                            val v = day.value
-                            if (v != null) Box(Modifier.fillMaxWidth(0.62f).height((plot * (v / 10f)).coerceAtLeast(4.dp))
-                                .background(ChartBands.color(v), RoundedCornerShape(topStart = 6.dp, topEnd = 6.dp)))
-                        }
-                    }
-                }
-                HorizontalDivider(Modifier.padding(start = axis), color = DoctorCardSub.copy(alpha = 0.5f))
-                Row(Modifier.fillMaxWidth().padding(top = 4.dp)) {
-                    Spacer(Modifier.width(axis))
-                    window.days.forEach { day ->
-                        val top = if (day.date == today) t("Today", "आज") else day.date.format(careDateFormat("EEE", hindi))
-                        Text("$top\n${day.date.dayOfMonth}", Modifier.weight(1f), textAlign = TextAlign.Center, fontSize = 12.sp, lineHeight = 14.sp,
-                            color = if (day.date == today) DoctorCardInk else DoctorCardSub, fontWeight = if (day.date == today) FontWeight.SemiBold else FontWeight.Normal)
-                    }
-                }
+            val chartPoints = window.days.mapIndexed { i, d -> ChartPoint(i.toDouble(), d.value?.toDouble(), d.value?.let { ChartBands.color(it) }) }
+            val xLabels = window.days.mapIndexed { i, d ->
+                val top = if (d.date == today) t("Today", "आज") else d.date.format(careDateFormat("EEE", hindi))
+                ChartXLabel(i.toDouble(), top + "\n" + d.date.dayOfMonth, strong = d.date == today)
             }
-            Text(t("Each bar is the highest number noted that day. 0 = none, 10 = worst.", "हर खंभा उस दिन का सबसे ऊँचा अंक है। 0 = बिलकुल नहीं, 10 = सबसे ज़्यादा।"), fontSize = 13.sp, color = DoctorCardSub)
+            CareLineChart(
+                points = chartPoints, yMin = 0.0, yMax = 10.0, yTicks = listOf(0.0, 5.0, 10.0), yText = { it.toInt().toString() },
+                xLabels = xLabels, description = TrendChartRules.description(title, summary, window, hindi, today),
+                latestText = (window.days.lastOrNull { it.value != null }?.value ?: 0).toString(), tag = tag, height = 180.dp,
+                lineColor = DoctorCardSub.copy(alpha = 0.7f), xMin = 0.0, xMax = (window.days.size - 1).coerceAtLeast(1).toDouble(), xLabelLines = 2,
+                bands = listOf(ChartBand(0.0, 3.5, ChartBands.Mild), ChartBand(3.5, 6.5, ChartBands.Moderate), ChartBand(6.5, 10.0, ChartBands.Severe)),
+            )
+            Text(t("Each point is the highest number noted that day. 0 = none, 10 = worst.", "हर बिंदु उस दिन का सबसे ऊँचा अंक है। 0 = बिलकुल नहीं, 10 = सबसे ज़्यादा।"), fontSize = 13.sp, color = DoctorCardSub)
             TextButton(onClick = { showAll = !showAll }, modifier = Modifier.heightIn(min = 48.dp).testTag("$tag-toggle")) {
                 Text(if (showAll) t("Hide entries", "नोट छिपाएँ") else t("See all ${points.size} entries", "सभी ${points.size} नोट देखें"))
             }

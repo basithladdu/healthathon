@@ -3714,3 +3714,185 @@ Confirm this item	اس نکتے کی تصدیق کریں
 Confirmed by you	آپ نے تصدیق کی
 Not discussed in this talk. I checked this.	اس گفتگو میں بات نہیں ہوئی۔ میں نے جانچ لیا۔
 It stays	یہ رہے گا
+Month	مہینہ
+Week	ہفتہ
+Previous week	پچھلا ہفتہ
+Previous month	پچھلا مہینہ
+Next week	اگلا ہفتہ
+Next month	اگلا مہینہ
+1 entry	1 اندراج
+$n entries	$n اندراجات
+Distress number	پریشانی کا نمبر
+Distress: $score	پریشانی: $score
+Required: choose 0 to 10	ضروری: 0 سے 10 چنیں
+None selected	کچھ نہیں چنا
+Optional	اختیاری
+Any other concern	کوئی اور فکر
+${date(item.created)} (date added)	${date(item.created)} (شامل کرنے کی تاریخ)
+ Printed range ${labNum(refLow ?: yMin)} to ${labNum(refHigh ?: yMax)} $unit.	 چھپی حد ${labNum(refLow ?: yMin)} سے ${labNum(refHigh ?: yMax)} $unit۔
+Recorded values ($unit)	درج قدریں ($unit)
+Line chart of ${points.size} recorded values. $summary.$rangeText	${points.size} درج قدروں کا لکیری چارٹ۔ $summary.$rangeText
+Shaded band: printed range	سایہ دار پٹی: چھپی حد
+Edit ${item.title} result from ${labDateText(item, t)}	${labDateText(item, t)} کا ${item.title} نتیجہ بدلیں
+Each point is the highest number noted that day. 0 = none, 10 = worst.	ہر نقطہ اس دن کا سب سے زیادہ نمبر ہے۔ 0 = بالکل نہیں، 10 = سب سے زیادہ۔
+Most severe	سب سے شدید
+Newest	سب سے نیا
+Hide this month	یہ مہینہ چھپائیں
+Show this month	یہ مہینہ دکھائیں
+(date added)	(شامل کرنے کی تاریخ)
+Show all ${events.size}	تمام ${events.size} دکھائیں
+(date added): Report date not recorded. This is the day the file was added.	(شامل کرنے کی تاریخ): رپورٹ کی تاریخ درج نہیں۔ یہ فائل شامل کرنے کا دن ہے۔
+Family report only. Not confirmed as taken or checked by anyone else.	صرف خاندان کی اطلاع۔ کسی اور نے لینا پکا یا جانچا نہیں ہے۔
+Missed	چھوٹ گئی
+Late	دیر سے
+Read the medicines from a photo, then check each one.	تصویر سے دوائیں پڑھیں، پھر ہر ایک جانچیں۔
+View	دیکھیں
+Printed range ${labNum(refLow ?: yMin)}–${labNum(refHigh ?: yMax)} $unit	چھپی حد ${labNum(refLow ?: yMin)}–${labNum(refHigh ?: yMax)} $unit
+Treatment day	علاج کا دن
+$arrow ${labNum(kotlin.math.abs(change))} $unit since $since · ${points.size} results	$arrow ${labNum(kotlin.math.abs(change))} $unit، $since سے · ${points.size} نتائج
+Add main illness	اہم بیماری شامل کریں
+Add address	پتہ شامل کریں
+Edit profile	پروفائل تبدیل کریں
+Age	عمر
+$it yrs	$it سال
+Weight	وزن
+kg	کلو
+Height	قد
+cm	سینٹی میٹر
+Blood group	بلڈ گروپ
+Female	خاتون
+Male	مرد
+Not known	معلوم نہیں
+Age (years)	عمر (سال)
+Weight (kg)	وزن (کلو)
+Height (cm)	قد (سینٹی میٹر)
+Main illness / diagnosis	اہم بیماری / تشخیص
+City / address	شہر / پتہ
+Saved on this phone only.	صرف اسی فون پر محفوظ ہوتا ہے۔
+Age should be between 0 and 120 years.	عمر 0 سے 120 سال کے درمیان ہونی چاہیے۔
+Weight should be between 1 and 300 kg.	وزن 1 سے 300 کلو کے درمیان ہونا چاہیے۔
+Height should be between 30 and 250 cm.	قد 30 سے 250 سینٹی میٹر کے درمیان ہونا چاہیے۔
+That invitation link isn't complete. Ask for a new one, or paste the code under Join someone's care.	وہ دعوتی لنک مکمل نہیں ہے۔ نیا لنک مانگیں، یا 'کسی کی دیکھ بھال میں شامل ہوں' میں کوڈ چسپاں کریں۔
+Sign in again before opening cloud care records.	کلاؤڈ دیکھ بھال کے ریکارڈ کھولنے سے پہلے دوبارہ سائن ان کریں۔
+Couldn't refresh. Try again.	ریفریش نہیں ہو سکا۔ دوبارہ کوشش کریں۔
+The signed-in account changed. Reopen your care records.	سائن ان شدہ اکاؤنٹ بدل گیا ہے۔ اپنے دیکھ بھال کے ریکارڈ دوبارہ کھولیں۔
+You can read these records. Ask the person who invited you to allow changes.	آپ یہ ریکارڈ پڑھ سکتے ہیں۔ تبدیلی کی اجازت کے لیے بلانے والے شخص سے کہیں۔
+Care-team contacts couldn't be loaded. Nothing was uploaded or changed.	دیکھ بھال ٹیم کے نمبر لوڈ نہیں ہو سکے۔ کچھ بھی اپ لوڈ یا تبدیل نہیں ہوا۔
+Only this care profile's owner can manage its contacts.	صرف اس دیکھ بھال پروفائل کا مالک اس کے نمبر سنبھال سکتا ہے۔
+Care access changed. Reopen the selected profile.	دیکھ بھال کی رسائی بدل گئی ہے۔ منتخب پروفائل دوبارہ کھولیں۔
+This visit changed. Reopen it before editing.	یہ ملاقات بدل گئی ہے۔ تبدیلی سے پہلے اسے دوبارہ کھولیں۔
+Visit saved on this device	ملاقات اس فون پر محفوظ ہو گئی
+Visit saved to shared care. The patient can see it after refreshing.	ملاقات مشترکہ دیکھ بھال میں محفوظ ہو گئی۔ ریفریش کرنے کے بعد مریض اسے دیکھ سکے گا۔
+Enter a name, up to 100 characters.	نام لکھیں، 100 حروف تک۔
+Open this person's care note before confirming.	تصدیق سے پہلے اس شخص کا دیکھ بھال نوٹ کھولیں۔
+The saved confirmation didn't match this version. Refresh the care note before trying again.	محفوظ تصدیق اس ورژن سے میل نہیں کھاتی۔ دوبارہ کوشش سے پہلے دیکھ بھال نوٹ ریفریش کریں۔
+This confirmation changed. Refresh the care note before trying again.	یہ تصدیق بدل گئی ہے۔ دوبارہ کوشش سے پہلے دیکھ بھال نوٹ ریفریش کریں۔
+Your confirmation is saved	آپ کی تصدیق محفوظ ہو گئی
+Choose the right person and add a name or a short note.	صحیح شخص چنیں اور نام یا مختصر نوٹ شامل کریں۔
+This person's records are no longer available.	اس شخص کے ریکارڈ اب دستیاب نہیں ہیں۔
+Please shorten this entry.	براہ کرم اس اندراج کو مختصر کریں۔
+This entry couldn't be read. Open it again.	یہ اندراج پڑھا نہیں جا سکا۔ اسے دوبارہ کھولیں۔
+Choose a date and type of care.	تاریخ اور دیکھ بھال کی قسم چنیں۔
+Saved	محفوظ ہو گیا
+Choose who these medicines are for.	چنیں کہ یہ دوائیں کس کے لیے ہیں۔
+Add at least one medicine.	کم از کم ایک دوا شامل کریں۔
+Check and confirm every medicine before saving.	محفوظ کرنے سے پہلے ہر دوا جانچیں اور تصدیق کریں۔
+Add a medicine name to every entry.	ہر اندراج میں دوا کا نام شامل کریں۔
+Each medicine needs a different name.	ہر دوا کا نام مختلف ہونا چاہیے۔
+Add the prescribed dose for ${medicine.medicineName}.	${medicine.medicineName} کی مقررہ خوراک شامل کریں۔
+Review the dose and directions for ${medicine.medicineName}.	${medicine.medicineName} کی خوراک اور ہدایات کا جائزہ لیں۔
+One medicine could not be matched to this person. Start the scan again.	ایک دوا اس شخص سے میل نہیں کھا سکی۔ اسکین دوبارہ شروع کریں۔
+Medicines saved: ${drafts.size}	دوائیں محفوظ ہو گئیں: ${drafts.size}
+Choose the right person before saving this note.	یہ نوٹ محفوظ کرنے سے پہلے صحیح شخص چنیں۔
+The previous note changed. Check the comparison and save again.	پچھلا نوٹ بدل گیا ہے۔ موازنہ دیکھیں اور دوبارہ محفوظ کریں۔
+Symptom note saved	علامات کا نوٹ محفوظ ہو گیا
+Reopen the selected care profile.	منتخب دیکھ بھال پروفائل دوبارہ کھولیں۔
+Daily check-off saved, but detailed history could not be recorded.	روزانہ کا نشان محفوظ ہو گیا، لیکن تفصیلی تاریخ درج نہیں ہو سکی۔
+Choose the right person and enter a name.	صحیح شخص چنیں اور نام لکھیں۔
+Removed	ہٹا دیا گیا
+Choose a person before adding a report.	رپورٹ شامل کرنے سے پہلے شخص چنیں۔
+Couldn't read this file. Choose it again from Files.	یہ فائل پڑھی نہیں جا سکی۔ اسے فائلز سے دوبارہ چنیں۔
+Couldn't add the report. Your original file is unchanged. Try again.	رپورٹ شامل نہیں ہو سکی۔ آپ کی اصل فائل جوں کی توں ہے۔ دوبارہ کوشش کریں۔
+Report added	رپورٹ شامل ہو گئی
+Choose a report for this person.	اس شخص کے لیے رپورٹ چنیں۔
+Couldn't rename this report. Try again.	اس رپورٹ کا نام نہیں بدلا جا سکا۔ دوبارہ کوشش کریں۔
+Couldn't remove this report. Try again.	یہ رپورٹ ہٹائی نہیں جا سکی۔ دوبارہ کوشش کریں۔
+Report removed	رپورٹ ہٹا دی گئی
+Stop the recording first.	پہلے ریکارڈنگ روکیں۔
+Only the person who added these records can remove them.	صرف ریکارڈ شامل کرنے والا شخص ہی انہیں ہٹا سکتا ہے۔
+Records removed	ریکارڈ ہٹا دیے گئے
+Still working on your last change. Please wait a moment.	آپ کی پچھلی تبدیلی ابھی جاری ہے۔ براہ کرم تھوڑا انتظار کریں۔
+Couldn't save. Your entry is still here; please try again.	محفوظ نہیں ہو سکا۔ آپ کا اندراج یہیں ہے؛ براہ کرم دوبارہ کوشش کریں۔
+No profile details yet	ابھی پروفائل کی تفصیلات نہیں
+No allergies recorded	کوئی الرجی درج نہیں
+Shared with the family and doctors you share this care with.	ان خاندان والوں اور ڈاکٹروں کے ساتھ شیئر، جن کے ساتھ آپ یہ دیکھ بھال شیئر کرتے ہیں۔
+Android blocked reminders. Check notification and battery settings.	Android نے یاد دہانیاں روک دیں۔ اطلاع اور بیٹری کی ترتیبات جانچیں۔
+Listening…	سن رہے ہیں…
+Checking the words…	الفاظ جانچ رہے ہیں…
+This language isn't installed for dictation. Choose another language or type the words.	یہ زبان ڈکٹیشن کے لیے انسٹال نہیں ہے۔ کوئی اور زبان چنیں یا الفاظ ٹائپ کریں۔
+Allow microphone access to dictate, or type the words.	ڈکٹیشن کے لیے مائیکروفون کی اجازت دیں، یا الفاظ ٹائپ کریں۔
+No words were recognised. Tap Dictate to try again.	کوئی الفاظ نہیں پہچانے گئے۔ دوبارہ کوشش کے لیے ڈکٹیٹ دبائیں۔
+The microphone is busy. Stop other recording and try again.	مائیکروفون مصروف ہے۔ دوسری ریکارڈنگ روکیں اور دوبارہ کوشش کریں۔
+Dictation couldn't finish. Your earlier words are safe. Try again or type.	ڈکٹیشن مکمل نہیں ہو سکی۔ آپ کے پچھلے الفاظ محفوظ ہیں۔ دوبارہ کوشش کریں یا ٹائپ کریں۔
+No words were recognised. Try again or type.	کوئی الفاظ نہیں پہچانے گئے۔ دوبارہ کوشش کریں یا ٹائپ کریں۔
+Words added. Check them below.	الفاظ شامل ہو گئے۔ نیچے جانچ لیں۔
+These words need attention before they can be added.	شامل کرنے سے پہلے ان الفاظ پر توجہ ضروری ہے۔
+For Hindi + English together, transcribe a saved recording below. This phone's dictation supports one language per turn.	ہندی + انگریزی ایک ساتھ کے لیے، نیچے محفوظ ریکارڈنگ کو تحریر میں بدلیں۔ اس فون کی ڈکٹیشن ایک باری میں ایک زبان سپورٹ کرتی ہے۔
+Starting microphone…	مائیکروفون شروع ہو رہا ہے…
+Couldn't start dictation. Check microphone access or type the words.	ڈکٹیشن شروع نہیں ہو سکی۔ مائیکروفون کی اجازت جانچیں یا الفاظ ٹائپ کریں۔
+Finishing this turn…	یہ باری مکمل کر رہے ہیں…
+Listening stopped. Check the unfinished words.	سننا رک گیا۔ نامکمل الفاظ جانچیں۔
+Listening stopped	سننا رک گیا
+Preparing voice…	آواز تیار ہو رہی ہے…
+Read aloud isn't available on this phone.	اس فون پر پڑھ کر سنانا دستیاب نہیں ہے۔
+Finished reading	پڑھنا مکمل ہو گیا
+Couldn't read this note. Try another installed language voice.	یہ نوٹ پڑھا نہیں جا سکا۔ کسی اور انسٹال شدہ زبان کی آواز آزمائیں۔
+Downloading the Hindi language pack (about 30 MB)…	ہندی زبان کا پیک ڈاؤن لوڈ ہو رہا ہے (تقریباً 30 MB)…
+Downloading the Telugu language pack (about 30 MB)…	تیلگو زبان کا پیک ڈاؤن لوڈ ہو رہا ہے (تقریباً 30 MB)…
+Downloading the Kannada language pack (about 30 MB)…	کنڑ زبان کا پیک ڈاؤن لوڈ ہو رہا ہے (تقریباً 30 MB)…
+Downloading the Tamil language pack (about 30 MB)…	تمل زبان کا پیک ڈاؤن لوڈ ہو رہا ہے (تقریباً 30 MB)…
+Downloading the Urdu language pack (about 30 MB)…	اردو زبان کا پیک ڈاؤن لوڈ ہو رہا ہے (تقریباً 30 MB)…
+Downloading a language pack (about 30 MB)…	زبان کا پیک ڈاؤن لوڈ ہو رہا ہے (تقریباً 30 MB)…
+The voice is still preparing. Try Read aloud again in a moment.	آواز ابھی تیار ہو رہی ہے۔ تھوڑی دیر بعد دوبارہ پڑھ کر سنائیں دبائیں۔
+No downloaded voice for this language. Choose another language or install its voice in phone settings.	اس زبان کی ڈاؤن لوڈ شدہ آواز نہیں ہے۔ کوئی اور زبان چنیں یا فون کی ترتیبات میں اس کی آواز انسٹال کریں۔
+Malayalam translation isn't available on this phone; reading the original words.	اس فون پر ملیالم ترجمہ دستیاب نہیں؛ اصل الفاظ پڑھ رہے ہیں۔
+Uses any network, including mobile data.	موبائل ڈیٹا سمیت کوئی بھی نیٹ ورک استعمال ہوتا ہے۔
+Some lines could not be checked, so they are read in the original words.	کچھ سطریں جانچی نہیں جا سکیں، اس لیے وہ اصل الفاظ میں پڑھی جا رہی ہیں۔
+Couldn't translate this note on this phone. Check the internet connection for the language pack and try again.	اس فون پر یہ نوٹ ترجمہ نہیں ہو سکا۔ زبان کے پیک کے لیے انٹرنیٹ جانچیں اور دوبارہ کوشش کریں۔
+Reading aloud	پڑھ کر سنا رہے ہیں
+Couldn't start reading. Try again.	پڑھنا شروع نہیں ہو سکا۔ دوبارہ کوشش کریں۔
+The words are translated on this phone for listening only. The saved note is not changed. Check anything important with the care team.	الفاظ صرف سننے کے لیے اسی فون پر ترجمہ ہوتے ہیں۔ محفوظ نوٹ نہیں بدلتا۔ کوئی بھی اہم بات دیکھ بھال ٹیم سے جانچ لیں۔
+No doctor linked	کوئی ڈاکٹر منسلک نہیں
+View doctor's details	ڈاکٹر کی تفصیلات دیکھیں
+Speciality	مہارت
+Clinic	کلینک
+Verification pending	تصدیق باقی ہے
+Not verified	تصدیق نہیں ہوئی
+Sahara has not confirmed this doctor's professional identity.	Sahara نے اس ڈاکٹر کی پیشہ ورانہ شناخت کی تصدیق نہیں کی ہے۔
+Body	جسم
+Health	صحت
+Contact	رابطہ
+Allergies (optional)	الرجی (اختیاری)
+All patients	تمام مریض
+No visits on $label	$label کو کوئی ملاقات نہیں
+Visit with ${patient.name}	${patient.name} کے ساتھ ملاقات
+Time not set	وقت طے نہیں
+Doctor: $doctor	ڈاکٹر: $doctor
+Appointment logistics: $note	اپائنٹمنٹ کا انتظام: $note
+Choose a patient	مریض منتخب کریں
+Search patients by name	نام سے مریض تلاش کریں
+Add document	دستاویز شامل کریں
+Find dates, results and doses	تاریخیں، نتائج اور خوراکیں تلاش کریں
+Scan with camera	کیمرے سے اسکین کریں
+Take a photo of a paper report or prescription.	کاغذی رپورٹ یا نسخے کی تصویر لیں۔
+Upload a file	فائل اپ لوڈ کریں
+Choose a PDF or photo already on this phone.	اس فون پر پہلے سے موجود PDF یا تصویر چنیں۔
+Verified clinician	تصدیق شدہ ڈاکٹر
+Palliative medicine	پیلیئیٹو میڈیسن
+Sahara Practice Hospital	سہارا پریکٹس اسپتال
+Palliative care unit · Hyderabad	پیلیئیٹو کیئر یونٹ · حیدرآباد
+Experience	تجربہ
+12 yrs	12 سال
+Languages	زبانیں
+Registration: practice sample, not a real number	رجسٹریشن: مشق کا نمونہ، اصلی نمبر نہیں
+Sample profile for the walkthrough. Real doctors are verified by the Sahara team against the medical council register.	یہ واک تھرو کی نمونہ پروفائل ہے۔ اصلی ڈاکٹروں کی تصدیق سہارا ٹیم میڈیکل کونسل رجسٹر سے کرتی ہے۔

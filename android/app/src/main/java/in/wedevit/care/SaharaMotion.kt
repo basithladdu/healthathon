@@ -134,8 +134,11 @@ object SaharaMotion {
     fun staggerDelay(index: Int, enabled: Boolean = this.enabled): Int = ms(index.coerceIn(0, STAGGER_ITEMS) * STAGGER_MS, enabled)
 
     /** Saved confirmations get the tick; this is what CareModel and the screens say after a real save. */
+    const val SAVED_MARK = "\u200B"
+
     fun isSavedMessage(text: String): Boolean {
         val t = text.trim()
+        if (t.startsWith(SAVED_MARK)) return true // CareModel marks real saves, so the tick survives translation
         if (Regex("""(?i)\b(not|couldn|can't|cannot|failed|unable|but)\b|n't|नहीं""").containsMatchIn(t)) return false
         return t.startsWith("Saved") || t.contains(" saved") || t.contains("सहेज")
     }

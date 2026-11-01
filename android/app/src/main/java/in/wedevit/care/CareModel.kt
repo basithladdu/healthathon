@@ -32,7 +32,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
         fun createPatientWalkthrough(app: Application, role: String) = CareModel(app, cloud = null, demoMode = true, walkthroughRole = role)
     }
     private val account = cloud?.session?.value?.userId.orEmpty().also {
-        require(cloud == null || it.isNotBlank()) { "Sign in again before opening cloud care records." }
+        require(cloud == null || it.isNotBlank()) { mTr("Sign in again before opening cloud care records.", "क्लाउड देखभाल रिकॉर्ड खोलने से पहले फिर से साइन इन करें।") }
     }
     val accountNamespace: String get() = account
     val storageNamespace: String = if (demoMode) DOCTOR_DEMO_STORAGE else account
@@ -229,7 +229,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
         refreshing.value = true
         viewModelScope.launch {
             try { reload(); refreshError.value = null }
-            catch (e: Exception) { if (e is CancellationException) throw e; refreshError.value = e.message ?: "Couldn't refresh. Try again." }
+            catch (e: Exception) { if (e is CancellationException) throw e; refreshError.value = e.message ?: mTr("Couldn't refresh. Try again.", "रिफ़्रेश नहीं हो सका। फिर कोशिश करें।") }
             finally { refreshing.value = false }
         }
     }
@@ -238,7 +238,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
     private suspend fun reload() {
         val service = cloud ?: return
         fun requireSameAccount() = check(careCloudAccountMatches(account, service.session.value?.userId)) {
-            "The signed-in account changed. Reopen your care records."
+            mTr("The signed-in account changed. Reopen your care records.", "साइन इन किया खाता बदल गया। अपने देखभाल रिकॉर्ड फिर से खोलें।")
         }
         requireSameAccount()
         sync?.flush()
@@ -267,7 +267,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
         refreshCareContacts(selected.value)
         refreshMedicineHistory(selected.value)
     }
-    private fun requireEdit(id: String) { require(cloud == null || id in editable.value) { "You can read these records. Ask the person who invited you to allow changes." } }
+    private fun requireEdit(id: String) { require(cloud == null || id in editable.value) { mTr("You can read these records. Ask the person who invited you to allow changes.", "आप ये रिकॉर्ड पढ़ सकते हैं। बदलाव की अनुमति के लिए बुलाने वाले व्यक्ति से कहें।") } }
     fun select(id: String) {
         if (recording.value) stopRecording()
         selected.value = id; preferences.edit().putString("person", id).apply()
@@ -293,11 +293,11 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
             if (selected.value == personId && (cloud?.session?.value?.userId.orEmpty() == account)) { careContacts.value = snapshot.contacts; canReadCareTeam.value = snapshot.readable }
         } catch (e: Exception) {
             if (e is CancellationException) throw e
-            if (selected.value == personId) { careContacts.value = emptyList(); canReadCareTeam.value = false; careContactsError.value = "Care-team contacts couldn't be loaded. Nothing was uploaded or changed." }
+            if (selected.value == personId) { careContacts.value = emptyList(); canReadCareTeam.value = false; careContactsError.value = mTr("Care-team contacts couldn't be loaded. Nothing was uploaded or changed.", "देखभाल टीम के नंबर नहीं खुल सके। कुछ भी अपलोड या बदला नहीं गया।") }
         } finally { if (selected.value == personId) careContactsLoading.value = false }
     }
     fun saveCareContact(contact: CareContact, expectedAccount: String, done: () -> Unit) = action {
-        require(sameCareContext(contact.personId, expectedAccount, ownerOnly = true)) { "Only this care profile's owner can manage its contacts." }
+        require(sameCareContext(contact.personId, expectedAccount, ownerOnly = true)) { mTr("Only this care profile's owner can manage its contacts.", "सिर्फ़ इस देखभाल प्रोफ़ाइल का मालिक इसके नंबर संभाल सकता है।") }
         CareContactRules.validate(contact.name, contact.relationship, contact.role, contact.phone)
         val sent = sync == null || sync.submit(CareSyncOps.saveContact(contact)) == CareSyncStatus.SENT
         val saved = if (cloud == null) withContext(Dispatchers.IO) { localContacts.save(contact) } else contact
@@ -307,16 +307,16 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
         }
     }
     fun removeCareContact(contact: CareContact, expectedAccount: String, done: () -> Unit) = action {
-        require(sameCareContext(contact.personId, expectedAccount, ownerOnly = true)) { "Only this care profile's owner can manage its contacts." }
+        require(sameCareContext(contact.personId, expectedAccount, ownerOnly = true)) { mTr("Only this care profile's owner can manage its contacts.", "सिर्फ़ इस देखभाल प्रोफ़ाइल का मालिक इसके नंबर संभाल सकता है।") }
         val sent = if (sync == null) { withContext(Dispatchers.IO) { localContacts.remove(contact) }; true } else sync.submit(CareSyncOps.removeContact(contact)) == CareSyncStatus.SENT
         if (sameCareContext(contact.personId, expectedAccount, ownerOnly = true)) { careContacts.value = careContacts.value.filterNot { it.id == contact.id }; done(); if (!sent) message.value = CareSyncText.REMOVED_WAITING }
     }
     fun saveDoctorVisit(expectedPersonId: String, expectedAccountId: String, doctorName: String, startsAt: Long, location: String, note: String, onSaved: () -> Unit, id: String = newId(), createdAt: Long = System.currentTimeMillis(), initial: CareItem? = null) = action {
-        require(sameCareContext(expectedPersonId, expectedAccountId)) { "Care access changed. Reopen the selected profile." }
+        require(sameCareContext(expectedPersonId, expectedAccountId)) { mTr("Care access changed. Reopen the selected profile.", "देखभाल की पहुँच बदल गई। चुनी हुई प्रोफ़ाइल फिर से खोलें।") }
         var item = DoctorVisitRules.item(id, expectedPersonId, doctorName, startsAt, location, note).copy(created = createdAt)
         if (initial != null) {
             val current = dao.item(initial.id)
-            require(initial.personId == expectedPersonId && current == initial && initial.id == id) { "This visit changed. Reopen it before editing." }
+            require(initial.personId == expectedPersonId && current == initial && initial.id == id) { mTr("This visit changed. Reopen it before editing.", "यह मुलाक़ात बदल गई है। बदलने से पहले इसे फिर से खोलें।") }
             val old = CareEntryCodec.decode(initial.detail)
             val next = CareEntryCodec.decode(item.detail)!!
             item = item.copy(created = initial.created, revision = initial.revision, doneOn = initial.doneOn, detail = CareEntryCodec.encode(next.copy(status = old?.status ?: "open", completedAt = old?.completedAt ?: 0, completedBy = old?.completedBy.orEmpty())))
@@ -324,7 +324,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
         // Persist only to the account-scoped local database; never switch to a different selected person.
         require(item.personId == expectedPersonId)
         val sent = storeItem(item)
-        if (sameCareContext(expectedPersonId, expectedAccountId)) { message.value = if (cloud == null) "Visit saved on this device" else if (sent) "Visit saved to shared care. The patient can see it after refreshing." else CareSyncText.SAVED_WAITING; onSaved() }
+        if (sameCareContext(expectedPersonId, expectedAccountId)) { message.value = if (cloud == null) savedTr("Visit saved on this device", "मुलाक़ात इस फ़ोन पर सहेजी गई") else if (sent) savedTr("Visit saved to shared care. The patient can see it after refreshing.", "मुलाक़ात साझा देखभाल में सहेजी गई। रिफ़्रेश करने पर मरीज़ इसे देख सकेंगे।") else CareSyncText.SAVED_WAITING; onSaved() }
     }
     fun role(value: Boolean) = role(if (value) "Doctor" else CareRoles.forOwner(isOwner.value))
     fun role(value: String) {
@@ -333,7 +333,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
         viewRole.value = value; clinician.value = value == "Doctor" // In memory only: the Doctor workspace and tests may set it, but it is never saved.
     }
     fun addPerson(name: String, done: () -> Unit = {}) = action {
-        require(name.trim().length in 1..100) { "Enter a name, up to 100 characters." }
+        require(name.trim().length in 1..100) { mTr("Enter a name, up to 100 characters.", "नाम लिखें, 100 अक्षरों तक।") }
         val person = Person(name = name.trim()); cloud?.addPerson(person); dao.addPerson(person)
         editable.value += person.id; owned.value += person.id; select(person.id); done()
     }
@@ -512,7 +512,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
         }
     }
     fun confirm(version: CareVersion, name: String, relationship: String, reviewed: Boolean, onSaved: suspend (Acknowledgement) -> Unit = {}, done: () -> Unit) = action {
-        require(selected.value == version.personId) { "Open this person's care note before confirming." }
+        require(selected.value == version.personId) { mTr("Open this person's care note before confirming.", "पुष्टि करने से पहले इस व्यक्ति का देखभाल नोट खोलें।") }
         val previousConfirmations = dao.confirmations(version.id).filter { cloud == null || it.id in authenticatedConfirmationIds.value }
         val proposed = NoteRules.acknowledge(version, dao.latest(version.personId), name, relationship, reviewed, previousConfirmations)
         val ack = if (cloud != null && dao.confirmation(proposed.id) != null && proposed.id !in authenticatedConfirmationIds.value) proposed.copy(id = newId()) else proposed
@@ -522,49 +522,49 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
             if (status != CareSyncStatus.SENT) { onSaved(ack); message.value = CareSyncText.CONFIRMED_WAITING; done(); return@action }
         }
         val saved = write?.let { sync?.takeConfirmation(it.opId) } ?: ack
-        require(saved.versionId == version.id && saved.contentHash == version.contentHash && saved.relationship == relationship && saved.name.trim().equals(name.trim(), ignoreCase = true)) { "The saved confirmation didn't match this version. Refresh the care note before trying again." }
+        require(saved.versionId == version.id && saved.contentHash == version.contentHash && saved.relationship == relationship && saved.name.trim().equals(name.trim(), ignoreCase = true)) { mTr("The saved confirmation didn't match this version. Refresh the care note before trying again.", "सहेजी गई पुष्टि इस संस्करण से मेल नहीं खाई। फिर कोशिश करने से पहले देखभाल नोट रिफ़्रेश करें।") }
         val previous = dao.confirmation(saved.id)
         if (previous == null) dao.acknowledge(saved)
-        else require(previous == saved) { "This confirmation changed. Refresh the care note before trying again." }
+        else require(previous == saved) { mTr("This confirmation changed. Refresh the care note before trying again.", "यह पुष्टि बदल गई है। फिर कोशिश करने से पहले देखभाल नोट रिफ़्रेश करें।") }
         if (cloud != null) authenticatedConfirmationIds.value += saved.id
         onSaved(saved)
-        message.value = "Your confirmation is saved"; done()
+        message.value = savedTr("Your confirmation is saved", "आपकी पुष्टि सहेजी गई"); done()
     }
     fun saveItem(kind: String, title: String, detail: String, due: Long = 0, done: () -> Unit = {}, id: String = newId()) {
         val person = selected.value
         action {
-            require(person.isNotBlank() && selected.value == person && title.trim().isNotEmpty()) { "Choose the right person and add a name or a short note." }
-            require(people.value.any { it.id == person }) { "This person's records are no longer available." }
-            require(title.length <= 200 && detail.length <= 4000) { "Please shorten this entry." }
+            require(person.isNotBlank() && selected.value == person && title.trim().isNotEmpty()) { mTr("Choose the right person and add a name or a short note.", "सही व्यक्ति चुनें और नाम या छोटा नोट जोड़ें।") }
+            require(people.value.any { it.id == person }) { mTr("This person's records are no longer available.", "इस व्यक्ति के रिकॉर्ड अब उपलब्ध नहीं हैं।") }
+            require(title.length <= 200 && detail.length <= 4000) { mTr("Please shorten this entry.", "कृपया इस प्रविष्टि को छोटा करें।") }
             if (CareEntryCodec.isStructured(detail)) {
-                val entry = requireNotNull(CareEntryCodec.decode(detail)) { "This entry couldn't be read. Open it again." }
+                val entry = requireNotNull(CareEntryCodec.decode(detail)) { mTr("This entry couldn't be read. Open it again.", "यह प्रविष्टि पढ़ी नहीं जा सकी। इसे फिर से खोलें।") }
                 when (entry.type) {
                     "task", "conversation" -> CareWorkflowRules.validate(title, entry)
                     "lab" -> CareLabRules.validate(title, entry, due)
-                    "schedule" -> require(due > 0 && entry.category in setOf("Visit", "Test", "Follow-up", "Procedure") + TreatmentDayRules.categories) { "Choose a date and type of care." }
+                    "schedule" -> require(due > 0 && entry.category in setOf("Visit", "Test", "Follow-up", "Procedure") + TreatmentDayRules.categories) { mTr("Choose a date and type of care.", "तारीख़ और देखभाल का प्रकार चुनें।") }
                 }
             }
             val sent = storeItem(CareItem(id = id, personId = person, kind = kind, title = title.trim(), detail = detail.trim(), due = due))
-            message.value = if (sent) "Saved" else CareSyncText.SAVED_WAITING; done()
+            message.value = if (sent) savedTr("Saved", "सहेजा गया") else CareSyncText.SAVED_WAITING; done()
         }
     }
     fun saveMedicineList(drafts: List<MedicineDraft>, done: () -> Unit = {}) {
         val person = selected.value
         action {
-            require(person.isNotBlank() && selected.value == person) { "Choose who these medicines are for." }
-            require(drafts.isNotEmpty()) { "Add at least one medicine." }
-            require(drafts.all { it.confirmed }) { "Check and confirm every medicine before saving." }
+            require(person.isNotBlank() && selected.value == person) { mTr("Choose who these medicines are for.", "चुनें कि ये दवाइयाँ किसके लिए हैं।") }
+            require(drafts.isNotEmpty()) { mTr("Add at least one medicine.", "कम से कम एक दवाई जोड़ें।") }
+            require(drafts.all { it.confirmed }) { mTr("Check and confirm every medicine before saving.", "सहेजने से पहले हर दवाई जाँचें और पक्की करें।") }
             val names = drafts.map { it.medicine.medicineName.trim() }
-            require(names.all { it.isNotBlank() && it.length <= 200 }) { "Add a medicine name to every entry." }
-            require(names.map { it.lowercase() }.distinct().size == names.size) { "Each medicine needs a different name." }
+            require(names.all { it.isNotBlank() && it.length <= 200 }) { mTr("Add a medicine name to every entry.", "हर प्रविष्टि में दवाई का नाम जोड़ें।") }
+            require(names.map { it.lowercase() }.distinct().size == names.size) { mTr("Each medicine needs a different name.", "हर दवाई का नाम अलग होना चाहिए।") }
             var allSent = true
             drafts.forEach { draft ->
                 val medicine = draft.medicine
-                require(medicine.strength.isNotBlank() || medicine.quantity.isNotBlank() || medicine.form.isNotBlank()) { "Add the prescribed dose for ${medicine.medicineName}." }
+                require(medicine.strength.isNotBlank() || medicine.quantity.isNotBlank() || medicine.form.isNotBlank()) { mTr("Add the prescribed dose for ${medicine.medicineName}.", "${medicine.medicineName} की तय खुराक जोड़ें।") }
                 val detail = medicineCareDetail(medicine)
-                require(detail.isNotBlank() && detail.length <= 4000) { "Review the dose and directions for ${medicine.medicineName}." }
+                require(detail.isNotBlank() && detail.length <= 4000) { mTr("Review the dose and directions for ${medicine.medicineName}.", "${medicine.medicineName} की खुराक और निर्देश जाँचें।") }
                 val existing = dao.item(draft.id)
-                require(existing == null || (existing.personId == person && existing.kind == "medicine")) { "One medicine could not be matched to this person. Start the scan again." }
+                require(existing == null || (existing.personId == person && existing.kind == "medicine")) { mTr("One medicine could not be matched to this person. Start the scan again.", "एक दवाई इस व्यक्ति से मिलाई नहीं जा सकी। स्कैन फिर से शुरू करें।") }
                 allSent = storeItem(CareItem(
                     id = draft.id,
                     personId = person,
@@ -576,49 +576,49 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
                     revision = existing?.revision ?: 0,
                 )) && allSent
             }
-            message.value = if (allSent) "${drafts.size} ${if (drafts.size == 1) "medicine" else "medicines"} saved" else CareSyncText.SAVED_WAITING
+            message.value = if (allSent) savedTr("Medicines saved: ${drafts.size}", "दवाइयाँ सहेजी गईं: ${drafts.size}") else CareSyncText.SAVED_WAITING
             done()
         }
     }
     fun saveSymptomNote(personId: String, id: String, note: SymptomNote, expectedToken: String?, done: () -> Unit = {}) = action {
-        require(personId.isNotBlank() && selected.value == personId && people.value.any { it.id == personId }) { "Choose the right person before saving this note." }
+        require(personId.isNotBlank() && selected.value == personId && people.value.any { it.id == personId }) { mTr("Choose the right person before saving this note.", "यह नोट सहेजने से पहले सही व्यक्ति चुनें।") }
         requireEdit(personId)
         SymptomDiaryRules.error(note)?.let { throw IllegalArgumentException(it) }
         val existing = dao.item(id)
         SymptomDiaryRules.saveConflict(existing, personId, expectedToken)?.let { throw IllegalArgumentException(it) }
         val candidate = CareItem(id = id, personId = personId, kind = "checkin", title = careInEnglish { "${note.symptom} · ${if (note.symptom == SymptomDiaryRules.MOOD) SymptomDiaryRules.moodSummary(note.moodRatings, false) else SymptomDiaryRules.ratingLabel(note.rating)}" },
             detail = SymptomNoteCodec.encode(note), created = existing?.created ?: System.currentTimeMillis(), revision = existing?.revision ?: 0)
-        if (note.selfReportedChange.isNotBlank()) require(SymptomDiaryRules.comparison(dao.allItems(), candidate, note)?.previous?.id == note.comparedWithId) { "The previous note changed. Check the comparison and save again." }
+        if (note.selfReportedChange.isNotBlank()) require(SymptomDiaryRules.comparison(dao.allItems(), candidate, note)?.previous?.id == note.comparedWithId) { mTr("The previous note changed. Check the comparison and save again.", "पिछला नोट बदल गया है। तुलना देखें और फिर से सहेजें।") }
         val sent = storeItem(candidate)
-        message.value = if (sent) "Symptom note saved" else CareSyncText.SAVED_WAITING; done()
+        message.value = if (sent) savedTr("Symptom note saved", "लक्षण नोट सहेजा गया") else CareSyncText.SAVED_WAITING; done()
     }
     fun toggle(item: CareItem) = action {
         val today = LocalDate.now().toString()
         val checked = if (item.kind == "medicine") item.doneOn == today else item.doneOn.isNotBlank()
-        require(item.personId == selected.value) { "Reopen the selected care profile." }
+        require(item.personId == selected.value) { mTr("Reopen the selected care profile.", "चुनी हुई देखभाल प्रोफ़ाइल फिर से खोलें।") }
         val changed = item.copy(doneOn = if (checked) "" else today)
         storeItem(changed)
         if (cloud == null && item.kind == "medicine") {
             try { appendLocalMedicineCheckoff(getApplication(), storageNamespace, item, item.doneOn, changed.doneOn) }
             catch (e: Exception) {
                 if (e is CancellationException) throw e
-                message.value = "Daily check-off saved, but detailed history could not be recorded."
+                message.value = mTr("Daily check-off saved, but detailed history could not be recorded.", "रोज़ का निशान सहेजा गया, लेकिन ब्योरेवार इतिहास दर्ज नहीं हो सका।")
             }
         }
         if (item.kind == "medicine") refreshMedicineHistory(item.personId)
     }
     /** Family/patient report that today's dose was missed. Appended to the intake history (server first when signed in); nothing is overwritten. */
     fun reportMedicineMissed(item: CareItem) = action {
-        require(item.kind == "medicine" && item.personId == selected.value && people.value.any { it.id == item.personId }) { "Reopen the selected care profile." }
+        require(item.kind == "medicine" && item.personId == selected.value && people.value.any { it.id == item.personId }) { mTr("Reopen the selected care profile.", "चुनी हुई देखभाल प्रोफ़ाइल फिर से खोलें।") }
         requireEdit(item.personId)
         val snapshot = medicineHistory.append(item.personId, MedicineHistoryRules.missedReport(item, viewRole.value, System.currentTimeMillis()))
         if (selected.value == item.personId) medicineEvents.value = snapshot.events
         message.value = careBilingual("Missed dose recorded", "छूटी खुराक दर्ज की गई")
     }
     fun updateItem(item: CareItem, done: () -> Unit) = action {
-        require(item.personId == selected.value && item.title.isNotBlank()) { "Choose the right person and enter a name." }
-        require(item.title.length <= 200 && item.detail.length <= 4000) { "Please shorten this entry." }
-        val sent = storeItem(item.copy(title = item.title.trim(), detail = item.detail.trim())); message.value = if (sent) "Saved" else CareSyncText.SAVED_WAITING; done()
+        require(item.personId == selected.value && item.title.isNotBlank()) { mTr("Choose the right person and enter a name.", "सही व्यक्ति चुनें और नाम लिखें।") }
+        require(item.title.length <= 200 && item.detail.length <= 4000) { mTr("Please shorten this entry.", "कृपया इस प्रविष्टि को छोटा करें।") }
+        val sent = storeItem(item.copy(title = item.title.trim(), detail = item.detail.trim())); message.value = if (sent) savedTr("Saved", "सहेजा गया") else CareSyncText.SAVED_WAITING; done()
     }
     /** Signed in: kept on the phone first, then sent in order. Returns false while it is still waiting to send. */
     private suspend fun storeItem(item: CareItem): Boolean {
@@ -661,32 +661,32 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
             val before = dao.item(item.id) ?: item
             queue.submit(CareSyncOps.removeEntry(item), local = { dao.removeItem(item) }, rollback = { dao.saveItem(before) }) == CareSyncStatus.SENT
         }
-        reconcileReminders(); message.value = if (sent) "Removed" else CareSyncText.REMOVED_WAITING
+        reconcileReminders(); message.value = if (sent) mTr("Removed", "हटाया गया") else CareSyncText.REMOVED_WAITING
     }
     fun importReport(uri: android.net.Uri, personId: String) = action {
-        require(people.value.any { it.id == personId }) { "Choose a person before adding a report." }
+        require(people.value.any { it.id == personId }) { mTr("Choose a person before adding a report.", "रिपोर्ट जोड़ने से पहले व्यक्ति चुनें।") }
         requireEdit(personId)
         val report = try { reportFiles.copyFrom(uri, personId) }
-        catch (e: SecurityException) { throw IllegalArgumentException("Couldn't read this file. Choose it again from Files.", e) }
-        catch (e: java.io.IOException) { throw IllegalArgumentException("Couldn't add the report. Your original file is unchanged. Try again.", e) }
+        catch (e: SecurityException) { throw IllegalArgumentException(mTr("Couldn't read this file. Choose it again from Files.", "यह फ़ाइल पढ़ी नहीं जा सकी। इसे फ़ाइलें में से फिर चुनें।"), e) }
+        catch (e: java.io.IOException) { throw IllegalArgumentException(mTr("Couldn't add the report. Your original file is unchanged. Try again.", "रिपोर्ट जोड़ी नहीं जा सकी। आपकी मूल फ़ाइल जस की तस है। फिर कोशिश करें।"), e) }
         try { dao.addReport(report) }
         catch (e: Exception) { withContext(NonCancellable + Dispatchers.IO) { reportFiles.file(report).delete() }; throw e }
-        message.value = "Report added"
+        message.value = mTr("Report added", "रिपोर्ट जोड़ी गई")
     }
     fun renameReport(report: CareReport, name: String, done: () -> Unit) = action {
-        require(report.personId == selected.value && reports.value.any { it.id == report.id }) { "Choose a report for this person." }
+        require(report.personId == selected.value && reports.value.any { it.id == report.id }) { mTr("Choose a report for this person.", "इस व्यक्ति के लिए रिपोर्ट चुनें।") }
         requireEdit(report.personId)
-        require(dao.renameReport(report.id, report.personId, ReportNameRules.clean(name)) == 1) { "Couldn't rename this report. Try again." }
+        require(dao.renameReport(report.id, report.personId, ReportNameRules.clean(name)) == 1) { mTr("Couldn't rename this report. Try again.", "इस रिपोर्ट का नाम नहीं बदला जा सका। फिर कोशिश करें।") }
         message.value = careBilingual("Report renamed", "नाम बदल गया"); done()
     }
     fun removeReport(report: CareReport, done: () -> Unit) = action {
-        require(report.personId == selected.value && reports.value.any { it.id == report.id }) { "Choose a report for this person." }
+        require(report.personId == selected.value && reports.value.any { it.id == report.id }) { mTr("Choose a report for this person.", "इस व्यक्ति के लिए रिपोर्ट चुनें।") }
         requireEdit(report.personId)
         withContext(Dispatchers.IO) {
             val file = reportFiles.file(report)
-            require(!file.exists() || file.delete()) { "Couldn't remove this report. Try again." }
+            require(!file.exists() || file.delete()) { mTr("Couldn't remove this report. Try again.", "यह रिपोर्ट हटाई नहीं जा सकी। फिर कोशिश करें।") }
         }
-        dao.removeReport(report); message.value = "Report removed"; done()
+        dao.removeReport(report); message.value = mTr("Report removed", "रिपोर्ट हटाई गई"); done()
         CareDocumentReviewStore(getApplication(), storageNamespace).remove(report)
     }
     /** After the server account is deleted: removes this account's copy on the phone (records, recordings, report files). */
@@ -700,8 +700,8 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
     fun removePerson(done: () -> Unit) {
         val id = selected.value
         action {
-            require(!recording.value) { "Stop the recording first." }
-            require(cloud == null || id in owned.value) { "Only the person who added these records can remove them." }
+            require(!recording.value) { mTr("Stop the recording first.", "पहले रिकॉर्डिंग रोकें।") }
+            require(cloud == null || id in owned.value) { mTr("Only the person who added these records can remove them.", "सिर्फ़ रिकॉर्ड जोड़ने वाला व्यक्ति ही उन्हें हटा सकता है।") }
             cloud?.removePerson(id)
             // Ignore queued edits for deleted records; an old write must never recreate them.
             lock.withLock {
@@ -716,7 +716,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
                 withContext(Dispatchers.IO) { NoteSignatureStore.of(getApplication(), storageNamespace).removePerson(id) }
             }
             reconcileReminders()
-            select(""); message.value = "Records removed"; done()
+            select(""); message.value = mTr("Records removed", "रिकॉर्ड हटाए गए"); done()
         }
     }
     fun startRecording(
@@ -904,13 +904,13 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
     }
     private fun action(block: suspend () -> Unit) {
         // A background refresh (for example on returning to the app) no longer turns a save away: the save waits for it, then runs.
-        if (busy.value) { message.value = "Still working on your last change. Please wait a moment."; return } // busy is only set by another action (a save, delete or import), e.g. after a double tap
+        if (busy.value) { message.value = mTr("Still working on your last change. Please wait a moment.", "आपका पिछला बदलाव अभी हो रहा है। कृपया थोड़ा रुकें।"); return } // busy is only set by another action (a save, delete or import), e.g. after a double tap
         actionError.value = null
         busy.value = true
         viewModelScope.launch {
             try { refreshing.first { !it }; block() } catch (e: Exception) {
                 if (e is CancellationException) throw e
-                val error = if (e is IllegalArgumentException || e is ConversationTranscriptionException) e.message else "Couldn't save. Your entry is still here; please try again."
+                val error = if (e is IllegalArgumentException || e is ConversationTranscriptionException) e.message else mTr("Couldn't save. Your entry is still here; please try again.", "सहेजा नहीं जा सका। आपकी प्रविष्टि यहीं है; कृपया फिर कोशिश करें।")
                 actionError.value = error; message.value = error
             }
             finally { busy.value = false }
@@ -925,3 +925,8 @@ object CareRoles {
     /** Saved role preferences from older installs (a menu choice, possibly Doctor) that must be dropped so the computed role applies. */
     fun staleKeys(all: Map<String, *>): List<String> = listOf("viewRole", "clinician").filter { it in all }
 }
+
+/** Text built outside a screen (messages, errors): the shown language, English while records are being saved. */
+private fun mTr(en: String, hi: String): String = careTr(CareLanguageState.shown, en, hi)
+/** A save confirmation; the invisible mark keeps the saved tick in every language (see SaharaMotion.isSavedMessage). */
+private fun savedTr(en: String, hi: String): String = SaharaMotion.SAVED_MARK + mTr(en, hi)

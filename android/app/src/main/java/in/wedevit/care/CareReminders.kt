@@ -98,7 +98,7 @@ class CareReminderScheduler(private val context: Context, private val account: S
                 else alarm.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, occurrence.at, intent)
                 keys += occurrence.key
                 saved.put(JSONObject().put("key", occurrence.key).put("id", occurrence.itemId).put("at", occurrence.at).put("date", occurrence.localDate).put("time", occurrence.time))
-            } catch (_: SecurityException) { prefs.edit().putString("error", "Android blocked reminders. Check notification and battery settings.").commit() }
+            } catch (_: SecurityException) { prefs.edit().putString("error", careWithDeviceLanguage(context) { careTr(careDeviceLanguage(context), "Android blocked reminders. Check notification and battery settings.", "Android ने रिमाइंडर रोक दिए। सूचना और बैटरी सेटिंग जाँचें।") }).commit() }
         }
         prefs.edit().putStringSet("scheduled", keys).putString("occurrences", saved.toString()).commit()
     }

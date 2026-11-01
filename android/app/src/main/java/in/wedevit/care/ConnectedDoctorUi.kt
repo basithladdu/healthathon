@@ -240,10 +240,8 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
                         if(earlierWorkspace) {
                             TextButton(onClick={earlierWorkspace=false}){Text(t("Return to current schedule", "अभी के शेड्यूल पर लौटें"))}
                             if (patients.isNotEmpty()) Box(Modifier.weight(1f)) { DemoSchedule(patients.map { it.card() }, localVisits, LocalDate.parse(day), { day = it.toString() }, ::openTest, { editingVisit = null; schedulePatient = patients.first().id }, { editingVisit = it; schedulePatient = it.patientId }, { visit -> localVisits = localVisits.map { if (it.id == visit.id) it.copy(status = "Cancelled") else it } }, { visit -> localVisits = localVisits.map { if (it.id == visit.id) it.copy(status = "Completed") else it } }) } else Text(t("No earlier planner records.", "पहले के प्लानर रिकॉर्ड नहीं हैं।"), Modifier.padding(20.dp))
-                        } else LazyColumn(Modifier.weight(1f).testTag("doctor-schedule"),contentPadding=PaddingValues(20.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {
-                            doctorConnectedScheduleItems(realPeople, allItems, System.currentTimeMillis(), hindi, onVisit = { openReal(it); section = "Visits" })
-                            item { DoctorWalkthroughCard(hindi) { p -> navigate { testCarePerson = DoctorTestProfiles.personId(p); testInitialSection = "Visits"; isolatedDemo = true } } }
-                        }
+                        } else DoctorConnectedSchedule(vm, realPeople, allItems, onOpenPatient = { openReal(it); section = "Visits" }, onAllPatients = { tab = 1 }, modifier = Modifier.weight(1f),
+                            footer = { DoctorWalkthroughCard(hindi) { p -> navigate { testCarePerson = DoctorTestProfiles.personId(p); testInitialSection = "Visits"; isolatedDemo = true } } })
                     }
                 }
                 else -> LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -284,6 +282,7 @@ private fun ConnectedDoctorPatient.card() = DoctorDemoPatient(id, name, age, car
     val entries = items?.collectAsStateWithLifecycle()?.value
     LazyColumn(Modifier.fillMaxSize().testTag("doctor-shared-patient-hub"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
         item { Text(t("${person.name}'s care", "${person.name} की देखभाल"), fontFamily = SaharaTitleFont, fontSize = 29.sp,lineHeight=36.sp); if(!DoctorTestProfiles.contains(person.id)) Text(if (deviceLocal) t("Device-local care · not synced or shared", "सिर्फ़ इस फ़ोन पर · सिंक या साझा नहीं") else t("Real shared records · access controlled by the patient", "असली साझा रिकॉर्ड · पहुँच मरीज़ के हाथ में"), style = MaterialTheme.typography.bodyMedium); if(!deviceLocal && !DoctorTestProfiles.contains(person.id)) Text(t("Patient ID ", "मरीज़ ID ") + DoctorConnectedHome.patientCode(person.id), style = MaterialTheme.typography.labelLarge, color = Rust, modifier = Modifier.testTag("doctor-shared-patient-id")) }
+        if (entries != null) item { DoctorPatientProfileCard(entries, person) }
         item { DoctorPatientNavigationTiles(onSection) }
         if (entries != null) item { DoctorSymptomSummary(entries, person.id) }
         item { OutlinedButton(onClick = { onSection("Tools") }, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("doctor-shared-tools")) { Icon(Icons.Default.Apps, null); Spacer(Modifier.width(10.dp)); Text(t("Daily care & tools", "रोज़ की देखभाल और टूल")) } }

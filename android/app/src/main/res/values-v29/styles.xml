@@ -1,0 +1,12 @@
+<resources>
+    <!-- Sahara draws its own light colours. Phone dark modes that repaint apps (MIUI and others) left some text pale, so they are turned off. -->
+    <style name="AppTheme" parent="android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:fontFamily">sans</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowBackground">@color/launcher_background</item>
+        <item name="android:windowLightNavigationBar">true</item>
+        <item name="android:windowActionModeOverlay">true</item>
+        <item name="android:colorAccent">#B9472C</item>
+        <item name="android:forceDarkAllowed">false</item>
+    </style>
+</resources>

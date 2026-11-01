@@ -19,7 +19,8 @@ data class TreatmentDay(val item: CareItem, val category: String)
 
 object TreatmentDayRules {
     val categories = listOf("Chemotherapy", "Radiotherapy")
-    fun label(category: String) = if (category == "Chemotherapy") careBilingual("Chemo", "कीमो") else careBilingual("Radiotherapy", "रेडियोथेरेपी")
+    // One language at a time: the header language switch decides which.
+    fun label(category: String) = if (category == "Chemotherapy") careTr(CareLanguageState.shown, "Chemo", "कीमो") else careTr(CareLanguageState.shown, "Radiotherapy", "रेडियोथेरेपी")
     fun days(items: List<CareItem>, personId: String): List<TreatmentDay> = items.mapNotNull { item ->
         CareEntryCodec.decode(item.detail)?.takeIf { item.personId == personId && item.due > 0 && it.type == "schedule" && it.category in categories && it.status != "cancelled" }
             ?.let { TreatmentDay(item, it.category) }

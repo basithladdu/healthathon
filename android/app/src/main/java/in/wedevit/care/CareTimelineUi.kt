@@ -2,6 +2,7 @@
 package `in`.wedevit.care
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -10,6 +11,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -79,6 +81,10 @@ private fun timelineFilterLabel(f: TimelineFilter, t: (String, String) -> String
     val notes by vm.versions.collectAsStateWithLifecycle()
     val person by vm.selected.collectAsStateWithLifecycle()
     var filterName by rememberSaveable { mutableStateOf(TimelineFilter.ALL.name) }
+    var toggled by rememberSaveable { mutableStateOf("") }; var showAllMonths by rememberSaveable { mutableStateOf("") }
+    fun flip(set: String, key: String) = set.split(',').filter { it.isNotBlank() }.let { if (key in it) it - key else it + key }.joinToString(",")
+    val shortFormat = DateTimeFormatter.ofPattern("d MMM", careLocale(careHindi()))
+    fun shortDate(epoch: Long) = java.time.Instant.ofEpochMilli(epoch).atZone(java.time.ZoneId.systemDefault()).format(shortFormat)
     val filter = TimelineFilter.entries.firstOrNull { it.name == filterName } ?: TimelineFilter.ALL
     val now = remember(items, reports, notes) { System.currentTimeMillis() }
     val all = remember(person, items, reports, notes) { CareTimelineRules.events(person, items, reports, notes, cancerType, folderOf, now) }
@@ -104,23 +110,38 @@ private fun timelineFilterLabel(f: TimelineFilter, t: (String, String) -> String
             IconButton(onClick = onClose, modifier = Modifier.size(48.dp)) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back to documents", "कागज़ात पर वापस")) }
             Column(Modifier.weight(1f)) { Heading(t("Care timeline", "देखभाल की समय-रेखा"), 28); Text(t("Key events from your documents", "आपके कागज़ों की मुख्य बातें"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
         } }
-        if (vm.demoMode) item { Text(t("Practice record: these dates are sample data, not a real person's treatment.", "अभ्यास रिकॉर्ड: ये तारीख़ें नमूना हैं, किसी असली व्यक्ति का इलाज नहीं।"), style = MaterialTheme.typography.bodySmall, color = RustText, modifier = Modifier.testTag("timeline-practice-note")) }
-        item { SurfaceCard {
-            Text(t("At a glance", "एक नज़र में"), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
-            listOf(
-                Triple(t("Last chemotherapy", "आख़िरी कीमो"), summary.chemo, "chemo"), Triple(t("Last radiotherapy", "आख़िरी रेडियोथेरेपी"), summary.radio, "radio"),
-                Triple(t("Last scan", "आख़िरी स्कैन"), summary.scan, "scan"), Triple(t("Last biopsy or histopathology", "आख़िरी बायोप्सी या हिस्टोपैथोलॉजी"), summary.biopsy, "biopsy"),
-            ).forEach { (label, event, tag) ->
-                val value = event?.let { dateText(it) } ?: t("Not recorded", "दर्ज नहीं")
-                val source = event?.let { t("From: ", "स्रोत: ") + timelineSource(it, t) }
-                val tappable = event != null && canOpen(event)
-                Column(Modifier.fillMaxWidth().heightIn(min = 48.dp).then(if (tappable) Modifier.clickable { open(event!!) } else Modifier).padding(vertical = 4.dp)
-                    .semantics(mergeDescendants = true) { contentDescription = listOfNotNull(label, value, source).joinToString(". ") }.testTag("timeline-summary-$tag"), verticalArrangement = Arrangement.Center) {
-                    Text(label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Text(value, fontWeight = FontWeight.SemiBold, color = if (event == null) MaterialTheme.colorScheme.onSurfaceVariant else Ink)
-                    if (source != null) Text(source, style = MaterialTheme.typography.bodySmall, color = if (tappable) RustText else MaterialTheme.colorScheme.onSurfaceVariant)
-                }
+        if (vm.demoMode) item { Surface(shape = RoundedCornerShape(14.dp), color = SaharaSoftGold, modifier = Modifier.fillMaxWidth()) {
+            Row(Modifier.padding(horizontal = 12.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.Info, null, Modifier.size(18.dp), tint = DoctorAccent); Spacer(Modifier.width(8.dp))
+                Text(t("Practice record: these dates are sample data, not a real person's treatment.", "अभ्यास रिकॉर्ड: ये तारीख़ें नमूना हैं, किसी असली व्यक्ति का इलाज नहीं।"), fontSize = 13.sp, color = DoctorCardInk)
             }
+        } }
+        item { Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Text(t("At a glance", "एक नज़र में"), fontWeight = FontWeight.SemiBold, fontSize = 17.sp, color = DoctorCardInk, modifier = Modifier.a11yHeading())
+            val tiles = listOf(
+                GlanceTile(t("Last chemotherapy", "आख़िरी कीमो"), summary.chemo, "chemo", Icons.Default.Vaccines, Peach),
+                GlanceTile(t("Last radiotherapy", "आख़िरी रेडियोथेरेपी"), summary.radio, "radio", Icons.Default.Healing, SaharaLavender),
+                GlanceTile(t("Last scan", "आख़िरी स्कैन"), summary.scan, "scan", Icons.Default.DocumentScanner, SaharaSoftBlue),
+                GlanceTile(t("Last biopsy or histopathology", "आख़िरी बायोप्सी या हिस्टोपैथोलॉजी"), summary.biopsy, "biopsy", Icons.Default.Science, Mint),
+            )
+            tiles.chunked(2).forEach { pair -> Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                pair.forEach { tile ->
+                    val event = tile.event
+                    val value = event?.let { dateText(it) } ?: t("Not recorded", "दर्ज नहीं")
+                    val source = event?.let { t("From: ", "स्रोत: ") + timelineSource(it, t) }
+                    val tappable = event != null && canOpen(event)
+                    Surface(shape = RoundedCornerShape(18.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline),
+                        modifier = Modifier.weight(1f).fillMaxHeight().then(if (tappable) Modifier.clickable { open(event!!) } else Modifier)
+                            .semantics(mergeDescendants = true) { contentDescription = listOfNotNull(tile.label, value, source).joinToString(". ") }.testTag("timeline-summary-${tile.tag}")) {
+                        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            Surface(shape = CircleShape, color = tile.tint) { Icon(tile.icon, null, Modifier.padding(7.dp).size(18.dp), tint = DoctorAccent) }
+                            Text(tile.label, fontSize = 12.sp, color = DoctorCardSub, maxLines = 2)
+                            Text(value, fontWeight = FontWeight.Bold, fontSize = 15.sp, color = if (event == null) DoctorCardSub else DoctorCardInk)
+                            if (source != null) Text(source, fontSize = 11.sp, color = if (tappable) RustText else DoctorCardSub, maxLines = 1)
+                        }
+                    }
+                }
+            } }
         } }
         item { Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             TimelineFilter.entries.forEach { option -> FilterChip(selected = filter == option, onClick = { filterName = option.name }, label = { Text(timelineFilterLabel(option, t)) }, modifier = Modifier.heightIn(min = 48.dp).testTag("timeline-filter-${option.name}")) }
@@ -132,27 +153,60 @@ private fun timelineFilterLabel(f: TimelineFilter, t: (String, String) -> String
             Text(if (all.isEmpty()) t("Add reports, lab results and chemo or radiotherapy days. They appear here with where they came from.", "रिपोर्टें, जाँच के नतीजे और कीमो या रेडियोथेरेपी के दिन जोड़ें। वे यहाँ अपने स्रोत के साथ दिखेंगे।") else t("Try another filter.", "कोई और फ़िल्टर चुनें।"), style = MaterialTheme.typography.bodyMedium)
             if (all.isNotEmpty()) TextButton(onClick = { filterName = TimelineFilter.ALL.name }) { Text(t("Show all", "सब दिखाएँ")) }
         } }
-        months.forEach { (month, events) ->
-            item(key = "month-$month") { Text(month.atDay(1).format(monthFormat), Modifier.a11yHeading().padding(top = 6.dp), fontSize = 20.sp, fontFamily = SaharaTitleFont) }
-            items(events, key = { it.id }) { e ->
-                val tappable = canOpen(e)
-                Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
-                    Column(Modifier.width(44.dp).fillMaxHeight(), horizontalAlignment = Alignment.CenterHorizontally) {
-                        Surface(shape = CircleShape, color = timelineColor(e.kind), modifier = Modifier.size(36.dp)) { Box(contentAlignment = Alignment.Center) { Icon(timelineIcon(e.kind), null, Modifier.size(20.dp), tint = Ink) } }
-                        Box(Modifier.width(2.dp).weight(1f).background(MaterialTheme.colorScheme.outlineVariant))
+        items(months, key = { "month-${it.first}" }) { (month, events) ->
+            val key = month.toString(); val newest = months.first().first == month
+            val isOpen = newest != (key in toggled.split(',')) // older months start closed; a tap flips the default
+            val expandedAll = key in showAllMonths.split(',')
+            val visible = if (expandedAll) events else events.take(5)
+            Column(Modifier.fillMaxWidth().animateItem()) {
+                Surface(onClick = { toggled = flip(toggled, key) }, shape = RoundedCornerShape(14.dp), color = SaharaSoftGold, border = BorderStroke(1.dp, DoctorHairline),
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).a11yHeading().testTag("timeline-month-$key")) {
+                    Row(Modifier.padding(horizontal = 14.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Text(month.atDay(1).format(monthFormat) + " · " + events.size, Modifier.weight(1f), fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
+                        Icon(if (isOpen) Icons.Default.ExpandLess else Icons.Default.ExpandMore, if (isOpen) t("Hide this month", "यह महीना छिपाएँ") else t("Show this month", "यह महीना दिखाएँ"), tint = DoctorCardInk)
                     }
-                    Surface(modifier = Modifier.weight(1f).padding(bottom = 10.dp).heightIn(min = 48.dp).semantics(mergeDescendants = true) { contentDescription = description(e) }.testTag("timeline-event-${e.id}"),
-                        onClick = { open(e) }, enabled = tappable, shape = RoundedCornerShape(16.dp), color = Paper) {
-                        Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                            Text(dateText(e) + " · " + timelineLabel(e, t), style = MaterialTheme.typography.labelMedium, color = RustText)
-                            Text(timelineHeadline(e, t), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, maxLines = 3, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
-                            Text(t("From: ", "स्रोत: ") + timelineSource(e, t), style = MaterialTheme.typography.bodySmall, color = if (tappable) RustText else MaterialTheme.colorScheme.onSurfaceVariant)
-                            if (e.dateIsFileDate && e.isFile) Text(t("Report date not recorded. This is the day the file was added.", "रिपोर्ट की तारीख़ दर्ज नहीं। यह फ़ाइल जोड़ने का दिन है।"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                AnimatedVisibility(isOpen, enter = SaharaMotion.expand, exit = SaharaMotion.collapse) {
+                    Column(Modifier.padding(top = 8.dp)) {
+                        visible.forEach { e ->
+                            val tappable = canOpen(e)
+                            Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
+                                Column(Modifier.width(36.dp).fillMaxHeight(), horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Surface(shape = CircleShape, color = timelineColor(e.kind), modifier = Modifier.size(28.dp)) { Box(contentAlignment = Alignment.Center) { Icon(timelineIcon(e.kind), null, Modifier.size(16.dp), tint = Ink) } }
+                                    Box(Modifier.width(2.dp).weight(1f).background(DoctorHairline))
+                                }
+                                // A row that opens something sits on a light card with an arrow, so it reads as tappable.
+                                Surface(modifier = Modifier.weight(1f).padding(start = 6.dp, bottom = 8.dp).heightIn(min = 48.dp).semantics(mergeDescendants = true) { contentDescription = description(e) }.testTag("timeline-event-${e.id}"),
+                                    onClick = { open(e) }, enabled = tappable, shape = RoundedCornerShape(14.dp), color = if (tappable) Paper else Color.Transparent,
+                                    border = if (tappable) BorderStroke(1.dp, DoctorHairline) else null) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Column(Modifier.weight(1f).padding(start = 12.dp, top = 8.dp, bottom = 8.dp, end = 4.dp)) {
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Text(shortDate(e.epoch), style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold, color = RustText)
+                                            if (e.dateIsFileDate) Text(" " + t("(date added)", "(जोड़ने की तारीख़)"), style = MaterialTheme.typography.labelSmall, color = DoctorCardSub)
+                                        }
+                                        Text(timelineHeadline(e, t), fontWeight = FontWeight.SemiBold, fontSize = 15.sp, color = DoctorCardInk, maxLines = 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+                                        Text(timelineSource(e, t), style = MaterialTheme.typography.bodySmall, color = DoctorCardSub, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+                                    }
+                                    if (tappable) Row(Modifier.padding(end = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                                        Text(t("View", "देखें"), fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = RustText)
+                                        Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, Modifier.size(20.dp), tint = Rust)
+                                    }
+                                    }
+                                }
+                            }
+                        }
+                        if (events.size > 5) TextButton(onClick = { showAllMonths = flip(showAllMonths, key) }, modifier = Modifier.heightIn(min = 48.dp).testTag("timeline-more-$key")) {
+                            Text(if (expandedAll) t("Show fewer", "कम दिखाएँ") else t("Show all ${events.size}", "सभी ${events.size} दिखाएँ"))
                         }
                     }
                 }
             }
         }
+        if (shown.any { it.dateIsFileDate && it.isFile }) item { Text(t("(date added): Report date not recorded. This is the day the file was added.", "(जोड़ने की तारीख़): रिपोर्ट की तारीख़ दर्ज नहीं। यह फ़ाइल जोड़ने का दिन है।"), style = MaterialTheme.typography.bodySmall, color = DoctorCardSub, modifier = Modifier.testTag("timeline-date-footnote")) }
         item { Text(t("Dates come from reports you added, Calendar days and results you copied. A Calendar day marks a day you noted; it does not confirm a treatment was given. Everything stays on this phone.", "तारीख़ें आपकी जोड़ी रिपोर्टों, कैलेंडर के दिनों और कॉपी किए नतीजों से हैं। कैलेंडर का दिन आपका नोट किया दिन है; इससे इलाज दिए जाने की पुष्टि नहीं होती। सब कुछ इसी फ़ोन पर रहता है।"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
     }
 }
+
+/** One "At a glance" tile: what it is, the newest matching event (or none), and its colour. */
+private class GlanceTile(val label: String, val event: TimelineEvent?, val tag: String, val icon: androidx.compose.ui.graphics.vector.ImageVector, val tint: androidx.compose.ui.graphics.Color)

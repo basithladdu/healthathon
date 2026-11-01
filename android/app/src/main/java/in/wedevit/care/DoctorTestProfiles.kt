@@ -17,6 +17,7 @@ internal object DoctorTestProfiles {
     data class Profile(val key: String, val name: String, val family: String)
     val profiles = listOf(Profile("rahul", "Rahul", "Meera · sister / Kavya · partner / Arjun · brother"), Profile("arjun", "Arjun", "Nisha · mother / Dev · brother"))
     private const val DAY=86_400_000L
+    private val RAHUL_PROFILE=CarePatientProfile(58,"Male",62.0,170,"B+","Carcinoma stomach, stage IV","","","Hyderabad")
     fun id(key:String)=UUID.nameUUIDFromBytes("sahara-test-workspace-v2/$key".toByteArray(Charsets.UTF_8)).toString()
     fun personId(profile:Profile)=id("${profile.key}/person")
     fun contains(person:String)=profiles.any {personId(it)==person}
@@ -94,6 +95,8 @@ internal object DoctorTestProfiles {
             sideEffect(2,0,listOf("drowsiness"),"Very sleepy for a few hours after the evening dose.","mild",18,"Rahul (patient)"),
             sideEffect(3,2,listOf("other"),"Trouble getting to sleep at night.","mild",6*24,"Kavya (partner)",3*24,"Dr Vikram Rao"),
         ) else emptyList()
+        // Rahul's basic profile (a shared care record entry), so the doctor and family walkthroughs show the profile card.
+        val profileItems=if(rahul) listOf(PatientProfileCodec.item(person.id,RAHUL_PROFILE,now-45*DAY,key("profile"))) else emptyList()
         fun journal(n:Int,title:String,detail:String,ageHours:Long)=CareItem(key("journal-$n"),person.id,"journal",title,detail,created=now-ageHours*3_600_000)
         val walkthroughJournal=if(extra) listOf(journal(1,"Rahul slept better after the evening dose","Rahul slept better after the evening dose. Arjun (brother): he settled by 10 pm and slept until morning.",30),journal(2,"Ate half of lunch and walked to the veranda","Ate half of lunch and walked to the veranda with help. Arjun (brother): he asked for the questions to be read out before the review.",8)) else emptyList()
         val reports=listOf(CareReport(key("document-1"),person.id,"${profile.name} care planning notes.png","image/png","${profile.key}-planning-v2.png",0,now-3*DAY),CareReport(key("document-2"),person.id,"${profile.name} family visit checklist.png","image/png","${profile.key}-family-v2.png",0,now-DAY),CareReport(key("document-3"),person.id,"${profile.name} blood test results.png","image/png","${profile.key}-bloods-v2.png",0,now-3*DAY),CareReport(key("document-4"),person.id,"${profile.name} prescription summary.png","image/png","${profile.key}-prescription-v2.png",0,now-2*DAY))
@@ -107,7 +110,7 @@ internal object DoctorTestProfiles {
         fun event(n:Int,med:Int,outcome:String,planned:Long?,taken:Long?,logged:Long)=MedicineIntakeEvent(key("event-$n"),medicines[med].id,medicines[med].title,outcome,planned,taken,"",logged,reporters[n%2],if(outcome=="planned")"Planned dose. Nothing has been reported yet." else "Family report only. Not confirmed as taken or checked by anyone else.","manual")
         val intake=listOf(event(1,0,"taken",now-14_400_000,now-14_400_000,now-13_800_000),event(2,1,"taken",now-7_200_000,now-5_400_000,now-4_800_000),event(3,0,"skipped",now-3_600_000,null,now-3_000_000),event(4,1,"planned",now-1_800_000,null,now-10_800_000),event(5,0,"planned",now+10_800_000,null,now-10_800_000),event(6,2,"taken",null,null,now-DAY).copy(reportedDate=Instant.ofEpochMilli(now-DAY).atZone(zone).toLocalDate().toString(),source="daily-checkoff",reporter=reporters[0]+" · date only"),event(7,4,"taken",now-DAY-3_600_000,now-DAY-3_000_000,now-DAY-2_400_000),event(8,3,"skipped",now-2*DAY,null,now-2*DAY+600_000),event(9,2,"taken",now-2*DAY-7_200_000,now-2*DAY-5_400_000,now-2*DAY-4_800_000),event(10,0,"taken",now-2*DAY-14_400_000,now-2*DAY-13_800_000,now-2*DAY-13_200_000))
         val contacts=if(rahul) listOf(CareContact(key("family-1"),person.id,"Meera","Sister","family"),CareContact(key("family-2"),person.id,"Kavya","Partner","family"),CareContact(key("support"),person.id,"Priya Nair","Palliative care nurse coordinator","caregiver"))+(if(extra) listOf(CareContact(key("family-3"),person.id,"Arjun","Brother","family"),CareContact(key("doctor"),person.id,meera,"Palliative care doctor","caregiver")) else emptyList()) else listOf(CareContact(key("family-1"),person.id,"Nisha","Mother","family"),CareContact(key("family-2"),person.id,"Dev","Brother","family"),CareContact(key("support"),person.id,"Farah Khan","Community nurse coordinator","caregiver"))
-        return DoctorCareDemoFixture(person,draft,versions,medicines+checks+diary+sideEffects+visits+walkthroughVisits+walkthroughTasks+walkthroughJournal+walkthroughTreatment+labs,intake,contacts,reports,medicines[2].id)
+        return DoctorCareDemoFixture(person,draft,versions,medicines+checks+diary+sideEffects+profileItems+visits+walkthroughVisits+walkthroughTasks+walkthroughJournal+walkthroughTreatment+labs,intake,contacts,reports,medicines[2].id)
     }
 
     suspend fun seed(vm:CareModel,context:Context) {
@@ -115,7 +118,13 @@ internal object DoctorTestProfiles {
         profiles.forEach { profile->
           val prefs=context.getSharedPreferences("doctor-test-profiles-${vm.storageNamespace}",Context.MODE_PRIVATE)
           vm.seedDoctorDemo {dao->
-            if(!needsSeed(profile,dao.people().first().map {it.id}.toSet(),prefs.getBoolean("complete-${profile.key}",false)))return@seedDoctorDemo
+            if(!needsSeed(profile,dao.people().first().map {it.id}.toSet(),prefs.getBoolean("complete-${profile.key}",false))) {
+                // Records seeded before the profile existed get it added once; an early seed with a sample allergy is replaced.
+                val old=dao.item(id("rahul/profile"))
+                if(profile.key=="rahul"&&dao.people().first().any {it.id==personId(profile)}&&(old==null||PatientProfileCodec.decode(old.detail)?.allergies=="Penicillin (rash)"))
+                    dao.saveItem(PatientProfileCodec.item(personId(profile),RAHUL_PROFILE,old?.created?:System.currentTimeMillis(),id("rahul/profile")))
+                return@seedDoctorDemo
+            }
             val anchor=prefs.getLong(profile.key,0).takeIf {it>0}?:System.currentTimeMillis().also {check(prefs.edit().putLong(profile.key,it).commit())}
             val data=fixture(profile,anchor)
             val reports=data.reports.mapIndexed {index,report->

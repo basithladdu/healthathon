@@ -63,6 +63,8 @@ import java.time.format.DateTimeFormatter
     val notes = remember(entries, selected) { entries.filter { it.personId == selected && SymptomNoteCodec.isStructured(it.detail) }
         .map { it to SymptomNoteCodec.decode(it.detail)?.let { n -> "${n.observedDate}T${n.observedTime}" }.orEmpty() }
         .sortedByDescending { it.second }.map { it.first } }
+    var severeFirst by rememberSaveable(selected) { mutableStateOf(true) }
+    val shown = remember(notes, severeFirst) { if (severeFirst) SymptomSort.severeFirst(notes, { SymptomSort.headline(it) }, { SymptomSort.stamp(it) }) else notes }
     val hasPainHistory = remember(entries, person?.id) { person != null && PainHistoryRules.entries(entries, person.id).isNotEmpty() }
     val t = { en: String, hi: String -> careTr(hindi, en, hi) }
     BackHandler(onBack = onBack)
@@ -91,10 +93,27 @@ import java.time.format.DateTimeFormatter
                 open(context, Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text), t("Share symptom notes", "तबीयत के नोट साझा करें")))
             }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.Share, null); Spacer(Modifier.width(8.dp)); Text(t("Share notes", "नोट साझा करें")) }
         }
-        items(notes, key = { it.id }) { SymptomNoteCard(it, vm, hindi) }
+        if (notes.size > 1) item {
+            SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth().testTag("symptom-sort")) {
+                SegmentedButton(selected = severeFirst, onClick = { severeFirst = true }, shape = SegmentedButtonDefaults.itemShape(0, 2), modifier = Modifier.heightIn(min = 48.dp).testTag("symptom-sort-severe")) { Text(t("Most severe", "सबसे गंभीर")) }
+                SegmentedButton(selected = !severeFirst, onClick = { severeFirst = false }, shape = SegmentedButtonDefaults.itemShape(1, 2), modifier = Modifier.heightIn(min = 48.dp).testTag("symptom-sort-newest")) { Text(t("Newest", "सबसे नया")) }
+            }
+        }
+        items(shown, key = { it.id }) { SymptomNoteCard(it, vm, hindi) }
     }
     if (adding && person != null) SymptomNoteEditor(vm, hindi, onClose = { adding = false })
     if (showingPainHistory && person != null) PainBodyHistorySheet(entries, person.id, hindi, onClose = { showingPainHistory = false })
+}
+
+/** Severity ordering for the tracker list; pure so it can be unit tested. */
+object SymptomSort {
+    /** Highest score first; ties newest first (stamp compares as "date" + "T" + "time"); unscored entries last. */
+    fun <T> severeFirst(items: List<T>, score: (T) -> Int?, stamp: (T) -> String): List<T> =
+        items.sortedWith(compareByDescending<T> { score(it) ?: -1 }.thenByDescending { stamp(it) })
+    /** The number the card badge shows; mood notes have no badge, so their worst scale counts. */
+    fun headline(item: CareItem): Int? = SymptomNoteCodec.decode(item.detail)?.let { n ->
+        if (n.symptom == SymptomDiaryRules.MOOD) n.moodRatings.values.maxOrNull() else PainBodyMapRules.overall(n.painBodyRatings) ?: n.rating }
+    fun stamp(item: CareItem): String = SymptomNoteCodec.decode(item.detail)?.let { "${it.observedDate}T${it.observedTime}" }.orEmpty()
 }
 
 /** Friendly "Today, 4:01 PM" / "Yesterday, ..." / "26 Oct, 4:01 PM" (Hindi too); falls back to the stored text. */
@@ -155,11 +174,7 @@ internal fun friendlyWhen(date: String, time: String, hindi: Boolean, today: Loc
                         Box(Modifier.size(10.dp).background(Color(PainBodyMapRules.heatColor(r)), CircleShape).border(1.dp, DoctorHairline, CircleShape)); Text("${PainBodyMapRules.label(site, hindi)} $r · ${PainBands.label(r, hindi)}", color = DoctorCardInk, fontSize = 12.sp, fontWeight = FontWeight.Medium) }
                 }
             }
-            Text(friendlyWhen(note.observedDate, note.observedTime, hindi), color = DoctorCardSub, fontSize = 14.sp, modifier = Modifier.testTag("symptom-card-when"))
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                SymptomTag(SymptomDiaryRules.label(SymptomDiaryRules.recalls, note.recall, hindi))
-                SymptomTag("${SymptomDiaryRules.label(SymptomDiaryRules.respondents, note.respondent, hindi)} · ${note.author}")
-            }
+            Text("${friendlyWhen(note.observedDate, note.observedTime, hindi)} · ${SymptomDiaryRules.label(SymptomDiaryRules.recalls, note.recall, hindi)} · ${SymptomDiaryRules.label(SymptomDiaryRules.respondents, note.respondent, hindi)} · ${note.author}", color = DoctorCardSub, fontSize = 14.sp, modifier = Modifier.testTag("symptom-card-when"))
             val details = listOf(SymptomDiaryRules.ratingAnchors(note.scale, hindi).takeIf { note.scale == SymptomDiaryRules.WELLBEING_SCALE }.orEmpty(), note.startedOn.takeIf { it.isNotBlank() }?.let { "${t("Started", "शुरू हुआ")}: $it" }.orEmpty(), note.painLocation,
                 note.painBodySites.takeIf { it.isNotEmpty() && note.painBodyRatings.isEmpty() }?.joinToString(prefix = t("Pain areas: ", "दर्द की जगह: ")) { PainBodyMapRules.label(it, hindi) }.orEmpty(), note.painTriggers.joinToString { SymptomDiaryRules.label(SymptomDiaryRules.triggers, it, hindi) },
                 note.selfReportedChange.takeIf { it.isNotBlank() }?.let { "${t("Reported change", "उनके मुताबिक बदलाव")}: ${SymptomDiaryRules.label(SymptomDiaryRules.changes, it, hindi)}" }.orEmpty()).filter(String::isNotBlank)

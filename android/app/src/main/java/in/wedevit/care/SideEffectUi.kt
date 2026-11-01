@@ -3,6 +3,12 @@ package `in`.wedevit.care
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.semantics.Role
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -33,24 +39,34 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
     ModalBottomSheet(onDismissRequest = onDismiss, containerColor = Cream) {
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(start = 20.dp, end = 20.dp, bottom = 32.dp).testTag("side-effect-sheet"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Heading(t("Side effect?", "कोई दुष्प्रभाव?"), 24)
-            Text(medicine.title, fontSize = 16.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
+            Surface(shape = RoundedCornerShape(16.dp), color = SaharaSoftBlue, modifier = Modifier.fillMaxWidth()) {
+                Row(Modifier.padding(horizontal = 14.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Icon(careIcon("medicine"), null, Modifier.size(22.dp), tint = DoctorAccent); Spacer(Modifier.width(10.dp))
+                    Text(medicine.title, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
+                }
+            }
             Text(t("Write down what happened so the doctor can talk about it at the next visit. This only records it; it is not advice.", "जो हुआ उसे लिख लें ताकि अगली मुलाक़ात में डॉक्टर इस पर बात कर सकें। यह सिर्फ़ दर्ज करता है, सलाह नहीं है।"), fontSize = 13.sp, color = DoctorCardSub)
-            Text(t("What happened?", "क्या हुआ?"), fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading())
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                SideEffectRules.effects.keys.forEach { key -> FilterChip(selected = key in picked, onClick = { pickedKeys = (if (key in picked) picked - key else picked + key).joinToString(",") }, label = { Text(SideEffectRules.effectLabel(key, hindi)) }, modifier = Modifier.heightIn(min = 48.dp).testTag("side-effect-chip-$key")) }
+            SideEffectStep(1, t("What happened?", "क्या हुआ?")) {
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    SideEffectRules.effects.keys.forEach { key -> PickChip(key in picked, SideEffectRules.effectLabel(key, hindi), Mint, Modifier.testTag("side-effect-chip-$key")) { pickedKeys = (if (key in picked) picked - key else picked + key).joinToString(",") } }
+                }
+                CareField(other, { other = it.take(SideEffectRules.MAX_OTHER) }, t("In your own words (optional)", "अपने शब्दों में (ज़रूरी नहीं)"), minLines = 2)
             }
-            CareField(other, { other = it.take(SideEffectRules.MAX_OTHER) }, t("In your own words (optional)", "अपने शब्दों में (ज़रूरी नहीं)"), minLines = 2)
-            Text(t("How bad was it?", "कितना ज़्यादा था?"), fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading())
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                SideEffectRules.severities.keys.forEach { key -> FilterChip(selected = severity == key, onClick = { severity = key }, label = { Text(SideEffectRules.severityLabel(key, hindi)) }, modifier = Modifier.heightIn(min = 48.dp).testTag("side-effect-severity-$key")) }
+            SideEffectStep(2, t("How bad was it?", "कितना ज़्यादा था?")) {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    SideEffectRules.severities.keys.forEachIndexed { i, key -> PickChip(severity == key, SideEffectRules.severityLabel(key, hindi), SeverityTints.getOrElse(i) { Mint }, Modifier.weight(1f).testTag("side-effect-severity-$key")) { severity = key } }
+                }
             }
-            Text(t("When?", "कब?"), fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading())
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                SideEffectRules.whenOptions.forEach { (key, label) -> FilterChip(selected = whenKey == key, onClick = { whenKey = key }, label = { Text(careTr(hindi, label.first, label.second)) }, modifier = Modifier.heightIn(min = 48.dp).testTag("side-effect-when-$key")) }
+            SideEffectStep(3, t("When?", "कब?")) {
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    SideEffectRules.whenOptions.forEach { (key, label) -> PickChip(whenKey == key, careTr(hindi, label.first, label.second), SaharaSoftBlue, Modifier.testTag("side-effect-when-$key")) { whenKey = key } }
+                }
             }
-            Row(Modifier.fillMaxWidth().heightIn(min = 48.dp), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
-                Checkbox(checked = stopped, onCheckedChange = { stopped = it }, modifier = Modifier.semantics { contentDescription = careTr(hindi, "I stopped taking it", "मैंने इसे लेना बंद कर दिया") })
-                Text(t("I stopped taking it", "मैंने इसे लेना बंद कर दिया"), fontSize = 15.sp, color = DoctorCardInk)
+            Surface(shape = RoundedCornerShape(18.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
+                Row(Modifier.fillMaxWidth().toggleable(stopped, role = Role.Switch) { stopped = it }.padding(horizontal = 16.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text(t("I stopped taking it", "मैंने इसे लेना बंद कर दिया"), fontSize = 15.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.weight(1f))
+                    Switch(checked = stopped, onCheckedChange = null)
+                }
             }
             problem?.let { Text(it, color = RustText, fontSize = 14.sp, modifier = Modifier.announce()) }
             if (!canEdit) Text(t("You can read these records but not change them.", "आप ये रिकॉर्ड देख सकते हैं, बदल नहीं सकते।"), fontSize = 13.sp, color = DoctorCardSub)
@@ -60,10 +76,35 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
                 val err = SideEffectRules.error(note, now)
                 if (err != null) problem = err
                 else if (canEditCareContext(vm, medicine.personId, capturedAccount)) { problem = null; vm.saveItem("journal", SideEffectRules.title(note), SideEffectCodec.encode(note), done = onDismiss) }
-            }, enabled = !busy && canEdit, colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent, contentColor = androidx.compose.ui.graphics.Color.White), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("side-effect-save")) { Text(t("Save side effect", "दुष्प्रभाव सहेजें")) }
+            }, enabled = !busy && canEdit, colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent, contentColor = androidx.compose.ui.graphics.Color.White), shape = RoundedCornerShape(50), modifier = Modifier.fillMaxWidth().heightIn(min = 54.dp).testTag("side-effect-save")) { Text(t("Save side effect", "दुष्प्रभाव सहेजें")) }
             Text(if (vm.cloud != null) t("Saved in your account. Family and doctors you share with can see it.", "आपके खाते में सेव। जिनके साथ आपने साझा किया, वे देख सकते हैं।") else t("Saved only on this phone. Sign in to share it with family and the doctor.", "सिर्फ़ इस फ़ोन पर।"), fontSize = 12.sp, color = DoctorCardFaint)
         }
     }
+}
+
+/** Calm green, amber and red for Mild, Moderate and Severe, in SideEffectRules.severities order. */
+private val SeverityTints = listOf(androidx.compose.ui.graphics.Color(0xFFDCEFE1), androidx.compose.ui.graphics.Color(0xFFFBE7C6), androidx.compose.ui.graphics.Color(0xFFF7D6D0))
+
+/** One numbered step of the side-effect form on its own card. */
+@Composable private fun SideEffectStep(number: Int, title: String, content: @Composable ColumnScope.() -> Unit) {
+    Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Surface(shape = CircleShape, color = DoctorAccent, modifier = Modifier.size(26.dp)) { Box(contentAlignment = Alignment.Center) { Text("$number", color = androidx.compose.ui.graphics.Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold) } }
+                Spacer(Modifier.width(10.dp))
+                Text(title, fontFamily = SaharaTitleFont, fontSize = 18.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading())
+            }
+            content()
+        }
+    }
+}
+
+/** A choice chip that shows a tick and a filled colour when picked, so the choice is clear at a glance. */
+@Composable private fun PickChip(selected: Boolean, label: String, tint: androidx.compose.ui.graphics.Color, modifier: Modifier, onClick: () -> Unit) {
+    FilterChip(selected = selected, onClick = onClick, label = { Text(label, fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal, maxLines = 1) },
+        leadingIcon = if (selected) { { Icon(Icons.Default.Check, null, Modifier.size(16.dp)) } } else null, shape = RoundedCornerShape(50),
+        colors = FilterChipDefaults.filterChipColors(containerColor = Cream, labelColor = DoctorCardInk, selectedContainerColor = tint, selectedLabelColor = DoctorCardInk, selectedLeadingIconColor = DoctorAccent),
+        modifier = modifier.heightIn(min = 48.dp))
 }
 
 /** One side-effect note as a card body: effect, severity, when, who reported it, and whether it was discussed. */
@@ -72,10 +113,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
     Column(Modifier.fillMaxWidth().testTag("side-effect-${entry.item.id}"), verticalArrangement = Arrangement.spacedBy(2.dp)) {
         if (showMedicine) Text(n.medicineName, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
         Text(SideEffectRules.effectsText(n, hindi), fontSize = 15.sp, color = DoctorCardInk)
-        Text(t("How bad: ", "कितना ज़्यादा: ") + SideEffectRules.severityLabel(n.severity, hindi), fontSize = 13.sp, fontWeight = FontWeight.Medium, color = if (n.severity == "severe") RustText else DoctorCardSub)
-        Text(t("When: ", "कब: ") + date(n.happenedAt) + " · " + t("Reported by ", "बताने वाले: ") + n.reporter.ifBlank { t("Not recorded", "दर्ज नहीं") }, fontSize = 13.sp, color = DoctorCardSub)
-        if (n.stoppedTaking) Text(t("They stopped taking it.", "उन्होंने इसे लेना बंद कर दिया।"), fontSize = 13.sp, color = DoctorCardSub)
-        Text(if (n.discussedAt > 0) t("Discussed ", "बात हो चुकी ") + date(n.discussedAt) + n.discussedBy.takeIf { it.isNotBlank() }?.let { " · $it" }.orEmpty() else t("Not discussed yet", "अभी बात नहीं हुई"), fontSize = 12.sp, color = DoctorCardFaint)
+        Text(SideEffectRules.severityLabel(n.severity, hindi) + " · " + date(n.happenedAt) + (if (n.stoppedTaking) " · " + t("They stopped taking it.", "उन्होंने इसे लेना बंद कर दिया।") else ""), fontSize = 13.sp, fontWeight = FontWeight.Medium, color = if (n.severity == "severe") RustText else DoctorCardSub)
+        Text(t("Reported by ", "बताने वाले: ") + n.reporter.ifBlank { t("Not recorded", "दर्ज नहीं") } + " · " + (if (n.discussedAt > 0) t("Discussed ", "बात हो चुकी ") + date(n.discussedAt) + n.discussedBy.takeIf { it.isNotBlank() }?.let { " · $it" }.orEmpty() else t("Not discussed yet", "अभी बात नहीं हुई")), fontSize = 13.sp, color = DoctorCardSub)
         trailing?.invoke(this)
     }
 }
@@ -89,7 +128,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 /** Under one medicine's History: every side effect noted for it, newest first. */
 fun androidx.compose.foundation.lazy.LazyListScope.medicineSideEffectItems(entries: List<SideEffectEntry>, vm: CareModel) {
     if (entries.isEmpty()) return
-    item(key = "side-effects-heading") { Text(careBilingual("Side effects noted", "दर्ज दुष्प्रभाव"), fontWeight = FontWeight.Medium, fontSize = 16.sp, color = DoctorCardInk, modifier = Modifier.a11yHeading().padding(top = 6.dp)) }
+    item(key = "side-effects-heading") { val t = careText(); Text(t("Side effects noted", "दर्ज दुष्प्रभाव"), fontWeight = FontWeight.Medium, fontSize = 16.sp, color = DoctorCardInk, modifier = Modifier.a11yHeading().padding(top = 6.dp)) }
     items(entries.size, key = { "side-effect-${entries[it].item.id}" }) { i -> val e = entries[i]; SurfaceCard(Paper) { SideEffectSummary(e, showMedicine = false) { MarkDiscussedButton(e, vm, SideEffectRules.reporterFor(vm.viewRole.value)) } } }
 }
 

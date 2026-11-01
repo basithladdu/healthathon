@@ -189,7 +189,7 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
 }
 
 /** Today: a large QR (the web link when it is live, otherwise the offline code), or the way to make one. */
-@Composable fun EmergencyCardOnToday(vm: CareModel, onRead: (CareVersion) -> Unit = {}, sosRequest: Int = 0, onSosHandled: () -> Unit = {}) {
+@Composable fun EmergencyCardOnToday(vm: CareModel, onRead: (CareVersion) -> Unit = {}) {
     val context = LocalContext.current; val scope = rememberCoroutineScope(); val t = careText()
     val people by vm.people.collectAsStateWithLifecycle(); val selected by vm.selected.collectAsStateWithLifecycle()
     val items by vm.items.collectAsStateWithLifecycle(); val versions by vm.versions.collectAsStateWithLifecycle()
@@ -300,8 +300,6 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
         finally { busy = false }
     }
 
-    // Today's SOS button: show the card full screen for staff, or start making one if there is none yet.
-    LaunchedEffect(sosRequest) { if (sosRequest > 0) { if (card != null && qr != null) fullScreen = true else setup = true; onSosHandled() } }
     if (selected.isBlank()) return
     if (card == null || qr == null) {
         ActionCard(Peach, modifier = Modifier.fillMaxWidth().testTag("emergency-card-entry"), onClick = { setup = true }) {

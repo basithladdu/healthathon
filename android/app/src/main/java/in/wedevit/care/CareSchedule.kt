@@ -3,6 +3,7 @@ package `in`.wedevit.care
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -68,21 +69,16 @@ fun calendarItems(entries: List<CareItem>, day: LocalDate): List<CareItem> = ent
     var dayString by rememberSaveable(person, initialDay) { mutableStateOf(calendarStartDay(initialDay).toString()) }
     var filter by rememberSaveable(person) { mutableStateOf("All") }
     var adding by rememberSaveable(person) { mutableStateOf(false) }
+    var weekView by rememberSaveable { mutableStateOf(false) }
     var editing by remember { mutableStateOf<CareItem?>(null) }; val t = careText(); val hindi = careHindi()
-    val day = LocalDate.parse(dayString)
+    val day =LocalDate.parse(dayString)
     val visible = calendarItems(entries.filter { it.personId == person }, day).filter { filter == "All" || calendarCategory(it) == filter }
     val undated = entries.filter { it.personId == person && it.kind == "medicine" && it.due == 0L }
     LazyColumn(Modifier.fillMaxSize().testTag("care-calendar"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         if (onAddDoctorVisit != null && canEdit) item { TextButton(onClick = { adding = true }) { Text(t("Add a test or other calendar entry", "जाँच या कोई और तारीख़ जोड़ें")) } }
         item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { Heading(t("Calendar", "कैलेंडर")); Spacer(Modifier.weight(1f)); if (canEdit) FilledTonalIconButton(onClick = { if (onAddDoctorVisit != null) onAddDoctorVisit() else adding = true }, colors = IconButtonDefaults.filledTonalIconButtonColors(containerColor = Gold)) { Icon(Icons.Default.Add, t("Add to calendar", "कैलेंडर में जोड़ें")) } } }
-        item { Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = { dayString = day.minusDays(1).toString() }) { Icon(Icons.Default.ChevronLeft, t("Previous day", "पिछला दिन")) }
-            Box(Modifier.weight(1f)) { CareDateButton(careEpoch(day), "", { dayString = careDay(it).toString() }) }
-            IconButton(onClick = { dayString = day.plusDays(1).toString() }) { Icon(Icons.Default.ChevronRight, t("Next day", "अगला दिन")) }
-        } }
-        item { Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            (-3L..3L).forEach { offset -> val date = day.plusDays(offset); FilterChip(selected = offset == 0L, onClick = { dayString = date.toString() }, label = { Column(horizontalAlignment = Alignment.CenterHorizontally) { Text(date.format(careDateFormat("EEE", hindi)), style = MaterialTheme.typography.labelSmall); Text(date.dayOfMonth.toString(), fontWeight = FontWeight.Bold) } }, modifier = Modifier.widthIn(min = 40.dp)) }
-        } }
+        item { CareCalendarGrid(entries.filter { it.personId == person }, day, weekView, { weekView = it }, { dayString = it.toString() }) }
+        item { Box(Modifier.fillMaxWidth()) { CareDateButton(careEpoch(day), "", { dayString = careDay(it).toString() }) } }
         item { Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) { listOf("All", "Medicine", "Visit", "Test", "Follow-up", "Procedure", "Chemotherapy", "Radiotherapy", "Task", "Conversation").forEach { category -> FilterChip(filter == category, { filter = category }, label = { Text(if (category in TreatmentDayRules.categories) TreatmentDayRules.label(category) else careCategoryLabel(category, hindi)) }) } } }
         if (day != LocalDate.now()) item { TextButton(onClick = { dayString = LocalDate.now().toString() }) { Text(t("Back to today", "आज पर वापस")) } }
         if (visible.isEmpty()) item { SurfaceCard { Text(day.format(careDateFormat("d MMM", hindi)).let { t("Nothing dated for $it", "$it के लिए कुछ तय नहीं") }, fontWeight = FontWeight.SemiBold); if (canEdit) TextButton(onClick = { if (onAddDoctorVisit != null) onAddDoctorVisit() else adding = true }) { Text(if (onAddDoctorVisit != null) t("Add a visit", "मुलाक़ात जोड़ें") else t("Add a visit, test or follow-up", "मुलाक़ात, जाँच या अगली मुलाक़ात जोड़ें")) } } }
@@ -114,7 +110,9 @@ fun calendarItems(entries: List<CareItem>, day: LocalDate): List<CareItem> = ent
     val time = if (payload?.timed == true) Instant.ofEpochMilli(item.due).atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("h:mm a")) else ""
     SurfaceCard(if (done) Sage.copy(alpha = .5f) else Paper) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(when (calendarCategory(item)) { "Medicine" -> Icons.Default.Medication; "Test" -> Icons.Default.Science; "Follow-up" -> Icons.Default.EventRepeat; "Procedure" -> Icons.Default.HealthAndSafety; else -> Icons.Default.Event }, null, tint = Rust)
+            val kindColor = CalendarKinds.color(CalendarKinds.key(item))
+            Box(Modifier.width(4.dp).height(40.dp).background(kindColor, RoundedCornerShape(2.dp))); Spacer(Modifier.width(8.dp))
+            Icon(when (calendarCategory(item)) { "Medicine" -> Icons.Default.Medication; "Test" -> Icons.Default.Science; "Follow-up" -> Icons.Default.EventRepeat; "Procedure" -> Icons.Default.HealthAndSafety; else -> Icons.Default.Event }, null, tint = kindColor)
             Spacer(Modifier.width(10.dp)); Column(Modifier.weight(1f)) { Text(item.title, fontWeight = FontWeight.SemiBold); Text(listOf(careCategoryLabel(calendarCategory(item), hindi), time, if (done) t("Done", "हो गया") else "").filter(String::isNotBlank).joinToString(" · "), style = MaterialTheme.typography.labelMedium, color = Rust) }
             if (canEdit) IconButton(onClick = onEdit, enabled = !busy) { Icon(Icons.Default.EditCalendar, t("Edit ${item.title}", "${item.title} बदलें")) }
         }
