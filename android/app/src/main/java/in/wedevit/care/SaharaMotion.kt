@@ -8,6 +8,7 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.Easing
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.animateFloatAsState
@@ -95,8 +96,12 @@ import androidx.compose.ui.unit.sp
  * "Remove animations" setting is on (animator duration scale 0) every duration and delay is 0.
  */
 object SaharaMotion {
-    const val ENTER_MS = 240
-    const val EXIT_MS = 120
+    const val ENTER_MS = 280
+    const val EXIT_MS = 140
+    /** The welcome panel rising to show a form, and settling back. */
+    const val PANEL_MS = 300
+    /** Material's emphasized curve: a quick start that glides to rest, so long moves feel calm rather than abrupt. */
+    val Emphasized: Easing = CubicBezierEasing(0.2f, 0f, 0f, 1f)
     const val FADE_DELAY_MS = 50
     /** Card expand/collapse and content-size changes. */
     const val EXPAND_MS = 200
@@ -141,13 +146,14 @@ object SaharaMotion {
     /** Screen-sized content that slides; [rtl] flips the drift so it always follows reading direction. */
     fun transform(direction: Direction, rtl: Boolean = false, enabled: Boolean = this.enabled): ContentTransform {
         val sign = if (rtl) -1 else 1
-        val slide = tween<IntOffset>(ENTER_MS, enabled = enabled)
+        val slide = tween<IntOffset>(ENTER_MS, easing = Emphasized, enabled = enabled)
         val (enter, exit) = when (direction) {
             Direction.Forward -> (fadeEnter(enabled) + slideInHorizontally(slide) { sign * it / 12 }) to (fadeExit(enabled) + slideOutHorizontally(slide) { -sign * it / 24 })
             Direction.Back -> (fadeEnter(enabled) + slideInHorizontally(slide) { -sign * it / 24 }) to (fadeExit(enabled) + slideOutHorizontally(slide) { sign * it / 12 })
             Direction.Switch -> fadeEnter(enabled) to fadeExit(enabled)
         }
-        return ContentTransform(enter, exit, sizeTransform = SizeTransform(clip = false))
+        // Screens fill the window, so there is no size to animate; skipping it saves a measure pass every frame.
+        return ContentTransform(enter, exit, sizeTransform = null)
     }
 
     /** Loading → empty → content: a plain crossfade, the size following smoothly. */
@@ -170,8 +176,8 @@ object SaharaMotion {
     val exit: ExitTransition get() = fadeExit(enabled)
 
     /** A card's hidden section opening and closing. */
-    val expand: EnterTransition get() = expandVertically(tween(EXPAND_MS)) + fadeIn(tween(EXPAND_MS))
-    val collapse: ExitTransition get() = shrinkVertically(tween(EXPAND_MS - 50)) + fadeOut(tween(EXIT_MS))
+    val expand: EnterTransition get() = expandVertically(tween(EXPAND_MS, easing = Emphasized)) + fadeIn(tween(EXPAND_MS))
+    val collapse: ExitTransition get() = shrinkVertically(tween(EXPAND_MS - 50, easing = Emphasized)) + fadeOut(tween(EXIT_MS))
 }
 
 /** Hands out first-load stagger delays to the cards of one screen. */

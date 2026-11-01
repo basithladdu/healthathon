@@ -34,6 +34,8 @@ import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -291,54 +293,67 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
     val close = { if (!formBusy && !entryBusy) select(if (panel == "person" || panel == "account") "family" else "") }
     BackHandler(panel.isNotEmpty()) { close() }
     if (walkthroughChooser) PatientWalkthroughChooser(onPick = { walkthroughChooser = false; onPatientWalkthrough(it) }, onDismiss = { walkthroughChooser = false })
-    Column(Modifier.fillMaxSize().imePadding().testTag("welcome-panel-screen")) {
-        AnimatedVisibility(panel.isEmpty(), modifier = if (panel.isEmpty()) Modifier.weight(1f) else Modifier, enter = fadeIn() + expandVertically(), exit = fadeOut() + shrinkVertically()) {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(start = 24.dp, end = 24.dp, top = heroTopPadding.dp, bottom = 24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                WelcomeHero()
-                Text(t("Palliative care,\ntogether.", "पैलिएटिव देखभाल,\nसाथ मिलकर।"), Modifier.fillMaxWidth(), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 30.sp, lineHeight = 36.sp, textAlign = TextAlign.Center)
-                Spacer(Modifier.height(10.dp)); Text(t("Care notes, medicines and visits.", "देखभाल नोट, दवाएँ और मुलाक़ातें।"), Modifier.fillMaxWidth(), fontSize = 16.sp, textAlign = TextAlign.Center)
-            }
-            }
+    // One value drives the whole change: the orange panel rises over the picture while the picture fades and drifts up.
+    // Nothing is re-measured per frame, so it stays smooth; the panel's own contents cross-fade.
+    val open = panel.isNotEmpty()
+    val progress by animateFloatAsState(if (open) 1f else 0f, SaharaMotion.tween(SaharaMotion.PANEL_MS, easing = SaharaMotion.Emphasized))
+    var closedPanelPx by remember { mutableIntStateOf(0) }
+    val density = LocalDensity.current
+    BoxWithConstraints(Modifier.fillMaxSize().imePadding().testTag("welcome-panel-screen")) {
+        val fullPx = constraints.maxHeight
+        val closedPx = closedPanelPx.coerceIn(0, fullPx)
+        val gapPx = with(density) { panelGap.dp.roundToPx() }
+        if (!(open && progress >= 1f)) Box(Modifier.align(Alignment.TopCenter).fillMaxWidth().height(with(density) { (fullPx - closedPx - gapPx).coerceAtLeast(0).toDp() })
+            .graphicsLayer { alpha = 1f - progress; translationY = -progress * 48.dp.toPx() }) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(start = 24.dp, end = 24.dp, top = heroTopPadding.dp, bottom = 24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                    WelcomeHero()
+                    Text(t("Palliative care,\ntogether.", "पैलिएटिव देखभाल,\nसाथ मिलकर।"), Modifier.fillMaxWidth(), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 30.sp, lineHeight = 36.sp, textAlign = TextAlign.Center)
+                    Spacer(Modifier.height(10.dp)); Text(t("Care notes, medicines and visits.", "देखभाल नोट, दवाएँ और मुलाक़ातें।"), Modifier.fillMaxWidth(), fontSize = 16.sp, textAlign = TextAlign.Center)
+                }
+                }
         }
-        AnimatedVisibility(panel.isEmpty(), enter = expandVertically(), exit = shrinkVertically()) {
-            Spacer(Modifier.fillMaxWidth().height(panelGap.dp).testTag("welcome-panel-gap"))
-        }
-        Surface(color = WelcomePanelOrange, contentColor = WelcomePanelInk, shape = RoundedCornerShape(topStart = 48.dp, topEnd = 48.dp), modifier = Modifier.fillMaxWidth().then(if (panel.isEmpty()) Modifier else Modifier.weight(1f)).animateContentSize().testTag("welcome-orange-panel")) {
-            Column(if (panel.isEmpty()) Modifier.fillMaxWidth() else Modifier.fillMaxSize()) {
-                if (panel.isEmpty()) Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(start = 22.dp, end = 22.dp, top = 22.dp, bottom = 14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Text(t("Welcome to Sahara", "सहारा में आपका स्वागत है"), modifier = Modifier.fillMaxWidth().testTag("welcome-panel-heading"), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 26.sp, textAlign = TextAlign.Center)
-                    Text(t("Choose where you would like to begin.", "चुनें कि कहाँ से शुरू करना है।"), modifier = Modifier.fillMaxWidth().testTag("welcome-panel-description"), style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Center)
-                    Button(onClick = { select("family") }, enabled = !entryBusy, colors = ButtonDefaults.buttonColors(containerColor = Paper, contentColor = Rust), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("welcome-patient-family")) { Icon(Icons.Default.People, null); Spacer(Modifier.width(10.dp)); Text(t("Patient & family", "मरीज़ और परिवार")) }
-                    TextButton(onClick = { select("doctor") }, enabled = !entryBusy, colors = ButtonDefaults.textButtonColors(contentColor = WelcomePanelInk), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-workspace-entry")) { Text(t("Doctor workspace", "डॉक्टर के लिए"), textDecoration = TextDecoration.Underline) }
-                } else {
-                    Row(Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                        IconButton(onClick = close, enabled = !formBusy && !entryBusy, modifier = Modifier.testTag("welcome-panel-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, if (panel == "person" || panel == "account") t("Back to patient and family", "मरीज़ और परिवार पर वापस") else t("Back to welcome", "शुरुआत पर वापस"), tint = WelcomePanelInk) }
-                        Text(when(panel) { "family" -> t("Patient & family", "मरीज़ और परिवार"); "person" -> t("Add a person", "व्यक्ति जोड़ें"); "doctor" -> t("Doctor workspace", "डॉक्टर के लिए"); else -> t("Your account", "आपका खाता") }, fontFamily = SaharaTitleFont, fontSize = 22.sp, fontWeight = FontWeight.Medium)
-                    }
-                    Surface(color = Paper, contentColor = Ink, shape = RoundedCornerShape(topStart = 26.dp, topEnd = 26.dp), modifier = Modifier.fillMaxWidth().weight(1f)) {
-                        Box(Modifier.fillMaxSize().padding(top = 20.dp)) { when(panel) {
-                            "family" -> Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(22.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                                Heading(t("Care, together", "साथ मिलकर देखभाल"), 27)
-                                Text(t("Start a care profile, or sign in to the records you already use.", "नई देखभाल प्रोफ़ाइल बनाएँ, या अपने पुराने रिकॉर्ड के लिए साइन इन करें।"), style = MaterialTheme.typography.bodyLarge)
-                                Button(onClick = { if (addPersonContent == null) onStart() else select("person") }, enabled = !entryBusy, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("welcome-add-person")) { Icon(Icons.Default.PersonAdd, null); Spacer(Modifier.width(10.dp)); Text(t("Add a person", "व्यक्ति जोड़ें")) }
-                                OutlinedButton(onClick = { if (accountContent == null) onAccount() else select("account") }, enabled = !entryBusy, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("welcome-account")) { Icon(Icons.Default.AccountCircle, null); Spacer(Modifier.width(10.dp)); Text(t("Sign in to your account", "अपने खाते में साइन इन करें")) }
-                                TextButton(onClick = { walkthroughChooser = true }, enabled = !entryBusy, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("patient-walkthrough-entry")) { Text(t("Try the walkthrough", "डेमो देखें")) }
-                            }
-                            "person" -> addPersonContent?.invoke(close)
-                            "doctor" -> Column(Modifier.fillMaxSize()) {
-                                Box(Modifier.fillMaxWidth().weight(1f)) {
-                                    if (doctorContent != null) doctorContent.invoke(close) { formBusy = it }
-                                    else Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(22.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                                        Heading(t("Doctor sign in", "डॉक्टर साइन इन"), 27)
-                                        Text(t("Open the records linked to your account.", "अपने खाते से जुड़े रिकॉर्ड खोलें।"))
-                                        Button(onClick = onSharedWorkspace, enabled = !formBusy && !entryBusy, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("welcome-open-doctor-workspace")) { Text(t("Open doctor workspace", "डॉक्टर कार्यक्षेत्र खोलें")) }
-                                    }
+        if (!open) Spacer(Modifier.align(Alignment.BottomCenter).padding(bottom = with(density) { closedPx.toDp() }).fillMaxWidth().height(panelGap.dp).testTag("welcome-panel-gap"))
+        val panelHeight = if (!open && progress <= 0f) Modifier.wrapContentHeight() else Modifier.height(with(density) { (closedPx + (fullPx - closedPx) * progress).toInt().toDp() })
+        Surface(color = WelcomePanelOrange, contentColor = WelcomePanelInk, shape = RoundedCornerShape(topStart = 48.dp, topEnd = 48.dp),
+            modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth().then(panelHeight).onSizeChanged { if (!open && progress <= 0f) closedPanelPx = it.height }.testTag("welcome-orange-panel")) {
+            AnimatedContent(panel, transitionSpec = { fadeIn(SaharaMotion.tween(SaharaMotion.ENTER_MS - 60, 80)) togetherWith fadeOut(SaharaMotion.tween(SaharaMotion.EXIT_MS)) using null },
+                contentAlignment = Alignment.TopCenter) { shown ->
+                Column(if (shown.isEmpty()) Modifier.fillMaxWidth() else Modifier.fillMaxSize()) {
+                    if (shown.isEmpty()) Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(start = 22.dp, end = 22.dp, top = 22.dp, bottom = 14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        Text(t("Welcome to Sahara", "सहारा में आपका स्वागत है"), modifier = Modifier.fillMaxWidth().testTag("welcome-panel-heading"), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 26.sp, textAlign = TextAlign.Center)
+                        Text(t("Choose where you would like to begin.", "चुनें कि कहाँ से शुरू करना है।"), modifier = Modifier.fillMaxWidth().testTag("welcome-panel-description"), style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Center)
+                        Button(onClick = { select("family") }, enabled = !entryBusy, colors = ButtonDefaults.buttonColors(containerColor = Paper, contentColor = Rust), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("welcome-patient-family")) { Icon(Icons.Default.People, null); Spacer(Modifier.width(10.dp)); Text(t("Patient & family", "मरीज़ और परिवार")) }
+                        TextButton(onClick = { select("doctor") }, enabled = !entryBusy, colors = ButtonDefaults.textButtonColors(contentColor = WelcomePanelInk), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-workspace-entry")) { Text(t("Doctor workspace", "डॉक्टर के लिए"), textDecoration = TextDecoration.Underline) }
+                    } else {
+                        Row(Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                            IconButton(onClick = close, enabled = !formBusy && !entryBusy, modifier = Modifier.testTag("welcome-panel-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, if (shown == "person" || shown == "account") t("Back to patient and family", "मरीज़ और परिवार पर वापस") else t("Back to welcome", "शुरुआत पर वापस"), tint = WelcomePanelInk) }
+                            Text(when(shown) { "family" -> t("Patient & family", "मरीज़ और परिवार"); "person" -> t("Add a person", "व्यक्ति जोड़ें"); "doctor" -> t("Doctor workspace", "डॉक्टर के लिए"); else -> t("Your account", "आपका खाता") }, fontFamily = SaharaTitleFont, fontSize = 22.sp, fontWeight = FontWeight.Medium)
+                        }
+                        Surface(color = Paper, contentColor = Ink, shape = RoundedCornerShape(topStart = 26.dp, topEnd = 26.dp), modifier = Modifier.fillMaxWidth().weight(1f)) {
+                            Box(Modifier.fillMaxSize().padding(top = 20.dp)) { when(shown) {
+                                "family" -> Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(22.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                                    Heading(t("Care, together", "साथ मिलकर देखभाल"), 27)
+                                    Text(t("Start a care profile, or sign in to the records you already use.", "नई देखभाल प्रोफ़ाइल बनाएँ, या अपने पुराने रिकॉर्ड के लिए साइन इन करें।"), style = MaterialTheme.typography.bodyLarge)
+                                    Button(onClick = { if (addPersonContent == null) onStart() else select("person") }, enabled = !entryBusy, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("welcome-add-person")) { Icon(Icons.Default.PersonAdd, null); Spacer(Modifier.width(10.dp)); Text(t("Add a person", "व्यक्ति जोड़ें")) }
+                                    OutlinedButton(onClick = { if (accountContent == null) onAccount() else select("account") }, enabled = !entryBusy, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("welcome-account")) { Icon(Icons.Default.AccountCircle, null); Spacer(Modifier.width(10.dp)); Text(t("Sign in to your account", "अपने खाते में साइन इन करें")) }
+                                    TextButton(onClick = { walkthroughChooser = true }, enabled = !entryBusy, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("patient-walkthrough-entry")) { Text(t("Try the walkthrough", "डेमो देखें")) }
                                 }
-                                TextButton(onClick = onDoctorDemo, enabled = !formBusy && !entryBusy, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-demo-entry")) { Text(t("Try the walkthrough", "डेमो देखें")) }
-                            }
-                            else -> accountContent?.invoke(close) { formBusy = it }
-                        } }
+                                "person" -> addPersonContent?.invoke(close)
+                                "doctor" -> Column(Modifier.fillMaxSize()) {
+                                    Box(Modifier.fillMaxWidth().weight(1f)) {
+                                        if (doctorContent != null) doctorContent.invoke(close) { formBusy = it }
+                                        else Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(22.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                                            Heading(t("Doctor sign in", "डॉक्टर साइन इन"), 27)
+                                            Text(t("Open the records linked to your account.", "अपने खाते से जुड़े रिकॉर्ड खोलें।"))
+                                            Button(onClick = onSharedWorkspace, enabled = !formBusy && !entryBusy, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("welcome-open-doctor-workspace")) { Text(t("Open doctor workspace", "डॉक्टर कार्यक्षेत्र खोलें")) }
+                                        }
+                                    }
+                                    TextButton(onClick = onDoctorDemo, enabled = !formBusy && !entryBusy, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-demo-entry")) { Text(t("Try the walkthrough", "डेमो देखें")) }
+                                }
+                                else -> accountContent?.invoke(close) { formBusy = it }
+                            } }
+                        }
                     }
                 }
             }
