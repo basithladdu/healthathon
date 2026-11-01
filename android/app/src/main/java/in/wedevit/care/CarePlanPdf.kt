@@ -90,8 +90,9 @@ internal object CarePlanPdf {
         val alert = android.graphics.Color.rgb(158, 59, 35); val mint = android.graphics.Color.rgb(220, 235, 228); val pale = android.graphics.Color.rgb(247, 221, 210)
         val d = Doc()
         d.text(p(Bi("Sahara emergency care plan (ECTPR) — ED Quick View", "सहारा आपातकालीन देखभाल योजना (ECTPR) — ED क्विक व्यू")), h1, 24f)
-        d.text("${r.patient.name} · UHID ${r.patient.uhid.ifBlank { "—" }} · DOB ${r.patient.dob.ifBlank { "—" }}", h2, 20f)
+        d.text("${r.patient.name} · UHID ${r.patient.uhid.ifBlank { "—" }} · DOB ${r.patient.dob.ifBlank { "—" }}" + listOf(r.patient.sex, r.patient.gender).filter(String::isNotBlank).joinToString("") { " · $it" }, h2, 20f)
         d.box(if (interp.kind == EdKind.ACTIVE) mint else pale, p(interp.banner) to bold)
+        interp.flags.forEach { d.text("! " + p(it), paint(9f, true, alert)) }
         d.space(6f)
         d.box(alert, p(IfInDoubt.TITLE) to paint(13f, true, android.graphics.Color.WHITE), p(IfInDoubt.LEAD) to whiteBody, *IfInDoubt.CONDITIONS.map { "• " + p(it) to whiteBody }.toTypedArray(), p(IfInDoubt.AFTER) to white)
         d.space(6f)
@@ -105,14 +106,19 @@ internal object CarePlanPdf {
             fun field(label: Bi, value: String) { if (value.isNotBlank()) { d.text(p(label) + ": " + value, body) } }
             field(Bi("Diagnosis", "बीमारी"), listOf(r.clinical.diagnosis, r.clinical.stage, r.clinical.ecog?.let { "ECOG $it" }.orEmpty()).filter(String::isNotBlank).joinToString(" · "))
             field(Bi("Key medicines", "मुख्य दवाएँ"), r.clinical.keyMedicines)
-            field(Bi("Alternate decision-maker", "दूसरे फ़ैसला लेने वाले"), r.decisionMakers.alternate?.let { listOf(it.name, it.relation, it.phone24h).filter(String::isNotBlank).joinToString(" · ") }.orEmpty())
+            field(Bi("Secondary decision-maker", "द्वितीय फ़ैसला लेने वाले"), r.decisionMakers.alternate?.let { listOf(it.name, it.relation, it.phone24h).filter(String::isNotBlank).joinToString(" · ") }.orEmpty())
             field(Bi("Family to inform", "परिवार जिन्हें बताना है"), r.decisionMakers.familyToInform.filter(String::isNotBlank).joinToString(", "))
+            field(Bi("Present for the discussion", "बातचीत में मौजूद"), r.decisionMakers.presentAtDiscussion.filter(String::isNotBlank).joinToString(", "))
+            field(Bi("Could not be reached", "संपर्क नहीं हो सका"), r.decisionMakers.attemptedContact.filter(String::isNotBlank).joinToString(", "))
             field(Bi("What matters, in the patient's words", "क्या ज़रूरी है, मरीज़ के शब्दों में"), r.values.ownWords)
+            field(Bi("When was this recorded?", "यह कब दर्ज किया गया?"), r.values.knowsRecordedWhen?.let { p(PlanText.knowsRecordedWhen(it)) }.orEmpty())
             field(Bi("Not acceptable to the patient", "मरीज़ को मंज़ूर नहीं"), r.values.unacceptableOutcomes.filter(String::isNotBlank).joinToString("; "))
             d.space(4f); d.text(p(AmdText.LEGAL_PENDING_TITLE) + ": " + p(AmdText.LEGAL_PENDING), paint(9f)); d.text(p(AmdText.RECONSIDERATION), paint(9f)); d.space(4f)
             field(Bi("Understanding confirmed", "समझ की पुष्टि"), if (r.prognosticUnderstanding.confirmed) "${r.prognosticUnderstanding.confirmedBy} ${r.prognosticUnderstanding.confirmedOn}".trim() else "")
             d.space(8f); d.text(p(Bi("Signatures", "हस्ताक्षर")), h2, 18f)
-            r.signatures.forEach { s -> d.text("${s.role.name.replace('_', ' ').lowercase()}: ${s.name}${s.registrationNo?.let { " (reg. $it)" } ?: ""}${if (s.thumbImpression == true) " — thumb impression" else ""} · ${s.signedAt.take(16).replace('T', ' ')}", body) }
+            r.signatures.forEach { s -> d.text("${s.role.name.replace('_', ' ').lowercase()}${s.surrogateRank?.let { " (${it.name.lowercase()})" } ?: ""}: ${s.name}${s.registrationNo?.let { " (reg. $it)" } ?: ""}${if (s.thumbImpression == true) " — thumb impression" else ""} · ${s.signedAt.take(16).replace('T', ' ')}", body) }
+            d.space(8f); d.text(p(CapacityGuide.TITLE), paint(10.5f, true), 16f); d.text(p(CapacityGuide.NOTE), paint(9f))
+            CapacityGuide.POINTS.forEachIndexed { i, point -> d.text("${i + 1}. " + p(point), paint(9f)) }
             if (cardUrl != null) {
                 d.space(16f); d.text(p(Bi("Wallet card — cut out and keep with the patient", "वॉलेट कार्ड — काटकर मरीज़ के पास रखें")), h2, 20f)
                 WalletCard.lines(r).forEach { (label, value) -> d.text(p(label) + ": " + p(value), body, 14f) }

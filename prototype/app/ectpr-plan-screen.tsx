@@ -2,14 +2,17 @@
 // Emergency care plan (ECTPR): step-by-step entry wizard (tech spec §4), rules V1–V9 / C1–C8 shown inline,
 // versions (Draft / Active / Superseded / Revoked), review, cancellation, signatures and the audit log.
 // Doctors create, edit and sign. Patients view, sign their part, request a review or cancel. Family view and request a review.
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react';
+import { emptyHomeCare, emptyWithdrawal } from './ectpr-rules.ts';
+import type { EctprHomeCare, EctprWithdrawal, WithdrawalFinal } from './ectpr-model.ts';
+import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react';
 import { careLocale, careText, type CareLang } from './care-i18n';
 import { AMD_BOARD_PATHWAY } from './amd-rules';
 import { DpdpNotice } from './dpdp-notice';
-import { boardReconsiderationNotice } from './ectpr-labels';
+import { capacityGuide, homeCareLines, withdrawalFinalLabel, withdrawalLines, boardReconsiderationNotice } from './ectpr-labels';
 import { EctprPilotLog } from './ectpr-pilot-log';
 import { FhirExportButton, PaperAndCopies, ReviewReminder } from './ectpr-plan-extras';
 import { ReadAloudButton } from './tts-speech';
+import type { GocOptionSets } from './goc-transcribe';
 import type {
   AmbulanceOption, AuditEvent, AuthorityBasis, Capacity, Cpr, DecisionMaker, Dialysis, DnacprReason, EctprRecord, EctprStatus,
   GoalOfCare, HospitalTransfer, Hydration, Icu, IdType, ImplantedDevice, NgFeeding, PegFeeding, RespCeiling, RuleIssue, Signature,
@@ -21,6 +24,9 @@ import {
   type ReviewTrigger,
 } from './ectpr-rules';
 import { listAudit, listEctprVersions, logAudit, revokeEctpr, saveEctprDraft, signEctpr, startReview, subscribeEctpr } from './ectpr-store';
+
+// Loaded only when the doctor opens the conversation panel. The speech engine loads later still, on Transcribe.
+const GocTranscribe = lazy(() => import('./goc-transcribe').then((module) => ({ default: module.GocTranscribe })));
 
 type Role = 'doctor' | 'patient' | 'family';
 type T = (en: string, hi: string) => string;
@@ -144,6 +150,15 @@ const DIRECTIVE_OPTS: Opt<DirectiveKind>[] = [
 const UNIT_OPTS: Array<{ value: TrialPlan['durationUnit']; en: string; hi: string }> = [
   { value: 'DAYS', en: 'days', hi: 'दिन' }, { value: 'HOURS', en: 'hours', hi: 'घंटे' }, { value: 'SESSIONS', en: 'sessions', hi: 'सत्र' },
 ];
+// The conversation panel shows these same lists, so its options can never differ from the plan's.
+const GOC_OPTIONS: GocOptionSets = {
+  goalOfCare: GOALS, cpr: CPR_OPTS, hospitalTransfer: TRANSFER_OPTS, ambulance: AMBULANCE_OPTS,
+  respCeiling: CEILINGS.map((level) => ({ ...level, value: String(level.value) })),
+  icu: ICU_OPTS, vasopressors: VASO_OPTS, dialysis: DIALYSIS_OPTS, ng: NG_OPTS, peg: PEG_OPTS, hydration: HYDRATION_OPTS,
+  patientKnows: [{ value: 'yes', en: 'Yes', hi: 'हाँ' }, { value: 'no', en: 'No', hi: 'नहीं' }],
+  familyAskedNotToTell: [{ value: 'yes', en: 'The family asked that the patient not be told', hi: 'परिवार ने कहा कि मरीज़ को न बताया जाए' }],
+};
+
 const LANGUAGE_OPTS = [
   ['en', 'English', 'अंग्रेज़ी'], ['hi', 'Hindi', 'हिन्दी'], ['te', 'Telugu', 'तेलुगु'], ['ur', 'Urdu', 'उर्दू'], ['kn', 'Kannada', 'कन्नड़'],
   ['ta', 'Tamil', 'तमिल'], ['ml', 'Malayalam', 'मलयालम'], ['mr', 'Marathi', 'मराठी'], ['bn', 'Bengali', 'बांग्ला'], ['other', 'Other', 'दूसरी'],
@@ -177,6 +192,7 @@ const STEPS: Array<{ en: string; hi: string }> = [
   { en: 'Values', hi: 'मूल्य' },
   { en: 'Emergency choices', hi: 'इमरजेंसी के फ़ैसले' },
   { en: 'Other treatment', hi: 'दूसरे इलाज' },
+  { en: 'Stopping or not starting treatment', hi: 'इलाज रोकना या शुरू न करना' },
   { en: 'Review date', hi: 'समीक्षा की तारीख़' },
   { en: 'Signatures', hi: 'हस्ताक्षर' },
 ];
@@ -218,6 +234,8 @@ function issueText(lang: CareLang, item: RuleIssue, record: EctprRecord): string
     'REVIEW-past': 'समीक्षा की तारीख़ निकल चुकी है। आगे की तारीख़ चुनें।',
     V6: 'अँगूठे के निशान या कम पढ़ाई-लिखाई की स्थिति में दो गवाहों के हस्ताक्षर ज़रूरी हैं।',
     V7: 'इलाज करने वाले कंसल्टेंट को अपने रजिस्ट्रेशन नंबर के साथ साइन करना होगा। तब तक यह सिर्फ़ बातचीत का नोट है, योजना नहीं।',
+    W1: 'आगे बढ़ने से पहले दोनों बोर्ड की तारीख़, सदस्य, उनका फ़ैसला और तरीका दर्ज करें।',
+    W2: 'द्वितीय फ़ैसला लेने वाले का नाम दर्ज है। उन्हें भी साइन करना चाहिए।',
     V8: 'हर छपे पन्ने पर नाम और अस्पताल नंबर (UHID) होता है। दोनों भरें।',
   };
   if (lang === 'hi' && item.id === 'V1') {
@@ -267,8 +285,9 @@ function stepForField(field: string): number {
   if (field.startsWith('values')) return 4;
   if (/^choices\.(icu|vasopressors|dialysis|feeding|hydration|conflictReasons\.C[23])/.test(field) || field.startsWith('clinical.icdDeactivation')) return 6;
   if (field.startsWith('choices')) return 5;
-  if (field === 'reviewDue') return 7;
-  if (field === 'signatures') return 8;
+  if (field === 'withdrawal') return 7;
+  if (field === 'reviewDue') return 8;
+  if (field === 'signatures') return 9;
   return 0;
 }
 
@@ -425,7 +444,7 @@ function DecisionMakerForm({ t, id, title, person, onChange, disabled }: { t: T;
   return <fieldset className="ep-group" disabled={disabled}><legend>{title}</legend>
     <div className="ep-fields">
       <Field id={`${id}-name`} label={t('Full name', 'पूरा नाम')}><input id={`${id}-name`} type="text" autoComplete="off" value={person.name} onChange={(event) => set({ name: event.target.value })} /></Field>
-      <Field id={`${id}-relation`} label={t('Relation to the patient', 'मरीज़ से रिश्ता')}><input id={`${id}-relation`} type="text" value={person.relation} onChange={(event) => set({ relation: event.target.value })} /></Field>
+      <Field id={`${id}-relation`} label={t('Relation to the patient', 'मरीज़ से रिश्ता')} hint={t('Includes spouses, live-in partners, same-sex and queer partners, and friends the patient chooses.', 'इसमें पति-पत्नी, लिव-इन साथी, समलैंगिक और क्वीयर साथी, और मरीज़ के चुने हुए दोस्त शामिल हैं।')}><input id={`${id}-relation`} type="text" value={person.relation} onChange={(event) => set({ relation: event.target.value })} /></Field>
       <Field id={`${id}-phone`} label={t('Phone that works day and night', 'दिन-रात चालू रहने वाला फ़ोन')}><input id={`${id}-phone`} type="tel" inputMode="tel" autoComplete="off" value={person.phone24h} onChange={(event) => set({ phone24h: event.target.value })} /></Field>
       <Field id={`${id}-idtype`} label={t('ID type', 'पहचान पत्र')}>
         <select id={`${id}-idtype`} value={person.idType ?? ''} onChange={(event) => set({ idType: (event.target.value || null) as IdType | null })}>
@@ -508,12 +527,30 @@ function describe(t: T, lang: CareLang, record: EctprRecord) {
     ] as Array<[string, string | null]>,
     people: [
       [t('Person who decides if the patient cannot', 'मरीज़ न कर सकें तो फ़ैसला लेने वाले'), dm ? `${dm.name}${dm.relation ? ` (${dm.relation})` : ''}${dm.phone24h ? ` · ${dm.phone24h}` : ''}` : none],
+      [t('Secondary decision-maker', 'द्वितीय फ़ैसला लेने वाले'), record.decisionMakers.alternate ? `${record.decisionMakers.alternate.name}${record.decisionMakers.alternate.relation ? ` (${record.decisionMakers.alternate.relation})` : ''}` : none],
+      [t('Present for the discussion', 'बातचीत में मौजूद'), (record.decisionMakers.presentAtDiscussion ?? []).join('\n') || none],
+      [t('Could not be reached', 'संपर्क नहीं हो सका'), (record.decisionMakers.attemptedContact ?? []).join('\n') || none],
+      [t('Home care', 'घर पर देखभाल'), homeCareLines(record, lang).join('\n') || none],
+      [t('Withdrawal or withholding (medical boards)', 'इलाज रोकना या शुरू न करना (मेडिकल बोर्ड)'), withdrawalLines(record, lang).join('\n') || none],
       [t('Ability to decide', 'फ़ैसला लेने की क्षमता'), opt(CAPACITY_OPTS, record.capacity.status)],
       [t('Living will', 'लिविंग विल'), directive ? opt(DIRECTIVE_OPTS, directive.kind) : none],
       [t('In the patient’s own words', 'मरीज़ के अपने शब्दों में'), record.values.ownWords.trim() || none],
       [t('Not acceptable to the patient', 'मरीज़ को जो मंज़ूर नहीं'), record.values.unacceptableOutcomes.filter((v) => v.trim()).join('\n') || none],
     ] as Array<[string, string | null]>,
   };
+}
+
+/** The reviewed conversation note, read-only. On a signed version it is locked with the rest of the record. */
+function GocSavedNote({ t, record, showLines }: { t: T; record: EctprRecord; showLines: boolean }) {
+  const saved = record.gocTranscript;
+  if (!saved) return null;
+  return <details className="ep-group ep-goc-saved-note">
+    <summary>{t('Conversation note', 'बातचीत का नोट')} · {t(`reviewed by ${saved.reviewedBy}`, `समीक्षा: ${saved.reviewedBy}`)} · {saved.reviewedAt.slice(0, 10)}</summary>
+    <p className="ep-goc-note-text" dir="auto">{saved.note || t('No note was written.', 'कोई नोट नहीं लिखा गया।')}</p>
+    {showLines && saved.lines.length ? <details><summary>{t('Word-for-word transcript', 'शब्दशः लिखावट')}{saved.machineDraft ? ` · ${t('machine draft, corrected by the doctor', 'मशीन का ड्राफ़्ट, डॉक्टर ने ठीक किया')}` : ''}</summary>
+      <ol className="ep-goc-verbatim">{saved.lines.map((line, index) => <li key={index} dir="auto">{line.speaker === 'DOCTOR' ? `${t('Doctor side', 'डॉक्टर की तरफ़')}: ` : line.speaker === 'PATIENT_PARTY' ? `${t('Patient side', 'मरीज़ की तरफ़')}: ` : ''}{line.text}</li>)}</ol>
+    </details> : null}
+  </details>;
 }
 
 function PlanSummary({ t, lang, record }: { t: T; lang: CareLang; record: EctprRecord }) {
@@ -728,7 +765,7 @@ export function EctprPlanScreen(props: { patientId: string; patientName: string;
   }
 
   if (mode.kind === 'wizard' && draft && role === 'doctor') {
-    return <Wizard t={t} lang={lang} draft={draft} issues={issues} step={step} busy={busy} error={error} toast={toast} dirty={dirty}
+    return <Wizard t={t} lang={lang} draft={draft} previous={versions?.find((record) => record.id === draft.supersedes) ?? null} issues={issues} step={step} busy={busy} error={error} toast={toast} dirty={dirty}
       saveBlocked={saveBlocked} actorName={actorName} patientName={patientName} edit={edit} goTo={goTo} top={top} heading={heading}
       onSave={() => void persist(false)} onClose={closeWizard} onSign={addSignature} />;
   }
@@ -886,6 +923,7 @@ function Overview({ anchor, t, lang, role, patientId, patientName, actorName, ve
     {active ? <div className="ep-card"><h2>{t('What the plan says', 'योजना में क्या लिखा है')}</h2>
       <p className="ep-hint">{t('“No preference recorded” means standard care. It is never a refusal.', '“कोई पसंद दर्ज नहीं” का मतलब है सामान्य इलाज। यह कभी मना करना नहीं है।')}</p>
       <PlanSummary t={t} lang={lang} record={active} /><LegalPending t={t} lang={lang} />
+      <GocSavedNote t={t} record={active} showLines={role === 'doctor'} />
       {role !== 'family' ? <div className="ep-actions"><FhirExportButton t={t} record={active} actorName={actorName} /></div> : null}</div> : null}
     {active && role !== 'family' ? <PaperAndCopies t={t} lang={lang} record={active} actorName={actorName} /> : null}
     {role !== 'doctor' && openDraft ? <div className="ep-card"><h2>{t(`Draft version ${openDraft.version} (not in use yet)`, `ड्राफ़्ट संस्करण ${openDraft.version} (अभी लागू नहीं)`)}</h2><PlanSummary t={t} lang={lang} record={openDraft} /></div> : null}
@@ -935,8 +973,8 @@ function auditAction(t: T, action: AuditEvent['action']): string {
 // ---------------------------------------------------------------------------
 // Wizard (doctor)
 
-function Wizard({ t, lang, draft, issues, step, busy, error, toast, dirty, saveBlocked, actorName, patientName, edit, goTo, top, heading, onSave, onClose, onSign }: {
-  t: T; lang: CareLang; draft: EctprRecord; issues: RuleIssue[]; step: number; busy: boolean; error: string; toast: string; dirty: boolean; saveBlocked: boolean;
+function Wizard({ t, lang, draft, previous, issues, step, busy, error, toast, dirty, saveBlocked, actorName, patientName, edit, goTo, top, heading, onSave, onClose, onSign }: {
+  t: T; lang: CareLang; draft: EctprRecord; previous: EctprRecord | null; issues: RuleIssue[]; step: number; busy: boolean; error: string; toast: string; dirty: boolean; saveBlocked: boolean;
   actorName: string; patientName: string; edit: (change: (record: EctprRecord) => void) => void; goTo: (step: number) => void;
   top: RefObject<HTMLDivElement | null>; heading: RefObject<HTMLHeadingElement | null>;
   onSave: () => void; onClose: () => void; onSign: (signature: Signature) => Promise<boolean>;
@@ -950,6 +988,11 @@ function Wizard({ t, lang, draft, issues, step, busy, error, toast, dirty, saveB
   const progress = (step + 1) / STEPS.length;
   const stepTitle = t(STEPS[step].en, STEPS[step].hi);
   const stepBody = useRef<HTMLDivElement>(null);
+  const [gocOpen, setGocOpen] = useState(false);
+  const gocEntry = <div className="ep-notice ep-info ep-goc-entry">
+    <p>{t('Talked this through with the patient or family? Record it, or paste your notes, to see every choice next to what was said.', 'मरीज़ या परिवार से इस पर बात की? इसे रिकॉर्ड करें, या नोट पेस्ट करें, ताकि हर फ़ैसला कही गई बात के साथ दिखे।')}</p>
+    <button type="button" className="ep-btn ep-quiet" onClick={() => setGocOpen(true)}>{t('Transcribe the conversation', 'बातचीत लिखें')}</button>
+  </div>;
 
   const lockNotice = (locked || surrogateLocked) ? <div className="ep-notice ep-warn ep-lock" role="status">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2" /><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" /></svg>
@@ -999,6 +1042,10 @@ function Wizard({ t, lang, draft, issues, step, busy, error, toast, dirty, saveB
     {toast ? <p className="ep-toast" role="status">{toast}</p> : null}
     {error ? <p className="ep-notice ep-alert" role="alert">{error}</p> : null}
 
+    {gocOpen ? <Suspense fallback={<p className="ep-hint" role="status">{t('Loading…', 'लोड हो रहा है…')}</p>}>
+      <GocTranscribe t={t} lang={lang} draft={draft} previous={previous} actorName={actorName} patientId={draft.patientId} edit={edit} options={GOC_OPTIONS} onClose={() => setGocOpen(false)} onGoToSign={() => { setGocOpen(false); goTo(STEPS.length - 1); }} />
+    </Suspense> : null}
+
     <form className="ep-card" noValidate onSubmit={(event) => { event.preventDefault(); goTo(step + 1); }}>
       <div key={step} className="ep-step" ref={stepBody}>
         <div className="ep-step-title"><h2 ref={heading} tabIndex={-1}>{stepTitle}</h2><span>{t(`Step ${step + 1} of ${STEPS.length}`, `चरण ${step + 1} / ${STEPS.length}`)}</span><ReadAloudButton lang={lang} target={stepBody} /></div>
@@ -1016,6 +1063,7 @@ function Wizard({ t, lang, draft, issues, step, busy, error, toast, dirty, saveB
                 </select>
               </Field>
               <Field id="ep-phone" label={t('Phone', 'फ़ोन')}><input id="ep-phone" type="tel" inputMode="tel" value={draft.patient.phone} onChange={(event) => edit((r) => { r.patient.phone = event.target.value; })} /></Field>
+              <Field id="ep-gender" label={t('Gender', 'जेंडर')}><input id="ep-gender" type="text" value={draft.patient.gender ?? ''} onChange={(event) => edit((r) => { r.patient.gender = event.target.value; })} /></Field>
               <Field id="ep-lang" label={t('Preferred language', 'पसंद की भाषा')}>
                 <select id="ep-lang" value={draft.patient.languagePref} onChange={(event) => edit((r) => { r.patient.languagePref = event.target.value; })}>
                   <option value="">{t('Not recorded', 'दर्ज नहीं')}</option>
@@ -1040,7 +1088,7 @@ function Wizard({ t, lang, draft, issues, step, busy, error, toast, dirty, saveB
           </fieldset>
           <fieldset className="ep-group"><legend>{t('Care team', 'देखभाल टीम')}</legend>
             <div className="ep-fields">
-              <Field id="ep-onc" label={t('Oncologist or treating doctor', 'कैंसर डॉक्टर या इलाज करने वाले डॉक्टर')}><input id="ep-onc" type="text" value={draft.careTeam.oncologist} onChange={(event) => edit((r) => { r.careTeam.oncologist = event.target.value; })} /></Field>
+              <Field id="ep-onc" label={t('Main treating doctor or specialist (oncologist or any other)', 'मुख्य इलाज करने वाले डॉक्टर या विशेषज्ञ (कैंसर या कोई और)')}><input id="ep-onc" type="text" value={draft.careTeam.oncologist} onChange={(event) => edit((r) => { r.careTeam.oncologist = event.target.value; })} /></Field>
               <Field id="ep-pall" label={t('Palliative care doctor', 'पैलिएटिव केयर डॉक्टर')}><input id="ep-pall" type="text" value={draft.careTeam.palliativePhysician} onChange={(event) => edit((r) => { r.careTeam.palliativePhysician = event.target.value; })} /></Field>
               <Field id="ep-pall-phone" label={t('Palliative team phone (day and night)', 'पैलिएटिव टीम का फ़ोन (दिन-रात)')}><input id="ep-pall-phone" type="tel" inputMode="tel" value={draft.careTeam.palliativePhone24h} onChange={(event) => edit((r) => { r.careTeam.palliativePhone24h = event.target.value; })} /></Field>
               <Field id="ep-local" label={t('Local doctor', 'स्थानीय डॉक्टर')}><input id="ep-local" type="text" value={draft.careTeam.localDoctor} onChange={(event) => edit((r) => { r.careTeam.localDoctor = event.target.value; })} /></Field>
@@ -1052,11 +1100,13 @@ function Wizard({ t, lang, draft, issues, step, busy, error, toast, dirty, saveB
 
         {step === 1 ? <>
           <p className="ep-hint">{t('Who speaks for the patient if they cannot decide? Store only the ID type and last 4 digits.', 'अगर मरीज़ फ़ैसला न ले सकें तो उनकी ओर से कौन बोलेगा? सिर्फ़ पहचान पत्र का प्रकार और आख़िरी 4 अंक रखें।')}</p>
-          <DecisionMakerForm t={t} id="ep-dm1" title={t('Main decision-maker', 'मुख्य फ़ैसला लेने वाले')} person={draft.decisionMakers.primary} onChange={(person) => edit((r) => { r.decisionMakers.primary = person; })} />
-          <DecisionMakerForm t={t} id="ep-dm2" title={t('Second (backup) decision-maker', 'दूसरे (बैकअप) फ़ैसला लेने वाले')} person={draft.decisionMakers.alternate} onChange={(person) => edit((r) => { r.decisionMakers.alternate = person; })} />
-          <fieldset className="ep-group"><legend>{t('Family', 'परिवार')}</legend>
+          <DecisionMakerForm t={t} id="ep-dm1" title={t('Primary decision-maker', 'मुख्य फ़ैसला लेने वाले')} person={draft.decisionMakers.primary} onChange={(person) => edit((r) => { r.decisionMakers.primary = person; })} />
+          <DecisionMakerForm t={t} id="ep-dm2" title={t('Secondary decision-maker', 'द्वितीय फ़ैसला लेने वाले')} person={draft.decisionMakers.alternate} onChange={(person) => edit((r) => { r.decisionMakers.alternate = person; })} />
+          <fieldset className="ep-group"><legend>{t('Family and friends', 'परिवार और दोस्त')}</legend>
             <div className="ep-fields">
-              <Field id="ep-inform" label={t('Family to keep informed (one per line)', 'जिन्हें ख़बर देनी है (हर लाइन में एक)')} wide><textarea id="ep-inform" rows={3} value={listToLines(draft.decisionMakers.familyToInform)} onChange={(event) => edit((r) => { r.decisionMakers.familyToInform = linesToList(event.target.value); })} /></Field>
+              <Field id="ep-present" label={t('Family or friends present for this discussion, with their relationship (one per line)', 'इस बातचीत में मौजूद परिवार या दोस्त, रिश्ते के साथ (हर लाइन में एक)')} hint={t('Includes spouses, live-in partners, same-sex and queer partners, and friends the patient chooses.', 'इसमें पति-पत्नी, लिव-इन साथी, समलैंगिक और क्वीयर साथी, और मरीज़ के चुने हुए दोस्त शामिल हैं।')} wide><textarea id="ep-present" rows={3} value={listToLines(draft.decisionMakers.presentAtDiscussion ?? [])} aria-describedby="ep-present-hint" onChange={(event) => edit((r) => { r.decisionMakers.presentAtDiscussion = linesToList(event.target.value); })} /></Field>
+              <Field id="ep-inform" label={t('Family or friends who must be informed before any major decision: name, relation, phone (one per line)', 'जिन परिवारजनों या दोस्तों को बड़े फ़ैसले से पहले बताना ज़रूरी है: नाम, रिश्ता, फ़ोन (हर लाइन में एक)')} wide><textarea id="ep-inform" rows={3} value={listToLines(draft.decisionMakers.familyToInform)} onChange={(event) => edit((r) => { r.decisionMakers.familyToInform = linesToList(event.target.value); })} /></Field>
+              <Field id="ep-attempted" label={t('Family or friends we tried to contact but could not reach (one per line)', 'जिन परिवारजनों या दोस्तों से संपर्क की कोशिश हुई पर बात नहीं हो सकी (हर लाइन में एक)')} wide><textarea id="ep-attempted" rows={2} value={listToLines(draft.decisionMakers.attemptedContact ?? [])} onChange={(event) => edit((r) => { r.decisionMakers.attemptedContact = linesToList(event.target.value); })} /></Field>
               <Field id="ep-consensus" label={t('Family agreement (a note, not a legal basis)', 'परिवार की सहमति (एक नोट, क़ानूनी आधार नहीं)')} hint={t('If the family disagrees: hold one family meeting, go back to what the patient would want, and ask the ethics committee if still unresolved. Current treatment continues meanwhile.', 'अगर परिवार असहमत हो: एक पारिवारिक बैठक करें, देखें कि मरीज़ क्या चाहते, और फिर भी हल न हो तो एथिक्स कमेटी से पूछें। तब तक मौजूदा इलाज जारी रहे।')} wide>
                 <textarea id="ep-consensus" rows={3} value={draft.decisionMakers.familyConsensusNote} aria-describedby="ep-consensus-hint" onChange={(event) => edit((r) => { r.decisionMakers.familyConsensusNote = event.target.value; })} />
               </Field>
@@ -1065,6 +1115,7 @@ function Wizard({ t, lang, draft, issues, step, busy, error, toast, dirty, saveB
         </> : null}
 
         {step === 2 ? <>
+          <CapacityGuide lang={lang} />
           <Choices t={t} name="ep-capacity" legend={t('Can the patient make this decision today?', 'क्या मरीज़ आज यह फ़ैसला ले सकते हैं?')} hint={t('Check it now, for this decision. Do not use old notes.', 'अभी, इसी फ़ैसले के लिए जाँचें। पुराने नोट का इस्तेमाल न करें।')}
             value={draft.capacity.status} options={CAPACITY_OPTS} invalid={bad('capacity.status')} noneHint={t('Not checked yet.', 'अभी नहीं जाँचा।')}
             onChange={(value) => edit((r) => { r.capacity.status = value; })}>
@@ -1117,10 +1168,16 @@ function Wizard({ t, lang, draft, issues, step, busy, error, toast, dirty, saveB
         </> : null}
 
         {step === 4 ? <>
+          {gocOpen ? null : gocEntry}
           {surrogateLocked ? lockNotice : null}
           <fieldset className="ep-group" disabled={surrogateLocked}><legend>{t('What matters to the patient', 'मरीज़ के लिए क्या ज़रूरी है')}</legend>
             <YesNo t={t} name="ep-knows" legend={t('Does the patient know about their illness?', 'क्या मरीज़ अपनी बीमारी के बारे में जानते हैं?')} value={draft.values.patientKnows} onChange={(value) => edit((r) => { r.values.patientKnows = value; })} />
             <div className="ep-fields">
+              <Field id="ep-knows-when" label={t('When was this recorded?', 'यह कब दर्ज किया गया?')}>
+                <select id="ep-knows-when" value={draft.values.knowsRecordedWhen ?? ''} onChange={(event) => edit((r) => { r.values.knowsRecordedWhen = (event.target.value || null) as EctprRecord['values']['knowsRecordedWhen']; })}>
+                  <option value="">{t('Not recorded', 'दर्ज नहीं')}</option><option value="BEFORE_COUNSELLING">{t('Before counselling', 'काउंसलिंग से पहले')}</option><option value="AFTER_COUNSELLING">{t('After counselling', 'काउंसलिंग के बाद')}</option>
+                </select>
+              </Field>
               <Field id="ep-own-words" label={t('In the patient’s own words', 'मरीज़ के अपने शब्दों में')} hint={t('Write exactly what they said. Do not change their words.', 'ठीक वही लिखें जो उन्होंने कहा। उनके शब्द न बदलें।')} wide>
                 <textarea id="ep-own-words" rows={4} value={draft.values.ownWords} aria-describedby="ep-own-words-hint" onChange={(event) => edit((r) => { r.values.ownWords = event.target.value; })} />
               </Field>
@@ -1146,6 +1203,7 @@ function Wizard({ t, lang, draft, issues, step, busy, error, toast, dirty, saveB
         </> : null}
 
         {step === 5 ? <>
+          {gocOpen ? null : gocEntry}
           {lockNotice}
           <LegalPending t={t} lang={lang} />
           <Choices t={t} name="ep-goal" legend={t('Goal of care', 'देखभाल का लक्ष्य')} value={c.goalOfCare} options={GOALS} disabled={locked || surrogateLocked} onChange={(value) => edit((r) => { r.choices.goalOfCare = value; })} />
@@ -1208,6 +1266,7 @@ function Wizard({ t, lang, draft, issues, step, busy, error, toast, dirty, saveB
               <span><strong>{t('I have checked: the goal is to prioritise life, with these limits on breathing support or ICU.', 'मैंने जाँच लिया: लक्ष्य जीवन को प्राथमिकता है, साँस की मदद या ICU पर इन सीमाओं के साथ।')}</strong></span></label> : null}
             {c1 ? reasonField('C1', t('Why “do not go to hospital” goes with high-flow oxygen, NIV or ICU', '“अस्पताल न जाएँ” के साथ हाई-फ़्लो ऑक्सीजन, NIV या ICU क्यों')) : null}
           </fieldset> : null}
+          <HomeCareFields t={t} draft={draft} edit={edit} />
         </> : null}
 
         {step === 6 ? <>
@@ -1270,7 +1329,9 @@ function Wizard({ t, lang, draft, issues, step, busy, error, toast, dirty, saveB
           </fieldset> : null}
         </> : null}
 
-        {step === 7 ? <>
+        {step === 7 ? <WithdrawalFields t={t} lang={lang} draft={draft} edit={edit} invalid={bad('withdrawal')} /> : null}
+
+        {step === 8 ? <>
           <IssueList t={t} lang={lang} issues={issues.filter((item) => item.id === 'V1')} record={draft} />
           <fieldset className="ep-group" aria-invalid={bad('reviewDue')}><legend>{t('When must this plan be reviewed?', 'इस योजना की समीक्षा कब ज़रूरी है?')}</legend>
             <div className="ep-fields">
@@ -1285,7 +1346,8 @@ function Wizard({ t, lang, draft, issues, step, busy, error, toast, dirty, saveB
           <AlwaysContinues t={t} />
         </> : null}
 
-        {step === 8 ? <SignStep t={t} lang={lang} draft={draft} actorName={actorName} busy={busy} dirty={dirty} saveBlocked={saveBlocked} edit={edit} onSign={onSign} />
+        {step === 9 && draft.gocTranscript ? <GocSavedNote t={t} record={draft} showLines /> : null}
+        {step === 9 ? <SignStep t={t} lang={lang} draft={draft} actorName={actorName} busy={busy} dirty={dirty} saveBlocked={saveBlocked} edit={edit} onSign={onSign} />
           : null}
       </div>
 
@@ -1326,13 +1388,65 @@ function AbilityBasis({ t, basis, onChange, invalid }: { t: T; basis: string; on
   </fieldset>;
 }
 
+function CapacityGuide({ lang }: { lang: CareLang }) {
+  const guide = capacityGuide(lang);
+  return <details className="ep-group"><summary><strong>{guide.title}</strong></summary>
+    <p className="ep-hint">{guide.note}</p>
+    <ol>{guide.points.map((point) => <li key={point}>{point}</li>)}</ol>
+  </details>;
+}
+
+function HomeCareFields({ t, draft, edit }: { t: T; draft: EctprRecord; edit: (change: (record: EctprRecord) => void) => void }) {
+  const home = draft.homeCare ?? emptyHomeCare();
+  const set = (patch: Partial<EctprHomeCare>) => edit((r) => { r.homeCare = { ...(r.homeCare ?? emptyHomeCare()), ...patch }; });
+  return <fieldset className="ep-group"><legend>{t('Home care (if relevant)', 'घर पर देखभाल (अगर लागू हो)')}</legend>
+    <p className="ep-hint">{t('Helps a doctor called to the home see the care schedule and decide whether home care can continue.', 'घर बुलाए गए डॉक्टर को देखभाल का क्रम देखने और यह तय करने में मदद करता है कि घर पर देखभाल जारी रह सकती है या नहीं।')}</p>
+    <div className="ep-fields">
+      <Field id="ep-home-freq" label={t('How often the patient is assessed', 'मरीज़ की जाँच कितनी बार होती है')}><input id="ep-home-freq" type="text" value={home.assessmentFrequency} onChange={(event) => set({ assessmentFrequency: event.target.value })} /></Field>
+      <Field id="ep-home-coord" label={t('Person coordinating between the family and the hospital or centre (name, phone, centre)', 'परिवार और अस्पताल या केंद्र के बीच तालमेल रखने वाले (नाम, फ़ोन, केंद्र)')} wide><input id="ep-home-coord" type="text" value={home.coordinator} onChange={(event) => set({ coordinator: event.target.value })} /></Field>
+      <Field id="ep-home-ngo" label={t('Non-governmental organisation caring for the patient: representative and contact', 'मरीज़ की देखभाल करने वाली ग़ैर-सरकारी संस्था: प्रतिनिधि और संपर्क')} wide><input id="ep-home-ngo" type="text" value={home.ngoContact} onChange={(event) => set({ ngoContact: event.target.value, ...(event.target.value.trim() ? {} : { ngoConsulted: false }) })} /></Field>
+    </div>
+    {home.ngoContact.trim() ? <label className="ep-option"><input type="checkbox" checked={home.ngoConsulted} onChange={(event) => set({ ngoConsulted: event.target.checked })} /><span><strong>{t('The organisation was consulted about this plan', 'इस योजना पर संस्था से सलाह ली गई')}</strong></span></label> : null}
+    <YesNo t={t} name="ep-home-admitted" legend={t('Admitted to any hospital before for this condition?', 'क्या इस बीमारी के लिए पहले किसी अस्पताल में भर्ती हुए थे?')} value={home.previousAdmission} onChange={(value) => set({ previousAdmission: value })} />
+    {home.previousAdmission ? <div className="ep-fields"><Field id="ep-home-admitted-where" label={t('Where and when', 'कहाँ और कब')} wide><input id="ep-home-admitted-where" type="text" value={home.previousAdmissionDetails} onChange={(event) => set({ previousAdmissionDetails: event.target.value })} /></Field></div> : null}
+  </fieldset>;
+}
+
+function WithdrawalFields({ t, lang, draft, edit, invalid }: { t: T; lang: CareLang; draft: EctprRecord; edit: (change: (record: EctprRecord) => void) => void; invalid?: boolean }) {
+  const w = draft.withdrawal ?? emptyWithdrawal();
+  const set = (patch: Partial<EctprWithdrawal>) => edit((r) => { r.withdrawal = { ...(r.withdrawal ?? emptyWithdrawal()), ...patch }; });
+  const finals: WithdrawalFinal[] = ['TO_BE_PERFORMED', 'FAMILY_REFUSED', 'BOARD_REFUSED', 'PHYSICIAN_REVOKED'];
+  return <>
+    <p>{t('Fill this only if withdrawing or withholding treatment has been decided (Common Cause v Union of India, 2018 and 2023). It records the process. This plan alone never authorises it.', 'इसे तभी भरें जब इलाज रोकने या शुरू न करने का फ़ैसला हुआ हो (Common Cause v Union of India, 2018 और 2023)। यह प्रक्रिया दर्ज करता है। सिर्फ़ यह योजना इसकी अनुमति कभी नहीं देती।')}</p>
+    <fieldset className="ep-group" aria-invalid={invalid}><legend>{t('Withdrawal or withholding (medical boards)', 'इलाज रोकना या शुरू न करना (मेडिकल बोर्ड)')}</legend>
+      <label className="ep-option"><input type="checkbox" checked={w.applicable} onChange={(event) => set({ applicable: event.target.checked })} /><span><strong>{t('Withdrawing or withholding treatment has been decided for this patient', 'इस मरीज़ के लिए इलाज रोकने या शुरू न करने का फ़ैसला हुआ है')}</strong></span></label>
+      {w.applicable ? <>
+        <div className="ep-fields" style={{ marginTop: 12 }}>
+          <Field id="ep-w-pdate" label={t('Date the Primary Board was formed', 'प्राथमिक बोर्ड बनने की तारीख़')}><input id="ep-w-pdate" type="date" value={w.primaryBoardDate} onChange={(event) => set({ primaryBoardDate: event.target.value })} /></Field>
+          <Field id="ep-w-sdate" label={t('Date the Secondary Board was formed', 'द्वितीय बोर्ड बनने की तारीख़')}><input id="ep-w-sdate" type="date" value={w.secondaryBoardDate} onChange={(event) => set({ secondaryBoardDate: event.target.value })} /></Field>
+          <Field id="ep-w-pmem" label={t('Members of the Primary Board', 'प्राथमिक बोर्ड के सदस्य')} wide><textarea id="ep-w-pmem" rows={2} value={w.primaryBoardMembers} onChange={(event) => set({ primaryBoardMembers: event.target.value })} /></Field>
+          <Field id="ep-w-smem" label={t('Members of the Secondary Board', 'द्वितीय बोर्ड के सदस्य')} wide><textarea id="ep-w-smem" rows={2} value={w.secondaryBoardMembers} onChange={(event) => set({ secondaryBoardMembers: event.target.value })} /></Field>
+          <Field id="ep-w-dec" label={t('Decision of the Boards', 'बोर्ड का फ़ैसला')} wide><textarea id="ep-w-dec" rows={2} value={w.boardDecision} onChange={(event) => set({ boardDecision: event.target.value })} /></Field>
+          <Field id="ep-w-final" label={t('Final decision', 'अंतिम फ़ैसला')} wide>
+            <select id="ep-w-final" value={w.finalDecision ?? ''} onChange={(event) => set({ finalDecision: (event.target.value || null) as WithdrawalFinal | null })}>
+              <option value="">{t('Not recorded', 'दर्ज नहीं')}</option>
+              {finals.map((value) => <option key={value} value={value}>{withdrawalFinalLabel(value, lang)}</option>)}
+            </select>
+          </Field>
+          <Field id="ep-w-protocol" label={t('Protocol for withdrawal or withholding', 'इलाज रोकने या शुरू न करने का तरीका')} wide><textarea id="ep-w-protocol" rows={3} value={w.protocol} onChange={(event) => set({ protocol: event.target.value })} /></Field>
+        </div>
+      </> : null}
+    </fieldset>
+  </>;
+}
+
 function SignStep({ t, lang, draft, actorName, busy, dirty, saveBlocked, edit, onSign }: {
   t: T; lang: CareLang; draft: EctprRecord; actorName: string; busy: boolean; dirty: boolean; saveBlocked: boolean;
   edit: (change: (record: EctprRecord) => void) => void; onSign: (signature: Signature) => Promise<boolean>;
 }) {
   const [consultant, setConsultant] = useState({ name: actorName, reg: '' });
   const [cosign, setCosign] = useState<{ role: 'PALLIATIVE_CLINICIAN' | 'NURSE'; name: string; reg: string }>({ role: 'PALLIATIVE_CLINICIAN', name: '', reg: '' });
-  const [person, setPerson] = useState<{ role: 'PATIENT' | 'SURROGATE'; name: string; thumb: boolean }>({ role: draft.surrogateDeclaration.answeringAsSurrogate ? 'SURROGATE' : 'PATIENT', name: '', thumb: false });
+  const [person, setPerson] = useState<{ role: 'PATIENT' | 'PRIMARY' | 'SECONDARY'; name: string; thumb: boolean }>({ role: draft.surrogateDeclaration.answeringAsSurrogate ? 'PRIMARY' : 'PATIENT', name: '', thumb: false });
   const [witness, setWitness] = useState('');
   const now = new Date().toISOString();
   const consultantSig: Signature = { role: 'TREATING_CONSULTANT', name: consultant.name.trim(), registrationNo: consultant.reg.trim(), signedAt: now };
@@ -1345,7 +1459,7 @@ function SignStep({ t, lang, draft, actorName, busy, dirty, saveBlocked, edit, o
   return <>
     <p>{t('Everyone signs here. The plan becomes active only when the treating consultant signs with their registration number. A signature cannot be taken back; if the plan changes later, start a review.', 'सब यहाँ साइन करते हैं। योजना तभी लागू होती है जब इलाज करने वाले कंसल्टेंट अपने रजिस्ट्रेशन नंबर के साथ साइन करें। हस्ताक्षर वापस नहीं लिया जा सकता; बाद में योजना बदले तो समीक्षा शुरू करें।')}</p>
     {draft.signatures.length ? <ul className="ep-sigs" aria-label={t('Signatures so far', 'अब तक के हस्ताक्षर')}>
-      {draft.signatures.map((s, index) => <li key={`${s.role}-${index}`}><strong>{signatureRole(t, s.role)}</strong><span>{s.name}{s.registrationNo ? ` · ${s.registrationNo}` : ''}{s.thumbImpression ? ` · ${t('thumb impression', 'अँगूठे का निशान')}` : ''}</span><span className="ep-hint">{formatTime(lang, s.signedAt)}</span></li>)}
+      {draft.signatures.map((s, index) => <li key={`${s.role}-${index}`}><strong>{s.surrogateRank === 'PRIMARY' ? t('Primary decision-maker', 'मुख्य फ़ैसला लेने वाले') : s.surrogateRank === 'SECONDARY' ? t('Secondary decision-maker', 'द्वितीय फ़ैसला लेने वाले') : signatureRole(t, s.role)}</strong><span>{s.name}{s.registrationNo ? ` · ${s.registrationNo}` : ''}{s.thumbImpression ? ` · ${t('thumb impression', 'अँगूठे का निशान')}` : ''}</span><span className="ep-hint">{formatTime(lang, s.signedAt)}</span></li>)}
     </ul> : null}
 
     <fieldset className="ep-group"><legend>{t('Patient or the person deciding for them', 'मरीज़ या उनकी ओर से फ़ैसला लेने वाले')}</legend>
@@ -1353,8 +1467,8 @@ function SignStep({ t, lang, draft, actorName, busy, dirty, saveBlocked, edit, o
         <span><strong>{t('The signer cannot read well, or the plan was read aloud to them', 'साइन करने वाले ठीक से पढ़ नहीं सकते, या योजना उन्हें पढ़कर सुनाई गई')}</strong><small>{t('Two witnesses must then sign.', 'तब दो गवाहों को साइन करना होगा।')}</small></span></label>
       <div className="ep-fields" style={{ marginTop: 12 }}>
         <Field id="ep-sig-person-role" label={t('Who is signing', 'कौन साइन कर रहे हैं')}>
-          <select id="ep-sig-person-role" value={person.role} onChange={(event) => setPerson({ ...person, role: event.target.value as 'PATIENT' | 'SURROGATE' })}>
-            <option value="PATIENT">{t('Patient', 'मरीज़')}</option><option value="SURROGATE">{t('Person deciding for the patient', 'मरीज़ की ओर से फ़ैसला लेने वाले')}</option>
+          <select id="ep-sig-person-role" value={person.role} onChange={(event) => setPerson({ ...person, role: event.target.value as 'PATIENT' | 'PRIMARY' | 'SECONDARY' })}>
+            <option value="PATIENT">{t('Patient', 'मरीज़')}</option><option value="PRIMARY">{t('Primary decision-maker', 'मुख्य फ़ैसला लेने वाले')}</option><option value="SECONDARY">{t('Secondary decision-maker', 'द्वितीय फ़ैसला लेने वाले')}</option>
           </select>
         </Field>
         <Field id="ep-sig-person-name" label={t('Full name', 'पूरा नाम')}><input id="ep-sig-person-name" type="text" value={person.name} onChange={(event) => setPerson({ ...person, name: event.target.value })} /></Field>
@@ -1362,11 +1476,11 @@ function SignStep({ t, lang, draft, actorName, busy, dirty, saveBlocked, edit, o
       <label className="ep-option" style={{ marginTop: 10 }}><input type="checkbox" checked={person.thumb} onChange={(event) => setPerson({ ...person, thumb: event.target.checked })} />
         <span><strong>{t('Signed with a thumb impression', 'अँगूठे के निशान से साइन')}</strong></span></label>
       <div className="ep-actions"><button type="button" className="ep-btn ep-quiet" disabled={!person.name.trim() || busy || saveBlocked}
-        onClick={async () => { if (await onSign({ role: person.role, name: person.name.trim(), signedAt: new Date().toISOString(), ...(person.thumb ? { thumbImpression: true } : {}) })) setPerson({ ...person, name: '', thumb: false }); }}>{t('Add this signature', 'यह हस्ताक्षर जोड़ें')}</button></div>
+        onClick={async () => { if (await onSign({ role: person.role === 'PATIENT' ? 'PATIENT' : 'SURROGATE', ...(person.role === 'PATIENT' ? {} : { surrogateRank: person.role }), name: person.name.trim(), signedAt: new Date().toISOString(), ...(person.thumb ? { thumbImpression: true } : {}) })) setPerson({ ...person, name: '', thumb: false }); }}>{t('Add this signature', 'यह हस्ताक्षर जोड़ें')}</button></div>
     </fieldset>
 
     {needsWitnesses ? <fieldset className="ep-group" aria-invalid={witnesses < 2 || undefined}><legend>{t(`Witnesses (${witnesses} of 2)`, `गवाह (2 में से ${witnesses})`)}</legend>
-      <p className="ep-hint">{t('Preferably people who are not decision-makers.', 'बेहतर है कि ये फ़ैसला लेने वाले न हों।')}</p>
+      <p className="ep-hint">{t('Needed when the patient signs by thumb impression or has limited literacy, for both home-based and hospital-based evaluation. Preferably people who are not decision-makers.', 'जब मरीज़ अँगूठे से साइन करें या ठीक से पढ़ न सकें तब ज़रूरी, घर और अस्पताल दोनों जगह की जाँच में। बेहतर है कि ये फ़ैसला लेने वाले न हों।')}</p>
       <div className="ep-fields"><Field id="ep-sig-witness" label={t('Witness full name', 'गवाह का पूरा नाम')}><input id="ep-sig-witness" type="text" value={witness} onChange={(event) => setWitness(event.target.value)} /></Field></div>
       <div className="ep-actions"><button type="button" className="ep-btn ep-quiet" disabled={!witness.trim() || busy || saveBlocked}
         onClick={async () => { if (await onSign({ role: 'WITNESS', name: witness.trim(), signedAt: new Date().toISOString() })) setWitness(''); }}>{t('Add witness signature', 'गवाह का हस्ताक्षर जोड़ें')}</button></div>

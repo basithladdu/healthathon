@@ -14,7 +14,7 @@ import java.nio.ByteOrder
 
 /** Decode the app's AAC/M4A recording to a bounded 16 kHz mono scratch file, without uploads. */
 object OfflineAudioDecoder {
-    suspend fun decode(source: File, destination: File): Long {
+    suspend fun decode(source: File, destination: File, maxSeconds: Int = OfflineSpeechModel.maxSeconds): Long {
         val extractor = MediaExtractor()
         var codec: MediaCodec? = null
         try {
@@ -24,7 +24,7 @@ object OfflineAudioDecoder {
             extractor.selectTrack(track)
             val format = extractor.getTrackFormat(track)
             val mime = requireNotNull(format.getString(MediaFormat.KEY_MIME))
-            if (format.containsKey(MediaFormat.KEY_DURATION)) require(format.getLong(MediaFormat.KEY_DURATION) <= OfflineSpeechModel.maxSeconds * 1_000_000L + 1_000_000) { "Choose a recording of 20 minutes or less, or transcribe a shorter conversation." }
+            if (format.containsKey(MediaFormat.KEY_DURATION)) require(format.getLong(MediaFormat.KEY_DURATION) <= maxSeconds * 1_000_000L + 1_000_000) { "Choose a recording of ${maxSeconds / 60} minutes or less, or transcribe a shorter conversation." }
             val decoder = MediaCodec.createDecoderByType(mime).also { codec = it }
             decoder.configure(format, null, null, 0); decoder.start()
             val info = MediaCodec.BufferInfo()
@@ -67,7 +67,7 @@ object OfflineAudioDecoder {
                                 buffer.position(info.offset); buffer.limit(info.offset + info.size)
                                 if (resampler == null) resampler = OfflinePcmResampler(outputRate) { sample ->
                                     frames++
-                                    require(frames <= OfflineSpeechModel.maxSeconds.toLong() * OfflineSpeechModel.sampleRate) { "Choose a recording of 20 minutes or less." }
+                                    require(frames <= maxSeconds.toLong() * OfflineSpeechModel.sampleRate) { "Choose a recording of ${maxSeconds / 60} minutes or less." }
                                     output.writeFloat(sample)
                                 }
                                 val bytesPerSample = if (outputEncoding == AudioFormat.ENCODING_PCM_FLOAT) 4 else 2

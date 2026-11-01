@@ -1,0 +1,272 @@
+Section I – General information
+Patient details
+Name
+Age, Sex[+, Gender
+Address
+Phone number
+Physician details
+Primary <<C1:Oncologist :C1>>name and hospital – and contact
+Palliative care physician name and hospital – and contact
+Additional space for the team – Surgical oncology, radiation oncology, etc.
+?Additional option to add a local physician who can be briefed about the care and part of the team
+Family[+/Friend details
+<<C3:Members :C3>>present for discussion and relationship with the patient
+Language preferred
+Primary decision maker and contact details
+Secondary decision maker and contact details
+PRIMARY
+[-ALTERNATE-][+SECONDARY
+Name
+Relationship to patient
+Phone (must be reachable 24 h)
+ID type & number
+Basis for authority
+❑ Named by patient  ❑ Family consensus  ❑ Named in AMD  ❑ Court-appointed
+❑ Named by patient  ❑ Family consensus  ❑ Named in AMD  ❑ Court-appointed
+<<C6:Family members who must be informed before any major decision (name, relation, phone):C6>>
+Section II – Preliminary medical information and patient values
+Primary diagnosis and stage
+Functional status – ECOG
+Patient’s <<C7:capacity:C7>>
+Existing medical directives
+<<C8:What the patient knows:C8>>
+4.1  The patient’s capacity, now❑  The patient has capacity for these decisions and has completed this record themselves.❑  The patient has capacity but has asked family to decide with the team. Record the patient’s own words: ______________________________❑  Capacity fluctuates. Assessed by: ____________________  on ____________. Re-assess before acting on any section.❑  The patient lacks capacity for these decisions. Basis of assessment (understand / retain / weigh / communicate): ________________________4.2  Existing directives❑  There is a valid written Advance Medical Directive / living will.  Executed on ____________.  Location of original: ______________________Attested by  ❑ Notary   ❑ Gazetted Officer,  with two witnesses?  ❑ Yes  ❑ No.  If yes, this ECTPR must be read as subordinate to it — the directive governs; this record operationalises it.❑  There is no directive, but the patient previously expressed clear wishes. Recorded here, with who heard them and when: ______________________________❑  No directive and no recorded prior wishes. Decisions will be made in the patient’s best interests through family consensus with the team.5.3  What the patient knows❑  The patient knows the diagnosis and the prognosis.❑  The patient knows the diagnosis but not the prognosis.❑  The family has asked that the patient not be told. Discussed with the family that the patient may ask directly and will not be lied to. Family understands:  ❑ Yes  ❑ Not yet resolved❑  The patient has said they do not wish to know details and has delegated: __________________________6.1  In their own wordsThe most distressing physical symptom right now is  ____________________________________________________________  What matters most to me / to them is  __________________________________________________________________  What I am most afraid of is  __________________________________________________________________________  Unfinished things that matter (people to see, disputes to settle, papers to sign, a place to visit)  ____________________  6.2  Outcomes that would be unacceptable  (tick any that apply)❑  Being kept alive on a ventilator with no prospect of coming off it❑  Being permanently dependent on a feeding tube❑  Not being able to recognise or respond to family❑  Surviving with severe, permanent physical dependence❑  Dying in an ICU, away from family❑  Uncontrolled pain or breathlessness at any stage❑  Loss of dignity in bathing, toileting or exposure❑  Being alone at the time of death❑  Exhausting the family’s savings on treatment that will not change the outcome❑  Other: ______________________________________4.1  The patient’s capacity, now❑  The patient has capacity for these decisions and has completed this record themselves.❑  The patient has capacity but has asked family to decide with the team. Record the patient’s own words: ______________________________❑  Capacity fluctuates. Assessed by: ____________________  on ____________. Re-assess before acting on any section.❑  The patient lacks capacity for these decisions. Basis of assessment (understand / retain / weigh / communicate): ________________________4.2  Existing directives❑  There is a valid written Advance Medical Directive / living will.  Executed on ____________.  Location of original: ______________________Attested by  ❑ Notary   ❑ Gazetted Officer,  with two witnesses?  ❑ Yes  ❑ No.  If yes, this ECTPR must be read as subordinate to it — the directive governs; this record operationalises it.❑  There is no directive, but the patient previously expressed clear wishes. Recorded here, with who heard them and when: ______________________________❑  No directive and no recorded prior wishes. Decisions will be made in the patient’s best interests through family consensus with the team.5.3  What the patient knows❑  The patient knows the diagnosis and the prognosis.❑  The patient knows the diagnosis but not the prognosis.❑  The family has asked that the patient not be told. Discussed with the family that the patient may ask directly and will not be lied to. Family understands:  ❑ Yes  ❑ Not yet resolved❑  The patient has said they do not wish to know details and has delegated: __________________________6.1  In their own wordsThe most distressing physical symptom right now is  ____________________________________________________________  What matters most to me / to them is  __________________________________________________________________  What I am most afraid of is  __________________________________________________________________________  Unfinished things that matter (people to see, disputes to settle, papers to sign, a place to visit)  ____________________  6.2  Outcomes that would be unacceptable  (tick any that apply)❑  Being kept alive on a ventilator with no prospect of coming off it❑  Being permanently dependent on a feeding tube❑  Not being able to recognise or respond to family❑  Surviving with severe, permanent physical dependence❑  Dying in an ICU, away from family❑  Uncontrolled pain or breathlessness at any stage❑  Loss of dignity in bathing, toileting or exposure❑  Being alone at the time of death❑  Exhausting the family’s savings on treatment that will not change the outcome❑  Other: ______________________________________
+4.1  The patient’s capacity, now
+❑  The patient has capacity for these decisions and has completed this record themselves.
+❑  The patient has capacity but has asked family to decide with the team. Record the patient’s own words: ______________________________
+❑  Capacity fluctuates. Assessed by: ____________________  on ____________. Re-assess before acting on any section.
+❑  The patient lacks capacity for these decisions. Basis of assessment (understand / retain / weigh / communicate): ________________________
+4.2  Existing directives
+❑  There is a valid written Advance Medical Directive / living will.  Executed on ____________.  Location of original: ______________________
+Attested by  ❑ Notary   ❑ Gazetted Officer,  with two witnesses?  ❑ Yes  ❑ No.  If yes, this ECTPR must be read as subordinate to it — the directive governs; this record operationalises it.
+❑  There is no directive, but the patient previously expressed clear wishes. Recorded here, with who heard them and when: ______________________________
+❑  No directive and no recorded prior wishes. Decisions will be made in the patient’s best interests through family consensus with the team.
+5.3  What the patient knows
+❑  The patient knows the diagnosis and the prognosis.
+❑  The patient knows the diagnosis but not the prognosis.
+❑  The family has asked that the patient not be told. Discussed with the family that the patient may ask directly and will not be lied to. Family understands:  ❑ Yes  ❑ Not yet resolved
+❑  The patient has said they do not wish to know details and has delegated: __________________________
+6.1  In their own words
+The most distressing physical symptom right now is  ____________________________________________________________
+What matters most to me / to them is  __________________________________________________________________
+What I am most afraid of is  __________________________________________________________________________
+Unfinished things that matter (people to see, disputes to settle, papers to sign, a place to visit)  ____________________
+6.2  Outcomes that would be unacceptable  (tick any that apply)
+❑  Being kept alive on a ventilator with no prospect of coming off it
+❑  Being permanently dependent on a feeding tube
+❑  Not being able to recognise or respond to family
+❑  Surviving with severe, permanent physical dependence
+❑  Dying in an ICU, away from family
+❑  Uncontrolled pain or breathlessness at any stage
+❑  Loss of dignity in bathing, toileting or exposure
+❑  Being alone at the time of death
+❑  Exhausting the family’s savings on treatment that will not change the outcome
+❑  Other: ______________________________________
+4.1  The patient’s capacity, now
+❑  The patient has capacity for these decisions and has completed this record themselves.
+❑  The patient has capacity but has asked family to decide with the team. Record the patient’s own words: ______________________________
+❑  Capacity fluctuates. Assessed by: ____________________  on ____________. Re-assess before acting on any section.
+❑  The patient lacks capacity for these decisions. Basis of assessment (understand / retain / weigh / communicate): ________________________
+4.2  Existing directives
+❑  There is a valid written Advance Medical Directive / living will.  Executed on ____________.  Location of original: ______________________
+Attested by  ❑ Notary   ❑ Gazetted Officer,  with two witnesses?  ❑ Yes  ❑ No.  If yes, this ECTPR must be read as subordinate to it — the directive governs; this record operationalises it.
+❑  There is no directive, but the patient previously expressed clear wishes. Recorded here, with who heard them and when: ______________________________
+❑  No directive and no recorded prior wishes. Decisions will be made in the patient’s best interests through family consensus with the team.
+5.3  What the patient knows
+❑  The patient knows the diagnosis and the prognosis.
+❑  The patient knows the diagnosis but not the prognosis.
+❑  The family has asked that the patient not be told. Discussed with the family that the patient may ask directly and will not be lied to. Family understands:  ❑ Yes  ❑ Not yet resolved
+❑  The patient has said they do not wish to know details and has delegated: __________________________
+6.1  In their own words
+The most distressing physical symptom right now is  ____________________________________________________________
+What matters most to me / to them is  __________________________________________________________________
+What I am most afraid of is  __________________________________________________________________________
+Unfinished things that matter (people to see, disputes to settle, papers to sign, a place to visit)  ____________________
+6.2  Outcomes that would be unacceptable  (tick any that apply)
+❑  Being kept alive on a ventilator with no prospect of coming off it
+❑  Being permanently dependent on a feeding tube
+❑  Not being able to recognise or respond to family
+❑  Surviving with severe, permanent physical dependence
+❑  Dying in an ICU, away from family
+❑  Uncontrolled pain or breathlessness at any stage
+❑  Loss of dignity in bathing, toileting or exposure
+❑  Being alone at the time of death
+❑  Exhausting the family’s savings on treatment that will not change the outcome
+❑  Other: ______________________________________
+Section III – Decisive Actions
+[+[+[+Home care (if relevant)
+[+Should the patient be brought to the hospital? (To inform any doctor that has been called to the home for evaluation)
+[+[+[+If not, what is the frequency of assessments, and the details of the person coordinating between the patient/family and the relevant hospital/centre
+[+[+If a non-governmental organisation has been taking care of the patients, contact details of their representative + declara[+tion confirming consultation with the NG<<C24:O:C24>>
+[+Had they been previously admitted to any hospital for the current condition?
+❑  YES — for any significant deterioration.❑  ONLY FOR THE FOLLOWING  (tick each that applies):❑  Pain that cannot be controlled at home❑  Breathlessness that cannot be controlled at home❑  Significant bleeding❑  Seizures❑  Fall with suspected fracture❑  Blocked or displaced catheter, feeding tube or stent❑  Suspected infection needing intravenous treatment❑  Acute confusion or agitation not settling❑  Caregiver unable to cope — respite admission❑  Other: ______________________________________❑  NO — the patient is to be cared for where they are.❑  YES — for any significant deterioration.❑  ONLY FOR THE FOLLOWING  (tick each that applies):❑  Pain that cannot be controlled at home❑  Breathlessness that cannot be controlled at home❑  Significant bleeding❑  Seizures❑  Fall with suspected fracture❑  Blocked or displaced catheter, feeding tube or stent❑  Suspected infection needing intravenous treatment❑  Acute confusion or agitation not settling❑  Caregiver unable to cope — respite admission❑  Other: ______________________________________❑  NO — the patient is to be cared for where they are.
+❑  YES — for any significant deterioration.
+❑  ONLY FOR THE FOLLOWING  (tick each that applies):
+❑  Pain that cannot be controlled at home
+❑  Breathlessness that cannot be controlled at home
+❑  Significant bleeding
+❑  Seizures
+❑  Fall with suspected fracture
+❑  Blocked or displaced catheter, feeding tube or stent
+❑  Suspected infection needing intravenous treatment
+❑  Acute confusion or agitation not settling
+❑  Caregiver unable to cope — respite admission
+❑  Other: ______________________________________
+❑  NO — the patient is to be cared for where they are.
+❑  YES — for any significant deterioration.
+❑  ONLY FOR THE FOLLOWING  (tick each that applies):
+❑  Pain that cannot be controlled at home
+❑  Breathlessness that cannot be controlled at home
+❑  Significant bleeding
+❑  Seizures
+❑  Fall with suspected fracture
+❑  Blocked or displaced catheter, feeding tube or stent
+❑  Suspected infection needing intravenous treatment
+❑  Acute confusion or agitation not settling
+❑  Caregiver unable to cope — respite admission
+❑  Other: ______________________________________
+❑  NO — the patient is to be cared for where they are.
+Should CPR be performed?
+❑  ATTEMPT CPR.❑  DO NOT ATTEMPT CPR (DNACPR).Reason recorded (clinical futility / patient refusal / burden outweighs benefit)  __________________________________Discussed with (patient / surrogate / both)  ____________________❑  ATTEMPT CPR.❑  DO NOT ATTEMPT CPR (DNACPR).Reason recorded (clinical futility / patient refusal / burden outweighs benefit)  __________________________________Discussed with (patient / surrogate / both)  ____________________
+❑  ATTEMPT CPR.
+❑  DO NOT ATTEMPT CPR (DNACPR).
+Reason recorded (clinical futility / patient refusal / burden outweighs benefit)  __________________________________
+Discussed with (patient / surrogate / both)  ____________________
+❑  ATTEMPT CPR.
+❑  DO NOT ATTEMPT CPR (DNACPR).
+Reason recorded (clinical futility / patient refusal / burden outweighs benefit)  __________________________________
+Discussed with (patient / surrogate / both)  ____________________
+What is the level of oxygen/ventilatory support that should be provided?
+LEVELWHAT IT MEANS FOR THE PATIENTCEILING0Comfort measures onlyOpioid and anxiolytic for breathlessness, fan, positioning, suction, mouth care. Oxygen used only if it makes the patient feel better — no saturation target is chased.❑1Nasal prongs / simple face maskLow-flow oxygen up to ____ L/min. Comfortable, no interference with talking, eating or being at home.❑2Non-rebreather / venturi maskHigher-concentration oxygen. Tolerable, but the mask can feel confining and interferes with speech.❑3High-flow nasal cannula (HFNC)Warmed humidified high-flow oxygen. Better tolerated than a mask, usually needs a high-dependency bed, and can be used purely for comfort.❑4Non-invasive ventilation (CPAP / BiPAP)A tight mask driving air in. Effective for fluid overload and COPD; often uncomfortable, restricts speaking and eating, and can be distressing if used for many hours.❑5Intubation and invasive mechanical ventilationA tube in the windpipe, sedation, inability to speak, ICU. Recovery may or may not follow; weaning may not be possible.❑LEVELWHAT IT MEANS FOR THE PATIENTCEILING0Comfort measures onlyOpioid and anxiolytic for breathlessness, fan, positioning, suction, mouth care. Oxygen used only if it makes the patient feel better — no saturation target is chased.❑1Nasal prongs / simple face maskLow-flow oxygen up to ____ L/min. Comfortable, no interference with talking, eating or being at home.❑2Non-rebreather / venturi maskHigher-concentration oxygen. Tolerable, but the mask can feel confining and interferes with speech.❑3High-flow nasal cannula (HFNC)Warmed humidified high-flow oxygen. Better tolerated than a mask, usually needs a high-dependency bed, and can be used purely for comfort.❑4Non-invasive ventilation (CPAP / BiPAP)A tight mask driving air in. Effective for fluid overload and COPD; often uncomfortable, restricts speaking and eating, and can be distressing if used for many hours.❑5Intubation and invasive mechanical ventilationA tube in the windpipe, sedation, inability to speak, ICU. Recovery may or may not follow; weaning may not be possible.❑
+LEVEL
+WHAT IT MEANS FOR THE PATIENT
+CEILING
+0
+Comfort measures only
+Opioid and anxiolytic for breathlessness, fan, positioning, suction, mouth care. Oxygen used only if it makes the patient feel better — no saturation target is chased.
+❑
+1
+Nasal prongs / simple face mask
+Low-flow oxygen up to ____ L/min. Comfortable, no interference with talking, eating or being at home.
+❑
+2
+Non-rebreather / venturi mask
+Higher-concentration oxygen. Tolerable, but the mask can feel confining and interferes with speech.
+❑
+3
+High-flow nasal cannula (HFNC)
+Warmed humidified high-flow oxygen. Better tolerated than a mask, usually needs a high-dependency bed, and can be used purely for comfort.
+❑
+4
+Non-invasive ventilation (CPAP / BiPAP)
+A tight mask driving air in. Effective for fluid overload and COPD; often uncomfortable, restricts speaking and eating, and can be distressing if used for many hours.
+❑
+5
+Intubation and invasive mechanical ventilation
+A tube in the windpipe, sedation, inability to speak, ICU. Recovery may or may not follow; weaning may not be possible.
+❑
+LEVEL
+WHAT IT MEANS FOR THE PATIENT
+CEILING
+0
+Comfort measures only
+Opioid and anxiolytic for breathlessness, fan, positioning, suction, mouth care. Oxygen used only if it makes the patient feel better — no saturation target is chased.
+❑
+1
+Nasal prongs / simple face mask
+Low-flow oxygen up to ____ L/min. Comfortable, no interference with talking, eating or being at home.
+❑
+2
+Non-rebreather / venturi mask
+Higher-concentration oxygen. Tolerable, but the mask can feel confining and interferes with speech.
+❑
+3
+High-flow nasal cannula (HFNC)
+Warmed humidified high-flow oxygen. Better tolerated than a mask, usually needs a high-dependency bed, and can be used purely for comfort.
+❑
+4
+Non-invasive ventilation (CPAP / BiPAP)
+A tight mask driving air in. Effective for fluid overload and COPD; often uncomfortable, restricts speaking and eating, and can be distressing if used for many hours.
+❑
+5
+Intubation and invasive mechanical ventilation
+A tube in the windpipe, sedation, inability to speak, ICU. Recovery may or may not follow; weaning may not be possible.
+❑
+Other parameters
+Dialysis or CRRT
+Others
+[+Requirement of ICU?
+[+[+<<C31:[+If withdrawal and withholding of treatment has been decided (as per Common Cause v Union of India,[+ 2018 and 2023:C31>>[+)
+[+[+Dates of constitution of [+the Primary and Secondary Boards 
+[+[+Composition [+of the B[+aords
+[+[+Decision of the Boards
+[+[+Final decision about withdrawal/withholding – [] withdrawal/withholding to be performed [] Family has refused consent (if patient has [+lost decision-making capacity) [] Primary/Secondary Board has refused permission[+ [] [+Treating physician has revoked their decisio[+n to support withdrawal/withholding
+[+Protocol for withdrawal/withholding
+Vasopressors / inotropes❑ No  ❑ Short trial only, up to ______ hours  ❑ Yes, without a pre-set limit  ❑ Yes, but no escalation beyond ____ agentsDialysis / CRRT❑ No  ❑ Trial of ______ sessions / days, then review  ❑ Yes  ❑ Only if the renal failure is judged reversible12.1  Feeding❑  Comfort feeding by mouth only — careful hand feeding, sips, tastes, favourite foods, no volume target, no forcing. Mouth care given regardless.❑  Nasogastric (Ryle’s) tube:  ❑ No  ❑ Yes, short-term only, up to ______ days, then review  ❑ Yes❑  Gastrostomy (PEG):  ❑ No  ❑ Only after discussion with the palliative care team  ❑ Yes❑  A. PRIORITISE LIFEAll medically effective treatment, including ICU and ventilation.❑  B. BALANCED / CEILING OF CARETreat reversible problems, but with the specific limits and as a time-limited trial.❑  C. PRIORITISE COMFORTSymptom control is the goal. Hospital transfer only if comfort cannot be achieved where the patient is.Vasopressors / inotropes❑ No  ❑ Short trial only, up to ______ hours  ❑ Yes, without a pre-set limit  ❑ Yes, but no escalation beyond ____ agentsDialysis / CRRT❑ No  ❑ Trial of ______ sessions / days, then review  ❑ Yes  ❑ Only if the renal failure is judged reversible12.1  Feeding❑  Comfort feeding by mouth only — careful hand feeding, sips, tastes, favourite foods, no volume target, no forcing. Mouth care given regardless.❑  Nasogastric (Ryle’s) tube:  ❑ No  ❑ Yes, short-term only, up to ______ days, then review  ❑ Yes❑  Gastrostomy (PEG):  ❑ No  ❑ Only after discussion with the palliative care team  ❑ Yes❑  A. PRIORITISE LIFEAll medically effective treatment, including ICU and ventilation.❑  B. BALANCED / CEILING OF CARETreat reversible problems, but with the specific limits and as a time-limited trial.❑  C. PRIORITISE COMFORTSymptom control is the goal. Hospital transfer only if comfort cannot be achieved where the patient is.Section IV – Signatures and declarations
+Vasopressors / inotropes
+❑ No  ❑ Short trial only, up to ______ hours  ❑ Yes, without a pre-set limit  ❑ Yes, but no escalation beyond ____ agents
+Dialysis / CRRT
+❑ No  ❑ Trial of ______ sessions / days, then review  ❑ Yes  ❑ Only if the renal failure is judged reversible
+12.1  Feeding
+❑  Comfort feeding by mouth only — careful hand feeding, sips, tastes, favourite foods, no volume target, no forcing. Mouth care given regardless.
+❑  Nasogastric (Ryle’s) tube:  ❑ No  ❑ Yes, short-term only, up to ______ days, then review  ❑ Yes
+❑  Gastrostomy (PEG):  ❑ No  ❑ Only after discussion with the palliative care team  ❑ Yes
+❑  A. PRIORITISE LIFE
+All medically effective treatment, including ICU and ventilation.
+❑  B. BALANCED / CEILING OF CARE
+Treat reversible problems, but with the specific limits and as a time-limited trial.
+❑  C. PRIORITISE COMFORT
+Symptom control is the goal. Hospital transfer only if comfort cannot be achieved where the patient is.
+Vasopressors / inotropes
+❑ No  ❑ Short trial only, up to ______ hours  ❑ Yes, without a pre-set limit  ❑ Yes, but no escalation beyond ____ agents
+Dialysis / CRRT
+❑ No  ❑ Trial of ______ sessions / days, then review  ❑ Yes  ❑ Only if the renal failure is judged reversible
+12.1  Feeding
+❑  Comfort feeding by mouth only — careful hand feeding, sips, tastes, favourite foods, no volume target, no forcing. Mouth care given regardless.
+❑  Nasogastric (Ryle’s) tube:  ❑ No  ❑ Yes, short-term only, up to ______ days, then review  ❑ Yes
+❑  Gastrostomy (PEG):  ❑ No  ❑ Only after discussion with the palliative care team  ❑ Yes
+❑  A. PRIORITISE LIFE
+All medically effective treatment, including ICU and ventilation.
+❑  B. BALANCED / CEILING OF CARE
+Treat reversible problems, but with the specific limits and as a time-limited trial.
+❑  C. PRIORITISE COMFORT
+Symptom control is the goal. Hospital transfer only if comfort cannot be achieved where the patient is.
+SECTION 19  —  Declarations and signatures
+19.1  Patient
+❑ I have made these choices myself.
+❑ I have chosen not to be involved in detail and have delegated to my surrogate.
+Signature / thumb impression
+Name in capitals
+Date
+19.2  Surrogate / healthcare proxy[+ (primary and secondary surrogate decision-makers)
+❑ I confirm I am conveying what the patient would have wanted, so far as I can judge.
+Signature
+Name & relationship
+Date
+19.3  Witnesses  (required where the patient signs by thumb impression, or where literacy is limited[+ – for both home-based and hospital-based [+evaluation)
+Witness 1 — name
+Address / ID
+Signature
+Date
+Witness 2 — name
+Address / ID
+Signature
+Date
+19.4  Clinicians
+ROLE
+NAME
+REGISTRATION NO.
+SIGNATURE
+DATE
+Treating consultant
+Palliative care clinician
+Nurse involved in the discussion
+
+=== COMMENTS ===
+C1 [RITUPARNA P]: Is this format available only to cancer patients? Or can other non-oncology patients needing palliative care access this also?
+C3 [RITUPARNA P]: Should clarify that live-in and queer relationships are also included
+C6 [RITUPARNA P]: Can also include details of family/friends who were attempted to be contacted, but were unavailable
+C7 [RITUPARNA P]: In addition to checklist below, there must be specific guidance to determine decision-making capacity – perhaps as annexures. 
+C8 [RITUPARNA P]: When should this be checked? Before or after counselling?
+C24 [RITUPARNA P]: This will help keep track of care schedule and measures if the visiting physician decides that home care can continue.
+C31 [RITUPARNA P]: This can perhaps be made a separate section.

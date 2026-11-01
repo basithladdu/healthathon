@@ -28,6 +28,35 @@ export type IdType = 'AADHAAR' | 'VOTER_ID' | 'PAN' | 'PASSPORT' | 'DRIVING_LICE
 export type ExistingDirective = { kind: 'VALID_AMD'; date: string; location: string; attestor: string } | { kind: 'PRIOR_WISHES'; note: string } | { kind: 'NONE' };
 export type ImplantedDevice = 'NONE' | 'PACEMAKER' | 'ICD' | 'CRT_D' | 'OTHER';
 
+/** Legal review, Rituparna P, 31 Oct 2026. Optional because older saved records do not have them. */
+export type EctprHomeCare = { assessmentFrequency: string; coordinator: string; ngoContact: string; ngoConsulted: boolean; previousAdmission: boolean | null; previousAdmissionDetails: string };
+export type WithdrawalFinal = 'TO_BE_PERFORMED' | 'FAMILY_REFUSED' | 'BOARD_REFUSED' | 'PHYSICIAN_REVOKED';
+export type EctprWithdrawal = { applicable: boolean; primaryBoardDate: string; secondaryBoardDate: string; primaryBoardMembers: string; secondaryBoardMembers: string; boardDecision: string; finalDecision: WithdrawalFinal | null; protocol: string };
+
+/** A goals-of-care conversation the doctor reviewed (goc-transcribe.tsx). Stays on this device: never on the emergency card. */
+export type GocTranscriptSpeaker = 'DOCTOR' | 'PATIENT_PARTY' | null;
+export type GocTopicMark = { status: 'DISCUSSED' | 'NOT_DISCUSSED'; verifiedBy: string; verifiedAt: string };
+export type GocTranscript = {
+  /** The verbatim words, one line each, with the side the doctor marked. */
+  lines: Array<{ text: string; speaker: GocTranscriptSpeaker }>;
+  language: 'en' | 'hi' | 'te' | 'ur' | 'kn' | 'auto';
+  source: 'RECORDED' | 'UPLOADED' | 'TYPED';
+  /** True when a speech model drafted it. */
+  machineDraft: boolean;
+  /** The speech model used, when machineDraft is true. */
+  model?: string;
+  consentAt: string;
+  reviewedBy: string; reviewedAt: string;
+  /** True only when the doctor chose to keep a copy of the audio. Sahara itself never stores the audio. */
+  audioKept: boolean;
+  /** What the doctor confirmed into the plan from this conversation, with the words that prompted it. */
+  accepted: Array<{ field: string; value: string | null; quote: string; at: string }>;
+  /** Topics the doctor verified on the checklist. A topic verified as not discussed stays "No preference recorded". */
+  topics: Partial<Record<string, GocTopicMark>>;
+  /** The draft note the doctor edited: what was said and decided, kept apart from the verbatim lines. */
+  note: string;
+};
+
 export type DecisionMaker = {
   name: string; relation: string; phone24h: string;
   /** Never a full Aadhaar: ID type + last 4 digits only (tech spec §2). */
@@ -40,15 +69,17 @@ export type EctprStatus = 'DRAFT' | 'ACTIVE' | 'SUPERSEDED' | 'REVOKED';
 export type Signature = {
   role: 'TREATING_CONSULTANT' | 'PALLIATIVE_CLINICIAN' | 'NURSE' | 'PATIENT' | 'SURROGATE' | 'WITNESS';
   name: string; registrationNo?: string; signedAt: string; thumbImpression?: boolean;
+  /** Which decision-maker signed, when role is SURROGATE. */
+  surrogateRank?: 'PRIMARY' | 'SECONDARY';
 };
 
 export type EctprRecord = {
   id: string; patientId: string; version: number; formVersion: string; status: EctprStatus;
   createdAt: string; updatedAt: string; createdBy: string;
   createdInEd?: boolean;
-  patient: { name: string; dob: string; sex: string; address: string; phone: string; uhid: string; languagePref: string };
+  patient: { name: string; dob: string; sex: string; address: string; phone: string; uhid: string; languagePref: string; gender?: string };
   careTeam: { oncologist: string; palliativePhysician: string; palliativePhone24h: string; extraTeam: string[]; localDoctor: string };
-  decisionMakers: { primary: DecisionMaker | null; alternate: DecisionMaker | null; familyToInform: string[]; familyConsensusNote: string };
+  decisionMakers: { primary: DecisionMaker | null; alternate: DecisionMaker | null; familyToInform: string[]; familyConsensusNote: string; presentAtDiscussion?: string[]; attemptedContact?: string[] };
   clinical: { diagnosis: string; stage: string; ecog: 0 | 1 | 2 | 3 | 4 | null; allergies: string; implantedDevice: ImplantedDevice | null; icdDeactivation: { decision: 'DEACTIVATE' | 'KEEP' | null; date: string } ; keyMedicines: string; eligibilityDate: string };
   capacity: { status: Capacity | null; assessor: string; assessedOn: string; basis: string; reassessOn: string };
   existingDirective: ExistingDirective | null;
@@ -56,7 +87,7 @@ export type EctprRecord = {
   prognosticUnderstanding: { confirmed: boolean; confirmedBy: string; confirmedOn: string };
   /** V5: surrogate's substituted-judgement declaration. */
   surrogateDeclaration: { answeringAsSurrogate: boolean; confirmed: boolean; confirmedOn: string };
-  values: { patientKnows: boolean | null; ownWords: string; unacceptableOutcomes: string[]; familyAskedNotToTell: boolean; directQuestionPlan: string; financialConcernDiscussed: boolean | null; socialWorkReferral: boolean | null };
+  values: { patientKnows: boolean | null; ownWords: string; unacceptableOutcomes: string[]; familyAskedNotToTell: boolean; directQuestionPlan: string; financialConcernDiscussed: boolean | null; socialWorkReferral: boolean | null; knowsRecordedWhen?: 'BEFORE_COUNSELLING' | 'AFTER_COUNSELLING' | null };
   choices: {
     goalOfCare: GoalOfCare | null;
     cpr: Cpr | null; dnacprReason: DnacprReason | null; dnacprDiscussedWith: string;
@@ -73,6 +104,10 @@ export type EctprRecord = {
     conflictReasons: Partial<Record<'C1' | 'C2' | 'C3', string>>;
     goalAConfirmed: boolean; // V3 confirmation
   };
+  homeCare?: EctprHomeCare;
+  withdrawal?: EctprWithdrawal;
+  /** Optional, so older saved records still read. */
+  gocTranscript?: GocTranscript;
   reviewDue: string;
   signatures: Signature[];
   limitedLiteracy: boolean;

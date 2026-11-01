@@ -31,6 +31,51 @@ Branch `awaiz/latest-main` (main `30736d9` plus local commits). Built, all unit 
 - Team: goals-of-care note format, symptom list and scales, KPIs.
 - Not done yet: speaker separation in recordings (Plan A on-device or Plan B tap-to-mark, waiting for a decision).
 
+## 1 Nov: Awaiz, build this (legal comments and goals-of-care transcription)
+
+Basith asked that nothing be built on his machine, so **none of this Android code has been compiled or run**. Expect some compile fixes, most likely in `CareGocUi.kt` and at `::rankLabel` / `::signerLabel` in `CarePlanUi.kt`. Disk F: on his machine has about 1 GB free.
+
+```bash
+cd android
+./gradlew :app:compileDebugKotlin
+./gradlew :app:testDebugUnitTest --tests "in.wedevit.care.CarePlanLegalReviewTest" --tests "in.wedevit.care.CareGocExtractTest" --tests "in.wedevit.care.CareEdCardTest" --tests "in.wedevit.care.CarePlanRulesTest" --tests "in.wedevit.care.CareLanguageDictionaryTest" --tests "in.wedevit.care.CareHindiCoverageTest" --tests "in.wedevit.care.OfflineSpeechSegmenterTest"
+./gradlew :app:testDebugUnitTest
+./gradlew :app:assembleDebug
+```
+
+The APK must not grow by the size of a model: weights download on demand. Then deploy the website, which also has not been built or deployed with this work (from `prototype/`):
+
+```bash
+npm test
+vercel deploy --prod --yes
+```
+
+Run `npx next typegen` first if `tsc` complains about `.next/types`. `next build` was not run on this work; the feature has only run on the dev server. Until the deploy, the live site has none of it, and the live server would not strip the new fields from QR views, so deploy before issuing Android cards.
+
+**What was added**
+- Legal comments (Rituparna P, 31 Oct): `source-materials/team-context/legal-review-2026-10-31/`. Web: `70e4603`. Android: `9170a89`.
+- Goals-of-care transcription. Web: `app/goc-transcribe.tsx`, `goc-extract.ts`, `goc-note.ts`, `goc-transcribe-model.ts`, `api/goc-extract/`, `public/vendor/goc-whisper/worker.mjs`. Android: `CareGocExtract.kt`, `CareGocTranscribe.kt`, `CareGocUi.kt`. Requirements came from `source-materials/meetings/MEETING_TRANSCRIPT_2026-08-24.txt` lines 88-113 and `2026-09-21-transcript.txt`. Models and sizes: `docs/FREE_MODELS.md`.
+
+**Test on a phone** (emergency plan, wizard, treatment choices; Understanding must be confirmed first)
+1. Consent stays off until everyone is ticked; the microphone prompt appears.
+2. The 375 MB model pack downloads, stop and retry work, the hash check passes.
+3. Record 2 minutes, then 60 minutes: note reading time, memory, battery, screen stays on. Locking the phone stops and saves the part, because there is no foreground service.
+4. Leave the app mid-recording, stop mid-reading, kill the app: work comes back with no repeated lines.
+5. Speak en, hi, te, ur, kn, with Detect and a picked language. Check negation survives.
+6. Paste "We do not want dialysis. Do you want CPR? No. No ventilator." All choices show with quotes, nothing is selected; confirming one changes only that field; Goal C with Attempt CPR still triggers V2.
+7. Correct a line's side; verify a topic as not discussed (stays "No preference recorded"); the note has no spoken quotes.
+8. Audio deleted unless kept; note appears at signing; the `/api/ed-card` payload has no `gocTranscript`.
+9. Review draft: the note opens as a draft, old lines gone, earlier choices marked to confirm.
+10. New withdrawal step, Primary and Secondary signing, and the PDFs, which have never been opened on Android. Urdu right to left.
+
+**Known gaps in this work**
+- **Telugu and Kannada speech-to-text is not usable.** Measured on the web with whisper-base and whisper-small (character error rate about 0.9 for Telugu and 1.6 to 1.8 for Kannada; a few clean clips only). Android uses whisper-small, so expect the same; its accuracy has not been measured. Typing is the route for these two. Next step to try: `vasista22` fine-tuned Whisper models, which need an ONNX export. Urdu is often detected as Hindi on auto, so pick it by hand.
+- Web speed: about real time on a Ryzen 5 laptop with base (27 minutes took 29, then stopped; a full hour was not completed). Phones and small are slower. Live microphone on the web, the per-line buttons by click, signing with a note and issuing a real card were not exercised.
+- Android does not print the goals-of-care note in `CarePlanPdf.kt`. The meeting wanted both sides to read and sign it.
+- Android's matcher does not extract patient-knows, family-asked-not-to-tell, home care or decision-maker hints; the web's does. The Android card shows to anyone who can edit the wizard, including family; V7 still needs the consultant.
+- Matchers are phrase lists, machine-written for te, ur, kn, and unchecked by a clinician. "Stay at home" reads as transfer No, for the doctor to check.
+- Web loads the speech engine from jsDelivr with SHA-384 checks and weights from Hugging Face at a pinned commit, instead of an npm install (446 MB of packages). FHIR export does not include the new fields.
+
 ## 28 Oct: Play upload gap and candidate 0.6.2 (9)
 
 - The latest saved live Console evidence is from 24 Oct: Production 0.6.0 (7), submission 7, showed **Changes in review**. No later live Console result is recorded, so refresh that status before any upload.

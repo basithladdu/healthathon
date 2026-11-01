@@ -47,7 +47,7 @@ class CareHindiCoverageTest {
         // Emergency plan (ECTPR) wizard, ED Quick View, wallet card and living will (SVK specs, 29 Oct).
         "CarePlanUi.kt" to listOf("CarePlanScreen", "PlanHeader", "IfInDoubtBox", "CareContinuesBox", "CarePlanHome", "WithdrawPlanForm", "EctprWizard", "PatientFields", "FamilyFields", "DecisionMakerFields",
             "CapacityFields", "UnderstandingFields", "ValuesFields", "LockedTreatment", "TreatmentIntro", "GoalAndTransfer", "CprFields", "TrialEditor", "BreathingFields", "OrganSupportFields",
-            "FeedingFields", "ConflictFields", "ReviewFields", "SignatureFields", "EdQuickViewPage", "EdRowView", "CardStatus", "WalletCardPage", "CarePlanEntryCard"),
+            "FeedingFields", "ConflictFields", "CapacityGuideCard", "HomeCareFields", "WithdrawalFields", "PlanSummaryExtras", "ReviewFields", "SignatureFields", "EdQuickViewPage", "EdRowView", "CardStatus", "WalletCardPage", "CarePlanEntryCard"),
         "CarePlanExtrasUi.kt" to listOf("PlanReadAloud", "LegalPendingBox", "DpdpNoticeCard", "ReviewReminderCard", "PilotLogPage", "EpisodeForm", "OutcomeForm", "IncidentForm", "LivingWillPage", "AmdIdFields", "AmdEditor", "AmdDhrFields", "CustodianFields", "PrintedCard", "ExecutedCard", "AmdCancelForm"),
     )
 

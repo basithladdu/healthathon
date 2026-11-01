@@ -14,21 +14,27 @@ import java.net.URL
 import java.security.MessageDigest
 
 /** The only network boundary in offline speech: fixed, public model GETs; no audio or text parameters. */
-class OfflineSpeechModelStore(context: Context) {
-    val directory = File(context.noBackupFilesDir, "offline-speech/${OfflineSpeechModel.id}")
+class OfflineSpeechModelStore(
+    context: Context,
+    modelId: String = OfflineSpeechModel.id,
+    private val files: List<OfflineModelFile> = OfflineSpeechModel.files,
+    private val urlOf: (OfflineModelFile) -> String = OfflineSpeechModel::url,
+) {
+    val directory = File(context.noBackupFilesDir, "offline-speech/$modelId")
+    private val downloadBytes: Long get() = files.sumOf { it.bytes }
 
     suspend fun ready(): Boolean = withContext(Dispatchers.IO) {
-        modelLock.withLock { OfflineSpeechModel.files.all { currentCoroutineContext().ensureActive(); OfflineSpeechRules.matches(File(directory, it.name), it) } }
+        modelLock.withLock { files.all { currentCoroutineContext().ensureActive(); OfflineSpeechRules.matches(File(directory, it.name), it) } }
     }
 
     suspend fun download(progress: (Long, Long) -> Unit) = withContext(Dispatchers.IO) {
         modelLock.withLock {
             directory.mkdirs()
-            val missing = OfflineSpeechModel.files.filterNot { OfflineSpeechRules.matches(File(directory, it.name), it) }
+            val missing = files.filterNot { OfflineSpeechRules.matches(File(directory, it.name), it) }
             val remaining = missing.sumOf { it.bytes }
             require(directory.usableSpace > remaining + 64L * 1024 * 1024) { "Free at least ${(remaining / 1_000_000) + 64} MB, then try again." }
-            var complete = OfflineSpeechModel.downloadBytes - remaining
-            progress(complete, OfflineSpeechModel.downloadBytes)
+            var complete = downloadBytes - remaining
+            progress(complete, downloadBytes)
             missing.forEach { spec ->
                 currentCoroutineContext().ensureActive()
                 val destination = File(directory, spec.name)
@@ -36,7 +42,7 @@ class OfflineSpeechModelStore(context: Context) {
                 try {
                     require(destination.parentFile?.isDirectory == true || destination.parentFile?.mkdirs() == true) { "The language folder could not be created. Free some storage and retry." }
                     // URLs are immutable constants; neither the recording nor any identifier is sent.
-                    val connection = URL(OfflineSpeechModel.url(spec)).openConnection() as HttpURLConnection
+                    val connection = URL(urlOf(spec)).openConnection() as HttpURLConnection
                     try {
                         connection.requestMethod = "GET"
                         connection.connectTimeout = 20_000; connection.readTimeout = 30_000
@@ -53,7 +59,7 @@ class OfflineSpeechModelStore(context: Context) {
                                 received += count
                                 if (received > spec.bytes) throw IOException("The language download has the wrong size. Try again.")
                                 hash.update(buffer, 0, count); output.write(buffer, 0, count)
-                                progress(complete + received, OfflineSpeechModel.downloadBytes)
+                                progress(complete + received, downloadBytes)
                             }
                         } }
                         val actualHash = hash.digest().joinToString("") { "%02x".format(it) }
@@ -63,13 +69,13 @@ class OfflineSpeechModelStore(context: Context) {
                     } finally { connection.disconnect() }
                 } finally { pending.delete() }
             }
-            progress(OfflineSpeechModel.downloadBytes, OfflineSpeechModel.downloadBytes)
+            progress(downloadBytes, downloadBytes)
         }
     }
 
     suspend fun remove() = withContext(Dispatchers.IO) {
         // Explicit files only, never a recursive delete of a computed path.
-        modelLock.withLock { OfflineSpeechModel.files.forEach { File(directory, it.name).delete(); File(directory, "${it.name}.part").delete() } }
+        modelLock.withLock { files.forEach { File(directory, it.name).delete(); File(directory, "${it.name}.part").delete() } }
     }
     companion object { private val modelLock = Mutex() }
 }

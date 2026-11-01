@@ -47,7 +47,12 @@ export function dpdpNotice(scope: DpdpScope): NoticeBlock[] {
     en: 'Use the buttons below, or tell your doctor or palliative care team. Ask them too if you want a copy on the Sahara server erased. During this pilot only made-up patients are used.',
     hi: 'नीचे के बटन इस्तेमाल करें, या अपने डॉक्टर या पैलिएटिव केयर टीम को बताएँ। Sahara सर्वर से कॉपी मिटवानी हो तो भी उन्हीं से कहें। इस पायलट में सिर्फ़ काल्पनिक मरीज़ों का डेटा है।',
   };
-  return [stored, why, where, rights, ask];
+  const conversation: NoticeBlock = {
+    titleEn: 'A recorded conversation', titleHi: 'रिकॉर्ड की गई बातचीत',
+    en: 'If everyone agrees, the doctor can record the talk. The audio stays on this device and is deleted after review, unless the doctor keeps a copy. The written words and the note stay with the plan on this device. They are never put on the emergency card. They leave this device only if the doctor agrees to an AI reading, and the screen names the service first.',
+    hi: 'अगर सभी राज़ी हों, तो डॉक्टर बातचीत रिकॉर्ड कर सकते हैं। ऑडियो इसी डिवाइस पर रहता है और समीक्षा के बाद मिट जाता है, जब तक डॉक्टर कॉपी न रखें। लिखे गए शब्द और नोट इसी डिवाइस पर योजना के साथ रहते हैं। वे इमरजेंसी कार्ड पर कभी नहीं जाते। वे इस डिवाइस से तभी बाहर जाते हैं जब डॉक्टर AI से पढ़वाने के लिए राज़ी हों, और स्क्रीन पहले सेवा का नाम बताती है।',
+  };
+  return scope === 'care-plan' ? [stored, why, where, conversation, rights, ask] : [stored, why, where, rights, ask];
 }
 
 export type DataExportInput = {

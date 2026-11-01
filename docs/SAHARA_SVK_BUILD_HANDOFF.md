@@ -16,7 +16,9 @@ This covers the build of SVK's two specs: the emergency care plan (ECTPR) and th
 | Free AI services, limits, key names | `docs/FREE_MODELS.md` |
 | What only people can do | `blockers.md` |
 
-**Downloaded:** Noto Sans Telugu font, in `prototype/public/fonts/` with its licence. **No AI models were downloaded or bundled.** AI runs on the server, so the app stays light.
+**Downloaded:** Noto Sans Telugu font, in `prototype/public/fonts/` with its licence. **No AI models are bundled.** Speech models download on the device only when a doctor transcribes a talk; see `docs/FREE_MODELS.md`.
+
+**1 Nov update:** legal comments and goals-of-care transcription are in. Android is uncompiled and the website is undeployed: see the top of `HANDOFF.md` and `blockers.md`.
 
 ## Where the code is
 

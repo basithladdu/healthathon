@@ -1100,7 +1100,7 @@ Check-ins	ದಿನದ ಸ್ಥಿತಿ
 No check-ins yet.	ಇನ್ನೂ ಯಾವುದೇ ಸ್ಥಿತಿ ಬರೆದಿಲ್ಲ.
 No journal notes yet.	ಡೈರಿಯಲ್ಲಿ ಇನ್ನೂ ಯಾವುದೇ ನೋಟ್ ಇಲ್ಲ.
 All India	ಇಡೀ ಭಾರತ
-Home care	ಮನೆಯಲ್ಲಿ ಆರೈಕೆ
+Home care	ಮನೆಯ ಆರೈಕೆ
 Clinic visits	ಕ್ಲಿನಿಕ್ ಭೇಟಿಗಳು
 Inpatient care	ಆಸ್ಪತ್ರೆಗೆ ದಾಖಲಿಸಿ ಆರೈಕೆ
 Day care	ಹಗಲಿನ ಆರೈಕೆ
@@ -2897,7 +2897,7 @@ Last 4 digits only	ಕೊನೆಯ 4 ಅಂಕೆಗಳು ಮಾತ್ರ
 Never type the full number here. Write it by hand on the paper.	ಪೂರ್ಣ ನಂಬರ್ ಅನ್ನು ಇಲ್ಲಿ ಎಂದಿಗೂ ಬರೆಯಬೇಡಿ. ಅದನ್ನು ಕಾಗದದ ಮೇಲೆ ಕೈಯಿಂದ ಬರೆಯಿರಿ.
 Living will v$version · $status	ಲಿವಿಂಗ್ ವಿಲ್ v$version · $status
 Full name	ಪೂರ್ಣ ಹೆಸರು
-Gender	ಲಿಂಗ
+Gender	ಜೆಂಡರ್
 Date of birth	ಹುಟ್ಟಿದ ದಿನಾಂಕ
 Permanent address	ಶಾಶ್ವತ ವಿಳಾಸ
 Current address (if different)	ಈಗಿನ ವಿಳಾಸ (ಬೇರೆಯಾಗಿದ್ದರೆ)
@@ -3552,3 +3552,165 @@ Help and settings	ಸಹಾಯ ಮತ್ತು ಸೆಟ್ಟಿಂಗ್‌ಗ
 Reports, bills and prescriptions	ವರದಿಗಳು, ಬಿಲ್‌ಗಳು ಮತ್ತು ಪ್ರಿಸ್ಕ್ರಿಪ್ಷನ್‌ಗಳು
 Medicine and visit reminders	ಔಷಧಿ ಮತ್ತು ಭೇಟಿ ಜ್ಞಾಪನೆಗಳು
 Tell us what to improve	ಏನು ಸುಧಾರಿಸಬೇಕು ಎಂದು ಹೇಳಿ
+Main treating doctor or specialist (oncologist or any other)	ಮುಖ್ಯ ಚಿಕಿತ್ಸಾ ವೈದ್ಯರು ಅಥವಾ ತಜ್ಞರು (ಆಂಕಾಲಜಿಸ್ಟ್ ಅಥವಾ ಇತರರು)
+Includes spouses, live-in partners, same-sex and queer partners, and friends the patient chooses.	ಇದರಲ್ಲಿ ಪತಿ-ಪತ್ನಿ, ಲಿವ್-ಇನ್ ಸಂಗಾತಿಗಳು, ಸಲಿಂಗ ಮತ್ತು ಕ್ವೀರ್ ಸಂಗಾತಿಗಳು ಹಾಗೂ ರೋಗಿ ಆಯ್ಕೆ ಮಾಡಿದ ಸ್ನೇಹಿತರು ಸೇರಿದ್ದಾರೆ.
+Secondary decision-maker	ಎರಡನೇ ನಿರ್ಧಾರ ತೆಗೆದುಕೊಳ್ಳುವವರು
+Primary decision-maker	ಮುಖ್ಯ ನಿರ್ಧಾರ ತೆಗೆದುಕೊಳ್ಳುವವರು
+Secondary	ಎರಡನೇ
+Family and friends	ಕುಟುಂಬ ಮತ್ತು ಸ್ನೇಹಿತರು
+Family or friends present for this discussion, with their relationship (one per line)	ಈ ಚರ್ಚೆಯಲ್ಲಿ ಇದ್ದ ಕುಟುಂಬ ಅಥವಾ ಸ್ನೇಹಿತರು, ಸಂಬಂಧದೊಂದಿಗೆ (ಪ್ರತಿ ಸಾಲಿಗೆ ಒಬ್ಬರು)
+Family or friends who must be informed before any major decision: name, relation, phone (one per line)	ದೊಡ್ಡ ನಿರ್ಧಾರಕ್ಕೆ ಮೊದಲು ತಿಳಿಸಬೇಕಾದ ಕುಟುಂಬ ಅಥವಾ ಸ್ನೇಹಿತರು: ಹೆಸರು, ಸಂಬಂಧ, ಫೋನ್ (ಪ್ರತಿ ಸಾಲಿಗೆ ಒಬ್ಬರು)
+Family or friends we tried to contact but could not reach (one per line)	ಸಂಪರ್ಕಿಸಲು ಪ್ರಯತ್ನಿಸಿದರೂ ಸಿಗದ ಕುಟುಂಬ ಅಥವಾ ಸ್ನೇಹಿತರು (ಪ್ರತಿ ಸಾಲಿಗೆ ಒಬ್ಬರು)
+Present for the discussion	ಚರ್ಚೆಯಲ್ಲಿ ಇದ್ದವರು
+Could not be reached	ಸಂಪರ್ಕ ಸಿಗಲಿಲ್ಲ
+How to assess decision-making capacity	ನಿರ್ಧಾರ ಸಾಮರ್ಥ್ಯವನ್ನು ಹೇಗೆ ಪರೀಕ್ಷಿಸಬೇಕು
+Draft annexure. A clinician and the legal team must approve this wording before the pilot.	ಕರಡು ಅನುಬಂಧ. ಪೈಲಟ್‌ಗೆ ಮೊದಲು ವೈದ್ಯರು ಮತ್ತು ಕಾನೂನು ತಂಡ ಈ ಪದಗಳನ್ನು ಅನುಮೋದಿಸಬೇಕು.
+Start by assuming the patient has capacity. Age, diagnosis or disagreeing with the doctor does not remove it.	ರೋಗಿಗೆ ಸಾಮರ್ಥ್ಯವಿದೆ ಎಂದು ಭಾವಿಸಿ ಆರಂಭಿಸಿ. ವಯಸ್ಸು, ರೋಗ ಅಥವಾ ವೈದ್ಯರೊಂದಿಗಿನ ಭಿನ್ನಾಭಿಪ್ರಾಯ ಅದನ್ನು ತೆಗೆಯುವುದಿಲ್ಲ.
+Assess this one decision, at this time. Do not rely on old notes.	ಈ ಒಂದು ನಿರ್ಧಾರಕ್ಕಾಗಿ, ಈಗಲೇ ಪರೀಕ್ಷಿಸಿ. ಹಳೆಯ ಟಿಪ್ಪಣಿಗಳನ್ನು ಅವಲಂಬಿಸಬೇಡಿ.
+Help them first: use their language, plain words and any aids, at the time of day they are most alert.	ಮೊದಲು ಸಹಾಯ ಮಾಡಿ: ಅವರ ಭಾಷೆ, ಸರಳ ಪದಗಳು ಮತ್ತು ಯಾವುದೇ ಸಾಧನಗಳನ್ನು ಬಳಸಿ, ಅವರು ಹೆಚ್ಚು ಎಚ್ಚರವಾಗಿರುವ ಸಮಯದಲ್ಲಿ.
+Check all four: can they understand the information, retain it long enough, weigh the choices and their results, and communicate a choice in any way?	ನಾಲ್ಕನ್ನೂ ಪರೀಕ್ಷಿಸಿ: ಅವರು ಮಾಹಿತಿಯನ್ನು ಅರ್ಥಮಾಡಿಕೊಳ್ಳಬಲ್ಲರೇ, ಸಾಕಷ್ಟು ಸಮಯ ನೆನಪಿಡಬಲ್ಲರೇ, ಆಯ್ಕೆಗಳು ಮತ್ತು ಫಲಿತಾಂಶಗಳನ್ನು ತೂಗಬಲ್ಲರೇ, ಯಾವುದೇ ರೀತಿಯಲ್ಲಿ ತಮ್ಮ ಆಯ್ಕೆಯನ್ನು ತಿಳಿಸಬಲ್ಲರೇ?
+If any one is missing, they lack capacity for this decision only. Record the basis and who assessed it, and still involve them as far as possible.	ಒಂದೂ ಇಲ್ಲದಿದ್ದರೆ, ಈ ನಿರ್ಧಾರಕ್ಕೆ ಮಾತ್ರ ಸಾಮರ್ಥ್ಯ ಇಲ್ಲ. ಆಧಾರ ಮತ್ತು ಪರೀಕ್ಷಿಸಿದವರನ್ನು ದಾಖಲಿಸಿ, ಆದರೂ ಸಾಧ್ಯವಾದಷ್ಟು ಅವರನ್ನು ಸೇರಿಸಿಕೊಳ್ಳಿ.
+If it may be temporary (delirium, medicines, pain, infection), treat the cause and check again before acting.	ಇದು ತಾತ್ಕಾಲಿಕವಾಗಿರಬಹುದಾದರೆ (ಡೆಲಿರಿಯಂ, ಔಷಧಿಗಳು, ನೋವು, ಸೋಂಕು), ಕಾರಣಕ್ಕೆ ಚಿಕಿತ್ಸೆ ನೀಡಿ, ಕ್ರಮಕ್ಕೆ ಮೊದಲು ಮತ್ತೆ ಪರೀಕ್ಷಿಸಿ.
+When was this recorded?	ಇದನ್ನು ಯಾವಾಗ ದಾಖಲಿಸಲಾಯಿತು?
+Before counselling	ಕೌನ್ಸೆಲಿಂಗ್‌ಗೆ ಮೊದಲು
+After counselling	ಕೌನ್ಸೆಲಿಂಗ್ ನಂತರ
+Home care (if relevant)	ಮನೆಯ ಆರೈಕೆ (ಅನ್ವಯಿಸಿದರೆ)
+Helps a doctor called to the home see the care schedule and decide whether home care can continue.	ಮನೆಗೆ ಕರೆಸಿದ ವೈದ್ಯರು ಆರೈಕೆಯ ವೇಳಾಪಟ್ಟಿಯನ್ನು ನೋಡಿ, ಮನೆಯ ಆರೈಕೆ ಮುಂದುವರಿಸಬಹುದೇ ಎಂದು ನಿರ್ಧರಿಸಲು ಇದು ಸಹಾಯ ಮಾಡುತ್ತದೆ.
+How often the patient is assessed	ರೋಗಿಯನ್ನು ಎಷ್ಟು ಬಾರಿ ಪರೀಕ್ಷಿಸಲಾಗುತ್ತದೆ
+Person coordinating between the family and the hospital or centre (name, phone, centre)	ಕುಟುಂಬ ಮತ್ತು ಆಸ್ಪತ್ರೆ ಅಥವಾ ಕೇಂದ್ರದ ನಡುವೆ ಸಮನ್ವಯ ಮಾಡುವವರು (ಹೆಸರು, ಫೋನ್, ಕೇಂದ್ರ)
+Non-governmental organisation caring for the patient: representative and contact	ರೋಗಿಯನ್ನು ನೋಡಿಕೊಳ್ಳುತ್ತಿರುವ ಸರ್ಕಾರೇತರ ಸಂಸ್ಥೆ: ಪ್ರತಿನಿಧಿ ಮತ್ತು ಸಂಪರ್ಕ
+The organisation was consulted about this plan	ಈ ಯೋಜನೆಯ ಬಗ್ಗೆ ಸಂಸ್ಥೆಯನ್ನು ಸಂಪರ್ಕಿಸಲಾಗಿದೆ
+Admitted to any hospital before for this condition?	ಈ ಸಮಸ್ಯೆಗಾಗಿ ಹಿಂದೆ ಯಾವುದೇ ಆಸ್ಪತ್ರೆಗೆ ದಾಖಲಾಗಿದ್ದರೇ?
+Where and when	ಎಲ್ಲಿ ಮತ್ತು ಯಾವಾಗ
+Admitted before for this condition	ಈ ಸಮಸ್ಯೆಗೆ ಹಿಂದೆ ದಾಖಲಾಗಿದ್ದರು
+Stopping or not starting treatment	ಚಿಕಿತ್ಸೆ ನಿಲ್ಲಿಸುವುದು ಅಥವಾ ಪ್ರಾರಂಭಿಸದಿರುವುದು
+Fill this only if withdrawing or withholding treatment has been decided (Common Cause v Union of India, 2018 and 2023). It records the process. This plan alone never authorises it.	ಚಿಕಿತ್ಸೆ ನಿಲ್ಲಿಸುವ ಅಥವಾ ಪ್ರಾರಂಭಿಸದಿರುವ ನಿರ್ಧಾರವಾಗಿದ್ದರೆ ಮಾತ್ರ ಇದನ್ನು ತುಂಬಿ (Common Cause v Union of India, 2018 ಮತ್ತು 2023). ಇದು ಪ್ರಕ್ರಿಯೆಯನ್ನು ದಾಖಲಿಸುತ್ತದೆ. ಈ ಯೋಜನೆ ಮಾತ್ರ ಎಂದಿಗೂ ಅದಕ್ಕೆ ಅನುಮತಿ ನೀಡುವುದಿಲ್ಲ.
+Withdrawing or withholding treatment has been decided for this patient	ಈ ರೋಗಿಗೆ ಚಿಕಿತ್ಸೆ ನಿಲ್ಲಿಸುವ ಅಥವಾ ಪ್ರಾರಂಭಿಸದಿರುವ ನಿರ್ಧಾರವಾಗಿದೆ
+Date the Primary Board was formed	ಪ್ರಾಥಮಿಕ ಮಂಡಳಿ ರಚನೆಯ ದಿನಾಂಕ
+Date the Secondary Board was formed	ದ್ವಿತೀಯ ಮಂಡಳಿ ರಚನೆಯ ದಿನಾಂಕ
+Members of the Primary Board	ಪ್ರಾಥಮಿಕ ಮಂಡಳಿಯ ಸದಸ್ಯರು
+Members of the Secondary Board	ದ್ವಿತೀಯ ಮಂಡಳಿಯ ಸದಸ್ಯರು
+Decision of the Boards	ಮಂಡಳಿಗಳ ನಿರ್ಧಾರ
+Final decision	ಅಂತಿಮ ನಿರ್ಧಾರ
+Withdrawal or withholding to be performed	ಚಿಕಿತ್ಸೆ ನಿಲ್ಲಿಸಲಾಗುವುದು ಅಥವಾ ಪ್ರಾರಂಭಿಸಲಾಗುವುದಿಲ್ಲ
+Family refused consent (patient has lost decision-making capacity)	ಕುಟುಂಬ ಒಪ್ಪಿಗೆ ನೀಡಲಿಲ್ಲ (ರೋಗಿ ನಿರ್ಧಾರ ಸಾಮರ್ಥ್ಯ ಕಳೆದುಕೊಂಡಿದ್ದಾರೆ)
+Primary or Secondary Board refused permission	ಪ್ರಾಥಮಿಕ ಅಥವಾ ದ್ವಿತೀಯ ಮಂಡಳಿ ಅನುಮತಿ ನೀಡಲಿಲ್ಲ
+Treating doctor revoked their decision to support it	ಚಿಕಿತ್ಸಾ ವೈದ್ಯರು ಬೆಂಬಲದ ನಿರ್ಧಾರವನ್ನು ಹಿಂಪಡೆದಿದ್ದಾರೆ
+Protocol for withdrawal or withholding	ಚಿಕಿತ್ಸೆ ನಿಲ್ಲಿಸುವ ಅಥವಾ ಪ್ರಾರಂಭಿಸದಿರುವ ಶಿಷ್ಟಾಚಾರ
+No final decision recorded	ಅಂತಿಮ ನಿರ್ಧಾರ ದಾಖಲಾಗಿಲ್ಲ
+Withdrawal or withholding (medical boards)	ಚಿಕಿತ್ಸೆ ನಿಲ್ಲಿಸುವುದು ಅಥವಾ ಪ್ರಾರಂಭಿಸದಿರುವುದು (ವೈದ್ಯಕೀಯ ಮಂಡಳಿಗಳು)
+Needed when the patient signs by thumb impression or has limited literacy, for both home-based and hospital-based evaluation. Preferably people who are not decision-makers.	ರೋಗಿ ಹೆಬ್ಬೆಟ್ಟಿನ ಗುರುತು ಹಾಕಿದಾಗ ಅಥವಾ ಓದು ಸೀಮಿತವಾಗಿದ್ದಾಗ ಅಗತ್ಯ, ಮನೆ ಮತ್ತು ಆಸ್ಪತ್ರೆ ಎರಡೂ ಕಡೆಯ ಪರೀಕ್ಷೆಗೆ. ನಿರ್ಧಾರ ತೆಗೆದುಕೊಳ್ಳುವವರಲ್ಲದವರು ಉತ್ತಮ.
+Withdrawal or withholding is recorded with medical board decisions. Check with the treating team.	ಚಿಕಿತ್ಸೆ ನಿಲ್ಲಿಸುವುದು ಅಥವಾ ಪ್ರಾರಂಭಿಸದಿರುವುದು ವೈದ್ಯಕೀಯ ಮಂಡಳಿ ನಿರ್ಧಾರಗಳೊಂದಿಗೆ ದಾಖಲಾಗಿದೆ. ಚಿಕಿತ್ಸಾ ತಂಡವನ್ನು ಕೇಳಿ.
+Before this can go ahead, record both Board dates, their members, their decision and the protocol.	ಮುಂದುವರಿಯುವ ಮೊದಲು ಎರಡೂ ಮಂಡಳಿಗಳ ದಿನಾಂಕ, ಸದಸ್ಯರು, ನಿರ್ಧಾರ ಮತ್ತು ಶಿಷ್ಟಾಚಾರವನ್ನು ದಾಖಲಿಸಿ.
+A secondary decision-maker is named. They should sign too.	ಎರಡನೇ ನಿರ್ಧಾರ ತೆಗೆದುಕೊಳ್ಳುವವರ ಹೆಸರು ಇದೆ. ಅವರೂ ಸಹಿ ಮಾಡಬೇಕು.
+Doctor side	ವೈದ್ಯರ ಕಡೆ
+Patient party	ರೋಗಿಯ ಕಡೆ
+Not marked	ಗುರುತಿಸಿಲ್ಲ
+Talk about intensive care: would it be wanted if the illness worsens?	ಐಸಿಯು ಬಗ್ಗೆ ಮಾತನಾಡಿ: ಕಾಯಿಲೆ ಹೆಚ್ಚಾದರೆ ಇದು ಬೇಕೇ?
+Talk about breathing support, up to the ventilator: how far would be acceptable?	ಉಸಿರಾಟದ ಸಹಾಯ ಮತ್ತು ವೆಂಟಿಲೇಟರ್ ಬಗ್ಗೆ ಮಾತನಾಡಿ: ಎಲ್ಲಿಯವರೆಗೆ ಒಪ್ಪಿಗೆ?
+Talk about dialysis if the kidneys fail.	ಮೂತ್ರಪಿಂಡಗಳು ವಿಫಲವಾದರೆ ಡಯಾಲಿಸಿಸ್ ಬಗ್ಗೆ ಮಾತನಾಡಿ.
+Talk about drugs that support blood pressure.	ರಕ್ತದೊತ್ತಡಕ್ಕೆ ಸಹಾಯ ಮಾಡುವ ಔಷಧಗಳ ಬಗ್ಗೆ ಮಾತನಾಡಿ.
+Talk about a nose feeding tube.	ಮೂಗಿನ ಆಹಾರ ನಳಿಕೆಯ ಬಗ್ಗೆ ಮಾತನಾಡಿ.
+Talk about a stomach feeding tube.	ಹೊಟ್ಟೆಯ ಆಹಾರ ನಳಿಕೆಯ ಬಗ್ಗೆ ಮಾತನಾಡಿ.
+Talk about fluids by drip or by mouth.	ಡ್ರಿಪ್ ಅಥವಾ ಬಾಯಿಯ ಮೂಲಕ ದ್ರವಗಳ ಬಗ್ಗೆ ಮಾತನಾಡಿ.
+Talk about CPR if the heart stops.	ಹೃದಯ ನಿಂತರೆ ಸಿಪಿಆರ್ ಬಗ್ಗೆ ಮಾತನಾಡಿ.
+Talk about going to hospital when things get worse.	ಸ್ಥಿತಿ ಹದಗೆಟ್ಟರೆ ಆಸ್ಪತ್ರೆಗೆ ಹೋಗುವ ಬಗ್ಗೆ ಮಾತನಾಡಿ.
+Talk about what an ambulance crew should do.	ಆಂಬುಲೆನ್ಸ್ ಸಿಬ್ಬಂದಿ ಏನು ಮಾಡಬೇಕು ಎಂದು ಮಾತನಾಡಿ.
+Talk about the overall goal: life, balance or comfort.	ಒಟ್ಟಾರೆ ಗುರಿಯ ಬಗ್ಗೆ ಮಾತನಾಡಿ: ಜೀವ, ಸಮತೋಲನ ಅಥವಾ ಆರಾಮ.
+Ask what matters most, and what would not be acceptable.	ಯಾವುದು ಅತ್ಯಂತ ಮುಖ್ಯ, ಯಾವುದು ಒಪ್ಪಿಗೆಯಿಲ್ಲ ಎಂದು ಕೇಳಿ.
+Add these words to What matters	ಈ ಮಾತುಗಳನ್ನು 'ಯಾವುದು ಮುಖ್ಯ' ಗೆ ಸೇರಿಸಿ
+Add these words to outcomes not accepted	ಈ ಮಾತುಗಳನ್ನು ಒಪ್ಪದ ಸ್ಥಿತಿಗಳಿಗೆ ಸೇರಿಸಿ
+General discussion	ಸಾಮಾನ್ಯ ಚರ್ಚೆ
+Decision taken	ನಿರ್ಧಾರ ತೆಗೆದುಕೊಳ್ಳಲಾಗಿದೆ
+Goals-of-care conversation note	ಆರೈಕೆಯ ಗುರಿಗಳ ಸಂಭಾಷಣೆಯ ಟಿಪ್ಪಣಿ
+Draft for the doctor to edit. Not signed.	ವೈದ್ಯರು ಬದಲಿಸಲು ಕರಡು. ಸಹಿ ಆಗಿಲ್ಲ.
+Present	ಹಾಜರಿದ್ದವರು
+Condition explained: recorded in the plan	ಕಾಯಿಲೆಯ ವಿವರಣೆ: ಯೋಜನೆಯಲ್ಲಿ ದಾಖಲಾಗಿದೆ
+Condition explained: not recorded	ಕಾಯಿಲೆಯ ವಿವರಣೆ: ದಾಖಲಾಗಿಲ್ಲ
+Not discussed (doctor verified)	ಚರ್ಚಿಸಿಲ್ಲ (ವೈದ್ಯರು ಪರಿಶೀಲಿಸಿದ್ದಾರೆ)
+Not discussed, not yet verified	ಚರ್ಚಿಸಿಲ್ಲ, ಇನ್ನೂ ಪರಿಶೀಲಿಸಿಲ್ಲ
+Would not accept	ಒಪ್ಪುವುದಿಲ್ಲ
+Download the speech pack first.	ಮೊದಲು ಸ್ಪೀಚ್ ಪ್ಯಾಕ್ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ.
+Too little free memory. Close other apps and retry. Your recording is safe.	ಮೆಮೊರಿ ಕಡಿಮೆ ಇದೆ. ಬೇರೆ ಆ್ಯಪ್‌ಗಳನ್ನು ಮುಚ್ಚಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ. ನಿಮ್ಮ ರೆಕಾರ್ಡಿಂಗ್ ಸುರಕ್ಷಿತವಾಗಿದೆ.
+Too little free storage to read this recording. Free some space and retry.	ಈ ರೆಕಾರ್ಡಿಂಗ್ ಓದಲು ಸ್ಥಳ ಕಡಿಮೆ ಇದೆ. ಸ್ಥಳ ಖಾಲಿ ಮಾಡಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.
+Speech reading is not available on this phone. Type or paste the words instead.	ಈ ಫೋನ್‌ನಲ್ಲಿ ಮಾತು ಓದುವುದು ಲಭ್ಯವಿಲ್ಲ. ಪದಗಳನ್ನು ಟೈಪ್ ಮಾಡಿ ಅಥವಾ ಅಂಟಿಸಿ.
+This transcript is too long to keep. Use a shorter recording.	ಈ ಬರಹ ತುಂಬಾ ಉದ್ದವಾಗಿದೆ. ಚಿಕ್ಕ ರೆಕಾರ್ಡಿಂಗ್ ಬಳಸಿ.
+The recording changed while being read. Open it again.	ಓದುವಾಗ ರೆಕಾರ್ಡಿಂಗ್ ಬದಲಾಗಿದೆ. ಮತ್ತೆ ತೆರೆಯಿರಿ.
+Everyone named must agree before recording.	ರೆಕಾರ್ಡಿಂಗ್‌ಗೆ ಮೊದಲು ಹೆಸರಿಸಿದ ಎಲ್ಲರೂ ಒಪ್ಪಬೇಕು.
+The microphone could not start. Check permission and try again.	ಮೈಕ್ರೊಫೋನ್ ಪ್ರಾರಂಭವಾಗಲಿಲ್ಲ. ಅನುಮತಿ ನೋಡಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.
+The recording was too short or could not be saved. Try again.	ರೆಕಾರ್ಡಿಂಗ್ ತುಂಬಾ ಚಿಕ್ಕದು ಅಥವಾ ಉಳಿಸಲಾಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.
+This recording could not be played.	ಈ ರೆಕಾರ್ಡಿಂಗ್ ಪ್ಲೇ ಆಗಲಿಲ್ಲ.
+Goals-of-care conversation	ಆರೈಕೆಯ ಗುರಿಗಳ ಸಂಭಾಷಣೆ
+A checklist for the talk, then record or type it. The words stay on this phone. Nothing reaches the plan until you confirm it, one item at a time.	ಸಂಭಾಷಣೆಗೆ ಪಟ್ಟಿ, ನಂತರ ರೆಕಾರ್ಡ್ ಅಥವಾ ಟೈಪ್ ಮಾಡಿ. ಪದಗಳು ಈ ಫೋನ್‌ನಲ್ಲೇ ಇರುತ್ತವೆ. ನೀವು ಒಂದೊಂದಾಗಿ ದೃಢೀಕರಿಸುವವರೆಗೆ ಯೋಜನೆಗೆ ಏನೂ ಸೇರುವುದಿಲ್ಲ.
+Saved with this draft	ಈ ಕರಡಿನೊಂದಿಗೆ ಉಳಿಸಲಾಗಿದೆ
+An earlier version has a note. It opens as a draft for you to confirm or change.	ಹಿಂದಿನ ಆವೃತ್ತಿಯಲ್ಲಿ ಟಿಪ್ಪಣಿ ಇದೆ. ನೀವು ದೃಢೀಕರಿಸಲು ಅಥವಾ ಬದಲಿಸಲು ಕರಡಾಗಿ ತೆರೆಯುತ್ತದೆ.
+Open the conversation	ಸಂಭಾಷಣೆ ತೆರೆಯಿರಿ
+Goals-of-care note	ಆರೈಕೆಯ ಗುರಿಗಳ ಟಿಪ್ಪಣಿ
+The word-for-word transcript is kept separately. It is not on the emergency card.	ಪದಶಃ ಬರಹವನ್ನು ಪ್ರತ್ಯೇಕವಾಗಿ ಇಡಲಾಗಿದೆ. ಇದು ತುರ್ತು ಕಾರ್ಡ್‌ನಲ್ಲಿ ಇಲ್ಲ.
+Stopped. What was read is kept, and it continues from there.	ನಿಲ್ಲಿಸಲಾಗಿದೆ. ಓದಿದ್ದನ್ನು ಉಳಿಸಲಾಗಿದೆ, ಅಲ್ಲಿಂದ ಮುಂದುವರಿಯುತ್ತದೆ.
+That did not work. Your recording is safe. Try again, or type the words.	ಅದು ಆಗಲಿಲ್ಲ. ನಿಮ್ಮ ರೆಕಾರ್ಡಿಂಗ್ ಸುರಕ್ಷಿತವಾಗಿದೆ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ, ಅಥವಾ ಪದಗಳನ್ನು ಟೈಪ್ ಮಾಡಿ.
+Reading the recording	ರೆಕಾರ್ಡಿಂಗ್ ಓದಲಾಗುತ್ತಿದೆ
+Draft. Sahara matches words only: it does not recommend any treatment. A topic not discussed stays as No preference recorded.	ಕರಡು. ಸಹಾರಾ ಪದಗಳನ್ನು ಮಾತ್ರ ಹೊಂದಿಸುತ್ತದೆ: ಯಾವುದೇ ಚಿಕಿತ್ಸೆಯನ್ನು ಸೂಚಿಸುವುದಿಲ್ಲ. ಚರ್ಚಿಸದ ವಿಷಯ 'ಆದ್ಯತೆ ದಾಖಲಾಗಿಲ್ಲ' ಎಂದೇ ಉಳಿಯುತ್ತದೆ.
+Before you begin	ಪ್ರಾರಂಭಿಸುವ ಮೊದಲು
+List everyone present. Each person must agree.	ಹಾಜರಿರುವ ಎಲ್ಲರ ಹೆಸರು ಬರೆಯಿರಿ. ಪ್ರತಿಯೊಬ್ಬರೂ ಒಪ್ಪಬೇಕು.
+Names of everyone present	ಹಾಜರಿರುವ ಎಲ್ಲರ ಹೆಸರುಗಳು
+Separate names with commas or new lines	ಹೆಸರುಗಳನ್ನು ಅಲ್ಪವಿರಾಮ ಅಥವಾ ಹೊಸ ಸಾಲಿನಿಂದ ಬೇರ್ಪಡಿಸಿ
+agrees	ಒಪ್ಪಿದ್ದಾರೆ
+We understand this is to write down what was discussed, for the doctor to check.	ಇದು ಚರ್ಚಿಸಿದ್ದನ್ನು ಬರೆಯಲು, ವೈದ್ಯರು ಪರಿಶೀಲಿಸಲು ಎಂದು ನಮಗೆ ತಿಳಿದಿದೆ.
+Audio and words stay on this phone. Nothing is uploaded. The audio is deleted after review unless the doctor keeps it.	ಆಡಿಯೋ ಮತ್ತು ಪದಗಳು ಈ ಫೋನ್‌ನಲ್ಲೇ ಇರುತ್ತವೆ. ಏನೂ ಅಪ್‌ಲೋಡ್ ಆಗುವುದಿಲ್ಲ. ವೈದ್ಯರು ಇಟ್ಟುಕೊಳ್ಳದಿದ್ದರೆ ಪರಿಶೀಲನೆಯ ನಂತರ ಆಡಿಯೋ ಅಳಿಸಲಾಗುತ್ತದೆ.
+People with access to this phone may read its records.	ಈ ಫೋನ್ ಬಳಸುವವರು ಇದರ ದಾಖಲೆಗಳನ್ನು ಓದಬಹುದು.
+Everyone agrees	ಎಲ್ಲರೂ ಒಪ್ಪಿದ್ದಾರೆ
+Topics to cover	ಚರ್ಚಿಸಬೇಕಾದ ವಿಷಯಗಳು
+Tick a topic as you cover it. The list is also checked against the transcript. You may skip any topic.	ಚರ್ಚಿಸಿದ ಕೂಡಲೇ ವಿಷಯವನ್ನು ಟಿಕ್ ಮಾಡಿ. ಪಟ್ಟಿಯನ್ನು ಬರಹದೊಂದಿಗೂ ಹೊಂದಿಸಲಾಗುತ್ತದೆ. ಯಾವುದೇ ವಿಷಯವನ್ನು ಬಿಡಬಹುದು.
+Record or type	ರೆಕಾರ್ಡ್ ಅಥವಾ ಟೈಪ್ ಮಾಡಿ
+Up to 90 minutes in one recording. Keep this screen open: leaving the app stops and saves the part, then record the next part.	ಒಂದು ರೆಕಾರ್ಡಿಂಗ್‌ನಲ್ಲಿ 90 ನಿಮಿಷಗಳವರೆಗೆ. ಈ ಪರದೆ ತೆರೆದಿಡಿ: ಆ್ಯಪ್‌ನಿಂದ ಹೊರಹೋದರೆ ಭಾಗ ನಿಂತು ಉಳಿಯುತ್ತದೆ, ನಂತರ ಮುಂದಿನ ಭಾಗ ರೆಕಾರ್ಡ್ ಮಾಡಿ.
+Play or stop the recording	ರೆಕಾರ್ಡಿಂಗ್ ಪ್ಲೇ ಮಾಡಿ ಅಥವಾ ನಿಲ್ಲಿಸಿ
+Part	ಭಾಗ
+Detect language	ಭಾಷೆ ಗುರುತಿಸಿ
+Pick the main language if the words come out wrong. Telugu, Urdu and Kannada are less accurate than English: check every line.	ಪದಗಳು ತಪ್ಪಾಗಿ ಬಂದರೆ ಮುಖ್ಯ ಭಾಷೆ ಆಯ್ಕೆಮಾಡಿ. ತೆಲುಗು, ಉರ್ದು ಮತ್ತು ಕನ್ನಡದಲ್ಲಿ ಇಂಗ್ಲಿಷ್‌ಗಿಂತ ನಿಖರತೆ ಕಡಿಮೆ: ಪ್ರತಿ ಸಾಲು ಪರಿಶೀಲಿಸಿ.
+Speech pack · 375 MB · for English, Hindi, Telugu, Urdu and Kannada. Download once, on Wi-Fi if you can. Then it works without internet.	ಸ್ಪೀಚ್ ಪ್ಯಾಕ್ · 375 MB · ಇಂಗ್ಲಿಷ್, ಹಿಂದಿ, ತೆಲುಗು, ಉರ್ದು ಮತ್ತು ಕನ್ನಡಕ್ಕಾಗಿ. ಒಮ್ಮೆ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ, ಸಾಧ್ಯವಾದರೆ Wi-Fi ನಲ್ಲಿ. ನಂತರ ಇಂಟರ್ನೆಟ್ ಇಲ್ಲದೆ ಕೆಲಸ ಮಾಡುತ್ತದೆ.
+Downloading the speech pack	ಸ್ಪೀಚ್ ಪ್ಯಾಕ್ ಡೌನ್‌ಲೋಡ್ ಆಗುತ್ತಿದೆ
+Checking the speech pack…	ಸ್ಪೀಚ್ ಪ್ಯಾಕ್ ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ…
+Download the speech pack	ಸ್ಪೀಚ್ ಪ್ಯಾಕ್ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ
+Preparing the audio…	ಆಡಿಯೋ ಸಿದ್ಧವಾಗುತ್ತಿದೆ…
+About $n minutes left. Keep the screen open and the phone charging.	ಸುಮಾರು $n ನಿಮಿಷ ಉಳಿದಿದೆ. ಪರದೆ ತೆರೆದಿಟ್ಟು ಫೋನ್ ಚಾರ್ಜ್‌ನಲ್ಲಿ ಇಡಿ.
+Type or paste the conversation	ಸಂಭಾಷಣೆ ಟೈಪ್ ಮಾಡಿ ಅಥವಾ ಅಂಟಿಸಿ
+Add to the transcript	ಬರಹಕ್ಕೆ ಸೇರಿಸಿ
+Transcript · draft	ಬರಹ · ಕರಡು
+Word for word, kept apart from the note. Check it against the audio. Tap a label to set doctor side or patient party. Sahara does not identify speakers.	ಪದಶಃ, ಟಿಪ್ಪಣಿಯಿಂದ ಪ್ರತ್ಯೇಕವಾಗಿ. ಆಡಿಯೋದೊಂದಿಗೆ ಹೋಲಿಸಿ. ವೈದ್ಯರ ಕಡೆ ಅಥವಾ ರೋಗಿಯ ಕಡೆ ಆಯ್ಕೆಗೆ ಲೇಬಲ್ ಒತ್ತಿ. ಮಾತನಾಡುವವರನ್ನು ಸಹಾರಾ ಗುರುತಿಸುವುದಿಲ್ಲ.
+guess	ಅಂದಾಜು
+Edit this line	ಈ ಸಾಲು ಬದಲಿಸಿ
+Correct this line	ಈ ಸಾಲು ಸರಿಪಡಿಸಿ
+Find what was discussed	ಏನು ಚರ್ಚಿಸಲಾಗಿದೆ ಎಂದು ನೋಡಿ
+The transcript changed. Find again	ಬರಹ ಬದಲಾಗಿದೆ. ಮತ್ತೆ ನೋಡಿ
+Find again	ಮತ್ತೆ ನೋಡಿ
+Confirm each item	ಪ್ರತಿ ಅಂಶವನ್ನು ದೃಢೀಕರಿಸಿ
+Every choice is shown. A mark only means those words were heard. Nothing is selected until you choose it and confirm.	ಪ್ರತಿ ಆಯ್ಕೆಯನ್ನು ತೋರಿಸಲಾಗಿದೆ. ಗುರುತು ಎಂದರೆ ಆ ಪದಗಳು ಕೇಳಿಸಿವೆ ಎಂದು ಮಾತ್ರ. ನೀವು ಆರಿಸಿ ದೃಢೀಕರಿಸುವವರೆಗೆ ಏನೂ ಆಯ್ಕೆಯಾಗುವುದಿಲ್ಲ.
+Note for the doctor to edit	ವೈದ್ಯರು ಬದಲಿಸಲು ಟಿಪ್ಪಣಿ
+This is the earlier version's note, as a draft. Confirm or change it.	ಇದು ಹಿಂದಿನ ಆವೃತ್ತಿಯ ಟಿಪ್ಪಣಿ, ಕರಡಾಗಿ. ದೃಢೀಕರಿಸಿ ಅಥವಾ ಬದಲಿಸಿ.
+It says what was said and decided. Spoken words and feelings stay in the transcript.	ಇದರಲ್ಲಿ ಹೇಳಿದ್ದು ಮತ್ತು ನಿರ್ಧರಿಸಿದ್ದು ಇರುತ್ತದೆ. ಆಡಿದ ಮಾತುಗಳು ಮತ್ತು ಭಾವನೆಗಳು ಬರಹದಲ್ಲೇ ಇರುತ್ತವೆ.
+Build the note from the items above	ಮೇಲಿನ ಅಂಶಗಳಿಂದ ಟಿಪ್ಪಣಿ ತಯಾರಿಸಿ
+$n topics are not confirmed or verified yet. The note will say so.	$n ವಿಷಯಗಳು ಇನ್ನೂ ದೃಢೀಕರಿಸಿಲ್ಲ ಅಥವಾ ಪರಿಶೀಲಿಸಿಲ್ಲ. ಟಿಪ್ಪಣಿಯಲ್ಲಿ ಹಾಗೆಯೇ ಇರುತ್ತದೆ.
+Keep the recording on this phone (otherwise it is deleted now)	ರೆಕಾರ್ಡಿಂಗ್ ಈ ಫೋನ್‌ನಲ್ಲಿ ಇಡಿ (ಇಲ್ಲದಿದ್ದರೆ ಈಗಲೇ ಅಳಿಸಲಾಗುತ್ತದೆ)
+Save the word-for-word transcript with this draft	ಪದಶಃ ಬರಹವನ್ನು ಈ ಕರಡಿನೊಂದಿಗೆ ಉಳಿಸಿ
+The transcript is never put on the emergency card or its QR code. Next: review date, then signatures.	ಬರಹ ಎಂದಿಗೂ ತುರ್ತು ಕಾರ್ಡ್ ಅಥವಾ ಅದರ QR ಕೋಡ್‌ನಲ್ಲಿ ಇರುವುದಿಲ್ಲ. ಮುಂದೆ: ಪರಿಶೀಲನೆಯ ದಿನಾಂಕ, ನಂತರ ಸಹಿಗಳು.
+Finish review	ಪರಿಶೀಲನೆ ಮುಗಿಸಿ
+The words already in the transcript are kept.	ಬರಹದಲ್ಲಿರುವ ಪದಗಳು ಉಳಿಯುತ್ತವೆ.
+Delete	ಅಳಿಸಿ
+Discussed, no clear choice	ಚರ್ಚಿಸಲಾಗಿದೆ, ಸ್ಪಷ್ಟ ಆಯ್ಕೆ ಇಲ್ಲ
+Discussed, needs your check	ಚರ್ಚಿಸಲಾಗಿದೆ, ನಿಮ್ಮ ಪರಿಶೀಲನೆ ಬೇಕು
+Confirmed	ದೃಢೀಕರಿಸಲಾಗಿದೆ
+Not discussed, verified	ಚರ್ಚಿಸಿಲ್ಲ, ಪರಿಶೀಲಿಸಲಾಗಿದೆ
+From the previous version	ಹಿಂದಿನ ಆವೃತ್ತಿಯಿಂದ
+Confirm it or change it.	ದೃಢೀಕರಿಸಿ ಅಥವಾ ಬದಲಿಸಿ.
+Now in the plan	ಈಗ ಯೋಜನೆಯಲ್ಲಿ
+Different things were said. Read the words and decide.	ಬೇರೆ ಬೇರೆ ಮಾತುಗಳು ಹೇಳಲಾಗಿದೆ. ಪದಗಳನ್ನು ಓದಿ ನಿರ್ಧರಿಸಿ.
+Came up, with no clear choice	ಪ್ರಸ್ತಾಪವಾಯಿತು, ಸ್ಪಷ್ಟ ಆಯ್ಕೆ ಇಲ್ಲ
+Leave the What matters section as it is	'ಯಾವುದು ಮುಖ್ಯ' ಭಾಗವನ್ನು ಹಾಗೆಯೇ ಬಿಡಿ
+Marked: these words were heard	ಗುರುತು: ಈ ಪದಗಳು ಕೇಳಿಸಿವೆ
+Marked: they said no to this	ಗುರುತು: ಇದಕ್ಕೆ ಬೇಡ ಎಂದಿದ್ದಾರೆ
+Previous version's choice	ಹಿಂದಿನ ಆವೃತ್ತಿಯ ಆಯ್ಕೆ
+Confirm this item	ಈ ಅಂಶವನ್ನು ದೃಢೀಕರಿಸಿ
+Confirmed by you	ನೀವು ದೃಢೀಕರಿಸಿದ್ದೀರಿ
+Not discussed in this talk. I checked this.	ಈ ಸಂಭಾಷಣೆಯಲ್ಲಿ ಚರ್ಚಿಸಿಲ್ಲ. ನಾನು ಪರಿಶೀಲಿಸಿದ್ದೇನೆ.
+It stays	ಇದು ಹಾಗೆಯೇ ಉಳಿಯುತ್ತದೆ

@@ -6,8 +6,8 @@ import kotlin.math.sqrt
 data class OfflineSpeechWindow(val startSample: Long, val endSample: Long, val samples: FloatArray)
 
 /** Signal-based phrase boundaries. This does not identify a speaker or language. */
-class OfflineSpeechSegmenter {
-    private val buffer = FloatArray(MAX_SAMPLES)
+class OfflineSpeechSegmenter(private val minSamples: Int = MIN_SAMPLES, private val maxSamples: Int = MAX_SAMPLES) {
+    private val buffer = FloatArray(maxSamples)
     private var size = 0
     private var quiet = 0
     private var endSample = 0L
@@ -15,7 +15,7 @@ class OfflineSpeechSegmenter {
 
     /** Accept one bounded PCM frame. No input samples are discarded at a boundary. */
     fun accept(frame: FloatArray): OfflineSpeechWindow? {
-        require(frame.size in 1..FRAME_SAMPLES && size + frame.size <= MAX_SAMPLES)
+        require(frame.size in 1..FRAME_SAMPLES && size + frame.size <= maxSamples)
         require(frame.all { it.isFinite() })
         frame.copyInto(buffer, size)
         size += frame.size
@@ -23,8 +23,8 @@ class OfflineSpeechSegmenter {
         freshSamples += frame.size
         val rms = sqrt(frame.sumOf { it.toDouble() * it } / frame.size)
         quiet = if (rms < QUIET_RMS && frame.maxOf { abs(it) } < QUIET_PEAK) quiet + frame.size else 0
-        val atPause = size >= MIN_SAMPLES && quiet >= PAUSE_SAMPLES
-        if (!atPause && size < MAX_SAMPLES) return null
+        val atPause = size >= minSamples && quiet >= PAUSE_SAMPLES
+        if (!atPause && size < maxSamples) return null
         return takeWindow(if (atPause) 0 else OVERLAP_SAMPLES)
     }
 

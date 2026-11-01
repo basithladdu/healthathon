@@ -271,6 +271,8 @@ export function startReview(patientId: string, trigger: ReviewTrigger, actor: st
       supersedes: base.id,
       reviewDue: nextReviewDue(now),
       revokedAt: undefined, revokedReason: undefined, revokedBy: undefined,
+      // A new talk gets its own transcript; the last one stays with its signed version.
+      gocTranscript: undefined,
     };
     draft.choices.goalAConfirmed = false;
     records.push(draft);

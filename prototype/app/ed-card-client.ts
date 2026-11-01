@@ -3,7 +3,7 @@
 // revoked or superseded. The server copy lives behind /api/ed-card (see that route for the Supabase tables).
 import type { EctprRecord } from './ectpr-model.ts';
 import { getEctpr, logAudit, subscribeEctpr } from './ectpr-store.ts';
-import { quickViewSnapshot, randomUrlToken, type EdCardViewResult } from './ed-card-snapshot.ts';
+import { quickViewSnapshot, randomUrlToken, withoutGocTranscript, type EdCardViewResult } from './ed-card-snapshot.ts';
 
 export type LocalEdCard = {
   token: string;
@@ -117,7 +117,7 @@ export async function issueEdCard(record: EctprRecord, actor: string): Promise<L
   const card: LocalEdCard = {
     token: randomUrlToken(32), manageKey: randomUrlToken(32),
     patientId: record.patientId, recordId: record.id, version: record.version,
-    issuedAt: new Date().toISOString(), snapshot: record, server: 'local-only',
+    issuedAt: new Date().toISOString(), snapshot: withoutGocTranscript(record), server: 'local-only',
   };
   const previous = readAll().filter((c) => c.patientId === record.patientId && !c.revokedAt);
   writeAll([...readAll(), card]);
