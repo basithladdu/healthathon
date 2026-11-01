@@ -40,10 +40,11 @@ export function quickViewSnapshot(record: EctprRecord): EctprRecord {
   const strip = (d: typeof dm) => (d ? { ...d, idType: null, idLast4: null } : null);
   return {
     ...record,
-    patient: { ...record.patient, dob: '', address: '', phone: '' },
+    patient: { ...record.patient, dob: '', address: '', phone: '', gender: '' },
     decisionMakers: { primary: strip(dm), alternate: strip(alt), familyToInform: [], familyConsensusNote: '' },
     values: { patientKnows: null, ownWords: '', unacceptableOutcomes: [], familyAskedNotToTell: false, directQuestionPlan: '', financialConcernDiscussed: null, socialWorkReferral: null },
     capacity: { ...record.capacity, basis: '' },
+    ...(record.withdrawal ? { withdrawal: { ...record.withdrawal, primaryBoardMembers: '', secondaryBoardMembers: '', boardDecision: '' } } : {}),
   };
 }
 

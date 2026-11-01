@@ -10,12 +10,12 @@ import { careText, type CareLang } from './care-i18n';
 import { AMD_ED_CAVEAT, AMD_ED_CAVEAT_HI } from './amd-rules';
 import type { EctprRecord } from './ectpr-model';
 import { edInterpretation, pageFooter } from './ectpr-rules';
-import {
+import { capacityGuide, homeCareLines, withdrawalLines,
   alwaysProvidedCare, amdCaveat, ambulanceLabel, edAmdLines, authorityLabel, ceilingDetails, ceilingLabel, ceilingShort, cprDecidedBy, cprLabel,
   cprShort, deviceLabel, dialysisLabel, dyingPhasePrompt, edBanner, edFlag, formatDay, goalLabel, hydrationLabel, icuLabel, ifInDoubtAfter,
   ifInDoubtConditions, ifInDoubtLead, ifInDoubtTitle, ngLabel, notRecorded, pegLabel, textFor, transferLabel, transferShort,
   treatingConsultant, vasopressorLabel, walletCardLine,
-} from './ectpr-labels';
+} from './ectpr-labels.ts';
 import { sha256Hex } from './ed-card-snapshot';
 
 export type PdfResult = { bytes: Uint8Array; sha256: string; fileName: string; pages: number };
@@ -217,12 +217,16 @@ export async function makeEctprPdf(record: EctprRecord, opts: { lang?: CareLang;
     [t('Key medicines', 'मुख्य दवाएँ'), [record.clinical.keyMedicines || notRecorded(lang)]],
     [t('Decision-maker (24 h)', 'निर्णयकर्ता (24 घंटे)'), [
       dm ? `${dm.name} · ${dm.relation} · ${dm.phone24h || notRecorded(lang)}${authorityLabel(dm.authorityBasis, lang) ? ` · ${authorityLabel(dm.authorityBasis, lang)}` : ''}` : notRecorded(lang),
-      ...(alt ? [`${t('Alternate', 'वैकल्पिक')}: ${alt.name} · ${alt.relation} · ${alt.phone24h || notRecorded(lang)}`] : []),
+      ...(alt ? [`${t('Secondary', 'द्वितीय')}: ${alt.name} · ${alt.relation} · ${alt.phone24h || notRecorded(lang)}`] : []),
     ]],
     [t('Treating team', 'इलाज करने वाली टीम'), [
       `${t('Treating consultant', 'मुख्य डॉक्टर')}: ${consultant ? `${consultant.name} (${t('Reg.', 'पंजी.')} ${consultant.registrationNo})` : record.careTeam.oncologist || notRecorded(lang)}`,
       `${t('Palliative care', 'पैलिएटिव केयर')}: ${record.careTeam.palliativePhysician || notRecorded(lang)} · ${record.careTeam.palliativePhone24h || notRecorded(lang)}`,
     ]],
+    ...(homeCareLines(record, lang).length ? [[t('Home care', 'घर पर देखभाल'), homeCareLines(record, lang)] as [string, string[]]] : []),
+    ...(withdrawalLines(record, lang).length ? [[t('Withdrawal or withholding (medical boards)', 'इलाज रोकना या शुरू न करना (मेडिकल बोर्ड)'), withdrawalLines(record, lang)] as [string, string[]]] : []),
+    ...((record.decisionMakers.presentAtDiscussion ?? []).length ? [[t('Present for the discussion', 'बातचीत में मौजूद'), record.decisionMakers.presentAtDiscussion!] as [string, string[]]] : []),
+    ...((record.decisionMakers.attemptedContact ?? []).length ? [[t('Could not be reached', 'संपर्क नहीं हो सका'), record.decisionMakers.attemptedContact!] as [string, string[]]] : []),
     [t('Capacity', 'निर्णय क्षमता'), [
       record.capacity.status === 'FLUCTUATES' ? t('Capacity fluctuates — reassess', 'निर्णय क्षमता बदलती है — दोबारा जाँचें')
         : record.capacity.status === 'HAS' ? t('Has capacity', 'निर्णय क्षमता है') : record.capacity.status === 'HAS_DELEGATED' ? t('Has capacity; has delegated decisions', 'क्षमता है; निर्णय सौंपे हैं')
@@ -232,7 +236,8 @@ export async function makeEctprPdf(record: EctprRecord, opts: { lang?: CareLang;
     [t('Living will (AMD)', 'लिविंग विल (AMD)'), [...edAmdLines(record.existingDirective, record.amdAtIssue, lang).lines, amdCaveat(lang)]],
   ];
 
-  const allTexts = [record.patient.name, record.clinical.diagnosis, ...rows.flatMap(([a, b]) => [a, ...b]), ...alwaysProvidedCare(lang), ...ifInDoubtConditions(lang), edBanner(interp, record, lang)];
+  const guide = capacityGuide(lang);
+  const allTexts = [guide.title, guide.note, ...guide.points, record.patient.gender ?? '', record.patient.name, record.clinical.diagnosis, ...rows.flatMap(([a, b]) => [a, ...b]), ...alwaysProvidedCare(lang), ...ifInDoubtConditions(lang), edBanner(interp, record, lang)];
   const { pdf, doc, writer } = await setup(`ECTPR · ${record.patient.name} · v${record.version}`, allTexts);
   const fixed = new Date(`${todayIso(now)}T00:00:00Z`);
   doc.setCreationDate(fixed); doc.setModificationDate(fixed);
@@ -272,7 +277,7 @@ export async function makeEctprPdf(record: EctprRecord, opts: { lang?: CareLang;
   writer.draw(page, 'SAHARA', M, y - 9, 9, accent);
   y -= 14;
   text(t('Emergency Care and Treatment Plan (ECTPR)', 'आपातकालीन देखभाल और इलाज योजना (ECTPR)'), 15, ink, M, headerWidth, 19);
-  text(`${record.patient.name || notRecorded(lang)} · UHID ${record.patient.uhid || notRecorded(lang)}${record.patient.dob ? ` · ${t('DOB', 'जन्म')} ${formatDay(record.patient.dob, lang)}` : ''}${record.patient.sex ? ` · ${record.patient.sex}` : ''}`, 10, ink, M, headerWidth, 13);
+  text(`${record.patient.name || notRecorded(lang)} · UHID ${record.patient.uhid || notRecorded(lang)}${record.patient.dob ? ` · ${t('DOB', 'जन्म')} ${formatDay(record.patient.dob, lang)}` : ''}${record.patient.sex ? ` · ${record.patient.sex}` : ''}${record.patient.gender ? ` · ${record.patient.gender}` : ''}`, 10, ink, M, headerWidth, 13);
   text(`${t('Diagnosis', 'निदान')}: ${record.clinical.diagnosis || notRecorded(lang)}${record.clinical.stage ? ` · ${record.clinical.stage}` : ''}${record.clinical.ecog !== null ? ` · ECOG ${record.clinical.ecog}` : ''}`, 9, ink, M, headerWidth, 12);
   text(`${t('Version', 'संस्करण')} ${record.version} · ${record.formVersion} · ${t('Signed', 'हस्ताक्षर')} ${consultant ? `${formatDay(consultant.signedAt, lang)} ${t('by', 'द्वारा')} ${consultant.name}` : t('NOT SIGNED', 'हस्ताक्षर नहीं')} · ${t('Review due', 'समीक्षा')} ${formatDay(record.reviewDue, lang)}`, 8.5, muted, M, headerWidth, 11);
   writer.draw(page, opts.liveUrl ? t('Scan: live card (internet)', 'स्कैन: लाइव कार्ड (इंटरनेट)') : t('Scan: offline summary', 'स्कैन: ऑफ़लाइन सारांश'), W - M - qrSize, H - M - qrSize - 9, 6.5, muted);
@@ -326,8 +331,12 @@ export async function makeEctprPdf(record: EctprRecord, opts: { lang?: CareLang;
   text(dyingPhasePrompt(lang), 7.8, muted);
   y -= 2;
   // Signatures
-  const sigs = record.signatures.map((s) => `${s.role.replace(/_/g, ' ').toLowerCase()}: ${s.name}${s.registrationNo ? ` (${t('Reg.', 'पंजी.')} ${s.registrationNo})` : ''} · ${formatDay(s.signedAt, lang)}${s.thumbImpression ? ` · ${t('thumb impression', 'अंगूठे का निशान')}` : ''}`);
+  const sigs = record.signatures.map((s) => `${s.role.replace(/_/g, ' ').toLowerCase()}${s.surrogateRank ? ` (${s.surrogateRank.toLowerCase()})` : ''}: ${s.name}${s.registrationNo ? ` (${t('Reg.', 'पंजी.')} ${s.registrationNo})` : ''} · ${formatDay(s.signedAt, lang)}${s.thumbImpression ? ` · ${t('thumb impression', 'अंगूठे का निशान')}` : ''}`);
   text(`${t('Signatures', 'हस्ताक्षर')}: ${sigs.length ? sigs.join(' | ') : t('none', 'कोई नहीं')}`, 7.8, muted);
+  y -= 4;
+  text(guide.title, 8.5, accent);
+  text(guide.note, 7.5, muted);
+  guide.points.forEach((point, index) => text(`${index + 1}. ${point}`, 7.5, muted));
   text(t('Typed signatures recorded in Sahara. Synthetic patient data for the healthathon. The SHA-256 of this file is shown in the app and kept in the audit log.', 'हस्ताक्षर Sahara में टाइप किए गए। हैकाथॉन के लिए काल्पनिक मरीज़। इस फ़ाइल का SHA-256 ऐप और ऑडिट लॉग में है।'), 7, grey);
 
   // V8 footer on every page

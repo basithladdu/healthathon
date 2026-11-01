@@ -8,7 +8,7 @@ import type { CareLang } from './care-i18n';
 import { careDir, careText } from './care-i18n';
 import type { AmdStatusSummary, EctprRecord } from './ectpr-model';
 import { edInterpretation, type EdInterpretation } from './ectpr-rules';
-import {
+import { homeCareLines, withdrawalLines,
   alwaysProvidedCare, amdCaveat, ambulanceLabel, authorityLabel, ceilingDetails, ceilingLabel, cprDecidedBy, cprLabel, deviceLabel,
   dialysisLabel, dyingPhasePrompt, edAmdLines, edBanner, edFlag, formatDay, goalLabel, hydrationLabel, icuLabel, ifInDoubtAfter, ifInDoubtConditions, ifInDoubtLead, ifInDoubtTitle,
   ngLabel, notRecorded, pegLabel, telHref, textFor, transferLabel, treatingConsultant, vasopressorLabel,
@@ -150,12 +150,14 @@ export function EctprEdView(props: { record: EctprRecord | null; lang?: CareLang
               <Row label={t('7 · Implanted device', '7 · लगा हुआ उपकरण')} recorded={!!record.clinical.implantedDevice}>{deviceLabel(record, lang)}</Row>
               <Row label={t('8 · Decision-maker (24 h)', '8 · निर्णयकर्ता (24 घंटे)')} recorded={!!dm}>
                 {dm ? <>{dm.name} · {dm.relation}{authorityLabel(dm.authorityBasis, lang) ? ` · ${authorityLabel(dm.authorityBasis, lang)}` : ''} · <Phone phone={dm.phone24h} lang={lang} /></> : notRecorded(lang)}
-                {alt && <div className="ectpr-ed-sub">{t('Alternate', 'वैकल्पिक')}: {alt.name} · {alt.relation} · <Phone phone={alt.phone24h} lang={lang} /></div>}
+                {alt && <div className="ectpr-ed-sub">{t('Secondary', 'द्वितीय')}: {alt.name} · {alt.relation} · <Phone phone={alt.phone24h} lang={lang} /></div>}
               </Row>
               <Row label={t('9 · Treating consultant · palliative care', '9 · मुख्य डॉक्टर · पैलिएटिव केयर')} recorded={!!consultant || !!record.careTeam.palliativePhysician}>
                 <div>{t('Consultant', 'डॉक्टर')}: {consultant ? `${consultant.name} (${t('Reg.', 'पंजी.')} ${consultant.registrationNo})` : record.careTeam.oncologist || notRecorded(lang)}</div>
                 <div>{t('Palliative care', 'पैलिएटिव केयर')}: {record.careTeam.palliativePhysician || notRecorded(lang)} · <Phone phone={record.careTeam.palliativePhone24h} lang={lang} /></div>
               </Row>
+              {homeCareLines(record, lang).length > 0 && <Row label={t('Home care', 'घर पर देखभाल')} recorded>{homeCareLines(record, lang).map((line) => <div key={line}>{line}</div>)}</Row>}
+              {withdrawalLines(record, lang).length > 0 && <Row label={t('Withdrawal or withholding (medical boards)', 'इलाज रोकना या शुरू न करना (मेडिकल बोर्ड)')} recorded>{withdrawalLines(record, lang).map((line) => <div key={line}>{line}</div>)}</Row>}
               <Row label={t('10 · Capacity', '10 · निर्णय क्षमता')} recorded={!!record.capacity.status}>
                 {record.capacity.status === 'FLUCTUATES'
                   ? <strong className="ectpr-ed-alert">{t('Capacity fluctuates — reassess', 'निर्णय क्षमता बदलती है — दोबारा जाँचें')}{record.capacity.reassessOn ? ` (${formatDay(record.capacity.reassessOn, lang)})` : ''}</strong>
@@ -217,12 +219,14 @@ export function EctprFullRecord(props: { record: EctprRecord; lang?: CareLang })
       <Row label={t('Hydration', 'तरल')} recorded={!!c.hydration}>{hydrationLabel(c.hydration, lang)}</Row>
       <Row label={t('Key medicines', 'मुख्य दवाएँ')} recorded={!!r.clinical.keyMedicines}>{r.clinical.keyMedicines || notRecorded(lang)}</Row>
       <Row label={t('Patient', 'मरीज़')} recorded>
-        {[r.patient.dob && `${t('DOB', 'जन्म')} ${formatDay(r.patient.dob, lang)}`, r.patient.sex, r.patient.address, r.patient.phone && <Phone key="p" phone={r.patient.phone} lang={lang} />].filter(Boolean).map((x, i) => <span key={i}>{i > 0 ? ' · ' : ''}{x}</span>)}
+        {[r.patient.dob && `${t('DOB', 'जन्म')} ${formatDay(r.patient.dob, lang)}`, r.patient.sex, r.patient.gender, r.patient.address, r.patient.phone && <Phone key="p" phone={r.patient.phone} lang={lang} />].filter(Boolean).map((x, i) => <span key={i}>{i > 0 ? ' · ' : ''}{x}</span>)}
         {r.clinical.ecog !== null && <div className="ectpr-ed-sub">ECOG {r.clinical.ecog}</div>}
       </Row>
       <Row label={t('Decision-makers', 'निर्णयकर्ता')} recorded={dms.length > 0}>
         {dms.length ? dms.map((d) => <div key={d.name}>{d.name} · {d.relation} · <Phone phone={d.phone24h} lang={lang} />{d.idType ? ` · ${d.idType} …${d.idLast4 ?? ''}` : ''}{authorityLabel(d.authorityBasis, lang) ? ` · ${authorityLabel(d.authorityBasis, lang)}` : ''}</div>) : notRecorded(lang)}
         {r.decisionMakers.familyToInform.length > 0 && <div className="ectpr-ed-sub">{t('Family to inform', 'जिन्हें बताना है')}: {r.decisionMakers.familyToInform.join(', ')}</div>}
+        {(r.decisionMakers.presentAtDiscussion ?? []).length > 0 && <div className="ectpr-ed-sub">{t('Present for the discussion', 'बातचीत में मौजूद')}: {r.decisionMakers.presentAtDiscussion!.join(', ')}</div>}
+        {(r.decisionMakers.attemptedContact ?? []).length > 0 && <div className="ectpr-ed-sub">{t('Could not be reached', 'संपर्क नहीं हो सका')}: {r.decisionMakers.attemptedContact!.join(', ')}</div>}
         {r.decisionMakers.familyConsensusNote && <div className="ectpr-ed-sub">{t('Family note', 'परिवार का नोट')}: {r.decisionMakers.familyConsensusNote}</div>}
       </Row>
       <Row label={t('Capacity assessment', 'क्षमता की जाँच')} recorded={!!r.capacity.status}>
@@ -230,10 +234,11 @@ export function EctprFullRecord(props: { record: EctprRecord; lang?: CareLang })
       </Row>
       <Row label={t("Patient's own words", 'मरीज़ के अपने शब्द')} recorded={!!r.values.ownWords}>
         {r.values.ownWords ? <q>{r.values.ownWords}</q> : notRecorded(lang)}
+        {r.values.knowsRecordedWhen && <div className="ectpr-ed-sub">{t('When was this recorded?', 'यह कब दर्ज किया गया?')} {r.values.knowsRecordedWhen === 'BEFORE_COUNSELLING' ? t('Before counselling', 'काउंसलिंग से पहले') : t('After counselling', 'काउंसलिंग के बाद')}</div>}
         {r.values.unacceptableOutcomes.length > 0 && <div className="ectpr-ed-sub">{t('Would not accept', 'स्वीकार नहीं')}: {r.values.unacceptableOutcomes.join('; ')}</div>}
       </Row>
       <Row label={t('Signatures', 'हस्ताक्षर')} recorded={r.signatures.length > 0}>
-        {r.signatures.length ? r.signatures.map((s, i) => <div key={i}>{s.role.replace(/_/g, ' ').toLowerCase()}: {s.name}{s.registrationNo ? ` (${t('Reg.', 'पंजी.')} ${s.registrationNo})` : ''} · {formatDay(s.signedAt, lang)}</div>) : notRecorded(lang)}
+        {r.signatures.length ? r.signatures.map((s, i) => <div key={i}>{s.role.replace(/_/g, ' ').toLowerCase()}{s.surrogateRank ? ` (${s.surrogateRank.toLowerCase()})` : ''}: {s.name}{s.registrationNo ? ` (${t('Reg.', 'पंजी.')} ${s.registrationNo})` : ''} · {formatDay(s.signedAt, lang)}</div>) : notRecorded(lang)}
       </Row>
     </section>
   );

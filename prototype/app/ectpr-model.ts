@@ -28,6 +28,11 @@ export type IdType = 'AADHAAR' | 'VOTER_ID' | 'PAN' | 'PASSPORT' | 'DRIVING_LICE
 export type ExistingDirective = { kind: 'VALID_AMD'; date: string; location: string; attestor: string } | { kind: 'PRIOR_WISHES'; note: string } | { kind: 'NONE' };
 export type ImplantedDevice = 'NONE' | 'PACEMAKER' | 'ICD' | 'CRT_D' | 'OTHER';
 
+/** Legal review, Rituparna P, 31 Oct 2026. Optional because older saved records do not have them. */
+export type EctprHomeCare = { assessmentFrequency: string; coordinator: string; ngoContact: string; ngoConsulted: boolean; previousAdmission: boolean | null; previousAdmissionDetails: string };
+export type WithdrawalFinal = 'TO_BE_PERFORMED' | 'FAMILY_REFUSED' | 'BOARD_REFUSED' | 'PHYSICIAN_REVOKED';
+export type EctprWithdrawal = { applicable: boolean; primaryBoardDate: string; secondaryBoardDate: string; primaryBoardMembers: string; secondaryBoardMembers: string; boardDecision: string; finalDecision: WithdrawalFinal | null; protocol: string };
+
 export type DecisionMaker = {
   name: string; relation: string; phone24h: string;
   /** Never a full Aadhaar: ID type + last 4 digits only (tech spec §2). */
@@ -40,15 +45,17 @@ export type EctprStatus = 'DRAFT' | 'ACTIVE' | 'SUPERSEDED' | 'REVOKED';
 export type Signature = {
   role: 'TREATING_CONSULTANT' | 'PALLIATIVE_CLINICIAN' | 'NURSE' | 'PATIENT' | 'SURROGATE' | 'WITNESS';
   name: string; registrationNo?: string; signedAt: string; thumbImpression?: boolean;
+  /** Which decision-maker signed, when role is SURROGATE. */
+  surrogateRank?: 'PRIMARY' | 'SECONDARY';
 };
 
 export type EctprRecord = {
   id: string; patientId: string; version: number; formVersion: string; status: EctprStatus;
   createdAt: string; updatedAt: string; createdBy: string;
   createdInEd?: boolean;
-  patient: { name: string; dob: string; sex: string; address: string; phone: string; uhid: string; languagePref: string };
+  patient: { name: string; dob: string; sex: string; address: string; phone: string; uhid: string; languagePref: string; gender?: string };
   careTeam: { oncologist: string; palliativePhysician: string; palliativePhone24h: string; extraTeam: string[]; localDoctor: string };
-  decisionMakers: { primary: DecisionMaker | null; alternate: DecisionMaker | null; familyToInform: string[]; familyConsensusNote: string };
+  decisionMakers: { primary: DecisionMaker | null; alternate: DecisionMaker | null; familyToInform: string[]; familyConsensusNote: string; presentAtDiscussion?: string[]; attemptedContact?: string[] };
   clinical: { diagnosis: string; stage: string; ecog: 0 | 1 | 2 | 3 | 4 | null; allergies: string; implantedDevice: ImplantedDevice | null; icdDeactivation: { decision: 'DEACTIVATE' | 'KEEP' | null; date: string } ; keyMedicines: string; eligibilityDate: string };
   capacity: { status: Capacity | null; assessor: string; assessedOn: string; basis: string; reassessOn: string };
   existingDirective: ExistingDirective | null;
@@ -56,7 +63,7 @@ export type EctprRecord = {
   prognosticUnderstanding: { confirmed: boolean; confirmedBy: string; confirmedOn: string };
   /** V5: surrogate's substituted-judgement declaration. */
   surrogateDeclaration: { answeringAsSurrogate: boolean; confirmed: boolean; confirmedOn: string };
-  values: { patientKnows: boolean | null; ownWords: string; unacceptableOutcomes: string[]; familyAskedNotToTell: boolean; directQuestionPlan: string; financialConcernDiscussed: boolean | null; socialWorkReferral: boolean | null };
+  values: { patientKnows: boolean | null; ownWords: string; unacceptableOutcomes: string[]; familyAskedNotToTell: boolean; directQuestionPlan: string; financialConcernDiscussed: boolean | null; socialWorkReferral: boolean | null; knowsRecordedWhen?: 'BEFORE_COUNSELLING' | 'AFTER_COUNSELLING' | null };
   choices: {
     goalOfCare: GoalOfCare | null;
     cpr: Cpr | null; dnacprReason: DnacprReason | null; dnacprDiscussedWith: string;
@@ -73,6 +80,8 @@ export type EctprRecord = {
     conflictReasons: Partial<Record<'C1' | 'C2' | 'C3', string>>;
     goalAConfirmed: boolean; // V3 confirmation
   };
+  homeCare?: EctprHomeCare;
+  withdrawal?: EctprWithdrawal;
   reviewDue: string;
   signatures: Signature[];
   limitedLiteracy: boolean;

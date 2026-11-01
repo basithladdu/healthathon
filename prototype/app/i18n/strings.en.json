@@ -1125,6 +1125,18 @@
    "ectpr-pilot-log.tsx"
   ]
  },
+ "Admitted before for this condition": {
+  "hi": "इस बीमारी के लिए पहले भर्ती",
+  "files": [
+   "ectpr-labels.ts"
+  ]
+ },
+ "Admitted to any hospital before for this condition?": {
+  "hi": "क्या इस बीमारी के लिए पहले किसी अस्पताल में भर्ती हुए थे?",
+  "files": [
+   "ectpr-plan-screen.tsx"
+  ]
+ },
  "Admitted to ICU?": {
   "hi": "ICU में भर्ती?",
   "files": [
@@ -1153,6 +1165,13 @@
   "hi": "बचपन के कैंसर के बाद",
   "files": [
    "care-community.tsx"
+  ]
+ },
+ "After counselling": {
+  "hi": "काउंसलिंग के बाद",
+  "files": [
+   "ectpr-ed-view.tsx",
+   "ectpr-plan-screen.tsx"
   ]
  },
  "After death": {
@@ -1342,13 +1361,6 @@
   "hi": "इस योजना में भी",
   "files": [
    "ectpr-labels.ts"
-  ]
- },
- "Alternate": {
-  "hi": "वैकल्पिक",
-  "files": [
-   "ectpr-ed-view.tsx",
-   "ectpr-pdf.ts"
   ]
  },
  "Always continues": {
@@ -1574,6 +1586,12 @@
    "family-open-questions.tsx"
   ]
  },
+ "Assess this one decision, at this time. Do not rely on old notes.": {
+  "hi": "इसी एक फ़ैसले के लिए, अभी जाँचें। पुराने नोट पर भरोसा न करें।",
+  "files": [
+   "ectpr-labels.ts"
+  ]
+ },
  "Assign follow-up": {
   "hi": "आगे का काम सौंपें",
   "files": [
@@ -1739,6 +1757,13 @@
  "Before any treatment choice, the patient or family must understand the illness. A choice made without this is not informed.": {
   "hi": "किसी भी इलाज के फ़ैसले से पहले मरीज़ या परिवार को बीमारी समझनी चाहिए। इसके बिना लिया गया फ़ैसला सोच-समझकर नहीं होता।",
   "files": [
+   "ectpr-plan-screen.tsx"
+  ]
+ },
+ "Before counselling": {
+  "hi": "काउंसलिंग से पहले",
+  "files": [
+   "ectpr-ed-view.tsx",
    "ectpr-plan-screen.tsx"
   ]
  },
@@ -2453,6 +2478,12 @@
   "hi": "दोबारा कब जाँचें",
   "files": [
    "ectpr-plan-screen.tsx"
+  ]
+ },
+ "Check all four: can they understand the information, retain it long enough, weigh the choices and their results, and communicate a choice in any way?": {
+  "hi": "चारों जाँचें: क्या वे जानकारी समझ सकते हैं, उसे काफ़ी देर याद रख सकते हैं, विकल्पों और नतीजों को तौल सकते हैं, और किसी भी तरह अपना फ़ैसला बता सकते हैं?",
+  "files": [
+   "ectpr-labels.ts"
   ]
  },
  "Check and print": {
@@ -3250,6 +3281,14 @@
    "family-cost-help.tsx"
   ]
  },
+ "Could not be reached": {
+  "hi": "संपर्क नहीं हो सका",
+  "files": [
+   "ectpr-ed-view.tsx",
+   "ectpr-pdf.ts",
+   "ectpr-plan-screen.tsx"
+  ]
+ },
  "Could not read the file text. You can still save the original and add text below.": {
   "hi": "फ़ाइल का टेक्स्ट नहीं पढ़ सके। मूल फ़ाइल सेव करके नीचे टेक्स्ट जोड़ सकते हैं।",
   "files": [
@@ -3453,6 +3492,20 @@
    "ectpr-plan-screen.tsx"
   ]
  },
+ "Date the Primary Board was formed": {
+  "hi": "प्राथमिक बोर्ड बनने की तारीख़",
+  "files": [
+   "ectpr-labels.ts",
+   "ectpr-plan-screen.tsx"
+  ]
+ },
+ "Date the Secondary Board was formed": {
+  "hi": "द्वितीय बोर्ड बनने की तारीख़",
+  "files": [
+   "ectpr-labels.ts",
+   "ectpr-plan-screen.tsx"
+  ]
+ },
  "Date treatment happened": {
   "hi": "इलाज होने की तारीख",
   "files": [
@@ -3515,6 +3568,13 @@
  "Decided by {0} ({1})": {
   "hi": "फ़ैसला: {0} ({1})",
   "files": [
+   "ectpr-plan-screen.tsx"
+  ]
+ },
+ "Decision of the Boards": {
+  "hi": "बोर्ड का फ़ैसला",
+  "files": [
+   "ectpr-labels.ts",
    "ectpr-plan-screen.tsx"
   ]
  },
@@ -3906,6 +3966,12 @@
   "files": [
    "amd-screen.tsx",
    "ectpr-plan-screen.tsx"
+  ]
+ },
+ "Draft annexure. A clinician and the legal team must approve this wording before the pilot.": {
+  "hi": "मसौदा अनुलग्नक। पायलट से पहले डॉक्टर और क़ानूनी टीम को यह भाषा मंज़ूर करनी होगी।",
+  "files": [
+   "ectpr-labels.ts"
   ]
  },
  "Draft saved. It is not in use until the consultant signs.": {
@@ -4374,8 +4440,7 @@
   "hi": "परिवार",
   "files": [
    "care-sign-in.tsx",
-   "doctor-care-home.tsx",
-   "ectpr-plan-screen.tsx"
+   "doctor-care-home.tsx"
   ]
  },
  "Family acknowledgement recorded; patient review is still required.": {
@@ -4386,6 +4451,12 @@
  },
  "Family agreement (a note, not a legal basis)": {
   "hi": "परिवार की सहमति (एक नोट, क़ानूनी आधार नहीं)",
+  "files": [
+   "ectpr-plan-screen.tsx"
+  ]
+ },
+ "Family and friends": {
+  "hi": "परिवार और दोस्त",
   "files": [
    "ectpr-plan-screen.tsx"
   ]
@@ -4434,6 +4505,30 @@
    "family-support-places.tsx"
   ]
  },
+ "Family or friends present for this discussion, with their relationship (one per line)": {
+  "hi": "इस बातचीत में मौजूद परिवार या दोस्त, रिश्ते के साथ (हर लाइन में एक)",
+  "files": [
+   "ectpr-plan-screen.tsx"
+  ]
+ },
+ "Family or friends we tried to contact but could not reach (one per line)": {
+  "hi": "जिन परिवारजनों या दोस्तों से संपर्क की कोशिश हुई पर बात नहीं हो सकी (हर लाइन में एक)",
+  "files": [
+   "ectpr-plan-screen.tsx"
+  ]
+ },
+ "Family or friends who must be informed before any major decision: name, relation, phone (one per line)": {
+  "hi": "जिन परिवारजनों या दोस्तों को बड़े फ़ैसले से पहले बताना ज़रूरी है: नाम, रिश्ता, फ़ोन (हर लाइन में एक)",
+  "files": [
+   "ectpr-plan-screen.tsx"
+  ]
+ },
+ "Family refused consent (patient has lost decision-making capacity)": {
+  "hi": "परिवार ने सहमति नहीं दी (मरीज़ निर्णय क्षमता खो चुके हैं)",
+  "files": [
+   "ectpr-labels.ts"
+  ]
+ },
  "Family signature · typed name": {
   "hi": "परिवार के हस्ताक्षर · टाइप किया हुआ नाम",
   "files": [
@@ -4457,12 +4552,6 @@
   "hi": "जिन्हें बताना है",
   "files": [
    "ectpr-ed-view.tsx"
-  ]
- },
- "Family to keep informed (one per line)": {
-  "hi": "जिन्हें ख़बर देनी है (हर लाइन में एक)",
-  "files": [
-   "ectpr-plan-screen.tsx"
   ]
  },
  "Family-saved replies": {
@@ -4533,6 +4622,12 @@
    "ectpr-pilot-log.tsx"
   ]
  },
+ "Fill this only if withdrawing or withholding treatment has been decided (Common Cause v Union of India, 2018 and 2023). It records the process. This plan alone never authorises it.": {
+  "hi": "इसे तभी भरें जब इलाज रोकने या शुरू न करने का फ़ैसला हुआ हो (Common Cause v Union of India, 2018 और 2023)। यह प्रक्रिया दर्ज करता है। सिर्फ़ यह योजना इसकी अनुमति कभी नहीं देती।",
+  "files": [
+   "ectpr-plan-screen.tsx"
+  ]
+ },
  "Filter arrangements": {
   "hi": "इंतज़ाम के हिसाब से देखें",
   "files": [
@@ -4560,6 +4655,13 @@
  "FIN-concern": {
   "hi": "पूछें कि क्या इस फ़ैसले में पैसे की चिंता है। पूरा करने से पहले सोशल वर्क या सरकारी योजना की जाँच की पेशकश करें।",
   "files": [
+   "ectpr-plan-screen.tsx"
+  ]
+ },
+ "Final decision": {
+  "hi": "अंतिम फ़ैसला",
+  "files": [
+   "ectpr-labels.ts",
    "ectpr-plan-screen.tsx"
   ]
  },
@@ -4926,7 +5028,8 @@
   "hi": "लिंग",
   "files": [
    "amd-screen.tsx",
-   "care-profile.tsx"
+   "care-profile.tsx",
+   "ectpr-plan-screen.tsx"
   ]
  },
  "Gender or pronouns to respect": {
@@ -5096,10 +5199,22 @@
    "conversation-preparation.tsx"
   ]
  },
+ "Help them first: use their language, plain words and any aids, at the time of day they are most alert.": {
+  "hi": "पहले मदद करें: उनकी भाषा, सरल शब्द और कोई भी सहायक साधन इस्तेमाल करें, उस समय जब वे सबसे ज़्यादा सतर्क हों।",
+  "files": [
+   "ectpr-labels.ts"
+  ]
+ },
  "Helping": {
   "hi": "मदद करने वाले",
   "files": [
    "family-home-help-state.ts"
+  ]
+ },
+ "Helps a doctor called to the home see the care schedule and decide whether home care can continue.": {
+  "hi": "घर बुलाए गए डॉक्टर को देखभाल का क्रम देखने और यह तय करने में मदद करता है कि घर पर देखभाल जारी रह सकती है या नहीं।",
+  "files": [
+   "ectpr-plan-screen.tsx"
   ]
  },
  "Hide text": {
@@ -5186,8 +5301,17 @@
   "hi": "घर पर देखभाल",
   "files": [
    "care-task-inbox.tsx",
+   "ectpr-ed-view.tsx",
+   "ectpr-pdf.ts",
+   "ectpr-plan-screen.tsx",
    "family-care-workspace.tsx",
    "family-cost-help.tsx"
+  ]
+ },
+ "Home care (if relevant)": {
+  "hi": "घर पर देखभाल (अगर लागू हो)",
+  "files": [
+   "ectpr-plan-screen.tsx"
   ]
  },
  "Hospital": {
@@ -5267,6 +5391,13 @@
    "ectpr-plan-screen.tsx"
   ]
  },
+ "How often the patient is assessed": {
+  "hi": "मरीज़ की जाँच कितनी बार होती है",
+  "files": [
+   "ectpr-labels.ts",
+   "ectpr-plan-screen.tsx"
+  ]
+ },
  "How staff should refer to them": {
   "hi": "स्टाफ़ उन्हें किस तरह संबोधित करे",
   "files": [
@@ -5283,6 +5414,12 @@
   "hi": "वे आपके क्या लगते हैं",
   "files": [
    "amd-screen.tsx"
+  ]
+ },
+ "How to assess decision-making capacity": {
+  "hi": "निर्णय लेने की क्षमता कैसे जाँचें",
+  "files": [
+   "ectpr-labels.ts"
   ]
  },
  "How you’ve been": {
@@ -5485,6 +5622,12 @@
    "ectpr-plan-screen.tsx"
   ]
  },
+ "If any one is missing, they lack capacity for this decision only. Record the basis and who assessed it, and still involve them as far as possible.": {
+  "hi": "अगर एक भी न हो, तो सिर्फ़ इस फ़ैसले की क्षमता नहीं है। आधार और जाँचने वाले का नाम लिखें, और फिर भी उन्हें जितना हो सके शामिल करें।",
+  "files": [
+   "ectpr-labels.ts"
+  ]
+ },
  "If care differed from the plan, why?": {
   "hi": "अगर इलाज योजना से अलग हुआ, तो क्यों?",
   "files": [
@@ -5502,6 +5645,12 @@
   "files": [
    "ectpr-pdf.ts",
    "ectpr.tsx"
+  ]
+ },
+ "If it may be temporary (delirium, medicines, pain, infection), treat the cause and check again before acting.": {
+  "hi": "अगर यह अस्थायी हो सकती है (डेलिरियम, दवाएँ, दर्द, संक्रमण), तो कारण का इलाज करें और कुछ करने से पहले दोबारा जाँचें।",
+  "files": [
+   "ectpr-labels.ts"
   ]
  },
  "If the family disagrees: hold one family meeting, go back to what the patient would want, and ask the ethics committee if still unresolved. Current treatment continues meanwhile.": {
@@ -5623,6 +5772,12 @@
   "hi": "शामिल किया",
   "files": [
    "family-handover-pack.tsx"
+  ]
+ },
+ "Includes spouses, live-in partners, same-sex and queer partners, and friends the patient chooses.": {
+  "hi": "इसमें पति-पत्नी, लिव-इन साथी, समलैंगिक और क्वीयर साथी, और मरीज़ के चुने हुए दोस्त शामिल हैं।",
+  "files": [
+   "ectpr-plan-screen.tsx"
   ]
  },
  "Income document": {
@@ -6205,16 +6360,16 @@
    "amd-screen.tsx"
   ]
  },
- "Main decision-maker": {
-  "hi": "मुख्य फ़ैसला लेने वाले",
-  "files": [
-   "ectpr-plan-screen.tsx"
-  ]
- },
  "Main navigation": {
   "hi": "मुख्य मेन्यू",
   "files": [
    "simple-care-shell.tsx"
+  ]
+ },
+ "Main treating doctor or specialist (oncologist or any other)": {
+  "hi": "मुख्य इलाज करने वाले डॉक्टर या विशेषज्ञ (कैंसर या कोई और)",
+  "files": [
+   "ectpr-plan-screen.tsx"
   ]
  },
  "Make a new living will": {
@@ -6494,6 +6649,20 @@
   "hi": "{0} पर लेने वाली दवाएँ",
   "files": [
    "care-today.tsx"
+  ]
+ },
+ "Members of the Primary Board": {
+  "hi": "प्राथमिक बोर्ड के सदस्य",
+  "files": [
+   "ectpr-labels.ts",
+   "ectpr-plan-screen.tsx"
+  ]
+ },
+ "Members of the Secondary Board": {
+  "hi": "द्वितीय बोर्ड के सदस्य",
+  "files": [
+   "ectpr-labels.ts",
+   "ectpr-plan-screen.tsx"
   ]
  },
  "Microphone access wasn’t allowed. You can still write below.": {
@@ -6815,6 +6984,12 @@
    "amd-screen.tsx"
   ]
  },
+ "Needed when the patient signs by thumb impression or has limited literacy, for both home-based and hospital-based evaluation. Preferably people who are not decision-makers.": {
+  "hi": "जब मरीज़ अँगूठे से साइन करें या ठीक से पढ़ न सकें तब ज़रूरी, घर और अस्पताल दोनों जगह की जाँच में। बेहतर है कि ये फ़ैसला लेने वाले न हों।",
+  "files": [
+   "ectpr-plan-screen.tsx"
+  ]
+ },
  "Needs review": {
   "hi": "जाँच बाकी है",
   "files": [
@@ -7052,6 +7227,12 @@
   "hi": "इस फ़ोल्डर में अभी कोई फ़ाइल नहीं है।",
   "files": [
    "family-report-comparison.tsx"
+  ]
+ },
+ "No final decision recorded": {
+  "hi": "कोई अंतिम फ़ैसला दर्ज नहीं",
+  "files": [
+   "ectpr-labels.ts"
   ]
  },
  "No groups match these choices yet.": {
@@ -7342,6 +7523,13 @@
   "hi": "कोई आप पर दबाव नहीं डाल सकता। आप इसे कभी भी, लिखित रूप में, बदल या रद्द कर सकते हैं।",
   "files": [
    "amd-screen.tsx"
+  ]
+ },
+ "Non-governmental organisation caring for the patient: representative and contact": {
+  "hi": "मरीज़ की देखभाल करने वाली ग़ैर-सरकारी संस्था: प्रतिनिधि और संपर्क",
+  "files": [
+   "ectpr-labels.ts",
+   "ectpr-plan-screen.tsx"
   ]
  },
  "none": {
@@ -7702,12 +7890,6 @@
   "hi": "प्रिंट होने के बाद यह संस्करण ऐप में बदला नहीं जा सकता। कुछ भी बदलने के लिए नया संस्करण शुरू करें और फिर प्रिंट करें।",
   "files": [
    "amd-screen.tsx"
-  ]
- },
- "Oncologist or treating doctor": {
-  "hi": "कैंसर डॉक्टर या इलाज करने वाले डॉक्टर",
-  "files": [
-   "ectpr-plan-screen.tsx"
   ]
  },
  "One clear photo per medicine · up to 10": {
@@ -8483,6 +8665,13 @@
    "care-circle.tsx"
   ]
  },
+ "Person coordinating between the family and the hospital or centre (name, phone, centre)": {
+  "hi": "परिवार और अस्पताल या केंद्र के बीच तालमेल रखने वाले (नाम, फ़ोन, केंद्र)",
+  "files": [
+   "ectpr-labels.ts",
+   "ectpr-plan-screen.tsx"
+  ]
+ },
  "Person deciding for the patient": {
   "hi": "मरीज़ की ओर से फ़ैसला लेने वाले",
   "files": [
@@ -8699,12 +8888,6 @@
    "care-profile.tsx"
   ]
  },
- "Preferably people who are not decision-makers.": {
-  "hi": "बेहतर है कि ये फ़ैसला लेने वाले न हों।",
-  "files": [
-   "ectpr-plan-screen.tsx"
-  ]
- },
  "Preference not known": {
   "hi": "पसंद पता नहीं",
   "files": [
@@ -8803,6 +8986,14 @@
    "care-medicines.tsx"
   ]
  },
+ "Present for the discussion": {
+  "hi": "बातचीत में मौजूद",
+  "files": [
+   "ectpr-ed-view.tsx",
+   "ectpr-pdf.ts",
+   "ectpr-plan-screen.tsx"
+  ]
+ },
  "PREVIEW — NOT ISSUED": {
   "hi": "पूर्वावलोकन — जारी नहीं",
   "files": [
@@ -8831,6 +9022,18 @@
   "hi": "पिछला हफ़्ता",
   "files": [
    "care-calendar.tsx"
+  ]
+ },
+ "Primary decision-maker": {
+  "hi": "मुख्य फ़ैसला लेने वाले",
+  "files": [
+   "ectpr-plan-screen.tsx"
+  ]
+ },
+ "Primary or Secondary Board refused permission": {
+  "hi": "प्राथमिक या द्वितीय बोर्ड ने अनुमति नहीं दी",
+  "files": [
+   "ectpr-labels.ts"
   ]
  },
  "Print": {
@@ -8917,6 +9120,13 @@
   "hi": "प्रगति",
   "files": [
    "amd-screen.tsx"
+  ]
+ },
+ "Protocol for withdrawal or withholding": {
+  "hi": "इलाज रोकने या शुरू न करने का तरीका",
+  "files": [
+   "ectpr-labels.ts",
+   "ectpr-plan-screen.tsx"
   ]
  },
  "QR code to open Care Note in this app": {
@@ -10389,16 +10599,23 @@
    "family-support-places.tsx"
   ]
  },
- "Second (backup) decision-maker": {
-  "hi": "दूसरे (बैकअप) फ़ैसला लेने वाले",
-  "files": [
-   "ectpr-plan-screen.tsx"
-  ]
- },
  "Second report": {
   "hi": "दूसरी रिपोर्ट",
   "files": [
    "family-report-comparison.tsx"
+  ]
+ },
+ "Secondary": {
+  "hi": "द्वितीय",
+  "files": [
+   "ectpr-ed-view.tsx",
+   "ectpr-pdf.ts"
+  ]
+ },
+ "Secondary decision-maker": {
+  "hi": "द्वितीय फ़ैसला लेने वाले",
+  "files": [
+   "ectpr-plan-screen.tsx"
   ]
  },
  "See all medicines": {
@@ -10929,6 +11146,12 @@
    "ectpr-plan-screen.tsx"
   ]
  },
+ "Start by assuming the patient has capacity. Age, diagnosis or disagreeing with the doctor does not remove it.": {
+  "hi": "पहले मानें कि मरीज़ में क्षमता है। उम्र, बीमारी या डॉक्टर से असहमति से यह ख़त्म नहीं होती।",
+  "files": [
+   "ectpr-labels.ts"
+  ]
+ },
  "Start conversation": {
   "hi": "बातचीत शुरू करें",
   "files": [
@@ -11023,6 +11246,12 @@
   "files": [
    "doctor-conversation.tsx",
    "family-voice-journal.tsx"
+  ]
+ },
+ "Stopping or not starting treatment": {
+  "hi": "इलाज रोकना या शुरू न करना",
+  "files": [
+   "ectpr-plan-screen.tsx"
   ]
  },
  "Summary": {
@@ -11460,6 +11689,13 @@
   "hi": "नोट वापस जोड़ दिया।",
   "files": [
    "family-care-story.tsx"
+  ]
+ },
+ "The organisation was consulted about this plan": {
+  "hi": "इस योजना पर संस्था से सलाह ली गई",
+  "files": [
+   "ectpr-labels.ts",
+   "ectpr-plan-screen.tsx"
   ]
  },
  "The original file is not available in this view.": {
@@ -12231,6 +12467,12 @@
   "files": [
    "ectpr-pdf.ts",
    "ectpr-plan-screen.tsx"
+  ]
+ },
+ "Treating doctor revoked their decision to support it": {
+  "hi": "इलाज करने वाले डॉक्टर ने समर्थन का अपना फ़ैसला वापस लिया",
+  "files": [
+   "ectpr-labels.ts"
   ]
  },
  "Treating team": {
@@ -13211,6 +13453,13 @@
    "family-open-questions.tsx"
   ]
  },
+ "When was this recorded?": {
+  "hi": "यह कब दर्ज किया गया?",
+  "files": [
+   "ectpr-ed-view.tsx",
+   "ectpr-plan-screen.tsx"
+  ]
+ },
  "When?": {
   "hi": "कब?",
   "files": [
@@ -13228,6 +13477,12 @@
   "hi": "कहाँ",
   "files": [
    "care-community.tsx"
+  ]
+ },
+ "Where and when": {
+  "hi": "कहाँ और कब",
+  "files": [
+   "ectpr-plan-screen.tsx"
   ]
  },
  "Where is the copy? (optional)": {
@@ -13508,6 +13763,26 @@
   "hi": "कार्ड वापस लें",
   "files": [
    "ectpr.tsx"
+  ]
+ },
+ "Withdrawal or withholding (medical boards)": {
+  "hi": "इलाज रोकना या शुरू न करना (मेडिकल बोर्ड)",
+  "files": [
+   "ectpr-ed-view.tsx",
+   "ectpr-pdf.ts",
+   "ectpr-plan-screen.tsx"
+  ]
+ },
+ "Withdrawal or withholding to be performed": {
+  "hi": "इलाज रोका जाएगा या शुरू नहीं किया जाएगा",
+  "files": [
+   "ectpr-labels.ts"
+  ]
+ },
+ "Withdrawing or withholding treatment has been decided for this patient": {
+  "hi": "इस मरीज़ के लिए इलाज रोकने या शुरू न करने का फ़ैसला हुआ है",
+  "files": [
+   "ectpr-plan-screen.tsx"
   ]
  },
  "Withdrawn on this device. The server will be told when you are online.": {
