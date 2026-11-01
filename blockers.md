@@ -6,6 +6,28 @@ Agents cannot do these: server migrations, deployments, provider accounts and ke
 
 Collected on 27 Oct from every agent lane across Sahara, ITI, WDCW and AI-FIR. The web survey and Android feature work have separate handoffs; these are the remaining owner/team actions. Tick an item only after the external step is verified.
 
+### Sahara: legal review and transcript check (added 1 Nov)
+
+**Awaiz**
+- [ ] Build Android and deploy the website: steps are at the top of `HANDOFF.md`. Neither was done for the 1 Nov work.
+- [ ] Test goals-of-care recording on a phone. Sujay's mock conversation week needs this, a doctor and an Android phone; none are recorded yet.
+
+**Basith, now**
+- [ ] Change the admin password `0` (`prototype/app/api/admin-survey/route.ts:15`). The survey message promises details "are not shown publicly", and that page shows names and registration details.
+- [ ] Confirm the deadline. The organisers' Phase 2 PDF says the Build Sprint ends 7 Nov 2026; ask them for the portal.
+
+**Sujay, Sharada, SVK, Rituparna (legal review questions the code cannot answer)**
+- [ ] C1: is this form for non-cancer patients too? The app now accepts any specialist, pending your answer.
+- [ ] C7: write the capacity annexure. The guidance in the app is our draft and is marked as one.
+- [ ] C8: should "what the patient knows" be checked before or after counselling? The app records which, but someone must decide.
+- [ ] C3: approve the wording on live-in and queer partners.
+- [ ] Approve the withdrawal or withholding step, including rule W1, and confirm whether Rituparna's review is the Vidhi review Sujay mentioned on 27 Oct.
+- [ ] Approve the topic order on the goals-of-care checklist and the phrase lists in all five languages.
+- [ ] Decide: Sujay asked on 23 Oct for hospital address and map to be compulsory, but the survey has them optional with no record of agreement.
+- [ ] Decide: Telugu and Kannada speech-to-text is not usable with the free models tested, so these two languages use typing for now. Is that acceptable for the pilot?
+
+**Missing:** no recording or transcript of the 28 Oct team meeting is in the repo. Add it if it has requirements not captured here.
+
 ### Sahara: API keys, Awaiz to do (added 30 Oct)
 **Owner: Awaiz.** Add these in Vercel → project `continuity-loop-healthathon` → Settings → Environment Variables (Production), then redeploy with `vercel deploy --prod` from `prototype/`. Sign-up links, free limits and optional overrides are in [docs/FREE_MODELS.md](docs/FREE_MODELS.md). The care plan, living will, emergency page and QR do not need any of them.
 - [ ] `GEMINI_API_KEY`: AI answers, note drafting, speech-to-text and translation. Free tier is for fake patients only; see the billing note below.
