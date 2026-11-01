@@ -6,6 +6,28 @@ Agents cannot do these: server migrations, deployments, provider accounts and ke
 
 Collected on 27 Oct from every agent lane across Sahara, ITI, WDCW and AI-FIR. The web survey and Android feature work have separate handoffs; these are the remaining owner/team actions. Tick an item only after the external step is verified.
 
+### Sahara: status on 2 Nov 2026 (Awaiz)
+New since 1 Nov, all on GitHub main (`b3435d7`): patient profile in the shared record, doctor Schedule redesign, compact cards, point graphs, read aloud in the chosen language, about 100 more translations, force-dark off. Details in HANDOFF.md "2 Nov 2026". A development APK was shared for a real-phone test.
+
+Done:
+- [x] Basith's 1 Nov Android code (legal comments, goals-of-care transcription) built: compiles, 760 unit tests pass.
+- [x] "Ask your documents" with Gemini (`gemini-3.1-flash-lite`) works; the function retries once when Google is busy.
+
+Still open for Awaiz:
+- [ ] Check on the Xiaomi phone that text is no longer faded (force-dark turned off in `res/values-v29/styles.xml`).
+- [ ] Read aloud in Telugu, Kannada, Urdu, Tamil or Hindi: install that language's voice in the phone's text-to-speech settings, then test one note.
+- [ ] Optional: add `SAHARA_AI_FALLBACK_MODEL` (e.g. `gemini-3.5-flash`) in Supabase secrets, because the free model sometimes says "high demand".
+- [ ] Give the doctor-verifier and centre-reviewer roles (needs a team member's email). Until then no real doctor can join a patient's care.
+- [ ] Real-phone test checklist (CLAUDE_TRANSCRIPT.md §3) and the narrated walkthrough video.
+- [ ] Before real patient data: Google billing on, and clinician back-translation of the Telugu, Urdu and Kannada dictionaries.
+
+Needs Basith:
+- [ ] Website deploy for the 1 Nov web work (`vercel deploy --prod` from `prototype/`, see HANDOFF.md).
+- [ ] Play App Signing SHA-256 into `assetlinks.json`; next Play upload (versionCode 9 or higher).
+
+Small code follow-ups:
+- [ ] "Plan a visit" from the doctor Schedule should open on the day selected in the strip.
+
 ### Sahara: status on 1 Nov 2026 (Awaiz, checked on the Saanthvana project and the emulator)
 Done and checked:
 - [x] All Supabase migrations are applied on Saanthvana (`kjnhtakqzboayqorrlue`): 20 in total, including emergency links, feedback, account lane, "Ask your documents", signature receipts and centre suggestions. `android/supabase/tests/emergency_links.sql` passed.
@@ -27,7 +49,7 @@ Needs Basith:
 ### Sahara: legal review and transcript check (added 1 Nov)
 
 **Awaiz**
-- [ ] Build Android and deploy the website: steps are at the top of `HANDOFF.md`. Neither was done for the 1 Nov work.
+- [ ] Build Android and deploy the website: steps are at the top of `HANDOFF.md`. Neither was done for the 1 Nov work. **2 Nov: Android built (compiles, 760 unit tests pass); the website deploy is still to do.**
 - [ ] Test goals-of-care recording on a phone. Sujay's mock conversation week needs this, a doctor and an Android phone; none are recorded yet.
 
 **Basith, now**

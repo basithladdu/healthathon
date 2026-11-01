@@ -2,6 +2,38 @@
 
 > **30 Oct 2026:** SVK spec build (emergency care plan, living will, QR card, languages): see [docs/SAHARA_SVK_BUILD_HANDOFF.md](docs/SAHARA_SVK_BUILD_HANDOFF.md).
 
+## 2 Nov 2026: what changed since 1 Nov (Awaiz, with Claude Code)
+
+On GitHub main: `c7cb9e6` (merge of Basith's legal comments and goals-of-care transcription), `38195cc` (smoother motion), `b3435d7` (this batch). Each build: app compiles, 760 unit tests pass, phone (androidTest) tests compile but were not run. Checked on the emulator unless noted. A development APK was shared with Awaiz for a real-phone test.
+
+**Basith's 1 Nov Android code** (legal comments, goals-of-care transcription) is now built and passes all unit tests. The website deploy he asked for was not done.
+
+**Patient side**
+- **Account tab** (was "More"): a profile card with age, sex, weight, height, blood group, main illness and city, plus a grouped edit form. The profile is stored in the shared care record (`sahara:profile:v1`, a journal entry hidden from Journal, Today and timeline lists), so family and doctors see it. Allergies are optional and shown only on the doctor's card.
+- **Today:** a greeting; a slim "How was today?" bar that opens the check-in, which now holds the distress question and a "Note a symptom" link; the at-a-glance card with a medicines ring and a details drop-down; Quick actions (Calendar, SOS, Family, Labs) with new art. **SOS** opens one sheet with tap-to-call emergency numbers (112, 108, 102, 14567), the emergency QR card and the emergency plan. "Invite family" is a labelled button at the top; "Add another person" is in the name menu.
+- **Care tab:** a compact bento grid; each module opens its own screen. Medicine cards have slim one-line capsules (Missed today, Side effect?, History) and Edit/Remove in a ⋮ menu; compact medicine history; side-effect notes left the Journal. "Scan a prescription" is a card.
+- **Docs:** one "+ Add document" button opens Scan with camera / Upload a file; Care timeline and Ask your documents are tiles; report cards are compact with capsules and a ⋮ menu. **Care timeline:** At a glance tiles, compact rows with "View ›", months that fold, 5 events per month then "Show all".
+- **Charts:** lab, symptom and distress trends are connected point graphs (values on each point, dates, printed range band, treatment-day markers, change since first result). Fixed the "1 Jan 1970" date for results without a date.
+- **Calendar:** Month/Week view, any month reachable, colour-coded dots and legend. **Distress check:** a compact 0–10 picker and step-by-step sections. **Symptom list:** "Most severe / Newest" sort. **Side-effect form:** numbered steps.
+- **Read aloud** translates the text on the phone (ML Kit, en→hi/te/kn/ta/ur/mr/bn/gu; packs about 30 MB download on first use) and then speaks it in the chosen voice. Lines whose numbers do not survive translation are read in the original words. Malayalam reads the original (no ML Kit model).
+- **Translations:** about 100 more patient-facing messages, statuses and notifications go through the dictionary (Telugu, Urdu, Kannada lines added; machine-drafted, clinician back-translation still needed). Checked on the emulator in Telugu.
+- **Faded text on some phones:** `res/values-v29/styles.xml` sets `android:forceDarkAllowed=false`, so MIUI-style dark modes stop repainting the app. Not yet confirmed on Awaiz's Xiaomi.
+- **Motion:** the welcome panel rises as one animation; screen changes use an emphasized curve with no per-frame size work.
+
+**Doctor side**
+- "<name>'s care" shows the patient's read-only profile card at the top.
+- **Schedule:** header with "+ Add", month bar, a 7-day strip with dots, visit cards per day; "+ Add" opens a searchable patient picker, then the usual "Plan a visit" sheet. Same screen for the walkthrough and connected doctors (`DoctorScheduleUi.kt`).
+- Walkthrough Patients list has a search bar. Walkthrough Account shows a sample doctor profile (verified badge, speciality, fictional hospital) clearly labelled as a sample.
+
+**AI (server):** `sahara-care-assist` is version 7: low thinking for Gemini, one retry when Google is busy, optional `SAHARA_AI_FALLBACK_MODEL`, safe error logging. `SAHARA_AI_MODEL` = `gemini-3.1-flash-lite`. "Ask your documents" passed 4 test questions (one needed a retry on Google's free tier).
+
+**Still open**
+- "Plan a visit" from the Schedule opens on tomorrow, not the day picked in the strip (the sheet has no start-date parameter yet).
+- Not seen on screen: the doctor walkthrough's profile card and the distress point graph (both built and tested).
+- Real-phone checks: faded text on Xiaomi; read aloud needs each language's voice installed on the phone.
+- People's own typed text (notes, medicine names) stays in the language it was written in; read aloud translates it.
+- See blockers.md "status on 2 Nov" for people-only items.
+
 ## 1 Nov 2026: what changed since 30 Oct (Awaiz, with Claude Code)
 
 Branch `awaiz/latest-main` (main `30736d9` plus local commits). Built, all unit tests pass, and each change was checked on the emulator. Not on a real phone yet. The phone (androidTest) tests compile but were not run.
@@ -32,6 +64,8 @@ Branch `awaiz/latest-main` (main `30736d9` plus local commits). Built, all unit 
 - Not done yet: speaker separation in recordings (Plan A on-device or Plan B tap-to-mark, waiting for a decision).
 
 ## 1 Nov: Awaiz, build this (legal comments and goals-of-care transcription)
+
+**2 Nov (Awaiz):** built on Awaiz's machine after merging: the app compiles and all unit tests pass (760). The website deploy below is still to do. The on-phone tests (model download, 60-minute recording) were not run.
 
 Basith asked that nothing be built on his machine, so **none of this Android code has been compiled or run**. Expect some compile fixes, most likely in `CareGocUi.kt` and at `::rankLabel` / `::signerLabel` in `CarePlanUi.kt`. Disk F: on his machine has about 1 GB free.
 
