@@ -6,7 +6,26 @@ Agents cannot do these: server migrations, deployments, provider accounts and ke
 
 Collected on 27 Oct from every agent lane across Sahara, ITI, WDCW and AI-FIR. The web survey and Android feature work have separate handoffs; these are the remaining owner/team actions. Tick an item only after the external step is verified.
 
+### Sahara: status on 1 Nov 2026 (Awaiz, checked on the Saanthvana project and the emulator)
+Done and checked:
+- [x] All Supabase migrations are applied on Saanthvana (`kjnhtakqzboayqorrlue`): 20 in total, including emergency links, feedback, account lane, "Ask your documents", signature receipts and centre suggestions. `android/supabase/tests/emergency_links.sql` passed.
+- [x] AI: the Android app now calls the Supabase function `sahara-care-assist` directly (not the Vercel route). Secrets are set in Supabase → Edge Functions → Secrets (`SAHARA_AI_BASE_URL` = Gemini's OpenAI-compatible URL, `SAHARA_AI_API_KEY`, `SAHARA_AI_MODEL` = `gemini-3.1-flash-lite`, `SAHARA_AI_PROVIDER_NAME` = Google Gemini). Function deployed (version 7): low thinking for Gemini, one retry when Google is busy, and an optional backup model.
+- [x] "Ask your documents" answered on the emulator with a cited line (practice discharge PDF, page 1 line 9). Google's free tier sometimes says "high demand" (503); the app then shows the lines found on the phone.
+- [x] Sign-up is on in Saanthvana ("Confirm email" was turned off, so new accounts are confirmed at once); Add family by WhatsApp link with auto-join works.
+
+Still open for Awaiz:
+- [ ] Optional: add `SAHARA_AI_FALLBACK_MODEL` (e.g. `gemini-3.5-flash`) in Supabase secrets, so a busy model falls back to a second one.
+- [ ] Give the doctor-verifier and centre-reviewer roles: needs the team member's email (SQL below under "Doctor approval" and in HANDOFF.md). No staff role exists yet.
+- [ ] Test on a real phone (the checklist in CLAUDE_TRANSCRIPT.md §3) and record the narrated walkthrough.
+- [ ] Before real patient data: turn on billing for the Google project (free tier may be used to improve Google's products).
+
+Needs Basith:
+- [ ] Play App Signing SHA-256 into `prototype/public/.well-known/assetlinks.json`, then redeploy, so invite links open the app.
+- [ ] Next Play upload (versionCode 9 or higher) and the Data safety form.
+- [ ] Note: the Vercel AI route `/api/sahara-assist` is no longer used by the Android app.
+
 ### Sahara: API keys, Awaiz to do (added 30 Oct)
+**1 Nov:** the Android app no longer uses these. It calls the Supabase function, whose key is in Supabase secrets (see "status on 1 Nov" above). These Vercel keys only matter for the website's own AI pages.
 **Owner: Awaiz.** Add these in Vercel → project `continuity-loop-healthathon` → Settings → Environment Variables (Production), then redeploy with `vercel deploy --prod` from `prototype/`. Sign-up links, free limits and optional overrides are in [docs/FREE_MODELS.md](docs/FREE_MODELS.md). The care plan, living will, emergency page and QR do not need any of them.
 - [ ] `GEMINI_API_KEY`: AI answers, note drafting, speech-to-text and translation. Free tier is for fake patients only; see the billing note below.
 - [ ] `GROQ_API_KEY`: backup when Gemini fails or hits its limit, and backup speech-to-text.
@@ -27,12 +46,12 @@ Details in [docs/SAHARA_SVK_BUILD_HANDOFF.md](docs/SAHARA_SVK_BUILD_HANDOFF.md).
 
 ### Sahara: do these now (29 Oct)
 **AI with Gemini (one key, on Vercel).** The Android app now calls `https://sahara.wedevit.in/api/sahara-assist` for note drafting, speech-to-text, translation and "Ask your documents". It replaces the Supabase function, so the Supabase function deploy below is no longer needed.
-- [ ] Google AI Studio (aistudio.google.com) → Get API key → create a key.
+- [x] Google AI Studio (aistudio.google.com) → Get API key → create a key. **31 Oct: done; the key is in Supabase secrets instead of Vercel.**
 - [ ] **Before real patient data:** turn on billing for that Google project (paid tier). On the free tier Google may use what is sent to improve its products and humans may review it; the paid tier does not. Also check the data region. For the demo with fake patients the free tier is fine.
 - [ ] Vercel → project `continuity-loop-healthathon` → Settings → Environment Variables → add `GEMINI_API_KEY` (Production) = the key. Then redeploy: run `vercel deploy --prod` in `prototype/`. Nothing else is needed: model defaults to `gemini-3.5-flash-lite` (override with `GEMINI_MODEL`).
-- [ ] Optional but better: apply migration `android/supabase/migrations/20261019151322_shared_care_clinician_review.sql` (holds `sahara_reserve_assist`, the durable 1-a-minute / 10-a-day limit per account). Until then the server uses a per-instance limit that is only a speed bump.
-- [ ] Optional: apply `20261028120000_assist_document_questions.sql` so the database limit also counts "ask".
-- [ ] Check on a phone after the key is in: sign in with a confirmed account → Docs → "Ask your documents" → "Search all my documents" on → ask "When is my next review?". The answer must show the cited lines.
+- [x] Optional but better: apply migration `android/supabase/migrations/20261019151322_shared_care_clinician_review.sql` (holds `sahara_reserve_assist`, the durable 1-a-minute / 10-a-day limit per account). Until then the server uses a per-instance limit that is only a speed bump. **31 Oct: applied.**
+- [x] Optional: apply `20261028120000_assist_document_questions.sql` so the database limit also counts "ask". **31 Oct: applied.**
+- [x] Check on a phone after the key is in: sign in with a confirmed account → Docs → "Ask your documents" → "Search all my documents" on → ask "When is my next review?". The answer must show the cited lines. **31 Oct: checked on the emulator; the answer showed the cited line.**
 
 **Speech-to-text.** Gemini hears the recording directly (same key). The app also keeps on-device transcription (sherpa-onnx) for offline. Whisper is not free through OpenAI's API (paid per minute); it is free only if you run it yourself on a GPU server. For Indian languages Sarvam's Saarika/Saaras (paid; the website already has Sarvam code) or AI4Bharat IndicConformer (open source, self-hosted) are stronger than Whisper. Decide after trying Gemini on Hindi and Kannada.
 - [ ] Try one 20-second Hindi and one Kannada turn on a phone; if the transcript is poor, decide Sarvam (key into Vercel) or self-hosted.
@@ -46,11 +65,11 @@ Details in [docs/SAHARA_SVK_BUILD_HANDOFF.md](docs/SAHARA_SVK_BUILD_HANDOFF.md).
 - [ ] Release bundle: close other apps (R8 needs about 4 GB free) and run `gradlew.bat --no-daemon bundleRelease` from `android/`. Upload to Play only after the current review finishes.
 
 ### Sahara (healthathon)
-- [ ] Apply the Supabase migrations the lanes add (emergency QR link, account delete, feedback, sync), then re-test.
+- [x] Apply the Supabase migrations the lanes add (emergency QR link, account delete, feedback, sync), then re-test. **31 Oct: all applied on Saanthvana.**
 - [ ] Add the Play App Signing SHA-256 to `prototype/public/.well-known/assetlinks.json` and redeploy, so invite links open the app. 29 Oct: the website itself is deployed to production and `/join` is live (200).
 - [ ] Supabase settings: email sign-up confirmation, leaked-password protection, lock `rls_auto_enable()`.
 - [ ] Approve doctor accounts: now done in the app (see "Sahara owner keys and steps (no-mock round, 28 Oct)" below).
-- [ ] AI note drafting: put the AI key on the server (see "Sahara owner keys and steps (no-mock round, 28 Oct)" below). Until then the app keeps word matching and says AI is not set up.
+- [x] AI note drafting: put the AI key on the server (see "Sahara owner keys and steps (no-mock round, 28 Oct)" below). Until then the app keeps word matching and says AI is not set up. **31 Oct: done in Supabase secrets.**
 - [ ] Decide the anonymisation scope: patient name → ID on the doctor's screens; blur faces in photos.
 - [ ] Re-tapping a marked body part: move the spot or add a new one?
 - [ ] Pick the CARE option in the team meeting (A / A+B / A+C).
@@ -81,15 +100,15 @@ Details in [docs/SAHARA_SVK_BUILD_HANDOFF.md](docs/SAHARA_SVK_BUILD_HANDOFF.md).
 
 ### Sahara owner keys and steps (no-mock round, 28 Oct)
 **AI note drafting, recorded-turn transcription and note translation** (works with any OpenAI-compatible service: a hosted one, or an open model you run yourself, e.g. vLLM, Ollama or llama.cpp server for text and faster-whisper-server for audio, behind HTTPS).
-- [ ] Supabase → project Saanthvana (`kjnhtakqzboayqorrlue`) → Edge Functions → Secrets → add:
+- [x] Supabase → project Saanthvana (`kjnhtakqzboayqorrlue`) → Edge Functions → Secrets → add: **31 Oct: done (Gemini).**
   - `SAHARA_AI_BASE_URL` = the service's base URL ending in `/v1` (must start with `https://`)
   - `SAHARA_AI_API_KEY` = your key (leave out for a self-hosted server without a key)
   - `SAHARA_AI_MODEL` = the chat model name
   - optional `SAHARA_AI_TRANSCRIBE_MODEL` = the speech-to-text model name (turns on "Transcribe a recorded turn")
   - optional `SAHARA_AI_PROVIDER_NAME` = the name people see in the consent line (default: the URL's host name)
-- [ ] Deploy the function once, from `android/`: `supabase functions deploy sahara-care-assist --project-ref kjnhtakqzboayqorrlue` (code: `android/supabase/functions/sahara-care-assist/index.ts`).
-- [ ] Check migration `20261019151322_shared_care_clinician_review.sql` is applied (it holds the attempt limit `sahara_reserve_assist`: 1 a minute, 10 a day per account, 100 a day in total).
-- [ ] "Ask your documents" (Docs tab, sa-docs lane, 28 Oct): apply migration `20261028120000_assist_document_questions.sql` (lets the same attempt limit count `ask`), then redeploy `sahara-care-assist`. Until both are done and the AI key is set, the app shows "AI is not set up yet". Only the question and the text read on the phone are sent, never photos or files.
+- [x] Deploy the function once, from `android/`: `supabase functions deploy sahara-care-assist --project-ref kjnhtakqzboayqorrlue` (code: `android/supabase/functions/sahara-care-assist/index.ts`). **31 Oct–1 Nov: deployed, now version 7.**
+- [x] Check migration `20261019151322_shared_care_clinician_review.sql` is applied (it holds the attempt limit `sahara_reserve_assist`: 1 a minute, 10 a day per account, 100 a day in total). **31 Oct: applied.**
+- [x] "Ask your documents" (Docs tab, sa-docs lane, 28 Oct): apply migration `20261028120000_assist_document_questions.sql` (lets the same attempt limit count `ask`), then redeploy `sahara-care-assist`. Until both are done and the AI key is set, the app shows "AI is not set up yet". Only the question and the text read on the phone are sent, never photos or files. **31 Oct: applied and redeployed; works.**
 - [ ] Check the service's data terms (retention, training use, region) against the DPDP drafts. The app names the service in every consent line and sends nothing until everyone agrees and someone taps the button.
 
 **Doctor approval** (no migration needed; the server function `healthathon_review_clinician` already exists).

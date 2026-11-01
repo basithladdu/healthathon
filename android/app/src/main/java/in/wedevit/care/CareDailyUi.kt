@@ -1,6 +1,17 @@
 package `in`.wedevit.care
 
+import androidx.activity.compose.BackHandler
+import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.WbSunny
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.Dp
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -45,6 +56,26 @@ internal val careAddKinds = listOf("medicine" to ("Add medicine" to "दवा �
  * Today's check-in in one tap: a mood button saves today's check-in (or changes the one already saved) through the same
  * save as the full check-in screen. Words and a symptom note are one more tap away. Shown only to people who may edit.
  */
+/** Today's check-in as one slim bar; tapping it opens the full "How was your day?" screen. */
+@Composable fun TodayCheckInBar(vm: CareModel, onOpen: () -> Unit) {
+    val t = careText(); val hindi = careHindi()
+    val items by vm.items.collectAsStateWithLifecycle(); val person by vm.selected.collectAsStateWithLifecycle()
+    val dayStart = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+    val today = CheckInMood.today(items, person, dayStart)
+    val subtitle = today?.let { val label = checkInMoodLabel(it.title, hindi); t("Saved: $label. Tap to change.", "सहेजा: $label। बदलने के लिए टैप करें।") } ?: t("Tap to check in", "दिन का हाल लिखने के लिए टैप करें")
+    ActionCard(Paper, Modifier.fillMaxWidth().testTag("today-checkin"), onOpen) {
+        Row(Modifier.fillMaxWidth().heightIn(min = 68.dp).padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+            Surface(shape = androidx.compose.foundation.shape.CircleShape, color = if (today != null) Mint else Peach) { Icon(Icons.Default.WbSunny, null, Modifier.padding(9.dp).size(24.dp), tint = DoctorAccent) }
+            Spacer(Modifier.width(14.dp))
+            Column(Modifier.weight(1f)) {
+                Text(t("How was today?", "आज का दिन कैसा रहा?"), fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
+                Text(subtitle, fontSize = 13.sp, color = DoctorCardSub)
+            }
+            Icon(Icons.AutoMirrored.Filled.ArrowForward, null, Modifier.size(20.dp), tint = Rust)
+        }
+    }
+}
+
 @Composable fun QuickCheckInCard(vm: CareModel, onAddWords: () -> Unit, onSymptom: () -> Unit, onDistress: () -> Unit = {}) {
     val t = careText(); val hindi = careHindi()
     val items by vm.items.collectAsStateWithLifecycle(); val person by vm.selected.collectAsStateWithLifecycle(); val busy by vm.busy.collectAsStateWithLifecycle()
@@ -140,5 +171,74 @@ internal object CareModules {
             TextButton(onClick = onScan, modifier = Modifier.heightIn(min = 48.dp).testTag("care-module-medicines-scan")) { Text(t("Scan & organize", "स्कैन करके जोड़ें"), color = DoctorAccent) }
             TextButton(onClick = onManual, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Add manually", "ख़ुद लिखें"), color = DoctorAccent) }
         }
+    }
+}
+
+/** One Daily care module: a tile in the grid that opens its own screen. [name] stays English for the test tag. */
+internal class CareModuleTile(val name: String, val title: String, val subtitle: String, val tint: Color, @param:DrawableRes val art: Int, val count: Int, val content: @Composable ColumnScope.() -> Unit) {
+    val key get() = name.lowercase().replace(' ', '-')
+}
+
+/** The six modules as a bento grid: one wide tile, a tall one beside two short ones, then two even ones. */
+@Composable internal fun CareModuleGrid(tiles: List<CareModuleTile>, onOpen: (String) -> Unit) {
+    val byName = tiles.associateBy { it.name }
+    @Composable fun tile(name: String, modifier: Modifier, layout: Int) { byName[name]?.let { CareBentoTile(it, modifier, layout) { onOpen(name) } } }
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        tile("Conversations", Modifier.fillMaxWidth().height(116.dp), BENTO_WIDE)
+        Row(Modifier.fillMaxWidth().height(220.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            tile("Medicines", Modifier.weight(1f).fillMaxHeight(), BENTO_TALL)
+            Column(Modifier.weight(1f).fillMaxHeight(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                tile("Visits", Modifier.fillMaxWidth().weight(1f), BENTO_SMALL)
+                tile("To do", Modifier.fillMaxWidth().weight(1f), BENTO_SMALL)
+            }
+        }
+        Row(Modifier.fillMaxWidth().height(132.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            tile("Check-ins", Modifier.weight(1f).fillMaxHeight(), BENTO_TALL)
+            tile("Journal", Modifier.weight(1f).fillMaxHeight(), BENTO_TALL)
+        }
+    }
+}
+
+private const val BENTO_WIDE = 0
+private const val BENTO_TALL = 1
+private const val BENTO_SMALL = 2
+
+@Composable private fun CareBentoTile(tile: CareModuleTile, modifier: Modifier, layout: Int, onClick: () -> Unit) {
+    val t = careText()
+    val count = if (tile.count == 0) t("Nothing yet", "अभी कुछ नहीं") else "${tile.count}"
+    val label = "${tile.title}, $count"
+    ActionCard(tile.tint, modifier.testTag("care-module-${tile.key}-toggle").semantics(mergeDescendants = true) { contentDescription = label }, onClick) {
+        @Composable fun art(size: Dp, m: Modifier = Modifier) = Image(saharaImage(tile.art, size), null, m.size(size), contentScale = ContentScale.Fit)
+        @Composable fun number() = SaharaAnimatedText(count) { Text(it, fontSize = if (tile.count == 0) 13.sp else 26.sp, fontWeight = FontWeight.Bold, color = DoctorCardInk) }
+        @Composable fun title() = Text(tile.title, fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, maxLines = 1, modifier = Modifier.a11yHeading())
+        when (layout) {
+            BENTO_WIDE -> Row(Modifier.fillMaxSize().padding(start = 18.dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) { title(); Text(tile.subtitle, fontSize = 13.sp, color = DoctorCardSub); Spacer(Modifier.height(10.dp)); number() }
+                art(100.dp)
+            }
+            BENTO_TALL -> Box(Modifier.fillMaxSize().padding(14.dp)) {
+                Column(Modifier.align(Alignment.TopStart)) { title(); Text(tile.subtitle, fontSize = 12.sp, color = DoctorCardSub, maxLines = 2) }
+                Box(Modifier.align(Alignment.BottomStart)) { number() }
+                art(if (tile.name == "Medicines") 112.dp else 72.dp, Modifier.align(Alignment.BottomEnd).offset(x = 6.dp, y = 6.dp))
+            }
+            else -> Row(Modifier.fillMaxSize().padding(start = 14.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) { title(); number() }
+                art(60.dp)
+            }
+        }
+    }
+}
+
+/** A module on its own screen, with a back arrow to the grid. */
+@Composable internal fun CareModuleScreen(tile: CareModuleTile, onBack: () -> Unit) {
+    val t = careText()
+    BackHandler(onBack = onBack)
+    LazyColumn(Modifier.fillMaxSize().testTag("care-list"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = onBack, modifier = Modifier.testTag("care-module-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back to daily care", "रोज़ की देखभाल पर वापस")) }
+            Text(tile.title, fontFamily = SaharaTitleFont, fontSize = 28.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.weight(1f).a11yHeading())
+            Image(saharaImage(tile.art, 56.dp), null, Modifier.size(56.dp), contentScale = ContentScale.Fit)
+        } }
+        item { Column(Modifier.testTag("care-module-${tile.key}"), verticalArrangement = Arrangement.spacedBy(10.dp), content = tile.content) }
     }
 }

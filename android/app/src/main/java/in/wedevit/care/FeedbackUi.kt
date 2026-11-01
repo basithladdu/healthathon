@@ -4,6 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -16,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.filled.Healing
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -57,9 +59,10 @@ internal object CheckInMood {
 }
 
 /** [cloud] sends app feedback to Sahara's server when signed in; without it, app feedback stays on this phone. */
-@Composable fun FeedbackScreen(accountScope: String, surface: String, onClose: () -> Unit, careModel: CareModel? = null, personId: String? = null, cloud: CareCloud? = null) {
+@Composable fun FeedbackScreen(accountScope: String, surface: String, onClose: () -> Unit, careModel: CareModel? = null, personId: String? = null, cloud: CareCloud? = null,
+    onDistress: () -> Unit = {}, onSymptom: () -> Unit = {}) {
     if (careModel == null || personId == null) AppFeedbackScreen(accountScope, surface, onClose, cloud)
-    else FeedbackExperienceScreen(accountScope, surface, onClose, careModel, personId)
+    else FeedbackExperienceScreen(accountScope, surface, onClose, careModel, personId, onDistress = onDistress, onSymptom = onSymptom)
 }
 
 /** Where the latest app feedback is: only "sent" once the server confirmed it. */
@@ -67,7 +70,8 @@ internal enum class FeedbackSendState { NONE, LOCAL, SENDING, SENT, QUEUED }
 
 /** Shared face-and-slider presentation; app feedback and patient check-ins retain distinct save destinations. */
 @OptIn(ExperimentalMaterial3Api::class)
-@Composable private fun FeedbackExperienceScreen(accountScope: String, surface: String, onClose: () -> Unit, careModel: CareModel? = null, personId: String? = null, cloud: CareCloud? = null) { val t = careText();
+@Composable private fun FeedbackExperienceScreen(accountScope: String, surface: String, onClose: () -> Unit, careModel: CareModel? = null, personId: String? = null, cloud: CareCloud? = null,
+    onDistress: () -> Unit = {}, onSymptom: () -> Unit = {}) { val t = careText();
     val checkIn = careModel != null && personId != null
     val items by (careModel?.items ?: remember { kotlinx.coroutines.flow.MutableStateFlow(emptyList<CareItem>()) }).collectAsStateWithLifecycle()
     val busy by (careModel?.busy ?: remember { kotlinx.coroutines.flow.MutableStateFlow(false) }).collectAsStateWithLifecycle()
@@ -146,6 +150,18 @@ internal enum class FeedbackSendState { NONE, LOCAL, SENDING, SENT, QUEUED }
         }
         OutlinedTextField(value = note, onValueChange = { if (it.length <= limit) { note = it; saved = false; error = null } }, label = { Text(t("Anything to add? (optional)", "कुछ और बताना है? (चाहें तो)")) }, placeholder = { Text(if (checkIn) t("How are you feeling today?", "आज आप कैसा महसूस कर रहे हैं?") else t("What felt easy, or what could be clearer?", "क्या आसान लगा, या क्या और साफ़ हो सकता है?")) }, supportingText = { Text(if (checkIn) t("Added to the care record. ${note.length}/$limit", "देखभाल रिकॉर्ड में जुड़ेगा। ${note.length}/$limit") else "${note.length}/500", fontSize = 12.sp) }, minLines = 2, maxLines = 5, modifier = Modifier.fillMaxWidth().testTag("feedback-note"), shape = RoundedCornerShape(18.dp), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Rust, focusedLabelColor = RustText, cursorColor = Rust, unfocusedBorderColor = Ink.copy(alpha = .25f), focusedContainerColor = Paper.copy(alpha = .7f), unfocusedContainerColor = Paper.copy(alpha = .55f)))
         Spacer(Modifier.height(8.dp))
+        // The check-in also asks about distress and links to a symptom note, as the old Today card did.
+        if (checkIn && careModel != null) {
+            Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("checkin-extras")) {
+                Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    DistressQuestion(careModel, onYes = onDistress)
+                    TextButton(onClick = onSymptom, modifier = Modifier.heightIn(min = 48.dp).testTag("today-symptom-note")) {
+                        Icon(Icons.Default.Healing, null, Modifier.size(20.dp), tint = Rust); Spacer(Modifier.width(8.dp)); Text(t("Note a symptom", "तबीयत का नोट लिखें"), color = RustText, fontWeight = FontWeight.SemiBold)
+                    }
+                }
+            }
+            Spacer(Modifier.height(12.dp))
+        }
         (modelError.takeIf { checkIn } ?: error)?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.fillMaxWidth().semantics { liveRegion = LiveRegionMode.Polite }); Spacer(Modifier.height(8.dp)) }
         Button(onClick = { focus.clearFocus(); if (saved) return@Button /* already saved and unchanged: a second tap must not add a second check-in before the list refreshes */; if (checkIn) { val model = careModel!!; val mood = CheckInMood.title(score); if (!canEditCareContext(model, personId!!, model.accountNamespace)) { model.message.value = t("Care access changed. Reopen this person's records before saving.", "देखभाल की अनुमति बदल गई है। सहेजने से पहले इस व्यक्ति के रिकॉर्ड फिर खोलें।"); onClose() } else if (today != null) model.updateItem(today.copy(title = mood, detail = note), onSaved) else model.saveItem("checkin", mood, note, 0, onSaved) } else { val to = account; error = store.save(score, note, to); if (error == null) { onSaved(); if (to != null) send(to) else sendState = FeedbackSendState.LOCAL } } }, enabled = !busy && sendState != FeedbackSendState.SENDING, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("feedback-save"), shape = RoundedCornerShape(18.dp), colors = ButtonDefaults.buttonColors(containerColor = Rust, contentColor = Color.White)) {
             if (saved && (checkIn || sendState == FeedbackSendState.SENT || sendState == FeedbackSendState.LOCAL)) { Icon(Icons.Outlined.CheckCircle, null); Spacer(Modifier.width(8.dp)) }

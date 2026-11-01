@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Quick action art: two clay figures close together, in Sahara's green and terracotta. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="120dp" android:height="120dp" android:viewportWidth="200" android:viewportHeight="200">
+    <path android:fillColor="#1F5A3A22" android:pathData="M30,180a70,8 0 1,0 140,0a70,8 0 1,0 -140,0z" />
+    <!-- taller figure, green -->
+    <path android:pathData="M38,176v-34a34,34 0 0 1 68,0v34z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="linear" android:startX="50" android:startY="110" android:endX="100" android:endY="176" android:startColor="#3E8A68" android:endColor="#1F5C45" />
+        </aapt:attr>
+    </path>
+    <path android:pathData="M72,44a24,24 0 1,0 0.1,0z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="radial" android:centerX="64" android:centerY="58" android:gradientRadius="30" android:startColor="#4FA07C" android:endColor="#1F5C45" />
+        </aapt:attr>
+    </path>
+    <path android:fillColor="#55FFFFFF" android:pathData="M58,58a10,12 0 0 1 10,-10a4,4 0 0 1 2,6a6,8 0 0 0 -6,6a3,3 0 0 1 -6,-2z" />
+    <!-- shorter figure, terracotta -->
+    <path android:pathData="M96,176v-26a30,30 0 0 1 60,0v26z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="linear" android:startX="100" android:startY="124" android:endX="150" android:endY="176" android:startColor="#F0916C" android:endColor="#C9573A" />
+        </aapt:attr>
+    </path>
+    <path android:pathData="M126,72a21,21 0 1,0 0.1,0z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="radial" android:centerX="119" android:centerY="86" android:gradientRadius="27" android:startColor="#F7A985" android:endColor="#C9573A" />
+        </aapt:attr>
+    </path>
+    <path android:fillColor="#55FFFFFF" android:pathData="M113,86a9,10 0 0 1 9,-9a3,3 0 0 1 2,5a5,6 0 0 0 -5,5a3,3 0 0 1 -6,-1z" />
+    <!-- heart between them -->
+    <path android:fillColor="#FFF4E8" android:pathData="M100,150C84,139 85,124 94,124C97,124 99,126 100,129C101,126 103,124 106,124C115,124 116,139 100,150z" />
+    <path android:fillColor="#E07A55" android:pathData="M100,145C88,137 89,128 95,128C97,128 99,130 100,132C101,130 103,128 105,128C111,128 112,137 100,145z" />
+</vector>

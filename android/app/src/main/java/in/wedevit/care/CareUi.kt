@@ -23,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.ListAlt
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Info
@@ -103,7 +104,7 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
     val allPeople by vm.people.collectAsStateWithLifecycle()
     val people = if (walkthrough != null) PatientWalkthrough.visiblePeople(allPeople) else allPeople
     val selected by vm.selected.collectAsStateWithLifecycle()
-    val clinician by vm.clinician.collectAsStateWithLifecycle()
+    val clinician by vm.clinician.collectAsStateWithLifecycle(); val isOwnerTop by vm.isOwner.collectAsStateWithLifecycle()
     val role by vm.viewRole.collectAsStateWithLifecycle()
     val message by vm.message.collectAsStateWithLifecycle()
     val actionError by vm.actionError.collectAsStateWithLifecycle()
@@ -180,7 +181,8 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
     Box(Modifier.fillMaxSize().background(Cream)) {
     SaharaScreenHost(overlay, label = "Care overlay", direction = { from, to -> if (from == "starting") SaharaMotion.Direction.Switch else if (to.isEmpty()) SaharaMotion.Direction.Back else SaharaMotion.Direction.Forward }) { shown -> when (shown) {
     "starting" -> Box(Modifier.fillMaxSize().testTag("care-starting"))
-    "checkin" -> FeedbackScreen(accountScope = feedbackAccountScope, surface = "patient-checkin", onClose = { dialog = "" }, careModel = vm, personId = vm.selected.value)
+    "checkin" -> FeedbackScreen(accountScope = feedbackAccountScope, surface = "patient-checkin", onClose = { dialog = "" }, careModel = vm, personId = vm.selected.value,
+        onDistress = { dialog = "distress" }, onSymptom = { dialog = ""; symptomAddPending = true; go(9) })
     "distress" -> DistressScreen(vm, onClose = { dialog = "" })
     "feedback" -> FeedbackScreen(accountScope = feedbackAccountScope, surface = "patient", onClose = { feedbackOpen = false }, cloud = vm.cloud)
     "reminders" -> CareReminderSettings(vm, onClose = { remindersOpen = false })
@@ -208,7 +210,9 @@ internal fun canEditCareContext(vm: CareModel, person: String, account: String):
             CarePersonSelector(person.name, people.map { it.id to it.name }, selected,
                 enabled = !activeRecording,
                 onSelect = { vm.select(it); reading = null },
-                onAdd = { dialog = "person" }, canAdd = walkthrough == null)
+                onAdd = { dialog = "person" }, canAdd = walkthrough == null,
+                onInvite = { inviteFamilyOpen = true }, canInvite = !clinician && isOwnerTop,
+                inviteLabel = if (vm.cloud == null) t("Add family", "परिवार जोड़ें") else t("Invite family", "परिवार को बुलाएँ"))
             Spacer(Modifier.height(10.dp))
         }
         if (person != null) HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = .15f))
@@ -350,27 +354,29 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
     val latest = versions.firstOrNull()
     val dayStart = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
     val hindi = careHindi(); val t = careText()
+    // SOS opens the emergency card and the emergency plan in one sheet: the QR goes full screen at once, and printing or sharing stays one tap away.
+    var sosOpen by rememberSaveable { mutableStateOf(false) }; var sos by remember { mutableIntStateOf(0) }
+    val showSummary = !clinician && selectedPerson.isNotBlank()
+    if (sosOpen) ModalBottomSheet(onDismissRequest = { sosOpen = false; sos = 0 }, containerColor = Paper) {
+        Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(start = 20.dp, end = 20.dp, bottom = 28.dp)) {
+            EmergencyNumbersCard()
+            Spacer(Modifier.height(12.dp))
+            EmergencyCardOnToday(vm, onRead, sosRequest = sos, onSosHandled = { sos = 0 })
+            Spacer(Modifier.height(12.dp))
+            CarePlanEntryCard { sosOpen = false; onCarePlan() }
+        }
+    }
+    val hour = java.time.LocalTime.now().hour
+    val greeting = when { hour < 12 -> t("Good morning", "सुप्रभात"); hour < 17 -> t("Good afternoon", "शुभ दोपहर"); else -> t("Good evening", "शुभ संध्या") }
     LazyColumn(Modifier.fillMaxSize().testTag("today-list"), contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
         item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Heading(t("Today", "आज"), 30); Spacer(Modifier.weight(1f)); Text(LocalDate.now().format(careDateFormat("EEE, d MMM", hindi)), color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp)
+            Column { Text(greeting, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp); Heading(t("Today", "आज"), 30) }
+            Spacer(Modifier.weight(1f)); Text(LocalDate.now().format(careDateFormat("EEE, d MMM", hindi)), color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp)
             if (vm.cloud != null) IconButton(onClick = vm::refresh) { Icon(Icons.Default.Refresh, t("Refresh records", "रिकॉर्ड फिर से लाएँ")) }
         } }
-        if (!clinician && selectedPerson.isNotBlank()) item(key = "patient-summary") { PatientSummaryCard(vm, onSymptoms = onSymptoms, onMedicines = { onCare("Medicines") }, onVisit = { if (it.due == 0L) onCalendar() else onCalendarAt(it.due) }, onRead = onRead, onCarePlan = onCarePlan) }
-        if (!clinician) item {
-            // Do not infer a current relationship from a note's typed reviewer.
-            // The account workspace loads actual patient-controlled membership.
-            TextButton(onClick = onSharedWorkspace, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.Groups, null); Spacer(Modifier.width(8.dp)); Text(t("Your care team", "आपकी देखभाल टीम")) }
-        }
-        if (!clinician && ownerOfRecords) item {
-            ActionCard(Mint, onClick = onInviteFamily) {
-                Row(Modifier.fillMaxWidth().heightIn(min = 64.dp).padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.PersonAdd, null, tint = Rust); Spacer(Modifier.width(12.dp))
-                    Column(Modifier.weight(1f)) { val name = todayPeople.firstOrNull { it.id == todaySelected }?.name.orEmpty()
-                        Text(if (vm.cloud == null) t("Add family", "परिवार जोड़ें") else t("Invite family", "परिवार को बुलाएँ"), fontWeight = FontWeight.Bold, fontSize = 16.sp); Text(t("Let family see $name's care on their own phone", "परिवार अपने फ़ोन पर $name की देखभाल देख सके"), fontSize = 13.sp) }
-                    Icon(Icons.AutoMirrored.Filled.ArrowForward, null, Modifier.size(19.dp))
-                }
-            }
-        }
+        if (!clinician && canEdit) item(key = "today-checkin") { TodayCheckInBar(vm, onOpen = onCheckInWords) }
+        if (showSummary) item(key = "patient-summary") { PatientSummaryCard(vm, onSymptoms = onSymptoms, onMedicines = { onCare("Medicines") }, onVisit = { if (it.due == 0L) onCalendar() else onCalendarAt(it.due) }, onRead = onRead, onCarePlan = onCarePlan) }
+        if (!clinician) item(key = "quick-actions") { TodayQuickActions(onCalendar = onCalendar, onSos = { sos++; sosOpen = true }, onFamily = onSharedWorkspace, onLabs = onLabs) }
         item { ActionCard(Gold, onClick = { if (!clinician && latest != null) onRead(latest) else onTalk() }) {
             Row(Modifier.fillMaxWidth().padding(18.dp), verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
@@ -386,9 +392,6 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                 Image(saharaImage(R.drawable.care_notes_illustration, 104.dp), null, Modifier.size(104.dp), contentScale = ContentScale.Fit)
             }
         } }
-        if (!clinician && canEdit) item(key = "today-checkin") { QuickCheckInCard(vm, onAddWords = onCheckInWords, onSymptom = onSymptomNote, onDistress = onDistress) }
-        if (!clinician) item(key = "emergency-card") { EmergencyCardOnToday(vm, onRead) }
-        item(key = "care-plan") { CarePlanEntryCard(onCarePlan) }
         if (clinician && latest != null) item { ActionCard(Paper, onClick = { onRead(latest) }) {
             Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.Description, null, tint = Rust); Spacer(Modifier.width(12.dp)); Column(Modifier.weight(1f)) { Text(t("Latest care note", "सबसे नया देखभाल नोट"), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium); Text("${date(latest.published)} · ${latest.doctor}", style = MaterialTheme.typography.bodySmall); Text(ReviewWorkflow.label(latest), style = MaterialTheme.typography.labelSmall, color = Rust) }; Icon(Icons.AutoMirrored.Filled.ArrowForward, t("Read note", "नोट पढ़ें"), Modifier.size(20.dp)) }
         } }
@@ -396,7 +399,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
             Tile(t("Symptom tracker", "तबीयत के नोट"), R.drawable.symptom_tracker_illustration, Peach, Modifier.weight(1f).fillMaxHeight().testTag("symptom-tracker-entry")) { onSymptoms() }
             Tile(t("Find care", "पास में देखभाल"), R.drawable.nearby_care_illustration, Sage, Modifier.weight(1f).fillMaxHeight(), onNearby)
         } }
-        item { DailyCareShortcuts(onCalendar, onWorkflow, onLabs) }
+        if (clinician) item { DailyCareShortcuts(onCalendar, onWorkflow, onLabs) }
         item { WorkflowSummary(vm, onWorkflow) }
         val scheduledToday = calendarItems(items, LocalDate.now()).filter { CareEntryCodec.decode(it.detail)?.type == "schedule" }
         if (scheduledToday.isNotEmpty()) item { Card(onClick = onCalendar, colors = CardDefaults.cardColors(containerColor = Mint), shape = RoundedCornerShape(18.dp), modifier = Modifier.fillMaxWidth()) { Column(Modifier.padding(16.dp)) { Text(t("${scheduledToday.size} planned today", "आज ${scheduledToday.size} काम तय हैं"), fontWeight = FontWeight.SemiBold); scheduledToday.take(2).forEach { Text("${calendarCategory(it)} · ${it.title}", style = MaterialTheme.typography.bodyMedium) }; Text(t("Open calendar", "कैलेंडर खोलें"), color = RustText, style = MaterialTheme.typography.labelLarge) } } }
@@ -885,11 +888,41 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
     val tasks = shown.filter { it.kind == "task" }; val checkins = shown.filter { it.kind == "checkin" }; val journal = shown.filter { it.kind == "journal" }
     val empty = shown.isEmpty() && pastMeds.isEmpty() && versions.isEmpty()
     val selectedPerson by vm.selected.collectAsStateWithLifecycle(); val loadedFor by vm.itemsLoadedFor.collectAsStateWithLifecycle()
-    LaunchedEffect(target) { val index = CareModules.order.indexOf(target); if (index >= 0) listState.animateScrollToItem(3 + index) }
+    // A tile opens its module on its own screen; Back returns to the grid. [initialFilter] can open one directly.
+    var openModule by rememberSaveable(target) { mutableStateOf(target) }
     val hindi = careHindi(); val t = careText()
-    // [name] stays English: it is the module's key and scroll target; only [title] is shown.
-    @Composable fun module(name: String, title: String, icon: ImageVector, tint: Color, count: Int, content: @Composable ColumnScope.() -> Unit) = CareModuleCard(name.lowercase().replace(' ', '-'), title, icon, tint, count, defaultOpen = name in CareModules.order.take(2), forceOpen = name == target, content = content)
     @Composable fun visit(item: CareItem) = if (isDoctorStructuredVisit(item)) DoctorVisitSummary(item, onOpen = { onCalendarAt(item.due) }) else CareRow(item, vm)
+    // [name] stays English: it is the module's key and test tag; only [title] is shown.
+    val tiles = listOf(
+        CareModuleTile("Conversations", t("Conversations", "बातचीत"), t("Saved talks and care notes", "सहेजी बातचीत और देखभाल नोट"), SaharaLavender, R.drawable.conversation_recent_art, versions.size) {
+            CareModuleList("conversations", versions, t("No saved conversations yet.", "अभी कोई सहेजी हुई बातचीत नहीं।"), keyOf = { it.id }) { ConversationRow(it, onReadNote) }
+        },
+        CareModuleTile("Medicines", t("Medicines", "दवाइयाँ"), t("Current and past", "अभी की और पहले की"), SaharaSoftBlue, R.drawable.care_medicines_art, currentMeds.size + pastMeds.size) {
+                SideEffectsToRaiseCard(vm)
+                MedicineScanAction(onScanPrescription) { onAdd("medicine") }
+                if (currentMeds.isEmpty() && pastMeds.isEmpty()) QuietLine(t("No medicines yet.", "अभी कोई दवा नहीं।")) else {
+                    CareModuleList("medicines-current", currentMeds, t("No current medicines.", "अभी कोई दवा नहीं चल रही।"), t("Current", "अभी चल रही"), { it.id }) { CareRow(it, vm) }
+                    CareModuleList("medicines-past", pastMeds, t("No past medicines yet.", "पहले की कोई दवा नहीं।"), t("Past", "पहले की"), { it.id }) { CareRow(it, vm) }
+                }
+        },
+        CareModuleTile("Visits", t("Visits", "मुलाक़ातें"), t("Upcoming and past", "आगे की और पहले की"), SaharaApricot, R.drawable.conversation_history_art, upcoming.size + pastVisits.size) {
+                if (upcoming.isEmpty() && pastVisits.isEmpty()) QuietLine(t("No visits yet.", "अभी कोई मुलाक़ात नहीं।")) else {
+                    CareModuleList("visits-upcoming", upcoming, t("No upcoming visits.", "आगे कोई मुलाक़ात नहीं।"), t("Upcoming", "आगे की"), { it.id }) { visit(it) }
+                    CareModuleList("visits-past", pastVisits, t("No past visits yet.", "पहले की कोई मुलाक़ात नहीं।"), t("Past", "पहले की"), { it.id }) { visit(it) }
+                }
+        },
+        CareModuleTile("To do", t("To do", "करने के काम"), t("Things to get done", "जो काम करने हैं"), SaharaSoftGold, R.drawable.care_notes_illustration, tasks.size) {
+            CareModuleList("to-do", tasks, t("No tasks yet.", "अभी कोई काम नहीं।"), keyOf = { it.id }) { CareRow(it, vm) }
+        },
+        CareModuleTile("Check-ins", t("Check-ins", "रोज़ का हाल"), t("How each day went", "हर दिन कैसा रहा"), Mint, R.drawable.wellbeing_checkin_illustration, checkins.size) {
+            DistressHistoryCard(checkins, selectedPerson); CareModuleList("check-ins", checkins, t("No check-ins yet.", "अभी कोई हाल नहीं लिखा।"), keyOf = { it.id }) { CareRow(it, vm) }
+        },
+        CareModuleTile("Journal", t("Journal", "डायरी"), t("Your own notes", "आपके अपने नोट"), Peach, R.drawable.conversation_record_art, journal.size) {
+            CareModuleList("journal", journal, t("No journal notes yet.", "डायरी में अभी कोई नोट नहीं।"), keyOf = { it.id }) { CareRow(it, vm) }
+        },
+    )
+    val opened = tiles.firstOrNull { it.name == openModule }.takeIf { loadedFor == selectedPerson && !empty }
+    if (opened != null) CareModuleScreen(opened) { openModule = null } else
     LazyColumn(Modifier.fillMaxSize().testTag("care-list"), state = listState, contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) { Heading(t("Daily care", "रोज़ की देखभाल"), 30); Text(LocalDate.now().format(careDateFormat("EEEE, d MMMM", hindi)), fontSize = 13.sp, color = DoctorCardSub) }
@@ -905,25 +938,35 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                 Spacer(Modifier.height(12.dp)); CareAddMenuButton(onAdd, onScanPrescription)
             }
         } } else {
-            item { module("Conversations", t("Conversations", "बातचीत"), Icons.Default.Description, SaharaLavender, versions.size) { CareModuleList("conversations", versions, t("No saved conversations yet.", "अभी कोई सहेजी हुई बातचीत नहीं।"), keyOf = { it.id }) { ConversationRow(it, onReadNote) } } }
-            item { module("Medicines", t("Medicines", "दवाइयाँ"), careIcon("medicine"), SaharaSoftBlue, currentMeds.size + pastMeds.size) {
-                SideEffectsToRaiseCard(vm)
-                MedicineScanAction(onScanPrescription) { onAdd("medicine") }
-                if (currentMeds.isEmpty() && pastMeds.isEmpty()) QuietLine(t("No medicines yet.", "अभी कोई दवा नहीं।")) else {
-                    CareModuleList("medicines-current", currentMeds, t("No current medicines.", "अभी कोई दवा नहीं चल रही।"), t("Current", "अभी चल रही"), { it.id }) { CareRow(it, vm) }
-                    CareModuleList("medicines-past", pastMeds, t("No past medicines yet.", "पहले की कोई दवा नहीं।"), t("Past", "पहले की"), { it.id }) { CareRow(it, vm) }
-                }
-            } }
-            item { module("Visits", t("Visits", "मुलाक़ातें"), careIcon("visit"), SaharaApricot, upcoming.size + pastVisits.size) {
-                if (upcoming.isEmpty() && pastVisits.isEmpty()) QuietLine(t("No visits yet.", "अभी कोई मुलाक़ात नहीं।")) else {
-                    CareModuleList("visits-upcoming", upcoming, t("No upcoming visits.", "आगे कोई मुलाक़ात नहीं।"), t("Upcoming", "आगे की"), { it.id }) { visit(it) }
-                    CareModuleList("visits-past", pastVisits, t("No past visits yet.", "पहले की कोई मुलाक़ात नहीं।"), t("Past", "पहले की"), { it.id }) { visit(it) }
-                }
-            } }
-            item { module("To do", t("To do", "करने के काम"), careIcon("task"), SaharaSoftGold, tasks.size) { CareModuleList("to-do", tasks, t("No tasks yet.", "अभी कोई काम नहीं।"), keyOf = { it.id }) { CareRow(it, vm) } } }
-            item { module("Check-ins", t("Check-ins", "रोज़ का हाल"), careIcon("checkin"), SaharaSoftBlue, checkins.size) { DistressHistoryCard(checkins, selectedPerson); CareModuleList("check-ins", checkins, t("No check-ins yet.", "अभी कोई हाल नहीं लिखा।"), keyOf = { it.id }) { CareRow(it, vm) } } }
-            item { module("Journal", t("Journal", "डायरी"), careIcon("journal"), SaharaLavender, journal.size) { CareModuleList("journal", journal, t("No journal notes yet.", "डायरी में अभी कोई नोट नहीं।"), keyOf = { it.id }) { CareRow(it, vm) } } }
+            item { CareModuleGrid(tiles) { openModule = it } }
         }
+    }
+}
+
+/** The emergency numbers (tap to open the dialler) and a hospitals map link. Shown in Nearby and in Today's SOS sheet. */
+@Composable fun EmergencyNumbersCard() {
+    val t = careText(); val context = LocalContext.current
+    SurfaceCard(Peach) {
+        Text(t("Emergency", "आपातकाल"), fontWeight = FontWeight.SemiBold, fontSize = 19.sp, modifier = Modifier.testTag("nearby-emergency"))
+        Text(t("Tap a number to open your phone dialler.", "नंबर दबाएँ, फ़ोन का डायलर खुलेगा।"), style = MaterialTheme.typography.bodySmall)
+        NearbyHelp.emergency.forEach { e ->
+            Spacer(Modifier.height(8.dp))
+            Button(onClick = { open(context, Intent(Intent.ACTION_DIAL, Uri.parse(NearbyHelp.dialUri(e.number)))) }, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = Paper, contentColor = Ink),
+                modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("emergency-${e.number}")) {
+                Icon(Icons.Default.Call, null, Modifier.size(20.dp), tint = Rust); Spacer(Modifier.width(10.dp))
+                Text(e.number, fontWeight = FontWeight.Bold, fontSize = 20.sp, modifier = Modifier.widthIn(min = 64.dp)); Spacer(Modifier.width(8.dp))
+                Column(Modifier.weight(1f)) {
+                    Text(t(e.label, e.labelHindi), fontWeight = FontWeight.SemiBold)
+                    if (e.note.isNotBlank()) Text(t(e.note, e.noteHindi), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+        }
+        Spacer(Modifier.height(8.dp))
+        // The maps app searches near the phone using its own location setting; this app does not read location.
+        OutlinedButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse("geo:0,0?q=" + Uri.encode("hospital")))) }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("nearby-hospitals-map")) {
+            Icon(Icons.Default.LocalHospital, null, Modifier.size(20.dp)); Spacer(Modifier.width(8.dp)); Text(t("Hospitals near you on the map", "नक्शे पर पास के अस्पताल"))
+        }
+        Text(t("Opens your maps app, which uses its own location setting.", "आपका मैप ऐप खुलेगा, जो अपनी लोकेशन सेटिंग इस्तेमाल करता है।"), style = MaterialTheme.typography.bodySmall)
     }
 }
 
@@ -982,28 +1025,7 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
                 TextButton(onClick = { search = ""; service = "All"; state = "All India"; district = ""; layerKey = allLayers }, modifier = Modifier.heightIn(min = 48.dp).testTag("nearby-clear-filters")) { Text(t("Clear filters", "सभी चुनाव हटाएँ")) }
             }
         } }
-        item { SurfaceCard(Peach) {
-            Text(t("Emergency", "आपातकाल"), fontWeight = FontWeight.SemiBold, fontSize = 19.sp, modifier = Modifier.testTag("nearby-emergency"))
-            Text(t("Tap a number to open your phone dialler.", "नंबर दबाएँ, फ़ोन का डायलर खुलेगा।"), style = MaterialTheme.typography.bodySmall)
-            NearbyHelp.emergency.forEach { e ->
-                Spacer(Modifier.height(8.dp))
-                Button(onClick = { open(context, Intent(Intent.ACTION_DIAL, Uri.parse(NearbyHelp.dialUri(e.number)))) }, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = Paper, contentColor = Ink),
-                    modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("emergency-${e.number}")) {
-                    Icon(Icons.Default.Call, null, Modifier.size(20.dp), tint = Rust); Spacer(Modifier.width(10.dp))
-                    Text(e.number, fontWeight = FontWeight.Bold, fontSize = 20.sp, modifier = Modifier.widthIn(min = 64.dp)); Spacer(Modifier.width(8.dp))
-                    Column(Modifier.weight(1f)) {
-                        Text(t(e.label, e.labelHindi), fontWeight = FontWeight.SemiBold)
-                        if (e.note.isNotBlank()) Text(t(e.note, e.noteHindi), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
-                }
-            }
-            Spacer(Modifier.height(8.dp))
-            // The maps app searches near the phone using its own location setting; this app does not read location.
-            OutlinedButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse("geo:0,0?q=" + Uri.encode("hospital")))) }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("nearby-hospitals-map")) {
-                Icon(Icons.Default.LocalHospital, null, Modifier.size(20.dp)); Spacer(Modifier.width(8.dp)); Text(t("Hospitals near you on the map", "नक्शे पर पास के अस्पताल"))
-            }
-            Text(t("Opens your maps app, which uses its own location setting.", "आपका मैप ऐप खुलेगा, जो अपनी लोकेशन सेटिंग इस्तेमाल करता है।"), style = MaterialTheme.typography.bodySmall)
-        } }
+        item { EmergencyNumbersCard() }
         item { Column { Text(t("Nearest centres", "पास के केंद्र"), fontWeight = FontWeight.SemiBold, fontSize = 19.sp); Text(t("Choose your state, then district if listed.", "अपना राज्य चुनें, फिर ज़िला (अगर सूची में हो)।"), style = MaterialTheme.typography.bodySmall) } }
         item { OutlinedTextField(value = search, onValueChange = { search = it }, placeholder = { Text(t("Name, place, state or PIN", "नाम, जगह, राज्य या पिन")) }, leadingIcon = { Icon(Icons.Default.Search, null) }, trailingIcon = { if (search.isNotEmpty()) IconButton(onClick = { search = "" }) { Icon(Icons.Default.Close, t("Clear search", "खोज मिटाएँ")) } }, shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth(), singleLine = true,
             keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(imeAction = androidx.compose.ui.text.input.ImeAction.Search), keyboardActions = androidx.compose.foundation.text.KeyboardActions(onSearch = { focus.clearFocus() })) }
@@ -1083,15 +1105,33 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
     val t = careText()
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(18.dp)) {
         item { Heading(if (doctorEmbedded) t("Daily care & tools", "रोज़ की देखभाल और साधन") else t("More", "और")) }
-        item { OutlinedButton(onClick = onDocuments, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("more-documents-entry")) { Icon(Icons.Default.FolderOpen, null); Spacer(Modifier.width(8.dp)); Text(t("Documents", "दस्तावेज़")) } }
-        if (onCarePlan != null) item { OutlinedButton(onClick = onCarePlan, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("more-care-plan-entry")) { Icon(Icons.Default.LocalHospital, null); Spacer(Modifier.width(8.dp)); Text(t("Emergency plan & living will", "आपातकालीन योजना और लिविंग विल")) } }
-        if (!walkthrough) item { OutlinedButton(onClick = onFeedback, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("patient-feedback-entry")) { Icon(Icons.Default.SentimentSatisfiedAlt, null); Spacer(Modifier.width(8.dp)); Text(t("App feedback", "ऐप के बारे में अपनी राय")) } }
-        if (doctorEmbedded) item { OutlinedButton(onClick = onSharedWorkspace, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.Groups, null); Spacer(Modifier.width(8.dp)); Text(t("Shared care and doctor's check", "साझा देखभाल और डॉक्टर की जाँच")) } }
-        // Today's "Your care team" opens the family's Care team, so the doctor workspace keeps its own entry here.
-        else if (!walkthrough) item { OutlinedButton(onClick = onSharedWorkspace, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("more-doctor-workspace-entry")) { Icon(Icons.Default.MedicalServices, null); Spacer(Modifier.width(8.dp)); Text(t("Doctor workspace", "डॉक्टर वर्कस्पेस")) } }
-        item { DailyCareShortcuts(onCalendar, onWorkflow, onLabs) }
-        if (!walkthrough) item { OutlinedButton(onClick = onReminders, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.NotificationsNone, null); Spacer(Modifier.width(8.dp)); Text(t("Reminders", "रिमाइंडर")) } }
-        if (!doctorEmbedded && !walkthrough) item { OutlinedButton(onClick = onAccount, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Icon(Icons.Default.PersonOutline, null); Spacer(Modifier.width(8.dp)); Text(if (vm.cloud == null) t("Sign in to share care", "देखभाल साझा करने के लिए साइन इन करें") else t("Your account and sharing", "आपका खाता और साझा करना")) } }
+        if (!doctorEmbedded && !walkthrough) item {
+            ActionCard(Paper, Modifier.fillMaxWidth().testTag("more-account"), onAccount) {
+                Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Surface(shape = CircleShape, color = SaharaApricot, modifier = Modifier.size(52.dp)) { Box(contentAlignment = Alignment.Center) { Text(person.name.take(1).uppercase(), fontFamily = SaharaTitleFont, fontSize = 24.sp, color = DoctorAccent) } }
+                    Spacer(Modifier.width(14.dp))
+                    Column(Modifier.weight(1f)) {
+                        Text(person.name, fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, maxLines = 1)
+                        Text(if (vm.cloud == null) t("Sign in to share care", "देखभाल साझा करने के लिए साइन इन करें") else t("Your account and sharing", "आपका खाता और साझा करना"), fontSize = 14.sp, color = RustText)
+                    }
+                    Icon(Icons.AutoMirrored.Filled.ArrowForward, null, Modifier.size(20.dp), tint = Rust)
+                }
+            }
+        }
+        item { MoreGroup(t("Your care", "आपकी देखभाल")) {
+            MoreRow(Icons.Default.FolderOpen, SaharaSoftBlue, t("Documents", "दस्तावेज़"), t("Reports, bills and prescriptions", "रिपोर्ट, बिल और पर्चे"), Modifier.testTag("more-documents-entry"), onDocuments)
+            if (onCarePlan != null) MoreRow(Icons.Default.LocalHospital, Peach, t("Emergency plan & living will", "आपातकालीन योजना और लिविंग विल"), t("ED Quick View, wallet card QR and living will", "ED क्विक व्यू, वॉलेट कार्ड QR और लिविंग विल"), Modifier.testTag("more-care-plan-entry"), onCarePlan)
+            MoreRow(Icons.Default.CalendarMonth, Mint, t("Calendar", "कैलेंडर"), t("Dates and reminders", "तारीख़ें और रिमाइंडर"), Modifier.testTag("more-calendar"), onCalendar)
+            MoreRow(Icons.Default.Groups, SaharaLavender, t("Care team", "देखभाल टीम"), t("Tasks and chats", "काम और बातचीत"), Modifier.testTag("more-care-team"), onWorkflow)
+            MoreRow(Icons.Default.Science, SaharaApricot, t("Lab history", "जाँच का इतिहास"), t("Past test results", "पिछली जाँच के नतीजे"), Modifier.testTag("more-labs"), onLabs)
+            if (!walkthrough) MoreRow(Icons.Default.NotificationsNone, SaharaSoftGold, t("Reminders", "रिमाइंडर"), t("Medicine and visit reminders", "दवा और मुलाक़ात के रिमाइंडर"), Modifier.testTag("more-reminders"), onReminders)
+        } }
+        if (!walkthrough || doctorEmbedded) item { MoreGroup(t("Help and settings", "मदद और सेटिंग")) {
+            if (!walkthrough) MoreRow(Icons.Default.SentimentSatisfiedAlt, Mint, t("App feedback", "ऐप के बारे में अपनी राय"), t("Tell us what to improve", "बताइए क्या बेहतर हो"), Modifier.testTag("patient-feedback-entry"), onFeedback)
+            if (doctorEmbedded) MoreRow(Icons.Default.Groups, SaharaSoftBlue, t("Shared care and doctor's check", "साझा देखभाल और डॉक्टर की जाँच"), "", Modifier, onSharedWorkspace)
+            // Today's "Your care team" opens the family's Care team, so the doctor workspace keeps its own entry here.
+            else if (!walkthrough) MoreRow(Icons.Default.MedicalServices, SaharaSoftBlue, t("Doctor workspace", "डॉक्टर वर्कस्पेस"), "", Modifier.testTag("more-doctor-workspace-entry"), onSharedWorkspace)
+        } }
         item { SurfaceCard(Gold) {
             Icon(Icons.Default.Description, null, Modifier.size(28.dp)); Spacer(Modifier.height(12.dp))
             Text(t("${person.name}'s care notes", "${person.name} के देखभाल नोट"), fontFamily = SaharaTitleFont, fontSize = 21.sp, fontWeight = FontWeight.Medium)
@@ -1115,6 +1155,27 @@ internal fun careTabBackEnabled(personShown: Boolean, medicineScanner: Boolean, 
             Spacer(Modifier.height(12.dp)); Text(t("Version ${BuildConfig.VERSION_NAME}", "संस्करण ${BuildConfig.VERSION_NAME}"), style = MaterialTheme.typography.bodySmall)
         } }
         if (owner && !walkthrough) item { TextButton(onClick = onDelete) { Icon(Icons.Default.DeleteOutline, null); Spacer(Modifier.width(8.dp)); Text(t("Remove this person's records", "इस व्यक्ति के रिकॉर्ड हटाएँ")) } }
+    }
+}
+
+/** A titled group of More rows on one rounded card. */
+@Composable private fun MoreGroup(title: String, content: @Composable ColumnScope.() -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(title, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardSub, modifier = Modifier.padding(start = 6.dp).a11yHeading())
+        Surface(shape = RoundedCornerShape(22.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) { Column(Modifier.padding(vertical = 4.dp), content = content) }
+    }
+}
+
+/** One More row: a coloured icon, a title, an optional short line and an arrow. */
+@Composable private fun MoreRow(icon: ImageVector, tint: Color, title: String, subtitle: String, modifier: Modifier, onClick: () -> Unit) {
+    Row(modifier.fillMaxWidth().heightIn(min = 64.dp).clickable(role = Role.Button, onClick = onClick).padding(horizontal = 14.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+        Surface(shape = RoundedCornerShape(14.dp), color = tint) { Icon(icon, null, Modifier.padding(9.dp).size(22.dp), tint = DoctorAccent) }
+        Spacer(Modifier.width(14.dp))
+        Column(Modifier.weight(1f)) {
+            Text(title, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk)
+            if (subtitle.isNotBlank()) Text(subtitle, fontSize = 13.sp, color = DoctorCardSub)
+        }
+        Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, Modifier.size(22.dp), tint = DoctorCardSub)
     }
 }
 

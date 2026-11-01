@@ -4,6 +4,7 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
@@ -83,9 +84,13 @@ import androidx.compose.ui.unit.sp
     }
 }
 
-/** The selected care profile stays visible; switching profiles never changes account permissions. */
+/**
+ * The selected care profile stays visible; switching profiles never changes account permissions.
+ * The button beside it invites family to this record; a new care profile is added from the name's menu.
+ */
 @Composable fun CarePersonSelector(name: String, people: List<Pair<String, String>>, selectedId: String,
-    enabled: Boolean, onSelect: (String) -> Unit, onAdd: () -> Unit, canAdd: Boolean = true) {
+    enabled: Boolean, onSelect: (String) -> Unit, onAdd: () -> Unit, canAdd: Boolean = true,
+    onInvite: () -> Unit = {}, canInvite: Boolean = false, inviteLabel: String = "") {
     var expanded by remember { mutableStateOf(false) }; val t = careText()
     LaunchedEffect(enabled) { if (!enabled) expanded = false }
     Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -108,12 +113,18 @@ import androidx.compose.ui.unit.sp
                         leadingIcon = { Icon(if (id == selectedId) Icons.Default.CheckCircle else Icons.Default.PersonOutline, null, tint = if (id == selectedId) Rust else Ink) },
                         onClick = { expanded = false; onSelect(id) })
                 }
+                if (canAdd) {
+                    HorizontalDivider()
+                    DropdownMenuItem(text = { Text(t("Add another person", "एक और व्यक्ति जोड़ें")) }, modifier = Modifier.testTag("add-care-person"),
+                        leadingIcon = { Icon(Icons.Default.PersonAdd, null, tint = Rust) }, onClick = { expanded = false; onAdd() })
+                }
             }
         }
-        if (canAdd) IconButton(onClick = onAdd, enabled = enabled, modifier = Modifier.size(52.dp).testTag("add-care-person").semantics { contentDescription = t("Add person", "व्यक्ति जोड़ें") }) {
-            Box(Modifier.size(36.dp).clip(CircleShape).border(1.dp, if (enabled) Rust.copy(alpha = .6f) else MaterialTheme.colorScheme.outline.copy(alpha = .3f), CircleShape), contentAlignment = Alignment.Center) {
-                Icon(Icons.Default.PersonAdd, null, Modifier.size(18.dp), tint = if (enabled) Rust else MaterialTheme.colorScheme.onSurface.copy(alpha = .38f))
-            }
+        if (canInvite) OutlinedButton(onClick = onInvite, enabled = enabled, modifier = Modifier.heightIn(min = 44.dp).testTag("invite-family-top"),
+            shape = RoundedCornerShape(50), border = BorderStroke(1.dp, if (enabled) Rust.copy(alpha = .6f) else MaterialTheme.colorScheme.outline.copy(alpha = .3f)),
+            contentPadding = PaddingValues(horizontal = 14.dp)) {
+            Icon(Icons.Default.PersonAdd, null, Modifier.size(18.dp), tint = if (enabled) Rust else MaterialTheme.colorScheme.onSurface.copy(alpha = .38f))
+            Spacer(Modifier.width(6.dp)); Text(inviteLabel, color = if (enabled) RustText else MaterialTheme.colorScheme.onSurface.copy(alpha = .38f), fontWeight = FontWeight.SemiBold, fontSize = 14.sp, maxLines = 1)
         }
     }
 }

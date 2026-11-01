@@ -10,6 +10,7 @@
 //   SAHARA_AI_MODEL             chat model used for drafting and translation
 //   SAHARA_AI_TRANSCRIBE_MODEL  optional; speech-to-text model (turns on recorded-turn transcription)
 //   SAHARA_AI_PROVIDER_NAME     optional; the name people see in the consent line (default: the host name)
+//   SAHARA_AI_FALLBACK_MODEL    optional; a second chat model tried when the first is busy
 // SUPABASE_URL and SUPABASE_ANON_KEY are provided by Supabase.
 declare const Deno: { env: { get(name: string): string | undefined }; serve(handler: (request: Request) => Promise<Response>): void };
 
@@ -67,9 +68,15 @@ async function reserve(who: { url: string; anon: string; authorization: string }
 
 async function provider(path: string, body: string | FormData) {
   const config = configuration(); const key = secret('SAHARA_AI_API_KEY');
-  const remote = await fetch(`${config.base}${path}`, { method: 'POST', redirect: 'error', signal: AbortSignal.timeout(60_000), body,
+  const send = () => fetch(`${config.base}${path}`, { method: 'POST', redirect: 'error', signal: AbortSignal.timeout(110_000), body,
     headers: { Accept: 'application/json', ...(key ? { Authorization: `Bearer ${key}` } : {}), ...(typeof body === 'string' ? { 'Content-Type': 'application/json' } : {}) } });
-  if (!remote.ok) fail(remote.status === 429 ? 429 : 502, remote.status === 429 ? 'provider_busy' : 'provider_unavailable', 'The AI service could not finish. Your original is unchanged.');
+  let remote = await send();
+  // A busy provider often answers a second request a moment later.
+  if (remote.status === 429 || remote.status === 503) { await remote.body?.cancel(); await new Promise((done) => setTimeout(done, 2000)); remote = await send(); }
+  // Logs only the provider's status and its own short error text (no key, no patient words), so a setup mistake can be found.
+  if (!remote.ok) console.warn('provider_error', remote.status, (await remote.text().catch(() => '')).replace(/\s+/gu, ' ').slice(0, 300));
+  const busy = remote.status === 429 || remote.status === 503;
+  if (!remote.ok) fail(busy ? 503 : 502, busy ? 'provider_busy' : 'provider_unavailable', busy ? 'The AI service is busy right now. Try again in a minute. Your original is unchanged.' : 'The AI service could not finish. Your original is unchanged.');
   const value = await remote.json().catch(() => null);
   if (!isObject(value)) fail(502, 'invalid_response', 'The AI service returned an unreadable answer.');
   return value as Json;
@@ -77,8 +84,18 @@ async function provider(path: string, body: string | FormData) {
 
 async function chat(system: string, user: string, json: boolean) {
   const config = configuration();
-  const raw = await provider('/chat/completions', JSON.stringify({ model: config.model, temperature: 0, max_tokens: 4096,
-    messages: [{ role: 'system', content: system }, { role: 'user', content: user }], ...(json ? { response_format: { type: 'json_object' } } : {}) }));
+  // Gemini's newer models think at length by default, which is too slow here; other providers may reject the field.
+  const gemini = config.base.includes('generativelanguage.googleapis.com');
+  const request = (model: string) => JSON.stringify({ model, temperature: 0, max_tokens: 4096, ...(gemini ? { reasoning_effort: 'low' } : {}),
+    messages: [{ role: 'system', content: system }, { role: 'user', content: user }], ...(json ? { response_format: { type: 'json_object' } } : {}) });
+  const fallback = secret('SAHARA_AI_FALLBACK_MODEL');
+  let raw: Json;
+  try { raw = await provider('/chat/completions', request(config.model)); }
+  catch (error) {
+    if (!(error instanceof Failure) || error.code !== 'provider_busy' || !fallback || fallback === config.model) throw error;
+    console.warn('provider_fallback');
+    raw = await provider('/chat/completions', request(fallback));
+  }
   const choice = Array.isArray(raw.choices) ? raw.choices[0] : null;
   if (!isObject(choice) || choice.finish_reason === 'length' || !isObject(choice.message) || typeof choice.message.content !== 'string') fail(502, 'incomplete_output', 'The AI service did not return a complete answer.');
   return (choice as { message: { content: string } }).message.content;
@@ -218,6 +235,7 @@ export async function handle(request: Request): Promise<Response> {
       : action === 'ask' ? await ask(payload as Json, reserveNow) : await translate(payload as Json, reserveNow));
   } catch (error) {
     if (error instanceof Failure) return reply({ code: error.code, error: error.message }, error.status);
+    console.warn('unexpected_error', error instanceof Error ? error.name : typeof error);
     return reply({ code: 'unavailable', error: 'Online help could not finish. Your original is unchanged.' }, 503);
   }
 }

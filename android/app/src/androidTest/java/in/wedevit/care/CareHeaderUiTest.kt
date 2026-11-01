@@ -37,36 +37,40 @@ class CareHeaderUiTest {
         val selected = mutableStateOf("first")
         val user = mutableStateOf(PatientWalkthrough.users[0]); var left = 0
         var additions = 0
+        var invites = 0
         ui.setContent {
             val density = LocalDensity.current.density
             CompositionLocalProvider(LocalDensity provides Density(density, 1.3f)) {
                 CareTheme { Column(Modifier.width(320.dp)) {
                     CarePersonSelector(if (selected.value == "first") "ff" else "Asha", listOf("first" to "ff", "second" to "Asha"), selected.value,
-                        enabled = true, onSelect = { selected.value = it }, onAdd = { additions++ })
+                        enabled = true, onSelect = { selected.value = it }, onAdd = { additions++ }, onInvite = { invites++ }, canInvite = true, inviteLabel = "Invite family")
                     WalkthroughUserMenu(user.value, { user.value = PatientWalkthrough.user(it)!! }, { left++ })
                 } }
             }
         }
         ui.onNodeWithContentDescription("Switch care profile, ff").assertIsDisplayed()
-        ui.onNodeWithContentDescription("Add person").assertIsDisplayed()
+        ui.onNodeWithText("Invite family").assertIsDisplayed()
+        ui.onNodeWithTag("invite-family-top").performClick()
         ui.onNodeWithTag("selected-care-profile").performClick()
         ui.onNodeWithTag("person-second").performClick()
         ui.onNodeWithText("Asha").assertIsDisplayed()
+        // A new care profile is added from the name's menu.
+        ui.onNodeWithTag("selected-care-profile").performClick()
         ui.onNodeWithTag("add-care-person").performClick()
         ui.onNodeWithTag("walkthrough-user-menu").performClick()
         ui.onNodeWithTag("walkthrough-switch-rahul").assertIsSelected()
         ui.onNodeWithTag("leave-walkthrough").assertIsDisplayed()
         ui.onNodeWithTag("walkthrough-switch-arjun").performClick()
         ui.onNodeWithContentDescription("Walkthrough user, currently Arjun, Family").assertIsDisplayed()
-        ui.runOnIdle { assertEquals("second", selected.value); assertEquals(1, additions); assertEquals("arjun", user.value.key); assertEquals(0, left) }
+        ui.runOnIdle { assertEquals("second", selected.value); assertEquals(1, additions); assertEquals(1, invites); assertEquals("arjun", user.value.key); assertEquals(0, left) }
     }
 
     @Test fun recordingDisabledHeaderDoesNotPermitProfileChanges() {
         ui.setContent { CareTheme { Column {
-            CarePersonSelector("Asha", listOf("first" to "Asha"), "first", false, {}, {})
+            CarePersonSelector("Asha", listOf("first" to "Asha"), "first", false, {}, {}, canInvite = true, inviteLabel = "Invite family")
         } } }
         ui.onNodeWithTag("selected-care-profile").assertIsNotEnabled()
-        ui.onNodeWithTag("add-care-person").assertIsNotEnabled()
+        ui.onNodeWithTag("invite-family-top").assertIsNotEnabled()
     }
 
     @Test fun illustratedFeatureCardsKeepTheirIndependentActions() {

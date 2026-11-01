@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Quick action art: a soft 3D desk calendar. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="120dp" android:height="120dp" android:viewportWidth="200" android:viewportHeight="200">
+    <path android:fillColor="#1F5A3A22" android:pathData="M36,178a64,8 0 1,0 128,0a64,8 0 1,0 -128,0z" />
+    <!-- body -->
+    <path android:pathData="M52,46h96a20,20 0 0 1 20,20v86a20,20 0 0 1 -20,20h-96a20,20 0 0 1 -20,-20v-86a20,20 0 0 1 20,-20z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="linear" android:startX="100" android:startY="46" android:endX="100" android:endY="172" android:startColor="#FFFFFF" android:endColor="#E9E3DC" />
+        </aapt:attr>
+    </path>
+    <!-- coral top band -->
+    <path android:pathData="M52,46h96a20,20 0 0 1 20,20v14h-136v-14a20,20 0 0 1 20,-20z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="linear" android:startX="100" android:startY="46" android:endX="100" android:endY="80" android:startColor="#F08A66" android:endColor="#D45C3B" />
+        </aapt:attr>
+    </path>
+    <path android:fillColor="#40FFFFFF" android:pathData="M54,52h70a6,6 0 0 1 0,8h-70a6,6 0 0 1 0,-8z" />
+    <!-- rings -->
+    <path android:fillColor="#5B3A2E" android:pathData="M66,30a8,8 0 0 1 8,8v18a8,8 0 0 1 -16,0v-18a8,8 0 0 1 8,-8z M134,30a8,8 0 0 1 8,8v18a8,8 0 0 1 -16,0v-18a8,8 0 0 1 8,-8z" />
+    <path android:fillColor="#8A6556" android:pathData="M64,34h4v16h-4z M132,34h4v16h-4z" />
+    <!-- day grid -->
+    <path android:fillColor="#D9CFE9" android:pathData="M52,92h18v14h-18z M78,92h18v14h-18z M104,92h18v14h-18z M130,92h18v14h-18z M52,114h18v14h-18z M78,114h18v14h-18z M130,114h18v14h-18z M52,136h18v14h-18z M78,136h18v14h-18z M104,136h18v14h-18z" />
+    <!-- today, marked -->
+    <path android:pathData="M108,110h10a8,8 0 0 1 8,8v6a8,8 0 0 1 -8,8h-10a8,8 0 0 1 -8,-8v-6a8,8 0 0 1 8,-8z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="linear" android:startX="100" android:startY="110" android:endX="126" android:endY="132" android:startColor="#F59A74" android:endColor="#D45C3B" />
+        </aapt:attr>
+    </path>
+    <path android:fillColor="#E07A55" android:pathData="M158,162C142,151 143,137 152,137C155,137 157,139 158,142C159,139 161,137 164,137C173,137 174,151 158,162z" />
+</vector>

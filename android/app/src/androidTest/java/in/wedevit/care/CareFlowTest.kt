@@ -275,7 +275,7 @@ class CareFlowTest {
         ui.onNodeWithText("Save", useUnmergedTree = true).performScrollTo().performClick()
         ui.waitUntil(15000) { vm.items.value.any { it.title == "Bring the prescription" } }
         ui.onNodeWithTag("nav-Care").performClick()
-        // Daily care groups entries into modules; To do starts collapsed.
+        // Daily care shows modules as tiles; the To do tile opens its own screen.
         ui.onNodeWithTag("care-list").performScrollToNode(hasTestTag("care-module-to-do-toggle"))
         ui.onNodeWithTag("care-module-to-do-toggle").performClick()
         ui.onNodeWithTag("care-list").performScrollToNode(hasText("Bring the prescription"))
@@ -289,7 +289,9 @@ class CareFlowTest {
     }
     @Test fun prescriptionScannerKeepsManualFallbackAndRequiresReviewBeforeSaving() {
         ui.onNodeWithTag("nav-Care").performClick()
-        // The Medicines module is open by default and holds the scan entry.
+        // The Medicines tile opens its own screen, which holds the scan entry.
+        ui.onNodeWithTag("care-list").performScrollToNode(hasTestTag("care-module-medicines-toggle"))
+        ui.onNodeWithTag("care-module-medicines-toggle").performClick()
         ui.onNodeWithTag("care-list").performScrollToNode(hasText("Scan a prescription"))
         ui.onNodeWithText("Scan a prescription").assertIsDisplayed()
         ui.onNodeWithText("Scan & organize").performClick()

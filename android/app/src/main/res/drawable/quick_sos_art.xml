@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Quick action art: a glossy red emergency light. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="120dp" android:height="120dp" android:viewportWidth="200" android:viewportHeight="200">
+    <path android:fillColor="#1F5A3A22" android:pathData="M40,180a60,8 0 1,0 120,0a60,8 0 1,0 -120,0z" />
+    <!-- rays -->
+    <path android:strokeColor="#F2B04B" android:strokeWidth="7" android:strokeLineCap="round" android:pathData="M100,22v14 M44,44l10,10 M156,44l-10,10 M24,96h14 M176,96h-14" />
+    <!-- dome -->
+    <path android:pathData="M52,138v-36a48,48 0 0 1 96,0v36z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="radial" android:centerX="84" android:centerY="84" android:gradientRadius="82" android:startColor="#FF8A73" android:endColor="#C7332A" />
+        </aapt:attr>
+    </path>
+    <!-- glass shine -->
+    <path android:fillColor="#66FFFFFF" android:pathData="M70,104a30,34 0 0 1 22,-34a6,6 0 0 1 4,10a22,26 0 0 0 -14,24a6,6 0 0 1 -12,0z" />
+    <!-- white cross -->
+    <path android:fillColor="#FFF6EE" android:pathData="M94,96h12v12h12v12h-12v12h-12v-12h-12v-12h12z" />
+    <!-- base -->
+    <path android:pathData="M42,136h116a10,10 0 0 1 10,10v14a10,10 0 0 1 -10,10h-116a10,10 0 0 1 -10,-10v-14a10,10 0 0 1 10,-10z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="linear" android:startX="100" android:startY="136" android:endX="100" android:endY="170" android:startColor="#6E4A3E" android:endColor="#3F2A23" />
+        </aapt:attr>
+    </path>
+    <path android:fillColor="#30FFFFFF" android:pathData="M46,142h108a4,4 0 0 1 0,6h-108a4,4 0 0 1 0,-6z" />
+</vector>

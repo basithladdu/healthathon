@@ -51,7 +51,9 @@ class CareAssistHttpTransport(private val base: String = CARE_ASSIST_ENDPOINT) :
         val active = AtomicReference<HttpURLConnection?>()
         val worker = CoroutineScope(Dispatchers.IO).launch {
             var connection: HttpURLConnection? = null
-            try {
+            var attempt = 0
+            while (true) try {
+                attempt++
                 require(path in setOf("", "/transcribe", "/translate", "/ask"))
                 if ((!accessToken.matches(Regex("[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+")) || accessToken.length > 16384)) throw CareAssistException("sign_in_required", "Sign in to Sahara first.")
                 connection = URL(base + path).openConnection() as HttpURLConnection
@@ -63,7 +65,7 @@ class CareAssistHttpTransport(private val base: String = CARE_ASSIST_ENDPOINT) :
                 connection.setRequestProperty("Accept", "application/json")
                 connection.setRequestProperty("Cache-Control", "no-store")
                 connection.setRequestProperty("X-Sahara-Client", "android")
-                // The Sahara server (sahara.wedevit.in) only answers for a signed-in, confirmed Sahara account.
+                // The Saanthvana function only answers for a signed-in, confirmed Sahara account.
                 connection.setRequestProperty("Authorization", "Bearer $accessToken")
                 connection.setRequestProperty("apikey", CareCloud.PUBLIC_API_KEY)
                 if (body != null) {
@@ -92,9 +94,14 @@ class CareAssistHttpTransport(private val base: String = CARE_ASSIST_ENDPOINT) :
                     val error = runCatching { JSONObject(text) }.getOrNull()
                     throw CareAssistException(error?.optString("code")?.take(80).orEmpty().ifBlank { "unavailable" }, error?.optString("error")?.take(400).orEmpty().ifBlank { "Online help did not work this time. Nothing was changed." })
                 }
-                continuation.resumeWith(Result.success(text))
-            } catch (error: Throwable) { continuation.resumeWith(Result.failure(error)) }
-            finally { connection?.disconnect() }
+                continuation.resumeWith(Result.success(text)); break
+            } catch (error: Throwable) {
+                connection?.disconnect(); connection = null
+                // A kept-alive socket the server already closed fails a POST with "Connection reset" before anything is sent;
+                // Android retries that quietly only for GET, so try once more on a fresh connection.
+                if (attempt == 1 && continuation.isActive && (error is java.net.SocketException || error is javax.net.ssl.SSLException || error is java.io.EOFException)) continue
+                continuation.resumeWith(Result.failure(error)); break
+            }
         }
         continuation.invokeOnCancellation { active.get()?.disconnect(); worker.cancel() }
         }

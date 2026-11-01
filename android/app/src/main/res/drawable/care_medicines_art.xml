@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Medicines card art for Daily care: a pill bottle, a capsule and two tablets in the app's clay palette. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp" android:height="200dp" android:viewportWidth="200" android:viewportHeight="200">
+    <!-- soft shadow -->
+    <path android:fillColor="#1A6B3A22" android:pathData="M24,184a76,8 0 1,0 152,0a76,8 0 1,0 -152,0z" />
+    <!-- bottle body, its lighter edge and the label with a cross -->
+    <path android:fillColor="#D9663F" android:pathData="M54,72h50a14,14 0 0 1 14,14v72a14,14 0 0 1 -14,14h-50a14,14 0 0 1 -14,-14v-72a14,14 0 0 1 14,-14z" />
+    <path android:fillColor="#B9502F" android:pathData="M104,72a14,14 0 0 1 14,14v72a14,14 0 0 1 -14,14h-8v-100z" />
+    <path android:fillColor="#EE8B63" android:pathData="M51,84a5,5 0 0 1 5,5v66a5,5 0 0 1 -10,0v-66a5,5 0 0 1 5,-5z" />
+    <path android:fillColor="#FFF4E8" android:pathData="M60,100h40a8,8 0 0 1 8,8v32a8,8 0 0 1 -8,8h-40a8,8 0 0 1 -8,-8v-32a8,8 0 0 1 8,-8z" />
+    <path android:fillColor="#D9663F" android:pathData="M76,110h8a2,2 0 0 1 2,2v8h8a2,2 0 0 1 2,2v8a2,2 0 0 1 -2,2h-8v8a2,2 0 0 1 -2,2h-8a2,2 0 0 1 -2,-2v-8h-8a2,2 0 0 1 -2,-2v-8a2,2 0 0 1 2,-2h8v-8a2,2 0 0 1 2,-2z" />
+    <!-- cap with ridges -->
+    <path android:fillColor="#7E3420" android:pathData="M44,48h70a8,8 0 0 1 8,8v12a8,8 0 0 1 -8,8h-70a8,8 0 0 1 -8,-8v-12a8,8 0 0 1 8,-8z" />
+    <path android:fillColor="#9A4329" android:pathData="M48,52h4v20h-4z M62,52h4v20h-4z M76,52h4v20h-4z M90,52h4v20h-4z M104,52h4v20h-4z" />
+    <!-- capsule, tilted -->
+    <group android:pivotX="150" android:pivotY="140" android:rotation="-35">
+        <path android:fillColor="#B7A3E3" android:pathData="M132,128h18v24h-18a12,12 0 0 1 0,-24z" />
+        <path android:fillColor="#FFF4E8" android:pathData="M150,128h18a12,12 0 0 1 0,24h-18z" />
+        <path android:fillColor="#D8CCF3" android:pathData="M132,132h14v4h-14a2,2 0 0 1 0,-4z" />
+    </group>
+    <!-- two tablets -->
+    <path android:fillColor="#F2B48C" android:pathData="M116,174a11,11 0 1,0 22,0a11,11 0 1,0 -22,0z" />
+    <path android:fillColor="#FFF4E8" android:pathData="M144,178a10,10 0 1,0 20,0a10,10 0 1,0 -20,0z" />
+    <path android:fillColor="#E2CDB8" android:pathData="M146,177h16v2h-16z" />
+    <!-- small heart and sparkles, as on the other Sahara art -->
+    <path android:fillColor="#E07A55" android:pathData="M160,92C140,78 142,60 153,60C157,60 159,63 160,66C161,63 163,60 167,60C178,60 180,78 160,92z" />
+    <path android:strokeColor="#F0A04B" android:strokeWidth="4" android:strokeLineCap="round" android:pathData="M176,44l6,-8 M186,58l9,-2 M164,40l1,-9" />
+</vector>

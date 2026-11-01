@@ -4,7 +4,23 @@ package `in`.wedevit.care
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -66,27 +82,87 @@ internal fun shareCareInvite(context: Context, text: String, whatsApp: Boolean) 
     }
     ModalBottomSheet(onDismissRequest = { if (!busy) onDismiss() }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(horizontal = 22.dp).padding(bottom = 30.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-            Heading(t("Add family", "परिवार जोड़ें"), 28)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Surface(shape = CircleShape, color = Mint, modifier = Modifier.size(64.dp)) { Box(contentAlignment = Alignment.Center) { Image(saharaImage(R.drawable.quick_family_art, 48.dp), null, Modifier.size(48.dp), contentScale = ContentScale.Fit) } }
+                Spacer(Modifier.width(14.dp))
+                Heading(t("Add family", "परिवार जोड़ें"), 28)
+            }
             if (cloud == null) {
                 run { val who = patient.ifBlank { t("this person", "इस व्यक्ति") }; Text(t("To let family see $who's care on their own phone, you first need to sign in. It takes a minute.", "परिवार अपने फ़ोन पर $who की देखभाल देख सके, इसके लिए पहले साइन इन करें। इसमें बस एक मिनट लगता है।")) }
                 Button(onClick = { onDismiss(); onSignIn() }, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Icon(Icons.Default.AccountCircle, null); Spacer(Modifier.width(8.dp)); Text(t("Sign in or create an account", "साइन इन करें या खाता बनाएँ")) }
             } else if (!owner || selected.isBlank()) {
                 Text(t("Only the person who set up these records can invite family.", "परिवार को सिर्फ़ वही बुला सकते हैं जिन्होंने ये रिकॉर्ड बनाए हैं।"))
             } else {
-                Text(t("Let family see $patient's care on their own phone.", "परिवार अपने फ़ोन पर $patient की देखभाल देख सके।"))
-                CareField(name, { name = it.take(40); code = "" }, t("Name", "नाम"), singleLine = true, placeholder = t("For example, Arjun", "जैसे, अर्जुन"))
-                Text(t("How are they related?", "उनसे क्या रिश्ता है?"), style = MaterialTheme.typography.bodyMedium)
-                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) { CareRelations.forEach { r -> FilterChip(selected = relation == r, onClick = { relation = if (relation == r) "" else r }, modifier = Modifier.heightIn(min = 48.dp), label = { Text(careTr(hindi, r, CareRelationsHindi[r] ?: r)) }) } }
-                Text(t("What can they do?", "वे क्या कर सकेंगे?"), style = MaterialTheme.typography.bodyMedium)
-                ChoiceRow(t("Can view", "सिर्फ़ देख सकें"), Icons.Default.Visibility, Mint, !canAdd) { canAdd = false; code = "" }
-                ChoiceRow(t("Can view and add", "देख सकें और जोड़ सकें"), Icons.Default.Edit, Mint, canAdd) { canAdd = true; code = "" }
-                CheckLine(careTeam, { careTeam = it; code = "" }, t("Share care-team contacts", "देखभाल टीम के नंबर भी साझा करें"))
-                Text(t("They can read care notes and daily entries. Recordings and unfinished conversations aren't shared. The link works once and expires in 3 days. Their access then lasts 30 days; invite them again to renew it. They will need to sign in, and Your account shows when they have joined.", "वे देखभाल नोट और रोज़ की जानकारी पढ़ सकेंगे। रिकॉर्डिंग और अधूरी बातचीत साझा नहीं होती। लिंक एक ही बार चलता है और 3 दिन में बंद हो जाता है। उसके बाद उनकी पहुँच 30 दिन रहती है; आगे के लिए फिर से निमंत्रण भेजें। उन्हें साइन इन करना होगा, और जुड़ने पर “आपका खाता” में दिखेगा।"), style = MaterialTheme.typography.bodySmall)
-                Button(onClick = { send(true) }, enabled = !busy && name.isNotBlank(), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Icon(Icons.Default.PersonAdd, null); Spacer(Modifier.width(8.dp)); Text(if (busy) t("Please wait…", "कृपया रुकें…") else t("Send invite on WhatsApp", "WhatsApp पर निमंत्रण भेजें")) }
-                OutlinedButton(onClick = { send(false) }, enabled = !busy && name.isNotBlank(), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.Share, null); Spacer(Modifier.width(8.dp)); Text(t("Share another way", "किसी और तरीके से भेजें")) }
+                Text(t("Let family see $patient's care on their own phone.", "परिवार अपने फ़ोन पर $patient की देखभाल देख सके।"), color = DoctorCardSub)
+                InviteSection(t("Who are you inviting?", "आप किसे बुला रहे हैं?")) {
+                    CareField(name, { name = it.take(40); code = "" }, t("Name", "नाम"), singleLine = true, placeholder = t("For example, Arjun", "जैसे, अर्जुन"))
+                    Text(t("How are they related?", "उनसे क्या रिश्ता है?"), style = MaterialTheme.typography.bodyMedium, color = DoctorCardSub)
+                    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) { CareRelations.forEach { r ->
+                        FilterChip(selected = relation == r, onClick = { relation = if (relation == r) "" else r }, modifier = Modifier.heightIn(min = 44.dp), shape = RoundedCornerShape(50),
+                            label = { Text(careTr(hindi, r, CareRelationsHindi[r] ?: r)) }, leadingIcon = if (relation == r) { { Icon(Icons.Default.Check, null, Modifier.size(16.dp)) } } else null,
+                            colors = FilterChipDefaults.filterChipColors(containerColor = Paper, selectedContainerColor = Mint, selectedLabelColor = DoctorCardInk, selectedLeadingIconColor = Rust))
+                    } }
+                }
+                InviteSection(t("What can they do?", "वे क्या कर सकेंगे?")) {
+                    Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        AccessOption(t("Can view", "सिर्फ़ देख सकें"), t("Read notes, medicines and check-ins", "नोट, दवाइयाँ और रोज़ का हाल पढ़ सकें"), Icons.Default.Visibility, !canAdd, Modifier.weight(1f).fillMaxHeight()) { canAdd = false; code = "" }
+                        AccessOption(t("Can view and add", "देख सकें और जोड़ सकें"), t("Also tick medicines and add check-ins", "दवा पर टिक और रोज़ का हाल भी जोड़ सकें"), Icons.Default.Edit, canAdd, Modifier.weight(1f).fillMaxHeight()) { canAdd = true; code = "" }
+                    }
+                    Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).toggleable(careTeam, role = Role.Switch) { careTeam = it; code = "" }.padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Column(Modifier.weight(1f)) {
+                            Text(t("Share care-team contacts", "देखभाल टीम के नंबर भी साझा करें"), fontWeight = FontWeight.SemiBold, fontSize = 15.sp, color = DoctorCardInk)
+                            Text(t("Doctors' and nurses' phone numbers", "डॉक्टर और नर्स के फ़ोन नंबर"), fontSize = 13.sp, color = DoctorCardSub)
+                        }
+                        Switch(checked = careTeam, onCheckedChange = null)
+                    }
+                }
+                Surface(shape = RoundedCornerShape(18.dp), color = SaharaSoftBlue, modifier = Modifier.fillMaxWidth()) {
+                    Row(Modifier.padding(14.dp)) {
+                        Icon(Icons.Default.Info, null, Modifier.size(20.dp), tint = DoctorAccent); Spacer(Modifier.width(10.dp))
+                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            listOf(
+                                t("The link works once and expires in 3 days.", "लिंक एक बार चलता है और 3 दिन में ख़त्म हो जाता है।"),
+                                t("Access lasts 30 days. Invite them again to renew it.", "पहुँच 30 दिन रहती है। बढ़ाने के लिए फिर से बुलाएँ।"),
+                                t("Recordings and unfinished conversations are not shared.", "रिकॉर्डिंग और अधूरी बातचीत साझा नहीं होतीं।"),
+                                t("They sign in to join. Your account shows when they have.", "वे साइन इन करके जुड़ते हैं। आपके खाते में दिखेगा कि वे जुड़ गए।"),
+                            ).forEach { Text("• $it", fontSize = 13.sp, color = DoctorCardInk) }
+                        }
+                    }
+                }
+                Button(onClick = { send(true) }, enabled = !busy && name.isNotBlank(), modifier = Modifier.fillMaxWidth().heightIn(min = 54.dp).testTag("invite-send-whatsapp"), shape = RoundedCornerShape(50),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1B8A4B), contentColor = Color.White)) {
+                    Icon(Icons.AutoMirrored.Filled.Send, null); Spacer(Modifier.width(8.dp)); Text(if (busy) t("Please wait…", "कृपया रुकें…") else t("Send invite on WhatsApp", "WhatsApp पर निमंत्रण भेजें"), fontWeight = FontWeight.SemiBold)
+                }
+                if (name.isBlank()) Text(t("Type a name to send the invite.", "निमंत्रण भेजने के लिए नाम लिखें।"), fontSize = 13.sp, color = DoctorCardSub, modifier = Modifier.align(Alignment.CenterHorizontally))
+                OutlinedButton(onClick = { send(false) }, enabled = !busy && name.isNotBlank(), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp), shape = RoundedCornerShape(50)) { Icon(Icons.Default.Share, null); Spacer(Modifier.width(8.dp)); Text(t("Share another way", "किसी और तरीके से भेजें")) }
             }
             error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
             TextButton(onClick = onDismiss, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Close", "बंद करें")) }
+        }
+    }
+}
+
+@Composable private fun InviteSection(title: String, content: @Composable ColumnScope.() -> Unit) {
+    Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Text(title, fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading())
+            content()
+        }
+    }
+}
+
+/** One access choice: an icon, a name and one line on what it allows. */
+@Composable private fun AccessOption(title: String, detail: String, icon: ImageVector, selected: Boolean, modifier: Modifier, onSelect: () -> Unit) {
+    Surface(shape = RoundedCornerShape(18.dp), color = if (selected) Mint else Cream, border = BorderStroke(if (selected) 2.dp else 1.dp, if (selected) DoctorAccent else DoctorHairline),
+        modifier = modifier.selectable(selected, role = Role.RadioButton, onClick = onSelect)) {
+        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Surface(shape = CircleShape, color = if (selected) Paper else Mint) { Icon(icon, null, Modifier.padding(7.dp).size(20.dp), tint = DoctorAccent) }
+                Spacer(Modifier.weight(1f))
+                if (selected) Icon(Icons.Default.CheckCircle, null, Modifier.size(22.dp), tint = DoctorAccent)
+            }
+            Text(title, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, color = DoctorCardInk)
+            Text(detail, fontSize = 12.sp, color = DoctorCardSub)
         }
     }
 }

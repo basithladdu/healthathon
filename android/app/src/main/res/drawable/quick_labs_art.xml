@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Quick action art: a glass lab flask with lavender liquid and bubbles. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="120dp" android:height="120dp" android:viewportWidth="200" android:viewportHeight="200">
+    <path android:fillColor="#1F5A3A22" android:pathData="M44,180a56,8 0 1,0 112,0a56,8 0 1,0 -112,0z" />
+    <!-- glass -->
+    <path android:fillColor="#E8F1F4" android:pathData="M80,30h40v8h-6v42l40,70a16,16 0 0 1 -14,24h-80a16,16 0 0 1 -14,-24l40,-70v-42h-6z" />
+    <!-- liquid -->
+    <path android:pathData="M64,118h72l22,36a14,14 0 0 1 -12,20h-92a14,14 0 0 1 -12,-20z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="linear" android:startX="100" android:startY="118" android:endX="100" android:endY="174" android:startColor="#C4B0F0" android:endColor="#7D62C9" />
+        </aapt:attr>
+    </path>
+    <path android:fillColor="#40FFFFFF" android:pathData="M68,124h64a4,4 0 0 1 0,6h-64a4,4 0 0 1 0,-6z" />
+    <!-- bubbles -->
+    <path android:fillColor="#E9E0FF" android:pathData="M88,148a6,6 0 1,0 12,0a6,6 0 1,0 -12,0z M110,158a4,4 0 1,0 8,0a4,4 0 1,0 -8,0z M118,138a3,3 0 1,0 6,0a3,3 0 1,0 -6,0z" />
+    <path android:fillColor="#D6C9F5" android:pathData="M132,92a6,6 0 1,0 12,0a6,6 0 1,0 -12,0z M146,70a4,4 0 1,0 8,0a4,4 0 1,0 -8,0z" />
+    <!-- glass shine and rim -->
+    <path android:fillColor="#99FFFFFF" android:pathData="M92,44a4,4 0 0 1 4,4v34l-30,54a4,4 0 0 1 -7,-4l29,-52v-32a4,4 0 0 1 4,-4z" />
+    <path android:pathData="M76,26h48a6,6 0 0 1 0,12h-48a6,6 0 0 1 0,-12z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="linear" android:startX="100" android:startY="26" android:endX="100" android:endY="38" android:startColor="#F08A66" android:endColor="#C9573A" />
+        </aapt:attr>
+    </path>
+</vector>

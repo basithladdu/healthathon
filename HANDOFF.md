@@ -2,6 +2,35 @@
 
 > **30 Oct 2026:** SVK spec build (emergency care plan, living will, QR card, languages): see [docs/SAHARA_SVK_BUILD_HANDOFF.md](docs/SAHARA_SVK_BUILD_HANDOFF.md).
 
+## 1 Nov 2026: what changed since 30 Oct (Awaiz, with Claude Code)
+
+Branch `awaiz/latest-main` (main `30736d9` plus local commits). Built, all unit tests pass, and each change was checked on the emulator. Not on a real phone yet. The phone (androidTest) tests compile but were not run.
+
+**Server (Saanthvana, `kjnhtakqzboayqorrlue`)**
+- All 20 migrations applied; `android/supabase/tests/emergency_links.sql` passed.
+- `sahara-care-assist` deployed (now version 7). The Gemini key and model are in Supabase → Edge Functions → Secrets (`SAHARA_AI_MODEL` = `gemini-3.1-flash-lite`).
+- The function now asks Gemini for low thinking (newer models were too slow), retries once when Google says it is busy, can fall back to `SAHARA_AI_FALLBACK_MODEL` if that secret is set, and logs only the provider's status and short error (never the key or patient text).
+
+**App**
+- **Online help calls the Supabase function directly** (`CARE_ASSIST_ENDPOINT` in `CareRemoteAssist.kt`). The Vercel route `/api/sahara-assist` is no longer used by the app.
+- **"Connection reset" fix:** a POST over a kept-alive socket the server had closed failed before reaching Supabase; the app now retries once on a fresh connection when no reply came back.
+- **"Ask your documents" works:** asked "When is the next review" about a practice discharge PDF, got "The next review is at the oncology clinic on 4 Nov 2026", citing page 1 line 9. When Google's free tier is busy (503 "high demand"), the app shows the matching lines found on the phone.
+- **Patient summary, side-effect notes and the care timeline** (handoff A6 and friends): "<name> at a glance" on Today; "Side effect?" on each medicine, a "to raise at the next visit" card for the family and a "reported since last visit" card for the doctor; Docs → "Care timeline". Practice data for Rahul.
+- **Today redesign:**
+  - A greeting ("Good morning/afternoon/evening").
+  - The at-a-glance card as a hero card: avatar, name, a ring for today's medicines ticked, the one-line summary, and a "Show details" drop-down with the five sections.
+  - **Quick actions:** Calendar, SOS, Family (care team) and Labs, as tall tiles with new 3D-style art (`res/drawable/quick_*_art.xml`).
+  - **SOS** opens a sheet with the emergency card (the QR goes full screen at once if a card exists, otherwise its setup) and the "Emergency plan & living will" entry. Both cards left the Today list.
+- **Invite family:** the round add-person icon at the top is now a labelled "Invite family" button (owner only). The invite card left Today. A new care profile ("Who is this care for?") is now "Add another person" in the name drop-down.
+- **Care tab:** the six drop-down modules are now a bento grid of picture cards (Conversations, Medicines, Visits, To do, Check-ins, Journal). Each opens its own screen with a back arrow. New Medicines art: `res/drawable/care_medicines_art.xml`.
+- All new strings are in the Telugu, Urdu and Kannada dictionaries.
+
+**Still left (details in [blockers.md](blockers.md), "status on 1 Nov")**
+- Awaiz: doctor-verifier / centre-reviewer roles (need an email); real-phone test; narrated walkthrough video; optional backup model secret; Google billing before real patient data.
+- Basith: Play App Signing SHA-256 in `assetlinks.json` and redeploy; next Play upload (versionCode 9+); CARE option; final brief and slides.
+- Team: goals-of-care note format, symptom list and scales, KPIs.
+- Not done yet: speaker separation in recordings (Plan A on-device or Plan B tap-to-mark, waiting for a decision).
+
 ## 28 Oct: Play upload gap and candidate 0.6.2 (9)
 
 - The latest saved live Console evidence is from 24 Oct: Production 0.6.0 (7), submission 7, showed **Changes in review**. No later live Console result is recorded, so refresh that status before any upload.
@@ -27,7 +56,7 @@ This note lists every change I made to the Android app, what the app is like rig
 
 Details and the exact values are in [blockers.md](blockers.md). Tick items there when done.
 
-1. **Supabase migrations:** open Supabase and apply these from `android/supabase/migrations/`, in order. First check that the 19–23 Oct ones are already applied.
+1. ✅ **Done 31 Oct.** **Supabase migrations:** open Supabase and apply these from `android/supabase/migrations/`, in order. First check that the 19–23 Oct ones are already applied.
    - `20261019151322_shared_care_clinician_review.sql`
    - `20261023053251_care_team_contacts.sql`
    - `20261023053321_doctor_medicine_history.sql`
@@ -37,10 +66,10 @@ Details and the exact values are in [blockers.md](blockers.md). Tick items there
      - `20261027190000_emergency_card_links.sql`, then run `android/supabase/tests/emergency_links.sql`
      - `20261027190500_sahara_app_feedback.sql`
      - `20261027210000_sahara_account_lane.sql`
-2. **AI key:** in Supabase → Edge Functions → Secrets, set `SAHARA_AI_BASE_URL`, `SAHARA_AI_API_KEY` and `SAHARA_AI_MODEL`. Then, from `android/`, run `supabase functions deploy sahara-care-assist --project-ref kjnhtakqzboayqorrlue`.
-3. **Website:** redeploy it, so the app-link file and the `/join` page go live. The Play App Signing SHA-256 must go into `prototype/public/.well-known/assetlinks.json` first.
-4. Don't change sign-in or the doctor walkthrough entry. Judges use it.
-5. **Meeting 28 Oct changes (branch `sa-integrate-1028b`):** apply these three new migrations after the ones above, in order:
+2. ✅ **Done 31 Oct–1 Nov.** **AI key:** in Supabase → Edge Functions → Secrets, set `SAHARA_AI_BASE_URL`, `SAHARA_AI_API_KEY` and `SAHARA_AI_MODEL`. Then, from `android/`, run `supabase functions deploy sahara-care-assist --project-ref kjnhtakqzboayqorrlue`.
+3. ❌ **Not done; needs the Play signing fingerprint from Basith.** **Website:** redeploy it, so the app-link file and the `/join` page go live. The Play App Signing SHA-256 must go into `prototype/public/.well-known/assetlinks.json` first.
+4. ✅ Kept. Don't change sign-in or the doctor walkthrough entry. Judges use it.
+5. ✅ **Migrations and redeploy done 31 Oct; ❌ reviewer role still needs an email.** **Meeting 28 Oct changes (branch `sa-integrate-1028b`):** apply these three new migrations after the ones above, in order:
    - `20261028120000_assist_document_questions.sql` ("Ask your documents" uses the AI function's limits), then redeploy the AI function from `android/`: `supabase functions deploy sahara-care-assist --project-ref kjnhtakqzboayqorrlue`
    - `20261028150000_note_signature_receipts.sql` (goals-of-care sign-off receipts; signature image stays on the phone, only its SHA-256 is shared)
    - `20261028160510_centre_suggestions.sql` (Nearby "Suggest a centre that's missing", pending until reviewed)
