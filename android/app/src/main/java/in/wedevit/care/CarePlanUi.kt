@@ -67,8 +67,9 @@ internal fun planStepOf(field: String): Int = when {
     field.startsWith("prognosticUnderstanding") || field.startsWith("surrogateDeclaration") -> 3
     field.startsWith("values") -> 4
     field.startsWith("choices") -> 5
-    field == "reviewDue" -> 6
-    else -> 7
+    field == "withdrawal" -> 6
+    field == "reviewDue" -> 7
+    else -> 8
 }
 
 /**
@@ -120,10 +121,10 @@ internal fun planStepOf(field: String): Int = when {
         "wizard" -> {
             val draft = EctprLifecycle.draft(state.ectprs, selected)
             if (draft == null) { LaunchedEffect(Unit) { page = "home" }; return }
-            EctprWizard(draft, clinician, canEdit,
+            CompositionLocalProvider(LocalGocFolder provides runCatching { store.folder(selected) }.getOrNull()) { EctprWizard(draft, clinician, canEdit,
                 onSave = { r -> commit { CarePlanBook.saveDraft(it, r, actor, planNow(), today) } },
                 onSign = { r -> commit { CarePlanBook.sign(CarePlanBook.saveDraft(it, r, actor, planNow(), today), r.id, actor, planNow(), today) }.also { ok -> if (ok) page = "ed" } },
-                onClose = { page = "home" })
+                onClose = { page = "home" }) }
         }
         "pilot" -> PilotLogPage(state, selected, actor, ED_VIEW_DETAIL, onBack = { page = "home" }, commit = ::commit)
         "ed" -> EdQuickViewPage(state, selected, onBack = { page = "home" }, onCard = { page = "card" }, onShare = ::sharePlanPdf,
@@ -333,7 +334,7 @@ internal fun planStepOf(field: String): Int = when {
     LaunchedEffect(step) { listState.scrollToItem(0) }
     LaunchedEffect(shown) { if (shown.isNotEmpty()) listState.animateScrollToItem((listState.layoutInfo.totalItemsCount - 1).coerceAtLeast(0)) }
     val steps = listOf(t("Patient and illness", "मरीज़ और बीमारी"), t("Decision-makers", "फ़ैसला लेने वाले"), t("Capacity and existing directive", "निर्णय-क्षमता और पहले का निर्देश"),
-        t("Understanding", "समझ"), t("What matters", "क्या ज़रूरी है"), t("Treatment choices", "इलाज के फ़ैसले"), t("Review date", "समीक्षा की तारीख़"), t("Signatures", "हस्ताक्षर"), t("Check and sign", "जाँचें और हस्ताक्षर करें"))
+        t("Understanding", "समझ"), t("What matters", "क्या ज़रूरी है"), t("Treatment choices", "इलाज के फ़ैसले"), t("Stopping or not starting treatment", "इलाज रोकना या शुरू न करना"), t("Review date", "समीक्षा की तारीख़"), t("Signatures", "हस्ताक्षर"), t("Check and sign", "जाँचें और हस्ताक्षर करें"))
     val blockers = EctprRules.saveBlockers(d, today)
     fun update(change: (EctprRecord) -> EctprRecord) { d = change(d); shown = emptyList() }
     fun choices(change: (PlanChoices) -> PlanChoices) = update { it.copy(choices = change(it.choices)) }
@@ -363,13 +364,16 @@ internal fun planStepOf(field: String): Int = when {
                 3 -> understandingStep(d, ::update)
                 4 -> valuesStep(d, ::update)
                 5 -> treatmentStep(d, today, ::update, ::choices)
-                6 -> reviewStep(d, today, ::update)
-                7 -> signatureStep(d, clinician, ::update)
+                6 -> withdrawalStep(d, today, ::update)
+                7 -> reviewStep(d, today, ::update)
+                8 -> signatureStep(d, clinician, ::update)
                 else -> item { Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     val stop = EctprRules.activationBlockers(d, today); val warn = EctprRules.warnings(d, today)
                     Text(if (stop.isEmpty()) t("Ready to sign. Signing makes this the one active plan; any earlier version is replaced and its card link switched off.", "हस्ताक्षर के लिए तैयार। हस्ताक्षर से यही एक लागू योजना होगी; पुराना संस्करण बदल जाएगा और उसके कार्ड का लिंक बंद होगा।")
                         else t("Still needed before the plan can be active:", "योजना लागू होने से पहले अभी चाहिए:"), fontWeight = FontWeight.SemiBold)
                     IssueList(stop); IssueList(warn)
+                    PlanSummaryExtras(d)
+                    GocNoteForSigning(d)
                     CareContinuesBox()
                     Button(onClick = { onSign(d) }, enabled = canEdit && stop.isEmpty(), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("ectpr-sign")) { Icon(Icons.Default.Verified, null); Spacer(Modifier.width(8.dp)); Text(t("Sign and make active", "हस्ताक्षर करें और लागू करें")) }
                     OutlinedButton(onClick = { if (blockers.isEmpty() && onSave(d)) onClose() else shown = blockers }, enabled = canEdit, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Save draft and close", "मसौदा सहेजें और बंद करें")) }
@@ -405,6 +409,7 @@ private fun LazyListScope.patientStep(d: EctprRecord, update: ((EctprRecord) -> 
         PlanDateField(d.patient.dob, t("Date of birth", "जन्मतिथि"), { v -> p { it.copy(dob = v) } }, latest = LocalDate.now())
         Text(t("Sahara plans are for adults (18 and over).", "सहारा की योजना वयस्कों (18 और ऊपर) के लिए है।"), style = MaterialTheme.typography.bodySmall, color = DoctorCardSub)
         CareField(d.patient.sex, { v -> p { it.copy(sex = v) } }, t("Sex", "लिंग"), singleLine = true)
+        CareField(d.patient.gender, { v -> p { it.copy(gender = v) } }, t("Gender", "जेंडर"), singleLine = true)
         CareField(d.patient.uhid, { v -> p { it.copy(uhid = v) } }, t("Hospital number (UHID)", "अस्पताल नंबर (UHID)"), singleLine = true)
         CareField(d.patient.phone, { v -> p { it.copy(phone = v) } }, t("Phone", "फ़ोन"), singleLine = true)
         CareField(d.patient.address, { v -> p { it.copy(address = v) } }, t("Address", "पता"))
@@ -418,7 +423,7 @@ private fun LazyListScope.patientStep(d: EctprRecord, update: ((EctprRecord) -> 
         CareField(d.clinical.keyMedicines, { v -> c { it.copy(keyMedicines = v) } }, t("Key medicines", "मुख्य दवाएँ"))
         PlanDateField(d.clinical.eligibilityDate, t("Eligible for this plan since", "इस योजना के योग्य कब से"), { v -> c { it.copy(eligibilityDate = v) } }, latest = LocalDate.now())
         SectionTitle(t("Care team", "देखभाल टीम"))
-        CareField(d.careTeam.oncologist, { v -> team { it.copy(oncologist = v) } }, t("Oncologist", "ऑन्कोलॉजिस्ट"), singleLine = true)
+        CareField(d.careTeam.oncologist, { v -> team { it.copy(oncologist = v) } }, t("Main treating doctor or specialist (oncologist or any other)", "मुख्य इलाज करने वाले डॉक्टर या विशेषज्ञ (कैंसर या कोई और)"), singleLine = true)
         CareField(d.careTeam.palliativePhysician, { v -> team { it.copy(palliativePhysician = v) } }, t("Palliative doctor", "पैलिएटिव डॉक्टर"), singleLine = true)
         CareField(d.careTeam.palliativePhone24h, { v -> team { it.copy(palliativePhone24h = v) } }, t("Palliative 24-hour phone", "पैलिएटिव 24 घंटे का फ़ोन"), singleLine = true)
         CareField(d.careTeam.localDoctor, { v -> team { it.copy(localDoctor = v) } }, t("Local doctor", "स्थानीय डॉक्टर"), singleLine = true)
@@ -433,7 +438,11 @@ private fun LazyListScope.decisionMakerStep(d: EctprRecord, update: ((EctprRecor
 
 @Composable private fun FamilyFields(d: EctprRecord, update: ((EctprRecord) -> EctprRecord) -> Unit) { val t = careText()
     PlanCard {
-        CareField(d.decisionMakers.familyToInform.joinToString("\n"), { v -> update { it.copy(decisionMakers = it.decisionMakers.copy(familyToInform = v.lines())) } }, t("Family to inform (one per line)", "किन परिवार वालों को बताना है (हर लाइन में एक)"), minLines = 2)
+        SectionTitle(t("Family and friends", "परिवार और दोस्त"))
+        CareField(d.decisionMakers.presentAtDiscussion.joinToString("\n"), { v -> update { it.copy(decisionMakers = it.decisionMakers.copy(presentAtDiscussion = v.lines())) } }, t("Family or friends present for this discussion, with their relationship (one per line)", "इस बातचीत में मौजूद परिवार या दोस्त, रिश्ते के साथ (हर लाइन में एक)"), minLines = 2,
+            supporting = t("Includes spouses, live-in partners, same-sex and queer partners, and friends the patient chooses.", "इसमें पति-पत्नी, लिव-इन साथी, समलैंगिक और क्वीयर साथी, और मरीज़ के चुने हुए दोस्त शामिल हैं।"))
+        CareField(d.decisionMakers.familyToInform.joinToString("\n"), { v -> update { it.copy(decisionMakers = it.decisionMakers.copy(familyToInform = v.lines())) } }, t("Family or friends who must be informed before any major decision: name, relation, phone (one per line)", "जिन परिवारजनों या दोस्तों को बड़े फ़ैसले से पहले बताना ज़रूरी है: नाम, रिश्ता, फ़ोन (हर लाइन में एक)"), minLines = 2)
+        CareField(d.decisionMakers.attemptedContact.joinToString("\n"), { v -> update { it.copy(decisionMakers = it.decisionMakers.copy(attemptedContact = v.lines())) } }, t("Family or friends we tried to contact but could not reach (one per line)", "जिन परिवारजनों या दोस्तों से संपर्क की कोशिश हुई पर बात नहीं हो सकी (हर लाइन में एक)"), minLines = 2)
         CareField(d.decisionMakers.familyConsensusNote, { v -> update { it.copy(decisionMakers = it.decisionMakers.copy(familyConsensusNote = v)) } }, t("Family discussion note", "परिवार से बातचीत का नोट"),
             supporting = t("Family agreement is a note, not legal authority.", "परिवार की सहमति एक नोट है, क़ानूनी अधिकार नहीं।"))
     }
@@ -443,9 +452,10 @@ private fun LazyListScope.decisionMakerStep(d: EctprRecord, update: ((EctprRecor
     val dm = value ?: DecisionMaker()
     fun set(change: (DecisionMaker) -> DecisionMaker) { val next = change(dm); onChange(if (next == DecisionMaker()) null else next) }
     PlanCard {
-        SectionTitle(if (primary) t("Main decision-maker", "मुख्य फ़ैसला लेने वाले") else t("Alternate decision-maker", "दूसरे फ़ैसला लेने वाले"))
+        SectionTitle(if (primary) t("Primary decision-maker", "मुख्य फ़ैसला लेने वाले") else t("Secondary decision-maker", "द्वितीय फ़ैसला लेने वाले"))
         CareField(dm.name, { v -> set { it.copy(name = v) } }, t("Name", "नाम"), singleLine = true)
-        CareField(dm.relation, { v -> set { it.copy(relation = v) } }, t("Relation to the patient", "मरीज़ से रिश्ता"), singleLine = true)
+        CareField(dm.relation, { v -> set { it.copy(relation = v) } }, t("Relation to the patient", "मरीज़ से रिश्ता"), singleLine = true,
+            supporting = t("Includes spouses, live-in partners, same-sex and queer partners, and friends the patient chooses.", "इसमें पति-पत्नी, लिव-इन साथी, समलैंगिक और क्वीयर साथी, और मरीज़ के चुने हुए दोस्त शामिल हैं।"))
         CareField(dm.phone24h, { v -> set { it.copy(phone24h = v) } }, t("24-hour phone", "24 घंटे का फ़ोन"), singleLine = true)
         Text(t("ID type", "पहचान-पत्र का प्रकार"), fontWeight = FontWeight.Medium)
         ChipGroup(dm.idType, IdType.entries, PlanText::idType, "dm-${if (primary) "primary" else "alternate"}-id") { v -> set { it.copy(idType = v) } }
@@ -460,6 +470,7 @@ private fun LazyListScope.capacityStep(d: EctprRecord, update: ((EctprRecord) ->
 @Composable private fun CapacityFields(d: EctprRecord, update: ((EctprRecord) -> EctprRecord) -> Unit) { val t = careText(); val hindi = careHindi()
     fun cap(change: (CapacityAssessment) -> CapacityAssessment) = update { it.copy(capacity = change(it.capacity)) }
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        CapacityGuideCard()
         Text(t("Capacity is decided for this decision, now — not taken from old notes. Record the basis: can the patient understand, remember, weigh and communicate the choice?", "निर्णय-क्षमता इसी फ़ैसले के लिए, अभी जाँची जाती है — पुराने नोट से नहीं। आधार लिखें: क्या मरीज़ फ़ैसला समझ, याद रख, तौल और बता सकते हैं?"), style = MaterialTheme.typography.bodyMedium)
         OptionGroup(t("Capacity", "निर्णय-क्षमता"), d.capacity.status, Capacity.entries, PlanText::capacity, tag = "capacity") { v -> cap { it.copy(status = v) } }
         if (d.capacity.status == Capacity.FLUCTUATES || d.capacity.status == Capacity.LACKS) {
@@ -481,6 +492,14 @@ private fun LazyListScope.capacityStep(d: EctprRecord, update: ((EctprRecord) ->
             Text(AmdText.CAVEAT.pick(hindi), style = MaterialTheme.typography.bodySmall, color = DoctorCardSub)
         }
         if (dir?.kind == DirectiveKind.PRIOR_WISHES) CareField(dir.note, { v -> update { it.copy(existingDirective = dir.copy(note = v)) } }, t("What was said or written", "क्या कहा या लिखा गया था"), minLines = 2)
+    }
+}
+
+/** The draft annexure from the legal review. */
+@Composable private fun CapacityGuideCard() { val hindi = careHindi()
+    InfoDisclosure(CapacityGuide.TITLE.pick(hindi)) {
+        Text(CapacityGuide.NOTE.pick(hindi), style = MaterialTheme.typography.bodySmall, color = DoctorCardSub)
+        CapacityGuide.POINTS.forEachIndexed { i, point -> Text("${i + 1}. " + point.pick(hindi), style = MaterialTheme.typography.bodyMedium) }
     }
 }
 
@@ -513,6 +532,7 @@ private fun LazyListScope.valuesStep(d: EctprRecord, update: ((EctprRecord) -> E
     fun v(change: (PlanValues) -> PlanValues) = update { it.copy(values = change(it.values)) }
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         OptionGroup(t("Does the patient know about the illness?", "क्या मरीज़ को बीमारी के बारे में पता है?"), d.values.patientKnows, listOf(true, false), { if (it) Bi("Yes", "हाँ") else Bi("No", "नहीं") }, tag = "patient-knows") { x -> v { it.copy(patientKnows = x) } }
+        OptionGroup(t("When was this recorded?", "यह कब दर्ज किया गया?"), d.values.knowsRecordedWhen, KnowsRecordedWhen.entries, PlanText::knowsRecordedWhen, tag = "knows-when", noneLabel = NOT_RECORDED) { x -> v { it.copy(knowsRecordedWhen = x) } }
         CareField(d.values.ownWords, { x -> v { it.copy(ownWords = x) } }, t("What matters most, in the patient's own words", "सबसे ज़रूरी क्या है, मरीज़ के अपने शब्दों में"), minLines = 3)
         CareField(d.values.unacceptableOutcomes.joinToString("\n"), { x -> v { it.copy(unacceptableOutcomes = x.lines()) } }, t("Outcomes the patient would not accept (one per line)", "जो हालात मरीज़ को मंज़ूर नहीं (हर लाइन में एक)"), minLines = 2)
         CheckLine(d.values.familyAskedNotToTell, { x -> v { it.copy(familyAskedNotToTell = x) } }, t("The family asked that the patient not be told", "परिवार ने कहा है कि मरीज़ को न बताया जाए"))
@@ -525,8 +545,9 @@ private fun LazyListScope.valuesStep(d: EctprRecord, update: ((EctprRecord) -> E
 
 private fun LazyListScope.treatmentStep(d: EctprRecord, today: LocalDate, update: ((EctprRecord) -> EctprRecord) -> Unit, choices: ((PlanChoices) -> PlanChoices) -> Unit) {
     val locked = !d.prognosticUnderstanding.confirmed || (d.surrogateDeclaration.answeringAsSurrogate && !d.surrogateDeclaration.confirmed)
-    if (locked) { item { LockedTreatment(d) }; return }
+    if (locked) { item { LockedTreatment(d) }; item { HomeCareFields(d, update) }; return }
     item { TreatmentIntro() }
+    item(key = "goc-conversation") { GocConversationCard(d, update) }
     item { GoalAndTransfer(d, choices) }
     item { CprFields(d, update, choices) }
     item { BreathingFields(d, today, choices) }
@@ -534,6 +555,48 @@ private fun LazyListScope.treatmentStep(d: EctprRecord, today: LocalDate, update
     item { FeedingFields(d, choices) }
     item { LegalPendingBox() }
     item { ConflictFields(d, today, choices) }
+    item { HomeCareFields(d, update) }
+}
+
+/** Helps a doctor called to the home. Not a treatment choice, so the V4 and V5 locks do not apply. */
+@Composable private fun HomeCareFields(d: EctprRecord, update: ((EctprRecord) -> EctprRecord) -> Unit) { val t = careText()
+    val home = d.homeCare ?: EctprHomeCare()
+    fun set(change: (EctprHomeCare) -> EctprHomeCare) = update { it.copy(homeCare = change(it.homeCare ?: EctprHomeCare())) }
+    PlanCard {
+        SectionTitle(t("Home care (if relevant)", "घर पर देखभाल (अगर लागू हो)"))
+        Text(t("Helps a doctor called to the home see the care schedule and decide whether home care can continue.", "घर बुलाए गए डॉक्टर को देखभाल का क्रम देखने और यह तय करने में मदद करता है कि घर पर देखभाल जारी रह सकती है या नहीं।"), style = MaterialTheme.typography.bodySmall, color = DoctorCardSub)
+        CareField(home.assessmentFrequency, { v -> set { it.copy(assessmentFrequency = v) } }, t("How often the patient is assessed", "मरीज़ की जाँच कितनी बार होती है"), singleLine = true)
+        CareField(home.coordinator, { v -> set { it.copy(coordinator = v) } }, t("Person coordinating between the family and the hospital or centre (name, phone, centre)", "परिवार और अस्पताल या केंद्र के बीच तालमेल रखने वाले (नाम, फ़ोन, केंद्र)"))
+        CareField(home.ngoContact, { v -> set { it.copy(ngoContact = v, ngoConsulted = it.ngoConsulted && v.isNotBlank()) } }, t("Non-governmental organisation caring for the patient: representative and contact", "मरीज़ की देखभाल करने वाली ग़ैर-सरकारी संस्था: प्रतिनिधि और संपर्क"))
+        if (home.ngoContact.isNotBlank()) CheckLine(home.ngoConsulted, { v -> set { it.copy(ngoConsulted = v) } }, t("The organisation was consulted about this plan", "इस योजना पर संस्था से सलाह ली गई"))
+        OptionGroup(t("Admitted to any hospital before for this condition?", "क्या इस बीमारी के लिए पहले किसी अस्पताल में भर्ती हुए थे?"), home.previousAdmission, listOf(true, false), { if (it) Bi("Yes", "हाँ") else Bi("No", "नहीं") }, tag = "home-admitted", noneLabel = NOT_RECORDED) { x -> set { it.copy(previousAdmission = x) } }
+        if (home.previousAdmission == true) CareField(home.previousAdmissionDetails, { v -> set { it.copy(previousAdmissionDetails = v) } }, t("Where and when", "कहाँ और कब"), singleLine = true)
+    }
+}
+
+private fun LazyListScope.withdrawalStep(d: EctprRecord, today: LocalDate, update: ((EctprRecord) -> EctprRecord) -> Unit) { item { WithdrawalFields(d, today, update) } }
+
+/** Records the process only. The app never triggers withdrawal. */
+@Composable private fun WithdrawalFields(d: EctprRecord, today: LocalDate, update: ((EctprRecord) -> EctprRecord) -> Unit) { val t = careText()
+    val w = d.withdrawal ?: EctprWithdrawal()
+    fun set(change: (EctprWithdrawal) -> EctprWithdrawal) = update { it.copy(withdrawal = change(it.withdrawal ?: EctprWithdrawal())) }
+    Column(Modifier.testTag("withdrawal-step"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Text(t("Fill this only if withdrawing or withholding treatment has been decided (Common Cause v Union of India, 2018 and 2023). It records the process. This plan alone never authorises it.", "इसे तभी भरें जब इलाज रोकने या शुरू न करने का फ़ैसला हुआ हो (Common Cause v Union of India, 2018 और 2023)। यह प्रक्रिया दर्ज करता है। सिर्फ़ यह योजना इसकी अनुमति कभी नहीं देती।"), style = MaterialTheme.typography.bodyMedium)
+        IssueList(EctprRules.check(d, today).filter { it.id == "W1" })
+        PlanCard {
+            SectionTitle(t("Withdrawal or withholding (medical boards)", "इलाज रोकना या शुरू न करना (मेडिकल बोर्ड)"))
+            CheckLine(w.applicable, { v -> set { it.copy(applicable = v) } }, t("Withdrawing or withholding treatment has been decided for this patient", "इस मरीज़ के लिए इलाज रोकने या शुरू न करने का फ़ैसला हुआ है"))
+            if (w.applicable) {
+                PlanDateField(w.primaryBoardDate, t("Date the Primary Board was formed", "प्राथमिक बोर्ड बनने की तारीख़"), { v -> set { it.copy(primaryBoardDate = v) } })
+                PlanDateField(w.secondaryBoardDate, t("Date the Secondary Board was formed", "द्वितीय बोर्ड बनने की तारीख़"), { v -> set { it.copy(secondaryBoardDate = v) } })
+                CareField(w.primaryBoardMembers, { v -> set { it.copy(primaryBoardMembers = v) } }, t("Members of the Primary Board", "प्राथमिक बोर्ड के सदस्य"), minLines = 2)
+                CareField(w.secondaryBoardMembers, { v -> set { it.copy(secondaryBoardMembers = v) } }, t("Members of the Secondary Board", "द्वितीय बोर्ड के सदस्य"), minLines = 2)
+                CareField(w.boardDecision, { v -> set { it.copy(boardDecision = v) } }, t("Decision of the Boards", "बोर्ड का फ़ैसला"), minLines = 2)
+                OptionGroup(t("Final decision", "अंतिम फ़ैसला"), w.finalDecision, WithdrawalFinal.entries, { PlanText.withdrawalFinal(it) }, tag = "withdrawal-final", noneLabel = NOT_RECORDED) { x -> set { it.copy(finalDecision = x) } }
+                CareField(w.protocol, { v -> set { it.copy(protocol = v) } }, t("Protocol for withdrawal or withholding", "इलाज रोकने या शुरू न करने का तरीका"), minLines = 3)
+            }
+        }
+    }
 }
 
 @Composable private fun LockedTreatment(d: EctprRecord) { val t = careText()
@@ -681,19 +744,21 @@ private fun LazyListScope.signatureStep(d: EctprRecord, clinician: Boolean, upda
 @Composable private fun SignatureFields(d: EctprRecord, clinician: Boolean, update: ((EctprRecord) -> EctprRecord) -> Unit) { val t = careText(); val hindi = careHindi()
     var consultant by rememberSaveable { mutableStateOf("") }; var reg by rememberSaveable { mutableStateOf("") }
     var coName by rememberSaveable { mutableStateOf("") }; var coReg by rememberSaveable { mutableStateOf("") }; var coRole by rememberSaveable { mutableStateOf(SignatureRole.PALLIATIVE_CLINICIAN.name) }
-    var signer by rememberSaveable { mutableStateOf("") }; var signerRole by rememberSaveable { mutableStateOf(SignatureRole.PATIENT.name) }; var thumb by rememberSaveable { mutableStateOf(false) }
+    var signer by rememberSaveable { mutableStateOf("") }; var signerRole by rememberSaveable { mutableStateOf(if (d.surrogateDeclaration.answeringAsSurrogate) SurrogateRank.PRIMARY.name else SignatureRole.PATIENT.name) }; var thumb by rememberSaveable { mutableStateOf(false) }
     var witness by rememberSaveable { mutableStateOf("") }
     fun add(s: Signature) = update { r -> r.copy(signatures = (if (s.role == SignatureRole.TREATING_CONSULTANT) r.signatures.filter { it.role != SignatureRole.TREATING_CONSULTANT } else r.signatures) + s) }
     fun roleLabel(r: SignatureRole) = when (r) {
         SignatureRole.TREATING_CONSULTANT -> Bi("Treating consultant", "इलाज करने वाले कंसल्टेंट"); SignatureRole.PALLIATIVE_CLINICIAN -> Bi("Palliative clinician", "पैलिएटिव डॉक्टर"); SignatureRole.NURSE -> Bi("Nurse", "नर्स")
         SignatureRole.PATIENT -> Bi("Patient", "मरीज़"); SignatureRole.SURROGATE -> Bi("Decision-maker", "फ़ैसला लेने वाले"); SignatureRole.WITNESS -> Bi("Witness", "गवाह")
     }
+    fun rankLabel(rank: SurrogateRank) = when (rank) { SurrogateRank.PRIMARY -> Bi("Primary decision-maker", "मुख्य फ़ैसला लेने वाले"); SurrogateRank.SECONDARY -> Bi("Secondary decision-maker", "द्वितीय फ़ैसला लेने वाले") }
+    fun signerLabel(value: String) = SurrogateRank.entries.firstOrNull { it.name == value }?.let(::rankLabel) ?: roleLabel(SignatureRole.PATIENT)
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text(t("An unsigned form is a conversation note, not a plan. It becomes active only when the treating consultant signs with their registration number. Keep the signed paper copy with the family.", "बिना हस्ताक्षर का फ़ॉर्म बातचीत का नोट है, योजना नहीं। यह तभी लागू होता है जब इलाज करने वाले कंसल्टेंट अपने रजिस्ट्रेशन नंबर के साथ हस्ताक्षर करें। हस्ताक्षरित काग़ज़ी कॉपी परिवार के पास रखें।"), style = MaterialTheme.typography.bodyMedium)
         if (d.signatures.isNotEmpty()) PlanCard {
             SectionTitle(t("Signed so far", "अब तक हस्ताक्षर"))
             d.signatures.forEachIndexed { i, s -> Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("${roleLabel(s.role).pick(hindi)}: ${s.name}${s.registrationNo?.let { " · $it" } ?: ""}${if (s.thumbImpression == true) t(" · thumb impression", " · अँगूठे का निशान") else ""} · ${s.signedAt.take(16).replace('T', ' ')}", Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
+                Text("${(s.surrogateRank?.let(::rankLabel) ?: roleLabel(s.role)).pick(hindi)}: ${s.name}${s.registrationNo?.let { " · $it" } ?: ""}${if (s.thumbImpression == true) t(" · thumb impression", " · अँगूठे का निशान") else ""} · ${s.signedAt.take(16).replace('T', ' ')}", Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
                 IconButton(onClick = { update { r -> r.copy(signatures = r.signatures.filterIndexed { j, _ -> j != i }) } }) { Icon(Icons.Default.Close, t("Remove signature", "हस्ताक्षर हटाएँ")) }
             } }
         }
@@ -712,18 +777,30 @@ private fun LazyListScope.signatureStep(d: EctprRecord, clinician: Boolean, upda
         }
         PlanCard {
             SectionTitle(t("Patient or decision-maker", "मरीज़ या फ़ैसला लेने वाले"))
-            ChipGroup(SignatureRole.valueOf(signerRole), listOf(SignatureRole.PATIENT, SignatureRole.SURROGATE), ::roleLabel, "signer-role") { signerRole = (it ?: SignatureRole.PATIENT).name }
+            ChipGroup(signerRole, listOf(SignatureRole.PATIENT.name, SurrogateRank.PRIMARY.name, SurrogateRank.SECONDARY.name), ::signerLabel, "signer-role") { signerRole = it ?: SignatureRole.PATIENT.name }
             CareField(signer, { signer = it }, t("Name", "नाम"), singleLine = true)
             CheckLine(thumb, { thumb = it }, t("Signed with a thumb impression", "अँगूठे के निशान से हस्ताक्षर"))
-            OutlinedButton(onClick = { add(Signature(SignatureRole.valueOf(signerRole), signer.trim(), null, planNow(), thumb.takeIf { it })); signer = ""; thumb = false }, enabled = signer.isNotBlank(), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Add signature", "हस्ताक्षर जोड़ें")) }
+            OutlinedButton(onClick = { val rank = SurrogateRank.entries.firstOrNull { it.name == signerRole }; add(Signature(if (rank == null) SignatureRole.PATIENT else SignatureRole.SURROGATE, signer.trim(), null, planNow(), thumb.takeIf { it }, rank)); signer = ""; thumb = false }, enabled = signer.isNotBlank(), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Add signature", "हस्ताक्षर जोड़ें")) }
             CheckLine(d.limitedLiteracy, { v -> update { it.copy(limitedLiteracy = v) } }, t("Limited reading or writing", "पढ़ना-लिखना कम आता है"))
         }
         if (d.limitedLiteracy || d.signatures.any { it.thumbImpression == true } || d.witnesses.isNotEmpty()) PlanCard {
             SectionTitle(t("Witnesses (two needed)", "गवाह (दो चाहिए)"))
             Text(t("${d.witnesses.size} of 2 recorded", "2 में से ${d.witnesses.size} दर्ज"), style = MaterialTheme.typography.bodySmall)
+            Text(t("Needed when the patient signs by thumb impression or has limited literacy, for both home-based and hospital-based evaluation. Preferably people who are not decision-makers.", "जब मरीज़ अँगूठे से साइन करें या ठीक से पढ़ न सकें तब ज़रूरी, घर और अस्पताल दोनों जगह की जाँच में। बेहतर है कि ये फ़ैसला लेने वाले न हों।"), style = MaterialTheme.typography.bodySmall, color = DoctorCardSub)
             CareField(witness, { witness = it }, t("Witness name", "गवाह का नाम"), singleLine = true)
             OutlinedButton(onClick = { add(Signature(SignatureRole.WITNESS, witness.trim(), null, planNow())); witness = "" }, enabled = witness.isNotBlank(), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("add-witness")) { Text(t("Add witness", "गवाह जोड़ें")) }
         }
+    }
+}
+
+/** What was added by the legal review, on the check-and-sign step, so it is seen before signing. */
+@Composable private fun PlanSummaryExtras(d: EctprRecord) { val t = careText(); val hindi = careHindi()
+    val lines = listOfNotNull(d.decisionMakers.alternate?.takeUnless { it.blank }?.let { Bi.labeled(Bi("Secondary decision-maker", "द्वितीय फ़ैसला लेने वाले"), Bi.plain(listOf(it.name, it.relation, it.phone24h).filter(String::isNotBlank).joinToString(" · "))) }) +
+        PlanText.fullRecordLines(d) + PlanText.homeCareLines(d) + PlanText.withdrawalLines(d)
+    if (lines.isEmpty()) return
+    PlanCard {
+        SectionTitle(t("Full record", "पूरा रिकॉर्ड"))
+        lines.forEach { Text(it.pick(hindi), style = MaterialTheme.typography.bodyMedium) }
     }
 }
 
@@ -742,11 +819,16 @@ private fun LazyListScope.signatureStep(d: EctprRecord, clinician: Boolean, upda
         item { Surface(color = if (interp.kind == EdKind.ACTIVE) DoctorStatusGoodBg else DoctorStatusRestBg, shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth().testTag("ed-banner-${interp.kind.name.lowercase()}")) {
             Text(interp.banner.pick(hindi), Modifier.padding(14.dp).announce(), fontWeight = FontWeight.Bold, color = if (interp.kind == EdKind.ACTIVE) DoctorStatusGood else DoctorStatusRest)
         } }
+        if (interp.flags.isNotEmpty()) item { Surface(color = DoctorStatusWarnBg, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().testTag("ed-flags")) {
+            Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) { interp.flags.forEach { Text(it.pick(hindi), fontWeight = FontWeight.SemiBold, color = RustText) } }
+        } }
         // An active plan leads with its decisions (tech spec §6), so the always-on box is the short form there; every condition stays on screen.
         item { IfInDoubtBox(compact = interp.kind == EdKind.ACTIVE) }
         if (r != null && interp.showContent) {
             val rows = EdView.rows(r, amdLine, CarePlanBook.openReview(state, r.id), AmdLifecycle.governs(state.amds, patientId, r.existingDirective))
             items(rows, key = { it.key }) { row -> EdRowView(row) }
+            val fullRecord = PlanText.fullRecordLines(r)
+            if (fullRecord.isNotEmpty()) item { InfoDisclosure(t("Full record", "पूरा रिकॉर्ड")) { fullRecord.forEach { Text(it.pick(hindi), style = MaterialTheme.typography.bodyMedium) } } }
             if (r.choices.feeding.removeExistingTube) item { Surface(color = DoctorStatusWarnBg, shape = RoundedCornerShape(14.dp)) { Text(t("Wish recorded to remove an existing feeding tube: that is withdrawal and follows the medical board pathway. Not actionable from this plan.", "लगी हुई खाने की नली हटाने की इच्छा दर्ज है: यह इलाज वापस लेना है और मेडिकल बोर्ड की प्रक्रिया से होता है। इस योजना से नहीं किया जा सकता।"), Modifier.padding(12.dp)) } }
         } else {
             item { Text(t("No plan content is shown: give full standard emergency care.", "योजना की जानकारी नहीं दिखाई जाती: पूरा सामान्य आपातकालीन इलाज दें।"), style = MaterialTheme.typography.bodyMedium) }

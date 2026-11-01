@@ -37,10 +37,13 @@ class EdCardHttpTransport : EdCardTransport {
     }
 }
 
-/** The JSON the server stores: the record in the web model's shape, with the living will's status when the card was issued (the AMD itself stays here). */
+/**
+ * The JSON the server stores: the record in the web model's shape, with the living will's status when the card was issued (the AMD itself stays here).
+ * It carries gender, the family lists, home care and the Board record; the route's quickViewSnapshot leaves gender, the family lists, Board members and the Board decision out of what a scan shows.
+ */
 object EdCardSnapshot {
     fun summary(amd: AmdStatusSummary?): Any = amd?.let { JSONObject().put("status", it.status.name).put("executedOn", it.executedOn ?: JSONObject.NULL).put("version", it.version).put("attestor", it.attestor ?: JSONObject.NULL) } ?: JSONObject.NULL
-    fun json(r: EctprRecord, amd: AmdStatusSummary?): JSONObject = PlanJson.encode(r).put("amdAtIssue", summary(amd))
+    fun json(r: EctprRecord, amd: AmdStatusSummary?): JSONObject = PlanJson.encode(r).put("amdAtIssue", summary(amd)).also { it.remove(GOC_TRANSCRIPT_KEY) }
 
     /** issuableProblem in prototype/app/ed-card-snapshot.ts (rule V7). */
     fun problem(snapshot: JSONObject?): String? {

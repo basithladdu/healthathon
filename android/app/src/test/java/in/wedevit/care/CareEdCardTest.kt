@@ -188,8 +188,13 @@ class CareEdCardTest {
         val amdSummary = linkedMapOf<String, Boolean>(); tsKeys(tsType(source, "AmdStatusSummary"), "amdAtIssue.", amdSummary); ts += amdSummary
         val dm = linkedMapOf<String, Boolean>(); tsKeys(tsType(source, "DecisionMaker"), "", dm)
         dm.keys.forEach { ts["decisionMakers.primary.$it"] = false; ts["decisionMakers.alternate.$it"] = true }
-        val snapshot = EdCardSnapshot.json(signed().ectprs.single(), AmdStatusSummary(AmdStatus.EXECUTED, "2026-10-01", 1, "Notary: R"))
+        val home = linkedMapOf<String, Boolean>(); tsKeys(tsType(source, "EctprHomeCare"), "", home); home.keys.forEach { ts["homeCare.$it"] = true }
+        val boards = linkedMapOf<String, Boolean>(); tsKeys(tsType(source, "EctprWithdrawal"), "", boards); boards.keys.forEach { ts["withdrawal.$it"] = true }
+        val full = signed().ectprs.single().copy(homeCare = EctprHomeCare(coordinator = "Sister Joy"), withdrawal = EctprWithdrawal(applicable = true))
+        val snapshot = EdCardSnapshot.json(full, AmdStatusSummary(AmdStatus.EXECUTED, "2026-10-01", 1, "Notary: R"))
         val keys = linkedSetOf<String>(); jsonKeys(snapshot, "", keys)
+        // The legal review's fields go to the server under the web's names.
+        listOf("patient.gender", "decisionMakers.presentAtDiscussion", "decisionMakers.attemptedContact", "values.knowsRecordedWhen", "homeCare.coordinator", "withdrawal.finalDecision").forEach { assertTrue(it, it in keys) }
         // Union members (hospitalTransfer, icu…) carry their own `kind` shape, checked against the model's unions below.
         val unionFields = listOf("choices.hospitalTransfer.", "choices.icu.", "choices.vasopressors.", "choices.dialysis.", "choices.feeding.ng.", "existingDirective.", "choices.conflictReasons.")
         val extra = keys.filter { k -> k !in ts && unionFields.none { k.startsWith(it) } }
@@ -210,6 +215,9 @@ class CareEdCardTest {
         assertEquals(tsUnion(s, "Dialysis"), DialysisKind.entries.map { it.name }.toSet()); assertEquals(tsUnion(s, "NgFeeding"), NgKind.entries.map { it.name }.toSet()); assertEquals(tsUnion(s, "AmdStatus"), AmdStatus.entries.map { it.name }.toSet())
         assertEquals(tsUnion(s, "AmdCondition"), AmdCondition.entries.map { it.name }.toSet()); assertEquals(tsUnion(s, "AmdTreatment"), AmdTreatment.entries.map { it.name }.toSet()); assertEquals(tsUnion(s, "AmdPlaceOfCare"), AmdPlaceOfCare.entries.map { it.name }.toSet())
         val roles = Regex("role:\\s*([^;]+);").find(s)!!.groupValues[1]; assertEquals(Regex("'([A-Z_]+)'").findAll(roles).map { it.groupValues[1] }.toSet(), SignatureRole.entries.map { it.name }.toSet())
+        assertEquals(tsUnion(s, "WithdrawalFinal"), WithdrawalFinal.entries.map { it.name }.toSet())
+        val ranks = Regex("surrogateRank\\?:\\s*([^;}]+)").find(s)!!.groupValues[1]; assertEquals(Regex("'([A-Z_]+)'").findAll(ranks).map { it.groupValues[1] }.toSet(), SurrogateRank.entries.map { it.name }.toSet())
+        val knows = Regex("knowsRecordedWhen\\?:\\s*([^;}]+)").find(s)!!.groupValues[1]; assertEquals(Regex("'([A-Z_]+)'").findAll(knows).map { it.groupValues[1] }.toSet(), KnowsRecordedWhen.entries.map { it.name }.toSet())
         // The values in an actual snapshot.
         val snap = EdCardSnapshot.json(signed().ectprs.single(), null).getJSONObject("choices")
         assertEquals("ONLY_FOR", snap.getJSONObject("hospitalTransfer").getString("kind")); assertEquals("PAIN", snap.getJSONObject("hospitalTransfer").getJSONArray("reasons").getString(0))
@@ -352,7 +360,7 @@ class CareEdCardTest {
         val blank = signed().ectprs.single().copy(choices = PlanChoices())
         val step = PlanSpeech.wizardStep(blank, 5, false)
         assertTrue(step.contains(NO_PREFERENCE.en)); assertFalse(step.contains("refused"))
-        (0..8).forEach { assertTrue("step $it", PlanSpeech.wizardStep(blank, it, false).isNotBlank()); assertTrue("step $it hindi", HindiScan.hasHindi(PlanSpeech.wizardStep(blank, it, true))) }
+        (0..9).forEach { assertTrue("step $it", PlanSpeech.wizardStep(blank, it, false).isNotBlank()); assertTrue("step $it hindi", HindiScan.hasHindi(PlanSpeech.wizardStep(blank, it, true))) }
         val ed = PlanSpeech.edView(EdView.interpret(blank, today), AmdLifecycle.edSummary(emptyList(), "p1"), false)
         assertTrue(ed.contains(IfInDoubt.TITLE.en)); assertTrue(ed.contains(CareThatContinues.ITEMS.first().en)); assertTrue(ed.contains(AmdText.CAVEAT.en))
         val will = PlanSpeech.livingWill(AmdContent(treatments = mapOf(AmdTreatment.CPR to AmdChoice.REFUSE)), false)

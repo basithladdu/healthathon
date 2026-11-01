@@ -68,19 +68,23 @@ data class DecisionMaker(
 
 enum class EctprStatus { DRAFT, ACTIVE, SUPERSEDED, REVOKED }
 enum class SignatureRole { TREATING_CONSULTANT, PALLIATIVE_CLINICIAN, NURSE, PATIENT, SURROGATE, WITNESS }
-data class Signature(val role: SignatureRole, val name: String, val registrationNo: String? = null, val signedAt: String, val thumbImpression: Boolean? = null)
+/** Which decision-maker signed, when the role is SURROGATE (legal review). */
+enum class SurrogateRank { PRIMARY, SECONDARY }
+data class Signature(val role: SignatureRole, val name: String, val registrationNo: String? = null, val signedAt: String, val thumbImpression: Boolean? = null, val surrogateRank: SurrogateRank? = null)
 
-data class EctprPatient(val name: String = "", val dob: String = "", val sex: String = "", val address: String = "", val phone: String = "", val uhid: String = "", val languagePref: String = "")
+data class EctprPatient(val name: String = "", val dob: String = "", val sex: String = "", val address: String = "", val phone: String = "", val uhid: String = "", val languagePref: String = "", val gender: String = "")
 data class CareTeam(val oncologist: String = "", val palliativePhysician: String = "", val palliativePhone24h: String = "", val extraTeam: List<String> = emptyList(), val localDoctor: String = "")
-data class DecisionMakers(val primary: DecisionMaker? = null, val alternate: DecisionMaker? = null, val familyToInform: List<String> = emptyList(), val familyConsensusNote: String = "")
+data class DecisionMakers(val primary: DecisionMaker? = null, val alternate: DecisionMaker? = null, val familyToInform: List<String> = emptyList(), val familyConsensusNote: String = "",
+    val presentAtDiscussion: List<String> = emptyList(), val attemptedContact: List<String> = emptyList())
 data class IcdDeactivation(val decision: IcdDecision? = null, val date: String = "")
 data class ClinicalDetails(val diagnosis: String = "", val stage: String = "", val ecog: Int? = null, val allergies: String = "", val implantedDevice: ImplantedDevice? = null,
     val icdDeactivation: IcdDeactivation = IcdDeactivation(), val keyMedicines: String = "", val eligibilityDate: String = "")
 data class CapacityAssessment(val status: Capacity? = null, val assessor: String = "", val assessedOn: String = "", val basis: String = "", val reassessOn: String = "")
 data class PrognosticUnderstanding(val confirmed: Boolean = false, val confirmedBy: String = "", val confirmedOn: String = "")
 data class SurrogateDeclaration(val answeringAsSurrogate: Boolean = false, val confirmed: Boolean = false, val confirmedOn: String = "")
+enum class KnowsRecordedWhen { BEFORE_COUNSELLING, AFTER_COUNSELLING }
 data class PlanValues(val patientKnows: Boolean? = null, val ownWords: String = "", val unacceptableOutcomes: List<String> = emptyList(), val familyAskedNotToTell: Boolean = false,
-    val directQuestionPlan: String = "", val financialConcernDiscussed: Boolean? = null, val socialWorkReferral: Boolean? = null)
+    val directQuestionPlan: String = "", val financialConcernDiscussed: Boolean? = null, val socialWorkReferral: Boolean? = null, val knowsRecordedWhen: KnowsRecordedWhen? = null)
 data class DnacprDecidedBy(val name: String = "", val registrationNo: String = "", val decidedAt: String = "")
 data class CeilingConditions(val reversibleCauseException: Boolean? = null, val nivMaxHours: Int? = null, val spo2Floor: Int? = null, val homeNivReason: String = "")
 /** Comfort feeding by mouth is always on (L9); it is stored so the record says so explicitly. */
@@ -111,6 +115,11 @@ data class PlanChoices(
         vasopressors != null || dialysis != null || feeding.ng != null || feeding.peg != null || feeding.removeExistingTube || hydration != null || nivTrial != null
 }
 
+/** Legal review, Rituparna P, 31 Oct 2026. Null on the record because older saved records do not have them. */
+data class EctprHomeCare(val assessmentFrequency: String = "", val coordinator: String = "", val ngoContact: String = "", val ngoConsulted: Boolean = false, val previousAdmission: Boolean? = null, val previousAdmissionDetails: String = "")
+enum class WithdrawalFinal { TO_BE_PERFORMED, FAMILY_REFUSED, BOARD_REFUSED, PHYSICIAN_REVOKED }
+data class EctprWithdrawal(val applicable: Boolean = false, val primaryBoardDate: String = "", val secondaryBoardDate: String = "", val primaryBoardMembers: String = "", val secondaryBoardMembers: String = "", val boardDecision: String = "", val finalDecision: WithdrawalFinal? = null, val protocol: String = "")
+
 data class EctprRecord(
     val id: String, val patientId: String, val version: Int = 1, val formVersion: String = ECTPR_FORM_VERSION, val status: EctprStatus = EctprStatus.DRAFT,
     val createdAt: String, val updatedAt: String = createdAt, val createdBy: String = "",
@@ -127,11 +136,15 @@ data class EctprRecord(
     val surrogateDeclaration: SurrogateDeclaration = SurrogateDeclaration(),
     val values: PlanValues = PlanValues(),
     val choices: PlanChoices = PlanChoices(),
+    val homeCare: EctprHomeCare? = null,
+    val withdrawal: EctprWithdrawal? = null,
     val reviewDue: String = "",
     val signatures: List<Signature> = emptyList(),
     val limitedLiteracy: Boolean = false,
     val revokedAt: String? = null, val revokedReason: String? = null,
     val supersedes: String? = null,
+    /** Optional goals-of-care talk: verbatim lines and the doctor's note. Local only; EdCardSnapshot removes it from the card. */
+    val gocTranscript: GocTranscript? = null,
 ) {
     val consultantSignature: Signature? get() = signatures.firstOrNull { it.role == SignatureRole.TREATING_CONSULTANT && it.name.isNotBlank() && !it.registrationNo.isNullOrBlank() }
     val witnesses: List<Signature> get() = signatures.filter { it.role == SignatureRole.WITNESS && it.name.isNotBlank() }
@@ -158,7 +171,7 @@ object PlanIds {
 /** Rules V1–V9 (tech spec §5) and C1–C8 (clinical spec §4), plus L1 and the trial and capacity completeness checks. */
 object EctprRules {
     /** Checks that only stop a plan becoming Active; a draft may be saved without them. */
-    val ACTIVATION_ONLY = setOf("V6", "V7", "V8", "REVIEW_DUE")
+    val ACTIVATION_ONLY = setOf("V6", "V7", "V8", "REVIEW_DUE", "W1")
 
     private fun issue(id: String, severity: IssueSeverity, field: String, en: String, hi: String) = RuleIssue(id, severity, field, en, hi)
 
@@ -239,6 +252,14 @@ object EctprRules {
         if (r.patient.name.isBlank() || r.patient.uhid.isBlank()) add(issue("V8", IssueSeverity.BLOCK, "patient", "Every printed page shows the name and hospital number (UHID). Enter both.", "हर छपे पन्ने पर नाम और अस्पताल नंबर (UHID) होता है। दोनों लिखें।"))
         if ((r.limitedLiteracy || r.signatures.any { it.thumbImpression == true }) && r.witnesses.size < 2)
             add(issue("V6", IssueSeverity.BLOCK, "signatures", "A thumb impression or limited literacy needs two witnesses.", "अँगूठे के निशान या कम पढ़े-लिखे होने पर दो गवाह ज़रूरी हैं।"))
+        // W1, legal review: going ahead needs the whole Board record. The plan itself never authorises it.
+        val w = r.withdrawal
+        if (w != null && w.applicable && w.finalDecision == WithdrawalFinal.TO_BE_PERFORMED &&
+            !(PlanDates.day(w.primaryBoardDate) != null && PlanDates.day(w.secondaryBoardDate) != null && w.primaryBoardMembers.isNotBlank() && w.secondaryBoardMembers.isNotBlank() && w.boardDecision.isNotBlank() && w.protocol.isNotBlank()))
+            add(issue("W1", IssueSeverity.BLOCK, "withdrawal", "Before this can go ahead, record both Board dates, their members, their decision and the protocol.", "आगे बढ़ने से पहले दोनों बोर्ड की तारीख़, सदस्य, उनका फ़ैसला और तरीका दर्ज करें।"))
+        // W2, legal review: primary and secondary decision-makers both sign.
+        if (r.signatures.any { it.role == SignatureRole.SURROGATE } && r.decisionMakers.alternate?.name?.isNotBlank() == true && r.signatures.none { it.surrogateRank == SurrogateRank.SECONDARY })
+            add(issue("W2", IssueSeverity.WARN, "signatures", "A secondary decision-maker is named. They should sign too.", "द्वितीय फ़ैसला लेने वाले का नाम दर्ज है। उन्हें भी साइन करना चाहिए।"))
     }
 
     private fun stops(i: RuleIssue) = i.severity != IssueSeverity.WARN
@@ -391,11 +412,68 @@ object PlanText {
         val review = Bi("review $at by $who", "समीक्षा $at, $who")
         return Bi.join("", listOf(Bi.plain(" · ${t.durationValue} "), unit(t.durationUnit), Bi.plain(", "), review))
     }
+    fun knowsRecordedWhen(k: KnowsRecordedWhen) = when (k) { KnowsRecordedWhen.BEFORE_COUNSELLING -> Bi("Before counselling", "काउंसलिंग से पहले"); KnowsRecordedWhen.AFTER_COUNSELLING -> Bi("After counselling", "काउंसलिंग के बाद") }
+    fun withdrawalFinal(value: WithdrawalFinal?) = when (value) {
+        WithdrawalFinal.TO_BE_PERFORMED -> Bi("Withdrawal or withholding to be performed", "इलाज रोका जाएगा या शुरू नहीं किया जाएगा")
+        WithdrawalFinal.FAMILY_REFUSED -> Bi("Family refused consent (patient has lost decision-making capacity)", "परिवार ने सहमति नहीं दी (मरीज़ निर्णय क्षमता खो चुके हैं)")
+        WithdrawalFinal.BOARD_REFUSED -> Bi("Primary or Secondary Board refused permission", "प्राथमिक या द्वितीय बोर्ड ने अनुमति नहीं दी")
+        WithdrawalFinal.PHYSICIAN_REVOKED -> Bi("Treating doctor revoked their decision to support it", "इलाज करने वाले डॉक्टर ने समर्थन का अपना फ़ैसला वापस लिया")
+        null -> Bi("No final decision recorded", "कोई अंतिम फ़ैसला दर्ज नहीं")
+    }
+    private fun filled(label: Bi, value: String): Bi? = value.takeIf { it.isNotBlank() }?.let { Bi.labeled(label, Bi.plain(it)) }
+    /** Empty lines are left out. Nothing at all unless the section is ticked. */
+    fun withdrawalLines(r: EctprRecord): List<Bi> {
+        val w = r.withdrawal?.takeIf { it.applicable } ?: return emptyList()
+        return listOfNotNull(
+            Bi.labeled(Bi("Final decision", "अंतिम फ़ैसला"), withdrawalFinal(w.finalDecision)),
+            filled(Bi("Date the Primary Board was formed", "प्राथमिक बोर्ड बनने की तारीख़"), w.primaryBoardDate),
+            filled(Bi("Members of the Primary Board", "प्राथमिक बोर्ड के सदस्य"), w.primaryBoardMembers),
+            filled(Bi("Date the Secondary Board was formed", "द्वितीय बोर्ड बनने की तारीख़"), w.secondaryBoardDate),
+            filled(Bi("Members of the Secondary Board", "द्वितीय बोर्ड के सदस्य"), w.secondaryBoardMembers),
+            filled(Bi("Decision of the Boards", "बोर्ड का फ़ैसला"), w.boardDecision),
+            filled(Bi("Protocol for withdrawal or withholding", "इलाज रोकने या शुरू न करने का तरीका"), w.protocol),
+        )
+    }
+    fun homeCareLines(r: EctprRecord): List<Bi> {
+        val h = r.homeCare ?: return emptyList()
+        val ngo = h.ngoContact.takeIf { it.isNotBlank() }?.let { contact ->
+            val value = if (h.ngoConsulted) Bi.join(" · ", listOf(Bi.plain(contact), Bi("The organisation was consulted about this plan", "इस योजना पर संस्था से सलाह ली गई"))) else Bi.plain(contact)
+            Bi.labeled(Bi("Non-governmental organisation caring for the patient: representative and contact", "मरीज़ की देखभाल करने वाली ग़ैर-सरकारी संस्था: प्रतिनिधि और संपर्क"), value)
+        }
+        val admitted = Bi("Admitted before for this condition", "इस बीमारी के लिए पहले भर्ती")
+        return listOfNotNull(
+            filled(Bi("How often the patient is assessed", "मरीज़ की जाँच कितनी बार होती है"), h.assessmentFrequency),
+            filled(Bi("Person coordinating between the family and the hospital or centre (name, phone, centre)", "परिवार और अस्पताल या केंद्र के बीच तालमेल रखने वाले (नाम, फ़ोन, केंद्र)"), h.coordinator),
+            ngo,
+            if (h.previousAdmission == true) filled(admitted, h.previousAdmissionDetails) ?: admitted else null,
+        )
+    }
+    /** Full record only, never the card's quick view: gender, who was at the discussion, who could not be reached, and when the patient's understanding was recorded. */
+    fun fullRecordLines(r: EctprRecord): List<Bi> = listOfNotNull(
+        filled(Bi("Gender", "जेंडर"), r.patient.gender),
+        filled(Bi("Present for the discussion", "बातचीत में मौजूद"), r.decisionMakers.presentAtDiscussion.filter(String::isNotBlank).joinToString(", ")),
+        filled(Bi("Could not be reached", "संपर्क नहीं हो सका"), r.decisionMakers.attemptedContact.filter(String::isNotBlank).joinToString(", ")),
+        r.values.knowsRecordedWhen?.let { Bi.join(" ", listOf(Bi("When was this recorded?", "यह कब दर्ज किया गया?"), knowsRecordedWhen(it))) },
+    )
     fun trigger(t: ReviewTrigger) = when (t) {
         ReviewTrigger.NEW_ADMISSION -> Bi("New admission", "नई भर्ती"); ReviewTrigger.TRANSFER_BETWEEN_SETTINGS -> Bi("Moved between home, hospital or hospice", "घर, अस्पताल या हॉस्पिस के बीच बदलाव")
         ReviewTrigger.CONDITION_CHANGE -> Bi("Significant change in condition (either way)", "हालत में बड़ा बदलाव (बेहतर या बदतर)"); ReviewTrigger.PATIENT_OR_FAMILY_REQUEST -> Bi("Patient or family asked for a review", "मरीज़ या परिवार ने समीक्षा माँगी")
         ReviewTrigger.NEW_TREATMENT_LINE -> Bi("A new line of treatment started", "इलाज का नया दौर शुरू हुआ"); ReviewTrigger.ROUTINE_INTERVAL -> Bi("Routine review date reached", "नियमित समीक्षा की तारीख़ आ गई")
     }
+}
+
+/** Draft annexure from the legal review, shown on the capacity step and printed in the PDF. */
+object CapacityGuide {
+    val TITLE = Bi("How to assess decision-making capacity", "निर्णय लेने की क्षमता कैसे जाँचें")
+    val NOTE = Bi("Draft annexure. A clinician and the legal team must approve this wording before the pilot.", "मसौदा अनुलग्नक। पायलट से पहले डॉक्टर और क़ानूनी टीम को यह भाषा मंज़ूर करनी होगी।")
+    val POINTS = listOf(
+        Bi("Start by assuming the patient has capacity. Age, diagnosis or disagreeing with the doctor does not remove it.", "पहले मानें कि मरीज़ में क्षमता है। उम्र, बीमारी या डॉक्टर से असहमति से यह ख़त्म नहीं होती।"),
+        Bi("Assess this one decision, at this time. Do not rely on old notes.", "इसी एक फ़ैसले के लिए, अभी जाँचें। पुराने नोट पर भरोसा न करें।"),
+        Bi("Help them first: use their language, plain words and any aids, at the time of day they are most alert.", "पहले मदद करें: उनकी भाषा, सरल शब्द और कोई भी सहायक साधन इस्तेमाल करें, उस समय जब वे सबसे ज़्यादा सतर्क हों।"),
+        Bi("Check all four: can they understand the information, retain it long enough, weigh the choices and their results, and communicate a choice in any way?", "चारों जाँचें: क्या वे जानकारी समझ सकते हैं, उसे काफ़ी देर याद रख सकते हैं, विकल्पों और नतीजों को तौल सकते हैं, और किसी भी तरह अपना फ़ैसला बता सकते हैं?"),
+        Bi("If any one is missing, they lack capacity for this decision only. Record the basis and who assessed it, and still involve them as far as possible.", "अगर एक भी न हो, तो सिर्फ़ इस फ़ैसले की क्षमता नहीं है। आधार और जाँचने वाले का नाम लिखें, और फिर भी उन्हें जितना हो सके शामिल करें।"),
+        Bi("If it may be temporary (delirium, medicines, pain, infection), treat the cause and check again before acting.", "अगर यह अस्थायी हो सकती है (डेलिरियम, दवाएँ, दर्द, संक्रमण), तो कारण का इलाज करें और कुछ करने से पहले दोबारा जाँचें।"),
+    )
 }
 
 /** §18.4 mandatory review triggers. Each opens a prefilled draft and resets the review-due date. */
@@ -421,7 +499,7 @@ object EctprLifecycle {
     fun reviewDraft(records: List<EctprRecord>, from: EctprRecord, createdBy: String, now: String, today: LocalDate, id: String = newId()): EctprRecord {
         require(records.none { it.patientId == from.patientId && it.status == EctprStatus.DRAFT }) { "Finish or discard the open draft first." }
         return from.copy(id = id, version = (records.filter { it.patientId == from.patientId }.maxOfOrNull { it.version } ?: from.version) + 1, status = EctprStatus.DRAFT,
-            createdAt = now, updatedAt = now, createdBy = createdBy, createdInEd = false, signatures = emptyList(), revokedAt = null, revokedReason = null, supersedes = from.id,
+            createdAt = now, updatedAt = now, createdBy = createdBy, createdInEd = false, signatures = emptyList(), revokedAt = null, revokedReason = null, supersedes = from.id, gocTranscript = from.gocTranscript?.copy(lines = emptyList(), audioKept = false),
             prognosticUnderstanding = from.prognosticUnderstanding.copy(confirmed = false), surrogateDeclaration = from.surrogateDeclaration.copy(confirmed = false),
             choices = from.choices.copy(goalAConfirmed = false), reviewDue = ReviewRules.defaultReviewDue(today))
     }
@@ -510,7 +588,7 @@ object CardTokens {
 }
 
 enum class EdKind { NONE, UNSIGNED, OUT_OF_DATE, REVOKED, ACTIVE }
-data class EdInterpretation(val kind: EdKind, val record: EctprRecord?, val standardCareApplies: Boolean, val showContent: Boolean, val banner: Bi)
+data class EdInterpretation(val kind: EdKind, val record: EctprRecord?, val standardCareApplies: Boolean, val showContent: Boolean, val banner: Bi, val flags: List<Bi> = emptyList())
 data class EdRow(val key: String, val label: Bi, val value: Bi, val flag: Boolean = false)
 
 /** ED Quick View (clinical spec §6). The "If in doubt" box and "Care that always continues" are always shown by the screen and the print. */
@@ -520,7 +598,15 @@ object EdView {
 
     val ORDER = listOf("TRANSFER", "CPR", "RESP_CEILING", "ICU", "GOAL", "ALLERGIES", "DEVICE", "DECISION_MAKER", "TEAM", "CAPACITY", "AMD", "VERSION")
 
-    fun interpret(r: EctprRecord?, today: LocalDate): EdInterpretation = when {
+    /** Extra lines for the ED view, shown whatever state the plan is in, as on the web. */
+    private fun flags(r: EctprRecord?): List<Bi> {
+        val w = r?.withdrawal
+        return if (w != null && w.applicable && w.finalDecision == WithdrawalFinal.TO_BE_PERFORMED) listOf(Bi("Withdrawal or withholding is recorded with medical board decisions. Check with the treating team.", "इलाज रोकने या शुरू न करने का फ़ैसला मेडिकल बोर्ड के साथ दर्ज है। इलाज करने वाली टीम से पूछें।")) else emptyList()
+    }
+
+    fun interpret(r: EctprRecord?, today: LocalDate): EdInterpretation = state(r, today).copy(flags = flags(r))
+
+    private fun state(r: EctprRecord?, today: LocalDate): EdInterpretation = when {
         r == null -> EdInterpretation(EdKind.NONE, null, true, false, Bi("NO PLAN FOUND — standard care applies", "कोई योजना नहीं मिली — सामान्य इलाज लागू"))
         r.status == EctprStatus.REVOKED || r.status == EctprStatus.SUPERSEDED -> EdInterpretation(EdKind.REVOKED, r, true, false, Bi("CARD WITHDRAWN — this plan is no longer valid. Standard care applies.", "कार्ड वापस लिया गया — यह योजना अब मान्य नहीं। सामान्य इलाज लागू।"))
         r.status == EctprStatus.DRAFT || r.consultantSignature == null -> EdInterpretation(EdKind.UNSIGNED, r, true, false, Bi("UNSIGNED — a conversation note, not a plan. Standard care applies.", "बिना हस्ताक्षर — यह बातचीत का नोट है, योजना नहीं। सामान्य इलाज लागू।"))
@@ -538,7 +624,7 @@ object EdView {
     fun forToken(token: String, tokens: List<CardToken>, records: List<EctprRecord>, today: LocalDate): EdInterpretation {
         val t = tokens.firstOrNull { it.token == token } ?: return interpret(null, today)
         val r = records.firstOrNull { it.id == t.ectprId }
-        if (!t.live) return EdInterpretation(EdKind.REVOKED, r, true, false, Bi("CARD WITHDRAWN — this card is no longer valid. Standard care applies.", "कार्ड वापस लिया गया — यह कार्ड अब मान्य नहीं। सामान्य इलाज लागू।"))
+        if (!t.live) return EdInterpretation(EdKind.REVOKED, r, true, false, Bi("CARD WITHDRAWN — this card is no longer valid. Standard care applies.", "कार्ड वापस लिया गया — यह कार्ड अब मान्य नहीं। सामान्य इलाज लागू।"), flags(r))
         return interpret(r, today)
     }
 
@@ -576,13 +662,16 @@ object EdView {
         val device = r.clinical.implantedDevice?.let { d -> join(PlanText.device(d), r.clinical.icdDeactivation.decision?.let { Bi.labeled(Bi("ICD decision", "ICD का फ़ैसला"), Bi.join(" ", listOf(if (it == IcdDecision.DEACTIVATE) Bi("Switch off shocks", "झटके बंद करें") else Bi("Keep shocks on", "झटके चालू रखें"), Bi.plain(r.clinical.icdDeactivation.date)))) }) }
         val consultant = r.consultantSignature
         val team = join(consultant?.let { Bi("Consultant: ${it.name} (reg. ${it.registrationNo})", "कंसल्टेंट: ${it.name} (रजि. ${it.registrationNo})") }
-            ?: r.careTeam.oncologist.takeIf { it.isNotBlank() }?.let { Bi("Oncologist: $it", "ऑन्कोलॉजिस्ट: $it") },
+            ?: r.careTeam.oncologist.takeIf { it.isNotBlank() }?.let { Bi.labeled(Bi("Treating consultant", "इलाज करने वाले कंसल्टेंट"), Bi.plain(it)) },
             r.careTeam.palliativePhysician.takeIf { it.isNotBlank() }?.let { Bi("Palliative: $it ${r.careTeam.palliativePhone24h}".trim(), "पैलिएटिव: $it ${r.careTeam.palliativePhone24h}".trim()) })
         val capacity = r.capacity.status?.let { s -> join(PlanText.capacity(s), Bi("reassess by ${r.capacity.reassessOn}", "${r.capacity.reassessOn} तक दोबारा जाँचें").takeIf { s == Capacity.FLUCTUATES && r.capacity.reassessOn.isNotBlank() }) }
+        val decider = join(dm(r.decisionMakers.primary), dm(r.decisionMakers.alternate)?.let { Bi.labeled(Bi("Secondary", "द्वितीय"), it) })
+        val homeCare = PlanText.homeCareLines(r); val withdrawal = PlanText.withdrawalLines(r)
         val signedDay = consultant?.signedAt?.take(10) ?: "—"; val dueDay = r.reviewDue.ifBlank { "—" }; val form = r.formVersion; val number = r.version
         val version = Bi.join(" · ", listOfNotNull(Bi("v$number · $form · signed $signedDay · review due $dueDay", "v$number · $form · हस्ताक्षर $signedDay · समीक्षा $dueDay"),
             reviewRequest?.let { Bi.labeled(Bi("Review requested", "समीक्षा माँगी"), Bi.join(" ", listOf(PlanText.trigger(it.trigger), Bi.plain("(${it.at.take(10)})")))) }))
-        return listOf(
+        // ORDER is the clinical spec's fixed list. Home care and withdrawal appear only when recorded, just before capacity, as on the web.
+        return listOfNotNull(
             EdRow("TRANSFER", Bi("Hospital transfer", "अस्पताल ले जाना"), transfer ?: NO_PREFERENCE),
             EdRow("CPR", Bi("CPR", "CPR"), cpr ?: NO_PREFERENCE, flag = c.cpr == Cpr.DNACPR),
             EdRow("RESP_CEILING", Bi("Breathing support ceiling", "साँस की मदद की सीमा"), ceiling ?: NO_PREFERENCE),
@@ -590,8 +679,10 @@ object EdView {
             EdRow("GOAL", Bi("Goal of care", "देखभाल का लक्ष्य"), goal ?: NO_PREFERENCE),
             EdRow("ALLERGIES", Bi("Allergies", "एलर्जी"), r.clinical.allergies.takeIf { it.isNotBlank() }?.let(::text) ?: NOT_RECORDED, flag = r.clinical.allergies.isNotBlank()),
             EdRow("DEVICE", Bi("Implanted device", "शरीर में लगा यंत्र"), device ?: NOT_RECORDED, flag = r.clinical.implantedDevice == ImplantedDevice.ICD || r.clinical.implantedDevice == ImplantedDevice.CRT_D),
-            EdRow("DECISION_MAKER", Bi("Decision-maker (24 h phone)", "फ़ैसला लेने वाले (24 घंटे फ़ोन)"), dm(r.decisionMakers.primary) ?: NOT_RECORDED),
+            EdRow("DECISION_MAKER", Bi("Decision-maker (24 h phone)", "फ़ैसला लेने वाले (24 घंटे फ़ोन)"), decider.takeIf { it.en.isNotBlank() } ?: NOT_RECORDED),
             EdRow("TEAM", Bi("Treating consultant and palliative contact", "इलाज करने वाले कंसल्टेंट और पैलिएटिव संपर्क"), team.takeIf { it.en.isNotBlank() } ?: NOT_RECORDED),
+            homeCare.takeIf { it.isNotEmpty() }?.let { EdRow("HOME_CARE", Bi("Home care", "घर पर देखभाल"), Bi.join("\n", it)) },
+            withdrawal.takeIf { it.isNotEmpty() }?.let { EdRow("WITHDRAWAL", Bi("Withdrawal or withholding (medical boards)", "इलाज रोकना या शुरू न करना (मेडिकल बोर्ड)"), Bi.join("\n", it)) },
             EdRow("CAPACITY", Bi("Capacity", "निर्णय-क्षमता"), capacity ?: NOT_RECORDED, flag = r.capacity.status == Capacity.FLUCTUATES),
             EdRow("AMD", Bi("Living will (AMD)", "लिविंग विल (AMD)"), amd, flag = amdGoverns),
             EdRow("VERSION", Bi("Version, signed, review due", "संस्करण, हस्ताक्षर, समीक्षा"), version),
@@ -661,14 +752,18 @@ object PlanJson {
     private fun dm(d: DecisionMaker?) = d?.let { JSONObject().put("name", it.name).put("relation", it.relation).put("phone24h", it.phone24h).n("idType", it.idType?.name).n("idLast4", it.idLast4).n("authorityBasis", it.authorityBasis?.name) }
     private fun dm(j: JSONObject?) = j?.let { DecisionMaker(it.s("name"), it.s("relation"), it.s("phone24h"), it.e<IdType>("idType"), it.ns("idLast4"), it.e<AuthorityBasis>("authorityBasis")) }
     private fun kind(kind: String) = JSONObject().put("kind", kind)
+    private fun homeCare(h: EctprHomeCare) = JSONObject().put("assessmentFrequency", h.assessmentFrequency).put("coordinator", h.coordinator).put("ngoContact", h.ngoContact).put("ngoConsulted", h.ngoConsulted).n("previousAdmission", h.previousAdmission).put("previousAdmissionDetails", h.previousAdmissionDetails)
+    private fun homeCare(j: JSONObject) = EctprHomeCare(j.s("assessmentFrequency"), j.s("coordinator"), j.s("ngoContact"), j.optBoolean("ngoConsulted"), j.nb("previousAdmission"), j.s("previousAdmissionDetails"))
+    private fun withdrawal(w: EctprWithdrawal) = JSONObject().put("applicable", w.applicable).put("primaryBoardDate", w.primaryBoardDate).put("secondaryBoardDate", w.secondaryBoardDate).put("primaryBoardMembers", w.primaryBoardMembers).put("secondaryBoardMembers", w.secondaryBoardMembers).put("boardDecision", w.boardDecision).n("finalDecision", w.finalDecision?.name).put("protocol", w.protocol)
+    private fun withdrawal(j: JSONObject) = EctprWithdrawal(j.optBoolean("applicable"), j.s("primaryBoardDate"), j.s("secondaryBoardDate"), j.s("primaryBoardMembers"), j.s("secondaryBoardMembers"), j.s("boardDecision"), j.e<WithdrawalFinal>("finalDecision"), j.s("protocol"))
 
     fun encode(r: EctprRecord): JSONObject {
         val c = r.choices
         return JSONObject().put("id", r.id).put("patientId", r.patientId).put("version", r.version).put("formVersion", r.formVersion).put("status", r.status.name)
             .put("createdAt", r.createdAt).put("updatedAt", r.updatedAt).put("createdBy", r.createdBy).put("createdInEd", r.createdInEd)
-            .put("patient", JSONObject().put("name", r.patient.name).put("dob", r.patient.dob).put("sex", r.patient.sex).put("address", r.patient.address).put("phone", r.patient.phone).put("uhid", r.patient.uhid).put("languagePref", r.patient.languagePref))
+            .put("patient", JSONObject().put("name", r.patient.name).put("dob", r.patient.dob).put("sex", r.patient.sex).put("address", r.patient.address).put("phone", r.patient.phone).put("uhid", r.patient.uhid).put("languagePref", r.patient.languagePref).put("gender", r.patient.gender))
             .put("careTeam", JSONObject().put("oncologist", r.careTeam.oncologist).put("palliativePhysician", r.careTeam.palliativePhysician).put("palliativePhone24h", r.careTeam.palliativePhone24h).put("extraTeam", arr(r.careTeam.extraTeam)).put("localDoctor", r.careTeam.localDoctor))
-            .put("decisionMakers", JSONObject().n("primary", dm(r.decisionMakers.primary)).n("alternate", dm(r.decisionMakers.alternate)).put("familyToInform", arr(r.decisionMakers.familyToInform)).put("familyConsensusNote", r.decisionMakers.familyConsensusNote))
+            .put("decisionMakers", JSONObject().n("primary", dm(r.decisionMakers.primary)).n("alternate", dm(r.decisionMakers.alternate)).put("familyToInform", arr(r.decisionMakers.familyToInform)).put("familyConsensusNote", r.decisionMakers.familyConsensusNote).put("presentAtDiscussion", arr(r.decisionMakers.presentAtDiscussion)).put("attemptedContact", arr(r.decisionMakers.attemptedContact)))
             .put("clinical", JSONObject().put("diagnosis", r.clinical.diagnosis).put("stage", r.clinical.stage).n("ecog", r.clinical.ecog).put("allergies", r.clinical.allergies).n("implantedDevice", r.clinical.implantedDevice?.name)
                 .put("icdDeactivation", JSONObject().n("decision", r.clinical.icdDeactivation.decision?.name).put("date", r.clinical.icdDeactivation.date)).put("keyMedicines", r.clinical.keyMedicines).put("eligibilityDate", r.clinical.eligibilityDate))
             .put("capacity", JSONObject().n("status", r.capacity.status?.name).put("assessor", r.capacity.assessor).put("assessedOn", r.capacity.assessedOn).put("basis", r.capacity.basis).put("reassessOn", r.capacity.reassessOn))
@@ -680,7 +775,7 @@ object PlanJson {
             .put("prognosticUnderstanding", JSONObject().put("confirmed", r.prognosticUnderstanding.confirmed).put("confirmedBy", r.prognosticUnderstanding.confirmedBy).put("confirmedOn", r.prognosticUnderstanding.confirmedOn))
             .put("surrogateDeclaration", JSONObject().put("answeringAsSurrogate", r.surrogateDeclaration.answeringAsSurrogate).put("confirmed", r.surrogateDeclaration.confirmed).put("confirmedOn", r.surrogateDeclaration.confirmedOn))
             .put("values", JSONObject().n("patientKnows", r.values.patientKnows).put("ownWords", r.values.ownWords).put("unacceptableOutcomes", arr(r.values.unacceptableOutcomes)).put("familyAskedNotToTell", r.values.familyAskedNotToTell)
-                .put("directQuestionPlan", r.values.directQuestionPlan).n("financialConcernDiscussed", r.values.financialConcernDiscussed).n("socialWorkReferral", r.values.socialWorkReferral))
+                .put("directQuestionPlan", r.values.directQuestionPlan).n("financialConcernDiscussed", r.values.financialConcernDiscussed).n("socialWorkReferral", r.values.socialWorkReferral).n("knowsRecordedWhen", r.values.knowsRecordedWhen?.name))
             .put("choices", JSONObject().n("goalOfCare", c.goalOfCare?.name).n("cpr", c.cpr?.name).n("dnacprReason", c.dnacprReason?.name).put("dnacprDiscussedWith", c.dnacprDiscussedWith)
                 .n("dnacprDecidedBy", c.dnacprDecidedBy?.let { JSONObject().put("name", it.name).put("registrationNo", it.registrationNo).put("decidedAt", it.decidedAt) })
                 .put("cprConflictReason", c.cprConflictReason)
@@ -695,9 +790,9 @@ object PlanJson {
                 .put("conflictReasons", JSONObject().also { j -> c.conflictReasons.filterValues(String::isNotBlank).forEach { (k, v) -> j.put(k, v) } })
                 .put("goalAConfirmed", c.goalAConfirmed).n("nivTrial", trial(c.nivTrial)))
             .put("reviewDue", r.reviewDue)
-            .put("signatures", JSONArray(r.signatures.map { s -> JSONObject().put("role", s.role.name).put("name", s.name).put("signedAt", s.signedAt).also { j -> s.registrationNo?.let { j.put("registrationNo", it) }; s.thumbImpression?.let { j.put("thumbImpression", it) } } }))
+            .put("signatures", JSONArray(r.signatures.map { s -> JSONObject().put("role", s.role.name).put("name", s.name).put("signedAt", s.signedAt).also { j -> s.registrationNo?.let { j.put("registrationNo", it) }; s.thumbImpression?.let { j.put("thumbImpression", it) }; s.surrogateRank?.let { j.put("surrogateRank", it.name) } } }))
             .put("limitedLiteracy", r.limitedLiteracy)
-            .also { j -> r.revokedAt?.let { j.put("revokedAt", it) }; r.revokedReason?.let { j.put("revokedReason", it) }; r.supersedes?.let { j.put("supersedes", it) } }
+            .also { j -> r.gocTranscript?.let { j.put(GOC_TRANSCRIPT_KEY, GocTranscriptJson.encode(it)) }; r.homeCare?.let { j.put("homeCare", homeCare(it)) }; r.withdrawal?.let { j.put("withdrawal", withdrawal(it)) }; r.revokedAt?.let { j.put("revokedAt", it) }; r.revokedReason?.let { j.put("revokedReason", it) }; r.supersedes?.let { j.put("supersedes", it) } }
     }
 
     fun decode(j: JSONObject): EctprRecord {
@@ -708,15 +803,15 @@ object PlanJson {
         return EctprRecord(
             id = j.getString("id"), patientId = j.s("patientId"), version = j.optInt("version", 1), formVersion = j.s("formVersion").ifBlank { ECTPR_FORM_VERSION },
             status = j.e<EctprStatus>("status") ?: EctprStatus.DRAFT, createdAt = j.s("createdAt"), updatedAt = j.s("updatedAt"), createdBy = j.s("createdBy"), createdInEd = j.optBoolean("createdInEd", false),
-            patient = EctprPatient(p.s("name"), p.s("dob"), p.s("sex"), p.s("address"), p.s("phone"), p.s("uhid"), p.s("languagePref")),
+            patient = EctprPatient(p.s("name"), p.s("dob"), p.s("sex"), p.s("address"), p.s("phone"), p.s("uhid"), p.s("languagePref"), p.s("gender")),
             careTeam = CareTeam(team.s("oncologist"), team.s("palliativePhysician"), team.s("palliativePhone24h"), team.strings("extraTeam"), team.s("localDoctor")),
-            decisionMakers = DecisionMakers(dm(dms.o("primary")), dm(dms.o("alternate")), dms.strings("familyToInform"), dms.s("familyConsensusNote")),
+            decisionMakers = DecisionMakers(dm(dms.o("primary")), dm(dms.o("alternate")), dms.strings("familyToInform"), dms.s("familyConsensusNote"), dms.strings("presentAtDiscussion"), dms.strings("attemptedContact")),
             clinical = ClinicalDetails(cl.s("diagnosis"), cl.s("stage"), cl.ni("ecog"), cl.s("allergies"), cl.e<ImplantedDevice>("implantedDevice"), IcdDeactivation(icd.e<IcdDecision>("decision"), icd.s("date")), cl.s("keyMedicines"), cl.s("eligibilityDate")),
             capacity = CapacityAssessment(cap.e<Capacity>("status"), cap.s("assessor"), cap.s("assessedOn"), cap.s("basis"), cap.s("reassessOn")),
             existingDirective = j.o("existingDirective")?.let { d -> d.e<DirectiveKind>("kind")?.let { ExistingDirective(it, d.s("date"), d.s("location"), d.s("attestor"), d.s("note")) } },
             prognosticUnderstanding = PrognosticUnderstanding(pu.optBoolean("confirmed"), pu.s("confirmedBy"), pu.s("confirmedOn")),
             surrogateDeclaration = SurrogateDeclaration(sd.optBoolean("answeringAsSurrogate"), sd.optBoolean("confirmed"), sd.s("confirmedOn")),
-            values = PlanValues(v.nb("patientKnows"), v.s("ownWords"), v.strings("unacceptableOutcomes"), v.optBoolean("familyAskedNotToTell"), v.s("directQuestionPlan"), v.nb("financialConcernDiscussed"), v.nb("socialWorkReferral")),
+            values = PlanValues(v.nb("patientKnows"), v.s("ownWords"), v.strings("unacceptableOutcomes"), v.optBoolean("familyAskedNotToTell"), v.s("directQuestionPlan"), v.nb("financialConcernDiscussed"), v.nb("socialWorkReferral"), v.e<KnowsRecordedWhen>("knowsRecordedWhen")),
             choices = PlanChoices(
                 goalOfCare = c.e<GoalOfCare>("goalOfCare"), cpr = c.e<Cpr>("cpr"), dnacprReason = c.e<DnacprReason>("dnacprReason"), dnacprDiscussedWith = c.s("dnacprDiscussedWith"),
                 dnacprDecidedBy = c.o("dnacprDecidedBy")?.let { DnacprDecidedBy(it.s("name"), it.s("registrationNo"), it.s("decidedAt")) }, cprConflictReason = c.s("cprConflictReason"),
@@ -731,9 +826,10 @@ object PlanJson {
                 conflictReasons = c.optJSONObject("conflictReasons")?.let { o -> o.keys().asSequence().associateWith { o.optString(it) } }.orEmpty(),
                 goalAConfirmed = c.optBoolean("goalAConfirmed"), nivTrial = trial(c.o("nivTrial")),
             ),
+            homeCare = j.o("homeCare")?.let { homeCare(it) }, withdrawal = j.o("withdrawal")?.let { withdrawal(it) },
             reviewDue = j.s("reviewDue"),
-            signatures = j.optJSONArray("signatures")?.let { a -> (0 until a.length()).map { a.getJSONObject(it) }.mapNotNull { s -> s.e<SignatureRole>("role")?.let { Signature(it, s.s("name"), s.ns("registrationNo"), s.s("signedAt"), s.nb("thumbImpression")) } } }.orEmpty(),
-            limitedLiteracy = j.optBoolean("limitedLiteracy"), revokedAt = j.ns("revokedAt"), revokedReason = j.ns("revokedReason"), supersedes = j.ns("supersedes"),
+            signatures = j.optJSONArray("signatures")?.let { a -> (0 until a.length()).map { a.getJSONObject(it) }.mapNotNull { s -> s.e<SignatureRole>("role")?.let { Signature(it, s.s("name"), s.ns("registrationNo"), s.s("signedAt"), s.nb("thumbImpression"), s.e<SurrogateRank>("surrogateRank")) } } }.orEmpty(),
+            limitedLiteracy = j.optBoolean("limitedLiteracy"), revokedAt = j.ns("revokedAt"), revokedReason = j.ns("revokedReason"), supersedes = j.ns("supersedes"), gocTranscript = GocTranscriptJson.decode(j.optJSONObject(GOC_TRANSCRIPT_KEY), j.optInt("version", 1)),
         )
     }
 
