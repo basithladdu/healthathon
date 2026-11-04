@@ -110,9 +110,9 @@ class MedicineHistoryRepo(context: Context, private val cloud: CareCloud?, priva
 }
 
 /** Call only after a successful device-local checkbox save. It never invents a taken time. */
-internal suspend fun appendLocalMedicineCheckoff(context: Context, accountId: String, item: CareItem, beforeDate: String, afterDate: String, loggedAt: Long = System.currentTimeMillis()) {
+internal suspend fun appendLocalMedicineCheckoff(context: Context, accountId: String, item: CareItem, beforeDate: String, afterDate: String, loggedAt: Long = System.currentTimeMillis(), role: String = "") {
     if(item.kind != "medicine" || beforeDate == afterDate) return
     MedicineHistoryRepo(context,null,accountId).append(item.personId,MedicineIntakeEvent(UUID.randomUUID().toString(),item.id,item.title,
         if(afterDate.isBlank()) "unmarked" else "taken", reportedDate=afterDate.ifBlank { beforeDate }, loggedAt=loggedAt,
-        reporter="Reporter not recorded",note=if(afterDate.isBlank()) "Daily check-off removed; earlier report retained." else "Daily check-off. Exact taken time was not recorded.",source="daily-checkoff"))
+        reporter=MedicineHistoryRules.checkoffReporter(role),note=if(afterDate.isBlank()) "Daily check-off removed; earlier report retained." else "Daily check-off. Exact taken time was not recorded.",source="daily-checkoff"))
 }

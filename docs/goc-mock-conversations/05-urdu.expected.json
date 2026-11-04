@@ -1,0 +1,64 @@
+{
+  "fictional": true,
+  "note": "FICTIONAL test data. The expected outcome is what Sahara's word matcher should SUGGEST for the doctor to check. It is not a clinical decision, and nothing is chosen until the doctor confirms each item (rule V1).",
+  "transcript": "05-urdu.txt",
+  "title": "Urdu",
+  "language": "ur",
+  "decisions": {
+    "cpr": {
+      "suggested": [
+        "DNACPR"
+      ]
+    },
+    "dialysis": {
+      "suggested": [
+        "NO"
+      ]
+    },
+    "respCeiling": {
+      "suggested": [],
+      "ruledOut": [
+        "5"
+      ]
+    },
+    "icu": {
+      "suggested": [
+        "NO"
+      ]
+    },
+    "hospitalTransfer": {
+      "suggested": [
+        "NO"
+      ]
+    },
+    "goalOfCare": {
+      "suggested": [
+        "C_COMFORT"
+      ]
+    }
+  },
+  "changedMind": [],
+  "conflict": [],
+  "discussed": [
+    "consent",
+    "patientDetails",
+    "decisionMakers",
+    "cpr",
+    "dialysis",
+    "respCeiling",
+    "icu",
+    "hospitalTransfer",
+    "goalOfCare"
+  ],
+  "notDiscussed": [
+    "vasopressors",
+    "ng",
+    "peg",
+    "hydration",
+    "ambulance"
+  ],
+  "knownGaps": {
+    "web": {},
+    "android": {}
+  }
+}

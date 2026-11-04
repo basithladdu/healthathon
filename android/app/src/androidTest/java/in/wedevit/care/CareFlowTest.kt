@@ -19,6 +19,11 @@ class CareFlowTest {
     private var previousPerson = ""
     private var previousRole = "Family"
     private val extraPeople = mutableListOf<String>()
+    /** The manifest asks for ACCESS_COARSE_LOCATION (Nearby); grant it up front so the system dialog never covers the screen. */
+    @Before fun grantLocation() {
+        val instrumentation = androidx.test.platform.app.InstrumentationRegistry.getInstrumentation()
+        runCatching { instrumentation.uiAutomation.grantRuntimePermission(instrumentation.targetContext.packageName, android.Manifest.permission.ACCESS_COARSE_LOCATION) }
+    }
     @Before fun setUp() {
         val account = ui.activity.careModel.cloud
         if (account != null) {
@@ -242,9 +247,16 @@ class CareFlowTest {
     @Test fun directoryFiltersRecoverFromNoResults() {
         ui.onNodeWithText("Nearby", useUnmergedTree = true).performClick()
         ui.onNodeWithText("All India · ${vm.centres.size} centres").assertIsDisplayed()
-        ui.onNodeWithText("Karnataka", useUnmergedTree = true).performScrollTo().performClick()
+        // State is a searchable picker (3 Nov review), not a sideways row of chips.
+        ui.onNodeWithTag("nearby-list").performScrollToNode(hasTestTag("nearby-state-picker"))
+        ui.onNodeWithTag("nearby-state-picker").performClick()
+        ui.onNodeWithTag("nearby-state-picker-search").performTextInput("karna")
+        ui.onNodeWithTag("nearby-option-Karnataka").performClick()
+        ui.onNodeWithTag("nearby-list").performScrollToIndex(0)
         ui.onNodeWithText("Karnataka · ${vm.centres.count { it.state == "Karnataka" }} centres").assertIsDisplayed()
-        ui.onNodeWithText("All India", useUnmergedTree = true).performScrollTo().performClick()
+        ui.onNodeWithTag("nearby-list").performScrollToNode(hasTestTag("nearby-state-picker"))
+        ui.onNodeWithTag("nearby-state-picker").performClick()
+        ui.onNodeWithTag("nearby-option-${NearbyHelp.ALL_INDIA}").performClick()
         screenshot("nearby")
         ui.onNode(hasSetTextAction()).performTextInput("No such hospital xyz")
         ui.onNodeWithText("No centres match that search.").assertIsDisplayed()
@@ -262,24 +274,25 @@ class CareFlowTest {
         screenshot("centre-map")
     }
     @Test fun dailyEntriesAppearOnTodayAndCanBeEditedAndRemoved() {
-        ui.onNodeWithTag("today-list").performScrollToNode(hasText("Add task"))
-        ui.onNodeWithText("Add task").performClick()
+        // The patient's Today no longer lists tasks (2 Nov redesign): a task is added from the Care tab's Add menu and shows under its To do tile.
+        ui.onNodeWithTag("nav-Care").performClick()
+        ui.onAllNodesWithTag("care-add-button").onFirst().performClick()
+        ui.onNodeWithTag("care-add-task").performClick()
         ui.onNode(hasSetTextAction() and hasText("What needs doing?")).performTextInput("Bring questions")
         ui.onNodeWithText("Save", useUnmergedTree = true).performScrollTo().performClick()
         ui.waitUntil(15000) { vm.items.value.any { it.title == "Bring questions" } }
-        ui.onNodeWithTag("today-list").performScrollToNode(hasText("Bring questions"))
-        ui.onNodeWithText("Bring questions").assertIsDisplayed()
         val entryId = vm.items.value.single { it.title == "Bring questions" }.id
-        ui.onNodeWithTag("today-list").performScrollToNode(hasTestTag("care-menu-$entryId"))
+        // Daily care shows modules as tiles; the To do tile opens its own screen.
+        ui.onNodeWithTag("care-list").performScrollToNode(hasTestTag("care-module-to-do-toggle"))
+        ui.onNodeWithTag("care-module-to-do-toggle").performClick()
+        ui.onNodeWithTag("care-list").performScrollToNode(hasText("Bring questions"))
+        ui.onNodeWithText("Bring questions").assertIsDisplayed()
+        ui.onNodeWithTag("care-list").performScrollToNode(hasTestTag("care-menu-$entryId"))
         ui.onNodeWithTag("care-menu-$entryId").performClick()
         ui.onNodeWithTag("care-edit-$entryId").performClick()
         ui.onNode(hasSetTextAction() and hasText("What needs doing?")).performTextReplacement("Bring the prescription")
         ui.onNodeWithText("Save", useUnmergedTree = true).performScrollTo().performClick()
         ui.waitUntil(15000) { vm.items.value.any { it.title == "Bring the prescription" } }
-        ui.onNodeWithTag("nav-Care").performClick()
-        // Daily care shows modules as tiles; the To do tile opens its own screen.
-        ui.onNodeWithTag("care-list").performScrollToNode(hasTestTag("care-module-to-do-toggle"))
-        ui.onNodeWithTag("care-module-to-do-toggle").performClick()
         ui.onNodeWithTag("care-list").performScrollToNode(hasText("Bring the prescription"))
         ui.onNodeWithText("Bring the prescription").assertIsDisplayed()
         screenshot("care")
@@ -437,9 +450,10 @@ class CareFlowTest {
         val other = vm.selected.value; extraPeople += other
         ui.runOnIdle { vm.select(personId) }
         ui.waitUntil(15000) { vm.selected.value == personId && vm.draft.value.personId == personId }
-        ui.onNodeWithTag("nav-Today").performClick()
-        ui.onNodeWithTag("today-list").performScrollToNode(hasText("Add task"))
-        ui.onNodeWithText("Add task").performClick()
+        // The patient's Today has no To do list now: open the task form from the Care tab's Add menu.
+        ui.onNodeWithTag("nav-Care").performClick()
+        ui.onAllNodesWithTag("care-add-button").onFirst().performClick()
+        ui.onNodeWithTag("care-add-task").performClick()
         val title = "Questions belonging to the first person"
         ui.onNode(hasSetTextAction() and hasText("What needs doing?")).performTextInput(title)
         ui.runOnIdle { vm.select(other) }

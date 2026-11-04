@@ -299,8 +299,11 @@ private fun livingWillPdfName(version: Int) = "sahara-living-will-v$version.pdf"
         if (made == null) android.widget.Toast.makeText(context, t("The PDF could not be made. Try again.", "PDF नहीं बन सका। फिर कोशिश करें।"), android.widget.Toast.LENGTH_LONG).show() else then(made.first, made.second)
     }
     fun printIt(a: AmdRecord) = pdf(a) { file, sha -> if (commit { CarePlanBook.generateAmd(it, a.id, sha, lang.code, actor, planNow(), today) }) onShare(file, a.id) }
+    val familyReadOnly = canEdit && !AmdRules.canChange(canEdit, clinician, actor)
+    @Suppress("NAME_SHADOWING") val canEdit = AmdRules.canChange(canEdit, clinician, actor)
     LazyColumn(Modifier.fillMaxSize().testTag("living-will"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
         item { PlanHeader(t("Living will", "लिविंग विल"), onBack, "amd-header") }
+        if (familyReadOnly) item { Text(t("Only ${person.name} can change this.", "इसे सिर्फ़ ${person.name} बदल सकते हैं।"), style = MaterialTheme.typography.bodyMedium, color = DoctorCardSub, modifier = Modifier.testTag("amd-family-read-only")) }
         item { Text(t("This follows the model living will by the Vidhi Centre for Legal Policy and ACP India, and the Supreme Court’s rules (2018, changed on 24 January 2023). If both a living will and an emergency plan exist, the living will governs.", "यह विधि सेंटर फ़ॉर लीगल पॉलिसी और ACP इंडिया की मॉडल लिविंग विल, और सुप्रीम कोर्ट के नियमों (2018, 24 जनवरी 2023 को बदले गए) पर आधारित है। अगर लिविंग विल और आपातकालीन योजना दोनों हों, तो लिविंग विल मानी जाती है।"), style = MaterialTheme.typography.bodyMedium) }
         item { Surface(color = DoctorStatusWarnBg, shape = RoundedCornerShape(14.dp)) { Text(AmdText.PAPER.pick(hindi), Modifier.padding(12.dp), style = MaterialTheme.typography.bodyMedium) } }
         (working ?: current)?.let { a -> item { PlanReadAloud({ PlanSpeech.livingWill(a.content, hindi) }, "amd-${a.id}") } }

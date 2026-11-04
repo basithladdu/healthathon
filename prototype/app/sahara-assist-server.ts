@@ -181,7 +181,10 @@ Return only JSON: {"found":true,"answer":"...","citations":[{"document":"D1","pa
 answer: one or two short sentences in the language of the question, using only facts, dates and numbers written in the cited lines.
 citations: every line you used, at most 6. If the lines do not answer the question, return {"found":false,"answer":"","citations":[]}.
 Never diagnose, never say whether a result is good or bad, never advise on medicines or doses. ${NO_TREATMENT_ADVICE_RULE}
+Each document may have a kind (bill, lab report, prescription, discharge summary). Answer bill questions only from bills and test-result questions only from lab reports, unless the question says otherwise.
 A person checks every answer against the cited lines.`;
+
+const DOCUMENT_KINDS = new Set(['bill', 'lab report', 'prescription', 'discharge summary']);
 
 export async function ask(config: Config, payload: Json, reserveNow: () => Promise<void>, send: typeof fetch) {
   const question = typeof payload.question === 'string' ? payload.question.trim() : '';
@@ -201,7 +204,8 @@ export async function ask(config: Config, payload: Json, reserveNow: () => Promi
       total += value.text.length; known.set(`${ref}:${value.page}:${value.line}`, value.text);
       return { page: value.page, line: value.line, text: value.text };
     });
-    return { document: ref, lines };
+    const kind = (item as { kind?: unknown }).kind;
+    return { document: ref, ...(typeof kind === 'string' && DOCUMENT_KINDS.has(kind) ? { kind } : {}), lines };
   });
   if (new Set(sent.map((d) => d.document)).size !== sent.length) fail(400, 'invalid_body', 'The documents could not be read.');
   if (total > 24_000) fail(413, 'too_large', 'Choose fewer or shorter documents (up to 24,000 characters).');

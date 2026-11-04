@@ -179,7 +179,7 @@ object PlanSpeech {
     /** The whole plan: rows, then what always continues. */
     fun summary(r: EctprRecord, amd: Bi?, hindi: Boolean): String = (EdView.rows(r, amd ?: NOT_RECORDED).filter { amd != null || it.key != "AMD" }.map { it.label.pick(hindi) + ": " + it.value.pick(hindi) + "." } + PlanText.fullRecordLines(r).map { it.pick(hindi) + "." } + careContinues(hindi)).joinToString("\n")
     private fun careContinues(hindi: Boolean) = (listOf(CareThatContinues.TITLE) + CareThatContinues.ITEMS).joinToString("\n") { it.pick(hindi) }
-    private fun ifInDoubt(hindi: Boolean) = (listOf(IfInDoubt.TITLE, IfInDoubt.LEAD) + IfInDoubt.CONDITIONS + IfInDoubt.AFTER).joinToString("\n") { it.pick(hindi) }
+    private fun ifInDoubt(hindi: Boolean) = (listOf(IfInDoubt.TITLE) + IfInDoubt.CONDITIONS + IfInDoubt.AFTER).joinToString("\n") { it.pick(hindi) }
 
     fun edView(interp: EdInterpretation, amd: Bi, hindi: Boolean): String = buildList {
         add(interp.banner.pick(hindi)); interp.flags.forEach { add(it.pick(hindi)) }; add(ifInDoubt(hindi))

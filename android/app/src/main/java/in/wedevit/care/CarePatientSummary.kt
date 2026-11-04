@@ -86,8 +86,9 @@ object CarePatientSummaryRules {
     fun noSymptoms(hindi: Boolean) = careTr(hindi, "No symptoms logged this week", "इस हफ़्ते कोई लक्षण दर्ज नहीं")
 
     fun medicineCount(n: Int, hindi: Boolean): String = when (n) { 0 -> careTr(hindi, "No medicines yet", "अभी कोई दवा नहीं"); 1 -> careTr(hindi, "1 medicine", "1 दवा"); else -> careTr(hindi, "$n medicines", "$n दवाइयाँ") }
-    fun medicineStatus(total: Int, ticked: Int, hindi: Boolean): String { val taken = ticked.coerceAtMost(total); val left = (total - taken).coerceAtLeast(0)
-        return if (total == 0) careTr(hindi, "No medicines yet", "अभी कोई दवा नहीं") else careTr(hindi, "$taken of $total ticked today, $left not yet", "आज $total में से $taken पर टिक, $left बाक़ी")
+    /** "0 of 3 today": no "3 not yet" count (3 Nov meeting: "you can just say zero of three"). */
+    fun medicineStatus(total: Int, ticked: Int, hindi: Boolean): String { val taken = ticked.coerceIn(0, total.coerceAtLeast(0))
+        return if (total == 0) careTr(hindi, "No medicines yet", "अभी कोई दवा नहीं") else careTr(hindi, "$taken of $total today", "आज $total में से $taken")
     }
 
     fun visitDay(item: CareItem, hindi: Boolean, zone: ZoneId = ZoneId.systemDefault()): String =

@@ -32,9 +32,15 @@ object MedicineHistoryRules {
     fun current(items: List<CareItem>, personId: String, snapshot: MedicineHistorySnapshot) = items.filter { it.personId == personId && it.kind == "medicine" && it.id !in snapshot.pastIds }
     fun status(event: MedicineIntakeEvent, all: List<MedicineIntakeEvent>, now: Long): String =
         if (event.outcome == "planned" && all.any { it.medicineId == event.medicineId && it.plannedAt == event.plannedAt && it.outcome in setOf("taken", "skipped") }) "Plan followed by a report" else status(event, now)
+    /** Who reported, from the phone's view role: an invited family member's report is stored as "Family report". */
+    fun reporterFor(role: String) = when (role) { "Patient" -> "Patient report"; "Family" -> "Family report"; else -> "Not recorded" }
+    /** The daily tick box keeps its older "Reporter not recorded" label unless the role says who ticked it. */
+    fun checkoffReporter(role: String) = when (role) { "Patient", "Family" -> reporterFor(role); else -> "Reporter not recorded" }
+    /** True for a dose report written by family, so the dose and the history can say "Logged by family". */
+    fun loggedByFamily(event: MedicineIntakeEvent) = event.reporter.startsWith("Family report")
     /** A "missed" report from the daily list: no planned or taken time is invented, and no date field (the server takes only its own log time). */
     fun missedReport(item: CareItem, role: String, now: Long, id: String = java.util.UUID.randomUUID().toString()) = MedicineIntakeEvent(id, item.id, item.title, "skipped",
-        loggedAt = now, reporter = when (role) { "Patient" -> "Patient report"; "Family" -> "Family report"; else -> "Not recorded" },
+        loggedAt = now, reporter = reporterFor(role),
         note = "Reported missed from the daily list on ${Instant.ofEpochMilli(now).atZone(java.time.ZoneId.systemDefault()).toLocalDate()}.", source = "manual")
     /** Latest taken/missed/corrected report logged on [day] for one medicine, or null. A ticked box for today always means taken. */
     fun todayOutcome(item: CareItem, events: List<MedicineIntakeEvent>, day: LocalDate, zone: java.time.ZoneId): String? {

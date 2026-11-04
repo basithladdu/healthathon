@@ -19,10 +19,10 @@ internal val DoctorCardVisit get() = lerp(Cream, Peach, .5f)
 internal val DoctorCardReport get() = Paper
 internal val DoctorCardMint = Color(0xFFDBEADF)
 
-/** Text tiers for tinted cards; alpha-blended ink loses contrast, so these are solid. */
+/** Text tiers for tinted cards; alpha-blended ink loses contrast, so these are solid. Darkened 4 Nov (pale on a Redmi): Sub >= 7:1 and Faint >= 5:1 on every Sahara tint. */
 internal val DoctorCardInk = Ink
-internal val DoctorCardSub = Color(0xFF55483F)
-internal val DoctorCardFaint = Color(0xFF6E6056)
+internal val DoctorCardSub = Color(0xFF4A3E36)
+internal val DoctorCardFaint = Color(0xFF5E5249)
 internal val DoctorHairline = Color(0x1F382E29)
 internal val DoctorAccent = Rust
 

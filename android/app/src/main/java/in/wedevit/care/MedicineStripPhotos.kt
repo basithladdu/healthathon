@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Medication
 import androidx.compose.material.icons.filled.PhotoCamera
@@ -31,6 +32,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -38,11 +40,13 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.time.LocalDate
+import java.time.ZoneId
 import java.util.UUID
 import kotlin.math.roundToInt
 
@@ -74,6 +78,7 @@ class MedicineStripPhotos(context: Context, storage: String) {
         try { target.outputStream().use { check(bitmap.compress(Bitmap.CompressFormat.JPEG, 82, it)) } }
         catch (failure: Exception) { target.delete(); throw failure }
         finally { bitmap.recycle() }
+        revision.value++
         target
     }
 
@@ -81,6 +86,7 @@ class MedicineStripPhotos(context: Context, storage: String) {
         val directory = folder(person, item).canonicalFile
         require(file.canonicalFile.parentFile == directory)
         file.delete()
+        revision.value++
     }
 
     /** One picture for the reminder: the first strip photo of each medicine due, side by side (up to four). */
@@ -98,6 +104,8 @@ class MedicineStripPhotos(context: Context, storage: String) {
 
     companion object {
         const val MAX_PHOTOS = 6
+        /** Bumped on every photo added or removed, so each pillbox placeholder shows a new strip photo at once. */
+        val revision = MutableStateFlow(0)
         private const val LONG_SIDE = 1280
 
         fun thumbnail(file: File, size: Int): Bitmap? = runCatching {
@@ -136,7 +144,7 @@ class MedicineStripPhotos(context: Context, storage: String) {
     }
 }
 
-@Composable private fun StripThumb(file: File?, size: Int, modifier: Modifier = Modifier) {
+@Composable internal fun StripThumb(file: File?, size: Int, modifier: Modifier = Modifier) {
     val image by produceState<android.graphics.Bitmap?>(null, file?.path) { value = file?.let { withContext(Dispatchers.IO) { MedicineStripPhotos.thumbnail(it, size * 2) } } }
     Surface(shape = RoundedCornerShape(12.dp), color = SaharaSoftBlue, modifier = modifier.size(size.dp)) {
         val bitmap = image
@@ -176,8 +184,10 @@ class MedicineStripPhotos(context: Context, storage: String) {
     }
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> if (uri != null) keep(uri, null) }
     Column(Modifier.fillMaxWidth().testTag("strip-photos-$itemId"), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(t("Strip photos (optional)", "पत्ते की फ़ोटो (चाहें तो)"), fontWeight = FontWeight.SemiBold, fontSize = 15.sp, color = DoctorCardInk)
-        Text(t("Shown with the dose reminder so anyone giving the medicine can match the strip. Kept only on this phone.", "दवा के रिमाइंडर के साथ दिखती है, ताकि दवा देने वाला पत्ता मिला सके। सिर्फ़ इसी फ़ोन पर रहती है।"), fontSize = 12.sp, color = DoctorCardFaint)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(t("Strip photos (optional)", "पत्ते की फ़ोटो (चाहें तो)"), fontWeight = FontWeight.SemiBold, fontSize = 15.sp, color = DoctorCardInk, modifier = Modifier.weight(1f))
+            MedicineInfoButton(t("Strip photos (optional)", "पत्ते की फ़ोटो (चाहें तो)"), t("Shown with the dose reminder so anyone giving the medicine can match the strip. Kept only on this phone.", "दवा के रिमाइंडर के साथ दिखती है, ताकि दवा देने वाला पत्ता मिला सके। सिर्फ़ इसी फ़ोन पर रहती है।"), "strip-photos-info")
+        }
         if (photos.isNotEmpty()) Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             photos.forEachIndexed { index, file -> Box {
                 StripThumb(file, 72)
@@ -227,8 +237,7 @@ class MedicineStripPhotos(context: Context, storage: String) {
     val t = careText(); val hindi = careHindi()
     val entry = MedicineEntryText.parse(detail) ?: MedicineEntry()
     fun change(next: MedicineEntry) = onDetail(MedicineEntryText.detail(next))
-    CareField(name, onName, t("Medicine name", "दवा का नाम"), singleLine = true, placeholder = t("e.g. Paracetamol", "जैसे Paracetamol"),
-        supporting = t("Strip cut or name missing? Type it, or pick from the list as you type.", "पत्ता कटा है या नाम नहीं दिखता? नाम लिखें, या लिखते समय सूची से चुनें।"))
+    CareField(name, onName, t("Medicine name", "दवा का नाम"), singleLine = true, placeholder = t("e.g. Paracetamol", "जैसे Paracetamol"))
     MedicineNameSuggestions(name, enabled = !busy) { onName(it) }
     CareField(entry.strength, { change(entry.copy(strength = it.take(80))) }, t("Strength", "ताक़त"), singleLine = true, placeholder = t("e.g. 500 mg, 5 mg/5 ml", "जैसे 500 mg, 5 mg/5 ml"))
     Text(t("Form", "रूप"), fontWeight = FontWeight.SemiBold, fontSize = 15.sp, color = DoctorCardInk)
@@ -250,7 +259,10 @@ class MedicineStripPhotos(context: Context, storage: String) {
     CareField(entry.days?.toString().orEmpty(), { value -> if (value.isBlank()) change(entry.copy(days = null)) else value.toIntOrNull()?.takeIf { it in 1..365 }?.let { change(entry.copy(days = it)) } },
         t("For how many days", "कितने दिन"), singleLine = true, placeholder = t("e.g. 5 · leave empty if ongoing", "जैसे 5 · चलती रहे तो ख़ाली छोड़ें"))
     CareField(entry.directions, { change(entry.copy(directions = it.take(500))) }, t("Directions", "तरीक़ा"), placeholder = t("e.g. as written: dissolve in water", "जैसे पर्चे में लिखा: पानी में घोलकर"))
-    Text(t("Type these from the prescription. Sahara never reads how much, how often, times or directions from a photo.", "ये पर्चे से देखकर लिखें। सहारा कितनी, कितनी बार, समय या तरीक़ा फ़ोटो से कभी नहीं पढ़ता।"), fontSize = 12.sp, color = DoctorCardFaint)
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(t("Type these from the prescription.", "ये पर्चे से देखकर लिखें।"), fontSize = 12.sp, color = DoctorCardFaint, modifier = Modifier.weight(1f))
+        MedicineInfoButton(t("Type these from the prescription.", "ये पर्चे से देखकर लिखें।"), t("Sahara never reads how much, how often, times or directions from a photo. Each dose time is its own tick on the medicine card. Strip cut or name missing? Type the name, or pick it from the list as you type.", "सहारा कितनी, कितनी बार, समय या तरीक़ा फ़ोटो से कभी नहीं पढ़ता। हर दवा के समय का अपना टिक होता है। पत्ता कटा है या नाम नहीं दिखता? नाम लिखें, या लिखते समय सूची से चुनें।"), "medicine-entry-info")
+    }
     if (detail.isBlank()) Text(t("Add at least the strength, form or how much each time.", "कम से कम ताक़त, रूप या हर बार कितनी लिखें।"), fontSize = 12.sp, color = RustText)
     StripPhotoRow(storage, personId, itemId, enabled = !busy) { reading ->
         if (name.isBlank() && reading.name.isNotBlank()) onName(reading.name.take(200))
@@ -259,35 +271,88 @@ class MedicineStripPhotos(context: Context, storage: String) {
     }
 }
 
-/** Today's doses grouped by time ("Morning · 08:00 · 3 medicines") with each medicine's strip photo, so a family member can match strips by sight. */
+/**
+ * Today's doses grouped by time ("Morning · 08:00 · 3 medicines"), each with its strip photo in the pillbox, so a family
+ * member can match strips by sight. Every dose is its own tick: tap a pillbox to mark that dose taken or missed.
+ * Medicines with a count per day but no times are listed under "Any time".
+ */
 @Composable fun TodayDosesCard(vm: CareModel) {
-    val t = careText(); val hindi = careHindi(); val context = LocalContext.current
+    val t = careText(); val hindi = careHindi(); val context = LocalContext.current; val scope = rememberCoroutineScope()
     val items by vm.items.collectAsStateWithLifecycle(); val person by vm.selected.collectAsStateWithLifecycle()
+    val events by vm.medicineEvents.collectAsStateWithLifecycle()
+    val canEdit by vm.canEdit.collectAsStateWithLifecycle(); val busy by vm.busy.collectAsStateWithLifecycle()
     val scheduler = remember(vm.accountNamespace) { CareReminderScheduler(context.applicationContext, vm.accountNamespace) }
     val store = remember(vm.storageNamespace) { MedicineStripPhotos(context.applicationContext, vm.storageNamespace) }
-    val groups = remember(items, person) {
-        MedicineDoseRules.groups(items.filter { it.kind == "medicine" && it.personId == person }.map { DoseMedicine(it.id, it.personId, it.title, MedicineDoseRules.times(it, scheduler.option(it.id))) })
+    val photoRevision by MedicineStripPhotos.revision.collectAsStateWithLifecycle()
+    val medicines = remember(items, person) { items.filter { it.kind == "medicine" && it.personId == person } }
+    val doses = remember(medicines) { medicines.associate { it.id to MedicineDoses.forItem(it, scheduler.option(it.id)?.times) } }
+    val groups = remember(medicines, doses) { MedicineDoseRules.groups(medicines.map { m -> DoseMedicine(m.id, m.personId, m.title, doses[m.id].orEmpty().filter { it.timed }.map { it.time }) }) }
+    val untimed = remember(medicines, doses) { medicines.flatMap { m -> doses[m.id].orEmpty().filter { !it.timed }.map { m to it } } }
+    val photos = remember(medicines, photoRevision) { medicines.associate { it.id to runCatching { store.first(it.personId, it.id) }.getOrNull() } }
+    var working by remember { mutableStateOf(false) }
+    var problem by remember { mutableStateOf("") }
+    if (groups.isEmpty() && untimed.isEmpty()) return
+    val zone = ZoneId.systemDefault(); val today = LocalDate.now(zone)
+    val byId = medicines.associateBy { it.id }
+    val total = doses.values.sumOf { it.size }
+    val taken = medicines.sumOf { m -> MedicineDoses.takenCount(MedicineDoses.states(m, doses[m.id].orEmpty(), events, today, zone)) }
+    val failed = t("Couldn't save. Please try again.", "सहेजा नहीं जा सका। कृपया फिर कोशिश करें।")
+    val mark: (CareItem, MedicineDose, Boolean) -> Unit = { item, dose, yes ->
+        if (canEditCareContext(vm, item.personId, vm.accountNamespace)) { working = true; problem = ""; scope.launch {
+            try { recordMedicineDose(context, vm, item, doses[item.id].orEmpty(), dose, yes) }
+            catch (e: Exception) { if (e is CancellationException) throw e; problem = if (e is IllegalArgumentException) e.message ?: failed else failed }
+            finally { working = false }
+        } }
     }
-    if (groups.isEmpty()) return
-    val today = LocalDate.now().toString(); val taken = items.filter { it.doneOn == today }.map { it.id }.toSet()
     Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("today-doses")) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text(t("Today's doses", "आज की दवाएँ"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading())
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(t("Today's doses", "आज की दवाएँ"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.weight(1f).a11yHeading())
+                Text(t("$taken of $total taken", "$total में से $taken ली"), fontSize = 13.sp, fontWeight = FontWeight.Medium, color = if (taken == total) DoctorStatusGood else DoctorCardSub, modifier = Modifier.testTag("today-doses-count"))
+            }
             groups.forEach { group ->
                 Column(Modifier.testTag("today-doses-${group.time}"), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text(MedicineDoseRules.title(group, hindi), fontWeight = FontWeight.SemiBold, fontSize = 15.sp, color = RustText)
                     Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         group.medicines.forEach { medicine ->
-                            Column(Modifier.width(84.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                                StripThumb(remember(medicine.itemId, items) { store.first(medicine.personId, medicine.itemId) }, 76)
-                                Text(medicine.name, fontSize = 12.sp, color = DoctorCardInk, maxLines = 2, overflow = TextOverflow.Ellipsis, lineHeight = 14.sp)
-                                if (medicine.itemId in taken) Text(t("Ticked today", "आज टिक"), fontSize = 11.sp, color = DoctorCardFaint)
+                            val item = byId[medicine.itemId]; val dose = doses[medicine.itemId].orEmpty().firstOrNull { it.time == group.time }
+                            if (item != null && dose != null) key(item.id, dose.key) {
+                                MedicinePillbox(item, dose, MedicineDoses.state(item, dose, events, today, zone), photos[item.id], "", canEdit && !busy && !working, MedicineDoses.loggedByFamily(item, dose, events, today, zone)) { mark(item, dose, it) }
                             }
                         }
                     }
                 }
             }
-            Text(t("Times come from Reminders or the medicine's saved times. Strip photos stay on the phone they were taken on.", "समय रिमाइंडर या दवा के सहेजे समय से आते हैं। पत्ते की फ़ोटो उसी फ़ोन पर रहती है जिस पर ली गई।"), fontSize = 12.sp, color = DoctorCardFaint)
+            if (untimed.isNotEmpty()) Column(Modifier.testTag("today-doses-any-time"), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(t("Any time", "कभी भी"), fontWeight = FontWeight.SemiBold, fontSize = 15.sp, color = RustText)
+                Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    untimed.forEach { (item, dose) -> key(item.id, dose.key) {
+                        MedicinePillbox(item, dose, MedicineDoses.state(item, dose, events, today, zone), photos[item.id], if (dose.count > 1) t("Dose ${dose.index}", "खुराक ${dose.index}") else "", canEdit && !busy && !working, MedicineDoses.loggedByFamily(item, dose, events, today, zone)) { mark(item, dose, it) }
+                    } }
+                }
+            }
+            if (problem.isNotBlank()) Text(problem, fontSize = 13.sp, color = RustText, modifier = Modifier.announce())
         }
+    }
+}
+
+/** One dose in Today's doses: the strip photo (or the empty pillbox), a tick or cross once marked, and a Taken / Missed menu. */
+@Composable private fun MedicinePillbox(item: CareItem, dose: MedicineDose, state: MedicineDoseState, photo: File?, caption: String, enabled: Boolean, family: Boolean = false, onMark: (Boolean) -> Unit) {
+    val t = careText(); var menu by remember { mutableStateOf(false) }
+    Column(Modifier.width(84.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+        Box {
+            Surface(onClick = { menu = true }, enabled = enabled, shape = RoundedCornerShape(12.dp), color = Paper, modifier = Modifier.testTag("today-dose-${item.id}-${dose.key}")) { StripThumb(photo, 76) }
+            if (state != MedicineDoseState.PENDING) Surface(shape = RoundedCornerShape(50), color = if (state == MedicineDoseState.TAKEN) DoctorStatusGood else DoctorStatusRest, modifier = Modifier.align(Alignment.TopEnd).padding(4.dp).size(22.dp)) {
+                Icon(if (state == MedicineDoseState.TAKEN) Icons.Default.Check else Icons.Default.Close, if (state == MedicineDoseState.TAKEN) t("Taken", "ली") else t("Missed", "छूटी"), Modifier.padding(3.dp), tint = Paper)
+            }
+            DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
+                DropdownMenuItem(text = { Text(t("Taken", "ली"), color = DoctorCardInk) }, leadingIcon = { Icon(Icons.Default.Check, null, tint = DoctorStatusGood) }, onClick = { menu = false; onMark(true) }, modifier = Modifier.heightIn(min = 48.dp))
+                DropdownMenuItem(text = { Text(t("Missed", "छूटी"), color = DoctorCardInk) }, leadingIcon = { Icon(Icons.Default.Close, null, tint = DoctorStatusRest) }, onClick = { menu = false; onMark(false) }, modifier = Modifier.heightIn(min = 48.dp))
+            }
+        }
+        Text(item.title, fontSize = 12.sp, color = DoctorCardInk, maxLines = 2, overflow = TextOverflow.Ellipsis, lineHeight = 14.sp)
+        if (caption.isNotBlank()) Text(caption, fontSize = 11.sp, color = DoctorCardFaint, maxLines = 1)
+        // A dose ticked by an invited family member says so, so the patient and the doctor can tell who logged it.
+        if (family && state != MedicineDoseState.PENDING) Text(t("Logged by family", "परिवार ने दर्ज किया"), fontSize = 11.sp, color = DoctorCardSub, maxLines = 2, lineHeight = 13.sp, textAlign = TextAlign.Center, modifier = Modifier.testTag("today-dose-family-${item.id}-${dose.key}"))
     }
 }

@@ -2,6 +2,43 @@
 
 > **30 Oct 2026:** SVK spec build (emergency care plan, living will, QR card, languages): see [docs/SAHARA_SVK_BUILD_HANDOFF.md](docs/SAHARA_SVK_BUILD_HANDOFF.md).
 
+## 4 Nov: 3 Nov meeting changes, goals-of-care finished (Basith, with Claude Code)
+
+Sources: `source-materials/meetings/2026-11-03-team-meeting-transcript.txt` (the 3 Nov app walkthrough with Sujay) and the team WhatsApp to 4 Nov (tubes and lines, "If" wording, faded text, side-effect list, ambulances). **None of the Android code below has been compiled**: Basith asked for no builds on his machine. Web: `npm test` 591/591, `tsc` clean. **The website and the Supabase function are not deployed**: this machine could not resolve vercel.com or supabase.co on 4 Nov.
+
+**Awaiz, in this order**
+```bash
+cd android
+./gradlew :app:compileDebugKotlin
+./gradlew :app:testDebugUnitTest
+./gradlew :app:assembleDebug
+supabase functions deploy sahara-care-assist --project-ref kjnhtakqzboayqorrlue
+```
+Then deploy the website from `prototype/` with `vercel deploy --prod --yes`. For Gemini on the website, copy the Gemini key from Supabase secrets into Vercel as `SAHARA_AI_API_KEY` (and `SAHARA_AI_MODEL`); Android already has it in the Supabase function's secrets. Where to look first if compile fails: each agent's notes are summarised in the "Compile first" list below.
+
+**Patient app (Android)**
+- Today: "Good morning, <name>" with the date; red SOS bar plus a one-tap QR card; goals-of-care card moved up; colourful Up next; "0 of 3"; side effects, journal, Care team and helper text removed; "Go to" tiles. Back now returns to the page you came from. New toasts.
+- Patient and family differ: family sees "Caring for <name>", their own caregiver distress check (kept on their phone only), caregiver tips and To do; family entries show "Logged by family"; the living will and the patient's own words are read-only for family.
+- Check-in: new faces, a 0-10 distress thermometer on one screen, sections open only when tapped, the extra symptom step merged, "Pain has gone (0)". Charts are connected lines with 1 week / 1 month / 3 months / All, and chemo and radiotherapy days marked.
+- Medicines: each dose time is its own tick (4 times a day = 4 ticks), optional reminder per dose, shorter cards, strip photos in the pillbox. The side-effect chips are a short generic list the team wrote, not from a drug source; the app now says so.
+- Nearby (`NearbyScreen.kt`): map first on the phone's approximate location (manifest now asks for coarse location), one Call 112 bar (dialer only), searchable state and service pickers, colour-coded cards, address and source behind an info icon, Google Maps directions; pregnant-women and elderly ambulances removed.
+- Account: fixed profile with age, blood group, height and a weight trend. Visits: date, doctor and speciality; tap for that day's prescription. Shorter Conversations and To do; timeline grouped.
+- New: Tubes and lines (`CareDevices*.kt`: insertion date, change due, centre, notes, a daily check, "Tell your care team today", v2.0 note); sample Community screen; Ask documents with type filters, chips and numbered sources (the AI now gets each document's type, web and Supabase function).
+- Text contrast raised and forced dark mode turned off in code for Redmi-style phones.
+
+**Doctor side (Android)**: tabs replace Overview (Symptoms & distress, Labs, Goals of care, Visits, Medicines, Documents); symptoms first, most severe on top; history from the first entry with one range selector; much less text; two panes on wide screens.
+
+**Goals of care (web and Android)**
+- Checklist in the doctors' order (consent, patient, family and emergency contact, CPR, dialysis, the rest); ticks itself; at the end "you haven't spoken about these" with Go back / Continue anyway; the latest statement from the same person wins, earlier ones shown struck through; different people disagreeing are both shown.
+- Output in the legal form's Sections I-IV: Word download and print on the web, a PDF page on Android. Doctor and patient or family sign by drawing or thumb on the doctor's device; the version locks; any later edit invalidates the signatures (SHA-256 seal).
+- Transcription: Google Gemini first when the server has the key and the consent tick is on, then Whisper on the device, then typing. Android also labels speakers on the device (`CareGocDiarize.kt`, 45 MB download). Gemini on Android goes through `sahara-care-assist` using the existing `SAHARA_AI_API_KEY`. Groq was removed.
+- 8 fictional mock conversations in `docs/goc-mock-conversations/` (English, Hindi, Hinglish with a change of mind, Telugu, Urdu, Kannada, a disagreement, a short talk). Both matchers pass all 8.
+- Checked in the browser end to end with pasted mocks and synthetic English audio. **Not checked**: Gemini (no key here), Hindi audio, anything on a phone. Telugu and Kannada speech-to-text on the device is poor; the screen offers typing.
+
+**Care plan wording**: "If in doubt" conditions each start with "If"; "care that always continues" now uses the 12 items of Saanthvana v1.0 §16 word for word (`source-materials/team-context/svk-specs-2026-10-29/Saanthvana_v1.0.*`).
+
+**Compile first**: `CareUi.kt` (router, Today, More), `CareComponents.kt` (toast host), `CareGocUi.kt`, `CareGocGemini.kt`, `CareSignaturePad.kt`, `CareDistress.kt` (thermometer), `DoctorPatientTabsUi.kt`, `NearbyScreen.kt`, `CareVisitsUi.kt`, `MedicineStripPhotos.kt`, `CarePlanUi.kt`. Then the phone tests: `CareFlowTest`, `DailyCareFlowsTest`, `CareSymptomDiaryUiTest` and the Doctor* navigation tests were updated without running.
+
 ## 2 Nov 2026: what changed since 1 Nov (Awaiz, with Claude Code)
 
 On GitHub main: `c7cb9e6` (merge of Basith's legal comments and goals-of-care transcription), `38195cc` (smoother motion), `b3435d7` (this batch). Each build: app compiles, 760 unit tests pass, phone (androidTest) tests compile but were not run. Checked on the emulator unless noted. A development APK was shared with Awaiz for a real-phone test.

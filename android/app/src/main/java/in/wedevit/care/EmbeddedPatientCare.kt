@@ -182,7 +182,7 @@ fun EmbeddedPatientCare(
                         "workflows" -> CareWorkflows(vm, onTalk = { changeSection("Conversations") })
                         "labs" -> CareLabs(vm)
                         "care-plan" -> CarePlanScreen(vm, clinician = true, onBack = ::leaveTool)
-                        "nearby" -> Nearby(vm.centres, vm)
+                        "nearby" -> NearbyScreen(vm.centres, vm)
                         "documents" -> CareDocuments(vm, onRead = ::read, onTalk = { changeSection("Conversations") }, onCalendarAt = { openTool("calendar") }, onLabs = { openTool("labs") })
                         "care-story" -> DoctorCareStory(person, versions, ::read)
                         "checkin-history" -> DoctorCheckInHistory(personId, entries)
@@ -199,6 +199,7 @@ fun EmbeddedPatientCare(
                             "Visits" -> DoctorVisits(vm,personId,onCalendar={openTool("calendar")},onAddVisit={add("doctor-visit")},onNavigationBlockedChange={visitBusy=it},onHeaderBackChange={visitBack=it})
                             "Reports" -> CareDocuments(vm, onRead = ::read, onTalk = { changeSection("Conversations") }, onCalendarAt = { openTool("calendar") }, onLabs = { openTool("labs") })
                             "Shared" -> EmbeddedSharedCare(vm, onAccount, { changeSection("Summary") }, onNavigationBlockedChange = { sharedBusy = it })
+                            "Labs" -> DoctorLabsTab(vm, personId)
                             else -> EmbeddedCareTools(::openTool)
                         }
                     }
@@ -223,24 +224,24 @@ fun EmbeddedSharedCare(vm: CareModel, onAccount: () -> Unit, onClose: () -> Unit
 @Composable
 internal fun EmbeddedCareTools(onOpen: (String) -> Unit) { val t = careText();
     val tools = listOf(
-        Triple("daily", t("Daily care", "रोज़ की देखभाल"), t("Medicines, tasks, check-ins and journal", "दवाएँ, काम, रोज़ का हाल और डायरी")),
-        Triple("care-plan", t("Emergency plan & living will", "आपातकालीन योजना और लिविंग विल"), t("ECTPR wizard, ED Quick View, wallet card QR, living will", "ECTPR फ़ॉर्म, ED क्विक व्यू, वॉलेट कार्ड QR, लिविंग विल")),
-        Triple("calendar", t("Calendar", "कैलेंडर"), t("Planned care activities and visits", "तय देखभाल और विज़िट")),
-        Triple("workflows", t("Care team & requests", "देखभाल टीम और अनुरोध"), t("Existing shared-care tasks and discussion requests", "साझा देखभाल के काम और चर्चा के अनुरोध")),
-        Triple("labs", t("Lab history", "जाँच रिपोर्टें"), t("Reported results and earlier entries", "बताए गए नतीजे और पुरानी एंट्री")),
-        Triple("nearby", t("Find care", "देखभाल केंद्र खोजें"), t("Nearby services and contact information", "आसपास की सेवाएँ और संपर्क")),
-        Triple("documents", t("Documents & care notes", "कागज़ात और देखभाल नोट"), t("Local reports, saved versions and sharing", "फ़ोन की रिपोर्टें, सहेजे संस्करण और साझा करना")),
-        Triple("reminders", t("Reminders", "रिमाइंडर"), t("Reminders for medicines and planned care on this phone", "इस फ़ोन पर दवा और तय देखभाल की सूचनाएँ")),
-        Triple("shared", t("Shared care & clinical review", "साझा देखभाल और क्लिनिकल समीक्षा"), t("Patient access, verification and submitted conversations", "मरीज़ की पहुँच, पुष्टि और भेजी गई बातचीत")),
-        Triple("resources", t("Privacy, exports & more", "निजता, एक्सपोर्ट और बाक़ी"), t("Export care notes and manage this care profile", "देखभाल नोट एक्सपोर्ट करें और यह प्रोफ़ाइल सँभालें")),
-        Triple("feedback", t("App feedback", "ऐप पर राय"), t("Tell us about your experience", "अपना अनुभव बताएँ")),
+        "daily" to t("Daily care", "रोज़ की देखभाल"),
+        "care-plan" to t("Emergency plan & living will", "आपातकालीन योजना और लिविंग विल"),
+        "calendar" to t("Calendar", "कैलेंडर"),
+        "workflows" to t("Care team & requests", "देखभाल टीम और अनुरोध"),
+        "labs" to t("Lab history", "जाँच रिपोर्टें"),
+        "nearby" to t("Find care", "देखभाल केंद्र खोजें"),
+        "documents" to t("Documents & care notes", "कागज़ात और देखभाल नोट"),
+        "reminders" to t("Reminders", "रिमाइंडर"),
+        "shared" to t("Shared care & clinical review", "साझा देखभाल और क्लिनिकल समीक्षा"),
+        "resources" to t("Privacy, exports & more", "निजता, एक्सपोर्ट और बाक़ी"),
+        "feedback" to t("App feedback", "ऐप पर राय"),
     )
     LazyColumn(Modifier.fillMaxSize().testTag("embedded-care-tools"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { Heading(t("Daily care & tools", "रोज़ की देखभाल और टूल"), 28); Text(t("Everything for this person, without leaving the doctor workspace.", "इस व्यक्ति की हर चीज़, डॉक्टर कार्यक्षेत्र छोड़े बिना।"), style = MaterialTheme.typography.bodyMedium) }
-        items(tools, key = { it.first }) { (key, title, subtitle) ->
-            OutlinedCard(onClick = { onOpen(key) }, modifier = Modifier.fillMaxWidth().heightIn(min = 72.dp).testTag("embedded-tool-$key")) {
+        item { Heading(t("Daily care & tools", "रोज़ की देखभाल और टूल"), 28) }
+        items(tools, key = { it.first }) { (key, title) ->
+            OutlinedCard(onClick = { onOpen(key) }, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("embedded-tool-$key")) {
                 Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Column(Modifier.weight(1f)) { Text(title, fontWeight = FontWeight.SemiBold); Spacer(Modifier.height(4.dp)); Text(subtitle, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                    Text(title, Modifier.weight(1f), fontWeight = FontWeight.SemiBold)
                     Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = Rust)
                 }
             }

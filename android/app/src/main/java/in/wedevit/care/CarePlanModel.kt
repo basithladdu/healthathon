@@ -274,32 +274,38 @@ object EctprRules {
         "${r.patient.name.ifBlank { "Name not recorded" }} · UHID ${r.patient.uhid.ifBlank { "not recorded" }} · plan v${r.version} · ${r.formVersion} · printed $printDate · page $page of $pages"
 }
 
-/** Clinical spec §6 "If in doubt, resuscitate" (Sahaara §1). Hard-coded on every ED view and print. */
+/** Sahaara v1.0 §1 "If in doubt, resuscitate". Hard-coded on every ED view and print.
+ *  Each condition starts with "If" (Sujay, WhatsApp 1 Nov), then the action. Same wording as prototype/app/ectpr-rules.ts. */
 object IfInDoubt {
     val TITLE = Bi("IF IN DOUBT, RESUSCITATE", "संदेह हो तो जान बचाने का पूरा इलाज करें")
-    val LEAD = Bi("Give full standard emergency care when:", "पूरा सामान्य आपातकालीन इलाज दें जब:")
+    /** No longer shown: the box now starts with the "If" conditions. Kept empty so older callers still compile. */
+    val LEAD = Bi("", "")
     val CONDITIONS = listOf(
-        Bi("the record is unsigned, out of date or cannot be found;", "रिकॉर्ड पर हस्ताक्षर नहीं है, पुराना हो गया है या मिल नहीं रहा;"),
-        Bi("the problem is new, reversible and unrelated to the illness — injury, choking, drug reaction, low sugar;", "समस्या नई है, ठीक हो सकती है और बीमारी से जुड़ी नहीं — चोट, गले में अटकना, दवा का रिएक्शन, शुगर कम होना;"),
-        Bi("the patient has capacity and says something different now;", "मरीज़ समझ-बूझ रखते हैं और अब कुछ और कह रहे हैं;"),
-        Bi("the record is ambiguous.", "रिकॉर्ड साफ़ नहीं है।"),
+        Bi("If the record is unsigned, out of date or cannot be found.", "अगर रिकॉर्ड पर हस्ताक्षर नहीं है, वह पुराना हो गया है या मिल नहीं रहा।"),
+        Bi("If the problem is new, reversible and unrelated to the illness (injury, choking, drug reaction, low sugar).", "अगर समस्या नई है, ठीक हो सकती है और बीमारी से जुड़ी नहीं है (चोट, गले में अटकना, दवा का रिएक्शन, शुगर कम होना)।"),
+        Bi("If the patient has capacity and says something different now. What they say now always overrides this record.", "अगर मरीज़ में फ़ैसला लेने की क्षमता है और वे अब कुछ और कह रहे हैं। उनकी अभी की बात हमेशा इस रिकॉर्ड से ऊपर है।"),
+        Bi("If the record is ambiguous.", "अगर रिकॉर्ड साफ़ नहीं है।"),
     )
-    val AFTER = Bi("Clarify with the treating team afterwards.", "बाद में इलाज करने वाली टीम से बात करें।")
+    val AFTER = Bi("Then resuscitate and give full standard emergency care. Clarify with the treating team afterwards.", "तब पुनर्जीवन (CPR) दें और पूरा सामान्य आपातकालीन इलाज करें। बाद में इलाज करने वाली टीम से बात करें।")
 }
 
-/** V9: Sahaara §16 "always provided" care, printed on every ECTPR, so the record is never read as "DNR = no care". */
+/** V9: Sahaara v1.0 §16 "What will always be provided, whatever else is limited", printed on every ECTPR, so the record is never read as "DNR = no care". */
 object CareThatContinues {
     val TITLE = Bi("Care that always continues", "देखभाल जो हमेशा जारी रहती है")
-    /** Exactly ALWAYS_PROVIDED_CARE in prototype/app/ectpr-rules.ts, with the Hindi of ectpr-labels.ts. */
+    /** Exactly ALWAYS_PROVIDED_CARE in prototype/app/ectpr-rules.ts (the §16 wording), with the Hindi of ectpr-labels.ts. */
     val ITEMS = listOf(
-        Bi("Mouth care and lip care, to keep the mouth moist and clean.", "मुँह और होंठों की देखभाल, ताकि मुँह नम और साफ़ रहे।"),
-        Bi("Food and drink by mouth, given by hand for comfort, as much as the person wants and can safely swallow.", "आराम के लिए हाथ से मुँह द्वारा खाना-पानी, जितना व्यक्ति चाहे और सुरक्षित रूप से निगल सके।"),
-        Bi("Relief of pain, breathlessness and other distressing symptoms, at any time of day or night.", "दर्द, साँस फूलने और अन्य परेशान करने वाले लक्षणों से राहत, दिन या रात किसी भी समय।"),
-        Bi("Washing, hygiene, skin care and pressure-area care.", "नहलाना, साफ़-सफ़ाई, त्वचा और दबाव वाली जगहों की देखभाल।"),
-        Bi("Turning and positioning for comfort.", "आराम के लिए करवट बदलना और सही स्थिति में रखना।"),
-        Bi("Family and loved ones may stay with the person.", "परिवार और प्रियजन व्यक्ति के साथ रह सकते हैं।"),
-        Bi("Spiritual, emotional and psychological support for the person and family.", "व्यक्ति और परिवार के लिए आध्यात्मिक, भावनात्मक और मानसिक सहारा।"),
-        Bi("Dignity, privacy and kindness in all care.", "हर देखभाल में गरिमा, निजता और दया।"),
+        Bi("Relief of pain, using opioids in adequate doses, by whatever route works", "दर्द से राहत — ओपिऑइड पूरी खुराक में, जिस भी रास्ते से असर करे"),
+        Bi("Relief of breathlessness — opioid, anxiolytic, fan, positioning, oxygen if it helps", "साँस फूलने से राहत — ओपिऑइड, घबराहट की दवा, पंखा, सही स्थिति, ऑक्सीजन अगर मदद करे"),
+        Bi("Sedation for distress that cannot be relieved any other way", "ऐसी तकलीफ़ के लिए नींद की दवा (सेडेशन) जो किसी और तरह कम न हो"),
+        Bi("Control of nausea, secretions, agitation, itch, hiccups", "जी मिचलाना, बलगम या स्राव, बेचैनी, खुजली और हिचकी पर नियंत्रण"),
+        Bi("Mouth care and eye care, given often", "मुँह और आँखों की देखभाल, बार-बार"),
+        Bi("Comfortable positioning; turning as tolerated; air mattress to prevent pressure sores", "आरामदायक स्थिति; जितना सह सकें करवट बदलना; बेडसोर से बचाव के लिए एयर गद्दा"),
+        Bi("Skin and wound care; management of odour", "त्वचा और घाव की देखभाल; बदबू पर नियंत्रण"),
+        Bi("Bowel care — assessment and management of constipation", "पेट की देखभाल — कब्ज़ की जाँच और इलाज"),
+        Bi("Bladder care — assessment and management of retention and incontinence", "मूत्राशय की देखभाल — पेशाब रुकने और अपने-आप निकल जाने की जाँच और इलाज"),
+        Bi("Privacy, dignity, and gentle handling in every personal-care task", "हर निजी देखभाल में निजता, गरिमा और कोमल व्यवहार"),
+        Bi("Presence of family; spiritual and religious support as the patient wishes", "परिवार का साथ; मरीज़ की इच्छा के अनुसार आध्यात्मिक और धार्मिक सहारा"),
+        Bi("Honest, unhurried communication with the patient and the family, every day", "मरीज़ और परिवार से हर दिन ईमानदार, बिना जल्दबाज़ी की बातचीत"),
     )
     val NOTE = Bi("A limit on treatment never means no care.", "इलाज पर सीमा का मतलब कभी 'देखभाल नहीं' नहीं होता।")
 }
@@ -383,7 +389,7 @@ object PlanText {
     fun ambulance(a: AmbulanceOption) = when (a) {
         AmbulanceOption.FULL_RESUSCITATION -> Bi("Full pre-hospital resuscitation and transport", "रास्ते में पूरा इलाज और अस्पताल ले जाना")
         AmbulanceOption.SYMPTOM_RELIEF_TRANSPORT -> Bi("Transport with symptom relief only (no CPR, no intubation)", "सिर्फ़ तकलीफ़ में राहत के साथ ले जाना (CPR नहीं, नली नहीं)")
-        AmbulanceOption.TRANSPORT_HOME_NURSE_ESCORT -> Bi("Take home for the last days, with a nurse", "आख़िरी दिनों के लिए नर्स के साथ घर ले जाना")
+        AmbulanceOption.TRANSPORT_HOME_NURSE_ESCORT -> Bi("Take home from hospital for the last days, with a nurse if available", "आख़िरी दिनों के लिए अस्पताल से घर ले जाना, नर्स मिले तो उसके साथ")
     }
     fun capacity(c: Capacity) = when (c) {
         Capacity.HAS -> Bi("Has capacity", "निर्णय ले सकते हैं"); Capacity.HAS_DELEGATED -> Bi("Has capacity, has asked family to decide", "निर्णय ले सकते हैं, परिवार को सौंपा है")
@@ -456,7 +462,7 @@ object PlanText {
         r.values.knowsRecordedWhen?.let { Bi.join(" ", listOf(Bi("When was this recorded?", "यह कब दर्ज किया गया?"), knowsRecordedWhen(it))) },
     )
     fun trigger(t: ReviewTrigger) = when (t) {
-        ReviewTrigger.NEW_ADMISSION -> Bi("New admission", "नई भर्ती"); ReviewTrigger.TRANSFER_BETWEEN_SETTINGS -> Bi("Moved between home, hospital or hospice", "घर, अस्पताल या हॉस्पिस के बीच बदलाव")
+        ReviewTrigger.NEW_ADMISSION -> Bi("New admission", "नई भर्ती"); ReviewTrigger.TRANSFER_BETWEEN_SETTINGS -> Bi("Moved between home, hospital, hospice or care home", "घर, अस्पताल, हॉस्पिस या केयर होम के बीच बदलाव")
         ReviewTrigger.CONDITION_CHANGE -> Bi("Significant change in condition (either way)", "हालत में बड़ा बदलाव (बेहतर या बदतर)"); ReviewTrigger.PATIENT_OR_FAMILY_REQUEST -> Bi("Patient or family asked for a review", "मरीज़ या परिवार ने समीक्षा माँगी")
         ReviewTrigger.NEW_TREATMENT_LINE -> Bi("A new line of treatment started", "इलाज का नया दौर शुरू हुआ"); ReviewTrigger.ROUTINE_INTERVAL -> Bi("Routine review date reached", "नियमित समीक्षा की तारीख़ आ गई")
     }

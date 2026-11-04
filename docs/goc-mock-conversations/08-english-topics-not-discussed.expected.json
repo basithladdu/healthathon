@@ -1,0 +1,33 @@
+{
+  "fictional": true,
+  "note": "FICTIONAL test data. The expected outcome is what Sahara's word matcher should SUGGEST for the doctor to check. It is not a clinical decision, and nothing is chosen until the doctor confirms each item (rule V1).",
+  "transcript": "08-english-topics-not-discussed.txt",
+  "title": "English, key topics never discussed",
+  "language": "en",
+  "decisions": {},
+  "changedMind": [],
+  "conflict": [],
+  "discussed": [
+    "consent",
+    "patientDetails"
+  ],
+  "notDiscussed": [
+    "decisionMakers",
+    "cpr",
+    "dialysis",
+    "respCeiling",
+    "icu",
+    "vasopressors",
+    "ng",
+    "peg",
+    "hydration",
+    "hospitalTransfer",
+    "ambulance",
+    "goalOfCare"
+  ],
+  "knownGaps": {
+    "web": {},
+    "android": {}
+  },
+  "notes": "At the end the app must list every not-discussed item and offer Continue anyway or Go back."
+}

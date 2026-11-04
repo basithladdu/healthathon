@@ -1,0 +1,25 @@
+# FICTIONAL. A made-up goals-of-care conversation for testing Sahara. No real patient, family or doctor. Not medical advice.
+# Language: Hinglish (Hindi and English mixed, Hindi in Latin letters). Patient: Sunita (fictional), 58, with her husband Vijay (fictional).
+# The patient changes her mind about CPR: no, then yes, then no. The last statement should be the suggestion.
+Doctor: Namaste. Kya aap is conversation ko record karne ke liye ready hain? Aapki consent chahiye.
+Patient: Haan, theek hai.
+Husband: Haan, consent hai.
+Doctor: Aapka naam aur umar?
+Patient: Sunita, 58 saal.
+Doctor: Emergency mein kisko phone karein?
+Husband: Mujhe, Vijay. Mera phone number file mein hai.
+Doctor: Agar heart ruk jaye, toh CPR?
+Patient: Nahi, CPR nahi chahiye.
+Doctor: Aap sure hain?
+Patient: Actually, I want CPR. Bachche abhi chhote hain.
+Doctor: Theek hai. Hum dialysis ki baat karein?
+Patient: Dialysis nahi karwana.
+Doctor: Aur ventilator?
+Patient: Ventilator mat lagana.
+Patient: Doctor, CPR ke baare mein maine phir socha. Do not do CPR. Mujhe CPR nahi chahiye.
+Doctor: Theek hai, yeh likh rahe hain. Hospital le jaana hai agar haalat bigde?
+Patient: Hospital only for pain.
+Doctor: Sabse zaroori kya hai aapke liye?
+Patient: Sabse zaroori hai ki main ghar par rahoon, family ke saath.
+Doctor: Aur goal kya hai?
+Patient: Sirf aaram chahiye.

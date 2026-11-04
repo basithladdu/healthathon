@@ -69,7 +69,7 @@ class DoctorCareDemoFlowTest {
         ui.onNodeWithTag("walkthrough-patients-list").performScrollToNode(hasText("Rahul"))
         ui.onNodeWithText("Rahul").performClick()
         waitFor("doctor-care-demo-hub")
-        val routes=listOf("Summary" to "doctor-patient-day","Progress" to "doctor-checkin-history","Medicines" to "doctor-medicines","Conversations" to "doctor-conversations","Visits" to "doctor-visits","Reports" to "documents-list")
+        val routes=listOf("Progress" to "doctor-checkin-history","Labs" to "doctor-labs","Medicines" to "doctor-medicines","Conversations" to "doctor-conversations","Visits" to "doctor-visits","Reports" to "documents-list")
         routes.forEach { (section,tag) ->
             ui.onNodeWithTag("doctor-shared-patient-hub").performScrollToNode(hasTestTag("doctor-shared-$section"))
             ui.onNodeWithTag("doctor-shared-$section").performClick();waitFor(tag)

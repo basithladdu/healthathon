@@ -20,8 +20,12 @@ const val GOC_TRANSCRIPT_KEY = "gocTranscript"
 /** Topics in the order the checklist prompts them: ICU, ventilator, dialysis, then on through the form [needs clinician sign-off on the order]. */
 enum class GocDecision { ICU, BREATHING, DIALYSIS, VASOPRESSORS, FEEDING_NG, FEEDING_PEG, HYDRATION, CPR, TRANSFER, AMBULANCE, GOAL, VALUES }
 
-/** One thing heard: which options it points to, and the words that triggered it. [options] holds more than one id only when the words cannot separate them. [ruledOut]: what was refused when no single option follows ("no ventilator" says nothing about NIV). */
-data class GocHit(val decision: GocDecision, val options: List<String>, val quote: String, val start: Int, val ruledOut: List<String> = emptyList())
+/**
+ * One thing heard: which options it points to, and the words that triggered it. [options] holds more than one id only when the words cannot separate them.
+ * [ruledOut]: what was refused when no single option follows ("no ventilator" says nothing about NIV). [start]: where the quote begins.
+ * [at]: where the deciding words are (the answer, for "Do you want CPR? No."), which orders statements for "latest statement wins" and finds who said it.
+ */
+data class GocHit(val decision: GocDecision, val options: List<String>, val quote: String, val start: Int, val ruledOut: List<String> = emptyList(), val at: Int = start)
 /** The topic came up, but as a question, undecided, or negated in a way that cannot be read as a choice. No option is marked. */
 data class GocMention(val decision: GocDecision, val quote: String, val start: Int)
 
@@ -119,7 +123,7 @@ private val DET_NEG = Lex(
     kn("ಇಲ್ಲದೆ"),
 )
 private val POSITIVE = Lex(
-    en("want*", "wish*", "yes", "agree*", "accept*", "okay", "ok", "fine", "prefer*", "would like", "go ahead", "try", "attempt", "chahiye", "chahte", "chahti", "chahta", "haan", "karein", "kijiye", "theek hai", "thik hai", "manzoor"),
+    en("want*", "wish*", "yes", "agree*", "accept*", "okay", "ok", "fine", "prefer*", "would like", "go ahead", "try", "attempt", "please", "put him on", "put her on", "chahiye", "chahte", "chahti", "chahta", "haan", "karein", "kijiye", "theek hai", "thik hai", "manzoor"),
     hi("चाहिए", "चाहिये", "चाहते", "चाहती", "चाहता", "चाहें", "चाहेंगे", "हाँ", "करें", "कीजिए", "ठीक है", "मंज़ूर"),
     te("*కావాలి*", "అవును", "సరే", "*కోరుకుంట*", "*ఒప్పుకుంట*", "చేయండి", "పెట్టండి"),
     ur("چاہیے", "چاہتے", "چاہتی", "چاہتا", "ہاں", "کریں", "کیجیے", "ٹھیک ہے", "منظور"),
@@ -244,7 +248,7 @@ private val RULES: List<GocRule> = listOf(
     GocRule(GocDecision.GOAL, emptyList(), explicit = listOf(
         listOf(GoalOfCare.A_LIFE.name) to Lex(en("prioritise life", "prioritize life", "everything possible", "do everything", "all treatment", "full treatment", "maximum treatment", "sab kuch kar*", "pura ilaj", "poora ilaj"), hi("सब कुछ कर*", "हर संभव", "जीवन को प्राथमिकता", "पूरा इलाज", "जान बचा*"), te("అన్ని చికిత్స*", "పూర్తి చికిత్స*", "ప్రాణం కాపాడ*"), ur("سب کچھ کر*", "ہر ممکن", "پورا علاج", "جان بچا*"), kn("ಎಲ್ಲಾ ಚಿಕಿತ್ಸೆ*", "ಪೂರ್ಣ ಚಿಕಿತ್ಸೆ*", "ಜೀವ ಉಳಿಸ*")),
         listOf(GoalOfCare.B_CEILING.name) to Lex(en("balanced", "within limits", "treat what can be reversed", "treat reversible"), hi("संतुलित", "तय सीमा में", "सीमा में इलाज"), te("సమతుల్య*", "పరిమితుల్లో"), ur("متوازن", "حد کے اندر"), kn("ಸಮತೋಲ*", "ಮಿತಿಯೊಳಗೆ")),
-        listOf(GoalOfCare.C_COMFORT.name) to Lex(en("comfort care", "comfort only", "only comfort", "prioritise comfort", "prioritize comfort", "keep comfortable", "keep him comfortable", "keep her comfortable", "sirf aaram", "aaram hi"), hi("सिर्फ़ आराम", "केवल आराम", "आराम को प्राथमिकता", "आराम ही"), te("సౌకర్యం మాత్రమే", "సౌకర్యమే", "సౌకర్యానికి ప్రాధాన్యత"), ur("صرف آرام", "آرام کو ترجیح"), kn("ಆರಾಮ ಮಾತ್ರ", "ಆರಾಮಕ್ಕೆ ಆದ್ಯತೆ")),
+        listOf(GoalOfCare.C_COMFORT.name) to Lex(en("comfort care", "comfort only", "only comfort", "prioritise comfort", "prioritize comfort", "keep comfortable", "keep him comfortable", "keep her comfortable", "sirf aaram", "aaram hi"), hi("सिर्फ़ आराम", "केवल आराम", "बस आराम", "आराम को प्राथमिकता", "आराम ही", "तकलीफ़ न हो"), te("సౌకర్యం మాత్రమే", "సౌకర్యమే", "సౌకర్యానికి ప్రాధాన్యత", "నొప్పి లేకుండా", "ప్రశాంతంగా*"), ur("صرف آرام", "بس آرام", "آرام کو ترجیح", "تکلیف نہ ہو"), kn("ಆರಾಮ ಮಾತ್ರ", "ಆರಾಮಕ್ಕೆ ಆದ್ಯತೆ", "ನೋವಿಲ್ಲದೆ", "ನೆಮ್ಮದಿಯಾಗಿ")),
     )) { _, _ -> emptyList() },
 )
 
@@ -329,20 +333,26 @@ object GocExtract {
         val all = clauses(text)
         val pending = mutableListOf<Pending>()
         fun mention(d: GocDecision, c: Clause) { mentions += GocMention(d, quote(text, c), c.tokens.first().start) }
-        fun hit(d: GocDecision, options: List<String>, c: Clause, next: Clause? = null) { if (options.isNotEmpty()) hits += GocHit(d, options, quote(text, c, next), c.tokens.first().start) else mention(d, c) }
+        fun hit(d: GocDecision, options: List<String>, c: Clause, next: Clause? = null) { if (options.isNotEmpty()) hits += GocHit(d, options, quote(text, c, next), c.tokens.first().start, at = (next ?: c).tokens.first().start) else mention(d, c) }
         fun refused(rule: GocRule, level: Int, c: Clause, next: Clause? = null) {
             val out = rule.ruledOut?.invoke(level)
-            if (out == null) hit(rule.decision, rule.map(Polarity.NEG, level), c, next) else hits += GocHit(rule.decision, emptyList(), quote(text, c, next), c.tokens.first().start, out)
+            if (out == null) hit(rule.decision, rule.map(Polarity.NEG, level), c, next) else hits += GocHit(rule.decision, emptyList(), quote(text, c, next), c.tokens.first().start, out, (next ?: c).tokens.first().start)
         }
+        // "Doctor:" or "Son:" at the start of a line is a label, not words said: skipped, so a reply still finds the question before it.
+        val label = BooleanArray(all.size) { i -> val c = all[i]; c.tokens.size <= 3 && gocLabelAfter(text, c.tokens.last().end) && gocLineStartBefore(text, c.tokens.first().start) }
+        fun previousContent(index: Int): Int { var i = index - 1; while (i >= 0 && label[i]) i--; return i }
 
         all.forEachIndexed { index, c ->
+            if (label[index]) return@forEachIndexed
             val words = c.words
             // A short "no" after a question or a bare topic answers it.
             // Every word must be a yes, a no or a courtesy, so "and no pain" answers nothing.
             val covered = (VERBAL_NEG.find(words) + DET_NEG.find(words) + POSITIVE.find(words) + ANSWER_FILLER.find(words)).flatMap { it.toList() }.toSet()
             val shortAnswer = words.size <= SHORT_ANSWER_WORDS && !c.question && words.indices.all { it in covered }
             if (shortAnswer) {
-                val before = pending.filter { it.clause == index - 1 }
+                // Any topic asked in the sentence just before ("If your heart stops, would you want CPR, where we press on the chest?").
+                val previous = previousContent(index)
+                val before = if (previous < 0 || all[previous].sentenceStart == c.sentenceStart) emptyList() else pending.filter { all[it.clause].sentenceStart == all[previous].sentenceStart }
                 if (before.isNotEmpty()) {
                     val no = VERBAL_NEG.any(words) || DET_NEG.any(words); val yes = POSITIVE.any(words)
                     if (no || yes) before.forEach { p -> if (no) refused(p.rule, p.level, all[p.clause], c) else hit(p.rule.decision, p.rule.map(Polarity.POS, p.level), all[p.clause], c) }
@@ -394,21 +404,34 @@ object GocExtract {
     }
 }
 
+/** True when the next character after [from] (skipping spaces) is a colon: the words before it are a speaker label. */
+internal fun gocLabelAfter(text: String, from: Int): Boolean { var i = from; while (i < text.length && text[i] == ' ') i++; return i < text.length && (text[i] == ':' || text[i] == '：') }
+/** True when only spaces sit between the start of the line and [at]. */
+internal fun gocLineStartBefore(text: String, at: Int): Boolean { var i = at - 1; while (i >= 0 && text[i] == ' ') i--; return i < 0 || text[i] == '\n' }
+
 // ── Doctor side or patient party, per line. Not speaker identification. ──
 
 enum class GocParty { DOCTOR_SIDE, PATIENT_PARTY, UNSET }
 
-/** One line of the verbatim transcript. [guessed]: the side came from a simple rule and the doctor has not looked at it. [key] ties a line to its audio segment, so resuming adds no repeats. */
-data class GocLine(val text: String, val party: GocParty = GocParty.UNSET, val guessed: Boolean = false, val key: String = "")
+/**
+ * One line of the verbatim transcript. [guessed]: the side came from a simple rule (or a speaker model) and the doctor has not looked at it.
+ * [key] ties a line to its audio segment, so resuming adds no repeats. [who]: the person label typed before it ("son", "patient"), lower case, or "Speaker 2"
+ * from the on-device speaker model, so "latest statement wins" never lets one person overrule another.
+ */
+data class GocLine(val text: String, val party: GocParty = GocParty.UNSET, val guessed: Boolean = false, val key: String = "", val who: String = "")
 
 object GocLines {
     private val DOCTOR_LABEL = Lex(en("doctor", "dr", "nurse", "consultant"), hi("डॉक्टर", "डॉ", "नर्स"), te("డాక్టర్", "వైద్యుడు", "నర్సు"), ur("ڈاکٹر", "نرس"), kn("ಡಾಕ್ಟರ್", "ವೈದ್ಯ*", "ನರ್ಸ್"))
-    private val PATIENT_LABEL = Lex(en("patient", "family", "son", "daughter", "wife", "husband", "mother", "father", "brother", "sister"), hi("मरीज़", "परिवार", "बेटा", "बेटी", "पत्नी", "पति"), te("రోగి", "కుటుంబం", "కొడుకు", "కూతురు", "భార్య", "భర్త"), ur("مریض", "خاندان", "بیٹا", "بیٹی", "بیوی", "شوہر"), kn("ರೋಗಿ", "ಕುಟುಂಬ", "ಮಗ", "ಮಗಳು", "ಹೆಂಡತಿ", "ಗಂಡ"))
+    private val PATIENT_LABEL = Lex(en("patient", "family", "son", "daughter", "wife", "husband", "mother", "father", "brother", "sister", "nephew", "niece", "grandson", "granddaughter", "relative", "attender", "caregiver", "friend"),
+        hi("मरीज़", "परिवार", "बेटा", "बेटी", "पत्नी", "पति", "माँ", "पिता", "भाई", "बहन"), te("రోగి", "కుటుంబం", "కొడుకు", "కూతురు", "భార్య", "భర్త", "అన్న", "తమ్ముడు", "అక్క", "చెల్లి"),
+        ur("مریض", "مریضہ", "خاندان", "بیٹا", "بیٹی", "بیوی", "شوہر", "بھائی", "بہن", "ماں", "والد"), kn("ರೋಗಿ", "ಕುಟುಂಬ", "ಮಗ", "ಮಗಳು", "ಹೆಂಡತಿ", "ಗಂಡ", "ಅಣ್ಣ", "ಅಕ್ಕ", "ತಂಗಿ"))
     private const val SHORT_REPLY_WORDS = 6
 
     /** Splits words into sentences and labels each. A written "Doctor:" or "Son:" is taken as said; a question is guessed doctor side, and a short reply straight after it patient party. Everything else stays not marked. */
     fun fromText(text: String, keyPrefix: String = ""): List<GocLine> {
         val out = mutableListOf<GocLine>(); var start = 0
+        // A label ("Son:") covers every sentence on its line, not only the first.
+        var carry: GocLine? = null
         fun add(end: Int) {
             val line = text.substring(start, end).trim()
             if (line.isEmpty() || gocTokens(line).isEmpty()) return
@@ -416,9 +439,11 @@ object GocLines {
             val colon = line.indexOf(':').takeIf { it in 1..24 }
             val label = colon?.let { gocTokens(line.substring(0, it)).map { t -> t.norm } }
             val previous = out.lastOrNull()
+            val held = carry
             out += when {
-                label != null && DOCTOR_LABEL.any(label) -> GocLine(line, GocParty.DOCTOR_SIDE, false, key)
-                label != null && PATIENT_LABEL.any(label) -> GocLine(line, GocParty.PATIENT_PARTY, false, key)
+                label != null && DOCTOR_LABEL.any(label) -> GocLine(line, GocParty.DOCTOR_SIDE, false, key).also { carry = it }
+                label != null && PATIENT_LABEL.any(label) -> GocLine(line, GocParty.PATIENT_PARTY, false, key, label.joinToString(" ")).also { carry = it }
+                held != null -> GocLine(line, held.party, false, key, held.who)
                 GocExtract.isQuestion(line) -> GocLine(line, GocParty.DOCTOR_SIDE, true, key)
                 previous != null && previous.party == GocParty.DOCTOR_SIDE && previous.guessed && gocTokens(line).size <= SHORT_REPLY_WORDS -> GocLine(line, GocParty.PATIENT_PARTY, true, key)
                 else -> GocLine(line, GocParty.UNSET, false, key)
@@ -428,7 +453,7 @@ object GocLines {
         while (i < text.length) {
             val c = text[i]
             val inNumber = c == '.' && i > 0 && i + 1 < text.length && text[i - 1].isDigit() && text[i + 1].isDigit()
-            if (c in SENTENCE_END && !inNumber) { add(if (c == '\n') i else i + 1); start = i + 1 }
+            if (c in SENTENCE_END && !inNumber) { add(if (c == '\n') i else i + 1); start = i + 1; if (c == '\n') carry = null }
             i++
         }
         add(text.length)
@@ -438,11 +463,12 @@ object GocLines {
     fun text(lines: List<GocLine>): String = lines.joinToString("\n") { it.text }
 
     /** Which line a matcher offset into [text] falls on. */
-    fun partyAt(lines: List<GocLine>, offset: Int): GocParty {
+    fun lineAt(lines: List<GocLine>, offset: Int): GocLine? {
         var at = 0
-        lines.forEach { line -> val end = at + line.text.length; if (offset <= end) return line.party; at = end + 1 }
-        return GocParty.UNSET
+        lines.forEach { line -> val end = at + line.text.length; if (offset <= end) return line; at = end + 1 }
+        return null
     }
+    fun partyAt(lines: List<GocLine>, offset: Int): GocParty = lineAt(lines, offset)?.party ?: GocParty.UNSET
 
     fun nextParty(p: GocParty): GocParty = when (p) { GocParty.UNSET -> GocParty.DOCTOR_SIDE; GocParty.DOCTOR_SIDE -> GocParty.PATIENT_PARTY; GocParty.PATIENT_PARTY -> GocParty.UNSET }
     fun label(p: GocParty): Bi = when (p) { GocParty.DOCTOR_SIDE -> Bi("Doctor side", "डॉक्टर की ओर"); GocParty.PATIENT_PARTY -> Bi("Patient party", "मरीज़ की ओर"); GocParty.UNSET -> Bi("Not marked", "तय नहीं") }
@@ -455,11 +481,17 @@ data class GocTopicRecord(val decision: GocDecision, val status: GocTopicStatus,
 enum class GocNoteKind { GENERAL_DISCUSSION, DECISION_TAKEN }
 
 /** The verbatim words ([lines]) and the doctor's note ([note]) are kept apart: the note says what was said and decided, and the words stay as spoken. [planVersion] tells a carried-over copy from this version's own. */
+data class GocSignOffSummary(val id: String, val sealSha256: String, val lockedAt: String, val signers: List<String>)
+
 data class GocTranscript(
     val lines: List<GocLine> = emptyList(), val language: String = "", val source: String = SOURCE_TYPED, val model: String = "",
     val participants: String = "", val consentAt: Long = 0, val planVersion: Int = 1,
     val topics: List<GocTopicRecord> = emptyList(), val note: String = "", val noteKind: GocNoteKind = GocNoteKind.GENERAL_DISCUSSION,
     val reviewedAt: String = "", val reviewedBy: String = "", val audioKept: Boolean = false,
+    /** The locked sign-off of [note] (CareGocSignOff.kt): its id in the sign-off store, its seal, when it locked, and who signed. Blank until signed. */
+    val signOff: GocSignOffSummary? = null,
+    /** Which engine wrote the machine draft, shown as "Transcribed by …". */
+    val transcribedBy: String = "",
 ) {
     companion object { const val SOURCE_TYPED = "TYPED"; const val SOURCE_RECORDED = "RECORDED" }
 }
@@ -476,19 +508,21 @@ object GocTranscriptJson {
         val marks = JSONObject()
         g.topics.forEach { t -> FIELDS[t.decision]?.let { field -> marks.put(field, JSONObject().put("status", if (t.status == GocTopicStatus.CONFIRMED) "DISCUSSED" else "NOT_DISCUSSED").put("verifiedBy", g.reviewedBy).put("verifiedAt", t.at)) } }
         return JSONObject()
-            .put("lines", JSONArray(g.lines.map { l -> JSONObject().put("text", l.text).put("speaker", when (l.party) { GocParty.DOCTOR_SIDE -> "DOCTOR"; GocParty.PATIENT_PARTY -> "PATIENT_PARTY"; GocParty.UNSET -> JSONObject.NULL }).put("guessed", l.guessed).put("key", l.key) }))
+            .put("lines", JSONArray(g.lines.map { l -> JSONObject().put("text", l.text).put("speaker", when (l.party) { GocParty.DOCTOR_SIDE -> "DOCTOR"; GocParty.PATIENT_PARTY -> "PATIENT_PARTY"; GocParty.UNSET -> JSONObject.NULL }).put("guessed", l.guessed).put("key", l.key).also { o -> if (l.who.isNotBlank()) o.put("who", l.who) } }))
             .put("language", g.language.ifBlank { "auto" }).put("source", g.source).put("machineDraft", g.model.isNotBlank()).put("model", g.model).put("consentAt", iso(g.consentAt))
             .put("reviewedBy", g.reviewedBy).put("reviewedAt", g.reviewedAt).put("audioKept", g.audioKept)
             .put("accepted", JSONArray(g.topics.filter { it.status == GocTopicStatus.CONFIRMED }.map { t -> JSONObject().put("field", FIELDS[t.decision]).put("value", t.optionId ?: JSONObject.NULL).put("quote", t.quote).put("at", t.at) }))
             .put("topics", marks).put("note", g.note)
             .put("planVersion", g.planVersion).put("participants", g.participants).put("noteKind", g.noteKind.name)
+            .put("transcribedBy", g.transcribedBy)
+            .also { o -> g.signOff?.let { so -> o.put("signOff", JSONObject().put("id", so.id).put("status", "LOCKED").put("sealSha256", so.sealSha256).put("lockedAt", so.lockedAt).put("signers", JSONArray(so.signers.map { JSONObject().put("name", it) }))) } }
     }
 
     /** [recordVersion] is the record's own version: a transcript written on the web carries no planVersion of its own. */
     fun decode(j: JSONObject?, recordVersion: Int = 1): GocTranscript? {
         if (j == null) return null
         val lines = j.optJSONArray("lines")?.let { a -> (0 until a.length()).mapNotNull { a.optJSONObject(it) }.map { o ->
-            GocLine(o.optString("text"), if (o.isNull("speaker")) GocParty.UNSET else when (o.optString("speaker")) { "DOCTOR" -> GocParty.DOCTOR_SIDE; "PATIENT_PARTY" -> GocParty.PATIENT_PARTY; else -> GocParty.UNSET }, o.optBoolean("guessed"), o.optString("key"))
+            GocLine(o.optString("text"), if (o.isNull("speaker")) GocParty.UNSET else when (o.optString("speaker")) { "DOCTOR" -> GocParty.DOCTOR_SIDE; "PATIENT_PARTY" -> GocParty.PATIENT_PARTY; else -> GocParty.UNSET }, o.optBoolean("guessed"), o.optString("key"), o.optString("who"))
         } }.orEmpty()
         val accepted = j.optJSONArray("accepted")?.let { a -> (0 until a.length()).mapNotNull { a.optJSONObject(it) }.mapNotNull { o ->
             decision(o.optString("field"))?.let { d -> GocTopicRecord(d, GocTopicStatus.CONFIRMED, if (o.isNull("value")) null else o.optString("value"), o.optString("quote"), o.optString("at")) }
@@ -499,7 +533,10 @@ object GocTranscriptJson {
             if (o == null || d == null || o.optString("status") != "NOT_DISCUSSED") null else GocTopicRecord(d, GocTopicStatus.NOT_DISCUSSED_VERIFIED, at = o.optString("verifiedAt"))
         }
         return GocTranscript(lines, j.optString("language").takeUnless { it == "auto" }.orEmpty(), j.optString("source").ifBlank { GocTranscript.SOURCE_TYPED }, j.optString("model"), j.optString("participants"), millis(j.optString("consentAt")), j.optInt("planVersion", recordVersion),
-            accepted + verified, j.optString("note"), GocNoteKind.entries.firstOrNull { it.name == j.optString("noteKind") } ?: GocNote.kind(accepted), j.optString("reviewedAt"), j.optString("reviewedBy"), j.optBoolean("audioKept"))
+            accepted + verified, j.optString("note"), GocNoteKind.entries.firstOrNull { it.name == j.optString("noteKind") } ?: GocNote.kind(accepted), j.optString("reviewedAt"), j.optString("reviewedBy"), j.optBoolean("audioKept"),
+            j.optJSONObject("signOff")?.takeIf { it.optString("status") == "LOCKED" && it.optString("id").isNotBlank() }?.let { o ->
+                GocSignOffSummary(o.optString("id"), o.optString("sealSha256"), o.optString("lockedAt"), o.optJSONArray("signers")?.let { a -> (0 until a.length()).mapNotNull { a.optJSONObject(it)?.optString("name")?.takeIf(String::isNotBlank) } }.orEmpty())
+            }, j.optString("transcribedBy"))
     }
 }
 
@@ -508,7 +545,9 @@ object GocTranscriptJson {
 data class GocOption(val id: String, val label: Bi, val meaning: Bi? = null)
 
 object GocPlan {
-    val ORDER: List<GocDecision> = GocDecision.entries
+    /** CPR and dialysis first, as the doctors asked on 3 Nov 2026, then the rest of Section III of the form. */
+    val ORDER: List<GocDecision> = listOf(GocDecision.CPR, GocDecision.DIALYSIS, GocDecision.BREATHING, GocDecision.ICU, GocDecision.VASOPRESSORS, GocDecision.FEEDING_NG, GocDecision.FEEDING_PEG,
+        GocDecision.HYDRATION, GocDecision.TRANSFER, GocDecision.AMBULANCE, GocDecision.GOAL, GocDecision.VALUES)
 
     fun title(d: GocDecision): Bi = when (d) {
         GocDecision.ICU -> Bi("Intensive care (ICU)", "इंटेंसिव केयर (ICU)")
@@ -625,25 +664,83 @@ object GocNote {
 
     private fun optionLabel(d: GocDecision, id: String?): Bi = id?.let { i -> GocPlan.options(d).firstOrNull { it.id == i }?.label } ?: NO_PREFERENCE
 
-    /** One line per topic in checklist order. A topic with nothing recorded says so; only the doctor's tick makes it "verified". The doctor edits the result before it is saved. */
-    fun draft(r: EctprRecord, topics: Map<GocDecision, GocTopicRecord>, participants: String, hindi: Boolean): String = buildList {
+    /** What a decision row says: the confirmed choice, or that it was not discussed (verified or not) and what the plan holds now. */
+    internal fun decisionValue(r: EctprRecord, d: GocDecision, topic: GocTopicRecord?): Bi = when (topic?.status) {
+        GocTopicStatus.CONFIRMED -> optionLabel(d, topic?.optionId)
+        GocTopicStatus.NOT_DISCUSSED_VERIFIED -> Bi.join(" · ", listOf(Bi("Not discussed (doctor verified)", "बात नहीं हुई (डॉक्टर ने जाँचा)"), optionLabel(d, GocPlan.current(r, d))))
+        null -> Bi.join(" · ", listOf(Bi("Not discussed, not yet verified", "बात नहीं हुई, अभी जाँचा नहीं"), optionLabel(d, GocPlan.current(r, d))))
+    }
+
+    /**
+     * The note in the order of the legal Word form (legal review, 31 Oct 2026): Sections I to IV. A topic with nothing recorded says so; only the
+     * doctor's tick makes it "verified". Spoken quotes stay in the transcript. The doctor edits the result before it is saved, then it is signed.
+     */
+    fun draft(r: EctprRecord, topics: Map<GocDecision, GocTopicRecord>, participants: String, hindi: Boolean, notDiscussed: List<Bi> = emptyList()): String = buildList {
         add(Bi("Goals-of-care conversation note", "देखभाल के लक्ष्यों की बातचीत का नोट").pick(hindi))
-        add(Bi("Draft for the doctor to edit. Not signed.", "डॉक्टर के बदलने के लिए ड्राफ़्ट। साइन नहीं हुआ।").pick(hindi))
+        add(Bi("For the doctor, and the patient or family, to read together and sign.", "डॉक्टर और मरीज़ या परिवार साथ पढ़ें और साइन करें।").pick(hindi))
         add(kindLabel(kind(topics.values)).pick(hindi))
         if (participants.isNotBlank()) add(Bi("Present", "मौजूद").pick(hindi) + ": " + participants.lines().filter(String::isNotBlank).joinToString(", "))
-        add((if (r.prognosticUnderstanding.confirmed) Bi("Condition explained: recorded in the plan", "बीमारी समझाना: योजना में दर्ज") else Bi("Condition explained: not recorded", "बीमारी समझाना: दर्ज नहीं")).pick(hindi))
-        GocPlan.ORDER.filter { it != GocDecision.VALUES }.forEach { d ->
-            val topic = topics[d]
-            val value = when (topic?.status) {
-                GocTopicStatus.CONFIRMED -> optionLabel(d, topic?.optionId).pick(hindi)
-                GocTopicStatus.NOT_DISCUSSED_VERIFIED -> Bi("Not discussed (doctor verified)", "बात नहीं हुई (डॉक्टर ने जाँचा)").pick(hindi) + " · " + optionLabel(d, GocPlan.current(r, d)).pick(hindi)
-                null -> Bi("Not discussed, not yet verified", "बात नहीं हुई, अभी जाँचा नहीं").pick(hindi) + " · " + optionLabel(d, GocPlan.current(r, d)).pick(hindi)
-            }
-            add(GocPlan.title(d).pick(hindi) + ": " + value)
+        if (notDiscussed.isNotEmpty()) add(Bi("Not discussed", "बात नहीं हुई").pick(hindi) + ": " + notDiscussed.joinToString("; ") { it.pick(hindi) })
+        GocForm.sections(r, topics).forEach { section ->
+            add(""); add(section.title.pick(hindi).uppercase())
+            section.rows.forEach { add(it.pick(hindi)) }
         }
-        if (r.values.ownWords.isNotBlank()) add(GocPlan.title(GocDecision.VALUES).pick(hindi) + ": " + r.values.ownWords.lines().map(GocExtract::withoutSoundCaptions).filter(String::isNotBlank).joinToString("; "))
-        r.values.unacceptableOutcomes.map(GocExtract::withoutSoundCaptions).filter(String::isNotBlank).forEach { add(Bi("Would not accept", "मंज़ूर नहीं").pick(hindi) + ": " + it) }
     }.joinToString("\n")
+}
+
+data class GocFormSection(val id: String, val title: Bi, val rows: List<Bi>)
+
+/** The legal form's Sections I to IV, filled from the plan and the confirmed topics. Shown on screen, written into the note, and printed in the PDF. */
+object GocForm {
+    private val NOT_RECORDED = Bi("Not recorded", "दर्ज नहीं")
+    private fun row(label: Bi, value: String) = Bi.labeled(label, if (value.isBlank()) NOT_RECORDED else Bi.plain(value))
+    private fun person(p: DecisionMaker?): String = p?.let { listOf(it.name, it.relation, it.phone24h, it.idType?.let { id -> PlanText.idType(id).en + (it.idLast4?.let { l -> " …$l" } ?: "") }.orEmpty(), it.authorityBasis?.let { a -> PlanText.authority(a).en }.orEmpty()).filter(String::isNotBlank).joinToString(" · ") }.orEmpty()
+    private fun directive(d: ExistingDirective?): Bi = when (d?.kind) {
+        null -> NOT_RECORDED
+        DirectiveKind.NONE -> Bi("No living will (AMD)", "कोई लिविंग विल (AMD) नहीं")
+        DirectiveKind.PRIOR_WISHES -> Bi.join(": ", listOf(Bi("No AMD; earlier wishes noted", "AMD नहीं; पहले की इच्छाएँ दर्ज"), Bi.plain(d.note)))
+        DirectiveKind.VALID_AMD -> Bi.join(" · ", listOf(Bi("Valid living will (AMD)", "वैध लिविंग विल (AMD)"), Bi.plain(listOf(d.date, d.location, d.attestor).filter(String::isNotBlank).joinToString(" · "))))
+    }
+    private fun signed(r: EctprRecord, label: Bi, match: (Signature) -> Boolean): Bi = r.signatures.firstOrNull(match)?.let { s ->
+        Bi.labeled(label, Bi.plain(listOf(s.name, s.registrationNo.orEmpty(), s.signedAt.take(10)).filter(String::isNotBlank).joinToString(" · ")))
+    } ?: Bi.labeled(label, Bi("Signature ________  Name ________  Date ______", "हस्ताक्षर ________  नाम ________  तारीख़ ______"))
+
+    fun sections(r: EctprRecord, topics: Map<GocDecision, GocTopicRecord>): List<GocFormSection> {
+        val p = r.patient; val dm = r.decisionMakers; val v = r.values
+        return listOf(
+            GocFormSection("I", Bi("Section I – General information", "भाग I – सामान्य जानकारी"), listOf(
+                row(Bi("Name", "नाम"), p.name),
+                row(Bi("Date of birth, sex, gender", "जन्म तिथि, लिंग, जेंडर"), listOf(p.dob, p.sex, p.gender).filter(String::isNotBlank).joinToString(" · ")),
+                row(Bi("Address and phone", "पता और फ़ोन"), listOf(p.address, p.phone).filter(String::isNotBlank).joinToString(" · ")),
+                row(Bi("Language preferred", "पसंद की भाषा"), p.languagePref),
+                row(Bi("Primary oncologist", "मुख्य ऑन्कोलॉजिस्ट"), r.careTeam.oncologist),
+                row(Bi("Palliative care physician", "पैलिएटिव केयर डॉक्टर"), listOf(r.careTeam.palliativePhysician, r.careTeam.palliativePhone24h).filter(String::isNotBlank).joinToString(" · ")),
+                row(Bi("Members present for the discussion", "बातचीत में मौजूद लोग"), dm.presentAtDiscussion.filter(String::isNotBlank).joinToString("; ")),
+                row(Bi("Primary decision-maker and contact", "मुख्य फ़ैसला लेने वाले और संपर्क"), person(dm.primary)),
+                row(Bi("Secondary decision-maker and contact", "द्वितीय फ़ैसला लेने वाले और संपर्क"), person(dm.alternate)),
+                row(Bi("Family to inform before any major decision", "बड़े फ़ैसले से पहले जिन्हें बताना है"), dm.familyToInform.filter(String::isNotBlank).joinToString("; ")),
+            )),
+            GocFormSection("II", Bi("Section II – Preliminary medical information and patient values", "भाग II – शुरुआती चिकित्सा जानकारी और मरीज़ के मूल्य"), listOfNotNull(
+                row(Bi("Primary diagnosis and stage", "मुख्य बीमारी और स्टेज"), listOf(r.clinical.diagnosis, r.clinical.stage, r.clinical.ecog?.let { "ECOG $it" }.orEmpty()).filter(String::isNotBlank).joinToString(" · ")),
+                Bi.labeled(Bi("Capacity, now", "अभी की निर्णय-क्षमता"), r.capacity.status?.let { PlanText.capacity(it) } ?: NOT_RECORDED),
+                Bi.labeled(Bi("Existing directives", "पहले के निर्देश"), directive(r.existingDirective)),
+                if (r.prognosticUnderstanding.confirmed) Bi("Condition explained: recorded in the plan", "बीमारी समझाना: योजना में दर्ज") else Bi("Condition explained: not recorded", "बीमारी समझाना: दर्ज नहीं"),
+                Bi.labeled(Bi("What the patient knows", "मरीज़ क्या जानते हैं"), when (v.patientKnows) { true -> Bi("Knows the diagnosis", "बीमारी के बारे में जानते हैं"); false -> Bi("Does not know the diagnosis", "बीमारी के बारे में नहीं जानते"); null -> NOT_RECORDED }),
+                if (v.familyAskedNotToTell) Bi("The family has asked that the patient not be told", "परिवार ने कहा कि मरीज़ को न बताया जाए") else null,
+                if (v.ownWords.isNotBlank()) Bi.labeled(GocPlan.title(GocDecision.VALUES), Bi.plain(v.ownWords.lines().map(GocExtract::withoutSoundCaptions).filter(String::isNotBlank).joinToString("; "))) else Bi.labeled(GocPlan.title(GocDecision.VALUES), NOT_RECORDED),
+            ) + v.unacceptableOutcomes.map(GocExtract::withoutSoundCaptions).filter(String::isNotBlank).map { Bi.labeled(Bi("Would not accept", "मंज़ूर नहीं"), Bi.plain(it)) }),
+            GocFormSection("III", Bi("Section III – Decisive actions", "भाग III – निर्णायक फ़ैसले"),
+                GocPlan.ORDER.filter { it != GocDecision.VALUES }.map { d -> Bi.labeled(GocPlan.title(d), GocNote.decisionValue(r, d, topics[d])) } +
+                    PlanText.homeCareLines(r) + PlanText.withdrawalLines(r)),
+            GocFormSection("IV", Bi("Section IV – Signatures and declarations", "भाग IV – हस्ताक्षर और घोषणाएँ"), listOf(
+                signed(r, Bi("Patient", "मरीज़")) { it.role == SignatureRole.PATIENT },
+                signed(r, Bi("Primary surrogate", "मुख्य प्रतिनिधि")) { it.role == SignatureRole.SURROGATE && it.surrogateRank != SurrogateRank.SECONDARY },
+                signed(r, Bi("Witness", "गवाह")) { it.role == SignatureRole.WITNESS },
+                signed(r, Bi("Treating consultant", "इलाज करने वाले कंसल्टेंट")) { it.role == SignatureRole.TREATING_CONSULTANT },
+                signed(r, Bi("Palliative care clinician", "पैलिएटिव केयर डॉक्टर")) { it.role == SignatureRole.PALLIATIVE_CLINICIAN },
+            )),
+        )
+    }
 }
 
 /** Carry-forward: a review draft is a copy of the last signed plan, so its transcript belongs to an earlier version until a new talk replaces it. */
@@ -654,4 +751,103 @@ object GocCarry {
     fun carried(r: EctprRecord, d: GocDecision, topics: Map<GocDecision, GocTopicRecord>): Boolean = r.supersedes != null && topics[d] == null && GocPlan.current(r, d) != null
     /** What a new talk starts from: the earlier note as an editable draft, no lines and no confirmed topics. */
     fun startingNote(r: EctprRecord): String = previous(r)?.note.orEmpty()
+}
+
+// ── The guide for the talk, in the order the doctors asked for on 3 Nov 2026: consent, patient details, family and emergency contact,
+// then CPR, dialysis and the other decisions, then the rest of the form. Items tick themselves when the words come up. ──
+
+enum class GocGuideItem(val decision: GocDecision?) {
+    CONSENT(null), PATIENT_DETAILS(null), FAMILY_CONTACT(null),
+    CPR(GocDecision.CPR), DIALYSIS(GocDecision.DIALYSIS), BREATHING(GocDecision.BREATHING), ICU(GocDecision.ICU), VASOPRESSORS(GocDecision.VASOPRESSORS),
+    FEEDING_NG(GocDecision.FEEDING_NG), FEEDING_PEG(GocDecision.FEEDING_PEG), HYDRATION(GocDecision.HYDRATION), TRANSFER(GocDecision.TRANSFER),
+    AMBULANCE(GocDecision.AMBULANCE), GOAL(GocDecision.GOAL), UNDERSTANDING(null), VALUES(GocDecision.VALUES), HOME_CARE(null),
+}
+
+object GocGuide {
+    val ORDER: List<GocGuideItem> = GocGuideItem.entries
+
+    // Machine-written for hi, te, ur, kn [needs native-speaker review]. Only for ticking the guide: never a choice.
+    private val TERMS: Map<GocGuideItem, Lex> = mapOf(
+        GocGuideItem.CONSENT to Lex(en("consent*", "permission", "record*", "agree to the recording", "sahmati", "ijazat"), hi("सहमति", "सहमत", "इजाज़त", "रिकॉर्ड*"), te("అనుమతి*", "సమ్మతి*", "రికార్డ్*"), ur("اجازت", "رضامندی", "ریکارڈ*"), kn("ಅನುಮತಿ*", "ರೆಕಾರ್ಡ್*")),
+        GocGuideItem.PATIENT_DETAILS to Lex(en("your name", "full name", "his name", "her name", "how old", "age", "years old", "date of birth", "address", "where do you live", "naam", "umar", "umr", "saal"), hi("नाम", "उम्र", "आयु", "साल"), te("పేరు*", "వయస్సు*", "వయసు*", "చిరునామా*"), ur("نام", "عمر", "سال"), kn("ಹೆಸರು*", "ವಯಸ್ಸು*", "ವಿಳಾಸ*")),
+        GocGuideItem.FAMILY_CONTACT to Lex(en("emergency*", "phone*", "mobile*", "contact*", "next of kin", "decide*", "decision*", "speak for"), hi("इमरजेंसी", "आपातकाल*", "फ़ोन", "नंबर", "फ़ैसला", "निर्णय"), te("అత్యవసర*", "ఎమర్జెన్సీ*", "ఫోన్*", "నిర్ణయ*"), ur("ایمرجنسی", "فون", "فیصلہ"), kn("ತುರ್ತು*", "ಎಮರ್ಜೆನ್ಸಿ*", "ಫೋನ್*", "ನಿರ್ಧಾರ*")),
+        GocGuideItem.UNDERSTANDING to Lex(en("cannot be cured", "cant be cured", "not curable", "incurable", "no cure", "prognosis", "illness", "cancer"), hi("लाइलाज", "ठीक नहीं हो", "बीमारी", "कैंसर"), te("నయం*", "జబ్బు*", "వ్యాధి*", "క్యాన్సర్*"), ur("لاعلاج", "بیماری", "کینسر"), kn("ಗುಣ*", "ಕಾಯಿಲೆ*", "ಕ್ಯಾನ್ಸರ್*")),
+        GocGuideItem.HOME_CARE to Lex(en("home care", "home nurse", "home visit*", "hospice", "ngo", "coordinator"), hi("घर पर देखभाल", "नर्स", "एनजीओ"), te("ఇంటి వద్ద*", "నర్సు*"), ur("گھر پر دیکھ بھال", "نرس"), kn("ಮನೆ ಆರೈಕೆ*", "ನರ್ಸ್*")),
+    )
+
+    /** Which form section the item belongs to, shown as a small tag ("I", "II", "III"). Consent comes before the form. */
+    fun section(item: GocGuideItem): String? = when (item) {
+        GocGuideItem.CONSENT -> null
+        GocGuideItem.PATIENT_DETAILS, GocGuideItem.FAMILY_CONTACT -> "I"
+        GocGuideItem.UNDERSTANDING, GocGuideItem.VALUES -> "II"
+        else -> "III"
+    }
+
+    fun title(item: GocGuideItem): Bi = item.decision?.let { GocPlan.title(it) } ?: when (item) {
+        GocGuideItem.CONSENT -> Bi("Consent for this conversation", "इस बातचीत के लिए सहमति")
+        GocGuideItem.PATIENT_DETAILS -> Bi("Patient details", "मरीज़ की जानकारी")
+        GocGuideItem.FAMILY_CONTACT -> Bi("Family details and emergency contact", "परिवार और इमरजेंसी संपर्क")
+        GocGuideItem.UNDERSTANDING -> Bi("Understanding the illness", "बीमारी की समझ")
+        else -> Bi("Home care (if relevant)", "घर पर देखभाल (अगर लागू हो)")
+    }
+
+    /** The guide items the words touch at all, in any line, either side. */
+    fun covered(text: String): Set<GocGuideItem> {
+        if (text.isBlank()) return emptySet()
+        val words = gocTokens(text).map { it.norm }
+        return TERMS.filterValues { it.any(words) }.keys
+    }
+
+    /** [ticked]: items the doctor ticked by hand. [consented]: everyone agreed in the app, which covers consent. */
+    fun status(item: GocGuideItem, extraction: GocExtraction, covered: Set<GocGuideItem>, ticked: Set<GocGuideItem>, topics: Map<GocDecision, GocTopicRecord>, consented: Boolean): GocChecklistStatus {
+        item.decision?.let { d -> return GocPlan.status(d, extraction, if (item in ticked) setOf(d) else emptySet(), topics) }
+        return when {
+            item == GocGuideItem.CONSENT && consented -> GocChecklistStatus.CONFIRMED
+            item in covered || item in ticked -> GocChecklistStatus.MENTIONED
+            else -> GocChecklistStatus.NOT_DISCUSSED
+        }
+    }
+
+    /** What the end-of-talk prompt lists: not covered, not ticked, and not verified by the doctor as not discussed. */
+    fun undiscussed(extraction: GocExtraction, covered: Set<GocGuideItem>, ticked: Set<GocGuideItem>, topics: Map<GocDecision, GocTopicRecord>, consented: Boolean): List<GocGuideItem> =
+        ORDER.filter { status(it, extraction, covered, ticked, topics, consented) == GocChecklistStatus.NOT_DISCUSSED }
+
+    fun next(extraction: GocExtraction, covered: Set<GocGuideItem>, ticked: Set<GocGuideItem>, topics: Map<GocDecision, GocTopicRecord>, consented: Boolean): GocGuideItem? =
+        undiscussed(extraction, covered, ticked, topics, consented).firstOrNull()
+}
+
+// ── Latest statement wins, per person. Twin of gocStanding in prototype/app/goc-extract.ts. ──
+
+/** What still stands for one decision, and the earlier statements a later one replaced (shown so the doctor sees the change of mind). */
+data class GocStanding(val current: List<GocHit>, val superseded: List<Pair<GocHit, GocHit>>, val additive: Boolean = false) {
+    val suggested: Map<String, List<GocHit>> get() = current.flatMap { h -> h.options.map { it to h } }.groupBy({ it.first }, { it.second })
+    val ruledOut: Map<String, List<GocHit>> get() = current.flatMap { h -> h.ruledOut.map { it to h } }.groupBy({ it.first }, { it.second })
+    val changedMind: Boolean get() = superseded.isNotEmpty()
+    /** Still standing on different sides, which only happens between different people. */
+    val conflict: Boolean get() = !additive && current.filter { it.options.isNotEmpty() }.map { it.options.toSet() }.toSet().size > 1 ||
+        current.any { a -> current.any { b -> a !== b && a.options.any { it in b.ruledOut } } }
+}
+
+object GocLatest {
+    /**
+     * A later statement by the same person replaces an earlier one about the same decision when they disagree: a different choice, or a "no" to an option
+     * that was earlier wanted (and the reverse). "No ventilator" then "BiPAP is fine" agree, so both stand. Different people never replace each other.
+     * Unlabelled lines count as one unknown speaker. Lines the doctor marked as the doctor side never become a suggestion. Nothing is chosen (V1).
+     */
+    fun standing(extraction: GocExtraction, d: GocDecision, lines: List<GocLine>? = null): GocStanding {
+        val own = extraction.hitsFor(d)
+            .filter { h -> lines == null || GocLines.partyAt(lines, h.at) != GocParty.DOCTOR_SIDE }
+            .sortedBy { it.at }
+        fun who(h: GocHit) = lines?.let { GocLines.lineAt(it, h.at)?.who }.orEmpty()
+        val current = mutableListOf<GocHit>(); val superseded = mutableListOf<Pair<GocHit, GocHit>>()
+        // Words about what matters add up; they never replace each other.
+        if (d == GocDecision.VALUES) return GocStanding(own, emptyList(), additive = true)
+        own.forEachIndexed { index, earlier ->
+            val by = own.drop(index + 1).lastOrNull { later -> later.at > earlier.at && who(later) == who(earlier) && (
+                (later.options.isNotEmpty() && earlier.options.isNotEmpty() && later.options.toSet() != earlier.options.toSet()) ||
+                    later.options.any { it in earlier.ruledOut } || later.ruledOut.any { it in earlier.options }) }
+            if (by != null) superseded += earlier to by else current += earlier
+        }
+        return GocStanding(current, superseded)
+    }
 }

@@ -31,7 +31,7 @@ class CareSymptomDiaryUiTest {
         ui.onNodeWithText("Name of the person who saw it").performScrollTo().performTextInput("Fixture observer")
         closeSoftKeyboard()
         ui.onNodeWithTag("diary-choice-average-24h").performScrollTo().performClick()
-        ui.onNodeWithTag("symptom-step-next").performScrollTo().performClick()
+        // The optional extras (comparison, start date, note) are on the same step as Save.
         ui.onNodeWithTag("symptom-previous-reference").performScrollTo().assertTextEquals("Previous matching note: $day 10:00 · 6/10")
         ui.onNodeWithTag("diary-choice-better").performScrollTo().performClick()
         screenshot("symptom-comparison")
@@ -56,7 +56,6 @@ class CareSymptomDiaryUiTest {
         ui.onNodeWithTag("diary-choice-worst-24h").performScrollTo().performClick()
         ui.onNodeWithTag("symptom-unrated").performScrollTo().performClick()
         screenshot("symptom-hindi-unrated")
-        ui.onNodeWithTag("symptom-step-next").performScrollTo().performClick()
         ui.onNodeWithTag("symptom-save").performScrollTo().assertTextContains("नोट सहेजें").performClick()
         ui.runOnIdle {
             assertNotNull(saved); assertNull(saved!!.rating)
@@ -72,9 +71,9 @@ class CareSymptomDiaryUiTest {
         ui.setContent { CareTheme { SymptomNoteForm("fixture-back", "Fictional patient", emptyList(), false, onSave = { _, _ -> }, onClose = { closed = true }) } }
         ui.onNodeWithTag("symptom-choice-Pain").performScrollTo().performClick()
         ui.onNodeWithTag("symptom-step-next").performScrollTo().performClick()
-        ui.onNodeWithTag("symptom-step-indicator").assertTextContains("Step 2 of 4")
+        ui.onNodeWithTag("symptom-step-indicator").assertTextContains("Step 2 of 3")
         androidx.test.espresso.Espresso.pressBack()
-        ui.onNodeWithTag("symptom-step-indicator").assertTextContains("Step 1 of 4")
+        ui.onNodeWithTag("symptom-step-indicator").assertTextContains("Step 1 of 3")
         ui.runOnIdle { assertFalse(closed) }
         androidx.test.espresso.Espresso.pressBack()
         ui.runOnIdle { assertTrue(closed) }
@@ -92,7 +91,6 @@ class CareSymptomDiaryUiTest {
         ui.onNodeWithTag("symptom-unrated").performScrollTo().performClick() // Pain with no rated spot: Not rated
         ui.runOnIdle { person.value = "second-person" }
         ui.waitForIdle()
-        ui.onNodeWithTag("symptom-step-next").performScrollTo().performClick()
         ui.onNodeWithTag("symptom-save").performScrollTo().assertIsNotEnabled()
         ui.runOnIdle { assertTrue(closed); assertFalse(saved) }
     }
@@ -107,12 +105,10 @@ class CareSymptomDiaryUiTest {
         var saved: SymptomNote? = null
         ui.setContent { CareTheme { SymptomNoteForm("fixture-edit", "Fictional patient", listOf(priorRow, initial), false, initial = initial,
             onSave = { id, value -> savedId = id; saved = value }, onClose = {}) } }
-        ui.onNodeWithTag("symptom-step-indicator").assertTextContains("Step 3 of 3")
-        ui.onNodeWithTag("symptom-step-back").performClick()
+        ui.onNodeWithTag("symptom-step-indicator").assertTextContains("Step 2 of 2")
         ui.onNodeWithTag("symptom-rating-5").performScrollTo().assertIsSelected()
         ui.onNodeWithTag("diary-choice-average-24h").performScrollTo().performClick()
         ui.onNodeWithTag("symptom-rating-3").performScrollTo().performClick()
-        ui.onNodeWithTag("symptom-step-next").performScrollTo().performClick()
         ui.onNodeWithTag("symptom-save").performScrollTo().performClick()
         ui.runOnIdle {
             assertEquals(initial.id, savedId)
@@ -132,10 +128,9 @@ class CareSymptomDiaryUiTest {
         ui.onNodeWithTag("symptom-step-next").assertIsNotEnabled()
         ui.onNodeWithTag("symptom-choice-Nausea").performScrollTo().performClick()
         ui.onNodeWithTag("diary-choice-patient").performScrollTo().performClick()
-        ui.onNodeWithTag("symptom-step-next").assertIsNotEnabled()
+        ui.onNodeWithTag("symptom-save").assertIsNotEnabled()
         ui.onNodeWithText("Choose a rating or Not rated.").assertExists()
         ui.onNodeWithTag("symptom-rating-0").performScrollTo().performClick()
-        ui.onNodeWithTag("symptom-step-next").performScrollTo().assertIsEnabled().performClick()
         ui.onNodeWithTag("symptom-save").performScrollTo().assertIsNotEnabled()
         ui.runOnIdle { assertNull(saved); editable.value = true }
         ui.onNodeWithTag("symptom-save").performScrollTo().assertIsEnabled().performClick()
@@ -150,7 +145,6 @@ class CareSymptomDiaryUiTest {
         ui.onNodeWithTag("diary-choice-patient").performScrollTo().performClick()
         ui.onNodeWithTag("symptom-rating-anchors").performScrollTo().assertTextContains("0 = best possible well-being · 10 = worst possible well-being")
         ui.onNodeWithTag("symptom-rating-0").performScrollTo().performClick()
-        ui.onNodeWithTag("symptom-step-next").performScrollTo().performClick()
         ui.onNodeWithTag("symptom-save").performScrollTo().performClick()
         ui.runOnIdle {
             assertEquals("Overall well-being", saved!!.symptom)
@@ -168,10 +162,8 @@ class CareSymptomDiaryUiTest {
         ui.setContent { CareTheme { SymptomNoteForm("fixture-legacy", "Fictional patient", listOf(row), false, initial = row,
             onSave = { _, next -> saved = next }, onClose = {}) } }
         ui.onNodeWithTag("symptom-step-back").performClick()
-        ui.onNodeWithTag("symptom-step-back").performClick()
         ui.onNodeWithTag("symptom-choice-Sleep difficulty").assertDoesNotExist()
         ui.onNodeWithText("Symptom name").performScrollTo().assertTextContains("Sleep difficulty")
-        ui.onNodeWithTag("symptom-step-next").performScrollTo().performClick()
         ui.onNodeWithTag("symptom-step-next").performScrollTo().performClick()
         ui.onNodeWithTag("symptom-save").performScrollTo().performClick()
         ui.runOnIdle { assertEquals(value, saved) }
@@ -224,7 +216,6 @@ class CareSymptomDiaryUiTest {
         setStrength(4f) // the marked right arm is the active spot
         ui.onNodeWithTag("symptom-step-next").performScrollTo().performClick()
         ui.onNodeWithTag("diary-choice-patient").performScrollTo().performClick()
-        ui.onNodeWithTag("symptom-step-next").performScrollTo().performClick()
         ui.onNodeWithTag("symptom-save").performScrollTo().performClick()
         ui.runOnIdle {
             assertEquals(listOf("right-arm"), saved!!.painBodySites)
@@ -248,8 +239,7 @@ class CareSymptomDiaryUiTest {
         ui.onNodeWithTag("symptom-step-next").performScrollTo().performClick()
         ui.onNodeWithTag("diary-choice-patient").performScrollTo().performClick()
         ui.onNodeWithTag("symptom-unrated").assertDoesNotExist(); ui.onNodeWithTag("symptom-rating-9").assertDoesNotExist()
-        ui.onNodeWithTag("symptom-step-next").performScrollTo().assertIsEnabled().performClick()
-        ui.onNodeWithTag("symptom-save").performScrollTo().performClick()
+        ui.onNodeWithTag("symptom-save").performScrollTo().assertIsEnabled().performClick()
         ui.runOnIdle { assertEquals(mapOf("head" to 9, "neck" to 3), saved!!.painBodyRatings); assertEquals(9, saved!!.rating) }
     }
 
@@ -261,12 +251,10 @@ class CareSymptomDiaryUiTest {
         ui.onNodeWithTag("symptom-step-next").performScrollTo().performClick()
         ui.onNodeWithTag("diary-choice-patient").performScrollTo().performClick()
         ui.onNodeWithText("No pain strength set yet.").assertExists()
-        ui.onNodeWithTag("symptom-step-next").assertIsNotEnabled()
+        ui.onNodeWithTag("symptom-save").performScrollTo().assertIsNotEnabled()
         ui.onNodeWithTag("symptom-pain-rate-back").performScrollTo().performClick()
         ui.onNodeWithTag("pain-strength-slider").assertExists()
         setStrength(0f) // 0 is a real rating: no colour, but the step can continue
-        ui.onNodeWithTag("symptom-step-next").performScrollTo().performClick()
-        ui.onNodeWithTag("symptom-step-next").assertIsEnabled()
         ui.onNodeWithTag("symptom-step-next").performScrollTo().performClick()
         ui.onNodeWithTag("symptom-save").performScrollTo().performClick()
         ui.runOnIdle { assertEquals(0, saved!!.rating); assertEquals(mapOf("neck" to 0), saved!!.painBodyRatings) }

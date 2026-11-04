@@ -76,7 +76,7 @@ class DoctorPatientDayContentTest {
         } } }
         ui.onNodeWithTag("doctor-condition-chart").assertDoesNotExist()
         ui.onNodeWithText("October 2026").assertExists()
-        ui.onNodeWithText("Dated self-reports, not a clinical score.").assertExists()
+        ui.onNodeWithTag("doctor-progress-info").assertExists()
         ui.onNodeWithTag("doctor-checkin-summary").assertExists()
         screenshot("doctor-condition-history")
         listOf("good", "okay", "hard").forEach {

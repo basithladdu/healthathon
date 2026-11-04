@@ -20,6 +20,11 @@ data class SideEffectNote(
 data class SideEffectEntry(val item: CareItem, val note: SideEffectNote)
 
 object SideEffectRules {
+    /**
+     * A short GENERIC list of common symptoms, written by the team for quick tapping. It is not taken from any drug label,
+     * formulary or database and is the same for every medicine (asked by Dr Sujay, 1 Nov 2026). Per-drug lists need a cited
+     * source we do not have yet, so none are shown; "Other" takes the person's own words. Keys stay as saved in old notes.
+     */
     val effects = linkedMapOf("nausea" to ("Nausea" to "मतली"), "drowsiness" to ("Drowsiness" to "बहुत नींद आना"), "constipation" to ("Constipation" to "कब्ज़"), "dizziness" to ("Dizziness" to "चक्कर आना"), "itching" to ("Itching" to "खुजली"), "confusion" to ("Confusion" to "भ्रम / उलझन"), "other" to ("Other" to "अन्य"))
     val severities = linkedMapOf("mild" to ("Mild" to "हल्का"), "moderate" to ("Moderate" to "मध्यम"), "severe" to ("Severe" to "तेज़"))
     val whenOptions = linkedMapOf("now" to ("Just now" to "अभी"), "earlier-today" to ("Earlier today" to "आज पहले"), "yesterday" to ("Yesterday" to "कल"), "two-days" to ("2 days ago or more" to "2 दिन पहले या उससे पहले"))

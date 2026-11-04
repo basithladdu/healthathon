@@ -18,6 +18,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Groups
+import androidx.compose.material.icons.filled.Healing
+import androidx.compose.material.icons.filled.Science
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.DocumentScanner
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -241,6 +245,32 @@ private const val BENTO_SMALL = 2
         }
     }
 }
+
+/** The Care tab's page shortcuts, two by two: Calendar, Lab history, Community (peer support) and Tubes and lines. */
+@Composable fun CareTabShortcuts(onCalendar: () -> Unit, onLabs: () -> Unit, onCommunity: () -> Unit, onDevices: () -> Unit) {
+    val t = careText()
+    val rows = listOf(
+        listOf(CareShortcut(t("Calendar", "कैलेंडर"), Icons.Default.CalendarMonth, SaharaSoftBlue, "shortcut-calendar", onCalendar), CareShortcut(t("Lab history", "जाँच रिपोर्टें"), Icons.Default.Science, SaharaApricot, "shortcut-labs", onLabs)),
+        listOf(CareShortcut(t("Community", "समुदाय"), Icons.Default.Groups, SaharaLavender, "shortcut-community", onCommunity), CareShortcut(t("Tubes and lines", "नलियाँ और लाइनें"), Icons.Default.Healing, Mint, "shortcut-devices", onDevices)),
+    )
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        rows.forEach { row ->
+            Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                row.forEach { s ->
+                    ActionCard(s.tint, Modifier.weight(1f).fillMaxHeight().heightIn(min = 64.dp).testTag(s.tag), s.onClick) {
+                        Row(Modifier.fillMaxSize().padding(horizontal = 14.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Surface(shape = androidx.compose.foundation.shape.CircleShape, color = Paper) { Icon(s.icon, null, Modifier.padding(8.dp).size(22.dp), tint = DoctorAccent) }
+                            Spacer(Modifier.width(10.dp))
+                            Text(s.label, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, modifier = Modifier.weight(1f))
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+private class CareShortcut(val label: String, val icon: ImageVector, val tint: Color, val tag: String, val onClick: () -> Unit)
 
 /** A module on its own screen, with a back arrow to the grid. */
 @Composable internal fun CareModuleScreen(tile: CareModuleTile, onBack: () -> Unit) {

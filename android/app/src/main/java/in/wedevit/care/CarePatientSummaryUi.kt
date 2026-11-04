@@ -116,22 +116,22 @@ import java.time.LocalDate
     }
 }
 
-/** Today's four quick actions as tall rounded tiles with their own art. Tags match the older shortcut row. */
-@Composable fun TodayQuickActions(onCalendar: () -> Unit, onSos: () -> Unit, onFamily: () -> Unit, onLabs: () -> Unit) {
+/** Today's page shortcuts as tall rounded tiles with their own art. SOS has its own bar above; Care team left (3 Nov meeting). */
+@Composable fun TodayQuickActions(onCalendar: () -> Unit, onSymptoms: () -> Unit, onLabs: () -> Unit, onCommunity: () -> Unit) {
     val t = careText()
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        Text(t("Quick actions", "झटपट काम"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading())
+        Text(t("Go to", "यहाँ जाएँ"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading())
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             listOf(
                 QuickAction(t("Calendar", "कैलेंडर"), R.drawable.quick_calendar_art, Color(0xFFFDE7DD), "shortcut-calendar", onCalendar),
-                QuickAction(t("SOS", "SOS मदद"), R.drawable.quick_sos_art, Color(0xFFFBE0DC), "today-sos", onSos),
-                QuickAction(t("Family", "परिवार"), R.drawable.quick_family_art, Color(0xFFE2F0E7), "shortcut-workflows", onFamily),
+                QuickAction(t("Symptoms", "लक्षण"), R.drawable.symptom_tracker_illustration, Color(0xFFFFE3CF), "symptom-tracker-entry", onSymptoms),
                 QuickAction(t("Labs", "जाँच"), R.drawable.quick_labs_art, Color(0xFFECE6FA), "shortcut-labs", onLabs),
+                QuickAction(t("Community", "समुदाय"), R.drawable.quick_family_art, Color(0xFFE2F0E7), "shortcut-community", onCommunity),
             ).forEach { action ->
                 ActionCard(Paper, Modifier.weight(1f).height(124.dp).testTag(action.tag), action.onClick) {
-                    Column(Modifier.fillMaxSize().padding(vertical = 12.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.SpaceBetween) {
+                    Column(Modifier.fillMaxSize().padding(vertical = 12.dp, horizontal = 4.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.SpaceBetween) {
                         Surface(shape = CircleShape, color = action.tint, modifier = Modifier.size(60.dp)) { Box(contentAlignment = Alignment.Center) { Image(saharaImage(action.art, 46.dp), null, Modifier.size(46.dp), contentScale = ContentScale.Fit) } }
-                        Text(action.label, fontSize = 15.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, maxLines = 1)
+                        Text(action.label, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
                     }
                 }
             }

@@ -38,14 +38,18 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
     val capturedAccount = remember(medicine.id) { vm.accountNamespace }
     ModalBottomSheet(onDismissRequest = onDismiss, containerColor = Cream) {
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(start = 20.dp, end = 20.dp, bottom = 32.dp).testTag("side-effect-sheet"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Heading(t("Side effect?", "कोई दुष्प्रभाव?"), 24)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(Modifier.weight(1f)) { Heading(t("Side effect?", "कोई दुष्प्रभाव?"), 24) }
+                MedicineInfoButton(t("Side effect?", "कोई दुष्प्रभाव?"), t("Write down what happened so the doctor can talk about it at the next visit. This only records it; it is not advice.", "जो हुआ उसे लिख लें ताकि अगली मुलाक़ात में डॉक्टर इस पर बात कर सकें। यह सिर्फ़ दर्ज करता है, सलाह नहीं है।") + "\n\n" +
+                    t("The choices are a short general list, not this medicine's own side effects. Use Other for anything else.", "ये विकल्प एक छोटी आम सूची हैं, इस दवा के अपने दुष्प्रभाव नहीं। बाक़ी सब के लिए “अन्य” चुनें।") + "\n\n" +
+                    (if (vm.cloud != null) t("Saved in your account. Family and doctors you share with can see it.", "आपके खाते में सेव। जिनके साथ आपने साझा किया, वे देख सकते हैं।") else t("Saved only on this phone. Sign in to share it with family and the doctor.", "सिर्फ़ इस फ़ोन पर सेव। परिवार और डॉक्टर से साझा करने के लिए साइन इन करें।")), "side-effect-info")
+            }
             Surface(shape = RoundedCornerShape(16.dp), color = SaharaSoftBlue, modifier = Modifier.fillMaxWidth()) {
                 Row(Modifier.padding(horizontal = 14.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                     Icon(careIcon("medicine"), null, Modifier.size(22.dp), tint = DoctorAccent); Spacer(Modifier.width(10.dp))
                     Text(medicine.title, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
                 }
             }
-            Text(t("Write down what happened so the doctor can talk about it at the next visit. This only records it; it is not advice.", "जो हुआ उसे लिख लें ताकि अगली मुलाक़ात में डॉक्टर इस पर बात कर सकें। यह सिर्फ़ दर्ज करता है, सलाह नहीं है।"), fontSize = 13.sp, color = DoctorCardSub)
             SideEffectStep(1, t("What happened?", "क्या हुआ?")) {
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     SideEffectRules.effects.keys.forEach { key -> PickChip(key in picked, SideEffectRules.effectLabel(key, hindi), Mint, Modifier.testTag("side-effect-chip-$key")) { pickedKeys = (if (key in picked) picked - key else picked + key).joinToString(",") } }
@@ -77,7 +81,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
                 if (err != null) problem = err
                 else if (canEditCareContext(vm, medicine.personId, capturedAccount)) { problem = null; vm.saveItem("journal", SideEffectRules.title(note), SideEffectCodec.encode(note), done = onDismiss) }
             }, enabled = !busy && canEdit, colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent, contentColor = androidx.compose.ui.graphics.Color.White), shape = RoundedCornerShape(50), modifier = Modifier.fillMaxWidth().heightIn(min = 54.dp).testTag("side-effect-save")) { Text(t("Save side effect", "दुष्प्रभाव सहेजें")) }
-            Text(if (vm.cloud != null) t("Saved in your account. Family and doctors you share with can see it.", "आपके खाते में सेव। जिनके साथ आपने साझा किया, वे देख सकते हैं।") else t("Saved only on this phone. Sign in to share it with family and the doctor.", "सिर्फ़ इस फ़ोन पर।"), fontSize = 12.sp, color = DoctorCardFaint)
         }
     }
 }
@@ -179,11 +182,14 @@ fun androidx.compose.foundation.lazy.LazyListScope.medicineSideEffectItems(entri
     val recent = remember(entries, last) { SideEffectLog.sinceVisit(entries, last).sortedBy { it.note.discussedAt > 0 } }
     Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("doctor-side-effects")) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text(t("Side effects reported since last visit", "पिछली मुलाक़ात के बाद बताए गए दुष्प्रभाव"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading())
-            Text(if (last > 0) t("Since the last recorded visit on ", "पिछली दर्ज मुलाक़ात के बाद, ") + date(last) else t("No visit is recorded yet, so everything reported is shown.", "अभी कोई मुलाक़ात दर्ज नहीं, इसलिए बताई गई हर बात दिख रही है।"), fontSize = 13.sp, color = DoctorCardSub)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(t("Side effects reported since last visit", "पिछली मुलाक़ात के बाद बताए गए दुष्प्रभाव"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.weight(1f).a11yHeading())
+                MedicineInfoButton(t("Side effects reported since last visit", "पिछली मुलाक़ात के बाद बताए गए दुष्प्रभाव"), (if (last > 0) t("Since the last recorded visit on ", "पिछली दर्ज मुलाक़ात के बाद, ") + date(last) else t("No visit is recorded yet, so everything reported is shown.", "अभी कोई मुलाक़ात दर्ज नहीं, इसलिए बताई गई हर बात दिख रही है।")) + "\n\n" + t("These are the patient's or family's own notes, not a clinical assessment.", "ये मरीज़ या परिवार के अपने नोट हैं, डॉक्टरी जाँच नहीं।") + "\n\n" +
+                    t("The choices are a short general list, not this medicine's own side effects. Use Other for anything else.", "ये विकल्प एक छोटी आम सूची हैं, इस दवा के अपने दुष्प्रभाव नहीं। बाक़ी सब के लिए “अन्य” चुनें।"), "doctor-side-effect-info")
+            }
+            // Where the window starts, and what these notes are, sit behind the info icon (3 Nov meeting: less text on screen).
             if (recent.isEmpty()) Text(t("Nothing reported since the last visit.", "पिछली मुलाक़ात के बाद कुछ नहीं बताया गया।"), fontSize = 15.sp, color = DoctorCardInk)
             recent.forEach { e -> key(e.item.id) { SideEffectSummary(e, showMedicine = true) { MarkDiscussedButton2(e, vm) } } }
-            Text(t("These are the patient's or family's own notes, not a clinical assessment.", "ये मरीज़ या परिवार के अपने नोट हैं, डॉक्टरी जाँच नहीं।"), fontSize = 12.sp, color = DoctorCardFaint)
         }
     }
 }

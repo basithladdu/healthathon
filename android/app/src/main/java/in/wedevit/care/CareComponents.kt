@@ -129,6 +129,40 @@ import androidx.compose.ui.unit.sp
     }
 }
 
+/**
+ * The selected person as a compact chip in the top bar ("Rahul · Family ▾"): switch person, add another person and,
+ * for the record's owner, invite family. Replaces the name row that sat under the top bar (3 Nov meeting: redundant).
+ */
+@Composable fun CareTopPersonMenu(name: String, roleLabel: String, people: List<Pair<String, String>>, selectedId: String,
+    enabled: Boolean, onSelect: (String) -> Unit, onAdd: () -> Unit, canAdd: Boolean, onInvite: () -> Unit, canInvite: Boolean, inviteLabel: String) {
+    var expanded by remember { mutableStateOf(false) }; val t = careText()
+    LaunchedEffect(enabled) { if (!enabled) expanded = false }
+    Box {
+        TextButton(onClick = { expanded = true }, enabled = enabled, modifier = Modifier.heightIn(min = 48.dp).widthIn(max = 180.dp).testTag("selected-care-profile").semantics { contentDescription = t("Switch care profile, $name", "देखभाल प्रोफ़ाइल बदलें, $name") },
+            shape = RoundedCornerShape(14.dp), contentPadding = PaddingValues(horizontal = 10.dp, vertical = 8.dp), colors = ButtonDefaults.textButtonColors(contentColor = RustText)) {
+            Text(if (roleLabel.isBlank()) name else "$name · $roleLabel", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
+            Spacer(Modifier.width(2.dp)); Icon(Icons.Default.ExpandMore, null, Modifier.size(18.dp))
+        }
+        DropdownMenu(expanded = expanded && enabled, onDismissRequest = { expanded = false }) {
+            people.forEach { (id, personName) ->
+                DropdownMenuItem(text = { Text(personName) }, modifier = Modifier.testTag("person-$id"),
+                    leadingIcon = { Icon(if (id == selectedId) Icons.Default.CheckCircle else Icons.Default.PersonOutline, null, tint = if (id == selectedId) Rust else Ink) },
+                    onClick = { expanded = false; onSelect(id) })
+            }
+            if (canInvite) {
+                HorizontalDivider()
+                DropdownMenuItem(text = { Text(inviteLabel) }, modifier = Modifier.testTag("invite-family-top"),
+                    leadingIcon = { Icon(Icons.Default.GroupAdd, null, tint = Rust) }, onClick = { expanded = false; onInvite() })
+            }
+            if (canAdd) {
+                if (!canInvite) HorizontalDivider()
+                DropdownMenuItem(text = { Text(t("Add another person", "एक और व्यक्ति जोड़ें")) }, modifier = Modifier.testTag("add-care-person"),
+                    leadingIcon = { Icon(Icons.Default.PersonAdd, null, tint = Rust) }, onClick = { expanded = false; onAdd() })
+            }
+        }
+    }
+}
+
 @Composable fun CareField(value: String, onValueChange: (String) -> Unit, label: String, minLines: Int = 1, singleLine: Boolean = false, placeholder: String? = null, supporting: String? = null) {
     OutlinedTextField(value = value, onValueChange = onValueChange, label = { Text(label) }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp), minLines = minLines, singleLine = singleLine,
         placeholder = placeholder?.let { { Text(it) } }, supportingText = supporting?.let { { Text(it) } },
@@ -160,4 +194,98 @@ fun careIcon(kind: String): ImageVector = when (kind) {
     "checkin" -> Icons.Default.WbSunny
     "journal" -> Icons.Default.EditNote
     else -> Icons.Default.Checklist
+}
+
+/**
+ * Sahara's toasts: a rounded card that floats above the bottom bar, coloured by what happened. A save shows a green tick,
+ * a problem shows the warning colour and icon, anything else is plain. Tap the cross to dismiss.
+ */
+@Composable fun CareToastHost(state: SnackbarHostState, modifier: Modifier = Modifier) = SnackbarHost(state, modifier) { data ->
+    val t = careText()
+    val kind = CareToastRules.kind(data.visuals.message)
+    val fill = when (kind) { CareToastKind.SAVED -> Color(0xFF2F6B46); CareToastKind.PROBLEM -> Color(0xFF7A2E1C); CareToastKind.INFO -> Ink }
+    val icon = when (kind) { CareToastKind.SAVED -> Icons.Default.CheckCircle; CareToastKind.PROBLEM -> Icons.Default.ErrorOutline; CareToastKind.INFO -> Icons.Default.Info }
+    val shown = remember { MutableTransitionState(false).apply { targetState = true } }
+    AnimatedVisibility(shown, enter = fadeIn(SaharaMotion.tween(SaharaMotion.ENTER_MS)) + slideInVertically(SaharaMotion.tween(SaharaMotion.ENTER_MS)) { it / 2 }) {
+        Surface(shape = RoundedCornerShape(18.dp), color = fill, contentColor = Color.White, shadowElevation = 6.dp,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp).fillMaxWidth().testTag("care-toast-${kind.name.lowercase()}").announce()) {
+            Row(Modifier.padding(start = 14.dp, end = 4.dp, top = 6.dp, bottom = 6.dp).heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically) {
+                Box(Modifier.size(32.dp).clip(CircleShape).background(Color.White.copy(alpha = .18f)), contentAlignment = Alignment.Center) {
+                    Icon(icon, null, Modifier.size(20.dp).then(if (kind == CareToastKind.SAVED) Modifier.testTag("sahara-saved-tick") else Modifier), tint = if (kind == CareToastKind.SAVED) Gold else Color.White)
+                }
+                Spacer(Modifier.width(12.dp))
+                Text(CareToastRules.text(data.visuals.message), Modifier.weight(1f), fontSize = 15.sp, lineHeight = 20.sp, fontWeight = FontWeight.Medium, color = Color.White)
+                data.visuals.actionLabel?.let { label -> TextButton(onClick = { data.performAction() }) { Text(label, color = Gold, fontWeight = FontWeight.Bold) } }
+                IconButton(onClick = { data.dismiss() }, modifier = Modifier.size(44.dp)) { Icon(Icons.Default.Close, t("Dismiss", "बंद करें"), Modifier.size(18.dp), tint = Color.White) }
+            }
+        }
+    }
+}
+
+/** A small "?" that opens a short explanation, in place of helper text under a heading. */
+@Composable fun CareHelpIcon(title: String, text: String, modifier: Modifier = Modifier) {
+    var open by remember { mutableStateOf(false) }; val t = careText()
+    Box(modifier.size(40.dp).clip(CircleShape).clickable(role = Role.Button, onClickLabel = t("What is this?", "यह क्या है?")) { open = true }
+        .semantics { contentDescription = t("Help: $title", "मदद: $title") }.testTag("care-help"), contentAlignment = Alignment.Center) {
+        Box(Modifier.size(24.dp).clip(CircleShape).background(Paper).border(1.5.dp, DoctorAccent, CircleShape), contentAlignment = Alignment.Center) {
+            Text("?", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = RustText)
+        }
+    }
+    if (open) AlertDialog(onDismissRequest = { open = false }, title = { Text(title, fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium) },
+        text = { Text(text, fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk) },
+        confirmButton = { TextButton(onClick = { open = false }, modifier = Modifier.testTag("care-help-close")) { Text(t("Got it", "समझ गए")) } }, containerColor = Paper)
+}
+
+private val SosRed = Color(0xFFB3261E)
+private val SosRedText = Color(0xFF8C1D18)
+
+/** SOS on Today: one large red button for the emergency sheet, and the emergency QR card one tap away beside it. */
+@Composable fun CareSosBar(onSos: () -> Unit, onQr: () -> Unit) {
+    val t = careText()
+    Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        Button(onClick = onSos, shape = RoundedCornerShape(20.dp), colors = ButtonDefaults.buttonColors(containerColor = SosRed, contentColor = Color.White),
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp), modifier = Modifier.weight(1f).fillMaxHeight().heightIn(min = 64.dp).testTag("today-sos")) {
+            Icon(Icons.Default.Call, null, Modifier.size(26.dp)); Spacer(Modifier.width(10.dp))
+            Column(Modifier.weight(1f)) {
+                Text(t("SOS", "SOS मदद"), fontSize = 22.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+                Text(t("Emergency numbers and plan", "आपातकालीन नंबर और योजना"), fontSize = 13.sp, maxLines = 2)
+            }
+        }
+        OutlinedButton(onClick = onQr, shape = RoundedCornerShape(20.dp), border = BorderStroke(2.dp, SosRed), colors = ButtonDefaults.outlinedButtonColors(containerColor = Paper, contentColor = SosRedText),
+            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 10.dp), modifier = Modifier.fillMaxHeight().heightIn(min = 64.dp).testTag("today-qr")) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Icon(Icons.Default.QrCode, null, Modifier.size(26.dp))
+                Text(t("QR card", "QR कार्ड"), fontSize = 13.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+            }
+        }
+    }
+}
+
+/** Up next: one visit as a coloured card with a calendar badge (month and day) and a "Tomorrow / In 3 days" chip. */
+@Composable fun CareUpNextCard(item: CareItem, whenLabel: String, tint: Color, onOpen: () -> Unit) {
+    val hindi = careHindi(); val t = careText()
+    val day = if (item.due > 0) java.time.Instant.ofEpochMilli(item.due).atZone(java.time.ZoneId.systemDefault()) else null
+    val detail = if (CareEntryCodec.isStructured(item.detail)) "" else item.detail
+    val time = if (day != null && (day.hour != 0 || day.minute != 0)) " · " + day.format(careDateFormat("h:mm a", hindi)) else ""
+    ActionCard(tint, Modifier.fillMaxWidth().testTag("up-next-${item.id}"), onOpen) {
+        Row(Modifier.fillMaxWidth().padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+            Surface(shape = RoundedCornerShape(16.dp), color = Paper, shadowElevation = 1.dp, modifier = Modifier.size(width = 62.dp, height = 68.dp)) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+                    if (day != null) {
+                        Text(day.format(careDateFormat("MMM", hindi)).uppercase(), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = RustText, maxLines = 1)
+                        Text("${day.dayOfMonth}", fontSize = 26.sp, fontWeight = FontWeight.Bold, color = DoctorCardInk, maxLines = 1)
+                    } else Icon(Icons.Default.Event, null, Modifier.size(28.dp), tint = DoctorAccent)
+                }
+            }
+            Spacer(Modifier.width(14.dp))
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Surface(shape = RoundedCornerShape(50), color = Paper) {
+                    Text(whenLabel + time, Modifier.padding(horizontal = 10.dp, vertical = 3.dp), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = RustText, maxLines = 1)
+                }
+                Text(item.title.ifBlank { t("Visit", "मुलाक़ात") }, fontSize = 17.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                if (detail.isNotBlank()) Text(detail, fontSize = 14.sp, color = DoctorCardSub, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            }
+            Icon(Icons.Default.ChevronRight, null, tint = DoctorAccent)
+        }
+    }
 }

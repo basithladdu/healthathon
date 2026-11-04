@@ -96,8 +96,8 @@ class CarePlanRulesTest {
     }
 
     @Test fun v9_careThatAlwaysContinuesIsFixedAndBilingual() {
-        assertEquals(8, CareThatContinues.ITEMS.size)
-        assertTrue(CareThatContinues.ITEMS.any { it.en.contains("Mouth care") })
+        assertEquals(12, CareThatContinues.ITEMS.size) // Sahaara v1.0 §16
+        listOf("opioids", "breathlessness", "Sedation", "Mouth care and eye care", "pressure sores", "Bowel", "Bladder", "dignity", "spiritual", "communication").forEach { word -> assertTrue(word, CareThatContinues.ITEMS.any { it.en.contains(word) }) }
         (CareThatContinues.ITEMS + CareThatContinues.TITLE).forEach { assertTrue(it.en, HindiScan.hasHindi(it.hi)) }
     }
 
@@ -268,6 +268,8 @@ class CarePlanRulesTest {
         assertEquals(EdView.ORDER, rows.map { it.key })
         assertTrue(IfInDoubt.TITLE.en == "IF IN DOUBT, RESUSCITATE")
         assertEquals(4, IfInDoubt.CONDITIONS.size)
+        IfInDoubt.CONDITIONS.forEach { assertTrue(it.en, it.en.startsWith("If ")) } // Sujay, 1 Nov: each line starts with "If"
+        assertTrue(IfInDoubt.AFTER.en.startsWith("Then resuscitate"))
         rows.forEach { assertTrue(it.label.en, HindiScan.hasHindi(it.label.hi) || it.label.hi.all { c -> c.isUpperCase() }) }
     }
 
@@ -368,7 +370,7 @@ class CarePlanRulesTest {
             (0..5).flatMap { listOf(PlanText.ceiling(it), PlanText.ceilingMeaning(it)) } + IcuKind.entries.map(PlanText::icu) + VasopressorKind.entries.map(PlanText::vaso) + DialysisKind.entries.map(PlanText::dialysis) +
             NgKind.entries.map(PlanText::ng) + PegFeeding.entries.map(PlanText::peg) + Hydration.entries.flatMap { listOf(PlanText.hydration(it), PlanText.hydrationMeaning(it)) } + AmbulanceOption.entries.map(PlanText::ambulance) +
             Capacity.entries.map(PlanText::capacity) + AuthorityBasis.entries.map(PlanText::authority) + IdType.entries.map(PlanText::idType) + ImplantedDevice.entries.map(PlanText::device) + EctprStatus.entries.map(PlanText::status) +
-            IfInDoubt.CONDITIONS + listOf(IfInDoubt.TITLE, IfInDoubt.LEAD, IfInDoubt.AFTER, NO_PREFERENCE, NOT_RECORDED, WalletCard.TREAT_LINE)
+            IfInDoubt.CONDITIONS + listOf(IfInDoubt.TITLE, IfInDoubt.AFTER, NO_PREFERENCE, NOT_RECORDED, WalletCard.TREAT_LINE)
         labels.forEach { assertTrue(it.en, HindiScan.hasHindi(it.hi) || it.hi == it.en.uppercase() || it.hi.matches(Regex("[A-Z0-9 ·()-]+"))) }
         val issues = EctprRules.check(choose(base().copy(createdInEd = true, patient = EctprPatient(dob = "2015-01-01"), capacity = CapacityAssessment(Capacity.FLUCTUATES), limitedLiteracy = true)) {
             it.copy(goalOfCare = GoalOfCare.C_COMFORT, cpr = Cpr.ATTEMPT, icu = Icu(IcuKind.TRIAL), feeding = Feeding(removeExistingTube = true)) }, today)

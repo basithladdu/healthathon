@@ -8,7 +8,7 @@ import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState, type
 import { careLocale, careText, type CareLang } from './care-i18n';
 import { AMD_BOARD_PATHWAY } from './amd-rules';
 import { DpdpNotice } from './dpdp-notice';
-import { capacityGuide, homeCareLines, withdrawalFinalLabel, withdrawalLines, boardReconsiderationNotice } from './ectpr-labels';
+import { alwaysProvidedCare, capacityGuide, homeCareLines, withdrawalFinalLabel, withdrawalLines, boardReconsiderationNotice } from './ectpr-labels';
 import { EctprPilotLog } from './ectpr-pilot-log';
 import { FhirExportButton, PaperAndCopies, ReviewReminder } from './ectpr-plan-extras';
 import { ReadAloudButton } from './tts-speech';
@@ -18,8 +18,7 @@ import type {
   GoalOfCare, HospitalTransfer, Hydration, Icu, IdType, ImplantedDevice, NgFeeding, PegFeeding, RespCeiling, RuleIssue, Signature,
   TransferReason, TrialPlan, Vasopressors,
 } from './ectpr-model';
-import {
-  ALWAYS_PROVIDED_CARE, DECISION_FIELDS, ROUTINE_REVIEW_WEEKS, TLT_DEFAULT_DAYS, TRANSFER_REASON_LABELS, blocksActivation, blocksSave, defaultTrialPlan,
+import { DECISION_FIELDS, ROUTINE_REVIEW_WEEKS, TLT_DEFAULT_DAYS, TRANSFER_REASON_LABELS, blocksActivation, blocksSave, defaultTrialPlan,
   emptyEctpr, isOutOfDate, nextReviewDue, reviewReminderDue, reviewTriggers, surrogateEntriesLocked, treatmentLocked, unrecordedDecisions, validateEctpr,
   type ReviewTrigger,
 } from './ectpr-rules';
@@ -166,22 +165,11 @@ const LANGUAGE_OPTS = [
 
 const TRIGGER_HI: Record<ReviewTrigger, string> = {
   NEW_ADMISSION: 'अस्पताल में कोई भी नई भर्ती',
-  TRANSFER_BETWEEN_SETTINGS: 'जगह बदलना (घर, हॉस्पिस, वार्ड, दूसरा अस्पताल)',
+  TRANSFER_BETWEEN_SETTINGS: 'जगह बदलना (घर, अस्पताल, हॉस्पिस, केयर होम)',
   SIGNIFICANT_CHANGE: 'हालत में बड़ा बदलाव, बेहतर या बदतर',
   PATIENT_OR_FAMILY_REQUEST: 'मरीज़ या परिवार समीक्षा माँगे',
   NEW_LINE_OF_TREATMENT: 'इलाज का नया दौर शुरू हो',
   ROUTINE_INTERVAL: `हर ${ROUTINE_REVIEW_WEEKS} हफ़्ते में नियमित समीक्षा`,
-};
-
-const ALWAYS_HI: Record<string, string> = {
-  'Mouth care and lip care, to keep the mouth moist and clean.': 'मुँह और होंठों की देखभाल, ताकि मुँह नम और साफ़ रहे।',
-  'Food and drink by mouth, given by hand for comfort, as much as the person wants and can safely swallow.': 'आराम के लिए हाथ से मुँह में खाना-पीना, जितना वे चाहें और सुरक्षित निगल सकें।',
-  'Relief of pain, breathlessness and other distressing symptoms, at any time of day or night.': 'दर्द, साँस फूलने और दूसरी तकलीफ़ों से राहत, दिन हो या रात।',
-  'Washing, hygiene, skin care and pressure-area care.': 'नहलाना, साफ़-सफ़ाई, त्वचा की देखभाल और बेडसोर से बचाव।',
-  'Turning and positioning for comfort.': 'आराम के लिए करवट दिलाना और ठीक से लिटाना।',
-  'Family and loved ones may stay with the person.': 'परिवार और अपने लोग साथ रह सकते हैं।',
-  'Spiritual, emotional and psychological support for the person and family.': 'मरीज़ और परिवार के लिए आध्यात्मिक, भावनात्मक और मानसिक सहारा।',
-  'Dignity, privacy and kindness in all care.': 'हर देखभाल में गरिमा, निजता और दया।',
 };
 
 const STEPS: Array<{ en: string; hi: string }> = [
@@ -581,11 +569,11 @@ function LegalPending({ t, lang }: { t: T; lang: CareLang }) {
   </div>;
 }
 
-function AlwaysContinues({ t }: { t: T }) {
+function AlwaysContinues({ t, lang }: { t: T; lang: CareLang }) {
   return <section className="ep-card ep-always" aria-labelledby="ep-always-title">
     <h2 id="ep-always-title">{t('Care that always continues', 'देखभाल जो हमेशा जारी रहती है')}</h2>
     <p>{t('Whatever this plan says, the patient always gets:', 'यह योजना कुछ भी कहे, मरीज़ को हमेशा मिलता है:')}</p>
-    <ul>{ALWAYS_PROVIDED_CARE.map((line) => <li key={line}>{t(line, ALWAYS_HI[line] ?? line)}</li>)}</ul>
+    <ul>{alwaysProvidedCare(lang).map((line) => <li key={line}>{line}</li>)}</ul>
   </section>;
 }
 
@@ -760,7 +748,7 @@ export function EctprPlanScreen(props: { patientId: string; patientName: string;
         <div className="ep-actions"><button type="button" className="ep-btn" onClick={() => { jump.current = true; setMode({ kind: 'overview' }); }}>{t('See the plan and versions', 'योजना और संस्करण देखें')}</button></div>
       </div>
       <div className="ep-card"><h2>{t('What the plan says', 'योजना में क्या लिखा है')}</h2><PlanSummary t={t} lang={lang} record={mode.record} /><LegalPending t={t} lang={lang} /></div>
-      <AlwaysContinues t={t} />
+      <AlwaysContinues t={t} lang={lang} />
     </section>;
   }
 
@@ -928,7 +916,7 @@ function Overview({ anchor, t, lang, role, patientId, patientName, actorName, ve
     {active && role !== 'family' ? <PaperAndCopies t={t} lang={lang} record={active} actorName={actorName} /> : null}
     {role !== 'doctor' && openDraft ? <div className="ep-card"><h2>{t(`Draft version ${openDraft.version} (not in use yet)`, `ड्राफ़्ट संस्करण ${openDraft.version} (अभी लागू नहीं)`)}</h2><PlanSummary t={t} lang={lang} record={openDraft} /></div> : null}
 
-    <AlwaysContinues t={t} />
+    <AlwaysContinues t={t} lang={lang} />
 
     <section className="ep-card" aria-labelledby="ep-versions-title">
       <h2 id="ep-versions-title">{t('Versions', 'संस्करण')}</h2>
@@ -1343,7 +1331,7 @@ function Wizard({ t, lang, draft, previous, issues, step, busy, error, toast, di
             <ul>{reviewTriggers.map((item) => <li key={item.id}>{t(item.label, TRIGGER_HI[item.id])}</li>)}</ul>
             <p>{t('After the review date, emergency teams treat the plan as information only and give standard care.', 'समीक्षा की तारीख़ के बाद इमरजेंसी टीम योजना को सिर्फ़ जानकारी मानती है और सामान्य इलाज देती है।')}</p>
           </div>
-          <AlwaysContinues t={t} />
+          <AlwaysContinues t={t} lang={lang} />
         </> : null}
 
         {step === 9 && draft.gocTranscript ? <GocSavedNote t={t} record={draft} showLines /> : null}

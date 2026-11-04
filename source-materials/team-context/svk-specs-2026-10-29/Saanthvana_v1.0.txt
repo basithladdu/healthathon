@@ -1,0 +1,517 @@
+EMERGENCY CARE & TREATMENT PREFERENCE RECORD (ECTPR)
+For adults with advanced, life-limiting illness — to be read first in the Emergency Department
+Adapted from the NCG End-of-Life Care algorithm, the ISCCM–IAPC 2024 position statements, POLST (USA) and ReSPECT (UK). Full source list at Appendix F.
+SECTION 1 —  ED QUICK VIEW  (complete this page last; it is the page that gets read in an emergency)
+
+
+Patient name  __________________ | Age / Sex  ____________ | UHID / MR No.  __________ | Date completed  __________
+Primary diagnosis: ____________ |   Stage of disease: _________________ |   ECOG: __________________ | Review due by  __________
+
+
+1.1  Overall goal of care  —  tick ONE
+❑  A. PRIORITISE LIFE / All medically effective treatment, including ICU and ventilation. | ❑  B. BALANCED / CEILING OF CARE / Treat reversible problems, but with the specific limits set out in Sections 6–13. | ❑  C. PRIORITISE COMFORT / Symptom control is the goal. Hospital transfer only if comfort cannot be achieved where the patient is.
+
+
+1.2  The four answers an emergency clinician needs in 20 seconds
+DECISION | RECORDED PREFERENCE
+Bring the patient to hospital at all? | ❑  Yes, for any deterioration / ❑  Only for the specific reasons listed in Section 6 / ❑  No — manage at home / hospice; call the numbers in Section 6
+CPR if the heart stops? | ❑  Attempt CPR / ❑  DO NOT attempt CPR (DNACPR)
+Highest acceptable level of breathing support (ceiling) | ❑  Comfort measures / oxygen for breathlessness only / ❑  Nasal prongs or face mask / ❑  Non-rebreather mask / ❑  High-flow nasal cannula (HFNC) / ❑  Non-invasive ventilation (CPAP / BiPAP) / ❑  Intubation + invasive ventilation, as a time-limited trial (Section 9) / ❑  Intubation + invasive ventilation, without a pre-set limit
+ICU admission? | ❑  Yes / ❑  Yes, as a time-limited trial of ____ days / ❑  No — ward-level or comfort care only
+
+
+Named decision-maker  ____________________________ / Relationship  ______________________________ / Phone (24 h)  ______________________________ | Treating consultant  ____________________________ / Palliative care contact  ________________________ / Phone (24 h)  ______________________________
+
+
+IF IN DOUBT, RESUSCITATE. / Provide full standard emergency care if: (a) this record is unsigned, out of date or cannot be found; (b) the cause of deterioration is new, reversible and unrelated to the underlying illness — an injury, choking, a drug reaction, hypoglycaemia; (c) the patient has capacity and says something different now, which always overrides this document; or (d) the record is ambiguous.  / Clarify with the treating team afterwards. / An unticked box means NO PREFERENCE HAS BEEN RECORDED. It does not mean refusal. Provide the standard of care.
+
+
+SECTION 2  —  How to use this record
+2.1  Who it is for
+Complete this record with a patient (or, if the patient lacks capacity, with the surrogate decision-maker) when the answer to the surprise question — “Would I be surprised if this patient died in the next 12 months?” — is “no”, and at least one of the following is present:
+–  Advanced disease with no remaining disease-modifying options, or options the patient has declined.
+–  Progressive and continuing decline in general condition: poor performance status, largely bed-bound, minimal oral intake, disinterested or withdrawn.
+–  Repeated unplanned admissions for the same underlying problem.
+–  The patient or family has asked about what will happen at the end, or about avoiding hospital.
+The NCG End-of-Life Care algorithm adds, for the actively dying phase: deteriorating vital signs — low blood pressure, cold skin, jaw breathing or Cheyne–Stokes respiration. Where the signs are ambiguous, take a second opinion before acting on them.
+2.2  What this record is, and what it is not
+IT IS | IT IS NOT
+–  A summary of what this patient values and what they would and would not accept, agreed in conversation and signed. / –  A prompt for the emergency clinician to make a recommendation that fits the patient, quickly. / –  Patient-held and portable: it travels with the patient between home, ambulance, ED, ward and ICU. / –  Revisable at any time, by the patient or by the clinical team as the condition changes. | –  Not, by itself, a legally executed Advance Medical Directive under the Supreme Court framework (see Appendix C). It can be converted into one, or can sit alongside one. / –  Not authority to withdraw life-sustaining treatment that has already been started. Withdrawal in India follows the Primary and Secondary Medical Board process (Appendix C). / –  Not a mechanism to demand treatment the clinical team judges non-beneficial. A patient or family may refuse a treatment; they cannot require one that is not indicated. / –  Not a DNACPR form. A decision not to attempt CPR says nothing about any other treatment.
+
+
+2.3  Sequence for completing it
+# | Step | Notes
+1 | Confirm eligibility and capacity | Sections 3 and 4. Capacity is decision-specific and can fluctuate; assess it now, not from the notes.
+2 | Establish what is understood | Section 5. Do not start on treatment choices until the family can say back, in their own words, that the illness is not curable.
+3 | Elicit values before options | Section 6. What matters, and what outcomes would be unacceptable. Preferences recorded without this step are unreliable.
+4 | Make a recommendation | Sections 7–14. Offer a recommendation based on the values just heard — not an unguided menu. Then record what is agreed.
+5 | Record what will always continue | Section 15. Say this out loud: care is not being withdrawn, only the treatments that are no longer helping.
+6 | Sign, copy, distribute, and set a review date | Sections 17 and 18. A record nobody can find in an emergency has no effect.
+
+
+SECTION 3  —  Patient details
+Full name  ________________________ | Age / DOB  ____________________ | Sex  ______________________ | UHID / MR No.  ________________
+Address  ________________________ |  | Phone  ______________________ | Language(s) preferred  ____________
+Primary diagnosis, stage, date  ____________________________________________________________ |  |  | ABHA / insurance  ________________
+Significant comorbidities  ____________________________________________________________ |  |  | Known allergies  ________________
+Functional status:  ECOG ____   /   PPS ____ %   /   Barthel ____   ❑ Bed-bound   ❑ Chair-bound   ❑ Ambulant with help   ❑ Independent |  |  | 
+Implanted devices:  ❑ None   ❑ Pacemaker   ❑ ICD   ❑ CRT   ❑ Other: __________    (see Section 10.5 for deactivation) |  |  | 
+Current key medications (attach list if long)  _______________________________________________________ |  |  | 
+Treating consultant / unit + 24 h phone  ________________________________________ |  | Palliative care team + 24 h phone  __________________________ | 
+Local doctor / home-care nurse + phone  ________________________________________ |  | Nearest hospital + distance / travel time  ______________________ | 
+
+SECTION 4  —  Who is making this decision
+4.1  The patient’s capacity, now
+❑  The patient has capacity for these decisions and has completed this record themselves.
+❑  The patient has capacity but has asked family to decide with the team. Record the patient’s own words: ______________________________
+❑  Capacity fluctuates. Assessed by: ____________________  on ____________. Re-assess before acting on any section.
+❑  The patient lacks capacity for these decisions. Basis of assessment (understand / retain / weigh / communicate): ________________________
+
+4.2  Existing directives
+❑  There is a valid written Advance Medical Directive / living will.  Executed on ____________.  Location of original: ______________________
+Attested by  ❑ Notary   ❑ Gazetted Officer,  with two witnesses?  ❑ Yes  ❑ No.  If yes, this ECTPR must be read as subordinate to it — the directive governs; this record operationalises it.
+❑  There is no directive, but the patient previously expressed clear wishes. Recorded here, with who heard them and when: ______________________________
+❑  No directive and no recorded prior wishes. Decisions will be made in the patient’s best interests through family consensus with the team.
+
+
+4.3  Surrogate / healthcare proxy
+ | PRIMARY | ALTERNATE
+Name |  | 
+Relationship to patient |  | 
+Phone (must be reachable 24 h) |  | 
+ID type & number |  | 
+Basis for authority | ❑ Named by patient  ❑ Family consensus  ❑ Named in AMD  ❑ Court-appointed | ❑ Named by patient  ❑ Family consensus  ❑ Named in AMD  ❑ Court-appointed
+
+
+Family members who must be informed before any major decision (name, relation, phone)  ______________________________________________
+  ____________________________________________________________________________________________________
+
+Declaration by the surrogate — read aloud and confirm / “In answering these questions I am trying to say what my relative would have chosen for themselves, as far as I can judge it from what I know of them — not what I would choose for myself, and not what I most want to happen. Where I do not know what they would have wanted, I will say so, and I will decide with the team in their best interests.” / Signature: ______________________________     Date: ________________
+
+
+SECTION 5  —  Understanding and prognosis
+No preference recorded below this line is valid unless this section is completed. A choice made without prognostic awareness is not an informed one.
+5.1  What has been discussed
+❑  The illness has been explained as incurable and progressive, and the family can repeat this back in their own words.
+❑  Expected survival discussed in ranges and probabilities, not as a single number. Range conveyed:  ❑ hours–days  ❑ days–weeks  ❑ weeks–months  ❑ months–a year  ❑ genuinely uncertain
+❑  Uncertainty was stated explicitly — the family were told the estimate could be wrong in either direction.
+❑  The likely mode of dying was described in plain language (e.g. increasing sleepiness, reduced intake, changed breathing).
+❑  What ICU and ventilation would actually involve for this patient was described, including the realistic chance of coming off the ventilator.
+
+5.2  Basis of the prognostic estimate  (tick all used)
+❑  Surprise question / ❑  Clinical trajectory over the last 3–6 months / ❑  Performance status trend (ECOG / PPS) / ❑  Weight loss, intake, delirium, serum albumin | ❑  Palliative Prognostic Index / Palliative Prognostic Score / ❑  Disease-specific prognostic model or nomogram / ❑  predictsurvival.com (as cited in the NCG algorithm) / ❑  Second opinion obtained — by: ______________
+
+
+5.3  What the patient knows
+❑  The patient knows the diagnosis and the prognosis.
+❑  The patient knows the diagnosis but not the prognosis.
+❑  The family has asked that the patient not be told. Discussed with the family that the patient may ask directly and will not be lied to. Family understands:  ❑ Yes  ❑ Not yet resolved
+❑  The patient has said they do not wish to know details and has delegated: __________________________
+Note on non-disclosure: withholding prognosis at family request is common in Indian practice and is not, in itself, a reason to refuse to complete this record. But a patient who retains capacity and asks a direct question must be answered honestly. Record here how that will be handled: ________________________________________
+SECTION 6  —  What matters to this patient
+The four realms in the NCG algorithm: physical, emotional, social, spiritual. Ask, listen, and write the patient’s or family’s own words — not a paraphrase.
+6.1  In their own words
+The most distressing physical symptom right now is  ____________________________________________________________
+  _________________________________________________________________________________________________________
+What matters most to me / to them is  __________________________________________________________________
+  _________________________________________________________________________________________________________
+What I am most afraid of is  __________________________________________________________________________
+  _________________________________________________________________________________________________________
+Unfinished things that matter (people to see, disputes to settle, papers to sign, a place to visit)  ____________________
+  _________________________________________________________________________________________________________
+
+6.2  Outcomes that would be unacceptable  (tick any that apply)
+❑  Being kept alive on a ventilator with no prospect of coming off it / ❑  Being permanently dependent on a feeding tube / ❑  Not being able to recognise or respond to family / ❑  Surviving with severe, permanent physical dependence / ❑  Dying in an ICU, away from family | ❑  Uncontrolled pain or breathlessness at any stage / ❑  Loss of dignity in bathing, toileting or exposure / ❑  Being alone at the time of death / ❑  Exhausting the family’s savings on treatment that will not change the outcome / ❑  Other: ______________________________________
+
+
+6.3  Psychosocial, spiritual and practical needs
+Emotional / psychological | ❑ Distress identified  ❑ Counsellor / psychologist involved  ❑ Referral made   Notes: ______________________
+Spiritual / religious | ❑ Support wanted  ❑ Specific person / faith leader to be called: ______________________  ❑ Rituals to observe: ______________
+Social | ❑ Dependent children  ❑ Dependent elderly  ❑ Sole earner  ❑ Caregiver strain  ❑ Financial hardship   Notes: ______________
+Practical | ❑ Home nursing needed  ❑ Equipment (bed / air mattress / oxygen / suction / commode)  ❑ Transport  ❑ Documents & finances
+Specific wishes | ❑ Visit by a named person or a grandchild: ______________  ❑ Diet / food preferences: ______________  ❑ Music / prayer: ______
+Family support needs | ❑ Family requires bereavement support  ❑ A family member is a health worker  ❑ Interpreter needed: ____________
+
+
+SECTION 7  —  Should the patient be brought to hospital?
+❑  YES — for any significant deterioration.
+❑  ONLY FOR THE FOLLOWING  (tick each that applies):
+❑  Pain that cannot be controlled at home / ❑  Breathlessness that cannot be controlled at home / ❑  Significant bleeding / ❑  Seizures / ❑  Fall with suspected fracture | ❑  Blocked or displaced catheter, feeding tube or stent / ❑  Suspected infection needing intravenous treatment / ❑  Acute confusion or agitation not settling / ❑  Caregiver unable to cope — respite admission / ❑  Other: ______________________________________
+
+❑  NO — the patient is to be cared for where they are. Call the numbers below before calling an ambulance.
+
+Preferred hospital / ED  ________________________ / Travel time  ______________________________ | First number to call before an ambulance  ________________ / Second number  ______________________________
+
+
+7.1  If an ambulance is called, what is expected of the crew
+❑  Full pre-hospital resuscitation and transport.
+❑  Transport with symptom relief only — oxygen for breathlessness, analgesia, positioning. No CPR, no intubation.
+❑  Transport home from hospital for the last days of life, with a nurse escort if available.
+
+Practical warning for the pilot site / Ambulance crews — government and private — will resuscitate by default. This record has no effect unless the crew is physically handed a signed copy at the door. Keep the ED Quick View page (page 1) in a marked folder or envelope by the patient’s bed, and give the family a laminated wallet card (Appendix E).
+
+SECTION 8  —  Cardiopulmonary resuscitation
+This section applies only if the heart stops and breathing stops. It says nothing about any other treatment.
+❑  ATTEMPT CPR.
+❑  DO NOT ATTEMPT CPR (DNACPR).
+
+Reason recorded (clinical futility / patient refusal / burden outweighs benefit)  __________________________________
+Discussed with (patient / surrogate / both)  ____________________
+Decision made by  __________________ | Registration no.  ________________ | Signature  __________________ | Date & time  ______________
+
+
+Consistency check, adapted from POLST: if Section 1.1 goal C (comfort) or a ceiling below intubation has been chosen, CPR is not consistent with that plan and DNACPR is the indicated recommendation — CPR cannot be delivered without invasive escalation. If “attempt CPR” is nevertheless ticked, record why: __________________________________
+
+SECTION 9  —  Oxygen and ventilatory support: the ceiling
+Tick the HIGHEST level that is acceptable. Everything below that level remains available. Nothing above it is to be started without a fresh discussion with the surrogate and the treating consultant.
+ | LEVEL | WHAT IT MEANS FOR THE PATIENT | CEILING
+0 | Comfort measures only | Opioid and anxiolytic for breathlessness, fan, positioning, suction, mouth care. Oxygen used only if it makes the patient feel better — no saturation target is chased. | ❑
+1 | Nasal prongs / simple face mask | Low-flow oxygen up to ____ L/min. Comfortable, no interference with talking, eating or being at home. | ❑
+2 | Non-rebreather / venturi mask | Higher-concentration oxygen. Tolerable, but the mask can feel confining and interferes with speech. | ❑
+3 | High-flow nasal cannula (HFNC) | Warmed humidified high-flow oxygen. Better tolerated than a mask, usually needs a high-dependency bed, and can be used purely for comfort. | ❑
+4 | Non-invasive ventilation (CPAP / BiPAP) | A tight mask driving air in. Effective for fluid overload and COPD; often uncomfortable, restricts speaking and eating, and can be distressing if used for many hours. | ❑
+5 | Intubation and invasive mechanical ventilation | A tube in the windpipe, sedation, inability to speak, ICU. Recovery may or may not follow; weaning may not be possible. | ❑
+
+
+9.1  Conditions attached to the ceiling
+❑  The ceiling above applies to any deterioration.
+❑  The ceiling may be exceeded ONLY if the cause is judged reversible — for example: ______________________________
+❑  NIV is acceptable only for symptom relief (breathlessness), for up to ____ hours, and is to be stopped if the patient finds it distressing.
+❑  NIV is acceptable as a treatment attempt for up to ____ hours; if there is no improvement by then, step down to comfort measures.
+❑  No saturation target is to be chased. Treat the symptom, not the number. If a floor is wanted, accept SpO₂ ≥ ____ %.
+
+9.2  If invasive ventilation is acceptable
+❑  Yes, but only as a time-limited trial — complete Section 10.
+❑  Yes, without a pre-set limit.
+❑  Tracheostomy:  ❑ No  ❑ Yes, only if weaning is judged likely  ❑ Yes
+❑  Prolonged ventilation beyond ____ days, or ventilation at home / in a long-term facility:  ❑ No  ❑ Yes
+❑  Re-intubation after a failed extubation:  ❑ No  ❑ Once  ❑ Yes
+❑  Return to ICU after step-down, for the same problem:  ❑ No  ❑ Yes  ❑ Decide at the time
+
+SECTION 10  —  The time-limited trial: deciding in advance when to stop
+A time-limited trial is an agreement between the family and the team to use life-sustaining treatment for a defined period, after which the patient’s response — measured against markers agreed now, in advance — decides whether treatment continues or the focus shifts entirely to comfort. Reported trials commonly run about 3 days, with a usual range of roughly 3 to 7. Agreeing the markers before the treatment starts is what makes the later conversation possible; without them, every review becomes a fresh argument about whether to “give up”.
+
+
+10.1  Trial parameters
+Treatments included in the trial | ❑ Invasive ventilation  ❑ Vasopressors  ❑ Dialysis / CRRT  ❑ Antibiotics  ❑ Transfusion  ❑ Other: ____________
+Duration agreed | ________ days, from ____ / ____ / ________ at ________ hrs
+Formal review date & time | ____ / ____ / ________ at ________ hrs
+Who reviews | Treating consultant + ____________________ + palliative care + the surrogate. Face to face, not by phone, wherever possible.
+Interim reviews | Daily, brief, documented — with a note of whether the trial is on track. ❑ Agreed
+
+
+10.2  Markers of improvement agreed in advance  (tick those that will count)
+❑  Falling oxygen requirement / improving P:F ratio / ❑  Vasopressor dose reducing or stopped / ❑  Organ failure score (e.g. SOFA) trending down / ❑  Regaining consciousness / following commands | ❑  Tolerating a spontaneous breathing trial / ❑  Source of infection controlled (drained, cleared, cultures improving) / ❑  Renal function recovering / off dialysis / ❑  Other, specific to this patient: ____________________
+
+
+10.3  Markers of non-improvement agreed in advance
+❑  Rising vasopressor requirement despite full treatment / ❑  New or persisting failure of three or more organ systems / ❑  No neurological recovery by the review point | ❑  Repeated failed weaning attempts / no prospect of extubation / ❑  A new irreversible complication (e.g. bowel infarction, massive stroke) / ❑  Other: ____________________________________________
+
+
+10.4  What the patient / family wishes to happen at the review, if the markers of non-improvement are present
+❑  Shift entirely to comfort care, including withdrawal of ventilation, with sedation assured for breathlessness and distress.
+❑  Continue treatment but escalate no further; allow a natural death when it comes.
+❑  Extend the trial once, by ____ more days, then decide.
+❑  Obtain a second opinion first, from: ____________________________
+❑  Continue full treatment regardless.
+
+Procedural note — read before acting on the box above / In India, withdrawing life-sustaining treatment already in progress is lawful but procedural. Following the Supreme Court’s order of 24 January 2023 and the MoHFW draft guidelines, the hospital constitutes a Primary Medical Board (the treating physician plus at least two subject experts with five or more years’ experience), which explains the illness, the options and the consequences of continuing or stopping to the surrogate; a Secondary Medical Board (a practitioner nominated by the District Chief Medical Officer plus at least two experts, none of whom sat on the Primary Board) then reviews, and is directed to give its opinion within 48 hours. This record captures the family’s wish in advance; it does not replace that process, and the treating team must initiate it. Verify the current position before the pilot goes live — the draft guidelines were still in consultation and the Supreme Court returned to the subject in March 2026.
+
+
+10.5  If ventilation is to be withdrawn
+❑  Family wish to be present.  Who: ______________________________
+❑  Religious rites to be performed first.  Details: ____________________________
+❑  Sedation and opioid to be titrated to comfort before and during withdrawal — this is mandatory, not optional.
+❑  Preference for terminal extubation (tube removed) rather than terminal weaning:  ❑ Yes  ❑ No  ❑ Team to decide
+❑  Monitors and alarms to be switched off or turned away from the family.
+❑  A private room / screened area to be arranged if available.
+
+SECTION 11  —  Other organ support
+Vasopressors / inotropes | ❑ No  ❑ Short trial only, up to ______ hours  ❑ Yes, without a pre-set limit  ❑ Yes, but no escalation beyond ____ agents
+Dialysis / CRRT | ❑ No  ❑ Trial of ______ sessions / days, then review  ❑ Yes  ❑ Only if the renal failure is judged reversible
+ECMO | ❑ No  ❑ To be discussed only if a specific reversible cause is identified
+Cardioversion / external pacing | ❑ No  ❑ Yes, if the arrhythmia is causing distress or is reversible  ❑ Yes
+Central venous / arterial line | ❑ No  ❑ Yes, if it reduces repeated needling  ❑ Yes
+Implanted defibrillator (ICD) | ❑ Not applicable  ❑ Deactivate shock therapy — date agreed: __________  ❑ Leave active / Pacing function is normally left on; shocks in a dying patient are painful and futile. Deactivation is a specific act requiring a technician or magnet — arrange it, do not assume it.
+Blood-pressure and glucose targets | ❑ Standard  ❑ Relaxed, treat only symptomatic extremes  ❑ Stop targeting altogether
+
+SECTION 12  —  Feeding and fluids
+To be explained before this section is completed / As the body shuts down, the need for food and fluid falls. Feeding a dying patient more does not extend life and often causes harm. The NCG algorithm is explicit: match fluids to urine output, allow oral sips as tolerated, keep parenteral fluid to no more than about 500–1000 mL of normal saline in 24 hours, and avoid over-hydration — which causes aspiration, oedema, bladder distension and breathlessness. Families experience “no feeding” as abandonment or starvation. Name that fear directly, explain the physiology, and promise what will continue: mouth care, sips, taste, and the offer of food by hand whenever the patient wants it.
+
+
+12.1  Feeding
+❑  Comfort feeding by mouth only — careful hand feeding, sips, tastes, favourite foods, no volume target, no forcing. Mouth care given regardless.
+❑  Nasogastric (Ryle’s) tube:  ❑ No  ❑ Yes, short-term only, up to ______ days, then review  ❑ Yes
+❑  Gastrostomy (PEG):  ❑ No  ❑ Only after discussion with the palliative care team  ❑ Yes
+❑  Total parenteral nutrition (TPN):  ❑ No  ❑ Only if a reversible obstruction is being treated  ❑ Yes
+❑  If a feeding tube is already in place, it is to be:  ❑ continued  ❑ reduced to comfort volumes  ❑ used only for medicines  ❑ removed
+
+12.2  Hydration
+❑  Oral sips only. No drip.
+❑  Clinically assisted hydration, limited: not more than 500–1000 mL of normal saline per 24 hours, intravenous or subcutaneous, matched to urine output and reviewed every day.
+❑  Full maintenance fluids.
+❑  A subcutaneous route is acceptable if venous access is difficult:  ❑ Yes  ❑ No
+
+Daily review prompt for the ward: is there new oedema, are there wet-sounding secretions, is the abdomen distended, is the patient more breathless? If yes, reduce or stop the fluid rather than adding a diuretic.
+
+SECTION 13  —  Blood and blood products
+❑  No transfusion of any kind.
+❑  Transfusion for symptom relief only — for breathlessness, exhaustion or dizziness from anaemia, or for bleeding that is distressing. Not for a haemoglobin number alone.
+Limit agreed: up to ______ units of packed cells at a time. The benefit is to be judged by whether the patient feels better within 48 hours; if there is no symptomatic benefit after ______ episodes, transfusion stops. ❑ Agreed
+❑  Platelets:  ❑ No  ❑ Only for active bleeding  ❑ Yes, including prophylactic
+❑  Fresh frozen plasma / factor concentrates:  ❑ No  ❑ Only for active bleeding  ❑ Yes
+❑  Full transfusion support without restriction.
+
+Practical note: in a haematology or transfusion-dependent patient, repeated transfusion may be the single thing that keeps the patient functional at home. Record what the transfusion is actually for — keeping them at their granddaughter’s wedding is a legitimate goal, and this box should reflect it: ________________________________________
+SECTION 14  —  Surgery and invasive procedures
+The distinction that matters is not “big” versus “small”, but whether the procedure is likely to restore something the patient values, or only to extend the dying process with added suffering.
+CATEGORY | PREFERENCE
+A. Surgery that could save life AND is likely to restore an acceptable quality of life / (e.g. drainage of an abscess, repair of a perforation in an otherwise stable patient) | ❑  Yes / ❑  Yes, only if the anticipated recovery is to at least the current level of function / ❑  No
+B. Surgery that may extend life but will predictably increase suffering or dependence without improving the underlying prognosis / (e.g. emergency laparotomy in widely metastatic disease, major amputation, tracheostomy for a malignant airway) | ❑  No — do not perform / ❑  Decide at the time, with the palliative care team and the surrogate involved / ❑  Yes
+C. Procedures done purely to relieve a symptom / (pleural or ascitic drainage, ureteric stent or nephrostomy for obstruction, defunctioning stoma for bowel obstruction, biliary stent for itch and jaundice, fixation of a painful pathological fracture, coeliac plexus or other nerve block, palliative radiotherapy, endoscopic control of bleeding) | ❑  Yes — acceptable, and expected, if they will relieve suffering / ❑  Yes, except: ____________________________________ / ❑  No
+D. Anaesthesia and sedation for any of the above | ❑  Acceptable / ❑  Acceptable, but with a clear plan not to extubate into ICU-level support afterwards / ❑  Not acceptable
+
+
+Specific procedures the patient or family refuses outright  ______________________________________________
+  _________________________________________________________________________________________________________
+
+SECTION 15  —  Medicines, tests and monitoring
+15.1  Anti-infectives
+❑  None — fever and secretions managed symptomatically.
+❑  Oral or subcutaneous only.
+❑  Intravenous antibiotics, if they are likely to relieve a symptom (e.g. a painful urinary infection, cellulitis).
+❑  Full anti-infective treatment including intensive-care regimens.
+
+15.2  Disease-modifying treatment
+❑  Stop chemotherapy / targeted therapy / immunotherapy.
+❑  Continue current line only while it is tolerated and the patient is out of bed more than half the day; stop at the next deterioration.
+❑  Palliative radiotherapy for pain, bleeding or obstruction remains acceptable.
+
+15.3  Deprescribing  (from the NCG routine-care panel)
+Stop medicines that no longer serve this patient — they add pill burden, aspiration risk and cost without benefit.
+❑  Statins and other lipid-lowering agents / ❑  Antihypertensives, unless needed for symptoms / ❑  Oral hypoglycaemics; simplify insulin, accept higher sugars / ❑  Bisphosphonates, vitamins, supplements, haematinics | ❑  Anticoagulants and antiplatelets — review bleeding risk / ❑  Anti-dementia drugs, long-term PPIs, laxatives no longer needed / ❑  Convert essential medicines to a route the patient can use / ❑  Other: ____________________________________
+
+
+15.4  Investigations and monitoring
+❑  Stop routine blood tests, blood sugars, chest films and cultures. Do a test only if the result would change something that affects comfort.
+❑  Stop routine observations — pulse, blood pressure, temperature, SpO₂ at fixed intervals. Monitor comfort instead: pain, breathlessness, secretions, agitation, bowel and bladder.
+❑  Continue selected monitoring for a specific reason: __________________________________
+
+15.5  Anticipatory medicines to be kept at home / at the bedside
+SYMPTOM | DRUG, DOSE, ROUTE  (prescriber to complete) | AVAILABLE?
+Pain |  | ❑ Yes  ❑ No  ❑ To arrange
+Breathlessness |  | ❑ Yes  ❑ No  ❑ To arrange
+Agitation / restlessness |  | ❑ Yes  ❑ No  ❑ To arrange
+Noisy secretions |  | ❑ Yes  ❑ No  ❑ To arrange
+Nausea / vomiting |  | ❑ Yes  ❑ No  ❑ To arrange
+Seizure |  | ❑ Yes  ❑ No  ❑ To arrange
+Fever |  | ❑ Yes  ❑ No  ❑ To arrange
+
+
+Who is trained and permitted to give these at home  __________________________________________
+Where the opioid is stored, and the prescription / NDPS documentation held  __________________________
+SECTION 16  —  What will always be provided, whatever else is limited
+Nothing in this record reduces care. Limiting a treatment that has stopped helping is not the same as withdrawing care, and the family should be told so in those words. Every item below continues to the end, in every setting, regardless of which boxes above are ticked. / These items are drawn from the routine-care panel of the NCG End-of-Life Care algorithm, which directs that they be assessed and the plan reviewed and updated daily.
+
+
+❑  Relief of pain, using opioids in adequate doses, by whatever route works / ❑  Relief of breathlessness — opioid, anxiolytic, fan, positioning, oxygen if it helps / ❑  Sedation for distress that cannot be relieved any other way / ❑  Control of nausea, secretions, agitation, itch, hiccups / ❑  Mouth care and eye care, given often / ❑  Comfortable positioning; turning as tolerated; air mattress to prevent pressure sores | ❑  Skin and wound care; management of odour / ❑  Bowel care — assessment and management of constipation / ❑  Bladder care — assessment and management of retention and incontinence / ❑  Privacy, dignity, and gentle handling in every personal-care task / ❑  Presence of family; spiritual and religious support as the patient wishes / ❑  Honest, unhurried communication with the patient and the family, every day
+
+
+SECTION 17  —  Place of care, place of death, and afterwards
+Preferred place of care | ❑ Home  ❑ Hospital  ❑ Hospice  ❑ Care home  ❑ Undecided     Second choice: ______________
+Preferred place of death | ❑ Home  ❑ Hospital  ❑ Hospice  ❑ No preference     Is the family able to manage this at home?  ❑ Yes  ❑ With support  ❑ No
+Support needed to make home possible | ❑ Home nursing visits  ❑ Equipment  ❑ Oxygen  ❑ Suction  ❑ Syringe driver  ❑ 24 h phone advice  ❑ Financial help
+If death occurs at home | First call: ______________________ (phone ______________).  Doctor who will certify the death: ______________________ / The family should be told in advance how certification and the death certificate will be arranged, and that a home death is not a police matter when an expected death has been documented in advance.
+Organ / tissue donation | ❑ Not wished  ❑ Corneal donation  ❑ Body donation to a medical college: ______________  ❑ Registered donor — card held?  ❑ Yes  ❑ No
+Rituals and last rites | ❑ Specific rites before death: ______________________  ❑ After death: ______________________ / ❑ Person to be called: ______________________  ❑ Restrictions on who may handle the body: ______________
+Practical arrangements | ❑ Transport of the body arranged  ❑ Burial / cremation preference: ____________  ❑ Documents ready (Aadhaar, insurance, will)
+Bereavement support | ❑ Family likely to need follow-up  ❑ Children in the household who will need age-appropriate explanation  ❑ Referral made
+
+SECTION 18  —  Changing this record, and resolving disagreement
+18.1  Changing or cancelling it
+–  A patient with capacity can change or cancel any part of this record at any time, verbally. Their current wish always overrides what is written here.
+–  A surrogate can ask for a review at any time.
+–  To cancel: strike through the page, write CANCELLED with the date and signature, and destroy the copies held by the family and the ambulance service. Record the cancellation in the hospital notes.
+
+18.2  When the family disagrees among themselves
+–  Do not proceed on a contested decision. Convene a single family meeting with the named surrogate and the dissenting members present together, with the treating consultant and palliative care.
+–  Return the discussion to what the patient would have wanted, not to what each member wants.
+–  If it remains unresolved: refer to the institutional clinical ethics committee. Continue current treatment meanwhile.
+–  Watch for the member who arrives late from another city and reverses an agreed plan — bring them into a full conversation rather than reversing course on a phone call.
+
+18.3  When the team judges a requested treatment to be non-beneficial
+–  The team is not obliged to provide a treatment it judges will not benefit the patient. Explain why, in plain language, without using the word “futile” as the whole of the explanation.
+–  Offer a second opinion from a clinician outside the treating team, and offer transfer if the family wishes it.
+–  Document the reasoning, who was present, and what was offered.
+
+18.4  Mandatory review triggers
+❑  Any new hospital admission / ❑  Any transfer between settings (home, hospital, hospice, care home) / ❑  A significant change in the condition, in either direction | ❑  A request from the patient or family / ❑  Start of a new line of treatment / ❑  Routinely, at least every ______ weeks
+
+
+18.5  Review log
+DATE | REVIEWED BY | WHAT CHANGED  (or “no change”) | SIGNATURE
+ |  |  | 
+ |  |  | 
+ |  |  | 
+ |  |  | 
+ |  |  | 
+
+
+SECTION 19  —  Declarations and signatures
+This record is not valid until the clinician section is signed. An unsigned form is a conversation note, not a plan.
+19.1  Patient
+❑ I have made these choices myself. / ❑ I have chosen not to be involved in detail and have delegated to my surrogate. | Signature / thumb impression | Name in capitals | Date
+ |  |  | 
+
+
+19.2  Surrogate / healthcare proxy
+❑ I confirm I am conveying what the patient would have wanted, so far as I can judge. | Signature | Name & relationship | Date
+ |  |  | 
+
+
+19.3  Witnesses  (required where the patient signs by thumb impression, or where literacy is limited)
+Witness 1 — name | Address / ID | Signature | Date
+ |  |  | 
+Witness 2 — name | Address / ID | Signature | Date
+ |  |  | 
+
+
+19.4  Clinicians
+ROLE | NAME | REGISTRATION NO. | SIGNATURE | DATE
+Treating consultant |  |  |  | 
+Palliative care clinician |  |  |  | 
+Nurse involved in the discussion |  |  |  | 
+
+
+19.5  Copies issued to
+❑  Original held by the patient / family, in a marked folder by the bed / ❑  Hospital medical record + flagged in the electronic record / ❑  Emergency Department, indexed against the UHID | ❑  Ambulance service / transport provider / ❑  Local doctor / home-care team / hospice / ❑  Photograph shared with the named surrogate’s phone
+
+
+19.6  Optional — converting this into a legal Advance Medical Directive
+If the patient has capacity and wishes this to stand as a legally executed Advance Medical Directive, the requirements are different and must be met separately: the document must be in writing, signed by the executor in the presence of two attesting witnesses, and attested before a Notary or a Gazetted Officer, who record their satisfaction that it was executed voluntarily, without coercion or inducement, and with full understanding. Counter-signature by a Judicial Magistrate is no longer required following the Supreme Court’s order of 24 January 2023. Take legal advice; do not rely on this form alone.
+Notary / Gazetted Officer (if applicable) | Name & designation | Seal & signature | Date
+ |  |  | 
+
+
+APPENDIX A  —  Conducting the conversation
+The NCG algorithm names SPIKES and Ask–Tell–Ask, and directs that information be mixed with the maintenance of hope, that uncertainty be emphasised, and that survival be discussed in probabilistic terms. It also warns, in the patient panel, against philosophising and against comparing this patient with others.
+STEP | WHAT TO DO | WORDS THAT WORK
+Set up | A private space, everyone seated, phones silenced, the key family members present at the same time. Say how long you have. | “I’ve asked you all to come together so we can talk properly. I have about twenty minutes and no interruptions.”
+Ask | Find out what they already understand before you say anything. This is the single most skipped step. | “What have the doctors told you so far?”  “What is your own sense of how things are going?”
+Permission | Ask before delivering the substance. | “Would it be all right if I told you what I’m worried about?”
+Tell | A short warning shot, then the headline in one plain sentence. No jargon, no numbers yet. Then stop and be quiet. | “I’m afraid I have difficult news.”  … “The cancer is no longer responding, and I think he is dying.”
+Respond to emotion | Silence, then name the emotion. Do not fill the gap with facts. Nothing said in the next two minutes will be remembered as information. | “I can see this is very hard.”  “Tell me what is going through your mind.”
+Ask again | Check what landed before adding more. | “What is your understanding of what I’ve just said?”
+Map values | Move from treatments to outcomes. This is what fills Section 6. | “What would he say is most important to him now?”  “Is there anything he would not want to go through?”
+Recommend | Do not hand them a menu. Make a recommendation grounded in what they just told you, and give them room to disagree. | “Given what you’ve told me matters to him, I would recommend we … What do you think of that?”
+Close the loop | Summarise, write it down in front of them, say what happens next and who to call. | “Let me read back what I’ve written, and you tell me if I’ve got it wrong.”
+
+
+A.1  Phrases to avoid, and what to say instead
+AVOID | INSTEAD
+“Do you want us to do everything?” — the only possible answer is yes, and it asks the family to authorise a death. | “What we do next should follow from what matters most to him. Here is what I recommend, and why.”
+“There is nothing more we can do.” — untrue, and heard as abandonment. | “We cannot stop the illness now. There is a great deal we can still do for how he feels and how this time goes.”
+“We will withdraw care.” | “We will stop the treatments that are no longer helping him, and step up everything that keeps him comfortable.”
+“Shall we stop feeding him?” | “His body can no longer use food the way it did. Forcing it in now causes more trouble than it prevents. We will keep giving him tastes and sips and keep his mouth comfortable.”
+“He has two months.” | “Patients in his situation usually have weeks to a few months. Some do better, some much less. I would use this time as though it were short.”
+“It is your decision.” — leaves the family carrying the death. | “This is our decision together. Based on what you’ve told me, my recommendation is …”
+Comparing with another patient, or philosophising about death. | Stay with this patient and this family. Listen more than you explain.
+
+
+A.2  Two questions that unlock most of this form
+–  “If time is short, what would you want it spent on?”
+–  “Is there anything that would be worse for him than dying?” — this is the question that produces Section 6.2, and it is the one that makes ceilings of care make sense to a family.
+
+APPENDIX B  —  Recognising the dying phase
+From the NCG End-of-Life Care algorithm. Recognition triggers the completion, or the urgent review, of this record.
+BACKGROUND STATE | SIGNS IN THE LAST DAYS
+–  Advanced stage disease with no disease-modifying options remaining / –  Constantly worsening general condition / –  Poor functional status; bed-ridden / –  No feeds; disinterested or withdrawn | –  Falling blood pressure / –  Cold skin, mottled peripheries / –  Jaw breathing / –  Cheyne–Stokes breathing / –  Reduced urine output
+
+
+Where the signs are ambiguous, take a second opinion before acting on them. Recognition of dying is a clinical judgement that is wrong often enough to warrant a check — and a wrongly declared dying phase produces a self-fulfilling outcome.
+
+
+B.1  Once the dying phase is recognised
+–  Complete the communication tasks: ensure insight, document what was discussed and with whom.
+–  De-escalate invasive interventions that no longer serve comfort.
+–  Simultaneously plan routine care and review it daily: position, skin and pressure-sore prevention, bowel and bladder, mouth care, fluids matched to output.
+–  Reassess this record in full — sections written weeks earlier may no longer fit.
+APPENDIX C  —  The Indian legal and procedural position
+This appendix is a working summary for clinicians, current to the sources cited and not a substitute for legal advice. The area is moving: the MoHFW guidelines were still in draft after public consultation, and the Supreme Court returned to the subject in a judgment of 11 March 2026 permitting withdrawal of life-sustaining treatment in a long-standing persistent vegetative state and urging a legislative framework and more uniform national application. Confirm the current position, and your State’s implementation status, before the pilot goes live.
+
+
+SOURCE | WHAT IT ESTABLISHES
+Common Cause v. Union of India (2018) | A five-judge Constitution Bench held that the right to die with dignity is part of the right to life under Article 21, recognised advance medical directives, and laid down a procedure for withholding and withdrawing life-sustaining treatment in the terminally ill.
+Supreme Court order, 24 January 2023 | Simplified that procedure on an application by the Indian Society of Critical Care Medicine. A directive must be in writing and signed by the executor before two attesting witnesses, preferably independent, and attested by a Notary or a Gazetted Officer, who record their satisfaction that it was made voluntarily, free of coercion or inducement, and with full understanding. Counter-signature by a Judicial Magistrate is no longer required, and the District Collector is no longer involved.
+Medical boards | For a patient without capacity, a Primary Medical Board is constituted by the hospital for each case — the treating physician and at least two subject experts with five or more years’ experience — and must explain the illness, the treatments available, the alternatives, and the consequences of continuing and of stopping, so that the surrogate is fully informed. A Secondary Medical Board — a practitioner nominated by the District Chief Medical Officer and at least two experts of similar standing, none of whom sat on the Primary Board — then reviews, and is directed to opine within 48 hours.
+MoHFW / DGHS draft Guidelines for Withdrawal of Life Support in Terminally Ill Patients (2024) | Issued for public consultation to operationalise the 2018 and 2023 orders. Withdrawal is framed as a considered decision in the patient’s best interests to stop life support that is no longer likely to benefit, or is likely to harm through suffering and loss of dignity. Conditions include brainstem death declared under the THOA, or a prognostic judgement that the condition is advanced and unlikely to benefit from aggressive intervention, together with documented informed refusal following prognostic awareness, and compliance with the Supreme Court’s procedure. Terminal illness is defined as an irreversible or incurable condition from which death is inevitable in the foreseeable future.
+ISCCM–IAPC Position Statements (Indian J Crit Care Med 2024;28(3):200–250) | The clinical companion to the law: the end-of-life care pathway, physician reflective prognostic assessment of potentially inappropriate life-sustaining treatment, goals of care set by combining the medical recommendation with the patient’s choices — expressed directly, through a valid advance directive, or through the surrogate — and the safeguards mandated in January 2023 built into the process.
+What remains unlawful | Active euthanasia — an intentional act to end life — is illegal in India. Nothing in this record contemplates it. Withholding and withdrawing non-beneficial life support, and giving opioids and sedatives in doses needed to relieve suffering, are lawful and are not euthanasia.
+
+
+C.1  Where this form sits
+–  If a valid attested advance directive exists, it governs. This record operationalises it into specific emergency instructions.
+–  If it does not, this record is strong contemporaneous documentation of the patient’s or surrogate’s informed refusal — which is one of the conditions the draft guidelines require — but it does not itself discharge the medical board procedure for withdrawing treatment already in progress.
+–  Withholding treatment that has not yet been started sits on a different and simpler footing than withdrawing treatment already running, and most of this form is about withholding. Say this to families: agreeing now not to start the ventilator is a smaller step than stopping one later, and it is the step that protects the patient from the harder decision.
+
+APPENDIX D  —  Running the beta
+D.1  Before the first form is used
+Ethics approval | Institutional Ethics Committee approval for the pilot, including the consent process, data collection and the version-control plan. Treat it as a service-evaluation protocol with a defined endpoint.
+Legal review | Have the form read by the hospital’s legal adviser against the current Supreme Court position and any State-level implementation orders.
+Translation | Telugu, Hindi and Urdu versions for the local population, back-translated and checked by a clinician who works in that language. The ED Quick View page must exist in every language in use.
+Readability | Target a reading level a Class 8 student can follow. Test the translated version with five families who are not in the study before you use it.
+Low literacy | A thumb-impression pathway with two witnesses, and a version read aloud from a script so that every family hears the same words.
+Training | No clinician completes this form without observed practice. Budget a half-day: the conversation, not the paperwork, is the intervention.
+Retrieval | Decide now how the form is found at 2 a.m.: a flag on the electronic record, a QR code on the wallet card linking to the hospital record, a coloured folder at the bedside. A pilot with no retrieval plan measures nothing.
+
+
+D.2  Who completes it, and when
+–  At the outpatient visit where disease-modifying options run out — the calmest moment, and the one most often missed.
+–  At discharge after any unplanned admission in a patient with advanced disease.
+–  At ICU step-down, when a patient has survived one episode and the next is foreseeable.
+–  On enrolment in home-based palliative care.
+–  Not for the first time in the resuscitation bay. A form completed under those conditions records panic, not preference.
+
+D.3  What to measure
+DOMAIN | INDICATOR
+Reach | Proportion of eligible patients with a completed, signed form; time from eligibility to completion.
+Retrieval | Proportion of emergency presentations where the form was located within 10 minutes of arrival. This is the indicator most likely to fail, and the one that determines whether the rest matters.
+Concordance | Proportion of episodes where the care delivered matched the recorded ceiling; every discordant episode reviewed individually, with the reason recorded.
+Process | Proportion of forms with Section 5 (prognostic understanding) and Section 6 (values) completed rather than left blank while treatment boxes are ticked — the failure mode reported for ReSPECT plans, where clinical recommendations are recorded but the personal-values section is not.
+Time-limited trials | Proportion with a documented review at the agreed date; proportion where agreed non-improvement markers were present and the recorded wish was followed.
+Outcomes | Place of death against stated preference; ICU days and ventilator days in the last 30 days of life; time from admission to first symptom-control prescription; out-of-pocket expenditure in the last admission.
+Experience | Bereaved-family interview at 6–8 weeks: did they feel heard, informed, and unpressured. Clinician survey on confidence and moral distress.
+Safety | Every case where the form was applied to a reversible illness, or where a family later said they had felt pushed, reviewed as an incident. Set this up before you start.
+
+
+D.4  Known risks in this design
+–  Ceiling creep: the form makes it easy to record a limit and hard to record why. Section 5 is the guard; audit it.
+–  Financial coercion. In a self-pay population, a decision to limit treatment may be about money, not values. Ask directly, record it, and offer the social-work and scheme-eligibility conversation before the treatment conversation is finalised.
+–  Surrogate substitution. Families answer with their own preference unless the substituted-judgement declaration in Section 4.3 is read aloud. Read it aloud.
+–  The form becoming shorthand for a DNR. Section 16 exists to prevent this; check that ward staff can say what continues, not only what stops.
+–  Application to reversible illness. The heading on page 1 is the safeguard, and it must survive any redesign.
+–  A form that outlives its accuracy. Preferences recorded three months ago in an outpatient clinic may be wrong today. Enforce the review triggers.
+
+APPENDIX E  —  Wallet / bedside card  (print, cut, laminate)
+One for the patient’s file at home, one for the family member who travels with them, one taped inside the front door for the ambulance crew.
+EMERGENCY CARE PLAN IN PLACE / Patient: ______________________________   UHID: ______________ / Diagnosis: ____________________________________________ / CPR:   ❑ Attempt      ❑ DO NOT ATTEMPT / Breathing support ceiling: ________________________________ / Hospital transfer:  ❑ Yes  ❑ Only for comfort  ❑ No / Call FIRST: ____________________  Phone: ________________ / Surrogate: ____________________  Phone: ________________ / Full record held: ❑ with patient  ❑ hospital record  ❑ both / Signed by Dr ____________________  Date: ______________ / If this card is unclear, or the problem is new and reversible — treat fully and call the number above.
+
+
+EMERGENCY CARE PLAN IN PLACE / Patient: ______________________________   UHID: ______________ / Diagnosis: ____________________________________________ / CPR:   ❑ Attempt      ❑ DO NOT ATTEMPT / Breathing support ceiling: ________________________________ / Hospital transfer:  ❑ Yes  ❑ Only for comfort  ❑ No / Call FIRST: ____________________  Phone: ________________ / Surrogate: ____________________  Phone: ________________ / Full record held: ❑ with patient  ❑ hospital record  ❑ both / Signed by Dr ____________________  Date: ______________ / If this card is unclear, or the problem is new and reversible — treat fully and call the number above.
+
+
+Version control / ECTPR Beta v0.1. Every printed form must carry a version number and a print date. When the form changes, withdraw the old version from circulation — two versions in the same hospital is the commonest way a pilot like this produces a serious incident. Record here: version ________  approved by ________________  on ____ / ____ / ________  next review ____ / ____ / ________
+
+
+APPENDIX F  —  Sources this record is built on
+Verify each before deployment; the Indian legal position in particular is still moving.
+–  National Cancer Grid (India). NCG Palliative Care Guidelines — End of Life Care algorithm. The structure of this record follows it: recognition of the dying phase, the four realms of patient assessment, the family panel, the routine-care panel reviewed daily, and the fluid guidance in Section 12.
+–  Mani RK, Bhatnagar S, Butola S, Gursahani R, Mehta D, Simha S, et al. Indian Society of Critical Care Medicine and Indian Association of Palliative Care Expert Consensus and Position Statements for End-of-life and Palliative Care in the Intensive Care Unit. Indian J Crit Care Med 2024;28(3):200–250.
+–  Ministry of Health and Family Welfare / Directorate General of Health Services (India). Draft Guidelines for Withdrawal of Life Support in Terminally Ill Patients, released for public consultation 2024.
+–  Supreme Court of India. Common Cause (A Registered Society) v. Union of India, (2018) 5 SCC 1; and the order of 24 January 2023 in Miscellaneous Application No. 1699 of 2019 modifying the procedure. Further judgment of 11 March 2026 on withdrawal in persistent vegetative state and the call for a legislative framework.
+–  National POLST (USA). National POLST Form and accompanying guidance — source of the three-tier treatment-goal structure (full / selective / comfort-focused), the medically assisted nutrition options, the internal consistency rule between CPR and treatment level, and the principle that an incomplete section creates no presumption and standard care applies.
+–  Resuscitation Council UK. ReSPECT (Recommended Summary Plan for Emergency Care and Treatment), version 3 — source of the patient-held, portable, cross-setting design, the “what matters to me” section, and the priority scale from prioritising life to prioritising comfort. Published evaluations of ReSPECT completion in practice inform the audit indicator on values-section completion in Appendix D.
+–  Kruser JM et al. Defining the Time-limited Trial for Patients with Critical Illness: An Official American Thoracic Society Workshop Report. Ann Am Thorac Soc, 2024 — basis for Section 10, including agreeing evaluation criteria in advance and treating an extension as a legitimate option rather than a failure.
+–  Observational data on time-limited trials in acute respiratory failure (Crit Care Explor 2024) — source of the typical trial duration of about three days used as the default prompt in Section 10.1.
+
+Nordic and wider European practice is reflected structurally rather than by citation: the deliberate separation of a treatment-limitation decision from a resuscitation decision, and the framing of limitation as a clinical decision made with the family rather than one delegated to them, which is what Section 18.3 and the recommendation-based approach in Appendix A are built on. If you extend the beta, the ERC and ESICM end-of-life guidance and the Danish and Norwegian national treatment-limitation frameworks are the closest comparators to read next.

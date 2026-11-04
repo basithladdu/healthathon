@@ -1,0 +1,23 @@
+/* Goals-of-care sign-off (goc-signature-pad.tsx). Uses the ep-* look of ectpr-plan.css. */
+.goc-signoff-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+.goc-signoff-head h2 { margin: 0; font-size: 22px; }
+.goc-locked-chip { background: var(--ep-sage, #d9eaa8); color: var(--ep-sage-ink, #465e45); }
+.goc-step { display: grid; gap: 12px; margin: 12px 0; }
+.goc-step h3 { margin: 0; font-size: 18px; }
+.goc-fields { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+.goc-fields .ep-field { margin: 0; }
+.goc-choice { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+.goc-note p { white-space: pre-wrap; margin: 8px 0 0; max-height: 240px; overflow: auto; }
+.goc-pad { display: grid; gap: 8px; }
+.goc-pad-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+.goc-pad-toggle { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; cursor: pointer; }
+.goc-pad-toggle input { width: 22px; height: 22px; accent-color: var(--ep-primary, #b9472c); }
+.goc-pad-canvas { display: block; width: 100%; aspect-ratio: 3 / 1; border: 2px dashed var(--ep-line, #e6ddd1); border-radius: 14px; background: #fff; touch-action: none; user-select: none; -webkit-user-select: none; cursor: crosshair; }
+.goc-pad[data-thumb] .goc-pad-canvas { border-color: var(--ep-primary, #b9472c); }
+.goc-pad-canvas[data-disabled] { opacity: .5; cursor: not-allowed; }
+.goc-pad-actions { margin: 0; }
+.goc-signed { display: grid; gap: 10px; margin: 0 0 12px; padding: 0; list-style: none; }
+.goc-signed li { display: flex; align-items: center; gap: 12px; padding: 8px; border: 1px solid var(--ep-line, #e6ddd1); border-radius: 12px; }
+.goc-signed img { flex: 0 0 auto; width: 150px; height: auto; background: #fff; border-radius: 8px; image-rendering: auto; }
+.goc-seal small { word-break: break-all; }
+@media (max-width: 420px) { .goc-signed li { flex-direction: column; align-items: flex-start; } }

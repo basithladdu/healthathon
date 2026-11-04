@@ -1,0 +1,62 @@
+{
+  "fictional": true,
+  "note": "FICTIONAL test data. The expected outcome is what Sahara's word matcher should SUGGEST for the doctor to check. It is not a clinical decision, and nothing is chosen until the doctor confirms each item (rule V1).",
+  "transcript": "03-hinglish-change-of-mind.txt",
+  "title": "Hinglish, change of mind about CPR (no, yes, no)",
+  "language": "hi-Latn+en",
+  "decisions": {
+    "cpr": {
+      "suggested": [
+        "DNACPR"
+      ]
+    },
+    "dialysis": {
+      "suggested": [
+        "NO"
+      ]
+    },
+    "respCeiling": {
+      "suggested": [],
+      "ruledOut": [
+        "5"
+      ]
+    },
+    "hospitalTransfer": {
+      "suggested": [
+        "ONLY_FOR"
+      ]
+    },
+    "goalOfCare": {
+      "suggested": [
+        "C_COMFORT"
+      ]
+    }
+  },
+  "changedMind": [
+    "cpr"
+  ],
+  "conflict": [],
+  "discussed": [
+    "consent",
+    "patientDetails",
+    "decisionMakers",
+    "cpr",
+    "dialysis",
+    "respCeiling",
+    "hospitalTransfer",
+    "goalOfCare"
+  ],
+  "notDiscussed": [
+    "icu",
+    "vasopressors",
+    "ng",
+    "peg",
+    "hydration",
+    "ambulance"
+  ],
+  "knownGaps": {
+    "web": {},
+    "android": {}
+  },
+  "notes": "The latest statement (\"Do not do CPR\") wins; the earlier \"No\" and \"I want CPR\" are shown as replaced quotes."
+}

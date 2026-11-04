@@ -66,6 +66,11 @@ object SymptomDiaryRules {
     } ?: value
     val recalls = linkedMapOf("now" to ("Right now" to "अभी"), "average-24h" to ("24-hour average" to "24 घंटे का औसत"), "worst-24h" to ("Worst in 24 hours" to "24 घंटे में सबसे ज़्यादा"))
     val respondents = linkedMapOf("patient" to ("Patient" to "मरीज़"), "assisted-patient" to ("Patient, with help" to "मरीज़ ने मदद से बताया"), "caregiver" to ("Seen by family or carer" to "देखभाल करने वाले ने देखा"), "clinician" to ("Seen by care team" to "देखभाल टीम ने देखा"))
+    /** Who answered, for a brand-new note: an invited family member defaults to "caregiver" (kept with the last carer name); everyone else keeps the last reporter. */
+    fun defaultReporter(role: String, last: Pair<String, String>?): Pair<String, String> =
+        if (role == "Family") "caregiver" to (last?.takeIf { it.first == "caregiver" }?.second.orEmpty()) else last ?: ("" to "")
+    /** True when the note was written by family or a carer, so the card and the doctor's view can say "Logged by family". */
+    fun loggedByFamily(note: SymptomNote) = note.respondent == "caregiver"
     val triggers = linkedMapOf("rest" to ("At rest" to "आराम करते समय"), "turning" to ("Turning in bed" to "करवट लेते समय"), "walking" to ("Standing / walking" to "खड़े होते / चलते समय"), "coughing" to ("Coughing" to "खाँसते समय"), "other" to ("Other" to "अन्य"), "not-sure" to ("Not sure" to "पक्का नहीं"))
     val changes = linkedMapOf("better" to ("Better" to "बेहतर"), "same" to ("Same" to "वैसा ही"), "worse" to ("Worse" to "ज़्यादा खराब"), "not-sure" to ("Not sure" to "पक्का नहीं"))
     fun label(labels: Map<String, Pair<String, String>>, key: String, hindi: Boolean) = labels[key]?.let { careTr(hindi, it.first, it.second) }.orEmpty()
@@ -124,6 +129,14 @@ object SymptomDiaryRules {
         rating = null, observedDate = now.toLocalDate().toString(), observedTime = now.toLocalTime().withSecond(0).withNano(0).toString(),
         note = "", selfReportedChange = "", comparedWithId = "", painBodyRatings = emptyMap(), moodRatings = emptyMap(),
     )
+    /** "Pain has gone": a new note now, same spots and reporter, every spot (and the note) at 0, so each part's trend ends at 0. */
+    fun painGone(value: SymptomNote, now: LocalDateTime = LocalDateTime.now()): SymptomNote = followUp(value, now).copy(
+        rating = 0, painBodyRatings = value.painBodySites.associateWith { 0 },
+    )
+    /** One point per day for a chart: the highest number noted that day, oldest day first. Unreadable dates are left out. */
+    fun dailyHighs(points: List<DatedRating>): List<Pair<LocalDate, Int>> = points
+        .mapNotNull { p -> runCatching { LocalDate.parse(p.date) }.getOrNull()?.let { it to p.value } }
+        .groupBy({ it.first }, { it.second }).map { (day, values) -> day to values.maxOf { it } }.sortedBy { it.first }
     private fun observed(items: List<CareItem>, personId: String) = items.filter { it.personId == personId && it.kind == "checkin" }
         .mapNotNull { item -> SymptomNoteCodec.decode(item.detail)?.let { item to it } }
         .sortedWith(compareBy<Pair<CareItem, SymptomNote>> { "${it.second.observedDate}T${it.second.observedTime}" }.thenBy { it.first.id })

@@ -4,7 +4,8 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 /** Text of one chosen document, read on this phone. [reviewed] is false while nobody has checked the reading against the original. */
-data class DocumentQuestionSource(val reportId: String, val name: String, val pages: List<DocumentPageText>, val reviewed: Boolean, val added: Long = 0L)
+/** [kind] is the phone's folder for it (DocumentFolderRules: bills, lab, prescriptions, discharge, other); blank when unknown. */
+data class DocumentQuestionSource(val reportId: String, val name: String, val pages: List<DocumentPageText>, val reviewed: Boolean, val added: Long = 0L, val kind: String = "")
 /** A line found on this phone. [marks] are the character ranges that matched the question; [next] is the line under it when the value is printed there. */
 data class DocumentMatch(val reportId: String, val reportName: String, val page: Int, val line: Int, val text: String, val marks: List<IntRange>, val reviewed: Boolean, val next: String = "")
 /** [date] is yyyymmdd, 0 when unknown. */
@@ -29,6 +30,25 @@ object DocumentQuestionRules {
     const val MAX_SEARCH_DOCUMENTS = 20
     const val MAX_RETRIEVED_LINES = 80
     const val MAX_RETRIEVED_CHARACTERS = 8_000
+
+    /** Where to look: every document, one folder (a DocumentFolderRules key), or the documents the person ticks. */
+    const val SCOPE_ALL = "all"
+    const val SCOPE_PICK = "pick"
+
+    /** The documents searched for [scope]. A document not sorted yet counts as Other. */
+    fun <T> inScope(items: List<T>, scope: String, folders: Map<String, DocumentFolder>, id: (T) -> String): List<T> = when (scope) {
+        SCOPE_ALL, SCOPE_PICK -> items
+        else -> items.filter { (folders[id(it)]?.folder ?: DocumentFolderRules.OTHER) == scope }
+    }
+
+    /** The type the AI is told for each document, so a bill is not read as a lab report. Nothing for Other or unknown. */
+    fun kindName(folder: String): String? = when (folder) {
+        DocumentFolderRules.BILLS -> "bill"
+        DocumentFolderRules.LAB -> "lab report"
+        DocumentFolderRules.PRESCRIPTIONS -> "prescription"
+        DocumentFolderRules.DISCHARGE -> "discharge summary"
+        else -> null
+    }
 
     fun build(question: String, documents: List<DocumentQuestionSource>): DocumentQuestionRequest {
         val asked = question.trim()
@@ -233,7 +253,10 @@ object DocumentQuestionRules {
         request.sources.keys.forEach { ref ->
             val lines = JSONArray()
             request.lines.filter { it.document == ref }.forEach { lines.put(JSONObject().put("page", it.page).put("line", it.line).put("text", it.text)) }
-            documents.put(JSONObject().put("ref", ref).put("lines", lines))
+            val document = JSONObject().put("ref", ref)
+            // The folder the phone sorted it into (or the person chose). Not part of sourceHash; file names still stay on the phone.
+            kindName(request.sources.getValue(ref).kind)?.let { document.put("kind", it) }
+            documents.put(document.put("lines", lines))
         }
         return base.put("question", request.question).put("sourceHash", request.sourceHash).put("documents", documents)
     }

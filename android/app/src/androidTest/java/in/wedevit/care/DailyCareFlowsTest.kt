@@ -50,6 +50,14 @@ class DailyCareFlowsTest {
         ui.onNodeWithTag("today-list").performScrollToNode(hasTestTag(tag))
         ui.onNodeWithTag(tag).performClick()
     }
+    /** The Care team page left the patient's Today (2 Nov redesign). A family member reaches it from the Goals of care card: Talk, then "Ask for a conversation". */
+    private fun openCareTeam() {
+        ui.onNodeWithTag("nav-Today").performClick()
+        ui.onNodeWithTag("today-list").performScrollToNode(hasTestTag("today-goals-of-care"))
+        ui.onNodeWithTag("today-goals-of-care").performClick()
+        ui.onNodeWithText("Ask for a conversation").performScrollTo().performClick()
+        ui.onNodeWithTag("workflow-list").assertIsDisplayed()
+    }
     private fun enter(label: String, text: String) {
         val field = ui.onNode(hasSetTextAction() and hasText(label))
         if (label != "Your name") field.performScrollTo()
@@ -73,7 +81,7 @@ class DailyCareFlowsTest {
     }
 
     @Test fun familyRequestAppearsInDoctorQueueAndCanOpenConversation() {
-        openShortcut("shortcut-workflows")
+        openCareTeam()
         ui.onNodeWithText("Ask to talk").performClick()
         enter("What would you like to discuss?", "Comfort at home")
         enter("Doctor or care team", "Dr Test")
@@ -100,7 +108,7 @@ class DailyCareFlowsTest {
     }
 
     @Test fun namedTaskAcceptanceCompletionAndSenderStatusSurviveReload() {
-        openShortcut("shortcut-workflows")
+        openCareTeam()
         ui.onNodeWithText("Add task", useUnmergedTree = true).performClick()
         enter("What needs doing?", "Collect the clinic report")
         enter("Who is this for?", "Ayesha")
@@ -117,7 +125,7 @@ class DailyCareFlowsTest {
         ui.onNodeWithText("Include finished").performClick()
         ui.onNodeWithText("Completed · For Ayesha").assertIsDisplayed()
         screenshot("care-task-completed")
-        recreate(); openShortcut("shortcut-workflows")
+        recreate(); openCareTeam()
         ui.onNodeWithText("Completed · For Ayesha").assertIsDisplayed()
         val result = runBlocking { CareDatabase.get(ui.activity).care().item(item.id) }!!
         val data = CareEntryCodec.decode(result.detail)!!

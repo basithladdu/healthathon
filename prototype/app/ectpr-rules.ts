@@ -18,25 +18,31 @@ export const ADULT_AGE_YEARS = 18;
 export const NO_PREFERENCE_LABEL = 'No preference recorded';
 export const STANDARD_CARE_LABEL = 'No preference recorded — give standard care';
 
-/** V9 / Sahaara §16: care that always continues, whatever else is recorded. Printed on every record; not editable. */
+/** V9 / Sahaara v1.0 §16 "What will always be provided, whatever else is limited", in the spec's words. Printed on every record; not editable. */
 export const ALWAYS_PROVIDED_CARE: readonly string[] = [
-  'Mouth care and lip care, to keep the mouth moist and clean.',
-  'Food and drink by mouth, given by hand for comfort, as much as the person wants and can safely swallow.',
-  'Relief of pain, breathlessness and other distressing symptoms, at any time of day or night.',
-  'Washing, hygiene, skin care and pressure-area care.',
-  'Turning and positioning for comfort.',
-  'Family and loved ones may stay with the person.',
-  'Spiritual, emotional and psychological support for the person and family.',
-  'Dignity, privacy and kindness in all care.',
+  'Relief of pain, using opioids in adequate doses, by whatever route works',
+  'Relief of breathlessness — opioid, anxiolytic, fan, positioning, oxygen if it helps',
+  'Sedation for distress that cannot be relieved any other way',
+  'Control of nausea, secretions, agitation, itch, hiccups',
+  'Mouth care and eye care, given often',
+  'Comfortable positioning; turning as tolerated; air mattress to prevent pressure sores',
+  'Skin and wound care; management of odour',
+  'Bowel care — assessment and management of constipation',
+  'Bladder care — assessment and management of retention and incontinence',
+  'Privacy, dignity, and gentle handling in every personal-care task',
+  'Presence of family; spiritual and religious support as the patient wishes',
+  'Honest, unhurried communication with the patient and the family, every day',
 ];
 
-/** Sahaara §1 "If in doubt, resuscitate": give full standard emergency care when any of these is true. */
+/** Sahaara v1.0 §1 "If in doubt, resuscitate". Each condition starts with "If" (Sujay, WhatsApp 1 Nov); IF_IN_DOUBT_ACTION follows them. */
 export const IF_IN_DOUBT_RESUSCITATE: readonly string[] = [
-  'The record is unsigned, out of date, or cannot be found.',
-  'The problem is new, reversible and not caused by the main illness — for example injury, choking, a drug reaction or low blood sugar.',
-  'The patient can decide for themselves and now says something different.',
-  'The record is unclear.',
+  'If the record is unsigned, out of date or cannot be found.',
+  'If the problem is new, reversible and unrelated to the illness (injury, choking, drug reaction, low sugar).',
+  'If the patient has capacity and says something different now. What they say now always overrides this record.',
+  'If the record is ambiguous.',
 ];
+/** What to do when any IF_IN_DOUBT_RESUSCITATE line is true. */
+export const IF_IN_DOUBT_ACTION = 'Then resuscitate and give full standard emergency care. Clarify with the treating team afterwards.';
 
 /** Listed reasons for hospital transfer (clinical spec §3, Sahaara §7). */
 export const TRANSFER_REASON_LABELS = {
@@ -211,7 +217,7 @@ export type ReviewTrigger = 'NEW_ADMISSION' | 'TRANSFER_BETWEEN_SETTINGS' | 'SIG
 
 export const reviewTriggers: readonly { id: ReviewTrigger; label: string }[] = [
   { id: 'NEW_ADMISSION', label: 'Any new admission to hospital' },
-  { id: 'TRANSFER_BETWEEN_SETTINGS', label: 'Move between settings (home, hospice, ward, another hospital)' },
+  { id: 'TRANSFER_BETWEEN_SETTINGS', label: 'Move between settings (home, hospital, hospice, care home)' },
   { id: 'SIGNIFICANT_CHANGE', label: 'A big change in condition, better or worse' },
   { id: 'PATIENT_OR_FAMILY_REQUEST', label: 'The patient or family asks for a review' },
   { id: 'NEW_LINE_OF_TREATMENT', label: 'A new line of treatment is started' },

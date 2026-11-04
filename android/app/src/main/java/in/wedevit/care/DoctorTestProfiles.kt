@@ -17,7 +17,9 @@ internal object DoctorTestProfiles {
     data class Profile(val key: String, val name: String, val family: String)
     val profiles = listOf(Profile("rahul", "Rahul", "Meera · sister / Kavya · partner / Arjun · brother"), Profile("arjun", "Arjun", "Nisha · mother / Dev · brother"))
     private const val DAY=86_400_000L
-    private val RAHUL_PROFILE=CarePatientProfile(58,"Male",62.0,170,"B+","Carcinoma stomach, stage IV","","","Hyderabad")
+    // Sample weights (test profile only) ending at the current 62 kg, so the profile card shows a trend.
+    private val RAHUL_PROFILE=CarePatientProfile(58,"Male",62.0,170,"B+","Carcinoma stomach, stage IV","","","Hyderabad",
+        weights=listOf(CareWeightEntry(java.time.LocalDate.of(2026,9,1),65.0),CareWeightEntry(java.time.LocalDate.of(2026,10,1),63.5),CareWeightEntry(java.time.LocalDate.of(2026,11,1),62.0)))
     fun id(key:String)=UUID.nameUUIDFromBytes("sahara-test-workspace-v2/$key".toByteArray(Charsets.UTF_8)).toString()
     fun personId(profile:Profile)=id("${profile.key}/person")
     fun contains(person:String)=profiles.any {personId(it)==person}
@@ -119,9 +121,9 @@ internal object DoctorTestProfiles {
           val prefs=context.getSharedPreferences("doctor-test-profiles-${vm.storageNamespace}",Context.MODE_PRIVATE)
           vm.seedDoctorDemo {dao->
             if(!needsSeed(profile,dao.people().first().map {it.id}.toSet(),prefs.getBoolean("complete-${profile.key}",false))) {
-                // Records seeded before the profile existed get it added once; an early seed with a sample allergy is replaced.
+                // Records seeded before the profile existed get it added once; an early seed with a sample allergy, or one without the sample weights, is replaced.
                 val old=dao.item(id("rahul/profile"))
-                if(profile.key=="rahul"&&dao.people().first().any {it.id==personId(profile)}&&(old==null||PatientProfileCodec.decode(old.detail)?.allergies=="Penicillin (rash)"))
+                if(profile.key=="rahul"&&dao.people().first().any {it.id==personId(profile)}&&(old==null||PatientProfileCodec.decode(old.detail)?.let {it.allergies=="Penicillin (rash)"||it.weights.isEmpty()}==true))
                     dao.saveItem(PatientProfileCodec.item(personId(profile),RAHUL_PROFILE,old?.created?:System.currentTimeMillis(),id("rahul/profile")))
                 return@seedDoctorDemo
             }

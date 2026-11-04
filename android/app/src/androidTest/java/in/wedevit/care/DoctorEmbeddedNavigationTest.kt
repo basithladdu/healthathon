@@ -49,14 +49,14 @@ class DoctorEmbeddedNavigationTest {
             }
         }
         ui.onNodeWithText("Test Person's care").assertExists()
-        listOf("Summary", "Progress", "Medicines", "Conversations", "Visits", "Reports").forEach {
+        listOf("Progress", "Labs", "Conversations", "Visits", "Medicines", "Reports").forEach {
             ui.onNodeWithTag("doctor-shared-$it").performScrollTo().assertIsDisplayed().assertHeightIsAtLeast(48.dp).performClick()
         }
         ui.onNodeWithTag("doctor-shared-patient-hub").performScrollToNode(hasTestTag("doctor-shared-tools"))
         ui.onNodeWithTag("doctor-shared-tools").assertIsDisplayed().performSemanticsAction(SemanticsActions.OnClick) { it() }
         ui.onNodeWithTag("doctor-shared-patient-hub").performScrollToNode(hasText("Sharing, access & clinical review"))
         ui.onNodeWithText("Sharing, access & clinical review").performClick()
-        assertEquals(listOf("Summary", "Progress", "Medicines", "Conversations", "Visits", "Reports", "Tools", "Shared"), opened)
+        assertEquals(listOf("Progress", "Labs", "Conversations", "Visits", "Medicines", "Reports", "Tools", "Shared"), opened)
         listOf("Today", "Talk", "Care", "Nearby", "More").forEach { ui.onNodeWithText(it).assertDoesNotExist() }
     }
 

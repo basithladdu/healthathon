@@ -121,7 +121,7 @@ internal fun planStepOf(field: String): Int = when {
         "wizard" -> {
             val draft = EctprLifecycle.draft(state.ectprs, selected)
             if (draft == null) { LaunchedEffect(Unit) { page = "home" }; return }
-            CompositionLocalProvider(LocalGocFolder provides runCatching { store.folder(selected) }.getOrNull()) { EctprWizard(draft, clinician, canEdit,
+            CompositionLocalProvider(LocalGocFolder provides runCatching { store.folder(selected) }.getOrNull()) { EctprWizard(draft, clinician, canEdit, familyReadOnly = actor == "Family" && !clinician, personName = person.name,
                 onSave = { r -> commit { CarePlanBook.saveDraft(it, r, actor, planNow(), today) } },
                 onSign = { r -> commit { CarePlanBook.sign(CarePlanBook.saveDraft(it, r, actor, planNow(), today), r.id, actor, planNow(), today) }.also { ok -> if (ok) page = "ed" } },
                 onClose = { page = "home" }) }
@@ -153,10 +153,9 @@ internal fun planStepOf(field: String): Int = when {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.Warning, null, tint = Color.White); Spacer(Modifier.width(8.dp)); Text(IfInDoubt.TITLE.pick(hindi), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp) }
             if (!compact) {
-                Text(IfInDoubt.LEAD.pick(hindi), color = Color.White)
                 IfInDoubt.CONDITIONS.forEach { Text("• " + it.pick(hindi), color = Color.White, style = MaterialTheme.typography.bodyMedium) }
                 Text(IfInDoubt.AFTER.pick(hindi), color = Color.White, fontWeight = FontWeight.SemiBold)
-            } else Text(IfInDoubt.CONDITIONS.joinToString(" ") { it.pick(hindi) }, color = Color.White, style = MaterialTheme.typography.bodySmall)
+            } else Text((IfInDoubt.CONDITIONS + IfInDoubt.AFTER).joinToString(" ") { it.pick(hindi) }, color = Color.White, style = MaterialTheme.typography.bodySmall)
         }
     }
 }
@@ -323,7 +322,7 @@ internal fun planStepOf(field: String): Int = when {
 
 // ───────────────────────────── Wizard ─────────────────────────────
 
-@Composable private fun EctprWizard(record: EctprRecord, clinician: Boolean, canEdit: Boolean, onSave: (EctprRecord) -> Boolean, onSign: (EctprRecord) -> Unit, onClose: () -> Unit) {
+@Composable private fun EctprWizard(record: EctprRecord, clinician: Boolean, canEdit: Boolean, familyReadOnly: Boolean = false, personName: String = "", onSave: (EctprRecord) -> Boolean, onSign: (EctprRecord) -> Unit, onClose: () -> Unit) {
     val t = careText(); val hindi = careHindi(); val today = LocalDate.now()
     var d by remember(record.id) { mutableStateOf(record) }
     var step by rememberSaveable(record.id) { mutableIntStateOf(0) }
@@ -362,7 +361,7 @@ internal fun planStepOf(field: String): Int = when {
                 1 -> decisionMakerStep(d, ::update)
                 2 -> capacityStep(d, ::update)
                 3 -> understandingStep(d, ::update)
-                4 -> valuesStep(d, ::update)
+                4 -> valuesStep(d, ::update, familyReadOnly, personName)
                 5 -> treatmentStep(d, today, ::update, ::choices)
                 6 -> withdrawalStep(d, today, ::update)
                 7 -> reviewStep(d, today, ::update)
@@ -526,15 +525,25 @@ private fun LazyListScope.understandingStep(d: EctprRecord, update: ((EctprRecor
     }
 }
 
-private fun LazyListScope.valuesStep(d: EctprRecord, update: ((EctprRecord) -> EctprRecord) -> Unit) { item { ValuesFields(d, update) } }
+private fun LazyListScope.valuesStep(d: EctprRecord, update: ((EctprRecord) -> EctprRecord) -> Unit, readOnly: Boolean, personName: String) { item { ValuesFields(d, update, readOnly, personName) } }
 
-@Composable private fun ValuesFields(d: EctprRecord, update: ((EctprRecord) -> EctprRecord) -> Unit) { val t = careText()
+/** [readOnly]: family members see the patient's own words but cannot change them. */
+@Composable private fun ValuesFields(d: EctprRecord, update: ((EctprRecord) -> EctprRecord) -> Unit, readOnly: Boolean = false, personName: String = "") { val t = careText()
     fun v(change: (PlanValues) -> PlanValues) = update { it.copy(values = change(it.values)) }
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         OptionGroup(t("Does the patient know about the illness?", "क्या मरीज़ को बीमारी के बारे में पता है?"), d.values.patientKnows, listOf(true, false), { if (it) Bi("Yes", "हाँ") else Bi("No", "नहीं") }, tag = "patient-knows") { x -> v { it.copy(patientKnows = x) } }
         OptionGroup(t("When was this recorded?", "यह कब दर्ज किया गया?"), d.values.knowsRecordedWhen, KnowsRecordedWhen.entries, PlanText::knowsRecordedWhen, tag = "knows-when", noneLabel = NOT_RECORDED) { x -> v { it.copy(knowsRecordedWhen = x) } }
-        CareField(d.values.ownWords, { x -> v { it.copy(ownWords = x) } }, t("What matters most, in the patient's own words", "सबसे ज़रूरी क्या है, मरीज़ के अपने शब्दों में"), minLines = 3)
-        CareField(d.values.unacceptableOutcomes.joinToString("\n"), { x -> v { it.copy(unacceptableOutcomes = x.lines()) } }, t("Outcomes the patient would not accept (one per line)", "जो हालात मरीज़ को मंज़ूर नहीं (हर लाइन में एक)"), minLines = 2)
+        if (readOnly) {
+            val person = object { val name = personName }
+            Text(t("What matters most, in the patient's own words", "सबसे ज़रूरी क्या है, मरीज़ के अपने शब्दों में"), fontWeight = FontWeight.SemiBold)
+            Text(d.values.ownWords.ifBlank { "—" }, modifier = Modifier.testTag("values-own-words-read-only"))
+            Text(t("Outcomes the patient would not accept (one per line)", "जो हालात मरीज़ को मंज़ूर नहीं (हर लाइन में एक)"), fontWeight = FontWeight.SemiBold)
+            Text(d.values.unacceptableOutcomes.filter(String::isNotBlank).joinToString("\n").ifBlank { "—" })
+            Text(t("Only ${person.name} can change this.", "इसे सिर्फ़ ${person.name} बदल सकते हैं।"), style = MaterialTheme.typography.bodyMedium, color = DoctorCardSub, modifier = Modifier.testTag("values-family-read-only"))
+        } else {
+            CareField(d.values.ownWords, { x -> v { it.copy(ownWords = x) } }, t("What matters most, in the patient's own words", "सबसे ज़रूरी क्या है, मरीज़ के अपने शब्दों में"), minLines = 3)
+            CareField(d.values.unacceptableOutcomes.joinToString("\n"), { x -> v { it.copy(unacceptableOutcomes = x.lines()) } }, t("Outcomes the patient would not accept (one per line)", "जो हालात मरीज़ को मंज़ूर नहीं (हर लाइन में एक)"), minLines = 2)
+        }
         CheckLine(d.values.familyAskedNotToTell, { x -> v { it.copy(familyAskedNotToTell = x) } }, t("The family asked that the patient not be told", "परिवार ने कहा है कि मरीज़ को न बताया जाए"))
         if (d.values.familyAskedNotToTell) CareField(d.values.directQuestionPlan, { x -> v { it.copy(directQuestionPlan = x) } }, t("Plan if the patient asks directly", "अगर मरीज़ सीधे पूछें तो क्या करेंगे"), minLines = 2,
             supporting = t("A patient with capacity who asks must be answered honestly.", "निर्णय ले सकने वाले मरीज़ पूछें, तो सच बताना ज़रूरी है।"))

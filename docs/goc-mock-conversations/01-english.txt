@@ -1,0 +1,31 @@
+# FICTIONAL. A made-up goals-of-care conversation for testing Sahara. No real patient, family or doctor. Not medical advice.
+# Language: English. Patient: Lakshmi (fictional), 64, with her daughter Priya (fictional).
+Doctor: Good morning. Before we start, is everyone okay with us recording this conversation so that I can write it down correctly?
+Patient: Yes, that is fine.
+Daughter: Yes, we agree to the recording.
+Doctor: Thank you. Can you tell me your full name and how old you are?
+Patient: I am Lakshmi, I am 64 years old.
+Doctor: And who should we call in an emergency? Please give me a phone number.
+Daughter: Call me, Priya. My phone number is the one on the file. I will also speak for her if she cannot.
+Doctor: Thank you. Let me ask about some treatments, if your heart or breathing were to stop.
+Doctor: If your heart stops, would you want CPR, where we press on the chest to try to restart it?
+Patient: No. I do not want CPR.
+Doctor: If your kidneys fail, would you want dialysis?
+Patient: No dialysis. I have seen what it does.
+Doctor: What about a breathing machine, a ventilator?
+Patient: I do not want a ventilator.
+Doctor: Is oxygen through the nose acceptable?
+Patient: Oxygen is okay.
+Doctor: Would you want to go to the ICU if you become very unwell?
+Patient: Maybe for a few days, as a trial, if it can help.
+Doctor: What about a feeding tube if you cannot swallow?
+Patient: No feeding tube.
+Doctor: Should we take you to hospital if things get worse at home?
+Patient: Take me to hospital only for pain or breathlessness that you cannot control at home.
+Doctor: What matters most to you now?
+Patient: What matters most is being at home with my grandchildren.
+Patient: I would not want to live on machines.
+Doctor: Overall, what is the goal for your care?
+Patient: Keep me comfortable. Comfort care only.
+Doctor: Do you understand that this illness cannot be cured?
+Patient: Yes, I know the cancer cannot be cured.

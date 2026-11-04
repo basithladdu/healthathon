@@ -10,7 +10,8 @@ export type GocDecisionField =
   | 'goalOfCare' | 'cpr' | 'hospitalTransfer' | 'ambulance' | 'respCeiling' | 'icu' | 'vasopressors' | 'dialysis' | 'ng' | 'peg' | 'hydration'
   | 'patientKnows' | 'familyAskedNotToTell';
 export type GocSpeaker = 'DOCTOR' | 'PATIENT_PARTY' | null;
-export type GocLine = { text: string; speaker: GocSpeaker };
+/** [who]: the label typed before the line ("Son:", "Patient:"), lower case, so "latest statement wins" never lets one person overrule another. */
+export type GocLine = { text: string; speaker: GocSpeaker; who?: string };
 export type GocSuggestion = {
   field: GocDecisionField;
   /** Options the words fit. One = the suggested option. Several = "said yes", and the doctor picks which. Empty = only ruled something out. */
@@ -20,6 +21,10 @@ export type GocSuggestion = {
   /** Copied exactly from the transcript. */
   quote: string;
   source: 'phrases' | 'ai';
+  /** Where in the transcript the deciding words are (a character offset), so a later statement can be told from an earlier one. */
+  at: number;
+  /** Who said it, from the typed label; '' when not known. */
+  who: string;
   reasons?: TransferReason[];
   maxAgents?: number;
 };
@@ -27,6 +32,7 @@ export type GocQuote = { quote: string };
 export type GocHomeCareHint = { field: 'assessmentFrequency' | 'coordinator' | 'ngoContact' | 'previousAdmission'; quote: string };
 export type GocPersonHint = { relation: string; name: string; quote: string };
 export type GocTopicId =
+  | 'consent' | 'patientDetails'
   | 'icu' | 'respCeiling' | 'dialysis' | 'vasopressors' | 'ng' | 'peg' | 'hydration' | 'cpr' | 'hospitalTransfer' | 'ambulance' | 'goalOfCare'
   | 'understanding' | 'patientKnows' | 'familyAskedNotToTell' | 'values' | 'decisionMakers' | 'homeCare';
 export type GocTopicCoverage = { topic: GocTopicId; discussed: boolean; quote: string };
@@ -34,9 +40,13 @@ export type GocExtraction = {
   suggestions: GocSuggestion[]; ownWords: GocQuote[]; unacceptableOutcomes: GocQuote[]; homeCare: GocHomeCareHint[]; decisionMakers: GocPersonHint[]; topics: GocTopicCoverage[];
 };
 
-/** The checklist order. It follows how the palliative team asked doctors to be prompted: ICU, ventilator, dialysis, then on through the form. */
-export const GOC_TOPIC_ORDER: readonly GocTopicId[] = ['icu', 'respCeiling', 'dialysis', 'vasopressors', 'ng', 'peg', 'hydration', 'cpr', 'hospitalTransfer', 'ambulance', 'goalOfCare', 'understanding', 'patientKnows', 'familyAskedNotToTell', 'values', 'decisionMakers', 'homeCare'];
-export const GOC_DECISION_FIELDS: readonly GocDecisionField[] = ['icu', 'respCeiling', 'dialysis', 'vasopressors', 'ng', 'peg', 'hydration', 'cpr', 'hospitalTransfer', 'ambulance', 'goalOfCare', 'patientKnows', 'familyAskedNotToTell'];
+/**
+ * The guide checklist, in the order the doctors asked for on 3 Nov 2026: "first one is consent, second one is patient details, third one is
+ * family details, emergency contact, and fourth is CPR, dialysis and all that". Then the rest of the form: Section II, then home care.
+ * 'decisionMakers' is the family details, decision-makers and emergency contact row.
+ */
+export const GOC_TOPIC_ORDER: readonly GocTopicId[] = ['consent', 'patientDetails', 'decisionMakers', 'cpr', 'dialysis', 'respCeiling', 'icu', 'vasopressors', 'ng', 'peg', 'hydration', 'hospitalTransfer', 'ambulance', 'goalOfCare', 'understanding', 'patientKnows', 'familyAskedNotToTell', 'values', 'homeCare'];
+export const GOC_DECISION_FIELDS: readonly GocDecisionField[] = ['cpr', 'dialysis', 'respCeiling', 'icu', 'vasopressors', 'ng', 'peg', 'hydration', 'hospitalTransfer', 'ambulance', 'goalOfCare', 'patientKnows', 'familyAskedNotToTell'];
 
 // ---------------------------------------------------------------------------
 // Regular expression helpers. Latin words need whole-word matches. Indian-script terms take suffixes ("వెంటిలేటర్‌ను"), so only the left edge is checked.
@@ -72,7 +82,7 @@ const NO_AFTER_WORD = /(?<![\p{L}\p{M}\p{N}])no(?=\s*(?:[,.;!।]|$))/iu;
 const YES_EN = new RegExp(words(['wants?(?: to(?: have| go| be| try| do)?)?', 'wishe?s?(?: to(?: have)?)?', "(?:'d|would) like(?: to(?: have| try)?)?", 'agrees?(?: to)?', 'agreed(?: to)?', 'accepts?', 'accepted', 'okay with', 'ok with', 'fine with', 'happy with', 'yes(?: to)?', 'please (?:do|give|start|put|try)', 'go ahead(?: with)?', 'prefers?', 'keen on']), 'iu');
 const YES_VERB = new RegExp(words(['continue', 'give', 'start', 'do', 'take', 'bring', 'shift']), 'iu');
 const YES_AFTER = new RegExp(words(['is (?:ok|okay|fine|acceptable|alright)', 'are (?:ok|okay|fine|acceptable)', 'ok', 'okay', 'yes', 'please']), 'iu');
-const NO_HI = rx([], ['मत(?![\\p{L}\\p{M}])(?:\\s+\\S+){0,2}', 'न ले(?:\\s+\\S+)?', 'नहीं चाहिए', 'नहीं चाहते', 'नहीं चाहती', 'नहीं चाहता', 'नहीं करना', 'नहीं करवाना', 'नहीं करवानी', 'नहीं डालना', 'नहीं लगाना', 'नहीं देना', 'नहीं लेना', 'नहीं जाना', 'नहीं ले जाना', 'नहीं रखना', 'मत करना', 'मत करो', 'मत करें', 'मत डालना', 'मत लगाना', 'मत देना', 'मत ले जाना', 'न करें', 'न करना', 'न डालें', 'न लगाएँ', 'न लगाएं', 'न दें', 'न ले जाएँ', 'न ले जाएं', 'मना', 'इनकार', 'इंकार', 'बिना', 'nahi chahiye', 'nahin chahiye', 'nahi chahte', 'nahi chahta', 'nahi chahti', 'mat karna', 'mat karo', 'mat lagana', 'nahi karna', 'nahi karwana', 'nahi lagana', 'nahi jana', 'nahi dena', 'nahi lena', 'na karein', 'vaddu', 'oddu', 'beda', 'bedaa']);
+const NO_HI = rx([], ['मत(?![\\p{L}\\p{M}])(?:\\s+\\S+){0,2}', 'न ले(?:\\s+\\S+)?', 'नहीं चाहिए', 'नहीं चाहते', 'नहीं चाहती', 'नहीं चाहता', 'नहीं करना', 'नहीं करवाना', 'नहीं करवानी', 'नहीं डालना', 'नहीं लगाना', 'नहीं देना', 'नहीं लेना', 'नहीं जाना', 'नहीं ले जाना', 'नहीं रखना', 'मत करना', 'मत करो', 'मत करें', 'मत डालना', 'मत लगाना', 'मत देना', 'मत ले जाना', 'न करें', 'न करना', 'न डालें', 'न लगाएँ', 'न लगाएं', 'न दें', 'न ले जाएँ', 'न ले जाएं', 'मना', 'इनकार', 'इंकार', 'बिना', 'nahi chahiye', 'nahin chahiye', 'nahi chahte', 'nahi chahta', 'nahi chahti', 'mat karna', 'mat karo', 'mat lagana', 'nahi karna', 'nahi karwana', 'nahi lagana', 'nahi jana', 'nahi dena', 'nahi lena', 'na karein', 'nahi?n? chah\\w*', 'na ?hi chah\\w*', 'nahi?n? kar\\w*', 'mat (?:lag|kar|dal|de)\\w*', 'vaddu', 'oddu', 'beda', 'bedaa']);
 const NO_HI_END = /(?:नहीं|nahi|nahin)\s*$/iu;
 const YES_HI = rx([], ['चाहिए', 'चाहते हैं', 'चाहती हैं', 'चाहता हूँ', 'चाहती हूँ', 'चाहेंगे', 'करवाना है', 'करना है', 'कर दीजिए', 'कीजिए', 'करें', 'लगाइए', 'लगा दीजिए', 'ठीक है', 'मंज़ूर', 'मंजूर', 'हाँ', 'हां', 'ले जाइए', 'ले जाएँ', 'ले जाएं', 'जाना है', 'chahiye', 'chahte hain', 'chahti hain', 'karna hai', 'karwana hai', 'theek hai', 'thik hai', 'kavali', 'kaavali', 'beku']);
 const NO_UR = rx([], ['مت(?![\\p{L}\\p{M}])(?:\\s+\\S+){0,2}', 'نہ لے(?:\\s+\\S+)?', 'نہیں چاہیے', 'نہیں چاہتے', 'نہیں چاہتی', 'نہیں چاہتا', 'نہیں کرنا', 'نہیں کروانا', 'نہیں لگانا', 'نہیں ڈالنا', 'نہیں لینا', 'نہیں جانا', 'نہیں لے جانا', 'مت کرنا', 'مت کریں', 'مت لگانا', 'نہ کریں', 'نہ لگائیں', 'نہ ڈالیں', 'نہ لے جائیں', 'منع', 'انکار', 'بغیر']);
@@ -164,6 +174,15 @@ const T_NGO = rx(['ngo', 'n\\.g\\.o\\.?'], ['एनजीओ', 'این جی او
 const T_COORDINATOR = rx(['coordinator'], ['समन्वयक', 'कोऑर्डिनेटर', 'کوآرڈینیٹر', 'కోఆర్డినేటర్', 'ಸಂಯೋಜಕ']);
 const T_PREV_ADMIT = rx(['admitted before', 'admitted earlier', 'admitted last', 'previous admission', 'was admitted', 'been admitted', 'hospitali[sz]ed before'], ['पहले भर्ती', 'پہلے داخل', 'ఇంతకు ముందు చేర్చ', 'ముందు అడ్మిట్', 'ಹಿಂದೆ ದಾಖಲ']);
 
+// Guide rows that are not decisions: they only tick when the talk covers them. Machine-written for hi, ur, te, kn [needs native-speaker review].
+const T_CONSENT = rx(['consent', 'agree(?:s|d)? to (?:this|the|us) (?:recording|recorded|conversation|talk)', 'okay to record', 'ok to record', 'fine to record', 'record (?:this|the|our) (?:conversation|talk)', 'recording (?:this|the) (?:conversation|talk)', 'permission to record', 'sahmati', 'ijazat', 'record kar\\w*'],
+  ['सहमति', 'सहमत हैं', 'इजाज़त', 'इजाजत', 'रिकॉर्ड कर', 'रिकॉर्डिंग', 'رضامندی', 'اجازت', 'ریکارڈ', 'అనుమతి', 'సమ్మతి', 'రికార్డ్', 'ಒಪ್ಪಿಗೆ', 'ಅನುಮತಿ', 'ರೆಕಾರ್ಡ್']);
+const T_PATIENT_DETAILS = rx(["(?:your|his|her|the patient's|full) name", 'how old', 'age', 'years old', 'date of birth', 'address', 'where do you live', 'where does (?:he|she) live', 'uhid', 'naam', 'umar', 'umr', 'kitne saal'],
+  ['आपका नाम', 'उनका नाम', 'पूरा नाम', 'उम्र', 'आयु', 'साल के', 'साल की', 'कहाँ रहते', 'घर का पता', 'آپ کا نام', 'ان کا نام', 'پورا نام', 'عمر', 'سال کے', 'سال کی', 'کہاں رہتے', 'گھر کا پتہ', 'పేరు', 'వయస్సు', 'వయసు', 'చిరునామా', 'ಹೆಸರು', 'ವಯಸ್ಸು', 'ವಿಳಾಸ']);
+const T_FAMILY_CONTACT = rx(['emergency contact', 'in an emergency', 'who should we call', 'whom (?:should|do) we call', 'who do we call', 'phone number', 'mobile number', 'contact number', 'reachable', 'next of kin', 'family members?', 'kisko phone', 'kise phone'],
+  ['आपातकाल', 'इमरजेंसी', 'किसे फ़ोन', 'किसको फ़ोन', 'किसे फोन', 'किसको फोन', 'फ़ोन नंबर', 'फोन नंबर', 'मोबाइल नंबर', 'परिवार के सदस्य', 'ایمرجنسی', 'کسے فون', 'کس کو فون', 'فون نمبر', 'خاندان کے افراد', 'ఎమర్జెన్సీ', 'అత్యవసర', 'ఎవరికి ఫోన్', 'ఫోన్ నంబర్', 'కుటుంబ సభ్యులు', 'ಎಮರ್ಜೆನ್ಸಿ', 'ತುರ್ತು', 'ಯಾರಿಗೆ ಫೋನ್', 'ಫೋನ್ ನಂಬರ್', 'ಕುಟುಂಬದ ಸದಸ್ಯರು']);
+const T_PHONE_WORD = rx(['phone', 'mobile', 'number', 'call'], ['फ़ोन', 'फोन', 'नंबर', 'فون', 'نمبر', 'ఫోన్', 'నంబర్', 'ಫೋನ್', 'ನಂಬರ್']);
+
 const REASON_TERMS: Array<[TransferReason, RegExp]> = [
   ['PAIN', rx(['pain'], ['दर्द', 'درد', 'నొప్పి', 'ನೋವು'])],
   ['BREATHLESSNESS', rx(['breathless\\w*', 'breathing trouble'], ['साँस', 'सांस', 'سانس', 'ఆయాసం', 'ఉసిరి', 'ಉಸಿರಾಟ'])],
@@ -177,16 +196,17 @@ const REASON_TERMS: Array<[TransferReason, RegExp]> = [
 ];
 
 const TOPIC_TERMS: Record<GocTopicId, RegExp[]> = {
+  consent: [T_CONSENT], patientDetails: [T_PATIENT_DETAILS],
   icu: [T_ICU], respCeiling: [T_VENT, T_NIV, T_HFNC, T_MASK2, T_O2], dialysis: [T_DIALYSIS], vasopressors: [T_VASO], ng: [T_NG, T_FEEDTUBE], peg: [T_PEG, T_FEEDTUBE], hydration: [T_FLUIDS],
   cpr: [T_CPR, T_DNR], hospitalTransfer: [T_HOSPITAL, T_STAY_HOME], ambulance: [T_AMBULANCE], goalOfCare: [T_GOAL_LIFE, T_GOAL_LIMITS, T_GOAL_COMFORT], understanding: [T_UNDERSTANDING],
-  patientKnows: [T_ILLNESS], familyAskedNotToTell: [NOT_TO_TELL], values: [T_UNACCEPTABLE], decisionMakers: [T_DECIDE], homeCare: [T_HOME_CARE, T_NGO, T_COORDINATOR],
+  patientKnows: [T_ILLNESS], familyAskedNotToTell: [NOT_TO_TELL], values: [T_UNACCEPTABLE], decisionMakers: [T_FAMILY_CONTACT], homeCare: [T_HOME_CARE, T_NGO, T_COORDINATOR],
 };
 
 // ---------------------------------------------------------------------------
 // Lines and sentences
 
 const DOCTOR_PREFIX = /^\s*(?:doctor|dr\.?|consultant|nurse|डॉक्टर|डॉ\.?|ڈاکٹر|డాక్టర్|ಡಾಕ್ಟರ್|ವೈದ್ಯರು)\s*[:：\-–]\s*/iu;
-const PARTY_PREFIX = /^\s*(?:patient|family|son|daughter|wife|husband|relative|attender|मरीज़|मरीज|परिवार|बेटा|बेटी|पत्नी|पति|مریض|خاندان|بیٹا|بیٹی|రోగి|కుటుంబం|ರೋಗಿ|ಕುಟುಂಬ)\s*[:：\-–]\s*/iu;
+const PARTY_PREFIX = /^\s*(patient|family|son|daughter|wife|husband|mother|father|brother|sister|nephew|niece|grandson|granddaughter|daughter-in-law|son-in-law|relative|attender|caregiver|friend|मरीज़|मरीज|परिवार|बेटा|बेटी|पत्नी|पति|माँ|मां|पिता|भाई|बहन|مریض|مریضہ|خاندان|بیٹا|بیٹی|بیوی|شوہر|بھائی|بہن|ماں|والد|రోగి|కుటుంబం|కొడుకు|కూతురు|భార్య|భర్త|అన్న|తమ్ముడు|అక్క|చెల్లి|ರೋಗಿ|ಕುಟುಂಬ|ಮಗಳು|ಮಗ|ಹೆಂಡತಿ|ಗಂಡ|ಅಣ್ಣ|ಅಕ್ಕ|ತಂಗಿ)\s*[:：\-–]\s*/iu;
 
 /** Splits pasted text or a machine draft into one line per sentence. "Doctor:" or "Family:" at the start sets the side; it is never guessed. */
 export function gocLinesFromText(text: string): GocLine[] {
@@ -197,9 +217,10 @@ export function gocLinesFromText(text: string): GocLine[] {
     const body = (doctor ? raw.slice(doctor[0].length) : party ? raw.slice(party[0].length) : raw).trim();
     if (!body) continue;
     const speaker: GocSpeaker = doctor ? 'DOCTOR' : party ? 'PATIENT_PARTY' : null;
+    const who = party ? party[1].toLocaleLowerCase() : '';
     for (const [start, end] of sentenceSpans(body)) {
       const part = body.slice(start, end).trim();
-      if (part) out.push({ text: part, speaker });
+      if (part) out.push(who ? { text: part, speaker, who } : { text: part, speaker });
     }
   }
   return out;
@@ -229,7 +250,7 @@ function sentenceSpans(text: string): Array<[number, number]> {
 
 const CLAUSE_BREAK = new RegExp(`;|${words(['but', 'however', 'though', 'although', 'whereas', 'except'], ['लेकिन', 'मगर', 'किंतु', 'परंतु', 'لیکن', 'مگر', 'కానీ', 'అయితే', 'ಆದರೆ'])}`, 'giu');
 
-type Sentence = { start: number; end: number; text: string; folded: string; speaker: GocSpeaker; question: boolean };
+type Sentence = { start: number; end: number; text: string; folded: string; speaker: GocSpeaker; who: string; question: boolean };
 type Clause = { start: number; end: number; text: string; speaker: GocSpeaker };
 
 function isQuestion(text: string): boolean {
@@ -246,7 +267,7 @@ function readLines(input: string | GocLine[]): { text: string; folded: string; s
     for (const [s, e] of sentenceSpans(line.text)) {
       const body = line.text.slice(s, e);
       if (!body.trim()) continue;
-      sentences.push({ start: base + s, end: base + e, text: body, folded: fold(body), speaker: line.speaker, question: isQuestion(fold(body)) });
+      sentences.push({ start: base + s, end: base + e, text: body, folded: fold(body), speaker: line.speaker, who: line.who ?? '', question: isQuestion(fold(body)) });
     }
     text += '\n';
   }
@@ -403,7 +424,7 @@ export function extractGoc(input: string | GocLine[]): GocExtraction {
         for (const rule of hits) {
           if (seen.has(rule.field)) continue;
           seen.add(rule.field);
-          suggestions.push({ field: rule.field, source: 'phrases', quote: quoteOf(asked.start, sentence.end), ...rule.decide(polarity, asked.folded) });
+          suggestions.push({ field: rule.field, source: 'phrases', at: sentence.start, who: sentence.who, quote: quoteOf(asked.start, sentence.end), ...rule.decide(polarity, asked.folded) });
         }
       }
       return;
@@ -417,7 +438,7 @@ export function extractGoc(input: string | GocLine[]): GocExtraction {
       for (const rule of DIRECT) {
         if (!rule.term.test(body)) continue;
         const refused = rule.field === 'goalOfCare' && polarityNear(body, allMatches(rule.term, body)[0]) === 'no' && !T_GOAL_COMFORT.test(body);
-        if (!refused) suggestions.push({ field: rule.field, values: rule.values, ruledOut: [], quote, source: 'phrases' });
+        if (!refused) suggestions.push({ field: rule.field, values: rule.values, ruledOut: [], quote, source: 'phrases', at: clause.start, who: sentence.who });
       }
       if (T_NO_CPR_PHRASE.test(body)) continue;
       if (STOPPING.test(body)) continue;
@@ -428,16 +449,16 @@ export function extractGoc(input: string | GocLine[]): GocExtraction {
           const trial = TRIAL.test(body) && ['icu', 'vasopressors', 'dialysis', 'ng'].includes(rule.field);
           const implied = trial || (rule.field === 'dialysis' && reversibleCondition(body)) || (rule.field === 'hospitalTransfer' && onlyForReason(body));
           const polarity = polarityNear(body, term) ?? (implied ? 'yes' : null);
-          if (polarity) { suggestions.push({ field: rule.field, source: 'phrases', quote, ...rule.decide(polarity, body) }); break; }
+          if (polarity) { suggestions.push({ field: rule.field, source: 'phrases', at: clause.start, who: sentence.who, quote, ...rule.decide(polarity, body) }); break; }
         }
       }
     }
 
     if (T_ILLNESS.test(clean)) {
-      if (KNOWS_NO.test(clean)) suggestions.push({ field: 'patientKnows', values: ['no'], ruledOut: [], quote, source: 'phrases' });
-      else if (KNOWS_YES.test(clean)) suggestions.push({ field: 'patientKnows', values: ['yes'], ruledOut: [], quote, source: 'phrases' });
+      if (KNOWS_NO.test(clean)) suggestions.push({ field: 'patientKnows', values: ['no'], ruledOut: [], quote, source: 'phrases', at: sentence.start, who: sentence.who });
+      else if (KNOWS_YES.test(clean)) suggestions.push({ field: 'patientKnows', values: ['yes'], ruledOut: [], quote, source: 'phrases', at: sentence.start, who: sentence.who });
     }
-    if (NOT_TO_TELL.test(clean)) suggestions.push({ field: 'familyAskedNotToTell', values: ['yes'], ruledOut: [], quote, source: 'phrases' });
+    if (NOT_TO_TELL.test(clean)) suggestions.push({ field: 'familyAskedNotToTell', values: ['yes'], ruledOut: [], quote, source: 'phrases', at: sentence.start, who: sentence.who });
     if (T_UNACCEPTABLE.test(clean)) unacceptableOutcomes.push({ quote });
     if (((T_FIRST_PERSON.test(clean) && T_WISH.test(clean)) || T_MATTERS.test(clean)) && !/not important/i.test(clean) && quote.length >= 12) ownWords.push({ quote });
 
@@ -457,7 +478,7 @@ export function extractGoc(input: string | GocLine[]): GocExtraction {
 
   // Topics: any mention, on either side, ticks the box. Ticking says the talk covered it, never what was chosen.
   const topics: GocTopicCoverage[] = GOC_TOPIC_ORDER.map((topic) => {
-    const hit = sentences.find((s) => TOPIC_TERMS[topic].some((re) => re.test(s.folded)) || (topic === 'values' && T_FIRST_PERSON.test(s.folded) && T_WISH.test(s.folded) && s.speaker !== 'DOCTOR') || (topic === 'decisionMakers' && T_RELATION.test(s.folded) && T_DECIDE.test(s.folded)));
+    const hit = sentences.find((s) => TOPIC_TERMS[topic].some((re) => re.test(s.folded)) || (topic === 'values' && T_FIRST_PERSON.test(s.folded) && T_WISH.test(s.folded) && s.speaker !== 'DOCTOR') || (topic === 'decisionMakers' && T_RELATION.test(s.folded) && (T_DECIDE.test(s.folded) || T_PHONE_WORD.test(s.folded))));
     return { topic, discussed: Boolean(hit), quote: hit ? quoteOf(hit.start, hit.end) : '' };
   });
 
@@ -469,6 +490,11 @@ export function extractGoc(input: string | GocLine[]): GocExtraction {
     decisionMakers: dedupe(decisionMakers, (p) => p.quote),
     topics,
   };
+}
+
+/** Guide rows not yet covered and not verified by the doctor: what the end-of-talk prompt lists. */
+export function gocUndiscussed<T extends { status: 'DISCUSSED' | 'NOT_DISCUSSED'; verified: boolean }>(rows: T[]): T[] {
+  return rows.filter((row) => row.status === 'NOT_DISCUSSED' && !row.verified);
 }
 
 /** Topics covered so far, for the live checklist. */
@@ -589,12 +615,43 @@ export function gocCarryForward(previous: EctprRecord, draft: EctprRecord): GocC
   });
 }
 
-/** Options the conversation pointed at for this field, with their quotes. More than one value across quotes means it said different things. */
+const sameSet = (a: string[], b: string[]) => a.length === b.length && a.every((value) => b.includes(value));
+const overlaps = (a: string[], b: string[]) => a.some((value) => b.includes(value));
+
+/**
+ * Latest statement wins, per person. A later statement by the same speaker replaces an earlier one about the same decision when they
+ * disagree: a different choice, or a "no" to an option that was earlier wanted (and the reverse). "No ventilator" and later "BiPAP is fine"
+ * agree, so both stand. Statements by different people (a patient and a son) never replace each other: that is a disagreement for the
+ * doctor, reported as a conflict. Unlabelled lines count as one unknown speaker. Pass one field's suggestions. Nothing here chooses (V1).
+ */
+export function gocStanding(suggestions: GocSuggestion[]): { current: GocSuggestion[]; superseded: Array<{ earlier: GocSuggestion; by: GocSuggestion }> } {
+  const ordered = [...suggestions].sort((a, b) => a.at - b.at);
+  const superseded: Array<{ earlier: GocSuggestion; by: GocSuggestion }> = [];
+  const current: GocSuggestion[] = [];
+  ordered.forEach((earlier, index) => {
+    const by = ordered.slice(index + 1).reverse().find((later) => later.who === earlier.who && later.at > earlier.at && (
+      (later.values.length > 0 && earlier.values.length > 0 && !sameSet(later.values, earlier.values))
+      || overlaps(later.values, earlier.ruledOut) || overlaps(later.ruledOut, earlier.values)));
+    if (by) superseded.push({ earlier, by }); else current.push(earlier);
+  });
+  return { current, superseded };
+}
+
+/**
+ * Options the conversation points at for this field, with their quotes, after the latest statement has won.
+ * [own]: every statement, [current]: what still stands, [superseded]: earlier words a later statement replaced, shown so the doctor sees the change of mind.
+ * [conflict]: what still stands disagrees, which only happens between different speakers.
+ */
 export function gocMarksFor(suggestions: GocSuggestion[], field: GocDecisionField) {
-  const own = suggestions.filter((s) => s.field === field);
-  const suggested = [...new Set(own.flatMap((s) => s.values))];
-  const ruledOut = [...new Set(own.flatMap((s) => s.ruledOut))];
-  return { own, suggested, ruledOut, conflict: new Set(own.filter((s) => s.values.length).map((s) => s.values.join())).size > 1 };
+  const own = suggestions.filter((s) => s.field === field).sort((a, b) => a.at - b.at);
+  const { current, superseded } = gocStanding(own);
+  const suggested = [...new Set(current.flatMap((s) => s.values))];
+  const allRuledOut = [...new Set(current.flatMap((s) => s.ruledOut))];
+  // Different people still standing on different sides: one wants an option another said no to, or they want different options.
+  const conflict = new Set(current.filter((s) => s.values.length).map((s) => [...s.values].sort().join())).size > 1
+    || current.some((a) => current.some((b) => a !== b && overlaps(a.values, b.ruledOut)));
+  const ruledOut = conflict ? allRuledOut : allRuledOut.filter((value) => !suggested.includes(value));
+  return { own, current, superseded, suggested, ruledOut, changedMind: superseded.length > 0, conflict };
 }
 
 /** Checks an answer from a server model: unknown fields and any quote that is not word-for-word in the transcript are dropped. */
@@ -617,7 +674,7 @@ export function checkedAiSuggestions(answer: unknown, transcript: string): GocSu
     const name = field as GocDecisionField;
     const words = quote.normalize('NFC').trim();
     if (words.length < 3 || !source.includes(words) || !GOC_FIELD_VALUES[name].includes(String(value))) continue;
-    out.push({ field: name, values: [String(value)], ruledOut: [], quote: words, source: 'ai' });
+    out.push({ field: name, values: [String(value)], ruledOut: [], quote: words, source: 'ai', at: source.indexOf(words), who: '' });
   }
   return out;
 }

@@ -98,13 +98,20 @@ private fun labRange(data: CareEntry): Pair<Double?, Double?> {
 
 @Composable private fun LabHistoryPlot(values: List<Pair<CareItem, CareEntry>>, treatmentDays: List<TreatmentDay>) { val t = careText();
     // oldest first; sortedBy is stable so results sharing a day stay in recorded order
-    val points = values.reversed().mapNotNull { (item, entry) -> entry.value.toDoubleOrNull()?.takeIf { it.isFinite() }?.let { labEpoch(item).toDouble() to it } }.sortedBy { it.first }
-    if (points.size < 2) return
+    val all = values.reversed().mapNotNull { (item, entry) -> entry.value.toDoubleOrNull()?.takeIf { it.isFinite() }?.let { labEpoch(item).toDouble() to it } }.sortedBy { it.first }
+    if (all.size < 2) return
+    val now = System.currentTimeMillis()
+    val chartPoints = all.map { ChartPoint(it.first, it.second) }
+    var rangeName by rememberSaveable(values.first().first.id) { mutableStateOf(ChartRange.ALL.name) }
+    val range = ChartRange.valueOf(rangeName).takeIf { it in ChartRangeRules.choices(chartPoints, now) } ?: ChartRange.ALL
+    // What the chosen range shows: the y axis, the change line and the treatment-day list follow it.
+    val points = ChartRangeRules.filter(chartPoints, range, now).map { it.x to it.y!! }
     val unit = values.first().second.unit
     val (refLow, refHigh) = labRange(values.first().second)
     val firstTime = points.first().first
     val lastTime = points.last().first
-    val markers = TreatmentDayRules.within(treatmentDays, firstTime.toLong(), lastTime.toLong())
+    val spanStart = ChartRangeRules.start(range, now)?.toLong() ?: firstTime.toLong()
+    val markers = TreatmentDayRules.within(treatmentDays, spanStart, maxOf(lastTime.toLong(), if (range == ChartRange.ALL) lastTime.toLong() else now))
     val dataMin = points.minOf { it.second }; val dataMax = points.maxOf { it.second }
     val lowEdge = listOfNotNull(dataMin, refLow, refHigh).min(); val highEdge = listOfNotNull(dataMax, refLow, refHigh).max()
     val pad = ((highEdge - lowEdge).takeIf { it > 0 } ?: kotlin.math.abs(highEdge).coerceAtLeast(1.0)) * 0.12
@@ -115,19 +122,16 @@ private fun labRange(data: CareEntry): Pair<Double?, Double?> {
     val yMin = kotlin.math.floor((lowEdge - pad) / step) * step; val yMax = kotlin.math.ceil((highEdge + pad) / step) * step
     val ticks = generateSequence(yMin) { it + step }.takeWhile { it <= yMax + step / 2 }.toList()
     val bands = if (refLow != null || refHigh != null) listOf(ChartBand(refLow ?: yMin, refHigh ?: yMax, Mint, 0.7f)) else emptyList()
-    // A date under every result (the newest bold); labels that would overlap are dropped by the chart.
-    val xLabels = buildList {
-        add(ChartXLabel(lastTime, shortLabDate(lastTime.toLong()), strong = true))
-        points.dropLast(1).asReversed().forEach { add(ChartXLabel(it.first, shortLabDate(it.first.toLong()))) }
-    }
     val summary = points.joinToString("; ") { (time, v) -> "${date(time.toLong())}: ${labNum(v)} $unit" }
     val rangeText = if (bands.isEmpty()) "" else t(" Printed range ${labNum(refLow ?: yMin)} to ${labNum(refHigh ?: yMax)} $unit.", " छपी सीमा ${labNum(refLow ?: yMin)} से ${labNum(refHigh ?: yMax)} $unit।")
     Text(t("Recorded values ($unit)", "दर्ज मान ($unit)"), style = MaterialTheme.typography.labelSmall, modifier = Modifier.padding(top = 12.dp))
-    CareLineChart(
-        points = points.map { ChartPoint(it.first, it.second) }, yMin = yMin, yMax = yMax, yTicks = ticks, yText = { labNum(it) },
-        xLabels = xLabels, latestText = labNum(points.last().second), tag = "lab-trend", height = 200.dp, bands = bands, pointText = { labNum(it) },
-        markers = markers.map { ChartMarker(careEpoch(careDay(it.item.due)).toDouble(), if (it.category == "Chemotherapy") DoctorStatusWarn else Ink) },
+    // Treatment days are dashed lines labelled "Chemo" or "Radiotherapy" at the top, so they can be read against the values.
+    CareTimeLineChart(
+        points = chartPoints, yMin = yMin, yMax = yMax, yTicks = ticks, yText = { labNum(it) },
+        latestText = { labNum(it) }, tag = "lab-trend", height = 200.dp, bands = bands, pointText = { labNum(it) },
+        markers = treatmentDays.map { ChartMarker(careEpoch(careDay(it.item.due)).toDouble(), if (it.category == "Chemotherapy") DoctorStatusWarn else Ink, TreatmentDayRules.label(it.category)) },
         description = t("Line chart of ${points.size} recorded values. $summary.$rangeText", "${points.size} दर्ज मानों का रेखा चार्ट। $summary।$rangeText"),
+        range = range, onRangeChange = { rangeName = it.name }, now = now,
     )
     // Legend and change: what the band and dashed lines mean, and how far the value has moved since the first result.
     Row(Modifier.fillMaxWidth().padding(top = 4.dp), horizontalArrangement = Arrangement.spacedBy(14.dp), verticalAlignment = Alignment.CenterVertically) {

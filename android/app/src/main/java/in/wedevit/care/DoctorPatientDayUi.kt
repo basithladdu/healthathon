@@ -2,6 +2,7 @@ package `in`.wedevit.care
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.Image
@@ -32,6 +33,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -245,30 +247,39 @@ private fun doctorDayLabel(at: Long, now: Long, zone: ZoneId): String {
 private fun doctorPlural(n: Int) = if (n == 1) "1 update" else "$n updates"
 private fun doctorToolLabel(label: String, hindi: Boolean) = careTr(hindi, label, when (label) { "Calendar" -> "कैलेंडर"; "Care team" -> "देखभाल टीम"; "Lab history" -> "जाँच रिपोर्टें"; else -> label })
 
+/**
+ * The "Symptoms & distress" tab (route "Progress"). Symptoms first, most severe first; then distress; then the daily
+ * good/okay/hard check-ins. One range (2 weeks to All, from the first entry) drives every chart and count here.
+ */
 @Composable internal fun DoctorCheckInHistory(personId: String, entries: List<CareItem>, now: Long = System.currentTimeMillis(), zone: ZoneId = ZoneId.systemDefault()) { val t = careText();
-    val checks = doctorCheckIns(entries, personId, now)
+    var rangeKey by rememberSaveable(personId) { mutableStateOf(DoctorTrendRange.ALL.name) }
+    val range = DoctorTrendRange.of(rangeKey)
+    val today = Instant.ofEpochMilli(now).atZone(zone).toLocalDate()
+    val inRange = { at: Long -> range.days == null || !Instant.ofEpochMilli(at).atZone(zone).toLocalDate().isBefore(today.minusDays(range.days - 1)) }
+    val checks = doctorCheckIns(entries, personId, now).filter { inRange(it.created) }
     var detail by remember(personId) { mutableStateOf<CareItem?>(null) }
     var query by rememberSaveable(personId) { mutableStateOf("") }
     var moodKeys by rememberSaveable(personId) { mutableStateOf("") }
     val picked = moodKeys.split(",").filter { it.isNotEmpty() }.mapNotNull { k -> DoctorReportedMood.entries.firstOrNull { it.name == k } }.toSet()
     val needle = query.trim()
     val shown = checks.filter { c -> (picked.isEmpty() || doctorMood(c.title) in picked) && (needle.isEmpty() || c.title.contains(needle, true) || c.detail.contains(needle, true)) }
-    val recent = checks.filter { it.created >= now - 30L * 86_400_000L }
     val grouped = shown.groupBy { java.time.YearMonth.from(Instant.ofEpochMilli(it.created).atZone(zone)) }
-    LazyColumn(Modifier.fillMaxSize().imePadding().testTag("doctor-checkin-history"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { Heading(t("Reported condition history", "बताई गई हालत का इतिहास"), 27); Text(t("Dated self-reports, not a clinical score.", "तारीख़ वाली अपनी सूचनाएँ, क्लिनिकल स्कोर नहीं।"), Modifier.padding(top = 4.dp), fontSize = 12.sp, lineHeight = 16.sp, color = DoctorCardFaint) }
-        item { DistressHistoryCard(entries, personId) }
-        if (checks.isEmpty()) item { SurfaceCard { Text(t("No check-ins recorded yet", "अभी कोई हाल दर्ज नहीं"), fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk); Text(t("Updates will appear here when recorded.", "दर्ज होने पर अपडेट यहाँ दिखेंगे।"), fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk) } } else {
+    LazyColumn(Modifier.fillMaxSize().imePadding().testTag("doctor-checkin-history"), contentPadding = PaddingValues(start = 20.dp, top = 12.dp, end = 20.dp, bottom = 96.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        item {
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Heading(t("Symptoms & distress", "लक्षण और परेशानी"), 26); Spacer(Modifier.weight(1f))
+                DoctorInfoIcon(t("Symptoms & distress", "लक्षण और परेशानी"), t("Dated self-reports, not a clinical score.", "तारीख़ वाली अपनी सूचनाएँ, क्लिनिकल स्कोर नहीं।"), "doctor-progress-info")
+            }
+        }
+        item { DoctorRangeSelector(range, { rangeKey = it.name }) }
+        item { DoctorSymptomSummary(entries, personId, range, today = today) }
+        item { DoctorDistressTrend(entries, personId, range, today, zone) }
+        item { Text(t("Daily check-ins", "रोज़ का हाल"), fontFamily = SaharaTitleFont, fontSize = 20.sp, color = DoctorCardInk, modifier = Modifier.padding(top = 4.dp).a11yHeading()) }
+        if (checks.isEmpty()) item { SurfaceCard { Text(t("No check-ins recorded yet", "अभी कोई हाल दर्ज नहीं"), fontFamily = SaharaTitleFont, fontSize = 17.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk) } } else {
             item {
-                Surface(color = DoctorCardProgress, shape = RoundedCornerShape(20.dp), modifier = Modifier.fillMaxWidth().testTag("doctor-checkin-summary")) {
-                    Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        Text(t("Last 30 days", "पिछले 30 दिन"), fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
-                        if (recent.isEmpty()) Text(t("No reports in the last 30 days.", "पिछले 30 दिनों में कोई सूचना नहीं।"), fontSize = 13.sp, color = DoctorCardSub) else Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            DoctorReportedMood.entries.forEach { m -> val (fg, bg) = doctorMoodColors(m); val n = recent.count { doctorMood(it.title) == m }
-                                Surface(color = bg, shape = RoundedCornerShape(16.dp), modifier = Modifier.weight(1f).testTag("doctor-checkin-summary-${m.name.lowercase()}")) { Column(Modifier.padding(horizontal = 10.dp, vertical = 8.dp)) { Text("$n", fontFamily = SaharaTitleFont, fontSize = 21.sp, fontWeight = FontWeight.Medium, color = fg); Text(doctorMoodShort(m), fontSize = 12.sp, lineHeight = 16.sp, color = fg) } } }
-                        }
-                        Text(t("A count of recorded self-reports, ${doctorPlural(recent.size)}.", "दर्ज अपनी सूचनाओं की गिनती: ${recent.size}।"), fontSize = 12.sp, color = DoctorCardFaint)
-                    }
+                Row(Modifier.fillMaxWidth().testTag("doctor-checkin-summary"), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    DoctorReportedMood.entries.forEach { m -> val (fg, bg) = doctorMoodColors(m); val n = checks.count { doctorMood(it.title) == m }
+                        Surface(color = bg, shape = RoundedCornerShape(16.dp), modifier = Modifier.weight(1f).testTag("doctor-checkin-summary-${m.name.lowercase()}")) { Column(Modifier.padding(horizontal = 10.dp, vertical = 8.dp)) { Text("$n", fontFamily = SaharaTitleFont, fontSize = 21.sp, fontWeight = FontWeight.Medium, color = fg); Text(doctorMoodShort(m), fontSize = 12.sp, lineHeight = 16.sp, color = fg) } } }
                 }
             }
             item {
@@ -287,7 +298,6 @@ private fun doctorToolLabel(label: String, hindi: Boolean) = careTr(hindi, label
             if (shown.isEmpty()) item {
                 SurfaceCard { Column(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.testTag("doctor-checkin-empty")) {
                     Text(t("No updates match", "कोई अपडेट नहीं मिला"), fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
-                    Text(t("Try different words or remove a filter.", "दूसरे शब्द आज़माएँ या कोई फ़िल्टर हटाएँ।"), fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk)
                     TextButton(onClick = { query = ""; moodKeys = "" }, Modifier.heightIn(min = 48.dp).testTag("doctor-checkin-clear-filters")) { Text(t("Clear search and filters", "खोज और फ़िल्टर हटाएँ"), color = DoctorAccent) }
                 } }
             }
@@ -298,6 +308,30 @@ private fun doctorToolLabel(label: String, hindi: Boolean) = careTr(hindi, label
         }
     }
     detail?.let { check -> AlertDialog(onDismissRequest = { detail = null }, title = { Text(check.title) }, text = { Column(Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) { Text(doctorRecordedTime(check.created, zone)); Text(CareEntryCodec.readable(check.detail).ifBlank { t("No additional details recorded.", "और कोई जानकारी दर्ज नहीं।") }); Text(t("Self-reported update; clinical assessment and reporter identity are not independently verified.", "अपनी बताई सूचना; क्लिनिकल आकलन और बताने वाले की पहचान अलग से पुष्ट नहीं है।")) } }, confirmButton = { TextButton(onClick = { detail = null }) { Text(t("Close", "बंद करें")) } }) }
+}
+
+/** Distress over the range (a "no distress" answer counts as 0), the latest score, and the latest problems in one line. */
+@Composable internal fun DoctorDistressTrend(entries: List<CareItem>, personId: String, range: DoctorTrendRange, today: LocalDate, zone: ZoneId) { val t = careText(); val hindi = careHindi()
+    val history = remember(entries, personId) { DistressRules.history(entries, personId) }
+    val days = remember(history, zone) { DoctorTrendRules.dailyAt(history.map { (item, check) -> item.created to (if (check.distress) check.score ?: 0 else 0) }, zone) }
+    Surface(shape = RoundedCornerShape(22.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("doctor-distress-trend-card")) {
+        Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(t("Distress", "परेशानी"), fontFamily = SaharaTitleFont, fontSize = 20.sp, color = DoctorCardInk, modifier = Modifier.weight(1f).a11yHeading())
+                history.firstOrNull()?.let { (_, check) -> val v = if (check.distress) check.score ?: 0 else 0; val fill = ChartBands.color(v)
+                    Text("$v", color = readableOn(fill), fontWeight = FontWeight.Bold, fontSize = 15.sp, modifier = Modifier.background(fill, RoundedCornerShape(50)).padding(horizontal = 10.dp, vertical = 2.dp).testTag("doctor-distress-latest")) }
+                DoctorInfoIcon(t("Distress", "परेशानी"), t("Self-reported. Not a diagnosis.", "अपनी बताई सूचना। यह निदान नहीं है।") + "\n\n" + DistressRules.SOURCE + " · " + DistressRules.VERSION, "doctor-distress-info")
+            }
+            if (history.isEmpty()) Text(t("No distress answers yet", "अभी परेशानी का कोई जवाब नहीं"), fontSize = 15.sp, color = DoctorCardInk, modifier = Modifier.testTag("doctor-distress-empty"))
+            else {
+                DoctorScoreTrend(t("Distress", "परेशानी"), days, range, today, "doctor-distress-trend")
+                val (item, check) = history.first()
+                val problems = DistressRules.summary(check, hindi)
+                Text(Instant.ofEpochMilli(item.created).atZone(zone).format(careDateFormat("d MMM", hindi)) + " · " + DistressRules.shownTitle(check, hindi) + if (problems.isBlank()) "" else " · $problems",
+                    fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardInk, maxLines = 2, overflow = TextOverflow.Ellipsis)
+            }
+        }
+    }
 }
 
 @Composable internal fun DoctorCheckInCard(check: CareItem, zone: ZoneId, now: Long = System.currentTimeMillis(), onOpen: () -> Unit) { val t = careText();

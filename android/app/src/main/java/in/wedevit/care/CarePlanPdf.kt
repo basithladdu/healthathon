@@ -94,7 +94,7 @@ internal object CarePlanPdf {
         d.box(if (interp.kind == EdKind.ACTIVE) mint else pale, p(interp.banner) to bold)
         interp.flags.forEach { d.text("! " + p(it), paint(9f, true, alert)) }
         d.space(6f)
-        d.box(alert, p(IfInDoubt.TITLE) to paint(13f, true, android.graphics.Color.WHITE), p(IfInDoubt.LEAD) to whiteBody, *IfInDoubt.CONDITIONS.map { "• " + p(it) to whiteBody }.toTypedArray(), p(IfInDoubt.AFTER) to white)
+        d.box(alert, p(IfInDoubt.TITLE) to paint(13f, true, android.graphics.Color.WHITE), *IfInDoubt.CONDITIONS.map { "• " + p(it) to whiteBody }.toTypedArray(), p(IfInDoubt.AFTER) to white)
         d.space(6f)
         if (interp.showContent) EdView.rows(r, amd).forEach { row -> d.text(p(row.label).uppercase(), paint(8.5f, true, android.graphics.Color.rgb(85, 72, 63)), 12f); d.text(p(row.value), if (row.flag) paint(10.5f, true, alert) else bold, 14f); d.space(3f) }
         else d.text(p(Bi("No plan content is shown: give full standard emergency care.", "योजना की जानकारी नहीं दिखाई जाती: पूरा सामान्य आपातकालीन इलाज दें।")), bold)
@@ -119,6 +119,19 @@ internal object CarePlanPdf {
             r.signatures.forEach { s -> d.text("${s.role.name.replace('_', ' ').lowercase()}${s.surrogateRank?.let { " (${it.name.lowercase()})" } ?: ""}: ${s.name}${s.registrationNo?.let { " (reg. $it)" } ?: ""}${if (s.thumbImpression == true) " — thumb impression" else ""} · ${s.signedAt.take(16).replace('T', ' ')}", body) }
             d.space(8f); d.text(p(CapacityGuide.TITLE), paint(10.5f, true), 16f); d.text(p(CapacityGuide.NOTE), paint(9f))
             CapacityGuide.POINTS.forEachIndexed { i, point -> d.text("${i + 1}. " + p(point), paint(9f)) }
+            // The goals-of-care note in the legal form's structure (Sections I to IV), as the doctors asked on 3 Nov 2026. Never on the wallet card.
+            r.gocTranscript?.takeIf { it.planVersion == r.version }?.let { g ->
+                d.blocks += PageBreak
+                d.text(p(Bi("Goals-of-care note, in the order of the legal form", "देखभाल के लक्ष्यों का नोट, क़ानूनी फ़ॉर्म के क्रम में")), h1, 24f)
+                d.text(p(GocNote.kindLabel(g.noteKind)), body)
+                g.signOff?.let { so -> d.text(p(Bi("Signed and locked on the doctor's device", "डॉक्टर के डिवाइस पर साइन होकर बंद")) + ": " + so.signers.joinToString(", ") + " · " + so.lockedAt.take(16).replace('T', ' ') + " · SHA-256 " + so.sealSha256.take(16), bold) }
+                    ?: d.text(p(Bi("The note is not signed yet.", "नोट पर अभी हस्ताक्षर नहीं हुए।")), paint(10.5f, true, alert))
+                GocForm.sections(r, g.topics.associateBy { it.decision }).forEach { section ->
+                    d.space(6f); d.text(p(section.title), h2, 18f)
+                    section.rows.forEach { d.text(p(it), body) }
+                }
+                if (g.note.isNotBlank()) { d.space(6f); d.text(p(Bi("Doctor's note", "डॉक्टर का नोट")), h2, 18f); d.text(g.note, body) }
+            }
             if (cardUrl != null) {
                 d.space(16f); d.text(p(Bi("Wallet card — cut out and keep with the patient", "वॉलेट कार्ड — काटकर मरीज़ के पास रखें")), h2, 20f)
                 WalletCard.lines(r).forEach { (label, value) -> d.text(p(label) + ": " + p(value), body, 14f) }

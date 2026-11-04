@@ -29,14 +29,14 @@ data class DoctorSymptomRow(val kind: String, val key: String, val series: List<
 }
 
 object DoctorSymptomSummaryRules {
-    /** This person's rated symptom notes only, newest change first. Mood shows its two scales; Pain also shows each body part. */
+    /** This person's rated symptom notes only, most severe first (latest number, then newest). Mood shows its two scales; Pain also shows each body part. */
     fun rows(items: List<CareItem>, personId: String): List<DoctorSymptomRow> {
         val mine = items.filter { it.personId == personId && it.kind == "checkin" }
         val symptoms = mine.mapNotNull { SymptomNoteCodec.decode(it.detail)?.symptom?.trim() }.distinctBy { it.lowercase() }
         val rows = symptoms.filter { it != SymptomDiaryRules.MOOD }.map { DoctorSymptomRow("symptom", it, SymptomDiaryRules.symptomSeries(mine, personId, it)) } +
             SymptomDiaryRules.moodScales.keys.map { DoctorSymptomRow("mood", it, SymptomDiaryRules.moodSeries(mine, personId, it)) } +
             SymptomDiaryRules.painPartsWithHistory(mine, personId).map { DoctorSymptomRow("part", it, SymptomDiaryRules.painPartSeries(mine, personId, it)) }
-        return rows.filter { it.series.isNotEmpty() }.sortedByDescending { "${it.latest.date}T${it.latest.time}" }
+        return DoctorTrendRules.bySeverity(rows.filter { it.series.isNotEmpty() })
     }
     fun label(row: DoctorSymptomRow, hindi: Boolean): String = when (row.kind) {
         "mood" -> SymptomDiaryRules.moodShort[row.key]?.let { careTr(hindi, it.first, it.second) }.orEmpty()
@@ -53,25 +53,33 @@ object DoctorSymptomSummaryRules {
     fun arrow(row: DoctorSymptomRow): String = previous(row)?.let { before -> when { row.latest.value > before -> "↑"; row.latest.value < before -> "↓"; else -> "→" } } ?: "–"
 }
 
-/** Read-only symptom and pain summary for the doctor's patient hub: one compact row per symptom. Tap a row for its day-by-day chart. */
-@Composable internal fun DoctorSymptomSummary(entries: List<CareItem>, personId: String) {
+/**
+ * Read-only symptom and pain summary, most severe first: one compact row per symptom. Tap a row for its trend over [range].
+ * With [limit] (the patient hub) only the top rows show, and [onSeeAll] opens the Symptoms & distress tab.
+ */
+@Composable internal fun DoctorSymptomSummary(entries: List<CareItem>, personId: String, range: DoctorTrendRange = DoctorTrendRange.ALL, limit: Int? = null, onSeeAll: (() -> Unit)? = null, today: LocalDate = LocalDate.now()) {
     val t = careText(); val hindi = careHindi()
-    val rows = remember(entries, personId) { DoctorSymptomSummaryRules.rows(entries, personId) }
+    val all = remember(entries, personId) { DoctorSymptomSummaryRules.rows(entries, personId) }
+    val rows = limit?.let { all.take(it) } ?: all
     val hasPainBody = remember(entries, personId) { PainHistoryRules.entries(entries, personId).isNotEmpty() }
     var open by rememberSaveable(personId) { mutableStateOf("") }
     var showingBody by rememberSaveable(personId) { mutableStateOf(false) }
     val numberCol = 52.dp
     val changeCol = 64.dp
+    val about = t("From the patient's and family's own notes. 0 = none, 10 = worst.", "मरीज़ और परिवार के अपने नोट से। 0 = बिलकुल नहीं, 10 = सबसे ज़्यादा।") +
+        (if (all.any { it.painBands }) "\n\n" + t(PainBands.SOURCE_EN, PainBands.SOURCE_HI) else "")
     Surface(shape = RoundedCornerShape(22.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("doctor-symptom-summary")) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(t("Symptoms and pain", "लक्षण और दर्द"), fontFamily = SaharaTitleFont, fontSize = 20.sp, color = DoctorCardInk)
-            Text(t("From the patient's and family's own notes. 0 = none, 10 = worst.", "मरीज़ और परिवार के अपने नोट से। 0 = बिलकुल नहीं, 10 = सबसे ज़्यादा।"), fontSize = 13.sp, color = DoctorCardSub)
+        Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(t("Symptoms and pain", "लक्षण और दर्द"), fontFamily = SaharaTitleFont, fontSize = 20.sp, color = DoctorCardInk, modifier = Modifier.weight(1f))
+                DoctorInfoIcon(t("Symptoms and pain", "लक्षण और दर्द"), about, "doctor-symptom-summary-info")
+            }
             if (rows.isEmpty()) Text(t("No symptom notes yet.", "अभी लक्षण का कोई नोट नहीं।"), color = DoctorCardInk, modifier = Modifier.testTag("doctor-symptom-summary-empty"))
             else {
-                Row(Modifier.fillMaxWidth().padding(top = 4.dp), verticalAlignment = Alignment.Bottom) {
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Bottom) {
                     Text(t("Symptom", "लक्षण"), fontSize = 12.sp, color = DoctorCardSub, modifier = Modifier.weight(1f))
                     Text(t("Latest", "अभी"), fontSize = 12.sp, color = DoctorCardSub, textAlign = TextAlign.Center, modifier = Modifier.width(numberCol))
-                    Text(t("Highest\n7 days", "7 दिन में\nसबसे ज़्यादा"), fontSize = 12.sp, lineHeight = 14.sp, color = DoctorCardSub, textAlign = TextAlign.Center, modifier = Modifier.width(numberCol))
+                    Text(t("Highest", "सबसे ज़्यादा"), fontSize = 12.sp, lineHeight = 14.sp, color = DoctorCardSub, textAlign = TextAlign.Center, modifier = Modifier.width(numberCol))
                     Text(t("Change", "बदलाव"), fontSize = 12.sp, color = DoctorCardSub, textAlign = TextAlign.Center, modifier = Modifier.width(changeCol))
                 }
                 HorizontalDivider(color = DoctorHairline)
@@ -80,7 +88,7 @@ object DoctorSymptomSummaryRules {
                 val id = "${row.kind}:${row.key}"
                 val latest = row.latest
                 val name = DoctorSymptomSummaryRules.label(row, hindi)
-                val highest = DoctorSymptomSummaryRules.highestLastWeek(row)
+                val highest = DoctorTrendRules.highest(row.series, range, today)
                 val before = DoctorSymptomSummaryRules.previous(row)
                 val arrow = DoctorSymptomSummaryRules.arrow(row)
                 val changeWords = when (arrow) {
@@ -90,13 +98,14 @@ object DoctorSymptomSummaryRules {
                     else -> t("only one entry", "सिर्फ़ एक नोट")
                 }
                 val spoken = "$name. ${t("Latest", "अभी")} ${latest.value}, ${ChartBands.word(latest.value, hindi)}. " +
-                    "${t("Highest in 7 days", "7 दिन में सबसे ज़्यादा")} ${highest ?: t("none", "कोई नहीं")}. $changeWords. " +
+                    "${t("Highest", "सबसे ज़्यादा")} ${highest ?: t("none", "कोई नहीं")}. $changeWords. " +
                     if (open == id) t("Tap to hide chart.", "चार्ट छिपाने के लिए छुएँ।") else t("Tap to see chart.", "चार्ट देखने के लिए छुएँ।")
                 Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable(role = Role.Button) { open = if (open == id) "" else id }
                     .semantics { contentDescription = spoken }.testTag("doctor-symptom-row-$id"), verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f).padding(vertical = 4.dp)) {
                         Text(name, color = DoctorCardInk, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
                         Text(friendlyWhen(latest.date, latest.time, hindi), fontSize = 12.sp, color = DoctorCardSub)
+                        if (latest.respondent == "caregiver") SymptomLoggedByFamilyChip(hindi, "doctor-symptom-family-$id")
                     }
                     Box(Modifier.width(numberCol), contentAlignment = Alignment.Center) {
                         val fill = ChartBands.color(latest.value)
@@ -112,11 +121,13 @@ object DoctorSymptomSummaryRules {
                     Text(changeShort, fontSize = 14.sp, lineHeight = 16.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center,
                         color = when (arrow) { "↑" -> ChartBands.Severe; "↓" -> ChartBands.Mild; else -> DoctorCardSub }, modifier = Modifier.width(changeCol))
                 }
-                if (open == id) DayBarChart(name, row.series, hindi, "doctor-symptom-trend-$id")
+                if (open == id) DoctorScoreTrend(name, DoctorTrendRules.daily(row.series), range, today, "doctor-symptom-trend-$id")
                 HorizontalDivider(color = DoctorHairline)
             }
             if (rows.isNotEmpty()) ChartLegend(hindi)
-            if (rows.any { it.painBands }) Text(t(PainBands.SOURCE_EN, PainBands.SOURCE_HI), fontSize = 12.sp, color = DoctorCardSub)
+            if (onSeeAll != null && all.size > rows.size) TextButton(onClick = onSeeAll, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-symptom-see-all")) {
+                Text(t("All symptoms (${all.size})", "सभी लक्षण (${all.size})"), color = DoctorAccent)
+            }
             if (hasPainBody) OutlinedButton(onClick = { showingBody = true }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-symptom-pain-body")) {
                 Icon(Icons.Default.AccessibilityNew, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("View pain on body", "शरीर पर दर्द देखें"))
             }

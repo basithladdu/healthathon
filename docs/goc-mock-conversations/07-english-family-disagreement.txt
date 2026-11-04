@@ -1,0 +1,25 @@
+# FICTIONAL. A made-up goals-of-care conversation for testing Sahara. No real patient, family or doctor. Not medical advice.
+# Language: English. Patient: Joseph (fictional), 75, with his wife Mary and son Thomas (both fictional).
+# The patient and his son disagree about the ventilator and ICU. Sahara must show both views, not pick one.
+Doctor: Is everyone comfortable with recording this talk? I need your consent.
+Patient: Yes.
+Wife: Yes, that is okay.
+Son: Fine, we consent.
+Doctor: Please tell me your name and age.
+Patient: Joseph, 75.
+Doctor: Who is the emergency contact?
+Son: Me, Thomas. Use my mobile number.
+Doctor: If your breathing gets very bad, would you want a ventilator?
+Patient: I do not want a ventilator.
+Son: Please put him on the ventilator. We want everything possible.
+Wife: I think we should listen to him.
+Doctor: And the ICU?
+Patient: No ICU for me.
+Son: We want ICU.
+Doctor: What about CPR if the heart stops?
+Patient: I do not want CPR.
+Son: I am not sure about CPR.
+Doctor: Let us talk about what matters most to you, Joseph.
+Patient: What matters most is that I do not suffer, and that I am at home.
+Doctor: Who will decide for you if you cannot speak?
+Patient: My wife Mary will decide for me.

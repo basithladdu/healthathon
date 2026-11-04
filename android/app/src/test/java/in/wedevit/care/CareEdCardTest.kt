@@ -226,7 +226,7 @@ class CareEdCardTest {
     }
 
     @Test fun alwaysProvidedCareIsExactlyTheWebList() {
-        assertEquals(8, CareThatContinues.ITEMS.size)
+        assertEquals(12, CareThatContinues.ITEMS.size) // Sahaara v1.0 §16
         if (modelDir == null) return
         val source = File(modelDir, "ectpr-rules.ts").readText()
         val block = source.substring(source.indexOf("ALWAYS_PROVIDED_CARE"), source.indexOf("];", source.indexOf("ALWAYS_PROVIDED_CARE")))

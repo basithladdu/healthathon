@@ -22,6 +22,8 @@ data class Centre(val name: String, val city: String, val district: String, val 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Boolean = false, val walkthroughRole: String? = null) : AndroidViewModel(app) {
     init { require(!demoMode || cloud == null) { "Doctor examples cannot use a cloud account." } }
+    // Goals-of-care Gemini transcription needs the signed-in account's token (CareGocGemini.kt).
+    init { GocGeminiAuth.token = if (cloud == null) null else suspend { cloud.transcriptionToken() } }
     init { require(walkthroughRole == null || (demoMode && cloud == null && walkthroughRole in listOf("Patient", "Family"))) { "The patient walkthrough is local and read as Patient or Family only." } }
     companion object {
         const val DOCTOR_DEMO_STORAGE = "4b68f5f1-36f4-4bd7-96b3-c8eb728951f1"
@@ -599,7 +601,7 @@ class CareModel(app: Application, val cloud: CareCloud? = null, val demoMode: Bo
         val changed = item.copy(doneOn = if (checked) "" else today)
         storeItem(changed)
         if (cloud == null && item.kind == "medicine") {
-            try { appendLocalMedicineCheckoff(getApplication(), storageNamespace, item, item.doneOn, changed.doneOn) }
+            try { appendLocalMedicineCheckoff(getApplication(), storageNamespace, item, item.doneOn, changed.doneOn, role = viewRole.value) }
             catch (e: Exception) {
                 if (e is CancellationException) throw e
                 message.value = mTr("Daily check-off saved, but detailed history could not be recorded.", "रोज़ का निशान सहेजा गया, लेकिन ब्योरेवार इतिहास दर्ज नहीं हो सका।")

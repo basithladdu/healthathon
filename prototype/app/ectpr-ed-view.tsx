@@ -10,7 +10,7 @@ import type { AmdStatusSummary, EctprRecord } from './ectpr-model';
 import { edInterpretation, type EdInterpretation } from './ectpr-rules';
 import { homeCareLines, withdrawalLines,
   alwaysProvidedCare, amdCaveat, ambulanceLabel, authorityLabel, ceilingDetails, ceilingLabel, cprDecidedBy, cprLabel, deviceLabel,
-  dialysisLabel, dyingPhasePrompt, edAmdLines, edBanner, edFlag, formatDay, goalLabel, hydrationLabel, icuLabel, ifInDoubtAfter, ifInDoubtConditions, ifInDoubtLead, ifInDoubtTitle,
+  dialysisLabel, dyingPhasePrompt, edAmdLines, edBanner, edFlag, formatDay, goalLabel, hydrationLabel, icuLabel, ifInDoubtAfter, ifInDoubtConditions, ifInDoubtTitle,
   ngLabel, notRecorded, pegLabel, telHref, textFor, transferLabel, treatingConsultant, vasopressorLabel,
 } from './ectpr-labels';
 
@@ -35,9 +35,9 @@ export function IfInDoubtBox(props: { lang: CareLang }) {
   return (
     <section className="ectpr-ed-doubt" aria-label={ifInDoubtTitle(lang)}>
       <h3>{ifInDoubtTitle(lang)}</h3>
-      <p>{ifInDoubtLead(lang)}</p>
-      <ol>{ifInDoubtConditions(lang).map((c) => <li key={c}>{c}</li>)}</ol>
-      <p className="ectpr-ed-doubt-after">{ifInDoubtAfter(lang)}</p>
+      {/* Each line starts with "If" (Sujay, 1 Nov), then the action. */}
+      <ol style={{ listStyleType: 'disc' }}>{ifInDoubtConditions(lang).map((c) => <li key={c}>{c}</li>)}</ol>
+      <p><strong>{ifInDoubtAfter(lang)}</strong></p>
     </section>
   );
 }

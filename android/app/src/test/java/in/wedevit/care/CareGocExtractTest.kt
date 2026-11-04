@@ -145,18 +145,20 @@ class CareGocExtractTest {
     }
 
     // Rule V1: not discussed stays "No preference recorded"; only a confirmed item changes the plan.
-    @Test fun notDiscussed_marksNothing_andChecklistStartsAtIcu() {
+    @Test fun notDiscussed_marksNothing_andChecklistStartsAtCpr() {
         val empty = GocExtract.extract("We spoke about the weather.")
         assertTrue(empty.hits.isEmpty() && empty.mentions.isEmpty())
-        assertEquals(GocDecision.ICU, GocPlan.next(empty, emptySet(), emptyMap()))
+        assertEquals(GocDecision.CPR, GocPlan.next(empty, emptySet(), emptyMap()))
+        assertEquals(GocGuideItem.CONSENT, GocGuide.next(empty, GocGuide.covered("We spoke about the weather."), emptySet(), emptyMap(), consented = false))
         GocPlan.ORDER.forEach { assertEquals(GocChecklistStatus.NOT_DISCUSSED, GocPlan.status(it, empty, emptySet(), emptyMap())) }
         assertTrue(GocExtract.extract("").hits.isEmpty())
     }
     @Test fun checklistFollowsTheOrderAskedFor() {
-        assertEquals(listOf(GocDecision.ICU, GocDecision.BREATHING, GocDecision.DIALYSIS), GocPlan.ORDER.take(3))
-        val afterIcu = GocExtract.extract("We want ICU.")
-        assertEquals(GocDecision.BREATHING, GocPlan.next(afterIcu, emptySet(), emptyMap()))
-        assertEquals(GocDecision.DIALYSIS, GocPlan.next(afterIcu, setOf(GocDecision.BREATHING), emptyMap()))
+        // 3 Nov 2026: "first one is consent, second one is patient details, third one is family details, emergency contact, and fourth is CPR, dialysis".
+        assertEquals(listOf(GocDecision.CPR, GocDecision.DIALYSIS, GocDecision.BREATHING), GocPlan.ORDER.take(3))
+        val afterCpr = GocExtract.extract("We want CPR.")
+        assertEquals(GocDecision.DIALYSIS, GocPlan.next(afterCpr, emptySet(), emptyMap()))
+        assertEquals(GocDecision.BREATHING, GocPlan.next(afterCpr, setOf(GocDecision.DIALYSIS), emptyMap()))
     }
     @Test fun everyDecisionOffersItsWholeFormList() {
         assertEquals(IcuKind.entries.size, GocPlan.options(GocDecision.ICU).size)

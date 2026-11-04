@@ -46,7 +46,7 @@ object PainHistoryRules {
     // Tapping a body-part tile zooms the model and shows that part's own dated trend below it.
     var part by rememberSaveable(personId) { mutableStateOf<String?>(null) }
     Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(20.dp).testTag("pain-history"), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        Heading(t("Pain history", "दर्द का इतिहास"), 27)
+        Heading(t("Past pain on the body", "पहले का दर्द शरीर पर"), 27)
         if (index < 0) ChartEmpty(hindi, "pain-history") else {
             val note = history[index].second
             Text(t("Which entry?", "कौन-सा नोट?"), fontWeight = FontWeight.SemiBold)
@@ -70,7 +70,7 @@ object PainHistoryRules {
             }
             if (note.painLocation.isNotBlank()) Text(note.painLocation, modifier = Modifier.testTag("pain-history-location"))
             if (PainHistoryRules.locationKind(note) != "unsupported-model") CarePainBodyMap(note.painBodySites, note.painBodyPoints, note.rating, hindi, readOnly = true, ratings = note.painBodyRatings, onFocus = { part = it }) { _, _ -> }
-            part?.let { PainPartTrend(entries, personId, it, hindi) } ?: Text(t("Tap a body part to see its pain day by day.", "किसी हिस्से को छुएँ, उसका रोज़ का दर्द दिखेगा।"), style = MaterialTheme.typography.bodySmall, modifier = Modifier.testTag("pain-part-trend-hint"))
+            part?.let { SymptomPartTrend(entries, personId, it, hindi) } ?: Text(t("Tap a body part to see its pain day by day.", "किसी हिस्से को छुएँ, उसका रोज़ का दर्द दिखेगा।"), style = MaterialTheme.typography.bodySmall, modifier = Modifier.testTag("pain-part-trend-hint"))
             if (note.startedOn.isNotBlank()) Text("${t("Started", "शुरू हुआ")}: ${note.startedOn}", style = MaterialTheme.typography.bodySmall)
             if (note.painTriggers.isNotEmpty()) Text(note.painTriggers.joinToString { SymptomDiaryRules.label(SymptomDiaryRules.triggers, it, hindi) }, style = MaterialTheme.typography.bodySmall)
             if (note.note.isNotBlank()) Text(note.note)

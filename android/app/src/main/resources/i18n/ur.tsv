@@ -3896,3 +3896,324 @@ Experience	تجربہ
 Languages	زبانیں
 Registration: practice sample, not a real number	رجسٹریشن: مشق کا نمونہ، اصلی نمبر نہیں
 Sample profile for the walkthrough. Real doctors are verified by the Sahara team against the medical council register.	یہ واک تھرو کی نمونہ پروفائل ہے۔ اصلی ڈاکٹروں کی تصدیق سہارا ٹیم میڈیکل کونسل رجسٹر سے کرتی ہے۔
+About this list	اس فہرست کے بارے میں
+Blue pins and tags: the directory also lists morphine. Call to confirm.	نیلے نشان اور ٹیگ: فہرست میں مارفین بھی درج ہے۔ فون کر کے تصدیق کریں۔
+Hollow pins mark only the PIN, town or district area. Numbered circles are groups: tap to zoom.	خالی نشان صرف پن، قصبے یا ضلع کا علاقہ دکھاتے ہیں۔ نمبر والے دائرے کئی مراکز ہیں: زوم کے لیے دبائیں۔
+${coverage.listOnly} centres have no map spot and are in the list only.	${coverage.listOnly} مراکز نقشے پر نہیں، صرف فہرست میں ہیں۔
+Your location stays on this phone. It only centres the map and sorts the list.	آپ کا مقام اسی فون پر رہتا ہے۔ یہ صرف نقشہ آپ کے پاس دکھانے اور فہرست ترتیب دینے کے لیے ہے۔
+Service	خدمت
+All services	تمام خدمات
+Call 112	112 پر فون کریں
+Search	تلاش کریں
+Nothing matches.	کچھ نہیں ملا۔
+about $n km	تقریباً $n کلومیٹر
+$n km	$n کلومیٹر
+About this centre	اس مرکز کے بارے میں
+Call to confirm services, availability and cost.	خدمات، دستیابی اور خرچ فون کر کے تصدیق کریں۔
+Open the source listing	اصل فہرست کھولیں
+Show where I am	میں کہاں ہوں، دکھائیں
+Please don't add patient details.	براہ کرم مریض کی معلومات نہ لکھیں۔
+Add address, phone or services	پتہ، فون یا خدمات شامل کریں
+Your suggestions (${items.size})	آپ کی تجاویز (${items.size})
+How much was my last bill?	میرا پچھلا بل کتنے کا تھا؟
+What is my latest haemoglobin?	میرا تازہ ترین ہیموگلوبن کتنا ہے؟
+Which medicines are listed on my prescription?	میرے نسخے پر کون سی دوائیں لکھی ہیں؟
+When was I discharged?	مجھے ہسپتال سے چھٹی کب ملی؟
+When is my next follow-up?	میرا اگلا فالو اپ کب ہے؟
+Offline · matching lines only	آف لائن · صرف ملتی جلتی سطریں
+Look in	کہاں دیکھیں
+Choose	چنیں
+Send my question and $sendWhat to $sendTo, this time only. Photos and files stay on this phone.	میرا سوال اور $sendWhat صرف اس بار $sendTo کو بھیجیں۔ تصویریں اور فائلیں اسی فون پر رہتی ہیں۔
+Answer	جواب
+Sources	ماخذ
+How answers work	جواب کیسے بنتے ہیں
+The phone sorts your documents into bills, lab reports, prescriptions and discharge summaries from their words. You can move a document to another folder on the Documents screen.	فون آپ کے کاغذات کو ان کے الفاظ سے بل، لیب رپورٹ، نسخے اور ڈسچارج خلاصے میں چھانٹتا ہے۔ آپ کاغذات والی اسکرین پر کسی کاغذ کو دوسرے فولڈر میں ڈال سکتے ہیں۔
+Nothing is sent until you tap Ask, and you are asked again each time. Only your question, the matching lines and each document's type are sent, never file names.	‘پوچھیں’ دبانے تک کچھ نہیں بھیجا جاتا، اور ہر بار پھر پوچھا جاتا ہے۔ صرف آپ کا سوال، ملتی جلتی سطریں اور ہر کاغذ کی قسم بھیجی جاتی ہے، فائل کے نام کبھی نہیں۔
+Matching lines are found on this phone, not explained. Best match first.	ملتی جلتی سطریں اسی فون پر ڈھونڈی جاتی ہیں، سمجھائی نہیں جاتیں۔ سب سے اچھی پہلے۔
+Not checked yet · compare with the paper	ابھی جانچا نہیں · اصل کاغذ سے ملائیں
+Bill	بل
+Discharge summary	ڈسچارج خلاصہ
+Family caregivers circle	خاندان کے دیکھ بھال کرنے والوں کا حلقہ
+For family members caring for someone at home	گھر پر کسی کی دیکھ بھال کرنے والے گھر والوں کے لیے
+Parents of children with cancer	کینسر میں مبتلا بچوں کے والدین
+For parents and close family of a child in treatment	علاج کروا رہے بچے کے والدین اور قریبی خاندان کے لیے
+Young survivors	نوجوان سروائیورز
+For young people who finished treatment	علاج مکمل کر چکے نوجوانوں کے لیے
+Loss and grief	بچھڑنے کا غم
+For families after the loss of someone close	کسی قریبی کو کھونے کے بعد خاندانوں کے لیے
+A caregiver	ایک دیکھ بھال کرنے والے
+How do you get a little rest when you care every day? A neighbour sitting in for one hour helped me.	روز دیکھ بھال کرتے ہوئے آپ تھوڑا آرام کیسے کرتے ہیں؟ ایک پڑوسی کے ایک گھنٹہ بیٹھنے سے مجھے مدد ملی۔
+A parent	ایک والد یا والدہ
+We wrote our questions down before each visit. It made the talk with the doctor easier.	ہم ہر ملاقات سے پہلے اپنے سوال لکھ لیتے تھے۔ اس سے ڈاکٹر سے بات آسان ہوئی۔
+A young survivor	ایک نوجوان سروائیور
+Going back to college felt strange at first. Talking to others who went through it helped.	کالج واپس جانا پہلے عجیب لگا۔ جو اس سے گزرے ہیں ان سے بات کر کے مدد ملی۔
+A family member	خاندان کے ایک فرد
+Some days are still hard. It helps to know other families feel this too.	کچھ دن اب بھی مشکل ہوتے ہیں۔ یہ جان کر سہارا ملتا ہے کہ دوسرے خاندان بھی ایسا محسوس کرتے ہیں۔
+Community	کمیونٹی
+Sample: not real people	نمونہ: اصلی لوگ نہیں
+Support groups	سپورٹ گروپ
+Coming soon	جلد آ رہا ہے
+Discussions	گفتگو
+Sample post	نمونہ پوسٹ
+About this page	اس صفحے کے بارے میں
+This is an example of how families could find each other. The groups and posts are written by the Sahara team. They are not real people.	یہ ایک مثال ہے کہ خاندان ایک دوسرے کو کیسے ڈھونڈ سکتے ہیں۔ گروپ اور پوسٹ سہارا ٹیم نے لکھے ہیں۔ یہ اصلی لوگ نہیں ہیں۔
+Real groups will be added only after your doctors check them.	اصلی گروپ آپ کے ڈاکٹروں کی جانچ کے بعد ہی شامل کیے جائیں گے۔
+If you need help now, talk to your care team.	ابھی مدد چاہیے تو اپنی دیکھ بھال کی ٹیم سے بات کریں۔
+No change	کوئی تبدیلی نہیں
+since $it	$it سے
+Weight history	وزن کی تاریخ
+Since first	پہلی بار سے
+Where these dates come from	یہ تاریخیں کہاں سے آئیں
+Oncology	آنکولوجی
+Surgery	سرجری
+General medicine	جنرل میڈیسن
+No prescription saved for this day.	اس دن کا کوئی نسخہ محفوظ نہیں۔
+Saved in Sahara on this day.	اس دن Sahara میں محفوظ کیا گیا۔
+Open in calendar	کیلنڈر میں کھولیں
+Nothing left to do.	کرنے کو کچھ باقی نہیں۔
+Chemo port / PICC line	کیمو پورٹ / PICC لائن
+Feeding tube (NG / PEG)	کھانے کی نلی (NG / PEG)
+Urinary catheter	پیشاب کی نلی (کیتھیٹر)
+Chest drain	سینے کی نلی (ڈرین)
+Colostomy / ileostomy bag	کولوسٹومی / الیوسٹومی تھیلی
+Tracheostomy	ٹریکیوسٹومی
+Stent	اسٹینٹ
+Other tube or line	دوسری نلی یا لائن
+Redness	لالی
+Swelling	سوجن
+Discharge or fluid	پیپ یا پانی نکلنا
+Bleeding	خون آنا
+Fever	بخار
+Blocked or not working	بند ہے یا کام نہیں کر رہی
+Fallen out or moved	نکل گئی یا کھسک گئی
+The date put in cannot be after today.	لگانے کی تاریخ آج کے بعد کی نہیں ہو سکتی۔
+The change date should be after the date put in.	بدلنے کی تاریخ لگانے کی تاریخ کے بعد ہونی چاہیے۔
+Tubes and lines	نلیاں اور لائنیں
+Could not save on this phone. Please try again.	اس فون پر محفوظ نہیں ہو سکا۔ دوبارہ کوشش کریں۔
+No tubes or lines added	کوئی نلی یا لائن نہیں جوڑی گئی
+Add tube or line	نلی یا لائن جوڑیں
+More coming in v2.0: device-specific care guides and alerts	v2.0 میں مزید: ہر نلی کے لیے دیکھ بھال کی رہنمائی اور الرٹ
+Tell your care team today	آج ہی اپنی دیکھ بھال کی ٹیم کو بتائیں
+Put in	لگائی گئی
+Change due in 1 day	1 دن میں بدلنی ہے
+Change due in $n days	$n دن میں بدلنی ہے
+Change due today	آج بدلنی ہے
+Change was due 1 day ago	1 دن پہلے بدلنی تھی
+Change was due $n days ago	$n دن پہلے بدلنی تھی
+Checked today: all fine	آج دیکھا: سب ٹھیک
+Checked today	آج دیکھا
+Daily check	روز کی جانچ
+Any of these today?	آج ان میں سے کچھ ہے؟
+All fine	سب ٹھیک
+Edit tube or line	نلی یا لائن بدلیں
+Date put in	لگانے کی تاریخ
+Next change due	اگلی بار بدلنا
+Centre where it was put in	کہاں لگائی گئی (ہسپتال)
+Problems or notes (optional)	مسائل یا نوٹ (ضروری نہیں)
+Remove this tube or line?	یہ نلی یا لائن ہٹائیں؟
+If the record is unsigned, out of date or cannot be found.	اگر ریکارڈ پر دستخط نہیں، وہ پرانا ہو گیا ہے یا مل نہیں رہا۔
+If the problem is new, reversible and unrelated to the illness (injury, choking, drug reaction, low sugar).	اگر مسئلہ نیا ہے، ٹھیک ہو سکتا ہے اور بیماری سے متعلق نہیں (چوٹ، گلے میں پھنسنا، دوا کا ردعمل، شوگر کم ہونا)۔
+If the patient has capacity and says something different now. What they say now always overrides this record.	اگر مریض فیصلہ کرنے کی صلاحیت رکھتا ہے اور اب کچھ اور کہتا ہے۔ اس کی ابھی کی بات ہمیشہ اس ریکارڈ سے اوپر ہے۔
+If the record is ambiguous.	اگر ریکارڈ واضح نہیں۔
+Relief of pain, using opioids in adequate doses, by whatever route works	درد سے نجات — مناسب مقدار میں اوپیئڈز، جس راستے سے بھی اثر کریں
+Relief of breathlessness — opioid, anxiolytic, fan, positioning, oxygen if it helps	سانس پھولنے سے نجات — اوپیئڈ، گھبراہٹ کی دوا، پنکھا، صحیح پوزیشن، مدد کرے تو آکسیجن
+Sedation for distress that cannot be relieved any other way	ایسی تکلیف کے لیے سکون آور دوا (سیڈیشن) جو کسی اور طریقے سے کم نہ ہو
+Control of nausea, secretions, agitation, itch, hiccups	متلی، رطوبتوں، بے چینی، خارش اور ہچکی پر قابو
+Mouth care and eye care, given often	منہ اور آنکھوں کی دیکھ بھال، بار بار
+Comfortable positioning; turning as tolerated; air mattress to prevent pressure sores	آرام دہ پوزیشن؛ جتنا برداشت ہو کروٹ بدلنا؛ بیڈ سور سے بچاؤ کے لیے ایئر گدا
+Skin and wound care; management of odour	جلد اور زخم کی دیکھ بھال؛ بدبو پر قابو
+Bowel care — assessment and management of constipation	آنتوں کی دیکھ بھال — قبض کی جانچ اور علاج
+Bladder care — assessment and management of retention and incontinence	مثانے کی دیکھ بھال — پیشاب رکنے اور بے قابو ہونے کی جانچ اور علاج
+Privacy, dignity, and gentle handling in every personal-care task	ہر ذاتی دیکھ بھال میں پرائیویسی، وقار اور نرم برتاؤ
+Presence of family; spiritual and religious support as the patient wishes	خاندان کا ساتھ؛ مریض کی خواہش کے مطابق روحانی اور مذہبی سہارا
+Honest, unhurried communication with the patient and the family, every day	مریض اور خاندان سے ہر روز دیانتدارانہ، بغیر جلدی کی بات چیت
+Then resuscitate and give full standard emergency care. Clarify with the treating team afterwards.	تو CPR کریں اور پوری معمول کی ایمرجنسی دیکھ بھال دیں۔ بعد میں علاج کرنے والی ٹیم سے وضاحت کریں۔
+Take home from hospital for the last days, with a nurse if available	آخری دنوں کے لیے ہسپتال سے گھر لے جانا، ہو سکے تو نرس کے ساتھ
+Moved between home, hospital, hospice or care home	گھر، ہسپتال، ہاسپس یا کیئر ہوم کے درمیان تبدیلی
+2 weeks	2 ہفتے
+1 month	1 مہینہ
+3 months	3 مہینے
+Nothing noted in this time	اس عرصے میں کچھ درج نہیں
+Lab trends	لیب نتائج کے رجحانات
+All results	تمام نتائج
+No lab results yet	ابھی کوئی لیب نتیجہ نہیں
+Band: printed range	پٹی: چھپی ہوئی حد
+Values and printed ranges are copied from the reports. Red means outside the printed range.	قدریں اور چھپی ہوئی حدیں رپورٹوں سے لی گئی ہیں۔ سرخ کا مطلب ہے چھپی ہوئی حد سے باہر۔
+Highest	سب سے زیادہ
+All symptoms (${all.size})	تمام علامات (${all.size})
+Symptoms & distress	علامات اور پریشانی
+Daily check-ins	روزانہ کا حال
+Distress	پریشانی
+No distress answers yet	ابھی پریشانی کا کوئی جواب نہیں
+$count selected	$count منتخب
+1 week	1 ہفتہ
+Has the pain gone?	کیا درد چلا گیا؟
+Pain has gone (0)	درد چلا گیا (0)
+Past pain on the body	جسم پر پچھلا درد
+See past pain on the body	جسم پر پچھلا درد دیکھیں
+Save 0	0 محفوظ کریں
+See all ${shownPoints.size} entries	سبھی ${shownPoints.size} نوٹ دیکھیں
+A new note with 0 (no pain) is saved for $where. Earlier notes stay as they were.	$where کے لیے 0 (کوئی درد نہیں) والا نیا نوٹ محفوظ ہوگا۔ پچھلے نوٹ ویسے ہی رہیں گے۔
+Show more	مزید دکھائیں
+Couldn't save. Please try again.	محفوظ نہیں ہو سکا۔ براہ کرم دوبارہ کوشش کریں۔
+Dose ${dose.index}	خوراک ${dose.index}
+Not yet	ابھی نہیں
+More information	مزید معلومات
+OK	ٹھیک ہے
+About these reports	ان اطلاعات کے بارے میں
+Each tick or missed dose is what someone recorded, not proof a dose was swallowed. Ask the doctor or nurse what to do about a missed dose.	ہر ٹک یا چھوٹی ہوئی خوراک وہی ہے جو کسی نے درج کی، خوراک نگلنے کا ثبوت نہیں۔ چھوٹی ہوئی خوراک کے بارے میں ڈاکٹر یا نرس سے پوچھیں۔
+No reports yet.	ابھی کوئی اطلاع نہیں۔
+$at dose	$at کی خوراک
+Type these from the prescription.	یہ نسخے سے دیکھ کر لکھیں۔
+Sahara never reads how much, how often, times or directions from a photo. Each dose time is its own tick on the medicine card. Strip cut or name missing? Type the name, or pick it from the list as you type.	سہارا کتنی، کتنی بار، اوقات یا طریقہ تصویر سے کبھی نہیں پڑھتا۔ ہر خوراک کے وقت کا دوا کے کارڈ پر اپنا ٹک ہوتا ہے۔ پتا کٹا ہے یا نام نظر نہیں آتا؟ نام لکھیں، یا لکھتے ہوئے فہرست سے چنیں۔
+$taken of $total taken	$total میں سے $taken لی گئیں
+Any time	کسی بھی وقت
+Reminders are optional. Turn the bell on for each dose you want a reminder for. Strip photos stay on the phone they were taken on.	یاد دہانیاں اختیاری ہیں۔ جس خوراک کی یاد دہانی چاہیے، اس کی گھنٹی چالو کریں۔ پتے کی تصویریں اسی فون پر رہتی ہیں جس پر لی گئیں۔
+Times you change here apply only to this phone.	یہاں بدلے گئے اوقات صرف اسی فون پر لاگو ہوتے ہیں۔
+Reminder on	یاد دہانی چالو
+Reminder off	یاد دہانی بند
+Start and end dates	شروع اور آخری تاریخیں
+The choices are a short general list, not this medicine's own side effects. Use Other for anything else.	یہ انتخاب ایک مختصر عام فہرست ہیں، اس دوا کے اپنے مضر اثرات نہیں۔ کسی اور چیز کے لیے "دیگر" چنیں۔
+Caring for $personName	$personName کی دیکھ بھال
+$personName's care notes	$personName کے دیکھ بھال کے نوٹ
+Today's medicines	آج کی دوائیں
+Dose times come from Reminders or each medicine's saved times. Tick a medicine once it is taken; the ones not yet ticked come first. Strip photos stay on the phone they were taken on.	خوراک کے اوقات یاددہانیوں یا ہر دوا کے محفوظ اوقات سے آتے ہیں۔ دوا لینے کے بعد اس پر نشان لگائیں؛ جن پر نشان نہیں لگا وہ پہلے دکھتی ہیں۔ پتے کی تصویریں اسی فون پر رہتی ہیں جس پر لی گئیں۔
+See all ${medicines.size} medicines	تمام ${medicines.size} دوائیں دیکھیں
+Dismiss	بند کریں
+What is this?	یہ کیا ہے؟
+Help: $title	مدد: $title
+Emergency numbers and plan	ہنگامی نمبر اور منصوبہ
+QR card	QR کارڈ
+$done of $all	$all میں سے $done
+Date to be set	تاریخ طے ہونی ہے
+In $days days	$days دن میں
+How are you holding up?	آپ خود کیسے ہیں؟
+Your own check, not $personName's	آپ کی اپنی جانچ، $personName کی نہیں
+Today: $current/10 · $band	آج: $current/10 · $band
+Your own check	آپ کی اپنی جانچ
+This is the Distress Thermometer question, for you as a carer: how much distress have you felt this past week, including today? 0 is none, 10 is extreme. Only you see it. It stays on this phone and is not added to $personName's record. A score of 4 or more is worth telling the care team about.	یہ آپ کے لیے، دیکھ بھال کرنے والے کے طور پر، ڈسٹریس تھرمامیٹر کا سوال ہے: آج سمیت پچھلے ہفتے آپ کو کتنی پریشانی رہی؟ 0 یعنی کوئی نہیں، 10 یعنی بہت زیادہ۔ اسے صرف آپ دیکھتے ہیں۔ یہ اسی فون پر رہتا ہے اور $personName کے ریکارڈ میں شامل نہیں ہوتا۔ 4 یا زیادہ ہو تو دیکھ بھال کی ٹیم کو ضرور بتائیں۔
+Distress this past week, including today	آج سمیت پچھلے ہفتے کی پریشانی
+Extreme	بہت زیادہ
+That is a lot to carry. Tell the care team how you are at the next visit or call.	یہ بہت بھاری ہے۔ اگلی ملاقات یا فون پر دیکھ بھال کی ٹیم کو اپنا حال بتائیں۔
+A tip for carers	دیکھ بھال کرنے والوں کے لیے ایک مشورہ
+About these tips	ان مشوروں کے بارے میں
+General tips for family carers. They are not medical advice. Ask the palliative care team about anything to do with treatment.	خاندان کے دیکھ بھال کرنے والوں کے لیے عام مشورے۔ یہ طبی مشورہ نہیں ہیں۔ علاج سے متعلق ہر بات پیلی ایٹو کیئر ٹیم سے پوچھیں۔
+Next tip	اگلا مشورہ
+Rest when you can, even for a short while.	جب ہو سکے، تھوڑی دیر ہی سہی، آرام کر لیں۔
+When someone offers help, say yes and name one task they can do.	کوئی مدد کی پیشکش کرے تو ہاں کہیں اور ایک کام بتا دیں۔
+Keep the emergency numbers and the QR card where the whole family can find them.	ہنگامی نمبر اور QR کارڈ ایسی جگہ رکھیں جہاں پورا خاندان دیکھ سکے۔
+Write down questions for the next visit as they come up.	اگلی ملاقات کے سوال جیسے جیسے آئیں، لکھتے جائیں۔
+Tell the care team how you are coping too. Your wellbeing matters.	دیکھ بھال کی ٹیم کو اپنا حال بھی بتائیں۔ آپ کی صحت بھی اہم ہے۔
+Share the caring with others in the family, so no one carries it alone.	دیکھ بھال کا کام خاندان میں بانٹیں، تاکہ کوئی اکیلا نہ اٹھائے۔
+Go to	یہاں جائیں
+Symptoms	علامات
+$taken of $total today	آج $total میں سے $taken
+Pick a part to zoom in. Left and right mean the patient's sides. If the pain has gone, use ⋮ › Pain has gone (0) on the note.	زوم کرنے کے لیے کوئی حصہ چنیں۔ بایاں اور دایاں مریض کے حساب سے ہے۔ درد چلا گیا ہو تو نوٹ پر ⋮ › درد چلا گیا (0) چنیں۔
+Download the speaker pack first.	پہلے اسپیکر پیک ڈاؤن لوڈ کریں۔
+Too little free memory to tell voices apart. Close other apps and retry. Your recording is safe.	آوازیں الگ کرنے کے لیے میموری کم ہے۔ دوسری ایپس بند کر کے دوبارہ کوشش کریں۔ آپ کی ریکارڈنگ محفوظ ہے۔
+Telling voices apart is not available on this phone. The transcript is kept without speakers.	اس فون پر آوازیں الگ کرنا دستیاب نہیں ہے۔ تحریر بولنے والوں کے بغیر رکھی گئی ہے۔
+The note has changed. Read the new note together before signing.	نوٹ بدل گیا ہے۔ دستخط سے پہلے نیا نوٹ ساتھ مل کر پڑھیں۔
+This note version is locked. No more signatures can be added.	نوٹ کا یہ ورژن لاک ہے۔ اب مزید دستخط شامل نہیں ہو سکتے۔
+These signatures are no longer valid. Sign again.	یہ دستخط اب درست نہیں ہیں۔ دوبارہ دستخط کریں۔
+Sign in order: doctor, then patient or family, then witness.	ترتیب سے دستخط کریں: ڈاکٹر، پھر مریض یا خاندان، پھر گواہ۔
+Write the name of the person signing.	دستخط کرنے والے کا نام لکھیں۔
+Write the doctor’s registration number.	ڈاکٹر کا رجسٹریشن نمبر لکھیں۔
+Write how the family member is related to the patient.	لکھیں کہ خاندان کے فرد کا مریض سے کیا رشتہ ہے۔
+Tick the box to confirm before signing.	دستخط سے پہلے تصدیق کے لیے خانے پر نشان لگائیں۔
+Say whether they can read the note themselves.	بتائیں کہ کیا وہ نوٹ خود پڑھ سکتے ہیں۔
+Sign or give a thumb impression on the pad.	پیڈ پر دستخط کریں یا انگوٹھا لگائیں۔
+Someone still needs to sign.	ابھی کسی کے دستخط باقی ہیں۔
+Family member	خاندان کا فرد
+Reg. no.	رجسٹریشن نمبر
+Thumb impression	انگوٹھے کا نشان
+Opening the sign-off…	دستخط کا صفحہ کھل رہا ہے…
+Note signed and locked	نوٹ پر دستخط ہو گئے اور لاک ہو گیا
+Sign the note	نوٹ پر دستخط کریں
+The note was changed after it was signed. All $n signatures on the earlier text are no longer valid. Read the new note together and sign again.	دستخط کے بعد نوٹ بدلا گیا۔ پرانے نوٹ پر کیے گئے تمام $n دستخط اب درست نہیں ہیں۔ نیا نوٹ ساتھ مل کر پڑھیں اور دوبارہ دستخط کریں۔
+This could not be saved on this phone. Try again.	یہ اس فون پر محفوظ نہیں ہو سکا۔ دوبارہ کوشش کریں۔
+1. Doctor	1۔ ڈاکٹر
+Registration no.	رجسٹریشن نمبر
+2. Patient or family member	2۔ مریض یا خاندان کا فرد
+Can they read the note themselves?	کیا وہ نوٹ خود پڑھ سکتے ہیں؟
+No, it was read to them	نہیں، انہیں پڑھ کر سنایا گیا
+I have read or heard this note and it records what we discussed	میں نے یہ نوٹ پڑھا یا سنا ہے اور اس میں وہی لکھا ہے جس پر ہم نے بات کی
+3. Witness	3۔ گواہ
+A thumb impression was used, so a witness also signs.	انگوٹھے کا نشان لگا ہے، اس لیے ایک گواہ بھی دستخط کرے گا۔
+The signer cannot read the note, so a witness also signs.	دستخط کرنے والے نوٹ نہیں پڑھ سکتے، اس لیے ایک گواہ بھی دستخط کرے گا۔
+A witness also signs.	ایک گواہ بھی دستخط کرے گا۔
+Role (optional)	کردار (اختیاری)
+I saw the note read out and the person sign or give their thumb impression	میں نے نوٹ پڑھ کر سناتے اور اس شخص کو دستخط کرتے یا انگوٹھا لگاتے دیکھا
+Lock this note version	نوٹ کا یہ ورژن لاک کریں
+Start the signatures again	دستخط دوبارہ شروع کریں
+Locked on	لاک ہوا:
+Any change to the note or a signature will show.	نوٹ یا کسی دستخط میں تبدیلی نظر آ جائے گی۔
+Thumb impression here	یہاں انگوٹھا لگائیں
+Thumb impression pad	انگوٹھے کے نشان کی جگہ
+Logged by family	خاندان نے درج کیا
+Only ${person.name} can change this.	اسے صرف ${person.name} بدل سکتے ہیں۔
+For the doctor, and the patient or family, to read together and sign.	ڈاکٹر اور مریض یا خاندان کے ساتھ پڑھنے اور دستخط کرنے کے لیے۔
+Signature ________  Name ________  Date ______	دستخط ________  نام ________  تاریخ ______
+Section I – General information	حصہ I – عام معلومات
+Date of birth, sex, gender	تاریخ پیدائش، جنس، صنف
+Address and phone	پتہ اور فون
+Language preferred	پسندیدہ زبان
+Primary oncologist	بنیادی آنکولوجسٹ
+Palliative care physician	پیلی ایٹو کیئر ڈاکٹر
+Members present for the discussion	گفتگو میں موجود افراد
+Primary decision-maker and contact	بنیادی فیصلہ کرنے والا اور رابطہ
+Secondary decision-maker and contact	ثانوی فیصلہ کرنے والا اور رابطہ
+Family to inform before any major decision	کسی بڑے فیصلے سے پہلے جنہیں بتانا ہے
+Section II – Preliminary medical information and patient values	حصہ II – ابتدائی طبی معلومات اور مریض کی اقدار
+Primary diagnosis and stage	بنیادی تشخیص اور مرحلہ
+Capacity, now	ابھی فیصلے کی صلاحیت
+Existing directives	پہلے سے موجود ہدایات
+What the patient knows	مریض کیا جانتے ہیں
+Knows the diagnosis	بیماری کے بارے میں جانتے ہیں
+Does not know the diagnosis	بیماری کے بارے میں نہیں جانتے
+The family has asked that the patient not be told	خاندان نے کہا ہے کہ مریض کو نہ بتایا جائے
+Section III – Decisive actions	حصہ III – فیصلہ کن اقدامات
+Section IV – Signatures and declarations	حصہ IV – دستخط اور اعلانات
+Primary surrogate	بنیادی نمائندہ
+Palliative care clinician	پیلی ایٹو کیئر معالج
+Consent for this conversation	اس گفتگو کے لیے رضامندی
+Patient details	مریض کی تفصیلات
+Family details and emergency contact	خاندان کی تفصیلات اور ہنگامی رابطہ
+Signed and locked	دستخط ہو کر بند
+The note is not signed yet.	نوٹ پر ابھی دستخط نہیں ہوئے۔
+Google Gemini did not finish, so this phone is reading the recording instead.	Google Gemini مکمل نہیں ہوا، اس لیے یہ فون ریکارڈنگ پڑھ رہا ہے۔
+Finding who spoke when	کون کب بولا، یہ ڈھونڈ رہے ہیں
+Audio and words stay on this phone, unless everyone also agrees below to Google Gemini writing the words. The audio is deleted after review unless the doctor keeps it.	آڈیو اور الفاظ اسی فون پر رہتے ہیں، جب تک سب نیچے Google Gemini سے لکھوانے پر بھی راضی نہ ہوں۔ جانچ کے بعد آڈیو مٹا دیا جاتا ہے، جب تک ڈاکٹر اسے نہ رکھیں۔
+Guide for the talk	گفتگو کی رہنمائی
+$done of ${GocGuide.ORDER.size} covered	${GocGuide.ORDER.size} میں سے $done پر بات ہوئی
+How the guide works	رہنمائی کیسے کام کرتی ہے
+In the order of the form: consent, patient details, family and emergency contact, then CPR, dialysis and the other decisions. A topic ticks itself when the words come up, and you can tick it too. A tick records no choice.	فارم کی ترتیب میں: رضامندی، مریض کی تفصیلات، خاندان اور ہنگامی رابطہ، پھر سی پی آر، ڈائیلاسز اور باقی فیصلے۔ الفاظ آتے ہی موضوع پر نشان لگ جاتا ہے، اور آپ بھی لگا سکتے ہیں۔ نشان سے کوئی فیصلہ درج نہیں ہوتا۔
+Audio is sent to Google Gemini to transcribe.	لکھنے کے لیے آڈیو Google Gemini کو بھیجا جاتا ہے۔
+Everyone here agrees. Without this tick the audio stays on this phone.	یہاں سب راضی ہیں۔ یہ نشان نہ ہو تو آڈیو اسی فون پر رہتا ہے۔
+Downloading the speaker pack	بولنے والوں کا پیک ڈاؤن لوڈ ہو رہا ہے
+Tell speakers apart · speaker pack	بولنے والوں کو الگ کریں · پیک
+Which speaker is the doctor?	ڈاکٹر کون سا بولنے والا ہے؟
+I will mark the lines myself	میں خود سطریں نشان زد کروں گا
+Transcribed by	لکھنے والا
+Word for word, kept apart from the note. Check it against the audio. Tap a label to set doctor side or patient party.	لفظ بہ لفظ، نوٹ سے الگ رکھا گیا۔ آڈیو سے ملائیں۔ ڈاکٹر کی طرف یا مریض کی طرف چننے کے لیے لیبل دبائیں۔
+Change the note (everyone signs again)	نوٹ بدلیں (سب کو دوبارہ دستخط کرنا ہوں گے)
+The note in the form's layout, Sections I to IV	فارم کی ترتیب میں نوٹ، حصے I سے IV
+You haven’t spoken about these things. Are you sure you want to continue?	آپ نے ان باتوں پر بات نہیں کی۔ کیا آپ واقعی آگے بڑھنا چاہتے ہیں؟
+They stay No preference recorded, and the note lists them as not discussed.	یہ 'کوئی پسند درج نہیں' رہیں گے، اور نوٹ میں 'بات نہیں ہوئی' لکھا جائے گا۔
+Continue anyway	پھر بھی آگے بڑھیں
+Go back	واپس جائیں
+Ask everyone present if they agree to this conversation being recorded and written down.	سب موجود لوگوں سے پوچھیں کہ کیا وہ اس گفتگو کو ریکارڈ کرنے اور لکھنے پر راضی ہیں۔
+Confirm the patient's name, age and address.	مریض کا نام، عمر اور پتہ تصدیق کریں۔
+Ask who is present, who decides with the patient, and who to call in an emergency.	پوچھیں کہ کون موجود ہے، مریض کے ساتھ کون فیصلہ کرے گا، اور ہنگامی حالت میں کسے فون کریں۔
+Ask what the patient and family understand about the illness.	پوچھیں کہ مریض اور خاندان بیماری کے بارے میں کیا سمجھتے ہیں۔
+If care is at home, ask who visits and how often.	اگر دیکھ بھال گھر پر ہے تو پوچھیں کہ کون اور کتنی بار آتا ہے۔
+Different people said different things. Both are shown. Check with the patient which one stands.	مختلف لوگوں نے مختلف باتیں کہیں۔ دونوں دکھائی گئی ہیں۔ مریض سے پوچھیں کہ کون سی بات درست ہے۔
+Changed during the talk. The latest statement is marked.	گفتگو کے دوران بدلا۔ آخری بات پر نشان ہے۔
+Said earlier, replaced by a later statement	پہلے کہا، بعد کی بات سے بدلا
+Goals-of-care note, in the order of the legal form	دیکھ بھال کے مقاصد کا نوٹ، قانونی فارم کی ترتیب میں
+Signed and locked on the doctor's device	ڈاکٹر کے آلے پر دستخط ہو کر بند
+Doctor's note	ڈاکٹر کا نوٹ
+radiation oncology	ریڈی ایشن آنکولوجی
+chemotherapy	کیموتھراپی
+surgical	سرجری
+home visit	گھر کا دورہ
+Overview	خلاصہ

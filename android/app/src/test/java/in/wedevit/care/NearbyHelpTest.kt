@@ -18,7 +18,10 @@ class NearbyHelpTest {
         NearbyHelp.visible(centres, text, search, state, district, service, layers).map { it.id }
 
     @Test fun emergencyNumbersAreTheCitedNationalOnesAndOnlyOpenTheDialler() {
-        assertEquals(listOf("112", "108", "102", "14567"), NearbyHelp.emergency.map { it.number })
+        // 102 (pregnant women and babies) was removed at the 3 Nov review; 112 is the number on the Nearby call bar.
+        assertEquals(listOf("112", "108", "14567"), NearbyHelp.emergency.map { it.number })
+        assertEquals("112", NearbyHelp.EMERGENCY_CALL)
+        assertEquals("tel:112", NearbyHelp.dialUri(NearbyHelp.EMERGENCY_CALL))
         assertTrue(NearbyHelp.emergency.all { it.label.isNotBlank() && it.labelHindi.isNotBlank() && (it.note.isBlank() == it.noteHindi.isBlank()) })
         assertEquals("tel:14567", NearbyHelp.dialUri("14 567"))
     }
@@ -125,5 +128,37 @@ class NearbyHelpTest {
         assertTrue(text.contains("https://www.google.com/maps/search/?api=1&query=Karunya+Hospice+4th+Cross%2C+Bangalore+560+034"))
         assertTrue(text.contains("call to confirm"))
         assertFalse(NearbyHelp.shareText(towns[1]).contains("Phone"))
+    }
+
+    @Test fun directionsGoToTheVerifiedSpotOnlyWhenTheDirectoryHasAnExactOne() {
+        assertEquals("https://www.google.com/maps/dir/?api=1&destination=18.980000,72.820000", NearbyHelp.directionsUrl(towns[1]))
+        val area = towns[1].copy(locationPrecision = CentreLocation.PINCODE)
+        assertTrue(NearbyHelp.directionsUrl(area).startsWith("https://www.google.com/maps/search/?api=1&query=Shanti+Avedna"))
+        assertTrue(NearbyHelp.directionsUrl(towns[0]).startsWith("https://www.google.com/maps/search/?api=1&query=Karunya+Hospice"))
+    }
+    @Test fun cardTagsComeFromTheListingInChipOrderAndEachHasItsOwnColour() {
+        assertEquals(listOf("Home care", "Inpatient care", "Hospice"), NearbyHelp.serviceTags(towns[0]))
+        assertEquals(listOf("Day care", "Physiotherapy"), NearbyHelp.serviceTags(towns[2]))
+        val tags = NearbyHelp.serviceOptions.drop(1) + NearbyHelp.layerOptions
+        assertEquals(tags.size, tags.map { NearbyHelp.tagColors(it) }.distinct().size)
+        assertEquals(tags.size, tags.map { NearbyHelp.tagColors(it).first }.distinct().size)
+    }
+    @Test fun distanceOrdersMappedCentresFirstAndKeepsTheRestInOrder() {
+        val pune = 18.52 to 73.86
+        val near = towns[1].copy(id = "near", latitude = 18.53, longitude = 73.85)
+        val list = listOf(towns[0], towns[1], near, towns[2])
+        assertEquals(listOf("near", "s", "k", "e"), NearbyHelp.byDistance(list, pune.first, pune.second).map { it.id })
+        assertEquals(listOf("near"), NearbyHelp.nearest(list, pune.first, pune.second, 1).map { it.id })
+        assertNull(NearbyHelp.distanceKm(towns[0], pune.first, pune.second))
+        // Pune to Mumbai is about 120 km in a straight line.
+        assertEquals(120.0, NearbyHelp.distanceKm(pune.first, pune.second, 18.98, 72.82), 10.0)
+    }
+    @Test fun pickerSearchMatchesValueOrShownLabelInAnyCase() {
+        val states = listOf("Kerala" to "केरल", "Karnataka" to "कर्नाटक", "Tamil Nadu" to "तमिलनाडु")
+        assertEquals(states, NearbyHelp.pick(states, "  "))
+        assertEquals(listOf("Tamil Nadu"), NearbyHelp.pick(states, "tamil").map { it.first })
+        assertEquals(listOf("Kerala"), NearbyHelp.pick(states, "केरल").map { it.first })
+        assertEquals(listOf("Karnataka"), NearbyHelp.pick(states, "KA").map { it.first })
+        assertEquals(emptyList<String>(), NearbyHelp.pick(states, "goa").map { it.first })
     }
 }

@@ -168,7 +168,7 @@ internal object DoctorCareDemoData {
     var childBlocked by remember {mutableStateOf(false)}
     var attempt by remember {mutableStateOf(0)}
     // Only sections EmbeddedPatientCare renders may be opened directly; anything else lands on Hub.
-    var section by rememberSaveable(initialPersonId,initialSection) {mutableStateOf(if(initialSection in setOf("Summary","Conversations","Medicines","Progress","Visits","Reports")) initialSection else "Hub")}
+    var section by rememberSaveable(initialPersonId,initialSection) {mutableStateOf(if(initialSection in setOf("Summary","Conversations","Medicines","Progress","Visits","Reports","Labs")) initialSection else "Hub")}
     val people by vm.people.collectAsState();val selected by vm.selected.collectAsState();val draft by vm.draft.collectAsState()
     val person=people.firstOrNull {it.id==initialPersonId}
     fun leave() {if(!closing&&!childBlocked){closing=true;onNavigationBlockedChange(true);scope.launch {val job=vm.closeDoctorDemo();job.join();if(job.isCancelled){closing=false;closeFailed=true;onNavigationBlockedChange(false)}else onExit()}}}
@@ -183,9 +183,11 @@ internal object DoctorCareDemoData {
     else if(error!=null) Column(Modifier.padding(20.dp)) {Text(error!!);Button(onClick={error=null;attempt++}){Text("Retry walkthrough setup")};TextButton(onClick=::leave){Text("Back to patients")}}
     else if(ready && person==null && DoctorTestProfiles.contains(initialPersonId)) Column(Modifier.padding(20.dp)) {Text("This test record was removed. It will not be recreated automatically.");TextButton(onClick=::leave){Text("Back to patients")}}
     else if(!ready || person==null || selected!=person.id || draft.personId!=person.id) Column(Modifier.padding(20.dp)) {LinearProgressIndicator(Modifier.fillMaxWidth());Text(if(DoctorTestProfiles.contains(initialPersonId)) "Opening care records…" else "Opening care records…")}
-    else if(section=="Hub") Column(Modifier.fillMaxSize().testTag("doctor-care-demo-hub")) {
-        if(!DoctorTestProfiles.contains(initialPersonId)) Column(Modifier.fillMaxWidth().padding(horizontal=20.dp,vertical=12.dp)){Text("Practice record · not a live patient",color=Rust);Text("These records are separate from your own patients and are not synced.")}
-        Box(Modifier.weight(1f)){DoctorSharedPatientHub(person,{section=it},deviceLocal=true,items=vm.items)}
-    } else EmbeddedPatientCare(vm,person.id,section,{section=it},{vm.message.value="Account and sharing are unavailable in this offline practice walkthrough."},::leave,
-        onNavigationBlockedChange={childBlocked=it;onNavigationBlockedChange(it||closing)},allowDeviceLocal=true,onHeaderBackChange={nested->onHeaderBackChange(nested ?: back)})
+    else DoctorPatientWorkspace(vm,person.id,section,{section=it},
+        hub={pane,open->Column(Modifier.fillMaxSize().testTag("doctor-care-demo-hub")) {
+            if(!DoctorTestProfiles.contains(initialPersonId)) Text("Practice record · not a live patient",Modifier.fillMaxWidth().padding(horizontal=20.dp,vertical=10.dp),color=Rust)
+            Box(Modifier.weight(1f)){DoctorSharedPatientHub(person,{section=it},deviceLocal=true,items=vm.items,pane=pane,selected=open)}
+        }},
+        care={shown->EmbeddedPatientCare(vm,person.id,shown,{section=it},{vm.message.value="Account and sharing are unavailable in this offline practice walkthrough."},::leave,
+            onNavigationBlockedChange={childBlocked=it;onNavigationBlockedChange(it||closing)},allowDeviceLocal=true,onHeaderBackChange={nested->onHeaderBackChange(nested ?: back)})})
 }

@@ -137,7 +137,8 @@ test('pinned: mixed sentences, ruled-out levels, conflict, and values', () => {
   assert.deepEqual(mixed.flatMap((s) => s.ruledOut), ['5']);
   assert.deepEqual(pick('وینٹی لیٹر نہیں', 'respCeiling')[0].ruledOut, ['5']);
   assert.deepEqual(pick('क्या आप वेंटिलेटर चाहते हैं? नहीं।', 'respCeiling')[0].ruledOut, ['5']);
-  assert.equal(gocMarksFor(extractGoc('I do not want ICU. My son wants ICU.').suggestions, 'icu').conflict, true);
+  assert.equal(gocMarksFor(extractGoc(gocLinesFromText('Patient: I do not want ICU.\nSon: We want ICU.')).suggestions, 'icu').conflict, true, 'two people disagreeing stays a conflict');
+  assert.equal(gocMarksFor(extractGoc('I do not want ICU. My son wants ICU.').suggestions, 'icu').changedMind, true, 'unlabelled lines count as one speaker');
   const case_ = pick('We met today. Amma does NOT want Dialysis, please.', 'dialysis');
   assert.equal(case_[0].quote, 'Amma does NOT want Dialysis, please.');
   const values = extractGoc('What matters most is being with family. Being a burden is unacceptable. Is it important to you?');
@@ -271,11 +272,37 @@ test('Arabic-style Urdu letters still match and the quote stays as typed', () =>
   assert.ok(text.includes(pick(text, 'dialysis')[0].quote));
 });
 
-test('different statements about one decision are all kept, and reported as a conflict', () => {
+test('different statements about one decision are all kept; the latest one stands and the earlier is shown as replaced', () => {
   const marks = gocMarksFor(extractGoc('We want dialysis. Then she said no dialysis.').suggestions, 'dialysis');
-  assert.equal(marks.conflict, true);
-  assert.deepEqual(marks.suggested.sort(), ['NO', 'YES']);
+  assert.equal(marks.conflict, false);
+  assert.equal(marks.changedMind, true);
+  assert.deepEqual(marks.suggested, ['NO']);
   assert.equal(marks.own.length, 2);
+  assert.deepEqual(marks.superseded.map((s) => s.earlier.values), [['YES']]);
+});
+
+test('latest statement wins: no, then yes, then no follows the last one, with both earlier quotes kept', () => {
+  const lines = gocLinesFromText('Doctor: Would you want CPR if the heart stops?\nPatient: No, no CPR.\nDoctor: Are you sure?\nPatient: Actually yes, I want CPR.\nPatient: No. I have thought again. Do not do CPR.');
+  const marks = gocMarksFor(extractGoc(lines).suggestions, 'cpr');
+  assert.deepEqual(marks.suggested, ['DNACPR']);
+  assert.equal(marks.superseded.length, 2);
+  assert.ok(marks.superseded.some((s) => s.earlier.values.includes('ATTEMPT')));
+  assert.equal(marks.conflict, false);
+  const hindi = gocMarksFor(extractGoc('डायलिसिस नहीं चाहिए। ठीक है, डायलिसिस करवाना है। नहीं, डायलिसिस नहीं करना।').suggestions, 'dialysis');
+  assert.deepEqual(hindi.suggested, ['NO']);
+  assert.equal(hindi.superseded.length, 2);
+});
+
+test('latest statement wins only within one person, and compatible statements both stand', () => {
+  const two = gocMarksFor(extractGoc(gocLinesFromText('Patient: I do not want the ventilator.\nSon: Please put him on the ventilator.')).suggestions, 'respCeiling');
+  assert.equal(two.superseded.length, 0, 'the son does not overrule the patient');
+  const ladder = gocMarksFor(extractGoc('No ventilator. BiPAP is okay.').suggestions, 'respCeiling');
+  assert.deepEqual(ladder.suggested, ['4']);
+  assert.deepEqual(ladder.ruledOut, ['5']);
+  assert.equal(ladder.superseded.length, 0);
+  const back = gocMarksFor(extractGoc('No ventilator. Then she changed her mind: the ventilator is okay.').suggestions, 'respCeiling');
+  assert.deepEqual(back.suggested, ['5']);
+  assert.deepEqual(back.ruledOut, []);
 });
 
 test('side labels come only from what was typed; sentences become lines', () => {
@@ -345,7 +372,7 @@ test('accepted quotes add to the plan; existing words and people are kept', () =
 });
 
 test('the checklist is in the order the team asked for, and a topic not talked about stays not discussed and null', () => {
-  assert.deepEqual(GOC_TOPIC_ORDER.slice(0, 3), ['icu', 'respCeiling', 'dialysis']);
+  assert.deepEqual(GOC_TOPIC_ORDER.slice(0, 5), ['consent', 'patientDetails', 'decisionMakers', 'cpr', 'dialysis'], 'consent, patient details, family and emergency contact, then CPR and dialysis');
   const r = draft();
   const rows = gocTopicRows(extractGoc('No ICU.').topics, {});
   assert.equal(rows.find((row) => row.topic === 'icu').status, 'DISCUSSED');
@@ -365,11 +392,14 @@ test('the draft note follows the form, states decisions, keeps no emotion and no
   const lines = [{ text: 'I am so scared and crying [crying], no ICU please', speaker: 'PATIENT_PARTY' }];
   const rows = gocTopicRows(extractGoc(lines).topics, { dialysis: { status: 'NOT_DISCUSSED', verifiedBy: 'Dr Test', verifiedAt: NOW.toISOString() } });
   const note = buildGocNote(r, rows, 'en', { reviewedBy: 'Dr Test', reviewedAt: NOW.toISOString() });
-  assert.match(note, /Intensive care \(ICU\): /);
-  assert.match(note, /Dialysis[^\n]*Not discussed[^\n]*No preference recorded/);
+  assert.match(note, /Requirement of ICU: No — ward-level/);
+  assert.match(note, /Dialysis or CRRT: Not discussed \(doctor verified\)\. No preference recorded/);
+  assert.match(note, /- CPR: Not discussed\. No preference recorded/);
   assert.match(note, /I want to go home/);
   assert.doesNotMatch(note, /scared|crying/);
-  assert.ok(note.indexOf('Intensive care') < note.indexOf('Dialysis'));
+  const order = ['SECTION I ', 'SECTION II ', 'SECTION III ', 'SECTION IV '].map((h) => note.indexOf(h));
+  assert.ok(order.every((at, i) => at > 0 && (i === 0 || at > order[i - 1])), 'Sections I to IV in the order of the legal form');
+  assert.match(note, /Not discussed: [^\n]*Patient details/, 'the note lists what was not discussed');
   assert.equal(gocNoteKind(r), 'DECISION');
   assert.equal(gocNoteKind(draft()), 'DISCUSSION');
   assert.match(buildGocNote(draft(), [], 'hi', { reviewedBy: 'Dr', reviewedAt: NOW.toISOString() }), /बातचीत/);
@@ -438,7 +468,64 @@ test('server reading: off without keys, needs consent, and only exact quotes and
   assert.equal(noConsent.status, 400);
   assert.equal(sent, '');
   const ok = await (await on(new Request('http://x/api/goc-extract', { method: 'POST', headers: { origin: 'http://x' }, body: JSON.stringify({ text: 'No ICU.', consent: true }) }))).json();
-  assert.deepEqual(ok.suggestions, [{ field: 'icu', values: ['NO'], ruledOut: [], quote: 'No ICU', source: 'ai' }]);
+  assert.deepEqual(ok.suggestions, [{ field: 'icu', values: ['NO'], ruledOut: [], quote: 'No ICU', source: 'ai', at: 0, who: '' }]);
   assert.match(sent, /Never give treatment advice/);
   assert.equal(checkedAiSuggestions(null, 'x').length, 0);
+});
+
+// The mock conversations in docs/goc-mock-conversations (all fictional). Each has an expected-outcome file; knownGaps.web lists what the
+// web matcher is known to miss, with the reason, so a gap is reported rather than hidden.
+import { readFileSync, readdirSync } from 'node:fs';
+import { gocUndiscussed } from '../app/goc-extract.ts';
+import { buildGocFormDocument, gocFormHtml } from '../app/goc-form.ts';
+import { crc32, gocFormDocx } from '../app/goc-docx.ts';
+const MOCKS = new URL('../../docs/goc-mock-conversations/', import.meta.url);
+const mockText = (file) => readFileSync(new URL(file, MOCKS), 'utf8').split(/\r?\n/).filter((line) => !line.startsWith('#')).join('\n');
+for (const file of readdirSync(MOCKS).filter((name) => name.endsWith('.expected.json')).sort()) {
+  const expected = JSON.parse(readFileSync(new URL(file, MOCKS), 'utf8'));
+  test(`mock conversation ${expected.transcript}: the matcher's suggestions, changes of mind, disagreements and checklist`, () => {
+    assert.equal(expected.fictional, true);
+    assert.match(readFileSync(new URL(expected.transcript, MOCKS), 'utf8').split('\n')[0], /^# FICTIONAL/);
+    const lines = gocLinesFromText(mockText(expected.transcript));
+    const result = extractGoc(lines);
+    const gaps = expected.knownGaps?.web ?? {};
+    for (const [field, want] of Object.entries(expected.decisions)) {
+      if (gaps[field]) continue;
+      const marks = gocMarksFor(result.suggestions, field);
+      assert.deepEqual([...marks.suggested].sort(), [...want.suggested].sort(), `${field} suggested`);
+      if (want.ruledOut) assert.deepEqual([...marks.ruledOut].sort(), [...want.ruledOut].sort(), `${field} ruled out`);
+      assert.equal(marks.changedMind, expected.changedMind.includes(field), `${field} change of mind`);
+      assert.equal(marks.conflict, expected.conflict.includes(field), `${field} disagreement`);
+    }
+    const rows = gocTopicRows(result.topics, {});
+    for (const topic of expected.discussed) if (!gaps[topic]) assert.equal(rows.find((row) => row.topic === topic).status, 'DISCUSSED', `${topic} discussed`);
+    const open = gocUndiscussed(rows).map((row) => row.topic);
+    for (const topic of expected.notDiscussed) if (!gaps[topic]) assert.ok(open.includes(topic), `${topic} listed as not discussed`);
+    quotesAreExact(gocTextFromLines(lines));
+  });
+}
+
+test('the end-of-talk prompt lists only what was neither discussed nor verified by the doctor', () => {
+  const rows = gocTopicRows(extractGoc('No ICU.').topics, { cpr: { status: 'NOT_DISCUSSED', verifiedBy: 'Dr', verifiedAt: NOW.toISOString() } }, { consented: true });
+  const open = gocUndiscussed(rows).map((row) => row.topic);
+  assert.ok(!open.includes('consent'), 'consent ticks once everyone agreed in the app');
+  assert.ok(!open.includes('icu'));
+  assert.ok(!open.includes('cpr'), 'the doctor verified it');
+  assert.ok(open.includes('dialysis') && open.includes('patientDetails'));
+});
+
+test('the note comes out as a printable page and a Word file in the legal form’s Sections I to IV', () => {
+  const r = draft();
+  applyGocDecision(r, 'cpr', 'DNACPR');
+  const doc = buildGocFormDocument(r, gocTopicRows(extractGoc('Do not do CPR.').topics, {}), 'en', { reviewedBy: 'Dr Test', reviewedAt: NOW.toISOString() });
+  assert.deepEqual(doc.sections.map((s) => s.id), ['I', 'II', 'III', 'IV']);
+  const html = gocFormHtml(doc);
+  assert.match(html, /Section I – General information[\s\S]*Section II[\s\S]*Section III – Decisive actions[\s\S]*Section IV – Signatures/);
+  assert.doesNotMatch(html, /<script/);
+  const bytes = gocFormDocx(doc);
+  assert.deepEqual([...bytes.slice(0, 4)], [0x50, 0x4b, 0x03, 0x04]);
+  const text = new TextDecoder().decode(bytes);
+  assert.match(text, /word\/document\.xml/);
+  assert.match(text, /Do not attempt CPR \(DNACPR\)/);
+  assert.equal(crc32(new TextEncoder().encode('123456789')), 0xcbf43926);
 });

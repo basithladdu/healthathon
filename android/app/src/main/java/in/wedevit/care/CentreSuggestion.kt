@@ -109,6 +109,7 @@ internal suspend fun CareCloud.myCentreSuggestions(account: String): List<Centre
     var address by rememberSaveable { mutableStateOf("") }; var phone by rememberSaveable { mutableStateOf("") }; var note by rememberSaveable { mutableStateOf("") }
     var problem by remember { mutableStateOf<Pair<String, String>?>(null) }
     var result by rememberSaveable { mutableStateOf("") }
+    var more by rememberSaveable { mutableStateOf(false) }
     val sending by vm.centreSuggestionSending.collectAsState()
     ModalBottomSheet(onDismissRequest = onDismiss, containerColor = Cream) {
         Column(Modifier.padding(horizontal = 20.dp).padding(bottom = 28.dp).verticalScroll(rememberScrollState()).testTag("centre-suggestion-sheet"), verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -125,14 +126,17 @@ internal suspend fun CareCloud.myCentreSuggestions(account: String): List<Centre
                     Button(onClick = onDismiss, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Done", "हो गया")) }
                 }
                 else -> {
-                    Text(t("The Sahara team checks it before anyone else sees it. Please don't add patient details.", "दूसरों को दिखने से पहले Sahara टीम इसे जाँचती है। मरीज़ की जानकारी न लिखें।"), style = MaterialTheme.typography.bodySmall)
+                    Text(t("Please don't add patient details.", "मरीज़ की जानकारी न लिखें।"), style = MaterialTheme.typography.bodySmall)
                     OutlinedTextField(name, { name = it.take(CentreSuggestionRules.NAME_MAX) }, label = { Text(t("Centre name", "केंद्र का नाम")) }, singleLine = true, modifier = Modifier.fillMaxWidth().testTag("suggest-name"))
                     OutlinedTextField(city, { city = it.take(CentreSuggestionRules.PLACE_MAX) }, label = { Text(t("Town or city", "शहर या क़स्बा")) }, singleLine = true, modifier = Modifier.fillMaxWidth().testTag("suggest-city"))
                     OutlinedTextField(state, { state = it.take(CentreSuggestionRules.PLACE_MAX) }, label = { Text(t("State", "राज्य")) }, singleLine = true, modifier = Modifier.fillMaxWidth().testTag("suggest-state"))
-                    OutlinedTextField(address, { address = it.take(CentreSuggestionRules.ADDRESS_MAX) }, label = { Text(t("Address (optional)", "पता (ज़रूरी नहीं)")) }, modifier = Modifier.fillMaxWidth())
-                    OutlinedTextField(phone, { phone = it.take(20) }, label = { Text(t("Centre phone (optional)", "केंद्र का फ़ोन (ज़रूरी नहीं)")) }, singleLine = true, modifier = Modifier.fillMaxWidth(),
-                        keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Phone))
-                    OutlinedTextField(note, { note = it.take(CentreSuggestionRules.NOTE_MAX) }, label = { Text(t("What care do they offer? (optional)", "वहाँ कौन-सी देखभाल मिलती है? (ज़रूरी नहीं)")) }, modifier = Modifier.fillMaxWidth())
+                    // Optional fields stay folded so the form is three boxes and a button; anything already typed keeps them open.
+                    if (more || address.isNotBlank() || phone.isNotBlank() || note.isNotBlank()) {
+                        OutlinedTextField(address, { address = it.take(CentreSuggestionRules.ADDRESS_MAX) }, label = { Text(t("Address (optional)", "पता (ज़रूरी नहीं)")) }, modifier = Modifier.fillMaxWidth())
+                        OutlinedTextField(phone, { phone = it.take(20) }, label = { Text(t("Centre phone (optional)", "केंद्र का फ़ोन (ज़रूरी नहीं)")) }, singleLine = true, modifier = Modifier.fillMaxWidth(),
+                            keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Phone))
+                        OutlinedTextField(note, { note = it.take(CentreSuggestionRules.NOTE_MAX) }, label = { Text(t("What care do they offer? (optional)", "वहाँ कौन-सी देखभाल मिलती है? (ज़रूरी नहीं)")) }, modifier = Modifier.fillMaxWidth())
+                    } else TextButton(onClick = { more = true }, modifier = Modifier.heightIn(min = 48.dp).testTag("suggest-more")) { Text(t("Add address, phone or services", "पता, फ़ोन या सेवाएँ जोड़ें")) }
                     problem?.let { (en, hi) -> Text(t(en, hi), color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall) }
                     Button(onClick = {
                         val draft = CentreSuggestionDraft(name, city, state, address, phone, note)
@@ -145,15 +149,18 @@ internal suspend fun CareCloud.myCentreSuggestions(account: String): List<Centre
     }
 }
 
-/** The person's own suggestions with their review state; shown on Nearby only when there are some. */
+/** The person's own suggestions with their review state; shown on Nearby only when there are some, folded to one line until opened. */
 @Composable fun CentreSuggestionList(items: List<CentreSuggestion>) {
     val t = careText()
+    var open by rememberSaveable { mutableStateOf(false) }
     SurfaceCard {
-        Text(t("Your suggestions", "आपके सुझाव"), fontWeight = FontWeight.SemiBold)
-        items.forEach { s ->
+        TextButton(onClick = { open = !open }, contentPadding = PaddingValues(0.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("centre-suggestion-toggle")) {
+            Text(t("Your suggestions (${items.size})", "आपके सुझाव (${items.size})"), fontWeight = FontWeight.SemiBold, color = Ink, modifier = Modifier.weight(1f))
+            Text(if (open) t("Hide", "छिपाएँ") else t("Show", "दिखाएँ"), color = RustText)
+        }
+        if (open) items.forEach { s ->
             Spacer(Modifier.height(8.dp))
-            Text(s.name, fontWeight = FontWeight.Medium)
-            Text(listOf(s.city, s.state).filter(String::isNotBlank).joinToString(", "), style = MaterialTheme.typography.bodySmall)
+            Text(s.name + listOf(s.city, s.state).filter(String::isNotBlank).joinToString(", ").let { if (it.isBlank()) "" else " · $it" }, fontWeight = FontWeight.Medium)
             val (en, hi) = CentreSuggestionRules.statusText(s.status)
             Text(t(en, hi), style = MaterialTheme.typography.bodySmall, color = Rust, modifier = Modifier.testTag("centre-suggestion-status-${s.id}"))
         }

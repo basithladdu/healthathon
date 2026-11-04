@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  ALWAYS_PROVIDED_CARE, DECISION_FIELDS, ROUTINE_REVIEW_WEEKS, TLT_DEFAULT_DAYS,
+  ALWAYS_PROVIDED_CARE, IF_IN_DOUBT_ACTION, IF_IN_DOUBT_RESUSCITATE, DECISION_FIELDS, ROUTINE_REVIEW_WEEKS, TLT_DEFAULT_DAYS,
   blocksActivation, blocksSave, defaultTrialPlan, edInterpretation, emptyEctpr, nextReviewDue, noPreference,
   pageFooter, reviewTriggers, surrogateEntriesLocked, treatmentLocked, unrecordedDecisions, validateEctpr, boardPathwayRequired, capacityFlag,
 } from '../app/ectpr-rules.ts';
@@ -120,9 +120,10 @@ test('V8: page footer carries name, UHID, version, form version, print date and 
   assert.ok(has(draft((x) => { x.patient.uhid = ''; }), 'V8'));
 });
 
-test('V9: always-provided care covers mouth care, hand feeding, symptom relief, hygiene, positioning, family, support, dignity', () => {
+test('V9: always-provided care is the twelve items of Sahaara v1.0 §16', () => {
+  assert.equal(ALWAYS_PROVIDED_CARE.length, 12);
   const text = ALWAYS_PROVIDED_CARE.join(' ').toLowerCase();
-  for (const word of ['mouth care', 'by hand', 'pain', 'breathlessness', 'hygiene', 'pressure', 'positioning', 'family', 'spiritual', 'dignity']) assert.ok(text.includes(word), word);
+  for (const word of ['opioids', 'breathlessness', 'sedation', 'nausea', 'mouth care and eye care', 'pressure sores', 'wound', 'bowel', 'bladder', 'dignity', 'family', 'spiritual', 'communication']) assert.ok(text.includes(word), word);
   assert.ok(Object.isFrozen(ALWAYS_PROVIDED_CARE) || Array.isArray(ALWAYS_PROVIDED_CARE));
 });
 
@@ -232,6 +233,9 @@ test('edInterpretation: NONE, UNSIGNED, OUT_OF_DATE, REVOKED, ACTIVE', () => {
   assert.match(revoked.banner, /CARD WITHDRAWN/);
   assert.equal(edInterpretation({ ...active, status: 'SUPERSEDED' }, NOW).state, 'OUT_OF_DATE');
   assert.ok(edInterpretation(null, NOW).ifInDoubt.length === 4);
+  // Sujay, 1 Nov: every condition starts with "If", then the action.
+  for (const line of IF_IN_DOUBT_RESUSCITATE) assert.match(line, /^If /);
+  assert.match(IF_IN_DOUBT_ACTION, /^Then resuscitate/);
 });
 
 test('review triggers and next review due', () => {

@@ -3896,3 +3896,324 @@ Experience	ಅನುಭವ
 Languages	ಭಾಷೆಗಳು
 Registration: practice sample, not a real number	ನೋಂದಣಿ: ಅಭ್ಯಾಸ ಮಾದರಿ, ನಿಜವಾದ ಸಂಖ್ಯೆ ಅಲ್ಲ
 Sample profile for the walkthrough. Real doctors are verified by the Sahara team against the medical council register.	ಇದು ವಾಕ್‌ಥ್ರೂಗಾಗಿ ಮಾದರಿ ಪ್ರೊಫೈಲ್. ನಿಜವಾದ ವೈದ್ಯರನ್ನು ಸಹಾರಾ ತಂಡ ಮೆಡಿಕಲ್ ಕೌನ್ಸಿಲ್ ರಿಜಿಸ್ಟರ್‌ನೊಂದಿಗೆ ದೃಢೀಕರಿಸುತ್ತದೆ.
+About this list	ಈ ಪಟ್ಟಿಯ ಬಗ್ಗೆ
+Blue pins and tags: the directory also lists morphine. Call to confirm.	ನೀಲಿ ಗುರುತುಗಳು ಮತ್ತು ಟ್ಯಾಗ್‌ಗಳು: ಪಟ್ಟಿಯಲ್ಲಿ ಮಾರ್ಫಿನ್ ಕೂಡ ಇದೆ. ಕರೆ ಮಾಡಿ ಖಚಿತಪಡಿಸಿ.
+Hollow pins mark only the PIN, town or district area. Numbered circles are groups: tap to zoom.	ಖಾಲಿ ಗುರುತುಗಳು ಪಿನ್, ಪಟ್ಟಣ ಅಥವಾ ಜಿಲ್ಲೆಯ ಪ್ರದೇಶವನ್ನು ಮಾತ್ರ ತೋರಿಸುತ್ತವೆ. ಸಂಖ್ಯೆಯ ವೃತ್ತಗಳು ಹಲವು ಕೇಂದ್ರಗಳು: ಜೂಮ್‌ಗಾಗಿ ಒತ್ತಿ.
+${coverage.listOnly} centres have no map spot and are in the list only.	${coverage.listOnly} ಕೇಂದ್ರಗಳು ನಕ್ಷೆಯಲ್ಲಿಲ್ಲ, ಪಟ್ಟಿಯಲ್ಲಿ ಮಾತ್ರ ಇವೆ.
+Your location stays on this phone. It only centres the map and sorts the list.	ನಿಮ್ಮ ಸ್ಥಳ ಈ ಫೋನ್‌ನಲ್ಲೇ ಇರುತ್ತದೆ. ಇದು ನಕ್ಷೆಯನ್ನು ನಿಮ್ಮ ಸುತ್ತ ತೋರಿಸಲು ಮತ್ತು ಪಟ್ಟಿಯನ್ನು ಜೋಡಿಸಲು ಮಾತ್ರ.
+Service	ಸೇವೆ
+All services	ಎಲ್ಲಾ ಸೇವೆಗಳು
+Call 112	112ಗೆ ಕರೆ ಮಾಡಿ
+Search	ಹುಡುಕಿ
+Nothing matches.	ಏನೂ ಸಿಗಲಿಲ್ಲ.
+about $n km	ಸುಮಾರು $n ಕಿ.ಮೀ.
+$n km	$n ಕಿ.ಮೀ.
+About this centre	ಈ ಕೇಂದ್ರದ ಬಗ್ಗೆ
+Call to confirm services, availability and cost.	ಸೇವೆಗಳು, ಲಭ್ಯತೆ ಮತ್ತು ವೆಚ್ಚವನ್ನು ಕರೆ ಮಾಡಿ ಖಚಿತಪಡಿಸಿ.
+Open the source listing	ಮೂಲ ಪಟ್ಟಿಯನ್ನು ತೆರೆಯಿರಿ
+Show where I am	ನಾನು ಎಲ್ಲಿದ್ದೇನೆ ತೋರಿಸಿ
+Please don't add patient details.	ದಯವಿಟ್ಟು ರೋಗಿಯ ವಿವರಗಳನ್ನು ಬರೆಯಬೇಡಿ.
+Add address, phone or services	ವಿಳಾಸ, ಫೋನ್ ಅಥವಾ ಸೇವೆಗಳನ್ನು ಸೇರಿಸಿ
+Your suggestions (${items.size})	ನಿಮ್ಮ ಸಲಹೆಗಳು (${items.size})
+How much was my last bill?	ನನ್ನ ಕೊನೆಯ ಬಿಲ್ ಎಷ್ಟು?
+What is my latest haemoglobin?	ನನ್ನ ಇತ್ತೀಚಿನ ಹಿಮೋಗ್ಲೋಬಿನ್ ಎಷ್ಟು?
+Which medicines are listed on my prescription?	ನನ್ನ ಪ್ರಿಸ್ಕ್ರಿಪ್ಷನ್‌ನಲ್ಲಿ ಯಾವ ಔಷಧಿಗಳನ್ನು ಬರೆದಿದ್ದಾರೆ?
+When was I discharged?	ನನ್ನನ್ನು ಆಸ್ಪತ್ರೆಯಿಂದ ಯಾವಾಗ ಡಿಸ್ಚಾರ್ಜ್ ಮಾಡಿದರು?
+When is my next follow-up?	ನನ್ನ ಮುಂದಿನ ಫಾಲೋ-ಅಪ್ ಯಾವಾಗ?
+Offline · matching lines only	ಆಫ್‌ಲೈನ್ · ಹೊಂದುವ ಸಾಲುಗಳು ಮಾತ್ರ
+Look in	ಎಲ್ಲಿ ನೋಡಬೇಕು
+Choose	ಆಯ್ಕೆಮಾಡಿ
+Send my question and $sendWhat to $sendTo, this time only. Photos and files stay on this phone.	ನನ್ನ ಪ್ರಶ್ನೆ ಮತ್ತು $sendWhat ಅನ್ನು ಈ ಬಾರಿ ಮಾತ್ರ $sendTo ಗೆ ಕಳುಹಿಸಿ. ಫೋಟೋಗಳು ಮತ್ತು ಫೈಲ್‌ಗಳು ಈ ಫೋನ್‌ನಲ್ಲೇ ಇರುತ್ತವೆ.
+Answer	ಉತ್ತರ
+Sources	ಮೂಲಗಳು
+How answers work	ಉತ್ತರಗಳು ಹೇಗೆ ಬರುತ್ತವೆ
+The phone sorts your documents into bills, lab reports, prescriptions and discharge summaries from their words. You can move a document to another folder on the Documents screen.	ಫೋನ್ ನಿಮ್ಮ ದಾಖಲೆಗಳನ್ನು ಅವುಗಳ ಪದಗಳಿಂದ ಬಿಲ್‌ಗಳು, ಲ್ಯಾಬ್ ವರದಿಗಳು, ಪ್ರಿಸ್ಕ್ರಿಪ್ಷನ್‌ಗಳು ಮತ್ತು ಡಿಸ್ಚಾರ್ಜ್ ಸಾರಾಂಶಗಳಾಗಿ ವಿಂಗಡಿಸುತ್ತದೆ. ದಾಖಲೆಗಳ ಪರದೆಯಲ್ಲಿ ನೀವು ಯಾವುದೇ ದಾಖಲೆಯನ್ನು ಬೇರೆ ಫೋಲ್ಡರ್‌ಗೆ ಸರಿಸಬಹುದು.
+Nothing is sent until you tap Ask, and you are asked again each time. Only your question, the matching lines and each document's type are sent, never file names.	ನೀವು ‘ಕೇಳಿ’ ಒತ್ತುವವರೆಗೆ ಏನನ್ನೂ ಕಳುಹಿಸುವುದಿಲ್ಲ, ಪ್ರತಿ ಬಾರಿ ಮತ್ತೆ ಕೇಳಲಾಗುತ್ತದೆ. ನಿಮ್ಮ ಪ್ರಶ್ನೆ, ಹೊಂದುವ ಸಾಲುಗಳು ಮತ್ತು ಪ್ರತಿ ದಾಖಲೆಯ ಪ್ರಕಾರ ಮಾತ್ರ ಕಳುಹಿಸಲಾಗುತ್ತದೆ, ಫೈಲ್ ಹೆಸರುಗಳನ್ನು ಎಂದಿಗೂ ಅಲ್ಲ.
+Matching lines are found on this phone, not explained. Best match first.	ಹೊಂದುವ ಸಾಲುಗಳನ್ನು ಈ ಫೋನ್‌ನಲ್ಲೇ ಹುಡುಕಲಾಗುತ್ತದೆ, ವಿವರಿಸಲಾಗುವುದಿಲ್ಲ. ಉತ್ತಮ ಹೊಂದಾಣಿಕೆ ಮೊದಲು.
+Not checked yet · compare with the paper	ಇನ್ನೂ ಪರಿಶೀಲಿಸಿಲ್ಲ · ಮೂಲ ಕಾಗದದೊಂದಿಗೆ ಹೋಲಿಸಿ
+Bill	ಬಿಲ್
+Discharge summary	ಡಿಸ್ಚಾರ್ಜ್ ಸಾರಾಂಶ
+Family caregivers circle	ಕುಟುಂಬ ಆರೈಕೆದಾರರ ಗುಂಪು
+For family members caring for someone at home	ಮನೆಯಲ್ಲಿ ಯಾರನ್ನಾದರೂ ಆರೈಕೆ ಮಾಡುತ್ತಿರುವ ಕುಟುಂಬದವರಿಗಾಗಿ
+Parents of children with cancer	ಕ್ಯಾನ್ಸರ್ ಇರುವ ಮಕ್ಕಳ ಪೋಷಕರು
+For parents and close family of a child in treatment	ಚಿಕಿತ್ಸೆಯಲ್ಲಿರುವ ಮಗುವಿನ ಪೋಷಕರು ಮತ್ತು ಹತ್ತಿರದ ಕುಟುಂಬಕ್ಕಾಗಿ
+Young survivors	ಯುವ ಸರ್ವೈವರ್‌ಗಳು
+For young people who finished treatment	ಚಿಕಿತ್ಸೆ ಮುಗಿಸಿದ ಯುವಜನರಿಗಾಗಿ
+Loss and grief	ಅಗಲಿಕೆ ಮತ್ತು ದುಃಖ
+For families after the loss of someone close	ಹತ್ತಿರದವರನ್ನು ಕಳೆದುಕೊಂಡ ಕುಟುಂಬಗಳಿಗಾಗಿ
+A caregiver	ಒಬ್ಬ ಆರೈಕೆದಾರರು
+How do you get a little rest when you care every day? A neighbour sitting in for one hour helped me.	ಪ್ರತಿದಿನ ಆರೈಕೆ ಮಾಡುವಾಗ ನೀವು ಸ್ವಲ್ಪ ವಿಶ್ರಾಂತಿ ಹೇಗೆ ಪಡೆಯುತ್ತೀರಿ? ನೆರೆಯವರೊಬ್ಬರು ಒಂದು ಗಂಟೆ ಕುಳಿತಿದ್ದು ನನಗೆ ಸಹಾಯವಾಯಿತು.
+A parent	ಒಬ್ಬ ಪೋಷಕರು
+We wrote our questions down before each visit. It made the talk with the doctor easier.	ಪ್ರತಿ ಭೇಟಿಗೂ ಮೊದಲು ನಮ್ಮ ಪ್ರಶ್ನೆಗಳನ್ನು ಬರೆದುಕೊಂಡೆವು. ಇದರಿಂದ ವೈದ್ಯರೊಂದಿಗೆ ಮಾತನಾಡುವುದು ಸುಲಭವಾಯಿತು.
+A young survivor	ಒಬ್ಬ ಯುವ ಸರ್ವೈವರ್
+Going back to college felt strange at first. Talking to others who went through it helped.	ಮೊದಲು ಕಾಲೇಜಿಗೆ ಮರಳುವುದು ವಿಚಿತ್ರವೆನಿಸಿತು. ಇದನ್ನು ಅನುಭವಿಸಿದ ಇತರರೊಂದಿಗೆ ಮಾತನಾಡುವುದು ಸಹಾಯವಾಯಿತು.
+A family member	ಕುಟುಂಬದ ಒಬ್ಬ ಸದಸ್ಯರು
+Some days are still hard. It helps to know other families feel this too.	ಕೆಲವು ದಿನಗಳು ಇನ್ನೂ ಕಷ್ಟವಾಗಿರುತ್ತವೆ. ಇತರ ಕುಟುಂಬಗಳೂ ಹೀಗೆಯೇ ಭಾವಿಸುತ್ತವೆ ಎಂದು ತಿಳಿದರೆ ಸಮಾಧಾನವಾಗುತ್ತದೆ.
+Community	ಸಮುದಾಯ
+Sample: not real people	ಮಾದರಿ: ನಿಜವಾದ ಜನರಲ್ಲ
+Support groups	ಬೆಂಬಲ ಗುಂಪುಗಳು
+Coming soon	ಶೀಘ್ರದಲ್ಲೇ ಬರಲಿದೆ
+Discussions	ಚರ್ಚೆಗಳು
+Sample post	ಮಾದರಿ ಪೋಸ್ಟ್
+About this page	ಈ ಪುಟದ ಬಗ್ಗೆ
+This is an example of how families could find each other. The groups and posts are written by the Sahara team. They are not real people.	ಕುಟುಂಬಗಳು ಪರಸ್ಪರ ಹೇಗೆ ಹುಡುಕಬಹುದು ಎಂಬುದರ ಉದಾಹರಣೆ ಇದು. ಗುಂಪುಗಳು ಮತ್ತು ಪೋಸ್ಟ್‌ಗಳನ್ನು ಸಹಾರಾ ತಂಡ ಬರೆದಿದೆ. ಇವರು ನಿಜವಾದ ಜನರಲ್ಲ.
+Real groups will be added only after your doctors check them.	ನಿಮ್ಮ ವೈದ್ಯರು ಪರಿಶೀಲಿಸಿದ ನಂತರವೇ ನಿಜವಾದ ಗುಂಪುಗಳನ್ನು ಸೇರಿಸಲಾಗುತ್ತದೆ.
+If you need help now, talk to your care team.	ಈಗಲೇ ಸಹಾಯ ಬೇಕಿದ್ದರೆ, ನಿಮ್ಮ ಆರೈಕೆ ತಂಡದೊಂದಿಗೆ ಮಾತನಾಡಿ.
+No change	ಬದಲಾವಣೆ ಇಲ್ಲ
+since $it	$it ರಿಂದ
+Weight history	ತೂಕದ ಇತಿಹಾಸ
+Since first	ಮೊದಲ ಬಾರಿಯಿಂದ
+Where these dates come from	ಈ ದಿನಾಂಕಗಳು ಎಲ್ಲಿಂದ ಬಂದವು
+Oncology	ಆಂಕಾಲಜಿ
+Surgery	ಶಸ್ತ್ರಚಿಕಿತ್ಸೆ
+General medicine	ಜನರಲ್ ಮೆಡಿಸಿನ್
+No prescription saved for this day.	ಈ ದಿನಕ್ಕೆ ಯಾವುದೇ ಪ್ರಿಸ್ಕ್ರಿಪ್ಷನ್ ಉಳಿಸಿಲ್ಲ.
+Saved in Sahara on this day.	ಈ ದಿನ Sahara ನಲ್ಲಿ ಉಳಿಸಲಾಗಿದೆ.
+Open in calendar	ಕ್ಯಾಲೆಂಡರ್‌ನಲ್ಲಿ ತೆರೆಯಿರಿ
+Nothing left to do.	ಮಾಡಲು ಏನೂ ಉಳಿದಿಲ್ಲ.
+Chemo port / PICC line	ಕೀಮೋ ಪೋರ್ಟ್ / PICC ಲೈನ್
+Feeding tube (NG / PEG)	ಆಹಾರದ ಕೊಳವೆ (NG / PEG)
+Urinary catheter	ಮೂತ್ರದ ಕ್ಯಾತಿಟರ್
+Chest drain	ಎದೆಯ ಡ್ರೈನ್
+Colostomy / ileostomy bag	ಕೊಲೊಸ್ಟೊಮಿ / ಇಲಿಯೊಸ್ಟೊಮಿ ಚೀಲ
+Tracheostomy	ಟ್ರೇಕಿಯೊಸ್ಟೊಮಿ
+Stent	ಸ್ಟೆಂಟ್
+Other tube or line	ಇತರ ಕೊಳವೆ ಅಥವಾ ಲೈನ್
+Redness	ಕೆಂಪು
+Swelling	ಊತ
+Discharge or fluid	ಕೀವು ಅಥವಾ ದ್ರವ ಸೋರುವುದು
+Bleeding	ರಕ್ತಸ್ರಾವ
+Fever	ಜ್ವರ
+Blocked or not working	ಕಟ್ಟಿಕೊಂಡಿದೆ ಅಥವಾ ಕೆಲಸ ಮಾಡುತ್ತಿಲ್ಲ
+Fallen out or moved	ಹೊರಬಂದಿದೆ ಅಥವಾ ಸರಿದಿದೆ
+The date put in cannot be after today.	ಅಳವಡಿಸಿದ ದಿನಾಂಕ ಇಂದಿನ ನಂತರ ಇರಬಾರದು.
+The change date should be after the date put in.	ಬದಲಿಸುವ ದಿನಾಂಕ ಅಳವಡಿಸಿದ ದಿನಾಂಕದ ನಂತರ ಇರಬೇಕು.
+Tubes and lines	ಕೊಳವೆಗಳು ಮತ್ತು ಲೈನ್‌ಗಳು
+Could not save on this phone. Please try again.	ಈ ಫೋನ್‌ನಲ್ಲಿ ಉಳಿಸಲಾಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.
+No tubes or lines added	ಯಾವುದೇ ಕೊಳವೆ ಅಥವಾ ಲೈನ್ ಸೇರಿಸಿಲ್ಲ
+Add tube or line	ಕೊಳವೆ ಅಥವಾ ಲೈನ್ ಸೇರಿಸಿ
+More coming in v2.0: device-specific care guides and alerts	v2.0 ರಲ್ಲಿ ಇನ್ನಷ್ಟು: ಪ್ರತಿ ಕೊಳವೆಗೆ ಆರೈಕೆ ಮಾರ್ಗದರ್ಶಿಗಳು ಮತ್ತು ಎಚ್ಚರಿಕೆಗಳು
+Tell your care team today	ಇಂದೇ ನಿಮ್ಮ ಆರೈಕೆ ತಂಡಕ್ಕೆ ತಿಳಿಸಿ
+Put in	ಅಳವಡಿಸಿದ್ದು
+Change due in 1 day	1 ದಿನದಲ್ಲಿ ಬದಲಿಸಬೇಕು
+Change due in $n days	$n ದಿನಗಳಲ್ಲಿ ಬದಲಿಸಬೇಕು
+Change due today	ಇಂದು ಬದಲಿಸಬೇಕು
+Change was due 1 day ago	1 ದಿನದ ಹಿಂದೆ ಬದಲಿಸಬೇಕಿತ್ತು
+Change was due $n days ago	$n ದಿನಗಳ ಹಿಂದೆ ಬದಲಿಸಬೇಕಿತ್ತು
+Checked today: all fine	ಇಂದು ಪರಿಶೀಲಿಸಲಾಗಿದೆ: ಎಲ್ಲಾ ಸರಿ
+Checked today	ಇಂದು ಪರಿಶೀಲಿಸಲಾಗಿದೆ
+Daily check	ದೈನಂದಿನ ಪರಿಶೀಲನೆ
+Any of these today?	ಇಂದು ಇವುಗಳಲ್ಲಿ ಯಾವುದಾದರೂ ಇದೆಯೇ?
+All fine	ಎಲ್ಲಾ ಸರಿ
+Edit tube or line	ಕೊಳವೆ ಅಥವಾ ಲೈನ್ ತಿದ್ದಿ
+Date put in	ಅಳವಡಿಸಿದ ದಿನಾಂಕ
+Next change due	ಮುಂದಿನ ಬದಲಾವಣೆ
+Centre where it was put in	ಅಳವಡಿಸಿದ ಆಸ್ಪತ್ರೆ
+Problems or notes (optional)	ಸಮಸ್ಯೆಗಳು ಅಥವಾ ಟಿಪ್ಪಣಿಗಳು (ಐಚ್ಛಿಕ)
+Remove this tube or line?	ಈ ಕೊಳವೆ ಅಥವಾ ಲೈನ್ ತೆಗೆದುಹಾಕಬೇಕೆ?
+If the record is unsigned, out of date or cannot be found.	ದಾಖಲೆಗೆ ಸಹಿ ಇಲ್ಲದಿದ್ದರೆ, ಅದು ಹಳೆಯದಾಗಿದ್ದರೆ ಅಥವಾ ಸಿಗದಿದ್ದರೆ.
+If the problem is new, reversible and unrelated to the illness (injury, choking, drug reaction, low sugar).	ಸಮಸ್ಯೆ ಹೊಸದಾಗಿದ್ದು, ಗುಣಪಡಿಸಬಹುದಾಗಿದ್ದು, ಕಾಯಿಲೆಗೆ ಸಂಬಂಧವಿಲ್ಲದಿದ್ದರೆ (ಗಾಯ, ಗಂಟಲಲ್ಲಿ ಸಿಕ್ಕಿಕೊಳ್ಳುವುದು, ಔಷಧ ಪ್ರತಿಕ್ರಿಯೆ, ಸಕ್ಕರೆ ಕಡಿಮೆಯಾಗುವುದು).
+If the patient has capacity and says something different now. What they say now always overrides this record.	ರೋಗಿಗೆ ನಿರ್ಧಾರ ತೆಗೆದುಕೊಳ್ಳುವ ಸಾಮರ್ಥ್ಯವಿದ್ದು, ಈಗ ಬೇರೆ ಹೇಳಿದರೆ. ಅವರು ಈಗ ಹೇಳುವುದು ಯಾವಾಗಲೂ ಈ ದಾಖಲೆಗಿಂತ ಮೇಲು.
+If the record is ambiguous.	ದಾಖಲೆ ಸ್ಪಷ್ಟವಾಗಿಲ್ಲದಿದ್ದರೆ.
+Relief of pain, using opioids in adequate doses, by whatever route works	ನೋವಿನಿಂದ ಉಪಶಮನ — ಸಾಕಷ್ಟು ಪ್ರಮಾಣದಲ್ಲಿ ಓಪಿಯಾಯ್ಡ್‌ಗಳು, ಕೆಲಸ ಮಾಡುವ ಯಾವುದೇ ಮಾರ್ಗದಲ್ಲಿ
+Relief of breathlessness — opioid, anxiolytic, fan, positioning, oxygen if it helps	ಉಸಿರಾಟದ ತೊಂದರೆಯಿಂದ ಉಪಶಮನ — ಓಪಿಯಾಯ್ಡ್, ಆತಂಕ ಕಡಿಮೆ ಮಾಡುವ ಔಷಧ, ಫ್ಯಾನ್, ಸರಿಯಾದ ಭಂಗಿ, ಸಹಾಯವಾದರೆ ಆಮ್ಲಜನಕ
+Sedation for distress that cannot be relieved any other way	ಬೇರೆ ಯಾವುದೇ ರೀತಿಯಲ್ಲಿ ಕಡಿಮೆಯಾಗದ ಸಂಕಟಕ್ಕೆ ನಿದ್ರಾಜನಕ (ಸೆಡೇಶನ್)
+Control of nausea, secretions, agitation, itch, hiccups	ವಾಕರಿಕೆ, ಸ್ರಾವಗಳು, ಚಡಪಡಿಕೆ, ತುರಿಕೆ, ಬಿಕ್ಕಳಿಕೆಯ ನಿಯಂತ್ರಣ
+Mouth care and eye care, given often	ಬಾಯಿ ಮತ್ತು ಕಣ್ಣಿನ ಆರೈಕೆ, ಆಗಾಗ್ಗೆ
+Comfortable positioning; turning as tolerated; air mattress to prevent pressure sores	ಆರಾಮದಾಯಕ ಭಂಗಿ; ಸಹಿಸುವಷ್ಟು ಮಗ್ಗುಲು ಬದಲಿಸುವುದು; ಒತ್ತಡದ ಹುಣ್ಣು ತಡೆಯಲು ಏರ್ ಹಾಸಿಗೆ
+Skin and wound care; management of odour	ಚರ್ಮ ಮತ್ತು ಗಾಯದ ಆರೈಕೆ; ದುರ್ವಾಸನೆಯ ನಿರ್ವಹಣೆ
+Bowel care — assessment and management of constipation	ಕರುಳಿನ ಆರೈಕೆ — ಮಲಬದ್ಧತೆಯ ಪರೀಕ್ಷೆ ಮತ್ತು ನಿರ್ವಹಣೆ
+Bladder care — assessment and management of retention and incontinence	ಮೂತ್ರಕೋಶದ ಆರೈಕೆ — ಮೂತ್ರ ನಿಲ್ಲುವುದು ಮತ್ತು ಹಿಡಿದಿಡಲಾಗದಿರುವುದರ ಪರೀಕ್ಷೆ ಮತ್ತು ನಿರ್ವಹಣೆ
+Privacy, dignity, and gentle handling in every personal-care task	ಪ್ರತಿ ವೈಯಕ್ತಿಕ ಆರೈಕೆಯಲ್ಲಿ ಖಾಸಗಿತನ, ಘನತೆ ಮತ್ತು ಮೃದುವಾದ ನಿರ್ವಹಣೆ
+Presence of family; spiritual and religious support as the patient wishes	ಕುಟುಂಬದ ಉಪಸ್ಥಿತಿ; ರೋಗಿಯ ಇಚ್ಛೆಯಂತೆ ಆಧ್ಯಾತ್ಮಿಕ ಮತ್ತು ಧಾರ್ಮಿಕ ಬೆಂಬಲ
+Honest, unhurried communication with the patient and the family, every day	ರೋಗಿ ಮತ್ತು ಕುಟುಂಬದೊಂದಿಗೆ ಪ್ರತಿದಿನ ಪ್ರಾಮಾಣಿಕ, ಆತುರವಿಲ್ಲದ ಮಾತುಕತೆ
+Then resuscitate and give full standard emergency care. Clarify with the treating team afterwards.	ಆಗ CPR ಮಾಡಿ ಮತ್ತು ಪೂರ್ಣ ಸಾಮಾನ್ಯ ತುರ್ತು ಆರೈಕೆ ನೀಡಿ. ನಂತರ ಚಿಕಿತ್ಸೆ ನೀಡುತ್ತಿರುವ ತಂಡದೊಂದಿಗೆ ಸ್ಪಷ್ಟಪಡಿಸಿ.
+Take home from hospital for the last days, with a nurse if available	ಕೊನೆಯ ದಿನಗಳಿಗಾಗಿ ಆಸ್ಪತ್ರೆಯಿಂದ ಮನೆಗೆ ಕರೆದೊಯ್ಯುವುದು, ಸಾಧ್ಯವಾದರೆ ನರ್ಸ್ ಜೊತೆ
+Moved between home, hospital, hospice or care home	ಮನೆ, ಆಸ್ಪತ್ರೆ, ಹಾಸ್ಪಿಸ್ ಅಥವಾ ಕೇರ್ ಹೋಮ್ ನಡುವೆ ಬದಲಾವಣೆ
+2 weeks	2 ವಾರಗಳು
+1 month	1 ತಿಂಗಳು
+3 months	3 ತಿಂಗಳುಗಳು
+Nothing noted in this time	ಈ ಅವಧಿಯಲ್ಲಿ ಏನೂ ದಾಖಲಾಗಿಲ್ಲ
+Lab trends	ಲ್ಯಾಬ್ ಫಲಿತಾಂಶಗಳ ಪ್ರವೃತ್ತಿ
+All results	ಎಲ್ಲಾ ಫಲಿತಾಂಶಗಳು
+No lab results yet	ಇನ್ನೂ ಲ್ಯಾಬ್ ಫಲಿತಾಂಶಗಳಿಲ್ಲ
+Band: printed range	ಪಟ್ಟಿ: ಮುದ್ರಿತ ವ್ಯಾಪ್ತಿ
+Values and printed ranges are copied from the reports. Red means outside the printed range.	ಮೌಲ್ಯಗಳು ಮತ್ತು ಮುದ್ರಿತ ವ್ಯಾಪ್ತಿಗಳನ್ನು ವರದಿಗಳಿಂದ ತೆಗೆದುಕೊಳ್ಳಲಾಗಿದೆ. ಕೆಂಪು ಎಂದರೆ ಮುದ್ರಿತ ವ್ಯಾಪ್ತಿಯ ಹೊರಗೆ.
+Highest	ಅತಿ ಹೆಚ್ಚು
+All symptoms (${all.size})	ಎಲ್ಲಾ ಲಕ್ಷಣಗಳು (${all.size})
+Symptoms & distress	ಲಕ್ಷಣಗಳು ಮತ್ತು ಸಂಕಟ
+Daily check-ins	ದೈನಂದಿನ ಸ್ಥಿತಿ
+Distress	ಸಂಕಟ
+No distress answers yet	ಇನ್ನೂ ಸಂಕಟದ ಉತ್ತರಗಳಿಲ್ಲ
+$count selected	$count ಆಯ್ಕೆ ಮಾಡಲಾಗಿದೆ
+1 week	1 ವಾರ
+Has the pain gone?	ನೋವು ಹೋಗಿದೆಯೇ?
+Pain has gone (0)	ನೋವು ಹೋಗಿದೆ (0)
+Past pain on the body	ದೇಹದ ಮೇಲೆ ಹಿಂದಿನ ನೋವು
+See past pain on the body	ದೇಹದ ಮೇಲೆ ಹಿಂದಿನ ನೋವು ನೋಡಿ
+Save 0	0 ಉಳಿಸಿ
+See all ${shownPoints.size} entries	ಎಲ್ಲಾ ${shownPoints.size} ನಮೂದುಗಳನ್ನು ನೋಡಿ
+A new note with 0 (no pain) is saved for $where. Earlier notes stay as they were.	$where ಗಾಗಿ 0 (ನೋವು ಇಲ್ಲ) ಇರುವ ಹೊಸ ಟಿಪ್ಪಣಿ ಉಳಿಸಲಾಗುತ್ತದೆ. ಹಿಂದಿನ ಟಿಪ್ಪಣಿಗಳು ಹಾಗೆಯೇ ಇರುತ್ತವೆ.
+Show more	ಇನ್ನಷ್ಟು ತೋರಿಸಿ
+Couldn't save. Please try again.	ಉಳಿಸಲಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.
+Dose ${dose.index}	ಡೋಸ್ ${dose.index}
+Not yet	ಇನ್ನೂ ಇಲ್ಲ
+More information	ಹೆಚ್ಚಿನ ಮಾಹಿತಿ
+OK	ಸರಿ
+About these reports	ಈ ವರದಿಗಳ ಬಗ್ಗೆ
+Each tick or missed dose is what someone recorded, not proof a dose was swallowed. Ask the doctor or nurse what to do about a missed dose.	ಪ್ರತಿ ಟಿಕ್ ಅಥವಾ ತಪ್ಪಿದ ಡೋಸ್ ಯಾರೋ ದಾಖಲಿಸಿದ್ದು ಮಾತ್ರ, ಡೋಸ್ ನುಂಗಿದ್ದಕ್ಕೆ ಪುರಾವೆಯಲ್ಲ. ತಪ್ಪಿದ ಡೋಸ್ ಬಗ್ಗೆ ಏನು ಮಾಡಬೇಕೆಂದು ವೈದ್ಯರು ಅಥವಾ ನರ್ಸ್ ಅವರನ್ನು ಕೇಳಿ.
+No reports yet.	ಇನ್ನೂ ವರದಿಗಳಿಲ್ಲ.
+$at dose	$at ಡೋಸ್
+Type these from the prescription.	ಇವುಗಳನ್ನು ಪ್ರಿಸ್ಕ್ರಿಪ್ಷನ್ ನೋಡಿ ಟೈಪ್ ಮಾಡಿ.
+Sahara never reads how much, how often, times or directions from a photo. Each dose time is its own tick on the medicine card. Strip cut or name missing? Type the name, or pick it from the list as you type.	ಸಹಾರಾ ಎಷ್ಟು, ಎಷ್ಟು ಬಾರಿ, ಸಮಯಗಳು ಅಥವಾ ಸೂಚನೆಗಳನ್ನು ಫೋಟೋದಿಂದ ಎಂದಿಗೂ ಓದುವುದಿಲ್ಲ. ಪ್ರತಿ ಡೋಸ್ ಸಮಯಕ್ಕೆ ಔಷಧಿ ಕಾರ್ಡ್‌ನಲ್ಲಿ ತನ್ನದೇ ಟಿಕ್ ಇರುತ್ತದೆ. ಸ್ಟ್ರಿಪ್ ಕತ್ತರಿಸಿದೆಯೇ ಅಥವಾ ಹೆಸರು ಇಲ್ಲವೇ? ಹೆಸರು ಟೈಪ್ ಮಾಡಿ, ಅಥವಾ ಟೈಪ್ ಮಾಡುವಾಗ ಪಟ್ಟಿಯಿಂದ ಆರಿಸಿ.
+$taken of $total taken	$total ರಲ್ಲಿ $taken ತೆಗೆದುಕೊಂಡಿದೆ
+Any time	ಯಾವಾಗ ಬೇಕಾದರೂ
+Reminders are optional. Turn the bell on for each dose you want a reminder for. Strip photos stay on the phone they were taken on.	ರಿಮೈಂಡರ್‌ಗಳು ಐಚ್ಛಿಕ. ರಿಮೈಂಡರ್ ಬೇಕಾದ ಪ್ರತಿ ಡೋಸ್‌ಗೆ ಗಂಟೆಯನ್ನು ಆನ್ ಮಾಡಿ. ಸ್ಟ್ರಿಪ್ ಫೋಟೋಗಳು ತೆಗೆದ ಫೋನ್‌ನಲ್ಲೇ ಇರುತ್ತವೆ.
+Times you change here apply only to this phone.	ಇಲ್ಲಿ ಬದಲಿಸಿದ ಸಮಯಗಳು ಈ ಫೋನ್‌ಗೆ ಮಾತ್ರ ಅನ್ವಯಿಸುತ್ತವೆ.
+Reminder on	ರಿಮೈಂಡರ್ ಆನ್
+Reminder off	ರಿಮೈಂಡರ್ ಆಫ್
+Start and end dates	ಆರಂಭ ಮತ್ತು ಕೊನೆಯ ದಿನಾಂಕಗಳು
+The choices are a short general list, not this medicine's own side effects. Use Other for anything else.	ಈ ಆಯ್ಕೆಗಳು ಒಂದು ಚಿಕ್ಕ ಸಾಮಾನ್ಯ ಪಟ್ಟಿ, ಈ ಔಷಧಿಯ ಸ್ವಂತ ಅಡ್ಡಪರಿಣಾಮಗಳಲ್ಲ. ಬೇರೆ ಏನಾದರೂ ಇದ್ದರೆ "ಇತರೆ" ಆರಿಸಿ.
+Caring for $personName	$personName ಅವರ ಆರೈಕೆ
+$personName's care notes	$personName ಅವರ ಆರೈಕೆ ಟಿಪ್ಪಣಿಗಳು
+Today's medicines	ಇಂದಿನ ಔಷಧಿಗಳು
+Dose times come from Reminders or each medicine's saved times. Tick a medicine once it is taken; the ones not yet ticked come first. Strip photos stay on the phone they were taken on.	ಡೋಸ್ ಸಮಯಗಳು ರಿಮೈಂಡರ್‌ಗಳಿಂದ ಅಥವಾ ಪ್ರತಿ ಔಷಧಿಯ ಉಳಿಸಿದ ಸಮಯಗಳಿಂದ ಬರುತ್ತವೆ. ಔಷಧಿ ತೆಗೆದುಕೊಂಡ ನಂತರ ಟಿಕ್ ಮಾಡಿ; ಟಿಕ್ ಮಾಡದವು ಮೊದಲು ಕಾಣುತ್ತವೆ. ಸ್ಟ್ರಿಪ್ ಫೋಟೋಗಳು ತೆಗೆದ ಫೋನ್‌ನಲ್ಲೇ ಇರುತ್ತವೆ.
+See all ${medicines.size} medicines	ಎಲ್ಲಾ ${medicines.size} ಔಷಧಿಗಳನ್ನು ನೋಡಿ
+Dismiss	ಮುಚ್ಚಿ
+What is this?	ಇದು ಏನು?
+Help: $title	ಸಹಾಯ: $title
+Emergency numbers and plan	ತುರ್ತು ಸಂಖ್ಯೆಗಳು ಮತ್ತು ಯೋಜನೆ
+QR card	QR ಕಾರ್ಡ್
+$done of $all	$all ರಲ್ಲಿ $done
+Date to be set	ದಿನಾಂಕ ನಿಗದಿಯಾಗಬೇಕು
+In $days days	$days ದಿನಗಳಲ್ಲಿ
+How are you holding up?	ನೀವು ಹೇಗಿದ್ದೀರಿ?
+Your own check, not $personName's	ನಿಮ್ಮ ಸ್ವಂತ ಪರಿಶೀಲನೆ, $personName ಅವರದಲ್ಲ
+Today: $current/10 · $band	ಇಂದು: $current/10 · $band
+Your own check	ನಿಮ್ಮ ಸ್ವಂತ ಪರಿಶೀಲನೆ
+This is the Distress Thermometer question, for you as a carer: how much distress have you felt this past week, including today? 0 is none, 10 is extreme. Only you see it. It stays on this phone and is not added to $personName's record. A score of 4 or more is worth telling the care team about.	ಇದು ಆರೈಕೆದಾರರಾಗಿ ನಿಮಗಾಗಿ ಡಿಸ್ಟ್ರೆಸ್ ಥರ್ಮಾಮೀಟರ್ ಪ್ರಶ್ನೆ: ಇಂದು ಸೇರಿ ಕಳೆದ ವಾರ ನಿಮಗೆ ಎಷ್ಟು ತೊಂದರೆ ಆಯಿತು? 0 ಎಂದರೆ ಇಲ್ಲ, 10 ಎಂದರೆ ತುಂಬಾ ಹೆಚ್ಚು. ಇದನ್ನು ನೀವು ಮಾತ್ರ ನೋಡುತ್ತೀರಿ. ಇದು ಈ ಫೋನ್‌ನಲ್ಲೇ ಇರುತ್ತದೆ, $personName ಅವರ ದಾಖಲೆಗೆ ಸೇರುವುದಿಲ್ಲ. 4 ಅಥವಾ ಹೆಚ್ಚು ಇದ್ದರೆ ಆರೈಕೆ ತಂಡಕ್ಕೆ ತಿಳಿಸಿ.
+Distress this past week, including today	ಇಂದು ಸೇರಿ ಕಳೆದ ವಾರದ ತೊಂದರೆ
+Extreme	ತುಂಬಾ ಹೆಚ್ಚು
+That is a lot to carry. Tell the care team how you are at the next visit or call.	ಇದು ತುಂಬಾ ಭಾರ. ಮುಂದಿನ ಭೇಟಿಯಲ್ಲಿ ಅಥವಾ ಕರೆಯಲ್ಲಿ ನಿಮ್ಮ ಸ್ಥಿತಿಯನ್ನು ಆರೈಕೆ ತಂಡಕ್ಕೆ ತಿಳಿಸಿ.
+A tip for carers	ಆರೈಕೆದಾರರಿಗೆ ಒಂದು ಸಲಹೆ
+About these tips	ಈ ಸಲಹೆಗಳ ಬಗ್ಗೆ
+General tips for family carers. They are not medical advice. Ask the palliative care team about anything to do with treatment.	ಕುಟುಂಬದ ಆರೈಕೆದಾರರಿಗೆ ಸಾಮಾನ್ಯ ಸಲಹೆಗಳು. ಇವು ವೈದ್ಯಕೀಯ ಸಲಹೆ ಅಲ್ಲ. ಚಿಕಿತ್ಸೆಗೆ ಸಂಬಂಧಿಸಿದ ಯಾವುದನ್ನಾದರೂ ಪ್ಯಾಲಿಯೇಟಿವ್ ಕೇರ್ ತಂಡವನ್ನು ಕೇಳಿ.
+Next tip	ಮುಂದಿನ ಸಲಹೆ
+Rest when you can, even for a short while.	ಸಾಧ್ಯವಾದಾಗ ಸ್ವಲ್ಪ ಹೊತ್ತಾದರೂ ವಿಶ್ರಾಂತಿ ತೆಗೆದುಕೊಳ್ಳಿ.
+When someone offers help, say yes and name one task they can do.	ಯಾರಾದರೂ ಸಹಾಯ ಮಾಡುತ್ತೇವೆ ಎಂದರೆ ಒಪ್ಪಿ, ಅವರು ಮಾಡಬಹುದಾದ ಒಂದು ಕೆಲಸ ಹೇಳಿ.
+Keep the emergency numbers and the QR card where the whole family can find them.	ತುರ್ತು ಸಂಖ್ಯೆಗಳು ಮತ್ತು QR ಕಾರ್ಡ್ ಅನ್ನು ಇಡೀ ಕುಟುಂಬ ಕಾಣುವ ಕಡೆ ಇಡಿ.
+Write down questions for the next visit as they come up.	ಮುಂದಿನ ಭೇಟಿಗೆ ಪ್ರಶ್ನೆಗಳು ಬಂದಂತೆ ಬರೆದಿಡಿ.
+Tell the care team how you are coping too. Your wellbeing matters.	ನೀವು ಹೇಗೆ ನಿಭಾಯಿಸುತ್ತಿದ್ದೀರಿ ಎಂದೂ ಆರೈಕೆ ತಂಡಕ್ಕೆ ತಿಳಿಸಿ. ನಿಮ್ಮ ಯೋಗಕ್ಷೇಮವೂ ಮುಖ್ಯ.
+Share the caring with others in the family, so no one carries it alone.	ಆರೈಕೆಯನ್ನು ಕುಟುಂಬದಲ್ಲಿ ಹಂಚಿಕೊಳ್ಳಿ, ಯಾರೂ ಒಬ್ಬರೇ ಹೊರದಂತೆ.
+Go to	ಇಲ್ಲಿಗೆ ಹೋಗಿ
+Symptoms	ಲಕ್ಷಣಗಳು
+$taken of $total today	ಇಂದು $total ರಲ್ಲಿ $taken
+Pick a part to zoom in. Left and right mean the patient's sides. If the pain has gone, use ⋮ › Pain has gone (0) on the note.	ಜೂಮ್ ಮಾಡಲು ಒಂದು ಭಾಗವನ್ನು ಆರಿಸಿ. ಎಡ ಮತ್ತು ಬಲ ರೋಗಿಯ ಬದಿಗಳು. ನೋವು ಹೋಗಿದ್ದರೆ, ಟಿಪ್ಪಣಿಯಲ್ಲಿ ⋮ › ನೋವು ಹೋಗಿದೆ (0) ಬಳಸಿ.
+Download the speaker pack first.	ಮೊದಲು ಸ್ಪೀಕರ್ ಪ್ಯಾಕ್ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ.
+Too little free memory to tell voices apart. Close other apps and retry. Your recording is safe.	ಧ್ವನಿಗಳನ್ನು ಬೇರ್ಪಡಿಸಲು ಮೆಮೊರಿ ಕಡಿಮೆ ಇದೆ. ಇತರ ಆ್ಯಪ್‌ಗಳನ್ನು ಮುಚ್ಚಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ. ನಿಮ್ಮ ರೆಕಾರ್ಡಿಂಗ್ ಸುರಕ್ಷಿತವಾಗಿದೆ.
+Telling voices apart is not available on this phone. The transcript is kept without speakers.	ಈ ಫೋನ್‌ನಲ್ಲಿ ಧ್ವನಿಗಳನ್ನು ಬೇರ್ಪಡಿಸುವುದು ಲಭ್ಯವಿಲ್ಲ. ಪ್ರತಿಲಿಪಿಯನ್ನು ಮಾತನಾಡುವವರಿಲ್ಲದೆ ಇರಿಸಲಾಗಿದೆ.
+The note has changed. Read the new note together before signing.	ಟಿಪ್ಪಣಿ ಬದಲಾಗಿದೆ. ಸಹಿ ಮಾಡುವ ಮೊದಲು ಹೊಸ ಟಿಪ್ಪಣಿಯನ್ನು ಒಟ್ಟಿಗೆ ಓದಿ.
+This note version is locked. No more signatures can be added.	ಈ ಟಿಪ್ಪಣಿಯ ಆವೃತ್ತಿ ಲಾಕ್ ಆಗಿದೆ. ಇನ್ನು ಸಹಿಗಳನ್ನು ಸೇರಿಸಲು ಆಗುವುದಿಲ್ಲ.
+These signatures are no longer valid. Sign again.	ಈ ಸಹಿಗಳು ಇನ್ನು ಮಾನ್ಯವಲ್ಲ. ಮತ್ತೆ ಸಹಿ ಮಾಡಿ.
+Sign in order: doctor, then patient or family, then witness.	ಕ್ರಮವಾಗಿ ಸಹಿ ಮಾಡಿ: ವೈದ್ಯರು, ನಂತರ ರೋಗಿ ಅಥವಾ ಕುಟುಂಬ, ನಂತರ ಸಾಕ್ಷಿ.
+Write the name of the person signing.	ಸಹಿ ಮಾಡುತ್ತಿರುವವರ ಹೆಸರು ಬರೆಯಿರಿ.
+Write the doctor’s registration number.	ವೈದ್ಯರ ನೋಂದಣಿ ಸಂಖ್ಯೆ ಬರೆಯಿರಿ.
+Write how the family member is related to the patient.	ಕುಟುಂಬದ ಸದಸ್ಯರಿಗೆ ರೋಗಿಯೊಂದಿಗೆ ಇರುವ ಸಂಬಂಧ ಬರೆಯಿರಿ.
+Tick the box to confirm before signing.	ಸಹಿ ಮಾಡುವ ಮೊದಲು ದೃಢೀಕರಿಸಲು ಪೆಟ್ಟಿಗೆಯಲ್ಲಿ ಟಿಕ್ ಮಾಡಿ.
+Say whether they can read the note themselves.	ಅವರು ಟಿಪ್ಪಣಿಯನ್ನು ತಾವೇ ಓದಬಲ್ಲರೇ ಎಂದು ತಿಳಿಸಿ.
+Sign or give a thumb impression on the pad.	ಪ್ಯಾಡ್ ಮೇಲೆ ಸಹಿ ಮಾಡಿ ಅಥವಾ ಹೆಬ್ಬೆರಳಿನ ಗುರುತು ಹಾಕಿ.
+Someone still needs to sign.	ಇನ್ನೂ ಯಾರೋ ಸಹಿ ಮಾಡಬೇಕಿದೆ.
+Family member	ಕುಟುಂಬದ ಸದಸ್ಯರು
+Reg. no.	ನೋಂ. ಸಂ.
+Thumb impression	ಹೆಬ್ಬೆರಳಿನ ಗುರುತು
+Opening the sign-off…	ಸಹಿ ಪುಟ ತೆರೆಯುತ್ತಿದೆ…
+Note signed and locked	ಟಿಪ್ಪಣಿಗೆ ಸಹಿ ಆಗಿದೆ ಮತ್ತು ಲಾಕ್ ಆಗಿದೆ
+Sign the note	ಟಿಪ್ಪಣಿಗೆ ಸಹಿ ಮಾಡಿ
+The note was changed after it was signed. All $n signatures on the earlier text are no longer valid. Read the new note together and sign again.	ಸಹಿ ಆದ ನಂತರ ಟಿಪ್ಪಣಿ ಬದಲಾಗಿದೆ. ಹಳೆಯ ಟಿಪ್ಪಣಿಯ ಮೇಲಿನ ಎಲ್ಲಾ $n ಸಹಿಗಳು ಇನ್ನು ಮಾನ್ಯವಲ್ಲ. ಹೊಸ ಟಿಪ್ಪಣಿಯನ್ನು ಒಟ್ಟಿಗೆ ಓದಿ ಮತ್ತೆ ಸಹಿ ಮಾಡಿ.
+This could not be saved on this phone. Try again.	ಇದನ್ನು ಈ ಫೋನಿನಲ್ಲಿ ಉಳಿಸಲು ಆಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.
+1. Doctor	1. ವೈದ್ಯರು
+Registration no.	ನೋಂದಣಿ ಸಂಖ್ಯೆ
+2. Patient or family member	2. ರೋಗಿ ಅಥವಾ ಕುಟುಂಬದ ಸದಸ್ಯರು
+Can they read the note themselves?	ಅವರು ಟಿಪ್ಪಣಿಯನ್ನು ತಾವೇ ಓದಬಲ್ಲರೇ?
+No, it was read to them	ಇಲ್ಲ, ಅವರಿಗೆ ಓದಿ ಹೇಳಲಾಯಿತು
+I have read or heard this note and it records what we discussed	ನಾನು ಈ ಟಿಪ್ಪಣಿಯನ್ನು ಓದಿದ್ದೇನೆ ಅಥವಾ ಕೇಳಿದ್ದೇನೆ, ನಾವು ಮಾತನಾಡಿದ್ದೇ ಇದರಲ್ಲಿದೆ
+3. Witness	3. ಸಾಕ್ಷಿ
+A thumb impression was used, so a witness also signs.	ಹೆಬ್ಬೆರಳಿನ ಗುರುತು ಹಾಕಲಾಗಿದೆ, ಆದ್ದರಿಂದ ಒಬ್ಬ ಸಾಕ್ಷಿಯೂ ಸಹಿ ಮಾಡುತ್ತಾರೆ.
+The signer cannot read the note, so a witness also signs.	ಸಹಿ ಮಾಡಿದವರು ಟಿಪ್ಪಣಿ ಓದಲಾರರು, ಆದ್ದರಿಂದ ಒಬ್ಬ ಸಾಕ್ಷಿಯೂ ಸಹಿ ಮಾಡುತ್ತಾರೆ.
+A witness also signs.	ಒಬ್ಬ ಸಾಕ್ಷಿಯೂ ಸಹಿ ಮಾಡುತ್ತಾರೆ.
+Role (optional)	ಪಾತ್ರ (ಐಚ್ಛಿಕ)
+I saw the note read out and the person sign or give their thumb impression	ಟಿಪ್ಪಣಿಯನ್ನು ಓದಿ ಹೇಳಿದ್ದು ಮತ್ತು ಆ ವ್ಯಕ್ತಿ ಸಹಿ ಮಾಡಿದ್ದು ಅಥವಾ ಹೆಬ್ಬೆರಳಿನ ಗುರುತು ಹಾಕಿದ್ದನ್ನು ನಾನು ನೋಡಿದೆ
+Lock this note version	ಈ ಟಿಪ್ಪಣಿ ಆವೃತ್ತಿಯನ್ನು ಲಾಕ್ ಮಾಡಿ
+Start the signatures again	ಸಹಿಗಳನ್ನು ಮತ್ತೆ ಆರಂಭಿಸಿ
+Locked on	ಲಾಕ್ ಆದದ್ದು:
+Any change to the note or a signature will show.	ಟಿಪ್ಪಣಿಯಲ್ಲಿ ಅಥವಾ ಯಾವುದೇ ಸಹಿಯಲ್ಲಿ ಬದಲಾವಣೆ ಆದರೆ ತಿಳಿಯುತ್ತದೆ.
+Thumb impression here	ಇಲ್ಲಿ ಹೆಬ್ಬೆರಳಿನ ಗುರುತು ಹಾಕಿ
+Thumb impression pad	ಹೆಬ್ಬೆರಳಿನ ಗುರುತಿನ ಜಾಗ
+Logged by family	ಕುಟುಂಬ ದಾಖಲಿಸಿದೆ
+Only ${person.name} can change this.	ಇದನ್ನು ${person.name} ಮಾತ್ರ ಬದಲಾಯಿಸಬಹುದು.
+For the doctor, and the patient or family, to read together and sign.	ವೈದ್ಯರು ಮತ್ತು ರೋಗಿ ಅಥವಾ ಕುಟುಂಬ ಒಟ್ಟಿಗೆ ಓದಿ ಸಹಿ ಮಾಡಲು.
+Signature ________  Name ________  Date ______	ಸಹಿ ________  ಹೆಸರು ________  ದಿನಾಂಕ ______
+Section I – General information	ಭಾಗ I – ಸಾಮಾನ್ಯ ಮಾಹಿತಿ
+Date of birth, sex, gender	ಹುಟ್ಟಿದ ದಿನಾಂಕ, ಲಿಂಗ, ಜೆಂಡರ್
+Address and phone	ವಿಳಾಸ ಮತ್ತು ಫೋನ್
+Language preferred	ಆದ್ಯತೆಯ ಭಾಷೆ
+Primary oncologist	ಮುಖ್ಯ ಆಂಕಾಲಜಿಸ್ಟ್
+Palliative care physician	ಪ್ಯಾಲಿಯೇಟಿವ್ ಕೇರ್ ವೈದ್ಯರು
+Members present for the discussion	ಚರ್ಚೆಯಲ್ಲಿ ಹಾಜರಿದ್ದ ಸದಸ್ಯರು
+Primary decision-maker and contact	ಮುಖ್ಯ ನಿರ್ಧಾರ ತೆಗೆದುಕೊಳ್ಳುವವರು ಮತ್ತು ಸಂಪರ್ಕ
+Secondary decision-maker and contact	ಎರಡನೇ ನಿರ್ಧಾರ ತೆಗೆದುಕೊಳ್ಳುವವರು ಮತ್ತು ಸಂಪರ್ಕ
+Family to inform before any major decision	ದೊಡ್ಡ ನಿರ್ಧಾರಕ್ಕೆ ಮೊದಲು ತಿಳಿಸಬೇಕಾದ ಕುಟುಂಬ
+Section II – Preliminary medical information and patient values	ಭಾಗ II – ಪ್ರಾಥಮಿಕ ವೈದ್ಯಕೀಯ ಮಾಹಿತಿ ಮತ್ತು ರೋಗಿಯ ಮೌಲ್ಯಗಳು
+Primary diagnosis and stage	ಮುಖ್ಯ ರೋಗನಿರ್ಣಯ ಮತ್ತು ಹಂತ
+Capacity, now	ಈಗಿನ ನಿರ್ಧಾರ ಸಾಮರ್ಥ್ಯ
+Existing directives	ಈಗಾಗಲೇ ಇರುವ ನಿರ್ದೇಶನಗಳು
+What the patient knows	ರೋಗಿಗೆ ಏನು ಗೊತ್ತಿದೆ
+Knows the diagnosis	ರೋಗದ ಬಗ್ಗೆ ಗೊತ್ತಿದೆ
+Does not know the diagnosis	ರೋಗದ ಬಗ್ಗೆ ಗೊತ್ತಿಲ್ಲ
+The family has asked that the patient not be told	ರೋಗಿಗೆ ಹೇಳಬಾರದೆಂದು ಕುಟುಂಬ ಕೇಳಿದೆ
+Section III – Decisive actions	ಭಾಗ III – ನಿರ್ಣಾಯಕ ಕ್ರಮಗಳು
+Section IV – Signatures and declarations	ಭಾಗ IV – ಸಹಿಗಳು ಮತ್ತು ಘೋಷಣೆಗಳು
+Primary surrogate	ಮುಖ್ಯ ಪ್ರತಿನಿಧಿ
+Palliative care clinician	ಪ್ಯಾಲಿಯೇಟಿವ್ ಕೇರ್ ವೈದ್ಯರು
+Consent for this conversation	ಈ ಮಾತುಕತೆಗೆ ಒಪ್ಪಿಗೆ
+Patient details	ರೋಗಿಯ ವಿವರಗಳು
+Family details and emergency contact	ಕುಟುಂಬದ ವಿವರಗಳು ಮತ್ತು ತುರ್ತು ಸಂಪರ್ಕ
+Signed and locked	ಸಹಿ ಮಾಡಿ ಲಾಕ್ ಮಾಡಲಾಗಿದೆ
+The note is not signed yet.	ಟಿಪ್ಪಣಿಗೆ ಇನ್ನೂ ಸಹಿ ಆಗಿಲ್ಲ.
+Google Gemini did not finish, so this phone is reading the recording instead.	Google Gemini ಮುಗಿಸಲಿಲ್ಲ, ಆದ್ದರಿಂದ ಈ ಫೋನ್ ರೆಕಾರ್ಡಿಂಗ್ ಓದುತ್ತಿದೆ.
+Finding who spoke when	ಯಾರು ಯಾವಾಗ ಮಾತನಾಡಿದರು ಎಂದು ಹುಡುಕುತ್ತಿದ್ದೇವೆ
+Audio and words stay on this phone, unless everyone also agrees below to Google Gemini writing the words. The audio is deleted after review unless the doctor keeps it.	ಎಲ್ಲರೂ ಕೆಳಗೆ Google Gemini ಮಾತುಗಳನ್ನು ಬರೆಯಲು ಒಪ್ಪದ ಹೊರತು, ಆಡಿಯೋ ಮತ್ತು ಮಾತುಗಳು ಈ ಫೋನ್‌ನಲ್ಲೇ ಇರುತ್ತವೆ. ವೈದ್ಯರು ಇಟ್ಟುಕೊಳ್ಳದಿದ್ದರೆ ಪರಿಶೀಲನೆಯ ನಂತರ ಆಡಿಯೋ ಅಳಿಸಲಾಗುತ್ತದೆ.
+Guide for the talk	ಮಾತುಕತೆಗೆ ಮಾರ್ಗದರ್ಶಿ
+$done of ${GocGuide.ORDER.size} covered	${GocGuide.ORDER.size} ರಲ್ಲಿ $done ಚರ್ಚಿಸಲಾಗಿದೆ
+How the guide works	ಮಾರ್ಗದರ್ಶಿ ಹೇಗೆ ಕೆಲಸ ಮಾಡುತ್ತದೆ
+In the order of the form: consent, patient details, family and emergency contact, then CPR, dialysis and the other decisions. A topic ticks itself when the words come up, and you can tick it too. A tick records no choice.	ಫಾರಂ ಕ್ರಮದಲ್ಲಿ: ಒಪ್ಪಿಗೆ, ರೋಗಿಯ ವಿವರಗಳು, ಕುಟುಂಬ ಮತ್ತು ತುರ್ತು ಸಂಪರ್ಕ, ನಂತರ ಸಿಪಿಆರ್, ಡಯಾಲಿಸಿಸ್ ಮತ್ತು ಇತರ ನಿರ್ಧಾರಗಳು. ಆ ಮಾತುಗಳು ಬಂದಾಗ ವಿಷಯ ತಾನಾಗಿ ಗುರುತಾಗುತ್ತದೆ, ನೀವೂ ಗುರುತು ಹಾಕಬಹುದು. ಗುರುತು ಯಾವ ನಿರ್ಧಾರವನ್ನೂ ದಾಖಲಿಸುವುದಿಲ್ಲ.
+Audio is sent to Google Gemini to transcribe.	ಬರೆಯಲು ಆಡಿಯೋ Google Gemini ಗೆ ಕಳುಹಿಸಲಾಗುತ್ತದೆ.
+Everyone here agrees. Without this tick the audio stays on this phone.	ಇಲ್ಲಿ ಎಲ್ಲರೂ ಒಪ್ಪುತ್ತಾರೆ. ಈ ಗುರುತು ಇಲ್ಲದಿದ್ದರೆ ಆಡಿಯೋ ಈ ಫೋನ್‌ನಲ್ಲೇ ಇರುತ್ತದೆ.
+Downloading the speaker pack	ಮಾತನಾಡುವವರ ಪ್ಯಾಕ್ ಡೌನ್‌ಲೋಡ್ ಆಗುತ್ತಿದೆ
+Tell speakers apart · speaker pack	ಮಾತನಾಡುವವರನ್ನು ಬೇರೆ ಮಾಡಿ · ಪ್ಯಾಕ್
+Which speaker is the doctor?	ವೈದ್ಯರು ಯಾವ ಮಾತನಾಡುವವರು?
+I will mark the lines myself	ನಾನೇ ಸಾಲುಗಳನ್ನು ಗುರುತಿಸುತ್ತೇನೆ
+Transcribed by	ಬರೆದದ್ದು
+Word for word, kept apart from the note. Check it against the audio. Tap a label to set doctor side or patient party.	ಪದಕ್ಕೆ ಪದ, ಟಿಪ್ಪಣಿಯಿಂದ ಬೇರೆಯಾಗಿ ಇಡಲಾಗಿದೆ. ಆಡಿಯೋ ಜೊತೆ ಹೋಲಿಸಿ. ವೈದ್ಯರ ಕಡೆ ಅಥವಾ ರೋಗಿಯ ಕಡೆ ಆಯ್ಕೆಗೆ ಲೇಬಲ್ ಒತ್ತಿ.
+Change the note (everyone signs again)	ಟಿಪ್ಪಣಿ ಬದಲಿಸಿ (ಎಲ್ಲರೂ ಮತ್ತೆ ಸಹಿ ಮಾಡಬೇಕು)
+The note in the form's layout, Sections I to IV	ಫಾರಂ ಕ್ರಮದಲ್ಲಿ ಟಿಪ್ಪಣಿ, ಭಾಗ I ರಿಂದ IV
+You haven’t spoken about these things. Are you sure you want to continue?	ನೀವು ಈ ವಿಷಯಗಳ ಬಗ್ಗೆ ಮಾತನಾಡಿಲ್ಲ. ನೀವು ಖಚಿತವಾಗಿ ಮುಂದುವರಿಯಲು ಬಯಸುವಿರಾ?
+They stay No preference recorded, and the note lists them as not discussed.	ಅವು 'ಯಾವುದೇ ಆದ್ಯತೆ ದಾಖಲಾಗಿಲ್ಲ' ಎಂದೇ ಇರುತ್ತವೆ, ಟಿಪ್ಪಣಿಯಲ್ಲಿ ಚರ್ಚಿಸಿಲ್ಲ ಎಂದು ಬರೆಯಲಾಗುತ್ತದೆ.
+Continue anyway	ಆದರೂ ಮುಂದುವರಿಸಿ
+Go back	ಹಿಂದೆ ಹೋಗಿ
+Ask everyone present if they agree to this conversation being recorded and written down.	ಈ ಮಾತುಕತೆಯನ್ನು ರೆಕಾರ್ಡ್ ಮಾಡಿ ಬರೆಯಲು ಹಾಜರಿರುವ ಎಲ್ಲರೂ ಒಪ್ಪುತ್ತಾರೆಯೇ ಎಂದು ಕೇಳಿ.
+Confirm the patient's name, age and address.	ರೋಗಿಯ ಹೆಸರು, ವಯಸ್ಸು ಮತ್ತು ವಿಳಾಸ ಖಚಿತಪಡಿಸಿ.
+Ask who is present, who decides with the patient, and who to call in an emergency.	ಯಾರು ಹಾಜರಿದ್ದಾರೆ, ರೋಗಿಯ ಜೊತೆ ಯಾರು ನಿರ್ಧರಿಸುತ್ತಾರೆ, ತುರ್ತು ಸಮಯದಲ್ಲಿ ಯಾರಿಗೆ ಫೋನ್ ಮಾಡಬೇಕು ಎಂದು ಕೇಳಿ.
+Ask what the patient and family understand about the illness.	ರೋಗದ ಬಗ್ಗೆ ರೋಗಿ ಮತ್ತು ಕುಟುಂಬಕ್ಕೆ ಏನು ಅರ್ಥವಾಗಿದೆ ಎಂದು ಕೇಳಿ.
+If care is at home, ask who visits and how often.	ಆರೈಕೆ ಮನೆಯಲ್ಲಿ ಇದ್ದರೆ, ಯಾರು ಎಷ್ಟು ಬಾರಿ ಬರುತ್ತಾರೆ ಎಂದು ಕೇಳಿ.
+Different people said different things. Both are shown. Check with the patient which one stands.	ಬೇರೆ ಬೇರೆ ಜನರು ಬೇರೆ ಬೇರೆ ಹೇಳಿದರು. ಎರಡನ್ನೂ ತೋರಿಸಲಾಗಿದೆ. ಯಾವುದು ಸರಿ ಎಂದು ರೋಗಿಯೊಂದಿಗೆ ಖಚಿತಪಡಿಸಿ.
+Changed during the talk. The latest statement is marked.	ಮಾತುಕತೆಯಲ್ಲಿ ಬದಲಾಯಿತು. ಕೊನೆಯ ಮಾತನ್ನು ಗುರುತಿಸಲಾಗಿದೆ.
+Said earlier, replaced by a later statement	ಮೊದಲು ಹೇಳಿದ್ದು, ನಂತರದ ಮಾತಿನಿಂದ ಬದಲಾಗಿದೆ
+Goals-of-care note, in the order of the legal form	ಆರೈಕೆಯ ಗುರಿಗಳ ಟಿಪ್ಪಣಿ, ಕಾನೂನು ಫಾರಂ ಕ್ರಮದಲ್ಲಿ
+Signed and locked on the doctor's device	ವೈದ್ಯರ ಸಾಧನದಲ್ಲಿ ಸಹಿ ಮಾಡಿ ಲಾಕ್ ಮಾಡಲಾಗಿದೆ
+Doctor's note	ವೈದ್ಯರ ಟಿಪ್ಪಣಿ
+radiation oncology	ವಿಕಿರಣ ಆಂಕಾಲಜಿ
+chemotherapy	ಕೀಮೋಥೆರಪಿ
+surgical	ಶಸ್ತ್ರಚಿಕಿತ್ಸೆ
+home visit	ಮನೆ ಭೇಟಿ
+Overview	ಸಾರಾಂಶ

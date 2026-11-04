@@ -2,7 +2,7 @@
 // wallet card. Records store enums (tech spec §5); this file turns them into words in the reader's language.
 // English is the source; Hindi is provided inline; other languages fall back through care-i18n dictionaries.
 import { careText, type CareLang } from './care-i18n.ts';
-import { ALWAYS_PROVIDED_CARE, IF_IN_DOUBT_RESUSCITATE, TRANSFER_REASON_LABELS, consultantSignature, type EdInterpretation } from './ectpr-rules.ts';
+import { ALWAYS_PROVIDED_CARE, IF_IN_DOUBT_ACTION, IF_IN_DOUBT_RESUSCITATE, TRANSFER_REASON_LABELS, consultantSignature, type EdInterpretation } from './ectpr-rules.ts';
 import type {
   AmbulanceOption, AmdStatusSummary, AuthorityBasis, Dialysis, EctprRecord, ExistingDirective, GoalOfCare, HospitalTransfer, Hydration,
   Icu, ImplantedDevice, NgFeeding, PegFeeding, RespCeiling, TransferReason, TrialPlan, Vasopressors, WithdrawalFinal,
@@ -22,20 +22,24 @@ export function notRecorded(lang: CareLang): string {
 }
 
 const ALWAYS_HI: Record<string, string> = {
-  'Mouth care and lip care, to keep the mouth moist and clean.': 'मुँह और होंठों की देखभाल, ताकि मुँह नम और साफ़ रहे।',
-  'Food and drink by mouth, given by hand for comfort, as much as the person wants and can safely swallow.': 'आराम के लिए हाथ से मुँह द्वारा खाना-पानी, जितना व्यक्ति चाहे और सुरक्षित रूप से निगल सके।',
-  'Relief of pain, breathlessness and other distressing symptoms, at any time of day or night.': 'दर्द, साँस फूलने और अन्य परेशान करने वाले लक्षणों से राहत, दिन या रात किसी भी समय।',
-  'Washing, hygiene, skin care and pressure-area care.': 'नहलाना, साफ़-सफ़ाई, त्वचा और दबाव वाली जगहों की देखभाल।',
-  'Turning and positioning for comfort.': 'आराम के लिए करवट बदलना और सही स्थिति में रखना।',
-  'Family and loved ones may stay with the person.': 'परिवार और प्रियजन व्यक्ति के साथ रह सकते हैं।',
-  'Spiritual, emotional and psychological support for the person and family.': 'व्यक्ति और परिवार के लिए आध्यात्मिक, भावनात्मक और मानसिक सहारा।',
-  'Dignity, privacy and kindness in all care.': 'हर देखभाल में गरिमा, निजता और दया।',
+  'Relief of pain, using opioids in adequate doses, by whatever route works': 'दर्द से राहत — ओपिऑइड पूरी खुराक में, जिस भी रास्ते से असर करे',
+  'Relief of breathlessness — opioid, anxiolytic, fan, positioning, oxygen if it helps': 'साँस फूलने से राहत — ओपिऑइड, घबराहट की दवा, पंखा, सही स्थिति, ऑक्सीजन अगर मदद करे',
+  'Sedation for distress that cannot be relieved any other way': 'ऐसी तकलीफ़ के लिए नींद की दवा (सेडेशन) जो किसी और तरह कम न हो',
+  'Control of nausea, secretions, agitation, itch, hiccups': 'जी मिचलाना, बलगम या स्राव, बेचैनी, खुजली और हिचकी पर नियंत्रण',
+  'Mouth care and eye care, given often': 'मुँह और आँखों की देखभाल, बार-बार',
+  'Comfortable positioning; turning as tolerated; air mattress to prevent pressure sores': 'आरामदायक स्थिति; जितना सह सकें करवट बदलना; बेडसोर से बचाव के लिए एयर गद्दा',
+  'Skin and wound care; management of odour': 'त्वचा और घाव की देखभाल; बदबू पर नियंत्रण',
+  'Bowel care — assessment and management of constipation': 'पेट की देखभाल — कब्ज़ की जाँच और इलाज',
+  'Bladder care — assessment and management of retention and incontinence': 'मूत्राशय की देखभाल — पेशाब रुकने और अपने-आप निकल जाने की जाँच और इलाज',
+  'Privacy, dignity, and gentle handling in every personal-care task': 'हर निजी देखभाल में निजता, गरिमा और कोमल व्यवहार',
+  'Presence of family; spiritual and religious support as the patient wishes': 'परिवार का साथ; मरीज़ की इच्छा के अनुसार आध्यात्मिक और धार्मिक सहारा',
+  'Honest, unhurried communication with the patient and the family, every day': 'मरीज़ और परिवार से हर दिन ईमानदार, बिना जल्दबाज़ी की बातचीत',
 };
 const IF_IN_DOUBT_HI: Record<string, string> = {
-  'The record is unsigned, out of date, or cannot be found.': 'रिकॉर्ड पर हस्ताक्षर नहीं है, वह पुराना है, या मिल नहीं रहा।',
-  'The problem is new, reversible and not caused by the main illness — for example injury, choking, a drug reaction or low blood sugar.': 'समस्या नई है, ठीक हो सकती है और मुख्य बीमारी से नहीं है — जैसे चोट, गले में अटकना, दवा का असर या कम शुगर।',
-  'The patient can decide for themselves and now says something different.': 'मरीज़ खुद निर्णय ले सकता है और अब कुछ अलग कह रहा है।',
-  'The record is unclear.': 'रिकॉर्ड साफ़ नहीं है।',
+  'If the record is unsigned, out of date or cannot be found.': 'अगर रिकॉर्ड पर हस्ताक्षर नहीं है, वह पुराना हो गया है या मिल नहीं रहा।',
+  'If the problem is new, reversible and unrelated to the illness (injury, choking, drug reaction, low sugar).': 'अगर समस्या नई है, ठीक हो सकती है और बीमारी से जुड़ी नहीं है (चोट, गले में अटकना, दवा का रिएक्शन, शुगर कम होना)।',
+  'If the patient has capacity and says something different now. What they say now always overrides this record.': 'अगर मरीज़ में फ़ैसला लेने की क्षमता है और वे अब कुछ और कह रहे हैं। उनकी अभी की बात हमेशा इस रिकॉर्ड से ऊपर है।',
+  'If the record is ambiguous.': 'अगर रिकॉर्ड साफ़ नहीं है।',
 };
 
 export function alwaysProvidedCare(lang: CareLang): string[] {
@@ -47,11 +51,8 @@ export function ifInDoubtConditions(lang: CareLang): string[] {
 export function ifInDoubtTitle(lang: CareLang): string {
   return careText(lang, 'IF IN DOUBT, RESUSCITATE', 'संदेह हो तो पुनर्जीवन (CPR) दें');
 }
-export function ifInDoubtLead(lang: CareLang): string {
-  return careText(lang, 'Give full standard emergency care when any of these is true:', 'इनमें से कोई भी बात सही हो तो पूरा सामान्य आपातकालीन इलाज दें:');
-}
 export function ifInDoubtAfter(lang: CareLang): string {
-  return careText(lang, 'Clarify with the treating team afterwards.', 'बाद में इलाज करने वाली टीम से स्पष्ट करें।');
+  return careText(lang, IF_IN_DOUBT_ACTION, 'तब पुनर्जीवन (CPR) दें और पूरा सामान्य आपातकालीन इलाज करें। बाद में इलाज करने वाली टीम से बात करें।');
 }
 
 export function walletCardLine(lang: CareLang): string {
@@ -146,7 +147,7 @@ export function ambulanceLabel(option: AmbulanceOption | null, lang: CareLang): 
   const t = textFor(lang);
   if (option === 'FULL_RESUSCITATION') return t('Full pre-hospital resuscitation and transport', 'अस्पताल से पहले पूरा पुनर्जीवन और ले जाना');
   if (option === 'SYMPTOM_RELIEF_TRANSPORT') return t('Transport with symptom relief only (O₂ for breathlessness, pain relief, positioning; no CPR, no intubation)', 'केवल लक्षण राहत के साथ ले जाना (साँस के लिए O₂, दर्द की दवा, स्थिति; CPR नहीं, ट्यूब नहीं)');
-  if (option === 'TRANSPORT_HOME_NURSE_ESCORT') return t('Transport home for last days with a nurse escort', 'अंतिम दिनों के लिए नर्स के साथ घर ले जाना');
+  if (option === 'TRANSPORT_HOME_NURSE_ESCORT') return t('Transport home from hospital for the last days of life, with a nurse escort if available', 'जीवन के अंतिम दिनों के लिए अस्पताल से घर ले जाना, नर्स साथ हो तो उसके साथ');
   return noPreferenceStandardCare(lang);
 }
 

@@ -137,6 +137,8 @@ object AmdIds {
 }
 
 object AmdRules {
+    /** The living will is the patient's own words: an invited family member (actor "Family") can read it but not change it. Doctors keep their existing rights. */
+    fun canChange(canEdit: Boolean, clinician: Boolean, actor: String) = canEdit && (clinician || actor != "Family")
     private fun issue(id: String, severity: IssueSeverity, field: String, en: String, hi: String) = RuleIssue(id, severity, field, en, hi)
     private val PREFIX = Regex("^(dr|mr|mrs|ms|shri|smt|sri|kumari)\\.?\\s+")
     private val NON_WORD = Regex("[^\\p{L}\\p{N}]+")

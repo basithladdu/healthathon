@@ -52,7 +52,7 @@ class CarePatientSummaryTest {
     @Test fun medicineCountsAndWording() {
         val s = CarePatientSummaryRules.build(listOf(med(true, "a"), med(false, "b"), med(false, "c")), emptyList(), "p", emptyList(), today, zone)
         assertEquals(3, s.medicineTotal); assertEquals(1, s.medicineTicked)
-        assertEquals("1 of 3 ticked today, 2 not yet", CarePatientSummaryRules.medicineStatus(s.medicineTotal, s.medicineTicked, false))
+        assertEquals("1 of 3 today", CarePatientSummaryRules.medicineStatus(s.medicineTotal, s.medicineTicked, false))
         assertEquals("No medicines yet", CarePatientSummaryRules.medicineCount(0, false)); assertEquals("1 medicine", CarePatientSummaryRules.medicineCount(1, false)); assertEquals("3 medicines", CarePatientSummaryRules.medicineCount(3, false))
     }
 

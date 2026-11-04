@@ -154,6 +154,30 @@ The web uses a smaller model (`onnx-community/whisper-base`, about 95 MB); see t
 
 URLs: https://huggingface.co/Qwen/Qwen3-ASR-0.6B, https://huggingface.co/api/models/csukuangfj/sherpa-onnx-whisper-small?blobs=true, https://github.com/openai/whisper/blob/main/whisper/tokenizer.py, https://github.com/k2-fsa/sherpa-onnx/blob/v1.13.8/sherpa-onnx/kotlin-api/OfflineRecognizer.kt
 
+### Who spoke when (speaker diarization)
+
+Checked **2026-11-04**. Sizes, hashes, URLs and licences are checked from headers and small files; nothing has run on a phone, so speed, memory and accuracy are not measured.
+
+sherpa-onnx's `OfflineSpeakerDiarization` (same runtime, 1.13.8): pyannote segmentation finds speech and speaker changes, a 3D-Speaker embedding tells voices apart, and clustering groups them. The output is "Speaker 1, 2...", never names, and the doctor checks it against the audio.
+
+| | |
+|---|---|
+| Segmentation | pyannote segmentation-3.0, ONNX export by the sherpa-onnx maintainer. https://huggingface.co/csukuangfj/sherpa-onnx-pyannote-segmentation-3-0 at revision `9403a6902bb58e3d5ae8c7e77c3422de279db2e0` |
+| `model.onnx` | 5,992,913 bytes, sha256 `220ad67ca923bef2fa91f2390c786097bf305bceb5e261d4af67b38e938e1079` |
+| Embedding | 3D-Speaker ERes2Net base (`speech_eres2net_base_sv_zh-cn_3dspeaker_16k`), the model sherpa-onnx's own Android diarization example uses. https://huggingface.co/csukuangfj/speaker-embedding-models at revision `0743f301363dec56491a490f6d6cbc9d67f9a3bf` (same file and size as the GitHub release `speaker-recongition-models`) |
+| `3dspeaker_speech_eres2net_base_sv_zh-cn_3dspeaker_16k.onnx` | 39,593,761 bytes, sha256 `1a331345f04805badbb495c775a6ddffcdd1a732567d5ec8b3d5749e3c7a5e4b` |
+| Total download | 45,586,674 bytes (about 46 MB), on the phone, on demand, into `noBackupFilesDir/offline-speech/speaker-diarization-pyannote3-eres2net-base/`. Not in the APK or the repo. |
+| Licence | pyannote segmentation-3.0: MIT, Copyright (c) 2022 CNRS (LICENSE file in the pinned repo). 3D-Speaker: Apache-2.0 (https://github.com/modelscope/3D-Speaker, README "License" and LICENSE). The ModelScope model card could not be opened from here (modelscope.cn did not resolve), so the per-model licence is taken from the 3D-Speaker project. The export repo has no licence tag. |
+| Where it is listed | `GocDiarizeModel` in `CareGocDiarize.kt`; `assets/offline-speech-NOTICE.txt` |
+
+**Settings.** sherpa-onnx's defaults: clustering threshold 0.5 on cosine distance with the number of speakers unknown, 10 s windows moved by 1 s, speech under 0.2 s dropped, gaps under 0.5 s within one voice joined. When the doctor gives the number (2 to 6), it is used. Not tuned on Sahara recordings.
+
+**Long talks.** sherpa clusters every window of the whole input at once, and its distance matrix for 90 minutes would be several hundred MB. So audio is diarized in parts of 10 minutes (a last part under 2 minutes joins the one before, so at most 12 minutes, 46 MB of samples). Each part's speakers get one voice print, taken from up to 30 s of their speech where nobody else talks, and prints are joined across parts by average-linkage clustering that never merges two speakers of the same part. With a given number, joining continues until that number is reached. Turns of one voice across a part edge are joined.
+
+**Not measured:** speed (about 600 embedding runs per 10 minutes of audio, on 2 threads), peak memory (the 768 MiB free-memory check is an estimate), and accuracy with Indian languages, overlap and phone microphones.
+
+URLs: https://huggingface.co/api/models/csukuangfj/sherpa-onnx-pyannote-segmentation-3-0?blobs=true, https://huggingface.co/api/models/csukuangfj/speaker-embedding-models?blobs=true, https://github.com/k2-fsa/sherpa-onnx/releases/tag/speaker-recongition-models, https://github.com/k2-fsa/sherpa-onnx/blob/v1.13.8/sherpa-onnx/kotlin-api/OfflineSpeakerDiarization.kt, https://github.com/k2-fsa/sherpa-onnx/blob/v1.13.8/android/SherpaOnnxSpeakerDiarization/app/src/main/java/com/k2fsa/sherpa/onnx/speaker/diarization/SpeakerDiarizationObject.kt
+
 ## On-device speech to text (goals-of-care conversation)
 
 This is the one exception to "we do not bundle on-device models", and it keeps to the reason: **nothing is bundled.** The care plan's conversation panel (`prototype/app/goc-transcribe.tsx`) fetches the engine and the model only when the doctor taps **Transcribe on this device**. Normal pages load none of it, and the audio is never sent anywhere. Typing or pasting always works with no download.
@@ -215,3 +239,50 @@ Measured with base on "auto", on this laptop, on a one-hour WAV built from the F
 `prototype/app/goc-extract.ts` is a deterministic phrase matcher with no model and no keys, tested in `prototype/tests/goc-extract.test.mjs`, including the sentences the Android matcher pins. A bare mention ticks a topic and suggests nothing, and when unsure it gives no mark. Every suggestion carries the exact quote. The doctor confirms each item, and the record stays a draft until the normal signing step.
 
 `POST /api/goc-extract` is an optional second reading on the existing free chain, after separate consent naming the services. It returns only known options with word-for-word quotes, and it is off with no keys, which is the state today.
+
+## Online transcription of goals-of-care recordings (Gemini only)
+
+Added 2026-11-04. For talks of 1 to 2 hours in English, Hindi, Telugu, Urdu and Kannada, often mixed. **Not run against the real key yet** (see "Not tested live").
+
+**Order:** Google Gemini → on-device Whisper (above) → typing. There is no second online service. When Gemini cannot finish (no key, offline, still busy after its retries, an error, or output that fails the checks), the client throws an error that carries the lines already done (`partial`), and the screen continues on the device. The result names the model that transcribed it (`model`, for example `gemini-3.1-flash-lite`; `engine` is always `gemini`).
+
+**Consent line:** "Audio is sent to Google Gemini to transcribe." The owner accepted the Gemini free tier's data-use terms (free-tier content is used to improve Google's products).
+
+**Where the key lives**
+
+| | Android app | Website |
+|---|---|---|
+| Server | Supabase function `sahara-care-assist` (project `kjnhtakqzboayqorrlue`), new actions `goc-transcribe-start`, `-window`, `-delete`, `-chunk` (`android/supabase/functions/sahara-care-assist/goc-gemini.ts`) | Vercel route `/api/goc-transcribe` (`prototype/app/goc-transcribe-server.ts`) |
+| Key | `SAHARA_AI_API_KEY` (already set as a function secret; used only while `SAHARA_AI_BASE_URL` points at `generativelanguage.googleapis.com`) | the same names: `SAHARA_AI_API_KEY`, or `GEMINI_API_KEY`. **Not set in Vercel yet: copy the value in for the website.** |
+| Model | `SAHARA_AI_MODEL` (`gemini-3.1-flash-lite` today), then `SAHARA_AI_FALLBACK_MODEL`, then `gemini-3.8-flash`, then `gemini-3.5-flash-lite` | `SAHARA_AI_MODEL` or `GEMINI_MODEL`, then `gemini-3.8-flash`, then `gemini-3.5-flash-lite` |
+| Optional | `GEMINI_GOC_MODEL` (forces one model), `GOC_TICKET_SECRET` (signs upload tickets; derived from the key when unset) | the same |
+| Who may call | a signed-in, confirmed account (Bearer), as for the function's other actions | same-origin browser, a Sahara Bearer token, or `X-Sahara-Client: android`, rate limited per instance |
+| Limit | one attempt per recording from the existing `sahara_reserve_assist` limit (action `transcribe`: 1 a minute, 10 a day), taken on its first part; a signed "run" ticket covers its other parts (up to 40) | per instance: 40 starts and 80 windows an hour |
+| Window | 5 minutes (Supabase stops a request after 150 s; the Gemini call gets 130 s) | 10 minutes (route `maxDuration` 300 s) |
+
+Deploy the function after this change, from `android/`: `supabase functions deploy sahara-care-assist --project-ref kjnhtakqzboayqorrlue`. No new secret and no migration is needed.
+
+**How the key stays on the server**
+
+1. `start`: the server opens a Files API resumable upload (`POST https://generativelanguage.googleapis.com/upload/v1beta/files`, `X-Goog-Upload-Protocol: resumable`, `X-Goog-Upload-Command: start`, key only in the `x-goog-api-key` header) and returns only the `x-goog-upload-url`, with a signed ticket. The URL is checked first: Google's upload host, no `key` parameter, and the key string nowhere in it. If it fails that check, the URL is sealed (AES-GCM) inside the ticket and the client relays chunks of under 4 MB through the server instead.
+2. The client uploads straight to that URL in 8 MB chunks (`upload`, then `upload, finalize`, with `X-Goog-Upload-Offset`), so the server's request size limit does not apply.
+3. `window`: the server finds the file (its display name must match the ticket, and on Android the ticket must belong to the same account), waits while it is `PROCESSING`, calls `models/{model}:generateContent` with `file_data`, JSON output (`responseMimeType: application/json` plus a schema) and the verbatim-transcript prompt, then deletes the file. A busy answer keeps the file for one more try; the client deletes it when it gives up. Files also expire after 48 hours.
+
+**Long audio.** Gemini counts about 32 tokens a second of audio (cookbook `Counting_Tokens`). Two hours is about 230k input tokens, so the recording is sent in windows rather than as one file read again for every part. A window whose answer is cut off (`MAX_TOKENS`) is split in two. Each Gemini call is retried once on 429, 5xx, a timeout or an unusable answer, and the next model is tried when one is not found or stays busy; the client then waits once more before stopping.
+
+**Output.** Lines of `{startSec, speaker: DOCTOR | PATIENT_PARTY | UNKNOWN, lang, text}`, with speaker roles labelled by Gemini. The prompt asks for a verbatim transcript in each language's own script, with no summary and no advice. Extraction stays in the deterministic phrase matcher (`goc-extract.ts`). Every answer is checked (`goc-online-lines.ts`, `goc-gemini.ts` and `CareGocGemini.kt` hold the same rules): the shape must be right, every line needs a time and words, no time may lie past the audio, a repeated (looping) line is kept once, and an unknown speaker becomes `UNKNOWN`.
+
+**Formats.** Web: the recording is decoded to 16 kHz mono and each window is sent as WAV (about 19 MB per 10 minutes, uploaded straight to Google); a short recording already in a format Gemini lists is sent as it is. Android: the recorder's AAC (M4A, which Gemini does not list) is remuxed to ADTS AAC (`audio/aac`) without re-encoding, about 2.4 MB per 5 minutes at 64 kbps, with a 2-second overlap between windows. HE-AAC cannot be carried in ADTS, so such a file is decoded and sent as WAV.
+
+**Try it with a real file (web route):** from `prototype/`, `SAHARA_AI_API_KEY=… node --experimental-strip-types scripts/goc-transcribe-try.mjs talk.m4a --local --lang hi` (needs ffmpeg), or `--base https://<preview>.vercel.app` against a deployment that has the key.
+
+**Not tested live.** No key was available on the build machine, and ai.google.dev could not be reached from it. The protocol was taken from the Gemini cookbook (`quickstarts/rest/Audio_REST.ipynb`, `Audio.ipynb`, `File_API.ipynb`, `Counting_Tokens.ipynb`, checked 2026-11-04) and the `@google/genai` uploader source. Still to confirm with the key:
+- the model ids;
+- that the returned upload URL carries no key;
+- that Google's upload URL answers the browser's CORS preflight for the `X-Goog-Upload-*` headers (if not, the website needs the relay mode);
+- speed per window on the edge function;
+- accuracy in Telugu, Urdu and Kannada.
+
+Google also has a dedicated `gemini-3.5-transcribe` model (Interactions API, speakers as `spk:0`, `spk:1`). It does not label doctor and patient roles, so it is not used here.
+
+URLs: https://github.com/google-gemini/cookbook/tree/main/quickstarts, https://github.com/googleapis/js-genai/blob/main/src/cross/_cross_uploader.ts

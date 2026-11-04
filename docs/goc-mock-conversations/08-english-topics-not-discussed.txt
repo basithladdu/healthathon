@@ -1,0 +1,13 @@
+# FICTIONAL. A made-up goals-of-care conversation for testing Sahara. No real patient, family or doctor. Not medical advice.
+# Language: English. Patient: Abdul (fictional), 59, with his nephew (fictional). A short talk that never reaches CPR, dialysis, the ventilator,
+# ICU, feeding, fluids, hospital transfer or the goal of care. At the end Sahara must list these as not discussed.
+Doctor: Hello. Are you okay with us recording this conversation? We need your consent.
+Patient: Yes, okay.
+Doctor: Tell me your name and age please.
+Patient: Abdul, 59 years old.
+Doctor: How have you been sleeping?
+Patient: Not well. The pain wakes me at night.
+Nephew: He has been worried about money.
+Doctor: We will ask the social worker to meet you. Is the pain medicine helping?
+Patient: A little. I take it after food.
+Doctor: Let us meet again next week to talk about the plan.

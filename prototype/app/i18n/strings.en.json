@@ -127,6 +127,12 @@
    "care-document-search.tsx"
   ]
  },
+ "{0} of {1} covered": {
+  "hi": "{1} में से {0} पर बात हुई",
+  "files": [
+   "goc-transcribe.tsx"
+  ]
+ },
  "{0} of {1} episodes": {
   "hi": "{1} में से {0} मामले",
   "files": [
@@ -253,6 +259,12 @@
    "ectpr-plan-screen.tsx"
   ]
  },
+ "1. Doctor": {
+  "hi": "1. डॉक्टर",
+  "files": [
+   "goc-signature-pad.tsx"
+  ]
+ },
  "1. First representative": {
   "hi": "1. पहले प्रतिनिधि",
   "files": [
@@ -289,10 +301,40 @@
    "ectpr-ed-view.tsx"
   ]
  },
+ "12.1 Feeding": {
+  "hi": "12.1 खाना",
+  "files": [
+   "goc-form.ts"
+  ]
+ },
  "14 digits": {
   "hi": "14 अंक",
   "files": [
    "care-sign-in.tsx"
+  ]
+ },
+ "19.1 Patient": {
+  "hi": "19.1 मरीज़",
+  "files": [
+   "goc-form.ts"
+  ]
+ },
+ "19.2 Surrogate (primary and secondary)": {
+  "hi": "19.2 प्रतिनिधि (मुख्य और द्वितीय)",
+  "files": [
+   "goc-form.ts"
+  ]
+ },
+ "19.3 Witnesses": {
+  "hi": "19.3 गवाह",
+  "files": [
+   "goc-form.ts"
+  ]
+ },
+ "19.4 Clinicians": {
+  "hi": "19.4 डॉक्टर और नर्स",
+  "files": [
+   "goc-form.ts"
   ]
  },
  "2 · CPR": {
@@ -307,6 +349,12 @@
    "ectpr-plan-screen.tsx"
   ]
  },
+ "2. Patient or family member": {
+  "hi": "2. मरीज़ या परिवार के सदस्य",
+  "files": [
+   "goc-signature-pad.tsx"
+  ]
+ },
  "3 · Breathing support ceiling": {
   "hi": "3 · साँस सहायता की सीमा",
   "files": [
@@ -317,6 +365,12 @@
   "hi": "3 · हाई-फ़्लो नाक ऑक्सीजन (HFNC)",
   "files": [
    "ectpr-plan-screen.tsx"
+  ]
+ },
+ "3. Witness": {
+  "hi": "3. गवाह",
+  "files": [
+   "goc-signature-pad.tsx"
   ]
  },
  "4 · ICU": {
@@ -331,6 +385,18 @@
    "ectpr-plan-screen.tsx"
   ]
  },
+ "4.1 The patient’s capacity, now": {
+  "hi": "4.1 मरीज़ की अभी की क्षमता",
+  "files": [
+   "goc-form.ts"
+  ]
+ },
+ "4.2 Existing directives": {
+  "hi": "4.2 पहले के निर्देश",
+  "files": [
+   "goc-form.ts"
+  ]
+ },
  "5 · Breathing tube and ventilator": {
   "hi": "5 · साँस की नली और वेंटिलेटर",
   "files": [
@@ -343,10 +409,28 @@
    "ectpr-ed-view.tsx"
   ]
  },
+ "5.3 What the patient knows": {
+  "hi": "5.3 मरीज़ क्या जानते हैं",
+  "files": [
+   "goc-form.ts"
+  ]
+ },
  "6 · Allergies": {
   "hi": "6 · एलर्जी",
   "files": [
    "ectpr-ed-view.tsx"
+  ]
+ },
+ "6.1 In their own words": {
+  "hi": "6.1 उनके अपने शब्दों में",
+  "files": [
+   "goc-form.ts"
+  ]
+ },
+ "6.2 Outcomes that would be unacceptable": {
+  "hi": "6.2 जो हालत मंज़ूर नहीं",
+  "files": [
+   "goc-form.ts"
   ]
  },
  "7 · Implanted device": {
@@ -566,6 +650,12 @@
    "family-voice-journal.tsx"
   ]
  },
+ "A thumb impression was used, so a witness also signs.": {
+  "hi": "अंगूठे का निशान लगा है, इसलिए एक गवाह भी साइन करेंगे।",
+  "files": [
+   "goc-signature-pad.tsx"
+  ]
+ },
  "A time-limited trial is usually about {0} days (range 3–7). At the end, review it together with the family.": {
   "hi": "तय समय का ट्रायल आमतौर पर लगभग {0} दिन (3–7) का होता है। अंत में परिवार के साथ मिलकर समीक्षा करें।",
   "files": [
@@ -582,6 +672,18 @@
   "hi": "एक वॉइस नोट",
   "files": [
    "family-voice-journal.tsx"
+  ]
+ },
+ "A witness also signs.": {
+  "hi": "एक गवाह भी साइन करेंगे।",
+  "files": [
+   "goc-signature-pad.tsx"
+  ]
+ },
+ "A, B or C": {
+  "hi": "A, B या C",
+  "files": [
+   "goc-form.ts"
   ]
  },
  "Aadhaar": {
@@ -1142,11 +1244,18 @@
    "family-open-questions.tsx"
   ]
  },
+ "Additional team": {
+  "hi": "और टीम",
+  "files": [
+   "goc-form.ts"
+  ]
+ },
  "Address": {
   "hi": "पता",
   "files": [
    "amd-screen.tsx",
-   "ectpr-plan-screen.tsx"
+   "ectpr-plan-screen.tsx",
+   "goc-form.ts"
   ]
  },
  "Adjust reading speed": {
@@ -1411,6 +1520,12 @@
    "amd-screen.tsx"
   ]
  },
+ "Always offered, with mouth care": {
+  "hi": "हमेशा, मुँह की देखभाल के साथ",
+  "files": [
+   "goc-form.ts"
+  ]
+ },
  "Ambulance crew": {
   "hi": "एम्बुलेंस टीम",
   "files": [
@@ -1453,6 +1568,12 @@
   "hi": "घबराहट",
   "files": [
    "family-symptom-diary.tsx"
+  ]
+ },
+ "Any change to the note or a signature will show.": {
+  "hi": "नोट या किसी हस्ताक्षर में बदलाव दिख जाएगा।",
+  "files": [
+   "goc-signature-pad.tsx"
   ]
  },
  "Any illness you expect, and what you want for it (optional)": {
@@ -1857,6 +1978,12 @@
    "family-lab-history.tsx"
   ]
  },
+ "Bladder care — assessment and management of retention and incontinence": {
+  "hi": "मूत्राशय की देखभाल — पेशाब रुकने और अपने-आप निकल जाने की जाँच और इलाज",
+  "files": [
+   "ectpr-labels.ts"
+  ]
+ },
  "Blood & lab tests": {
   "hi": "खून और लैब जाँच",
   "files": [
@@ -1873,6 +2000,12 @@
   "hi": "ब्लड-प्रेशर की दवाएँ",
   "files": [
    "ectpr-plan-screen.tsx"
+  ]
+ },
+ "Bowel care — assessment and management of constipation": {
+  "hi": "पेट की देखभाल — कब्ज़ की जाँच और इलाज",
+  "files": [
+   "ectpr-labels.ts"
   ]
  },
  "Break-glass failed.": {
@@ -2088,6 +2221,12 @@
    "ectpr-plan-screen.tsx"
   ]
  },
+ "Can they read the note themselves?": {
+  "hi": "क्या वे नोट ख़ुद पढ़ सकते हैं?",
+  "files": [
+   "goc-signature-pad.tsx"
+  ]
+ },
  "Cancel": {
   "hi": "रहने दें",
   "files": [
@@ -2255,6 +2394,12 @@
   "hi": "क्षमता की जाँच",
   "files": [
    "ectpr-ed-view.tsx"
+  ]
+ },
+ "Capacity fluctuates": {
+  "hi": "क्षमता बदलती रहती है",
+  "files": [
+   "goc-form.ts"
   ]
  },
  "Capacity fluctuates — reassess": {
@@ -2473,10 +2618,22 @@
    "amd-screen.tsx"
   ]
  },
+ "Change the note": {
+  "hi": "नोट बदलें",
+  "files": [
+   "goc-transcribe.tsx"
+  ]
+ },
  "Changed": {
   "hi": "बदला है",
   "files": [
    "family-note-history.tsx"
+  ]
+ },
+ "Changed during the talk": {
+  "hi": "बातचीत में बदला",
+  "files": [
+   "goc-transcribe.tsx"
   ]
  },
  "Changed means the saved words differ. The notes do not tell us why unless the doctor wrote a reason.": {
@@ -2915,10 +3072,10 @@
    "family-support-places.tsx"
   ]
  },
- "Clarify with the treating team afterwards.": {
-  "hi": "बाद में इलाज करने वाली टीम से स्पष्ट करें।",
+ "Clear": {
+  "hi": "मिटाएँ",
   "files": [
-   "ectpr-labels.ts"
+   "goc-signature-pad.tsx"
   ]
  },
  "clinical futility": {
@@ -3036,11 +3193,23 @@
    "amd-screen.tsx"
   ]
  },
+ "Comfort feeding by mouth": {
+  "hi": "मुँह से आराम के लिए खाना",
+  "files": [
+   "goc-form.ts"
+  ]
+ },
  "Comfort feeding by mouth always continues.": {
   "hi": "मुँह से आराम के लिए खिलाना हमेशा जारी रहेगा।",
   "files": [
    "ectpr-ed-view.tsx",
    "ectpr-pdf.ts"
+  ]
+ },
+ "Comfortable positioning; turning as tolerated; air mattress to prevent pressure sores": {
+  "hi": "आरामदायक स्थिति; जितना सह सकें करवट बदलना; बेडसोर से बचाव के लिए एयर गद्दा",
+  "files": [
+   "ectpr-labels.ts"
   ]
  },
  "Compare every copied word and dose with this original page.": {
@@ -3133,6 +3302,12 @@
    "ectpr-plan-screen.tsx"
   ]
  },
+ "Consent for this conversation": {
+  "hi": "इस बातचीत के लिए सहमति",
+  "files": [
+   "goc-note.ts"
+  ]
+ },
  "Consent resource (scope adr)": {
   "hi": "Consent रिसोर्स (scope adr)",
   "files": [
@@ -3171,6 +3346,12 @@
    "ectpr-plan-screen.tsx"
   ]
  },
+ "Continue anyway": {
+  "hi": "फिर भी आगे बढ़ें",
+  "files": [
+   "goc-transcribe.tsx"
+  ]
+ },
  "Continue the draft": {
   "hi": "ड्राफ़्ट जारी रखें",
   "files": [
@@ -3181,6 +3362,12 @@
   "hi": "जारी",
   "files": [
    "ectpr-pdf.ts"
+  ]
+ },
+ "Control of nausea, secretions, agitation, itch, hiccups": {
+  "hi": "जी मिचलाना, बलगम या स्राव, बेचैनी, खुजली और हिचकी पर नियंत्रण",
+  "files": [
+   "ectpr-labels.ts"
   ]
  },
  "Conversation in progress": {
@@ -3519,7 +3706,8 @@
   "files": [
    "care-calendar.tsx",
    "family-care-story.tsx",
-   "family-cost-help.tsx"
+   "family-cost-help.tsx",
+   "goc-form.ts"
   ]
  },
  "Date acknowledged": {
@@ -3564,6 +3752,12 @@
   "hi": "जन्म तिथि (वैकल्पिक)",
   "files": [
    "amd-screen.tsx"
+  ]
+ },
+ "Date of birth, sex, gender": {
+  "hi": "जन्म तिथि, लिंग, जेंडर",
+  "files": [
+   "goc-form.ts"
   ]
  },
  "Date of the written cancellation": {
@@ -3685,20 +3879,12 @@
   "files": [
    "ectpr-ed-view.tsx",
    "ectpr-plan-screen.tsx",
-   "goc-note.ts",
    "goc-transcribe.tsx"
-  ]
- },
- "Decisions": {
-  "hi": "फ़ैसले",
-  "files": [
-   "goc-note.ts"
   ]
  },
  "Decisions were recorded": {
   "hi": "फ़ैसले दर्ज हुए",
   "files": [
-   "goc-note.ts",
    "goc-transcribe.tsx"
   ]
  },
@@ -3756,10 +3942,22 @@
    "amd-screen.tsx"
   ]
  },
+ "Dialysis or CRRT": {
+  "hi": "डायलिसिस या CRRT",
+  "files": [
+   "goc-form.ts"
+  ]
+ },
  "Differed from the plan": {
   "hi": "योजना से अलग",
   "files": [
    "ectpr-pilot-log.tsx"
+  ]
+ },
+ "Different people said different things. Both are shown. Check with the patient which one stands.": {
+  "hi": "अलग-अलग लोगों ने अलग बातें कहीं। दोनों दिखाई गई हैं। मरीज़ से जाँचें कि कौन सी बात सही है।",
+  "files": [
+   "goc-transcribe.tsx"
   ]
  },
  "Digital copy": {
@@ -3771,7 +3969,6 @@
  "Dignity, privacy and kindness in all care.": {
   "hi": "हर देखभाल में गरिमा, निजता और दया।",
   "files": [
-   "ectpr-labels.ts",
    "ectpr-plan-screen.tsx"
   ]
  },
@@ -3796,7 +3993,8 @@
  "discussed with": {
   "hi": "चर्चा की",
   "files": [
-   "ectpr-labels.ts"
+   "ectpr-labels.ts",
+   "goc-form.ts"
   ]
  },
  "Discussed with": {
@@ -3808,7 +4006,7 @@
  "Discussed, no choice confirmed": {
   "hi": "बात हुई, कोई फ़ैसला पक्का नहीं",
   "files": [
-   "goc-note.ts"
+   "goc-form.ts"
   ]
  },
  "Discussed, no choice stated": {
@@ -3884,7 +4082,8 @@
   "files": [
    "care-sign-in.tsx",
    "family-copy-tracker.tsx",
-   "family-handover-pack.tsx"
+   "family-handover-pack.tsx",
+   "goc-signature-pad.tsx"
   ]
  },
  "Doctor review required": {
@@ -3915,7 +4114,7 @@
  "doctor verified": {
   "hi": "डॉक्टर ने जाँचा",
   "files": [
-   "goc-note.ts"
+   "goc-form.ts"
   ]
  },
  "Doctor you would like to look after you (name, place)": {
@@ -4002,7 +4201,8 @@
    "family-care-workspace.tsx",
    "family-home-help-state.ts",
    "family-home-help.tsx",
-   "family-support-places.tsx"
+   "family-support-places.tsx",
+   "goc-signature-pad.tsx"
   ]
  },
  "Done by": {
@@ -4084,6 +4284,12 @@
    "family-lab-history.tsx"
   ]
  },
+ "Download the form (Word)": {
+  "hi": "फ़ॉर्म डाउनलोड करें (Word)",
+  "files": [
+   "goc-transcribe.tsx"
+  ]
+ },
  "Download the PDF again": {
   "hi": "PDF फिर से डाउनलोड करें",
   "files": [
@@ -4113,12 +4319,6 @@
   "hi": "मसौदा अनुलग्नक। पायलट से पहले डॉक्टर और क़ानूनी टीम को यह भाषा मंज़ूर करनी होगी।",
   "files": [
    "ectpr-labels.ts"
-  ]
- },
- "Draft for the doctor to edit. Not signed.": {
-  "hi": "डॉक्टर के बदलने के लिए ड्राफ़्ट। साइन नहीं हुआ।",
-  "files": [
-   "goc-note.ts"
   ]
  },
  "Draft note": {
@@ -4162,6 +4362,18 @@
   "files": [
    "ectpr-plan-screen.tsx",
    "goc-note.ts"
+  ]
+ },
+ "e.g. Daughter": {
+  "hi": "जैसे बेटी",
+  "files": [
+   "goc-signature-pad.tsx"
+  ]
+ },
+ "e.g. Nurse": {
+  "hi": "जैसे नर्स",
+  "files": [
+   "goc-signature-pad.tsx"
   ]
  },
  "e.g. Unresponsive in ED, need medicines and decision-maker details": {
@@ -4384,6 +4596,12 @@
    "ectpr-pdf.ts"
   ]
  },
+ "Emergency care and treatment plan: goals of care": {
+  "hi": "आपातकालीन देखभाल और इलाज की योजना: देखभाल के लक्ष्य",
+  "files": [
+   "goc-form.ts"
+  ]
+ },
  "Emergency care plan": {
   "hi": "इमरजेंसी देखभाल योजना",
   "files": [
@@ -4549,6 +4767,12 @@
    "doctor-conversation.tsx"
   ]
  },
+ "Everyone in the room agrees to this. Without this tick, the audio is transcribed on this device only and never leaves it.": {
+  "hi": "कमरे में सभी इसके लिए राज़ी हैं। यह टिक न हो तो ऑडियो सिर्फ़ इसी डिवाइस पर लिखा जाता है और बाहर नहीं जाता।",
+  "files": [
+   "goc-transcribe.tsx"
+  ]
+ },
  "Everyone in the room has agreed to this conversation being recorded and written down": {
   "hi": "कमरे में मौजूद सभी लोग इस बातचीत को रिकॉर्ड करने और लिखने के लिए राज़ी हैं",
   "files": [
@@ -4597,12 +4821,6 @@
    "family-cost-help.tsx"
   ]
  },
- "Explained, and the family can say it back": {
-  "hi": "समझाया गया, परिवार दोहरा सकता है",
-  "files": [
-   "goc-note.ts"
-  ]
- },
  "Export FHIR (R4)": {
   "hi": "FHIR (R4) निर्यात करें",
   "files": [
@@ -4628,6 +4846,12 @@
    "ectpr-plan-screen.tsx"
   ]
  },
+ "Family and friend details": {
+  "hi": "परिवार और दोस्तों की जानकारी",
+  "files": [
+   "goc-form.ts"
+  ]
+ },
  "Family and friends": {
   "hi": "परिवार और दोस्त",
   "files": [
@@ -4635,10 +4859,15 @@
   ]
  },
  "Family and loved ones may stay with the person.": {
-  "hi": "परिवार और प्रियजन व्यक्ति के साथ रह सकते हैं।",
+  "hi": "परिवार और अपने लोग साथ रह सकते हैं।",
   "files": [
-   "ectpr-labels.ts",
    "ectpr-plan-screen.tsx"
+  ]
+ },
+ "Family details, decision-makers and emergency contact": {
+  "hi": "परिवार, फ़ैसला लेने वाले और इमरजेंसी संपर्क",
+  "files": [
+   "goc-note.ts"
   ]
  },
  "Family doctor": {
@@ -4663,6 +4892,12 @@
   "hi": "परिवार को दबाव महसूस हुआ",
   "files": [
    "ectpr-pilot-log.tsx"
+  ]
+ },
+ "Family member": {
+  "hi": "परिवार के सदस्य",
+  "files": [
+   "goc-signature-pad.tsx"
   ]
  },
  "Family note": {
@@ -4725,6 +4960,12 @@
   "hi": "जिन्हें बताना है",
   "files": [
    "ectpr-ed-view.tsx"
+  ]
+ },
+ "Family who must be informed before any major decision": {
+  "hi": "जिन्हें बड़े फ़ैसले से पहले बताना ज़रूरी है",
+  "files": [
+   "goc-form.ts"
   ]
  },
  "Family-saved replies": {
@@ -4982,7 +5223,8 @@
  "Fluids": {
   "hi": "तरल",
   "files": [
-   "ectpr-plan-screen.tsx"
+   "ectpr-plan-screen.tsx",
+   "goc-form.ts"
   ]
  },
  "Fluids (drip or under the skin)": {
@@ -5047,9 +5289,8 @@
   ]
  },
  "Food and drink by mouth, given by hand for comfort, as much as the person wants and can safely swallow.": {
-  "hi": "आराम के लिए हाथ से मुँह द्वारा खाना-पानी, जितना व्यक्ति चाहे और सुरक्षित रूप से निगल सके।",
+  "hi": "आराम के लिए हाथ से मुँह में खाना-पीना, जितना वे चाहें और सुरक्षित निगल सकें।",
   "files": [
-   "ectpr-labels.ts",
    "ectpr-plan-screen.tsx"
   ]
  },
@@ -5099,6 +5340,12 @@
   "hi": "केवल देखभाल टीम के लिए। पायलट में सिर्फ़ काल्पनिक मरीज़। इसी डिवाइस पर सेव।",
   "files": [
    "ectpr-pilot-log.tsx"
+  ]
+ },
+ "For the doctor, and the patient or family, to read together and sign below.": {
+  "hi": "डॉक्टर और मरीज़ या परिवार साथ पढ़ें और नीचे साइन करें।",
+  "files": [
+   "goc-form.ts"
   ]
  },
  "For the emergency doctor": {
@@ -5209,6 +5456,18 @@
    "ed/[token]/ed-card-page.tsx"
   ]
  },
+ "Functional status (ECOG)": {
+  "hi": "काम करने की क्षमता (ECOG)",
+  "files": [
+   "goc-form.ts"
+  ]
+ },
+ "Gastrostomy (PEG)": {
+  "hi": "पेट की नली (PEG)",
+  "files": [
+   "goc-form.ts"
+  ]
+ },
  "Gazetted officer": {
   "hi": "राजपत्रित अधिकारी",
   "files": [
@@ -5233,7 +5492,6 @@
  "General discussion, no decision recorded": {
   "hi": "सामान्य बातचीत, कोई फ़ैसला दर्ज नहीं",
   "files": [
-   "goc-note.ts",
    "goc-transcribe.tsx"
   ]
  },
@@ -5261,12 +5519,6 @@
    "ectpr-plan-screen.tsx"
   ]
  },
- "Give full standard emergency care when any of these is true:": {
-  "hi": "इनमें से कोई भी बात सही हो तो पूरा सामान्य आपातकालीन इलाज दें:",
-  "files": [
-   "ectpr-labels.ts"
-  ]
- },
  "Give the caregiver a break": {
   "hi": "देखभाल करने वाले को आराम",
   "files": [
@@ -5277,6 +5529,12 @@
   "hi": "दी गई",
   "files": [
    "ectpr-plan-extras.tsx"
+  ]
+ },
+ "Go back": {
+  "hi": "वापस जाएँ",
+  "files": [
+   "goc-transcribe.tsx"
   ]
  },
  "Go to hospital if things get worse?": {
@@ -5322,13 +5580,14 @@
    "ectpr-ed-view.tsx",
    "ectpr-pdf.ts",
    "ectpr-plan-screen.tsx",
+   "goc-form.ts",
    "goc-note.ts"
   ]
  },
- "Goals-of-care conversation note": {
-  "hi": "देखभाल के लक्ष्यों की बातचीत का नोट",
+ "Goals-of-care conversation note, in the order of the legal form": {
+  "hi": "देखभाल के लक्ष्यों की बातचीत का नोट, क़ानूनी फ़ॉर्म के क्रम में",
   "files": [
-   "goc-note.ts"
+   "goc-form.ts"
   ]
  },
  "Good to know": {
@@ -5337,10 +5596,22 @@
    "amd-screen.tsx"
   ]
  },
+ "Google Gemini did not finish, so this device is transcribing instead.": {
+  "hi": "Google Gemini से लिखावट पूरी नहीं हुई, इसलिए यह डिवाइस लिख रहा है।",
+  "files": [
+   "goc-transcribe.tsx"
+  ]
+ },
  "Guardian appointed by a court": {
   "hi": "अदालत द्वारा नियुक्त अभिभावक",
   "files": [
    "ectpr-plan-screen.tsx"
+  ]
+ },
+ "Guide for the talk": {
+  "hi": "बातचीत की गाइड",
+  "files": [
+   "goc-transcribe.tsx"
   ]
  },
  "h": {
@@ -5377,6 +5648,18 @@
   "hi": "क्षमता है — मरीज़ से पूछें; उनकी अभी की बात सबसे पहले",
   "files": [
    "ectpr-ed-view.tsx"
+  ]
+ },
+ "Has capacity for these decisions": {
+  "hi": "इन फ़ैसलों की क्षमता है",
+  "files": [
+   "goc-form.ts"
+  ]
+ },
+ "Has capacity, and asked family to decide with the team": {
+  "hi": "क्षमता है, और परिवार से टीम के साथ फ़ैसला करने को कहा",
+  "files": [
+   "goc-form.ts"
   ]
  },
  "Has capacity; has delegated decisions": {
@@ -5467,6 +5750,12 @@
    "ectpr-plan-screen.tsx"
   ]
  },
+ "Highest level allowed": {
+  "hi": "सबसे ऊँचा स्तर",
+  "files": [
+   "goc-form.ts"
+  ]
+ },
  "Highest number of drugs": {
   "hi": "ज़्यादा से ज़्यादा दवाएँ",
   "files": [
@@ -5532,8 +5821,15 @@
   "hi": "घर पर देखभाल (अगर लागू हो)",
   "files": [
    "ectpr-plan-screen.tsx",
+   "goc-form.ts",
    "goc-note.ts",
    "goc-transcribe.tsx"
+  ]
+ },
+ "Honest, unhurried communication with the patient and the family, every day": {
+  "hi": "मरीज़ और परिवार से हर दिन ईमानदार, बिना जल्दबाज़ी की बातचीत",
+  "files": [
+   "ectpr-labels.ts"
   ]
  },
  "Hospital": {
@@ -5630,6 +5926,12 @@
   "hi": "हर परेशानी कितनी है?",
   "files": [
    "family-symptom-diary.tsx"
+  ]
+ },
+ "How the guide works": {
+  "hi": "गाइड कैसे काम करती है",
+  "files": [
+   "goc-transcribe.tsx"
   ]
  },
  "How they are related to you": {
@@ -5741,6 +6043,18 @@
    "ectpr-plan-screen.tsx"
   ]
  },
+ "I have made these choices myself, or have delegated to my surrogate": {
+  "hi": "ये फ़ैसले मैंने ख़ुद लिए, या अपने प्रतिनिधि को सौंपे",
+  "files": [
+   "goc-form.ts"
+  ]
+ },
+ "I have read or heard this note and it records what we discussed": {
+  "hi": "मैंने यह नोट पढ़ा या सुना है और इसमें वही लिखा है जिस पर हमने बात की",
+  "files": [
+   "goc-signature-pad.tsx"
+  ]
+ },
  "I have read this": {
   "hi": "मैंने यह पढ़ लिया",
   "files": [
@@ -5781,6 +6095,12 @@
   "hi": "मैंने यह संस्करण देखा। इसमें हमारी बातचीत सही दर्ज है।",
   "files": [
    "care-note-reader.tsx"
+  ]
+ },
+ "I saw the note read out and the person sign or give their thumb impression": {
+  "hi": "मैंने नोट पढ़कर सुनाते और व्यक्ति को साइन करते या अंगूठा लगाते देखा",
+  "files": [
+   "goc-signature-pad.tsx"
   ]
  },
  "I understand doctors will not use it if the situation is unclear or one I did not think of.": {
@@ -5899,6 +6219,30 @@
    "ectpr-plan-screen.tsx"
   ]
  },
+ "If the patient has capacity and says something different now. What they say now always overrides this record.": {
+  "hi": "अगर मरीज़ में फ़ैसला लेने की क्षमता है और वे अब कुछ और कह रहे हैं। उनकी अभी की बात हमेशा इस रिकॉर्ड से ऊपर है।",
+  "files": [
+   "ectpr-labels.ts"
+  ]
+ },
+ "If the problem is new, reversible and unrelated to the illness (injury, choking, drug reaction, low sugar).": {
+  "hi": "अगर समस्या नई है, ठीक हो सकती है और बीमारी से जुड़ी नहीं है (चोट, गले में अटकना, दवा का रिएक्शन, शुगर कम होना)।",
+  "files": [
+   "ectpr-labels.ts"
+  ]
+ },
+ "If the record is ambiguous.": {
+  "hi": "अगर रिकॉर्ड साफ़ नहीं है।",
+  "files": [
+   "ectpr-labels.ts"
+  ]
+ },
+ "If the record is unsigned, out of date or cannot be found.": {
+  "hi": "अगर रिकॉर्ड पर हस्ताक्षर नहीं है, वह पुराना हो गया है या मिल नहीं रहा।",
+  "files": [
+   "ectpr-labels.ts"
+  ]
+ },
  "If unclear or the problem is new and reversible — treat fully and call.": {
   "hi": "अगर साफ़ न हो या समस्या नई और ठीक होने वाली हो — पूरा इलाज करें और फ़ोन करें।",
   "files": [
@@ -5928,6 +6272,12 @@
   "hi": "बीमारी",
   "files": [
    "ectpr-plan-screen.tsx"
+  ]
+ },
+ "Illness explained as not curable, and the family can say it back": {
+  "hi": "समझाया गया कि बीमारी ठीक नहीं हो सकती, और परिवार दोहरा सकता है",
+  "files": [
+   "goc-form.ts"
   ]
  },
  "Implanted device": {
@@ -5991,8 +6341,8 @@
    "family-cancer-overview.tsx"
   ]
  },
- "In the order of the form. A topic is ticked once the transcript covers it. A tick does not record any choice. A topic not discussed stays No preference recorded, and you verify that.": {
-  "hi": "फ़ॉर्म के क्रम में। लिखावट में बात आने पर विषय टिक हो जाता है। टिक से कोई फ़ैसला दर्ज नहीं होता। जिस विषय पर बात नहीं हुई वह “कोई पसंद दर्ज नहीं” रहता है, और इसकी जाँच आप करते हैं।",
+ "In the order of the form: consent, patient details, family and emergency contact, then CPR, dialysis and the other decisions. A topic ticks itself once the transcript covers it. A tick records no choice. A topic not discussed stays No preference recorded.": {
+  "hi": "फ़ॉर्म के क्रम में: सहमति, मरीज़ की जानकारी, परिवार और इमरजेंसी संपर्क, फिर CPR, डायलिसिस और बाक़ी फ़ैसले। लिखावट में बात आते ही विषय टिक हो जाता है। टिक से कोई फ़ैसला दर्ज नहीं होता। जिस विषय पर बात नहीं हुई वह “कोई पसंद दर्ज नहीं” रहता है।",
   "files": [
    "goc-transcribe.tsx"
   ]
@@ -6001,7 +6351,6 @@
   "hi": "मरीज़ के अपने शब्दों में",
   "files": [
    "ectpr-plan-screen.tsx",
-   "goc-note.ts",
    "goc-transcribe.tsx"
   ]
  },
@@ -6319,7 +6668,8 @@
  "Lacks capacity for these decisions": {
   "hi": "इन निर्णयों की क्षमता नहीं",
   "files": [
-   "ectpr-pdf.ts"
+   "ectpr-pdf.ts",
+   "goc-form.ts"
   ]
  },
  "Lacks capacity for these decisions — use the decision-maker": {
@@ -6332,6 +6682,12 @@
   "hi": "भाषा",
   "files": [
    "care-language-select.tsx"
+  ]
+ },
+ "Language preferred": {
+  "hi": "पसंद की भाषा",
+  "files": [
+   "goc-form.ts"
   ]
  },
  "Language spoken": {
@@ -6473,6 +6829,12 @@
    "ectpr-plan-screen.tsx"
   ]
  },
+ "Level of oxygen or ventilatory support": {
+  "hi": "ऑक्सीजन या साँस की मदद का स्तर",
+  "files": [
+   "goc-form.ts"
+  ]
+ },
  "Life after treatment": {
   "hi": "इलाज के बाद की ज़िंदगी",
   "files": [
@@ -6610,10 +6972,34 @@
    "ectpr-plan-screen.tsx"
   ]
  },
+ "Local physician": {
+  "hi": "स्थानीय डॉक्टर",
+  "files": [
+   "goc-form.ts"
+  ]
+ },
  "local-body custodian": {
   "hi": "स्थानीय निकाय संरक्षक",
   "files": [
    "amd-screen.tsx"
+  ]
+ },
+ "Lock this note version": {
+  "hi": "नोट का यह संस्करण लॉक करें",
+  "files": [
+   "goc-signature-pad.tsx"
+  ]
+ },
+ "Locked": {
+  "hi": "लॉक",
+  "files": [
+   "goc-signature-pad.tsx"
+  ]
+ },
+ "Locked on ": {
+  "hi": "लॉक हुआ: ",
+  "files": [
+   "goc-signature-pad.tsx"
   ]
  },
  "Locked. First record that the illness has been explained as not curable and the family can say it back.": {
@@ -6889,6 +7275,12 @@
    "care-sign-in.tsx"
   ]
  },
+ "Medical information": {
+  "hi": "चिकित्सा जानकारी",
+  "files": [
+   "goc-form.ts"
+  ]
+ },
  "Medical registration number": {
   "hi": "मेडिकल रजिस्ट्रेशन नंबर",
   "files": [
@@ -7013,6 +7405,12 @@
    "ectpr-plan-screen.tsx"
   ]
  },
+ "Members present for the discussion, and relationship": {
+  "hi": "बातचीत में मौजूद लोग, और रिश्ता",
+  "files": [
+   "goc-form.ts"
+  ]
+ },
  "Microphone access wasn’t allowed. You can still write below.": {
   "hi": "माइक्रोफ़ोन की अनुमति नहीं मिली। आप नीचे लिख सकते हैं।",
   "files": [
@@ -7097,10 +7495,15 @@
    "family-lab-history.tsx"
   ]
  },
+ "Mouth care and eye care, given often": {
+  "hi": "मुँह और आँखों की देखभाल, बार-बार",
+  "files": [
+   "ectpr-labels.ts"
+  ]
+ },
  "Mouth care and lip care, to keep the mouth moist and clean.": {
   "hi": "मुँह और होंठों की देखभाल, ताकि मुँह नम और साफ़ रहे।",
   "files": [
-   "ectpr-labels.ts",
    "ectpr-plan-screen.tsx"
   ]
  },
@@ -7274,7 +7677,9 @@
    "care-calendar.tsx",
    "care-circle.tsx",
    "care-medicine-access.tsx",
-   "family-handover-pack.tsx"
+   "family-handover-pack.tsx",
+   "goc-form.ts",
+   "goc-signature-pad.tsx"
   ]
  },
  "Name at least one, better two, people who can speak for you (representatives).": {
@@ -7323,6 +7728,12 @@
   "hi": "लिविंग विल में नामित",
   "files": [
    "ectpr-labels.ts"
+  ]
+ },
+ "Nasogastric (Ryle’s) tube": {
+  "hi": "नाक की नली (राइल्स)",
+  "files": [
+   "goc-form.ts"
   ]
  },
  "Nausea": {
@@ -7460,8 +7871,7 @@
   "files": [
    "ectpr-labels.ts",
    "ectpr-pilot-log.tsx",
-   "ectpr-plan-screen.tsx",
-   "goc-note.ts"
+   "ectpr-plan-screen.tsx"
   ]
  },
  "No — call first": {
@@ -7887,6 +8297,12 @@
    "family-care-workspace.tsx"
   ]
  },
+ "No, it was read to them": {
+  "hi": "नहीं, उन्हें पढ़कर सुनाया गया",
+  "files": [
+   "goc-signature-pad.tsx"
+  ]
+ },
  "Nobody may pressure you. You can change or cancel it at any time, in writing.": {
   "hi": "कोई आप पर दबाव नहीं डाल सकता। आप इसे कभी भी, लिखित रूप में, बदल या रद्द कर सकते हैं।",
   "files": [
@@ -8001,7 +8417,7 @@
  "Not discussed": {
   "hi": "बात नहीं हुई",
   "files": [
-   "goc-note.ts",
+   "goc-form.ts",
    "goc-transcribe.tsx"
   ]
  },
@@ -8176,6 +8592,12 @@
    "family-symptom-diary.tsx"
   ]
  },
+ "Note signed and locked": {
+  "hi": "नोट पर हस्ताक्षर हुए और लॉक हुआ",
+  "files": [
+   "goc-signature-pad.tsx"
+  ]
+ },
  "Notes": {
   "hi": "नोट",
   "files": [
@@ -8247,6 +8669,12 @@
   "hi": "नर्स",
   "files": [
    "ectpr-plan-screen.tsx"
+  ]
+ },
+ "Nurse involved in the discussion": {
+  "hi": "बातचीत में शामिल नर्स",
+  "files": [
+   "goc-form.ts"
   ]
  },
  "Officer’s name and office": {
@@ -8540,6 +8968,12 @@
    "ed/[token]/ed-card-page.tsx"
   ]
  },
+ "Opening the sign-off…": {
+  "hi": "साइन-ऑफ़ खुल रहा है…",
+  "files": [
+   "goc-signature-pad.tsx"
+  ]
+ },
  "Opening your care": {
   "hi": "आपकी देखभाल खुल रही है",
   "files": [
@@ -8657,6 +9091,12 @@
   "hi": "अन्य बाकी काम",
   "files": [
    "care-task-inbox.tsx"
+  ]
+ },
+ "Other parameters": {
+  "hi": "दूसरी बातें",
+  "files": [
+   "goc-form.ts"
   ]
  },
  "Other signatures": {
@@ -8819,13 +9259,20 @@
  "Palliative care clinician": {
   "hi": "पैलिएटिव केयर डॉक्टर",
   "files": [
-   "ectpr-plan-screen.tsx"
+   "ectpr-plan-screen.tsx",
+   "goc-form.ts"
   ]
  },
  "Palliative care doctor": {
   "hi": "पैलिएटिव केयर डॉक्टर",
   "files": [
    "ectpr-plan-screen.tsx"
+  ]
+ },
+ "Palliative care physician: name, hospital and contact": {
+  "hi": "पैलिएटिव केयर डॉक्टर: नाम, अस्पताल और संपर्क",
+  "files": [
+   "goc-form.ts"
   ]
  },
  "Palliative team": {
@@ -8925,7 +9372,15 @@
    "ectpr-pdf.ts",
    "ectpr-plan-screen.tsx",
    "ectpr.tsx",
-   "family-symptom-state.ts"
+   "family-symptom-state.ts",
+   "goc-signature-pad.tsx"
+  ]
+ },
+ "Patient details": {
+  "hi": "मरीज़ की जानकारी",
+  "files": [
+   "goc-form.ts",
+   "goc-note.ts"
   ]
  },
  "Patient or the person deciding for them": {
@@ -9031,6 +9486,12 @@
    "care-conversation-request.tsx"
   ]
  },
+ "People disagree": {
+  "hi": "लोगों की राय अलग है",
+  "files": [
+   "goc-transcribe.tsx"
+  ]
+ },
  "people helping": {
   "hi": "मदद करने वाले",
   "files": [
@@ -9092,6 +9553,12 @@
    "ectpr-plan-screen.tsx"
   ]
  },
+ "phone": {
+  "hi": "फ़ोन",
+  "files": [
+   "goc-form.ts"
+  ]
+ },
  "Phone": {
   "hi": "फ़ोन",
   "files": [
@@ -9117,7 +9584,8 @@
   "hi": "फ़ोन नंबर",
   "files": [
    "care-medicine-access.tsx",
-   "care-profile.tsx"
+   "care-profile.tsx",
+   "goc-form.ts"
   ]
  },
  "Phone numbers to call before an ambulance (one per line)": {
@@ -9166,6 +9634,12 @@
   "hi": "इन तस्वीरों के लिए आपकी मदद चाहिए",
   "files": [
    "care-medicine-import.tsx"
+  ]
+ },
+ "Physician details": {
+  "hi": "डॉक्टरों की जानकारी",
+  "files": [
+   "goc-form.ts"
   ]
  },
  "Pilot audit log": {
@@ -9394,10 +9868,10 @@
    "care-medicines.tsx"
   ]
  },
- "Present": {
-  "hi": "मौजूद",
+ "Presence of family; spiritual and religious support as the patient wishes": {
+  "hi": "परिवार का साथ; मरीज़ की इच्छा के अनुसार आध्यात्मिक और धार्मिक सहारा",
   "files": [
-   "goc-note.ts"
+   "ectpr-labels.ts"
   ]
  },
  "Present at the talk": {
@@ -9444,12 +9918,35 @@
    "care-calendar.tsx"
   ]
  },
+ "Primary": {
+  "hi": "मुख्य",
+  "files": [
+   "goc-form.ts"
+  ]
+ },
  "Primary decision-maker": {
   "hi": "मुख्य फ़ैसला लेने वाले",
   "files": [
    "ectpr-plan-screen.tsx",
-   "goc-note.ts",
    "goc-transcribe.tsx"
+  ]
+ },
+ "Primary decision-maker and contact details": {
+  "hi": "मुख्य फ़ैसला लेने वाले और संपर्क",
+  "files": [
+   "goc-form.ts"
+  ]
+ },
+ "Primary diagnosis and stage": {
+  "hi": "मुख्य बीमारी और स्टेज",
+  "files": [
+   "goc-form.ts"
+  ]
+ },
+ "Primary oncologist: name, hospital and contact": {
+  "hi": "मुख्य ऑन्कोलॉजिस्ट: नाम, अस्पताल और संपर्क",
+  "files": [
+   "goc-form.ts"
   ]
  },
  "Primary or Secondary Board refused permission": {
@@ -9481,6 +9978,12 @@
   "hi": "देखभाल की कॉपी प्रिंट करें",
   "files": [
    "family-handover-pack.tsx"
+  ]
+ },
+ "Print the form": {
+  "hi": "फ़ॉर्म प्रिंट करें",
+  "files": [
+   "goc-transcribe.tsx"
   ]
  },
  "Print the PDF. Read it once more.": {
@@ -9524,6 +10027,12 @@
   "hi": "प्रिंट हुआ, अभी हस्ताक्षर नहीं",
   "files": [
    "amd-screen.tsx"
+  ]
+ },
+ "Privacy, dignity, and gentle handling in every personal-care task": {
+  "hi": "हर निजी देखभाल में निजता, गरिमा और कोमल व्यवहार",
+  "files": [
+   "ectpr-labels.ts"
   ]
  },
  "Procedure": {
@@ -10014,12 +10523,30 @@
    "ectpr-plan-screen.tsx"
   ]
  },
+ "reg.": {
+  "hi": "पंजीकरण",
+  "files": [
+   "goc-form.ts"
+  ]
+ },
  "Reg.": {
   "hi": "पंजी.",
   "files": [
    "ectpr-ed-view.tsx",
    "ectpr-labels.ts",
    "ectpr-pdf.ts"
+  ]
+ },
+ "Reg. no.": {
+  "hi": "रजि. नं.",
+  "files": [
+   "goc-signature-pad.tsx"
+  ]
+ },
+ "Registration no.": {
+  "hi": "रजिस्ट्रेशन नंबर",
+  "files": [
+   "goc-signature-pad.tsx"
   ]
  },
  "Registration no. or designation": {
@@ -10045,7 +10572,8 @@
  "Relation to the patient": {
   "hi": "मरीज़ से रिश्ता",
   "files": [
-   "ectpr-plan-screen.tsx"
+   "ectpr-plan-screen.tsx",
+   "goc-signature-pad.tsx"
   ]
  },
  "Relationship": {
@@ -10061,11 +10589,22 @@
    "family-handover-pack.tsx"
   ]
  },
- "Relief of pain, breathlessness and other distressing symptoms, at any time of day or night.": {
-  "hi": "दर्द, साँस फूलने और अन्य परेशान करने वाले लक्षणों से राहत, दिन या रात किसी भी समय।",
+ "Relief of breathlessness — opioid, anxiolytic, fan, positioning, oxygen if it helps": {
+  "hi": "साँस फूलने से राहत — ओपिऑइड, घबराहट की दवा, पंखा, सही स्थिति, ऑक्सीजन अगर मदद करे",
   "files": [
-   "ectpr-labels.ts",
+   "ectpr-labels.ts"
+  ]
+ },
+ "Relief of pain, breathlessness and other distressing symptoms, at any time of day or night.": {
+  "hi": "दर्द, साँस फूलने और दूसरी तकलीफ़ों से राहत, दिन हो या रात।",
+  "files": [
    "ectpr-plan-screen.tsx"
+  ]
+ },
+ "Relief of pain, using opioids in adequate doses, by whatever route works": {
+  "hi": "दर्द से राहत — ओपिऑइड पूरी खुराक में, जिस भी रास्ते से असर करे",
+  "files": [
+   "ectpr-labels.ts"
   ]
  },
  "Remembers it long enough": {
@@ -10403,6 +10942,12 @@
    "doctor-care-home.tsx"
   ]
  },
+ "Requirement of ICU": {
+  "hi": "ICU की ज़रूरत",
+  "files": [
+   "goc-form.ts"
+  ]
+ },
  "RESP-max-oxygen": {
   "hi": "ऑक्सीजन का सबसे ज़्यादा बहाव (लीटर प्रति मिनट) लिखें।",
   "files": [
@@ -10612,7 +11157,7 @@
   "hi": "समीक्षा करेंगे",
   "files": [
    "ectpr-plan-screen.tsx",
-   "goc-note.ts"
+   "goc-form.ts"
   ]
  },
  "reviewed by {0}": {
@@ -10649,6 +11194,12 @@
   "hi": "भूमिका",
   "files": [
    "ectpr-plan-screen.tsx"
+  ]
+ },
+ "Role (optional)": {
+  "hi": "भूमिका (वैकल्पिक)",
+  "files": [
+   "goc-signature-pad.tsx"
   ]
  },
  "Sahara": {
@@ -10713,8 +11264,8 @@
    "family-open-questions.tsx"
   ]
  },
- "Said different things": {
-  "hi": "अलग-अलग बातें कहीं",
+ "Said earlier, replaced by a later statement": {
+  "hi": "पहले कहा, बाद की बात से बदला",
   "files": [
    "goc-transcribe.tsx"
   ]
@@ -11017,6 +11568,12 @@
    "family-voice-journal.tsx"
   ]
  },
+ "Say whether they can read the note themselves.": {
+  "hi": "बताएँ कि क्या वे नोट ख़ुद पढ़ सकते हैं।",
+  "files": [
+   "goc-signature-pad.tsx"
+  ]
+ },
  "Scan & organize": {
   "hi": "स्कैन करके सूची बनाएँ",
   "files": [
@@ -11105,15 +11662,51 @@
   "hi": "द्वितीय",
   "files": [
    "ectpr-ed-view.tsx",
-   "ectpr-pdf.ts"
+   "ectpr-pdf.ts",
+   "goc-form.ts"
   ]
  },
  "Secondary decision-maker": {
   "hi": "द्वितीय फ़ैसला लेने वाले",
   "files": [
    "ectpr-plan-screen.tsx",
-   "goc-note.ts",
    "goc-transcribe.tsx"
+  ]
+ },
+ "Secondary decision-maker and contact details": {
+  "hi": "द्वितीय फ़ैसला लेने वाले और संपर्क",
+  "files": [
+   "goc-form.ts"
+  ]
+ },
+ "Section I – General information": {
+  "hi": "भाग I – सामान्य जानकारी",
+  "files": [
+   "goc-form.ts"
+  ]
+ },
+ "Section II – Preliminary medical information and patient values": {
+  "hi": "भाग II – शुरुआती चिकित्सा जानकारी और मरीज़ के मूल्य",
+  "files": [
+   "goc-form.ts"
+  ]
+ },
+ "Section III – Decisive actions": {
+  "hi": "भाग III – निर्णायक फ़ैसले",
+  "files": [
+   "goc-form.ts"
+  ]
+ },
+ "Section IV – Signatures and declarations": {
+  "hi": "भाग IV – हस्ताक्षर और घोषणाएँ",
+  "files": [
+   "goc-form.ts"
+  ]
+ },
+ "Sedation for distress that cannot be relieved any other way": {
+  "hi": "ऐसी तकलीफ़ के लिए नींद की दवा (सेडेशन) जो किसी और तरह कम न हो",
+  "files": [
+   "ectpr-labels.ts"
   ]
  },
  "See all medicines": {
@@ -11268,6 +11861,18 @@
    "ectpr-plan-screen.tsx"
   ]
  },
+ "Should CPR be performed?": {
+  "hi": "क्या CPR किया जाए?",
+  "files": [
+   "goc-form.ts"
+  ]
+ },
+ "Should the patient be brought to the hospital?": {
+  "hi": "क्या मरीज़ को अस्पताल लाया जाए?",
+  "files": [
+   "goc-form.ts"
+  ]
+ },
  "Show": {
   "hi": "दिखाएँ",
   "files": [
@@ -11346,6 +11951,12 @@
    "doctor-conversation.tsx"
   ]
  },
+ "Sign here": {
+  "hi": "यहाँ हस्ताक्षर करें",
+  "files": [
+   "goc-signature-pad.tsx"
+  ]
+ },
  "Sign in": {
   "hi": "साइन इन करें",
   "files": [
@@ -11364,16 +11975,35 @@
    "care-document-treatment.tsx"
   ]
  },
+ "Sign in order: doctor, then patient or family, then witness.": {
+  "hi": "क्रम से साइन करें: डॉक्टर, फिर मरीज़ या परिवार, फिर गवाह।",
+  "files": [
+   "goc-signature-pad.tsx"
+  ]
+ },
  "Sign my part": {
   "hi": "अपना हिस्सा साइन करें",
   "files": [
    "ectpr-plan-screen.tsx"
   ]
  },
+ "Sign or give a thumb impression on the pad.": {
+  "hi": "जगह पर साइन करें या अंगूठा लगाएँ।",
+  "files": [
+   "goc-signature-pad.tsx"
+  ]
+ },
  "Sign out": {
   "hi": "साइन आउट",
   "files": [
    "simple-care-shell.tsx"
+  ]
+ },
+ "Sign the note": {
+  "hi": "नोट पर हस्ताक्षर",
+  "files": [
+   "goc-signature-pad.tsx",
+   "goc-transcribe.tsx"
   ]
  },
  "Sign this version": {
@@ -11394,10 +12024,28 @@
    "amd-screen.tsx"
   ]
  },
+ "Signature": {
+  "hi": "हस्ताक्षर",
+  "files": [
+   "goc-form.ts"
+  ]
+ },
  "Signature added.": {
   "hi": "हस्ताक्षर जुड़ गया।",
   "files": [
    "ectpr-plan-screen.tsx"
+  ]
+ },
+ "Signature of ": {
+  "hi": "हस्ताक्षर: ",
+  "files": [
+   "goc-signature-pad.tsx"
+  ]
+ },
+ "Signature pad": {
+  "hi": "हस्ताक्षर की जगह",
+  "files": [
+   "goc-signature-pad.tsx"
   ]
  },
  "Signatures": {
@@ -11427,7 +12075,14 @@
    "amd-screen.tsx",
    "ectpr-pdf.ts",
    "ectpr-plan-screen.tsx",
-   "ectpr.tsx"
+   "ectpr.tsx",
+   "goc-signature-pad.tsx"
+  ]
+ },
+ "Signed and locked: {0}.": {
+  "hi": "हस्ताक्षर हुए और बंद: {0}।",
+  "files": [
+   "goc-transcribe.tsx"
   ]
  },
  "Signed and recorded": {
@@ -11502,6 +12157,12 @@
    "ectpr-plan-screen.tsx"
   ]
  },
+ "Skin and wound care; management of odour": {
+  "hi": "त्वचा और घाव की देखभाल; बदबू पर नियंत्रण",
+  "files": [
+   "ectpr-labels.ts"
+  ]
+ },
  "Sleep trouble": {
   "hi": "नींद की परेशानी",
   "files": [
@@ -11537,6 +12198,12 @@
   "hi": "कुछ पृष्ठों का टेक्स्ट सेव नहीं है। पूरा दस्तावेज़ मूल फ़ाइल में देखें।",
   "files": [
    "care-document-search.tsx"
+  ]
+ },
+ "Someone still needs to sign.": {
+  "hi": "अभी किसी के हस्ताक्षर बाक़ी हैं।",
+  "files": [
+   "goc-signature-pad.tsx"
   ]
  },
  "Something to ask at the next visit?": {
@@ -11589,9 +12256,8 @@
   ]
  },
  "Spiritual, emotional and psychological support for the person and family.": {
-  "hi": "व्यक्ति और परिवार के लिए आध्यात्मिक, भावनात्मक और मानसिक सहारा।",
+  "hi": "मरीज़ और परिवार के लिए आध्यात्मिक, भावनात्मक और मानसिक सहारा।",
   "files": [
-   "ectpr-labels.ts",
    "ectpr-plan-screen.tsx"
   ]
  },
@@ -11686,6 +12352,12 @@
   "files": [
    "doctor-conversation.tsx",
    "family-voice-journal.tsx"
+  ]
+ },
+ "Start the signatures again": {
+  "hi": "हस्ताक्षर फिर से शुरू करें",
+  "files": [
+   "goc-signature-pad.tsx"
   ]
  },
  "Started": {
@@ -11959,6 +12631,7 @@
   "hi": "मरीज़ को बताना",
   "files": [
    "ectpr-plan-screen.tsx",
+   "goc-form.ts",
    "goc-note.ts"
   ]
  },
@@ -12136,14 +12809,19 @@
  "The family asked that the patient not be told": {
   "hi": "परिवार ने कहा कि मरीज़ को न बताया जाए",
   "files": [
-   "ectpr-plan-screen.tsx",
-   "goc-note.ts"
+   "ectpr-plan-screen.tsx"
   ]
  },
  "The family felt pushed": {
   "hi": "परिवार को दबाव महसूस हुआ",
   "files": [
    "ectpr-pilot-log.tsx"
+  ]
+ },
+ "The family has asked that the patient not be told": {
+  "hi": "परिवार ने कहा कि मरीज़ को न बताया जाए",
+  "files": [
+   "goc-form.ts"
   ]
  },
  "The file could not be saved on this device.": {
@@ -12278,10 +12956,34 @@
    "goc-transcribe.tsx"
   ]
  },
+ "The note": {
+  "hi": "नोट",
+  "files": [
+   "goc-signature-pad.tsx"
+  ]
+ },
+ "The note could not be locked. Try again.": {
+  "hi": "नोट लॉक नहीं हो सका। फिर कोशिश करें।",
+  "files": [
+   "goc-signature-pad.tsx"
+  ]
+ },
+ "The note has changed. Read the new note together before signing.": {
+  "hi": "नोट बदल गया है। साइन करने से पहले नया नोट साथ में पढ़ें।",
+  "files": [
+   "goc-signature-pad.tsx"
+  ]
+ },
  "The note is back.": {
   "hi": "नोट वापस जोड़ दिया।",
   "files": [
    "family-care-story.tsx"
+  ]
+ },
+ "The note was changed after it was signed. All {0} signatures on the earlier text are no longer valid. Read the new note together and sign again.": {
+  "hi": "साइन होने के बाद नोट बदला गया। पुराने नोट पर किए सभी {0} हस्ताक्षर अब मान्य नहीं हैं। नया नोट साथ में पढ़ें और फिर से साइन करें।",
+  "files": [
+   "goc-signature-pad.tsx"
   ]
  },
  "The organisation was consulted about this plan": {
@@ -12315,16 +13017,22 @@
    "amd-screen.tsx"
   ]
  },
- "The patient can decide for themselves and now says something different.": {
-  "hi": "मरीज़ खुद निर्णय ले सकता है और अब कुछ अलग कह रहा है।",
+ "The patient does not know the diagnosis": {
+  "hi": "मरीज़ बीमारी के बारे में नहीं जानते",
   "files": [
-   "ectpr-labels.ts"
+   "goc-form.ts"
   ]
  },
  "The patient does not want CPR": {
   "hi": "मरीज़ CPR नहीं चाहते",
   "files": [
    "ectpr-plan-screen.tsx"
+  ]
+ },
+ "The patient knows the diagnosis": {
+  "hi": "मरीज़ बीमारी के बारे में जानते हैं",
+  "files": [
+   "goc-form.ts"
   ]
  },
  "The patient must review and sign this version before a family member can acknowledge it.": {
@@ -12405,28 +13113,10 @@
    "ectpr-pilot-log.tsx"
   ]
  },
- "The problem is new, reversible and not caused by the main illness — for example injury, choking, a drug reaction or low blood sugar.": {
-  "hi": "समस्या नई है, ठीक हो सकती है और मुख्य बीमारी से नहीं है — जैसे चोट, गले में अटकना, दवा का असर या कम शुगर।",
-  "files": [
-   "ectpr-labels.ts"
-  ]
- },
  "The QR holds only a random code, not the patient’s details. Anyone with the card can open the emergency view; the full record needs a typed reason (break-glass), is logged, and the decision-maker is told by SMS where SMS is set up.": {
   "hi": "QR में केवल एक बेतरतीब कोड है, मरीज़ की जानकारी नहीं। कार्ड वाला कोई भी आपातकालीन दृश्य खोल सकता है; पूरा रिकॉर्ड कारण लिखने (ब्रेक-ग्लास) पर ही खुलता है, दर्ज होता है, और SMS सेट हो तो निर्णयकर्ता को बताया जाता है।",
   "files": [
    "ectpr.tsx"
-  ]
- },
- "The record is unclear.": {
-  "hi": "रिकॉर्ड साफ़ नहीं है।",
-  "files": [
-   "ectpr-labels.ts"
-  ]
- },
- "The record is unsigned, out of date, or cannot be found.": {
-  "hi": "रिकॉर्ड पर हस्ताक्षर नहीं है, वह पुराना है, या मिल नहीं रहा।",
-  "files": [
-   "ectpr-labels.ts"
   ]
  },
  "The record was not opened": {
@@ -12452,6 +13142,18 @@
   "files": [
    "amd-screen.tsx",
    "ectpr-plan-extras.tsx"
+  ]
+ },
+ "The signature could not be added. Try again.": {
+  "hi": "हस्ताक्षर नहीं जुड़ सका। फिर कोशिश करें।",
+  "files": [
+   "goc-signature-pad.tsx"
+  ]
+ },
+ "The signer cannot read the note, so a witness also signs.": {
+  "hi": "साइन करने वाले नोट नहीं पढ़ सकते, इसलिए एक गवाह भी साइन करेंगे।",
+  "files": [
+   "goc-signature-pad.tsx"
   ]
  },
  "The signer cannot read well, or the plan was read aloud to them": {
@@ -12494,12 +13196,6 @@
   "hi": "सुप्रीम कोर्ट लिविंग विल को डिजिटल स्वास्थ्य रिकॉर्ड में जोड़ने की अनुमति देता है। सहारा यहाँ केवल ABHA पता नोट करता है; स्कैन अपने ABHA ऐप में ख़ुद अपलोड करें।",
   "files": [
    "amd-screen.tsx"
-  ]
- },
- "The talk said different things. Check with the patient or family which one stands.": {
-  "hi": "बातचीत में अलग-अलग बातें कही गईं। मरीज़ या परिवार से जाँचें कि कौन सी बात सही है।",
-  "files": [
-   "goc-transcribe.tsx"
   ]
  },
  "The talk said no to the options marked below. It did not say which level is the highest allowed. Choose one only if you know.": {
@@ -12563,6 +13259,12 @@
    "dpdp-notice.tsx"
   ]
  },
+ "These signatures are no longer valid. Sign again.": {
+  "hi": "ये हस्ताक्षर अब मान्य नहीं हैं। फिर से साइन करें।",
+  "files": [
+   "goc-signature-pad.tsx"
+  ]
+ },
  "These symptoms could not be saved. Try again.": {
   "hi": "परेशानियाँ सेव नहीं हुईं। फिर से कोशिश करें।",
   "files": [
@@ -12585,6 +13287,12 @@
   "hi": "वे वादा करते हैं कि वही बताएँगे जो मरीज़ चुनते, न कि जो वे ख़ुद चाहते हैं।",
   "files": [
    "ectpr-plan-screen.tsx"
+  ]
+ },
+ "They stay No preference recorded, and the note lists them as not discussed.": {
+  "hi": "ये “कोई पसंद दर्ज नहीं” रहेंगे, और नोट में “बात नहीं हुई” लिखा जाएगा।",
+  "files": [
+   "goc-transcribe.tsx"
   ]
  },
  "Things to do": {
@@ -12657,6 +13365,12 @@
   "hi": "इससे मौजूदा योजना नए ड्राफ़्ट में कॉपी होती है। नया साइन होने तक मौजूदा योजना लागू रहती है।",
   "files": [
    "ectpr-plan-screen.tsx"
+  ]
+ },
+ "This could not be saved on this device. Keep this page open and try again.": {
+  "hi": "यह इस डिवाइस पर सेव नहीं हो सका। पेज खुला रखें और फिर कोशिश करें।",
+  "files": [
+   "goc-signature-pad.tsx"
   ]
  },
  "This could not be saved. Try adding it again.": {
@@ -12827,6 +13541,12 @@
    "family-voice-journal.tsx"
   ]
  },
+ "This note is signed and locked. Changing it clears the signatures, and everyone signs again.": {
+  "hi": "यह नोट साइन होकर बंद है। बदलने पर हस्ताक्षर हट जाते हैं, और सबको फिर साइन करना होता है।",
+  "files": [
+   "goc-transcribe.tsx"
+  ]
+ },
  "This note no longer matches its signed version.": {
   "hi": "यह नोट हस्ताक्षर किए हुए संस्करण से मेल नहीं खाता।",
   "files": [
@@ -12837,6 +13557,12 @@
   "hi": "यह नोट अपने हस्ताक्षर किए हुए संस्करण से अलग है। पुराने हस्ताक्षर बदले हुए नोट पर लागू नहीं होते।",
   "files": [
    "care-note-reader.tsx"
+  ]
+ },
+ "This note version is locked. No more signatures can be added.": {
+  "hi": "नोट का यह संस्करण लॉक है। अब और हस्ताक्षर नहीं जुड़ सकते।",
+  "files": [
+   "goc-signature-pad.tsx"
   ]
  },
  "This passage changed. Search the document again.": {
@@ -12971,7 +13697,20 @@
   "files": [
    "amd-screen.tsx",
    "ectpr-pdf.ts",
-   "ectpr-plan-screen.tsx"
+   "ectpr-plan-screen.tsx",
+   "goc-form.ts"
+  ]
+ },
+ "Thumb impression": {
+  "hi": "अंगूठे का निशान",
+  "files": [
+   "goc-signature-pad.tsx"
+  ]
+ },
+ "Thumb impression here": {
+  "hi": "यहाँ अंगूठा लगाएँ",
+  "files": [
+   "goc-signature-pad.tsx"
   ]
  },
  "Thumb impression instead of signature": {
@@ -12980,10 +13719,22 @@
    "amd-screen.tsx"
   ]
  },
+ "Thumb impression pad": {
+  "hi": "अंगूठे के निशान की जगह",
+  "files": [
+   "goc-signature-pad.tsx"
+  ]
+ },
  "Tick a box or write what happened.": {
   "hi": "कोई बॉक्स चुनें या लिखें कि क्या हुआ।",
   "files": [
    "ectpr-pilot-log.tsx"
+  ]
+ },
+ "Tick the box to confirm before signing.": {
+  "hi": "साइन करने से पहले पुष्टि के लिए बॉक्स पर टिक करें।",
+  "files": [
+   "goc-signature-pad.tsx"
   ]
  },
  "Time": {
@@ -13096,12 +13847,6 @@
    "ectpr-plan-extras.tsx"
   ]
  },
- "Topics to talk through": {
-  "hi": "जिन विषयों पर बात करनी है",
-  "files": [
-   "goc-transcribe.tsx"
-  ]
- },
  "Total": {
   "hi": "कुल खर्च",
   "files": [
@@ -13118,6 +13863,12 @@
   "hi": "बातचीत लिखें",
   "files": [
    "ectpr-plan-screen.tsx"
+  ]
+ },
+ "Transcribed by {0}": {
+  "hi": "{0} ने लिखा",
+  "files": [
+   "goc-transcribe.tsx"
   ]
  },
  "Transfer": {
@@ -13145,8 +13896,8 @@
    "family-care-workspace.tsx"
   ]
  },
- "Transport home for last days with a nurse escort": {
-  "hi": "अंतिम दिनों के लिए नर्स के साथ घर ले जाना",
+ "Transport home from hospital for the last days of life, with a nurse escort if available": {
+  "hi": "जीवन के अंतिम दिनों के लिए अस्पताल से घर ले जाना, नर्स साथ हो तो उसके साथ",
   "files": [
    "ectpr-labels.ts"
   ]
@@ -13173,7 +13924,8 @@
   "hi": "मुख्य डॉक्टर",
   "files": [
    "ectpr-pdf.ts",
-   "ectpr-plan-screen.tsx"
+   "ectpr-plan-screen.tsx",
+   "goc-form.ts"
   ]
  },
  "Treating doctor revoked their decision to support it": {
@@ -13272,6 +14024,12 @@
    "ectpr-plan-screen.tsx"
   ]
  },
+ "Tried to contact, but unavailable": {
+  "hi": "संपर्क की कोशिश की, पर नहीं मिले",
+  "files": [
+   "goc-form.ts"
+  ]
+ },
  "Try a report name, a medicine name, or fewer words.": {
   "hi": "जाँच का नाम, दवा का नाम या कम शब्द लिखकर खोजें।",
   "files": [
@@ -13304,9 +14062,8 @@
   ]
  },
  "Turning and positioning for comfort.": {
-  "hi": "आराम के लिए करवट बदलना और सही स्थिति में रखना।",
+  "hi": "आराम के लिए करवट दिलाना और ठीक से लिटाना।",
   "files": [
-   "ectpr-labels.ts",
    "ectpr-plan-screen.tsx"
   ]
  },
@@ -13340,8 +14097,13 @@
    "care-task-inbox.tsx",
    "family-care-story.tsx",
    "family-care-workspace.tsx",
-   "family-cost-help.tsx",
-   "goc-note.ts"
+   "family-cost-help.tsx"
+  ]
+ },
+ "Type instead": {
+  "hi": "इसके बजाय टाइप करें",
+  "files": [
+   "goc-transcribe.tsx"
   ]
  },
  "Typed names; no verified digital signature.": {
@@ -13371,8 +14133,7 @@
  "Understanding": {
   "hi": "समझ",
   "files": [
-   "ectpr-plan-screen.tsx",
-   "goc-note.ts"
+   "ectpr-plan-screen.tsx"
   ]
  },
  "Understanding the illness": {
@@ -13608,6 +14369,12 @@
    "goc-transcribe.tsx"
   ]
  },
+ "Urdu is often written as Hindi by this model. Check every line, or type the conversation.": {
+  "hi": "यह मॉडल उर्दू को अक्सर हिंदी में लिखता है। हर लाइन जाँचें, या बातचीत टाइप करें।",
+  "files": [
+   "goc-transcribe.tsx"
+  ]
+ },
  "Use a line for the instructions": {
   "hi": "निर्देश के लिए एक पंक्ति चुनें",
   "files": [
@@ -13677,8 +14444,7 @@
  "Values": {
   "hi": "मूल्य",
   "files": [
-   "ectpr-plan-screen.tsx",
-   "goc-note.ts"
+   "ectpr-plan-screen.tsx"
   ]
  },
  "Values section completed": {
@@ -13710,6 +14476,12 @@
   "hi": "वैसोप्रेसर / डायलिसिस",
   "files": [
    "ectpr-pdf.ts"
+  ]
+ },
+ "Vasopressors or inotropes": {
+  "hi": "वैसोप्रेसर या इनोट्रोप",
+  "files": [
+   "goc-form.ts"
   ]
  },
  "vegetative state": {
@@ -13760,6 +14532,7 @@
    "family-copy-tracker.tsx",
    "family-handover-pack.tsx",
    "family-note-history.tsx",
+   "goc-form.ts",
    "simple-care-shell.tsx"
   ]
  },
@@ -13927,9 +14700,8 @@
   ]
  },
  "Washing, hygiene, skin care and pressure-area care.": {
-  "hi": "नहलाना, साफ़-सफ़ाई, त्वचा और दबाव वाली जगहों की देखभाल।",
+  "hi": "नहलाना, साफ़-सफ़ाई, त्वचा की देखभाल और बेडसोर से बचाव।",
   "files": [
-   "ectpr-labels.ts",
    "ectpr-plan-screen.tsx"
   ]
  },
@@ -13999,6 +14771,12 @@
    "conversation-preparation.tsx"
   ]
  },
+ "What matters most": {
+  "hi": "सबसे ज़रूरी क्या है",
+  "files": [
+   "goc-form.ts"
+  ]
+ },
  "What matters to me": {
   "hi": "मेरे लिए क्या मायने रखता है",
   "files": [
@@ -14055,7 +14833,14 @@
   "hi": "एम्बुलेंस टीम क्या करे",
   "files": [
    "ectpr-plan-screen.tsx",
+   "goc-form.ts",
    "goc-note.ts"
+  ]
+ },
+ "What the patient knows": {
+  "hi": "मरीज़ क्या जानते हैं",
+  "files": [
+   "goc-form.ts"
   ]
  },
  "What the patient said or wrote before": {
@@ -14349,7 +15134,8 @@
  "Who is signing": {
   "hi": "कौन साइन कर रहे हैं",
   "files": [
-   "ectpr-plan-screen.tsx"
+   "ectpr-plan-screen.tsx",
+   "goc-signature-pad.tsx"
   ]
  },
  "Who opened or changed this plan": {
@@ -14512,6 +15298,12 @@
    "ectpr-plan-screen.tsx"
   ]
  },
+ "Withdrawal or withholding of treatment": {
+  "hi": "इलाज रोकना या शुरू न करना",
+  "files": [
+   "goc-form.ts"
+  ]
+ },
  "Withdrawal or withholding to be performed": {
   "hi": "इलाज रोका जाएगा या शुरू नहीं किया जाएगा",
   "files": [
@@ -14539,7 +15331,9 @@
  "Witness": {
   "hi": "गवाह",
   "files": [
-   "ectpr-plan-screen.tsx"
+   "ectpr-plan-screen.tsx",
+   "goc-form.ts",
+   "goc-signature-pad.tsx"
   ]
  },
  "Witness {0}": {
@@ -14593,14 +15387,31 @@
  "Would not accept": {
   "hi": "स्वीकार नहीं",
   "files": [
-   "ectpr-ed-view.tsx",
-   "goc-note.ts"
+   "ectpr-ed-view.tsx"
   ]
  },
  "Write exactly what they said. Do not change their words.": {
   "hi": "ठीक वही लिखें जो उन्होंने कहा। उनके शब्द न बदलें।",
   "files": [
    "ectpr-plan-screen.tsx"
+  ]
+ },
+ "Write how the family member is related to the patient.": {
+  "hi": "लिखें कि परिवार के सदस्य का मरीज़ से क्या रिश्ता है।",
+  "files": [
+   "goc-signature-pad.tsx"
+  ]
+ },
+ "Write the doctor’s registration number.": {
+  "hi": "डॉक्टर का रजिस्ट्रेशन नंबर लिखें।",
+  "files": [
+   "goc-signature-pad.tsx"
+  ]
+ },
+ "Write the name of the person signing.": {
+  "hi": "साइन करने वाले का नाम लिखें।",
+  "files": [
+   "goc-signature-pad.tsx"
   ]
  },
  "Write the need in 160 characters or fewer.": {
@@ -14659,7 +15470,8 @@
    "ectpr-labels.ts",
    "ectpr-pilot-log.tsx",
    "ectpr-plan-screen.tsx",
-   "goc-note.ts"
+   "goc-form.ts",
+   "goc-signature-pad.tsx"
   ]
  },
  "Yes — for any significant deterioration": {
@@ -14751,6 +15563,12 @@
   "hi": "यहाँ अधिकतम {0} तस्वीरें चुनें।",
   "files": [
    "care-medicine-import.tsx"
+  ]
+ },
+ "You haven’t spoken about these things. Are you sure you want to continue?": {
+  "hi": "इन बातों पर बात नहीं हुई। क्या आप सच में आगे बढ़ना चाहते हैं?",
+  "files": [
+   "goc-transcribe.tsx"
   ]
  },
  "You kept a copy of the audio.": {

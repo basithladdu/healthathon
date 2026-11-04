@@ -13,7 +13,7 @@ import { edInterpretation, pageFooter } from './ectpr-rules';
 import { capacityGuide, homeCareLines, withdrawalLines,
   alwaysProvidedCare, amdCaveat, ambulanceLabel, edAmdLines, authorityLabel, ceilingDetails, ceilingLabel, ceilingShort, cprDecidedBy, cprLabel,
   cprShort, deviceLabel, dialysisLabel, dyingPhasePrompt, edBanner, edFlag, formatDay, goalLabel, hydrationLabel, icuLabel, ifInDoubtAfter,
-  ifInDoubtConditions, ifInDoubtLead, ifInDoubtTitle, ngLabel, notRecorded, pegLabel, textFor, transferLabel, transferShort,
+  ifInDoubtConditions, ifInDoubtTitle, ngLabel, notRecorded, pegLabel, textFor, transferLabel, transferShort,
   treatingConsultant, vasopressorLabel, walletCardLine,
 } from './ectpr-labels.ts';
 import { sha256Hex } from './ed-card-snapshot';
@@ -293,7 +293,7 @@ export async function makeEctprPdf(record: EctprRecord, opts: { lang?: CareLang;
   for (const flag of interp.flags) text(`! ${edFlag(flag, lang)}`, 9, red);
 
   // If in doubt box (always)
-  const doubt = [ifInDoubtLead(lang), ...ifInDoubtConditions(lang).map((s, i) => `${i + 1}. ${s}`), ifInDoubtAfter(lang)];
+  const doubt = [...ifInDoubtConditions(lang).map((s) => `• ${s}`), ifInDoubtAfter(lang)];
   const doubtLines = doubt.flatMap((s) => writer.wrap(s, 8.5, W - 2 * M - 16));
   const doubtH = 16 + doubtLines.length * 11 + 6;
   page.drawRectangle({ x: M, y: y - doubtH, width: W - 2 * M, height: doubtH, borderColor: red, borderWidth: 1.6 });

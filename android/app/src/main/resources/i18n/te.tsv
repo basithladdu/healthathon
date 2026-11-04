@@ -3896,3 +3896,324 @@ Experience	అనుభవం
 Languages	భాషలు
 Registration: practice sample, not a real number	నమోదు: ప్రాక్టీస్ నమూనా, నిజమైన నంబర్ కాదు
 Sample profile for the walkthrough. Real doctors are verified by the Sahara team against the medical council register.	ఇది వాక్‌త్రూ కోసం నమూనా ప్రొఫైల్. నిజమైన వైద్యులను సహారా బృందం మెడికల్ కౌన్సిల్ రిజిస్టర్‌తో ధృవీకరిస్తుంది.
+About this list	ఈ జాబితా గురించి
+Blue pins and tags: the directory also lists morphine. Call to confirm.	నీలి గుర్తులు, ట్యాగ్‌లు: జాబితాలో మార్ఫిన్ కూడా ఉంది. ఫోన్ చేసి నిర్ధారించుకోండి.
+Hollow pins mark only the PIN, town or district area. Numbered circles are groups: tap to zoom.	ఖాళీ గుర్తులు పిన్, పట్టణం లేదా జిల్లా ప్రాంతాన్ని మాత్రమే చూపుతాయి. సంఖ్య ఉన్న వృత్తాలు చాలా కేంద్రాలు: జూమ్ కోసం నొక్కండి.
+${coverage.listOnly} centres have no map spot and are in the list only.	${coverage.listOnly} కేంద్రాలు మ్యాప్‌లో లేవు, జాబితాలో మాత్రమే ఉన్నాయి.
+Your location stays on this phone. It only centres the map and sorts the list.	మీ స్థానం ఈ ఫోన్‌లోనే ఉంటుంది. ఇది మ్యాప్‌ను మీ చుట్టూ చూపి, జాబితాను వరుసలో పెట్టడానికి మాత్రమే.
+Service	సేవ
+All services	అన్ని సేవలు
+Call 112	112కి ఫోన్ చేయండి
+Search	వెతకండి
+Nothing matches.	ఏదీ దొరకలేదు.
+about $n km	సుమారు $n కి.మీ.
+$n km	$n కి.మీ.
+About this centre	ఈ కేంద్రం గురించి
+Call to confirm services, availability and cost.	సేవలు, అందుబాటు, ఖర్చు ఫోన్ చేసి నిర్ధారించుకోండి.
+Open the source listing	మూల జాబితాను తెరవండి
+Show where I am	నేను ఎక్కడ ఉన్నానో చూపించు
+Please don't add patient details.	దయచేసి రోగి వివరాలు రాయవద్దు.
+Add address, phone or services	చిరునామా, ఫోన్ లేదా సేవలు జోడించండి
+Your suggestions (${items.size})	మీ సూచనలు (${items.size})
+How much was my last bill?	నా చివరి బిల్లు ఎంత?
+What is my latest haemoglobin?	నా తాజా హిమోగ్లోబిన్ ఎంత?
+Which medicines are listed on my prescription?	నా ప్రిస్క్రిప్షన్‌లో ఏ మందులు రాసి ఉన్నాయి?
+When was I discharged?	నన్ను ఆసుపత్రి నుండి ఎప్పుడు డిశ్చార్జ్ చేశారు?
+When is my next follow-up?	నా తదుపరి ఫాలో-అప్ ఎప్పుడు?
+Offline · matching lines only	ఆఫ్‌లైన్ · సరిపోలే పంక్తులు మాత్రమే
+Look in	ఎక్కడ చూడాలి
+Choose	ఎంచుకోండి
+Send my question and $sendWhat to $sendTo, this time only. Photos and files stay on this phone.	నా ప్రశ్నను మరియు $sendWhat ను ఈసారి మాత్రమే $sendTo కు పంపండి. ఫోటోలు, ఫైళ్లు ఈ ఫోన్‌లోనే ఉంటాయి.
+Answer	సమాధానం
+Sources	మూలాలు
+How answers work	సమాధానాలు ఎలా వస్తాయి
+The phone sorts your documents into bills, lab reports, prescriptions and discharge summaries from their words. You can move a document to another folder on the Documents screen.	ఫోన్ మీ పత్రాలను వాటిలోని పదాల ఆధారంగా బిల్లులు, ల్యాబ్ రిపోర్టులు, ప్రిస్క్రిప్షన్లు, డిశ్చార్జ్ సారాంశాలుగా విభజిస్తుంది. పత్రాల స్క్రీన్‌లో మీరు ఏ పత్రాన్నైనా వేరే ఫోల్డర్‌కు మార్చవచ్చు.
+Nothing is sent until you tap Ask, and you are asked again each time. Only your question, the matching lines and each document's type are sent, never file names.	మీరు ‘అడగండి’ నొక్కే వరకు ఏదీ పంపబడదు, ప్రతిసారీ మళ్లీ అడుగుతాము. మీ ప్రశ్న, సరిపోలే పంక్తులు, ప్రతి పత్రం రకం మాత్రమే పంపబడతాయి, ఫైల్ పేర్లు ఎప్పుడూ కాదు.
+Matching lines are found on this phone, not explained. Best match first.	సరిపోలే పంక్తులు ఈ ఫోన్‌లోనే కనుగొనబడతాయి, వివరించబడవు. బాగా సరిపోయేది ముందు.
+Not checked yet · compare with the paper	ఇంకా తనిఖీ చేయలేదు · అసలు కాగితంతో పోల్చండి
+Bill	బిల్లు
+Discharge summary	డిశ్చార్జ్ సారాంశం
+Family caregivers circle	కుటుంబ సంరక్షకుల బృందం
+For family members caring for someone at home	ఇంట్లో ఎవరినైనా చూసుకుంటున్న కుటుంబ సభ్యుల కోసం
+Parents of children with cancer	క్యాన్సర్ ఉన్న పిల్లల తల్లిదండ్రులు
+For parents and close family of a child in treatment	చికిత్స పొందుతున్న పిల్లల తల్లిదండ్రులు, దగ్గరి కుటుంబం కోసం
+Young survivors	యువ సర్వైవర్లు
+For young people who finished treatment	చికిత్స పూర్తి చేసుకున్న యువత కోసం
+Loss and grief	కోల్పోవడం, దుఃఖం
+For families after the loss of someone close	దగ్గరి వారిని కోల్పోయిన కుటుంబాల కోసం
+A caregiver	ఒక సంరక్షకులు
+How do you get a little rest when you care every day? A neighbour sitting in for one hour helped me.	రోజూ చూసుకుంటూ మీరు కొంచెం విశ్రాంతి ఎలా తీసుకుంటారు? ఒక పొరుగువారు ఒక గంట కూర్చోవడం నాకు సహాయపడింది.
+A parent	ఒక తల్లి/తండ్రి
+We wrote our questions down before each visit. It made the talk with the doctor easier.	ప్రతి సందర్శనకు ముందు మా ప్రశ్నలు రాసుకున్నాం. దాంతో డాక్టర్‌తో మాట్లాడటం సులభమైంది.
+A young survivor	ఒక యువ సర్వైవర్
+Going back to college felt strange at first. Talking to others who went through it helped.	మొదట కాలేజీకి తిరిగి వెళ్లడం వింతగా అనిపించింది. ఇది అనుభవించిన ఇతరులతో మాట్లాడటం సహాయపడింది.
+A family member	ఒక కుటుంబ సభ్యులు
+Some days are still hard. It helps to know other families feel this too.	కొన్ని రోజులు ఇంకా కష్టంగానే ఉంటాయి. ఇతర కుటుంబాలు కూడా ఇలాగే భావిస్తాయని తెలిస్తే ఊరటగా ఉంటుంది.
+Community	సమాజం
+Sample: not real people	నమూనా: నిజమైన వ్యక్తులు కాదు
+Support groups	సహాయ బృందాలు
+Coming soon	త్వరలో వస్తుంది
+Discussions	చర్చలు
+Sample post	నమూనా పోస్ట్
+About this page	ఈ పేజీ గురించి
+This is an example of how families could find each other. The groups and posts are written by the Sahara team. They are not real people.	కుటుంబాలు ఒకరినొకరు ఎలా కనుగొనవచ్చో చూపే ఉదాహరణ ఇది. బృందాలు, పోస్ట్‌లు సహారా బృందం రాసినవి. ఇవి నిజమైన వ్యక్తులు కాదు.
+Real groups will be added only after your doctors check them.	మీ డాక్టర్లు తనిఖీ చేసిన తర్వాతే నిజమైన బృందాలు జోడించబడతాయి.
+If you need help now, talk to your care team.	ఇప్పుడే సహాయం కావాలంటే, మీ సంరక్షణ బృందంతో మాట్లాడండి.
+No change	మార్పు లేదు
+since $it	$it నుండి
+Weight history	బరువు చరిత్ర
+Since first	మొదటిసారి నుండి
+Where these dates come from	ఈ తేదీలు ఎక్కడి నుండి వచ్చాయి
+Oncology	ఆంకాలజీ
+Surgery	శస్త్రచికిత్స
+General medicine	జనరల్ మెడిసిన్
+No prescription saved for this day.	ఈ రోజుకు ప్రిస్క్రిప్షన్ ఏదీ సేవ్ చేయలేదు.
+Saved in Sahara on this day.	ఈ రోజు Saharaలో సేవ్ చేయబడింది.
+Open in calendar	క్యాలెండర్‌లో తెరవండి
+Nothing left to do.	చేయాల్సింది ఏమీ మిగలలేదు.
+Chemo port / PICC line	కీమో పోర్ట్ / PICC లైన్
+Feeding tube (NG / PEG)	ఆహార గొట్టం (NG / PEG)
+Urinary catheter	మూత్ర కాథెటర్
+Chest drain	ఛాతీ డ్రెయిన్
+Colostomy / ileostomy bag	కొలోస్టమీ / ఇలియోస్టమీ సంచి
+Tracheostomy	ట్రాకియోస్టమీ
+Stent	స్టెంట్
+Other tube or line	ఇతర గొట్టం లేదా లైన్
+Redness	ఎరుపు
+Swelling	వాపు
+Discharge or fluid	చీము లేదా ద్రవం కారడం
+Bleeding	రక్తం కారడం
+Fever	జ్వరం
+Blocked or not working	మూసుకుపోయింది లేదా పనిచేయడం లేదు
+Fallen out or moved	బయటకు వచ్చింది లేదా జరిగింది
+The date put in cannot be after today.	అమర్చిన తేదీ ఈరోజు తర్వాత ఉండకూడదు.
+The change date should be after the date put in.	మార్చే తేదీ అమర్చిన తేదీ తర్వాత ఉండాలి.
+Tubes and lines	గొట్టాలు మరియు లైన్లు
+Could not save on this phone. Please try again.	ఈ ఫోన్‌లో సేవ్ కాలేదు. మళ్ళీ ప్రయత్నించండి.
+No tubes or lines added	గొట్టాలు లేదా లైన్లు ఏవీ జోడించలేదు
+Add tube or line	గొట్టం లేదా లైన్ జోడించండి
+More coming in v2.0: device-specific care guides and alerts	v2.0లో మరిన్ని: ప్రతి గొట్టానికి సంరక్షణ గైడ్‌లు మరియు అలర్ట్‌లు
+Tell your care team today	ఈరోజే మీ సంరక్షణ బృందానికి చెప్పండి
+Put in	అమర్చినది
+Change due in 1 day	1 రోజులో మార్చాలి
+Change due in $n days	$n రోజుల్లో మార్చాలి
+Change due today	ఈరోజు మార్చాలి
+Change was due 1 day ago	1 రోజు క్రితం మార్చాల్సింది
+Change was due $n days ago	$n రోజుల క్రితం మార్చాల్సింది
+Checked today: all fine	ఈరోజు చూశారు: అంతా బాగుంది
+Checked today	ఈరోజు చూశారు
+Daily check	రోజువారీ తనిఖీ
+Any of these today?	ఈరోజు వీటిలో ఏదైనా ఉందా?
+All fine	అంతా బాగుంది
+Edit tube or line	గొట్టం లేదా లైన్ మార్చండి
+Date put in	అమర్చిన తేదీ
+Next change due	తదుపరి మార్పు
+Centre where it was put in	అమర్చిన ఆసుపత్రి
+Problems or notes (optional)	సమస్యలు లేదా గమనికలు (ఐచ్ఛికం)
+Remove this tube or line?	ఈ గొట్టం లేదా లైన్ తీసివేయాలా?
+If the record is unsigned, out of date or cannot be found.	రికార్డ్‌పై సంతకం లేకపోతే, అది పాతబడితే లేదా కనిపించకపోతే.
+If the problem is new, reversible and unrelated to the illness (injury, choking, drug reaction, low sugar).	సమస్య కొత్తదై, నయం చేయగలిగేదై, అనారోగ్యానికి సంబంధం లేనిదైతే (గాయం, గొంతులో అడ్డుపడటం, మందు రియాక్షన్, షుగర్ తగ్గడం).
+If the patient has capacity and says something different now. What they say now always overrides this record.	రోగికి నిర్ణయం తీసుకునే సామర్థ్యం ఉండి, ఇప్పుడు వేరేగా చెబితే. వారు ఇప్పుడు చెప్పేదే ఎప్పుడూ ఈ రికార్డ్ కంటే ముఖ్యం.
+If the record is ambiguous.	రికార్డ్ స్పష్టంగా లేకపోతే.
+Relief of pain, using opioids in adequate doses, by whatever route works	నొప్పి నుండి ఉపశమనం — తగిన మోతాదులో ఓపియాయిడ్లు, పని చేసే ఏ మార్గంలోనైనా
+Relief of breathlessness — opioid, anxiolytic, fan, positioning, oxygen if it helps	ఊపిరి ఆడకపోవడం నుండి ఉపశమనం — ఓపియాయిడ్, ఆందోళన తగ్గించే మందు, ఫ్యాన్, సరైన భంగిమ, సహాయపడితే ఆక్సిజన్
+Sedation for distress that cannot be relieved any other way	వేరే ఏ విధంగానూ తగ్గని బాధకు మత్తు మందు (సెడేషన్)
+Control of nausea, secretions, agitation, itch, hiccups	వికారం, స్రావాలు, అశాంతి, దురద, ఎక్కిళ్ళ నియంత్రణ
+Mouth care and eye care, given often	నోరు, కళ్ళ సంరక్షణ, తరచుగా
+Comfortable positioning; turning as tolerated; air mattress to prevent pressure sores	సౌకర్యవంతమైన భంగిమ; తట్టుకోగలిగినంత వరకు పక్కకు తిప్పడం; ఒత్తిడి పుండ్లు రాకుండా గాలి పరుపు
+Skin and wound care; management of odour	చర్మం, గాయాల సంరక్షణ; దుర్వాసన నియంత్రణ
+Bowel care — assessment and management of constipation	ప్రేగుల సంరక్షణ — మలబద్ధకాన్ని పరిశీలించి చికిత్స చేయడం
+Bladder care — assessment and management of retention and incontinence	మూత్రాశయ సంరక్షణ — మూత్రం ఆగిపోవడం, ఆపుకోలేకపోవడాన్ని పరిశీలించి చికిత్స చేయడం
+Privacy, dignity, and gentle handling in every personal-care task	ప్రతి వ్యక్తిగత సంరక్షణలో గోప్యత, గౌరవం, మృదువైన స్పర్శ
+Presence of family; spiritual and religious support as the patient wishes	కుటుంబం దగ్గర ఉండటం; రోగి కోరుకున్నట్లు ఆధ్యాత్మిక, మతపరమైన మద్దతు
+Honest, unhurried communication with the patient and the family, every day	రోగి, కుటుంబంతో ప్రతిరోజూ నిజాయితీగా, తొందరలేకుండా మాట్లాడటం
+Then resuscitate and give full standard emergency care. Clarify with the treating team afterwards.	అప్పుడు CPR చేసి, పూర్తి సాధారణ అత్యవసర చికిత్స ఇవ్వండి. తర్వాత చికిత్స చేస్తున్న బృందంతో స్పష్టం చేసుకోండి.
+Take home from hospital for the last days, with a nurse if available	చివరి రోజుల కోసం ఆసుపత్రి నుండి ఇంటికి తీసుకెళ్లడం, వీలైతే నర్సుతో
+Moved between home, hospital, hospice or care home	ఇల్లు, ఆసుపత్రి, హాస్పిస్ లేదా కేర్ హోమ్ మధ్య మార్పు
+2 weeks	2 వారాలు
+1 month	1 నెల
+3 months	3 నెలలు
+Nothing noted in this time	ఈ కాలంలో ఏమీ నమోదు కాలేదు
+Lab trends	ల్యాబ్ ఫలితాల ధోరణులు
+All results	అన్ని ఫలితాలు
+No lab results yet	ఇంకా ల్యాబ్ ఫలితాలు లేవు
+Band: printed range	పట్టీ: ముద్రించిన పరిధి
+Values and printed ranges are copied from the reports. Red means outside the printed range.	విలువలు, ముద్రించిన పరిధులు రిపోర్టుల నుండి తీసుకున్నవి. ఎరుపు అంటే ముద్రించిన పరిధికి బయట.
+Highest	అత్యధికం
+All symptoms (${all.size})	అన్ని లక్షణాలు (${all.size})
+Symptoms & distress	లక్షణాలు & బాధ
+Daily check-ins	రోజువారీ పరిస్థితి
+Distress	బాధ
+No distress answers yet	ఇంకా బాధ గురించి సమాధానాలు లేవు
+$count selected	$count ఎంచుకున్నారు
+1 week	1 వారం
+Has the pain gone?	నొప్పి తగ్గిపోయిందా?
+Pain has gone (0)	నొప్పి తగ్గిపోయింది (0)
+Past pain on the body	శరీరంపై గత నొప్పి
+See past pain on the body	శరీరంపై గత నొప్పి చూడండి
+Save 0	0 సేవ్ చేయండి
+See all ${shownPoints.size} entries	మొత్తం ${shownPoints.size} ఎంట్రీలు చూడండి
+A new note with 0 (no pain) is saved for $where. Earlier notes stay as they were.	$where కోసం 0 (నొప్పి లేదు) తో కొత్త నోట్ సేవ్ అవుతుంది. పాత నోట్లు అలాగే ఉంటాయి.
+Show more	మరింత చూపించు
+Couldn't save. Please try again.	సేవ్ కాలేదు. దయచేసి మళ్ళీ ప్రయత్నించండి.
+Dose ${dose.index}	మోతాదు ${dose.index}
+Not yet	ఇంకా లేదు
+More information	మరింత సమాచారం
+OK	సరే
+About these reports	ఈ నివేదికల గురించి
+Each tick or missed dose is what someone recorded, not proof a dose was swallowed. Ask the doctor or nurse what to do about a missed dose.	ప్రతి టిక్ లేదా తప్పిన మోతాదు ఎవరో నమోదు చేసినది మాత్రమే, మోతాదు మింగినట్టు రుజువు కాదు. తప్పిన మోతాదు గురించి ఏం చేయాలో డాక్టర్ లేదా నర్సును అడగండి.
+No reports yet.	ఇంకా నివేదికలు లేవు.
+$at dose	$at మోతాదు
+Type these from the prescription.	వీటిని ప్రిస్క్రిప్షన్ చూసి టైప్ చేయండి.
+Sahara never reads how much, how often, times or directions from a photo. Each dose time is its own tick on the medicine card. Strip cut or name missing? Type the name, or pick it from the list as you type.	సహారా ఎంత, ఎన్నిసార్లు, సమయాలు లేదా సూచనలను ఫోటో నుండి ఎప్పుడూ చదవదు. ప్రతి మోతాదు సమయానికి మందు కార్డుపై దాని సొంత టిక్ ఉంటుంది. స్ట్రిప్ కత్తిరించబడిందా లేదా పేరు లేదా? పేరు టైప్ చేయండి, లేదా టైప్ చేస్తూ జాబితా నుండి ఎంచుకోండి.
+$taken of $total taken	$total లో $taken తీసుకున్నారు
+Any time	ఎప్పుడైనా
+Reminders are optional. Turn the bell on for each dose you want a reminder for. Strip photos stay on the phone they were taken on.	రిమైండర్‌లు ఐచ్ఛికం. రిమైండర్ కావాల్సిన ప్రతి మోతాదుకు గంటను ఆన్ చేయండి. స్ట్రిప్ ఫోటోలు తీసిన ఫోన్‌లోనే ఉంటాయి.
+Times you change here apply only to this phone.	ఇక్కడ మార్చిన సమయాలు ఈ ఫోన్‌కు మాత్రమే వర్తిస్తాయి.
+Reminder on	రిమైండర్ ఆన్
+Reminder off	రిమైండర్ ఆఫ్
+Start and end dates	ప్రారంభ మరియు చివరి తేదీలు
+The choices are a short general list, not this medicine's own side effects. Use Other for anything else.	ఈ ఎంపికలు ఒక చిన్న సాధారణ జాబితా, ఈ మందు యొక్క సొంత దుష్ప్రభావాలు కావు. ఇంకేదైనా ఉంటే "ఇతర" ఎంచుకోండి.
+Caring for $personName	$personName సంరక్షణ
+$personName's care notes	$personName సంరక్షణ నోట్స్
+Today's medicines	ఈరోజు మందులు
+Dose times come from Reminders or each medicine's saved times. Tick a medicine once it is taken; the ones not yet ticked come first. Strip photos stay on the phone they were taken on.	మోతాదు సమయాలు రిమైండర్లు లేదా ప్రతి మందు సేవ్ చేసిన సమయాల నుండి వస్తాయి. మందు తీసుకున్నాక దానికి టిక్ పెట్టండి; టిక్ పెట్టనివి ముందు కనిపిస్తాయి. స్ట్రిప్ ఫోటోలు తీసిన ఫోన్‌లోనే ఉంటాయి.
+See all ${medicines.size} medicines	అన్ని ${medicines.size} మందులు చూడండి
+Dismiss	మూసివేయండి
+What is this?	ఇది ఏమిటి?
+Help: $title	సహాయం: $title
+Emergency numbers and plan	అత్యవసర నంబర్లు మరియు ప్రణాళిక
+QR card	QR కార్డ్
+$done of $all	$all లో $done
+Date to be set	తేదీ నిర్ణయించాలి
+In $days days	$days రోజుల్లో
+How are you holding up?	మీరు ఎలా ఉన్నారు?
+Your own check, not $personName's	మీ స్వంత తనిఖీ, $personName ది కాదు
+Today: $current/10 · $band	ఈరోజు: $current/10 · $band
+Your own check	మీ స్వంత తనిఖీ
+This is the Distress Thermometer question, for you as a carer: how much distress have you felt this past week, including today? 0 is none, 10 is extreme. Only you see it. It stays on this phone and is not added to $personName's record. A score of 4 or more is worth telling the care team about.	ఇది సంరక్షకునిగా మీ కోసం డిస్ట్రెస్ థర్మామీటర్ ప్రశ్న: ఈరోజుతో కలిపి గత వారం మీకు ఎంత బాధ కలిగింది? 0 అంటే అసలు లేదు, 10 అంటే చాలా ఎక్కువ. దీన్ని మీరు మాత్రమే చూస్తారు. ఇది ఈ ఫోన్‌లోనే ఉంటుంది, $personName రికార్డులో చేరదు. 4 లేదా అంతకంటే ఎక్కువ అయితే సంరక్షణ బృందానికి చెప్పండి.
+Distress this past week, including today	ఈరోజుతో కలిపి గత వారం బాధ
+Extreme	చాలా ఎక్కువ
+That is a lot to carry. Tell the care team how you are at the next visit or call.	ఇది చాలా భారం. తదుపరి సందర్శనలో లేదా ఫోన్‌లో మీ పరిస్థితి సంరక్షణ బృందానికి చెప్పండి.
+A tip for carers	సంరక్షకులకు ఒక సూచన
+About these tips	ఈ సూచనల గురించి
+General tips for family carers. They are not medical advice. Ask the palliative care team about anything to do with treatment.	కుటుంబ సంరక్షకులకు సాధారణ సూచనలు. ఇవి వైద్య సలహా కాదు. చికిత్సకు సంబంధించిన ఏ విషయమైనా పాలియేటివ్ కేర్ బృందాన్ని అడగండి.
+Next tip	తదుపరి సూచన
+Rest when you can, even for a short while.	వీలైనప్పుడు కొద్దిసేపైనా విశ్రాంతి తీసుకోండి.
+When someone offers help, say yes and name one task they can do.	ఎవరైనా సహాయం చేస్తామంటే ఒప్పుకోండి, వారు చేయగల ఒక పని చెప్పండి.
+Keep the emergency numbers and the QR card where the whole family can find them.	అత్యవసర నంబర్లు, QR కార్డ్ కుటుంబమంతా చూడగలిగే చోట ఉంచండి.
+Write down questions for the next visit as they come up.	తదుపరి సందర్శన కోసం ప్రశ్నలు వచ్చినప్పుడల్లా రాసుకోండి.
+Tell the care team how you are coping too. Your wellbeing matters.	మీరు ఎలా తట్టుకుంటున్నారో కూడా సంరక్షణ బృందానికి చెప్పండి. మీ క్షేమం కూడా ముఖ్యం.
+Share the caring with others in the family, so no one carries it alone.	సంరక్షణను కుటుంబంలో పంచుకోండి, ఎవరూ ఒంటరిగా మోయకుండా.
+Go to	ఇక్కడికి వెళ్ళండి
+Symptoms	లక్షణాలు
+$taken of $total today	ఈరోజు $total లో $taken
+Pick a part to zoom in. Left and right mean the patient's sides. If the pain has gone, use ⋮ › Pain has gone (0) on the note.	జూమ్ చేయడానికి ఒక భాగాన్ని ఎంచుకోండి. ఎడమ, కుడి రోగి వైపులు. నొప్పి పోయి ఉంటే, నోట్‌పై ⋮ › నొప్పి పోయింది (0) వాడండి.
+Download the speaker pack first.	ముందుగా స్పీకర్ ప్యాక్‌ను డౌన్‌లోడ్ చేయండి.
+Too little free memory to tell voices apart. Close other apps and retry. Your recording is safe.	గొంతులను వేరు చేయడానికి మెమరీ తక్కువగా ఉంది. ఇతర యాప్‌లను మూసివేసి మళ్లీ ప్రయత్నించండి. మీ రికార్డింగ్ సురక్షితంగా ఉంది.
+Telling voices apart is not available on this phone. The transcript is kept without speakers.	ఈ ఫోన్‌లో గొంతులను వేరు చేయడం అందుబాటులో లేదు. ట్రాన్స్‌క్రిప్ట్ మాట్లాడేవారు లేకుండా ఉంచబడింది.
+The note has changed. Read the new note together before signing.	నోట్ మారింది. సంతకం చేసే ముందు కొత్త నోట్‌ను కలిసి చదవండి.
+This note version is locked. No more signatures can be added.	ఈ నోట్ వెర్షన్ లాక్ అయింది. ఇక సంతకాలు జోడించలేరు.
+These signatures are no longer valid. Sign again.	ఈ సంతకాలు ఇక చెల్లవు. మళ్లీ సంతకం చేయండి.
+Sign in order: doctor, then patient or family, then witness.	క్రమంలో సంతకం చేయండి: డాక్టర్, తర్వాత రోగి లేదా కుటుంబం, తర్వాత సాక్షి.
+Write the name of the person signing.	సంతకం చేస్తున్న వ్యక్తి పేరు రాయండి.
+Write the doctor’s registration number.	డాక్టర్ రిజిస్ట్రేషన్ నంబర్ రాయండి.
+Write how the family member is related to the patient.	కుటుంబ సభ్యులకు రోగితో ఉన్న సంబంధం రాయండి.
+Tick the box to confirm before signing.	సంతకం చేసే ముందు నిర్ధారించడానికి పెట్టెలో టిక్ చేయండి.
+Say whether they can read the note themselves.	వారు నోట్‌ను స్వయంగా చదవగలరో లేదో చెప్పండి.
+Sign or give a thumb impression on the pad.	ప్యాడ్‌పై సంతకం చేయండి లేదా వేలిముద్ర వేయండి.
+Someone still needs to sign.	ఇంకా ఎవరో సంతకం చేయాలి.
+Family member	కుటుంబ సభ్యులు
+Reg. no.	రిజి. నం.
+Thumb impression	బొటనవేలి ముద్ర
+Opening the sign-off…	సంతకాల పేజీ తెరుస్తోంది…
+Note signed and locked	నోట్‌పై సంతకాలు అయ్యాయి, లాక్ అయింది
+Sign the note	నోట్‌పై సంతకం చేయండి
+The note was changed after it was signed. All $n signatures on the earlier text are no longer valid. Read the new note together and sign again.	సంతకం తర్వాత నోట్ మారింది. పాత నోట్‌పై చేసిన మొత్తం $n సంతకాలు ఇక చెల్లవు. కొత్త నోట్‌ను కలిసి చదివి మళ్లీ సంతకం చేయండి.
+This could not be saved on this phone. Try again.	దీన్ని ఈ ఫోన్‌లో సేవ్ చేయలేకపోయాం. మళ్లీ ప్రయత్నించండి.
+1. Doctor	1. డాక్టర్
+Registration no.	రిజిస్ట్రేషన్ నంబర్
+2. Patient or family member	2. రోగి లేదా కుటుంబ సభ్యులు
+Can they read the note themselves?	వారు నోట్‌ను స్వయంగా చదవగలరా?
+No, it was read to them	లేదు, వారికి చదివి వినిపించారు
+I have read or heard this note and it records what we discussed	నేను ఈ నోట్ చదివాను లేదా విన్నాను, మేము మాట్లాడినదే ఇందులో ఉంది
+3. Witness	3. సాక్షి
+A thumb impression was used, so a witness also signs.	బొటనవేలి ముద్ర వేశారు, కాబట్టి ఒక సాక్షి కూడా సంతకం చేస్తారు.
+The signer cannot read the note, so a witness also signs.	సంతకం చేసినవారు నోట్ చదవలేరు, కాబట్టి ఒక సాక్షి కూడా సంతకం చేస్తారు.
+A witness also signs.	ఒక సాక్షి కూడా సంతకం చేస్తారు.
+Role (optional)	పాత్ర (ఐచ్ఛికం)
+I saw the note read out and the person sign or give their thumb impression	నోట్ చదివి వినిపించడం, ఆ వ్యక్తి సంతకం చేయడం లేదా బొటనవేలి ముద్ర వేయడం నేను చూశాను
+Lock this note version	ఈ నోట్ వెర్షన్‌ను లాక్ చేయండి
+Start the signatures again	సంతకాలను మళ్లీ మొదలుపెట్టండి
+Locked on	లాక్ అయిన సమయం:
+Any change to the note or a signature will show.	నోట్‌లో లేదా ఏ సంతకంలో మార్పు జరిగినా తెలుస్తుంది.
+Thumb impression here	ఇక్కడ బొటనవేలి ముద్ర వేయండి
+Thumb impression pad	బొటనవేలి ముద్ర వేసే చోటు
+Logged by family	కుటుంబం నమోదు చేసింది
+Only ${person.name} can change this.	దీన్ని ${person.name} మాత్రమే మార్చగలరు.
+For the doctor, and the patient or family, to read together and sign.	డాక్టర్, రోగి లేదా కుటుంబం కలిసి చదివి సంతకం చేయడానికి.
+Signature ________  Name ________  Date ______	సంతకం ________  పేరు ________  తేదీ ______
+Section I – General information	భాగం I – సాధారణ సమాచారం
+Date of birth, sex, gender	పుట్టిన తేదీ, లింగం, జెండర్
+Address and phone	చిరునామా మరియు ఫోన్
+Language preferred	ఇష్టమైన భాష
+Primary oncologist	ప్రధాన ఆంకాలజిస్ట్
+Palliative care physician	పాలియేటివ్ కేర్ డాక్టర్
+Members present for the discussion	చర్చలో ఉన్న సభ్యులు
+Primary decision-maker and contact	ప్రధాన నిర్ణయం తీసుకునేవారు మరియు సంప్రదింపు
+Secondary decision-maker and contact	రెండవ నిర్ణయం తీసుకునేవారు మరియు సంప్రదింపు
+Family to inform before any major decision	పెద్ద నిర్ణయానికి ముందు తెలియజేయాల్సిన కుటుంబం
+Section II – Preliminary medical information and patient values	భాగం II – ప్రాథమిక వైద్య సమాచారం మరియు రోగి విలువలు
+Primary diagnosis and stage	ప్రధాన వ్యాధి నిర్ధారణ మరియు దశ
+Capacity, now	ప్రస్తుత నిర్ణయ సామర్థ్యం
+Existing directives	ఇప్పటికే ఉన్న ఆదేశాలు
+What the patient knows	రోగికి ఏమి తెలుసు
+Knows the diagnosis	వ్యాధి గురించి తెలుసు
+Does not know the diagnosis	వ్యాధి గురించి తెలియదు
+The family has asked that the patient not be told	రోగికి చెప్పవద్దని కుటుంబం కోరింది
+Section III – Decisive actions	భాగం III – నిర్ణయాత్మక చర్యలు
+Section IV – Signatures and declarations	భాగం IV – సంతకాలు మరియు ప్రకటనలు
+Primary surrogate	ప్రధాన ప్రతినిధి
+Palliative care clinician	పాలియేటివ్ కేర్ వైద్యులు
+Consent for this conversation	ఈ సంభాషణకు అనుమతి
+Patient details	రోగి వివరాలు
+Family details and emergency contact	కుటుంబ వివరాలు మరియు అత్యవసర సంప్రదింపు
+Signed and locked	సంతకం చేసి లాక్ చేయబడింది
+The note is not signed yet.	నోట్‌పై ఇంకా సంతకం కాలేదు.
+Google Gemini did not finish, so this phone is reading the recording instead.	Google Gemini పూర్తి చేయలేదు, కాబట్టి ఈ ఫోన్ రికార్డింగ్‌ను చదువుతోంది.
+Finding who spoke when	ఎవరు ఎప్పుడు మాట్లాడారో కనుగొంటున్నాం
+Audio and words stay on this phone, unless everyone also agrees below to Google Gemini writing the words. The audio is deleted after review unless the doctor keeps it.	అందరూ కింద Google Gemini మాటలు రాయడానికి కూడా అంగీకరిస్తే తప్ప, ఆడియో మరియు మాటలు ఈ ఫోన్‌లోనే ఉంటాయి. డాక్టర్ ఉంచుకోకపోతే, పరిశీలన తర్వాత ఆడియో తొలగించబడుతుంది.
+Guide for the talk	సంభాషణకు మార్గదర్శి
+$done of ${GocGuide.ORDER.size} covered	${GocGuide.ORDER.size} లో $done చర్చించబడ్డాయి
+How the guide works	మార్గదర్శి ఎలా పని చేస్తుంది
+In the order of the form: consent, patient details, family and emergency contact, then CPR, dialysis and the other decisions. A topic ticks itself when the words come up, and you can tick it too. A tick records no choice.	ఫారం క్రమంలో: అనుమతి, రోగి వివరాలు, కుటుంబం మరియు అత్యవసర సంప్రదింపు, తర్వాత సీపీఆర్, డయాలసిస్ మరియు ఇతర నిర్ణయాలు. ఆ మాటలు వచ్చినప్పుడు అంశం తనంతట తానే టిక్ అవుతుంది, మీరూ టిక్ చేయవచ్చు. టిక్ ఏ నిర్ణయాన్నీ నమోదు చేయదు.
+Audio is sent to Google Gemini to transcribe.	రాయడానికి ఆడియో Google Gemini కి పంపబడుతుంది.
+Everyone here agrees. Without this tick the audio stays on this phone.	ఇక్కడ అందరూ అంగీకరిస్తున్నారు. ఈ టిక్ లేకపోతే ఆడియో ఈ ఫోన్‌లోనే ఉంటుంది.
+Downloading the speaker pack	మాట్లాడేవారి ప్యాక్ డౌన్‌లోడ్ అవుతోంది
+Tell speakers apart · speaker pack	మాట్లాడేవారిని వేరు చేయండి · ప్యాక్
+Which speaker is the doctor?	డాక్టర్ ఏ మాట్లాడేవారు?
+I will mark the lines myself	నేనే పంక్తులను గుర్తిస్తాను
+Transcribed by	రాసినది
+Word for word, kept apart from the note. Check it against the audio. Tap a label to set doctor side or patient party.	పదం పదంగా, నోట్ నుండి వేరుగా ఉంచబడింది. ఆడియోతో సరిపోల్చండి. డాక్టర్ వైపు లేదా రోగి వైపు ఎంచుకోవడానికి లేబుల్‌ను నొక్కండి.
+Change the note (everyone signs again)	నోట్ మార్చండి (అందరూ మళ్ళీ సంతకం చేయాలి)
+The note in the form's layout, Sections I to IV	ఫారం క్రమంలో నోట్, భాగాలు I నుండి IV
+You haven’t spoken about these things. Are you sure you want to continue?	మీరు ఈ విషయాల గురించి మాట్లాడలేదు. మీరు ఖచ్చితంగా కొనసాగాలనుకుంటున్నారా?
+They stay No preference recorded, and the note lists them as not discussed.	అవి 'ఏ ఇష్టమూ నమోదు కాలేదు' గానే ఉంటాయి, నోట్‌లో చర్చించలేదని రాయబడుతుంది.
+Continue anyway	అయినా కొనసాగించండి
+Go back	వెనక్కి వెళ్ళండి
+Ask everyone present if they agree to this conversation being recorded and written down.	ఈ సంభాషణను రికార్డ్ చేసి రాయడానికి అక్కడ ఉన్న అందరూ అంగీకరిస్తారా అని అడగండి.
+Confirm the patient's name, age and address.	రోగి పేరు, వయసు మరియు చిరునామా నిర్ధారించండి.
+Ask who is present, who decides with the patient, and who to call in an emergency.	ఎవరు ఉన్నారు, రోగితో కలిసి ఎవరు నిర్ణయిస్తారు, అత్యవసరంలో ఎవరికి ఫోన్ చేయాలి అని అడగండి.
+Ask what the patient and family understand about the illness.	వ్యాధి గురించి రోగికి మరియు కుటుంబానికి ఏమి అర్థమైందో అడగండి.
+If care is at home, ask who visits and how often.	సంరక్షణ ఇంట్లో అయితే, ఎవరు ఎంత తరచుగా వస్తారో అడగండి.
+Different people said different things. Both are shown. Check with the patient which one stands.	వేర్వేరు వ్యక్తులు వేర్వేరు మాటలు చెప్పారు. రెండూ చూపబడ్డాయి. ఏది సరైనదో రోగితో నిర్ధారించండి.
+Changed during the talk. The latest statement is marked.	సంభాషణలో మారింది. చివరి మాట గుర్తించబడింది.
+Said earlier, replaced by a later statement	ముందు చెప్పినది, తర్వాతి మాటతో మారింది
+Goals-of-care note, in the order of the legal form	సంరక్షణ లక్ష్యాల నోట్, చట్టపరమైన ఫారం క్రమంలో
+Signed and locked on the doctor's device	డాక్టర్ పరికరంలో సంతకం చేసి లాక్ చేయబడింది
+Doctor's note	డాక్టర్ నోట్
+radiation oncology	రేడియేషన్ ఆంకాలజీ
+chemotherapy	కీమోథెరపీ
+surgical	శస్త్రచికిత్స
+home visit	ఇంటి సందర్శన
+Overview	సారాంశం

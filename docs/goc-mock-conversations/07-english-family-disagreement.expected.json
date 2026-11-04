@@ -1,0 +1,56 @@
+{
+  "fictional": true,
+  "note": "FICTIONAL test data. The expected outcome is what Sahara's word matcher should SUGGEST for the doctor to check. It is not a clinical decision, and nothing is chosen until the doctor confirms each item (rule V1).",
+  "transcript": "07-english-family-disagreement.txt",
+  "title": "English, patient and son disagree",
+  "language": "en",
+  "decisions": {
+    "cpr": {
+      "suggested": [
+        "DNACPR"
+      ]
+    },
+    "respCeiling": {
+      "suggested": [
+        "5"
+      ],
+      "ruledOut": [
+        "5"
+      ]
+    },
+    "icu": {
+      "suggested": [
+        "NO",
+        "YES"
+      ]
+    }
+  },
+  "changedMind": [],
+  "conflict": [
+    "respCeiling",
+    "icu"
+  ],
+  "discussed": [
+    "consent",
+    "patientDetails",
+    "decisionMakers",
+    "cpr",
+    "respCeiling",
+    "icu",
+    "values"
+  ],
+  "notDiscussed": [
+    "dialysis",
+    "vasopressors",
+    "ng",
+    "peg",
+    "hydration",
+    "hospitalTransfer",
+    "ambulance"
+  ],
+  "knownGaps": {
+    "web": {},
+    "android": {}
+  },
+  "notes": "The son never overrules the patient: both views stay, marked as a disagreement for the doctor. \"Everything possible\" from the son is shown for goal of care; the doctor decides."
+}

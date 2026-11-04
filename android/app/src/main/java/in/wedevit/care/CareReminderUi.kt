@@ -1,3 +1,4 @@
+@file:OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 package `in`.wedevit.care
 
 import android.Manifest
@@ -12,6 +13,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.NotificationsActive
+import androidx.compose.material.icons.filled.NotificationsOff
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -54,7 +59,11 @@ import java.time.ZoneId
     LazyColumn(Modifier.fillMaxSize().imePadding().testTag("care-reminder-settings"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { IconButton(onClick = onClose) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back", "वापस")) }; Box(Modifier.weight(1f)) { Heading(t("Reminders", "रिमाइंडर"), 28) }; CareLanguageMenu(compact = true) } }
         item { SurfaceCard(Sage) {
-            Row { Column(Modifier.weight(1f)) { Text(t("Care reminders", "देखभाल रिमाइंडर"), fontWeight = FontWeight.SemiBold); Text(if (enabled && allowed) t("$count next alerts scheduled", "अगले $count अलर्ट तय हैं") else t("Off", "बंद"), style = MaterialTheme.typography.bodySmall) }; Switch(checked = enabled && allowed, onCheckedChange = { turnOn ->
+            Row(verticalAlignment = Alignment.CenterVertically) { Column(Modifier.weight(1f)) { Text(t("Care reminders", "देखभाल रिमाइंडर"), fontWeight = FontWeight.SemiBold); Text(if (enabled && allowed) t("$count next alerts scheduled", "अगले $count अलर्ट तय हैं") else t("Off", "बंद"), style = MaterialTheme.typography.bodySmall) }
+                MedicineInfoButton(t("Care reminders", "देखभाल रिमाइंडर"), t("Alerts can be delayed by Android, battery settings or a switched-off phone. They are a reminder to check the record, not an urgent-care service.", "Android, बैटरी सेटिंग या बंद फ़ोन की वजह से अलर्ट देर से आ सकते हैं। ये रिकॉर्ड देखने की याद दिलाते हैं, आपातकालीन सेवा नहीं हैं।") + "\n\n" +
+                    t("Only the active account sends alerts. Medicine times follow the phone’s current time zone; dated visits keep their saved time.", "सिर्फ़ चालू खाता अलर्ट भेजता है। दवा का समय फ़ोन के अभी के समय क्षेत्र से चलता है; तय मुलाक़ातें अपने सहेजे समय पर रहती हैं।") + "\n\n" +
+                    t("Reminders are optional. Turn the bell on for each dose you want a reminder for. Strip photos stay on the phone they were taken on.", "रिमाइंडर चाहें तो ही लगाएँ। जिस खुराक का रिमाइंडर चाहिए, उसकी घंटी चालू करें। पत्ते की फ़ोटो उसी फ़ोन पर रहती है जिस पर ली गई।"), "reminder-info")
+                Switch(checked = enabled && allowed, onCheckedChange = { turnOn ->
                 error = ""
                 if (!turnOn) scheduler.enable(false)
                 else if (Build.VERSION.SDK_INT >= 33 && !allowed) request.launch(Manifest.permission.POST_NOTIFICATIONS)
@@ -62,8 +71,6 @@ import java.time.ZoneId
                 else scheduler.enable(true)
                 revision++
             }) }
-            Text(t("Alerts can be delayed by Android, battery settings or a switched-off phone. They are a reminder to check the record, not an urgent-care service.", "Android, बैटरी सेटिंग या बंद फ़ोन की वजह से अलर्ट देर से आ सकते हैं। ये रिकॉर्ड देखने की याद दिलाते हैं, आपातकालीन सेवा नहीं हैं।"), style = MaterialTheme.typography.bodySmall)
-            Text(t("Only the active account sends alerts. Medicine times follow the phone’s current time zone; dated visits keep their saved time.", "सिर्फ़ चालू खाता अलर्ट भेजता है। दवा का समय फ़ोन के अभी के समय क्षेत्र से चलता है; तय मुलाक़ातें अपने सहेजे समय पर रहती हैं।"), style = MaterialTheme.typography.bodySmall)
             if (!allowed) TextButton(onClick = { runCatching { context.startActivity(Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)) }.onFailure { error = t("Open Android Settings → Apps → Sahara → Notifications.", "Android Settings → Apps → Sahara → Notifications खोलें।") } }) { Text(t("Open notification settings", "सूचना सेटिंग खोलें")) }
             if (enabled && allowed && !exact && Build.VERSION.SDK_INT >= 31) {
                 Text(t("Android may send these alerts late. Allow on-time alerts so they arrive at the set time.", "Android ये सूचनाएँ देर से भेज सकता है। समय पर सूचना की अनुमति दें, ताकि वे तय समय पर आएँ।"), style = MaterialTheme.typography.bodySmall, modifier = Modifier.testTag("reminder-exact-off"))
@@ -71,12 +78,10 @@ import java.time.ZoneId
             }
         } }
         if (error.isNotBlank()) item { Text(error, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
-        item { Text(t("Choose times from the existing prescription. Sahara does not calculate or change doses. Marking a medicine done completes that whole entry for the day.", "पर्चे में लिखे समय चुनें। सहारा ख़ुराक तय या नहीं बदलता। दवा को 'हो गया' करने से उस दिन की पूरी दवा पूरी मानी जाती है।"), style = MaterialTheme.typography.bodySmall) }
         val today = java.time.LocalDate.now()
         val eligible = items.filter { it.personId == selected && CareReminderRules.listed(it, today) }
         if (eligible.isEmpty()) item { SurfaceCard { Text(t("No dated care activities or medicines yet.", "अभी कोई तारीख़ वाली देखभाल या दवा नहीं है।")); Text(t("Add a medicine or choose a time in Calendar first.", "पहले दवा जोड़ें या कैलेंडर में समय चुनें।"), style = MaterialTheme.typography.bodySmall) } }
-        if (eligible.any { it.kind == "medicine" }) item { Text(if (canEdit) t("Medicine times you save here are also saved with the medicine. Family members who share this care get the same dose reminders once they turn on Reminders on their own phone. Strip photos stay on the phone they were taken on.", "यहाँ सहेजे दवा के समय दवा के साथ भी सहेजे जाते हैं। इस देखभाल से जुड़े परिवार वाले अपने फ़ोन पर रिमाइंडर चालू करके वही दवा रिमाइंडर पाते हैं। पत्ते की फ़ोटो उसी फ़ोन पर रहती है जिस पर ली गई।")
-            else t("Medicine times saved with the medicine by the family reach this phone. Times you change here apply only to this phone.", "परिवार ने दवा के साथ जो समय सहेजे, वे इस फ़ोन पर आते हैं। यहाँ बदले समय सिर्फ़ इसी फ़ोन पर लागू होते हैं।"), style = MaterialTheme.typography.bodySmall, modifier = Modifier.testTag("reminder-shared-times")) }
+        if (!canEdit && eligible.any { it.kind == "medicine" }) item { Text(t("Times you change here apply only to this phone.", "यहाँ बदले समय सिर्फ़ इसी फ़ोन पर लागू होते हैं।"), style = MaterialTheme.typography.bodySmall, modifier = Modifier.testTag("reminder-shared-times")) }
         items(eligible, key = { it.id }) { item -> ReminderItemSettings(item, scheduler, revision, share = if (canEdit && item.kind == "medicine") { times ->
             val detail = runCatching { MedicineEntryText.withTimes(item.detail, times) }.getOrDefault(item.detail)
             if (detail != item.detail && detail.length <= 4000) vm.updateItem(item.copy(detail = detail)) {}
@@ -97,14 +102,32 @@ import java.time.ZoneId
             item.due > 0 -> careDateFormat("dd MMM yyyy · HH:mm z", careHindi()).withZone(ZoneId.systemDefault()).format(Instant.ofEpochMilli(item.due)); else -> t("No time chosen", "समय नहीं चुना") }, style = MaterialTheme.typography.bodySmall, modifier = Modifier.testTag("reminder-when-${item.id}")) }
             Switch(checked = option?.muted != true, onCheckedChange = { enabled -> scheduler.configure(item.id, (option ?: ReminderOption(CareReminderRules.printedTimes(item.detail))).copy(muted = !enabled)); changed() }) }
         if (item.kind == "medicine") {
+            val doseTimes = CareReminderRules.printedTimes(item.detail)
+            var dates by rememberSaveable(item.id) { mutableStateOf(starts.isNotBlank() || ends.isNotBlank()) }
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                CareField(times, { times = it; error = "" }, t("Times · HH:mm, separated by commas", "समय · HH:mm, कॉमा लगाकर"), singleLine = true)
-                CareField(starts, { starts = it; error = "" }, t("Start date · YYYY-MM-DD (optional)", "शुरू की तारीख़ · YYYY-MM-DD (चाहें तो)"), singleLine = true)
-                CareField(ends, { ends = it; error = "" }, t("Last date · YYYY-MM-DD (optional)", "आख़िरी तारीख़ · YYYY-MM-DD (चाहें तो)"), singleLine = true)
+                if (doseTimes.isNotEmpty()) {
+                    // Each dose time is its own optional reminder; turning a bell off never changes the dose times.
+                    val ringing = option?.times ?: doseTimes
+                    FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        doseTimes.forEach { time ->
+                            val on = time in ringing
+                            FilterChip(selected = on, onClick = { runCatching {
+                                val next = if (on) ringing - time else (ringing + time).distinct().sorted()
+                                scheduler.configure(item.id, ReminderOption(next, option?.starts.orEmpty(), option?.ends.orEmpty(), option?.muted == true)); changed()
+                            }.onFailure { error = it.message?.let { m -> t(m, ReminderTextHindi[m] ?: m) } ?: t("Check the times and dates.", "समय और तारीख़ें जाँचें।") } },
+                                label = { Text(time) }, leadingIcon = { Icon(if (on) Icons.Default.NotificationsActive else Icons.Default.NotificationsOff, null, Modifier.size(16.dp)) },
+                                modifier = Modifier.heightIn(min = 48.dp).semantics { contentDescription = time + ": " + if (on) t("Reminder on", "रिमाइंडर चालू") else t("Reminder off", "रिमाइंडर बंद") }.testTag("reminder-dose-${item.id}-$time"))
+                        }
+                    }
+                } else CareField(times, { times = it; error = "" }, t("Times · HH:mm, separated by commas", "समय · HH:mm, कॉमा लगाकर"), singleLine = true)
+                if (dates) {
+                    CareField(starts, { starts = it; error = "" }, t("Start date · YYYY-MM-DD (optional)", "शुरू की तारीख़ · YYYY-MM-DD (चाहें तो)"), singleLine = true)
+                    CareField(ends, { ends = it; error = "" }, t("Last date · YYYY-MM-DD (optional)", "आख़िरी तारीख़ · YYYY-MM-DD (चाहें तो)"), singleLine = true)
+                } else TextButton(onClick = { dates = true }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Start and end dates", "शुरू और आख़िरी तारीख़")) }
                 if (error.isNotBlank()) Text(error, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce())
-                Button(onClick = { runCatching {
-                    val chosen = if (times.isBlank()) emptyList() else times.split(',').map(String::trim)
-                    scheduler.configure(item.id, ReminderOption(chosen, starts.trim(), ends.trim(), option?.muted == true)); share?.invoke(chosen); changed()
+                if (doseTimes.isEmpty() || dates) Button(onClick = { runCatching {
+                    val chosen = if (doseTimes.isNotEmpty()) option?.times ?: doseTimes else if (times.isBlank()) emptyList() else times.split(',').map(String::trim)
+                    scheduler.configure(item.id, ReminderOption(chosen, starts.trim(), ends.trim(), option?.muted == true)); if (doseTimes.isEmpty()) share?.invoke(chosen); changed()
                 }.onFailure { error = it.message?.let { m -> t(m, ReminderTextHindi[m] ?: m) } ?: t("Check the times and dates.", "समय और तारीख़ें जाँचें।") } }, modifier = Modifier.fillMaxWidth()) { Text(t("Save reminder times", "रिमाइंडर का समय सहेजें")) }
             }
         } else if (dateOnly) {
