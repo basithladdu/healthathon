@@ -111,7 +111,7 @@ internal object CareNavTrail {
 internal enum class CareToastKind { SAVED, PROBLEM, INFO }
 
 internal object CareToastRules {
-    private val problem = Regex("""(?i)\b(couldn|can't|cannot|failed|unable|not available|isn't|wasn't|no app|try again|error|choose|reopen|ask the person)\b|n't\b|नहीं|फिर कोशिश""")
+    private val problem = Regex("""(?i)\b(couldn|can't|cannot|failed|unable|not available|isn't|wasn't|no app|try again|error|could not|not be|choose|reopen|ask the person)\b|n't\b|नहीं|फिर कोशिश""")
     fun kind(message: String): CareToastKind = when {
         SaharaMotion.isSavedMessage(message) -> CareToastKind.SAVED
         problem.containsMatchIn(message) -> CareToastKind.PROBLEM

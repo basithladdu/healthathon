@@ -170,9 +170,9 @@ fun MedicineDoses.reporter(role: String): String = when (role) { "Patient" -> "P
  * Only the person's own words are shown; nothing is added.
  */
 object MedicineCardText {
-    private val sentence = Regex("(?<=[.!?])\s+|\n")
-    private val purposeStart = Regex("^(?:for|to|helps?|used for|eases?|relieves?)\b", RegexOption.IGNORE_CASE)
-    private val purposeInside = Regex("\bto (?:ease|help|treat|prevent|reduce|control|relieve|stop)\b", RegexOption.IGNORE_CASE)
+    private val sentence = Regex("""(?<=[.!?])\s+|\n""")
+    private val purposeStart = Regex("""^(?:for|to|helps?|used for|eases?|relieves?)\b""", RegexOption.IGNORE_CASE)
+    private val purposeInside = Regex("""\bto (?:ease|help|treat|prevent|reduce|control|relieve|stop)\b""", RegexOption.IGNORE_CASE)
 
     private fun sentences(detail: String): List<String> = detail.lineSequence().filterNot { it.startsWith("Times: ") }.joinToString("\n")
         .split(sentence).map(String::trim).filter(String::isNotEmpty)
@@ -181,7 +181,7 @@ object MedicineCardText {
     fun purpose(detail: String): String {
         if (MedicineEntryText.parse(detail) != null) return MedicineEntryText.parse(detail)?.directions.orEmpty()
         val all = sentences(detail)
-        return (all.firstOrNull { purposeStart.containsMatchIn(it) && !it.matches(Regex("(?i)^for \d+ days?\.?$")) } ?: all.firstOrNull { purposeInside.containsMatchIn(it) }).orEmpty()
+        return (all.firstOrNull { purposeStart.containsMatchIn(it) && !it.matches(Regex("""(?i)^for \d+ days?\.?$""")) } ?: all.firstOrNull { purposeInside.containsMatchIn(it) }).orEmpty()
     }
 
     /** The rest of a free-text detail, shown only when the card is opened. Blank for a form-entered medicine. */
