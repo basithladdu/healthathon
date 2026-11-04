@@ -384,3 +384,11 @@ internal fun gocSpeakerForSpan(startSec: Float, endSec: Float, turns: List<GocSp
 /** The speaker of each transcript segment by overlap ([gocSpeakerForSpan]); null where nobody was heard. */
 internal fun gocSpeakersForSegments(segments: List<OfflineTranscriptSegment>, turns: List<GocSpeakerTurn>): List<Int?> =
     segments.map { gocSpeakerForSpan(it.startMs / 1000f, it.endMs / 1000f, turns) }
+
+/** Which "Speaker N" is the doctor: the one who clearly asked the most questions. Null when that can't be told, so the screen asks once. */
+internal fun gocDoctorSpeaker(lines: List<GocLine>): String? {
+    val asked = lines.filter { it.who.startsWith("Speaker ") }.groupBy { it.who }.mapValues { (_, own) -> own.count { GocExtract.isQuestion(it.text) } }
+    if (asked.size < 2) return null
+    val ranked = asked.entries.sortedByDescending { it.value }
+    return ranked[0].key.takeIf { ranked[0].value >= 2 && ranked[0].value >= 2 * ranked[1].value }
+}

@@ -39,7 +39,7 @@ class DoctorGocFormTest {
         val rows = d.sections().associate { it.id to it.rows.map { r -> r.pick(false) } }
         assertTrue(rows.getValue("I").any { it.contains("Sample patient; Sample son") })
         assertTrue(rows.getValue("II").any { it.contains("To be at home") })
-        assertTrue(rows.getValue("I").any { it.endsWith("Not recorded") })
+        assertTrue(rows.getValue("I").any { it.endsWith("Not discussed") })
         assertTrue(d.note.contains("Pain at night") && d.note.contains("Review in a week"))
         assertFalse(d.signed)
     }

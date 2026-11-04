@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import androidx.compose.ui.platform.LocalContext
 import org.json.JSONArray
 import org.json.JSONObject
 import java.security.MessageDigest
@@ -345,7 +346,15 @@ private fun gocRoleText(t: (String, String) -> String, role: String): String = w
 @Composable internal fun GocSignOff(
     noteId: String, noteText: String, store: GocSignOffStore, onComplete: (GocSignOffRecord) -> Unit,
     modifier: Modifier = Modifier, steps: List<String> = GocSignOffRules.DEFAULT_STEPS, onInvalidated: (GocSignOffRecord) -> Unit = {},
+    /** Prefills, so the usual case is: sign, sign, done. The registration number is remembered on this phone. */
+    doctorPrefill: String = "", signerPrefill: String = "",
+    /** Lock as soon as the last person has signed: the signature is the confirmation. */
+    autoLock: Boolean = true,
+    /** Shows the note text again at the patient step. Off when the form is already on screen above. */
+    showNote: Boolean = true,
 ) { val t = careText()
+    val context = LocalContext.current
+    val prefs = remember { context.getSharedPreferences("goc-signoff-doctor", Context.MODE_PRIVATE) }
     val scope = rememberCoroutineScope()
     val complete by rememberUpdatedState(onComplete)
     val invalidatedCallback by rememberUpdatedState(onInvalidated)
@@ -353,13 +362,12 @@ private fun gocRoleText(t: (String, String) -> String, role: String): String = w
     var invalidatedCount by remember(noteId) { mutableStateOf<Int?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
     var saveFailed by remember { mutableStateOf(false) }
-    var doctorName by remember { mutableStateOf("") }
-    var registrationNo by remember { mutableStateOf("") }
+    var doctorName by remember { mutableStateOf(doctorPrefill) }
+    var registrationNo by remember { mutableStateOf(prefs.getString("registration", "").orEmpty()) }
     var signerRole by remember { mutableStateOf(GocSignOffRules.PATIENT) }
-    var signerName by remember { mutableStateOf("") }
+    var signerName by remember { mutableStateOf(signerPrefill) }
     var relation by remember { mutableStateOf("") }
-    var canRead by remember { mutableStateOf<Boolean?>(null) }
-    var consent by remember { mutableStateOf(false) }
+    var canRead by remember { mutableStateOf<Boolean?>(true) }
     var witnessName by remember { mutableStateOf("") }
     var witnessRole by remember { mutableStateOf("") }
     var witnessConsent by remember { mutableStateOf(false) }
@@ -384,7 +392,10 @@ private fun gocRoleText(t: (String, String) -> String, role: String): String = w
         return try {
             val next = GocSignOffRules.add(base, noteText, input, steps)
             record = next; error = null; invalidatedCount = null
-            scope.launch { persist(next) }
+            if (input.role == GocSignOffRules.DOCTOR) input.registrationNo?.takeIf(String::isNotBlank)?.let { prefs.edit().putString("registration", it).apply() }
+            val locked = if (autoLock && GocSignOffRules.nextStep(next, steps) == GocSignOffRules.LOCK) runCatching { GocSignOffRules.lock(next, noteText, steps) }.getOrNull() else null
+            if (locked != null) record = locked
+            scope.launch { persist(next); if (locked != null) { persist(locked); complete(locked) } }
             true
         } catch (e: GocSignOffException) { error = gocErrorText(t, e.code); false }
     }
@@ -409,16 +420,16 @@ private fun gocRoleText(t: (String, String) -> String, role: String): String = w
             }
             GocSignOffRules.PATIENT_OR_FAMILY -> {
                 Text(t("2. Patient or family member", "2. मरीज़ या परिवार के सदस्य"), fontWeight = FontWeight.Bold)
-                Surface(shape = RoundedCornerShape(12.dp), color = Color.White, border = BorderStroke(1.dp, DoctorHairline)) {
+                if (showNote) Surface(shape = RoundedCornerShape(12.dp), color = Color.White, border = BorderStroke(1.dp, DoctorHairline)) {
                     Text(noteText, Modifier.fillMaxWidth().heightIn(max = 240.dp).padding(12.dp), fontSize = 14.sp, lineHeight = 20.sp)
                 }
                 Row { GocChoice(t("Patient", "मरीज़"), signerRole == GocSignOffRules.PATIENT) { signerRole = GocSignOffRules.PATIENT }; GocChoice(t("Family member", "परिवार के सदस्य"), signerRole == GocSignOffRules.FAMILY) { signerRole = GocSignOffRules.FAMILY } }
                 OutlinedTextField(signerName, { signerName = it.take(GocSignOffRules.NAME_MAX) }, singleLine = true, label = { Text(t("Name", "नाम")) }, modifier = Modifier.fillMaxWidth().testTag("goc-signer-name"))
                 if (signerRole == GocSignOffRules.FAMILY) OutlinedTextField(relation, { relation = it.take(GocSignOffRules.NAME_MAX) }, singleLine = true, label = { Text(t("Relation to the patient", "मरीज़ से रिश्ता")) }, modifier = Modifier.fillMaxWidth().testTag("goc-signer-relation"))
-                Text(t("Can they read the note themselves?", "क्या वे नोट ख़ुद पढ़ सकते हैं?"))
-                Row { GocChoice(t("Yes", "हाँ"), canRead == true) { canRead = true }; GocChoice(t("No, it was read to them", "नहीं, उन्हें पढ़कर सुनाया गया"), canRead == false) { canRead = false } }
-                GocTick(t("I have read or heard this note and it records what we discussed", "मैंने यह नोट पढ़ा या सुना है और इसमें वही लिखा है जिस पर हमने बात की"), consent, { consent = it }, "goc-signer-consent")
-                GocSignaturePad(onDone = { p -> sign(GocSignatureInput(signerRole, signerName, relation = relation, consent = consent, canRead = canRead, method = p.method, png = p.png, strokeCount = p.strokeCount)) })
+                GocTick(t("The note was read to them (a witness also signs)", "नोट उन्हें पढ़कर सुनाया गया (एक गवाह भी साइन करेंगे)"), canRead == false, { canRead = !it }, "goc-signer-read-aloud")
+                Text(t("I have read or heard this note and it records what we discussed", "मैंने यह नोट पढ़ा या सुना है और इसमें वही लिखा है जिस पर हमने बात की"), fontWeight = FontWeight.Medium, modifier = Modifier.testTag("goc-signer-consent"))
+                // Signing under that line is the agreement: one tap, "Agree and sign".
+                GocSignaturePad(doneLabel = t("Agree and sign", "सहमत हूँ, साइन करें"), onDone = { p -> sign(GocSignatureInput(signerRole, signerName, relation = relation, consent = true, canRead = canRead, method = p.method, png = p.png, strokeCount = p.strokeCount)) })
             }
             GocSignOffRules.WITNESS -> {
                 Text(t("3. Witness", "3. गवाह"), fontWeight = FontWeight.Bold)

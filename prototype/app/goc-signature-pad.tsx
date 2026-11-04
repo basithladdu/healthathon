@@ -184,10 +184,11 @@ function roleText(t: T, role: GocSignatureRole): string {
   }
 }
 
+const GOC_REG_KEY = 'sahara-goc-doctor-registration';
 const shortHash = (hash: string | null) => !hash ? '' : hash.length < 16 ? hash : `${hash.slice(0, 8)}…${hash.slice(-8)}`;
 const when = (iso: string) => { const d = new Date(iso); return Number.isNaN(d.getTime()) ? iso : d.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }); };
 
-export function GocSignOff({ t, noteId, noteText, roles = GOC_DEFAULT_STEPS, onComplete, onInvalidated }: {
+export function GocSignOff({ t, noteId, noteText, roles = GOC_DEFAULT_STEPS, onComplete, onInvalidated, doctorName: doctorPrefill = '', signerName: signerPrefill = '', autoLock = true, showNote = true }: {
   t: T;
   /** The GOC note this sign-off belongs to. Sign-offs are stored on this device under this id. */
   noteId: string;
@@ -199,6 +200,12 @@ export function GocSignOff({ t, noteId, noteText, roles = GOC_DEFAULT_STEPS, onC
   onComplete: (record: GocSignOffRecord) => void;
   /** Called when a change to the note text invalidated earlier signatures. */
   onInvalidated?: (invalidated: GocSignOffRecord) => void;
+  /** Prefills, so the usual case is: sign, sign, done. */
+  doctorName?: string; signerName?: string;
+  /** Lock as soon as the last person has signed (the signature is the confirmation). */
+  autoLock?: boolean;
+  /** Shows the note text again at the patient step. Off when the form is already on screen above. */
+  showNote?: boolean;
 }) {
   const [record, setRecord] = useState<GocSignOffRecord | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -210,14 +217,13 @@ export function GocSignOff({ t, noteId, noteText, roles = GOC_DEFAULT_STEPS, onC
   useEffect(() => { callbacks.current = { onComplete, onInvalidated }; }, [onComplete, onInvalidated]);
 
   // Doctor
-  const [doctorName, setDoctorName] = useState('');
-  const [registrationNo, setRegistrationNo] = useState('');
+  const [doctorName, setDoctorName] = useState(doctorPrefill);
+  const [registrationNo, setRegistrationNo] = useState(() => { try { return window.localStorage.getItem(GOC_REG_KEY) ?? ''; } catch { return ''; } });
   // Patient or family member
   const [signerRole, setSignerRole] = useState<'PATIENT' | 'FAMILY'>('PATIENT');
-  const [signerName, setSignerName] = useState('');
+  const [signerName, setSignerName] = useState(signerPrefill);
   const [relation, setRelation] = useState('');
-  const [canRead, setCanRead] = useState<boolean | null>(null);
-  const [consent, setConsent] = useState(false);
+  const [canRead, setCanRead] = useState<boolean | null>(true);
   // Witness
   const [witnessName, setWitnessName] = useState('');
   const [witnessRole, setWitnessRole] = useState('');
@@ -268,6 +274,8 @@ export function GocSignOff({ t, noteId, noteText, roles = GOC_DEFAULT_STEPS, onC
       await persist(next);
       show(next);
       setNotice(null);
+      if (input.role === 'DOCTOR' && input.registrationNo) { try { window.localStorage.setItem(GOC_REG_KEY, input.registrationNo); } catch { /* private window */ } }
+      if (autoLock && gocNextStep(next, roles) === 'LOCK') await lockRecord(next);
       return true;
     } catch (e) {
       setError(e instanceof GocSignOffError ? errorText(t, e.code) : t('The signature could not be added. Try again.', 'हस्ताक्षर नहीं जुड़ सका। फिर कोशिश करें।'));
@@ -275,10 +283,10 @@ export function GocSignOff({ t, noteId, noteText, roles = GOC_DEFAULT_STEPS, onC
     }
   };
 
-  const lock = async () => {
+  const lockRecord = async (base: GocSignOffRecord) => {
     setError(null);
     try {
-      const next = await gocLock(record, noteText, roles);
+      const next = await gocLock(base, noteText, roles);
       await persist(next);
       show(next);
       callbacks.current.onComplete(next);
@@ -326,7 +334,7 @@ export function GocSignOff({ t, noteId, noteText, roles = GOC_DEFAULT_STEPS, onC
 
     {step === 'PATIENT_OR_FAMILY' ? <div className="goc-step">
       <h3>{t('2. Patient or family member', '2. मरीज़ या परिवार के सदस्य')}</h3>
-      <details className="goc-note" open><summary>{t('The note', 'नोट')}</summary><p dir="auto">{noteText}</p></details>
+      {showNote ? <details className="goc-note"><summary>{t('The note', 'नोट')}</summary><p dir="auto">{noteText}</p></details> : null}
       <div className="goc-choice" role="radiogroup" aria-label={t('Who is signing', 'कौन साइन कर रहे हैं')}>
         <label className="ep-option"><input type="radio" name={`goc-who-${record.id}`} checked={signerRole === 'PATIENT'} onChange={() => setSignerRole('PATIENT')} /><span>{t('Patient', 'मरीज़')}</span></label>
         <label className="ep-option"><input type="radio" name={`goc-who-${record.id}`} checked={signerRole === 'FAMILY'} onChange={() => setSignerRole('FAMILY')} /><span>{t('Family member', 'परिवार के सदस्य')}</span></label>
@@ -335,14 +343,9 @@ export function GocSignOff({ t, noteId, noteText, roles = GOC_DEFAULT_STEPS, onC
         <label className="ep-field"><span>{t('Name', 'नाम')}</span><input value={signerName} maxLength={120} onChange={(e) => setSignerName(e.target.value)} /></label>
         {signerRole === 'FAMILY' ? <label className="ep-field"><span>{t('Relation to the patient', 'मरीज़ से रिश्ता')}</span><input value={relation} maxLength={120} placeholder={t('e.g. Daughter', 'जैसे बेटी')} onChange={(e) => setRelation(e.target.value)} /></label> : null}
       </div>
-      <div className="goc-choice" role="radiogroup" aria-label={t('Can they read the note themselves?', 'क्या वे नोट ख़ुद पढ़ सकते हैं?')}>
-        <span>{t('Can they read the note themselves?', 'क्या वे नोट ख़ुद पढ़ सकते हैं?')}</span>
-        <label className="ep-option"><input type="radio" name={`goc-read-${record.id}`} checked={canRead === true} onChange={() => setCanRead(true)} /><span>{t('Yes', 'हाँ')}</span></label>
-        <label className="ep-option"><input type="radio" name={`goc-read-${record.id}`} checked={canRead === false} onChange={() => setCanRead(false)} /><span>{t('No, it was read to them', 'नहीं, उन्हें पढ़कर सुनाया गया')}</span></label>
-      </div>
-      <label className="ep-option"><input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
-        <span><strong>{t('I have read or heard this note and it records what we discussed', 'मैंने यह नोट पढ़ा या सुना है और इसमें वही लिखा है जिस पर हमने बात की')}</strong></span></label>
-      <GocSignaturePad t={t} onDone={(r) => sign({ role: signerRole, name: signerName, relation: signerRole === 'FAMILY' ? relation : 'Self', canRead, consent, method: r.method, imageDataUrl: r.dataUrl, strokeCount: r.strokeCount })} />
+      <label className="ep-option goc-read-aloud"><input type="checkbox" checked={canRead === false} onChange={(e) => setCanRead(e.target.checked ? false : true)} /><span>{t('The note was read to them (a witness also signs)', 'नोट उन्हें पढ़कर सुनाया गया (एक गवाह भी साइन करेंगे)')}</span></label>
+      <p className="goc-declare">{t('I have read or heard this note and it records what we discussed', 'मैंने यह नोट पढ़ा या सुना है और इसमें वही लिखा है जिस पर हमने बात की')}</p>
+      <GocSignaturePad t={t} doneLabel={t('Agree and sign', 'सहमत हूँ, साइन करें')} onDone={(r) => sign({ role: signerRole, name: signerName, relation: signerRole === 'FAMILY' ? relation : 'Self', canRead, consent: true, method: r.method, imageDataUrl: r.dataUrl, strokeCount: r.strokeCount })} />
     </div> : null}
 
     {step === 'WITNESS' ? <div className="goc-step">
@@ -360,7 +363,7 @@ export function GocSignOff({ t, noteId, noteText, roles = GOC_DEFAULT_STEPS, onC
     {error ? <p className="ep-notice ep-warn" role="alert">{error}</p> : null}
 
     {step === 'LOCK' ? <div className="ep-actions">
-      <button type="button" className="ep-btn" onClick={() => void lock()}>{t('Lock this note version', 'नोट का यह संस्करण लॉक करें')}</button>
+      <button type="button" className="ep-btn" onClick={() => void lockRecord(record)}>{t('Lock this note version', 'नोट का यह संस्करण लॉक करें')}</button>
     </div> : null}
     {record.status === 'OPEN' && signed.length ? <div className="ep-actions">
       <button type="button" className="ep-btn ep-danger" onClick={() => void restart()}>{t('Start the signatures again', 'हस्ताक्षर फिर से शुरू करें')}</button>

@@ -678,3 +678,17 @@ export function checkedAiSuggestions(answer: unknown, transcript: string): GocSu
   }
   return out;
 }
+
+/** What "Confirm all suggested" may set: one option the conversation stated, no disagreement, gate open. Never a default (V1). */
+export function gocSuggestedValue(suggestions: GocSuggestion[], field: GocDecisionField, lock: 'V4' | 'V5' | null): string | null {
+  if (lock) return null;
+  const info = gocMarksFor(suggestions, field);
+  return !info.conflict && info.suggested.length === 1 ? info.suggested[0] : null;
+}
+
+/** True when nothing tells the doctor's lines from the patient's, so the screen asks "Who's the doctor?". */
+export function gocNeedsSpeakers(lines: Array<{ text: string; speaker: GocSpeaker }>): boolean {
+  const spoken = lines.filter((line) => line.text.trim());
+  return spoken.length > 1 && spoken.every((line) => line.speaker === null);
+}
+

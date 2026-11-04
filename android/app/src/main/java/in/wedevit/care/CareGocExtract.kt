@@ -481,7 +481,12 @@ data class GocTopicRecord(val decision: GocDecision, val status: GocTopicStatus,
 enum class GocNoteKind { GENERAL_DISCUSSION, DECISION_TAKEN }
 
 /** The verbatim words ([lines]) and the doctor's note ([note]) are kept apart: the note says what was said and decided, and the words stay as spoken. [planVersion] tells a carried-over copy from this version's own. */
-data class GocSignOffSummary(val id: String, val sealSha256: String, val lockedAt: String, val signers: List<String>)
+data class GocSignOffSummary(val id: String, val sealSha256: String, val lockedAt: String, val signers: List<String>,
+    /** DOCTOR, PATIENT, FAMILY or WITNESS, one per signer; with [registrations] and [methods] so Section 19 of the form shows who signed as what. */
+    val roles: List<String> = emptyList(), val registrations: List<String> = emptyList(), val methods: List<String> = emptyList(), val signedAt: List<String> = emptyList()) {
+    fun formSigners(): List<GocFormSigner> = signers.mapIndexedNotNull { i, name -> roles.getOrNull(i)?.let { role ->
+        GocFormSigner(role, name, signedAt.getOrNull(i) ?: lockedAt, registrations.getOrNull(i).orEmpty(), thumb = methods.getOrNull(i) == "THUMB") } }
+}
 
 data class GocTranscript(
     val lines: List<GocLine> = emptyList(), val language: String = "", val source: String = SOURCE_TYPED, val model: String = "",
@@ -515,7 +520,7 @@ object GocTranscriptJson {
             .put("topics", marks).put("note", g.note)
             .put("planVersion", g.planVersion).put("participants", g.participants).put("noteKind", g.noteKind.name)
             .put("transcribedBy", g.transcribedBy)
-            .also { o -> g.signOff?.let { so -> o.put("signOff", JSONObject().put("id", so.id).put("status", "LOCKED").put("sealSha256", so.sealSha256).put("lockedAt", so.lockedAt).put("signers", JSONArray(so.signers.map { JSONObject().put("name", it) }))) } }
+            .also { o -> g.signOff?.let { so -> o.put("signOff", JSONObject().put("id", so.id).put("status", "LOCKED").put("sealSha256", so.sealSha256).put("lockedAt", so.lockedAt).put("signers", JSONArray(so.signers.mapIndexed { i, name -> JSONObject().put("name", name).put("role", so.roles.getOrNull(i).orEmpty()).put("registrationNo", so.registrations.getOrNull(i).orEmpty()).put("method", so.methods.getOrNull(i).orEmpty()).put("signedAt", so.signedAt.getOrNull(i).orEmpty()) }))) } }
     }
 
     /** [recordVersion] is the record's own version: a transcript written on the web carries no planVersion of its own. */
@@ -535,7 +540,9 @@ object GocTranscriptJson {
         return GocTranscript(lines, j.optString("language").takeUnless { it == "auto" }.orEmpty(), j.optString("source").ifBlank { GocTranscript.SOURCE_TYPED }, j.optString("model"), j.optString("participants"), millis(j.optString("consentAt")), j.optInt("planVersion", recordVersion),
             accepted + verified, j.optString("note"), GocNoteKind.entries.firstOrNull { it.name == j.optString("noteKind") } ?: GocNote.kind(accepted), j.optString("reviewedAt"), j.optString("reviewedBy"), j.optBoolean("audioKept"),
             j.optJSONObject("signOff")?.takeIf { it.optString("status") == "LOCKED" && it.optString("id").isNotBlank() }?.let { o ->
-                GocSignOffSummary(o.optString("id"), o.optString("sealSha256"), o.optString("lockedAt"), o.optJSONArray("signers")?.let { a -> (0 until a.length()).mapNotNull { a.optJSONObject(it)?.optString("name")?.takeIf(String::isNotBlank) } }.orEmpty())
+                val people = o.optJSONArray("signers")?.let { a -> (0 until a.length()).mapNotNull { a.optJSONObject(it)?.takeIf { p -> p.optString("name").isNotBlank() } } }.orEmpty()
+                GocSignOffSummary(o.optString("id"), o.optString("sealSha256"), o.optString("lockedAt"), people.map { it.optString("name") },
+                    people.map { it.optString("role") }.takeIf { r -> r.all(String::isNotBlank) }.orEmpty(), people.map { it.optString("registrationNo") }, people.map { it.optString("method") }, people.map { it.optString("signedAt") })
             }, j.optString("transcribedBy"))
     }
 }
@@ -688,58 +695,272 @@ object GocNote {
     }.joinToString("\n")
 }
 
-data class GocFormSection(val id: String, val title: Bi, val rows: List<Bi>)
+/** One tick box of the paper form. [detail] is what goes in the form's blank (days, hours, L/min, a name). */
+data class GocFormTick(val text: Bi, val on: Boolean, val detail: String = "")
+/** One line of the form. [value] fills the blank (empty when the boxes carry the answer); [open] means nothing was filled: "Not discussed". */
+data class GocFormRow(val label: Bi, val value: Bi, val open: Boolean = false, val ticks: List<GocFormTick> = emptyList())
+/** A table of the form: decision-makers, the oxygen LEVEL / WHAT IT MEANS FOR THE PATIENT / CEILING table, Section 19. Cell lines that start with a box are boxes. */
+data class GocFormTable(val head: List<Bi>, val rows: List<List<Bi>>)
+data class GocFormGroup(val title: Bi, val rows: List<GocFormRow> = emptyList(), val table: GocFormTable? = null)
+data class GocFormSection(val id: String, val title: Bi, val groups: List<GocFormGroup>) {
+    /** The section as plain lines, the way the signed note and older readers print it. */
+    val rows: List<Bi> get() = GocForm.lines(this)
+}
+/** A signature drawn on the doctor's device for this note (CareGocSignOff.kt), so Section 19 shows it. [role]: DOCTOR, PATIENT, FAMILY or WITNESS. */
+data class GocFormSigner(val role: String, val name: String, val signedAt: String, val registrationNo: String = "", val relation: String = "", val thumb: Boolean = false)
 
-/** The legal form's Sections I to IV, filled from the plan and the confirmed topics. Shown on screen, written into the note, and printed in the PDF. */
+/**
+ * The goals-of-care note IS the legal form: Healthathon_form_Rituparna.docx (legal review, 31 Oct 2026), with Rituparna's tracked additions.
+ * Its own wording, headings, numbering (4.1, 4.2, 5.3, 6.1, 6.2, 12.1, Section 19), order, tick boxes and tables, filled like a completed paper
+ * form. The talk screen, the doctor's view, the note text that is signed and the PDF all draw this. Twin of prototype/app/goc-form.ts;
+ * line-by-line map in docs/goc-legal-form-coverage.md. Built only from what was confirmed (V1): a blank nobody filled reads "Not discussed".
+ */
 object GocForm {
-    private val NOT_RECORDED = Bi("Not recorded", "दर्ज नहीं")
-    private fun row(label: Bi, value: String) = Bi.labeled(label, if (value.isBlank()) NOT_RECORDED else Bi.plain(value))
-    private fun person(p: DecisionMaker?): String = p?.let { listOf(it.name, it.relation, it.phone24h, it.idType?.let { id -> PlanText.idType(id).en + (it.idLast4?.let { l -> " …$l" } ?: "") }.orEmpty(), it.authorityBasis?.let { a -> PlanText.authority(a).en }.orEmpty()).filter(String::isNotBlank).joinToString(" · ") }.orEmpty()
-    private fun directive(d: ExistingDirective?): Bi = when (d?.kind) {
-        null -> NOT_RECORDED
-        DirectiveKind.NONE -> Bi("No living will (AMD)", "कोई लिविंग विल (AMD) नहीं")
-        DirectiveKind.PRIOR_WISHES -> Bi.join(": ", listOf(Bi("No AMD; earlier wishes noted", "AMD नहीं; पहले की इच्छाएँ दर्ज"), Bi.plain(d.note)))
-        DirectiveKind.VALID_AMD -> Bi.join(" · ", listOf(Bi("Valid living will (AMD)", "वैध लिविंग विल (AMD)"), Bi.plain(listOf(d.date, d.location, d.attestor).filter(String::isNotBlank).joinToString(" · "))))
-    }
-    private fun signed(r: EctprRecord, label: Bi, match: (Signature) -> Boolean): Bi = r.signatures.firstOrNull(match)?.let { s ->
-        Bi.labeled(label, Bi.plain(listOf(s.name, s.registrationNo.orEmpty(), s.signedAt.take(10)).filter(String::isNotBlank).joinToString(" · ")))
-    } ?: Bi.labeled(label, Bi("Signature ________  Name ________  Date ______", "हस्ताक्षर ________  नाम ________  तारीख़ ______"))
+    const val TICK_ON = "☑"; const val TICK_OFF = "☐"
+    val NOT_DISCUSSED = Bi("Not discussed", "बात नहीं हुई")
+    private fun box(on: Boolean) = if (on) TICK_ON else TICK_OFF
+    private fun indent(b: Bi) = Bi.join("", listOf(Bi.plain("    "), b))
+    private fun field(label: Bi, value: String?): GocFormRow = if (value.isNullOrBlank()) GocFormRow(label, NOT_DISCUSSED, open = true) else GocFormRow(label, Bi.plain(value.trim()))
+    private fun boxes(label: Bi, ticks: List<GocFormTick>, unticked: Bi, filled: Bi = Bi.plain("")) =
+        if (ticks.any { it.on }) GocFormRow(label, filled, ticks = ticks) else GocFormRow(label, unticked, open = true, ticks = ticks)
+    private fun tk(on: Boolean, text: Bi, detail: String? = null) = GocFormTick(text, on, detail?.trim().orEmpty())
+    private fun cell(ticks: List<GocFormTick>): Bi = Bi.join("\n", ticks.map { Bi.join("", listOf(Bi.plain(box(it.on) + " "), it.text, Bi.plain(if (it.detail.isBlank()) "" else " " + it.detail))) })
+    private fun same(a: String, b: String) = a.trim().lowercase().replace('’', '\'') == b.trim().lowercase().replace('’', '\'')
 
-    fun sections(r: EctprRecord, topics: Map<GocDecision, GocTopicRecord>): List<GocFormSection> {
-        val p = r.patient; val dm = r.decisionMakers; val v = r.values
+    /** Form 6.2, in its order. */
+    val UNACCEPTABLE = listOf(
+        Bi("Being kept alive on a ventilator with no prospect of coming off it", "ऐसे वेंटिलेटर पर ज़िंदा रखा जाना जिससे हटने की कोई उम्मीद न हो"),
+        Bi("Being permanently dependent on a feeding tube", "हमेशा के लिए खाने की नली पर निर्भर रहना"),
+        Bi("Not being able to recognise or respond to family", "परिवार को पहचान या जवाब न दे पाना"),
+        Bi("Surviving with severe, permanent physical dependence", "गंभीर, स्थायी शारीरिक निर्भरता के साथ जीना"),
+        Bi("Dying in an ICU, away from family", "परिवार से दूर ICU में मृत्यु"),
+        Bi("Uncontrolled pain or breathlessness at any stage", "किसी भी समय बेक़ाबू दर्द या साँस फूलना"),
+        Bi("Loss of dignity in bathing, toileting or exposure", "नहाने, शौच या शरीर खुलने में सम्मान खोना"),
+        Bi("Being alone at the time of death", "मृत्यु के समय अकेले होना"),
+        Bi("Exhausting the family’s savings on treatment that will not change the outcome", "ऐसे इलाज पर परिवार की बचत ख़त्म होना जो नतीजा न बदले"),
+    )
+    /** The form's own words for each hospital-transfer reason. */
+    private fun reason(r: TransferReason): Bi = when (r) {
+        TransferReason.PAIN -> Bi("Pain that cannot be controlled at home", "घर पर काबू न होने वाला दर्द")
+        TransferReason.BREATHLESSNESS -> Bi("Breathlessness that cannot be controlled at home", "घर पर काबू न होने वाली साँस फूलना")
+        TransferReason.BLEEDING -> Bi("Significant bleeding", "ज़्यादा खून बहना")
+        TransferReason.SEIZURES -> Bi("Seizures", "दौरे")
+        TransferReason.FALL_FRACTURE -> Bi("Fall with suspected fracture", "गिरना और हड्डी टूटने का शक")
+        TransferReason.BLOCKED_TUBE -> Bi("Blocked or displaced catheter, feeding tube or stent", "बंद या हिली हुई कैथेटर, खाने की नली या स्टेंट")
+        TransferReason.INFECTION_IV -> Bi("Suspected infection needing intravenous treatment", "संक्रमण का शक जिसमें नस से (IV) इलाज चाहिए")
+        TransferReason.CONFUSION -> Bi("Acute confusion or agitation not settling", "अचानक भ्रम या बेचैनी जो शांत न हो")
+        TransferReason.CAREGIVER_RESPITE -> Bi("Caregiver unable to cope — respite admission", "देखभाल करने वाला संभाल नहीं पा रहा — राहत के लिए भर्ती")
+    }
+    private fun authority(a: AuthorityBasis): Bi = when (a) {
+        AuthorityBasis.NAMED_BY_PATIENT -> Bi("Named by patient", "मरीज़ द्वारा नामित"); AuthorityBasis.NEXT_OF_KIN -> Bi("Family consensus", "परिवार की सहमति")
+        AuthorityBasis.NAMED_IN_AMD -> Bi("Named in AMD", "AMD में नामित"); AuthorityBasis.COURT_APPOINTED -> Bi("Court-appointed", "अदालत द्वारा नियुक्त")
+    }
+    private val AUTHORITY_ORDER = listOf(AuthorityBasis.NAMED_BY_PATIENT, AuthorityBasis.NEXT_OF_KIN, AuthorityBasis.NAMED_IN_AMD, AuthorityBasis.COURT_APPOINTED)
+    /** The oxygen table, LEVEL / WHAT IT MEANS FOR THE PATIENT / CEILING, word for word. */
+    val OXYGEN_LEVELS = listOf(
+        Bi("Comfort measures only", "केवल आराम के उपाय") to Bi("Opioid and anxiolytic for breathlessness, fan, positioning, suction, mouth care. Oxygen used only if it makes the patient feel better — no saturation target is chased.", "साँस फूलने पर ओपिऑइड और घबराहट की दवा, पंखा, सही स्थिति, सक्शन, मुँह की देखभाल। ऑक्सीजन तभी जब उससे आराम मिले — कोई सैचुरेशन लक्ष्य नहीं।"),
+        Bi("Nasal prongs / simple face mask", "नाक की नली / साधारण मास्क") to Bi("Low-flow oxygen up to ____ L/min. Comfortable, no interference with talking, eating or being at home.", "कम बहाव की ऑक्सीजन, ____ L/min तक। आरामदायक, बोलने, खाने या घर रहने में बाधा नहीं।"),
+        Bi("Non-rebreather / venturi mask", "नॉन-रीब्रीदर / वेंचुरी मास्क") to Bi("Higher-concentration oxygen. Tolerable, but the mask can feel confining and interferes with speech.", "ज़्यादा ऑक्सीजन। सहने लायक़, पर मास्क घुटन भरा लग सकता है और बोलने में बाधा डालता है।"),
+        Bi("High-flow nasal cannula (HFNC)", "हाई-फ़्लो नाक ऑक्सीजन (HFNC)") to Bi("Warmed humidified high-flow oxygen. Better tolerated than a mask, usually needs a high-dependency bed, and can be used purely for comfort.", "गर्म, नम, तेज़ बहाव की ऑक्सीजन। मास्क से बेहतर सहन होती है, आम तौर पर HDU बिस्तर चाहिए, और सिर्फ़ आराम के लिए भी दी जा सकती है।"),
+        Bi("Non-invasive ventilation (CPAP / BiPAP)", "बिना ट्यूब वेंटिलेशन (CPAP / BiPAP)") to Bi("A tight mask driving air in. Effective for fluid overload and COPD; often uncomfortable, restricts speaking and eating, and can be distressing if used for many hours.", "कसा हुआ मास्क जो हवा भरता है। फ़्लूइड ओवरलोड और COPD में असरदार; अक्सर असहज, बोलना और खाना रोकता है, और कई घंटे चले तो परेशान कर सकता है।"),
+        Bi("Intubation and invasive mechanical ventilation", "ट्यूब डालकर वेंटिलेटर") to Bi("A tube in the windpipe, sedation, inability to speak, ICU. Recovery may or may not follow; weaning may not be possible.", "साँस की नली में ट्यूब, बेहोशी की दवा, बोल न पाना, ICU। ठीक हो भी सकते हैं और नहीं भी; मशीन हटाना संभव न हो।"),
+    )
+
+    /** An unticked decision: whether it came up, and V1's "No preference recorded". */
+    private fun status(d: GocDecision, topics: Map<GocDecision, GocTopicRecord>): Bi = Bi.join(". ", listOf(
+        if (topics[d]?.status == GocTopicStatus.NOT_DISCUSSED_VERIFIED) Bi("Not discussed (doctor verified)", "बात नहीं हुई (डॉक्टर ने जाँचा)") else NOT_DISCUSSED, NO_PREFERENCE)).let { Bi.join("", listOf(it, Bi.plain("."))) }
+    private fun label(d: GocDecision, r: EctprRecord): Bi = GocPlan.options(d).firstOrNull { it.id == GocPlan.current(r, d) }?.label ?: NO_PREFERENCE
+    private fun trial(t: TrialPlan?): String = t?.let { "${it.durationValue} " + PlanText.unit(it.durationUnit).en + (if (it.reviewAt.isNotBlank()) ", review ${it.reviewAt}" else "") }.orEmpty()
+
+    fun sections(r: EctprRecord, topics: Map<GocDecision, GocTopicRecord>, signers: List<GocFormSigner> = emptyList()): List<GocFormSection> {
+        val p = r.patient; val dm = r.decisionMakers; val v = r.values; val c = r.choices; val cap = r.capacity; val h = r.homeCare; val w = r.withdrawal
+        fun decision(lbl: Bi, d: GocDecision, ticks: List<GocFormTick>) = if (GocPlan.current(r, d) == null) GocFormRow(lbl, status(d, topics), open = true, ticks = ticks) else GocFormRow(lbl, label(d, r), ticks = ticks)
+        val people = listOf(dm.primary, dm.alternate)
+        fun dmCell(who: DecisionMaker?, pick: (DecisionMaker) -> String): Bi = who?.let(pick)?.takeIf(String::isNotBlank)?.let(Bi::plain) ?: NOT_DISCUSSED
+        val dmTable = GocFormTable(listOf(Bi.plain(""), Bi("PRIMARY", "मुख्य"), Bi("SECONDARY", "द्वितीय")), listOf(
+            listOf(Bi("Name", "नाम")) + people.map { dmCell(it) { x -> x.name } },
+            listOf(Bi("Relationship to patient", "मरीज़ से रिश्ता")) + people.map { dmCell(it) { x -> x.relation } },
+            listOf(Bi("Phone (must be reachable 24 h)", "फ़ोन (24 घंटे मिलना चाहिए)")) + people.map { dmCell(it) { x -> x.phone24h } },
+            listOf(Bi("ID type & number", "पहचान पत्र का प्रकार और नंबर")) + people.map { dmCell(it) { x -> x.idType?.let { id -> PlanText.idType(id).en + (x.idLast4?.let { l -> " …$l" } ?: "") }.orEmpty() } },
+            listOf(Bi("Basis for authority", "अधिकार का आधार")) + people.map { who -> cell(AUTHORITY_ORDER.map { a -> tk(who?.authorityBasis == a, authority(a)) }) },
+        ))
+        val capacityTicks = listOf(
+            tk(cap.status == Capacity.HAS, Bi("The patient has capacity for these decisions and has completed this record themselves.", "मरीज़ में इन फ़ैसलों की क्षमता है और उन्होंने यह रिकॉर्ड ख़ुद भरा।")),
+            tk(cap.status == Capacity.HAS_DELEGATED, Bi("The patient has capacity but has asked family to decide with the team. Record the patient’s own words:", "मरीज़ में क्षमता है, पर उन्होंने परिवार से टीम के साथ फ़ैसला करने को कहा। मरीज़ के अपने शब्द:"), cap.basis.takeIf { cap.status == Capacity.HAS_DELEGATED }),
+            tk(cap.status == Capacity.FLUCTUATES, Bi("Capacity fluctuates. Assessed by: ____ on ____. Re-assess before acting on any section.", "क्षमता बदलती रहती है। किसने जाँचा: ____ कब: ____। किसी भी भाग पर अमल से पहले दोबारा जाँचें।"), listOf(cap.assessor, cap.assessedOn).filter(String::isNotBlank).joinToString(" · ").takeIf { cap.status == Capacity.FLUCTUATES }),
+            tk(cap.status == Capacity.LACKS, Bi("The patient lacks capacity for these decisions. Basis of assessment (understand / retain / weigh / communicate):", "मरीज़ में इन फ़ैसलों की क्षमता नहीं है। जाँच का आधार (समझना / याद रखना / तौलना / बताना):"), cap.basis.takeIf { cap.status == Capacity.LACKS }),
+        )
+        val dir = r.existingDirective; val amd = dir?.takeIf { it.kind == DirectiveKind.VALID_AMD }
+        val directiveTicks = listOf(
+            tk(amd != null, Bi("There is a valid written Advance Medical Directive / living will. Executed on ____. Location of original: ____", "वैध लिखित एडवांस मेडिकल डायरेक्टिव / लिविंग विल है। कब बनी: ____। मूल कहाँ है: ____"), amd?.let { listOf(it.date, it.location).filter(String::isNotBlank).joinToString(" · ") }),
+            tk(amd?.attestor?.contains("notary", true) == true, indent(Bi("Attested by Notary", "नोटरी ने सत्यापित किया"))),
+            tk(amd?.attestor?.contains("gazett", true) == true, indent(Bi("Attested by Gazetted Officer", "राजपत्रित अधिकारी ने सत्यापित किया")), amd?.attestor?.takeIf { !it.contains("notary", true) && !it.contains("gazett", true) }),
+            tk(false, indent(Bi("With two witnesses? Yes / No. If yes, this ECTPR must be read as subordinate to it — the directive governs; this record operationalises it.", "दो गवाहों के साथ? हाँ / नहीं। अगर हाँ, तो यह ECTPR उसके अधीन है — डायरेक्टिव ही मान्य है; यह रिकॉर्ड उसे लागू करता है।"))),
+            tk(dir?.kind == DirectiveKind.PRIOR_WISHES, Bi("There is no directive, but the patient previously expressed clear wishes. Recorded here, with who heard them and when:", "कोई डायरेक्टिव नहीं, पर मरीज़ ने पहले साफ़ इच्छाएँ बताई थीं। यहाँ दर्ज, किसने और कब सुनीं:"), dir?.note?.takeIf { dir?.kind == DirectiveKind.PRIOR_WISHES }),
+            tk(dir?.kind == DirectiveKind.NONE, Bi("No directive and no recorded prior wishes. Decisions will be made in the patient’s best interests through family consensus with the team.", "न डायरेक्टिव, न पहले की दर्ज इच्छाएँ। फ़ैसले मरीज़ के हित में, परिवार और टीम की सहमति से होंगे।")),
+        )
+        // The plan stores only "knows the diagnosis": the prognosis box and "does not wish to know" stay empty, never guessed.
+        val knowsTicks = listOf(
+            tk(false, Bi("The patient knows the diagnosis and the prognosis.", "मरीज़ बीमारी और आगे क्या होगा, दोनों जानते हैं।")),
+            tk(v.patientKnows == true, Bi("The patient knows the diagnosis but not the prognosis.", "मरीज़ बीमारी जानते हैं, पर आगे क्या होगा यह नहीं।")),
+            tk(v.familyAskedNotToTell, Bi("The family has asked that the patient not be told. Discussed with the family that the patient may ask directly and will not be lied to. Family understands: Yes / Not yet resolved", "परिवार ने कहा कि मरीज़ को न बताया जाए। परिवार से बात हुई कि मरीज़ सीधे पूछ सकते हैं और उनसे झूठ नहीं बोला जाएगा। परिवार समझता है: हाँ / अभी तय नहीं"), v.directQuestionPlan.takeIf { v.familyAskedNotToTell }),
+            tk(false, Bi("The patient has said they do not wish to know details and has delegated:", "मरीज़ ने कहा कि वे विस्तार नहीं जानना चाहते और यह सौंपा:")),
+        )
+        val outcomes = v.unacceptableOutcomes.map(GocExtract::withoutSoundCaptions).map(String::trim).filter(String::isNotBlank)
+        val other = outcomes.filter { o -> UNACCEPTABLE.none { same(o, it.en) || same(o, it.hi) } }
+        val outcomeTicks = UNACCEPTABLE.map { u -> tk(outcomes.any { same(it, u.en) || same(it, u.hi) }, u) } + tk(other.isNotEmpty(), Bi("Other:", "अन्य:"), other.joinToString("; "))
+        fun firstOn(ticks: List<GocFormTick>) = ticks.firstOrNull { it.on }?.let { Bi.join("", listOf(it.text, Bi.plain(if (it.detail.isBlank()) "" else " " + it.detail))) }
+        val tr = c.hospitalTransfer
+        val transferTicks = listOf(tk(tr?.kind == TransferKind.ANY, Bi("YES — for any significant deterioration.", "हाँ — किसी भी गंभीर बिगड़ने पर।")),
+            tk(tr?.kind == TransferKind.ONLY_FOR, Bi("ONLY FOR THE FOLLOWING (tick each that applies):", "केवल इनके लिए (जो लागू हों उन पर निशान):"))) +
+            TransferReason.entries.map { x -> GocFormTick(indent(reason(x)), tr?.kind == TransferKind.ONLY_FOR && x in tr!!.reasons) } +
+            listOf(tk(false, indent(Bi("Other:", "अन्य:"))), tk(tr?.kind == TransferKind.NO, Bi("NO — the patient is to be cared for where they are.", "नहीं — मरीज़ की देखभाल वहीं होगी जहाँ वे हैं।")))
+        val cprTicks = listOf(tk(c.cpr == Cpr.ATTEMPT, Bi("ATTEMPT CPR.", "CPR करें।")), tk(c.cpr == Cpr.DNACPR, Bi("DO NOT ATTEMPT CPR (DNACPR).", "CPR न करें (DNACPR)।")))
+        val reasonText = when (c.dnacprReason) { DnacprReason.FUTILITY -> "clinical futility"; DnacprReason.PATIENT_REFUSAL -> "patient refusal"; DnacprReason.BURDEN_OUTWEIGHS_BENEFIT -> "burden outweighs benefit"; null -> "" }
+        val ceiling = c.respCeiling
+        val oxygen = GocFormTable(listOf(Bi("LEVEL", "स्तर"), Bi("WHAT IT MEANS FOR THE PATIENT", "मरीज़ के लिए इसका मतलब"), Bi("CEILING", "सबसे ऊँचा स्तर")), OXYGEN_LEVELS.mapIndexed { level, (name, meaning) ->
+            val filled = if (level == 1 && c.maxOxygenLpm != null) Bi(meaning.en.replace("____", "%.0f".format(c.maxOxygenLpm)), meaning.hi.replace("____", "%.0f".format(c.maxOxygenLpm)), meaning.pick(false).replace("____", "%.0f".format(c.maxOxygenLpm))) else meaning
+            listOf(Bi.plain(level.toString()), Bi.join("\n", listOf(name, filled)), Bi.plain(box(ceiling == level)))
+        })
+        val vp = c.vasopressors; val dy = c.dialysis; val ng = c.feeding.ng; val icu = c.icu
+        val vasoTicks = listOf(tk(vp?.kind == VasopressorKind.NO, Bi("No", "नहीं")), tk(vp?.kind == VasopressorKind.TRIAL, Bi("Short trial only, up to ______ hours", "केवल छोटा ट्रायल, ______ घंटे तक"), trial(vp?.trial).takeIf { vp?.kind == VasopressorKind.TRIAL }),
+            tk(vp?.kind == VasopressorKind.YES_NO_LIMIT, Bi("Yes, without a pre-set limit", "हाँ, बिना पहले से तय सीमा")), tk(vp?.kind == VasopressorKind.YES_MAX_AGENTS, Bi("Yes, but no escalation beyond ____ agents", "हाँ, पर ____ दवाओं से आगे नहीं"), vp?.maxAgents?.toString()?.takeIf { vp?.kind == VasopressorKind.YES_MAX_AGENTS }))
+        val dialysisTicks = listOf(tk(dy?.kind == DialysisKind.NO, Bi("No", "नहीं")), tk(dy?.kind == DialysisKind.TRIAL, Bi("Trial of ______ sessions / days, then review", "______ सत्र / दिन का ट्रायल, फिर समीक्षा"), trial(dy?.trial).takeIf { dy?.kind == DialysisKind.TRIAL }),
+            tk(dy?.kind == DialysisKind.YES, Bi("Yes", "हाँ")), tk(dy?.kind == DialysisKind.ONLY_IF_REVERSIBLE, Bi("Only if the renal failure is judged reversible", "केवल तब जब किडनी फ़ेल्योर ठीक होने वाला माना जाए")))
+        val icuTicks = listOf(tk(icu?.kind == IcuKind.YES, Bi("Yes", "हाँ")), tk(icu?.kind == IcuKind.TRIAL, Bi("Time-limited trial", "समय-सीमित ट्रायल"), trial(icu?.trial).takeIf { icu?.kind == IcuKind.TRIAL }), tk(icu?.kind == IcuKind.NO, Bi("No", "नहीं")))
+        val ngTicks = listOf(tk(ng?.kind == NgKind.NO, Bi("No", "नहीं")), tk(ng?.kind == NgKind.UP_TO_DAYS, Bi("Yes, short-term only, up to ______ days, then review", "हाँ, थोड़े समय, ______ दिन तक, फिर समीक्षा"), ng?.days?.let { "$it days" }?.takeIf { ng?.kind == NgKind.UP_TO_DAYS }), tk(ng?.kind == NgKind.YES, Bi("Yes", "हाँ")))
+        val pegTicks = listOf(tk(c.feeding.peg == PegFeeding.NO, Bi("No", "नहीं")), tk(c.feeding.peg == PegFeeding.ONLY_AFTER_PALLIATIVE_DISCUSSION, Bi("Only after discussion with the palliative care team", "केवल पैलिएटिव केयर टीम से बात के बाद")), tk(c.feeding.peg == PegFeeding.YES, Bi("Yes", "हाँ")))
+        val goalTicks = listOf(
+            tk(c.goalOfCare == GoalOfCare.A_LIFE, Bi("A. PRIORITISE LIFE — All medically effective treatment, including ICU and ventilation.", "A. जीवन को प्राथमिकता — ICU और वेंटिलेटर सहित हर असरदार इलाज।")),
+            tk(c.goalOfCare == GoalOfCare.B_CEILING, Bi("B. BALANCED / CEILING OF CARE — Treat reversible problems, but with the specific limits and as a time-limited trial.", "B. संतुलित / इलाज की सीमा — ठीक होने वाली समस्याओं का इलाज, तय सीमाओं में और समय-सीमित ट्रायल के रूप में।")),
+            tk(c.goalOfCare == GoalOfCare.C_COMFORT, Bi("C. PRIORITISE COMFORT — Symptom control is the goal. Hospital transfer only if comfort cannot be achieved where the patient is.", "C. आराम को प्राथमिकता — लक्षणों पर नियंत्रण ही लक्ष्य। अस्पताल तभी जब वहाँ आराम न मिल सके।")),
+        )
+        val withdrawn = w?.applicable == true
+        fun wField(lbl: Bi, value: String?) = if (withdrawn) field(lbl, value) else GocFormRow(lbl, NOT_DISCUSSED, open = true)
+        val finalTicks = listOf(
+            tk(withdrawn && w?.finalDecision == WithdrawalFinal.TO_BE_PERFORMED, Bi("withdrawal/withholding to be performed", "इलाज रोका जाएगा / शुरू नहीं होगा")),
+            tk(withdrawn && w?.finalDecision == WithdrawalFinal.FAMILY_REFUSED, Bi("Family has refused consent (if patient has lost decision-making capacity)", "परिवार ने सहमति नहीं दी (अगर मरीज़ निर्णय क्षमता खो चुके हों)")),
+            tk(withdrawn && w?.finalDecision == WithdrawalFinal.BOARD_REFUSED, Bi("Primary/Secondary Board has refused permission", "प्राथमिक/द्वितीय बोर्ड ने अनुमति नहीं दी")),
+            tk(withdrawn && w?.finalDecision == WithdrawalFinal.PHYSICIAN_REVOKED, Bi("Treating physician has revoked their decision to support withdrawal/withholding", "इलाज करने वाले डॉक्टर ने इलाज रोकने/शुरू न करने का समर्थन वापस लिया")),
+        )
+        // Section 19: the plan's signatures first, then those drawn on this device for this note.
+        fun planSig(match: (Signature) -> Boolean) = r.signatures.firstOrNull(match)
+        fun dev(role: String) = signers.firstOrNull { it.role == role }
+        val signedWord = Bi("Signed", "हस्ताक्षर किए"); val thumbWord = Bi("Thumb impression", "अँगूठे का निशान")
+        fun how(thumb: Boolean?) = if (thumb == true) thumbWord else signedWord
+        val patientSig = planSig { it.role == SignatureRole.PATIENT }; val patientDev = dev("PATIENT"); val familyDev = dev("FAMILY")
+        val primary = planSig { it.role == SignatureRole.SURROGATE && it.surrogateRank != SurrogateRank.SECONDARY }; val secondary = planSig { it.role == SignatureRole.SURROGATE && it.surrogateRank == SurrogateRank.SECONDARY }
+        val witnesses = r.signatures.filter { it.role == SignatureRole.WITNESS }; val witnessDev = dev("WITNESS")
+        fun clinician(role: SignatureRole, device: GocFormSigner?): List<Bi> { val s = planSig { it.role == role }
+            return listOf(Bi.plain(s?.name ?: device?.name.orEmpty()), Bi.plain(s?.registrationNo ?: device?.registrationNo.orEmpty()),
+                if (s != null) how(s.thumbImpression) else if (device != null) how(device.thumb) else Bi.plain(""), Bi.plain((s?.signedAt ?: device?.signedAt.orEmpty()).take(10)))
+        }
+        val blank = Bi.plain("")
+
         return listOf(
             GocFormSection("I", Bi("Section I – General information", "भाग I – सामान्य जानकारी"), listOf(
-                row(Bi("Name", "नाम"), p.name),
-                row(Bi("Date of birth, sex, gender", "जन्म तिथि, लिंग, जेंडर"), listOf(p.dob, p.sex, p.gender).filter(String::isNotBlank).joinToString(" · ")),
-                row(Bi("Address and phone", "पता और फ़ोन"), listOf(p.address, p.phone).filter(String::isNotBlank).joinToString(" · ")),
-                row(Bi("Language preferred", "पसंद की भाषा"), p.languagePref),
-                row(Bi("Primary oncologist", "मुख्य ऑन्कोलॉजिस्ट"), r.careTeam.oncologist),
-                row(Bi("Palliative care physician", "पैलिएटिव केयर डॉक्टर"), listOf(r.careTeam.palliativePhysician, r.careTeam.palliativePhone24h).filter(String::isNotBlank).joinToString(" · ")),
-                row(Bi("Members present for the discussion", "बातचीत में मौजूद लोग"), dm.presentAtDiscussion.filter(String::isNotBlank).joinToString("; ")),
-                row(Bi("Primary decision-maker and contact", "मुख्य फ़ैसला लेने वाले और संपर्क"), person(dm.primary)),
-                row(Bi("Secondary decision-maker and contact", "द्वितीय फ़ैसला लेने वाले और संपर्क"), person(dm.alternate)),
-                row(Bi("Family to inform before any major decision", "बड़े फ़ैसले से पहले जिन्हें बताना है"), dm.familyToInform.filter(String::isNotBlank).joinToString("; ")),
+                GocFormGroup(Bi("Patient details", "मरीज़ की जानकारी"), listOf(
+                    field(Bi("Name", "नाम"), p.name), field(Bi("Age, Sex, Gender", "उम्र, लिंग, जेंडर"), listOf(p.dob, p.sex, p.gender).filter(String::isNotBlank).joinToString(" · ")),
+                    field(Bi("Address", "पता"), p.address), field(Bi("Phone number", "फ़ोन नंबर"), p.phone))),
+                GocFormGroup(Bi("Physician details", "डॉक्टरों की जानकारी"), listOf(
+                    field(Bi("Primary Oncologist name and hospital – and contact", "मुख्य ऑन्कोलॉजिस्ट का नाम और अस्पताल – और संपर्क"), r.careTeam.oncologist),
+                    field(Bi("Palliative care physician name and hospital – and contact", "पैलिएटिव केयर डॉक्टर का नाम और अस्पताल – और संपर्क"), listOf(r.careTeam.palliativePhysician, r.careTeam.palliativePhone24h).filter(String::isNotBlank).joinToString(" · ")),
+                    field(Bi("Additional space for the team – Surgical oncology, radiation oncology, etc.", "टीम के लिए और जगह – सर्जिकल ऑन्कोलॉजी, रेडिएशन ऑन्कोलॉजी आदि"), r.careTeam.extraTeam.filter(String::isNotBlank).joinToString("; ")),
+                    field(Bi("Additional option to add a local physician who can be briefed about the care and part of the team", "स्थानीय डॉक्टर जिन्हें देखभाल के बारे में बताया जा सके और जो टीम में हों"), r.careTeam.localDoctor))),
+                GocFormGroup(Bi("Family/Friend details", "परिवार/दोस्तों की जानकारी"), listOf(
+                    field(Bi("Members present for discussion and relationship with the patient", "बातचीत में मौजूद सदस्य और मरीज़ से रिश्ता"), dm.presentAtDiscussion.filter(String::isNotBlank).joinToString("; ")),
+                    field(Bi("Language preferred", "पसंद की भाषा"), p.languagePref))),
+                GocFormGroup(Bi("Primary decision maker and contact details · Secondary decision maker and contact details", "मुख्य फ़ैसला लेने वाले और संपर्क · द्वितीय फ़ैसला लेने वाले और संपर्क"), table = dmTable),
+                GocFormGroup(Bi("Family members who must be informed before any major decision (name, relation, phone)", "जिन परिवार वालों को किसी बड़े फ़ैसले से पहले बताना ज़रूरी है (नाम, रिश्ता, फ़ोन)"), listOf(
+                    field(Bi("Name, relation, phone", "नाम, रिश्ता, फ़ोन"), dm.familyToInform.filter(String::isNotBlank).joinToString("; ")),
+                    field(Bi("Family/friends who were attempted to be contacted, but were unavailable", "परिवार/दोस्त जिनसे संपर्क की कोशिश हुई, पर नहीं मिले"), dm.attemptedContact.filter(String::isNotBlank).joinToString("; ")))),
             )),
-            GocFormSection("II", Bi("Section II – Preliminary medical information and patient values", "भाग II – शुरुआती चिकित्सा जानकारी और मरीज़ के मूल्य"), listOfNotNull(
-                row(Bi("Primary diagnosis and stage", "मुख्य बीमारी और स्टेज"), listOf(r.clinical.diagnosis, r.clinical.stage, r.clinical.ecog?.let { "ECOG $it" }.orEmpty()).filter(String::isNotBlank).joinToString(" · ")),
-                Bi.labeled(Bi("Capacity, now", "अभी की निर्णय-क्षमता"), r.capacity.status?.let { PlanText.capacity(it) } ?: NOT_RECORDED),
-                Bi.labeled(Bi("Existing directives", "पहले के निर्देश"), directive(r.existingDirective)),
-                if (r.prognosticUnderstanding.confirmed) Bi("Condition explained: recorded in the plan", "बीमारी समझाना: योजना में दर्ज") else Bi("Condition explained: not recorded", "बीमारी समझाना: दर्ज नहीं"),
-                Bi.labeled(Bi("What the patient knows", "मरीज़ क्या जानते हैं"), when (v.patientKnows) { true -> Bi("Knows the diagnosis", "बीमारी के बारे में जानते हैं"); false -> Bi("Does not know the diagnosis", "बीमारी के बारे में नहीं जानते"); null -> NOT_RECORDED }),
-                if (v.familyAskedNotToTell) Bi("The family has asked that the patient not be told", "परिवार ने कहा कि मरीज़ को न बताया जाए") else null,
-                if (v.ownWords.isNotBlank()) Bi.labeled(GocPlan.title(GocDecision.VALUES), Bi.plain(v.ownWords.lines().map(GocExtract::withoutSoundCaptions).filter(String::isNotBlank).joinToString("; "))) else Bi.labeled(GocPlan.title(GocDecision.VALUES), NOT_RECORDED),
-            ) + v.unacceptableOutcomes.map(GocExtract::withoutSoundCaptions).filter(String::isNotBlank).map { Bi.labeled(Bi("Would not accept", "मंज़ूर नहीं"), Bi.plain(it)) }),
-            GocFormSection("III", Bi("Section III – Decisive actions", "भाग III – निर्णायक फ़ैसले"),
-                GocPlan.ORDER.filter { it != GocDecision.VALUES }.map { d -> Bi.labeled(GocPlan.title(d), GocNote.decisionValue(r, d, topics[d])) } +
-                    PlanText.homeCareLines(r) + PlanText.withdrawalLines(r)),
-            GocFormSection("IV", Bi("Section IV – Signatures and declarations", "भाग IV – हस्ताक्षर और घोषणाएँ"), listOf(
-                signed(r, Bi("Patient", "मरीज़")) { it.role == SignatureRole.PATIENT },
-                signed(r, Bi("Primary surrogate", "मुख्य प्रतिनिधि")) { it.role == SignatureRole.SURROGATE && it.surrogateRank != SurrogateRank.SECONDARY },
-                signed(r, Bi("Witness", "गवाह")) { it.role == SignatureRole.WITNESS },
-                signed(r, Bi("Treating consultant", "इलाज करने वाले कंसल्टेंट")) { it.role == SignatureRole.TREATING_CONSULTANT },
-                signed(r, Bi("Palliative care clinician", "पैलिएटिव केयर डॉक्टर")) { it.role == SignatureRole.PALLIATIVE_CLINICIAN },
+            GocFormSection("II", Bi("Section II – Preliminary medical information and patient values", "भाग II – शुरुआती चिकित्सा जानकारी और मरीज़ के मूल्य"), listOf(
+                GocFormGroup(Bi.plain(""), listOf(
+                    field(Bi("Primary diagnosis and stage", "मुख्य बीमारी और स्टेज"), listOf(r.clinical.diagnosis, r.clinical.stage).filter(String::isNotBlank).joinToString(" · ")),
+                    field(Bi("Functional status – ECOG", "काम करने की क्षमता – ECOG"), r.clinical.ecog?.toString()),
+                    firstOn(capacityTicks)?.let { GocFormRow(Bi("Patient’s capacity", "मरीज़ की क्षमता"), it) } ?: GocFormRow(Bi("Patient’s capacity", "मरीज़ की क्षमता"), NOT_DISCUSSED, open = true),
+                    firstOn(directiveTicks)?.let { GocFormRow(Bi("Existing medical directives", "पहले के चिकित्सा निर्देश"), it) } ?: GocFormRow(Bi("Existing medical directives", "पहले के चिकित्सा निर्देश"), NOT_DISCUSSED, open = true),
+                    firstOn(knowsTicks)?.let { GocFormRow(Bi("What the patient knows", "मरीज़ क्या जानते हैं"), it) } ?: GocFormRow(Bi("What the patient knows", "मरीज़ क्या जानते हैं"), NOT_DISCUSSED, open = true),
+                )),
+                GocFormGroup(Bi("4.1  The patient’s capacity, now", "4.1  मरीज़ की अभी की क्षमता"), listOf(boxes(blank, capacityTicks, NOT_DISCUSSED))),
+                GocFormGroup(Bi("4.2  Existing directives", "4.2  पहले के निर्देश"), listOf(boxes(blank, directiveTicks, NOT_DISCUSSED))),
+                GocFormGroup(Bi("5.3  What the patient knows", "5.3  मरीज़ क्या जानते हैं"), listOf(boxes(blank, knowsTicks, NOT_DISCUSSED))),
+                GocFormGroup(Bi("6.1  In their own words", "6.1  उनके अपने शब्दों में"), listOf(
+                    field(Bi("The most distressing physical symptom right now is", "अभी सबसे ज़्यादा तकलीफ़ देने वाला शारीरिक लक्षण है"), null),
+                    field(Bi("What matters most to me / to them is", "मेरे / उनके लिए सबसे ज़रूरी है"), v.ownWords.lines().map(GocExtract::withoutSoundCaptions).filter(String::isNotBlank).joinToString("; ")),
+                    field(Bi("What I am most afraid of is", "मुझे सबसे ज़्यादा डर है"), null),
+                    field(Bi("Unfinished things that matter (people to see, disputes to settle, papers to sign, a place to visit)", "अधूरे ज़रूरी काम (किससे मिलना है, कौन सा झगड़ा सुलझाना है, कौन से काग़ज़ साइन करने हैं, कहाँ जाना है)"), null))),
+                GocFormGroup(Bi("6.2  Outcomes that would be unacceptable  (tick any that apply)", "6.2  जो हालत मंज़ूर नहीं  (जो लागू हों उन पर निशान)"), listOf(boxes(blank, outcomeTicks, NOT_DISCUSSED))),
+            )),
+            GocFormSection("III", Bi("Section III – Decisive Actions", "भाग III – निर्णायक फ़ैसले"), listOf(
+                GocFormGroup(Bi("Home care (if relevant)", "घर पर देखभाल (अगर लागू हो)"), listOf(
+                    decision(Bi("Should the patient be brought to the hospital? (To inform any doctor that has been called to the home for evaluation)", "क्या मरीज़ को अस्पताल लाया जाए? (घर पर जाँच के लिए बुलाए गए किसी भी डॉक्टर को बताने के लिए)"), GocDecision.TRANSFER, transferTicks),
+                    field(Bi("If not, what is the frequency of assessments, and the details of the person coordinating between the patient/family and the relevant hospital/centre", "अगर नहीं, तो जाँच कितनी बार होगी, और मरीज़/परिवार और अस्पताल/केंद्र के बीच तालमेल रखने वाले व्यक्ति की जानकारी"), listOfNotNull(h?.assessmentFrequency, h?.coordinator).filter(String::isNotBlank).joinToString(" · ")),
+                    field(Bi("If a non-governmental organisation has been taking care of the patients, contact details of their representative + declaration confirming consultation with the NGO", "अगर कोई ग़ैर-सरकारी संस्था मरीज़ की देखभाल कर रही है, तो उसके प्रतिनिधि का संपर्क + संस्था से सलाह की पुष्टि"), h?.ngoContact?.takeIf(String::isNotBlank)?.let { it + if (h?.ngoConsulted == true) " · $TICK_ON NGO consulted" else "" }),
+                    field(Bi("Had they been previously admitted to any hospital for the current condition?", "क्या इसी बीमारी के लिए पहले किसी अस्पताल में भर्ती हुए थे?"), when (h?.previousAdmission) { true -> "Yes" + h?.previousAdmissionDetails.orEmpty().takeIf(String::isNotBlank)?.let { ": $it" }.orEmpty(); false -> "No"; null -> null }))),
+                GocFormGroup(Bi("Should CPR be performed?", "क्या CPR किया जाए?"), listOf(
+                    decision(Bi.plain("CPR"), GocDecision.CPR, cprTicks),
+                    field(Bi("Reason recorded (clinical futility / patient refusal / burden outweighs benefit)", "दर्ज कारण (इलाज बेअसर / मरीज़ ने मना किया / नुकसान फ़ायदे से ज़्यादा)"), reasonText),
+                    field(Bi("Discussed with (patient / surrogate / both)", "किससे बात हुई (मरीज़ / प्रतिनिधि / दोनों)"), c.dnacprDiscussedWith))),
+                GocFormGroup(Bi("What is the level of oxygen/ventilatory support that should be provided?", "ऑक्सीजन/साँस की कितनी मदद दी जानी चाहिए?"),
+                    if (ceiling == null) listOf(GocFormRow(Bi("Ceiling", "सबसे ऊँचा स्तर"), status(GocDecision.BREATHING, topics), open = true)) else emptyList(), oxygen),
+                GocFormGroup(Bi("Other parameters", "दूसरी बातें"), listOf(
+                    decision(Bi("Dialysis or CRRT", "डायलिसिस या CRRT"), GocDecision.DIALYSIS, dialysisTicks),
+                    field(Bi("Others", "अन्य"), null),
+                    decision(Bi("Requirement of ICU?", "ICU की ज़रूरत?"), GocDecision.ICU, icuTicks))),
+                GocFormGroup(Bi("If withdrawal and withholding of treatment has been decided (as per Common Cause v Union of India, 2018 and 2023)", "अगर इलाज रोकने और शुरू न करने का फ़ैसला हुआ है (कॉमन कॉज़ बनाम भारत संघ, 2018 और 2023 के अनुसार)"), listOf(
+                    wField(Bi("Dates of constitution of the Primary and Secondary Boards", "प्राथमिक और द्वितीय बोर्ड बनने की तारीख़ें"), listOfNotNull(w?.primaryBoardDate, w?.secondaryBoardDate).filter(String::isNotBlank).joinToString(" · ")),
+                    wField(Bi("Composition of the Boards", "बोर्ड के सदस्य"), listOfNotNull(w?.primaryBoardMembers, w?.secondaryBoardMembers).filter(String::isNotBlank).joinToString(" · ")),
+                    wField(Bi("Decision of the Boards", "बोर्ड का फ़ैसला"), w?.boardDecision),
+                    boxes(Bi("Final decision about withdrawal/withholding", "इलाज रोकने/शुरू न करने का अंतिम फ़ैसला"), finalTicks, NOT_DISCUSSED),
+                    wField(Bi("Protocol for withdrawal/withholding", "इलाज रोकने/शुरू न करने का तरीका"), w?.protocol))),
+                GocFormGroup(Bi("Vasopressors / inotropes", "वैसोप्रेसर / इनोट्रोप"), listOf(decision(Bi("Vasopressors / inotropes", "वैसोप्रेसर / इनोट्रोप"), GocDecision.VASOPRESSORS, vasoTicks))),
+                GocFormGroup(Bi("12.1  Feeding", "12.1  खाना"), listOf(
+                    GocFormRow(blank, blank, ticks = listOf(tk(true, Bi("Comfort feeding by mouth only — careful hand feeding, sips, tastes, favourite foods, no volume target, no forcing. Mouth care given regardless.", "केवल मुँह से आराम के लिए खाना — ध्यान से हाथ से खिलाना, घूँट, स्वाद, पसंद का खाना, कोई मात्रा लक्ष्य नहीं, कोई ज़बरदस्ती नहीं। मुँह की देखभाल हर हाल में।")))),
+                    decision(Bi("Nasogastric (Ryle’s) tube", "नाक की नली (राइल्स ट्यूब)"), GocDecision.FEEDING_NG, ngTicks),
+                    decision(Bi("Gastrostomy (PEG)", "पेट की नली (PEG)"), GocDecision.FEEDING_PEG, pegTicks))),
+                GocFormGroup(Bi("Goal of care", "देखभाल का लक्ष्य"), listOf(decision(Bi("A, B or C", "A, B या C"), GocDecision.GOAL, goalTicks))),
+            )),
+            GocFormSection("IV", Bi("Section IV – Signatures and declarations (SECTION 19 — Declarations and signatures)", "भाग IV – हस्ताक्षर और घोषणाएँ (भाग 19 — घोषणाएँ और हस्ताक्षर)"), listOf(
+                GocFormGroup(Bi("19.1  Patient", "19.1  मरीज़"), table = GocFormTable(listOf(
+                    cell(listOf(tk(cap.status == Capacity.HAS, Bi("I have made these choices myself.", "ये फ़ैसले मैंने ख़ुद लिए।")), tk(cap.status == Capacity.HAS_DELEGATED, Bi("I have chosen not to be involved in detail and have delegated to my surrogate.", "मैंने विस्तार में शामिल न होने का फ़ैसला किया और अपने प्रतिनिधि को सौंपा।")))),
+                    Bi("Signature / thumb impression", "हस्ताक्षर / अँगूठे का निशान"), Bi("Name in capitals", "बड़े अक्षरों में नाम"), Bi("Date", "तारीख़")),
+                    listOf(listOf(blank, if (patientSig != null) how(patientSig.thumbImpression) else if (patientDev != null) how(patientDev.thumb) else blank,
+                        Bi.plain((patientSig?.name ?: patientDev?.name.orEmpty()).uppercase()), Bi.plain((patientSig?.signedAt ?: patientDev?.signedAt.orEmpty()).take(10)))))),
+                GocFormGroup(Bi("19.2  Surrogate / healthcare proxy (primary and secondary surrogate decision-makers)", "19.2  प्रतिनिधि / हेल्थकेयर प्रॉक्सी (मुख्य और द्वितीय फ़ैसला लेने वाले)"), table = GocFormTable(listOf(
+                    cell(listOf(tk(r.surrogateDeclaration.confirmed, Bi("I confirm I am conveying what the patient would have wanted, so far as I can judge.", "मैं पुष्टि करता/करती हूँ कि जितना मैं समझ सकता/सकती हूँ, मैं वही बता रहा/रही हूँ जो मरीज़ चाहते।")))),
+                    Bi("Signature", "हस्ताक्षर"), Bi("Name & relationship", "नाम और रिश्ता"), Bi("Date", "तारीख़")), listOf(
+                    listOf(Bi("Primary", "मुख्य"), if (primary != null) how(primary.thumbImpression) else if (familyDev != null) how(familyDev.thumb) else blank,
+                        Bi.plain(primary?.name ?: familyDev?.let { f -> f.name + f.relation.takeIf(String::isNotBlank)?.let { " ($it)" }.orEmpty() }.orEmpty()), Bi.plain((primary?.signedAt ?: familyDev?.signedAt.orEmpty()).take(10))),
+                    listOf(Bi("Secondary", "द्वितीय"), secondary?.let { how(it.thumbImpression) } ?: blank, Bi.plain(secondary?.name.orEmpty()), Bi.plain(secondary?.signedAt.orEmpty().take(10)))))),
+                GocFormGroup(Bi("19.3  Witnesses  (required where the patient signs by thumb impression, or where literacy is limited – for both home-based and hospital-based evaluation)", "19.3  गवाह  (जब मरीज़ अँगूठा लगाएँ, या पढ़ना-लिखना कम हो, तब ज़रूरी – घर और अस्पताल दोनों जगह की जाँच में)"), table = GocFormTable(
+                    listOf(Bi("Witness — name", "गवाह — नाम"), Bi("Address / ID", "पता / पहचान"), Bi("Signature", "हस्ताक्षर"), Bi("Date", "तारीख़")), (0..1).map { i ->
+                        val s = witnesses.getOrNull(i); val d = if (i == 0 && s == null) witnessDev else null
+                        listOf(Bi.join("", listOf(Bi("Witness", "गवाह"), Bi.plain(" ${i + 1} — " + (s?.name ?: d?.name.orEmpty())))), Bi.plain(d?.relation.orEmpty()),
+                            if (s != null) how(s.thumbImpression) else if (d != null) how(d.thumb) else blank, Bi.plain((s?.signedAt ?: d?.signedAt.orEmpty()).take(10)))
+                    })),
+                GocFormGroup(Bi("19.4  Clinicians", "19.4  डॉक्टर और नर्स"), table = GocFormTable(
+                    listOf(Bi("ROLE", "भूमिका"), Bi("NAME", "नाम"), Bi("REGISTRATION NO.", "रजिस्ट्रेशन नंबर"), Bi("SIGNATURE", "हस्ताक्षर"), Bi("DATE", "तारीख़")), listOf(
+                        listOf(Bi("Treating consultant", "इलाज करने वाले कंसल्टेंट")) + clinician(SignatureRole.TREATING_CONSULTANT, dev("DOCTOR")),
+                        listOf(Bi("Palliative care clinician", "पैलिएटिव केयर डॉक्टर")) + clinician(SignatureRole.PALLIATIVE_CLINICIAN, null),
+                        listOf(Bi("Nurse involved in the discussion", "बातचीत में शामिल नर्स")) + clinician(SignatureRole.NURSE, null)))),
             )),
         )
+    }
+
+    private fun tickLine(t: GocFormTick) = Bi.join("", listOf(Bi.plain(box(t.on) + " "), t.text, Bi.plain(if (t.detail.isBlank()) "" else " " + t.detail)))
+
+    /** The section as plain lines: group title, "- label: value", each box indented, and tables as "| a | b |". */
+    fun lines(s: GocFormSection): List<Bi> = buildList {
+        s.groups.forEach { g ->
+            if (g.title.en.isNotBlank()) add(g.title)
+            g.rows.forEach { row ->
+                if (row.label.en.isNotBlank() || row.value.en.isNotBlank()) add(Bi.join("", listOf(Bi.plain("- "), if (row.label.en.isBlank()) row.value else Bi.labeled(row.label, row.value))))
+                row.ticks.forEach { add(Bi.join("", listOf(Bi.plain("    "), tickLine(it)))) }
+            }
+            g.table?.let { t -> (listOf(t.head) + t.rows).forEach { cells -> add(Bi.join("", listOf(Bi.plain("| "), Bi.join(" | ", cells.map { c -> Bi(c.en.replace("\n", " / "), c.hi.replace("\n", " / "), c.pick(false).replace("\n", " / ")) }), Bi.plain(" |")))) } }
+        }
     }
 }
 
@@ -849,5 +1070,17 @@ object GocLatest {
             if (by != null) superseded += earlier to by else current += earlier
         }
         return GocStanding(current, superseded)
+    }
+}
+
+/** "Confirm all suggested" (rule V1): only options the talk stated, one clear option per decision; never a default, nothing undiscussed. */
+object GocSuggest {
+    /** The one option to set, or null when nothing was said, different people disagree, or the words fit several options. */
+    fun single(standing: GocStanding): String? = if (standing.conflict) null else standing.suggested.keys.singleOrNull()
+    /** Everything Confirm all applies, in the form's order: decision, option id, the words. Words about what matters add up, so each is listed. */
+    fun all(extraction: GocExtraction, lines: List<GocLine>?): List<Triple<GocDecision, String, List<String>>> = GocPlan.ORDER.flatMap { d ->
+        val s = GocLatest.standing(extraction, d, lines)
+        if (d == GocDecision.VALUES) s.suggested.map { (id, hits) -> Triple(d, id, hits.map { it.quote }) }
+        else single(s)?.let { id -> listOf(Triple(d, id, s.suggested[id].orEmpty().map { it.quote })) }.orEmpty()
     }
 }

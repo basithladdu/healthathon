@@ -978,8 +978,8 @@ function Wizard({ t, lang, draft, previous, issues, step, busy, error, toast, di
   const stepBody = useRef<HTMLDivElement>(null);
   const [gocOpen, setGocOpen] = useState(false);
   const gocEntry = <div className="ep-notice ep-info ep-goc-entry">
-    <p>{t('Talked this through with the patient or family? Record it, or paste your notes, to see every choice next to what was said.', 'मरीज़ या परिवार से इस पर बात की? इसे रिकॉर्ड करें, या नोट पेस्ट करें, ताकि हर फ़ैसला कही गई बात के साथ दिखे।')}</p>
-    <button type="button" className="ep-btn ep-quiet" onClick={() => setGocOpen(true)}>{t('Transcribe the conversation', 'बातचीत लिखें')}</button>
+    <p><strong>{t('Goals-of-care conversation', 'देखभाल के लक्ष्यों की बातचीत')}</strong></p>
+    <button type="button" className="ep-btn" onClick={() => setGocOpen(true)}>{t('Record the conversation', 'बातचीत रिकॉर्ड करें')}</button>
   </div>;
 
   const lockNotice = (locked || surrogateLocked) ? <div className="ep-notice ep-warn ep-lock" role="status">

@@ -392,8 +392,10 @@ test('the draft note follows the form, states decisions, keeps no emotion and no
   const lines = [{ text: 'I am so scared and crying [crying], no ICU please', speaker: 'PATIENT_PARTY' }];
   const rows = gocTopicRows(extractGoc(lines).topics, { dialysis: { status: 'NOT_DISCUSSED', verifiedBy: 'Dr Test', verifiedAt: NOW.toISOString() } });
   const note = buildGocNote(r, rows, 'en', { reviewedBy: 'Dr Test', reviewedAt: NOW.toISOString() });
-  assert.match(note, /Requirement of ICU: No — ward-level/);
+  assert.match(note, /Requirement of ICU\?: No — ward-level/);
+  assert.match(note, /Requirement of ICU\?[^\n]*\n {4}☐ Yes\n {4}☐ Time-limited trial\n {4}☑ No/, 'the boxes print like the paper form, the chosen one ticked');
   assert.match(note, /Dialysis or CRRT: Not discussed \(doctor verified\)\. No preference recorded/);
+  assert.match(note, /- What I am most afraid of is: Not discussed/, 'a blank nobody filled reads Not discussed');
   assert.match(note, /- CPR: Not discussed\. No preference recorded/);
   assert.match(note, /I want to go home/);
   assert.doesNotMatch(note, /scared|crying/);
@@ -477,7 +479,7 @@ test('server reading: off without keys, needs consent, and only exact quotes and
 // web matcher is known to miss, with the reason, so a gap is reported rather than hidden.
 import { readFileSync, readdirSync } from 'node:fs';
 import { gocUndiscussed } from '../app/goc-extract.ts';
-import { buildGocFormDocument, gocFormHtml } from '../app/goc-form.ts';
+import { buildGocFormDocument, gocFormHtml, gocFormText } from '../app/goc-form.ts';
 import { crc32, gocFormDocx } from '../app/goc-docx.ts';
 const MOCKS = new URL('../../docs/goc-mock-conversations/', import.meta.url);
 const mockText = (file) => readFileSync(new URL(file, MOCKS), 'utf8').split(/\r?\n/).filter((line) => !line.startsWith('#')).join('\n');
@@ -520,7 +522,7 @@ test('the note comes out as a printable page and a Word file in the legal form�
   const doc = buildGocFormDocument(r, gocTopicRows(extractGoc('Do not do CPR.').topics, {}), 'en', { reviewedBy: 'Dr Test', reviewedAt: NOW.toISOString() });
   assert.deepEqual(doc.sections.map((s) => s.id), ['I', 'II', 'III', 'IV']);
   const html = gocFormHtml(doc);
-  assert.match(html, /Section I – General information[\s\S]*Section II[\s\S]*Section III – Decisive actions[\s\S]*Section IV – Signatures/);
+  assert.match(html, /Section I – General information[\s\S]*Section II[\s\S]*Section III – Decisive Actions[\s\S]*Section IV – Signatures/);
   assert.doesNotMatch(html, /<script/);
   const bytes = gocFormDocx(doc);
   assert.deepEqual([...bytes.slice(0, 4)], [0x50, 0x4b, 0x03, 0x04]);
@@ -528,4 +530,69 @@ test('the note comes out as a printable page and a Word file in the legal form�
   assert.match(text, /word\/document\.xml/);
   assert.match(text, /Do not attempt CPR \(DNACPR\)/);
   assert.equal(crc32(new TextEncoder().encode('123456789')), 0xcbf43926);
+});
+
+test('every heading, field, box and table of Rituparna’s form is in the note, in the form’s order and words', () => {
+  const r = draft();
+  applyGocDecision(r, 'respCeiling', '1'); r.choices.maxOxygenLpm = 2;
+  applyGocDecision(r, 'hospitalTransfer', 'ONLY_FOR', { reasons: ['PAIN'] });
+  const doc = buildGocFormDocument(r, [], 'en', { reviewedBy: 'Dr Test', reviewedAt: NOW.toISOString(), deviceSignatures: [{ role: 'DOCTOR', name: 'Dr Test', method: 'DRAWN', signedAt: NOW.toISOString(), registrationNo: 'KMC 1' }] });
+  const note = gocFormText(doc);
+  const lower = note.toLowerCase();
+  const form = [
+    'Section I – General information', 'Patient details', 'Age, Sex, Gender', 'Physician details', 'Primary Oncologist name and hospital – and contact',
+    'Palliative care physician name and hospital – and contact', 'Additional space for the team – Surgical oncology, radiation oncology, etc.',
+    'Additional option to add a local physician', 'Family/Friend details', 'Members present for discussion and relationship with the patient', 'Language preferred',
+    'PRIMARY', 'SECONDARY', 'Relationship to patient', 'Phone (must be reachable 24 h)', 'ID type & number', 'Basis for authority', 'Named by patient', 'Family consensus', 'Named in AMD', 'Court-appointed',
+    'Family members who must be informed before any major decision (name, relation, phone)', 'attempted to be contacted, but were unavailable',
+    'Section II – Preliminary medical information and patient values', 'Primary diagnosis and stage', 'Functional status – ECOG', 'Patient’s capacity', 'Existing medical directives',
+    '4.1  The patient’s capacity, now', 'Capacity fluctuates.', 'Basis of assessment (understand / retain / weigh / communicate)', '4.2  Existing directives', 'Attested by Notary', 'Gazetted Officer',
+    'with two witnesses', 'No directive and no recorded prior wishes.', '5.3  What the patient knows', 'The patient knows the diagnosis and the prognosis.', 'will not be lied to',
+    'do not wish to know details and has delegated', '6.1  In their own words', 'The most distressing physical symptom right now is', 'What matters most to me / to them is',
+    'What I am most afraid of is', 'Unfinished things that matter', '6.2  Outcomes that would be unacceptable', 'Exhausting the family’s savings', 'Other:',
+    'Section III – Decisive Actions', 'Home care (if relevant)', 'Should the patient be brought to the hospital?', 'YES — for any significant deterioration.', '☑ ONLY FOR THE FOLLOWING', '☑     Pain that cannot be controlled at home',
+    'Caregiver unable to cope — respite admission', 'NO — the patient is to be cared for where they are.', 'frequency of assessments', 'non-governmental organisation', 'previously admitted', 'Should CPR be performed?', 'ATTEMPT CPR.', 'DO NOT ATTEMPT CPR (DNACPR).', 'Reason recorded (clinical futility / patient refusal / burden outweighs benefit)',
+    'Discussed with (patient / surrogate / both)', 'What is the level of oxygen/ventilatory support', '| LEVEL | WHAT IT MEANS FOR THE PATIENT | CEILING |', 'Low-flow oxygen up to 2 L/min', '| 1 | Nasal prongs / simple face mask',
+    'Intubation and invasive mechanical ventilation', 'Other parameters', 'Dialysis or CRRT', 'Only if the renal failure is judged reversible', 'Others', 'Requirement of ICU?', 'Common Cause v Union of India, 2018 and 2023',
+    'Dates of constitution of the Primary and Secondary Boards', 'Composition of the Boards', 'Decision of the Boards', 'Final decision about withdrawal/withholding', 'Protocol for withdrawal/withholding',
+    'Vasopressors / inotropes', 'Short trial only, up to ______ hours', 'no escalation beyond ____ agents', '12.1  Feeding',
+    '☑ Comfort feeding by mouth only', 'Nasogastric (Ryle’s) tube', 'up to ______ days, then review', 'Gastrostomy (PEG)', 'Only after discussion with the palliative care team',
+    'A. PRIORITISE LIFE', 'B. BALANCED / CEILING OF CARE', 'C. PRIORITISE COMFORT', 'SECTION 19 — Declarations and signatures', '19.1  Patient', 'I have made these choices myself.',
+    'delegated to my surrogate', 'Signature / thumb impression', 'Name in capitals', '19.2  Surrogate / healthcare proxy (primary and secondary surrogate decision-makers)',
+    'so far as I can judge', 'Name & relationship', '19.3  Witnesses', 'Address / ID', '19.4  Clinicians', '| ROLE | NAME | REGISTRATION NO. | SIGNATURE | DATE |', '| Treating consultant | Dr Test | KMC 1 | Signed |',
+    'Palliative care clinician', 'Nurse involved in the discussion',
+  ];
+  let at = 0;
+  for (const words of form) {
+    const found = lower.indexOf(words.toLowerCase(), words.startsWith('|') || words.startsWith('☑') ? 0 : at);
+    assert.ok(found >= 0, `missing from the note: ${words}`);
+    if (!words.startsWith('|') && !words.startsWith('☑')) at = found;
+  }
+  assert.match(note, /\| 1 \| [^|]* \| ☑ \|/, 'the ceiling box is ticked in the oxygen table');
+});
+
+import { gocNeedsSpeakers, gocSuggestedValue, GOC_DECISION_FIELDS } from '../app/goc-extract.ts';
+
+test('Confirm all (V1): only one clear option the talk stated is applied; disagreements, locks and silence set nothing', () => {
+  for (const file of readdirSync(MOCKS).filter((name) => name.endsWith('.txt'))) {
+    const lines = gocLinesFromText(mockText(file));
+    const found = extractGoc(lines);
+    const r = draft();
+    for (const field of GOC_DECISION_FIELDS) {
+      const value = gocSuggestedValue(found.suggestions, field, gocFieldLock(r, field));
+      const info = gocMarksFor(found.suggestions, field);
+      if (!info.own.length || info.conflict) assert.equal(value, null, `${file} ${field}: nothing said or people disagree, so nothing is applied`);
+      if (value !== null) { assert.ok(info.suggested.includes(value), `${file} ${field}: the value was said`); applyGocDecision(r, field, value); }
+      if (!info.own.length) assert.equal(gocCurrentValue(r, field), null, `${file} ${field}: undiscussed stays No preference recorded`);
+    }
+  }
+  const locked = emptyEctpr('P1', { name: 'A', uhid: '' }, 'Dr', NOW);
+  assert.equal(gocSuggestedValue(extractGoc('Patient: No. I do not want CPR.').suggestions, 'cpr', gocFieldLock(locked, 'cpr')), null, 'a closed gate applies nothing');
+  assert.equal(gocSuggestedValue(extractGoc('Patient: No. I do not want CPR.').suggestions, 'cpr', null), 'DNACPR');
+});
+
+test('"Who’s the doctor?" is asked only when no line says who spoke', () => {
+  assert.equal(gocNeedsSpeakers([{ text: 'Would you want CPR?', speaker: null }, { text: 'No.', speaker: null }]), true);
+  assert.equal(gocNeedsSpeakers(gocLinesFromText('Doctor: Would you want CPR?\nPatient: No.')), false);
+  assert.equal(gocNeedsSpeakers([{ text: 'One line', speaker: null }]), false);
 });

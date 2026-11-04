@@ -143,7 +143,7 @@ internal fun gocRenderSignaturePng(strokes: List<List<Pair<Float, Float>>>, thum
  * Clear and Done buttons and a "Thumb impression" switch. [onDone] gets the PNG; return true to clear the pad,
  * false to keep the drawing (say a name is still missing).
  */
-@Composable internal fun GocSignaturePad(onDone: (GocPadResult) -> Boolean, modifier: Modifier = Modifier, enabled: Boolean = true, allowThumb: Boolean = true) { val t = careText()
+@Composable internal fun GocSignaturePad(onDone: (GocPadResult) -> Boolean, modifier: Modifier = Modifier, enabled: Boolean = true, allowThumb: Boolean = true, doneLabel: String? = null) { val t = careText()
     var strokes by remember { mutableStateOf(listOf<List<Pair<Float, Float>>>()) }
     var thumb by remember { mutableStateOf(false) }
     val ready = GocSignatureInk.ready(strokes, thumb)
@@ -190,7 +190,7 @@ internal fun gocRenderSignaturePng(strokes: List<List<Pair<Float, Float>>>, thum
                 val png = gocRenderSignaturePng(strokes, thumb)
                 val result = GocPadResult(png, strokes.size, GocSignOffRules.isoNow(), if (thumb) GocSignOffRules.THUMB else GocSignOffRules.DRAWN, GocSignatureInk.MAX_WIDTH, (GocSignatureInk.MAX_WIDTH / GocSignatureInk.ASPECT).toInt())
                 if (onDone(result)) strokes = emptyList()
-            }, enabled = enabled && ready, colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent), modifier = Modifier.heightIn(min = 48.dp).testTag("goc-signature-done")) { Text(t("Done", "हो गया")) }
+            }, enabled = enabled && ready, colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent), modifier = Modifier.heightIn(min = 48.dp).testTag("goc-signature-done")) { Text(doneLabel ?: t("Done", "हो गया")) }
         }
     }
 }

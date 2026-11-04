@@ -122,15 +122,8 @@ internal object CarePlanPdf {
             // The goals-of-care note in the legal form's structure (Sections I to IV), as the doctors asked on 3 Nov 2026. Never on the wallet card.
             r.gocTranscript?.takeIf { it.planVersion == r.version }?.let { g ->
                 d.blocks += PageBreak
-                d.text(p(Bi("Goals-of-care note, in the order of the legal form", "देखभाल के लक्ष्यों का नोट, क़ानूनी फ़ॉर्म के क्रम में")), h1, 24f)
-                d.text(p(GocNote.kindLabel(g.noteKind)), body)
-                g.signOff?.let { so -> d.text(p(Bi("Signed and locked on the doctor's device", "डॉक्टर के डिवाइस पर साइन होकर बंद")) + ": " + so.signers.joinToString(", ") + " · " + so.lockedAt.take(16).replace('T', ' ') + " · SHA-256 " + so.sealSha256.take(16), bold) }
-                    ?: d.text(p(Bi("The note is not signed yet.", "नोट पर अभी हस्ताक्षर नहीं हुए।")), paint(10.5f, true, alert))
-                GocForm.sections(r, g.topics.associateBy { it.decision }).forEach { section ->
-                    d.space(6f); d.text(p(section.title), h2, 18f)
-                    section.rows.forEach { d.text(p(it), body) }
-                }
-                if (g.note.isNotBlank()) { d.space(6f); d.text(p(Bi("Doctor's note", "डॉक्टर का नोट")), h2, 18f); d.text(g.note, body) }
+                gocForm(d, r, g.topics.associateBy { it.decision }, hindi, g.signOff?.let { so -> p(Bi("Signed and locked on the doctor's device", "डॉक्टर के डिवाइस पर साइन होकर बंद")) + ": " + so.signers.joinToString(", ") + " · " + so.lockedAt.take(16).replace('T', ' ') }
+                    ?: p(Bi("The note is not signed yet.", "नोट पर अभी हस्ताक्षर नहीं हुए।")), g.note, emptyList())
             }
             if (cardUrl != null) {
                 d.space(16f); d.text(p(Bi("Wallet card — cut out and keep with the patient", "वॉलेट कार्ड — काटकर मरीज़ के पास रखें")), h2, 20f)
@@ -147,6 +140,51 @@ internal object CarePlanPdf {
             }
         }
         render(file, d) { page, pages -> EctprRules.pageFooter(r, today, page, pages) }
+    }
+
+    /**
+     * The goals-of-care note on its own, in the legal form's layout (Rituparna's form, legal review 31 Oct 2026): Sections I to IV with the form's
+     * tick boxes and tables, then the doctor's note. The same drawing as the plan PDF's goals-of-care pages, so both read the same.
+     */
+    fun gocNote(file: File, r: EctprRecord, hindi: Boolean, today: LocalDate, note: String = r.gocTranscript?.note.orEmpty(), status: String = "",
+        topics: Map<GocDecision, GocTopicRecord> = r.gocTranscript?.topics.orEmpty().associateBy { it.decision }, signers: List<GocFormSigner> = emptyList()) {
+        val d = Doc()
+        gocForm(d, r, topics, hindi, status, note, signers)
+        render(file, d) { page, pages -> EctprRules.pageFooter(r, today, page, pages) }
+    }
+
+    private fun gocForm(d: Doc, r: EctprRecord, topics: Map<GocDecision, GocTopicRecord>, hindi: Boolean, status: String, note: String, signers: List<GocFormSigner>) {
+        fun p(b: Bi) = b.pick(hindi)
+        val h1 = paint(16f, true); val h2 = paint(12f, true); val h3 = paint(10.5f, true, android.graphics.Color.rgb(122, 59, 38))
+        val body = paint(9.5f); val head = paint(9f, true); val sand = android.graphics.Color.rgb(246, 236, 225)
+        d.text(p(Bi("Emergency care and treatment plan: goals of care", "आपातकालीन देखभाल और इलाज की योजना: देखभाल के लक्ष्य")), h1, 22f)
+        d.text(listOf(r.patient.name, p(Bi("Goals-of-care conversation note, in the order of the legal form", "देखभाल के लक्ष्यों की बातचीत का नोट, क़ानूनी फ़ॉर्म के क्रम में"))).filter(String::isNotBlank).joinToString(" · "), body)
+        if (status.isNotBlank()) d.text(status, paint(9.5f, true))
+        GocForm.sections(r, topics, signers).forEach { section ->
+            d.space(6f); d.box(sand, "${section.id}   " + p(section.title) to h2)
+            section.groups.forEach { g ->
+                if (g.title.en.isNotBlank()) { d.space(3f); d.text(p(g.title), h3, 15f) }
+                g.rows.forEach { row ->
+                    val value = (listOf(p(row.value)).filter(String::isNotBlank) + row.ticks.map { t -> (if (t.on) GocForm.TICK_ON else GocForm.TICK_OFF) + " " + p(t.text) + (if (t.detail.isBlank()) "" else " " + t.detail) }).joinToString("\n")
+                    if (row.label.en.isBlank()) d.blocks += TableRow(listOf(wrap(value, body, 503f)), listOf(511f), body, 0f, 0f)
+                    else d.blocks += TableRow(listOf(wrap(p(row.label), head, 188f), wrap(value, body, 307f)), listOf(196f, 315f), body, 0f, 0f)
+                }
+                g.table?.let { t ->
+                    val n = t.head.size
+                    val widths = when {
+                        n == 3 && t.head[0].en == "LEVEL" -> listOf(46f, 385f, 80f)
+                        n == 3 -> listOf(171f, 170f, 170f)
+                        n == 4 -> listOf(201f, 120f, 120f, 70f)
+                        n == 5 -> listOf(141f, 120f, 100f, 80f, 70f)
+                        else -> List(n) { 511f / n }
+                    }
+                    d.blocks += TableRow(t.head.mapIndexed { i, c -> wrap(p(c), head, widths[i] - 8f) }, widths, head, 0f, 0f)
+                    t.rows.forEach { cells -> d.blocks += TableRow(cells.mapIndexed { i, c -> wrap(p(c), body, widths[i] - 8f) }, widths, body, 0f, 0f) }
+                }
+            }
+        }
+        // The signed note is the form itself; only a note the doctor wrote in their own words is printed after it.
+        if (note.isNotBlank() && !note.contains("SECTION I – GENERAL INFORMATION") && !note.contains("भाग I – सामान्य जानकारी")) { d.space(8f); d.text(p(Bi("Doctor's note", "डॉक्टर का नोट")), h2, 18f); d.text(note, body) }
     }
 
     /** The Vidhi layout from [AmdDocument]: English operative text in a serif face, headings also in the chosen language, signature and ID boxes blank for handwriting. */

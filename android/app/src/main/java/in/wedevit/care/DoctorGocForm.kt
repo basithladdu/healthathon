@@ -28,6 +28,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.time.Instant
+import java.time.LocalDate
 
 /**
  * One goals-of-care discussion as the doctor reads it, in the legal form's layout (Sections I to IV, legal review 31 Oct 2026).
@@ -39,7 +40,7 @@ internal data class DoctorGocDiscussion(
     val at: String, val signOff: GocSignOffSummary?, val note: String,
 ) {
     val signed: Boolean get() = signOff != null
-    fun sections(): List<GocFormSection> = GocForm.sections(record, topics)
+    fun sections(): List<GocFormSection> = GocForm.sections(record, topics, signOff?.formSigners().orEmpty())
 }
 
 internal object DoctorGocDiscussions {
@@ -75,35 +76,11 @@ internal object DoctorGocDiscussions {
 
 /** The doctor-side PDF of one discussion: the form's sections as text, A4, page x of y. Drawn like [CarePlanPdf], never on the wallet card. */
 internal object DoctorGocPdf {
+    /** The same layout as the plan PDF's goals-of-care pages ([CarePlanPdf.gocNote]): the legal form with its boxes and tables. */
     fun write(context: Context, d: DoctorGocDiscussion, hindi: Boolean, status: String): File {
         val folder = File(context.cacheDir, "doctor-preview-exports").apply { mkdirs() }
         val file = File(folder, "goals-of-care-${d.id.filter { it.isLetterOrDigit() || it == '-' }.take(48)}.pdf")
-        val ink = android.graphics.Color.rgb(56, 46, 41)
-        val paints = listOf(17f to true, 13f to true, 10.5f to false).map { (size, bold) -> Paint(Paint.ANTI_ALIAS_FLAG).apply { textSize = size; isFakeBoldText = bold; color = ink } }
-        val small = Paint(Paint.ANTI_ALIAS_FLAG).apply { textSize = 8f; color = ink }
-        fun wrap(value: String, paint: Paint): List<String> = value.lines().flatMap { original ->
-            val out = mutableListOf<String>(); var rest = original
-            if (rest.isEmpty()) out += ""
-            while (rest.isNotEmpty()) {
-                val count = paint.breakText(rest, true, 511f, null).coerceAtLeast(1)
-                val split = if (count < rest.length) rest.lastIndexOf(' ', count).takeIf { it > 0 } ?: count else count
-                out += rest.take(split); rest = rest.drop(split).trimStart()
-            }
-            out
-        }
-        val lines = DoctorGocDiscussions.pdfLines(d, hindi, status).flatMap { (text, level) -> (if (level == 1) listOf("" to paints[2]) else emptyList()) + wrap(text, paints[level]).map { it to paints[level] } }
-        val pages = mutableListOf(mutableListOf<Pair<String, Paint>>()); var y = 48f
-        lines.forEach { line -> val h = line.second.textSize + 5f; if (y + h > 790f && pages.last().isNotEmpty()) { pages += mutableListOf<Pair<String, Paint>>(); y = 48f }; pages.last() += line; y += h }
-        val pdf = PdfDocument()
-        try {
-            pages.forEachIndexed { i, page ->
-                val p = pdf.startPage(PdfDocument.PageInfo.Builder(595, 842, i + 1).create()); var top = 48f
-                page.forEach { (text, paint) -> p.canvas.drawText(text, 42f, top + paint.textSize, paint); top += paint.textSize + 5f }
-                p.canvas.drawText("${d.record.patient.name} · Sahara · ${i + 1} / ${pages.size}", 42f, 808f, small)
-                pdf.finishPage(p)
-            }
-            file.outputStream().use { pdf.writeTo(it) }
-        } finally { pdf.close() }
+        CarePlanPdf.gocNote(file, d.record, hindi, LocalDate.now(), note = d.note, status = status, topics = d.topics, signers = d.signOff?.formSigners().orEmpty())
         return file
     }
 
@@ -127,18 +104,9 @@ internal object DoctorGocPdf {
     }
 }
 
-/** Sections I to IV as headed cards. */
-@Composable internal fun DoctorGocFormSections(d: DoctorGocDiscussion) { val hindi = careHindi()
-    Column(Modifier.fillMaxWidth().testTag("doctor-goc-form"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        d.sections().forEach { section ->
-            Surface(color = DoctorCardReport, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("doctor-goc-section-${section.id}")) {
-                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Text(section.title.pick(hindi), Modifier.a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 18.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
-                    section.rows.forEach { row -> SelectionContainer { Text(row.pick(hindi), fontSize = 14.sp, lineHeight = 21.sp, color = DoctorCardInk) } }
-                }
-            }
-        }
-    }
+/** Sections I to IV as the legal form, the same view the talk screen shows ([GocFormView]). */
+@Composable internal fun DoctorGocFormSections(d: DoctorGocDiscussion) {
+    GocFormView(d.sections(), Modifier.testTag("doctor-goc-form"))
 }
 
 /** The PDF button: writes the form's sections with [DoctorGocPdf] and opens the share sheet. */

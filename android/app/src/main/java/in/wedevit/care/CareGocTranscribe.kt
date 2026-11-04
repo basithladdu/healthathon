@@ -170,7 +170,7 @@ internal class GocSpeechEngine(context: Context) {
     companion object { private val lock = Mutex() }
 }
 
-internal data class GocRecorderState(val recording: Boolean = false, val seconds: Int = 0, val level: Float = 0f, val clips: List<DoctorAudioClip> = emptyList(), val playing: String? = null, val error: Bi? = null)
+internal data class GocRecorderState(val recording: Boolean = false, val seconds: Int = 0, val level: Float = 0f, val clips: List<DoctorAudioClip> = emptyList(), val playing: String? = null, val error: Bi? = null, val paused: Boolean = false)
 
 /**
  * The microphone for a long talk. DoctorAudioController stops at 299 s and 3 MB because of the cloud route's limits, and this flow has no cloud route, so it records on its own here.
@@ -203,17 +203,46 @@ internal class GocRecorder(context: Context, folder: File, private val personId:
             next.setOnInfoListener { _, what, _ -> if (what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED || what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_FILESIZE_REACHED) stop() }
             next.setOutputFile(file.absolutePath); next.prepare(); next.start()
             recorder = next; active = DoctorAudioClip(id, file, consent)
-            state.value = state.value.copy(recording = true, seconds = 0, error = null)
-            val started = SystemClock.elapsedRealtime()
+            state.value = state.value.copy(recording = true, paused = false, seconds = 0, error = null)
+            var last = SystemClock.elapsedRealtime(); var spoken = 0L
             meter = scope.launch { while (isActive) { delay(250)
-                val level = runCatching { DoctorLocalAudioRules.level(next.maxAmplitude) }.getOrDefault(0f)
-                state.value = state.value.copy(seconds = ((SystemClock.elapsedRealtime() - started) / 1000).toInt(), level = level)
+                val now = SystemClock.elapsedRealtime(); if (!state.value.paused) spoken += now - last; last = now
+                val level = if (state.value.paused) 0f else runCatching { DoctorLocalAudioRules.level(next.maxAmplitude) }.getOrDefault(0f)
+                state.value = state.value.copy(seconds = (spoken / 1000).toInt(), level = level)
             } }
         } catch (_: Exception) {
             next.release(); file.delete()
             state.value = state.value.copy(recording = false, error = Bi("The microphone could not start. Check permission and try again.", "माइक्रोफ़ोन शुरू नहीं हुआ। अनुमति जाँचकर फिर कोशिश करें।"))
         }
     }
+
+    /** Pause and resume one recording (Android 7 and later), so a break in the talk is not recorded. */
+    fun pause() { val current = recorder ?: return; if (android.os.Build.VERSION.SDK_INT >= 24 && runCatching { current.pause() }.isSuccess) state.value = state.value.copy(paused = true) }
+    fun resume() { val current = recorder ?: return; if (android.os.Build.VERSION.SDK_INT >= 24 && runCatching { current.resume() }.isSuccess) state.value = state.value.copy(paused = false) }
+
+    /** An audio file chosen by the doctor, copied into the plan folder with the same consent sidecar as a recording. Returns the new clip, or null. */
+    fun import(uri: android.net.Uri, participants: String, agreed: Set<String>): DoctorAudioClip? {
+        if (recorder != null) return null
+        val id = UUID.randomUUID().toString(); val file = File(directory, "$id.m4a")
+        return try {
+            val consent = RecordingConsentRules.create(personId, file.absolutePath, participants, agreed, true, true, true, transcriptionAccepted = false)
+            directory.mkdirs()
+            val copied = app.contentResolver.openInputStream(uri)?.use { input -> file.outputStream().use { out -> input.copyTo(out) } } ?: 0L
+            require(copied in 1..GOC_MAX_AUDIO_BYTES)
+            val json = JSONObject().put("id", id).put("patientId", personId).put("participants", consent.participants).put("recordingConsentAt", consent.recordingConsentAt).put("transcriptionConsentAt", consent.transcriptionConsentAt).put("noticeVersion", consent.noticeVersion)
+            val atomic = AtomicFile(File(directory, "$id.json")); val stream = atomic.startWrite()
+            try { stream.write(json.toString().toByteArray()); atomic.finishWrite(stream) } catch (e: Exception) { atomic.failWrite(stream); throw e }
+            refresh()
+            state.value.clips.firstOrNull { it.id == id }
+        } catch (_: Exception) {
+            file.delete()
+            state.value = state.value.copy(error = Bi("This file could not be used. Choose an audio file under 100 MB.", "यह फ़ाइल इस्तेमाल नहीं हो सकी। 100 MB से छोटी ऑडियो फ़ाइल चुनें।"))
+            null
+        }
+    }
+
+    /** Stops and returns the saved clip, so the screen can read it straight away. */
+    fun stopAndGet(): DoctorAudioClip? { val id = active?.id ?: return null; stop(); return state.value.clips.firstOrNull { it.id == id } }
 
     fun stop() {
         val current = recorder ?: return
@@ -230,7 +259,7 @@ internal class GocRecorder(context: Context, folder: File, private val personId:
         } catch (_: Exception) {
             clip?.file?.delete()
             state.value = state.value.copy(error = Bi("The recording was too short or could not be saved. Try again.", "रिकॉर्डिंग बहुत छोटी थी या सेव नहीं हुई। फिर कोशिश करें।"))
-        } finally { current.release(); state.value = state.value.copy(recording = false, level = 0f); refresh() }
+        } finally { current.release(); state.value = state.value.copy(recording = false, paused = false, level = 0f); refresh() }
     }
 
     fun play(clip: DoctorAudioClip) {

@@ -1,6 +1,6 @@
 // A Word (.docx) file of the goals-of-care form, made in the browser with no library: a stored (uncompressed) zip of three XML parts.
 // Word, LibreOffice and Google Docs open it. Headings and two-column tables follow the legal form's Sections I to IV.
-import type { GocFormDocument } from './goc-form.ts';
+import type { GocFormDocument, GocFormRow, GocFormTable } from './goc-form.ts';
 
 const CRC_TABLE = (() => {
   const table = new Uint32Array(256);
@@ -45,9 +45,30 @@ export function storedZip(files: Array<{ name: string; data: Uint8Array }>): Uin
 const xml = (value: string) => value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const run = (text: string, props = '') => `<w:r>${props ? `<w:rPr>${props}</w:rPr>` : ''}<w:t xml:space="preserve">${xml(text)}</w:t></w:r>`;
 const para = (text: string, { size = 22, bold = false, rtl = false, shade = '' } = {}) =>
-  `<w:p><w:pPr>${rtl ? '<w:bidi/>' : ''}${shade ? `<w:shd w:val="clear" w:color="auto" w:fill="${shade}"/>` : ''}<w:spacing w:after="80"/></w:pPr>${text.split('\n').map((line, i) => (i ? '<w:r><w:br/></w:r>' : '') + run(line, `${bold ? '<w:b/>' : ''}<w:sz w:val="${size}"/>${rtl ? '<w:rtl/>' : ''}`)).join('')}</w:p>`;
+  `<w:p><w:pPr>${shade ? `<w:shd w:val="clear" w:color="auto" w:fill="${shade}"/>` : ''}${rtl ? '<w:bidi/>' : ''}<w:spacing w:after="80"/></w:pPr>${text.split('\n').map((line, i) => (i ? '<w:r><w:br/></w:r>' : '') + run(line, `${bold ? '<w:b/>' : ''}<w:sz w:val="${size}"/>${rtl ? '<w:rtl/>' : ''}`)).join('')}</w:p>`;
 const cell = (text: string, width: number, rtl: boolean, bold = false) =>
-  `<w:tc><w:tcPr><w:tcW w:w="${width}" w:type="dxa"/>${bold ? '<w:shd w:val="clear" w:color="auto" w:fill="F4F1EC"/>' : ''}</w:tcPr>${para(text, { size: 20, bold, rtl })}</w:tc>`;
+  `<w:tc><w:tcPr><w:tcW w:w="${width}" w:type="dxa"/>${bold ? '<w:shd w:val="clear" w:color="auto" w:fill="F4F7F5"/>' : ''}</w:tcPr>${para(text, { size: 20, bold, rtl })}</w:tc>`;
+
+/** The value, bold when filled and grey when not discussed, then each tick box of the form, ticked ones bold, like the paper. */
+const valueCell = (row: GocFormRow, rtl: boolean, width = 5760, span = 1) => {
+  const p = (text: string, props: string) => `<w:p><w:pPr>${rtl ? '<w:bidi/>' : ''}<w:spacing w:after="40"/></w:pPr>${run(text, `${props}<w:sz w:val="20"/>${rtl ? '<w:rtl/>' : ''}`)}</w:p>`;
+  const value = row.value ? p(row.value, row.open ? '<w:i/><w:color w:val="8D7F74"/>' : '<w:b/>') : '';
+  const ticks = (row.ticks ?? []).map((tick) => p(`${tick.on ? '☑' : '☐'} ${tick.text}${tick.detail ? ` ${tick.detail}` : ''}`, tick.on ? '<w:b/>' : '<w:color w:val="6D6058"/>')).join('');
+  return `<w:tc><w:tcPr><w:tcW w:w="${width}" w:type="dxa"/>${span > 1 ? `<w:gridSpan w:val="${span}"/>` : ''}</w:tcPr>${value || ticks ? `${value}${ticks}` : p('', '')}</w:tc>`;
+};
+
+/** The form's own tables (decision-makers, oxygen LEVEL / WHAT IT MEANS / CEILING, Section 19), header row shaded like the docx. */
+const gridTable = (table: GocFormTable, rtl: boolean, border: string) => {
+  const n = table.head.length;
+  const widths = n === 3 && table.head[0].length <= 8 ? [1100, 6860, 1400] : n === 3 ? [2800, 3280, 3280] : n === 5 ? [2560, 2000, 1800, 1600, 1400] : Array.from({ length: n }, () => Math.floor(9360 / n));
+  const lines = (text: string, head: boolean) => text.split('\n').map((line) => {
+    const on = line.startsWith('☑');
+    return `<w:p><w:pPr>${rtl ? '<w:bidi/>' : ''}<w:spacing w:after="20"/></w:pPr>${run(line, `<w:rFonts w:ascii="Calibri" w:hAnsi="Calibri" w:cs="Calibri"/>${head || on ? '<w:b/>' : ''}${line.trim() === 'Not discussed' ? '<w:i/><w:color w:val="8D7F74"/>' : ''}<w:sz w:val="${head ? 18 : 20}"/>${rtl ? '<w:rtl/>' : ''}`)}</w:p>`;
+  }).join('');
+  const tc = (text: string, i: number, head: boolean) => `<w:tc><w:tcPr><w:tcW w:w="${widths[i]}" w:type="dxa"/>${head ? '<w:shd w:val="clear" w:color="auto" w:fill="E4EDE8"/>' : ''}</w:tcPr>${lines(text, head)}</w:tc>`;
+  return `<w:tbl><w:tblPr><w:tblW w:w="9360" w:type="dxa"/>${rtl ? '<w:bidiVisual/>' : ''}${border}</w:tblPr><w:tblGrid>${widths.map((x) => `<w:gridCol w:w="${x}"/>`).join('')}</w:tblGrid>`
+    + `<w:tr>${table.head.map((text, i) => tc(text, i, true)).join('')}</w:tr>${table.rows.map((cells) => `<w:tr>${cells.map((text, i) => tc(text, i, false)).join('')}</w:tr>`).join('')}</w:tbl>`;
+};
 
 export function gocFormDocumentXml(doc: GocFormDocument, rtl = false, note = ''): string {
   const border = '<w:tblBorders>' + ['top', 'left', 'bottom', 'right', 'insideH', 'insideV'].map((side) => `<w:${side} w:val="single" w:sz="4" w:color="999999"/>`).join('') + '</w:tblBorders>';
@@ -55,10 +76,13 @@ export function gocFormDocumentXml(doc: GocFormDocument, rtl = false, note = '')
     para(doc.title, { size: 32, bold: true, rtl }),
     ...doc.lead.map((line) => para(line, { size: 20, rtl })),
     ...doc.sections.flatMap((section) => [
-      para(section.title, { size: 28, bold: true, rtl, shade: 'E8E2D8' }),
+      para(section.title, { size: 26, bold: true, rtl, shade: 'E4EDE8' }),
       ...section.groups.flatMap((group) => [
-        para(group.title, { size: 24, bold: true, rtl }),
-        `<w:tbl><w:tblPr><w:tblW w:w="9360" w:type="dxa"/>${rtl ? '<w:bidiVisual/>' : ''}${border}</w:tblPr><w:tblGrid><w:gridCol w:w="3600"/><w:gridCol w:w="5760"/></w:tblGrid>${group.rows.map((row) => `<w:tr>${cell(row.label, 3600, rtl, true)}${cell(row.value, 5760, rtl)}</w:tr>`).join('')}</w:tbl>`,
+        ...(group.title ? [para(group.title, { size: 22, bold: true, rtl })] : []),
+        ...(group.rows.length ? [`<w:tbl><w:tblPr><w:tblW w:w="9360" w:type="dxa"/>${rtl ? '<w:bidiVisual/>' : ''}${border}</w:tblPr><w:tblGrid><w:gridCol w:w="3600"/><w:gridCol w:w="5760"/></w:tblGrid>${group.rows.map((row) => (row.label
+          ? `<w:tr>${cell(row.label, 3600, rtl, true)}${valueCell(row, rtl)}</w:tr>`
+          : `<w:tr>${valueCell(row, rtl, 9360, 2)}</w:tr>`)).join('')}</w:tbl>`] : []),
+        ...(group.table ? [gridTable(group.table, rtl, border)] : []),
         para(''),
       ]),
     ]),
