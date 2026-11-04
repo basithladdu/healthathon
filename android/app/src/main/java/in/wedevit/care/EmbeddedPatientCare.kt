@@ -156,16 +156,17 @@ fun EmbeddedPatientCare(
         if (!ready || person == null) {
             Column(Modifier.fillMaxWidth().padding(22.dp).testTag(if (person == null && !refreshing) "embedded-care-unavailable" else "embedded-care-loading"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Text(if (person == null && !refreshing) t("This care profile is unavailable", "यह देखभाल प्रोफ़ाइल उपलब्ध नहीं है") else t("Opening this person's care…", "इस व्यक्ति की देखभाल खुल रही है…"), style = MaterialTheme.typography.titleLarge)
-                Text(t("Only this selected person's records will appear here. Test patients and other care profiles are kept separate.", "यहाँ सिर्फ़ चुने गए व्यक्ति के रिकॉर्ड दिखेंगे। टेस्ट मरीज़ और बाक़ी प्रोफ़ाइल अलग रहती हैं।"))
                 OutlinedButton(onClick = onExit) { Text(t("Back to patients", "मरीज़ों पर वापस")) }
                 refreshError?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()); TextButton(onClick = vm::refresh) { Text(t("Retry", "फिर कोशिश करें")) } }
             }
         } else {
-            if ((section != "Conversations" || tool.isNotEmpty() || !conversationCapture) && (!DoctorTestProfiles.contains(personId) || !canEdit)) Surface(color = if (vm.cloud == null) Peach.copy(alpha = .5f) else Paper) {
-                Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 10.dp)) {
-                    if(!DoctorTestProfiles.contains(personId)) Text(if(vm.demoMode) t("Demo care record · not saved to an account", "डेमो देखभाल रिकॉर्ड · किसी खाते में सेव नहीं") else if (vm.cloud == null) t("Care profile on this phone only", "सिर्फ़ इस फ़ोन की देखभाल प्रोफ़ाइल") else t("Shared care profile", "साझा देखभाल प्रोफ़ाइल"), style = MaterialTheme.typography.labelLarge, color = Rust, modifier = Modifier.testTag("embedded-care-source"))
-                    if(vm.demoMode && !DoctorTestProfiles.contains(personId)) Text(t("No prescription is issued and no appointment is booked.", "न कोई पर्चा जारी होता है, न कोई अपॉइंटमेंट बुक होती है।"),style=MaterialTheme.typography.bodySmall)
-                    if (!canEdit) Text(t("Read-only access · changes need the patient's permission", "सिर्फ़ पढ़ने की पहुँच · बदलाव के लिए मरीज़ की अनुमति चाहिए"), style = MaterialTheme.typography.bodySmall, modifier = Modifier.testTag("embedded-read-only"))
+            // Only what changes what the doctor can do stays on screen; the demo label sits behind the info icon.
+            val demoLabel = vm.demoMode && !DoctorTestProfiles.contains(personId)
+            if ((section != "Conversations" || tool.isNotEmpty() || !conversationCapture) && (demoLabel || !canEdit)) Surface(color = if (vm.cloud == null) Peach.copy(alpha = .5f) else Paper) {
+                Row(Modifier.fillMaxWidth().padding(horizontal = 20.dp), verticalAlignment = Alignment.CenterVertically) {
+                    if (!canEdit) Text(t("Read-only access · changes need the patient's permission", "सिर्फ़ पढ़ने की पहुँच · बदलाव के लिए मरीज़ की अनुमति चाहिए"), style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f).testTag("embedded-read-only"))
+                    else Spacer(Modifier.weight(1f))
+                    if (demoLabel) DoctorInfoIcon(t("Demo care record · not saved to an account", "डेमो देखभाल रिकॉर्ड · किसी खाते में सेव नहीं"), t("No prescription is issued and no appointment is booked.", "न कोई पर्चा जारी होता है, न कोई अपॉइंटमेंट बुक होती है।"), "embedded-care-source")
                 }
             }
             if (tool.isNotEmpty() && tool !in listOf("scanner", "feedback", "reminders", "symptoms")) Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically) {

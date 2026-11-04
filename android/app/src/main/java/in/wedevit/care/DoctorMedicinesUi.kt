@@ -88,7 +88,7 @@ private fun medicineTime(at: Long?) = at?.let { DateTimeFormatter.ofPattern("d M
         item {FlowRow(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween,verticalArrangement=Arrangement.spacedBy(8.dp)) {Heading(t("Prescription", "पर्चा"),28);TextButton(onClick={openPrescription(true)},enabled=editable&&loaded&&prescriptions!=null&&!busy,modifier=Modifier.heightIn(min=48.dp).testTag("doctor-add-prescription")){Icon(Icons.Default.AddCircle,null,tint=DoctorAccent);Spacer(Modifier.width(6.dp));Text(t("Add prescription", "पर्चा जोड़ें"),color=DoctorAccent)}}}
 
         if(busy)item {LinearProgressIndicator(Modifier.fillMaxWidth())}
-        error?.let {message->item {SurfaceCard(Peach){Text(message, Modifier.announce());Text(t("Your existing medicines and original history have not been cleared.", "आपकी मौजूदा दवाएँ और पुराना इतिहास मिटाया नहीं गया।"));TextButton(onClick=::refresh,enabled=!busy){Text(t("Retry", "फिर कोशिश करें"), color = RustText)}}}}
+        error?.let {message->item {SurfaceCard(Peach){Text(message, Modifier.announce());TextButton(onClick=::refresh,enabled=!busy){Text(t("Retry", "फिर कोशिश करें"), color = RustText)}}}}
         item {DoctorSideEffectsSection(vm,personId)}
         item {MedicineHistoryTabs(tab,busy){tab=it}}
         prescriptionError?.let {message->item {Text(message,fontSize=13.sp,color=DoctorCardSub,modifier=Modifier.announce())}}
@@ -97,7 +97,7 @@ private fun medicineTime(at: Long?) = at?.let { DateTimeFormatter.ofPattern("d M
             FlowRow(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween,verticalArrangement=Arrangement.Center){Column(Modifier.widthIn(max=260.dp)){Text(t("CURRENT PRESCRIPTION", "अभी का पर्चा"),fontSize=12.sp,color=DoctorCardFaint,fontWeight=FontWeight.Medium);Text(prescriptions?.current?.title?:t("Prescription group/date not recorded", "पर्चे का समूह/तारीख़ दर्ज नहीं"),fontSize=20.sp,fontWeight=FontWeight.Medium, fontFamily = SaharaTitleFont,color=DoctorCardInk)};TextButton(onClick={openPrescription(false)},enabled=editable&&prescriptions!=null&&!busy,modifier=Modifier.heightIn(min=48.dp)){Text(t("Edit list", "सूची बदलें"),color=DoctorAccent)}}
             prescriptions?.current?.let {Text(if(it.prescribedOn.isBlank())t("Start date not recorded", "शुरू की तारीख़ दर्ज नहीं")else "Started ${it.prescribedOn}",fontSize=13.sp,color=DoctorCardSub)}
         }
-        if(!loaded) item {Text(t("Medicine history has not loaded. Course changes and intake reports stay unavailable until it does.", "दवाओं का इतिहास नहीं खुला। इसके खुलने तक कोर्स के बदलाव और दवा लेने की सूचनाएँ उपलब्ध नहीं हैं।"),fontSize=15.sp,lineHeight=22.sp,color=DoctorCardInk);TextButton(onClick=::refresh,enabled=!busy){Text(t("Load history", "इतिहास खोलें"))}}
+        if(!loaded) item {TextButton(onClick=::refresh,enabled=!busy){Text(t("Load history", "इतिहास खोलें"))}}
         if(tab=="Intake history") {
             item {Heading(t("Intake history", "दवा लेने का इतिहास"),22)}
             if(loaded&&snapshot.events.isEmpty())item {SurfaceCard(DoctorCardReport){Text(t("No detailed intake reports yet", "अभी दवा लेने की कोई विस्तृत सूचना नहीं"),fontSize=20.sp,fontWeight=FontWeight.Medium, fontFamily = SaharaTitleFont,color=DoctorCardInk)}}
@@ -136,7 +136,7 @@ private fun medicineTime(at: Long?) = at?.let { DateTimeFormatter.ofPattern("d M
             }}
             if(tab=="Past") {
                 val missing=snapshot.courses.filter {it.past&&medicines.none {item->item.id==it.medicineId}}
-                items(missing,key={"archived-${it.medicineId}"}) {course->MedicineSurface(false){Text(course.name,fontSize=20.sp,fontWeight=FontWeight.Medium,fontFamily=SaharaTitleFont,color=DoctorCardInk);Text(course.directions,fontSize=15.sp,color=DoctorCardSub);Text(t("Moved to past ${medicineTime(course.changedAt)}", "${medicineTime(course.changedAt)} को पुरानी में डाली गई"),fontSize=12.sp,color=DoctorCardFaint);Text(t("Earlier medicine entry is no longer available. Its course snapshot and reports are retained.", "पुरानी दवा की एंट्री अब उपलब्ध नहीं है। उसके कोर्स की जानकारी और सूचनाएँ रखी गई हैं।"),fontSize=12.sp,color=DoctorCardFaint)}}
+                items(missing,key={"archived-${it.medicineId}"}) {course->MedicineSurface(false){Text(course.name,fontSize=20.sp,fontWeight=FontWeight.Medium,fontFamily=SaharaTitleFont,color=DoctorCardInk);Text(course.directions,fontSize=15.sp,color=DoctorCardSub);Text(t("Moved to past ${medicineTime(course.changedAt)}", "${medicineTime(course.changedAt)} को पुरानी में डाली गई"),fontSize=12.sp,color=DoctorCardFaint)}}
             }
         }
         item {Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.End){DoctorInfoIcon(t("Medicines", "दवाइयाँ"),"${if(vm.cloud==null)t("Saved only on this device.", "सिर्फ़ इसी फ़ोन पर सहेजा गया।") else t("Shared medicine history, access controlled by the patient.", "साझा दवा इतिहास, पहुँच मरीज़ के हाथ में।")} " + t("Reports are not proof a medicine was swallowed. Follow the prescriber's instructions.", "सूचना इस बात का सबूत नहीं कि दवा सच में ली गई। दवा लिखने वाले के निर्देश मानें।"),"doctor-medicines-info")}}
@@ -158,15 +158,13 @@ private fun medicineTime(at: Long?) = at?.let { DateTimeFormatter.ofPattern("d M
         val group=prescriptions?.groups?.firstOrNull {it.id==id}
         if(group!=null) AlertDialog(onDismissRequest={pastGroupId=null},title={Text(group.title)},text={Column(Modifier.fillMaxWidth().heightIn(max=500.dp).verticalScroll(rememberScrollState()),verticalArrangement=Arrangement.spacedBy(14.dp)) {
             Text(if(group.prescribedOn.isBlank())t("Prescription date not recorded", "पर्चे की तारीख़ दर्ज नहीं")else "Prescribed ${group.prescribedOn}")
-            Text(t("Saved past prescription · names and instructions below retain the reviewed last-active list at replacement. Earlier removed medicines and intake reports remain in history.", "सहेजा पुराना पर्चा · नीचे के नाम और निर्देश बदलते समय की आख़िरी जाँची सूची के हैं। पहले हटाई दवाएँ और दवा लेने की सूचनाएँ इतिहास में रहती हैं।"))
             prescriptions!!.medicines.filter {it.prescriptionId==id}.sortedWith(compareBy<DoctorPrescriptionMedicine>{it.removedAt>0}.thenBy {it.position}).forEach {row ->SurfaceCard(DoctorCardReport) {Text(row.name,fontSize=20.sp,fontWeight=FontWeight.Medium,fontFamily=SaharaTitleFont,color=DoctorCardInk);Text(row.instructions.ifBlank {t("Instructions not recorded", "निर्देश दर्ज नहीं")},fontSize=15.sp,color=DoctorCardSub);if(row.removedAt>0)Text(t("Removed earlier ${medicineTime(row.removedAt)}", "पहले ${medicineTime(row.removedAt)} को हटाई गई"),fontSize=12.sp,color=DoctorCardFaint);TextButton(onClick={pastGroupId=null;tab="Intake history"},modifier=Modifier.heightIn(min=48.dp)){Text(t("View intake history", "दवा लेने का इतिहास देखें"))}}}
         }},confirmButton={TextButton(onClick={pastGroupId=null}){Text(t("Close", "बंद करें"))}})
     }
     if(add) ModalBottomSheet(onDismissRequest={if(!busy)add=false},containerColor=Cream) {Column(Modifier.fillMaxWidth().padding(22.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {
-        Heading(t("Add a prescription", "पर्चा जोड़ें"),25);Text(t("Add reviewed medicines to the current list. Existing medicines are not stopped or replaced automatically.", "जाँची गई दवाएँ अभी की सूची में जोड़ें। मौजूदा दवाएँ अपने-आप बंद या बदली नहीं जातीं।"))
+        Heading(t("Add a prescription", "पर्चा जोड़ें"),25)
         Button(onClick={if(same(true)&&!busy){add=false;onAddManual()}},modifier=Modifier.fillMaxWidth()){Text(t("Enter medicine manually", "दवा हाथ से लिखें"))}
         OutlinedButton(onClick={if(same(true)&&!busy){add=false;onScanPrescription()}},modifier=Modifier.fillMaxWidth()){Text(t("Scan prescription and review", "पर्चा स्कैन करके जाँचें"))}
-        Text(t("If this replaces an earlier course, move only the relevant older medicines to Past after confirming the change. Their reports remain available.", "अगर यह पुराने कोर्स की जगह ले रहा है, तो बदलाव पक्का करने के बाद सिर्फ़ वही पुरानी दवाएँ पुरानी सूची में डालें। उनकी सूचनाएँ बनी रहेंगी।"))
     }}
     edit?.let {item->AddCareItem("medicine",vm,onDismiss={edit=null},initial=item)}
     report?.let {item->MedicineReportDialog(item,busy||!loaded,snapshot.events.filter {it.medicineId==item.id&&it.outcome=="planned"},onClose={report=null},onSave={event->if(loaded&&same(true))run {val result=repo.append(personId,event);if(same()){snapshot=result;report=null}}})}
@@ -206,7 +204,7 @@ private fun chooseMedicineTime(context:Context,current:Long?,onPicked:(Long)->Un
     val context=LocalContext.current;var outcome by rememberSaveable(item.id){mutableStateOf("taken")};var planned by rememberSaveable(item.id){mutableStateOf<Long?>(null)};var taken by rememberSaveable(item.id){mutableStateOf<Long?>(null)}
     var reporter by rememberSaveable(item.id){mutableStateOf("Not recorded")};var note by rememberSaveable(item.id){mutableStateOf("")};val id=rememberSaveable(item.id){UUID.randomUUID().toString()};var error by remember {mutableStateOf<String?>(null)}
     AlertDialog(onDismissRequest={if(!busy)onClose()},title={Text(t("Record medicine report", "दवा की सूचना दर्ज करें"))},text={Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),verticalArrangement=Arrangement.spacedBy(10.dp)) {
-        Text(item.title,fontWeight=FontWeight.Medium, fontFamily = SaharaTitleFont);Text(t("Record what was reported. Leave a time blank if it is unknown. New reports do not erase earlier reports.", "जो बताया गया वही दर्ज करें। समय न पता हो तो ख़ाली छोड़ें। नई सूचना से पुरानी नहीं मिटती।"))
+        Text(item.title,fontWeight=FontWeight.Medium, fontFamily = SaharaTitleFont)
         FlowRow(horizontalArrangement=Arrangement.spacedBy(5.dp)){listOf("taken" to t("Taken", "ली"),"skipped" to t("Skipped", "छोड़ी"),"planned" to t("Planned", "तय")).forEach{(value,label)->FilterChip(outcome==value,onClick={outcome=value;if(value!="taken")taken=null},enabled=!busy,label={Text(label)})}}
         plans.distinctBy {it.plannedAt}.take(6).forEach {plan->FilterChip(selected=planned==plan.plannedAt,onClick={planned=plan.plannedAt},enabled=!busy,label={Text(t("For planned dose: ${medicineTime(plan.plannedAt)}", "तय ख़ुराक के लिए: ${medicineTime(plan.plannedAt)}"))})}
         OutlinedButton(onClick={chooseMedicineTime(context,planned){planned=it}},enabled=!busy){Text(t("Planned: ", "तय: ") + medicineTime(planned))}

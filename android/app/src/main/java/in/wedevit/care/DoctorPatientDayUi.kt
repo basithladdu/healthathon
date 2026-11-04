@@ -83,8 +83,8 @@ private fun doctorRecordedTime(at: Long, zone: ZoneId) = if (at <= 0) "Date not 
         item { DistressHistoryCard(entries, person.id) }
         careTeamSummary?.let { summary -> item { summary() } }
         latestNote?.let { note -> item { Card(onClick = { onReadNote(note) }, colors = CardDefaults.cardColors(containerColor = DoctorCardReport), border = BorderStroke(1.dp, DoctorHairline), shape = RoundedCornerShape(20.dp), modifier = Modifier.fillMaxWidth().testTag("doctor-latest-note")) { Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) { Text(t("Latest care note", "नया केयर नोट"), fontSize = 19.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, color = DoctorCardInk); Text(doctorRecordedTime(note.published, zone), fontSize = 13.sp, color = DoctorCardSub); Text(ReviewWorkflow.label(note), fontSize = 13.sp, color = DoctorCardSub); Text(note.topics.ifBlank { t("Read the recorded discussion.", "दर्ज चर्चा पढ़ें।") }, fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk, maxLines = 3); Text(t("Read exact version ${note.version}", "संस्करण ${note.version} पढ़ें"), fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = DoctorAccent, modifier = Modifier.heightIn(min = 32.dp)) } } } }
-        item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { Text(t("Up next", "आगे क्या है"), fontSize = 21.sp, fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f), fontFamily = SaharaTitleFont, color = DoctorCardInk); TextButton(onClick = onAddVisit, enabled = canEdit, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-add-visit")) { Icon(Icons.Default.Add, null); Text(t("Add visit", "विज़िट जोड़ें")) } }; if (!canEdit) Text(t("Read-only access. A permitted editor must add a visit.", "सिर्फ़ पढ़ने की पहुँच। विज़िट अनुमति वाला व्यक्ति ही जोड़ सकता है।"), fontSize = 13.sp, color = DoctorCardSub) }
-        if (visits.isEmpty()) item { SurfaceCard { Text(t("No upcoming visits recorded", "आगे की कोई विज़िट दर्ज नहीं"), fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk); Text(t("Add a visit to plan the next conversation.", "अगली बातचीत तय करने के लिए विज़िट जोड़ें।"), fontSize = 13.sp, color = DoctorCardSub) } }
+        item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { Text(t("Up next", "आगे क्या है"), fontSize = 21.sp, fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f), fontFamily = SaharaTitleFont, color = DoctorCardInk); TextButton(onClick = onAddVisit, enabled = canEdit, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-add-visit")) { Icon(Icons.Default.Add, null); Text(t("Add visit", "विज़िट जोड़ें")) } } }
+        if (visits.isEmpty()) item { SurfaceCard { Text(t("No upcoming visits recorded", "आगे की कोई विज़िट दर्ज नहीं"), fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk) } }
         items(visits.take(3), key = { it.id }) { visit -> DoctorVisitSummary(visit, zone, onCalendar) }
     }
 }
@@ -206,12 +206,11 @@ private fun doctorRecordedTime(at: Long, zone: ZoneId) = if (at <= 0) "Date not 
                     Text(t("Not recorded", "दर्ज नहीं"),fontSize=16.sp)
                     Text(t("What matters", "क्या ज़रूरी है"),fontSize=17.sp,fontWeight=FontWeight.SemiBold)
                     Text(latest?.priorities?.ifBlank {t("Not recorded", "दर्ज नहीं")}?:t("Not recorded", "दर्ज नहीं"),fontSize=16.sp,lineHeight=24.sp)
-                    Text(t("Priorities from the saved discussion, not a current clinical assessment.", "सहेजी चर्चा की प्राथमिकताएँ, अभी का क्लिनिकल आकलन नहीं।"),fontSize=14.sp,lineHeight=21.sp)
                 }
             }
         }
         item {Text(t("Care handover", "देखभाल हैंडओवर"),fontSize=22.sp,fontWeight=FontWeight.Medium, fontFamily = SaharaTitleFont)}
-        if(notes.isEmpty()) item {SurfaceCard {Text(t("No care discussion recorded yet", "अभी कोई देखभाल चर्चा दर्ज नहीं"),fontSize=20.sp,fontWeight=FontWeight.Medium, fontFamily = SaharaTitleFont);Text(t("Saved discussions will appear here without replacing earlier versions.", "सहेजी चर्चाएँ यहाँ दिखेंगी, पुराने संस्करण बने रहेंगे।"),fontSize=16.sp,lineHeight=24.sp)}}
+        if(notes.isEmpty()) item {SurfaceCard {Text(t("No care discussion recorded yet", "अभी कोई देखभाल चर्चा दर्ज नहीं"),fontSize=20.sp,fontWeight=FontWeight.Medium, fontFamily = SaharaTitleFont)}}
         items(notes,key={it.id}) {note ->
             Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min),horizontalArrangement=Arrangement.spacedBy(12.dp)) {
                 Canvas(Modifier.width(18.dp).fillMaxHeight()) {val x=size.width/2;drawLine(Color(0xFFCBDDE8),Offset(x,0f),Offset(x,size.height),2.dp.toPx());drawCircle(Rust,5.dp.toPx(),Offset(x,14.dp.toPx()))}
@@ -307,7 +306,7 @@ private fun doctorToolLabel(label: String, hindi: Boolean) = careTr(hindi, label
             }
         }
     }
-    detail?.let { check -> AlertDialog(onDismissRequest = { detail = null }, title = { Text(check.title) }, text = { Column(Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) { Text(doctorRecordedTime(check.created, zone)); Text(CareEntryCodec.readable(check.detail).ifBlank { t("No additional details recorded.", "और कोई जानकारी दर्ज नहीं।") }); Text(t("Self-reported update; clinical assessment and reporter identity are not independently verified.", "अपनी बताई सूचना; क्लिनिकल आकलन और बताने वाले की पहचान अलग से पुष्ट नहीं है।")) } }, confirmButton = { TextButton(onClick = { detail = null }) { Text(t("Close", "बंद करें")) } }) }
+    detail?.let { check -> AlertDialog(onDismissRequest = { detail = null }, title = { Text(check.title) }, text = { Column(Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) { Text(doctorRecordedTime(check.created, zone)); Text(CareEntryCodec.readable(check.detail).ifBlank { t("No additional details recorded.", "और कोई जानकारी दर्ज नहीं।") }) } }, confirmButton = { TextButton(onClick = { detail = null }) { Text(t("Close", "बंद करें")) } }) }
 }
 
 /** Distress over the range (a "no distress" answer counts as 0), the latest score, and the latest problems in one line. */

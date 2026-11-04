@@ -26,7 +26,9 @@ class DoctorPatientNavigationTilesTest {
         val person=Person("long-header-fixture","Fictional person with a deliberately long display name")
         ui.setContent {CareTheme {Box(Modifier.width(320.dp).fillMaxSize()){DoctorSharedPatientHub(person,{},deviceLocal=true)}}}
         val title=ui.onNodeWithText("${person.name}'s care")
-        val subtitle=ui.onNodeWithText("Device-local care · not synced or shared")
+        // The source subtitle under the name was removed (3 Nov meeting); the first tile is the next thing below the name.
+        ui.onNodeWithText("Device-local care · not synced or shared").assertDoesNotExist()
+        val subtitle=ui.onNodeWithTag("doctor-shared-Progress")
         val layouts=mutableListOf<TextLayoutResult>()
         title.performSemanticsAction(SemanticsActions.GetTextLayoutResult){it(layouts)}
         assertTrue(layouts.single().lineCount>1)

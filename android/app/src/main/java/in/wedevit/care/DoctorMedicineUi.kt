@@ -44,8 +44,6 @@ fun doctorMedicinePresentation(dose:SampleMedicineDose,asOf:Long,zone:ZoneId):Do
         Text(t("Medicine reports", "दवा की सूचनाएँ"),fontSize=22.sp,fontWeight=FontWeight.Medium, fontFamily = SaharaTitleFont)
         Text(t("Practice data, not a real patient's reports", "उदाहरण डेटा, असली मरीज़ नहीं"),fontSize=14.sp,lineHeight=20.sp,fontWeight=FontWeight.Medium,color=Rust)
         Text("As of ${DateTimeFormatter.ofPattern("dd MMM yyyy · h:mm a",Locale.ENGLISH).withZone(zone).format(Instant.ofEpochMilli(asOf))} · ${zone.id}",fontSize=14.sp,lineHeight=20.sp)
-        Text(t("Reported activity is not proof of ingestion or prescribing advice.", "बताई गतिविधि दवा लेने का सबूत या दवा लिखने की सलाह नहीं है।"),fontSize=14.sp,lineHeight=20.sp,color=Ink.copy(alpha=.75f))
-        Text(t("Planned = schedule · Reported taken = reported intake · Logged = entry time", "तय = समय-सारणी · लेने का बताया समय = बताई गई दवा · दर्ज = एंट्री का समय"),fontSize=14.sp,lineHeight=20.sp,color=Ink.copy(alpha=.75f))
         if(doses.isEmpty()) Text(t("No medicine reports recorded.", "दवा की कोई सूचना दर्ज नहीं।"))
         doses.forEachIndexed {index,dose ->
             val view=doctorMedicinePresentation(dose,asOf,zone)

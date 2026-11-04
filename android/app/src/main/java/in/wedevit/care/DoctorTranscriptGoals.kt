@@ -107,7 +107,7 @@ internal fun doctorTranscriptIsSample(walkthrough: Boolean, source: String, samp
     Column(Modifier.fillMaxWidth().testTag("transcript-goals"), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Text(t("Goals of care", "देखभाल के लक्ष्य"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
         if (rows.isEmpty()) {
-            Text(t("No goals-of-care questions were added before recording. Add them on the Who's here page.", "रिकॉर्डिंग से पहले देखभाल के लक्ष्यों के सवाल नहीं जोड़े गए। उन्हें “कौन मौजूद है” पेज पर जोड़ें।"), fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub)
+            Text(t("No questions were prepared.", "कोई सवाल तैयार नहीं किया गया।"), fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub)
             TextButton(onClick = onBackToWho, modifier = Modifier.heightIn(min = 48.dp).testTag("transcript-goals-back")) { Text(t("Back to who is here", "कौन मौजूद है पर वापस"), color = DoctorAccent) }
         } else {
             Text(careBilingual("Suggestions come from matching words in the transcript. Accept or edit each answer before the note is saved.", "सुझाव बातचीत के शब्दों से हैं; हर जवाब जाँचें।"), fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub)
@@ -141,7 +141,6 @@ internal fun doctorTranscriptIsSample(walkthrough: Boolean, source: String, samp
             if (open) {
                 if (row.answer.isNotBlank() && draft == null) {
                     if (answerLine != null) TextButton(onClick = { onShowLine(answerLine) }, modifier = Modifier.heightIn(min = 48.dp).testTag("transcript-goal-line-${row.id}")) { Text(careBilingual("From line ${answerLine.number} · show in transcript", "पंक्ति देखें"), color = DoctorAccent) }
-                    else Text(t("Your own words · not linked to a transcript line", "आपके अपने शब्द · लिखाई की किसी पंक्ति से जुड़े नहीं"), fontSize = 12.sp, color = DoctorCardFaint)
                 }
                 if (row.answer.isBlank() && draft == null && suggestion != null) Surface(shape = RoundedCornerShape(14.dp), color = DoctorStatusWarnBg, modifier = Modifier.fillMaxWidth().testTag("transcript-goal-suggestion-${row.id}")) {
                     Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {

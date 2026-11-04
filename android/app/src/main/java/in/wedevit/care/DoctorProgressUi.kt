@@ -28,7 +28,6 @@ import java.util.Locale
 @Composable fun DoctorProgressTimeline(reports: List<DoctorProgressReport>, onOpenReport: (String) -> Unit, modifier: Modifier = Modifier) { val t = careText();
     Column(modifier.fillMaxWidth().testTag("doctor-progress-timeline"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text(t("Reported updates", "बताए अपडेट"), fontSize = 23.sp, fontWeight = FontWeight.Medium, color = Ink, fontFamily = SaharaTitleFont)
-        Text(t("A history of patient and family reports, not a clinical assessment.", "मरीज़ और परिवार की सूचनाओं का इतिहास, क्लिनिकल आकलन नहीं।"), color = DoctorCardSub, style = MaterialTheme.typography.bodyMedium, lineHeight = 21.sp)
         reports.firstOrNull()?.let { Text(t("Times shown in ${it.zoneId}", "समय ${it.zoneId} के अनुसार"), color = DoctorCardFaint, style = MaterialTheme.typography.bodySmall) }
         if (reports.isEmpty()) Text(t("No reported updates recorded.", "कोई बताया अपडेट दर्ज नहीं।"), color = DoctorCardSub, modifier = Modifier.padding(vertical = 20.dp))
         reports.forEachIndexed { index, report ->
@@ -49,7 +48,6 @@ import java.util.Locale
                 }
             }
         }
-        Text(t("Dates reflect when each update was recorded.", "तारीख़ें बताती हैं कि हर अपडेट कब दर्ज हुआ।"), style = MaterialTheme.typography.bodySmall, color = DoctorCardFaint)
     }
 }
 
@@ -67,7 +65,6 @@ import java.util.Locale
         if (report.questions.isNotEmpty()) ProgressDetailCard(t("Questions and concerns", "सवाल और चिंताएँ"), Icons.Outlined.QuestionAnswer, SaharaSoftBlue) { report.questions.forEach { Text(it, lineHeight = 23.sp) }; Text(t("Specific questions were not recorded.", "कोई ख़ास सवाल दर्ज नहीं।"), style = MaterialTheme.typography.bodySmall, color = DoctorCardFaint) }
         if (report.familySupport.isNotEmpty()) ProgressDetailCard(t("Family coordination", "परिवार का तालमेल"), Icons.Outlined.PeopleOutline, SaharaLavender) { report.familySupport.forEach { Text(it, lineHeight = 23.sp) }; Text(t("No transport arrangement or booking was recorded.", "आने-जाने का इंतज़ाम या बुकिंग दर्ज नहीं।"), style = MaterialTheme.typography.bodySmall, color = DoctorCardFaint) }
         if (report.medicineActivity.isNotEmpty()) ProgressDetailCard(t("Medicine activity for this day", "इस दिन की दवा गतिविधि"), Icons.Outlined.Medication, Paper) {
-            Text(t("As known at this update. Separate activity scheduled on the same day—not information supplied by this update. Later logs are excluded. Not verified ingestion or prescribing instructions.", "इस अपडेट के समय की जानकारी। उसी दिन तय अलग गतिविधि—यह इस अपडेट ने नहीं बताई। बाद की एंट्री शामिल नहीं। दवा लेना या लिखने के निर्देश पुष्ट नहीं।"), style = MaterialTheme.typography.bodySmall, lineHeight = 19.sp, color = DoctorCardSub)
             report.medicineActivity.forEach { dose ->
                 HorizontalDivider(color = Ink.copy(alpha = .1f))
                 Text(dose.medicineLabel, fontWeight = FontWeight.SemiBold)

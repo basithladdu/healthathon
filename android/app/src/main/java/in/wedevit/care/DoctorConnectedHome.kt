@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
@@ -129,7 +130,7 @@ internal fun LazyListScope.doctorConnectedHomeItems(people: List<Person>, items:
         Surface(color = Paper, shape = RoundedCornerShape(22.dp), modifier = Modifier.fillMaxWidth()) { Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(t("Your patients", "आपके मरीज़"), style = MaterialTheme.typography.titleLarge)
             Text(if (people.isEmpty()) t("No patient has shared their care with you yet.", "अभी किसी मरीज़ ने अपनी देखभाल आपसे साझा नहीं की है।")
-                else t("${people.size} connected · shared by the patient or family", "${people.size} जुड़े हुए · मरीज़ या परिवार ने साझा किया"), modifier = Modifier.testTag("doctor-home-patient-count"))
+                else "${people.size}", style = MaterialTheme.typography.headlineSmall, modifier = Modifier.testTag("doctor-home-patient-count"))
             TextButton(onClick = onPatients, modifier = Modifier.heightIn(min = 48.dp)) { Text(if (people.isEmpty()) t("Join with an invitation code", "निमंत्रण कोड से जुड़ें") else t("Open patients", "मरीज़ खोलें")) }
         } }
     }
@@ -150,7 +151,7 @@ internal fun LazyListScope.doctorConnectedHomeItems(people: List<Person>, items:
 internal fun LazyListScope.doctorConnectedScheduleItems(people: List<Person>, items: List<CareItem>, now: Long, hindi: Boolean, onVisit: (String) -> Unit) {
     val t = { en: String, hi: String -> careTr(hindi, en, hi) }
     val visits = DoctorConnectedHome.upcomingVisits(people, items, now)
-    item(key = "schedule-title") { Text(t("Schedule", "समय-सारणी"), style = MaterialTheme.typography.headlineMedium); Text(t("Open visits for the patients who share their care with you. Tap one to add or change a visit.", "जो मरीज़ आपसे देखभाल साझा करते हैं, उनकी खुली मुलाक़ातें। मुलाक़ात जोड़ने या बदलने के लिए छुएँ।")) }
+    item(key = "schedule-title") { Text(t("Schedule", "समय-सारणी"), style = MaterialTheme.typography.headlineMedium) }
     if (people.isEmpty()) item(key = "schedule-no-people") { Text(t("No connected patients yet.", "अभी कोई जुड़ा हुआ मरीज़ नहीं है।"), fontWeight = FontWeight.Medium) }
     else if (visits.isEmpty()) item(key = "schedule-empty") { Text(t("No open visits. Open a patient's Visits to plan one.", "कोई खुली मुलाक़ात नहीं। मुलाक़ात तय करने के लिए मरीज़ की मुलाक़ातें खोलें।")) }
     items(visits, key = { "schedule-${it.item.id}" }) { visit -> DoctorPatientListCard(visit.person.name, "${doctorWhen(visit.item, hindi)} · ${visit.item.title}", { onVisit(visit.person.id) }) }
@@ -165,8 +166,10 @@ internal fun LazyListScope.doctorConnectedScheduleItems(people: List<Person>, it
 @Composable internal fun DoctorWalkthroughCard(hindi: Boolean, onOpen: (DoctorTestProfiles.Profile) -> Unit) {
     Surface(color = Peach.copy(alpha = .45f), shape = RoundedCornerShape(22.dp), modifier = Modifier.fillMaxWidth().testTag("doctor-walkthrough-card")) {
         Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(careTr(hindi, "Practice walkthrough · not real patients", "अभ्यास वॉकथ्रू · असली मरीज़ नहीं"), style = MaterialTheme.typography.titleLarge)
-            Text(careTr(hindi, "Made-up patients for practice, not real people. They stay on this phone and never mix with a real patient's records.", "अभ्यास के लिए बनाए गए मरीज़, असली नहीं। ये सिर्फ़ इस फ़ोन पर रहते हैं और किसी असली मरीज़ के रिकॉर्ड में नहीं जाते।"), style = MaterialTheme.typography.bodyMedium)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(careTr(hindi, "Practice walkthrough · not real patients", "अभ्यास वॉकथ्रू · असली मरीज़ नहीं"), style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f))
+                DoctorInfoIcon(careTr(hindi, "Practice walkthrough · not real patients", "अभ्यास वॉकथ्रू · असली मरीज़ नहीं"), careTr(hindi, "Made-up patients for practice, not real people. They stay on this phone and never mix with a real patient's records.", "अभ्यास के लिए बनाए गए मरीज़, असली नहीं। ये सिर्फ़ इस फ़ोन पर रहते हैं और किसी असली मरीज़ के रिकॉर्ड में नहीं जाते।"), "doctor-walkthrough-about")
+            }
             DoctorTestProfiles.profiles.forEach { profile ->
                 TextButton(onClick = { onOpen(profile) }, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-walkthrough-${profile.key}")) { Text((careTr(hindi, "Practice: ", "अभ्यास: ")) + profile.name) }
             }

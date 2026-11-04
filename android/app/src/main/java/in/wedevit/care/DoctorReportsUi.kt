@@ -78,7 +78,6 @@ import androidx.compose.ui.unit.sp
                 }
             }
         }
-        Text(t("Original documents, dates and authors have not been supplied.", "मूल कागज़, तारीख़ें और लेखक नहीं दिए गए।"), style = MaterialTheme.typography.bodySmall, color = DoctorCardSub, lineHeight = 18.sp)
     }
 }
 
@@ -106,6 +105,5 @@ import androidx.compose.ui.unit.sp
                 Text(t("Document date: Not recorded", "कागज़ की तारीख़: दर्ज नहीं"), style = MaterialTheme.typography.bodySmall)
             }
         }
-        Text(t("This is a text summary, not a verified medical report. There is no original document to download, share or interpret.", "यह लिखा सार है, पुष्ट मेडिकल रिपोर्ट नहीं। डाउनलोड, साझा या पढ़ने के लिए कोई मूल कागज़ नहीं है।"), style = MaterialTheme.typography.bodyMedium, color = DoctorCardSub, lineHeight = 22.sp)
     }
 }

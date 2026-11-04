@@ -24,7 +24,6 @@ import java.util.UUID
     var error by remember { mutableStateOf<String?>(null) }
     AlertDialog(onDismissRequest={if(!busy)onDismiss()},title={Text(if(replacing)t("New prescription", "नया पर्चा") else t("Edit current list", "अभी की सूची बदलें"))},text={
         Column(Modifier.fillMaxWidth().heightIn(max=560.dp).verticalScroll(rememberScrollState()),verticalArrangement=Arrangement.spacedBy(12.dp)) {
-            Text(t("Copy the prescriber's instructions exactly. This form does not recommend drugs or doses.", "दवा लिखने वाले के निर्देश वैसे ही लिखें। यह फ़ॉर्म दवा या ख़ुराक नहीं सुझाता।"))
             OutlinedTextField(title,{title=it.take(200)},label={Text(t("Prescription label", "पर्चे का नाम"))},enabled=!busy)
             OutlinedTextField(date,{date=it.take(10)},label={Text(t("Prescription date (YYYY-MM-DD, optional)", "पर्चे की तारीख़ (YYYY-MM-DD, चाहें तो)"))},enabled=!busy)
             rows.forEachIndexed { index,row ->
@@ -39,10 +38,9 @@ import java.util.UUID
             OutlinedButton(onClick={rows=rows+PrescriptionMedicineInput(UUID.randomUUID().toString(),"","")},enabled=!busy&&rows.size<50,modifier=Modifier.fillMaxWidth().heightIn(min=48.dp)){Text(t("Add another medicine", "एक और दवा जोड़ें"))}
             if(replacing) TextButton(onClick={onScan(title,date,rows)},enabled=!busy){Text(t("Scan prescription and review", "पर्चा स्कैन करके जाँचें"))}
             if(replacing&&currentExists) Row { Checkbox(confirmed,{confirmed=it},enabled=!busy);Text(t("Replace the entire current prescription after saving this reviewed list. Keep the previous prescription and its history in Past.", "यह जाँची सूची सहेजने के बाद पूरा मौजूदा पर्चा बदलें। पिछला पर्चा और उसका इतिहास पुराने में रखें।")) }
-            if(!replacing) Text(t("Removing a medicine only ends its current-list membership. Earlier directions, prescriptions and intake reports are retained.", "दवा हटाने से वह सिर्फ़ अभी की सूची से हटती है। पुराने निर्देश, पर्चे और दवा लेने की सूचनाएँ रहती हैं।"))
             Row {Checkbox(reviewed,{reviewed=it},enabled=!busy);Text(t("I reviewed every medicine name and instruction against the prescription.", "मैंने हर दवा का नाम और निर्देश पर्चे से मिला लिया है।"))}
             error?.let {Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce())}
-            saveError?.let {Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce());Text(t("Cancel and refresh the current list before reviewing again. After a connection error, check the saved state rather than assuming success or failure.", "फिर से जाँचने से पहले रद्द करके सूची ताज़ा करें। इंटरनेट की गड़बड़ी के बाद सफल या असफल मानने के बजाय सहेजी स्थिति देखें।"))}
+            saveError?.let {Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce())}
         }
     },confirmButton={TextButton(enabled=!busy&&reviewed&&(!replacing||!currentExists||confirmed),onClick={
         if(title.isBlank()||rows.any {it.name.isBlank()})error=t("Add a prescription label and each medicine name.", "पर्चे का नाम और हर दवा का नाम लिखें।")

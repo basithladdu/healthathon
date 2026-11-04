@@ -30,7 +30,6 @@ private fun conversationDate(at: Long?, hindi: Boolean) = at?.takeIf { it > 0 }?
                     Icon(Icons.Default.Forum, null, tint = DoctorAccent, modifier = Modifier.size(24.dp))
                     Text(t("Conversation workspace", "बातचीत की जगह"), fontFamily = SaharaTitleFont, fontSize = 21.sp, lineHeight = 27.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
                 }
-                Text(t("Prepare the next discussion, or continue your saved words.", "अगली चर्चा की तैयारी करें, या सहेजे शब्दों से आगे बढ़ें।"), fontSize = 15.sp, lineHeight = 23.sp, color = DoctorCardInk)
                 if (model.currentDraft != null) {
                     Column(Modifier.testTag("conversation-draft"), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         Text(t("Saved draft · not a published Care Note", "सहेजा ड्राफ़्ट · प्रकाशित केयर नोट नहीं"), fontWeight = FontWeight.Medium, fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub)
@@ -56,14 +55,12 @@ private fun conversationDate(at: Long?, hindi: Boolean) = at?.takeIf { it > 0 }?
         model.priorSample?.let { discussion ->
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 ConversationHeading(t("Previous discussion on record", "रिकॉर्ड में पिछली चर्चा"))
-                Text(t("An undated discussion from this patient's earlier record. It is separate from the versions saved here.", "इस मरीज़ के पुराने रिकॉर्ड से बिना तारीख़ की चर्चा। यह यहाँ सहेजे संस्करणों से अलग है।"), fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub)
                 DiscussionReadingCard(discussion, highlighted = false)
             }
         }
         if (model.latestPublished == null && model.priorSample == null) {
             Text(t("No saved discussion is recorded yet. You can prepare one in the workspace.", "अभी कोई सहेजी चर्चा दर्ज नहीं है। आप बातचीत की जगह में एक तैयार कर सकते हैं।"), fontSize = 15.sp, lineHeight = 23.sp, color = DoctorCardInk)
         }
-        DoctorFootnote(t("The reviewer's identity is not verified. Audio is not automatically transcribed, so the words must be checked by a person. Audio stays on this device and is not included when a written note is shared.", "समीक्षक की पहचान की जाँच नहीं हुई है। ऑडियो अपने-आप लिखाई में नहीं बदलता, इसलिए शब्द किसी व्यक्ति को जाँचने होंगे। ऑडियो इसी फ़ोन पर रहता है और लिखा नोट साझा करने पर साथ नहीं जाता।"))
     }
 }
 
@@ -92,7 +89,6 @@ private fun conversationDate(at: Long?, hindi: Boolean) = at?.takeIf { it > 0 }?
                             SelectionContainer { Text(value, fontSize = 15.sp, lineHeight = 23.sp, color = DoctorCardInk) }
                         }
                     }
-                    if (fields.any { it.second.isBlank() }) Text(t("Other headings were not recorded in this version.", "इस संस्करण में बाक़ी शीर्षक दर्ज नहीं हुए।"), fontSize = 12.sp, lineHeight = 16.sp, color = DoctorCardFaint)
                     HorizontalDivider(color = DoctorHairline)
                 }
                 Text(t("Original words", "मूल शब्द"), fontSize = 19.sp, lineHeight = 24.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, fontFamily = SaharaTitleFont)

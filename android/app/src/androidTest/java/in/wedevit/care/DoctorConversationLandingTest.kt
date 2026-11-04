@@ -23,7 +23,9 @@ class DoctorConversationLandingTest {
   ui.setContent {val density=LocalDensity.current;CompositionLocalProvider(LocalDensity provides Density(density.density,1.5f)){CareTheme{Box(Modifier.width(320.dp).fillMaxSize().safeDrawingPadding()){DoctorConversationLanding(true,{opened+="recent"},{opened+="record"},{opened+="history"})}}}}
   listOf("Recent conversation","Record conversation","Conversation history").forEach {ui.onNodeWithText(it).performScrollTo().assertIsDisplayed().performClick()}
   assertEquals(listOf("recent","record","history"),opened)
-  listOf("Revisit the latest saved discussion, care priorities and questions.","Capture a discussion, then review the draft before saving the note.","Browse earlier conversations by date or doctor, and read archived drafts.").forEachIndexed { index,copy ->
+  // 3 Nov meeting: the cards keep their titles only; the descriptions are gone.
+  listOf("Revisit the latest saved discussion, care priorities and questions.","Capture a discussion, then review the draft before saving the note.","Browse earlier conversations by date or doctor, and read archived drafts.").forEach { ui.onNodeWithText(it).assertDoesNotExist() }
+  listOf("Recent conversation","Record conversation","Conversation history").forEachIndexed { index,copy ->
    ui.onNodeWithText(copy).performScrollTo().assertIsDisplayed()
    val text=ui.onNodeWithTag("doctor-conversation-copy-$index",useUnmergedTree=true).fetchSemanticsNode().boundsInRoot
    val art=ui.onNodeWithTag("doctor-conversation-art-$index",useUnmergedTree=true).fetchSemanticsNode().boundsInRoot

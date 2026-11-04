@@ -36,7 +36,7 @@ class DoctorPatientRecordUiTest {
         ui.onNodeWithTag("workflow-open-conversation").assertDoesNotExist()
         select("Progress")
         ui.onNodeWithTag("demo-dose-demo-asha-dose-1").assertDoesNotExist()
-        ui.onNodeWithText("A history of patient and family reports, not a clinical assessment.").assertExists()
+        ui.onNodeWithText("A history of patient and family reports, not a clinical assessment.").assertDoesNotExist()
         select("Conversations")
         ui.onNodeWithTag("demo-patient-detail").performScrollToNode(hasTestTag("workflow-open-conversation"))
         ui.onNodeWithTag("workflow-open-conversation").assertIsDisplayed()

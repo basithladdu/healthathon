@@ -129,8 +129,10 @@ private class PrepModel(val store: DoctorPreparationStore, val scope: String, va
 @Composable private fun PrepCard(tag: String, title: String, intro: String, m: PrepModel, content: @Composable ColumnScope.() -> Unit) { val t = careText();
     Card(Modifier.fillMaxWidth().testTag(tag), shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = DoctorCardReport), border = BorderStroke(1.dp, DoctorHairline)) {
         Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text(title, fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading())
-            Text(intro, fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(title, fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.weight(1f).a11yHeading())
+                DoctorInfoIcon(title, intro, "$tag-info")
+            }
             m.error?.let { Text(t(it, DoctorPreparationErrorsHindi[it] ?: it), fontSize = 13.sp, color = DoctorAccent, modifier = Modifier.testTag("$tag-error").announce()) }
             if (!m.loaded) TextButton(onClick = { m.load() }, modifier = Modifier.heightIn(min = 48.dp).testTag("$tag-retry")) { Text(t("Retry questions", "सवाल फिर से लाएँ"), color = DoctorAccent) }
             content()

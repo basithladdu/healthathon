@@ -34,11 +34,10 @@ private fun overviewValue(value:String) = value.takeIf {it.isNotBlank()} ?: "Not
                 Column(Modifier.testTag("overview-previous-professional"),verticalArrangement=Arrangement.spacedBy(4.dp)) {
                     Text(t("Previous care professional", "पिछले देखभाल पेशेवर"),style=MaterialTheme.typography.labelMedium,color=DoctorCardSub)
                     Text(overview.previousProfessional?.name ?: t("Name not recorded", "नाम दर्ज नहीं"),fontWeight=FontWeight.Medium,fontSize=18.sp, fontFamily = SaharaTitleFont)
-                    Text(t("Not a verified note author or an assigned doctor", "पुष्ट नोट लेखक या तय डॉक्टर नहीं"),fontSize=12.sp,color=DoctorCardFaint)
                 }
                 Text(t("Clinical assessment: ${overview.clinicalAssessment}", "क्लिनिकल आकलन: ${overview.clinicalAssessment}"),fontWeight=FontWeight.Medium,modifier=Modifier.testTag("overview-clinical-assessment"))
                 Column(Modifier.testTag("overview-handover-toggle"), verticalArrangement=Arrangement.spacedBy(4.dp)) {Text(overview.previousProfessional?.role ?: t("Professional role not recorded", "पेशेवर भूमिका दर्ज नहीं"));Text(overview.previousProfessional?.disclosure ?: t("No previous professional is documented.", "कोई पिछला पेशेवर दर्ज नहीं।"),style=MaterialTheme.typography.bodySmall)}
-                Column(Modifier.testTag("overview-background-toggle"), verticalArrangement=Arrangement.spacedBy(4.dp)) {Text(t("Background summary", "पृष्ठभूमि का सार"),fontWeight=FontWeight.SemiBold);Text(overview.background,lineHeight=24.sp);Text(t("Background recorded earlier; not a current clinical assessment.", "पहले दर्ज पृष्ठभूमि; अभी का क्लिनिकल आकलन नहीं।"),fontSize=12.sp,color=DoctorCardFaint)}
+                Column(Modifier.testTag("overview-background-toggle"), verticalArrangement=Arrangement.spacedBy(4.dp)) {Text(t("Background summary", "पृष्ठभूमि का सार"),fontWeight=FontWeight.SemiBold);Text(overview.background,lineHeight=24.sp)}
             }
         }
         Text(t("Care handover", "देखभाल हैंडओवर"),fontSize=21.sp,fontWeight=FontWeight.Medium, fontFamily = SaharaTitleFont)
@@ -68,7 +67,6 @@ private fun overviewValue(value:String) = value.takeIf {it.isNotBlank()} ?: "Not
                 val visit=overview.nextVisit
                 Text(if(visit==null) t("No upcoming visit recorded.", "आगे की कोई विज़िट दर्ज नहीं।") else "${visit.type} · ${visit.durationMinutes} minutes",fontWeight=FontWeight.Medium)
                 OverviewLabel(t("Recorded next steps", "दर्ज अगले क़दम"),discussion?.nextSteps?.let(::overviewValue) ?: t("Not recorded", "दर्ज नहीं"))
-                Text(t("Next steps are copied from the selected discussion, not generated treatment advice.", "अगले क़दम चुनी चर्चा से लिए गए हैं, बनाई गई इलाज की सलाह नहीं।"),style=MaterialTheme.typography.bodySmall,color=Ink.copy(alpha=.7f))
                 TextButton(onClick={onSection("Reports")},modifier=Modifier.heightIn(min=48.dp).testTag("overview-reports")) {Text(t("View report summaries", "सूचनाओं का सार देखें"))}
                 Button(onClick=onSchedule,modifier=Modifier.fillMaxWidth().heightIn(min=48.dp).testTag("demo-schedule-visit")) {Text(t("Schedule visit", "विज़िट तय करें"))}
             }

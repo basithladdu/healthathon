@@ -62,23 +62,38 @@ private fun readerFallbackGoals(note: CareVersion): List<ReaderGoal> = listOf(no
     ReaderGoal("fallback-$i", firstSentence.trim(), rest)
 }
 
-/** Reader body for doctor conversation notes: audio, transcription, then goals-of-care cards. */
-@Composable fun DoctorNoteReaderBody(vm: CareModel, note: CareVersion) { val t = careText();
+/** Reader body for doctor conversation notes: the goals-of-care note in the legal form's layout (Sections I to IV) with its PDF, then audio and transcription. */
+@Composable fun DoctorNoteReaderBody(vm: CareModel, note: CareVersion) { val t = careText(); val hindi = careHindi()
     val context = LocalContext.current
+    val form = remember(note.id, note.contentHash, hindi) { DoctorGocDiscussions.fromNote(note, hindi) }
+    var problem by remember(note.id) { mutableStateOf<String?>(null) }
     val goals = remember(vm, note.id, note.personId, note.conversationId, note.priorities, note.participants, note.topics, note.questions, note.nextSteps) {
         val stored = runCatching { DoctorPreparationStore(context, vm.storageNamespace).load(DoctorPreparationStore.scope(vm.accountNamespace, note.personId, note.conversationId)) }.getOrDefault(emptyList())
         if (stored.isNotEmpty()) stored.map { ReaderGoal(it.id, it.text.trim(), it.answer.trim().ifBlank { t("Not answered in this conversation", "इस बातचीत में जवाब नहीं मिला") }, it.answer.trim()) } else readerFallbackGoals(note)
     }
     // The audio card is looked up after the first frame; the body grows smoothly instead of pushing the transcript down in one jump.
     Column(Modifier.animateContentSize(), verticalArrangement = Arrangement.spacedBy(20.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Box(Modifier.weight(1f)) { ReaderHeading(t("Goals of care", "देखभाल के लक्ष्य")) }
+                DoctorGocPdfButton(form) { problem = it }
+            }
+            problem?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
+            DoctorGocFormSections(form)
+        }
+        // The doctor's own questions and answers, then what the note says beyond Sections I and II. The fallback cards repeat the note, so they are left out.
+        val asked = goals.filterNot { it.id.startsWith("fallback-") }
+        if (asked.isNotEmpty() || form.note.isNotBlank()) Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            ReaderHeading(t("Doctor's note", "डॉक्टर का नोट"))
+            asked.forEach { NoteReaderGoalCard(it, note.source) }
+            if (form.note.isNotBlank()) Surface(color = DoctorCardReport, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("note-reader-doctor-note")) {
+                SelectionContainer { Text(form.note, fontSize = 15.sp, lineHeight = 23.sp, color = DoctorCardInk, modifier = Modifier.padding(18.dp)) }
+            }
+        }
         NoteReaderAudio(vm, note)
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             ReaderHeading(t("Transcription", "बातचीत की लिखाई"))
             NoteReaderTranscript(note.source)
-        }
-        if (goals.isNotEmpty()) Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            ReaderHeading(t("Goals of care", "देखभाल के लक्ष्य"))
-            goals.forEach { NoteReaderGoalCard(it, note.source) }
         }
     }
 }
@@ -113,7 +128,6 @@ private fun readerFallbackGoals(note: CareVersion): List<ReaderGoal> = listOf(no
                 SelectionContainer { Text(goal.body, fontSize = 15.sp, lineHeight = 23.sp, color = DoctorCardInk, modifier = Modifier.padding(14.dp)) }
             }
             if (open && said.isNotEmpty()) Column(Modifier.fillMaxWidth().padding(bottom = 12.dp).testTag("note-reader-said-${goal.id}"), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(t("Said in the conversation (found by matching words)", "बातचीत में कहा गया (शब्द मिलाकर ढूँढा)"), fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardSub)
                 said.forEach { line -> SelectionContainer { Text("“$line”", fontSize = 15.sp, lineHeight = 23.sp, color = DoctorCardInk) } }
             }
         }
@@ -128,7 +142,7 @@ private fun readerFallbackGoals(note: CareVersion): List<ReaderGoal> = listOf(no
     var file by remember(note.id, note.contentHash) { mutableStateOf<java.io.File?>(null) }
     LaunchedEffect(vm, vm.accountNamespace, vm.storageNamespace, sessionId, note.id, note.contentHash, person, versions) { file = vm.doctorAudioFor(note); loaded = true }
     val audio = file
-    if (audio == null) { if (loaded) Text(t("No audio saved on this device for this conversation.", "इस बातचीत का कोई ऑडियो इस फ़ोन पर सहेजा नहीं।"), fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub, modifier = Modifier.testTag("note-reader-audio-none")); return }
+    if (audio == null) return
     val context = LocalContext.current
     val player = remember(audio.absolutePath) { runCatching { MediaPlayer.create(context, Uri.fromFile(audio)) }.getOrNull() }
     var playing by remember(player) { mutableStateOf(false) }

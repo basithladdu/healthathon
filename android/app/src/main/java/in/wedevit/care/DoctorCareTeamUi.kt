@@ -38,7 +38,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 @Composable fun DoctorCareTeamContent(contacts: List<CareContact>, readable: Boolean, loading: Boolean, error: String?, onRefresh: () -> Unit, ownerContent: @Composable () -> Unit = {}) { val t = careText();
     Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(16.dp).testTag("doctor-care-team-content"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text(t("Family & care team", "परिवार और देखभाल टीम"), fontFamily = SaharaTitleFont, fontSize = 21.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
-        Text(t("Only contacts explicitly added to this care profile appear here. Adding a contact does not invite them or give account access.", "यहाँ सिर्फ़ इस देखभाल प्रोफ़ाइल में जोड़े गए संपर्क दिखते हैं। संपर्क जोड़ने से उन्हें निमंत्रण या खाते की पहुँच नहीं मिलती।"), fontSize = 13.sp, color = DoctorCardSub)
         if (loading) LinearProgressIndicator(Modifier.fillMaxWidth())
         error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
         if (!readable && !loading) Text(t("The owner has not shared care-team contacts with this account.", "मालिक ने देखभाल टीम के संपर्क इस खाते से साझा नहीं किए।"), fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk)
@@ -67,7 +66,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
     if (!owner || selected != personId) return
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(t("Family & care-team contacts", "परिवार और देखभाल टीम के संपर्क"), style = MaterialTheme.typography.titleMedium)
-        Text(t("These contacts stay private unless you explicitly share them below. Contacts do not receive an invitation automatically.", "ये संपर्क निजी रहते हैं, जब तक आप नीचे इन्हें साझा न करें। संपर्कों को अपने-आप निमंत्रण नहीं जाता।"), style = MaterialTheme.typography.bodySmall)
         contacts.filter { it.personId == personId }.forEach { contact ->
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Column(Modifier.weight(1f)) { Text(contact.name); Text(contact.relationship, style = MaterialTheme.typography.bodySmall) }

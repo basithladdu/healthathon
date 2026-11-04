@@ -76,7 +76,7 @@ class DoctorCareDemoFlowTest {
             if(section=="Progress") ui.onNodeWithTag("doctor-condition-chart").assertDoesNotExist()
             if(section=="Medicines") ui.waitUntil(15_000){ui.onAllNodesWithText("Morphine sulfate 10 mg").fetchSemanticsNodes().isNotEmpty()}
             if(section=="Conversations") {
-                ui.onNodeWithTag("doctor-conversation-card-2").performScrollTo().performClick();ui.onNodeWithText("All saved conversation versions.").assertExists();screenshot("doctor-demo-conversation-history-filters");ui.onNodeWithContentDescription("Back to patient care").performClick();waitFor("doctor-conversations")
+                ui.onNodeWithTag("doctor-conversation-card-2").performScrollTo().performClick();ui.onNodeWithText("Conversation history").assertExists();screenshot("doctor-demo-conversation-history-filters");ui.onNodeWithContentDescription("Back to patient care").performClick();waitFor("doctor-conversations")
             }
             if(section=="Reports") {
                 ui.waitUntil(15_000){ui.onAllNodesWithText("2 care notes · 4 reports").fetchSemanticsNodes().isNotEmpty()}

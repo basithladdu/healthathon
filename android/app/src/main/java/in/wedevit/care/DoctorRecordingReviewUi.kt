@@ -97,7 +97,6 @@ fun effectiveDoctorCoverage(item: DoctorCoverageItem, sourceText: String): Docto
                             Button(onClick = onStopRecording, modifier = Modifier.weight(1f).heightIn(min = 52.dp).testTag("record-stop"), colors = ButtonDefaults.buttonColors(containerColor = Paper, contentColor = Rust)) { Icon(Icons.Default.Stop, null); Spacer(Modifier.width(6.dp)); Text(t("Stop & save", "रोकें और सहेजें")) }
                         }
                     } else {
-                        Text(t("Capture a conversation on this device. Recording starts only after consent and microphone permission.", "इसी फ़ोन पर बातचीत रिकॉर्ड करें। रिकॉर्डिंग सहमति और माइक्रोफ़ोन की अनुमति के बाद ही शुरू होती है।"), fontSize = 14.sp, lineHeight = 21.sp, color = Color.White.copy(alpha = .9f))
                         Button(onClick = onRecord, enabled = state.canRecord && !state.busy, modifier = Modifier.fillMaxWidth().heightIn(min = 54.dp).testTag("record-start"), colors = ButtonDefaults.buttonColors(containerColor = Paper, contentColor = Rust, disabledContainerColor = Paper.copy(alpha = .65f), disabledContentColor = Rust.copy(alpha = .75f))) { Icon(Icons.Default.Mic, null); Spacer(Modifier.width(8.dp)); Text(t("Record conversation", "बातचीत रिकॉर्ड करें")) }
                     }
                 } else {
@@ -123,7 +122,7 @@ fun effectiveDoctorCoverage(item: DoctorCoverageItem, sourceText: String): Docto
         Surface(color = DoctorCardReport, contentColor = DoctorCardInk, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
             Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.Notes, null, tint = DoctorAccent); Spacer(Modifier.width(10.dp)); Text(t("Conversation transcript", "बातचीत की लिखाई"), fontSize = 20.sp, lineHeight = 26.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, color = DoctorCardInk) }
-                Text(if (state.clipLabel != null) t("Written from the conversation audio above. Play it back while you read.", "ऊपर के बातचीत वाले ऑडियो से लिखा गया। पढ़ते समय उसे चलाकर सुनें।") else t("Not linked to a recording yet.", "अभी किसी रिकॉर्डिंग से जुड़ा नहीं।"), fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub)
+                if (state.clipLabel == null) Text(t("Not linked to a recording yet.", "अभी किसी रिकॉर्डिंग से जुड़ा नहीं।"), fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub)
                 Text(when (state.sourceKind) { DoctorTranscriptKind.FICTIONAL_SAMPLE -> t("Prepared transcript · not taken from this recording", "पहले से लिखी लिखाई · इस रिकॉर्डिंग से नहीं"); DoctorTranscriptKind.ONLINE -> t("Online transcript · check every word against the audio", "ऑनलाइन लिखाई · हर शब्द ऑडियो से जाँचें"); DoctorTranscriptKind.MANUAL -> t("Manually entered · check wording and speakers", "हाथ से लिखा · शब्द और बोलने वाले जाँचें"); DoctorTranscriptKind.NONE -> t("No transcript yet", "अभी कोई लिखाई नहीं") }, fontSize = 13.sp, lineHeight = 18.sp, fontWeight = FontWeight.Medium, color = DoctorAccent, modifier = Modifier.testTag("record-transcript-origin"))
                 OutlinedTextField(value = state.sourceText, onValueChange = { if (it.length <= 12000) onSourceEdit(it) }, enabled = !state.busy && !state.recording, label = { Text(t("Transcript · tap to edit", "लिखाई · बदलने के लिए छुएँ")) }, placeholder = { Text(t("Type or paste what was said, then correct any words that are wrong.", "जो कहा गया वह लिखें या चिपकाएँ, फिर ग़लत शब्द ठीक करें।")) }, supportingText = { Text("${state.sourceText.length} / 12000", fontSize = 12.sp, color = DoctorCardFaint) }, textStyle = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp, lineHeight = 26.sp, color = DoctorCardInk), minLines = 6, maxLines = 14, modifier = Modifier.fillMaxWidth().testTag("record-transcript"), shape = RoundedCornerShape(16.dp), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = DoctorAccent, focusedLabelColor = DoctorAccent, cursorColor = DoctorAccent, unfocusedBorderColor = DoctorCardSub, unfocusedLabelColor = DoctorCardSub, disabledTextColor = DoctorCardSub))
             }
@@ -131,7 +130,6 @@ fun effectiveDoctorCoverage(item: DoctorCoverageItem, sourceText: String): Docto
         Surface(color = DoctorCardReport, contentColor = DoctorCardInk, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
             Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Text(t("Goals of Care review", "देखभाल के लक्ष्यों की जाँच"), fontSize = 20.sp, lineHeight = 26.sp, color = DoctorCardInk, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
-                Text(t("Check what was covered. Missing text does not mean a topic was not discussed or that anyone agreed.", "देखें किस पर बात हुई। लिखाई में कुछ न होने का मतलब यह नहीं कि उस पर बात नहीं हुई या कोई सहमत हुआ।"), fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub)
                 state.coverage.forEachIndexed { index, item ->
                     val status = effectiveDoctorCoverage(item, state.sourceText)
                     val label = when (status) { DoctorCoverageStatus.NOT_ASSESSED -> t("Not assessed", "जाँचा नहीं"); DoctorCoverageStatus.REVIEWED_DISCUSSED -> if (item.manuallyReviewed) t("Discussed · manually reviewed", "बात हुई · हाथ से जाँचा") else t("Discussed · source linked", "बात हुई · स्रोत जुड़ा"); DoctorCoverageStatus.NOT_FOUND_IN_TRANSCRIPT -> t("Not found in transcript", "लिखाई में नहीं मिला"); DoctorCoverageStatus.NEEDS_REVIEW -> t("Needs review", "जाँच ज़रूरी") }
@@ -145,7 +143,6 @@ fun effectiveDoctorCoverage(item: DoctorCoverageItem, sourceText: String): Docto
                 }
             }
         }
-        DoctorFootnote(t("Audio is not automatically transcribed, so the words must be checked by a person. Audio stays on this device and is not included when a written note is shared.", "ऑडियो अपने-आप लिखाई में नहीं बदलता, इसलिए शब्द किसी व्यक्ति को जाँचने होंगे। ऑडियो इसी फ़ोन पर रहता है और लिखा नोट साझा करने पर साथ नहीं जाता।"))
         }
         }
     }

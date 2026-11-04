@@ -60,7 +60,6 @@ fun DoctorVisitEditor(vm: CareModel, personId: String, onDismiss: () -> Unit, in
             onSave = { try { vm.saveDoctorVisit(personId, account, doctor, startsAt, location, DoctorVisitDetails.encode(conditionRef, discussionRef, note), onDismiss, entryId, created, initial) } catch (e: IllegalArgumentException) { vm.actionError.value = e.message ?: t("Check the linked records and shorten the note.", "जुड़े रिकॉर्ड जाँचें और नोट छोटा करें।") } }, onCancel = onDismiss,
             sourceLinks = {
                 Text(t("Link exact records (optional)", "रिकॉर्ड जोड़ें (चाहें तो)"), style = MaterialTheme.typography.titleMedium)
-                Text(t("Linked health details remain protected by their own sharing permissions.", "जुड़ी सेहत की जानकारी अपनी साझा करने की अनुमति से सुरक्षित रहती है।"))
                 Text(t("Condition update", "हालत का अपडेट"))
                 SourceChoice("None", conditionRef.isBlank()) { conditionRef = "" }
                 entries.filter { it.personId == personId && it.kind == "checkin" }.takeLast(20).forEach { row -> SourceChoice("${date(row.created)} · ${row.title}", conditionRef == row.id) { conditionRef = row.id } }
@@ -75,15 +74,12 @@ fun DoctorVisitEditor(vm: CareModel, personId: String, onDismiss: () -> Unit, in
 @Composable fun DoctorVisitForm(doctor: String, onDoctor: (String) -> Unit, location: String, onLocation: (String) -> Unit, note: String, onNote: (String) -> Unit, dateLabel: String, timeLabel: String, zoneLabel: String, deviceLocal: Boolean, busy: Boolean, canSave: Boolean, error: String?, onDate: () -> Unit, onTime: () -> Unit, onSave: () -> Unit, onCancel: () -> Unit, sourceLinks: @Composable () -> Unit = {}) { val t = careText();
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(start = 22.dp, end = 22.dp, bottom = 28.dp).testTag("doctor-real-visit-editor"), verticalArrangement = Arrangement.spacedBy(14.dp)) {
             Heading(t("Plan a visit", "विज़िट तय करें"), 28)
-            Text(if (deviceLocal) t("This visit stays with this care profile on this device.", "यह विज़िट इसी फ़ोन पर इस देखभाल प्रोफ़ाइल के साथ रहती है।") else t("Save to this patient's shared care record. They can see the visit after refreshing their app.", "इस मरीज़ के साझा देखभाल रिकॉर्ड में सहेजें। ऐप ताज़ा करने पर उन्हें विज़िट दिखेगी।"))
             CareField(doctor, onDoctor, t("Doctor's name", "डॉक्टर का नाम"), singleLine = true)
-            Text(t("This is the appointment's doctor label, not proof of professional verification.", "यह अपॉइंटमेंट के डॉक्टर का नाम है, पेशेवर पुष्टि का सबूत नहीं।"), style = MaterialTheme.typography.bodySmall)
             OutlinedButton(onClick = onDate, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp), enabled = !busy) { Text(dateLabel) }
             OutlinedButton(onClick = onTime, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-visit-time"), enabled = !busy) { Text(timeLabel) }
             Text(t("Time zone: $zoneLabel", "समय क्षेत्र: $zoneLabel"), style = MaterialTheme.typography.bodySmall)
             CareField(location, onLocation, t("Place or visit type (optional)", "जगह या विज़िट का प्रकार (चाहें तो)"), singleLine = true)
             CareField(note, onNote, t("Appointment logistics (optional)", "अपॉइंटमेंट का इंतज़ाम (चाहें तो)"), minLines = 2)
-            Text(t("Keep health condition and discussion details in the protected records linked below.", "सेहत की हालत और चर्चा की जानकारी नीचे जुड़े सुरक्षित रिकॉर्ड में रखें।"), style = MaterialTheme.typography.bodySmall)
             sourceLinks()
             error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
             Button(onClick = onSave, enabled = canSave && !busy && doctor.isNotBlank(), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("doctor-save-real-visit")) { Text(if (busy) "Saving…" else t("Save visit", "विज़िट सहेजें")) }

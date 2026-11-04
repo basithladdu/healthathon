@@ -92,7 +92,6 @@ internal fun doctorCaptureModeLabel(mode: String, hindi: Boolean): String = care
             Column(Modifier.fillMaxWidth().padding(end = 12.dp)) {
                 Text(t("Conversation", "बातचीत"), fontFamily = SaharaTitleFont, fontSize = 36.sp, lineHeight = 42.sp, fontWeight = FontWeight.Medium, color = white)
                 Text(doctorStageStatus(recording, saving, seconds, careHindi()), fontSize = 16.sp, lineHeight = 22.sp, color = white, modifier = Modifier.testTag("record-stage-status"))
-                Text(t("Audio stays on this device and is not included when a written note is shared. It is not automatically transcribed.", "ऑडियो इसी फ़ोन पर रहता है और लिखा नोट साझा करने पर साथ नहीं जाता। यह अपने-आप लिखाई में नहीं बदलता।"), fontSize = 12.sp, lineHeight = 16.sp, color = white, modifier = Modifier.padding(top = 4.dp).testTag("record-stage-privacy"))
             }
             // The goals-of-care checklist sits between the title and the waveform and scrolls if it is long.
             Column(Modifier.weight(1f).fillMaxWidth().padding(top = 12.dp, end = 12.dp).verticalScroll(rememberScrollState())) { checklist() }

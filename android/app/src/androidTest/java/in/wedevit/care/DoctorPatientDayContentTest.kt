@@ -99,7 +99,7 @@ class DoctorPatientDayContentTest {
         ui.onNodeWithTag("doctor-checkin-filter-hard").performClick()
         ui.onNodeWithTag("doctor-checkin-history").performScrollToNode(hasTestTag("doctor-checkin-good"))
         ui.onNodeWithTag("doctor-checkin-good").performClick()
-        ui.onNodeWithText("Self-reported update; clinical assessment and reporter identity are not independently verified.").assertExists()
+        ui.onNodeWithText("Self-reported update; clinical assessment and reporter identity are not independently verified.").assertDoesNotExist()
         ui.onNodeWithText("Close").performClick()
     }
 
@@ -122,7 +122,7 @@ class DoctorPatientDayContentTest {
         } } }
         ui.onNodeWithTag("doctor-patient-day").performScrollToNode(hasTestTag("doctor-add-visit"))
         ui.onNodeWithTag("doctor-add-visit").assertIsNotEnabled()
-        ui.onNodeWithText("Read-only access. A permitted editor must add a visit.").assertExists()
+        ui.onNodeWithText("Read-only access. A permitted editor must add a visit.").assertDoesNotExist()
         ui.onNodeWithTag("doctor-medicine-summary").assertDoesNotExist()
     }
 

@@ -69,7 +69,6 @@ private fun requestLabel(status: WorkflowRequestStatus) = status.name.lowercase(
                 OutlinedButton(onClick = { onOpen(request.patientId) }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("workflow-request-${request.id}")) { Text(t("Open conversation", "बातचीत खोलें")); Spacer(Modifier.width(8.dp)); Icon(Icons.Default.ChevronRight, null) }
             }
         }
-        item { Text(t("This is your own list. Status changes stay on this device: nobody is notified, invited or called, and no hospital appointment is reserved.", "यह आपकी अपनी सूची है। स्थिति के बदलाव इसी फ़ोन पर रहते हैं: किसी को सूचना, निमंत्रण या कॉल नहीं जाती, और अस्पताल की कोई अपॉइंटमेंट बुक नहीं होती।"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
     }
 }
 
@@ -77,7 +76,6 @@ private fun requestLabel(status: WorkflowRequestStatus) = status.name.lowercase(
     Column(verticalArrangement=Arrangement.spacedBy(12.dp)) {
         TextButton(onClick=onBack,modifier=Modifier.heightIn(min=48.dp).testTag("workflow-back")) { Icon(Icons.Default.ChevronLeft,null);Text(t("Workspace", "कार्यक्षेत्र")) }
         WorkflowTitle(t("Conversations to plan", "तय करने वाली बातचीत"))
-        Text(t("Your own list. Nothing here was sent to you by a patient or family member.", "आपकी अपनी सूची। यहाँ कुछ भी मरीज़ या परिवार ने नहीं भेजा।"),color=MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 
@@ -159,13 +157,13 @@ private fun requestLabel(status: WorkflowRequestStatus) = status.name.lowercase(
                 item { WorkflowSection(t("Previous discussion", "पिछली चर्चा")) }
                 val previous = versions.firstOrNull()
                 if (previous != null) item { WorkflowCard { Text(t("Practice care note v${previous.number}", "अभ्यास केयर नोट v${previous.number}"), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont); Text(previous.draft.nextSteps.ifBlank { t("No next steps recorded.", "कोई अगला क़दम दर्ज नहीं।") }); TextButton(onClick = { selectedVersion = previous.id }, modifier = Modifier.testTag("workflow-version-${previous.id}")) { Text(t("Read exact version", "मूल संस्करण पढ़ें")) } } }
-                else item { WorkflowCard { Text(sources.firstOrNull()?.label ?: t("No previous discussion", "कोई पिछली चर्चा नहीं"), fontWeight = FontWeight.SemiBold); Text(sources.firstOrNull()?.text ?: t("Start a conversation below.", "नीचे बातचीत शुरू करें।")); Text(t("Source text as entered, not a verified clinical note.", "जैसा लिखा गया वैसा स्रोत, पुष्ट क्लिनिकल नोट नहीं।"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) } }
-                item { WorkflowSection(t("Guided discussion checklist", "चर्चा की सूची")); Text(t("Record what was covered. Leaving a topic open does not imply agreement.", "जिस पर बात हुई वह दर्ज करें। किसी विषय को खुला छोड़ने का मतलब सहमति नहीं।"), color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                else item { WorkflowCard { Text(sources.firstOrNull()?.label ?: t("No previous discussion", "कोई पिछली चर्चा नहीं"), fontWeight = FontWeight.SemiBold); Text(sources.firstOrNull()?.text ?: t("Start a conversation below.", "नीचे बातचीत शुरू करें।")) } }
+                item { WorkflowSection(t("Guided discussion checklist", "चर्चा की सूची")) }
                 items(draft.checklist.withIndex().toList(), key = { it.index }) { (index, topic) -> WorkflowCard {
                     Text(topic.title, fontWeight = FontWeight.Medium)
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) { WorkflowTopicStatus.entries.forEach { status -> FilterChip(topic.status == status, onClick = { update(draft.copy(checklist = draft.checklist.mapIndexed { i, row -> if(i == index) row.copy(status = status) else row })) }, label = { Text(when(status) { WorkflowTopicStatus.DISCUSSED -> t("Discussed", "बात हुई"); WorkflowTopicStatus.DEFERRED -> "Defer"; else -> t("Not discussed", "बात नहीं हुई") }, fontSize = 12.sp) }, modifier = Modifier.heightIn(min=48.dp).testTag("workflow-topic-$index-${status.name}")) } }
                 } }
-                item { WorkflowSection(t("Participant permissions", "भागीदारों की अनुमति")); Text(t("See each person's separate selections. This screen does not record or upload audio.", "हर व्यक्ति के अलग चुनाव देखें। यह स्क्रीन ऑडियो रिकॉर्ड या अपलोड नहीं करती।"), color=MaterialTheme.colorScheme.onSurfaceVariant) }
+                item { WorkflowSection(t("Participant permissions", "भागीदारों की अनुमति")) }
                 item { OutlinedTextField(participant, { participant = it }, label = { Text(t("Participant name", "भागीदार का नाम")) }, modifier = Modifier.fillMaxWidth().testTag("workflow-consent-participant"), singleLine=true) }
                 item { OutlinedTextField(purpose, { purpose = it }, label = { Text(t("Purpose", "उद्देश्य")) }, modifier = Modifier.fillMaxWidth().testTag("workflow-consent-purpose")) }
                 item { WorkflowCheck(recordingAgreed, { recordingAgreed = it }, t("Agrees to recording", "रिकॉर्डिंग के लिए राज़ी"), "workflow-consent-recording"); WorkflowCheck(cloudAgreed, { cloudAgreed = it }, t("Separately agrees to cloud processing", "क्लाउड प्रोसेसिंग के लिए अलग से राज़ी"), "workflow-consent-cloud") }
@@ -177,7 +175,6 @@ private fun requestLabel(status: WorkflowRequestStatus) = status.name.lowercase(
                 if(enableOnlineAi) {
                     item { WorkflowSection("Audio → transcript → draft") }
                     item { DoctorAudioCapture(audio,sessionState?.value!=null,onlineBusy,draft.sourceText.isBlank(),onSignIn,::transcribeAndDraft) }
-                    item { Text(t("Use non-confidential, non-patient content only. Online processing is explicit; nothing is uploaded while recording. You can also type source text below.", "सिर्फ़ ग़ैर-गोपनीय, असली मरीज़ से अलग सामग्री इस्तेमाल करें। ऑनलाइन प्रोसेसिंग आप ख़ुद चुनते हैं; रिकॉर्ड करते समय कुछ अपलोड नहीं होता। आप नीचे स्रोत लिख भी सकते हैं।"),color=MaterialTheme.colorScheme.onSurfaceVariant,style=MaterialTheme.typography.bodySmall) }
                 } else item { DoctorLocalPreviewCapture(audio,draft.sourceText,when {draft.sourceText.isBlank()->DoctorTranscriptKind.NONE;draft.mockGenerated->DoctorTranscriptKind.FICTIONAL_SAMPLE;else->DoctorTranscriptKind.MANUAL},onSourceEdit={update(draft.copy(sourceText=it.take(12000)))}) }
                 items(audioState.clips, key={"offline-audio-${it.id}"}) { clip ->
                     OfflineConversationTranscription(file=clip.file,identity="$accountId:${patient.id}",consent=clip.consent,
@@ -211,7 +208,7 @@ private fun requestLabel(status: WorkflowRequestStatus) = status.name.lowercase(
             }
             else -> {
                 item { WorkflowSection(t("Check the exact draft", "मूल ड्राफ़्ट जाँचें")) }
-                item { WorkflowCard { Text(t("Practice walkthrough · unverified", "अभ्यास वॉकथ्रू · अपुष्ट"), fontWeight=FontWeight.Medium, color=Rust, fontFamily = SaharaTitleFont); Text(t("Professional verification is not connected. Publishing here creates an unverified version, not a verified clinical record.", "डॉक्टर की पुष्टि जुड़ी नहीं है। यहाँ प्रकाशित करने से अपुष्ट संस्करण बनता है, पुष्ट क्लिनिकल रिकॉर्ड नहीं।")) } }
+                item { WorkflowCard { Text(t("Practice walkthrough · unverified", "अभ्यास वॉकथ्रू · अपुष्ट"), fontWeight=FontWeight.Medium, color=Rust, fontFamily = SaharaTitleFont) } }
                 item { WorkflowDraftSummary(draft) }
                 item { OutlinedTextField(reviewer,{reviewer=it; checked=false},label={Text(t("Reviewer name (self-entered)", "समीक्षक का नाम (ख़ुद लिखा)"))},singleLine=true,modifier=Modifier.fillMaxWidth().testTag("workflow-reviewer")) }
                 item { WorkflowCheck(sourceConfirmed,{sourceConfirmed=it},t("I checked the original source text", "मैंने मूल स्रोत जाँचा"), "workflow-source-confirmed"); WorkflowCheck(checked,{checked=it},t("I reviewed every section and unresolved point", "मैंने हर हिस्सा और अनसुलझी बात जाँची"), "workflow-review-checked") }
@@ -228,7 +225,7 @@ private fun requestLabel(status: WorkflowRequestStatus) = status.name.lowercase(
             items(store.attachments(patient.id),key={it.id}) { attachment -> WorkflowCard { Text(attachment.title,fontWeight=FontWeight.Medium); Text(attachment.text); Text(t("Text source; no uploaded original file.", "लिखा हुआ स्रोत; कोई मूल फ़ाइल अपलोड नहीं।"),style=MaterialTheme.typography.bodySmall,color=MaterialTheme.colorScheme.onSurfaceVariant) } }
             items(store.timeline(patient.id),key={"timeline-${it.id}"}) { entry -> Column { Text(entry.title,fontWeight=FontWeight.Medium); Text(entry.detail); Text(workflowDate(entry.at),style=MaterialTheme.typography.bodySmall,color=MaterialTheme.colorScheme.onSurfaceVariant) } }
         }
-        if(historySection=="Activity") { item { Text(t("In-app history only; no SMS, push or external delivery.", "सिर्फ़ ऐप के अंदर का इतिहास; कोई SMS, नोटिफ़िकेशन या बाहर भेजना नहीं।"),style=MaterialTheme.typography.bodySmall) }; items(store.activity(patient.id).take(30),key={it.id}) { entry -> Text("${workflowDate(entry.at)}\n${entry.action}",style=MaterialTheme.typography.bodySmall) } }
+        if(historySection=="Activity") { items(store.activity(patient.id).take(30),key={it.id}) { entry -> Text("${workflowDate(entry.at)}\n${entry.action}",style=MaterialTheme.typography.bodySmall) } }
     }
 }
 
@@ -264,6 +261,5 @@ private fun requestLabel(status: WorkflowRequestStatus) = status.name.lowercase(
         } }
         item { Button(onClick={runCatching { if(pdfPassword.isEmpty()) DoctorWorkflowPdf.create(context,version,patient.name.removeSuffix(" Demo")) else DoctorWorkflowPdf.createLocked(context,version,patient.name.removeSuffix(" Demo"),pdfPassword) }.onSuccess { exported=it;message=if(pdfPassword.isEmpty()) t("Practice PDF created on this device", "अभ्यास PDF इसी फ़ोन पर बनी") else t("Locked PDF created on this device", "लॉक PDF इसी फ़ोन पर बनी") }.onFailure { message=(it as? IllegalArgumentException)?.message ?: t("Could not create the practice PDF. Try again.", "अभ्यास PDF नहीं बन सकी। फिर कोशिश करें।") }},enabled=pdfPassword.isEmpty()||PdfPasswordLock.passwordError(pdfPassword)==null,modifier=Modifier.fillMaxWidth().heightIn(min=48.dp).testTag("workflow-export-pdf")) { Icon(if(pdfPassword.isEmpty()) Icons.Default.PictureAsPdf else Icons.Default.Lock,null);Spacer(Modifier.width(8.dp));Text(if(pdfPassword.isEmpty()) t("Create practice PDF", "अभ्यास PDF बनाएँ") else t("Create locked PDF", "लॉक PDF बनाएँ")) } }
         exported?.let { file -> item { Text("${file.name} · ${file.length()/1024} KB",style=MaterialTheme.typography.bodySmall,modifier=Modifier.testTag("workflow-pdf-ready")); OutlinedButton(onClick={runCatching { DoctorWorkflowPdf.share(context,file) }.onFailure { message=t("No sharing app is available.", "भेजने के लिए कोई ऐप नहीं है।") }},modifier=Modifier.fillMaxWidth().heightIn(min=48.dp).testTag("workflow-share-pdf")) { Icon(Icons.Default.Share,null);Spacer(Modifier.width(8.dp));Text(if(file.name.endsWith("-locked.pdf")) t("Share locked PDF", "लॉक PDF भेजें") else t("Share practice PDF", "अभ्यास PDF भेजें")) } } }
-        item { WorkflowCard { Text(t("Emergency QR retrieval", "आपातकालीन QR से देखना"),fontWeight=FontWeight.SemiBold); Text(t("Secure hospital retrieval is not connected. No QR code or public patient link is created in this practice walkthrough.", "अस्पताल के लिए सुरक्षित देखना अभी जुड़ा नहीं है। इस अभ्यास वॉकथ्रू में कोई QR कोड या सार्वजनिक लिंक नहीं बनता।"),style=MaterialTheme.typography.bodySmall) } }
     }
 }
