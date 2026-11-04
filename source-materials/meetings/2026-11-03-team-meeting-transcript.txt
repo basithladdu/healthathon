@@ -1,0 +1,790 @@
+Sahara team meeting, 3 Nov 2026: app walkthrough with the doctors (patient app, doctor side, goals of care).
+Pasted by Basith on 4 Nov 2026. Automatic transcript, no speaker labels.
+
+Next visit. 
+
+Yeah. 
+
+Latest note from the doctor. Emergency care plan. Um. 
+
+Yeah. So, uh, this one didn't make sense to me. Zero of three today. Three not yet. Uh, so you can remove the three not yet part. You know, you can just say zero of three. 
+
+Yes. Okay. That one. And differentiating between patient and family interface. So, I think we have to kind of change that. And which one? One more. Did you tagline? Yeah, of course. Tag we have to think. I think we'll think about. 
+
+Yeah, we'll have to think about it. We can just put that on the group I mean. 
+
+Sure. Sure. 
+
+Yeah. Um next you know calendar SOS. Oh sorry calendar SOS family and labs that is also good. 
+
+Um um yeah but um this is great. I like this uh but I think see uh the AI strong part of the thing is the goals of care app and I think uh you know the labs being differentiated and those kind of things. 
+
+So maybe The SOS thing should be more highlighted. I don't know how like um because they should be able to easily access the QR code as well, right? 
+
+Yeah. 
+
+Yeah. So maybe I mean we'll have to think about where you want to place the SOS thing. We'll go through each one of them again. 
+
+Yes. Okay. 
+
+Uh goals of care. This is fine. Yeah. You know, maybe this can go up or something like that. I don't know. 
+
+Got it. We'll improve the UI. Yeah. Yeah. 
+
+Uh fine here. Up next. Next. Up. Next. This is fine. Medicine. This is fine. Um, times come from reminders of medicine. Yeah, this is fine. Um, 
+
+one second. 
+
+Can you go back? One sec. 
+
+No, no, go back. Go back. 
+
+Go back. 
+
+Uh, go back to the screen. Okay. Yeah. Obvious we I think uh near the up next we have to improve the UI. It's plain. Let's just like add something where it's like colorful. instead of like plain text. Yeah. And then uh more scroll down more. Thank you. Uh and the medicines thing as well. It's the UI is going down. I'll do this. No problem. And go down. We will we'll also remove the explanatory text like the time comes from reminders. Those are like those are not good. Well, if 
+
+we'll just remove those because it's just making the screen long. We'll just put a question mark and if they want to read about it, then they can read about it, I guess. Yeah. 
+
+Yeah. Okay. And the not yet. Yeah. 
+
+So these um you know pillbot like placeholders are where the image of the strip will come I'm assuming. Right. 
+
+Yes. 
+
+Okay. Where that be? Yeah. 
+
+Yeah. 
+
+Okay. Continue. 
+
+Um so maybe you know the effects part need not be there in the landing page. 
+
+Uh 
+
+because you know that 
+
+which which part? 
+
+Uh This one these are what are these? These are the side effects of what it is. 
+
+Yes. Yes. These are like you know if they want to have any questions about the side effects etc etc or history history is basically I think uh from how they've taken it like how when they have taken it etc. 
+
+Oh okay. So when I take it 
+
+yeah 
+
+it would have said it should ideally reflect here right one. 
+
+I have to save the UI too long here. What happens you know say morning is 4 hours leads right 
+
+and I take it once and it's gone. So how what does that mean? Do I take it at the end of the day? Do I take it for every course? How does it work? 
+
+Uh I think we have to put the I think we have to put the frequency in a way where like if it's four times a day then we have to ping them or not ping them four times and every single time they have to take it I guess. 
+
+Yeah. Okay. 
+
+Yeah. Maybe they can set a reminder if they want to and you know they And we think that each time you know 
+
+Yeah. 
+
+Okay. 
+
+Makes sense. 
+
+Something like that. Yeah. And I like that you know you have put you know to what the medicine does and you take this is really helpful. 
+
+Yeah it is. It is. 
+
+So we can so we can revisit this a little later. So to do is the fine. 
+
+Yeah. 
+
+Journal is fine. 
+
+And yeah so this I meant so this side effects maybe we can remove in the landing page. 
+
+Yeah. Okay. 
+
+Sure. Yeah. I think journal also we can remove I guess. I think we'll just use this main page to kind of direct like kind of just have like pages. 
+
+Yeah, different page. That will be better. This this is too long. 
+
+Yeah. 
+
+So, um let's just go into each one of these. How is today? So, yeah, the face is kind of freaking me out. 
+
+Okay. 
+
+So, I mean you know. So, this face looks kind of evil. It looks like the face is on the mushroom, you know. 
+
+Yeah, we'll find better ones. No worries. 
+
+Yeah, you can. Yeah, you can add 
+
+Yeah. And the distress thing we put can you click S on distress? 
+
+Correct. Yeah. Quiet day. This is fine. Uh, no, it just gets saved. I realize that. 
+
+Yes. 
+
+Um, 
+
+which we have to improve the toast as well. 
+
+The toast are not. 
+
+Yeah. Okay. 
+
+Okay. 
+
+Do we need this? 
+
+No, we don't need we the help vertex in this as well. 
+
+Correct. Um and then you know okay are you in any distress today? Yes. So this one I mean I think the thermometer is a better thing because it says distress thermometer and we haven't put a thermometer or even 
+
+the thermometer thermometer takes too long for the page. 
+
+Oh then what I mean we can just make the Sorry. Oh it should have ideally gone back to that one right? 
+
+Yeah. Go back. back. It should have gone back to the previous one. I think 
+
+is the router. 
+
+Okay. 
+
+Yeah. So, I mean you can just make the thermometer this time, right? 
+
+Okay. 
+
+Yeah. Yeah. Be good. I think I will be good. 
+
+Yeah. So, then you know this is fine. This is great. 
+
+Yeah. 
+
+And so, so what happens is if I click say nine, you know, 
+
+Yeah. 
+
+automatically the physical concerns opens up and then if I tick this, the next one opens up. 
+
+Um 
+
+you have to click Should that not happen, right? 
+
+We we should not open it. Uh so they they will open it if they want. 
+
+Yeah, I think so. 
+
+Okay, then 
+
+what do you guys think? 
+
+Uh that's fine with us. I mean I mean I think this is good. Like I think we have to instead of the distress number thing, we'll just put a thermometer and they can see all the other uh things as well. I guess 
+
+things if they want to open it, they can open it. 
+
+Yeah, they'll open it and then Yeah. That's perfect. 
+
+Okay. And then what else is on this page? Yeah. What is symptom? Yeah. So this is fine. We'll revisit this when we go to the symptom. 
+
+Yeah. 
+
+So if I go back. So again, if I So whenever I press back, it's going to the landing page. I think it should go back to the page it was linked to, right? I don't know. 
+
+Yeah. Anything else you guys want to see over there? 
+
+What? I think you have some questions on pain symptom on the 3D model. Correct. Yeah. Yeah. Do you So, how do you guys want to do it? Do you want to do everything? Do you want to go through the whole app together or 
+
+uh let's do one thing. You tell the changes that you know I mean you have some questions, right? 
+
+Correct. Yeah. 
+
+Also, you know, is this today going to change cuz every day is going to be today, right? 
+
+Um if we look at 
+
+I think if you have to put like Wednesday or like November 3 like that. 
+
+Yeah. So that is over We have to make it bigger. 
+
+Or maybe you can just make this good morning. 
+
+Yeah. Yeah. Okay. Okay. 
+
+Um the pain. 
+
+Yeah. Yeah. 
+
+The pain history on body. Yeah. This is taking the wording of that pain history on body or something else. 
+
+Yeah. Yeah. 
+
+Visualization. I don't know. 
+
+The thing that happened with the body thing was I was not able to kind of select the thing. Exactly. 
+
+So let's look at this. So uh it said you know drag to rotate 
+
+and say I have pain here. 
+
+Yeah. 
+
+It it doesn't do anything. Okay. 
+
+So right now you are in the pain history right? So it just show the older Ps that you have recorded. 
+
+Okay. 
+
+So you can't put the P here. If you have to to put the new pen. You have to click on how you are feeling. 
+
+Uh how are you feeling? Okay. 
+
+Yeah. And then you go for the pain. 
+
+Okay. 
+
+And then I 
+
+And you Yeah. Go for the pen and you get to see the 3D model body model body model body model body model body model body model body model body model body model body model body model. And you select wherever you want. Uh let's say you you got the head to point at the pen and click on the head below and you can just Just zoom it out to the head. Yeah. 
+
+Okay. Yeah. 
+
+Oh, this is okay. 
+
+Okay, that's great. Yeah. 
+
+Yeah. If you want to keep everything body part, you just zoom it out there. Yeah. 
+
+Um, and what is the area that it covers? have. Okay. What? Okay. Yeah. Okay. Okay. Yeah, this is great. So, yeah, this is the issue that I was having with the painting. Um, what else had I mentioned 
+
+uh on edit symptom thing I think. Yes. 
+
+Yeah. Uh you said that maybe this part doesn't come as separate. Yeah. Eight symptom. 
+
+Yeah. So huh. So the symptoms right I think. So again pain is showing up twice here. I'm not sure why is it because I made two different entries. 
+
+Sorry where 
+
+the pain is above and below. Right. So four moderate and this thing over here and then I go above again. 
+
+Uh right now just a mock so just record just I want to see uh it is for just to see the UI that's it. It's not the real thing. 
+
+Correct. 
+
+Fine. And then if I switch the graph 
+
+Yeah, 
+
+this is fine. Um uh maybe a line can connect the two of them. And uh I want to know how much can we zoom out these graphs? just uh didn't put the zoom out thing but 
+
+so to see it yeah I think you just want like uh you want to see the m pain yeah right 
+
+yeah so I mean I should be able okay this is fine for the patient but ideally these symptoms would get mapped onto the doctor's system also and the doctor should be able to zoom out and see a trend over different weeks and you know months if that is possible 
+
+yeah yeah I will do it 
+
+yeah same thing for the mood and everything, you know. 
+
+Yeah. Okay, I'll do it. 
+
+Yes. And then um the other thing that I had an issue with was the lab reports, you know. 
+
+Yeah. 
+
+Okay. 
+
+Yeah. We don't see the treatment days, do we? 
+
+Okay. Okay. 
+
+Um and Even these uh this graph right this graph would also have to map it to the doctor's thing and kind of they should be able to zoom out and 
+
+view the things and so on. Yeah. 
+
+Yeah. Yeah. 
+
+And then when we go to nearby uh I don't know if we need ambulance for pregnant babies or anything. 
+
+I think we just have to discuss right What 
+
+for the ambulance for pregnant women's and babies? Should I keep it or remove? 
+
+I think you can remove it. 
+
+Yeah. Okay. 
+
+Uh and uh this one you know so the map thing. 
+
+Yeah. 
+
+How do you you just have to click on the directions that way? 
+
+Uh I mean I think the best way is Google maps for them to redirect. access to Google Maps and just have a verified directory in our app and then send them to the Google map. That's it. 
+
+Okay. So, how do they ideally go? I just see around where they are here. 
+
+Uh there's a location thing. I don't know if the emulator will pick up, but on the phone it will pick up your location. Is there a I think there's kind of like an EM button. Wait, let me check. 
+
+Oh, yeah. 
+
+Yeah. I don't know why I can't See the VB? 
+
+I don't know. 
+
+It's fine. I think so. It picks up your location and then it shows you what's around you, right? 
+
+Yes. 
+
+Yeah. 
+
+Like it shows up the vicinity. I think the closest nearest neighbor. 
+
+Yeah, that's fine. Uh and if you go to account Yeah. So here uh you'll have to yeah maybe we don't we shouldn't have a scrolling thing. 
+
+Okay. Okay I'll 
+
+should be fix so maybe 58 years and you can put the blood group I like the blood group and height height height of this ideally can remain the same but keep changing right I think it might be important to make that you know But does it give you a train or does it just change? 
+
+Yeah, I think these were mainly the issues that I had. But yeah, there are many smaller issues we can go into about you know usability and things like that depending on how much time you Hello. 
+
+Hello. Yeah. Yeah. 
+
+Okay. I don't know why I'm disconnected. There's also a lot of helper text that we have to remove but I will remove 
+
+actually actually just in the Rahles and if you create a new account by your email it just don't show up. 
+
+Just put put it for the UI thing that's it just a mock. 
+
+This is just mock UI because we have to do a lot of back and forth. 
+
+So it's better if we like predefine it 
+
+but once we are done with that we'll just move to like real accounts and real data. So 
+
+yeah 
+
+I mean if you so I I mean I have told you what I need from our side. 
+
+If you guys want to share your screen and go through the app through the tech side and see I know what changes you want to suggest. I'm okay with that also now. 
+
+Yes, sir. 
+
+Or if you want to do it on your own, that's okay. 
+
+Yes, that's okay. 
+
+Can you share it? 
+
+Right. Can you see my screen? 
+
+Wait, I'm Can you see my screen now? 
+
+Yeah. 
+
+Yeah, I can see. 
+
+Yeah. Okay. What's the thing? 
+
+Uh, go into the map thing once. 
+
+Yeah. Okay. 
+
+This is good. Uh, I guess. Oh, it can. Are you still sharing your screen? 
+
+Yeah. Okay. 
+
+Okay. 
+
+Just can I see it now? 
+
+One sec. Uh, yeah, I can see it now. Okay. So, one is No. Go. So, is this is that the top of the screen? Like the top of the screen? What is it? Top of the screen. 
+
+Sorry. 
+
+Huh? Okay. This is the fine. Okay. I'm saying should we have this? I think this is like too extensive. It's like 
+
+I think it'll be nice if you just like as soon as it opens, we show the map. It will be nice. 
+
+Yeah. Maybe we can just put like a a small bar below or something like you know 
+
+call 112 or 
+
+yeah and one more thing 
+
+if you click call 112 does it connect to the phone just saying otherwise there's no point of this right 
+
+no there is I mean it doesn't connect to the phone but it kind of like redirects them to just click and uh so when they click it it just opens the phone dial and they can just 
+
+one more click so that it they can call 
+
+you just need two 
+
+yeah but I think we have to like remove this whole thing and put it on top and there's one more redundant thing which is Rahul thing. So there's Rahul on the top bar and then Rahul below and then add a family. So I think the Rahul add a family completely needs to go this this whole thing. Yeah, this whole thing needs to go. 
+
+Yeah. And then we'll take down this. I'm writing this down for myself as well because I'm recording. Uh and uh we'll take the helper text out. The helper text is not helping the terra cotta p that thing also will will remove suggest a center that's missing. ing uh oh we have to one second go above will instead of all India and demand and lens so and they have to scroll right to find out all the like states 
+
+so instead of that we'll just put a drop down search dropown so that they can search 
+
+yeah okay 
+
+same thing with all home care clinic visits and all that yeah this this this is very extensive oh my god okay go down 
+
+okay This is nice. Uh again, we have to improve the UI. It looks so bland. 
+
+Okay, I will do it. 
+
+Okay. And I think we have to we can I think we we should remove the source. I think we have to put a like uh I mean we will have the source at the info button. We just give a I info uh icon and then we'll put the source thing. 
+
+You have a source button there anyway, right? 
+
+Yeah, I think it's better cuz the card is getting too bigger. So, 
+
+okay. 
+
+And then we clinic visits. utation care, home care. We're going to just like categorize it and give one color to each, I guess. Uh, 
+
+okay. 
+
+And pallet of care and morphin listed. So, we're also going to give Okay. Yeah, that's great. I I'll do the 
+
+probably remove the address from the card as well. I need 
+
+Yeah. Yeah, I think. Yeah, that's also Okay. 
+
+Okay. 
+
+This is that's it. I think these are just uh UI issues. Sorry. Go into care. 
+
+Thank you. Thank you. Uh calendar. Well, this is good. This this this is the kind of homepage that normally apps make. 
+
+What is What is care team? Sorry. 
+
+That was like the caretaker thing that we once made. I think we have to orphan it now because we're not like 
+
+orphan. Oh, it just means remove it. 
+
+Sorry. 
+
+Yeah. Yeah. 
+
+So, conversations is what you've had with the doctors, right? 
+
+Yeah. 
+
+Yeah. 
+
+Okay. visits and to-do. I I don't think we need visits. Oh, I think we do. Okay. Uh 
+
+we need visits. We need to do. 
+
+Okay. So, in all these we like this is this just feels like we're reading too much. Like even in visits, it's just like 
+
+it feels like it's feel like my notes app. So, it's like we have to kind of like I I don't know like make it vibrant good I guess. 
+
+Yeah. I just put the visits because of the doctor's side. So, when the hand end of the call doctor you just have to see that what of their visit I mean 
+
+their visits and every kind of stuff so that's why I put it here 
+
+okay is that okay so like we can put that that they've visited other doctors 
+
+yeah 
+
+I mean uh I agree that the individual cards are too big 
+
+okay 
+
+but the visits would be needed like um 
+
+this is one of the things that gets mapped onto the doctor's side also right Yeah. Yeah. 
+
+Yeah. So I think it's needed but the cards are too big. Maybe we can uh click on it. What what information is there right now in the visit thing? So the doctor 
+
+just Yeah. The previous of the doctors. Yeah. 
+
+One second. One second. Just go up. I don't know. Do me a text is attending that will try the 
+
+uh Uh I don't think we need I mean if they want to click it and view it it's fine I guess. Then 
+
+what is the point of this? I'm sorry. So what is the point of the visit thing again? 
+
+I guess just like a history of uh them having like how many doctors because that is always a black box right for them. 
+
+Okay. Like so yeah I agree with you. There should be a visit thing the date and which doctor they visited and which specialist uh you know they are like you know the doctor name um oncology or palative or whatever it is that one can be there 
+
+and uh that is enough I think I don't think anything else is needed. 
+
+Yeah. 
+
+Okay. 
+
+If you want to really you know go be more extensive then if they click on say visit with Dr. Mira her that day prescription shows up there that would be 
+
+Yeah. Okay. Okay. 
+
+Yeah that makes sense. Okay. Okay. Next. Mas, is there anything? Uh, 
+
+nothing. I'm just looking. Uh, I guess it's just a lot of UI issues. I think even when we discussed um last meeting, there was a lot of redundant stuff, a lot of helper text, 
+
+a lot of like text in general. So, I think we have to remove that. 
+
+Yeah. Okay. That's it. 
+
+And have you visited the doctor's walk through? 
+
+Yes. I think that can I did. Yeah, I did. 
+
+Yeah. So, this correct correct the doctor's walk through. There are some things that 
+
+Yeah. So, click on one patient say just click on any patient. 
+
+Yeah. 
+
+Yeah. 
+
+Correct. Yeah. So, um Yeah. What does progress actually mean? You know, Yeah. 
+
+So in the progress we're getting the distress thing. Uh but the symptoms aren't being uh the symptoms are coming up as cards you know but they're not being progressed. So I think we can have two things. One is distress and one is symptoms. And then if they click on symptoms you can kind of see. 
+
+Yeah. Okay. 
+
+Because it doesn't really so distress I agree it's important but uh symptoms would be more important for the doctor to kind of address. So it can be symptoms first distress next you know. Yeah. Okay. I will do it then. 
+
+And like I said, uh you know the distress and symptoms and everything, we really need to be able to get a history from the beginning of the patient. Sometimes you know it really 
+
+is important to visit months ago also maybe. 
+
+Yeah. Okay. 
+
+And most of the most of these patients are dying in 6 months. So you don't have too much of history also. 
+
+Got it. Okay. 
+
+Yeah. 
+
+Yeah. And then go back. Uh 
+
+yeah, medicines uh yeah this is fine. Uh goals of care discussion is also fine is fine and reports is fine. Yeah that was my main issue with the doctor that the symptoms don't show up prominently and here also like the symptoms are showing up. I think the highest should be the highest. 
+
+Yeah. Okay. 
+
+Yeah. And when we keep on those you should be able to kind of act the doctor will be using it on the phone. They'll be using it on the computer because it'll connect with care. So that is something you'll have to work on as to how you're going to do that. 
+
+Uh yeah. Okay. 
+
+Okay. Um and maybe for the doctor we don't need so many clicks. Like if you click on overview, what what comes up? So this is just too much stuff, you know. It's the all the same stuff and we're not reading all. 
+
+Yeah. Okay. I know that. 
+
+Yeah. So you can just have specific tabs, symptoms and distress, uh previous lab reports, previous goals of care, discussion, and uh whatever. One more thing, you know, previous visits. 
+
+Yeah, you need to minimize text in the doctor's side as much as possible because they're not going to read it. Yeah. Okay. 
+
+Uh even medicines you know um can you go back to medicines please? 
+
+Yeah. 
+
+So the detail you put the medicine in uh it's good you know that the side effects are shown uh shown but yeah I think um again a little 
+
+too much text. 
+
+Yeah. Okay. I will I will minimize 
+
+correct. Yeah I think that would be good. Yeah. 
+
+Whenever you guys want to discuss the goals of gas. I think we can do that. And another thing I didn't find on the app was, you know, the community thing that we were discussing where they can find other people that can so on. Was that there? Did I miss it? 
+
+No, no, no. We didn't put that. 
+
+We didn't put it yet. We'll put it when we are onboarding the real users. 
+
+But I think we should do a mock thing, right? That would be nice. 
+
+Yeah. Once we have one Yeah, today's third, right? 
+
+Yeah, 
+
+we'll need at least two days to do the mark uh discussions. 
+
+Okay, 
+
+I think we have to get the get started. 
+
+Yes, we have discussion with Dr. Sha get that fixed then we can have the discussions you know. 
+
+Done. Done. 
+
+Yeah. Okay, man. 
+
+Do you think they'll extend this round again to 9th instead of seven? 
+
+I think they will extend it but we're not sure like Extensions always happen these kind of things, right? So, 
+
+I guess we'll just like 
+
+work for the seventh and we'll see where we 
+
+Yeah, we'll go for the seventh. It would be good to discuss this no matter how late you guys want this channel and I awake like 1 2 a.m. also. 
+
+Sure. Sure. 
+
+Uh just let us know. I think it'll give best to get this. This is the strongest part of the app, right? I mean, 
+
+like where is that with the tech thing? 
+
+Yeah. 
+
+In the GCD. Do we have rag? I mean, we have rag. I know that. Oh, also the documents you can upload now documents and ask questions. 
+
+Yeah, the ask document, right? 
+
+Yeah. Yeah. 
+
+The ask document, right? 
+
+Yes. Yes. 
+
+Yeah. I think I just put it. 
+
+Okay. So, that is there. I think we've done it. 
+
+Yeah. 
+
+And uh second thing is 
+
+you can ask document here. 
+
+So, you can just add documents and like uh you can ask any question. I think we have to improve the UI for this. Uh okay. And uh we'll do the god. Gio city. Where are we with the god? Do you have any idea? Because the last time I remember that we had the recording transcription thing. We didn't do the multilingual 
+
+still. We have to do the multilingual. 
+
+Yeah. 
+
+Okay. 
+
+Okay. 
+
+Multilingual. It's just uh like 
+
+we'll record the thing and uh I mean I I think we should do main now and then like give them to the app so that they can have like a mock conversation and we'll see whether or not like they'll have multiple like end of life uh decisions just to test out how the apps will pick it up. You know they'll have like they'll say no in one and they'll no in they'll say yes again in the conversation and then say no so that make so that like you know the decision is overridden by the latest one and all that and uh Yeah, 
+
+we we will do this and we'll provide it by uh I'll provide it by end of day because I'm sitting at the monitor right now. 
+
+That's okay. And uh what did you guys do with the the format that we gave you? That's incorporated, right? 
+
+The geoc which format we have a lot of formats. 
+
+Yeah. Yeah. 
+
+The one that I sent you the latest you know 
+
+Oh, the legal format. 
+
+Yeah, the legal format. 
+
+Legal. format. I mean like I mean whatever that they have in the legal format we have already like almost uh kind of like do it there. There were a few things in the comments that I read that we incorporated. 
+
+Uh no for 2 days I'll be I'm keeping my text. I just wanted to also know that you know on the doctor's side 
+
+yeah 
+
+when someone is when they're starting this conversation is there a guide for the doctors that can take them through saying you know talk about this next talk about 
+
+uh we could do it but it has to be preded I think 
+
+should should it be predefined or should it be based on the conver that they're having 
+
+both of them. 
+
+So um ideally so what I was imagining is you know there can be a checklist and once that part of the conversation has happened the AI can kick it off and not I don't know if that is possible 
+
+uh we can do it is there like I think we have already discussed this we will put like some kind of a predefined uh thing where guide or or there was one research paper where you said that they uh they observed the number of dispal of care discussions etc or like goals of care discussion 
+
+where it shot up to 98% something which we put it in the post pd so I think do we have something there where we have like what to talk about in the discussions that we can put it in the checklist 
+
+no so the so the checklist can just be mocked up 
+
+yeah 
+
+drill down we've given you right so first one is consent second one is patient details third one is you know family details emergency contact 
+
+and fourth is you know CPR, diialysis and all that and once the doctor keeps talking about it and it gets checked and at the end of the once the conversation ends you know the app can prompt the doctor saying you know you haven't spoken about these things are you sure you want to you know continue 
+
+yeah 
+
+that's got yeah 
+
+okay 
+
+and then you know it comes out as a format like we've given it in the word document 
+
+and then sign it off and then give it 
+
+Yeah. Okay, 
+
+I think that makes sense. Yeah, I think this is good. I think I think uh after these changes, I think the app will look really better. I think it's mostly UI when we like I think do the UI thing and then the god and the documents once we'll test today and we'll if we release I think we should be done with the most of it and there are few tweaks here and there but yeah that's the most 
+
+yes Anything else uh apart from these? Oh, they they they sent a mail that we have to make a video on it. 6 to 8\. 
+
+Yeah. 
+
+Okay. Yeah. Fine. Um should I get should I do something with the PPT? 
+
+Uh 
+
+you guys have a lot of work, you know, like I'm just saying. 
+
+That's fine. That's fine. Uh I mean if there's anything like just feedback would be better like I think I guess from the app just just raw feedback. example brothers like I mean rigorously use the app because once we make it we kind of like we do this and then we move on to our second project which is like uh which is also in the pipeline so like that's what's happened and we don't test a lot so it will be nice if we just like rigorously test uh and it will be even better because we do not know how these things work medical medically 
+
+correct I mean uh that is great um uh yeah we can test it out because I want to test one is you know how whether the AI able to differentiate bills, lab reports, those kind of things. Ask the report thing, the map thing and uh one more important thing. 
+
+Yeah, the the medicine photo thing. Yeah. 
+
+Yeah. The medicine photo 
+
+and of course the go city is the main thing. 
+
+The of course. Yeah. You know what? Okay. Uh I think this is I think we'll do it and we'll come back. I guess like I don't know. I I'll be leaving Bangalore at today. I think tonight and I don't know if I can we can have another meeting at 9:30 but if we can with with Dr. Shahada as well we'll have it. 
+
+Okay. Yeah. Yeah. Just let us know sometime before and then 
+
+Yeah. Yeah. I'll let you know like one 3 4 hours before. 
+
+Oh good. Okay. Anything else for you to add? Do you have any questions for Dr. 
+
+Yeah. Nothing much just 
+
+Okay. 
+
+Yeah. No no everything else. Great. Yeah. Yeah. So the PPT thing, you know, I don't have to do anything. 
+
+Uh no, you don't have to. It's fine. 
+
+Okay. Once you guys are done with it, just share it along. 
+
+Yeah. Just guess your feedback is better here. 
+
+Yeah. Cool. Okay. 
+
+Uh okay. 
+
+Hopefully this works. Let's see. 
+
+Let's see. I think our app is really looking strong now that you have just mentioned all the things. The medicine one, the documents one and the 
+
+uh god one. At first I used to think the only we using AI only in one place but All these use cases are like perfectly centralized for the cancer patients like 
+
+like I would I would use it if I have cancer. 
+
+Yeah. Please don't. Yeah. 
+
+Yeah. Just Yeah. No. 
+
+Yeah. Okay. 
+
+Okay. Thanks. Yes. No problem. Thank you. Thank you. Thank you. Okay. Okay. Bye-bye. 
+
+Thank you. Thank you. Okay. Bye. Bye. Bye. I'm coming on his way to the ocean. 
+
+Yeah.
