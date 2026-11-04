@@ -138,44 +138,47 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
     var addSheet by rememberSaveable { mutableStateOf(false) }
     // Two ways in: photograph a paper report, or pick a file that is already on the phone.
     if (addSheet) ModalBottomSheet(onDismissRequest = { addSheet = false }, containerColor = Cream) {
-        Column(Modifier.fillMaxWidth().padding(start = 20.dp, end = 20.dp, bottom = 28.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text(t("Add document", "कागज़ जोड़ें"), fontFamily = SaharaTitleFont, fontSize = 24.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
+        Column(Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Text(t("Add document", "कागज़ जोड़ें"), Modifier.a11yHeading().padding(bottom = 4.dp), fontFamily = SaharaTitleFont, fontSize = 24.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
             AddDocOption(t("Scan with camera", "कैमरे से स्कैन करें"), t("Take a photo of a paper report or prescription.", "काग़ज़ की रिपोर्ट या पर्चे की फ़ोटो लें।"), Icons.Default.PhotoCamera, Peach, Modifier.testTag("document-scan")) { addSheet = false; scanReport() }
             AddDocOption(t("Upload a file", "फ़ाइल अपलोड करें"), t("Choose a PDF or photo already on this phone.", "इस फ़ोन पर पहले से रखी PDF या फ़ोटो चुनें।"), Icons.Default.UploadFile, SaharaSoftBlue, Modifier.testTag("document-upload")) { addSheet = false; addReport() }
         }
     }
-    LazyColumn(Modifier.fillMaxSize().testTag("documents-list"), state = listState, contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    LazyColumn(Modifier.fillMaxSize().testTag("documents-list"), state = listState, contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Column(Modifier.weight(1f)) {
+            Column(Modifier.weight(1f).padding(end = 8.dp)) {
                 Heading(t("Documents", "कागज़ात"), 30)
-                Text(run { val n = notes.size; val m = reports.size; (if (n == 1) t("1 care note", "1 देखभाल नोट") else t("$n care notes", "$n देखभाल नोट")) + " · " + (if (m == 1) t("1 report", "1 रिपोर्ट") else t("$m reports", "$m रिपोर्ट")) }, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(run { val n = notes.size; val m = reports.size; (if (n == 1) t("1 care note", "1 देखभाल नोट") else t("$n care notes", "$n देखभाल नोट")) + " · " + (if (m == 1) t("1 report", "1 रिपोर्ट") else t("$m reports", "$m रिपोर्ट")) }, fontSize = 14.sp, color = DoctorCardSub)
             }
-            if (canEdit) Button(onClick = { addSheet = true }, enabled = !busy, shape = RoundedCornerShape(50), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent), contentPadding = PaddingValues(horizontal = 16.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("document-add")) {
+            if (canEdit) Button(onClick = { addSheet = true }, enabled = !busy, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent), contentPadding = PaddingValues(horizontal = 16.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("document-add")) {
                 Icon(Icons.Default.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Add document", "कागज़ जोड़ें"), fontWeight = FontWeight.SemiBold)
             }
         } }
-        item { Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        item { Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             DocsTile(t("Care timeline", "देखभाल की समय-रेखा"), t("Key events from your documents", "आपके कागज़ों की मुख्य बातें"), Icons.Default.Timeline, Peach, Modifier.weight(1f).fillMaxHeight().testTag("care-timeline-open")) { timeline = true }
             if (reports.isNotEmpty()) DocsTile(t("Ask your documents", "अपने कागज़ों से पूछें"), t("Find dates, results and doses", "तारीख़, नतीजे और खुराक खोजें"), Icons.Default.QuestionAnswer, SaharaLavender, Modifier.weight(1f).fillMaxHeight().testTag("document-ask-open")) { asking = true }
         } }
-        if (vm.demoMode) item { Row(verticalAlignment = Alignment.Top) { Icon(Icons.Default.Lock, null, Modifier.size(14.dp).padding(top = 2.dp), tint = DoctorCardSub); Spacer(Modifier.width(6.dp)); Text(t("In the demo, reports you add stay on this phone. They are removed when the demo ends.", "डेमो में जोड़ी गई रिपोर्टें इसी फ़ोन पर रहती हैं। डेमो ख़त्म होने पर ये हट जाती हैं।"), fontSize = 12.sp, color = DoctorCardSub) } }
-        else item { Row(verticalAlignment = Alignment.Top) { Icon(Icons.Default.Lock, null, Modifier.size(14.dp).padding(top = 2.dp), tint = DoctorCardSub); Spacer(Modifier.width(6.dp)); Text(t("Report files stay on this phone. Your care team sees them only if you share them. Lab results you copy from a report are saved in your care record.", "रिपोर्ट की फ़ाइलें इसी फ़ोन पर रहती हैं। देखभाल टीम इन्हें तभी देखती है जब आप भेजें। रिपोर्ट से कॉपी किए लैब नतीजे आपके देखभाल रिकॉर्ड में सेव होते हैं।"), fontSize = 12.sp, color = DoctorCardSub) } }
+        // Who sees the files sits behind one small row instead of a paragraph above the list.
+        item { InfoDisclosure(t("Who sees these files", "ये फ़ाइलें कौन देखता है")) {
+            Row(verticalAlignment = Alignment.Top) { Icon(Icons.Default.Lock, null, Modifier.padding(top = 2.dp).size(16.dp), tint = DoctorCardSub); Spacer(Modifier.width(8.dp)); Text(if (vm.demoMode) t("In the demo, reports you add stay on this phone. They are removed when the demo ends.", "डेमो में जोड़ी गई रिपोर्टें इसी फ़ोन पर रहती हैं। डेमो ख़त्म होने पर ये हट जाती हैं।") else t("Report files stay on this phone. Your care team sees them only if you share them. Lab results you copy from a report are saved in your care record.", "रिपोर्ट की फ़ाइलें इसी फ़ोन पर रहती हैं। देखभाल टीम इन्हें तभी देखती है जब आप भेजें। रिपोर्ट से कॉपी किए लैब नतीजे आपके देखभाल रिकॉर्ड में सेव होते हैं।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub) }
+        } }
         item { OutlinedTextField(value = search, onValueChange = { search = it }, placeholder = { Text(t("Search documents", "कागज़ात खोजें")) }, leadingIcon = { Icon(Icons.Default.Search, null) },
             trailingIcon = { if (search.isNotEmpty()) IconButton(onClick = { search = "" }) { Icon(Icons.Default.Close, t("Clear document search", "खोज मिटाएँ")) } },
-            modifier = Modifier.fillMaxWidth().testTag("document-search"), shape = RoundedCornerShape(16.dp), singleLine = true,
+            modifier = Modifier.fillMaxWidth().testTag("document-search"), shape = RoundedCornerShape(14.dp), singleLine = true,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search), keyboardActions = KeyboardActions(onSearch = { focus.clearFocus() })) }
         item { Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf("All", "Care notes", "Reports", "Cancer").forEach { label -> FilterChip(selected = filter == label, onClick = { filter = label }, label = { Text(when (label) { "Care notes" -> t("Care notes", "देखभाल नोट"); "Reports" -> t("Reports", "रिपोर्टें"); "Cancer" -> t("Cancer documents", "कैंसर के कागज़"); else -> t("All", "सभी") }) }, modifier = Modifier.testTag("document-filter-$label")) }
+            listOf("All", "Care notes", "Reports", "Cancer").forEach { label -> FilterChip(selected = filter == label, onClick = { filter = label }, label = { Text(when (label) { "Care notes" -> t("Care notes", "देखभाल नोट"); "Reports" -> t("Reports", "रिपोर्टें"); "Cancer" -> t("Cancer documents", "कैंसर के कागज़"); else -> t("All", "सभी") }) }, shape = RoundedCornerShape(50), modifier = Modifier.testTag("document-filter-$label")) }
         } }
         if (reports.isNotEmpty()) item { Column {
             val counts = DocumentFolderRules.counts(reports.map(::folderOf))
-            Text(if (sorting) t("Folders · sorting on this phone…", "फ़ोल्डर · इसी फ़ोन पर छाँट रहे हैं…") else t("Folders", "फ़ोल्डर"), style = MaterialTheme.typography.labelLarge)
-            Row(Modifier.horizontalScroll(rememberScrollState()).padding(top = 6.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(if (sorting) t("Folders · sorting on this phone…", "फ़ोल्डर · इसी फ़ोन पर छाँट रहे हैं…") else t("Folders", "फ़ोल्डर"), style = MaterialTheme.typography.labelLarge, color = DoctorCardSub)
+            Row(Modifier.horizontalScroll(rememberScrollState()).padding(top = 4.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 DocumentFolderRules.folders.forEach { folder -> FilterChip(selected = folderFilter == folder, onClick = { folderFilter = if (folderFilter == folder) "" else folder },
-                    label = { Text("${DocumentFolderRules.label(folder, t)} · ${counts[folder] ?: 0}") }, modifier = Modifier.testTag("document-folder-$folder")) }
+                    label = { Text("${DocumentFolderRules.label(folder, t)} · ${counts[folder] ?: 0}") }, shape = RoundedCornerShape(50), modifier = Modifier.testTag("document-folder-$folder")) }
             }
         } }
-        item { TextButton(onClick = {
+        // Searching inside checked report text only makes sense once something is typed.
+        if (search.isNotBlank()) item { OutlinedButton(onClick = {
             val query = search.trim(); val capturedPerson = person
             searching = true; textError = ""
             scope.launch {
@@ -189,54 +192,58 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
                 } catch (_: Exception) { textError = t("Search did not work. Your reports are safe. Try again.", "खोज नहीं हो सकी। आपकी रिपोर्टें सुरक्षित हैं। फिर कोशिश करें।") }
                 finally { searching = false }
             }
-        }, enabled = search.isNotBlank() && !searching, modifier = Modifier.fillMaxWidth()) { Text(if (searching) t("Searching your reports…", "रिपोर्टों में खोज रहे हैं…") else t("Search checked reports", "जाँची गई रिपोर्टों में खोजें")) } }
-        if (textError.isNotBlank()) item { Text(textError, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
+        }, enabled = !searching, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.Search, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(if (searching) t("Searching your reports…", "रिपोर्टों में खोज रहे हैं…") else t("Search checked reports", "जाँची गई रिपोर्टों में खोजें")) } }
+        if (textError.isNotBlank()) item { Text(textError, color = MaterialTheme.colorScheme.error, fontSize = 14.sp, modifier = Modifier.announce()) }
         if (searchedText.isNotBlank()) {
             item { SectionTitle(t("From your reports", "आपकी रिपोर्टों से")) }
-            if (textMatches.isEmpty()) item { SurfaceCard { Text(t("Not found in your reports", "आपकी रिपोर्टों में नहीं मिला"), fontWeight = FontWeight.SemiBold); Text(t("Try fewer words. Or open a report and check its text first.", "कम शब्दों से खोजें। या पहले रिपोर्ट खोलकर उसकी लिखाई जाँचें।"), style = MaterialTheme.typography.bodySmall) } }
+            if (textMatches.isEmpty()) item { SurfaceCard { Text(t("Not found in your reports", "आपकी रिपोर्टों में नहीं मिला"), fontWeight = FontWeight.SemiBold, color = DoctorCardInk); Text(t("Try fewer words. Or open a report and check its text first.", "कम शब्दों से खोजें। या पहले रिपोर्ट खोलकर उसकी लिखाई जाँचें।"), fontSize = 14.sp, color = DoctorCardSub) } }
             items(textMatches, key = { "${it.reportId}:${it.page}:${it.line}" }) { match ->
-                reports.firstOrNull { it.id == match.reportId }?.let { report -> SurfaceCard(Sage) {
-                    Text(report.name, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
-                    Text(t("Page ${match.page} · line ${match.line}", "पेज ${match.page} · पंक्ति ${match.line}"), style = MaterialTheme.typography.labelMedium)
-                    Text(match.quote)
+                reports.firstOrNull { it.id == match.reportId }?.let { report -> SurfaceCard(Mint) {
+                    Text(report.name, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, color = DoctorCardInk, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                    Text(t("Page ${match.page} · line ${match.line}", "पेज ${match.page} · पंक्ति ${match.line}"), fontSize = 14.sp, color = DoctorCardSub)
+                    Spacer(Modifier.height(4.dp)); Text(match.quote, color = DoctorCardInk)
                     TextButton(onClick = { reviewId = report.id }, colors = ButtonDefaults.textButtonColors(contentColor = RustText)) { Text(t("Open report and copy this", "रिपोर्ट खोलें और यह कॉपी करें")) }
                 } }
             }
         }
         if (visibleNotes.isEmpty() && visibleReports.isEmpty()) item { SurfaceCard {
-            Icon(Icons.Default.FolderOpen, null, Modifier.size(36.dp), tint = Rust)
-            Spacer(Modifier.height(12.dp)); Text(if (search.isNotBlank()) t("No documents found", "कोई कागज़ नहीं मिला") else when (filter) { "Reports" -> t("No reports yet", "अभी कोई रिपोर्ट नहीं"); "Care notes" -> t("No care notes yet", "अभी कोई देखभाल नोट नहीं"); "Cancer" -> t("No cancer documents yet", "अभी कैंसर का कोई कागज़ नहीं"); else -> t("Keep your care together", "देखभाल के सारे कागज़ एक जगह रखें") }, fontSize = 20.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
-            Spacer(Modifier.height(6.dp)); Text(if (search.isNotBlank()) t("Try a name or clear your search.", "कोई नाम लिखें या खोज मिटाएँ।") else if (filter == "Cancer") t("PET-CT, biopsy, histopathology and staging reports appear here. Add a report, then tap “Cancer document?” on it.", "पेट-सीटी, बायोप्सी, हिस्टोपैथोलॉजी और स्टेजिंग रिपोर्टें यहाँ दिखेंगी। रिपोर्ट जोड़ें, फिर उस पर “कैंसर का कागज़?” दबाएँ।") else t("Your reviewed care notes and reports appear here.", "जाँचे गए देखभाल नोट और रिपोर्टें यहाँ दिखेंगी।"), style = MaterialTheme.typography.bodyMedium)
-            if (search.isNotBlank()) TextButton(onClick = { search = ""; filter = "All" }) { Text(t("Clear search", "खोज मिटाएँ")) }
-            else if (filter != "Care notes" && canEdit) TextButton(onClick = addReport, enabled = !busy) { Icon(Icons.Default.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Add a report", "रिपोर्ट जोड़ें")) }
+            Surface(shape = CircleShape, color = SaharaApricot) { Icon(Icons.Default.FolderOpen, null, Modifier.padding(12.dp).size(28.dp), tint = DoctorAccent) }
+            Spacer(Modifier.height(12.dp)); Text(if (search.isNotBlank()) t("No documents found", "कोई कागज़ नहीं मिला") else when (filter) { "Reports" -> t("No reports yet", "अभी कोई रिपोर्ट नहीं"); "Care notes" -> t("No care notes yet", "अभी कोई देखभाल नोट नहीं"); "Cancer" -> t("No cancer documents yet", "अभी कैंसर का कोई कागज़ नहीं"); else -> t("Keep your care together", "देखभाल के सारे कागज़ एक जगह रखें") }, fontSize = 20.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, color = DoctorCardInk)
+            Spacer(Modifier.height(4.dp)); Text(if (search.isNotBlank()) t("Try a name or clear your search.", "कोई नाम लिखें या खोज मिटाएँ।") else if (filter == "Cancer") t("Add a report, then choose “Cancer document?” in its menu.", "रिपोर्ट जोड़ें, फिर उसके मेन्यू में “कैंसर का कागज़?” चुनें।") else t("Your reviewed care notes and reports appear here.", "जाँचे गए देखभाल नोट और रिपोर्टें यहाँ दिखेंगी।"), fontSize = 16.sp, color = DoctorCardSub)
+            Spacer(Modifier.height(4.dp))
+            if (search.isNotBlank()) TextButton(onClick = { search = ""; filter = "All" }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Clear search", "खोज मिटाएँ")) }
+            else if (filter != "Care notes" && canEdit) TextButton(onClick = { addSheet = true }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Icon(Icons.Default.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Add a report", "रिपोर्ट जोड़ें")) }
         } }
         if (visibleNotes.isNotEmpty()) item { SectionTitle(t("Care notes", "देखभाल नोट")) }
         items(visibleNotes, key = { it.id }) { note ->
-            Card(onClick = { onRead(note) }, modifier = Modifier.animateItem().fillMaxWidth(), shape = RoundedCornerShape(18.dp), colors = CardDefaults.cardColors(containerColor = if (note.id == notes.firstOrNull()?.id) Gold else Paper)) {
+            val latest = note.id == notes.firstOrNull()?.id
+            Card(onClick = { onRead(note) }, modifier = Modifier.animateItem().fillMaxWidth(), shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = Paper), border = BorderStroke(1.dp, DoctorHairline)) {
                 Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.Description, null, Modifier.size(26.dp)); Spacer(Modifier.width(12.dp))
+                    Surface(shape = RoundedCornerShape(14.dp), color = if (latest) SaharaSoftGold else SaharaLavender) { Icon(Icons.Default.Description, null, Modifier.padding(10.dp).size(22.dp), tint = DoctorAccent) }
+                    Spacer(Modifier.width(12.dp))
                     Column(Modifier.weight(1f)) {
-                        Text(t("Goals of care", "देखभाल के लक्ष्य"), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
-                        Text(t("Version ${note.version}", "संस्करण ${note.version}") + if (note.id == notes.firstOrNull()?.id) t(" · Latest", " · नया") else t(" · Earlier", " · पुराना"), style = MaterialTheme.typography.bodySmall)
-                        Text("${date(note.published)} · ${note.doctor}", style = MaterialTheme.typography.bodySmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                        Text(t("Goals of care", "देखभाल के लक्ष्य"), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, fontSize = 17.sp, color = DoctorCardInk)
+                        Text(t("Version ${note.version}", "संस्करण ${note.version}") + " · ${date(note.published)} · ${note.doctor}", fontSize = 14.sp, color = DoctorCardSub, maxLines = 2, overflow = TextOverflow.Ellipsis)
                     }
-                    Icon(Icons.AutoMirrored.Filled.ArrowForward, t("Read version ${note.version}", "संस्करण ${note.version} पढ़ें"), Modifier.size(20.dp))
+                    if (latest) { Spacer(Modifier.width(8.dp)); DocsChip(t("Latest", "नया"), SaharaSoftGold) }
+                    Spacer(Modifier.width(4.dp))
+                    Icon(Icons.AutoMirrored.Filled.ArrowForward, t("Read version ${note.version}", "संस्करण ${note.version} पढ़ें"), Modifier.size(20.dp), tint = DoctorAccent)
                 }
             }
         }
         if (visibleReports.isNotEmpty()) item { SectionTitle(t("Reports", "रिपोर्टें")) }
         items(visibleReports, key = { it.id }) { report ->
-            Surface(Modifier.animateItem().fillMaxWidth(), shape = RoundedCornerShape(18.dp), color = Paper) {
+            Surface(Modifier.animateItem().fillMaxWidth(), shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline)) {
                 Column {
                     var menuOpen by remember { mutableStateOf(false) }
                     val editable = canEdit && prescriptionOriginals.none { it.id == report.id }
-                    Row(Modifier.fillMaxWidth().clickable { openReport(report, false) }.padding(start = 14.dp, top = 12.dp, end = 4.dp), verticalAlignment = Alignment.Top) {
-                        Surface(shape = RoundedCornerShape(12.dp), color = if (report.mime == "application/pdf") Peach else Sage) { Icon(if (report.mime == "application/pdf") Icons.Default.PictureAsPdf else Icons.Default.Image, null, Modifier.padding(8.dp).size(22.dp)) }
+                    Row(Modifier.fillMaxWidth().clickable { openReport(report, false) }.padding(start = 16.dp, top = 12.dp, end = 4.dp), verticalAlignment = Alignment.Top) {
+                        Surface(shape = RoundedCornerShape(14.dp), color = if (report.mime == "application/pdf") SaharaApricot else Mint) { Icon(if (report.mime == "application/pdf") Icons.Default.PictureAsPdf else Icons.Default.Image, null, Modifier.padding(10.dp).size(22.dp), tint = DoctorAccent) }
                         Spacer(Modifier.width(12.dp))
                         Column(Modifier.weight(1f).padding(top = 2.dp)) {
-                            Text(report.name, fontWeight = FontWeight.Medium, maxLines = 2, overflow = TextOverflow.Ellipsis, fontFamily = SaharaTitleFont, color = DoctorCardInk)
-                            Text(Formatter.formatShortFileSize(context, report.bytes) + " · " + date(report.created) + " · " + DocumentFolderRules.label(folderOf(report), t) + if (folders[report.id]?.chosen == true) "" else t(" · sorted on this phone", " · फ़ोन ने छाँटा"), style = MaterialTheme.typography.bodySmall, color = DoctorCardSub, modifier = Modifier.testTag("report-folder-${report.id}"))
-                            cancerType(report)?.let { type -> Text(CancerDocumentRules.label(type, t) + if (cancerChoices[report.id].isNullOrBlank()) t(" · from file name", " · नाम से अंदाज़ा") else "", style = MaterialTheme.typography.labelMedium, color = RustText, modifier = Modifier.testTag("report-cancer-${report.id}")) }
+                            Text(report.name, fontWeight = FontWeight.Medium, fontSize = 17.sp, maxLines = 2, overflow = TextOverflow.Ellipsis, fontFamily = SaharaTitleFont, color = DoctorCardInk)
+                            Text(Formatter.formatShortFileSize(context, report.bytes) + " · " + date(report.created) + " · " + DocumentFolderRules.label(folderOf(report), t) + if (folders[report.id]?.chosen == true) "" else t(" · sorted on this phone", " · फ़ोन ने छाँटा"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub, modifier = Modifier.padding(top = 2.dp).testTag("report-folder-${report.id}"))
+                            cancerType(report)?.let { type -> DocsChip(CancerDocumentRules.label(type, t) + if (cancerChoices[report.id].isNullOrBlank()) t(" · from file name", " · नाम से अंदाज़ा") else "", DoctorStatusRestBg, Modifier.padding(top = 6.dp).testTag("report-cancer-${report.id}"), color = DoctorStatusRest) }
                         }
                         if (canEdit) Box {
                             IconButton(onClick = { menuOpen = true }, modifier = Modifier.size(48.dp).testTag("report-menu-${report.id}")) { Icon(Icons.Default.MoreVert, t("More actions", "और विकल्प"), tint = DoctorCardInk) }
@@ -249,11 +256,11 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
                         } else Spacer(Modifier.width(10.dp))
                     }
                     // Main actions as small capsules; the rest live in the menu above.
-                    Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 14.dp, vertical = 4.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         @Composable fun Capsule(label: String, icon: androidx.compose.ui.graphics.vector.ImageVector, tag: String, onClick: () -> Unit) {
                             // Slim capsule so the three actions fit on one line; the touch area still meets 48dp.
                             Surface(onClick = onClick, shape = RoundedCornerShape(50), color = SaharaSoftGold, contentColor = DoctorCardInk, modifier = Modifier.minimumInteractiveComponentSize().testTag(tag)) {
-                                Row(Modifier.padding(horizontal = 10.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) { Icon(icon, null, Modifier.size(15.dp), tint = DoctorAccent); Spacer(Modifier.width(4.dp)); Text(label, fontSize = 12.5.sp, fontWeight = FontWeight.Medium, maxLines = 1) }
+                                Row(Modifier.padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) { Icon(icon, null, Modifier.size(16.dp), tint = DoctorAccent); Spacer(Modifier.width(6.dp)); Text(label, fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1) }
                             }
                         }
                         Capsule(t("Open", "खोलें"), Icons.AutoMirrored.Filled.OpenInNew, "report-open-${report.id}") { openReport(report, false) }
@@ -263,16 +270,16 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
                 }
             }
         }
-        if (search.isBlank() && filter != "Reports") item { TextButton(onClick = onTalk, modifier = Modifier.fillMaxWidth()) { Icon(Icons.Default.Forum, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(if (clinician) t("Start a conversation", "बातचीत शुरू करें") else t("Talk with your doctor", "अपने डॉक्टर से बात करें")) } }
+        if (search.isBlank() && filter != "Reports") item { TextButton(onClick = onTalk, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.Forum, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(if (clinician) t("Start a conversation", "बातचीत शुरू करें") else t("Talk with your doctor", "अपने डॉक्टर से बात करें")) } }
     }
     remove?.let { report -> AlertDialog(onDismissRequest = { if (!busy) remove = null }, title = { Text(t("Remove this report?", "यह रिपोर्ट हटाएँ?")) }, text = { Text(report.name + t("\n\nSahara's copy on this phone is deleted. A file you picked from Files stays there; a camera scan is gone for good.", "\n\nइस फ़ोन से Sahara की कॉपी मिट जाएगी। Files से चुनी गई असली फ़ाइल वहीं रहेगी; कैमरे से किया स्कैन हमेशा के लिए हट जाएगा।")) },
-        confirmButton = { TextButton(onClick = { vm.removeReport(report) { remove = null; cancerStore.remove(report.id); cancerChoices = cancerStore.all(); folderStore.remove(report.id); folders = folderStore.all() } }, enabled = !busy) { Text(t("Remove report", "रिपोर्ट हटाएँ")) } },
+        confirmButton = { TextButton(onClick = { vm.removeReport(report) { remove = null; cancerStore.remove(report.id); cancerChoices = cancerStore.all(); folderStore.remove(report.id); folders = folderStore.all() } }, enabled = !busy, colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)) { Text(t("Remove report", "रिपोर्ट हटाएँ"), fontWeight = FontWeight.SemiBold) } },
         dismissButton = { TextButton(onClick = { remove = null }, enabled = !busy) { Text(t("Keep", "रखें")) } }) }
     marking?.let { report ->
         val current = cancerType(report)
         AlertDialog(onDismissRequest = { marking = null }, title = { Text(t("What kind of document?", "यह कौन सा कागज़ है?")) }, text = { Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(report.name, style = MaterialTheme.typography.bodySmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
-            Text(t("Only this label changes. It stays on this phone, like the report file.", "सिर्फ़ यह लेबल बदलेगा। यह रिपोर्ट फ़ाइल की तरह इसी फ़ोन पर रहता है।"), style = MaterialTheme.typography.bodySmall)
+            Text(t("Only this label changes. It stays on this phone, like the report file.", "सिर्फ़ यह लेबल बदलेगा। यह रिपोर्ट फ़ाइल की तरह इसी फ़ोन पर रहता है।"), fontSize = 14.sp, color = DoctorCardSub)
             (CancerDocumentRules.types + CancerDocumentRules.NOT_CANCER).forEach { type ->
                 val chosen = if (type == CancerDocumentRules.NOT_CANCER) current == null else current == type
                 FilterChip(selected = chosen, onClick = { cancerStore.set(report.id, type); cancerChoices = cancerStore.all(); marking = null },
@@ -284,7 +291,7 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
     moving?.let { report ->
         AlertDialog(onDismissRequest = { moving = null }, title = { Text(t("Move to folder", "किस फ़ोल्डर में रखें?")) }, text = { Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(report.name, style = MaterialTheme.typography.bodySmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
-            Text(t("Only the folder changes. It stays on this phone, like the report file.", "सिर्फ़ फ़ोल्डर बदलेगा। यह रिपोर्ट फ़ाइल की तरह इसी फ़ोन पर रहता है।"), style = MaterialTheme.typography.bodySmall)
+            Text(t("Only the folder changes. It stays on this phone, like the report file.", "सिर्फ़ फ़ोल्डर बदलेगा। यह रिपोर्ट फ़ाइल की तरह इसी फ़ोन पर रहता है।"), fontSize = 14.sp, color = DoctorCardSub)
             DocumentFolderRules.folders.forEach { folder ->
                 FilterChip(selected = folderOf(report) == folder, onClick = { folderStore.choose(report.id, folder); folders = folderStore.all(); moving = null },
                     label = { Text(DocumentFolderRules.label(folder, t)) }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("folder-choice-$folder"))
@@ -294,8 +301,8 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
     renaming?.let { report ->
         val nameError = ReportNameRules.error(newName)
         AlertDialog(onDismissRequest = { if (!busy) renaming = null }, title = { Text(t("Rename report", "रिपोर्ट का नाम बदलें")) }, text = { Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            OutlinedTextField(newName, { newName = it.take(160) }, label = { Text(t("Report name", "रिपोर्ट का नाम")) }, singleLine = true, isError = nameError != null, supportingText = nameError?.let { { Text(it) } }, modifier = Modifier.fillMaxWidth().testTag("report-rename-field"))
-            Text(t("Only the name in Sahara changes. The file and the facts copied from it stay the same.", "सिर्फ़ Sahara में नाम बदलेगा। फ़ाइल और उससे कॉपी की गई बातें वैसी ही रहेंगी।"), style = MaterialTheme.typography.bodySmall)
+            OutlinedTextField(newName, { newName = it.take(160) }, label = { Text(t("Report name", "रिपोर्ट का नाम")) }, singleLine = true, shape = RoundedCornerShape(14.dp), isError = nameError != null, supportingText = nameError?.let { { Text(it) } }, modifier = Modifier.fillMaxWidth().testTag("report-rename-field"))
+            Text(t("Only the name in Sahara changes. The file and the facts copied from it stay the same.", "सिर्फ़ Sahara में नाम बदलेगा। फ़ाइल और उससे कॉपी की गई बातें वैसी ही रहेंगी।"), fontSize = 14.sp, color = DoctorCardSub)
         } }, confirmButton = { TextButton(onClick = { vm.renameReport(report, newName) { renaming = null } }, enabled = !busy && nameError == null && newName.trim() != report.name, modifier = Modifier.testTag("report-rename-save")) { Text(t("Save", "सेव करें")) } },
             dismissButton = { TextButton(onClick = { renaming = null }, enabled = !busy) { Text(t("Cancel", "रद्द करें")) } })
     }
@@ -305,25 +312,32 @@ private val PrescriptionOriginalsCache = java.util.concurrent.ConcurrentHashMap<
 /** A tappable tile on the Documents screen: icon, title and one short line. */
 @Composable private fun DocsTile(title: String, subtitle: String, icon: androidx.compose.ui.graphics.vector.ImageVector, tint: androidx.compose.ui.graphics.Color, modifier: Modifier, onClick: () -> Unit) {
     ActionCard(tint, modifier, onClick) {
-        Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Surface(shape = CircleShape, color = Paper) { Icon(icon, null, Modifier.padding(8.dp).size(20.dp), tint = DoctorAccent) }
                 Spacer(Modifier.weight(1f)); Icon(Icons.AutoMirrored.Filled.ArrowForward, null, Modifier.size(18.dp), tint = DoctorAccent)
             }
             Text(title, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk)
-            Text(subtitle, fontSize = 12.sp, color = DoctorCardSub)
+            Text(subtitle, fontSize = 14.sp, lineHeight = 18.sp, color = DoctorCardSub)
         }
     }
 }
 
 /** One choice in the Add document sheet. */
 @Composable private fun AddDocOption(title: String, subtitle: String, icon: androidx.compose.ui.graphics.vector.ImageVector, tint: androidx.compose.ui.graphics.Color, modifier: Modifier, onClick: () -> Unit) {
-    ActionCard(Paper, modifier.fillMaxWidth(), onClick) {
+    ActionCard(Paper, modifier.fillMaxWidth().heightIn(min = 72.dp), onClick) {
         Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-            Surface(shape = RoundedCornerShape(16.dp), color = tint) { Icon(icon, null, Modifier.padding(12.dp).size(26.dp), tint = DoctorAccent) }
+            Surface(shape = RoundedCornerShape(14.dp), color = tint) { Icon(icon, null, Modifier.padding(12.dp).size(26.dp), tint = DoctorAccent) }
             Spacer(Modifier.width(14.dp))
-            Column(Modifier.weight(1f)) { Text(title, fontWeight = FontWeight.SemiBold, fontSize = 17.sp, color = DoctorCardInk); Text(subtitle, fontSize = 13.sp, color = DoctorCardSub) }
+            Column(Modifier.weight(1f)) { Text(title, fontWeight = FontWeight.SemiBold, fontSize = 17.sp, color = DoctorCardInk); Text(subtitle, fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub) }
             Icon(Icons.AutoMirrored.Filled.ArrowForward, null, Modifier.size(20.dp), tint = DoctorAccent)
         }
+    }
+}
+
+/** A small status pill: a label on a soft tint, fully rounded. */
+@Composable private fun DocsChip(text: String, tint: androidx.compose.ui.graphics.Color, modifier: Modifier = Modifier, color: androidx.compose.ui.graphics.Color = DoctorCardInk) {
+    Surface(shape = RoundedCornerShape(50), color = tint, contentColor = color, modifier = modifier) {
+        Text(text, Modifier.padding(horizontal = 10.dp, vertical = 4.dp), fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }

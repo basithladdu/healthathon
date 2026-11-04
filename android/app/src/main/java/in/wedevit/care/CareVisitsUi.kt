@@ -131,18 +131,18 @@ private fun visitColours(s: CareVisitSpeciality?): Pair<Color, Color> = when (s)
 @Composable private fun VisitDateBlock(at: Long, color: Color) {
     val hindi = careHindi()
     val day = at.takeIf { it > 0 }?.let(::careDay)
-    Surface(shape = RoundedCornerShape(14.dp), color = color, modifier = Modifier.size(width = 52.dp, height = 56.dp)) {
+    Surface(shape = RoundedCornerShape(14.dp), color = color, modifier = Modifier.size(width = 48.dp, height = 52.dp)) {
         Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-            Text(day?.dayOfMonth?.toString() ?: "—", fontFamily = SaharaTitleFont, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = DoctorCardInk, maxLines = 1)
-            if (day != null) Text(day.format(careDateFormat("MMM", hindi)).uppercase(), fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = DoctorAccent, maxLines = 1)
-            if (day != null && day.year != LocalDate.now().year) Text("${day.year}", fontSize = 10.sp, color = DoctorCardSub, maxLines = 1)
+            Text(day?.dayOfMonth?.toString() ?: "—", fontFamily = SaharaTitleFont, fontSize = 20.sp, lineHeight = 22.sp, fontWeight = FontWeight.Bold, color = DoctorCardInk, maxLines = 1)
+            if (day != null) Text(day.format(careDateFormat("MMM", hindi)).uppercase(), fontSize = 12.sp, lineHeight = 14.sp, fontWeight = FontWeight.SemiBold, color = RustText, maxLines = 1)
+            if (day != null && day.year != LocalDate.now().year) Text("${day.year}", fontSize = 11.sp, lineHeight = 12.sp, color = DoctorCardSub, maxLines = 1)
         }
     }
 }
 
 /** A small rounded label. */
 @Composable private fun VisitChip(text: String, color: Color, ink: Color = DoctorCardInk) {
-    Surface(shape = RoundedCornerShape(50), color = color) { Text(text, Modifier.padding(horizontal = 10.dp, vertical = 3.dp), fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = ink, maxLines = 1, overflow = TextOverflow.Ellipsis) }
+    Surface(shape = RoundedCornerShape(50), color = color) { Text(text, Modifier.padding(horizontal = 10.dp, vertical = 2.dp), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = ink, maxLines = 1, overflow = TextOverflow.Ellipsis) }
 }
 
 /** One visit: date, doctor and speciality only. A tap opens that day's details. */
@@ -153,15 +153,15 @@ private fun visitColours(s: CareVisitSpeciality?): Pair<Color, Color> = when (s)
     val speciality = info.speciality?.let { visitSpecialityLabel(it) }
     val status = visitStatusLabel(info.status)
     val dateText = if (item.due > 0) date(item.due) else t("Date not recorded", "तारीख़ दर्ज नहीं")
-    Surface(onClick = onOpen, shape = RoundedCornerShape(18.dp), color = soft, border = BorderStroke(1.dp, DoctorHairline),
-        modifier = Modifier.fillMaxWidth().heightIn(min = 72.dp).semantics(mergeDescendants = true) { contentDescription = listOfNotNull(dateText, info.doctor, speciality, status.ifBlank { null }).joinToString(", ") }.testTag("care-visit-${item.id}")) {
-        Row(Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
+    Surface(onClick = onOpen, shape = RoundedCornerShape(20.dp), color = soft, border = BorderStroke(1.dp, DoctorHairline),
+        modifier = Modifier.fillMaxWidth().heightIn(min = 64.dp).semantics(mergeDescendants = true) { contentDescription = listOfNotNull(dateText, info.doctor, speciality, status.ifBlank { null }).joinToString(", ") }.testTag("care-visit-${item.id}")) {
+        Row(Modifier.padding(horizontal = 8.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
             VisitDateBlock(item.due, strong)
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(info.doctor.ifBlank { t("Visit", "मुलाक़ात") }, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis,
                     textDecoration = if (info.status == "cancelled") TextDecoration.LineThrough else null)
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
+                if (speciality != null || status.isNotBlank()) Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
                     if (speciality != null) VisitChip(speciality, strong)
                     if (status.isNotBlank()) VisitChip(status, Paper, if (info.status == "completed") DoctorAccent else RustText)
                 }
@@ -178,11 +178,19 @@ private fun visitColours(s: CareVisitSpeciality?): Pair<Color, Color> = when (s)
 @Composable fun CareVisitsModule(vm: CareModel, upcoming: List<CareItem>, past: List<CareItem>, onCalendarAt: (Long) -> Unit) {
     val t = careText()
     var openId by rememberSaveable { mutableStateOf<String?>(null) }
-    if (upcoming.isEmpty() && past.isEmpty()) QuietLine(t("No visits yet.", "अभी कोई मुलाक़ात नहीं।")) else {
+    if (upcoming.isEmpty() && past.isEmpty()) ModuleEmpty(Icons.Default.EventAvailable, t("No visits yet.", "अभी कोई मुलाक़ात नहीं।")) else {
         CareModuleList("visits-upcoming", upcoming, t("No upcoming visits.", "आगे कोई मुलाक़ात नहीं।"), t("Upcoming", "आगे की"), { it.id }) { CareVisitRow(it) { openId = it.id } }
         CareModuleList("visits-past", past, t("No past visits yet.", "पहले की कोई मुलाक़ात नहीं।"), t("Past", "पहले की"), { it.id }) { CareVisitRow(it) { openId = it.id } }
     }
     (upcoming + past).firstOrNull { it.id == openId }?.let { visit -> CareVisitDaySheet(vm, visit, onCalendarAt) { openId = null } }
+}
+
+/** A friendly empty module: a soft icon and one line. */
+@Composable private fun ModuleEmpty(icon: ImageVector, text: String) {
+    Row(Modifier.fillMaxWidth().padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+        Surface(shape = CircleShape, color = SaharaApricot) { Icon(icon, null, Modifier.padding(8.dp).size(20.dp), tint = DoctorAccent) }
+        Spacer(Modifier.width(12.dp)); Text(text, fontSize = 15.sp, color = DoctorCardSub)
+    }
 }
 
 /** That visit's day: when, who, where, the note and the day's prescription, with Edit/Remove for a family's own visit. */
@@ -206,9 +214,9 @@ private fun visitColours(s: CareVisitSpeciality?): Pair<Color, Color> = when (s)
         .format(if (info.timed) careDateFormat("EEE, d MMM yyyy · h:mm a", hindi) else careDateFormat("EEE, d MMM yyyy", hindi))
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(start = 20.dp, end = 20.dp, bottom = 28.dp).testTag("care-visit-day"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Surface(shape = RoundedCornerShape(22.dp), color = soft, modifier = Modifier.fillMaxWidth()) {
-                Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
-                    VisitDateBlock(visit.due, strong); Spacer(Modifier.width(14.dp))
+            Surface(shape = RoundedCornerShape(20.dp), color = soft, modifier = Modifier.fillMaxWidth()) {
+                Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                    VisitDateBlock(visit.due, strong); Spacer(Modifier.width(12.dp))
                     Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         Text(info.doctor.ifBlank { t("Visit", "मुलाक़ात") }, fontFamily = SaharaTitleFont, fontSize = 22.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading())
                         Text(whenText, fontSize = 14.sp, color = DoctorCardSub)
@@ -222,9 +230,12 @@ private fun visitColours(s: CareVisitSpeciality?): Pair<Color, Color> = when (s)
             if (info.place.isNotBlank()) VisitDetailLine(Icons.Default.Place, info.place)
             if (info.note.isNotBlank()) VisitDetailLine(Icons.Default.EditNote, info.note)
             Text(t("Prescription", "पर्चा"), fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading())
-            if (prescription.isEmpty) Text(t("No prescription saved for this day.", "इस दिन का कोई पर्चा सहेजा नहीं गया।"), fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.testTag("care-visit-no-prescription"))
-            else Surface(shape = RoundedCornerShape(18.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("care-visit-prescription")) {
-                Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            if (prescription.isEmpty) Row(Modifier.fillMaxWidth().testTag("care-visit-no-prescription"), verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.Description, null, Modifier.size(20.dp), tint = DoctorCardSub); Spacer(Modifier.width(12.dp))
+                Text(t("No prescription saved for this day.", "इस दिन का कोई पर्चा सहेजा नहीं गया।"), fontSize = 14.sp, color = DoctorCardSub)
+            }
+            else Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("care-visit-prescription")) {
+                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     prescription.documents.forEach { doc -> Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Default.Description, null, Modifier.size(20.dp), tint = DoctorAccent); Spacer(Modifier.width(10.dp))
                         Text(doc.name, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, maxLines = 2, overflow = TextOverflow.Ellipsis)
@@ -234,18 +245,18 @@ private fun visitColours(s: CareVisitSpeciality?): Pair<Color, Color> = when (s)
                         Spacer(Modifier.width(10.dp))
                         Column(Modifier.weight(1f)) {
                             Text(m.title, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                            CareEntryCodec.readable(m.detail).takeIf(String::isNotBlank)?.let { Text(it, fontSize = 13.sp, color = DoctorCardSub, maxLines = 2, overflow = TextOverflow.Ellipsis) }
+                            CareEntryCodec.readable(m.detail).takeIf(String::isNotBlank)?.let { Text(it, fontSize = 14.sp, color = DoctorCardSub, maxLines = 2, overflow = TextOverflow.Ellipsis) }
                         }
                     } }
-                    Text(t("Saved in Sahara on this day.", "इस दिन Sahara में सहेजा गया।"), fontSize = 12.sp, color = DoctorCardFaint)
+                    Text(t("Saved in Sahara on this day.", "इस दिन Sahara में सहेजा गया।"), fontSize = 14.sp, color = DoctorCardSub)
                 }
             }
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                if (visit.due > 0) OutlinedButton(onClick = { onDismiss(); onCalendarAt(visit.due) }, shape = RoundedCornerShape(50), modifier = Modifier.heightIn(min = 48.dp)) {
+                if (visit.due > 0) OutlinedButton(onClick = { onDismiss(); onCalendarAt(visit.due) }, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp)) {
                     Icon(Icons.Default.CalendarMonth, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Open in calendar", "कैलेंडर में खोलें"))
                 }
                 if (canEdit && !info.structured) {
-                    OutlinedButton(onClick = { editing = true }, enabled = !busy, shape = RoundedCornerShape(50), modifier = Modifier.heightIn(min = 48.dp).testTag("care-visit-edit")) { Icon(Icons.Default.Edit, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Edit", "बदलें")) }
+                    OutlinedButton(onClick = { editing = true }, enabled = !busy, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("care-visit-edit")) { Icon(Icons.Default.Edit, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Edit", "बदलें")) }
                     TextButton(onClick = { removing = true }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp).testTag("care-visit-remove")) { Text(t("Remove", "हटाएँ"), color = RustText) }
                 }
             }
@@ -258,9 +269,9 @@ private fun visitColours(s: CareVisitSpeciality?): Pair<Color, Color> = when (s)
 }
 
 @Composable private fun VisitDetailLine(icon: ImageVector, text: String) {
-    Surface(shape = RoundedCornerShape(16.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
-        Row(Modifier.padding(horizontal = 12.dp, vertical = 10.dp), verticalAlignment = Alignment.Top) {
-            Icon(icon, null, Modifier.size(20.dp), tint = Rust); Spacer(Modifier.width(10.dp))
+    Surface(shape = RoundedCornerShape(14.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
+        Row(Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.Top) {
+            Icon(icon, null, Modifier.size(20.dp), tint = Rust); Spacer(Modifier.width(12.dp))
             Text(text, fontSize = 15.sp, color = DoctorCardInk)
         }
     }
@@ -270,7 +281,7 @@ private fun visitColours(s: CareVisitSpeciality?): Pair<Color, Color> = when (s)
 @Composable fun CareTodoModule(vm: CareModel, tasks: List<CareItem>) {
     val t = careText()
     val (open, done) = remember(tasks) { CareTodoRules.split(tasks) }
-    if (tasks.isEmpty()) QuietLine(t("No tasks yet.", "अभी कोई काम नहीं।")) else {
+    if (tasks.isEmpty()) ModuleEmpty(Icons.Default.Checklist, t("No tasks yet.", "अभी कोई काम नहीं।")) else {
         CareModuleList("to-do", open, t("Nothing left to do.", "कोई काम बाक़ी नहीं।"), keyOf = { it.id }) { CareTaskRow(it, vm) }
         if (done.isNotEmpty()) CareModuleList("to-do-done", done, "", t("Done", "हो गया"), { it.id }) { CareTaskRow(it, vm) }
     }
@@ -315,16 +326,16 @@ private fun visitColours(s: CareVisitSpeciality?): Pair<Color, Color> = when (s)
 /** One saved conversation: a coloured date block, who it was with, and its version and review state on one line. */
 @Composable fun CareConversationRow(note: CareVersion, onRead: (CareVersion) -> Unit) {
     val t = careText()
-    Surface(onClick = { onRead(note) }, shape = RoundedCornerShape(18.dp), color = SaharaLavender, border = BorderStroke(1.dp, DoctorHairline),
-        modifier = Modifier.fillMaxWidth().heightIn(min = 72.dp).testTag("care-note-${note.id}")) {
-        Row(Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
+    Surface(onClick = { onRead(note) }, shape = RoundedCornerShape(20.dp), color = SaharaLavender, border = BorderStroke(1.dp, DoctorHairline),
+        modifier = Modifier.fillMaxWidth().heightIn(min = 64.dp).testTag("care-note-${note.id}")) {
+        Row(Modifier.padding(horizontal = 8.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
             VisitDateBlock(note.published, Color(0xFFD3C2EA))
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(note.doctor.trim().ifBlank { t("Goals of care", "देखभाल के लक्ष्य") }, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
                     VisitChip(t("Version ${note.version}", "संस्करण ${note.version}"), Paper)
-                    Text(ReviewWorkflow.label(note), fontSize = 12.sp, color = DoctorCardSub, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(ReviewWorkflow.label(note), fontSize = 14.sp, color = DoctorCardSub, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
             }
             Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, Modifier.size(22.dp), tint = Rust)

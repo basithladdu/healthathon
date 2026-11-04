@@ -61,12 +61,16 @@
 .ep-progress-top strong { color: var(--ep-ink); font-size: 15px; }
 .ep-progress-track { height: 8px; border-radius: 999px; background: #ece2d7; overflow: hidden; }
 .ep-progress-fill { height: 100%; border-radius: inherit; background: var(--ep-primary); transition: width .45s cubic-bezier(.4, 0, .2, 1); }
-.ep-steps { display: flex; gap: 6px; margin: 10px 0 0; padding: 0; list-style: none; overflow-x: auto; scrollbar-width: none; }
+.ep-steps { display: flex; gap: 8px; margin: 12px 0 0; padding: 2px 2px 4px; list-style: none; overflow-x: auto; scrollbar-width: none; scroll-snap-type: x proximity; }
 .ep-steps::-webkit-scrollbar { display: none; }
-.ep-steps li { flex: 0 0 auto; }
-.ep-steps button { min-height: 36px; padding: 4px 12px; border: 1px solid var(--ep-line); border-radius: 999px; background: var(--ep-surface); color: var(--ep-muted); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.ep-steps li { flex: 0 0 auto; scroll-snap-align: center; }
+.ep-steps button { position: relative; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 4px 14px 4px 6px; border: 1px solid var(--ep-line); border-radius: 999px; background: var(--ep-surface); color: var(--ep-muted); font: inherit; font-size: 14px; font-weight: 650; cursor: pointer; transition: border-color .2s, background-color .2s; }
+.ep-steps button:hover:not(:disabled) { border-color: #c79a84; }
+.ep-step-n { display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: #f3ebe1; color: var(--ep-muted); font-size: 13px; font-weight: 800; }
 .ep-steps button[aria-current='step'] { background: var(--ep-primary); border-color: var(--ep-primary); color: #fff; }
+.ep-steps button[aria-current='step'] .ep-step-n { background: #fff; color: var(--ep-primary); }
 .ep-steps button[data-done='true'] { color: var(--ep-sage-ink); border-color: #b9cf8a; background: #f3f8e6; }
+.ep-steps button[data-done='true'] .ep-step-n { background: var(--ep-sage); color: var(--ep-sage-ink); }
 .ep-steps button:disabled { opacity: .55; cursor: not-allowed; }
 
 .ep-step { animation: epStepEnter .28s ease-out; }
@@ -75,7 +79,7 @@
 .ep-step-title { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid #efe5da; }
 .ep-step-title h2 { font-size: 23px; }
 .ep-step-title h2:focus { outline: none; }
-.ep-step-title > span { padding: 4px 11px; border-radius: 999px; background: #f6ece2; color: #7a4a38; font-size: 12px; font-weight: 600; }
+.ep-step-title > span:not(.read-aloud) { padding: 4px 11px; border-radius: 999px; background: #f6ece2; color: #7a4a38; font-size: 12px; font-weight: 600; }
 .ep-nav { position: sticky; bottom: 0; z-index: 2; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; margin: 18px -20px -20px; padding: 14px 20px; border-top: 1px solid var(--ep-line); border-radius: 0 0 20px 20px; background: #fffaf3f2; backdrop-filter: blur(4px); }
 .ep-nav > div { display: flex; flex-wrap: wrap; gap: 10px; }
 
@@ -192,7 +196,7 @@
 /* The doctor's bottom bar gained a 6th item (Care plan); keep it on one row instead of wrapping. */
 @media (max-width: 700px) {
   .simple-care-app .simple-care-nav:has(> :nth-child(6)) { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 3px; padding-inline: max(8px, env(safe-area-inset-left)); }
-  .simple-care-app .simple-care-nav:has(> :nth-child(6)) :is(a, button) { font-size: 9.5px; }
+  .simple-care-app .simple-care-nav:has(> :nth-child(6)) :is(a, button) { font-size: 12px; }
 }
 @media print {
   .ep-nav, .ep-actions, .ep-steps, .ep-progress { display: none !important; }
@@ -236,8 +240,10 @@
 .ep-board-steps ul { display: grid; gap: 6px; margin: 4px 0 0; padding-inline-start: 20px; }
 
 /* Goals-of-care conversation panel (goc-transcribe.tsx) */
-.ep-goc-entry { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
-.ep-goc-entry p { flex: 1 1 260px; margin: 0; }
+.ep-notice.ep-goc-entry { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 16px; border: 1px solid #f1d0bd; border-left: 5px solid var(--ep-primary); border-radius: 20px; background: linear-gradient(135deg, #fff3ea, #fffaf4); color: var(--ep-ink); }
+.ep-goc-entry-icon { flex: 0 0 auto; display: inline-grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; background: var(--ep-primary); color: #fff; box-shadow: 0 6px 16px rgba(185, 71, 44, .25); }
+.ep-goc-entry p { flex: 1 1 180px; margin: 0; font-size: 17px; }
+@media (max-width: 420px) { .ep-goc-entry .ep-btn { flex: 1 1 100%; } }
 .ep-goc-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
 .ep-goc-head h2 { font-size: 22px; }
 .ep-goc > .ep-hint, .ep-goc > .ep-option { margin-bottom: 14px; }

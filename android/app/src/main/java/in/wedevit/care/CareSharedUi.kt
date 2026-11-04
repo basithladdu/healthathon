@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -70,11 +71,11 @@ import kotlinx.coroutines.launch
     LaunchedEffect(cloud, cloud?.session?.value?.userId) { verifier = try { cloud?.session?.value != null && cloud.isClinicalVerifier() } catch (cancel: CancellationException) { throw cancel } catch (_: Exception) { false } }
     BackHandler { if (!busy) onClose() }
     val content: @Composable (PaddingValues) -> Unit = { padding ->
-        LazyColumn(Modifier.fillMaxSize().padding(padding).imePadding(), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+        LazyColumn(Modifier.fillMaxSize().padding(padding).imePadding(), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             if (cloud == null) item { SurfaceCard { Heading(t("Sign in to your records", "अपने रिकॉर्ड के लिए साइन इन करें"), 25); Text(t("Use an existing confirmed Sahara account. A selected doctor role does not verify your identity.", "पहले से पुष्ट सहारा खाता इस्तेमाल करें। डॉक्टर की भूमिका चुनने से आपकी पहचान पक्की नहीं होती।")); Button(onClick = onAccount) { Text(t("Your account", "आपका खाता")) } } }
             else {
-                item { Text(people.firstOrNull { it.id == selected }?.name.orEmpty(), style = MaterialTheme.typography.titleLarge); OutlinedButton(onClick = { run { refresh(); vm.refresh() } }, enabled = !busy) { Icon(Icons.Default.Refresh, null); Spacer(Modifier.width(8.dp)); Text(t("Refresh shared records", "साझा रिकॉर्ड ताज़ा करें")) } }
-                if (error.isNotBlank()) item { SurfaceCard(Peach) { Text(error, Modifier.announce()); TextButton(onClick = { run { refresh() } }, enabled = !busy) { Text(t("Retry", "फिर कोशिश करें"), color = RustText) } } }
+                item { Text(people.firstOrNull { it.id == selected }?.name.orEmpty(), style = MaterialTheme.typography.titleLarge); OutlinedButton(onClick = { run { refresh(); vm.refresh() } }, enabled = !busy, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp)) { Icon(Icons.Default.Refresh, null); Spacer(Modifier.width(8.dp)); Text(t("Refresh shared records", "साझा रिकॉर्ड ताज़ा करें")) } }
+                if (error.isNotBlank()) item { SurfaceCard(Peach) { Text(error, Modifier.announce()); TextButton(onClick = { run { refresh() } }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Retry", "फिर कोशिश करें"), color = RustText, fontWeight = FontWeight.Bold) } } }
                 if (notice.isNotBlank()) item { Text(notice, color = Rust, modifier = Modifier.announce()) }
                 item { SurfaceCard(Mint) {
                     Text(t("Clinician verification", "डॉक्टर की पुष्टि"), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
@@ -84,7 +85,7 @@ import kotlinx.coroutines.launch
                         CareField(council, { council = it.take(160) }, t("Medical council", "मेडिकल काउंसिल"), singleLine = true)
                         CareField(registration, { registration = it.take(80) }, t("Registration number", "रजिस्ट्रेशन नंबर"), singleLine = true)
                         if (profile?.status == "approved") Text(t("Changing these details suspends verified status until a new independent review.", "यह जानकारी बदलने पर नई स्वतंत्र जाँच तक पुष्टि रुक जाती है।"), style = MaterialTheme.typography.bodySmall)
-                        Button(onClick = { run { cloud.requestClinician(name, council, registration); refresh(); notice = t("Request received. Verification is pending.", "अनुरोध मिल गया। पुष्टि बाक़ी है।") } }, enabled = !busy && name.isNotBlank() && council.length >= 2 && registration.length >= 2) { Text(t("Submit for verification", "पुष्टि के लिए भेजें")) }
+                        Button(onClick = { run { cloud.requestClinician(name, council, registration); refresh(); notice = t("Request received. Verification is pending.", "अनुरोध मिल गया। पुष्टि बाक़ी है।") } }, enabled = !busy && name.isNotBlank() && council.length >= 2 && registration.length >= 2, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Text(t("Submit for verification", "पुष्टि के लिए भेजें")) }
                     }
                 } }
                 if (verifier) item { CareClinicianReviewPanel(cloud) }
@@ -111,7 +112,7 @@ import kotlinx.coroutines.launch
     reading?.let { draft ->
         var confirmed by remember(draft.id, draft.revision) { mutableStateOf(false) }
         ModalBottomSheet(onDismissRequest = { if (!busy) reading = null }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
-            LazyColumn(Modifier.imePadding().fillMaxWidth(), contentPadding = PaddingValues(22.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            LazyColumn(Modifier.imePadding().fillMaxWidth(), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 item { Heading(t("Review conversation", "बातचीत की समीक्षा"), 26); Text(t("Revision ${draft.revision}", "संशोधन ${draft.revision}") + " · ${draft.status}", style = MaterialTheme.typography.bodySmall) }
                 item { SurfaceCard(Gold) { Text(t("Original words", "मूल शब्द"), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont); SelectionContainerText(draft.conversation.source) } }
                 items(NoteRules.labels.zip(NoteRules.values(draft.conversation)), key = { it.first }) { (label, value) -> SurfaceCard { Text(label, fontWeight = FontWeight.Bold); SelectionContainerText(value.ifBlank { t("Not recorded", "दर्ज नहीं") }); CareSourceLinks(draft.conversation.source, value) } }

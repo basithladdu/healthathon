@@ -1,5 +1,6 @@
 package `in`.wedevit.care
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
@@ -7,9 +8,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.*
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.sp
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -91,16 +92,20 @@ private fun doctorWhen(item: CareItem, hindi: Boolean, zone: ZoneId = ZoneId.sys
 
 @Composable internal fun DoctorVerificationCard(state: DoctorConnectedHome.Verification, note: String, checkedAt: Long, checking: Boolean, error: String?, hindi: Boolean, onCheck: () -> Unit, onOpenForm: () -> Unit) {
     val t = { en: String, hi: String -> careTr(hindi, en, hi) }
-    val color = when (state) { DoctorConnectedHome.Verification.APPROVED -> Mint; DoctorConnectedHome.Verification.PENDING, DoctorConnectedHome.Verification.UNKNOWN -> Gold.copy(alpha = .35f); else -> Peach }
-    Surface(color = color, shape = RoundedCornerShape(22.dp), modifier = Modifier.fillMaxWidth().testTag("doctor-verification-card")) {
-        Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text(DoctorConnectedHome.verificationTitle(state, hindi), style = MaterialTheme.typography.titleLarge, modifier = Modifier.testTag("doctor-verification-status"))
-            Text(DoctorConnectedHome.verificationBody(state, hindi))
+    val (ink, color) = when (state) { DoctorConnectedHome.Verification.APPROVED -> DoctorStatusGood to DoctorStatusGoodBg; DoctorConnectedHome.Verification.PENDING, DoctorConnectedHome.Verification.UNKNOWN -> DoctorStatusWarn to DoctorStatusWarnBg; else -> DoctorStatusRest to DoctorStatusRestBg }
+    val icon = when (state) { DoctorConnectedHome.Verification.APPROVED -> Icons.Default.Verified; DoctorConnectedHome.Verification.PENDING, DoctorConnectedHome.Verification.UNKNOWN -> Icons.Default.HourglassTop; else -> Icons.Default.ErrorOutline }
+    Surface(color = color, shape = RoundedCornerShape(20.dp), modifier = Modifier.fillMaxWidth().testTag("doctor-verification-card")) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Icon(icon, null, tint = ink, modifier = Modifier.size(22.dp))
+                Text(DoctorConnectedHome.verificationTitle(state, hindi), Modifier.weight(1f).testTag("doctor-verification-status"), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
+                DoctorInfoIcon(DoctorConnectedHome.verificationTitle(state, hindi), DoctorConnectedHome.verificationBody(state, hindi), "doctor-verification-about")
+            }
             if (note.isNotBlank() && state in setOf(DoctorConnectedHome.Verification.REJECTED, DoctorConnectedHome.Verification.SUSPENDED)) Text(t("Reviewer note: ", "जाँचने वाले की टिप्पणी: ") + note, style = MaterialTheme.typography.bodyMedium)
             error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
-            if (checkedAt > 0) Text(DoctorConnectedHome.checkedAt(checkedAt, hindi), style = MaterialTheme.typography.bodySmall)
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedButton(onClick = onCheck, enabled = !checking, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-verification-check")) {
+            if (checkedAt > 0) Text(DoctorConnectedHome.checkedAt(checkedAt, hindi), fontSize = 14.sp, color = DoctorCardSub)
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedButton(onClick = onCheck, enabled = !checking, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-verification-check")) {
                     Icon(Icons.Default.Refresh, null); Spacer(Modifier.width(6.dp)); Text(if (checking) t("Checking…", "देखा जा रहा है…") else t("Check again", "फिर से देखें"))
                 }
                 if (state != DoctorConnectedHome.Verification.PENDING && state != DoctorConnectedHome.Verification.UNKNOWN)
@@ -115,10 +120,11 @@ private fun doctorWhen(item: CareItem, hindi: Boolean, zone: ZoneId = ZoneId.sys
 @Composable internal fun DoctorPatientSearchField(query: String, onQuery: (String) -> Unit, hindi: Boolean) {
     val focus = LocalFocusManager.current
     OutlinedTextField(query, { onQuery(it.take(80)) }, Modifier.fillMaxWidth().testTag("doctor-patient-search"), singleLine = true,
+        colors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = Paper, focusedContainerColor = Paper),
         placeholder = { Text(careTr(hindi, "Name or patient ID (e.g. SH-1A2B3C4D)", "नाम या मरीज़ ID (जैसे SH-1A2B3C4D)")) },
         leadingIcon = { Icon(Icons.Default.Search, null) },
         trailingIcon = { if (query.isNotEmpty()) IconButton(onClick = { onQuery("") }, Modifier.size(48.dp)) { Icon(Icons.Default.Clear, careTr(hindi, "Clear search", "खोज साफ़ करें")) } },
-        shape = RoundedCornerShape(16.dp), keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search), keyboardActions = KeyboardActions(onSearch = { focus.clearFocus() }))
+        shape = RoundedCornerShape(14.dp), keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search), keyboardActions = KeyboardActions(onSearch = { focus.clearFocus() }))
 }
 
 /** Doctor Home: real visits and check-ins across this account's connected patients. */
@@ -127,23 +133,43 @@ internal fun LazyListScope.doctorConnectedHomeItems(people: List<Person>, items:
     val visits = DoctorConnectedHome.upcomingVisits(people, items, now)
     val checks = DoctorConnectedHome.recentCheckIns(people, items, now)
     item(key = "home-patients") {
-        Surface(color = Paper, shape = RoundedCornerShape(22.dp), modifier = Modifier.fillMaxWidth()) { Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(t("Your patients", "आपके मरीज़"), style = MaterialTheme.typography.titleLarge)
-            Text(if (people.isEmpty()) t("No patient has shared their care with you yet.", "अभी किसी मरीज़ ने अपनी देखभाल आपसे साझा नहीं की है।")
-                else "${people.size}", style = MaterialTheme.typography.headlineSmall, modifier = Modifier.testTag("doctor-home-patient-count"))
-            TextButton(onClick = onPatients, modifier = Modifier.heightIn(min = 48.dp)) { Text(if (people.isEmpty()) t("Join with an invitation code", "निमंत्रण कोड से जुड़ें") else t("Open patients", "मरीज़ खोलें")) }
+        Surface(onClick = onPatients, color = DoctorCardOverview, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) { Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text(if (people.isEmpty()) t("No patient has shared their care with you yet.", "अभी किसी मरीज़ ने अपनी देखभाल आपसे साझा नहीं की है।")
+                    else "${people.size}", fontFamily = SaharaTitleFont, fontSize = if (people.isEmpty()) 17.sp else 30.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.testTag("doctor-home-patient-count"))
+                Text(if (people.isEmpty()) t("Join with an invitation code", "निमंत्रण कोड से जुड़ें") else t("Your patients", "आपके मरीज़"), fontSize = 14.sp, fontWeight = FontWeight.Medium, color = if (people.isEmpty()) RustText else DoctorCardSub)
+            }
+            Icon(Icons.Default.ChevronRight, if (people.isEmpty()) t("Join with an invitation code", "निमंत्रण कोड से जुड़ें") else t("Open patients", "मरीज़ खोलें"), tint = DoctorAccent)
         } }
     }
     if (people.isEmpty()) return
-    item(key = "home-visits-title") { Text(t("Upcoming visits", "आने वाली मुलाक़ातें"), style = MaterialTheme.typography.titleMedium) }
-    if (visits.isEmpty()) item(key = "home-visits-empty") { Text(t("No open visits are planned for your patients.", "आपके मरीज़ों की कोई मुलाक़ात तय नहीं है।"), style = MaterialTheme.typography.bodyMedium) }
+    item(key = "home-visits-title") { DoctorHomeSection(t("Upcoming visits", "आने वाली मुलाक़ातें"), visits.size) }
+    if (visits.isEmpty()) item(key = "home-visits-empty") { DoctorHomeEmpty(Icons.Default.EventAvailable, t("No open visits are planned for your patients.", "आपके मरीज़ों की कोई मुलाक़ात तय नहीं है।")) }
     items(visits.take(5), key = { "home-visit-${it.item.id}" }) { visit ->
         DoctorPatientListCard(visit.person.name, "${doctorWhen(visit.item, hindi)} · ${visit.item.title}", { onVisit(visit.person.id) })
     }
-    item(key = "home-checks-title") { Text(t("Check-ins this week", "इस हफ़्ते के हालचाल"), style = MaterialTheme.typography.titleMedium) }
-    if (checks.isEmpty()) item(key = "home-checks-empty") { Text(t("No check-ins reported in the last 7 days.", "पिछले 7 दिनों में कोई हालचाल दर्ज नहीं हुआ।"), style = MaterialTheme.typography.bodyMedium) }
+    item(key = "home-checks-title") { DoctorHomeSection(t("Check-ins this week", "इस हफ़्ते के हालचाल"), checks.size) }
+    if (checks.isEmpty()) item(key = "home-checks-empty") { DoctorHomeEmpty(Icons.Default.Favorite, t("No check-ins reported in the last 7 days.", "पिछले 7 दिनों में कोई हालचाल दर्ज नहीं हुआ।")) }
     items(checks, key = { "home-check-${it.second.id}" }) { (person, check) ->
         DoctorPatientListCard(person.name, "${checkInMoodLabel(check.title, hindi)} · ${DateTimeFormatter.ofPattern("d MMM, h:mm a", careLocale(hindi)).withZone(ZoneId.systemDefault()).format(Instant.ofEpochMilli(check.created))}", { onProgress(person.id) })
+    }
+}
+
+/** Section title with a count pill: scannable at a glance. */
+@Composable private fun DoctorHomeSection(title: String, count: Int) {
+    Row(Modifier.fillMaxWidth().padding(top = 12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(title, Modifier.a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
+        if (count > 0) Surface(color = DoctorStatusWarnBg, shape = RoundedCornerShape(50)) { Text("$count", Modifier.padding(horizontal = 10.dp, vertical = 2.dp), fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = DoctorStatusWarn) }
+    }
+}
+
+/** One quiet line with an icon for an empty list. */
+@Composable private fun DoctorHomeEmpty(icon: ImageVector, text: String) {
+    Surface(color = Paper, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
+        Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Icon(icon, null, tint = DoctorAccent, modifier = Modifier.size(22.dp))
+            Text(text, fontSize = 15.sp, lineHeight = 21.sp, color = DoctorCardSub)
+        }
     }
 }
 
@@ -164,14 +190,15 @@ internal fun LazyListScope.doctorConnectedScheduleItems(people: List<Person>, it
 
 /** The only place the signed-in workspace offers practice patients. They live on this device, apart from real care. */
 @Composable internal fun DoctorWalkthroughCard(hindi: Boolean, onOpen: (DoctorTestProfiles.Profile) -> Unit) {
-    Surface(color = Peach.copy(alpha = .45f), shape = RoundedCornerShape(22.dp), modifier = Modifier.fillMaxWidth().testTag("doctor-walkthrough-card")) {
-        Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Surface(color = DoctorCardVisit, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("doctor-walkthrough-card")) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(careTr(hindi, "Practice walkthrough · not real patients", "अभ्यास वॉकथ्रू · असली मरीज़ नहीं"), style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f))
+                Icon(Icons.Default.School, null, tint = DoctorAccent, modifier = Modifier.size(22.dp)); Spacer(Modifier.width(8.dp))
+                Text(careTr(hindi, "Practice walkthrough · not real patients", "अभ्यास वॉकथ्रू · असली मरीज़ नहीं"), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, modifier = Modifier.weight(1f))
                 DoctorInfoIcon(careTr(hindi, "Practice walkthrough · not real patients", "अभ्यास वॉकथ्रू · असली मरीज़ नहीं"), careTr(hindi, "Made-up patients for practice, not real people. They stay on this phone and never mix with a real patient's records.", "अभ्यास के लिए बनाए गए मरीज़, असली नहीं। ये सिर्फ़ इस फ़ोन पर रहते हैं और किसी असली मरीज़ के रिकॉर्ड में नहीं जाते।"), "doctor-walkthrough-about")
             }
             DoctorTestProfiles.profiles.forEach { profile ->
-                TextButton(onClick = { onOpen(profile) }, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-walkthrough-${profile.key}")) { Text((careTr(hindi, "Practice: ", "अभ्यास: ")) + profile.name) }
+                TextButton(onClick = { onOpen(profile) }, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-walkthrough-${profile.key}")) { Text((careTr(hindi, "Practice: ", "अभ्यास: ")) + profile.name, color = RustText, fontSize = 15.sp); Spacer(Modifier.width(4.dp)); Icon(Icons.Default.ChevronRight, null, Modifier.size(18.dp), tint = RustText) }
             }
         }
     }

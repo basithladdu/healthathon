@@ -25,7 +25,6 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -73,17 +72,17 @@ import java.time.format.DateTimeFormatter
         val food = when (e.food) { MedicineMealTiming.BEFORE_FOOD -> t("Before food", "खाने से पहले"); MedicineMealTiming.WITH_FOOD -> t("With food", "खाने के साथ"); MedicineMealTiming.AFTER_FOOD -> t("After food", "खाने के बाद"); else -> "" }
         listOf(e.strength, e.howMuch, e.howOften, food).filter(String::isNotBlank).joinToString(" · ")
     }.orEmpty()
-    SurfaceCard(if (allTaken) Color(0xFFE7EED6) else Paper) {
+    SurfaceCard(if (allTaken) DoctorStatusGoodBg else Paper) {
         Row(verticalAlignment = Alignment.Top) {
             // The pillbox: the strip photo once one is taken; tap an empty one to add it.
-            Box(Modifier.clickable(enabled = canEdit && !busy, onClickLabel = t("Edit", "बदलें")) { editing = true }.testTag("medicine-photo-${item.id}")) { StripThumb(photo, 52) }
+            Box(Modifier.clickable(enabled = canEdit && !busy, onClickLabel = t("Edit", "बदलें")) { editing = true }.testTag("medicine-photo-${item.id}")) { StripThumb(photo, 56) }
             Spacer(Modifier.width(12.dp))
-            Column(Modifier.weight(1f).clickable(enabled = !compact && rest.isNotBlank(), onClickLabel = if (open) t("Show less", "कम दिखाएँ") else t("Show more", "और दिखाएँ")) { open = !open }) {
-                Text(item.title, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                if (!compact && summary.isNotBlank()) Text(summary, fontSize = 13.sp, color = DoctorCardSub, maxLines = if (open) Int.MAX_VALUE else 1, overflow = TextOverflow.Ellipsis)
-                if (!compact && purpose.isNotBlank()) Text(purpose, fontSize = 14.sp, color = DoctorCardInk, maxLines = if (open) Int.MAX_VALUE else 2, overflow = TextOverflow.Ellipsis, modifier = Modifier.testTag("medicine-purpose-${item.id}"))
-                if (!compact && open && rest.isNotBlank()) Text(rest, fontSize = 13.sp, color = DoctorCardSub)
-                if (!compact && !open && rest.isNotBlank()) Text(t("More", "और"), fontSize = 12.sp, fontWeight = FontWeight.Medium, color = DoctorAccent)
+            Column(Modifier.weight(1f).clickable(enabled = !compact && rest.isNotBlank(), onClickLabel = if (open) t("Show less", "कम दिखाएँ") else t("Show more", "और दिखाएँ")) { open = !open }, verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text(item.title, fontWeight = FontWeight.SemiBold, fontSize = 17.sp, lineHeight = 22.sp, color = DoctorCardInk, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                if (!compact && summary.isNotBlank()) Text(summary, fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub, maxLines = if (open) Int.MAX_VALUE else 1, overflow = TextOverflow.Ellipsis)
+                if (!compact && purpose.isNotBlank()) Text(purpose, fontSize = 15.sp, lineHeight = 21.sp, color = DoctorCardInk, maxLines = if (open) Int.MAX_VALUE else 2, overflow = TextOverflow.Ellipsis, modifier = Modifier.testTag("medicine-purpose-${item.id}"))
+                if (!compact && open && rest.isNotBlank()) Text(rest, fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
+                if (!compact && !open && rest.isNotBlank()) Text(t("More", "और"), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = RustText)
             }
             if (canEdit) Box {
                 IconButton(onClick = { menu = true }, modifier = Modifier.size(48.dp).testTag("care-menu-${item.id}")) { Icon(Icons.Default.MoreVert, t("More actions", "और विकल्प"), tint = DoctorCardInk) }
@@ -98,7 +97,7 @@ import java.time.format.DateTimeFormatter
     }
     if (sideEffect) SideEffectSheet(item, vm, onDismiss = { sideEffect = false })
     if (delete) AlertDialog(onDismissRequest = { delete = false }, title = { Text(t("Remove this entry?", "यह जानकारी हटाएँ?")) }, text = { Text(item.title) },
-        confirmButton = { TextButton(onClick = { if (canEditCareContext(vm, item.personId, capturedAccount)) vm.remove(item); delete = false }, enabled = !busy && canEdit) { Text(t("Remove", "हटाएँ")) } },
+        confirmButton = { TextButton(onClick = { if (canEditCareContext(vm, item.personId, capturedAccount)) vm.remove(item); delete = false }, enabled = !busy && canEdit) { Text(t("Remove", "हटाएँ"), color = RustText, fontWeight = FontWeight.SemiBold) } },
         dismissButton = { TextButton(onClick = { delete = false }) { Text(t("Keep", "रखें")) } })
     if (editing) AddCareItem(item.kind, vm, onDismiss = { editing = false }, initial = item)
 }
@@ -142,7 +141,7 @@ internal suspend fun recordMedicineDose(context: Context, vm: CareModel, item: C
     val states = MedicineDoses.states(item, doses, events, today, zone)
     val editable = canEdit && current.any { it.id == item.id }
     val failed = t("Couldn't save. Please try again.", "सहेजा नहीं जा सका। कृपया फिर कोशिश करें।")
-    Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(top = 6.dp), horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
+    Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
         doses.forEach { dose ->
             MedicineDoseChip(item, dose, states[dose.key] ?: MedicineDoseState.PENDING, enabled = editable && !busy && !working) { taken ->
                 if (canEditCareContext(vm, item.personId, capturedAccount)) { working = true; problem = ""; scope.launch {
@@ -154,7 +153,7 @@ internal suspend fun recordMedicineDose(context: Context, vm: CareModel, item: C
         }
         if (showHistory) DoseChip(Icons.Default.History, t("History", "इतिहास"), "care-medicine-history-${item.id}", true) { history = true }
     }
-    if (problem.isNotBlank()) Text(problem, fontSize = 13.sp, color = RustText, modifier = Modifier.announce())
+    if (problem.isNotBlank()) Text(problem, fontSize = 14.sp, color = RustText, modifier = Modifier.padding(top = 4.dp).announce())
     if (history) MedicineHistorySheet(item, vm) { history = false }
 }
 
@@ -171,16 +170,17 @@ internal suspend fun recordMedicineDose(context: Context, vm: CareModel, item: C
         state == MedicineDoseState.TAKEN -> Triple(Icons.Default.Check, DoctorStatusGood, DoctorStatusGoodBg)
         state == MedicineDoseState.MISSED -> Triple(Icons.Default.Close, DoctorStatusRest, DoctorStatusRestBg)
         late -> Triple(Icons.Default.RadioButtonUnchecked, DoctorStatusWarn, DoctorStatusWarnBg)
-        else -> Triple(Icons.Default.RadioButtonUnchecked, DoctorCardSub, Cream)
+        else -> Triple(Icons.Default.RadioButtonUnchecked, DoctorCardSub, Paper)
     }
     val label = medicineDoseLabel(dose)
     val stateWord = when (state) { MedicineDoseState.TAKEN -> t("Taken", "ली"); MedicineDoseState.MISSED -> t("Missed", "छूटी"); else -> t("Not yet", "अभी नहीं") }
     Box {
-        Surface(onClick = { menu = true }, enabled = enabled, shape = RoundedCornerShape(50), color = bg, border = if (state == MedicineDoseState.PENDING && !late) BorderStroke(1.dp, DoctorHairline) else null,
+        Surface(onClick = { menu = true }, enabled = enabled, shape = RoundedCornerShape(50), color = bg, border = if (state == MedicineDoseState.PENDING && !late) BorderStroke(1.dp, DoctorCardFaint.copy(alpha = .4f)) else null,
             modifier = Modifier.minimumInteractiveComponentSize().semantics { contentDescription = "${item.title}, $label: $stateWord" }.testTag("medicine-dose-${item.id}-${dose.key}")) {
-            Row(Modifier.padding(horizontal = 10.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-                Icon(icon, null, Modifier.size(16.dp), tint = fg); Spacer(Modifier.width(5.dp))
-                Text(label, color = DoctorCardInk, fontSize = 13.sp, fontWeight = FontWeight.Medium, maxLines = 1)
+            // A clear time chip: the dose time in bold; the state shows as icon and colour (the word is in the description).
+            Row(Modifier.heightIn(min = 40.dp).padding(start = 10.dp, end = 14.dp), verticalAlignment = Alignment.CenterVertically) {
+                Icon(icon, null, Modifier.size(18.dp), tint = fg); Spacer(Modifier.width(6.dp))
+                Text(label, color = if (state == MedicineDoseState.PENDING && !late) DoctorCardInk else fg, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
             }
         }
         DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
@@ -193,7 +193,7 @@ internal suspend fun recordMedicineDose(context: Context, vm: CareModel, item: C
 /** A small "?" that opens a short explanation, in place of helper text on the screen (3 Nov meeting). */
 @Composable internal fun MedicineInfoButton(title: String, text: String, tag: String = "medicine-info") {
     val t = careText(); var open by remember { mutableStateOf(false) }
-    IconButton(onClick = { open = true }, modifier = Modifier.size(40.dp).testTag(tag)) { Icon(Icons.AutoMirrored.Outlined.HelpOutline, t("More information", "और जानकारी"), Modifier.size(20.dp), tint = DoctorAccent) }
+    IconButton(onClick = { open = true }, modifier = Modifier.size(48.dp).testTag(tag)) { Icon(Icons.AutoMirrored.Outlined.HelpOutline, t("More information", "और जानकारी"), Modifier.size(22.dp), tint = RustText) }
     if (open) AlertDialog(onDismissRequest = { open = false }, title = { Text(title) }, text = { Text(text) }, confirmButton = { TextButton(onClick = { open = false }) { Text(t("OK", "ठीक है")) } })
 }
 
@@ -208,7 +208,7 @@ internal suspend fun recordMedicineDose(context: Context, vm: CareModel, item: C
         val zone = ZoneId.systemDefault()
         val mine = events.filter { it.medicineId == item.id }.let { all -> all.filterNot { MedicineDoses.redundantCheckoff(it, all, zone) } }
         val now = System.currentTimeMillis()
-        LazyColumn(Modifier.fillMaxWidth().testTag("care-medicine-history-sheet"), contentPadding = PaddingValues(start = 20.dp, end = 20.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        LazyColumn(Modifier.fillMaxWidth().testTag("care-medicine-history-sheet"), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             item { Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(Modifier.weight(1f)) { Heading("${item.title} · ${t("History", "इतिहास")}", 24) }
                 MedicineInfoButton(t("About these reports", "इन सूचनाओं के बारे में"),
@@ -216,11 +216,15 @@ internal suspend fun recordMedicineDose(context: Context, vm: CareModel, item: C
                         (if (vm.cloud != null) t("Saved in your account. Family and doctors you share with can see it.", "आपके खाते में सेव। जिनके साथ आपने साझा किया, वे देख सकते हैं।") else t("Saved only on this phone. Sign in to share it with family and the doctor.", "सिर्फ़ इस फ़ोन पर सेव। परिवार और डॉक्टर से साझा करने के लिए साइन इन करें।")),
                     "care-medicine-history-info")
             } }
-            if (mine.isEmpty()) item { Text(t("No reports yet.", "अभी कोई जानकारी नहीं।"), fontSize = 15.sp, color = DoctorCardInk) }
+            // Friendly empty state: icon and one line; the Side effect? action sits below.
+            if (mine.isEmpty()) item { Column(Modifier.fillMaxWidth().padding(vertical = 24.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Icon(Icons.Default.History, null, Modifier.size(32.dp), tint = DoctorCardSub)
+                Text(t("No reports yet.", "अभी कोई जानकारी नहीं।"), fontSize = 16.sp, color = DoctorCardInk)
+            } }
             items(mine, key = { it.id }) { CompactMedicineReport(it, mine, now) }
             medicineSideEffectItems(SideEffectLog.forMedicine(SideEffectLog.entries(allItems, item.personId), item.id), vm)
-            if (canEdit) item { OutlinedButton(onClick = { sideEffect = true }, shape = RoundedCornerShape(50), modifier = Modifier.heightIn(min = 48.dp).testTag("care-medicine-history-side-effect")) { Icon(Icons.Default.ErrorOutline, null, Modifier.size(16.dp)); Spacer(Modifier.width(6.dp)); Text(t("Side effect?", "कोई दुष्प्रभाव?")) } }
-            if (vm.cloud != null) item { TextButton(onClick = vm::refreshMedicineHistory, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Refresh history", "इतिहास ताज़ा करें")) } }
+            if (canEdit) item { OutlinedButton(onClick = { sideEffect = true }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().padding(top = 12.dp).heightIn(min = 48.dp).testTag("care-medicine-history-side-effect")) { Icon(Icons.Default.ErrorOutline, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Side effect?", "कोई दुष्प्रभाव?"), fontSize = 16.sp) } }
+            if (vm.cloud != null) item { TextButton(onClick = vm::refreshMedicineHistory, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Refresh history", "इतिहास ताज़ा करें"), fontSize = 15.sp) } }
         }
     }
     if (sideEffect) SideEffectSheet(item, vm, onDismiss = { sideEffect = false })
@@ -230,9 +234,9 @@ internal suspend fun recordMedicineDose(context: Context, vm: CareModel, item: C
 @Composable private fun DoseChip(icon: ImageVector, label: String, tag: String, enabled: Boolean, onClick: () -> Unit) {
     // Slim capsule so the actions fit on one line; the touch area still meets 48dp.
     Surface(onClick = onClick, enabled = enabled, shape = RoundedCornerShape(50), color = Mint, modifier = Modifier.minimumInteractiveComponentSize().testTag(tag)) {
-        Row(Modifier.padding(horizontal = 10.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-            Icon(icon, null, Modifier.size(16.dp), tint = DoctorAccent); Spacer(Modifier.width(5.dp))
-            Text(label, color = DoctorCardInk, fontSize = 12.5.sp, fontWeight = FontWeight.Medium, maxLines = 1)
+        Row(Modifier.heightIn(min = 40.dp).padding(start = 10.dp, end = 14.dp), verticalAlignment = Alignment.CenterVertically) {
+            Icon(icon, null, Modifier.size(18.dp), tint = RustText); Spacer(Modifier.width(6.dp))
+            Text(label, color = DoctorCardInk, fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1)
         }
     }
 }
@@ -263,12 +267,12 @@ private const val FAMILY_ONLY_NOTE = "Family report only. Not confirmed as taken
     }
     SurfaceCard(Paper) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Surface(color = bg, shape = RoundedCornerShape(50)) { Text(word, Modifier.padding(horizontal = 12.dp, vertical = 6.dp), fontSize = 13.sp, fontWeight = FontWeight.Medium, color = fg) }
-            Spacer(Modifier.width(10.dp))
+            Surface(color = bg, shape = RoundedCornerShape(50)) { Text(word, Modifier.padding(horizontal = 12.dp, vertical = 6.dp), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = fg) }
+            Spacer(Modifier.width(12.dp))
             Text(main, Modifier.weight(1f), fontSize = 15.sp, color = DoctorCardInk)
             if (MedicineHistoryRules.loggedByFamily(event)) SymptomLoggedByFamilyChip(careHindi(), "medicine-report-family-${event.id}")
         }
-        Text(t("Reported by ", "बताने वाले: ") + event.reporter.ifBlank { t("Not recorded", "दर्ज नहीं") } + " · " + t("Logged: ", "दर्ज: ") + reportTime.format(Instant.ofEpochMilli(event.loggedAt)), Modifier.padding(top = 4.dp), fontSize = 13.sp, color = DoctorCardSub)
-        if (event.note.isNotBlank() && event.note != FAMILY_ONLY_NOTE && !event.note.startsWith("Planned dose.") && event.plannedAt == null) Text(event.note, Modifier.padding(top = 4.dp), fontSize = 14.sp, color = DoctorCardInk)
+        Text(t("Reported by ", "बताने वाले: ") + event.reporter.ifBlank { t("Not recorded", "दर्ज नहीं") } + " · " + t("Logged: ", "दर्ज: ") + reportTime.format(Instant.ofEpochMilli(event.loggedAt)), Modifier.padding(top = 8.dp), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
+        if (event.note.isNotBlank() && event.note != FAMILY_ONLY_NOTE && !event.note.startsWith("Planned dose.") && event.plannedAt == null) Text(event.note, Modifier.padding(top = 4.dp), fontSize = 15.sp, color = DoctorCardInk)
     }
 }

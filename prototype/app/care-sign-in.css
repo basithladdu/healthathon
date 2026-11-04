@@ -6,7 +6,7 @@
   display: flex;
   flex-direction: column;
   padding: 22px 32px 12px;
-  color: #304e43;
+  color: var(--care-ink, #382e29);
   background: radial-gradient(ellipse at 4% 96%, #dbe5c8 0, transparent 45%), radial-gradient(ellipse at 97% 2%, #f6dcc4 0, transparent 47%), #fff7e9;
   font-family: var(--font-inter), sans-serif;
 }
@@ -27,7 +27,7 @@
 }
 .care-sign-in-brand > span { display: grid; gap: 2px; }
 .care-sign-in-brand strong { font: 700 24px/1 var(--font-sora), sans-serif; letter-spacing: -1px; }
-.care-sign-in-brand small { color: #6a7c72; font: 600 9px/1.2 var(--font-inter), sans-serif; letter-spacing: .02em; }
+.care-sign-in-brand small { color: var(--care-muted, #6f6056); font: 500 12px/1.2 var(--font-inter), sans-serif; letter-spacing: .01em; }
 .care-sign-in-logo { width: 42px; height: 42px; flex: none; object-fit: contain; }
 .care-sign-in-language {
   min-height: 44px;
@@ -133,13 +133,13 @@
 .care-sign-in-form h1 {
   max-width: 11ch;
   margin: 0 0 7px;
-  color: #345449;
-  font: 650 34px/1.14 var(--font-sora), sans-serif;
-  letter-spacing: -1.35px;
+  color: var(--care-ink, #382e29);
+  font: 500 34px/1.14 var(--care-font-display, Georgia, serif);
+  letter-spacing: -1px;
   text-wrap: balance;
 }
 .care-sign-in-roles { min-width: 0; margin: 0; padding: 0; border: 0; }
-.care-sign-in-roles legend { margin-bottom: 9px; padding: 0; font-size: 13px; font-weight: 600; }
+.care-sign-in-roles legend { margin-bottom: 8px; padding: 0; font-size: 14px; font-weight: 600; }
 .care-sign-in-roles > div { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; }
 .care-sign-in-role {
   min-width: 0;
@@ -152,8 +152,8 @@
   padding: 7px 4px 10px;
   border: 2px solid transparent;
   border-radius: 18px;
-  color: #3c5145;
-  font: 600 13px/1.25 var(--font-inter), sans-serif;
+  color: var(--care-ink, #382e29);
+  font: 600 15px/1.25 var(--font-inter), sans-serif;
   cursor: pointer;
   transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
 }
@@ -161,23 +161,23 @@
 .care-sign-in-role-family { background: #f8e5d0; }
 .care-sign-in-role-patient { background: #e7edda; }
 .care-sign-in-role-doctor { background: #ede3f4; }
-.care-sign-in-role[aria-pressed='true'] { border-color: #397e69; box-shadow: 0 4px 0 #bad0ba; transform: translateY(-2px); color: #204f40; }
-.care-sign-in-label { display: grid; min-width: 0; gap: 7px; font-size: 13px; font-weight: 600; }
+.care-sign-in-role[aria-pressed='true'] { border-color: var(--care-primary, #b9472c); box-shadow: 0 4px 0 #e3b8a6; transform: translateY(-2px); }
+.care-sign-in-label { display: grid; min-width: 0; gap: 8px; font-size: 14px; font-weight: 600; }
 .care-sign-in-label input {
   width: 100%;
   min-width: 0;
-  min-height: 50px;
-  border: 1px solid #d9daca;
-  border-radius: 14px;
-  padding: 11px 13px;
-  color: #304e43;
-  background: #fffdf7;
-  box-shadow: 0 2px 0 #eee9dc80;
+  min-height: 52px;
+  border: 1px solid var(--care-line-strong, #cbbcad);
+  border-radius: var(--care-radius-control, 14px);
+  padding: 12px 14px;
+  color: var(--care-ink, #382e29);
+  background: var(--care-surface, #fffdf9);
+  box-shadow: none;
   font: 400 16px var(--font-inter), sans-serif;
 }
-.care-sign-in-label input::placeholder { color: #7c8578; opacity: 1; }
-.care-sign-in-label input[aria-invalid='true'] { border-color: #ae4f39; }
-.care-sign-in-error { margin: -5px 0 0; color: #a54832; font-size: 12px; line-height: 1.45; }
+.care-sign-in-label input::placeholder { color: #85776c; opacity: 1; }
+.care-sign-in-label input[aria-invalid='true'] { border-color: var(--care-danger, #a3271f); background: var(--care-danger-soft, #fdeceb); }
+.care-sign-in-error { margin: -4px 0 0; color: var(--care-danger, #a3271f); font-size: 14px; font-weight: 600; line-height: 1.45; }
 .care-sign-in-submit {
   min-height: 54px;
   display: flex;
@@ -185,29 +185,31 @@
   justify-content: space-between;
   gap: 12px;
   padding: 13px 18px;
-  border: 1px solid #af5f42;
-  border-radius: 16px;
-  color: #fffaf1;
-  background: #a9543b;
-  box-shadow: 0 4px 0 #8e4b3530;
-  font: 650 16px var(--font-inter), sans-serif;
+  border: 1px solid var(--care-primary, #b9472c);
+  border-radius: var(--care-radius-control, 14px);
+  color: var(--care-on-primary, #fffaf5);
+  background: var(--care-primary, #b9472c);
+  box-shadow: 0 3px 0 #8e4b3530;
+  font: 600 17px var(--font-inter), sans-serif;
   cursor: pointer;
   transition: background-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
 }
 .care-sign-in-submit svg { width: 23px; height: 23px; flex: none; }
 .care-sign-in-account { text-decoration: none; }
 .care-sign-in-tools { min-width: 0; border-top: 1px solid #e6ddd1; padding-top: 5px; }
-.care-sign-in-tools > summary { min-height: 44px; padding-block: 12px; color: #76675d; font-size: 14px; font-weight: 600; cursor: pointer; }
+.care-sign-in-tools > summary { min-height: 44px; padding-block: 12px; color: var(--care-muted, #6f6056); font-size: 14px; font-weight: 600; cursor: pointer; }
 .care-sign-in-tools-form { display: grid; min-width: 0; gap: 14px; padding-top: 5px; }
-.care-sign-in-tools-note { margin: 0; color: #76675d; font-size: 12px; line-height: 1.5; }
+.care-sign-in-tools-note { margin: 0; color: var(--care-muted, #6f6056); font-size: 14px; line-height: 1.5; }
 .care-sign-in .care-sign-in-tools-submit { color: #382e29; background: #fff8ee; border-color: #d7c8bc; box-shadow: none; }
-.care-sign-in button:disabled { opacity: .5; cursor: not-allowed; }
-.care-sign-in :is(button, input, a, summary):focus-visible { outline: 3px solid #397e69; outline-offset: 4px; }
+.care-sign-in button:disabled { opacity: .55; cursor: not-allowed; }
+.care-sign-in .care-sign-in-submit:disabled { opacity: 1; color: #7a6d63; background: #efe7dc; border-color: #e2d7ca; box-shadow: none; }
+.care-sign-in :is(button, input, a, summary, select):focus-visible { outline: 3px solid var(--care-focus, #8a4a26); outline-offset: 3px; }
+.care-sign-in-label input:focus { border-color: var(--care-primary, #b9472c); }
 
 @media (hover: hover) {
   .care-sign-in-role:hover { transform: translateY(-3px); box-shadow: 0 5px 0 #c6c4a647; }
   .care-sign-in-role[aria-pressed='true']:hover { box-shadow: 0 5px 0 #bad0ba; }
-  .care-sign-in-submit:not(:disabled):hover { background: #974a34; transform: translateY(-1px); box-shadow: 0 5px 0 #8e4b3530; }
+  .care-sign-in-submit:not(:disabled):hover { background: var(--care-primary-hover, #923522); transform: translateY(-1px); box-shadow: 0 5px 0 #8e4b3530; }
   .care-sign-in .care-sign-in-tools-submit:not(:disabled):hover { background: #f1e9dd; box-shadow: none; }
   .care-sign-in-language:hover { background: #f1ebd9; }
 }
@@ -215,7 +217,7 @@
 .care-sign-in-submit:not(:disabled):active { transform: translateY(1px); box-shadow: none; }
 
 @media (max-width: 760px) {
-  .care-sign-in { padding: 16px 18px 10px; }
+  .care-sign-in { padding: 12px 16px 12px; }
   .care-sign-in-header { width: min(430px, 100%); }
   .care-sign-in-brand { gap: 8px; }
   .care-sign-in-brand strong { font-size: 22px; letter-spacing: -.85px; }
@@ -230,19 +232,19 @@
   .care-sign-in-art-main { top: 9px; left: calc(50% - 66px); width: 130px; height: 111px; border-radius: 20px; transform: rotate(-7deg); }
   .care-sign-in-art-story { top: 31px; right: calc(50% - 157px); width: 82px; height: 72px; border-radius: 17px; transform: rotate(12deg); }
   .care-sign-in-art-voice { top: 25px; left: calc(50% - 145px); width: 73px; height: 64px; border-radius: 16px; transform: rotate(-13deg); }
-  .care-sign-in-form { min-height: 0; gap: 12px; padding: 20px; }
-  .care-sign-in-form h1 { max-width: none; margin-bottom: 3px; font-size: 27px; line-height: 1.17; letter-spacing: -1.1px; }
+  .care-sign-in-form { min-height: 0; gap: 16px; padding: 20px; }
+  .care-sign-in-form h1 { max-width: none; margin-bottom: 0; font-size: 28px; line-height: 1.17; letter-spacing: -.8px; }
   .care-sign-in-roles > div { gap: 8px; }
   .care-sign-in-role { min-height: 87px; padding-block: 5px 8px; border-radius: 16px; }
   .care-sign-in-role svg { width: 60px; height: 50px; }
-  .care-sign-in-label input { min-height: 48px; }
+  .care-sign-in-label input { min-height: 50px; }
   .care-sign-in-submit { min-height: 52px; }
 }
 
 @media (max-width: 380px) {
-  .care-sign-in { padding-inline: 14px; }
-  .care-sign-in-form { padding-inline: 18px; }
-  .care-sign-in-form h1 { font-size: 25px; }
+  .care-sign-in { padding-inline: 12px; }
+  .care-sign-in-form { padding-inline: 16px; }
+  .care-sign-in-form h1 { font-size: 26px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

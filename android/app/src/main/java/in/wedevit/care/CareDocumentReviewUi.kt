@@ -5,17 +5,21 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.OpenInNew
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -77,40 +81,42 @@ import java.time.ZoneId
     DisposableEffect(Unit) { onDispose { job?.cancel() } }
     BackHandler { job?.cancel(); onClose() }
 
-    LazyColumn(Modifier.fillMaxSize().imePadding().testTag("document-review"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { Row { IconButton(onClick = { job?.cancel(); onClose() }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back to documents", "कागज़ात पर वापस")) }; Column(Modifier.weight(1f)) { Heading(t("Review report", "रिपोर्ट जाँचें"), 26); Text(report.name) } } }
-        item { OutlinedButton(onClick = { runCatching { open(context, vm.reportFiles.intent(report, false)) }.onFailure { error = t("No app could open this original. Your file is unchanged.", "कोई ऐप यह फ़ाइल नहीं खोल सका। आपकी फ़ाइल वैसी ही है।") } }, modifier = Modifier.fillMaxWidth()) { Icon(Icons.Default.OpenInNew, null); Spacer(Modifier.width(8.dp)); Text(t("View original", "असली फ़ाइल देखें")) } }
-        item { Text(t("Read text, correct any mistakes, then copy only the facts you checked. Handwriting and small print may not be readable.", "लिखाई पढ़ें, ग़लतियाँ ठीक करें, फिर सिर्फ़ जाँची हुई बातें कॉपी करें। हाथ की लिखाई और बारीक छपाई शायद न पढ़ी जाए।"), style = MaterialTheme.typography.bodySmall) }
-        if (loading) item { SurfaceCard { LinearProgressIndicator(Modifier.fillMaxWidth()); Text(t("Reading page ${progress.first} of ${progress.second.coerceAtLeast(1)}", "पेज ${progress.first} / ${progress.second.coerceAtLeast(1)} पढ़ रहे हैं")); TextButton(onClick = { job?.cancel(); loading = false }) { Text(t("Cancel reading", "पढ़ना रोकें")) } } }
-        if (error.isNotBlank()) item { SurfaceCard(Peach) { Text(error, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()); TextButton(onClick = ::read, enabled = !loading) { Text(t("Read again", "फिर पढ़ें"), color = RustText) } } }
+    LazyColumn(Modifier.fillMaxSize().imePadding().testTag("document-review"), contentPadding = PaddingValues(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        item { Row(verticalAlignment = Alignment.CenterVertically) { IconButton(onClick = { job?.cancel(); onClose() }, modifier = Modifier.size(48.dp)) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back to documents", "कागज़ात पर वापस")) }; Column(Modifier.weight(1f)) { Heading(t("Review report", "रिपोर्ट जाँचें"), 26); Text(report.name, fontSize = 14.sp, color = DoctorCardSub, maxLines = 2, overflow = TextOverflow.Ellipsis) } } }
+        item { OutlinedButton(onClick = { runCatching { open(context, vm.reportFiles.intent(report, false)) }.onFailure { error = t("No app could open this original. Your file is unchanged.", "कोई ऐप यह फ़ाइल नहीं खोल सका। आपकी फ़ाइल वैसी ही है।") } }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.OpenInNew, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("View original", "असली फ़ाइल देखें")) } }
+        item { InfoDisclosure(t("How this works", "यह कैसे काम करता है")) { Text(t("Read text, correct any mistakes, then copy only the facts you checked. Handwriting and small print may not be readable.", "लिखाई पढ़ें, ग़लतियाँ ठीक करें, फिर सिर्फ़ जाँची हुई बातें कॉपी करें। हाथ की लिखाई और बारीक छपाई शायद न पढ़ी जाए।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub) } }
+        if (loading) item { SurfaceCard { LinearProgressIndicator(Modifier.fillMaxWidth(), color = DoctorAccent, trackColor = DoctorHairline); Spacer(Modifier.height(8.dp)); Text(t("Reading page ${progress.first} of ${progress.second.coerceAtLeast(1)}", "पेज ${progress.first} / ${progress.second.coerceAtLeast(1)} पढ़ रहे हैं")); TextButton(onClick = { job?.cancel(); loading = false }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Cancel reading", "पढ़ना रोकें")) } } }
+        if (error.isNotBlank()) item { SurfaceCard { Text(error, color = MaterialTheme.colorScheme.error, fontSize = 14.sp, modifier = Modifier.announce()); TextButton(onClick = ::read, enabled = !loading, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Read again", "फिर पढ़ें"), color = RustText) } } }
         value?.let { document ->
-            if (document.pages.size < document.pageCount) item { Text(t("First ${document.pages.size} of ${document.pageCount} pages read. Open the original for the remaining pages.", "${document.pageCount} में से पहले ${document.pages.size} पेज पढ़े गए। बाक़ी पेजों के लिए असली फ़ाइल खोलें।"), color = MaterialTheme.colorScheme.error) }
-            item { Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) { document.pages.forEach { candidate -> FilterChip(selected = page == candidate.page, onClick = { page = candidate.page; factLine = 0; factChecked = false }, label = { Text(t("Page ${candidate.page}", "पेज ${candidate.page}")) }) } } }
+            if (document.pages.size < document.pageCount) item { Text(t("First ${document.pages.size} of ${document.pageCount} pages read. Open the original for the remaining pages.", "${document.pageCount} में से पहले ${document.pages.size} पेज पढ़े गए। बाक़ी पेजों के लिए असली फ़ाइल खोलें।"), color = DoctorStatusWarn, fontSize = 14.sp) }
+            item { Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) { document.pages.forEach { candidate -> FilterChip(selected = page == candidate.page, onClick = { page = candidate.page; factLine = 0; factChecked = false }, label = { Text(t("Page ${candidate.page}", "पेज ${candidate.page}")) }, shape = RoundedCornerShape(50)) } } }
             currentPage?.let { shown ->
                 item { CareField(shown.reviewedText, { next ->
                     value = document.copy(pages = document.pages.map { if (it.page == page) it.copy(reviewedText = next.take(40_000)) else it }, reviewedAt = 0)
                     checked = false; factLine = 0; factChecked = false
                 }, t("Text to check", "जाँचने के लिए लिखाई"), minLines = 8) }
-                if (shown.originalText != shown.reviewedText) item { Text(t("Corrections are separate from the original reading. The original file is kept.", "सुधार अलग रखे जाते हैं। असली फ़ाइल वैसी ही रहती है।"), style = MaterialTheme.typography.bodySmall) }
+                if (shown.originalText != shown.reviewedText) item { Text(t("Corrections are separate from the original reading. The original file is kept.", "सुधार अलग रखे जाते हैं। असली फ़ाइल वैसी ही रहती है।"), fontSize = 14.sp, color = DoctorCardSub) }
                 item { CheckLine(checked || document.reviewedAt > 0, { checked = it }, t("I compared these pages and any corrections with the original.", "मैंने इन पेजों और सुधारों को असली फ़ाइल से मिला लिया है।")) }
-                item { Button(onClick = { scope.launch {
+                item { val saveReview: () -> Unit = { scope.launch {
                     try { val confirmed = DocumentEvidenceRules.confirm(requireNotNull(value), checked, System.currentTimeMillis()); withContext(Dispatchers.IO) { store.save(confirmed) }; value = confirmed; checked = false; error = ""; vm.message.value = t("Reviewed text saved", "जाँची गई लिखाई सहेज ली गई") }
                     catch (failure: Exception) { error = failure.message ?: t("Could not save the reviewed text. Keep this page open and try again.", "जाँची गई लिखाई सहेजी नहीं जा सकी। यह पेज खुला रखें और फिर कोशिश करें।") }
-                } }, enabled = checked && !loading && canEdit, modifier = Modifier.fillMaxWidth()) { Text(if (document.reviewedAt > 0) t("Save review again", "जाँच फिर सहेजें") else t("Save reviewed text", "जाँची गई लिखाई सहेजें")) } }
+                } }
+                    if (document.reviewedAt > 0) OutlinedButton(onClick = saveReview, enabled = checked && !loading && canEdit, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Save review again", "जाँच फिर सहेजें")) }
+                    else Button(onClick = saveReview, enabled = checked && !loading && canEdit, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Save reviewed text", "जाँची गई लिखाई सहेजें"), fontWeight = FontWeight.SemiBold) } }
                 if (document.reviewedAt > 0 && canEdit) {
                     item { SectionTitle(t("Copy a checked fact", "जाँची हुई बात कॉपी करें")) }
-                    item { Text(t("Choose the exact line to keep with a medicine, test or follow-up. A copied record does not confirm treatment happened.", "दवा, जाँच या अगली मुलाक़ात के लिए सही पंक्ति चुनें। कॉपी करने से यह पक्का नहीं होता कि इलाज हुआ।"), style = MaterialTheme.typography.bodySmall) }
+                    item { Text(t("Choose the exact line to keep with a medicine, test or follow-up. A copied record does not confirm treatment happened.", "दवा, जाँच या अगली मुलाक़ात के लिए सही पंक्ति चुनें। कॉपी करने से यह पक्का नहीं होता कि इलाज हुआ।"), fontSize = 14.sp, color = DoctorCardSub) }
                     shown.reviewedText.split('\n').forEachIndexed { index, line -> if (line.isNotBlank() && line.length <= 2000) item("line-$page-$index") {
-                        FilterChip(selected = factLine == index + 1, onClick = { factLine = index + 1; if (kind == "Lab result") suggestLab(line) else title = line.take(160); factChecked = false }, label = { Text("${index + 1}. $line") }, modifier = Modifier.fillMaxWidth())
+                        FilterChip(selected = factLine == index + 1, onClick = { factLine = index + 1; if (kind == "Lab result") suggestLab(line) else title = line.take(160); factChecked = false }, label = { Text("${index + 1}. $line", Modifier.padding(vertical = 8.dp)) }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth())
                     } }
                     if (factLine > 0) {
                         item { CareField(title, { title = it.take(160); factChecked = false }, if (kind == "Lab result") t("Test name on report", "रिपोर्ट पर जाँच का नाम") else t("Record name", "रिकॉर्ड का नाम"), singleLine = true) }
                         item { Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) { listOf("Record", "Medicine", "Follow-up", "Test", "Lab result").forEach { option -> FilterChip(selected = kind == option, onClick = {
                             if (option == "Lab result" && kind != option) currentPage?.reviewedText?.split('\n')?.getOrNull(factLine - 1)?.let(::suggestLab)
                             kind = option; factChecked = false
-                        }, label = { Text(when (option) { "Medicine" -> t("Medicine", "दवा"); "Follow-up" -> t("Follow-up", "अगली मुलाक़ात"); "Test" -> t("Test", "जाँच"); "Lab result" -> t("Lab result", "लैब का नतीजा"); else -> t("Record", "रिकॉर्ड") }) }, modifier = Modifier.testTag("document-kind-$option")) } } }
+                        }, label = { Text(when (option) { "Medicine" -> t("Medicine", "दवा"); "Follow-up" -> t("Follow-up", "अगली मुलाक़ात"); "Test" -> t("Test", "जाँच"); "Lab result" -> t("Lab result", "लैब का नतीजा"); else -> t("Record", "रिकॉर्ड") }) }, shape = RoundedCornerShape(50), modifier = Modifier.testTag("document-kind-$option")) } } }
                         if (kind == "Lab result") {
-                            item { Text(t("Filled in from the chosen line. Check each box against the original report. The result and this line are saved with the care record; the report file stays on this phone.", "चुनी पंक्ति से भरा गया है। हर खाना असली रिपोर्ट से मिलाएँ। नतीजा और यह पंक्ति देखभाल रिकॉर्ड में सेव होंगे; रिपोर्ट फ़ाइल इसी फ़ोन पर रहेगी।"), style = MaterialTheme.typography.bodySmall) }
+                            item { Text(t("Filled in from the chosen line. Check each box against the original report. The result and this line are saved with the care record; the report file stays on this phone.", "चुनी पंक्ति से भरा गया है। हर खाना असली रिपोर्ट से मिलाएँ। नतीजा और यह पंक्ति देखभाल रिकॉर्ड में सेव होंगे; रिपोर्ट फ़ाइल इसी फ़ोन पर रहेगी।"), fontSize = 14.sp, color = DoctorCardSub) }
                             item { Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                 Box(Modifier.weight(1f)) { CareField(labValue, { labValue = it.take(40); factChecked = false }, t("Value", "नतीजा"), singleLine = true) }
                                 Box(Modifier.weight(1f)) { CareField(labUnit, { labUnit = it.take(40); factChecked = false }, t("Printed unit", "छपी इकाई"), singleLine = true) }
@@ -151,7 +157,7 @@ import java.time.ZoneId
                                 vm.saveItem(targetKind, title, savedDetail, due, done = { factLine = 0; factChecked = false; vm.message.value = if (due > 0) t("Copied to Calendar. Check Reminders to enable alerts.", "कैलेंडर में कॉपी हो गया। अलर्ट के लिए रिमाइंडर देखें।") else t("Checked fact copied", "जाँची हुई बात कॉपी हो गई") })
                                 error = ""
                             } catch (failure: Exception) { error = failure.message ?: t("Check the date and exact time.", "तारीख़ और सही समय जाँचें।") }
-                        }, enabled = factChecked && !busy, modifier = Modifier.fillMaxWidth().testTag("document-copy-fact")) { Text(if (busy) t("Saving…", "सहेज रहे हैं…") else if (kind == "Lab result") t("Add to Lab history", "लैब इतिहास में जोड़ें") else if (kind in listOf("Follow-up", "Test")) t("Copy to Calendar", "कैलेंडर में कॉपी करें") else t("Copy checked fact", "जाँची हुई बात कॉपी करें")) } }
+                        }, enabled = factChecked && !busy, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("document-copy-fact")) { Text(if (busy) t("Saving…", "सहेज रहे हैं…") else if (kind == "Lab result") t("Add to Lab history", "लैब इतिहास में जोड़ें") else if (kind in listOf("Follow-up", "Test")) t("Copy to Calendar", "कैलेंडर में कॉपी करें") else t("Copy checked fact", "जाँची हुई बात कॉपी करें")) } }
                     }
                 }
             }

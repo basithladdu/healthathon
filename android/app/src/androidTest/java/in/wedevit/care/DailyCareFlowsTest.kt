@@ -89,7 +89,7 @@ class DailyCareFlowsTest {
         ui.onNodeWithTag("workflow-save").performScrollTo().performClick()
         val item = saved("Comfort at home")
         assertEquals("conversation", CareEntryCodec.decode(item.detail)!!.type)
-        ui.onNodeWithText("Requested · For Dr Test").assertIsDisplayed()
+        ui.onNode(hasText("Requested") and hasText("For Dr Test", substring = true)).assertIsDisplayed()
         ui.onNodeWithText("Pick up", useUnmergedTree = true).assertDoesNotExist()
         ui.runOnIdle { vm.role("Doctor") }
         ui.onNodeWithText("Care queue").assertIsDisplayed()
@@ -97,7 +97,7 @@ class DailyCareFlowsTest {
         enter("Your name", "Dr Test"); hideKeyboard()
         ui.onNodeWithTag("workflow-confirm-action").performClick()
         ui.waitUntil(15000) { CareEntryCodec.decode(vm.items.value.first { it.id == item.id }.detail)?.status == "accepted" }
-        ui.onNodeWithText("Picked up · For Dr Test").assertIsDisplayed()
+        ui.onNode(hasText("Picked up") and hasText("For Dr Test", substring = true)).assertIsDisplayed()
         screenshot("conversation-request-picked-up")
         ui.onNodeWithText("Open conversation").performScrollTo().performClick()
         ui.onNodeWithTag("conversation-list").assertIsDisplayed()
@@ -115,7 +115,7 @@ class DailyCareFlowsTest {
         hideKeyboard()
         ui.onNodeWithTag("workflow-save").performScrollTo().performClick()
         val item = saved("Collect the clinic report")
-        ui.onNodeWithText("To do · For Ayesha").assertIsDisplayed()
+        ui.onNode(hasText("To do") and hasText("For Ayesha", substring = true)).assertIsDisplayed()
         ui.onNodeWithText("Pick up", useUnmergedTree = true).performClick()
         enter("Your name", "Ayesha"); hideKeyboard(); ui.onNodeWithTag("workflow-confirm-action").performClick()
         ui.waitUntil(15000) { CareEntryCodec.decode(vm.items.value.first { it.id == item.id }.detail)?.status == "accepted" }
@@ -123,10 +123,10 @@ class DailyCareFlowsTest {
         ui.onNodeWithTag("workflow-confirm-action").performClick()
         ui.waitUntil(15000) { CareEntryCodec.decode(vm.items.value.first { it.id == item.id }.detail)?.status == "completed" }
         ui.onNodeWithText("Include finished").performClick()
-        ui.onNodeWithText("Completed · For Ayesha").assertIsDisplayed()
+        ui.onNode(hasText("Completed") and hasText("For Ayesha", substring = true)).assertIsDisplayed()
         screenshot("care-task-completed")
         recreate(); openCareTeam()
-        ui.onNodeWithText("Completed · For Ayesha").assertIsDisplayed()
+        ui.onNode(hasText("Completed") and hasText("For Ayesha", substring = true)).assertIsDisplayed()
         val result = runBlocking { CareDatabase.get(ui.activity).care().item(item.id) }!!
         val data = CareEntryCodec.decode(result.detail)!!
         assertEquals("Family", data.sender)

@@ -55,7 +55,7 @@ import java.time.format.DateTimeFormatter
         val request=approved;approved=null
         if(granted && signedIn && request!=null && request.controller===controller && !controller.isClosed() && owner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) request.start()
     }
-    Surface(color=Peach.copy(alpha=.45f),shape=RoundedCornerShape(18.dp),modifier=Modifier.fillMaxWidth().testTag("doctor-live-capture")) {
+    Surface(color=Peach.copy(alpha=.45f),shape=RoundedCornerShape(20.dp),modifier=Modifier.fillMaxWidth().testTag("doctor-live-capture")) {
         Column(Modifier.padding(16.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {
             Row(verticalAlignment=Alignment.CenterVertically) { Icon(Icons.Default.Mic,null,tint=Rust);Spacer(Modifier.width(10.dp));Text(if(state.recording) "Recording ${state.seconds/60}:${(state.seconds%60).toString().padStart(2,'0')}" else "Record a test conversation",fontWeight=FontWeight.SemiBold) }
             Text("Real microphone → online transcript & AI draft. Fictional, non-confidential test conversations only.",style=MaterialTheme.typography.bodySmall)
@@ -67,13 +67,13 @@ import java.time.format.DateTimeFormatter
             if(busy) { LinearProgressIndicator(Modifier.fillMaxWidth(),color=Rust);Text("Preparing transcript and draft…",modifier=Modifier.testTag("doctor-ai-busy"),style=MaterialTheme.typography.bodySmall) }
         }
     }
-    state.clips.forEach { clip -> Surface(color=Paper,shape=RoundedCornerShape(16.dp),modifier=Modifier.fillMaxWidth().padding(top=12.dp).testTag("doctor-audio-clip-${clip.id}")) {
+    state.clips.forEach { clip -> Surface(color=Paper,shape=RoundedCornerShape(20.dp),border=androidx.compose.foundation.BorderStroke(1.dp,DoctorHairline),modifier=Modifier.fillMaxWidth().padding(top=12.dp).testTag("doctor-audio-clip-${clip.id}")) {
         Column(Modifier.padding(16.dp),verticalArrangement=Arrangement.spacedBy(10.dp)) {
             Text("Conversation · "+DateTimeFormatter.ofPattern("d MMM, h:mm a").withZone(ZoneId.systemDefault()).format(Instant.ofEpochMilli(clip.consent.recordingConsentAt)),fontWeight=FontWeight.Medium)
             Row(verticalAlignment=Alignment.CenterVertically) {
                 IconButton(onClick={controller.play(clip)},enabled=!state.recording && !busy,modifier=Modifier.testTag("doctor-play-${clip.id}")) { Icon(if(state.playing==clip.id) Icons.Default.Stop else Icons.Default.PlayArrow,if(state.playing==clip.id) "Stop playback" else "Play recording") }
                 Text("${clip.file.length()/1024} KB · private on this device",Modifier.weight(1f),style=MaterialTheme.typography.bodySmall)
-                IconButton(onClick={deleting=clip},enabled=!busy && !state.recording) { Icon(Icons.Default.DeleteOutline,"Delete recording") }
+                IconButton(onClick={deleting=clip},enabled=!busy && !state.recording) { Icon(Icons.Default.DeleteOutline,"Delete recording",tint=MaterialTheme.colorScheme.error) }
             }
             if(clip.consent.transcriptionConsentAt>0) Button(onClick={controller.stopPlayback();onTranscribe(clip)},enabled=signedIn && !busy && !state.recording && sourceIsBlank,modifier=Modifier.fillMaxWidth().heightIn(min=52.dp).testTag("doctor-transcribe-${clip.id}")) { Icon(Icons.Default.AutoAwesome,null,Modifier.size(18.dp));Spacer(Modifier.width(8.dp));Text("Transcribe & draft Care Note") }
             else Text("Cloud processing was not agreed for this recording. No upload is available.",style=MaterialTheme.typography.bodySmall)
@@ -100,7 +100,7 @@ import java.time.format.DateTimeFormatter
             else {approved=request;permission.launch(Manifest.permission.RECORD_AUDIO)}
         }
     },enabled=signedIn && names.isNotEmpty() && names.all { agreements[it]==true } && purpose && storage && access,modifier=Modifier.testTag("doctor-start-recording")) { Text("Start recording") }},dismissButton={TextButton(onClick={consentOpen=false}) {Text("Cancel")}})
-    deleting?.let { clip -> AlertDialog(containerColor=Paper,onDismissRequest={deleting=null},title={Text("Delete this recording?")},text={Text("Written transcripts and published versions are kept.")},confirmButton={TextButton(onClick={controller.remove(clip);deleting=null}){Text("Delete")}},dismissButton={TextButton(onClick={deleting=null}){Text("Keep recording")}}) }
+    deleting?.let { clip -> AlertDialog(containerColor=Paper,onDismissRequest={deleting=null},title={Text("Delete this recording?")},text={Text("Written transcripts and published versions are kept.")},confirmButton={TextButton(onClick={controller.remove(clip);deleting=null}){Text("Delete",color=MaterialTheme.colorScheme.error)}},dismissButton={TextButton(onClick={deleting=null}){Text("Keep recording")}}) }
 }
 @Composable private fun AudioConsentCheck(value:Boolean,onChange:(Boolean)->Unit,label:String,tag:String) { Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically) { Checkbox(value,onChange,modifier=Modifier.testTag(tag));Text(label,Modifier.weight(1f),style=MaterialTheme.typography.bodyMedium) } }
 private data class ApprovedDoctorRecording(val controller:DoctorAudioController,val participants:String,val agreed:Set<String>,val purpose:Boolean,val storage:Boolean,val access:Boolean,val cloud:Boolean) {

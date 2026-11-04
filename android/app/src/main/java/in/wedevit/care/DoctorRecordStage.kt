@@ -15,6 +15,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -77,9 +78,9 @@ internal fun doctorCaptureModeLabel(mode: String, hindi: Boolean): String = care
         val expanded = frac.targetValue > 0.5f
         SideEffect { keptOpen = expanded }
         BackHandler(expanded) { scope.launch { frac.animateTo(0f) } }
-        Column(Modifier.fillMaxSize().padding(start = 20.dp, end = 8.dp, top = 8.dp, bottom = peek), horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(Modifier.fillMaxSize().padding(start = 16.dp, end = 4.dp, top = 8.dp, bottom = peek), horizontalAlignment = Alignment.CenterHorizontally) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                if (onBack != null) TextButton(onClick = onBack, enabled = backEnabled, colors = ButtonDefaults.textButtonColors(contentColor = white, disabledContentColor = white.copy(alpha = .5f)), contentPadding = PaddingValues(0.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-capture-back")) { Text(t("Back to conversations", "बातचीत की सूची पर वापस"), fontSize = 14.sp) }
+                if (onBack != null) TextButton(onClick = onBack, enabled = backEnabled, colors = ButtonDefaults.textButtonColors(contentColor = white, disabledContentColor = white.copy(alpha = .5f)), contentPadding = PaddingValues(0.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-capture-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null, Modifier.size(20.dp)); Spacer(Modifier.width(6.dp)); Text(t("Back to conversations", "बातचीत की सूची पर वापस"), fontSize = 16.sp) }
                 Spacer(Modifier.weight(1f))
                 Box { IconButton(onClick = { menu = true }, enabled = menuEnabled, modifier = Modifier.size(48.dp).testTag("doctor-capture-mode")) { Icon(Icons.Default.MoreVert, t("Choose Record, Dictate or Type, start new, or go back to who is here", "रिकॉर्ड, बोलकर लिखें या टाइप चुनें, नया शुरू करें, या कौन मौजूद है पर लौटें"), tint = white.copy(alpha = if (menuEnabled) 1f else .5f)) }
                     DropdownMenu(menu, { menu = false }) {
@@ -99,8 +100,8 @@ internal fun doctorCaptureModeLabel(mode: String, hindi: Boolean): String = care
             Spacer(Modifier.height(28.dp))
             Surface(onClick = { if (recording) onStop() else onRecord() }, enabled = recordEnabled, shape = CircleShape, color = DoctorStageCream, contentColor = DoctorStageDeep, modifier = Modifier.size(88.dp).testTag("record-stage-button")) { Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Icon(if (recording) Icons.Default.Stop else Icons.Default.Mic, if (recording) t("Stop and save", "रोकें और सहेजें") else t("Record conversation", "बातचीत रिकॉर्ड करें"), Modifier.size(40.dp), tint = DoctorStageDeep.copy(alpha = if (recordEnabled) 1f else .4f)) } }
             if (saving || saveError) Column(Modifier.padding(top = 12.dp, end = 12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(if (saving) t("Saving local audio and its consent record…", "फ़ोन पर ऑडियो और उसकी सहमति सहेज रहे हैं…") else t("The audio file was retained, but its recording details could not be saved. Retry before continuing.", "ऑडियो फ़ाइल रखी गई, पर रिकॉर्डिंग की जानकारी सहेजी नहीं जा सकी। आगे बढ़ने से पहले फिर कोशिश करें।"), fontSize = 13.sp, lineHeight = 18.sp, color = white, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
-                if (saveError) OutlinedButton(onClick = onRetry, enabled = !saving, colors = ButtonDefaults.outlinedButtonColors(contentColor = white), modifier = Modifier.heightIn(min = 48.dp).testTag("retry-saving-audio")) { Text(t("Retry saving audio", "ऑडियो फिर से सहेजें")) }
+                Text(if (saving) t("Saving local audio and its consent record…", "फ़ोन पर ऑडियो और उसकी सहमति सहेज रहे हैं…") else t("The audio file was retained, but its recording details could not be saved. Retry before continuing.", "ऑडियो फ़ाइल रखी गई, पर रिकॉर्डिंग की जानकारी सहेजी नहीं जा सकी। आगे बढ़ने से पहले फिर कोशिश करें।"), fontSize = 15.sp, lineHeight = 21.sp, color = white, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+                if (saveError) OutlinedButton(onClick = onRetry, enabled = !saving, shape = RoundedCornerShape(14.dp), border = androidx.compose.foundation.BorderStroke(1.dp, white), colors = ButtonDefaults.outlinedButtonColors(contentColor = white), modifier = Modifier.heightIn(min = 48.dp).testTag("retry-saving-audio")) { Text(t("Retry saving audio", "ऑडियो फिर से सहेजें")) }
             }
             Spacer(Modifier.weight(1f))
         }

@@ -2,9 +2,9 @@
   min-height: calc(100svh - 57px);
   display: flex;
   flex-direction: column;
-  background: #f4f3ed;
-  color: #123f32;
-  font-family: var(--font-ui);
+  background: var(--care-canvas);
+  color: var(--care-ink);
+  font-family: var(--care-font-ui);
 }
 
 .lp-nav, .lp-main, .lp-footer {
@@ -18,7 +18,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  border-bottom: 1px solid #d4ddd2;
+  border-bottom: 1px solid var(--care-line);
 }
 
 .lp-brand {
@@ -39,7 +39,7 @@
   letter-spacing: -.04em;
 }
 .lp-brand-copy { display: grid; gap: 1px; }
-.lp-brand-copy small { color: #617167; font-size: 9px; font-weight: 650; letter-spacing: .02em; }
+.lp-brand-copy small { color: var(--care-muted); font-size: 12px; font-weight: 500; letter-spacing: .01em; }
 
 .lp-nav-actions {
   display: flex;
@@ -49,13 +49,13 @@
 
 .lp-nav-btn {
   appearance: none;
-  border: 1px solid #c7d1c6;
+  border: 1px solid var(--care-line-strong);
   background: transparent;
-  color: #123f32;
+  color: var(--care-ink);
   min-height: 44px;
   padding: 8px 14px;
-  border-radius: 8px;
-  font-size: 13px;
+  border-radius: var(--care-radius-control);
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
 }
@@ -81,21 +81,22 @@
 
 .lp-kicker {
   margin: 0 0 14px;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 650;
-  color: #426b4c;
+  color: var(--care-primary);
 }
 
 .lp-hero h1 {
   margin: 0 0 16px;
   font-size: clamp(32px, 3.5vw, 50px);
   line-height: 1.12;
-  font-weight: 750;
-  letter-spacing: -.055em;
+  font-family: var(--care-font-display);
+  font-weight: 500;
+  letter-spacing: -.03em;
 }
 
 .lp-hero h1 span {
-  color: #4a704b;
+  color: var(--care-primary);
 }
 
 .lp-hero-desc {
@@ -103,7 +104,7 @@
   margin: 0 0 22px;
   font-size: 16px;
   line-height: 1.65;
-  color: #4d6354;
+  color: var(--care-muted);
 }
 
 .lp-hero-actions {
@@ -117,29 +118,30 @@
   align-items: center;
   justify-content: center;
   gap: 9px;
-  min-height: 46px;
+  min-height: 48px;
   padding: 10px 16px;
-  border: 1px solid #174d39;
-  border-radius: 9px;
-  font-size: 13px;
+  border: 1px solid var(--care-primary);
+  border-radius: var(--care-radius-control);
+  font-size: 16px;
   font-weight: 650;
   cursor: pointer;
 }
 
 .lp-demo {
-  color: #fff;
-  background: #174d39;
+  color: var(--care-on-primary);
+  background: var(--care-primary);
 }
 
 .lp-account-action {
-  color: #174d39;
-  background: transparent;
+  color: var(--care-ink);
+  background: var(--care-surface);
+  border-color: var(--care-line-strong);
 }
 
 .lp-demo-note {
   margin: 12px 0 0;
-  color: #62705f;
-  font-size: 12px;
+  color: var(--care-muted);
+  font-size: 14px;
   line-height: 1.6;
 }
 
@@ -147,9 +149,9 @@
   position: relative;
   margin: 0;
   height: clamp(280px, 26vw, 350px);
-  border-radius: 16px;
+  border-radius: var(--care-radius-card);
   overflow: hidden;
-  background: #e9e4d8;
+  background: var(--care-surface-2);
 }
 
 .lp-hero-img {
@@ -170,10 +172,10 @@
   gap: 12px;
   min-height: 58px;
   padding: 14px 18px;
-  border: 1px solid #d0dbca;
-  border-radius: 10px;
-  background: #fffdf7;
-  color: #123f32;
+  border: 1px solid var(--care-line);
+  border-radius: var(--care-radius-card);
+  background: var(--care-surface);
+  color: var(--care-ink);
   text-decoration: none;
   font-size: 14px;
   font-weight: 650;
@@ -182,27 +184,27 @@
 }
 
 .lp-care-links > :first-child {
-  background: #e4ebd6;
+  background: var(--care-surface-2);
 }
 
 .lp-details {
-  border-top: 1px solid #d4ddd2;
+  border-top: 1px solid var(--care-line);
 }
 
 .lp-details > details {
-  border-bottom: 1px solid #d4ddd2;
+  border-bottom: 1px solid var(--care-line);
 }
 
 .lp-details summary {
   padding: 12px 0;
   min-height: 44px;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 650;
 }
 
 .lp-details summary::marker {
-  color: #587048;
+  color: var(--care-primary);
 }
 
 .lp-details details[open] > :not(summary) {
@@ -219,9 +221,9 @@
   display: flex;
   flex-direction: column;
   padding: 16px;
-  border: 1px solid #d0dbca;
-  border-radius: 10px;
-  background: #fffdf7;
+  border: 1px solid var(--care-line);
+  border-radius: var(--care-radius-card);
+  background: var(--care-surface);
 }
 
 .lp-door-card h2 {
@@ -231,9 +233,9 @@
 }
 
 .lp-door-card p, .lp-pillar-card p {
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.6;
-  color: #52665b;
+  color: var(--care-muted);
   margin: 0 0 14px;
 }
 
@@ -243,9 +245,9 @@
   text-align: left;
   border: 0;
   background: transparent;
-  color: #174d39;
+  color: var(--care-primary);
   cursor: pointer;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 650;
 }
 
@@ -258,7 +260,7 @@
 .lp-pillar-image-wrap {
   position: relative;
   height: 150px;
-  border-radius: 10px;
+  border-radius: var(--care-radius-card);
   overflow: hidden;
   margin-bottom: 12px;
 }
@@ -271,9 +273,9 @@
 .lp-info-list {
   padding: 0 0 0 20px;
   margin: 10px 0 20px;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.65;
-  color: #52665b;
+  color: var(--care-muted);
 }
 
 .lp-info-list li + li {
@@ -281,7 +283,7 @@
 }
 
 .lp-info-list strong {
-  color: #123f32;
+  color: var(--care-ink);
 }
 
 .lp-info-list p {
@@ -300,10 +302,10 @@
   align-content: start;
   gap: 8px;
   padding: 16px;
-  border: 1px solid #d0dbca;
-  border-radius: 10px;
-  background: #fffdf7;
-  color: #123f32;
+  border: 1px solid var(--care-line);
+  border-radius: var(--care-radius-card);
+  background: var(--care-surface);
+  color: var(--care-ink);
   text-align: left;
   cursor: pointer;
 }
@@ -313,15 +315,15 @@
 }
 
 .lp-os-grid span {
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.6;
-  color: #52665b;
+  color: var(--care-muted);
 }
 
 .lp-footer {
   padding: 0 0 14px;
-  color: #62705f;
-  font-size: 11px;
+  color: var(--care-muted);
+  font-size: 14px;
 }
 
 .lp-footer p {
@@ -329,7 +331,7 @@
 }
 
 .lp-page :is(a, button, summary):focus-visible {
-  outline: 2px solid #174d39;
+  outline: 3px solid var(--care-focus);
   outline-offset: 4px;
 }
 
@@ -354,6 +356,9 @@
   .lp-nav, .lp-main, .lp-footer {
     width: calc(100% - 32px);
   }
+  .lp-brand-copy small {
+    display: none;
+  }
   .lp-nav {
     gap: 8px;
     min-height: 64px;
@@ -373,7 +378,7 @@
     gap: 5px;
   }
   .lp-nav-btn {
-    font-size: 12px;
+    font-size: 14px;
     padding: 8px;
   }
   .lp-main {
@@ -401,8 +406,8 @@
   }
   .lp-hero-actions button {
     flex: 1 1 145px;
-    font-size: 12px;
-    padding: 9px;
+    font-size: 15px;
+    padding: 10px 12px;
   }
   .lp-hero-media {
     height: 180px;

@@ -50,6 +50,7 @@ function NextVisitForPatient({ patientId, patientName, author, today, lang, view
   const [actionKind, setActionKind] = useState<'Question' | Exclude<FamilyTaskKind, 'Question'>>('Question');
   const [assigneeId, setAssigneeId] = useState(viewer?.id ?? '');
   const [message, setMessage] = useState('');
+  const [messageAtForm, setMessageAtForm] = useState(false);
   const [savingPdf, setSavingPdf] = useState(false);
   const candidates: Visit[] = [
     ...appointments.filter((item) => item.hospitalId === patientId && item.status === 'Scheduled' && item.date >= today).map((item): Visit => ({
@@ -83,13 +84,14 @@ function NextVisitForPatient({ patientId, patientName, author, today, lang, view
       ...(!isQuestion && recipient ? { assignedToId: recipient.id, ownerRole: recipient.role } : {}), ...(viewer ? { createdById: viewer.id } : {}),
       ...(next?.source === 'appointment' && !isQuestion ? { appointmentId: next.id } : {}),
     };
+    setMessageAtForm(true);
     if (addFamilyTask(tasks, task) === tasks) { setMessage(t('A matching task is already on the list. Change its recipient in Family tasks.', 'ऐसा काम सूची में पहले से है। परिवार के कामों में पाने वाले का नाम बदलें।')); return; }
     onAddTask(task); setActionText(''); setMessage(t(isQuestion ? 'Question added.' : `Assigned to ${recipient?.name ?? author}.`, isQuestion ? 'सवाल जोड़ दिया।' : `${recipient?.name ?? author} को सौंपा।`));
   }
 
   async function savePdf() {
     if (savingPdf) return;
-    setSavingPdf(true); setMessage('');
+    setSavingPdf(true); setMessage(''); setMessageAtForm(false);
     try {
       await downloadCarePdf({
         fileName: `sahara-next-visit-${patientId.replace(/[^a-zA-Z0-9_-]/g, '-')}.pdf`,
@@ -117,7 +119,7 @@ function NextVisitForPatient({ patientId, patientName, author, today, lang, view
 
   return <section className="care-next-visit-page" aria-labelledby={`${id}-heading`}>
     <header className="next-visit-heading"><div><span>{patientName}</span><h1 id={`${id}-heading`}>{t('Next visit', 'अगली मुलाकात')}</h1></div><button type="button" className="next-visit-download" disabled={savingPdf} onClick={savePdf}><VisitIcon kind="download" />{savingPdf ? t('Saving…', 'सेव हो रहा है…') : t('Save PDF', 'PDF सेव करें')}</button></header>
-    {message && <p className="next-visit-message" role="status">{message}</p>}
+    {message && !messageAtForm && <p className="next-visit-message" role="status">{message}</p>}
     <div className="next-visit-top">
       <section className="next-visit-appointment"><div className="next-visit-date-icon"><VisitIcon />{next && <strong>{Number(next.date.slice(-2))}</strong>}</div><div>{next ? <><span className="next-visit-source">{next.source === 'appointment' ? t('Appointment', 'मुलाकात') : t('Calendar entry', 'कैलेंडर एंट्री')}</span><h2>{next.title}</h2><time dateTime={`${next.date}${next.time ? `T${next.time}` : ''}`}>{dateLabel(next.date)}{next.time && ` · ${next.time}`}</time>{next.clinician && <p>{next.clinician}{next.mode && ` · ${next.mode}`}</p>}</> : <h2>{t('Add your next visit', 'अगली मुलाकात जोड़ें')}</h2>}<button type="button" onClick={() => onOpen('calendar')}>{next ? t('Open calendar', 'कैलेंडर खोलें') : t('Add to calendar', 'कैलेंडर में जोड़ें')} <span aria-hidden="true">↗</span></button></div></section>
       <section className="next-visit-prep"><h2>{t('Before you go', 'जाने से पहले')}</h2>{next?.instructions ? <><p>{next.instructions}</p>{next.instructionAuthor && <span>{t(next.source === 'appointment' ? 'From' : 'Added by', next.source === 'appointment' ? 'दिए गए' : 'जोड़ने वाले')}: {next.instructionAuthor}</span>}</> : <p className="next-visit-empty-line">{t('No preparation note added.', 'तैयारी का निर्देश अभी नहीं जोड़ा है।')}</p>}</section>
@@ -129,7 +131,7 @@ function NextVisitForPatient({ patientId, patientName, author, today, lang, view
         {actionKind !== 'Question' && recipients.length > 0 && <label>{t('Assign to', 'काम सौंपें')}<select value={selectedRecipient?.id ?? ''} onChange={(event) => setAssigneeId(event.target.value)}>{recipients.map((person) => <option key={person.id} value={person.id}>{person.id === viewer?.id ? t('Me', 'मैं') : person.name}</option>)}</select></label>}
         <button type="submit" disabled={!actionText.trim() || (actionKind !== 'Question' && recipients.length > 0 && !selectedRecipient)}>{t('Add', 'जोड़ें')}</button>
       </form></details>
-      {message && <p className="next-visit-message" role="status">{message}</p>}
+      {message && messageAtForm && <p className="next-visit-message" role="status">{message}</p>}
       {openTasks.length > 0 && <details className="next-visit-task-list"><summary>{t('Questions and tasks', 'सवाल और काम')} · {openTasks.length}</summary><button type="button" className="next-visit-all-tasks" onClick={() => onOpen('family-tasks')}>{t('All tasks', 'सभी काम')} ↗</button><ul>{openTasks.slice(0, 4).map((task) => <li key={task.id}><span><strong>{task.title}</strong><small>{task.owner}{task.due ? ` · ${dateLabel(task.due)}` : ''}{task.acceptedBy ? ` · ${t('Accepted by', 'स्वीकार किया')} ${task.acceptedBy}` : ''}</small></span>{taskAction(task)}</li>)}</ul></details>}
       <section className="next-visit-panel next-visit-reports"><div className="next-visit-section-heading"><h2><VisitIcon kind="file" />{t('Reports to bring', 'साथ लाने की रिपोर्ट')}</h2><button type="button" onClick={() => onOpen('reports')}>{t('All reports', 'सभी रिपोर्ट')} ↗</button></div>{files.length ? <><ul className="next-visit-report-list">{files.slice(0, 3).map((report) => <li key={report.id}><VisitReportLink report={report} lang={lang} /></li>)}</ul>{files.length > 3 && <details className="next-visit-more-reports"><summary>{t('More reports', 'और रिपोर्ट')} · {files.length - 3}</summary><ul className="next-visit-report-list">{files.slice(3).map((report) => <li key={report.id}><VisitReportLink report={report} lang={lang} /></li>)}</ul></details>}</> : <button type="button" className="next-visit-add-report" onClick={() => onOpen('reports')}>{t('Add a report', 'रिपोर्ट जोड़ें')}</button>}</section>
     </div>

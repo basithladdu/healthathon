@@ -31,8 +31,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 44px;
+  height: 44px;
   border-radius: 999px;
   border: 1px solid var(--bp-border, rgb(10 33 24 / .10));
   background: transparent;
@@ -74,8 +74,8 @@
 }
 
 .pp-back-btn {
-  width: 32px;
-  height: 32px;
+  width: 44px;
+  height: 44px;
   border-radius: 999px;
   border: 1px solid var(--bp-border, rgb(10 33 24 / .10));
   background: var(--bp-mist, #f3f7f5);
@@ -123,7 +123,7 @@
 }
 .pp-subline {
   margin: 2px 0 0;
-  font-size: 13px;
+  font-size: 14px;
   color: var(--bp-muted, #4d6259);
 }
 
@@ -148,7 +148,7 @@
 }
 .pp-stat span {
   font-family: var(--font-body, 'Inter', system-ui, sans-serif);
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1.1px;
@@ -180,7 +180,7 @@
   padding-left: 64px;
 }
 .pp-chip {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   padding: 4px 10px;
   border-radius: 999px;
@@ -219,7 +219,7 @@
   background: transparent;
   color: var(--bp-muted, #4d6259);
   font-family: var(--font-body, 'Inter', system-ui, sans-serif);
-  font-size: 13.5px;
+  font-size: 14px;
   font-weight: 600;
   padding: 7px 16px;
   border-radius: 999px;
@@ -244,7 +244,7 @@
   background: #fff;
   border: 1.5px solid var(--bp-border-strong, rgb(10 33 24 / .22));
   color: var(--bp-primary, #0c5c3f);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   min-height: 40px;
   padding: 0 18px;
@@ -309,7 +309,7 @@
   gap: 8px;
 }
 .pp-year-chip {
-  font-size: 11px;
+  font-size: 13px;
   padding: 2px 8px;
   border-radius: 999px;
   background: var(--bp-ice, #e6f2ec);
@@ -324,7 +324,7 @@
   mask-image: linear-gradient(to bottom, transparent 0, black 16px, black calc(100% - 16px), transparent 100%);
 }
 .pp-timeline-list .timeline-date {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1.1px;
@@ -339,7 +339,7 @@
 .pp-fullhistory-link {
   align-self: flex-start;
   color: var(--bp-primary, #0c5c3f);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   text-decoration: none;
   background: transparent;
@@ -354,7 +354,7 @@
 /* Patient description / muted note */
 .pp-muted-note {
   margin-top: 8px;
-  font-size: 12.5px;
+  font-size: 14px;
   color: var(--bp-muted, #4d6259);
 }
 
@@ -403,12 +403,12 @@
   transition: width 200ms ease;
 }
 .pp-goal-caption {
-  font-size: 12px;
+  font-size: 14px;
   color: var(--bp-muted, #4d6259);
 }
 .pp-goal-row .pp-icon-btn {
-  width: 32px;
-  height: 32px;
+  width: 44px;
+  height: 44px;
   border: 1px solid var(--bp-border, rgb(10 33 24 / .10));
 }
 .pp-goal-row .pp-icon-btn:hover:not(:disabled) {
@@ -523,7 +523,7 @@
   border: none;
   background: transparent;
   text-align: left;
-  font-size: 12.5px;
+  font-size: 14px;
   padding: 8px 10px;
   border-radius: 8px;
   cursor: pointer;
@@ -561,7 +561,7 @@
   grid-template-columns: 100px 120px minmax(0, 1fr) auto;
   gap: 10px;
   align-items: center;
-  font-size: 12.5px;
+  font-size: 14px;
   color: var(--bp-secondary-text, #2a3d35);
   padding: 6px 0;
   border-bottom: 1px solid var(--bp-border, rgb(10 33 24 / .10));
@@ -639,7 +639,7 @@
   border: none;
   outline: none;
   background: transparent;
-  font-size: 12.5px;
+  font-size: 14px;
   color: var(--bp-ink, #0a2118);
   min-width: 0;
   width: 100%;
@@ -657,7 +657,7 @@
   gap: 6px;
 }
 .pp-filter-chip {
-  font-size: 11px;
+  font-size: 13px;
   padding: 4px 9px;
   border-radius: 999px;
   border: 1px solid var(--bp-border, rgb(10 33 24 / .10));
@@ -676,15 +676,15 @@
   justify-content: space-between;
 }
 .pp-sort-row .text-button {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--bp-muted, #4d6259);
   border: none;
   background: transparent;
 }
 .pp-sort-row > .pp-icon-btn {
-  width: 32px;
-  height: 32px;
+  width: 44px;
+  height: 44px;
   border: 1.5px solid var(--bp-border-strong, rgb(10 33 24 / .22));
   color: var(--bp-primary, #0c5c3f);
 }
@@ -732,7 +732,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
   flex-shrink: 0;
 }
@@ -748,7 +748,7 @@
   min-width: 0;
 }
 .pp-patient-name {
-  font-size: 13.5px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--bp-ink, #0a2118);
   overflow: hidden;
@@ -756,7 +756,7 @@
   white-space: nowrap;
 }
 .pp-patient-meta {
-  font-size: 11.5px;
+  font-size: 13px;
   color: var(--bp-muted, #4d6259);
   overflow: hidden;
   text-overflow: ellipsis;

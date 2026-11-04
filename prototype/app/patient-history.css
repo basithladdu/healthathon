@@ -17,7 +17,7 @@
 .ph-eyebrow {
   margin: 0;
   font-family: var(--font-body, 'Inter', system-ui, sans-serif);
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -63,7 +63,7 @@
 
 .ph-stat-value {
   font-family: var(--font-body, 'Inter', system-ui, sans-serif);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--bp-ink, #0a2118);
   overflow-wrap: break-word;
@@ -83,7 +83,7 @@
 
 .ph-chip {
   font-family: var(--font-body, 'Inter', system-ui, sans-serif);
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--bp-ink, #0a2118);
   background: var(--bp-mist, #f3f7f5);
@@ -118,24 +118,24 @@
   align-items: center;
   gap: 6px;
   font-family: var(--font-body, 'Inter', system-ui, sans-serif);
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--bp-muted, #4d6259);
 }
 
 .ph-select {
   font-family: var(--font-body, 'Inter', system-ui, sans-serif);
-  font-size: 12px;
+  font-size: 14px;
   color: var(--bp-ink, #0a2118);
   background: #fff;
   border: 1px solid var(--bp-border, rgb(10 33 24 / .10));
-  border-radius: 8px;
-  padding: 5px 8px;
+  border-radius: 14px;
+  padding: 8px 12px; min-height: 44px;
 }
 
 .ph-clear {
   font-family: var(--font-body, 'Inter', system-ui, sans-serif);
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--bp-primary, #0c5c3f);
   background: none;
@@ -147,7 +147,7 @@
 
 .ph-empty {
   font-family: var(--font-body, 'Inter', system-ui, sans-serif);
-  font-size: 13px;
+  font-size: 14px;
   color: var(--bp-muted, #4d6259);
   padding: 14px 0;
 }
@@ -165,7 +165,7 @@
 
 .ph-month {
   font-family: var(--font-display, 'Sora', system-ui, sans-serif);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--bp-muted, #4d6259);
   margin: 10px 0 4px;
@@ -187,7 +187,7 @@
 
 .ph-row-date {
   font-family: var(--font-body, 'Inter', system-ui, sans-serif);
-  font-size: 12px;
+  font-size: 14px;
   color: var(--bp-muted, #4d6259);
   white-space: nowrap;
   min-width: 0;
@@ -195,7 +195,7 @@
 
 .ph-kind-chip {
   font-family: var(--font-body, 'Inter', system-ui, sans-serif);
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
   color: var(--bp-primary, #0c5c3f);
   background: var(--bp-ice, #e6f2ec);
@@ -214,7 +214,7 @@
 
 .ph-row-title {
   font-family: var(--font-body, 'Inter', system-ui, sans-serif);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--bp-ink, #0a2118);
   min-width: 0;
@@ -223,7 +223,7 @@
 
 .ph-row-detail {
   font-family: var(--font-body, 'Inter', system-ui, sans-serif);
-  font-size: 12px;
+  font-size: 14px;
   color: var(--bp-muted, #4d6259);
   min-width: 0;
   overflow-wrap: break-word;
@@ -231,13 +231,13 @@
 
 .ph-row-actor {
   font-family: var(--font-body, 'Inter', system-ui, sans-serif);
-  font-size: 11px;
+  font-size: 13px;
   color: var(--bp-muted, #4d6259);
 }
 
 .ph-status-pill {
   font-family: var(--font-body, 'Inter', system-ui, sans-serif);
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--bp-ink, #0a2118);
   background: var(--bp-mist, #f3f7f5);

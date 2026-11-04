@@ -1,13 +1,21 @@
 package `in`.wedevit.care
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -112,37 +120,50 @@ internal suspend fun CareCloud.myCentreSuggestions(account: String): List<Centre
     var more by rememberSaveable { mutableStateOf(false) }
     val sending by vm.centreSuggestionSending.collectAsState()
     ModalBottomSheet(onDismissRequest = onDismiss, containerColor = Cream) {
-        Column(Modifier.padding(horizontal = 20.dp).padding(bottom = 28.dp).verticalScroll(rememberScrollState()).testTag("centre-suggestion-sheet"), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text(t("Suggest a centre that's missing", "छूटा हुआ केंद्र सुझाएँ"), fontWeight = FontWeight.SemiBold, fontSize = 20.sp)
+        val fieldShape = RoundedCornerShape(14.dp)
+        val fieldColors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = Paper, focusedContainerColor = Paper, focusedBorderColor = Rust, focusedLabelColor = RustText, cursorColor = Rust)
+        Column(Modifier.padding(horizontal = 16.dp).padding(bottom = 32.dp).verticalScroll(rememberScrollState()).testTag("centre-suggestion-sheet"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Text(t("Suggest a centre that's missing", "छूटा हुआ केंद्र सुझाएँ"), fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 22.sp, color = DoctorCardInk, modifier = Modifier.a11yHeading())
             when {
                 vm.cloud == null -> {
-                    Text(t("Sign in to send a suggestion. The Sahara team checks every suggestion before anyone else sees it.", "सुझाव भेजने के लिए साइन इन करें। हर सुझाव दूसरों को दिखने से पहले Sahara टीम जाँचती है।"))
-                    TextButton(onClick = onDismiss, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Close", "बंद करें")) }
+                    Text(t("Sign in to send a suggestion. The Sahara team checks every suggestion before anyone else sees it.", "सुझाव भेजने के लिए साइन इन करें। हर सुझाव दूसरों को दिखने से पहले Sahara टीम जाँचती है।"), color = DoctorCardInk)
+                    OutlinedButton(onClick = onDismiss, shape = fieldShape, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Close", "बंद करें")) }
                 }
                 result.isNotBlank() -> {
                     val (en, hi) = CentreSuggestionRules.statusText(result)
-                    Text(t(en, hi), fontWeight = FontWeight.SemiBold, color = Rust, modifier = Modifier.testTag("centre-suggestion-result"))
-                    Text(t("It is not shown to anyone else until the Sahara team checks it.", "Sahara टीम की जाँच से पहले यह किसी और को नहीं दिखेगा।"), style = MaterialTheme.typography.bodySmall)
-                    Button(onClick = onDismiss, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Done", "हो गया")) }
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Outlined.CheckCircle, null, Modifier.size(24.dp), tint = DoctorStatusGood); Spacer(Modifier.width(8.dp))
+                        Text(t(en, hi), fontWeight = FontWeight.SemiBold, color = DoctorCardInk, modifier = Modifier.weight(1f).testTag("centre-suggestion-result").announce())
+                    }
+                    Text(t("It is not shown to anyone else until the Sahara team checks it.", "Sahara टीम की जाँच से पहले यह किसी और को नहीं दिखेगा।"), color = DoctorCardSub)
+                    Button(onClick = onDismiss, shape = fieldShape, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Text(t("Done", "हो गया"), fontWeight = FontWeight.SemiBold) }
                 }
                 else -> {
-                    Text(t("Please don't add patient details.", "मरीज़ की जानकारी न लिखें।"), style = MaterialTheme.typography.bodySmall)
-                    OutlinedTextField(name, { name = it.take(CentreSuggestionRules.NAME_MAX) }, label = { Text(t("Centre name", "केंद्र का नाम")) }, singleLine = true, modifier = Modifier.fillMaxWidth().testTag("suggest-name"))
-                    OutlinedTextField(city, { city = it.take(CentreSuggestionRules.PLACE_MAX) }, label = { Text(t("Town or city", "शहर या क़स्बा")) }, singleLine = true, modifier = Modifier.fillMaxWidth().testTag("suggest-city"))
-                    OutlinedTextField(state, { state = it.take(CentreSuggestionRules.PLACE_MAX) }, label = { Text(t("State", "राज्य")) }, singleLine = true, modifier = Modifier.fillMaxWidth().testTag("suggest-state"))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Outlined.Info, null, Modifier.size(18.dp), tint = DoctorCardSub); Spacer(Modifier.width(8.dp))
+                        Text(t("Please don't add patient details.", "मरीज़ की जानकारी न लिखें।"), color = DoctorCardSub, fontSize = 14.sp)
+                    }
+                    OutlinedTextField(name, { name = it.take(CentreSuggestionRules.NAME_MAX) }, label = { Text(t("Centre name", "केंद्र का नाम")) }, singleLine = true, shape = fieldShape, colors = fieldColors, modifier = Modifier.fillMaxWidth().testTag("suggest-name"))
+                    OutlinedTextField(city, { city = it.take(CentreSuggestionRules.PLACE_MAX) }, label = { Text(t("Town or city", "शहर या क़स्बा")) }, singleLine = true, shape = fieldShape, colors = fieldColors, modifier = Modifier.fillMaxWidth().testTag("suggest-city"))
+                    OutlinedTextField(state, { state = it.take(CentreSuggestionRules.PLACE_MAX) }, label = { Text(t("State", "राज्य")) }, singleLine = true, shape = fieldShape, colors = fieldColors, modifier = Modifier.fillMaxWidth().testTag("suggest-state"))
                     // Optional fields stay folded so the form is three boxes and a button; anything already typed keeps them open.
                     if (more || address.isNotBlank() || phone.isNotBlank() || note.isNotBlank()) {
-                        OutlinedTextField(address, { address = it.take(CentreSuggestionRules.ADDRESS_MAX) }, label = { Text(t("Address (optional)", "पता (ज़रूरी नहीं)")) }, modifier = Modifier.fillMaxWidth())
-                        OutlinedTextField(phone, { phone = it.take(20) }, label = { Text(t("Centre phone (optional)", "केंद्र का फ़ोन (ज़रूरी नहीं)")) }, singleLine = true, modifier = Modifier.fillMaxWidth(),
+                        OutlinedTextField(address, { address = it.take(CentreSuggestionRules.ADDRESS_MAX) }, label = { Text(t("Address (optional)", "पता (ज़रूरी नहीं)")) }, shape = fieldShape, colors = fieldColors, modifier = Modifier.fillMaxWidth())
+                        OutlinedTextField(phone, { phone = it.take(20) }, label = { Text(t("Centre phone (optional)", "केंद्र का फ़ोन (ज़रूरी नहीं)")) }, singleLine = true, shape = fieldShape, colors = fieldColors, modifier = Modifier.fillMaxWidth(),
                             keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Phone))
-                        OutlinedTextField(note, { note = it.take(CentreSuggestionRules.NOTE_MAX) }, label = { Text(t("What care do they offer? (optional)", "वहाँ कौन-सी देखभाल मिलती है? (ज़रूरी नहीं)")) }, modifier = Modifier.fillMaxWidth())
-                    } else TextButton(onClick = { more = true }, modifier = Modifier.heightIn(min = 48.dp).testTag("suggest-more")) { Text(t("Add address, phone or services", "पता, फ़ोन या सेवाएँ जोड़ें")) }
-                    problem?.let { (en, hi) -> Text(t(en, hi), color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall) }
+                        OutlinedTextField(note, { note = it.take(CentreSuggestionRules.NOTE_MAX) }, label = { Text(t("What care do they offer? (optional)", "वहाँ कौन-सी देखभाल मिलती है? (ज़रूरी नहीं)")) }, shape = fieldShape, colors = fieldColors, modifier = Modifier.fillMaxWidth())
+                    } else TextButton(onClick = { more = true }, modifier = Modifier.heightIn(min = 48.dp).testTag("suggest-more")) {
+                        Icon(Icons.Default.Add, null, Modifier.size(18.dp), tint = RustText); Spacer(Modifier.width(8.dp)); Text(t("Add address, phone or services", "पता, फ़ोन या सेवाएँ जोड़ें"), color = RustText)
+                    }
+                    problem?.let { (en, hi) -> Text(t(en, hi), color = MaterialTheme.colorScheme.error, fontSize = 14.sp, modifier = Modifier.announce()) }
                     Button(onClick = {
                         val draft = CentreSuggestionDraft(name, city, state, address, phone, note)
                         problem = CentreSuggestionRules.error(draft)
                         if (problem == null) vm.suggestCentre(draft) { status -> result = status }
-                    }, enabled = !sending, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("suggest-send")) { Text(t("Send for review", "जाँच के लिए भेजें")) }
+                    }, enabled = !sending, shape = fieldShape, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("suggest-send")) {
+                        if (sending) { CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.onPrimary); Spacer(Modifier.width(8.dp)) }
+                        Text(t("Send for review", "जाँच के लिए भेजें"), fontWeight = FontWeight.SemiBold)
+                    }
                 }
             }
         }
@@ -158,11 +179,16 @@ internal suspend fun CareCloud.myCentreSuggestions(account: String): List<Centre
             Text(t("Your suggestions (${items.size})", "आपके सुझाव (${items.size})"), fontWeight = FontWeight.SemiBold, color = Ink, modifier = Modifier.weight(1f))
             Text(if (open) t("Hide", "छिपाएँ") else t("Show", "दिखाएँ"), color = RustText)
         }
-        if (open) items.forEach { s ->
-            Spacer(Modifier.height(8.dp))
-            Text(s.name + listOf(s.city, s.state).filter(String::isNotBlank).joinToString(", ").let { if (it.isBlank()) "" else " · $it" }, fontWeight = FontWeight.Medium)
+        if (open) items.forEachIndexed { index, s ->
+            if (index > 0) HorizontalDivider(Modifier.padding(vertical = 8.dp), color = DoctorHairline) else Spacer(Modifier.height(8.dp))
+            Text(s.name + listOf(s.city, s.state).filter(String::isNotBlank).joinToString(", ").let { if (it.isBlank()) "" else " · $it" }, fontWeight = FontWeight.Medium, color = DoctorCardInk)
             val (en, hi) = CentreSuggestionRules.statusText(s.status)
-            Text(t(en, hi), style = MaterialTheme.typography.bodySmall, color = Rust, modifier = Modifier.testTag("centre-suggestion-status-${s.id}"))
+            // A colour dot carries the state at a glance: green approved, rust not added, amber still waiting.
+            val dot = when (s.status) { "approved" -> DoctorStatusGood; "rejected" -> DoctorStatusRest; else -> DoctorStatusWarn }
+            Row(Modifier.padding(top = 4.dp), verticalAlignment = Alignment.Top) {
+                Box(Modifier.padding(top = 6.dp).size(8.dp).clip(CircleShape).background(dot)); Spacer(Modifier.width(8.dp))
+                Text(t(en, hi), fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.weight(1f).testTag("centre-suggestion-status-${s.id}"))
+            }
         }
     }
 }

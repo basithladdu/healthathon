@@ -7,7 +7,7 @@ import { CareRouteLink } from './care-route-link';
 import { CareArt, type CareArtKind } from './care-art';
 import { CARE_ROUTES, type CareView } from './care-routes';
 import { CARE_SECTIONS } from './care-section-pages';
-import { CareToday } from './care-today';
+import { CareToday, CareTodayGreeting } from './care-today';
 import type { CareCheck, CareEvent } from './care-calendar-state';
 import type { Appointment } from './appointments-page';
 import type { FamilyTask } from './family-care-state';
@@ -39,12 +39,21 @@ export function FamilyCareHome({ patientName, lang, signedCareNote, patientId, t
   const signedVersion = signedCareNote?.version;
   const qrDataUrl = qr?.patientId === patientId && qr.version === signedVersion ? qr.dataUrl : '';
   const name = patientName.trim().split(/\s+/)[0];
+  const isFamily = role === 'family';
   const quickAccess: Array<{ view: CareView; en: string; hi: string; art: CareArtKind }> = [
     { view: 'doctor-pack', en: 'Visit pack', hi: 'मुलाक़ात की फ़ाइल', art: 'doctor-pack' },
-    { view: 'care-circle', en: 'My care circle', hi: 'मेरे अपने', art: 'home-help' },
+    isFamily ? { view: 'care-circle', en: 'Care circle', hi: 'देखभाल का घेरा', art: 'home-help' } : { view: 'care-circle', en: 'My care circle', hi: 'मेरे अपने', art: 'home-help' },
     { view: 'family-tasks', en: 'Who can help?', hi: 'कौन मदद करेगा?', art: 'open-questions' },
-    { view: 'medicines', en: 'My medicines', hi: 'मेरी दवाइयाँ', art: 'cancer-overview' },
+    isFamily ? { view: 'medicines', en: 'Medicines', hi: 'दवाइयाँ', art: 'cancer-overview' } : { view: 'medicines', en: 'My medicines', hi: 'मेरी दवाइयाँ', art: 'cancer-overview' },
   ];
+  // Caregiver tips are practical, non-medical reminders for the family member. One per day.
+  const caregiverTips: Array<{ en: string; hi: string }> = [
+    { en: 'Share one task with the care circle today.', hi: 'आज एक काम देखभाल के घेरे में किसी को सौंपें।' },
+    { en: 'Write questions down as they come up.', hi: 'सवाल जैसे ही आएँ, लिख लें।' },
+    { en: 'Take a short break. Rest helps you care.', hi: 'थोड़ा आराम करें। आराम से देखभाल आसान होती है।' },
+    { en: 'Keep the visit pack ready before each visit.', hi: 'हर मुलाक़ात से पहले फ़ाइल तैयार रखें।' },
+  ];
+  const tip = caregiverTips[Number(today.replace(/\D/g, '').slice(-2) || 0) % caregiverTips.length];
   const categoryCards: Array<{ view: CareView; en: string; hi: string; art: CareArtKind; color: string }> = [
     ...CARE_SECTIONS.map(({ view, en, hi, art, color }) => ({ view, en, hi, art, color })),
     { view: 'calendar', en: 'Calendar', hi: 'कैलेंडर', art: 'lab-history', color: 'peach' },
@@ -64,7 +73,14 @@ export function FamilyCareHome({ patientName, lang, signedCareNote, patientId, t
   }, [patientId, signedVersion]);
 
   return <section className="family-care-home care-home-organised">
-    <header className="family-care-home-heading"><h1>{t(`${name}’s care`, `${name} की देखभाल`)}</h1><CareRouteLink view="my-details" className="care-home-profile">{t('My profile', 'मेरी जानकारी')}</CareRouteLink></header>
+    <CareTodayGreeting name={patientName} role={role} today={today} lang={lang} />
+    <header className="family-care-home-heading">
+      {/* The greeting above is the visible title; the h1 stays for screen readers and page structure. */}
+      <h1 className="family-care-home-sr-title">{isFamily ? t(`Caring for ${name}`, `${name} की देखभाल`) : t(`${name}’s care`, `${name} की देखभाल`)}</h1>
+      {isFamily && <span className="family-care-home-eyebrow">{t('Family view', 'परिवार का दृश्य')}</span>}
+      <CareRouteLink view="my-details" className="care-home-profile">{t('My profile', 'मेरी जानकारी')}</CareRouteLink>
+    </header>
+    {isFamily && <p className="family-care-home-tip"><span aria-hidden="true">✦</span><span><strong>{t('Tip', 'सुझाव')}</strong> {careText(lang, tip.en, tip.hi)}</span></p>}
     <section className={`care-home-note-feature${signedCareNote ? '' : ' is-empty'}`} aria-labelledby={`${id}-note-title`}>
       {signedCareNote ? <>
         <div className="care-home-note-copy">

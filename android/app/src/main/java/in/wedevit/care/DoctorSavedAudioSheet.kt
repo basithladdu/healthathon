@@ -48,18 +48,23 @@ fun savedAudioFormatTime(at: Long, zone: ZoneId = ZoneId.systemDefault()): Strin
     val labels = savedAudioLabels(rows)
     val current = rows.indexOfFirst { it.id == nowPlaying }
     Column(modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(bottom = 16.dp).testTag("saved_audio_sheet")) {
-        if (rows.isEmpty()) Surface(Modifier.fillMaxWidth().testTag("saved_audio_empty"), color = Color.White, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline)) { Text(t("No audio recorded yet. Drag this down and record to add one.", "अभी कोई ऑडियो रिकॉर्ड नहीं हुआ। इसे नीचे खींचें और रिकॉर्ड करके जोड़ें।"), fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk, modifier = Modifier.padding(16.dp)) }
-        LazyColumn(Modifier.weight(1f).testTag("saved_audio_list"), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        if (rows.isEmpty()) Surface(Modifier.fillMaxWidth().testTag("saved_audio_empty"), color = Color.White, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline)) {
+            Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Box(Modifier.size(40.dp).clip(RoundedCornerShape(50)).background(DoctorStageCream), contentAlignment = Alignment.Center) { Icon(Icons.Default.MicNone, null, tint = DoctorStageDeep, modifier = Modifier.size(22.dp)) }
+                Text(t("No audio recorded yet. Drag this down and record to add one.", "अभी कोई ऑडियो रिकॉर्ड नहीं हुआ। इसे नीचे खींचें और रिकॉर्ड करके जोड़ें।"), fontSize = 16.sp, lineHeight = 22.sp, color = DoctorCardInk, modifier = Modifier.weight(1f))
+            }
+        }
+        LazyColumn(Modifier.weight(1f).testTag("saved_audio_list"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             items(rows.size, key = { rows[it].id }) { i ->
                 val r = rows[i]; val checked = r.id in selected; val playing = r.id == nowPlaying
-                Surface(Modifier.fillMaxWidth().heightIn(min = 64.dp).testTag("saved_audio_row_${r.id}"), color = Color.White, shape = RoundedCornerShape(18.dp), border = BorderStroke(if (playing) 2.dp else 1.dp, if (playing) DoctorStageTerracotta else DoctorHairline)) {
+                Surface(Modifier.fillMaxWidth().heightIn(min = 64.dp).testTag("saved_audio_row_${r.id}"), color = Color.White, shape = RoundedCornerShape(20.dp), border = BorderStroke(if (playing) 2.dp else 1.dp, if (playing) DoctorStageTerracotta else DoctorHairline)) {
                     Row(Modifier.padding(start = 4.dp, end = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                         Box(Modifier.size(48.dp).semantics { role = Role.Checkbox }.clickable(role = Role.Checkbox) { onSelectedChange(savedAudioToggle(selected, r.id)) }.testTag("saved_audio_check_${r.id}"), contentAlignment = Alignment.Center) {
                             Box(Modifier.size(24.dp).clip(RoundedCornerShape(7.dp)).background(if (checked) DoctorStageTerracotta else Color.White).border(2.dp, DoctorStageTerracotta, RoundedCornerShape(7.dp)), contentAlignment = Alignment.Center) { if (checked) Icon(Icons.Default.Check, t("Selected", "चुना हुआ"), tint = Color.White, modifier = Modifier.size(18.dp)) }
                         }
                         Column(Modifier.weight(1f).heightIn(min = 48.dp).clickable(role = Role.Button) { onPlay(r) }.padding(start = 6.dp, top = 8.dp, bottom = 8.dp), verticalArrangement = Arrangement.Center) {
                             Text(labels[i], fontSize = 16.sp, lineHeight = 22.sp, color = DoctorCardInk, fontWeight = FontWeight.Medium, modifier = Modifier.testTag("saved_audio_label_${r.id}"))
-                            Text(savedAudioFormatTime(r.recordedAt), fontSize = 12.sp, lineHeight = 16.sp, color = DoctorCardFaint, modifier = Modifier.testTag("saved_audio_time_${r.id}"))
+                            Text(savedAudioFormatTime(r.recordedAt), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub, modifier = Modifier.testTag("saved_audio_time_${r.id}"))
                         }
                     }
                 }
@@ -77,6 +82,6 @@ fun savedAudioFormatTime(at: Long, zone: ZoneId = ZoneId.systemDefault()): Strin
             }
         }
         Spacer(Modifier.height(12.dp))
-        Button(onClick = onContinue, enabled = savedAudioContinueEnabled(selected.intersect(rows.map { it.id }.toSet())), shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("saved_audio_continue"), colors = ButtonDefaults.buttonColors(containerColor = DoctorStageTerracotta, contentColor = Color.White)) { Text(t("Continue to transcript →", "लिखाई पर आगे बढ़ें →"), fontSize = 16.sp) }
+        Button(onClick = onContinue, enabled = savedAudioContinueEnabled(selected.intersect(rows.map { it.id }.toSet())), shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("saved_audio_continue"), colors = ButtonDefaults.buttonColors(containerColor = DoctorStageTerracotta, contentColor = Color.White)) { Text(t("Continue to transcript →", "लिखाई पर आगे बढ़ें →"), fontSize = 16.sp) }
     }
 }

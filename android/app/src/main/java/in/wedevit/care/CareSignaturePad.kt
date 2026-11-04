@@ -31,6 +31,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.Icon
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -149,17 +154,18 @@ internal fun gocRenderSignaturePng(strokes: List<List<Pair<Float, Float>>>, thum
     val ready = GocSignatureInk.ready(strokes, thumb)
     Column(modifier.fillMaxWidth().testTag("goc-signature-pad"), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Text(if (thumb) t("Thumb impression here", "यहाँ अंगूठा लगाएँ") else t("Sign here", "यहाँ हस्ताक्षर करें"), fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+            Text(if (thumb) t("Thumb impression here", "यहाँ अंगूठा लगाएँ") else t("Sign here", "यहाँ हस्ताक्षर करें"), fontWeight = FontWeight.Bold, fontSize = 16.sp, color = DoctorCardInk, modifier = Modifier.weight(1f))
             if (allowThumb) {
-                Text(t("Thumb impression", "अंगूठे का निशान"), color = DoctorCardSub)
+                Text(t("Thumb impression", "अंगूठे का निशान"), color = DoctorCardSub, fontSize = 14.sp)
                 Spacer(Modifier.width(8.dp))
                 Switch(checked = thumb, onCheckedChange = { thumb = it; strokes = emptyList() }, enabled = enabled, modifier = Modifier.testTag("goc-signature-thumb"))
             }
         }
         val ink = DoctorCardInk
+        val guide = DoctorCardSub.copy(alpha = .35f)
         val padLabel = if (thumb) t("Thumb impression pad", "अंगूठे के निशान की जगह") else t("Signature pad", "हस्ताक्षर की जगह")
         Canvas(Modifier.fillMaxWidth().aspectRatio(GocSignatureInk.ASPECT).clip(RoundedCornerShape(14.dp)).background(Color.White)
-            .border(2.dp, if (thumb) DoctorAccent else DoctorHairline, RoundedCornerShape(14.dp))
+            .border(if (thumb) 2.dp else 1.5.dp, if (thumb) DoctorAccent else DoctorCardSub.copy(alpha = .45f), RoundedCornerShape(14.dp))
             .semantics { contentDescription = padLabel }.testTag("goc-signature-canvas")
             .pointerInput(enabled) {
                 if (!enabled) return@pointerInput
@@ -176,6 +182,11 @@ internal fun gocRenderSignaturePng(strokes: List<List<Pair<Float, Float>>>, thum
                     }
                 }
             }) {
+            // A paper-like signing line with a small cross at its start; only the strokes go into the PNG.
+            val lineY = size.height * .74f; val margin = size.width * .06f
+            drawLine(guide, Offset(margin, lineY), Offset(size.width - margin, lineY), 1.dp.toPx(), pathEffect = PathEffect.dashPathEffect(floatArrayOf(6.dp.toPx(), 4.dp.toPx())))
+            val cross = 6.dp.toPx(); val cx = margin + cross; val cy = lineY - cross * 1.8f
+            drawLine(guide, Offset(cx - cross, cy - cross), Offset(cx + cross, cy + cross), 1.5.dp.toPx()); drawLine(guide, Offset(cx - cross, cy + cross), Offset(cx + cross, cy - cross), 1.5.dp.toPx())
             val width = size.height * if (thumb) GocSignatureInk.THUMB else GocSignatureInk.DRAWN
             strokes.forEach { stroke ->
                 if (stroke.isEmpty()) return@forEach
@@ -184,13 +195,13 @@ internal fun gocRenderSignaturePng(strokes: List<List<Pair<Float, Float>>>, thum
                 drawPath(path, ink, style = Stroke(width = width, cap = StrokeCap.Round, join = StrokeJoin.Round))
             }
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            TextButton(onClick = { strokes = emptyList() }, enabled = enabled && strokes.isNotEmpty(), modifier = Modifier.heightIn(min = 48.dp).testTag("goc-signature-clear")) { Text(t("Clear", "मिटाएँ"), color = DoctorAccent) }
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+            TextButton(onClick = { strokes = emptyList() }, enabled = enabled && strokes.isNotEmpty(), modifier = Modifier.heightIn(min = 48.dp).testTag("goc-signature-clear")) { Text(t("Clear", "मिटाएँ"), color = if (enabled && strokes.isNotEmpty()) RustText else DoctorCardFaint, fontSize = 16.sp) }
             Button(onClick = {
                 val png = gocRenderSignaturePng(strokes, thumb)
                 val result = GocPadResult(png, strokes.size, GocSignOffRules.isoNow(), if (thumb) GocSignOffRules.THUMB else GocSignOffRules.DRAWN, GocSignatureInk.MAX_WIDTH, (GocSignatureInk.MAX_WIDTH / GocSignatureInk.ASPECT).toInt())
                 if (onDone(result)) strokes = emptyList()
-            }, enabled = enabled && ready, colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent), modifier = Modifier.heightIn(min = 48.dp).testTag("goc-signature-done")) { Text(doneLabel ?: t("Done", "हो गया")) }
+            }, enabled = enabled && ready, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent), modifier = Modifier.weight(1f).heightIn(min = 52.dp).testTag("goc-signature-done")) { Icon(Icons.Default.Check, null); Spacer(Modifier.width(8.dp)); Text(doneLabel ?: t("Done", "हो गया"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold) }
         }
     }
 }

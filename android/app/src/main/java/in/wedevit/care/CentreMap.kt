@@ -3,7 +3,10 @@ package `in`.wedevit.care
 import android.animation.ValueAnimator
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.MyLocation
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -162,13 +165,21 @@ import org.maplibre.geojson.Point
     }
     Box(Modifier.fillMaxWidth().height(height).testTag("centre-map").semantics { stateDescription = if (failed) t("Map unavailable", "नक्शा उपलब्ध नहीं") else if (loaded) t("Map ready", "नक्शा तैयार") else t("Loading map", "नक्शा खुल रहा है") }) {
         key(retry) { AndroidView(factory = { view }, modifier = Modifier.fillMaxSize()) }
-        if (!loaded && !failed) CircularProgressIndicator(Modifier.size(28.dp).align(Alignment.Center))
-        if (failed) Surface(Modifier.align(Alignment.Center).padding(8.dp), color = Paper) { Column(Modifier.padding(12.dp)) { Text(t("Couldn't load the map.", "नक्शा नहीं खुल सका।"), style = MaterialTheme.typography.bodySmall); TextButton(onClick = { failed = false; loaded = false; retry++ }) { Text(t("Try again", "फिर कोशिश करें")) } } }
+        if (!loaded && !failed) CircularProgressIndicator(Modifier.size(28.dp).align(Alignment.Center), color = Rust)
+        // One plain line and a retry; the list below still works without the map.
+        if (failed) Surface(Modifier.align(Alignment.Center).padding(16.dp), shape = RoundedCornerShape(20.dp), color = Paper) {
+            Row(Modifier.padding(start = 16.dp, end = 8.dp, top = 8.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.ErrorOutline, null, Modifier.size(20.dp), tint = RustText); Spacer(Modifier.width(8.dp))
+                Text(t("Couldn't load the map.", "नक्शा नहीं खुल सका।"), color = DoctorCardInk, modifier = Modifier.weight(1f, fill = false))
+                TextButton(onClick = { failed = false; loaded = false; retry++ }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Try again", "फिर कोशिश करें"), color = RustText) }
+            }
+        }
         val located = centres.filter { it.latitude != null && it.longitude != null }
         if (loaded && located.isNotEmpty()) FilledTonalButton(onClick = {
             val update = bounds(located)
             if (ValueAnimator.areAnimatorsEnabled()) map?.animateCamera(update, 350) else map?.moveCamera(update)
-        }, modifier = Modifier.align(Alignment.TopEnd).padding(8.dp)) { Text(t("Show all", "सभी दिखाएँ")) }
+        }, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.filledTonalButtonColors(containerColor = Paper, contentColor = Ink),
+            modifier = Modifier.align(Alignment.TopEnd).padding(8.dp).heightIn(min = 48.dp)) { Text(t("Show all", "सभी दिखाएँ"), fontWeight = FontWeight.SemiBold) }
         if (loaded && (userLocation != null || onLocate != null)) SmallFloatingActionButton(onClick = {
             if (userLocation == null) onLocate?.invoke() else {
                 val update = centreMapAround(userLocation, centres)

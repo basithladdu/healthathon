@@ -121,7 +121,7 @@ internal object DoctorTrendRules {
 @Composable internal fun DoctorInfoIcon(title: String, text: String, tag: String) {
     val t = careText()
     var open by remember { mutableStateOf(false) }
-    IconButton(onClick = { open = true }, modifier = Modifier.size(40.dp).testTag(tag)) { Icon(Icons.Outlined.Info, t("About this", "इसके बारे में"), Modifier.size(20.dp), tint = DoctorCardSub) }
+    IconButton(onClick = { open = true }, modifier = Modifier.size(48.dp).testTag(tag)) { Icon(Icons.Outlined.Info, t("About this", "इसके बारे में"), Modifier.size(20.dp), tint = DoctorCardSub) }
     if (open) AlertDialog(onDismissRequest = { open = false }, title = { Text(title) }, text = { Text(text, lineHeight = 22.sp) },
         confirmButton = { TextButton(onClick = { open = false }) { Text(t("Close", "बंद करें")) } })
 }
@@ -131,8 +131,8 @@ internal object DoctorTrendRules {
     val t = careText()
     Row(modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).testTag("doctor-trend-range"), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         DoctorTrendRange.entries.forEach { r ->
-            FilterChip(selected = r == range, onClick = { onRange(r) }, label = { Text(t(r.en, r.hi), fontSize = 13.sp) },
-                modifier = Modifier.heightIn(min = 40.dp).testTag("doctor-trend-range-${r.name}"),
+            FilterChip(selected = r == range, onClick = { onRange(r) }, label = { Text(t(r.en, r.hi), fontSize = 14.sp) },
+                shape = RoundedCornerShape(50), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-trend-range-${r.name}"),
                 colors = FilterChipDefaults.filterChipColors(selectedContainerColor = DoctorAccent, selectedLabelColor = Paper, containerColor = Paper, labelColor = DoctorCardSub))
         }
     }
@@ -144,7 +144,7 @@ private val doctorScoreBands = listOf(ChartBand(0.0, 3.5, ChartBands.Mild), Char
 @Composable internal fun DoctorScoreTrend(name: String, days: List<Pair<LocalDate, Int>>, range: DoctorTrendRange, today: LocalDate, tag: String) {
     val t = careText(); val hindi = careHindi()
     val shown = DoctorTrendRules.within(days, range, today)
-    if (shown.isEmpty()) { Text(t("Nothing noted in this time", "इस समय में कुछ दर्ज नहीं"), fontSize = 13.sp, color = DoctorCardSub, modifier = Modifier.testTag("$tag-empty")); return }
+    if (shown.isEmpty()) { Text(t("Nothing noted in this time", "इस समय में कुछ दर्ज नहीं"), fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.testTag("$tag-empty")); return }
     val start = DoctorTrendRules.start(range, shown.first().first, today)
     val (lo, hi) = start.toEpochDay().toDouble() to today.toEpochDay().toDouble()
     val description = "$name: " + shown.joinToString("; ") { (day, v) -> "${day.format(careDateFormat("d MMM yyyy", hindi))} $v ${ChartBands.word(v, hindi)}" }
@@ -162,7 +162,7 @@ private val doctorScoreBands = listOf(ChartBand(0.0, 3.5, ChartBands.Mild), Char
 @Composable internal fun DoctorValueTrend(name: String, unit: String, days: List<Pair<LocalDate, Double>>, printed: Pair<Double?, Double?>, range: DoctorTrendRange, today: LocalDate, tag: String) {
     val t = careText(); val hindi = careHindi()
     val shown = DoctorTrendRules.within(days, range, today)
-    if (shown.isEmpty()) { Text(t("Nothing noted in this time", "इस समय में कुछ दर्ज नहीं"), fontSize = 13.sp, color = DoctorCardSub, modifier = Modifier.testTag("$tag-empty")); return }
+    if (shown.isEmpty()) { Text(t("Nothing noted in this time", "इस समय में कुछ दर्ज नहीं"), fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.testTag("$tag-empty")); return }
     val start = DoctorTrendRules.start(range, shown.first().first, today)
     val (lo, hi) = start.toEpochDay().toDouble() to today.toEpochDay().toDouble()
     val edges = shown.map { it.second } + listOfNotNull(printed.first, printed.second)
@@ -193,10 +193,10 @@ internal fun doctorLabRange(data: CareEntry): Pair<Double?, Double?> {
 /** Phone: scrollable tab chips above the section. */
 @Composable internal fun DoctorPatientTabRow(selected: String, onSection: (String) -> Unit, modifier: Modifier = Modifier) {
     val t = careText()
-    Row(modifier.fillMaxWidth().background(Cream).horizontalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 6.dp).testTag("doctor-patient-tabs"), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    Row(modifier.fillMaxWidth().background(Cream).horizontalScroll(rememberScrollState()).padding(horizontal = 16.dp, vertical = 8.dp).testTag("doctor-patient-tabs"), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         doctorPatientTabs.forEach { tab ->
             FilterChip(selected = tab.section == selected, onClick = { if (tab.section != selected) onSection(tab.section) }, label = { Text(t(tab.en, tab.hi), fontSize = 14.sp) },
-                leadingIcon = { Icon(tab.icon, null, Modifier.size(18.dp)) }, shape = RoundedCornerShape(14.dp),
+                leadingIcon = { Icon(tab.icon, null, Modifier.size(18.dp)) }, shape = RoundedCornerShape(50),
                 modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-tab-${tab.section}"),
                 colors = FilterChipDefaults.filterChipColors(selectedContainerColor = tab.color, selectedLabelColor = DoctorCardInk, selectedLeadingIconColor = DoctorAccent, containerColor = Paper, labelColor = DoctorCardSub),
                 border = FilterChipDefaults.filterChipBorder(enabled = true, selected = tab.section == selected, borderColor = DoctorHairline, selectedBorderColor = DoctorAccent))
@@ -220,6 +220,7 @@ internal fun doctorLabRange(data: CareEntry): Pair<Double?, Double?> {
         } else if (section == "Hub") hub(false, null)
         else Column(Modifier.fillMaxSize()) {
             DoctorPatientTabRow(shown, onSection)
+            HorizontalDivider(color = DoctorHairline)
             Box(Modifier.weight(1f).fillMaxWidth()) { DoctorPatientSectionContent(vm, personId, shown, care) }
         }
     }
@@ -248,15 +249,24 @@ internal fun doctorLabRange(data: CareEntry): Pair<Double?, Double?> {
     val zone = ZoneId.systemDefault()
     val today = LocalDate.now(zone)
     val groups = remember(entries, personId) { labGroups(entries.filter { it.personId == personId }) }
-    LazyColumn(Modifier.fillMaxSize().testTag("doctor-labs"), contentPadding = PaddingValues(start = 20.dp, top = 12.dp, end = 20.dp, bottom = 96.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+    LazyColumn(Modifier.fillMaxSize().testTag("doctor-labs"), contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 96.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Heading(t("Lab reports", "जाँच रिपोर्टें"), 26); Spacer(Modifier.weight(1f))
-                TextButton(onClick = { full = true }, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-labs-all")) { Text(t("All results", "सभी नतीजे"), color = DoctorAccent) }
+                if (groups.isNotEmpty()) DoctorInfoIcon(t("Lab reports", "जाँच रिपोर्टें"), t("Values and printed ranges are copied from the reports. Red means outside the printed range.", "मान और छपी सीमा रिपोर्ट से लिए गए हैं। लाल का मतलब छपी सीमा से बाहर।"), "doctor-labs-info")
+                TextButton(onClick = { full = true }, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-labs-all")) { Text(t("All results", "सभी नतीजे"), color = RustText) }
             }
         }
         item { DoctorRangeSelector(range, { rangeKey = it.name }) }
-        if (groups.isEmpty()) item { SurfaceCard { Text(t("No lab results yet", "अभी कोई जाँच नतीजा नहीं"), color = DoctorCardInk, modifier = Modifier.testTag("doctor-labs-empty")) } }
+        if (groups.isEmpty()) item {
+            Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
+                Column(Modifier.fillMaxWidth().padding(20.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Icon(Icons.Outlined.Science, null, Modifier.size(28.dp), tint = DoctorAccent)
+                    Text(t("No lab results yet", "अभी कोई जाँच नतीजा नहीं"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.testTag("doctor-labs-empty"))
+                    OutlinedButton(onClick = { full = true }, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp)) { Text(t("All results", "सभी नतीजे")) }
+                }
+            }
+        }
         items(groups, key = { values -> "${values.first().first.title.trim().lowercase()}:${values.first().second.unit.trim()}" }) { values ->
             val key = "${values.first().first.title.trim().lowercase()}:${values.first().second.unit.trim()}"
             val (latestItem, latest) = values.first()
@@ -265,24 +275,24 @@ internal fun doctorLabRange(data: CareEntry): Pair<Double?, Double?> {
             val previous = values.getOrNull(1)?.second?.value?.toDoubleOrNull()
             val outside = latestValue != null && ((printed.first != null && latestValue < printed.first!!) || (printed.second != null && latestValue > printed.second!!))
             val arrow = if (latestValue == null || previous == null) "" else when { latestValue > previous -> "↑"; latestValue < previous -> "↓"; else -> "→" }
-            Surface(shape = RoundedCornerShape(18.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("doctor-lab-$key")) {
-                Column(Modifier.padding(horizontal = 14.dp, vertical = 6.dp)) {
-                    Row(Modifier.fillMaxWidth().heightIn(min = 52.dp).clickable(role = Role.Button) { open = if (open == key) "" else key }, verticalAlignment = Alignment.CenterVertically) {
+            Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, if (outside) ChartBands.Severe.copy(alpha = .5f) else DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("doctor-lab-$key")) {
+                Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+                    Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).clickable(role = Role.Button) { open = if (open == key) "" else key }, verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) {
-                            Text(latestItem.title, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, color = DoctorCardInk)
-                            Text(labDateText(latestItem, t), fontSize = 12.sp, color = DoctorCardSub)
+                            Text(latestItem.title, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk)
+                            Text(labDateText(latestItem, t), fontSize = 14.sp, color = DoctorCardSub)
                         }
-                        Text("${latest.value} ${latest.unit}".trim(), fontWeight = FontWeight.Bold, fontSize = 16.sp, color = if (outside) ChartBands.Severe else DoctorCardInk, textAlign = TextAlign.End)
+                        Text("${latest.value} ${latest.unit}".trim(), fontWeight = FontWeight.Bold, fontSize = 17.sp, color = if (outside) ChartBands.Severe else DoctorCardInk, textAlign = TextAlign.End)
                         if (arrow.isNotEmpty()) Text(" $arrow", fontSize = 15.sp, color = DoctorCardSub, fontWeight = FontWeight.SemiBold)
                     }
                     if (open == key) {
                         val days = DoctorTrendRules.dailyAt(values.mapNotNull { (item, entry) -> entry.value.toDoubleOrNull()?.takeIf { it.isFinite() }?.let { labEpoch(item) to it } }, zone)
                         DoctorValueTrend(latestItem.title, latest.unit, days, printed, range, today, "doctor-lab-trend-$key")
-                        if (printed.first != null || printed.second != null) Text(t("Band: printed range", "पट्टी: छपी सीमा") + " ${printed.first?.let(::doctorNumber) ?: "–"}–${printed.second?.let(::doctorNumber) ?: "–"} ${latest.unit}", fontSize = 12.sp, color = DoctorCardSub, modifier = Modifier.padding(bottom = 8.dp))
+                        if (printed.first != null || printed.second != null) Text(t("Band: printed range", "पट्टी: छपी सीमा") + " ${printed.first?.let(::doctorNumber) ?: "–"}–${printed.second?.let(::doctorNumber) ?: "–"} ${latest.unit}", fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.padding(bottom = 8.dp))
                     }
                 }
             }
         }
-        if (groups.isNotEmpty()) item { Row(verticalAlignment = Alignment.CenterVertically) { Spacer(Modifier.weight(1f)); DoctorInfoIcon(t("Lab reports", "जाँच रिपोर्टें"), t("Values and printed ranges are copied from the reports. Red means outside the printed range.", "मान और छपी सीमा रिपोर्ट से लिए गए हैं। लाल का मतलब छपी सीमा से बाहर।"), "doctor-labs-info") } }
+
     }
 }

@@ -13,7 +13,7 @@
 .ptl-eyebrow {
   margin: 0 0 6px;
   font-family: var(--font-display, 'Sora', system-ui, sans-serif);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -60,7 +60,7 @@
 
 .ptl-footer-note {
   margin-top: 32px;
-  font-size: 13px;
+  font-size: 14px;
   color: var(--bp-muted, #4d6259);
 }
 
@@ -83,7 +83,7 @@
   gap: 8px;
   padding: 6px 14px;
   border-radius: 999px;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 650;
   border: 1px solid transparent;
 }
@@ -152,7 +152,7 @@
   margin: 2px 0 0;
   min-width: 0;
   color: var(--bp-muted, #4d6259);
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.04em;
   line-height: 1.35;
@@ -188,7 +188,7 @@
 
 .ptl-overline {
   margin: 0 0 4px;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -289,7 +289,7 @@
   display: inline-block;
   padding: 4px 10px;
   border-radius: 999px;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 650;
   background: var(--bp-ice, #e6f2ec);
   color: var(--bp-primary, #0c5c3f);
@@ -415,10 +415,10 @@
 .ptl-select,
 .ptl-textarea {
   min-height: 44px;
-  font-size: 15px;
+  font-size: 16px;
   font-family: var(--font-body, 'Inter', system-ui, sans-serif);
   padding: 8px 12px;
-  border-radius: 10px;
+  border-radius: 14px;
   border: 1px solid var(--bp-border, rgb(10 33 24 / .10));
   color: var(--bp-ink, #0a2118);
   background: #fff;
@@ -440,7 +440,7 @@
 .ptl-field-error {
   margin: 0;
   color: var(--critical-ink);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 650;
 }
 
@@ -453,8 +453,8 @@
 .ptl-btn {
   min-height: 44px;
   padding: 10px 20px;
-  border-radius: 10px;
-  font-size: 15px;
+  border-radius: 14px;
+  font-size: 16px;
   font-weight: 650;
   cursor: pointer;
   border: 1px solid transparent;
@@ -490,7 +490,7 @@
 }
 
 .ptl-form-note {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--bp-muted, #4d6259);
 }
 
@@ -568,7 +568,7 @@
 
   .ptl-chip {
     padding: 4px 10px;
-    font-size: 12px;
+    font-size: 14px;
   }
 
   .ptl-card-grid {
@@ -592,7 +592,7 @@
   }
 
   .ptl-summary-label {
-    font-size: 11px;
+    font-size: 13px;
   }
 
   .ptl-summary-value {

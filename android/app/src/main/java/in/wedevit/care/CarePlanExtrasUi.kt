@@ -18,6 +18,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -39,7 +40,7 @@ private fun livingWillPdfName(version: Int) = "sahara-living-will-v$version.pdf"
     @Suppress("UNUSED_VARIABLE") val changed = revision
     var pressed by remember(identity) { mutableStateOf(false) }
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        OutlinedButton(onClick = { pressed = true; if (reader.speaking) reader.stop() else reader.read(text(), lang.code + "-IN") }, modifier = Modifier.heightIn(min = 48.dp).testTag("plan-read-aloud")) {
+        OutlinedButton(onClick = { pressed = true; if (reader.speaking) reader.stop() else reader.read(text(), lang.code + "-IN") }, shape = RoundedCornerShape(50), modifier = Modifier.heightIn(min = 48.dp).testTag("plan-read-aloud")) {
             Icon(if (reader.speaking) Icons.Default.Stop else Icons.Default.VolumeUp, null, Modifier.size(18.dp)); Spacer(Modifier.width(7.dp)); Text(if (reader.speaking) t("Stop reading", "पढ़ना रोकें") else t("Read aloud", "पढ़कर सुनाएँ"))
         }
         if (pressed && reader.status.isNotBlank()) Text(reader.status, style = Small, color = DoctorCardSub)
@@ -166,7 +167,7 @@ private fun livingWillPdfName(version: Int) = "sahara-living-will-v$version.pdf"
     var panel by rememberSaveable { mutableStateOf("") }; var saved by remember { mutableStateOf("") }
     val target = Pilot.RETRIEVAL_TARGET_MINUTES; val notRecorded = NOT_RECORDED.pick(hindi)
     fun yesNo(v: Boolean?) = when (v) { null -> notRecorded; true -> t("Yes", "हाँ"); else -> t("No", "नहीं") }
-    LazyColumn(Modifier.fillMaxSize().testTag("pilot-log"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    LazyColumn(Modifier.fillMaxSize().testTag("pilot-log"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { PlanHeader(t("Pilot audit log", "पायलट ऑडिट लॉग"), onBack, "pilot-header") }
         item { Text(t("For the care team only. Made-up patients only during the pilot. Saved on this phone.", "केवल देखभाल टीम के लिए। पायलट में सिर्फ़ काल्पनिक मरीज़। इसी फ़ोन पर सेव।"), style = MaterialTheme.typography.bodyMedium) }
         item { PlanCard {
@@ -301,7 +302,7 @@ private fun livingWillPdfName(version: Int) = "sahara-living-will-v$version.pdf"
     fun printIt(a: AmdRecord) = pdf(a) { file, sha -> if (commit { CarePlanBook.generateAmd(it, a.id, sha, lang.code, actor, planNow(), today) }) onShare(file, a.id) }
     val familyReadOnly = canEdit && !AmdRules.canChange(canEdit, clinician, actor)
     @Suppress("NAME_SHADOWING") val canEdit = AmdRules.canChange(canEdit, clinician, actor)
-    LazyColumn(Modifier.fillMaxSize().testTag("living-will"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+    LazyColumn(Modifier.fillMaxSize().testTag("living-will"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { PlanHeader(t("Living will", "लिविंग विल"), onBack, "amd-header") }
         if (familyReadOnly) item { Text(t("Only ${person.name} can change this.", "इसे सिर्फ़ ${person.name} बदल सकते हैं।"), style = MaterialTheme.typography.bodyMedium, color = DoctorCardSub, modifier = Modifier.testTag("amd-family-read-only")) }
         item { Text(t("This follows the model living will by the Vidhi Centre for Legal Policy and ACP India, and the Supreme Court’s rules (2018, changed on 24 January 2023). If both a living will and an emergency plan exist, the living will governs.", "यह विधि सेंटर फ़ॉर लीगल पॉलिसी और ACP इंडिया की मॉडल लिविंग विल, और सुप्रीम कोर्ट के नियमों (2018, 24 जनवरी 2023 को बदले गए) पर आधारित है। अगर लिविंग विल और आपातकालीन योजना दोनों हों, तो लिविंग विल मानी जाती है।"), style = MaterialTheme.typography.bodyMedium) }
@@ -366,10 +367,11 @@ private fun livingWillPdfName(version: Int) = "sahara-living-will-v$version.pdf"
             CareField(c.anticipatedConditions, { v -> c = c.copy(anticipatedConditions = v) }, t("Any illness you expect, and what you want for it (optional)", "कोई बीमारी जिसकी आप उम्मीद करते हैं, और उसके लिए आप क्या चाहते हैं (वैकल्पिक)"), minLines = 2)
             Text(t("For each treatment, choose what you want in those situations. You can leave any as “Not decided”.", "हर इलाज के लिए चुनें कि उन स्थितियों में आप क्या चाहते हैं। किसी को भी “तय नहीं” छोड़ सकते हैं।"), style = MaterialTheme.typography.bodyMedium)
             AmdTreatment.entries.forEach { tr ->
-                Text(AmdText.treatment(tr).pick(hindi), fontWeight = FontWeight.SemiBold)
-                Text(AmdText.treatmentHelp(tr).pick(hindi), style = Small, color = DoctorCardSub)
+                HorizontalDivider(color = DoctorHairline)
+                Text(AmdText.treatment(tr).pick(hindi), fontWeight = FontWeight.SemiBold, fontSize = 17.sp, color = Ink)
+                Text(AmdText.treatmentHelp(tr).pick(hindi), fontSize = 14.sp, color = DoctorCardSub)
                 ChipGroup(c.treatments[tr], AmdChoice.entries, AmdText::choice, "amd-treatment-${tr.name.lowercase()}") { v -> c = c.copy(treatments = if (v == null) c.treatments - tr else c.treatments + (tr to v)) }
-                if (c.treatments[tr] == null) Text(AmdText.NOT_DECIDED.pick(hindi), style = Small, color = DoctorCardSub)
+                if (c.treatments[tr] == null) Text(AmdText.NOT_DECIDED.pick(hindi), fontSize = 14.sp, color = DoctorCardSub)
             }
             Surface(color = Mint, shape = RoundedCornerShape(12.dp)) { Text(AmdText.COMFORT.pick(hindi), Modifier.padding(10.dp), style = MaterialTheme.typography.bodyMedium) }
         }
@@ -409,14 +411,14 @@ private fun livingWillPdfName(version: Int) = "sahara-living-will-v$version.pdf"
         IssueList(issues)
         Surface(color = Peach, shape = RoundedCornerShape(12.dp)) { Text(t("Once printed, this version cannot be changed in the app. To change anything, start a new version and print again.", "प्रिंट होने के बाद यह संस्करण ऐप में बदला नहीं जा सकता। कुछ भी बदलने के लिए नया संस्करण शुरू करें और फिर से प्रिंट करें।"), Modifier.padding(10.dp), style = MaterialTheme.typography.bodyMedium) }
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            OutlinedButton(onClick = { onSave(c) }, enabled = canEdit && c != record.content, modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("amd-save")) { Text(t("Save", "सहेजें")) }
-            Button(onClick = { onPrint(c) }, enabled = canEdit && AmdRules.blocking(issues).isEmpty(), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("amd-generate")) { Text(t("Make the PDF to print and sign", "प्रिंट और हस्ताक्षर के लिए PDF बनाएँ")) }
+            OutlinedButton(onClick = { onSave(c) }, enabled = canEdit && c != record.content, shape = RoundedCornerShape(14.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("amd-save")) { Text(t("Save", "सहेजें")) }
+            Button(onClick = { onPrint(c) }, enabled = canEdit && AmdRules.blocking(issues).isEmpty(), shape = RoundedCornerShape(14.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("amd-generate")) { Text(t("Make the PDF to print and sign", "प्रिंट और हस्ताक्षर के लिए PDF बनाएँ")) }
         }
     }
 }
 
 @Composable private fun AmdDhrFields(index: Int, dhr: AmdDhr, count: Int, today: LocalDate, onChange: (AmdDhr) -> Unit, onRemove: () -> Unit, onMoveUp: () -> Unit) { val t = careText(); val n = index + 1
-    Surface(color = Cream, shape = RoundedCornerShape(14.dp)) { Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Surface(color = Cream, shape = RoundedCornerShape(14.dp), border = androidx.compose.foundation.BorderStroke(1.dp, DoctorHairline)) { Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(if (index == 0) t("1. First representative", "1. पहले प्रतिनिधि") else t("$n. If the one before cannot be reached", "$n. अगर पिछले से संपर्क न हो"), fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
             if (index > 0) IconButton(onClick = onMoveUp) { Icon(Icons.Default.ArrowUpward, t("Move up", "ऊपर करें")) }
@@ -490,7 +492,7 @@ private fun livingWillPdfName(version: Int) = "sahara-living-will-v$version.pdf"
         if (e.scanSha256.isNotBlank()) Text(t("Scan SHA-256", "स्कैन SHA-256") + ": " + e.scanSha256, style = Small, color = DoctorCardSub, modifier = Modifier.testTag("amd-scan-sha"))
         if (scanError) Text(t("That file could not be read. Try another.", "वह फ़ाइल पढ़ी नहीं जा सकी। दूसरी आज़माएँ।"), color = RustText, style = Small)
         IssueList(issues)
-        Button(onClick = { commit { CarePlanBook.executeAmd(it, w.id, e, custodian, actor, planNow(), today) } }, enabled = canEdit && AmdRules.blocking(issues).isEmpty(), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("amd-execute")) { Text(t("Record as signed and attested", "हस्ताक्षरित और सत्यापित के रूप में दर्ज करें")) }
+        Button(onClick = { commit { CarePlanBook.executeAmd(it, w.id, e, custodian, actor, planNow(), today) } }, enabled = canEdit && AmdRules.blocking(issues).isEmpty(), shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("amd-execute")) { Text(t("Record as signed and attested", "हस्ताक्षरित और सत्यापित के रूप में दर्ज करें")) }
         Text(t("Need to change something? Start a new version. This printed copy must then not be signed.", "कुछ बदलना है? नया संस्करण शुरू करें। तब इस प्रिंट की गई प्रति पर हस्ताक्षर नहीं करने चाहिए।"), style = Small)
         TextButton(onClick = { commit { CarePlanBook.startAmd(it, w.patientId, actor, planNow()).first } }, enabled = canEdit, modifier = Modifier.testTag("amd-new-version")) { Text(t("Start a new version", "नया संस्करण शुरू करें")) }
     }

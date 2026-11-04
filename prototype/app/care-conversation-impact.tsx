@@ -31,7 +31,7 @@ export function CareConversationImpact({ episodes, requests, loading = false }: 
       <h2 id="care-impact-title">Conversation activity</h2>
       {activity.length > 0 && <button type="button" onClick={downloadCsv}>Download CSV</button>}
     </header>
-    {loading ? <p role="status">Loading recorded conversation activity…</p> : activity.length === 0 ? <p>No conversation activity with a known starting point has been recorded here yet. Older notes without a recorded origin are not counted.</p> : <>
+    {loading ? <p role="status" className="care-impact-empty">Loading conversation activity…</p> : activity.length === 0 ? <p className="care-impact-empty">No conversation activity recorded here yet.</p> : <>
       <dl>
         <div><dt>Patient requests</dt><dd>{summary.patientRequests}</dd></div>
         <div><dt>Family requests</dt><dd>{summary.familyRequests}</dd></div>
@@ -40,7 +40,7 @@ export function CareConversationImpact({ episodes, requests, loading = false }: 
         <div><dt>Care Notes documented</dt><dd>{summary.documented}</dd></div>
         <div><dt>Doctor signed</dt><dd>{summary.signed}</dd></div>
       </dl>
-      <p>Each episode is counted once. A request, a saved conversation record, a Care Note and a doctor’s signature are separate steps. Counts include activity recorded in this browser only.</p>
+      <details className="care-impact-info"><summary>How this is counted</summary><p>Each episode is counted once. A request, a saved conversation record, a Care Note and a doctor’s signature are separate steps. Counts include activity recorded in this browser only. Older notes without a recorded origin are not counted.</p></details>
     </>}
   </section>;
 }

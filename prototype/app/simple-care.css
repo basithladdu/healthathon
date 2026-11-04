@@ -1,11 +1,11 @@
-.simple-care-app { min-height: 100svh; background: #f6f5f0; color: #183f32; }
-.simple-care-header, .simple-care-nav, .simple-care-content, .simple-care-footer { width: min(1180px, 100%); margin-inline: auto; padding-inline: 36px; }
+.simple-care-app { min-height: 100svh; background: #fff8ee; color: #382e29; font-size: 16px; line-height: 1.5; }
+.simple-care-header, .simple-care-nav, .simple-care-content, .simple-care-footer { width: min(1180px, 100%); margin-inline: auto; padding-inline: 32px; }
 .simple-care-header { min-height: 84px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
 .simple-care-brand { display: flex; align-items: center; gap: 9px; color: #123f32; background: none; border: 0; padding: 8px 0; min-height: 44px; cursor: pointer; }
 .simple-care-brand-logo { width: 44px; height: 44px; flex: none; object-fit: contain; }
 .simple-care-brand-copy { display: grid; justify-items: start; gap: 2px; }
 .simple-care-brand-name { font: 700 26px/1 var(--font-sora), sans-serif; letter-spacing: -1px; }
-.simple-care-brand-tagline { font: 600 10px/1.25 var(--font-inter), sans-serif; letter-spacing: .02em; color: #657469; }
+.simple-care-brand-tagline { font: 500 12px/1.25 var(--font-inter), sans-serif; letter-spacing: .01em; color: #6f6056; }
 .simple-care-switches { display: flex; align-items: center; gap: 12px; }
 .simple-care-switches > button, .simple-care-role-trigger, .doctor-note-review > .family-workspace-heading select { min-height: 44px; border: 1px solid #c6d0c3; border-radius: 8px; padding: 8px 12px; color: #183f32; background: transparent; font: inherit; font-size: 14px; cursor: pointer; }
 .simple-care-role-switcher { position: relative; }
@@ -23,18 +23,17 @@
 .simple-care-nav :is(a, button) { min-height: 50px; border: 0; border-bottom: 3px solid transparent; background: none; color: #5e7065; padding: 10px 0; font: 600 15px var(--font-inter), sans-serif; cursor: pointer; }
 .simple-care-nav :is(a, button)[aria-current='page'] { border-bottom-color: #1b513f; color: #123f32; }
 .simple-care-content { padding-block: 24px 10px; }
-.simple-care-app :is(button, input, textarea, select, summary):focus-visible { outline: 2px solid #35765d; outline-offset: 3px; }
-.simple-care-app .secondary-button { min-height: 44px; font-size: 14px; box-shadow: none; background: #fff; }
-.simple-care-app .primary-button { min-height: 44px; background: #174c3b; color: #fff; border-color: #174c3b; }
-.simple-care-app button:disabled { opacity: .5; cursor: not-allowed; }
-.simple-care-footer { display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start; padding-block: 10px 14px; color: #657469; border-top: 1px solid #dce1d8; font-size: 12px; }
+.simple-care-app .secondary-button { min-height: 48px; box-shadow: none; color: #382e29; background: #fffdf9; border-color: #cbbcad; }
+.simple-care-app .primary-button { min-height: 48px; background: #b9472c; color: #fffaf5; border-color: #b9472c; }
+.simple-care-app button:disabled { opacity: .55; cursor: not-allowed; }
+.simple-care-footer { display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start; padding-block: 10px 14px; color: #6f6056; border-top: 1px solid #e6ddd1; font-size: 14px; }
 .simple-care-footer > span { padding-block: 14px; }
 .simple-care-footer details { max-width: 530px; }
 .simple-care-footer summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
 .simple-care-footer p { margin: 0; line-height: 1.6; }
-.care-note-meta { color: #5e7065; font-size: 14px; line-height: 1.6; margin: -10px 0 26px; }
+.care-note-meta { color: #6f6056; font-size: 14px; line-height: 1.6; margin: -10px 0 26px; }
 .care-note-fields { margin: 0 0 20px; display: grid; gap: 20px; }
-.care-note-fields dt { color: #52675c; font-size: 13px; margin-bottom: 6px; font-weight: 600; }
+.care-note-fields dt { color: #6f6056; font-size: 14px; margin-bottom: 6px; font-weight: 600; }
 .care-note-fields dd { margin: 0; font-size: 16px; line-height: 1.65; white-space: pre-wrap; overflow-wrap: anywhere; }
 .simple-care-note { max-width: 850px; }
 .simple-care-content .conversation-preparation .preparation-fields { grid-template-columns: 1fr; }
@@ -59,8 +58,9 @@
 .simple-workspace-return button { min-height: 44px; background: none; border: 0; font: inherit; color: #123f32; cursor: pointer; }
 .simple-care-brand, .simple-care-nav a, .family-tool-buttons a, .care-home-shortcut { text-decoration: none; }
 .simple-care-nav a { display: flex; align-items: center; justify-content: center; }
-.simple-care-nav-icon, .simple-care-nav-short-label { display: none; }
-.care-save-error { width: min(1108px, calc(100% - 36px)); margin: 8px auto 20px; color: #813d24; font-size: 13px; }
+.simple-care-nav-short-label { display: none; }
+.simple-care-nav-icon { display: block; width: 18px; height: 18px; flex: none; }
+.care-save-error { position: sticky; bottom: 12px; z-index: 40; width: min(1108px, calc(100% - 32px)); margin: 8px auto 20px; padding: 12px 16px; border: 1px solid #f0c9c4; border-radius: 14px; color: #a3271f; background: #fdeceb; font-size: 14px; font-weight: 600; line-height: 1.45; box-shadow: 0 6px 20px #664b301a; }
 .simple-care-app .care-report-page { border: 0; margin: 0; padding: 0; }
 .care-report-date { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; font-size: 14px; }
 .care-report-date input { min-height: 44px; padding: 8px 12px; border: 1px solid #cfc1b3; border-radius: 11px; font: inherit; }
@@ -83,10 +83,10 @@
   .simple-care-role-trigger > svg { transition: none; }
 }
 @media (max-width: 700px) {
-  .simple-care-header, .simple-care-nav, .simple-care-content, .simple-care-footer { padding-inline: 18px; }
+  .simple-care-header, .simple-care-nav, .simple-care-content, .simple-care-footer { padding-inline: 16px; }
   .simple-care-header { min-height: 74px; gap: 6px 10px; flex-wrap: wrap; padding-block: 8px; }
-  .simple-care-brand-name { font-size: 20px; letter-spacing: -.7px; }
-  .simple-care-brand-tagline { max-width: 138px; font-size: 8px; }
+  .simple-care-brand-name { font-size: 22px; letter-spacing: -.7px; }
+  .simple-care-brand-tagline { display: none; }
   .simple-care-brand-logo { width: 36px; height: 36px; }
   .simple-care-switches { gap: 6px; }
   .simple-care-switches > button, .simple-care-role-trigger { padding-inline: 8px; font-size: 13px; }
@@ -96,6 +96,7 @@
   .simple-care-footer { gap: 0 15px; }
   .simple-care-footer > span { padding-block: 8px; }
   .simple-care-footer summary { min-height: 44px; }
+  .care-save-error { bottom: calc(84px + env(safe-area-inset-bottom)); }
   .doctor-review-grid { grid-template-columns: 1fr; gap: 8px; }
   .doctor-approval { grid-template-columns: 1fr; gap: 20px; }
   .doctor-approval button { width: 100%; }

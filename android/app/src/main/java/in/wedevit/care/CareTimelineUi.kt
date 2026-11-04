@@ -107,61 +107,62 @@ private fun timelineFilterLabel(f: TimelineFilter, t: (String, String) -> String
     fun dateText(e: TimelineEvent) = date(e.epoch) + if (e.dateIsFileDate) t(" (date added)", " (जोड़ने की तारीख़)") else ""
     fun description(e: TimelineEvent) = listOf(dateText(e), timelineHeadline(e, t), t("From: ", "स्रोत: ") + timelineSource(e, t)).joinToString(". ")
 
-    LazyColumn(Modifier.fillMaxSize().testTag("care-timeline"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    LazyColumn(Modifier.fillMaxSize().testTag("care-timeline"), contentPadding = PaddingValues(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onClose, modifier = Modifier.size(48.dp)) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Back to documents", "कागज़ात पर वापस")) }
             Column(Modifier.weight(1f)) { Heading(t("Care timeline", "देखभाल की समय-रेखा"), 28) }
             // Where the dates come from sits behind this button instead of a paragraph under the list.
             IconButton(onClick = { about = !about }, modifier = Modifier.size(48.dp).testTag("timeline-about")) { Icon(Icons.Outlined.Info, t("Where these dates come from", "ये तारीख़ें कहाँ से हैं"), tint = DoctorAccent) }
         } }
-        if (about) item { Surface(shape = RoundedCornerShape(14.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("timeline-about-text")) {
-            Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text(t("Dates come from reports you added, Calendar days and results you copied. A Calendar day marks a day you noted; it does not confirm a treatment was given. Everything stays on this phone.", "तारीख़ें आपकी जोड़ी रिपोर्टों, कैलेंडर के दिनों और कॉपी किए नतीजों से हैं। कैलेंडर का दिन आपका नोट किया दिन है; इससे इलाज दिए जाने की पुष्टि नहीं होती। सब कुछ इसी फ़ोन पर रहता है।"), style = MaterialTheme.typography.bodySmall, color = DoctorCardSub)
-                if (shown.any { it.dateIsFileDate && it.isFile }) Text(t("(date added): Report date not recorded. This is the day the file was added.", "(जोड़ने की तारीख़): रिपोर्ट की तारीख़ दर्ज नहीं। यह फ़ाइल जोड़ने का दिन है।"), style = MaterialTheme.typography.bodySmall, color = DoctorCardSub, modifier = Modifier.testTag("timeline-date-footnote"))
+        if (about) item { Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("timeline-about-text")) {
+            Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(t("Dates come from reports you added, Calendar days and results you copied. A Calendar day marks a day you noted; it does not confirm a treatment was given. Everything stays on this phone.", "तारीख़ें आपकी जोड़ी रिपोर्टों, कैलेंडर के दिनों और कॉपी किए नतीजों से हैं। कैलेंडर का दिन आपका नोट किया दिन है; इससे इलाज दिए जाने की पुष्टि नहीं होती। सब कुछ इसी फ़ोन पर रहता है।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
+                if (shown.any { it.dateIsFileDate && it.isFile }) Text(t("(date added): Report date not recorded. This is the day the file was added.", "(जोड़ने की तारीख़): रिपोर्ट की तारीख़ दर्ज नहीं। यह फ़ाइल जोड़ने का दिन है।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub, modifier = Modifier.testTag("timeline-date-footnote"))
             }
         } }
-        if (vm.demoMode) item { Surface(shape = RoundedCornerShape(14.dp), color = SaharaSoftGold, modifier = Modifier.fillMaxWidth()) {
-            Row(Modifier.padding(horizontal = 12.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+        if (vm.demoMode) item { Surface(shape = RoundedCornerShape(20.dp), color = SaharaSoftGold, modifier = Modifier.fillMaxWidth()) {
+            Row(Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.Info, null, Modifier.size(18.dp), tint = DoctorAccent); Spacer(Modifier.width(8.dp))
-                Text(t("Practice record: these dates are sample data, not a real person's treatment.", "अभ्यास रिकॉर्ड: ये तारीख़ें नमूना हैं, किसी असली व्यक्ति का इलाज नहीं।"), fontSize = 13.sp, color = DoctorCardInk)
+                Text(t("Practice record: these dates are sample data, not a real person's treatment.", "अभ्यास रिकॉर्ड: ये तारीख़ें नमूना हैं, किसी असली व्यक्ति का इलाज नहीं।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardInk)
             }
         } }
-        item { Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text(t("At a glance", "एक नज़र में"), fontWeight = FontWeight.SemiBold, fontSize = 17.sp, color = DoctorCardInk, modifier = Modifier.a11yHeading())
+        item { Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            SectionTitle(t("At a glance", "एक नज़र में"))
             val tiles = listOf(
                 GlanceTile(t("Last chemotherapy", "आख़िरी कीमो"), summary.chemo, "chemo", Icons.Default.Vaccines, Peach),
                 GlanceTile(t("Last radiotherapy", "आख़िरी रेडियोथेरेपी"), summary.radio, "radio", Icons.Default.Healing, SaharaLavender),
                 GlanceTile(t("Last scan", "आख़िरी स्कैन"), summary.scan, "scan", Icons.Default.DocumentScanner, SaharaSoftBlue),
                 GlanceTile(t("Last biopsy or histopathology", "आख़िरी बायोप्सी या हिस्टोपैथोलॉजी"), summary.biopsy, "biopsy", Icons.Default.Science, Mint),
             )
-            tiles.chunked(2).forEach { pair -> Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            tiles.chunked(2).forEach { pair -> Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 pair.forEach { tile ->
                     val event = tile.event
                     val value = event?.let { dateText(it) } ?: t("Not recorded", "दर्ज नहीं")
                     val source = event?.let { t("From: ", "स्रोत: ") + timelineSource(it, t) }
                     val tappable = event != null && canOpen(event)
-                    Surface(shape = RoundedCornerShape(18.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline),
+                    Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline),
                         modifier = Modifier.weight(1f).fillMaxHeight().then(if (tappable) Modifier.clickable { open(event!!) } else Modifier)
                             .semantics(mergeDescendants = true) { contentDescription = listOfNotNull(tile.label, value, source).joinToString(". ") }.testTag("timeline-summary-${tile.tag}")) {
-                        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            Surface(shape = CircleShape, color = tile.tint) { Icon(tile.icon, null, Modifier.padding(7.dp).size(18.dp), tint = DoctorAccent) }
-                            Text(tile.label, fontSize = 12.sp, color = DoctorCardSub, maxLines = 2)
-                            Text(value, fontWeight = FontWeight.Bold, fontSize = 15.sp, color = if (event == null) DoctorCardSub else DoctorCardInk)
-                            if (source != null) Text(source, fontSize = 11.sp, color = if (tappable) RustText else DoctorCardSub, maxLines = 1)
+                        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            Surface(shape = CircleShape, color = tile.tint) { Icon(tile.icon, null, Modifier.padding(8.dp).size(18.dp), tint = DoctorAccent) }
+                            Spacer(Modifier.height(4.dp))
+                            Text(tile.label, fontSize = 14.sp, lineHeight = 18.sp, color = DoctorCardSub, maxLines = 2)
+                            Text(value, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = if (event == null) DoctorCardSub else DoctorCardInk)
+                            if (source != null) Text(source, fontSize = 14.sp, color = if (tappable) RustText else DoctorCardSub, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
                         }
                     }
                 }
             } }
         } }
         item { Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            TimelineFilter.entries.forEach { option -> FilterChip(selected = filter == option, onClick = { filterName = option.name }, label = { Text(timelineFilterLabel(option, t)) }, modifier = Modifier.heightIn(min = 48.dp).testTag("timeline-filter-${option.name}")) }
+            TimelineFilter.entries.forEach { option -> FilterChip(selected = filter == option, onClick = { filterName = option.name }, label = { Text(timelineFilterLabel(option, t)) }, shape = RoundedCornerShape(50), modifier = Modifier.heightIn(min = 48.dp).testTag("timeline-filter-${option.name}")) }
         } }
         if (shown.isEmpty()) item { SurfaceCard {
-            Icon(Icons.Default.Timeline, null, Modifier.size(34.dp), tint = Rust)
-            Spacer(Modifier.height(8.dp))
-            Text(if (all.isEmpty()) t("Nothing on the timeline yet", "समय-रेखा में अभी कुछ नहीं") else t("Nothing here", "यहाँ कुछ नहीं"), fontSize = 20.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
-            Text(if (all.isEmpty()) t("Add reports, lab results and chemo or radiotherapy days. They appear here with where they came from.", "रिपोर्टें, जाँच के नतीजे और कीमो या रेडियोथेरेपी के दिन जोड़ें। वे यहाँ अपने स्रोत के साथ दिखेंगे।") else t("Try another filter.", "कोई और फ़िल्टर चुनें।"), style = MaterialTheme.typography.bodyMedium)
-            if (all.isNotEmpty()) TextButton(onClick = { filterName = TimelineFilter.ALL.name }) { Text(t("Show all", "सब दिखाएँ")) }
+            Surface(shape = CircleShape, color = SaharaApricot) { Icon(Icons.Default.Timeline, null, Modifier.padding(12.dp).size(28.dp), tint = DoctorAccent) }
+            Spacer(Modifier.height(12.dp))
+            Text(if (all.isEmpty()) t("Nothing on the timeline yet", "समय-रेखा में अभी कुछ नहीं") else t("Nothing here", "यहाँ कुछ नहीं"), fontSize = 20.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, color = DoctorCardInk)
+            Text(if (all.isEmpty()) t("Add reports, lab results and chemo or radiotherapy days. They appear here with where they came from.", "रिपोर्टें, जाँच के नतीजे और कीमो या रेडियोथेरेपी के दिन जोड़ें। वे यहाँ अपने स्रोत के साथ दिखेंगे।") else t("Try another filter.", "कोई और फ़िल्टर चुनें।"), Modifier.padding(top = 4.dp), fontSize = 16.sp, color = DoctorCardSub)
+            if (all.isNotEmpty()) TextButton(onClick = { filterName = TimelineFilter.ALL.name }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Show all", "सब दिखाएँ")) }
         } }
         items(months, key = { "month-${it.first}" }) { (month, events) ->
             val key = month.toString(); val newest = months.first().first == month
@@ -169,10 +170,12 @@ private fun timelineFilterLabel(f: TimelineFilter, t: (String, String) -> String
             val expandedAll = key in showAllMonths.split(',')
             val visible = if (expandedAll) events else events.take(5)
             Column(Modifier.fillMaxWidth().animateItem()) {
-                Surface(onClick = { toggled = flip(toggled, key) }, shape = RoundedCornerShape(14.dp), color = SaharaSoftGold, border = BorderStroke(1.dp, DoctorHairline),
+                Surface(onClick = { toggled = flip(toggled, key) }, shape = RoundedCornerShape(50), color = SaharaSoftGold,
                     modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).a11yHeading().testTag("timeline-month-$key")) {
-                    Row(Modifier.padding(horizontal = 14.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Text(month.atDay(1).format(monthFormat) + " · " + events.size, Modifier.weight(1f), fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
+                    Row(Modifier.padding(start = 16.dp, end = 12.dp, top = 4.dp, bottom = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Text(month.atDay(1).format(monthFormat), Modifier.weight(1f), fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
+                        Surface(shape = CircleShape, color = Paper) { Text("${events.size}", Modifier.padding(horizontal = 10.dp, vertical = 2.dp), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk) }
+                        Spacer(Modifier.width(8.dp))
                         Icon(if (isOpen) Icons.Default.ExpandLess else Icons.Default.ExpandMore, if (isOpen) t("Hide this month", "यह महीना छिपाएँ") else t("Show this month", "यह महीना दिखाएँ"), tint = DoctorCardInk)
                     }
                 }
@@ -182,25 +185,25 @@ private fun timelineFilterLabel(f: TimelineFilter, t: (String, String) -> String
                             val tappable = canOpen(e)
                             Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
                                 Column(Modifier.width(36.dp).fillMaxHeight(), horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Surface(shape = CircleShape, color = timelineColor(e.kind), modifier = Modifier.size(28.dp)) { Box(contentAlignment = Alignment.Center) { Icon(timelineIcon(e.kind), null, Modifier.size(16.dp), tint = Ink) } }
+                                    Surface(shape = CircleShape, color = timelineColor(e.kind), modifier = Modifier.size(32.dp)) { Box(contentAlignment = Alignment.Center) { Icon(timelineIcon(e.kind), null, Modifier.size(18.dp), tint = DoctorCardInk) } }
                                     Box(Modifier.width(2.dp).weight(1f).background(DoctorHairline))
                                 }
                                 // A row that opens something sits on a light card with an arrow, so it reads as tappable.
                                 Surface(modifier = Modifier.weight(1f).padding(start = 6.dp, bottom = 8.dp).heightIn(min = 48.dp).semantics(mergeDescendants = true) { contentDescription = description(e) }.testTag("timeline-event-${e.id}"),
-                                    onClick = { open(e) }, enabled = tappable, shape = RoundedCornerShape(14.dp), color = if (tappable) Paper else Color.Transparent,
+                                    onClick = { open(e) }, enabled = tappable, shape = RoundedCornerShape(20.dp), color = if (tappable) Paper else Color.Transparent,
                                     border = if (tappable) BorderStroke(1.dp, DoctorHairline) else null) {
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                     Column(Modifier.weight(1f).padding(start = 12.dp, top = 8.dp, bottom = 8.dp, end = 4.dp)) {
                                         Row(verticalAlignment = Alignment.CenterVertically) {
-                                            Text(shortDate(e.epoch), style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold, color = RustText)
-                                            if (e.dateIsFileDate) Text(" " + t("(date added)", "(जोड़ने की तारीख़)"), style = MaterialTheme.typography.labelSmall, color = DoctorCardSub)
+                                            Text(shortDate(e.epoch), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = RustText)
+                                            if (e.dateIsFileDate) Text(" " + t("(date added)", "(जोड़ने की तारीख़)"), fontSize = 14.sp, color = DoctorCardSub)
                                         }
-                                        Text(timelineHeadline(e, t), fontWeight = FontWeight.SemiBold, fontSize = 15.sp, color = DoctorCardInk, maxLines = 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
-                                        Text(timelineSource(e, t), style = MaterialTheme.typography.bodySmall, color = DoctorCardSub, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+                                        Text(timelineHeadline(e, t), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk, maxLines = 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+                                        Text(timelineSource(e, t), fontSize = 14.sp, color = DoctorCardSub, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
                                     }
                                     if (tappable) Row(Modifier.padding(end = 10.dp), verticalAlignment = Alignment.CenterVertically) {
-                                        Text(t("View", "देखें"), fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = RustText)
-                                        Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, Modifier.size(20.dp), tint = Rust)
+                                        Text(t("View", "देखें"), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = RustText)
+                                        Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, Modifier.size(20.dp), tint = RustText)
                                     }
                                     }
                                 }

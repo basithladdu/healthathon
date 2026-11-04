@@ -29,14 +29,14 @@ private fun overviewValue(value:String) = value.takeIf {it.isNotBlank()} ?: "Not
     val earlierDiscussions=overview.history.filter {it.id!=discussion?.id}
     Column(Modifier.fillMaxWidth().testTag("overview-content"),verticalArrangement=Arrangement.spacedBy(16.dp)) {
         Surface(color=SaharaSoftBlue,shape=RoundedCornerShape(20.dp)) {
-            Column(Modifier.padding(18.dp),verticalArrangement=Arrangement.spacedBy(8.dp)) {
+            Column(Modifier.fillMaxWidth().padding(16.dp),verticalArrangement=Arrangement.spacedBy(8.dp)) {
                 Text(t("Handover at a glance", "एक नज़र में हैंडओवर"),fontSize=19.sp,fontWeight=FontWeight.Medium, fontFamily = SaharaTitleFont)
                 Column(Modifier.testTag("overview-previous-professional"),verticalArrangement=Arrangement.spacedBy(4.dp)) {
                     Text(t("Previous care professional", "पिछले देखभाल पेशेवर"),style=MaterialTheme.typography.labelMedium,color=DoctorCardSub)
                     Text(overview.previousProfessional?.name ?: t("Name not recorded", "नाम दर्ज नहीं"),fontWeight=FontWeight.Medium,fontSize=18.sp, fontFamily = SaharaTitleFont)
                 }
                 Text(t("Clinical assessment: ${overview.clinicalAssessment}", "क्लिनिकल आकलन: ${overview.clinicalAssessment}"),fontWeight=FontWeight.Medium,modifier=Modifier.testTag("overview-clinical-assessment"))
-                Column(Modifier.testTag("overview-handover-toggle"), verticalArrangement=Arrangement.spacedBy(4.dp)) {Text(overview.previousProfessional?.role ?: t("Professional role not recorded", "पेशेवर भूमिका दर्ज नहीं"));Text(overview.previousProfessional?.disclosure ?: t("No previous professional is documented.", "कोई पिछला पेशेवर दर्ज नहीं।"),style=MaterialTheme.typography.bodySmall)}
+                Column(Modifier.testTag("overview-handover-toggle"), verticalArrangement=Arrangement.spacedBy(4.dp)) {Text(overview.previousProfessional?.role ?: t("Professional role not recorded", "पेशेवर भूमिका दर्ज नहीं"));Text(overview.previousProfessional?.disclosure ?: t("No previous professional is documented.", "कोई पिछला पेशेवर दर्ज नहीं।"),fontSize=14.sp,color=DoctorCardSub)}
                 Column(Modifier.testTag("overview-background-toggle"), verticalArrangement=Arrangement.spacedBy(4.dp)) {Text(t("Background summary", "पृष्ठभूमि का सार"),fontWeight=FontWeight.SemiBold);Text(overview.background,lineHeight=24.sp)}
             }
         }
@@ -45,7 +45,7 @@ private fun overviewValue(value:String) = value.takeIf {it.isNotBlank()} ?: "Not
             val report=overview.latestReport
             OverviewTimeline(t("Last reported update", "पिछला बताया अपडेट"),overviewDate(report?.at),SaharaSoftBlue,"overview-latest-report") {
                 Text(report?.text ?: t("No patient or family update recorded.", "मरीज़ या परिवार का कोई अपडेट दर्ज नहीं।"),lineHeight=24.sp)
-                if(report!=null) Text("${report.source.name.lowercase().replaceFirstChar {it.uppercase()}} report",style=MaterialTheme.typography.bodySmall,color=DoctorAccent)
+                if(report!=null) Text("${report.source.name.lowercase().replaceFirstChar {it.uppercase()}} report",fontSize=14.sp,color=RustText)
                 TextButton(onClick={onSection("Progress")},modifier=Modifier.heightIn(min=48.dp).testTag("overview-progress")) {Text(t("View reported updates", "बताए अपडेट देखें"))}
             }
             OverviewTimeline(t("Last conversation", "पिछली बातचीत"),overviewDate(discussion?.publishedAt),SaharaLavender,"overview-last-discussion") {
@@ -74,7 +74,7 @@ private fun overviewValue(value:String) = value.takeIf {it.isNotBlank()} ?: "Not
         if(earlierDiscussions.isNotEmpty()) {
             Text(t("Earlier discussions (${earlierDiscussions.size})", "पुरानी चर्चाएँ (${earlierDiscussions.size})"),fontWeight=FontWeight.Medium,modifier=Modifier.testTag("overview-history-toggle"), fontFamily = SaharaTitleFont)
             earlierDiscussions.forEach {earlier ->
-                Surface(color=Paper,shape=RoundedCornerShape(16.dp),border=BorderStroke(1.dp,Ink.copy(alpha=.1f))) {
+                Surface(color=Paper,shape=RoundedCornerShape(20.dp),border=BorderStroke(1.dp,DoctorHairline)) {
                     Column(Modifier.fillMaxWidth().padding(16.dp),verticalArrangement=Arrangement.spacedBy(8.dp)) {
                         Text(overviewDate(earlier.publishedAt),style=MaterialTheme.typography.labelLarge,color=Rust)
                         OverviewDiscussionMeta(earlier)
@@ -88,27 +88,27 @@ private fun overviewValue(value:String) = value.takeIf {it.isNotBlank()} ?: "Not
 }
 @Composable private fun OverviewLabel(label:String,value:String) {
     Column(verticalArrangement=Arrangement.spacedBy(4.dp)) {
-        Text(label,style=MaterialTheme.typography.labelLarge,color=Ink.copy(alpha=.75f))
+        Text(label,style=MaterialTheme.typography.labelLarge,color=DoctorCardSub)
         Text(value,lineHeight=24.sp)
     }
 }
 @Composable private fun OverviewDiscussionMeta(discussion:DoctorOverviewDiscussion) { val t = careText();
     Text(if(discussion.isPublishedPreview) t("Version ${discussion.versionNumber} · not a verified clinical note", "संस्करण ${discussion.versionNumber} · पुष्ट क्लिनिकल नोट नहीं") else t("Earlier discussion · not a verified clinical note", "पुरानी चर्चा · पुष्ट क्लिनिकल नोट नहीं"),style=MaterialTheme.typography.labelMedium,color=DoctorAccent)
-    Text(if(discussion.isPublishedPreview) t("Self-entered reviewer: ", "ख़ुद लिखे समीक्षक: ") + (discussion.reviewerName ?: t("Not recorded", "दर्ज नहीं")) + t(" · identity not verified", " · पहचान पुष्ट नहीं") else t("Discussion author: ", "चर्चा के लेखक: ") + (discussion.reviewerName ?: t("Not recorded", "दर्ज नहीं")),style=MaterialTheme.typography.bodySmall)
-    Text(t("Source: ${discussion.sourceLabel}", "स्रोत: ${discussion.sourceLabel}"),style=MaterialTheme.typography.bodySmall,color=Ink.copy(alpha=.7f))
+    Text(if(discussion.isPublishedPreview) t("Self-entered reviewer: ", "ख़ुद लिखे समीक्षक: ") + (discussion.reviewerName ?: t("Not recorded", "दर्ज नहीं")) + t(" · identity not verified", " · पहचान पुष्ट नहीं") else t("Discussion author: ", "चर्चा के लेखक: ") + (discussion.reviewerName ?: t("Not recorded", "दर्ज नहीं")),fontSize=14.sp,color=DoctorCardSub)
+    Text(t("Source: ${discussion.sourceLabel}", "स्रोत: ${discussion.sourceLabel}"),fontSize=14.sp,color=DoctorCardSub)
 }
 @Composable private fun OverviewSource(discussion:DoctorOverviewDiscussion) { val t = careText();
     if(discussion.sourceText.isNotBlank()) {
         Text(t("Original source", "मूल स्रोत"),fontWeight=FontWeight.Medium,modifier=Modifier.testTag("overview-source-${discussion.id}"), fontFamily = SaharaTitleFont)
         Text(discussion.sourceText,lineHeight=24.sp,modifier=Modifier.testTag("overview-source-text-${discussion.id}"))
-    } else Text(t("Original source not recorded.", "मूल स्रोत दर्ज नहीं।"),style=MaterialTheme.typography.bodySmall)
+    } else Text(t("Original source not recorded.", "मूल स्रोत दर्ज नहीं।"),fontSize=14.sp,color=DoctorCardSub)
 }
 @Composable private fun OverviewTimeline(title:String,date:String,tint:Color,tag:String,content:@Composable ColumnScope.()->Unit) {
     Column(Modifier.fillMaxWidth().testTag(tag).drawBehind {
-        val x=5.dp.toPx();drawLine(Rust.copy(alpha=.2f),Offset(x,12.dp.toPx()),Offset(x,size.height),strokeWidth=1.dp.toPx());drawCircle(Rust,radius=4.dp.toPx(),center=Offset(x,12.dp.toPx()))
+        val x=5.dp.toPx();drawLine(DoctorHairline,Offset(x,12.dp.toPx()),Offset(x,size.height),strokeWidth=1.dp.toPx());drawCircle(Rust,radius=4.dp.toPx(),center=Offset(x,12.dp.toPx()))
     }.padding(start=24.dp,bottom=18.dp),verticalArrangement=Arrangement.spacedBy(9.dp)) {
-        Surface(color=tint,shape=RoundedCornerShape(10.dp)) {Text(date,Modifier.padding(horizontal=10.dp,vertical=5.dp),style=MaterialTheme.typography.labelMedium,color=Ink)}
-        Surface(color=Paper,shape=RoundedCornerShape(18.dp),border=BorderStroke(1.dp,Ink.copy(alpha=.08f))) {
+        Surface(color=tint,shape=RoundedCornerShape(50)) {Text(date,Modifier.padding(horizontal=10.dp,vertical=4.dp),style=MaterialTheme.typography.labelMedium,color=Ink)}
+        Surface(color=Paper,shape=RoundedCornerShape(20.dp),border=BorderStroke(1.dp,DoctorHairline)) {
             Column(Modifier.fillMaxWidth().padding(16.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {Text(title,fontWeight=FontWeight.Medium,fontSize=18.sp, fontFamily = SaharaTitleFont);content()}
         }
     }

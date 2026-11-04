@@ -40,6 +40,7 @@ object PainBands {
 data class SymptomComparison(val baseline: CareItem, val previous: CareItem, val difference: Int)
 
 object SymptomDiaryRules {
+    const val WELLBEING_SYMPTOM = "Overall well-being"
     const val SAVE_CONFLICT = "This note changed or was removed. Your answers are still here. Close this form and reopen the current note before saving."
     const val PERSONAL_SCALE = "sahara-personal-nrs-v1"
     const val WELLBEING_SCALE = "sahara-personal-wellbeing-nrs-v1"

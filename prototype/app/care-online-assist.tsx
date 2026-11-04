@@ -79,7 +79,7 @@ export function CareOnlineConversationTools({ source, identity, onAppend, token 
     finally { if (active.current) setBusy(false); }
   }
   return <details className="care-online-tools"><summary>Record or transcribe a conversation turn</summary>
-    <p className="care-online-hint">Record one person at a time, up to 30 seconds. Check the words and identify the speaker before adding them.</p>
+    <p className="care-online-hint">One person at a time, up to 30 seconds.</p>
     <Language label="Spoken language" value={language} onChange={setLanguage} disabled={busy || recording || starting} />
     <label className="care-online-check"><input type="checkbox" checked={recordingConsent} disabled={busy || recording || starting} onChange={(event) => setRecordingConsent(event.target.checked)} />Everyone here agrees to recording this turn.</label>
     <div className="care-online-row"><button type="button" className="secondary" disabled={!recordingConsent || starting || busy || Boolean(file)} onClick={recording ? () => recorder.current?.stop() : start}>{starting ? 'Opening microphone…' : recording ? 'Stop recording' : 'Record a turn'}</button><label className="care-online-file">Choose audio<input type="file" accept="audio/wav,audio/x-wav,audio/mp4,audio/m4a,audio/webm,audio/ogg,audio/mpeg" disabled={!recordingConsent || busy || recording || starting} onChange={(event) => { const next = event.target.files?.[0]; if (next && next.size > 2 * 1024 * 1024) setMessage('Choose audio under 2 MB.'); else reset(next); event.target.value = ''; }} /></label></div>

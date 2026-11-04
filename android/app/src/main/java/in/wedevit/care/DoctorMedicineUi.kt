@@ -8,6 +8,7 @@ import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -40,28 +41,30 @@ fun doctorMedicinePresentation(dose:SampleMedicineDose,asOf:Long,zone:ZoneId):Do
 }
 
 @Composable fun DoctorMedicineContent(doses:List<SampleMedicineDose>,asOf:Long,zone:ZoneId=ZoneId.systemDefault()) { val t = careText();
-    Column(Modifier.fillMaxWidth().testTag("doctor-medicine-content"),verticalArrangement=Arrangement.spacedBy(14.dp)) {
-        Text(t("Medicine reports", "दवा की सूचनाएँ"),fontSize=22.sp,fontWeight=FontWeight.Medium, fontFamily = SaharaTitleFont)
-        Text(t("Practice data, not a real patient's reports", "उदाहरण डेटा, असली मरीज़ नहीं"),fontSize=14.sp,lineHeight=20.sp,fontWeight=FontWeight.Medium,color=Rust)
-        Text("As of ${DateTimeFormatter.ofPattern("dd MMM yyyy · h:mm a",Locale.ENGLISH).withZone(zone).format(Instant.ofEpochMilli(asOf))} · ${zone.id}",fontSize=14.sp,lineHeight=20.sp)
-        if(doses.isEmpty()) Text(t("No medicine reports recorded.", "दवा की कोई सूचना दर्ज नहीं।"))
-        doses.forEachIndexed {index,dose ->
+    Column(Modifier.fillMaxWidth().testTag("doctor-medicine-content"),verticalArrangement=Arrangement.spacedBy(12.dp)) {
+        Text(t("Medicine reports", "दवा की सूचनाएँ"),Modifier.a11yHeading(),fontSize=22.sp,fontWeight=FontWeight.Medium, fontFamily = SaharaTitleFont,color=DoctorCardInk)
+        Surface(color=DoctorStatusWarnBg,shape=RoundedCornerShape(50)) {Text(t("Practice data, not a real patient's reports", "उदाहरण डेटा, असली मरीज़ नहीं"),Modifier.padding(horizontal=12.dp,vertical=6.dp),fontSize=14.sp,lineHeight=20.sp,fontWeight=FontWeight.Medium,color=DoctorStatusWarn)}
+        Text("As of ${DateTimeFormatter.ofPattern("dd MMM yyyy · h:mm a",Locale.ENGLISH).withZone(zone).format(Instant.ofEpochMilli(asOf))} · ${zone.id}",fontSize=14.sp,lineHeight=20.sp,color=DoctorCardSub)
+        if(doses.isEmpty()) Surface(color=Paper,shape=RoundedCornerShape(20.dp),border=BorderStroke(1.dp,DoctorHairline),modifier=Modifier.fillMaxWidth()) {
+            Row(Modifier.padding(16.dp),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(12.dp)) {Icon(Icons.Outlined.Schedule,null,tint=Rust,modifier=Modifier.size(24.dp));Text(t("No medicine reports recorded.", "दवा की कोई सूचना दर्ज नहीं।"),fontSize=16.sp,color=DoctorCardInk)}
+        }
+        doses.forEach {dose ->
             val view=doctorMedicinePresentation(dose,asOf,zone)
-            val accent=when(index%3) {0->SaharaApricot;1->SaharaSoftBlue;else->SaharaLavender}
-            Surface(color=Paper,shape=RoundedCornerShape(24.dp),border=BorderStroke(1.dp,Ink.copy(alpha=.1f)),modifier=Modifier.fillMaxWidth().testTag("doctor-medicine-${dose.id}")) {
-                Column(Modifier.padding(18.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {
-                    Text(dose.medicineLabel,fontSize=18.sp,fontWeight=FontWeight.SemiBold,lineHeight=25.sp)
-                    Surface(color=accent,shape=RoundedCornerShape(12.dp)) {
-                        Row(Modifier.padding(horizontal=12.dp,vertical=9.dp),horizontalArrangement=Arrangement.spacedBy(8.dp)) {
-                            Icon(if(view.status=="Taken reported") Icons.Outlined.CheckCircle else Icons.Outlined.Schedule,null,tint=Rust,modifier=Modifier.size(20.dp))
-                            Text(view.status,fontSize=14.sp,fontWeight=FontWeight.SemiBold)
+            val good=view.status=="Taken reported"
+            Surface(color=Paper,shape=RoundedCornerShape(20.dp),border=BorderStroke(1.dp,DoctorHairline),modifier=Modifier.fillMaxWidth().testTag("doctor-medicine-${dose.id}")) {
+                Column(Modifier.padding(16.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {
+                    Text(dose.medicineLabel,fontSize=18.sp,fontWeight=FontWeight.SemiBold,lineHeight=25.sp,color=DoctorCardInk)
+                    Surface(color=if(good) DoctorStatusGoodBg else DoctorStatusWarnBg,shape=RoundedCornerShape(50)) {
+                        Row(Modifier.padding(horizontal=12.dp,vertical=6.dp),horizontalArrangement=Arrangement.spacedBy(8.dp),verticalAlignment=Alignment.CenterVertically) {
+                            Icon(if(good) Icons.Outlined.CheckCircle else Icons.Outlined.Schedule,null,tint=if(good) DoctorStatusGood else DoctorStatusWarn,modifier=Modifier.size(18.dp))
+                            Text(view.status,fontSize=14.sp,fontWeight=FontWeight.SemiBold,color=if(good) DoctorStatusGood else DoctorStatusWarn)
                         }
                     }
                     MedicineTime("Planned",view.planned)
                     MedicineTime(t("Reported taken", "लेने का बताया समय"),view.taken)
                     MedicineTime("Logged",view.logged)
-                    HorizontalDivider(color=Ink.copy(alpha=.1f))
-                    Text(t("Reporter: ${view.reporter}", "बताने वाले: ${view.reporter}"),fontSize=14.sp,color=Ink.copy(alpha=.75f))
+                    HorizontalDivider(color=DoctorHairline)
+                    Text(t("Reporter: ${view.reporter}", "बताने वाले: ${view.reporter}"),fontSize=14.sp,color=DoctorCardSub)
                 }
             }
         }
@@ -69,8 +72,8 @@ fun doctorMedicinePresentation(dose:SampleMedicineDose,asOf:Long,zone:ZoneId):Do
 }
 
 @Composable private fun MedicineTime(label:String,value:String) {
-    Column(Modifier.fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(3.dp)) {
-        Text(label,fontSize=14.sp,color=Ink.copy(alpha=.7f))
-        Text(value,fontSize=16.sp,lineHeight=23.sp,fontWeight=FontWeight.Medium)
+    Column(Modifier.fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(2.dp)) {
+        Text(label,fontSize=14.sp,color=DoctorCardSub)
+        Text(value,fontSize=16.sp,lineHeight=23.sp,fontWeight=FontWeight.Medium,color=DoctorCardInk)
     }
 }

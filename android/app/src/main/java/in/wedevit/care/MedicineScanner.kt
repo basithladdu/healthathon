@@ -22,11 +22,11 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -148,8 +148,9 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
             contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 28.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            item { ScannerHeader(t("Scan prescription", "पर्चा स्कैन करें"), "1 / 2") { cleanAndClose() } }
-            item { Text(t("Add a clear prescription. Read and check the words before saving. Medicine packaging is optional for your own comparison.", "साफ़ पर्चा जोड़ें। सहेजने से पहले शब्द पढ़कर जाँचें। मिलान के लिए दवा के पैकेट की फ़ोटो चाहें तो जोड़ें।")) }
+            // The how-it-works paragraphs sit behind the "?" in the header (less text on screen).
+            item { ScannerHeader(t("Scan prescription", "पर्चा स्कैन करें"), "1 / 2", info = t("Add a clear prescription. Read and check the words before saving. Medicine packaging is optional for your own comparison.", "साफ़ पर्चा जोड़ें। सहेजने से पहले शब्द पढ़कर जाँचें। मिलान के लिए दवा के पैकेट की फ़ोटो चाहें तो जोड़ें।") + "\n\n" +
+                t("Your phone reads the page. It can read printed English letters. You may need to type handwriting yourself. The app does not decide any dose or treatment.", "पढ़ाई आपके फ़ोन पर ही होती है। छपे अंग्रेज़ी अक्षर पढ़े जाते हैं। हाथ की लिखाई आपको ख़ुद लिखनी पड़ सकती है। ऐप ख़ुराक या इलाज तय नहीं करता।")) { cleanAndClose() } }
             item {
                 PhotoSelectionCard(
                     title = t("Prescription pages", "पर्चे के पेज"),
@@ -172,7 +173,7 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
                 PhotoSelectionCard(
                     title = t("Medicine strips or boxes", "दवा के पत्ते या डिब्बे"),
                     subtitle = t("One clear photo per medicine · up to 10", "हर दवा की एक साफ़ फ़ोटो · ज़्यादा से ज़्यादा 10"),
-                    tint = Color(0xFFFFEDD3),
+                    tint = SaharaApricot,
                     uris = medicineUris,
                     chooseLabel = t("Choose photos", "फ़ोटो चुनें"),
                     photographLabel = t("Take photo", "फ़ोटो लें"),
@@ -186,10 +187,9 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
                     onMove = null,
                 )
             }
-            scanError?.let { error -> item { Text(error, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) } }
+            scanError?.let { error -> item { Text(error, color = RustText, fontSize = 15.sp, modifier = Modifier.announce()) } }
             item {
-                Text(t("Your phone reads the page. It can read printed English letters. You may need to type handwriting yourself. The app does not decide any dose or treatment.", "पढ़ाई आपके फ़ोन पर ही होती है। छपे अंग्रेज़ी अक्षर पढ़े जाते हैं। हाथ की लिखाई आपको ख़ुद लिखनी पड़ सकती है। ऐप ख़ुराक या इलाज तय नहीं करता।"), style = MaterialTheme.typography.bodySmall)
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(8.dp))
                 Button(
                     onClick = {
                         scanError = null; phase = MedicineScannerPhase.Scanning
@@ -213,43 +213,48 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
                     },
                     enabled = prescriptionUris.isNotEmpty(),
                     modifier = Modifier.fillMaxWidth().heightIn(min = 54.dp),
-                    shape = RoundedCornerShape(16.dp),
-                ) { Icon(Icons.Default.DocumentScanner, null); Spacer(Modifier.width(8.dp)); Text(t("Read prescription", "पर्चा पढ़ें")) }
-                TextButton(onClick = {
+                    shape = RoundedCornerShape(14.dp),
+                ) { Icon(Icons.Default.DocumentScanner, null); Spacer(Modifier.width(8.dp)); Text(t("Read prescription", "पर्चा पढ़ें"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold) }
+                Spacer(Modifier.height(8.dp))
+                OutlinedButton(onClick = {
                     drafts = listOf(MedicineDraft(newId(), manualMedicine(), false)); warnings = emptyList(); unmatched = emptyList(); unmatchedReviewed = true; phase = MedicineScannerPhase.Review
-                }, modifier = Modifier.fillMaxWidth()) { Text(t("Add one manually", "एक दवा ख़ुद लिखें")) }
-                TextButton(onClick = { cleanAndClose() }, modifier = Modifier.fillMaxWidth()) { Text(t("Cancel", "रद्द करें")) }
+                }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.Edit, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Add one manually", "एक दवा ख़ुद लिखें"), fontSize = 15.sp) }
+                TextButton(onClick = { cleanAndClose() }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Cancel", "रद्द करें"), fontSize = 15.sp) }
             }
         }
 
-        MedicineScannerPhase.Scanning -> Box(Modifier.fillMaxSize().padding(28.dp), contentAlignment = Alignment.Center) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(14.dp)) {
+        MedicineScannerPhase.Scanning -> Box(Modifier.fillMaxSize().padding(24.dp), contentAlignment = Alignment.Center) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 CircularProgressIndicator(color = Rust)
                 Heading(t("Reading prescription", "पर्चा पढ़ रहे हैं"), 26)
                 val value = progress
                 if (value?.stage == MedicineScanStage.PREPARING && value.total > 0) {
-                    Text(t("${value.completed.coerceAtMost(value.total)} of ${value.total}", "${value.completed.coerceAtMost(value.total)} / ${value.total}"))
-                    if (value.fileName.isNotBlank()) Text(value.fileName, style = MaterialTheme.typography.bodySmall)
-                } else Text(t("Reading the selected pages…", "चुने गए पेज पढ़ रहे हैं…"), style = MaterialTheme.typography.bodyMedium)
-                Text(t("Keep this screen open until review appears. You can cancel without changing saved medicines.", "जाँच की सूची आने तक यह स्क्रीन खुली रखें। रोकने से सहेजी दवाएँ नहीं बदलेंगी।"), style = MaterialTheme.typography.bodySmall)
-                OutlinedButton(onClick = { returnToImages() }) { Text(t("Cancel", "रद्द करें")) }
+                    // Progress as a badge.
+                    Surface(shape = RoundedCornerShape(50), color = Mint) { Text(t("${value.completed.coerceAtMost(value.total)} of ${value.total}", "${value.completed.coerceAtMost(value.total)} / ${value.total}"), Modifier.padding(horizontal = 14.dp, vertical = 6.dp), fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk) }
+                    if (value.fileName.isNotBlank()) Text(value.fileName, fontSize = 14.sp, color = DoctorCardSub, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                } else Text(t("Reading the selected pages…", "चुने गए पेज पढ़ रहे हैं…"), fontSize = 16.sp, color = DoctorCardInk)
+                Text(t("Keep this screen open until review appears. You can cancel without changing saved medicines.", "जाँच की सूची आने तक यह स्क्रीन खुली रखें। रोकने से सहेजी दवाएँ नहीं बदलेंगी।"), fontSize = 14.sp, color = DoctorCardSub, textAlign = TextAlign.Center)
+                OutlinedButton(onClick = { returnToImages() }, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Cancel", "रद्द करें"), fontSize = 15.sp) }
             }
         }
 
         MedicineScannerPhase.Review -> LazyColumn(
             Modifier.fillMaxSize().imePadding().testTag("medicine-scanner-review"),
-            contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 28.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
+            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 32.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             item { ScannerHeader(t("Review medicine list", "दवा की सूची जाँचें"), "2 / 2") { returnToImages() } }
-            item { SurfaceCard(Sage) { Text(t("Check before saving", "सहेजने से पहले जाँचें"), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont); Text(t("The phone can read words wrongly. Check each medicine with the prescription and the packet. Sahara does not diagnose, prescribe or suggest treatment.", "पढ़ाई में ग़लती हो सकती है। हर दवा को पर्चे और पैकेट से मिलाएँ। सहारा बीमारी नहीं बताता, दवा नहीं लिखता और इलाज की सलाह नहीं देता।")) } }
+            item { SurfaceCard(Sage) { Row(verticalAlignment = Alignment.Top) {
+                Icon(Icons.Default.FactCheck, null, Modifier.size(22.dp), tint = DoctorCardInk); Spacer(Modifier.width(12.dp))
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) { Text(t("Check before saving", "सहेजने से पहले जाँचें"), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, fontSize = 18.sp, color = DoctorCardInk); Text(t("The phone can read words wrongly. Check each medicine with the prescription and the packet. Sahara does not diagnose, prescribe or suggest treatment.", "पढ़ाई में ग़लती हो सकती है। हर दवा को पर्चे और पैकेट से मिलाएँ। सहारा बीमारी नहीं बताता, दवा नहीं लिखता और इलाज की सलाह नहीं देता।"), fontSize = 15.sp, color = DoctorCardInk) }
+            } } }
             if (prescriptionUris.isNotEmpty()) item { SurfaceCard {
-                Text(t("Original pages", "असली पेज"), fontWeight = FontWeight.SemiBold)
+                Text(t("Original pages", "असली पेज"), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk)
                 prescriptionUris.forEachIndexed { index, uri -> TextButton(onClick = { runCatching {
                     context.startActivity(Intent(Intent.ACTION_VIEW).setDataAndType(Uri.parse(uri), "image/*").addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION))
-                }.onFailure { scanError = t("No image viewer is available. Open this photo in Files to compare it.", "फ़ोटो देखने का ऐप नहीं मिला। मिलाने के लिए यह फ़ोटो Files में खोलें।") } }) { Text(t("View prescription page ${index + 1}", "पर्चे का पेज ${index + 1} देखें")) } }
+                }.onFailure { scanError = t("No image viewer is available. Open this photo in Files to compare it.", "फ़ोटो देखने का ऐप नहीं मिला। मिलाने के लिए यह फ़ोटो Files में खोलें।") } }, modifier = Modifier.heightIn(min = 48.dp)) { Icon(Icons.Default.Image, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("View prescription page ${index + 1}", "पर्चे का पेज ${index + 1} देखें"), fontSize = 15.sp) } }
             } }
-            warnings.forEach { warning -> item(warning) { SurfaceCard(Peach) { Text(warning) } } }
+            warnings.forEach { warning -> item(warning) { SurfaceCard(Peach) { Row(verticalAlignment = Alignment.Top) { Icon(Icons.Default.WarningAmber, null, Modifier.size(20.dp), tint = RustText); Spacer(Modifier.width(12.dp)); Text(warning, fontSize = 15.sp, color = DoctorCardInk) } } } }
             items(drafts.size, key = { drafts[it].id }) { index ->
                 MedicineReviewCard(
                     draft = drafts[index],
@@ -261,8 +266,8 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
             }
             if (unmatched.isNotEmpty()) item {
                 SurfaceCard(Peach) {
-                    Text(run { val n = unmatched.size; if (n == 1) t("1 medicine photo was not matched", "दवा की 1 फ़ोटो नहीं मिली") else t("$n medicine photos were not matched", "दवा की $n फ़ोटो नहीं मिलीं") }, fontWeight = FontWeight.Bold)
-                    Text(run { val photos = unmatched.joinToString { val k = it + 1; t("photo $k", "फ़ोटो $k") }; t("Review $photos. Add any missing medicine manually or leave it out only after checking the original prescription.", "$photos जाँचें। छूटी दवा ख़ुद लिखें, या असली पर्चा देखने के बाद ही उसे छोड़ें।") })
+                    Text(run { val n = unmatched.size; if (n == 1) t("1 medicine photo was not matched", "दवा की 1 फ़ोटो नहीं मिली") else t("$n medicine photos were not matched", "दवा की $n फ़ोटो नहीं मिलीं") }, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk)
+                    Text(fontSize = 15.sp, color = DoctorCardInk, text = run { val photos = unmatched.joinToString { val k = it + 1; t("photo $k", "फ़ोटो $k") }; t("Review $photos. Add any missing medicine manually or leave it out only after checking the original prescription.", "$photos जाँचें। छूटी दवा ख़ुद लिखें, या असली पर्चा देखने के बाद ही उसे छोड़ें।") })
                     unmatched.filter { it in medicineUris.indices }.forEach { index -> TextButton(onClick = { runCatching {
                         context.startActivity(Intent(Intent.ACTION_VIEW).setDataAndType(Uri.parse(medicineUris[index]), "image/*").addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION))
                     }.onFailure { scanError = t("No image viewer is available. Open this photo in Files to compare it.", "फ़ोटो देखने वाला ऐप नहीं मिला। मिलान के लिए यह फ़ोटो Files में खोलें।") } }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("View medicine photo ${index + 1}", "दवा की फ़ोटो ${index + 1} देखें")) } }
@@ -270,11 +275,11 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
                 }
             }
             item {
-                OutlinedButton(onClick = { drafts = drafts + MedicineDraft(newId(), manualMedicine(), false) }, modifier = Modifier.fillMaxWidth()) {
-                    Icon(Icons.Default.Add, null); Spacer(Modifier.width(6.dp)); Text(t("Add another manually", "एक और दवा ख़ुद लिखें"))
+                OutlinedButton(onClick = { drafts = drafts + MedicineDraft(newId(), manualMedicine(), false) }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
+                    Icon(Icons.Default.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Add another manually", "एक और दवा ख़ुद लिखें"), fontSize = 15.sp)
                 }
             }
-            scanError?.let { error -> item { Text(error, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) } }
+            scanError?.let { error -> item { Text(error, color = RustText, fontSize = 15.sp, modifier = Modifier.announce()) } }
             item {
                 val names = drafts.map { it.medicine.medicineName.trim().lowercase() }.filter(String::isNotEmpty)
                 val valid = drafts.isNotEmpty() && unmatchedReviewed && names.size == names.distinct().size && drafts.all {
@@ -303,21 +308,22 @@ fun MedicineScanner(vm: CareModel, onClose: () -> Unit, onAccount: () -> Unit, o
                         } catch (failure: Exception) { if (failure is CancellationException) throw failure; scanError = failure.message ?: t("Could not keep the original pages. Your medicine list has not been saved.", "असली पेज सँभाले नहीं जा सके। आपकी दवा की सूची सहेजी नहीं गई।") }
                         finally { savingSources = false }
                     }
-                }, enabled = valid && !busy && !savingSources, modifier = Modifier.fillMaxWidth().heightIn(min = 54.dp), shape = RoundedCornerShape(16.dp)) {
-                    Text(if (busy || savingSources) t("Saving…", "सहेज रहे हैं…") else if(onReviewedMedicines != null) t("Use ${drafts.size} reviewed medicines", "जाँची गई ${drafts.size} दवाएँ लें") else run { val n = drafts.size; if (n == 1) t("Save 1 medicine", "1 दवा सहेजें") else t("Save $n medicines", "$n दवा सहेजें") })
+                }, enabled = valid && !busy && !savingSources, modifier = Modifier.fillMaxWidth().heightIn(min = 54.dp), shape = RoundedCornerShape(14.dp)) {
+                    Text(fontSize = 16.sp, fontWeight = FontWeight.SemiBold, text = if (busy || savingSources) t("Saving…", "सहेज रहे हैं…") else if(onReviewedMedicines != null) t("Use ${drafts.size} reviewed medicines", "जाँची गई ${drafts.size} दवाएँ लें") else run { val n = drafts.size; if (n == 1) t("Save 1 medicine", "1 दवा सहेजें") else t("Save $n medicines", "$n दवा सहेजें") })
                 }
-                if (!valid) Text(t("Before saving, add a medicine name and dose, check photos that did not match, and confirm every medicine.", "सहेजने से पहले दवा का नाम और ख़ुराक लिखें, बिना मिली फ़ोटो देखें और हर दवा की पुष्टि करें।"), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 8.dp))
-                TextButton(onClick = { returnToImages() }, enabled = !busy, modifier = Modifier.fillMaxWidth()) { Text(t("Back to photos", "फ़ोटो पर वापस")) }
-                TextButton(onClick = { cleanAndClose() }, enabled = !busy, modifier = Modifier.fillMaxWidth()) { Text(t("Cancel", "रद्द करें")) }
+                if (!valid) Text(t("Before saving, add a medicine name and dose, check photos that did not match, and confirm every medicine.", "सहेजने से पहले दवा का नाम और ख़ुराक लिखें, बिना मिली फ़ोटो देखें और हर दवा की पुष्टि करें।"), fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.padding(top = 8.dp))
+                Spacer(Modifier.height(8.dp))
+                TextButton(onClick = { returnToImages() }, enabled = !busy, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Back to photos", "फ़ोटो पर वापस"), fontSize = 15.sp) }
+                TextButton(onClick = { cleanAndClose() }, enabled = !busy, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Cancel", "रद्द करें"), fontSize = 15.sp) }
             }
         }
     }
 }
 
 @Composable
-private fun ScannerHeader(title: String, step: String, onBack: () -> Unit) {
+private fun ScannerHeader(title: String, step: String, info: String? = null, onBack: () -> Unit) {
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, careText()("Back", "वापस")) }
+        IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) { Icon(Icons.AutoMirrored.Filled.ArrowBack, careText()("Back", "वापस")) }
         Text(
             text = title,
             modifier = Modifier.weight(1f),
@@ -327,18 +333,21 @@ private fun ScannerHeader(title: String, step: String, onBack: () -> Unit) {
             letterSpacing = (-0.7).sp,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
+            color = DoctorCardInk,
         )
+        if (info != null) MedicineInfoButton(title, info, "medicine-scanner-info")
         CareLanguageMenu(compact = true)
         Spacer(Modifier.width(8.dp))
         Surface(
             color = Mint,
-            shape = RoundedCornerShape(16.dp),
-            modifier = Modifier.widthIn(min = 58.dp),
+            shape = RoundedCornerShape(50),
         ) {
             Text(
                 text = step,
-                modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp),
-                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                fontSize = 14.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = DoctorCardInk,
                 maxLines = 1,
                 softWrap = false,
             )
@@ -362,13 +371,15 @@ private fun PhotoSelectionCard(
     val context = LocalContext.current; val t = careText(); val hindi = careHindi()
     SurfaceCard(tint) {
         Row(verticalAlignment = Alignment.Top) {
-            Column(Modifier.weight(1f)) { Text(title, fontWeight = FontWeight.Bold, fontSize = 17.sp); Text(subtitle, style = MaterialTheme.typography.bodySmall) }
-            Surface(color = Paper, shape = RoundedCornerShape(12.dp)) { Text(uris.size.toString(), Modifier.padding(horizontal = 11.dp, vertical = 6.dp), fontWeight = FontWeight.Bold) }
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) { Text(title, fontWeight = FontWeight.SemiBold, fontSize = 17.sp, color = DoctorCardInk); Text(subtitle, fontSize = 14.sp, color = DoctorCardSub) }
+            // Count as a round badge, green once something is added.
+            Surface(color = if (uris.isEmpty()) Paper else DoctorStatusGoodBg, shape = RoundedCornerShape(50)) { Text(uris.size.toString(), Modifier.padding(horizontal = 12.dp, vertical = 6.dp), fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = if (uris.isEmpty()) DoctorCardSub else DoctorStatusGood) }
         }
         uris.forEachIndexed { index, value ->
-            Row(Modifier.fillMaxWidth().padding(top = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.Image, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp))
-                Text(imageName(context, Uri.parse(value), index, hindi), Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
+            if (index == 0) Spacer(Modifier.height(4.dp))
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.Image, null, Modifier.size(20.dp), tint = DoctorCardSub); Spacer(Modifier.width(8.dp))
+                Text(imageName(context, Uri.parse(value), index, hindi), Modifier.weight(1f), fontSize = 15.sp, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 if (onMove != null && index > 0) IconButton(onClick = { onMove(index, index - 1) }, modifier = Modifier.size(48.dp)) { Icon(Icons.Default.ArrowUpward, t("Move earlier", "ऊपर करें")) }
                 if (onMove != null && index < uris.lastIndex) IconButton(onClick = { onMove(index, index + 1) }, modifier = Modifier.size(48.dp)) { Icon(Icons.Default.ArrowDownward, t("Move later", "नीचे करें")) }
                 IconButton(onClick = { onRemove(index) }, modifier = Modifier.size(48.dp)) { Icon(Icons.Default.Close, t("Remove ${index + 1}", "${index + 1} हटाएँ")) }
@@ -376,13 +387,15 @@ private fun PhotoSelectionCard(
         }
         Spacer(Modifier.height(12.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            OutlinedButton(onClick = onChoose, modifier = Modifier.weight(1f)) {
-                Text(chooseLabel, fontSize = 13.sp, lineHeight = 16.sp, maxLines = 2)
+            OutlinedButton(onClick = onChoose, shape = RoundedCornerShape(14.dp), contentPadding = PaddingValues(horizontal = 12.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp)) {
+                Icon(Icons.Default.PhotoLibrary, null, Modifier.size(18.dp))
+                Spacer(Modifier.width(8.dp))
+                Text(chooseLabel, fontSize = 15.sp, lineHeight = 18.sp, maxLines = 2)
             }
-            OutlinedButton(onClick = onPhotograph, modifier = Modifier.weight(1f)) {
-                Icon(Icons.Default.PhotoCamera, null, Modifier.size(15.dp))
-                Spacer(Modifier.width(4.dp))
-                Text(photographLabel, fontSize = 13.sp, lineHeight = 16.sp, maxLines = 2)
+            OutlinedButton(onClick = onPhotograph, shape = RoundedCornerShape(14.dp), contentPadding = PaddingValues(horizontal = 12.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp)) {
+                Icon(Icons.Default.PhotoCamera, null, Modifier.size(18.dp))
+                Spacer(Modifier.width(8.dp))
+                Text(photographLabel, fontSize = 15.sp, lineHeight = 18.sp, maxLines = 2)
             }
         }
     }
@@ -394,32 +407,34 @@ private fun MedicineReviewCard(draft: MedicineDraft, storage: String, personId: 
     fun change(next: OrganizedMedicine) = onChange(draft.copy(medicine = next, confirmed = false))
     SurfaceCard(Paper) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Default.Medication, null, tint = Rust); Spacer(Modifier.width(9.dp))
-            Column(Modifier.weight(1f)) {
-                Text(if (medicine.medicineName.isBlank()) t("Manual medicine", "ख़ुद लिखी दवा") else medicine.medicineName, fontWeight = FontWeight.Bold)
-                Text(matchLabel(medicine, hindi), style = MaterialTheme.typography.bodySmall)
+            Icon(Icons.Default.Medication, null, tint = RustText); Spacer(Modifier.width(12.dp))
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(if (medicine.medicineName.isBlank()) t("Manual medicine", "ख़ुद लिखी दवा") else medicine.medicineName, fontWeight = FontWeight.SemiBold, fontSize = 17.sp, color = DoctorCardInk)
+                // How well it matched, as a status chip.
+                val (fg, bg) = when (medicine.matchQuality) { MedicineMatchQuality.MATCHED -> DoctorStatusGood to DoctorStatusGoodBg; MedicineMatchQuality.MANUAL -> DoctorCardSub to Cream; else -> DoctorStatusWarn to DoctorStatusWarnBg }
+                Surface(shape = RoundedCornerShape(50), color = bg) { Text(matchLabel(medicine, hindi), Modifier.padding(horizontal = 10.dp, vertical = 4.dp), fontSize = 14.sp, fontWeight = FontWeight.Medium, color = fg) }
             }
-            IconButton(onClick = onRemove) { Icon(Icons.Default.DeleteOutline, t("Remove medicine", "दवा हटाएँ")) }
+            IconButton(onClick = onRemove, modifier = Modifier.size(48.dp)) { Icon(Icons.Default.DeleteOutline, t("Remove medicine", "दवा हटाएँ"), tint = RustText) }
         }
-        medicine.uncertainties.forEach { Text("• $it", color = Rust, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 4.dp)) }
-        Spacer(Modifier.height(10.dp))
+        medicine.uncertainties.forEach { Text("• $it", color = RustText, fontSize = 14.sp, modifier = Modifier.padding(top = 4.dp)) }
+        Spacer(Modifier.height(12.dp))
         CareField(medicine.medicineName, { change(medicine.copy(medicineName = it.take(120))) }, t("Medicine name", "दवा का नाम"), singleLine = true,
             supporting = t("Strip cut or name missing? Type it, or pick from the list as you type.", "पत्ता कटा है या नाम नहीं दिखता? नाम लिखें, या लिखते समय सूची से चुनें।"))
         MedicineNameSuggestions(medicine.medicineName) { change(medicine.copy(medicineName = it.take(120))) }
         CareField(medicine.strength, { change(medicine.copy(strength = it.take(80))) }, t("Strength", "ताक़त"), singleLine = true, placeholder = t("e.g. 500 mg, 5 mg/5 ml", "जैसे 500 mg, 5 mg/5 ml"))
         CareField(medicine.form, { change(medicine.copy(form = it.take(60))) }, t("Form", "रूप"), singleLine = true, placeholder = t("e.g. tablet, capsule, syrup, injection, patch", "जैसे गोली, कैप्सूल, सिरप, इंजेक्शन, पैच"))
-        Text(t("Type the rest by hand from the prescription. A photo never fills these.", "बाक़ी पर्चे से देखकर ख़ुद लिखें। फ़ोटो से ये कभी नहीं भरे जाते।"), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 6.dp))
+        Text(t("Type the rest by hand from the prescription. A photo never fills these.", "बाक़ी पर्चे से देखकर ख़ुद लिखें। फ़ोटो से ये कभी नहीं भरे जाते।"), fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.padding(top = 8.dp))
         CareField(medicine.quantity, { change(medicine.copy(quantity = it.take(80))) }, t("How much each time", "हर बार कितनी"), singleLine = true, placeholder = t("e.g. 1 tablet, 1½ tablets, 5 ml", "जैसे 1 गोली, 1½ गोली, 5 ml"))
         CareField(medicine.frequency, { change(medicine.copy(frequency = it.take(120))) }, t("How often", "कितनी बार"), singleLine = true, placeholder = t("e.g. twice a day, only when needed", "जैसे दिन में दो बार, ज़रूरत होने पर ही"))
         CareField(medicine.instructions, { change(medicine.copy(instructions = it.take(500))) }, t("Directions", "तरीक़ा"), minLines = 2, placeholder = t("e.g. as written: dissolve in water", "जैसे पर्चे में लिखा: पानी में घोलकर"))
-        Text(t("Food timing", "खाने के हिसाब से समय"), fontWeight = FontWeight.SemiBold)
+        Text(t("Food timing", "खाने के हिसाब से समय"), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk, modifier = Modifier.padding(top = 8.dp))
         if (medicine.sourceQuote.isNotBlank()) {
-            Text(run { val pages = medicine.prescriptionPageIndexes.joinToString { val k = it + 1; t("page $k", "पेज $k") }; t("Original reading · $pages", "असली पढ़ाई · $pages") }, style = MaterialTheme.typography.labelMedium)
-            Text(medicine.sourceQuote, style = MaterialTheme.typography.bodySmall)
+            Text(run { val pages = medicine.prescriptionPageIndexes.joinToString { val k = it + 1; t("page $k", "पेज $k") }; t("Original reading · $pages", "असली पढ़ाई · $pages") }, fontSize = 14.sp, fontWeight = FontWeight.Medium, color = DoctorCardSub)
+            Text(medicine.sourceQuote, fontSize = 14.sp, color = DoctorCardInk)
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())) {
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())) {
             MedicineMealTiming.entries.forEach { timing ->
-                FilterChip(selected = medicine.mealTiming == timing, onClick = { change(medicine.copy(mealTiming = timing)) }, label = { Text(mealTimingLabel(timing, hindi), fontSize = 11.sp) })
+                FilterChip(selected = medicine.mealTiming == timing, onClick = { change(medicine.copy(mealTiming = timing)) }, label = { Text(mealTimingLabel(timing, hindi), fontSize = 14.sp) }, shape = RoundedCornerShape(50), modifier = Modifier.heightIn(min = 48.dp))
             }
         }
         DoseTimesField(medicine.suggestedTimes, { change(medicine.copy(suggestedTimes = it)) })

@@ -355,7 +355,9 @@ export function GocTranscribe({ t, lang, draft, previous, actorName, patientId, 
       <Info label={t('About this', 'इसके बारे में')}><p>{t('Sahara writes down what was said and finds the choices that were stated. It does not recommend any treatment. Nothing goes into the plan until you confirm it, and a topic not discussed stays No preference recorded.', 'Sahara लिखता है कि क्या कहा गया और जो फ़ैसले बताए गए उन्हें ढूँढता है। यह कोई इलाज नहीं सुझाता। आपकी पुष्टि के बिना कुछ भी योजना में नहीं जाता, और जिस विषय पर बात नहीं हुई वह “कोई पसंद दर्ज नहीं” रहता है।')}</p></Info>
       <button type="button" className="ep-btn ep-quiet" onClick={onClose}>{t('Close', 'बंद करें')}</button>
     </div>
-    <ol className="goc-stepper" aria-label={t('Steps', 'चरण')}>{steps.map(([id, name], index) => <li key={id} data-state={index < stageIndex ? 'done' : index === stageIndex ? 'now' : undefined}>{name}</li>)}</ol>
+    <ol className="goc-stepper" aria-label={t('Steps', 'चरण')}>{steps.map(([id, name], index) => <li key={id} data-state={index < stageIndex ? 'done' : index === stageIndex ? 'now' : undefined} aria-current={index === stageIndex ? 'step' : undefined}>
+      <span className="goc-step-num" aria-hidden="true">{index < stageIndex ? '✓' : index + 1}</span><span className="goc-step-name">{name}</span>
+    </li>)}</ol>
 
     {stage === 'capture' ? <div className="goc-stage goc-capture">
       {previous && !lines.length ? <details className="goc-carry">
@@ -363,7 +365,7 @@ export function GocTranscribe({ t, lang, draft, previous, actorName, patientId, 
         <ul className="ep-goc-carry">{carried.filter((row) => row.previous !== null || row.current !== null).map((row) => <li key={row.field} data-changed={row.changed || undefined}><strong>{gocTopicName(row.field, lang)}</strong>
           <span>{row.changed ? t(`Changed: ${optionName(row.field, row.previous)} to ${optionName(row.field, row.current)}`, `बदला: ${optionName(row.field, row.previous)} से ${optionName(row.field, row.current)}`) : optionName(row.field, row.current)}</span></li>)}</ul>
       </details> : null}
-      <label className="goc-consent">
+      <label className="goc-consent" data-on={consented || undefined}>
         <input type="checkbox" checked={consented} onChange={(event) => agree(event.target.checked)} />
         <span><strong>{t('Everyone present agrees to this conversation being recorded and written down', 'मौजूद सभी लोग इस बातचीत को रिकॉर्ड करने और लिखने के लिए राज़ी हैं')}</strong>
           {gemini ? <small>{t('Audio is sent to Google Gemini to transcribe.', 'ऑडियो लिखने के लिए Google Gemini को भेजा जाता है।')}</small> : null}</span>
@@ -375,7 +377,7 @@ export function GocTranscribe({ t, lang, draft, previous, actorName, patientId, 
 
       {!running ? <>
         {recording ? <div className="goc-recording" role="status"><span className="goc-dot" data-paused={paused || undefined} aria-hidden="true" />{paused ? t('Paused', 'रुका हुआ') : t('Recording', 'रिकॉर्ड हो रहा है')} · {clock(seconds)}</div> : null}
-        <div className="goc-record-row">
+        <div className="goc-record-row" data-recording={recording ? (paused ? 'paused' : 'live') : undefined}>
           {recording ? <>
             <button type="button" className="goc-record goc-stop" onClick={() => recorder.current?.stop()}><span aria-hidden="true">■</span>{t('Stop', 'रोकें')}</button>
             <button type="button" className="goc-pause" onClick={togglePause}>{paused ? t('Resume', 'फिर शुरू') : t('Pause', 'रोकें (थोड़ी देर)')}</button>
@@ -389,8 +391,9 @@ export function GocTranscribe({ t, lang, draft, previous, actorName, patientId, 
           <button type="button" className="goc-link" onClick={() => setTyping((on) => !on)} aria-expanded={typing}>{t('Type or paste', 'टाइप या पेस्ट करें')}</button>
         </div> : null}
       </> : <div className="goc-working" role="status">
-        <div className="ep-progress-track" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progressPercent)}><div className="ep-progress-fill" style={{ width: `${progressPercent}%` }} /></div>
-        <p>{progressText}</p>
+        <div className="goc-working-head"><span className="goc-spinner" aria-hidden="true" /><p>{progressText}</p>{progress !== 'preparing' && progressPercent > 0 ? <strong className="goc-percent">{Math.round(progressPercent)}%</strong> : null}</div>
+        <div className="ep-progress-track" role="progressbar" aria-label={t('Progress', 'प्रगति')} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progressPercent)} data-indeterminate={progress === 'preparing' || progressPercent === 0 || undefined}><div className="ep-progress-fill" style={{ width: `${progressPercent}%` }} /></div>
+        {transcribedBy ? <small className="goc-engine">{transcribedBy}</small> : null}
         <button type="button" className="goc-link" onClick={() => cancel.current?.abort()}>{t('Stop', 'रोकें')}</button>
       </div>}
       {message ? <p className="ep-notice ep-alert" role="alert">{message}</p> : null}
@@ -406,7 +409,7 @@ export function GocTranscribe({ t, lang, draft, previous, actorName, patientId, 
 
     {stage === 'review' ? <div className="goc-stage goc-review">
       <div className="goc-checklist" aria-label={t('Checklist', 'सूची')}>
-        <h3>{t('Checklist', 'सूची')} · {t(`${rows.length - undiscussed.length} of ${rows.length}`, `${rows.length} में से ${rows.length - undiscussed.length}`)}</h3>
+        <h3>{t('Checklist', 'सूची')} <span className="goc-count">{t(`${rows.length - undiscussed.length} of ${rows.length}`, `${rows.length} में से ${rows.length - undiscussed.length}`)}</span></h3>
         <ol>{rows.map((row) => <li key={row.topic} data-status={row.status} data-verified={row.verified || undefined}>
           <span className="goc-tick" aria-hidden="true">{row.status === 'DISCUSSED' ? '✓' : ''}</span>
           <span>{gocFormSection(row.topic) ? <span className="goc-sec">{gocFormSection(row.topic)}</span> : null}{gocTopicName(row.topic, lang)}</span>
@@ -495,7 +498,10 @@ export function GocTranscribe({ t, lang, draft, previous, actorName, patientId, 
       </div>
       <style>{GOC_FORM_CSS}</style>
       {/* The form's own markup, escaped in goc-form.ts, so the screen matches print and Word exactly. */}
-      <div className="goc-form" dir={careDir(lang)} dangerouslySetInnerHTML={{ __html: gocFormBodyHtml(formDocument(true)) }} />
+      <div className="goc-paper" data-locked={noteLocked || undefined}>
+        {noteLocked ? <span className="goc-stamp" aria-hidden="true">{t('Locked', 'लॉक')}</span> : null}
+        <div className="goc-form" dir={careDir(lang)} dangerouslySetInnerHTML={{ __html: gocFormBodyHtml(formDocument(true)) }} />
+      </div>
       {noteLocked ? <p className="ep-notice ep-info" role="status">{t('Signed and locked.', 'साइन होकर बंद।')} <button type="button" className="ep-link" onClick={() => setEditSigned(true)}>{t('Change the note', 'नोट बदलें')}</button></p> : null}
       {editSigned ? <p className="ep-notice ep-warn">{t('Changing the note clears the signatures, and everyone signs again.', 'नोट बदलने पर हस्ताक्षर हट जाते हैं, और सबको फिर साइन करना होगा।')} <button type="button" className="ep-link" onClick={() => setStage('review')}>{t('Back to review', 'जाँच पर वापस')}</button></p> : null}
       {note.trim() ? <GocSignOff t={t} noteId={`${draft.id}:v${draft.version}:goc`} noteText={note} doctorName={actorName} signerName={draft.patient.name} showNote={false}

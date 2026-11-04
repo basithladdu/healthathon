@@ -16,6 +16,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -120,9 +122,9 @@ object ChartRangeRules {
     val shownPoints = remember(points, range, now / 3_600_000L) { ChartRangeRules.filter(points, range, now) }
     val progress = remember(shownPoints) { Animatable(0f) }
     LaunchedEffect(shownPoints) { progress.snapTo(0f); progress.animateTo(1f, SaharaMotion.tween(700)) }
-    val axisStyle = TextStyle(color = DoctorCardSub, fontSize = 11.sp, lineHeight = 13.sp)
+    val axisStyle = TextStyle(color = DoctorCardSub, fontSize = 12.sp, lineHeight = 14.sp)
     val xStyle = axisStyle.copy(textAlign = TextAlign.Center)
-    val markerStyle = TextStyle(color = DoctorCardInk, fontSize = 10.sp, lineHeight = 11.sp, fontWeight = FontWeight.SemiBold)
+    val markerStyle = TextStyle(color = DoctorCardInk, fontSize = 11.sp, lineHeight = 12.sp, fontWeight = FontWeight.SemiBold)
     val span = ChartRangeRules.span(shownPoints, range, now)
     val lo = span?.first ?: xMin ?: shownPoints.minOfOrNull { it.x } ?: 0.0
     val hi = span?.second ?: xMax ?: shownPoints.maxOfOrNull { it.x } ?: 1.0
@@ -130,8 +132,9 @@ object ChartRangeRules {
     val shownLabels = xLabels.filter { it.x >= minOf(lo, hi) && it.x <= maxOf(lo, hi) }
     val labelEach = shownPoints.count { it.y != null } <= pointTextLimit
     Canvas(modifier.fillMaxWidth().height(height).clearAndSetSemantics { contentDescription = description }.testTag("$tag-chart")) {
-        val topPad = 14.dp.toPx()
-        val bottomPad = (8 + 14 * xLabelLines).dp.toPx()
+        // Room above the plot for treatment-day labels, so they never sit on the top gridline.
+        val topPad = (if (shownMarkers.any { it.label.isNotBlank() }) 22 else 14).dp.toPx()
+        val bottomPad = (10 + 15 * xLabelLines).dp.toPx()
         val rightPad = 16.dp.toPx()
         val yWidth = (yTicks.maxOfOrNull { measurer.measure(yText(it), axisStyle).size.width } ?: 0) + 8.dp.toPx()
         val left = yWidth
@@ -145,18 +148,32 @@ object ChartRangeRules {
             val top = py(b.to.coerceAtMost(yMax)); val bottom = py(b.from.coerceAtLeast(yMin))
             if (bottom > top) drawRect(b.color.copy(alpha = b.alpha), Offset(left, top), Size(plotW, bottom - top))
         }
+        // The lowest tick is the axis (solid, a little darker); the others are light dashed gridlines.
+        val baseTick = yTicks.minOrNull()
         yTicks.forEach { v ->
             val y = py(v)
-            drawLine(DoctorHairline, Offset(left, y), Offset(left + plotW, y), 1.dp.toPx())
+            if (v == baseTick) drawLine(DoctorCardSub.copy(alpha = 0.35f), Offset(left, y), Offset(left + plotW, y), 1.dp.toPx())
+            else drawLine(DoctorHairline, Offset(left, y), Offset(left + plotW, y), 1.dp.toPx(), pathEffect = PathEffect.dashPathEffect(floatArrayOf(4.dp.toPx(), 4.dp.toPx())))
             val layout = measurer.measure(yText(v), axisStyle)
             drawText(layout, topLeft = Offset(left - layout.size.width - 6.dp.toPx(), y - layout.size.height / 2f))
         }
-        shownMarkers.forEach { m ->
+        // Treatment days: a dashed line and a small label on a soft pill; a label that would overlap the previous one is left out (the line stays).
+        val markerSpans = mutableListOf<ClosedFloatingPointRange<Float>>()
+        shownMarkers.sortedBy { it.x }.forEach { m ->
             val x = px(m.x)
-            drawLine(m.color, Offset(x, topPad), Offset(x, topPad + plotH), 2.dp.toPx(), pathEffect = PathEffect.dashPathEffect(floatArrayOf(5.dp.toPx(), 4.dp.toPx())))
+            drawLine(m.color.copy(alpha = 0.8f), Offset(x, topPad), Offset(x, topPad + plotH), 1.5.dp.toPx(), pathEffect = PathEffect.dashPathEffect(floatArrayOf(5.dp.toPx(), 4.dp.toPx())))
             if (m.label.isNotBlank()) {
                 val layout = measurer.measure(m.label, markerStyle.copy(color = m.color))
-                drawText(layout, topLeft = Offset((x + 3.dp.toPx()).coerceAtMost((size.width - layout.size.width).coerceAtLeast(0f)), (topPad - layout.size.height).coerceAtLeast(0f)))
+                val padX = 4.dp.toPx(); val w = layout.size.width + padX * 2; val h = layout.size.height.toFloat()
+                val lx = (x - w / 2f).coerceIn(0f, (size.width - w).coerceAtLeast(0f))
+                val room = (lx - 2.dp.toPx())..(lx + w + 2.dp.toPx())
+                if (markerSpans.none { it.start < room.endInclusive && room.start < it.endInclusive }) {
+                    markerSpans += room
+                    val ly = (topPad - h - 4.dp.toPx()).coerceAtLeast(0f)
+                    drawRoundRect(Paper, Offset(lx, ly), Size(w, h), androidx.compose.ui.geometry.CornerRadius(h / 2f))
+                    drawRoundRect(m.color.copy(alpha = 0.45f), Offset(lx, ly), Size(w, h), androidx.compose.ui.geometry.CornerRadius(h / 2f), style = Stroke(1.dp.toPx()))
+                    drawText(layout, topLeft = Offset(lx + padX, ly))
+                }
             }
         }
         // x labels, skipping any that would collide
@@ -186,7 +203,7 @@ object ChartRangeRules {
         val latest = shownPoints.lastOrNull { it.y != null }
         // every other point's value, small and above its dot
         if (pointText != null && labelEach && shown >= 1f) shownPoints.forEach { p -> val y = p.y; if (y != null && p !== latest) {
-            val layout = measurer.measure(pointText(y), TextStyle(color = DoctorCardSub, fontSize = 11.sp, fontWeight = FontWeight.Medium))
+            val layout = measurer.measure(pointText(y), TextStyle(color = DoctorCardSub, fontSize = 12.sp, fontWeight = FontWeight.Medium))
             val c = Offset(px(p.x), py(y))
             val ty = if (c.y - 8.dp.toPx() - layout.size.height >= 0f) c.y - 8.dp.toPx() - layout.size.height else c.y + 8.dp.toPx()
             drawText(layout, topLeft = Offset((c.x - layout.size.width / 2f).coerceIn(0f, (size.width - layout.size.width).coerceAtLeast(0f)), ty))
@@ -212,7 +229,10 @@ object ChartRangeRules {
     val hindi = careHindi()
     Row(modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).testTag("$tag-range"), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         choices.forEach { r ->
-            FilterChip(selected = r == selected, onClick = { onSelect(r) }, label = { Text(r.label(hindi)) }, modifier = Modifier.heightIn(min = 48.dp).testTag("$tag-range-${r.name.lowercase()}"))
+            FilterChip(selected = r == selected, onClick = { onSelect(r) }, label = { Text(r.label(hindi), fontSize = 14.sp, fontWeight = if (r == selected) FontWeight.SemiBold else FontWeight.Medium) },
+                shape = CircleShape, border = FilterChipDefaults.filterChipBorder(enabled = true, selected = r == selected, borderColor = DoctorHairline, selectedBorderColor = Rust),
+                colors = FilterChipDefaults.filterChipColors(containerColor = Paper, labelColor = DoctorCardInk, selectedContainerColor = Rust, selectedLabelColor = Color.White),
+                modifier = Modifier.heightIn(min = 48.dp).testTag("$tag-range-${r.name.lowercase()}"))
         }
     }
 }
@@ -254,7 +274,7 @@ object ChartRangeRules {
         dated.mapIndexed { i, p -> ChartXLabel(p.x, careDay(p.x.toLong()).format(format), strong = i == 0) }
     }
     val single = shown.count { it.y != null } == 1 && current == ChartRange.ALL
-    Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+    Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         ChartRangeChips(choices, current, { own = it.name; onRangeChange(it) }, tag)
         CareLineChart(
             points = points, yMin = yMin, yMax = yMax, yTicks = yTicks, yText = yText, xLabels = labels,

@@ -5,6 +5,8 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.foundation.text.KeyboardActions
@@ -81,30 +83,33 @@ internal fun doctorAttendeesAllConsented(rows: List<DoctorAttendee>): Boolean = 
     LaunchedEffect(store, scope) { load() }
     val all = doctorAttendeesAllConsented(rows)
     Card(Modifier.fillMaxWidth().testTag("doctor-attendees"), shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = DoctorCardReport), border = BorderStroke(1.dp, DoctorHairline)) {
-        Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text(t("Who is in the room", "कमरे में कौन है"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
-            Text(t("Write down everyone physically present. Each person ticks to agree to being recorded. Nobody listed here is contacted or notified, and names are not checked.", "जो भी यहाँ मौजूद है, सबका नाम लिखें। रिकॉर्डिंग के लिए हर व्यक्ति ख़ुद टिक करके सहमति दे। यहाँ लिखे किसी व्यक्ति से संपर्क नहीं होता, उसे सूचना नहीं जाती, और नाम जाँचे नहीं जाते।"), fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub)
-            error?.let { Text(it, fontSize = 13.sp, color = DoctorAccent, modifier = Modifier.testTag("doctor-attendees-error")) }
-            if (!loaded) TextButton(onClick = { load() }, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-attendees-retry")) { Text(t("Retry", "फिर कोशिश करें"), color = DoctorAccent) }
-            rows.forEach { row -> Card(Modifier.fillMaxWidth().testTag("doctor-attendee-${row.id}"), shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = DoctorCardConversation)) {
-                Row(Modifier.padding(horizontal = 16.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(t("Who is in the room", "कमरे में कौन है"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.weight(1f).a11yHeading())
+                DoctorInfoIcon(t("Who is in the room", "कमरे में कौन है"), t("Write down everyone physically present. Each person ticks to agree to being recorded. Nobody listed here is contacted or notified, and names are not checked.", "जो भी यहाँ मौजूद है, सबका नाम लिखें। रिकॉर्डिंग के लिए हर व्यक्ति ख़ुद टिक करके सहमति दे। यहाँ लिखे किसी व्यक्ति से संपर्क नहीं होता, उसे सूचना नहीं जाती, और नाम जाँचे नहीं जाते।"), "doctor-attendees-info")
+            }
+            error?.let { Text(it, fontSize = 15.sp, lineHeight = 21.sp, color = MaterialTheme.colorScheme.error, modifier = Modifier.testTag("doctor-attendees-error").announce()) }
+            if (!loaded) TextButton(onClick = { load() }, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-attendees-retry")) { Text(t("Retry", "फिर कोशिश करें"), color = RustText, fontSize = 16.sp) }
+            rows.forEachIndexed { i, row -> if (i > 0) HorizontalDivider(color = DoctorHairline); Column(Modifier.fillMaxWidth().testTag("doctor-attendee-${row.id}")) {
+                Row(Modifier.padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(row.consented, { checked -> persist(rows.map { if (it.id == row.id) it.copy(consented = checked) else it }) }, enabled = loaded && editable, modifier = Modifier.minimumInteractiveComponentSize().testTag("doctor-attendee-consent-${row.id}"))
-                    Column(Modifier.weight(1f)) {
-                        Text(row.name, fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk)
-                        Text(row.role, fontSize = 13.sp, color = DoctorCardSub)
-                        Text(if (row.consented) t("Agrees to being recorded", "रिकॉर्डिंग के लिए सहमत") else t("Has not agreed yet", "अभी सहमति नहीं दी"), fontSize = 12.sp, color = if (row.consented) DoctorStatusGood else DoctorCardFaint)
+                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                        Text(row.name, fontSize = 16.sp, lineHeight = 22.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
+                        Text(row.role, fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
+                        Text(if (row.consented) t("Agrees to being recorded", "रिकॉर्डिंग के लिए सहमत") else t("Has not agreed yet", "अभी सहमति नहीं दी"), fontSize = 14.sp, lineHeight = 20.sp, fontWeight = FontWeight.Medium, color = if (row.consented) DoctorStatusGood else DoctorStatusWarn)
                     }
-                    if (editable) TextButton(onClick = { persist(rows.filterNot { it.id == row.id }) }, enabled = loaded, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-attendee-remove-${row.id}")) { Text(t("Remove", "हटाएँ"), color = DoctorAccent) }
+                    if (editable) TextButton(onClick = { persist(rows.filterNot { it.id == row.id }) }, enabled = loaded, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-attendee-remove-${row.id}")) { Text(t("Remove", "हटाएँ"), color = RustText) }
                 }
             } }
+            if (rows.isNotEmpty()) HorizontalDivider(color = DoctorHairline)
             if (editable) {
                 val canAdd = loaded && rows.size < 12 && name.isNotBlank() && role.isNotBlank()
                 val add = { if (persist(rows + DoctorAttendee(newId(), name.trim(), role.trim(), false))) { name = ""; role = "" } }
-                OutlinedTextField(name, { name = it.take(100) }, label = { Text(t("Name", "नाम")) }, singleLine = true, enabled = loaded, keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-attendee-name-input"))
-                OutlinedTextField(role, { role = it.take(40) }, label = { Text(t("Role, such as Daughter or Nurse", "रिश्ता या भूमिका, जैसे बेटी या नर्स")) }, singleLine = true, enabled = loaded, keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done), keyboardActions = KeyboardActions(onDone = { if (canAdd) add() }), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-attendee-role-input"))
-                TextButton(onClick = add, enabled = canAdd, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-add-attendee")) { Text(t("Add person", "व्यक्ति जोड़ें"), color = DoctorAccent) }
+                OutlinedTextField(name, { name = it.take(100) }, label = { Text(t("Name", "नाम")) }, singleLine = true, enabled = loaded, shape = RoundedCornerShape(14.dp), keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-attendee-name-input"))
+                OutlinedTextField(role, { role = it.take(40) }, label = { Text(t("Role, such as Daughter or Nurse", "रिश्ता या भूमिका, जैसे बेटी या नर्स")) }, singleLine = true, enabled = loaded, shape = RoundedCornerShape(14.dp), keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done), keyboardActions = KeyboardActions(onDone = { if (canAdd) add() }), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-attendee-role-input"))
+                OutlinedButton(onClick = add, enabled = canAdd, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.outlinedButtonColors(contentColor = RustText), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-add-attendee")) { Icon(Icons.Default.PersonAdd, null, Modifier.size(20.dp)); Spacer(Modifier.width(8.dp)); Text(t("Add person", "व्यक्ति जोड़ें"), fontSize = 16.sp) }
             }
-            Text(if (all) t("Everyone listed has agreed to being recorded.", "सूची में सभी रिकॉर्डिंग के लिए सहमत हैं।") else t("Recording can start once everyone listed has agreed.", "सूची में सबकी सहमति के बाद ही रिकॉर्डिंग शुरू हो सकती है।"), fontSize = 12.sp, color = if (all) DoctorStatusGood else DoctorCardFaint, modifier = Modifier.testTag("doctor-attendees-status"))
+            Text(if (all) t("Everyone listed has agreed to being recorded.", "सूची में सभी रिकॉर्डिंग के लिए सहमत हैं।") else t("Recording can start once everyone listed has agreed.", "सूची में सबकी सहमति के बाद ही रिकॉर्डिंग शुरू हो सकती है।"), fontSize = 14.sp, lineHeight = 20.sp, fontWeight = FontWeight.Medium, color = if (all) DoctorStatusGood else DoctorStatusWarn, modifier = Modifier.testTag("doctor-attendees-status").announce())
         }
     }
 }

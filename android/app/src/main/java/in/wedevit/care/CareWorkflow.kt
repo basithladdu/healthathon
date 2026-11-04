@@ -1,7 +1,9 @@
 @file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 package `in`.wedevit.care
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -18,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.json.JSONObject
 import java.math.BigDecimal
@@ -156,12 +159,12 @@ object CareLabRules {
     val entries by vm.items.collectAsStateWithLifecycle()
     val active = entries.mapNotNull { item -> CareEntryCodec.decode(item.detail)?.takeIf { it.type in setOf("task", "conversation") && it.status in setOf("open", "accepted") } }
     val t = careText()
-    if (active.isNotEmpty()) Card(onClick = onOpen, colors = CardDefaults.cardColors(containerColor = Mint), shape = RoundedCornerShape(18.dp), modifier = Modifier.fillMaxWidth()) {
+    if (active.isNotEmpty()) Card(onClick = onOpen, colors = CardDefaults.cardColors(containerColor = Mint), shape = RoundedCornerShape(20.dp), modifier = Modifier.fillMaxWidth()) {
         Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
             Icon(Icons.Default.Groups, null, tint = Rust); Spacer(Modifier.width(12.dp))
             val talks = active.count { it.type == "conversation" }; val jobs = active.count { it.type == "task" }
-            Column(Modifier.weight(1f)) { Text(t("Care team", "देखभाल टीम"), fontWeight = FontWeight.SemiBold); Text(t("$talks conversations · $jobs tasks", "$talks बातचीत · $jobs काम"), style = MaterialTheme.typography.bodySmall) }
-            Icon(Icons.Default.ChevronRight, t("Open care team", "देखभाल टीम खोलें"))
+            Column(Modifier.weight(1f)) { Text(t("Care team", "देखभाल टीम"), fontWeight = FontWeight.SemiBold, color = DoctorCardInk); Text(t("$talks conversations · $jobs tasks", "$talks बातचीत · $jobs काम"), fontSize = 14.sp, color = DoctorCardSub) }
+            Icon(Icons.Default.ChevronRight, t("Open care team", "देखभाल टीम खोलें"), tint = DoctorCardSub)
         }
     }
 }
@@ -177,19 +180,31 @@ object CareLabRules {
     val workflows = entries.filter { it.personId == person }.mapNotNull { item -> CareEntryCodec.decode(item.detail)?.takeIf { it.type in setOf("task", "conversation") }?.let { item to it } }
     val visible = workflows.filter { (_, data) -> (filter == "All" || data.type == if (filter == "Tasks") "task" else "conversation") && (showFinished || data.status !in setOf("completed", "cancelled")) }
         .sortedWith(compareBy<Pair<CareItem, CareEntry>> { it.second.status in setOf("completed", "cancelled") }.thenBy { it.first.due.takeIf { due -> due > 0 } ?: Long.MAX_VALUE }.thenByDescending { it.first.created })
-    LazyColumn(Modifier.fillMaxSize().testTag("workflow-list"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { Heading(if (role == "Doctor") t("Care queue", "देखभाल की सूची") else t("Care team", "देखभाल टीम")); Spacer(Modifier.weight(1f)); if (vm.cloud != null) IconButton(onClick = vm::refresh) { Icon(Icons.Default.Refresh, t("Refresh care team", "देखभाल टीम ताज़ा करें")) } } }
-        if (canEdit) item { Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            FilledTonalButton(onClick = { adding = "conversation" }, modifier = Modifier.weight(1f), colors = ButtonDefaults.filledTonalButtonColors(containerColor = Gold)) { Icon(Icons.Default.Forum, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Ask to talk", "बात करने को कहें")) }
-            OutlinedButton(onClick = { adding = "task" }, modifier = Modifier.weight(1f)) { Icon(Icons.Default.AddTask, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Add task", "काम जोड़ें")) }
+    LazyColumn(Modifier.fillMaxSize().testTag("workflow-list"), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) { Heading(if (role == "Doctor") t("Care queue", "देखभाल की सूची") else t("Care team", "देखभाल टीम"), 26); Spacer(Modifier.weight(1f)); if (vm.cloud != null) IconButton(onClick = vm::refresh, modifier = Modifier.size(48.dp)) { Icon(Icons.Default.Refresh, t("Refresh care team", "देखभाल टीम ताज़ा करें")) } } }
+        // One primary action (ask to talk); adding a task is secondary.
+        if (canEdit) item { Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Button(onClick = { adding = "conversation" }, modifier = Modifier.weight(1f).heightIn(min = 48.dp), shape = RoundedCornerShape(14.dp)) { Icon(Icons.Default.Forum, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Ask to talk", "बात करने को कहें"), fontWeight = FontWeight.SemiBold) }
+            OutlinedButton(onClick = { adding = "task" }, modifier = Modifier.weight(1f).heightIn(min = 48.dp), shape = RoundedCornerShape(14.dp)) { Icon(Icons.Default.AddTask, null, Modifier.size(18.dp), tint = RustText); Spacer(Modifier.width(8.dp)); Text(t("Add task", "काम जोड़ें"), color = RustText) }
         } }
-        item { Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf("All", "Conversations", "Tasks").forEach { label -> FilterChip(filter == label, { filter = label }, label = { Text(when (label) { "Conversations" -> t("Conversations", "बातचीत"); "Tasks" -> t("Tasks", "काम"); else -> t("All", "सभी") }) }) } } }
-        item { FilterChip(showFinished, { showFinished = !showFinished }, label = { Text(t("Include finished", "पूरे हुए भी दिखाएँ")) }, leadingIcon = { Icon(Icons.Default.CheckCircleOutline, null, Modifier.size(18.dp)) }) }
-        if (visible.isEmpty()) item { SurfaceCard { Text(if (showFinished) t("No matching requests or tasks", "कोई अनुरोध या काम नहीं मिला") else t("Nothing waiting here", "यहाँ कुछ बाक़ी नहीं"), fontWeight = FontWeight.SemiBold); if (canEdit) TextButton(onClick = { adding = if (filter == "Tasks") "task" else "conversation" }) { Text(if (filter == "Tasks") t("Add a task", "काम जोड़ें") else t("Ask for a conversation", "बातचीत के लिए कहें")) } } }
+        // Filters and "include finished" share one scrolling row of pills.
+        item { Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+            listOf("All", "Conversations", "Tasks").forEach { label -> FilterChip(filter == label, { filter = label }, label = { Text(when (label) { "Conversations" -> t("Conversations", "बातचीत"); "Tasks" -> t("Tasks", "काम"); else -> t("All", "सभी") }) }, shape = RoundedCornerShape(50), colors = workflowChipColors(), modifier = Modifier.heightIn(min = 48.dp)) }
+            Box(Modifier.height(24.dp).width(1.dp).background(DoctorHairline))
+            FilterChip(showFinished, { showFinished = !showFinished }, label = { Text(t("Include finished", "पूरे हुए भी दिखाएँ")) }, leadingIcon = { Icon(Icons.Default.CheckCircleOutline, null, Modifier.size(18.dp)) }, shape = RoundedCornerShape(50), colors = workflowChipColors(), modifier = Modifier.heightIn(min = 48.dp))
+        } }
+        // Empty state: icon, one line, one action.
+        if (visible.isEmpty()) item { SurfaceCard { Column(Modifier.fillMaxWidth().padding(vertical = 8.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Icon(Icons.Default.Inbox, null, Modifier.size(32.dp), tint = DoctorCardSub)
+            Text(if (showFinished) t("No matching requests or tasks", "कोई अनुरोध या काम नहीं मिला") else t("Nothing waiting here", "यहाँ कुछ बाक़ी नहीं"), fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
+            if (canEdit) OutlinedButton(onClick = { adding = if (filter == "Tasks") "task" else "conversation" }, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp)) { Text(if (filter == "Tasks") t("Add a task", "काम जोड़ें") else t("Ask for a conversation", "बातचीत के लिए कहें"), color = RustText) }
+        } } }
         items(visible, key = { it.first.id }) { (item, data) -> WorkflowCard(vm, item, data, onTalk) }
     }
     if (adding.isNotEmpty()) CareWorkflowEditor(vm, adding) { adding = "" }
 }
+
+@Composable private fun workflowChipColors() = FilterChipDefaults.filterChipColors(containerColor = Paper, labelColor = DoctorCardInk, selectedContainerColor = Mint, selectedLabelColor = DoctorCardInk, selectedLeadingIconColor = RustText)
 
 @Composable fun WorkflowCard(vm: CareModel, item: CareItem, entry: CareEntry? = CareEntryCodec.decode(item.detail), onTalk: () -> Unit = {}) { val t = careText();
     val data = entry ?: return
@@ -200,25 +215,34 @@ object CareLabRules {
     var editing by remember(item.id) { mutableStateOf(false) }
     val capturedAccount = remember(item.id) { vm.accountNamespace }
     val active = data.status in setOf("open", "accepted")
-    SurfaceCard(if (data.status == "completed") Sage.copy(alpha = .5f) else Paper) {
+    SurfaceCard(Paper) {
+        // Title row: type icon, title, and the status as a coloured pill.
+        val (statusBg, statusInk) = when (data.status) { "completed" -> DoctorStatusGoodBg to DoctorStatusGood; "cancelled" -> DoctorStatusRestBg to DoctorStatusRest; "accepted" -> SaharaSoftBlue to DoctorCardInk; else -> DoctorStatusWarnBg to DoctorStatusWarn }
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(if (data.type == "conversation") Icons.Default.Forum else Icons.Default.Assignment, null, tint = Rust)
-            Spacer(Modifier.width(10.dp)); Text(item.title, fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f), fontFamily = SaharaTitleFont)
+            Surface(shape = CircleShape, color = if (data.type == "conversation") SaharaLavender else Mint, contentColor = RustText, modifier = Modifier.size(36.dp)) {
+                Box(contentAlignment = Alignment.Center) { Icon(if (data.type == "conversation") Icons.Default.Forum else Icons.Default.Assignment, null, Modifier.size(20.dp)) }
+            }
+            Spacer(Modifier.width(12.dp)); Text(item.title, fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f), fontFamily = SaharaTitleFont, fontSize = 17.sp, color = DoctorCardInk)
+            Spacer(Modifier.width(8.dp))
+            Surface(shape = RoundedCornerShape(50), color = statusBg, contentColor = statusInk, modifier = Modifier.testTag("workflow-status-${item.id}")) {
+                Text(data.statusLabel(careHindi()), Modifier.padding(horizontal = 10.dp, vertical = 4.dp), style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold, maxLines = 1)
+            }
         }
-        Text(data.statusLabel(careHindi()) + " · " + t("For ${data.assignee}", "${data.assignee} के लिए"), color = Rust, style = MaterialTheme.typography.labelLarge)
-        if (data.sender.isNotBlank()) Text(t("From ${data.sender}", "भेजने वाले: ${data.sender}"), style = MaterialTheme.typography.bodySmall)
-        if (item.due > 0) Text(if (data.type == "conversation") t("Preferred ${date(item.due)}", "पसंद की तारीख़ ${date(item.due)}") else t("Due ${date(item.due)}", "आख़िरी तारीख़ ${date(item.due)}"), style = MaterialTheme.typography.bodySmall)
-        if (data.detail.isNotBlank()) Text(data.detail, modifier = Modifier.padding(top = 8.dp))
-        if (data.acceptedBy.isNotBlank()) Text(t("Picked up by ${data.acceptedBy} · ${date(data.acceptedAt)}", "${data.acceptedBy} ने लिया · ${date(data.acceptedAt)}"), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 8.dp))
-        if (data.completedBy.isNotBlank()) Text(t("Completed by ${data.completedBy} · ${date(data.completedAt)}", "${data.completedBy} ने पूरा किया · ${date(data.completedAt)}"), style = MaterialTheme.typography.bodySmall)
-        if (canEdit) FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            if (data.status == "open") TextButton(onClick = { editing = true }, enabled = !busy) { Text(t("Edit", "बदलें")) }
-            TextButton(onClick = { action = if (active) "cancelled" else "open" }, enabled = !busy) { Text(if (active) t("Cancel", "रद्द करें") else t("Reopen", "फिर खोलें")) }
-            TextButton(onClick = { action = "remove" }, enabled = !busy) { Text(t("Remove", "हटाएँ")) }
-        }
-        if (canEdit && active && (data.type != "conversation" || role == "Doctor")) Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-            if (data.type == "conversation" && data.status == "accepted") TextButton(onClick = onTalk, enabled = !busy) { Text(t("Open conversation", "बातचीत खोलें")) }
-            TextButton(onClick = { action = if (data.status == "open") "accepted" else "completed" }, enabled = !busy) { Icon(if (data.status == "open") Icons.Default.PersonAdd else Icons.Default.DoneAll, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(if (data.status == "open") t("Pick up", "यह मैं लूँगा/लूँगी") else if (data.type == "conversation") t("Conversation done", "बातचीत हो गई") else t("Mark done", "हो गया")) }
+        Spacer(Modifier.height(8.dp))
+        val meta = listOfNotNull(t("For ${data.assignee}", "${data.assignee} के लिए"), data.sender.takeIf { it.isNotBlank() }?.let { t("From ${data.sender}", "भेजने वाले: ${data.sender}") },
+            item.due.takeIf { it > 0 }?.let { if (data.type == "conversation") t("Preferred ${date(item.due)}", "पसंद की तारीख़ ${date(item.due)}") else t("Due ${date(item.due)}", "आख़िरी तारीख़ ${date(item.due)}") })
+        Text(meta.joinToString(" · "), fontSize = 14.sp, color = DoctorCardSub)
+        if (data.detail.isNotBlank()) Text(data.detail, fontSize = 16.sp, color = DoctorCardInk, modifier = Modifier.padding(top = 8.dp))
+        if (data.acceptedBy.isNotBlank()) Text(t("Picked up by ${data.acceptedBy} · ${date(data.acceptedAt)}", "${data.acceptedBy} ने लिया · ${date(data.acceptedAt)}"), fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.padding(top = 8.dp))
+        if (data.completedBy.isNotBlank()) Text(t("Completed by ${data.completedBy} · ${date(data.completedAt)}", "${data.completedBy} ने पूरा किया · ${date(data.completedAt)}"), fontSize = 14.sp, color = DoctorCardSub)
+        if (canEdit) { HorizontalDivider(Modifier.padding(top = 8.dp), color = DoctorHairline); FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            if (data.status == "open") TextButton(onClick = { editing = true }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Edit", "बदलें"), color = RustText) }
+            TextButton(onClick = { action = if (active) "cancelled" else "open" }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text(if (active) t("Cancel", "रद्द करें") else t("Reopen", "फिर खोलें"), color = RustText) }
+            TextButton(onClick = { action = "remove" }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Remove", "हटाएँ"), color = MaterialTheme.colorScheme.error) }
+        } }
+        if (canEdit && active && (data.type != "conversation" || role == "Doctor")) Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)) {
+            if (data.type == "conversation" && data.status == "accepted") TextButton(onClick = onTalk, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Open conversation", "बातचीत खोलें"), color = RustText) }
+            FilledTonalButton(onClick = { action = if (data.status == "open") "accepted" else "completed" }, enabled = !busy, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.filledTonalButtonColors(containerColor = Mint, contentColor = Ink), modifier = Modifier.heightIn(min = 48.dp)) { Icon(if (data.status == "open") Icons.Default.PersonAdd else Icons.Default.DoneAll, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(if (data.status == "open") t("Pick up", "यह मैं लूँगा/लूँगी") else if (data.type == "conversation") t("Conversation done", "बातचीत हो गई") else t("Mark done", "हो गया")) }
         }
     }
     if (editing) CareWorkflowEditor(vm, data.type, item, data) { editing = false }
@@ -239,7 +263,7 @@ object CareLabRules {
                 val changed = CareWorkflowRules.transition(data, action, name)
                 vm.updateItem(item.copy(detail = CareEntryCodec.encode(changed), doneOn = if (action == "completed") LocalDate.now().toString() else "")) { action = "" }
             }.onFailure { error = it.message.orEmpty() }
-        }, modifier = Modifier.testTag("workflow-confirm-action")) { Text(if (busy) t("Saving…", "सहेज रहे हैं…") else when (action) { "accepted" -> t("Pick up", "यह मैं लूँगा/लूँगी"); "completed" -> t("Mark done", "हो गया"); "cancelled" -> t("Cancel entry", "रद्द करें"); "remove" -> t("Remove", "हटाएँ"); else -> t("Reopen", "फिर खोलें") }) } }, dismissButton = { TextButton(onClick = { action = "" }, enabled = !busy) { Text(t("Back", "वापस")) } })
+        }, modifier = Modifier.heightIn(min = 48.dp).testTag("workflow-confirm-action")) { Text(color = if (action == "remove") MaterialTheme.colorScheme.error else RustText, fontWeight = FontWeight.SemiBold, text = if (busy) t("Saving…", "सहेज रहे हैं…") else when (action) { "accepted" -> t("Pick up", "यह मैं लूँगा/लूँगी"); "completed" -> t("Mark done", "हो गया"); "cancelled" -> t("Cancel entry", "रद्द करें"); "remove" -> t("Remove", "हटाएँ"); else -> t("Reopen", "फिर खोलें") }) } }, dismissButton = { TextButton(onClick = { action = "" }, enabled = !busy) { Text(t("Back", "वापस")) } })
     }
 }
 
@@ -260,16 +284,18 @@ object CareLabRules {
     LaunchedEffect(entryId) { vm.actionError.value = null }
     LaunchedEffect(person) { if (person != capturedPerson) onDismiss() }
     ModalBottomSheet(onDismissRequest = { if (!busy) onDismiss() }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
-        Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(start = 20.dp, end = 20.dp, bottom = 28.dp).testTag("workflow-editor"), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        val fieldShape = RoundedCornerShape(14.dp)
+        val fieldColors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = Paper, focusedContainerColor = Paper, focusedBorderColor = Rust, focusedLabelColor = RustText, cursorColor = Rust)
+        Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(start = 16.dp, end = 16.dp, bottom = 32.dp).testTag("workflow-editor"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Heading(if (initial != null) (if (type == "conversation") t("Edit request", "अनुरोध बदलें") else t("Edit task", "काम बदलें")) else if (type == "conversation") t("Ask to talk", "बात करने को कहें") else t("Ask for help", "मदद माँगें"), 26)
-            OutlinedTextField(title, { title = it; error = "" }, label = { Text(if (type == "conversation") t("What would you like to discuss?", "आप किस बारे में बात करना चाहते हैं?") else t("What needs doing?", "क्या करना है?")) }, modifier = Modifier.fillMaxWidth(), maxLines = 3)
+            OutlinedTextField(title, { title = it; error = "" }, label = { Text(if (type == "conversation") t("What would you like to discuss?", "आप किस बारे में बात करना चाहते हैं?") else t("What needs doing?", "क्या करना है?")) }, shape = fieldShape, colors = fieldColors, modifier = Modifier.fillMaxWidth(), maxLines = 3)
             if (title.isEmpty()) Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                (if (type == "conversation") listOf(t("Goals of care", "देखभाल के लक्ष्य"), t("Comfort and symptoms", "आराम और लक्षण"), t("Care at home", "घर पर देखभाल")) else listOf(t("Collect medicines", "दवाएँ लाना"), t("Arrange transport", "आने-जाने का इंतज़ाम"), t("Bring reports", "रिपोर्टें साथ लाना"))).forEach { suggestion -> SuggestionChip(onClick = { title = suggestion }, label = { Text(suggestion) }) }
+                (if (type == "conversation") listOf(t("Goals of care", "देखभाल के लक्ष्य"), t("Comfort and symptoms", "आराम और लक्षण"), t("Care at home", "घर पर देखभाल")) else listOf(t("Collect medicines", "दवाएँ लाना"), t("Arrange transport", "आने-जाने का इंतज़ाम"), t("Bring reports", "रिपोर्टें साथ लाना"))).forEach { suggestion -> SuggestionChip(onClick = { title = suggestion }, label = { Text(suggestion) }, shape = RoundedCornerShape(50), modifier = Modifier.heightIn(min = 48.dp)) }
             }
-            OutlinedTextField(recipient, { recipient = it; error = "" }, label = { Text(if (type == "conversation") t("Doctor or care team", "डॉक्टर या देखभाल टीम") else t("Who is this for?", "यह किसके लिए है?")) }, modifier = Modifier.fillMaxWidth(), singleLine = true)
+            OutlinedTextField(recipient, { recipient = it; error = "" }, label = { Text(if (type == "conversation") t("Doctor or care team", "डॉक्टर या देखभाल टीम") else t("Who is this for?", "यह किसके लिए है?")) }, shape = fieldShape, colors = fieldColors, modifier = Modifier.fillMaxWidth(), singleLine = true)
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 CareDateButton(due, if (type == "conversation") t("Preferred date", "पसंद की तारीख़") else t("Due date", "आख़िरी तारीख़"), { due = it }, allowClear = true)
-                OutlinedTextField(detail, { detail = it }, label = { Text(t("Details (optional)", "जानकारी (चाहें तो)")) }, modifier = Modifier.fillMaxWidth(), maxLines = 4)
+                OutlinedTextField(detail, { detail = it }, label = { Text(t("Details (optional)", "जानकारी (चाहें तो)")) }, shape = fieldShape, colors = fieldColors, modifier = Modifier.fillMaxWidth(), maxLines = 4)
             }
             (error.ifBlank { saveError.orEmpty() }).takeIf(String::isNotBlank)?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
             Button(onClick = {
@@ -281,7 +307,7 @@ object CareLabRules {
                     if (initial == null) vm.saveItem("task", title, encoded, due, done = onDismiss, id = entryId)
                     else vm.updateItem(initial.copy(title = title, detail = encoded, due = due), onDismiss)
                 }.onFailure { error = it.message.orEmpty() }
-            }, enabled = !busy && canEdit && title.isNotBlank() && recipient.isNotBlank(), modifier = Modifier.fillMaxWidth().heightIn(min = 50.dp).testTag("workflow-save"), shape = RoundedCornerShape(14.dp)) { Text(if (busy) t("Saving…", "सहेज रहे हैं…") else if (initial != null) t("Save changes", "बदलाव सहेजें") else if (type == "conversation") t("Send request", "अनुरोध भेजें") else t("Add task", "काम जोड़ें")) }
+            }, enabled = !busy && canEdit && title.isNotBlank() && recipient.isNotBlank(), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("workflow-save"), shape = fieldShape) { Text(fontWeight = FontWeight.SemiBold, text = if (busy) t("Saving…", "सहेज रहे हैं…") else if (initial != null) t("Save changes", "बदलाव सहेजें") else if (type == "conversation") t("Send request", "अनुरोध भेजें") else t("Add task", "काम जोड़ें")) }
         }
     }
 }

@@ -1,9 +1,10 @@
-@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class, androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 package `in`.wedevit.care
 
 import android.content.Intent
 import android.net.Uri
 import android.app.Application
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,7 +21,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.Alignment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.AndroidViewModel
@@ -102,11 +105,11 @@ class CareRootModel(app: Application) : AndroidViewModel(app) {
             welcomeAccountContent = { close, onBusy -> AccountContent(cloud, model, close, onBusyChange = onBusy, banner = joinBanner, onInvite = root::offerInviteLink, onDeleted = { accountNotice = it }) },
             welcomeDoctorContent = { close, onBusy ->
                 if (session == null) AccountContent(cloud, model, close, heading = rt("Doctor sign in", "डॉक्टर साइन इन"), onBusyChange = onBusy, onDeleted = { accountNotice = it })
-                else Column(Modifier.padding(22.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                else Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Heading(rt("Your doctor workspace", "आपका डॉक्टर कार्यक्षेत्र"), 26)
-                    Text(session!!.email)
-                    Text(rt("Use your own account. Professional verification and patient access are separate.", "अपना खाता इस्तेमाल करें। डॉक्टर होने की पुष्टि और मरीज़ तक पहुँच अलग-अलग हैं।"))
-                    Button(onClick = { doctorOpen = true; doctorEntryPending = false }, modifier = Modifier.fillMaxWidth()) { Text(rt("Open workspace", "कार्यक्षेत्र खोलें")) }
+                    Text(session!!.email, fontWeight = FontWeight.Medium, color = DoctorCardInk)
+                    Text(rt("Use your own account. Professional verification and patient access are separate.", "अपना खाता इस्तेमाल करें। डॉक्टर होने की पुष्टि और मरीज़ तक पहुँच अलग-अलग हैं।"), color = DoctorCardSub)
+                    Button(onClick = { doctorOpen = true; doctorEntryPending = false }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Text(rt("Open workspace", "कार्यक्षेत्र खोलें")) }
                 }
             }, onWelcomePanelChanged = { doctorEntryPending = it == "doctor" },
             openToday = openToday, onOpenTodayHandled = { root.openToday.value = null })
@@ -229,14 +232,14 @@ private fun clipboardText(context: android.content.Context): String? = (context.
         }
     }
     fun day(ms: Long) = java.time.Instant.ofEpochMilli(ms).atZone(java.time.ZoneId.systemDefault()).format(careDateFormat(CARE_SHORT_DATE, hindi))
-        Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(horizontal = 22.dp).padding(bottom = 30.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+        Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(horizontal = 16.dp).padding(bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Heading(heading ?: if (session == null) if (create) t("Create an account", "खाता बनाएँ") else t("Sign in", "साइन इन करें") else t("Your account", "आपका खाता"), 28)
-            banner?.let { Surface(color = Mint, shape = RoundedCornerShape(14.dp)) { Text(it, Modifier.fillMaxWidth().padding(14.dp), fontWeight = FontWeight.Medium) } }
+            banner?.let { Surface(color = Mint, shape = RoundedCornerShape(14.dp)) { Text(it, Modifier.fillMaxWidth().padding(16.dp), fontWeight = FontWeight.Medium) } }
             if (session == null) {
-                Text(t("Sign in to share care notes and daily care with people you invite.", "जिन्हें आप बुलाएँ, उनके साथ देखभाल नोट और रोज़ की देखभाल साझा करने के लिए साइन इन करें।"))
-                OutlinedTextField(email, { email = it }, label = { Text(t("Email", "ईमेल")) }, singleLine = true, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email), modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(password, { password = it }, label = { Text(t("Password", "पासवर्ड")) }, singleLine = true, visualTransformation = PasswordVisualTransformation(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password), modifier = Modifier.fillMaxWidth())
-                if (create) Text(t("Use at least 10 characters.", "कम से कम 10 अक्षर रखें।"), style = MaterialTheme.typography.bodySmall)
+                Text(t("Sign in to share care notes and daily care with people you invite.", "जिन्हें आप बुलाएँ, उनके साथ देखभाल नोट और रोज़ की देखभाल साझा करने के लिए साइन इन करें।"), color = DoctorCardSub)
+                OutlinedTextField(email, { email = it }, label = { Text(t("Email", "ईमेल")) }, singleLine = true, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email), shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(password, { password = it }, label = { Text(t("Password", "पासवर्ड")) }, singleLine = true, visualTransformation = PasswordVisualTransformation(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password), shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth(),
+                    supportingText = if (create) { { Text(t("Use at least 10 characters.", "कम से कम 10 अक्षर रखें।"), fontSize = 14.sp, color = DoctorCardSub) } } else null)
                 Button(onClick = { authRun {
                     if (create) when (cloud.signUp(email, password)) {
                         CareSignUp.SIGNED_IN -> password = ""
@@ -244,89 +247,120 @@ private fun clipboardText(context: android.content.Context): String? = (context.
                         CareSignUp.ALREADY_REGISTERED -> { create = false; password = ""; error = careAuthMessage(CARE_ALREADY_REGISTERED, hindi) }
                     }
                     else { cloud.signIn(email, password); awaitingConfirmation = "" }
-                } }, enabled = !busy && email.contains('@') && password.isNotEmpty(), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Text(if (busy) t("Please wait…", "कृपया रुकें…") else if (create) t("Create account", "खाता बनाएँ") else t("Sign in", "साइन इन करें")) }
-                if (awaitingConfirmation.isNotBlank()) OutlinedButton(onClick = { authRun { cloud.resendConfirmation(awaitingConfirmation); notice = t("Sending the email again to $awaitingConfirmation. If it does not come, write to workwithdevit@gmail.com.", "$awaitingConfirmation पर ईमेल फिर भेज रहे हैं। न आए तो workwithdevit@gmail.com पर लिखें।") } }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Resend confirmation email", "पुष्टि ईमेल फिर भेजें")) }
-                if (!create) TextButton(onClick = { authRun {
-                    cloud.sendPasswordReset(email)
-                    notice = t("If that email has an account, you'll receive a reset link.", "अगर इस ईमेल से खाता बना है, तो पासवर्ड बदलने का लिंक आपको मिल जाएगा।")
-                } }, enabled = !busy && email.contains('@') && CareEmailAvailability.ready) { Text(t("Forgot password?", "पासवर्ड भूल गए?")) }
-                TextButton(onClick = { create = !create; error = null; notice = null }, enabled = !busy && (create || CareEmailAvailability.ready)) { Text(if (create) t("Already have an account? Sign in", "पहले से खाता है? साइन इन करें") else t("Create an account", "खाता बनाएँ")) }
-                if (!CareEmailAvailability.ready) Text(t("New accounts and password reset are temporarily unavailable. Existing confirmed accounts can sign in.", "नया खाता बनाना और पासवर्ड बदलना अभी कुछ समय के लिए बंद है। पहले से पक्के खाते साइन इन कर सकते हैं।"), style = MaterialTheme.typography.bodySmall)
-                if (onInvite != null) OutlinedButton(onClick = { val pasted = clipboardText(context); if (CareInviteLink.parse(pasted) != null) { onInvite(pasted.orEmpty()); error = null; notice = t("Invitation kept. Sign in or create an account, and Sahara will ask you to join.", "निमंत्रण रख लिया। साइन इन करें या खाता बनाएँ, फिर Sahara आपसे जुड़ने को पूछेगा।") } else { notice = null; error = t("No Sahara invite found on the clipboard. Copy the WhatsApp message or link first.", "कॉपी किए गए टेक्स्ट में Sahara का निमंत्रण नहीं मिला। पहले WhatsApp संदेश या लिंक कॉपी करें।") } }, enabled = !busy, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.ContentPaste, null); Spacer(Modifier.width(8.dp)); Text(t("Got an invitation? Paste it here", "निमंत्रण मिला है? यहाँ चिपकाएँ")) }
-            } else {
-                Text(session!!.email)
-                if (!owner && selected.isNotBlank()) people.firstOrNull { it.id == selected }?.let { p -> Text(if (canEditShared) t("${p.name}'s care is shared with you. You can read it and add to it.", "${p.name} की देखभाल आपके साथ साझा है। आप इसे देख सकते हैं और जोड़ सकते हैं।") else t("${p.name}'s care is shared with you. You can read it; only the person who invited you can allow changes.", "${p.name} की देखभाल आपके साथ साझा है। आप इसे देख सकते हैं; बदलाव की अनुमति सिर्फ़ बुलाने वाले दे सकते हैं।"), style = MaterialTheme.typography.bodyMedium) }
-                OutlinedButton(onClick = { vm.refresh(); onDismiss() }, enabled = !busy) { Icon(Icons.Default.Refresh, null); Spacer(Modifier.width(8.dp)); Text(t("Refresh records", "रिकॉर्ड फिर से लाएँ")) }
-                DetailPanel(t("Join someone's care", "किसी की देखभाल से जुड़ें"), Icons.Default.GroupAdd) {
-                    Text(t("The person who invited you will see your email.", "जिसने आपको बुलाया है, उन्हें आपका ईमेल दिखेगा।"), style = MaterialTheme.typography.bodySmall)
-                    CareField(code, { code = CareInviteLink.parse(it)?.code ?: it.trim().take(4000) }, t("Invitation code or link", "निमंत्रण कोड या लिंक"), singleLine = true)
-                    OutlinedButton(onClick = { val pasted = clipboardText(context); val invite = CareInviteLink.parse(pasted); if (invite != null) { code = invite.code; error = null; notice = t("Invite pasted. Tap Join.", "निमंत्रण चिपका दिया। अब “जुड़ें” दबाएँ।") } else { notice = null; error = t("No Sahara invite found on the clipboard. Copy the WhatsApp message or link first.", "कॉपी किए गए टेक्स्ट में Sahara का निमंत्रण नहीं मिला। पहले WhatsApp संदेश या लिंक कॉपी करें।") } }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Icon(Icons.Default.ContentPaste, null); Spacer(Modifier.width(8.dp)); Text(t("Paste invite", "निमंत्रण चिपकाएँ")) }
-                    Spacer(Modifier.height(10.dp))
-                    Button(onClick = { run { val before = vm.people.value.map { it.id }.toSet(); try { cloud.join(code) } catch (e: Exception) { if (e is CancellationException) throw e; throw IllegalArgumentException(careJoinFailureMessage(e.message, hindi), e) }; code = ""; val added = vm.joinedRefresh(before); notice = (added?.name?.let { t("You can now see $it's care.", "अब आप $it की देखभाल देख सकते हैं।") } ?: t("You can now see their care.", "अब आप उनकी देखभाल देख सकते हैं।")) + if (added != null && vm.canEditPerson(added.id)) t(" You can read and add.", " आप देख और जोड़ सकते हैं।") else t(" You can read.", " आप देख सकते हैं।") } }, enabled = !busy && code.trim().length == 48) { Text(t("Join", "जुड़ें")) }
+                } }, enabled = !busy && email.contains('@') && password.isNotEmpty(), shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) {
+                    if (busy) { CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp, color = LocalContentColor.current); Spacer(Modifier.width(8.dp)) }
+                    Text(if (busy) t("Please wait…", "कृपया रुकें…") else if (create) t("Create account", "खाता बनाएँ") else t("Sign in", "साइन इन करें"))
                 }
+                if (awaitingConfirmation.isNotBlank()) OutlinedButton(onClick = { authRun { cloud.resendConfirmation(awaitingConfirmation); notice = t("Sending the email again to $awaitingConfirmation. If it does not come, write to workwithdevit@gmail.com.", "$awaitingConfirmation पर ईमेल फिर भेज रहे हैं। न आए तो workwithdevit@gmail.com पर लिखें।") } }, enabled = !busy, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.MailOutline, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Resend confirmation email", "पुष्टि ईमेल फिर भेजें")) }
+                // Secondary links side by side, so the form stays short.
+                FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    if (!create) TextButton(onClick = { authRun {
+                        cloud.sendPasswordReset(email)
+                        notice = t("If that email has an account, you'll receive a reset link.", "अगर इस ईमेल से खाता बना है, तो पासवर्ड बदलने का लिंक आपको मिल जाएगा।")
+                    } }, enabled = !busy && email.contains('@') && CareEmailAvailability.ready, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Forgot password?", "पासवर्ड भूल गए?")) }
+                    TextButton(onClick = { create = !create; error = null; notice = null }, enabled = !busy && (create || CareEmailAvailability.ready), modifier = Modifier.heightIn(min = 48.dp)) { Text(if (create) t("Already have an account? Sign in", "पहले से खाता है? साइन इन करें") else t("Create an account", "खाता बनाएँ"), fontWeight = FontWeight.SemiBold) }
+                }
+                if (!CareEmailAvailability.ready) Text(t("New accounts and password reset are temporarily unavailable. Existing confirmed accounts can sign in.", "नया खाता बनाना और पासवर्ड बदलना अभी कुछ समय के लिए बंद है। पहले से पक्के खाते साइन इन कर सकते हैं।"), fontSize = 14.sp, color = DoctorCardSub)
+                if (onInvite != null) OutlinedButton(onClick = { val pasted = clipboardText(context); if (CareInviteLink.parse(pasted) != null) { onInvite(pasted.orEmpty()); error = null; notice = t("Invitation kept. Sign in or create an account, and Sahara will ask you to join.", "निमंत्रण रख लिया। साइन इन करें या खाता बनाएँ, फिर Sahara आपसे जुड़ने को पूछेगा।") } else { notice = null; error = t("No Sahara invite found on the clipboard. Copy the WhatsApp message or link first.", "कॉपी किए गए टेक्स्ट में Sahara का निमंत्रण नहीं मिला। पहले WhatsApp संदेश या लिंक कॉपी करें।") } }, enabled = !busy, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.ContentPaste, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Got an invitation? Paste it here", "निमंत्रण मिला है? यहाँ चिपकाएँ")) }
+            } else {
+                // Who is signed in, with refresh beside it: one row instead of a line and a separate button.
+                Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
+                    Row(Modifier.padding(start = 16.dp, end = 4.dp, top = 4.dp, bottom = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.AccountCircle, null, Modifier.size(28.dp), tint = Rust); Spacer(Modifier.width(12.dp))
+                        Text(session!!.email, Modifier.weight(1f), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        IconButton(onClick = { vm.refresh(); onDismiss() }, enabled = !busy, modifier = Modifier.size(48.dp)) { Icon(Icons.Default.Refresh, t("Refresh records", "रिकॉर्ड फिर से लाएँ"), tint = Rust) }
+                    }
+                }
+                if (!owner && selected.isNotBlank()) people.firstOrNull { it.id == selected }?.let { p -> Text(if (canEditShared) t("${p.name}'s care is shared with you. You can read it and add to it.", "${p.name} की देखभाल आपके साथ साझा है। आप इसे देख सकते हैं और जोड़ सकते हैं।") else t("${p.name}'s care is shared with you. You can read it; only the person who invited you can allow changes.", "${p.name} की देखभाल आपके साथ साझा है। आप इसे देख सकते हैं; बदलाव की अनुमति सिर्फ़ बुलाने वाले दे सकते हैं।"), style = MaterialTheme.typography.bodyMedium, color = DoctorCardSub) }
                 if (owner && selected.isNotBlank()) DetailPanel(people.firstOrNull { it.id == selected }?.name.orEmpty().let { t("Share $it's care", "$it की देखभाल साझा करें") }, Icons.Default.PersonAdd) {
-                    Button(onClick = { addFamily = true }, enabled = !busy, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Icon(Icons.Default.PersonAdd, null); Spacer(Modifier.width(8.dp)); Text(t("Add family", "परिवार जोड़ें")) }
-                    Text(people.firstOrNull { it.id == selected }?.name.orEmpty().let { t("Let family see $it's care on their own phone", "परिवार अपने फ़ोन पर $it की देखभाल देख सके") }, style = MaterialTheme.typography.bodySmall)
-                    Text(t("Who are you inviting?", "आप किसे बुला रहे हैं?"), style = MaterialTheme.typography.bodyMedium)
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        FilterChip(selected = !inviteDoctor, onClick = { inviteDoctor = false; invite = "" }, modifier = Modifier.heightIn(min = 48.dp), label = { Text(t("Family", "परिवार")) })
-                        FilterChip(selected = inviteDoctor, onClick = { inviteDoctor = true; invite = "" }, modifier = Modifier.heightIn(min = 48.dp), label = { Text(t("Doctor", "डॉक्टर")) })
+                    Text(people.firstOrNull { it.id == selected }?.name.orEmpty().let { t("Let family see $it's care on their own phone", "परिवार अपने फ़ोन पर $it की देखभाल देख सके") }, style = MaterialTheme.typography.bodyMedium, color = DoctorCardSub)
+                    Button(onClick = { addFamily = true }, enabled = !busy, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Icon(Icons.Default.PersonAdd, null); Spacer(Modifier.width(8.dp)); Text(t("Add family", "परिवार जोड़ें")) }
+                    HorizontalDivider(color = DoctorHairline)
+                    Text(t("Who are you inviting?", "आप किसे बुला रहे हैं?"), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium, color = DoctorCardInk)
+                    SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
+                        SegmentedButton(selected = !inviteDoctor, onClick = { inviteDoctor = false; invite = "" }, shape = SegmentedButtonDefaults.itemShape(0, 2), modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Family", "परिवार")) }
+                        SegmentedButton(selected = inviteDoctor, onClick = { inviteDoctor = true; invite = "" }, shape = SegmentedButtonDefaults.itemShape(1, 2), modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Doctor", "डॉक्टर")) }
                     }
                     if (!inviteDoctor) {
-                        Text(t("Invited people can read the care notes and daily entries. Recordings and unfinished conversations aren't shared.", "बुलाए गए लोग देखभाल नोट और रोज़ की जानकारी पढ़ सकते हैं। रिकॉर्डिंग और अधूरी बातचीत साझा नहीं होती।"))
+                        Text(t("Invited people can read the care notes and daily entries. Recordings and unfinished conversations aren't shared.", "बुलाए गए लोग देखभाल नोट और रोज़ की जानकारी पढ़ सकते हैं। रिकॉर्डिंग और अधूरी बातचीत साझा नहीं होती।"), style = MaterialTheme.typography.bodyMedium, color = DoctorCardSub)
                         CheckLine(allowChanges, { allowChanges = it; invite = "" }, t("Allow them to add and change records", "उन्हें रिकॉर्ड जोड़ने और बदलने दें"))
                         CheckLine(allowCareTeam, { allowCareTeam = it; invite = "" }, t("Share family and care-team contacts", "परिवार और देखभाल टीम के नंबर साझा करें"))
                     } else {
-                        Text(t("This creates a one-person code that you share yourself. Nothing is sent to the doctor, and creating it does not verify them.", "इससे एक व्यक्ति के लिए कोड बनता है, जिसे आप ख़ुद भेजते हैं। डॉक्टर को अपने-आप कुछ नहीं जाता, और कोड बनाने से डॉक्टर की पहचान पक्की नहीं होती।"), style = MaterialTheme.typography.bodySmall)
-                        Text(t("A doctor can only join with this code after their clinician verification has been approved. Until then, joining with it will fail with a verification message.", "डॉक्टर इस कोड से तभी जुड़ सकते हैं जब उनकी डॉक्टर-पहचान मंज़ूर हो चुकी हो। तब तक जुड़ने पर पहचान से जुड़ा संदेश आएगा।"), style = MaterialTheme.typography.bodySmall)
+                        // The two long rules about doctor codes sit behind one tap.
+                        InfoDisclosure(t("About this", "इसके बारे में"), Cream) {
+                            Text(t("This creates a one-person code that you share yourself. Nothing is sent to the doctor, and creating it does not verify them.", "इससे एक व्यक्ति के लिए कोड बनता है, जिसे आप ख़ुद भेजते हैं। डॉक्टर को अपने-आप कुछ नहीं जाता, और कोड बनाने से डॉक्टर की पहचान पक्की नहीं होती।"), style = MaterialTheme.typography.bodyMedium, color = DoctorCardSub)
+                            Text(t("A doctor can only join with this code after their clinician verification has been approved. Until then, joining with it will fail with a verification message.", "डॉक्टर इस कोड से तभी जुड़ सकते हैं जब उनकी डॉक्टर-पहचान मंज़ूर हो चुकी हो। तब तक जुड़ने पर पहचान से जुड़ा संदेश आएगा।"), style = MaterialTheme.typography.bodyMedium, color = DoctorCardSub)
+                        }
                         PatientIdForDoctor(selected)
-                        Text(t("What they can open", "वे क्या खोल सकेंगे"), style = MaterialTheme.typography.bodyMedium)
-                        CheckLine(doctorNotes, { doctorNotes = it; invite = "" }, t("Care notes and conversations", "देखभाल नोट और बातचीत"))
-                        CheckLine(doctorCalendar, { doctorCalendar = it; invite = "" }, t("Calendar, medicines and tasks", "कैलेंडर, दवाइयाँ और काम"))
-                        CheckLine(doctorReports, { doctorReports = it; invite = "" }, t("Report-derived records", "रिपोर्ट से बने रिकॉर्ड"))
-                        CheckLine(doctorCosts, { doctorCosts = it; invite = "" }, t("Costs", "ख़र्च"))
+                        Text(t("What they can open", "वे क्या खोल सकेंगे"), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium, color = DoctorCardInk)
+                        // Chips instead of a wall of checkboxes; each one still toggles on its own.
+                        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            AccessChip(doctorNotes, t("Care notes and conversations", "देखभाल नोट और बातचीत")) { doctorNotes = !doctorNotes; invite = "" }
+                            AccessChip(doctorCalendar, t("Calendar, medicines and tasks", "कैलेंडर, दवाइयाँ और काम")) { doctorCalendar = !doctorCalendar; invite = "" }
+                            AccessChip(doctorReports, t("Report-derived records", "रिपोर्ट से बने रिकॉर्ड")) { doctorReports = !doctorReports; invite = "" }
+                            AccessChip(doctorCosts, t("Costs", "ख़र्च")) { doctorCosts = !doctorCosts; invite = "" }
+                        }
                         CheckLine(doctorEdit, { doctorEdit = it; invite = "" }, t("Allow them to add and change records (otherwise read-only)", "उन्हें रिकॉर्ड जोड़ने और बदलने दें (नहीं तो सिर्फ़ पढ़ सकेंगे)"))
-                        Text(t("Access lasts", "कितने दिन खुला रहे"), style = MaterialTheme.typography.bodyMedium)
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf(1, 7, 30, 90).forEach { d -> FilterChip(selected = doctorDays == d, onClick = { doctorDays = d; invite = "" }, modifier = Modifier.heightIn(min = 48.dp), label = { Text(t("$d days", "$d दिन")) }) } }
+                        Text(t("Access lasts", "कितने दिन खुला रहे"), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium, color = DoctorCardInk)
+                        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) { listOf(1, 7, 30, 90).forEach { d -> AccessChip(doctorDays == d, t("$d days", "$d दिन")) { doctorDays = d; invite = "" } } }
                     }
-                    Button(onClick = { val person = selected; val account = session!!.userId; val doctor = inviteDoctor; run { val before = cloud.openInvites(person); val code = if (doctor) cloud.inviteAccess(person, "clinician", doctorEdit, mapOf("careNote" to doctorNotes, "calendar" to doctorCalendar, "reports" to doctorReports, "costs" to doctorCosts), doctorDays, expectedAccountId = account) else cloud.invite(person, allowChanges, allowCareTeam); if (vm.selected.value == person && cloud.session.value?.userId == account && vm.isOwner.value) { invite = code; inviteStore.logCreated(cloud, account, person, "", "", if (doctor) "clinician" else "family", before); inviteTick++ } } }, enabled = !busy && (!inviteDoctor || doctorNotes || doctorCalendar || doctorReports || doctorCosts), modifier = Modifier.heightIn(min = 48.dp)) { Text(if (inviteDoctor) t("Create doctor invitation", "डॉक्टर के लिए निमंत्रण बनाएँ") else t("Create invitation", "निमंत्रण बनाएँ")) }
-                    if (invite.isNotEmpty()) {
-                        Spacer(Modifier.height(12.dp)); Text(if (inviteDoctor) t("One person · the code expires in 3 days · works only for an approved clinician account", "एक व्यक्ति · कोड 3 दिन में बंद हो जाएगा · सिर्फ़ मंज़ूर डॉक्टर खाते के लिए") else t("One person · the link expires in 3 days · access then lasts 30 days", "एक व्यक्ति · लिंक 3 दिन में बंद होगा · उसके बाद पहुँच 30 दिन रहेगी"), style = MaterialTheme.typography.bodySmall)
-                        TextButton(onClick = { open(context, Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, CareInviteLink.shareText(people.firstOrNull { it.id == selected }?.name.orEmpty(), invite)), t("Share invitation", "निमंत्रण भेजें"))) }) { Icon(Icons.Default.Share, null); Spacer(Modifier.width(8.dp)); Text(t("Share invitation", "निमंत्रण भेजें")) }
-                        androidx.compose.foundation.text.selection.SelectionContainer { Text(invite, style = MaterialTheme.typography.bodySmall) }
+                    OutlinedButton(onClick = { val person = selected; val account = session!!.userId; val doctor = inviteDoctor; run { val before = cloud.openInvites(person); val code = if (doctor) cloud.inviteAccess(person, "clinician", doctorEdit, mapOf("careNote" to doctorNotes, "calendar" to doctorCalendar, "reports" to doctorReports, "costs" to doctorCosts), doctorDays, expectedAccountId = account) else cloud.invite(person, allowChanges, allowCareTeam); if (vm.selected.value == person && cloud.session.value?.userId == account && vm.isOwner.value) { invite = code; inviteStore.logCreated(cloud, account, person, "", "", if (doctor) "clinician" else "family", before); inviteTick++ } } }, enabled = !busy && (!inviteDoctor || doctorNotes || doctorCalendar || doctorReports || doctorCosts), shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.Link, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(if (inviteDoctor) t("Create doctor invitation", "डॉक्टर के लिए निमंत्रण बनाएँ") else t("Create invitation", "निमंत्रण बनाएँ")) }
+                    if (invite.isNotEmpty()) Surface(shape = RoundedCornerShape(14.dp), color = Mint, modifier = Modifier.fillMaxWidth()) {
+                        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Text(if (inviteDoctor) t("One person · the code expires in 3 days · works only for an approved clinician account", "एक व्यक्ति · कोड 3 दिन में बंद हो जाएगा · सिर्फ़ मंज़ूर डॉक्टर खाते के लिए") else t("One person · the link expires in 3 days · access then lasts 30 days", "एक व्यक्ति · लिंक 3 दिन में बंद होगा · उसके बाद पहुँच 30 दिन रहेगी"), style = MaterialTheme.typography.bodyMedium, color = DoctorCardInk)
+                            Button(onClick = { open(context, Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, CareInviteLink.shareText(people.firstOrNull { it.id == selected }?.name.orEmpty(), invite)), t("Share invitation", "निमंत्रण भेजें"))) }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.Share, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Share invitation", "निमंत्रण भेजें")) }
+                            androidx.compose.foundation.text.selection.SelectionContainer { Text(invite, style = MaterialTheme.typography.bodySmall, color = DoctorCardSub, maxLines = 2, overflow = TextOverflow.Ellipsis) }
+                        }
                     }
-                    if (invites.isNotEmpty()) { Text(t("Invitations", "भेजे गए निमंत्रण"), fontWeight = FontWeight.Medium); val now = System.currentTimeMillis(); invites.forEach { e ->
+                    if (invites.isNotEmpty()) { HorizontalDivider(color = DoctorHairline); Text(t("Invitations", "भेजे गए निमंत्रण"), fontWeight = FontWeight.Medium, color = DoctorCardInk); val now = System.currentTimeMillis(); invites.forEach { e ->
                         val status = CareInviteLog.status(e, openInvites, memberDetails, now)
-                        Row(Modifier.fillMaxWidth(), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
-                            Text(CareInviteLog.label(e, status, now, hindi, members.firstOrNull { it.userId == status.memberId }?.email.orEmpty()), Modifier.weight(1f).padding(vertical = 4.dp), style = MaterialTheme.typography.bodyMedium)
-                            if (status.state == CareInviteState.OPEN) TextButton(onClick = { val person = selected; val acct = session!!.userId; run { cloud.cancelInvite(e.inviteId); inviteStore.save(acct, inviteStore.all(acct).filterNot { it.inviteId == e.inviteId }); inviteTick++; if (vm.selected.value == person) notice = t("Invitation cancelled. The link no longer works.", "निमंत्रण रद्द हुआ। अब लिंक काम नहीं करेगा।") } }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Cancel", "रद्द करें")) }
+                        Row(Modifier.fillMaxWidth().heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Default.MailOutline, null, Modifier.size(18.dp), tint = DoctorCardSub); Spacer(Modifier.width(8.dp))
+                            Text(CareInviteLog.label(e, status, now, hindi, members.firstOrNull { it.userId == status.memberId }?.email.orEmpty()), Modifier.weight(1f).padding(vertical = 4.dp), style = MaterialTheme.typography.bodyMedium, color = DoctorCardInk)
+                            if (status.state == CareInviteState.OPEN) TextButton(onClick = { val person = selected; val acct = session!!.userId; run { cloud.cancelInvite(e.inviteId); inviteStore.save(acct, inviteStore.all(acct).filterNot { it.inviteId == e.inviteId }); inviteTick++; if (vm.selected.value == person) notice = t("Invitation cancelled. The link no longer works.", "निमंत्रण रद्द हुआ। अब लिंक काम नहीं करेगा।") } }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Cancel", "रद्द करें"), color = RustText) }
                         }
                     } }
-                    if (membersLoaded) Text(if (members.isEmpty()) t("Nobody has joined yet.", "अभी तक कोई नहीं जुड़ा।") else t("People with access", "जिन्हें पहुँच है"), fontWeight = FontWeight.Medium)
-                    members.forEach { member ->
+                    if (membersLoaded) { HorizontalDivider(color = DoctorHairline); Text(if (members.isEmpty()) t("Nobody has joined yet.", "अभी तक कोई नहीं जुड़ा।") else t("People with access", "जिन्हें पहुँच है"), fontWeight = FontWeight.Medium, color = if (members.isEmpty()) DoctorCardSub else DoctorCardInk) }
+                    members.forEachIndexed { index, member ->
                         val detail = memberDetails?.firstOrNull { it.userId == member.userId }; val now = System.currentTimeMillis()
-                        Row(Modifier.fillMaxWidth()) {
-                            Column(Modifier.weight(1f).padding(top = 12.dp)) { Text(member.email); Text(listOfNotNull(if (member.canEdit) t("Can make changes", "बदलाव कर सकते हैं") else t("Can read", "सिर्फ़ पढ़ सकते हैं"),
-                                detail?.joinedAt?.takeIf { it > 0 }?.let { t("joined ${day(it)}", "${day(it)} को जुड़े") },
-                                detail?.expiresAt?.takeIf { it > 0 }?.let { if (it > now) t("access until ${day(it)}", "${day(it)} तक पहुँच") else t("access ended ${day(it)} · invite again", "${day(it)} को पहुँच ख़त्म · फिर से बुलाएँ") }).joinToString(" · "), style = MaterialTheme.typography.bodySmall) }
-                            TextButton(onClick = { removing = member }, enabled = !busy) { Text(t("Remove", "हटाएँ")) }
+                        if (index > 0) HorizontalDivider(color = DoctorHairline)
+                        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                Text(member.email, fontSize = 16.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                // Access level as a badge; dates on one quiet line.
+                                Surface(shape = RoundedCornerShape(50), color = if (member.canEdit) DoctorStatusGoodBg else SaharaSoftBlue) { Text(if (member.canEdit) t("Can make changes", "बदलाव कर सकते हैं") else t("Can read", "सिर्फ़ पढ़ सकते हैं"), Modifier.padding(horizontal = 10.dp, vertical = 2.dp), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = if (member.canEdit) DoctorStatusGood else DoctorCardInk) }
+                                listOfNotNull(detail?.joinedAt?.takeIf { it > 0 }?.let { t("joined ${day(it)}", "${day(it)} को जुड़े") },
+                                    detail?.expiresAt?.takeIf { it > 0 }?.let { if (it > now) t("access until ${day(it)}", "${day(it)} तक पहुँच") else t("access ended ${day(it)} · invite again", "${day(it)} को पहुँच ख़त्म · फिर से बुलाएँ") }).joinToString(" · ").takeIf(String::isNotBlank)?.let { Text(it, fontSize = 14.sp, color = DoctorCardSub) }
+                            }
+                            TextButton(onClick = { removing = member }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Remove", "हटाएँ"), color = RustText) }
                         }
                         OutlinedButton(onClick = { val person = selected; run {
                             try { cloud.setMemberEdit(person, member.userId, !member.canEdit) } catch (e: CareServerFeatureMissing) { throw IllegalStateException(t("You cannot change access yet. For now, remove them and send a new invite with the access you want.", "अभी पहुँच नहीं बदल सकते। अभी के लिए उन्हें हटाकर, सही पहुँच के साथ नया निमंत्रण भेजें।"), e) }
                             loadSharing(person); if (vm.selected.value == person) notice = if (member.canEdit) t("${member.email} can now only read.", "${member.email} अब सिर्फ़ देख सकते हैं।") else t("${member.email} can now add and change records.", "${member.email} अब रिकॉर्ड जोड़ और बदल सकते हैं।")
-                        } }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text(if (member.canEdit) t("Change to read only", "सिर्फ़ देखने की पहुँच दें") else t("Allow adding and changes", "जोड़ने-बदलने की पहुँच दें")) }
+                        } }, enabled = !busy, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp)) { Text(if (member.canEdit) t("Change to read only", "सिर्फ़ देखने की पहुँच दें") else t("Allow adding and changes", "जोड़ने-बदलने की पहुँच दें")) }
                         CheckLine(member.careTeamRead, { enabled -> val person = selected; val account = session!!.userId; run { require(vm.selected.value == person && cloud.session.value?.userId == account && vm.isOwner.value); cloud.setCareTeamSharing(person, member.userId, enabled); if (vm.selected.value == person && cloud.session.value?.userId == account) loadSharing(person) } }, t("Share care-team contacts with this person", "इस व्यक्ति के साथ देखभाल टीम के नंबर साझा करें"))
-                        if (!member.careTeamPermissionKnown) Text(t("Sharing care-team contacts is not available yet.", "देखभाल टीम के नंबर अभी साझा नहीं हो सकते।"), style = MaterialTheme.typography.bodySmall)
+                        if (!member.careTeamPermissionKnown) Text(t("Sharing care-team contacts is not available yet.", "देखभाल टीम के नंबर अभी साझा नहीं हो सकते।"), fontSize = 14.sp, color = DoctorCardSub)
                     }
                     CareContactManager(vm, selected)
                 }
-                TextButton(onClick = { signingOut = true }, enabled = !busy) { Text(t("Sign out", "साइन आउट करें")) }
-                TextButton(onClick = { deleteUnderstood = false; deleting = true }, enabled = !busy) { Text(t("Delete my account and data", "मेरा खाता और जानकारी मिटाएँ")) }
-                if (deletionByEmail) TextButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.delete_account_url)))) }, enabled = !busy) { Text(t("Request deletion by email", "ईमेल से मिटाने का अनुरोध भेजें")) }
+                DetailPanel(t("Join someone's care", "किसी की देखभाल से जुड़ें"), Icons.Default.GroupAdd) {
+                    Text(t("The person who invited you will see your email.", "जिसने आपको बुलाया है, उन्हें आपका ईमेल दिखेगा।"), style = MaterialTheme.typography.bodyMedium, color = DoctorCardSub)
+                    CareField(code, { code = CareInviteLink.parse(it)?.code ?: it.trim().take(4000) }, t("Invitation code or link", "निमंत्रण कोड या लिंक"), singleLine = true)
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        OutlinedButton(onClick = { val pasted = clipboardText(context); val invite = CareInviteLink.parse(pasted); if (invite != null) { code = invite.code; error = null; notice = t("Invite pasted. Tap Join.", "निमंत्रण चिपका दिया। अब “जुड़ें” दबाएँ।") } else { notice = null; error = t("No Sahara invite found on the clipboard. Copy the WhatsApp message or link first.", "कॉपी किए गए टेक्स्ट में Sahara का निमंत्रण नहीं मिला। पहले WhatsApp संदेश या लिंक कॉपी करें।") } }, enabled = !busy, shape = RoundedCornerShape(14.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp)) { Icon(Icons.Default.ContentPaste, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Paste invite", "निमंत्रण चिपकाएँ"), maxLines = 1, overflow = TextOverflow.Ellipsis) }
+                        Button(onClick = { run { val before = vm.people.value.map { it.id }.toSet(); try { cloud.join(code) } catch (e: Exception) { if (e is CancellationException) throw e; throw IllegalArgumentException(careJoinFailureMessage(e.message, hindi), e) }; code = ""; val added = vm.joinedRefresh(before); notice = (added?.name?.let { t("You can now see $it's care.", "अब आप $it की देखभाल देख सकते हैं।") } ?: t("You can now see their care.", "अब आप उनकी देखभाल देख सकते हैं।")) + if (added != null && vm.canEditPerson(added.id)) t(" You can read and add.", " आप देख और जोड़ सकते हैं।") else t(" You can read.", " आप देख सकते हैं।") } }, enabled = !busy && code.trim().length == 48, shape = RoundedCornerShape(14.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp)) { Text(t("Join", "जुड़ें")) }
+                    }
+                }
+                HorizontalDivider(color = DoctorHairline)
+                FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    TextButton(onClick = { signingOut = true }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Sign out", "साइन आउट करें")) }
+                    TextButton(onClick = { deleteUnderstood = false; deleting = true }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp), colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)) { Icon(Icons.Default.DeleteOutline, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Delete my account and data", "मेरा खाता और जानकारी मिटाएँ")) }
+                }
+                if (deletionByEmail) TextButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.delete_account_url)))) }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Request deletion by email", "ईमेल से मिटाने का अनुरोध भेजें")) }
             }
-            TextButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.privacy_url)))) }) { Text(t("Privacy policy", "निजता नीति")) }
-            notice?.let { Text(it, color = MaterialTheme.colorScheme.secondary) }
-            error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()) }
+            notice?.let { Text(it, color = MaterialTheme.colorScheme.secondary, fontWeight = FontWeight.Medium, modifier = Modifier.announce()) }
+            error?.let { Text(it, color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.Medium, modifier = Modifier.announce()) }
+            TextButton(onClick = { open(context, Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.privacy_url)))) }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Privacy policy", "निजता नीति"), color = DoctorCardSub) }
         }
     if (addFamily) AddFamilySheet(vm, onDismiss = { addFamily = false }, onSignIn = {}, onInvited = { inviteTick++ })
     removing?.let { member -> AlertDialog(onDismissRequest = { removing = null }, title = { Text(t("Stop sharing with this person?", "इस व्यक्ति के साथ साझा करना बंद करें?")) }, text = { Text(t("They won't be able to read or change these records online. Copies they've already saved cannot be recalled.", "वे ये रिकॉर्ड ऑनलाइन न पढ़ सकेंगे, न बदल सकेंगे। जो कॉपी वे पहले सहेज चुके हैं, वह वापस नहीं ली जा सकती।")) }, confirmButton = { TextButton(onClick = { removing = null; val person = selected; run { cloud.removeMember(person, member.userId); loadSharing(person); if (vm.selected.value == person) notice = t("${member.email} no longer has access.", "${member.email} की पहुँच हटा दी गई।") } }) { Text(t("Stop sharing", "साझा करना बंद करें")) } }, dismissButton = { TextButton(onClick = { removing = null }) { Text(t("Keep sharing", "साझा करते रहें")) } }) }
@@ -344,4 +378,11 @@ private fun clipboardText(context: android.content.Context): String? = (context.
         } }, enabled = deleteUnderstood) { Text(t("Delete everything", "सब मिटाएँ")) } },
         dismissButton = { TextButton(onClick = { deleting = false }) { Text(t("Keep my account", "खाता रहने दें")) } })
     if (signingOut) AlertDialog(onDismissRequest = { signingOut = false }, title = { Text(t("Sign out?", "साइन आउट करें?")) }, confirmButton = { TextButton(onClick = { signingOut = false; run { vm.stopRecording(); cloud.signOut() } }) { Text(t("Sign out", "साइन आउट करें")) } }, dismissButton = { TextButton(onClick = { signingOut = false }) { Text(t("Cancel", "रद्द करें")) } })
+}
+
+/** One access choice as a chip with a tick when on; at least 48dp tall. */
+@Composable private fun AccessChip(selected: Boolean, label: String, onClick: () -> Unit) {
+    FilterChip(selected = selected, onClick = onClick, label = { Text(label, fontSize = 14.sp) }, shape = RoundedCornerShape(50), modifier = Modifier.heightIn(min = 48.dp),
+        leadingIcon = if (selected) { { Icon(Icons.Default.Check, null, Modifier.size(16.dp)) } } else null,
+        colors = FilterChipDefaults.filterChipColors(containerColor = Paper, selectedContainerColor = Mint, selectedLabelColor = DoctorCardInk, selectedLeadingIconColor = Rust))
 }

@@ -4,6 +4,7 @@ package `in`.wedevit.care
 import android.app.Application
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -65,17 +66,17 @@ private fun visitDay(due: Long, zone: ZoneId) = Instant.ofEpochMilli(due).atZone
     val weekStart = selected.minusDays((selected.dayOfWeek.value - 1).toLong())
     fun pick(day: LocalDate) { selectedText = day.toString(); expandedId = null }
 
-    LazyColumn(modifier.fillMaxSize().testTag("doctor-schedule"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+    LazyColumn(modifier.fillMaxSize().testTag("doctor-schedule"), contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item {
             Column {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     Icon(Icons.Default.CalendarMonth, null, tint = DoctorAccent, modifier = Modifier.size(28.dp))
                     Text(t("Schedule", "समय-सूची"), Modifier.weight(1f).a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 28.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
-                    Button(onClick = { picking = true }, shape = RoundedCornerShape(50), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent, contentColor = Color.White), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-schedule-add")) {
+                    Button(onClick = { picking = true }, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent, contentColor = Color.White), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-schedule-add")) {
                         Icon(Icons.Default.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Add", "जोड़ें"))
                     }
                 }
-                TextButton(onClick = onAllPatients, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-schedule-all-patients")) { Text(t("All patients", "सभी मरीज़"), color = RustText) }
+                TextButton(onClick = onAllPatients, contentPadding = PaddingValues(horizontal = 0.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-schedule-all-patients")) { Icon(Icons.Default.People, null, Modifier.size(18.dp), tint = RustText); Spacer(Modifier.width(6.dp)); Text(t("All patients", "सभी मरीज़"), color = RustText) }
             }
         }
         item {
@@ -100,7 +101,7 @@ private fun visitDay(due: Long, zone: ZoneId) = Instant.ofEpochMilli(due).atZone
                       Box(contentAlignment = Alignment.Center) {
                         val ink = if (isSelected) Color.White else DoctorCardInk
                         Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                            Text(careDateFormat("EEE", hindi).format(day), fontSize = 11.sp, color = ink.copy(alpha = if (isSelected) .9f else .7f), maxLines = 1, softWrap = false)
+                            Text(careDateFormat("EEE", hindi).format(day), fontSize = 12.sp, color = if (isSelected) Color.White else DoctorCardSub, maxLines = 1, softWrap = false)
                             Text(careDateFormat("dd", hindi).format(day), fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = ink, maxLines = 1)
                             Box(Modifier.size(5.dp).clip(CircleShape).background(if (has) (if (isSelected) Color.White else DoctorAccent) else Color.Transparent))
                         }
@@ -112,11 +113,11 @@ private fun visitDay(due: Long, zone: ZoneId) = Instant.ofEpochMilli(due).atZone
         }
         if (dayVisits.isEmpty()) item(key = "schedule-empty") {
             val label = careDateFormat("EEE d MMM", hindi).format(selected)
-            Surface(color = Paper, shape = RoundedCornerShape(22.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
-                Column(Modifier.padding(20.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Icon(Icons.Default.EventAvailable, null, tint = DoctorAccent, modifier = Modifier.size(32.dp))
-                    Text(t("No visits on $label", "$label को कोई विज़िट नहीं"), fontWeight = FontWeight.Medium, color = DoctorCardInk, textAlign = TextAlign.Center)
-                    OutlinedButton(onClick = { picking = true }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Add a visit", "विज़िट जोड़ें")) }
+            Surface(color = Paper, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
+                Column(Modifier.padding(20.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Box(Modifier.size(48.dp).clip(CircleShape).background(Peach), contentAlignment = Alignment.Center) { Icon(Icons.Default.EventAvailable, null, tint = DoctorAccent, modifier = Modifier.size(24.dp)) }
+                    Text(t("No visits on $label", "$label को कोई विज़िट नहीं"), fontSize = 16.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, textAlign = TextAlign.Center)
+                    OutlinedButton(onClick = { picking = true }, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Add a visit", "विज़िट जोड़ें")) }
                 }
             }
         }
@@ -137,28 +138,29 @@ private fun visitDay(due: Long, zone: ZoneId) = Instant.ofEpochMilli(due).atZone
     val place = entry?.location?.trim().orEmpty().ifBlank { t("Visit", "विज़िट") }
     val doctor = doctorVisitDoctor(item).ifBlank { t("Doctor not recorded", "डॉक्टर दर्ज नहीं") }
     val note = DoctorVisitDetails.decode(entry?.detail ?: item.detail).note.trim()
-    Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(24.dp)).background(Brush.linearGradient(listOf(tint.first, tint.second))).clickable(onClick = onToggle).testTag("doctor-schedule-card-${item.id}")) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Row(verticalAlignment = Alignment.Top) {
-                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text(t("Visit with ${patient.name}", "${patient.name} के साथ विज़िट"), fontFamily = SaharaTitleFont, fontSize = 19.sp, lineHeight = 25.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
-                    Text(time, fontSize = 14.sp, color = DoctorCardSub)
+    Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(Brush.linearGradient(listOf(tint.first, tint.second))).border(1.dp, DoctorHairline, RoundedCornerShape(20.dp)).clickable(onClick = onToggle).testTag("doctor-schedule-card-${item.id}")) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(time, Modifier.width(76.dp), fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = RustText, maxLines = 2)
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text(t("Visit with ${patient.name}", "${patient.name} के साथ विज़िट"), fontFamily = SaharaTitleFont, fontSize = 18.sp, lineHeight = 24.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
                 }
                 Surface(onClick = onToggle, shape = CircleShape, color = Color.White.copy(alpha = .75f), modifier = Modifier.size(48.dp)) {
                     Box(contentAlignment = Alignment.Center) { Icon(if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore, if (expanded) t("Hide details", "विवरण छिपाएँ") else t("Show details", "विवरण दिखाएँ"), tint = DoctorCardInk) }
                 }
             }
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                Box(Modifier.size(32.dp).clip(CircleShape).background(Color.White.copy(alpha = .8f)), contentAlignment = Alignment.Center) { Text(patient.name.take(1).uppercase(), fontWeight = FontWeight.Bold, fontSize = 14.sp, color = RustText) }
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Icon(Icons.Default.Place, null, Modifier.size(18.dp), tint = DoctorCardSub)
                 Text(place, Modifier.weight(1f), fontSize = 14.sp, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Surface(color = Color.Transparent, shape = RoundedCornerShape(50), border = BorderStroke(1.dp, DoctorCardSub)) {
-                    Text(if (doctorVisitCompleted(item)) t("Completed", "पूरी हुई") else t("Planned", "तय"), Modifier.padding(horizontal = 10.dp, vertical = 4.dp), fontSize = 12.sp, color = DoctorCardInk)
+                val done = doctorVisitCompleted(item)
+                Surface(color = if (done) DoctorStatusGoodBg else DoctorStatusWarnBg, shape = RoundedCornerShape(50)) {
+                    Text(if (done) t("Completed", "पूरी हुई") else t("Planned", "तय"), Modifier.padding(horizontal = 10.dp, vertical = 4.dp), fontSize = 13.sp, fontWeight = FontWeight.Medium, color = if (done) DoctorStatusGood else DoctorStatusWarn)
                 }
             }
             if (expanded) {
                 Text(t("Doctor: $doctor", "डॉक्टर: $doctor"), fontSize = 14.sp, color = DoctorCardInk)
                 if (note.isNotBlank()) Text(t("Appointment logistics: $note", "अपॉइंटमेंट का इंतज़ाम: $note"), fontSize = 14.sp, color = DoctorCardSub)
-                OutlinedButton(onClick = onOpen, shape = RoundedCornerShape(50), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-schedule-open-${item.id}")) { Text(t("Open", "खोलें"), color = RustText) }
+                OutlinedButton(onClick = onOpen, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-schedule-open-${item.id}")) { Text(t("Open", "खोलें"), color = RustText); Spacer(Modifier.width(4.dp)); Icon(Icons.Default.ChevronRight, null, Modifier.size(18.dp), tint = RustText) }
             }
         }
     }
@@ -170,15 +172,20 @@ private fun visitDay(due: Long, zone: ZoneId) = Instant.ofEpochMilli(due).atZone
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
         Column(Modifier.fillMaxWidth().imePadding().padding(horizontal = 20.dp).padding(bottom = 20.dp).testTag("doctor-schedule-picker"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(t("Choose a patient", "मरीज़ चुनें"), Modifier.a11yHeading(), fontFamily = SaharaTitleFont, fontSize = 24.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
-            OutlinedTextField(query, { query = it.take(80) }, Modifier.fillMaxWidth().testTag("doctor-schedule-search"), singleLine = true, shape = RoundedCornerShape(16.dp),
+            OutlinedTextField(query, { query = it.take(80) }, Modifier.fillMaxWidth().testTag("doctor-schedule-search"), singleLine = true, shape = RoundedCornerShape(14.dp),
+                colors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = Paper, focusedContainerColor = Paper),
                 placeholder = { Text(t("Search patients by name", "नाम से मरीज़ खोजें")) }, leadingIcon = { Icon(Icons.Default.Search, null) },
                 trailingIcon = { if (query.isNotEmpty()) IconButton(onClick = { query = "" }, Modifier.size(48.dp)) { Icon(Icons.Default.Clear, t("Clear search", "खोज साफ़ करें")) } })
-            if (shown.isEmpty()) Text(if (patients.isEmpty()) t("No patients yet", "अभी कोई मरीज़ नहीं") else t("No matching patient", "कोई मरीज़ नहीं मिला"), color = DoctorCardSub)
+            if (shown.isEmpty()) Row(Modifier.fillMaxWidth().padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Icon(if (patients.isEmpty()) Icons.Default.PersonOutline else Icons.Default.Search, null, tint = DoctorAccent)
+                Text(if (patients.isEmpty()) t("No patients yet", "अभी कोई मरीज़ नहीं") else t("No matching patient", "कोई मरीज़ नहीं मिला"), Modifier.weight(1f), fontSize = 15.sp, color = DoctorCardSub)
+                if (query.isNotEmpty()) TextButton(onClick = { query = "" }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Clear search", "खोज साफ़ करें"), color = RustText) }
+            }
             LazyColumn(Modifier.heightIn(max = 380.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 items(shown, key = { it.id }) { p ->
-                    Surface(onClick = { onPick(p.id) }, color = Paper, shape = RoundedCornerShape(18.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().heightIn(min = 64.dp)) {
-                        Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-                            Box(Modifier.size(40.dp).clip(CircleShape).background(Peach), contentAlignment = Alignment.Center) { Text(p.name.take(1).uppercase(), fontWeight = FontWeight.Bold, fontSize = 17.sp, color = DoctorCardInk) }
+                    Surface(onClick = { onPick(p.id) }, color = Paper, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().heightIn(min = 64.dp)) {
+                        Row(Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                            Box(Modifier.size(40.dp).clip(CircleShape).background(Peach), contentAlignment = Alignment.Center) { Text(p.name.take(1).uppercase(), fontWeight = FontWeight.Bold, fontSize = 17.sp, color = RustText) }
                             Text(p.name, Modifier.weight(1f), fontSize = 18.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
                             Icon(Icons.Default.ChevronRight, null, tint = DoctorAccent)
                         }

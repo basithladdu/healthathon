@@ -3,6 +3,24 @@ package `in`.wedevit.care
 import android.content.Context
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -312,29 +330,49 @@ private fun gocRoleText(t: (String, String) -> String, role: String): String = w
     else -> t("Witness", "गवाह")
 }
 
-@Composable private fun GocChoice(label: String, selected: Boolean, onSelect: () -> Unit) {
-    Row(Modifier.heightIn(min = 48.dp).selectable(selected, onClick = onSelect, role = Role.RadioButton), verticalAlignment = Alignment.CenterVertically) {
-        RadioButton(selected = selected, onClick = null); Text(label, Modifier.padding(start = 8.dp, end = 12.dp))
+@Composable private fun GocChoice(label: String, selected: Boolean, onSelect: () -> Unit, modifier: Modifier = Modifier) {
+    Row(modifier.heightIn(min = 48.dp).clip(RoundedCornerShape(14.dp)).background(if (selected) DoctorStatusGoodBg else Paper).border(if (selected) 1.5.dp else 1.dp, if (selected) DoctorStatusGood else DoctorHairline, RoundedCornerShape(14.dp))
+        .selectable(selected, onClick = onSelect, role = Role.RadioButton).padding(end = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+        RadioButton(selected = selected, onClick = null, modifier = Modifier.padding(start = 4.dp)); Text(label, Modifier.padding(start = 4.dp), fontSize = 16.sp, fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal, color = DoctorCardInk)
     }
 }
 
 @Composable private fun GocTick(label: String, checked: Boolean, onChange: (Boolean) -> Unit, tag: String) {
     Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).toggleable(checked, onValueChange = onChange, role = Role.Checkbox).testTag(tag), verticalAlignment = Alignment.CenterVertically) {
-        Checkbox(checked = checked, onCheckedChange = null); Text(label, Modifier.padding(start = 8.dp), fontWeight = FontWeight.Medium)
+        Checkbox(checked = checked, onCheckedChange = null); Text(label, Modifier.padding(start = 8.dp), fontSize = 16.sp, lineHeight = 22.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
     }
+}
+
+/** One signer's step heading: a Rust dot and the step's own words ("1. Doctor"). */
+@Composable private fun GocStepHeading(text: String) {
+    Row(Modifier.fillMaxWidth().padding(top = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+        Box(Modifier.size(8.dp).background(Rust, CircleShape)); Spacer(Modifier.width(10.dp))
+        Text(text, fontFamily = SaharaTitleFont, fontWeight = FontWeight.SemiBold, fontSize = 19.sp, color = DoctorCardInk, modifier = Modifier.a11yHeading())
+    }
+}
+
+/** A one-line field in the app's style: 14 corners, paper fill. */
+@Composable private fun GocSignField(value: String, onChange: (String) -> Unit, label: String, tag: String? = null) {
+    OutlinedTextField(value, onChange, singleLine = true, label = { Text(label) }, shape = RoundedCornerShape(14.dp),
+        colors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = Paper, focusedContainerColor = Paper),
+        modifier = Modifier.fillMaxWidth().then(if (tag != null) Modifier.testTag(tag) else Modifier))
 }
 
 @Composable private fun GocSignedRow(s: GocSignature) { val t = careText()
     val bitmap = remember(s.imageDataUrl) { GocSignOffRules.dataUrlBytes(s.imageDataUrl)?.let { BitmapFactory.decodeByteArray(it, 0, it.size)?.asImageBitmap() } }
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
-        Surface(shape = RoundedCornerShape(8.dp), color = Color.White, border = BorderStroke(1.dp, DoctorHairline)) {
+    Row(Modifier.fillMaxWidth().padding(vertical = 4.dp), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+        Surface(shape = RoundedCornerShape(10.dp), color = Color.White, border = BorderStroke(1.dp, DoctorHairline)) {
             if (bitmap != null) Image(bitmap, t("Signature of ", "हस्ताक्षर: ") + s.name, Modifier.width(120.dp).padding(4.dp), contentScale = ContentScale.Fit)
         }
-        Column(Modifier.weight(1f)) {
-            Text(s.name + " · " + gocRoleText(t, s.role) + (if (s.role == GocSignOffRules.FAMILY || s.role == GocSignOffRules.WITNESS) s.relation?.let { " ($it)" }.orEmpty() else ""), fontWeight = FontWeight.Medium)
-            s.registrationNo?.let { Text(t("Reg. no.", "रजि. नं.") + " " + it, fontSize = 13.sp, color = DoctorCardSub) }
+        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.CheckCircle, null, tint = DoctorStatusGood, modifier = Modifier.size(18.dp)); Spacer(Modifier.width(6.dp))
+                Text(gocRoleText(t, s.role), fontWeight = FontWeight.Bold, fontSize = 14.sp, color = DoctorStatusGood)
+            }
+            Text(s.name + (if (s.role == GocSignOffRules.FAMILY || s.role == GocSignOffRules.WITNESS) s.relation?.let { " ($it)" }.orEmpty() else ""), fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk)
+            s.registrationNo?.let { Text(t("Reg. no.", "रजि. नं.") + " " + it, fontSize = 14.sp, color = DoctorCardSub) }
             Text((if (s.method == GocSignOffRules.THUMB) t("Thumb impression", "अंगूठे का निशान") else t("Signed", "हस्ताक्षर")) + " · " +
-                runCatching { signedAtLabel(Instant.parse(s.signedAt).toEpochMilli()) }.getOrDefault(s.signedAt), fontSize = 13.sp, color = DoctorCardSub)
+                runCatching { signedAtLabel(Instant.parse(s.signedAt).toEpochMilli()) }.getOrDefault(s.signedAt), fontSize = 14.sp, color = DoctorCardSub)
         }
     }
 }
@@ -402,44 +440,56 @@ private fun gocRoleText(t: (String, String) -> String, role: String): String = w
 
     val r = record
     Column(modifier.fillMaxWidth().testTag("goc-signoff"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        if (r == null) { Text(t("Opening the sign-off…", "साइन-ऑफ़ खुल रहा है…"), color = DoctorCardSub); return@Column }
-        Text(if (r.status == GocSignOffRules.LOCKED) t("Note signed and locked", "नोट पर हस्ताक्षर हुए और लॉक हुआ") else t("Sign the note", "नोट पर हस्ताक्षर"), fontWeight = FontWeight.Bold, fontSize = 20.sp)
-        invalidatedCount?.let { n ->
-            Text(t("The note was changed after it was signed. All $n signatures on the earlier text are no longer valid. Read the new note together and sign again.",
-                "साइन होने के बाद नोट बदला गया। पुराने नोट पर किए सभी $n हस्ताक्षर अब मान्य नहीं हैं। नया नोट साथ में पढ़ें और फिर से साइन करें।"), color = RustText, fontWeight = FontWeight.Medium, modifier = Modifier.testTag("goc-signoff-invalidated"))
+        if (r == null) { Row(verticalAlignment = Alignment.CenterVertically) { CircularProgressIndicator(Modifier.size(20.dp), color = Rust, strokeWidth = 2.dp); Spacer(Modifier.width(10.dp)); Text(t("Opening the sign-off…", "साइन-ऑफ़ खुल रहा है…"), color = DoctorCardSub, fontSize = 15.sp) }; return@Column }
+        val locked = r.status == GocSignOffRules.LOCKED
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(if (locked) Icons.Default.Lock else Icons.Default.Edit, null, tint = if (locked) DoctorStatusGood else RustText); Spacer(Modifier.width(10.dp))
+            Text(if (locked) t("Note signed and locked", "नोट पर हस्ताक्षर हुए और लॉक हुआ") else t("Sign the note", "नोट पर हस्ताक्षर"), fontFamily = SaharaTitleFont, fontWeight = FontWeight.SemiBold, fontSize = 21.sp, color = DoctorCardInk, modifier = Modifier.a11yHeading())
         }
-        if (saveFailed) Text(t("This could not be saved on this phone. Try again.", "यह इस फ़ोन पर सेव नहीं हो सका। फिर कोशिश करें।"), color = RustText)
-        r.signatures.forEach { GocSignedRow(it) }
+        invalidatedCount?.let { n ->
+            Surface(color = DoctorStatusRestBg, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth()) {
+                Text(t("The note was changed after it was signed. All $n signatures on the earlier text are no longer valid. Read the new note together and sign again.",
+                    "साइन होने के बाद नोट बदला गया। पुराने नोट पर किए सभी $n हस्ताक्षर अब मान्य नहीं हैं। नया नोट साथ में पढ़ें और फिर से साइन करें।"), color = DoctorStatusRest, fontWeight = FontWeight.Medium, fontSize = 15.sp, lineHeight = 21.sp, modifier = Modifier.padding(12.dp).testTag("goc-signoff-invalidated"))
+            }
+        }
+        if (saveFailed) Text(t("This could not be saved on this phone. Try again.", "यह इस फ़ोन पर सेव नहीं हो सका। फिर कोशिश करें।"), color = RustText, fontSize = 15.sp)
+        r.signatures.forEachIndexed { index, s -> if (index > 0) HorizontalDivider(color = DoctorHairline); GocSignedRow(s) }
+        if (r.signatures.isNotEmpty() && !locked) HorizontalDivider(color = DoctorHairline)
 
         when (GocSignOffRules.nextStep(r, steps)) {
             GocSignOffRules.DOCTOR -> {
-                Text(t("1. Doctor", "1. डॉक्टर"), fontWeight = FontWeight.Bold)
-                OutlinedTextField(doctorName, { doctorName = it.take(GocSignOffRules.NAME_MAX) }, singleLine = true, label = { Text(t("Name", "नाम")) }, modifier = Modifier.fillMaxWidth().testTag("goc-doctor-name"))
-                OutlinedTextField(registrationNo, { registrationNo = it.take(60) }, singleLine = true, label = { Text(t("Registration no.", "रजिस्ट्रेशन नंबर")) }, modifier = Modifier.fillMaxWidth().testTag("goc-doctor-reg"))
+                GocStepHeading(t("1. Doctor", "1. डॉक्टर"))
+                GocSignField(doctorName, { doctorName = it.take(GocSignOffRules.NAME_MAX) }, t("Name", "नाम"), "goc-doctor-name")
+                GocSignField(registrationNo, { registrationNo = it.take(60) }, t("Registration no.", "रजिस्ट्रेशन नंबर"), "goc-doctor-reg")
                 GocSignaturePad(allowThumb = false, onDone = { p -> sign(GocSignatureInput(GocSignOffRules.DOCTOR, doctorName, registrationNo = registrationNo, consent = true, method = p.method, png = p.png, strokeCount = p.strokeCount)) })
             }
             GocSignOffRules.PATIENT_OR_FAMILY -> {
-                Text(t("2. Patient or family member", "2. मरीज़ या परिवार के सदस्य"), fontWeight = FontWeight.Bold)
-                if (showNote) Surface(shape = RoundedCornerShape(12.dp), color = Color.White, border = BorderStroke(1.dp, DoctorHairline)) {
-                    Text(noteText, Modifier.fillMaxWidth().heightIn(max = 240.dp).padding(12.dp), fontSize = 14.sp, lineHeight = 20.sp)
+                GocStepHeading(t("2. Patient or family member", "2. मरीज़ या परिवार के सदस्य"))
+                if (showNote) Surface(shape = RoundedCornerShape(14.dp), color = Color.White, border = BorderStroke(1.dp, DoctorHairline)) {
+                    Text(noteText, Modifier.fillMaxWidth().heightIn(max = 240.dp).padding(12.dp), fontSize = 15.sp, lineHeight = 21.sp)
                 }
-                Row { GocChoice(t("Patient", "मरीज़"), signerRole == GocSignOffRules.PATIENT) { signerRole = GocSignOffRules.PATIENT }; GocChoice(t("Family member", "परिवार के सदस्य"), signerRole == GocSignOffRules.FAMILY) { signerRole = GocSignOffRules.FAMILY } }
-                OutlinedTextField(signerName, { signerName = it.take(GocSignOffRules.NAME_MAX) }, singleLine = true, label = { Text(t("Name", "नाम")) }, modifier = Modifier.fillMaxWidth().testTag("goc-signer-name"))
-                if (signerRole == GocSignOffRules.FAMILY) OutlinedTextField(relation, { relation = it.take(GocSignOffRules.NAME_MAX) }, singleLine = true, label = { Text(t("Relation to the patient", "मरीज़ से रिश्ता")) }, modifier = Modifier.fillMaxWidth().testTag("goc-signer-relation"))
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    GocChoice(t("Patient", "मरीज़"), signerRole == GocSignOffRules.PATIENT, { signerRole = GocSignOffRules.PATIENT }, Modifier.weight(1f))
+                    GocChoice(t("Family member", "परिवार के सदस्य"), signerRole == GocSignOffRules.FAMILY, { signerRole = GocSignOffRules.FAMILY }, Modifier.weight(1f))
+                }
+                GocSignField(signerName, { signerName = it.take(GocSignOffRules.NAME_MAX) }, t("Name", "नाम"), "goc-signer-name")
+                if (signerRole == GocSignOffRules.FAMILY) GocSignField(relation, { relation = it.take(GocSignOffRules.NAME_MAX) }, t("Relation to the patient", "मरीज़ से रिश्ता"), "goc-signer-relation")
                 GocTick(t("The note was read to them (a witness also signs)", "नोट उन्हें पढ़कर सुनाया गया (एक गवाह भी साइन करेंगे)"), canRead == false, { canRead = !it }, "goc-signer-read-aloud")
-                Text(t("I have read or heard this note and it records what we discussed", "मैंने यह नोट पढ़ा या सुना है और इसमें वही लिखा है जिस पर हमने बात की"), fontWeight = FontWeight.Medium, modifier = Modifier.testTag("goc-signer-consent"))
+                Surface(color = Cream, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
+                    Text(t("I have read or heard this note and it records what we discussed", "मैंने यह नोट पढ़ा या सुना है और इसमें वही लिखा है जिस पर हमने बात की"), fontFamily = SaharaTitleFont, fontSize = 17.sp, lineHeight = 24.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.padding(16.dp).testTag("goc-signer-consent"))
+                }
                 // Signing under that line is the agreement: one tap, "Agree and sign".
                 GocSignaturePad(doneLabel = t("Agree and sign", "सहमत हूँ, साइन करें"), onDone = { p -> sign(GocSignatureInput(signerRole, signerName, relation = relation, consent = true, canRead = canRead, method = p.method, png = p.png, strokeCount = p.strokeCount)) })
             }
             GocSignOffRules.WITNESS -> {
-                Text(t("3. Witness", "3. गवाह"), fontWeight = FontWeight.Bold)
+                GocStepHeading(t("3. Witness", "3. गवाह"))
                 Text(when {
                     r.signatures.any { it.method == GocSignOffRules.THUMB } -> t("A thumb impression was used, so a witness also signs.", "अंगूठे का निशान लगा है, इसलिए एक गवाह भी साइन करेंगे।")
                     r.signatures.any { it.canRead == false } -> t("The signer cannot read the note, so a witness also signs.", "साइन करने वाले नोट नहीं पढ़ सकते, इसलिए एक गवाह भी साइन करेंगे।")
                     else -> t("A witness also signs.", "एक गवाह भी साइन करेंगे।")
-                }, color = DoctorCardSub)
-                OutlinedTextField(witnessName, { witnessName = it.take(GocSignOffRules.NAME_MAX) }, singleLine = true, label = { Text(t("Name", "नाम")) }, modifier = Modifier.fillMaxWidth().testTag("goc-witness-name"))
-                OutlinedTextField(witnessRole, { witnessRole = it.take(GocSignOffRules.NAME_MAX) }, singleLine = true, label = { Text(t("Role (optional)", "भूमिका (वैकल्पिक)")) }, modifier = Modifier.fillMaxWidth())
+                }, color = DoctorCardSub, fontSize = 15.sp, lineHeight = 21.sp)
+                GocSignField(witnessName, { witnessName = it.take(GocSignOffRules.NAME_MAX) }, t("Name", "नाम"), "goc-witness-name")
+                GocSignField(witnessRole, { witnessRole = it.take(GocSignOffRules.NAME_MAX) }, t("Role (optional)", "भूमिका (वैकल्पिक)"))
                 GocTick(t("I saw the note read out and the person sign or give their thumb impression", "मैंने नोट पढ़कर सुनाते और व्यक्ति को साइन करते या अंगूठा लगाते देखा"), witnessConsent, { witnessConsent = it }, "goc-witness-consent")
                 GocSignaturePad(allowThumb = false, onDone = { p -> sign(GocSignatureInput(GocSignOffRules.WITNESS, witnessName, relation = witnessRole, consent = witnessConsent, method = p.method, png = p.png, strokeCount = p.strokeCount)) })
             }
@@ -449,19 +499,24 @@ private fun gocRoleText(t: (String, String) -> String, role: String): String = w
                     record = locked; error = null
                     scope.launch { persist(locked); complete(locked) }
                 } catch (e: GocSignOffException) { error = gocErrorText(t, e.code) }
-            }, colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("goc-signoff-lock")) { Text(t("Lock this note version", "नोट का यह संस्करण लॉक करें")) }
+            }, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("goc-signoff-lock")) { Icon(Icons.Default.Lock, null); Spacer(Modifier.width(8.dp)); Text(t("Lock this note version", "नोट का यह संस्करण लॉक करें"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold) }
             else -> {}
         }
-        error?.let { Text(it, color = RustText, modifier = Modifier.testTag("goc-signoff-error")) }
+        error?.let { Text(it, color = MaterialTheme.colorScheme.error, fontSize = 15.sp, modifier = Modifier.testTag("goc-signoff-error").announce()) }
         if (r.status == GocSignOffRules.OPEN && r.signatures.isNotEmpty()) OutlinedButton(onClick = {
             val result = GocSignOffRules.restart(r, noteText)
             record = result.record; error = null
             scope.launch { result.invalidated?.let { persist(it) }; persist(result.record) }
-        }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Start the signatures again", "हस्ताक्षर फिर से शुरू करें"), color = RustText) }
-        if (r.status == GocSignOffRules.LOCKED) {
-            Text(t("Locked on", "लॉक हुआ:") + " " + runCatching { signedAtLabel(Instant.parse(r.lockedAt.orEmpty()).toEpochMilli()) }.getOrDefault(r.lockedAt.orEmpty()) + ". " +
-                t("Any change to the note or a signature will show.", "नोट या किसी हस्ताक्षर में बदलाव दिख जाएगा।"), color = DoctorStatusGood, fontWeight = FontWeight.Medium, modifier = Modifier.testTag("goc-signoff-locked"))
-            Text("SHA-256 " + NoteSignatureRules.shortHash(r.sealSha256.orEmpty()), fontSize = 12.sp, color = DoctorCardSub)
+        }, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp)) { Icon(Icons.Default.Refresh, null, tint = RustText, modifier = Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Start the signatures again", "हस्ताक्षर फिर से शुरू करें"), color = RustText) }
+        if (locked) Surface(color = DoctorStatusGoodBg, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth()) {
+            Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Row(verticalAlignment = Alignment.Top) {
+                    Icon(Icons.Default.Lock, null, tint = DoctorStatusGood, modifier = Modifier.size(20.dp)); Spacer(Modifier.width(8.dp))
+                    Text(t("Locked on", "लॉक हुआ:") + " " + runCatching { signedAtLabel(Instant.parse(r.lockedAt.orEmpty()).toEpochMilli()) }.getOrDefault(r.lockedAt.orEmpty()) + ". " +
+                        t("Any change to the note or a signature will show.", "नोट या किसी हस्ताक्षर में बदलाव दिख जाएगा।"), color = DoctorStatusGood, fontWeight = FontWeight.Medium, fontSize = 15.sp, lineHeight = 21.sp, modifier = Modifier.weight(1f).testTag("goc-signoff-locked"))
+                }
+                Text("SHA-256 " + NoteSignatureRules.shortHash(r.sealSha256.orEmpty()), fontSize = 14.sp, fontFamily = FontFamily.Monospace, color = DoctorCardSub, modifier = Modifier.padding(start = 28.dp))
+            }
         }
     }
 }

@@ -1,41 +1,67 @@
-.care-today { width: 100%; margin: 0 0 15px; padding: 16px; border: 1px solid #ddc9e8; border-radius: 20px; background: linear-gradient(135deg, #f6edf9, #fff8e9); color: #3d342e; box-shadow: 0 7px 24px #4937230a; }
-.care-today-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.care-today-title { display: flex; align-items: center; gap: 10px; min-width: 0; }
-.care-today-title > div { display: grid; gap: 2px; }
-.care-today-title > div > span { color: #805d92; font-size: 9px; font-weight: 800; letter-spacing: .1em; }
-.care-today-title h2 { margin: 0; color: #3f372f; font: 650 18px/1.25 var(--font-sora, sans-serif); }
-.care-today-dot { width: 11px; height: 11px; flex: 0 0 auto; border-radius: 50%; background: #2d815b; box-shadow: 0 0 0 4px #2d815b1c; }
-.care-today-count { display: inline-grid; place-items: center; min-width: 25px; height: 25px; padding: 0 7px; border-radius: 999px; background: #fff; color: #604a36; font-size: 11px; font-weight: 750; }
-.care-today-all-tasks { display: inline-flex; align-items: center; gap: 5px; min-height: 40px; padding: 7px 10px; border-radius: 10px; color: #5b426c; font-size: 11px; font-weight: 700; text-decoration: none; }
-.care-today-all-tasks svg { width: 14px; height: 14px; }
-.care-next-dose { display: grid; grid-template-columns: minmax(120px, .32fr) minmax(0, 1fr); gap: 12px; margin-top: 13px; }
-.care-next-dose-time { display: grid; place-items: center; align-content: center; gap: 5px; min-height: 112px; padding: 14px; border: 1px solid #edc77f; border-radius: 17px; background: #ffe1a9; text-align: center; }
-.care-next-dose-time time { color: #67452c; font: 750 24px/1.1 var(--font-sora, sans-serif); font-variant-numeric: tabular-nums; }
-.care-next-dose-time span { color: #795e47; font-size: 11px; font-weight: 650; }
-.care-next-dose-list { display: grid; gap: 7px; }
-.care-next-dose-medicine { display: flex; align-items: center; gap: 12px; min-width: 0; padding: 10px 11px; border: 1px solid #e8ddd0; border-radius: 14px; background: #fffdf9; }
+/* Today: next medicines as a colourful "Up next" card (matches Android CareUpNextCard), plus the optional greeting header. */
+.care-today {
+  --today-ink: var(--care-ink, #382e29);
+  --today-muted: var(--care-muted, #76675d);
+  --today-surface: var(--care-surface, #fffdf9);
+  --today-line: var(--care-line, #e6ddd1);
+  --today-rust: var(--care-primary, #b9472c);
+  --today-sage: var(--care-sage, #d9eaa8);
+  --today-sage-ink: var(--care-sage-ink, #465e45);
+  width: 100%;
+  margin: 0 0 24px;
+  color: var(--today-ink);
+}
+.care-today * { box-sizing: border-box; }
+.care-today-heading { display: flex; align-items: center; gap: 8px; min-height: 44px; margin-bottom: 12px; }
+.care-today .care-today-heading h2 { margin: 0; color: var(--today-ink); font: 500 22px/1.25 Georgia, 'Times New Roman', serif; letter-spacing: -.3px; }
+.care-today-count { display: inline-grid; place-items: center; min-width: 28px; height: 28px; padding: 0 10px; border-radius: 999px; background: var(--care-honey, #ffe69f); color: var(--today-ink); font-size: 14px; font-weight: 700; }
+.care-today-all-tasks { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; margin-left: auto; padding: 8px 4px 8px 12px; border-radius: 14px; color: var(--today-rust); font-size: 14px; font-weight: 700; text-decoration: none; white-space: nowrap; }
+.care-today-all-tasks:hover { text-decoration: underline; text-underline-offset: 3px; }
+.care-today-all-tasks svg { width: 16px; height: 16px; }
+
+/* One coloured surface: white time tile on the left, the doses on the right (no card inside a card). */
+.care-next-dose { display: grid; grid-template-columns: 96px minmax(0, 1fr); align-items: start; gap: 16px; padding: 16px; border-radius: 20px; background: #dce7f1; }
+.care-next-dose-time { display: grid; justify-items: center; align-content: center; gap: 4px; min-height: 88px; padding: 12px 8px; border-radius: 16px; background: var(--today-surface); box-shadow: 0 1px 3px #382e2914; text-align: center; }
+.care-next-dose-when { color: var(--today-rust); font-size: 12px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
+.care-next-dose-time time { color: var(--today-ink); font: 700 22px/1.1 var(--font-inter, sans-serif); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.care-next-dose-list { display: grid; min-width: 0; }
+.care-next-dose-medicine { display: flex; align-items: center; gap: 12px; min-width: 0; min-height: 64px; padding: 8px 0; }
+.care-next-dose-medicine + .care-next-dose-medicine { border-top: 1px solid #382e291a; }
 .care-next-dose-copy { min-width: 0; margin-right: auto; }
-.care-next-dose-medicine > :is(.medicine-photo-trigger, .medicine-photo-fallback) { width: 44px; min-width: 44px; min-height: 44px; height: 44px; border-radius: 11px; }
-.care-next-dose-medicine strong { display: block; margin-bottom: 3px; color: #40372f; font-size: 13px; line-height: 1.35; overflow-wrap: anywhere; }
-.care-next-dose-medicine p { display: -webkit-box; margin: 0; color: #766657; font-size: 10px; line-height: 1.45; overflow: hidden; overflow-wrap: anywhere; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
-.care-today-check { flex: none; min-height: 38px; padding: 7px 10px; border: 1px solid #9fbd7f; border-radius: 10px; background: #e8f1da; color: #47652f; font: 700 11px/1.2 var(--font-inter, sans-serif); cursor: pointer; }
-.care-today-empty { margin: 13px 0 0; padding: 15px; border: 1px dashed #d8c8b7; border-radius: 14px; background: #fffdf9; color: #6a5b4e; font-size: 12px; text-align: center; }
-.care-today :focus-visible { outline: 3px solid #764699; outline-offset: 2px; }
+.care-next-dose-medicine > :is(.medicine-photo-trigger, .medicine-photo-fallback) { width: 48px; min-width: 48px; height: 48px; min-height: 48px; border-radius: 14px; }
+.care-next-dose-pill { display: grid; place-items: center; width: 48px; height: 48px; flex: none; border-radius: 14px; background: var(--today-surface); color: var(--today-rust); }
+.care-next-dose-pill svg { width: 24px; height: 24px; }
+.care-next-dose-medicine strong { display: block; color: var(--today-ink); font-size: 17px; font-weight: 650; line-height: 1.3; overflow-wrap: anywhere; }
+.care-next-dose-medicine p { display: -webkit-box; margin: 2px 0 0; color: var(--today-muted); font-size: 14px; line-height: 1.4; overflow: hidden; overflow-wrap: anywhere; -webkit-box-orient: vertical; -webkit-line-clamp: 1; }
+.care-today-check { display: inline-flex; flex: none; align-items: center; gap: 6px; min-height: 44px; padding: 8px 14px; border: 1px solid #9fbd7f; border-radius: 14px; background: var(--today-sage); color: var(--today-sage-ink); font: 700 15px/1.2 var(--font-inter, sans-serif); cursor: pointer; }
+.care-today-check svg { width: 18px; height: 18px; }
+.care-today-check:hover { background: #cfe296; }
+.care-today-empty { display: flex; align-items: center; gap: 12px; padding: 16px; border-radius: 20px; background: #dce7f1; }
+.care-today-empty p { margin: 0; color: var(--today-ink); font-size: 16px; line-height: 1.4; }
+.care-today :focus-visible { outline: 3px solid var(--care-lavender-ink, #655278); outline-offset: 2px; }
 
-@media(max-width: 650px) {
-  .care-today { margin-bottom: 11px; padding: 12px; border-radius: 17px; }
-  .care-today-heading { align-items: flex-start; }
-  .care-today-title h2 { font-size: 16px; }
-  .care-today-all-tasks { min-height: 38px; padding: 6px 7px; }
-  .care-next-dose { grid-template-columns: minmax(0, 1fr); }
-  .care-next-dose-time { min-height: 78px; }
-  .care-next-dose-time time { font-size: 22px; }
-  .care-next-dose-medicine { gap: 9px; padding: 9px; }
-  .care-next-dose-medicine > :is(.medicine-photo-trigger, .medicine-photo-fallback) { width: 42px; min-width: 42px; min-height: 42px; height: 42px; }
+@media (max-width: 650px) {
+  .care-today .care-today-heading h2 { font-size: 20px; }
+  .care-next-dose { grid-template-columns: minmax(0, 1fr); gap: 8px; padding: 12px 16px; }
+  .care-next-dose-time { display: flex; justify-self: start; align-items: baseline; gap: 8px; min-height: 0; padding: 6px 14px; border-radius: 999px; }
+  .care-next-dose-time time { font-size: 18px; }
+  .care-next-dose-medicine { gap: 12px; }
+  .care-next-dose-medicine > :is(.medicine-photo-trigger, .medicine-photo-fallback), .care-next-dose-pill { width: 44px; min-width: 44px; height: 44px; min-height: 44px; }
+  .care-next-dose-medicine strong { font-size: 16px; }
+  .care-today-check { padding-inline: 12px; }
 }
 
-@media(max-width: 390px) {
-  .care-today-heading { display: grid; }
-  .care-today-all-tasks { justify-self: start; }
-  .care-next-dose-medicine { align-items: flex-start; }
-}
+/* Optional greeting header (CareTodayGreeting). */
+.care-today-greeting { display: grid; gap: 16px; margin: 0 0 24px; color: var(--care-ink, #382e29); }
+.care-today-greeting p { margin: 0; }
+.care-today-hello { font: 500 clamp(28px, 3vw, 36px)/1.2 Georgia, 'Times New Roman', serif; letter-spacing: -.8px; }
+.care-today-date { margin-top: 4px; color: var(--care-muted, #76675d); font-size: 18px; font-weight: 600; }
+.care-today-caring { margin-top: 2px; color: var(--care-primary, #b9472c); font-size: 15px; font-weight: 600; }
+.care-today-sos-bar { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; }
+.care-today-sos, .care-today-qr { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; padding: 12px 20px; border-radius: 14px; font-size: 17px; font-weight: 800; text-decoration: none; }
+.care-today-sos { background: #b3261e; color: #fff; letter-spacing: .08em; }
+.care-today-sos:hover { background: #8c1d18; }
+.care-today-qr { border: 1px solid var(--care-line, #e6ddd1); background: var(--care-surface, #fffdf9); color: var(--care-ink, #382e29); font-weight: 700; }
+.care-today-qr svg { width: 22px; height: 22px; }
+.care-today-greeting :focus-visible { outline: 3px solid var(--care-lavender-ink, #655278); outline-offset: 2px; }
+@media (min-width: 760px) { .care-today-greeting { grid-template-columns: minmax(0, 1fr) minmax(280px, 360px); align-items: center; } }

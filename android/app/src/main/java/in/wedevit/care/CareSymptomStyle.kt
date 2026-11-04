@@ -78,7 +78,7 @@ internal fun ratingColor(n: Int): Color = if (n <= 5) lerp(DoctorStatusGood, Col
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 if (number != null) Box(Modifier.sizeIn(minWidth = 28.dp, minHeight = 28.dp).clip(CircleShape).background(DoctorAccent), contentAlignment = Alignment.Center) { Text(number.toString(), color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold) }
                 Column(Modifier.weight(1f)) {
-                    Text(title, color = DoctorCardInk, fontSize = 17.sp, fontWeight = FontWeight.SemiBold, lineHeight = 22.sp, modifier = Modifier.a11yHeading())
+                    Text(title, color = DoctorCardInk, fontSize = 18.sp, fontWeight = FontWeight.SemiBold, lineHeight = 23.sp, modifier = Modifier.a11yHeading())
                     if (helper != null) Text(helper, color = DoctorCardSub, fontSize = 14.sp, lineHeight = 19.sp)
                 }
             }
@@ -89,13 +89,13 @@ internal fun ratingColor(n: Int): Color = if (n <= 5) lerp(DoctorStatusGood, Col
 
 /** Symptom tile: icon + label, warm fill and check when selected (single choice, so RadioButton). */
 @Composable internal fun SymptomTile(selected: Boolean, label: String, icon: Painter, tag: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
-    val shape = RoundedCornerShape(16.dp)
-    Row(modifier.heightIn(min = 56.dp).testTag(tag).clip(shape).background(if (selected) SymSelectedBg else Cream, shape)
+    val shape = RoundedCornerShape(14.dp)
+    Row(modifier.heightIn(min = 56.dp).testTag(tag).clip(shape).background(if (selected) SymSelectedBg else Paper, shape)
         .border(if (selected) 2.dp else 1.dp, if (selected) DoctorAccent else DoctorHairline, shape)
-        .selectable(selected, role = Role.RadioButton, onClick = onClick).padding(horizontal = 10.dp, vertical = 8.dp),
+        .selectable(selected, role = Role.RadioButton, onClick = onClick).padding(horizontal = 12.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        Image(icon, null, Modifier.size(30.dp))
-        Text(label, Modifier.weight(1f), color = DoctorCardInk, fontSize = 15.sp, lineHeight = 19.sp, fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal)
+        Image(icon, null, Modifier.size(32.dp))
+        Text(label, Modifier.weight(1f), color = DoctorCardInk, fontSize = 16.sp, lineHeight = 19.sp, fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal)
         if (selected) Icon(Icons.Default.Check, null, Modifier.size(18.dp), tint = DoctorAccent)
     }
 }

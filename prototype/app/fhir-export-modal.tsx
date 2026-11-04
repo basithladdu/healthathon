@@ -174,8 +174,8 @@ export function FhirExportModal(props: {
           <div className="flex items-center gap-3">
             <span className="fhir-badge">ABDM · FHIR R4</span>
             <div>
-              <h2 id="fhir-modal-title">Interoperable Health Record Export</h2>
-              <p className="text-xs text-emerald-800">Ayushman Bharat Digital Mission (ABDM) Compatible Bundle</p>
+              <h2 id="fhir-modal-title">Export health record</h2>
+              <p className="text-sm text-emerald-800">ABDM-compatible bundle</p>
             </div>
           </div>
           <button type="button" className="close-btn" onClick={onClose} aria-label="Close modal">✕</button>
@@ -187,14 +187,14 @@ export function FhirExportModal(props: {
             className={`fhir-tab-btn ${activeTab === 'preview' ? 'is-active' : ''}`}
             onClick={() => setActiveTab('preview')}
           >
-            Structured FHIR Resources
+            Summary
           </button>
           <button
             type="button"
             className={`fhir-tab-btn ${activeTab === 'json' ? 'is-active' : ''}`}
             onClick={() => setActiveTab('json')}
           >
-            Raw FHIR R4 JSON
+            JSON
           </button>
         </div>
 
@@ -263,10 +263,10 @@ export function FhirExportModal(props: {
         <div className="fhir-footer">
           <div className="flex items-center gap-2">
             <button type="button" className="secondary-button" onClick={handleCopy}>
-              {copied ? '✓ Copied to Clipboard' : 'Copy JSON'}
+              {copied ? '✓ Copied' : 'Copy JSON'}
             </button>
             <button type="button" className="primary-button" onClick={handleDownload}>
-              Download ABDM Bundle (.json)
+              Download .json
             </button>
           </div>
           <button type="button" className="secondary-button" onClick={onClose}>

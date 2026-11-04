@@ -1,6 +1,7 @@
 package `in`.wedevit.care
 
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -54,19 +55,20 @@ import java.time.LocalDate
     var planOpen by rememberSaveable(selected) { mutableStateOf(false) }
     val expandedWord = t("Expanded", "खुला"); val collapsedWord = t("Collapsed", "बंद")
     val taken = summary.medicineTicked.coerceAtMost(summary.medicineTotal)
-    Surface(shape = RoundedCornerShape(26.dp), color = Paper, shadowElevation = 2.dp, modifier = Modifier.fillMaxWidth().testTag("patient-summary")) {
-        Column(Modifier.background(Brush.linearGradient(listOf(Color(0xFFFFF1D6), Color(0xFFFFFBF4), Color(0xFFE2F0E7)))).padding(vertical = 8.dp, horizontal = 14.dp)) {
-            Row(Modifier.fillMaxWidth().padding(top = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                Surface(shape = CircleShape, color = SaharaApricot, modifier = Modifier.size(56.dp)) { Box(contentAlignment = Alignment.Center) { Text(name.take(1).uppercase(), fontFamily = SaharaTitleFont, fontSize = 26.sp, color = DoctorAccent) } }
+    // Same card language as the rest of the app: 20dp corners, a hairline border, one soft wash from the palette.
+    Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("patient-summary")) {
+        Column(Modifier.background(Brush.linearGradient(listOf(SaharaSoftGold.copy(alpha = .55f), Paper, Mint.copy(alpha = .8f)))).padding(top = 16.dp, bottom = 4.dp, start = 16.dp, end = 16.dp)) {
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Surface(shape = CircleShape, color = SaharaApricot, modifier = Modifier.size(48.dp)) { Box(contentAlignment = Alignment.Center) { Text(name.take(1).uppercase(), fontFamily = SaharaTitleFont, fontSize = 22.sp, fontWeight = FontWeight.Medium, color = DoctorAccent) } }
                 Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f).semantics(mergeDescendants = true) { heading() }) {
-                    Text(today.format(careDateFormat("EEEE, d MMM", hindi)), fontSize = 12.sp, color = DoctorCardSub)
-                    Text(t("$name at a glance", "$name एक नज़र में"), fontFamily = SaharaTitleFont, fontSize = 21.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, maxLines = 2)
+                    Text(today.format(careDateFormat("EEEE, d MMM", hindi)), fontSize = 14.sp, color = DoctorCardSub)
+                    Text(t("$name at a glance", "$name एक नज़र में"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, maxLines = 2)
                 }
                 Spacer(Modifier.width(8.dp))
                 MedicineRing(taken, summary.medicineTotal)
             }
-            if (!open) Text(CarePatientSummaryRules.collapsed(summary, hindi), Modifier.padding(top = 10.dp), fontSize = 14.sp, color = DoctorCardSub, maxLines = 3)
+            if (!open) Text(CarePatientSummaryRules.collapsed(summary, hindi), Modifier.padding(top = 12.dp), fontSize = 15.sp, lineHeight = 21.sp, color = DoctorCardSub, maxLines = 3)
             // The drop-down: the same five sections as before, one tap away.
             Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable(role = Role.Button) { open = !open }.semantics(mergeDescendants = true) { stateDescription = if (open) expandedWord else collapsedWord },
                 horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
@@ -103,15 +105,16 @@ import java.time.LocalDate
     val t = careText(); val hindi = careHindi()
     val progress by animateFloatAsState(if (total == 0) 0f else taken.toFloat() / total, label = "medicine ring")
     val label = CarePatientSummaryRules.medicineStatus(total, taken, hindi)
-    Box(Modifier.size(84.dp).semantics(mergeDescendants = true) { contentDescription = label }, contentAlignment = Alignment.Center) {
-        Canvas(Modifier.fillMaxSize().padding(5.dp)) {
-            val stroke = Stroke(width = 9.dp.toPx(), cap = StrokeCap.Round)
-            drawArc(Color(0x1F1F5C45), 0f, 360f, false, style = stroke)
-            if (progress > 0f) drawArc(Color(0xFF3E8A68), -90f, 360f * progress, false, style = stroke)
+    val track = DoctorStatusGood.copy(alpha = .14f); val fill = DoctorStatusGood
+    Box(Modifier.size(80.dp).semantics(mergeDescendants = true) { contentDescription = label }, contentAlignment = Alignment.Center) {
+        Canvas(Modifier.fillMaxSize().padding(4.dp)) {
+            val stroke = Stroke(width = 8.dp.toPx(), cap = StrokeCap.Round)
+            drawArc(track, 0f, 360f, false, style = stroke)
+            if (progress > 0f) drawArc(fill, -90f, 360f * progress, false, style = stroke)
         }
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(if (total == 0) "–" else "$taken/$total", fontSize = 19.sp, fontWeight = FontWeight.Bold, color = DoctorCardInk)
-            Text(t("Medicines", "दवाइयाँ"), fontSize = 10.sp, color = DoctorCardSub)
+            Text(t("Medicines", "दवाइयाँ"), fontSize = 11.sp, color = DoctorCardSub, maxLines = 1)
         }
     }
 }
@@ -119,14 +122,14 @@ import java.time.LocalDate
 /** Today's page shortcuts as tall rounded tiles with their own art. SOS has its own bar above; Care team left (3 Nov meeting). */
 @Composable fun TodayQuickActions(onCalendar: () -> Unit, onSymptoms: () -> Unit, onLabs: () -> Unit, onCommunity: () -> Unit) {
     val t = careText()
-    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text(t("Go to", "यहाँ जाएँ"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading())
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf(
-                QuickAction(t("Calendar", "कैलेंडर"), R.drawable.quick_calendar_art, Color(0xFFFDE7DD), "shortcut-calendar", onCalendar),
-                QuickAction(t("Symptoms", "लक्षण"), R.drawable.symptom_tracker_illustration, Color(0xFFFFE3CF), "symptom-tracker-entry", onSymptoms),
-                QuickAction(t("Labs", "जाँच"), R.drawable.quick_labs_art, Color(0xFFECE6FA), "shortcut-labs", onLabs),
-                QuickAction(t("Community", "समुदाय"), R.drawable.quick_family_art, Color(0xFFE2F0E7), "shortcut-community", onCommunity),
+                QuickAction(t("Calendar", "कैलेंडर"), R.drawable.quick_calendar_art, SaharaApricot, "shortcut-calendar", onCalendar),
+                QuickAction(t("Symptoms", "लक्षण"), R.drawable.symptom_tracker_illustration, Peach.copy(alpha = .6f), "symptom-tracker-entry", onSymptoms),
+                QuickAction(t("Labs", "जाँच"), R.drawable.quick_labs_art, SaharaLavender, "shortcut-labs", onLabs),
+                QuickAction(t("Community", "समुदाय"), R.drawable.quick_family_art, Mint, "shortcut-community", onCommunity),
             ).forEach { action ->
                 ActionCard(Paper, Modifier.weight(1f).height(124.dp).testTag(action.tag), action.onClick) {
                     Column(Modifier.fillMaxSize().padding(vertical = 12.dp, horizontal = 4.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.SpaceBetween) {
@@ -143,19 +146,19 @@ private class QuickAction(val label: String, val art: Int, val tint: Color, val 
 
 @Composable private fun GlanceSection(icon: ImageVector, title: String, subtitle: String, open: Boolean, toggle: () -> Unit, content: @Composable ColumnScope.() -> Unit) {
     val t = careText(); val expandedWord = t("Expanded", "खुला"); val collapsedWord = t("Collapsed", "बंद")
-    HorizontalDivider(color = Rust.copy(alpha = 0.15f))
+    HorizontalDivider(color = DoctorHairline)
     Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).clickable(role = Role.Button, onClick = toggle).padding(vertical = 6.dp).semantics(mergeDescendants = true) { stateDescription = if (open) expandedWord else collapsedWord },
         verticalAlignment = Alignment.CenterVertically) {
-        Icon(icon, null, tint = Rust); Spacer(Modifier.width(12.dp))
-        Column(Modifier.weight(1f)) { Text(title, fontWeight = FontWeight.Bold, fontSize = 15.sp); Text(subtitle, fontSize = 13.sp, color = DoctorCardSub, maxLines = 3) }
-        Icon(if (open) Icons.Default.ExpandLess else Icons.Default.ExpandMore, null)
+        Surface(shape = CircleShape, color = Paper) { Icon(icon, null, Modifier.padding(6.dp).size(20.dp), tint = Rust) }; Spacer(Modifier.width(12.dp))
+        Column(Modifier.weight(1f)) { Text(title, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = DoctorCardInk); Text(subtitle, fontSize = 14.sp, color = DoctorCardSub, maxLines = 3) }
+        Icon(if (open) Icons.Default.ExpandLess else Icons.Default.ExpandMore, null, tint = DoctorCardSub)
     }
-    if (open) Column(Modifier.padding(start = 36.dp), content = content)
+    if (open) Column(Modifier.padding(start = 44.dp, bottom = 4.dp), content = content)
 }
 
 @Composable private fun GlanceRow(text: String, onClick: () -> Unit, action: Boolean = false) {
     Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable(role = Role.Button, onClick = onClick).padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text(text, Modifier.weight(1f), fontSize = 14.sp, fontWeight = if (action) FontWeight.Bold else FontWeight.Normal, color = if (action) RustText else MaterialTheme.colorScheme.onSurface)
+        Text(text, Modifier.weight(1f), fontSize = 15.sp, fontWeight = if (action) FontWeight.SemiBold else FontWeight.Normal, color = if (action) RustText else DoctorCardInk)
         Icon(Icons.AutoMirrored.Filled.ArrowForward, null, Modifier.size(18.dp), tint = Rust)
     }
 }

@@ -73,12 +73,17 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
     val visible = remember(filtered, here, district) { if (here != null && district.isBlank()) NearbyHelp.byDistance(filtered, here.first, here.second) else filtered }
     val clear = { search = ""; service = NearbyHelp.ALL_SERVICES; state = NearbyHelp.ALL_INDIA; district = ""; layerKey = allLayers }
     val filtersOn = search.isNotBlank() || service != NearbyHelp.ALL_SERVICES || state != NearbyHelp.ALL_INDIA || district.isNotBlank() || layerKey != allLayers
-    LazyColumn(Modifier.fillMaxSize().testTag("nearby-list"), contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 12.dp, bottom = 20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    LazyColumn(Modifier.fillMaxSize().testTag("nearby-list"), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
                 Heading(t("Find care", "देखभाल केंद्र खोजें"), 26)
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(listOf(optionLabel(state), district).filter(String::isNotBlank).joinToString(" · ") + " · " + t("${visible.size} ${if (visible.size == 1) "centre" else "centres"}", "${visible.size} केंद्र"), color = Rust, modifier = Modifier.weight(1f, fill = false))
+                    Text(listOf(optionLabel(state), district).filter(String::isNotBlank).joinToString(" · "), color = RustText, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
+                    Spacer(Modifier.width(8.dp))
+                    // The count is a badge, not part of the sentence.
+                    Surface(shape = RoundedCornerShape(50), color = SaharaSoftGold, contentColor = DoctorCardInk, modifier = Modifier.testTag("nearby-count")) {
+                        Text(t("${visible.size} ${if (visible.size == 1) "centre" else "centres"}", "${visible.size} केंद्र"), style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold, maxLines = 1, modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp))
+                    }
                     NearbyInfoButton(t("About this list", "इस सूची के बारे में"), Modifier.testTag("nearby-about")) {
                         Text(t("Directory listings. Call to confirm services, availability and cost.", "यह सूची से ली गई जानकारी है। सेवा, उपलब्धता और ख़र्च फ़ोन करके पक्का करें।"))
                         Text(t("Blue pins and tags: the directory also lists morphine. Call to confirm.", "नीले निशान और टैग: सूची में मॉर्फ़ीन भी लिखा है। फ़ोन करके पक्का करें।"))
@@ -99,7 +104,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
             Column(Modifier.clip(RoundedCornerShape(20.dp))) { CentreMap(visible, userLocation = here, height = 300.dp, onLocate = location.ask) { chosen = it } }
         }
         item(key = "nearby-call") { NearbyCallBar() }
-        item { OutlinedTextField(value = search, onValueChange = { search = it }, placeholder = { Text(t("Name, place, state or PIN", "नाम, जगह, राज्य या पिन")) }, leadingIcon = { Icon(Icons.Default.Search, null) }, trailingIcon = { if (search.isNotEmpty()) IconButton(onClick = { search = "" }) { Icon(Icons.Default.Close, t("Clear search", "खोज मिटाएँ")) } }, shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth(), singleLine = true,
+        item { OutlinedTextField(value = search, onValueChange = { search = it }, placeholder = { Text(t("Name, place, state or PIN", "नाम, जगह, राज्य या पिन")) }, leadingIcon = { Icon(Icons.Default.Search, null) }, trailingIcon = { if (search.isNotEmpty()) IconButton(onClick = { search = "" }) { Icon(Icons.Default.Close, t("Clear search", "खोज मिटाएँ")) } }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp), singleLine = true,
+            colors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = Paper, focusedContainerColor = Paper, focusedBorderColor = Rust, cursorColor = Rust),
             keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(imeAction = androidx.compose.ui.text.input.ImeAction.Search), keyboardActions = androidx.compose.foundation.text.KeyboardActions(onSearch = { focus.clearFocus() })) }
         item { Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             NearbyPicker(t("State", "राज्य"), state, listOf(NearbyHelp.ALL_INDIA) + states, optionLabel, "nearby-state-picker", Modifier.weight(1f)) { if (state != it) district = ""; state = it }
@@ -110,21 +116,30 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
         item { FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.testTag("nearby-layers")) {
             NearbyHelp.layerOptions.forEach { layer -> FilterChip(selected = layer in layers, onClick = { layerKey = NearbyHelp.layerOptions.filter { it in NearbyHelp.toggleLayer(layers, layer) }.joinToString(",") },
                 label = { Text(if (layer == NearbyHelp.LAYER_MORPHINE) t("Morphine listed", "मॉर्फ़ीन सूची में") else t("Palliative care", "पैलिएटिव देखभाल")) },
-                leadingIcon = { Box(Modifier.size(14.dp).clip(CircleShape).background(Color(NearbyHelp.layerColor(layer)))) }, modifier = Modifier.heightIn(min = 48.dp).testTag("nearby-layer-$layer")) }
+                leadingIcon = { Box(Modifier.size(14.dp).clip(CircleShape).background(Color(NearbyHelp.layerColor(layer)))) }, shape = RoundedCornerShape(50),
+                colors = FilterChipDefaults.filterChipColors(containerColor = Paper, labelColor = DoctorCardInk, selectedContainerColor = Mint, selectedLabelColor = DoctorCardInk),
+                modifier = Modifier.heightIn(min = 48.dp).testTag("nearby-layer-$layer")) }
         } }
-        if (visible.isEmpty()) item { SurfaceCard { Text(t("No centres match that search.", "इस खोज से कोई केंद्र नहीं मिला।")) } }
+        // Empty results: one icon, one line, one way out.
+        if (visible.isEmpty()) item(key = "nearby-empty") { SurfaceCard {
+            Column(Modifier.fillMaxWidth().testTag("nearby-empty"), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Icon(Icons.Default.SearchOff, null, Modifier.size(32.dp), tint = DoctorCardSub)
+                Text(t("No centres match that search.", "इस खोज से कोई केंद्र नहीं मिला।"), fontSize = 16.sp, color = DoctorCardInk)
+                if (filtersOn) OutlinedButton(onClick = clear, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Clear filters", "सभी चुनाव हटाएँ"), color = RustText) }
+            }
+        } }
         items(visible, key = { it.id }) { c -> Box(Modifier.animateItem()) { NearbyCentreCard(c, here) } }
         if (vm != null) item(key = "nearby-suggest") {
-            TextButton(onClick = { suggesting = true }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("nearby-suggest-centre")) {
-                Icon(Icons.Default.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Suggest a centre that's missing", "छूटा हुआ केंद्र सुझाएँ"))
+            OutlinedButton(onClick = { suggesting = true }, shape = RoundedCornerShape(14.dp), border = androidx.compose.foundation.BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("nearby-suggest-centre")) {
+                Icon(Icons.Default.Add, null, Modifier.size(18.dp), tint = RustText); Spacer(Modifier.width(8.dp)); Text(t("Suggest a centre that's missing", "छूटा हुआ केंद्र सुझाएँ"), color = RustText)
             }
         }
         if (suggestions.isNotEmpty()) item { CentreSuggestionList(suggestions) }
     }
     if (chosen.isNotEmpty()) ModalBottomSheet(onDismissRequest = { chosen = emptyList() }, containerColor = Cream) {
         // Several centres can share one approximate area pin; the sheet lists all of them.
-        LazyColumn(Modifier.padding(start = 20.dp, end = 20.dp), contentPadding = PaddingValues(bottom = 28.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-            if (chosen.size > 1) item { Text(t("${chosen.size} centres here", "यहाँ ${chosen.size} केंद्र"), fontWeight = FontWeight.SemiBold) }
+        LazyColumn(Modifier.padding(start = 16.dp, end = 16.dp), contentPadding = PaddingValues(bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            if (chosen.size > 1) item { Text(t("${chosen.size} centres here", "यहाँ ${chosen.size} केंद्र"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading()) }
             items(chosen, key = { it.id }) { NearbyCentreCard(it, here) }
         }
     }
@@ -146,12 +161,17 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 /** One slim bar: tapping it opens the phone's dialler with 112 filled in (ACTION_DIAL). The person presses call; the app never calls. */
 @Composable fun NearbyCallBar() {
     val t = careText(); val context = LocalContext.current
-    Surface(onClick = { open(context, Intent(Intent.ACTION_DIAL, Uri.parse(NearbyHelp.dialUri(NearbyHelp.EMERGENCY_CALL)))) }, shape = RoundedCornerShape(16.dp), color = Peach,
-        modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("emergency-112")) {
-        Row(Modifier.padding(horizontal = 16.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Default.Call, null, Modifier.size(20.dp), tint = RustText); Spacer(Modifier.width(10.dp))
-            Text(t("Call 112", "112 पर फ़ोन करें"), fontWeight = FontWeight.Bold, fontSize = 17.sp, color = Ink, modifier = Modifier.weight(1f))
-            Text(t("Emergency", "आपातकाल"), style = MaterialTheme.typography.labelMedium, color = RustText)
+    Surface(onClick = { open(context, Intent(Intent.ACTION_DIAL, Uri.parse(NearbyHelp.dialUri(NearbyHelp.EMERGENCY_CALL)))) }, shape = RoundedCornerShape(14.dp), color = Peach,
+        modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("emergency-112")) {
+        Row(Modifier.padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+            Surface(shape = CircleShape, color = Rust, contentColor = Color.White, modifier = Modifier.size(36.dp)) {
+                Box(contentAlignment = Alignment.Center) { Icon(Icons.Default.Call, null, Modifier.size(20.dp)) }
+            }
+            Spacer(Modifier.width(12.dp))
+            Text(t("Call 112", "112 पर फ़ोन करें"), fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Ink, modifier = Modifier.weight(1f))
+            Surface(shape = RoundedCornerShape(50), color = Paper, contentColor = RustText) {
+                Text(t("Emergency", "आपातकाल"), style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp))
+            }
         }
     }
 }
@@ -159,44 +179,50 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 /** A small info icon that opens [content] in a dialog: for fine print that matters but should not sit on the screen. */
 @Composable fun NearbyInfoButton(title: String, modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
     val t = careText(); var open by rememberSaveable(title) { mutableStateOf(false) }
-    IconButton(onClick = { open = true }, modifier = modifier.size(48.dp)) { Icon(Icons.Outlined.Info, title, tint = DoctorCardSub, modifier = Modifier.size(20.dp)) }
-    if (open) AlertDialog(onDismissRequest = { open = false }, containerColor = Paper, title = { Text(title, fontWeight = FontWeight.SemiBold) },
+    IconButton(onClick = { open = true }, modifier = modifier.size(48.dp)) { Icon(Icons.Outlined.Info, title, tint = DoctorAccent, modifier = Modifier.size(22.dp)) }
+    if (open) AlertDialog(onDismissRequest = { open = false }, containerColor = Paper, title = { Text(title, fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium) },
         text = { Column(verticalArrangement = Arrangement.spacedBy(8.dp), content = content) },
-        confirmButton = { TextButton(onClick = { open = false }) { Text(t("Close", "बंद करें")) } })
+        confirmButton = { TextButton(onClick = { open = false }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Close", "बंद करें"), color = RustText) } })
 }
 
 /** A field that opens a searchable list in a bottom sheet: a long list of states fits without sideways scrolling. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable fun NearbyPicker(label: String, selected: String, options: List<String>, optionLabel: (String) -> String, tag: String, modifier: Modifier = Modifier, onSelect: (String) -> Unit) {
     val t = careText(); var open by rememberSaveable(tag) { mutableStateOf(false) }
-    Surface(onClick = { open = true }, shape = RoundedCornerShape(16.dp), color = Paper, border = androidx.compose.foundation.BorderStroke(1.dp, DoctorHairline),
+    Surface(onClick = { open = true }, shape = RoundedCornerShape(14.dp), color = Paper, border = androidx.compose.foundation.BorderStroke(1.dp, DoctorHairline),
         modifier = modifier.heightIn(min = 56.dp).testTag(tag).semantics { contentDescription = "$label: ${optionLabel(selected)}" }) {
-        Row(Modifier.padding(start = 14.dp, end = 8.dp, top = 8.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(Modifier.padding(start = 16.dp, end = 8.dp, top = 8.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
-                Text(label, style = MaterialTheme.typography.labelSmall, color = DoctorCardSub)
-                Text(optionLabel(selected), fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(label, style = MaterialTheme.typography.labelMedium, color = DoctorCardSub)
+                Text(optionLabel(selected), fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
-            Icon(Icons.Default.ArrowDropDown, null, tint = DoctorCardSub)
+            Icon(Icons.Default.ArrowDropDown, null, tint = DoctorAccent)
         }
     }
     if (open) {
         var query by rememberSaveable(tag + "-query") { mutableStateOf("") }
         val shown = remember(options, query, optionLabel) { NearbyHelp.pick(options.map { it to optionLabel(it) }, query) }
         ModalBottomSheet(onDismissRequest = { open = false; query = "" }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
-            Column(Modifier.padding(horizontal = 20.dp).testTag("$tag-sheet")) {
-                Text(label, fontWeight = FontWeight.SemiBold, fontSize = 19.sp)
-                Spacer(Modifier.height(8.dp))
+            Column(Modifier.padding(horizontal = 16.dp).testTag("$tag-sheet")) {
+                Text(label, fontFamily = SaharaTitleFont, fontWeight = FontWeight.Medium, fontSize = 20.sp, color = DoctorCardInk, modifier = Modifier.a11yHeading())
+                Spacer(Modifier.height(12.dp))
                 if (options.size > 8) OutlinedTextField(query, { query = it }, placeholder = { Text(t("Search", "खोजें")) }, leadingIcon = { Icon(Icons.Default.Search, null) }, singleLine = true,
-                    shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth().testTag("$tag-search"))
-                LazyColumn(Modifier.fillMaxWidth().heightIn(max = 460.dp), contentPadding = PaddingValues(top = 8.dp, bottom = 28.dp)) {
+                    shape = RoundedCornerShape(14.dp), colors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = Paper, focusedContainerColor = Paper, focusedBorderColor = Rust, cursorColor = Rust),
+                    modifier = Modifier.fillMaxWidth().testTag("$tag-search"))
+                LazyColumn(Modifier.fillMaxWidth().heightIn(max = 460.dp), contentPadding = PaddingValues(top = 8.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     items(shown, key = { it.first }) { (value, shownLabel) ->
-                        Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable(role = Role.Button) { onSelect(value); open = false; query = "" }.padding(horizontal = 4.dp).testTag("nearby-option-$value"),
+                        // The chosen row is tinted as well as ticked, so it is easy to spot in a long list.
+                        Row(Modifier.fillMaxWidth().heightIn(min = 52.dp).clip(RoundedCornerShape(14.dp)).background(if (value == selected) Mint else Color.Transparent)
+                            .clickable(role = Role.Button) { onSelect(value); open = false; query = "" }.padding(horizontal = 12.dp).testTag("nearby-option-$value"),
                             verticalAlignment = Alignment.CenterVertically) {
-                            Text(shownLabel, Modifier.weight(1f), fontWeight = if (value == selected) FontWeight.SemiBold else FontWeight.Normal)
+                            Text(shownLabel, Modifier.weight(1f), fontSize = 16.sp, color = DoctorCardInk, fontWeight = if (value == selected) FontWeight.SemiBold else FontWeight.Normal)
                             if (value == selected) Icon(Icons.Default.Check, t("Selected", "चुना हुआ"), tint = RustText)
                         }
                     }
-                    if (shown.isEmpty()) item { Text(t("Nothing matches.", "कुछ नहीं मिला।"), style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(vertical = 12.dp)) }
+                    if (shown.isEmpty()) item { Row(Modifier.padding(horizontal = 12.dp, vertical = 16.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.SearchOff, null, Modifier.size(20.dp), tint = DoctorCardSub); Spacer(Modifier.width(8.dp))
+                        Text(t("Nothing matches.", "कुछ नहीं मिला।"), color = DoctorCardSub)
+                    } }
                 }
             }
         }
@@ -223,11 +249,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
             }
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
-                Text(c.name, fontSize = 18.sp, fontWeight = FontWeight.SemiBold, lineHeight = 23.sp)
+                Text(c.name, fontSize = 18.sp, fontWeight = FontWeight.SemiBold, lineHeight = 23.sp, color = DoctorCardInk)
                 val km = here?.let { NearbyHelp.distanceKm(c, it.first, it.second) }
                 val place = listOf(c.city, c.state).filter(String::isNotBlank).distinct().joinToString(" · ")
                 Text(listOfNotNull(place.ifBlank { null }, km?.let { k -> val n = Math.round(k).coerceAtLeast(1); if (CentreLocation.approximate(c)) t("about $n km", "लगभग $n किमी") else t("$n km", "$n किमी") }).joinToString(" · "),
-                    color = Rust, style = MaterialTheme.typography.labelMedium)
+                    color = RustText, style = MaterialTheme.typography.bodyMedium)
             }
             NearbyInfoButton(t("About this centre", "इस केंद्र के बारे में"), Modifier.testTag("centre-info-${c.id}")) {
                 if (c.address.isNotBlank()) Text(c.address)
@@ -240,14 +266,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
             }
         }
         val tags = listOf(layer) + NearbyHelp.serviceTags(c)
-        Spacer(Modifier.height(10.dp))
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) { tags.forEach { NearbyTag(it, optionLabel(it)) } }
-        Spacer(Modifier.height(10.dp))
+        Spacer(Modifier.height(12.dp))
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { tags.forEach { NearbyTag(it, optionLabel(it)) } }
+        Spacer(Modifier.height(12.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
             if (c.phone.any(Char::isDigit)) FilledTonalButton(onClick = { open(context, Intent(Intent.ACTION_DIAL, Uri.parse(NearbyHelp.dialUri(c.phone)))) }, colors = ButtonDefaults.filledTonalButtonColors(containerColor = Mint, contentColor = Ink),
-                modifier = Modifier.heightIn(min = 48.dp).testTag("centre-call-${c.id}")) { Icon(Icons.Default.Call, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Call", "फ़ोन करें")) }
-            FilledTonalButton(onClick = { nearbyOpenDirections(context, c) }, colors = ButtonDefaults.filledTonalButtonColors(containerColor = Gold, contentColor = Ink),
-                modifier = Modifier.heightIn(min = 48.dp).testTag("centre-directions-${c.id}")) { Icon(Icons.Default.Directions, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Directions", "रास्ता")) }
+                shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("centre-call-${c.id}")) { Icon(Icons.Default.Call, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Call", "फ़ोन करें"), fontWeight = FontWeight.SemiBold) }
+            FilledTonalButton(onClick = { nearbyOpenDirections(context, c) }, colors = ButtonDefaults.filledTonalButtonColors(containerColor = SaharaSoftGold, contentColor = Ink),
+                shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("centre-directions-${c.id}")) { Icon(Icons.Default.Directions, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Directions", "रास्ता"), fontWeight = FontWeight.SemiBold) }
             Spacer(Modifier.weight(1f))
             IconButton(onClick = { open(context, Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, NearbyHelp.shareText(c)), t("Share centre", "केंद्र भेजें"))) },
                 modifier = Modifier.size(48.dp).testTag("centre-share-${c.id}")) { Icon(Icons.Default.Share, t("Share", "भेजें"), tint = DoctorCardSub) }

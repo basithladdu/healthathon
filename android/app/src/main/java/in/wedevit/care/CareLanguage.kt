@@ -1,6 +1,7 @@
 package `in`.wedevit.care
 
 import android.content.Context
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.heightIn
@@ -182,13 +183,13 @@ val LocalCareLanguage = staticCompositionLocalOf<CareLanguageChoice?> { null }
             if (!compact) { Spacer(Modifier.width(4.dp)); Text(language.lang.label, fontSize = 14.sp, maxLines = 1) }
             Icon(Icons.Default.ArrowDropDown, null, Modifier.size(20.dp))
         }
-        DropdownMenu(expanded = open, onDismissRequest = { open = false }, modifier = Modifier.testTag("care-language-options")) {
+        DropdownMenu(expanded = open, onDismissRequest = { open = false }, modifier = Modifier.background(Paper).testTag("care-language-options")) {
             CareLang.entries.forEach { option ->
                 val chosen = option == language.lang
                 DropdownMenuItem(
-                    text = { Row(verticalAlignment = Alignment.CenterVertically) { Text(option.label, fontWeight = if (chosen) FontWeight.SemiBold else FontWeight.Normal); if (option != CareLang.EN) { Spacer(Modifier.width(8.dp)); Text(option.englishName, fontSize = 12.sp, color = LocalContentColor.current.copy(alpha = .6f)) } } },
+                    text = { Row(verticalAlignment = Alignment.CenterVertically) { Text(option.label, fontSize = 16.sp, fontWeight = if (chosen) FontWeight.SemiBold else FontWeight.Normal, color = if (chosen) RustText else DoctorCardInk); if (option != CareLang.EN) { Spacer(Modifier.width(8.dp)); Text(option.englishName, fontSize = 14.sp, color = DoctorCardSub) } } },
                     onClick = { language.choose(option); open = false },
-                    trailingIcon = { if (chosen) Icon(Icons.Default.Check, null) },
+                    trailingIcon = { if (chosen) Icon(Icons.Default.Check, null, tint = Rust) },
                     modifier = Modifier.heightIn(min = 48.dp).testTag("care-language-${option.code}"))
             }
         }

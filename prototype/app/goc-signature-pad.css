@@ -1,25 +1,53 @@
 /* Goals-of-care sign-off (goc-signature-pad.tsx). Uses the ep-* look of ectpr-plan.css. */
-.goc-signoff-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+.goc-signoff { --goc-paper-line: #d9cbb8; }
+.goc-signoff-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
 .goc-signoff-head h2 { margin: 0; font-size: 22px; }
 .goc-locked-chip { background: var(--ep-sage, #d9eaa8); color: var(--ep-sage-ink, #465e45); }
-.goc-step { display: grid; gap: 12px; margin: 12px 0; }
-.goc-step h3 { margin: 0; font-size: 18px; }
+.goc-locked-chip::before { content: '✓'; font-weight: 800; }
+.goc-signoff[data-status='LOCKED'] { border-color: #c9dc9f; }
+/* Inside the goals-of-care flow it is one surface with the form above, not a card in a card */
+.goc-flow .goc-signoff { margin: 8px 0 0; padding: 20px 0 0; border: 0; border-top: 2px solid var(--ep-line, #e6ddd1); border-radius: 0; background: transparent; box-shadow: none; }
+.goc-flow .goc-signoff .goc-step:first-of-type { border-top: 0; padding-top: 0; }
+
+.goc-step { display: grid; gap: 12px; margin: 16px 0 0; padding-top: 16px; border-top: 1px solid var(--ep-line, #e6ddd1); }
+.goc-step h3 { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 18px; }
 .goc-fields { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
 .goc-fields .ep-field { margin: 0; }
-.goc-choice { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+.goc-fields input { min-height: 48px; padding: 8px 12px; border: 1px solid #cdbd9d; border-radius: 14px; background: #fff; font: inherit; }
+.goc-choice { display: flex; flex-wrap: wrap; align-items: stretch; gap: 8px; }
+.goc-choice .ep-option { flex: 1 1 140px; align-items: center; }
+.goc-note > summary { min-height: 44px; display: flex; align-items: center; font-weight: 700; cursor: pointer; }
 .goc-note p { white-space: pre-wrap; margin: 8px 0 0; max-height: 240px; overflow: auto; }
+.goc-declare { margin: 0; padding: 12px 16px; border-inline-start: 3px solid var(--ep-primary, #b9472c); background: #fdf6f0; font-weight: 650; font-family: Georgia, 'Noto Serif', 'Noto Serif Devanagari', serif; }
+
+/* The pad: a signature box with a line to sign on, like the paper form */
 .goc-pad { display: grid; gap: 8px; }
 .goc-pad-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
 .goc-pad-toggle { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; cursor: pointer; }
 .goc-pad-toggle input { width: 22px; height: 22px; accent-color: var(--ep-primary, #b9472c); }
-.goc-pad-canvas { display: block; width: 100%; aspect-ratio: 3 / 1; border: 2px dashed var(--ep-line, #e6ddd1); border-radius: 14px; background: #fff; touch-action: none; user-select: none; -webkit-user-select: none; cursor: crosshair; }
-.goc-pad[data-thumb] .goc-pad-canvas { border-color: var(--ep-primary, #b9472c); }
+.goc-pad-canvas {
+  display: block; width: 100%; aspect-ratio: 3 / 1; min-height: 120px; border: 1.5px solid var(--goc-paper-line, #d9cbb8); border-radius: 14px;
+  background:
+    linear-gradient(#8d7f74, #8d7f74) center bottom 26% / calc(100% - 48px) 1.5px no-repeat,
+    #fff;
+  box-shadow: inset 0 1px 3px rgba(60, 35, 20, .06);
+  touch-action: none; user-select: none; -webkit-user-select: none; cursor: crosshair;
+}
+.goc-pad-canvas:focus-visible { outline: 3px solid #b9472c66; outline-offset: 2px; }
+.goc-pad[data-thumb] .goc-pad-canvas { border: 2px dashed var(--ep-primary, #b9472c); background: #fff; }
 .goc-pad-canvas[data-disabled] { opacity: .5; cursor: not-allowed; }
-.goc-pad-actions { margin: 0; }
-.goc-signed { display: grid; gap: 10px; margin: 0 0 12px; padding: 0; list-style: none; }
-.goc-signed li { display: flex; align-items: center; gap: 12px; padding: 8px; border: 1px solid var(--ep-line, #e6ddd1); border-radius: 12px; }
-.goc-signed img { flex: 0 0 auto; width: 150px; height: auto; background: #fff; border-radius: 8px; image-rendering: auto; }
-.goc-seal small { word-break: break-all; }
-@media (max-width: 420px) { .goc-signed li { flex-direction: column; align-items: flex-start; } }
-.goc-fields input { min-height: 48px; padding: 8px 12px; border: 1px solid #d6c8b9; border-radius: 12px; background: #fff; font: inherit; }
-.goc-declare { margin: 0; font-weight: 650; }
+.goc-pad-actions { margin: 0; justify-content: flex-end; }
+
+/* Signatures already made, shown as signed boxes */
+.goc-signed { display: grid; gap: 8px; margin: 0 0 12px; padding: 0; list-style: none; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+.goc-signed li { display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px solid var(--goc-paper-line, #d9cbb8); border-radius: 14px; background: #fff; }
+.goc-signed img { flex: 0 0 auto; width: 150px; height: auto; background: #fff; border-bottom: 1.5px solid #8d7f74; image-rendering: auto; }
+.goc-signed small { color: var(--ep-muted, #76675d); font-size: 14px; }
+.goc-seal small { word-break: break-all; font-family: ui-monospace, Consolas, monospace; }
+@media (max-width: 420px) { .goc-signed li { flex-direction: column; align-items: flex-start; } .goc-signed img { width: 100%; max-width: 240px; } }
+
+@media print {
+  .goc-pad, .goc-signoff .ep-actions { display: none !important; }
+  .goc-signoff { border: 0 !important; box-shadow: none !important; }
+  .goc-signed li { break-inside: avoid; }
+}

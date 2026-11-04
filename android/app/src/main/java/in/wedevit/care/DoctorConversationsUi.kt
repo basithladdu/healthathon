@@ -25,14 +25,14 @@ private fun conversationDate(at: Long?, hindi: Boolean) = at?.takeIf { it > 0 }?
 @Composable fun DoctorConversationsContent(model: DoctorConversationsModel, onContinue: () -> Unit, modifier: Modifier = Modifier) { val t = careText();
     Column(modifier.fillMaxWidth().testTag("doctor-conversations"), verticalArrangement = Arrangement.spacedBy(24.dp)) {
         Surface(color = DoctorCardConversation, shape = RoundedCornerShape(20.dp)) {
-            Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
                     Icon(Icons.Default.Forum, null, tint = DoctorAccent, modifier = Modifier.size(24.dp))
                     Text(t("Conversation workspace", "बातचीत की जगह"), fontFamily = SaharaTitleFont, fontSize = 21.sp, lineHeight = 27.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
                 }
                 if (model.currentDraft != null) {
                     Column(Modifier.testTag("conversation-draft"), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text(t("Saved draft · not a published Care Note", "सहेजा ड्राफ़्ट · प्रकाशित केयर नोट नहीं"), fontWeight = FontWeight.Medium, fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub)
+                        Surface(color = DoctorStatusWarnBg, contentColor = DoctorStatusWarn, shape = RoundedCornerShape(50)) { Text(t("Saved draft · not a published Care Note", "सहेजा ड्राफ़्ट · प्रकाशित केयर नोट नहीं"), fontWeight = FontWeight.Medium, fontSize = 14.sp, lineHeight = 18.sp, modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)) }
                     }
                 }
                 Button(onClick = onContinue, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("workflow-open-conversation"), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent, contentColor = Paper), shape = RoundedCornerShape(14.dp)) {
@@ -59,7 +59,12 @@ private fun conversationDate(at: Long?, hindi: Boolean) = at?.takeIf { it > 0 }?
             }
         }
         if (model.latestPublished == null && model.priorSample == null) {
-            Text(t("No saved discussion is recorded yet. You can prepare one in the workspace.", "अभी कोई सहेजी चर्चा दर्ज नहीं है। आप बातचीत की जगह में एक तैयार कर सकते हैं।"), fontSize = 15.sp, lineHeight = 23.sp, color = DoctorCardInk)
+            Surface(color = DoctorCardReport, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
+                Row(Modifier.padding(16.dp), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Icon(Icons.Default.Forum, null, tint = RustText, modifier = Modifier.size(24.dp))
+                    Text(t("No saved discussion is recorded yet. You can prepare one in the workspace.", "अभी कोई सहेजी चर्चा दर्ज नहीं है। आप बातचीत की जगह में एक तैयार कर सकते हैं।"), fontSize = 16.sp, lineHeight = 23.sp, color = DoctorCardSub, modifier = Modifier.weight(1f))
+                }
+            }
         }
     }
 }
@@ -73,27 +78,26 @@ private fun conversationDate(at: Long?, hindi: Boolean) = at?.takeIf { it > 0 }?
     val author = discussion.reviewerName?.takeIf { it.isNotBlank() } ?: t("Author not recorded", "लेखक दर्ज नहीं")
     val brief = discussion.topics.ifBlank { discussion.priorities }.ifBlank { t("No summary recorded", "कोई सार दर्ज नहीं") }
     Surface(color = if (highlighted) DoctorCardConversation else DoctorCardReport, shape = RoundedCornerShape(20.dp), border = if (highlighted) null else BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("conversation-card-${discussion.id}")) {
-        Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(if (discussion.isPublishedPreview) t("Version ${discussion.versionNumber}", "संस्करण ${discussion.versionNumber}") else t("Earlier discussion", "पहले की चर्चा"), fontSize = 21.sp, lineHeight = 26.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, fontFamily = SaharaTitleFont)
-                Text(conversationDate(discussion.publishedAt, careHindi()), fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub)
-                Text(author, fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub)
+                Text(conversationDate(discussion.publishedAt, careHindi()) + " · " + author, fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
             }
-            Text(brief, fontSize = 15.sp, lineHeight = 23.sp, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(brief, fontSize = 16.sp, lineHeight = 24.sp, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis)
             HorizontalDivider(color = DoctorHairline)
             Column(Modifier.testTag("conversation-expand-${discussion.id}"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 if (discussion.isPublishedPreview) {
                     fields.filter { it.second.isNotBlank() }.forEach { (label, value) ->
                         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            Text(label, fontSize = 13.sp, lineHeight = 18.sp, fontWeight = FontWeight.Medium, color = DoctorCardSub)
-                            SelectionContainer { Text(value, fontSize = 15.sp, lineHeight = 23.sp, color = DoctorCardInk) }
+                            Text(label, fontSize = 14.sp, lineHeight = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardSub)
+                            SelectionContainer { Text(value, fontSize = 16.sp, lineHeight = 24.sp, color = DoctorCardInk) }
                         }
                     }
                     HorizontalDivider(color = DoctorHairline)
                 }
                 Text(t("Original words", "मूल शब्द"), fontSize = 19.sp, lineHeight = 24.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, fontFamily = SaharaTitleFont)
-                Text(discussion.sourceLabel, fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub)
-                SelectionContainer { Text(discussion.sourceText, fontSize = 15.sp, lineHeight = 24.sp, color = DoctorCardInk, modifier = Modifier.testTag("conversation-source-${discussion.id}")) }
+                Text(discussion.sourceLabel, fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
+                SelectionContainer { Text(discussion.sourceText, fontSize = 16.sp, lineHeight = 25.sp, color = DoctorCardInk, modifier = Modifier.testTag("conversation-source-${discussion.id}")) }
             }
         }
     }

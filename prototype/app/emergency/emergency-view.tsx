@@ -23,7 +23,7 @@ export function EmergencyView() {
           <span className={styles.brand}>Sahara</span>
           <span className={styles.tag}>Emergency card · आपातकालीन कार्ड</span>
         </header>
-        {!result && <p className={styles.muted}>Loading the card… · कार्ड लोड हो रहा है…</p>}
+        {!result && <p className={`${styles.muted} ${styles.loading}`} role="status">Loading the card… · कार्ड लोड हो रहा है…</p>}
         {result && result.status !== 'live' && (
           <section className={styles.notice}><h1>{MESSAGES[result.status].title}</h1><p>{MESSAGES[result.status].detail}</p></section>
         )}

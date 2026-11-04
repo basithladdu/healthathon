@@ -68,7 +68,7 @@ enum class PatientDoctorVerification { NOT_VERIFIED, PENDING }
                         Text(if (doctor.verification == PatientDoctorVerification.PENDING) t("Verification pending", "पुष्टि बाकी है") else t("Not verified", "पुष्टि नहीं हुई"),
                             fontWeight = FontWeight.Medium, modifier = Modifier.testTag("patient-doctor-status"))
                         Text(t("Sahara has not confirmed this doctor's professional identity.", "Sahara ने इस डॉक्टर की पेशेवर पहचान की पुष्टि नहीं की है।"),
-                            style = MaterialTheme.typography.bodySmall)
+                            style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
             }
@@ -86,6 +86,6 @@ enum class PatientDoctorVerification { NOT_VERIFIED, PENDING }
     androidx.compose.foundation.text.selection.SelectionContainer {
         Text((careTr(hindi, "Patient ID: ", "मरीज़ ID: ")) + DoctorConnectedHome.patientCode(personId) +
             (careTr(hindi, " · after joining, your doctor can find you by this ID.", " · जुड़ने के बाद डॉक्टर इस ID से आपको ढूँढ सकते हैं।")),
-            style = MaterialTheme.typography.bodySmall, modifier = Modifier.testTag("patient-id-for-doctor"))
+            style = MaterialTheme.typography.bodyMedium, modifier = Modifier.testTag("patient-id-for-doctor"))
     }
 }

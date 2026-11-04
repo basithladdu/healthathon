@@ -3,6 +3,7 @@ package `in`.wedevit.care
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
@@ -35,13 +36,13 @@ internal fun doctorHubSingleColumn(widthDp: Float, fontScale: Float): Boolean = 
 @Composable internal fun DoctorPatientNavigationTiles(onSection:(String)->Unit,modifier:Modifier=Modifier,tagPrefix:String="doctor-shared",minimumPairedWidth:Float=300f,meta:Map<String,String> = emptyMap(),tabs:List<DoctorPatientTab> = doctorPatientTabs,selected:String?=null) {
     BoxWithConstraints(modifier.fillMaxWidth()) {
         val single = maxWidth.value < minimumPairedWidth || LocalDensity.current.fontScale >= 1.3f
-        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             tabs.firstOrNull()?.let { PatientHubTile(it, wide = true, onSection = onSection, tagPrefix = tagPrefix, meta = meta[it.section], selected = selected == it.section) }
             val rest = tabs.drop(1)
             if (single) rest.forEach { PatientHubTile(it, wide = true, onSection = onSection, tagPrefix = tagPrefix, meta = meta[it.section], selected = selected == it.section) }
             else rest.chunked(2).forEach { pair ->
                 if (pair.size == 1) PatientHubTile(pair[0], wide = true, onSection = onSection, tagPrefix = tagPrefix, meta = meta[pair[0].section], selected = selected == pair[0].section)
-                else Row(Modifier.height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                else Row(Modifier.height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     pair.forEach { PatientHubTile(it, modifier = Modifier.weight(1f).fillMaxHeight(), onSection = onSection, tagPrefix = tagPrefix, meta = meta[it.section], selected = selected == it.section) }
                 }
             }
@@ -53,18 +54,18 @@ internal fun doctorHubSingleColumn(widthDp: Float, fontScale: Float): Boolean = 
     val title = t(tab.en, tab.hi)
     Surface(onClick = { onSection(tab.section) }, modifier = modifier.fillMaxWidth().heightIn(min = if (wide) 64.dp else 84.dp).testTag("$tagPrefix-${tab.section}").semantics { role = Role.Button }, shape = RoundedCornerShape(20.dp), color = tab.color, contentColor = DoctorCardInk,
         border = if (selected) BorderStroke(2.dp, DoctorAccent) else if (tab.color == DoctorCardReport) BorderStroke(1.dp, DoctorHairline) else null) {
-        if (wide) Row(Modifier.padding(horizontal = 14.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.size(40.dp).background(Paper.copy(alpha = .9f), RoundedCornerShape(12.dp)), contentAlignment = Alignment.Center) { Icon(tab.icon, null, tint = DoctorAccent, modifier = Modifier.size(21.dp)) }
+        if (wide) Row(Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.size(40.dp).background(Paper.copy(alpha = .9f), CircleShape), contentAlignment = Alignment.Center) { Icon(tab.icon, null, tint = DoctorAccent, modifier = Modifier.size(22.dp)) }
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 Text(title, fontSize = 17.sp, lineHeight = 22.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, color = DoctorCardInk)
-                if(!meta.isNullOrBlank()) Text(meta, fontSize=12.sp, color = RustText, lineHeight = 16.sp, fontWeight = FontWeight.Medium, modifier = Modifier.testTag("$tagPrefix-${tab.section}-meta"))
+                if(!meta.isNullOrBlank()) Text(meta, fontSize=14.sp, color = RustText, lineHeight = 18.sp, fontWeight = FontWeight.Medium, modifier = Modifier.testTag("$tagPrefix-${tab.section}-meta"))
             }
             Spacer(Modifier.width(8.dp)); Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = DoctorAccent, modifier = Modifier.size(20.dp))
-        } else Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        } else Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Icon(tab.icon, null, tint = DoctorAccent, modifier = Modifier.size(22.dp))
             Text(title, fontSize = 16.sp, lineHeight = 21.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, color = DoctorCardInk)
-            if(!meta.isNullOrBlank()) Text(meta, fontSize=12.sp, color = RustText, lineHeight = 16.sp, fontWeight = FontWeight.Medium, modifier = Modifier.testTag("$tagPrefix-${tab.section}-meta"))
+            if(!meta.isNullOrBlank()) Text(meta, fontSize=14.sp, color = RustText, lineHeight = 18.sp, fontWeight = FontWeight.Medium, modifier = Modifier.testTag("$tagPrefix-${tab.section}-meta"))
         }
     }
 }

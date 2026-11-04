@@ -2,6 +2,9 @@
 package `in`.wedevit.care
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Timeline
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -88,18 +91,25 @@ object TrendChartRules {
 
 /** Tiny legend in words: Mild · Moderate · Severe with their colours and number ranges. */
 @Composable internal fun ChartLegend(hindi: Boolean) {
-    FlowRow(horizontalArrangement = Arrangement.spacedBy(14.dp), verticalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.testTag("chart-legend")) {
+    // Three soft pills, one per band, so the legend reads like the chips elsewhere in the app.
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.testTag("chart-legend")) {
         listOf(2, 5, 8).zip(listOf("0–3", "4–6", "7–10")).forEach { (sample, range) ->
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            Row(Modifier.background(Paper, CircleShape).border(1.dp, DoctorHairline, CircleShape).padding(horizontal = 12.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Box(Modifier.size(12.dp).background(ChartBands.color(sample), CircleShape))
-                Text("${ChartBands.word(sample, hindi)} $range", fontSize = 13.sp, color = DoctorCardSub)
+                Text("${ChartBands.word(sample, hindi)} $range", fontSize = 14.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
             }
         }
     }
 }
 
-@Composable internal fun ChartEmpty(hindi: Boolean, tag: String) =
-    Text(careTr(hindi, "No entries yet. Add one from Today.", "अभी कोई नोट नहीं। ‘आज’ पेज से एक जोड़ें।"), color = DoctorCardSub, fontSize = 15.sp, modifier = Modifier.testTag("$tag-empty"))
+/** Empty chart: a soft rounded box with a timeline icon and one line, the same height feel as a chart so the sheet does not jump. */
+@Composable internal fun ChartEmpty(hindi: Boolean, tag: String) {
+    Column(Modifier.fillMaxWidth().background(Paper, RoundedCornerShape(20.dp)).border(1.dp, DoctorHairline, RoundedCornerShape(20.dp)).padding(horizontal = 16.dp, vertical = 24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Icon(Icons.Default.Timeline, null, Modifier.size(32.dp), tint = DoctorCardSub)
+        Text(careTr(hindi, "No entries yet. Add one from Today.", "अभी कोई नोट नहीं। ‘आज’ पेज से एक जोड़ें।"), color = DoctorCardSub, fontSize = 15.sp, textAlign = TextAlign.Center, modifier = Modifier.testTag("$tag-empty"))
+    }
+}
 
 /**
  * One question per chart: "How strong was it each day?". A connected line (highest number each day) on a 0–10 scale with only
@@ -131,7 +141,7 @@ object TrendChartRules {
                 lineColor = DoctorCardSub.copy(alpha = 0.7f), xMin = 0.0, xMax = (window.days.size - 1).coerceAtLeast(1).toDouble(), xLabelLines = 2,
                 bands = listOf(ChartBand(0.0, 3.5, ChartBands.Mild), ChartBand(3.5, 6.5, ChartBands.Moderate), ChartBand(6.5, 10.0, ChartBands.Severe)),
             )
-            Text(t("Each point is the highest number noted that day. 0 = none, 10 = worst.", "हर बिंदु उस दिन का सबसे ऊँचा अंक है। 0 = बिलकुल नहीं, 10 = सबसे ज़्यादा।"), fontSize = 13.sp, color = DoctorCardSub)
+            Text(t("Each point is the highest number noted that day. 0 = none, 10 = worst.", "हर बिंदु उस दिन का सबसे ऊँचा अंक है। 0 = बिलकुल नहीं, 10 = सबसे ज़्यादा।"), fontSize = 14.sp, color = DoctorCardSub)
             TextButton(onClick = { showAll = !showAll }, modifier = Modifier.heightIn(min = 48.dp).testTag("$tag-toggle")) {
                 Text(if (showAll) t("Hide entries", "नोट छिपाएँ") else t("See all ${points.size} entries", "सभी ${points.size} नोट देखें"))
             }
@@ -150,7 +160,7 @@ object TrendChartRules {
     val t = { en: String, hi: String -> careTr(hindi, en, hi) }
     val name = SymptomDiaryRules.symptomLabel(value.symptom, hindi)
     ModalBottomSheet(onDismissRequest = onClose, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
-        Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp).padding(bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
             Heading(name, 27)
             ChartLegend(hindi)
             if (value.symptom == SymptomDiaryRules.MOOD) SymptomDiaryRules.moodShort.forEach { (key, label) ->

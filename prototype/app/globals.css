@@ -6478,7 +6478,7 @@ body {
   letter-spacing: -0.01em !important;
 }
 
-h3 {
+h3:not(.simple-care-app *):not(.care-sign-in *) {
   font-size: 13.5px !important;
   font-weight: 650 !important;
 }
@@ -6698,12 +6698,13 @@ tbody tr:hover {
   background: var(--surface-2) !important;
 }
 
+/* Scoped away from the Sahara workspace and sign-in, which use the sunset tokens in care-colors.css. */
 /* ── Buttons ──────────────────────────────────────────────────────────── */
-.primary-button,
-.secondary-button,
-.text-button,
-.back-button,
-.row-action button {
+.primary-button:not(.simple-care-app *):not(.care-sign-in *),
+.secondary-button:not(.simple-care-app *):not(.care-sign-in *),
+.text-button:not(.simple-care-app *):not(.care-sign-in *),
+.back-button:not(.simple-care-app *):not(.care-sign-in *),
+.row-action button:not(.simple-care-app *):not(.care-sign-in *) {
   font-size: 13px !important;
   font-weight: 620 !important;
   padding: 9px 16px !important;
@@ -6715,31 +6716,31 @@ tbody tr:hover {
   transition: filter .12s, background .12s;
 }
 
-.primary-button {
+.primary-button:not(.simple-care-app *):not(.care-sign-in *) {
   background: var(--accent) !important;
   border-color: var(--accent) !important;
   color: #fff !important;
 }
 
-.primary-button:hover,
-.secondary-button:hover,
-.text-button:hover,
-.back-button:hover,
-.row-action button:hover {
+.primary-button:not(.simple-care-app *):not(.care-sign-in *):hover,
+.secondary-button:not(.simple-care-app *):not(.care-sign-in *):hover,
+.text-button:not(.simple-care-app *):not(.care-sign-in *):hover,
+.back-button:not(.simple-care-app *):not(.care-sign-in *):hover,
+.row-action button:not(.simple-care-app *):not(.care-sign-in *):hover {
   filter: brightness(.97);
 }
 
-.primary-button:disabled,
-.secondary-button:disabled,
-.text-button:disabled,
-.back-button:disabled,
-.row-action button:disabled {
+.primary-button:not(.simple-care-app *):not(.care-sign-in *):disabled,
+.secondary-button:not(.simple-care-app *):not(.care-sign-in *):disabled,
+.text-button:not(.simple-care-app *):not(.care-sign-in *):disabled,
+.back-button:not(.simple-care-app *):not(.care-sign-in *):disabled,
+.row-action button:not(.simple-care-app *):not(.care-sign-in *):disabled {
   opacity: .55 !important;
   cursor: not-allowed;
   filter: none;
 }
 
-.row-action button {
+.row-action button:not(.simple-care-app *):not(.care-sign-in *) {
   font-size: 11px !important;
   font-weight: 600 !important;
   padding: 4px 9px !important;

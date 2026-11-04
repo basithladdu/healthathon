@@ -111,29 +111,33 @@ internal object GoalsScreening {
         Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable(role = Role.Button, onClickLabel = if (open) t("Collapse", "बंद करें") else t("Expand", "खोलें")) { open = !open }, verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
-                    Text(t("Optional · Does this patient need a goals-of-care discussion?", "वैकल्पिक · क्या इस मरीज़ से देखभाल के लक्ष्यों पर बात करनी चाहिए?"), fontSize = 15.sp, lineHeight = 21.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
-                    Text(t(tool.titleEn, tool.titleHi), fontSize = 12.sp, lineHeight = 16.sp, color = DoctorCardSub)
+                    Text(t("Optional · Does this patient need a goals-of-care discussion?", "वैकल्पिक · क्या इस मरीज़ से देखभाल के लक्ष्यों पर बात करनी चाहिए?"), fontSize = 16.sp, lineHeight = 22.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
+                    Text(t(tool.titleEn, tool.titleHi), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
                 }
-                Icon(if (open) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown, null, tint = DoctorCardSub, modifier = Modifier.size(48.dp).padding(12.dp))
+                Icon(if (open) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown, null, tint = RustText, modifier = Modifier.size(48.dp).padding(12.dp))
             }
             if (open) {
                 tool.questions.forEach { q ->
-                    Text(t(q.en, q.hi), fontSize = 14.sp, lineHeight = 20.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
+                    HorizontalDivider(color = DoctorHairline)
+                    Text(t(q.en, q.hi), fontSize = 16.sp, lineHeight = 22.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, modifier = Modifier.padding(top = 4.dp))
                     q.options.forEach { option ->
                         val chosen = answers[q.id] == option.value
                         Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).selectable(chosen, enabled = option.selectable, role = Role.RadioButton) { answers = if (chosen) answers - q.id else answers + (q.id to option.value) }.testTag("goals-screening-${q.id}-${option.value}"), verticalAlignment = Alignment.CenterVertically) {
                             RadioButton(selected = chosen, onClick = null, enabled = option.selectable)
                             Spacer(Modifier.width(8.dp))
-                            Text(t(option.en, option.hi), fontSize = 14.sp, lineHeight = 20.sp, color = if (option.selectable) DoctorCardInk else DoctorCardFaint, modifier = Modifier.weight(1f))
+                            Text(t(option.en, option.hi), fontSize = 15.sp, lineHeight = 21.sp, color = if (option.selectable) DoctorCardInk else DoctorCardFaint, modifier = Modifier.weight(1f))
                         }
                     }
-                    if (q.noteEn.isNotBlank()) Text(t(q.noteEn, q.noteHi), fontSize = 12.sp, lineHeight = 16.sp, color = DoctorCardFaint)
+                    if (q.noteEn.isNotBlank()) Text(t(q.noteEn, q.noteHi), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardFaint)
                 }
-                if (suggestion != null) Surface(shape = RoundedCornerShape(14.dp), color = if (suggestion.consider) DoctorStatusWarnBg else DoctorStatusRestBg, modifier = Modifier.fillMaxWidth().testTag("goals-screening-suggestion")) {
-                    Text(t(suggestion.en, suggestion.hi), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardInk, modifier = Modifier.padding(12.dp))
+                if (suggestion != null) Surface(shape = RoundedCornerShape(14.dp), border = BorderStroke(1.dp, if (suggestion.consider) DoctorStatusWarn.copy(alpha = .35f) else DoctorHairline), color = if (suggestion.consider) DoctorStatusWarnBg else DoctorStatusRestBg, modifier = Modifier.fillMaxWidth().testTag("goals-screening-suggestion")) {
+                    Text(t(suggestion.en, suggestion.hi), fontSize = 15.sp, lineHeight = 22.sp, color = DoctorCardInk, modifier = Modifier.padding(12.dp).announce())
                 }
-                Text(t("A suggestion, not a decision. Your clinical judgement decides. Answers are not saved.", "यह सिर्फ़ सुझाव है, फ़ैसला नहीं। फ़ैसला आपकी डॉक्टरी समझ से होगा। जवाब सहेजे नहीं जाते।"), fontSize = 12.sp, lineHeight = 16.sp, color = DoctorCardSub)
-                tool.sources.forEach { Text(t("Source: ", "स्रोत: ") + it, fontSize = 11.sp, lineHeight = 15.sp, color = DoctorCardFaint) }
+                Text(t("A suggestion, not a decision. Your clinical judgement decides. Answers are not saved.", "यह सिर्फ़ सुझाव है, फ़ैसला नहीं। फ़ैसला आपकी डॉक्टरी समझ से होगा। जवाब सहेजे नहीं जाते।"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
+                InfoDisclosure(t("Sources", "स्रोत")) {
+                    tool.sources.forEach { Text(t("Source: ", "स्रोत: ") + it, fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub) }
+                }
+                Spacer(Modifier.height(4.dp))
             }
         }
     }

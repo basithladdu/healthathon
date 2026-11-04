@@ -2,7 +2,7 @@
 .care-community-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
 .care-community-heading h1 { margin: 0; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(28px, 3vw, 38px); font-weight: 500; letter-spacing: -.025em; line-height: 1.15; }
 .care-community-choices { min-width: 0; border: 0; margin: 0; padding: 0; }
-.care-community-choices legend, .care-community-filter label { padding: 0; margin-bottom: 8px; font-size: 13px; font-weight: 650; }
+.care-community-choices legend, .care-community-filter label { padding: 0; margin-bottom: 8px; font-size: 14px; font-weight: 650; }
 .care-community-choices > div { display: flex; gap: 8px; }
 .care-community-choices label { position: relative; min-width: 0; cursor: pointer; }
 .care-community-choices input { position: absolute; width: 1px; height: 1px; margin: 0; opacity: 0; }
@@ -25,7 +25,7 @@
 .care-community-card-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
 .care-community-icon { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 15px; background: #ffffff91; color: var(--community-ink); flex-shrink: 0; }
 .care-community-icon svg { width: 28px; height: 28px; }
-.care-community-card-top p { display: flex; align-items: center; justify-content: flex-end; gap: 6px; margin: 0; max-width: 170px; font-size: 12px; line-height: 1.5; text-align: right; color: var(--community-ink); }
+.care-community-card-top p { display: flex; align-items: center; justify-content: flex-end; gap: 6px; margin: 0; max-width: 170px; font-size: 14px; line-height: 1.5; text-align: right; color: var(--community-ink); }
 .care-community-card-top p > span { display: flex; flex-shrink: 0; }
 .care-community-card-top p svg { width: 15px; height: 15px; }
 .care-community-card h2 { margin: 0; max-width: 28ch; font: 500 24px/1.25 Georgia, 'Times New Roman', serif; letter-spacing: -.02em; overflow-wrap: anywhere; }

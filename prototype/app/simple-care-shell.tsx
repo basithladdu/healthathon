@@ -9,7 +9,7 @@ import { SaharaLogo } from './sahara-logo';
 import { careDir, careLocale, careText, type CareLang } from './care-i18n';
 import { CareLanguageSelect } from './care-language-select';
 
-type CareNavIconName = 'home' | 'documents' | 'support' | 'space' | 'visit' | 'record' | 'review' | 'history' | 'care';
+type CareNavIconName = 'home' | 'documents' | 'support' | 'space' | 'visit' | 'record' | 'review' | 'history' | 'care' | 'plan';
 
 const CARE_NAV_ICON_PATHS: Record<CareNavIconName, ReactNode> = {
   home: <><path d="M3 10.5 12 3l9 7.5" /><path d="M5.5 9.5V21h13V9.5" /><path d="M9.5 21v-6h5v6" /></>,
@@ -20,6 +20,7 @@ const CARE_NAV_ICON_PATHS: Record<CareNavIconName, ReactNode> = {
   record: <><path d="M6 3h12v18H6z" /><path d="M9 7h6M9 11h6M9 15h4" /></>,
   review: <><circle cx="12" cy="12" r="9" /><path d="m8.5 12 2.25 2.25L15.75 9" /></>,
   history: <><path d="M4 5v5h5" /><path d="M4.7 15.5A8.5 8.5 0 1 0 5 8" /><path d="M12 7.5V12l3 2" /></>,
+  plan: <><path d="M8 4.5H6v16.5h12V4.5h-2" /><path d="M9 3h6v3H9z" /><path d="m9 13 2 2 4-4.5" /></>,
   care: <><path d="M12 21s7-4.35 7-10.1A4.1 4.1 0 0 0 12 8a4.1 4.1 0 0 0-7 2.9C5 16.65 12 21 12 21Z" /><path d="M9 12h6M12 9v6" /></>,
 };
 
@@ -42,7 +43,7 @@ export function SimpleCareShell({ children, view, role, lang, saveStatus, onNavi
     { key: 'doctor-record', label: t('Record', 'बातचीत'), shortLabel: t('Record', 'नोट'), icon: 'record' },
     { key: 'doctor-review', label: t('Review & sign', 'जाँचें और साइन करें'), shortLabel: t('Review', 'जाँच'), icon: 'review' },
     { key: 'doctor-history', label: t('History', 'पुराने नोट'), shortLabel: t('History', 'इतिहास'), icon: 'history' },
-    { key: 'doctor-care-plan', label: t('Care plan', 'देखभाल योजना'), shortLabel: t('Plan', 'योजना'), icon: 'review' },
+    { key: 'doctor-care-plan', label: t('Care plan', 'देखभाल योजना'), shortLabel: t('Plan', 'योजना'), icon: 'plan' },
     { key: 'care-near-me', label: t('Find care', 'देखभाल ढूँढें'), shortLabel: t('Care', 'देखभाल'), icon: 'care' },
   ] as const : [
     { key: 'daily-care', label: t('Home', 'होम'), shortLabel: t('Home', 'होम'), icon: 'home' },

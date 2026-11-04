@@ -1,9 +1,13 @@
 package `in`.wedevit.care
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
@@ -16,8 +20,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -154,26 +161,30 @@ fun EmbeddedPatientCare(
     }
     Column(Modifier.fillMaxSize().testTag("embedded-patient-care")) {
         if (!ready || person == null) {
-            Column(Modifier.fillMaxWidth().padding(22.dp).testTag(if (person == null && !refreshing) "embedded-care-unavailable" else "embedded-care-loading"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text(if (person == null && !refreshing) t("This care profile is unavailable", "यह देखभाल प्रोफ़ाइल उपलब्ध नहीं है") else t("Opening this person's care…", "इस व्यक्ति की देखभाल खुल रही है…"), style = MaterialTheme.typography.titleLarge)
-                OutlinedButton(onClick = onExit) { Text(t("Back to patients", "मरीज़ों पर वापस")) }
-                refreshError?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce()); TextButton(onClick = vm::refresh) { Text(t("Retry", "फिर कोशिश करें")) } }
+            val unavailable = person == null && !refreshing
+            // Loading shows a spinner; unavailable shows an icon, one line and the way back.
+            Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 32.dp).testTag(if (unavailable) "embedded-care-unavailable" else "embedded-care-loading"), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                if (unavailable) Icon(Icons.Default.PersonOff, null, Modifier.size(40.dp), tint = DoctorCardSub)
+                else CircularProgressIndicator(Modifier.size(32.dp), color = Rust)
+                Text(if (unavailable) t("This care profile is unavailable", "यह देखभाल प्रोफ़ाइल उपलब्ध नहीं है") else t("Opening this person's care…", "इस व्यक्ति की देखभाल खुल रही है…"), fontFamily = SaharaTitleFont, fontSize = 20.sp, color = DoctorCardInk, textAlign = TextAlign.Center)
+                OutlinedButton(onClick = onExit, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp)) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Back to patients", "मरीज़ों पर वापस")) }
+                refreshError?.let { Text(it, color = MaterialTheme.colorScheme.error, textAlign = TextAlign.Center, modifier = Modifier.announce()); TextButton(onClick = vm::refresh, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Retry", "फिर कोशिश करें"), color = RustText) } }
             }
         } else {
             // Only what changes what the doctor can do stays on screen; the demo label sits behind the info icon.
             val demoLabel = vm.demoMode && !DoctorTestProfiles.contains(personId)
             if ((section != "Conversations" || tool.isNotEmpty() || !conversationCapture) && (demoLabel || !canEdit)) Surface(color = if (vm.cloud == null) Peach.copy(alpha = .5f) else Paper) {
-                Row(Modifier.fillMaxWidth().padding(horizontal = 20.dp), verticalAlignment = Alignment.CenterVertically) {
-                    if (!canEdit) Text(t("Read-only access · changes need the patient's permission", "सिर्फ़ पढ़ने की पहुँच · बदलाव के लिए मरीज़ की अनुमति चाहिए"), style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f).testTag("embedded-read-only"))
+                Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
+                    if (!canEdit) { Icon(Icons.Default.Lock, null, Modifier.size(16.dp), tint = DoctorCardSub); Spacer(Modifier.width(8.dp)); Text(t("Read-only access · changes need the patient's permission", "सिर्फ़ पढ़ने की पहुँच · बदलाव के लिए मरीज़ की अनुमति चाहिए"), fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.weight(1f).padding(vertical = 8.dp).testTag("embedded-read-only")) }
                     else Spacer(Modifier.weight(1f))
                     if (demoLabel) DoctorInfoIcon(t("Demo care record · not saved to an account", "डेमो देखभाल रिकॉर्ड · किसी खाते में सेव नहीं"), t("No prescription is issued and no appointment is booked.", "न कोई पर्चा जारी होता है, न कोई अपॉइंटमेंट बुक होती है।"), "embedded-care-source")
                 }
             }
             if (tool.isNotEmpty() && tool !in listOf("scanner", "feedback", "reminders", "symptoms")) Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-                TextButton(onClick = ::leaveTool, enabled = !navigating, modifier = Modifier.heightIn(min = 48.dp).testTag("embedded-care-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null); Spacer(Modifier.width(6.dp)); Text(if (section == "Tools") t("Back to tools", "टूल पर वापस") else t("Back to patient care", "मरीज़ की देखभाल पर वापस")) }
+                TextButton(onClick = ::leaveTool, enabled = !navigating, modifier = Modifier.heightIn(min = 48.dp).testTag("embedded-care-back")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = RustText); Spacer(Modifier.width(8.dp)); Text(color = RustText, fontWeight = FontWeight.SemiBold, text = if (section == "Tools") t("Back to tools", "टूल पर वापस") else t("Back to patient care", "मरीज़ की देखभाल पर वापस")) }
             }
             Box(Modifier.weight(1f).fillMaxWidth()) {
-                if (refreshing) Column(Modifier.fillMaxWidth().padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) { LinearProgressIndicator(Modifier.fillMaxWidth()); Text(t("Refreshing this person's access and records…", "इस व्यक्ति की पहुँच और रिकॉर्ड ताज़ा हो रहे हैं…")) }
+                if (refreshing) Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) { LinearProgressIndicator(Modifier.fillMaxWidth(), color = Rust); Text(t("Refreshing this person's access and records…", "इस व्यक्ति की पहुँच और रिकॉर्ड ताज़ा हो रहे हैं…"), color = DoctorCardSub) }
                 else key(account, personId, section, tool) { screens.SaveableStateProvider("$account:$personId:$section:$tool") {
                     when (tool) {
                         "scanner" -> if (canEdit) MedicineScanner(vm, onClose = { tool = "" }, onAccount = onAccount) else Text(t("Editing access is no longer available.", "बदलाव की पहुँच अब नहीं है।"), Modifier.padding(20.dp))
@@ -206,7 +217,7 @@ fun EmbeddedPatientCare(
                     }
                 } }
             }
-            refreshError?.let { Surface(color = Peach) { Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) { Text(it, Modifier.weight(1f), style = MaterialTheme.typography.bodySmall); TextButton(onClick = vm::refresh, enabled = !busy) { Text(t("Retry", "फिर कोशिश करें"), color = RustText) } } } }
+            refreshError?.let { Surface(color = Peach) { Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.ErrorOutline, null, Modifier.size(18.dp), tint = RustText); Spacer(Modifier.width(8.dp)); Text(it, Modifier.weight(1f), fontSize = 14.sp, color = DoctorCardInk); TextButton(modifier = Modifier.heightIn(min = 48.dp), onClick = vm::refresh, enabled = !busy) { Text(t("Retry", "फिर कोशिश करें"), color = RustText) } } } }
         }
         SnackbarHost(snackbar)
     }
@@ -237,15 +248,36 @@ internal fun EmbeddedCareTools(onOpen: (String) -> Unit) { val t = careText();
         "resources" to t("Privacy, exports & more", "निजता, एक्सपोर्ट और बाक़ी"),
         "feedback" to t("App feedback", "ऐप पर राय"),
     )
-    LazyColumn(Modifier.fillMaxSize().testTag("embedded-care-tools"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { Heading(t("Daily care & tools", "रोज़ की देखभाल और टूल"), 28) }
-        items(tools, key = { it.first }) { (key, title) ->
-            OutlinedCard(onClick = { onOpen(key) }, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("embedded-tool-$key")) {
-                Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Text(title, Modifier.weight(1f), fontWeight = FontWeight.SemiBold)
-                    Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = Rust)
+    // One grouped surface: each tool is its own lazy row (so tests and TalkBack can scroll to it), drawn as one card with dividers.
+    LazyColumn(Modifier.fillMaxSize().testTag("embedded-care-tools"), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 24.dp)) {
+        item { Box(Modifier.padding(bottom = 12.dp)) { Heading(t("Daily care & tools", "रोज़ की देखभाल और टूल"), 26) } }
+        itemsIndexed(tools, key = { _, tool -> tool.first }) { index, (key, title) ->
+            val top = if (index == 0) 20.dp else 0.dp; val bottom = if (index == tools.lastIndex) 20.dp else 0.dp
+            Surface(shape = RoundedCornerShape(topStart = top, topEnd = top, bottomStart = bottom, bottomEnd = bottom), color = Paper, modifier = Modifier.fillMaxWidth()) { Column {
+                if (index > 0) HorizontalDivider(Modifier.padding(start = 68.dp), color = DoctorHairline)
+                val (icon, tint) = embeddedToolIcon(key)
+                Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).clickable(role = Role.Button) { onOpen(key) }.padding(horizontal = 16.dp, vertical = 12.dp).testTag("embedded-tool-$key"), verticalAlignment = Alignment.CenterVertically) {
+                    Surface(shape = CircleShape, color = tint, contentColor = RustText, modifier = Modifier.size(36.dp)) { Box(contentAlignment = Alignment.Center) { Icon(icon, null, Modifier.size(20.dp)) } }
+                    Spacer(Modifier.width(16.dp))
+                    Text(title, Modifier.weight(1f), fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
+                    Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = DoctorAccent, modifier = Modifier.size(20.dp))
                 }
-            }
+            } }
         }
     }
+}
+
+private fun embeddedToolIcon(key: String): Pair<androidx.compose.ui.graphics.vector.ImageVector, androidx.compose.ui.graphics.Color> = when (key) {
+    "daily" -> Icons.Default.Checklist to Mint
+    "care-plan" -> Icons.Default.Description to SaharaApricot
+    "calendar" -> Icons.Default.CalendarMonth to SaharaSoftBlue
+    "workflows" -> Icons.Default.Groups to SaharaLavender
+    "labs" -> Icons.Default.Science to SaharaSoftBlue
+    "nearby" -> Icons.Default.LocalHospital to Mint
+    "documents" -> Icons.Default.Folder to SaharaSoftGold
+    "reminders" -> Icons.Default.Notifications to SaharaApricot
+    "shared" -> Icons.Default.VerifiedUser to SaharaLavender
+    "resources" -> Icons.Default.Lock to Mint
+    "feedback" -> Icons.Default.Feedback to SaharaSoftGold
+    else -> Icons.Default.ChevronRight to Mint
 }

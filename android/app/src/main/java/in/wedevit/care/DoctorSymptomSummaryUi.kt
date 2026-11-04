@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessibilityNew
+import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Healing
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -64,23 +66,23 @@ object DoctorSymptomSummaryRules {
     val hasPainBody = remember(entries, personId) { PainHistoryRules.entries(entries, personId).isNotEmpty() }
     var open by rememberSaveable(personId) { mutableStateOf("") }
     var showingBody by rememberSaveable(personId) { mutableStateOf(false) }
-    val numberCol = 52.dp
-    val changeCol = 64.dp
+    val numberCol = 56.dp
+    val changeCol = 72.dp
     val about = t("From the patient's and family's own notes. 0 = none, 10 = worst.", "मरीज़ और परिवार के अपने नोट से। 0 = बिलकुल नहीं, 10 = सबसे ज़्यादा।") +
         (if (all.any { it.painBands }) "\n\n" + t(PainBands.SOURCE_EN, PainBands.SOURCE_HI) else "")
-    Surface(shape = RoundedCornerShape(22.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("doctor-symptom-summary")) {
-        Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("doctor-symptom-summary")) {
+        Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(t("Symptoms and pain", "लक्षण और दर्द"), fontFamily = SaharaTitleFont, fontSize = 20.sp, color = DoctorCardInk, modifier = Modifier.weight(1f))
+                Text(t("Symptoms and pain", "लक्षण और दर्द"), fontFamily = SaharaTitleFont, fontSize = 20.sp, color = DoctorCardInk, modifier = Modifier.weight(1f).a11yHeading())
                 DoctorInfoIcon(t("Symptoms and pain", "लक्षण और दर्द"), about, "doctor-symptom-summary-info")
             }
-            if (rows.isEmpty()) Text(t("No symptom notes yet.", "अभी लक्षण का कोई नोट नहीं।"), color = DoctorCardInk, modifier = Modifier.testTag("doctor-symptom-summary-empty"))
+            if (rows.isEmpty()) Row(Modifier.fillMaxWidth().padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) { Icon(Icons.Default.Healing, null, tint = DoctorAccent, modifier = Modifier.size(24.dp)); Text(t("No symptom notes yet.", "अभी लक्षण का कोई नोट नहीं।"), fontSize = 16.sp, color = DoctorCardInk, modifier = Modifier.testTag("doctor-symptom-summary-empty")) }
             else {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Bottom) {
-                    Text(t("Symptom", "लक्षण"), fontSize = 12.sp, color = DoctorCardSub, modifier = Modifier.weight(1f))
-                    Text(t("Latest", "अभी"), fontSize = 12.sp, color = DoctorCardSub, textAlign = TextAlign.Center, modifier = Modifier.width(numberCol))
-                    Text(t("Highest", "सबसे ज़्यादा"), fontSize = 12.sp, lineHeight = 14.sp, color = DoctorCardSub, textAlign = TextAlign.Center, modifier = Modifier.width(numberCol))
-                    Text(t("Change", "बदलाव"), fontSize = 12.sp, color = DoctorCardSub, textAlign = TextAlign.Center, modifier = Modifier.width(changeCol))
+                    Text(t("Symptom", "लक्षण"), fontSize = 14.sp, fontWeight = FontWeight.Medium, color = DoctorCardSub, modifier = Modifier.weight(1f))
+                    Text(t("Latest", "अभी"), fontSize = 14.sp, lineHeight = 16.sp, fontWeight = FontWeight.Medium, color = DoctorCardSub, textAlign = TextAlign.Center, modifier = Modifier.width(numberCol))
+                    Text(t("Highest", "सबसे ज़्यादा"), fontSize = 14.sp, lineHeight = 16.sp, fontWeight = FontWeight.Medium, color = DoctorCardSub, textAlign = TextAlign.Center, modifier = Modifier.width(numberCol))
+                    Text(t("Change", "बदलाव"), fontSize = 14.sp, lineHeight = 16.sp, fontWeight = FontWeight.Medium, color = DoctorCardSub, textAlign = TextAlign.Center, modifier = Modifier.width(changeCol))
                 }
                 HorizontalDivider(color = DoctorHairline)
             }
@@ -103,16 +105,16 @@ object DoctorSymptomSummaryRules {
                 Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable(role = Role.Button) { open = if (open == id) "" else id }
                     .semantics { contentDescription = spoken }.testTag("doctor-symptom-row-$id"), verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f).padding(vertical = 4.dp)) {
-                        Text(name, color = DoctorCardInk, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
-                        Text(friendlyWhen(latest.date, latest.time, hindi), fontSize = 12.sp, color = DoctorCardSub)
+                        Text(name, color = DoctorCardInk, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+                        Text(friendlyWhen(latest.date, latest.time, hindi), fontSize = 14.sp, color = DoctorCardSub)
                         if (latest.respondent == "caregiver") SymptomLoggedByFamilyChip(hindi, "doctor-symptom-family-$id")
                     }
                     Box(Modifier.width(numberCol), contentAlignment = Alignment.Center) {
                         val fill = ChartBands.color(latest.value)
-                        Text("${latest.value}", color = readableOn(fill), fontWeight = FontWeight.Bold, fontSize = 15.sp, textAlign = TextAlign.Center,
-                            modifier = Modifier.background(fill, RoundedCornerShape(50)).padding(horizontal = 10.dp, vertical = 2.dp))
+                        Text("${latest.value}", color = readableOn(fill), fontWeight = FontWeight.Bold, fontSize = 16.sp, textAlign = TextAlign.Center,
+                            modifier = Modifier.background(fill, RoundedCornerShape(50)).padding(horizontal = 12.dp, vertical = 4.dp))
                     }
-                    Text(highest?.toString() ?: "–", color = DoctorCardInk, fontSize = 15.sp, textAlign = TextAlign.Center, modifier = Modifier.width(numberCol))
+                    Text(highest?.toString() ?: "–", color = DoctorCardInk, fontSize = 16.sp, fontWeight = FontWeight.Medium, textAlign = TextAlign.Center, modifier = Modifier.width(numberCol))
                     val changeShort = when {
                         before == null -> "–"
                         arrow == "→" -> t("→ same", "→ वही")
@@ -126,9 +128,9 @@ object DoctorSymptomSummaryRules {
             }
             if (rows.isNotEmpty()) ChartLegend(hindi)
             if (onSeeAll != null && all.size > rows.size) TextButton(onClick = onSeeAll, modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-symptom-see-all")) {
-                Text(t("All symptoms (${all.size})", "सभी लक्षण (${all.size})"), color = DoctorAccent)
+                Text(t("All symptoms (${all.size})", "सभी लक्षण (${all.size})"), color = DoctorAccent, fontWeight = FontWeight.Medium); Spacer(Modifier.width(4.dp)); Icon(Icons.Default.ChevronRight, null, Modifier.size(18.dp), tint = DoctorAccent)
             }
-            if (hasPainBody) OutlinedButton(onClick = { showingBody = true }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-symptom-pain-body")) {
+            if (hasPainBody) OutlinedButton(onClick = { showingBody = true }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("doctor-symptom-pain-body")) {
                 Icon(Icons.Default.AccessibilityNew, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("View pain on body", "शरीर पर दर्द देखें"))
             }
         }

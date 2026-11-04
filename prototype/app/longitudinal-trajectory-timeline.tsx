@@ -232,7 +232,7 @@ Attestation: Dr Sujay · Oncology Palliative Lead | Date: ${new Date().toLocaleD
         <div className="tep-header">
           <div className="tep-header-title">
             <div className="flex items-center gap-2">
-              <span className="p-1 rounded-md bg-indigo-600 text-white font-black text-xs">
+              <span className="p-1 rounded-md bg-[#b9472c] text-white font-black text-sm">
                 LONGITUDINAL TRAJECTORY
               </span>
               <h2 className="text-xl font-bold text-slate-800">
@@ -253,15 +253,15 @@ Attestation: Dr Sujay · Oncology Palliative Lead | Date: ${new Date().toLocaleD
         </div>
 
         {/* Patient Banner */}
-        <div className="px-6 py-3 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div className="px-6 py-3 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3 text-sm">
           <div className="flex items-center gap-4">
             <div>
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Patient</span>
+              <span className="text-[13px] font-bold text-slate-600 uppercase tracking-wider block">Patient</span>
               <span className="font-bold text-slate-900 text-sm">{patientName} ({patientId})</span>
             </div>
             <div className="h-6 w-px bg-slate-200" />
             <div>
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Diagnosis</span>
+              <span className="text-[13px] font-bold text-slate-600 uppercase tracking-wider block">Diagnosis</span>
               <span className="font-semibold text-slate-800">{diagnosis}</span>
             </div>
           </div>
@@ -279,17 +279,17 @@ Attestation: Dr Sujay · Oncology Palliative Lead | Date: ${new Date().toLocaleD
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <h3 className="text-sm font-bold text-slate-800">{metricMeta.title}</h3>
-              <p className="text-xs text-slate-500">{metricMeta.description} · <span className="font-medium text-slate-700">{metricMeta.trend}</span></p>
+              <p className="text-sm text-slate-500">{metricMeta.description} · <span className="font-medium text-slate-700">{metricMeta.trend}</span></p>
             </div>
 
             {/* Metric Switcher */}
-            <div className="flex bg-slate-100 p-1 rounded-lg text-xs gap-1 border border-slate-200">
+            <div className="flex bg-slate-100 p-1 rounded-lg text-sm gap-1 border border-slate-200">
               <button
                 type="button"
                 onClick={() => setSelectedMetric('pps')}
                 className={`px-3 py-1 rounded font-bold transition ${
                   selectedMetric === 'pps'
-                    ? 'bg-indigo-600 text-white shadow-xs'
+                    ? 'bg-[#b9472c] text-white shadow-xs'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -351,7 +351,7 @@ Attestation: Dr Sujay · Oncology Palliative Lead | Date: ${new Date().toLocaleD
         </div>
 
         {/* Facility Filter Pills */}
-        <div className="px-6 py-2 bg-slate-100 border-b border-slate-200 flex items-center justify-between text-xs">
+        <div className="px-6 py-2 bg-slate-100 border-b border-slate-200 flex items-center justify-between text-sm">
           <div className="flex items-center gap-2">
             <span className="text-slate-500 font-semibold">Filter Encounter Setting:</span>
             <div className="flex gap-1">
@@ -365,7 +365,7 @@ Attestation: Dr Sujay · Oncology Palliative Lead | Date: ${new Date().toLocaleD
                 <button
                   key={f.id}
                   onClick={() => setFilterFacility(f.id)}
-                  className={`px-2.5 py-1 rounded text-xs font-semibold transition ${
+                  className={`px-2.5 py-1 rounded text-sm font-semibold transition ${
                     filterFacility === f.id
                       ? 'bg-slate-800 text-white'
                       : 'bg-white text-slate-600 hover:bg-slate-200 border border-slate-300'
@@ -380,13 +380,13 @@ Attestation: Dr Sujay · Oncology Palliative Lead | Date: ${new Date().toLocaleD
 
         {/* Chronological Encounter Journey Feed */}
         <div className="p-6 overflow-y-auto max-h-[60vh] space-y-4">
-          <div className="relative pl-6 border-l-2 border-indigo-200 space-y-6">
+          <div className="relative pl-6 border-l-2 border-[#ffd1b3] space-y-6">
             {displayedPoints.map((point, idx) => (
               <div key={idx} className="relative group">
                 {/* Node Dot */}
                 <div
                   className={`absolute -left-[31px] top-1.5 w-4 h-4 rounded-full border-2 border-white shadow-sm ${
-                    point.isKeyMilestone ? 'bg-rose-500 ring-4 ring-rose-100' : 'bg-indigo-500'
+                    point.isKeyMilestone ? 'bg-rose-500 ring-4 ring-rose-100' : 'bg-[#b9472c]'
                   }`}
                 />
 
@@ -394,8 +394,8 @@ Attestation: Dr Sujay · Oncology Palliative Lead | Date: ${new Date().toLocaleD
                 <div className="p-4 bg-white rounded-xl border border-slate-200 shadow-xs hover:shadow-sm transition space-y-2.5">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-black text-slate-800">{point.date}</span>
-                      <span className={`px-2 py-0.5 rounded text-[11px] font-bold ${
+                      <span className="text-sm font-black text-slate-800">{point.date}</span>
+                      <span className={`px-2 py-0.5 rounded text-[13px] font-bold ${
                         point.facilityType === 'tertiary' ? 'bg-blue-100 text-blue-800' :
                         point.facilityType === 'district' ? 'bg-amber-100 text-amber-800' :
                         point.facilityType === 'hospice' ? 'bg-purple-100 text-purple-800' : 'bg-emerald-100 text-emerald-800'
@@ -403,13 +403,13 @@ Attestation: Dr Sujay · Oncology Palliative Lead | Date: ${new Date().toLocaleD
                         {point.facility}
                       </span>
                       {point.isKeyMilestone && (
-                        <span className="px-2 py-0.5 rounded bg-rose-100 text-rose-800 text-[10px] font-extrabold uppercase">
+                        <span className="px-2 py-0.5 rounded bg-rose-100 text-rose-800 text-[13px] font-extrabold uppercase">
                           Key Decision Milestone
                         </span>
                       )}
                     </div>
 
-                    <div className="flex items-center gap-2 text-xs">
+                    <div className="flex items-center gap-2 text-sm">
                       <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-bold">
                         PPS {point.pps}%
                       </span>
@@ -419,7 +419,7 @@ Attestation: Dr Sujay · Oncology Palliative Lead | Date: ${new Date().toLocaleD
                       <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-bold">
                         OMEDD {point.omedd}mg
                       </span>
-                      <span className={`px-2 py-0.5 rounded text-xs font-bold ${
+                      <span className={`px-2 py-0.5 rounded text-sm font-bold ${
                         point.ceilingTier === 1 ? 'bg-amber-100 text-amber-900' : 'bg-blue-100 text-blue-900'
                       }`}>
                         Tier {point.ceilingTier}
@@ -429,14 +429,14 @@ Attestation: Dr Sujay · Oncology Palliative Lead | Date: ${new Date().toLocaleD
 
                   <h4 className="font-bold text-slate-900 text-sm">{point.milestoneTitle}</h4>
 
-                  <p className="text-xs text-slate-600 leading-relaxed">
+                  <p className="text-sm text-slate-600 leading-relaxed">
                     {point.clinicalSummary}
                   </p>
 
                   {/* Interventions */}
                   <div className="pt-2 border-t border-slate-100 space-y-1">
-                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Key Clinical Actions & Decisions:</span>
-                    <ul className="grid grid-cols-1 md:grid-cols-2 gap-1 text-xs text-slate-700">
+                    <span className="text-[13px] font-bold text-slate-600 uppercase tracking-wider block">Key Clinical Actions & Decisions:</span>
+                    <ul className="grid grid-cols-1 md:grid-cols-2 gap-1 text-sm text-slate-700">
                       {point.keyInterventions.map((action, aIdx) => (
                         <li key={aIdx} className="flex items-start gap-1.5">
                           <span className="text-emerald-600 font-bold">✓</span>
@@ -446,7 +446,7 @@ Attestation: Dr Sujay · Oncology Palliative Lead | Date: ${new Date().toLocaleD
                     </ul>
                   </div>
 
-                  <div className="pt-2 flex items-center justify-between text-[11px] text-slate-400 border-t border-slate-50">
+                  <div className="pt-2 flex items-center justify-between text-[13px] text-slate-600 border-t border-slate-50">
                     <span>Treating Clinician: <strong className="text-slate-600">{point.clinician}</strong> ({point.role})</span>
                     <span>✓ Authenticated Electronic Record</span>
                   </div>
@@ -461,7 +461,7 @@ Attestation: Dr Sujay · Oncology Palliative Lead | Date: ${new Date().toLocaleD
           <div className="flex items-center gap-2">
             <button
               onClick={handleCopyHandoff}
-              className="px-4 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-100 transition shadow-sm"
+              className="px-4 py-2 bg-white border border-slate-300 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-100 transition shadow-sm"
             >
               {copiedToast ? '✓ Copied Handoff Packet!' : '📋 Copy Inter-Facility Handoff Summary'}
             </button>
@@ -470,7 +470,7 @@ Attestation: Dr Sujay · Oncology Palliative Lead | Date: ${new Date().toLocaleD
           <div className="flex items-center gap-3">
             <button
               onClick={onClose}
-              className="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900 transition"
+              className="px-4 py-2 text-sm font-semibold text-slate-600 hover:text-slate-900 transition"
             >
               Close
             </button>
@@ -479,7 +479,7 @@ Attestation: Dr Sujay · Oncology Palliative Lead | Date: ${new Date().toLocaleD
                 if (onExportHandoffPacket) onExportHandoffPacket();
                 if (onClose) onClose();
               }}
-              className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold transition shadow-sm flex items-center gap-1.5"
+              className="min-h-11 px-5 py-2 bg-[#b9472c] hover:bg-[#923522] text-white rounded-[14px] text-sm font-bold transition shadow-sm flex items-center gap-1.5"
             >
               <IconCheckCircle className="w-4 h-4" />
               <span>Export Continuity Packet</span>

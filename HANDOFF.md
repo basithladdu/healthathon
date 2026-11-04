@@ -12,6 +12,8 @@ Sources: `source-materials/meetings/2026-11-03-team-meeting-transcript.txt` (the
 - Phone APK (arm64 only, 107 MB) built on Basith's C: drive: `Desktop/Sahara-dev-2026-11-04b-phone.apk`. Too big for GitHub; shared by hand.
 - Goals of care: 8 taps from start to a locked note; the note is Rituparna's legal form word for word. Doctor side: helper text removed; goals of care shown in the legal form layout.
 
+**5 Nov UI polish (every screen, Android and web):** one design system across both apps: sunset palette tokens, 16 side padding, cards radius 20, controls 14, pill chips, text at least 14sp/px, one Rust primary button per screen, icon empty states, helper text behind "?" icons. Android theme now maps Material container colours to cream/paper and raises bodySmall to 14sp. Web: the old global `!important` button rules in `globals.css` are scoped to the clinician shell so page styles show. Goals-of-care screens (both apps) and the doctor's legal-form view are drawn as an official ruled sheet; legal wording unchanged. Android compiles, 877 unit tests pass, androidTest compiles (not run). Web 594/594. APK: `Desktop/Sahara-dev-2026-11-05-phone.apk` (107 MB, arm64). Not run on a phone; phone tests to check first: `CarePainHistoryUiTest`, `DoctorMedicineTabsTest`, `DoctorMedicineReportUiTest` (already out of date before this pass), `DailyCareFlowsTest`, and anything that finds "Refresh records" by text (now an icon button).
+
 **Awaiz: tasks, in order**
 1. Deploy the goals-of-care Gemini actions (Basith's machine cannot resolve supabase.co):
    ```bash

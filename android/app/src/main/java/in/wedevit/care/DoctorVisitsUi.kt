@@ -7,7 +7,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Event
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
@@ -87,10 +92,10 @@ internal fun doctorVisitSources(item: CareItem, entries: List<CareItem>, notes: 
 }
 
 @Composable internal fun DoctorVisitsContent(visits: List<CareItem>, canEdit: Boolean, now: Long, onOpen: (CareItem) -> Unit, onCalendar: () -> Unit, onAdd: () -> Unit, conditionSources: List<CareItem> = emptyList(), discussionSources: List<CareVersion> = emptyList()) { val t = careText();
-    LazyColumn(Modifier.fillMaxSize().testTag("doctor-visits"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-        item { FlowRow(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween,verticalArrangement=Arrangement.spacedBy(8.dp)) { Heading(t("Visits", "विज़िट"),29);Button(onClick=onAdd,enabled=canEdit,modifier=Modifier.heightIn(min=48.dp)){Text(t("Plan visit", "विज़िट तय करें"))} } }
-        item { Text(t("All appointments", "सभी अपॉइंटमेंट"), fontSize = 21.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont) }
-        if (visits.isEmpty()) item { SurfaceCard { Text(t("No visits recorded yet", "अभी कोई विज़िट दर्ज नहीं")) } }
+    LazyColumn(Modifier.fillMaxSize().testTag("doctor-visits"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        item { FlowRow(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween,verticalArrangement=Arrangement.spacedBy(8.dp)) { Heading(t("Visits", "विज़िट"),28);Button(onClick=onAdd,enabled=canEdit,shape=RoundedCornerShape(14.dp),modifier=Modifier.heightIn(min=48.dp)){Icon(Icons.Default.Add,null,Modifier.size(18.dp));Spacer(Modifier.width(8.dp));Text(t("Plan visit", "विज़िट तय करें"))} } }
+        if (visits.isNotEmpty()) item { Surface(color = SaharaSoftGold, shape = RoundedCornerShape(50)) { Text(t("All appointments", "सभी अपॉइंटमेंट") + " · ${visits.size}", Modifier.padding(horizontal = 12.dp, vertical = 6.dp), fontSize = 14.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk) } }
+        if (visits.isEmpty()) item { SurfaceCard { Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) { Icon(Icons.Default.Event, null, tint = DoctorAccent, modifier = Modifier.size(24.dp)); Text(t("No visits recorded yet", "अभी कोई विज़िट दर्ज नहीं"), fontSize = 16.sp, color = DoctorCardInk) } } }
         items(visits, key = { "all:${it.id}" }) { VisitListCard(it, now, onOpen, conditionSources, discussionSources, highlighted = it.id == visits.firstOrNull()?.id) }
     }
 }
@@ -100,27 +105,27 @@ internal val DoctorVisitHighlightInk = Color(0xFF201711)
     val links = DoctorVisitDetails.decode(CareEntryCodec.decode(item.detail)?.detail ?: item.detail)
     val sources = doctorVisitSources(item, conditionSources, discussionSources)
     val largeText = LocalDensity.current.fontScale > 1.2f
-    val background = if (highlighted) DoctorVisitHighlight else Color.White
+    val background = if (highlighted) DoctorVisitHighlight else Paper
     val ink = if (highlighted) DoctorVisitHighlightInk else MaterialTheme.colorScheme.onSurface
     Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min).drawBehind {
         val x = 8.dp.toPx()
         // Extend into the lazy-list spacing so successive appointments share one rail.
-        drawLine(Color(0xFFD4C2B2), Offset(x, -7.dp.toPx()), Offset(x, size.height + 7.dp.toPx()), 1.5.dp.toPx())
+        drawLine(Ink.copy(alpha = .22f), Offset(x, -7.dp.toPx()), Offset(x, size.height + 7.dp.toPx()), 1.5.dp.toPx())
         drawCircle(DoctorVisitHighlight, 4.dp.toPx(), Offset(x, 29.dp.toPx()))
     }, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         Spacer(Modifier.width(16.dp))
-        Card(onClick = { onOpen(item) }, shape = RoundedCornerShape(if(highlighted) 22.dp else 16.dp), colors = CardDefaults.cardColors(containerColor = background), modifier = Modifier.weight(1f).heightIn(min = 104.dp).testTag("doctor-visit-card-${item.id}")) {
-            Column(Modifier.padding(if(largeText) 14.dp else 18.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Card(onClick = { onOpen(item) }, shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = background), border = if (highlighted) null else androidx.compose.foundation.BorderStroke(1.dp, DoctorHairline), modifier = Modifier.weight(1f).heightIn(min = 104.dp).testTag("doctor-visit-card-${item.id}")) {
+            Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (largeText) {
                     Text(doctorVisitDoctor(item).ifBlank { t("Doctor not recorded", "डॉक्टर दर्ज नहीं") }, color=ink, fontSize=18.sp, fontFamily=SaharaTitleFont, fontWeight=FontWeight.Medium)
-                    Text(t("Planned: ${visitDate(item)}", "तय: ${visitDate(item)}"), color=ink.copy(alpha=.85f), fontSize=13.sp, lineHeight=19.sp)
+                    Text(t("Planned: ${visitDate(item)}", "तय: ${visitDate(item)}"), color=ink.copy(alpha=.85f), fontSize=14.sp, lineHeight=20.sp)
                 } else Row(Modifier.fillMaxWidth(), horizontalArrangement=Arrangement.spacedBy(12.dp), verticalAlignment=Alignment.Top) {
                     Text(doctorVisitDoctor(item).ifBlank { t("Doctor not recorded", "डॉक्टर दर्ज नहीं") }, color=ink, fontSize=18.sp, lineHeight=24.sp, fontFamily=SaharaTitleFont, fontWeight=FontWeight.Medium, modifier=Modifier.weight(1f))
-                    Text(t("Planned\n${visitDate(item)}", "तय\n${visitDate(item)}"), color=ink.copy(alpha=.85f), fontSize=12.sp, lineHeight=17.sp, modifier=Modifier.widthIn(max=128.dp))
+                    Text(visitDate(item), color=ink.copy(alpha=.85f), fontSize=14.sp, lineHeight=19.sp, textAlign=androidx.compose.ui.text.style.TextAlign.End, modifier=Modifier.widthIn(max=136.dp))
                 }
                 Row(Modifier.fillMaxWidth(), verticalAlignment=Alignment.CenterVertically, horizontalArrangement=Arrangement.spacedBy(10.dp)) {
                     Text(links.note.ifBlank {sources.discussion?.topics.orEmpty().ifBlank {t("Care review visit", "देखभाल समीक्षा विज़िट")}}, color=ink, fontSize=16.sp, lineHeight=23.sp, maxLines=2, overflow=TextOverflow.Ellipsis, modifier=Modifier.weight(1f))
-                    Icon(Icons.AutoMirrored.Filled.ArrowForward,contentDescription=t("Open visit details", "विज़िट की जानकारी खोलें"),modifier=Modifier.size(18.dp),tint=ink)
+                    Icon(Icons.AutoMirrored.Filled.ArrowForward,contentDescription=t("Open visit details", "विज़िट की जानकारी खोलें"),modifier=Modifier.size(20.dp),tint=ink)
                 }
             }
         }
@@ -128,18 +133,45 @@ internal val DoctorVisitHighlightInk = Color(0xFF201711)
 }
 @Composable internal fun DoctorVisitDetailsContent(item: CareItem, canEdit: Boolean, busy: Boolean, onBack: () -> Unit, onEdit: () -> Unit, onStatus: (String) -> Unit, conditionSources: List<CareItem> = emptyList(), discussionSources: List<CareVersion> = emptyList(), onPlanAnother: () -> Unit = {}) { val t = careText();
     val entry = CareEntryCodec.decode(item.detail); val summary = DoctorVisitDetails.decode(entry?.detail ?: item.detail)
-    LazyColumn(Modifier.fillMaxSize().testTag("doctor-visit-details"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-        item { TextButton(onClick = onBack, enabled = !busy) { Text(t("Back to visits", "विज़िट पर वापस")) }; Heading(t("Visit details", "विज़िट की जानकारी"), 28); Text(doctorVisitDoctor(item).ifBlank { t("Doctor not recorded", "डॉक्टर दर्ज नहीं") }, fontSize = 21.sp); Text(t("Planned: ${visitDate(item)}", "तय: ${visitDate(item)}")); Text(doctorVisitState(item, System.currentTimeMillis()), color = Rust);if(doctorVisitCompleted(item))Text(entry?.completedAt?.takeIf {it in 1..System.currentTimeMillis()}?.let {t("Completion recorded: ${visitSourceDate(it)}", "पूरा होना दर्ज: ${visitSourceDate(it)}")}?:t("Completion time not recorded.", "पूरा होने का समय दर्ज नहीं।")) }
-        item { SurfaceCard { Text(t("Place / visit type", "जगह / विज़िट का प्रकार"), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont); Text(entry?.location?.ifBlank { t("Not recorded", "दर्ज नहीं") } ?: t("Not recorded", "दर्ज नहीं")) } }
+    var confirmCancel by remember(item.id) { mutableStateOf(false) }
+    LazyColumn(Modifier.fillMaxSize().testTag("doctor-visit-details"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        item { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            TextButton(onClick = onBack, enabled = !busy, contentPadding = PaddingValues(horizontal = 4.dp), modifier = Modifier.heightIn(min = 48.dp)) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Back to visits", "विज़िट पर वापस")) }
+            Heading(doctorVisitDoctor(item).ifBlank { t("Doctor not recorded", "डॉक्टर दर्ज नहीं") }, 26)
+            Text(t("Planned: ${visitDate(item)}", "तय: ${visitDate(item)}"), fontSize = 16.sp, color = DoctorCardSub)
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                val state = doctorVisitState(item, System.currentTimeMillis())
+                val (fg, bg) = when { state == "Completed" -> DoctorStatusGood to DoctorStatusGoodBg; state == "Upcoming" -> DoctorStatusWarn to DoctorStatusWarnBg; else -> DoctorStatusRest to DoctorStatusRestBg }
+                Surface(color = bg, shape = RoundedCornerShape(50)) { Text(state, Modifier.padding(horizontal = 12.dp, vertical = 6.dp), fontSize = 14.sp, fontWeight = FontWeight.Medium, color = fg) }
+                if (doctorVisitCompleted(item)) Surface(color = Paper, shape = RoundedCornerShape(50), border = androidx.compose.foundation.BorderStroke(1.dp, DoctorHairline)) { Text(entry?.completedAt?.takeIf { it in 1..System.currentTimeMillis() }?.let { t("Completion recorded: ${visitSourceDate(it)}", "पूरा होना दर्ज: ${visitSourceDate(it)}") } ?: t("Completion time not recorded.", "पूरा होने का समय दर्ज नहीं।"), Modifier.padding(horizontal = 12.dp, vertical = 6.dp), fontSize = 14.sp, color = DoctorCardSub) }
+            }
+        } }
+        item { VisitSection(t("Place / visit type", "जगह / विज़िट का प्रकार"), entry?.location?.ifBlank { t("Not recorded", "दर्ज नहीं") } ?: t("Not recorded", "दर्ज नहीं")) }
         val sources = doctorVisitSources(item, conditionSources, discussionSources)
         val condition = sources.condition
         val discussion = sources.discussion
         val conditionText = if (summary.conditionRef.isBlank()) t("Not recorded for this visit.", "इस विज़िट के लिए दर्ज नहीं।") else condition?.let { "${visitSourceDate(it.created)} · " + t("Patient / family report", "मरीज़ / परिवार की सूचना") + "\n${it.title}\n${CareEntryCodec.readable(it.detail)}" } ?: t("Linked update is not accessible or no longer available.", "जुड़ा अपडेट खुल नहीं सकता या अब उपलब्ध नहीं।")
         val discussionText = if (summary.discussionRef.isBlank()) t("Not recorded for this visit.", "इस विज़िट के लिए दर्ज नहीं।") else discussion?.let { "${visitSourceDate(it.published)}\n${ReviewWorkflow.label(it)}\n${it.topics.ifBlank { t("Discussion not recorded in this note.", "इस नोट में चर्चा दर्ज नहीं।") }}\n${it.nextSteps}" } ?: t("Linked care note is not accessible or no longer available.", "जुड़ा केयर नोट खुल नहीं सकता या अब उपलब्ध नहीं।")
-        listOf(t("Linked condition report", "जुड़ी हालत की सूचना") to conditionText, t("Discussion linked to this visit", "इस विज़िट से जुड़ी चर्चा") to discussionText, t("Visit notes", "विज़िट के नोट") to summary.note).forEach { (label, value) -> item { SurfaceCard { Text(label, fontSize = 19.sp, fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont); Text(value.ifBlank { t("Not recorded for this visit.", "इस विज़िट के लिए दर्ज नहीं।") }, fontSize = 16.sp) } } }
-        if (canEdit) item { Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            if (doctorVisitCompleted(item) || entry?.status == "cancelled") Button(onClick = onPlanAnother, enabled = !busy, modifier = Modifier.fillMaxWidth()) { Text(t("Plan another visit", "एक और विज़िट तय करें")) }
-            else { OutlinedButton(onClick = onEdit, enabled = !busy, modifier = Modifier.fillMaxWidth()) { Text(t("Edit or reschedule", "बदलें या समय बदलें")) }; Button(onClick = { onStatus("completed") }, enabled = !busy, modifier = Modifier.fillMaxWidth()) { Text(t("Mark completed", "पूरी हुई")) }; TextButton(onClick = { onStatus("cancelled") }, enabled = !busy) { Text(t("Cancel visit", "विज़िट रद्द करें")) } }
+        listOf(t("Linked condition report", "जुड़ी हालत की सूचना") to conditionText, t("Discussion linked to this visit", "इस विज़िट से जुड़ी चर्चा") to discussionText, t("Visit notes", "विज़िट के नोट") to summary.note).forEach { (label, value) -> item { VisitSection(label, value.ifBlank { t("Not recorded for this visit.", "इस विज़िट के लिए दर्ज नहीं।") }) } }
+        if (canEdit) item { Column(Modifier.padding(top = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            if (doctorVisitCompleted(item) || entry?.status == "cancelled") Button(onClick = onPlanAnother, enabled = !busy, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Plan another visit", "एक और विज़िट तय करें")) }
+            else {
+                Button(onClick = { onStatus("completed") }, enabled = !busy, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.CheckCircle, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Mark completed", "पूरी हुई")) }
+                OutlinedButton(onClick = onEdit, enabled = !busy, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Icon(Icons.Default.Edit, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Edit or reschedule", "बदलें या समय बदलें")) }
+                TextButton(onClick = { confirmCancel = true }, enabled = !busy, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Cancel visit", "विज़िट रद्द करें"), color = MaterialTheme.colorScheme.error) }
+            }
         } }
+    }
+    if (confirmCancel) AlertDialog(onDismissRequest = { confirmCancel = false }, containerColor = Cream, title = { Text(t("Cancel this visit?", "यह विज़िट रद्द करें?")) },
+        confirmButton = { TextButton(onClick = { confirmCancel = false; onStatus("cancelled") }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Cancel visit", "विज़िट रद्द करें"), color = MaterialTheme.colorScheme.error) } },
+        dismissButton = { TextButton(onClick = { confirmCancel = false }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Keep visit", "विज़िट रहने दें")) } })
+}
+
+@Composable private fun VisitSection(label: String, value: String) {
+    Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = androidx.compose.foundation.BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Text(label, Modifier.a11yHeading(), fontSize = 14.sp, fontWeight = FontWeight.Medium, color = DoctorCardSub)
+            Text(value, fontSize = 16.sp, lineHeight = 23.sp, color = DoctorCardInk)
+        }
     }
 }

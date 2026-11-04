@@ -6,6 +6,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -17,6 +18,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -41,15 +43,15 @@ import kotlinx.coroutines.launch
     LaunchedEffect(Unit) { try { available = service.installed() } catch (failure: Exception) { if (failure is CancellationException) throw failure; error = CareOfflineTranslationCopy.unavailable } }
     DisposableEffect(versionId, source) { onDispose { job?.cancel() } }
     SurfaceCard(Mint) {
-        Text("हिन्दी / English", fontWeight = FontWeight.Bold)
-        Text(t("Read alongside the original", "मूल के साथ पढ़ें"), style = MaterialTheme.typography.bodySmall)
+        Text("हिन्दी / English", Modifier.a11yHeading(), fontWeight = FontWeight.SemiBold, fontFamily = SaharaTitleFont, fontSize = 18.sp, color = DoctorCardInk)
+        Text(t("Read alongside the original", "मूल के साथ पढ़ें"), fontSize = 14.sp, color = DoctorCardSub)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf("hi" to "हिन्दी", "en" to "English").forEach { (code, label) ->
-                FilterChip(selected = target == code, onClick = { target = code; result = emptyList(); checked = false }, enabled = !busy, label = { Text(label) })
+                FilterChip(selected = target == code, onClick = { target = code; result = emptyList(); checked = false }, enabled = !busy, label = { Text(label) }, shape = RoundedCornerShape(50), modifier = Modifier.heightIn(min = 48.dp))
             }
         }
         if (available != true) {
-            Text(t("Download the language pack once (about 30 MB). Reading then works offline.", "भाषा पैक एक बार डाउनलोड करें (लगभग 30 MB)। फिर बिना इंटरनेट पढ़ सकेंगे।"), style = MaterialTheme.typography.bodySmall)
+            Text(t("Download the language pack once (about 30 MB). Reading then works offline.", "भाषा पैक एक बार डाउनलोड करें (लगभग 30 MB)। फिर बिना इंटरनेट पढ़ सकेंगे।"), fontSize = 14.sp, color = DoctorCardSub)
             CheckLine(wifiOnly, { wifiOnly = it }, t("Download over Wi-Fi only", "सिर्फ़ Wi-Fi पर डाउनलोड करें"))
             OutlinedButton(onClick = {
                 downloadBusy = true; error = ""
@@ -57,36 +59,37 @@ import kotlinx.coroutines.launch
                     if (failure is CancellationException) throw failure
                     error = CareOfflineTranslationCopy.downloadFailed
                 } finally { downloadBusy = false } }
-            }, enabled = !downloadBusy, modifier = Modifier.testTag("offline-translation-download")) { Text(if (downloadBusy) t("Downloading language pack…", "भाषा पैक डाउनलोड हो रहा है…") else t("Download Hindi–English pack", "हिन्दी–अंग्रेज़ी पैक डाउनलोड करें")) }
-            if (downloadBusy && wifiOnly) Text(CareOfflineTranslationCopy.waitingForWifi, style = MaterialTheme.typography.bodySmall)
-            if (downloadBusy) TextButton(onClick = { job?.cancel(); downloadBusy = false }) { Text(t("Stop waiting", "इंतज़ार बंद करें")) }
+            }, enabled = !downloadBusy, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("offline-translation-download")) { Text(if (downloadBusy) t("Downloading language pack…", "भाषा पैक डाउनलोड हो रहा है…") else t("Download Hindi–English pack", "हिन्दी–अंग्रेज़ी पैक डाउनलोड करें")) }
+            if (downloadBusy && wifiOnly) Text(CareOfflineTranslationCopy.waitingForWifi, fontSize = 14.sp, color = DoctorCardSub)
+            if (downloadBusy) TextButton(onClick = { job?.cancel(); downloadBusy = false }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Stop waiting", "इंतज़ार बंद करें")) }
         } else {
             Button(onClick = {
                 busy = true; error = ""; checked = false; result = emptyList(); progress = 0 to 0
                 job = scope.launch { try { result = service.translate(source, target) { done, total -> progress = done to total } }
                 catch (failure: Exception) { if (failure is CancellationException) throw failure; error = failure.message ?: t("Could not translate. The original is unchanged.", "अनुवाद नहीं हो सका। मूल वैसा ही है।") }
                 finally { busy = false } }
-            }, enabled = !busy && source.isNotBlank(), modifier = Modifier.testTag("offline-translation-start")) { Text(if (busy) t("Reading line ${progress.first} / ${progress.second}", "पंक्ति ${progress.first} / ${progress.second} पढ़ रहे हैं") else if (target == "hi") careBilingual("Translate with Google", "हिन्दी") else "Translate with Google · English") }
-            if (busy) TextButton(onClick = { job?.cancel(); busy = false }) { Text(t("Cancel", "रद्द करें")) }
+            }, enabled = !busy && source.isNotBlank(), shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("offline-translation-start")) { Text(if (busy) t("Reading line ${progress.first} / ${progress.second}", "पंक्ति ${progress.first} / ${progress.second} पढ़ रहे हैं") else if (target == "hi") careBilingual("Translate with Google", "हिन्दी") else "Translate with Google · English") }
+            if (busy) TextButton(onClick = { job?.cancel(); busy = false }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Cancel", "रद्द करें")) }
         }
-        if (error.isNotBlank()) Text(error, color = MaterialTheme.colorScheme.error, modifier = Modifier.announce())
+        if (error.isNotBlank()) Text(error, color = MaterialTheme.colorScheme.error, fontSize = 14.sp, modifier = Modifier.announce())
         if (result.isNotEmpty()) {
-            Text(careBilingual("Original and machine translation", "मूल और अनुवाद"), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont)
-            result.forEach { line ->
-                Column(Modifier.padding(vertical = 6.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text(careBilingual("Original and machine translation", "मूल और अनुवाद"), Modifier.padding(top = 8.dp), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, color = DoctorCardInk)
+            result.forEachIndexed { index, line ->
+                if (index > 0) HorizontalDivider(color = DoctorHairline)
+                Column(Modifier.padding(vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     SelectionContainerText(line.original)
                     SelectionContainerText(line.translated)
                 }
             }
-            Text(t("Check names, medicines, numbers and words such as ‘not’. Mixed or Roman Hindi may need correction by a bilingual person. This reading aid does not change the care note.", "नाम, दवाएँ, अंक और ‘नहीं’ जैसे शब्द जाँचें। मिली-जुली या रोमन में लिखी हिन्दी को दोनों भाषाएँ जानने वाला व्यक्ति ठीक करे। यह पढ़ने की मदद केयर नोट नहीं बदलती।"), style = MaterialTheme.typography.bodySmall)
+            Text(t("Check names, medicines, numbers and words such as ‘not’. Mixed or Roman Hindi may need correction by a bilingual person. This reading aid does not change the care note.", "नाम, दवाएँ, अंक और ‘नहीं’ जैसे शब्द जाँचें। मिली-जुली या रोमन में लिखी हिन्दी को दोनों भाषाएँ जानने वाला व्यक्ति ठीक करे। यह पढ़ने की मदद केयर नोट नहीं बदलती।"), fontSize = 14.sp, color = DoctorCardSub)
             CheckLine(checked, { checked = it }, careBilingual("A Hindi/English reader checked this translation", "अनुवाद जाँच लिया"))
             if (checked) {
                 val translated = result.joinToString("\n") { it.translated }
                 CareReadAloudControl(translated, "$versionId-offline-$target", if (target == "hi") "hi-IN" else "en-IN")
-                OutlinedButton(onClick = { clipboard.setText(AnnotatedString("Machine translation · human checked\n${result.joinToString("\n\n") { "${it.original}\n${it.translated}" }}")) }) { Text(t("Copy both languages", "दोनों भाषाएँ कॉपी करें")) }
+                OutlinedButton(shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp), onClick = { clipboard.setText(AnnotatedString("Machine translation · human checked\n${result.joinToString("\n\n") { "${it.original}\n${it.translated}" }}")) }) { Text(t("Copy both languages", "दोनों भाषाएँ कॉपी करें")) }
             }
             Image(painterResource(R.drawable.google_translate_attribution), contentDescription = "Powered by Google Translate", modifier = Modifier.width(150.dp))
-            TextButton(onClick = { notices = true }) { Text(t("Translation notices", "अनुवाद की सूचनाएँ")) }
+            TextButton(onClick = { notices = true }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Translation notices", "अनुवाद की सूचनाएँ")) }
         }
     }
     if (notices) AlertDialog(onDismissRequest = { notices = false }, title = { Text(t("Translation notices", "अनुवाद की सूचनाएँ")) }, text = {

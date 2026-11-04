@@ -18,6 +18,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -29,6 +30,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -174,35 +176,37 @@ private class CareDictation(private val context: Context, val changed: () -> Uni
     LaunchedEffect(active) { latestActiveChanged(active) }
     DisposableEffect(Unit) { onDispose { latestActiveChanged(false) } }
     SurfaceCard(Mint) {
-        Row(verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.RecordVoiceOver, null, tint = Ink); Spacer(Modifier.width(10.dp)); Text(t("Speak to type", "फ़ोन पर बोलकर लिखना"), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont) }
+        Row(verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.RecordVoiceOver, null, Modifier.size(20.dp), tint = RustText); Spacer(Modifier.width(8.dp)); Text(t("Speak to type", "फ़ोन पर बोलकर लिखना"), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, fontSize = 17.sp, color = DoctorCardInk, modifier = Modifier.a11yHeading()) }
         Spacer(Modifier.height(8.dp))
-        Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(7.dp)) {
-            listOf("Patient", "Family / carer", "Doctor").forEach { role -> FilterChip(selected = speaker == role, onClick = { speaker = role }, enabled = !active, label = { Text(role) }) }
+        Text(t("Speaker", "बोलने वाले"), style = MaterialTheme.typography.labelLarge, color = DoctorCardSub)
+        Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            // Stored speaker values stay English; only the chip label follows the language.
+            listOf("Patient", "Family / carer", "Doctor").forEach { role -> FilterChip(selected = speaker == role, onClick = { speaker = role }, enabled = !active, label = { Text(careSpeakerLabel(role)) }, shape = RoundedCornerShape(50), modifier = Modifier.heightIn(min = 48.dp)) }
         }
         CareLanguageMenu(languageTag, enabled = !active, includeMixed = true) { languageTag = it }
         if (languageTag == "hi-en") Text(if (Build.VERSION.SDK_INT >= 34) t("Both phone language packs must be installed. If the language does not switch, turn a saved recording into text below.", "फ़ोन में दोनों भाषा पैक होने चाहिए। अगर भाषा नहीं बदलती, तो नीचे सहेजी रिकॉर्डिंग से लिखाई बनाएँ।") else t("This phone listens to one language at a time. For Hindi and English together, use a saved recording below.", "यह फ़ोन हर बार एक ही भाषा सुनता है। हिन्दी और अंग्रेज़ी साथ में नीचे सहेजी रिकॉर्डिंग के लिए उपलब्ध है।"), style = MaterialTheme.typography.bodySmall)
         if (dictation.available) {
             if (dictation.processing) LinearProgressIndicator(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp), color = Rust)
             else if (dictation.listening) LinearProgressIndicator(progress = { dictation.level }, modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp), color = Rust)
-            if (dictation.partial.isNotBlank()) Text(dictation.partial, modifier = Modifier.padding(vertical = 8.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            if (dictation.partial.isNotBlank()) Text(dictation.partial, fontSize = 16.sp, color = DoctorCardInk, modifier = Modifier.padding(vertical = 8.dp))
+            Row(Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                 Button(onClick = {
                     if (dictation.listening) dictation.stop() else {
                         pendingSpeaker = speaker; pendingLanguageTag = languageTag
                         permissionError = ""; consent = false; showConsent = true
                     }
-                }, enabled = enabled && !recording && !dictation.processing && (heldWords.isBlank() || dictation.listening), modifier = Modifier.testTag("dictation-toggle")) {
+                }, enabled = enabled && !recording && !dictation.processing && (heldWords.isBlank() || dictation.listening), shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("dictation-toggle")) {
                     Icon(if (dictation.listening) Icons.Default.Stop else Icons.Default.Mic, null, Modifier.size(18.dp)); Spacer(Modifier.width(7.dp)); Text(if (dictation.listening) t("Finish turn", "बोलना पूरा करें") else "Dictate")
                 }
-                if (active) TextButton(onClick = { dictation.cancel(keepWords = false); heldWords = "" }) { Text(t("Cancel turn", "यह बारी रद्द करें")) }
+                if (active) TextButton(onClick = { dictation.cancel(keepWords = false); heldWords = "" }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Cancel turn", "यह बारी रद्द करें"), color = RustText) }
             }
-            if (dictation.status.isNotBlank()) Text(dictation.status, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 6.dp))
+            if (dictation.status.isNotBlank()) Text(dictation.status, fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.padding(top = 8.dp).announce())
         } else Text(if (Build.VERSION.SDK_INT < 31) t("Speaking to type needs Android 12 or newer. Type the words or keep an audio recording.", "फ़ोन पर बोलकर लिखने के लिए Android 12 या नया चाहिए। शब्द लिखें या ऑडियो रिकॉर्डिंग रखें।") else t("Speaking to type does not work on this phone. Type the words or keep an audio recording.", "इस फ़ोन पर बोलकर लिखना उपलब्ध नहीं है। शब्द लिखें या ऑडियो रिकॉर्डिंग रखें।"), style = MaterialTheme.typography.bodySmall)
         if (permissionError.isNotBlank()) Text(permissionError, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall, modifier = Modifier.announce())
         if (heldWords.isNotBlank() && !active) {
             Text(t("Unfinished words · $pendingSpeaker · ${pendingLanguage.label}", "अधूरे शब्द · $pendingSpeaker · ${pendingLanguage.label}"), style = MaterialTheme.typography.labelMedium)
             CareField(heldWords, { heldWords = it }, t("Words to keep", "रखने वाले शब्द"), minLines = 2)
-            TextButton(onClick = { if (latestWords(heldWords, pendingSpeaker, pendingLanguage.label)) heldWords = "" }) { Text(t("Add these words", "ये शब्द जोड़ें")) }
+            TextButton(onClick = { if (latestWords(heldWords, pendingSpeaker, pendingLanguage.label)) heldWords = "" }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Add these words", "ये शब्द जोड़ें"), color = RustText, fontWeight = FontWeight.SemiBold) }
         }
         if (recording) Text(t("Stop the audio recording before dictating.", "बोलकर लिखने से पहले ऑडियो रिकॉर्डिंग रोकें।"), style = MaterialTheme.typography.bodySmall)
     }
@@ -218,10 +222,12 @@ private class CareDictation(private val context: Context, val changed: () -> Uni
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable fun CareLanguageMenu(tag: String, enabled: Boolean = true, includeMixed: Boolean = false, onSelect: (String) -> Unit) {
-    FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(7.dp)) {
+    FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         careSpeechLanguages.filter { includeMixed || it.tag != "hi-en" }.forEach { language ->
             FilterChip(selected = language.tag == tag, onClick = { onSelect(language.tag) }, enabled = enabled,
-                label = { Text(language.label) }, modifier = Modifier.testTag("care-language-${language.tag}"))
+                label = { Text(language.label) }, shape = RoundedCornerShape(50),
+                leadingIcon = if (language.tag == tag) { { Icon(Icons.Default.Check, null, Modifier.size(16.dp)) } } else null,
+                modifier = Modifier.heightIn(min = 48.dp).testTag("care-language-${language.tag}"))
         }
     }
 }
@@ -349,13 +355,16 @@ internal class CareReadAloud(context: Context, val changed: () -> Unit) {
     LaunchedEffect(text, language) { reader.stop() }
     @Suppress("UNUSED_VARIABLE") val callbackRevision = revision
     SurfaceCard(Mint) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            FilledTonalButton(onClick = { if (reader.busy) reader.stop() else reader.read(text, language) }, modifier = Modifier.testTag("note-read-aloud"), colors = ButtonDefaults.filledTonalButtonColors(containerColor = Sage, contentColor = Ink)) {
-                Icon(if (reader.busy) Icons.Default.Stop else Icons.Default.VolumeUp, null, Modifier.size(18.dp)); Spacer(Modifier.width(7.dp)); Text(if (reader.busy) t("Stop reading", "पढ़ना रोकें") else t("Read aloud", "पढ़कर सुनाएँ"))
+        // The button and a "?" for the fine print; the languages sit under them.
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            FilledTonalButton(onClick = { if (reader.busy) reader.stop() else reader.read(text, language) }, shape = RoundedCornerShape(14.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("note-read-aloud"), colors = ButtonDefaults.filledTonalButtonColors(containerColor = Sage, contentColor = Ink)) {
+                Icon(if (reader.busy) Icons.Default.Stop else Icons.Default.VolumeUp, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(if (reader.busy) t("Stop reading", "पढ़ना रोकें") else t("Read aloud", "पढ़कर सुनाएँ"), fontWeight = FontWeight.SemiBold)
             }
+            Spacer(Modifier.weight(1f))
+            CareHelpIcon(t("Read aloud", "पढ़कर सुनाएँ"), t("The words are translated on this phone for listening only. The saved note is not changed. Check anything important with the care team.", "शब्द सिर्फ़ सुनने के लिए इसी फ़ोन पर अनुवाद होते हैं। सहेजा हुआ नोट नहीं बदलता। कोई भी ज़रूरी बात केयर टीम से जाँच लें।"))
         }
+        Spacer(Modifier.height(8.dp))
         CareLanguageMenu(language) { language = it }
-        if (reader.status.isNotBlank()) Text(reader.status, style = MaterialTheme.typography.bodySmall)
-        Text(t("The words are translated on this phone for listening only. The saved note is not changed. Check anything important with the care team.", "शब्द सिर्फ़ सुनने के लिए इसी फ़ोन पर अनुवाद होते हैं। सहेजा हुआ नोट नहीं बदलता। कोई भी ज़रूरी बात केयर टीम से जाँच लें।"), style = MaterialTheme.typography.bodySmall)
+        if (reader.status.isNotBlank()) Text(reader.status, fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.padding(top = 4.dp).announce())
     }
 }

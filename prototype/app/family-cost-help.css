@@ -1,72 +1,75 @@
-.family-cost-help { max-width: 1100px; color: #3c342c; }
-.family-cost-heading, .family-cost-section-heading, .family-cost-actions, .family-expense-title, .family-cost-undo { display: flex; align-items: center; gap: 10px; }
-.family-cost-heading { justify-content: space-between; flex-wrap: wrap; margin-bottom: 16px; gap: 12px; }
+.family-cost-help { max-width: 1100px; color: var(--care-ink); }
+.family-cost-heading, .family-cost-section-heading, .family-cost-actions, .family-expense-title, .family-cost-undo { display: flex; align-items: center; gap: var(--care-space-3); }
+.family-cost-heading { justify-content: space-between; flex-wrap: wrap; margin-bottom: var(--care-space-4); }
 .family-cost-heading h1 { margin: 0; }
-.family-cost-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); align-items: start; gap: 16px; }
-.family-cost-side { display: grid; gap: 16px; min-width: 0; }
-.family-cost-panel { padding: 20px; min-width: 0; border: 1px solid #e4ceaf; border-radius: 20px; background: #fff7e9; }
-.family-cost-support { background: #e7eedc; border-color: #cbdabb; }
-.family-paperwork-panel { background: #f1e8f9; border-color: #d9c7e8; }
+.family-cost-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); align-items: start; gap: var(--care-space-4); }
+.family-cost-side { display: grid; gap: var(--care-space-4); min-width: 0; }
+.family-cost-panel { padding: var(--care-space-5); min-width: 0; border: 1px solid var(--care-line); border-radius: var(--care-radius-card); background: var(--care-surface); box-shadow: var(--care-shadow); }
+.family-cost-support { background: color-mix(in srgb, var(--care-sage) 22%, var(--care-surface)); border-color: color-mix(in srgb, var(--care-sage) 80%, var(--care-sage-ink)); }
+.family-paperwork-panel { background: color-mix(in srgb, var(--care-lavender) 22%, var(--care-surface)); border-color: color-mix(in srgb, var(--care-lavender) 70%, var(--care-surface)); }
 .family-cost-section-heading { justify-content: space-between; flex-wrap: wrap; }
-.family-cost-panel h2 { margin: 0; font-size: 19px; line-height: 1.4; color: #3c342c; }
-.family-cost-panel h3 { margin: 0 0 9px; font-size: 16px; line-height: 1.5; overflow-wrap: anywhere; }
+.family-cost-panel h2 { margin: 0; font-size: 20px; line-height: 1.35; color: var(--care-ink); }
+.family-cost-panel h3 { margin: 0 0 var(--care-space-2); font-size: 17px; line-height: 1.45; overflow-wrap: anywhere; }
 .family-cost-help :is(button, input:not([type='checkbox']), select, a) { min-height: 44px; }
-.family-cost-help :is(button, input, select, textarea, a):focus-visible { outline: 2px solid #885439; outline-offset: 3px; }
-.family-cost-help :is(input:not([type='checkbox']), select, textarea) { min-width: 0; width: 100%; border: 1px solid #c9bca9; border-radius: 8px; padding: 10px 12px; background: #fffdf8; color: #3c342c; font: inherit; font-size: 16px; }
+.family-cost-help :is(button, input, select, textarea, a):focus-visible { outline: 3px solid var(--care-focus); outline-offset: 3px; }
+.family-cost-help :is(input:not([type='checkbox']), select, textarea) { min-width: 0; width: 100%; border: 1px solid var(--care-line-strong); border-radius: var(--care-radius-control); padding: 10px 12px; background: var(--care-surface); color: var(--care-ink); font: inherit; font-size: 16px; }
 .family-cost-help textarea { resize: vertical; line-height: 1.6; }
 .family-cost-help button { cursor: pointer; }
-.family-cost-help button:disabled { cursor: not-allowed; opacity: .5; }
-.family-cost-primary { min-height: 44px; padding: 10px 14px; border: 1px solid #a04e34; border-radius: 9px; background: #aa5439; color: #fff8ee; font: inherit; font-size: 14px; font-weight: 600; }
-.family-cost-link, .family-cost-undo button { min-height: 44px; padding: 8px; border: 0; border-radius: 5px; background: transparent; color: #784a33; font: inherit; font-size: 13px; font-weight: 600; }
-.family-cost-totals { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 16px 0; }
-.family-cost-totals > div { min-width: 0; padding: 12px 10px; border-radius: 14px; background: #ffe2ad; }
-.family-cost-totals > div:nth-child(2) { background: #d8ecd8; }
-.family-cost-totals > div:nth-child(3) { background: #f6d3c3; }
-.family-cost-totals dt { color: #756451; font-size: 12px; line-height: 1.5; }
-.family-cost-totals dd { margin: 5px 0 0; font-size: clamp(16px, 1.7vw, 21px); font-weight: 650; line-height: 1.5; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
-.family-cost-form { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; margin: 16px 0; padding: 16px; border: 1px solid #dfd4c1; border-radius: 10px; background: #fffaf1; }
+.family-cost-help button:disabled { cursor: not-allowed; opacity: .55; }
+.family-cost-primary, .family-cost-secondary { min-height: 48px; padding: 10px 16px; border: 1px solid var(--care-primary); border-radius: var(--care-radius-control); background: var(--care-primary); color: var(--care-on-primary); font: inherit; font-size: 15px; font-weight: 600; }
+.family-cost-primary:hover:not(:disabled) { background: var(--care-primary-hover); border-color: var(--care-primary-hover); }
+.family-cost-secondary { border-color: var(--care-line-strong); background: var(--care-surface); color: var(--care-ink); }
+.family-cost-secondary:hover:not(:disabled) { background: var(--care-surface-2); }
+.family-cost-link, .family-cost-undo button { min-height: 44px; padding: var(--care-space-2); border: 0; border-radius: 10px; background: transparent; color: var(--care-primary); font: inherit; font-size: 14px; font-weight: 600; }
+.family-cost-totals { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--care-space-2); margin: var(--care-space-4) 0; }
+.family-cost-totals > div { min-width: 0; padding: var(--care-space-3); border-radius: var(--care-radius-control); background: var(--care-honey); }
+.family-cost-totals > div:nth-child(2) { background: var(--care-sage); }
+.family-cost-totals > div:nth-child(3) { background: var(--care-peach); }
+.family-cost-totals dt { color: #5b4a3d; font-size: 14px; font-weight: 600; line-height: 1.4; }
+.family-cost-totals dd { margin: var(--care-space-1) 0 0; font-size: clamp(17px, 1.7vw, 22px); font-weight: 700; line-height: 1.3; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.family-cost-form { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--care-space-3); margin: var(--care-space-4) 0; padding: var(--care-space-4); border: 1px solid var(--care-line); border-radius: var(--care-radius-card); background: var(--care-surface-2); }
 .family-cost-form h3 { grid-column: 1 / -1; margin: 0; }
-.family-cost-form label:not(.family-cost-checkbox) { display: grid; gap: 7px; font-size: 13px; font-weight: 600; min-width: 0; }
+.family-cost-form label:not(.family-cost-checkbox) { display: grid; gap: var(--care-space-2); font-size: 14px; font-weight: 600; min-width: 0; }
 .family-cost-wide { grid-column: 1 / -1; min-width: 0; }
 .family-cost-actions { flex-wrap: wrap; }
-.family-cost-help .family-cost-checkbox { display: flex; align-items: center; gap: 10px; min-height: 44px; font-size: 14px; line-height: 1.5; cursor: pointer; min-width: 0; }
-.family-cost-checkbox input { width: 21px; height: 21px; flex: 0 0 21px; margin: 0; accent-color: #775333; }
+.family-cost-help .family-cost-checkbox { display: flex; align-items: center; gap: var(--care-space-3); min-height: 44px; font-size: 15px; line-height: 1.5; cursor: pointer; min-width: 0; }
+.family-cost-checkbox input { width: 22px; height: 22px; flex: 0 0 22px; margin: 0; accent-color: var(--care-primary); }
 .family-expense-list, .family-paperwork-list { list-style: none; margin: 0; padding: 0; }
-.family-expense-list li { border-top: 1px solid #e2d7c6; padding: 14px 0 6px; }
+.family-expense-list li { border-top: 1px solid var(--care-line); padding: var(--care-space-3) 0 var(--care-space-1); }
 .family-expense-title { align-items: flex-start; justify-content: space-between; }
-.family-expense-title strong { min-width: 0; overflow-wrap: anywhere; font-size: 15px; line-height: 1.5; }
-.family-expense-title > span { flex-shrink: 0; font-size: 14px; line-height: 1.5; font-weight: 600; font-variant-numeric: tabular-nums; }
-.family-expense-list p { color: #756451; font-size: 12px; line-height: 1.6; margin: 4px 0; }
-.family-expense-list .family-cost-actions { gap: 7px; }
+.family-expense-title strong { min-width: 0; overflow-wrap: anywhere; font-size: 16px; line-height: 1.5; }
+.family-expense-title > span { flex-shrink: 0; padding: 2px 12px; border-radius: var(--care-radius-pill); background: var(--care-surface-2); font-size: 15px; line-height: 1.5; font-weight: 700; font-variant-numeric: tabular-nums; }
+.family-expense-list p { color: var(--care-muted); font-size: 14px; line-height: 1.5; margin: var(--care-space-1) 0; }
+.family-expense-list .family-cost-actions { gap: var(--care-space-2); }
 .family-expense-list .family-cost-checkbox { margin-right: auto; }
-.family-cost-empty { margin: 12px 0 0; color: #756451; font-size: 14px; line-height: 1.6; }
-.family-paperwork-hint { margin: 8px 0 12px; color: #6e567b; font-size: 12px; line-height: 1.5; }
-.family-paperwork-suggestions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
-.family-paperwork-suggestions button { display: flex; align-items: center; gap: 7px; min-width: 0; padding: 8px 10px; border: 1px solid #cfb9df; border-radius: 12px; background: #fcf8ff; color: #624776; font: inherit; font-size: 12px; text-align: left; line-height: 1.4; cursor: pointer; }
+.family-cost-empty { margin: var(--care-space-3) 0 0; padding: var(--care-space-4); border: 1px dashed var(--care-line-strong); border-radius: var(--care-radius-control); color: var(--care-muted); font-size: 15px; line-height: 1.5; text-align: center; }
+.family-paperwork-hint { margin: var(--care-space-2) 0 var(--care-space-3); color: var(--care-lavender-ink); font-size: 14px; line-height: 1.5; }
+.family-paperwork-suggestions { display: flex; flex-wrap: wrap; gap: var(--care-space-2); }
+.family-paperwork-suggestions button { display: inline-flex; align-items: center; gap: var(--care-space-2); min-width: 0; max-width: 100%; padding: var(--care-space-2) 14px; border: 1px solid #d8c3e8; border-radius: var(--care-radius-pill); background: var(--care-surface); color: var(--care-lavender-ink); font: inherit; font-size: 14px; font-weight: 600; text-align: left; line-height: 1.35; cursor: pointer; }
 .family-paperwork-suggestions button > span { flex: none; font-size: 17px; }
-.family-paperwork-suggestions button:disabled { background: #e5dcc0; color: #514b32; border-color: #d5ccaf; cursor: default; }
-.family-cost-question { margin: 12px 0; padding: 13px 14px; border-radius: 14px; border: 1px solid #d0dabc; background: #f8fbee; color: #435436; font-size: 14px; line-height: 1.65; user-select: text; }
-.family-paperwork-list li { padding: 9px 0; border-bottom: 1px solid #dcd3e3; }
-.family-paperwork-list .family-cost-checkbox { align-items: flex-start; padding-top: 9px; }
+.family-cost-help .family-paperwork-suggestions button:disabled { opacity: 1; background: var(--care-sage); color: var(--care-sage-ink); border-color: #c4d595; cursor: default; }
+.family-cost-question { margin: var(--care-space-3) 0; padding: var(--care-space-3) var(--care-space-4); border-radius: var(--care-radius-control); border: 1px solid #d6e3b4; background: var(--care-surface); color: var(--care-ink); font-size: 16px; line-height: 1.6; user-select: text; }
+.family-paperwork-list { margin-top: var(--care-space-3); }
+.family-paperwork-list li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0 var(--care-space-2); padding: var(--care-space-1) 0; border-bottom: 1px solid #e3d6f7; }
+.family-paperwork-list .family-cost-checkbox { align-items: flex-start; padding-top: var(--care-space-2); flex: 1 1 200px; }
 .family-paperwork-list .family-cost-checkbox > span { overflow-wrap: anywhere; min-width: 0; }
-.family-paperwork-list .is-done { text-decoration: line-through; color: #796c81; }
-.family-paperwork-list .family-cost-actions { justify-content: flex-end; }
-.family-paperwork-add { margin-top: 14px; }
-.family-paperwork-add .family-cost-actions { flex-wrap: nowrap; }
+.family-paperwork-list .is-done { text-decoration: line-through; color: var(--care-muted); }
+.family-paperwork-list .family-cost-actions { justify-content: flex-end; gap: var(--care-space-1); }
+.family-paperwork-add { margin-top: var(--care-space-4); }
+.family-paperwork-add .family-cost-actions { flex-wrap: nowrap; gap: var(--care-space-2); }
 .family-paperwork-add input { flex: 1; }
 .family-paperwork-add button { flex-shrink: 0; }
-.family-cost-message { margin: 0; font-size: 14px; line-height: 1.5; }
-.family-cost-message:not(:empty) { margin-bottom: 14px; }
-.family-cost-undo { justify-content: space-between; margin: 0 0 14px; padding: 4px 12px; border: 1px solid #d9c7a4; border-radius: 8px; background: #f0e3c8; font-size: 14px; }
+.family-cost-message { margin: 0; color: var(--care-muted); font-size: 14px; line-height: 1.5; }
+.family-cost-message:not(:empty) { margin-bottom: var(--care-space-3); }
+.family-cost-undo { justify-content: space-between; margin: 0 0 var(--care-space-3); padding: var(--care-space-1) var(--care-space-4); border: 1px solid #dfc891; border-radius: var(--care-radius-control); background: #fff0c5; color: #5b391f; font-size: 14px; }
 .family-cost-undo span { min-width: 0; overflow-wrap: anywhere; }
-.family-cost-undo button { flex-shrink: 0; text-decoration: underline; text-underline-offset: 3px; }
+.family-cost-undo button { flex-shrink: 0; color: #5b391f; text-decoration: underline; text-underline-offset: 3px; }
 @media (max-width: 700px) {
-  .family-cost-grid { grid-template-columns: minmax(0, 1fr); gap: 16px; }
-  .family-cost-side { gap: 16px; }
-  .family-cost-panel { padding: 16px; }
-  .family-cost-form { grid-template-columns: minmax(0, 1fr); padding: 13px; }
-  .family-cost-totals { gap: 8px; }
-  .family-cost-totals > div { padding: 10px 8px; }
-  .family-cost-totals dd { font-size: 15px; }
-  .family-expense-title { flex-wrap: wrap; gap: 6px; }
+  .family-cost-grid { grid-template-columns: minmax(0, 1fr); gap: var(--care-space-3); }
+  .family-cost-side { gap: var(--care-space-3); }
+  .family-cost-panel { padding: var(--care-space-4); }
+  .family-cost-form { grid-template-columns: minmax(0, 1fr); padding: var(--care-space-3); }
+  .family-cost-totals > div { padding: var(--care-space-2) var(--care-space-3); }
+  .family-cost-totals dd { font-size: 16px; }
+  .family-expense-title { flex-wrap: wrap; gap: var(--care-space-2); }
 }

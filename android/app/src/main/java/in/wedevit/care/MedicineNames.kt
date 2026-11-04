@@ -2,6 +2,7 @@ package `in`.wedevit.care
 
 import android.content.Context
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -57,11 +58,12 @@ object MedicineNames {
     LaunchedEffect(Unit) { names = withContext(Dispatchers.IO) { runCatching { MedicineNames.all(context) }.getOrDefault(emptyList()) } }
     val matches = remember(names, query) { MedicineNames.search(names.orEmpty(), query) }
     if (matches.isEmpty() || !enabled) return
-    Column(Modifier.fillMaxWidth().testTag("medicine-name-suggestions"), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-        Text(careBilingual("Spelling from the India drug list", "भारत की दवा सूची से नाम"), fontSize = 12.sp, color = Ink.copy(alpha = .7f))
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            matches.forEach { match -> SuggestionChip(onClick = { onPick(match.name) }, label = { Text(match.name, fontSize = 13.sp) }, modifier = Modifier.heightIn(min = 48.dp)) }
+    Column(Modifier.fillMaxWidth().testTag("medicine-name-suggestions"), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        // Solid secondary ink, not faded Ink (pale on Xiaomi phones).
+        Text(careBilingual("Spelling from the India drug list", "भारत की दवा सूची से नाम"), fontSize = 14.sp, color = DoctorCardSub)
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            matches.forEach { match -> SuggestionChip(onClick = { onPick(match.name) }, label = { Text(match.name, fontSize = 15.sp, color = DoctorCardInk) }, shape = RoundedCornerShape(50), modifier = Modifier.heightIn(min = 48.dp)) }
         }
-        Text(careBilingual("Names only. Copy the dose from the prescription", "खुराक पर्चे से ही लिखें"), fontSize = 12.sp, color = Ink.copy(alpha = .7f))
+        Text(careBilingual("Names only. Copy the dose from the prescription", "खुराक पर्चे से ही लिखें"), fontSize = 14.sp, color = DoctorCardSub)
     }
 }

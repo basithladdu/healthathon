@@ -13,8 +13,9 @@
   --amd-lavender: var(--care-lavender, #ddc8ff);
   --amd-lavender-ink: var(--care-lavender-ink, #655278);
   display: grid;
-  gap: 18px;
+  gap: 16px;
   max-width: 880px;
+  margin-inline: auto;
   color: var(--amd-ink);
   font-size: 16px;
   line-height: 1.5;
@@ -26,10 +27,10 @@
 .amd-card {
   display: grid;
   gap: 14px;
-  padding: 20px 22px;
+  padding: 20px;
   background: var(--amd-surface);
   border: 1px solid var(--amd-line);
-  border-radius: 18px;
+  border-radius: 20px;
   box-shadow: var(--care-shadow, 0 5px 20px #664b3010);
   min-width: 0;
 }
@@ -41,7 +42,7 @@
 
 /* Status and lifecycle */
 .amd-status-line { display: flex; flex-wrap: wrap; gap: 8px; }
-.amd-chip { display: inline-block; padding: 4px 10px; border-radius: 999px; background: var(--amd-honey); color: #5b391f; font-size: 13px; font-weight: 600; }
+.amd-chip { display: inline-flex; align-items: center; min-height: 28px; padding: 4px 12px; border-radius: 999px; background: var(--amd-honey); color: #5b391f; font-size: 13px; font-weight: 600; }
 .amd-chip-ok { background: var(--amd-sage); color: var(--amd-sage-ink); }
 .amd-chip-none { background: #efe7dc; color: var(--amd-muted); }
 .amd-chip-work { background: var(--amd-lavender); color: var(--amd-lavender-ink); }
@@ -58,11 +59,11 @@
 .amd-steps { display: flex; gap: 6px; margin: 0; padding: 0; list-style: none; overflow-x: auto; scrollbar-width: thin; }
 .amd-steps li { flex: 0 0 auto; }
 .amd-steps button {
-  display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 6px 12px;
-  border: 1px solid var(--amd-line); border-radius: 12px; background: transparent; color: var(--amd-muted); font: inherit; font-size: 14px; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 6px 14px 6px 8px;
+  border: 1px solid var(--amd-line); border-radius: 999px; background: var(--amd-surface); color: var(--amd-muted); font: inherit; font-size: 14px; cursor: pointer;
 }
 .amd-steps button:disabled { cursor: default; opacity: .7; }
-.amd-steps button span { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: #efe7dc; font-size: 12px; font-weight: 700; }
+.amd-steps button span { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: #efe7dc; font-size: 12px; font-weight: 700; }
 .amd-steps li[data-state='current'] button { border-color: var(--amd-primary); color: var(--amd-ink); font-weight: 600; }
 .amd-steps li[data-state='current'] button span { background: var(--amd-primary); color: #fffaf5; }
 .amd-steps li[data-state='done'] button span { background: var(--amd-sage); color: var(--amd-sage-ink); }
@@ -72,29 +73,29 @@
 
 /* Fields */
 .amd-field { display: grid; gap: 5px; min-width: 0; }
-.amd-field > label { font-weight: 600; }
+.amd-field > label { font-size: 15px; font-weight: 650; color: #534839; }
 .amd-field :is(input:not([type='checkbox']):not([type='radio']):not([type='file']), select, textarea) {
-  width: 100%; min-height: 44px; padding: 10px 12px; font: inherit; color: var(--amd-ink);
-  background: var(--amd-surface); border: 1px solid #cfc1b3; border-radius: 11px;
+  width: 100%; min-height: 48px; padding: 10px 12px; font: inherit; color: var(--amd-ink);
+  background: #fff; border: 1px solid #cfc1b3; border-radius: 14px;
 }
 .amd-field textarea { resize: vertical; }
 .amd-field [aria-invalid='true'] { border-color: #b3261e; }
 .amd-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
 .amd-hint { margin: 0; color: var(--amd-muted); font-size: 14px; }
-.amd-fieldset, .amd-dhr, .amd-treatment { display: grid; gap: 10px; margin: 0; padding: 14px 16px; border: 1px solid var(--amd-line); border-radius: 14px; min-width: 0; }
+.amd-fieldset, .amd-dhr, .amd-treatment { display: grid; gap: 10px; margin: 0; padding: 16px; border: 1px solid var(--amd-line); border-radius: 14px; background: #fffaf4; min-width: 0; }
 .amd-fieldset legend, .amd-dhr legend, .amd-treatment legend { padding: 0 6px; font-weight: 700; }
 .amd-dhr-tools { display: flex; gap: 6px; justify-content: flex-end; }
 .amd-dhr-tools button { min-width: 44px; }
-.amd-check { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; }
-.amd-check input { width: 20px; height: 20px; margin-top: 2px; flex: 0 0 auto; accent-color: var(--amd-primary); }
+.amd-check { display: flex; align-items: flex-start; gap: 12px; min-height: 44px; padding-top: 4px; cursor: pointer; }
+.amd-check input { width: 22px; height: 22px; margin-top: 2px; flex: 0 0 auto; accent-color: var(--amd-primary); }
 .amd-check:has(input:disabled) { cursor: default; color: var(--amd-muted); }
 .amd-segment { display: flex; flex-wrap: wrap; gap: 8px; }
-.amd-segment label { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 8px 14px; border: 1px solid #cfc1b3; border-radius: 12px; cursor: pointer; }
-.amd-segment label[data-on] { border-color: var(--amd-primary); background: #fff1e8; font-weight: 600; }
+.amd-segment label { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 8px 16px; border: 1px solid #cfc1b3; border-radius: 14px; background: #fff; cursor: pointer; }
+.amd-segment label[data-on] { border-color: var(--amd-primary); background: #fdf1ea; box-shadow: inset 0 0 0 1px var(--amd-primary); font-weight: 650; }
 .amd-segment input { accent-color: var(--amd-primary); }
 
 /* Messages */
-.amd-issue { margin: 0; padding: 8px 12px; border-radius: 10px; font-size: 14px; }
+.amd-issue { margin: 0; padding: 8px 12px; border-radius: 12px; font-size: 15px; }
 .amd-issue-block { background: #fde8e5; color: #8c1d13; }
 .amd-issue-warn, .amd-issue-confirm { background: #fff4d6; color: #6b4a0e; }
 .amd-issue-list { display: grid; gap: 6px; }
@@ -120,18 +121,19 @@
 
 /* Actions */
 .amd-actions { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; }
-.amd-screen .amd-primary { min-height: 48px; padding: 10px 20px; color: #fffaf5; background: var(--amd-primary); border: 1px solid var(--amd-primary); border-radius: 12px; font: inherit; font-weight: 600; cursor: pointer; }
+.amd-screen .amd-primary { min-height: 48px; padding: 10px 20px; color: #fffaf5; background: var(--amd-primary); border: 1px solid var(--amd-primary); border-radius: 14px; font: inherit; font-weight: 650; cursor: pointer; }
 .amd-screen .amd-primary:hover:not(:disabled) { background: var(--amd-primary-hover); }
 .amd-screen .amd-primary:disabled { opacity: .6; cursor: progress; }
-.amd-screen .secondary-button { min-height: 44px; padding: 8px 16px; color: var(--amd-ink); background: var(--amd-surface); border: 1px solid var(--amd-line); border-radius: 12px; font: inherit; cursor: pointer; }
+.amd-screen .secondary-button { min-height: 48px; padding: 8px 16px; color: var(--amd-ink); background: var(--amd-surface); border: 1px solid #cfc1b3; border-radius: 14px; font-weight: 650; font: inherit; cursor: pointer; }
+.amd-screen .secondary-button:hover:not(:disabled) { border-color: var(--amd-primary); background: #fbf2e7; }
 .amd-screen .secondary-button:disabled { opacity: .5; cursor: default; }
 .amd-screen .amd-danger { color: #8c1d13; border-color: #e3b4ad; }
 .amd-screen .amd-primary.amd-danger { color: #fff; background: #a3271b; border-color: #a3271b; }
-.amd-screen .care-text-button { background: none; border: 0; padding: 0 4px; color: var(--amd-primary); font: inherit; text-decoration: underline; cursor: pointer; }
+.amd-screen .care-text-button { min-height: 44px; background: none; border: 0; padding: 0 4px; text-underline-offset: 3px; color: var(--amd-primary); font: inherit; text-decoration: underline; cursor: pointer; }
 .amd-screen :is(button, input, select, textarea, summary):focus-visible { outline: 3px solid #a7653d; outline-offset: 2px; }
 
 @media (max-width: 560px) {
-  .amd-card { padding: 16px 14px; border-radius: 14px; }
+  .amd-card { padding: 16px; border-radius: 20px; }
   .amd-summary > div { grid-template-columns: 1fr; gap: 2px; }
   .amd-actions > * { flex: 1 1 auto; }
 }

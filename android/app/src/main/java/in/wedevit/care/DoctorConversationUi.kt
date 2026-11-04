@@ -26,6 +26,9 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Forum
+import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.Inventory2
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -110,36 +113,37 @@ private fun conversationDate(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy
     }
     BackHandler { destination = "landing" }
     archiveDetail?.takeIf {it.personId==person}?.let { saved -> AlertDialog(onDismissRequest={archiveDetail=null},title={Text(t("Archived draft · not published", "सँभाला गया ड्राफ़्ट · प्रकाशित नहीं"))},text={DoctorArchiveContent(saved)},confirmButton={TextButton(onClick={archiveDetail=null}){Text(t("Close", "बंद करें"))}}) }
-    LazyColumn(Modifier.fillMaxSize().testTag("doctor-conversations"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(18.dp)) {
-        item { TextButton(onClick = { destination = "landing" }) { Text(t("Back to conversations", "बातचीत पर वापस")) } }
+    LazyColumn(Modifier.fillMaxSize().testTag("doctor-conversations"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        item { TextButton(onClick = { destination = "landing" }, colors = ButtonDefaults.textButtonColors(contentColor = RustText), modifier = Modifier.heightIn(min = 48.dp)) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null); Spacer(Modifier.width(8.dp)); Text(t("Back to conversations", "बातचीत पर वापस"), fontSize = 16.sp) } }
         if (destination == "recent") {
             item { Heading(t("Recent conversation", "हाल की बातचीत"), 28) }
-            if (own.isEmpty()) item { Text(t("Nothing saved yet", "अभी कुछ सहेजा नहीं"), fontSize = 15.sp, lineHeight = 23.sp, color = DoctorCardInk) }
+            if (own.isEmpty()) item { DoctorEmptyState(Icons.Default.Forum, t("Nothing saved yet", "अभी कुछ सहेजा नहीं")) }
             else item { Column(verticalArrangement = Arrangement.spacedBy(12.dp)) { DoctorConversationCard(own.first(), onRead); DoctorSavedConversationContext(own.first()) } }
         } else {
-        item { Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { Icon(Icons.Default.History, null, tint = Rust); SectionTitle(t("Conversation history", "बातचीत का इतिहास")) } }
+        item { Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Default.History, null, tint = Rust); SectionTitle(t("Conversation history", "बातचीत का इतिहास")) } }
         item {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Box {
-                OutlinedButton(onClick = { doctorMenu = true }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(doctorFilter.ifBlank { t("All recorded doctors", "सभी दर्ज डॉक्टर") }) }
+                OutlinedButton(onClick = { doctorMenu = true }, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(doctorFilter.ifBlank { t("All recorded doctors", "सभी दर्ज डॉक्टर") }) }
                 DropdownMenu(doctorMenu, { doctorMenu = false }) {
                     DropdownMenuItem(text = { Text(t("All recorded doctors", "सभी दर्ज डॉक्टर")) }, onClick = { doctorFilter = ""; doctorMenu = false })
                     own.map { it.doctor }.filter(String::isNotBlank).distinct().sorted().forEach { name -> DropdownMenuItem(text = { Text(name) }, onClick = { doctorFilter = name; doctorMenu = false }) }
                 }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedButton(onClick = { val initial = dateFilter.takeIf(String::isNotBlank)?.let(LocalDate::parse) ?: LocalDate.now(); DatePickerDialog(context, { _, y, m, d -> dateFilter = LocalDate.of(y, m + 1, d).toString() }, initial.year, initial.monthValue - 1, initial.dayOfMonth).show() }, modifier = Modifier.weight(1f).heightIn(min = 48.dp)) { Text(if (dateFilter.isBlank()) t("Choose a day", "दिन चुनें") else LocalDate.parse(dateFilter).format(DateTimeFormatter.ofPattern("d MMM yyyy"))) }
+                OutlinedButton(onClick = { val initial = dateFilter.takeIf(String::isNotBlank)?.let(LocalDate::parse) ?: LocalDate.now(); DatePickerDialog(context, { _, y, m, d -> dateFilter = LocalDate.of(y, m + 1, d).toString() }, initial.year, initial.monthValue - 1, initial.dayOfMonth).show() }, shape = RoundedCornerShape(14.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp)) { Text(if (dateFilter.isBlank()) t("Choose a day", "दिन चुनें") else LocalDate.parse(dateFilter).format(DateTimeFormatter.ofPattern("d MMM yyyy"))) }
                 if (dateFilter.isNotBlank()) TextButton(onClick = { dateFilter = "" }, modifier = Modifier.heightIn(min = 48.dp)) { Text(t("Clear date", "तारीख़ हटाएँ")) }
             }
             }
         }
         val filtered = own.filter { (doctorFilter.isBlank() || it.doctor == doctorFilter) && (dateFilter.isBlank() || Instant.ofEpochMilli(it.published).atZone(ZoneId.systemDefault()).toLocalDate().toString() == dateFilter) }
-        if (filtered.isEmpty() && own.isNotEmpty()) item { Text(t("No conversation matches these filters.", "इन फ़िल्टरों से कोई बातचीत नहीं मिली।")) }
+        if (filtered.isEmpty() && own.isNotEmpty()) item { DoctorEmptyState(Icons.Default.History, t("No conversation matches these filters.", "इन फ़िल्टरों से कोई बातचीत नहीं मिली।")) }
+        if (own.isEmpty()) item { DoctorEmptyState(Icons.Default.Forum, t("Nothing saved yet", "अभी कुछ सहेजा नहीं")) }
         items(filtered, key = { it.id }) { DoctorConversationCard(it, onRead) }
-        item {SectionTitle(t("Archived drafts · not published", "सँभाले गए ड्राफ़्ट · प्रकाशित नहीं"))}
+        item { Spacer(Modifier.height(12.dp)); SectionTitle(t("Archived drafts · not published", "सँभाले गए ड्राफ़्ट · प्रकाशित नहीं")) }
         val ownArchives=archives.filter {it.personId==person}
-        if(ownArchives.isEmpty())item {Text(t("No archived drafts.", "कोई सँभाला ड्राफ़्ट नहीं।"))}
-        items(ownArchives,key={"archive:${it.id}"}) { saved -> OutlinedCard(onClick={archiveDetail=saved},modifier=Modifier.fillMaxWidth()){Column(Modifier.padding(18.dp),verticalArrangement=Arrangement.spacedBy(8.dp)){Text(t("Unfinished conversation draft", "अधूरा बातचीत ड्राफ़्ट"),style=MaterialTheme.typography.titleMedium);Text(conversationDate(saved.archivedAt))}} }
+        if(ownArchives.isEmpty())item { DoctorEmptyState(Icons.Default.Inventory2, t("No archived drafts.", "कोई सँभाला ड्राफ़्ट नहीं।")) }
+        items(ownArchives,key={"archive:${it.id}"}) { saved -> DoctorListRow(Icons.Default.Inventory2, t("Unfinished conversation draft", "अधूरा बातचीत ड्राफ़्ट"), conversationDate(saved.archivedAt), onClick = { archiveDetail = saved }) }
         }
     }
 }
@@ -209,7 +213,7 @@ private fun conversationDate(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy
 private fun doctorSectionLabel(key: String) = when (key) { "patient_priorities" -> "What matters"; "participants" -> "Who was there"; "understanding_questions" -> "What we discussed"; "concerns_uncertainty" -> "Still undecided"; else -> "Next steps" }
 private val doctorSectionOrder = listOf("patient_priorities", "participants", "understanding_questions", "concerns_uncertainty", "next_steps")
 
-@Composable private fun DoctorChip(text: String, fg: Color, bg: Color) { Surface(color = bg, contentColor = fg, shape = RoundedCornerShape(50)) { Text(text, fontSize = 12.sp, lineHeight = 16.sp, fontWeight = FontWeight.Medium, modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)) } }
+@Composable private fun DoctorChip(text: String, fg: Color, bg: Color) { Surface(color = bg, contentColor = fg, shape = RoundedCornerShape(50)) { Text(text, fontSize = 14.sp, lineHeight = 18.sp, fontWeight = FontWeight.Medium, modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)) } }
 @Composable private fun DoctorStatusChip(status: String) { val t = careText();
     when (status) {
         "discussed" -> DoctorChip(t("Discussed", "बात हुई"), DoctorStatusGood, DoctorStatusGoodBg)
@@ -219,7 +223,31 @@ private val doctorSectionOrder = listOf("patient_priorities", "participants", "u
         else -> DoctorChip(t("Needs review", "जाँच बाक़ी"), DoctorStatusWarn, DoctorStatusWarnBg)
     }
 }
-@Composable fun DoctorFootnote(text: String) { Text(text, fontSize = 12.sp, lineHeight = 17.sp, color = DoctorCardFaint) }
+@Composable fun DoctorFootnote(text: String) { Text(text, fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardFaint) }
+
+/** Friendly empty list: an icon in a soft circle and one line. */
+@Composable private fun DoctorEmptyState(icon: androidx.compose.ui.graphics.vector.ImageVector, text: String) {
+    Surface(color = DoctorCardReport, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
+        Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Box(Modifier.size(40.dp).background(DoctorCardConversation, CircleShape), contentAlignment = Alignment.Center) { Icon(icon, null, tint = RustText, modifier = Modifier.size(22.dp)) }
+            Text(text, fontSize = 16.sp, lineHeight = 22.sp, color = DoctorCardSub, modifier = Modifier.weight(1f))
+        }
+    }
+}
+
+/** One tappable list row: icon tile, title, one line under it, chevron. */
+@Composable private fun DoctorListRow(icon: androidx.compose.ui.graphics.vector.ImageVector, title: String, sub: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
+    Surface(onClick = onClick, color = DoctorCardReport, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = modifier.fillMaxWidth().heightIn(min = 72.dp)) {
+        Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Box(Modifier.size(40.dp).background(DoctorCardConversation, RoundedCornerShape(12.dp)), contentAlignment = Alignment.Center) { Icon(icon, null, tint = RustText, modifier = Modifier.size(22.dp)) }
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(title, fontFamily = SaharaTitleFont, fontSize = 18.sp, lineHeight = 24.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
+                if (sub.isNotBlank()) Text(sub, fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
+            }
+            Icon(Icons.Default.ChevronRight, null, tint = DoctorCardSub)
+        }
+    }
+}
 
 @Composable private fun DoctorQuote(text: String) {
     Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min).padding(start = 4.dp)) {
@@ -233,21 +261,21 @@ private val doctorSectionOrder = listOf("patient_priorities", "participants", "u
     val goals = remember(note.id, note.contextJson) { doctorContextGoals(Conversation(note.personId, source = note.source, contextJson = note.contextJson)).associateBy { it.key } }
     if (goals.isEmpty()) {
         Surface(color = DoctorCardReport, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
-            Text(runCatching { DoctorConversationContext.readable(note) }.getOrElse { t("This saved context needs an updated app. The original note has been retained.", "इस सहेजे संदर्भ के लिए नया ऐप चाहिए। मूल नोट रखा गया है।") }.ifBlank { t("No saved goals were recorded for this version.", "इस संस्करण के लिए कोई लक्ष्य सहेजा नहीं गया।") }, fontSize = 15.sp, lineHeight = 23.sp, color = DoctorCardInk, modifier = Modifier.padding(18.dp))
+            Text(runCatching { DoctorConversationContext.readable(note) }.getOrElse { t("This saved context needs an updated app. The original note has been retained.", "इस सहेजे संदर्भ के लिए नया ऐप चाहिए। मूल नोट रखा गया है।") }.ifBlank { t("No saved goals were recorded for this version.", "इस संस्करण के लिए कोई लक्ष्य सहेजा नहीं गया।") }, fontSize = 16.sp, lineHeight = 24.sp, color = DoctorCardInk, modifier = Modifier.padding(16.dp))
         }
         return
     }
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         doctorSectionOrder.mapNotNull { goals[it] }.forEach { goal ->
             Surface(color = DoctorCardReport, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth()) {
-                Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text(doctorSectionLabel(goal.key), fontFamily = SaharaTitleFont, fontSize = 19.sp, lineHeight = 24.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.weight(1f))
                         DoctorStatusChip(goal.status)
                     }
-                    Text(goal.answer.ifBlank { t("Nothing was recorded for this section.", "इस हिस्से के लिए कुछ दर्ज नहीं।") }, fontSize = 15.sp, lineHeight = 23.sp, color = DoctorCardInk)
+                    Text(goal.answer.ifBlank { t("Nothing was recorded for this section.", "इस हिस्से के लिए कुछ दर्ज नहीं।") }, fontSize = 16.sp, lineHeight = 24.sp, color = if (goal.answer.isBlank()) DoctorCardSub else DoctorCardInk)
                     goal.evidence.forEach { DoctorQuote(it.quote) }
-                    if (CarriedForward.isOrigin(goal.origin)) Text(t("Carried forward from version ${CarriedForward.version(goal.origin)}, not discussed in this conversation", "संस्करण ${CarriedForward.version(goal.origin)} से आगे लाया गया, इस बातचीत में चर्चा नहीं हुई"), fontSize = 12.sp, lineHeight = 16.sp, color = RustText)
+                    if (CarriedForward.isOrigin(goal.origin)) Text(t("Carried forward from version ${CarriedForward.version(goal.origin)}, not discussed in this conversation", "संस्करण ${CarriedForward.version(goal.origin)} से आगे लाया गया, इस बातचीत में चर्चा नहीं हुई"), fontSize = 14.sp, lineHeight = 20.sp, color = RustText)
                 }
             }
         }
@@ -265,12 +293,12 @@ private val doctorSectionOrder = listOf("patient_priorities", "participants", "u
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
-                if (title) Text(summary, fontFamily = SaharaTitleFont, fontSize = 19.sp, lineHeight = 24.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk) else Text(summary, fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub)
-                if (hint.isNotBlank()) Text(hint, fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub)
+                if (title) Text(summary, fontFamily = SaharaTitleFont, fontSize = 19.sp, lineHeight = 24.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk) else Text(summary, fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
+                if (hint.isNotBlank()) Text(hint, fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
             }
             IconButton(onClick = { open = !open }, modifier = Modifier.size(48.dp)) { Icon(Icons.Outlined.Info, if (open) t("Hide details: $summary", "जानकारी छिपाएँ: $summary") else t("Show details: $summary", "जानकारी देखें: $summary"), tint = DoctorAccent) }
         }
-        if (open) Text(detail, fontSize = 13.sp, lineHeight = 19.sp, color = DoctorCardSub, modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite })
+        if (open) Text(detail, fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub, modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite })
     }
 }
 
@@ -308,7 +336,7 @@ private val doctorSectionOrder = listOf("patient_priorities", "participants", "u
 }
 
 @Composable fun DoctorConversationLanding(canRecord: Boolean, onRecent: () -> Unit, onRecord: () -> Unit, onHistory: () -> Unit, recentPreview: String? = null, archivedCount: Int = 0, discussions: androidx.compose.foundation.lazy.LazyListScope.() -> Unit = {}) { val t = careText();
-    LazyColumn(Modifier.fillMaxSize().testTag("doctor-conversations"), contentPadding = PaddingValues(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    LazyColumn(Modifier.fillMaxSize().testTag("doctor-conversations"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { Heading(t("Goals of care", "देखभाल के लक्ष्य"), 30) }
         val titles = listOf(t("Recent conversation", "हाल की बातचीत"), t("Record conversation", "बातचीत रिकॉर्ड करें"), t("Conversation history", "बातचीत का इतिहास"))
         val arts = listOf(R.drawable.conversation_recent_art, R.drawable.conversation_record_art, R.drawable.conversation_history_art)
@@ -319,11 +347,11 @@ private val doctorSectionOrder = listOf("patient_priorities", "participants", "u
             val ink = if (primary) Color.White else DoctorCardInk
             val sub = if (primary) Color.White else DoctorCardSub
             Surface(onClick = when (index) { 0 -> onRecent; 1 -> onRecord; else -> onHistory }, enabled = index != 1 || canRecord, color = if (primary) DoctorAccent else DoctorCardConversation, contentColor = ink, shape = RoundedCornerShape(20.dp), modifier = Modifier.fillMaxWidth().heightIn(min = if (primary) 172.dp else 120.dp).testTag(if (index == 1) "doctor-start-conversation" else "doctor-conversation-card-$index")) {
-                BoxWithConstraints(Modifier.fillMaxWidth().padding(18.dp)) {
+                BoxWithConstraints(Modifier.fillMaxWidth().padding(16.dp)) {
                     Image(saharaImage(arts[index], 120.dp), contentDescription = null, contentScale = ContentScale.Fit, alpha = if (primary) .5f else .4f, modifier = Modifier.align(Alignment.BottomEnd).width(maxWidth * .30f).height(if (primary) 120.dp else 80.dp).testTag("doctor-conversation-art-$index"))
                     Column(Modifier.fillMaxWidth(.67f).testTag("doctor-conversation-copy-$index"), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text(titles[index], fontFamily = SaharaTitleFont, fontSize = if (primary) 21.sp else 19.sp, lineHeight = 26.sp, fontWeight = FontWeight.Medium, color = ink)
-                        Text(previews[index], fontSize = 12.sp, lineHeight = 16.sp, fontWeight = FontWeight.Medium, color = ink)
+                        Text(previews[index], fontSize = 14.sp, lineHeight = 20.sp, fontWeight = FontWeight.Medium, color = sub)
                     }
                 }
             }
@@ -334,12 +362,7 @@ private val doctorSectionOrder = listOf("patient_priorities", "participants", "u
 
 /** A saved conversation note in the Goals of care list; it opens in the note reader, which shows the form's layout. */
 @Composable private fun DoctorNoteDiscussionRow(note: CareVersion, onOpen: () -> Unit) { val t = careText()
-    Surface(onClick = onOpen, color = DoctorCardReport, shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().heightIn(min = 72.dp).testTag("doctor-goc-note-${note.id}")) {
-        Column(Modifier.padding(horizontal = 18.dp, vertical = 14.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text(t("Version ", "संस्करण ") + note.version + " · " + conversationDate(note.published), fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
-            Text(ReviewWorkflow.label(note), fontSize = 13.sp, fontWeight = FontWeight.Medium, color = DoctorCardSub)
-        }
-    }
+    DoctorListRow(Icons.Default.Description, t("Version ", "संस्करण ") + note.version + " · " + conversationDate(note.published), ReviewWorkflow.label(note), Modifier.testTag("doctor-goc-note-${note.id}"), onOpen)
 }
 
 internal fun doctorContextGoals(draft: Conversation): List<DoctorGoalContext> = runCatching {
@@ -405,14 +428,14 @@ internal fun assignDoctorSource(vm: CareModel, expected: Conversation, index: In
 }
 
 @Composable private fun DoctorConversationCard(note: CareVersion, onRead: (CareVersion) -> Unit) { val t = careText();
-    Surface(color = DoctorCardConversation, shape = RoundedCornerShape(20.dp), modifier = Modifier.fillMaxWidth()) { Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    Surface(color = DoctorCardConversation, shape = RoundedCornerShape(20.dp), modifier = Modifier.fillMaxWidth()) { Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text("Version ${note.version}", fontFamily = SaharaTitleFont, fontSize = 21.sp, lineHeight = 26.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
-            Text("${conversationDate(note.published)} \u00B7 ${note.doctor.ifBlank { t("Doctor name not recorded", "डॉक्टर का नाम दर्ज नहीं") }}", fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub)
+            Text("${conversationDate(note.published)} \u00B7 ${note.doctor.ifBlank { t("Doctor name not recorded", "डॉक्टर का नाम दर्ज नहीं") }}", fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
         }
-        Text(note.topics.ifBlank { note.priorities.ifBlank { t("Read the saved conversation", "सहेजी बातचीत पढ़ें") } }, fontSize = 15.sp, lineHeight = 23.sp, color = DoctorCardInk, maxLines = 3, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
-        Text(ReviewWorkflow.label(note), fontSize = 12.sp, lineHeight = 16.sp, color = DoctorCardFaint)
-        Button(onClick = { onRead(note) }, colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent, contentColor = Color.White), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Read full note and original words", "पूरा नोट और मूल शब्द पढ़ें")) }
+        Text(note.topics.ifBlank { note.priorities.ifBlank { t("Read the saved conversation", "सहेजी बातचीत पढ़ें") } }, fontSize = 16.sp, lineHeight = 24.sp, color = DoctorCardInk, maxLines = 3, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+        Text(ReviewWorkflow.label(note), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
+        Button(onClick = { onRead(note) }, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = DoctorAccent, contentColor = Color.White), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(t("Read full note and original words", "पूरा नोट और मूल शब्द पढ़ें")) }
     } }
 }
 
@@ -421,13 +444,13 @@ internal fun assignDoctorSource(vm: CareModel, expected: Conversation, index: In
     // One quiet header: title, live/idle state and mode. The single record control, consent and transcript live in the panel below.
     Surface(color = DoctorCardConversation, contentColor = DoctorCardInk, shape = RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp), modifier = Modifier.fillMaxWidth().testTag("doctor-capture-hero")) {
         Column(Modifier.padding(horizontal = 20.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            if (onBack != null) TextButton(onClick = onBack, enabled = backEnabled, colors = ButtonDefaults.textButtonColors(contentColor = DoctorAccent), contentPadding = PaddingValues(0.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-capture-back")) { Text(t("Back to conversations", "बातचीत पर वापस"), fontSize = 13.sp) }
+            if (onBack != null) TextButton(onClick = onBack, enabled = backEnabled, colors = ButtonDefaults.textButtonColors(contentColor = DoctorAccent), contentPadding = PaddingValues(0.dp), modifier = Modifier.heightIn(min = 48.dp).testTag("doctor-capture-back")) { Text(t("Back to conversations", "बातचीत पर वापस"), fontSize = 14.sp) }
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text(t("Conversation", "बातचीत"), fontFamily = SaharaTitleFont, fontSize = 21.sp, lineHeight = 26.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         Box(Modifier.size(10.dp).background(if (recording) DoctorAccent else DoctorCardFaint, CircleShape))
-                        Text(if (recording) "Recording ${seconds / 60}:${(seconds % 60).toString().padStart(2, '0')}" else if (dictating) t("Dictation in progress", "बोलकर लिखना जारी है") else t("$mode mode \u00B7 ready when you are", "${when (mode) { "Record" -> "रिकॉर्ड"; "Dictate" -> "बोलकर लिखना"; "Type" -> "टाइप"; else -> mode }} \u00B7 जब आप तैयार हों"), fontSize = 13.sp, lineHeight = 18.sp, color = DoctorCardSub)
+                        Text(if (recording) "Recording ${seconds / 60}:${(seconds % 60).toString().padStart(2, '0')}" else if (dictating) t("Dictation in progress", "बोलकर लिखना जारी है") else t("$mode mode \u00B7 ready when you are", "${when (mode) { "Record" -> "रिकॉर्ड"; "Dictate" -> "बोलकर लिखना"; "Type" -> "टाइप"; else -> mode }} \u00B7 जब आप तैयार हों"), fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardSub)
                     }
                 }
                 Box { IconButton(onClick = { menu = true }, enabled = !recording && !dictating, modifier = Modifier.size(48.dp).testTag("doctor-capture-mode")) { Icon(Icons.Default.MoreVert, t("Choose Record, Dictate or Type", "रिकॉर्ड, बोलकर लिखें या टाइप चुनें"), tint = DoctorCardInk) }; DropdownMenu(menu, { menu = false }) { listOf("Record", "Dictate", "Type").forEach { value -> val available = when(value) { "Record" -> localRecordingAllowed; "Dictate" -> !demo; else -> true }; DropdownMenuItem(text = { Text(value + if (!available) " \u00B7 unavailable" else "") }, enabled = available, onClick = { onMode(value); menu = false }) } } }

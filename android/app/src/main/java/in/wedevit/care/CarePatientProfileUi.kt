@@ -63,8 +63,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 @Composable fun PatientProfileCard(profile: CarePatientProfile?, name: String, editable: Boolean, onEdit: () -> Unit, modifier: Modifier = Modifier, tag: String = "patient-profile-card") {
     val t = careText()
     if (profile == null) {
-        Surface(shape = RoundedCornerShape(16.dp), color = Cream, border = BorderStroke(1.dp, DoctorHairline), modifier = modifier.fillMaxWidth().testTag(tag)) {
-            Text(t("No profile details yet", "अभी प्रोफ़ाइल की जानकारी नहीं"), Modifier.padding(horizontal = 16.dp, vertical = 14.dp), fontSize = 14.sp, color = DoctorCardSub)
+        Surface(shape = RoundedCornerShape(20.dp), color = Cream, border = BorderStroke(1.dp, DoctorHairline), modifier = modifier.fillMaxWidth().testTag(tag)) {
+            Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.PersonOutline, null, Modifier.size(20.dp), tint = DoctorCardSub); Spacer(Modifier.width(12.dp))
+                Text(t("No profile details yet", "अभी प्रोफ़ाइल की जानकारी नहीं"), fontSize = 14.sp, color = DoctorCardSub)
+            }
         }
         return
     }
@@ -74,19 +77,20 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
     val illness = profile.illness.ifBlank { if (editable) t("Add main illness", "मुख्य बीमारी जोड़ें") else "" }
     val contact = listOf(profile.phone, profile.address).filter(String::isNotBlank).joinToString("  ·  ")
     val weights = CareWeightHistory.forCard(profile)
-    Surface(shape = RoundedCornerShape(24.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = modifier.fillMaxWidth().testTag(tag)) {
-        Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+    // Kept short on purpose: the Account tab pins this card above its list, so the screen should fit without scrolling.
+    Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = BorderStroke(1.dp, DoctorHairline), modifier = modifier.fillMaxWidth().testTag(tag)) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 // A plain initial on a soft colour: no photo is stored.
-                Surface(shape = RoundedCornerShape(18.dp), color = SaharaApricot, modifier = Modifier.size(56.dp)) { Box(contentAlignment = Alignment.Center) { Text(name.take(1).uppercase(), fontFamily = SaharaTitleFont, fontSize = 26.sp, color = DoctorAccent) } }
+                Surface(shape = CircleShape, color = SaharaApricot, modifier = Modifier.size(48.dp)) { Box(contentAlignment = Alignment.Center) { Text(name.take(1).uppercase(), fontFamily = SaharaTitleFont, fontSize = 22.sp, fontWeight = FontWeight.Medium, color = DoctorAccent) } }
                 Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f)) {
-                    Text(name, fontFamily = SaharaTitleFont, fontSize = 21.sp, fontWeight = FontWeight.Bold, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(name, fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     val line = listOf(sex, illness).filter(String::isNotBlank).joinToString(" · ")
                     if (line.isNotBlank()) Text(line, fontSize = 14.sp, color = DoctorCardSub, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
-                if (editable) TextButton(onClick = onEdit, modifier = Modifier.heightIn(min = 48.dp).testTag("patient-profile-edit")) {
-                    Icon(Icons.Default.Edit, null, Modifier.size(18.dp), tint = DoctorAccent); Spacer(Modifier.width(4.dp)); Text(t("Edit", "बदलें"), color = DoctorAccent)
+                if (editable) OutlinedButton(onClick = onEdit, shape = RoundedCornerShape(50), contentPadding = PaddingValues(horizontal = 12.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.heightIn(min = 48.dp).testTag("patient-profile-edit")) {
+                    Icon(Icons.Default.Edit, null, Modifier.size(18.dp), tint = DoctorAccent); Spacer(Modifier.width(4.dp)); Text(t("Edit", "बदलें"), color = DoctorAccent, fontWeight = FontWeight.SemiBold)
                 }
             }
             Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -103,15 +107,15 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
                 }
             }
             if (contact.isNotBlank()) Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(if (profile.phone.isNotBlank()) Icons.Default.Phone else Icons.Default.Place, null, Modifier.size(16.dp), tint = Rust); Spacer(Modifier.width(6.dp))
-                Text(contact, fontSize = 13.sp, color = DoctorCardSub, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Icon(if (profile.phone.isNotBlank()) Icons.Default.Phone else Icons.Default.Place, null, Modifier.size(18.dp), tint = Rust); Spacer(Modifier.width(8.dp))
+                Text(contact, fontSize = 14.sp, color = DoctorCardSub, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
         }
     }
     if (history) ProfileWeightHistoryDialog(profile.weightKg, weights) { history = false }
 }
 
-/** Current weight, the change since the weight before it and a small line of the last few weights. A tap opens the history. */
+/** Current weight with a trend badge (change since the weight before it) and a small line of the last few weights. A tap opens the history. */
 @Composable private fun ProfileWeightTile(kg: Double?, weights: List<CareWeightEntry>, onOpen: () -> Unit, tag: String) {
     val t = careText()
     val trend = CareWeightHistory.trend(weights); val change = CareWeightHistory.change(weights)
@@ -124,18 +128,23 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
     }
     val since = weights.takeIf { it.size >= 2 }?.let { it[it.size - 2].day }?.format(careDateFormat("d MMM", careHindi()))
     val open = weights.isNotEmpty()
-    Surface(onClick = onOpen, enabled = open, shape = RoundedCornerShape(16.dp), color = SaharaSoftGold, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag(tag)) {
-        Row(Modifier.padding(horizontal = 14.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-            Column(Modifier.weight(1f)) {
-                Text(t("Weight", "वज़न"), fontSize = 12.sp, color = DoctorCardSub, maxLines = 1)
-                Row(verticalAlignment = Alignment.Bottom) {
+    Surface(onClick = onOpen, enabled = open, shape = RoundedCornerShape(14.dp), color = SaharaSoftGold, modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag(tag)) {
+        Row(Modifier.padding(start = 12.dp, end = 8.dp, top = 8.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.Default.MonitorWeight, null, Modifier.size(20.dp), tint = DoctorAccent); Spacer(Modifier.width(8.dp))
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(t("Weight", "वज़न"), fontSize = 14.sp, color = DoctorCardSub, maxLines = 1); Spacer(Modifier.width(8.dp))
                     Text(value, fontSize = 17.sp, fontWeight = FontWeight.Bold, color = DoctorCardInk, maxLines = 1)
-                    if (changeText.isNotBlank()) Text("  $changeText" + (since?.let { " · " + t("since $it", "$it से") } ?: ""), fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = DoctorAccent, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                }
+                // The change as a small badge; the date it is measured from follows in quieter text.
+                if (changeText.isNotBlank()) Row(verticalAlignment = Alignment.CenterVertically) {
+                    Surface(shape = RoundedCornerShape(50), color = Paper) { Text(changeText, Modifier.padding(horizontal = 8.dp, vertical = 1.dp), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = DoctorAccent, maxLines = 1) }
+                    since?.let { Text(" " + t("since $it", "$it से"), fontSize = 14.sp, color = DoctorCardSub, maxLines = 1, overflow = TextOverflow.Ellipsis) }
                 }
             }
             val points = CareWeightHistory.recent(weights)
-            if (points.size >= 2) ProfileWeightSparkline(points, Modifier.width(84.dp).height(32.dp))
-            if (open) Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, t("Weight history", "वज़न का इतिहास"), Modifier.size(20.dp), tint = Rust)
+            if (points.size >= 2) { Spacer(Modifier.width(8.dp)); ProfileWeightSparkline(points, Modifier.width(72.dp).height(32.dp)) }
+            if (open) Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, t("Weight history", "वज़न का इतिहास"), Modifier.size(24.dp), tint = Rust)
         }
     }
 }
@@ -147,8 +156,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
         val low = points.minOf { it.kg }; val high = points.maxOf { it.kg }; val span = (high - low).takeIf { it > 0.0 } ?: 1.0
         val step = size.width / (points.size - 1).coerceAtLeast(1)
         val dots = points.mapIndexed { i, p -> Offset(i * step, (size.height - 4f) - ((p.kg - low) / span).toFloat() * (size.height - 8f)) }
-        dots.zipWithNext().forEach { (a, b) -> drawLine(line, a, b, strokeWidth = 2.5f, cap = StrokeCap.Round) }
-        drawCircle(line, radius = 4f, center = dots.last())
+        dots.zipWithNext().forEach { (a, b) -> drawLine(line, a, b, strokeWidth = 2.dp.toPx(), cap = StrokeCap.Round) }
+        drawCircle(line.copy(alpha = .35f), radius = 2.5.dp.toPx(), center = dots.first())
+        drawCircle(line, radius = 3.5.dp.toPx(), center = dots.last())
     }
 }
 
@@ -157,7 +167,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
     val t = careText(); val format = careDateFormat("d MMM yyyy", careHindi())
     val sorted = CareWeightHistory.sorted(weights)
     AlertDialog(onDismissRequest = onDismiss, title = { Text(t("Weight history", "वज़न का इतिहास")) }, text = {
-        Column(Modifier.heightIn(max = 360.dp).verticalScroll(rememberScrollState()).testTag("patient-profile-weight-history"), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Column(Modifier.heightIn(max = 360.dp).verticalScroll(rememberScrollState()).testTag("patient-profile-weight-history"), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            // The trend at a glance before the list of numbers.
+            CareWeightHistory.recent(sorted).takeIf { it.size >= 2 }?.let { points -> Surface(shape = RoundedCornerShape(14.dp), color = SaharaSoftGold, modifier = Modifier.fillMaxWidth()) { ProfileWeightSparkline(points, Modifier.fillMaxWidth().height(64.dp).padding(horizontal = 12.dp, vertical = 8.dp)) } }
             CareWeightHistory.changeSinceFirst(sorted)?.let { total ->
                 val sign = if (total > 0) "+" else if (total < 0) "−" else ""
                 Text(t("Since first", "पहली बार से") + ": $sign${CareWeightHistory.amountText(total)} ${t("kg", "किलो")}", fontWeight = FontWeight.SemiBold, color = DoctorAccent)
@@ -168,7 +180,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
                     Text(e.day.format(format), Modifier.weight(1f), fontSize = 14.sp, color = DoctorCardSub)
                     Text("${CarePatientProfileRules.weightText(e.kg)} ${t("kg", "किलो")}", fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
                     val d = before?.let { kotlin.math.round((e.kg - it.kg) * 10.0) / 10.0 }
-                    Text(when { d == null || d == 0.0 -> ""; d > 0 -> " ▲"; else -> " ▼" }, Modifier.widthIn(min = 22.dp), fontSize = 13.sp, color = DoctorAccent)
+                    Text(when { d == null || d == 0.0 -> ""; d > 0 -> " ▲"; else -> " ▼" }, Modifier.widthIn(min = 24.dp), fontSize = 14.sp, color = DoctorAccent)
                 }
             }
             if (sorted.isEmpty() && kg != null) Text("${CarePatientProfileRules.weightText(kg)} ${t("kg", "किलो")} · ${t("Date not recorded", "तारीख़ दर्ज नहीं")}", fontSize = 14.sp)
@@ -177,9 +189,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 }
 
 @Composable private fun ProfileTile(label: String, value: String, color: Color, modifier: Modifier) {
-    Surface(shape = RoundedCornerShape(16.dp), color = color, modifier = modifier) {
-        Column(Modifier.padding(horizontal = 10.dp, vertical = 8.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-            Text(label, fontSize = 12.sp, color = DoctorCardSub, maxLines = 1, overflow = TextOverflow.Ellipsis)
+    Surface(shape = RoundedCornerShape(14.dp), color = color, modifier = modifier) {
+        Column(Modifier.padding(horizontal = 8.dp, vertical = 8.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+            Text(label, fontSize = 14.sp, color = DoctorCardSub, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Text(value, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = DoctorCardInk, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
     }
@@ -200,11 +212,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
     var error by remember { mutableStateOf<ProfileError?>(null) }
     fun sexLabel(v: String) = when (v) { "Female" -> t("Female", "महिला"); "Male" -> t("Male", "पुरुष"); else -> t("Other", "अन्य") }
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
-        Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(horizontal = 20.dp).padding(bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).imePadding().padding(horizontal = 16.dp).padding(bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(t("Edit profile", "प्रोफ़ाइल बदलें"), fontFamily = SaharaTitleFont, fontSize = 24.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
             ProfileStep(1, t("About", "परिचय")) {
                 ProfileField(age, { age = it.filter(Char::isDigit).take(3) }, t("Age (years)", "उम्र (साल)"), Icons.Default.Cake, KeyboardType.Number)
-                Text(t("Sex", "लिंग"), fontSize = 13.sp, color = DoctorCardSub)
+                Text(t("Sex", "लिंग"), fontSize = 14.sp, color = DoctorCardSub)
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) { CarePatientProfile.SEX.forEach { v -> ProfileChip(sex == v, sexLabel(v), Modifier.weight(1f)) { sex = if (sex == v) "" else v } } }
             }
             ProfileStep(2, t("Body", "शरीर")) {
@@ -212,7 +224,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
                     ProfileField(weight, { weight = it.filter { c -> c.isDigit() || c == '.' || c == ',' }.take(6) }, t("Weight (kg)", "वज़न (किलो)"), Icons.Default.MonitorWeight, KeyboardType.Decimal, Modifier.weight(1f))
                     ProfileField(height, { height = it.filter(Char::isDigit).take(3) }, t("Height (cm)", "क़द (सेमी)"), Icons.Default.Height, KeyboardType.Number, Modifier.weight(1f))
                 }
-                Text(t("Blood group", "ख़ून का समूह"), fontSize = 13.sp, color = DoctorCardSub)
+                Text(t("Blood group", "ख़ून का समूह"), fontSize = 14.sp, color = DoctorCardSub)
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) { CarePatientProfile.BLOOD.forEach { v -> ProfileChip(blood == v, if (v == "Not known") t("Not known", "पता नहीं") else v) { blood = if (blood == v) "" else v } } }
             }
             ProfileStep(3, t("Health", "सेहत")) {
@@ -224,15 +236,15 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
                 ProfileField(address, { address = it.take(160) }, t("City / address", "शहर / पता"), Icons.Default.Place)
             }
             error?.let { Text(t(it.en, it.hi), color = RustText, fontSize = 14.sp, fontWeight = FontWeight.Medium) }
-            Text(if (shared) t("Shared with the family and doctors you share this care with.", "उन परिवारजनों और डॉक्टरों के साथ साझा, जिनके साथ आप यह देखभाल साझा करते हैं।") else t("Saved on this phone only.", "सिर्फ़ इसी फ़ोन पर सहेजा जाता है।"), fontSize = 13.sp, color = DoctorCardSub)
+            Text(if (shared) t("Shared with the family and doctors you share this care with.", "उन परिवारजनों और डॉक्टरों के साथ साझा, जिनके साथ आप यह देखभाल साझा करते हैं।") else t("Saved on this phone only.", "सिर्फ़ इसी फ़ोन पर सहेजा जाता है।"), fontSize = 14.sp, color = DoctorCardSub)
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
-                OutlinedButton(onClick = onDismiss, modifier = Modifier.weight(1f).heightIn(min = 52.dp), shape = RoundedCornerShape(50)) { Text(t("Cancel", "रद्द करें")) }
+                OutlinedButton(onClick = onDismiss, modifier = Modifier.weight(1f).heightIn(min = 52.dp), shape = RoundedCornerShape(14.dp)) { Text(t("Cancel", "रद्द करें")) }
                 Button(onClick = {
                     val a = CarePatientProfileRules.age(age); val w = CarePatientProfileRules.weight(weight); val h = CarePatientProfileRules.height(height)
                     val bad = a.second ?: w.second ?: h.second
                     if (bad != null) error = bad
                     else onSave(CarePatientProfile(a.first, sex, w.first, h.first, blood, illness.trim(), allergies.trim(), phone.trim(), address.trim(), CareWeightHistory.afterSave(initial, w.first, java.time.LocalDate.now())))
-                }, enabled = !busy, modifier = Modifier.weight(1f).heightIn(min = 52.dp).testTag("patient-profile-save"), shape = RoundedCornerShape(50)) { Text(t("Save", "सहेजें")) }
+                }, enabled = !busy, modifier = Modifier.weight(1f).heightIn(min = 52.dp).testTag("patient-profile-save"), shape = RoundedCornerShape(14.dp)) { Text(if (busy) t("Saving…", "सहेज रहे हैं…") else t("Save", "सहेजें")) }
             }
         }
     }
@@ -256,7 +268,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 /** A rounded text field with a small leading icon. */
 @Composable private fun ProfileField(value: String, onChange: (String) -> Unit, label: String, icon: ImageVector, keyboard: KeyboardType = KeyboardType.Text, modifier: Modifier = Modifier.fillMaxWidth()) {
     OutlinedTextField(value, onChange, modifier, label = { Text(label) }, leadingIcon = { Icon(icon, null, Modifier.size(20.dp), tint = DoctorAccent) },
-        singleLine = keyboard != KeyboardType.Text, keyboardOptions = KeyboardOptions(keyboardType = keyboard), shape = RoundedCornerShape(16.dp),
+        singleLine = keyboard != KeyboardType.Text, keyboardOptions = KeyboardOptions(keyboardType = keyboard), shape = RoundedCornerShape(14.dp),
         colors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = Cream, focusedContainerColor = Paper))
 }
 

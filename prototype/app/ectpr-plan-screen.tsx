@@ -977,7 +977,14 @@ function Wizard({ t, lang, draft, previous, issues, step, busy, error, toast, di
   const stepTitle = t(STEPS[step].en, STEPS[step].hi);
   const stepBody = useRef<HTMLDivElement>(null);
   const [gocOpen, setGocOpen] = useState(false);
+  const stepList = useRef<HTMLOListElement>(null);
+  // Keeps the current step pill in view on a phone, where the row scrolls sideways.
+  useEffect(() => {
+    const list = stepList.current; const current = list?.querySelector<HTMLElement>('[aria-current="step"]');
+    if (list && current) list.scrollTo({ left: Math.max(0, current.offsetLeft - list.clientWidth / 2 + current.offsetWidth / 2), behavior: 'smooth' });
+  }, [step]);
   const gocEntry = <div className="ep-notice ep-info ep-goc-entry">
+    <span className="ep-goc-entry-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="3" width="6" height="11" rx="3" /><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7" /></svg></span>
     <p><strong>{t('Goals-of-care conversation', 'देखभाल के लक्ष्यों की बातचीत')}</strong></p>
     <button type="button" className="ep-btn" onClick={() => setGocOpen(true)}>{t('Record the conversation', 'बातचीत रिकॉर्ड करें')}</button>
   </div>;
@@ -1021,9 +1028,9 @@ function Wizard({ t, lang, draft, previous, issues, step, busy, error, toast, di
       <div className="ep-progress-track" role="progressbar" aria-label={t('Plan progress', 'योजना की प्रगति')} aria-valuemin={1} aria-valuemax={STEPS.length} aria-valuenow={step + 1}>
         <div className="ep-progress-fill" style={{ width: `${progress * 100}%` }} />
       </div>
-      <ol className="ep-steps" aria-label={t('Steps', 'चरण')}>
+      <ol className="ep-steps" ref={stepList} aria-label={t('Steps', 'चरण')}>
         {STEPS.map((item, index) => <li key={item.en}><button type="button" aria-current={index === step ? 'step' : undefined} data-done={index < step || undefined}
-          onClick={() => goTo(index)}>{index + 1}. {t(item.en, item.hi)}</button></li>)}
+          onClick={() => goTo(index)}><span className="ep-step-n" aria-hidden="true">{index < step ? '✓' : index + 1}</span><span className="sr-only">{index + 1}. </span>{t(item.en, item.hi)}</button></li>)}
       </ol>
     </div>
 
@@ -1036,7 +1043,7 @@ function Wizard({ t, lang, draft, previous, issues, step, busy, error, toast, di
 
     <form className="ep-card" noValidate onSubmit={(event) => { event.preventDefault(); goTo(step + 1); }}>
       <div key={step} className="ep-step" ref={stepBody}>
-        <div className="ep-step-title"><h2 ref={heading} tabIndex={-1}>{stepTitle}</h2><span>{t(`Step ${step + 1} of ${STEPS.length}`, `चरण ${step + 1} / ${STEPS.length}`)}</span><ReadAloudButton lang={lang} target={stepBody} /></div>
+        <div className="ep-step-title"><h2 ref={heading} tabIndex={-1}>{stepTitle}</h2><ReadAloudButton lang={lang} target={stepBody} /></div>
         <IssueList t={t} lang={lang} issues={stepIssues} record={draft} />
 
         {step === 0 ? <>

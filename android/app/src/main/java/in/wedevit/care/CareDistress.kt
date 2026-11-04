@@ -40,6 +40,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
@@ -202,7 +203,7 @@ internal object DistressCodec {
     fun markDone(step: Int) { doneSteps = (finished + step).joinToString(",") }
     LaunchedEffect(Unit) { vm.actionError.value = null }
     BackHandler { onClose() }
-    Column(Modifier.fillMaxSize().background(Cream).safeDrawingPadding().imePadding().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp).padding(bottom = 16.dp).testTag("distress-screen"), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+    Column(Modifier.fillMaxSize().background(Cream).safeDrawingPadding().imePadding().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp).padding(bottom = 16.dp).testTag("distress-screen"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onClose, modifier = Modifier.sizeIn(minWidth = 48.dp, minHeight = 48.dp).testTag("distress-close")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t("Close", "बंद करें"), tint = Ink) }
             Box(Modifier.weight(1f)) { Heading(t("Distress Thermometer", "परेशानी थर्मामीटर"), 24) }
@@ -229,7 +230,7 @@ internal object DistressCodec {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(t(category.en, category.hi), fontFamily = SaharaTitleFont, fontSize = 19.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk, modifier = Modifier.a11yHeading())
                     DistressProblemGroup(category, colour, chosen) { id -> ticked = (if (id in chosen) chosen - id else chosen + id).joinToString("\n") }
-                    OutlinedButton(onClick = { markDone(step); open = -1 }, shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("distress-done-$step")) {
+                    OutlinedButton(onClick = { markDone(step); open = -1 }, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("distress-done-$step")) {
                         Text(t("Done", "हो गया"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
                     }
                 }
@@ -237,8 +238,8 @@ internal object DistressCodec {
         }
         AnimatedVisibility(open == 6, enter = SaharaMotion.expand, exit = SaharaMotion.collapse) {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(other, { if (it.length <= DistressRules.OTHER_LIMIT) other = it }, label = { Text(t("Any other concern (optional)", "कोई और चिंता (चाहें तो)")) }, minLines = 2, maxLines = 4, shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth().testTag("distress-other"))
-                OutlinedButton(onClick = { markDone(6); open = -1 }, shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("distress-done-6")) {
+                OutlinedTextField(other, { if (it.length <= DistressRules.OTHER_LIMIT) other = it }, label = { Text(t("Any other concern (optional)", "कोई और चिंता (चाहें तो)")) }, minLines = 2, maxLines = 4, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().testTag("distress-other"))
+                OutlinedButton(onClick = { markDone(6); open = -1 }, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("distress-done-6")) {
                     Text(t("Done", "हो गया"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
                 }
             }
@@ -248,7 +249,7 @@ internal object DistressCodec {
             val check = DistressCheck(true, score, DistressRules.problems.filter { it in chosen }, other.trim())
             val change = DistressRules.change(today, check)
             when { change == null -> onClose(); !canEditCareContext(vm, person, capturedAccount) -> onClose(); today != null -> vm.updateItem(change, onClose); else -> vm.saveItem("checkin", change.title, change.detail, 0, onClose) }
-        }, enabled = !busy && score in 0..10, shape = RoundedCornerShape(18.dp), colors = ButtonDefaults.buttonColors(containerColor = Rust, contentColor = Color.White), modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("distress-save")) {
+        }, enabled = !busy && score in 0..10, shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = Rust, contentColor = Color.White), modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp).testTag("distress-save")) {
             Text(if (score in 0..10) t("Save", "सहेजें") else t("Choose a number to save", "सहेजने के लिए अंक चुनें"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
         }
     }
@@ -261,11 +262,12 @@ private fun distressAbout(t: (String, String) -> String): String =
 
 @Composable private fun DistressSource() {
     val t = careText()
-    Text(t("Source: NCCN Distress Thermometer and Problem List, NCCN Guidelines Version 1.2026 (Distress Management).", "स्रोत: NCCN Distress Thermometer and Problem List, NCCN Guidelines संस्करण 1.2026। हिंदी अनुवाद Sahara का है, NCCN का नहीं।"), fontSize = 12.sp, lineHeight = 16.sp, color = DoctorCardFaint, modifier = Modifier.testTag("distress-source"))
+    Text(t("Source: NCCN Distress Thermometer and Problem List, NCCN Guidelines Version 1.2026 (Distress Management).", "स्रोत: NCCN Distress Thermometer and Problem List, NCCN Guidelines संस्करण 1.2026। हिंदी अनुवाद Sahara का है, NCCN का नहीं।"), fontSize = 13.sp, lineHeight = 17.sp, color = DoctorCardFaint, modifier = Modifier.testTag("distress-source"))
 }
 
 /** Thermometer colours: green for 0–3, amber for 4–6, red for 7–10. */
-private fun distressBand(n: Int): Color = when { n <= 3 -> Color(0xFF2E8B57); n <= 6 -> Color(0xFFE8A317); else -> Color(0xFFC62828) }
+/** The same three bands as every other chart in the app (ChartBands), so a 7 looks the same here and on the symptom graphs. */
+private fun distressBand(n: Int): Color = ChartBands.color(n)
 /** Darker versions of the same colours, for text on the cream background. */
 private fun distressBandText(n: Int): Color = when { n <= 3 -> Color(0xFF1E6B3C); n <= 6 -> Color(0xFF8A5A00); else -> Color(0xFFB3261E) }
 private fun distressOnBand(n: Int): Color = if (n in 4..6) Ink else Color.White
@@ -291,7 +293,7 @@ private val DistressRowHeight = 24.dp
     val picked = score in 0..10
     val empty = Color(0xFFEDE4D8)
     Column(modifier.testTag("distress-thermometer"), horizontalAlignment = Alignment.Start) {
-        Text(t("Extreme distress", "बहुत ज़्यादा परेशानी"), fontSize = 12.sp, lineHeight = 14.sp, color = DoctorCardSub, modifier = Modifier.padding(bottom = 4.dp))
+        Text(t("Extreme distress", "बहुत ज़्यादा परेशानी"), fontSize = 13.sp, lineHeight = 16.sp, fontWeight = FontWeight.Medium, color = DoctorCardSub, modifier = Modifier.padding(bottom = 4.dp))
         Column(Modifier.selectableGroup().pointerInput(Unit) {
             val row = DistressRowHeight.toPx()
             detectVerticalDragGestures { change, _ -> pick(10 - (change.position.y / row).toInt().coerceIn(0, 10)) }
@@ -316,7 +318,7 @@ private val DistressRowHeight = 24.dp
         Box(Modifier.padding(start = 24.dp).offset(y = (-4).dp).size(44.dp).background(if (picked) distressBand(score) else empty, CircleShape).testTag("distress-chosen"), contentAlignment = Alignment.Center) {
             Text(if (picked) "$score" else "–", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = if (picked) distressOnBand(score) else DoctorCardSub)
         }
-        Text(t("No distress", "कोई परेशानी नहीं"), fontSize = 12.sp, lineHeight = 14.sp, color = DoctorCardSub)
+        Text(t("No distress", "कोई परेशानी नहीं"), fontSize = 13.sp, lineHeight = 16.sp, fontWeight = FontWeight.Medium, color = DoctorCardSub)
     }
 }
 
@@ -357,10 +359,15 @@ private val DistressRowHeight = 24.dp
     val t = careText(); val hindi = careHindi()
     val check = DistressCodec.decode(item.detail)
     SurfaceCard {
-        Text(check?.let { DistressRules.shownTitle(it, hindi) } ?: t("This distress answer could not be read.", "यह परेशानी वाला जवाब पढ़ा नहीं जा सका।"), fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
-        check?.let { DistressRules.summary(it, hindi) }?.takeIf { it.isNotBlank() }?.let { Text(it, style = MaterialTheme.typography.bodyMedium) }
-        Text(date(item.created), style = MaterialTheme.typography.bodySmall)
-        DistressSource()
+        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                if (check != null) DistressScoreChip(check)
+                Text(check?.let { DistressRules.shownTitle(it, hindi) } ?: t("This distress answer could not be read.", "यह परेशानी वाला जवाब पढ़ा नहीं जा सका।"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, modifier = Modifier.weight(1f))
+            }
+            check?.let { DistressRules.summary(it, hindi) }?.takeIf { it.isNotBlank() }?.let { Text(it, fontSize = 15.sp, lineHeight = 21.sp, color = DoctorCardInk) }
+            Text(date(item.created), fontSize = 14.sp, color = DoctorCardSub)
+            DistressSource()
+        }
     }
 }
 
@@ -381,11 +388,27 @@ private val DistressRowHeight = 24.dp
                 description = summary, latestText = { it.toInt().toString() }, tag = "distress-history", height = 160.dp,
                 bands = listOf(ChartBand(0.0, 3.5, Sage, 0.10f), ChartBand(3.5, 6.5, distressBand(5), 0.10f), ChartBand(6.5, 10.0, distressBand(8), 0.10f)),
                 pointText = { it.toInt().toString() })
-            history.take(5).forEach { (item, check) ->
-                Text("${Instant.ofEpochMilli(item.created).atZone(ZoneId.systemDefault()).format(day)} · ${DistressRules.shownTitle(check, hindi)}" + DistressRules.summary(check, hindi).let { if (it.isBlank()) "" else " · $it" }, fontSize = 14.sp, lineHeight = 20.sp, color = DoctorCardInk)
+            // The latest answers as one list with dividers: score chip, date, then any ticked problems.
+            history.take(5).forEachIndexed { i, (item, check) ->
+                if (i > 0) HorizontalDivider(color = DoctorHairline)
+                Row(Modifier.fillMaxWidth().semantics(mergeDescendants = true) {}, verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    DistressScoreChip(check)
+                    Column(Modifier.weight(1f)) {
+                        Text(Instant.ofEpochMilli(item.created).atZone(ZoneId.systemDefault()).format(day) + " · " + DistressRules.shownTitle(check, hindi), fontSize = 15.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
+                        DistressRules.summary(check, hindi).takeIf { it.isNotBlank() }?.let { Text(it, fontSize = 14.sp, lineHeight = 19.sp, color = DoctorCardSub) }
+                    }
+                }
             }
-            Text(t("Self-reported. Not a diagnosis.", "अपनी बताई सूचना। यह निदान नहीं है।"), fontSize = 12.sp, color = DoctorCardFaint)
+            Text(t("Self-reported. Not a diagnosis.", "अपनी बताई सूचना। यह निदान नहीं है।"), fontSize = 14.sp, color = DoctorCardFaint)
             DistressSource()
         }
+    }
+}
+
+/** A round score badge in its band colour; a "No" answer shows a calm sage 0. Decorative: the row text carries the words. */
+@Composable private fun DistressScoreChip(check: DistressCheck) {
+    val n = if (check.distress) check.score ?: 0 else 0
+    Box(Modifier.size(36.dp).background(if (check.distress) distressBand(n) else Sage, CircleShape).clearAndSetSemantics {}, contentAlignment = Alignment.Center) {
+        Text("$n", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = if (check.distress) distressOnBand(n) else Ink)
     }
 }

@@ -24,6 +24,7 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -306,9 +307,10 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
             Row(Modifier.fillMaxWidth().heightIn(min = 64.dp).padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.QrCode, null, Modifier.size(36.dp), tint = Rust); Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f)) {
-                    Text(t("Emergency card", "आपातकालीन कार्ड"), fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                    Text(t("Make a QR card the hospital can scan. You choose what goes on it.", "आप चुनें कि उसमें क्या हो।"), fontSize = 13.sp)
-                    Text(t("Web link plus an offline copy", "वेब लिंक और ऑफ़लाइन कॉपी"), fontSize = 12.sp, color = RustText)
+                    Text(t("Emergency card", "आपातकालीन कार्ड"), fontWeight = FontWeight.Bold, fontSize = 17.sp, color = Ink)
+                    Text(t("Make a QR card the hospital can scan. You choose what goes on it.", "आप चुनें कि उसमें क्या हो।"), fontSize = 14.sp, color = Ink)
+                    Spacer(Modifier.height(4.dp))
+                    Surface(color = Paper, shape = RoundedCornerShape(50)) { Text(t("Web link plus an offline copy", "वेब लिंक और ऑफ़लाइन कॉपी"), Modifier.padding(horizontal = 10.dp, vertical = 2.dp), fontSize = 14.sp, fontWeight = FontWeight.Medium, color = RustText) }
                 }
                 Icon(Icons.AutoMirrored.Filled.ArrowForward, null, Modifier.size(19.dp))
             }
@@ -317,20 +319,20 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
         val stale = ready && runCatching { card.outOfDate(source) }.getOrDefault(false)
         val shownQr = linkQr ?: qr
         val link = card.link
-        Surface(shape = RoundedCornerShape(22.dp), color = Paper, modifier = Modifier.fillMaxWidth().testTag("emergency-card")) {
-            Column(Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Surface(shape = RoundedCornerShape(20.dp), color = Paper, border = androidx.compose.foundation.BorderStroke(1.dp, DoctorHairline), modifier = Modifier.fillMaxWidth().testTag("emergency-card")) {
+            Column(Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Text(t("Emergency card", "आपातकालीन कार्ड"), fontFamily = SaharaTitleFont, fontSize = 20.sp, fontWeight = FontWeight.Medium, modifier = Modifier.fillMaxWidth().a11yHeading())
-                QrImage(shownQr, if (link != null) t("Emergency web link QR code", "आपातकालीन वेब लिंक QR कोड") else t("Emergency card offline QR code", "आपातकालीन कार्ड ऑफ़लाइन QR कोड"), Modifier.fillMaxWidth(.86f).widthIn(max = 320.dp).clickable(onClickLabel = t("Show full screen", "पूरी स्क्रीन पर दिखाएँ")) { fullScreen = true }.testTag("emergency-card-qr"))
-                Text(t("Tap the code to show it full screen", "बड़ा दिखाने के लिए छुएँ"), fontSize = 13.sp, color = DoctorCardSub, textAlign = TextAlign.Center)
-                Text(t("Card ${card.number} · ID ${card.id} · made ${cardDay(card.madeAt)}", "कार्ड ${card.number} · ID ${card.id} · बना ${cardDay(card.madeAt)}"), fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+                QrImage(shownQr, if (link != null) t("Emergency web link QR code", "आपातकालीन वेब लिंक QR कोड") else t("Emergency card offline QR code", "आपातकालीन कार्ड ऑफ़लाइन QR कोड"), Modifier.fillMaxWidth(.86f).widthIn(max = 320.dp).border(2.dp, Ink).clickable(onClickLabel = t("Show full screen", "पूरी स्क्रीन पर दिखाएँ")) { fullScreen = true }.testTag("emergency-card-qr"))
+                Text(t("Tap the code to show it full screen", "बड़ा दिखाने के लिए छुएँ"), fontSize = 14.sp, color = DoctorCardSub, textAlign = TextAlign.Center)
+                Text(t("Card ${card.number} · ID ${card.id} · made ${cardDay(card.madeAt)}", "कार्ड ${card.number} · ID ${card.id} · बना ${cardDay(card.madeAt)}"), fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Ink, textAlign = TextAlign.Center)
                 if (link != null) {
-                    Text(t("Opens a read-only web page with this card. Works until ${cardDay(link.expiresAt)}.", "स्कैन करने पर केवल पढ़ने वाला वेब पेज खुलता है।"), fontSize = 13.sp, color = RustText, textAlign = TextAlign.Center, modifier = Modifier.testTag("emergency-link-live"))
-                    linkStatus?.takeIf { it.live }?.let { s -> Text(if (s.views == 0) t("Not opened yet", "अभी तक नहीं खोला गया") else { val views = s.views; val last = s.lastViewedAt?.let { val day = cardDay(it); t(", last on $day", ", आख़िरी बार $day") }.orEmpty(); if (views == 1) t("Opened once$last", "एक बार खोला गया$last") else t("Opened $views times$last", "$views बार खोला गया$last") }, fontSize = 12.sp, color = DoctorCardSub) }
-                } else Text(t(EmergencyCardRules.OFFLINE_EN, EmergencyCardRules.OFFLINE_HI), fontSize = 13.sp, color = RustText, textAlign = TextAlign.Center)
+                    Text(t("Opens a read-only web page with this card. Works until ${cardDay(link.expiresAt)}.", "स्कैन करने पर केवल पढ़ने वाला वेब पेज खुलता है।"), fontSize = 14.sp, color = RustText, textAlign = TextAlign.Center, modifier = Modifier.testTag("emergency-link-live"))
+                    linkStatus?.takeIf { it.live }?.let { s -> Text(if (s.views == 0) t("Not opened yet", "अभी तक नहीं खोला गया") else { val views = s.views; val last = s.lastViewedAt?.let { val day = cardDay(it); t(", last on $day", ", आख़िरी बार $day") }.orEmpty(); if (views == 1) t("Opened once$last", "एक बार खोला गया$last") else t("Opened $views times$last", "$views बार खोला गया$last") }, fontSize = 14.sp, color = DoctorCardSub) }
+                } else Text(t(EmergencyCardRules.OFFLINE_EN, EmergencyCardRules.OFFLINE_HI), fontSize = 14.sp, color = RustText, textAlign = TextAlign.Center)
                 val problem = linkProblem ?: blocked?.takeIf { link == null }
-                if (linkBusy) Text(t("Checking the web link…", "वेब लिंक जाँचा जा रहा है…"), fontSize = 12.sp, color = DoctorCardSub)
-                else if (problem != null) Column(Modifier.fillMaxWidth().background(DoctorStatusWarnBg, RoundedCornerShape(12.dp)).padding(10.dp).testTag("emergency-link-problem")) {
-                    Text(t(problem.en, problem.hi), fontSize = 13.sp, color = DoctorStatusWarn)
+                if (linkBusy) Row(verticalAlignment = Alignment.CenterVertically) { CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp, color = Rust); Spacer(Modifier.width(8.dp)); Text(t("Checking the web link…", "वेब लिंक जाँचा जा रहा है…"), fontSize = 14.sp, color = DoctorCardSub) }
+                else if (problem != null) Column(Modifier.fillMaxWidth().background(DoctorStatusWarnBg, RoundedCornerShape(14.dp)).padding(12.dp).testTag("emergency-link-problem")) {
+                    Text(t(problem.en, problem.hi), fontSize = 14.sp, color = DoctorStatusWarn)
                     if (problem == EmergencyLinkProblem.OFFLINE || problem == EmergencyLinkProblem.NOT_SET_UP || problem == EmergencyLinkProblem.LINK_OFF) TextButton(onClick = {
                         scope.launch {
                             linkBusy = true
@@ -341,25 +343,25 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
                         }
                     }, enabled = !linkBusy, modifier = Modifier.heightIn(min = 48.dp)) { Text(if (problem == EmergencyLinkProblem.LINK_OFF) t("Make a new link", "नया लिंक बनाएँ") else t("Try again", "फिर कोशिश करें")) }
                 }
-                if (stale) Column(Modifier.fillMaxWidth().background(DoctorStatusWarnBg, RoundedCornerShape(12.dp)).padding(10.dp).testTag("emergency-card-stale")) {
-                    Text(t("Your records changed after this card was made. Update it so the code and the web page match.", "रिकॉर्ड बदल गए हैं, कार्ड अपडेट करें।"), fontSize = 13.sp, color = DoctorStatusWarn)
+                if (stale) Column(Modifier.fillMaxWidth().background(DoctorStatusWarnBg, RoundedCornerShape(14.dp)).padding(12.dp).testTag("emergency-card-stale")) {
+                    Text(t("Your records changed after this card was made. Update it so the code and the web page match.", "रिकॉर्ड बदल गए हैं, कार्ड अपडेट करें।"), fontSize = 14.sp, color = DoctorStatusWarn)
                     TextButton(onClick = { remake(card.sections, card) }, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp).testTag("emergency-card-update")) { Text(t("Update card", "कार्ड अपडेट करें")) }
                 }
-                if (card.leftOut.isNotEmpty()) Text(t("Not on the offline code: ", "ऑफ़लाइन कोड में नहीं: ") + card.leftOut.joinToString("; "), fontSize = 12.sp, color = DoctorCardSub, modifier = Modifier.fillMaxWidth())
+                if (card.leftOut.isNotEmpty()) Text(t("Not on the offline code: ", "ऑफ़लाइन कोड में नहीं: ") + card.leftOut.joinToString("; "), fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.fillMaxWidth())
                 source.goals?.let { g -> versions.firstOrNull { it.version == g.version && it.personId == selected } }?.takeIf { EmergencySection.GOALS in card.sections }?.let { note ->
                     OutlinedButton(onClick = { onRead(note) }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("emergency-card-note")) { Icon(Icons.Default.Description, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Read the confirmed note (v${note.version})", "नोट पढ़ें")) }
                 }
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    FilledTonalButton(onClick = { share(card) }, modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("emergency-card-share"), colors = ButtonDefaults.filledTonalButtonColors(containerColor = Gold, contentColor = Ink)) { Icon(Icons.Default.Share, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Share", "साझा करें")) }
-                    FilledTonalButton(onClick = { print(card) }, modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("emergency-card-print"), colors = ButtonDefaults.filledTonalButtonColors(containerColor = Gold, contentColor = Ink)) { Icon(Icons.Default.Print, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Print", "प्रिंट")) }
+                    Button(onClick = { share(card) }, shape = RoundedCornerShape(14.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("emergency-card-share")) { Icon(Icons.Default.Share, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Share", "साझा करें")) }
+                    OutlinedButton(onClick = { print(card) }, shape = RoundedCornerShape(14.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("emergency-card-print")) { Icon(Icons.Default.Print, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Print", "प्रिंट")) }
                 }
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedButton(onClick = { savePdf.launch("Sahara-emergency-card-${card.number}.pdf") }, modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("emergency-card-save")) { Icon(Icons.Default.FileDownload, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Save PDF", "PDF सहेजें")) }
-                    OutlinedButton(onClick = { lockFor = "" }, modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("emergency-card-lock")) { Icon(Icons.Default.Lock, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Locked PDF", "लॉक PDF")) }
+                    OutlinedButton(onClick = { savePdf.launch("Sahara-emergency-card-${card.number}.pdf") }, shape = RoundedCornerShape(14.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("emergency-card-save")) { Icon(Icons.Default.FileDownload, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Save PDF", "PDF सहेजें")) }
+                    OutlinedButton(onClick = { lockFor = "" }, shape = RoundedCornerShape(14.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("emergency-card-lock")) { Icon(Icons.Default.Lock, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Locked PDF", "लॉक PDF")) }
                 }
-                OutlinedButton(onClick = { setup = true }, enabled = !busy, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("emergency-card-replace")) { Icon(Icons.Default.Refresh, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Change what's on the card", "कार्ड बदलें")) }
+                OutlinedButton(onClick = { setup = true }, enabled = !busy, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("emergency-card-replace")) { Icon(Icons.Default.Refresh, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(t("Change what's on the card", "कार्ड बदलें")) }
                 if (link != null && blocked == null) TextButton(onClick = { confirmNewLink = true }, enabled = !linkBusy, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("emergency-link-replace")) { Text(t("Link shared by mistake? Replace the link", "लिंक बदलें"), color = RustText) }
-                if (card.replaced.isNotEmpty()) Text(t("Outdated offline codes (do not use): ", "पुराने ऑफ़लाइन कोड (इस्तेमाल न करें): ") + card.replaced.joinToString(", ") { "${t("card", "कार्ड")} ${it.number} · ID ${it.id}" }, fontSize = 12.sp, color = DoctorCardSub, modifier = Modifier.fillMaxWidth().testTag("emergency-card-outdated"))
+                if (card.replaced.isNotEmpty()) Text(t("Outdated offline codes (do not use): ", "पुराने ऑफ़लाइन कोड (इस्तेमाल न करें): ") + card.replaced.joinToString(", ") { "${t("card", "कार्ड")} ${it.number} · ID ${it.id}" }, fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.fillMaxWidth().testTag("emergency-card-outdated"))
             }
         }
         if (fullScreen) EmergencyQrFullScreen(linkQr, qr, card) { fullScreen = false }
@@ -407,14 +409,16 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
             enter = fadeIn(tween(SaharaMotion.ENTER_MS - SaharaMotion.FADE_DELAY_MS, delayMillis = SaharaMotion.FADE_DELAY_MS)) + scaleIn(tween(SaharaMotion.ENTER_MS, easing = FastOutSlowInEasing), initialScale = .88f),
             exit = fadeOut(tween(SaharaMotion.EXIT_MS, easing = FastOutSlowInEasing)) + scaleOut(tween(SaharaMotion.EXIT_MS, easing = FastOutSlowInEasing), targetScale = .94f)) {
             Column(Modifier.fillMaxSize().background(Color.White).clickable(onClickLabel = t("Close", "बंद करें")) { shown.targetState = false }.padding(20.dp).testTag("emergency-card-fullscreen"), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-                Text(t("Emergency card", "आपातकालीन कार्ड"), fontFamily = SaharaTitleFont, fontSize = 24.sp, color = Color.Black)
+                Text(t("Emergency card", "आपातकालीन कार्ड"), fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color.Black, modifier = Modifier.a11yHeading())
+                Spacer(Modifier.height(16.dp))
+                QrImage(if (offline || linkQr == null) offlineQr else linkQr, if (offline || linkQr == null) t("Emergency card offline QR code", "आपातकालीन कार्ड ऑफ़लाइन QR कोड") else t("Emergency web link QR code", "आपातकालीन वेब लिंक QR कोड"), Modifier.fillMaxWidth().widthIn(max = 480.dp).border(3.dp, Color.Black))
+                Spacer(Modifier.height(16.dp))
+                Text(t("Card ${card.number} · ID ${card.id} · made ${cardDay(card.madeAt)}", "कार्ड ${card.number} · ID ${card.id} · बना ${cardDay(card.madeAt)}"), fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.Black, textAlign = TextAlign.Center)
+                Spacer(Modifier.height(8.dp))
+                Text(if (offline || linkQr == null) t(EmergencyCardRules.OFFLINE_EN, EmergencyCardRules.OFFLINE_HI) else t("Scan to open the read-only emergency page (needs internet).", "स्कैन करके पेज खोलें।"), fontSize = 17.sp, lineHeight = 23.sp, color = Color.Black, textAlign = TextAlign.Center)
                 Spacer(Modifier.height(12.dp))
-                QrImage(if (offline || linkQr == null) offlineQr else linkQr, if (offline || linkQr == null) t("Emergency card offline QR code", "आपातकालीन कार्ड ऑफ़लाइन QR कोड") else t("Emergency web link QR code", "आपातकालीन वेब लिंक QR कोड"), Modifier.fillMaxWidth())
-                Spacer(Modifier.height(12.dp))
-                Text(t("Card ${card.number} · ID ${card.id} · made ${cardDay(card.madeAt)}", "कार्ड ${card.number} · ID ${card.id} · बना ${cardDay(card.madeAt)}"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = Color.Black)
-                Text(if (offline || linkQr == null) t(EmergencyCardRules.OFFLINE_EN, EmergencyCardRules.OFFLINE_HI) else t("Scan to open the read-only emergency page (needs internet).", "स्कैन करके पेज खोलें।"), fontSize = 14.sp, color = Color.Black, textAlign = TextAlign.Center)
-                if (linkQr != null) TextButton(onClick = { offline = !offline }, modifier = Modifier.heightIn(min = 48.dp).testTag("emergency-fullscreen-toggle")) { Text(if (offline) t("Show the web link code", "वेब लिंक कोड") else t("No internet? Show the offline code", "ऑफ़लाइन कोड"), color = RustText) }
-                Spacer(Modifier.height(8.dp)); Text(t("Tap anywhere to close", "बंद करने के लिए कहीं भी छुएँ"), fontSize = 14.sp, color = DoctorCardSub)
+                if (linkQr != null) OutlinedButton(onClick = { offline = !offline }, shape = RoundedCornerShape(14.dp), border = androidx.compose.foundation.BorderStroke(1.5.dp, RustText), modifier = Modifier.heightIn(min = 48.dp).testTag("emergency-fullscreen-toggle")) { Text(if (offline) t("Show the web link code", "वेब लिंक कोड") else t("No internet? Show the offline code", "ऑफ़लाइन कोड"), color = RustText) }
+                Spacer(Modifier.height(12.dp)); Text(t("Tap anywhere to close", "बंद करने के लिए कहीं भी छुएँ"), fontSize = 15.sp, color = DoctorCardSub)
             }
         }
     }
@@ -426,8 +430,8 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
     val sections = chosen.mapNotNull { s -> EmergencySection.entries.firstOrNull { it.name == s } }.toSet()
     val preview = remember(source, sections, previous) { if (sections.isEmpty()) null else runCatching { EmergencyCardRules.build(source, sections, (previous?.number ?: 0) + 1, "NEW", System.currentTimeMillis()) }.getOrNull() }
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Cream) {
-        LazyColumn(Modifier.fillMaxWidth().testTag("emergency-card-setup"), contentPadding = PaddingValues(start = 22.dp, end = 22.dp, bottom = 40.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            item { Heading(if (previous == null) t("Emergency card", "आपातकालीन कार्ड") else t("Change the card", "कार्ड बदलें"), 28) }
+        LazyColumn(Modifier.fillMaxWidth().testTag("emergency-card-setup"), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            item { Heading(if (previous == null) t("Emergency card", "आपातकालीन कार्ड") else t("Change the card", "कार्ड बदलें"), 26) }
             item { Text(if (blocked == null) t("The QR opens a read-only web page with what you tick below. You can replace the link if it is shared by mistake. The PDF also carries an offline code.", "QR एक केवल-पढ़ने वाला वेब पेज खोलता है।") else t(blocked.en, blocked.hi), fontWeight = FontWeight.SemiBold, color = RustText) }
             item { Text(t("Anyone who scans the code can read what you put on it. Tick only what you are happy to share.", "कोड स्कैन करने वाला इसे पढ़ सकता है। जो साझा करना ठीक लगे, वही चुनें।"), style = MaterialTheme.typography.bodyMedium) }
             item {
@@ -442,15 +446,15 @@ private fun cardDay(at: Long) = DateTimeFormatter.ofPattern("d MMM yyyy").withZo
                     CheckLine(section.name in chosen, { on -> chosen = if (on) chosen + section.name else chosen - section.name }, "${t(section.en, section.hi)}\n$detail")
                 }
             }
-            item { Text(t("Age, conditions and allergies are not recorded in Sahara, so they are not on the card. The card says so.", "उम्र, बीमारियाँ और एलर्जी ऐप में दर्ज नहीं हैं।"), style = MaterialTheme.typography.bodySmall, color = DoctorCardSub) }
-            if (previous != null) item { Text(t("The web link stays the same and shows the new card. The old offline code (card ${previous.number}, ID ${previous.id}) is marked outdated; a printed copy cannot be switched off, so tear up old copies.", "वेब लिंक वही रहेगा।"), style = MaterialTheme.typography.bodySmall) }
+            item { Text(t("Age, conditions and allergies are not recorded in Sahara, so they are not on the card. The card says so.", "उम्र, बीमारियाँ और एलर्जी ऐप में दर्ज नहीं हैं।"), fontSize = 14.sp, color = DoctorCardSub) }
+            if (previous != null) item { Text(t("The web link stays the same and shows the new card. The old offline code (card ${previous.number}, ID ${previous.id}) is marked outdated; a printed copy cannot be switched off, so tear up old copies.", "वेब लिंक वही रहेगा।"), fontSize = 14.sp, color = DoctorCardSub) }
             if (preview != null) item { SurfaceCard {
                 Text(t("What the offline code will contain", "ऑफ़लाइन कोड में क्या होगा"), fontWeight = FontWeight.Bold)
                 Spacer(Modifier.height(6.dp)); Text(preview.text, fontFamily = FontFamily.Monospace, fontSize = 12.sp, lineHeight = 16.sp, modifier = Modifier.testTag("emergency-card-preview"))
                 Spacer(Modifier.height(6.dp)); Text(t("${EmergencyCardRules.bytes(preview.text)} of ${EmergencyCardRules.MAX_BYTES} bytes used", "${EmergencyCardRules.MAX_BYTES} में से ${EmergencyCardRules.bytes(preview.text)} बाइट"), style = MaterialTheme.typography.labelSmall, color = DoctorCardSub)
                 if (preview.leftOut.isNotEmpty()) Text(t("Left out: ", "छोड़ा गया: ") + preview.leftOut.joinToString("; "), style = MaterialTheme.typography.bodySmall, color = RustText)
             } }
-            item { Button(onClick = { onMake(sections) }, enabled = ready && preview != null, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("emergency-card-make")) { Text(if (!ready) t("Loading records…", "लोड हो रहा है…") else if (sections.isEmpty()) t("Choose what to include", "क्या शामिल करें चुनें") else if (previous == null) t("Make card", "कार्ड बनाएँ") else t("Save new card", "नया कार्ड सहेजें")) } }
+            item { Button(onClick = { onMake(sections) }, enabled = ready && preview != null, shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("emergency-card-make")) { Text(if (!ready) t("Loading records…", "लोड हो रहा है…") else if (sections.isEmpty()) t("Choose what to include", "क्या शामिल करें चुनें") else if (previous == null) t("Make card", "कार्ड बनाएँ") else t("Save new card", "नया कार्ड सहेजें")) } }
         }
     }
 }

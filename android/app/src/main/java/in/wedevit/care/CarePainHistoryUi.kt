@@ -2,6 +2,12 @@
 package `in`.wedevit.care
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -45,35 +51,36 @@ object PainHistoryRules {
     val index = history.indexOfFirst { it.first.id == selected }
     // Tapping a body-part tile zooms the model and shows that part's own dated trend below it.
     var part by rememberSaveable(personId) { mutableStateOf<String?>(null) }
-    Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(20.dp).testTag("pain-history"), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+    Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp).padding(bottom = 24.dp).testTag("pain-history"), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Heading(t("Past pain on the body", "पहले का दर्द शरीर पर"), 27)
         if (index < 0) ChartEmpty(hindi, "pain-history") else {
             val note = history[index].second
-            Text(t("Which entry?", "कौन-सा नोट?"), fontWeight = FontWeight.SemiBold)
+            Text(t("Which entry?", "कौन-सा नोट?"), fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk)
             LazyRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(history, key = { it.first.id }) { (item, value) ->
-                    FilterChip(selected == item.id, { preferred = item.id }, label = { Text("${friendlyWhen(value.observedDate, value.observedTime, hindi)} · ${SymptomDiaryRules.ratingLabel(value.rating, hindi)}") }, modifier = Modifier.heightIn(min = 48.dp).testTag("pain-history-entry-${item.id}"))
+                    FilterChip(selected == item.id, { preferred = item.id }, label = { Text("${friendlyWhen(value.observedDate, value.observedTime, hindi)} · ${SymptomDiaryRules.ratingLabel(value.rating, hindi)}", fontSize = 14.sp) }, shape = CircleShape,
+                        colors = FilterChipDefaults.filterChipColors(containerColor = Paper, labelColor = DoctorCardInk, selectedContainerColor = Mint, selectedLabelColor = DoctorCardInk), modifier = Modifier.heightIn(min = 48.dp).testTag("pain-history-entry-${item.id}"))
                 }
             }
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedButton(onClick = { preferred = history[index + 1].first.id }, enabled = index < history.lastIndex, modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("pain-history-older")) { Text(t("Older", "पुराना")) }
-                OutlinedButton(onClick = { preferred = history[index - 1].first.id }, enabled = index > 0, modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("pain-history-newer")) { Text(t("Newer", "नया")) }
+                OutlinedButton(onClick = { preferred = history[index + 1].first.id }, enabled = index < history.lastIndex, shape = RoundedCornerShape(14.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("pain-history-older")) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null, Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t("Older", "पुराना")) }
+                OutlinedButton(onClick = { preferred = history[index - 1].first.id }, enabled = index > 0, shape = RoundedCornerShape(14.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("pain-history-newer")) { Text(t("Newer", "नया")); Spacer(Modifier.width(8.dp)); Icon(Icons.AutoMirrored.Filled.ArrowForward, null, Modifier.size(18.dp)) }
             }
-            Text("${friendlyWhen(note.observedDate, note.observedTime, hindi)} · ${SymptomDiaryRules.ratingLabel(note.rating, hindi)}${note.rating?.let { " · ${ChartBands.word(it, hindi)}" }.orEmpty()}", fontWeight = FontWeight.SemiBold, modifier = Modifier.testTag("pain-history-observation"))
-            Text("${SymptomDiaryRules.label(SymptomDiaryRules.recalls, note.recall, hindi)} · ${SymptomDiaryRules.label(SymptomDiaryRules.respondents, note.respondent, hindi)} · ${note.author}", style = MaterialTheme.typography.bodySmall, modifier = Modifier.testTag("pain-history-context"))
+            Text("${friendlyWhen(note.observedDate, note.observedTime, hindi)} · ${SymptomDiaryRules.ratingLabel(note.rating, hindi)}${note.rating?.let { " · ${ChartBands.word(it, hindi)}" }.orEmpty()}", fontSize = 17.sp, fontWeight = FontWeight.SemiBold, color = DoctorCardInk, modifier = Modifier.testTag("pain-history-observation"))
+            Text("${SymptomDiaryRules.label(SymptomDiaryRules.recalls, note.recall, hindi)} · ${SymptomDiaryRules.label(SymptomDiaryRules.respondents, note.respondent, hindi)} · ${note.author}", fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.testTag("pain-history-context"))
             when (PainHistoryRules.locationKind(note)) {
-                "points" -> Text(if (note.painBodyRatings.isNotEmpty()) t("Dots show where it hurt. Each colour shows how strong.", "बिंदु दिखाते हैं कहाँ दर्द था। रंग दिखाता है कितना तेज़।") else t("Dots show where it hurt. Colour shows how strong.", "बिंदु दिखाते हैं कहाँ दर्द था। रंग दिखाता है कितना तेज़।"), style = MaterialTheme.typography.bodySmall)
-                "regions" -> Text(t("Shaded parts show where it hurt.", "रंगे हुए हिस्से दिखाते हैं कहाँ दर्द था।"), style = MaterialTheme.typography.bodySmall)
-                "text" -> Text(t("The place was written in words, not marked on the body.", "जगह शब्दों में लिखी थी, शरीर पर नहीं दिखाई गई।"), style = MaterialTheme.typography.bodySmall)
-                "unsupported-model" -> Text(t("This body picture can't be shown here. The note is still saved.", "यह शरीर की तस्वीर यहाँ नहीं दिख सकती। नोट सुरक्षित है।"), style = MaterialTheme.typography.bodySmall)
-                else -> Text(t("No place on the body was marked for this entry.", "इस नोट में शरीर पर दर्द की जगह नहीं बताई थी।"), style = MaterialTheme.typography.bodySmall)
+                "points" -> Text(if (note.painBodyRatings.isNotEmpty()) t("Dots show where it hurt. Each colour shows how strong.", "बिंदु दिखाते हैं कहाँ दर्द था। रंग दिखाता है कितना तेज़।") else t("Dots show where it hurt. Colour shows how strong.", "बिंदु दिखाते हैं कहाँ दर्द था। रंग दिखाता है कितना तेज़।"), fontSize = 14.sp, color = DoctorCardSub)
+                "regions" -> Text(t("Shaded parts show where it hurt.", "रंगे हुए हिस्से दिखाते हैं कहाँ दर्द था।"), fontSize = 14.sp, color = DoctorCardSub)
+                "text" -> Text(t("The place was written in words, not marked on the body.", "जगह शब्दों में लिखी थी, शरीर पर नहीं दिखाई गई।"), fontSize = 14.sp, color = DoctorCardSub)
+                "unsupported-model" -> Text(t("This body picture can't be shown here. The note is still saved.", "यह शरीर की तस्वीर यहाँ नहीं दिख सकती। नोट सुरक्षित है।"), fontSize = 14.sp, color = DoctorCardSub)
+                else -> Text(t("No place on the body was marked for this entry.", "इस नोट में शरीर पर दर्द की जगह नहीं बताई थी।"), fontSize = 14.sp, color = DoctorCardSub)
             }
             if (note.painLocation.isNotBlank()) Text(note.painLocation, modifier = Modifier.testTag("pain-history-location"))
             if (PainHistoryRules.locationKind(note) != "unsupported-model") CarePainBodyMap(note.painBodySites, note.painBodyPoints, note.rating, hindi, readOnly = true, ratings = note.painBodyRatings, onFocus = { part = it }) { _, _ -> }
-            part?.let { SymptomPartTrend(entries, personId, it, hindi) } ?: Text(t("Tap a body part to see its pain day by day.", "किसी हिस्से को छुएँ, उसका रोज़ का दर्द दिखेगा।"), style = MaterialTheme.typography.bodySmall, modifier = Modifier.testTag("pain-part-trend-hint"))
-            if (note.startedOn.isNotBlank()) Text("${t("Started", "शुरू हुआ")}: ${note.startedOn}", style = MaterialTheme.typography.bodySmall)
-            if (note.painTriggers.isNotEmpty()) Text(note.painTriggers.joinToString { SymptomDiaryRules.label(SymptomDiaryRules.triggers, it, hindi) }, style = MaterialTheme.typography.bodySmall)
-            if (note.note.isNotBlank()) Text(note.note)
+            part?.let { SymptomPartTrend(entries, personId, it, hindi) } ?: Text(t("Tap a body part to see its pain day by day.", "किसी हिस्से को छुएँ, उसका रोज़ का दर्द दिखेगा।"), fontSize = 14.sp, color = DoctorCardSub, modifier = Modifier.testTag("pain-part-trend-hint"))
+            if (note.startedOn.isNotBlank()) Text("${t("Started", "शुरू हुआ")}: ${note.startedOn}", fontSize = 14.sp, color = DoctorCardSub)
+            if (note.painTriggers.isNotEmpty()) Text(note.painTriggers.joinToString { SymptomDiaryRules.label(SymptomDiaryRules.triggers, it, hindi) }, fontSize = 14.sp, color = DoctorCardSub)
+            if (note.note.isNotBlank()) Text(note.note, fontSize = 16.sp, color = DoctorCardInk)
         }
         TextButton(onClick = onClose, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("pain-history-close")) { Text(t("Close", "बंद करें")) }
     }

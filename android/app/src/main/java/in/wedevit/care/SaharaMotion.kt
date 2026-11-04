@@ -56,6 +56,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
 import androidx.activity.OnBackPressedDispatcher
 import androidx.activity.OnBackPressedDispatcherOwner
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
@@ -288,11 +294,13 @@ fun Modifier.saharaContentSize(): Modifier = animateContentSize(SaharaMotion.twe
 /** Shared empty / dead-end state: what is missing, and the one thing to do next. */
 @Composable fun SaharaEmpty(title: String, detail: String? = null, modifier: Modifier = Modifier, icon: ImageVector? = null,
     actionLabel: String? = null, onAction: (() -> Unit)? = null, secondaryLabel: String? = null, onSecondary: (() -> Unit)? = null) {
-    Column(modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 32.dp).testTag("sahara-empty"), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        if (icon != null) Icon(icon, null, Modifier.size(36.dp), tint = Rust)
-        Text(title, fontFamily = SaharaTitleFont, fontSize = 20.sp, textAlign = TextAlign.Center)
-        if (detail != null) Text(detail, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
-        if (actionLabel != null && onAction != null) TextButton(onClick = onAction, modifier = Modifier.heightIn(min = 48.dp)) { Text(actionLabel) }
-        if (secondaryLabel != null && onSecondary != null) TextButton(onClick = onSecondary, modifier = Modifier.heightIn(min = 48.dp)) { Text(secondaryLabel) }
+    Column(modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 32.dp).testTag("sahara-empty"), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        // Icon in a soft circle, one line, then the one thing to do (outlined) and an optional quieter way out.
+        if (icon != null) Box(Modifier.size(64.dp).clip(CircleShape).background(SaharaApricot), contentAlignment = Alignment.Center) { Icon(icon, null, Modifier.size(30.dp), tint = RustText) }
+        Text(title, fontFamily = SaharaTitleFont, fontSize = 20.sp, lineHeight = 26.sp, color = Ink, textAlign = TextAlign.Center)
+        if (detail != null) Text(detail, fontSize = 16.sp, lineHeight = 22.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
+        if (actionLabel != null && onAction != null) OutlinedButton(onClick = onAction, shape = RoundedCornerShape(14.dp), border = BorderStroke(1.dp, Rust.copy(alpha = .6f)),
+            colors = ButtonDefaults.outlinedButtonColors(containerColor = Paper, contentColor = RustText), modifier = Modifier.heightIn(min = 48.dp)) { Text(actionLabel) }
+        if (secondaryLabel != null && onSecondary != null) TextButton(onClick = onSecondary, modifier = Modifier.heightIn(min = 48.dp), colors = ButtonDefaults.textButtonColors(contentColor = RustText)) { Text(secondaryLabel) }
     }
 }

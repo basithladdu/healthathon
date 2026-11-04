@@ -12,10 +12,10 @@ export function CareDirectory({ centres = CARE_CENTRES, selectedId, locatingId, 
 }): React.JSX.Element {
   return <div className="care-directory care-directory-map-list">
     {centres.map((centre) => <article key={centre.id} className={`care-centre${selectedId === centre.id ? ' is-selected' : ''}`}>
-      <p className="care-centre-city">{pinNumbers?.[centre.id] && <span className="care-centre-pin-number" aria-label={`Map marker ${pinNumbers[centre.id]}`}>{pinNumbers[centre.id]}</span>}{centre.city} · {centre.state}{distances?.[centre.id] !== undefined && <span className="care-centre-distance">{distances[centre.id].toFixed(1)} km straight-line</span>}</p>
+      <p className="care-centre-city">{pinNumbers?.[centre.id] && <span className="care-centre-pin-number" aria-label={`Map marker ${pinNumbers[centre.id]}`}>{pinNumbers[centre.id]}</span>}{centre.city} · {centre.state}{distances?.[centre.id] !== undefined && <span className="care-centre-distance" aria-label={`${distances[centre.id].toFixed(1)} km straight-line`}>{distances[centre.id].toFixed(1)} km</span>}</p>
       <h3>{onSelect && (!pinNumbers || pinNumbers[centre.id]) ? <button type="button" className="care-centre-select" aria-pressed={selectedId === centre.id} onClick={() => onSelect(centre)}>{centre.name}<span aria-hidden="true">↗</span></button> : centre.name}</h3>
       <p className="care-centre-services">{centre.services.length ? centre.services.join(' · ') : 'Call for available services'}</p>
-      {centre.morphine && <p className={`care-centre-morphine is-${centre.morphine}`}>Morphine: {centre.morphine === 'available' ? 'Listed by Pallium' : centre.morphine === 'unavailable' ? 'Listed as unavailable' : 'Not listed'}<span>Call to confirm oral morphine and current stock.</span></p>}
+      {centre.morphine && <p className={`care-centre-morphine is-${centre.morphine}`}><span className="care-centre-chip">Morphine: {centre.morphine === 'available' ? 'Listed by Pallium' : centre.morphine === 'unavailable' ? 'Listed as unavailable' : 'Not listed'}</span><span>Call to confirm oral morphine and current stock.</span></p>}
       {centre.morphineNote && <p className="care-directory-note">{centre.morphineNote}</p>}
       <address>{centre.address}</address>
       {centre.phoneNote && <p className="care-directory-note">{centre.phoneNote}</p>}

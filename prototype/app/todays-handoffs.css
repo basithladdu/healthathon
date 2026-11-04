@@ -21,7 +21,7 @@
 }
 
 .th-note {
-  font-size: 12.5px;
+  font-size: 14px;
   color: var(--bp-muted, #4d6259);
   margin-top: 4px;
 }
@@ -34,7 +34,7 @@
 }
 
 .th-count {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--bp-muted, #4d6259);
 }
 
@@ -55,7 +55,7 @@
 
 .th-empty {
   margin: 14px 0 0;
-  font-size: 13.5px;
+  font-size: 14px;
   color: var(--bp-muted, #4d6259);
 }
 
@@ -143,7 +143,7 @@
   background: var(--bp-ice, #e6f2ec);
   color: var(--bp-primary, #0c5c3f);
   font-family: var(--font-display, 'Sora', system-ui, sans-serif);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -157,18 +157,18 @@
 }
 
 .th-id {
-  font-size: 12px;
+  font-size: 14px;
   color: var(--bp-muted, #4d6259);
 }
 
 .th-task > div:first-child {
-  font-size: 13.5px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--bp-ink, #0a2118);
 }
 
 .th-last-update {
-  font-size: 12.5px;
+  font-size: 14px;
   color: var(--bp-muted, #4d6259);
   margin-top: 2px;
 }
@@ -181,13 +181,13 @@
 }
 
 .th-due {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--bp-ink, #0a2118);
 }
 
 .th-next-appt {
-  font-size: 12px;
+  font-size: 14px;
   color: var(--bp-muted, #4d6259);
 }
 
@@ -199,7 +199,7 @@
 }
 
 .th-owner-label {
-  font-size: 11px;
+  font-size: 14px;
   text-transform: uppercase;
   letter-spacing: 0.4px;
   color: var(--bp-muted, #4d6259);
@@ -220,7 +220,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 650;
   border-radius: 999px;
   padding: 4px 10px;
@@ -256,7 +256,7 @@
   border: none;
   padding: 0;
   color: var(--bp-primary, #0c5c3f);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   margin-top: 10px;
   cursor: pointer;
@@ -272,7 +272,7 @@
 }
 
 .th-footnote {
-  font-size: 12px;
+  font-size: 14px;
   color: var(--bp-muted, #4d6259);
   margin-top: 12px;
 }

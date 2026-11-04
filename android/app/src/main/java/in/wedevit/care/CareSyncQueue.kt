@@ -2,6 +2,11 @@ package `in`.wedevit.care
 
 import android.content.Context
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CloudUpload
+import androidx.compose.material.icons.filled.ErrorOutline
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -10,7 +15,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.room.*
 import androidx.room.withTransaction
 import kotlinx.coroutines.CancellationException
@@ -304,13 +314,17 @@ internal suspend fun CareCloud.removeCareContactOnce(contact: CareContact) {
 /** Small, calm line above the tab bar while signed-in changes are still on the phone. */
 @Composable fun CareSyncStatusLine(waiting: Int, kept: Int, busy: Boolean, onSend: () -> Unit, modifier: Modifier = Modifier) {
     if (waiting + kept == 0) return
-    Surface(modifier.fillMaxWidth().testTag("care-sync-status"), color = SaharaSoftBlue) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Column(Modifier.weight(1f).padding(horizontal = 12.dp, vertical = 8.dp)) {
-                if (waiting > 0) Text(CareSyncText.waiting(waiting), style = MaterialTheme.typography.bodySmall)
-                if (kept > 0) Text(CareSyncText.kept(kept), style = MaterialTheme.typography.bodySmall)
+    Surface(modifier.fillMaxWidth().testTag("care-sync-status").semantics { liveRegion = LiveRegionMode.Polite }, color = SaharaSoftBlue) {
+        Row(Modifier.padding(start = 16.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+            // Icon carries the state: a spinner while sending, a warning when some were kept back, a cloud while waiting.
+            if (busy) CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp, color = Rust)
+            else Icon(if (kept > 0) Icons.Default.ErrorOutline else Icons.Default.CloudUpload, null, Modifier.size(20.dp), tint = if (kept > 0) RustText else DoctorCardSub)
+            Spacer(Modifier.width(12.dp))
+            Column(Modifier.weight(1f).padding(vertical = 8.dp)) {
+                if (waiting > 0) Text(CareSyncText.waiting(waiting), fontSize = 14.sp, color = DoctorCardInk)
+                if (kept > 0) Text(CareSyncText.kept(kept), fontSize = 14.sp, color = RustText, fontWeight = FontWeight.Medium)
             }
-            TextButton(onClick = onSend, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text(CareSyncText.SEND_NOW) }
+            TextButton(onClick = onSend, enabled = !busy, modifier = Modifier.heightIn(min = 48.dp)) { Text(CareSyncText.SEND_NOW, color = if (busy) DoctorCardFaint else RustText, fontWeight = FontWeight.SemiBold) }
         }
     }
 }

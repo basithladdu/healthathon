@@ -1,13 +1,17 @@
-/* Sunset palette, scoped to the family workspace and its sign-in screen. */
-.simple-care-app,
-.care-sign-in {
+/* Sunset palette and shared design tokens. Defined on :root so every Sahara page (landing,
+   loading, public care finder) can use them; the family workspace and sign-in also apply them. */
+:root {
   --care-ink: #382e29;
-  --care-muted: #76675d;
+  --care-muted: #6f6056;
   --care-canvas: #fff8ee;
   --care-surface: #fffdf9;
+  --care-surface-2: #fbf3e8;
   --care-line: #e6ddd1;
+  --care-line-strong: #cbbcad;
   --care-primary: #b9472c;
   --care-primary-hover: #923522;
+  --care-primary-soft: #fbe6dc;
+  --care-on-primary: #fffaf5;
   --care-peach: #ffd1b3;
   --care-marigold: #ffcf5c;
   --care-honey: #ffe69f;
@@ -15,101 +19,294 @@
   --care-sage-ink: #465e45;
   --care-lavender: #ddc8ff;
   --care-lavender-ink: #655278;
+  --care-danger: #a3271f;
+  --care-danger-soft: #fdeceb;
+  --care-focus: #8a4a26;
   --care-shadow: 0 5px 20px #664b3010;
-  color: var(--care-ink);
-  background: var(--care-canvas);
-  font-family: var(--font-inter), sans-serif;
+  --care-shadow-raised: 0 10px 30px #664b301f;
+
+  /* Spacing scale: 4, 8, 12, 16, 20, 24, 32. */
+  --care-space-1: 4px;
+  --care-space-2: 8px;
+  --care-space-3: 12px;
+  --care-space-4: 16px;
+  --care-space-5: 20px;
+  --care-space-6: 24px;
+  --care-space-7: 32px;
+
+  /* Radius: cards 20, buttons and inputs 14, chips fully rounded. */
+  --care-radius-card: 20px;
+  --care-radius-control: 14px;
+  --care-radius-pill: 999px;
+
+  /* Type scale. Body never below 16, secondary never below 14. */
+  --care-text-sm: 14px;
+  --care-text-md: 16px;
+  --care-text-lg: 18px;
+  --care-text-xl: 22px;
+  --care-font-display: Georgia, 'Times New Roman', serif;
+  --care-font-ui: var(--font-inter), 'Noto Sans', sans-serif;
+  --care-control-height: 48px;
 }
 
-.simple-care-app .simple-care-header { min-height: 80px; gap: 16px; }
+.simple-care-app,
+.care-sign-in {
+  color: var(--care-ink);
+  background: var(--care-canvas);
+  font-family: var(--care-font-ui);
+}
+
+.simple-care-app .simple-care-header { min-height: 76px; gap: var(--care-space-4); }
 .simple-care-app .simple-care-brand,
 .care-sign-in .care-sign-in-brand {
   color: var(--care-ink);
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family: var(--care-font-display);
   font-size: 30px;
   font-weight: 600;
   letter-spacing: -1.2px;
 }
-.simple-care-app .simple-care-switches { gap: 8px; }
+.simple-care-app .simple-care-brand-tagline { color: var(--care-muted); }
+.simple-care-app .simple-care-switches { gap: var(--care-space-2); }
 .simple-care-app .simple-care-switches > button,
 .simple-care-app .simple-care-role-trigger,
 .care-sign-in .care-sign-in-header button {
+  min-height: 44px;
+  padding: 8px 14px;
   color: var(--care-ink);
   background: var(--care-surface);
-  border-color: var(--care-line);
-  border-radius: 12px;
+  border: 1px solid var(--care-line-strong);
+  border-radius: var(--care-radius-control);
+  font-weight: 600;
 }
-.simple-care-app .simple-care-nav { gap: 6px; padding-block: 4px 12px; border-color: var(--care-line); }
+
+/* Main navigation: calm pill tabs on wide screens, a bottom bar on phones. */
+.simple-care-app .simple-care-nav { gap: var(--care-space-1); padding-block: 4px 12px; border-color: var(--care-line); }
 .simple-care-app .simple-care-nav :is(a, button) {
   min-height: 44px;
-  padding: 10px 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--care-space-2);
+  padding: 10px 16px;
   border: 0;
-  border-radius: 14px;
+  border-radius: var(--care-radius-pill);
   color: var(--care-muted);
+  font-size: 15px;
   font-weight: 600;
+  transition: background-color .16s ease, color .16s ease;
 }
 .simple-care-app .simple-care-nav :is(a, button)[aria-current='page'] {
   color: #5b391f;
   background: var(--care-marigold);
   box-shadow: 0 2px 0 #b2823b20;
 }
-.simple-care-app .simple-care-content { padding-block: 24px 18px; }
+.simple-care-app .simple-care-content { padding-block: var(--care-space-6) var(--care-space-6); }
 .simple-care-app .family-workspace,
 .simple-care-app .family-care-tools { color: var(--care-ink); }
+
+/* Type scale: one clear title per screen, quieter section titles. */
 .simple-care-app .simple-care-content h1 {
   color: var(--care-ink);
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: clamp(30px, 3.1vw, 40px);
+  font-family: var(--care-font-display);
+  font-size: clamp(28px, 3.1vw, 38px);
   font-weight: 500;
   line-height: 1.15;
-  letter-spacing: -1.3px;
+  letter-spacing: -1px;
+  text-wrap: balance;
 }
 .simple-care-app .simple-care-content :where(h2) {
   color: var(--care-ink);
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: 24px;
+  font-family: var(--care-font-display);
+  font-size: var(--care-text-xl);
   font-weight: 500;
   line-height: 1.25;
-  letter-spacing: -.4px;
+  letter-spacing: -.3px;
 }
-.simple-care-app .family-workspace-heading { margin-bottom: 14px; }
+.simple-care-app .simple-care-content :where(h3) { color: var(--care-ink); font-size: var(--care-text-lg); font-weight: 600; line-height: 1.35; }
+.simple-care-app .simple-care-content :where(p, li, dd) { line-height: 1.55; }
+.simple-care-app .family-workspace-heading { flex-wrap: wrap; gap: var(--care-space-3); margin-bottom: var(--care-space-4); }
+.simple-care-app .family-workspace-heading > :where(h1) { margin-block: 0; }
+.simple-care-app .family-section-heading { flex-wrap: wrap; gap: var(--care-space-2) var(--care-space-3); }
+.simple-care-app .family-section-heading :where(h2, h3) { margin-block: 0; }
 .simple-care-app .family-next-visit-line {
   gap: 4px 14px;
-  margin: 0 0 18px;
+  margin: 0 0 var(--care-space-4);
   color: var(--care-muted);
 }
 .simple-care-app .simple-care-footer { border-color: var(--care-line); color: var(--care-muted); }
+
+/* Buttons: one filled Rust primary, outlined secondary, text tertiary. All at least 48px tall. */
+.simple-care-app :where(.primary-button, .secondary-button) {
+  min-height: var(--care-control-height);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--care-space-2);
+  padding: 10px 20px;
+  max-width: 100%;
+  border-width: 1px;
+  border-style: solid;
+  border-radius: var(--care-radius-control);
+  font-family: var(--care-font-ui);
+  font-size: var(--care-text-md);
+  font-weight: 600;
+  line-height: 1.25;
+  text-align: center;
+  text-decoration: none;
+  white-space: normal;
+  cursor: pointer;
+}
+.simple-care-app :where(.primary-button, .secondary-button) > svg { width: 20px; height: 20px; flex: none; }
 .simple-care-app .simple-care-content .primary-button {
-  color: #fffaf5;
+  color: var(--care-on-primary);
   background: var(--care-primary);
   border-color: var(--care-primary);
-  border-radius: 12px;
+  border-radius: var(--care-radius-control);
   box-shadow: 0 2px 0 #69341f20;
 }
 .simple-care-app .simple-care-content .secondary-button {
   color: var(--care-ink);
   background: var(--care-surface);
-  border-color: var(--care-line);
-  border-radius: 12px;
+  border-color: var(--care-line-strong);
+  border-radius: var(--care-radius-control);
+  box-shadow: none;
 }
-.simple-care-app .care-text-button { color: var(--care-primary); border-radius: 10px; }
+.simple-care-app .simple-care-content :is(.primary-button, .secondary-button):disabled {
+  color: #7a6d63;
+  background: #efe7dc;
+  border-color: #e2d7ca;
+  box-shadow: none;
+  opacity: 1;
+}
+.simple-care-app .care-text-button {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 4px;
+  border: 0;
+  background: none;
+  color: var(--care-primary);
+  border-radius: 10px;
+  font-weight: 600;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
 .simple-care-app :is(button, summary, select, input:not([type='checkbox']):not([type='radio'])) { min-height: 44px; }
-.simple-care-app :is(input:not([type='checkbox']):not([type='radio']), select, textarea) {
+
+/* Inputs: labels above, 48px fields, 16px text so phones do not zoom. */
+.simple-care-app :is(input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='file']), select, textarea) {
   color: var(--care-ink);
   background-color: var(--care-surface);
-  border-color: #cfc1b3;
-  border-radius: 11px;
+  border-color: var(--care-line-strong);
+  border-radius: var(--care-radius-control);
+  font-size: var(--care-text-md);
 }
-.simple-care-app input[type='checkbox'] { accent-color: var(--care-primary); }
+.simple-care-app :is(input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='file']), select) { min-height: var(--care-control-height); }
+.simple-care-app :is(input, textarea)::placeholder { color: #85776c; opacity: 1; }
+.simple-care-app :is(input:not([type='checkbox']):not([type='radio']), select, textarea):hover:not(:disabled):not(:focus) { border-color: #b3a291; }
+.simple-care-app :is(input, select, textarea)[aria-invalid='true'] { border-color: var(--care-danger); }
+.simple-care-app :is(input[type='checkbox'], input[type='radio']) { accent-color: var(--care-primary); }
+.simple-care-app :is(input[type='checkbox'], input[type='radio']):not([class]) { width: 20px; height: 20px; }
 .simple-care-app :is(button, input, select, textarea, summary, a):focus-visible,
-.care-sign-in :is(button, input, select, summary):focus-visible {
-  outline: 3px solid #a7653d;
+.care-sign-in :is(button, input, select, summary, a):focus-visible {
+  outline: 3px solid var(--care-focus);
   outline-offset: 3px;
+  box-shadow: none;
 }
+.simple-care-app summary { cursor: pointer; }
 .simple-care-app button,
-.care-sign-in button { transition: background-color .16s ease, box-shadow .16s ease, transform .12s ease; }
+.care-sign-in button { transition: background-color .16s ease, border-color .16s ease, box-shadow .16s ease, transform .12s ease; }
 .simple-care-app button:active:not(:disabled),
 .care-sign-in button:active:not(:disabled) { transform: translateY(1px); }
+
+.simple-care-app :where(.text-button, .back-button) {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 1px solid transparent;
+  border-radius: var(--care-radius-control);
+  color: var(--care-primary);
+  background: transparent;
+  font-size: var(--care-text-md);
+  font-weight: 600;
+  cursor: pointer;
+}
+.simple-care-app :where(.back-button) { padding-inline: 4px 12px; color: var(--care-ink); }
+.simple-care-app :where(.text-button, .back-button):hover:not(:disabled) { background: var(--care-surface-2); }
+.simple-care-app :where(.danger-button, .destructive-button) { color: #fff; background: var(--care-danger); border-color: var(--care-danger); }
+
+/* Shared building blocks any Sahara page can use (all optional, all low specificity). */
+.simple-care-app :where(.care-card) {
+  padding: var(--care-space-4);
+  background: var(--care-surface);
+  border: 1px solid var(--care-line);
+  border-radius: var(--care-radius-card);
+  box-shadow: var(--care-shadow);
+}
+.simple-care-app :where(.care-card-title) { display: flex; align-items: center; gap: var(--care-space-3); min-width: 0; }
+.simple-care-app :where(.care-card-title) > :where(h2, h3, strong) { flex: 1; min-width: 0; margin: 0; }
+.simple-care-app :where(.care-stack) { display: grid; gap: var(--care-space-3); }
+.simple-care-app :where(.care-section) + :where(.care-section) { margin-top: var(--care-space-6); }
+.simple-care-app :where(.care-chip) {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 4px 12px;
+  border-radius: var(--care-radius-pill);
+  color: var(--care-ink);
+  background: var(--care-surface-2);
+  border: 1px solid var(--care-line);
+  font-size: var(--care-text-sm);
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.simple-care-app :where(.care-chip.is-good) { color: var(--care-sage-ink); background: #edf3dc; border-color: #d3e0b6; }
+.simple-care-app :where(.care-chip.is-warn) { color: #7a531c; background: #fff2cc; border-color: #f0d995; }
+.simple-care-app :where(.care-chip.is-alert) { color: var(--care-danger); background: var(--care-danger-soft); border-color: #f0c9c4; }
+.simple-care-app :where(.care-chip.is-info) { color: var(--care-lavender-ink); background: #f1ebf8; border-color: #dfd3ee; }
+.simple-care-app :where(.care-empty) {
+  display: grid;
+  justify-items: center;
+  gap: var(--care-space-2);
+  padding: var(--care-space-6) var(--care-space-4);
+  border: 1px dashed var(--care-line-strong);
+  border-radius: var(--care-radius-card);
+  color: var(--care-muted);
+  background: var(--care-surface);
+  text-align: center;
+}
+.simple-care-app :where(.care-empty) > :where(svg) { width: 40px; height: 40px; color: var(--care-primary); }
+.simple-care-app :where(.care-empty) > :where(p) { margin: 0; font-size: var(--care-text-md); }
+.simple-care-app :where(.care-inline-error, [role='alert'].care-error) {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--care-space-2) var(--care-space-3);
+  margin: var(--care-space-2) 0;
+  padding: 10px 14px;
+  border: 1px solid #f0c9c4;
+  border-radius: var(--care-radius-control);
+  color: var(--care-danger);
+  background: var(--care-danger-soft);
+  font-size: var(--care-text-sm);
+  font-weight: 600;
+}
+.simple-care-app :where(.care-muted) { color: var(--care-muted); font-size: var(--care-text-sm); }
+.simple-care-app :where(.care-divider-list) { margin: 0; padding: 0; list-style: none; }
+.simple-care-app :where(.care-divider-list) > :where(li) + :where(li) { border-top: 1px solid var(--care-line); }
+
+/* Disclosure rows ("details") read as quiet, tappable rows. */
+.simple-care-app :where(details) > :where(summary) { min-height: 44px; display: flex; align-items: center; gap: var(--care-space-2); font-weight: 600; }
+.simple-care-app :where(details) > :where(summary)::-webkit-details-marker { color: var(--care-muted); }
+
+/* Form labels sit above fields. */
+.simple-care-app :where(label) { font-size: var(--care-text-sm); font-weight: 500; color: var(--care-ink); }
+.simple-care-app :where(fieldset) { min-width: 0; }
+.simple-care-app :where(legend) { font-size: var(--care-text-sm); font-weight: 600; }
 
 /* The home tools form two balanced rows, each with a recognisable colour. */
 .simple-care-app .family-tool-buttons {
@@ -352,7 +549,7 @@
   color: var(--care-ink);
   background: var(--care-surface);
   border-color: #d9cbbc;
-  border-radius: 12px;
+  border-radius: 999px;
 }
 .simple-care-app :is(.symptom-choices, .symptom-range, .home-help-categories, .home-help-filters, .care-story-filter) button[aria-pressed='true'] {
   color: #fffaf5;
@@ -360,10 +557,10 @@
   border-color: var(--feature-ink);
 }
 .simple-care-app :is(.family-symptom-diary, .family-care-story, .family-handover-pack, .family-home-help, .family-support-places, .family-open-questions, .family-copy-tracker, .family-note-history) .primary-button {
-  color: #fffaf5;
-  background: var(--feature-ink);
-  border-color: var(--feature-ink);
-  border-radius: 12px;
+  color: var(--care-on-primary, #fff);
+  background: var(--care-primary);
+  border-color: var(--care-primary);
+  border-radius: var(--care-radius-control, 14px);
 }
 .simple-care-app :is(.family-support-places, .family-copy-tracker, .family-handover-pack) button:not(.primary-button):not(.care-text-button):not(.support-text-button) { color: var(--feature-ink); border-color: var(--feature-line); border-radius: 11px; }
 .simple-care-app :is(.home-help-card-actions .home-help-next, .support-next-step, .open-question-next, .copy-current-note, .care-story-undo, .open-question-undo) { color: var(--feature-ink); background: var(--feature-tint); border-color: var(--feature-line); border-radius: 14px; }
@@ -380,7 +577,11 @@
   .simple-care-app .family-tool-buttons > :is(a, button):hover .family-tool-icon svg { transform: rotate(-4deg) translateY(-3px); }
   .simple-care-app .family-tool-buttons > :is(a, button):hover { background: var(--tool-tint); box-shadow: 0 6px 18px #71503716; transform: translateY(-2px); }
   .simple-care-app .family-tool-buttons > :is(a, button):active { transform: translateY(1px); box-shadow: 0 1px 2px #71503710; }
-  .simple-care-app .primary-button:hover, .care-sign-in .care-sign-in-submit:hover { filter: brightness(.96); }
+  .simple-care-app .simple-care-content .primary-button:hover:not(:disabled) { background: var(--care-primary-hover); border-color: var(--care-primary-hover); }
+  .simple-care-app .simple-care-content .secondary-button:hover:not(:disabled) { background: var(--care-surface-2); border-color: #b3a291; color: var(--care-ink); }
+  .simple-care-app .care-text-button:hover:not(:disabled) { text-decoration: underline; }
+  .simple-care-app .simple-care-switches > button:hover, .simple-care-app .simple-care-role-trigger:hover { background: var(--care-surface-2); }
+  .care-sign-in .care-sign-in-submit:hover { filter: brightness(.96); }
   .simple-care-app .simple-care-nav :is(a, button):hover:not([aria-current='page']) { color: var(--care-ink); background: #f1e9dd; }
 }
 
@@ -399,20 +600,23 @@
 }
 
 @media (max-width: 700px) {
-  .simple-care-app { padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
-  .simple-care-app .simple-care-header { min-height: 76px; flex-wrap: wrap; gap: 6px 12px; padding-block: 10px; border-bottom: 1px solid var(--care-line); }
-  .simple-care-app .simple-care-brand { font-size: 27px; }
-  .simple-care-app .simple-care-switches { gap: 6px; margin-inline-start: auto; }
-  .simple-care-app .simple-care-switches > button, .simple-care-app .simple-care-role-trigger { padding: 8px 10px; font-size: 13px; }
-  .simple-care-app .simple-care-nav { position: fixed; z-index: 50; inset: auto 0 0; display: grid; width: 100%; max-width: none; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 5px; padding: 7px max(12px, env(safe-area-inset-right)) calc(7px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left)); border-top: 1px solid var(--care-line); border-bottom: 0; background: #fff8ee; box-shadow: 0 -8px 28px #5b3d2514; transform: translate3d(0, 0, 0); backface-visibility: hidden; }
-  .simple-care-app .simple-care-nav :is(a, button) { min-width: 0; min-height: 58px; padding: 6px 2px; border-radius: 14px; flex-direction: column; gap: 4px; font-size: 10px; line-height: 1; text-align: center; }
-  .simple-care-app .simple-care-nav :is(a, button)[aria-current='page'] { background: #ffe39a; box-shadow: inset 0 0 0 1px #e5b95555; }
-  .simple-care-app .simple-care-nav-icon { display: block; width: 21px; height: 21px; flex: none; }
+  .simple-care-app { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
+  .simple-care-app .simple-care-header { min-height: 64px; flex-wrap: wrap; gap: var(--care-space-2); padding-block: var(--care-space-2); border-bottom: 1px solid var(--care-line); }
+  .simple-care-app .simple-care-brand { min-width: 0; font-size: 27px; }
+  .simple-care-app .simple-care-switches { flex: none; gap: 6px; margin-inline-start: auto; }
+  .simple-care-app .simple-care-switches > button, .simple-care-app .simple-care-role-trigger { padding: 8px 12px; font-size: 14px; }
+  .simple-care-app .simple-care-nav { position: fixed; z-index: 50; inset: auto 0 0; display: grid; width: 100%; max-width: none; grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: var(--care-space-1); padding: 6px max(8px, env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left)); border-top: 1px solid var(--care-line); border-bottom: 0; background: var(--care-canvas); box-shadow: 0 -8px 28px #5b3d2514; transform: translate3d(0, 0, 0); backface-visibility: hidden; }
+  .simple-care-app .simple-care-nav :is(a, button) { min-width: 0; min-height: 60px; padding: 6px 2px; border-radius: var(--care-radius-control); flex-direction: column; justify-content: center; gap: 4px; font-size: 12px; line-height: 1.1; text-align: center; }
+  .simple-care-app .simple-care-nav :is(a, button)[aria-current='page'] { color: #5b391f; background: #ffe39a; box-shadow: inset 0 0 0 1px #e5b95555; }
+  .simple-care-app .simple-care-nav-icon { display: block; width: 22px; height: 22px; flex: none; }
+  .simple-care-app .simple-care-nav:has(> :nth-child(6)) { grid-template-columns: none; gap: 2px; }
+  .simple-care-app .simple-care-nav:has(> :nth-child(6)) :is(a, button) { font-size: 12px; }
   .simple-care-app .simple-care-nav-label { display: none; }
   .simple-care-app .simple-care-nav-short-label { display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .simple-care-app .simple-care-content { padding-top: 20px; }
-  .simple-care-app .simple-care-content h1 { font-size: 31px; letter-spacing: -.9px; }
-  .simple-care-app .simple-care-content :where(h2) { font-size: 22px; }
+  .simple-care-app .simple-care-content { padding-top: var(--care-space-5); }
+  .simple-care-app .simple-care-content h1 { font-size: 28px; letter-spacing: -.8px; }
+  .simple-care-app .simple-care-content :where(h2) { font-size: 20px; }
+  .simple-care-app .simple-care-content .family-workspace-heading > :is(.primary-button, .secondary-button) { flex: 1 1 auto; }
   .simple-care-app .care-month-heading h2 { font-size: 16px; }
   .simple-care-app .family-workspace-heading { margin-bottom: 12px; }
   .simple-care-app .family-next-visit-line { margin-bottom: 14px; }
@@ -423,8 +627,8 @@
     gap: 5px;
     min-height: 112px;
     padding: 12px;
-    border-radius: 17px;
-    font-size: 13px;
+    border-radius: 18px;
+    font-size: 14px;
   }
   .simple-care-app .family-tool-buttons > [data-tool='cancer-overview'] { grid-column: 1 / -1; min-height: 100px; grid-template-columns: 86px minmax(0, 1fr) 18px; font-size: 15px; }
   .simple-care-app .family-tool-icon { width: 60px; height: 52px; border-radius: 14px; }
@@ -432,7 +636,7 @@
   .simple-care-app .family-tool-arrow { display: none; }
   .simple-care-app [data-tool='cancer-overview'] .family-tool-arrow { display: flex; }
   .simple-care-app .family-workspace .care-home-grid { grid-template-columns: minmax(0, 1fr); gap: 14px; }
-  .simple-care-app .care-home-section { padding: 16px; border-radius: 18px; }
+  .simple-care-app .care-home-section { padding: var(--care-space-4); border-radius: var(--care-radius-card); }
   .simple-care-app .family-report-pair > div { padding: 12px; }
   .simple-care-app :is(.symptom-note, .home-help-card) { padding: 16px; }
   .simple-care-app :is(.care-story-card-heading h2, .support-place-title h2, .open-question-card h2, .copy-recipient-card h2, .copy-current-note h2, .handover-preview-heading h2) { font-size: 17px; }
@@ -442,6 +646,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .simple-care-app .family-tool-buttons > :is(a, button):hover .family-tool-icon svg { transform: none; transition: none; }
-  .simple-care-app button, .care-sign-in button { transition: none; }
+  .simple-care-app button, .care-sign-in button, .simple-care-app .simple-care-nav :is(a, button) { transition: none; }
   .simple-care-app button:active:not(:disabled), .simple-care-app .family-tool-buttons > :is(a, button):hover, .care-sign-in button:active:not(:disabled) { transform: none; }
 }

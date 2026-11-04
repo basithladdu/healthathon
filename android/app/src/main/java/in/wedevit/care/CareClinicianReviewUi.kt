@@ -1,12 +1,19 @@
 package `in`.wedevit.care
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.VerifiedUser
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 
@@ -21,15 +28,26 @@ import kotlinx.coroutines.launch
     var requests by remember(userId) { mutableStateOf<List<CareClinicianRequest>>(emptyList()) }
     var busy by remember { mutableStateOf(false) }
     var message by remember { mutableStateOf("") }
+    var loading by remember(userId) { mutableStateOf(true) }
     suspend fun load() { requests = cloud.pendingClinicianRequests() }
     LaunchedEffect(userId) {
-        try { load() } catch (cancel: CancellationException) { throw cancel } catch (e: Exception) { message = e.message ?: t("Couldn't load requests.", "अनुरोध नहीं खुल सके।") }
+        try { load() } catch (cancel: CancellationException) { throw cancel } catch (e: Exception) { message = e.message ?: t("Couldn't load requests.", "अनुरोध नहीं खुल सके।") } finally { loading = false }
     }
-    SurfaceCard(Gold) {
-        Text(t("Approve doctors · Sahara team", "डॉक्टर मंज़ूर करें · सहारा टीम"), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, modifier = Modifier.testTag("clinician-review-panel"))
-        Text(t("Check each registration on the medical council's register before deciding. You cannot approve your own account.", "फ़ैसले से पहले हर रजिस्ट्रेशन मेडिकल काउंसिल के रजिस्टर में जाँचें। आप अपना खाता मंज़ूर नहीं कर सकते।"), style = MaterialTheme.typography.bodySmall)
-        OutlinedButton(onClick = { if (!busy) { busy = true; message = ""; scope.launch { try { load() } catch (e: Exception) { if (e is CancellationException) throw e; message = e.message.orEmpty() } finally { busy = false } } } }, enabled = !busy) { Text(t("Refresh requests", "अनुरोध ताज़ा करें")) }
-        if (requests.isEmpty()) Text(t("No doctor is waiting for approval.", "कोई डॉक्टर मंज़ूरी का इंतज़ार नहीं कर रहा।"))
+    val refresh = { if (!busy) { busy = true; message = ""; scope.launch { try { load() } catch (e: Exception) { if (e is CancellationException) throw e; message = e.message.orEmpty() } finally { busy = false } } } }
+    SurfaceCard(SaharaSoftGold) {
+        // Title row: icon, title, count badge, the rule behind "?", and refresh.
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.Default.VerifiedUser, null, Modifier.size(20.dp), tint = RustText); Spacer(Modifier.width(8.dp))
+            Text(t("Approve doctors · Sahara team", "डॉक्टर मंज़ूर करें · सहारा टीम"), fontWeight = FontWeight.Medium, fontFamily = SaharaTitleFont, fontSize = 17.sp, color = DoctorCardInk, modifier = Modifier.weight(1f).a11yHeading().testTag("clinician-review-panel"))
+            if (requests.isNotEmpty()) Surface(shape = RoundedCornerShape(50), color = Paper, contentColor = RustText) { Text("${requests.size}", Modifier.padding(horizontal = 10.dp, vertical = 2.dp), fontWeight = FontWeight.Bold) }
+            CareHelpIcon(t("Approve doctors · Sahara team", "डॉक्टर मंज़ूर करें · सहारा टीम"), t("Check each registration on the medical council's register before deciding. You cannot approve your own account.", "फ़ैसले से पहले हर रजिस्ट्रेशन मेडिकल काउंसिल के रजिस्टर में जाँचें। आप अपना खाता मंज़ूर नहीं कर सकते।"))
+            IconButton(onClick = refresh, enabled = !busy, modifier = Modifier.size(48.dp)) { Icon(Icons.Default.Refresh, t("Refresh requests", "अनुरोध ताज़ा करें"), tint = DoctorCardInk) }
+        }
+        if (loading || busy && requests.isEmpty()) LinearProgressIndicator(Modifier.fillMaxWidth().padding(vertical = 8.dp), color = Rust)
+        else if (requests.isEmpty()) Row(Modifier.fillMaxWidth().padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.Default.CheckCircle, null, Modifier.size(20.dp), tint = DoctorStatusGood); Spacer(Modifier.width(8.dp))
+            Text(t("No doctor is waiting for approval.", "कोई डॉक्टर मंज़ूरी का इंतज़ार नहीं कर रहा।"), color = DoctorCardInk)
+        }
         requests.forEach { request -> key(request.userId, request.revision) {
             var evidence by remember { mutableStateOf("") }
             var note by remember { mutableStateOf("") }
@@ -45,18 +63,20 @@ import kotlinx.coroutines.launch
                     finally { busy = false }
                 }
             }
-            HorizontalDivider()
-            Text(request.name, fontWeight = FontWeight.Bold)
-            Text(t("Council: ", "काउंसिल: ") + request.council)
-            Text(t("Registration number: ", "रजिस्ट्रेशन नंबर: ") + request.registration)
+            HorizontalDivider(Modifier.padding(vertical = 8.dp), color = DoctorHairline)
+            Text(request.name, fontWeight = FontWeight.SemiBold, fontSize = 17.sp, color = DoctorCardInk)
+            Text(t("Council: ", "काउंसिल: ") + request.council, fontSize = 14.sp, color = DoctorCardSub)
+            Text(t("Registration number: ", "रजिस्ट्रेशन नंबर: ") + request.registration, fontSize = 14.sp, color = DoctorCardSub)
+            Spacer(Modifier.height(4.dp))
             CareField(evidence, { evidence = it.take(1200) }, t("Where you checked it (register name or link)", "कहाँ जाँचा (रजिस्टर का नाम या लिंक)"), singleLine = true)
             CareField(note, { note = it.take(2000) }, t("Reason, shown to the doctor", "कारण, डॉक्टर को दिखेगा"), minLines = 2)
             val valid = runCatching { ClinicianReviewRules.check("approved", evidence, note) }.isSuccess
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(onClick = { decide("approved") }, enabled = valid && !busy, modifier = Modifier.heightIn(min = 48.dp).testTag("clinician-approve-${request.userId}")) { Text(t("Approve", "मंज़ूर करें")) }
-                OutlinedButton(onClick = { decide("rejected") }, enabled = valid && !busy, modifier = Modifier.heightIn(min = 48.dp).testTag("clinician-reject-${request.userId}")) { Text(t("Don't approve", "मंज़ूर न करें")) }
+            Spacer(Modifier.height(4.dp))
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedButton(onClick = { decide("rejected") }, enabled = valid && !busy, shape = RoundedCornerShape(14.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("clinician-reject-${request.userId}")) { Text(t("Don't approve", "मंज़ूर न करें")) }
+                Button(onClick = { decide("approved") }, enabled = valid && !busy, shape = RoundedCornerShape(14.dp), modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("clinician-approve-${request.userId}")) { Text(t("Approve", "मंज़ूर करें"), fontWeight = FontWeight.SemiBold) }
             }
         } }
-        if (message.isNotBlank()) Text(message, modifier = Modifier.announce())
+        if (message.isNotBlank()) Text(message, color = DoctorCardInk, modifier = Modifier.padding(top = 8.dp).announce())
     }
 }

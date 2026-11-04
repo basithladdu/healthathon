@@ -62,13 +62,13 @@ internal fun DoctorContributionChart(checks: List<CareItem>, zone: ZoneId, now: 
     val scale = LocalDensity.current.fontScale.coerceAtLeast(1f)
     val rowHeight = (26 * scale).dp
     val labelWidth = (40 * scale).dp
-    Surface(color = Peach.copy(alpha = .4f), shape = RoundedCornerShape(22.dp)) {
-    Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        Text(monthLabel, fontFamily=SaharaTitleFont,fontSize = 19.sp, fontWeight = FontWeight.Medium)
+    Surface(color = Peach.copy(alpha = .4f), shape = RoundedCornerShape(20.dp), modifier = Modifier.fillMaxWidth()) {
+    Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(monthLabel, fontFamily=SaharaTitleFont,fontSize = 18.sp, fontWeight = FontWeight.Medium, color = DoctorCardInk)
         Row(Modifier.fillMaxWidth()) {
             Column(Modifier.width(labelWidth)) {
                 listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun").forEach {
-                    Box(Modifier.height(rowHeight), contentAlignment = Alignment.CenterStart) { Text(it, fontSize = 11.sp, lineHeight = 15.sp) }
+                    Box(Modifier.height(rowHeight), contentAlignment = Alignment.CenterStart) { Text(it, fontSize = 12.sp, lineHeight = 15.sp, color = DoctorCardSub) }
                 }
             }
             Canvas(Modifier.weight(1f).height(rowHeight * 7).testTag("doctor-condition-chart").semantics {

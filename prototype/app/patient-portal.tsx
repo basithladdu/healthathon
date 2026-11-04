@@ -230,13 +230,14 @@ export function MyCarePlan(props: {
             <button
               type="button"
               style={{
-                padding: '6px 14px',
-                fontSize: '12.5px',
+                minHeight: '44px',
+                padding: '8px 16px',
+                fontSize: '15px',
                 fontWeight: 700,
-                background: '#fef3c7',
-                color: '#92400e',
-                borderRadius: '8px',
-                border: '1px solid #fde68a',
+                background: '#ffe69f',
+                color: '#382e29',
+                borderRadius: '14px',
+                border: '1px solid #f0d27a',
                 cursor: 'pointer',
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -244,20 +245,21 @@ export function MyCarePlan(props: {
               }}
               onClick={onOpenSymptomTracker}
             >
-              <span>📊 {lang === 'hi' ? 'लक्षण ट्रैकर (ESAS)' : 'Track Symptoms (ESAS)'}</span>
+              <span>{lang === 'hi' ? 'लक्षण ट्रैकर (ESAS)' : 'Track Symptoms (ESAS)'}</span>
             </button>
           )}
 
-          <div className="ptl-lang-toggle" style={{ display: 'inline-flex', padding: '3px', background: '#eef3f0', borderRadius: '8px', border: '1px solid #cbd8d1' }}>
+          <div className="ptl-lang-toggle" style={{ display: 'inline-flex', padding: '4px', background: '#f3ebdf', borderRadius: '999px', border: '1px solid #e6ddd1' }}>
           <button
             type="button"
             style={{
-              padding: '5px 12px',
-              fontSize: '12px',
+              minHeight: '40px',
+              padding: '8px 16px',
+              fontSize: '14px',
               fontWeight: lang === 'en' ? 700 : 500,
               background: lang === 'en' ? '#ffffff' : 'transparent',
-              color: '#12201b',
-              borderRadius: '6px',
+              color: '#382e29',
+              borderRadius: '999px',
               border: 'none',
               cursor: 'pointer',
               boxShadow: lang === 'en' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
@@ -269,12 +271,13 @@ export function MyCarePlan(props: {
           <button
             type="button"
             style={{
-              padding: '5px 12px',
-              fontSize: '12px',
+              minHeight: '40px',
+              padding: '8px 16px',
+              fontSize: '14px',
               fontWeight: lang === 'hi' ? 700 : 500,
               background: lang === 'hi' ? '#ffffff' : 'transparent',
-              color: '#12201b',
-              borderRadius: '6px',
+              color: '#382e29',
+              borderRadius: '999px',
               border: 'none',
               cursor: 'pointer',
               boxShadow: lang === 'hi' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',

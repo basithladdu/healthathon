@@ -118,6 +118,7 @@ export function CareNearMe({ homeAddress }: CareNearMeProps): React.JSX.Element 
   const [morphine, setMorphine] = useState('');
   const [category, setCategory] = useState<Category>('all');
   const [mobileView, setMobileView] = useState<'map' | 'centres'>('map');
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [startText, setStartText] = useState('');
   const [origin, setOrigin] = useState<CareMapOrigin | null>(null);
   const [originMatches, setOriginMatches] = useState<SearchMatch[]>([]);
@@ -366,32 +367,51 @@ export function CareNearMe({ homeAddress }: CareNearMeProps): React.JSX.Element 
     centreRequest.current?.abort(); setSelectedId(null); setCentreMatches(null); setCentreMessage(''); setLocatingId(null);
   }
 
+  const resultCount = centres.length + visibleCommunityHospitals.length + filteredPlaces.length;
+  const activeFilterCount = [service, district, morphine].filter(Boolean).length;
+  const showFilters = filtersOpen || activeFilterCount > 0;
+  function resetFilters() {
+    clearDestination(); setQuery(''); setService(''); setDistrict(''); setMorphine(''); setCategory('all');
+  }
+
   return <section className="cnm-root" aria-label="Find care">
-    <div className="cnm-toolbar">
+    <header className="cnm-header">
       <div className="cnm-topline"><h1>Care in Karnataka</h1><div className="cnm-categories" role="group" aria-label="Type of care">
         {(['palliative', 'hospital', 'all'] as const).map((value) => <button type="button" key={value} aria-pressed={category === value} onClick={() => { clearDestination(); setCategory(value); }}>{value === 'all' ? 'All' : value === 'palliative' ? 'Palliative care' : 'Hospitals'}</button>)}
       </div></div>
+      <div className="cnm-emergency" role="note" aria-label="Emergency">
+        <span className="cnm-emergency-text"><strong>Emergency?</strong> Call now, do not travel first.</span>
+        <a className="cnm-emergency-call" href="tel:112" aria-label="Call 112 for an emergency"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1Z" /></svg>Call 112</a>
+      </div>
+    </header>
+
+    <div className="cnm-toolbar">
       <form className="cnm-start-row" onSubmit={searchOrigin}>
         <label>Starting point<input ref={startInput} value={startText} onChange={(event) => setStartText(event.target.value)} placeholder="City, area or address" autoComplete="off" /></label>
         <button type="submit" className="cnm-btn cnm-btn-secondary" disabled={findingOrigin}>Find place</button>
-        <button type="button" className="cnm-btn cnm-btn-primary" onClick={useLocation} disabled={findingOrigin}>Use my location</button>
+        <button type="button" className="cnm-btn cnm-btn-primary" onClick={useLocation} disabled={findingOrigin}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v3m0 14v3M2 12h3m14 0h3" /><circle cx="12" cy="12" r="6" /><circle cx="12" cy="12" r="2" /></svg>Use my location</button>
         {homeAddress?.trim() && <button type="button" className="cnm-btn cnm-btn-secondary" onClick={() => { setStartText(homeAddress.trim()); startInput.current?.focus(); }}>Use home address</button>}
       </form>
-      {findingOrigin && <p className="cnm-message" role="status">Finding your starting point…</p>}
+      {findingOrigin && <p className="cnm-message is-loading" role="status">Finding your starting point…</p>}
       {locationMessage && <p className="cnm-message is-error" role="alert">{locationMessage}</p>}
       {originMatches.length > 0 && <ul className="cnm-location-matches" aria-label="Choose a starting point">{originMatches.map((match) => <li key={match.id}><button type="button" onClick={() => chooseOrigin(match)}><strong>{match.label}</strong><span>{match.address}</span></button></li>)}</ul>}
-      {origin && <div className="cnm-origin-line"><span>From {origin.label}</span><button type="button" onClick={clearOrigin}>Clear starting point</button></div>}
-      <div className="cnm-search-row cnm-karnataka-filters">
-        <label>Search centres<input type="search" value={query} onChange={(event) => { clearDestination(); setQuery(event.target.value); }} placeholder="City or centre name" /></label>
+      {origin && <div className="cnm-origin-line"><span className="cnm-origin-chip"><span className="cnm-origin-dot" aria-hidden="true" />From {origin.label}</span><button type="button" onClick={clearOrigin}>Clear starting point</button></div>}
+      <div className="cnm-search-line">
+        <label className="cnm-search-label">Search centres<input type="search" value={query} onChange={(event) => { clearDestination(); setQuery(event.target.value); }} placeholder="City or centre name" /></label>
+        <button type="button" className="cnm-filter-toggle" aria-expanded={showFilters} aria-controls="cnm-more-filters" onClick={() => setFiltersOpen((open) => !open)}>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4" /></svg>Filters{activeFilterCount > 0 && <span className="cnm-filter-count" aria-label={`${activeFilterCount} active`}>{activeFilterCount}</span>}
+        </button>
+      </div>
+      {showFilters && <div id="cnm-more-filters" className="cnm-search-row cnm-karnataka-filters">
         <label>Services<select value={service} onChange={(event) => { clearDestination(); setService(event.target.value); }}><option value="">All services</option><option>Clinic visits</option><option>Home care</option><option>Inpatient care</option></select></label>
         <label>District<select value={district} onChange={(event) => { clearDestination(); setDistrict(event.target.value); }}><option value="">All districts</option>{districtOptions.map((name) => <option key={name}>{name}</option>)}</select></label>
         <label>Morphine<select value={morphine} onChange={(event) => { clearDestination(); setMorphine(event.target.value); }}><option value="">All listings</option><option value="available">Listed as available</option><option value="unavailable">Listed as unavailable</option><option value="unspecified">Not listed</option></select></label>
-      </div>
+      </div>}
     </div>
 
     <div className="cnm-view-tabs" role="group" aria-label="Find care view">
       <button type="button" aria-pressed={mobileView === 'map'} onClick={() => setMobileView('map')}>Map</button>
-      <button type="button" aria-pressed={mobileView === 'centres'} onClick={() => setMobileView('centres')}>Centres ({centres.length + visibleCommunityHospitals.length + filteredPlaces.length})</button>
+      <button type="button" aria-pressed={mobileView === 'centres'} onClick={() => setMobileView('centres')}>Centres ({resultCount})</button>
     </div>
     <div className="cnm-results" data-mobile-view={mobileView}>
       <div className="cnm-map-panel">
@@ -400,9 +420,9 @@ export function CareNearMe({ homeAddress }: CareNearMeProps): React.JSX.Element 
           <address className="cnm-selected-address">{selectedAddress || 'Address not listed'}</address>
           {centreMatches && centreMatches.matches.length > 0 && <div className="cnm-centre-matches"><p>Choose the matching map location</p>{centreMatches.matches.map((match) => <button type="button" key={match.id} onClick={() => chooseCentreMatch(centreMatches.centre, match)}><strong>{match.label}</strong><span>{match.address}</span></button>)}</div>}
           {centreMessage && <p className="cnm-message is-error">{centreMessage}</p>}
-          {locatingId && <p className="cnm-message">Finding the centre…</p>}
+          {locatingId && <p className="cnm-message is-loading">Finding the centre…</p>}
           {selectedReportGroup && <div className="cnm-report-enrichment"><strong>Community reports</strong><span>{selectedReportGroup.summary.recentCount} recent · {reportStatusLabel(selectedReportGroup.summary)}</span></div>}
-          {selectedPoint && origin && routeStatus === 'loading' && <p className="cnm-message">Finding a road route…</p>}
+          {selectedPoint && origin && routeStatus === 'loading' && <p className="cnm-message is-loading">Finding a road route…</p>}
           {route && routeStatus === 'ready' && <p className="cnm-route-summary"><strong>{(route.distance / 1000).toFixed(1)} km</strong><span>About {Math.max(1, Math.round(route.duration / 60))} min driving · no live traffic</span></p>}
           {routeStatus === 'error' && <p className="cnm-message is-error">A road route could not load. <button type="button" onClick={() => setRouteRetry((value) => value + 1)}>Try again</button></p>}
           <div className="cnm-selected-actions">{selectedPhone && <a className="cnm-call-link" href={`tel:${selectedPhone.replace(/[^+\d]/g, '')}`}>Call centre</a>}{selectedPoint ? <a className="cnm-directions-link" href={directionsUrl(selectedPoint, origin)} target="_blank" rel="noopener noreferrer">Directions ↗</a> : selectedAddress && <a className="cnm-directions-link" href={addressDirectionsUrl(selectedName ?? '', selectedAddress, origin)} target="_blank" rel="noopener noreferrer">Directions to address ↗</a>}</div>
@@ -410,11 +430,10 @@ export function CareNearMe({ homeAddress }: CareNearMeProps): React.JSX.Element 
         <PalliativeMap points={points} origin={origin} selectedId={selectedId} route={route} searchCentre={origin} onSelect={selectPoint} />
       </div>
       <div className="cnm-list" role="region" aria-label="Care centres" tabIndex={0}>
-        <div className="cnm-list-heading"><span>{centres.length + visibleCommunityHospitals.length + filteredPlaces.length} centres</span>{(query || service || district || morphine || category !== 'all') && <button type="button" onClick={() => { clearDestination(); setQuery(''); setService(''); setDistrict(''); setMorphine(''); setCategory('all'); }}>Clear filters</button>}</div>
+        <div className="cnm-list-heading"><span className="cnm-count-chip">{resultCount} centres</span>{(query || service || district || morphine || category !== 'all') && <button type="button" onClick={resetFilters}>Clear filters</button>}</div>
         <CareDirectory centres={centres} selectedId={selectedId} locatingId={locatingId} onSelect={selectCentre} pinNumbers={pinNumbers} distances={distances} />
-        <p className="cnm-message"><Link href="/reviewed-centres">Reviewed hospital updates across India ↗</Link></p>
         {visibleCommunityHospitals.length > 0 && <section className="cnm-community-hospitals" aria-labelledby="cnm-community-hospitals-title">
-          <h3 id="cnm-community-hospitals-title">Community hospitals</h3>
+          <h3 id="cnm-community-hospitals-title"><span className="cnm-kind-dot is-community" aria-hidden="true" />Community hospitals</h3>
           {visibleCommunityHospitals.map((group) => <article key={group.id} className={`cnm-community-hospital${selectedId === group.id ? ' is-selected' : ''}`}>
             <button type="button" className="cnm-community-select" aria-pressed={selectedId === group.id} onClick={() => selectPoint(group.id)}>
               <span>Community report · {group.coordinates ? 'Mapped' : 'Address only'}</span><strong>{group.name}</strong>
@@ -427,15 +446,16 @@ export function CareNearMe({ homeAddress }: CareNearMeProps): React.JSX.Element 
             </div>
           </article>)}
         </section>}
-        {filteredPlaces.length > 0 && <div className="cnm-nearby-list"><h3>Nearby map listings</h3>{filteredPlaces.map((place) => <article key={place.id} className={`cnm-place${selectedId === place.id ? ' is-selected' : ''}`}>
+        {filteredPlaces.length > 0 && <div className="cnm-nearby-list"><h3><span className="cnm-kind-dot is-openstreetmap" aria-hidden="true" />Nearby map listings</h3>{filteredPlaces.map((place) => <article key={place.id} className={`cnm-place${selectedId === place.id ? ' is-selected' : ''}`}>
           <button type="button" className="cnm-place-select" aria-pressed={selectedId === place.id} onClick={() => selectPoint(place.id)}><span>{pinNumbers[place.id] && <span className="care-centre-pin-number">{pinNumbers[place.id]}</span>}{place.category === 'palliative' ? 'Palliative care' : 'Hospital'}</span><strong>{place.name}</strong></button>
           <address>{place.address || 'Address not listed'}</address>
-          <p>{place.distanceKm.toFixed(1)} km away in a straight line</p>
+          <p><span className="cnm-distance-chip">{place.distanceKm.toFixed(1)} km</span> straight line</p>
           <div className="cnm-place-actions"><a href={directionsUrl(place, origin)} target="_blank" rel="noopener noreferrer">Directions ↗</a><a href={place.sourceUrl} target="_blank" rel="noopener noreferrer">Source ↗</a></div>
         </article>)}</div>}
-        {nearbyStatus === 'loading' && <p className="cnm-message" role="status">Finding nearby care…</p>}
+        {nearbyStatus === 'loading' && <p className="cnm-message is-loading" role="status">Finding nearby care…</p>}
         {nearbyStatus === 'error' && <p className="cnm-message is-error">Nearby search could not load. <button type="button" onClick={() => setNearbyRetry((value) => value + 1)}>Try again</button></p>}
-        {!centres.length && !visibleCommunityHospitals.length && !filteredPlaces.length && nearbyStatus !== 'loading' && <p className="cnm-empty">No matching centres. Try another name, area or service.</p>}
+        {!resultCount && nearbyStatus !== 'loading' && <div className="cnm-empty"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6" /><path d="m20 20-4.5-4.5" /></svg><p>No matching centres. Try another name, area or service.</p><button type="button" onClick={resetFilters}>Show all centres</button></div>}
+        <p className="cnm-message cnm-reviewed-link"><Link href="/reviewed-centres">Reviewed hospital updates across India ↗</Link></p>
       </div>
     </div>
     <section className="cnm-community-reports" aria-label="Community reports">

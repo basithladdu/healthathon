@@ -58,8 +58,8 @@ export function CareConversationRequestForm({ patientId, patientName, requester,
   }
 
   return <section className="care-conversation-request" aria-labelledby={`${id}-title`}>
-    <div className="care-request-head"><span className="care-request-mark" aria-hidden="true">↗</span><div><h2 id={`${id}-title`}>{t('Talk about what matters', 'जो आपके लिए मायने रखता है उस पर बात करें')}</h2></div></div>
-    <p className="care-request-intro">{t('A care conversation is a chance to say what matters to you, choose who joins, and ask your care team questions.', 'देखभाल की बातचीत में आप बता सकते हैं कि आपके लिए क्या मायने रखता है, कौन साथ आए, और अपनी देखभाल टीम से सवाल पूछ सकते हैं।')}</p>
+    <div className="care-request-head"><span className="care-request-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12Z" /><path d="M8.5 11h7M8.5 14h4" /></svg></span><div><h2 id={`${id}-title`}>{t('Talk about what matters', 'जो आपके लिए मायने रखता है उस पर बात करें')}</h2></div></div>
+    <p className="care-request-intro">{t('Say what matters, choose who joins, and ask your questions.', 'बताएँ क्या मायने रखता है, कौन साथ आए, और अपने सवाल पूछें।')}</p>
     {request && request.status !== 'cancelled' && !editing && !requestAnother ? <div className="care-request-current">
       <div className="care-request-status"><span className={`care-request-status-dot is-${request.status}`} aria-hidden="true" /><strong>{statusLabel[request.status]}</strong></div>
       {request.topics.length > 0 && <ul className="care-request-topic-list">{request.topics.map((topic) => <li key={topic}>{topic}</li>)}</ul>}
