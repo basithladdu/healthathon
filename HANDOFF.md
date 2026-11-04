@@ -4,17 +4,27 @@
 
 ## 4 Nov: 3 Nov meeting changes, goals-of-care finished (Basith, with Claude Code)
 
-Sources: `source-materials/meetings/2026-11-03-team-meeting-transcript.txt` (the 3 Nov app walkthrough with Sujay) and the team WhatsApp to 4 Nov (tubes and lines, "If" wording, faded text, side-effect list, ambulances). **None of the Android code below has been compiled**: Basith asked for no builds on his machine. Web: `npm test` 591/591, `tsc` clean. **The website and the Supabase function are not deployed**: this machine could not resolve vercel.com or supabase.co on 4 Nov.
+Sources: `source-materials/meetings/2026-11-03-team-meeting-transcript.txt` (the 3 Nov app walkthrough with Sujay), the team WhatsApp to 4 Nov (tubes and lines, "If" wording, faded text, side-effect list, ambulances), and Rituparna's legal form (`source-materials/team-context/legal-review-2026-10-31/`).
 
-**Awaiz, in this order**
-```bash
-cd android
-./gradlew :app:compileDebugKotlin
-./gradlew :app:testDebugUnitTest
-./gradlew :app:assembleDebug
-supabase functions deploy sahara-care-assist --project-ref kjnhtakqzboayqorrlue
-```
-Then deploy the website from `prototype/` with `vercel deploy --prod --yes`. For Gemini on the website, copy the Gemini key from Supabase secrets into Vercel as `SAHARA_AI_API_KEY` (and `SAHARA_AI_MODEL`); Android already has it in the Supabase function's secrets. Where to look first if compile fails: each agent's notes are summarised in the "Compile first" list below.
+**State on 5 Nov (checked):**
+- GitHub main `dca45be` and later. Android compiles; 877 unit tests pass. Web: `npm test` 594/594, `tsc` clean.
+- Website live at sahara.wedevit.in (deployed with the Vercel connector; the Vercel CLI cannot reach vercel.com from Basith's machine).
+- Phone APK (arm64 only, 107 MB) built on Basith's C: drive: `Desktop/Sahara-dev-2026-11-04b-phone.apk`. Too big for GitHub; shared by hand.
+- Goals of care: 8 taps from start to a locked note; the note is Rituparna's legal form word for word. Doctor side: helper text removed; goals of care shown in the legal form layout.
+
+**Awaiz: tasks, in order**
+1. Deploy the goals-of-care Gemini actions (Basith's machine cannot resolve supabase.co):
+   ```bash
+   cd android
+   supabase functions deploy sahara-care-assist --project-ref kjnhtakqzboayqorrlue
+   ```
+   Until this is done, Android transcribes goals-of-care recordings with Whisper on the phone, then typing.
+2. Website Gemini: in Vercel → project → Environment Variables, add `SAHARA_AI_API_KEY` (the same Gemini key as the Supabase secret) and `SAHARA_AI_MODEL` = `gemini-3.1-flash-lite`, then redeploy. Without it the website uses Whisper in the browser.
+3. Install the APK on a real phone and go through: goals-of-care recording (Gemini and on-device), speaker labels, drawn signatures, the locked PDF note; the new Today; Nearby with location; per-dose medicine ticks; the family view; text not faded on the Xiaomi.
+4. Run the phone tests on a device or emulator: `./gradlew :app:connectedDebugAndroidTest` (`CareFlowTest`, `DailyCareFlowsTest`, `CareSymptomDiaryUiTest` and the Doctor* tests were updated but never run).
+5. Record a goals-of-care talk with Dr. Sharada using the app; compare with `docs/goc-mock-conversations/`.
+
+**To build the APK yourself:** `cd android && ./gradlew :app:assembleDebug`. For a smaller phone-only APK, drop the x86, x86_64 and armeabi-v7a libraries from the APK, then zipalign and sign with the debug keystore.
 
 **Patient app (Android)**
 - Today: "Good morning, <name>" with the date; red SOS bar plus a one-tap QR card; goals-of-care card moved up; colourful Up next; "0 of 3"; side effects, journal, Care team and helper text removed; "Go to" tiles. Back now returns to the page you came from. New toasts.
@@ -37,7 +47,7 @@ Then deploy the website from `prototype/` with `vercel deploy --prod --yes`. For
 
 **Care plan wording**: "If in doubt" conditions each start with "If"; "care that always continues" now uses the 12 items of Saanthvana v1.0 §16 word for word (`source-materials/team-context/svk-specs-2026-10-29/Saanthvana_v1.0.*`).
 
-**Compile first**: `CareUi.kt` (router, Today, More), `CareComponents.kt` (toast host), `CareGocUi.kt`, `CareGocGemini.kt`, `CareSignaturePad.kt`, `CareDistress.kt` (thermometer), `DoctorPatientTabsUi.kt`, `NearbyScreen.kt`, `CareVisitsUi.kt`, `MedicineStripPhotos.kt`, `CarePlanUi.kt`. Then the phone tests: `CareFlowTest`, `DailyCareFlowsTest`, `CareSymptomDiaryUiTest` and the Doctor* navigation tests were updated without running.
+**First places to look if something breaks on a phone**: `CareUi.kt` (router, Today, More), `CareGocUi.kt`, `CareGocGemini.kt`, `CareSignaturePad.kt`, `DoctorGocForm.kt`, `NearbyScreen.kt`, `MedicineDoses.kt`.
 
 ## 2 Nov 2026: what changed since 1 Nov (Awaiz, with Claude Code)
 

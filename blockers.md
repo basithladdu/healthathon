@@ -46,23 +46,34 @@ Needs Basith:
 - [ ] Next Play upload (versionCode 9 or higher) and the Data safety form.
 - [ ] Note: the Vercel AI route `/api/sahara-assist` is no longer used by the Android app.
 
-### Sahara: from the 3 Nov meeting and WhatsApp (added 4 Nov)
+### Sahara: from the 3 Nov meeting and WhatsApp (updated 5 Nov)
+
+Done (5 Nov):
+- [x] Android compiles; 877 unit tests pass; phone APK built (`Desktop/Sahara-dev-2026-11-04b-phone.apk` on Basith's laptop).
+- [x] Website deployed to sahara.wedevit.in.
+- [x] Goals of care follows Rituparna's legal form word for word, in 8 taps; doctor side shows the same layout.
 
 **Awaiz**
-- [ ] Compile Android, fix errors, run unit tests, build the APK for the doctors: see the top of `HANDOFF.md`.
-- [ ] Deploy `sahara-care-assist` (goals-of-care Gemini) and the website. Copy the Gemini key into Vercel as `SAHARA_AI_API_KEY` for the website.
-- [ ] Test on a phone: goals-of-care recording (Gemini and on-device), speaker labels, signing, the new Today, Nearby location, per-dose medicines.
+- [ ] `supabase functions deploy sahara-care-assist --project-ref kjnhtakqzboayqorrlue` from `android/` (goals-of-care Gemini on Android).
+- [ ] Vercel env: `SAHARA_AI_API_KEY` and `SAHARA_AI_MODEL`, then redeploy (goals-of-care Gemini on the website).
+- [ ] Real-phone test of the APK: goals-of-care recording, signing and PDF; Today; Nearby location; per-dose ticks; family view; faded text on the Xiaomi.
+- [ ] `./gradlew :app:connectedDebugAndroidTest` on a device or emulator.
 
 **Team and doctors**
 - [ ] Tagline (meeting: "we'll put that on the group").
 - [ ] 6-8 minute video (organisers' email).
 - [ ] Mock goals-of-care conversations with Dr. Sharada using the app; the 8 written mocks are in `docs/goc-mock-conversations/`.
+- [ ] Legal form lines with no field in the app yet (they print "Not discussed"): the 6.1 prompts, the 5.3 boxes, "with two witnesses", the "Other" transfer reason. Decide: add fields or leave them for hand-writing.
+- [ ] "Confirm all" on the review screen also ticks the V4 understanding confirmation. Keep it, or make the doctor tick V4 separately?
+- [ ] Fluids and ambulance are not in the note. Should they be?
 - [ ] Review the machine-written Telugu, Urdu and Kannada phrase lists and translations.
-- [ ] Gemini free tier: Google may use submitted audio to improve its models. Basith chose Gemini for all recordings; a paid key avoids this before real patients.
+- [ ] Gemini free tier: Google may use submitted audio to improve its models. A paid key avoids this before real patients.
 - [ ] Decide five places where we differ from Saanthvana v1.0: hand feeding is not in §16; Goal B wording; "Family consensus" vs our "next of kin"; "CRT" vs "CRT-D"; where the "unticked means no preference" note sits.
 - [ ] Side-effect list: generic, hand-written by the team. Approve it or give a source.
 - [ ] Tubes and lines: approve the device list and daily check items (Sujay and Shirin, 3 Nov).
-- [ ] Basith: this machine cannot resolve vercel.com or supabase.co; fix DNS or use another network to deploy from here.
+
+**Basith**
+- [ ] This machine cannot resolve vercel.com or supabase.co; fix DNS or use another network to deploy from here.
 
 ### Sahara: legal review and transcript check (added 1 Nov)
 
