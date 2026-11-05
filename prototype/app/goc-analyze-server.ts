@@ -137,7 +137,7 @@ export async function analyzeGoc(lines: GocAnalyzeLine[], options: GocAnalyzeOpt
         let response: Response;
         try {
           response = await options.send(`${GEMINI_NATIVE}/models/${encodeURIComponent(model)}:generateContent`, { method: 'POST', redirect: 'error', cache: 'no-store',
-            signal: AbortSignal.timeout(Math.min(options.perAttemptMs ?? 120_000, left)), headers: { 'x-goog-api-key': slot.key, 'Content-Type': 'application/json', Accept: 'application/json' }, body });
+            signal: AbortSignal.timeout(Math.min(options.perAttemptMs ?? 60_000, left)), headers: { 'x-goog-api-key': slot.key, 'Content-Type': 'application/json', Accept: 'application/json' }, body });
         } catch (error) { console.warn('goc_analyze_fetch_failed', model, String(error).slice(0, 200)); throw new GeminiCallError(null); }
         if (!response.ok) {
           const detail = (await response.text().catch(() => '')).slice(0, 600);

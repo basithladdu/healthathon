@@ -30,7 +30,7 @@ type Json = Record<string, unknown>;
 
 export const GEMINI_UPLOAD = 'https://generativelanguage.googleapis.com/upload/v1beta/files';
 /** Tried in order. Model ids from the Gemini cookbook's audio quickstart (google-gemini/cookbook, checked 2026-11-04). */
-export const GOC_GEMINI_MODELS = [DEFAULT_MODELS.gemini, 'gemini-3.8-flash', 'gemini-2.5-flash'];
+export const GOC_GEMINI_MODELS = ['gemini-3.8-flash-lite', DEFAULT_MODELS.gemini, 'gemini-2.5-flash'];
 const MAX_UPLOAD_BYTES = 400 * 1024 * 1024;
 const UPLOAD_CHUNK = 8 * 1024 * 1024;
 const TICKET_HOURS = 6;
